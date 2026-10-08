@@ -1,0 +1,58 @@
+#!/usr/bin/env python3
+"""Calibration (not an acceptance run): one native `codex exec --json` turn through NativeStack's omniroute profile on 20128, with a per-turn X-OmniRoute-Session-Id, to see
+(a) the JSONL event types the client prints (value-free: only the type sequence, the number of command executions, and the turn.completed usage numbers),
+(b) whether the call_logs rows written for the turn (selected by that session id) carry the id, and whether the sum of their token counts equals the client's usage.
+usage: calibrate-native-json-20261006.py <shape: astra-max|two-request> [label]
+Reads only metadata columns (mode=ro). The scratch CODEX_HOME holds only the repository's omniroute profile and the documented loopback placeholder key.
+"""
+import datetime as dt
+import json
+import os
+import sqlite3
+import subprocess
+import sys
+import time
+from pathlib import Path
+
+HOME = Path.home()
+DB = str(HOME / ".local/share/omniroute/storage.sqlite")
+SCRATCH = HOME / ".cache/codex-home-omni-calibration"
+shape = sys.argv[1]
+label = sys.argv[2] if len(sys.argv) > 2 else "cal"
+prompt = "Reply with: ok" if shape == "astra-max" else "Run the shell command `echo hi`, then reply with: ok"
+SCRATCH.mkdir(parents=True, exist_ok=True)
+(SCRATCH / "config.toml").write_text("# scratch home for the calibration\n")
+(SCRATCH / "omniroute.config.toml").write_text((HOME / "code/native-agent-stack/adoption/templates/codex.omniroute.config.toml").read_text())
+env = {k: v for k, v in os.environ.items() if not k.startswith(("OPENAI", "OMNIROUTE", "ANTHROPIC", "CODEX"))}
+env.update({"CODEX_HOME": str(SCRATCH), "OMNIROUTE_API_KEY": "local-loopback"})
+tag = f"calibration-{dt.datetime.now(dt.timezone.utc).strftime('%Y%m%dT%H%M%S')}-{label}"
+cmd = ["codex", "exec", "--json", "-p", "omniroute", "--skip-git-repo-check", "--ephemeral", "-m", "cx/gpt-6-astra", "-c", 'model_reasoning_effort="max"',
+       "-c", 'model_providers.omniroute.http_headers={"X-OmniRoute-Session-Id"="%s"}' % tag, prompt]
+t0 = time.time()
+proc = subprocess.run(cmd, cwd=str(SCRATCH), env=env, stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=300)
+print(f"tag={tag} shape={shape} exit={proc.returncode} elapsed_s={time.time() - t0:.1f}")
+events, usage, commands = [], None, 0
+for line in proc.stdout.splitlines():
+    try:
+        e = json.loads(line)
+    except Exception:
+        events.append("(non-json line)")
+        continue
+    t = e.get("type")
+    item = e.get("item") or {}
+    events.append(t + (f"({item.get('type')})" if item.get("type") else ""))
+    if t == "item.completed" and item.get("type") == "command_execution":
+        commands += 1
+    if t == "turn.completed":
+        usage = e.get("usage")
+print("event types:", events)
+print("command executions completed:", commands)
+print("turn.completed usage:", usage)
+time.sleep(14)
+con = sqlite3.connect(f"file:{DB}?mode=ro", uri=True)
+rows = con.execute("select timestamp, path, status, model, requested_model, tokens_in, tokens_out, tokens_cache_read, session_tag from call_logs where session_tag = ? order by timestamp", (tag,)).fetchall()
+print("call_logs rows with the tag:", len(rows))
+for r in rows:
+    print("   ", r)
+if rows:
+    print("sum of rows: tokens_in =", sum(r[5] or 0 for r in rows), "tokens_out =", sum(r[6] or 0 for r in rows), "tokens_cache_read =", sum(r[7] or 0 for r in rows))

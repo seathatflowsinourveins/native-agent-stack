@@ -1,0 +1,42 @@
+import subprocess, sys, os
+M = os.path.expanduser("~/.cache/omniroute-upstream-mirror-20261005.git")
+R = "0585aba5589d5a1f49243a13a8db249558e7c9e3"
+old = open(sys.argv[1], encoding="utf-8").read()
+tail = open(sys.argv[3], encoding="utf-8").read()  # the per-file release/v3.8.52 comparison, produced by verify-excerpts.py
+
+def show(path):
+    return subprocess.run(["git", "--git-dir=" + M, "show", f"{R}:{path}"], capture_output=True, text=True, check=True).stdout.split("\n")
+
+def sec(path, ranges, title):
+    lines = show(path)
+    out = [f"## {path} {title}"]
+    prev = None
+    for a, b in ranges:
+        if prev is not None and a > prev + 1:
+            out.append("...")
+        for n in range(a, b + 1):
+            out.append(f"{n}: {lines[n-1]}".rstrip() if lines[n-1].strip() else f"{n}:")
+        prev = b
+    return "\n".join(out)
+
+S = "open-sse/utils/streamHandler.ts"
+parts = [
+"# Upstream OmniRoute, read at 0585aba5589d5a1f49243a13a8db249558e7c9e3 (PR 15167's head): the lines that cause and bound the dropped call_logs and usage_history rows, and the other routes to onStreamComplete (verbatim, line-numbered; read from a bare mirror of diegosouzapw/OmniRoute).\n"
+"# All 28 excerpt ranges are identical at the v3.8.51 tag c1e30b7676975feb298b49eff6ff58923c04b89e, and neither PR 15167's diff nor the affinity patch touches these eight files, so they are also the composition's content (checks/source-lines-check.txt, scripts/verify-excerpts.py.txt).\n",
+sec(S, [(326, 362)], "L326-362: the stream controller's handleDisconnect (a client that has the terminal event goes to handleComplete and never reaches onDisconnect) and handleComplete"),
+sec(S, [(383, 394)], "L383-394: handleError skips onError once the controller is disconnected"),
+sec(S, [(842, 852)], "L842-852: cancel() of the disconnect-aware stream, the code the patch changes"),
+sec(S, [(660, 690)], "L660-690: drainCompletedToolHandoff, the reference implementation the patch reuses"),
+sec(S, [(704, 717)], "L704-717: where the terminal marker is noted after the chunk is enqueued to the client"),
+sec("open-sse/utils/stream.ts", [(1340, 1356), (2510, 2512), (2872, 2873), (2993, 2996), (3160, 3161), (3214, 3216)],
+    "flush() starts at L2510 and calls onComplete at L2872 and L3160, which is the normal completion; the failure routes call it too (notifyComplete at L1354 and L2995); cancel() at L3214 only clears the idle timer"),
+sec("open-sse/utils/streamFailureBoundary.ts", [(36, 72)], "L36-72: a stream failure that asks for completion (notifyComplete) calls onComplete at L52"),
+sec("open-sse/utils/streamFailureFinalization.ts", [(56, 82), (160, 190)], "L56-82 and L160-190: the 499 grace handler that onDisconnect starts, and handleStreamFailure, which calls onStreamComplete at L173"),
+sec("open-sse/handlers/chatCore.ts", [(3085, 3115), (6025, 6026), (6088, 6089), (6112, 6113), (6174, 6175), (6281, 6291)],
+    "createStreamController wiring (L3085-3115: onDisconnect, onError, the grace period at L3113-3114); onStreamComplete (L6025) calls finalizeStreamRequestLog (L6088, finalizes the pending-request entry), recordStreamingUsageStats (L6112, the usage row) and persistAttemptLogs (L6174); the 499 grace handler (L6281-6291)"),
+sec("open-sse/handlers/chatCore/attemptLogging.ts", [(397, 397), (565, 565)], "persistAttemptLogs (L397) calls saveCallLog (L565), the call log"),
+sec("bin/cli/runtime/processSupervisor.mjs", [(22, 22), (77, 92), (99, 128), (186, 191), (207, 228)], "the serve supervisor: the child's stdio when OMNIROUTE_SHOW_LOG is not 1 (L92), the 50-line buffer (L22 CRASH_LOG_LINES, L99-107), what is printed at once (L108-127: the Android hint and a `[STARTUP] Fatal:` diagnostic), and what is printed later (dumpCrashLog L191 and L209, getRecentLog L221)"),
+sec("bin/cli/commands/serve.mjs", [(600, 604)], "L600-604: a readiness timeout reads the supervisor's buffer"),
+]
+open(sys.argv[2], "w", encoding="utf-8").write("\n\n".join(parts) + "\n\n" + tail)
+print("written", sys.argv[2])

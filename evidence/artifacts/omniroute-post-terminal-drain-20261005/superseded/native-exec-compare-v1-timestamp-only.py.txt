@@ -1,0 +1,67 @@
+#!/usr/bin/env python3
+"""Native `codex exec` turns through NativeStack's omniroute profile (20128, build with PR 15167 head f5d8e150b), then read what call_logs and usage_history recorded.
+
+The co-op's discriminator on 2604 (21128, tarball head 0585aba55): single-request native exec sessions leave no rows; in a 2-request session the first request is logged and the final one is dropped.
+This runs the same shapes here: a scratch CODEX_HOME holding only the repository's omniroute profile (adoption/templates/codex.omniroute.config.toml) and the documented loopback placeholder key; nothing in a real Codex home is touched.
+Reads only metadata columns of the gateway store (mode=ro): timestamps, path, model, status, token counts, detail state; never a credential or a body.
+usage: omniroute-native-exec-compare-20261005.py <shape>   shape = astra-max | sol-xhigh | two-request
+"""
+import os
+import sqlite3
+import subprocess
+import sys
+import time
+import datetime as dt
+from pathlib import Path
+
+HOME = Path.home()
+DB = HOME / ".local/share/omniroute/storage.sqlite"
+SCRATCH = HOME / ".cache/codex-home-omni-compare"
+TEMPLATE = Path(os.environ.get("REPO_WORKTREE", ".")) / "adoption/templates/codex.omniroute.config.toml"  # a checkout of this repository (the path of the run is masked)
+SHAPES = {
+    # the co-op's 18:14 and 18:24 shapes, then a session that needs a second request after a tool call
+    "astra-max": (["-m", "cx/gpt-6-astra", "-c", 'model_reasoning_effort="max"'], "Reply with: ok"),
+    "sol-xhigh": (["-m", "cx/gpt-6.1-sol", "-c", 'model_reasoning_effort="xhigh"'], "Reply with: ok"),
+    "two-request": (["-m", "cx/gpt-6-astra", "-c", 'model_reasoning_effort="max"'], "Run the shell command `echo hi`, then reply with: ok"),
+}
+
+
+def utc(ts=None):
+    return (ts or dt.datetime.now(dt.timezone.utc)).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
+
+
+def rows(since):
+    con = sqlite3.connect(f"file:{DB}?mode=ro", uri=True)
+    out = {}
+    out["call_logs"] = con.execute(
+        "select timestamp, path, status, model, tokens_in, tokens_out, detail_state from call_logs where timestamp >= ? order by timestamp", (since,)).fetchall()
+    out["usage_history"] = con.execute(
+        "select timestamp, model, status, tokens_input, tokens_output from usage_history where timestamp >= ? order by timestamp", (since,)).fetchall()
+    return out
+
+
+def main():
+    shape = sys.argv[1]
+    extra, prompt = SHAPES[shape]
+    SCRATCH.mkdir(parents=True, exist_ok=True)
+    (SCRATCH / "config.toml").write_text('# scratch home for the omniroute-profile comparison\n')
+    (SCRATCH / "omniroute.config.toml").write_text(TEMPLATE.read_text())
+    env = {k: v for k, v in os.environ.items() if not k.startswith(("OPENAI", "OMNIROUTE", "ANTHROPIC", "CODEX"))}
+    env.update({"CODEX_HOME": str(SCRATCH), "OMNIROUTE_API_KEY": "local-loopback"})  # the documented placeholder (docs/secret-storage.md)
+    since = utc()
+    started = time.time()
+    cmd = ["codex", "exec", "-p", "omniroute", "--skip-git-repo-check", "--ephemeral", *extra, prompt]
+    proc = subprocess.run(cmd, cwd=str(SCRATCH), env=env, capture_output=True, text=True, timeout=240)
+    finished = utc()
+    print(f"shape={shape} started={since} finished={finished} elapsed={time.time() - started:.1f}s exit={proc.returncode}")
+    print("stdout tail:", proc.stdout.strip().replace("\n", " | ")[-300:])
+    print("stderr lines:", len(proc.stderr.splitlines()), "| last:", (proc.stderr.strip().splitlines() or [""])[-1][:200])
+    time.sleep(8)  # give the gateway's asynchronous logging time to land
+    data = rows(since)
+    for table, items in data.items():
+        print(f"{table} rows since {since}: {len(items)}")
+        for r in items:
+            print("  ", r)
+
+
+main()

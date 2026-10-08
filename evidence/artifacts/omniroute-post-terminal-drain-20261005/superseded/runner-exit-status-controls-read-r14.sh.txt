@@ -1,0 +1,151 @@
+#!/bin/bash
+# Control for the exit-status enforcement of the three native test runners (full-scope read r12, P2-2): scripts/drain-prototype.sh.txt, scripts/handler-e2e.sh.txt and scripts/handler-e2e-session-tag.sh.txt.
+# usage: runner-exit-status-controls.sh <evidence folder> <drain-prototype script> <handler-e2e script> <handler-e2e-session-tag script>
+#   run once per version under test (the three scripts of one revision, e.g. extracted with `git show <commit>:<path>`); raw output goes to stdout; exit 0 when the version meets every case and the static check, 1 when it does not, 2 on a usage error.
+# Nothing here builds a tree or runs a test. From each script the control cuts, by anchors, its constants (the T*, S*, PFX, UNRELATED_FAILURE, NEWTEST and E2E lines), its helper block (from `log()` up to `step clone`) and its run() block
+# (from `FLAGS=` to run's closing brace), sources them in a subshell, and drives every stage with that version's own call lines (from `run <label>` through `expect_failing <label>`). A fixture `node` first on PATH prints a recorded
+# stage log and exits with the status the case names. The fixture logs are the committed stage logs of checks/logs/ (sha256 printed and compared with checks/logs/MANIFEST.txt); the three drain-prototype stages whose logs are
+# private (A-baseline, A2, B2) get a SYNTHETIC log in the runner's format, built from the counters and failing names recorded in checks/drain-prototype-results.txt.
+# Cases per stage; R is the stage's exit status in the progress log of checks/<script>-results.txt:
+#   R     the recorded log, exit R                                                   required: accepted   (an exit-0 stage is case (a) of the request, an exit-1 stage case (c))
+#   X42   the recorded log, exit 42: the expected counters, then a crash             required: rejected   (case (b))
+#   X124  the recorded log, exit 124: what `timeout` returns when it stops the run   required: rejected
+#   XF    the recorded log, the flipped status (0 for an exit-1 stage, 1 for an exit-0 stage)   required: rejected   (for an exit-1 stage, case (d))
+#   C     another stage's log, whose counters differ, exit 0                         required: rejected   (case (e))
+#   M     the recorded log at R, the stage's expect_counts line cut to its first four arguments (an expectation that names no exit status)   required: rejected (fail closed)
+# Static check: every expect_counts call has a fifth argument, the expected exit status, equal to the status recorded for that stage (so the recorded runs are exactly what this version accepts), and every recorded stage has one.
+set -u
+set -o pipefail
+EV=${1:?evidence folder}
+DRAIN=${2:?drain-prototype script}
+E2E_SCRIPT=${3:?handler-e2e script}
+TAG_SCRIPT=${4:?handler-e2e-session-tag script}
+for f in "$DRAIN" "$E2E_SCRIPT" "$TAG_SCRIPT" "$EV/checks/drain-prototype-results.txt" "$EV/checks/handler-e2e-results.txt" "$EV/checks/handler-e2e-session-tag-results.txt" "$EV/checks/logs/MANIFEST.txt"; do
+  [ -f "$f" ] || { echo "missing input file: $f" >&2; exit 2; }
+done
+W=$(mktemp -d "${WORK_ROOT:-$HOME/.cache}/runner-exit-status-XXXXXX") || exit 2
+mkdir -p "$W/bin" "$W/tree" "$W/fixtures"
+mask() { sed "s#$HOME#\$HOME#g"; }
+cat > "$W/bin/node" <<'NODEEOF'
+#!/bin/sh
+# fixture node: prints the stage log named by FIXTURE_LOG and exits with FIXTURE_EXIT; its arguments are ignored
+cat "$FIXTURE_LOG"
+exit "$FIXTURE_EXIT"
+NODEEOF
+chmod 755 "$W/bin/node"
+block() { # file start-regex end-regex before|through: the lines from the first match of start up to (before) or through the first LATER match of end (the regexes go through the environment: awk -v would rewrite their backslashes)
+  BLOCK_S=$2 BLOCK_E=$3 BLOCK_M=$4 awk '!on && $0 ~ ENVIRON["BLOCK_S"] { on = 1; print; next } on && $0 ~ ENVIRON["BLOCK_E"] { if (ENVIRON["BLOCK_M"] == "through") print; exit } on { print }' "$1"
+}
+recorded_exit() { # results file, label: the exit status of that stage's run line in the recorded progress log
+  grep -aE "^[0-9]{2}:[0-9]{2}:[0-9]{2}Z $2 exit=[0-9]+ tests=" "$1" | head -1 | sed -E 's/.* exit=([0-9]+) .*/\1/'
+}
+recorded_labels() { # results file: the stage labels of the recorded progress log, in order
+  grep -aE "^[0-9]{2}:[0-9]{2}:[0-9]{2}Z [A-Za-z0-9-]+ exit=[0-9]+ tests=" "$1" | awk '{print $2}'
+}
+synthetic_log() { # label: a runner-format log from the drain-prototype results table and its failing names (for the stages whose logs are private)
+  python3 - "$EV/checks/drain-prototype-results.txt" "$1" <<'PYEOF'
+import sys
+text = open(sys.argv[1], encoding="utf-8").read().split("\n")
+label = sys.argv[2]
+row = next(l for l in text if l.startswith("| " + label + " |"))
+cells = [c.strip() for c in row.strip("|").split("|")]
+_, _, tests, suites, passed, failed, cancelled, skipped, todo = cells
+names_line = next(l for l in text if l.startswith(label + ": "))
+names = [] if names_line[len(label) + 2:] == "none" else names_line[len(label) + 2:].split(" | ")
+for n in names:
+    print("✖ " + n + " (1.0ms)")
+for k, v in (("tests", tests), ("suites", suites), ("pass", passed), ("fail", failed), ("cancelled", cancelled), ("skipped", skipped), ("todo", todo), ("duration_ms", "1")):
+    print("ℹ " + k + " " + v)
+if names:
+    print("\n✖ failing tests:\n")
+    for n in names:
+        print("test at fixture:1:1\n✖ " + n + " (1.0ms)\n  synthetic fixture line\n")
+PYEOF
+}
+fixture_for() { # script-name label: prints the path of the stage's fixture log (committed, or synthetic for a private one)
+  local committed=$EV/checks/logs/$1-$2.log
+  [ "$1" = drain-prototype ] && committed=$EV/checks/logs/validation-$2.log
+  if [ -f "$committed" ]; then echo "$committed"; return; fi
+  [ "$1" = drain-prototype ] || return 1
+  synthetic_log "$2" > "$W/fixtures/synthetic-$2.log" && echo "$W/fixtures/synthetic-$2.log"
+}
+counters_of() { # log: tests/pass/fail as the runner prints them
+  printf '%s/%s/%s' "$(grep -aE '^ℹ tests ' "$1" | awk '{print $3}')" "$(grep -aE '^ℹ pass ' "$1" | awk '{print $3}')" "$(grep -aE '^ℹ fail ' "$1" | awk '{print $3}')"
+}
+TOTAL=0
+OK=0
+STATIC_BAD=0
+stage_case() { # script-name helpers stage-block case-name fixture-log fixture-exit required(accepted|rejected)
+  local o rc verdict last mark
+  o=$(mktemp -d "$W/case-XXXXXX")
+  ( export FIXTURE_LOG=$5 FIXTURE_EXIT=$6 PATH="$W/bin:$PATH"
+    T=$W/tree OUT=$o STREAM_TESTS=fixture-stream.test.ts CALLUSE_TESTS=fixture-calluse.test.ts
+    . "$2"
+    . "$3"
+    echo "STAGE ACCEPTED"
+  ) > "$o/case.txt" 2>&1; rc=$?
+  if [ $rc -eq 0 ] && grep -q '^STAGE ACCEPTED$' "$o/case.txt"; then verdict=accepted; elif [ $rc -eq 3 ]; then verdict=rejected; else verdict="error(rc=$rc)"; fi
+  last=$(grep -aE 'expectation met|EXPECTATION VIOLATED|EXIT STATUS VIOLATED|FAILING SET VIOLATED|failing tests are as expected' "$o/progress.txt" 2>/dev/null | tail -1 | cut -c1-170)
+  TOTAL=$((TOTAL + 1))
+  if [ "$verdict" = "$7" ]; then OK=$((OK + 1)); mark="as required"; else mark="NOT AS REQUIRED"; fi
+  echo "  $1 $4 log=$(basename "$5") exit=$6 -> $verdict (required: $7) $mark | last decision line: ${last:-none}"
+}
+run_script() { # script-name file results-file
+  local name=$1 file=$2 results=$3 labels label rexit flog clog other oc rc5 helpers sb args
+  echo "== $name: $(basename "$file") git blob $(git hash-object "$file") sha256 $(sha256sum "$file" | cut -d' ' -f1)"
+  helpers=$W/$name.helpers.sh
+  { grep -E '^(UNRELATED_FAILURE|T[0-9]+|S[0-9]+|PFX|NEWTEST|E2E)=' "$file"; block "$file" '^log\(\) \{' '^step clone ' before; block "$file" '^FLAGS=' '^}$' through; } > "$helpers"
+  echo "   constants, helper block (log() up to step clone) and run() block (FLAGS= to run's closing brace): $(wc -l < "$helpers" | tr -d ' ') lines, sha256 $(sha256sum "$helpers" | cut -d' ' -f1)"
+  labels=$(recorded_labels "$results")
+  echo "   recorded stages in $(basename "$results"): $(for label in $labels; do printf '%s=%s\n' "$label" "$(recorded_exit "$results" "$label")"; done | paste -sd' ')"
+  echo "   static check (every expect_counts call names the recorded exit status):"
+  for label in $labels; do
+    rexit=$(recorded_exit "$results" "$label")
+    args=$(grep -E "^expect_counts $label( |$)" "$file" | head -1)
+    if [ -z "$args" ]; then echo "     $label: NO expect_counts call"; STATIC_BAD=$((STATIC_BAD + 1)); continue; fi
+    set -- $args
+    if [ $# -lt 6 ]; then echo "     $label: '$args' names no exit status (recorded exit=$rexit): FAIL"; STATIC_BAD=$((STATIC_BAD + 1))
+    elif [ "$6" != "$rexit" ]; then echo "     $label: '$args' expects exit=$6, recorded exit=$rexit: FAIL"; STATIC_BAD=$((STATIC_BAD + 1))
+    else echo "     $label: '$args' expects exit=$6 = recorded exit=$rexit: ok"; fi
+  done
+  echo "   cases:"
+  for label in $labels; do
+    rexit=$(recorded_exit "$results" "$label")
+    flog=$(fixture_for "$name" "$label") || { echo "     $label: no fixture log"; TOTAL=$((TOTAL + 1)); continue; }
+    sb=$W/$name.$label.stage.sh
+    block "$file" "^run $label( |\$)" "^expect_failing $label( |\$)" through > "$sb"
+    stage_case "$name" "$helpers" "$sb" "$label/R" "$flog" "$rexit" accepted
+    stage_case "$name" "$helpers" "$sb" "$label/X42" "$flog" 42 rejected
+    stage_case "$name" "$helpers" "$sb" "$label/X124" "$flog" 124 rejected
+    stage_case "$name" "$helpers" "$sb" "$label/XF" "$flog" $((1 - rexit)) rejected
+    clog=""
+    for other in $labels; do
+      [ "$other" = "$label" ] && continue
+      oc=$(fixture_for "$name" "$other") || continue
+      if [ "$(counters_of "$oc")" != "$(counters_of "$flog")" ]; then clog=$oc; break; fi
+    done
+    if [ -n "$clog" ]; then stage_case "$name" "$helpers" "$sb" "$label/C($(counters_of "$clog") for $(counters_of "$flog"))" "$clog" 0 rejected; fi
+    awk -v l="$label" '$1 == "expect_counts" && $2 == l { print $1, $2, $3, $4, $5; next } { print }' "$sb" > "$sb.cut"
+    stage_case "$name" "$helpers" "$sb.cut" "$label/M" "$flog" "$rexit" rejected
+  done
+}
+echo "# runner-exit-status-controls: run $(date -u +%Y-%m-%dT%H:%M:%SZ); scratch $(echo "$W" | mask)"
+echo "== fixture logs (committed copies: sha256 compared with checks/logs/MANIFEST.txt; synthetic ones built from checks/drain-prototype-results.txt)"
+for f in "$EV"/checks/logs/*.log; do
+  b=$(basename "$f"); s=$(sha256sum "$f" | cut -d' ' -f1); m="not listed in MANIFEST"
+  if grep -qF "\`$b\` " "$EV/checks/logs/MANIFEST.txt"; then m=$(grep -F "\`$b\` " "$EV/checks/logs/MANIFEST.txt" | grep -qF "$s" && echo "equals MANIFEST retained_sha256" || echo "DIFFERS from MANIFEST"); fi
+  echo "  $b sha256 $s counters $(counters_of "$f") ($m)"
+done
+run_script drain-prototype "$DRAIN" "$EV/checks/drain-prototype-results.txt"
+for f in "$W"/fixtures/synthetic-*.log; do [ -f "$f" ] && echo "  synthetic fixture $(basename "$f"): counters $(counters_of "$f"), sha256 $(sha256sum "$f" | cut -d' ' -f1)"; done
+run_script handler-e2e "$E2E_SCRIPT" "$EV/checks/handler-e2e-results.txt"
+run_script handler-e2e-session-tag "$TAG_SCRIPT" "$EV/checks/handler-e2e-session-tag-results.txt"
+echo "== summary: cases as required $OK of $TOTAL; static check failures $STATIC_BAD"
+if [ "$OK" = "$TOTAL" ] && [ "$STATIC_BAD" = 0 ]; then
+  echo "VERDICT: this version enforces each stage's exit status beside its counts and failing names (every case and the static check as required)"
+  echo "scratch directory (remove with rm -rf after reading): $(echo "$W" | mask)"
+  exit 0
+fi
+echo "VERDICT: this version does NOT enforce the stages' exit status ($((TOTAL - OK)) case(s) not as required, $STATIC_BAD static check failure(s))"
+echo "scratch directory (remove with rm -rf after reading): $(echo "$W" | mask)"
+exit 1

@@ -1,0 +1,20 @@
+#!/bin/bash
+# The calibration series behind the native acceptance script's completeness check: native `codex exec --json` turns on the UNPATCHED 20128, each with its own X-OmniRoute-Session-Id,
+# comparing the rows stored under that id with the client's own turn.completed usage. Output (kept as checks/native-usage-calibration.txt): header, one block per turn, an end time.
+# usage: run-calibration-20261006.sh <output file>
+set -u
+P=$HOME/.local/state/native-agent-stack/coordination/peer-99-20261004
+OUTF=${1:?output file}
+cd /tmp || exit 2
+{
+  echo "# native codex exec --json calibration on the UNPATCHED NativeStack 20128 (build cf6748d04), $(date -u +%FT%TZ): script calibrate-native-json-20261006.py (sha256 $(sha256sum "$P/calibrate-native-json-20261006.py" | cut -d' ' -f1))"
+  echo "# Each block: the client's JSONL event types, the number of completed command executions, the turn.completed usage, then the call_logs rows stored under the turn's session id and their token sums."
+  for spec in "two-request twoA" "two-request twoB" "two-request twoC" "two-request twoD" "astra-max oneA" "astra-max oneB"; do
+    set -- $spec
+    echo
+    nice -n 19 python3 "$P/calibrate-native-json-20261006.py" "$1" "$2" 2>&1
+  done
+  echo
+  echo "# finished $(date -u +%FT%TZ)"
+} > "$OUTF"
+echo "written $OUTF"

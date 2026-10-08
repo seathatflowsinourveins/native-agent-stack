@@ -1,0 +1,6 @@
+# Control for the pinned test file of scripts/handler-e2e.sh.txt (2026-10-06 UTC): the script run with a DRAIN_DIR whose handler-e2e-terminal-close.test.ts has one extra comment line.
+# Expected: it reports that the file is not the pinned one and stops with exit 2 before it creates anything. Observed (output with $HOME masked, then the exit code):
+
+handler-e2e-terminal-close.test.ts is not the pinned file (sha256 9ab6eae294a2b6912e5c2132f3210b34c1e1d08a90b4864d228c80fb3c69f190)
+exit=2
+omniroute-handler-e2e-* work directories before the run: 3, after: 3

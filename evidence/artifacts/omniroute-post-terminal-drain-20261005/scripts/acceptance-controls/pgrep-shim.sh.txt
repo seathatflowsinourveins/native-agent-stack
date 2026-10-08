@@ -1,0 +1,10 @@
+#!/bin/sh
+# Control FIXTURE only (put first on PATH, as an executable named pgrep, for the offline controls of version 1's native script; never for a live run): a stand-in for pgrep that answers "no match" (exit status 1, no output) for the one query the native scripts use to count
+# the workers of OTHER lanes (`pgrep -af "omniroute-codex-sdk/worker.py|codex exec"`), and passes every other call through to the real pgrep.
+# Why: version 1's quiet check turns a run into INCONCLUSIVE whenever any such process exists on the host, and the "defect demonstrations" of version 1 (it passes a failed exec plus unrelated rows, three healthy turns fail at the second read, ...) need that check to see a quiet host,
+# as it did in the earlier runs. On 2026-10-06 06:21Z-06:35Z a headless Codex SDK worker of another lane (omniroute-codex-sdk/worker.py, a review job that calls the gateway) was running on the host, so those scenarios came out INCONCLUSIVE in the first run of part B
+# (marked UNEXPECTED in checks/acceptance-controls.txt, with the reason in its header); parts B2 and D were run with this fixture.
+case "$*" in
+  *"omniroute-codex-sdk/worker.py"*|*"codex exec"*) exit 1 ;;
+esac
+exec /usr/bin/pgrep "$@"

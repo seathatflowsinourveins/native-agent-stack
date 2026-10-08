@@ -1,0 +1,65 @@
+#!/usr/bin/env python3
+"""Read-only (mode=ro), value-free probe of how a call_logs row and the usage_history row of the same request relate on the live gateway store: the evidence behind the usage association of raw acceptance script 2.2 and native acceptance script 2.1.
+For every call_logs row with status 200 on /v1/responses or /v1/chat/completions between --since and --until it finds the usage_history rows within 3 s with the same model and token counts (the look-alikes) and, for a pair (exactly one candidate), checks every field the association uses:
+provider, connection_id, api_key_id (equality, both NULL counts as equal), endpoint (= the call's path), and the latency (usage latency_ms against the call's duration) and time to first token (usage ttft_ms against the call's ttft_ms) differences. Only counts and numeric differences are printed; no id, key or account value.
+usage: probe-usage-association-20261006.py --since 2026-10-05T12:00:00Z --until 2026-10-06T10:56:00Z [--latency-tolerance-ms 100] [--ttft-tolerance-ms 1]
+"""
+import argparse
+import datetime as dt
+import os
+import sqlite3
+
+ap = argparse.ArgumentParser()
+ap.add_argument("--since", required=True)
+ap.add_argument("--until", required=True)
+ap.add_argument("--latency-tolerance-ms", type=float, default=100)
+ap.add_argument("--ttft-tolerance-ms", type=float, default=1.0)
+ap.add_argument("--db", default=os.path.expanduser("~/.local/share/omniroute/storage.sqlite"))
+a = ap.parse_args()
+con = sqlite3.connect(f"file:{a.db}?mode=ro", uri=True)
+con.row_factory = sqlite3.Row
+
+
+def ts(s):
+    return dt.datetime.fromisoformat(s.replace("Z", "+00:00")).timestamp()
+
+
+calls = con.execute("select * from call_logs where status = 200 and path in ('/v1/responses', '/v1/chat/completions') and timestamp >= ? and timestamp <= ? order by timestamp", (a.since, a.until)).fetchall()
+pad = lambda s, sec: (dt.datetime.fromisoformat(s.replace("Z", "+00:00")) + dt.timedelta(seconds=sec)).strftime("%Y-%m-%dT%H:%M:%S.000Z")
+usage = [(ts(u["timestamp"]), u) for u in con.execute("select * from usage_history where timestamp >= ? and timestamp <= ?", (pad(a.since, -5), pad(a.until, 5))).fetchall()]
+n_none = n_multi = n_single = 0
+eq = {"provider": 0, "connection_id": 0, "api_key_id": 0, "endpoint_eq_path": 0}
+lat, ttft = [], []
+all_fields = 0
+for c in calls:
+    t = ts(c["timestamp"])
+    cands = [u for (tu, u) in usage if abs(tu - t) <= 3.0 and u["model"] == c["model"] and u["tokens_input"] == c["tokens_in"] and u["tokens_output"] == c["tokens_out"]]
+    if not cands:
+        n_none += 1
+        continue
+    if len(cands) > 1:
+        n_multi += 1
+        continue
+    n_single += 1
+    u = cands[0]
+    e = (u["provider"] == c["provider"], u["connection_id"] == c["connection_id"], u["api_key_id"] == c["api_key_id"], u["endpoint"] == c["path"])
+    for k, v in zip(eq, e):
+        eq[k] += v
+    d = abs(float(u["latency_ms"]) - float(c["duration"])) if u["latency_ms"] is not None and c["duration"] is not None else None
+    if d is not None:
+        lat.append(d)
+    g = abs(float(u["ttft_ms"]) - float(c["ttft_ms"])) if u["ttft_ms"] is not None and c["ttft_ms"] is not None else None
+    if g is not None:
+        ttft.append(g)
+    if all(e) and d is not None and d <= a.latency_tolerance_ms and (g is None or g <= a.ttft_tolerance_ms):
+        all_fields += 1
+lat.sort()
+ttft.sort()
+q = lambda xs, f: (xs[min(len(xs) - 1, int(len(xs) * f))] if xs else None)
+print(f"# usage association probe on the live store (read-only), window {a.since} .. {a.until}; run {dt.datetime.now(dt.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')}")
+print(f"call_logs rows (status 200, /v1/responses or /v1/chat/completions): {len(calls)}")
+print(f"  with no usage_history look-alike (same model and token counts within 3 s): {n_none}; with more than one: {n_multi}; with exactly one (a pair): {n_single}")
+print(f"pairs with equal provider: {eq['provider']}; equal connection_id: {eq['connection_id']}; equal api_key_id (NULL = NULL counts as equal): {eq['api_key_id']}; usage endpoint equal to the call's path: {eq['endpoint_eq_path']}")
+print(f"latency difference |usage latency_ms - call duration| over {len(lat)} pairs (ms): median {q(lat, 0.5)}, p95 {q(lat, 0.95)}, p99 {q(lat, 0.99)}, max {lat[-1] if lat else None}")
+print(f"time-to-first-token difference over {len(ttft)} pairs (ms): median {q(ttft, 0.5)}, p99 {q(ttft, 0.99)}, max {ttft[-1] if ttft else None}")
+print(f"pairs that meet EVERY field of the association (provider, account, endpoint, latency within {a.latency_tolerance_ms:g} ms, ttft within {a.ttft_tolerance_ms:g} ms): {all_fields} of {n_single}")

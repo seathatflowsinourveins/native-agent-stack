@@ -1,0 +1,61 @@
+# Controls and positive runs for scripts/install-drain.sh.txt (version 3, 2026-10-06 UTC); the controls are scripts/install-controls.sh.txt. Raw output, home directory written $HOME.
+# (1)-(2) the identity check of an installed prefix (the drain build passes, the earlier live build fails: BUILD_SHA differs and the drain marker count is 0); (3) a one-byte-corrupted tarball fails at the pinned sha256 before any npm install; (4) the dependency-graph hash of the NativeStack install of 2026-10-05 21:29Z;
+# (5)-(7) inputs missing BEFORE npm install (no shim source, a shim source with the wrong hash, no node) each stop with exit 3 and create no prefix (version 2 failed at the shim copy AFTER npm install on a host without the NativeStack prefix layout);
+# (8)-(10) a full positive run into a scratch tools directory that has no NativeStack prefix layout (the 2604 situation), taking the shim from the repository's committed copy, then its --verify-prefix and its dependency-graph hash: the tarball does not pin the runtime dependency graph.
+# Version 2's results (its controls and the 2026-10-05 21:29Z and 23:52Z installs) are superseded/install-v2-results.txt.
+
+## (1) --verify-prefix on the installed drain prefix (must pass)
+prefix omniroute-3.8.51-c1e30b76-affinity-pr15167-drain-b7c68690: BUILD_SHA=2a41147b7 (expected 2a41147b7) shim_sha256=b6ae900224df3dc73fff2a50b3d7206d78895c6147e93e80b62e66d423e69854 drain_marker_files=2
+verified: omniroute-3.8.51-c1e30b76-affinity-pr15167-drain-b7c68690 is the drain build
+exit=0
+
+## (2) --verify-prefix on the earlier live build, which has no drain (must fail: BUILD_SHA differs, and the marker count shows 0)
+prefix omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167: BUILD_SHA=cf6748d04 (expected 2a41147b7) shim_sha256=b6ae900224df3dc73fff2a50b3d7206d78895c6147e93e80b62e66d423e69854 drain_marker_files=0
+FAILED: BUILD_SHA of omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167 is not 2a41147b7
+exit=3
+
+## (3) a one-byte-corrupted copy of the tarball (must fail at the pinned sha256, before any npm install)
+$HOME/.cache/omniroute-install-v3-ySRj8r/corrupt/omniroute-3.8.51-drain-b7c68690.tgz: FAILED
+sha256sum: WARNING: 1 computed checksum did NOT match
+FAILED: sha256 of omniroute-3.8.51-drain-b7c68690.tgz is not the pinned 5b0e986bdff81487130cfd7c7dad20c6534f447836ff1c757e7c4bcf82d0fa14
+exit=3
+prefix created by the corrupted run: no
+
+## (4) dependency-graph hash of the installed drain prefix (the 21:29Z install of 2026-10-05)
+dependency graph of omniroute-3.8.51-c1e30b76-affinity-pr15167-drain-b7c68690: 1261 f2a40ab81ea2c0b423be70653af0ceb2901f3b56c1c2bfa70e3a809e805a7589
+exit=0
+
+## (5) no shim source (SHIM_SOURCE points to a file that does not exist): must stop with exit 3 BEFORE npm install and create no prefix (version 2 failed at the shim copy after npm install)
+FAILED: no lsof shim source at $HOME/.cache/omniroute-install-v3-ySRj8r/no-such-shim (set SHIM_SOURCE or REPO_DIR)
+exit=3
+prefix created: no
+
+## (6) a shim source with the wrong sha256: must stop with exit 3 before npm install and create no prefix
+FAILED: the shim source $HOME/.cache/omniroute-install-v3-ySRj8r/wrong-shim does not have the pinned sha256 b6ae900224df3dc73fff2a50b3d7206d78895c6147e93e80b62e66d423e69854
+exit=3
+prefix created: no
+
+## (7) no node in NODE_BIN_DIR: must stop with exit 3 before npm install and create no prefix
+FAILED: no node at $HOME/.cache/omniroute-install-v3-ySRj8r/no-node-here/node (set NODE_BIN_DIR)
+exit=3
+prefix created: no
+
+## (8) a full positive run into a scratch tools directory with NO NativeStack prefix layout (as on 2604): TOOLS_DIR, NODE_BIN_DIR and ARTIFACT_DIR overridden, the shim taken from the repository's committed copy; every pinned check passes
+$HOME/.cache/omniroute-install-v3-ySRj8r/artifacts/omniroute-3.8.51-drain-b7c68690.tgz: OK
+tarball verified: sha256, npm integrity and 26762 entries equal the pinned values
+01:58:29Z npm install exit=0
+prefix ctl-2604-style: BUILD_SHA=2a41147b7 (expected 2a41147b7) shim_sha256=b6ae900224df3dc73fff2a50b3d7206d78895c6147e93e80b62e66d423e69854 drain_marker_files=2
+installed dependency graph: packages and sha256 of the sorted name@version list: 1261 d05fd5fcc66d4c3ebfc05e5bff63c5eab70e089fb8f4999871b17858f4005ea6
+bytes: 2565118614
+installed and verified: ctl-2604-style
+exit=0
+
+## (9) --verify-prefix of that scratch prefix (the pinned BUILD_SHA, shim hash and drain marker)
+prefix ctl-2604-style: BUILD_SHA=2a41147b7 (expected 2a41147b7) shim_sha256=b6ae900224df3dc73fff2a50b3d7206d78895c6147e93e80b62e66d423e69854 drain_marker_files=2
+verified: ctl-2604-style is the drain build
+exit=0
+
+## (10) the dependency-graph hash of that scratch install, next to the NativeStack install's from (4): the tarball does not pin it
+dependency graph of ctl-2604-style: 1261 d05fd5fcc66d4c3ebfc05e5bff63c5eab70e089fb8f4999871b17858f4005ea6
+exit=0
+scratch directory (remove with rm -rf after reading): $HOME/.cache/omniroute-install-v3-ySRj8r

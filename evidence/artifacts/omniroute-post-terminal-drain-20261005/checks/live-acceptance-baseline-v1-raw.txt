@@ -1,0 +1,52 @@
+# Publication note: UUID-shaped strings (the gateway's correlation ids) are shortened to their first 8 hex digits and an ellipsis, because the repository's publication check rejects full UUIDs; sha256 of this text before the shortening: 958f880b96a7753eceb908dd77a4bedbacce7e467b5b019834dbfbf75dca66d9; the unshortened text is kept in the first host's private artifact directory (checks/logs/MANIFEST.txt)
+# Produced by version 1 of the acceptance scripts (superseded; see superseded/README.md). Its observations of the unpatched build cf6748d04 stand; its verdict logic does not.
+# baseline on the UNPATCHED gateway (20128 build cf6748d04), same-day, frozen scripts; started 2026-10-05T23:54:19Z
+FROZEN script_sha256=8aa14054401c00a5af1e8c180fc83af80c79cc0a807da98ea519149291188859 argv=['--expect', 'observe', '--wait1', '12', '--wait2', '60', 'responses:eof', 'responses:early:0', 'responses:early:0', 'responses:early:0.5', 'responses:early:2', 'chat:eof', 'chat:early:0', 'chat:early:0', 'effort:cx/gpt-6-astra:max', 'effort:cx/gpt-6.1-sol-max', 'effort:cx/gpt-6.1-sol:max'] cwd=/tmp start=2026-10-05T23:54:19.412Z expect=observe wait1=12.0 wait2=60.0 port=20128
+RESULT mode=responses:eof http=200 terminal=True closed_early=False stream_s=68.7 corr=cc72b3e6… response_id=resp_0bd24ba24314415a016ac438abd0a0819093118142807b361e read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=OBSERVED
+   call_logs: ('2026-10-05T23:54:22.925Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', 'max', 'max')
+   usage_history: ('2026-10-05T23:54:22.922Z', 'gpt-6-astra', '200', 22, 19)
+RESULT mode=responses:early:0 http=200 terminal=True closed_early=True stream_s=2.4 corr=None response_id=resp_09ab73828a13694d016ac438fd97608197995ecd80a62ef50b read1_call_logs=0 read1_usage=0 window_call_logs=0 window_usage=0 verdict=OBSERVED
+RESULT mode=responses:early:0 http=200 terminal=True closed_early=True stream_s=4.0 corr=913c7ad2… response_id=resp_0a922130e23888e3016ac4390cb7108196bd8be942b2ce5439 read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=OBSERVED
+   call_logs: ('2026-10-05T23:56:00.917Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 28, 'ready', 'max', 'max')
+   usage_history: ('2026-10-05T23:56:00.913Z', 'gpt-6-astra', '200', 22, 28)
+RESULT mode=responses:early:0.5 http=200 terminal=True closed_early=True stream_s=3.4 corr=29e8f013… response_id=resp_0b2f8ff42f5365fd016ac4391d648487d18c5480cabdf64b5f read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=OBSERVED
+   call_logs: ('2026-10-05T23:56:16.713Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 21, 'ready', 'max', 'max')
+   usage_history: ('2026-10-05T23:56:16.711Z', 'gpt-6-astra', '200', 22, 21)
+RESULT mode=responses:early:2 http=200 terminal=True closed_early=True stream_s=4.3 corr=6b4f3c89… response_id=resp_07ce0edc91822c18016ac4392da15c819689805255da6c0bcb read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=OBSERVED
+   call_logs: ('2026-10-05T23:56:32.265Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 30, 'ready', 'max', 'max')
+   usage_history: ('2026-10-05T23:56:32.261Z', 'gpt-6-astra', '200', 22, 30)
+RESULT mode=chat:eof http=200 terminal=True closed_early=False stream_s=66.1 corr=d0580a2c… response_id=None read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=OBSERVED
+   call_logs: ('2026-10-05T23:56:47.880Z', '/v1/chat/completions', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 21, 5, 'ready', None, None)
+   usage_history: ('2026-10-05T23:56:47.876Z', 'gpt-6-astra', '200', 21, 5)
+RESULT mode=chat:early:0 http=200 terminal=True closed_early=True stream_s=1.1 corr=d9571c7e… response_id=None read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=OBSERVED
+   call_logs: ('2026-10-05T23:58:08.879Z', '/v1/chat/completions', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 21, 5, 'ready', None, None)
+   usage_history: ('2026-10-05T23:58:08.875Z', 'gpt-6-astra', '200', 21, 5)
+RESULT mode=chat:early:0 http=200 terminal=True closed_early=True stream_s=0.3 corr=1ab557d4… response_id=None read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=OBSERVED
+   call_logs: ('2026-10-05T23:58:22.996Z', '/v1/chat/completions', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 21, 5, 'ready', None, None)
+   usage_history: ('2026-10-05T23:58:22.992Z', 'gpt-6-astra', '200', 21, 5)
+RESULT mode=effort:cx/gpt-6-astra:max http=200 terminal=True closed_early=False stream_s=68.8 corr=4dd46496… response_id=resp_005fe780d1ef8887016ac439ab779087d1b5060f718b65bdd8 read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=OBSERVED
+   call_logs: ('2026-10-05T23:58:38.616Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 37, 'ready', 'max', 'max')
+   usage_history: ('2026-10-05T23:58:38.613Z', 'gpt-6-astra', '200', 22, 37)
+EFFORT mode=effort:cx/gpt-6-astra:max model=gpt-6-astra requested_model=codex/gpt-6-astra effort_requested=max effort_upstream=max
+RESULT mode=effort:cx/gpt-6.1-sol-max http=200 terminal=True closed_early=False stream_s=69.3 corr=None response_id=resp_0caafe6878fe2b69016ac439fdaf5087d1a3682c207a2012ba read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=OBSERVED
+   call_logs: ('2026-10-06T00:00:00.887Z', '/v1/responses', 200, 'gpt-6.1-sol-max', 'codex/gpt-6.1-sol-max', 22, 43, 'ready', None, 'max')
+   usage_history: ('2026-10-06T00:00:00.884Z', 'gpt-6.1-sol-max', '200', 22, 43)
+EFFORT mode=effort:cx/gpt-6.1-sol-max model=gpt-6.1-sol-max requested_model=codex/gpt-6.1-sol-max effort_requested=None effort_upstream=max
+RESULT mode=effort:cx/gpt-6.1-sol:max http=200 terminal=True closed_early=False stream_s=68.7 corr=None response_id=resp_089cf565d2d5e4c0016ac43a4fc21487d1a974d13f54933a68 read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=OBSERVED
+   call_logs: ('2026-10-06T00:01:22.623Z', '/v1/responses', 200, 'gpt-6.1-sol', 'codex/gpt-6.1-sol', 22, 22, 'ready', 'max', 'max')
+   usage_history: ('2026-10-06T00:01:22.621Z', 'gpt-6.1-sol', '200', 22, 22)
+EFFORT mode=effort:cx/gpt-6.1-sol:max model=gpt-6.1-sol requested_model=codex/gpt-6.1-sol effort_requested=max effort_upstream=max
+LATE mode=responses:eof read2_call_logs=1 read2_usage=1 changed=False verdict=OBSERVED
+LATE mode=responses:early:0 read2_call_logs=0 read2_usage=0 changed=False verdict=OBSERVED
+LATE mode=responses:early:0 read2_call_logs=1 read2_usage=1 changed=False verdict=OBSERVED
+LATE mode=responses:early:0.5 read2_call_logs=1 read2_usage=1 changed=False verdict=OBSERVED
+LATE mode=responses:early:2 read2_call_logs=1 read2_usage=1 changed=False verdict=OBSERVED
+LATE mode=chat:eof read2_call_logs=1 read2_usage=1 changed=False verdict=OBSERVED
+LATE mode=chat:early:0 read2_call_logs=1 read2_usage=1 changed=False verdict=OBSERVED
+LATE mode=chat:early:0 read2_call_logs=1 read2_usage=1 changed=False verdict=OBSERVED
+LATE mode=effort:cx/gpt-6-astra:max read2_call_logs=1 read2_usage=1 changed=False verdict=OBSERVED
+LATE mode=effort:cx/gpt-6.1-sol-max read2_call_logs=1 read2_usage=1 changed=False verdict=OBSERVED
+LATE mode=effort:cx/gpt-6.1-sol:max read2_call_logs=1 read2_usage=1 changed=False verdict=OBSERVED
+SUMMARY {"OBSERVED": 11} end=2026-10-06T00:03:28.698Z exit=0
+exit=0
+# finished 2026-10-06T00:03:28Z

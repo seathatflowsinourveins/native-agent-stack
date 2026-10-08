@@ -1,0 +1,1377 @@
+# Controls of the show-log receipt helper as of round 13 (scripts/show-log-receipt.py.txt, sha256 cd119a03186fb2acd66b22024423bcc6fae533fd87d412dae70c467e79e637f8) against the helper before round 13 (the text at 4624137290244eb7044ff3fd935c693042e337fe, sha256 7dd746bce15964c68d8b847f8072257a4b5712adca7ed7cd9089c09273ff26d6), 2026-10-07 UTC: scripts/show-log-receipt-controls.py.txt (sha256 2106727c8c6e9cc1838838262409a188e92b013be3caf4ecdb5ad7d82cfca9e2; its modification time precedes the run's start below), run on scratch copies byte-identical to those files. Raw output, home directory written $HOME.
+# Full-scope read r12, P2-3: a failed or unavailable systemctl or journalctl observation was printed as zero journal lines and all-zero counts of credential-shaped strings in a receipt that completed normally; P3-9: the logging boolean was a substring test on the Environment property. Every run is the whole helper as a subprocess, with systemctl and journalctl shims first on PATH that print the case's fixture, inside a private network namespace (`unshare -rn`) whose 127.0.0.1:20128 and 127.0.0.1:20129 are the controls' own stubs of /api/health (S0 checks the isolation; every run prints the hits per stub, one per port): no request reached the host's gateways, and no systemd unit or journal was read (the helper's reads of /etc/systemd/journald.conf(.d) are real). Read r13 (round 21), P2-4: journalctl can exit 0 and say on stderr that it skipped data (`Warning: some journal files were not opened due to insufficient permissions.`); the helper counted the lines that it did get and reported no observation missing.
+# Results (every CONTROL-RESULT line OK, the driver's exit status 0). The defects reproduce on the helper before round 13: b (journalctl exits 1), c1 (systemctl exits 1) and c2 (no start timestamp) print all-zero counts and exit 0 for journals that were not read; e1, e2 and e5 print the boolean True for OMNIROUTE_SHOW_LOG=10, X_OMNIROUTE_SHOW_LOG=1 and a later assignment of 0. The fixed helper prints those counts as unavailable with sanitized diagnostics and exits 2 (b, c1, c2), and applies the gateway's predicate (OmniRoute@c1e30b76 bin/cli/runtime/processSupervisor.mjs:77, `process.env.OMNIROUTE_SHOW_LOG === "1"`; e1-e6).
+#   d is a genuine zero in both versions (exit 0); a, d, e3, e4 and e6 print the same output in both versions apart from the taken time and the fixed helper's closing line. Beyond the findings: d2 (journalctl prints no entry at all: unavailable, exit 2), f (the disk-usage read fails: unavailable, exit 2), e7 (an entry systemctl cannot print as one token follows the assignment of 1: undetermined, exit 2). d3 (journalctl exits 0 with ordinary lines and the partial-read warning on stderr): the helper before round 13 prints all-zero counts and exits 0 (and so did the version of ec4b489d9), the fixed helper prints the counts as unavailable, names the stderr and exits 2; d4 (a stderr line that holds no word of loss): a genuine zero in both, exit 0.
+# Part R (after the controls' output): the existing drop-in controls RC1 and RC2 of scripts/acceptance-controls/run-controls.py.txt (`--only RC1,RC2`, with the same scratch HOME as checks/guard5-existing-controls.txt), rerun on the fixed helper: both OK, the driver's exit status 0.
+
+# show-log receipt controls: the helper before round 13 and the fixed helper on synthetic systemctl and journalctl observations, in a private network namespace
+# before: sha256 7dd746bce15964c68d8b847f8072257a4b5712adca7ed7cd9089c09273ff26d6; fixed: sha256 cd119a03186fb2acd66b22024423bcc6fae533fd87d412dae70c467e79e637f8
+# started 2026-10-07T21:55:35Z; python 3.13.15
+
+### S0: a private network namespace answers 127.0.0.1:20128 and 127.0.0.1:20129 with the controls' own stubs: exit=0 20128 marker=1 20129 marker=1 stub_hits={20128: 1, 20129: 1} namespace net:[4026532770] vs the host's net:[4026531833]   [as expected]
+### a: both commands succeed, the journals hold one of each synthetic credential-shaped string and two email-shaped [ModelSync] labels: the counts are printed, by both versions
+--- a / before: python3 omniroute-show-log-receipt-20261006-v2-r12.py control-a   [not a defect]
+    # value-free receipt: control-a
+    taken 2026-10-07T21:55:35Z
+    
+    ## 20128 omniroute.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: True
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: 10
+    one journal line that shows the child's output reaches journald: [16:12:33] [STREAM] CODEX | gpt-6-astra | 4386ms | complete
+    counts of credential-shaped strings in that journal (no values): {'bearer_token': 1, 'sk_key': 1, 'refresh_token': 1, 'id_token': 1, 'email_shaped': 2, 'api_key_assignment_with_value': 1}
+    log tags of the email-shaped matches (the addresses are not printed): {'[ModelSync]': 2}
+    
+    ## 20129 omniroute-fw.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute-fw.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: True
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: 10
+    one journal line that shows the child's output reaches journald: [16:12:33] [STREAM] CODEX | gpt-6-astra | 4386ms | complete
+    counts of credential-shaped strings in that journal (no values): {'bearer_token': 1, 'sk_key': 1, 'refresh_token': 1, 'id_token': 1, 'email_shaped': 2, 'api_key_assignment_with_value': 1}
+    log tags of the email-shaped matches (the addresses are not printed): {'[ModelSync]': 2}
+    
+    ## user journal
+    Archived and active journals take up 64.0M in the file system.
+    retention keys set in /etc/systemd/journald.conf(.d): none (the journald defaults apply)
+    shim calls: 5 (journalctl -u reads: 2); the helper's health reads reached the private stubs {20128: 1, 20129: 1}, in namespace net:[4026532772] (the host's is net:[4026531833])
+CONTROL-RESULT a before expected_exit=0 observed_exit=0 checked: the counts of the synthetic strings for both units, 10 journal lines each; no home path, user name or machine id in the output: True OK
+
+--- a / fixed: python3 omniroute-show-log-receipt-20261006.py control-a   [the fixed helper]
+    # value-free receipt: control-a
+    taken 2026-10-07T21:55:35Z
+    
+    ## 20128 omniroute.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: True
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: 10
+    one journal line that shows the child's output reaches journald: [16:12:33] [STREAM] CODEX | gpt-6-astra | 4386ms | complete
+    counts of credential-shaped strings in that journal (no values): {'bearer_token': 1, 'sk_key': 1, 'refresh_token': 1, 'id_token': 1, 'email_shaped': 2, 'api_key_assignment_with_value': 1}
+    log tags of the email-shaped matches (the addresses are not printed): {'[ModelSync]': 2}
+    
+    ## 20129 omniroute-fw.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute-fw.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: True
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: 10
+    one journal line that shows the child's output reaches journald: [16:12:33] [STREAM] CODEX | gpt-6-astra | 4386ms | complete
+    counts of credential-shaped strings in that journal (no values): {'bearer_token': 1, 'sk_key': 1, 'refresh_token': 1, 'id_token': 1, 'email_shaped': 2, 'api_key_assignment_with_value': 1}
+    log tags of the email-shaped matches (the addresses are not printed): {'[ModelSync]': 2}
+    
+    ## user journal
+    Archived and active journals take up 64.0M in the file system.
+    retention keys set in /etc/systemd/journald.conf(.d): none (the journald defaults apply)
+    
+    observations not obtained: none
+    shim calls: 5 (journalctl -u reads: 2); the helper's health reads reached the private stubs {20128: 1, 20129: 1}, in namespace net:[4026532770] (the host's is net:[4026531833])
+CONTROL-RESULT a fixed expected_exit=0 observed_exit=0 checked: the same counts and lines, and no observation missing; no home path, user name or machine id in the output: True; output identical to the version before round 13 apart from the taken time and the closing list: True OK
+
+### b: journalctl exits 1 with empty stdout and an error on stderr (the journal cannot be read)
+--- b / before: python3 omniroute-show-log-receipt-20261006-v2-r12.py control-b   [the defect]
+    # value-free receipt: control-b
+    taken 2026-10-07T21:55:35Z
+    
+    ## 20128 omniroute.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: True
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: 0
+    one journal line that shows the child's output reaches journald: (no suitable line)
+    counts of credential-shaped strings in that journal (no values): {'bearer_token': 0, 'sk_key': 0, 'refresh_token': 0, 'id_token': 0, 'email_shaped': 0, 'api_key_assignment_with_value': 0}
+    log tags of the email-shaped matches (the addresses are not printed): none
+    
+    ## 20129 omniroute-fw.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute-fw.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: True
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: 0
+    one journal line that shows the child's output reaches journald: (no suitable line)
+    counts of credential-shaped strings in that journal (no values): {'bearer_token': 0, 'sk_key': 0, 'refresh_token': 0, 'id_token': 0, 'email_shaped': 0, 'api_key_assignment_with_value': 0}
+    log tags of the email-shaped matches (the addresses are not printed): none
+    
+    ## user journal
+    Archived and active journals take up 64.0M in the file system.
+    retention keys set in /etc/systemd/journald.conf(.d): none (the journald defaults apply)
+    shim calls: 5 (journalctl -u reads: 2); the helper's health reads reached the private stubs {20128: 1, 20129: 1}, in namespace net:[4026532772] (the host's is net:[4026531833])
+CONTROL-RESULT b before expected_exit=0 observed_exit=0 checked: zero journal lines and all-zero counts printed for a journal that was not read, exit 0; no home path, user name or machine id in the output: True OK
+
+--- b / fixed: python3 omniroute-show-log-receipt-20261006.py control-b   [the fixed helper]
+    # value-free receipt: control-b
+    taken 2026-10-07T21:55:35Z
+    
+    ## 20128 omniroute.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: True
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: unavailable (journalctl exited 1: Failed to open journal file /var/log/journal/<hex>/user-1000.journal: Permission denied (as $USER))
+    one journal line that shows the child's output reaches journald: unavailable
+    counts of credential-shaped strings in that journal (no values): unavailable (no journal was read, so no count is known: not zero)
+    log tags of the email-shaped matches (the addresses are not printed): unavailable
+    
+    ## 20129 omniroute-fw.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute-fw.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: True
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: unavailable (journalctl exited 1: Failed to open journal file /var/log/journal/<hex>/user-1000.journal: Permission denied (as $USER))
+    one journal line that shows the child's output reaches journald: unavailable
+    counts of credential-shaped strings in that journal (no values): unavailable (no journal was read, so no count is known: not zero)
+    log tags of the email-shaped matches (the addresses are not printed): unavailable
+    
+    ## user journal
+    Archived and active journals take up 64.0M in the file system.
+    retention keys set in /etc/systemd/journald.conf(.d): none (the journald defaults apply)
+    
+    observations not obtained: ['20128 journal', '20129 journal']
+    shim calls: 5 (journalctl -u reads: 2); the helper's health reads reached the private stubs {20128: 1, 20129: 1}, in namespace net:[4026532831] (the host's is net:[4026531833])
+CONTROL-RESULT b fixed expected_exit=2 observed_exit=2 checked: counts unavailable for both units, the diagnostic names the exit status with the machine id masked, both journals listed as not obtained; no home path, user name or machine id in the output: True OK
+
+### c1: systemctl exits 1 with empty stdout (no bus): no unit property, no start timestamp
+--- c1 / before: python3 omniroute-show-log-receipt-20261006-v2-r12.py control-c1   [the defect]
+    # value-free receipt: control-c1
+    taken 2026-10-07T21:55:36Z
+    
+    ## 20128 omniroute.service
+    DropInPaths: 
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: False
+    ActiveState: None
+    SubState: None
+    MainPID: None
+    ActiveEnterTimestamp: None
+    NRestarts: None
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: 0
+    one journal line that shows the child's output reaches journald: (no suitable line)
+    counts of credential-shaped strings in that journal (no values): {'bearer_token': 0, 'sk_key': 0, 'refresh_token': 0, 'id_token': 0, 'email_shaped': 0, 'api_key_assignment_with_value': 0}
+    log tags of the email-shaped matches (the addresses are not printed): none
+    
+    ## 20129 omniroute-fw.service
+    DropInPaths: 
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: False
+    ActiveState: None
+    SubState: None
+    MainPID: None
+    ActiveEnterTimestamp: None
+    NRestarts: None
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: 0
+    one journal line that shows the child's output reaches journald: (no suitable line)
+    counts of credential-shaped strings in that journal (no values): {'bearer_token': 0, 'sk_key': 0, 'refresh_token': 0, 'id_token': 0, 'email_shaped': 0, 'api_key_assignment_with_value': 0}
+    log tags of the email-shaped matches (the addresses are not printed): none
+    
+    ## user journal
+    Archived and active journals take up 64.0M in the file system.
+    retention keys set in /etc/systemd/journald.conf(.d): none (the journald defaults apply)
+    shim calls: 3 (journalctl -u reads: 0); the helper's health reads reached the private stubs {20128: 1, 20129: 1}, in namespace net:[4026532770] (the host's is net:[4026531833])
+CONTROL-RESULT c1 before expected_exit=0 observed_exit=0 checked: the logging boolean False and all-zero counts printed, though no property was read and the journal was never read (0 journalctl -u calls), exit 0; no home path, user name or machine id in the output: True OK
+
+--- c1 / fixed: python3 omniroute-show-log-receipt-20261006.py control-c1   [the fixed helper]
+    # value-free receipt: control-c1
+    taken 2026-10-07T21:55:36Z
+    
+    ## 20128 omniroute.service
+    unit properties: unavailable (systemctl exited 1: Failed to connect to bus: No medium found)
+    DropInPaths: unavailable
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: unavailable
+    ActiveState: unavailable
+    SubState: unavailable
+    MainPID: unavailable
+    ActiveEnterTimestamp: unavailable
+    NRestarts: unavailable
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: unavailable (the unit's properties are unavailable, so its start is not known)
+    one journal line that shows the child's output reaches journald: unavailable
+    counts of credential-shaped strings in that journal (no values): unavailable (no journal was read, so no count is known: not zero)
+    log tags of the email-shaped matches (the addresses are not printed): unavailable
+    
+    ## 20129 omniroute-fw.service
+    unit properties: unavailable (systemctl exited 1: Failed to connect to bus: No medium found)
+    DropInPaths: unavailable
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: unavailable
+    ActiveState: unavailable
+    SubState: unavailable
+    MainPID: unavailable
+    ActiveEnterTimestamp: unavailable
+    NRestarts: unavailable
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: unavailable (the unit's properties are unavailable, so its start is not known)
+    one journal line that shows the child's output reaches journald: unavailable
+    counts of credential-shaped strings in that journal (no values): unavailable (no journal was read, so no count is known: not zero)
+    log tags of the email-shaped matches (the addresses are not printed): unavailable
+    
+    ## user journal
+    Archived and active journals take up 64.0M in the file system.
+    retention keys set in /etc/systemd/journald.conf(.d): none (the journald defaults apply)
+    
+    observations not obtained: ['20128 unit properties', '20128 journal', '20129 unit properties', '20129 journal']
+    shim calls: 3 (journalctl -u reads: 0); the helper's health reads reached the private stubs {20128: 1, 20129: 1}, in namespace net:[4026532772] (the host's is net:[4026531833])
+CONTROL-RESULT c1 fixed expected_exit=2 observed_exit=2 checked: properties, the boolean and the counts unavailable, with systemctl's exit status and stderr; no home path, user name or machine id in the output: True OK
+
+### c2: systemctl succeeds but the units have no ActiveEnterTimestamp (inactive, never started)
+--- c2 / before: python3 omniroute-show-log-receipt-20261006-v2-r12.py control-c2   [the defect]
+    # value-free receipt: control-c2
+    taken 2026-10-07T21:55:36Z
+    
+    ## 20128 omniroute.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: True
+    ActiveState: inactive
+    SubState: dead
+    MainPID: 0
+    ActiveEnterTimestamp: 
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: 0
+    one journal line that shows the child's output reaches journald: (no suitable line)
+    counts of credential-shaped strings in that journal (no values): {'bearer_token': 0, 'sk_key': 0, 'refresh_token': 0, 'id_token': 0, 'email_shaped': 0, 'api_key_assignment_with_value': 0}
+    log tags of the email-shaped matches (the addresses are not printed): none
+    
+    ## 20129 omniroute-fw.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute-fw.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: True
+    ActiveState: inactive
+    SubState: dead
+    MainPID: 0
+    ActiveEnterTimestamp: 
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: 0
+    one journal line that shows the child's output reaches journald: (no suitable line)
+    counts of credential-shaped strings in that journal (no values): {'bearer_token': 0, 'sk_key': 0, 'refresh_token': 0, 'id_token': 0, 'email_shaped': 0, 'api_key_assignment_with_value': 0}
+    log tags of the email-shaped matches (the addresses are not printed): none
+    
+    ## user journal
+    Archived and active journals take up 64.0M in the file system.
+    retention keys set in /etc/systemd/journald.conf(.d): none (the journald defaults apply)
+    shim calls: 3 (journalctl -u reads: 0); the helper's health reads reached the private stubs {20128: 1, 20129: 1}, in namespace net:[4026532774] (the host's is net:[4026531833])
+CONTROL-RESULT c2 before expected_exit=0 observed_exit=0 checked: all-zero counts printed although the journal was never read (0 journalctl -u calls), exit 0; no home path, user name or machine id in the output: True OK
+
+--- c2 / fixed: python3 omniroute-show-log-receipt-20261006.py control-c2   [the fixed helper]
+    # value-free receipt: control-c2
+    taken 2026-10-07T21:55:36Z
+    
+    ## 20128 omniroute.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: True
+    ActiveState: inactive
+    SubState: dead
+    MainPID: 0
+    ActiveEnterTimestamp: 
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: unavailable (the unit has no ActiveEnterTimestamp (not started, or not loaded): there is no journal since its start to read)
+    one journal line that shows the child's output reaches journald: unavailable
+    counts of credential-shaped strings in that journal (no values): unavailable (no journal was read, so no count is known: not zero)
+    log tags of the email-shaped matches (the addresses are not printed): unavailable
+    
+    ## 20129 omniroute-fw.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute-fw.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: True
+    ActiveState: inactive
+    SubState: dead
+    MainPID: 0
+    ActiveEnterTimestamp: 
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: unavailable (the unit has no ActiveEnterTimestamp (not started, or not loaded): there is no journal since its start to read)
+    one journal line that shows the child's output reaches journald: unavailable
+    counts of credential-shaped strings in that journal (no values): unavailable (no journal was read, so no count is known: not zero)
+    log tags of the email-shaped matches (the addresses are not printed): unavailable
+    
+    ## user journal
+    Archived and active journals take up 64.0M in the file system.
+    retention keys set in /etc/systemd/journald.conf(.d): none (the journald defaults apply)
+    
+    observations not obtained: ['20128 journal', '20129 journal']
+    shim calls: 3 (journalctl -u reads: 0); the helper's health reads reached the private stubs {20128: 1, 20129: 1}, in namespace net:[4026532770] (the host's is net:[4026531833])
+CONTROL-RESULT c2 fixed expected_exit=2 observed_exit=2 checked: counts unavailable: no start timestamp, so no journal since the start; no home path, user name or machine id in the output: True OK
+
+### d: journalctl succeeds and the journals hold ordinary lines only (no credential-shaped string): a genuine zero
+--- d / before: python3 omniroute-show-log-receipt-20261006-v2-r12.py control-d   [not a defect]
+    # value-free receipt: control-d
+    taken 2026-10-07T21:55:36Z
+    
+    ## 20128 omniroute.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: True
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: 3
+    one journal line that shows the child's output reaches journald: [16:12:33] [STREAM] CODEX | gpt-6-astra | 4386ms | complete
+    counts of credential-shaped strings in that journal (no values): {'bearer_token': 0, 'sk_key': 0, 'refresh_token': 0, 'id_token': 0, 'email_shaped': 0, 'api_key_assignment_with_value': 0}
+    log tags of the email-shaped matches (the addresses are not printed): none
+    
+    ## 20129 omniroute-fw.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute-fw.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: True
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: 3
+    one journal line that shows the child's output reaches journald: [16:12:33] [STREAM] CODEX | gpt-6-astra | 4386ms | complete
+    counts of credential-shaped strings in that journal (no values): {'bearer_token': 0, 'sk_key': 0, 'refresh_token': 0, 'id_token': 0, 'email_shaped': 0, 'api_key_assignment_with_value': 0}
+    log tags of the email-shaped matches (the addresses are not printed): none
+    
+    ## user journal
+    Archived and active journals take up 64.0M in the file system.
+    retention keys set in /etc/systemd/journald.conf(.d): none (the journald defaults apply)
+    shim calls: 5 (journalctl -u reads: 2); the helper's health reads reached the private stubs {20128: 1, 20129: 1}, in namespace net:[4026532775] (the host's is net:[4026531833])
+CONTROL-RESULT d before expected_exit=0 observed_exit=0 checked: all-zero counts of 3 journal lines each; no home path, user name or machine id in the output: True OK
+
+--- d / fixed: python3 omniroute-show-log-receipt-20261006.py control-d   [the fixed helper]
+    # value-free receipt: control-d
+    taken 2026-10-07T21:55:36Z
+    
+    ## 20128 omniroute.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: True
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: 3
+    one journal line that shows the child's output reaches journald: [16:12:33] [STREAM] CODEX | gpt-6-astra | 4386ms | complete
+    counts of credential-shaped strings in that journal (no values): {'bearer_token': 0, 'sk_key': 0, 'refresh_token': 0, 'id_token': 0, 'email_shaped': 0, 'api_key_assignment_with_value': 0}
+    log tags of the email-shaped matches (the addresses are not printed): none
+    
+    ## 20129 omniroute-fw.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute-fw.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: True
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: 3
+    one journal line that shows the child's output reaches journald: [16:12:33] [STREAM] CODEX | gpt-6-astra | 4386ms | complete
+    counts of credential-shaped strings in that journal (no values): {'bearer_token': 0, 'sk_key': 0, 'refresh_token': 0, 'id_token': 0, 'email_shaped': 0, 'api_key_assignment_with_value': 0}
+    log tags of the email-shaped matches (the addresses are not printed): none
+    
+    ## user journal
+    Archived and active journals take up 64.0M in the file system.
+    retention keys set in /etc/systemd/journald.conf(.d): none (the journald defaults apply)
+    
+    observations not obtained: none
+    shim calls: 5 (journalctl -u reads: 2); the helper's health reads reached the private stubs {20128: 1, 20129: 1}, in namespace net:[4026532774] (the host's is net:[4026531833])
+CONTROL-RESULT d fixed expected_exit=0 observed_exit=0 checked: all-zero counts of 3 journal lines each, exit 0, no observation missing; no home path, user name or machine id in the output: True; output identical to the version before round 13 apart from the taken time and the closing list: True OK
+
+### d2: journalctl succeeds but prints no entry since the units' start, only its `-- No entries --` line (beyond the finding: an empty journal where at least the manager's start line is expected)
+--- d2 / before: python3 omniroute-show-log-receipt-20261006-v2-r12.py control-d2   [the defect]
+    # value-free receipt: control-d2
+    taken 2026-10-07T21:55:36Z
+    
+    ## 20128 omniroute.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: True
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: 1
+    one journal line that shows the child's output reaches journald: (no suitable line)
+    counts of credential-shaped strings in that journal (no values): {'bearer_token': 0, 'sk_key': 0, 'refresh_token': 0, 'id_token': 0, 'email_shaped': 0, 'api_key_assignment_with_value': 0}
+    log tags of the email-shaped matches (the addresses are not printed): none
+    
+    ## 20129 omniroute-fw.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute-fw.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: True
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: 1
+    one journal line that shows the child's output reaches journald: (no suitable line)
+    counts of credential-shaped strings in that journal (no values): {'bearer_token': 0, 'sk_key': 0, 'refresh_token': 0, 'id_token': 0, 'email_shaped': 0, 'api_key_assignment_with_value': 0}
+    log tags of the email-shaped matches (the addresses are not printed): none
+    
+    ## user journal
+    Archived and active journals take up 64.0M in the file system.
+    retention keys set in /etc/systemd/journald.conf(.d): none (the journald defaults apply)
+    shim calls: 5 (journalctl -u reads: 2); the helper's health reads reached the private stubs {20128: 1, 20129: 1}, in namespace net:[4026532770] (the host's is net:[4026531833])
+CONTROL-RESULT d2 before expected_exit=0 observed_exit=0 checked: all-zero counts of `1` journal line (the marker line), exit 0; no home path, user name or machine id in the output: True OK
+
+--- d2 / fixed: python3 omniroute-show-log-receipt-20261006.py control-d2   [the fixed helper]
+    # value-free receipt: control-d2
+    taken 2026-10-07T21:55:36Z
+    
+    ## 20128 omniroute.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: True
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: unavailable (journalctl printed no entry since the unit's start, where at least the manager's start line is expected)
+    one journal line that shows the child's output reaches journald: unavailable
+    counts of credential-shaped strings in that journal (no values): unavailable (no journal was read, so no count is known: not zero)
+    log tags of the email-shaped matches (the addresses are not printed): unavailable
+    
+    ## 20129 omniroute-fw.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute-fw.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: True
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: unavailable (journalctl printed no entry since the unit's start, where at least the manager's start line is expected)
+    one journal line that shows the child's output reaches journald: unavailable
+    counts of credential-shaped strings in that journal (no values): unavailable (no journal was read, so no count is known: not zero)
+    log tags of the email-shaped matches (the addresses are not printed): unavailable
+    
+    ## user journal
+    Archived and active journals take up 64.0M in the file system.
+    retention keys set in /etc/systemd/journald.conf(.d): none (the journald defaults apply)
+    
+    observations not obtained: ['20128 journal', '20129 journal']
+    shim calls: 5 (journalctl -u reads: 2); the helper's health reads reached the private stubs {20128: 1, 20129: 1}, in namespace net:[4026532775] (the host's is net:[4026531833])
+CONTROL-RESULT d2 fixed expected_exit=2 observed_exit=2 checked: counts unavailable: no entry since the start; no home path, user name or machine id in the output: True OK
+
+### d3: journalctl exits 0 with ordinary lines and, on stderr, the warning that some journal files were not opened (a partial read; round 21, the read r13 P2-4)
+--- d3 / before: python3 omniroute-show-log-receipt-20261006-v2-r12.py control-d3   [the defect]
+    # value-free receipt: control-d3
+    taken 2026-10-07T21:55:36Z
+    
+    ## 20128 omniroute.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: True
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: 3
+    one journal line that shows the child's output reaches journald: [16:12:33] [STREAM] CODEX | gpt-6-astra | 4386ms | complete
+    counts of credential-shaped strings in that journal (no values): {'bearer_token': 0, 'sk_key': 0, 'refresh_token': 0, 'id_token': 0, 'email_shaped': 0, 'api_key_assignment_with_value': 0}
+    log tags of the email-shaped matches (the addresses are not printed): none
+    
+    ## 20129 omniroute-fw.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute-fw.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: True
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: 3
+    one journal line that shows the child's output reaches journald: [16:12:33] [STREAM] CODEX | gpt-6-astra | 4386ms | complete
+    counts of credential-shaped strings in that journal (no values): {'bearer_token': 0, 'sk_key': 0, 'refresh_token': 0, 'id_token': 0, 'email_shaped': 0, 'api_key_assignment_with_value': 0}
+    log tags of the email-shaped matches (the addresses are not printed): none
+    
+    ## user journal
+    Archived and active journals take up 64.0M in the file system.
+    retention keys set in /etc/systemd/journald.conf(.d): none (the journald defaults apply)
+    shim calls: 5 (journalctl -u reads: 2); the helper's health reads reached the private stubs {20128: 1, 20129: 1}, in namespace net:[4026532774] (the host's is net:[4026531833])
+CONTROL-RESULT d3 before expected_exit=0 observed_exit=0 checked: all-zero counts of the 3 lines that were printed, exit 0, `observations not obtained: none` (a partial read passed as a genuine zero); no home path, user name or machine id in the output: True OK
+
+--- d3 / fixed: python3 omniroute-show-log-receipt-20261006.py control-d3   [the fixed helper]
+    # value-free receipt: control-d3
+    taken 2026-10-07T21:55:37Z
+    
+    ## 20128 omniroute.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: True
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: unavailable (journalctl exited 0 but wrote on stderr, so it may have skipped data: Warning: some journal files were not opened due to insufficient permissions.)
+    one journal line that shows the child's output reaches journald: unavailable
+    counts of credential-shaped strings in that journal (no values): unavailable (no journal was read, so no count is known: not zero)
+    log tags of the email-shaped matches (the addresses are not printed): unavailable
+    
+    ## 20129 omniroute-fw.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute-fw.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: True
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: unavailable (journalctl exited 0 but wrote on stderr, so it may have skipped data: Warning: some journal files were not opened due to insufficient permissions.)
+    one journal line that shows the child's output reaches journald: unavailable
+    counts of credential-shaped strings in that journal (no values): unavailable (no journal was read, so no count is known: not zero)
+    log tags of the email-shaped matches (the addresses are not printed): unavailable
+    
+    ## user journal
+    Archived and active journals take up 64.0M in the file system.
+    retention keys set in /etc/systemd/journald.conf(.d): none (the journald defaults apply)
+    
+    observations not obtained: ['20128 journal', '20129 journal']
+    shim calls: 5 (journalctl -u reads: 2); the helper's health reads reached the private stubs {20128: 1, 20129: 1}, in namespace net:[4026532770] (the host's is net:[4026531833])
+CONTROL-RESULT d3 fixed expected_exit=2 observed_exit=2 checked: counts unavailable for both units, the diagnostic says that journalctl exited 0 and wrote the warning, both journals listed as not obtained; no home path, user name or machine id in the output: True OK
+
+### d4: journalctl exits 0 with ordinary lines and a stderr line that holds no word of loss (a notice, not a warning that data was skipped): a genuine zero, as before
+--- d4 / before: python3 omniroute-show-log-receipt-20261006-v2-r12.py control-d4   [not a defect]
+    # value-free receipt: control-d4
+    taken 2026-10-07T21:55:37Z
+    
+    ## 20128 omniroute.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: True
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: 3
+    one journal line that shows the child's output reaches journald: [16:12:33] [STREAM] CODEX | gpt-6-astra | 4386ms | complete
+    counts of credential-shaped strings in that journal (no values): {'bearer_token': 0, 'sk_key': 0, 'refresh_token': 0, 'id_token': 0, 'email_shaped': 0, 'api_key_assignment_with_value': 0}
+    log tags of the email-shaped matches (the addresses are not printed): none
+    
+    ## 20129 omniroute-fw.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute-fw.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: True
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: 3
+    one journal line that shows the child's output reaches journald: [16:12:33] [STREAM] CODEX | gpt-6-astra | 4386ms | complete
+    counts of credential-shaped strings in that journal (no values): {'bearer_token': 0, 'sk_key': 0, 'refresh_token': 0, 'id_token': 0, 'email_shaped': 0, 'api_key_assignment_with_value': 0}
+    log tags of the email-shaped matches (the addresses are not printed): none
+    
+    ## user journal
+    Archived and active journals take up 64.0M in the file system.
+    retention keys set in /etc/systemd/journald.conf(.d): none (the journald defaults apply)
+    shim calls: 5 (journalctl -u reads: 2); the helper's health reads reached the private stubs {20128: 1, 20129: 1}, in namespace net:[4026532773] (the host's is net:[4026531833])
+CONTROL-RESULT d4 before expected_exit=0 observed_exit=0 checked: all-zero counts of 3 journal lines each; no home path, user name or machine id in the output: True OK
+
+--- d4 / fixed: python3 omniroute-show-log-receipt-20261006.py control-d4   [the fixed helper]
+    # value-free receipt: control-d4
+    taken 2026-10-07T21:55:37Z
+    
+    ## 20128 omniroute.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: True
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: 3
+    one journal line that shows the child's output reaches journald: [16:12:33] [STREAM] CODEX | gpt-6-astra | 4386ms | complete
+    counts of credential-shaped strings in that journal (no values): {'bearer_token': 0, 'sk_key': 0, 'refresh_token': 0, 'id_token': 0, 'email_shaped': 0, 'api_key_assignment_with_value': 0}
+    log tags of the email-shaped matches (the addresses are not printed): none
+    
+    ## 20129 omniroute-fw.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute-fw.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: True
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: 3
+    one journal line that shows the child's output reaches journald: [16:12:33] [STREAM] CODEX | gpt-6-astra | 4386ms | complete
+    counts of credential-shaped strings in that journal (no values): {'bearer_token': 0, 'sk_key': 0, 'refresh_token': 0, 'id_token': 0, 'email_shaped': 0, 'api_key_assignment_with_value': 0}
+    log tags of the email-shaped matches (the addresses are not printed): none
+    
+    ## user journal
+    Archived and active journals take up 64.0M in the file system.
+    retention keys set in /etc/systemd/journald.conf(.d): none (the journald defaults apply)
+    
+    observations not obtained: none
+    shim calls: 5 (journalctl -u reads: 2); the helper's health reads reached the private stubs {20128: 1, 20129: 1}, in namespace net:[4026532775] (the host's is net:[4026531833])
+CONTROL-RESULT d4 fixed expected_exit=0 observed_exit=0 checked: all-zero counts of 3 journal lines each, exit 0, no observation missing; no home path, user name or machine id in the output: True; output identical to the version before round 13 apart from the taken time and the closing list: True OK
+
+### f: the disk-usage read fails (journalctl --user --disk-usage exits 1)
+--- f / before: python3 omniroute-show-log-receipt-20261006-v2-r12.py control-f   [the defect]
+    # value-free receipt: control-f
+    taken 2026-10-07T21:55:37Z
+    
+    ## 20128 omniroute.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: True
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: 3
+    one journal line that shows the child's output reaches journald: [16:12:33] [STREAM] CODEX | gpt-6-astra | 4386ms | complete
+    counts of credential-shaped strings in that journal (no values): {'bearer_token': 0, 'sk_key': 0, 'refresh_token': 0, 'id_token': 0, 'email_shaped': 0, 'api_key_assignment_with_value': 0}
+    log tags of the email-shaped matches (the addresses are not printed): none
+    
+    ## 20129 omniroute-fw.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute-fw.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: True
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: 3
+    one journal line that shows the child's output reaches journald: [16:12:33] [STREAM] CODEX | gpt-6-astra | 4386ms | complete
+    counts of credential-shaped strings in that journal (no values): {'bearer_token': 0, 'sk_key': 0, 'refresh_token': 0, 'id_token': 0, 'email_shaped': 0, 'api_key_assignment_with_value': 0}
+    log tags of the email-shaped matches (the addresses are not printed): none
+    
+    ## user journal
+    
+    retention keys set in /etc/systemd/journald.conf(.d): none (the journald defaults apply)
+    shim calls: 5 (journalctl -u reads: 2); the helper's health reads reached the private stubs {20128: 1, 20129: 1}, in namespace net:[4026532770] (the host's is net:[4026531833])
+CONTROL-RESULT f before expected_exit=0 observed_exit=0 checked: an empty disk-usage line, exit 0; no home path, user name or machine id in the output: True OK
+
+--- f / fixed: python3 omniroute-show-log-receipt-20261006.py control-f   [the fixed helper]
+    # value-free receipt: control-f
+    taken 2026-10-07T21:55:37Z
+    
+    ## 20128 omniroute.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: True
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: 3
+    one journal line that shows the child's output reaches journald: [16:12:33] [STREAM] CODEX | gpt-6-astra | 4386ms | complete
+    counts of credential-shaped strings in that journal (no values): {'bearer_token': 0, 'sk_key': 0, 'refresh_token': 0, 'id_token': 0, 'email_shaped': 0, 'api_key_assignment_with_value': 0}
+    log tags of the email-shaped matches (the addresses are not printed): none
+    
+    ## 20129 omniroute-fw.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute-fw.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: True
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: 3
+    one journal line that shows the child's output reaches journald: [16:12:33] [STREAM] CODEX | gpt-6-astra | 4386ms | complete
+    counts of credential-shaped strings in that journal (no values): {'bearer_token': 0, 'sk_key': 0, 'refresh_token': 0, 'id_token': 0, 'email_shaped': 0, 'api_key_assignment_with_value': 0}
+    log tags of the email-shaped matches (the addresses are not printed): none
+    
+    ## user journal
+    journal disk usage: unavailable (journalctl exited 1: Failed to get disk usage: Input/output error)
+    retention keys set in /etc/systemd/journald.conf(.d): none (the journald defaults apply)
+    
+    observations not obtained: ['user journal disk usage']
+    shim calls: 5 (journalctl -u reads: 2); the helper's health reads reached the private stubs {20128: 1, 20129: 1}, in namespace net:[4026532833] (the host's is net:[4026531833])
+CONTROL-RESULT f fixed expected_exit=2 observed_exit=2 checked: the disk usage unavailable with its diagnostic; the unit journals still read (genuine zeros); no home path, user name or machine id in the output: True OK
+
+### e1: Environment=OMNIROUTE_SHOW_LOG=10 PATH=/usr/bin: the variable set to 10: the gateway's predicate (=== "1") does not hold
+--- e1 / before: python3 omniroute-show-log-receipt-20261006-v2-r12.py control-e1   [the defect]
+    # value-free receipt: control-e1
+    taken 2026-10-07T21:55:37Z
+    
+    ## 20128 omniroute.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: True
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: 3
+    one journal line that shows the child's output reaches journald: [16:12:33] [STREAM] CODEX | gpt-6-astra | 4386ms | complete
+    counts of credential-shaped strings in that journal (no values): {'bearer_token': 0, 'sk_key': 0, 'refresh_token': 0, 'id_token': 0, 'email_shaped': 0, 'api_key_assignment_with_value': 0}
+    log tags of the email-shaped matches (the addresses are not printed): none
+    
+    ## 20129 omniroute-fw.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute-fw.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: True
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: 3
+    one journal line that shows the child's output reaches journald: [16:12:33] [STREAM] CODEX | gpt-6-astra | 4386ms | complete
+    counts of credential-shaped strings in that journal (no values): {'bearer_token': 0, 'sk_key': 0, 'refresh_token': 0, 'id_token': 0, 'email_shaped': 0, 'api_key_assignment_with_value': 0}
+    log tags of the email-shaped matches (the addresses are not printed): none
+    
+    ## user journal
+    Archived and active journals take up 64.0M in the file system.
+    retention keys set in /etc/systemd/journald.conf(.d): none (the journald defaults apply)
+    shim calls: 5 (journalctl -u reads: 2); the helper's health reads reached the private stubs {20128: 1, 20129: 1}, in namespace net:[4026532770] (the host's is net:[4026531833])
+CONTROL-RESULT e1 before expected_exit=0 observed_exit=0 checked: the boolean True; no home path, user name or machine id in the output: True OK
+
+--- e1 / fixed: python3 omniroute-show-log-receipt-20261006.py control-e1   [the fixed helper]
+    # value-free receipt: control-e1
+    taken 2026-10-07T21:55:37Z
+    
+    ## 20128 omniroute.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: False
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: 3
+    one journal line that shows the child's output reaches journald: [16:12:33] [STREAM] CODEX | gpt-6-astra | 4386ms | complete
+    counts of credential-shaped strings in that journal (no values): {'bearer_token': 0, 'sk_key': 0, 'refresh_token': 0, 'id_token': 0, 'email_shaped': 0, 'api_key_assignment_with_value': 0}
+    log tags of the email-shaped matches (the addresses are not printed): none
+    
+    ## 20129 omniroute-fw.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute-fw.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: False
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: 3
+    one journal line that shows the child's output reaches journald: [16:12:33] [STREAM] CODEX | gpt-6-astra | 4386ms | complete
+    counts of credential-shaped strings in that journal (no values): {'bearer_token': 0, 'sk_key': 0, 'refresh_token': 0, 'id_token': 0, 'email_shaped': 0, 'api_key_assignment_with_value': 0}
+    log tags of the email-shaped matches (the addresses are not printed): none
+    
+    ## user journal
+    Archived and active journals take up 64.0M in the file system.
+    retention keys set in /etc/systemd/journald.conf(.d): none (the journald defaults apply)
+    
+    observations not obtained: none
+    shim calls: 5 (journalctl -u reads: 2); the helper's health reads reached the private stubs {20128: 1, 20129: 1}, in namespace net:[4026532831] (the host's is net:[4026531833])
+CONTROL-RESULT e1 fixed expected_exit=0 observed_exit=0 checked: the boolean False; no home path, user name or machine id in the output: True OK
+
+### e2: Environment=X_OMNIROUTE_SHOW_LOG=1: a longer variable name that contains OMNIROUTE_SHOW_LOG=1
+--- e2 / before: python3 omniroute-show-log-receipt-20261006-v2-r12.py control-e2   [the defect]
+    # value-free receipt: control-e2
+    taken 2026-10-07T21:55:37Z
+    
+    ## 20128 omniroute.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: True
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: 3
+    one journal line that shows the child's output reaches journald: [16:12:33] [STREAM] CODEX | gpt-6-astra | 4386ms | complete
+    counts of credential-shaped strings in that journal (no values): {'bearer_token': 0, 'sk_key': 0, 'refresh_token': 0, 'id_token': 0, 'email_shaped': 0, 'api_key_assignment_with_value': 0}
+    log tags of the email-shaped matches (the addresses are not printed): none
+    
+    ## 20129 omniroute-fw.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute-fw.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: True
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: 3
+    one journal line that shows the child's output reaches journald: [16:12:33] [STREAM] CODEX | gpt-6-astra | 4386ms | complete
+    counts of credential-shaped strings in that journal (no values): {'bearer_token': 0, 'sk_key': 0, 'refresh_token': 0, 'id_token': 0, 'email_shaped': 0, 'api_key_assignment_with_value': 0}
+    log tags of the email-shaped matches (the addresses are not printed): none
+    
+    ## user journal
+    Archived and active journals take up 64.0M in the file system.
+    retention keys set in /etc/systemd/journald.conf(.d): none (the journald defaults apply)
+    shim calls: 5 (journalctl -u reads: 2); the helper's health reads reached the private stubs {20128: 1, 20129: 1}, in namespace net:[4026532772] (the host's is net:[4026531833])
+CONTROL-RESULT e2 before expected_exit=0 observed_exit=0 checked: the boolean True; no home path, user name or machine id in the output: True OK
+
+--- e2 / fixed: python3 omniroute-show-log-receipt-20261006.py control-e2   [the fixed helper]
+    # value-free receipt: control-e2
+    taken 2026-10-07T21:55:38Z
+    
+    ## 20128 omniroute.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: False
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: 3
+    one journal line that shows the child's output reaches journald: [16:12:33] [STREAM] CODEX | gpt-6-astra | 4386ms | complete
+    counts of credential-shaped strings in that journal (no values): {'bearer_token': 0, 'sk_key': 0, 'refresh_token': 0, 'id_token': 0, 'email_shaped': 0, 'api_key_assignment_with_value': 0}
+    log tags of the email-shaped matches (the addresses are not printed): none
+    
+    ## 20129 omniroute-fw.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute-fw.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: False
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: 3
+    one journal line that shows the child's output reaches journald: [16:12:33] [STREAM] CODEX | gpt-6-astra | 4386ms | complete
+    counts of credential-shaped strings in that journal (no values): {'bearer_token': 0, 'sk_key': 0, 'refresh_token': 0, 'id_token': 0, 'email_shaped': 0, 'api_key_assignment_with_value': 0}
+    log tags of the email-shaped matches (the addresses are not printed): none
+    
+    ## user journal
+    Archived and active journals take up 64.0M in the file system.
+    retention keys set in /etc/systemd/journald.conf(.d): none (the journald defaults apply)
+    
+    observations not obtained: none
+    shim calls: 5 (journalctl -u reads: 2); the helper's health reads reached the private stubs {20128: 1, 20129: 1}, in namespace net:[4026532770] (the host's is net:[4026531833])
+CONTROL-RESULT e2 fixed expected_exit=0 observed_exit=0 checked: the boolean False; no home path, user name or machine id in the output: True OK
+
+### e3: Environment=OMNIROUTE_SHOW_LOG=1: the exact assignment OMNIROUTE_SHOW_LOG=1
+--- e3 / before: python3 omniroute-show-log-receipt-20261006-v2-r12.py control-e3   [not a defect]
+    # value-free receipt: control-e3
+    taken 2026-10-07T21:55:38Z
+    
+    ## 20128 omniroute.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: True
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: 3
+    one journal line that shows the child's output reaches journald: [16:12:33] [STREAM] CODEX | gpt-6-astra | 4386ms | complete
+    counts of credential-shaped strings in that journal (no values): {'bearer_token': 0, 'sk_key': 0, 'refresh_token': 0, 'id_token': 0, 'email_shaped': 0, 'api_key_assignment_with_value': 0}
+    log tags of the email-shaped matches (the addresses are not printed): none
+    
+    ## 20129 omniroute-fw.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute-fw.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: True
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: 3
+    one journal line that shows the child's output reaches journald: [16:12:33] [STREAM] CODEX | gpt-6-astra | 4386ms | complete
+    counts of credential-shaped strings in that journal (no values): {'bearer_token': 0, 'sk_key': 0, 'refresh_token': 0, 'id_token': 0, 'email_shaped': 0, 'api_key_assignment_with_value': 0}
+    log tags of the email-shaped matches (the addresses are not printed): none
+    
+    ## user journal
+    Archived and active journals take up 64.0M in the file system.
+    retention keys set in /etc/systemd/journald.conf(.d): none (the journald defaults apply)
+    shim calls: 5 (journalctl -u reads: 2); the helper's health reads reached the private stubs {20128: 1, 20129: 1}, in namespace net:[4026532774] (the host's is net:[4026531833])
+CONTROL-RESULT e3 before expected_exit=0 observed_exit=0 checked: the boolean True; no home path, user name or machine id in the output: True OK
+
+--- e3 / fixed: python3 omniroute-show-log-receipt-20261006.py control-e3   [the fixed helper]
+    # value-free receipt: control-e3
+    taken 2026-10-07T21:55:38Z
+    
+    ## 20128 omniroute.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: True
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: 3
+    one journal line that shows the child's output reaches journald: [16:12:33] [STREAM] CODEX | gpt-6-astra | 4386ms | complete
+    counts of credential-shaped strings in that journal (no values): {'bearer_token': 0, 'sk_key': 0, 'refresh_token': 0, 'id_token': 0, 'email_shaped': 0, 'api_key_assignment_with_value': 0}
+    log tags of the email-shaped matches (the addresses are not printed): none
+    
+    ## 20129 omniroute-fw.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute-fw.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: True
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: 3
+    one journal line that shows the child's output reaches journald: [16:12:33] [STREAM] CODEX | gpt-6-astra | 4386ms | complete
+    counts of credential-shaped strings in that journal (no values): {'bearer_token': 0, 'sk_key': 0, 'refresh_token': 0, 'id_token': 0, 'email_shaped': 0, 'api_key_assignment_with_value': 0}
+    log tags of the email-shaped matches (the addresses are not printed): none
+    
+    ## user journal
+    Archived and active journals take up 64.0M in the file system.
+    retention keys set in /etc/systemd/journald.conf(.d): none (the journald defaults apply)
+    
+    observations not obtained: none
+    shim calls: 5 (journalctl -u reads: 2); the helper's health reads reached the private stubs {20128: 1, 20129: 1}, in namespace net:[4026532772] (the host's is net:[4026531833])
+CONTROL-RESULT e3 fixed expected_exit=0 observed_exit=0 checked: the boolean True; no home path, user name or machine id in the output: True; output identical to the version before round 13 apart from the taken time and the closing list: True OK
+
+### e4: Environment=PATH=/usr/bin OMNIROUTE_SHOW_LOG=1 LANG=C.UTF-8: the exact assignment among others
+--- e4 / before: python3 omniroute-show-log-receipt-20261006-v2-r12.py control-e4   [not a defect]
+    # value-free receipt: control-e4
+    taken 2026-10-07T21:55:38Z
+    
+    ## 20128 omniroute.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: True
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: 3
+    one journal line that shows the child's output reaches journald: [16:12:33] [STREAM] CODEX | gpt-6-astra | 4386ms | complete
+    counts of credential-shaped strings in that journal (no values): {'bearer_token': 0, 'sk_key': 0, 'refresh_token': 0, 'id_token': 0, 'email_shaped': 0, 'api_key_assignment_with_value': 0}
+    log tags of the email-shaped matches (the addresses are not printed): none
+    
+    ## 20129 omniroute-fw.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute-fw.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: True
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: 3
+    one journal line that shows the child's output reaches journald: [16:12:33] [STREAM] CODEX | gpt-6-astra | 4386ms | complete
+    counts of credential-shaped strings in that journal (no values): {'bearer_token': 0, 'sk_key': 0, 'refresh_token': 0, 'id_token': 0, 'email_shaped': 0, 'api_key_assignment_with_value': 0}
+    log tags of the email-shaped matches (the addresses are not printed): none
+    
+    ## user journal
+    Archived and active journals take up 64.0M in the file system.
+    retention keys set in /etc/systemd/journald.conf(.d): none (the journald defaults apply)
+    shim calls: 5 (journalctl -u reads: 2); the helper's health reads reached the private stubs {20128: 1, 20129: 1}, in namespace net:[4026532770] (the host's is net:[4026531833])
+CONTROL-RESULT e4 before expected_exit=0 observed_exit=0 checked: the boolean True; no home path, user name or machine id in the output: True OK
+
+--- e4 / fixed: python3 omniroute-show-log-receipt-20261006.py control-e4   [the fixed helper]
+    # value-free receipt: control-e4
+    taken 2026-10-07T21:55:38Z
+    
+    ## 20128 omniroute.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: True
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: 3
+    one journal line that shows the child's output reaches journald: [16:12:33] [STREAM] CODEX | gpt-6-astra | 4386ms | complete
+    counts of credential-shaped strings in that journal (no values): {'bearer_token': 0, 'sk_key': 0, 'refresh_token': 0, 'id_token': 0, 'email_shaped': 0, 'api_key_assignment_with_value': 0}
+    log tags of the email-shaped matches (the addresses are not printed): none
+    
+    ## 20129 omniroute-fw.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute-fw.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: True
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: 3
+    one journal line that shows the child's output reaches journald: [16:12:33] [STREAM] CODEX | gpt-6-astra | 4386ms | complete
+    counts of credential-shaped strings in that journal (no values): {'bearer_token': 0, 'sk_key': 0, 'refresh_token': 0, 'id_token': 0, 'email_shaped': 0, 'api_key_assignment_with_value': 0}
+    log tags of the email-shaped matches (the addresses are not printed): none
+    
+    ## user journal
+    Archived and active journals take up 64.0M in the file system.
+    retention keys set in /etc/systemd/journald.conf(.d): none (the journald defaults apply)
+    
+    observations not obtained: none
+    shim calls: 5 (journalctl -u reads: 2); the helper's health reads reached the private stubs {20128: 1, 20129: 1}, in namespace net:[4026532772] (the host's is net:[4026531833])
+CONTROL-RESULT e4 fixed expected_exit=0 observed_exit=0 checked: the boolean True; no home path, user name or machine id in the output: True; output identical to the version before round 13 apart from the taken time and the closing list: True OK
+
+### e5: Environment=OMNIROUTE_SHOW_LOG=1 OMNIROUTE_SHOW_LOG=0: a later assignment of the same variable to 0 (the last assignment applies; a shape systemd may never print)
+--- e5 / before: python3 omniroute-show-log-receipt-20261006-v2-r12.py control-e5   [the defect]
+    # value-free receipt: control-e5
+    taken 2026-10-07T21:55:38Z
+    
+    ## 20128 omniroute.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: True
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: 3
+    one journal line that shows the child's output reaches journald: [16:12:33] [STREAM] CODEX | gpt-6-astra | 4386ms | complete
+    counts of credential-shaped strings in that journal (no values): {'bearer_token': 0, 'sk_key': 0, 'refresh_token': 0, 'id_token': 0, 'email_shaped': 0, 'api_key_assignment_with_value': 0}
+    log tags of the email-shaped matches (the addresses are not printed): none
+    
+    ## 20129 omniroute-fw.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute-fw.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: True
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: 3
+    one journal line that shows the child's output reaches journald: [16:12:33] [STREAM] CODEX | gpt-6-astra | 4386ms | complete
+    counts of credential-shaped strings in that journal (no values): {'bearer_token': 0, 'sk_key': 0, 'refresh_token': 0, 'id_token': 0, 'email_shaped': 0, 'api_key_assignment_with_value': 0}
+    log tags of the email-shaped matches (the addresses are not printed): none
+    
+    ## user journal
+    Archived and active journals take up 64.0M in the file system.
+    retention keys set in /etc/systemd/journald.conf(.d): none (the journald defaults apply)
+    shim calls: 5 (journalctl -u reads: 2); the helper's health reads reached the private stubs {20128: 1, 20129: 1}, in namespace net:[4026532774] (the host's is net:[4026531833])
+CONTROL-RESULT e5 before expected_exit=0 observed_exit=0 checked: the boolean True; no home path, user name or machine id in the output: True OK
+
+--- e5 / fixed: python3 omniroute-show-log-receipt-20261006.py control-e5   [the fixed helper]
+    # value-free receipt: control-e5
+    taken 2026-10-07T21:55:38Z
+    
+    ## 20128 omniroute.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: False
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: 3
+    one journal line that shows the child's output reaches journald: [16:12:33] [STREAM] CODEX | gpt-6-astra | 4386ms | complete
+    counts of credential-shaped strings in that journal (no values): {'bearer_token': 0, 'sk_key': 0, 'refresh_token': 0, 'id_token': 0, 'email_shaped': 0, 'api_key_assignment_with_value': 0}
+    log tags of the email-shaped matches (the addresses are not printed): none
+    
+    ## 20129 omniroute-fw.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute-fw.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: False
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: 3
+    one journal line that shows the child's output reaches journald: [16:12:33] [STREAM] CODEX | gpt-6-astra | 4386ms | complete
+    counts of credential-shaped strings in that journal (no values): {'bearer_token': 0, 'sk_key': 0, 'refresh_token': 0, 'id_token': 0, 'email_shaped': 0, 'api_key_assignment_with_value': 0}
+    log tags of the email-shaped matches (the addresses are not printed): none
+    
+    ## user journal
+    Archived and active journals take up 64.0M in the file system.
+    retention keys set in /etc/systemd/journald.conf(.d): none (the journald defaults apply)
+    
+    observations not obtained: none
+    shim calls: 5 (journalctl -u reads: 2); the helper's health reads reached the private stubs {20128: 1, 20129: 1}, in namespace net:[4026532771] (the host's is net:[4026531833])
+CONTROL-RESULT e5 fixed expected_exit=0 observed_exit=0 checked: the boolean False; no home path, user name or machine id in the output: True OK
+
+### e6: Environment=: no Environment entry at all
+--- e6 / before: python3 omniroute-show-log-receipt-20261006-v2-r12.py control-e6   [not a defect]
+    # value-free receipt: control-e6
+    taken 2026-10-07T21:55:38Z
+    
+    ## 20128 omniroute.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: False
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: 3
+    one journal line that shows the child's output reaches journald: [16:12:33] [STREAM] CODEX | gpt-6-astra | 4386ms | complete
+    counts of credential-shaped strings in that journal (no values): {'bearer_token': 0, 'sk_key': 0, 'refresh_token': 0, 'id_token': 0, 'email_shaped': 0, 'api_key_assignment_with_value': 0}
+    log tags of the email-shaped matches (the addresses are not printed): none
+    
+    ## 20129 omniroute-fw.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute-fw.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: False
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: 3
+    one journal line that shows the child's output reaches journald: [16:12:33] [STREAM] CODEX | gpt-6-astra | 4386ms | complete
+    counts of credential-shaped strings in that journal (no values): {'bearer_token': 0, 'sk_key': 0, 'refresh_token': 0, 'id_token': 0, 'email_shaped': 0, 'api_key_assignment_with_value': 0}
+    log tags of the email-shaped matches (the addresses are not printed): none
+    
+    ## user journal
+    Archived and active journals take up 64.0M in the file system.
+    retention keys set in /etc/systemd/journald.conf(.d): none (the journald defaults apply)
+    shim calls: 5 (journalctl -u reads: 2); the helper's health reads reached the private stubs {20128: 1, 20129: 1}, in namespace net:[4026532774] (the host's is net:[4026531833])
+CONTROL-RESULT e6 before expected_exit=0 observed_exit=0 checked: the boolean False; no home path, user name or machine id in the output: True OK
+
+--- e6 / fixed: python3 omniroute-show-log-receipt-20261006.py control-e6   [the fixed helper]
+    # value-free receipt: control-e6
+    taken 2026-10-07T21:55:39Z
+    
+    ## 20128 omniroute.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: False
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: 3
+    one journal line that shows the child's output reaches journald: [16:12:33] [STREAM] CODEX | gpt-6-astra | 4386ms | complete
+    counts of credential-shaped strings in that journal (no values): {'bearer_token': 0, 'sk_key': 0, 'refresh_token': 0, 'id_token': 0, 'email_shaped': 0, 'api_key_assignment_with_value': 0}
+    log tags of the email-shaped matches (the addresses are not printed): none
+    
+    ## 20129 omniroute-fw.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute-fw.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: False
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: 3
+    one journal line that shows the child's output reaches journald: [16:12:33] [STREAM] CODEX | gpt-6-astra | 4386ms | complete
+    counts of credential-shaped strings in that journal (no values): {'bearer_token': 0, 'sk_key': 0, 'refresh_token': 0, 'id_token': 0, 'email_shaped': 0, 'api_key_assignment_with_value': 0}
+    log tags of the email-shaped matches (the addresses are not printed): none
+    
+    ## user journal
+    Archived and active journals take up 64.0M in the file system.
+    retention keys set in /etc/systemd/journald.conf(.d): none (the journald defaults apply)
+    
+    observations not obtained: none
+    shim calls: 5 (journalctl -u reads: 2); the helper's health reads reached the private stubs {20128: 1, 20129: 1}, in namespace net:[4026532771] (the host's is net:[4026531833])
+CONTROL-RESULT e6 fixed expected_exit=0 observed_exit=0 checked: the boolean False; no home path, user name or machine id in the output: True; output identical to the version before round 13 apart from the taken time and the closing list: True OK
+
+### e7: Environment=OMNIROUTE_SHOW_LOG=1 [unprintable]: an entry systemctl prints as [unprintable] follows the assignment of 1 (it could assign the variable again; beyond the finding)
+--- e7 / before: python3 omniroute-show-log-receipt-20261006-v2-r12.py control-e7   [not a demonstrated defect: the conservative case of the new parse]
+    # value-free receipt: control-e7
+    taken 2026-10-07T21:55:39Z
+    
+    ## 20128 omniroute.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: True
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: 3
+    one journal line that shows the child's output reaches journald: [16:12:33] [STREAM] CODEX | gpt-6-astra | 4386ms | complete
+    counts of credential-shaped strings in that journal (no values): {'bearer_token': 0, 'sk_key': 0, 'refresh_token': 0, 'id_token': 0, 'email_shaped': 0, 'api_key_assignment_with_value': 0}
+    log tags of the email-shaped matches (the addresses are not printed): none
+    
+    ## 20129 omniroute-fw.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute-fw.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: True
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: 3
+    one journal line that shows the child's output reaches journald: [16:12:33] [STREAM] CODEX | gpt-6-astra | 4386ms | complete
+    counts of credential-shaped strings in that journal (no values): {'bearer_token': 0, 'sk_key': 0, 'refresh_token': 0, 'id_token': 0, 'email_shaped': 0, 'api_key_assignment_with_value': 0}
+    log tags of the email-shaped matches (the addresses are not printed): none
+    
+    ## user journal
+    Archived and active journals take up 64.0M in the file system.
+    retention keys set in /etc/systemd/journald.conf(.d): none (the journald defaults apply)
+    shim calls: 5 (journalctl -u reads: 2); the helper's health reads reached the private stubs {20128: 1, 20129: 1}, in namespace net:[4026532776] (the host's is net:[4026531833])
+CONTROL-RESULT e7 before expected_exit=0 observed_exit=0 checked: the boolean True; no home path, user name or machine id in the output: True OK
+
+--- e7 / fixed: python3 omniroute-show-log-receipt-20261006.py control-e7   [the fixed helper]
+    # value-free receipt: control-e7
+    taken 2026-10-07T21:55:39Z
+    
+    ## 20128 omniroute.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: undetermined (an Environment entry that is not one NAME=VALUE token follows the assignment OMNIROUTE_SHOW_LOG=1 and may assign it again)
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: 3
+    one journal line that shows the child's output reaches journald: [16:12:33] [STREAM] CODEX | gpt-6-astra | 4386ms | complete
+    counts of credential-shaped strings in that journal (no values): {'bearer_token': 0, 'sk_key': 0, 'refresh_token': 0, 'id_token': 0, 'email_shaped': 0, 'api_key_assignment_with_value': 0}
+    log tags of the email-shaped matches (the addresses are not printed): none
+    
+    ## 20129 omniroute-fw.service
+    DropInPaths: $HOME/.cache/show-log-controls-cf1gfzev/dropins/omniroute-fw.service.d/show-log.conf
+    OMNIROUTE_SHOW_LOG=1 present in the unit's environment: undetermined (an Environment entry that is not one NAME=VALUE token follows the assignment OMNIROUTE_SHOW_LOG=1 and may assign it again)
+    ActiveState: active
+    SubState: running
+    MainPID: 4242
+    ActiveEnterTimestamp: Mon 2026-10-05 16:12:12 EDT
+    NRestarts: 0
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+    health: 200 {'status': 'ok', 'stub': 'show-log-receipt-controls'}
+    journal lines since the unit's start: 3
+    one journal line that shows the child's output reaches journald: [16:12:33] [STREAM] CODEX | gpt-6-astra | 4386ms | complete
+    counts of credential-shaped strings in that journal (no values): {'bearer_token': 0, 'sk_key': 0, 'refresh_token': 0, 'id_token': 0, 'email_shaped': 0, 'api_key_assignment_with_value': 0}
+    log tags of the email-shaped matches (the addresses are not printed): none
+    
+    ## user journal
+    Archived and active journals take up 64.0M in the file system.
+    retention keys set in /etc/systemd/journald.conf(.d): none (the journald defaults apply)
+    
+    observations not obtained: ['20128 OMNIROUTE_SHOW_LOG', '20129 OMNIROUTE_SHOW_LOG']
+    shim calls: 5 (journalctl -u reads: 2); the helper's health reads reached the private stubs {20128: 1, 20129: 1}, in namespace net:[4026532772] (the host's is net:[4026531833])
+CONTROL-RESULT e7 fixed expected_exit=2 observed_exit=2 checked: the boolean undetermined, listed as not obtained, exit 2; no home path, user name or machine id in the output: True OK
+
+# scratch directory (remove with rm -rf after reading): $HOME/.cache/show-log-controls-cf1gfzev
+# finished 2026-10-07T21:55:39Z; runs not as expected: none
+
+# ---- Part R: the existing drop-in controls RC1 and RC2, `run-controls.py --only RC1,RC2` (scripts/acceptance-controls/run-controls.py.txt), on the fixed helper; raw output ----
+# Offline controls of the live-acceptance scripts, version 1 (superseded) against version 2.2 (frozen; versions 2.0 and 2.1, guard version 3 and the earlier wrapper appear where a control reproduces a defect a review found), on the stub gateway and a scratch database. Nothing here touches a live gateway.
+# started 2026-10-07T21:55:39Z; codex-cli 0.159.3; python 3.13.15
+# live-acceptance v1: sha256 8aa14054401c00a5af1e8c180fc83af80c79cc0a807da98ea519149291188859
+# live-acceptance v2.0 (superseded): sha256 fa8fa6f8dc3a0e7360be4a0737c34daaf4d4b58696df6a7ab3483896cb739e82
+# live-acceptance v2.1 (superseded; R10): sha256 15b8cf04134aa8ead6526739e5a95b6dc15f4e5b77d59840e0d03aa56b33301b
+# live-acceptance v2.2: sha256 52b1d749dc6b7f6b406f8ce8db5d8b1d3e3a73a6b7861a63cc158dbebd320d75
+# native-exec v1: sha256 9f511620db390c3b4c7177f858342c6592680efd1d383e2e02ecf3f5d249fdee
+# native-exec v2.0 (superseded; N10): sha256 9bd478a1502839e7cfe2c5999e3485d6e9ba5d10bfe62e2593e061b7441dda71
+# native-exec v2.1: sha256 db2a4d42d6caf4c39e484903313f0f94bd2be40fabe4f1336d0dcdc3b1d0bafd
+# show-log-receipt v2: sha256 cd119a03186fb2acd66b22024423bcc6fae533fd87d412dae70c467e79e637f8
+# gateway-identity: sha256 a7932710412e9e834f6b992f267db5620b64bbe62f25021013c8004a7eec6011
+# pre-switch-guard v5: sha256 5c8ccf3fb4ca747ddcf3a427d732cf111a74e6c09358adceba55ea7ead75c95b
+# pre-switch-guard v3 (superseded; G13-G15): sha256 305a065227bff71dcbe3b46b157f4d3ed83f5a5b5ce90a2f73cbfa6b26805040
+# pre-switch-guard v2 (superseded; G12): sha256 b491de6b3e4a5a1d3a3761c8fa8aefc439cca8cf4c453d696c7b9cb41a73af3a
+# run-acceptance wrapper: sha256 0e74b3b15616b809a907c8ad197247a637fd7a8b7d706f81f1ab41b5119ca33d
+# run-acceptance wrapper before the re-freeze (superseded; W7-W12): sha256 abcbb5407c244062697fb94a677100b3e670b609b423582d9f39368073e9cb11
+# switch tool copy (committed evidence file): sha256 97d1b87bb651d6f43e184b9617d03afa7861ee7715e7030ad23ed29057bc23e3
+# stub-gateway: sha256 1d29d8f6dfda224d21e40f82834d47746e54225acb37ac0096d0d73f207400ea
+# fake-codex: sha256 9e9146449b02d50ea0322ce3f5f07e5dcfb29253e5edcba48aec0f524dc0fc77
+# health-server: sha256 c8b1183543319d501d6729b59b7c836817da333ebc65233268873f9452afca75
+# poller: sha256 aabb35f12418f85f6d23fca3a5cd137bf646d77f4241267bc6b12089fe53890f
+# run-controls: sha256 8a36cdd43ebdcb363f8538538386e801cf31deb2c9943a3bdad2a28b8157462b
+
+### RC1: a drop-in with only the show-log line
+--- RC1 / v1 (the print statement of version 1 applied to the same file): drop-in file: effective lines: ['[Service]', 'Environment=OMNIROUTE_SHOW_LOG=1']
+--- RC1 / v2: python3 omniroute-show-log-receipt-20261006.py --describe-dropin show-log-clean.conf
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o644
+CONTROL-RESULT RC1 v2 expected_no_leak observed_leaked=[] OK
+
+### RC2: a drop-in with an extra synthetic assignment that looks like a credential
+--- RC2 / v1 (the print statement of version 1 applied to the same file): drop-in file: effective lines: ['[Service]', 'Environment=OMNIROUTE_SHOW_LOG=1', 'Environment=SYNTHETIC_CONTROL_SECRET=control-value-0123456789']
+--- RC2 / v2: python3 omniroute-show-log-receipt-20261006.py --describe-dropin show-log-with-extra.conf
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 1 (not printed) | size 105 bytes | mode 0o644
+CONTROL-RESULT RC2 v2 expected_no_leak observed_leaked=[] OK
+
+# finished 2026-10-07T21:55:39Z; scenarios with an unexpected exit status: none

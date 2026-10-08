@@ -1,0 +1,21 @@
+# Publication note: UUID-shaped strings (the gateway's correlation ids) are shortened to their first 8 hex digits and an ellipsis, because the repository's publication check rejects full UUIDs; sha256 of this text before the shortening: 4c4dd15ce3a3f2f9a0adc21ec05202eea344e3091c25699002adcf633e917e9e; the unshortened text is kept in the first host's private artifact directory (checks/logs/MANIFEST.txt)
+# Produced by version 1 of the acceptance scripts (superseded; see superseded/README.md). Its observations of the unpatched build cf6748d04 stand; its verdict logic does not.
+# race set on the UNPATCHED gateway (20128 build cf6748d04), same-day, frozen script; started 2026-10-06T00:09:22Z
+FROZEN script_sha256=8aa14054401c00a5af1e8c180fc83af80c79cc0a807da98ea519149291188859 argv=['--expect', 'observe', '--wait1', '12', '--wait2', '60', 'responses:early:0', 'responses:early:0', 'responses:early:0', 'responses:early:0', 'responses:early:0', 'responses:early:0'] cwd=/tmp start=2026-10-06T00:09:22.390Z expect=observe wait1=12.0 wait2=60.0 port=20128
+RESULT mode=responses:early:0 http=200 terminal=True closed_early=True stream_s=2.3 corr=d69ac181… response_id=resp_0365af1efa0973c6016ac43c33012487d1948856ab07b3271f read1_call_logs=0 read1_usage=0 window_call_logs=0 window_usage=0 verdict=OBSERVED
+RESULT mode=responses:early:0 http=200 terminal=True closed_early=True stream_s=2.7 corr=aba9be55… response_id=resp_06651fee9a1cc2bd016ac43c4222c087d199f9d8d0d71a33fa read1_call_logs=0 read1_usage=0 window_call_logs=0 window_usage=0 verdict=OBSERVED
+RESULT mode=responses:early:0 http=200 terminal=True closed_early=True stream_s=4.7 corr=None response_id=resp_07f390b5529f1351016ac43c526f9487d19e76574ac0804f6c read1_call_logs=0 read1_usage=0 window_call_logs=0 window_usage=0 verdict=OBSERVED
+RESULT mode=responses:early:0 http=200 terminal=True closed_early=True stream_s=4.9 corr=21b37f33… response_id=resp_0ea1f10fdbb8448b016ac43c6350e087d18a17024a25a907dd read1_call_logs=0 read1_usage=0 window_call_logs=0 window_usage=0 verdict=OBSERVED
+RESULT mode=responses:early:0 http=200 terminal=True closed_early=True stream_s=2.6 corr=b98b1cdd… response_id=resp_011720bbafbab1ab016ac43c75154087d19fedcd03442d85bb read1_call_logs=0 read1_usage=0 window_call_logs=0 window_usage=0 verdict=OBSERVED
+RESULT mode=responses:early:0 http=200 terminal=True closed_early=True stream_s=2.2 corr=c162f321… response_id=resp_0ec2cd3629e39bc5016ac43c84716087d1b7ecee216a8e9186 read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=OBSERVED
+   call_logs: ('2026-10-06T00:10:46.942Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 22, 'ready', 'max', 'max')
+   usage_history: ('2026-10-06T00:10:46.936Z', 'gpt-6-astra', '200', 22, 22)
+LATE mode=responses:early:0 read2_call_logs=0 read2_usage=0 changed=False verdict=OBSERVED
+LATE mode=responses:early:0 read2_call_logs=0 read2_usage=0 changed=False verdict=OBSERVED
+LATE mode=responses:early:0 read2_call_logs=0 read2_usage=0 changed=False verdict=OBSERVED
+LATE mode=responses:early:0 read2_call_logs=0 read2_usage=0 changed=False verdict=OBSERVED
+LATE mode=responses:early:0 read2_call_logs=0 read2_usage=0 changed=False verdict=OBSERVED
+LATE mode=responses:early:0 read2_call_logs=1 read2_usage=1 changed=False verdict=OBSERVED
+SUMMARY {"OBSERVED": 6} end=2026-10-06T00:11:46.954Z exit=0
+exit=0
+# finished 2026-10-06T00:11:46Z

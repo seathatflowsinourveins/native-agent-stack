@@ -1,0 +1,17 @@
+#!/bin/bash
+# Control for the owned-group selector of the smoke script. Under `set -m` a background job is its own process group inside the script's session.
+# `ps -g <number>` selects by SESSION (or effective group name), so it cannot count the members of that process group; a filter on the real PGID column can.
+# The leader is a shell with one child, so the group has two members.
+set -u
+set -m
+bash -c 'sleep 300 & wait' &
+LEADER=$!
+sleep 0.5
+PGID=$(ps -o pgid= -p "$LEADER" | tr -d ' ')
+echo "leader pid $LEADER, its pgid $PGID, its session $(ps -o sid= -p "$LEADER" | tr -d ' '); this script's own session $(ps -o sid= -p $$ | tr -d ' ')"
+echo "members counted with 'ps -o pid= -g PGID' (the selector the first fixed version used): $(ps -o pid= -g "$PGID" 2>/dev/null | wc -l)"
+echo "members counted with a filter on the PGID column (ps -eo pid=,pgid= | awk): $(ps -eo pid=,pgid= | awk -v g="$PGID" '$2 == g' | wc -l)"
+kill -- "-$PGID"
+for _ in 1 2 3 4 5 6 7 8 9 10; do [ -z "$(ps -eo pid=,pgid= | awk -v g="$PGID" '$2 == g { print $1 }')" ] && break; sleep 0.5; done
+wait "$LEADER" 2>/dev/null
+echo "after kill -- -PGID, members counted with the PGID filter: $(ps -eo pid=,pgid= | awk -v g="$PGID" '$2 == g' | wc -l)"

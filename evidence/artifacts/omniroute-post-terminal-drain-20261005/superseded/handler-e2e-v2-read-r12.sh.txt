@@ -1,0 +1,83 @@
+#!/bin/bash
+# Handler-level end-to-end check of the post-terminal client disconnect, in a scratch tree built from public refs (nothing is deployed).
+# The test (handler-e2e-terminal-close.test.ts, sha256 pinned below) calls the real handleChat -> chatCore -> stream pipeline -> call-log and usage writers with a stubbed upstream fetch and a temporary database,
+# in the style of upstream's tests/integration/chat-pipeline.test.ts: a client reads until its terminal event and closes while the upstream body is still open for a short tail.
+# Five scenarios: Responses clients (plain and Codex-originated, body close only, and request signal aborted first) and one Chat Completions client (a non-Responses format, signal first).
+# Steps (each logs its exit code to $OUT/progress.txt; a failed setup step, a tree-id mismatch or a violated expectation stops the script with exit 3):
+#   composition C (v3.8.51 tag + affinity patch + PR 15167; tree id checked), npm ci
+#   U  the e2e test on the unpatched composition: exactly the four scenarios that the bug affects must FAIL (a Codex-originated client, and the three clients whose request signal aborts first); the plain body-close-only client passes
+#   P  the patch under test applied (its tree id must equal EXPECT_TREE, or the script stops before this stage), then the same test: 5 of 5 must pass
+# Each stage keeps the runner's summary counters, the failing tests' names and the full log in $OUT; every scenario prints an `E2E_SCENARIO {...}` line with the rows it found.
+# The script owns only the directory it creates (mktemp under $WORK_ROOT, default ~/.cache) and deletes nothing. A missing or changed input file, or a missing mirror, stops it with exit 2 before anything is created.
+# usage: DRAIN_DIR=<directory with drain-after-terminal.patch and handler-e2e-terminal-close.test.ts> EV=<evidence folder of omniroute-wire-effort-20261005> EXPECT_TREE=<tree id of the patched tree> omniroute-handler-e2e-20261005.sh
+# For the patch's removal check on a release that fixes the drop another way, run the test file alone with E2E_OUTCOME_ONLY=1 (it then skips the assertion that the upstream is not cancelled).
+set -u
+set -o pipefail
+M=${MIRROR:-$HOME/.cache/omniroute-upstream-mirror-20261005.git}
+D=${DRAIN_DIR:?set DRAIN_DIR to the directory holding drain-after-terminal.patch and handler-e2e-terminal-close.test.ts}
+TAG=c1e30b7676975feb298b49eff6ff58923c04b89e
+PR=0585aba5589d5a1f49243a13a8db249558e7c9e3
+COMPOSITION_TREE=f1336dfd6c8ebd81586dd6c71e7ef668ef8c949f
+E2E_SHA256=9ab6eae294a2b6912e5c2132f3210b34c1e1d08a90b4864d228c80fb3c69f190
+EV=${EV:?set EV to the evidence folder of the gateway-composition record}
+EXPECT_TREE=${EXPECT_TREE:?set EXPECT_TREE to the tree id of the composition with the patch applied}
+S1="a Responses client that closes the body right after response.completed still gets its call_logs row and its usage_history row"
+S2="a Codex-originated client (originator codex_exec) that closes the body right after response.completed still gets its call_logs row and its usage_history row"
+S3="a Codex-originated client whose request signal aborts and whose body closes right after response.completed still gets its call_logs row and its usage_history row"
+S4="a Responses client whose request signal aborts and whose body closes right after response.completed still gets its call_logs row and its usage_history row"
+S5="a Chat Completions client (a non-Responses format) whose request signal aborts and whose body closes right after its terminal chunk still gets its call_logs row and its usage_history row"
+export PATH="$HOME/.local/share/codex-ecosystem/tools/node-24.21.0/bin:/usr/local/bin:/usr/bin:/bin"
+for f in "$D/drain-after-terminal.patch" "$D/handler-e2e-terminal-close.test.ts" "$EV/patches/045aa81f3.patch"; do
+  [ -f "$f" ] || { echo "missing input file: $f" >&2; exit 2; }
+done
+[ -d "$M" ] || { echo "missing OmniRoute mirror: $M" >&2; exit 2; }
+[ "$(sha256sum "$D/handler-e2e-terminal-close.test.ts" | cut -d' ' -f1)" = "$E2E_SHA256" ] || { echo "handler-e2e-terminal-close.test.ts is not the pinned file (sha256 $E2E_SHA256)" >&2; exit 2; }
+WORK=$(mktemp -d "${WORK_ROOT:-$HOME/.cache}/omniroute-handler-e2e-XXXXXX") || exit 2
+T=$WORK/tree
+OUT=$WORK/out
+mkdir -p "$OUT"
+log() { echo "$(date -u +%H:%M:%SZ) $*" | tee -a "$OUT/progress.txt"; }
+G() { git -c user.name=Scout -c user.email=scout@local -c core.hooksPath=/dev/null -C "$T" "$@"; }
+step() { local label=$1; shift; "$@"; local rc=$?; log "$label exit=$rc"; [ $rc -eq 0 ] || exit 3; }
+apply_pr_diff() { git --git-dir="$M" diff $PR^ $PR | G apply --index; }
+counter() { grep -aE "^ℹ $2 " "$OUT/test-$1.log" | awk '{print $3}'; }
+failing() { awk '/^✖ failing tests:/{f=1;next} f&&/^✖ /{sub(/ \([0-9.]+ms\)$/,""); sub(/^✖ /,""); print}' "$OUT/test-$1.log" | sort -u; }
+expect_counts() { # label tests pass fail
+  local t p f; t=$(counter "$1" tests); p=$(counter "$1" pass); f=$(counter "$1" fail)
+  if [ "$t" = "$2" ] && [ "$p" = "$3" ] && [ "$f" = "$4" ]; then log "$1 expectation met: tests=$t pass=$p fail=$f"; else log "$1 EXPECTATION VIOLATED: tests=$t pass=$p fail=$f, expected tests=$2 pass=$3 fail=$4: stopping"; exit 3; fi
+}
+expect_failing() {
+  local got; got=$(failing "$1")
+  if [ "$got" = "$2" ]; then log "$1 failing tests are as expected: $(printf '%s' "$got" | grep -c . | tr -d ' ') name(s)"; else log "$1 FAILING SET VIOLATED: got [$got]: stopping"; exit 3; fi
+}
+step clone git clone -q --shared --no-checkout "$M" "$T"
+step "fetch pr15167" G fetch -q "$M" "+refs/pull/15167/head:refs/pull/15167/head"
+step "checkout tag" G checkout -q --detach $TAG
+( cd "$T" && nice -n 19 npm ci --no-audit --no-fund > "$OUT/npm-ci.log" 2>&1 ); rc=$?; log "npm ci exit=$rc"; [ $rc -eq 0 ] || exit 3
+step "apply affinity patch" G apply --index "$EV/patches/045aa81f3.patch"
+step "apply pr15167 diff" apply_pr_diff
+step "commit composition" G commit -q -m "composition"
+ACTUAL_TREE=$(G rev-parse 'HEAD^{tree}')
+if [ "$ACTUAL_TREE" = "$COMPOSITION_TREE" ]; then log "composition tree=$ACTUAL_TREE equals the expected tree"; else log "composition tree=$ACTUAL_TREE DIFFERS from the expected tree $COMPOSITION_TREE: stopping"; exit 3; fi
+FLAGS="--import tsx/esm --import ./open-sse/utils/setupPolyfill.ts --import ./tests/_setup/isolateDataDir.ts"
+run() {
+  local label=$1; shift
+  ( cd "$T" && DISABLE_SQLITE_AUTO_BACKUP=true nice -n 19 timeout 600 node $FLAGS --test --test-force-exit "$@" > "$OUT/test-$label.log" 2>&1 ); local rc=$?
+  log "$label exit=$rc tests=$(counter "$label" tests) suites=$(counter "$label" suites) pass=$(counter "$label" pass) fail=$(counter "$label" fail) cancelled=$(counter "$label" cancelled) skipped=$(counter "$label" skipped) todo=$(counter "$label" todo)"
+}
+cd "$T" || exit 2
+E2E=tests/integration/handler-e2e-terminal-close.test.ts
+step "copy the e2e test file" cp "$D/handler-e2e-terminal-close.test.ts" $E2E
+log "e2e test file sha256 $(sha256sum $E2E | cut -d' ' -f1) git blob $(G hash-object $E2E)"
+run U-e2e-unpatched $E2E
+expect_counts U-e2e-unpatched 5 1 4
+PFX="handler e2e: "
+expect_failing U-e2e-unpatched "$(printf '%s\n%s\n%s\n%s' "$PFX$S2" "$PFX$S3" "$PFX$S4" "$PFX$S5" | sort -u)"
+step "apply patch under test" G apply --index "$D/drain-after-terminal.patch"
+step "commit patch under test" G commit -q -m "drain patch under test"
+PATCHED_TREE=$(G rev-parse 'HEAD^{tree}')
+if [ "$PATCHED_TREE" = "$EXPECT_TREE" ]; then log "patched tree=$PATCHED_TREE equals the expected tree"; else log "patched tree=$PATCHED_TREE DIFFERS from the expected tree $EXPECT_TREE: stopping before the patched stage"; exit 3; fi
+run P-e2e-patched $E2E
+expect_counts P-e2e-patched 5 5 0
+expect_failing P-e2e-patched ""
+log "DONE; the scratch tree and the logs stay in $WORK (remove it with rm -rf after reading)"

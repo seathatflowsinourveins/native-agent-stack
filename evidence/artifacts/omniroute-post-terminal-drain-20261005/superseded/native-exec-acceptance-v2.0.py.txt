@@ -1,0 +1,351 @@
+#!/usr/bin/env python3
+"""Native `codex exec` turns through NativeStack's omniroute profile (20128), VERSION 2 (frozen before the canary switch; see checks/live-acceptance-protocol.md).
+
+Version 1 (sha256 9f511620...) is kept as superseded. A full-scope read of 2026-10-06 reproduced three defects of it: (1) with three correctly logged turns its second read counted every row from a turn's
+start to the present, so the earlier turns also counted the later turns' rows (SUMMARY FAIL 2, PASS 1); (2) its PASS ignored the client's exit status and attributed every row in the time window to the client
+(a failed exec plus one unrelated request's rows passed); (3) a quiet check before launch was the only exclusivity. Version 2 attributes by IDENTITY, not by time window, and checks COMPLETENESS against the client:
+
+  Identity. Each turn carries its own X-OmniRoute-Session-Id (a static provider header set per turn with `-c model_providers.omniroute.http_headers={...}`; the gateway stores a caller-supplied session id
+  outright as call_logs.session_tag: open-sse/services/conversationTracker.ts `resolveConversationId`, upstream #8249). The turn's call_logs rows are `where session_tag = <this turn's id>`, at both reads,
+  whatever else runs on the gateway; its usage_history rows are the ones written with each call row (same model and token counts within 3 s of the row; ambiguity is INCONCLUSIVE).
+  Completeness. The client (`codex exec --json`) reports the turn's token usage in its `turn.completed` event. On the unpatched build on 2026-10-06 a turn whose rows were all logged had call_logs token sums equal
+  to that usage exactly (30145 input, 78 output, 25600 cached), and turns that lost the final request's rows had smaller sums (30168 input used, 15042 stored). So the sums of tokens_in and tokens_out over the turn's call_logs
+  rows must EQUAL the client's input_tokens and output_tokens: fewer means a request's rows are missing, more means duplicate rows. This needs no assumption about how many requests the model made.
+
+SHAPE: astra-max (the final-request shape, one request expected) | sol-xhigh (one request expected) | two-request (the prompt asks for one shell command: a tool call, then the final answer; the turn must contain
+at least one command execution, otherwise the multi-request path was not exercised)
+--expect observe   print what happened and the rows of each turn, no verdict (the baseline on the unpatched gateway)
+--expect all-logged  a verdict per turn:
+    INCONCLUSIVE   the exec did not complete (non-zero exit status, or no exit within --exec-timeout seconds, with value-free diagnostics printed); the client reported no usage; a two-request turn made no tool call;
+                   the usage match is ambiguous
+    FAIL           the exec completed and, at READ1 or at READ2: fewer call_logs rows with the turn's session id than the shape needs (1, or 2); a row has a status other than 200, a path other than /v1/responses, a model
+                   other than the shape's, or a requested model other than codex/<model>; the rows' token sums differ from the client's usage; the usage_history rows matched to the call rows are not exactly one per call row
+                   with status 200; or the rows at READ2 are not the same rows with the same values as at READ1
+    PASS           otherwise
+READ1 is --wait1 s after each exec ended, READ2 is --wait2 s after the last exec ended. Because rows are selected by each turn's own id, later turns cannot change an earlier turn's rows.
+The quiet check (no other worker process of another lane, no call_logs row in the last 120 s) is only a courtesy to the usage match: it waits up to --quiet-timeout seconds and then runs anyway; the result is printed.
+The exec runs with stdin closed (/dev/null): `codex exec` with a prompt argument and an open stdin prints "Reading additional input from stdin..." and waits for it to end (found by the offline controls).
+A scratch CODEX_HOME (--scratch) holds only the repository's omniroute profile and the documented loopback placeholder key; nothing in a real Codex home is touched. Only metadata columns of the gateway store are read (mode=ro).
+exit code: 0 when every verdict is PASS or OBSERVED, 1 when any is FAIL, 2 when none failed but any is INCONCLUSIVE, 3 for a usage or script error (no verdict: bad arguments, an unknown shape, an unreadable store,
+a missing profile template or codex executable, a gateway that does not answer its health endpoint, or an unexpected exception; the preflight raises these BEFORE any turn is run, so an error can never be mistaken for a FAIL).
+A run that printed no SUMMARY line is not a verdict.
+"""
+import argparse
+import datetime as dt
+import hashlib
+import json
+import os
+import re
+import shutil
+import sqlite3
+import subprocess
+import sys
+import time
+import urllib.request
+from pathlib import Path
+
+HOME = Path.home()
+DEFAULT_DB = str(HOME / ".local/share/omniroute/storage.sqlite")
+DEFAULT_SCRATCH = str(HOME / ".cache/codex-home-omni-acceptance")
+# shape: (codex arguments, prompt, minimum rows, tool call required, the model the gateway serves)
+SHAPES = {
+    "astra-max": (["-m", "cx/gpt-6-astra", "-c", 'model_reasoning_effort="max"'], "Reply with: ok", 1, False, "gpt-6-astra"),
+    "sol-xhigh": (["-m", "cx/gpt-6.1-sol", "-c", 'model_reasoning_effort="xhigh"'], "Reply with: ok", 1, False, "gpt-6.1-sol"),
+    "two-request": (["-m", "cx/gpt-6-astra", "-c", 'model_reasoning_effort="max"'], "Run the shell command `echo hi`, then reply with: ok", 2, True, "gpt-6-astra"),
+}
+
+
+class UsageError(Exception):
+    """A usage or script error: reported as ERROR and exit status 3, never as a verdict."""
+
+
+class Parser(argparse.ArgumentParser):
+    def error(self, message):
+        raise UsageError(message)
+
+
+def utc(ts=None):
+    return (ts or dt.datetime.now(dt.timezone.utc)).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
+
+
+def shift(ts, seconds):
+    base = dt.datetime.strptime(ts, "%Y-%m-%dT%H:%M:%S.%fZ").replace(tzinfo=dt.timezone.utc)
+    return utc(base + dt.timedelta(seconds=seconds))
+
+
+def id8(value):
+    return hashlib.sha256(str(value).encode()).hexdigest()[:8]
+
+
+def con_ro(db):
+    return sqlite3.connect(f"file:{db}?mode=ro", uri=True)
+
+
+def mask(text):
+    return text.replace(str(HOME) + "/", "$HOME/")
+
+
+def read_turn(db, tag):
+    """The rows of one turn: call_logs by its session id, usage_history by the call rows' model and token counts within 3 s."""
+    con = con_ro(db)
+    raw = con.execute(
+        "select id, timestamp, path, status, model, requested_model, tokens_in, tokens_out, detail_state, reasoning_effort_requested, reasoning_effort_upstream from call_logs where session_tag = ? order by timestamp",
+        (tag,),
+    ).fetchall()
+    calls = [{"id8": id8(r[0]), "timestamp": r[1], "path": r[2], "status": r[3], "model": r[4], "requested_model": r[5], "tokens_in": r[6], "tokens_out": r[7],
+              "detail_state": r[8], "effort_requested": r[9], "effort_upstream": r[10]} for r in raw]
+    usage, ambiguous = {}, False
+    for c in calls:
+        rows = con.execute(
+            "select id, timestamp, model, status, tokens_input, tokens_output from usage_history where timestamp >= ? and timestamp <= ? and model = ? and tokens_input = ? and tokens_output = ? order by timestamp",
+            (shift(c["timestamp"], -3), shift(c["timestamp"], 3), c["model"], c["tokens_in"], c["tokens_out"]),
+        ).fetchall()
+        if len(rows) > 1:
+            ambiguous = True
+        for r in rows:
+            usage[r[0]] = {"id": r[0], "timestamp": r[1], "model": r[2], "status": r[3], "tokens_input": r[4], "tokens_output": r[5]}
+    con.close()
+    return {"calls": calls, "usage": sorted(usage.values(), key=lambda u: u["timestamp"]), "ambiguous": ambiguous}
+
+
+def parse_events(stdout):
+    """The client's JSONL events: the number of completed command executions and the usage of turn.completed. Only numbers and event types are kept."""
+    commands, usage, types, bad = 0, None, [], 0
+    for line in (stdout or "").splitlines():
+        if not line.strip():
+            continue
+        try:
+            e = json.loads(line)
+        except ValueError:
+            bad += 1
+            continue
+        t = e.get("type")
+        item = e.get("item") or {}
+        types.append(str(t) + (f"({item.get('type')})" if item.get("type") else ""))
+        if t == "item.completed" and item.get("type") == "command_execution":
+            commands += 1
+        if t == "turn.completed" and isinstance(e.get("usage"), dict):
+            usage = {k: e["usage"].get(k) for k in ("input_tokens", "cached_input_tokens", "output_tokens")}
+    return {"commands": commands, "usage": usage, "types": types, "bad_lines": bad}
+
+
+def judge(read, info, min_rows, model):
+    """One read of one turn against the client's own report: (state, reasons); state PASS, FAIL or INCONCLUSIVE."""
+    if read["ambiguous"]:
+        return "INCONCLUSIVE", ["more than one usage row matches a call row's model and token counts"]
+    calls, usage, reasons = read["calls"], read["usage"], []
+    if len(calls) < min_rows:
+        reasons.append(f"call_logs rows with the turn's session id: {len(calls)} (at least {min_rows} needed)")
+    for c in calls:
+        if c["status"] != 200:
+            reasons.append(f"call_logs status {c['status']} (expected 200)")
+        if c["path"] != "/v1/responses":
+            reasons.append(f"call_logs path {c['path']} (expected /v1/responses)")
+        if c["model"] != model:
+            reasons.append(f"call_logs model {c['model']} (expected {model})")
+        if c["requested_model"] != "codex/" + model:
+            reasons.append(f"call_logs requested model {c['requested_model']} (expected codex/{model})")
+    sum_in, sum_out = sum(c["tokens_in"] or 0 for c in calls), sum(c["tokens_out"] or 0 for c in calls)
+    used_in, used_out = info["usage"]["input_tokens"], info["usage"]["output_tokens"]
+    if (sum_in, sum_out) != (used_in, used_out):
+        why = "a request's rows are missing" if sum_in < used_in or sum_out < used_out else "more tokens are stored than the client used (duplicate rows)"
+        reasons.append(f"the rows hold {sum_in} input and {sum_out} output tokens, the client used {used_in} and {used_out}: {why}")
+    if len(usage) != len(calls):
+        reasons.append(f"usage_history rows matched to the {len(calls)} call rows: {len(usage)}")
+    for u in usage:
+        if str(u["status"]) != "200":
+            reasons.append(f"usage_history status {u['status']} (expected 200)")
+    return ("FAIL", reasons) if reasons else ("PASS", [])
+
+
+def row_key(read):
+    return (
+        [(c["id8"], c["path"], c["status"], c["model"], c["requested_model"], c["tokens_in"], c["tokens_out"], c["effort_requested"], c["effort_upstream"]) for c in read["calls"]],
+        [(u["id"], u["timestamp"], u["model"], u["status"], u["tokens_input"], u["tokens_output"]) for u in read["usage"]],
+    )
+
+
+def show_rows(read):
+    for c in read["calls"]:
+        print("   call_logs:", (c["timestamp"], c["path"], c["status"], c["model"], c["requested_model"], c["tokens_in"], c["tokens_out"], c["detail_state"], c["effort_requested"], c["effort_upstream"]), "id8=" + c["id8"])
+    for u in read["usage"]:
+        print("   usage_history:", (u["timestamp"], u["model"], u["status"], u["tokens_input"], u["tokens_output"]))
+
+
+def recent_rows(db):
+    con = con_ro(db)
+    n = con.execute("select count(*) from call_logs where timestamp >= ?", (utc(dt.datetime.now(dt.timezone.utc) - dt.timedelta(seconds=120)),)).fetchone()[0]
+    con.close()
+    return n
+
+
+def other_workers():
+    out = subprocess.run(["pgrep", "-af", "omniroute-codex-sdk/worker.py|codex exec"], capture_output=True, text=True).stdout.splitlines()
+    mine = str(os.getpid())
+    return [line for line in out if not line.startswith(mine + " ") and "pgrep" not in line and "native-exec-acceptance" not in line]
+
+
+def wait_quiet(db, timeout):
+    end = time.time() + timeout
+    while True:
+        n_recent, n_workers = recent_rows(db), len(other_workers())
+        if not n_recent and not n_workers:
+            return True, 0, 0
+        if time.time() >= end:
+            return False, n_recent, n_workers
+        time.sleep(10)
+
+
+def tail(value, n):
+    if value is None:
+        return ""
+    if isinstance(value, bytes):
+        value = value.decode("utf-8", "replace")
+    return mask(value.strip().replace("\n", " | "))[-n:]
+
+
+def preflight(args, template):
+    """Everything that can be checked before a turn is run; any problem is a usage error (exit 3), never a verdict."""
+    problems = []
+    unknown = [s for s in args.shapes if s not in SHAPES]
+    if unknown:
+        problems.append(f"unknown shape(s) {unknown}; known: {sorted(SHAPES)}")
+    try:
+        con = con_ro(args.db)
+        con.execute("select 1 from call_logs limit 1")
+        con.execute("select 1 from usage_history limit 1")
+        con.close()
+    except Exception as error:
+        problems.append(f"the gateway store {args.db} is not readable ({type(error).__name__})")
+    if not template.is_file():
+        problems.append(f"the profile template {template} does not exist")
+    else:
+        match = re.search(r'base_url\s*=\s*"http://127\.0\.0\.1:(\d+)/v1"', template.read_text())
+        if not match:
+            problems.append("the profile template has no loopback base_url")
+        else:
+            try:
+                with urllib.request.urlopen(f"http://127.0.0.1:{match.group(1)}/api/health", timeout=5) as response:
+                    if response.status != 200:
+                        problems.append(f"the gateway on port {match.group(1)} answers health with status {response.status}")
+            except Exception:
+                problems.append(f"no healthy gateway answers on port {match.group(1)} (GET /api/health)")
+    if shutil.which(args.codex) is None and not Path(args.codex).is_file():
+        problems.append(f"the codex executable {args.codex!r} was not found")
+    if problems:
+        raise UsageError("preflight: " + "; ".join(problems))
+
+
+def main():
+    ap = Parser(add_help=False)
+    ap.add_argument("--expect", choices=["observe", "all-logged"], default="observe")
+    ap.add_argument("--wait1", type=float, default=12.0)
+    ap.add_argument("--wait2", type=float, default=60.0)
+    ap.add_argument("--quiet-timeout", type=float, default=120.0)
+    ap.add_argument("--exec-timeout", type=float, default=300.0)
+    ap.add_argument("--repo", default=str(HOME / "code/native-agent-stack"))
+    ap.add_argument("--db", default=DEFAULT_DB)
+    ap.add_argument("--scratch", default=DEFAULT_SCRATCH)
+    ap.add_argument("--codex", default="codex")
+    ap.add_argument("shapes", nargs="+")
+    args = ap.parse_args()
+    me = open(os.path.abspath(__file__), "rb").read()
+    template = Path(args.repo) / "adoption/templates/codex.omniroute.config.toml"
+    preflight(args, template)
+    runid = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%S")
+    print(f"FROZEN version=2 script_sha256={hashlib.sha256(me).hexdigest()} argv={sys.argv[1:]} cwd={os.getcwd()} start={utc()} expect={args.expect} wait1={args.wait1} wait2={args.wait2} "
+          f"quiet_timeout={args.quiet_timeout} exec_timeout={args.exec_timeout} db={args.db} run_id={runid} template_sha256={hashlib.sha256(template.read_bytes()).hexdigest()}")
+    scratch = Path(args.scratch)
+    scratch.mkdir(parents=True, exist_ok=True)
+    (scratch / "config.toml").write_text("# scratch home for the omniroute-profile acceptance\n")
+    (scratch / "omniroute.config.toml").write_text(template.read_text())
+    env = {k: v for k, v in os.environ.items() if not k.startswith(("OPENAI", "OMNIROUTE", "ANTHROPIC", "CODEX"))}
+    env.update({"CODEX_HOME": str(scratch), "OMNIROUTE_API_KEY": "local-loopback"})  # the documented placeholder (docs/secret-storage.md)
+    turns = []
+    for index, shape in enumerate(args.shapes, 1):
+        extra, prompt, min_rows, need_tool, model = SHAPES[shape]
+        quiet, n_recent, n_workers = wait_quiet(args.db, args.quiet_timeout)
+        tag = f"acceptance-{runid}-{shape}-{index}"
+        header = '{"X-OmniRoute-Session-Id"="%s"}' % tag
+        cmd = [args.codex, "exec", "--json", "-p", "omniroute", "--skip-git-repo-check", "--ephemeral", *extra, "-c", f"model_providers.omniroute.http_headers={header}", prompt]
+        started = time.time()
+        exec_exit, timed_out, stdout, stderr = None, False, "", ""
+        try:
+            proc = subprocess.run(cmd, cwd=str(scratch), env=env, stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=args.exec_timeout)  # codex exec waits for EOF on an open stdin
+            exec_exit, stdout, stderr = proc.returncode, proc.stdout, proc.stderr
+        except subprocess.TimeoutExpired as e:
+            timed_out, stdout, stderr = True, e.stdout, e.stderr
+        ended = time.time()
+        info = parse_events(stdout if isinstance(stdout, str) else (stdout or b"").decode("utf-8", "replace"))
+        turn = {"shape": shape, "tag": tag, "min_rows": min_rows, "model": model, "ended": ended, "judged": False, "verdict": "INCONCLUSIVE", "info": info}
+        turns.append(turn)
+        head = f"RESULT shape={shape} session_id={tag} quiet={quiet} recent_call_logs={n_recent} other_workers={n_workers} min_rows={min_rows}"
+        problem = None
+        if timed_out or exec_exit != 0:
+            problem = "the exec did not complete: " + (f"no exit within {args.exec_timeout:.0f} s (timeout)" if timed_out else f"exec exit status {exec_exit}")
+        elif info["usage"] is None or info["usage"].get("input_tokens") is None or info["usage"].get("output_tokens") is None:
+            problem = "the client reported no turn usage (no turn.completed event with usage)"
+        elif need_tool and info["commands"] == 0:
+            problem = "the turn made no tool call: the multi-request path was not exercised"
+        client = f"client_usage={info['usage']} command_executions={info['commands']} events={len(info['types'])}"
+        if problem:
+            turn["verdict"] = "OBSERVED" if args.expect == "observe" else "INCONCLUSIVE"
+            read = read_turn(args.db, tag)
+            print(f"{head} exec_exit={exec_exit} timed_out={timed_out} elapsed_s={ended - started:.1f} {client} rows_with_session_id={len(read['calls'])} verdict={turn['verdict']} reasons=['{problem}']")
+            print("   diagnostics (value-free): event types:", info["types"], "| stdout tail:", tail(stdout, 200), "| stderr tail:", tail(stderr, 300))
+            show_rows(read)
+            continue
+        time.sleep(args.wait1)
+        read1 = read_turn(args.db, tag)
+        turn.update({"judged": True, "read1": read1})
+        if args.expect == "observe":
+            state1, reasons, verdict = None, [], "OBSERVED"
+        else:
+            state1 = judge(read1, info, min_rows, model)
+            verdict, reasons = state1
+        turn.update({"state1": state1, "verdict": verdict})
+        sums = (sum(c["tokens_in"] or 0 for c in read1["calls"]), sum(c["tokens_out"] or 0 for c in read1["calls"]))
+        complete = sums == (info["usage"]["input_tokens"], info["usage"]["output_tokens"])
+        print(f"{head} exec_exit={exec_exit} elapsed_s={ended - started:.1f} {client} read1_call_logs={len(read1['calls'])} read1_usage={len(read1['usage'])} rows_tokens_in_out={sums} rows_complete={complete} verdict={verdict}"
+              + (f" reasons={reasons}" if reasons else ""))
+        show_rows(read1)
+    judged = [t for t in turns if t["judged"]]
+    if judged:
+        time.sleep(max(0.0, max(t["ended"] for t in judged) + args.wait2 - time.time()))
+        for t in judged:
+            read2 = read_turn(args.db, t["tag"])
+            changed = row_key(read2) != row_key(t["read1"])
+            if args.expect == "observe":
+                verdict, reasons = "OBSERVED", (["rows changed between READ1 and READ2"] if changed else [])
+            else:
+                states = [t["state1"], judge(read2, t["info"], t["min_rows"], t["model"])]
+                if changed:
+                    states.append(("FAIL", ["the rows at READ2 are not the rows (or not the values) of READ1"]))
+                reasons = []
+                for _, rs in states:
+                    reasons += [r for r in rs if r not in reasons]
+                names = [s for s, _ in states]
+                verdict = "FAIL" if "FAIL" in names else ("INCONCLUSIVE" if "INCONCLUSIVE" in names else "PASS")
+            t["verdict"] = verdict
+            sums = (sum(c["tokens_in"] or 0 for c in read2["calls"]), sum(c["tokens_out"] or 0 for c in read2["calls"]))
+            print(f"LATE shape={t['shape']} session_id={t['tag']} read2_call_logs={len(read2['calls'])} read2_usage={len(read2['usage'])} rows_tokens_in_out={sums} changed={changed} verdict={verdict}"
+                  + (f" reasons={reasons}" if reasons else ""))
+            if changed:
+                show_rows(read2)
+    verdicts = [t["verdict"] for t in turns]
+    summary = {v: verdicts.count(v) for v in sorted(set(verdicts))}
+    code = 1 if "FAIL" in verdicts else (2 if "INCONCLUSIVE" in verdicts else 0)
+    print(f"SUMMARY {summary} end={utc()} exit={code}")
+    sys.exit(code)
+
+
+try:
+    main()
+except UsageError as error:
+    print(f"ERROR usage: {error}", file=sys.stderr)
+    sys.exit(3)
+except SystemExit:
+    raise
+except Exception as error:
+    print(f"ERROR {type(error).__name__}: {mask(str(error))[:300]}", file=sys.stderr)
+    sys.exit(3)

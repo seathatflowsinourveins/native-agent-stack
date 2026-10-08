@@ -1,0 +1,292 @@
+# The guard scenarios of the existing offline controls (checks/acceptance-controls.txt: dummy processes, a failing `ss` and `pgrep`) rerun with pre-switch guard version 5 as of round 13 (scripts/pre-switch-guard.py.txt, sha256 5c8ccf3fb4ca747ddcf3a427d732cf111a74e6c09358adceba55ea7ead75c95b; 2026-10-06 UTC): `run-controls.py --only G1,G2,G3,G4,G5,G6,G7,G8,G14,G15,G16` (scripts/acceptance-controls/run-controls.py.txt, sha256 8a36cdd43ebdcb363f8538538386e801cf31deb2c9943a3bdad2a28b8157462b, whose guard under test is this version). Every scenario of the rerun ends as expected (the driver's exit status 0); the fixture control in the last part is expected to fail (see below).
+# NOT RUN in this rerun: G9-G13. They start a poller in a transient systemd scope (`systemd-run --user --scope`), which this round's rules excluded (no systemd). Their last run is the previous version of this file (git 4624137290244eb7044ff3fd935c693042e337fe:evidence/artifacts/omniroute-post-terminal-drain-20261005/checks/guard5-existing-controls.txt), with guard 5 before round 13 (sha256 62dea3d25040...), where every one of them ended as expected. Round 13 changed the guard's check_prefix() only, which every scenario below runs (G1 and G16 pass it, G4, G5 and G8 fail it); guard5-controls K12-K19 and E7 control the change itself.
+# Round 13 changes of run-controls.py: the stand-in prefixes' shim/lsof is made executable (mode 0755, as install-drain.sh installs it), which the guard now requires. The earlier fixture wrote it with mode 0644: the last part of this file runs the 4624137 text of run-controls.py (sha256 890c70b63eb9c097cfa4f2dab230d445e12b64c78894ee038252110be86a0d3c) on this guard with `--only G16`, and both prefix checks FAIL on that shim (`mode 0o644`), so G16 exits 4 where 0 is expected (UNEXPECTED, the driver's exit status 1). And the poller block (G9-G12) runs only when an --only list names one of them, so `--only G` runs as before.
+# How it ran: HOME was a scratch directory holding byte-identical copies of the published scripts at the paths run-controls names (the sha256 lines below; all but the three files this round changed match the earlier runs'), so `$HOME` below is that scratch directory, and the real home directory, printed only in the PATH of the G14-G16 lines, is written `$REALHOME`. `systemctl` was a stub first on PATH that prints no property (exit 0), so the identity read-back's unit fields (ExecMainStartTimestamp, NRestarts) are blank below; with --pid its verdict does not depend on them. A refusing `systemd-run` stub was first on PATH as a tripwire and was not called (13 systemctl calls in the rerun and 1 in the fixture control, 0 systemd-run calls). The stub gateway's --schema was a minimal synthetic definition of call_logs and usage_history with the columns the G scenarios insert and the guard reads, not a dump of the live store: no G scenario sends an inference request to the stub.
+# Raw output. No gateway request was sent: the guard's and the identity read-back's HTTP reads went to the stub gateway on an ephemeral loopback port (53386 in the rerun). Note: the fixture's scratch HOME directory is named `home` under the work directory; it is written `scratch-home` below, because the repository's publication check reads `/home/...` as a personal home path.
+
+# Offline controls of the live-acceptance scripts, version 1 (superseded) against version 2.2 (frozen; versions 2.0 and 2.1, guard version 3 and the earlier wrapper appear where a control reproduces a defect a review found), on the stub gateway and a scratch database. Nothing here touches a live gateway.
+# started 2026-10-06T23:23:50Z; codex-cli 0.159.3; python 3.13.15
+# live-acceptance v1: sha256 8aa14054401c00a5af1e8c180fc83af80c79cc0a807da98ea519149291188859
+# live-acceptance v2.0 (superseded): sha256 fa8fa6f8dc3a0e7360be4a0737c34daaf4d4b58696df6a7ab3483896cb739e82
+# live-acceptance v2.1 (superseded; R10): sha256 15b8cf04134aa8ead6526739e5a95b6dc15f4e5b77d59840e0d03aa56b33301b
+# live-acceptance v2.2: sha256 52b1d749dc6b7f6b406f8ce8db5d8b1d3e3a73a6b7861a63cc158dbebd320d75
+# native-exec v1: sha256 9f511620db390c3b4c7177f858342c6592680efd1d383e2e02ecf3f5d249fdee
+# native-exec v2.0 (superseded; N10): sha256 9bd478a1502839e7cfe2c5999e3485d6e9ba5d10bfe62e2593e061b7441dda71
+# native-exec v2.1: sha256 db2a4d42d6caf4c39e484903313f0f94bd2be40fabe4f1336d0dcdc3b1d0bafd
+# show-log-receipt v2: sha256 df74b842ae73d03006a372c4bc34e33f51b0102ad737c545f3e3a278cbf23e3c
+# gateway-identity: sha256 a7932710412e9e834f6b992f267db5620b64bbe62f25021013c8004a7eec6011
+# pre-switch-guard v5: sha256 5c8ccf3fb4ca747ddcf3a427d732cf111a74e6c09358adceba55ea7ead75c95b
+# pre-switch-guard v3 (superseded; G13-G15): sha256 305a065227bff71dcbe3b46b157f4d3ed83f5a5b5ce90a2f73cbfa6b26805040
+# pre-switch-guard v2 (superseded; G12): sha256 b491de6b3e4a5a1d3a3761c8fa8aefc439cca8cf4c453d696c7b9cb41a73af3a
+# run-acceptance wrapper: sha256 0e74b3b15616b809a907c8ad197247a637fd7a8b7d706f81f1ab41b5119ca33d
+# run-acceptance wrapper before the re-freeze (superseded; W7-W12): sha256 abcbb5407c244062697fb94a677100b3e670b609b423582d9f39368073e9cb11
+# switch tool copy (committed evidence file): sha256 97d1b87bb651d6f43e184b9617d03afa7861ee7715e7030ad23ed29057bc23e3
+# stub-gateway: sha256 1d29d8f6dfda224d21e40f82834d47746e54225acb37ac0096d0d73f207400ea
+# fake-codex: sha256 9e9146449b02d50ea0322ce3f5f07e5dcfb29253e5edcba48aec0f524dc0fc77
+# health-server: sha256 c8b1183543319d501d6729b59b7c836817da333ebc65233268873f9452afca75
+# poller: sha256 aabb35f12418f85f6d23fca3a5cd137bf646d77f4241267bc6b12089fe53890f
+# run-controls: sha256 8a36cdd43ebdcb363f8538538386e801cf31deb2c9943a3bdad2a28b8157462b
+
+### G1: everything holds, and an IDLE established connection to the gateway port exists (it must be tolerated: idle keep-alive connections from other PID namespaces exist at rest on the live gateway): exit 0
+--- G1 / clean: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/pre-switch-guard-20261006.py --switch-tool $WORK/switch-tool-standin.py --switch-sha256 6b444a2fa3d57976592289cc59537da365f49aa6fc917871dce10dfda12586c1 --port 53386 --tools $WORK/tools --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --clean-for 6 --interval 2 --rollback-prefix omniroute-ctl-rollback --rollback-build cf6748d04 --target-prefix omniroute-ctl-target --target-build 2a41147b7 --shim-sha256 4a5c247583b8a0f02ffd71b1a8bdf107ae6f7c564ab61e341bb92be48d643c2a --pid 2830465 --worker-pattern nonexistent-process-pattern-for-the-controls
+    GUARD version=5 mode=full script_sha256=5c8ccf3fb4ca747ddcf3a427d732cf111a74e6c09358adceba55ea7ead75c95b start=2026-10-06T23:23:52.544Z port=53386 unit=omniroute.service clean_for=6.0 interval=2.0 tolerate_units=['omniroute-fw.service']
+    CHECK switch tool sha256: ok (6b444a2fa3d5)
+    CHECK rollback prefix intact: ok (omniroute-ctl-rollback: bin/omniroute, BUILD_SHA cf6748d04, shim v2)
+    CHECK target prefix intact: ok (omniroute-ctl-target: bin/omniroute, BUILD_SHA 2a41147b7, shim v2, drain marker)
+       IDENTITY label=pre-switch time=2026-10-06T23:23:52Z unit=omniroute.service MainPID=2830465 ExecMainStartTimestamp= NRestarts=None running_prefix=omniroute-ctl-rollback BUILD_SHA=cf6748d04 health=ok pending_total=0 expect_prefix_ok=True expect_build_ok=True
+    CHECK unit runs the rollback prefix, health ok: ok
+       sample 1 at 2026-10-06T23:23:52.681Z: connections=1 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 2 at 2026-10-06T23:23:54.723Z: connections=1 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 3 at 2026-10-06T23:23:56.767Z: connections=1 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 4 at 2026-10-06T23:23:58.809Z: connections=1 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+    CHECK nothing in flight for 6 s (4 samples): ok (1 idle and 0 tolerated connection(s))
+    INFO unrelated_remote_records=0 connections_seen=1 connections_tolerated=0 connections_active=0 connections_idle=1 pending_total_before=0 pending_total_after=0 pending_changed=False hindsight_processes=10
+    GUARD-RESULT clean=True failed_checks=[] end=2026-10-06T23:23:58.825Z
+CONTROL-RESULT G1 clean expected_exit=0 observed_exit=0 elapsed_s=6 OK
+
+### G2: a client connection that carries traffic during the window (a request sent in slow pieces): ACTIVE, exit 4
+--- G2 / active connection: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/pre-switch-guard-20261006.py --switch-tool $WORK/switch-tool-standin.py --switch-sha256 6b444a2fa3d57976592289cc59537da365f49aa6fc917871dce10dfda12586c1 --port 53386 --tools $WORK/tools --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --clean-for 6 --interval 2 --rollback-prefix omniroute-ctl-rollback --rollback-build cf6748d04 --target-prefix omniroute-ctl-target --target-build 2a41147b7 --shim-sha256 4a5c247583b8a0f02ffd71b1a8bdf107ae6f7c564ab61e341bb92be48d643c2a --pid 2830465 --worker-pattern nonexistent-process-pattern-for-the-controls
+    GUARD version=5 mode=full script_sha256=5c8ccf3fb4ca747ddcf3a427d732cf111a74e6c09358adceba55ea7ead75c95b start=2026-10-06T23:23:58.891Z port=53386 unit=omniroute.service clean_for=6.0 interval=2.0 tolerate_units=['omniroute-fw.service']
+    CHECK switch tool sha256: ok (6b444a2fa3d5)
+    CHECK rollback prefix intact: ok (omniroute-ctl-rollback: bin/omniroute, BUILD_SHA cf6748d04, shim v2)
+    CHECK target prefix intact: ok (omniroute-ctl-target: bin/omniroute, BUILD_SHA 2a41147b7, shim v2, drain marker)
+       IDENTITY label=pre-switch time=2026-10-06T23:23:58Z unit=omniroute.service MainPID=2830465 ExecMainStartTimestamp= NRestarts=None running_prefix=omniroute-ctl-rollback BUILD_SHA=cf6748d04 health=ok pending_total=0 expect_prefix_ok=True expect_build_ok=True
+    CHECK unit runs the rollback prefix, health ok: ok
+       sample 1 at 2026-10-06T23:23:59.052Z: connections=1 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 2 at 2026-10-06T23:24:01.096Z: connections=1 tolerated_so_far=0 active_so_far=1 workers=0 last_call_log_age_s=none
+       sample 3 at 2026-10-06T23:24:03.135Z: connections=1 tolerated_so_far=0 active_so_far=1 workers=0 last_call_log_age_s=none
+       sample 4 at 2026-10-06T23:24:05.184Z: connections=1 tolerated_so_far=0 active_so_far=1 workers=0 last_call_log_age_s=none
+    CHECK nothing in flight for 6 s (4 samples): FAIL ["1 ACTIVE connection(s) to port 53386: ['traffic during the window (non-systemd)']"]
+    INFO unrelated_remote_records=0 connections_seen=1 connections_tolerated=0 connections_active=1 connections_idle=0 pending_total_before=0 pending_total_after=0 pending_changed=False hindsight_processes=10
+    GUARD-RESULT clean=False failed_checks=['nothing in flight for 6 s (4 samples)'] end=2026-10-06T23:24:05.200Z
+CONTROL-RESULT G2 active connection expected_exit=4 observed_exit=4 elapsed_s=6 OK
+
+### G3: a call_logs row written a few seconds ago: exit 4
+--- G3 / recent row: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/pre-switch-guard-20261006.py --switch-tool $WORK/switch-tool-standin.py --switch-sha256 6b444a2fa3d57976592289cc59537da365f49aa6fc917871dce10dfda12586c1 --port 53386 --tools $WORK/tools --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --clean-for 6 --interval 2 --rollback-prefix omniroute-ctl-rollback --rollback-build cf6748d04 --target-prefix omniroute-ctl-target --target-build 2a41147b7 --shim-sha256 4a5c247583b8a0f02ffd71b1a8bdf107ae6f7c564ab61e341bb92be48d643c2a --pid 2830465 --worker-pattern nonexistent-process-pattern-for-the-controls
+    GUARD version=5 mode=full script_sha256=5c8ccf3fb4ca747ddcf3a427d732cf111a74e6c09358adceba55ea7ead75c95b start=2026-10-06T23:24:05.952Z port=53386 unit=omniroute.service clean_for=6.0 interval=2.0 tolerate_units=['omniroute-fw.service']
+    CHECK switch tool sha256: ok (6b444a2fa3d5)
+    CHECK rollback prefix intact: ok (omniroute-ctl-rollback: bin/omniroute, BUILD_SHA cf6748d04, shim v2)
+    CHECK target prefix intact: ok (omniroute-ctl-target: bin/omniroute, BUILD_SHA 2a41147b7, shim v2, drain marker)
+       IDENTITY label=pre-switch time=2026-10-06T23:24:06Z unit=omniroute.service MainPID=2830465 ExecMainStartTimestamp= NRestarts=None running_prefix=omniroute-ctl-rollback BUILD_SHA=cf6748d04 health=ok pending_total=0 expect_prefix_ok=True expect_build_ok=True
+    CHECK unit runs the rollback prefix, health ok: ok
+       sample 1 at 2026-10-06T23:24:06.093Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=0
+       sample 2 at 2026-10-06T23:24:08.136Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=2
+       sample 3 at 2026-10-06T23:24:10.178Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=4
+       sample 4 at 2026-10-06T23:24:12.230Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=6
+    CHECK nothing in flight for 6 s (4 samples): FAIL ['the last call_logs row is 0 s old (< 120 s)', 'the last call_logs row is 2 s old (< 120 s)', 'the last call_logs row is 4 s old (< 120 s)', 'the last call_logs row is 6 s old (< 120 s)']
+    INFO unrelated_remote_records=0 connections_seen=0 connections_tolerated=0 connections_active=0 connections_idle=0 pending_total_before=0 pending_total_after=0 pending_changed=False hindsight_processes=10
+    GUARD-RESULT clean=False failed_checks=['nothing in flight for 6 s (4 samples)'] end=2026-10-06T23:24:12.246Z
+CONTROL-RESULT G3 recent row expected_exit=4 observed_exit=4 elapsed_s=6 OK
+
+### G4: the stand-in shim's sha256 is not the reviewed one: exit 4
+--- G4 / shim hash: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/pre-switch-guard-20261006.py --switch-tool $WORK/switch-tool-standin.py --switch-sha256 6b444a2fa3d57976592289cc59537da365f49aa6fc917871dce10dfda12586c1 --port 53386 --tools $WORK/tools --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --clean-for 6 --interval 2 --rollback-prefix omniroute-ctl-rollback --rollback-build cf6748d04 --target-prefix omniroute-ctl-target --target-build 2a41147b7 --shim-sha256 0000000000000000000000000000000000000000000000000000000000000000 --pid 2830465 --worker-pattern nonexistent-process-pattern-for-the-controls
+    GUARD version=5 mode=full script_sha256=5c8ccf3fb4ca747ddcf3a427d732cf111a74e6c09358adceba55ea7ead75c95b start=2026-10-06T23:24:13.821Z port=53386 unit=omniroute.service clean_for=6.0 interval=2.0 tolerate_units=['omniroute-fw.service']
+    CHECK switch tool sha256: ok (6b444a2fa3d5)
+    CHECK rollback prefix intact: FAIL ['shim/lsof sha256 is not the reviewed shim v2']
+    CHECK target prefix intact: FAIL ['shim/lsof sha256 is not the reviewed shim v2']
+       IDENTITY label=pre-switch time=2026-10-06T23:24:13Z unit=omniroute.service MainPID=2830465 ExecMainStartTimestamp= NRestarts=None running_prefix=omniroute-ctl-rollback BUILD_SHA=cf6748d04 health=ok pending_total=0 expect_prefix_ok=True expect_build_ok=True
+    CHECK unit runs the rollback prefix, health ok: ok
+       sample 1 at 2026-10-06T23:24:13.961Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 2 at 2026-10-06T23:24:16.006Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 3 at 2026-10-06T23:24:18.046Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 4 at 2026-10-06T23:24:20.089Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+    CHECK nothing in flight for 6 s (4 samples): ok (0 idle and 0 tolerated connection(s))
+    INFO unrelated_remote_records=0 connections_seen=0 connections_tolerated=0 connections_active=0 connections_idle=0 pending_total_before=0 pending_total_after=0 pending_changed=False hindsight_processes=10
+    GUARD-RESULT clean=False failed_checks=['rollback prefix intact', 'target prefix intact'] end=2026-10-06T23:24:20.106Z
+CONTROL-RESULT G4 shim hash expected_exit=4 observed_exit=4 elapsed_s=6 OK
+
+### G5: the rollback prefix's BUILD_SHA is not the expected one: exit 4
+--- G5 / rollback build: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/pre-switch-guard-20261006.py --switch-tool $WORK/switch-tool-standin.py --switch-sha256 6b444a2fa3d57976592289cc59537da365f49aa6fc917871dce10dfda12586c1 --port 53386 --tools $WORK/tools --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --clean-for 6 --interval 2 --rollback-prefix omniroute-ctl-rollback --rollback-build deadbeef0 --target-prefix omniroute-ctl-target --target-build 2a41147b7 --shim-sha256 4a5c247583b8a0f02ffd71b1a8bdf107ae6f7c564ab61e341bb92be48d643c2a --pid 2830465 --worker-pattern nonexistent-process-pattern-for-the-controls
+    GUARD version=5 mode=full script_sha256=5c8ccf3fb4ca747ddcf3a427d732cf111a74e6c09358adceba55ea7ead75c95b start=2026-10-06T23:24:20.172Z port=53386 unit=omniroute.service clean_for=6.0 interval=2.0 tolerate_units=['omniroute-fw.service']
+    CHECK switch tool sha256: ok (6b444a2fa3d5)
+    CHECK rollback prefix intact: FAIL ['dist/BUILD_SHA is cf6748d04, expected deadbeef0']
+    CHECK target prefix intact: ok (omniroute-ctl-target: bin/omniroute, BUILD_SHA 2a41147b7, shim v2, drain marker)
+       IDENTITY label=pre-switch time=2026-10-06T23:24:20Z unit=omniroute.service MainPID=2830465 ExecMainStartTimestamp= NRestarts=None running_prefix=omniroute-ctl-rollback BUILD_SHA=cf6748d04 health=ok pending_total=0 expect_prefix_ok=True expect_build_ok=False
+    CHECK unit runs the rollback prefix, health ok: FAIL ['identity read-back exit 5']
+       sample 1 at 2026-10-06T23:24:20.322Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 2 at 2026-10-06T23:24:22.362Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 3 at 2026-10-06T23:24:24.403Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 4 at 2026-10-06T23:24:26.444Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+    CHECK nothing in flight for 6 s (4 samples): ok (0 idle and 0 tolerated connection(s))
+    INFO unrelated_remote_records=0 connections_seen=0 connections_tolerated=0 connections_active=0 connections_idle=0 pending_total_before=0 pending_total_after=0 pending_changed=False hindsight_processes=10
+    GUARD-RESULT clean=False failed_checks=['rollback prefix intact', 'unit runs the rollback prefix, health ok'] end=2026-10-06T23:24:26.460Z
+CONTROL-RESULT G5 rollback build expected_exit=4 observed_exit=4 elapsed_s=6 OK
+
+### G6: the switch tool is not the pinned file: exit 4
+--- G6 / switch tool hash: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/pre-switch-guard-20261006.py --switch-tool $WORK/switch-tool-standin.py --switch-sha256 0000000000000000000000000000000000000000000000000000000000000000 --port 53386 --tools $WORK/tools --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --clean-for 6 --interval 2 --rollback-prefix omniroute-ctl-rollback --rollback-build cf6748d04 --target-prefix omniroute-ctl-target --target-build 2a41147b7 --shim-sha256 4a5c247583b8a0f02ffd71b1a8bdf107ae6f7c564ab61e341bb92be48d643c2a --pid 2830465 --worker-pattern nonexistent-process-pattern-for-the-controls
+    GUARD version=5 mode=full script_sha256=5c8ccf3fb4ca747ddcf3a427d732cf111a74e6c09358adceba55ea7ead75c95b start=2026-10-06T23:24:26.519Z port=53386 unit=omniroute.service clean_for=6.0 interval=2.0 tolerate_units=['omniroute-fw.service']
+    CHECK switch tool sha256: FAIL ['6b444a2fa3d57976592289cc59537da365f49aa6fc917871dce10dfda12586c1 is not the pinned 0000000000000000000000000000000000000000000000000000000000000000']
+    CHECK rollback prefix intact: ok (omniroute-ctl-rollback: bin/omniroute, BUILD_SHA cf6748d04, shim v2)
+    CHECK target prefix intact: ok (omniroute-ctl-target: bin/omniroute, BUILD_SHA 2a41147b7, shim v2, drain marker)
+       IDENTITY label=pre-switch time=2026-10-06T23:24:26Z unit=omniroute.service MainPID=2830465 ExecMainStartTimestamp= NRestarts=None running_prefix=omniroute-ctl-rollback BUILD_SHA=cf6748d04 health=ok pending_total=0 expect_prefix_ok=True expect_build_ok=True
+    CHECK unit runs the rollback prefix, health ok: ok
+       sample 1 at 2026-10-06T23:24:26.653Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 2 at 2026-10-06T23:24:28.696Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 3 at 2026-10-06T23:24:30.735Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 4 at 2026-10-06T23:24:32.773Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+    CHECK nothing in flight for 6 s (4 samples): ok (0 idle and 0 tolerated connection(s))
+    INFO unrelated_remote_records=0 connections_seen=0 connections_tolerated=0 connections_active=0 connections_idle=0 pending_total_before=0 pending_total_after=0 pending_changed=False hindsight_processes=10
+    GUARD-RESULT clean=False failed_checks=['switch tool sha256'] end=2026-10-06T23:24:32.788Z
+CONTROL-RESULT G6 switch tool hash expected_exit=4 observed_exit=4 elapsed_s=6 OK
+
+### G7: a worker process of another lane exists (the frozen default pattern, a dummy process whose command line names omniroute-codex-sdk/worker.py): exit 4
+--- G7 / worker present: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/pre-switch-guard-20261006.py --switch-tool $WORK/switch-tool-standin.py --switch-sha256 6b444a2fa3d57976592289cc59537da365f49aa6fc917871dce10dfda12586c1 --port 53386 --tools $WORK/tools --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --clean-for 6 --interval 2 --rollback-prefix omniroute-ctl-rollback --rollback-build cf6748d04 --target-prefix omniroute-ctl-target --target-build 2a41147b7 --shim-sha256 4a5c247583b8a0f02ffd71b1a8bdf107ae6f7c564ab61e341bb92be48d643c2a --pid 2830465
+    GUARD version=5 mode=full script_sha256=5c8ccf3fb4ca747ddcf3a427d732cf111a74e6c09358adceba55ea7ead75c95b start=2026-10-06T23:24:33.348Z port=53386 unit=omniroute.service clean_for=6.0 interval=2.0 tolerate_units=['omniroute-fw.service']
+    CHECK switch tool sha256: ok (6b444a2fa3d5)
+    CHECK rollback prefix intact: ok (omniroute-ctl-rollback: bin/omniroute, BUILD_SHA cf6748d04, shim v2)
+    CHECK target prefix intact: ok (omniroute-ctl-target: bin/omniroute, BUILD_SHA 2a41147b7, shim v2, drain marker)
+       IDENTITY label=pre-switch time=2026-10-06T23:24:33Z unit=omniroute.service MainPID=2830465 ExecMainStartTimestamp= NRestarts=None running_prefix=omniroute-ctl-rollback BUILD_SHA=cf6748d04 health=ok pending_total=0 expect_prefix_ok=True expect_build_ok=True
+    CHECK unit runs the rollback prefix, health ok: ok
+       sample 1 at 2026-10-06T23:24:33.480Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=4 last_call_log_age_s=none
+       sample 2 at 2026-10-06T23:24:35.519Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=4 last_call_log_age_s=none
+       sample 3 at 2026-10-06T23:24:37.563Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=4 last_call_log_age_s=none
+       sample 4 at 2026-10-06T23:24:39.608Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=4 last_call_log_age_s=none
+    CHECK nothing in flight for 6 s (4 samples): FAIL ['4 worker or codex process(es) of another lane']
+    INFO unrelated_remote_records=0 connections_seen=0 connections_tolerated=0 connections_active=0 connections_idle=0 pending_total_before=0 pending_total_after=0 pending_changed=False hindsight_processes=10
+    GUARD-RESULT clean=False failed_checks=['nothing in flight for 6 s (4 samples)'] end=2026-10-06T23:24:39.624Z
+CONTROL-RESULT G7 worker present expected_exit=4 observed_exit=4 elapsed_s=6 OK
+
+### G8: the target prefix lacks the drain marker: exit 4
+--- G8 / no marker: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/pre-switch-guard-20261006.py --switch-tool $WORK/switch-tool-standin.py --switch-sha256 6b444a2fa3d57976592289cc59537da365f49aa6fc917871dce10dfda12586c1 --port 53386 --tools $WORK/tools --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --clean-for 6 --interval 2 --rollback-prefix omniroute-ctl-rollback --rollback-build cf6748d04 --target-prefix omniroute-ctl-target --target-build 2a41147b7 --shim-sha256 4a5c247583b8a0f02ffd71b1a8bdf107ae6f7c564ab61e341bb92be48d643c2a --pid 2830465 --worker-pattern nonexistent-process-pattern-for-the-controls
+    GUARD version=5 mode=full script_sha256=5c8ccf3fb4ca747ddcf3a427d732cf111a74e6c09358adceba55ea7ead75c95b start=2026-10-06T23:24:39.681Z port=53386 unit=omniroute.service clean_for=6.0 interval=2.0 tolerate_units=['omniroute-fw.service']
+    CHECK switch tool sha256: ok (6b444a2fa3d5)
+    CHECK rollback prefix intact: ok (omniroute-ctl-rollback: bin/omniroute, BUILD_SHA cf6748d04, shim v2)
+    CHECK target prefix intact: FAIL ['the drain marker is absent from the compiled server chunks']
+       IDENTITY label=pre-switch time=2026-10-06T23:24:39Z unit=omniroute.service MainPID=2830465 ExecMainStartTimestamp= NRestarts=None running_prefix=omniroute-ctl-rollback BUILD_SHA=cf6748d04 health=ok pending_total=0 expect_prefix_ok=True expect_build_ok=True
+    CHECK unit runs the rollback prefix, health ok: ok
+       sample 1 at 2026-10-06T23:24:39.814Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 2 at 2026-10-06T23:24:41.856Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 3 at 2026-10-06T23:24:43.894Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 4 at 2026-10-06T23:24:45.939Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+    CHECK nothing in flight for 6 s (4 samples): ok (0 idle and 0 tolerated connection(s))
+    INFO unrelated_remote_records=0 connections_seen=0 connections_tolerated=0 connections_active=0 connections_idle=0 pending_total_before=0 pending_total_after=0 pending_changed=False hindsight_processes=10
+    GUARD-RESULT clean=False failed_checks=['target prefix intact'] end=2026-10-06T23:24:45.956Z
+CONTROL-RESULT G8 no marker expected_exit=4 observed_exit=4 elapsed_s=6 OK
+
+### G14: `ss` fails (exit 2, empty stdout): version 3 read the empty output as an idle host and exited 0, version 5 FAILS the check (exit 4)
+--- G14 / v3: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/pre-switch-guard-20261006-v3.py --switch-tool $WORK/switch-tool-standin.py --switch-sha256 6b444a2fa3d57976592289cc59537da365f49aa6fc917871dce10dfda12586c1 --port 53386 --tools $WORK/tools --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --clean-for 6 --interval 2 --rollback-prefix omniroute-ctl-rollback --rollback-build cf6748d04 --target-prefix omniroute-ctl-target --target-build 2a41147b7 --shim-sha256 4a5c247583b8a0f02ffd71b1a8bdf107ae6f7c564ab61e341bb92be48d643c2a --pid 2830465 --worker-pattern nonexistent-process-pattern-for-the-controls   [env: PATH=$WORK/guard-shim-ss:$HOME/stubs:$REALHOME/.local/share/codex-ecosystem/bin:$REALHOME/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/wsl/lib]
+    GUARD version=3 script_sha256=305a065227bff71dcbe3b46b157f4d3ed83f5a5b5ce90a2f73cbfa6b26805040 start=2026-10-06T23:24:47.526Z port=53386 unit=omniroute.service clean_for=6.0 interval=2.0 tolerate_units=['omniroute-fw.service']
+    CHECK switch tool sha256: ok (6b444a2fa3d5)
+    CHECK rollback prefix intact: ok (omniroute-ctl-rollback: bin/omniroute, BUILD_SHA cf6748d04, shim v2)
+    CHECK target prefix intact: ok (omniroute-ctl-target: bin/omniroute, BUILD_SHA 2a41147b7, shim v2, drain marker)
+       IDENTITY label=pre-switch time=2026-10-06T23:24:47Z unit=omniroute.service MainPID=2830465 ExecMainStartTimestamp= NRestarts=None running_prefix=omniroute-ctl-rollback BUILD_SHA=cf6748d04 health=ok pending_total=0 expect_prefix_ok=True expect_build_ok=True
+    CHECK unit runs the rollback prefix, health ok: ok
+       sample 1 at 2026-10-06T23:24:47.638Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 2 at 2026-10-06T23:24:49.653Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 3 at 2026-10-06T23:24:51.670Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 4 at 2026-10-06T23:24:53.699Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+    CHECK nothing in flight for 6 s (4 samples): ok (0 idle and 0 tolerated connection(s))
+    INFO connections_seen=0 connections_tolerated=0 connections_active=0 connections_idle=0 pending_total_before=0 pending_total_after=0 pending_changed=False hindsight_processes=10
+    GUARD-RESULT clean=True failed_checks=[] end=2026-10-06T23:24:53.722Z
+CONTROL-RESULT G14 v3 defect-demonstration expected_exit=0 observed_exit=0 elapsed_s=6 OK
+
+--- G14 / v5: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/pre-switch-guard-20261006.py --switch-tool $WORK/switch-tool-standin.py --switch-sha256 6b444a2fa3d57976592289cc59537da365f49aa6fc917871dce10dfda12586c1 --port 53386 --tools $WORK/tools --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --clean-for 6 --interval 2 --rollback-prefix omniroute-ctl-rollback --rollback-build cf6748d04 --target-prefix omniroute-ctl-target --target-build 2a41147b7 --shim-sha256 4a5c247583b8a0f02ffd71b1a8bdf107ae6f7c564ab61e341bb92be48d643c2a --pid 2830465 --worker-pattern nonexistent-process-pattern-for-the-controls   [env: PATH=$WORK/guard-shim-ss:$HOME/stubs:$REALHOME/.local/share/codex-ecosystem/bin:$REALHOME/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/wsl/lib]
+    GUARD version=5 mode=full script_sha256=5c8ccf3fb4ca747ddcf3a427d732cf111a74e6c09358adceba55ea7ead75c95b start=2026-10-06T23:24:53.807Z port=53386 unit=omniroute.service clean_for=6.0 interval=2.0 tolerate_units=['omniroute-fw.service']
+    CHECK switch tool sha256: ok (6b444a2fa3d5)
+    CHECK rollback prefix intact: ok (omniroute-ctl-rollback: bin/omniroute, BUILD_SHA cf6748d04, shim v2)
+    CHECK target prefix intact: ok (omniroute-ctl-target: bin/omniroute, BUILD_SHA 2a41147b7, shim v2, drain marker)
+       IDENTITY label=pre-switch time=2026-10-06T23:24:53Z unit=omniroute.service MainPID=2830465 ExecMainStartTimestamp= NRestarts=None running_prefix=omniroute-ctl-rollback BUILD_SHA=cf6748d04 health=ok pending_total=0 expect_prefix_ok=True expect_build_ok=True
+    CHECK unit runs the rollback prefix, health ok: ok
+       sample 1 at 2026-10-06T23:24:54.001Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 2 at 2026-10-06T23:24:56.021Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 3 at 2026-10-06T23:24:58.038Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 4 at 2026-10-06T23:25:00.065Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+    CHECK nothing in flight for 6 s (4 samples): FAIL ['the socket observation failed: ss (listeners) exited 2: ss: stub failure']
+    INFO unrelated_remote_records=0 connections_seen=0 connections_tolerated=0 connections_active=0 connections_idle=0 pending_total_before=0 pending_total_after=0 pending_changed=False hindsight_processes=10
+    GUARD-RESULT clean=False failed_checks=['nothing in flight for 6 s (4 samples)'] end=2026-10-06T23:25:00.087Z
+CONTROL-RESULT G14 v5 expected_exit=4 observed_exit=4 elapsed_s=6 OK
+
+### G15: `pgrep` fails (exit 2, empty stdout): version 3 read it as no worker present and exited 0, version 5 FAILS the check (exit 4)
+--- G15 / v3: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/pre-switch-guard-20261006-v3.py --switch-tool $WORK/switch-tool-standin.py --switch-sha256 6b444a2fa3d57976592289cc59537da365f49aa6fc917871dce10dfda12586c1 --port 53386 --tools $WORK/tools --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --clean-for 6 --interval 2 --rollback-prefix omniroute-ctl-rollback --rollback-build cf6748d04 --target-prefix omniroute-ctl-target --target-build 2a41147b7 --shim-sha256 4a5c247583b8a0f02ffd71b1a8bdf107ae6f7c564ab61e341bb92be48d643c2a --pid 2830465 --worker-pattern nonexistent-process-pattern-for-the-controls   [env: PATH=$WORK/guard-shim-pgrep:$HOME/stubs:$REALHOME/.local/share/codex-ecosystem/bin:$REALHOME/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/wsl/lib]
+    GUARD version=3 script_sha256=305a065227bff71dcbe3b46b157f4d3ed83f5a5b5ce90a2f73cbfa6b26805040 start=2026-10-06T23:25:01.675Z port=53386 unit=omniroute.service clean_for=6.0 interval=2.0 tolerate_units=['omniroute-fw.service']
+    CHECK switch tool sha256: ok (6b444a2fa3d5)
+    CHECK rollback prefix intact: ok (omniroute-ctl-rollback: bin/omniroute, BUILD_SHA cf6748d04, shim v2)
+    CHECK target prefix intact: ok (omniroute-ctl-target: bin/omniroute, BUILD_SHA 2a41147b7, shim v2, drain marker)
+       IDENTITY label=pre-switch time=2026-10-06T23:25:01Z unit=omniroute.service MainPID=2830465 ExecMainStartTimestamp= NRestarts=None running_prefix=omniroute-ctl-rollback BUILD_SHA=cf6748d04 health=ok pending_total=0 expect_prefix_ok=True expect_build_ok=True
+    CHECK unit runs the rollback prefix, health ok: ok
+       sample 1 at 2026-10-06T23:25:01.812Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 2 at 2026-10-06T23:25:03.838Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 3 at 2026-10-06T23:25:05.862Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 4 at 2026-10-06T23:25:07.888Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+    CHECK nothing in flight for 6 s (4 samples): ok (0 idle and 0 tolerated connection(s))
+    INFO connections_seen=0 connections_tolerated=0 connections_active=0 connections_idle=0 pending_total_before=0 pending_total_after=0 pending_changed=False hindsight_processes=0
+    GUARD-RESULT clean=True failed_checks=[] end=2026-10-06T23:25:07.891Z
+CONTROL-RESULT G15 v3 defect-demonstration expected_exit=0 observed_exit=0 elapsed_s=6 OK
+
+--- G15 / v5: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/pre-switch-guard-20261006.py --switch-tool $WORK/switch-tool-standin.py --switch-sha256 6b444a2fa3d57976592289cc59537da365f49aa6fc917871dce10dfda12586c1 --port 53386 --tools $WORK/tools --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --clean-for 6 --interval 2 --rollback-prefix omniroute-ctl-rollback --rollback-build cf6748d04 --target-prefix omniroute-ctl-target --target-build 2a41147b7 --shim-sha256 4a5c247583b8a0f02ffd71b1a8bdf107ae6f7c564ab61e341bb92be48d643c2a --pid 2830465 --worker-pattern nonexistent-process-pattern-for-the-controls   [env: PATH=$WORK/guard-shim-pgrep:$HOME/stubs:$REALHOME/.local/share/codex-ecosystem/bin:$REALHOME/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/wsl/lib]
+    GUARD version=5 mode=full script_sha256=5c8ccf3fb4ca747ddcf3a427d732cf111a74e6c09358adceba55ea7ead75c95b start=2026-10-06T23:25:07.948Z port=53386 unit=omniroute.service clean_for=6.0 interval=2.0 tolerate_units=['omniroute-fw.service']
+    CHECK switch tool sha256: ok (6b444a2fa3d5)
+    CHECK rollback prefix intact: ok (omniroute-ctl-rollback: bin/omniroute, BUILD_SHA cf6748d04, shim v2)
+    CHECK target prefix intact: ok (omniroute-ctl-target: bin/omniroute, BUILD_SHA 2a41147b7, shim v2, drain marker)
+       IDENTITY label=pre-switch time=2026-10-06T23:25:08Z unit=omniroute.service MainPID=2830465 ExecMainStartTimestamp= NRestarts=None running_prefix=omniroute-ctl-rollback BUILD_SHA=cf6748d04 health=ok pending_total=0 expect_prefix_ok=True expect_build_ok=True
+    CHECK unit runs the rollback prefix, health ok: ok
+       sample 1 at 2026-10-06T23:25:08.071Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 2 at 2026-10-06T23:25:10.100Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 3 at 2026-10-06T23:25:12.126Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 4 at 2026-10-06T23:25:14.153Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+    CHECK nothing in flight for 6 s (4 samples): FAIL ['the worker observation failed: pgrep exited 2: pgrep: stub failure']
+    INFO unrelated_remote_records=0 connections_seen=0 connections_tolerated=0 connections_active=0 connections_idle=0 pending_total_before=0 pending_total_after=0 pending_changed=False hindsight_processes=0
+    GUARD-RESULT clean=False failed_checks=['nothing in flight for 6 s (4 samples)'] end=2026-10-06T23:25:14.159Z
+CONTROL-RESULT G15 v5 expected_exit=4 observed_exit=4 elapsed_s=6 OK
+
+### G16: `pgrep` exits 1 (no process matched, an idle host) and prints nothing: that is NOT a failure, version 5 exits 0
+--- G16 / v5: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/pre-switch-guard-20261006.py --switch-tool $WORK/switch-tool-standin.py --switch-sha256 6b444a2fa3d57976592289cc59537da365f49aa6fc917871dce10dfda12586c1 --port 53386 --tools $WORK/tools --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --clean-for 6 --interval 2 --rollback-prefix omniroute-ctl-rollback --rollback-build cf6748d04 --target-prefix omniroute-ctl-target --target-build 2a41147b7 --shim-sha256 4a5c247583b8a0f02ffd71b1a8bdf107ae6f7c564ab61e341bb92be48d643c2a --pid 2830465 --worker-pattern nonexistent-process-pattern-for-the-controls   [env: PATH=$WORK/guard-shim-pgrep-nomatch:$HOME/stubs:$REALHOME/.local/share/codex-ecosystem/bin:$REALHOME/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/wsl/lib]
+    GUARD version=5 mode=full script_sha256=5c8ccf3fb4ca747ddcf3a427d732cf111a74e6c09358adceba55ea7ead75c95b start=2026-10-06T23:25:15.737Z port=53386 unit=omniroute.service clean_for=6.0 interval=2.0 tolerate_units=['omniroute-fw.service']
+    CHECK switch tool sha256: ok (6b444a2fa3d5)
+    CHECK rollback prefix intact: ok (omniroute-ctl-rollback: bin/omniroute, BUILD_SHA cf6748d04, shim v2)
+    CHECK target prefix intact: ok (omniroute-ctl-target: bin/omniroute, BUILD_SHA 2a41147b7, shim v2, drain marker)
+       IDENTITY label=pre-switch time=2026-10-06T23:25:15Z unit=omniroute.service MainPID=2830465 ExecMainStartTimestamp= NRestarts=None running_prefix=omniroute-ctl-rollback BUILD_SHA=cf6748d04 health=ok pending_total=0 expect_prefix_ok=True expect_build_ok=True
+    CHECK unit runs the rollback prefix, health ok: ok
+       sample 1 at 2026-10-06T23:25:15.855Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 2 at 2026-10-06T23:25:17.882Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 3 at 2026-10-06T23:25:19.910Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 4 at 2026-10-06T23:25:21.938Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+    CHECK nothing in flight for 6 s (4 samples): ok (0 idle and 0 tolerated connection(s))
+    INFO unrelated_remote_records=0 connections_seen=0 connections_tolerated=0 connections_active=0 connections_idle=0 pending_total_before=0 pending_total_after=0 pending_changed=False hindsight_processes=0
+    GUARD-RESULT clean=True failed_checks=[] end=2026-10-06T23:25:21.942Z
+CONTROL-RESULT G16 v5 expected_exit=0 observed_exit=0 elapsed_s=6 OK
+
+# finished 2026-10-06T23:25:21Z; scenarios with an unexpected exit status: none
+
+# ---- Fixture control: the 4624137 text of run-controls.py (sha256 890c70b63eb9..., whose stand-in shim/lsof has mode 0644) on this guard, `--only G16`, with the same scratch HOME and stubs; raw output. Its UNEXPECTED is the expected outcome: the guard refuses a shim that is not executable ----
+# Offline controls of the live-acceptance scripts, version 1 (superseded) against version 2.2 (frozen; versions 2.0 and 2.1, guard version 3 and the earlier wrapper appear where a control reproduces a defect a review found), on the stub gateway and a scratch database. Nothing here touches a live gateway.
+# started 2026-10-06T23:32:18Z; codex-cli 0.159.3; python 3.13.15
+# live-acceptance v1: sha256 8aa14054401c00a5af1e8c180fc83af80c79cc0a807da98ea519149291188859
+# live-acceptance v2.0 (superseded): sha256 fa8fa6f8dc3a0e7360be4a0737c34daaf4d4b58696df6a7ab3483896cb739e82
+# live-acceptance v2.1 (superseded; R10): sha256 15b8cf04134aa8ead6526739e5a95b6dc15f4e5b77d59840e0d03aa56b33301b
+# live-acceptance v2.2: sha256 52b1d749dc6b7f6b406f8ce8db5d8b1d3e3a73a6b7861a63cc158dbebd320d75
+# native-exec v1: sha256 9f511620db390c3b4c7177f858342c6592680efd1d383e2e02ecf3f5d249fdee
+# native-exec v2.0 (superseded; N10): sha256 9bd478a1502839e7cfe2c5999e3485d6e9ba5d10bfe62e2593e061b7441dda71
+# native-exec v2.1: sha256 db2a4d42d6caf4c39e484903313f0f94bd2be40fabe4f1336d0dcdc3b1d0bafd
+# show-log-receipt v2: sha256 df74b842ae73d03006a372c4bc34e33f51b0102ad737c545f3e3a278cbf23e3c
+# gateway-identity: sha256 a7932710412e9e834f6b992f267db5620b64bbe62f25021013c8004a7eec6011
+# pre-switch-guard v5: sha256 5c8ccf3fb4ca747ddcf3a427d732cf111a74e6c09358adceba55ea7ead75c95b
+# pre-switch-guard v3 (superseded; G13-G15): sha256 305a065227bff71dcbe3b46b157f4d3ed83f5a5b5ce90a2f73cbfa6b26805040
+# pre-switch-guard v2 (superseded; G12): sha256 b491de6b3e4a5a1d3a3761c8fa8aefc439cca8cf4c453d696c7b9cb41a73af3a
+# run-acceptance wrapper: sha256 0e74b3b15616b809a907c8ad197247a637fd7a8b7d706f81f1ab41b5119ca33d
+# run-acceptance wrapper before the re-freeze (superseded; W7-W12): sha256 abcbb5407c244062697fb94a677100b3e670b609b423582d9f39368073e9cb11
+# switch tool copy (committed evidence file): sha256 97d1b87bb651d6f43e184b9617d03afa7861ee7715e7030ad23ed29057bc23e3
+# stub-gateway: sha256 1d29d8f6dfda224d21e40f82834d47746e54225acb37ac0096d0d73f207400ea
+# fake-codex: sha256 9e9146449b02d50ea0322ce3f5f07e5dcfb29253e5edcba48aec0f524dc0fc77
+# health-server: sha256 c8b1183543319d501d6729b59b7c836817da333ebc65233268873f9452afca75
+# poller: sha256 aabb35f12418f85f6d23fca3a5cd137bf646d77f4241267bc6b12089fe53890f
+# run-controls: sha256 890c70b63eb9c097cfa4f2dab230d445e12b64c78894ee038252110be86a0d3c
+
+### G16: `pgrep` exits 1 (no process matched, an idle host) and prints nothing: that is NOT a failure, version 5 exits 0
+--- G16 / v5: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/pre-switch-guard-20261006.py --switch-tool $WORK/switch-tool-standin.py --switch-sha256 6b444a2fa3d57976592289cc59537da365f49aa6fc917871dce10dfda12586c1 --port 51878 --tools $WORK/tools --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --clean-for 6 --interval 2 --rollback-prefix omniroute-ctl-rollback --rollback-build cf6748d04 --target-prefix omniroute-ctl-target --target-build 2a41147b7 --shim-sha256 4a5c247583b8a0f02ffd71b1a8bdf107ae6f7c564ab61e341bb92be48d643c2a --pid 2943728 --worker-pattern nonexistent-process-pattern-for-the-controls   [env: PATH=$WORK/guard-shim-pgrep-nomatch:$HOME/stubs:$REALHOME/.local/share/codex-ecosystem/bin:$REALHOME/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/wsl/lib]
+    GUARD version=5 mode=full script_sha256=5c8ccf3fb4ca747ddcf3a427d732cf111a74e6c09358adceba55ea7ead75c95b start=2026-10-06T23:32:20.866Z port=51878 unit=omniroute.service clean_for=6.0 interval=2.0 tolerate_units=['omniroute-fw.service']
+    CHECK switch tool sha256: ok (6b444a2fa3d5)
+    CHECK rollback prefix intact: FAIL ['shim/lsof is not readable and executable by this user (mode 0o644)']
+    CHECK target prefix intact: FAIL ['shim/lsof is not readable and executable by this user (mode 0o644)']
+       IDENTITY label=pre-switch time=2026-10-06T23:32:20Z unit=omniroute.service MainPID=2943728 ExecMainStartTimestamp= NRestarts=None running_prefix=omniroute-ctl-rollback BUILD_SHA=cf6748d04 health=ok pending_total=0 expect_prefix_ok=True expect_build_ok=True
+    CHECK unit runs the rollback prefix, health ok: ok
+       sample 1 at 2026-10-06T23:32:20.987Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 2 at 2026-10-06T23:32:23.012Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 3 at 2026-10-06T23:32:25.037Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 4 at 2026-10-06T23:32:27.070Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+    CHECK nothing in flight for 6 s (4 samples): ok (0 idle and 0 tolerated connection(s))
+    INFO unrelated_remote_records=0 connections_seen=0 connections_tolerated=0 connections_active=0 connections_idle=0 pending_total_before=0 pending_total_after=0 pending_changed=False hindsight_processes=0
+    GUARD-RESULT clean=False failed_checks=['rollback prefix intact', 'target prefix intact'] end=2026-10-06T23:32:27.073Z
+CONTROL-RESULT G16 v5 expected_exit=0 observed_exit=4 elapsed_s=6 UNEXPECTED
+
+# finished 2026-10-06T23:32:27Z; scenarios with an unexpected exit status: ['G16 v5']

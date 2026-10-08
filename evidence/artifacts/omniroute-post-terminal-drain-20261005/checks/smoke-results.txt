@@ -1,0 +1,59 @@
+# Boot smoke of the installed drain prefix (version 5 of the smoke script, run 2026-10-06 UTC), with controls for its own checks. Raw output, ANSI colour codes removed and the home directory written $HOME.
+# (1) the smoke with an UNRELATED healthy process on the port it is told to use (scripts/smoke-control.sh.txt): health_ok=no, listener_owned_by_child=no, exit 1, and the unrelated process is still alive afterwards.
+# (2) the smoke on a free port: the child is alive, the health body's status is exactly ok, the listener belongs to the child's process group, the listening address is 127.0.0.1 only, the server prints no exposure warning, the group held 3 processes before cleanup and the FINAL observation of the group is empty (version 5: `final observation: empty`), exit 0.
+# (3) the ownership check on its own (scripts/smoke-ownership-control.sh.txt).
+# Version 5 (full-scope read r9, P2-5): a process-group observation that FAILS (`ps` exits non-zero or its listing lacks this shell) is `unavailable`, never an empty group, and an unavailable final observation fails the smoke; the control for that is checks/smoke-observation-control.txt. Version 4 and its results are superseded/smoke-v4.sh.txt and superseded/smoke-v4-results.txt.
+
+## (1) the smoke script with an unrelated process answering {"status":"ok"} on the forced port
+unrelated dummy health server: pid 25991 on port 55224, alive=yes
+prefix=omniroute-3.8.51-c1e30b76-affinity-pr15167-drain-b7c68690 port=55224 health_ok=no listener_owned_by_child=no listening_address=127.0.0.1:55224 loopback_only=yes exposure_warning_printed=no body=none child_alive=no
+processes in the owned process group 26185 before cleanup: 0
+--- first log lines:
+  📋 Loaded env from $HOME/.local/share/codex-ecosystem/tools/omniroute-3.8.51-c1e30b76-affinity-pr15167-drain-b7c68690/lib/node_modules/omniroute/.env
+  ⚠ REQUIRE_API_KEY in $HOME/.local/share/codex-ecosystem/tools/omniroute-3.8.51-c1e30b76-affinity-pr15167-drain-b7c68690/lib/node_modules/omniroute/.env is ignored, the environment set it first
+  ⚠ $HOME/.local/share/codex-ecosystem/tools/omniroute-3.8.51-c1e30b76-affinity-pr15167-drain-b7c68690/lib/node_modules/omniroute/.env lives inside the installed package: updating OmniRoute replaces it. Move the values you set to $HOME/.cache/omniroute-smoke-4LCkTi/data/.env, which updates leave alone.
+  ✨ Generated STORAGE_ENCRYPTION_KEY in $HOME/.cache/omniroute-smoke-4LCkTi/data/.env
+
+   ____                  _ ____              _
+   / __ \                (_) __ \            | |
+  | |  | |_ __ ___  _ __ _| |__) |___  _   _| |_ ___
+  | |  | | '_ ` _ \| '_ \ |  _  // _ \| | | | __/ _ \
+  | |__| | | | | | | | | | | | \ \ (_) | |_| | ||  __/
+   \____/|_| |_| |_|_| |_|_|_|  \_\___/ \__,_|\__\___|
+
+  v3.8.51
+
+processes left in the owned process group 26185: 0 (final observation: empty)
+scratch dir: $HOME/.cache/omniroute-smoke-4LCkTi (remove with rm -rf after reading)
+smoke exit=1
+unrelated dummy still alive after the smoke: yes
+dummy stopped by this control (its own pid only)
+
+## (2) the smoke script on a free port
+prefix=omniroute-3.8.51-c1e30b76-affinity-pr15167-drain-b7c68690 port=53962 health_ok=yes listener_owned_by_child=yes listening_address=127.0.0.1:53962 loopback_only=yes exposure_warning_printed=no body={"status":"ok","timestamp":"2026-10-06T13:56:26.487Z"} child_alive=yes
+processes in the owned process group 26657 before cleanup: 3
+--- first log lines:
+  📋 Loaded env from $HOME/.local/share/codex-ecosystem/tools/omniroute-3.8.51-c1e30b76-affinity-pr15167-drain-b7c68690/lib/node_modules/omniroute/.env
+  ⚠ REQUIRE_API_KEY in $HOME/.local/share/codex-ecosystem/tools/omniroute-3.8.51-c1e30b76-affinity-pr15167-drain-b7c68690/lib/node_modules/omniroute/.env is ignored, the environment set it first
+  ⚠ $HOME/.local/share/codex-ecosystem/tools/omniroute-3.8.51-c1e30b76-affinity-pr15167-drain-b7c68690/lib/node_modules/omniroute/.env lives inside the installed package: updating OmniRoute replaces it. Move the values you set to $HOME/.cache/omniroute-smoke-dyiAHq/data/.env, which updates leave alone.
+  ✨ Generated STORAGE_ENCRYPTION_KEY in $HOME/.cache/omniroute-smoke-dyiAHq/data/.env
+
+   ____                  _ ____              _
+   / __ \                (_) __ \            | |
+  | |  | |_ __ ___  _ __ _| |__) |___  _   _| |_ ___
+  | |  | | '_ ` _ \| '_ \ |  _  // _ \| | | | __/ _ \
+  | |__| | | | | | | | | | | | \ \ (_) | |_| | ||  __/
+   \____/|_| |_| |_|_| |_|_|_|  \_\___/ \__,_|\__\___|
+
+  v3.8.51
+
+processes left in the owned process group 26657: 0 (final observation: empty)
+scratch dir: $HOME/.cache/omniroute-smoke-dyiAHq (remove with rm -rf after reading)
+smoke exit=0
+
+## (3) the ownership check on its own
+listener: pid 27201 in process group 27201 on port 53540; an unrelated process: pid 27239 in process group 27239
+owned_listener for the listener's own process group 27201: yes   (expected: yes)
+owned_listener for the unrelated process group 27239: no   (expected: no)
+[2]+  Terminated              sleep 300
+both stopped (their own process groups only)

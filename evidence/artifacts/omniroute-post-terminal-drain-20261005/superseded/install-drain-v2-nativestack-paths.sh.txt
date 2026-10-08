@@ -1,0 +1,86 @@
+#!/bin/bash
+# Install the drain-patched tarball (patch v2, patched tree b7c6869001ce, BUILD_SHA 2a41147b7) into its own prefix next to the live ones; no live unit is touched.
+# Every identity check is pinned HERE, from the PR's record (checks/build-results.txt), not from a file beside the tarball; a failed check stops the script with exit 3.
+# 1. The build output (what scripts/build-drain.sh.txt packs: omniroute-3.8.51.tgz, the same base name as the first composition tarball) is COPIED to a distinct name,
+#    omniroute-3.8.51-drain-b7c68690.tgz, in the artifact directory, and SHA256SUMS there is updated (the committed copy step).
+# 2. The copy must equal the pinned sha256, the pinned npm integrity (sha512) and the pinned entry count, checked with `sha256sum -c` and recomputed values.
+# 3. `npm install -g --prefix` of the copy (exit status checked), then the lsof shim is copied from the live prefix (exit status checked).
+# 4. The installed prefix must have dist/BUILD_SHA 2a41147b7, the pinned shim sha256, and the drain's marker in its compiled server chunks (a controlled `.clearPendingRequest?.()` call after
+#    abort() in the grace timer): present in this build, absent in the earlier 3.8.51 builds. The same checks run alone against any installed prefix with --verify-prefix NAME (the controls).
+# 5. A hash of the installed dependency graph (sorted name@version of `npm ls -g --all --json`) is printed: the tarball bundles its server build, but npm resolves the runtime dependencies at install time,
+#    so another host compares this hash after its own install (the tarball's sha256 does not pin them).
+# usage: omniroute-install-drain-b7c68690-20261005.sh                    copy, verify, install, verify the prefix
+#        omniroute-install-drain-b7c68690-20261005.sh --deps-hash NAME       print the dependency-graph hash of an installed prefix
+#        omniroute-install-drain-b7c68690-20261005.sh --verify-prefix NAME   verify an installed prefix under tools/ (BUILD_SHA, shim, marker)
+set -u
+set -o pipefail
+EXPECTED_SHA256=5b0e986bdff81487130cfd7c7dad20c6534f447836ff1c757e7c4bcf82d0fa14
+EXPECTED_SRI=sha512-yuWHzCGuHHad+kFYw87C+8YfIYLMF5unzpv/ucHb+XSVdsDmBLdYcQ3aXJ2puoHpfmblXgWvoTgeMuc6RtIN9w==
+EXPECTED_ENTRIES=26762
+EXPECTED_BUILD_SHA=2a41147b7
+EXPECTED_SHIM_SHA256=b6ae900224df3dc73fff2a50b3d7206d78895c6147e93e80b62e66d423e69854
+MARKER_RE='abort\(\),[A-Za-z_$]+\.clearPendingRequest\?\.\(\),Promise\.allSettled'
+TGZ_NAME=omniroute-3.8.51-drain-b7c68690.tgz
+PREFIX_NAME=${PREFIX_NAME_OVERRIDE:-omniroute-3.8.51-c1e30b76-affinity-pr15167-drain-b7c68690}   # the override is only for a verification install beside the real prefix
+TOOLS=$HOME/.local/share/codex-ecosystem/tools
+LIVE=$TOOLS/omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167
+A=${ARTIFACT_DIR:-$HOME/.local/state/native-agent-stack/omniroute-artifacts-20261005}
+BUILD_OUT=${BUILD_OUT:-$HOME/.cache/omniroute-drain-build-out/omniroute-3.8.51.tgz}
+export PATH="$TOOLS/node-24.21.0/bin:/usr/local/bin:/usr/bin:/bin"
+fail() { echo "FAILED: $*" >&2; exit 3; }
+verify_prefix() { # directory name under tools/
+  local p=$TOOLS/$1 sha shim marker
+  [ -d "$p" ] || fail "no prefix $p"
+  sha=$(cat "$p/lib/node_modules/omniroute/dist/BUILD_SHA" 2>/dev/null)
+  shim=$(sha256sum "$p/shim/lsof" 2>/dev/null | cut -d' ' -f1)
+  marker=$(grep -rEl "$MARKER_RE" "$p/lib/node_modules/omniroute/dist/.build/next/server/chunks" --include='*.js' 2>/dev/null | wc -l | tr -d ' ')
+  echo "prefix $1: BUILD_SHA=${sha:-none} (expected $EXPECTED_BUILD_SHA) shim_sha256=${shim:-none} drain_marker_files=$marker"
+  [ "$sha" = "$EXPECTED_BUILD_SHA" ] || fail "BUILD_SHA of $1 is not $EXPECTED_BUILD_SHA"
+  [ "$shim" = "$EXPECTED_SHIM_SHA256" ] || fail "shim sha256 of $1 is not the reviewed shim v2 ($EXPECTED_SHIM_SHA256)"
+  [ "$marker" -ge 1 ] || fail "the drain marker is absent from the compiled server chunks of $1: not the drain build"
+}
+deps_hash() { # installed prefix directory (full path): packages and sha256 of the sorted name@version list
+  npm ls -g --all --json --prefix "$1" 2>/dev/null | python3 -c '
+import json, sys
+def walk(node, out):
+    for name, dep in (node.get("dependencies") or {}).items():
+        out.add(name + "@" + str(dep.get("version", "?")))
+        walk(dep, out)
+out = set()
+walk(json.load(sys.stdin), out)
+print(len(out), __import__("hashlib").sha256("\n".join(sorted(out)).encode()).hexdigest())
+'
+}
+if [ "${1:-}" = "--deps-hash" ]; then
+  echo "dependency graph of $2: $(deps_hash "$TOOLS/${2:?prefix name}")"
+  exit 0
+fi
+if [ "${1:-}" = "--verify-prefix" ]; then
+  verify_prefix "${2:?prefix name}"
+  echo "verified: $2 is the drain build"
+  exit 0
+fi
+P=$TOOLS/$PREFIX_NAME
+[ -e "$P" ] && fail "$P exists; refusing to overwrite"
+mkdir -p "$A" || fail "artifact directory"
+if [ ! -e "$A/$TGZ_NAME" ]; then
+  [ -f "$BUILD_OUT" ] || fail "no build output at $BUILD_OUT"
+  cp "$BUILD_OUT" "$A/$TGZ_NAME" || fail "copy of the build output to $TGZ_NAME"
+  chmod 600 "$A/$TGZ_NAME"
+fi
+echo "$EXPECTED_SHA256  $A/$TGZ_NAME" | sha256sum -c - || fail "sha256 of $TGZ_NAME is not the pinned $EXPECTED_SHA256"
+SRI="sha512-$(openssl dgst -sha512 -binary "$A/$TGZ_NAME" | base64 -w0)"
+[ "$SRI" = "$EXPECTED_SRI" ] || fail "npm integrity of $TGZ_NAME is $SRI, not the pinned $EXPECTED_SRI"
+ENTRIES=$(tar -tzf "$A/$TGZ_NAME" | wc -l | tr -d ' ')
+[ "$ENTRIES" = "$EXPECTED_ENTRIES" ] || fail "$TGZ_NAME has $ENTRIES entries, not the pinned $EXPECTED_ENTRIES"
+{ [ -f "$A/SHA256SUMS" ] && grep -v " $TGZ_NAME\$" "$A/SHA256SUMS"; (cd "$A" && sha256sum "$TGZ_NAME"); } > "$A/SHA256SUMS.new" && mv "$A/SHA256SUMS.new" "$A/SHA256SUMS" && chmod 600 "$A/SHA256SUMS" || fail "SHA256SUMS update"
+echo "tarball verified: sha256, npm integrity and $ENTRIES entries equal the pinned values"
+OUT=$HOME/.cache/omniroute-drain-install-out; mkdir -p "$OUT"
+nice -n 19 npm install -g --prefix "$P" --no-audit --no-fund "$A/$TGZ_NAME" > "$OUT/install.log" 2>&1 || { tail -5 "$OUT/install.log"; fail "npm install"; }
+echo "$(date -u +%H:%M:%SZ) npm install exit=0"
+cp -a "$LIVE/shim" "$P/shim" || fail "copy of the lsof shim from $LIVE"
+verify_prefix "$PREFIX_NAME"
+DEPS=$(deps_hash "$P")
+echo "installed dependency graph: packages and sha256 of the sorted name@version list: $DEPS"
+du -sb "$P" | cut -f1 | sed 's/^/bytes: /'
+echo "installed and verified: $PREFIX_NAME"

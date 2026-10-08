@@ -1,0 +1,180 @@
+# Controls of pre-switch guard version 5 as of round 13 (scripts/pre-switch-guard.py.txt, sha256 5c8ccf3fb4ca747ddcf3a427d732cf111a74e6c09358adceba55ea7ead75c95b), 2026-10-07 UTC: scripts/acceptance-controls/guard5-controls.py.txt. Raw output, home directory written $HOME. Part K sends no request. Part E runs every guard inside a private network namespace (`unshare -rn`) whose 127.0.0.1:20128 is the controls' own stub of the one endpoint the guard reads, so no request of this run reached the host's gateway (E0, E0b, and the stub count of every case: two requests for each of E1-E5 and E7a-E7c, none for E6, whose usage error comes before the guard's HTTP read). Full-scope read r12, P3-1: the previous run of these controls (guard sha256 62dea3d25040..., controls sha256 168daf3528d2..., this file at 4624137290244eb7044ff3fd935c693042e337fe) ran E6 directly, outside the namespace, while its header said every guard ran inside it; that guard exits on its missing --switch-tool before any HTTP read, so E6 sent no request, but the statement did not hold for it. The earlier Part E (superseded/guard5-controls-r12.py.txt) had no such isolation at all: its guard runs read the live gateway's /api/usage/history (read-only, at most two requests per run), and the header it carried said otherwise.
+# Part K (K1-K11): the connection parser on `ss -O -Htnpi state established ( sport = :20128 or dport = :20128 )` RECORDS CAPTURED ON THIS HOST, in both record orders. Version 4's parser, fed the same records in its own two-line format, is run next to it where it had the defect (labelled `guard 4 (the defect)`):
+#   a client port that two connections share overwrites the busy one (K2), a missing TCP-info line and missing or malformed counters read as zeros (K3-K5), a client-only record is dropped silently (K6), and the last duplicate wins (K7). Guard 5 pairs the two ends on the full normalized (family, address, port) tuple, rejects conflicts, duplicates, malformed and client-only records, and tells an unavailable counter from a zero.
+# Part K (K12-K19; round 13, full-scope read r12, P2-4): check_prefix() of guard 5 and of guard 5 before round 13 (labelled `guard 5 before round 13`: the text at 4624137290244eb7044ff3fd935c693042e337fe, sha256 62dea3d25040ed6fee469f44332068a0b47f3f4951fdaa309b4e99000378700b) on scratch install prefixes built as installed, one file changed per scenario, in-process as this user.
+#   Before round 13 an entrypoint or a shim that lost its execute permission (K12-K15) and a directory in place of the entrypoint (K16) read as intact (the defect), a directory in place of the shim crashed the check (K16b: the whole guard would exit 3 with an ERROR, not with a CHECK FAIL), a dangling symlink (K17, K17b) was already reported, as missing (not a defect of that version), and an execute-only entrypoint (K18: the read bit, which guard 5 checks with the execute bit; beyond the finding) read as intact. Guard 5 fails K12-K18 and passes the positive controls K19a-K19c.
+# Part E (E0, E0b, E1-E7): the whole guard in --idle-only mode (E1-E6) and in full mode (E7a-E7c) with an `ss` shim, a stub identity script and a scratch database, inside a private network namespace whose 127.0.0.1:20128 is a stub of the one endpoint the guard reads; every case prints how many requests reached the stub. E7b and E7c: a rollback shim of mode 0644 passes the pre-switch gate of guard 5 before round 13 (exit 0) and fails guard 5's (exit 4). E7's unlaunchable file has no execute bit at all, because inside the namespace the guard runs as the namespace's root, for whom a file without its read bit would still read (that case is K18, in-process).
+# The controls script is scripts/acceptance-controls/guard5-controls.py.txt, sha256 d8eb311ca4de78f1b514d4fad63f4fc0d1a2c35d8609b5375b66aabcb3cf9eb8; its modification time precedes the run's start below. It ran as `guard5-controls.py --guard5 <guard 5> --guard4 <superseded/pre-switch-guard-v4.py.txt> --guard5-r12 <the guard text at 4624137> --work-root <a scratch directory>`, on scratch copies byte-identical to those files (the sha256 line below).
+
+# guard 5 controls: the connection parser on records captured on the live host
+# guard 5: sha256 5c8ccf3fb4ca747ddcf3a427d732cf111a74e6c09358adceba55ea7ead75c95b; guard 4 (superseded): sha256 b587c3a48700a7e7802e527784b5d25d76c96f358d8fc36c5bf512e4a965856f; guard 5 before round 13 (K12-K19, E7): sha256 62dea3d25040ed6fee469f44332068a0b47f3f4951fdaa309b4e99000378700b
+# started 2026-10-07T21:55:15Z; python 3.13.15
+
+### K1a: an idle connection and a busy one (the real sample's shape), server end printed first
+    guard 5: OK {'127.0.0.1:57989 -> 127.0.0.1:20128': ((0, 0, 0, 0), [2335]), '127.0.0.1:59077 -> 127.0.0.1:20128': ((0, 0, 729017, 1559298), [1521275])}   [as expected]
+    guard 4 (the defect): OK {'57989': ((0, 0, 0, 0), [2335]), '59077': ((0, 0, 729017, 1559298), [1521275])}   [as expected]
+### K1b: the same records, client end printed first
+    guard 5: OK {'127.0.0.1:57989 -> 127.0.0.1:20128': ((0, 0, 0, 0), [2335]), '127.0.0.1:59077 -> 127.0.0.1:20128': ((0, 0, 729017, 1559298), [1521275])}   [as expected]
+    guard 4 (the defect): OK {'57989': ((0, 0, 0, 0), [2335]), '59077': ((0, 0, 729017, 1559298), [1521275])}   [as expected]
+### K1c: the same records interleaved and in reverse order
+    guard 5: OK {'127.0.0.1:59077 -> 127.0.0.1:20128': ((0, 0, 729017, 1559298), [1521275]), '127.0.0.1:57989 -> 127.0.0.1:20128': ((0, 0, 0, 0), [2335])}   [as expected]
+    guard 4 (the defect): OK {'59077': ((0, 0, 729017, 1559298), [1521275]), '57989': ((0, 0, 0, 0), [2335])}   [as expected]
+### K2a: the same client PORT from two client addresses (127.0.0.1:50000 idle, 127.0.0.2:50000 with queued data), idle one first: two connections with their own counters; guard 4 keys by the client port alone and sees ONE
+    guard 5: OK {'127.0.0.1:50000 -> 127.0.0.1:20128': ((0, 0, 0, 0), [2335]), '127.0.0.2:50000 -> 127.0.0.1:20128': ((512, 0, 4096, 0), [])}   [as expected]
+    guard 4 (the defect): OK {'50000': ((512, 0, 4096, 0), [])}   [as expected]
+### K2b: the same records, the busy connection first (guard 4's single entry is whichever record came last)
+    guard 5: OK {'127.0.0.2:50000 -> 127.0.0.1:20128': ((512, 0, 4096, 0), []), '127.0.0.1:50000 -> 127.0.0.1:20128': ((0, 0, 0, 0), [2335])}   [as expected]
+    guard 4 (the defect): OK {'50000': ((0, 0, 0, 0), [2335])}   [as expected]
+### K3: a server-end record with NO TCP info at all (users field only): guard 4 reads its counters as zero (an idle connection); guard 5 refuses
+    guard 5: ObservationError a record has no TCP info (no mss: and cwnd:), so its byte counters are unavailable, not zero   [as expected]
+    guard 4 (the defect): OK {'51000': ((0, 0, 0, 0), [2335])}   [as expected]
+### K4: a server-end record whose info lacks mss: and cwnd: (a truncated line): guard 4 reads zeros; guard 5 refuses
+    guard 5: ObservationError a record has no TCP info (no mss: and cwnd:), so its byte counters are unavailable, not zero   [as expected]
+    guard 4 (the defect): OK {'51001': ((0, 0, 0, 0), [2335])}   [as expected]
+### K5a: malformed counter `bytes_received:abc` on the server end: guard 4 reads it as zero (or ignores it); guard 5 refuses
+    guard 5: ObservationError the bytes_received counter is repeated or malformed (['abc'])   [as expected]
+    guard 4 (the defect): OK {'51002': ((0, 0, 0, 0), [2335])}   [as expected]
+### K5b: malformed counter `bytes_sent:` on the server end: guard 4 reads it as zero (or ignores it); guard 5 refuses
+    guard 5: ObservationError the bytes_sent counter is repeated or malformed ([''])   [as expected]
+    guard 4 (the defect): OK {'51002': ((0, 0, 0, 0), [2335])}   [as expected]
+### K5c: malformed counter `bytes_sent:12x` on the server end: guard 4 reads it as zero (or ignores it); guard 5 refuses
+    guard 5: ObservationError the bytes_sent counter is repeated or malformed (['12x'])   [as expected]
+    guard 4 (the defect): OK {'51002': ((0, 0, 0, 12), [2335])}   [as expected]
+### K5d: malformed counter `bytes_received:-5` on the server end: guard 4 reads it as zero (or ignores it); guard 5 refuses
+    guard 5: ObservationError the bytes_received counter is repeated or malformed (['-5'])   [as expected]
+    guard 4 (the defect): OK {'51002': ((0, 0, 0, 0), [2335])}   [as expected]
+### K5e: malformed counter `bytes_sent:1 bytes_sent:2` on the server end: guard 4 reads it as zero (or ignores it); guard 5 refuses
+    guard 5: ObservationError the bytes_sent counter is repeated or malformed (['1', '2'])   [as expected]
+    guard 4 (the defect): OK {'51002': ((0, 0, 0, 1), [2335])}   [as expected]
+### K5f: bytes_sent and bytes_received ABSENT on a well-formed record (ss omits them when zero): a real zero, accepted, with the right counters
+    guard 5: OK {'127.0.0.1:51003 -> 127.0.0.1:20128': ((0, 0, 0, 0), [2335])}   [as expected]
+### K5g: queues that are not numbers
+    guard 5: ObservationError ss printed a line that is not a connection record   [as expected]
+### K6a: a CLIENT-end record whose server end is missing: guard 4 drops it silently (no connection reported); guard 5 fails closed
+    guard 5: ObservationError the connection 127.0.0.1:52000 -> 127.0.0.1:20128 was observed on its client end only: the other end is missing (a connection closing during the snaps   [as expected]
+    guard 4 (the defect): OK {}   [as expected]
+### K6b: a SERVER-end record whose client end is missing: guard 4 reports a connection with no owner (an idle keep-alive from another PID namespace); guard 5 fails closed
+    guard 5: ObservationError the connection 127.0.0.1:52001 -> 127.0.0.1:20128 was observed on its server end only: the other end is missing (a connection closing during the snaps   [as expected]
+    guard 4 (the defect): OK {'52001': ((0, 0, 10, 0), [])}   [as expected]
+### K7: two server-end records for the SAME tuple with different counters (a conflicting observation): guard 4 keeps the last; guard 5 fails closed
+    guard 5: ObservationError two server-end records for the connection 127.0.0.1:53000 -> 127.0.0.1:20128: conflicting observations   [as expected]
+    guard 4 (the defect): OK {'53000': ((0, 0, 999, 0), [2335])}   [as expected]
+### K7b: two client-end records for the same tuple
+    guard 5: ObservationError two client-end records for the connection 127.0.0.1:53001 -> 127.0.0.1:20128: conflicting observations   [as expected]
+### K7c: a record with the listener's address at both ends
+    guard 5: ObservationError a record has the gateway's listener address at both ends   [as expected]
+### K8a: another host's port 20128 (10.0.0.5:44444 -> 10.0.0.9:20128): not the gateway's, ignored and counted (an unrelated remote :20128 must not fail the guard)
+    guard 5: OK {} (unrelated records: 1)   [as expected]
+### K8b: an IPv6 loopback connection to [::1]:20128 (the gateway does not listen there): unrelated, counted
+    guard 5: OK {} (unrelated records: 1)   [as expected]
+### K8c: an IPv4-mapped IPv6 client end paired with its plain IPv4 server end: the addresses are normalized, ONE connection
+    guard 5: OK {'127.0.0.1:54000 -> 127.0.0.1:20128': ((0, 0, 0, 0), [])}   [as expected]
+### K9a: the port listens on 0.0.0.0 (not loopback only): the classification does not hold, refused
+    guard 5: ObservationError port 20128 listens on 0.0.0.0, not on loopback only: the guard's connection classification does not hold   [as expected]
+### K9b: the port listens on * (all addresses): refused
+    guard 5: ObservationError port 20128 listens on *, not on loopback only: the guard's connection classification does not hold   [as expected]
+### K9c: nothing listens on the port: refused
+    guard 5: ObservationError nothing listens on port 20128   [as expected]
+### K9d: `ss -Htln` fails (exit 1): refused
+    guard 5: ObservationError ss (listeners) exited 1: ss: fixture failure   [as expected]
+### K9e: `ss` (the connection query) fails (exit 2): refused
+    guard 5: ObservationError ss exited 2: ss: fixture failure   [as expected]
+### K9f: two listeners, one non-loopback: refused
+    guard 5: ObservationError port 20128 listens on 192.168.1.5, not on loopback only: the guard's connection classification does not hold   [as expected]
+### K10a: no users field on the client end (an owner in another PID namespace): accepted, owners []
+    guard 5: OK {'127.0.0.1:56000 -> 127.0.0.1:20128': ((0, 0, 0, 0), [])}   [as expected]
+### K10b: a users field with an empty pid
+    guard 5: ObservationError the users field of a record cannot be parsed   [as expected]
+### K10c: a users field after the info (an unexpected position)
+    guard 5: ObservationError a users field sits in an unexpected position   [as expected]
+### K11a: a blank line between records
+    guard 5: ObservationError ss printed a line that is not a connection record   [as expected]
+### K11b: no connections at all (empty output): an idle gateway, accepted
+    guard 5: OK {}   [as expected]
+### K11c: a line that is not a record (an error text on stdout)
+    guard 5: ObservationError ss printed a line that is not a connection record   [as expected]
+
+### part K, prefix checks (K12-K19): check_prefix() of guard 5 and of guard 5 before round 13 on scratch install prefixes built as installed, one file changed per scenario, in-process as this user (the guard's user is the units' user)
+### K12: the ROLLBACK prefix's entrypoint lost its execute permission (bin/omniroute resolves to a file of mode 0644): a rollback that launches the prefix fails; before round 13 the prefix read as intact
+    guard 5: FAIL ['bin/omniroute is not readable and executable by this user (mode 0o644)']   [as expected]
+    guard 5 before round 13 (the defect): intact []   [as expected]
+### K13: the TARGET prefix's entrypoint lost its execute permission (mode 0644)
+    guard 5: FAIL ['bin/omniroute is not readable and executable by this user (mode 0o644)']   [as expected]
+    guard 5 before round 13 (the defect): intact []   [as expected]
+### K14: the ROLLBACK prefix's shim lost its execute permission (shim/lsof mode 0644, its content still the pinned shim)
+    guard 5: FAIL ['shim/lsof is not readable and executable by this user (mode 0o644)']   [as expected]
+    guard 5 before round 13 (the defect): intact []   [as expected]
+### K15: the TARGET prefix's shim lost its execute permission (mode 0644, the pinned content)
+    guard 5: FAIL ['shim/lsof is not readable and executable by this user (mode 0o644)']   [as expected]
+    guard 5 before round 13 (the defect): intact []   [as expected]
+### K16: a directory in place of the rollback prefix's entrypoint (bin/omniroute)
+    guard 5: FAIL ['bin/omniroute is a directory, not a regular file']   [as expected]
+    guard 5 before round 13 (the defect): intact []   [as expected]
+### K16b: a directory in place of the target prefix's shim (shim/lsof): guard 5 before round 13 crashes reading it for its hash (the whole guard exits 3 with ERROR IsADirectoryError, not with a CHECK FAIL)
+    guard 5: FAIL ['shim/lsof is a directory, not a regular file']   [as expected]
+    guard 5 before round 13 (the defect: a crash, not a FAIL): CRASH IsADirectoryError: [Errno 21] Is a directory: '$HOME/.cache/guard5-controls-iej14r2n/tools-K16b/omniroute-ctl-tar   [as expected]
+### K17: the rollback prefix's entrypoint is a dangling symlink (its target file removed)
+    guard 5: FAIL ['bin/omniroute is a dangling symlink']   [as expected]
+    guard 5 before round 13 (not a defect of that version: it reports it as missing): FAIL ['missing bin/omniroute']   [as expected]
+### K17b: the target prefix's shim is a dangling symlink
+    guard 5: FAIL ['shim/lsof is a dangling symlink']   [as expected]
+    guard 5 before round 13 (not a defect of that version: it reports it as missing): FAIL ['missing shim/lsof']   [as expected]
+### K18: the rollback prefix's entrypoint resolves to an execute-only file (mode 0111): its interpreter cannot read the script (the read bit, which guard 5 checks with the execute bit)
+    guard 5: FAIL ['bin/omniroute is not readable and executable by this user (mode 0o111)']   [as expected]
+    guard 5 before round 13 (the defect): intact []   [as expected]
+### K19a: positive control: the rollback prefix as installed (an executable entrypoint behind its symlink, an executable shim with the pinned hash): intact
+    guard 5: intact []   [as expected]
+    guard 5 before round 13 (positive control): intact []   [as expected]
+### K19b: positive control: the target prefix as installed, with the drain marker: intact
+    guard 5: intact []   [as expected]
+    guard 5 before round 13 (positive control): intact []   [as expected]
+### K19c: positive control: the entrypoint a regular executable file instead of a symlink (the shape of run-controls' stand-in prefixes): intact
+    guard 5: intact []   [as expected]
+    guard 5 before round 13 (positive control): intact []   [as expected]
+
+### part E: the whole guard 5 in --idle-only mode (E1-E6) and in full mode (E7) against an `ss` shim, a stub identity script and a scratch database (--clean-for 2 --interval 1), every run inside a private network namespace (unshare -rn) whose 127.0.0.1:20128 is the controls' own stub
+### E0: a private network namespace answers 127.0.0.1:20128 with the controls' own stub: exit=0 marker=1 stub_hits=1 namespace net:[4026532770] vs the host's net:[4026531833] (the host has listener on :20128 in its own namespace, unreachable from inside)   [as expected]
+### E0b: the guard's network primitives, by AST: calls [('pending_total', 'urlopen')], imports none besides urllib.request   [as expected]
+### E1: an idle gateway (one empty connection of the tolerated unit): exit 0, IDLE-RESULT clean=True (and never a GUARD-RESULT line)
+    exit=0 IDLE-RESULT clean=True failed_checks=[] end=2026-10-07T21:55:17.764Z
+    the guard's HTTP read reached the private stub 2 time(s), in namespace net:[4026532831] (the host's is net:[4026531833])   [as expected]
+### E2: a server-end record with no TCP info: the guard FAILS (exit 4), where guard 4 would have read zeros
+    exit=4 IDLE-RESULT clean=False failed_checks=['nothing in flight for 2 s (3 samples)'] end=2026-10-07T21:55:19.945Z
+    CHECK nothing in flight for 2 s (3 samples): FAIL ['the socket observation failed: a record has no TCP info (no mss: and cwnd:), so its byte counters are unavailable, not zero']
+    the guard's HTTP read reached the private stub 2 time(s), in namespace net:[4026532770] (the host's is net:[4026531833])   [as expected]
+### E3: a client-only record: the guard FAILS (exit 4)
+    exit=4 IDLE-RESULT clean=False failed_checks=['nothing in flight for 2 s (3 samples)'] end=2026-10-07T21:55:22.119Z
+    CHECK nothing in flight for 2 s (3 samples): FAIL ['the socket observation failed: the connection 127.0.0.1:58002 -> 127.0.0.1:20128 was observed on its client end only: the other end is missing (a co
+    the guard's HTTP read reached the private stub 2 time(s), in namespace net:[4026532831] (the host's is net:[4026531833])   [as expected]
+### E4a: the same client port from two client addresses: an empty connection of the tolerated unit and a connection with queued data, idle one first: the busy one is ACTIVE (exit 4)
+    exit=4 IDLE-RESULT clean=False failed_checks=['nothing in flight for 2 s (3 samples)'] end=2026-10-07T21:55:24.294Z
+    CHECK nothing in flight for 2 s (3 samples): FAIL ["1 ACTIVE connection(s) to port 20128: ['queued data (owner not visible)']"]
+    the guard's HTTP read reached the private stub 2 time(s), in namespace net:[4026532770] (the host's is net:[4026531833])   [as expected]
+### E4b: the same records, the busy connection first: the same verdict
+    exit=4 IDLE-RESULT clean=False failed_checks=['nothing in flight for 2 s (3 samples)'] end=2026-10-07T21:55:26.467Z
+    CHECK nothing in flight for 2 s (3 samples): FAIL ["1 ACTIVE connection(s) to port 20128: ['queued data (owner not visible)']"]
+    the guard's HTTP read reached the private stub 2 time(s), in namespace net:[4026532831] (the host's is net:[4026531833])   [as expected]
+### E5: an unrelated remote :20128 record next to an idle gateway: exit 0 (not a failure)
+    exit=0 IDLE-RESULT clean=True failed_checks=[] end=2026-10-07T21:55:28.644Z
+    the guard's HTTP read reached the private stub 2 time(s), in namespace net:[4026532770] (the host's is net:[4026531833])   [as expected]
+### E6: without --switch-tool and without --idle-only the guard refuses to start (usage error, exit 3), in a private namespace like E1-E5; the usage error comes before the guard's HTTP read, so the stub counts no request
+    exit=3 ERROR usage: --switch-tool is required unless --idle-only
+    the private stub counted 0 request(s), in namespace net:[4026532831] (the host's is net:[4026531833])   [as expected]
+### E7a: full mode, both prefixes as installed (positive control): guard 5 exits 0, GUARD-RESULT clean=True
+    exit=0 GUARD-RESULT clean=True failed_checks=[] end=2026-10-07T21:55:30.928Z
+    CHECK rollback prefix intact: ok (omniroute-ctl-rollback: bin/omniroute, BUILD_SHA cf6748d04, shim v2)
+    CHECK target prefix intact: ok (omniroute-ctl-target: bin/omniroute, BUILD_SHA 2a41147b7, shim v2, drain marker)
+    the guard's HTTP read reached the private stub 2 time(s), in namespace net:[4026532772] (the host's is net:[4026531833])   [as expected]
+### E7b: full mode, the rollback prefix's shim without its execute permission (mode 0644): guard 5 before round 13 passes the pre-switch gate (exit 0, the defect)
+    exit=0 GUARD-RESULT clean=True failed_checks=[] end=2026-10-07T21:55:33.108Z
+    CHECK rollback prefix intact: ok (omniroute-ctl-rollback: bin/omniroute, BUILD_SHA cf6748d04, shim v2)
+    CHECK target prefix intact: ok (omniroute-ctl-target: bin/omniroute, BUILD_SHA 2a41147b7, shim v2, drain marker)
+    the guard's HTTP read reached the private stub 2 time(s), in namespace net:[4026532770] (the host's is net:[4026531833])   [as expected]
+### E7c: the same prefixes with guard 5: `rollback prefix intact` FAILS and the guard exits 4
+    exit=4 GUARD-RESULT clean=False failed_checks=['rollback prefix intact'] end=2026-10-07T21:55:35.289Z
+    CHECK rollback prefix intact: FAIL ['shim/lsof is not readable and executable by this user (mode 0o644)']
+    CHECK target prefix intact: ok (omniroute-ctl-target: bin/omniroute, BUILD_SHA 2a41147b7, shim v2, drain marker)
+    the guard's HTTP read reached the private stub 2 time(s), in namespace net:[4026532772] (the host's is net:[4026531833])   [as expected]
+
+# scratch directory (remove with rm -rf after reading): $HOME/.cache/guard5-controls-iej14r2n
+# finished 2026-10-07T21:55:35Z; scenarios not as expected: none

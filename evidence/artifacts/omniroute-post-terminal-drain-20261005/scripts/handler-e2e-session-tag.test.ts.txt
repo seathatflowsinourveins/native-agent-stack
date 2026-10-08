@@ -1,0 +1,178 @@
+/**
+ * Handler-level check of the identity mechanism of the native acceptance: a caller-supplied X-OmniRoute-Session-Id header must end up as call_logs.session_tag of that request's row, through the real request path
+ * (handleChat -> resolveConversationId -> chatCore -> stream pipeline -> call-log writer), with a stubbed upstream fetch and a temporary database. The native acceptance script attributes the rows of each `codex exec` turn by this value.
+ * (Upstream's tests/unit/call-logs-session-tag.test.ts covers only the storage layer, saveCallLog with a given sessionTag.)
+ *
+ * The client reads each response to the end, so the rows are written by the normal completion path on EVERY build; the check is therefore independent of the post-terminal drain and must pass on the unpatched composition and on the patched tree.
+ * Scenarios: a Responses request and a Chat Completions request with the header; two sequential requests with different tags (each row carries its own); a request without the header (its row must not carry a tag that no request sent).
+ * Every scenario prints one `E2E_SCENARIO {...}` line with what it found before it asserts.
+ */
+import test from "node:test";
+import assert from "node:assert/strict";
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+
+const TEST_DATA_DIR = fs.mkdtempSync(path.join(os.tmpdir(), "omniroute-session-tag-e2e-"));
+process.env.DATA_DIR = TEST_DATA_DIR;
+process.env.REQUIRE_API_KEY = "false";
+process.env.API_KEY_SECRET = process.env.API_KEY_SECRET || "test-session-tag-secret";
+
+const core = await import("../../src/lib/db/core.ts");
+const providersDb = await import("../../src/lib/db/providers.ts");
+const apiKeysDb = await import("../../src/lib/db/apiKeys.ts");
+const readCacheDb = await import("../../src/lib/db/readCache.ts");
+const { getCallLogs } = await import("../../src/lib/usage/callLogs.ts");
+const { waitForCallLogSaves } = await import("../../src/lib/usage/callLogs.ts");
+const { invalidateMemorySettingsCache } = await import("../../src/lib/memory/settings.ts");
+const { handleChat } = await import("../../src/sse/handlers/chat.ts");
+const { initTranslators } = await import("../../open-sse/translator/index.ts");
+const { clearInflight } = await import("../../open-sse/services/requestDedup.ts");
+const { resetAllCircuitBreakers } = await import("../../src/shared/utils/circuitBreaker.ts");
+
+const originalFetch = globalThis.fetch;
+const encoder = new TextEncoder();
+const TAIL_MS = 100;
+// E2E_SESSION_HEADER names another header only for the negative control (the oracle must then FAIL on the three tests that assert a tag)
+const SESSION_HEADER = process.env.E2E_SESSION_HEADER || "X-OmniRoute-Session-Id";
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+async function resetStorage() {
+  globalThis.fetch = originalFetch;
+  process.env.REQUIRE_API_KEY = "false";
+  clearInflight();
+  resetAllCircuitBreakers();
+  apiKeysDb.resetApiKeyState();
+  readCacheDb.invalidateDbCache();
+  invalidateMemorySettingsCache();
+  await sleep(20);
+  await waitForCallLogSaves(10_000);
+  core.resetDbInstance();
+  fs.rmSync(TEST_DATA_DIR, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
+  fs.mkdirSync(TEST_DATA_DIR, { recursive: true });
+  initTranslators();
+}
+
+function completedFrame(id: string): string {
+  const payload = {
+    type: "response.completed",
+    response: {
+      id,
+      object: "response",
+      status: "completed",
+      model: "gpt-5.6-sol",
+      output: [{ id: "msg_e2e", type: "message", role: "assistant", content: [{ type: "output_text", text: "ok", annotations: [] }] }],
+      usage: { input_tokens: 22, output_tokens: 5 },
+    },
+  };
+  return `event: response.completed\ndata: ${JSON.stringify(payload)}\n\n`;
+}
+
+// An upstream whose body carries response.completed at once and ends TAIL_MS later.
+function upstreamWithTail(id: string) {
+  const body = new ReadableStream<Uint8Array>({
+    start(controller) {
+      controller.enqueue(encoder.encode(completedFrame(id)));
+      setTimeout(() => {
+        try {
+          controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+          controller.close();
+        } catch {
+          // already closed
+        }
+      }, TAIL_MS);
+    },
+  });
+  return new Response(body, { status: 200, headers: { "Content-Type": "text/event-stream" } });
+}
+
+type Sent = { kind: "responses" | "chat"; sessionId: string | null };
+
+async function sendOne({ kind, sessionId }: Sent): Promise<void> {
+  globalThis.fetch = async () => upstreamWithTail(`resp_${kind}_${sessionId ?? "none"}`);
+  const headers: Record<string, string> = { "Content-Type": "application/json", originator: "codex_exec" };
+  if (sessionId) headers[SESSION_HEADER] = sessionId;
+  const route = kind === "responses" ? "/v1/responses" : "/v1/chat/completions";
+  const body =
+    kind === "responses"
+      ? { model: "codex/gpt-5.6-sol", stream: true, input: `session tag e2e ${sessionId ?? "none"}` }
+      : { model: "codex/gpt-5.6-sol", stream: true, messages: [{ role: "user", content: `session tag e2e ${sessionId ?? "none"}` }] };
+  const response = await handleChat(new Request(`http://localhost${route}`, { method: "POST", headers, body: JSON.stringify(body) }));
+  assert.equal(response.status, 200);
+  const reader = response.body!.getReader();
+  for (;;) {
+    const chunk = await reader.read();   // the client reads to the end of the stream: the rows are written by the normal completion path
+    if (chunk.done) break;
+  }
+  await sleep(300);
+  await waitForCallLogSaves(10_000);
+}
+
+async function rowsFor(kind: "responses" | "chat") {
+  const route = kind === "responses" ? "/v1/responses" : "/v1/chat/completions";
+  const rows = await getCallLogs({ limit: 200 });
+  return (Array.isArray(rows) ? rows : []).filter((row) => row.provider === "codex" && row.path === route);
+}
+
+async function withProvider<T>(fn: () => Promise<T>): Promise<T> {
+  await resetStorage();
+  await providersDb.createProviderConnection({
+    provider: "codex",
+    authType: "apikey",
+    name: "codex-e2e",
+    apiKey: "sk-codex-e2e",
+    isActive: true,
+    testStatus: "active",
+    providerSpecificData: {},
+  });
+  return fn();
+}
+
+test("handler e2e session tag: a Responses request with X-OmniRoute-Session-Id stores that value as its row's session tag", async () => {
+  const tag = "acceptance-e2e-responses-1";
+  const rows = await withProvider(async () => {
+    await sendOne({ kind: "responses", sessionId: tag });
+    return rowsFor("responses");
+  });
+  console.log("E2E_SCENARIO " + JSON.stringify({ name: "responses with header", expected: tag, rows: rows.length, tags: rows.map((r) => r.sessionTag ?? null), status: rows[0]?.status ?? null }));
+  assert.equal(rows.length, 1);
+  assert.equal(rows[0].status, 200);
+  assert.equal(rows[0].sessionTag, tag);
+});
+
+test("handler e2e session tag: a Chat Completions request with X-OmniRoute-Session-Id stores that value as its row's session tag", async () => {
+  const tag = "acceptance-e2e-chat-1";
+  const rows = await withProvider(async () => {
+    await sendOne({ kind: "chat", sessionId: tag });
+    return rowsFor("chat");
+  });
+  console.log("E2E_SCENARIO " + JSON.stringify({ name: "chat with header", expected: tag, rows: rows.length, tags: rows.map((r) => r.sessionTag ?? null), status: rows[0]?.status ?? null }));
+  assert.equal(rows.length, 1);
+  assert.equal(rows[0].status, 200);
+  assert.equal(rows[0].sessionTag, tag);
+});
+
+test("handler e2e session tag: two requests with different tags each get their own tag (no cross-contamination)", async () => {
+  const tags = ["acceptance-e2e-turn-1", "acceptance-e2e-turn-2"];
+  const rows = await withProvider(async () => {
+    await sendOne({ kind: "responses", sessionId: tags[0] });
+    await sendOne({ kind: "responses", sessionId: tags[1] });
+    return rowsFor("responses");
+  });
+  const got = rows.map((r) => r.sessionTag ?? null).sort();
+  console.log("E2E_SCENARIO " + JSON.stringify({ name: "two tags", expected: tags, rows: rows.length, tags: got }));
+  assert.equal(rows.length, 2);
+  assert.deepEqual(got, [...tags].sort());
+});
+
+test("handler e2e session tag: a request without the header does not carry a tag that no request sent", async () => {
+  const sentTag = "acceptance-e2e-never-sent-to-this-request";
+  const rows = await withProvider(async () => {
+    await sendOne({ kind: "responses", sessionId: null });
+    return rowsFor("responses");
+  });
+  console.log("E2E_SCENARIO " + JSON.stringify({ name: "no header", rows: rows.length, tags: rows.map((r) => (r.sessionTag ? "<generated conversation id>" : null)) }));
+  assert.equal(rows.length, 1);
+  assert.notEqual(rows[0].sessionTag, sentTag);
+});

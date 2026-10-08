@@ -1,0 +1,24 @@
+# Publication note: UUID-shaped strings (the gateway's correlation ids) are shortened to their first 8 hex digits and an ellipsis, because the repository's publication check rejects full UUIDs; sha256 of this text before the shortening: 8662d411eb5f22c6e88e2563d5f9f0107aecfa832674be35fd416a29d97dac38; the unshortened text is kept in the first host's private artifact directory (checks/logs/MANIFEST.txt)
+# Produced by version 2.0 of the raw script (sha256 fa8fa6f8...) and version 2 of the native script on the unpatched build cf6748d04, 2026-10-06 02:02-02:17Z (superseded; see superseded/README.md). The raw baseline shows the effort-probe flaw (the sol:max probe's columns are NULL where version 1's baseline had max/max); the native two-request run was cut off by the host restart (header only).
+# baseline, race set (responses:early:0 x6), frozen script v2, --expect observe; started 2026-10-06T02:12:03Z; wrapper kind=baseline
+IDENTITY label=before-live-acceptance-baseline-race.txt time=2026-10-06T02:12:03Z unit=omniroute.service MainPID=3396193 ExecMainStartTimestamp=Mon_2026-10-05_16:12:12_EDT NRestarts=0 running_prefix=omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167 BUILD_SHA=cf6748d04 health=ok pending_total=296 expect_prefix_ok=True expect_build_ok=True
+FROZEN version=2 script_sha256=fa8fa6f8dc3a0e7360be4a0737c34daaf4d4b58696df6a7ab3483896cb739e82 argv=['--expect', 'observe', '--wait1', '12', '--wait2', '60', 'responses:early:0', 'responses:early:0', 'responses:early:0', 'responses:early:0', 'responses:early:0', 'responses:early:0'] cwd=/tmp start=2026-10-06T02:12:03.664Z expect=observe wait1=12.0 wait2=60.0 port=20128 db=$HOME/.local/share/omniroute/storage.sqlite baseline=None baseline_sha256=None
+RESULT mode=responses:early:0 http=200 terminal=True closed_early=True stream_s=2.3 corr=5aedacf5… response_id=resp_07133c071be87095016ac458f42e5087d1b62b6ff4f80c92e7 read1_call_logs=0 read1_usage=0 window_call_logs=0 window_usage=0 verdict=OBSERVED
+RESULT mode=responses:early:0 http=200 terminal=True closed_early=True stream_s=1.8 corr=f2652025… response_id=resp_04e506cf12ccd772016ac45903262c8197b0be2aa41996c507 read1_call_logs=0 read1_usage=0 window_call_logs=0 window_usage=0 verdict=OBSERVED
+RESULT mode=responses:early:0 http=200 terminal=True closed_early=True stream_s=2.2 corr=338856b3… response_id=resp_0ed369da34c24d0f016ac45911e4e887d1b2d27cf0a1956c65 read1_call_logs=0 read1_usage=0 window_call_logs=0 window_usage=0 verdict=OBSERVED
+RESULT mode=responses:early:0 http=200 terminal=True closed_early=True stream_s=3.1 corr=ecb530bf… response_id=resp_0813f1acc6abe10f016ac4592104ac87d1a6fa4a46fdf18857 read1_call_logs=0 read1_usage=0 window_call_logs=0 window_usage=0 verdict=OBSERVED
+RESULT mode=responses:early:0 http=200 terminal=True closed_early=True stream_s=2.5 corr=71215988… response_id=resp_027d9157c0121703016ac45930def087d1a4f05998f1bf170c read1_call_logs=0 read1_usage=0 window_call_logs=7 window_usage=0 verdict=OBSERVED
+RESULT mode=responses:early:0 http=200 terminal=True closed_early=True stream_s=2.0 corr=c15bd413… response_id=resp_054973152161461f016ac45940538087d19572072e09d6499d read1_call_logs=0 read1_usage=0 window_call_logs=0 window_usage=0 verdict=OBSERVED
+LATE mode=responses:early:0 read2_call_logs=0 read2_usage=0 changed=False verdict=OBSERVED
+LATE mode=responses:early:0 read2_call_logs=0 read2_usage=0 changed=False verdict=OBSERVED
+LATE mode=responses:early:0 read2_call_logs=0 read2_usage=0 changed=False verdict=OBSERVED
+LATE mode=responses:early:0 read2_call_logs=0 read2_usage=0 changed=False verdict=OBSERVED
+LATE mode=responses:early:0 read2_call_logs=0 read2_usage=0 changed=False verdict=OBSERVED
+LATE mode=responses:early:0 read2_call_logs=0 read2_usage=0 changed=False verdict=OBSERVED
+SUMMARY {"OBSERVED": 6} end=2026-10-06T02:14:22.617Z exit=0
+exit=0
+IDENTITY label=after-live-acceptance-baseline-race.txt time=2026-10-06T02:14:22Z unit=omniroute.service MainPID=3396193 ExecMainStartTimestamp=Mon_2026-10-05_16:12:12_EDT NRestarts=0 running_prefix=omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167 BUILD_SHA=cf6748d04 health=ok pending_total=302 expect_prefix_ok=True expect_build_ok=True
+journal_failed_to_save_call_log=0 (journalctl --user -u omniroute.service --since <the unit's ExecMainStartTimestamp> -o cat --no-pager | grep -c 'Failed to save call log')
+pending_delta=6 (informational: pending_total 296 -> 302)
+RUN-STATUS live-acceptance-baseline-race.txt status=0 (ok)
+# finished 2026-10-06T02:14:22Z

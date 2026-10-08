@@ -1,0 +1,30 @@
+#!/bin/bash
+# Build the composition with the drain patch (v3.8.51 tag + affinity patch + PR 15167 + drain-after-terminal) with upstream's own release scripts, in the prototype tree (already `npm ci`'d, HEAD = the drain commit).
+# No live unit is touched. Every step logs its real exit code to $B/progress.txt. Run niced.
+set -u
+T=$HOME/.cache/omniroute-drain-proto
+B=$HOME/.cache/omniroute-drain-build-out
+export PATH="$HOME/.local/share/codex-ecosystem/tools/node-24.21.0/bin:/usr/local/bin:/usr/bin:/bin"
+mkdir -p "$B/tmp"; export TMPDIR="$B/tmp"
+log() { echo "$(date -u +%H:%M:%SZ) $*" | tee -a "$B/progress.txt"; }
+step() { local name="$1"; shift; local t0; t0=$(date +%s); ( "$@" > "$B/$name.log" 2>&1 ); local rc=$?; log "$name exit=$rc seconds=$(( $(date +%s) - t0 ))"; return $rc; }
+cd "$T" || exit 2
+log "HEAD $(git rev-parse --short HEAD) tree $(git rev-parse 'HEAD^{tree}')"; git log --oneline -3 | tee -a "$B/progress.txt"
+step build-release nice -n 19 npm run build:release || exit 1
+step check-pack-artifact env OMNIROUTE_ALLOW_CANARY_BUILD=1 npm run check:pack-artifact || exit 1
+rm -f "$B"/omniroute-*.tgz
+step pack npm pack --pack-destination "$B" || exit 1
+log "BUILD_SHA $(cat dist/BUILD_SHA)"
+sha256sum "$B"/omniroute-*.tgz | tee -a "$B/progress.txt"
+step check-pack-boot nice -n 19 npm run check:pack-boot; boot_rc=$?
+grep -a '\[pack-boot\]' "$B/check-pack-boot.log" | sed 's/\x1b\[[0-9;]*m//g' | cut -c1-150 | tee -a "$B/progress.txt"
+( npm pack --dry-run --json > "$B/packdry.json" 2> "$B/packdry.err" ); log "npm pack --dry-run exit=$?"
+python3 - <<'EOF' | tee -a "$B/progress.txt"
+import json, hashlib, base64, os, glob
+B = os.path.expanduser("~/.cache/omniroute-drain-build-out")
+d = json.load(open(B + "/packdry.json"))[0]
+t = open(glob.glob(B + "/omniroute-*.tgz")[0], "rb").read()
+sha1 = hashlib.sha1(t).hexdigest(); sri = "sha512-" + base64.b64encode(hashlib.sha512(t).digest()).decode()
+print("dry-run shasum", d.get("shasum"), "| kept sha1", sha1, "| equal:", d.get("shasum") == sha1 and d.get("integrity") == sri, "| size", d.get("size"), len(t), "| entries", d.get("entryCount"))
+EOF
+log "DONE boot_rc=$boot_rc"

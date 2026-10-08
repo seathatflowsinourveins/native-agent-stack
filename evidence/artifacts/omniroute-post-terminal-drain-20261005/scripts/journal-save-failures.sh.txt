@@ -1,0 +1,48 @@
+#!/bin/bash
+# The manual journal scan of checks/live-acceptance-protocol.md, run by hand at the end of the acceptance and again 30 minutes later (repair round r13 of PR #757, finding 3 of the
+# read of ec4b489d9). The protocol's earlier by-hand command, `journalctl ... -o cat --no-pager | grep -c 'Failed to save call log'`, prints the same 0 with the same pipeline status
+# (grep's) when journalctl fails with empty stdout as when it reads a journal without such a line, so it cannot establish a clean scan. This script writes journalctl's output to a
+# temporary file (no pipe), checks journalctl's exit status and stderr, and only then counts.
+# usage: journal-save-failures.sh [UNIT [SINCE]]
+#   UNIT defaults to omniroute.service, SINCE to the unit's ExecMainStartTimestamp (`systemctl --user show UNIT -p ExecMainStartTimestamp --value`).
+# One line on stdout: `journal_failed_to_save_call_log=<n> (journalctl --user -u <unit> --since <since> -o cat --no-pager | grep -c 'Failed to save call log')`, or, when there is
+#   no observation, `JOURNAL-UNAVAILABLE exit=<status of the step that failed> (<its first 160 bytes of stderr, newlines as spaces, or the reason>): ...`.
+# Exit status: 0 the journal was read and holds no such line since SINCE (clean); 1 it holds one or more (a rollback trigger on the canary); 2 JOURNAL-UNAVAILABLE, INCONCLUSIVE, no
+#   acceptance and no queueing: journalctl exited non-zero, or exited 0 with a stderr line that holds a word of the census's JOURNAL_STDERR_ALARM (such a line says that data was
+#   not read), or exited 0 and printed nothing (a unit that does not exist or a start in the future reads the same: with an explicit SINCE the pipeline into grep -c would print 0), or the start
+#   timestamp could not be read, was empty or is not a date that `date -d` accepts; 3 a usage error (more than two arguments, a UNIT that starts with -).
+set -u
+PHRASE='Failed to save call log'
+ALARM='truncat|corrupt|ignor|fail|error|inconsisten|skipp|missing|unavailable|denied|insufficient|not opened|permission'   # JOURNAL_STDERR_ALARM, scripts/window-census.py.txt line 89 (case-insensitive)
+OUT= ERR=
+trap 'rm -f -- ${OUT:+"$OUT"} ${ERR:+"$ERR"}' EXIT
+usage() { echo "usage: journal-save-failures.sh [UNIT [SINCE]]" >&2; exit 3; }
+unavailable() { # status detail: prints the line and exits 2 (call it directly, never inside $(...))
+  echo "JOURNAL-UNAVAILABLE exit=$1 ($2): the journal query failed, so '$PHRASE' could not be counted (INCONCLUSIVE: acceptance and queueing are prohibited)"
+  exit 2
+}
+first160() { local s; s=$(head -c 160 -- "$1"); s=${s//$'\n'/ }; printf '%s' "${s:-no stderr}"; }   # a file's first 160 bytes, newlines as spaces
+[ $# -le 2 ] || usage
+UNIT=${1:-omniroute.service}
+case $UNIT in -*) usage;; esac
+OUT=$(mktemp) || unavailable 1 "mktemp could not create a temporary file"
+ERR=$(mktemp) || unavailable 1 "mktemp could not create a temporary file"
+if [ $# -eq 2 ]; then
+  SINCE=$2; FROM="the SINCE argument"
+else
+  FROM="systemctl --user show $UNIT -p ExecMainStartTimestamp --value"
+  SINCE=$(systemctl --user show "$UNIT" -p ExecMainStartTimestamp --value 2> "$ERR"); rc=$?
+  [ "$rc" = 0 ] || unavailable "$rc" "no start timestamp: $FROM exited $rc: $(first160 "$ERR")"
+fi
+[ -n "$SINCE" ] || unavailable 0 "no start timestamp: $FROM gave an empty value"   # before date -d, which accepts '' as midnight
+date -d "$SINCE" > /dev/null 2> "$ERR" || { rc=$?; unavailable "$rc" "no start timestamp: $FROM gave a value that is not a date: $(first160 "$ERR")"; }
+journalctl --user -u "$UNIT" --since "$SINCE" -o cat --no-pager > "$OUT" 2> "$ERR"; rc=$?
+[ "$rc" = 0 ] || unavailable "$rc" "$(first160 "$ERR")"
+LC_ALL=C grep -qiE -- "$ALARM" "$ERR"; rc=$?   # 0 a word of loss on stderr, 1 none, 2 stderr unreadable
+[ "$rc" = 1 ] || unavailable 0 "$(first160 "$ERR")"
+[ -s "$OUT" ] || unavailable 0 "journalctl exited 0 and printed nothing since $SINCE: a unit that does not exist, a start in the future or an unread journal reads the same, and the gateway's journal is never empty since its start"
+N=$(grep -c -- "$PHRASE" "$OUT"); rc=$?   # grep exits 1 for a count of 0: not an error
+[ "$rc" -le 1 ] || unavailable "$rc" "grep could not read journalctl's output"
+echo "journal_failed_to_save_call_log=$N (journalctl --user -u $UNIT --since $SINCE -o cat --no-pager | grep -c '$PHRASE')"
+[ "$N" = 0 ] || exit 1
+exit 0

@@ -1,0 +1,27 @@
+# The stub gateway of the offline controls: the change of round 27 (2026-10-07T21:58:39Z, date -u). Evidence class: local_integration (a comparison of two source texts and the abstract syntax trees of the two modules; no gateway, no store, no network).
+# 5f's FULL read r15 of 1004174e3, P3-2: the setting `row_delay_s` was documented ("rows are written row_delay_s after the terminal event") and read into the variable `delay`, which nothing used; the rows are written when the stream's tail (`tail_s`) has passed, or at once when a keep-alive write to a client that has closed fails. The command center's ruling (J757-R15-FIX, line 4): use it or remove it. It is removed: no script of the offline controls sets it, so no control's input or verdict depends on it, and the behaviour that every recorded run exercised stays as it was.
+# As read (superseded/stub-gateway-read-r15.py.txt): sha256 1d29d8f6dfda224d21e40f82834d47746e54225acb37ac0096d0d73f207400ea; this is the sha256 that checks/acceptance-controls.txt, checks/acceptance-controls-v1-reproduction.txt, checks/guard5-existing-controls.txt and checks/guard5-existing-controls-poller.txt name as `stub-gateway`, because their runs used that text. As published since round 27 (scripts/acceptance-controls/stub-gateway.py.txt): sha256 5cffc2aff5806f1c6ca03960359d470b6f76d0ed2b537d1420fe04d339c1f02c.
+# Executed here: the module as read, with the one statement `delay = float(cfg.get("row_delay_s", 0.4))` removed and both module docstrings stripped, has the same ast.dump as the module as published: IDENTICAL (the executable code of every mode is the same; the two texts differ in that statement, the module docstring and one comment). The sources of the other published offline controls (run-controls.py, guard5-controls.py, fake-codex.py, census-controls.py, census-property-test.py, show-log-receipt-controls.py) contain `row_delay_s` 0 times.
+# diff -u of the two texts (one line of context):
+--- superseded/stub-gateway-read-r15.py.txt
++++ scripts/acceptance-controls/stub-gateway.py.txt
+@@ -7,3 +7,3 @@
+ 
+-  {"mode": "...", "tail_s": 3.0, "row_delay_s": 0.4, "http_status": 200, "flip_s": 3, "dup_s": 4, "effort_upstream_override": "xhigh", "responses_corr_header": true}
++  {"mode": "...", "tail_s": 3.0, "http_status": 200, "flip_s": 3, "dup_s": 4, "effort_upstream_override": "xhigh", "responses_corr_header": true}
+   (responses_corr_header: send X-Correlation-Id on /v1/responses too, as the real gateway does on some responses; by default only Chat Completions responses carry it, so a Responses client attributes rows by the response id)
+@@ -15,3 +15,4 @@
+ 
+-  mode "normal"            rows are written row_delay_s after the terminal event, whether or not the client is still connected (what the patched gateway does)
++  (tail_s: how long the connection is kept open, with keep-alive comments, after the terminal event; there is no separate persistence delay: round 27 removed the unused `row_delay_s` setting that this text used to describe)
++  mode "normal"            rows are written when the tail (tail_s) has passed, or at once when a keep-alive write to a client that has closed fails, whether or not the client is still connected (what the patched gateway does)
+   mode "lose-on-early"     rows are written only when the client stayed connected until the stream ended; a client that closes after the terminal event leaves NO row (the unpatched gateway's drop)
+@@ -141,3 +142,2 @@
+         tail = float(cfg.get("tail_s", 3.0))
+-        delay = float(cfg.get("row_delay_s", 0.4))
+         tag = self.headers.get("X-OmniRoute-Session-Id")
+@@ -193,3 +193,3 @@
+             pass
+-        # the rows: written when the response completes (delay after the terminal event), unless this mode loses them for an early-closing client
++        # the rows: written when the tail (tail_s of keep-alive comments after the terminal event) ends, or as soon as a write to a client that closed fails, unless this mode loses them for an early-closing client
+         stayed = True

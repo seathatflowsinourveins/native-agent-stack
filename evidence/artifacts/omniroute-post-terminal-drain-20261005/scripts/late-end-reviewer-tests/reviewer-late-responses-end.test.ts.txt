@@ -1,0 +1,72 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { setTimeout as delay } from "node:timers/promises";
+import Database from "better-sqlite3";
+import path from "node:path";
+import { createSSEStream } from "../../open-sse/utils/stream.ts";
+import { createStreamController, pipeWithDisconnect } from "../../open-sse/utils/streamHandler.ts";
+import { recordStreamingUsageStats } from "../../open-sse/handlers/chatCore/streamingUsageStats.ts";
+
+test("native CODEX Responses default queues: successful usage persists before END while the client does not drain", { timeout: 20000 }, async () => {
+  assert.ok(process.env.DATA_DIR, "the data directory is isolated by tests/_setup/isolateDataDir.ts");
+  globalThis.fetch = async () => { throw new Error("Reviewer test forbids network"); };
+  const ends: Array<{at:number,line:string}> = [];
+  const originalLog = console.log;
+  console.log = (...args) => {
+    const line = args.join(" ");
+    if (/🌊 \[STREAM\].*\|\s*\d+ms\s*\|/.test(line)) ends.push({at:Date.now(), line});
+    else originalLog(...args);
+  };
+  const started = Date.now();
+  let completedAt=0;
+  let payload: any;
+  const sc = createStreamController({ provider:"codex",model:"gpt-6-astra",clientResponseFormat:"openai-responses" });
+  const transformed = createSSEStream({
+    mode:"passthrough",sourceFormat:"openai-responses",targetFormat:"openai-responses",clientResponseFormat:"openai-responses",provider:"codex",model:"gpt-6-astra",
+    onComplete(result) {
+      payload=result;
+      completedAt=Date.now();
+      recordStreamingUsageStats(result.usage, {
+        provider:"codex",model:"gpt-6-astra",streamStatus:result.status,startTime:started,ttft:10,streamErrorCode:null,
+        connectionId:null,apiKeyInfo:null,effectiveServiceTier:"default",isCombo:false,comboStrategy:null,endpoint:"/v1/responses"
+      });
+    }
+  });
+  const encoder = new TextEncoder();
+  const frame = (obj:any) => "data: "+JSON.stringify(obj)+"\n\n";
+  const completed={id:"resp-review",object:"response",model:"gpt-6-astra",status:"completed",output:[{id:"msg-review",type:"message",role:"assistant",status:"completed",content:[{type:"output_text",text:"hi",annotations:[]}]}],usage:{input_tokens:11,output_tokens:2,total_tokens:13}};
+  const body = frame({type:"response.created",response:{id:"resp-review",object:"response",model:"gpt-6-astra",status:"in_progress",output:[]}})
+    + frame({type:"response.output_item.added",output_index:0,item:{id:"msg-review",type:"message",role:"assistant",status:"in_progress",content:[]}})
+    + frame({type:"response.content_part.added",item_id:"msg-review",output_index:0,content_index:0,part:{type:"output_text",text:"",annotations:[]}})
+    + frame({type:"response.output_text.delta",item_id:"msg-review",output_index:0,content_index:0,delta:"hi"})
+    + frame({type:"response.output_text.delta",item_id:"msg-review",output_index:0,content_index:0,delta:""}).repeat(20000)
+    + frame({type:"response.output_text.done",item_id:"msg-review",output_index:0,content_index:0,text:"hi"})
+    + frame({type:"response.content_part.done",item_id:"msg-review",output_index:0,content_index:0,part:completed.output[0].content[0]})
+    + frame({type:"response.output_item.done",output_index:0,item:completed.output[0]})
+    + frame({type:"response.completed",response:completed});
+  const bytes=encoder.encode(body); let offset=0;
+  const upstream = new Response(new ReadableStream({pull(c){ if(offset>=bytes.length){c.close();return;} c.enqueue(bytes.slice(offset,offset+65536));offset+=65536; }}));
+  const downstream = pipeWithDisconnect(upstream,transformed,sc);
+  try {
+    for(let i=0;i<200 && !completedAt;i++) await delay(10);
+    assert.ok(completedAt, "onComplete must have run while output is unread");
+    assert.equal(payload.status,200);
+    const db=new Database(path.join(process.env.DATA_DIR!,"storage.sqlite"),{readonly:true});
+    const rows=db.prepare("SELECT timestamp, status, tokens_input, tokens_output, latency_ms FROM usage_history WHERE model='gpt-6-astra'").all();
+    db.close();
+    assert.equal(rows.length,1,"native successful usage row must already be persisted");
+    assert.equal((rows[0] as any).status,"200");
+    assert.equal((rows[0] as any).tokens_input,11);
+    assert.equal((rows[0] as any).tokens_output,2);
+    assert.equal(ends.length,0,"no END before reading");
+    await delay(5500);
+    assert.equal(ends.length,0,"END still absent past the 4s census tail");
+    const reader=downstream.getReader();
+    let chunks=0;
+    while(!(await reader.read()).done) chunks++;
+    reader.releaseLock();
+    assert.equal(ends.length,1,"exactly one END once drained");
+    assert.match(ends[0].line,/\| complete$/);
+    originalLog("REVIEW-LATE-END",JSON.stringify({usageRows:rows,callbackMs:completedAt-started,endAfterUsageMs:ends[0].at-completedAt,chunks,ends}));
+  } finally { console.log=originalLog; }
+});

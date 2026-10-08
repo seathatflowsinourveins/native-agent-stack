@@ -1,0 +1,348 @@
+#!/usr/bin/env python3
+"""Live acceptance of the post-terminal drain on NativeStack's 20128, VERSION 2 (frozen before the canary switch; see checks/live-acceptance-protocol.md).
+
+Version 1 (sha256 8aa14054...) is kept as superseded: its verdict ignored whether the client saw the terminal event and closed early, compared only the NUMBER of rows at the second read, and checked
+the call's status and the effort columns at the first read only (a full-scope read of 2026-10-06 reproduced a PASS with no terminal event and a PASS after the call's status changed from 200 to 499).
+
+Each MODE sends one tiny streamed request to the gateway (documented loopback placeholder key), reads the response's X-Correlation-Id and, for Responses, the response id, closes the socket as the mode says,
+and then reads only metadata columns of the gateway store (mode=ro). Rows are attributed to the request by the correlation id or the response id (call_logs) and by the same model and token counts within 3 s of that
+call_logs row's timestamp (usage_history has no correlation id; the two rows are written together); more than one matching usage row is INCONCLUSIVE, never a pass. The totals of both tables in the request's window
+are printed, so a reader can see other lanes' traffic.
+
+MODE:
+  responses:eof            /v1/responses, read the stream until the server ends it (a normal client)
+  responses:early:<sec>    /v1/responses, close the socket <sec> seconds after the data line that carries response.completed (what `codex exec` does when it exits)
+  chat:eof                 /v1/chat/completions (a non-Responses client), read to the end
+  chat:early:<sec>         /v1/chat/completions, close <sec> seconds after the line `data: [DONE]`
+  effort:<model>[:<eff>]   /v1/responses, read to the end, with client reasoning effort <eff> when given; prints the effort columns of the call-log row
+
+--expect observe           print what is observed (rows, the request's own outcome), no verdict (the baseline on the unpatched gateway)
+--expect all-logged        a verdict per mode, from TWO reads (READ1 --wait1 s after the request ended, READ2 --wait2 s after the last request ended):
+    sample checks (INCONCLUSIVE: the request does not exercise what the mode means): the HTTP status is 5xx, 408 or 429; no terminal event was received; an early mode did not close early.
+                  (FAIL: another 4xx status: the build rejects a request the baseline accepted.)
+    row checks, applied to BOTH reads (FAIL when violated): exactly one call_logs row for the request, status 200, the path of the mode, the model the gateway serves for the mode; exactly one usage_history row with status 200;
+                  with --baseline, an effort mode's four columns (model, requested model, requested effort, upstream effort) equal the EFFORT line of the baseline file for that mode.
+    stability     (FAIL when violated): the rows at READ2 are the same rows with the same values as at READ1 (row id, status, path, model, tokens, effort columns), not only the same number.
+    INCONCLUSIVE  when the usage match is ambiguous (more than one usage row with the request's model and token counts inside the 3 s window).
+exit code: 0 when every verdict is PASS or OBSERVED, 1 when any is FAIL, 2 when none failed but any is INCONCLUSIVE, 3 for a usage or script error (no verdict: bad arguments, an unknown mode, an unreadable store or baseline file,
+a gateway that does not answer its health endpoint, or an unexpected exception; the preflight raises these BEFORE any request is sent, so an error can never be mistaken for a FAIL). A run that printed no SUMMARY line is not a verdict.
+--baseline must name an existing file by a path that does not depend on the working directory's contents (use an absolute path); its sha256 is printed on the FROZEN line.
+"""
+import argparse
+import datetime as dt
+import hashlib
+import http.client
+import json
+import os
+import re
+import sqlite3
+import sys
+import time
+import urllib.request
+
+DEFAULT_DB = os.path.expanduser("~/.local/share/omniroute/storage.sqlite")
+DEFAULT_MODEL = "cx/gpt-6-astra"
+EXPECT_PATH = {"responses": "/v1/responses", "chat": "/v1/chat/completions"}
+
+
+class UsageError(Exception):
+    """A usage or script error: reported as ERROR and exit status 3, never as a verdict."""
+
+
+class Parser(argparse.ArgumentParser):
+    def error(self, message):
+        raise UsageError(message)
+
+
+def utc(ts=None):
+    return (ts or dt.datetime.now(dt.timezone.utc)).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
+
+
+def con_ro(db):
+    return sqlite3.connect(f"file:{db}?mode=ro", uri=True)
+
+
+def parse_mode(mode):
+    parts = mode.split(":")
+    if parts[0] in ("responses", "chat") and len(parts) >= 2:
+        if parts[1] == "eof":
+            return {"kind": parts[0], "model": DEFAULT_MODEL, "effort": None, "close_after": None}
+        if parts[1] == "early" and len(parts) == 3:
+            return {"kind": parts[0], "model": DEFAULT_MODEL, "effort": None, "close_after": float(parts[2])}
+    if parts[0] == "effort" and len(parts) >= 2:
+        model = parts[1]
+        return {"kind": "responses", "model": model, "effort": parts[2] if len(parts) > 2 else None, "close_after": None}
+    raise UsageError(f"unknown mode {mode!r}")
+
+
+def served_model(spec):
+    """The model name the gateway stores for the mode: the requested id without its cx/ route prefix."""
+    return spec["model"].split("/", 1)[-1]
+
+
+def send(spec, port):
+    conn = http.client.HTTPConnection("127.0.0.1", port, timeout=300)
+    if spec["kind"] == "responses":
+        path = "/v1/responses"
+        body = {"model": spec["model"], "input": "Reply with: ok", "stream": True}
+        body["reasoning"] = {"effort": spec["effort"] or "max"} if spec["model"] == DEFAULT_MODEL or spec["effort"] else None
+        if body["reasoning"] is None:
+            del body["reasoning"]
+    else:
+        path = "/v1/chat/completions"
+        body = {"model": spec["model"], "messages": [{"role": "user", "content": "Reply with: ok"}], "stream": True}
+    conn.request("POST", path, json.dumps(body), {"Content-Type": "application/json", "Authorization": "Bearer local-loopback", "Accept": "text/event-stream"})
+    resp = conn.getresponse()
+    out = {"http": resp.status, "corr": resp.getheader("X-Correlation-Id"), "response_id": None, "terminal": False, "closed_early": False, "path": path}
+    t0 = time.time()
+    while True:
+        line = resp.fp.readline()
+        if not line:
+            break
+        is_terminal = False
+        if spec["kind"] == "responses" and line.startswith(b"data:") and b'"response.completed"' in line:
+            is_terminal = True
+            try:
+                out["response_id"] = json.loads(line[5:].strip())["response"]["id"]
+            except Exception:
+                pass
+        elif spec["kind"] == "chat" and line.strip() == b"data: [DONE]":
+            is_terminal = True
+        if is_terminal and not out["terminal"]:
+            out["terminal"] = True
+            if spec["close_after"] is not None:
+                time.sleep(spec["close_after"])
+                conn.close()
+                out["closed_early"] = True
+                break
+    if not out["closed_early"]:
+        conn.close()
+    out["stream_s"] = round(time.time() - t0, 1)
+    return out
+
+
+def shift(ts, seconds):
+    base = dt.datetime.strptime(ts, "%Y-%m-%dT%H:%M:%S.%fZ").replace(tzinfo=dt.timezone.utc)
+    return utc(base + dt.timedelta(seconds=seconds))
+
+
+def id8(value):
+    return hashlib.sha256(str(value).encode()).hexdigest()[:8]
+
+
+def read_rows(req, db):
+    con = con_ro(db)
+    raw = con.execute(
+        "select id, timestamp, path, status, model, requested_model, tokens_in, tokens_out, detail_state, reasoning_effort_requested, reasoning_effort_upstream from call_logs "
+        "where (correlation_id is not null and correlation_id = ?) or (response_id is not null and response_id = ?) order by timestamp",
+        (req["corr"], req["response_id"]),
+    ).fetchall()
+    calls = [{"id8": id8(r[0]), "timestamp": r[1], "path": r[2], "status": r[3], "model": r[4], "requested_model": r[5], "tokens_in": r[6], "tokens_out": r[7],
+              "detail_state": r[8], "effort_requested": r[9], "effort_upstream": r[10]} for r in raw]
+    usage, ambiguous = [], False
+    if calls:
+        # usage_history has no correlation id: the usage row of this request is the one written together with its call_logs row
+        # (same model and token counts, within 3 s of that row's timestamp), so later requests with identical counts cannot be mistaken for it
+        c = calls[0]
+        rows = con.execute(
+            "select id, timestamp, model, status, tokens_input, tokens_output from usage_history where timestamp >= ? and timestamp <= ? and model = ? and tokens_input = ? and tokens_output = ? order by timestamp",
+            (shift(c["timestamp"], -3), shift(c["timestamp"], 3), c["model"], c["tokens_in"], c["tokens_out"]),
+        ).fetchall()
+        usage = [{"id": r[0], "timestamp": r[1], "model": r[2], "status": r[3], "tokens_input": r[4], "tokens_output": r[5]} for r in rows]
+        ambiguous = len(usage) > 1
+    window_usage = con.execute("select count(*) from usage_history where timestamp >= ? and timestamp <= ?", (req["t_start"], req["t_read_end"])).fetchone()[0]
+    window_calls = con.execute("select count(*) from call_logs where timestamp >= ? and timestamp <= ?", (req["t_start"], req["t_read_end"])).fetchone()[0]
+    con.close()
+    return {"calls": calls, "usage": usage, "ambiguous": ambiguous, "window_calls": window_calls, "window_usage": window_usage}
+
+
+def health_ok(port):
+    try:
+        with urllib.request.urlopen(f"http://127.0.0.1:{port}/api/health", timeout=5) as response:
+            return response.status == 200
+    except Exception:
+        return False
+
+
+def preflight(args, specs):
+    """Everything that can be checked before a request is sent; any problem is a usage error (exit 3), never a verdict."""
+    problems = []
+    try:
+        con = con_ro(args.db)
+        con.execute("select 1 from call_logs limit 1")
+        con.execute("select 1 from usage_history limit 1")
+        con.close()
+    except Exception as error:
+        problems.append(f"the gateway store {args.db} is not readable ({type(error).__name__})")
+    if not health_ok(args.port):
+        problems.append(f"no healthy gateway answers on port {args.port} (GET /api/health)")
+    efforts = [m for m in args.modes if m.startswith("effort:")]
+    if args.expect == "all-logged" and efforts and not args.baseline:
+        problems.append("--expect all-logged with effort modes needs --baseline (the effort columns are compared with it)")
+    if args.baseline:
+        if not os.path.isfile(args.baseline):
+            problems.append(f"--baseline {args.baseline!r} is not a readable file (give an absolute path)")
+        else:
+            base = parse_baseline(args.baseline)
+            missing = [m for m in efforts if m not in base]
+            if args.expect == "all-logged" and missing:
+                problems.append(f"the baseline file has no EFFORT line for: {missing}")
+    if problems:
+        raise UsageError("preflight: " + "; ".join(problems))
+
+
+def sample_problems(out, spec):
+    """What the request itself did: (severity, reason) pairs. INCONCLUSIVE means the sample does not exercise what the mode means."""
+    if out["http"] != 200:
+        severity = "FAIL" if 400 <= out["http"] < 500 and out["http"] not in (408, 429) else "INCONCLUSIVE"
+        return [(severity, f"HTTP status {out['http']}")]
+    if not out["terminal"]:
+        return [("INCONCLUSIVE", "no terminal event was received")]
+    if spec["close_after"] is not None and not out["closed_early"]:
+        return [("INCONCLUSIVE", "the early close did not happen")]
+    return []
+
+
+def judge_read(read, spec, mode, base):
+    """One read of one request: (state, reasons) with state PASS, FAIL or INCONCLUSIVE."""
+    if read["ambiguous"]:
+        return "INCONCLUSIVE", ["more than one usage row matches the request's model and token counts"]
+    calls, usage = read["calls"], read["usage"]
+    if len(calls) != 1:
+        return "FAIL", [f"call_logs rows for this request: {len(calls)} (expected 1)"]
+    c, reasons = calls[0], []
+    if c["status"] != 200:
+        reasons.append(f"call_logs status {c['status']} (expected 200)")
+    if c["path"] != EXPECT_PATH[spec["kind"]]:
+        reasons.append(f"call_logs path {c['path']} (expected {EXPECT_PATH[spec['kind']]})")
+    if c["model"] != served_model(spec):
+        reasons.append(f"call_logs model {c['model']} (expected {served_model(spec)})")
+    if len(usage) != 1:
+        reasons.append(f"usage_history rows for this request: {len(usage)} (expected 1)")
+    elif str(usage[0]["status"]) != "200":
+        reasons.append(f"usage_history status {usage[0]['status']} (expected 200)")
+    if mode.startswith("effort:") and base is not None:
+        now = (str(c["model"]), str(c["requested_model"]), str(c["effort_requested"]), str(c["effort_upstream"]))
+        if mode not in base:
+            reasons.append("no EFFORT line for this mode in the baseline file")
+        elif tuple(base[mode]) != now:
+            reasons.append(f"effort columns {now} differ from the baseline {tuple(base[mode])}")
+    return ("FAIL", reasons) if reasons else ("PASS", [])
+
+
+def row_key(read):
+    return (
+        [(c["id8"], c["path"], c["status"], c["model"], c["requested_model"], c["tokens_in"], c["tokens_out"], c["effort_requested"], c["effort_upstream"]) for c in read["calls"]],
+        [(u["id"], u["timestamp"], u["model"], u["status"], u["tokens_input"], u["tokens_output"]) for u in read["usage"]],
+    )
+
+
+def combine(problems, states):
+    """Overall verdict: the sample's INCONCLUSIVE wins (rows say nothing about a request that did not exercise the mode), then any FAIL, then any INCONCLUSIVE, else PASS."""
+    reasons = [r for _, r in problems] + [r for _, rs in states for r in rs]
+    severities = [s for s, _ in problems] + [s for s, _ in states]
+    if any(s == "INCONCLUSIVE" for s, _ in problems):
+        return "INCONCLUSIVE", reasons
+    if "FAIL" in severities:
+        return "FAIL", reasons
+    if "INCONCLUSIVE" in severities:
+        return "INCONCLUSIVE", reasons
+    return "PASS", reasons
+
+
+def parse_baseline(path):
+    base = {}
+    for line in open(path, encoding="utf-8", errors="replace"):
+        m = re.match(r"EFFORT mode=(\S+) model=(\S*) requested_model=(\S*) effort_requested=(\S*) effort_upstream=(\S*)", line)
+        if m:
+            base[m.group(1)] = m.groups()[1:]
+    return base
+
+
+def show_rows(read):
+    for c in read["calls"]:
+        print("   call_logs:", (c["timestamp"], c["path"], c["status"], c["model"], c["requested_model"], c["tokens_in"], c["tokens_out"], c["detail_state"], c["effort_requested"], c["effort_upstream"]), "id8=" + c["id8"])
+    for u in read["usage"]:
+        print("   usage_history:", (u["timestamp"], u["model"], u["status"], u["tokens_input"], u["tokens_output"]))
+
+
+def main():
+    ap = Parser(add_help=False)
+    ap.add_argument("--port", type=int, default=20128)
+    ap.add_argument("--db", default=DEFAULT_DB)
+    ap.add_argument("--expect", choices=["observe", "all-logged"], default="observe")
+    ap.add_argument("--baseline")
+    ap.add_argument("--wait1", type=float, default=12.0)
+    ap.add_argument("--wait2", type=float, default=60.0)
+    ap.add_argument("modes", nargs="+")
+    args = ap.parse_args()
+    me = open(os.path.abspath(__file__), "rb").read()
+    specs = [parse_mode(m) for m in args.modes]
+    preflight(args, specs)
+    base = parse_baseline(args.baseline) if args.baseline else None
+    base_sha = hashlib.sha256(open(args.baseline, "rb").read()).hexdigest() if args.baseline else None
+    print(f"FROZEN version=2 script_sha256={hashlib.sha256(me).hexdigest()} argv={sys.argv[1:]} cwd={os.getcwd()} start={utc()} expect={args.expect} wait1={args.wait1} wait2={args.wait2} port={args.port} db={args.db} "
+          f"baseline={args.baseline} baseline_sha256={base_sha}")
+    reqs = []
+    for mode, spec in zip(args.modes, specs):
+        t_start = utc()
+        out = send(spec, args.port)
+        t_end = time.time()
+        time.sleep(args.wait1)
+        out.update({"mode": mode, "spec": spec, "t_start": t_start, "t_read_end": utc(), "end_epoch": t_end})
+        out["read1"] = read_rows(out, args.db)
+        out["problems"] = sample_problems(out, spec)
+        reqs.append(out)
+        r = out["read1"]
+        if args.expect == "observe":
+            v, reasons = "OBSERVED", [reason for _, reason in out["problems"]]
+            out["state1"] = None
+        else:
+            out["state1"] = judge_read(r, spec, mode, base)
+            v, reasons = combine(out["problems"], [out["state1"]])
+        out["verdict"] = v
+        print(
+            f"RESULT mode={mode} http={out['http']} terminal={out['terminal']} closed_early={out['closed_early']} stream_s={out['stream_s']} corr={out['corr']} response_id={out['response_id']} "
+            f"read1_call_logs={len(r['calls'])} read1_usage={len(r['usage'])} window_call_logs={r['window_calls']} window_usage={r['window_usage']} verdict={v}" + (f" reasons={reasons}" if reasons else "")
+        )
+        show_rows(r)
+        if mode.startswith("effort:") and r["calls"]:
+            c = r["calls"][0]
+            print(f"EFFORT mode={mode} model={c['model']} requested_model={c['requested_model']} effort_requested={c['effort_requested']} effort_upstream={c['effort_upstream']}")
+    last = max(r["end_epoch"] for r in reqs)
+    time.sleep(max(0.0, last + args.wait2 - time.time()))
+    for out in reqs:
+        out["t_read_end"] = utc()
+        late = read_rows(out, args.db)
+        r1 = out["read1"]
+        changed = row_key(late) != row_key(r1)
+        if args.expect == "observe":
+            v, reasons = "OBSERVED", ([f"rows changed between READ1 and READ2"] if changed else [])
+        else:
+            state2 = judge_read(late, out["spec"], out["mode"], base)
+            states = [out["state1"], state2]
+            if changed:
+                states.append(("FAIL", ["the rows at READ2 are not the rows (or not the values) of READ1"]))
+            v, reasons = combine(out["problems"], states)
+        out["verdict"] = v
+        print(f"LATE mode={out['mode']} read2_call_logs={len(late['calls'])} read2_usage={len(late['usage'])} changed={changed} verdict={v}" + (f" reasons={reasons}" if reasons else ""))
+        if changed:
+            show_rows(late)
+    counts = {}
+    for out in reqs:
+        counts[out["verdict"]] = counts.get(out["verdict"], 0) + 1
+    code = 1 if counts.get("FAIL") else (2 if counts.get("INCONCLUSIVE") else 0)
+    print(f"SUMMARY {json.dumps(counts, sort_keys=True)} end={utc()} exit={code}")
+    sys.exit(code)
+
+
+try:
+    main()
+except UsageError as error:
+    print(f"ERROR usage: {error}", file=sys.stderr)
+    sys.exit(3)
+except SystemExit:
+    raise
+except Exception as error:
+    print(f"ERROR {type(error).__name__}: {str(error)[:300]}", file=sys.stderr)
+    sys.exit(3)

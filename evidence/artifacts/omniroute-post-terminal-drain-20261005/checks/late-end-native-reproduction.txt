@@ -1,0 +1,28 @@
+# Native reproductions of 5f's read r13 of ec4b489d9 (P1-2 and P3-5), rerun by 99 on the first host, 2026-10-07 UTC: two node:test files written by 5f's read (scripts/late-end-reviewer-tests/*.test.ts.txt; sha256 reviewer-late-responses-end.test.ts 0c5140a6b9c0198de61c955d5bce00b446eeafb40a908e5fa7f716e63c71b646; reviewer-controller-lines.test.ts fb005baa0ff253fcce7d6d366fa8529c56df9fd9cef644702ee28818e55b716d), run against the scratch tree of the PATCHED composition (git HEAD ca7a2e2b4; open-sse/utils/streamHandler.ts git blob c3cfb7019, the blob that patches/drain-after-terminal.patch produces) with upstream's runner flags (`node --import tsx/esm --import ./open-sse/utils/setupPolyfill.ts --import ./tests/_setup/isolateDataDir.ts --test --test-force-exit --test-concurrency=1 tests/unit/<file>`, DISABLE_SQLITE_AUTO_BACKUP=true, from the tree's root).
+# The only change to the reviewer's text is the guard on the data directory of the late-END test (it asserted a path under 5f's scratch directory; it asserts that the isolated data directory is set). Evidence class `local_integration` (upstream's node:test runner and stream code, reviewer-written tests with a stubbed upstream; no network, no gateway, no provider).
+# What it shows: (1) a successful CODEX Responses stream with default queues whose client does not drain persists its usage row (status 200, 11 in, 2 out) while NO stream-end line exists, and the line comes 5761 ms after the usage callback, when the client drains: the stream-end record is a second record, not a bound on where the rows are written (r13-P1-2); (2) one controller can print several non-echo stream-end lines (two `error:` lines and `complete`): one primary line per controller is not an invariant, and the census counts each non-echo line as a group of its own (r13-P3-5; J41a-J41d).
+
+## reviewer-late-responses-end.test.ts (late-end), started 2026-10-07T06:20:31Z, exit status 0
+[02:20:34] 📊 [32m[USAGE] CODEX | in=11 | out=2 | account=unknown[0m
+REVIEW-LATE-END {"usageRows":[{"timestamp":"2026-10-07T06:20:34.720Z","status":"200","tokens_input":11,"tokens_output":2,"latency_ms":291}],"callbackMs":291,"endAfterUsageMs":5761,"chunks":20008,"ends":[{"at":1791354040481,"line":"[02:20:40] 🌊 [STREAM] CODEX | gpt-6-astra | 6051ms | complete"}]}
+✔ native CODEX Responses default queues: successful usage persists before END while the client does not drain (6063.726917ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 9013.448249
+
+## reviewer-controller-lines.test.ts (controller-lines), started 2026-10-07T06:20:40Z, exit status 0
+REVIEW-CONTROLLER-LINES ["[02:20:41] 🌊 [STREAM] OPENAI | review | 2ms | error: first","[02:20:41] 🌊 [STREAM] OPENAI | review | 15ms | error: second","[02:20:41] 🌊 [STREAM] OPENAI | review | 15ms | complete"]
+✔ one controller may print several non-echo error lines (16.259034ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 958.855544

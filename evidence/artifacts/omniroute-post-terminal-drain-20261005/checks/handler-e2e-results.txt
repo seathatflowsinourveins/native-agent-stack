@@ -1,0 +1,47 @@
+# Handler-level end-to-end check of the post-terminal client disconnect (2026-10-06 UTC, node 24.21.0; nothing deployed)
+# The test (scripts/handler-e2e-terminal-close.test.ts.txt, sha256 pinned in the script) calls the real handleChat -> chatCore -> stream pipeline -> call-log and usage writers with a stubbed upstream fetch and a temporary database, in the style of upstream's tests/integration/chat-pipeline.test.ts.
+# A client reads until its terminal event and closes (reader.cancel(); in three scenarios after aborting the request signal first, as a server does when the socket closes) while the upstream body stays open for 150 ms more. Five scenarios: Responses clients (plain, Codex-originated) and one Chat Completions client (a non-Responses format).
+# composition C = the v3.8.51 tag commit + the affinity patch + PR 15167's commit 0585aba55 (tree f1336dfd...); the patch under test is patches/drain-after-terminal.patch (sha256 74c0f449...), applied to C it gives tree b7c68690...
+# script: scripts/handler-e2e.sh.txt; it enforces its expectations (exactly four failing scenarios unpatched, by name; five of five patched). The block below is its progress log, byte for byte except that the home directory is written $HOME. Full stage logs: checks/logs/handler-e2e-<stage>.log (plain text, with checks/logs/MANIFEST.txt).
+
+00:00:20Z clone exit=0
+00:00:20Z fetch pr15167 exit=0
+00:00:24Z checkout tag exit=0
+00:01:37Z npm ci exit=0
+00:01:37Z apply affinity patch exit=0
+00:01:37Z apply pr15167 diff exit=0
+00:01:37Z commit composition exit=0
+00:01:37Z composition tree=f1336dfd6c8ebd81586dd6c71e7ef668ef8c949f equals the expected tree
+00:01:37Z copy the e2e test file exit=0
+00:01:37Z e2e test file sha256 9ab6eae294a2b6912e5c2132f3210b34c1e1d08a90b4864d228c80fb3c69f190 git blob 8510b2bd2b050e20a56157c8cb7bcd6542d9db76
+00:02:18Z U-e2e-unpatched exit=1 tests=5 suites=0 pass=1 fail=4 cancelled=0 skipped=0 todo=0
+00:02:18Z U-e2e-unpatched expectation met: tests=5 pass=1 fail=4
+00:02:18Z U-e2e-unpatched failing tests are as expected: 4 name(s)
+00:02:18Z apply patch under test exit=0
+00:02:18Z commit patch under test exit=0
+00:02:18Z patched tree=b7c6869001ce8bdd23e2e2352f48ce3058bc13d2 equals the expected tree
+00:02:27Z P-e2e-patched exit=0 tests=5 suites=0 pass=5 fail=0 cancelled=0 skipped=0 todo=0
+00:02:27Z P-e2e-patched expectation met: tests=5 pass=5 fail=0
+00:02:27Z P-e2e-patched failing tests are as expected: 0 name(s)
+00:02:27Z DONE; the scratch tree and the logs stay in $HOME/.cache/omniroute-handler-e2e-JnYZ01 (remove it with rm -rf after reading)
+
+## Runner summaries of both stages
+| stage | exit | tests | suites | pass | fail | cancelled | skipped | todo |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| U-e2e-unpatched | 1 | 5 | 0 | 1 | 4 | 0 | 0 | 0 |
+| P-e2e-patched | 0 | 5 | 0 | 5 | 0 | 0 | 0 | 0 |
+
+## U: the unpatched composition (the printed E2E_SCENARIO lines show what each scenario found; four fail with 0 rows and the upstream cancelled)
+{"name":"a Responses client that closes the body right after response.completed","kind":"responses","codexHeaders":false,"abortSignalFirst":false,"callLogsRows":1,"usageRows":1,"upstreamCancelled":false,"status":200}
+{"name":"a Codex-originated client (originator codex_exec) that closes the body right after response.completed","kind":"responses","codexHeaders":true,"abortSignalFirst":false,"callLogsRows":0,"usageRows":0,"upstreamCancelled":true,"status":null}
+{"name":"a Codex-originated client whose request signal aborts and whose body closes right after response.completed","kind":"responses","codexHeaders":true,"abortSignalFirst":true,"callLogsRows":0,"usageRows":0,"upstreamCancelled":true,"status":null}
+{"name":"a Responses client whose request signal aborts and whose body closes right after response.completed","kind":"responses","codexHeaders":false,"abortSignalFirst":true,"callLogsRows":0,"usageRows":0,"upstreamCancelled":true,"status":null}
+{"name":"a Chat Completions client (a non-Responses format) whose request signal aborts and whose body closes right after its terminal chunk","kind":"chat","codexHeaders":false,"abortSignalFirst":true,"callLogsRows":0,"usageRows":0,"upstreamCancelled":true,"status":null}
+failing tests: handler e2e: a Chat Completions client (a non-Responses format) whose request signal aborts and whose body closes right after its terminal chunk still gets its call_logs row and its usage_history row | handler e2e: a Codex-originated client (originator codex_exec) that closes the body right after response.completed still gets its call_logs row and its usage_history row | handler e2e: a Codex-originated client whose request signal aborts and whose body closes right after response.completed still gets its call_logs row and its usage_history row | handler e2e: a Responses client whose request signal aborts and whose body closes right after response.completed still gets its call_logs row and its usage_history row
+
+## P: the patched tree (five of five pass: one call_logs row, one usage_history row, status 200, upstream not cancelled)
+{"name":"a Responses client that closes the body right after response.completed","kind":"responses","codexHeaders":false,"abortSignalFirst":false,"callLogsRows":1,"usageRows":1,"upstreamCancelled":false,"status":200}
+{"name":"a Codex-originated client (originator codex_exec) that closes the body right after response.completed","kind":"responses","codexHeaders":true,"abortSignalFirst":false,"callLogsRows":1,"usageRows":1,"upstreamCancelled":false,"status":200}
+{"name":"a Codex-originated client whose request signal aborts and whose body closes right after response.completed","kind":"responses","codexHeaders":true,"abortSignalFirst":true,"callLogsRows":1,"usageRows":1,"upstreamCancelled":false,"status":200}
+{"name":"a Responses client whose request signal aborts and whose body closes right after response.completed","kind":"responses","codexHeaders":false,"abortSignalFirst":true,"callLogsRows":1,"usageRows":1,"upstreamCancelled":false,"status":200}
+{"name":"a Chat Completions client (a non-Responses format) whose request signal aborts and whose body closes right after its terminal chunk","kind":"chat","codexHeaders":false,"abortSignalFirst":true,"callLogsRows":1,"usageRows":1,"upstreamCancelled":false,"status":200}

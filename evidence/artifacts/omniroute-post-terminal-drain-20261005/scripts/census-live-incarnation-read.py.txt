@@ -1,0 +1,58 @@
+#!/usr/bin/env python3
+"""The census on the REAL host for a FABRICATED four-arm window placed in a quiet hour of the live incarnation: the census's own incarnation lines for the real serving process (read-only: the real /proc, the system's journalctl, ss, systemctl and systemd-analyze, the live store opened with mode=ro by the census).
+Nothing is sent to a gateway. The window's rows do not exist in the store (own=0), so the result is INCONCLUSIVE by construction; what the run shows is the census's reading of the REAL incarnation: the unit's cgroup, the listener's start, the coverage by its startup banner, and the inbound lines with no call row (on the unpatched build: the post-terminal closes that the drain patch fixes).
+usage: census-live-incarnation-read.py --controls census-controls.py --census window-census.py --schema gateway-schema.sql --work DIR --db LIVE_STORE [--hours-ahead N]   (the fixture's 2026-10-06T12:00Z is shifted by N hours, default 15, to land in a quiet hour of the live incarnation)
+Keeps only value-free lines (scope, serving process, coverage, counts, the journal command and limits, the incarnation and serving PROBLEMs, the result) and the exit status."""
+import argparse
+import datetime as dt
+import importlib.util
+import os
+import shutil
+import subprocess
+import sys
+
+sys.dont_write_bytecode = True
+ap = argparse.ArgumentParser()
+ap.add_argument("--controls", required=True)
+ap.add_argument("--census", required=True)
+ap.add_argument("--schema", required=True)
+ap.add_argument("--work", required=True)
+ap.add_argument("--db", required=True)
+ap.add_argument("--hours-ahead", type=float, default=15.0)
+args = ap.parse_args()
+spec_ = importlib.util.spec_from_file_location("census_controls", args.controls)
+ctrl = importlib.util.module_from_spec(spec_)
+spec_.loader.exec_module(ctrl)
+os.makedirs(args.work, exist_ok=True)
+import argparse as _ap
+ctrl.ARGS = _ap.Namespace(work=args.work, schema=args.schema, census=args.census)
+OFFSET = dt.timedelta(hours=args.hours_ahead)
+
+
+def shift(x):
+    if isinstance(x, dt.datetime):
+        return x + OFFSET
+    if isinstance(x, dict):
+        return {k: shift(v) for k, v in x.items()}
+    if isinstance(x, list):
+        return [shift(v) for v in x]
+    return x
+
+
+spec = ctrl.default_spec("livewin")
+ctrl.four_arms(spec)
+spec = shift(spec)
+for arm in spec["arms"]:
+    arm["db_override"] = args.db
+db, files, guard = ctrl.materialize(spec, args.work)
+for tool in ("journalctl", "ss", "systemctl", "systemd-analyze"):
+    assert os.path.dirname(os.path.realpath(shutil.which(tool))) in ("/usr/bin", "/usr/sbin", "/bin", "/sbin"), tool
+cmd = [sys.executable, "-B", args.census, "--guard-receipt", str(guard), "--db", args.db] + [str(f) for f in files]
+p = subprocess.run(cmd, capture_output=True, timeout=600)
+out = p.stdout.decode("utf-8", "replace")
+home = os.path.expanduser("~")
+keep = ("SCOPE", "CENSUS ", "WINDOW", "SERVING-PROCESS", "INCARNATION-COVERAGE", "INCARNATION-ARRIVALS", "INCARNATION-ROWS", "INCARNATION-BIRTH", "INCARNATION-JOURNAL-COMMAND", "JOURNAL-COMMAND", "JOURNAL-LIMITS", "JOURNAL unit", "CENSUS-RESULT", "OBSERVED-AT", "STORE")
+lines = [l for l in out.splitlines() if l.startswith(keep) or (l.startswith("PROBLEM ") and any(w in l for w in ("since the serving process started", "startup banner", "listener", "cgroup", "restart diagnostic", "correlation id", "arrival lines", "boot clock", "monotonic", "boot id")))]
+print(f"# exit={p.returncode}; problems in the whole receipt: {sum(1 for l in out.splitlines() if l.startswith('PROBLEM '))} (the others are the fabricated arms: no own rows)")
+for l in lines:
+    print(l.replace(home, "$HOME"))

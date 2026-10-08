@@ -1,0 +1,35 @@
+# Publication note: UUID-shaped strings (the gateway's correlation ids) are shortened to their first 8 hex digits and an ellipsis, because the repository's publication check rejects full UUIDs; sha256 of this text before the shortening: 75436b5ba561038e7ae75f4fcb3340236c75df2ca45104620b419a237dbf4a81; the unshortened text is kept in the first host's private artifact directory (checks/logs/MANIFEST.txt)
+# canary, race set (responses:early:0 x6), frozen script v2, --expect all-logged; started 2026-10-07T23:54:45Z; wrapper kind=canary
+IDENTITY label=before-live-acceptance-canary-race.txt time=2026-10-07T23:54:45Z unit=omniroute.service MainPID=339027 ExecMainStartTimestamp=Wed_2026-10-07_19:41:48_EDT NRestarts=0 running_prefix=omniroute-3.8.51-c1e30b76-affinity-pr15167-drain-b7c68690 BUILD_SHA=2a41147b7 health=ok pending_total=0 expect_prefix_ok=True expect_build_ok=True
+FROZEN version=2.2 script_sha256=52b1d749dc6b7f6b406f8ce8db5d8b1d3e3a73a6b7861a63cc158dbebd320d75 argv=['--expect', 'all-logged', '--wait1', '12', '--wait2', '60', 'responses:early:0', 'responses:early:0', 'responses:early:0', 'responses:early:0', 'responses:early:0', 'responses:early:0'] cwd=/tmp start=2026-10-07T23:54:45.639Z expect=all-logged wait1=12.0 wait2=60.0 port=20128 db=$HOME/.local/share/omniroute/storage.sqlite effort_close_after=10.0 baseline=None baseline_sha256=None
+RESULT mode=responses:early:0 http=200 terminal=True closed_early=True stream_s=1.7 corr=d8bc27a8… response_id=resp_0c982b8ed126ca2a016ac6dbc616808193b58cf38fa1262cbc read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 read1_usage_lookalikes=0 verdict=PASS
+   call_logs: ('2026-10-07T23:54:48.068Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 28, 'ready', 'max', 'max') id8=47d32694
+   usage_history: ('2026-10-07T23:54:48.066Z', 'gpt-6-astra', '200', 22, 28)
+RESULT mode=responses:early:0 http=200 terminal=True closed_early=True stream_s=2.1 corr=bc85092e… response_id=resp_0061920c185475a6016ac6dbd4658c8195ac34104f6a91e6de read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 read1_usage_lookalikes=0 verdict=PASS
+   call_logs: ('2026-10-07T23:55:02.747Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 25, 'ready', 'max', 'max') id8=f858626f
+   usage_history: ('2026-10-07T23:55:02.745Z', 'gpt-6-astra', '200', 22, 25)
+RESULT mode=responses:early:0 http=200 terminal=True closed_early=True stream_s=2.1 corr=4fe9d659… response_id=resp_07ef69f96640f960016ac6dbe353b4819099e9fbc65d895b98 read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 read1_usage_lookalikes=0 verdict=PASS
+   call_logs: ('2026-10-07T23:55:17.709Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 20, 'ready', 'max', 'max') id8=614d1807
+   usage_history: ('2026-10-07T23:55:17.706Z', 'gpt-6-astra', '200', 22, 20)
+RESULT mode=responses:early:0 http=200 terminal=True closed_early=True stream_s=1.7 corr=46bd4025… response_id=resp_050181dc879a9b74016ac6dbf230f8819483166a750867081d read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 read1_usage_lookalikes=0 verdict=PASS
+   call_logs: ('2026-10-07T23:55:32.326Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 21, 'ready', 'max', 'max') id8=e7187ca6
+   usage_history: ('2026-10-07T23:55:32.325Z', 'gpt-6-astra', '200', 22, 21)
+RESULT mode=responses:early:0 http=200 terminal=True closed_early=True stream_s=2.0 corr=fc58bd15… response_id=resp_0e2f6a2ace397f49016ac6dc00c3708196be7f7a77d32454c5 read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 read1_usage_lookalikes=0 verdict=PASS
+   call_logs: ('2026-10-07T23:55:47.044Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 36, 'ready', 'max', 'max') id8=bea3bc0d
+   usage_history: ('2026-10-07T23:55:47.042Z', 'gpt-6-astra', '200', 22, 36)
+RESULT mode=responses:early:0 http=200 terminal=True closed_early=True stream_s=1.8 corr=f74fa21e… response_id=resp_0f8529a0703f9308016ac6dc0f8bb481969e84e0ffda0c5125 read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 read1_usage_lookalikes=0 verdict=PASS
+   call_logs: ('2026-10-07T23:56:01.634Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 21, 'ready', 'max', 'max') id8=96c41de3
+   usage_history: ('2026-10-07T23:56:01.631Z', 'gpt-6-astra', '200', 22, 21)
+LATE mode=responses:early:0 read2_call_logs=1 read2_usage=1 changed=False verdict=PASS
+LATE mode=responses:early:0 read2_call_logs=1 read2_usage=1 changed=False verdict=PASS
+LATE mode=responses:early:0 read2_call_logs=1 read2_usage=1 changed=False verdict=PASS
+LATE mode=responses:early:0 read2_call_logs=1 read2_usage=1 changed=False verdict=PASS
+LATE mode=responses:early:0 read2_call_logs=1 read2_usage=1 changed=False verdict=PASS
+LATE mode=responses:early:0 read2_call_logs=1 read2_usage=1 changed=False verdict=PASS
+SUMMARY {"PASS": 6} end=2026-10-07T23:57:01.673Z exit=0
+exit=0
+IDENTITY label=after-live-acceptance-canary-race.txt time=2026-10-07T23:57:01Z unit=omniroute.service MainPID=339027 ExecMainStartTimestamp=Wed_2026-10-07_19:41:48_EDT NRestarts=0 running_prefix=omniroute-3.8.51-c1e30b76-affinity-pr15167-drain-b7c68690 BUILD_SHA=2a41147b7 health=ok pending_total=0 expect_prefix_ok=True expect_build_ok=True
+journal_failed_to_save_call_log=0 (journalctl --user -u omniroute.service --since <the unit's ExecMainStartTimestamp> -o cat --no-pager | grep -c 'Failed to save call log')
+pending_delta=0 (informational: pending_total 0 -> 0)
+RUN-STATUS live-acceptance-canary-race.txt status=0 (ok)
+# finished 2026-10-07T23:57:01Z

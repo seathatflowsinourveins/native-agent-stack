@@ -1,0 +1,1247 @@
+# Publication note: UUID-shaped strings (the gateway's correlation ids) are shortened to their first 8 hex digits and an ellipsis, because the repository's publication check rejects full UUIDs; sha256 of this text before the shortening: 07c6aef63bf542a0efa3246babfd8cc9443460e88e54343b2c05570d9750639b; the unshortened text is kept in the first host's private artifact directory (checks/logs/MANIFEST.txt)
+# Note: the fixture's scratch HOME directory is named `home` under the work directory; it is written `scratch-home` below, because the repository's publication check reads `/home/...` as a personal home path.
+# Parts A (raw clients R1-R9, with the effort-group controls R8a-j), B (native shapes N1-N7 and the receipt RC1-RC2), B2 (a rerun of the four version-1 scenarios that came out INCONCLUSIVE in part B) and C (usage errors U, identity I, guard G1-G12, wrapper W) ran on separate stub gateways and scratch databases with the same frozen scripts (their sha256 are in each part's header, which also names the 2.0 raw script and the guard v2 that the controls R8h and G12 exercise); the slow reproduction of the first review's P1 with version 1 (N1v1) is acceptance-controls-v1-reproduction.txt.
+# Part B's results of N2a v1, N2b v1, N5b v1 and N6 v1 are marked UNEXPECTED there, and that is not a defect of the scripts under test: a headless Codex SDK worker of another lane (an omniroute-codex-sdk/worker.py process, a review job that calls the gateway) was running on the host, and version 1's own quiet check turns every run into INCONCLUSIVE while any such process exists (RESULT ... other_workers=2 ... INCONCLUSIVE (not run: the window was not quiet)).
+# Those four scenarios are therefore repeated in part B2 with a pgrep fixture shim first on PATH (scripts/acceptance-controls/pgrep-shim.sh.txt, sha256 c7df53bebe7a30678416ec3e3466e7a5c4858037e25582d42df8aea539d9bda4, installed as an executable named pgrep) that hides other lanes' workers from that one query and passes every other call through; all four came out as expected there (version 1's defects reproduced). The shim is a fixture of the controls of the superseded script only; no live run uses it. Part B's version-2 results of the same scenarios were as expected in both parts.
+
+################ PART A
+# Offline controls of the live-acceptance scripts, version 1 (superseded) against version 2.1 (frozen; version 2.0 appears in the effort controls R8h), on the stub gateway and a scratch database. Nothing here touches a live gateway.
+# started 2026-10-06T06:21:30Z; codex-cli 0.159.3; python 3.13.15
+# live-acceptance v1: sha256 8aa14054401c00a5af1e8c180fc83af80c79cc0a807da98ea519149291188859
+# live-acceptance v2.0 (superseded): sha256 fa8fa6f8dc3a0e7360be4a0737c34daaf4d4b58696df6a7ab3483896cb739e82
+# live-acceptance v2.1: sha256 15b8cf04134aa8ead6526739e5a95b6dc15f4e5b77d59840e0d03aa56b33301b
+# native-exec v1: sha256 9f511620db390c3b4c7177f858342c6592680efd1d383e2e02ecf3f5d249fdee
+# native-exec v2: sha256 9bd478a1502839e7cfe2c5999e3485d6e9ba5d10bfe62e2593e061b7441dda71
+# show-log-receipt v2: sha256 7dd746bce15964c68d8b847f8072257a4b5712adca7ed7cd9089c09273ff26d6
+# gateway-identity: sha256 a7932710412e9e834f6b992f267db5620b64bbe62f25021013c8004a7eec6011
+# pre-switch-guard: sha256 305a065227bff71dcbe3b46b157f4d3ed83f5a5b5ce90a2f73cbfa6b26805040
+# pre-switch-guard v2 (superseded; G12): sha256 b491de6b3e4a5a1d3a3761c8fa8aefc439cca8cf4c453d696c7b9cb41a73af3a
+# run-acceptance wrapper: sha256 abcbb5407c244062697fb94a677100b3e670b609b423582d9f39368073e9cb11
+# switch tool copy (committed evidence file): sha256 97d1b87bb651d6f43e184b9617d03afa7861ee7715e7030ad23ed29057bc23e3
+# stub-gateway: sha256 2e500af67bf1aae55d82e4972c34664650e48e3bf9c167675184c7517afe9bb7
+# fake-codex: sha256 6c9eecec7e3209ad9690510463632780c0f7204e0abb4782ce09c92883e4c206
+# run-controls: sha256 cb249594fc5f256567837dcbab104b2a446324a9cbf894cd1eda78b7a90b74d8
+
+### R1: healthy gateway (rows are written for every client): both versions pass every mode
+    stub mode: {"mode": "normal"}
+--- R1 / v1: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-live-acceptance-20261005.py --port 58634 --expect all-logged --wait1 5 --wait2 10 responses:eof responses:early:0 chat:eof chat:early:0   [env: HOME=$WORK/home]
+    FROZEN script_sha256=8aa14054401c00a5af1e8c180fc83af80c79cc0a807da98ea519149291188859 argv=['--port', '58634', '--expect', 'all-logged', '--wait1', '5', '--wait2', '10', 'responses:eof', 'responses:early:0', 'chat:eof', 'chat:early:0'] cwd=/tmp start=2026-10-06T06:21:32.281Z expect=all-logged wait1=5.0 wait2=10.0 port=58634
+    RESULT mode=responses:eof http=200 terminal=True closed_early=False stream_s=3.0 corr=None response_id=resp_7c20fb6286a0496dbd905bf1 read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=PASS
+       call_logs: ('2026-10-06T06:21:35.286Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', 'max', 'max')
+       usage_history: ('2026-10-06T06:21:35.286Z', 'gpt-6-astra', '200', 22, 19)
+    RESULT mode=responses:early:0 http=200 terminal=True closed_early=True stream_s=0.0 corr=None response_id=resp_d97dd5db59bb47e9a61cc3b3 read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=PASS
+       call_logs: ('2026-10-06T06:21:40.702Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', 'max', 'max')
+       usage_history: ('2026-10-06T06:21:40.702Z', 'gpt-6-astra', '200', 22, 19)
+    RESULT mode=chat:eof http=200 terminal=True closed_early=False stream_s=3.0 corr=0fc6a23d… response_id=None read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=PASS
+       call_logs: ('2026-10-06T06:21:48.307Z', '/v1/chat/completions', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 21, 5, 'ready', None, None)
+       usage_history: ('2026-10-06T06:21:48.307Z', 'gpt-6-astra', '200', 21, 5)
+    RESULT mode=chat:early:0 http=200 terminal=True closed_early=True stream_s=0.0 corr=ada5735b… response_id=None read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=PASS
+       call_logs: ('2026-10-06T06:21:53.722Z', '/v1/chat/completions', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 21, 5, 'ready', None, None)
+       usage_history: ('2026-10-06T06:21:53.722Z', 'gpt-6-astra', '200', 21, 5)
+    LATE mode=responses:eof read2_call_logs=1 read2_usage=1 changed=False verdict=PASS
+    LATE mode=responses:early:0 read2_call_logs=1 read2_usage=1 changed=False verdict=PASS
+    LATE mode=chat:eof read2_call_logs=1 read2_usage=1 changed=False verdict=PASS
+    LATE mode=chat:early:0 read2_call_logs=1 read2_usage=1 changed=False verdict=PASS
+    SUMMARY {"PASS": 4} end=2026-10-06T06:22:03.325Z exit=0
+CONTROL-RESULT R1 v1 expected_exit=0 observed_exit=0 elapsed_s=31 OK
+
+--- R1 / v2: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-live-acceptance-20261006.py --port 58634 --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --expect all-logged --wait1 5 --wait2 10 responses:eof responses:early:0 chat:eof chat:early:0
+    FROZEN version=2.1 script_sha256=15b8cf04134aa8ead6526739e5a95b6dc15f4e5b77d59840e0d03aa56b33301b argv=['--port', '58634', '--db', '$WORK/scratch-home/.local/share/omniroute/storage.sqlite', '--expect', 'all-logged', '--wait1', '5', '--wait2', '10', 'responses:eof', 'responses:early:0', 'chat:eof', 'chat:early:0'] cwd=/tmp start=2026-10-06T06:22:04.896Z expect=all-logged wait1=5.0 wait2=10.0 port=58634 db=$WORK/scratch-home/.local/share/omniroute/storage.sqlite effort_close_after=10.0 baseline=None baseline_sha256=None
+    RESULT mode=responses:eof http=200 terminal=True closed_early=False stream_s=3.0 corr=None response_id=resp_b36284559449468c995ee5c6 read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=PASS
+       call_logs: ('2026-10-06T06:22:07.900Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', 'max', 'max') id8=e26be0d6
+       usage_history: ('2026-10-06T06:22:07.900Z', 'gpt-6-astra', '200', 22, 19)
+    RESULT mode=responses:early:0 http=200 terminal=True closed_early=True stream_s=0.0 corr=None response_id=resp_5ce1c3bb6ab94d57861ada08 read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=PASS
+       call_logs: ('2026-10-06T06:22:13.326Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', 'max', 'max') id8=c481952b
+       usage_history: ('2026-10-06T06:22:13.326Z', 'gpt-6-astra', '200', 22, 19)
+    RESULT mode=chat:eof http=200 terminal=True closed_early=False stream_s=3.0 corr=6449c4f2… response_id=None read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=PASS
+       call_logs: ('2026-10-06T06:22:20.931Z', '/v1/chat/completions', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 21, 5, 'ready', None, None) id8=2cd0d116
+       usage_history: ('2026-10-06T06:22:20.931Z', 'gpt-6-astra', '200', 21, 5)
+    RESULT mode=chat:early:0 http=200 terminal=True closed_early=True stream_s=0.0 corr=092859f2… response_id=None read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=PASS
+       call_logs: ('2026-10-06T06:22:26.353Z', '/v1/chat/completions', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 21, 5, 'ready', None, None) id8=43a4bac0
+       usage_history: ('2026-10-06T06:22:26.353Z', 'gpt-6-astra', '200', 21, 5)
+    LATE mode=responses:eof read2_call_logs=1 read2_usage=1 changed=False verdict=PASS
+    LATE mode=responses:early:0 read2_call_logs=1 read2_usage=1 changed=False verdict=PASS
+    LATE mode=chat:eof read2_call_logs=1 read2_usage=1 changed=False verdict=PASS
+    LATE mode=chat:early:0 read2_call_logs=1 read2_usage=1 changed=False verdict=PASS
+    SUMMARY {"PASS": 4} end=2026-10-06T06:22:35.955Z exit=0
+CONTROL-RESULT R1 v2 expected_exit=0 observed_exit=0 elapsed_s=31 OK
+
+### R2: the unpatched gateway's drop (a client that closes right after the terminal event leaves no row): both versions fail the early modes and pass the eof modes
+    stub mode: {"mode": "lose-on-early", "tail_s": 3.0}
+--- R2 / v1: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-live-acceptance-20261005.py --port 58634 --expect all-logged --wait1 5 --wait2 10 responses:eof responses:early:0 chat:eof chat:early:0   [env: HOME=$WORK/home]
+    FROZEN script_sha256=8aa14054401c00a5af1e8c180fc83af80c79cc0a807da98ea519149291188859 argv=['--port', '58634', '--expect', 'all-logged', '--wait1', '5', '--wait2', '10', 'responses:eof', 'responses:early:0', 'chat:eof', 'chat:early:0'] cwd=/tmp start=2026-10-06T06:22:37.515Z expect=all-logged wait1=5.0 wait2=10.0 port=58634
+    RESULT mode=responses:eof http=200 terminal=True closed_early=False stream_s=3.0 corr=None response_id=resp_e6836966f35f426e97076a04 read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=PASS
+       call_logs: ('2026-10-06T06:22:40.521Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', 'max', 'max')
+       usage_history: ('2026-10-06T06:22:40.521Z', 'gpt-6-astra', '200', 22, 19)
+    RESULT mode=responses:early:0 http=200 terminal=True closed_early=True stream_s=0.0 corr=None response_id=resp_20240a40bb9c45e9b89d57f5 read1_call_logs=0 read1_usage=0 window_call_logs=0 window_usage=0 verdict=FAIL
+    RESULT mode=chat:eof http=200 terminal=True closed_early=False stream_s=3.0 corr=7e15b694… response_id=None read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=PASS
+       call_logs: ('2026-10-06T06:22:53.543Z', '/v1/chat/completions', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 21, 5, 'ready', None, None)
+       usage_history: ('2026-10-06T06:22:53.543Z', 'gpt-6-astra', '200', 21, 5)
+    RESULT mode=chat:early:0 http=200 terminal=True closed_early=True stream_s=0.0 corr=918b14df… response_id=None read1_call_logs=0 read1_usage=0 window_call_logs=0 window_usage=0 verdict=FAIL
+    LATE mode=responses:eof read2_call_logs=1 read2_usage=1 changed=False verdict=PASS
+    LATE mode=responses:early:0 read2_call_logs=0 read2_usage=0 changed=False verdict=FAIL
+    LATE mode=chat:eof read2_call_logs=1 read2_usage=1 changed=False verdict=PASS
+    LATE mode=chat:early:0 read2_call_logs=0 read2_usage=0 changed=False verdict=FAIL
+    SUMMARY {"FAIL": 2, "PASS": 2} end=2026-10-06T06:23:08.559Z exit=1
+CONTROL-RESULT R2 v1 expected_exit=1 observed_exit=1 elapsed_s=31 OK
+
+--- R2 / v2: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-live-acceptance-20261006.py --port 58634 --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --expect all-logged --wait1 5 --wait2 10 responses:eof responses:early:0 chat:eof chat:early:0
+    FROZEN version=2.1 script_sha256=15b8cf04134aa8ead6526739e5a95b6dc15f4e5b77d59840e0d03aa56b33301b argv=['--port', '58634', '--db', '$WORK/scratch-home/.local/share/omniroute/storage.sqlite', '--expect', 'all-logged', '--wait1', '5', '--wait2', '10', 'responses:eof', 'responses:early:0', 'chat:eof', 'chat:early:0'] cwd=/tmp start=2026-10-06T06:23:10.126Z expect=all-logged wait1=5.0 wait2=10.0 port=58634 db=$WORK/scratch-home/.local/share/omniroute/storage.sqlite effort_close_after=10.0 baseline=None baseline_sha256=None
+    RESULT mode=responses:eof http=200 terminal=True closed_early=False stream_s=3.0 corr=None response_id=resp_00923830de1a405fb51fa9ef read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=PASS
+       call_logs: ('2026-10-06T06:23:13.130Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', 'max', 'max') id8=76301f90
+       usage_history: ('2026-10-06T06:23:13.130Z', 'gpt-6-astra', '200', 22, 19)
+    RESULT mode=responses:early:0 http=200 terminal=True closed_early=True stream_s=0.0 corr=None response_id=resp_c11ff870ec014d27a85745c3 read1_call_logs=0 read1_usage=0 window_call_logs=0 window_usage=0 verdict=FAIL reasons=['call_logs rows for this request: 0 (expected 1)']
+    RESULT mode=chat:eof http=200 terminal=True closed_early=False stream_s=3.0 corr=3a871a0a… response_id=None read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=PASS
+       call_logs: ('2026-10-06T06:23:26.151Z', '/v1/chat/completions', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 21, 5, 'ready', None, None) id8=c5d44ca3
+       usage_history: ('2026-10-06T06:23:26.151Z', 'gpt-6-astra', '200', 21, 5)
+    RESULT mode=chat:early:0 http=200 terminal=True closed_early=True stream_s=0.0 corr=34d777eb… response_id=None read1_call_logs=0 read1_usage=0 window_call_logs=0 window_usage=0 verdict=FAIL reasons=['call_logs rows for this request: 0 (expected 1)']
+    LATE mode=responses:eof read2_call_logs=1 read2_usage=1 changed=False verdict=PASS
+    LATE mode=responses:early:0 read2_call_logs=0 read2_usage=0 changed=False verdict=FAIL reasons=['call_logs rows for this request: 0 (expected 1)', 'call_logs rows for this request: 0 (expected 1)']
+    LATE mode=chat:eof read2_call_logs=1 read2_usage=1 changed=False verdict=PASS
+    LATE mode=chat:early:0 read2_call_logs=0 read2_usage=0 changed=False verdict=FAIL reasons=['call_logs rows for this request: 0 (expected 1)', 'call_logs rows for this request: 0 (expected 1)']
+    SUMMARY {"FAIL": 2, "PASS": 2} end=2026-10-06T06:23:41.171Z exit=1
+CONTROL-RESULT R2 v2 expected_exit=1 observed_exit=1 elapsed_s=31 OK
+
+### R3: the stream ends WITHOUT a terminal event (an error event) but rows exist: version 1 passes without any early close having happened, version 2 is INCONCLUSIVE
+    stub mode: {"mode": "no-terminal", "responses_corr_header": true}
+--- R3 / v1: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-live-acceptance-20261005.py --port 58634 --expect all-logged --wait1 5 --wait2 10 responses:early:0 chat:early:0   [env: HOME=$WORK/home]
+    FROZEN script_sha256=8aa14054401c00a5af1e8c180fc83af80c79cc0a807da98ea519149291188859 argv=['--port', '58634', '--expect', 'all-logged', '--wait1', '5', '--wait2', '10', 'responses:early:0', 'chat:early:0'] cwd=/tmp start=2026-10-06T06:23:42.730Z expect=all-logged wait1=5.0 wait2=10.0 port=58634
+    RESULT mode=responses:early:0 http=200 terminal=False closed_early=False stream_s=3.0 corr=7b9f416d… response_id=None read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=PASS
+       call_logs: ('2026-10-06T06:23:45.735Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', 'max', 'max')
+       usage_history: ('2026-10-06T06:23:45.735Z', 'gpt-6-astra', '200', 22, 19)
+    RESULT mode=chat:early:0 http=200 terminal=False closed_early=False stream_s=3.0 corr=0ffeb99d… response_id=None read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=PASS
+       call_logs: ('2026-10-06T06:23:53.752Z', '/v1/chat/completions', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 21, 5, 'ready', None, None)
+       usage_history: ('2026-10-06T06:23:53.752Z', 'gpt-6-astra', '200', 21, 5)
+    LATE mode=responses:early:0 read2_call_logs=1 read2_usage=1 changed=False verdict=PASS
+    LATE mode=chat:early:0 read2_call_logs=1 read2_usage=1 changed=False verdict=PASS
+    SUMMARY {"PASS": 2} end=2026-10-06T06:24:03.769Z exit=0
+CONTROL-RESULT R3 v1 defect-demonstration expected_exit=0 observed_exit=0 elapsed_s=21 OK
+
+--- R3 / v2: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-live-acceptance-20261006.py --port 58634 --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --expect all-logged --wait1 5 --wait2 10 responses:early:0 chat:early:0
+    FROZEN version=2.1 script_sha256=15b8cf04134aa8ead6526739e5a95b6dc15f4e5b77d59840e0d03aa56b33301b argv=['--port', '58634', '--db', '$WORK/scratch-home/.local/share/omniroute/storage.sqlite', '--expect', 'all-logged', '--wait1', '5', '--wait2', '10', 'responses:early:0', 'chat:early:0'] cwd=/tmp start=2026-10-06T06:24:05.335Z expect=all-logged wait1=5.0 wait2=10.0 port=58634 db=$WORK/scratch-home/.local/share/omniroute/storage.sqlite effort_close_after=10.0 baseline=None baseline_sha256=None
+    RESULT mode=responses:early:0 http=200 terminal=False closed_early=False stream_s=3.0 corr=79142c7b… response_id=None read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=INCONCLUSIVE reasons=['no terminal event was received']
+       call_logs: ('2026-10-06T06:24:08.338Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', 'max', 'max') id8=8db67c0a
+       usage_history: ('2026-10-06T06:24:08.338Z', 'gpt-6-astra', '200', 22, 19)
+    RESULT mode=chat:early:0 http=200 terminal=False closed_early=False stream_s=3.0 corr=1377bc78… response_id=None read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=INCONCLUSIVE reasons=['no terminal event was received']
+       call_logs: ('2026-10-06T06:24:16.357Z', '/v1/chat/completions', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 21, 5, 'ready', None, None) id8=a59b1127
+       usage_history: ('2026-10-06T06:24:16.357Z', 'gpt-6-astra', '200', 21, 5)
+    LATE mode=responses:early:0 read2_call_logs=1 read2_usage=1 changed=False verdict=INCONCLUSIVE reasons=['no terminal event was received']
+    LATE mode=chat:early:0 read2_call_logs=1 read2_usage=1 changed=False verdict=INCONCLUSIVE reasons=['no terminal event was received']
+    SUMMARY {"INCONCLUSIVE": 2} end=2026-10-06T06:24:26.375Z exit=2
+CONTROL-RESULT R3 v2 expected_exit=2 observed_exit=2 elapsed_s=21 OK
+
+### R4: the call's status changes from 200 (READ1) to 499 (READ2) with the row counts unchanged: version 1 passes, version 2 fails
+    stub mode: {"mode": "status-flip", "flip_s": 7}
+--- R4 / v1: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-live-acceptance-20261005.py --port 58634 --expect all-logged --wait1 5 --wait2 10 responses:early:0 chat:early:0   [env: HOME=$WORK/home]
+    FROZEN script_sha256=8aa14054401c00a5af1e8c180fc83af80c79cc0a807da98ea519149291188859 argv=['--port', '58634', '--expect', 'all-logged', '--wait1', '5', '--wait2', '10', 'responses:early:0', 'chat:early:0'] cwd=/tmp start=2026-10-06T06:24:27.940Z expect=all-logged wait1=5.0 wait2=10.0 port=58634
+    RESULT mode=responses:early:0 http=200 terminal=True closed_early=True stream_s=0.0 corr=None response_id=resp_dbdc886719d445f9ae6528d3 read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=PASS
+       call_logs: ('2026-10-06T06:24:28.343Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', 'max', 'max')
+       usage_history: ('2026-10-06T06:24:28.343Z', 'gpt-6-astra', '200', 22, 19)
+    RESULT mode=chat:early:0 http=200 terminal=True closed_early=True stream_s=0.0 corr=ace44b21… response_id=None read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=PASS
+       call_logs: ('2026-10-06T06:24:33.348Z', '/v1/chat/completions', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 21, 5, 'ready', None, None)
+       usage_history: ('2026-10-06T06:24:33.348Z', 'gpt-6-astra', '200', 21, 5)
+    LATE mode=responses:early:0 read2_call_logs=1 read2_usage=1 changed=False verdict=PASS
+    LATE mode=chat:early:0 read2_call_logs=1 read2_usage=1 changed=False verdict=PASS
+    SUMMARY {"PASS": 2} end=2026-10-06T06:24:42.949Z exit=0
+CONTROL-RESULT R4 v1 defect-demonstration expected_exit=0 observed_exit=0 elapsed_s=15 OK
+
+--- R4 / v2: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-live-acceptance-20261006.py --port 58634 --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --expect all-logged --wait1 5 --wait2 10 responses:early:0 chat:early:0
+    FROZEN version=2.1 script_sha256=15b8cf04134aa8ead6526739e5a95b6dc15f4e5b77d59840e0d03aa56b33301b argv=['--port', '58634', '--db', '$WORK/scratch-home/.local/share/omniroute/storage.sqlite', '--expect', 'all-logged', '--wait1', '5', '--wait2', '10', 'responses:early:0', 'chat:early:0'] cwd=/tmp start=2026-10-06T06:24:44.527Z expect=all-logged wait1=5.0 wait2=10.0 port=58634 db=$WORK/scratch-home/.local/share/omniroute/storage.sqlite effort_close_after=10.0 baseline=None baseline_sha256=None
+    RESULT mode=responses:early:0 http=200 terminal=True closed_early=True stream_s=0.0 corr=None response_id=resp_5bc74b80753c44a9b912eb89 read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=PASS
+       call_logs: ('2026-10-06T06:24:44.929Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', 'max', 'max') id8=91d97502
+       usage_history: ('2026-10-06T06:24:44.929Z', 'gpt-6-astra', '200', 22, 19)
+    RESULT mode=chat:early:0 http=200 terminal=True closed_early=True stream_s=0.0 corr=2ec892e0… response_id=None read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=PASS
+       call_logs: ('2026-10-06T06:24:49.934Z', '/v1/chat/completions', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 21, 5, 'ready', None, None) id8=868038f6
+       usage_history: ('2026-10-06T06:24:49.934Z', 'gpt-6-astra', '200', 21, 5)
+    LATE mode=responses:early:0 read2_call_logs=1 read2_usage=1 changed=True verdict=FAIL reasons=['call_logs status 499 (expected 200)', 'the rows at READ2 are not the rows (or not the values) of READ1']
+       call_logs: ('2026-10-06T06:24:44.929Z', '/v1/responses', 499, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', 'max', 'max') id8=91d97502
+       usage_history: ('2026-10-06T06:24:44.929Z', 'gpt-6-astra', '200', 22, 19)
+    LATE mode=chat:early:0 read2_call_logs=1 read2_usage=1 changed=True verdict=FAIL reasons=['call_logs status 499 (expected 200)', 'the rows at READ2 are not the rows (or not the values) of READ1']
+       call_logs: ('2026-10-06T06:24:49.934Z', '/v1/chat/completions', 499, 'gpt-6-astra', 'codex/gpt-6-astra', 21, 5, 'ready', None, None) id8=868038f6
+       usage_history: ('2026-10-06T06:24:49.934Z', 'gpt-6-astra', '200', 21, 5)
+    SUMMARY {"FAIL": 2} end=2026-10-06T06:24:59.535Z exit=1
+CONTROL-RESULT R4 v2 expected_exit=1 observed_exit=1 elapsed_s=15 OK
+
+### R5: a late duplicate call_logs row appears after READ1: both versions fail
+    stub mode: {"mode": "double-row", "dup_s": 7}
+--- R5 / v1: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-live-acceptance-20261005.py --port 58634 --expect all-logged --wait1 5 --wait2 10 responses:early:0 chat:early:0   [env: HOME=$WORK/home]
+    FROZEN script_sha256=8aa14054401c00a5af1e8c180fc83af80c79cc0a807da98ea519149291188859 argv=['--port', '58634', '--expect', 'all-logged', '--wait1', '5', '--wait2', '10', 'responses:early:0', 'chat:early:0'] cwd=/tmp start=2026-10-06T06:25:01.099Z expect=all-logged wait1=5.0 wait2=10.0 port=58634
+    RESULT mode=responses:early:0 http=200 terminal=True closed_early=True stream_s=0.0 corr=None response_id=resp_ffa82dde5fc4426c8612f83b read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=PASS
+       call_logs: ('2026-10-06T06:25:01.502Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', 'max', 'max')
+       usage_history: ('2026-10-06T06:25:01.502Z', 'gpt-6-astra', '200', 22, 19)
+    RESULT mode=chat:early:0 http=200 terminal=True closed_early=True stream_s=0.0 corr=78076f0e… response_id=None read1_call_logs=1 read1_usage=1 window_call_logs=2 window_usage=1 verdict=PASS
+       call_logs: ('2026-10-06T06:25:06.507Z', '/v1/chat/completions', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 21, 5, 'ready', None, None)
+       usage_history: ('2026-10-06T06:25:06.507Z', 'gpt-6-astra', '200', 21, 5)
+    LATE mode=responses:early:0 read2_call_logs=2 read2_usage=1 changed=True verdict=FAIL
+    LATE mode=chat:early:0 read2_call_logs=2 read2_usage=1 changed=True verdict=FAIL
+    SUMMARY {"FAIL": 2} end=2026-10-06T06:25:16.109Z exit=1
+CONTROL-RESULT R5 v1 expected_exit=1 observed_exit=1 elapsed_s=15 OK
+
+--- R5 / v2: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-live-acceptance-20261006.py --port 58634 --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --expect all-logged --wait1 5 --wait2 10 responses:early:0 chat:early:0
+    FROZEN version=2.1 script_sha256=15b8cf04134aa8ead6526739e5a95b6dc15f4e5b77d59840e0d03aa56b33301b argv=['--port', '58634', '--db', '$WORK/scratch-home/.local/share/omniroute/storage.sqlite', '--expect', 'all-logged', '--wait1', '5', '--wait2', '10', 'responses:early:0', 'chat:early:0'] cwd=/tmp start=2026-10-06T06:25:17.684Z expect=all-logged wait1=5.0 wait2=10.0 port=58634 db=$WORK/scratch-home/.local/share/omniroute/storage.sqlite effort_close_after=10.0 baseline=None baseline_sha256=None
+    RESULT mode=responses:early:0 http=200 terminal=True closed_early=True stream_s=0.0 corr=None response_id=resp_248892f7e83f4b2090f62afe read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=PASS
+       call_logs: ('2026-10-06T06:25:18.086Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', 'max', 'max') id8=ab8db8cb
+       usage_history: ('2026-10-06T06:25:18.086Z', 'gpt-6-astra', '200', 22, 19)
+    RESULT mode=chat:early:0 http=200 terminal=True closed_early=True stream_s=0.0 corr=6939a9b1… response_id=None read1_call_logs=1 read1_usage=1 window_call_logs=2 window_usage=1 verdict=PASS
+       call_logs: ('2026-10-06T06:25:23.091Z', '/v1/chat/completions', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 21, 5, 'ready', None, None) id8=18b918e4
+       usage_history: ('2026-10-06T06:25:23.091Z', 'gpt-6-astra', '200', 21, 5)
+    LATE mode=responses:early:0 read2_call_logs=2 read2_usage=1 changed=True verdict=FAIL reasons=['call_logs rows for this request: 2 (expected 1)', 'the rows at READ2 are not the rows (or not the values) of READ1']
+       call_logs: ('2026-10-06T06:25:18.086Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', 'max', 'max') id8=ab8db8cb
+       call_logs: ('2026-10-06T06:25:25.107Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', 'max', 'max') id8=9ab7760f
+       usage_history: ('2026-10-06T06:25:18.086Z', 'gpt-6-astra', '200', 22, 19)
+    LATE mode=chat:early:0 read2_call_logs=2 read2_usage=1 changed=True verdict=FAIL reasons=['call_logs rows for this request: 2 (expected 1)', 'the rows at READ2 are not the rows (or not the values) of READ1']
+       call_logs: ('2026-10-06T06:25:23.091Z', '/v1/chat/completions', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 21, 5, 'ready', None, None) id8=18b918e4
+       call_logs: ('2026-10-06T06:25:30.104Z', '/v1/chat/completions', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 21, 5, 'ready', None, None) id8=8f78b3a1
+       usage_history: ('2026-10-06T06:25:23.091Z', 'gpt-6-astra', '200', 21, 5)
+    SUMMARY {"FAIL": 2} end=2026-10-06T06:25:32.693Z exit=1
+CONTROL-RESULT R5 v2 expected_exit=1 observed_exit=1 elapsed_s=15 OK
+
+### R6a: the gateway answers HTTP 500 (no stream, no row): version 1 fails it as a lost row, version 2 is INCONCLUSIVE (the request was not served)
+    stub mode: {"mode": "http-error", "http_status": 500}
+--- R6a / v1: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-live-acceptance-20261005.py --port 58634 --expect all-logged --wait1 5 --wait2 10 responses:early:0   [env: HOME=$WORK/home]
+    FROZEN script_sha256=8aa14054401c00a5af1e8c180fc83af80c79cc0a807da98ea519149291188859 argv=['--port', '58634', '--expect', 'all-logged', '--wait1', '5', '--wait2', '10', 'responses:early:0'] cwd=/tmp start=2026-10-06T06:25:34.255Z expect=all-logged wait1=5.0 wait2=10.0 port=58634
+    RESULT mode=responses:early:0 http=500 terminal=False closed_early=False stream_s=0.0 corr=None response_id=None read1_call_logs=0 read1_usage=0 window_call_logs=0 window_usage=0 verdict=FAIL
+    LATE mode=responses:early:0 read2_call_logs=0 read2_usage=0 changed=False verdict=FAIL
+    SUMMARY {"FAIL": 1} end=2026-10-06T06:25:44.259Z exit=1
+CONTROL-RESULT R6a v1 expected_exit=1 observed_exit=1 elapsed_s=10 OK
+
+--- R6a / v2: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-live-acceptance-20261006.py --port 58634 --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --expect all-logged --wait1 5 --wait2 10 responses:early:0
+    FROZEN version=2.1 script_sha256=15b8cf04134aa8ead6526739e5a95b6dc15f4e5b77d59840e0d03aa56b33301b argv=['--port', '58634', '--db', '$WORK/scratch-home/.local/share/omniroute/storage.sqlite', '--expect', 'all-logged', '--wait1', '5', '--wait2', '10', 'responses:early:0'] cwd=/tmp start=2026-10-06T06:25:45.846Z expect=all-logged wait1=5.0 wait2=10.0 port=58634 db=$WORK/scratch-home/.local/share/omniroute/storage.sqlite effort_close_after=10.0 baseline=None baseline_sha256=None
+    RESULT mode=responses:early:0 http=500 terminal=False closed_early=False stream_s=0.0 corr=None response_id=None read1_call_logs=0 read1_usage=0 window_call_logs=0 window_usage=0 verdict=INCONCLUSIVE reasons=['HTTP status 500', 'call_logs rows for this request: 0 (expected 1)']
+    LATE mode=responses:early:0 read2_call_logs=0 read2_usage=0 changed=False verdict=INCONCLUSIVE reasons=['HTTP status 500', 'call_logs rows for this request: 0 (expected 1)', 'call_logs rows for this request: 0 (expected 1)']
+    SUMMARY {"INCONCLUSIVE": 1} end=2026-10-06T06:25:55.849Z exit=2
+CONTROL-RESULT R6a v2 expected_exit=2 observed_exit=2 elapsed_s=10 OK
+
+### R6c: the gateway answers HTTP 429 (a rate limit, not the build's fault): version 1 fails it as a lost row, version 2 is INCONCLUSIVE
+    stub mode: {"mode": "http-error", "http_status": 429}
+--- R6c / v1: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-live-acceptance-20261005.py --port 58634 --expect all-logged --wait1 5 --wait2 10 responses:early:0   [env: HOME=$WORK/home]
+    FROZEN script_sha256=8aa14054401c00a5af1e8c180fc83af80c79cc0a807da98ea519149291188859 argv=['--port', '58634', '--expect', 'all-logged', '--wait1', '5', '--wait2', '10', 'responses:early:0'] cwd=/tmp start=2026-10-06T06:25:57.437Z expect=all-logged wait1=5.0 wait2=10.0 port=58634
+    RESULT mode=responses:early:0 http=429 terminal=False closed_early=False stream_s=0.0 corr=None response_id=None read1_call_logs=0 read1_usage=0 window_call_logs=0 window_usage=0 verdict=FAIL
+    LATE mode=responses:early:0 read2_call_logs=0 read2_usage=0 changed=False verdict=FAIL
+    SUMMARY {"FAIL": 1} end=2026-10-06T06:26:07.443Z exit=1
+CONTROL-RESULT R6c v1 expected_exit=1 observed_exit=1 elapsed_s=10 OK
+
+--- R6c / v2: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-live-acceptance-20261006.py --port 58634 --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --expect all-logged --wait1 5 --wait2 10 responses:early:0
+    FROZEN version=2.1 script_sha256=15b8cf04134aa8ead6526739e5a95b6dc15f4e5b77d59840e0d03aa56b33301b argv=['--port', '58634', '--db', '$WORK/scratch-home/.local/share/omniroute/storage.sqlite', '--expect', 'all-logged', '--wait1', '5', '--wait2', '10', 'responses:early:0'] cwd=/tmp start=2026-10-06T06:26:09.023Z expect=all-logged wait1=5.0 wait2=10.0 port=58634 db=$WORK/scratch-home/.local/share/omniroute/storage.sqlite effort_close_after=10.0 baseline=None baseline_sha256=None
+    RESULT mode=responses:early:0 http=429 terminal=False closed_early=False stream_s=0.0 corr=None response_id=None read1_call_logs=0 read1_usage=0 window_call_logs=0 window_usage=0 verdict=INCONCLUSIVE reasons=['HTTP status 429', 'call_logs rows for this request: 0 (expected 1)']
+    LATE mode=responses:early:0 read2_call_logs=0 read2_usage=0 changed=False verdict=INCONCLUSIVE reasons=['HTTP status 429', 'call_logs rows for this request: 0 (expected 1)', 'call_logs rows for this request: 0 (expected 1)']
+    SUMMARY {"INCONCLUSIVE": 1} end=2026-10-06T06:26:19.026Z exit=2
+CONTROL-RESULT R6c v2 expected_exit=2 observed_exit=2 elapsed_s=10 OK
+
+### R6b: the gateway answers HTTP 400 (it rejects a request the baseline accepted): both versions fail
+    stub mode: {"mode": "http-error", "http_status": 400}
+--- R6b / v1: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-live-acceptance-20261005.py --port 58634 --expect all-logged --wait1 5 --wait2 10 responses:early:0   [env: HOME=$WORK/home]
+    FROZEN script_sha256=8aa14054401c00a5af1e8c180fc83af80c79cc0a807da98ea519149291188859 argv=['--port', '58634', '--expect', 'all-logged', '--wait1', '5', '--wait2', '10', 'responses:early:0'] cwd=/tmp start=2026-10-06T06:26:20.595Z expect=all-logged wait1=5.0 wait2=10.0 port=58634
+    RESULT mode=responses:early:0 http=400 terminal=False closed_early=False stream_s=0.0 corr=None response_id=None read1_call_logs=0 read1_usage=0 window_call_logs=0 window_usage=0 verdict=FAIL
+    LATE mode=responses:early:0 read2_call_logs=0 read2_usage=0 changed=False verdict=FAIL
+    SUMMARY {"FAIL": 1} end=2026-10-06T06:26:30.599Z exit=1
+CONTROL-RESULT R6b v1 expected_exit=1 observed_exit=1 elapsed_s=10 OK
+
+--- R6b / v2: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-live-acceptance-20261006.py --port 58634 --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --expect all-logged --wait1 5 --wait2 10 responses:early:0
+    FROZEN version=2.1 script_sha256=15b8cf04134aa8ead6526739e5a95b6dc15f4e5b77d59840e0d03aa56b33301b argv=['--port', '58634', '--db', '$WORK/scratch-home/.local/share/omniroute/storage.sqlite', '--expect', 'all-logged', '--wait1', '5', '--wait2', '10', 'responses:early:0'] cwd=/tmp start=2026-10-06T06:26:32.176Z expect=all-logged wait1=5.0 wait2=10.0 port=58634 db=$WORK/scratch-home/.local/share/omniroute/storage.sqlite effort_close_after=10.0 baseline=None baseline_sha256=None
+    RESULT mode=responses:early:0 http=400 terminal=False closed_early=False stream_s=0.0 corr=None response_id=None read1_call_logs=0 read1_usage=0 window_call_logs=0 window_usage=0 verdict=FAIL reasons=['HTTP status 400', 'call_logs rows for this request: 0 (expected 1)']
+    LATE mode=responses:early:0 read2_call_logs=0 read2_usage=0 changed=False verdict=FAIL reasons=['HTTP status 400', 'call_logs rows for this request: 0 (expected 1)', 'call_logs rows for this request: 0 (expected 1)']
+    SUMMARY {"FAIL": 1} end=2026-10-06T06:26:42.179Z exit=1
+CONTROL-RESULT R6b v2 expected_exit=1 observed_exit=1 elapsed_s=10 OK
+
+### R7: only an unrelated request's rows exist (other model, other tokens, other id): both versions fail, rows are attributed by the request's own ids
+    stub mode: {"mode": "unrelated-only"}
+--- R7 / v1: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-live-acceptance-20261005.py --port 58634 --expect all-logged --wait1 5 --wait2 10 responses:early:0 chat:early:0   [env: HOME=$WORK/home]
+    FROZEN script_sha256=8aa14054401c00a5af1e8c180fc83af80c79cc0a807da98ea519149291188859 argv=['--port', '58634', '--expect', 'all-logged', '--wait1', '5', '--wait2', '10', 'responses:early:0', 'chat:early:0'] cwd=/tmp start=2026-10-06T06:26:43.742Z expect=all-logged wait1=5.0 wait2=10.0 port=58634
+    RESULT mode=responses:early:0 http=200 terminal=True closed_early=True stream_s=0.0 corr=None response_id=resp_31f394b4f7284f099912444d read1_call_logs=0 read1_usage=0 window_call_logs=1 window_usage=1 verdict=FAIL
+    RESULT mode=chat:early:0 http=200 terminal=True closed_early=True stream_s=0.0 corr=8b3c872f… response_id=None read1_call_logs=0 read1_usage=0 window_call_logs=1 window_usage=1 verdict=FAIL
+    LATE mode=responses:early:0 read2_call_logs=0 read2_usage=0 changed=False verdict=FAIL
+    LATE mode=chat:early:0 read2_call_logs=0 read2_usage=0 changed=False verdict=FAIL
+    SUMMARY {"FAIL": 2} end=2026-10-06T06:26:58.748Z exit=1
+CONTROL-RESULT R7 v1 expected_exit=1 observed_exit=1 elapsed_s=15 OK
+
+--- R7 / v2: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-live-acceptance-20261006.py --port 58634 --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --expect all-logged --wait1 5 --wait2 10 responses:early:0 chat:early:0
+    FROZEN version=2.1 script_sha256=15b8cf04134aa8ead6526739e5a95b6dc15f4e5b77d59840e0d03aa56b33301b argv=['--port', '58634', '--db', '$WORK/scratch-home/.local/share/omniroute/storage.sqlite', '--expect', 'all-logged', '--wait1', '5', '--wait2', '10', 'responses:early:0', 'chat:early:0'] cwd=/tmp start=2026-10-06T06:27:00.313Z expect=all-logged wait1=5.0 wait2=10.0 port=58634 db=$WORK/scratch-home/.local/share/omniroute/storage.sqlite effort_close_after=10.0 baseline=None baseline_sha256=None
+    RESULT mode=responses:early:0 http=200 terminal=True closed_early=True stream_s=0.0 corr=None response_id=resp_0cc54616abdb43aea7301c6e read1_call_logs=0 read1_usage=0 window_call_logs=1 window_usage=1 verdict=FAIL reasons=['call_logs rows for this request: 0 (expected 1)']
+    RESULT mode=chat:early:0 http=200 terminal=True closed_early=True stream_s=0.0 corr=a8a1c596… response_id=None read1_call_logs=0 read1_usage=0 window_call_logs=1 window_usage=1 verdict=FAIL reasons=['call_logs rows for this request: 0 (expected 1)']
+    LATE mode=responses:early:0 read2_call_logs=0 read2_usage=0 changed=False verdict=FAIL reasons=['call_logs rows for this request: 0 (expected 1)', 'call_logs rows for this request: 0 (expected 1)']
+    LATE mode=chat:early:0 read2_call_logs=0 read2_usage=0 changed=False verdict=FAIL reasons=['call_logs rows for this request: 0 (expected 1)', 'call_logs rows for this request: 0 (expected 1)']
+    SUMMARY {"FAIL": 2} end=2026-10-06T06:27:15.319Z exit=1
+CONTROL-RESULT R7 v2 expected_exit=1 observed_exit=1 elapsed_s=15 OK
+
+### R9: the usage match is ambiguous (two usage rows with the request's model and token counts inside the 3 s window): both versions are INCONCLUSIVE, never a pass
+    stub mode: {"mode": "dup-usage"}
+--- R9 / v1: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-live-acceptance-20261005.py --port 58634 --expect all-logged --wait1 5 --wait2 10 responses:early:0 chat:early:0   [env: HOME=$WORK/home]
+    FROZEN script_sha256=8aa14054401c00a5af1e8c180fc83af80c79cc0a807da98ea519149291188859 argv=['--port', '58634', '--expect', 'all-logged', '--wait1', '5', '--wait2', '10', 'responses:early:0', 'chat:early:0'] cwd=/tmp start=2026-10-06T06:27:16.886Z expect=all-logged wait1=5.0 wait2=10.0 port=58634
+    RESULT mode=responses:early:0 http=200 terminal=True closed_early=True stream_s=0.0 corr=None response_id=resp_17b50f9b5b594772b6f679e3 read1_call_logs=1 read1_usage=2 window_call_logs=1 window_usage=2 verdict=INCONCLUSIVE
+       call_logs: ('2026-10-06T06:27:17.289Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', 'max', 'max')
+       usage_history: ('2026-10-06T06:27:17.289Z', 'gpt-6-astra', '200', 22, 19)
+       usage_history: ('2026-10-06T06:27:17.303Z', 'gpt-6-astra', '200', 22, 19)
+    RESULT mode=chat:early:0 http=200 terminal=True closed_early=True stream_s=0.0 corr=4888fcf5… response_id=None read1_call_logs=1 read1_usage=2 window_call_logs=1 window_usage=2 verdict=INCONCLUSIVE
+       call_logs: ('2026-10-06T06:27:22.294Z', '/v1/chat/completions', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 21, 5, 'ready', None, None)
+       usage_history: ('2026-10-06T06:27:22.294Z', 'gpt-6-astra', '200', 21, 5)
+       usage_history: ('2026-10-06T06:27:22.306Z', 'gpt-6-astra', '200', 21, 5)
+    LATE mode=responses:early:0 read2_call_logs=1 read2_usage=2 changed=False verdict=INCONCLUSIVE
+    LATE mode=chat:early:0 read2_call_logs=1 read2_usage=2 changed=False verdict=INCONCLUSIVE
+    SUMMARY {"INCONCLUSIVE": 2} end=2026-10-06T06:27:31.896Z exit=2
+CONTROL-RESULT R9 v1 expected_exit=2 observed_exit=2 elapsed_s=15 OK
+
+--- R9 / v2: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-live-acceptance-20261006.py --port 58634 --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --expect all-logged --wait1 5 --wait2 10 responses:early:0 chat:early:0
+    FROZEN version=2.1 script_sha256=15b8cf04134aa8ead6526739e5a95b6dc15f4e5b77d59840e0d03aa56b33301b argv=['--port', '58634', '--db', '$WORK/scratch-home/.local/share/omniroute/storage.sqlite', '--expect', 'all-logged', '--wait1', '5', '--wait2', '10', 'responses:early:0', 'chat:early:0'] cwd=/tmp start=2026-10-06T06:27:33.468Z expect=all-logged wait1=5.0 wait2=10.0 port=58634 db=$WORK/scratch-home/.local/share/omniroute/storage.sqlite effort_close_after=10.0 baseline=None baseline_sha256=None
+    RESULT mode=responses:early:0 http=200 terminal=True closed_early=True stream_s=0.0 corr=None response_id=resp_253e08c50c3943abbafa2d67 read1_call_logs=1 read1_usage=2 window_call_logs=1 window_usage=2 verdict=INCONCLUSIVE reasons=["more than one usage row matches the request's model and token counts"]
+       call_logs: ('2026-10-06T06:27:33.870Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', 'max', 'max') id8=d80fc8ef
+       usage_history: ('2026-10-06T06:27:33.870Z', 'gpt-6-astra', '200', 22, 19)
+       usage_history: ('2026-10-06T06:27:33.883Z', 'gpt-6-astra', '200', 22, 19)
+    RESULT mode=chat:early:0 http=200 terminal=True closed_early=True stream_s=0.0 corr=fe8a692d… response_id=None read1_call_logs=1 read1_usage=2 window_call_logs=1 window_usage=2 verdict=INCONCLUSIVE reasons=["more than one usage row matches the request's model and token counts"]
+       call_logs: ('2026-10-06T06:27:38.875Z', '/v1/chat/completions', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 21, 5, 'ready', None, None) id8=b1e2766d
+       usage_history: ('2026-10-06T06:27:38.875Z', 'gpt-6-astra', '200', 21, 5)
+       usage_history: ('2026-10-06T06:27:38.888Z', 'gpt-6-astra', '200', 21, 5)
+    LATE mode=responses:early:0 read2_call_logs=1 read2_usage=2 changed=False verdict=INCONCLUSIVE reasons=["more than one usage row matches the request's model and token counts", "more than one usage row matches the request's model and token counts"]
+    LATE mode=chat:early:0 read2_call_logs=1 read2_usage=2 changed=False verdict=INCONCLUSIVE reasons=["more than one usage row matches the request's model and token counts", "more than one usage row matches the request's model and token counts"]
+    SUMMARY {"INCONCLUSIVE": 2} end=2026-10-06T06:27:48.476Z exit=2
+CONTROL-RESULT R9 v2 expected_exit=2 observed_exit=2 elapsed_s=15 OK
+
+### R8 baselines: version 2.1 in observe mode against the healthy stub (three attempts, the stub writes max/max), against a stub whose responses all lack the effort columns, and one with a different upstream effort
+--- R8-baseline / healthy three attempts: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-live-acceptance-20261006.py --port 58634 --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --expect observe --wait1 5 --wait2 10 --effort-close-after 3 effort:cx/gpt-6-astra:max effort:cx/gpt-6-astra:max effort:cx/gpt-6-astra:max
+    FROZEN version=2.1 script_sha256=15b8cf04134aa8ead6526739e5a95b6dc15f4e5b77d59840e0d03aa56b33301b argv=['--port', '58634', '--db', '$WORK/scratch-home/.local/share/omniroute/storage.sqlite', '--expect', 'observe', '--wait1', '5', '--wait2', '10', '--effort-close-after', '3', 'effort:cx/gpt-6-astra:max', 'effort:cx/gpt-6-astra:max', 'effort:cx/gpt-6-astra:max'] cwd=/tmp start=2026-10-06T06:27:50.045Z expect=observe wait1=5.0 wait2=10.0 port=58634 db=$WORK/scratch-home/.local/share/omniroute/storage.sqlite effort_close_after=3.0 baseline=None baseline_sha256=None
+    RESULT mode=effort:cx/gpt-6-astra:max http=200 terminal=True closed_early=True stream_s=3.0 corr=None response_id=resp_adaf7c62bbf2478ea2532a56 read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=OBSERVED
+       call_logs: ('2026-10-06T06:27:53.049Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', 'max', 'max') id8=163e70d1
+       usage_history: ('2026-10-06T06:27:53.049Z', 'gpt-6-astra', '200', 22, 19)
+    EFFORT mode=effort:cx/gpt-6-astra:max model=gpt-6-astra requested_model=codex/gpt-6-astra effort_requested=max effort_upstream=max observed=True
+    RESULT mode=effort:cx/gpt-6-astra:max http=200 terminal=True closed_early=True stream_s=3.0 corr=None response_id=resp_4f28504be8ad44d5a3ef8861 read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=OBSERVED
+       call_logs: ('2026-10-06T06:28:01.054Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', 'max', 'max') id8=728201ca
+       usage_history: ('2026-10-06T06:28:01.054Z', 'gpt-6-astra', '200', 22, 19)
+    EFFORT mode=effort:cx/gpt-6-astra:max model=gpt-6-astra requested_model=codex/gpt-6-astra effort_requested=max effort_upstream=max observed=True
+    RESULT mode=effort:cx/gpt-6-astra:max http=200 terminal=True closed_early=True stream_s=3.0 corr=None response_id=resp_f9ba7fffcd1a4b36848342cf read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=OBSERVED
+       call_logs: ('2026-10-06T06:28:09.057Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', 'max', 'max') id8=079eb459
+       usage_history: ('2026-10-06T06:28:09.057Z', 'gpt-6-astra', '200', 22, 19)
+    EFFORT mode=effort:cx/gpt-6-astra:max model=gpt-6-astra requested_model=codex/gpt-6-astra effort_requested=max effort_upstream=max observed=True
+    LATE mode=effort:cx/gpt-6-astra:max read2_call_logs=1 read2_usage=1 changed=False verdict=OBSERVED
+    LATE mode=effort:cx/gpt-6-astra:max read2_call_logs=1 read2_usage=1 changed=False verdict=OBSERVED
+    LATE mode=effort:cx/gpt-6-astra:max read2_call_logs=1 read2_usage=1 changed=False verdict=OBSERVED
+    EFFORT-GROUP mode=effort:cx/gpt-6-astra:max attempts=3 observed=3 values=[('gpt-6-astra', 'codex/gpt-6-astra', 'max', 'max')] verdict=OBSERVED
+    SUMMARY {"OBSERVED": 4} end=2026-10-06T06:28:19.056Z exit=0
+CONTROL-RESULT R8-baseline healthy three attempts expected_exit=0 observed_exit=0 elapsed_s=29 OK
+
+--- R8-baseline / all-null three attempts: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-live-acceptance-20261006.py --port 58634 --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --expect observe --wait1 5 --wait2 10 --effort-close-after 3 effort:cx/gpt-6-astra:max effort:cx/gpt-6-astra:max effort:cx/gpt-6-astra:max
+    FROZEN version=2.1 script_sha256=15b8cf04134aa8ead6526739e5a95b6dc15f4e5b77d59840e0d03aa56b33301b argv=['--port', '58634', '--db', '$WORK/scratch-home/.local/share/omniroute/storage.sqlite', '--expect', 'observe', '--wait1', '5', '--wait2', '10', '--effort-close-after', '3', 'effort:cx/gpt-6-astra:max', 'effort:cx/gpt-6-astra:max', 'effort:cx/gpt-6-astra:max'] cwd=/tmp start=2026-10-06T06:28:20.631Z expect=observe wait1=5.0 wait2=10.0 port=58634 db=$WORK/scratch-home/.local/share/omniroute/storage.sqlite effort_close_after=3.0 baseline=None baseline_sha256=None
+    RESULT mode=effort:cx/gpt-6-astra:max http=200 terminal=True closed_early=True stream_s=3.0 corr=None response_id=resp_843285ad75fa44f597b93db1 read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=OBSERVED
+       call_logs: ('2026-10-06T06:28:23.635Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', None, None) id8=c5d4e55c
+       usage_history: ('2026-10-06T06:28:23.635Z', 'gpt-6-astra', '200', 22, 19)
+    EFFORT mode=effort:cx/gpt-6-astra:max model=gpt-6-astra requested_model=codex/gpt-6-astra effort_requested=None effort_upstream=None observed=False
+    RESULT mode=effort:cx/gpt-6-astra:max http=200 terminal=True closed_early=True stream_s=3.0 corr=None response_id=resp_7e707d1e8010468bbc165e4c read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=OBSERVED
+       call_logs: ('2026-10-06T06:28:31.640Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', None, None) id8=29269cc2
+       usage_history: ('2026-10-06T06:28:31.640Z', 'gpt-6-astra', '200', 22, 19)
+    EFFORT mode=effort:cx/gpt-6-astra:max model=gpt-6-astra requested_model=codex/gpt-6-astra effort_requested=None effort_upstream=None observed=False
+    RESULT mode=effort:cx/gpt-6-astra:max http=200 terminal=True closed_early=True stream_s=3.0 corr=None response_id=resp_2b5fc067a3ca4cf1b6f5d2e7 read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=OBSERVED
+       call_logs: ('2026-10-06T06:28:39.642Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', None, None) id8=71df1236
+       usage_history: ('2026-10-06T06:28:39.642Z', 'gpt-6-astra', '200', 22, 19)
+    EFFORT mode=effort:cx/gpt-6-astra:max model=gpt-6-astra requested_model=codex/gpt-6-astra effort_requested=None effort_upstream=None observed=False
+    LATE mode=effort:cx/gpt-6-astra:max read2_call_logs=1 read2_usage=1 changed=False verdict=OBSERVED
+    LATE mode=effort:cx/gpt-6-astra:max read2_call_logs=1 read2_usage=1 changed=False verdict=OBSERVED
+    LATE mode=effort:cx/gpt-6-astra:max read2_call_logs=1 read2_usage=1 changed=False verdict=OBSERVED
+    EFFORT-GROUP mode=effort:cx/gpt-6-astra:max attempts=3 observed=0 values=[] verdict=OBSERVED
+    SUMMARY {"OBSERVED": 4} end=2026-10-06T06:28:49.642Z exit=0
+CONTROL-RESULT R8-baseline all-null three attempts expected_exit=0 observed_exit=0 elapsed_s=29 OK
+
+--- R8-baseline / xhigh three attempts: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-live-acceptance-20261006.py --port 58634 --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --expect observe --wait1 5 --wait2 10 --effort-close-after 3 effort:cx/gpt-6-astra:max effort:cx/gpt-6-astra:max effort:cx/gpt-6-astra:max
+    FROZEN version=2.1 script_sha256=15b8cf04134aa8ead6526739e5a95b6dc15f4e5b77d59840e0d03aa56b33301b argv=['--port', '58634', '--db', '$WORK/scratch-home/.local/share/omniroute/storage.sqlite', '--expect', 'observe', '--wait1', '5', '--wait2', '10', '--effort-close-after', '3', 'effort:cx/gpt-6-astra:max', 'effort:cx/gpt-6-astra:max', 'effort:cx/gpt-6-astra:max'] cwd=/tmp start=2026-10-06T06:28:51.212Z expect=observe wait1=5.0 wait2=10.0 port=58634 db=$WORK/scratch-home/.local/share/omniroute/storage.sqlite effort_close_after=3.0 baseline=None baseline_sha256=None
+    RESULT mode=effort:cx/gpt-6-astra:max http=200 terminal=True closed_early=True stream_s=3.0 corr=None response_id=resp_a146eb4a6371446f801096c3 read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=OBSERVED
+       call_logs: ('2026-10-06T06:28:54.216Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', 'max', 'xhigh') id8=38a6f3c0
+       usage_history: ('2026-10-06T06:28:54.216Z', 'gpt-6-astra', '200', 22, 19)
+    EFFORT mode=effort:cx/gpt-6-astra:max model=gpt-6-astra requested_model=codex/gpt-6-astra effort_requested=max effort_upstream=xhigh observed=True
+    RESULT mode=effort:cx/gpt-6-astra:max http=200 terminal=True closed_early=True stream_s=3.0 corr=None response_id=resp_aa0fd65afa714c95a9d97e08 read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=OBSERVED
+       call_logs: ('2026-10-06T06:29:02.221Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', 'max', 'xhigh') id8=f25f557e
+       usage_history: ('2026-10-06T06:29:02.221Z', 'gpt-6-astra', '200', 22, 19)
+    EFFORT mode=effort:cx/gpt-6-astra:max model=gpt-6-astra requested_model=codex/gpt-6-astra effort_requested=max effort_upstream=xhigh observed=True
+    RESULT mode=effort:cx/gpt-6-astra:max http=200 terminal=True closed_early=True stream_s=3.0 corr=None response_id=resp_0f5e98f7c4d44ac58a4c7dd6 read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=OBSERVED
+       call_logs: ('2026-10-06T06:29:10.224Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', 'max', 'xhigh') id8=30c91a98
+       usage_history: ('2026-10-06T06:29:10.224Z', 'gpt-6-astra', '200', 22, 19)
+    EFFORT mode=effort:cx/gpt-6-astra:max model=gpt-6-astra requested_model=codex/gpt-6-astra effort_requested=max effort_upstream=xhigh observed=True
+    LATE mode=effort:cx/gpt-6-astra:max read2_call_logs=1 read2_usage=1 changed=False verdict=OBSERVED
+    LATE mode=effort:cx/gpt-6-astra:max read2_call_logs=1 read2_usage=1 changed=False verdict=OBSERVED
+    LATE mode=effort:cx/gpt-6-astra:max read2_call_logs=1 read2_usage=1 changed=False verdict=OBSERVED
+    EFFORT-GROUP mode=effort:cx/gpt-6-astra:max attempts=3 observed=3 values=[('gpt-6-astra', 'codex/gpt-6-astra', 'max', 'xhigh')] verdict=OBSERVED
+    SUMMARY {"OBSERVED": 4} end=2026-10-06T06:29:20.224Z exit=0
+CONTROL-RESULT R8-baseline xhigh three attempts expected_exit=0 observed_exit=0 elapsed_s=29 OK
+
+### R8a: healthy canary, three attempts, all observed and equal to the baseline: PASS
+    stub mode: {"mode": "normal"}
+--- R8a / v2.1: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-live-acceptance-20261006.py --port 58634 --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --expect all-logged --baseline $WORK/effort-baseline-healthy.txt --wait1 5 --wait2 10 --effort-close-after 3 effort:cx/gpt-6-astra:max effort:cx/gpt-6-astra:max effort:cx/gpt-6-astra:max
+    FROZEN version=2.1 script_sha256=15b8cf04134aa8ead6526739e5a95b6dc15f4e5b77d59840e0d03aa56b33301b argv=['--port', '58634', '--db', '$WORK/scratch-home/.local/share/omniroute/storage.sqlite', '--expect', 'all-logged', '--baseline', '$WORK/effort-baseline-healthy.txt', '--wait1', '5', '--wait2', '10', '--effort-close-after', '3', 'effort:cx/gpt-6-astra:max', 'effort:cx/gpt-6-astra:max', 'effort:cx/gpt-6-astra:max'] cwd=/tmp start=2026-10-06T06:29:21.808Z expect=all-logged wait1=5.0 wait2=10.0 port=58634 db=$WORK/scratch-home/.local/share/omniroute/storage.sqlite effort_close_after=3.0 baseline=$WORK/effort-baseline-healthy.txt baseline_sha256=8bdf8ec22f4ffdc22e76fb4903048c069e370aff24a2936f722d52094db9de2d
+    RESULT mode=effort:cx/gpt-6-astra:max http=200 terminal=True closed_early=True stream_s=3.0 corr=None response_id=resp_57fa9885b2364abeb0d20f8a read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=PASS
+       call_logs: ('2026-10-06T06:29:24.812Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', 'max', 'max') id8=5215acb3
+       usage_history: ('2026-10-06T06:29:24.812Z', 'gpt-6-astra', '200', 22, 19)
+    EFFORT mode=effort:cx/gpt-6-astra:max model=gpt-6-astra requested_model=codex/gpt-6-astra effort_requested=max effort_upstream=max observed=True
+    RESULT mode=effort:cx/gpt-6-astra:max http=200 terminal=True closed_early=True stream_s=3.0 corr=None response_id=resp_a8b4f2f19d9848caa97e9299 read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=PASS
+       call_logs: ('2026-10-06T06:29:32.817Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', 'max', 'max') id8=f01b3210
+       usage_history: ('2026-10-06T06:29:32.817Z', 'gpt-6-astra', '200', 22, 19)
+    EFFORT mode=effort:cx/gpt-6-astra:max model=gpt-6-astra requested_model=codex/gpt-6-astra effort_requested=max effort_upstream=max observed=True
+    RESULT mode=effort:cx/gpt-6-astra:max http=200 terminal=True closed_early=True stream_s=3.0 corr=None response_id=resp_bde443ade7e841ef8d7ca06e read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=PASS
+       call_logs: ('2026-10-06T06:29:40.819Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', 'max', 'max') id8=061ed6db
+       usage_history: ('2026-10-06T06:29:40.819Z', 'gpt-6-astra', '200', 22, 19)
+    EFFORT mode=effort:cx/gpt-6-astra:max model=gpt-6-astra requested_model=codex/gpt-6-astra effort_requested=max effort_upstream=max observed=True
+    LATE mode=effort:cx/gpt-6-astra:max read2_call_logs=1 read2_usage=1 changed=False verdict=PASS
+    LATE mode=effort:cx/gpt-6-astra:max read2_call_logs=1 read2_usage=1 changed=False verdict=PASS
+    LATE mode=effort:cx/gpt-6-astra:max read2_call_logs=1 read2_usage=1 changed=False verdict=PASS
+    EFFORT-GROUP mode=effort:cx/gpt-6-astra:max attempts=3 observed=3 expected=('gpt-6-astra', 'codex/gpt-6-astra', 'max', 'max') values=[('gpt-6-astra', 'codex/gpt-6-astra', 'max', 'max')] verdict=PASS
+    SUMMARY {"PASS": 4} end=2026-10-06T06:29:50.819Z exit=0
+CONTROL-RESULT R8a v2.1 expected_exit=0 observed_exit=0 elapsed_s=29 OK
+
+### R8b: the upstream effort differs from the baseline's on every attempt (xhigh against max): FAIL
+    stub mode: {"mode": "normal", "effort_upstream_override": "xhigh"}
+--- R8b / v2.1: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-live-acceptance-20261006.py --port 58634 --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --expect all-logged --baseline $WORK/effort-baseline-healthy.txt --wait1 5 --wait2 10 --effort-close-after 3 effort:cx/gpt-6-astra:max effort:cx/gpt-6-astra:max effort:cx/gpt-6-astra:max
+    FROZEN version=2.1 script_sha256=15b8cf04134aa8ead6526739e5a95b6dc15f4e5b77d59840e0d03aa56b33301b argv=['--port', '58634', '--db', '$WORK/scratch-home/.local/share/omniroute/storage.sqlite', '--expect', 'all-logged', '--baseline', '$WORK/effort-baseline-healthy.txt', '--wait1', '5', '--wait2', '10', '--effort-close-after', '3', 'effort:cx/gpt-6-astra:max', 'effort:cx/gpt-6-astra:max', 'effort:cx/gpt-6-astra:max'] cwd=/tmp start=2026-10-06T06:29:52.382Z expect=all-logged wait1=5.0 wait2=10.0 port=58634 db=$WORK/scratch-home/.local/share/omniroute/storage.sqlite effort_close_after=3.0 baseline=$WORK/effort-baseline-healthy.txt baseline_sha256=8bdf8ec22f4ffdc22e76fb4903048c069e370aff24a2936f722d52094db9de2d
+    RESULT mode=effort:cx/gpt-6-astra:max http=200 terminal=True closed_early=True stream_s=3.0 corr=None response_id=resp_2f34247402d143a295b5f17c read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=PASS
+       call_logs: ('2026-10-06T06:29:55.386Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', 'max', 'xhigh') id8=c21186ff
+       usage_history: ('2026-10-06T06:29:55.386Z', 'gpt-6-astra', '200', 22, 19)
+    EFFORT mode=effort:cx/gpt-6-astra:max model=gpt-6-astra requested_model=codex/gpt-6-astra effort_requested=max effort_upstream=xhigh observed=True
+    RESULT mode=effort:cx/gpt-6-astra:max http=200 terminal=True closed_early=True stream_s=3.0 corr=None response_id=resp_0395043faf5149d6b9ae8ac7 read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=PASS
+       call_logs: ('2026-10-06T06:30:03.391Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', 'max', 'xhigh') id8=4feba7d7
+       usage_history: ('2026-10-06T06:30:03.391Z', 'gpt-6-astra', '200', 22, 19)
+    EFFORT mode=effort:cx/gpt-6-astra:max model=gpt-6-astra requested_model=codex/gpt-6-astra effort_requested=max effort_upstream=xhigh observed=True
+    RESULT mode=effort:cx/gpt-6-astra:max http=200 terminal=True closed_early=True stream_s=3.0 corr=None response_id=resp_26a5b9191e1542ef9323252b read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=PASS
+       call_logs: ('2026-10-06T06:30:11.394Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', 'max', 'xhigh') id8=4d98f0ed
+       usage_history: ('2026-10-06T06:30:11.394Z', 'gpt-6-astra', '200', 22, 19)
+    EFFORT mode=effort:cx/gpt-6-astra:max model=gpt-6-astra requested_model=codex/gpt-6-astra effort_requested=max effort_upstream=xhigh observed=True
+    LATE mode=effort:cx/gpt-6-astra:max read2_call_logs=1 read2_usage=1 changed=False verdict=PASS
+    LATE mode=effort:cx/gpt-6-astra:max read2_call_logs=1 read2_usage=1 changed=False verdict=PASS
+    LATE mode=effort:cx/gpt-6-astra:max read2_call_logs=1 read2_usage=1 changed=False verdict=PASS
+    EFFORT-GROUP mode=effort:cx/gpt-6-astra:max attempts=3 observed=3 expected=('gpt-6-astra', 'codex/gpt-6-astra', 'max', 'max') values=[('gpt-6-astra', 'codex/gpt-6-astra', 'max', 'xhigh')] verdict=FAIL reasons=["attempt 1: effort columns ('gpt-6-astra', 'codex/gpt-6-astra', 'max', 'xhigh') differ from the baseline's ('gpt-6-astra', 'codex/gpt-6-astra', 'max', 'max')", "attempt 2: effort columns ('gpt-6-astra', 'codex/gpt-6-astra', 'max', 'xhigh') differ from the baseline's ('gpt-6-astra', 'codex/gpt-6-astra', 'max', 'max')", "attempt 3: effort columns ('gpt-6-astra', 'codex/gpt-6-astra', 'max', 'xhigh') differ from the baseline's ('gpt-6-astra', 'codex/gpt-6-astra', 'max', 'max')"]
+    SUMMARY {"FAIL": 1, "PASS": 3} end=2026-10-06T06:30:21.393Z exit=1
+CONTROL-RESULT R8b v2.1 expected_exit=1 observed_exit=1 elapsed_s=29 OK
+
+### R8c: no attempt carries the effort columns (all NULL): the rows pass, the group is INCONCLUSIVE, never a FAIL and never a PASS
+    stub mode: {"mode": "normal", "null_effort": [true]}
+--- R8c / v2.1: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-live-acceptance-20261006.py --port 58634 --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --expect all-logged --baseline $WORK/effort-baseline-healthy.txt --wait1 5 --wait2 10 --effort-close-after 3 effort:cx/gpt-6-astra:max effort:cx/gpt-6-astra:max effort:cx/gpt-6-astra:max
+    FROZEN version=2.1 script_sha256=15b8cf04134aa8ead6526739e5a95b6dc15f4e5b77d59840e0d03aa56b33301b argv=['--port', '58634', '--db', '$WORK/scratch-home/.local/share/omniroute/storage.sqlite', '--expect', 'all-logged', '--baseline', '$WORK/effort-baseline-healthy.txt', '--wait1', '5', '--wait2', '10', '--effort-close-after', '3', 'effort:cx/gpt-6-astra:max', 'effort:cx/gpt-6-astra:max', 'effort:cx/gpt-6-astra:max'] cwd=/tmp start=2026-10-06T06:30:22.967Z expect=all-logged wait1=5.0 wait2=10.0 port=58634 db=$WORK/scratch-home/.local/share/omniroute/storage.sqlite effort_close_after=3.0 baseline=$WORK/effort-baseline-healthy.txt baseline_sha256=8bdf8ec22f4ffdc22e76fb4903048c069e370aff24a2936f722d52094db9de2d
+    RESULT mode=effort:cx/gpt-6-astra:max http=200 terminal=True closed_early=True stream_s=3.0 corr=None response_id=resp_d98767b3b1fc40a0b04e9787 read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=PASS
+       call_logs: ('2026-10-06T06:30:25.970Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', None, None) id8=59ef732d
+       usage_history: ('2026-10-06T06:30:25.970Z', 'gpt-6-astra', '200', 22, 19)
+    EFFORT mode=effort:cx/gpt-6-astra:max model=gpt-6-astra requested_model=codex/gpt-6-astra effort_requested=None effort_upstream=None observed=False
+    RESULT mode=effort:cx/gpt-6-astra:max http=200 terminal=True closed_early=True stream_s=3.0 corr=None response_id=resp_9ad292b91e5c4d7db9b43cd4 read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=PASS
+       call_logs: ('2026-10-06T06:30:33.977Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', None, None) id8=aef03f5c
+       usage_history: ('2026-10-06T06:30:33.977Z', 'gpt-6-astra', '200', 22, 19)
+    EFFORT mode=effort:cx/gpt-6-astra:max model=gpt-6-astra requested_model=codex/gpt-6-astra effort_requested=None effort_upstream=None observed=False
+    RESULT mode=effort:cx/gpt-6-astra:max http=200 terminal=True closed_early=True stream_s=3.0 corr=None response_id=resp_2ca66d5b69684e538ccc9153 read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=PASS
+       call_logs: ('2026-10-06T06:30:41.979Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', None, None) id8=5d6f298e
+       usage_history: ('2026-10-06T06:30:41.979Z', 'gpt-6-astra', '200', 22, 19)
+    EFFORT mode=effort:cx/gpt-6-astra:max model=gpt-6-astra requested_model=codex/gpt-6-astra effort_requested=None effort_upstream=None observed=False
+    LATE mode=effort:cx/gpt-6-astra:max read2_call_logs=1 read2_usage=1 changed=False verdict=PASS
+    LATE mode=effort:cx/gpt-6-astra:max read2_call_logs=1 read2_usage=1 changed=False verdict=PASS
+    LATE mode=effort:cx/gpt-6-astra:max read2_call_logs=1 read2_usage=1 changed=False verdict=PASS
+    EFFORT-GROUP mode=effort:cx/gpt-6-astra:max attempts=3 observed=0 expected=('gpt-6-astra', 'codex/gpt-6-astra', 'max', 'max') values=[] verdict=INCONCLUSIVE reasons=['none of the 3 attempts carried the effort columns (the gateway stores them only for responses with encrypted reasoning)']
+    SUMMARY {"INCONCLUSIVE": 1, "PASS": 3} end=2026-10-06T06:30:51.979Z exit=2
+CONTROL-RESULT R8c v2.1 expected_exit=2 observed_exit=2 elapsed_s=29 OK
+
+### R8d: one attempt of three without the effort columns, two observed and equal: PASS (the NULL attempt is unobservable, not wrong)
+    stub mode: {"mode": "normal", "null_effort": [true, false, false]}
+--- R8d / v2.1: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-live-acceptance-20261006.py --port 58634 --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --expect all-logged --baseline $WORK/effort-baseline-healthy.txt --wait1 5 --wait2 10 --effort-close-after 3 effort:cx/gpt-6-astra:max effort:cx/gpt-6-astra:max effort:cx/gpt-6-astra:max
+    FROZEN version=2.1 script_sha256=15b8cf04134aa8ead6526739e5a95b6dc15f4e5b77d59840e0d03aa56b33301b argv=['--port', '58634', '--db', '$WORK/scratch-home/.local/share/omniroute/storage.sqlite', '--expect', 'all-logged', '--baseline', '$WORK/effort-baseline-healthy.txt', '--wait1', '5', '--wait2', '10', '--effort-close-after', '3', 'effort:cx/gpt-6-astra:max', 'effort:cx/gpt-6-astra:max', 'effort:cx/gpt-6-astra:max'] cwd=/tmp start=2026-10-06T06:30:53.581Z expect=all-logged wait1=5.0 wait2=10.0 port=58634 db=$WORK/scratch-home/.local/share/omniroute/storage.sqlite effort_close_after=3.0 baseline=$WORK/effort-baseline-healthy.txt baseline_sha256=8bdf8ec22f4ffdc22e76fb4903048c069e370aff24a2936f722d52094db9de2d
+    RESULT mode=effort:cx/gpt-6-astra:max http=200 terminal=True closed_early=True stream_s=3.0 corr=None response_id=resp_cdd0baadc2764554b41c064b read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=PASS
+       call_logs: ('2026-10-06T06:30:56.586Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', None, None) id8=e4e87eff
+       usage_history: ('2026-10-06T06:30:56.586Z', 'gpt-6-astra', '200', 22, 19)
+    EFFORT mode=effort:cx/gpt-6-astra:max model=gpt-6-astra requested_model=codex/gpt-6-astra effort_requested=None effort_upstream=None observed=False
+    RESULT mode=effort:cx/gpt-6-astra:max http=200 terminal=True closed_early=True stream_s=3.0 corr=None response_id=resp_e870821b57f144c8a385879c read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=PASS
+       call_logs: ('2026-10-06T06:31:04.592Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', 'max', 'max') id8=19b892b1
+       usage_history: ('2026-10-06T06:31:04.592Z', 'gpt-6-astra', '200', 22, 19)
+    EFFORT mode=effort:cx/gpt-6-astra:max model=gpt-6-astra requested_model=codex/gpt-6-astra effort_requested=max effort_upstream=max observed=True
+    RESULT mode=effort:cx/gpt-6-astra:max http=200 terminal=True closed_early=True stream_s=3.0 corr=None response_id=resp_22321b760955451d91d5bfc1 read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=PASS
+       call_logs: ('2026-10-06T06:31:12.596Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', 'max', 'max') id8=4fa1a79b
+       usage_history: ('2026-10-06T06:31:12.596Z', 'gpt-6-astra', '200', 22, 19)
+    EFFORT mode=effort:cx/gpt-6-astra:max model=gpt-6-astra requested_model=codex/gpt-6-astra effort_requested=max effort_upstream=max observed=True
+    LATE mode=effort:cx/gpt-6-astra:max read2_call_logs=1 read2_usage=1 changed=False verdict=PASS
+    LATE mode=effort:cx/gpt-6-astra:max read2_call_logs=1 read2_usage=1 changed=False verdict=PASS
+    LATE mode=effort:cx/gpt-6-astra:max read2_call_logs=1 read2_usage=1 changed=False verdict=PASS
+    EFFORT-GROUP mode=effort:cx/gpt-6-astra:max attempts=3 observed=2 expected=('gpt-6-astra', 'codex/gpt-6-astra', 'max', 'max') values=[('gpt-6-astra', 'codex/gpt-6-astra', 'max', 'max')] verdict=PASS
+    SUMMARY {"PASS": 4} end=2026-10-06T06:31:22.596Z exit=0
+CONTROL-RESULT R8d v2.1 expected_exit=0 observed_exit=0 elapsed_s=29 OK
+
+### R8e: two attempts NULL and the one observed attempt differs (xhigh): FAIL
+    stub mode: {"mode": "normal", "null_effort": [true, true, false], "effort_upstream_override": "xhigh"}
+--- R8e / v2.1: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-live-acceptance-20261006.py --port 58634 --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --expect all-logged --baseline $WORK/effort-baseline-healthy.txt --wait1 5 --wait2 10 --effort-close-after 3 effort:cx/gpt-6-astra:max effort:cx/gpt-6-astra:max effort:cx/gpt-6-astra:max
+    FROZEN version=2.1 script_sha256=15b8cf04134aa8ead6526739e5a95b6dc15f4e5b77d59840e0d03aa56b33301b argv=['--port', '58634', '--db', '$WORK/scratch-home/.local/share/omniroute/storage.sqlite', '--expect', 'all-logged', '--baseline', '$WORK/effort-baseline-healthy.txt', '--wait1', '5', '--wait2', '10', '--effort-close-after', '3', 'effort:cx/gpt-6-astra:max', 'effort:cx/gpt-6-astra:max', 'effort:cx/gpt-6-astra:max'] cwd=/tmp start=2026-10-06T06:31:24.194Z expect=all-logged wait1=5.0 wait2=10.0 port=58634 db=$WORK/scratch-home/.local/share/omniroute/storage.sqlite effort_close_after=3.0 baseline=$WORK/effort-baseline-healthy.txt baseline_sha256=8bdf8ec22f4ffdc22e76fb4903048c069e370aff24a2936f722d52094db9de2d
+    RESULT mode=effort:cx/gpt-6-astra:max http=200 terminal=True closed_early=True stream_s=3.0 corr=None response_id=resp_10aec6d39e594f45b3df5d24 read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=PASS
+       call_logs: ('2026-10-06T06:31:27.198Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', None, None) id8=602359c4
+       usage_history: ('2026-10-06T06:31:27.198Z', 'gpt-6-astra', '200', 22, 19)
+    EFFORT mode=effort:cx/gpt-6-astra:max model=gpt-6-astra requested_model=codex/gpt-6-astra effort_requested=None effort_upstream=None observed=False
+    RESULT mode=effort:cx/gpt-6-astra:max http=200 terminal=True closed_early=True stream_s=3.0 corr=None response_id=resp_36ed94130f7c406fbf0b82af read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=PASS
+       call_logs: ('2026-10-06T06:31:35.203Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', None, None) id8=4d2e8155
+       usage_history: ('2026-10-06T06:31:35.203Z', 'gpt-6-astra', '200', 22, 19)
+    EFFORT mode=effort:cx/gpt-6-astra:max model=gpt-6-astra requested_model=codex/gpt-6-astra effort_requested=None effort_upstream=None observed=False
+    RESULT mode=effort:cx/gpt-6-astra:max http=200 terminal=True closed_early=True stream_s=3.0 corr=None response_id=resp_6cfb6d951ffc4261a85b6565 read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=PASS
+       call_logs: ('2026-10-06T06:31:43.206Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', 'max', 'xhigh') id8=c603cd5b
+       usage_history: ('2026-10-06T06:31:43.206Z', 'gpt-6-astra', '200', 22, 19)
+    EFFORT mode=effort:cx/gpt-6-astra:max model=gpt-6-astra requested_model=codex/gpt-6-astra effort_requested=max effort_upstream=xhigh observed=True
+    LATE mode=effort:cx/gpt-6-astra:max read2_call_logs=1 read2_usage=1 changed=False verdict=PASS
+    LATE mode=effort:cx/gpt-6-astra:max read2_call_logs=1 read2_usage=1 changed=False verdict=PASS
+    LATE mode=effort:cx/gpt-6-astra:max read2_call_logs=1 read2_usage=1 changed=False verdict=PASS
+    EFFORT-GROUP mode=effort:cx/gpt-6-astra:max attempts=3 observed=1 expected=('gpt-6-astra', 'codex/gpt-6-astra', 'max', 'max') values=[('gpt-6-astra', 'codex/gpt-6-astra', 'max', 'xhigh')] verdict=FAIL reasons=["attempt 3: effort columns ('gpt-6-astra', 'codex/gpt-6-astra', 'max', 'xhigh') differ from the baseline's ('gpt-6-astra', 'codex/gpt-6-astra', 'max', 'max')"]
+    SUMMARY {"FAIL": 1, "PASS": 3} end=2026-10-06T06:31:53.206Z exit=1
+CONTROL-RESULT R8e v2.1 expected_exit=1 observed_exit=1 elapsed_s=29 OK
+
+### R8f: the baseline file holds no OBSERVED effort line for the mode (every baseline attempt had NULL columns): exit 3 before any request
+    stub mode: {"mode": "normal"}
+--- R8f / v2.1: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-live-acceptance-20261006.py --port 58634 --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --expect all-logged --baseline $WORK/effort-baseline-all-null.txt --wait1 5 --wait2 10 --effort-close-after 3 effort:cx/gpt-6-astra:max effort:cx/gpt-6-astra:max effort:cx/gpt-6-astra:max
+    ERROR usage: preflight: the baseline file has no OBSERVED EFFORT line for effort:cx/gpt-6-astra:max (every attempt of the probe had NULL effort columns, or the file was not written by this script version)
+CONTROL-RESULT R8f v2.1 expected_exit=3 observed_exit=3 elapsed_s=0 OK
+
+### R8g: the baseline's observed lines for the mode disagree (max and xhigh): exit 3 before any request
+    stub mode: {"mode": "normal"}
+--- R8g / v2.1: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-live-acceptance-20261006.py --port 58634 --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --expect all-logged --baseline $WORK/effort-baseline-mixed.txt --wait1 5 --wait2 10 --effort-close-after 3 effort:cx/gpt-6-astra:max effort:cx/gpt-6-astra:max effort:cx/gpt-6-astra:max
+    ERROR usage: preflight: the baseline's observed EFFORT lines for effort:cx/gpt-6-astra:max disagree: [('gpt-6-astra', 'codex/gpt-6-astra', 'max', 'max'), ('gpt-6-astra', 'codex/gpt-6-astra', 'max', 'xhigh')]
+CONTROL-RESULT R8g v2.1 expected_exit=3 observed_exit=3 elapsed_s=0 OK
+
+### R8h: VERSION 2.0 (the first version of this script, kept in superseded/) with ONE attempt of which the gateway stored no effort columns: it FAILS a healthy canary, the flaw this round fixes
+    stub mode: {"mode": "normal", "null_effort": [true]}
+--- R8h / v2.0: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-live-acceptance-20261006-v2.0.py --port 58634 --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --expect all-logged --baseline $WORK/effort-baseline-healthy.txt --wait1 5 --wait2 10 effort:cx/gpt-6-astra:max
+    FROZEN version=2 script_sha256=fa8fa6f8dc3a0e7360be4a0737c34daaf4d4b58696df6a7ab3483896cb739e82 argv=['--port', '58634', '--db', '$WORK/scratch-home/.local/share/omniroute/storage.sqlite', '--expect', 'all-logged', '--baseline', '$WORK/effort-baseline-healthy.txt', '--wait1', '5', '--wait2', '10', 'effort:cx/gpt-6-astra:max'] cwd=/tmp start=2026-10-06T06:31:57.983Z expect=all-logged wait1=5.0 wait2=10.0 port=58634 db=$WORK/scratch-home/.local/share/omniroute/storage.sqlite baseline=$WORK/effort-baseline-healthy.txt baseline_sha256=8bdf8ec22f4ffdc22e76fb4903048c069e370aff24a2936f722d52094db9de2d
+    RESULT mode=effort:cx/gpt-6-astra:max http=200 terminal=True closed_early=False stream_s=3.0 corr=None response_id=resp_8bc677a68fa54294b07b1ac0 read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=FAIL reasons=["effort columns ('gpt-6-astra', 'codex/gpt-6-astra', 'None', 'None') differ from the baseline ('gpt-6-astra', 'codex/gpt-6-astra', 'max', 'max')"]
+       call_logs: ('2026-10-06T06:32:00.988Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', None, None) id8=30d7ce29
+       usage_history: ('2026-10-06T06:32:00.988Z', 'gpt-6-astra', '200', 22, 19)
+    EFFORT mode=effort:cx/gpt-6-astra:max model=gpt-6-astra requested_model=codex/gpt-6-astra effort_requested=None effort_upstream=None
+    LATE mode=effort:cx/gpt-6-astra:max read2_call_logs=1 read2_usage=1 changed=False verdict=FAIL reasons=["effort columns ('gpt-6-astra', 'codex/gpt-6-astra', 'None', 'None') differ from the baseline ('gpt-6-astra', 'codex/gpt-6-astra', 'max', 'max')", "effort columns ('gpt-6-astra', 'codex/gpt-6-astra', 'None', 'None') differ from the baseline ('gpt-6-astra', 'codex/gpt-6-astra', 'max', 'max')"]
+    SUMMARY {"FAIL": 1} end=2026-10-06T06:32:11.004Z exit=1
+CONTROL-RESULT R8h v2.0 defect-demonstration expected_exit=1 observed_exit=1 elapsed_s=13 OK
+
+### R8i: VERSION 2.1 with the same ONE NULL attempt: the group is INCONCLUSIVE (exit 2), not a FAIL
+    stub mode: {"mode": "normal", "null_effort": [true]}
+--- R8i / v2.1: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-live-acceptance-20261006.py --port 58634 --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --expect all-logged --baseline $WORK/effort-baseline-healthy.txt --wait1 5 --wait2 10 --effort-close-after 3 effort:cx/gpt-6-astra:max
+    FROZEN version=2.1 script_sha256=15b8cf04134aa8ead6526739e5a95b6dc15f4e5b77d59840e0d03aa56b33301b argv=['--port', '58634', '--db', '$WORK/scratch-home/.local/share/omniroute/storage.sqlite', '--expect', 'all-logged', '--baseline', '$WORK/effort-baseline-healthy.txt', '--wait1', '5', '--wait2', '10', '--effort-close-after', '3', 'effort:cx/gpt-6-astra:max'] cwd=/tmp start=2026-10-06T06:32:12.595Z expect=all-logged wait1=5.0 wait2=10.0 port=58634 db=$WORK/scratch-home/.local/share/omniroute/storage.sqlite effort_close_after=3.0 baseline=$WORK/effort-baseline-healthy.txt baseline_sha256=8bdf8ec22f4ffdc22e76fb4903048c069e370aff24a2936f722d52094db9de2d
+    RESULT mode=effort:cx/gpt-6-astra:max http=200 terminal=True closed_early=True stream_s=3.0 corr=None response_id=resp_50211bf30f6446dc8fc76bb6 read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=PASS
+       call_logs: ('2026-10-06T06:32:15.599Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', None, None) id8=0ec18e45
+       usage_history: ('2026-10-06T06:32:15.599Z', 'gpt-6-astra', '200', 22, 19)
+    EFFORT mode=effort:cx/gpt-6-astra:max model=gpt-6-astra requested_model=codex/gpt-6-astra effort_requested=None effort_upstream=None observed=False
+    LATE mode=effort:cx/gpt-6-astra:max read2_call_logs=1 read2_usage=1 changed=False verdict=PASS
+    EFFORT-GROUP mode=effort:cx/gpt-6-astra:max attempts=1 observed=0 expected=('gpt-6-astra', 'codex/gpt-6-astra', 'max', 'max') values=[] verdict=INCONCLUSIVE reasons=['none of the 1 attempts carried the effort columns (the gateway stores them only for responses with encrypted reasoning)']
+    SUMMARY {"INCONCLUSIVE": 1, "PASS": 1} end=2026-10-06T06:32:25.598Z exit=2
+CONTROL-RESULT R8i v2.1 expected_exit=2 observed_exit=2 elapsed_s=13 OK
+
+### R8j: the suffix model (no client effort, the model id carries it): requested NULL and upstream max is an OBSERVED attempt, and it is compared as such
+--- R8-baseline / suffix-model three attempts: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-live-acceptance-20261006.py --port 58634 --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --expect observe --wait1 5 --wait2 10 --effort-close-after 3 effort:cx/gpt-6.1-sol-max effort:cx/gpt-6.1-sol-max effort:cx/gpt-6.1-sol-max
+    FROZEN version=2.1 script_sha256=15b8cf04134aa8ead6526739e5a95b6dc15f4e5b77d59840e0d03aa56b33301b argv=['--port', '58634', '--db', '$WORK/scratch-home/.local/share/omniroute/storage.sqlite', '--expect', 'observe', '--wait1', '5', '--wait2', '10', '--effort-close-after', '3', 'effort:cx/gpt-6.1-sol-max', 'effort:cx/gpt-6.1-sol-max', 'effort:cx/gpt-6.1-sol-max'] cwd=/tmp start=2026-10-06T06:32:27.171Z expect=observe wait1=5.0 wait2=10.0 port=58634 db=$WORK/scratch-home/.local/share/omniroute/storage.sqlite effort_close_after=3.0 baseline=None baseline_sha256=None
+    RESULT mode=effort:cx/gpt-6.1-sol-max http=200 terminal=True closed_early=True stream_s=3.0 corr=None response_id=resp_1249e37bdb1b4c22af8962f9 read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=OBSERVED
+       call_logs: ('2026-10-06T06:32:30.175Z', '/v1/responses', 200, 'gpt-6.1-sol-max', 'codex/gpt-6.1-sol-max', 22, 19, 'ready', None, 'max') id8=fd691384
+       usage_history: ('2026-10-06T06:32:30.175Z', 'gpt-6.1-sol-max', '200', 22, 19)
+    EFFORT mode=effort:cx/gpt-6.1-sol-max model=gpt-6.1-sol-max requested_model=codex/gpt-6.1-sol-max effort_requested=None effort_upstream=max observed=True
+    RESULT mode=effort:cx/gpt-6.1-sol-max http=200 terminal=True closed_early=True stream_s=3.0 corr=None response_id=resp_efc2d9afa67c43faa7c76802 read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=OBSERVED
+       call_logs: ('2026-10-06T06:32:38.181Z', '/v1/responses', 200, 'gpt-6.1-sol-max', 'codex/gpt-6.1-sol-max', 22, 19, 'ready', None, 'max') id8=e7a0a239
+       usage_history: ('2026-10-06T06:32:38.181Z', 'gpt-6.1-sol-max', '200', 22, 19)
+    EFFORT mode=effort:cx/gpt-6.1-sol-max model=gpt-6.1-sol-max requested_model=codex/gpt-6.1-sol-max effort_requested=None effort_upstream=max observed=True
+    RESULT mode=effort:cx/gpt-6.1-sol-max http=200 terminal=True closed_early=True stream_s=3.0 corr=None response_id=resp_dd97275470414f708d185209 read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=OBSERVED
+       call_logs: ('2026-10-06T06:32:46.185Z', '/v1/responses', 200, 'gpt-6.1-sol-max', 'codex/gpt-6.1-sol-max', 22, 19, 'ready', None, 'max') id8=29bce66c
+       usage_history: ('2026-10-06T06:32:46.185Z', 'gpt-6.1-sol-max', '200', 22, 19)
+    EFFORT mode=effort:cx/gpt-6.1-sol-max model=gpt-6.1-sol-max requested_model=codex/gpt-6.1-sol-max effort_requested=None effort_upstream=max observed=True
+    LATE mode=effort:cx/gpt-6.1-sol-max read2_call_logs=1 read2_usage=1 changed=False verdict=OBSERVED
+    LATE mode=effort:cx/gpt-6.1-sol-max read2_call_logs=1 read2_usage=1 changed=False verdict=OBSERVED
+    LATE mode=effort:cx/gpt-6.1-sol-max read2_call_logs=1 read2_usage=1 changed=False verdict=OBSERVED
+    EFFORT-GROUP mode=effort:cx/gpt-6.1-sol-max attempts=3 observed=3 values=[('gpt-6.1-sol-max', 'codex/gpt-6.1-sol-max', 'None', 'max')] verdict=OBSERVED
+    SUMMARY {"OBSERVED": 4} end=2026-10-06T06:32:56.185Z exit=0
+CONTROL-RESULT R8-baseline suffix-model three attempts expected_exit=0 observed_exit=0 elapsed_s=29 OK
+
+### R8j: suffix model, healthy: PASS
+    stub mode: {"mode": "normal"}
+--- R8j / v2.1: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-live-acceptance-20261006.py --port 58634 --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --expect all-logged --baseline $WORK/effort-baseline-suffix-model.txt --wait1 5 --wait2 10 --effort-close-after 3 effort:cx/gpt-6.1-sol-max effort:cx/gpt-6.1-sol-max effort:cx/gpt-6.1-sol-max
+    FROZEN version=2.1 script_sha256=15b8cf04134aa8ead6526739e5a95b6dc15f4e5b77d59840e0d03aa56b33301b argv=['--port', '58634', '--db', '$WORK/scratch-home/.local/share/omniroute/storage.sqlite', '--expect', 'all-logged', '--baseline', '$WORK/effort-baseline-suffix-model.txt', '--wait1', '5', '--wait2', '10', '--effort-close-after', '3', 'effort:cx/gpt-6.1-sol-max', 'effort:cx/gpt-6.1-sol-max', 'effort:cx/gpt-6.1-sol-max'] cwd=/tmp start=2026-10-06T06:32:57.768Z expect=all-logged wait1=5.0 wait2=10.0 port=58634 db=$WORK/scratch-home/.local/share/omniroute/storage.sqlite effort_close_after=3.0 baseline=$WORK/effort-baseline-suffix-model.txt baseline_sha256=4298c3e3e4a3d559f559e05784bf8c1eb182c2323e0bcb3dcfb57e2496337c02
+    RESULT mode=effort:cx/gpt-6.1-sol-max http=200 terminal=True closed_early=True stream_s=3.0 corr=None response_id=resp_21934fb8206343d7bc66be50 read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=PASS
+       call_logs: ('2026-10-06T06:33:00.772Z', '/v1/responses', 200, 'gpt-6.1-sol-max', 'codex/gpt-6.1-sol-max', 22, 19, 'ready', None, 'max') id8=0242362e
+       usage_history: ('2026-10-06T06:33:00.772Z', 'gpt-6.1-sol-max', '200', 22, 19)
+    EFFORT mode=effort:cx/gpt-6.1-sol-max model=gpt-6.1-sol-max requested_model=codex/gpt-6.1-sol-max effort_requested=None effort_upstream=max observed=True
+    RESULT mode=effort:cx/gpt-6.1-sol-max http=200 terminal=True closed_early=True stream_s=3.0 corr=None response_id=resp_d56a536f32f946168bab2104 read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=PASS
+       call_logs: ('2026-10-06T06:33:08.778Z', '/v1/responses', 200, 'gpt-6.1-sol-max', 'codex/gpt-6.1-sol-max', 22, 19, 'ready', None, 'max') id8=3052579f
+       usage_history: ('2026-10-06T06:33:08.778Z', 'gpt-6.1-sol-max', '200', 22, 19)
+    EFFORT mode=effort:cx/gpt-6.1-sol-max model=gpt-6.1-sol-max requested_model=codex/gpt-6.1-sol-max effort_requested=None effort_upstream=max observed=True
+    RESULT mode=effort:cx/gpt-6.1-sol-max http=200 terminal=True closed_early=True stream_s=3.0 corr=None response_id=resp_0e1f484b730243f08e770714 read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=PASS
+       call_logs: ('2026-10-06T06:33:16.781Z', '/v1/responses', 200, 'gpt-6.1-sol-max', 'codex/gpt-6.1-sol-max', 22, 19, 'ready', None, 'max') id8=cf05c439
+       usage_history: ('2026-10-06T06:33:16.781Z', 'gpt-6.1-sol-max', '200', 22, 19)
+    EFFORT mode=effort:cx/gpt-6.1-sol-max model=gpt-6.1-sol-max requested_model=codex/gpt-6.1-sol-max effort_requested=None effort_upstream=max observed=True
+    LATE mode=effort:cx/gpt-6.1-sol-max read2_call_logs=1 read2_usage=1 changed=False verdict=PASS
+    LATE mode=effort:cx/gpt-6.1-sol-max read2_call_logs=1 read2_usage=1 changed=False verdict=PASS
+    LATE mode=effort:cx/gpt-6.1-sol-max read2_call_logs=1 read2_usage=1 changed=False verdict=PASS
+    EFFORT-GROUP mode=effort:cx/gpt-6.1-sol-max attempts=3 observed=3 expected=('gpt-6.1-sol-max', 'codex/gpt-6.1-sol-max', 'None', 'max') values=[('gpt-6.1-sol-max', 'codex/gpt-6.1-sol-max', 'None', 'max')] verdict=PASS
+    SUMMARY {"PASS": 4} end=2026-10-06T06:33:26.781Z exit=0
+CONTROL-RESULT R8j v2.1 expected_exit=0 observed_exit=0 elapsed_s=29 OK
+
+# finished 2026-10-06T06:33:26Z; scenarios with an unexpected exit status: none
+driver exit=0
+
+################ PART B
+# Offline controls of the live-acceptance scripts, version 1 (superseded) against version 2.1 (frozen; version 2.0 appears in the effort controls R8h), on the stub gateway and a scratch database. Nothing here touches a live gateway.
+# started 2026-10-06T06:24:32Z; codex-cli 0.159.3; python 3.13.15
+# live-acceptance v1: sha256 8aa14054401c00a5af1e8c180fc83af80c79cc0a807da98ea519149291188859
+# live-acceptance v2.0 (superseded): sha256 fa8fa6f8dc3a0e7360be4a0737c34daaf4d4b58696df6a7ab3483896cb739e82
+# live-acceptance v2.1: sha256 15b8cf04134aa8ead6526739e5a95b6dc15f4e5b77d59840e0d03aa56b33301b
+# native-exec v1: sha256 9f511620db390c3b4c7177f858342c6592680efd1d383e2e02ecf3f5d249fdee
+# native-exec v2: sha256 9bd478a1502839e7cfe2c5999e3485d6e9ba5d10bfe62e2593e061b7441dda71
+# show-log-receipt v2: sha256 7dd746bce15964c68d8b847f8072257a4b5712adca7ed7cd9089c09273ff26d6
+# gateway-identity: sha256 a7932710412e9e834f6b992f267db5620b64bbe62f25021013c8004a7eec6011
+# pre-switch-guard: sha256 305a065227bff71dcbe3b46b157f4d3ed83f5a5b5ce90a2f73cbfa6b26805040
+# pre-switch-guard v2 (superseded; G12): sha256 b491de6b3e4a5a1d3a3761c8fa8aefc439cca8cf4c453d696c7b9cb41a73af3a
+# run-acceptance wrapper: sha256 abcbb5407c244062697fb94a677100b3e670b609b423582d9f39368073e9cb11
+# switch tool copy (committed evidence file): sha256 97d1b87bb651d6f43e184b9617d03afa7861ee7715e7030ad23ed29057bc23e3
+# stub-gateway: sha256 2e500af67bf1aae55d82e4972c34664650e48e3bf9c167675184c7517afe9bb7
+# fake-codex: sha256 6c9eecec7e3209ad9690510463632780c0f7204e0abb4782ce09c92883e4c206
+# run-controls: sha256 cb249594fc5f256567837dcbab104b2a446324a9cbf894cd1eda78b7a90b74d8
+
+### N1: three consecutive correctly logged astra-max turns (real codex exec against the stub, rows written with each turn's session id): version 2 passes all three
+    stub mode: {"mode": "normal"}
+--- N1 / v2: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-native-exec-acceptance-20261006.py --expect all-logged --wait1 5 --wait2 10 --quiet-timeout 1 --exec-timeout 60 --repo $WORK/repo --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --scratch $WORK/codex-home-N1-v2 astra-max astra-max astra-max
+    FROZEN version=2 script_sha256=9bd478a1502839e7cfe2c5999e3485d6e9ba5d10bfe62e2593e061b7441dda71 argv=['--expect', 'all-logged', '--wait1', '5', '--wait2', '10', '--quiet-timeout', '1', '--exec-timeout', '60', '--repo', '$WORK/repo', '--db', '$WORK/scratch-home/.local/share/omniroute/storage.sqlite', '--scratch', '$WORK/codex-home-N1-v2', 'astra-max', 'astra-max', 'astra-max'] cwd=/tmp start=2026-10-06T06:24:34.297Z expect=all-logged wait1=5.0 wait2=10.0 quiet_timeout=1.0 exec_timeout=60.0 db=$WORK/scratch-home/.local/share/omniroute/storage.sqlite run_id=20261006T062434 template_sha256=5b817ce8cd10ffdfa89ab9dd8ff7d6a392e5e6cf5b4d0c8baa391faceb5898d3
+    RESULT shape=astra-max session_id=acceptance-20261006T062434-astra-max-1 quiet=False recent_call_logs=0 other_workers=2 min_rows=1 exec_exit=0 elapsed_s=0.6 client_usage={'input_tokens': 22, 'cached_input_tokens': 0, 'output_tokens': 19} command_executions=0 events=5 read1_call_logs=1 read1_usage=1 rows_tokens_in_out=(22, 19) rows_complete=True verdict=PASS
+       call_logs: ('2026-10-06T06:24:45.198Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', 'max', 'max') id8=057ddec4
+       usage_history: ('2026-10-06T06:24:45.198Z', 'gpt-6-astra', '200', 22, 19)
+    RESULT shape=astra-max session_id=acceptance-20261006T062434-astra-max-2 quiet=False recent_call_logs=1 other_workers=2 min_rows=1 exec_exit=0 elapsed_s=0.4 client_usage={'input_tokens': 22, 'cached_input_tokens': 0, 'output_tokens': 19} command_executions=0 events=5 read1_call_logs=1 read1_usage=1 rows_tokens_in_out=(22, 19) rows_complete=True verdict=PASS
+       call_logs: ('2026-10-06T06:25:00.615Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', 'max', 'max') id8=ab884319
+       usage_history: ('2026-10-06T06:25:00.615Z', 'gpt-6-astra', '200', 22, 19)
+    RESULT shape=astra-max session_id=acceptance-20261006T062434-astra-max-3 quiet=False recent_call_logs=2 other_workers=2 min_rows=1 exec_exit=0 elapsed_s=0.4 client_usage={'input_tokens': 22, 'cached_input_tokens': 0, 'output_tokens': 19} command_executions=0 events=5 read1_call_logs=1 read1_usage=1 rows_tokens_in_out=(22, 19) rows_complete=True verdict=PASS
+       call_logs: ('2026-10-06T06:25:16.038Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', 'max', 'max') id8=f18ae304
+       usage_history: ('2026-10-06T06:25:16.038Z', 'gpt-6-astra', '200', 22, 19)
+    LATE shape=astra-max session_id=acceptance-20261006T062434-astra-max-1 read2_call_logs=1 read2_usage=1 rows_tokens_in_out=(22, 19) changed=False verdict=PASS
+    LATE shape=astra-max session_id=acceptance-20261006T062434-astra-max-2 read2_call_logs=1 read2_usage=1 rows_tokens_in_out=(22, 19) changed=False verdict=PASS
+    LATE shape=astra-max session_id=acceptance-20261006T062434-astra-max-3 read2_call_logs=1 read2_usage=1 rows_tokens_in_out=(22, 19) changed=False verdict=PASS
+    SUMMARY {'PASS': 3} end=2026-10-06T06:25:25.777Z exit=0
+CONTROL-RESULT N1 v2 expected_exit=0 observed_exit=0 elapsed_s=52 OK
+
+    the stub saw 3 distinct X-OmniRoute-Session-Id values from the three codex exec turns: ['acceptance-20261006T062434-astra-max-1', 'acceptance-20261006T062434-astra-max-2', 'acceptance-20261006T062434-astra-max-3']
+### N2a: the turn's own rows are lost but unrelated rows (other tag) with the same shape exist (real codex exec exits 0): version 1 attributes them to the turn and passes, version 2 fails
+    stub mode: {"mode": "unrelated-only"}
+--- N2a / v1: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-native-exec-acceptance-20261005.py --expect all-logged --wait1 5 --wait2 10 --quiet-timeout 1 --repo $WORK/repo astra-max   [env: HOME=$WORK/home]
+    FROZEN script_sha256=9f511620db390c3b4c7177f858342c6592680efd1d383e2e02ecf3f5d249fdee argv=['--expect', 'all-logged', '--wait1', '5', '--wait2', '10', '--quiet-timeout', '1', '--repo', '$WORK/repo', 'astra-max'] cwd=/tmp start=2026-10-06T06:25:27.335Z expect=all-logged wait1=5.0 wait2=10.0 quiet_timeout=1.0
+    RESULT shape=astra-max quiet=False recent_call_logs=0 other_workers=2 verdict=INCONCLUSIVE (not run: the window was not quiet)
+    SUMMARY {'INCONCLUSIVE': 1} end=2026-10-06T06:25:37.368Z exit=2
+CONTROL-RESULT N2a v1 defect-demonstration expected_exit=0 observed_exit=2 elapsed_s=10 UNEXPECTED
+
+--- N2a / v2: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-native-exec-acceptance-20261006.py --expect all-logged --wait1 5 --wait2 10 --quiet-timeout 1 --exec-timeout 60 --repo $WORK/repo --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --scratch $WORK/codex-home-N2a-v2 astra-max
+    FROZEN version=2 script_sha256=9bd478a1502839e7cfe2c5999e3485d6e9ba5d10bfe62e2593e061b7441dda71 argv=['--expect', 'all-logged', '--wait1', '5', '--wait2', '10', '--quiet-timeout', '1', '--exec-timeout', '60', '--repo', '$WORK/repo', '--db', '$WORK/scratch-home/.local/share/omniroute/storage.sqlite', '--scratch', '$WORK/codex-home-N2a-v2', 'astra-max'] cwd=/tmp start=2026-10-06T06:25:38.970Z expect=all-logged wait1=5.0 wait2=10.0 quiet_timeout=1.0 exec_timeout=60.0 db=$WORK/scratch-home/.local/share/omniroute/storage.sqlite run_id=20261006T062538 template_sha256=5b817ce8cd10ffdfa89ab9dd8ff7d6a392e5e6cf5b4d0c8baa391faceb5898d3
+    RESULT shape=astra-max session_id=acceptance-20261006T062538-astra-max-1 quiet=False recent_call_logs=0 other_workers=2 min_rows=1 exec_exit=0 elapsed_s=0.7 client_usage={'input_tokens': 22, 'cached_input_tokens': 0, 'output_tokens': 19} command_executions=0 events=5 read1_call_logs=0 read1_usage=0 rows_tokens_in_out=(0, 0) rows_complete=False verdict=FAIL reasons=["call_logs rows with the turn's session id: 0 (at least 1 needed)", "the rows hold 0 input and 0 output tokens, the client used 22 and 19: a request's rows are missing"]
+    LATE shape=astra-max session_id=acceptance-20261006T062538-astra-max-1 read2_call_logs=0 read2_usage=0 rows_tokens_in_out=(0, 0) changed=False verdict=FAIL reasons=["call_logs rows with the turn's session id: 0 (at least 1 needed)", "the rows hold 0 input and 0 output tokens, the client used 22 and 19: a request's rows are missing"]
+    SUMMARY {'FAIL': 1} end=2026-10-06T06:25:59.679Z exit=1
+CONTROL-RESULT N2a v2 expected_exit=1 observed_exit=1 elapsed_s=21 OK
+
+### N2b: the exec FAILS (exit 1) while an unrelated request's rows appear in the window: version 1 passes, version 2 is INCONCLUSIVE (the turn did not complete)
+    stub mode: {"mode": "normal"}   fake codex mode: exit1
+--- N2b / v1: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-native-exec-acceptance-20261005.py --expect all-logged --wait1 5 --wait2 10 --quiet-timeout 1 --repo $WORK/repo astra-max   [env: HOME=$WORK/home, FAKE_CODEX_MODE=exit1, FAKE_CODEX_DB=$WORK/scratch-home/.local/share/omniroute/storage.sqlite, PATH=$WORK/bin:$HOME/.local/share/codex-ecosystem/bin:$HOME/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/wsl/lib:$HOME/.local/share/codex-ecosystem/sources/context-mode-6f0cc684/bin]
+    FROZEN script_sha256=9f511620db390c3b4c7177f858342c6592680efd1d383e2e02ecf3f5d249fdee argv=['--expect', 'all-logged', '--wait1', '5', '--wait2', '10', '--quiet-timeout', '1', '--repo', '$WORK/repo', 'astra-max'] cwd=/tmp start=2026-10-06T06:26:01.271Z expect=all-logged wait1=5.0 wait2=10.0 quiet_timeout=1.0
+    RESULT shape=astra-max quiet=False recent_call_logs=1 other_workers=2 verdict=INCONCLUSIVE (not run: the window was not quiet)
+    SUMMARY {'INCONCLUSIVE': 1} end=2026-10-06T06:26:11.312Z exit=2
+CONTROL-RESULT N2b v1 defect-demonstration expected_exit=0 observed_exit=2 elapsed_s=10 UNEXPECTED
+
+--- N2b / v2: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-native-exec-acceptance-20261006.py --expect all-logged --wait1 5 --wait2 10 --quiet-timeout 1 --exec-timeout 60 --repo $WORK/repo --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --scratch $WORK/codex-home-N2b-v2 astra-max --codex $WORK/bin/codex   [env: FAKE_CODEX_MODE=exit1, FAKE_CODEX_DB=$WORK/scratch-home/.local/share/omniroute/storage.sqlite]
+    FROZEN version=2 script_sha256=9bd478a1502839e7cfe2c5999e3485d6e9ba5d10bfe62e2593e061b7441dda71 argv=['--expect', 'all-logged', '--wait1', '5', '--wait2', '10', '--quiet-timeout', '1', '--exec-timeout', '60', '--repo', '$WORK/repo', '--db', '$WORK/scratch-home/.local/share/omniroute/storage.sqlite', '--scratch', '$WORK/codex-home-N2b-v2', 'astra-max', '--codex', '$WORK/bin/codex'] cwd=/tmp start=2026-10-06T06:26:12.886Z expect=all-logged wait1=5.0 wait2=10.0 quiet_timeout=1.0 exec_timeout=60.0 db=$WORK/scratch-home/.local/share/omniroute/storage.sqlite run_id=20261006T062612 template_sha256=5b817ce8cd10ffdfa89ab9dd8ff7d6a392e5e6cf5b4d0c8baa391faceb5898d3
+    RESULT shape=astra-max session_id=acceptance-20261006T062612-astra-max-1 quiet=False recent_call_logs=1 other_workers=2 min_rows=1 exec_exit=1 timed_out=False elapsed_s=0.0 client_usage=None command_executions=0 events=0 rows_with_session_id=0 verdict=INCONCLUSIVE reasons=['the exec did not complete: exec exit status 1']
+       diagnostics (value-free): event types: [] | stdout tail:  | stderr tail: fake codex: simulated failure
+    SUMMARY {'INCONCLUSIVE': 1} end=2026-10-06T06:26:22.938Z exit=2
+CONTROL-RESULT N2b v2 expected_exit=2 observed_exit=2 elapsed_s=10 OK
+
+### N3: the exec does not exit within --exec-timeout (fake codex sleeps): version 2 is INCONCLUSIVE and prints value-free diagnostics; version 1 (hard-coded 600 s timeout, TimeoutExpired uncaught) is not run
+    stub mode: {"mode": "normal"}   fake codex mode: hang
+--- N3 / v2: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-native-exec-acceptance-20261006.py --expect all-logged --wait1 5 --wait2 10 --quiet-timeout 1 --exec-timeout 60 --repo $WORK/repo --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --scratch $WORK/codex-home-N3-v2 --exec-timeout 6 astra-max --codex $WORK/bin/codex   [env: FAKE_CODEX_MODE=hang, FAKE_CODEX_DB=$WORK/scratch-home/.local/share/omniroute/storage.sqlite]
+    FROZEN version=2 script_sha256=9bd478a1502839e7cfe2c5999e3485d6e9ba5d10bfe62e2593e061b7441dda71 argv=['--expect', 'all-logged', '--wait1', '5', '--wait2', '10', '--quiet-timeout', '1', '--exec-timeout', '60', '--repo', '$WORK/repo', '--db', '$WORK/scratch-home/.local/share/omniroute/storage.sqlite', '--scratch', '$WORK/codex-home-N3-v2', '--exec-timeout', '6', 'astra-max', '--codex', '$WORK/bin/codex'] cwd=/tmp start=2026-10-06T06:26:24.516Z expect=all-logged wait1=5.0 wait2=10.0 quiet_timeout=1.0 exec_timeout=6.0 db=$WORK/scratch-home/.local/share/omniroute/storage.sqlite run_id=20261006T062624 template_sha256=5b817ce8cd10ffdfa89ab9dd8ff7d6a392e5e6cf5b4d0c8baa391faceb5898d3
+    RESULT shape=astra-max session_id=acceptance-20261006T062624-astra-max-1 quiet=False recent_call_logs=0 other_workers=2 min_rows=1 exec_exit=None timed_out=True elapsed_s=6.0 client_usage=None command_executions=0 events=0 rows_with_session_id=0 verdict=INCONCLUSIVE reasons=['the exec did not complete: no exit within 6 s (timeout)']
+       diagnostics (value-free): event types: [] | stdout tail:  | stderr tail: 
+    SUMMARY {'INCONCLUSIVE': 1} end=2026-10-06T06:26:40.579Z exit=2
+CONTROL-RESULT N3 v2 expected_exit=2 observed_exit=2 elapsed_s=16 OK
+
+### N4a: two-request turn, both requests logged under the turn's session id (fake codex): PASS
+    stub mode: {"mode": "normal"}   fake codex mode: two-ok
+--- N4a / v2: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-native-exec-acceptance-20261006.py --expect all-logged --wait1 5 --wait2 10 --quiet-timeout 1 --exec-timeout 60 --repo $WORK/repo --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --scratch $WORK/codex-home-N4a-v2 two-request --codex $WORK/bin/codex   [env: FAKE_CODEX_MODE=two-ok, FAKE_CODEX_DB=$WORK/scratch-home/.local/share/omniroute/storage.sqlite]
+    FROZEN version=2 script_sha256=9bd478a1502839e7cfe2c5999e3485d6e9ba5d10bfe62e2593e061b7441dda71 argv=['--expect', 'all-logged', '--wait1', '5', '--wait2', '10', '--quiet-timeout', '1', '--exec-timeout', '60', '--repo', '$WORK/repo', '--db', '$WORK/scratch-home/.local/share/omniroute/storage.sqlite', '--scratch', '$WORK/codex-home-N4a-v2', 'two-request', '--codex', '$WORK/bin/codex'] cwd=/tmp start=2026-10-06T06:26:42.155Z expect=all-logged wait1=5.0 wait2=10.0 quiet_timeout=1.0 exec_timeout=60.0 db=$WORK/scratch-home/.local/share/omniroute/storage.sqlite run_id=20261006T062642 template_sha256=5b817ce8cd10ffdfa89ab9dd8ff7d6a392e5e6cf5b4d0c8baa391faceb5898d3
+    RESULT shape=two-request session_id=acceptance-20261006T062642-two-request-1 quiet=False recent_call_logs=0 other_workers=2 min_rows=2 exec_exit=0 elapsed_s=3.0 client_usage={'input_tokens': 30151, 'cached_input_tokens': 0, 'output_tokens': 74} command_executions=1 events=6 read1_call_logs=2 read1_usage=2 rows_tokens_in_out=(30151, 74) rows_complete=True verdict=PASS
+       call_logs: ('2026-10-06T06:26:52.702Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 15045, 50, 'ready', 'max', 'max') id8=d0f6f640
+       call_logs: ('2026-10-06T06:26:55.214Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 15106, 24, 'ready', 'max', 'max') id8=f3592962
+       usage_history: ('2026-10-06T06:26:52.702Z', 'gpt-6-astra', '200', 15045, 50)
+       usage_history: ('2026-10-06T06:26:55.214Z', 'gpt-6-astra', '200', 15106, 24)
+    LATE shape=two-request session_id=acceptance-20261006T062642-two-request-1 read2_call_logs=2 read2_usage=2 rows_tokens_in_out=(30151, 74) changed=False verdict=PASS
+    SUMMARY {'PASS': 1} end=2026-10-06T06:27:05.231Z exit=0
+CONTROL-RESULT N4a v2 expected_exit=0 observed_exit=0 elapsed_s=23 OK
+
+### N4b: two-request turn, the FINAL request's rows are lost (fake codex): FAIL (the multi-request case found on 2604 is a gate)
+    stub mode: {"mode": "normal"}   fake codex mode: two-final-lost
+--- N4b / v2: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-native-exec-acceptance-20261006.py --expect all-logged --wait1 5 --wait2 10 --quiet-timeout 1 --exec-timeout 60 --repo $WORK/repo --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --scratch $WORK/codex-home-N4b-v2 two-request --codex $WORK/bin/codex   [env: FAKE_CODEX_MODE=two-final-lost, FAKE_CODEX_DB=$WORK/scratch-home/.local/share/omniroute/storage.sqlite]
+    FROZEN version=2 script_sha256=9bd478a1502839e7cfe2c5999e3485d6e9ba5d10bfe62e2593e061b7441dda71 argv=['--expect', 'all-logged', '--wait1', '5', '--wait2', '10', '--quiet-timeout', '1', '--exec-timeout', '60', '--repo', '$WORK/repo', '--db', '$WORK/scratch-home/.local/share/omniroute/storage.sqlite', '--scratch', '$WORK/codex-home-N4b-v2', 'two-request', '--codex', '$WORK/bin/codex'] cwd=/tmp start=2026-10-06T06:27:06.801Z expect=all-logged wait1=5.0 wait2=10.0 quiet_timeout=1.0 exec_timeout=60.0 db=$WORK/scratch-home/.local/share/omniroute/storage.sqlite run_id=20261006T062706 template_sha256=5b817ce8cd10ffdfa89ab9dd8ff7d6a392e5e6cf5b4d0c8baa391faceb5898d3
+    RESULT shape=two-request session_id=acceptance-20261006T062706-two-request-1 quiet=False recent_call_logs=0 other_workers=2 min_rows=2 exec_exit=0 elapsed_s=0.5 client_usage={'input_tokens': 30151, 'cached_input_tokens': 0, 'output_tokens': 74} command_executions=1 events=6 read1_call_logs=1 read1_usage=1 rows_tokens_in_out=(15045, 50) rows_complete=False verdict=FAIL reasons=["call_logs rows with the turn's session id: 1 (at least 2 needed)", "the rows hold 15045 input and 50 output tokens, the client used 30151 and 74: a request's rows are missing"]
+       call_logs: ('2026-10-06T06:27:17.349Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 15045, 50, 'ready', 'max', 'max') id8=2e2aac5c
+       usage_history: ('2026-10-06T06:27:17.349Z', 'gpt-6-astra', '200', 15045, 50)
+    LATE shape=two-request session_id=acceptance-20261006T062706-two-request-1 read2_call_logs=1 read2_usage=1 rows_tokens_in_out=(15045, 50) changed=False verdict=FAIL reasons=["call_logs rows with the turn's session id: 1 (at least 2 needed)", "the rows hold 15045 input and 50 output tokens, the client used 30151 and 74: a request's rows are missing"]
+    SUMMARY {'FAIL': 1} end=2026-10-06T06:27:27.367Z exit=1
+CONTROL-RESULT N4b v2 expected_exit=1 observed_exit=1 elapsed_s=21 OK
+
+### N4c: two-request shape but the turn made NO tool call (fake codex: the model skipped it): INCONCLUSIVE, the multi-request path was not exercised
+    stub mode: {"mode": "normal"}   fake codex mode: two-notool
+--- N4c / v2: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-native-exec-acceptance-20261006.py --expect all-logged --wait1 5 --wait2 10 --quiet-timeout 1 --exec-timeout 60 --repo $WORK/repo --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --scratch $WORK/codex-home-N4c-v2 two-request --codex $WORK/bin/codex   [env: FAKE_CODEX_MODE=two-notool, FAKE_CODEX_DB=$WORK/scratch-home/.local/share/omniroute/storage.sqlite]
+    FROZEN version=2 script_sha256=9bd478a1502839e7cfe2c5999e3485d6e9ba5d10bfe62e2593e061b7441dda71 argv=['--expect', 'all-logged', '--wait1', '5', '--wait2', '10', '--quiet-timeout', '1', '--exec-timeout', '60', '--repo', '$WORK/repo', '--db', '$WORK/scratch-home/.local/share/omniroute/storage.sqlite', '--scratch', '$WORK/codex-home-N4c-v2', 'two-request', '--codex', '$WORK/bin/codex'] cwd=/tmp start=2026-10-06T06:27:28.939Z expect=all-logged wait1=5.0 wait2=10.0 quiet_timeout=1.0 exec_timeout=60.0 db=$WORK/scratch-home/.local/share/omniroute/storage.sqlite run_id=20261006T062728 template_sha256=5b817ce8cd10ffdfa89ab9dd8ff7d6a392e5e6cf5b4d0c8baa391faceb5898d3
+    RESULT shape=two-request session_id=acceptance-20261006T062728-two-request-1 quiet=False recent_call_logs=0 other_workers=2 min_rows=2 exec_exit=0 timed_out=False elapsed_s=0.5 client_usage={'input_tokens': 15045, 'cached_input_tokens': 0, 'output_tokens': 50} command_executions=0 events=4 rows_with_session_id=1 verdict=INCONCLUSIVE reasons=['the turn made no tool call: the multi-request path was not exercised']
+       diagnostics (value-free): event types: ['thread.started', 'turn.started', 'item.completed(agent_message)', 'turn.completed'] | stdout tail: "type": "item.completed", "item": {"id": "item_1", "type": "agent_message", "text": "ok"}} | {"type": "turn.completed", "usage": {"input_tokens": 15045, "cached_input_tokens": 0, "output_tokens": 50}} | stderr tail: 
+       call_logs: ('2026-10-06T06:27:39.488Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 15045, 50, 'ready', 'max', 'max') id8=25c043b9
+       usage_history: ('2026-10-06T06:27:39.488Z', 'gpt-6-astra', '200', 15045, 50)
+    SUMMARY {'INCONCLUSIVE': 1} end=2026-10-06T06:27:39.517Z exit=2
+CONTROL-RESULT N4c v2 expected_exit=2 observed_exit=2 elapsed_s=11 OK
+
+### N4d: the client reported no turn usage (fake codex prints no turn.completed): INCONCLUSIVE, completeness cannot be checked
+    stub mode: {"mode": "normal"}   fake codex mode: two-nousage
+--- N4d / v2: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-native-exec-acceptance-20261006.py --expect all-logged --wait1 5 --wait2 10 --quiet-timeout 1 --exec-timeout 60 --repo $WORK/repo --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --scratch $WORK/codex-home-N4d-v2 two-request --codex $WORK/bin/codex   [env: FAKE_CODEX_MODE=two-nousage, FAKE_CODEX_DB=$WORK/scratch-home/.local/share/omniroute/storage.sqlite]
+    FROZEN version=2 script_sha256=9bd478a1502839e7cfe2c5999e3485d6e9ba5d10bfe62e2593e061b7441dda71 argv=['--expect', 'all-logged', '--wait1', '5', '--wait2', '10', '--quiet-timeout', '1', '--exec-timeout', '60', '--repo', '$WORK/repo', '--db', '$WORK/scratch-home/.local/share/omniroute/storage.sqlite', '--scratch', '$WORK/codex-home-N4d-v2', 'two-request', '--codex', '$WORK/bin/codex'] cwd=/tmp start=2026-10-06T06:27:41.087Z expect=all-logged wait1=5.0 wait2=10.0 quiet_timeout=1.0 exec_timeout=60.0 db=$WORK/scratch-home/.local/share/omniroute/storage.sqlite run_id=20261006T062741 template_sha256=5b817ce8cd10ffdfa89ab9dd8ff7d6a392e5e6cf5b4d0c8baa391faceb5898d3
+    RESULT shape=two-request session_id=acceptance-20261006T062741-two-request-1 quiet=False recent_call_logs=0 other_workers=2 min_rows=2 exec_exit=0 timed_out=False elapsed_s=3.1 client_usage=None command_executions=1 events=5 rows_with_session_id=2 verdict=INCONCLUSIVE reasons=['the client reported no turn usage (no turn.completed event with usage)']
+       diagnostics (value-free): event types: ['thread.started', 'turn.started', 'item.started(command_execution)', 'item.completed(command_execution)', 'item.completed(agent_message)'] | stdout tail: and_execution", "command": "echo hi", "aggregated_output": "hi\n", "exit_code": 0, "status": "completed"}} | {"type": "item.completed", "item": {"id": "item_2", "type": "agent_message", "text": "ok"}} | stderr tail: 
+       call_logs: ('2026-10-06T06:27:51.637Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 15045, 50, 'ready', 'max', 'max') id8=5e7d0bd1
+       call_logs: ('2026-10-06T06:27:54.154Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 15106, 24, 'ready', 'max', 'max') id8=eb7f2b2e
+       usage_history: ('2026-10-06T06:27:51.637Z', 'gpt-6-astra', '200', 15045, 50)
+       usage_history: ('2026-10-06T06:27:54.154Z', 'gpt-6-astra', '200', 15106, 24)
+    SUMMARY {'INCONCLUSIVE': 1} end=2026-10-06T06:27:54.180Z exit=2
+CONTROL-RESULT N4d v2 expected_exit=2 observed_exit=2 elapsed_s=13 OK
+
+### N5a: a late duplicate call_logs row for the turn appears after READ1 (real codex exec): version 2 fails
+    stub mode: {"mode": "double-row", "dup_s": 7}
+--- N5a / v2: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-native-exec-acceptance-20261006.py --expect all-logged --wait1 5 --wait2 10 --quiet-timeout 1 --exec-timeout 60 --repo $WORK/repo --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --scratch $WORK/codex-home-N5a-v2 astra-max
+    FROZEN version=2 script_sha256=9bd478a1502839e7cfe2c5999e3485d6e9ba5d10bfe62e2593e061b7441dda71 argv=['--expect', 'all-logged', '--wait1', '5', '--wait2', '10', '--quiet-timeout', '1', '--exec-timeout', '60', '--repo', '$WORK/repo', '--db', '$WORK/scratch-home/.local/share/omniroute/storage.sqlite', '--scratch', '$WORK/codex-home-N5a-v2', 'astra-max'] cwd=/tmp start=2026-10-06T06:27:55.750Z expect=all-logged wait1=5.0 wait2=10.0 quiet_timeout=1.0 exec_timeout=60.0 db=$WORK/scratch-home/.local/share/omniroute/storage.sqlite run_id=20261006T062755 template_sha256=5b817ce8cd10ffdfa89ab9dd8ff7d6a392e5e6cf5b4d0c8baa391faceb5898d3
+    RESULT shape=astra-max session_id=acceptance-20261006T062755-astra-max-1 quiet=False recent_call_logs=0 other_workers=2 min_rows=1 exec_exit=0 elapsed_s=0.5 client_usage={'input_tokens': 22, 'cached_input_tokens': 0, 'output_tokens': 19} command_executions=0 events=5 read1_call_logs=1 read1_usage=1 rows_tokens_in_out=(22, 19) rows_complete=True verdict=PASS
+       call_logs: ('2026-10-06T06:28:06.560Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', 'max', 'max') id8=32dd696b
+       usage_history: ('2026-10-06T06:28:06.560Z', 'gpt-6-astra', '200', 22, 19)
+    LATE shape=astra-max session_id=acceptance-20261006T062755-astra-max-1 read2_call_logs=2 read2_usage=1 rows_tokens_in_out=(44, 38) changed=True verdict=FAIL reasons=['the rows hold 44 input and 38 output tokens, the client used 22 and 19: more tokens are stored than the client used (duplicate rows)', 'usage_history rows matched to the 2 call rows: 1', 'the rows at READ2 are not the rows (or not the values) of READ1']
+       call_logs: ('2026-10-06T06:28:06.560Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', 'max', 'max') id8=32dd696b
+       call_logs: ('2026-10-06T06:28:13.573Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', 'max', 'max') id8=6fa2c5fe
+       usage_history: ('2026-10-06T06:28:06.560Z', 'gpt-6-astra', '200', 22, 19)
+    SUMMARY {'FAIL': 1} end=2026-10-06T06:28:16.290Z exit=1
+CONTROL-RESULT N5a v2 expected_exit=1 observed_exit=1 elapsed_s=21 OK
+
+### N5b: the turn's call status changes from 200 to 499 after READ1 with the counts unchanged (real codex exec): version 1 passes, version 2 fails
+    stub mode: {"mode": "status-flip", "flip_s": 7}
+--- N5b / v1: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-native-exec-acceptance-20261005.py --expect all-logged --wait1 5 --wait2 10 --quiet-timeout 1 --repo $WORK/repo astra-max   [env: HOME=$WORK/home]
+    FROZEN script_sha256=9f511620db390c3b4c7177f858342c6592680efd1d383e2e02ecf3f5d249fdee argv=['--expect', 'all-logged', '--wait1', '5', '--wait2', '10', '--quiet-timeout', '1', '--repo', '$WORK/repo', 'astra-max'] cwd=/tmp start=2026-10-06T06:28:17.843Z expect=all-logged wait1=5.0 wait2=10.0 quiet_timeout=1.0
+    RESULT shape=astra-max quiet=False recent_call_logs=0 other_workers=2 verdict=INCONCLUSIVE (not run: the window was not quiet)
+    SUMMARY {'INCONCLUSIVE': 1} end=2026-10-06T06:28:27.872Z exit=2
+CONTROL-RESULT N5b v1 defect-demonstration expected_exit=0 observed_exit=2 elapsed_s=10 UNEXPECTED
+
+--- N5b / v2: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-native-exec-acceptance-20261006.py --expect all-logged --wait1 5 --wait2 10 --quiet-timeout 1 --exec-timeout 60 --repo $WORK/repo --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --scratch $WORK/codex-home-N5b-v2 astra-max
+    FROZEN version=2 script_sha256=9bd478a1502839e7cfe2c5999e3485d6e9ba5d10bfe62e2593e061b7441dda71 argv=['--expect', 'all-logged', '--wait1', '5', '--wait2', '10', '--quiet-timeout', '1', '--exec-timeout', '60', '--repo', '$WORK/repo', '--db', '$WORK/scratch-home/.local/share/omniroute/storage.sqlite', '--scratch', '$WORK/codex-home-N5b-v2', 'astra-max'] cwd=/tmp start=2026-10-06T06:28:29.442Z expect=all-logged wait1=5.0 wait2=10.0 quiet_timeout=1.0 exec_timeout=60.0 db=$WORK/scratch-home/.local/share/omniroute/storage.sqlite run_id=20261006T062829 template_sha256=5b817ce8cd10ffdfa89ab9dd8ff7d6a392e5e6cf5b4d0c8baa391faceb5898d3
+    RESULT shape=astra-max session_id=acceptance-20261006T062829-astra-max-1 quiet=False recent_call_logs=0 other_workers=2 min_rows=1 exec_exit=0 elapsed_s=0.5 client_usage={'input_tokens': 22, 'cached_input_tokens': 0, 'output_tokens': 19} command_executions=0 events=5 read1_call_logs=1 read1_usage=1 rows_tokens_in_out=(22, 19) rows_complete=True verdict=PASS
+       call_logs: ('2026-10-06T06:28:40.244Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', 'max', 'max') id8=e360bb04
+       usage_history: ('2026-10-06T06:28:40.244Z', 'gpt-6-astra', '200', 22, 19)
+    LATE shape=astra-max session_id=acceptance-20261006T062829-astra-max-1 read2_call_logs=1 read2_usage=1 rows_tokens_in_out=(22, 19) changed=True verdict=FAIL reasons=['call_logs status 499 (expected 200)', 'the rows at READ2 are not the rows (or not the values) of READ1']
+       call_logs: ('2026-10-06T06:28:40.244Z', '/v1/responses', 499, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', 'max', 'max') id8=e360bb04
+       usage_history: ('2026-10-06T06:28:40.244Z', 'gpt-6-astra', '200', 22, 19)
+    SUMMARY {'FAIL': 1} end=2026-10-06T06:28:50.007Z exit=1
+CONTROL-RESULT N5b v2 expected_exit=1 observed_exit=1 elapsed_s=21 OK
+
+### N6: the unpatched gateway's drop with the real client (it closes right after the terminal event, the stub keeps no row): both versions fail
+    stub mode: {"mode": "lose-on-early", "tail_s": 3.0}
+--- N6 / v1: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-native-exec-acceptance-20261005.py --expect all-logged --wait1 5 --wait2 10 --quiet-timeout 1 --repo $WORK/repo astra-max   [env: HOME=$WORK/home]
+    FROZEN script_sha256=9f511620db390c3b4c7177f858342c6592680efd1d383e2e02ecf3f5d249fdee argv=['--expect', 'all-logged', '--wait1', '5', '--wait2', '10', '--quiet-timeout', '1', '--repo', '$WORK/repo', 'astra-max'] cwd=/tmp start=2026-10-06T06:28:51.556Z expect=all-logged wait1=5.0 wait2=10.0 quiet_timeout=1.0
+    RESULT shape=astra-max quiet=False recent_call_logs=0 other_workers=2 verdict=INCONCLUSIVE (not run: the window was not quiet)
+    SUMMARY {'INCONCLUSIVE': 1} end=2026-10-06T06:29:01.586Z exit=2
+CONTROL-RESULT N6 v1 expected_exit=1 observed_exit=2 elapsed_s=10 UNEXPECTED
+
+--- N6 / v2: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-native-exec-acceptance-20261006.py --expect all-logged --wait1 5 --wait2 10 --quiet-timeout 1 --exec-timeout 60 --repo $WORK/repo --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --scratch $WORK/codex-home-N6-v2 astra-max
+    FROZEN version=2 script_sha256=9bd478a1502839e7cfe2c5999e3485d6e9ba5d10bfe62e2593e061b7441dda71 argv=['--expect', 'all-logged', '--wait1', '5', '--wait2', '10', '--quiet-timeout', '1', '--exec-timeout', '60', '--repo', '$WORK/repo', '--db', '$WORK/scratch-home/.local/share/omniroute/storage.sqlite', '--scratch', '$WORK/codex-home-N6-v2', 'astra-max'] cwd=/tmp start=2026-10-06T06:29:03.154Z expect=all-logged wait1=5.0 wait2=10.0 quiet_timeout=1.0 exec_timeout=60.0 db=$WORK/scratch-home/.local/share/omniroute/storage.sqlite run_id=20261006T062903 template_sha256=5b817ce8cd10ffdfa89ab9dd8ff7d6a392e5e6cf5b4d0c8baa391faceb5898d3
+    RESULT shape=astra-max session_id=acceptance-20261006T062903-astra-max-1 quiet=False recent_call_logs=0 other_workers=2 min_rows=1 exec_exit=0 elapsed_s=0.6 client_usage={'input_tokens': 22, 'cached_input_tokens': 0, 'output_tokens': 19} command_executions=0 events=5 read1_call_logs=0 read1_usage=0 rows_tokens_in_out=(0, 0) rows_complete=False verdict=FAIL reasons=["call_logs rows with the turn's session id: 0 (at least 1 needed)", "the rows hold 0 input and 0 output tokens, the client used 22 and 19: a request's rows are missing"]
+    LATE shape=astra-max session_id=acceptance-20261006T062903-astra-max-1 read2_call_logs=0 read2_usage=0 rows_tokens_in_out=(0, 0) changed=False verdict=FAIL reasons=["call_logs rows with the turn's session id: 0 (at least 1 needed)", "the rows hold 0 input and 0 output tokens, the client used 22 and 19: a request's rows are missing"]
+    SUMMARY {'FAIL': 1} end=2026-10-06T06:29:23.779Z exit=1
+CONTROL-RESULT N6 v2 expected_exit=1 observed_exit=1 elapsed_s=21 OK
+
+### N6o: the baseline mode (--expect observe) on the unpatched gateway's drop with the real client: no verdict, exit 0, the rows of each turn and the client's usage are printed
+    stub mode: {"mode": "lose-on-early", "tail_s": 3.0}
+--- N6o / v2: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-native-exec-acceptance-20261006.py --expect all-logged --wait1 5 --wait2 10 --quiet-timeout 1 --exec-timeout 60 --repo $WORK/repo --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --scratch $WORK/codex-home-N6o-v2 --expect observe astra-max astra-max
+    FROZEN version=2 script_sha256=9bd478a1502839e7cfe2c5999e3485d6e9ba5d10bfe62e2593e061b7441dda71 argv=['--expect', 'all-logged', '--wait1', '5', '--wait2', '10', '--quiet-timeout', '1', '--exec-timeout', '60', '--repo', '$WORK/repo', '--db', '$WORK/scratch-home/.local/share/omniroute/storage.sqlite', '--scratch', '$WORK/codex-home-N6o-v2', '--expect', 'observe', 'astra-max', 'astra-max'] cwd=/tmp start=2026-10-06T06:29:25.348Z expect=observe wait1=5.0 wait2=10.0 quiet_timeout=1.0 exec_timeout=60.0 db=$WORK/scratch-home/.local/share/omniroute/storage.sqlite run_id=20261006T062925 template_sha256=5b817ce8cd10ffdfa89ab9dd8ff7d6a392e5e6cf5b4d0c8baa391faceb5898d3
+    RESULT shape=astra-max session_id=acceptance-20261006T062925-astra-max-1 quiet=False recent_call_logs=0 other_workers=2 min_rows=1 exec_exit=0 elapsed_s=0.5 client_usage={'input_tokens': 22, 'cached_input_tokens': 0, 'output_tokens': 19} command_executions=0 events=5 read1_call_logs=0 read1_usage=0 rows_tokens_in_out=(0, 0) rows_complete=False verdict=OBSERVED
+    RESULT shape=astra-max session_id=acceptance-20261006T062925-astra-max-2 quiet=False recent_call_logs=0 other_workers=2 min_rows=1 exec_exit=0 elapsed_s=0.3 client_usage={'input_tokens': 22, 'cached_input_tokens': 0, 'output_tokens': 19} command_executions=0 events=5 read1_call_logs=0 read1_usage=0 rows_tokens_in_out=(0, 0) rows_complete=False verdict=OBSERVED
+    LATE shape=astra-max session_id=acceptance-20261006T062925-astra-max-1 read2_call_logs=0 read2_usage=0 rows_tokens_in_out=(0, 0) changed=False verdict=OBSERVED
+    LATE shape=astra-max session_id=acceptance-20261006T062925-astra-max-2 read2_call_logs=0 read2_usage=0 rows_tokens_in_out=(0, 0) changed=False verdict=OBSERVED
+    SUMMARY {'OBSERVED': 2} end=2026-10-06T06:30:01.285Z exit=0
+CONTROL-RESULT N6o v2 expected_exit=0 observed_exit=0 elapsed_s=36 OK
+
+### N7: healthy single astra-max turn (real codex exec): version 2 passes
+    stub mode: {"mode": "normal"}
+--- N7 / v2: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-native-exec-acceptance-20261006.py --expect all-logged --wait1 5 --wait2 10 --quiet-timeout 1 --exec-timeout 60 --repo $WORK/repo --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --scratch $WORK/codex-home-N7-v2 astra-max
+    FROZEN version=2 script_sha256=9bd478a1502839e7cfe2c5999e3485d6e9ba5d10bfe62e2593e061b7441dda71 argv=['--expect', 'all-logged', '--wait1', '5', '--wait2', '10', '--quiet-timeout', '1', '--exec-timeout', '60', '--repo', '$WORK/repo', '--db', '$WORK/scratch-home/.local/share/omniroute/storage.sqlite', '--scratch', '$WORK/codex-home-N7-v2', 'astra-max'] cwd=/tmp start=2026-10-06T06:30:02.861Z expect=all-logged wait1=5.0 wait2=10.0 quiet_timeout=1.0 exec_timeout=60.0 db=$WORK/scratch-home/.local/share/omniroute/storage.sqlite run_id=20261006T063002 template_sha256=5b817ce8cd10ffdfa89ab9dd8ff7d6a392e5e6cf5b4d0c8baa391faceb5898d3
+    RESULT shape=astra-max session_id=acceptance-20261006T063002-astra-max-1 quiet=False recent_call_logs=0 other_workers=2 min_rows=1 exec_exit=0 elapsed_s=0.5 client_usage={'input_tokens': 22, 'cached_input_tokens': 0, 'output_tokens': 19} command_executions=0 events=5 read1_call_logs=1 read1_usage=1 rows_tokens_in_out=(22, 19) rows_complete=True verdict=PASS
+       call_logs: ('2026-10-06T06:30:13.634Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', 'max', 'max') id8=ecb12d54
+       usage_history: ('2026-10-06T06:30:13.634Z', 'gpt-6-astra', '200', 22, 19)
+    LATE shape=astra-max session_id=acceptance-20261006T063002-astra-max-1 read2_call_logs=1 read2_usage=1 rows_tokens_in_out=(22, 19) changed=False verdict=PASS
+    SUMMARY {'PASS': 1} end=2026-10-06T06:30:23.371Z exit=0
+CONTROL-RESULT N7 v2 expected_exit=0 observed_exit=0 elapsed_s=21 OK
+
+### RC1: a drop-in with only the show-log line
+--- RC1 / v1 (the print statement of version 1 applied to the same file): drop-in file: effective lines: ['[Service]', 'Environment=OMNIROUTE_SHOW_LOG=1']
+--- RC1 / v2: python3 omniroute-show-log-receipt-20261006.py --describe-dropin show-log-clean.conf
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o644
+CONTROL-RESULT RC1 v2 expected_no_leak observed_leaked=[] OK
+
+### RC2: a drop-in with an extra synthetic assignment that looks like a credential
+--- RC2 / v1 (the print statement of version 1 applied to the same file): drop-in file: effective lines: ['[Service]', 'Environment=OMNIROUTE_SHOW_LOG=1', 'Environment=SYNTHETIC_CONTROL_SECRET=control-value-0123456789']
+--- RC2 / v2: python3 omniroute-show-log-receipt-20261006.py --describe-dropin show-log-with-extra.conf
+    drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 1 (not printed) | size 105 bytes | mode 0o644
+CONTROL-RESULT RC2 v2 expected_no_leak observed_leaked=[] OK
+
+# finished 2026-10-06T06:30:23Z; scenarios with an unexpected exit status: ['N2a v1', 'N2b v1', 'N5b v1', 'N6 v1']
+driver exit=1
+
+################ PART B2
+# Offline controls of the live-acceptance scripts, version 1 (superseded) against version 2.1 (frozen; version 2.0 appears in the effort controls R8h), on the stub gateway and a scratch database. Nothing here touches a live gateway.
+# started 2026-10-06T09:51:47Z; codex-cli 0.159.3; python 3.13.15
+# live-acceptance v1: sha256 8aa14054401c00a5af1e8c180fc83af80c79cc0a807da98ea519149291188859
+# live-acceptance v2.0 (superseded): sha256 fa8fa6f8dc3a0e7360be4a0737c34daaf4d4b58696df6a7ab3483896cb739e82
+# live-acceptance v2.1: sha256 15b8cf04134aa8ead6526739e5a95b6dc15f4e5b77d59840e0d03aa56b33301b
+# native-exec v1: sha256 9f511620db390c3b4c7177f858342c6592680efd1d383e2e02ecf3f5d249fdee
+# native-exec v2: sha256 9bd478a1502839e7cfe2c5999e3485d6e9ba5d10bfe62e2593e061b7441dda71
+# show-log-receipt v2: sha256 7dd746bce15964c68d8b847f8072257a4b5712adca7ed7cd9089c09273ff26d6
+# gateway-identity: sha256 a7932710412e9e834f6b992f267db5620b64bbe62f25021013c8004a7eec6011
+# pre-switch-guard: sha256 305a065227bff71dcbe3b46b157f4d3ed83f5a5b5ce90a2f73cbfa6b26805040
+# pre-switch-guard v2 (superseded; G12): sha256 b491de6b3e4a5a1d3a3761c8fa8aefc439cca8cf4c453d696c7b9cb41a73af3a
+# run-acceptance wrapper: sha256 abcbb5407c244062697fb94a677100b3e670b609b423582d9f39368073e9cb11
+# switch tool copy (committed evidence file): sha256 97d1b87bb651d6f43e184b9617d03afa7861ee7715e7030ad23ed29057bc23e3
+# stub-gateway: sha256 2e500af67bf1aae55d82e4972c34664650e48e3bf9c167675184c7517afe9bb7
+# fake-codex: sha256 6c9eecec7e3209ad9690510463632780c0f7204e0abb4782ce09c92883e4c206
+# run-controls: sha256 cb249594fc5f256567837dcbab104b2a446324a9cbf894cd1eda78b7a90b74d8
+
+### N2a: the turn's own rows are lost but unrelated rows (other tag) with the same shape exist (real codex exec exits 0): version 1 attributes them to the turn and passes, version 2 fails
+    stub mode: {"mode": "unrelated-only"}
+--- N2a / v1: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-native-exec-acceptance-20261005.py --expect all-logged --wait1 5 --wait2 10 --quiet-timeout 1 --repo $WORK/repo astra-max   [env: HOME=$WORK/home]
+    FROZEN script_sha256=9f511620db390c3b4c7177f858342c6592680efd1d383e2e02ecf3f5d249fdee argv=['--expect', 'all-logged', '--wait1', '5', '--wait2', '10', '--quiet-timeout', '1', '--repo', '$WORK/repo', 'astra-max'] cwd=/tmp start=2026-10-06T09:51:49.341Z expect=all-logged wait1=5.0 wait2=10.0 quiet_timeout=1.0
+    RESULT shape=astra-max quiet=True exec_exit=0 elapsed_s=0.6 expected_each=1 read1_call_logs=1 read1_usage=1 verdict=PASS
+       stdout tail: ok
+       call_logs: ('2026-10-06T09:51:50.262Z', '/v1/responses', 200, 'gpt-6.1-sol', 4711, 42)
+       usage_history: ('2026-10-06T09:51:50.262Z', 'gpt-6.1-sol', '200', 4711, 42)
+    LATE shape=astra-max read2_call_logs=1 read2_usage=1 changed=False verdict=PASS
+    SUMMARY {'PASS': 1} end=2026-10-06T09:51:59.990Z exit=0
+CONTROL-RESULT N2a v1 defect-demonstration expected_exit=0 observed_exit=0 elapsed_s=11 OK
+
+--- N2a / v2: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-native-exec-acceptance-20261006.py --expect all-logged --wait1 5 --wait2 10 --quiet-timeout 1 --exec-timeout 60 --repo $WORK/repo --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --scratch $WORK/codex-home-N2a-v2 astra-max
+    FROZEN version=2 script_sha256=9bd478a1502839e7cfe2c5999e3485d6e9ba5d10bfe62e2593e061b7441dda71 argv=['--expect', 'all-logged', '--wait1', '5', '--wait2', '10', '--quiet-timeout', '1', '--exec-timeout', '60', '--repo', '$WORK/repo', '--db', '$WORK/scratch-home/.local/share/omniroute/storage.sqlite', '--scratch', '$WORK/codex-home-N2a-v2', 'astra-max'] cwd=/tmp start=2026-10-06T09:52:01.562Z expect=all-logged wait1=5.0 wait2=10.0 quiet_timeout=1.0 exec_timeout=60.0 db=$WORK/scratch-home/.local/share/omniroute/storage.sqlite run_id=20261006T095201 template_sha256=16d980115dadc3838d7830576f16b9f01e2d8fd963440ddd93cecd1217012f20
+    RESULT shape=astra-max session_id=acceptance-20261006T095201-astra-max-1 quiet=True recent_call_logs=0 other_workers=0 min_rows=1 exec_exit=0 elapsed_s=0.5 client_usage={'input_tokens': 22, 'cached_input_tokens': 0, 'output_tokens': 19} command_executions=0 events=5 read1_call_logs=0 read1_usage=0 rows_tokens_in_out=(0, 0) rows_complete=False verdict=FAIL reasons=["call_logs rows with the turn's session id: 0 (at least 1 needed)", "the rows hold 0 input and 0 output tokens, the client used 22 and 19: a request's rows are missing"]
+    LATE shape=astra-max session_id=acceptance-20261006T095201-astra-max-1 read2_call_logs=0 read2_usage=0 rows_tokens_in_out=(0, 0) changed=False verdict=FAIL reasons=["call_logs rows with the turn's session id: 0 (at least 1 needed)", "the rows hold 0 input and 0 output tokens, the client used 22 and 19: a request's rows are missing"]
+    SUMMARY {'FAIL': 1} end=2026-10-06T09:52:12.103Z exit=1
+CONTROL-RESULT N2a v2 expected_exit=1 observed_exit=1 elapsed_s=11 OK
+
+### N2b: the exec FAILS (exit 1) while an unrelated request's rows appear in the window: version 1 passes, version 2 is INCONCLUSIVE (the turn did not complete)
+    stub mode: {"mode": "normal"}   fake codex mode: exit1
+--- N2b / v1: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-native-exec-acceptance-20261005.py --expect all-logged --wait1 5 --wait2 10 --quiet-timeout 1 --repo $WORK/repo astra-max   [env: HOME=$WORK/home, FAKE_CODEX_MODE=exit1, FAKE_CODEX_DB=$WORK/scratch-home/.local/share/omniroute/storage.sqlite, PATH=$WORK/bin:$HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/drain-patch/acceptance-controls/shim:$HOME/.local/share/codex-ecosystem/bin:$HOME/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/wsl/lib:$HOME/.local/share/codex-ecosystem/sources/context-mode-6f0cc684/bin]
+    FROZEN script_sha256=9f511620db390c3b4c7177f858342c6592680efd1d383e2e02ecf3f5d249fdee argv=['--expect', 'all-logged', '--wait1', '5', '--wait2', '10', '--quiet-timeout', '1', '--repo', '$WORK/repo', 'astra-max'] cwd=/tmp start=2026-10-06T09:52:13.658Z expect=all-logged wait1=5.0 wait2=10.0 quiet_timeout=1.0
+    RESULT shape=astra-max quiet=True exec_exit=1 elapsed_s=0.0 expected_each=1 read1_call_logs=1 read1_usage=1 verdict=PASS
+       stdout tail: 
+       call_logs: ('2026-10-06T09:52:14.627Z', '/v1/responses', 200, 'gpt-6-astra', 15045, 50)
+       usage_history: ('2026-10-06T09:52:14.627Z', 'gpt-6-astra', '200', 15045, 50)
+    LATE shape=astra-max read2_call_logs=1 read2_usage=1 changed=False verdict=PASS
+    SUMMARY {'PASS': 1} end=2026-10-06T09:52:23.686Z exit=0
+CONTROL-RESULT N2b v1 defect-demonstration expected_exit=0 observed_exit=0 elapsed_s=10 OK
+
+--- N2b / v2: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-native-exec-acceptance-20261006.py --expect all-logged --wait1 5 --wait2 10 --quiet-timeout 1 --exec-timeout 60 --repo $WORK/repo --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --scratch $WORK/codex-home-N2b-v2 astra-max --codex $WORK/bin/codex   [env: FAKE_CODEX_MODE=exit1, FAKE_CODEX_DB=$WORK/scratch-home/.local/share/omniroute/storage.sqlite]
+    FROZEN version=2 script_sha256=9bd478a1502839e7cfe2c5999e3485d6e9ba5d10bfe62e2593e061b7441dda71 argv=['--expect', 'all-logged', '--wait1', '5', '--wait2', '10', '--quiet-timeout', '1', '--exec-timeout', '60', '--repo', '$WORK/repo', '--db', '$WORK/scratch-home/.local/share/omniroute/storage.sqlite', '--scratch', '$WORK/codex-home-N2b-v2', 'astra-max', '--codex', '$WORK/bin/codex'] cwd=/tmp start=2026-10-06T09:52:25.286Z expect=all-logged wait1=5.0 wait2=10.0 quiet_timeout=1.0 exec_timeout=60.0 db=$WORK/scratch-home/.local/share/omniroute/storage.sqlite run_id=20261006T095225 template_sha256=16d980115dadc3838d7830576f16b9f01e2d8fd963440ddd93cecd1217012f20
+    RESULT shape=astra-max session_id=acceptance-20261006T095225-astra-max-1 quiet=True recent_call_logs=0 other_workers=0 min_rows=1 exec_exit=1 timed_out=False elapsed_s=0.0 client_usage=None command_executions=0 events=0 rows_with_session_id=0 verdict=INCONCLUSIVE reasons=['the exec did not complete: exec exit status 1']
+       diagnostics (value-free): event types: [] | stdout tail:  | stderr tail: fake codex: simulated failure
+    SUMMARY {'INCONCLUSIVE': 1} end=2026-10-06T09:52:25.316Z exit=2
+CONTROL-RESULT N2b v2 expected_exit=2 observed_exit=2 elapsed_s=0 OK
+
+### N5b: the turn's call status changes from 200 to 499 after READ1 with the counts unchanged (real codex exec): version 1 passes, version 2 fails
+    stub mode: {"mode": "status-flip", "flip_s": 7}
+--- N5b / v1: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-native-exec-acceptance-20261005.py --expect all-logged --wait1 5 --wait2 10 --quiet-timeout 1 --repo $WORK/repo astra-max   [env: HOME=$WORK/home]
+    FROZEN script_sha256=9f511620db390c3b4c7177f858342c6592680efd1d383e2e02ecf3f5d249fdee argv=['--expect', 'all-logged', '--wait1', '5', '--wait2', '10', '--quiet-timeout', '1', '--repo', '$WORK/repo', 'astra-max'] cwd=/tmp start=2026-10-06T09:52:27.773Z expect=all-logged wait1=5.0 wait2=10.0 quiet_timeout=1.0
+    RESULT shape=astra-max quiet=True exec_exit=0 elapsed_s=0.4 expected_each=1 read1_call_logs=1 read1_usage=1 verdict=PASS
+       stdout tail: ok
+       call_logs: ('2026-10-06T09:52:28.444Z', '/v1/responses', 200, 'gpt-6-astra', 22, 19)
+       usage_history: ('2026-10-06T09:52:28.444Z', 'gpt-6-astra', '200', 22, 19)
+    LATE shape=astra-max read2_call_logs=1 read2_usage=1 changed=False verdict=PASS
+    SUMMARY {'PASS': 1} end=2026-10-06T09:52:38.209Z exit=0
+CONTROL-RESULT N5b v1 defect-demonstration expected_exit=0 observed_exit=0 elapsed_s=10 OK
+
+--- N5b / v2: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-native-exec-acceptance-20261006.py --expect all-logged --wait1 5 --wait2 10 --quiet-timeout 1 --exec-timeout 60 --repo $WORK/repo --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --scratch $WORK/codex-home-N5b-v2 astra-max
+    FROZEN version=2 script_sha256=9bd478a1502839e7cfe2c5999e3485d6e9ba5d10bfe62e2593e061b7441dda71 argv=['--expect', 'all-logged', '--wait1', '5', '--wait2', '10', '--quiet-timeout', '1', '--exec-timeout', '60', '--repo', '$WORK/repo', '--db', '$WORK/scratch-home/.local/share/omniroute/storage.sqlite', '--scratch', '$WORK/codex-home-N5b-v2', 'astra-max'] cwd=/tmp start=2026-10-06T09:52:39.775Z expect=all-logged wait1=5.0 wait2=10.0 quiet_timeout=1.0 exec_timeout=60.0 db=$WORK/scratch-home/.local/share/omniroute/storage.sqlite run_id=20261006T095239 template_sha256=16d980115dadc3838d7830576f16b9f01e2d8fd963440ddd93cecd1217012f20
+    RESULT shape=astra-max session_id=acceptance-20261006T095239-astra-max-1 quiet=True recent_call_logs=0 other_workers=0 min_rows=1 exec_exit=0 elapsed_s=0.5 client_usage={'input_tokens': 22, 'cached_input_tokens': 0, 'output_tokens': 19} command_executions=0 events=5 read1_call_logs=1 read1_usage=1 rows_tokens_in_out=(22, 19) rows_complete=True verdict=PASS
+       call_logs: ('2026-10-06T09:52:40.532Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', 'max', 'max') id8=708935e2
+       usage_history: ('2026-10-06T09:52:40.532Z', 'gpt-6-astra', '200', 22, 19)
+    LATE shape=astra-max session_id=acceptance-20261006T095239-astra-max-1 read2_call_logs=1 read2_usage=1 rows_tokens_in_out=(22, 19) changed=True verdict=FAIL reasons=['call_logs status 499 (expected 200)', 'the rows at READ2 are not the rows (or not the values) of READ1']
+       call_logs: ('2026-10-06T09:52:40.532Z', '/v1/responses', 499, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', 'max', 'max') id8=708935e2
+       usage_history: ('2026-10-06T09:52:40.532Z', 'gpt-6-astra', '200', 22, 19)
+    SUMMARY {'FAIL': 1} end=2026-10-06T09:52:50.266Z exit=1
+CONTROL-RESULT N5b v2 expected_exit=1 observed_exit=1 elapsed_s=11 OK
+
+### N6: the unpatched gateway's drop with the real client (it closes right after the terminal event, the stub keeps no row): both versions fail
+    stub mode: {"mode": "lose-on-early", "tail_s": 3.0}
+--- N6 / v1: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-native-exec-acceptance-20261005.py --expect all-logged --wait1 5 --wait2 10 --quiet-timeout 1 --repo $WORK/repo astra-max   [env: HOME=$WORK/home]
+    FROZEN script_sha256=9f511620db390c3b4c7177f858342c6592680efd1d383e2e02ecf3f5d249fdee argv=['--expect', 'all-logged', '--wait1', '5', '--wait2', '10', '--quiet-timeout', '1', '--repo', '$WORK/repo', 'astra-max'] cwd=/tmp start=2026-10-06T09:52:51.819Z expect=all-logged wait1=5.0 wait2=10.0 quiet_timeout=1.0
+    RESULT shape=astra-max quiet=True exec_exit=0 elapsed_s=0.3 expected_each=1 read1_call_logs=0 read1_usage=0 verdict=FAIL
+       stdout tail: ok
+    LATE shape=astra-max read2_call_logs=0 read2_usage=0 changed=False verdict=FAIL
+    SUMMARY {'FAIL': 1} end=2026-10-06T09:53:02.168Z exit=1
+CONTROL-RESULT N6 v1 expected_exit=1 observed_exit=1 elapsed_s=10 OK
+
+--- N6 / v2: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-native-exec-acceptance-20261006.py --expect all-logged --wait1 5 --wait2 10 --quiet-timeout 1 --exec-timeout 60 --repo $WORK/repo --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --scratch $WORK/codex-home-N6-v2 astra-max
+    FROZEN version=2 script_sha256=9bd478a1502839e7cfe2c5999e3485d6e9ba5d10bfe62e2593e061b7441dda71 argv=['--expect', 'all-logged', '--wait1', '5', '--wait2', '10', '--quiet-timeout', '1', '--exec-timeout', '60', '--repo', '$WORK/repo', '--db', '$WORK/scratch-home/.local/share/omniroute/storage.sqlite', '--scratch', '$WORK/codex-home-N6-v2', 'astra-max'] cwd=/tmp start=2026-10-06T09:53:03.738Z expect=all-logged wait1=5.0 wait2=10.0 quiet_timeout=1.0 exec_timeout=60.0 db=$WORK/scratch-home/.local/share/omniroute/storage.sqlite run_id=20261006T095303 template_sha256=16d980115dadc3838d7830576f16b9f01e2d8fd963440ddd93cecd1217012f20
+    RESULT shape=astra-max session_id=acceptance-20261006T095303-astra-max-1 quiet=True recent_call_logs=0 other_workers=0 min_rows=1 exec_exit=0 elapsed_s=0.6 client_usage={'input_tokens': 22, 'cached_input_tokens': 0, 'output_tokens': 19} command_executions=0 events=5 read1_call_logs=0 read1_usage=0 rows_tokens_in_out=(0, 0) rows_complete=False verdict=FAIL reasons=["call_logs rows with the turn's session id: 0 (at least 1 needed)", "the rows hold 0 input and 0 output tokens, the client used 22 and 19: a request's rows are missing"]
+    LATE shape=astra-max session_id=acceptance-20261006T095303-astra-max-1 read2_call_logs=0 read2_usage=0 rows_tokens_in_out=(0, 0) changed=False verdict=FAIL reasons=["call_logs rows with the turn's session id: 0 (at least 1 needed)", "the rows hold 0 input and 0 output tokens, the client used 22 and 19: a request's rows are missing"]
+    SUMMARY {'FAIL': 1} end=2026-10-06T09:53:14.304Z exit=1
+CONTROL-RESULT N6 v2 expected_exit=1 observed_exit=1 elapsed_s=11 OK
+
+# finished 2026-10-06T09:53:14Z; scenarios with an unexpected exit status: none
+driver exit=0
+
+################ PART C
+# Offline controls of the live-acceptance scripts, version 1 (superseded) against version 2.1 (frozen; version 2.0 appears in the effort controls R8h), on the stub gateway and a scratch database. Nothing here touches a live gateway.
+# started 2026-10-06T06:21:30Z; codex-cli 0.159.3; python 3.13.15
+# live-acceptance v1: sha256 8aa14054401c00a5af1e8c180fc83af80c79cc0a807da98ea519149291188859
+# live-acceptance v2.0 (superseded): sha256 fa8fa6f8dc3a0e7360be4a0737c34daaf4d4b58696df6a7ab3483896cb739e82
+# live-acceptance v2.1: sha256 15b8cf04134aa8ead6526739e5a95b6dc15f4e5b77d59840e0d03aa56b33301b
+# native-exec v1: sha256 9f511620db390c3b4c7177f858342c6592680efd1d383e2e02ecf3f5d249fdee
+# native-exec v2: sha256 9bd478a1502839e7cfe2c5999e3485d6e9ba5d10bfe62e2593e061b7441dda71
+# show-log-receipt v2: sha256 7dd746bce15964c68d8b847f8072257a4b5712adca7ed7cd9089c09273ff26d6
+# gateway-identity: sha256 a7932710412e9e834f6b992f267db5620b64bbe62f25021013c8004a7eec6011
+# pre-switch-guard: sha256 305a065227bff71dcbe3b46b157f4d3ed83f5a5b5ce90a2f73cbfa6b26805040
+# pre-switch-guard v2 (superseded; G12): sha256 b491de6b3e4a5a1d3a3761c8fa8aefc439cca8cf4c453d696c7b9cb41a73af3a
+# run-acceptance wrapper: sha256 abcbb5407c244062697fb94a677100b3e670b609b423582d9f39368073e9cb11
+# switch tool copy (committed evidence file): sha256 97d1b87bb651d6f43e184b9617d03afa7861ee7715e7030ad23ed29057bc23e3
+# stub-gateway: sha256 2e500af67bf1aae55d82e4972c34664650e48e3bf9c167675184c7517afe9bb7
+# fake-codex: sha256 6c9eecec7e3209ad9690510463632780c0f7204e0abb4782ce09c92883e4c206
+# run-controls: sha256 cb249594fc5f256567837dcbab104b2a446324a9cbf894cd1eda78b7a90b74d8
+
+### U1: --baseline names a file that does not exist (a relative path run from /tmp, as the frozen version-1 command was): version 1 crashes with exit 1, the code of a FAIL; version 2 stops with exit 3 before sending any request
+--- U1 / v1: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-live-acceptance-20261005.py --port 57874 --expect all-logged --baseline checks/live-acceptance-baseline-raw.txt --wait1 5 --wait2 10 effort:cx/gpt-6-astra:max   [env: HOME=$WORK/home]
+    note: run from /tmp, where the relative path does not exist
+    FROZEN script_sha256=8aa14054401c00a5af1e8c180fc83af80c79cc0a807da98ea519149291188859 argv=['--port', '57874', '--expect', 'all-logged', '--baseline', 'checks/live-acceptance-baseline-raw.txt', '--wait1', '5', '--wait2', '10', 'effort:cx/gpt-6-astra:max'] cwd=/tmp start=2026-10-06T06:21:32.275Z expect=all-logged wait1=5.0 wait2=10.0 port=57874
+    Traceback (most recent call last):
+      File "$HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-live-acceptance-20261005.py", line 206, in <module>
+        main()
+        ~~~~^^
+      File "$HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-live-acceptance-20261005.py", line 155, in main
+        base = parse_baseline(args.baseline) if args.baseline else {}
+               ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+      File "$HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-live-acceptance-20261005.py", line 137, in parse_baseline
+        for line in open(path, encoding="utf-8", errors="replace"):
+                    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    FileNotFoundError: [Errno 2] No such file or directory: 'checks/live-acceptance-baseline-raw.txt'
+CONTROL-RESULT U1 v1 defect-demonstration expected_exit=1 observed_exit=1 elapsed_s=0 OK
+
+    requests the stub received: 0
+--- U1 / v2: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-live-acceptance-20261006.py --port 57874 --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --expect all-logged --baseline checks/live-acceptance-baseline-raw.txt --wait1 5 --wait2 10 effort:cx/gpt-6-astra:max
+    note: run from /tmp, where the relative path does not exist
+    ERROR usage: preflight: --baseline 'checks/live-acceptance-baseline-raw.txt' is not a readable file (give an absolute path)
+CONTROL-RESULT U1 v2 expected_exit=3 observed_exit=3 elapsed_s=0 OK
+
+    requests the stub received: 0
+### U2: an unknown mode: version 1 exits 1 (SystemExit with a message), version 2 exits 3
+--- U2 / v1: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-live-acceptance-20261005.py --port 57874 --expect observe --wait1 5 --wait2 10 responses:nonsense   [env: HOME=$WORK/home]
+    FROZEN script_sha256=8aa14054401c00a5af1e8c180fc83af80c79cc0a807da98ea519149291188859 argv=['--port', '57874', '--expect', 'observe', '--wait1', '5', '--wait2', '10', 'responses:nonsense'] cwd=/tmp start=2026-10-06T06:21:35.410Z expect=observe wait1=5.0 wait2=10.0 port=57874
+    unknown mode 'responses:nonsense'
+CONTROL-RESULT U2 v1 defect-demonstration expected_exit=1 observed_exit=1 elapsed_s=0 OK
+
+--- U2 / v2: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-live-acceptance-20261006.py --port 57874 --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --expect observe --wait1 5 --wait2 10 responses:nonsense
+    ERROR usage: unknown mode 'responses:nonsense'
+CONTROL-RESULT U2 v2 expected_exit=3 observed_exit=3 elapsed_s=0 OK
+
+### U3: a bad option value (--wait1 abc): version 1 exits 2 (argparse), the code of INCONCLUSIVE; version 2 exits 3
+--- U3 / v1: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-live-acceptance-20261005.py --port 57874 --expect observe --wait1 abc --wait2 10 responses:eof   [env: HOME=$WORK/home]
+    usage: omniroute-live-acceptance-20261005.py [--port PORT]
+                                                 [--expect {observe,all-logged}]
+                                                 [--baseline BASELINE]
+                                                 [--wait1 WAIT1] [--wait2 WAIT2]
+                                                 modes [modes ...]
+    omniroute-live-acceptance-20261005.py: error: argument --wait1: invalid float value: 'abc'
+CONTROL-RESULT U3 v1 defect-demonstration expected_exit=2 observed_exit=2 elapsed_s=0 OK
+
+--- U3 / v2: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-live-acceptance-20261006.py --port 57874 --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --expect observe --wait1 abc --wait2 10 responses:eof
+    ERROR usage: argument --wait1: invalid float value: 'abc'
+CONTROL-RESULT U3 v2 expected_exit=3 observed_exit=3 elapsed_s=0 OK
+
+### U4: no gateway answers on the port: version 2 stops with exit 3 at its health preflight, before any request
+--- U4 / v2: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-live-acceptance-20261006.py --port 1 --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --expect observe --wait1 5 --wait2 10 responses:eof
+    ERROR usage: preflight: no healthy gateway answers on port 1 (GET /api/health)
+CONTROL-RESULT U4 v2 expected_exit=3 observed_exit=3 elapsed_s=5 OK
+
+### U5: native: an unknown shape (version 1 raises a KeyError and exits 1, version 2 exits 3), and a missing profile template (version 2 exits 3)
+--- U5 / v1: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-native-exec-acceptance-20261005.py --expect all-logged --wait1 5 --wait2 10 --quiet-timeout 1 --repo $WORK/repo nonsense   [env: HOME=$WORK/home]
+    FROZEN script_sha256=9f511620db390c3b4c7177f858342c6592680efd1d383e2e02ecf3f5d249fdee argv=['--expect', 'all-logged', '--wait1', '5', '--wait2', '10', '--quiet-timeout', '1', '--repo', '$WORK/repo', 'nonsense'] cwd=/tmp start=2026-10-06T06:21:48.244Z expect=all-logged wait1=5.0 wait2=10.0 quiet_timeout=1.0
+    Traceback (most recent call last):
+      File "$HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-native-exec-acceptance-20261005.py", line 132, in <module>
+        main()
+        ~~~~^^
+      File "$HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-native-exec-acceptance-20261005.py", line 86, in main
+        extra, prompt, expected = SHAPES[shape]
+                                  ~~~~~~^^^^^^^
+    KeyError: 'nonsense'
+CONTROL-RESULT U5 v1 defect-demonstration expected_exit=1 observed_exit=1 elapsed_s=0 OK
+
+--- U5 / v2 unknown shape: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-native-exec-acceptance-20261006.py --expect all-logged --wait1 5 --wait2 10 --quiet-timeout 1 --exec-timeout 60 --repo $WORK/repo --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --scratch $WORK/codex-home-U5 nonsense
+    ERROR usage: preflight: unknown shape(s) ['nonsense']; known: ['astra-max', 'sol-xhigh', 'two-request']
+CONTROL-RESULT U5 v2 unknown shape expected_exit=3 observed_exit=3 elapsed_s=0 OK
+
+--- U5 / v2 missing template: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-native-exec-acceptance-20261006.py --expect all-logged --wait1 5 --wait2 10 --quiet-timeout 1 --exec-timeout 60 --repo $WORK/no-such-repo --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --scratch $WORK/codex-home-U5b astra-max
+    ERROR usage: preflight: the profile template $WORK/no-such-repo/adoption/templates/codex.omniroute.config.toml does not exist
+CONTROL-RESULT U5 v2 missing template expected_exit=3 observed_exit=3 elapsed_s=0 OK
+
+### I1: the identity read-back of a dummy process that carries the rollback prefix in its command line, against the stub's health endpoint: it prints the line and exits 0 when the expectations hold
+--- I1 / expectations hold: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/gateway-identity-20261006.py --pid 373267 --port 57874 --tools $WORK/tools --label control --expect-prefix omniroute-ctl-rollback --expect-build cf6748d04
+    IDENTITY label=control time=2026-10-06T06:21:48Z unit=omniroute.service MainPID=373267 ExecMainStartTimestamp=Tue_2026-10-06_00:26:11_EDT NRestarts=0 running_prefix=omniroute-ctl-rollback BUILD_SHA=cf6748d04 health=ok pending_total=0 expect_prefix_ok=True expect_build_ok=True
+CONTROL-RESULT I1 expectations hold expected_exit=0 observed_exit=0 elapsed_s=0 OK
+
+### I2: a build id that is not the running one: exit 5
+--- I2 / wrong build: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/gateway-identity-20261006.py --pid 373267 --port 57874 --tools $WORK/tools --label control --expect-prefix omniroute-ctl-rollback --expect-build 2a41147b7
+    IDENTITY label=control time=2026-10-06T06:21:49Z unit=omniroute.service MainPID=373267 ExecMainStartTimestamp=Tue_2026-10-06_00:26:11_EDT NRestarts=0 running_prefix=omniroute-ctl-rollback BUILD_SHA=cf6748d04 health=ok pending_total=0 expect_prefix_ok=True expect_build_ok=False
+CONTROL-RESULT I2 wrong build expected_exit=5 observed_exit=5 elapsed_s=0 OK
+
+### I3: no healthy gateway on the port: exit 5
+--- I3 / no health: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/gateway-identity-20261006.py --pid 373267 --port 1 --tools $WORK/tools --label control
+    IDENTITY label=control time=2026-10-06T06:21:54Z unit=omniroute.service MainPID=373267 ExecMainStartTimestamp=Tue_2026-10-06_00:26:11_EDT NRestarts=0 running_prefix=omniroute-ctl-rollback BUILD_SHA=cf6748d04 health=URLError pending_total=None
+CONTROL-RESULT I3 no health expected_exit=5 observed_exit=5 elapsed_s=25 OK
+
+### G1: everything holds, and an IDLE established connection to the gateway port exists (it must be tolerated: idle keep-alive connections from other PID namespaces exist at rest on the live gateway): exit 0
+--- G1 / clean: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/pre-switch-guard-20261006.py --switch-tool $WORK/switch-tool-standin.py --switch-sha256 6b444a2fa3d57976592289cc59537da365f49aa6fc917871dce10dfda12586c1 --port 57874 --tools $WORK/tools --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --clean-for 6 --interval 2 --rollback-prefix omniroute-ctl-rollback --rollback-build cf6748d04 --target-prefix omniroute-ctl-target --target-build 2a41147b7 --shim-sha256 4a5c247583b8a0f02ffd71b1a8bdf107ae6f7c564ab61e341bb92be48d643c2a --pid 375461 --worker-pattern nonexistent-process-pattern-for-the-controls
+    GUARD version=3 script_sha256=305a065227bff71dcbe3b46b157f4d3ed83f5a5b5ce90a2f73cbfa6b26805040 start=2026-10-06T06:22:16.301Z port=57874 unit=omniroute.service clean_for=6.0 interval=2.0 tolerate_units=['omniroute-fw.service']
+    CHECK switch tool sha256: ok (6b444a2fa3d5)
+    CHECK rollback prefix intact: ok (omniroute-ctl-rollback: bin/omniroute, BUILD_SHA cf6748d04, shim v2)
+    CHECK target prefix intact: ok (omniroute-ctl-target: bin/omniroute, BUILD_SHA 2a41147b7, shim v2, drain marker)
+       IDENTITY label=pre-switch time=2026-10-06T06:22:16Z unit=omniroute.service MainPID=375461 ExecMainStartTimestamp=Tue_2026-10-06_00:26:11_EDT NRestarts=0 running_prefix=omniroute-ctl-rollback BUILD_SHA=cf6748d04 health=ok pending_total=0 expect_prefix_ok=True expect_build_ok=True
+    CHECK unit runs the rollback prefix, health ok: ok
+       sample 1 at 2026-10-06T06:22:16.425Z: connections=1 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 2 at 2026-10-06T06:22:18.462Z: connections=1 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 3 at 2026-10-06T06:22:20.498Z: connections=1 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 4 at 2026-10-06T06:22:22.533Z: connections=1 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+    CHECK nothing in flight for 6 s (4 samples): ok (1 idle and 0 tolerated connection(s))
+    INFO connections_seen=1 connections_tolerated=0 connections_active=0 connections_idle=1 pending_total_before=0 pending_total_after=0 pending_changed=False hindsight_processes=9
+    GUARD-RESULT clean=True failed_checks=[] end=2026-10-06T06:22:22.549Z
+CONTROL-RESULT G1 clean expected_exit=0 observed_exit=0 elapsed_s=6 OK
+
+### G2: a client connection that carries traffic during the window (a request sent in slow pieces): ACTIVE, exit 4
+--- G2 / active connection: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/pre-switch-guard-20261006.py --switch-tool $WORK/switch-tool-standin.py --switch-sha256 6b444a2fa3d57976592289cc59537da365f49aa6fc917871dce10dfda12586c1 --port 57874 --tools $WORK/tools --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --clean-for 6 --interval 2 --rollback-prefix omniroute-ctl-rollback --rollback-build cf6748d04 --target-prefix omniroute-ctl-target --target-build 2a41147b7 --shim-sha256 4a5c247583b8a0f02ffd71b1a8bdf107ae6f7c564ab61e341bb92be48d643c2a --pid 375461 --worker-pattern nonexistent-process-pattern-for-the-controls
+    GUARD version=3 script_sha256=305a065227bff71dcbe3b46b157f4d3ed83f5a5b5ce90a2f73cbfa6b26805040 start=2026-10-06T06:22:22.603Z port=57874 unit=omniroute.service clean_for=6.0 interval=2.0 tolerate_units=['omniroute-fw.service']
+    CHECK switch tool sha256: ok (6b444a2fa3d5)
+    CHECK rollback prefix intact: ok (omniroute-ctl-rollback: bin/omniroute, BUILD_SHA cf6748d04, shim v2)
+    CHECK target prefix intact: ok (omniroute-ctl-target: bin/omniroute, BUILD_SHA 2a41147b7, shim v2, drain marker)
+       IDENTITY label=pre-switch time=2026-10-06T06:22:22Z unit=omniroute.service MainPID=375461 ExecMainStartTimestamp=Tue_2026-10-06_00:26:11_EDT NRestarts=0 running_prefix=omniroute-ctl-rollback BUILD_SHA=cf6748d04 health=ok pending_total=0 expect_prefix_ok=True expect_build_ok=True
+    CHECK unit runs the rollback prefix, health ok: ok
+       sample 1 at 2026-10-06T06:22:22.716Z: connections=1 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 2 at 2026-10-06T06:22:24.751Z: connections=1 tolerated_so_far=0 active_so_far=1 workers=0 last_call_log_age_s=none
+       sample 3 at 2026-10-06T06:22:26.786Z: connections=1 tolerated_so_far=0 active_so_far=1 workers=0 last_call_log_age_s=none
+       sample 4 at 2026-10-06T06:22:28.823Z: connections=1 tolerated_so_far=0 active_so_far=1 workers=0 last_call_log_age_s=none
+    CHECK nothing in flight for 6 s (4 samples): FAIL ["1 ACTIVE connection(s) to port 57874: ['traffic during the window (non-systemd)']"]
+    INFO connections_seen=1 connections_tolerated=0 connections_active=1 connections_idle=0 pending_total_before=0 pending_total_after=0 pending_changed=False hindsight_processes=9
+    GUARD-RESULT clean=False failed_checks=['nothing in flight for 6 s (4 samples)'] end=2026-10-06T06:22:28.841Z
+CONTROL-RESULT G2 active connection expected_exit=4 observed_exit=4 elapsed_s=6 OK
+
+### G9: traffic from a poller in a TOLERATED unit (a transient systemd scope named by --tolerate-unit, as omniroute-fw.service is for the 20129 gateway's poll of 20128): reported as tolerated, exit 0
+    poller process alive before G9: True
+--- G9 / tolerated poller: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/pre-switch-guard-20261006.py --switch-tool $WORK/switch-tool-standin.py --switch-sha256 6b444a2fa3d57976592289cc59537da365f49aa6fc917871dce10dfda12586c1 --port 57874 --tools $WORK/tools --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --clean-for 6 --interval 2 --rollback-prefix omniroute-ctl-rollback --rollback-build cf6748d04 --target-prefix omniroute-ctl-target --target-build 2a41147b7 --shim-sha256 4a5c247583b8a0f02ffd71b1a8bdf107ae6f7c564ab61e341bb92be48d643c2a --pid 375461 --worker-pattern nonexistent-process-pattern-for-the-controls --tolerate-unit ctl-poller-371801.scope
+    GUARD version=3 script_sha256=305a065227bff71dcbe3b46b157f4d3ed83f5a5b5ce90a2f73cbfa6b26805040 start=2026-10-06T06:22:30.407Z port=57874 unit=omniroute.service clean_for=6.0 interval=2.0 tolerate_units=['ctl-poller-371801.scope']
+    CHECK switch tool sha256: ok (6b444a2fa3d5)
+    CHECK rollback prefix intact: ok (omniroute-ctl-rollback: bin/omniroute, BUILD_SHA cf6748d04, shim v2)
+    CHECK target prefix intact: ok (omniroute-ctl-target: bin/omniroute, BUILD_SHA 2a41147b7, shim v2, drain marker)
+       IDENTITY label=pre-switch time=2026-10-06T06:22:30Z unit=omniroute.service MainPID=375461 ExecMainStartTimestamp=Tue_2026-10-06_00:26:11_EDT NRestarts=0 running_prefix=omniroute-ctl-rollback BUILD_SHA=cf6748d04 health=ok pending_total=0 expect_prefix_ok=True expect_build_ok=True
+    CHECK unit runs the rollback prefix, health ok: ok
+       sample 1 at 2026-10-06T06:22:30.526Z: connections=1 tolerated_so_far=1 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 2 at 2026-10-06T06:22:32.561Z: connections=1 tolerated_so_far=2 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 3 at 2026-10-06T06:22:34.599Z: connections=1 tolerated_so_far=3 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 4 at 2026-10-06T06:22:36.641Z: connections=1 tolerated_so_far=4 active_so_far=0 workers=0 last_call_log_age_s=none
+    CHECK nothing in flight for 6 s (4 samples): ok (0 idle and 4 tolerated connection(s))
+    INFO connections_seen=4 connections_tolerated=4 connections_active=0 connections_idle=0 pending_total_before=0 pending_total_after=0 pending_changed=False hindsight_processes=9
+    GUARD-RESULT clean=True failed_checks=[] end=2026-10-06T06:22:36.659Z
+CONTROL-RESULT G9 tolerated poller expected_exit=0 observed_exit=0 elapsed_s=6 OK
+
+### G10: the same poller when its unit is NOT tolerated (the default tolerates only omniroute-fw.service): ACTIVE, exit 4
+    poller process alive before G10: True
+--- G10 / poller not tolerated: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/pre-switch-guard-20261006.py --switch-tool $WORK/switch-tool-standin.py --switch-sha256 6b444a2fa3d57976592289cc59537da365f49aa6fc917871dce10dfda12586c1 --port 57874 --tools $WORK/tools --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --clean-for 6 --interval 2 --rollback-prefix omniroute-ctl-rollback --rollback-build cf6748d04 --target-prefix omniroute-ctl-target --target-build 2a41147b7 --shim-sha256 4a5c247583b8a0f02ffd71b1a8bdf107ae6f7c564ab61e341bb92be48d643c2a --pid 375461 --worker-pattern nonexistent-process-pattern-for-the-controls
+    GUARD version=3 script_sha256=305a065227bff71dcbe3b46b157f4d3ed83f5a5b5ce90a2f73cbfa6b26805040 start=2026-10-06T06:22:36.719Z port=57874 unit=omniroute.service clean_for=6.0 interval=2.0 tolerate_units=['omniroute-fw.service']
+    CHECK switch tool sha256: ok (6b444a2fa3d5)
+    CHECK rollback prefix intact: ok (omniroute-ctl-rollback: bin/omniroute, BUILD_SHA cf6748d04, shim v2)
+    CHECK target prefix intact: ok (omniroute-ctl-target: bin/omniroute, BUILD_SHA 2a41147b7, shim v2, drain marker)
+       IDENTITY label=pre-switch time=2026-10-06T06:22:36Z unit=omniroute.service MainPID=375461 ExecMainStartTimestamp=Tue_2026-10-06_00:26:11_EDT NRestarts=0 running_prefix=omniroute-ctl-rollback BUILD_SHA=cf6748d04 health=ok pending_total=0 expect_prefix_ok=True expect_build_ok=True
+    CHECK unit runs the rollback prefix, health ok: ok
+       sample 1 at 2026-10-06T06:22:36.847Z: connections=1 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 2 at 2026-10-06T06:22:38.885Z: connections=1 tolerated_so_far=0 active_so_far=1 workers=0 last_call_log_age_s=none
+       sample 3 at 2026-10-06T06:22:40.920Z: connections=1 tolerated_so_far=0 active_so_far=2 workers=0 last_call_log_age_s=none
+       sample 4 at 2026-10-06T06:22:42.957Z: connections=1 tolerated_so_far=0 active_so_far=3 workers=0 last_call_log_age_s=none
+    CHECK nothing in flight for 6 s (4 samples): FAIL ["3 ACTIVE connection(s) to port 57874: ['new during the window (ctl-poller-371801.scope)']"]
+    INFO connections_seen=4 connections_tolerated=0 connections_active=3 connections_idle=1 pending_total_before=0 pending_total_after=0 pending_changed=False hindsight_processes=9
+    GUARD-RESULT clean=False failed_checks=['nothing in flight for 6 s (4 samples)'] end=2026-10-06T06:22:42.973Z
+CONTROL-RESULT G10 poller not tolerated expected_exit=4 observed_exit=4 elapsed_s=6 OK
+
+### G11: a tolerated poller AND another client that carries traffic: the tolerance does not hide the other client, exit 4
+--- G11 / tolerated poller plus another active client: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/pre-switch-guard-20261006.py --switch-tool $WORK/switch-tool-standin.py --switch-sha256 6b444a2fa3d57976592289cc59537da365f49aa6fc917871dce10dfda12586c1 --port 57874 --tools $WORK/tools --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --clean-for 6 --interval 2 --rollback-prefix omniroute-ctl-rollback --rollback-build cf6748d04 --target-prefix omniroute-ctl-target --target-build 2a41147b7 --shim-sha256 4a5c247583b8a0f02ffd71b1a8bdf107ae6f7c564ab61e341bb92be48d643c2a --pid 375461 --worker-pattern nonexistent-process-pattern-for-the-controls --tolerate-unit ctl-poller-371801.scope
+    GUARD version=3 script_sha256=305a065227bff71dcbe3b46b157f4d3ed83f5a5b5ce90a2f73cbfa6b26805040 start=2026-10-06T06:22:43.032Z port=57874 unit=omniroute.service clean_for=6.0 interval=2.0 tolerate_units=['ctl-poller-371801.scope']
+    CHECK switch tool sha256: ok (6b444a2fa3d5)
+    CHECK rollback prefix intact: ok (omniroute-ctl-rollback: bin/omniroute, BUILD_SHA cf6748d04, shim v2)
+    CHECK target prefix intact: ok (omniroute-ctl-target: bin/omniroute, BUILD_SHA 2a41147b7, shim v2, drain marker)
+       IDENTITY label=pre-switch time=2026-10-06T06:22:43Z unit=omniroute.service MainPID=375461 ExecMainStartTimestamp=Tue_2026-10-06_00:26:11_EDT NRestarts=0 running_prefix=omniroute-ctl-rollback BUILD_SHA=cf6748d04 health=ok pending_total=0 expect_prefix_ok=True expect_build_ok=True
+    CHECK unit runs the rollback prefix, health ok: ok
+       sample 1 at 2026-10-06T06:22:43.160Z: connections=2 tolerated_so_far=1 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 2 at 2026-10-06T06:22:45.195Z: connections=2 tolerated_so_far=2 active_so_far=1 workers=0 last_call_log_age_s=none
+       sample 3 at 2026-10-06T06:22:47.232Z: connections=2 tolerated_so_far=3 active_so_far=1 workers=0 last_call_log_age_s=none
+       sample 4 at 2026-10-06T06:22:49.269Z: connections=2 tolerated_so_far=4 active_so_far=1 workers=0 last_call_log_age_s=none
+    CHECK nothing in flight for 6 s (4 samples): FAIL ["1 ACTIVE connection(s) to port 57874: ['traffic during the window (non-systemd)']"]
+    INFO connections_seen=5 connections_tolerated=4 connections_active=1 connections_idle=0 pending_total_before=0 pending_total_after=0 pending_changed=False hindsight_processes=9
+    GUARD-RESULT clean=False failed_checks=['nothing in flight for 6 s (4 samples)'] end=2026-10-06T06:22:49.284Z
+CONTROL-RESULT G11 tolerated poller plus another active client expected_exit=4 observed_exit=4 elapsed_s=6 OK
+
+### G12: the superseded guard (version 2) on the same fixture and the same poller, with the same options (it has no way to tolerate a unit): the poller counts as ACTIVE, exit 4: the failure of the first live trial that version 3 fixed (the 20129 gateway's poll of 20128)
+    poller process alive before G12: True
+--- G12 / guard v2 with the poller: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/pre-switch-guard-20261006-v2.py --switch-tool $WORK/switch-tool-standin.py --switch-sha256 6b444a2fa3d57976592289cc59537da365f49aa6fc917871dce10dfda12586c1 --port 57874 --tools $WORK/tools --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --clean-for 6 --interval 2 --rollback-prefix omniroute-ctl-rollback --rollback-build cf6748d04 --target-prefix omniroute-ctl-target --target-build 2a41147b7 --shim-sha256 4a5c247583b8a0f02ffd71b1a8bdf107ae6f7c564ab61e341bb92be48d643c2a --pid 375461 --worker-pattern nonexistent-process-pattern-for-the-controls
+    GUARD version=2 script_sha256=b491de6b3e4a5a1d3a3761c8fa8aefc439cca8cf4c453d696c7b9cb41a73af3a start=2026-10-06T06:22:50.032Z port=57874 unit=omniroute.service clean_for=6.0 interval=2.0
+    CHECK switch tool sha256: ok (6b444a2fa3d5)
+    CHECK rollback prefix intact: ok (omniroute-ctl-rollback: bin/omniroute, BUILD_SHA cf6748d04, shim v2)
+    CHECK target prefix intact: ok (omniroute-ctl-target: bin/omniroute, BUILD_SHA 2a41147b7, shim v2, drain marker)
+       IDENTITY label=pre-switch time=2026-10-06T06:22:50Z unit=omniroute.service MainPID=375461 ExecMainStartTimestamp=Tue_2026-10-06_00:26:11_EDT NRestarts=0 running_prefix=omniroute-ctl-rollback BUILD_SHA=cf6748d04 health=ok pending_total=0 expect_prefix_ok=True expect_build_ok=True
+    CHECK unit runs the rollback prefix, health ok: ok
+       sample 1 at 2026-10-06T06:22:50.134Z: connections=1 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 2 at 2026-10-06T06:22:52.153Z: connections=1 active_so_far=1 workers=0 last_call_log_age_s=none
+       sample 3 at 2026-10-06T06:22:54.171Z: connections=1 active_so_far=2 workers=0 last_call_log_age_s=none
+       sample 4 at 2026-10-06T06:22:56.190Z: connections=1 active_so_far=3 workers=0 last_call_log_age_s=none
+    CHECK nothing in flight for 6 s (4 samples): FAIL ['3 ACTIVE connection(s) to port 57874 (traffic or queued data during the window), of 1 established']
+    INFO connections_total=1 connections_active=3 pending_total_before=0 pending_total_after=0 pending_changed=False hindsight_processes=9
+    GUARD-RESULT clean=False failed_checks=['nothing in flight for 6 s (4 samples)'] end=2026-10-06T06:22:56.207Z
+CONTROL-RESULT G12 guard v2 with the poller defect-demonstration expected_exit=4 observed_exit=4 elapsed_s=6 OK
+
+### G3: a call_logs row written a few seconds ago: exit 4
+--- G3 / recent row: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/pre-switch-guard-20261006.py --switch-tool $WORK/switch-tool-standin.py --switch-sha256 6b444a2fa3d57976592289cc59537da365f49aa6fc917871dce10dfda12586c1 --port 57874 --tools $WORK/tools --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --clean-for 6 --interval 2 --rollback-prefix omniroute-ctl-rollback --rollback-build cf6748d04 --target-prefix omniroute-ctl-target --target-build 2a41147b7 --shim-sha256 4a5c247583b8a0f02ffd71b1a8bdf107ae6f7c564ab61e341bb92be48d643c2a --pid 375461 --worker-pattern nonexistent-process-pattern-for-the-controls
+    GUARD version=3 script_sha256=305a065227bff71dcbe3b46b157f4d3ed83f5a5b5ce90a2f73cbfa6b26805040 start=2026-10-06T06:22:56.278Z port=57874 unit=omniroute.service clean_for=6.0 interval=2.0 tolerate_units=['omniroute-fw.service']
+    CHECK switch tool sha256: ok (6b444a2fa3d5)
+    CHECK rollback prefix intact: ok (omniroute-ctl-rollback: bin/omniroute, BUILD_SHA cf6748d04, shim v2)
+    CHECK target prefix intact: ok (omniroute-ctl-target: bin/omniroute, BUILD_SHA 2a41147b7, shim v2, drain marker)
+       IDENTITY label=pre-switch time=2026-10-06T06:22:56Z unit=omniroute.service MainPID=375461 ExecMainStartTimestamp=Tue_2026-10-06_00:26:11_EDT NRestarts=0 running_prefix=omniroute-ctl-rollback BUILD_SHA=cf6748d04 health=ok pending_total=0 expect_prefix_ok=True expect_build_ok=True
+    CHECK unit runs the rollback prefix, health ok: ok
+       sample 1 at 2026-10-06T06:22:56.406Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=0
+       sample 2 at 2026-10-06T06:22:58.442Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=2
+       sample 3 at 2026-10-06T06:23:00.480Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=4
+       sample 4 at 2026-10-06T06:23:02.517Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=6
+    CHECK nothing in flight for 6 s (4 samples): FAIL ['the last call_logs row is 0 s old (< 120 s)', 'the last call_logs row is 2 s old (< 120 s)', 'the last call_logs row is 4 s old (< 120 s)', 'the last call_logs row is 6 s old (< 120 s)']
+    INFO connections_seen=0 connections_tolerated=0 connections_active=0 connections_idle=0 pending_total_before=0 pending_total_after=0 pending_changed=False hindsight_processes=9
+    GUARD-RESULT clean=False failed_checks=['nothing in flight for 6 s (4 samples)'] end=2026-10-06T06:23:02.533Z
+CONTROL-RESULT G3 recent row expected_exit=4 observed_exit=4 elapsed_s=6 OK
+
+### G4: the stand-in shim's sha256 is not the reviewed one: exit 4
+--- G4 / shim hash: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/pre-switch-guard-20261006.py --switch-tool $WORK/switch-tool-standin.py --switch-sha256 6b444a2fa3d57976592289cc59537da365f49aa6fc917871dce10dfda12586c1 --port 57874 --tools $WORK/tools --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --clean-for 6 --interval 2 --rollback-prefix omniroute-ctl-rollback --rollback-build cf6748d04 --target-prefix omniroute-ctl-target --target-build 2a41147b7 --shim-sha256 0000000000000000000000000000000000000000000000000000000000000000 --pid 375461 --worker-pattern nonexistent-process-pattern-for-the-controls
+    GUARD version=3 script_sha256=305a065227bff71dcbe3b46b157f4d3ed83f5a5b5ce90a2f73cbfa6b26805040 start=2026-10-06T06:23:04.102Z port=57874 unit=omniroute.service clean_for=6.0 interval=2.0 tolerate_units=['omniroute-fw.service']
+    CHECK switch tool sha256: ok (6b444a2fa3d5)
+    CHECK rollback prefix intact: FAIL ['shim/lsof sha256 is not the reviewed shim v2']
+    CHECK target prefix intact: FAIL ['shim/lsof sha256 is not the reviewed shim v2']
+       IDENTITY label=pre-switch time=2026-10-06T06:23:04Z unit=omniroute.service MainPID=375461 ExecMainStartTimestamp=Tue_2026-10-06_00:26:11_EDT NRestarts=0 running_prefix=omniroute-ctl-rollback BUILD_SHA=cf6748d04 health=ok pending_total=0 expect_prefix_ok=True expect_build_ok=True
+    CHECK unit runs the rollback prefix, health ok: ok
+       sample 1 at 2026-10-06T06:23:04.266Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 2 at 2026-10-06T06:23:06.301Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 3 at 2026-10-06T06:23:08.338Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 4 at 2026-10-06T06:23:10.373Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+    CHECK nothing in flight for 6 s (4 samples): ok (0 idle and 0 tolerated connection(s))
+    INFO connections_seen=0 connections_tolerated=0 connections_active=0 connections_idle=0 pending_total_before=0 pending_total_after=0 pending_changed=False hindsight_processes=9
+    GUARD-RESULT clean=False failed_checks=['rollback prefix intact', 'target prefix intact'] end=2026-10-06T06:23:10.389Z
+CONTROL-RESULT G4 shim hash expected_exit=4 observed_exit=4 elapsed_s=6 OK
+
+### G5: the rollback prefix's BUILD_SHA is not the expected one: exit 4
+--- G5 / rollback build: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/pre-switch-guard-20261006.py --switch-tool $WORK/switch-tool-standin.py --switch-sha256 6b444a2fa3d57976592289cc59537da365f49aa6fc917871dce10dfda12586c1 --port 57874 --tools $WORK/tools --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --clean-for 6 --interval 2 --rollback-prefix omniroute-ctl-rollback --rollback-build deadbeef0 --target-prefix omniroute-ctl-target --target-build 2a41147b7 --shim-sha256 4a5c247583b8a0f02ffd71b1a8bdf107ae6f7c564ab61e341bb92be48d643c2a --pid 375461 --worker-pattern nonexistent-process-pattern-for-the-controls
+    GUARD version=3 script_sha256=305a065227bff71dcbe3b46b157f4d3ed83f5a5b5ce90a2f73cbfa6b26805040 start=2026-10-06T06:23:10.451Z port=57874 unit=omniroute.service clean_for=6.0 interval=2.0 tolerate_units=['omniroute-fw.service']
+    CHECK switch tool sha256: ok (6b444a2fa3d5)
+    CHECK rollback prefix intact: FAIL ['dist/BUILD_SHA is cf6748d04, expected deadbeef0']
+    CHECK target prefix intact: ok (omniroute-ctl-target: bin/omniroute, BUILD_SHA 2a41147b7, shim v2, drain marker)
+       IDENTITY label=pre-switch time=2026-10-06T06:23:10Z unit=omniroute.service MainPID=375461 ExecMainStartTimestamp=Tue_2026-10-06_00:26:11_EDT NRestarts=0 running_prefix=omniroute-ctl-rollback BUILD_SHA=cf6748d04 health=ok pending_total=0 expect_prefix_ok=True expect_build_ok=False
+    CHECK unit runs the rollback prefix, health ok: FAIL ['identity read-back exit 5']
+       sample 1 at 2026-10-06T06:23:10.575Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 2 at 2026-10-06T06:23:12.610Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 3 at 2026-10-06T06:23:14.647Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 4 at 2026-10-06T06:23:16.683Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+    CHECK nothing in flight for 6 s (4 samples): ok (0 idle and 0 tolerated connection(s))
+    INFO connections_seen=0 connections_tolerated=0 connections_active=0 connections_idle=0 pending_total_before=0 pending_total_after=0 pending_changed=False hindsight_processes=9
+    GUARD-RESULT clean=False failed_checks=['rollback prefix intact', 'unit runs the rollback prefix, health ok'] end=2026-10-06T06:23:16.700Z
+CONTROL-RESULT G5 rollback build expected_exit=4 observed_exit=4 elapsed_s=6 OK
+
+### G6: the switch tool is not the pinned file: exit 4
+--- G6 / switch tool hash: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/pre-switch-guard-20261006.py --switch-tool $WORK/switch-tool-standin.py --switch-sha256 0000000000000000000000000000000000000000000000000000000000000000 --port 57874 --tools $WORK/tools --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --clean-for 6 --interval 2 --rollback-prefix omniroute-ctl-rollback --rollback-build cf6748d04 --target-prefix omniroute-ctl-target --target-build 2a41147b7 --shim-sha256 4a5c247583b8a0f02ffd71b1a8bdf107ae6f7c564ab61e341bb92be48d643c2a --pid 375461 --worker-pattern nonexistent-process-pattern-for-the-controls
+    GUARD version=3 script_sha256=305a065227bff71dcbe3b46b157f4d3ed83f5a5b5ce90a2f73cbfa6b26805040 start=2026-10-06T06:23:16.760Z port=57874 unit=omniroute.service clean_for=6.0 interval=2.0 tolerate_units=['omniroute-fw.service']
+    CHECK switch tool sha256: FAIL ['6b444a2fa3d57976592289cc59537da365f49aa6fc917871dce10dfda12586c1 is not the pinned 0000000000000000000000000000000000000000000000000000000000000000']
+    CHECK rollback prefix intact: ok (omniroute-ctl-rollback: bin/omniroute, BUILD_SHA cf6748d04, shim v2)
+    CHECK target prefix intact: ok (omniroute-ctl-target: bin/omniroute, BUILD_SHA 2a41147b7, shim v2, drain marker)
+       IDENTITY label=pre-switch time=2026-10-06T06:23:16Z unit=omniroute.service MainPID=375461 ExecMainStartTimestamp=Tue_2026-10-06_00:26:11_EDT NRestarts=0 running_prefix=omniroute-ctl-rollback BUILD_SHA=cf6748d04 health=ok pending_total=0 expect_prefix_ok=True expect_build_ok=True
+    CHECK unit runs the rollback prefix, health ok: ok
+       sample 1 at 2026-10-06T06:23:16.885Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 2 at 2026-10-06T06:23:18.920Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 3 at 2026-10-06T06:23:20.957Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 4 at 2026-10-06T06:23:22.992Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+    CHECK nothing in flight for 6 s (4 samples): ok (0 idle and 0 tolerated connection(s))
+    INFO connections_seen=0 connections_tolerated=0 connections_active=0 connections_idle=0 pending_total_before=0 pending_total_after=0 pending_changed=False hindsight_processes=9
+    GUARD-RESULT clean=False failed_checks=['switch tool sha256'] end=2026-10-06T06:23:23.007Z
+CONTROL-RESULT G6 switch tool hash expected_exit=4 observed_exit=4 elapsed_s=6 OK
+
+### G7: a worker process of another lane exists (the frozen default pattern, a dummy process whose command line names omniroute-codex-sdk/worker.py): exit 4
+--- G7 / worker present: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/pre-switch-guard-20261006.py --switch-tool $WORK/switch-tool-standin.py --switch-sha256 6b444a2fa3d57976592289cc59537da365f49aa6fc917871dce10dfda12586c1 --port 57874 --tools $WORK/tools --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --clean-for 6 --interval 2 --rollback-prefix omniroute-ctl-rollback --rollback-build cf6748d04 --target-prefix omniroute-ctl-target --target-build 2a41147b7 --shim-sha256 4a5c247583b8a0f02ffd71b1a8bdf107ae6f7c564ab61e341bb92be48d643c2a --pid 375461
+    GUARD version=3 script_sha256=305a065227bff71dcbe3b46b157f4d3ed83f5a5b5ce90a2f73cbfa6b26805040 start=2026-10-06T06:23:23.562Z port=57874 unit=omniroute.service clean_for=6.0 interval=2.0 tolerate_units=['omniroute-fw.service']
+    CHECK switch tool sha256: ok (6b444a2fa3d5)
+    CHECK rollback prefix intact: ok (omniroute-ctl-rollback: bin/omniroute, BUILD_SHA cf6748d04, shim v2)
+    CHECK target prefix intact: ok (omniroute-ctl-target: bin/omniroute, BUILD_SHA 2a41147b7, shim v2, drain marker)
+       IDENTITY label=pre-switch time=2026-10-06T06:23:23Z unit=omniroute.service MainPID=375461 ExecMainStartTimestamp=Tue_2026-10-06_00:26:11_EDT NRestarts=0 running_prefix=omniroute-ctl-rollback BUILD_SHA=cf6748d04 health=ok pending_total=0 expect_prefix_ok=True expect_build_ok=True
+    CHECK unit runs the rollback prefix, health ok: ok
+       sample 1 at 2026-10-06T06:23:23.689Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=4 last_call_log_age_s=none
+       sample 2 at 2026-10-06T06:23:25.725Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=4 last_call_log_age_s=none
+       sample 3 at 2026-10-06T06:23:27.762Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=4 last_call_log_age_s=none
+       sample 4 at 2026-10-06T06:23:29.799Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=4 last_call_log_age_s=none
+    CHECK nothing in flight for 6 s (4 samples): FAIL ['4 worker or codex process(es) of another lane']
+    INFO connections_seen=0 connections_tolerated=0 connections_active=0 connections_idle=0 pending_total_before=0 pending_total_after=0 pending_changed=False hindsight_processes=9
+    GUARD-RESULT clean=False failed_checks=['nothing in flight for 6 s (4 samples)'] end=2026-10-06T06:23:29.815Z
+CONTROL-RESULT G7 worker present expected_exit=4 observed_exit=4 elapsed_s=6 OK
+
+### G8: the target prefix lacks the drain marker: exit 4
+--- G8 / no marker: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/pre-switch-guard-20261006.py --switch-tool $WORK/switch-tool-standin.py --switch-sha256 6b444a2fa3d57976592289cc59537da365f49aa6fc917871dce10dfda12586c1 --port 57874 --tools $WORK/tools --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --clean-for 6 --interval 2 --rollback-prefix omniroute-ctl-rollback --rollback-build cf6748d04 --target-prefix omniroute-ctl-target --target-build 2a41147b7 --shim-sha256 4a5c247583b8a0f02ffd71b1a8bdf107ae6f7c564ab61e341bb92be48d643c2a --pid 375461 --worker-pattern nonexistent-process-pattern-for-the-controls
+    GUARD version=3 script_sha256=305a065227bff71dcbe3b46b157f4d3ed83f5a5b5ce90a2f73cbfa6b26805040 start=2026-10-06T06:23:29.871Z port=57874 unit=omniroute.service clean_for=6.0 interval=2.0 tolerate_units=['omniroute-fw.service']
+    CHECK switch tool sha256: ok (6b444a2fa3d5)
+    CHECK rollback prefix intact: ok (omniroute-ctl-rollback: bin/omniroute, BUILD_SHA cf6748d04, shim v2)
+    CHECK target prefix intact: FAIL ['the drain marker is absent from the compiled server chunks']
+       IDENTITY label=pre-switch time=2026-10-06T06:23:29Z unit=omniroute.service MainPID=375461 ExecMainStartTimestamp=Tue_2026-10-06_00:26:11_EDT NRestarts=0 running_prefix=omniroute-ctl-rollback BUILD_SHA=cf6748d04 health=ok pending_total=0 expect_prefix_ok=True expect_build_ok=True
+    CHECK unit runs the rollback prefix, health ok: ok
+       sample 1 at 2026-10-06T06:23:29.993Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 2 at 2026-10-06T06:23:32.028Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 3 at 2026-10-06T06:23:34.063Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+       sample 4 at 2026-10-06T06:23:36.107Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=none
+    CHECK nothing in flight for 6 s (4 samples): ok (0 idle and 0 tolerated connection(s))
+    INFO connections_seen=0 connections_tolerated=0 connections_active=0 connections_idle=0 pending_total_before=0 pending_total_after=0 pending_changed=False hindsight_processes=9
+    GUARD-RESULT clean=False failed_checks=['target prefix intact'] end=2026-10-06T06:23:36.125Z
+CONTROL-RESULT G8 no marker expected_exit=4 observed_exit=4 elapsed_s=6 OK
+
+### W1: the wrapper on a healthy stub gateway (kind test, shortened waits and counts; the native turns use the fake codex, which writes two requests per turn with the client usage equal to their sum): every run ok, status 0
+--- W1 / wrapper: bash $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/run-acceptance-20261006.sh test $WORK/wrapper-W1   [env: ACCEPT_TEST_WAITS=--wait1 4 --wait2 8, ACCEPT_TEST_LIVE_ARGS=--port 57874 --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite, ACCEPT_TEST_IDENT_ARGS=--pid 380751 --port 57874 --tools $WORK/tools, ACCEPT_TEST_EXPECT_PREFIX=omniroute-ctl-rollback, ACCEPT_TEST_EXPECT_BUILD=cf6748d04, ACCEPT_TEST_JOURNAL_CMD=true, ACCEPT_TEST_SINCE=2026-10-06 00:00:00, ACCEPT_TEST_N_RACE=3, ACCEPT_TEST_N_ASTRA=2, ACCEPT_TEST_N_TWO=2, ACCEPT_TEST_N_TWO_PRE=2, ACCEPT_TEST_RAW_MODES=responses:eof responses:early:0 chat:early:0, FAKE_CODEX_MODE=two-ok, FAKE_CODEX_DB=$WORK/scratch-home/.local/share/omniroute/storage.sqlite, ACCEPT_TEST_NATIVE_ARGS=--quiet-timeout 1 --exec-timeout 60 --repo $WORK/repo --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --scratch $WORK/codex-home-W1 --codex $WORK/bin/codex]
+    IDENTITY label=start-of-wrapper time=2026-10-06T06:23:38Z unit=omniroute.service MainPID=380751 ExecMainStartTimestamp=Tue_2026-10-06_00:26:11_EDT NRestarts=0 running_prefix=omniroute-ctl-rollback BUILD_SHA=cf6748d04 health=ok pending_total=0 expect_prefix_ok=True expect_build_ok=True
+    live-acceptance-test-raw.txt: SUMMARY {"PASS": 3} end=2026-10-06T06:23:57.419Z exit=0 status=0
+    live-acceptance-test-race.txt: SUMMARY {"PASS": 3} end=2026-10-06T06:24:13.699Z exit=0 status=0
+    live-acceptance-test-native.txt: SUMMARY {'PASS': 2} end=2026-10-06T06:24:52.177Z exit=0 status=0
+    live-acceptance-test-native-tworequest.txt: SUMMARY {'PASS': 2} end=2026-10-06T06:25:30.671Z exit=0 status=0
+    WRAPPER-RESULT kind=test status=0 runs: live-acceptance-test-raw.txt:0 live-acceptance-test-race.txt:0 live-acceptance-test-native.txt:0 live-acceptance-test-native-tworequest.txt:0 (4 VOID, 1 FAIL, 2 INCONCLUSIVE, 0 ok); outputs in $WORK/wrapper-W1
+CONTROL-RESULT W1 wrapper expected_exit=0 observed_exit=0 elapsed_s=113 OK
+
+    live-acceptance-test-native-tworequest.txt: journal_failed_to_save_call_log=0 (journalctl --user -u omniroute.service --since <the unit's ExecMainStartTimestamp> -o cat --no-pager | grep -c 'Failed to save call log'); pending_delta=0 (informational: pending_total 0 -> 0); RUN-STATUS live-acceptance-test-native-tworequest.txt status=0 (ok)
+    live-acceptance-test-native.txt: journal_failed_to_save_call_log=0 (journalctl --user -u omniroute.service --since <the unit's ExecMainStartTimestamp> -o cat --no-pager | grep -c 'Failed to save call log'); pending_delta=0 (informational: pending_total 0 -> 0); RUN-STATUS live-acceptance-test-native.txt status=0 (ok)
+    live-acceptance-test-race.txt: journal_failed_to_save_call_log=0 (journalctl --user -u omniroute.service --since <the unit's ExecMainStartTimestamp> -o cat --no-pager | grep -c 'Failed to save call log'); pending_delta=0 (informational: pending_total 0 -> 0); RUN-STATUS live-acceptance-test-race.txt status=0 (ok)
+    live-acceptance-test-raw.txt: journal_failed_to_save_call_log=0 (journalctl --user -u omniroute.service --since <the unit's ExecMainStartTimestamp> -o cat --no-pager | grep -c 'Failed to save call log'); pending_delta=0 (informational: pending_total 0 -> 0); RUN-STATUS live-acceptance-test-raw.txt status=0 (ok)
+### W2: the gateway process disappears during the first run (the identity read after it is not the one read before): that run is VOID, status 4
+--- W2 / wrapper: bash $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/run-acceptance-20261006.sh test $WORK/wrapper-W2   [env: ACCEPT_TEST_WAITS=--wait1 4 --wait2 8, ACCEPT_TEST_LIVE_ARGS=--port 57874 --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite, ACCEPT_TEST_IDENT_ARGS=--pid 388725 --port 57874 --tools $WORK/tools, ACCEPT_TEST_EXPECT_PREFIX=omniroute-ctl-rollback, ACCEPT_TEST_EXPECT_BUILD=cf6748d04, ACCEPT_TEST_JOURNAL_CMD=true, ACCEPT_TEST_SINCE=2026-10-06 00:00:00, ACCEPT_TEST_N_RACE=1, ACCEPT_TEST_N_ASTRA=1, ACCEPT_TEST_N_TWO=1, ACCEPT_TEST_N_TWO_PRE=2, ACCEPT_TEST_RAW_MODES=responses:eof, FAKE_CODEX_MODE=two-ok, FAKE_CODEX_DB=$WORK/scratch-home/.local/share/omniroute/storage.sqlite, ACCEPT_TEST_NATIVE_ARGS=--quiet-timeout 1 --exec-timeout 60 --repo $WORK/repo --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --scratch $WORK/codex-home-W2 --codex $WORK/bin/codex]
+    IDENTITY label=start-of-wrapper time=2026-10-06T06:25:32Z unit=omniroute.service MainPID=388725 ExecMainStartTimestamp=Tue_2026-10-06_00:26:11_EDT NRestarts=0 running_prefix=omniroute-ctl-rollback BUILD_SHA=cf6748d04 health=ok pending_total=0 expect_prefix_ok=True expect_build_ok=True
+    live-acceptance-test-raw.txt: SUMMARY {"PASS": 1} end=2026-10-06T06:25:44.131Z exit=0 status=4
+    live-acceptance-test-race.txt: SUMMARY {"PASS": 1} end=2026-10-06T06:25:52.488Z exit=0 status=0
+    live-acceptance-test-native.txt: SUMMARY {'PASS': 1} end=2026-10-06T06:26:13.935Z exit=0 status=0
+    live-acceptance-test-native-tworequest.txt: SUMMARY {'PASS': 1} end=2026-10-06T06:26:35.297Z exit=0 status=0
+    WRAPPER-RESULT kind=test status=4 runs: live-acceptance-test-raw.txt:4 live-acceptance-test-race.txt:0 live-acceptance-test-native.txt:0 live-acceptance-test-native-tworequest.txt:0 (4 VOID, 1 FAIL, 2 INCONCLUSIVE, 0 ok); outputs in $WORK/wrapper-W2
+CONTROL-RESULT W2 wrapper expected_exit=4 observed_exit=4 elapsed_s=63 OK
+
+### W3: a script that prints no SUMMARY line (an invalid option makes both raw runs exit 3): those runs are INCONCLUSIVE (status 2), the native runs still pass, the wrapper exits 2
+--- W3 / wrapper: bash $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/run-acceptance-20261006.sh test $WORK/wrapper-W3   [env: ACCEPT_TEST_WAITS=--wait1 4 --wait2 8, ACCEPT_TEST_LIVE_ARGS=--port 57874 --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --no-such-option, ACCEPT_TEST_IDENT_ARGS=--pid 380751 --port 57874 --tools $WORK/tools, ACCEPT_TEST_EXPECT_PREFIX=omniroute-ctl-rollback, ACCEPT_TEST_EXPECT_BUILD=cf6748d04, ACCEPT_TEST_JOURNAL_CMD=true, ACCEPT_TEST_SINCE=2026-10-06 00:00:00, ACCEPT_TEST_N_RACE=3, ACCEPT_TEST_N_ASTRA=2, ACCEPT_TEST_N_TWO=2, ACCEPT_TEST_N_TWO_PRE=2, ACCEPT_TEST_RAW_MODES=responses:eof responses:early:0 chat:early:0, FAKE_CODEX_MODE=two-ok, FAKE_CODEX_DB=$WORK/scratch-home/.local/share/omniroute/storage.sqlite, ACCEPT_TEST_NATIVE_ARGS=--quiet-timeout 1 --exec-timeout 60 --repo $WORK/repo --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --scratch $WORK/codex-home-W3 --codex $WORK/bin/codex]
+    IDENTITY label=start-of-wrapper time=2026-10-06T06:26:37Z unit=omniroute.service MainPID=380751 ExecMainStartTimestamp=Tue_2026-10-06_00:26:11_EDT NRestarts=0 running_prefix=omniroute-ctl-rollback BUILD_SHA=cf6748d04 health=ok pending_total=0 expect_prefix_ok=True expect_build_ok=True
+    live-acceptance-test-raw.txt:  status=2
+    live-acceptance-test-race.txt:  status=2
+    live-acceptance-test-native.txt: SUMMARY {'PASS': 2} end=2026-10-06T06:27:15.948Z exit=0 status=0
+    live-acceptance-test-native-tworequest.txt: SUMMARY {'PASS': 2} end=2026-10-06T06:27:54.386Z exit=0 status=0
+    WRAPPER-RESULT kind=test status=2 runs: live-acceptance-test-raw.txt:2 live-acceptance-test-race.txt:2 live-acceptance-test-native.txt:0 live-acceptance-test-native-tworequest.txt:0 (4 VOID, 1 FAIL, 2 INCONCLUSIVE, 0 ok); outputs in $WORK/wrapper-W3
+CONTROL-RESULT W3 wrapper expected_exit=2 observed_exit=2 elapsed_s=78 OK
+
+### W4: a script copy that differs from the frozen sha256 (one comment line appended): the wrapper stops with exit 2 before running anything
+--- W4 / tampered script: bash $WORK/scripts-copy/run-acceptance-20261006.sh test $WORK/wrapper-W4   [env: ACCEPT_TEST_WAITS=--wait1 4 --wait2 8, ACCEPT_TEST_LIVE_ARGS=--port 57874 --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite, ACCEPT_TEST_IDENT_ARGS=--pid 380751 --port 57874 --tools $WORK/tools, ACCEPT_TEST_EXPECT_PREFIX=omniroute-ctl-rollback, ACCEPT_TEST_EXPECT_BUILD=cf6748d04, ACCEPT_TEST_JOURNAL_CMD=true, ACCEPT_TEST_SINCE=2026-10-06 00:00:00, ACCEPT_TEST_N_RACE=3, ACCEPT_TEST_N_ASTRA=2, ACCEPT_TEST_N_TWO=2, ACCEPT_TEST_N_TWO_PRE=2, ACCEPT_TEST_RAW_MODES=responses:eof responses:early:0 chat:early:0, FAKE_CODEX_MODE=two-ok, FAKE_CODEX_DB=$WORK/scratch-home/.local/share/omniroute/storage.sqlite]
+    live-acceptance script differs from the frozen sha256
+CONTROL-RESULT W4 tampered script expected_exit=2 observed_exit=2 elapsed_s=0 OK
+
+    output files written by the stopped wrapper: 0
+### W5: the journal shows a `Failed to save call log` line since the unit's start: every run is FAIL (status 1), the wrapper exits 1
+--- W5 / wrapper: bash $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/run-acceptance-20261006.sh test $WORK/wrapper-W5   [env: ACCEPT_TEST_WAITS=--wait1 4 --wait2 8, ACCEPT_TEST_LIVE_ARGS=--port 57874 --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite, ACCEPT_TEST_IDENT_ARGS=--pid 380751 --port 57874 --tools $WORK/tools, ACCEPT_TEST_EXPECT_PREFIX=omniroute-ctl-rollback, ACCEPT_TEST_EXPECT_BUILD=cf6748d04, ACCEPT_TEST_JOURNAL_CMD=echo 'Failed to save call log', ACCEPT_TEST_SINCE=2026-10-06 00:00:00, ACCEPT_TEST_N_RACE=1, ACCEPT_TEST_N_ASTRA=1, ACCEPT_TEST_N_TWO=1, ACCEPT_TEST_N_TWO_PRE=2, ACCEPT_TEST_RAW_MODES=responses:early:0, FAKE_CODEX_MODE=two-ok, FAKE_CODEX_DB=$WORK/scratch-home/.local/share/omniroute/storage.sqlite, ACCEPT_TEST_NATIVE_ARGS=--quiet-timeout 1 --exec-timeout 60 --repo $WORK/repo --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --scratch $WORK/codex-home-W5 --codex $WORK/bin/codex]
+    IDENTITY label=start-of-wrapper time=2026-10-06T06:27:56Z unit=omniroute.service MainPID=380751 ExecMainStartTimestamp=Tue_2026-10-06_00:26:11_EDT NRestarts=0 running_prefix=omniroute-ctl-rollback BUILD_SHA=cf6748d04 health=ok pending_total=0 expect_prefix_ok=True expect_build_ok=True
+    live-acceptance-test-raw.txt: SUMMARY {"PASS": 1} end=2026-10-06T06:28:04.288Z exit=0 status=1
+    live-acceptance-test-race.txt: SUMMARY {"PASS": 1} end=2026-10-06T06:28:12.559Z exit=0 status=1
+    live-acceptance-test-native.txt: SUMMARY {'PASS': 1} end=2026-10-06T06:28:33.917Z exit=0 status=1
+    live-acceptance-test-native-tworequest.txt: SUMMARY {'PASS': 1} end=2026-10-06T06:28:55.298Z exit=0 status=1
+    WRAPPER-RESULT kind=test status=1 runs: live-acceptance-test-raw.txt:1 live-acceptance-test-race.txt:1 live-acceptance-test-native.txt:1 live-acceptance-test-native-tworequest.txt:1 (4 VOID, 1 FAIL, 2 INCONCLUSIVE, 0 ok); outputs in $WORK/wrapper-W5
+CONTROL-RESULT W5 wrapper expected_exit=1 observed_exit=1 elapsed_s=59 OK
+
+### W6: the pre-switch control (kind test with ACCEPT_TEST_PRECONTROL=1) on the stub that drops rows for early-closing clients: it counts the lost race requests and the incomplete two-request turns
+--- W6 / wrapper: bash $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/run-acceptance-20261006.sh test $WORK/wrapper-W6   [env: ACCEPT_TEST_WAITS=--wait1 4 --wait2 8, ACCEPT_TEST_LIVE_ARGS=--port 57874 --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite, ACCEPT_TEST_IDENT_ARGS=--pid 380751 --port 57874 --tools $WORK/tools, ACCEPT_TEST_EXPECT_PREFIX=omniroute-ctl-rollback, ACCEPT_TEST_EXPECT_BUILD=cf6748d04, ACCEPT_TEST_JOURNAL_CMD=true, ACCEPT_TEST_SINCE=2026-10-06 00:00:00, ACCEPT_TEST_N_RACE=3, ACCEPT_TEST_N_ASTRA=2, ACCEPT_TEST_N_TWO=2, ACCEPT_TEST_N_TWO_PRE=2, ACCEPT_TEST_RAW_MODES=responses:eof responses:early:0 chat:early:0, FAKE_CODEX_MODE=two-final-lost, FAKE_CODEX_DB=$WORK/scratch-home/.local/share/omniroute/storage.sqlite, ACCEPT_TEST_NATIVE_ARGS=--quiet-timeout 1 --exec-timeout 60 --repo $WORK/repo --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --scratch $WORK/codex-home-W6 --codex $WORK/bin/codex, ACCEPT_TEST_PRECONTROL=1]
+    IDENTITY label=start-of-wrapper time=2026-10-06T06:28:57Z unit=omniroute.service MainPID=380751 ExecMainStartTimestamp=Tue_2026-10-06_00:26:11_EDT NRestarts=0 running_prefix=omniroute-ctl-rollback BUILD_SHA=cf6748d04 health=ok pending_total=0 expect_prefix_ok=True expect_build_ok=True
+    live-acceptance-test-race.txt: SUMMARY {"OBSERVED": 3} end=2026-10-06T06:29:13.180Z exit=0 status=0
+    live-acceptance-test-native-tworequest.txt: SUMMARY {'OBSERVED': 2} end=2026-10-06T06:29:46.616Z exit=0 status=0
+    PRECONTROL race_lost=3/3 tworequest_incomplete=2/2 race_discriminating=True (the protocol's rule: fewer than 2 of 3 lost means the race set cannot discriminate at this hour)
+    WRAPPER-RESULT kind=test status=0 runs: live-acceptance-test-race.txt:0 live-acceptance-test-native-tworequest.txt:0 (4 VOID, 1 FAIL, 2 INCONCLUSIVE, 0 ok); outputs in $WORK/wrapper-W6
+CONTROL-RESULT W6 wrapper expected_exit=0 observed_exit=0 elapsed_s=50 OK
+
+# finished 2026-10-06T06:29:46Z; scenarios with an unexpected exit status: none
+driver exit=0
+

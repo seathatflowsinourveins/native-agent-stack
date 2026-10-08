@@ -1,0 +1,55 @@
+#!/bin/bash
+# Live trial of guard 5 (--idle-only) and the census inputs on the live 20128 gateway, 2026-10-06 (CC item task-native-agent-stack-99-20261006T135625Z: a quiet window of about 15 min, pre-approved 17:15-19:30Z, agreed with 5f).
+# Read-only except for the requests of the arms themselves: the frozen scripts send a handful of real requests through the Codex lane (a trivial prompt each) and read the gateway's store read-only.
+#   1. guard 5 --idle-only (the receipt the census consumes; it must end before the first request and not more than 600 s earlier)
+#   2. arm A: the frozen raw script v2.2, --expect all-logged, responses:eof chat:eof (a streamed request read to EOF on each path); the guard is run once more MID-REQUEST as the ACTIVE control (it must NOT be clean)
+#   3. arm B: the frozen raw script v2.2, --expect all-logged, responses:early:0 x2 (the race set: the client closes at the terminal event; on the unpatched build the call row may be dropped)
+#   4. arm C: the frozen native script v2.1, --expect all-logged, one two-request turn (codex exec with a tool call; its call rows are found by X-OmniRoute-Session-Id)
+# Outputs (private, with the full ids; the committed copies are shortened) in this directory, mode 0700. Nothing is written under /tmp.
+set -u
+P=$(cd "$(dirname "$0")/.." && pwd)
+T=$P/live-trial-20261006
+mkdir -p "$T" && chmod 700 "$T" || exit 2
+cd "$T" || exit 2
+LIVE=$P/omniroute-live-acceptance-20261006.py
+NATIVE=$P/omniroute-native-exec-acceptance-20261006.py
+IDENT=$P/gateway-identity-20261006.py
+GUARD=$P/pre-switch-guard-20261006.py
+[ "$(sha256sum "$LIVE" | cut -d' ' -f1)" = 52b1d749dc6b7f6b406f8ce8db5d8b1d3e3a73a6b7861a63cc158dbebd320d75 ] || { echo "raw script differs from the frozen sha256" >&2; exit 2; }
+[ "$(sha256sum "$NATIVE" | cut -d' ' -f1)" = db2a4d42d6caf4c39e484903313f0f94bd2be40fabe4f1336d0dcdc3b1d0bafd ] || { echo "native script differs from the frozen sha256" >&2; exit 2; }
+[ "$(sha256sum "$IDENT" | cut -d' ' -f1)" = a7932710412e9e834f6b992f267db5620b64bbe62f25021013c8004a7eec6011 ] || { echo "identity script differs from the frozen sha256" >&2; exit 2; }
+[ "$(sha256sum "$GUARD" | cut -d' ' -f1)" = 62dea3d25040ed6fee469f44332068a0b47f3f4951fdaa309b4e99000378700b ] || { echo "guard 5 differs from the recorded sha256" >&2; exit 2; }
+stamp() { date -u +%FT%TZ; }
+SINCE=$(systemctl --user show omniroute.service -p ExecMainStartTimestamp --value 2>/dev/null)
+JOURNAL_CMD='journalctl --user -u omniroute.service --since "$SINCE" -o cat --no-pager'   # the wrapper's journal query, unchanged
+arm() { # output name, description, command...  (the same header, journal line and footer as the wrapper's, so the census reads one format)
+  local name=$1 desc=$2 rc n jfile jrc=0; shift 2
+  {
+    echo "# $desc; started $(stamp); wrapper kind=trial"
+    "$@"; rc=$?
+    echo "exit=$rc"
+    jfile=$(mktemp -p "$T")
+    eval "$JOURNAL_CMD" > "$jfile" 2> "$jfile.err" || jrc=$?
+    if [ "$jrc" -ne 0 ]; then n=unavailable; echo "JOURNAL-UNAVAILABLE exit=$jrc: the journal query failed, so 'Failed to save call log' could not be counted (INCONCLUSIVE)"; else n=$(grep -c 'Failed to save call log' "$jfile"); fi
+    rm -f "$jfile" "$jfile.err"
+    echo "journal_failed_to_save_call_log=$n (journalctl --user -u omniroute.service --since <the unit's ExecMainStartTimestamp> -o cat --no-pager | grep -c 'Failed to save call log')"
+    echo "# finished $(stamp)"
+  } > "$T/$name" 2>&1
+}
+echo "trial start $(stamp)"
+python3 "$IDENT" --label trial-before > identity-before.txt 2>&1; echo "identity before: exit=$? $(head -c 300 identity-before.txt | tr '\n' ' ')"
+python3 "$GUARD" --idle-only > guard-idle-1.txt 2>&1; GRC=$?
+echo "guard idle-only #1: exit=$GRC $(grep -E '^IDLE-RESULT' guard-idle-1.txt)"
+[ "$GRC" = 0 ] || { echo "the gateway is not idle: nothing was sent"; exit 4; }
+arm arm-A-raw.txt "trial, raw set A (responses:eof chat:eof), frozen script v2.2, --expect all-logged" python3 "$LIVE" --expect all-logged --wait1 12 --wait2 60 responses:eof chat:eof &
+APID=$!
+sleep 25
+echo "ACTIVE control $(stamp): guard idle-only with the first request of arm A in flight"
+python3 "$GUARD" --idle-only --clean-for 10 > guard-active-1.txt 2>&1; echo "guard idle-only #2 (mid-request): exit=$? $(grep -E '^IDLE-RESULT' guard-active-1.txt)"
+wait "$APID"; echo "arm A done $(stamp): $(grep -E '^SUMMARY' arm-A-raw.txt)"
+arm arm-B-race.txt "trial, race set B (responses:early:0 x2), frozen script v2.2, --expect all-logged" python3 "$LIVE" --expect all-logged --wait1 12 --wait2 60 responses:early:0 responses:early:0
+echo "arm B done $(stamp): $(grep -E '^SUMMARY' arm-B-race.txt)"
+arm arm-C-native.txt "trial, native codex exec two-request x1, frozen script v2.1, --expect all-logged" python3 "$NATIVE" --expect all-logged --wait1 12 --wait2 60 two-request
+echo "arm C done $(stamp): $(grep -E '^SUMMARY' arm-C-native.txt)"
+python3 "$IDENT" --label trial-after > identity-after.txt 2>&1; echo "identity after: exit=$? $(head -c 300 identity-after.txt | tr '\n' ' ')"
+echo "trial end $(stamp)"

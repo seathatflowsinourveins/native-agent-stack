@@ -1,0 +1,32 @@
+#!/bin/bash
+# Controls for scripts/drain-prototype.sh.txt (version 5): (1) wrong expected tree, (2) a tampered patch whose test-file blob differs from its own index line, (3) a DRAIN_DIR without the patch,
+# (4) a patch whose index line for the test file was removed (version 4's prefix comparison would have matched ANY blob; version 5 must stop with exit 3 at its new parse check).
+# Raw output (filtered to the script's own decision lines, with the exit code of the script) goes to the file named by $1.
+set -u
+P=$HOME/.local/state/native-agent-stack/coordination/peer-99-20261004
+S=$P/omniroute-drain-prototype-20261006.sh
+D=$P/drain-patch
+EV=$HOME/code/.worktrees/native-agent-stack/99/omniroute-gw3/evidence/artifacts/omniroute-wire-effort-20261005
+TREE=b7c6869001ce8bdd23e2e2352f48ce3058bc13d2
+TAMPER=$HOME/.cache/omniroute-tamper-fixture-20261005
+NOINDEX=$HOME/.cache/omniroute-noindex-fixture-20261006
+OUTF=${1:?output file}
+run() { # label, DRAIN_DIR, EXPECT_TREE
+  local before after
+  before=$(ls -d "$HOME"/.cache/omniroute-drain-validate-*/ 2>/dev/null | wc -l)
+  echo "## $1"
+  DRAIN_DIR=$2 EV=$EV EXPECT_TREE=$3 nice -n 19 bash "$S" 2>&1 | grep -aE "exit=|equals|DIFFERS|VIOLATED|missing input|blob|stopping|expectation met|did not parse" | tail -n 14
+  echo "script exit=${PIPESTATUS[0]}"
+  after=$(ls -d "$HOME"/.cache/omniroute-drain-validate-*/ 2>/dev/null | wc -l)
+  echo "omniroute-drain-validate-* work directories before: $before, after: $after"
+  echo
+}
+{
+  run "(1) EXPECT_TREE = 40 zeros: must stop with exit 3 at the patched-tree check, before the P, A2 and B2 stages" "$D" 0000000000000000000000000000000000000000
+  run "(2) a patch whose test-file hunk was changed by one token while its index line was left alone: must stop with exit 3 at the blob check, before the negative controls" "$TAMPER" "$TREE"
+  EMPTY=$(mktemp -d "$HOME/.cache/omniroute-empty-fixture-XXXXXX")
+  run "(3) a DRAIN_DIR that holds no patch: must stop with exit 2 before anything is created" "$EMPTY" "$TREE"
+  rmdir "$EMPTY"
+  run "(4) a patch whose index line for the test file was removed: must stop with exit 3 at the new blob-id parse check, before the negative controls" "$NOINDEX" "$TREE"
+} > "$OUTF"
+echo "written $OUTF"

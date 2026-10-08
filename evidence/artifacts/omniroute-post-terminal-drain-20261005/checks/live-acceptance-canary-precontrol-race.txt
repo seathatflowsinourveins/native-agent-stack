@@ -1,0 +1,24 @@
+# Publication note: UUID-shaped strings (the gateway's correlation ids) are shortened to their first 8 hex digits and an ellipsis, because the repository's publication check rejects full UUIDs; sha256 of this text before the shortening: 4608d6f378932796c57f74420bdd6d6004f3735e0b74fa82e57ae0e405b942cd; the unshortened text is kept in the first host's private artifact directory (checks/logs/MANIFEST.txt)
+# precontrol, race set (responses:early:0 x6), frozen script v2, --expect observe; started 2026-10-07T23:28:07Z; wrapper kind=precontrol
+IDENTITY label=before-live-acceptance-precontrol-race.txt time=2026-10-07T23:28:07Z unit=omniroute.service MainPID=341 ExecMainStartTimestamp=Tue_2026-10-06_09:51:19_EDT NRestarts=0 running_prefix=omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167 BUILD_SHA=cf6748d04 health=ok pending_total=1002 expect_prefix_ok=True expect_build_ok=True
+FROZEN version=2.2 script_sha256=52b1d749dc6b7f6b406f8ce8db5d8b1d3e3a73a6b7861a63cc158dbebd320d75 argv=['--expect', 'observe', '--wait1', '12', '--wait2', '60', 'responses:early:0', 'responses:early:0', 'responses:early:0', 'responses:early:0', 'responses:early:0', 'responses:early:0'] cwd=/tmp start=2026-10-07T23:28:07.615Z expect=observe wait1=12.0 wait2=60.0 port=20128 db=$HOME/.local/share/omniroute/storage.sqlite effort_close_after=10.0 baseline=None baseline_sha256=None
+RESULT mode=responses:early:0 http=200 terminal=True closed_early=True stream_s=1.9 corr=2a73a6e4… response_id=resp_05197d515b390442016ac6d5883170819482699f247fb1efce read1_call_logs=0 read1_usage=0 window_call_logs=0 window_usage=0 read1_usage_lookalikes=0 verdict=OBSERVED
+RESULT mode=responses:early:0 http=200 terminal=True closed_early=True stream_s=5.5 corr=1728c769… response_id=resp_0a5f279ef0c66a74016ac6d596d0988190bad6a33e8d25932e read1_call_logs=0 read1_usage=0 window_call_logs=0 window_usage=0 read1_usage_lookalikes=0 verdict=OBSERVED
+RESULT mode=responses:early:0 http=200 terminal=True closed_early=True stream_s=1.8 corr=2db8df29… response_id=resp_0f364f8d4ef98489016ac6d5a914008196af2c1afb31aeaf6c read1_call_logs=0 read1_usage=0 window_call_logs=0 window_usage=0 read1_usage_lookalikes=0 verdict=OBSERVED
+RESULT mode=responses:early:0 http=200 terminal=True closed_early=True stream_s=2.7 corr=None response_id=resp_0e208d0d9937e251016ac6d5b7a5f88190b9caada4fc3280c4 read1_call_logs=0 read1_usage=0 window_call_logs=0 window_usage=0 read1_usage_lookalikes=0 verdict=OBSERVED
+RESULT mode=responses:early:0 http=200 terminal=True closed_early=True stream_s=2.3 corr=75f1cf35… response_id=resp_0585669755255e30016ac6d5c7574c8195b4382c39b0bd959d read1_call_logs=0 read1_usage=0 window_call_logs=0 window_usage=0 read1_usage_lookalikes=0 verdict=OBSERVED
+RESULT mode=responses:early:0 http=200 terminal=True closed_early=True stream_s=2.0 corr=dd5019e2… response_id=resp_0bbc3cabae03bde0016ac6d5d64384819696b2de8b6f3f0e55 read1_call_logs=0 read1_usage=0 window_call_logs=0 window_usage=0 read1_usage_lookalikes=0 verdict=OBSERVED
+LATE mode=responses:early:0 read2_call_logs=0 read2_usage=0 changed=False verdict=OBSERVED
+LATE mode=responses:early:0 read2_call_logs=0 read2_usage=0 changed=False verdict=OBSERVED
+LATE mode=responses:early:0 read2_call_logs=0 read2_usage=0 changed=False verdict=OBSERVED
+LATE mode=responses:early:0 read2_call_logs=0 read2_usage=0 changed=False verdict=OBSERVED
+LATE mode=responses:early:0 read2_call_logs=0 read2_usage=0 changed=False verdict=OBSERVED
+LATE mode=responses:early:0 read2_call_logs=0 read2_usage=0 changed=False verdict=OBSERVED
+SUMMARY {"OBSERVED": 6} end=2026-10-07T23:30:28.475Z exit=0
+exit=0
+IDENTITY label=after-live-acceptance-precontrol-race.txt time=2026-10-07T23:30:28Z unit=omniroute.service MainPID=341 ExecMainStartTimestamp=Tue_2026-10-06_09:51:19_EDT NRestarts=0 running_prefix=omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167 BUILD_SHA=cf6748d04 health=ok pending_total=1008 expect_prefix_ok=True expect_build_ok=True
+journal_failed_to_save_call_log=0 (journalctl --user -u omniroute.service --since <the unit's ExecMainStartTimestamp> -o cat --no-pager | grep -c 'Failed to save call log')
+pending_delta=6 (informational: pending_total 1002 -> 1008)
+RUN-STATUS live-acceptance-precontrol-race.txt status=0 (ok)
+# finished 2026-10-07T23:30:28Z
+PRECONTROL race_lost=6/6 race_valid=6/6 tworequest_incomplete=1/4 tworequest_valid=4/4 race_discriminating=True (the protocol's rule: fewer than 2 of 6 lost among valid samples means the race set cannot discriminate at this hour; fewer than 6 valid samples is INCONCLUSIVE, not a verdict)

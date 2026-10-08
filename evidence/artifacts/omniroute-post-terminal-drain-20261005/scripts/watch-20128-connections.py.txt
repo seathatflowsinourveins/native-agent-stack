@@ -1,0 +1,65 @@
+#!/usr/bin/env python3
+"""Value-free watch of the established connections to a gateway port (default 20128): every --interval seconds for --duration seconds, from `ss -tnp` (both directions of the loopback connection), print each NEW or CLOSED connection once with
+the owner of each end that is visible in this PID namespace (process name and pid; the other end of a loopback connection owned by a process in another distro's PID namespace shows no owner), plus the child processes of the unit's MainPID,
+so that a connection owned by the gateway itself (its own pid tree) can be told from a client's.
+usage: watch-20128-connections-20261006.py [--port 20128] [--duration 60] [--interval 1] [--unit omniroute.service]
+Only ports, process names and pids are read or printed.
+"""
+import argparse
+import re
+import subprocess
+import time
+
+
+def sh(*a):
+    return subprocess.run(a, capture_output=True, text=True).stdout
+
+
+def tree(pid):
+    out, todo = {int(pid)}, [int(pid)]
+    while todo:
+        cur = todo.pop()
+        for line in sh("pgrep", "-P", str(cur)).split():
+            c = int(line)
+            if c not in out:
+                out.add(c)
+                todo.append(c)
+    return out
+
+
+def snapshot(port):
+    """{(local_port, peer_port): owners} for every established loopback connection with the port as one end; an end's owner is the 'name(pid)' ss shows for it."""
+    res = {}
+    for line in sh("ss", "-Htnp", "state", "established", f"( sport = :{port} or dport = :{port} )").splitlines():
+        parts = line.split()
+        if len(parts) < 4:
+            continue
+        local, peer = parts[2], parts[3]
+        owners = re.findall(r'\("([^"]*)",pid=(\d+)', line)
+        res[(local.rsplit(":", 1)[-1], peer.rsplit(":", 1)[-1])] = [f"{n}({p})" for n, p in owners]
+    return res
+
+
+ap = argparse.ArgumentParser()
+ap.add_argument("--port", default="20128")
+ap.add_argument("--duration", type=float, default=60.0)
+ap.add_argument("--interval", type=float, default=1.0)
+ap.add_argument("--unit", default="omniroute.service")
+a = ap.parse_args()
+main_pid = sh("systemctl", "--user", "show", a.unit, "-p", "MainPID", "--value").strip()
+own = tree(main_pid) if main_pid.isdigit() and main_pid != "0" else set()
+print(f"WATCH start MainPID={main_pid} unit_process_tree={sorted(own)} port={a.port} duration={a.duration}s")
+seen, end, t0 = {}, time.time() + a.duration, time.time()
+while time.time() < end:
+    now = snapshot(a.port)
+    for key, owners in now.items():
+        if key not in seen:
+            seen[key] = (time.time() - t0, owners)
+            mine = [o for o in owners if int(re.search(r"\((\d+)\)", o).group(1)) in own]
+            print(f"+{time.time() - t0:6.1f}s OPEN  local_port={key[0]} peer_port={key[1]} owners={owners or 'none visible'} gateway_own_pid_tree={'yes' if mine else 'no'}")
+    for key in list(seen):
+        if key not in now:
+            print(f"+{time.time() - t0:6.1f}s CLOSE local_port={key[0]} peer_port={key[1]} (open for {time.time() - t0 - seen[key][0]:.1f}s)")
+            del seen[key]
+    time.sleep(a.interval)
+print("WATCH end; still open:", sorted(seen))

@@ -1,0 +1,13 @@
+# Produced by version 1 of the acceptance scripts (superseded; see superseded/README.md). Its observations of the unpatched build cf6748d04 stand; its verdict logic does not.
+# native codex exec two-request (tool call) shape, observed only, on the UNPATCHED gateway (20128 build cf6748d04), same-day, frozen script, quiet window; started 2026-10-06T00:05:31Z
+FROZEN script_sha256=9f511620db390c3b4c7177f858342c6592680efd1d383e2e02ecf3f5d249fdee argv=['--expect', 'observe', '--wait1', '12', '--wait2', '60', '--quiet-timeout', '900', 'two-request'] cwd=/tmp start=2026-10-06T00:05:31.624Z expect=observe wait1=12.0 wait2=60.0 quiet_timeout=900.0
+RESULT shape=two-request quiet=True exec_exit=0 elapsed_s=12.7 expected_each=2 read1_call_logs=2 read1_usage=2 verdict=OBSERVED
+   stdout tail: ok
+   call_logs: ('2026-10-06T00:05:37.433Z', '/v1/responses', 200, 'gpt-6-astra', 15045, 50)
+   call_logs: ('2026-10-06T00:05:44.528Z', '/v1/responses', 200, 'gpt-6-astra', 15106, 24)
+   usage_history: ('2026-10-06T00:05:37.409Z', 'gpt-6-astra', '200', 15045, 50)
+   usage_history: ('2026-10-06T00:05:44.502Z', 'gpt-6-astra', '200', 15106, 24)
+LATE shape=two-request read2_call_logs=2 read2_usage=2 changed=False verdict=OBSERVED
+SUMMARY {'OBSERVED': 1} end=2026-10-06T00:06:44.776Z exit=0
+exit=0
+# finished 2026-10-06T00:06:44Z

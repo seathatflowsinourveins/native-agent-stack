@@ -1,0 +1,784 @@
+#!/usr/bin/env python3
+"""Offline controls for the live-acceptance scripts: version 1 (superseded) and version 2 (frozen) run against the stub gateway and a scratch database, scenario by scenario, with the raw output kept.
+
+Nothing here touches a live gateway: the stub (stub-gateway.py) is a test fixture with the live store's table definitions and its own database; the native shapes run the REAL `codex exec` against the stub
+(it closes right after the terminal event, as in the field) except where a tool-call turn or a failing exec is needed, which use fake-codex.py. A scenario is a control of a script's DECISION LOGIC on synthetic
+rows (evidence class local_integration), never evidence about OmniRoute.
+
+Each run prints `CONTROL-RESULT <scenario> <script> expected_exit=N observed_exit=M OK|UNEXPECTED`. For a version-1 run that is expected to give the WRONG answer (the defect a review reproduced) the line says
+`defect-demonstration`. The driver's own exit status is 0 when every observed exit status is the expected one.
+
+usage: run-controls.py --work DIR --schema FILE --repo REPO [--only ID[,ID...]]
+scenarios: U (usage errors U1-U5), I (identity I1-I3), G (guard G1-G16), W (wrapper W1-W12), R1..R9, R10 (R10a-d) (raw), N1, N1v1 (slow), N2a, N2b, N3, N4a, N4b, N4c, N4d, N5a, N5b, N6, N6o, N7, N10 (N10a-b) (native), RC1, RC2 (receipt)
+"""
+import argparse
+import hashlib
+import json
+import os
+import re
+import sqlite3
+import subprocess
+import sys
+import threading
+import time
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+COORD = Path.home() / ".local/state/native-agent-stack/coordination/peer-99-20261004"
+V1_RAW, V2_RAW = COORD / "omniroute-live-acceptance-20261005.py", COORD / "omniroute-live-acceptance-20261006.py"
+V21_RAW = COORD / "omniroute-live-acceptance-20261006-v2.1.py"   # the version-2.1 text of the raw script (sha256 15b8cf04...), kept for the controls of the two defects the full-scope read of 04e505a5d reproduced (R10)
+V20_NAT = COORD / "omniroute-native-exec-acceptance-20261006-v2.0.py"   # the version-2.0 text of the native script (sha256 9bd478a1...), kept for N10
+GUARD_V3 = COORD / "pre-switch-guard-20261006-v3.py"   # the guard version 3 (sha256 305a0652...), kept for G13-G15
+WRAPPER_V21 = COORD / "run-acceptance-20261006-v2.1.sh"   # the wrapper before the re-freeze (sha256 abcbb540...), kept for W7-W12
+V20_RAW = COORD / "omniroute-live-acceptance-20261006-v2.0.py"   # the first version-2 text of the raw script (sha256 fa8fa6f8...), kept for the controls that reproduce its effort-probe flaw
+V1_NAT, V2_NAT = COORD / "omniroute-native-exec-acceptance-20261005.py", COORD / "omniroute-native-exec-acceptance-20261006.py"
+V2_RCP = COORD / "omniroute-show-log-receipt-20261006.py"
+IDENT, GUARD, WRAPPER = COORD / "gateway-identity-20261006.py", COORD / "pre-switch-guard-20261006.py", COORD / "run-acceptance-20261006.sh"
+GUARD_V2 = COORD / "pre-switch-guard-20261006-v2.py"   # the first guard (sha256 b491de6b...), kept for G12, which reproduces its live failure on the 20129 gateway's poll
+SWITCH_TOOL_COPY = Path.home() / ".cache/switch_gateways_committed.py"
+HOME = str(Path.home())
+RAW_WAITS = ["--wait1", "5", "--wait2", "10"]
+NAT_V2 = ["--expect", "all-logged", "--wait1", "5", "--wait2", "10", "--quiet-timeout", "1", "--exec-timeout", "60"]
+UNEXPECTED = []
+
+
+def sha(path):
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+class Fixture:
+    def __init__(self, work, schema, repo):
+        self.work = Path(work)
+        self.work.mkdir(parents=True, exist_ok=True)
+        os.chmod(self.work, 0o700)
+        self.home = self.work / "home"
+        self.db = self.home / ".local/share/omniroute/storage.sqlite"
+        self.db.parent.mkdir(parents=True, exist_ok=True)
+        self.modefile = self.work / "mode.json"
+        self.portfile = self.work / "port"
+        self.reqlog = Path(str(self.db) + ".requests.jsonl")
+        self.set_mode({"mode": "normal"})
+        self.stub = subprocess.Popen([sys.executable, str(HERE / "stub-gateway.py"), "--db", str(self.db), "--schema", schema, "--mode-file", str(self.modefile), "--port-file", str(self.portfile)],
+                                     stdout=open(self.work / "stub.log", "w"), stderr=subprocess.STDOUT)
+        for _ in range(100):
+            if self.portfile.exists() and self.portfile.read_text().strip():
+                break
+            time.sleep(0.1)
+        self.port = int(self.portfile.read_text())
+        self.repo = self.work / "repo"
+        template = self.repo / "adoption/templates/codex.omniroute.config.toml"
+        template.parent.mkdir(parents=True, exist_ok=True)
+        template.write_text((Path(repo) / "adoption/templates/codex.omniroute.config.toml").read_text().replace("http://127.0.0.1:20128/v1", f"http://127.0.0.1:{self.port}/v1"))
+        self.bin = self.work / "bin"
+        self.bin.mkdir(exist_ok=True)
+        fake = self.bin / "codex"
+        if not fake.exists():
+            fake.symlink_to(HERE / "fake-codex.py")
+        os.chmod(HERE / "fake-codex.py", 0o755)
+
+    def set_mode(self, cfg):
+        self.modefile.write_text(json.dumps(cfg))
+
+    def reset(self, cfg):
+        time.sleep(1.5)  # let a previous scenario's delayed stub writes (duplicate rows, status flips) land before the tables are emptied
+        con = sqlite3.connect(self.db, timeout=30)
+        con.execute("delete from call_logs")
+        con.execute("delete from usage_history")
+        con.commit()
+        con.close()
+        self.reqlog.write_text("")
+        self.set_mode(cfg)
+
+    def insert_unrelated(self, delay):
+        def run():
+            time.sleep(delay)
+            con = sqlite3.connect(self.db, timeout=30)
+            ts = dt_now()
+            con.execute("insert into call_logs (id, timestamp, method, path, status, model, requested_model, provider, tokens_in, tokens_out, detail_state, session_tag) values (?,?,?,?,?,?,?,?,?,?,?,?)",
+                        ("unrelated-1", ts, "POST", "/v1/responses", 200, "gpt-6-astra", "codex/gpt-6-astra", "codex", 15045, 50, "ready", "someone-else"))
+            con.execute("insert into usage_history (provider, model, tokens_input, tokens_output, status, success, timestamp) values (?,?,?,?,?,?,?)", ("codex", "gpt-6-astra", 15045, 50, "200", 1, ts))
+            con.commit()
+            con.close()
+        t = threading.Thread(target=run, daemon=True)
+        t.start()
+        return t
+
+    def close(self):
+        self.stub.terminate()
+        try:
+            self.stub.wait(timeout=10)
+        except Exception:
+            self.stub.kill()
+
+
+def dt_now():
+    import datetime as dt
+    return dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
+
+
+def mask(text, fx):
+    return str(text).replace(str(fx.work), "$WORK").replace(HOME + "/", "$HOME/")
+
+
+def run(fx, scenario, label, argv, expected, env_extra=None, defect=False, timeout=900, note=None):
+    env = dict(os.environ)
+    env.update(env_extra or {})
+    shown = " ".join(mask(a, fx) for a in argv)
+    print(f"--- {scenario} / {label}: {'bash' if str(argv[0]).endswith('.sh') else 'python3'} {shown}" + (f"   [env: {', '.join(k + '=' + mask(v, fx) for k, v in (env_extra or {}).items())}]" if env_extra else ""), flush=True)
+    if note:
+        print(f"    note: {note}")
+    t0 = time.time()
+    try:
+        exe = ["bash"] if str(argv[0]).endswith(".sh") else [sys.executable]
+        proc = subprocess.run(exe + [str(a) for a in argv], env=env, capture_output=True, text=True, timeout=timeout)
+        rc, out = proc.returncode, proc.stdout + proc.stderr
+    except subprocess.TimeoutExpired as e:
+        rc, out = 124, f"(driver timeout after {timeout} s)\n{(e.stdout or b'').decode() if isinstance(e.stdout, bytes) else (e.stdout or '')}"
+    for line in mask(out, fx).rstrip("\n").splitlines():
+        print("    " + line)
+    ok = rc == expected
+    kind = "defect-demonstration " if defect else ""
+    print(f"CONTROL-RESULT {scenario} {label} {kind}expected_exit={expected} observed_exit={rc} elapsed_s={time.time() - t0:.0f} {'OK' if ok else 'UNEXPECTED'}\n", flush=True)
+    if not ok:
+        UNEXPECTED.append(f"{scenario} {label}")
+    return rc, out
+
+
+def raw(fx, scenario, title, cfg, modes, v1_exit, v2_exit, v1_note=None, v2_extra=None, v1_extra=None, v2_only=False):
+    print(f"### {scenario}: {title}\n    stub mode: {json.dumps(cfg)}", flush=True)
+    for label, script, expected, extra, note in (("v1", V1_RAW, v1_exit, v1_extra, v1_note), ("v2", V2_RAW, v2_exit, v2_extra, None)):
+        if label == "v1" and v2_only:
+            continue
+        fx.reset(cfg)
+        if label == "v1":
+            argv = [script, "--port", fx.port, "--expect", "all-logged", *RAW_WAITS, *(extra or []), *modes]
+            env = {"HOME": str(fx.home)}
+        else:
+            argv = [script, "--port", fx.port, "--db", fx.db, "--expect", "all-logged", *RAW_WAITS, *(extra or []), *modes]
+            env = None
+        defect = label == "v1" and v1_exit in (0,) and scenario in ("R3", "R4", "N2a", "N2b", "N5b")
+        run(fx, scenario, label, argv, expected, env_extra=env, defect=defect, note=note)
+
+
+def native(fx, scenario, title, cfg, shapes, v1_exit, v2_exit, mode_env=None, side=None, v1_note=None, v2_extra=None, v1_extra=None, v2_only=False, v1_timeout=900):
+    print(f"### {scenario}: {title}\n    stub mode: {json.dumps(cfg)}" + (f"   fake codex mode: {mode_env}" if mode_env else ""), flush=True)
+    for label, script, expected in (("v1", V1_NAT, v1_exit), ("v2", V2_NAT, v2_exit)):
+        if label == "v1" and v2_only:
+            continue
+        fx.reset(cfg)
+        scratch = fx.work / f"codex-home-{scenario}-{label}"
+        if label == "v1":
+            argv = [script, "--expect", "all-logged", "--wait1", "5", "--wait2", "10", "--quiet-timeout", "1", "--repo", fx.repo, *(v1_extra or []), *shapes]
+            env = {"HOME": str(fx.home)}
+        else:
+            argv = [script, *NAT_V2, "--repo", fx.repo, "--db", fx.db, "--scratch", scratch, *(v2_extra or []), *shapes]
+            env = {}
+        if mode_env:
+            env.update({"FAKE_CODEX_MODE": mode_env, "FAKE_CODEX_DB": str(fx.db)})
+            if label == "v1":
+                env["PATH"] = f"{fx.bin}:{os.environ['PATH']}"
+            else:
+                argv += ["--codex", str(fx.bin / "codex")]
+        thread = side(fx) if side else None
+        defect = label == "v1" and expected == 0 and scenario in ("N2a", "N2b", "N5b")
+        run(fx, scenario, label, argv, expected, env_extra=env, defect=defect, note=v1_note if label == "v1" else None, timeout=v1_timeout if label == "v1" else 900)
+        if thread:
+            thread.join()
+        if scenario == "N1" and label == "v2":
+            ids = sorted({json.loads(l)["x-omniroute-session-id"] for l in fx.reqlog.read_text().splitlines() if l.strip()})
+            print(f"    the stub saw {len(ids)} distinct X-OmniRoute-Session-Id values from the three codex exec turns: {ids}")
+            if len(ids) != 3:
+                UNEXPECTED.append("N1 distinct session ids")
+
+
+def receipt(work):
+    work = Path(work)
+    work.mkdir(parents=True, exist_ok=True)
+    clean = work / "show-log-clean.conf"
+    clean.write_text("[Service]\nEnvironment=OMNIROUTE_SHOW_LOG=1\n")
+    extra = work / "show-log-with-extra.conf"
+    extra.write_text("[Service]\nEnvironment=OMNIROUTE_SHOW_LOG=1\nEnvironment=SYNTHETIC_CONTROL_SECRET=control-value-0123456789\n")
+    for sid, title, path, must_not in (("RC1", "a drop-in with only the show-log line", clean, []), ("RC2", "a drop-in with an extra synthetic assignment that looks like a credential", extra, ["SYNTHETIC_CONTROL_SECRET", "control-value-0123456789"])):
+        print(f"### {sid}: {title}")
+        v1_line = [l for l in path.read_text().splitlines() if l.strip() and not l.lstrip().startswith("#")]
+        print(f"--- {sid} / v1 (the print statement of version 1 applied to the same file): drop-in file: effective lines: {v1_line}")
+        proc = subprocess.run([sys.executable, str(V2_RCP), "--describe-dropin", str(path)], capture_output=True, text=True)
+        out = (proc.stdout + proc.stderr).replace(HOME + "/", "$HOME/").replace(str(work), "$WORK")
+        print(f"--- {sid} / v2: python3 {V2_RCP.name} --describe-dropin {path.name}\n    {out.strip()}")
+        leaked = [m for m in must_not if m in proc.stdout + proc.stderr]
+        ok = proc.returncode == 0 and not leaked and "declared by its own line: True" in out
+        print(f"CONTROL-RESULT {sid} v2 expected_no_leak observed_leaked={leaked} {'OK' if ok else 'UNEXPECTED'}\n")
+        if not ok:
+            UNEXPECTED.append(sid)
+
+
+# ---------------------------------------------------------------- usage errors, identity, guard, wrapper
+def make_tools(work):
+    """A scratch tools directory with a stand-in rollback prefix and a stand-in target prefix (the target carries the drain marker); returns (tools dir, sha256 of the stand-in shim)."""
+    import hashlib as _h
+    tools = Path(work) / "tools"
+    shim_text = "shim v2 stand-in\n"
+    for name, build in (("omniroute-ctl-rollback", "cf6748d04"), ("omniroute-ctl-target", "2a41147b7")):
+        base = tools / name
+        (base / "bin").mkdir(parents=True, exist_ok=True)
+        (base / "bin/omniroute").write_text("#!/bin/sh\n")
+        os.chmod(base / "bin/omniroute", 0o755)
+        (base / "lib/node_modules/omniroute/dist").mkdir(parents=True, exist_ok=True)
+        (base / "lib/node_modules/omniroute/dist/BUILD_SHA").write_text(build + "\n")
+        (base / "shim").mkdir(exist_ok=True)
+        (base / "shim/lsof").write_text(shim_text)
+    chunks = tools / "omniroute-ctl-target/lib/node_modules/omniroute/dist/.build/next/server/chunks"
+    chunks.mkdir(parents=True, exist_ok=True)
+    (chunks / "a.js").write_text("x;abort(),n.clearPendingRequest?.(),Promise.allSettled([y]);")
+    return tools, _h.sha256(shim_text.encode()).hexdigest()
+
+
+def dummy(tools, name="omniroute-ctl-rollback", extra=()):
+    """A dummy process whose command line carries /tools/<name>/ like the gateway's server does."""
+    return subprocess.Popen([sys.executable, "-c", "import time; time.sleep(3600)", f"{tools}/{name}/bin/omniroute", "serve", "--port", "20128", *extra])   # long enough for a driver that runs twelve wrapper runs (a 600 s dummy ended in the middle of W12 in a first attempt)
+
+
+def effort_controls(fx):
+    """The effort probes as GROUPS of attempts (version 2.1) against the stub that can write NULL effort columns, as the real gateway does for a response without encrypted reasoning; and the flaw of version 2.0 (a single NULL attempt fails a healthy canary)."""
+    modes3 = ["effort:cx/gpt-6-astra:max"] * 3
+    waits = [*RAW_WAITS, "--effort-close-after", "3"]
+
+    def baseline(label, cfg, modes=None):
+        fx.reset(cfg)
+        _, out = run(fx, "R8-baseline", label, [V2_RAW, "--port", fx.port, "--db", fx.db, "--expect", "observe", *waits, *(modes or modes3)], 0)
+        path = fx.work / f"effort-baseline-{label.split()[0]}.txt"
+        path.write_text(out)
+        return path
+
+    def canary(sid, title, cfg, base, expected, modes=None, script=V2_RAW, extra=()):
+        print(f"### {sid}: {title}\n    stub mode: {json.dumps(cfg)}", flush=True)
+        fx.reset(cfg)
+        used = RAW_WAITS if script == V20_RAW else waits   # version 2.0 has no --effort-close-after (it reads an effort probe to the end of the stream, which the stub ends 3 s after the terminal event)
+        run(fx, sid, "v2.2" if script == V2_RAW else "v2.0", [script, "--port", fx.port, "--db", fx.db, "--expect", "all-logged", "--baseline", base, *extra, *used, *(modes or modes3)], expected, defect=(script == V20_RAW and expected == 1))
+
+    print("### R8 baselines: version 2.1 in observe mode against the healthy stub (three attempts, the stub writes max/max), against a stub whose responses all lack the effort columns, and one with a different upstream effort", flush=True)
+    healthy = baseline("healthy three attempts", {"mode": "normal"})
+    all_null = baseline("all-null three attempts", {"mode": "normal", "null_effort": [True]})
+    other = baseline("xhigh three attempts", {"mode": "normal", "effort_upstream_override": "xhigh"})
+    mixed = fx.work / "effort-baseline-mixed.txt"
+    mixed.write_text(healthy.read_text() + other.read_text())
+    canary("R8a", "healthy canary, three attempts, all observed and equal to the baseline: PASS", {"mode": "normal"}, healthy, 0)
+    canary("R8b", "the upstream effort differs from the baseline's on every attempt (xhigh against max): FAIL", {"mode": "normal", "effort_upstream_override": "xhigh"}, healthy, 1)
+    canary("R8c", "no attempt carries the effort columns (all NULL): the rows pass, the group is INCONCLUSIVE, never a FAIL and never a PASS", {"mode": "normal", "null_effort": [True]}, healthy, 2)
+    canary("R8d", "one attempt of three without the effort columns, two observed and equal: PASS (the NULL attempt is unobservable, not wrong)", {"mode": "normal", "null_effort": [True, False, False]}, healthy, 0)
+    canary("R8e", "two attempts NULL and the one observed attempt differs (xhigh): FAIL", {"mode": "normal", "null_effort": [True, True, False], "effort_upstream_override": "xhigh"}, healthy, 1)
+    canary("R8f", "the baseline file holds no OBSERVED effort line for the mode (every baseline attempt had NULL columns): exit 3 before any request", {"mode": "normal"}, all_null, 3)
+    canary("R8g", "the baseline's observed lines for the mode disagree (max and xhigh): exit 3 before any request", {"mode": "normal"}, mixed, 3)
+    canary("R8h", "VERSION 2.0 (the first version of this script, kept in superseded/) with ONE attempt of which the gateway stored no effort columns: it FAILS a healthy canary, the flaw this round fixes", {"mode": "normal", "null_effort": [True]}, healthy, 1,
+           modes=["effort:cx/gpt-6-astra:max"], script=V20_RAW, extra=())
+    canary("R8i", "VERSION 2.1 with the same ONE NULL attempt: the group is INCONCLUSIVE (exit 2), not a FAIL", {"mode": "normal", "null_effort": [True]}, healthy, 2, modes=["effort:cx/gpt-6-astra:max"])
+    print("### R8j: the suffix model (no client effort, the model id carries it): requested NULL and upstream max is an OBSERVED attempt, and it is compared as such")
+    sm = ["effort:cx/gpt-6.1-sol-max"] * 3
+    sbase = baseline("suffix-model three attempts", {"mode": "normal"}, modes=sm)
+    canary("R8j", "suffix model, healthy: PASS", {"mode": "normal"}, sbase, 0, modes=sm)
+
+
+def usage_errors(fx):
+    cwd_note = "run from /tmp, where the relative path does not exist"
+    print("### U1: --baseline names a file that does not exist (a relative path run from /tmp, as the frozen version-1 command was): version 1 crashes with exit 1, the code of a FAIL; version 2 stops with exit 3 before sending any request")
+    for label, script, expected, port_arg in (("v1", V1_RAW, 1, []), ("v2", V2_RAW, 3, ["--db", fx.db])):
+        fx.reset({"mode": "normal"})
+        argv = [script, "--port", fx.port, *port_arg, "--expect", "all-logged", "--baseline", "checks/live-acceptance-baseline-raw.txt", *RAW_WAITS, "effort:cx/gpt-6-astra:max"]
+        run(fx, "U1", label, argv, expected, env_extra={"HOME": str(fx.home)} if label == "v1" else None, defect=(label == "v1"), note=cwd_note)
+        print(f"    requests the stub received: {len([l for l in fx.reqlog.read_text().splitlines() if l.strip()])}")
+    print("### U2: an unknown mode: version 1 exits 1 (SystemExit with a message), version 2 exits 3")
+    for label, script, expected, extra in (("v1", V1_RAW, 1, []), ("v2", V2_RAW, 3, ["--db", fx.db])):
+        fx.reset({"mode": "normal"})
+        run(fx, "U2", label, [script, "--port", fx.port, *extra, "--expect", "observe", *RAW_WAITS, "responses:nonsense"], expected, env_extra={"HOME": str(fx.home)} if label == "v1" else None, defect=(label == "v1"))
+    print("### U3: a bad option value (--wait1 abc): version 1 exits 2 (argparse), the code of INCONCLUSIVE; version 2 exits 3")
+    for label, script, expected, extra in (("v1", V1_RAW, 2, []), ("v2", V2_RAW, 3, ["--db", fx.db])):
+        fx.reset({"mode": "normal"})
+        run(fx, "U3", label, [script, "--port", fx.port, *extra, "--expect", "observe", "--wait1", "abc", "--wait2", "10", "responses:eof"], expected, env_extra={"HOME": str(fx.home)} if label == "v1" else None, defect=(label == "v1"))
+    print("### U4: no gateway answers on the port: version 2 stops with exit 3 at its health preflight, before any request")
+    fx.reset({"mode": "normal"})
+    run(fx, "U4", "v2", [V2_RAW, "--port", "1", "--db", fx.db, "--expect", "observe", *RAW_WAITS, "responses:eof"], 3)
+    print("### U5: native: an unknown shape (version 1 raises a KeyError and exits 1, version 2 exits 3), and a missing profile template (version 2 exits 3)")
+    fx.reset({"mode": "normal"})
+    run(fx, "U5", "v1", [V1_NAT, "--expect", "all-logged", "--wait1", "5", "--wait2", "10", "--quiet-timeout", "1", "--repo", fx.repo, "nonsense"], 1, env_extra={"HOME": str(fx.home)}, defect=True)
+    run(fx, "U5", "v2 unknown shape", [V2_NAT, *NAT_V2, "--repo", fx.repo, "--db", fx.db, "--scratch", fx.work / "codex-home-U5", "nonsense"], 3)
+    run(fx, "U5", "v2 missing template", [V2_NAT, *NAT_V2, "--repo", fx.work / "no-such-repo", "--db", fx.db, "--scratch", fx.work / "codex-home-U5b", "astra-max"], 3)
+
+
+def identity_controls(fx):
+    tools, _ = make_tools(fx.work)
+    proc = dummy(tools)
+    time.sleep(0.5)
+    try:
+        print("### I1: the identity read-back of a dummy process that carries the rollback prefix in its command line, against the stub's health endpoint: it prints the line and exits 0 when the expectations hold")
+        base = [IDENT, "--pid", proc.pid, "--port", fx.port, "--tools", tools]
+        run(fx, "I1", "expectations hold", [*base, "--label", "control", "--expect-prefix", "omniroute-ctl-rollback", "--expect-build", "cf6748d04"], 0)
+        print("### I2: a build id that is not the running one: exit 5")
+        run(fx, "I2", "wrong build", [*base, "--label", "control", "--expect-prefix", "omniroute-ctl-rollback", "--expect-build", "2a41147b7"], 5)
+        print("### I3: no healthy gateway on the port: exit 5")
+        run(fx, "I3", "no health", [IDENT, "--pid", proc.pid, "--port", "1", "--tools", tools, "--label", "control"], 5)
+    finally:
+        proc.kill()
+
+
+def guard_controls(fx, want=lambda sid: True):
+    import hashlib as _h
+    tools, shim_sha = make_tools(fx.work)
+    tool = fx.work / "switch-tool-standin.py"
+    tool.write_text("# stand-in for the committed switch tool\n")
+    tool_sha = _h.sha256(tool.read_bytes()).hexdigest()
+    proc = dummy(tools)
+    time.sleep(0.5)
+    other = "nonexistent-process-pattern-for-the-controls"
+    common = [GUARD, "--switch-tool", tool, "--switch-sha256", tool_sha, "--port", fx.port, "--tools", tools, "--db", fx.db, "--clean-for", "6", "--interval", "2", "--rollback-prefix", "omniroute-ctl-rollback",
+              "--rollback-build", "cf6748d04", "--target-prefix", "omniroute-ctl-target", "--target-build", "2a41147b7", "--shim-sha256", shim_sha, "--pid", proc.pid, "--worker-pattern", other]
+    if not any(want(s) for s in ("G1", "G2", "G3", "G4", "G5", "G6", "G7", "G8", "G9", "G10", "G11", "G12", "G")):
+        try:
+            guard_round9(fx, common, proc, tools, tool, shim_sha, want)
+        finally:
+            proc.kill()
+        return
+    import socket
+    try:
+        fx.reset({"mode": "normal"})
+        print("### G1: everything holds, and an IDLE established connection to the gateway port exists (it must be tolerated: idle keep-alive connections from other PID namespaces exist at rest on the live gateway): exit 0")
+        idle = socket.create_connection(("127.0.0.1", fx.port))
+        run(fx, "G1", "clean", common, 0)
+        idle.close()
+        print("### G2: a client connection that carries traffic during the window (a request sent in slow pieces): ACTIVE, exit 4")
+        busy = socket.create_connection(("127.0.0.1", fx.port))
+        stop = threading.Event()
+
+        def trickle():
+            busy.sendall(b"GET /api/health HTTP/1.1\r\nHost: x\r\n")
+            while not stop.is_set():
+                try:
+                    busy.sendall(b"X-Slow: 1\r\n")
+                except OSError:
+                    return
+                time.sleep(0.7)
+        th = threading.Thread(target=trickle, daemon=True)
+        th.start()
+        run(fx, "G2", "active connection", common, 4)
+        stop.set()
+        th.join(timeout=3)
+        busy.close()
+        print("### G9: traffic from a poller in a TOLERATED unit (a transient systemd scope named by --tolerate-unit, as omniroute-fw.service is for the 20129 gateway's poll of 20128): reported as tolerated, exit 0")
+        scope = f"ctl-poller-{os.getpid()}"
+        poller = subprocess.Popen(["systemd-run", "--user", "--scope", "--quiet", f"--unit={scope}", sys.executable, str(HERE / "poller.py"), "--port", str(fx.port), "--duration", "120"])
+        time.sleep(1.5)
+        print(f"    poller process alive before G9: {poller.poll() is None}")
+        run(fx, "G9", "tolerated poller", [*common, "--tolerate-unit", f"{scope}.scope"], 0)
+        print("### G10: the same poller when its unit is NOT tolerated (the default tolerates only omniroute-fw.service): ACTIVE, exit 4")
+        print(f"    poller process alive before G10: {poller.poll() is None}")
+        run(fx, "G10", "poller not tolerated", common, 4)
+        print("### G11: a tolerated poller AND another client that carries traffic: the tolerance does not hide the other client, exit 4")
+        busy2 = socket.create_connection(("127.0.0.1", fx.port))
+        stop2 = threading.Event()
+
+        def trickle2():
+            busy2.sendall(b"GET /api/health HTTP/1.1\r\nHost: x\r\n")
+            while not stop2.is_set():
+                try:
+                    busy2.sendall(b"X-Slow: 1\r\n")
+                except OSError:
+                    return
+                time.sleep(0.7)
+        th2 = threading.Thread(target=trickle2, daemon=True)
+        th2.start()
+        run(fx, "G11", "tolerated poller plus another active client", [*common, "--tolerate-unit", f"{scope}.scope"], 4)
+        stop2.set()
+        th2.join(timeout=3)
+        busy2.close()
+        print("### G12: the superseded guard (version 2) on the same fixture and the same poller, with the same options (it has no way to tolerate a unit): the poller counts as ACTIVE, exit 4: the failure of the first live trial that version 3 fixed (the 20129 gateway's poll of 20128)")
+        print(f"    poller process alive before G12: {poller.poll() is None}")
+        run(fx, "G12", "guard v2 with the poller", [GUARD_V2, *common[1:]], 4, defect=True)
+        poller.terminate()
+        try:
+            poller.wait(timeout=5)
+        except Exception:
+            poller.kill()
+        print("### G3: a call_logs row written a few seconds ago: exit 4")
+        con = sqlite3.connect(fx.db, timeout=30)
+        con.execute("insert into call_logs (id, timestamp, method, path, status, model, requested_model, provider, tokens_in, tokens_out, detail_state, session_tag) values (?,?,?,?,?,?,?,?,?,?,?,?)",
+                    ("recent-1", dt_now(), "POST", "/v1/responses", 200, "gpt-6-astra", "codex/gpt-6-astra", "codex", 1, 1, "ready", "someone"))
+        con.commit()
+        con.close()
+        run(fx, "G3", "recent row", common, 4)
+        fx.reset({"mode": "normal"})
+        print("### G4: the stand-in shim's sha256 is not the reviewed one: exit 4")
+        bad = list(common)
+        bad[bad.index("--shim-sha256") + 1] = "0" * 64
+        run(fx, "G4", "shim hash", bad, 4)
+        print("### G5: the rollback prefix's BUILD_SHA is not the expected one: exit 4")
+        bad = list(common)
+        bad[bad.index("--rollback-build") + 1] = "deadbeef0"
+        run(fx, "G5", "rollback build", bad, 4)
+        print("### G6: the switch tool is not the pinned file: exit 4")
+        bad = list(common)
+        bad[bad.index("--switch-sha256") + 1] = "0" * 64
+        run(fx, "G6", "switch tool hash", bad, 4)
+        print("### G7: a worker process of another lane exists (the frozen default pattern, a dummy process whose command line names omniroute-codex-sdk/worker.py): exit 4")
+        worker = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(60)", "omniroute-codex-sdk/worker.py"])
+        time.sleep(0.5)
+        default_pattern = [a for i, a in enumerate(common) if not (a == "--worker-pattern" or (i > 0 and common[i - 1] == "--worker-pattern"))]
+        run(fx, "G7", "worker present", default_pattern, 4)
+        worker.kill()
+        print("### G8: the target prefix lacks the drain marker: exit 4")
+        marker = tools / "omniroute-ctl-target/lib/node_modules/omniroute/dist/.build/next/server/chunks/a.js"
+        keep = marker.read_text()
+        marker.write_text("x;no marker here;")
+        run(fx, "G8", "no marker", common, 4)
+        marker.write_text(keep)
+        guard_round9(fx, common, proc, tools, tool, shim_sha, want)
+    finally:
+        proc.kill()
+
+
+def wrapper_controls(fx, want=lambda sid: True):
+    import shutil as _sh
+    tools, shim_sha = make_tools(fx.work)
+    proc = dummy(tools)
+    time.sleep(0.5)
+    try:
+        base_env = {
+            "ACCEPT_TEST_WAITS": "--wait1 4 --wait2 8",
+            "ACCEPT_TEST_LIVE_ARGS": f"--port {fx.port} --db {fx.db}",
+            "ACCEPT_TEST_IDENT_ARGS": f"--pid {proc.pid} --port {fx.port} --tools {tools}",
+            "ACCEPT_TEST_EXPECT_PREFIX": "omniroute-ctl-rollback", "ACCEPT_TEST_EXPECT_BUILD": "cf6748d04",
+            "ACCEPT_TEST_JOURNAL_CMD": "true", "ACCEPT_TEST_SINCE": "2026-10-06 00:00:00",
+            "ACCEPT_TEST_N_RACE": "3", "ACCEPT_TEST_N_ASTRA": "2", "ACCEPT_TEST_N_TWO": "2", "ACCEPT_TEST_N_TWO_PRE": "2",
+            "ACCEPT_TEST_RAW_MODES": "responses:eof responses:early:0 chat:early:0",
+            "FAKE_CODEX_MODE": "two-ok", "FAKE_CODEX_DB": str(fx.db),
+        }
+
+        def native_args(scratch, codex=None):
+            return f"--quiet-timeout 1 --exec-timeout 60 --repo {fx.repo} --db {fx.db} --scratch {fx.work / scratch}" + (f" --codex {codex}" if codex else "")
+        fake = fx.bin / "codex"
+        out = lambda name: fx.work / f"wrapper-{name}"
+
+        if not any(want(s) for s in ("W", "W1", "W2", "W3", "W4", "W5", "W6")):
+            wrapper_round9(fx, base_env, native_args, fake, out, want)
+            return
+        print("### W1: the wrapper on a healthy stub gateway (kind test, shortened waits and counts; the native turns use the fake codex, which writes two requests per turn with the client usage equal to their sum): every run ok, status 0")
+        fx.reset({"mode": "normal"})
+        env = dict(base_env, ACCEPT_TEST_NATIVE_ARGS=native_args("codex-home-W1", fake))
+        run(fx, "W1", "wrapper", [WRAPPER, "test", out("W1")], 0, env_extra=env, timeout=900)
+        for f in sorted(out("W1").glob("*.txt")):
+            print(f"    {f.name}: " + "; ".join(l for l in f.read_text().splitlines() if l.startswith(("RUN-STATUS", "pending_delta", "journal_failed", "IDENTITY ")) and "before" not in l and "after" not in l or l.startswith("RUN-STATUS")))
+        print("### W2: the gateway process disappears during the first run (the identity read after it is not the one read before): that run is VOID, status 4")
+        fx.reset({"mode": "normal"})
+        victim = dummy(tools)
+        time.sleep(0.5)
+        env2 = dict(base_env, ACCEPT_TEST_NATIVE_ARGS=native_args("codex-home-W2", fake), ACCEPT_TEST_IDENT_ARGS=f"--pid {victim.pid} --port {fx.port} --tools {tools}",
+                    ACCEPT_TEST_RAW_MODES="responses:eof", ACCEPT_TEST_N_RACE="1", ACCEPT_TEST_N_ASTRA="1", ACCEPT_TEST_N_TWO="1")
+        threading.Timer(3.0, victim.kill).start()
+        run(fx, "W2", "wrapper", [WRAPPER, "test", out("W2")], 4, env_extra=env2, timeout=900)
+        print("### W3: a script that prints no SUMMARY line (an invalid option makes both raw runs exit 3): those runs are INCONCLUSIVE (status 2), the native runs still pass, the wrapper exits 2")
+        fx.reset({"mode": "normal"})
+        env3 = dict(base_env, ACCEPT_TEST_NATIVE_ARGS=native_args("codex-home-W3", fake), ACCEPT_TEST_LIVE_ARGS=f"--port {fx.port} --db {fx.db} --no-such-option")
+        run(fx, "W3", "wrapper", [WRAPPER, "test", out("W3")], 2, env_extra=env3, timeout=900)
+        print("### W4: a script copy that differs from the frozen sha256 (one comment line appended): the wrapper stops with exit 2 before running anything")
+        copy = fx.work / "scripts-copy"
+        copy.mkdir(exist_ok=True)
+        for f in COORD.glob("*20261006*"):
+            if f.is_file():
+                _sh.copyfile(f, copy / f.name)
+        with open(copy / "omniroute-live-acceptance-20261006.py", "a") as fh:
+            fh.write("# tampered\n")
+        run(fx, "W4", "tampered script", [copy / "run-acceptance-20261006.sh", "test", out("W4")], 2, env_extra=base_env)
+        print(f"    output files written by the stopped wrapper: {len(list(out('W4').glob('*'))) if out('W4').exists() else 0}")
+        print("### W5: the journal shows a `Failed to save call log` line since the unit's start: every run is FAIL (status 1), the wrapper exits 1")
+        fx.reset({"mode": "normal"})
+        env5 = dict(base_env, ACCEPT_TEST_NATIVE_ARGS=native_args("codex-home-W5", fake), ACCEPT_TEST_JOURNAL_CMD="echo 'Failed to save call log'", ACCEPT_TEST_RAW_MODES="responses:early:0",
+                    ACCEPT_TEST_N_RACE="1", ACCEPT_TEST_N_ASTRA="1", ACCEPT_TEST_N_TWO="1")
+        run(fx, "W5", "wrapper", [WRAPPER, "test", out("W5")], 1, env_extra=env5, timeout=900)
+        print("### W6: the pre-switch control (kind test with ACCEPT_TEST_PRECONTROL=1) on the stub that drops rows for early-closing clients: it counts the lost race requests and the incomplete two-request turns")
+        fx.reset({"mode": "lose-on-early", "tail_s": 3.0})
+        env6 = dict(base_env, ACCEPT_TEST_NATIVE_ARGS=native_args("codex-home-W6", fake), ACCEPT_TEST_PRECONTROL="1", FAKE_CODEX_MODE="two-final-lost")
+        _, out6 = run(fx, "W6", "wrapper", [WRAPPER, "test", out("W6")], 0, env_extra=env6, timeout=900)
+        if "PRECONTROL race_lost=3/3" not in out6 or "tworequest_incomplete=2/2" not in out6 or "race_discriminating=True" not in out6:
+            UNEXPECTED.append("W6 precontrol summary")
+            print("CONTROL-RESULT W6 precontrol-summary UNEXPECTED")
+        wrapper_round9(fx, base_env, native_args, fake, out, want)
+    finally:
+        proc.kill()
+
+
+
+
+# ---------------------------------------------------------------- round 9: the findings of the full-scope read of 04e505a5d
+def r10_controls(fx, want):
+    """Effort observability (P2-1) and the usage association (P2-2) in the raw script: version 2.1 (defect demonstration) against version 2.2."""
+    modes3 = ["effort:cx/gpt-6-astra:max"] * 3
+    waits = [*RAW_WAITS, "--effort-close-after", "3"]
+    if want("R10a"):
+        print("### R10a baseline: version 2.2 in observe mode against the healthy stub (three attempts, all observable with max/max)", flush=True)
+        fx.reset({"mode": "normal"})
+        _, out = run(fx, "R10-baseline", "v2.2 healthy three attempts", [V2_RAW, "--port", fx.port, "--db", fx.db, "--expect", "observe", *waits, *modes3], 0)
+        base = fx.work / "effort-baseline-r10.txt"
+        base.write_text(out)
+        cfg = {"mode": "normal", "dropped_effort": [False, True, True]}
+        print(f"### R10a: three attempts, one correct and TWO observable attempts (reasoning_source encrypted) that dropped the effort (both effort columns NULL): version 2.1 treated the NULL attempts as unobservable and PASSED, version 2.2 FAILS\n    stub mode: {json.dumps(cfg)}", flush=True)
+        for script, label, expected in ((V21_RAW, "v2.1", 0), (V2_RAW, "v2.2", 1)):
+            fx.reset(cfg)
+            run(fx, "R10a", label, [script, "--port", fx.port, "--db", fx.db, "--expect", "all-logged", "--baseline", base, *waits, *modes3], expected, defect=(script == V21_RAW))
+    if want("R10b"):
+        cfg = {"mode": "foreign-usage"}
+        print(f"### R10b: the request's own usage row is MISSING and one foreign request's usage row with the same model, token counts and time (another account, another latency) is there instead: version 2.1 PASSES, version 2.2 is INCONCLUSIVE\n    stub mode: {json.dumps(cfg)}", flush=True)
+        for script, label, expected in ((V21_RAW, "v2.1", 0), (V2_RAW, "v2.2", 2)):
+            fx.reset(cfg)
+            run(fx, "R10b", label, [script, "--port", fx.port, "--db", fx.db, "--expect", "all-logged", *RAW_WAITS, "responses:eof", "responses:early:0"], expected, defect=(script == V21_RAW))
+    if want("R10c"):
+        cfg = {"mode": "no-usage-row"}
+        print(f"### R10c: the request has its call_logs row and NO usage_history row at all (nothing near it with its model and counts): both versions FAIL (the usage row is missing)\n    stub mode: {json.dumps(cfg)}", flush=True)
+        for script, label, expected in ((V21_RAW, "v2.1", 1), (V2_RAW, "v2.2", 1)):
+            fx.reset(cfg)
+            run(fx, "R10c", label, [script, "--port", fx.port, "--db", fx.db, "--expect", "all-logged", *RAW_WAITS, "responses:eof"], expected)
+    if want("R10d"):
+        cfg = {"mode": "extra-foreign-usage"}
+        print(f"### R10d: the request's own usage row is there AND a foreign look-alike row exists next to it: version 2.1 was INCONCLUSIVE (two rows matched by model and counts), version 2.2 associates the own row and PASSES\n    stub mode: {json.dumps(cfg)}", flush=True)
+        for script, label, expected in ((V21_RAW, "v2.1", 2), (V2_RAW, "v2.2", 0)):
+            fx.reset(cfg)
+            run(fx, "R10d", label, [script, "--port", fx.port, "--db", fx.db, "--expect", "all-logged", *RAW_WAITS, "responses:eof"], expected)
+
+
+def n10_controls(fx, want):
+    """The usage association of the native script (P2-2): version 2.0 (defect demonstration) against version 2.1, with the fake codex (two requests per turn) and FAKE_CODEX_USAGE."""
+    cases = (("N10a", "foreign", "the usage rows of both requests are FOREIGN look-alikes (same model, counts and time, another account and latency): version 2.0 PASSES, version 2.1 is INCONCLUSIVE", 0, 2),
+             ("N10b", "none", "the turn's requests have call_logs rows and NO usage rows at all: both versions FAIL", 1, 1))
+    for sid, usage, title, old_exit, new_exit in cases:
+        if not want(sid):
+            continue
+        cfg = {"mode": "normal"}
+        print(f"### {sid}: {title}\n    stub mode: {json.dumps(cfg)}   fake codex mode: two-ok, usage rows: {usage}", flush=True)
+        for script, label, expected in ((V20_NAT, "v2.0", old_exit), (V2_NAT, "v2.1", new_exit)):
+            fx.reset(cfg)
+            argv = [script, *NAT_V2, "--repo", fx.repo, "--db", fx.db, "--scratch", fx.work / f"codex-home-{sid}-{label}", "two-request", "--codex", str(fx.bin / "codex")]
+            run(fx, sid, label, argv, expected, env_extra={"FAKE_CODEX_MODE": "two-ok", "FAKE_CODEX_DB": str(fx.db), "FAKE_CODEX_USAGE": usage}, defect=(script == V20_NAT and expected == 0))
+
+
+def start_unit(name, tools, prefix):
+    """A transient user service whose command line carries /tools/<prefix>/ like the gateway's server does: the identity read-back reads its MainPID, start timestamp, prefix and BUILD_SHA with --unit."""
+    subprocess.run(["systemctl", "--user", "stop", name], capture_output=True)
+    subprocess.run(["systemd-run", "--user", "--quiet", "--collect", f"--unit={name}", sys.executable, "-c", "import time; time.sleep(900)", f"{tools}/{prefix}/bin/omniroute", "serve", "--port", "20128"], check=True)
+    time.sleep(1.0)
+
+
+def wrapper_round9(fx, base_env, native_args, fake, out, want):
+    """The wrapper after the re-freeze (W7-W12) against the wrapper before it (a copy of the earlier scripts in one directory), each on the same fixture."""
+    import shutil as _sh
+    old = fx.work / "old-wrapper"
+    old.mkdir(exist_ok=True)
+    for src, name in ((WRAPPER_V21, "run-acceptance-20261006.sh"), (V21_RAW, "omniroute-live-acceptance-20261006.py"), (V20_NAT, "omniroute-native-exec-acceptance-20261006.py"), (IDENT, "gateway-identity-20261006.py")):
+        _sh.copyfile(src, old / name)
+    tools, _ = make_tools(fx.work / "tools-r9")
+    small = {"ACCEPT_TEST_RAW_MODES": "responses:eof", "ACCEPT_TEST_N_RACE": "1", "ACCEPT_TEST_N_ASTRA": "1", "ACCEPT_TEST_N_TWO": "1"}
+
+    def both(sid, title, mk_env, new_exit, old_exit, before=None, after=None, check=None):
+        print(f"### {sid}: {title}", flush=True)
+        for label, wrapper, expected in (("v2.1 (before the re-freeze)", old / "run-acceptance-20261006.sh", old_exit), ("v2.2", WRAPPER, new_exit)):
+            tag = "old" if label.startswith("v2.1") else "new"
+            fx.reset({"mode": "normal"})
+            env = mk_env(tag)
+            if before:
+                before(tag)
+            _, text = run(fx, sid, label, [wrapper, "test", out(f"{sid}-{tag}")], expected, env_extra=env, timeout=900, defect=(tag == "old"))
+            if after:
+                after(tag)
+            if check:
+                check(tag, text)
+
+    if want("W7"):
+        def mk7(tag):
+            pf = fx.work / f"w7-{tag}.port"
+            hs = subprocess.Popen([sys.executable, str(HERE / "health-server.py"), "--port-file", str(pf), "--fail-after", "4"])
+            for _ in range(50):
+                if pf.exists() and pf.read_text().strip():
+                    break
+                time.sleep(0.1)
+            fx.w7_server = hs
+            unit = f"ctl-gw-w7-{os.getpid()}-{tag}"
+            start_unit(unit, tools, "omniroute-ctl-rollback")
+            fx.w7_unit = unit
+            return dict(base_env, **small, ACCEPT_TEST_NATIVE_ARGS=native_args(f"codex-home-W7-{tag}", fake), ACCEPT_TEST_IDENT_ARGS=f"--unit {unit} --port {pf.read_text().strip()} --tools {tools}")
+
+        def clean7(tag):
+            fx.w7_server.kill()
+            subprocess.run(["systemctl", "--user", "stop", fx.w7_unit], capture_output=True)
+        both("W7", "the identity read-back's health fails from the fifth read on (the after-read of the second run; the reads are: start, before and after of each run) while every acceptance script keeps working: version 2.1 ignores the helper's exit status and exits 0, version 2.2 voids the runs that read it (status 4)",
+             mk7, 4, 0, after=clean7)
+
+    def unit_env(tag, sid, hook_extra):
+        unit = f"ctl-gw-{sid.lower()}-{os.getpid()}-{tag}"
+        start_unit(unit, tools, "omniroute-ctl-rollback")
+        flag = fx.work / f"{sid}-{tag}.flag"
+        if flag.exists():
+            flag.unlink()
+        fx.round9_unit = unit
+        hook = f"[ -e {flag} ] || {{ touch {flag}; {hook_extra(unit)}; }}; true"
+        return dict(base_env, **small, ACCEPT_TEST_NATIVE_ARGS=native_args(f"codex-home-{sid}-{tag}", fake), ACCEPT_TEST_IDENT_ARGS=f"--unit {unit} --port {fx.port} --tools {tools}", ACCEPT_TEST_JOURNAL_CMD=hook)
+
+    def stop_unit(tag):
+        subprocess.run(["systemctl", "--user", "stop", fx.round9_unit], capture_output=True)
+
+    if want("W8"):
+        both("W8", "the gateway unit is RESTARTED between the first and the second run (the journal step of the first run is where the restart happens, so every read inside a run is stable): version 2.1 compares each run's own before and after reads and exits 0, version 2.2 compares every read with the identity accepted at the start and voids the later runs (status 4)",
+             lambda tag: unit_env(tag, "W8", lambda unit: f"systemctl --user restart {unit}"), 4, 0, after=stop_unit)
+    if want("W9"):
+        both("W9", "the unit is replaced between the first and the second run by one that runs ANOTHER build (the target prefix, BUILD_SHA 2a41147b7; the kind of run is for the rollback prefix): version 2.1 exits 0, version 2.2 voids the later runs (status 4)",
+             lambda tag: unit_env(tag, "W9", lambda unit: f"systemctl --user stop {unit}; systemd-run --user --quiet --collect --unit={unit} {sys.executable} -c 'import time; time.sleep(900)' {tools}/omniroute-ctl-target/bin/omniroute serve --port 20128; sleep 1"), 4, 0, after=stop_unit)
+    if want("W10"):
+        both("W10", "the journal query FAILS (exit 1, no output): version 2.1 counts zero lines and exits 0, version 2.2 reports JOURNAL-UNAVAILABLE and the runs are INCONCLUSIVE (status 2)",
+             lambda tag: dict(base_env, **small, ACCEPT_TEST_NATIVE_ARGS=native_args(f"codex-home-W10-{tag}", fake), ACCEPT_TEST_JOURNAL_CMD="false"), 2, 0)
+    if want("W11"):
+        both("W11", "the unit's start timestamp is unreadable (it cannot be parsed as a date): version 2.1 runs everything with an unbounded journal query and exits 0, version 2.2 stops with exit 4 before running anything",
+             lambda tag: dict(base_env, **small, ACCEPT_TEST_NATIVE_ARGS=native_args(f"codex-home-W11-{tag}", fake), ACCEPT_TEST_SINCE="not a date"), 4, 0)
+    if want("W12"):
+        print("### W12: the pre-switch control while the gateway answers HTTP 503 to every race request (no stream, no row): version 2.1 counts every missing row as a reproduced loss (race_lost=3/3, race_discriminating=True), version 2.2 counts no valid sample and says INCONCLUSIVE (status 2)", flush=True)
+        for label, wrapper, expected, must in (("v2.1 (before the re-freeze)", old / "run-acceptance-20261006.sh", 0, "race_discriminating=True"), ("v2.2", WRAPPER, 2, "race_discriminating=INCONCLUSIVE")):
+            tag = "old" if label.startswith("v2.1") else "new"
+            fx.reset({"mode": "http-error", "http_status": 503})
+            env = dict(base_env, ACCEPT_TEST_NATIVE_ARGS=native_args(f"codex-home-W12-{tag}", fake), ACCEPT_TEST_PRECONTROL="1", FAKE_CODEX_MODE="two-final-lost")
+            _, text = run(fx, "W12", label, [wrapper, "test", out(f"W12-{tag}")], expected, env_extra=env, timeout=900, defect=(tag == "old"))
+            if must not in text:
+                UNEXPECTED.append(f"W12 {label} summary")
+                print(f"CONTROL-RESULT W12 {label} precontrol-summary UNEXPECTED (expected {must})")
+
+
+def guard_round9(fx, common, proc, tools, tool, shim_sha, want):
+    """G13-G16: the tolerance covers EMPTY connections of the tolerated unit only, and a failing ss or pgrep is a FAIL (guard version 3 reproduces both defects)."""
+    if want("G13"):
+        print("### G13: a connection of the TOLERATED unit that carries a request (a slow request in pieces, as inference forwarded through the 20129 gateway would): version 3 exempted every connection of the unit and exited 0, version 5 judges it ACTIVE (exit 4)", flush=True)
+        scope = f"ctl-poller-req-{os.getpid()}"
+        fx.reset({"mode": "normal"})
+        poller = subprocess.Popen(["systemd-run", "--user", "--scope", "--quiet", f"--unit={scope}", sys.executable, str(HERE / "poller.py"), "--port", str(fx.port), "--duration", "120", "--mode", "request", "--hold", "40"])
+        time.sleep(1.5)
+        for script, label, expected in ((GUARD_V3, "v3", 0), (GUARD, "v5", 4)):
+            run(fx, "G13", label, [script, *common[1:], "--tolerate-unit", f"{scope}.scope"], expected, defect=(script == GUARD_V3))
+        poller.terminate()
+        try:
+            poller.wait(timeout=5)
+        except Exception:
+            poller.kill()
+    sub = lambda name: fx.work / f"guard-shim-{name}"
+    for name, body in (("ss", "#!/bin/sh\necho 'ss: stub failure' >&2\nexit 2\n"), ("pgrep", "#!/bin/sh\necho 'pgrep: stub failure' >&2\nexit 2\n"), ("pgrep-nomatch", "#!/bin/sh\nexit 1\n")):
+        d = sub(name)
+        d.mkdir(exist_ok=True)
+        f = d / ("pgrep" if name.startswith("pgrep") else "ss")
+        f.write_text(body)
+        f.chmod(0o755)
+    if want("G14"):
+        print("### G14: `ss` fails (exit 2, empty stdout): version 3 read the empty output as an idle host and exited 0, version 5 FAILS the check (exit 4)", flush=True)
+        fx.reset({"mode": "normal"})
+        env = {"PATH": f"{sub('ss')}:{os.environ['PATH']}"}
+        for script, label, expected in ((GUARD_V3, "v3", 0), (GUARD, "v5", 4)):
+            run(fx, "G14", label, [script, *common[1:]], expected, env_extra=env, defect=(script == GUARD_V3))
+    if want("G15"):
+        print("### G15: `pgrep` fails (exit 2, empty stdout): version 3 read it as no worker present and exited 0, version 5 FAILS the check (exit 4)", flush=True)
+        fx.reset({"mode": "normal"})
+        env = {"PATH": f"{sub('pgrep')}:{os.environ['PATH']}"}
+        for script, label, expected in ((GUARD_V3, "v3", 0), (GUARD, "v5", 4)):
+            run(fx, "G15", label, [script, *common[1:]], expected, env_extra=env, defect=(script == GUARD_V3))
+    if want("G16"):
+        print("### G16: `pgrep` exits 1 (no process matched, an idle host) and prints nothing: that is NOT a failure, version 5 exits 0", flush=True)
+        fx.reset({"mode": "normal"})
+        run(fx, "G16", "v5", [GUARD, *common[1:]], 0, env_extra={"PATH": f"{sub('pgrep-nomatch')}:{os.environ['PATH']}"})
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--work", required=True)
+    ap.add_argument("--schema", required=True)
+    ap.add_argument("--repo", required=True)
+    ap.add_argument("--only")
+    args = ap.parse_args()
+    only = set(args.only.split(",")) if args.only else None
+    want = lambda sid: only is None or sid in only
+    codex_version = subprocess.run(["codex", "--version"], capture_output=True, text=True).stdout.strip()
+    print("# Offline controls of the live-acceptance scripts, version 1 (superseded) against version 2.2 (frozen; versions 2.0 and 2.1, guard version 3 and the earlier wrapper appear where a control reproduces a defect a review found), on the stub gateway and a scratch database. Nothing here touches a live gateway.")
+    print(f"# started {time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())}; {codex_version}; python {sys.version.split()[0]}")
+    for name, p in (("live-acceptance v1", V1_RAW), ("live-acceptance v2.0 (superseded)", V20_RAW), ("live-acceptance v2.1 (superseded; R10)", V21_RAW), ("live-acceptance v2.2", V2_RAW), ("native-exec v1", V1_NAT), ("native-exec v2.0 (superseded; N10)", V20_NAT), ("native-exec v2.1", V2_NAT), ("show-log-receipt v2", V2_RCP),
+                    ("gateway-identity", IDENT), ("pre-switch-guard v5", GUARD), ("pre-switch-guard v3 (superseded; G13-G15)", GUARD_V3), ("pre-switch-guard v2 (superseded; G12)", GUARD_V2), ("run-acceptance wrapper", WRAPPER), ("run-acceptance wrapper before the re-freeze (superseded; W7-W12)", WRAPPER_V21), ("switch tool copy (committed evidence file)", SWITCH_TOOL_COPY),
+                    ("stub-gateway", HERE / "stub-gateway.py"), ("fake-codex", HERE / "fake-codex.py"), ("health-server", HERE / "health-server.py"), ("poller", HERE / "poller.py"), ("run-controls", Path(__file__).resolve())):
+        print(f"# {name}: sha256 {sha(p)}")
+    print()
+    fx = Fixture(args.work, args.schema, args.repo)
+    try:
+        E = ["responses:early:0", "chat:early:0"]
+        if want("R1"):
+            raw(fx, "R1", "healthy gateway (rows are written for every client): both versions pass every mode", {"mode": "normal"}, ["responses:eof", "responses:early:0", "chat:eof", "chat:early:0"], 0, 0)
+        if want("R2"):
+            raw(fx, "R2", "the unpatched gateway's drop (a client that closes right after the terminal event leaves no row): both versions fail the early modes and pass the eof modes",
+                {"mode": "lose-on-early", "tail_s": 3.0}, ["responses:eof", "responses:early:0", "chat:eof", "chat:early:0"], 1, 1)
+        if want("R3"):
+            raw(fx, "R3", "the stream ends WITHOUT a terminal event (an error event) but rows exist: version 1 passes without any early close having happened, version 2 is INCONCLUSIVE", {"mode": "no-terminal", "responses_corr_header": True}, E, 0, 2)
+        if want("R4"):
+            raw(fx, "R4", "the call's status changes from 200 (READ1) to 499 (READ2) with the row counts unchanged: version 1 passes, version 2 fails", {"mode": "status-flip", "flip_s": 7}, E, 0, 1)
+        if want("R5"):
+            raw(fx, "R5", "a late duplicate call_logs row appears after READ1: both versions fail", {"mode": "double-row", "dup_s": 7}, E, 1, 1)
+        if want("R6"):
+            raw(fx, "R6a", "the gateway answers HTTP 500 (no stream, no row): version 1 fails it as a lost row, version 2 is INCONCLUSIVE (the request was not served)", {"mode": "http-error", "http_status": 500}, ["responses:early:0"], 1, 2)
+            raw(fx, "R6c", "the gateway answers HTTP 429 (a rate limit, not the build's fault): version 1 fails it as a lost row, version 2 is INCONCLUSIVE", {"mode": "http-error", "http_status": 429}, ["responses:early:0"], 1, 2)
+            raw(fx, "R6b", "the gateway answers HTTP 400 (it rejects a request the baseline accepted): both versions fail", {"mode": "http-error", "http_status": 400}, ["responses:early:0"], 1, 1)
+        if want("R7"):
+            raw(fx, "R7", "only an unrelated request's rows exist (other model, other tokens, other id): both versions fail, rows are attributed by the request's own ids", {"mode": "unrelated-only"}, E, 1, 1)
+        if want("R9"):
+            raw(fx, "R9", "the usage match is ambiguous (two usage rows with the request's model and token counts inside the 3 s window): both versions are INCONCLUSIVE, never a pass", {"mode": "dup-usage"}, ["responses:early:0", "chat:early:0"], 2, 2)
+        if any(want(s) for s in ("R8", "R8a", "R8b", "R8c", "R8d", "R8e", "R8f", "R8g", "R8h", "R8i")):
+            effort_controls(fx)
+        if any(want(s) for s in ("R10", "R10a", "R10b", "R10c", "R10d")):
+            r10_controls(fx, lambda sid: only is None or sid in only or "R10" in only)
+        # ---- native
+        if want("N1"):
+            native(fx, "N1", "three consecutive correctly logged astra-max turns (real codex exec against the stub, rows written with each turn's session id): version 2 passes all three",
+                   {"mode": "normal"}, ["astra-max", "astra-max", "astra-max"], 1, 0, v2_only=True)
+        if want("N2a"):
+            native(fx, "N2a", "the turn's own rows are lost but unrelated rows (other tag) with the same shape exist (real codex exec exits 0): version 1 attributes them to the turn and passes, version 2 fails",
+                   {"mode": "unrelated-only"}, ["astra-max"], 0, 1)
+        if want("N2b"):
+            native(fx, "N2b", "the exec FAILS (exit 1) while an unrelated request's rows appear in the window: version 1 passes, version 2 is INCONCLUSIVE (the turn did not complete)",
+                   {"mode": "normal"}, ["astra-max"], 0, 2, mode_env="exit1", side=lambda f: f.insert_unrelated(1.0))
+        if want("N3"):
+            native(fx, "N3", "the exec does not exit within --exec-timeout (fake codex sleeps): version 2 is INCONCLUSIVE and prints value-free diagnostics; version 1 (hard-coded 600 s timeout, TimeoutExpired uncaught) is not run",
+                   {"mode": "normal"}, ["astra-max"], 2, 2, mode_env="hang", v2_extra=["--exec-timeout", "6"], v2_only=True)
+        if want("N4a"):
+            native(fx, "N4a", "two-request turn, both requests logged under the turn's session id (fake codex): PASS", {"mode": "normal"}, ["two-request"], 0, 0, mode_env="two-ok", v2_only=True)
+        if want("N4b"):
+            native(fx, "N4b", "two-request turn, the FINAL request's rows are lost (fake codex): FAIL (the multi-request case found on 2604 is a gate)", {"mode": "normal"}, ["two-request"], 1, 1, mode_env="two-final-lost", v2_only=True)
+        if want("N4c"):
+            native(fx, "N4c", "two-request shape but the turn made NO tool call (fake codex: the model skipped it): INCONCLUSIVE, the multi-request path was not exercised", {"mode": "normal"}, ["two-request"], 2, 2, mode_env="two-notool", v2_only=True)
+        if want("N4d"):
+            native(fx, "N4d", "the client reported no turn usage (fake codex prints no turn.completed): INCONCLUSIVE, completeness cannot be checked", {"mode": "normal"}, ["two-request"], 2, 2, mode_env="two-nousage", v2_only=True)
+        if want("N5a"):
+            native(fx, "N5a", "a late duplicate call_logs row for the turn appears after READ1 (real codex exec): version 2 fails", {"mode": "double-row", "dup_s": 7}, ["astra-max"], 1, 1, v2_only=True)
+        if want("N5b"):
+            native(fx, "N5b", "the turn's call status changes from 200 to 499 after READ1 with the counts unchanged (real codex exec): version 1 passes, version 2 fails", {"mode": "status-flip", "flip_s": 7}, ["astra-max"], 0, 1)
+        if want("N6"):
+            native(fx, "N6", "the unpatched gateway's drop with the real client (it closes right after the terminal event, the stub keeps no row): both versions fail", {"mode": "lose-on-early", "tail_s": 3.0}, ["astra-max"], 1, 1)
+        if want("N6o"):
+            native(fx, "N6o", "the baseline mode (--expect observe) on the unpatched gateway's drop with the real client: no verdict, exit 0, the rows of each turn and the client's usage are printed",
+                   {"mode": "lose-on-early", "tail_s": 3.0}, ["astra-max", "astra-max"], 0, 0, v2_extra=["--expect", "observe"], v2_only=True)
+        if want("N7"):
+            native(fx, "N7", "healthy single astra-max turn (real codex exec): version 2 passes", {"mode": "normal"}, ["astra-max"], 0, 0, v2_only=True)
+        if want("N1v1"):
+            native(fx, "N1v1", "version 1 on three consecutive correctly logged turns (the reviewer's P1): its quiet check waits for each earlier turn's rows to age past 120 s, and its second read then counts every later turn's rows in the earlier turns' windows",
+                   {"mode": "normal"}, ["astra-max", "astra-max", "astra-max"], 1, 0, v1_extra=["--quiet-timeout", "140"], v1_timeout=1200, v2_only=False)
+        if any(want(s) for s in ("U1", "U2", "U3", "U4", "U5", "U")):
+            usage_errors(fx)
+        if any(want(s) for s in ("I1", "I2", "I3", "I")):
+            identity_controls(fx)
+        if any(want(s) for s in ("G1", "G2", "G3", "G4", "G5", "G6", "G7", "G8", "G9", "G10", "G11", "G12", "G13", "G14", "G15", "G16", "G")):
+            guard_controls(fx, lambda sid: only is None or sid in only or "G" in only)
+        if any(want(s) for s in ("W1", "W2", "W3", "W4", "W5", "W6", "W7", "W8", "W9", "W10", "W11", "W12", "W")):
+            wrapper_controls(fx, lambda sid: only is None or sid in only or "W" in only)
+        if any(want(s) for s in ("N10", "N10a", "N10b")):
+            n10_controls(fx, lambda sid: only is None or sid in only or "N10" in only)
+        if want("RC1") or want("RC2"):
+            receipt(fx.work / "receipt")
+    finally:
+        fx.close()
+    print(f"# finished {time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())}; scenarios with an unexpected exit status: {UNEXPECTED or 'none'}")
+    sys.exit(1 if UNEXPECTED else 0)
+
+
+main()

@@ -1,0 +1,74 @@
+# Boot smoke of the installed prefix, and two controls for the smoke script's own checks (2026-10-05, ~22:23Z). Raw output, ANSI colour codes removed and the home directory written $HOME.
+# (1) the superseded smoke script (scripts/smoke-superseded.sh.txt: fixed port 29999, health checked before the child, no ownership check) with an UNRELATED process answering {"status":"ok"} on 29999: it reports health_ok=yes and exits 0 although its own child had died (pid_alive=no): the false pass a review found.
+# (2) the fixed script (scripts/smoke.sh.txt) with an unrelated healthy process on the port it is told to use (scripts/smoke-control.sh.txt): health_ok=no, listener_owned_by_child=no, exit 1, and the unrelated process is still alive afterwards.
+# (3) the fixed script on a free port: the child is alive, the listener on the port belongs to the child's process group, health answered ok, the group held 3 processes before cleanup and none after (members selected on the PGID column; see checks/smoke-group-selector-control.txt for why `ps -g` cannot be used).
+
+## (1) old smoke script (fixed port 29999) with an unrelated process answering {"status":"ok"} on 29999
+unrelated dummy health server: pid 4057683 on port 29999, alive=yes
+prefix=omniroute-3.8.51-c1e30b76-affinity-pr15167-drain-b7c68690 health_ok=yes body={"status":"ok"} pid_alive=no
+--- first log lines:
+  📋 Loaded env from $HOME/.local/share/codex-ecosystem/tools/omniroute-3.8.51-c1e30b76-affinity-pr15167-drain-b7c68690/lib/node_modules/omniroute/.env
+  ⚠ $HOME/.local/share/codex-ecosystem/tools/omniroute-3.8.51-c1e30b76-affinity-pr15167-drain-b7c68690/lib/node_modules/omniroute/.env lives inside the installed package: updating OmniRoute replaces it. Move the values you set to $HOME/.cache/omniroute-smoke-kdb0oQ/data/.env, which updates leave alone.
+  ✨ Generated STORAGE_ENCRYPTION_KEY in $HOME/.cache/omniroute-smoke-kdb0oQ/data/.env
+
+   ____                  _ ____              _
+   / __ \                (_) __ \            | |
+  | |  | |_ __ ___  _ __ _| |__) |___  _   _| |_ ___
+  | |  | | '_ ` _ \| '_ \ |  _  // _ \| | | | __/ _ \
+  | |__| | | | | | | | | | | | \ \ (_) | |_| | ||  __/
+   \____/|_| |_| |_|_| |_|_|_|  \_\___/ \__,_|\__\___|
+
+  v3.8.51
+
+  ⚠  SECURITY: listening on 0.0.0.0 with NO API-key requirement — the inference plane (/v1/*) is reachable by ANY device that can route to this host, and requests are billed to your configured providers. This local-first default is intentional, but on an untrusted network either set REQUIRE_API_KEY=true or bind loopback with OMNIROUTE_SERVER_HOST=127.0.0.1.
+scratch dir: $HOME/.cache/omniroute-smoke-kdb0oQ (remove with rm -rf after reading)
+smoke exit=0
+unrelated dummy still alive after the smoke: yes
+dummy stopped by this control (its own pid only)
+
+## (2) fixed smoke script with an unrelated process answering {"status":"ok"} on the forced port
+unrelated dummy health server: pid 4058103 on port 26844, alive=yes
+prefix=omniroute-3.8.51-c1e30b76-affinity-pr15167-drain-b7c68690 port=26844 health_ok=no listener_owned_by_child=no body=none child_alive=no
+processes in the owned process group 4058146 before cleanup: 0
+--- first log lines:
+  📋 Loaded env from $HOME/.local/share/codex-ecosystem/tools/omniroute-3.8.51-c1e30b76-affinity-pr15167-drain-b7c68690/lib/node_modules/omniroute/.env
+  ⚠ $HOME/.local/share/codex-ecosystem/tools/omniroute-3.8.51-c1e30b76-affinity-pr15167-drain-b7c68690/lib/node_modules/omniroute/.env lives inside the installed package: updating OmniRoute replaces it. Move the values you set to $HOME/.cache/omniroute-smoke-ZelFaI/data/.env, which updates leave alone.
+  ✨ Generated STORAGE_ENCRYPTION_KEY in $HOME/.cache/omniroute-smoke-ZelFaI/data/.env
+
+   ____                  _ ____              _
+   / __ \                (_) __ \            | |
+  | |  | |_ __ ___  _ __ _| |__) |___  _   _| |_ ___
+  | |  | | '_ ` _ \| '_ \ |  _  // _ \| | | | __/ _ \
+  | |__| | | | | | | | | | | | \ \ (_) | |_| | ||  __/
+   \____/|_| |_| |_|_| |_|_|_|  \_\___/ \__,_|\__\___|
+
+  v3.8.51
+
+  ⚠  SECURITY: listening on 0.0.0.0 with NO API-key requirement — the inference plane (/v1/*) is reachable by ANY device that can route to this host, and requests are billed to your configured providers. This local-first default is intentional, but on an untrusted network either set REQUIRE_API_KEY=true or bind loopback with OMNIROUTE_SERVER_HOST=127.0.0.1.
+processes left in the owned process group 4058146: 0
+scratch dir: $HOME/.cache/omniroute-smoke-ZelFaI (remove with rm -rf after reading)
+smoke exit=1
+unrelated dummy still alive after the smoke: yes
+dummy stopped by this control (its own pid only)
+
+## (3) fixed smoke script on a free port
+prefix=omniroute-3.8.51-c1e30b76-affinity-pr15167-drain-b7c68690 port=26506 health_ok=yes listener_owned_by_child=yes body={"status":"ok","timestamp":"2026-10-05T22:23:41.363Z"} child_alive=yes
+processes in the owned process group 4058287 before cleanup: 3
+--- first log lines:
+  📋 Loaded env from $HOME/.local/share/codex-ecosystem/tools/omniroute-3.8.51-c1e30b76-affinity-pr15167-drain-b7c68690/lib/node_modules/omniroute/.env
+  ⚠ $HOME/.local/share/codex-ecosystem/tools/omniroute-3.8.51-c1e30b76-affinity-pr15167-drain-b7c68690/lib/node_modules/omniroute/.env lives inside the installed package: updating OmniRoute replaces it. Move the values you set to $HOME/.cache/omniroute-smoke-olh2T3/data/.env, which updates leave alone.
+  ✨ Generated STORAGE_ENCRYPTION_KEY in $HOME/.cache/omniroute-smoke-olh2T3/data/.env
+
+   ____                  _ ____              _
+   / __ \                (_) __ \            | |
+  | |  | |_ __ ___  _ __ _| |__) |___  _   _| |_ ___
+  | |  | | '_ ` _ \| '_ \ |  _  // _ \| | | | __/ _ \
+  | |__| | | | | | | | | | | | \ \ (_) | |_| | ||  __/
+   \____/|_| |_| |_|_| |_|_|_|  \_\___/ \__,_|\__\___|
+
+  v3.8.51
+
+  ⚠  SECURITY: listening on 0.0.0.0 with NO API-key requirement — the inference plane (/v1/*) is reachable by ANY device that can route to this host, and requests are billed to your configured providers. This local-first default is intentional, but on an untrusted network either set REQUIRE_API_KEY=true or bind loopback with OMNIROUTE_SERVER_HOST=127.0.0.1.
+processes left in the owned process group 4058287: 0
+scratch dir: $HOME/.cache/omniroute-smoke-olh2T3 (remove with rm -rf after reading)
+smoke exit=0

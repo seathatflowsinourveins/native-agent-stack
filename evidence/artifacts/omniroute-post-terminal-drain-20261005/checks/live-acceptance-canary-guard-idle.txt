@@ -1,0 +1,13 @@
+GUARD version=5 mode=idle-only script_sha256=5c8ccf3fb4ca747ddcf3a427d732cf111a74e6c09358adceba55ea7ead75c95b start=2026-10-07T23:45:05.083Z port=20128 unit=omniroute.service clean_for=30.0 interval=5.0 tolerate_units=['omniroute-fw.service']
+   IDENTITY label=idle-only time=2026-10-07T23:45:05Z unit=omniroute.service MainPID=339027 ExecMainStartTimestamp=Wed_2026-10-07_19:41:48_EDT NRestarts=0 running_prefix=omniroute-3.8.51-c1e30b76-affinity-pr15167-drain-b7c68690 BUILD_SHA=2a41147b7 health=ok pending_total=0
+CHECK unit healthy (identity read-back, no build expectation): ok
+   sample 1 at 2026-10-07T23:45:05.397Z: connections=1 tolerated_so_far=1 active_so_far=0 workers=0 last_call_log_age_s=161
+   sample 2 at 2026-10-07T23:45:10.433Z: connections=1 tolerated_so_far=1 active_so_far=0 workers=0 last_call_log_age_s=166
+   sample 3 at 2026-10-07T23:45:15.467Z: connections=1 tolerated_so_far=1 active_so_far=0 workers=0 last_call_log_age_s=171
+   sample 4 at 2026-10-07T23:45:20.505Z: connections=1 tolerated_so_far=2 active_so_far=0 workers=0 last_call_log_age_s=176
+   sample 5 at 2026-10-07T23:45:25.539Z: connections=1 tolerated_so_far=2 active_so_far=0 workers=0 last_call_log_age_s=181
+   sample 6 at 2026-10-07T23:45:30.573Z: connections=1 tolerated_so_far=2 active_so_far=0 workers=0 last_call_log_age_s=186
+   sample 7 at 2026-10-07T23:45:35.608Z: connections=1 tolerated_so_far=2 active_so_far=0 workers=0 last_call_log_age_s=191
+CHECK nothing in flight for 30 s (7 samples): ok (0 idle and 2 tolerated connection(s))
+INFO unrelated_remote_records=0 connections_seen=2 connections_tolerated=2 connections_active=0 connections_idle=0 pending_total_before=0 pending_total_after=0 pending_changed=False hindsight_processes=9
+IDLE-RESULT clean=True failed_checks=[] end=2026-10-07T23:45:35.707Z

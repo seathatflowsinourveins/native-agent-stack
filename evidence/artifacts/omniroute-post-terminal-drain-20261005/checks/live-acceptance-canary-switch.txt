@@ -1,0 +1,39 @@
+# Publication note: UUID-shaped strings (the gateway's correlation ids) are shortened to their first 8 hex digits and an ellipsis, because the repository's publication check rejects full UUIDs; sha256 of this text before the shortening: 6c11d919123c67ec5114d0bdd95138b6bc86d14816dd6e87df199df07365337e; the unshortened text is kept in the first host's private artifact directory (checks/logs/MANIFEST.txt)
+# The switch of 20128 only (window 2 of the canary, RULING-757-CANARY-W2): the required dry run, then the guard and the switch on ONE command line (`python3 pre-switch-guard.py --switch-tool <pinned copy> > guard.txt && python3 switch_gateways.py --only 20128 --prefix-20128 <drain prefix> --desc-20128 <description> --apply > apply.txt`, redirections instead of a pipe so that the guard's exit status gates the switch)
+# the unit description passed (the record carries none): OmniRoute gateway 3.8.51 (v3.8.51 tag c1e30b76 + local session-affinity patch 045aa81f3 + upstream #15167 0585aba55 + local drain-after-terminal patch, patched tree b7c68690; canary build 2a41147b7; lsof shim v2), loopback only
+
+## dry run (exit 0; the four required lines are present)
+20129 omniroute-fw.service: NOT in scope; running omniroute-3.8.51-2f42a9ac-pr13788 (87c4c488d) MainPID=340 NRestarts=0
+20128 omniroute.service: running omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167 (cf6748d04) -> omniroute-3.8.51-c1e30b76-affinity-pr15167-drain-b7c68690 (2a41147b7, shim v2); lines changed: ['Description', 'Environment', 'ExecStart']; prefix problems: []
+dry run: no unit file written, nothing restarted
+
+## guard (version 5, exit 0)
+GUARD version=5 mode=full script_sha256=5c8ccf3fb4ca747ddcf3a427d732cf111a74e6c09358adceba55ea7ead75c95b start=2026-10-07T23:41:11.855Z port=20128 unit=omniroute.service clean_for=30.0 interval=5.0 tolerate_units=['omniroute-fw.service']
+CHECK switch tool sha256: ok (97d1b87bb651)
+CHECK rollback prefix intact: ok (omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167: bin/omniroute, BUILD_SHA cf6748d04, shim v2)
+CHECK target prefix intact: ok (omniroute-3.8.51-c1e30b76-affinity-pr15167-drain-b7c68690: bin/omniroute, BUILD_SHA 2a41147b7, shim v2, drain marker)
+   IDENTITY label=pre-switch time=2026-10-07T23:41:16Z unit=omniroute.service MainPID=341 ExecMainStartTimestamp=Tue_2026-10-06_09:51:19_EDT NRestarts=0 running_prefix=omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167 BUILD_SHA=cf6748d04 health=ok pending_total=1009 expect_prefix_ok=True expect_build_ok=True
+CHECK unit runs the rollback prefix, health ok: ok
+   sample 1 at 2026-10-07T23:41:17.047Z: connections=1 tolerated_so_far=1 active_so_far=0 workers=0 last_call_log_age_s=251
+   sample 2 at 2026-10-07T23:41:22.082Z: connections=1 tolerated_so_far=1 active_so_far=0 workers=0 last_call_log_age_s=256
+   sample 3 at 2026-10-07T23:41:27.116Z: connections=1 tolerated_so_far=1 active_so_far=0 workers=0 last_call_log_age_s=261
+   sample 4 at 2026-10-07T23:41:32.155Z: connections=1 tolerated_so_far=1 active_so_far=0 workers=0 last_call_log_age_s=266
+   sample 5 at 2026-10-07T23:41:37.194Z: connections=1 tolerated_so_far=1 active_so_far=0 workers=0 last_call_log_age_s=271
+   sample 6 at 2026-10-07T23:41:42.234Z: connections=1 tolerated_so_far=1 active_so_far=0 workers=0 last_call_log_age_s=276
+   sample 7 at 2026-10-07T23:41:47.282Z: connections=1 tolerated_so_far=2 active_so_far=0 workers=0 last_call_log_age_s=281
+CHECK nothing in flight for 30 s (7 samples): ok (0 idle and 2 tolerated connection(s))
+INFO unrelated_remote_records=0 connections_seen=2 connections_tolerated=2 connections_active=0 connections_idle=0 pending_total_before=1009 pending_total_after=1009 pending_changed=False hindsight_processes=9
+GUARD-RESULT clean=True failed_checks=[] end=2026-10-07T23:41:47.398Z
+
+## apply (exit 0)
+20129 omniroute-fw.service: NOT in scope; running omniroute-3.8.51-2f42a9ac-pr13788 (87c4c488d) MainPID=340 NRestarts=0
+20128 omniroute.service: running omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167 (cf6748d04) -> omniroute-3.8.51-c1e30b76-affinity-pr15167-drain-b7c68690 (2a41147b7, shim v2); lines changed: ['Description', 'Environment', 'ExecStart']; prefix problems: []
+saved prior unit files to switch-2026-10-07T23:41:47Z
+20128: health=True (ok) running prefix=omniroute-3.8.51-c1e30b76-affinity-pr15167-drain-b7c68690 identity_ok=True MainPID=339027 NRestarts=0
+20129 omniroute-fw.service: untouched; running omniroute-3.8.51-2f42a9ac-pr13788 (87c4c488d) MainPID=340 NRestarts=0
+switched: ['20128'] | rollback dir: $HOME/.local/state/native-agent-stack/omniroute-tokensave-20260929/switch-2026-10-07T23:41:47Z
+
+## timing
+guard+switch start 2026-10-07T23:41:11Z
+guard+switch end 2026-10-07T23:41:58Z
+guard-and-switch-exit=0

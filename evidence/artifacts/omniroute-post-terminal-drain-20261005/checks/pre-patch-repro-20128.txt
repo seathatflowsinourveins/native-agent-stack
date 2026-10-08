@@ -1,0 +1,16 @@
+# pre-patch reproduction on NativeStack 20128 (omniroute.service, build with PR 15167 head f5d8e150b), 2026-10-05T20:17:03Z
+# raw streaming client (omniroute-stream-close-repro-20261005.py): eof, close at response.completed, close 0.5 s after, close at response.completed again
+mode=eof http=200 saw_completed=True closed_early=False stream_s=68.6 -> call_logs rows=1 usage_history rows=1
+   call_logs: ('2026-10-05T20:17:07.091Z', '/v1/responses', 200, 'gpt-6-astra', 22, 21)
+   usage_history: ('2026-10-05T20:17:07.087Z', 'gpt-6-astra', '200', 22, 21)
+mode=early:0 http=200 saw_completed=True closed_early=True stream_s=3.2 -> call_logs rows=0 usage_history rows=0
+mode=early:0.5 http=200 saw_completed=True closed_early=True stream_s=4.8 -> call_logs rows=1 usage_history rows=1
+   call_logs: ('2026-10-05T20:18:38.340Z', '/v1/responses', 200, 'gpt-6-astra', 22, 22)
+   usage_history: ('2026-10-05T20:18:38.337Z', 'gpt-6-astra', '200', 22, 22)
+mode=early:0 http=200 saw_completed=True closed_early=True stream_s=2.4 -> call_logs rows=0 usage_history rows=0
+# native codex exec (omniroute-native-exec-compare-20261005.py astra-max)
+shape=astra-max started=2026-10-05T20:18:58.079Z finished=2026-10-05T20:19:03.207Z elapsed=5.1s exit=0
+stdout tail: ok
+stderr lines: 19 | last: 15,038
+call_logs rows since 2026-10-05T20:18:58.079Z: 0
+usage_history rows since 2026-10-05T20:18:58.079Z: 0

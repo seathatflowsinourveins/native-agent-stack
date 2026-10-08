@@ -1,0 +1,11 @@
+# Publication note: UUID-shaped strings (the gateway's correlation ids) are shortened to their first 8 hex digits and an ellipsis, because the repository's publication check rejects full UUIDs; sha256 of this text before the shortening: 454b8e33ae75cf257e7294252ec57d6655b4f89b6a9704e1117fd79f9c2e213e; the unshortened text is kept in the first host's private artifact directory (checks/logs/MANIFEST.txt)
+# The pre-switch control of window 2 (protocol step 3; race set and four native two-request turns on the UNPATCHED build, --expect observe; the real-run gate and the wrapper on one command line)
+precontrol start 2026-10-07T23:28:07Z
+REAL-RUN-GATE clean: no ACCEPT_TEST_ variable in the environment, and run-acceptance-20261006.sh has the expected sha256 0e74b3b15616b809a907c8ad197247a637fd7a8b7d706f81f1ab41b5119ca33d
+IDENTITY label=start-of-wrapper time=2026-10-07T23:28:07Z unit=omniroute.service MainPID=341 ExecMainStartTimestamp=Tue_2026-10-06_09:51:19_EDT NRestarts=0 running_prefix=omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167 BUILD_SHA=cf6748d04 health=ok pending_total=1002 expect_prefix_ok=True expect_build_ok=True
+live-acceptance-precontrol-race.txt: SUMMARY {"OBSERVED": 6} end=2026-10-07T23:30:28.475Z exit=0 status=0
+live-acceptance-precontrol-native-tworequest.txt: SUMMARY {'OBSERVED': 4} end=2026-10-07T23:38:10.620Z exit=0 status=0
+PRECONTROL race_lost=6/6 race_valid=6/6 tworequest_incomplete=1/4 tworequest_valid=4/4 race_discriminating=True (the protocol's rule: fewer than 2 of 6 lost among valid samples means the race set cannot discriminate at this hour; fewer than 6 valid samples is INCONCLUSIVE, not a verdict)
+WRAPPER-RESULT kind=precontrol status=0 runs: live-acceptance-precontrol-race.txt:0 live-acceptance-precontrol-native-tworequest.txt:0 (4 VOID, 1 FAIL, 2 INCONCLUSIVE, 0 ok); outputs in $HOME/.cache/canary-w2-20261007T2325Z/precontrol
+precontrol-exit=0
+precontrol end 2026-10-07T23:38:11Z

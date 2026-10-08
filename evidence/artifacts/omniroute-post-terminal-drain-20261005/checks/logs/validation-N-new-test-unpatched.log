@@ -1,0 +1,94 @@
+[DB] Driver: better-sqlite3 | file: /tmp/omniroute-test-XcnvDH/storage.sqlite
+[DB] Added provider_connections.last_ping_at column
+[DB] Added provider_connections.last_pinged_reset_key column
+[DB] Added usage_history.combo_strategy column
+[DB] Added call_logs.video_content_removed column
+[DB] Added call_logs.ttft_ms column
+[DB] Added call_logs.model_pinned column
+[DB] Added call_logs.session_tag column
+[DB] Added call_logs.reasoning_duration_ms column
+[DB] Added call_logs.reasoning_effort_requested column
+[DB] Added call_logs.reasoning_effort_upstream column
+[DB] Added call_logs.reasoning_encrypted column
+[DB] Added call_logs.has_content column
+[DB] Added call_logs.usage_provenance column
+[DB] Added call_logs.resilience_actions column
+[DB] Changing cache_size from 65536KB to 16384KB
+[DB] cache_size changed to 16384KB
+[DB] auto_vacuum drift detected (configured=INCREMENTAL, live=NONE); scheduling reconcile on the next vacuum-scheduler run
+[DB] SQLite database ready: /tmp/omniroute-test-XcnvDH/storage.sqlite (DATA_DIR=/tmp/omniroute-test-XcnvDH, SQLITE_FILE=/tmp/omniroute-test-XcnvDH/storage.sqlite)
+[21:49:32] 🌊 [STREAM] CODEX | gpt-5.6-sol | 10ms | complete
+[21:49:32] 🌊 [STREAM] CODEX | gpt-5.6-sol | 2ms | complete
+✖ a client that closes right after response.completed still lets the stream finish: completion and usage bookkeeping run (96.011009ms)
+[21:49:32] 🌊 [STREAM] CODEX | gpt-5.6-sol | 1ms | complete
+✔ with the disconnect grace period disabled the old behaviour stays: the upstream is cancelled and onComplete does not run (32.802927ms)
+[21:49:32] 🌊 [STREAM] CODEX | gpt-5.6-sol | 2ms | disconnect: request_signal_aborted
+[21:49:32] 🌊 [STREAM] CODEX | gpt-5.6-sol | 2ms | client_disconnect (post-abort)
+✖ the drain is bounded: an upstream that never ends is cancelled when the grace period expires, and the pending request is cleared (122.911811ms)
+[21:49:33] 🌊 [STREAM] CODEX | gpt-5.6-sol | 3ms | complete
+✔ a disconnect before the terminal event is unchanged: the upstream is cancelled right away (26.249788ms)
+[21:49:33] 📊 [USAGE] CODEX | in=10 | out=2 | account=connecti...
+[21:49:33] 🌊 [STREAM] CODEX | gpt-5.6-sol | 2ms | complete
+✔ a completed tool handoff whose terminal event was already delivered is drained too: completion and usage bookkeeping run (74.536901ms)
+✖ a completed tool handoff whose terminal event was already delivered has a bounded drain, and the pending request is cleared (122.668312ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 3
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1390.417989
+
+✖ failing tests:
+
+test at tests/unit/stream-terminal-seen-client-disconnect.test.ts:4:2413
+✖ a client that closes right after response.completed still lets the stream finish: completion and usage bookkeeping run (96.011009ms)
+  AssertionError [ERR_ASSERTION]: the completed response must be drained, not aborted
+  
+  true !== false
+  
+      at TestContext.<anonymous> ($HOME/.cache/omniroute-drain-validate-y3mwwP/tree/tests/unit/stream-terminal-seen-client-disconnect.test.ts:189:10)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/unit/stream-terminal-seen-client-disconnect.test.ts:4:3378
+✖ the drain is bounded: an upstream that never ends is cancelled when the grace period expires, and the pending request is cleared (122.911811ms)
+  AssertionError [ERR_ASSERTION]: flush() never runs, so the drain must clear the pending request
+  
+  1 !== 0
+  
+      at TestContext.<anonymous> ($HOME/.cache/omniroute-drain-validate-y3mwwP/tree/tests/unit/stream-terminal-seen-client-disconnect.test.ts:224:10)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/unit/stream-terminal-seen-client-disconnect.test.ts:4:5387
+✖ a completed tool handoff whose terminal event was already delivered has a bounded drain, and the pending request is cleared (122.668312ms)
+  AssertionError [ERR_ASSERTION]: the grace period must end the drain
+  
+  false !== true
+  
+      at TestContext.<anonymous> ($HOME/.cache/omniroute-drain-validate-y3mwwP/tree/tests/unit/stream-terminal-seen-client-disconnect.test.ts:296:10)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

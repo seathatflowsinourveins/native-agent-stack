@@ -1,0 +1,168 @@
+# Control for the smoke script's first observation of its child's process group and its cleanup on an early exit (full-scope read r12, P2-5), run 2026-10-06 UTC: scripts/smoke-initial-ps-control.sh.txt
+# (git blob 67144031be8db04e00edfcf9d60a8c847a839c7e), run from a scratch copy with WORK_ROOT in a scratch directory; each variant runs the WHOLE smoke script against a fixture prefix (two processes: the leader and its health
+# server, both recording their pids and carrying the run's token) with a ps fixture on the smoke's PATH; survivors are counted from the recorded pids that still carry the token, and pgrep -f on the token.
+# (1) SMOKE_SCRIPT = scripts/smoke.sh.txt of 4624137 (version 5, git blob 8497c84bf5b6c2d0c93f99c9f7e15a6c0d4a2afa): control exit=1; per variant: I1-first-observation-fails exit=2 alive=2 NOT as required; I2-first-observation-wrong-pgid exit=2 alive=2 NOT as required; I3-sigterm-while-polling exit=143 alive=2 NOT as required; I3b-sigint-while-polling exit=130 alive=2 NOT as required; I3c-sighup-while-polling exit=129 alive=2 NOT as required; I4-observation-never-available exit=2 alive=2 as required.
+# (2) SMOKE_SCRIPT = the fixed scripts/smoke.sh.txt (version 6, git blob acdabceeb9a234e64f73af59a22f8a3175b7c938): control exit=0; per variant: I1-first-observation-fails exit=2 alive=0 as required; I2-first-observation-wrong-pgid exit=2 alive=0 as required; I3-sigterm-while-polling exit=143 alive=0 as required; I3b-sigint-while-polling exit=130 alive=0 as required; I3c-sighup-while-polling exit=129 alive=0 as required; I4-observation-never-available exit=2 alive=2 as required.
+#     (I4 is the boundary: no version may signal a group it could not verify, so its survivor is expected and is stopped by the control after verifying the group; survivors of the other variants are stopped the same way.)
+# (3) the existing smoke controls rerun on version 6, with HOME pointing to scratch homes; their output's home directory is written $HOME by the recording command.
+
+## (1) the control on smoke.sh of 4624137 (version 5)
+# smoke-initial-ps-control: run 2026-10-06T23:38:47Z; smoke script under test: smoke.sh git blob 8497c84bf5b6c2d0c93f99c9f7e15a6c0d4a2afa sha256 96d11414e0fd7eebd4374f60eb75fc045b870dbf4c2ce6252e2299ff2fafc1d6
+  I1-first-observation-fails: smoke exit=2; the fixture's leader pid 2994890 and server pid 2994896; the fixture server got SIGTERM before the smoke ended: no; fixture processes alive after the smoke: 2 (pids 2994890 2994896); pgrep -f token: 2
+    the smoke's own lines:
+      ps: simulated failure
+      the child is not its own process group leader (pid 2994890, pgid ): refusing to continue
+    the smoke's first ps calls, as the ps fixture logged them: ps -o pgid= -p 2994890: simulated failure, exit 1
+    -> NOT AS REQUIRED (non-zero exit and no survivor)
+    the control stops the survivors: pid 2994890 carries this run's token and its PGID 2994890 is the recorded fixture leader, so the control signals process group 2994890
+    after the control's cleanup: fixture processes alive: 0
+  I2-first-observation-wrong-pgid: smoke exit=2; the fixture's leader pid 2995019 and server pid 2995025; the fixture server got SIGTERM before the smoke ended: no; fixture processes alive after the smoke: 2 (pids 2995019 2995025); pgrep -f token: 2
+    the smoke's own lines:
+      the child is not its own process group leader (pid 2995019, pgid 1): refusing to continue
+    the smoke's first ps calls, as the ps fixture logged them: ps -o pgid= -p 2995019: simulated wrong pgid 1, exit 0
+    -> NOT AS REQUIRED (non-zero exit and no survivor)
+    the control stops the survivors: pid 2995019 carries this run's token and its PGID 2995019 is the recorded fixture leader, so the control signals process group 2995019
+    after the control's cleanup: fixture processes alive: 0
+  I3-sigterm-while-polling: SIGTERM sent to the smoke script (pid 2995329) while it polled the health endpoint
+  I3-sigterm-while-polling: smoke exit=143; the fixture's leader pid 2995336 and server pid 2995342; the fixture server got SIGTERM before the smoke ended: no; fixture processes alive after the smoke: 2 (pids 2995336 2995342); pgrep -f token: 2
+    the smoke's own lines:
+    the smoke's first ps calls, as the ps fixture logged them: ps -o pgid= -p 2995336: the real ps
+    -> NOT AS REQUIRED (exit 143 and no survivor)
+    the control stops the survivors: pid 2995336 carries this run's token and its PGID 2995336 is the recorded fixture leader, so the control signals process group 2995336
+    after the control's cleanup: fixture processes alive: 0
+  I3b-sigint-while-polling: SIGINT sent to the smoke script (pid 2995604) while it polled the health endpoint
+  I3b-sigint-while-polling: smoke exit=130; the fixture's leader pid 2995611 and server pid 2995615; the fixture server got SIGTERM before the smoke ended: no; fixture processes alive after the smoke: 2 (pids 2995611 2995615); pgrep -f token: 2
+    the smoke's own lines:
+    the smoke's first ps calls, as the ps fixture logged them: ps -o pgid= -p 2995611: the real ps
+    -> NOT AS REQUIRED (exit 130 and no survivor)
+    the control stops the survivors: pid 2995611 carries this run's token and its PGID 2995611 is the recorded fixture leader, so the control signals process group 2995611
+    after the control's cleanup: fixture processes alive: 0
+  I3c-sighup-while-polling: SIGHUP sent to the smoke script (pid 2995763) while it polled the health endpoint
+  I3c-sighup-while-polling: smoke exit=129; the fixture's leader pid 2995770 and server pid 2995776; the fixture server got SIGTERM before the smoke ended: no; fixture processes alive after the smoke: 2 (pids 2995770 2995776); pgrep -f token: 2
+    the smoke's own lines:
+    the smoke's first ps calls, as the ps fixture logged them: ps -o pgid= -p 2995770: the real ps
+    -> NOT AS REQUIRED (exit 129 and no survivor)
+    the control stops the survivors: pid 2995770 carries this run's token and its PGID 2995770 is the recorded fixture leader, so the control signals process group 2995770
+    after the control's cleanup: fixture processes alive: 0
+  I4-observation-never-available: smoke exit=2; the fixture's leader pid 2996019 and server pid 2996024; the fixture server got SIGTERM before the smoke ended: no; fixture processes alive after the smoke: 2 (pids 2996019 2996024); pgrep -f token: 2
+    the smoke's own lines:
+      ps: simulated failure
+      the child is not its own process group leader (pid 2996019, pgid ): refusing to continue
+    the smoke's first ps calls, as the ps fixture logged them: ps -o pgid= -p 2996019: simulated failure, exit 1
+    -> as required (nothing signalled and the child's pid named)
+    the control stops the survivors: pid 2996019 carries this run's token and its PGID 2996019 is the recorded fixture leader, so the control signals process group 2996019
+    after the control's cleanup: fixture processes alive: 0
+fixture processes left running after all variants: 0
+variants not as required: 5
+scratch directory (remove with rm -rf after reading): $HOME/.cache/r13-s/smoke/final/work/omniroute-smoke-initial-ps-vp9EmS
+control exit=1
+
+## (2) the control on the fixed smoke.sh (version 6)
+# smoke-initial-ps-control: run 2026-10-06T23:38:58Z; smoke script under test: smoke.sh git blob acdabceeb9a234e64f73af59a22f8a3175b7c938 sha256 0cbb66ef788f6a8ce264720879712d2253440d412ea44852c16295db1388446e
+  I1-first-observation-fails: smoke exit=2; the fixture's leader pid 2996170 and server pid 2996176; the fixture server got SIGTERM before the smoke ended: yes; fixture processes alive after the smoke: 0; pgrep -f token: 0
+    the smoke's own lines:
+      ps: simulated failure
+      the child is not its own process group leader (pid 2996170, pgid ): refusing to continue
+      early exit (status 2): the owned process group 2996170 was signalled; processes left: 0 (final observation: empty)
+    the smoke's first ps calls, as the ps fixture logged them: ps -o pgid= -p 2996170: simulated failure, exit 1 | ps -o pgid= -p 2996170: the real ps | ps -eo pid=,pgid=: the real ps
+    -> as required (non-zero exit and no survivor)
+  I2-first-observation-wrong-pgid: smoke exit=2; the fixture's leader pid 2996286 and server pid 2996291; the fixture server got SIGTERM before the smoke ended: yes; fixture processes alive after the smoke: 0; pgrep -f token: 0
+    the smoke's own lines:
+      the child is not its own process group leader (pid 2996286, pgid 1): refusing to continue
+      early exit (status 2): the owned process group 2996286 was signalled; processes left: 0 (final observation: empty)
+    the smoke's first ps calls, as the ps fixture logged them: ps -o pgid= -p 2996286: simulated wrong pgid 1, exit 0 | ps -o pgid= -p 2996286: the real ps | ps -eo pid=,pgid=: the real ps
+    -> as required (non-zero exit and no survivor)
+  I3-sigterm-while-polling: SIGTERM sent to the smoke script (pid 2996437) while it polled the health endpoint
+  I3-sigterm-while-polling: smoke exit=143; the fixture's leader pid 2996444 and server pid 2996450; the fixture server got SIGTERM before the smoke ended: yes; fixture processes alive after the smoke: 0; pgrep -f token: 0
+    the smoke's own lines:
+      early exit (status 143): the owned process group 2996444 was signalled; processes left: 0 (final observation: empty)
+    the smoke's first ps calls, as the ps fixture logged them: ps -o pgid= -p 2996444: the real ps | ps -eo pid=,pgid=: the real ps | ps -eo pid=,pgid=: the real ps
+    -> as required (exit 143 and no survivor)
+  I3b-sigint-while-polling: SIGINT sent to the smoke script (pid 2996659) while it polled the health endpoint
+  I3b-sigint-while-polling: smoke exit=130; the fixture's leader pid 2996666 and server pid 2996672; the fixture server got SIGTERM before the smoke ended: yes; fixture processes alive after the smoke: 0; pgrep -f token: 0
+    the smoke's own lines:
+      early exit (status 130): the owned process group 2996666 was signalled; processes left: 0 (final observation: empty)
+    the smoke's first ps calls, as the ps fixture logged them: ps -o pgid= -p 2996666: the real ps | ps -eo pid=,pgid=: the real ps | ps -eo pid=,pgid=: the real ps
+    -> as required (exit 130 and no survivor)
+  I3c-sighup-while-polling: SIGHUP sent to the smoke script (pid 2996982) while it polled the health endpoint
+  I3c-sighup-while-polling: smoke exit=129; the fixture's leader pid 2996995 and server pid 2996999; the fixture server got SIGTERM before the smoke ended: yes; fixture processes alive after the smoke: 0; pgrep -f token: 0
+    the smoke's own lines:
+      early exit (status 129): the owned process group 2996995 was signalled; processes left: 0 (final observation: empty)
+    the smoke's first ps calls, as the ps fixture logged them: ps -o pgid= -p 2996995: the real ps | ps -eo pid=,pgid=: the real ps | ps -eo pid=,pgid=: the real ps
+    -> as required (exit 129 and no survivor)
+  I4-observation-never-available: smoke exit=2; the fixture's leader pid 2997437 and server pid 2997443; the fixture server got SIGTERM before the smoke ended: no; fixture processes alive after the smoke: 2 (pids 2997437 2997443); pgrep -f token: 2
+    the smoke's own lines:
+      ps: simulated failure
+      the child is not its own process group leader (pid 2997437, pgid ): refusing to continue
+      early exit (status 2): the child pid 2997437 was not observed as the leader of its own process group, so nothing was signalled; check it and stop it by its literal pid
+    the smoke's first ps calls, as the ps fixture logged them: ps -o pgid= -p 2997437: simulated failure, exit 1 | ps -o pgid= -p 2997437: simulated failure, exit 1 | ps -o pgid= -p 2997437: simulated failure, exit 1
+    -> as required (nothing signalled and the child's pid named)
+    the control stops the survivors: pid 2997437 carries this run's token and its PGID 2997437 is the recorded fixture leader, so the control signals process group 2997437
+    after the control's cleanup: fixture processes alive: 0
+fixture processes left running after all variants: 0
+variants not as required: 0
+scratch directory (remove with rm -rf after reading): $HOME/.cache/r13-s/smoke/final/work/omniroute-smoke-initial-ps-uq6iqW
+control exit=0
+
+## (3) the existing smoke controls on the fixed smoke.sh (version 6)
+### (A) scripts/smoke-observation-control.sh.txt: SMOKE_SCRIPT = the fixed smoke.sh (version 6; the control's own labels say version 5), SMOKE_V4 = superseded/smoke-v4.sh.txt, HOME = a scratch home
+== A-E: the functions, sourced
+a real process group: leader 2997784, pgid 2997784, with a surviving descendant (the sleep)
+A. ps works, group alive: group_state=alive member_count=2 (expected: alive, 2)
+B. ps FAILS (exit 1, no output) while the descendant survives: group_state=unavailable member_count=unavailable (expected: unavailable, unavailable; never empty)
+C. ps exits 0 with an empty listing: group_state=unavailable (expected: unavailable)
+D. version 4's members() on the failing ps: [] -> the test [ -z "$(members)" ] is TRUE, so version 4 reads the group as EMPTY although its descendant is alive
+[1]+  Terminated              bash -c 'sleep 300 & wait'
+E. the group killed and ps working: group_state=empty member_count=0 (expected: empty, 0)
+== F1-F3: the whole smoke against a fixture prefix in a scratch HOME
+F1. version 5, the fixture prefix, no failing ps (expected exit 0: the fixture is a valid prefix): smoke exit=0
+    prefix=fixtureprefix port=54366 health_ok=yes listener_owned_by_child=yes listening_address=127.0.0.1:54366 loopback_only=yes exposure_warning_printed=no body={"status":"ok"} child_alive=yes
+    processes in the owned process group 2997891 before cleanup: 2
+    processes left in the owned process group 2997891: 0 (final observation: empty)
+F2. version 5, ps fails once the server is signalled (expected: non-zero, final observation: unavailable): smoke exit=1
+    prefix=fixtureprefix port=53564 health_ok=yes listener_owned_by_child=yes listening_address=127.0.0.1:53564 loopback_only=yes exposure_warning_printed=no body={"status":"ok"} child_alive=yes
+    processes in the owned process group 2998308 before cleanup: 2
+    processes left in the owned process group 2998308: unavailable (final observation: unavailable)
+F3. version 4, the same failing ps (exit 0: the failed observation was read as an empty group): smoke exit=0
+    prefix=fixtureprefix port=54706 health_ok=yes listener_owned_by_child=yes listening_address=127.0.0.1:54706 loopback_only=yes exposure_warning_printed=no body={"status":"ok"} child_alive=yes
+    processes in the owned process group 2999114 before cleanup: 2
+    processes left in the owned process group 2999114: 0
+fixture processes left running: 0
+scratch directory (remove with rm -rf after reading): $HOME/.cache/r13-s/smoke/final/home-obs/.cache/omniroute-smoke-observation-SRk5QW
+control exit=0
+
+### (B) scripts/smoke-ownership-control.sh.txt: SMOKE_SCRIPT = the fixed smoke.sh
+listener: pid 2999433 in process group 2999433 on port 53354; an unrelated process: pid 2999443 in process group 2999443
+owned_listener for the listener's own process group 2999433: yes   (expected: yes)
+owned_listener for the unrelated process group 2999443: no   (expected: no)
+both stopped (their own process groups only)
+control exit=0
+
+### (C) scripts/smoke-group-selector-control.sh.txt (it reads no smoke script; rerun for completeness)
+leader pid 2999467, its pgid 2999467, its session 2994842; this script's own session 2994842
+members counted with 'ps -o pid= -g PGID' (the selector the first fixed version used): 0
+members counted with a filter on the PGID column (ps -eo pid=,pgid= | awk): 2
+[1]+  Terminated              bash -c 'sleep 300 & wait'
+after kill -- -PGID, members counted with the PGID filter: 0
+control exit=0
+
+### (D) scripts/smoke-control.sh.txt: SMOKE_SCRIPT = the fixed smoke.sh; the prefix is the fixture prefix of (A) in a scratch HOME (the recorded run, checks/smoke-results.txt (1), used the real drain prefix, which this round does not boot)
+unrelated dummy health server: pid 2999508 on port 54370, alive=yes
+prefix=fixtureprefix port=54370 health_ok=no listener_owned_by_child=no listening_address=127.0.0.1:54370 loopback_only=yes exposure_warning_printed=no body=none child_alive=no
+processes in the owned process group 2999559 before cleanup: 0
+--- first log lines:
+Traceback (most recent call last):
+  File "<stdin>", line 14, in <module>
+  File "/usr/lib/python3.12/socketserver.py", line 457, in __init__
+    self.server_bind()
+  File "/usr/lib/python3.12/http/server.py", line 136, in server_bind
+    socketserver.TCPServer.server_bind(self)
+  File "/usr/lib/python3.12/socketserver.py", line 473, in server_bind
+    self.socket.bind(self.server_address)
+OSError: [Errno 98] Address already in use
+processes left in the owned process group 2999559: 0 (final observation: empty)
+scratch dir: $HOME/.cache/r13-s/smoke/final/home-ctl/.cache/omniroute-smoke-AufYYF (remove with rm -rf after reading)
+smoke exit=1
+unrelated dummy still alive after the smoke: yes
+dummy stopped by this control (its own pid only)
+control exit=0

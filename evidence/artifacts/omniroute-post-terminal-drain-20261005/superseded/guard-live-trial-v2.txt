@@ -1,0 +1,63 @@
+# Two read-only live trials of the SUPERSEDED pre-switch guard (version 2, script sha256 b491de6b...) against the live 20128; neither wrote or restarted anything.
+# Trial 1 ran at 05:13:03Z and FAILED: the 20129 framework gateway's connection was counted as an ACTIVE client (1 ACTIVE connection of 1 established). Its output was not saved to a file when it ran: the text below is that run's output as displayed to the session (the display command cut every line at 250 characters, so its IDENTITY line is cut; nothing else was altered), recovered from the session transcript.
+# Trial 2 ran at 06:13:10Z in a quiet window (no connection to 20128 at all) and was clean, so it does not discriminate; version 3 (checks/guard-live-trial.txt) tolerates the poll, and control G12 reproduces version 2's failure on the same fixture as G9-G11.
+
+################ TRIAL 1 (05:13Z)
+05:13:03
+written $HOME/.cache/guard-live-trial-20261006.txt
+# read-only trial of pre-switch-guard-20261006.py against the live 20128, 2026-10-06T05:13:03Z; the guard exit status is printed at the end
+GUARD version=2 script_sha256=b491de6b3e4a5a1d3a3761c8fa8aefc439cca8cf4c453d696c7b9cb41a73af3a start=2026-10-06T05:13:03.332Z port=20128 unit=omniroute.service clean_for=40.0 interval=5.0
+CHECK switch tool sha256: ok (97d1b87bb651)
+CHECK rollback prefix intact: ok (omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167: bin/omniroute, BUILD_SHA cf6748d04, shim v2)
+CHECK target prefix intact: ok (omniroute-3.8.51-c1e30b76-affinity-pr15167-drain-b7c68690: bin/omniroute, BUILD_SHA 2a41147b7, shim v2, drain marker)
+   IDENTITY label=pre-switch time=2026-10-06T05:13:08Z unit=omniroute.service MainPID=767 ExecMainStartTimestamp=Tue_2026-10-06_00:26:11_EDT NRestarts=0 running_prefix=omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167 BUILD_SHA=cf6748d04 health=ok 
+CHECK unit runs the rollback prefix, health ok: ok
+   sample 1 at 2026-10-06T05:13:08.337Z: connections=1 active_so_far=0 workers=0 last_call_log_age_s=471
+   sample 2 at 2026-10-06T05:13:13.357Z: connections=1 active_so_far=0 workers=0 last_call_log_age_s=476
+   sample 3 at 2026-10-06T05:13:18.377Z: connections=1 active_so_far=0 workers=0 last_call_log_age_s=481
+   sample 4 at 2026-10-06T05:13:23.396Z: connections=1 active_so_far=0 workers=0 last_call_log_age_s=486
+   sample 5 at 2026-10-06T05:13:28.415Z: connections=1 active_so_far=1 workers=0 last_call_log_age_s=491
+   sample 6 at 2026-10-06T05:13:33.434Z: connections=1 active_so_far=1 workers=0 last_call_log_age_s=496
+   sample 7 at 2026-10-06T05:13:38.454Z: connections=1 active_so_far=1 workers=0 last_call_log_age_s=501
+   sample 8 at 2026-10-06T05:13:43.473Z: connections=1 active_so_far=1 workers=0 last_call_log_age_s=506
+   sample 9 at 2026-10-06T05:13:48.493Z: connections=1 active_so_far=1 workers=0 last_call_log_age_s=511
+CHECK nothing in flight for 40 s (9 samples): FAIL ['1 ACTIVE connection(s) to port 20128 (traffic or queued data during the window), of 1 established']
+INFO connections_total=1 connections_active=1 pending_total_before=0 pending_total_after=0 pending_changed=False hindsight_processes=9
+GUARD-RESULT clean=False failed_checks=['nothing in flight for 40 s (9 samples)'] end=2026-10-06T05:13:48.604Z
+guard exit=4
+
+## established connections to port 20128 right after the guard (value-free: ports, queues and counters only)
+peer_port recv_q send_q bytes_received bytes_sent lastsnd_ms lastrcv_ms
+57393 0 0 None None 23924 23924
+connections: 1
+
+## client-side owners visible to this PID namespace (process names only)
+      1 users:(("omniroute (v16."
+
+################ TRIAL 2 (06:13Z)
+# read-only trial of the pre-switch guard against the live 20128, 2026-10-06T06:13:10Z; the guard exit status is printed at the end
+GUARD version=2 script_sha256=b491de6b3e4a5a1d3a3761c8fa8aefc439cca8cf4c453d696c7b9cb41a73af3a start=2026-10-06T06:13:10.365Z port=20128 unit=omniroute.service clean_for=40.0 interval=5.0
+CHECK switch tool sha256: ok (97d1b87bb651)
+CHECK rollback prefix intact: ok (omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167: bin/omniroute, BUILD_SHA cf6748d04, shim v2)
+CHECK target prefix intact: ok (omniroute-3.8.51-c1e30b76-affinity-pr15167-drain-b7c68690: bin/omniroute, BUILD_SHA 2a41147b7, shim v2, drain marker)
+   IDENTITY label=pre-switch time=2026-10-06T06:13:11Z unit=omniroute.service MainPID=767 ExecMainStartTimestamp=Tue_2026-10-06_00:26:11_EDT NRestarts=0 running_prefix=omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167 BUILD_SHA=cf6748d04 health=ok pending_total=13 expect_prefix_ok=True expect_build_ok=True
+CHECK unit runs the rollback prefix, health ok: ok
+   sample 1 at 2026-10-06T06:13:12.336Z: connections=0 active_so_far=0 workers=0 last_call_log_age_s=524
+   sample 2 at 2026-10-06T06:13:17.380Z: connections=0 active_so_far=0 workers=0 last_call_log_age_s=529
+   sample 3 at 2026-10-06T06:13:23.957Z: connections=0 active_so_far=0 workers=0 last_call_log_age_s=535
+   sample 4 at 2026-10-06T06:13:29.408Z: connections=0 active_so_far=0 workers=0 last_call_log_age_s=541
+   sample 5 at 2026-10-06T06:13:34.477Z: connections=0 active_so_far=0 workers=0 last_call_log_age_s=546
+   sample 6 at 2026-10-06T06:13:39.524Z: connections=0 active_so_far=0 workers=0 last_call_log_age_s=551
+   sample 7 at 2026-10-06T06:13:44.564Z: connections=0 active_so_far=0 workers=0 last_call_log_age_s=556
+   sample 8 at 2026-10-06T06:13:49.593Z: connections=0 active_so_far=0 workers=0 last_call_log_age_s=561
+   sample 9 at 2026-10-06T06:13:54.620Z: connections=0 active_so_far=0 workers=0 last_call_log_age_s=566
+CHECK nothing in flight for 40 s (9 samples): ok (0 idle established connections tolerated)
+INFO connections_total=0 connections_active=0 pending_total_before=13 pending_total_after=13 pending_changed=False hindsight_processes=9
+GUARD-RESULT clean=True failed_checks=[] end=2026-10-06T06:13:54.828Z
+guard exit=0
+
+## established connections to port 20128 right after the guard (value-free: ports, queues and counters only)
+peer_port recv_q send_q bytes_received bytes_sent lastsnd_ms lastrcv_ms
+connections: 0
+
+## client-side owners visible to this PID namespace (process names only)

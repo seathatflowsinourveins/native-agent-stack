@@ -1,0 +1,47 @@
+# Live trials of pre-switch guard version 5 in --idle-only mode against the running 20128 (the UNPATCHED build `cf6748d04`, MainPID 341 before and after), 2026-10-06 UTC. Read-only: the guard reads `ss`, `pgrep`, the gateway store (mode=ro) and the identity read-back, and writes nothing; the trial's own requests are the census trial's (checks/census-live-trial.txt).
+# (1) a rehearsal at 17:09:31Z, 17 minutes after the last gateway-internal provider-test rows and with no client of any lane: CLEAN (7 samples over 30 s, no connection, last call_logs row 1050 s old).
+# (2) the trial's receipt at 17:20:02Z, immediately before arm A: CLEAN (this is the receipt the census consumed).
+# (3) the same guard run again 25 s into arm A, `clean_for` 10 s (the runner's label for it, written before the run, is 'ACTIVE control'): NOT clean. READ THE REASON: what failed was the call_logs recency rule (the call row of arm A's first request, written at 17:20:39Z, was 20-30 s old at the three samples; the minimum is 120 s); the guard saw ONE connection and classified it idle (empty queues, unchanged counters).
+#     That connection was the stream of arm A's first request: its call row was written at 17:20:39Z, 6 s after the arm started, and the gateway keeps the downstream open for about a minute after the terminal event (the stream ended 70.7 s in), so an open stream that is silent on the wire is indistinguishable from an idle keep-alive; the guard refused by the recency rule, not by the connection. That is the limit the protocol names (the guard cannot see what is silent on the wire); active-connection detection is shown by controls K and E (checks/guard5-controls.txt) and G13 (checks/guard5-existing-controls.txt), not by this trial.
+# The earlier live trials (guard 3 at 05:19Z and 06:12Z, guard 4 at 12:24Z) are superseded/guard-live-trial-v3.txt and superseded/guard-live-trial-v4.txt; guard 2's are superseded/guard-live-trial-v2.txt.
+
+## (1) rehearsal, 17:09:31Z
+GUARD version=5 mode=idle-only script_sha256=62dea3d25040ed6fee469f44332068a0b47f3f4951fdaa309b4e99000378700b start=2026-10-06T17:09:31.372Z port=20128 unit=omniroute.service clean_for=30.0 interval=5.0 tolerate_units=['omniroute-fw.service']
+   IDENTITY label=idle-only time=2026-10-06T17:09:31Z unit=omniroute.service MainPID=341 ExecMainStartTimestamp=Tue_2026-10-06_09:51:19_EDT NRestarts=0 running_prefix=omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167 BUILD_SHA=cf6748d04 health=ok pending_total=92
+CHECK unit healthy (identity read-back, no build expectation): ok
+   sample 1 at 2026-10-06T17:09:31.692Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=1050
+   sample 2 at 2026-10-06T17:09:36.734Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=1055
+   sample 3 at 2026-10-06T17:09:41.770Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=1060
+   sample 4 at 2026-10-06T17:09:46.805Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=1065
+   sample 5 at 2026-10-06T17:09:51.841Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=1070
+   sample 6 at 2026-10-06T17:09:56.875Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=1075
+   sample 7 at 2026-10-06T17:10:01.911Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=1080
+CHECK nothing in flight for 30 s (7 samples): ok (0 idle and 0 tolerated connection(s))
+INFO unrelated_remote_records=0 connections_seen=0 connections_tolerated=0 connections_active=0 connections_idle=0 pending_total_before=92 pending_total_after=92 pending_changed=False hindsight_processes=9
+IDLE-RESULT clean=True failed_checks=[] end=2026-10-06T17:10:02.005Z
+
+## (2) the trial's receipt, 17:20:02Z (scripts/census-live-trial.sh.txt)
+GUARD version=5 mode=idle-only script_sha256=62dea3d25040ed6fee469f44332068a0b47f3f4951fdaa309b4e99000378700b start=2026-10-06T17:20:02.625Z port=20128 unit=omniroute.service clean_for=30.0 interval=5.0 tolerate_units=['omniroute-fw.service']
+   IDENTITY label=idle-only time=2026-10-06T17:20:02Z unit=omniroute.service MainPID=341 ExecMainStartTimestamp=Tue_2026-10-06_09:51:19_EDT NRestarts=0 running_prefix=omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167 BUILD_SHA=cf6748d04 health=ok pending_total=92
+CHECK unit healthy (identity read-back, no build expectation): ok
+   sample 1 at 2026-10-06T17:20:02.937Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=1681
+   sample 2 at 2026-10-06T17:20:07.974Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=1686
+   sample 3 at 2026-10-06T17:20:13.007Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=1691
+   sample 4 at 2026-10-06T17:20:18.044Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=1696
+   sample 5 at 2026-10-06T17:20:23.081Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=1702
+   sample 6 at 2026-10-06T17:20:28.123Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=1707
+   sample 7 at 2026-10-06T17:20:33.160Z: connections=0 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=1712
+CHECK nothing in flight for 30 s (7 samples): ok (0 idle and 0 tolerated connection(s))
+INFO unrelated_remote_records=0 connections_seen=0 connections_tolerated=0 connections_active=0 connections_idle=0 pending_total_before=92 pending_total_after=92 pending_changed=False hindsight_processes=9
+IDLE-RESULT clean=True failed_checks=[] end=2026-10-06T17:20:33.262Z
+
+## (3) mid-arm, 17:20:58Z
+GUARD version=5 mode=idle-only script_sha256=62dea3d25040ed6fee469f44332068a0b47f3f4951fdaa309b4e99000378700b start=2026-10-06T17:20:58.325Z port=20128 unit=omniroute.service clean_for=10.0 interval=5.0 tolerate_units=['omniroute-fw.service']
+   IDENTITY label=idle-only time=2026-10-06T17:20:58Z unit=omniroute.service MainPID=341 ExecMainStartTimestamp=Tue_2026-10-06_09:51:19_EDT NRestarts=0 running_prefix=omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167 BUILD_SHA=cf6748d04 health=ok pending_total=92
+CHECK unit healthy (identity read-back, no build expectation): ok
+   sample 1 at 2026-10-06T17:20:58.613Z: connections=1 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=20
+   sample 2 at 2026-10-06T17:21:03.651Z: connections=1 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=25
+   sample 3 at 2026-10-06T17:21:08.692Z: connections=1 tolerated_so_far=0 active_so_far=0 workers=0 last_call_log_age_s=30
+CHECK nothing in flight for 10 s (3 samples): FAIL ['the last call_logs row is 20 s old (< 120 s)', 'the last call_logs row is 25 s old (< 120 s)', 'the last call_logs row is 30 s old (< 120 s)']
+INFO unrelated_remote_records=0 connections_seen=1 connections_tolerated=0 connections_active=0 connections_idle=1 pending_total_before=92 pending_total_after=92 pending_changed=False hindsight_processes=9
+IDLE-RESULT clean=False failed_checks=['nothing in flight for 10 s (3 samples)'] end=2026-10-06T17:21:08.808Z

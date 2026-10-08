@@ -1,0 +1,103 @@
+#!/usr/bin/env python3
+"""Calibration (not an acceptance run): how often does the gateway store the effort columns of a request, per candidate probe prompt? Observe-only, on the gateway the caller names (the live UNPATCHED 20128 in its one use).
+
+Background: call_logs.reasoning_effort_requested and reasoning_effort_upstream are written only when the response carried encrypted reasoning (src/lib/usage/callLogs.ts L660-670 at 0585aba55). The probe prompt `Reply with: ok`
+returned max/max for cx/gpt-6.1-sol with client effort max at 2026-10-06 00:01Z and NULL/NULL at 02:08Z for the same request on the same build, so a rule "the effort columns equal the baseline's" is flaky unless the probe
+elicits reasoning. This script sends the same streamed Responses request the acceptance script's effort probes send, with each candidate prompt N times, and records for every request whether its call_logs row exists and
+whether the effort columns are non-null (and the reasoning token count, a witness that the model reasoned).
+
+A request is closed `--close-after` seconds after the data line that carries `response.completed` (default 10 s): the row of a request is written about 4 s after it starts and the gateway keeps the downstream stream open about a minute
+longer, so waiting for the end of the stream adds a minute per request and nothing else. (An early close right AFTER the terminal event loses the rows on the unpatched build; 10 s is far past the upstream's end.)
+
+usage: calibrate-effort-20261006.py --model cx/gpt-6-astra [--effort max] [--n 5] [--prompts P0,P1,P2] [--close-after 10] [--port 20128] [--db FILE]
+Prints one CAL line per request and a CAL-SUMMARY line per prompt. Reads only metadata columns (mode=ro). The key is the documented loopback placeholder.
+"""
+import argparse
+import datetime as dt
+import http.client
+import json
+import os
+import sqlite3
+import sys
+import time
+
+PROMPTS = {
+    "P0": "Reply with: ok",
+    "P1": "What is 23 times 47? Reply with only the number.",
+    "P2": "A bat and a ball cost $1.10 in total. The bat costs $1.00 more than the ball. How much does the ball cost? Reply with only the amount in cents.",
+}
+DEFAULT_DB = os.path.expanduser("~/.local/share/omniroute/storage.sqlite")
+
+
+def utc():
+    return dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
+
+
+def send(model, effort, prompt, port, close_after):
+    conn = http.client.HTTPConnection("127.0.0.1", port, timeout=300)
+    body = {"model": model, "input": prompt, "stream": True}
+    if effort:
+        body["reasoning"] = {"effort": effort}
+    conn.request("POST", "/v1/responses", json.dumps(body), {"Content-Type": "application/json", "Authorization": "Bearer local-loopback", "Accept": "text/event-stream"})
+    resp = conn.getresponse()
+    out = {"http": resp.status, "response_id": None, "terminal": False}
+    t0 = time.time()
+    while True:
+        line = resp.fp.readline()
+        if not line:
+            break
+        if line.startswith(b"data:") and b'"response.completed"' in line:
+            out["terminal"] = True
+            out["to_terminal_s"] = round(time.time() - t0, 1)
+            try:
+                out["response_id"] = json.loads(line[5:].strip())["response"]["id"]
+            except Exception:
+                pass
+            time.sleep(close_after)
+            break
+    conn.close()
+    return out
+
+
+def row(db, response_id):
+    if not response_id:
+        return None
+    con = sqlite3.connect(f"file:{db}?mode=ro", uri=True)
+    r = con.execute("select status, model, requested_model, reasoning_effort_requested, reasoning_effort_upstream, tokens_reasoning, tokens_out from call_logs where response_id = ?", (response_id,)).fetchall()
+    con.close()
+    return r
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--model", required=True)
+    ap.add_argument("--effort")
+    ap.add_argument("--n", type=int, default=5)
+    ap.add_argument("--prompts", default="P0,P1,P2")
+    ap.add_argument("--close-after", type=float, default=10.0)
+    ap.add_argument("--port", type=int, default=20128)
+    ap.add_argument("--db", default=DEFAULT_DB)
+    args = ap.parse_args()
+    print(f"CAL-START model={args.model} effort={args.effort} n={args.n} prompts={args.prompts} close_after={args.close_after} port={args.port} start={utc()}", flush=True)
+    for pid in args.prompts.split(","):
+        stats = {"requests": 0, "terminal": 0, "rows": 0, "observed": 0}
+        for i in range(1, args.n + 1):
+            out = send(args.model, args.effort, PROMPTS[pid], args.port, args.close_after)
+            time.sleep(2)
+            rows = row(args.db, out["response_id"])
+            if rows is not None and not rows:
+                time.sleep(8)
+                rows = row(args.db, out["response_id"])
+            stats["requests"] += 1
+            stats["terminal"] += 1 if out["terminal"] else 0
+            if rows:
+                stats["rows"] += 1
+                stats["observed"] += 1 if rows[0][4] is not None else 0
+            r = rows[0] if rows else None
+            print(f"CAL model={args.model} client_effort={args.effort} prompt={pid} i={i} http={out['http']} terminal={out['terminal']} to_terminal_s={out.get('to_terminal_s')} rows={len(rows) if rows is not None else None} "
+                  + (f"status={r[0]} model={r[1]} requested_model={r[2]} effort_requested={r[3]} effort_upstream={r[4]} tokens_reasoning={r[5]} tokens_out={r[6]}" if r else "(no row)"), flush=True)
+        print(f"CAL-SUMMARY model={args.model} client_effort={args.effort} prompt={pid} requests={stats['requests']} terminal_seen={stats['terminal']} rows={stats['rows']} effort_columns_observed={stats['observed']}", flush=True)
+    print(f"CAL-END end={utc()}", flush=True)
+
+
+main()

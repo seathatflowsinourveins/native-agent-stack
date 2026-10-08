@@ -1,0 +1,12 @@
+# Control for the input checks of scripts/drain-prototype.sh.txt (2026-10-05): the script run with a DRAIN_DIR that lacks a fixture. A review had found that a missing test file was not stopped by the copy step.
+# Expected: the script names the missing input file and stops with exit 2 before it creates any work directory. Observed (output with the home directory written $HOME, and the exit code of the script):
+
+## DRAIN_DIR is an empty directory
+missing input file: $HOME/.cache/omniroute-empty-fixture-S57PiV/drain-after-terminal.patch
+exit=2
+(no new work directory appeared: the listing after the run held only the two earlier validation runs' directories and their wrapper logs)
+
+## DRAIN_DIR holds drain-after-terminal.patch and superseded-first-version.patch but not stream-terminal-seen-client-disconnect.test.ts
+missing input file: $HOME/.cache/omniroute-partial-fixture-OvwZGy/stream-terminal-seen-client-disconnect.test.ts
+exit=2
+work dirs before=3 after=3

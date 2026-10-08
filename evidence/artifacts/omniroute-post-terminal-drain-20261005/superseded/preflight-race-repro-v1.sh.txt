@@ -1,0 +1,75 @@
+#!/bin/bash
+# Reproduction of the failure of upstream's check:pack-boot on this host, on the installed candidate prefix, in about a minute (nothing live is touched, no credential is involved).
+# What it shows: upstream's harness (scripts/check/check-pack-boot.mjs) starts the installed CLI and at once polls http://127.0.0.1:PORT/api/monitoring/health with fetch every 2 s; the CLI's own port preflight
+# (bin/cli/utils/pid.mjs findListeningPids: `lsof -ti :PORT`) lists every process with a socket on the port, CLIENTS included. On this host a connect to a closed loopback port does not fail at once with ECONNREFUSED,
+# it hangs (undici: UND_ERR_CONNECT_TIMEOUT after 10.5 s), so the harness's poll sits in SYN_SENT with remote port PORT while the CLI runs its preflight, and the CLI refuses with "Port PORT is already in use by PID <the harness>".
+# Mode A: PATH without the lsof shim (upstream's behaviour). Mode B: the reviewed shim v2 first on PATH (it answers `lsof -ti :PORT` with exit 2, so upstream's own bind-probe fallback #14518 decides; it is the PATH the deployed prefix runs with).
+# usage: preflight-race-repro-20261006.sh <A|B> <prefix directory name under tools/> <output file>
+set -u
+set -m
+MODE=${1:?A or B}
+NAME=${2:?prefix name}
+OUTF=${3:?output file}
+TOOLS="$HOME/.local/share/codex-ecosystem/tools"
+PREFIX="$TOOLS/$NAME"
+NODE_BIN="$TOOLS/node-24.21.0/bin"
+[ -x "$PREFIX/bin/omniroute" ] || { echo "no executable $PREFIX/bin/omniroute" >&2; exit 2; }
+case "$MODE" in A) PATH_USED="$NODE_BIN:/usr/local/bin:/usr/bin:/bin" ;; B) PATH_USED="$PREFIX/shim:$NODE_BIN:/usr/local/bin:/usr/bin:/bin" ;; *) echo "mode A or B" >&2; exit 2 ;; esac
+S="$(mktemp -d "$HOME/.cache/omniroute-preflight-repro-XXXXXX")" || exit 2
+chmod 700 "$S"
+# a port in the range upstream's harness uses (pickPort: 23000 + pid % 4000), chosen WITHOUT binding it: on this host a connect to a closed port that nothing in this network namespace has bound before hangs
+# (undici UND_ERR_CONNECT_TIMEOUT after 10.5 s) instead of being refused, while a port that was bound once (even a bind and close) is refused at once; a bind test here would hide the failure (observed 2026-10-06)
+PORT=$(python3 -c '
+import random, subprocess
+for _ in range(200):
+    port = random.randrange(23000, 27000)
+    out = subprocess.run(["ss", "-Htan", f"( sport = :{port} or dport = :{port} )"], capture_output=True, text=True).stdout.strip()
+    if not out:
+        print(port); break
+') || exit 2
+cat > "$S/poll.mjs" <<'EOF'
+// the harness's waitForHealthy loop: one fetch per 2 s (a failed attempt is "not listening yet, keep polling")
+const port = Number(process.argv[2]), seconds = Number(process.argv[3]);
+const t0 = Date.now(), end = t0 + seconds * 1000;
+while (Date.now() < end) {
+  const t = Date.now();
+  try {
+    const r = await fetch(`http://127.0.0.1:${port}/api/monitoring/health`);
+    console.log(`poll at +${((t - t0) / 1000).toFixed(1)} s: HTTP ${r.status} after ${Date.now() - t} ms`);
+  } catch (e) {
+    console.log(`poll at +${((t - t0) / 1000).toFixed(1)} s: ${e.cause && e.cause.code} after ${Date.now() - t} ms`);
+  }
+  await new Promise((r) => setTimeout(r, 2000));
+}
+EOF
+export DATA_DIR="$S/data" TMPDIR="$S/tmp"
+mkdir -p "$DATA_DIR" "$TMPDIR"
+cd "$S" || exit 2
+{
+  echo "# preflight race reproduction, mode $MODE ($( [ "$MODE" = A ] && echo 'no lsof shim' || echo 'lsof shim v2 first on PATH' )), prefix $NAME, port $PORT, $(date -u +%FT%TZ)"
+  # the harness spawns the CLI with stdio pipes and starts polling in the same process
+  PATH="$PATH_USED" PORT="$PORT" JWT_SECRET="repro-secret-with-sufficient-length-0000000" API_KEY_SECRET="repro-api-key-secret-long" DISABLE_SQLITE_AUTO_BACKUP=true OMNIROUTE_SKIP_SYSTEM_TRUST=1 \
+    "$PREFIX/bin/omniroute" serve --port "$PORT" --no-open --no-tray > "$S/serve.log" 2>&1 &
+  CLI=$!
+  PGID=$(ps -o pgid= -p "$CLI" | tr -d ' ')
+  PATH="$NODE_BIN:/usr/bin:/bin" node "$S/poll.mjs" "$PORT" 40 > "$S/poll.log" 2>&1 &
+  POLLER=$!
+  echo "cli pid $CLI (group $PGID), poller pid $POLLER"
+  for _ in $(seq 1 40); do
+    sleep 1
+    kill -0 "$CLI" 2>/dev/null || { wait "$CLI" 2>/dev/null; echo "the CLI process exited with status $? after about $_ s"; break; }
+    if curl -s -m 2 "http://127.0.0.1:$PORT/api/health" 2>/dev/null | python3 -c 'import json, sys; sys.exit(0 if json.load(sys.stdin).get("status") == "ok" else 1)' 2>/dev/null; then echo "the server answered /api/health after about $_ s"; break; fi
+  done
+  echo "--- the CLI's last output lines (ANSI removed):"
+  sed 's/\x1b\[[0-9;]*m//g' "$S/serve.log" | grep -v "is ignored\|Generated STORAGE\|^$" | tail -n 8 | cut -c1-200
+  echo "--- poller output so far:"
+  cat "$S/poll.log"
+  echo "poller pid was $POLLER (compare with the PID in the CLI's message)"
+} > "$OUTF" 2>&1
+kill -- "-$PGID" 2>/dev/null
+kill "$POLLER" 2>/dev/null
+sleep 2
+kill -9 -- "-$PGID" 2>/dev/null
+wait 2>/dev/null
+echo "scratch directory (remove with rm -rf after reading): $S" >> "$OUTF"
+echo "written $OUTF"

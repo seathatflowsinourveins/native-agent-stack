@@ -1,0 +1,8 @@
+# Control for the owned-group selector of scripts/smoke.sh.txt (2026-10-05): scripts/smoke-group-selector-control.sh.txt run once. A review found that `ps -o pid= -g PGID`, used by the first fixed version to count the processes left in the group, selects by session, so its count of 0 proved nothing.
+# Observed: the leader's pgid differs from its session, `ps -g` counts 0 members of a group that has 2, a filter on the PGID column counts 2, and 0 after `kill -- -PGID`. Raw output below.
+
+leader pid 4055499, its pgid 4055499, its session 4055495; this script's own session 4055495
+members counted with 'ps -o pid= -g PGID' (the selector the first fixed version used): 0
+members counted with a filter on the PGID column (ps -eo pid=,pgid= | awk): 2
+[1]+  Terminated              bash -c 'sleep 300 & wait'
+after kill -- -PGID, members counted with the PGID filter: 0

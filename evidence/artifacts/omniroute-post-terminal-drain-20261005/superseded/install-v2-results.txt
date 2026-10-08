@@ -1,0 +1,37 @@
+# Controls and a positive run for scripts/install-drain.sh.txt (version 2, 2026-10-06 ~23:50Z). Raw output, home directory written $HOME.
+# (1) --verify-prefix on the installed drain prefix passes: BUILD_SHA 2a41147b7, the reviewed shim v2 hash, the drain marker in 2 compiled server chunks.
+# (2) the same check on the earlier live build (no drain) fails: BUILD_SHA differs and the marker count is 0. (3) a one-byte-corrupted copy of the tarball fails at the pinned sha256 before any npm install, and no prefix is created.
+# (4) the dependency-graph hash of the installed (21:29Z) drain prefix; (5) a positive full run of the script into a verification prefix beside the real one at 23:52Z: every pinned check passes, and its dependency graph has the same
+# package count but a different hash: npm resolved 22 packages differently in between (21 @radix-ui/* packages and js-yaml 5.4.2 against 5.4.3), so the tarball's sha256 does not pin the runtime dependency graph (the record's Limits).
+# The verification prefix was removed afterwards (its literal path, unreferenced by any unit).
+
+## (1) --verify-prefix on the installed drain prefix (must pass)
+prefix omniroute-3.8.51-c1e30b76-affinity-pr15167-drain-b7c68690: BUILD_SHA=2a41147b7 (expected 2a41147b7) shim_sha256=b6ae900224df3dc73fff2a50b3d7206d78895c6147e93e80b62e66d423e69854 drain_marker_files=2
+verified: omniroute-3.8.51-c1e30b76-affinity-pr15167-drain-b7c68690 is the drain build
+exit=0
+
+## (2) --verify-prefix on the earlier live build, which has no drain (must fail: BUILD_SHA differs, and the marker count shows 0)
+prefix omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167: BUILD_SHA=cf6748d04 (expected 2a41147b7) shim_sha256=b6ae900224df3dc73fff2a50b3d7206d78895c6147e93e80b62e66d423e69854 drain_marker_files=0
+FAILED: BUILD_SHA of omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167 is not 2a41147b7
+exit=3
+
+## (3) a one-byte-corrupted copy of the tarball as the build output (must fail at the pinned sha256, before any npm install)
+$HOME/.cache/omniroute-install-control-Ft4aBP/omniroute-3.8.51-drain-b7c68690.tgz: FAILED
+sha256sum: WARNING: 1 computed checksum did NOT match
+FAILED: sha256 of omniroute-3.8.51-drain-b7c68690.tgz is not the pinned 5b0e986bdff81487130cfd7c7dad20c6534f447836ff1c757e7c4bcf82d0fa14
+exit=3
+prefix created by the corrupted run: no
+
+## (4) dependency-graph hash of the installed drain prefix (21:29Z install)
+dependency graph of omniroute-3.8.51-c1e30b76-affinity-pr15167-drain-b7c68690: 1261 f2a40ab81ea2c0b423be70653af0ceb2901f3b56c1c2bfa70e3a809e805a7589
+exit=0
+
+## (5) a positive full run of the script into a verification prefix beside the real one (copy step skipped: the artifact exists; pinned checks, install, shim, marker, dependency hash)
+$HOME/.local/state/native-agent-stack/omniroute-artifacts-20261005/omniroute-3.8.51-drain-b7c68690.tgz: OK
+tarball verified: sha256, npm integrity and 26762 entries equal the pinned values
+23:52:51Z npm install exit=0
+prefix omniroute-3.8.51-c1e30b76-affinity-pr15167-drain-b7c68690-verify: BUILD_SHA=2a41147b7 (expected 2a41147b7) shim_sha256=b6ae900224df3dc73fff2a50b3d7206d78895c6147e93e80b62e66d423e69854 drain_marker_files=2
+installed dependency graph: packages and sha256 of the sorted name@version list: 1261 d05fd5fcc66d4c3ebfc05e5bff63c5eab70e089fb8f4999871b17858f4005ea6
+bytes: 2565118614
+installed and verified: omniroute-3.8.51-c1e30b76-affinity-pr15167-drain-b7c68690-verify
+exit=0

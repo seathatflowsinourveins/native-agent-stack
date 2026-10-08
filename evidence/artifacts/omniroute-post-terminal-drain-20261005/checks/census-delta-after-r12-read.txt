@@ -1,0 +1,1180 @@
+# The complete diff of the window census between the head that the full-scope read r12 read (4624137290; superseded/window-census-r13.py.txt, sha256 9350953cd4d6a005a4aa1817f8b3de743d6b15ae4d8697bb91b8c61a9c45fb9c) and this head (scripts/window-census.py.txt, sha256 2ec9a6498e1ae8c8c57007be7a62ee7b161e9df7777331144701a3a5a1e73cbd), as `diff -u` with one line of context. Nothing else of the census differs.
+# The causes: the findings of the full-scope read r12 (its table in checks/census-adversarial-reviews.txt: the completion-anchored journal record and the start agreement, the serving-process check, the widths in estimated-start terms, the reserved-word and canary-pin fixes), the third and the fourth independent adversarial review (the same file), and the command center's ruling on the residual (2026-10-06): the receipt states the residual verbatim as an untested boundary and states its evidence classes (controls J21a and J21b). The controls are J22-J39 and X4-X7 (the fourth review's findings are J30-J35 and X4; X5 reads the real stream-end lines of the patched build; J36-J39, X6 and X7 answer the read r13 of ec4b489d9, whose delta is checks/census-delta-after-r13-read.txt).
+
+--- superseded/window-census-r13.py.txt
++++ scripts/window-census.py.txt
+@@ -11,3 +11,3 @@
+   (iii) no ORPHAN usage row: every usage row of the window (read from 3 s before to 3 s after it) is associated with an own call row, and no group of usage rows has identical metadata (a duplicated row); foreign call rows are read over the same 3 s pad, and exactly (the pad alone leaves a sliver at its edge) every call row that is not this run's and could own a usage row an own call row can claim (the candidate query seen from the usage row, the same association) is a problem wherever it lies;
+-  (iv)  the guard 5 receipt (--idle-only; the standard invocation: port 20128, unit omniroute.service, the default tolerated unit): GUARD version=5, an OBSERVED interval of at least 30 s (the receipt's start= to its IDLE-RESULT end, both parsed and in order, and a declared clean_for no longer than that), a clean IDLE-RESULT that ended before the first arm began and not more than 600 s earlier; the window starts at its end. "Idle for the whole window" means two things together: the guard was clean at the start of the window, AND
++  (iv)  the guard 5 receipt (--idle-only; the standard invocation: port 20128, unit omniroute.service, the default tolerated unit): GUARD version=5, an OBSERVED interval of at least 30 s (the receipt's start= to its IDLE-RESULT end, both parsed and in order, and a declared clean_for no longer than that), a clean IDLE-RESULT that ended before the first arm began and not more than 600 s earlier, and, on the receipt's INFO and sample lines (each parsed against the guard's exact line grammar, fail-closed: a line that does not match exactly, a field with an empty value and a second counter summary are refused; the activity fields are then read by their own names), the gateway's own pending-request counter complete, readable and UNCHANGED (pending_total_before, pending_total_after, pending_changed), no active client connection, no process of another lane and no call_logs row younger than 120 s (rounds 27 to 30, the command center's second condition on the item (2) residual and its rulings J757-R17-FIX and RULING-757-R19: a window whose idle receipt shows any foreign arrival is INCONCLUSIVE; a repeated, missing, empty, unreadable or contradictory field is refused, the IDENTITY line's pending_total, the same counter read at the identity read-back, must agree with both INFO readings, and the canary gate needs exactly one INFO line and an IDENTITY line that gives its pending_total); the window starts at its end. "Idle for the whole window" means two things together: the guard was clean at the start of the window, AND
+         no foreign call row and no orphan usage row exists over the whole tiled window; the guard's observation (30 s by default) does not observe the window itself;
+@@ -19,5 +19,21 @@
+ (ix)  the rows an association rests on are plausible numbers (a present latency, duration or time to first token is finite and non-negative and the time to first token is not longer than the latency: true of every row of this host's store, 30,129 usage rows and 24,522 call rows; a NULL time to first token is not compared, as in the scripts, and is routine here), every timestamp of both tables is a calendar-valid gateway stamp of 2000-2100 (checked row by row, not by shape), every reserved record of an arm output (RESULT, SUMMARY, FROZEN, RUN-STATUS, IDENTITY, the journal line) is parsed or refused, a script stamp that is present but invalid is never rescued by another stamp, the canary gate requires the frozen request counts per arm (17, 6, 4, 8) and every query runs in ONE read transaction;
+-(x)   the gateway's journal (journalctl --user -u omniroute.service, `-o json --all`) holds exactly as many inbound request lines (`tag=HTTP method=POST`, message `\U0001F4E5 POST ...`), counted by the journal's own timestamp from 4 s BEFORE the window's start (a foreign request whose usage row could stand in for an own one arrived at most 3.1 s before the own request) to the window's end, as there are own call rows, and they pair one to one by time and path (each own call row with a distinct line of the same path that arrived within 3 s of its timestamp minus its duration); a journalctl that cannot be run, exits non-zero or reports a loss on stderr, and an entry the census cannot read (a line that is not JSON, a null or non-string message, a message that starts with `{` and does not parse, an arrival marker it did not count, a timestamp outside 2000-2100) make the window INCONCLUSIVE; the receipt prints the exact command, the binary, its version and its stderr;
+-The census never says FAIL (the scripts judge the rows) and never says PASS for a window it could not read: an unreadable store or an unparsable input is INCONCLUSIVE. The result line ends `scope=canary` for the canary's four-arm gate and `scope=trial` for anything else (fewer or more arms, a diagnostic run): only `PASS ... scope=canary` accepts the canary.
+-What it cannot exclude: the rows alone cannot attribute a usage row to its request (the usage table has no request key) and the association tolerates numbers that are not identical (latency within 100 ms, a time to first token within 1 ms or not compared when either side is NULL, within 3 s). The census therefore also counts the gateway's own journal lines of inbound POST requests (written when a request arrives, whatever happens to its rows) inside the window, requires exactly as many as there are own call rows and pairs them one to one by time and path (each own call row with a distinct line of the same path that arrived within 3 s of its timestamp minus its duration; the counted range starts 4 s before the window): a foreign request, a request whose call row was never written and an own request that lost its rows each leave a line without a matching row. What stays outside: a foreign request that the gateway did not log on arrival while every own request's line is present, a lost own line balanced by a foreign line of the same path that arrives within 3 s of it or of the lines of a chain of neighbouring own requests (each link within 3 s: the width is 3 s per link), a persistence failure that is not logged (a save skipped while disk persistence is off or saves are closing, the usage insert's same-millisecond dedup), and traffic that is not an inbound POST. A PASS means every own request's rows are present and paired one to one, no row of any other request was seen in the window, the journal shows no other inbound request in the counted range, the guard was idle at its start, the gateway process was the same and the wrapper's journal line per arm was 0.
++(x)   the gateway's journal (journalctl --user -u omniroute.service, `-o json --all`) holds exactly as many inbound request lines (`tag=HTTP method=POST`, message `\U0001F4E5 POST ...`), counted by the gateway's own clock (the line's `time`, which must lie between 1 s after and 30 s before journald's receive stamp) from 4 s BEFORE the window's start to 4 s AFTER its end (the usage pad plus 1 s; the 3 s pairing tolerance is measured from the own row's ESTIMATED start, not from the request's arrival, which can precede it by a delay that nothing bounds), as there are own call rows, and they pair one to one by time and path (each own call row with a distinct line of the same path that arrived within 3 s of its timestamp minus its duration); a journalctl that cannot be run, exits non-zero or reports a loss on stderr, and an entry the census cannot read (a line that is not JSON, a null or non-string message, a message that starts with `{` and does not parse, an arrival marker it did not count, a timestamp outside 2000-2100) make the window INCONCLUSIVE; the receipt prints the exact command, the binary, its version and its stderr, also when the observation failed;
++(xi)  the same journal run holds the stream-end lines (`\U0001F30A [STREAM] PROVIDER | model | Nms | status`, printed by the stream controller when a stream ends or its client leaves: open-sse/utils/streamHandler.ts at OmniRoute
++c1e30b7676975feb298b49eff6ff58923c04b89e). Their time is where the CONTROLLER ends, not where the rows are written: a successful HTTP stream persists its rows at the transform's flush and prints its line when the downstream reader has seen the terminal event, which an
++unread downstream queue delays by the reader's pace, with no bound (review r13, P1-2: 5.75 s measured natively at default queues; on this host's rows a completed request's line lies within about 0.2 s of them, a measurement and not an enforced bound; after a client that left the rows follow
++the line by up to the disconnect grace, and an error row can precede its line: checks/census-calibration-measurements.txt). The census uses the lines as a SECOND record, whatever the delay between the arrival line and the duration clock was and whatever happened to the rows. A controller's
++`client_disconnect (post-abort)` echo is folded into its primary line; every other line is a group of its own (a controller can print several primary lines: repeated handleError calls and a handleComplete, review r13, P3-5), a conservative convention: extra groups can only leave lines over (INCONCLUSIVE),
++two requests are never merged, and a group is a controller, not an inbound request (a combo's failed attempts and a client's retries each end one). Each own call row pairs one to one with a group of its provider and model whose implied start (line time minus its ms: the controller's start, which does
++not move when the line is late) lies within 0.25 s of the row's estimated start, and no group is left over whose line lies in the window padded by the 3 s usage pad, the serving process's STREAM_DISCONNECT_GRACE_PERIOD_MS (read from its environment, default 10 s: after a client that left once the terminal
++event was delivered the rows follow its line by at most that long) and 1 s; a line later than that range is not read, so the stream-end record covers no request whose line is late (for the canary the arrival matching of clause (xiv) is the record that does); a claimed usage row's clock start
++(timestamp minus latency) agrees with its call row's (timestamp minus duration) within 0.25 s (one request has one duration clock: a foreign request's row standing in for it started elsewhere);
++(xii) the serving process is established where MainPID and its start time cannot (they identify the CLI supervisor, which restarts the serving child on a crash): the process listening on the guard receipt's port (ss -ltnp) is in the unit's cgroup, started before the guard receipt began (/proc starttime against /proc/uptime, margin 2 s), is the writer of every request line of the range (a restarted
++        child leaves lines of two pids), no supervisor restart diagnostic or child startup banner occurs in the range, and no other process of this user holds the store open; the unit's journal limits are read and the range's busiest stretch must stay below a tenth of the rate limit (journald drops lines above it and says so only in the system journal);
++(xiii) no Responses-over-WebSocket turn reaches the window padded by the usage pad: such a turn (call_logs method WEBSOCKET or request_type responses_websocket, written by the gateway's WebSocket proxy through POST /api/internal/codex-responses-ws) is stamped at its START in both tables, with the turn's length as its duration and latency, and writes neither an arrival line nor a stream-end line, so no journal record covers it; a call row of such a turn whose [start, start + duration] reaches the padded window makes the result INCONCLUSIVE;
++(xiv) for the canary (`scope=canary`: four arms, the real /proc and the system's journalctl, ss, systemctl and systemd-analyze), every inbound request line since the serving process's start is accounted for (review r13, P1: a non-streaming foreign request whose arrival precedes its duration clock by more than the counted range could stand in for an own one): the journal is read from the listener's start and must hold a startup banner (Next.js or Ready: the `[DB] Driver` line is printed at every database open, review r14, P1-2) of every listener pid from [its start - 1 s, its start + 120 s] (a vacuum, a rotation, another sink or a console that is not forwarded is INCONCLUSIVE) and no entry of a listener dated more than 1 s before its start and no request line (arrival or stream-end) of a listener dated before its own start (a wall-clock step against the boot clock, which would move the computed start past lines that are in the journal: review 5, L1-2), and each inbound POST line since the start is matched to a distinct call row of its path, own or foreign, whose estimated start is not more than 3 s before the line, whatever the line's lead over the duration clock (a maximum matching, greedily from the latest line); a line with no call row (a request that left none: dropped, rejected before the call log, or another client's lost row) is INCONCLUSIVE; a listener's own startup lines (from 1 s before ITS start to 120 s after), and the supervisor's restart lines within 10 s before a listener's start, are not restart evidence, in the trial's scope as well; the unit's cgroup is established from the entries of the incarnation (the user manager's own entry about the unit, dated before the child's start, is not one of the unit's processes); a run with CENSUS_PROC_ROOT set, or with a journalctl, ss, systemctl or systemd-analyze that is not the system's, says `scope=canary-fixture` (or `trial-fixture`) and is never canary acceptance (review r13, P2: the process evidence of a fixture could reach `scope=canary`);
++(xv) for the canary, the read r14 of 115b885ba and the command center's ruling add REFUSALS only (every window that PASSes now PASSed before): the listeners' own entries are also read by boot and pid with no wall-clock lower bound (`journalctl --user -u UNIT _BOOT_ID=... _PID=... -o json --all`; each entry is checked again here), so that a step of the wall clock cannot move the computed start past lines that are in the journal
++and the incarnation's arrival lines are those of that read; coverage is the listener's startup banner (Next.js or Ready, never the repeatable `[DB] Driver` line) on the journal's MONOTONIC stamp within 120 s of the process's start in boot-clock seconds (/proc/PID/stat), no banner kind twice for a pid, the realtime minus monotonic offset of the entries of each pid varying by at most 1 s (a step of the wall clock since its birth is INCONCLUSIVE; slewing moves both clocks alike),
++and the service manager's monotonic start stamp of the unit (`systemctl --user show -p ExecMainStartTimestampMonotonic`) not later than the earliest listener's start + 1 s; every call row of the incarnation on a path with arrival lines has a correlation id, no two call rows share one (whatever their paths), and no such path has a call row without a matched arrival line (a request can leave several persisted attempt rows, and the spare row balanced a request that left none: review r14, P1-1);
++The census never says FAIL (the scripts judge the rows) and never says PASS for a window it could not read: an unreadable store or an unparsable input is INCONCLUSIVE. The result line ends `scope=canary` for the canary's four-arm gate and `scope=trial` for anything else (fewer or more arms, a diagnostic run): only `PASS ... scope=canary` accepts the canary; a run whose process evidence is a fixture (CENSUS_PROC_ROOT set, or a journalctl, ss, systemctl or systemd-analyze that is not the system's) ends `scope=canary-fixture` or `scope=trial-fixture`.
++What it cannot exclude: the rows alone cannot attribute a usage row to its request (the usage table has no request key) and the association tolerates numbers that are not identical (latency within 100 ms, a time to first token within 1 ms or not compared when either side is NULL, within 3 s). The census therefore also counts the gateway's own journal lines of inbound POST requests (written when a request arrives, whatever happens to its rows) inside the window, requires exactly as many as there are own call rows and pairs them one to one by time and path (each own call row with a distinct line of the same path that arrived within 3 s of its timestamp minus its duration; the counted range starts 4 s before the window): a foreign request, a request whose call row was never written and an own request that lost its rows each leave a line without a matching row (for the endpoints whose handler logs an arrival line: the chat and responses handlers; `/v1/search` and the gateway's other endpoints log none). What stays outside, which the receipt states verbatim as an untested boundary (the line `UNTESTED-BOUNDARY`, refined by `UNTESTED-BOUNDARY-DETAIL`) next to its evidence classes (the line `EVIDENCE-CLASS`): (1) a foreign request that the gateway did not log or journald did not keep; (2) a lost own line balanced by a same-path foreign line within 3 s, per link of a chain (for the arrival lines measured from the lost request's estimated start, not from its arrival; for the stream-end lines within 0.25 s of the implied start); (3) an unlogged persistence failure (a save skipped while disk persistence is off or saves are closing, the usage insert's same-millisecond dedup); and traffic that is not an inbound POST (a non-streaming foreign request, and a streaming one whose stream-end line comes late (review r13, P1-2), are covered by their arrival lines over the whole incarnation of the canary, not by a stream-end line, and a Responses-over-WebSocket turn is covered by neither journal record, whose rows are stamped at its start: a WebSocket turn whose call row reaches the padded window makes the window INCONCLUSIVE, and one whose call row was lost is a case of items (1) and (3)). A PASS means every own request's rows are present and paired one to one, no row of any other request was seen in the window, the journal's inbound lines in the counted range pair one to one with the own requests and its stream-end groups with them too (the untested boundary above stays outside), the guard was idle at its start, the serving process was the same (listener, start, writer of the request lines) and the wrapper's journal line per arm was 0.
+ --require-arms N (default 4, the canary's four arms: raw, race, native, native tool-call): the number of arm outputs that must be given; fewer or more is INCONCLUSIVE, so that an omitted arm cannot pass unnoticed (a live trial of fewer arms states its own number).
+@@ -51,7 +67,44 @@
+ JOURNAL_UNIT = "omniroute.service"   # the gateway's user unit (the guard's standard invocation names the same one)
+-JOURNAL_PAIR_S = 3.0   # an own call row is paired with the inbound journal line that arrived within this long of (its timestamp - its duration): the same 3 s as the scripts' candidate query (measured offsets on this host: median 0.011 s, p99 0.28 s, max 2.6 s)
++JOURNAL_PAIR_S = 3.0   # an own call row is paired with the inbound journal line of its path within this long of its ESTIMATED START (its timestamp - its duration): the same 3 s as the scripts' candidate query. The estimate is not the request's physical arrival: the arrival line is written before the policy work, the credential refresh and the duration clock, by a delay that nothing bounds (what was measured on this host's rows is in checks/census-calibration-measurements.txt and is not an enforced invariant)
+ JOURNAL_PAD_S = 2   # the journal is read this much beyond the counted range
+-JOURNAL_LEAD_S = CANDIDATE_SECONDS + 1.0   # arrival lines are counted from this long BEFORE the window's start: a foreign request whose usage row could stand in for an own one (up to 3 s before the own row, a latency within 0.1 s of the own) arrived at most 3.1 s before that own request, which starts inside the window
+-JOURNAL_STDERR_ALARM = re.compile(r"(?i)truncat|corrupt|ignor|fail|error|inconsisten|skipp|missing|unavailable|denied")   # words with which journalctl reports data that it did not read
++JOURNAL_LEAD_S = CANDIDATE_SECONDS + 1.0   # arrival lines are counted from this long BEFORE the window's start (the usage pad plus 1 s). It is a width, not a bound: a request's arrival can precede its estimated start (its row's timestamp minus its duration) by a delay that nothing bounds, because the arrival line is written before the policy work, the credential refresh and the duration clock (what this host measured: checks/census-calibration-measurements.txt)
++STREAM_PAIR_START_S = 0.25   # an own call row is paired with the stream-end controller whose implied start (line time - its ms) lies within this of the row's estimated start (measured on 590 pairs of 24 h of this host's traffic: at most 0.047 s; checks/census-calibration-measurements.txt)
++STREAM_GROUP_S = 0.1   # stream-end lines of one process, provider and model whose implied starts differ by at most this are the lines of ONE stream controller
++COMPLETION_MARGIN_S = 1.0   # the stream-end line of a COMPLETED request lies within about 0.2 s of its row, a MEASUREMENT and not an enforced bound: an unread downstream queue delays the line behind the rows without limit (review r13, P1-2) (its console write against the row's timestamp, journald's own stamp 12-25 ms after the write; measured -0.177 to +0.002 s over 541 rows of status 200); after a client that left, the rows follow the line by up to the disconnect grace and an error row can precede its line, which is why the pairing uses the implied START and the counted range reaches the grace back (checks/census-calibration-measurements.txt)
++DEFAULT_DISCONNECT_GRACE_MS = 10000   # STREAM_DISCONNECT_GRACE_PERIOD_MS, src/shared/utils/runtimeTimeouts.ts:48 at OmniRoute c1e30b7676975feb298b49eff6ff58923c04b89e: a client that left after the terminal event: the drain writes the rows at most this long after the stream-end line (streamHandler.ts drainCompletedToolHandoff)
++MAX_DISCONNECT_GRACE_MS = 120000   # a longer grace (the serving process's environment) is not covered: the counted range would have to be that long
++USAGE_START_TOLERANCE_S = 0.25   # a usage row claimed by an own call row must have started (its timestamp minus its latency) within this of the call row's own start (timestamp minus duration): one request has ONE duration clock, and the two rows of the 594 associated pairs measured on this host differ by at most 0.025 s (checks/census-calibration-measurements.txt); the frozen association tolerates 3 s of timestamp
++SERVING_MARGIN_S = 2.0   # the serving process must have started this long before the guard receipt began
++RATE_WINDOW_S = 30.0
++DEFAULT_RATE_BURST = 10000   # journald's compiled-in RateLimitBurst (per RateLimitIntervalSec, default 30 s)
++RATE_SAFETY = 0.1   # the busiest stretch of the range must stay below this fraction of the limit
++PROC_ROOT = os.environ.get("CENSUS_PROC_ROOT") or "/proc"   # the controls point this at a fixture tree; a PASS receipt on the host shows `proc_root=/proc` (a fixture run shows `proc_root=<overridden by CENSUS_PROC_ROOT>` and says `-fixture`)
++CLK_TCK = os.sysconf("SC_CLK_TCK") if hasattr(os, "sysconf") else 100
++STREAM_MARKER = "\U0001F30A [STREAM]"
++STREAM_LINE = re.compile(r"\[STREAM\] (\S+) \| (.*?) \| ([0-9]{1,12})ms \| (.*?)\s*$")
++POST_ABORT = "client_disconnect (post-abort)"
++SUPPRESSED_MESSAGE_ID = "a596d6fe7bfa4994828e72309e95d61e"   # systemd-journald's "Suppressed N messages from UNIT" (the rate limiter): stored in the system journal, which this user cannot read, but a notice that does reach the range is a loss
++RESTART_PATTERNS = tuple((name, re.compile(pattern)) for name, pattern in (
++    ("supervisor: server exited", r"Server exited \(code="),   # bin/cli/runtime/processSupervisor.mjs:206 at OmniRoute c1e30b7676975feb298b49eff6ff58923c04b89e
++    ("supervisor: restarting", r"Restarting in [0-9.]+s"),   # :206
++    ("supervisor: crash budget", r"Server crashed [0-9]+ times"),   # :180
++    ("supervisor: MITM retry", r"Disabling MITM and retrying"),   # :185
++    ("supervisor: spawn error", r"Spawn error:"),   # :163
++    ("supervisor: crash log", r"--- Server crash log ---"),   # :226
++    ("child startup: starting", r"Starting server\.\.\."),
++    ("child startup: next", r"\u25b2 Next\.js"),
++    ("child startup: ready", r"\u2713 Ready in"),
++    ("child startup: database", r"\[DB\] Driver:"),
++))
++JOURNAL_STDERR_ALARM = re.compile(r"(?i)truncat|corrupt|ignor|fail|error|inconsisten|skipp|missing|unavailable|denied|insufficient|not opened|permission")   # words with which journalctl reports data that it did not read
+ MAX_DURATION_MS = 7 * 86400 * 1000   # a request that lasted longer than a week is not a measurement
++ARRIVAL_LAG_EARLY_S = 1.0   # an arrival line's own `time` may not be later than journald's receive stamp by more than this (the gateway writes the line, journald stamps it afterwards)
++ARRIVAL_LAG_MAX_S = 30.0   # ... nor earlier by more than this (measured on this host: 0.010-3.5 s under load, checks/census-calibration-measurements.txt): a larger difference is a clock fault or a forged field
++STARTUP_WINDOW_S = 120.0   # a serving child prints its startup banners within this long of its start (measured on this host: 0.61 s the Next.js banner, 0.61 s Ready, 1.4 s the database driver): the journal must hold a startup banner of every listener pid from [its start - STARTUP_BANNER_LEAD_S, its start + this] (the proof that the read reaches the start), and the diagnostics inside it are the listener's own start
++STARTUP_LEAD_S = 10.0   # ... and the supervisor's restart messages that led to the listener lie at most this long before its start
++STARTUP_BANNER_LEAD_S = 1.0   # a listener's own entries cannot precede its own start by more than the clocks' agreement: an entry dated earlier is a wall-clock step against the boot clock (or a mis-dated start), review r13 L1-2
++MONOTONIC_SPAN_TOLERANCE_S = 1.0   # the realtime minus monotonic offset of the entries of one process varies by at most this: only a STEP of the wall clock changes it (slewing moves both clocks alike; review r14, P1-2 and the review of round 25, R25-4; measured on this host: 0.0 s over 19.3 h)
++HOST_TOOLS = ("journalctl", "ss", "systemctl", "systemd-analyze")   # the programs whose output the census trusts as the host's
++SYSTEM_BIN_DIRS = ("/usr/bin", "/usr/sbin", "/bin", "/sbin")
++SQL_INCARNATION_CALLS = "select id, timestamp, path, duration, method, request_type, correlation_id from call_logs where timestamp >= ? and timestamp <= ? order by timestamp, id"   # every call row since the serving process's start, any requester (review r13, P1)
+ SETTLE_S = 5
+@@ -62,7 +115,8 @@
+ MIN_ID_LENGTH = 20
+-GUARD_SCRIPT_SHA = "62dea3d25040ed6fee469f44332068a0b47f3f4951fdaa309b4e99000378700b"   # pre-switch guard 5 (scripts/pre-switch-guard.py.txt): the idle receipt must come from this script
++GUARD_SCRIPT_SHA = "5c8ccf3fb4ca747ddcf3a427d732cf111a74e6c09358adceba55ea7ead75c95b"   # pre-switch guard 5 as repaired in round 13 (r12-P2-4: executable prefixes; scripts/pre-switch-guard.py.txt): the canary's idle receipt must come from this script
++GUARD_SCRIPT_SHA_BEFORE_R12 = "62dea3d25040ed6fee469f44332068a0b47f3f4951fdaa309b4e99000378700b"   # guard 5 as the full-scope read r12 read it: the same idle-only observation (the repair concerns the prefix checks of the full mode), accepted for a trial, not for the canary
+ GUARD_MAX_INTERVAL_S = 5.0   # the guard's sampling interval (its default): a longer one observes too coarsely
+ SHAPE_MIN_ROWS = {"astra-max": 1, "sol-xhigh": 1, "two-request": 2}   # native script 2.1 SHAPES: the call rows a judged turn needs
+-RESERVED = "RESULT|SUMMARY|FROZEN|RUN-STATUS|IDENTITY|journal_failed_to_save_call_log"
+-LOOSE_RESERVED = re.compile(r"(?i)(" + RESERVED + r")(?![A-Za-z0-9_-])")
++RESERVED = "RESULT|SUMMARY|FROZEN|RUN-STATUS|IDENTITY-PROBLEM|IDENTITY|journal_failed_to_save_call_log"
++LOOSE_RESERVED = re.compile(r"(?i)(?<![A-Za-z0-9_-])(" + RESERVED + r")(?![A-Za-z0-9_-])")
+ LOOSE_FINISHED = re.compile(r"(?i)^[^A-Za-z0-9]*#\s*finished\b")
+@@ -100,2 +154,3 @@
+ SQL_ALL_CALL_STAMPS = "select timestamp from call_logs"
++SQL_WS_TURNS = "select id, timestamp, duration from call_logs where (request_type = 'responses_websocket' or method = 'WEBSOCKET') and timestamp >= ? and timestamp <= ? order by timestamp, id"   # review 4, F1
+ SQL_ALL_USAGE_STAMPS = "select timestamp from usage_history"   # every timestamp of both tables is validated in Python (a glob matches the SHAPE of 2026-99-06 or xxxx-xx-xxTxx:xx:xx.xxxZ)
+@@ -174,9 +229,30 @@
+ 
+-def journal_posts(unit, since, until):
+-    """Every inbound request line (`tag=HTTP method=POST`, message `📥 POST ...`) of the gateway unit's journal between `since` and `until`: (found, info), found a list of (datetime, label, path) and info the command, the binary, its version, its stderr and the number of entries read.
+-    The gateway logs one such line when a request ARRIVES, whatever happens to its call and usage rows afterwards. Raises RuntimeError (the check then fails closed) when the journal cannot be run, exits non-zero, reports a loss on stderr or yields an entry that cannot be read:
+-    a null or non-string MESSAGE (journalctl writes a field over 4096 bytes as null unless it is given --all), a message that starts with `{` and does not parse, an arrival marker that was not counted, a timestamp outside 2000-2100, a line that is not JSON."""
+-    start = since.replace(microsecond=0)
+-    stop = until.replace(microsecond=0) + dt.timedelta(seconds=1)
+-    cmd = ["journalctl", "--user", "-u", unit, "--since", start.strftime("%Y-%m-%d %H:%M:%S") + " UTC", "--until", stop.strftime("%Y-%m-%d %H:%M:%S") + " UTC", "-o", "json", "--all", "--no-pager"]
++# ---------------------------------------------------------------- the gateway's journal: arrival lines, stream-end lines, restart diagnostics, one query
++class JournalError(RuntimeError):
++    """A journal observation that failed. The exact command, the binary, its version and its stderr are kept with the error, so that the receipt shows them when they matter most (r12-P3-5)."""
++
++    def __init__(self, message, info):
++        super().__init__(message)
++        self.info = info
++
++
++def journal_events(unit, since, until, pids=None, boot_id=None):
++    """Every request-lifecycle record of the gateway unit's journal between `since` and `until`, from ONE `journalctl --user -u UNIT -o json --all` run (the user journal; the receipt prints the command):
++      "posts": [(time, label, path, pid)]  inbound-request lines (`tag=HTTP method=POST`, message `\U0001F4E5 POST ...`): written when a request ARRIVES, before the policy work, the credential refresh and the duration clock (src/sse/handlers/chat.ts at OmniRoute c1e30b7676975feb298b49eff6ff58923c04b89e);
++      "streams": [(time, provider, model, ms, status, pid)]  stream-end lines (`\U0001F30A [STREAM] PROVIDER | model | Nms | status`): printed by the stream controller when a stream ends (open-sse/utils/streamHandler.ts logStream: complete, disconnect, aborted, error), whatever happens to the request's rows afterwards;
++      "diagnostics": [(time, name, text, pid)]  the supervisor's restart diagnostics and the child's startup banners (bin/cli/runtime/processSupervisor.mjs): a serving child that was restarted inside the range;
++      "stamps": the time of every entry (the rate check), "cgroups": the _SYSTEMD_CGROUP values of the entries, "cgroup_entries": [(time, value)] (the canary uses only those of the incarnation: the user manager's own entry about the unit is dated before the child's start and lies in the manager's cgroup), "info": the exact command, binary, version, stderr and the number of entries.
++    The time of a stream-end line and of a diagnostic is journald's own `__REALTIME_TIMESTAMP` (its receive stamp, in 2000-2100); the time of an ARRIVAL line is the gateway's own record `time` (the pino field, a valid gateway stamp), which must lie between ARRIVAL_LAG_EARLY_S after and ARRIVAL_LAG_MAX_S before journald's receive stamp of the same entry (else the observation fails: the two clocks disagree or the field was forged). Raises JournalError (the check then fails closed, the receipt keeps the command) when journalctl cannot be run, exits non-zero or times out, writes a word of loss on stderr (data it skipped), or when an entry cannot be read:
++    a line that is not JSON, a null or non-string message (journalctl writes a field over 4096 bytes as null unless it is given --all), a message that starts with `{` and does not parse, an arrival or stream-end marker that was not counted, a timestamp outside 2000-2100."""
++    if pids is not None:   # review r14, P1-2: the listeners' own entries by boot and pid, with NO wall-clock lower bound (a step of the wall clock moves the computed start, so a bounded read can omit lines that are in the journal); the tool's filtering is not trusted, each entry is checked again below
++        cmd = ["journalctl", "--user", "-u", unit, f"_BOOT_ID={boot_id}"] + [f"_PID={p}" for p in sorted(pids)] + ["-o", "json", "--all", "--no-pager"]
++    else:
++        start = since.replace(microsecond=0)
++        stop = until.replace(microsecond=0) + dt.timedelta(seconds=1)
++        cmd = ["journalctl", "--user", "-u", unit, "--since", start.strftime("%Y-%m-%d %H:%M:%S") + " UTC", "--until", stop.strftime("%Y-%m-%d %H:%M:%S") + " UTC", "-o", "json", "--all", "--no-pager"]
++    try:
++        version = subprocess.run(["journalctl", "--version"], capture_output=True, timeout=10).stdout.decode("utf-8", "replace").splitlines()[0][:60]
++    except (OSError, subprocess.TimeoutExpired, IndexError):
++        version = "unavailable"
++    info = {"argv": " ".join(cmd), "binary": shutil.which("journalctl") or "?", "version": version, "stderr": "", "entries": 0, "dropped": 0}
+     try:
+@@ -184,15 +260,20 @@
+     except (OSError, subprocess.TimeoutExpired) as error:
+-        raise RuntimeError(f"journalctl could not be run: {type(error).__name__}")
++        partial = getattr(error, "stderr", None) if isinstance(error, subprocess.TimeoutExpired) else None   # review r13, P3-3: what journalctl wrote to stderr before the timeout is provenance
++        if partial:
++            info["stderr"] = (partial if isinstance(partial, str) else bytes(partial).decode("utf-8", "replace")).strip()[:200]
++        raise JournalError(f"journalctl could not be run: {type(error).__name__}", info)
++    stderr = p.stderr.decode("utf-8", "replace").strip()
++    info["stderr"] = stderr[:200]
+     if p.returncode != 0:
+-        raise RuntimeError(f"journalctl exited with status {p.returncode}")
+-    stderr = p.stderr.decode("utf-8", "replace").strip()
+-    try:
+-        version = subprocess.run(["journalctl", "--version"], capture_output=True, timeout=10).stdout.decode("utf-8", "replace").splitlines()[0][:60]
+-    except (OSError, subprocess.TimeoutExpired, IndexError):
+-        version = "unknown"
+-    info = {"argv": " ".join(cmd), "binary": shutil.which("journalctl") or "?", "version": version, "stderr": stderr[:200], "entries": 0}
++        raise JournalError(f"journalctl exited with status {p.returncode}", info)
+     if stderr and JOURNAL_STDERR_ALARM.search(stderr):
+-        raise RuntimeError(f"journalctl reported on stderr ({stderr[:100]!r}): it may have skipped data")
++        raise JournalError(f"journalctl reported on stderr ({stderr[:100]!r}): it may have skipped data", info)
+     marker = "\U0001F4E5 POST"
+-    found, unreadable = [], 0
++    posts, streams, diagnostics, stamps, cgroups, losses = [], [], [], [], set(), []
++    cgroup_entries = []
++    unreadable = 0
++    skewed = 0
++    first_by_pid = {}
++    off_min, off_max = {}, {}   # per pid: the smallest and the largest realtime-minus-monotonic offset of its entries (constant unless the wall clock stepped)
++    mono_first, mono_last, banner_mono = {}, {}, collections.defaultdict(list)   # the read by boot and pid: per pid the first and the last entry by the journal's MONOTONIC stamp (realtime stamp, seconds), and the monotonic stamps of each startup banner
+     for line in p.stdout.decode("utf-8", "replace").splitlines():
+@@ -211,3 +292,32 @@
+             continue
++        raw_pid = entry.get("_PID")
++        pid = int(raw_pid) if isinstance(raw_pid, str) and raw_pid.isascii() and raw_pid.isdigit() and len(raw_pid) <= 10 else None
++        mono_s = None
++        if pids is not None:
++            if entry.get("_BOOT_ID") != boot_id or pid not in pids:
++                info["dropped"] += 1   # another boot (a reused pid) or another process: counted and printed, never used
++                continue
++            if stamp > until.replace(microsecond=0) + dt.timedelta(seconds=1):
++                continue   # after the counted range: the future of the observation
++            raw_mono = entry.get("__MONOTONIC_TIMESTAMP")
++            if not (isinstance(raw_mono, str) and raw_mono.isascii() and raw_mono.isdigit() and 0 < len(raw_mono) <= 18):
++                unreadable += 1
++                continue
++            mono_s = int(raw_mono) / 1e6
+         info["entries"] += 1
++        stamps.append(stamp)
++        if pid is not None and (pid not in first_by_pid or stamp < first_by_pid[pid]):
++            first_by_pid[pid] = stamp   # the earliest entry of each process: the proof that the range reaches a listener's start
++        if mono_s is not None:
++            if pid not in mono_first or mono_s < mono_first[pid][1]:
++                mono_first[pid] = (stamp, mono_s)
++            if pid not in mono_last or mono_s > mono_last[pid][1]:
++                mono_last[pid] = (stamp, mono_s)
++            off_ = stamp.timestamp() - mono_s
++            off_min[pid] = min(off_min.get(pid, off_), off_)
++            off_max[pid] = max(off_max.get(pid, off_), off_)
++        cgroup = entry.get("_SYSTEMD_CGROUP")
++        if isinstance(cgroup, str) and cgroup:
++            cgroups.add(cgroup)
++            cgroup_entries.append((stamp, cgroup))
+         if "MESSAGE" not in entry:   # an entry without a message field carries no request line
+@@ -221,5 +331,6 @@
+                 continue
+-        if not isinstance(message, str):   # null (a field over 4096 bytes without --all), a number, an object: the line, if it was an arrival line, is not readable
++        if not isinstance(message, str):   # null (a field over 4096 bytes without --all), a number, an object: the line, if it was a request line, is not readable
+             unreadable += 1
+             continue
++        plain = ANSI.sub("", message)
+         counted = False
+@@ -234,9 +345,566 @@
+                 path_match = re.match(r"\U0001F4E5 POST (\S+)", msg)
+-                found.append((stamp, msg[:90], path_match.group(1) if path_match else None))
++                own_time = parse_ts(record.get("time")) if valid_gateway_ts(record.get("time")) else None   # the gateway's own clock when the line was written (journald stamps it 12-25 ms later, under load up to seconds)
++                if own_time is None:
++                    unreadable += 1
++                    continue
++                lag = (stamp - own_time).total_seconds()   # journald's receive stamp minus the gateway's own `time` (measured 0.010-3.5 s on this host)
++                if lag < -ARRIVAL_LAG_EARLY_S or lag > ARRIVAL_LAG_MAX_S:
++                    skewed += 1
++                    continue
++                posts.append((own_time, msg[:90], path_match.group(1) if path_match else None, pid))
+                 counted = True
++        if not message.startswith("{"):   # review 4, P3-1: the gateway's and the supervisor's CONSOLE lines. A JSON record (pino) carries client-controlled text (the model string, the path), is read as a record and is never searched for these markers
++            if STREAM_MARKER in plain:
++                m = STREAM_LINE.search(plain)
++                if m is None:
++                    unreadable += 1
++                    continue
++                streams.append((stamp, m.group(1), m.group(2), int(m.group(3)), m.group(4), pid))
++                counted = True
++            for name, pattern in RESTART_PATTERNS:
++                if pattern.search(plain):
++                    diagnostics.append((stamp, name, plain.strip()[:100], pid))
++                    if mono_s is not None and name.startswith("child startup: "):
++                        banner_mono[(pid, name)].append(mono_s)
++        if entry.get("MESSAGE_ID") == SUPPRESSED_MESSAGE_ID or re.match(r"Suppressed [0-9]+ messages", plain):
++            losses.append((stamp, plain.strip()[:100]))
+         if not counted and marker in message:
+             unreadable += 1
++    if unreadable or skewed:
++        parts = []
++        if unreadable:
++            parts.append(f"{unreadable} journal entry(ies) could not be read (an unparsable line, a null or non-string message, a timestamp outside 2000-2100, or a request marker that was not counted)")
++        if skewed:
++            parts.append(f"{skewed} arrival line(s) carry a `time` more than {ARRIVAL_LAG_MAX_S:g} s before or {ARRIVAL_LAG_EARLY_S:g} s after journald's receive stamp (the gateway's clock and journald's disagree, or the field was forged)")
++        raise JournalError("; ".join(parts) + ": the independent record of the window's requests cannot be trusted", info)
++    return {"posts": posts, "streams": streams, "diagnostics": diagnostics, "stamps": stamps, "cgroups": cgroups, "cgroup_entries": cgroup_entries, "losses": losses, "info": info, "first_by_pid": first_by_pid, "mono_first": mono_first, "mono_last": mono_last, "banner_mono": dict(banner_mono), "off_min": off_min, "off_max": off_max}
++
++
++def stream_groups(streams):
++    """Group the stream-end lines by stream controller. A controller normally prints one PRIMARY line (complete, disconnect: ..., aborted, error: ..., client_disconnect) and, when handleError runs after a disconnect or a completion, an ECHO (`client_disconnect (post-abort)`), but one primary line per controller is NOT an upstream invariant (review r13, P3-5: repeated handleError calls and a handleComplete printed three primary lines for one controller in upstream's node:test): all lines of one controller share its startTime, so lines of one process, provider and model whose
++    implied starts (line time minus its ms) differ by at most STREAM_GROUP_S belong together. Two primary lines that close together are two groups (a conservative counting convention, not controller identity: extra groups leave lines over and make the window INCONCLUSIVE, they never hide a request, and a group is a controller, not an inbound request: a combo's failed attempts and a client's retries each end one), an echo is attached to the nearest primary line of the same process, provider and model whose implied start lies within STREAM_GROUP_S (only that group's echo count rises); an echo with no such primary is a group of its own (primary False), and the census refuses the window for it.
++    A group: {"t", "provider", "model", "ms", "status", "pid", "start" (implied start), "echoes", "primary"}."""
++    primaries = sorted((s for s in streams if s[4] != POST_ABORT), key=lambda s: s[0] - dt.timedelta(milliseconds=s[3]))
++    groups = [{"t": t, "provider": provider, "model": model, "ms": ms, "status": status, "pid": pid, "start": t - dt.timedelta(milliseconds=ms), "echoes": 0, "primary": True} for t, provider, model, ms, status, pid in primaries]
++    for t, provider, model, ms, status, pid in sorted((s for s in streams if s[4] == POST_ABORT), key=lambda s: s[0]):
++        start = t - dt.timedelta(milliseconds=ms)
++        best = None
++        for g in groups:
++            if g["primary"] and (g["pid"], g["provider"], g["model"]) == (pid, provider, model) and g["t"] <= t + dt.timedelta(seconds=STREAM_GROUP_S):
++                gap = abs((g["start"] - start).total_seconds())
++                if gap <= STREAM_GROUP_S and (best is None or gap < best[0]):
++                    best = (gap, g)
++        if best:
++            best[1]["echoes"] += 1
++        else:
++            groups.append({"t": t, "provider": provider, "model": model, "ms": ms, "status": status, "pid": pid, "start": start, "echoes": 0, "primary": False})
++    return groups
++
++
++def pair_counts(edges, n_lines):
++    """A maximum matching of own call rows to lines (edges: {call id: [line index]}): ({line index: call id}, the call ids left over, the line indexes left over). The leftovers of a MAXIMUM matching are the exact counts."""
++    used = {j for js in edges.values() for j in js}
++    left_lines = [j for j in range(n_lines) if j not in used]
++    left_calls, matched_all = [], {}
++    for calls, lines in components(edges):
++        matched = maximum_matching({c: edges[c] for c in calls}, calls)
++        matched_all.update(matched)
++        matched_calls = set(matched.values())
++        left_calls += [c for c in calls if c not in matched_calls]
++        left_lines += [j for j in lines if j not in matched]
++    return matched_all, left_calls, left_lines
++
++
++# ---------------------------------------------------------------- the serving process (r12-P1-2): the listener, its start, its cgroup, its configuration, the holders of the store
++def proc_read(rel, limit=1000000):
++    with open(os.path.join(PROC_ROOT, rel), "rb") as handle:
++        return handle.read(limit)
++
++
++def listener_pids(port):
++    """(ss binary, the pids that ss shows for the listeners on `port`, an error text or None). `ss -Hltnp 'sport = :PORT'`: a record without a pid (another user's process, or ss cannot see it), no listener and unparsable output are errors."""
++    binary = shutil.which("ss") or "?"
++    try:
++        p = subprocess.run(["ss", "-Hltnp", f"sport = :{port}"], capture_output=True, timeout=20)
++    except (OSError, subprocess.TimeoutExpired) as error:
++        return binary, set(), f"ss could not be run ({type(error).__name__})"
++    if p.returncode != 0:
++        return binary, set(), f"ss exited with status {p.returncode}"
++    pids = set()
++    for line in p.stdout.decode("utf-8", "replace").splitlines():
++        if not line.strip():
++            continue
++        if not line.startswith("LISTEN"):
++            return binary, set(), f"an ss line that is not a listener record ({line[:50]!r})"
++        found = re.findall(r"pid=([0-9]{1,10})", line)
++        if not found:
++            return binary, set(), "a listener record without a pid (another user's process, or ss cannot see it)"
++        pids.update(int(x) for x in found)
++    if not pids:
++        return binary, set(), f"no listener on port {port}"
++    return binary, pids, None
++
++
++def process_started(pid, now):
++    """When a process started, on the host clock: the clock ticks since boot of its /proc/PID/stat (field 22) against /proc/uptime, precise to 10 ms (`ps etimes` counts whole seconds)."""
++    uptime = float(proc_read("uptime").split()[0])
++    stat = proc_read(f"{pid}/stat").decode("utf-8", "replace")
++    ticks = int(stat[stat.rindex(")") + 2:].split()[19])
++    return now - dt.timedelta(seconds=uptime - ticks / CLK_TCK)
++
++
++def boottime_minus_monotonic():
++    """The seconds that the kernel has been suspended since boot: CLOCK_BOOTTIME (which the start time of /proc/PID/stat runs on) minus CLOCK_MONOTONIC (which journald's `__MONOTONIC_TIMESTAMP` and the service manager's stamps run on); 0.0 on a fixture /proc root. A process that started after the last suspend is converted exactly; one that started before it comes out too early and is refused (review of round 25, R25-2)."""
++    if PROC_ROOT != "/proc":
++        return 0.0
++    return time.clock_gettime(time.CLOCK_BOOTTIME) - time.clock_gettime(time.CLOCK_MONOTONIC)
++
++
++def process_boot_start(pid):
++    """When a process started, in seconds since boot on the clock of /proc (CLOCK_BOOTTIME): field 22 of its /proc/PID/stat over the clock ticks per second. A step of the wall clock does not move it (the wall-clock start that process_started derives is moved by one: review r14, P1-2)."""
++    stat = proc_read(f"{pid}/stat").decode("utf-8", "replace")
++    return int(stat[stat.rindex(")") + 2:].split()[19]) / CLK_TCK
++
++
++def process_cgroup(pid):
++    for line in proc_read(f"{pid}/cgroup").decode("utf-8", "replace").splitlines():
++        if line.startswith("0::"):
++            return line[3:]
++    return None
++
++
++def process_env(pid, name):
++    for item in proc_read(f"{pid}/environ").split(b"\0"):
++        key, _sep, value = item.partition(b"=")
++        if key == name.encode():
++            return value.decode("utf-8", "replace")
++    return None
++
++
++def store_holders(db):
++    """The processes (of this user: the others are not visible) that hold the store, its -wal or its -shm open, by device and inode, from /proc/*/fd."""
++    wanted = set()
++    for suffix in ("", "-wal", "-shm"):
++        try:
++            st = os.stat(str(db) + suffix)
++            wanted.add((st.st_dev, st.st_ino))
++        except OSError:
++            pass
++    holders = set()
++    for name in os.listdir(PROC_ROOT):
++        if not name.isdigit():
++            continue
++        fd_dir = os.path.join(PROC_ROOT, name, "fd")
++        try:
++            fds = os.listdir(fd_dir)
++        except OSError:
++            continue
++        for fd in fds:
++            try:
++                st = os.stat(os.path.join(fd_dir, fd))
++            except OSError:
++                continue
++            if (st.st_dev, st.st_ino) in wanted:
++                holders.add(int(name))
++                break
++    holders.discard(os.getpid())
++    return holders
++
++
++GRACE_DECIMAL = re.compile(r"[+-]?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)(?:[eE][+-]?[0-9]+)?")
++GRACE_RADIX = re.compile(r"0[xX][0-9a-fA-F]+|0[oO][0-7]+|0[bB][01]+|[+-]?Infinity")
++
++
++def gateway_grace(text):
++    """(milliseconds, source, problem): what readTimeoutMs(env, "STREAM_DISCONNECT_GRACE_PERIOD_MS", 10000, {allowZero: true}) in src/shared/utils/runtimeTimeouts.ts at OmniRoute c1e30b7676975feb298b49eff6ff58923c04b89e makes of the value: an unset, empty or blank value is the default; anything else goes through
++    JavaScript's Number(), and a result that is not finite or is negative is `Invalid ... Using default` (the gateway logs it and uses the default); the value is floored. The census reads the decimal forms that Number() accepts (surrounding whitespace, a sign, a fraction, an exponent: ' 30000', '30000.5', '1e4');
++    the radix and Infinity forms that Number() also accepts are not read (a problem, never a guess), and everything else is NaN there, so the default."""
++    raw = text.strip()
++    if raw == "":
++        return DEFAULT_DISCONNECT_GRACE_MS, "default (the variable is empty)", None
++    if GRACE_RADIX.fullmatch(raw):
++        return DEFAULT_DISCONNECT_GRACE_MS, "default", f"STREAM_DISCONNECT_GRACE_PERIOD_MS={raw[:20]!r} is a form of number that the census does not read (the gateway applies JavaScript's Number() to it)"
++    if GRACE_DECIMAL.fullmatch(raw):
++        value = float(raw)
++        if math.isfinite(value) and value >= 0:
++            return int(math.floor(value)), "the serving process's environment", None
++    return DEFAULT_DISCONNECT_GRACE_MS, f"default (the gateway rejects STREAM_DISCONNECT_GRACE_PERIOD_MS={raw[:20]!r} and uses the default)", None
++
++
++def serving_probe(guard):
++    """The listener(s) on the guard receipt's port before the journal is read (the journal's range depends on the disconnect grace that the serving process runs with): their pids, start times, cgroups and STREAM_DISCONNECT_GRACE_PERIOD_MS (the drain after a client that left after the terminal event: rows follow the stream-end line by at most that long; default 10000 ms, src/shared/utils/runtimeTimeouts.ts:48 at OmniRoute c1e30b7)."""
++    probe = {"pids": set(), "starts": {}, "boot_starts": {}, "suspended_s": 0.0, "cgroups": {}, "binary": shutil.which("ss") or "?", "error": None, "port": None, "grace_ms": DEFAULT_DISCONNECT_GRACE_MS, "grace_source": "default", "grace_problem": None}
++    if guard is None:
++        probe["error"] = "no guard receipt (a diagnostic run)"
++        return probe
++    probe["port"] = guard.get("port") or GUARD_EXPECT["port"]
++    probe["binary"], probe["pids"], probe["error"] = listener_pids(probe["port"])
++    if probe["error"]:
++        return probe
++    now = now_utc()
++    try:
++        values = set()
++        probe["suspended_s"] = boottime_minus_monotonic()
++        for pid in sorted(probe["pids"]):
++            probe["starts"][pid] = process_started(pid, now)
++            probe["boot_starts"][pid] = process_boot_start(pid) - probe["suspended_s"]   # on the monotonic clock of the journal and the service manager
++            probe["cgroups"][pid] = process_cgroup(pid)
++            values.add(process_env(pid, "STREAM_DISCONNECT_GRACE_PERIOD_MS"))
++    except (OSError, ValueError, IndexError) as error:
++        probe["error"] = f"the listener's /proc entries cannot be read ({type(error).__name__})"
++        return probe
++    if values != {None}:
++        if None in values or len(values) != 1:
++            probe["grace_problem"] = f"the listeners disagree about STREAM_DISCONNECT_GRACE_PERIOD_MS ({sorted(str(v) for v in values)}), so the grace that the counted range must cover is not known"
++        else:
++            probe["grace_ms"], probe["grace_source"], probe["grace_problem"] = gateway_grace(values.pop())
++    if probe["grace_problem"] is None and probe["grace_ms"] > MAX_DISCONNECT_GRACE_MS:
++        probe["grace_problem"] = f"STREAM_DISCONNECT_GRACE_PERIOD_MS={probe['grace_ms']} is longer than the {MAX_DISCONNECT_GRACE_MS} ms the census covers"
++    return probe
++
++
++TIME_UNITS = {"usec": 1e-6, "us": 1e-6, "\u00b5s": 1e-6, "\u03bcs": 1e-6, "msec": 1e-3, "ms": 1e-3, "seconds": 1.0, "second": 1.0, "sec": 1.0, "s": 1.0, "minutes": 60.0, "minute": 60.0, "min": 60.0, "m": 60.0,
++              "hours": 3600.0, "hour": 3600.0, "hr": 3600.0, "h": 3600.0, "days": 86400.0, "day": 86400.0, "d": 86400.0, "weeks": 604800.0, "week": 604800.0, "w": 604800.0,
++              "months": 2629800.0, "month": 2629800.0, "M": 2629800.0, "years": 31557600.0, "year": 31557600.0, "y": 31557600.0}   # systemd.time(7): a month is 30.4375 days, a year 365.25 days; the unit letters are case-sensitive (M is a month, m a minute)
++TIME_PART = r"[0-9]+(?:\.[0-9]+)?\s*(?:" + "|".join(re.escape(k) for k in sorted(TIME_UNITS, key=len, reverse=True)) + r")"
++TIME_SPAN = re.compile(r"\s*(?:" + TIME_PART + r"\s*)+")
++TIME_PIECE = re.compile(r"([0-9]+(?:\.[0-9]+)?)\s*(" + "|".join(re.escape(k) for k in sorted(TIME_UNITS, key=len, reverse=True)) + r")")
++
++
++def seconds_of(text):
++    """systemd.time(7) span such as `30s`, `1min 30s`, `500ms`, `1d`, `1w`, `1M`, `0` -> seconds; None when any part of it is not one. The whole value must be consumed (`30 foo` and `1.5.5s` are refused), the digits are ASCII, the unit letters
++    are case-sensitive, and a bare number (seconds) is a span only when it is the whole value."""
++    t = text.strip()
++    if re.fullmatch(r"[0-9]+(?:\.[0-9]+)?", t):
++        return float(t)
++    if not TIME_SPAN.fullmatch(t):
++        return None
++    return sum(float(number) * TIME_UNITS[unit] for number, unit in TIME_PIECE.findall(t))
++
++
++def journal_limits(unit):
++    """(StandardOutput, StandardError, interval s, burst, source, error): the unit's stream targets and the rate limit that journald applies to it. journald drops the lines of a service that logs more than RateLimitBurst messages in RateLimitIntervalSec and says so only in the SYSTEM journal (which this user cannot read);
++    the unit's own LogRateLimitIntervalSec/LogRateLimitBurst override journald.conf (merged here with `systemd-analyze cat-config`), the compiled-in defaults are 30 s and 10000."""
++    try:
++        shown = subprocess.run(["systemctl", "--user", "show", unit, "-p", "StandardOutput", "-p", "StandardError", "-p", "LogRateLimitIntervalUSec", "-p", "LogRateLimitBurst"], capture_output=True, timeout=20)
++        merged = subprocess.run(["systemd-analyze", "cat-config", "systemd/journald.conf"], capture_output=True, timeout=20)
++    except (OSError, subprocess.TimeoutExpired) as error:
++        return None, None, None, None, None, f"the unit's journal settings cannot be read ({type(error).__name__})"
++    if shown.returncode != 0 or merged.returncode != 0:
++        return None, None, None, None, None, f"the unit's journal settings cannot be read (systemctl exit {shown.returncode}, systemd-analyze exit {merged.returncode})"
++    props = dict(line.split("=", 1) for line in shown.stdout.decode("utf-8", "replace").splitlines() if "=" in line)
++    interval, burst, source = 30.0, DEFAULT_RATE_BURST, "the compiled-in default"
++    for line in merged.stdout.decode("utf-8", "replace").splitlines():
++        m = re.match(r"^\s*(RateLimitIntervalSec|RateLimitInterval|RateLimitBurst)\s*=\s*(.*?)\s*$", line)   # RateLimitInterval= is the deprecated name of RateLimitIntervalSec=
++        if not m:
++            continue
++        if m.group(1) in ("RateLimitIntervalSec", "RateLimitInterval"):
++            value = seconds_of(m.group(2))
++            if value is None:
++                return None, None, None, None, None, f"journald.conf holds {m.group(1)}={m.group(2)[:20]!r}, which is not a time span"
++            interval = value
++        else:
++            if not (m.group(2).isascii() and m.group(2).isdigit()) or len(m.group(2)) > 12:
++                return None, None, None, None, None, f"journald.conf holds RateLimitBurst={m.group(2)[:20]!r}, which is not a number"
++            burst = int(m.group(2))
++        source = "journald.conf"
++    raw_interval, raw_burst = props.get("LogRateLimitIntervalUSec", "0"), props.get("LogRateLimitBurst", "0")
++    unit_interval = seconds_of(raw_interval + "us") if raw_interval.isascii() and raw_interval.isdigit() else seconds_of(raw_interval)
++    if unit_interval is None or not (raw_burst.isascii() and raw_burst.isdigit()) or len(raw_burst) > 12:
++        return None, None, None, None, None, f"the unit's LogRateLimit settings are not numbers ({raw_interval[:20]!r}, {raw_burst[:20]!r})"
++    if unit_interval or int(raw_burst):
++        interval, burst, source = unit_interval or interval, int(raw_burst) or burst, "the unit's LogRateLimit settings"
++    return props.get("StandardOutput"), props.get("StandardError"), interval, burst, source, None
++
++
++def peak_rate(stamps, interval):
++    """The most entries inside any window of `interval` seconds (stamps: datetimes)."""
++    ordered = sorted(stamps)
++    best, low = 0, 0
++    for high, stamp in enumerate(ordered):
++        while (stamp - ordered[low]).total_seconds() > interval:
++            low += 1
++        best = max(best, high - low + 1)
++    return best
++
++
++def serving_check(rep, probe, guard, events, db, canary=False):
++    """r12-P1-2: the identity of the serving process, established where the frozen helpers cannot (MainPID and ExecMainStartTimestamp identify the CLI supervisor, which restarts the serving child on a crash while both stay equal: bin/cli/runtime/processSupervisor.mjs:204 at OmniRoute c1e30b7676975feb298b49eff6ff58923c04b89e):
++    (a) the process listening on the guard receipt's port, its cgroup (the unit's) and its start (before the guard receipt began, with a margin of SERVING_MARGIN_S): any restart of the serving child since then makes it younger;
++    (b) every request line of the range (arrival and stream-end) was written by a listener (a child that was restarted inside the range leaves lines of two pids);
++    (c) the supervisor's restart diagnostics and the child's startup banners do not occur in the range;
++    (d) no other process of this user holds the store open (a second writer's request lines would be in another journal): read at one point in time, not during the window."""
++    where = "proc_root=/proc" if PROC_ROOT == "/proc" else "proc_root=<overridden by CENSUS_PROC_ROOT>"
++    if probe["error"]:
++        rep.say(f"SERVING-PROCESS port={probe['port']} readable=False error={probe['error']} ss={shown_db(probe['binary'])} {where}")
++        rep.bad(f"the process that serves the port cannot be established ({probe['error']}): MainPID and its start time identify the supervisor, not the serving child that the supervisor restarts on a crash, so PASS is not possible")
++        return
++    pids = probe["pids"]
++    line_pids = {p for _t, _l, _path, p in events["posts"]} | {s[5] for s in events["streams"]}
++    cgroups = events["cgroups"]
++    unit_cgroup = next(iter(cgroups)) if len(cgroups) == 1 else None
++    try:
++        holders = store_holders(db)
++    except OSError as error:
++        holders = None
++        rep.bad(f"the processes that hold the store open cannot be listed ({type(error).__name__}): a second writer cannot be excluded")
++    guard_start = guard["start"] if guard is not None else None
++    started = min(probe["starts"][p] for p in pids)
++    def own_start(t, pid):
++        """A listener's own startup banners lie in ITS window [its start - STARTUP_BANNER_LEAD_S, its start + STARTUP_WINDOW_S]; a restart message of another process (the supervisor's) is the start of a listener when it lies in [that listener's start - STARTUP_LEAD_S, its start + STARTUP_WINDOW_S] (review r13, L1-6)."""
++        if pid in pids:
++            s = probe["starts"][pid]
++            return s - dt.timedelta(seconds=STARTUP_BANNER_LEAD_S) <= t <= s + dt.timedelta(seconds=STARTUP_WINDOW_S)
++        return any(probe["starts"][q] - dt.timedelta(seconds=STARTUP_LEAD_S) <= t <= probe["starts"][q] + dt.timedelta(seconds=STARTUP_WINDOW_S) for q in pids)
++    expected = [d for d in events["diagnostics"] if own_start(d[0], d[3])]
++    diagnostics = [d for d in events["diagnostics"] if not own_start(d[0], d[3])]
++    rep.say(f"SERVING-PROCESS port={probe['port']} listener_pids={sorted(pids)} started={[utc(probe['starts'][p]) for p in sorted(pids)]} unit_cgroup={unit_cgroup} request_line_pids={sorted(p for p in line_pids if p is not None)} "
++            f"store_holders={sorted(holders) if holders is not None else None} disconnect_grace_ms={probe['grace_ms']} ({probe['grace_source']}) startup_lines_of_the_listener_itself={len(expected)} restart_or_startup_diagnostics_in_range={len(diagnostics)} guard_start={utc(guard_start) if guard_start else None} ss={shown_db(probe['binary'])} {where}")
++    if probe["grace_problem"]:
++        rep.bad(f"the serving process's disconnect grace cannot be established: {probe['grace_problem']}")
++    if canary:   # coverage of the incarnation (review r13, P1; review 5, L1-2 and L1-3): the journal read must reach every listener's start, on the journal's own clock
++        first = events["first_by_pid"]
++        banner_names = ("child startup: next", "child startup: ready")   # review r14, P1-2: `[DB] Driver:` is printed at EVERY database open (the DB import route too), so it is not evidence of a start
++        banner = {p: min((d[0] for d in events["diagnostics"] if d[3] == p and d[1] in banner_names and own_start(d[0], p)), default=None) for p in pids}
++        missing = sorted(p for p in pids if banner[p] is None)
++        early = sorted(p for p in pids if first.get(p) is not None and (probe["starts"][p] - first[p]).total_seconds() > STARTUP_BANNER_LEAD_S)
++        dropped = events.get("dropped_before_start", ((0, 0), []))
++        rep.say(f"INCARNATION-COVERAGE the serving process started {utc(started)}; first journal entry per listener pid {{{', '.join(f'{p}: {utc(first[p]) if first.get(p) else None}' for p in sorted(pids))}}}, first startup banner of each listener pid {{{', '.join(f'{p}: {utc(banner[p]) if banner[p] else None}' for p in sorted(pids))}}} "
++                f"(needed: a startup banner of each listener from [its start - {STARTUP_BANNER_LEAD_S:g} s, its start + {STARTUP_WINDOW_S:g} s] and no entry of it dated more than {STARTUP_BANNER_LEAD_S:g} s before its start); lines dated before the start and dropped: arrival {dropped[0][0]}, stream-end {dropped[0][1]}, of process(es) {dropped[1]}")
++        if early:
++            rep.bad(f"listener pid(s) {early} wrote journal entries dated more than {STARTUP_BANNER_LEAD_S:g} s before their own process start: the wall clock stepped against the boot clock (a host resume, an NTP step) or the start is mis-dated, so the lines before the computed start were dropped and the incarnation cannot be established")
++        early_lines = events.get("listener_lines_before_own_start", [])
++        if early_lines:
++            rep.bad(f"listener pid(s) {early_lines} wrote request lines (arrival or stream-end) dated before their own process start: a request cannot reach a process that has not started, so the wall clock stepped against the boot clock (a host resume, an NTP step; a step under {STARTUP_BANNER_LEAD_S:g} s passes the check of the listener's other entries) or the start is mis-dated, and the lines before the computed start were dropped")
++        if missing:
++            rep.bad(f"the journal read holds no startup banner (Next.js or Ready) of listener pid(s) {missing} from [their start - {STARTUP_BANNER_LEAD_S:g} s, their start + {STARTUP_WINDOW_S:g} s]: it does not reach the serving process's start (a vacuum, a rotation, another sink, or a console that is not forwarded to the journal), so the arrivals since the start were not all counted")
++    if unit_cgroup is None:
++        rep.bad(f"the journal entries carry {len(cgroups)} different _SYSTEMD_CGROUP values (exactly one is needed): the unit's cgroup, and so the serving child, cannot be established")
++    else:
++        outside = sorted(p for p in pids if probe["cgroups"].get(p) != unit_cgroup)
++        if outside:
++            rep.bad(f"listener pid(s) {outside} are not in the unit's cgroup: another unit or a process of another service answers on the port")
++    if guard_start is not None:
++        late = sorted(p for p in pids if probe["starts"][p] > guard_start - dt.timedelta(seconds=SERVING_MARGIN_S))
++        if late:
++            rep.bad(f"listener pid(s) {late} started after the guard receipt began (less than {SERVING_MARGIN_S:g} s before it, or later): the serving process was started inside the observation, so the idle claim and the window may belong to different processes")
++    named = {p for p in line_pids if p is not None}
++    if not named:
++        rep.bad("no request line (arrival or stream-end) in the journal range names a process (a valid _PID): nothing ties the window's requests to the serving process")
++    else:
++        if None in line_pids:
++            rep.bad("a request line of the range carries no valid _PID (a journal entry without the sender's process id): the process that wrote it cannot be established")
++        if named - pids:
++            rep.bad(f"request lines of the range were written by pid(s) {sorted(named)} but the listener(s) are {sorted(pids)}: the serving child was restarted inside the range (a restart under the supervisor leaves MainPID unchanged), or another process answered")
++    if holders is not None:
++        if not (holders & pids):
++            rep.bad(f"no listener holds the store open (holders {sorted(holders)}): the serving process is not the writer of the rows that were measured")
++        if holders - pids:
++            rep.bad(f"process(es) {sorted(holders - pids)} hold the store open besides the serving process: a second writer of the store, whose request lines are in another journal, cannot be excluded")
++    for t, name, text, p in diagnostics[:20]:
++        rep.say(f"   {name} at {utc(t)} (pid {p}): {text}")
++    if diagnostics:
++        rep.bad(f"{len(diagnostics)} supervisor restart diagnostic(s) or child startup banner(s) in the journal range ({sorted({d[1] for d in diagnostics})}): the serving child was (re)started while the idle receipt and the window were observed")
++
++
++def host_fixture_reasons():
++    """Why this run's process, socket and journal evidence may not be the host's: [] for a run on the real /proc with the system's own journalctl, ss, systemctl and systemd-analyze. A run with a reason says `scope=canary-fixture` (or `trial-fixture`) and is
++    never canary acceptance (review r13, P2: a CENSUS_PROC_ROOT fixture could reach `scope=canary`; the same holds for a shim of the programs that the census trusts)."""
++    reasons = []
++    if PROC_ROOT != "/proc":
++        reasons.append("CENSUS_PROC_ROOT is set")
++    for tool in HOST_TOOLS:
++        found = shutil.which(tool)
++        if found is None or os.path.dirname(os.path.realpath(found)) not in SYSTEM_BIN_DIRS:
++            reasons.append(f"{tool} resolves to {shown_db(found) if found else 'nothing'}, not a system binary")
++    return reasons
++
++
++def incarnation_unmatched(arrivals, rows, tau):
++    """The arrival lines that a maximum matching leaves without a call row. arrivals: [(time, label, path)], rows: [(estimated start, path)]. An arrival may be matched to any call row of its path whose estimated start (its timestamp minus its duration) is not more than tau
++    before the arrival, whatever the arrival's lead over that clock (the line is written before the policy work, the credential refresh and the duration clock, by a delay that nothing bounds); each row serves one arrival. The sets of rows that can serve an arrival are nested
++    (a later arrival can use only the rows that an earlier one can use), so the greedy order from the latest arrival, taking any available row, is a maximum matching: the leftovers are the exact count (the controls check it against a brute force)."""
++    leftovers = []
++    for path in sorted({p for _t, _l, p in arrivals}, key=str):
++        latest_first = sorted((a for a in arrivals if a[2] == path), key=lambda a: a[0], reverse=True)
++        starts = sorted(s for s, p in rows if p == path)
++        j, pool = len(starts), 0
++        for t, label, _p in latest_first:
++            threshold = t - dt.timedelta(seconds=tau)
++            while j > 0 and starts[j - 1] >= threshold:
++                j -= 1
++                pool += 1
++            if pool == 0:
++                leftovers.append((t, label, path))
++            else:
++                pool -= 1
++    return sorted(leftovers, key=lambda a: a[0])
++
++
++def incarnation_check(rep, con, posts, started, u1s, c_hi, bounded=True):
++    """review r13, P1 (r12-P1-1 across the required scope): for the canary, every inbound POST line since the serving process's start is accounted for, so that a foreign request whose arrival precedes its duration clock by more than the counted range cannot stand in
++    for an own one: each line is matched to a distinct call row of its path (any requester), whatever its lead; a line with no call row (a request that left none: dropped, rejected before the call log, another client's lost row) is INCONCLUSIVE.
++    Review r14, P1-1 (REFUSALS only): a request can leave several persisted attempt rows (a failed attempt, then the successful one, one correlation id), and the spare row balanced a request with no row of its own (45 lines matched to 45 rows, PASS). So the incarnation is also INCONCLUSIVE when
++    two call rows share a correlation id (whatever their paths), when a call row of a path with arrival lines has none, and when such a path has call rows without a matched arrival line (the correlation id is read only to refuse; rows are never merged into requests).
++    bounded=False: `posts` come from the read by boot and pid, which has no wall-clock lower bound (review r14, P1-2)."""
++    rows = con.execute(SQL_INCARNATION_CALLS, (utc(started), u1s)).fetchall()
++    starts, corr_of, unreadable = [], [], 0
++    for _id, ts, path, duration, method, request_type, corr in rows:
++        if str(path).startswith("/api/") or method == "WEBSOCKET" or request_type == "responses_websocket":
++            continue   # the gateway's own provider-test calls write no arrival line; a WebSocket turn is refused by its own check
++        t = parse_ts(ts)
++        try:
++            length = float(duration) if duration is not None else 0.0
++        except (TypeError, ValueError, OverflowError):
++            length = float("nan")
++        if t is None or not math.isfinite(length) or length < 0 or length > MAX_DURATION_MS:
++            unreadable += 1
++            continue
++        starts.append((t - dt.timedelta(milliseconds=length), path))
++        corr_of.append((path, corr))
++    arrivals = [(t, label, lpath) for t, label, lpath, _pid in posts if (t >= started or not bounded) and t <= c_hi]
++    leftovers = incarnation_unmatched(arrivals, starts, JOURNAL_PAIR_S)
++    rep.say(f"INCARNATION-ARRIVALS the serving process started {utc(started)}: inbound POST lines since then={len(arrivals)}, call rows since then on inference paths (any requester)={len(starts)}, rows whose duration could not be read={unreadable}, "
++            f"lines with no call row={len(leftovers)} (each line is matched to a distinct call row of its path whose estimated start is not more than {JOURNAL_PAIR_S:g} s before the line, whatever the line's lead over the duration clock: a maximum matching; "
++            f"the lines are {'those of the read by boot and pid, with no wall-clock lower bound' if not bounded else 'those of the bounded read'})")
++    for t, label, _lpath in leftovers[:20]:
++        rep.say(f"   inbound line since the start with no call row at {utc(t)} {label}")
++    if leftovers:
++        rep.bad(f"{len(leftovers)} inbound POST line(s) since the serving process started ({utc(started)}) have no call row of their path (a request that left none: dropped, rejected before the call log, or another client's lost row, whatever its lead over the duration clock): "
++                "a foreign request whose arrival precedes its duration clock by more than the counted range could stand in for an own one, so PASS is not possible")
+     if unreadable:
+-        raise RuntimeError(f"{unreadable} journal entry(ies) could not be read (an unparsable line, a null or non-string message, a timestamp outside 2000-2100, or an arrival marker that was not counted)")
+-    return found, info
++        rep.bad(f"{unreadable} call row(s) since the serving process started have a duration that cannot be read: their estimated start is unknown, so the lines cannot all be matched")
++    arrival_paths = {lpath for _t, _l, lpath in arrivals}
++    on_paths = [(p, c) for p, c in corr_of if p in arrival_paths]
++    without_id = sum(1 for _p, c in on_paths if not (isinstance(c, str) and c.strip()))
++    shared = {k: n for k, n in collections.Counter(c for _p, c in corr_of if isinstance(c, str) and c.strip()).items() if n > 1}   # whatever the paths of the rows (review of round 25, R25-6)
++    per_rows, per_arrivals, per_left = collections.Counter(p for p, _c in on_paths), collections.Counter(lp for _t, _l, lp in arrivals), collections.Counter(lp for _t, _l, lp in leftovers)
++    surplus = {p: per_rows[p] - (per_arrivals[p] - per_left[p]) for p in per_rows}
++    surplus_rows = sum(v for v in surplus.values() if v > 0)
++    rep.say(f"INCARNATION-ROWS call rows since the start on the paths with arrival lines={len(on_paths)}, rows without a correlation id={without_id}, correlation ids shared by several rows={len(shared)} (rows {sum(shared.values())}), call rows without a matched arrival line on their path={surplus_rows} "
++            "(a request can leave several persisted attempt rows with one correlation id: such a spare row could balance a request that left none; the correlation id is read only to refuse)")
++    if without_id:
++        rep.bad(f"{without_id} call row(s) since the serving process started, on paths with arrival lines, carry no correlation id: whether such a row is a further attempt of a request that already has a row cannot be established, and a spare row could stand in for a request with no row of its own (review r14, P1-1)")
++    if shared:
++        rep.bad(f"{len(shared)} correlation id(s) are shared by {sum(shared.values())} call rows since the serving process started (several persisted attempt rows of one request, whatever their paths, or a client that reuses an id): the rows of one request are not told apart from those of other requests, "
++                "and a spare attempt row could stand in for a request with no row of its own (review r14, P1-1)")
++    if surplus_rows:
++        rep.bad(f"{surplus_rows} call row(s) on paths with arrival lines have no inbound line of their own (no arrival line is matched to them) since the serving process started ({dict(sorted((str(p), n) for p, n in surplus.items() if n > 0))}): a request whose arrival line was not logged or not kept, or a further attempt row, could balance a request that left no row (review r14, P1-1)")
++
++
++def read_boot_id():
++    """This boot's id as journald writes it (_BOOT_ID: 32 lower-case hex digits), or None."""
++    try:
++        raw = proc_read("sys/kernel/random/boot_id", 100).decode("ascii", "replace").strip().replace("-", "").lower()
++    except OSError:
++        return None
++    return raw if re.fullmatch(r"[0-9a-f]{32}", raw) else None
++
++
++def unit_manager_stamp(unit):
++    """(MainPID, the service manager's MONOTONIC start stamp of the unit's main process in seconds since boot, error): `systemctl --user show UNIT -p MainPID -p ExecMainStartTimestampMonotonic`. The manager's stamp is a boot-clock reading, so a step of the wall clock does not move it."""
++    try:
++        shown = subprocess.run(["systemctl", "--user", "show", unit, "-p", "MainPID", "-p", "ExecMainStartTimestampMonotonic"], capture_output=True, timeout=20)
++    except (OSError, subprocess.TimeoutExpired) as error:
++        return None, None, f"the service manager cannot be asked ({type(error).__name__})"
++    if shown.returncode != 0:
++        return None, None, f"systemctl exited with status {shown.returncode}"
++    props = dict(line.split("=", 1) for line in shown.stdout.decode("utf-8", "replace").splitlines() if "=" in line)
++    raw, main = props.get("ExecMainStartTimestampMonotonic", ""), props.get("MainPID", "")
++    if not (raw.isascii() and raw.isdigit() and 0 < len(raw) <= 18 and int(raw) > 0):
++        return None, None, f"the manager's ExecMainStartTimestampMonotonic is {raw[:20]!r}, not a positive number of microseconds"
++    return (int(main) if main.isascii() and main.isdigit() and len(main) <= 10 else None), int(raw) / 1e6, None
++
++
++def monotonic_birth_check(rep, probe, until, legacy_posts, started, c_hi):
++    """review r14, P1-2 and the command center's ruling J757-R14-FIX (REFUSALS only): the canary's coverage from process-birth evidence that a step of the wall clock does not move. The listeners' own entries are read by boot and pid with no wall-clock lower bound (a step moved the computed start past lines that were
++    in the journal, and a later genuine `[DB] Driver` line, printed at every database open, then satisfied the old banner rule). For each listener pid: the journal's first entry (by its MONOTONIC stamp) is not older than the process and not later than 120 s after its start (the start from /proc converted to the
++    monotonic clock: R25-2), a startup banner (Next.js or Ready) of the pid lies in that window on the monotonic stamp, no banner kind occurs twice for the pid, and the realtime minus monotonic offset of its entries varies by at most 1 s (only a step of the wall clock changes it: R25-4); the service manager's monotonic start stamp
++    of the unit is not later than the earliest listener's start. The read by boot and pid must also hold every arrival line of a listener that the bounded read counted (R25-1: a line of another boot, or entries that journalctl left out, made r25 PASS where r24 refused). Returns the events of the read (None when it could not be made)."""
++    pids = sorted(probe["pids"])
++    boot_id = read_boot_id()
++    if boot_id is None:
++        rep.say("INCARNATION-BIRTH boot_id=unreadable")
++        rep.bad("the boot id cannot be read (/proc/sys/kernel/random/boot_id): the serving processes' journal entries cannot be tied to this boot, so the incarnation's coverage cannot be established from process-birth evidence (review r14, P1-2)")
++        return None
++    try:
++        inc = journal_events(JOURNAL_UNIT, None, until, pids=pids, boot_id=boot_id)
++    except JournalError as error:
++        failed = error.info
++        rep.say(f"INCARNATION-JOURNAL-COMMAND argv={failed['argv']} binary={shown_db(failed['binary'])} version={failed['version']!r} stderr={failed['stderr']!r} entries_read={failed['entries']}")
++        rep.bad(f"the serving processes' own journal entries (by boot and pid) cannot be read ({error}): the incarnation's coverage cannot be established from process-birth evidence (review r14, P1-2)")
++        return None
++    jinfo = inc["info"]
++    rep.say(f"INCARNATION-JOURNAL-COMMAND argv={jinfo['argv']} binary={shown_db(jinfo['binary'])} version={jinfo['version']!r} stderr={jinfo['stderr']!r} entries_read={jinfo['entries']} entries_dropped_for_another_boot_or_pid={jinfo['dropped']} arrival_lines_read={len(inc['posts'])}")
++    have = collections.Counter((t, label, lpath, pid) for t, label, lpath, pid in inc["posts"])
++    need = collections.Counter((t, label, lpath, pid) for t, label, lpath, pid in legacy_posts if pid in probe["pids"] and started <= t <= c_hi)
++    missing_lines = sum((need - have).values())
++    main_pid, unit_mono, unit_error = unit_manager_stamp(JOURNAL_UNIT)
++    kinds = {"next": "child startup: next", "ready": "child startup: ready", "database": "child startup: database"}
++    shown_pids, missing, early, late_first, uncovered, repeated, steps = [], [], [], [], [], [], []
++    for p in pids:
++        born = probe["boot_starts"][p]
++        first, last = inc["mono_first"].get(p), inc["mono_last"].get(p)
++        counts = {k: len(inc["banner_mono"].get((p, n), [])) for k, n in kinds.items()}
++        if first is None:
++            missing.append(p)
++            shown_pids.append(f"{p}: boot_start_s={born:.2f} no entry of this boot")
++            continue
++        age = first[1] - born
++        spread = inc["off_max"][p] - inc["off_min"][p]
++        shown_pids.append(f"{p}: boot_start_s={born:.2f} first_entry_age_s={age:.2f} banners={counts} span_realtime_s={(last[0] - first[0]).total_seconds():.2f} span_monotonic_s={last[1] - first[1]:.2f} offset_spread_s={spread:.2f}")
++        if age < -STARTUP_BANNER_LEAD_S:
++            early.append(p)
++        if age > STARTUP_WINDOW_S:
++            late_first.append(p)
++        if not any(born - STARTUP_BANNER_LEAD_S <= m <= born + STARTUP_WINDOW_S for n in (kinds["next"], kinds["ready"]) for m in inc["banner_mono"].get((p, n), [])):
++            uncovered.append(p)
++        if any(c > 1 for c in counts.values()):
++            repeated.append((p, {k: c for k, c in counts.items() if c > 1}))
++        if spread > MONOTONIC_SPAN_TOLERANCE_S:
++            steps.append((p, round(spread, 2)))
++    earliest_born = min(probe["boot_starts"][p] for p in pids)
++    rep.say(f"INCARNATION-BIRTH boot_id={boot_id[:8]} listener_pids={pids} kernel_suspended_s={probe['suspended_s']:.2f} unit_manager_main_pid={main_pid} unit_manager_start_mono_s={unit_mono if unit_mono is not None else 'unreadable'} " + "; ".join(shown_pids) +
++            f" arrival_lines_of_the_bounded_read_missing_from_this_read={missing_lines} (needed, on the monotonic clock: a first entry of each listener from {STARTUP_BANNER_LEAD_S:g} s before to {STARTUP_WINDOW_S:g} s after its start, a Next.js or Ready banner in that window, each banner kind at most once, the realtime minus monotonic offset of its entries varying by at most {MONOTONIC_SPAN_TOLERANCE_S:g} s, "
++            "the manager's start stamp of the unit not later than the earliest listener's start + 1 s, and every arrival line of the bounded read also in this read)")
++    if missing:
++        rep.bad(f"the journal holds no entry of listener pid(s) {missing} for this boot: the serving process's own lines cannot be read, so the incarnation's arrivals were not all counted (review r14, P1-2)")
++    if early:
++        rep.bad(f"listener pid(s) {early} have a journal entry dated on the monotonic clock more than {STARTUP_BANNER_LEAD_S:g} s before the process started: the entries are of another process (a reused pid) or the start is mis-read")
++    if late_first:
++        rep.bad(f"the first journal entry of listener pid(s) {late_first} is later than {STARTUP_WINDOW_S:g} s after the process started (on the monotonic clock): the oldest part of the journal is missing (a vacuum, a rotation), so the incarnation's early arrivals were not counted")
++    if uncovered:
++        rep.bad(f"the journal holds no startup banner (Next.js or Ready) of listener pid(s) {uncovered} within [their start - {STARTUP_BANNER_LEAD_S:g} s, their start + {STARTUP_WINDOW_S:g} s] on the monotonic clock: the read does not reach the process's birth (the `[DB] Driver` line is printed at every database open and is no evidence of a start)")
++    if repeated:
++        rep.bad(f"listener pid(s) show a startup banner kind more than once ({repeated}): Next.js and Ready are printed once per process start, so a repeat is not birth evidence (a restart), and a second `[DB] Driver` line is a second database open (an import can replace the store under the census)")
++    if steps:
++        rep.bad(f"the realtime minus monotonic offset of the journal entries of listener pid(s) {steps} varies by more than {MONOTONIC_SPAN_TOLERANCE_S:g} s (seconds, largest minus smallest): the wall clock stepped since the process's birth, so the wall-clock stamps of the incarnation are not comparable (review r14, P1-2)")
++    if missing_lines:
++        rep.bad(f"{missing_lines} arrival line(s) of a listener that the bounded read counted are not in the read by boot and pid (entries of another boot, or entries that journalctl left out of the pid read): the read by boot and pid is not a superset of the bounded read, so the incarnation's arrivals cannot be established from it (review of round 25, R25-1)")
++    if unit_error:
++        rep.bad(f"the service manager's monotonic start stamp of the unit cannot be read ({unit_error}): the unit's run cannot be tied to the listeners by a clock that a wall-clock step does not move (review r14, P1-2)")
++    elif unit_mono > earliest_born + 1.0:
++        rep.bad(f"the service manager's monotonic start stamp of the unit ({unit_mono:.2f} s) is later than the earliest listener's start ({earliest_born:.2f} s) by more than 1 s: a listener older than its unit's run (a process of an earlier run that the manager did not stop, or a reused pid)")
++    return inc
++
++
++def journal_limit_check(rep, events):
++    """What journald keeps: it drops the lines of a service that exceeds its rate limit and says so only in the system journal, which this user cannot read, so the census bounds the busiest stretch of the range against the limit (a tenth of it) instead."""
++    stdout, stderr, interval, burst, source, error = journal_limits(JOURNAL_UNIT)
++    if error:
++        rep.say(f"JOURNAL-LIMITS unit={JOURNAL_UNIT} readable=False error={error}")
++        rep.bad(f"{error}: whether journald kept every line of the range cannot be established")
++        return
++    for t, text_ in events["losses"][:10]:
++        rep.say(f"   journald loss notice at {utc(t)}: {text_}")
++    if events["losses"]:
++        rep.bad(f"journald reports {len(events['losses'])} loss notice(s) (`Suppressed N messages`) in the journal range: lines of the range were dropped")
++    limited = bool(interval and burst)
++    peak = peak_rate(events["stamps"], interval if limited else RATE_WINDOW_S)
++    rep.say(f"JOURNAL-LIMITS unit={JOURNAL_UNIT} StandardOutput={stdout} StandardError={stderr} rate_limit={'off' if not limited else f'{burst} messages per {interval:g} s ({source})'} peak_entries_in_range={peak} within any {interval if limited else RATE_WINDOW_S:g} s (journald's suppression notice is in the system journal, which this user cannot read)")
++    for name, value in (("StandardOutput", stdout), ("StandardError", stderr)):
++        if not ((value or "").startswith("journal") or (name == "StandardError" and value == "inherit" and (stdout or "").startswith("journal"))):   # `inherit` is the stderr default: it follows StandardOutput
++            rep.bad(f"the unit's {name} is {value!r}, not the journal: its lines would not be in the journal at all")
++    if limited and peak >= RATE_SAFETY * burst:
++        rep.bad(f"the unit logged {peak} entries within {interval:g} s in the range, a tenth or more of the journald rate limit ({burst} per {interval:g} s, {source}): journald may have dropped lines, and its notice is not readable here")
+ 
+@@ -329,3 +997,3 @@
+     arm = {"name": os.path.basename(path), "kind": None, "version": None, "script_sha": None, "db": None, "db_resolved": None, "cwd": None, "requests": [], "journal": "missing", "problems": [], "source": "", "run_status": None, "run_statuses": [],
+-           "identities": [], "pid": None, "unit_started": None, "wrapper_kind": None, "header_n": 0, "finished_n": 0}
++           "identities": [], "pid": None, "unit_started": None, "wrapper_kind": None, "header_n": 0, "finished_n": 0, "expect": None, "wait1": None, "wait2": None, "summary_exit": None}
+     wrapper_start = wrapper_end = script_start = script_end = None
+@@ -369,2 +1037,3 @@
+                 arm["cwd"] = (re.search(r"\bcwd=(.+?) start=", line) or [None, None])[1]
++                arm["expect"], arm["wait1"], arm["wait2"] = ((re.search(r"\b" + key + r"=(\S+)", line) or [None, None])[1] for key in ("expect", "wait1", "wait2"))
+             continue
+@@ -382,2 +1051,3 @@
+             summary_seen = True
++            arm["summary_exit"] = m.group(2)
+             script_end = parse_ts(m.group(1))
+@@ -398,3 +1068,3 @@
+             continue
+-        m = re.match(r"^RUN-STATUS \S+ status=([0-9]+)\b", line)
++        m = re.match(r"^RUN-STATUS \S+ status=([0-9]{1,6})\b", line)
+         if m:
+@@ -408,3 +1078,3 @@
+             continue
+-        loose = LOOSE_RESERVED.match(re.sub(r"^[^A-Za-z0-9#]+", "", ANSI.sub("", line)))   # a reserved word after a BOM, a zero-width space, a control character or any other prefix, in any letter case
++        loose = LOOSE_RESERVED.search(ANSI.sub("", line))   # a reserved word ANYWHERE in a line that no strict pattern took (after a BOM, a zero-width space, any other prefix, a `#`, in any letter case)
+         if loose:
+@@ -458,2 +1128,4 @@
+             arm["db_resolved"] = db
++        elif arm["cwd"] and "\x00" in arm["cwd"]:
++            arm["problems"].append("the FROZEN cwd= holds a NUL: the store the script read is not established")
+         elif arm["cwd"] and os.path.isabs(arm["cwd"]):
+@@ -484,2 +1156,102 @@
+ 
++ACTIVITY_FIELDS = ("pending_total_before", "pending_total_after", "pending_changed", "connections_active", "active_so_far", "workers", "last_call_log_age_s")
++COUNTER_FIELDS = ("pending_total_before", "pending_total_after", "pending_changed")
++
++
++def activity_values(line):
++    """Round 29 (5f's delta check r17, r16-P2-1 (a)): every activity field is matched ON ITS OWN, whatever the other assignments of the line are, so that an empty or unrelated assignment (`hindsight_processes= pending_changed=True`) cannot swallow the next one,
++    and an EMPTY value (`pending_changed=`) is found and stays invalid evidence instead of counting as absent. Returns {field: [value, ...]} (every occurrence on the line, in order; a key written in quotes is read too: `"pending_changed": true`)."""
++    found = {}
++    for name in ACTIVITY_FIELDS:
++        for m in re.finditer(r"(?<![A-Za-z0-9_])[\"']?" + name + r"[\"']?\s*[=:]\s*[\"']?([^\s,;}\]\"']*)", line, re.I):
++            found.setdefault(name, []).append(m.group(1))
++    return found
++
++
++# The guard's two activity-bearing line shapes, exactly as scripts/pre-switch-guard.py prints them (the sample line at its print of `sample`, the INFO line at its print of `INFO`): every field once, in this order, each with a value of its own shape.
++GUARD_INFO_LINE = re.compile(r"INFO unrelated_remote_records=[0-9]+ connections_seen=[0-9]+ connections_tolerated=[0-9]+ connections_active=[0-9]+ connections_idle=-?[0-9]+ "
++                             r"pending_total_before=(?:[0-9]+|None) pending_total_after=(?:[0-9]+|None) pending_changed=(?:True|False) hindsight_processes=[0-9]+")
++GUARD_SAMPLE_LINE = re.compile(r" {3}sample [0-9]+ at [0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{3}Z: connections=[0-9]+ tolerated_so_far=[0-9]+ active_so_far=[0-9]+ workers=[0-9]+ last_call_log_age_s=(?:none|-?[0-9]+)")
++GUARD_IDENTITY_LINE = re.compile(r" {3}IDENTITY label=idle-only time=[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z unit=\S+ MainPID=[0-9]+ ExecMainStartTimestamp=\S+ NRestarts=(?:[0-9]+|None) running_prefix=\S+ BUILD_SHA=\S+ health=\S+ pending_total=([0-9]+|None)")   # the group is the IDENTITY line's reading of the counter: the same pattern validates the line and extracts the reading
++IDENTITY_COUNTER = re.compile(r"(?<![A-Za-z0-9_])pending_total(?![A-Za-z0-9_])", re.I)   # the IDENTITY line's reading of the gateway's pending-request counter (pending_total_before and pending_total_after are the INFO line's)
++
++
++def receipt_grammar_problem(line):
++    """Round 29 (the command center's ruling J757-R17-FIX: the receipt parser is FAIL-CLOSED as one class fix). Returns the problem of one line of the guard receipt, or "".
++    A line that starts with INFO must be the guard's INFO line exactly, a line that starts with `sample` must be the guard's sample line exactly; any other line that carries an activity field is not in the guard's grammar. A line without an activity field that is neither INFO nor sample is not governed here."""
++    stripped = line.strip()
++    if re.match(r"\s*INFO\b", line, re.I):
++        kind, grammar = "INFO", GUARD_INFO_LINE
++    elif re.match(r"\s*sample\b", line, re.I):
++        kind, grammar = "sample", GUARD_SAMPLE_LINE
++    elif re.match(r"\s*IDENTITY\b", line) and IDENTITY_COUNTER.search(line):
++        kind, grammar = "IDENTITY", GUARD_IDENTITY_LINE
++    elif activity_values(line):
++        return (f"a line of the idle receipt carries an activity field but is neither the guard's INFO line nor one of its sample lines (fail-closed): {stripped[:120]!r} "
++                "(the command center's ruling J757-R17-FIX)")
++    else:
++        return ""
++    if grammar.fullmatch(line) and (kind != "IDENTITY" or (len(IDENTITY_COUNTER.findall(line)) == 1 and not activity_values(line))):   # an IDENTITY line may name pending_total once (a value such as running_prefix=pending_total=7 would otherwise hide a second reading) and carries no activity field at all (its \S+ values could hide one: running_prefix=workers=2; 5f's bounded delta check r19)
++        return ""
++    return (f"the {kind} line of the idle receipt does not match the guard's line grammar exactly (every field once, in the guard's order, with a value of its own shape; an empty value, a missing, repeated, reordered or unknown field is refused; fail-closed): {stripped[:140]!r} "
++            "(the command center's ruling J757-R17-FIX)")
++
++
++def activity_problems(line):
++    """Round 27 (the command center's second condition on the item (2) residual: a window whose idle receipt shows any foreign arrival is INCONCLUSIVE) and round 28 (5f's delta check r16, r16-P2-1: the fields are read BY NAME, in any order, and an incomplete, unreadable or contradictory field is refused instead of being taken as absent).
++    Round 29 (5f's delta check r17, r16-P2-1, and the ruling J757-R17-FIX): the fields are matched one by one (activity_values) behind a fail-closed grammar (receipt_grammar_problem), so that an empty or unrelated assignment cannot hide the next one and an empty value is refused.
++    The activity-bearing fields of one line of the guard receipt (the guard prints them on its INFO line and on every sample line): the gateway's own pending-request counter (pending_total_before, pending_total_after, pending_changed) must be complete, readable and UNCHANGED, no client connection may be active (connections_active, active_so_far),
++    no process of another lane may run (workers) and no call_logs row may be younger than 120 s (last_call_log_age_s). Returns (problems, changed): `changed` is True when the line shows that the counter changed, False when it shows the counter complete and unchanged, None when it carries no counter."""
++    found_all = activity_values(line)   # round 29: each field on its own
++    found = {key: values[0] for key, values in found_all.items()}
++    repeated = {key for key, values in found_all.items() if len(values) > 1}
++    if not found:
++        return [], None
++    reasons, changed = [], None
++    if repeated:
++        reasons.append("repeated field(s) " + ", ".join(sorted(repeated)))
++    counter = [k for k in COUNTER_FIELDS if k in found]
++    if counter:
++        totals = {}
++        for key in ("pending_total_before", "pending_total_after"):
++            if key in found:
++                if re.fullmatch(r"-?[0-9]{1,18}", found[key]):
++                    totals[key] = int(found[key])
++                else:
++                    reasons.append(f"{key}={found[key]} is not a readable number")
++        flag = None
++        if "pending_changed" in found:
++            if found["pending_changed"].lower() in ("true", "false"):
++                flag = found["pending_changed"].lower() == "true"
++            else:
++                reasons.append(f"pending_changed={found['pending_changed']} is neither True nor False")
++        missing = [k for k in COUNTER_FIELDS if k not in found]
++        if missing:
++            reasons.append("the pending-request counter is incomplete (" + ", ".join(missing) + " missing)")
++        differ = len(totals) == 2 and totals["pending_total_before"] != totals["pending_total_after"]
++        if flag is True:
++            reasons.append("pending_changed=True")
++        if differ:
++            reasons.append(f"the totals differ ({totals['pending_total_before']} and {totals['pending_total_after']})")
++        if flag is True or differ:
++            changed = True
++        elif flag is False and len(totals) == 2 and not missing and not repeated:
++            changed = False
++    for key in ("connections_active", "active_so_far", "workers"):
++        if key in found:
++            if not re.fullmatch(r"[0-9]{1,9}", found[key]):
++                reasons.append(f"{key}={found[key]} is not a readable number")
++            elif int(found[key]) > 0:
++                reasons.append(f"{key}={found[key]}")
++    if "last_call_log_age_s" in found and found["last_call_log_age_s"].lower() != "none":
++        if not re.fullmatch(r"[0-9]{1,12}(\.[0-9]+)?", found["last_call_log_age_s"]):
++            reasons.append(f"last_call_log_age_s={found['last_call_log_age_s']} is not a readable number")
++        elif float(found["last_call_log_age_s"]) < 120:
++            reasons.append(f"last_call_log_age_s={found['last_call_log_age_s']} (a call_logs row younger than 120 s)")
++    if not reasons:
++        return [], changed
++    return [f"the idle receipt shows foreign activity, or cannot show its absence ({'; '.join(reasons)}): the gateway's own pending-request counter must be complete, readable and unchanged, and no client connection, process of another lane or recent call_logs row may appear, on the line {line.strip()[:120]!r} "
++            "(the command center's second condition on the item (2) residual, ruling J757-R15-FIX; review r16, P2-1)"], changed
++
++
+ def parse_guard(path):
+@@ -489,2 +1261,18 @@
+     for line in read_text(path, "guard receipt").splitlines():
++        grammar_problem = receipt_grammar_problem(line)   # round 29 (ruling J757-R17-FIX): fail-closed grammar of the activity-bearing lines, on every line of the receipt
++        if grammar_problem:
++            g["problems"].append(grammar_problem)
++        if any(key in activity_values(line) for key in COUNTER_FIELDS):   # round 29 (5f's delta check r17, r16-P2-1 (b)): the guard prints its pending-request counter ONCE, on the INFO line (the sample fields repeat on every sample line and are not counted); a second line that carries it cannot be reconciled and is refused, equal or not
++            g["counter_lines"] = g.get("counter_lines", 0) + 1
++            if g["counter_lines"] == 2:
++                g["problems"].append("the idle receipt carries more than one pending-request counter summary (a second line with pending_total_before, pending_total_after or pending_changed): the guard prints one, two summaries cannot be reconciled "
++                                     "(the command center's second condition on the item (2) residual and its ruling J757-R17-FIX; review r17, r16-P2-1)")
++        id_total = GUARD_IDENTITY_LINE.fullmatch(line)   # round 30 (RULING-757-R19): the identity read-back's reading of the gateway's pending-request counter, taken from the native line only (and only when the name occurs once on it), kept for the reconciliation after the loop
++        if id_total and len(IDENTITY_COUNTER.findall(line)) == 1 and "identity_pending" not in g:
++            g["identity_pending"] = id_total.group(1)
++        if GUARD_INFO_LINE.fullmatch(line):
++            g["info_lines"] = g.get("info_lines", 0) + 1
++            if "info_totals" not in g:
++                info_totals = re.search(r"\bpending_total_before=(\S+) pending_total_after=(\S+)", line)
++                g["info_totals"] = (info_totals.group(1), info_totals.group(2))
+         if re.match(r"^\s*GUARD(?![A-Za-z0-9_-])", line):
+@@ -497,2 +1285,4 @@
+             g["problems"].append(f"a CHECK line of the receipt says FAIL: {line[:70]!r}")
++        if line.startswith("GUARD version=") and len(re.findall(r"\bstart=", line)) > 1:
++            g["problems"].append("the GUARD line holds more than one start= field: the first would be taken")
+         m = re.match(r"^GUARD version=(\S+) mode=(\S+) script_sha256=([0-9a-f]{64}) start=(\S+) .*?\bclean_for=(\S+)", line)
+@@ -520,2 +1310,24 @@
+             results.append((m.group(1) == "True", m.group(2), parse_ts(m.group(3))))
++        m = re.match(r"^\s*INFO\b.*?\bpending_total_before=(\S+)\s+pending_total_after=(\S+)\s+pending_changed=(True|False)\b", line)
++        if m:   # round 27: the gateway's own pending-request counter, which the guard prints as informational; a change during the idle observation shows a request that arrived or finished while the lane was to be idle
++            before, after, flag = m.group(1), m.group(2), m.group(3) == "True"
++            differ = before.lstrip("-").isdigit() and after.lstrip("-").isdigit() and int(before) != int(after)
++            g["pending_changed"] = bool(g.get("pending_changed")) or flag or differ
++            if flag or differ:
++                g["problems"].append(f"the INFO line shows that the gateway's own pending-request counter changed during the idle observation (pending_total_before={before}, pending_total_after={after}, pending_changed={flag}): a request arrived or finished while the lane was to be idle, so the idle receipt shows foreign traffic "
++                                     "(the command center's second condition on the item (2) residual, ruling J757-R15-FIX)")
++        line_problems, line_changed = activity_problems(line)   # round 28: the activity-bearing fields of every line (the INFO line, the sample lines), read by name, in any order; the round-27 statement above is kept as it stands (a complete line in the normal order)
++        g["problems"].extend(line_problems)
++        if line_changed is not None:
++            g["pending_changed"] = True if (line_changed or g.get("pending_changed")) else False
++    if g.get("identity_pending") is not None:   # round 30 (5f's delta check r18, P1; RULING-757-R19): the IDENTITY line's pending_total is the same counter that INFO reads before and after the observation (the guard reads it at the identity read-back, then pend0, then pend1)
++        id_reading = g["identity_pending"]
++        if not re.fullmatch(r"[0-9]{1,18}", id_reading):
++            g["problems"].append(f"the IDENTITY line's pending_total={id_reading!r} is not a readable number: an unknown observation of the gateway's own pending-request counter is not proof of quiet (5f's delta check r18; RULING-757-R19)")
++        elif g.get("info_totals"):
++            readable = [v for v in (id_reading, *g["info_totals"]) if re.fullmatch(r"[0-9]{1,18}", v)]
++            if len({int(v) for v in readable}) > 1:
++                g["pending_changed"] = True
++                g["problems"].append(f"the gateway's own pending-request counter is not the same at the identity read-back (pending_total={id_reading}) and in the INFO line (pending_total_before={g['info_totals'][0]}, pending_total_after={g['info_totals'][1]}): a request arrived or finished "
++                                     "between the readings, inside the receipt's interval (5f's delta check r18, P1; RULING-757-R19; the command center's second condition on the item (2) residual)")
+     if g.get("guard_lines", 0) != 1 or g.get("identity_lines", 0) > 1:
+@@ -524,3 +1336,3 @@
+         g["problems"].append(f"{g.get('result_lines', 0)} IDLE-RESULT or GUARD-RESULT line(s) in the receipt (exactly one IDLE-RESULT is needed; another result line, even a malformed one, is refused)")
+-    if g["version"] == "5" and g.get("script_sha") != GUARD_SCRIPT_SHA:
++    if g["version"] == "5" and g.get("script_sha") not in (GUARD_SCRIPT_SHA, GUARD_SCRIPT_SHA_BEFORE_R12):
+         g["problems"].append(f"the receipt is from a guard script of sha256 {str(g.get('script_sha'))[:12]}, not guard 5 ({GUARD_SCRIPT_SHA[:12]})")
+@@ -626,4 +1438,6 @@
+     canary_gate = require_arms == DEFAULT_REQUIRED_ARMS and not diagnostic   # the canary contract: four wrapper arms (raw set, race set, native one-request set, native tool-call set, from `run-acceptance.sh canary`), each with the wrapper's header and identity lines
+-    scope = "canary" if canary_gate else "trial"
+-    rep.say(f"SCOPE {scope}" + ("" if canary_gate else ": not the canary's four arms (or a diagnostic run): a PASS here is a trial result, not canary acceptance"))
++    fixture_reasons = host_fixture_reasons()
++    scope = ("canary" if canary_gate else "trial") + ("-fixture" if fixture_reasons else "")
++    rep.say(f"SCOPE {scope}" + ("" if canary_gate else ": not the canary's four arms (or a diagnostic run): a PASS here is a trial result, not canary acceptance")
++            + (f" FIXTURE ({'; '.join(fixture_reasons)}): the process, socket and journal evidence may not be the host's, so this run can never be canary acceptance (the protocol accepts only `scope=canary`)" if fixture_reasons else ""))
+     if canary_gate:
+@@ -646,2 +1460,7 @@
+                 rep.bad(f"arm {index} ({a['name']}) holds {a['header_n']} wrapper header(s) and {a['finished_n']} `# finished` line(s): the wrapper's output is complete only with one of each")
++        for index, a in enumerate(arms, 1):
++            if (a["expect"], a["wait1"], a["wait2"]) != ("all-logged", "12.0", "60.0"):
++                rep.bad(f"arm {index} ({a['name']}) ran with expect={a['expect']} wait1={a['wait1']} wait2={a['wait2']}: the canary's wrapper fixes --expect all-logged --wait1 12 --wait2 60, so the frozen script's own verdict and its two reads are not those of the canary")
++            if a["summary_exit"] != "0":
++                rep.bad(f"arm {index} ({a['name']}) holds a SUMMARY line with exit={a['summary_exit']}: the canary needs the script's own exit status 0 next to the wrapper's RUN-STATUS 0")
+         for index, a in enumerate(arms, 1):
+@@ -666,5 +1485,7 @@
+         guard = parse_guard(guard_path)
+-        rep.say(f"GUARD file={guard['name']} version={guard['version']} mode={guard['mode']} clean_for={guard['clean_for']} start={utc(guard['start']) if guard['start'] else None} end={utc(guard['end']) if guard['end'] else None} clean={guard['clean']}")
++        rep.say(f"GUARD file={guard['name']} version={guard['version']} mode={guard['mode']} clean_for={guard['clean_for']} start={utc(guard['start']) if guard['start'] else None} end={utc(guard['end']) if guard['end'] else None} clean={guard['clean']} pending_changed={guard.get('pending_changed')}")
+         for problem in guard["problems"]:
+             rep.bad(f"guard receipt: {problem}")
++        if canary_gate and guard.get("script_sha") == GUARD_SCRIPT_SHA_BEFORE_R12:
++            rep.bad(f"the idle receipt is from the guard of sha256 {GUARD_SCRIPT_SHA_BEFORE_R12[:12]} (guard 5 before round 13's repair of the prefix checks): the canary needs the repaired guard ({GUARD_SCRIPT_SHA[:12]})")
+         compared = 0
+@@ -684,5 +1505,9 @@
+             rep.bad("the guard receipt has no identity line (MainPID and ExecMainStartTimestamp): the canary gate must compare the process of the idle check with that of every arm")
++        if canary_gate and guard.get("info_lines", 0) != 1:
++            rep.bad(f"the idle receipt has {guard.get('info_lines', 0)} INFO line(s) of the guard's grammar: the canary gate needs exactly one (it carries the gateway's own pending-request counter before and after the observation) (RULING-757-R19)")
++        if canary_gate and guard.get("identity_pending") is None:
++            rep.bad("the idle receipt's IDENTITY line gives no native pending_total (the guard's own IDENTITY line, exactly, with the identity read-back's reading of the gateway's pending-request counter): the canary gate reconciles it with both INFO readings, so a receipt without it cannot be accepted (RULING-757-R19)")
+         if canary_gate and compared != len(arms):
+             rep.bad(f"the gateway process identity was compared for {compared} of {len(arms)} arm(s): the canary gate needs every comparison to succeed")
+-        rep.say(f"IDENTITY-CHECK guard MainPID={guard['pid']} started={guard['unit_started']}; compared with {compared} of {len(arms)} arm(s)" + ("" if canary_gate else " (a direct run carries no identity line)"))
++        rep.say(f"IDENTITY-CHECK guard MainPID={guard['pid']} started={guard['unit_started']}; compared with {compared} of {len(arms)} arm(s)" + ("" if compared == len(arms) else " (a direct run carries no identity line)"))
+         if guard["end"] is not None and timed:
+@@ -708,7 +1533,7 @@
+             f"{CLOCK_MARGIN_S} s; the guard's end is the host clock")
+-    rep.say("IDLE-MEANING idle for the whole window = the guard was clean at the window's start AND no foreign call row and no orphan usage row exists over the whole tiled window (the guard's observation does not observe the window itself)")
++    rep.say("IDLE-MEANING idle for the whole window = the guard was clean at the window's start (its INFO and sample lines show the gateway's pending-request counter complete and unchanged, no active connection and no recent row) AND no foreign call row and no orphan usage row exists over the whole tiled window (the guard's observation does not observe the window itself)")
+     # ---- queries (printed first, so a failure below still leaves them in the receipt)
+-    for name, sql in (("own-raw", SQL_OWN_RAW), ("own-native", SQL_OWN_NATIVE), ("window-calls", SQL_WINDOW_CALLS), ("window-usage", SQL_WINDOW_USAGE), ("candidates", SQL_CANDIDATES), ("competing-calls", SQL_COMPETING_CALLS), ("all-call-stamps", SQL_ALL_CALL_STAMPS), ("all-usage-stamps", SQL_ALL_USAGE_STAMPS)):
++    for name, sql in (("own-raw", SQL_OWN_RAW), ("own-native", SQL_OWN_NATIVE), ("window-calls", SQL_WINDOW_CALLS), ("window-usage", SQL_WINDOW_USAGE), ("candidates", SQL_CANDIDATES), ("competing-calls", SQL_COMPETING_CALLS), ("incarnation-calls", SQL_INCARNATION_CALLS), ("all-call-stamps", SQL_ALL_CALL_STAMPS), ("all-usage-stamps", SQL_ALL_USAGE_STAMPS)):
+         rep.say(f"QUERY {name}: {sql}")
+-    rep.say(f"QUERY journal: journalctl --user -u {JOURNAL_UNIT} --since <window start - {JOURNAL_LEAD_S + JOURNAL_PAD_S:.0f} s> UTC --until <window end + {JOURNAL_PAD_S} s> UTC -o json --all --no-pager (every `tag=HTTP method=POST` line whose message starts with the inbound-request marker, counted by the journal's own timestamp from {JOURNAL_LEAD_S:.0f} s before the window's start to its end and compared with the own call rows; the exact command, the binary, its version and its stderr are printed on the JOURNAL-COMMAND line)")
++    rep.say(f"QUERY journal: journalctl --user -u {JOURNAL_UNIT} --since <the earliest of the guard receipt's start, the window's start - {JOURNAL_LEAD_S:.0f} s and the window's start - the usage pad - the serving process's disconnect grace - {COMPLETION_MARGIN_S:g} s, and for the canary the serving process's start; - {JOURNAL_PAD_S} s> UTC --until <the end of the window padded by the usage pad and {COMPLETION_MARGIN_S:g} s, + {JOURNAL_PAD_S} s, rounded up to the next whole second> UTC -o json --all --no-pager (one run: arrival lines `tag=HTTP method=POST` counted by the line's own `time` from {JOURNAL_LEAD_S:.0f} s before the window's start to {CANDIDATE_SECONDS + COMPLETION_MARGIN_S:g} s after its end (the usage pad plus {COMPLETION_MARGIN_S:g} s); stream-end lines `[STREAM] PROVIDER | model | Nms | status` counted over the window padded by the usage pad, the disconnect grace and {COMPLETION_MARGIN_S:g} s; restart diagnostics and startup banners anywhere in the range; the exact command, the binary, its version and its stderr are printed on the JOURNAL-COMMAND line, also when the observation failed; for the canary a second run, `journalctl --user -u {JOURNAL_UNIT} _BOOT_ID=<this boot> _PID=<each listener> -o json --all --no-pager`, reads the listeners' own entries from their birth with no wall-clock lower bound: the INCARNATION-JOURNAL-COMMAND and INCARNATION-BIRTH lines)")
+     rep.say(f"BOUNDS own-raw: (correlation id, response id) of each request as printed by the script (shown here as id8); own-native: the session id of each turn; window-calls: ({u0s}, {w1s}) (the window's start padded by the same {CANDIDATE_SECONDS} s as the usage rows); window-usage: ({u0s}, {u1s}); "
+@@ -743,3 +1568,3 @@
+     try:
+-        measure(rep, con, timed, w0s, w1s, u0s, u1s, bounds)
++        measure(rep, con, timed, w0s, w1s, u0s, u1s, bounds, guard, db, canary_gate)
+     except Exception as error:   # whatever fails here, the receipt printed so far stays and the result is INCONCLUSIVE, never a crash without a receipt and never a PASS
+@@ -748,3 +1573,8 @@
+         con.close()
+-    rep.say("NOT-EXCLUDED the rows alone cannot attribute a usage row to its request (the usage table has no request key), and the association tolerates numbers that are not identical (latency within 100 ms; time to first token within 1 ms, or not compared at all when either side is NULL, which is routine here: 32 of 244 associated pairs on this host have a NULL time to first token on the call row only; within 3 s of the own call row). A PASS therefore rests on the gateway's journal as the independent record: the number of inbound POST requests it logged in the window equals the number of own call rows and the lines pair with them one to one by time and path within 3 s (so a foreign request leaves a line even when its call row was never written), and the rows are paired one to one. What stays outside: a foreign request that the gateway did not log on arrival while the own requests' lines are all present, a lost own line balanced by a foreign line of the same path that arrives within 3 s of it or of a chain of neighbouring own requests' lines (3 s per link), a persistence failure that is not logged (a save skipped while disk persistence is off or saves are closing, the usage insert's same-millisecond dedup), and traffic that is not an inbound POST. The wrapper's journal line per arm (journal_failed_to_save_call_log, above) covers only the call-log save's logged failure")
++    rep.say("NOT-EXCLUDED the rows alone cannot attribute a usage row to its request (the usage table has no request key), and the association tolerates numbers that are not identical (latency within 100 ms; time to first token within 1 ms, or not compared at all when either side is NULL, which is routine here: 32 of 244 associated pairs on this host have a NULL time to first token on the call row only; within 3 s of the own call row). A PASS therefore also rests on two records of the gateway's journal that do not depend on the rows: the inbound POST lines (written at arrival, before the duration clock: they pair with the own call rows one to one by path and by the rows' ESTIMATED start, timestamp minus duration, within 3 s, which is not their physical arrival) and the stream-end lines (printed when a stream ends or its client leaves, at the end of the request's lifecycle: measured within about 0.2 s of the rows of a completed request on this host (checks/census-calibration-measurements.txt: one host over one range, NOT a bound: an unread downstream queue delays a successful stream's line behind its rows without bound, 5.7 s in the native reproduction, r13-P1-2), and up to the disconnect grace before the rows of a request whose client left: they pair one to one by provider, model and implied start within 0.25 s, and none is left over in the window padded by the usage pad and the serving process's disconnect grace), and on the serving process being the one the guard receipt began with. What stays outside is the untested boundary stated on the next lines, and traffic that is not an inbound POST. The wrapper's journal line per arm (journal_failed_to_save_call_log, above) covers only the call-log save's logged failure")
++    rep.say("UNTESTED-BOUNDARY the residual of this check, stated as an untested boundary (no real run has observed these; the synthetic controls R3, J10, J15, J22f and J27a show that the census passes them): (1) a foreign request that the gateway did not log or journald did not keep; (2) a lost own line balanced by a same-path foreign line within 3 s, per link of a chain; (3) an unlogged persistence failure (a save skipped while disk persistence is off or saves are closing, the usage insert's same-millisecond dedup)")
++    rep.say("UNTESTED-BOUNDARY-DETAIL (added after the full-scope read r12; these refine the three items above and do not replace them): (2) holds for each of the two journal records separately: for the arrival lines the 3 s is measured from the lost request's ESTIMATED start (timestamp minus duration), so its physical arrival may be earlier by a delay that nothing bounds and the two lines may lie further apart; "
++            "for the stream-end lines the tolerance is 0.25 s on the implied start and the pairing needs the same provider and model. A request is covered by the stream-end record only when it passes the HTTP stream controller of chatCore and its line falls in the counted range (an unread downstream queue delays a successful stream's line behind its rows without bound: r13-P1-2): a non-streaming foreign request prints no stream-end line, and since the read r13 the canary census covers the ARRIVAL line of such a request, and of a late-ending streaming one, over the whole incarnation instead (every inbound POST line since the serving process's start needs a call row of its path, whatever its lead over the duration clock), so it can stand in for an own request only when its arrival line was not logged or not kept (item (1)) or when a call row of its path without an arrival line balances it one for one (item (2): a request whose line was lost beside a request that left no row, control J37e); since the read r14 the incarnation is INCONCLUSIVE when a spare row would balance it without such a pair (several persisted attempt rows of one request, a row without a correlation id, or a call row without a matched arrival line on a path: review r14, P1-1); a Responses-over-WebSocket turn (dist/server-ws.mjs; its rows are written by POST /api/internal/codex-responses-ws, both stamped at the turn's START, with the turn's length as duration and latency) writes neither an arrival line nor a stream-end line, so it is covered by neither either: the census refuses a window that a WebSocket call row reaches (the WEBSOCKET line), and a WebSocket turn whose call row was lost is a case of items (1) and (3) above. "
++            "Journald's drops are bounded only by the unit's entry rate against its limit (its suppression notice is in the system journal, which this user cannot read), a vacuum or rotation gap is not detected, and the serving process, its start and the holders of the store are read at one point in time (a transient listener or writer inside the window is not seen)")
++    rep.say("EVIDENCE-CLASS local_integration and synthetic controls, plus the stated real rows (the baseline arms and the quiet-window live trial of 2026-10-06: checks/census-baseline-real-data.txt and checks/census-live-trial.txt in the evidence folder of PR #757): the census is validated by its controls and those rows")
+     rep.say(f"CENSUS-RESULT {rep.state} exit={0 if rep.state == 'PASS' else 2} problems={len(rep.reasons)} scope={scope}")
+@@ -753,3 +1583,3 @@
+ 
+-def measure(rep, con, timed, w0s, w1s, u0s, u1s, bounds):
++def measure(rep, con, timed, w0s, w1s, u0s, u1s, bounds, guard, db, canary=False):
+     # ---- timestamp format: a row whose timestamp has another format would be skipped by the string bounds, silently
+@@ -795,15 +1625,56 @@
+     rep.say(f"OWN call rows={len(own)} per arm={dict(sorted(per_arm_own.items()))}")
+-    # ---- the gateway's journal: an independent record of every inbound request, written when it ARRIVES (a foreign request leaves a line even when its call row was never written)
++    # ---- review 4, F1: Responses-over-WebSocket turns. The gateway's WebSocket proxy (dist/server-ws.mjs) persists a turn through POST /api/internal/codex-responses-ws with BOTH rows stamped at the turn's START (its length is the duration and the latency) and writes neither an arrival line
++    # nor a stream-end line (chat.ts logs the only arrival line, and a WebSocket turn never creates a stream controller), so no journal record covers it, and a turn that began before the usage pad leaves rows outside every range read here. A call row of such a turn that reaches the padded window is refused.
++    pad = dt.timedelta(seconds=CANDIDATE_SECONDS)
++    ws_lo, ws_hi = bounds[0] - pad - dt.timedelta(milliseconds=MAX_DURATION_MS), bounds[-1] + pad
++    ws_rows = con.execute(SQL_WS_TURNS, (utc(ws_lo), utc(ws_hi))).fetchall()
++    ws_reaching = []
++    for _wid, wts, wdur in ws_rows:
++        wstart = parse_ts(wts)
++        try:
++            wlen = float(wdur) if wdur is not None else 0.0
++        except (TypeError, ValueError, OverflowError):
++            wlen = float("nan")
++        if wstart is None or not math.isfinite(wlen) or wlen < 0 or wlen > MAX_DURATION_MS:
++            ws_reaching.append((wts, "its stamp or duration cannot be read"))
++        elif wstart <= bounds[-1] + pad and wstart + dt.timedelta(milliseconds=wlen) >= bounds[0] - pad:
++            ws_reaching.append((wts, f"duration {wlen:g} ms"))
++    rep.say(f"WEBSOCKET call_logs rows with method WEBSOCKET or request_type responses_websocket stamped from {utc(ws_lo)} (the longest duration measured plus the usage pad before the window) to {utc(ws_hi)}: {len(ws_rows)}; of these reaching the window padded by the usage pad: {len(ws_reaching)}")
++    for wts, why in ws_reaching[:10]:
++        rep.say(f"   Responses-WebSocket turn stamped {wts} ({why})")
++    if ws_reaching:
++        rep.bad(f"{len(ws_reaching)} Responses-over-WebSocket turn(s) reach the window padded by the usage pad (call_logs method WEBSOCKET or request_type responses_websocket; a turn is stamped at its START, with its length as duration, and writes neither an arrival line nor a stream-end line): no journal record covers such a turn, and its rows may stand in for an own request's or lie outside every range read here")
++    # ---- the gateway's journal and the serving process: independent records of the window's requests (arrival lines, stream-end lines) and the process that served them
+     w0, w1 = bounds[0], bounds[-1]
+-    lo = w0 - dt.timedelta(seconds=JOURNAL_LEAD_S)
++    probe = serving_probe(guard)
++    grace_s = probe["grace_ms"] / 1000.0
++    started = min(probe["starts"].values()) if canary and not probe["error"] and probe["starts"] else None   # the canary's incarnation: the serving process's start (review r13, P1)
++    lo = w0 - dt.timedelta(seconds=JOURNAL_LEAD_S)   # arrival lines are counted from here to c_hi, the end of the usage pad plus the completion margin after the window's end
++    c_lo = w0 - dt.timedelta(seconds=CANDIDATE_SECONDS + grace_s + COMPLETION_MARGIN_S)   # stream-end lines are counted from here ...
++    c_hi = w1 + dt.timedelta(seconds=CANDIDATE_SECONDS + COMPLETION_MARGIN_S)   # ... to here
++    earliest = min(lo, c_lo, guard["start"] if guard is not None and guard["start"] is not None else lo)   # the range also covers the guard receipt's observation (a restart of the serving process inside it)
++    if started is not None:
++        earliest = min(earliest, started)
+     try:
+-        posts, jinfo = journal_posts(JOURNAL_UNIT, lo - dt.timedelta(seconds=JOURNAL_PAD_S), w1 + dt.timedelta(seconds=JOURNAL_PAD_S))
+-    except RuntimeError as error:
++        events = journal_events(JOURNAL_UNIT, earliest - dt.timedelta(seconds=JOURNAL_PAD_S), c_hi + dt.timedelta(seconds=JOURNAL_PAD_S))
++    except JournalError as error:
++        failed = error.info
++        rep.say(f"JOURNAL-COMMAND argv={failed['argv']} binary={shown_db(failed['binary'])} version={failed['version']!r} stderr={failed['stderr']!r} entries_read={failed['entries']}")
+         rep.say(f"JOURNAL unit={JOURNAL_UNIT} readable=False error={error}")
+         rep.bad(f"the gateway journal cannot be read ({error}): the independent record of the window's requests is missing, so PASS is not possible")
+-        posts = None
+-    if posts is not None:
+-        rep.say(f"JOURNAL-COMMAND argv={jinfo['argv']} binary={shown_db(jinfo['binary'])} version={jinfo['version']!r} stderr={jinfo['stderr']!r} entries_read={jinfo['entries']} arrival_lines_read={len(posts)}")
+-        inside = [(t, label, lpath) for t, label, lpath in posts if lo <= t <= w1]
+-        rep.say(f"JOURNAL unit={JOURNAL_UNIT} readable=True inbound_POST_lines_in_window={len(inside)} own_call_rows={len(own)} (counted by the journal's own timestamp from {utc(lo)}, {JOURNAL_LEAD_S:.0f} s before the window's start, to {utc(w1)}, the window's end)")
++        events = None
++    if events is not None:
++        if started is not None:   # the lines of the previous child, just before the start, are not the incarnation's; the user manager's own entry about the unit (dated before the child's start, in the manager's cgroup) is not one of the unit's processes (review 5, L1-1)
++            events["listener_lines_before_own_start"] = sorted({p[3] for p in events["posts"] if p[3] in probe["pids"] and p[0] < probe["starts"][p[3]]} | {s[5] for s in events["streams"] if s[5] in probe["pids"] and s[0] < probe["starts"][s[5]]})   # a request line of a listener dated before ITS OWN start: a clock fault, whatever the step's size
++            before_posts = [p for p in events["posts"] if p[0] < started]
++            before_streams = [s for s in events["streams"] if s[0] < started]
++            events["dropped_before_start"] = ((len(before_posts), len(before_streams)), sorted({p[3] for p in before_posts if p[3] is not None} | {s[5] for s in before_streams if s[5] is not None}))
++            events["posts"] = [p for p in events["posts"] if p[0] >= started]
++            events["streams"] = [s for s in events["streams"] if s[0] >= started]
++            events["cgroups"] = {c for s_, c in events["cgroup_entries"] if s_ >= started}
++        jinfo, posts, streams = events["info"], events["posts"], events["streams"]
++        rep.say(f"JOURNAL-COMMAND argv={jinfo['argv']} binary={shown_db(jinfo['binary'])} version={jinfo['version']!r} stderr={jinfo['stderr']!r} entries_read={jinfo['entries']} arrival_lines_read={len(posts)} stream_end_lines_read={len(streams)} restart_or_startup_diagnostics_read={len(events['diagnostics'])}" + (f" lines_dropped_as_dated_before_the_serving_process_start=(arrival {events['dropped_before_start'][0][0]}, stream-end {events['dropped_before_start'][0][1]})" if 'dropped_before_start' in events else ""))
++        # -- arrival lines: written when a request ARRIVES, before the policy work, the credential refresh and the duration clock (so a line can precede the request's estimated start by a delay that nothing bounds)
++        inside = [(t, label, lpath) for t, label, lpath, _pid in posts if lo <= t <= c_hi]
++        rep.say(f"JOURNAL unit={JOURNAL_UNIT} readable=True inbound_POST_lines_in_window={len(inside)} own_call_rows={len(own)} (counted by the gateway's own clock (the line's `time`) from {utc(lo)}, {JOURNAL_LEAD_S:.0f} s before the window's start, to {utc(c_hi)}, the end of the window padded by the {CANDIDATE_SECONDS} s usage pad and {COMPLETION_MARGIN_S:g} s)")
+         if len(inside) != len(own):
+@@ -811,4 +1682,4 @@
+                 rep.say(f"   journal request line at {utc(t)} {label}")
+-            rep.bad(f"the gateway's journal shows {len(inside)} inbound POST request(s) in the window (counted from {JOURNAL_LEAD_S:.0f} s before its start) and the store holds {len(own)} own call row(s): a request that left no call row (dropped, or another client's) cannot be excluded")
+-        # pairing by time and path: a count alone can be balanced by an own request's missing line and a foreign request's line elsewhere
++            rep.bad(f"the gateway's journal shows {len(inside)} inbound POST request(s) in the counted range (from {JOURNAL_LEAD_S:.0f} s before the window's start) and the store holds {len(own)} own call row(s): " + ("more lines than rows: a request that left no call row (dropped, or another client's) cannot be excluded" if len(inside) > len(own) else "fewer lines than rows: an own request's arrival line is missing"))
++        # estimated start of each own request: its call row's timestamp minus its duration (NOT its physical arrival: the clock starts after the arrival line)
+         arrivals = {}
+@@ -822,12 +1693,5 @@
+         pair_edges = {cid: ([j for j, (t, _label, lpath) in enumerate(inside) if lpath is not None and lpath == own[cid]["path"] and abs((t - arr).total_seconds()) <= JOURNAL_PAIR_S] if arr is not None else []) for cid, arr in arrivals.items()}
+-        used = {j2 for js in pair_edges.values() for j2 in js}
+-        left_lines = [j for j in range(len(inside)) if j not in used]
+-        left_calls = []
+-        for calls, lines in components(pair_edges):
+-            matched = maximum_matching({c: pair_edges[c] for c in calls}, calls)   # {line index: call id}: a maximum matching, whose leftovers are the exact counts
+-            matched_calls = set(matched.values())
+-            left_calls += [c for c in calls if c not in matched_calls]
+-            left_lines += [j for j in lines if j not in matched]
++        matched, left_calls, left_lines = pair_counts(pair_edges, len(inside))
+         unpaired_own, unpaired_lines = len(left_calls), len(left_lines)
+-        rep.say(f"JOURNAL-PAIRING each own call row to one inbound line of the same path within {JOURNAL_PAIR_S:.0f} s of (its timestamp - its duration): own_call_rows_without_a_line={unpaired_own} inbound_lines_without_an_own_call_row={unpaired_lines}")
++        rep.say(f"JOURNAL-PAIRING each own call row to one inbound line of the same path within {JOURNAL_PAIR_S:.0f} s of its ESTIMATED START (its timestamp - its duration, not its physical arrival): own_call_rows_without_a_line={unpaired_own} inbound_lines_without_an_own_call_row={unpaired_lines}")
+         if unpaired_own or unpaired_lines:
+@@ -835,3 +1699,35 @@
+                 rep.say(f"   inbound line with no own call row at {utc(inside[j][0])} {inside[j][1]}")
+-            rep.bad(f"the gateway's journal and the own call rows do not pair one to one by time and path: {unpaired_own} own call row(s) have no inbound line of their path within {JOURNAL_PAIR_S:.0f} s of their arrival and {unpaired_lines} inbound line(s) have no own call row (a lost line balanced by another client's request cannot pass)")
++            rep.bad(f"the gateway's journal and the own call rows do not pair one to one by estimated start and path: {unpaired_own} own call row(s) have no inbound line of their path within {JOURNAL_PAIR_S:.0f} s of their estimated start and {unpaired_lines} inbound line(s) have no own call row (a lost line balanced by another client's line of the same path within {JOURNAL_PAIR_S:.0f} s of the lost request's estimated start cannot be told apart; the lost request's physical arrival may lie earlier than its estimated start by a delay that nothing bounds)")
++        # -- stream-end lines: printed when a stream controller ENDS (or its client leaves), whatever the arrival-to-clock delay was and whatever happened to the rows; NOT where the usage row is written: a successful stream persists its rows at the transform's flush and its line follows when the downstream reader has seen the terminal event, which an unread downstream queue delays without bound (review r13, P1-2), so a line can fall after the counted range and the record is a second record, not a bound
++        groups = stream_groups(streams)
++        relevant = [g for g in groups if c_lo <= g["t"] <= c_hi]
++        statuses = collections.Counter(g["status"].split(":")[0] + ":" if g["status"].startswith(("error:", "disconnect:")) else g["status"] for g in relevant)
++        stream_edges = {}
++        for cid, row in own.items():
++            arr = arrivals[cid]
++            stream_edges[cid] = ([j for j, g in enumerate(relevant) if g["primary"] and g["provider"].lower() == str(row["provider"]).lower() and g["model"] == row["model"] and abs((g["start"] - arr).total_seconds()) <= STREAM_PAIR_START_S] if arr is not None else [])
++        s_matched, s_left_calls, s_left_groups = pair_counts(stream_edges, len(relevant))
++        rep.say(f"COMPLETION-RECORD stream_end_lines_read={len(streams)} controllers={len(groups)} (post-abort echoes folded in: {sum(g['echoes'] for g in groups)}) controllers_in_the_counted_range={len(relevant)} statuses={dict(sorted(statuses.items()))} counted from {utc(c_lo)} to {utc(c_hi)} "
++                f"(the window padded by the {CANDIDATE_SECONDS} s usage pad, the {grace_s:g} s disconnect grace of the serving process (a client that left after the terminal event: its rows follow its stream-end line by at most that long) and {COMPLETION_MARGIN_S:g} s; a line later than that, which an unread downstream queue can cause without bound (review r13, P1-2), is not in the range: this record is a second record, not a bound)")
++        rep.say(f"COMPLETION-PAIRING each own call row to one stream-end controller of its provider and model whose implied start (line time - its ms) lies within {STREAM_PAIR_START_S:g} s of its estimated start: own_call_rows_without_a_stream_end_line={len(s_left_calls)} stream_end_controllers_without_an_own_call_row={len(s_left_groups)}")
++        orphans = [g for g in relevant if not g["primary"]]
++        if orphans:
++            rep.bad(f"{len(orphans)} stream-end echo line(s) (`{POST_ABORT}`) have no primary line of their controller in the range: the grouping of the lines into requests is ambiguous")
++        if s_left_calls or s_left_groups:
++            for j in sorted(s_left_groups)[:20]:
++                g = relevant[j]
++                rep.say(f"   stream-end controller with no own call row: line at {utc(g['t'])} {g['provider']} | {g['model']} | {g['ms']}ms | {g['status']} (implied start {utc(g['start'])})")
++            for cid in s_left_calls[:20]:
++                rep.say(f"   own call row id8={id8(cid)} ({own[cid]['path']}, {own[cid]['timestamp']}) with no stream-end line")
++            rep.bad(f"the stream-end lines and the own call rows do not pair one to one: {len(s_left_calls)} own call row(s) have no stream-end line of their provider and model with an implied start within {STREAM_PAIR_START_S:g} s of theirs, and {len(s_left_groups)} stream-end controller(s) in the counted range have no own call row: a foreign stream ended (or its client left) there, and its rows, or the lack of them, may stand in for an own request's")
++        # -- the serving process (r12-P1-2): the listener, its start, its cgroup, the processes that wrote the request lines, the holders of the store, the supervisor's restart diagnostics
++        serving_check(rep, probe, guard, events, db, canary)
++        if started is not None:
++            inc_events = monotonic_birth_check(rep, probe, c_hi + dt.timedelta(seconds=JOURNAL_PAD_S), posts, started, c_hi)
++            if inc_events is not None:   # the arrival lines of the listeners since their birth, by boot and pid, with no wall-clock lower bound (review r14, P1-2)
++                incarnation_check(rep, con, inc_events["posts"], started, u1s, c_hi, bounded=False)
++            else:
++                incarnation_check(rep, con, posts, started, u1s, c_hi)
++        # -- what journald keeps (r12 design check, hole 4): the unit's targets and rate limit against the busiest stretch of the range
++        journal_limit_check(rep, events)
+     # ---- clocks: own rows inside their arm's interval and inside the window
+@@ -877,2 +1773,3 @@
+     edges, lookalikes, edge_rows = {}, 0, {}
++    start_checked, start_bad = 0, 0
+     for cid, c in sorted(own.items(), key=lambda kv: (str(kv[1]["timestamp"]), str(kv[0]))):
+@@ -934,4 +1831,13 @@
+         adj = {c: edges[c] for c in calls}
+-        status, _pairs = matching_status(adj, calls, usages)
++        status, pairs = matching_status(adj, calls, usages)
+         statuses[status] += 1
++        for cid_, uid_ in (pairs if status == "unique" else []):
++            u, c_row = edge_rows[uid_], own[cid_]
++            u_ts, c_ts = parse_ts(u["timestamp"]), parse_ts(c_row["timestamp"])
++            if u_ts is not None and c_ts is not None:
++                start_gap = ((u_ts - dt.timedelta(milliseconds=float(u["latency_ms"]))) - (c_ts - dt.timedelta(milliseconds=float(c_row["duration"])))).total_seconds()
++                start_checked += 1
++                if abs(start_gap) > USAGE_START_TOLERANCE_S:
++                    start_bad += 1
++                    rep.bad(f"usage row {id8(u['id'])} (matched to own call row {id8(cid_)}) started {start_gap:+.2f} s from its call row's own start (its timestamp - its latency against the call row's timestamp - duration: both rows come from ONE duration clock and differ by milliseconds for one request; the tolerance is {USAGE_START_TOLERANCE_S:g} s): it is another request's row that stands in for this one")
+         if status != "unique":
+@@ -943,2 +1849,3 @@
+         rep.bad(f"own call row {id8(cid)} ({own[cid]['path']}, status {own[cid]['status']}, tokens {own[cid]['tokens_in']}/{own[cid]['tokens_out']}) has no associated usage row (same model and token counts within {CANDIDATE_SECONDS} s, and provider, account, endpoint, latency, time to first token)")
++    rep.say(f"START-AGREEMENT matched_usage_rows_checked={start_checked} usage_rows_whose_clock_start_differs_from_their_call_row_by_more_than_{USAGE_START_TOLERANCE_S:g}_s={start_bad}")
+     rep.say(f"MATCHING own_call_rows={len(edges)} components={len(comps)} statuses={dict(sorted(statuses.items()))} own_call_rows_without_usage_row={len(uncovered)} look_alike_usage_rows_that_do_not_associate={lookalikes}")

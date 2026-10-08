@@ -1,0 +1,150 @@
+#!/bin/bash
+# Control for scripts/journal-save-failures.sh.txt, the manual journal scan of checks/live-acceptance-protocol.md (repair round r13 of PR #757, finding 3 of the read of ec4b489d9).
+# usage: journal-save-failures-controls.sh <script under test>
+# It writes a fake journalctl and a fake systemctl into its scratch directory (mktemp -d under ${WORK_ROOT:-$HOME/.cache}), asserts that `command -v` resolves both names to the fakes
+# on the PATH that every case uses (otherwise no case runs: exit 2), and runs each case with `env -i` (that PATH, TMPDIR and the case's FAKE_* variables only) in a working directory
+# of its own. The fakes read no journal and no unit: each appends its argument vector (printf %q, one line per call) to the case's call log, then does what the case's variables say:
+#   FAKE_SYSTEMCTL_RC, FAKE_SYSTEMCTL_STDOUT (printed with a newline when set, even when empty; unset prints nothing), FAKE_SYSTEMCTL_STDERR
+#   FAKE_JOURNALCTL_RC, FAKE_JOURNALCTL_STDOUT_FILE (copied to stdout), FAKE_JOURNALCTL_STDERR
+# A case prints `CONTROL-RESULT <id> <OK|UNEXPECTED> :: <what>`, then the output of the script (stdout and stderr, each line after `  | `), its exit status and the call log. It is OK
+# when the exit status, the required lines, the absence of the forbidden lines and the call log are as required, no file named MARKER exists in the scratch directory and the script
+# left nothing in its TMPDIR. Only D0 runs the protocol's old command (journalctl ... | grep -c 'Failed to save call log'). The home directory is written as $HOME.
+# Exit 0 when every case is as required, 1 when one is not, 2 on a usage or setup error. The scratch directory is removed at the end by its absolute path.
+set -u
+: "${HOME:?HOME must be set}"
+[ $# -eq 1 ] && [ -f "$1" ] && [ -r "$1" ] || { echo "usage: journal-save-failures-controls.sh <script under test>" >&2; exit 2; }
+SUT_DIR=$(cd -- "$(dirname -- "$1")" && pwd) || exit 2
+SUT=$SUT_DIR/$(basename -- "$1")
+W=$(mktemp -d "${WORK_ROOT:-$HOME/.cache}/journal-save-failures-controls-XXXXXX") || exit 2
+case $W in /*/journal-save-failures-controls-??????) ;; *) echo "unexpected scratch directory: $W" >&2; exit 2;; esac
+mask() { local l; while IFS= read -r l || [ -n "$l" ]; do [ ${#HOME} -gt 1 ] && l=${l//"$HOME"/\$HOME}; printf '%s\n' "$l"; done; }
+cleanup() { if rm -rf -- "$W"; then echo "scratch directory removed: $W" | mask; else echo "scratch directory NOT removed: $W" | mask; fi; }
+trap cleanup EXIT
+mkdir -- "$W/fakes" || exit 2
+cat > "$W/fakes/journalctl" <<'EOF'
+#!/bin/bash
+# fake journalctl of journal-save-failures-controls.sh: it reads no journal
+{ printf 'journalctl'; [ $# -eq 0 ] || printf ' %q' "$@"; printf '\n'; } >> "${FAKE_CALL_LOG:?}"
+[ -z "${FAKE_JOURNALCTL_STDOUT_FILE:-}" ] || cat -- "$FAKE_JOURNALCTL_STDOUT_FILE"
+[ -z "${FAKE_JOURNALCTL_STDERR:-}" ] || printf '%s\n' "$FAKE_JOURNALCTL_STDERR" >&2
+exit "${FAKE_JOURNALCTL_RC:-0}"
+EOF
+cat > "$W/fakes/systemctl" <<'EOF'
+#!/bin/bash
+# fake systemctl of journal-save-failures-controls.sh: it reads no unit
+{ printf 'systemctl'; [ $# -eq 0 ] || printf ' %q' "$@"; printf '\n'; } >> "${FAKE_CALL_LOG:?}"
+[ -z "${FAKE_SYSTEMCTL_STDOUT+set}" ] || printf '%s\n' "$FAKE_SYSTEMCTL_STDOUT"
+[ -z "${FAKE_SYSTEMCTL_STDERR:-}" ] || printf '%s\n' "$FAKE_SYSTEMCTL_STDERR" >&2
+exit "${FAKE_SYSTEMCTL_RC:-0}"
+EOF
+chmod 755 -- "$W/fakes/journalctl" "$W/fakes/systemctl" || exit 2
+FAKE_PATH=$W/fakes:/usr/local/bin:/usr/bin:/bin
+echo "# journal-save-failures-controls: run $(date -u +%Y-%m-%dT%H:%M:%SZ); control $(basename -- "$0") sha256 $(sha256sum < "$0" | cut -d' ' -f1); script under test $(basename -- "$SUT") sha256 $(sha256sum < "$SUT" | cut -d' ' -f1)"
+echo "# tools: bash $BASH_VERSION; $(grep --version | head -n 1); $(date --version | head -n 1); the cases run under env -i, so in the C locale"
+J=$(env -i PATH="$FAKE_PATH" bash -c 'command -v journalctl'); S=$(env -i PATH="$FAKE_PATH" bash -c 'command -v systemctl')
+if [ "$J" != "$W/fakes/journalctl" ] || [ "$S" != "$W/fakes/systemctl" ]; then echo "the fakes are not first on PATH (journalctl -> $J, systemctl -> $S): no case was run" | mask; exit 2; fi
+echo "the cases' PATH is $FAKE_PATH: command -v journalctl -> $J; command -v systemctl -> $S" | mask
+
+# fixtures: journal outputs as `journalctl -o cat` prints them, and the values the fakes give
+START='Tue 2026-10-06 21:38:35 UTC'   # an ExecMainStartTimestamp as systemd 255 prints it
+printf '%s\n' 'Starting server...' '[DB] Driver: better-sqlite3' '📥 POST /v1/responses' '🌊 [STREAM] CODEX | gpt-6-astra | 5321ms | complete' 'Failed to save call' 'Failed to save usage history: SQLITE_BUSY' > "$W/clean.txt"
+{ cat -- "$W/clean.txt"; printf '%s\n' '[callLogs] Failed to save call log: SqliteError: database is locked' 'Failed to save call log' 'error: Failed to save call log (retry 2)'; } > "$W/three.txt"
+{ yes 'filler: 📥 POST /v1/responses 200, a line of a long journal' | head -n 200000; printf '%s' 'Failed to save call log: the last line, without a newline'; } > "$W/long.txt"
+printf '%s\n' 'Starting server...' '[callLogs] Failed to save call log: Failed to save call log (the phrase twice in one line)' 'xFailed to save call logx' 'call log' > "$W/inline.txt"
+C1_ERR="Could not open the journal: No such file or directory (the diagnostic of the fake producer, no alarm word in it)
+a second line, so that the text is longer than the 160 bytes that the script quotes from it: abcdefghijklmnopqrstuvwxyz"
+C1_DETAIL=$(printf '%s\n' "$C1_ERR" | head -c 160 | tr '\n' ' ')
+C9B='2026-10-06 21:38:35 UTC (x; touch MARKER $(touch MARKER) `touch MARKER`)'   # date -d accepts it (a parenthesized comment); the real journalctl would reject it
+TAIL=": the journal query failed, so 'Failed to save call log' could not be counted (INCONCLUSIVE: acceptance and queueing are prohibited)"
+NOCOUNT='e:^journal_failed_to_save_call_log='
+NOUNAV='e:JOURNAL-UNAVAILABLE'
+call() { printf '%s' "$1"; shift; [ $# -eq 0 ] || printf ' %q' "$@"; printf '\n'; }   # a call-log line as the fakes write it
+show() { call systemctl --user show "$1" -p ExecMainStartTimestamp --value; }
+jcall() { call journalctl --user -u "$1" --since "$2" -o cat --no-pager; }
+count_line() { printf "journal_failed_to_save_call_log=%s (journalctl --user -u %s --since %s -o cat --no-pager | grep -c 'Failed to save call log')" "$1" "$2" "$3"; }
+TOTAL=0 FAILED=0
+verdict() { # id what problems: prints the CONTROL-RESULT line and counts
+  TOTAL=$((TOTAL + 1))
+  if [ -z "$3" ]; then echo "CONTROL-RESULT $1 OK :: $2" | mask
+  else FAILED=$((FAILED + 1)); echo "CONTROL-RESULT $1 UNEXPECTED :: $2" | mask; echo "  not as required:$3" | mask; fi
+}
+run_case() { # id required-exit expected-call-log what -- script arguments; reads the arrays CASE_ENV, MUST (x:<line> exact, f:<text> held by a line, e:<ERE>) and MUSTNOT (e:<ERE>)
+  local id=$1 req=$2 calls=$3 what=$4 d=$W/case-$1 out rc why="" m; shift 5
+  mkdir -- "$d" "$d/cwd" "$d/tmp" || exit 2; : > "$d/calls.log"
+  out=$(cd -- "$d/cwd" && env -i PATH="$FAKE_PATH" TMPDIR="$d/tmp" FAKE_CALL_LOG="$d/calls.log" "${CASE_ENV[@]}" bash "$SUT" "$@" 2>&1); rc=$?
+  [ "$rc" = "$req" ] || why="$why exit $rc, not $req;"
+  for m in "${MUST[@]}"; do
+    case $m in
+      x:*) printf '%s\n' "$out" | grep -qxF -- "${m#x:}" || why="$why no line equal to: ${m#x:};";;
+      f:*) printf '%s\n' "$out" | grep -qF -- "${m#f:}" || why="$why no line holding: ${m#f:};";;
+      e:*) printf '%s\n' "$out" | grep -qE -- "${m#e:}" || why="$why no line matching /${m#e:}/;";;
+    esac
+  done
+  for m in "${MUSTNOT[@]}"; do ! printf '%s\n' "$out" | grep -qE -- "${m#e:}" || why="$why a line matching /${m#e:}/;"; done
+  [ "$(cat -- "$d/calls.log")" = "$calls" ] || why="$why the call log is not: ${calls:-empty};"
+  [ -z "$(find "$W" -name MARKER)" ] || why="$why a file named MARKER exists: $(find "$W" -name MARKER | paste -sd' ');"
+  [ -z "$(ls -A -- "$d/tmp")" ] || why="$why the script left files in its TMPDIR;"
+  verdict "$id" "$what" "$why"
+  [ -z "$out" ] || printf '%s\n' "$out" | mask | sed 's/^/  | /'
+  echo "  exit=$rc"
+  if [ -s "$d/calls.log" ]; then sed 's/^/  call: /' "$d/calls.log" | mask; else echo "  call: none"; fi
+}
+
+echo "== D0, the defect: the protocol's old command, typed by hand, under the fakes"
+OLD="journalctl --user -u omniroute.service --since \"\$(systemctl --user show omniroute.service -p ExecMainStartTimestamp --value)\" -o cat --no-pager | grep -c 'Failed to save call log'"
+old_run() { # label: runs OLD under the fakes with the array CASE_ENV; sets O_OUT, O_RC, O_ERR and O_LOG
+  local d=$W/case-D0-$1; mkdir -- "$d" "$d/cwd" "$d/tmp" || exit 2; : > "$d/calls.log"
+  O_OUT=$(cd -- "$d/cwd" && env -i PATH="$FAKE_PATH" TMPDIR="$d/tmp" FAKE_CALL_LOG="$d/calls.log" "${CASE_ENV[@]}" bash -c "$OLD" 2> "$d/stderr"); O_RC=$?
+  O_ERR=$(head -c 160 -- "$d/stderr"); O_ERR=${O_ERR//$'\n'/ }; O_LOG=$d/calls.log
+}
+CASE_ENV=(FAKE_SYSTEMCTL_STDOUT="$START" FAKE_JOURNALCTL_RC=1 FAKE_JOURNALCTL_STDERR="$C1_ERR"); old_run failing; F_OUT=$O_OUT F_RC=$O_RC F_ERR=$O_ERR F_LOG=$O_LOG
+CASE_ENV=(FAKE_SYSTEMCTL_STDOUT="$START" FAKE_JOURNALCTL_STDOUT_FILE="$W/clean.txt"); old_run clean; K_OUT=$O_OUT K_RC=$O_RC K_ERR=$O_ERR K_LOG=$O_LOG
+why=""
+[ "$F_OUT" = 0 ] || why="$why the failing run printed '$F_OUT', not 0;"
+[ "$F_OUT" = "$K_OUT" ] || why="$why the outputs differ ('$F_OUT' and '$K_OUT');"
+[ "$F_RC" = "$K_RC" ] || why="$why the pipeline statuses differ ($F_RC and $K_RC);"
+grep -q '^journalctl ' "$F_LOG" && grep -q '^journalctl ' "$K_LOG" || why="$why the fake journalctl was not called in both runs;"
+verdict D0 "THE DEFECT: \`$OLD\` prints the same count with the same pipeline status (grep's) when journalctl exits 1 with empty stdout as when it reads a clean journal" "$why"
+echo "  failing journalctl (exit 1, empty stdout): stdout=$F_OUT pipeline status=$F_RC; its stderr on the terminal: ($F_ERR)" | mask
+echo "  clean journal (exit 0, lines without the phrase): stdout=$K_OUT pipeline status=$K_RC; stderr: ($K_ERR)" | mask
+echo "  the only difference is the failing producer's stderr on the terminal, which is neither the count nor the status"
+sed 's/^/  call (failing): /' "$F_LOG" | mask; sed 's/^/  call (clean): /' "$K_LOG" | mask
+
+echo "== C1-C13b: the script under test, each case under the fakes"
+DEF="$(show omniroute.service)
+$(jcall omniroute.service "$START")"
+CASE_ENV=(FAKE_SYSTEMCTL_STDOUT="$START" FAKE_JOURNALCTL_RC=1 FAKE_JOURNALCTL_STDERR="$C1_ERR"); MUST=("x:JOURNAL-UNAVAILABLE exit=1 ($C1_DETAIL)$TAIL"); MUSTNOT=("$NOCOUNT")
+run_case C1 2 "$DEF" "producer failure: journalctl exits 1 with empty stdout and two lines on stderr (no alarm word) -> JOURNAL-UNAVAILABLE exit=1 with the first 160 bytes of stderr, newlines as spaces, no count line, exit 2" --
+CASE_ENV=(FAKE_SYSTEMCTL_STDOUT="$START" FAKE_JOURNALCTL_STDOUT_FILE="$W/clean.txt"); MUST=("x:$(count_line 0 omniroute.service "$START")"); MUSTNOT=("$NOUNAV")
+run_case C2 0 "$DEF" "genuine zero: journalctl exits 0 with six lines, none with the phrase (two near misses) -> the count line with 0, exit 0; the defaults: unit omniroute.service, SINCE from systemctl" --
+CASE_ENV=(FAKE_SYSTEMCTL_STDOUT="$START" FAKE_JOURNALCTL_STDOUT_FILE="$W/three.txt"); MUST=("x:$(count_line 3 omniroute.service "$START")"); MUSTNOT=("$NOUNAV")
+run_case C3 1 "$DEF" "three matching lines among clean ones -> the count line with 3, exit 1" --
+CASE_ENV=(FAKE_SYSTEMCTL_STDOUT="$START" FAKE_JOURNALCTL_STDOUT_FILE="$W/clean.txt" FAKE_JOURNALCTL_STDERR='Journal file /x/user-1000.journal is truncated, ignoring file.'); MUST=("x:JOURNAL-UNAVAILABLE exit=0 (Journal file /x/user-1000.journal is truncated, ignoring file.)$TAIL"); MUSTNOT=("$NOCOUNT")
+run_case C4 2 "$DEF" "journalctl exits 0 with clean stdout and the stderr line of a truncated journal file -> JOURNAL-UNAVAILABLE exit=0, no count line, exit 2" --
+CASE_ENV=(FAKE_SYSTEMCTL_STDOUT="$START" FAKE_JOURNALCTL_STDOUT_FILE="$W/clean.txt" FAKE_JOURNALCTL_STDERR='Warning: some journal files were not opened due to insufficient permissions.'); MUST=("x:JOURNAL-UNAVAILABLE exit=0 (Warning: some journal files were not opened due to insufficient permissions.)$TAIL"); MUSTNOT=("$NOCOUNT")
+run_case C5 2 "$DEF" "journalctl exits 0 with clean stdout and the stderr line of journal files not opened for permissions -> JOURNAL-UNAVAILABLE exit=0, no count line, exit 2" --
+CASE_ENV=(FAKE_SYSTEMCTL_RC=1 FAKE_SYSTEMCTL_STDERR='Failed to connect to bus: No medium found' FAKE_JOURNALCTL_STDOUT_FILE="$W/clean.txt"); MUST=('e:^JOURNAL-UNAVAILABLE exit=1 [(]' 'f:Failed to connect to bus: No medium found' "f:$TAIL"); MUSTNOT=("$NOCOUNT")
+run_case C6 2 "$(show omniroute.service)" "systemctl fails (exit 1, no stdout), so there is no start timestamp; a journalctl would succeed with a clean journal -> JOURNAL-UNAVAILABLE exit=1 with systemctl's stderr, journalctl not run, exit 2" --
+CASE_ENV=(FAKE_SYSTEMCTL_STDOUT= FAKE_JOURNALCTL_STDOUT_FILE="$W/clean.txt"); MUST=('e:^JOURNAL-UNAVAILABLE exit=0 [(]' "f:$TAIL"); MUSTNOT=("$NOCOUNT")
+run_case C7 2 "$(show omniroute.service)" "systemctl exits 0 and prints an empty value (a bare newline, what systemd 255 prints for a unit that does not exist, so also a misspelled UNIT with the default SINCE) -> JOURNAL-UNAVAILABLE, journalctl not run, exit 2" --
+CASE_ENV=(FAKE_SYSTEMCTL_STDOUT="$START" FAKE_JOURNALCTL_STDOUT_FILE="$W/clean.txt"); MUST=('e:^JOURNAL-UNAVAILABLE exit=1 [(]' "f:$TAIL"); MUSTNOT=("$NOCOUNT")
+run_case C8 2 "" "an unparsable SINCE argument (not-a-date) -> JOURNAL-UNAVAILABLE exit=1 with date's diagnostic, neither systemctl nor journalctl run, exit 2" -- omniroute.service not-a-date
+CASE_ENV=(FAKE_SYSTEMCTL_STDOUT="$START" FAKE_JOURNALCTL_STDOUT_FILE="$W/clean.txt"); MUST=('e:^JOURNAL-UNAVAILABLE exit=1 [(]' "f:$TAIL"); MUSTNOT=("$NOCOUNT")
+run_case C9a 2 "" "a SINCE argument with shell metacharacters that is not a date (x; touch MARKER) -> JOURNAL-UNAVAILABLE, nothing run, no MARKER file, exit 2" -- omniroute.service 'x; touch MARKER'
+CASE_ENV=(FAKE_SYSTEMCTL_STDOUT="$START" FAKE_JOURNALCTL_STDOUT_FILE="$W/clean.txt"); MUST=("x:$(count_line 0 omniroute.service "$C9B")"); MUSTNOT=("$NOUNAV")
+run_case C9b 0 "$(jcall omniroute.service "$C9B")" "a SINCE argument that date -d accepts and that holds ; \$(...) and backticks inside a comment -> passed to journalctl as ONE argument, intact (the call log), nothing executed (no MARKER file), the count line with 0, exit 0" -- omniroute.service "$C9B"
+CASE_ENV=(FAKE_SYSTEMCTL_STDOUT="$START" FAKE_JOURNALCTL_STDOUT_FILE="$W/clean.txt"); MUST=('f:usage: '); MUSTNOT=("$NOCOUNT" "$NOUNAV")
+run_case C10 3 "" "usage error: three arguments -> a usage line, nothing run, exit 3" -- omniroute.service "$START" extra
+CASE_ENV=(FAKE_SYSTEMCTL_STDOUT="$START" FAKE_JOURNALCTL_STDOUT_FILE="$W/clean.txt"); MUST=('f:usage: '); MUSTNOT=("$NOCOUNT" "$NOUNAV")
+run_case C10b 3 "" "usage error: a UNIT that starts with - (--host=example.invalid, an option of systemctl) -> a usage line, nothing run, exit 3" -- --host=example.invalid
+CASE_ENV=(FAKE_SYSTEMCTL_STDOUT="$START" FAKE_JOURNALCTL_STDOUT_FILE="$W/long.txt"); MUST=("x:$(count_line 1 omniroute.service "$START")"); MUSTNOT=("$NOUNAV")
+run_case C11 1 "$DEF" "a long output ($(wc -l < "$W/long.txt") newlines, $(wc -c < "$W/long.txt") bytes) with the phrase only on the last line, which has no newline -> counted: the count line with 1, exit 1" --
+CASE_ENV=(FAKE_SYSTEMCTL_STDOUT="$START" FAKE_JOURNALCTL_STDOUT_FILE="$W/inline.txt"); MUST=("x:$(count_line 2 other-gateway.service "$START")"); MUSTNOT=("$NOUNAV")
+run_case C12 1 "$(show other-gateway.service)
+$(jcall other-gateway.service "$START")" "the phrase inside longer lines (twice in one line, once inside another word) and a UNIT argument (other-gateway.service, passed to systemctl and journalctl) -> counted once per line: the count line with 2, exit 1" -- other-gateway.service
+CASE_ENV=(FAKE_SYSTEMCTL_STDOUT="$START"); MUST=('e:^JOURNAL-UNAVAILABLE exit=0 [(]journalctl exited 0 and printed nothing since ' "f:$TAIL"); MUSTNOT=("$NOCOUNT")
+run_case C13 2 "$DEF" "an empty read: journalctl exits 0 with no stdout and no stderr (the real journalctl does that for a unit that does not exist, or for a SINCE in the future; probed on this host) -> JOURNAL-UNAVAILABLE exit=0, no count line, exit 2" --
+CASE_ENV=(FAKE_SYSTEMCTL_STDOUT="$START"); MUST=('e:^JOURNAL-UNAVAILABLE exit=0 [(]journalctl exited 0 and printed nothing since 2026-10-07 05:00:00 UTC' "f:$TAIL"); MUSTNOT=("$NOCOUNT")
+run_case C13b 2 "$(jcall nosuch.service '2026-10-07 05:00:00 UTC')" "an empty read with an explicit UNIT and SINCE (a misspelled unit, nothing to read): JOURNAL-UNAVAILABLE exit=0, no count line, exit 2 (the old pipeline printed 0)" -- nosuch.service '2026-10-07 05:00:00 UTC'
+echo "cases: $TOTAL; not as required: $FAILED"
+[ "$FAILED" = 0 ]

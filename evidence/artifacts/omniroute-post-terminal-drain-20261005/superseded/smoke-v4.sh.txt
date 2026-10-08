@@ -1,0 +1,74 @@
+#!/bin/bash
+# Boot smoke of an OmniRoute install prefix on a FREE port with an EMPTY scratch data dir (no credentials, no live unit touched).
+# The scratch server listens on loopback only and requires an API key (OMNIROUTE_SERVER_HOST=127.0.0.1, REQUIRE_API_KEY=true: on Linux the server ignores HOST and HOSTNAME, bin/cli/utils/serverHost.mjs), and the smoke
+# fails if the listening address is not 127.0.0.1 or if the server prints its exposure warning.
+# The child runs in its own process group (set -m). Success needs a health reply (status exactly "ok") while the child is alive AND a listener on the port that belongs to that group,
+# so another OmniRoute instance on any port can neither make this smoke pass nor be killed by it (cleanup signals only the owned process group, never a name match),
+# and the smoke succeeds only when that group is empty again afterwards (members are selected on the real PGID column, not with `ps -g`, which selects by session).
+# usage: omniroute-smoke-20261005.sh <prefix directory name under tools/>   e.g. omniroute-3.8.51-npm
+#        SMOKE_SOURCE_ONLY=1 . omniroute-smoke-20261005.sh   defines owned_listener and members for the ownership control only
+set -u
+set -m
+members() { ps -eo pid=,pgid= 2>/dev/null | awk -v g="$PGID" '$2 == g { print $1 }'; }
+owned_listener() { # yes when a listener on $PORT belongs to the process group $PGID
+  local p
+  for p in $(ss -ltnpH "sport = :$PORT" 2>/dev/null | grep -o 'pid=[0-9]*' | cut -d= -f2 | sort -u); do
+    if [ "$(ps -o pgid= -p "$p" 2>/dev/null | tr -d ' ')" = "$PGID" ]; then echo yes; return; fi
+  done
+  echo no
+}
+if [ "${SMOKE_SOURCE_ONLY:-0}" = "1" ]; then return 0 2>/dev/null || exit 0; fi
+NAME="${1:?prefix name}"
+TOOLS="$HOME/.local/share/codex-ecosystem/tools"
+PREFIX="$TOOLS/$NAME"
+[ -x "$PREFIX/bin/omniroute" ] || { echo "no executable $PREFIX/bin/omniroute" >&2; exit 2; }
+S="$(mktemp -d "$HOME/.cache/omniroute-smoke-XXXXXX")" || exit 2
+# SMOKE_PORT forces a port (only for the control that occupies it with a dummy health server); the default is a free port chosen now
+PORT=${SMOKE_PORT:-$(python3 -c 'import socket; s = socket.socket(); s.bind(("127.0.0.1", 0)); print(s.getsockname()[1]); s.close()')} || exit 2
+export PATH="$PREFIX/shim:$TOOLS/node-24.21.0/bin:/usr/local/bin:/usr/bin:/bin"
+export DATA_DIR="$S/data"
+export HOST=127.0.0.1
+export HOSTNAME=127.0.0.1
+export OMNIROUTE_SERVER_HOST=127.0.0.1
+export REQUIRE_API_KEY=true
+export OMNIROUTE_MEMORY_MB=4096
+export CLI_ALLOW_CONFIG_WRITES=false
+export TMPDIR="$S/tmp"
+mkdir -p "$DATA_DIR" "$TMPDIR"
+cd "$S" || exit 2
+"$PREFIX/bin/omniroute" serve --port "$PORT" --no-open --no-tray > "$S/serve.log" 2>&1 &
+PID=$!
+PGID=$(ps -o pgid= -p "$PID" | tr -d ' ')
+[ "$PGID" = "$PID" ] || { echo "the child is not its own process group leader (pid $PID, pgid $PGID): refusing to continue" >&2; exit 2; }
+ok=no
+owned=no
+for _ in $(seq 1 60); do
+  sleep 2
+  kill -0 "$PID" 2>/dev/null || break
+  if body=$(curl -s -m 3 "http://127.0.0.1:$PORT/api/health"); then
+    if printf '%s' "$body" | python3 -c 'import json, sys; sys.exit(0 if json.load(sys.stdin).get("status") == "ok" else 1)' 2>/dev/null; then
+      owned=$(owned_listener)
+      if [ "$owned" = yes ]; then ok=yes; break; fi
+    fi
+  fi
+done
+listen=$(ss -ltnH "sport = :$PORT" 2>/dev/null | awk '{print $4}' | sort -u | tr '\n' ',' | sed 's/,$//')
+loopback=no
+[ "$listen" = "127.0.0.1:$PORT" ] && loopback=yes
+warned=no
+grep -q "SECURITY: listening on" "$S/serve.log" 2>/dev/null && warned=yes
+echo "prefix=$NAME port=$PORT health_ok=$ok listener_owned_by_child=$owned listening_address=${listen:-none} loopback_only=$loopback exposure_warning_printed=$warned body=${body:-none} child_alive=$(kill -0 "$PID" 2>/dev/null && echo yes || echo no)"
+echo "processes in the owned process group $PGID before cleanup: $(members | wc -l)"
+echo "--- first log lines:"
+head -c 1500 "$S/serve.log" | head -14
+kill -- "-$PGID" 2>/dev/null
+for _ in 1 2 3 4 5 6 7 8 9 10; do [ -z "$(members)" ] && break; sleep 0.5; done
+if [ -n "$(members)" ]; then
+  kill -9 -- "-$PGID" 2>/dev/null
+  for _ in 1 2 3 4 5 6; do [ -z "$(members)" ] && break; sleep 0.5; done
+fi
+wait "$PID" 2>/dev/null
+left=$(members | wc -l)
+echo "processes left in the owned process group $PGID: $left"
+echo "scratch dir: $S (remove with rm -rf after reading)"
+[ "$ok" = yes ] && [ "$loopback" = yes ] && [ "$warned" = no ] && [ "$left" -eq 0 ]

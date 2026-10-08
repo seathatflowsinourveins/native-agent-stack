@@ -1,0 +1,113 @@
+# Receipt of one run of scripts/journal-save-failures-controls.sh.txt on scripts/journal-save-failures.sh.txt, the manual journal scan of checks/live-acceptance-protocol.md (repair round r13 of PR #757, finding 3 of the read of ec4b489d9), started 2026-10-07T05:49:09Z (date -u).
+# Command, run from evidence/artifacts/omniroute-post-terminal-drain-20261005: bash scripts/journal-save-failures-controls.sh.txt scripts/journal-save-failures.sh.txt
+# sha256: scripts/journal-save-failures.sh.txt 242542dda4af513ecd6fcf46b6a2fbc3d6aac9325f8797fca41a2c82b738f425; scripts/journal-save-failures-controls.sh.txt 38ad505a559d7ba7e9686bf503378a8b12a1db195602d1b40a9e80e5441f5030
+# Control exit status: 0. Below: the control's stdout and stderr of that run, byte for byte; the control writes the home directory as $HOME itself. After it, the CONTROL-RESULT lines of the same control run on the scan as it was before its empty-read rule (the teeth of C13 and C13b).
+
+# journal-save-failures-controls: run 2026-10-07T05:49:09Z; control journal-save-failures-controls.sh.txt sha256 38ad505a559d7ba7e9686bf503378a8b12a1db195602d1b40a9e80e5441f5030; script under test journal-save-failures.sh.txt sha256 242542dda4af513ecd6fcf46b6a2fbc3d6aac9325f8797fca41a2c82b738f425
+# tools: bash 5.2.21(1)-release; grep (GNU grep) 3.11; date (GNU coreutils) 9.4; the cases run under env -i, so in the C locale
+the cases' PATH is $HOME/.cache/journal-save-failures-controls-sHSQ0c/fakes:/usr/local/bin:/usr/bin:/bin: command -v journalctl -> $HOME/.cache/journal-save-failures-controls-sHSQ0c/fakes/journalctl; command -v systemctl -> $HOME/.cache/journal-save-failures-controls-sHSQ0c/fakes/systemctl
+== D0, the defect: the protocol's old command, typed by hand, under the fakes
+CONTROL-RESULT D0 OK :: THE DEFECT: `journalctl --user -u omniroute.service --since "$(systemctl --user show omniroute.service -p ExecMainStartTimestamp --value)" -o cat --no-pager | grep -c 'Failed to save call log'` prints the same count with the same pipeline status (grep's) when journalctl exits 1 with empty stdout as when it reads a clean journal
+  failing journalctl (exit 1, empty stdout): stdout=0 pipeline status=1; its stderr on the terminal: (Could not open the journal: No such file or directory (the diagnostic of the fake producer, no alarm word in it) a second line, so that the text is longer than )
+  clean journal (exit 0, lines without the phrase): stdout=0 pipeline status=1; stderr: ()
+  the only difference is the failing producer's stderr on the terminal, which is neither the count nor the status
+  call (failing): systemctl --user show omniroute.service -p ExecMainStartTimestamp --value
+  call (failing): journalctl --user -u omniroute.service --since Tue\ 2026-10-06\ 21:38:35\ UTC -o cat --no-pager
+  call (clean): systemctl --user show omniroute.service -p ExecMainStartTimestamp --value
+  call (clean): journalctl --user -u omniroute.service --since Tue\ 2026-10-06\ 21:38:35\ UTC -o cat --no-pager
+== C1-C13b: the script under test, each case under the fakes
+CONTROL-RESULT C1 OK :: producer failure: journalctl exits 1 with empty stdout and two lines on stderr (no alarm word) -> JOURNAL-UNAVAILABLE exit=1 with the first 160 bytes of stderr, newlines as spaces, no count line, exit 2
+  | JOURNAL-UNAVAILABLE exit=1 (Could not open the journal: No such file or directory (the diagnostic of the fake producer, no alarm word in it) a second line, so that the text is longer than ): the journal query failed, so 'Failed to save call log' could not be counted (INCONCLUSIVE: acceptance and queueing are prohibited)
+  exit=2
+  call: systemctl --user show omniroute.service -p ExecMainStartTimestamp --value
+  call: journalctl --user -u omniroute.service --since Tue\ 2026-10-06\ 21:38:35\ UTC -o cat --no-pager
+CONTROL-RESULT C2 OK :: genuine zero: journalctl exits 0 with six lines, none with the phrase (two near misses) -> the count line with 0, exit 0; the defaults: unit omniroute.service, SINCE from systemctl
+  | journal_failed_to_save_call_log=0 (journalctl --user -u omniroute.service --since Tue 2026-10-06 21:38:35 UTC -o cat --no-pager | grep -c 'Failed to save call log')
+  exit=0
+  call: systemctl --user show omniroute.service -p ExecMainStartTimestamp --value
+  call: journalctl --user -u omniroute.service --since Tue\ 2026-10-06\ 21:38:35\ UTC -o cat --no-pager
+CONTROL-RESULT C3 OK :: three matching lines among clean ones -> the count line with 3, exit 1
+  | journal_failed_to_save_call_log=3 (journalctl --user -u omniroute.service --since Tue 2026-10-06 21:38:35 UTC -o cat --no-pager | grep -c 'Failed to save call log')
+  exit=1
+  call: systemctl --user show omniroute.service -p ExecMainStartTimestamp --value
+  call: journalctl --user -u omniroute.service --since Tue\ 2026-10-06\ 21:38:35\ UTC -o cat --no-pager
+CONTROL-RESULT C4 OK :: journalctl exits 0 with clean stdout and the stderr line of a truncated journal file -> JOURNAL-UNAVAILABLE exit=0, no count line, exit 2
+  | JOURNAL-UNAVAILABLE exit=0 (Journal file /x/user-1000.journal is truncated, ignoring file.): the journal query failed, so 'Failed to save call log' could not be counted (INCONCLUSIVE: acceptance and queueing are prohibited)
+  exit=2
+  call: systemctl --user show omniroute.service -p ExecMainStartTimestamp --value
+  call: journalctl --user -u omniroute.service --since Tue\ 2026-10-06\ 21:38:35\ UTC -o cat --no-pager
+CONTROL-RESULT C5 OK :: journalctl exits 0 with clean stdout and the stderr line of journal files not opened for permissions -> JOURNAL-UNAVAILABLE exit=0, no count line, exit 2
+  | JOURNAL-UNAVAILABLE exit=0 (Warning: some journal files were not opened due to insufficient permissions.): the journal query failed, so 'Failed to save call log' could not be counted (INCONCLUSIVE: acceptance and queueing are prohibited)
+  exit=2
+  call: systemctl --user show omniroute.service -p ExecMainStartTimestamp --value
+  call: journalctl --user -u omniroute.service --since Tue\ 2026-10-06\ 21:38:35\ UTC -o cat --no-pager
+CONTROL-RESULT C6 OK :: systemctl fails (exit 1, no stdout), so there is no start timestamp; a journalctl would succeed with a clean journal -> JOURNAL-UNAVAILABLE exit=1 with systemctl's stderr, journalctl not run, exit 2
+  | JOURNAL-UNAVAILABLE exit=1 (no start timestamp: systemctl --user show omniroute.service -p ExecMainStartTimestamp --value exited 1: Failed to connect to bus: No medium found): the journal query failed, so 'Failed to save call log' could not be counted (INCONCLUSIVE: acceptance and queueing are prohibited)
+  exit=2
+  call: systemctl --user show omniroute.service -p ExecMainStartTimestamp --value
+CONTROL-RESULT C7 OK :: systemctl exits 0 and prints an empty value (a bare newline, what systemd 255 prints for a unit that does not exist, so also a misspelled UNIT with the default SINCE) -> JOURNAL-UNAVAILABLE, journalctl not run, exit 2
+  | JOURNAL-UNAVAILABLE exit=0 (no start timestamp: systemctl --user show omniroute.service -p ExecMainStartTimestamp --value gave an empty value): the journal query failed, so 'Failed to save call log' could not be counted (INCONCLUSIVE: acceptance and queueing are prohibited)
+  exit=2
+  call: systemctl --user show omniroute.service -p ExecMainStartTimestamp --value
+CONTROL-RESULT C8 OK :: an unparsable SINCE argument (not-a-date) -> JOURNAL-UNAVAILABLE exit=1 with date's diagnostic, neither systemctl nor journalctl run, exit 2
+  | JOURNAL-UNAVAILABLE exit=1 (no start timestamp: the SINCE argument gave a value that is not a date: date: invalid date 'not-a-date'): the journal query failed, so 'Failed to save call log' could not be counted (INCONCLUSIVE: acceptance and queueing are prohibited)
+  exit=2
+  call: none
+CONTROL-RESULT C9a OK :: a SINCE argument with shell metacharacters that is not a date (x; touch MARKER) -> JOURNAL-UNAVAILABLE, nothing run, no MARKER file, exit 2
+  | JOURNAL-UNAVAILABLE exit=1 (no start timestamp: the SINCE argument gave a value that is not a date: date: invalid date 'x; touch MARKER'): the journal query failed, so 'Failed to save call log' could not be counted (INCONCLUSIVE: acceptance and queueing are prohibited)
+  exit=2
+  call: none
+CONTROL-RESULT C9b OK :: a SINCE argument that date -d accepts and that holds ; $(...) and backticks inside a comment -> passed to journalctl as ONE argument, intact (the call log), nothing executed (no MARKER file), the count line with 0, exit 0
+  | journal_failed_to_save_call_log=0 (journalctl --user -u omniroute.service --since 2026-10-06 21:38:35 UTC (x; touch MARKER $(touch MARKER) `touch MARKER`) -o cat --no-pager | grep -c 'Failed to save call log')
+  exit=0
+  call: journalctl --user -u omniroute.service --since 2026-10-06\ 21:38:35\ UTC\ \(x\;\ touch\ MARKER\ \$\(touch\ MARKER\)\ \`touch\ MARKER\`\) -o cat --no-pager
+CONTROL-RESULT C10 OK :: usage error: three arguments -> a usage line, nothing run, exit 3
+  | usage: journal-save-failures.sh [UNIT [SINCE]]
+  exit=3
+  call: none
+CONTROL-RESULT C10b OK :: usage error: a UNIT that starts with - (--host=example.invalid, an option of systemctl) -> a usage line, nothing run, exit 3
+  | usage: journal-save-failures.sh [UNIT [SINCE]]
+  exit=3
+  call: none
+CONTROL-RESULT C11 OK :: a long output (200000 newlines, 12400057 bytes) with the phrase only on the last line, which has no newline -> counted: the count line with 1, exit 1
+  | journal_failed_to_save_call_log=1 (journalctl --user -u omniroute.service --since Tue 2026-10-06 21:38:35 UTC -o cat --no-pager | grep -c 'Failed to save call log')
+  exit=1
+  call: systemctl --user show omniroute.service -p ExecMainStartTimestamp --value
+  call: journalctl --user -u omniroute.service --since Tue\ 2026-10-06\ 21:38:35\ UTC -o cat --no-pager
+CONTROL-RESULT C12 OK :: the phrase inside longer lines (twice in one line, once inside another word) and a UNIT argument (other-gateway.service, passed to systemctl and journalctl) -> counted once per line: the count line with 2, exit 1
+  | journal_failed_to_save_call_log=2 (journalctl --user -u other-gateway.service --since Tue 2026-10-06 21:38:35 UTC -o cat --no-pager | grep -c 'Failed to save call log')
+  exit=1
+  call: systemctl --user show other-gateway.service -p ExecMainStartTimestamp --value
+  call: journalctl --user -u other-gateway.service --since Tue\ 2026-10-06\ 21:38:35\ UTC -o cat --no-pager
+CONTROL-RESULT C13 OK :: an empty read: journalctl exits 0 with no stdout and no stderr (the real journalctl does that for a unit that does not exist, or for a SINCE in the future; probed on this host) -> JOURNAL-UNAVAILABLE exit=0, no count line, exit 2
+  | JOURNAL-UNAVAILABLE exit=0 (journalctl exited 0 and printed nothing since Tue 2026-10-06 21:38:35 UTC: a unit that does not exist, a start in the future or an unread journal reads the same, and the gateway's journal is never empty since its start): the journal query failed, so 'Failed to save call log' could not be counted (INCONCLUSIVE: acceptance and queueing are prohibited)
+  exit=2
+  call: systemctl --user show omniroute.service -p ExecMainStartTimestamp --value
+  call: journalctl --user -u omniroute.service --since Tue\ 2026-10-06\ 21:38:35\ UTC -o cat --no-pager
+CONTROL-RESULT C13b OK :: an empty read with an explicit UNIT and SINCE (a misspelled unit, nothing to read): JOURNAL-UNAVAILABLE exit=0, no count line, exit 2 (the old pipeline printed 0)
+  | JOURNAL-UNAVAILABLE exit=0 (journalctl exited 0 and printed nothing since 2026-10-07 05:00:00 UTC: a unit that does not exist, a start in the future or an unread journal reads the same, and the gateway's journal is never empty since its start): the journal query failed, so 'Failed to save call log' could not be counted (INCONCLUSIVE: acceptance and queueing are prohibited)
+  exit=2
+  call: journalctl --user -u nosuch.service --since 2026-10-07\ 05:00:00\ UTC -o cat --no-pager
+cases: 17; not as required: 0
+scratch directory removed: $HOME/.cache/journal-save-failures-controls-sHSQ0c
+
+
+# Teeth: the same control (same sha256) run on the scan before its empty-read rule (sha256 92beaf245c594864e498a26f59424a16ef13d829e264e7626302bf1ac9b8f1b7, the text of commit 7b7e2ecb9): C13 and C13b are UNEXPECTED, every other case is OK. These are the CONTROL-RESULT lines of that run, not its whole output.
+CONTROL-RESULT D0 OK :: THE DEFECT: `journalctl --user -u omniroute.service --since "$(systemctl --user show omniroute.service -p ExecMainStartTimestamp --value)" -o cat --no-pager | grep -c 'Failed to save call log'` prints the same count with the same pipeline status (grep's) when journalctl exits 1 with empty stdout as when it reads a clean journal
+CONTROL-RESULT C1 OK :: producer failure: journalctl exits 1 with empty stdout and two lines on stderr (no alarm word) -> JOURNAL-UNAVAILABLE exit=1 with the first 160 bytes of stderr, newlines as spaces, no count line, exit 2
+CONTROL-RESULT C2 OK :: genuine zero: journalctl exits 0 with six lines, none with the phrase (two near misses) -> the count line with 0, exit 0; the defaults: unit omniroute.service, SINCE from systemctl
+CONTROL-RESULT C3 OK :: three matching lines among clean ones -> the count line with 3, exit 1
+CONTROL-RESULT C4 OK :: journalctl exits 0 with clean stdout and the stderr line of a truncated journal file -> JOURNAL-UNAVAILABLE exit=0, no count line, exit 2
+CONTROL-RESULT C5 OK :: journalctl exits 0 with clean stdout and the stderr line of journal files not opened for permissions -> JOURNAL-UNAVAILABLE exit=0, no count line, exit 2
+CONTROL-RESULT C6 OK :: systemctl fails (exit 1, no stdout), so there is no start timestamp; a journalctl would succeed with a clean journal -> JOURNAL-UNAVAILABLE exit=1 with systemctl's stderr, journalctl not run, exit 2
+CONTROL-RESULT C7 OK :: systemctl exits 0 and prints an empty value (a bare newline, what systemd 255 prints for a unit that does not exist, so also a misspelled UNIT with the default SINCE) -> JOURNAL-UNAVAILABLE, journalctl not run, exit 2
+CONTROL-RESULT C8 OK :: an unparsable SINCE argument (not-a-date) -> JOURNAL-UNAVAILABLE exit=1 with date's diagnostic, neither systemctl nor journalctl run, exit 2
+CONTROL-RESULT C9a OK :: a SINCE argument with shell metacharacters that is not a date (x; touch MARKER) -> JOURNAL-UNAVAILABLE, nothing run, no MARKER file, exit 2
+CONTROL-RESULT C9b OK :: a SINCE argument that date -d accepts and that holds ; $(...) and backticks inside a comment -> passed to journalctl as ONE argument, intact (the call log), nothing executed (no MARKER file), the count line with 0, exit 0
+CONTROL-RESULT C10 OK :: usage error: three arguments -> a usage line, nothing run, exit 3
+CONTROL-RESULT C10b OK :: usage error: a UNIT that starts with - (--host=example.invalid, an option of systemctl) -> a usage line, nothing run, exit 3
+CONTROL-RESULT C11 OK :: a long output (200000 newlines, 12400057 bytes) with the phrase only on the last line, which has no newline -> counted: the count line with 1, exit 1
+CONTROL-RESULT C12 OK :: the phrase inside longer lines (twice in one line, once inside another word) and a UNIT argument (other-gateway.service, passed to systemctl and journalctl) -> counted once per line: the count line with 2, exit 1
+CONTROL-RESULT C13 UNEXPECTED :: an empty read: journalctl exits 0 with no stdout and no stderr (the real journalctl does that for a unit that does not exist, or for a SINCE in the future; probed on this host) -> JOURNAL-UNAVAILABLE exit=0, no count line, exit 2
+CONTROL-RESULT C13b UNEXPECTED :: an empty read with an explicit UNIT and SINCE (a misspelled unit, nothing to read): JOURNAL-UNAVAILABLE exit=0, no count line, exit 2 (the old pipeline printed 0)
+cases: 17; not as required: 2

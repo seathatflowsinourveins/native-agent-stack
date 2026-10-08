@@ -1,0 +1,110 @@
+#!/bin/bash
+# Controls for the exit-code logic of scripts/build-drain.sh.txt (version 5): gate(), compare_dry_run(), write_sums() and tree_clean_gate() are SOURCED (BUILD_DRAIN_SOURCE_ONLY=1) and exercised with failing and passing inputs. Raw output goes to the file named by $1.
+# (1) a failing gate stops the script with exit 3; (2) a passing gate continues; (3) the first build's recorded dry-run metadata equals the kept tarball; (4) a one-byte-corrupted tarball and (5) altered metadata both fail the comparison;
+# (6) write_sums on a writable directory writes and verifies SHA256SUMS (status 0); (7) write_sums when SHA256SUMS cannot be written (a read-only directory) fails; (8) write_sums for a tarball that is not there fails; (9) the exit-3 path of the main flow:
+# the same function result inside the script's own `|| { log ...; exit 3; }` wrapper stops a subshell with exit 3;
+# (10) the real script with a SHIM_SOURCE whose sha256 is not the pinned one stops with exit 2 before it creates a work directory; (11) the same with no shim file at all; (12) the mechanism of the check:pack-boot gate line: with a copy of the pinned shim first on PATH,
+# `lsof -ti :PORT` answers exit 2 with no output (the status upstream's findListeningPids reports as null, so its bind probe decides) and another lsof call passes through to the real lsof.
+# Version 5 adds (13) tree_clean_gate() on a clean repository (succeeds), (14) with an untracked file and (15) with a modified tracked file (both stop with exit 3), (16) with `git status` failing and printing nothing (a git fixture first on PATH; stops with exit 3, while version 4's own
+# line, run on the same fixture, reads the failure as zero lines and passes), (17) with `git diff --quiet HEAD` exiting 1 while `git status` prints nothing (stops), (18) with `git diff` failing (exit 128; stops and says so), and (19) compare_dry_run with a changed entryCount: still succeeds,
+# because the entry count is printed as reported and not compared (what its comment now says).
+set -u
+S=$HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-build-drain-20261006.sh
+ART=$HOME/.local/state/native-agent-stack/omniroute-artifacts-20261005
+DRY=${FIRST_BUILD_PACKDRY:-$HOME/.cache/omniroute-drain-build-out/packdry.json}
+OUTF=${1:?output file}
+W=$(mktemp -d "$HOME/.cache/omniroute-build-controls-XXXXXX")
+chmod 700 "$W"
+export OUT=$W/out; mkdir -p "$OUT"
+export T=$W/tree; mkdir -p "$T"
+export BUILD_DRAIN_SOURCE_ONLY=1
+# shellcheck disable=SC1090
+. "$S"
+{
+  echo "## (1) gate() with a failing command must stop the script with exit 3 and log the failing gate"
+  ( gate failing-gate false; echo "reached after the failing gate (must not print)" ); echo "subshell exit=$?"
+  echo "## (2) gate() with a passing command logs it and continues"
+  ( gate passing-gate true; echo "reached after the passing gate" ); echo "subshell exit=$?"
+  echo "## (3) compare_dry_run: the first build's recorded dry-run metadata against the kept tarball (same bytes: must succeed)"
+  compare_dry_run "$DRY" "$ART/omniroute-3.8.51-drain-b7c68690.tgz"; echo "exit=$?"
+  echo "## (4) compare_dry_run against a one-byte-corrupted copy of the tarball (must fail)"
+  cp "$ART/omniroute-3.8.51-drain-b7c68690.tgz" "$W/corrupt.tgz"
+  printf 'X' | dd of="$W/corrupt.tgz" bs=1 seek=1000 conv=notrunc 2> /dev/null
+  compare_dry_run "$DRY" "$W/corrupt.tgz"; echo "exit=$?"
+  echo "## (5) compare_dry_run with dry-run metadata whose integrity was altered (must fail)"
+  python3 - "$DRY" "$W/altered.json" <<'PYEOF'
+import json, sys
+d = json.load(open(sys.argv[1]))
+d[0]["integrity"] = "sha512-" + "A" * 86 + "=="
+json.dump(d, open(sys.argv[2], "w"))
+PYEOF
+  compare_dry_run "$W/altered.json" "$ART/omniroute-3.8.51-drain-b7c68690.tgz"; echo "exit=$?"
+  echo "## (6) write_sums on a writable directory with the tarball present: SHA256SUMS is written and verified (must succeed)"
+  mkdir -p "$W/ok"; OUT=$W/ok; : > "$OUT/progress.txt"
+  echo "stand-in tarball bytes" > "$OUT/standin.tgz"
+  write_sums standin.tgz; echo "exit=$?"; echo "SHA256SUMS lines: $(wc -l < "$OUT/SHA256SUMS")"
+  echo "## (7) write_sums when SHA256SUMS cannot be written (the directory is read-only): must fail"
+  mkdir -p "$W/ro"; OUT=$W/ro; echo "stand-in tarball bytes" > "$OUT/standin.tgz"; : > "$OUT/progress.txt"; chmod 555 "$OUT"
+  # progress.txt is written by tee, so keep it writable by its own file mode (a file in a read-only directory stays writable)
+  write_sums standin.tgz; echo "exit=$?"
+  chmod 755 "$OUT"
+  echo "## (8) write_sums for a tarball that is not in the directory: must fail"
+  mkdir -p "$W/missing"; OUT=$W/missing; : > "$OUT/progress.txt"
+  write_sums no-such.tgz; echo "exit=$?"
+  echo "## (9) the main flow's wrapper around write_sums stops with exit 3 when it fails (the same wrapper text as the script's last step)"
+  ( OUT=$W/missing; write_sums no-such.tgz > /dev/null 2>&1 || { log "writing or verifying SHA256SUMS failed: stopping" > /dev/null; exit 3; }; echo "reached after the failed step (must not print)" ); echo "subshell exit=$?"
+  echo "## (10) the real script with a SHIM_SOURCE that is not the pinned shim (one extra comment line): must stop with exit 2 before creating a work directory"
+  WT=$HOME/code/.worktrees/native-agent-stack/99/omniroute-gw3
+  PINNED_SHIM=$WT/evidence/artifacts/omniroute-sol-max-20260930/scripts/lsof-shim-v2.sh.txt
+  mkdir -p "$W/work10" "$W/in"; cp "$PINNED_SHIM" "$W/in/lsof-shim-changed.sh.txt"; echo "# one extra comment line" >> "$W/in/lsof-shim-changed.sh.txt"
+  echo "pinned shim sha256: $(sha256sum "$PINNED_SHIM" | cut -d' ' -f1); the changed copy: $(sha256sum "$W/in/lsof-shim-changed.sh.txt" | cut -d' ' -f1)"
+  env BUILD_DRAIN_SOURCE_ONLY=0 DRAIN_DIR=$HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/drain-patch EV=$WT/evidence/artifacts/omniroute-wire-effort-20261005 EXPECT_TREE=0000000000000000000000000000000000000000 \
+    SHIM_SOURCE="$W/in/lsof-shim-changed.sh.txt" WORK_ROOT="$W/work10" bash "$S"; echo "script exit=$?"; echo "work directories created under the control's WORK_ROOT: $(ls "$W/work10" | wc -l)"
+  echo "## (11) the real script with no shim file at all: must stop with exit 2 before creating a work directory"
+  mkdir -p "$W/work11"
+  env BUILD_DRAIN_SOURCE_ONLY=0 DRAIN_DIR=$HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/drain-patch EV=$WT/evidence/artifacts/omniroute-wire-effort-20261005 EXPECT_TREE=0000000000000000000000000000000000000000 \
+    SHIM_SOURCE="$W/in/no-such-shim.sh.txt" WORK_ROOT="$W/work11" bash "$S"; echo "script exit=$?"; echo "work directories created under the control's WORK_ROOT: $(ls "$W/work11" | wc -l)"
+  echo "## (12) the gate line's mechanism: a copy of the pinned shim first on PATH answers lsof -ti :PORT with exit 2 and no output; another lsof call passes through"
+  mkdir -p "$W/shim12"; cp "$PINNED_SHIM" "$W/shim12/lsof"; chmod 755 "$W/shim12/lsof"
+  env PATH="$W/shim12:$PATH" sh -c 'echo "resolved lsof: $(command -v lsof)"; out=$(lsof -ti :24999); echo "lsof -ti :24999 -> status=$? output=[$out]"; lsof -v > /dev/null 2>&1; echo "lsof -v (pass-through to /usr/bin/lsof) -> status=$?"'
+  echo "without the shim, the same query on a port nothing uses: $(lsof -ti :24999 > /dev/null 2>&1; echo "status=$?") (1 = no match, which upstream reads as 'free')"
+  echo "## (13) tree_clean_gate on a clean repository: must succeed"
+  REAL_GIT=$(command -v git)
+  mkdir -p "$W/repo13"; "$REAL_GIT" -C "$W/repo13" init -q; echo one > "$W/repo13/a.txt"; "$REAL_GIT" -C "$W/repo13" add a.txt; "$REAL_GIT" -c user.name=Scout -c user.email=scout@local -c core.hooksPath=/dev/null -C "$W/repo13" commit -q -m one
+  : > "$OUT/progress.txt"; T=$W/repo13; tree_clean_gate; echo "exit=$?"
+  echo "## (14) an untracked file: must stop with exit 3 and list it"
+  echo two > "$W/repo13/b.txt"; tree_clean_gate; echo "exit=$?"; rm -f "$W/repo13/b.txt"
+  echo "## (15) a modified tracked file: must stop with exit 3 and list it"
+  echo changed >> "$W/repo13/a.txt"; tree_clean_gate; echo "exit=$?"; "$REAL_GIT" -C "$W/repo13" checkout -q -- a.txt
+  mkdir -p "$W/gitstub"
+  cat > "$W/gitstub/git" <<'STUBEOF'
+#!/bin/bash
+# fixture git: STUB_GIT_STATUS_RC makes `status` print nothing on stdout and exit with that status, STUB_GIT_DIFF_RC makes `diff` exit with that status; everything else is the real git
+args=("$@"); i=0
+while [ "$i" -lt "${#args[@]}" ]; do case "${args[$i]}" in -c|-C) i=$((i + 2));; *) break;; esac; done
+case "${args[$i]:-}" in
+  status) [ -n "${STUB_GIT_STATUS_RC:-}" ] && { echo "fatal: simulated git status failure" >&2; exit "$STUB_GIT_STATUS_RC"; };;
+  diff) [ -n "${STUB_GIT_DIFF_RC:-}" ] && exit "$STUB_GIT_DIFF_RC";;
+esac
+exec "${STUB_GIT_REAL:?}" "$@"
+STUBEOF
+  chmod 755 "$W/gitstub/git"
+  echo "## (16) git status FAILS (exit 128) and prints nothing: version 5 must stop with exit 3; version 4's own line on the same fixture reads the failure as zero lines and passes (the defect)"
+  ( export PATH="$W/gitstub:$PATH" STUB_GIT_REAL="$REAL_GIT" STUB_GIT_STATUS_RC=128; : > "$OUT/progress.txt"; tree_clean_gate; echo "version 5: exit=$?"
+    set -o pipefail; DIRTY=$(G status --porcelain --untracked-files=all | wc -l | tr -d ' '); echo "version 4's line: DIRTY=$DIRTY; its test [ \"\$DIRTY\" = \"0\" ] $([ "$DIRTY" = "0" ] && echo PASSES, so version 4 went on to the build || echo fails)" )
+  echo "## (17) git diff --quiet HEAD exits 1 while git status prints nothing (fixture): must stop with exit 3"
+  ( export PATH="$W/gitstub:$PATH" STUB_GIT_REAL="$REAL_GIT" STUB_GIT_DIFF_RC=1; : > "$OUT/progress.txt"; tree_clean_gate; echo "exit=$?" )
+  echo "## (18) git diff FAILS (exit 128): must stop with exit 3 and say the tree cannot be compared"
+  ( export PATH="$W/gitstub:$PATH" STUB_GIT_REAL="$REAL_GIT" STUB_GIT_DIFF_RC=128; : > "$OUT/progress.txt"; tree_clean_gate; echo "exit=$?" )
+  echo "## (19) compare_dry_run with a changed entryCount (sha1, integrity and size equal): must still succeed, because the entry count is printed as reported, not compared"
+  python3 - "$DRY" "$W/entries.json" <<'PYEOF2'
+import json, sys
+d = json.load(open(sys.argv[1]))
+d[0]["entryCount"] = 1
+json.dump(d, open(sys.argv[2], "w"))
+PYEOF2
+  compare_dry_run "$W/entries.json" "$ART/omniroute-3.8.51-drain-b7c68690.tgz"; echo "exit=$?"
+} > "$OUTF" 2>&1
+grep -n "write_sums" "$S" | cut -c1-200 >> "$OUTF"
+echo "scratch directory (remove with rm -rf after reading): $W" >> "$OUTF"
+echo "written $OUTF"

@@ -1,0 +1,42 @@
+[DB] Driver: better-sqlite3 | file: /tmp/omniroute-test-dN3T1E/storage.sqlite
+[DB] Added provider_connections.last_ping_at column
+[DB] Added provider_connections.last_pinged_reset_key column
+[DB] Added usage_history.combo_strategy column
+[DB] Added call_logs.video_content_removed column
+[DB] Added call_logs.ttft_ms column
+[DB] Added call_logs.model_pinned column
+[DB] Added call_logs.session_tag column
+[DB] Added call_logs.reasoning_duration_ms column
+[DB] Added call_logs.reasoning_effort_requested column
+[DB] Added call_logs.reasoning_effort_upstream column
+[DB] Added call_logs.reasoning_encrypted column
+[DB] Added call_logs.has_content column
+[DB] Added call_logs.usage_provenance column
+[DB] Added call_logs.resilience_actions column
+[DB] Changing cache_size from 65536KB to 16384KB
+[DB] cache_size changed to 16384KB
+[DB] auto_vacuum drift detected (configured=INCREMENTAL, live=NONE); scheduling reconcile on the next vacuum-scheduler run
+[DB] SQLite database ready: /tmp/omniroute-test-dN3T1E/storage.sqlite (DATA_DIR=/tmp/omniroute-test-dN3T1E, SQLITE_FILE=/tmp/omniroute-test-dN3T1E/storage.sqlite)
+[21:49:35] 🌊 [STREAM] CODEX | gpt-5.6-sol | 10ms | complete
+[21:49:35] 📊 [USAGE] CODEX | in=10 | out=2 | account=connecti...
+[21:49:35] 🌊 [STREAM] CODEX | gpt-5.6-sol | 1ms | complete
+✔ a client that closes right after response.completed still lets the stream finish: completion and usage bookkeeping run (91.85316ms)
+[21:49:35] 🌊 [STREAM] CODEX | gpt-5.6-sol | 2ms | complete
+✔ with the disconnect grace period disabled the old behaviour stays: the upstream is cancelled and onComplete does not run (32.059951ms)
+[21:49:35] 🌊 [STREAM] CODEX | gpt-5.6-sol | 2ms | disconnect: request_signal_aborted
+[21:49:35] 🌊 [STREAM] CODEX | gpt-5.6-sol | 2ms | client_disconnect (post-abort)
+✔ the drain is bounded: an upstream that never ends is cancelled when the grace period expires, and the pending request is cleared (122.004319ms)
+[21:49:36] 🌊 [STREAM] CODEX | gpt-5.6-sol | 3ms | complete
+✔ a disconnect before the terminal event is unchanged: the upstream is cancelled right away (25.919096ms)
+[21:49:36] 📊 [USAGE] CODEX | in=10 | out=2 | account=connecti...
+[21:49:36] 🌊 [STREAM] CODEX | gpt-5.6-sol | 2ms | complete
+✔ a completed tool handoff whose terminal event was already delivered is drained too: completion and usage bookkeeping run (73.692324ms)
+✔ a completed tool handoff whose terminal event was already delivered has a bounded drain, and the pending request is cleared (123.494608ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1385.508582

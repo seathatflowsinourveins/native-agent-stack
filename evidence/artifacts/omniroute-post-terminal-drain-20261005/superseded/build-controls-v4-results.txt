@@ -1,0 +1,52 @@
+# Controls for scripts/build-drain.sh.txt (version 4, 2026-10-06 UTC): gate(), compare_dry_run() and write_sums() are sourced (BUILD_DRAIN_SOURCE_ONLY=1) and exercised with failing and passing inputs; the pinned-shim check runs in the real script. Raw output, home directory written $HOME.
+# (1) a failing gate stops the script with exit 3; (2) a passing gate continues; (3) the first build's recorded dry-run metadata equals the kept tarball; (4) a one-byte-corrupted tarball and (5) altered metadata both fail the comparison;
+# (6) write_sums writes and verifies SHA256SUMS; (7) it fails when the file cannot be written; (8) it fails for a missing tarball; (9) the main flow's wrapper turns that failure into exit 3; (10) a shim that is not the pinned one and (11) no shim at all stop the real script with exit 2 before a work directory exists;
+# (12) the gate line's mechanism: with the pinned shim first on PATH `lsof -ti :PORT` answers exit 2 with no output and another lsof call passes through.
+
+## (1) gate() with a failing command must stop the script with exit 3 and log the failing gate
+11:08:32Z failing-gate exit=1 seconds=0
+subshell exit=3
+## (2) gate() with a passing command logs it and continues
+11:08:32Z passing-gate exit=0 seconds=0
+reached after the passing gate
+subshell exit=0
+## (3) compare_dry_run: the first build's recorded dry-run metadata against the kept tarball (same bytes: must succeed)
+dry-run shasum 3d1308f97056a31fcfe571a28116cbbfd1a7e894 | kept sha1 3d1308f97056a31fcfe571a28116cbbfd1a7e894 | integrity equal: True | size 137825952 137825952 | entries 26762 | equal: True
+exit=0
+## (4) compare_dry_run against a one-byte-corrupted copy of the tarball (must fail)
+dry-run shasum 3d1308f97056a31fcfe571a28116cbbfd1a7e894 | kept sha1 078d30810bc6e280b27f982076bc37ca16acaede | integrity equal: False | size 137825952 137825952 | entries 26762 | equal: False
+exit=1
+## (5) compare_dry_run with dry-run metadata whose integrity was altered (must fail)
+dry-run shasum 3d1308f97056a31fcfe571a28116cbbfd1a7e894 | kept sha1 3d1308f97056a31fcfe571a28116cbbfd1a7e894 | integrity equal: False | size 137825952 137825952 | entries 26762 | equal: False
+exit=1
+## (6) write_sums on a writable directory with the tarball present: SHA256SUMS is written and verified (must succeed)
+standin.tgz: OK
+exit=0
+SHA256SUMS lines: 1
+## (7) write_sums when SHA256SUMS cannot be written (the directory is read-only): must fail
+$HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-build-drain-20261006.sh: line 37: SHA256SUMS: Permission denied
+exit=1
+## (8) write_sums for a tarball that is not in the directory: must fail
+sha256sum: no-such.tgz: No such file or directory
+exit=1
+## (9) the main flow's wrapper around write_sums stops with exit 3 when it fails (the same wrapper text as the script's last step)
+subshell exit=3
+## (10) the real script with a SHIM_SOURCE that is not the pinned shim (one extra comment line): must stop with exit 2 before creating a work directory
+pinned shim sha256: b6ae900224df3dc73fff2a50b3d7206d78895c6147e93e80b62e66d423e69854; the changed copy: a0366bc49ef115a1c0ea4f31ef24b1387e76bfe7cb84cdd5cbc75e648b93c3b1
+the shim source $HOME/.cache/omniroute-build-controls-C2jGu0/in/lsof-shim-changed.sh.txt does not have the pinned sha256 b6ae900224df3dc73fff2a50b3d7206d78895c6147e93e80b62e66d423e69854
+script exit=2
+work directories created under the control's WORK_ROOT: 0
+## (11) the real script with no shim file at all: must stop with exit 2 before creating a work directory
+no lsof shim source at $HOME/.cache/omniroute-build-controls-C2jGu0/in/no-such-shim.sh.txt (set SHIM_SOURCE)
+script exit=2
+work directories created under the control's WORK_ROOT: 0
+## (12) the gate line's mechanism: a copy of the pinned shim first on PATH answers lsof -ti :PORT with exit 2 and no output; another lsof call passes through
+resolved lsof: $HOME/.cache/omniroute-build-controls-C2jGu0/shim12/lsof
+lsof -ti :24999 -> status=2 output=[]
+lsof -v (pass-through to /usr/bin/lsof) -> status=0
+without the shim, the same query on a port nothing uses: status=1 (1 = no match, which upstream reads as 'free')
+7:# Version 3 (2026-10-06) adds: the SHA256SUMS write-and-verify step is a function, write_sums(), whose status decides the exit status (version 2 logged "every gate exited 0" whatever the step return
+17:#        BUILD_DRAIN_SOURCE_ONLY=1 . omniroute-build-drain-20261006.sh   defines the gate, comparison and write_sums functions only (for their controls; the caller sets OUT)
+36:write_sums() { # tarball name (a file in $OUT): write SHA256SUMS there and verify it; returns the status of the write-and-verify subshell, not of tee
+100:write_sums "omniroute-3.8.51-drain-$NAME8.tgz" || { log "writing or verifying SHA256SUMS failed: stopping"; exit 3; }
+scratch directory (remove with rm -rf after reading): $HOME/.cache/omniroute-build-controls-C2jGu0

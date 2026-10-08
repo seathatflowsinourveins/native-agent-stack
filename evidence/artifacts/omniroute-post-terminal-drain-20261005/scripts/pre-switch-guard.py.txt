@@ -1,0 +1,413 @@
+#!/usr/bin/env python3
+"""Pre-switch guard for the 20128 canary (frozen with checks/live-acceptance-protocol.md): run it IMMEDIATELY before `switch_gateways.py --only 20128 ... --apply`, chained with `&&` so that nothing separates the
+two; do not switch unless it exits 0. It answers the questions the command center's round-3 ruling asked for, one `CHECK` line each (value-free: counts, process names, hashes of files, build ids):
+
+ 1. Is the switch tool the pinned one? sha256 of the copy that will be run equals the committed evidence copy's (97d1b87b...).
+ 2. Is the first-hop rollback target intact? The prefix omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167 has bin/omniroute, dist/BUILD_SHA cf6748d04 and shim/lsof with sha256 b6ae9002... (the reviewed shim v2), and the
+    unit currently runs it (identity read-back: gateway-identity-20261006.py, health ok). Is the target intact? bin/omniroute, dist/BUILD_SHA 2a41147b7, the same shim, and the drain's marker in its compiled chunks.
+    In both prefixes bin/omniroute and shim/lsof must be, with their symlinks resolved, regular files that the guard's user (the units' user) may read and execute. Round 13 (full-scope read r12, P2-4; still version 5): the check
+    required only that bin/omniroute EXISTS and that the shim has the pinned hash, so a prefix whose entrypoint or shim had lost its execute permission, or whose entrypoint was a directory, read as intact; a running
+    process of the prefix stays healthy after such a loss, while the rollback that launches the prefix would fail. A dangling symlink, a directory or a missing permission is now a problem of the prefix.
+ 3. Is nothing in flight? For --clean-for seconds (default 30), sampled every --interval seconds (default 5), ALL of:
+    - no worker process of another lane (omniroute-codex-sdk/worker.py, `codex exec`, or an interactive `codex` that names the omniroute profile or the gateway port);
+    - no call_logs row in the last 120 s;
+    - no ACTIVE client connection to the gateway port. Every established connection (one `ss -O -tnpi` snapshot per sample, both ends of the loopback connection) is classified by the owner of its CLIENT end:
+        * TOLERATED: the owner is visible in this PID namespace, its cgroup unit is one of --tolerate-unit (default `omniroute-fw.service`, the 20129 framework gateway) AND the connection is EMPTY at every sample: empty receive and send
+          queues and no bytes received or sent (ss prints bytes_received and bytes_sent only when they are not zero). That is what the observed poll is: the framework gateway holds a connection to 20128 for 22-30 s and opens
+          a new one (watch of 2026-10-06 05:14Z, `checks/connection-watch-20128.txt`), with no call_logs row and no byte on it. It is NOT enough to be that unit's: the same unit forwards real inference to 20128 through a provider node,
+          so a connection of that unit that carries bytes or queued data, or whose counters change, is judged like any other client's (ACTIVE). An empty connection carries no request; a request that starts on it after the last sample
+          is invisible to any guard, which is why callers must be paused (protocol step 2). Tolerated connections are reported, never failed.
+        * every other connection (including a tolerated unit's connection that carries data) must be IDLE across the window: empty receive and send queues at every sample, unchanged bytes_received and bytes_sent between the first and the last sample, and not new during the window
+          (a new connection from an unknown or non-tolerated owner is a client making a request). The command center asked for "no established client connection"; that cannot hold literally on this host: idle keep-alive connections
+          from clients in other PID namespaces exist at rest (nine at 2026-10-06 01:36Z, before the host restart, none with queued data; the other WSL distro shares the network namespace) and the framework gateway polls. They are
+          counted and reported (`connections_total`, `connections_tolerated`) but only ACTIVE ones fail the check. Hindsight and any other service that calls 20128 must be paused before the switch (protocol step 2): its requests show up here as active.
+    Informational only (never a failure): the gateway's own pending-request counter (GET /api/usage/history, counts only; on the unpatched build it keeps entries of requests whose stream was cancelled before it finished,
+    so it does not return to zero), whether it changed during the window, and the running hindsight processes (a known 20128 client, to be paused by the protocol).
+ An observation that fails is a FAIL of the check, never an idle host: `ss` exiting non-zero or printing lines it cannot parse, `pgrep` exiting with a status other than 0 (matches) or 1 (no match).
+ Version 5 (full-scope read of 8f9d89662, P2-2 and P2-3): the `ss` parse is strict and the connections are keyed by their full endpoint tuple.
+    * `ss -O -Htnpi` prints ONE record per line (iproute2 6.1.0 here): `Recv-Q Send-Q Local Peer [users:(("name",pid=N,fd=M)[,...])] <tcp info>`. A line that is not that shape, a users field that does not parse, a record whose info lacks `mss:` and `cwnd:` (an established TCP socket always has both,
+      so a record without them has no counters: unavailable, not zero), a `bytes_received` or `bytes_sent` that is repeated or not all digits, and a blank line are an ObservationError. ss prints bytes_sent and bytes_received only when they are not zero (iproute2 misc/ss.c), so an ABSENT key on a well-formed record is a real zero.
+    * The listeners of the port are observed first (`ss -Htln`): the guard's classification relies on the unit listening on loopback only, so a listener on any other address, or none, is an ObservationError. A connection is the pair of its two records, matched on the FULL normalized
+      (client address, client port, server address, server port) tuple (IPv4-mapped IPv6 normalized to IPv4); the server end (local = a listener address) carries the queues and counters, the client end (peer = a listener address) the owner. Two records of the same end for one tuple, a record with the
+      listener address at both ends, and a connection seen on one end only (a connection closing during the snapshot, or a socket whose other end `ss` cannot show) are an ObservationError: rerun the guard. A record whose two addresses are not the listener's (another host's port 20128) is unrelated and only counted.
+    * --idle-only runs only the idle observation (no switch tool, rollback or target prefix checks; the identity read-back expects no build) and ends with IDLE-RESULT instead of GUARD-RESULT, so an idle-only receipt cannot pass for the pre-switch gate: it is the pre-arm check of the census gate after the switch,
+      where the full mode's identity check (it expects the ROLLBACK prefix) cannot hold. An `&&` chain in front of `switch_gateways.py --apply` uses the full mode.
+ The guard cannot see an interactive client that holds no connection at the moment, or a request that is silent on the wire (waiting for the upstream); announcing the restart time to 5f, c5 and the command center first,
+ and their holds, are protocol steps, not checks here.
+
+Exit status: 0 all checks hold (GUARD-RESULT clean=True), 4 any check fails (clean=False), 3 usage error. It writes nothing and restarts nothing.
+usage: pre-switch-guard-20261006.py (--switch-tool FILE | --idle-only) [--port 20128] [--tools DIR] [--db FILE] [--unit omniroute.service] [--clean-for 30] [--interval 5]
+       [--rollback-prefix NAME] [--rollback-build SHA] [--target-prefix NAME] [--target-build SHA] [--shim-sha256 HEX] [--switch-sha256 HEX] [--pid N] [--identity-script FILE] [--worker-pattern REGEX] [--tolerate-unit UNIT]
+(every default below is the frozen value; the offline controls override them with scratch values, a live run passes none of them except --switch-tool)
+"""
+import argparse
+import datetime as dt
+import hashlib
+import ipaddress
+import json
+import os
+import re
+import sqlite3
+import subprocess
+import sys
+import time
+import urllib.request
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+MARKER = re.compile(rb"abort\(\),[A-Za-z_$]+\.clearPendingRequest\?\.\(\),Promise\.allSettled")
+
+
+class Parser(argparse.ArgumentParser):
+    def error(self, message):
+        print(f"ERROR usage: {message}", file=sys.stderr)
+        sys.exit(3)
+
+
+def sha256(path):
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+class ObservationError(Exception):
+    """An observation the guard needs failed (a command exited with an unexpected status, or printed what cannot be parsed): the check FAILS, it never reads as an idle host."""
+
+
+def sh(*args):
+    return subprocess.run(args, capture_output=True, text=True)
+
+
+def utc(ts=None):
+    return (ts or dt.datetime.now(dt.timezone.utc)).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
+
+
+def build_sha(tools, prefix):
+    p = Path(tools) / prefix / "lib/node_modules/omniroute/dist/BUILD_SHA"
+    return p.read_text().strip() if p.exists() else ""
+
+
+def not_runnable(path):
+    """Why this user could not launch `path` ("" when it can): with its symlinks resolved it must be a regular file that this user may read and execute (the entrypoint and the shim are scripts, so
+    their interpreter has to read them; the guard runs as the units' user). "missing" when there is no such entry at all; a dangling symlink, a directory and a file without those permissions are problems too."""
+    if not path.exists() and not path.is_symlink():
+        return "missing"
+    real = Path(os.path.realpath(path))
+    if not real.exists():
+        return "is a dangling symlink"
+    if not real.is_file():
+        return "is a directory, not a regular file" if real.is_dir() else "is not a regular file"
+    if not os.access(real, os.R_OK | os.X_OK):
+        return f"is not readable and executable by this user (mode {oct(real.stat().st_mode & 0o777)})"
+    return ""
+
+
+def check_prefix(tools, name, build, shim_sha, marker):
+    """Problems of one install prefix, as strings (empty list: intact)."""
+    base = Path(tools) / name
+    problems = []
+    if not base.is_dir():
+        return [f"prefix {name} does not exist"]
+    why = not_runnable(base / "bin/omniroute")
+    if why:
+        problems.append("missing bin/omniroute" if why == "missing" else f"bin/omniroute {why}")
+    got = build_sha(tools, name)
+    if got != build:
+        problems.append(f"dist/BUILD_SHA is {got or 'missing'}, expected {build}")
+    shim = base / "shim/lsof"
+    why = not_runnable(shim)
+    if why:
+        problems.append("missing shim/lsof" if why == "missing" else f"shim/lsof {why}")
+    elif sha256(shim) != shim_sha:
+        problems.append("shim/lsof sha256 is not the reviewed shim v2")
+    if marker:
+        chunks = base / "lib/node_modules/omniroute/dist/.build/next/server/chunks"
+        hits = 0
+        if chunks.is_dir():
+            for f in chunks.rglob("*.js"):
+                try:
+                    if MARKER.search(f.read_bytes()):
+                        hits += 1
+                except OSError:
+                    pass
+        if hits < 1:
+            problems.append("the drain marker is absent from the compiled server chunks")
+    return problems
+
+
+def unit_of(pid):
+    """The last segment of the pid's cgroup path (for example `omniroute-fw.service`), or None when it cannot be read (another PID namespace, a process that has gone)."""
+    try:
+        for line in open(f"/proc/{pid}/cgroup", encoding="utf-8"):
+            if line.startswith("0::"):
+                return line.strip()[3:].rsplit("/", 1)[-1] or None
+    except OSError:
+        return None
+    return None
+
+
+def parse_endpoint(text):
+    """(address, port) of an `ss` address:port field with the address normalized (an IPv4-mapped IPv6 address becomes IPv4; `*` stays); an ObservationError when it cannot be parsed."""
+    try:
+        if text.startswith("["):
+            host, sep, port = text[1:].partition("]:")
+        else:
+            host, sep, port = text.rpartition(":")
+        if not sep or not port.isdigit() or not 0 < int(port) < 65536:
+            raise ValueError("not address:port")
+        if host == "*":
+            return "*", int(port)
+        ip = ipaddress.ip_address(host)
+        if isinstance(ip, ipaddress.IPv6Address) and ip.ipv4_mapped:
+            ip = ip.ipv4_mapped
+        return str(ip), int(port)
+    except ValueError as error:
+        raise ObservationError(f"cannot parse the address {text[:60]!r} ({error})")
+
+
+def listeners(port):
+    """The addresses the gateway port listens on, from `ss -Htln`. The guard's classification relies on the unit listening on loopback only, so a listener on any other address, or none at all, is an ObservationError."""
+    proc = sh("ss", "-Htln", f"sport = :{port}")
+    if proc.returncode != 0:
+        raise ObservationError(f"ss (listeners) exited {proc.returncode}: {proc.stderr.strip()[:120]}")
+    found = set()
+    for line in proc.stdout.splitlines():
+        fields = line.split()
+        if len(fields) < 5 or fields[0] != "LISTEN":
+            raise ObservationError(f"ss printed a listener line that cannot be parsed ({len(fields)} fields)")
+        ip, lport = parse_endpoint(fields[3])
+        if lport != port:
+            raise ObservationError(f"ss printed a listener on port {lport}, not {port}")
+        if ip == "*" or not ipaddress.ip_address(ip).is_loopback:
+            raise ObservationError(f"port {port} listens on {ip}, not on loopback only: the guard's connection classification does not hold")
+        found.add((ip, lport))
+    if not found:
+        raise ObservationError(f"nothing listens on port {port}")
+    return found
+
+
+USERS_RE = re.compile(r'users:\(\("[^"]*",pid=\d+,fd=\d+\)(?:,\("[^"]*",pid=\d+,fd=\d+\))*\)')
+RECORD_RE = re.compile(r"^(\d+)\s+(\d+)\s+(\S+)\s+(\S+)\s+(.+)$")
+
+
+def counter(info, key):
+    """The value of `key:N` in an ss info string: 0 when the key is absent (ss prints bytes_sent and bytes_received only when they are not zero); an ObservationError when it is repeated or not all digits."""
+    hits = re.findall(r"(?:^|\s)" + key + r":(\S*)", info)
+    if not hits:
+        return 0
+    if len(hits) > 1 or not re.fullmatch(r"\d+", hits[0]):
+        raise ObservationError(f"the {key} counter is repeated or malformed ({hits[:2]!r})")
+    return int(hits[0])
+
+
+def parse_record(line):
+    """One `ss -O -Htnpi state established` record: queues, both endpoints, the owner pids of the end when ss shows them, and the byte counters; an ObservationError for anything else."""
+    m = RECORD_RE.match(line)
+    if not m:
+        raise ObservationError("ss printed a line that is not a connection record")
+    rest, owners = m.group(5), []
+    if rest.startswith("users:("):
+        um = USERS_RE.match(rest)
+        if not um:
+            raise ObservationError("the users field of a record cannot be parsed")
+        owners = sorted({int(p) for p in re.findall(r"pid=(\d+)", um.group(0))})
+        rest = rest[um.end():].strip()
+    if "users:(" in rest:
+        raise ObservationError("a users field sits in an unexpected position")
+    if not re.search(r"(?:^|\s)mss:\d+", rest) or not re.search(r"(?:^|\s)cwnd:\d+", rest):
+        raise ObservationError("a record has no TCP info (no mss: and cwnd:), so its byte counters are unavailable, not zero")
+    return {"recvq": int(m.group(1)), "sendq": int(m.group(2)), "local": parse_endpoint(m.group(3)), "peer": parse_endpoint(m.group(4)), "owners": owners,
+            "bytes_received": counter(rest, "bytes_received"), "bytes_sent": counter(rest, "bytes_sent")}
+
+
+class Connections(dict):
+    """{client endpoint -> server endpoint: {"counters": (recv_q, send_q, bytes_received, bytes_sent) of the server end, "owners": pids of the client end}} plus `unrelated`, the number of records that are not the gateway's."""
+    unrelated = 0
+
+
+def connections(port):
+    """The established connections with the gateway as the server end, from ONE `ss -O -Htnpi` snapshot, paired from both ends on the full normalized endpoint tuple (see the docstring of this file, version 5)."""
+    gateway = listeners(port)
+    proc = sh("ss", "-O", "-Htnpi", "state", "established", f"( sport = :{port} or dport = :{port} )")
+    if proc.returncode != 0:
+        raise ObservationError(f"ss exited {proc.returncode}: {proc.stderr.strip()[:120]}")
+    ends, unrelated = {}, 0
+    lines = proc.stdout.split("\n")
+    if lines and lines[-1] == "":
+        lines.pop()   # the final newline; a blank line anywhere else fails parse_record
+    for line in lines:
+        rec = parse_record(line)
+        at_server, at_client = rec["local"] in gateway, rec["peer"] in gateway
+        if at_server and at_client:
+            raise ObservationError("a record has the gateway's listener address at both ends")
+        if not (at_server or at_client):
+            unrelated += 1
+            continue
+        key = (rec["peer"], rec["local"]) if at_server else (rec["local"], rec["peer"])   # (client endpoint, server endpoint)
+        side = "server" if at_server else "client"
+        slot = ends.setdefault(key, {})
+        if side in slot:
+            raise ObservationError(f"two {side}-end records for the connection {key[0][0]}:{key[0][1]} -> {key[1][0]}:{key[1][1]}: conflicting observations")
+        slot[side] = rec
+    out = Connections()
+    out.unrelated = unrelated
+    for key, slot in ends.items():
+        name = f"{key[0][0]}:{key[0][1]} -> {key[1][0]}:{key[1][1]}"
+        if "server" not in slot or "client" not in slot:
+            raise ObservationError(f"the connection {name} was observed on its {'client' if 'server' not in slot else 'server'} end only: the other end is missing (a connection closing during the snapshot, or a socket ss cannot show); rerun")
+        s, c = slot["server"], slot["client"]
+        out[name] = {"counters": (s["recvq"], s["sendq"], s["bytes_received"], s["bytes_sent"]), "owners": c["owners"]}
+    return out
+
+
+WORKER_PATTERN = "omniroute-codex-sdk/worker.py|codex exec|codex .*omniroute|codex .*20128"
+
+
+def workers(pattern=WORKER_PATTERN):
+    mine = str(os.getpid())
+    proc = sh("pgrep", "-af", pattern)
+    if proc.returncode not in (0, 1):   # 0: matches, 1: no process matched (an idle host); anything else is pgrep failing
+        raise ObservationError(f"pgrep exited {proc.returncode}: {proc.stderr.strip()[:120]}")
+    return [l for l in proc.stdout.splitlines()
+            if not l.startswith(mine + " ") and "pgrep" not in l and "pre-switch-guard" not in l and "run-acceptance" not in l and "gateway-identity" not in l]
+
+
+def last_row_age(db):
+    con = sqlite3.connect(f"file:{db}?mode=ro", uri=True)
+    last = con.execute("select max(timestamp) from call_logs").fetchone()[0]
+    con.close()
+    if not last:
+        return None
+    return (dt.datetime.now(dt.timezone.utc) - dt.datetime.strptime(last, "%Y-%m-%dT%H:%M:%S.%fZ").replace(tzinfo=dt.timezone.utc)).total_seconds()
+
+
+def pending_total(port):
+    """The gateway's own pending-request counter (informational): the sum of the counts in pending.byAccount; None when the endpoint does not answer."""
+    try:
+        with urllib.request.urlopen(f"http://127.0.0.1:{port}/api/usage/history", timeout=20) as r:
+            body = json.loads(r.read())
+        return sum(int(c) for models in (body.get("pending") or {}).get("byAccount", {}).values() for c in models.values())
+    except Exception:
+        return None
+
+
+def hindsight_count():
+    return len([l for l in sh("pgrep", "-af", "hindsight").stdout.splitlines() if "pgrep" not in l and "pre-switch-guard" not in l])
+
+
+def main():
+    ap = Parser()
+    ap.add_argument("--switch-tool")
+    ap.add_argument("--idle-only", action="store_true", help="only the idle observation: no switch tool, rollback or target prefix checks; ends with IDLE-RESULT (never GUARD-RESULT)")
+    ap.add_argument("--port", type=int, default=20128)
+    ap.add_argument("--tools", default=str(Path.home() / ".local/share/codex-ecosystem/tools"))
+    ap.add_argument("--db", default=str(Path.home() / ".local/share/omniroute/storage.sqlite"))
+    ap.add_argument("--unit", default="omniroute.service")
+    ap.add_argument("--clean-for", type=float, default=30.0)
+    ap.add_argument("--interval", type=float, default=5.0)
+    ap.add_argument("--rollback-prefix", default="omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167")
+    ap.add_argument("--rollback-build", default="cf6748d04")
+    ap.add_argument("--target-prefix", default="omniroute-3.8.51-c1e30b76-affinity-pr15167-drain-b7c68690")
+    ap.add_argument("--target-build", default="2a41147b7")
+    ap.add_argument("--shim-sha256", default="b6ae900224df3dc73fff2a50b3d7206d78895c6147e93e80b62e66d423e69854")
+    ap.add_argument("--switch-sha256", default="97d1b87bb651d6f43e184b9617d03afa7861ee7715e7030ad23ed29057bc23e3")
+    ap.add_argument("--pid")
+    ap.add_argument("--tolerate-unit", action="append", help="cgroup unit of a known infrastructure client whose connections to the port are tolerated (repeatable; default omniroute-fw.service, the 20129 framework gateway)")
+    ap.add_argument("--worker-pattern", default=WORKER_PATTERN, help="pgrep -f pattern of another lane's client processes (the offline controls narrow it to isolate from other sessions; a live run never passes it)")
+    ap.add_argument("--identity-script", default=str(HERE / "gateway-identity-20261006.py"))
+    args = ap.parse_args()
+    if not args.idle_only and not args.switch_tool:
+        ap.error("--switch-tool is required unless --idle-only")
+    me = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
+    tolerated_units = args.tolerate_unit or ["omniroute-fw.service"]
+    print(f"GUARD version=5 mode={'idle-only' if args.idle_only else 'full'} script_sha256={me} start={utc()} port={args.port} unit={args.unit} clean_for={args.clean_for} interval={args.interval} tolerate_units={tolerated_units}")
+    failed = []
+
+    def check(name, problems, detail=""):
+        ok = not problems
+        print(f"CHECK {name}: {'ok' if ok else 'FAIL'}" + (f" ({detail})" if detail and ok else "") + ("" if ok else f" {problems}"))
+        if not ok:
+            failed.append(name)
+
+    if args.idle_only:
+        ident = [sys.executable, args.identity_script, "--label", "idle-only", "--unit", args.unit, "--port", str(args.port), "--tools", args.tools]
+        if args.pid:
+            ident += ["--pid", args.pid]
+        proc = subprocess.run(ident, capture_output=True, text=True)
+        print("   " + (proc.stdout.strip() or proc.stderr.strip()))
+        check("unit healthy (identity read-back, no build expectation)", [] if proc.returncode == 0 else [f"identity read-back exit {proc.returncode}"])
+    else:
+        tool_sha = sha256(args.switch_tool)
+        check("switch tool sha256", [] if tool_sha == args.switch_sha256 else [f"{tool_sha} is not the pinned {args.switch_sha256}"], tool_sha[:12])
+        check("rollback prefix intact", check_prefix(args.tools, args.rollback_prefix, args.rollback_build, args.shim_sha256, False), f"{args.rollback_prefix}: bin/omniroute, BUILD_SHA {args.rollback_build}, shim v2")
+        check("target prefix intact", check_prefix(args.tools, args.target_prefix, args.target_build, args.shim_sha256, True), f"{args.target_prefix}: bin/omniroute, BUILD_SHA {args.target_build}, shim v2, drain marker")
+        ident = [sys.executable, args.identity_script, "--label", "pre-switch", "--unit", args.unit, "--port", str(args.port), "--tools", args.tools, "--expect-prefix", args.rollback_prefix, "--expect-build", args.rollback_build]
+        if args.pid:
+            ident += ["--pid", args.pid]
+        proc = subprocess.run(ident, capture_output=True, text=True)
+        print("   " + (proc.stdout.strip() or proc.stderr.strip()))
+        check("unit runs the rollback prefix, health ok", [] if proc.returncode == 0 else [f"identity read-back exit {proc.returncode}"])
+
+    first, active, tolerated, seen_all, problems, samples = None, {}, set(), set(), [], 0
+    unrelated_seen = 0
+    pend0 = pending_total(args.port)
+    end = time.time() + args.clean_for
+    while True:
+        samples += 1
+        now_problems = []
+        try:
+            conns = connections(args.port)
+            unrelated_seen = max(unrelated_seen, conns.unrelated)
+        except ObservationError as error:
+            conns = {}
+            now_problems.append(f"the socket observation failed: {error}")
+        try:
+            w = workers(args.worker_pattern)
+        except ObservationError as error:
+            w = []
+            now_problems.append(f"the worker observation failed: {error}")
+        age = last_row_age(args.db)
+        if first is None and not now_problems:
+            first = {k: v["counters"] for k, v in conns.items()}
+        for client_port, c in conns.items():
+            seen_all.add(client_port)
+            units = {unit_of(p) for p in c["owners"]}
+            rq, sq, rb, sb = c["counters"]
+            if c["owners"] and units <= set(tolerated_units) and not (rq or sq or rb or sb):
+                tolerated.add(client_port)       # an EMPTY connection of an infrastructure unit of the same host (no bytes, no queued data): it carries no request; reported, never failed
+                continue
+            if first is None:
+                first = {}
+            who = ",".join(sorted(str(u) for u in units)) if c["owners"] else "owner not visible"
+            if rq or sq:
+                active.setdefault(client_port, f"queued data ({who})")
+            elif client_port not in first:
+                active.setdefault(client_port, f"new during the window ({who})")
+            elif first[client_port][2:] != (rb, sb):
+                active.setdefault(client_port, f"traffic during the window ({who})")
+        if w:
+            now_problems.append(f"{len(w)} worker or codex process(es) of another lane")
+        if age is not None and age < 120:
+            now_problems.append(f"the last call_logs row is {age:.0f} s old (< 120 s)")
+        print(f"   sample {samples} at {utc()}: connections={len(conns)} tolerated_so_far={len(tolerated)} active_so_far={len(active)} workers={len(w)} last_call_log_age_s={'none' if age is None else f'{age:.0f}'}")
+        problems += now_problems
+        if time.time() >= end:
+            break
+        time.sleep(args.interval)
+    pend1 = pending_total(args.port)
+    tolerated -= set(active)             # a tolerated (empty) connection that later carried data is ACTIVE, not tolerated
+    if active:
+        reasons = sorted(set(active.values()))
+        problems.append(f"{len(active)} ACTIVE connection(s) to port {args.port}: {reasons}")
+    idle = len(seen_all) - len(tolerated) - len(active)
+    check(f"nothing in flight for {args.clean_for:.0f} s ({samples} samples)", sorted(set(problems)), f"{idle} idle and {len(tolerated)} tolerated connection(s)")
+    print(f"INFO unrelated_remote_records={unrelated_seen} connections_seen={len(seen_all)} connections_tolerated={len(tolerated)} connections_active={len(active)} connections_idle={idle} pending_total_before={pend0} pending_total_after={pend1} pending_changed={pend0 != pend1} hindsight_processes={hindsight_count()}")
+    print(f"{'IDLE' if args.idle_only else 'GUARD'}-RESULT clean={not failed} failed_checks={failed} end={utc()}")
+    sys.exit(0 if not failed else 4)
+
+
+try:
+    main()
+except SystemExit:
+    raise
+except Exception as error:
+    print(f"ERROR {type(error).__name__}: {str(error)[:200]}", file=sys.stderr)
+    sys.exit(3)

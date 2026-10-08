@@ -1,0 +1,196 @@
+#!/bin/bash
+# The live acceptance of checks/live-acceptance-protocol.md (version 2, re-frozen after the full-scope read of 04e505a5d): the raw set, the race set, four native single-request turns, then eight native two-request turns,
+# each run bracketed by an identity read-back of the gateway unit and followed by a journal check.
+#
+# usage: run-acceptance-20261006.sh baseline <output directory>
+#        run-acceptance-20261006.sh canary <output directory> <ABSOLUTE path of the committed raw baseline file>
+#        run-acceptance-20261006.sh precontrol <output directory>       the pre-switch control: the race set (6 requests) and 4 native two-request turns, --expect observe, against the UNPATCHED build, run right
+#                                                                       before the switch; it prints PRECONTROL race_lost=<n>/6 race_valid=<v>/6 tworequest_incomplete=<m>/4 tworequest_valid=<w>/4 race_discriminating=<True|False|INCONCLUSIVE>
+#        run-acceptance-20261006.sh test <output directory> [<baseline file>]    (offline controls only: the ACCEPT_TEST_* variables below apply to this kind and to no other;
+#                                                                       ACCEPT_TEST_PRECONTROL=1 makes it run like precontrol)
+#   baseline  --expect observe against the UNPATCHED build (the identity must be prefix omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167, BUILD_SHA cf6748d04; otherwise nothing runs: exit 4)
+#   canary    --expect all-logged against the DRAIN build (prefix omniroute-3.8.51-c1e30b76-affinity-pr15167-drain-b7c68690, BUILD_SHA 2a41147b7; otherwise nothing runs: exit 4); the raw set gets --baseline <file>,
+#             whose sha256 must equal the frozen value
+# All scripts sit beside this wrapper (the directory is not configurable); every script's sha256 must equal the frozen value or the wrapper stops with exit 2 before running anything.
+#
+# For every run the output file holds: a header, IDENTITY before, the script's output, exit=<script status>, IDENTITY after, journal_failed_to_save_call_log=<n, or unavailable>, pending_delta (informational), RUN-STATUS and an end time.
+# A run's status: 4 VOID when an identity read of the run (before or after) exits non-zero (unhealthy, not the build this kind of run is for, unreadable), carries a sentinel (MainPID 0 or not a number, an empty or `none` prefix,
+# build or start timestamp), or differs in MainPID, ExecMainStartTimestamp, running prefix or BUILD_SHA from the identity ACCEPTED AT THE START of the wrapper (so a restart between two runs voids the next one, not only a change
+# inside one run); else 1 FAIL when the script exited 1, or the journal shows `Failed to save call log` since the unit's start; else 2 INCONCLUSIVE when the script exited 2 or 3, printed no SUMMARY line, or the journal could not be
+# read (a failed query is not a clean journal); else 0. The wrapper exits with the first that applies of: 4 if any run is VOID, 1 if any FAIL, 2 if any INCONCLUSIVE, else 0.
+# The pending-request counter (pending_total of the identity line) is informational: on the unpatched build it grows by one for every request whose stream was cancelled early; it is not a gate.
+set -u
+P=$(cd "$(dirname "$0")" && pwd)
+LIVE=$P/omniroute-live-acceptance-20261006.py
+NATIVE=$P/omniroute-native-exec-acceptance-20261006.py
+IDENT=$P/gateway-identity-20261006.py
+FROZEN_LIVE=52b1d749dc6b7f6b406f8ce8db5d8b1d3e3a73a6b7861a63cc158dbebd320d75
+FROZEN_NATIVE=db2a4d42d6caf4c39e484903313f0f94bd2be40fabe4f1336d0dcdc3b1d0bafd
+FROZEN_IDENT=a7932710412e9e834f6b992f267db5620b64bbe62f25021013c8004a7eec6011
+FROZEN_BASELINE_RAW=8ea9638c48571dc9a3da0ba75dddc5641abff6ccd9fc9681ff0d1cd665b76dd2
+UNPATCHED_PREFIX=omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167
+UNPATCHED_BUILD=cf6748d04
+DRAIN_PREFIX=omniroute-3.8.51-c1e30b76-affinity-pr15167-drain-b7c68690
+DRAIN_BUILD=2a41147b7
+KIND=${1:?baseline, canary or test}
+OUT=${2:?output directory}
+BASEFILE=${3:-}
+WAITS="--wait1 12 --wait2 60"
+LIVE_ARGS=""; NATIVE_ARGS="--quiet-timeout 120 --exec-timeout 300"; IDENT_ARGS=""
+N_RACE=6; N_ASTRA=4; N_TWO=8
+# the raw set: eight requests of the five request kinds, then each effort probe three times in a row (its attempts form a group; the gateway stores the effort columns only for a response with encrypted reasoning)
+RAW_MODES="responses:eof responses:early:0 responses:early:0 responses:early:0.5 responses:early:2 chat:eof chat:early:0 chat:early:0 effort:cx/gpt-6-astra:max effort:cx/gpt-6-astra:max effort:cx/gpt-6-astra:max effort:cx/gpt-6.1-sol-max effort:cx/gpt-6.1-sol-max effort:cx/gpt-6.1-sol-max effort:cx/gpt-6.1-sol:max effort:cx/gpt-6.1-sol:max effort:cx/gpt-6.1-sol:max"
+JOURNAL_CMD='journalctl --user -u omniroute.service --since "$SINCE" -o cat --no-pager'
+case "$KIND" in
+  baseline) EXPECT=observe; EXP_PREFIX=$UNPATCHED_PREFIX; EXP_BUILD=$UNPATCHED_BUILD;;
+  precontrol) EXPECT=observe; EXP_PREFIX=$UNPATCHED_PREFIX; EXP_BUILD=$UNPATCHED_BUILD;;
+  canary)   EXPECT=all-logged; EXP_PREFIX=$DRAIN_PREFIX; EXP_BUILD=$DRAIN_BUILD
+            case "$BASEFILE" in /*) ;; *) echo "canary needs the ABSOLUTE path of the raw baseline file as the third argument" >&2; exit 2;; esac
+            [ -f "$BASEFILE" ] || { echo "no baseline file $BASEFILE" >&2; exit 2; }
+            [ "$(sha256sum "$BASEFILE" | cut -d' ' -f1)" = "$FROZEN_BASELINE_RAW" ] || { echo "the baseline file's sha256 differs from the frozen value" >&2; exit 2; };;
+  test)     EXPECT=all-logged; EXP_PREFIX=${ACCEPT_TEST_EXPECT_PREFIX:-}; EXP_BUILD=${ACCEPT_TEST_EXPECT_BUILD:-}
+            WAITS=${ACCEPT_TEST_WAITS:-$WAITS}; LIVE_ARGS=${ACCEPT_TEST_LIVE_ARGS:-}; NATIVE_ARGS="${ACCEPT_TEST_NATIVE_ARGS:-$NATIVE_ARGS}"; IDENT_ARGS=${ACCEPT_TEST_IDENT_ARGS:-}
+            N_RACE=${ACCEPT_TEST_N_RACE:-$N_RACE}; N_ASTRA=${ACCEPT_TEST_N_ASTRA:-$N_ASTRA}; N_TWO=${ACCEPT_TEST_N_TWO:-$N_TWO}; RAW_MODES=${ACCEPT_TEST_RAW_MODES:-$RAW_MODES}
+            JOURNAL_CMD=${ACCEPT_TEST_JOURNAL_CMD:-$JOURNAL_CMD}
+            [ "${ACCEPT_TEST_PRECONTROL:-0}" = 1 ] && EXPECT=observe;;
+  *) echo "kind must be baseline, canary, precontrol or test" >&2; exit 2;;
+esac
+PRE=0
+{ [ "$KIND" = precontrol ] || { [ "$KIND" = test ] && [ "${ACCEPT_TEST_PRECONTROL:-0}" = 1 ]; }; } && PRE=1
+N_TWO_PRE=${ACCEPT_TEST_N_TWO_PRE:-4}
+[ "$(sha256sum "$LIVE" | cut -d' ' -f1)" = "$FROZEN_LIVE" ] || { echo "live-acceptance script differs from the frozen sha256" >&2; exit 2; }
+[ "$(sha256sum "$NATIVE" | cut -d' ' -f1)" = "$FROZEN_NATIVE" ] || { echo "native-exec-acceptance script differs from the frozen sha256" >&2; exit 2; }
+[ "$(sha256sum "$IDENT" | cut -d' ' -f1)" = "$FROZEN_IDENT" ] || { echo "gateway-identity script differs from the frozen sha256" >&2; exit 2; }
+mkdir -p "$OUT" && chmod 700 "$OUT" || exit 2
+cd /tmp || exit 2
+
+identity() { # label -> prints the IDENTITY line, with the expectations of the kind when it has any
+  local exp=()
+  [ -n "$EXP_PREFIX" ] && exp=(--expect-prefix "$EXP_PREFIX" --expect-build "$EXP_BUILD")
+  # shellcheck disable=SC2086
+  python3 "$IDENT" --label "$1" $IDENT_ARGS "${exp[@]}" 2>&1
+}
+field() { echo "$1" | tr ' ' '\n' | sed -n "s/^$2=//p" | head -n 1; }
+
+S_PID=""; S_TS=""; S_PREFIX=""; S_BUILD=""
+identity_problems() { # IDENTITY line, the helper's exit status -> prints one line per problem; nothing when the identity is usable and is the identity accepted at the start (the start read itself is only checked for usability)
+  local line=$1 rc=$2 key val start
+  [ "$rc" = 0 ] || echo "the identity read exited $rc (unhealthy, not the build this $KIND run is for, or unreadable)"
+  for key in MainPID ExecMainStartTimestamp running_prefix BUILD_SHA; do
+    val=$(field "$line" $key)
+    case "$key:$val" in
+      MainPID:|MainPID:0|MainPID:*[!0-9]*) echo "$key is unreadable ('$val')"; continue;;
+      *:|*:none|*:None) echo "$key is unreadable ('$val')"; continue;;
+    esac
+    case $key in MainPID) start=$S_PID;; ExecMainStartTimestamp) start=$S_TS;; running_prefix) start=$S_PREFIX;; BUILD_SHA) start=$S_BUILD;; esac
+    [ -z "$start" ] || [ "$val" = "$start" ] || echo "$key is $val, but the identity accepted at the start of the wrapper had $start"
+  done
+}
+
+START_ID=$(identity "start-of-wrapper"); START_RC=$?
+echo "$START_ID"
+START_PROBLEMS=$(identity_problems "$START_ID" "$START_RC")
+if [ -n "$START_PROBLEMS" ]; then echo "$START_PROBLEMS" >&2; echo "the gateway is not the build this $KIND run is for, is unhealthy or is unreadable: nothing was run" >&2; exit 4; fi
+S_PID=$(field "$START_ID" MainPID); S_TS=$(field "$START_ID" ExecMainStartTimestamp); S_PREFIX=$(field "$START_ID" running_prefix); S_BUILD=$(field "$START_ID" BUILD_SHA)
+SINCE=$(systemctl --user show omniroute.service -p ExecMainStartTimestamp --value 2>/dev/null)
+[ "$KIND" = test ] && [ -n "${ACCEPT_TEST_SINCE:-}" ] && SINCE=$ACCEPT_TEST_SINCE
+if [ -z "$SINCE" ] || ! date -d "$SINCE" > /dev/null 2>&1; then echo "the unit's ExecMainStartTimestamp ('$SINCE') is unreadable, so the journal check cannot be bounded: nothing was run" >&2; exit 4; fi
+
+WORST=0
+RUNS=""
+note_status() { # status -> updates WORST with the precedence 4 > 1 > 2 > 0
+  case "$1" in 4) WORST=4;; 1) [ "$WORST" != 4 ] && WORST=1;; 2) [ "$WORST" = 0 ] && WORST=2;; esac
+}
+repeat() { # word count -> the word repeated count times
+  local i out=""; for ((i = 0; i < $2; i++)); do out="$out $1"; done; echo "$out"
+}
+run() { # output name, description, command...
+  local name=$1 desc=$2 rc status=0 before after n pb pa b_rc a_rc jrc jbad jfile which line lrc problem; shift 2
+  before=$(identity "before-$name"); b_rc=$?
+  {
+    echo "# $desc; started $(date -u +%FT%TZ); wrapper kind=$KIND"
+    echo "$before"
+    "$@"
+    rc=$?
+    echo "exit=$rc"
+    after=$(identity "after-$name"); a_rc=$?
+    echo "$after"
+    jfile=$(mktemp); jrc=0; jbad=0
+    eval "$JOURNAL_CMD" > "$jfile" 2> "$jfile.err" || jrc=$?
+    if [ "$jrc" -ne 0 ]; then
+      n=unavailable; jbad=1
+      echo "JOURNAL-UNAVAILABLE exit=$jrc ($(head -c 160 "$jfile.err" | tr '\n' ' ')): the journal query failed, so 'Failed to save call log' could not be counted (INCONCLUSIVE)"
+    else
+      n=$(grep -c 'Failed to save call log' "$jfile")   # a successful query with no matching line prints 0
+    fi
+    rm -f "$jfile" "$jfile.err"
+    echo "journal_failed_to_save_call_log=$n (journalctl --user -u omniroute.service --since <the unit's ExecMainStartTimestamp> -o cat --no-pager | grep -c 'Failed to save call log')"
+    pb=$(field "$before" pending_total); pa=$(field "$after" pending_total)
+    case "$pb" in ''|*[!0-9]*) pb_n=0;; *) pb_n=$pb;; esac
+    case "$pa" in ''|*[!0-9]*) pa_n=0;; *) pa_n=$pa;; esac
+    echo "pending_delta=$(( pa_n - pb_n )) (informational: pending_total $pb -> $pa)"
+    for which in before after; do
+      if [ $which = before ]; then line=$before; lrc=$b_rc; else line=$after; lrc=$a_rc; fi
+      while IFS= read -r problem; do
+        [ -n "$problem" ] && { echo "IDENTITY-PROBLEM $which: $problem: VOID"; status=4; }
+      done <<< "$(identity_problems "$line" "$lrc")"
+    done
+    if [ $status -ne 4 ]; then
+      if [ "$rc" = 1 ] || { [ "$jbad" = 0 ] && [ "$n" != 0 ] && [ "$KIND" != baseline ]; }; then status=1
+      elif [ "$rc" != 0 ] || [ "$jbad" = 1 ]; then status=2
+      fi
+    fi
+    echo "RUN-STATUS $name status=$status ($( [ $status = 4 ] && echo VOID || { [ $status = 1 ] && echo FAIL || { [ $status = 2 ] && echo INCONCLUSIVE || echo ok; }; } ))"
+    echo "# finished $(date -u +%FT%TZ)"
+  } > "$OUT/$name" 2>&1
+  # the shell's view of the run: a run without a SUMMARY line is not a verdict
+  status=$(sed -n 's/^RUN-STATUS [^ ]* status=\([0-9]\).*/\1/p' "$OUT/$name" | tail -n 1)
+  if ! grep -q '^SUMMARY ' "$OUT/$name"; then
+    echo "NO-SUMMARY: the run printed no SUMMARY line, so it is not a verdict (INCONCLUSIVE)" >> "$OUT/$name"
+    [ "${status:-2}" = 0 ] && status=2
+  fi
+  note_status "${status:-2}"
+  RUNS="$RUNS $name:${status:-2}"
+  echo "$name: $(grep -E '^SUMMARY' "$OUT/$name" | cut -c1-200) status=${status:-2}"
+}
+
+RAWBASE=()
+[ "$KIND" = canary ] && RAWBASE=(--baseline "$BASEFILE")
+[ "$KIND" = test ] && [ -n "$BASEFILE" ] && RAWBASE=(--baseline "$BASEFILE")
+if [ $PRE = 1 ]; then
+  # shellcheck disable=SC2086
+  run "live-acceptance-$KIND-race.txt" "$KIND, race set (responses:early:0 x$N_RACE), frozen script v2, --expect observe" \
+    python3 "$LIVE" --expect observe $WAITS $LIVE_ARGS $(repeat responses:early:0 $N_RACE)
+  # shellcheck disable=SC2086
+  run "live-acceptance-$KIND-native-tworequest.txt" "$KIND, native codex exec two-request x$N_TWO_PRE, frozen script v2, --expect observe" \
+    python3 "$NATIVE" --expect observe $WAITS $NATIVE_ARGS $(repeat two-request $N_TWO_PRE)
+  # a race sample counts only when it is valid and identified: HTTP 200, the terminal event received, the early close done, and a correlation id or a response id to attribute rows by (an HTTP 503 or a stream without a terminal event is no loss)
+  RACE_OK=$(grep -E '^RESULT mode=responses:early:0 ' "$OUT/live-acceptance-$KIND-race.txt" 2>/dev/null | grep -E ' http=200 ' | grep -E ' terminal=True ' | grep -E ' closed_early=True ' | grep -vE ' corr=None response_id=None ')
+  RACE_VALID=$(printf '%s\n' "$RACE_OK" | grep -c '^RESULT')
+  LOST_RACE=$(printf '%s\n' "$RACE_OK" | grep -c ' read1_call_logs=0 ')
+  # a two-request turn is judged only when the exec completed, the client reported usage and a tool call was made (the script prints rows_complete= for exactly those turns)
+  TWO_JUDGED=$(grep -E '^RESULT shape=two-request ' "$OUT/live-acceptance-$KIND-native-tworequest.txt" 2>/dev/null | grep -E ' exec_exit=0 ' | grep -E ' rows_complete=')
+  VALID_TWO=$(printf '%s\n' "$TWO_JUDGED" | grep -c '^RESULT')
+  LOST_TWO=$(printf '%s\n' "$TWO_JUDGED" | grep -c ' rows_complete=False')
+  # lost >= 2 among the VALID samples discriminates; fewer than 2 lost cannot discriminate only when all samples were valid; otherwise there are too few valid samples to say (INCONCLUSIVE: repeat once, the protocol's bounded rule)
+  if [ "$LOST_RACE" -ge 2 ]; then DISC=True
+  elif [ "$RACE_VALID" -ge "$N_RACE" ]; then DISC=False
+  else DISC=INCONCLUSIVE; note_status 2
+  fi
+  echo "PRECONTROL race_lost=$LOST_RACE/$N_RACE race_valid=$RACE_VALID/$N_RACE tworequest_incomplete=$LOST_TWO/$N_TWO_PRE tworequest_valid=$VALID_TWO/$N_TWO_PRE race_discriminating=$DISC (the protocol's rule: fewer than 2 of $N_RACE lost among valid samples means the race set cannot discriminate at this hour; fewer than $N_RACE valid samples is INCONCLUSIVE, not a verdict)" | tee -a "$OUT/live-acceptance-$KIND-race.txt"
+else
+  # shellcheck disable=SC2086
+  run "live-acceptance-$KIND-raw.txt" "$KIND, raw set (seventeen requests), frozen script v2, --expect $EXPECT" \
+    python3 "$LIVE" --expect "$EXPECT" "${RAWBASE[@]}" $WAITS $LIVE_ARGS $RAW_MODES
+  # shellcheck disable=SC2086
+  run "live-acceptance-$KIND-race.txt" "$KIND, race set (responses:early:0 x$N_RACE), frozen script v2, --expect $EXPECT" \
+    python3 "$LIVE" --expect "$EXPECT" $WAITS $LIVE_ARGS $(repeat responses:early:0 $N_RACE)
+  # shellcheck disable=SC2086
+  run "live-acceptance-$KIND-native.txt" "$KIND, native codex exec astra-max x$N_ASTRA (identity: X-OmniRoute-Session-Id; completeness against the client's usage), frozen script v2, --expect $EXPECT" \
+    python3 "$NATIVE" --expect "$EXPECT" $WAITS $NATIVE_ARGS $(repeat astra-max $N_ASTRA)
+  # shellcheck disable=SC2086
+  run "live-acceptance-$KIND-native-tworequest.txt" "$KIND, native codex exec two-request (tool call) x$N_TWO, frozen script v2, --expect $EXPECT" \
+    python3 "$NATIVE" --expect "$EXPECT" $WAITS $NATIVE_ARGS $(repeat two-request $N_TWO)
+fi
+echo "WRAPPER-RESULT kind=$KIND status=$WORST runs:$RUNS (4 VOID, 1 FAIL, 2 INCONCLUSIVE, 0 ok); outputs in $OUT"
+exit $WORST
