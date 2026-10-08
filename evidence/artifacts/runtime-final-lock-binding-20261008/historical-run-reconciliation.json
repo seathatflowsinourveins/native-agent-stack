@@ -1,0 +1,154 @@
+{
+  "schema_version": 1,
+  "kind": "dated_additive_historical_acceptance_reconciliation",
+  "evidence_class": "independent_observation",
+  "recorded_at_utc": "2026-10-08T17:55:07Z",
+  "authority": "CC task-ns2604-coop-20261008T172905Z; both historical runs lack a printed lock in acceptance stdout, and only the authorized fresh final run binds acceptance to finalf451.",
+  "correction": {
+    "subject": "The publication phrase earlier24/24on17221888 was ambiguous alongside the separate06:20Z24/24receipt.",
+    "original_receipts_rewritten": false,
+    "original_lock_value_proved_wrong": false,
+    "remedy": "Name both historical runs separately with their actual time/output provenance; label1fb9receipt-reported and172writer-reported. Preserve the later separate172readback as an after-run observation. Bind final acceptance only to the fresh17:48:39–17:49:09 run."
+  },
+  "historical_runs": [
+    {
+      "name": "run1_coop_5a",
+      "actual_started_utc": "2026-10-08T06:20:48Z",
+      "actual_ended_utc": "2026-10-08T06:21:25Z",
+      "time_provenance": "Printed start/end in original nativeacceptance.out",
+      "acceptance_script_sha256": "900be972121b8be41a54871ec12eb2b61d11dbc077bc2af61dd208743664a26d",
+      "case_count": 24,
+      "passed": 24,
+      "exit_code": 0,
+      "check_composition": "One isolation check, one Python check,13research-distributionimports and9adapter/examplechecks.",
+      "original_native_receipt": {
+        "logical_source": "TRADING-2604-5A-COOP-20261008T062048Z/RECEIPT.md",
+        "sha256": "4670f1df7d7c357d69cdb337481bf847ef54f7d9bac3e4cbc46d69184ce5ee3f",
+        "bytes": 1996
+      },
+      "immutable_public_derivative": {
+        "path": "blueprints/us-equities/runtime-2604/receipts/acceptance-20261008.json",
+        "sha256": "19d4b8be66b16d0bf6d5681c4954b2dbc1dd77b3c04aeedae166f2dfba75acfd"
+      },
+      "native_stdout": {
+        "name": "acceptance.out",
+        "bytes": 893,
+        "sha256": "0a0bb6fa3a4705a292fa6117a8d65ec6fcfad14f83455b45d34be729515bdf76",
+        "has_printed_lock": false,
+        "has_printed_start_end": true,
+        "has_printed_exit_code": true
+      },
+      "native_stderr": {
+        "name": "acceptance.err",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "lock_association": {
+        "basis": "receipt-reported",
+        "original_receipt_reported_prefix": "1fb9f8ca6fef9c47",
+        "public_derivative_reported_full_sha256": "1fb9f8ca6fef9c47a4ded826ddf20012f78d6643926cce3a36b86c674f55eb9c",
+        "printed_in_acceptance_stdout": false,
+        "final_lock_binding": false
+      }
+    },
+    {
+      "name": "run2_lightgbm_intermediate",
+      "actual_started_utc": "2026-10-08T13:45:33.120Z",
+      "actual_ended_utc": "2026-10-08T13:45:58.886Z",
+      "time_provenance": "Owner-provided compact native command-event envelope supplement; not inferred filesystemmtime and not a new operating-system process trace.",
+      "acceptance_script_sha256": "4d7b784aa2b24ccfe05910fd652fb4d7ef99f0298b7200e3a864b7c186207ade",
+      "case_count": 24,
+      "passed": 24,
+      "exit_code": 0,
+      "check_composition": "One isolation check,14research-distributionimports (each also checksPython3.12.3) and9adapter/examplechecks.",
+      "original_native_receipt": {
+        "logical_source": "rnd-r1-lightgbm-native-20261008T1343Z/receipt.json",
+        "sha256": "1a29f1572326dca40c853d3b7fbc26bc9dd12388262ef50ee38e13246dd821ff",
+        "recorded_at_utc": "2026-10-08T13:50:35Z",
+        "original_unchanged": true,
+        "identical_R3_source_copy": "R3-RUNTIME-ACCEPTANCE.json"
+      },
+      "existing_public_import_pointer": "evidence/artifacts/runtime-final-lock-binding-20261008/native-verification.json#/prior_native_evidence/installation_and_24_checks",
+      "native_stdout": {
+        "name": "accept.stdout",
+        "bytes": 672,
+        "sha256": "29bed249663d682153014481b98d7278bbaa2f2ae8a63b783614041bc8dd4e10",
+        "has_printed_lock": false,
+        "has_printed_start_end": false
+      },
+      "native_stderr": {
+        "name": "accept.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "lock_association": {
+        "basis": "writer-reported installation/writer-release snapshot",
+        "reported_lock_sha256": "17221888e8f3017d61e8a96eacd87a8bd8eda60ff6b1738eb683ed52980e175a",
+        "reported_pyproject_sha256": "25d95481cd5cf509ffd4ce60fc8848d489b53fc402ae4dbd3cc65d528354c270",
+        "printed_in_acceptance_stdout": false,
+        "final_lock_binding": false
+      },
+      "compact_owner_supplement": {
+        "logical_source": "NATIVE-ACCEPTANCE-ASSOCIATION-20261008T1739Z.json",
+        "sha256": "c8caf23103c5d7057a2c4f7cb760fb716d9500bf091c0059f42ddf7c2944950c",
+        "recorded_at_utc": "2026-10-08T17:40:46Z",
+        "historical_acceptance_event_sha256_excluding_LF": "48b5c01dd507ec0edb3cdd162a493cd17cafc2167fcb21b9e956b74e569800a6",
+        "allowed_source_pointer": "/historical_run",
+        "full_session_or_event_identifier_published": false
+      },
+      "separate_after_run_readback": {
+        "started_utc": "2026-10-08T13:46:01.921Z",
+        "ended_utc": "2026-10-08T13:46:02.069Z",
+        "exit_code": 0,
+        "printed_lock_sha256": "17221888e8f3017d61e8a96eacd87a8bd8eda60ff6b1738eb683ed52980e175a",
+        "native_event_sha256_excluding_LF": "a621c3adbd96e810a85127686bbb0f2cf838ed18b832b39a4c34e0023d28de1d",
+        "source_pointer": "/separate_native_readback",
+        "same_acceptance_stream": false,
+        "limitation": "This later native readback supports its own observation; it is not a lockprologue inside the acceptance stream."
+      }
+    }
+  ],
+  "fresh_final_acceptance": {
+    "public_artifact": "evidence/artifacts/runtime-final-lock-binding-20261008/final-native-24-acceptance.json",
+    "original_native_receipt_sha256": "4a064e39026f205b8e2f273d396044b9145dbcb58a1510b8c9dbf45c56c5a2a5",
+    "started_utc": "2026-10-08T17:48:39Z",
+    "ended_utc": "2026-10-08T17:49:09Z",
+    "script_sha256": "4d7b784aa2b24ccfe05910fd652fb4d7ef99f0298b7200e3a864b7c186207ade",
+    "native_stdout": {
+      "name": "native.stdout",
+      "bytes": 1361,
+      "original_sha256": "e176e06192e9d027669f42b58b86b395c3df3dfe9dc02a4e439917d23b906313"
+    },
+    "native_stderr": {
+      "name": "native.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "case_count": 24,
+    "passed": 24,
+    "exit_code": 0,
+    "printed_lock_before_sha256": "f451ef979cdb1ae3686a30df1c883c257402b32753478c1f9c686c057e9c3989",
+    "printed_lock_after_sha256": "f451ef979cdb1ae3686a30df1c883c257402b32753478c1f9c686c057e9c3989",
+    "own_same_stdout_stream": true,
+    "current_final_lock_acceptance_claim_only": true,
+    "runtime_metadata_or_venv_write": false,
+    "new_script_or_oracle": false
+  },
+  "retained_other_scope": {
+    "historical_dependency_verification_receipt_sha256": "95cb1caebc07e725fa46c6408ae31ea0e4806b14ec75416ab999b18df143e56b",
+    "historical_dependency_verification_recorded_at_utc": "2026-10-08T14:09:06Z",
+    "historical_command_preserved": "locked --group dev --inexact sync and pipcheck; not final acceptance or a prospectiveexactmigration",
+    "prospective_source_check_count": 28,
+    "prospective_28_execution": false,
+    "prospective_dev_probe_execution": false,
+    "exact_legacy_migration_execution": false,
+    "exact_migration_inverse_execution": false,
+    "Layer15_historical_engine_E2E": false
+  },
+  "sanitization": "Logical source locators, exact hashes/times and allowlisted fields only; no personalpaths, nativeprocessids, fullUUID/session/eventidentifiers, rawconversations, privateconfig orcredentialvalues.",
+  "limitations": [
+    "No originalreceipt hashvalue has been provedwrong. The correction resolves ambiguous attribution and recordsmissing historical same-streamlockproof.",
+    "Fresh24acceptance is local repository offline integration; it doesnot qualify the current28-case source, three separatedevprobes, upstreamfulltests, exactlegacycleanup, Layer1.5historicaldata or broker/paper/strategygates.",
+    "The original pinnedreceipts and95cb command/output remain unchanged. This worker performed only recordreads and twoownedsourcewrites; no acceptance/runtime/provider/model/broker action."
+  ]
+}

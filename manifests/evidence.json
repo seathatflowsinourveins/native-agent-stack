@@ -4817,6 +4817,49 @@
         "The initial source-checks.json remains its dated three-file/pre-review snapshot; live-site-review.json and the retained expanded critic bind the later review fixes."
       ],
       "path": "evidence/receipts/row70-defect-a-install-plan-20261008.json"
+    },
+    {
+      "id": "runtime-final-lock-binding-20261008",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "alpaca-py",
+        "edgartools",
+        "nautilus-trader",
+        "pandas",
+        "skfolio"
+      ],
+      "claim": "Publish the measured f451ef97 runtime lock and aa370e42 manifest. The run fields retain imported95cb inexact dev-sync/dependency evidence. A separate fresh final24-case acceptance receipt supplies the only final-lock acceptance claim with its own printed before/afterf451 hashes; it does not rewrite the historical runs or prove prospective exact migration,28-case/dev probes or historical engineE2E.",
+      "limitations": [
+        "This is imported/reused native dependency evidence, not a new sync/relock/install or final28-case acceptance.",
+        "Run1 06:20:48-06:21:25Z returned24/24 on receipt-reported1fb9f8ca; run2 13:45:33.120-13:45:58.886Z returned24/24 on writer-reported17221888. Neither printed a lock in acceptance stdout; the separate13:46:01.921-13:46:02.069Z172readback is after run2. All original receipts are unchanged.",
+        "Prospective final recipe checks14research and3development distributions, for28totalcases; full execution remains owed in its authorized lane.",
+        "Source artifact checks validate syntax, lock consistency and repository contracts separately from native acceptance.",
+        "The prospective exact sync removes packages absent from the lock; this behavior was source-checked, not executed on a legacy host. The imported95cb receipt remains its original inexact operation.",
+        "The dated pre-repair source-checks.json retains its old hashes and12-case output; legacy-migration-source-repair.json binds the repaired exact source and13-case checks.",
+        "Public native-output projection replaces only the runtime locator; original-output SHA256 values name the unchanged private originals.",
+        "The separate CC172905Z final24-case read-only native run is newly executed; no uvlock/sync, metadata/venv write, provider/model/GPU/SEC/broker/paper operation or runtime writer occurred.",
+        "Catalog runtime-target projection remains with its sole assembler; this source packet changes no strategy or evaluation gate."
+      ],
+      "path": "evidence/receipts/runtime-final-lock-binding-20261008.json"
+    },
+    {
+      "id": "runtime-final-native-24-acceptance-20261008",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "alpaca-py",
+        "edgartools",
+        "nautilus-trader",
+        "pandas",
+        "skfolio"
+      ],
+      "claim": "One fresh native24-case offline runtime acceptance returned24PASS/rc0 on finalf451. The same output stream prints actual lock SHA256 immediately before and after, bothf451. This is the only final-lock acceptance claim; earlier24/24 receipts remain historical.",
+      "limitations": [
+        "24-case offline integration only; no28-case/dev-probe acceptance, prospective exact legacy migration or host rollback.",
+        "No Layer1.5 historical engineE2E, strategy/performance/data/provider/broker/paper/GPU/model or global readiness claim.",
+        "Both earlier24/24 receipts remain unchanged: run1receipt-reported1fb,run2writer-reported172; neither printed a lock in its acceptance stdout.",
+        "No uv lock/sync, runtime metadata/venv mutation, provider/broker/model request or N2 resume; owned synthetic acceptance outputs only."
+      ],
+      "path": "evidence/receipts/runtime-final-native-24-acceptance-20261008.json"
     }
   ],
   "files": [
@@ -16343,18 +16386,18 @@
     },
     {
       "path": "blueprints/us-equities/runtime-2604/README.md",
-      "sha256": "5b51b79a4e9c395ea967e5b4c2b399ef577c00679d29b75cc2a4c7ea639addf0",
-      "bytes": 27894
+      "sha256": "0428df473d1245ce9222692bf78dd2fa8d6957271cc02bead76a1aebc7e34c60",
+      "bytes": 35736
     },
     {
       "path": "blueprints/us-equities/runtime-2604/accept-trading-2604.sh",
-      "sha256": "900be972121b8be41a54871ec12eb2b61d11dbc077bc2af61dd208743664a26d",
-      "bytes": 13161
+      "sha256": "c0b2dc45cbe77949969eeb94f65e5b98750a720333b9fd337ca5903337baac44",
+      "bytes": 13990
     },
     {
       "path": "blueprints/us-equities/runtime-2604/install-trading-2604.sh",
-      "sha256": "1ee8707a248d2c988f468ac721a85b22103d0f2c4a95076e2e2b5ca86c4d0b92",
-      "bytes": 19205
+      "sha256": "dbe61ddab078356a24430cf7b5ef91643a88506fbb6748c888bb3665f2900ee9",
+      "bytes": 20381
     },
     {
       "path": "blueprints/us-equities/runtime-2604/receipts/acceptance-20261008.json",
@@ -16368,18 +16411,18 @@
     },
     {
       "path": "blueprints/us-equities/runtime-2604/sync-trading-2604.sh",
-      "sha256": "4df2974e7fbc27fe7feea90ccdc6d180d0bd2c6b254cb5265dfd5e3368756f9a",
-      "bytes": 1259
+      "sha256": "fd150296759b07d037b1dfd65048aaf49a84306dc0488df90ec4a08da481f7f1",
+      "bytes": 1000
     },
     {
       "path": "blueprints/us-equities/runtime-2604/trading-2604-runtime/pyproject.toml",
-      "sha256": "30f47dfbcb247c01e8e3ed8733fbf63bf5de6ad4ea7e4c0807e3ea484b975958",
-      "bytes": 496
+      "sha256": "aa370e42e29dc2419e586358254ff2e821df48a693aa9a3ee16b65d30036ee0b",
+      "bytes": 571
     },
     {
       "path": "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock",
-      "sha256": "1fb9f8ca6fef9c47a4ded826ddf20012f78d6643926cce3a36b86c674f55eb9c",
-      "bytes": 303829
+      "sha256": "f451ef979cdb1ae3686a30df1c883c257402b32753478c1f9c686c057e9c3989",
+      "bytes": 308332
     },
     {
       "path": "blueprints/us-equities/security-identity/README.md",
@@ -48507,6 +48550,36 @@
       "bytes": 29878
     },
     {
+      "path": "evidence/artifacts/runtime-final-lock-binding-20261008/final-native-24-acceptance.json",
+      "sha256": "c1f82a1357cc5685826e3d6829cb7a8d5df6ee0c107acf91badde53ab3d8d217",
+      "bytes": 6563
+    },
+    {
+      "path": "evidence/artifacts/runtime-final-lock-binding-20261008/final-native-24-independent-critic.md",
+      "sha256": "1ad3615d0d715d12b8a28e1f2783cd98eb5a803a942c5a53618fdd13ead1c73c",
+      "bytes": 7416
+    },
+    {
+      "path": "evidence/artifacts/runtime-final-lock-binding-20261008/historical-run-reconciliation.json",
+      "sha256": "901ffc85ed047c6ff4be9ad675ee5b5478d9008470c9d971ec81d74e2bce0c25",
+      "bytes": 8446
+    },
+    {
+      "path": "evidence/artifacts/runtime-final-lock-binding-20261008/legacy-migration-source-repair.json",
+      "sha256": "ca339699b131f0b965af0cc8aaa26080390e921f470d41aceeb6c2737f44e000",
+      "bytes": 8169
+    },
+    {
+      "path": "evidence/artifacts/runtime-final-lock-binding-20261008/native-verification.json",
+      "sha256": "1128a5697d40ad8e2573d2d37c3a9d343a151f74b4ba7d85144729a1c23f947b",
+      "bytes": 6977
+    },
+    {
+      "path": "evidence/artifacts/runtime-final-lock-binding-20261008/source-checks.json",
+      "sha256": "c3cc7cbbe8f3e1e390323549e72e67be0f7134a6825ba8910b13b1ceb9952af8",
+      "bytes": 12574
+    },
+    {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk-native-effort-inputs-local-20261003.json",
       "sha256": "c03203c82bb4262ba5e12c2f518f8f836c1e5893f874b0d33b06078d507dec9c",
       "bytes": 8392
@@ -55907,6 +55980,16 @@
       "bytes": 16146
     },
     {
+      "path": "evidence/receipts/runtime-final-lock-binding-20261008.json",
+      "sha256": "4a90f12aac44f54bf009acb71352b8e1954986dd297169b6f1e660b65a299d64",
+      "bytes": 7221
+    },
+    {
+      "path": "evidence/receipts/runtime-final-native-24-acceptance-20261008.json",
+      "sha256": "cc32a1462171763446809fb675bd946f3b45875c797bea5049d1a925d4809086",
+      "bytes": 3655
+    },
+    {
       "path": "evidence/receipts/runtime-sdk-20261003.json",
       "sha256": "e5ad4e1e95bf4e621bcecd35bcdd16ec6d55a5e39933414f96cb704559a4093b",
       "bytes": 4748
@@ -58468,8 +58551,8 @@
     },
     {
       "path": "tests/test_trading_2604_lock.py",
-      "sha256": "be76cc58f3fed437dba0b198ab1897f5bf544a1c43c5d076d6681472816b9272",
-      "bytes": 9251
+      "sha256": "43ec520d08fb78e6a6dae5df82ea251ca8d9c44dec51f02ef54e7e2d30a22a3f",
+      "bytes": 10502
     },
     {
       "path": "tests/test_trading_gates.py",

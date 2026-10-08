@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "id": "runtime-final-native-24-acceptance-20261008",
+  "kind": "native_cli_e2e",
+  "evidence_class": "local_integration",
+  "claim": "One fresh native24-case offline runtime acceptance returned24PASS/rc0 on finalf451. The same output stream prints actual lock SHA256 immediately before and after, bothf451. This is the only final-lock acceptance claim; earlier24/24 receipts remain historical.",
+  "component_ids": [
+    "alpaca-py",
+    "edgartools",
+    "nautilus-trader",
+    "pandas",
+    "skfolio"
+  ],
+  "recorded_at_utc": "2026-10-08T17:49:09Z",
+  "status": "passed_within_scope",
+  "imported_observation": false,
+  "new_native_runtime_execution": true,
+  "run": {
+    "started_utc": "2026-10-08T17:48:39Z",
+    "ended_utc": "2026-10-08T17:49:09Z",
+    "exit_code": 0,
+    "cases": 24,
+    "passed": 24,
+    "source_receipt_sha256": "4a064e39026f205b8e2f273d396044b9145dbcb58a1510b8c9dbf45c56c5a2a5",
+    "acceptance_script_sha256": "4d7b784aa2b24ccfe05910fd652fb4d7ef99f0298b7200e3a864b7c186207ade"
+  },
+  "runtime_lock_before_sha256": "f451ef979cdb1ae3686a30df1c883c257402b32753478c1f9c686c057e9c3989",
+  "runtime_lock_after_sha256": "f451ef979cdb1ae3686a30df1c883c257402b32753478c1f9c686c057e9c3989",
+  "lock_hash_source": "Native sha256sum output in this run's own stream; not reported expectation, a separate later readback or an imported old acceptance.",
+  "sources": [
+    "blueprints/us-equities/runtime-2604/accept-trading-2604.sh@sha256:4d7b784aa2b24ccfe05910fd652fb4d7ef99f0298b7200e3a864b7c186207ade",
+    "https://github.com/containers/bubblewrap/blob/v0.9.0/bubblewrap.c"
+  ],
+  "artifacts": [
+    {
+      "path": "evidence/artifacts/runtime-final-lock-binding-20261008/final-native-24-independent-critic.md",
+      "bytes": 7416,
+      "sha256": "1ad3615d0d715d12b8a28e1f2783cd98eb5a803a942c5a53618fdd13ead1c73c",
+      "hash_scope": "actual_retained_sanitized_independent_assessment"
+    },
+    {
+      "path": "evidence/artifacts/runtime-final-lock-binding-20261008/final-native-24-acceptance.json",
+      "bytes": 6563,
+      "sha256": "c1f82a1357cc5685826e3d6829cb7a8d5df6ee0c107acf91badde53ab3d8d217",
+      "hash_scope": "published_sanitized_projection"
+    }
+  ],
+  "checks": [
+    {
+      "name": "retained_independent_run_binding_assessment",
+      "result": "pass",
+      "scope": "Actual original output/receipt/source hashes,24uniquePASS0,same-stream lock before/after/native completion/authorization; no rerun or wider acceptance."
+    },
+    {
+      "name": "same_stream_lock_before_after",
+      "result": "pass",
+      "source": "actual returned native stdout"
+    },
+    {
+      "name": "unchanged_native24case_acceptance",
+      "result": "pass",
+      "exit_code": 0,
+      "cases": 24,
+      "scope": "1isolation+14research-distribution/Python+9offlineadapter/example"
+    }
+  ],
+  "limitations": [
+    "24-case offline integration only; no28-case/dev-probe acceptance, prospective exact legacy migration or host rollback.",
+    "No Layer1.5 historical engineE2E, strategy/performance/data/provider/broker/paper/GPU/model or global readiness claim.",
+    "Both earlier24/24 receipts remain unchanged: run1receipt-reported1fb,run2writer-reported172; neither printed a lock in its acceptance stdout.",
+    "No uv lock/sync, runtime metadata/venv mutation, provider/broker/model request or N2 resume; owned synthetic acceptance outputs only."
+  ],
+  "inverse": {
+    "publication": "Revert only this fresh evidence projection/receipt/registry binding; preserve original native outputs and historical receipts.",
+    "runtime_state_change": false,
+    "host_inverse_executed": false
+  }
+}

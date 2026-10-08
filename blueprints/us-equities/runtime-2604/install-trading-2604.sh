@@ -81,17 +81,21 @@ readonly owner='native-stack-trading-2604-v1'
 readonly completion='native-stack-trading-2604-no-dvc-r4'
 script_directory=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
 readonly script_directory
-readonly sync_vector_hash=4df2974e7fbc27fe7feea90ccdc6d180d0bd2c6b254cb5265dfd5e3368756f9a
+readonly sync_vector_hash=fd150296759b07d037b1dfd65048aaf49a84306dc0488df90ec4a08da481f7f1
 [[ ! -L "$script_directory/sync-trading-2604.sh" && -f "$script_directory/sync-trading-2604.sh" ]] || die 'Shared sync vector is missing or symlinked.' 65
 printf '%s  %s\n' "$sync_vector_hash" "$script_directory/sync-trading-2604.sh" | sha256sum --check --status
 # BEGIN shared-sync-source
 source "$script_directory/sync-trading-2604.sh"
 # END shared-sync-source
 readonly lock_bundle="$script_directory/trading-2604-runtime"
-readonly project_hash=30f47dfbcb247c01e8e3ed8733fbf63bf5de6ad4ea7e4c0807e3ea484b975958
-readonly lock_hash=1fb9f8ca6fef9c47a4ded826ddf20012f78d6643926cce3a36b86c674f55eb9c
-# Only exact approved bundles may migrate on the owned host: the recorded
-# round-c 5.60.0 lock and original 5.58.0 run. Neither qualifies this new lock.
+readonly project_hash=aa370e42e29dc2419e586358254ff2e821df48a693aa9a3ee16b65d30036ee0b
+readonly lock_hash=f451ef979cdb1ae3686a30df1c883c257402b32753478c1f9c686c057e9c3989
+# Only exact recorded bundles may migrate toward the published final bundle.
+# Prior hashes are migration inputs and inverse records, never new acceptance.
+readonly accepted_project_hash=30f47dfbcb247c01e8e3ed8733fbf63bf5de6ad4ea7e4c0807e3ea484b975958
+readonly accepted_lock_hash=1fb9f8ca6fef9c47a4ded826ddf20012f78d6643926cce3a36b86c674f55eb9c
+readonly intermediate_project_hash=25d95481cd5cf509ffd4ce60fc8848d489b53fc402ae4dbd3cc65d528354c270
+readonly intermediate_lock_hash=17221888e8f3017d61e8a96eacd87a8bd8eda60ff6b1738eb683ed52980e175a
 readonly previous_project_hash=36b85fd48566fedff258ec4a8bef496cace0ea00954afd7c9255bffda0894fdb
 readonly previous_lock_hash=4c98672d14147a1be712bf788b495cf318705631cbf5e04ebe230c8a13c516c2
 readonly recorded_project_hash=581bbb38a265068791c1a8c92435f9859876fd613d3c2c87d618a223376b01e0
@@ -167,16 +171,18 @@ requirements=(
     'numpy==2.5.3' 'pandas==3.0.6'
     # https://github.com/alpacahq/alpaca-py/blob/cc4cb3b7ba50ae250e621983c2779047fb16bb28/README.md
     'alpaca-py==0.44.0'
-    # v5.60.0: https://github.com/dgunning/edgartools/blob/1e7a61b3a142dbf5d19bc82444f85239c1786348/README.md
-    'edgartools==5.60.0'
+    # https://pypi.org/pypi/edgartools/5.61.1/json
+    'edgartools==5.61.1'
     # https://github.com/gerrymanoim/exchange_calendars/blob/dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a/README.md
     'exchange-calendars==4.13.2'
     # https://github.com/duckdb/duckdb-python/blob/b236c8194ed14c7a7c685e0534dde501cc855b3a/README.md
     'duckdb==1.5.5'
     # https://github.com/unionai-oss/pandera/blob/62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6/README.md
     'pandera[pandas]==0.33.1'
-    # https://github.com/skfolio/skfolio/blob/c99fcf71349e2df4a7a1033ee85ca2e9ced9abee/docs/user_guide/install.rst
-    'skfolio==1.2.9'
+    # https://pypi.org/pypi/skfolio/1.7.0/json
+    'skfolio==1.7.0'
+    # https://github.com/lightgbm-org/LightGBM/blob/8f7036f03627054d5a54a6f965b13f4b9ff2cb63/README.md
+    'lightgbm==4.7.0'
     # https://github.com/cloudQuant/fincore/blob/576459c495a8f7ff839f55e0d3057daa636174cc/README.md
     'fincore==0.5.1'
     # https://github.com/mlflow/mlflow/blob/32792afe5b0183fce10532d3a023f5cfa8612d09/docs/docs/classic-ml/getting-started/quickstart.mdx
@@ -188,17 +194,18 @@ requirements=(
     # https://github.com/eslazarev/purged-cross-validation/blob/aee1215c58d65a60a1d6af4b483f929fecde76e2/README.md
     'purgedcv==0.1.10'
 )
-# This bundle was created with uv init/add --no-sync and checked with uv lock
-# --check, without installing packages. Copying its byte-verified metadata and
-# lock avoids a new target-host resolution, even while the retained cutoff is
-# still in the future. Both files are validated before either is replaced. Only
+dev_requirements=('pytest==9.1.1') # https://pypi.org/pypi/pytest/9.1.1/json
+# These public metadata bytes were copied from the measured final native bundle.
+# Its locked dev sync and dependency check are imported evidence, not a new run.
+# Copying the byte-verified metadata avoids another target-host resolution.
+# Both files are validated before either is replaced. Only
 # the exact approved metadata (including an interrupted migration) is accepted;
 # arbitrary local edits are refused. Each replacement is atomic within the project.
 # https://github.com/astral-sh/uv/blob/0.12.17/docs/concepts/projects/sync.md
 step=locked-project
 [[ ! -L "$lock_bundle" && -d "$lock_bundle" ]] || die 'Verified runtime lock bundle is missing or symlinked.' 65
-for entry in "pyproject.toml|$project_hash|$previous_project_hash|$recorded_project_hash" "uv.lock|$lock_hash|$previous_lock_hash|$recorded_lock_hash"; do
-    IFS='|' read -r filename expected_hash previous_hash recorded_hash <<< "$entry"
+for entry in "pyproject.toml|$project_hash|$previous_project_hash|$recorded_project_hash|$accepted_project_hash|$intermediate_project_hash" "uv.lock|$lock_hash|$previous_lock_hash|$recorded_lock_hash|$accepted_lock_hash|$intermediate_lock_hash"; do
+    IFS='|' read -r filename expected_hash previous_hash recorded_hash accepted_hash intermediate_hash <<< "$entry"
     [[ ! -L "$lock_bundle/$filename" && -f "$lock_bundle/$filename" ]] || die "Verified bundle file is unavailable: $filename" 65
     printf '%s  %s\n' "$expected_hash" "$lock_bundle/$filename" | sha256sum --check --status
     [[ ! -L "$project/$filename" ]] || die "Owned project file is symlinked: $filename" 73
@@ -206,7 +213,9 @@ for entry in "pyproject.toml|$project_hash|$previous_project_hash|$recorded_proj
         [[ -f "$project/$filename" && -O "$project/$filename" ]] || die "Owned project file is not an owned regular file: $filename" 73
         if ! printf '%s  %s\n' "$expected_hash" "$project/$filename" | sha256sum --check --status &&
             ! printf '%s  %s\n' "$previous_hash" "$project/$filename" | sha256sum --check --status &&
-            ! printf '%s  %s\n' "$recorded_hash" "$project/$filename" | sha256sum --check --status; then
+            ! printf '%s  %s\n' "$recorded_hash" "$project/$filename" | sha256sum --check --status &&
+            ! printf '%s  %s\n' "$accepted_hash" "$project/$filename" | sha256sum --check --status &&
+            ! printf '%s  %s\n' "$intermediate_hash" "$project/$filename" | sha256sum --check --status; then
             die "Owned project file differs from all verified bundles: $filename" 73
         fi
     fi
@@ -220,16 +229,21 @@ for entry in "pyproject.toml|$project_hash" "uv.lock|$lock_hash"; do
         temporary=''
     fi
 done
-"${safe[@]}" "$runtime_python" -I - "$project/pyproject.toml" "$python_pin" "${requirements[@]}" <<'PY'
+"${safe[@]}" "$runtime_python" -I - "$project/pyproject.toml" "$python_pin" "${dev_requirements[0]}" "${requirements[@]}" <<'PY'
 import sys
 import tomllib
 with open(sys.argv[1], "rb") as f:
-    project = tomllib.load(f)["project"]
+    manifest = tomllib.load(f)
+project = manifest["project"]
 assert project["name"] == "us-equities-runtime"
 assert project["requires-python"] == "==" + sys.argv[2], "Owned project interpreter pin differs"
 assert sys.version.split()[0] == sys.argv[2]
-assert sorted(project["dependencies"]) == sorted(sys.argv[3:]), "Direct requirement matrix differs"
+assert sorted(project["dependencies"]) == sorted(sys.argv[4:]), "Direct requirement matrix differs"
+assert manifest["dependency-groups"]["dev"] == [sys.argv[3]], "Development requirement matrix differs"
 PY
+# Reuse the installed interpreter for the measured locked-dev sync vector.
+# A fresh prefix still uses the verified managed interpreter to create its venv.
+if [[ -x "$project/.venv/bin/python" ]]; then runtime_python="$project/.venv/bin/python"; fi
 # BEGIN shared-sync-call
 sync_trading_2604
 # END shared-sync-call

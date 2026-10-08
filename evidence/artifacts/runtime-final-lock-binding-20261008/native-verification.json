@@ -1,0 +1,152 @@
+{
+  "schema_version": 1,
+  "kind": "imported_native_existing_runtime_verification",
+  "evidence_class": "local_integration",
+  "reused": true,
+  "actual_new_execution": false,
+  "source_receipt": {
+    "locator": "rnd-r1-sweep-20261008T1404Z/runtime-lock-receipt.json",
+    "sha256": "95cb1caebc07e725fa46c6408ae31ea0e4806b14ec75416ab999b18df143e56b",
+    "recorded_at_utc": "2026-10-08T14:09:06Z",
+    "identical_packet_copy": "n1-ranking-protocol-20261008T0730Z/R3-RUNTIME-LOCK-VERIFICATION.json"
+  },
+  "independent_current_observation": {
+    "recorded_at_utc": "2026-10-08T15:29:03.791496Z",
+    "source_receipt_sha256": "da1985f3bc4969f5bc15584925b8a27609a9a951989b4369115bcb0d7f32e5b3",
+    "inputs": {
+      "observed_at": "2026-10-08T15:29:03.791496+00:00",
+      "lock_sha256": "f451ef979cdb1ae3686a30df1c883c257402b32753478c1f9c686c057e9c3989",
+      "pyproject_sha256": "aa370e42e29dc2419e586358254ff2e821df48a693aa9a3ee16b65d30036ee0b"
+    },
+    "package_metadata": {
+      "python": "3.12.3",
+      "edgartools": "5.61.1",
+      "skfolio": "1.7.0",
+      "lightgbm": "4.7.0",
+      "pytest": "9.1.1",
+      "pluggy": "1.6.0",
+      "iniconfig": "2.3.1",
+      "nautilus_trader": "2.0.0rc5"
+    },
+    "matrix_package_count": 17,
+    "all_version_metadata_match": true
+  },
+  "runtime_lock_delta": {
+    "packages_before": 189,
+    "packages_after": 192,
+    "added": {
+      "pytest": "9.1.1",
+      "pluggy": "1.6.0",
+      "iniconfig": "2.3.1"
+    },
+    "removed": [],
+    "changed_existing_distribution_records": [],
+    "project_dev_metadata_only": true
+  },
+  "native_entrypoint": "Windows wsl.exe --distribution NativeStack2604 --exec; no WSL variable manufactured",
+  "commands": [
+    {
+      "name": "locked_dev_sync",
+      "requested_inner_vector": "mise exec uv@0.12.17 -- uv --no-config sync --project <runtime> --python <runtime>/.venv/bin/python --no-python-downloads --locked --group dev --inexact",
+      "exit_code": 0,
+      "provenance": "The original native receipt names this requested inner vector and retains returned native output; the public record does not assert a recovered post-hook outer command."
+    },
+    {
+      "name": "dependency_check",
+      "requested_inner_vector": "mise exec uv@0.12.17 -- uv --no-config pip check --python <runtime>/.venv/bin/python",
+      "exit_code": 0,
+      "provenance": "Same original receipt/input scope as locked_dev_sync."
+    }
+  ],
+  "actual_native_outputs": [
+    {
+      "name": "sync-attempt3.stdout",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "returned_text": "",
+      "projection": "Byte-exact returned output retained."
+    },
+    {
+      "name": "sync-attempt3.stderr",
+      "original_bytes": 57,
+      "original_sha256": "c3ff219848483697e337b68e0ab45bae3e8afe792d53c9dd43a01a8b2b07ad87",
+      "returned_text": "Resolved 192 packages in 1ms\nChecked 187 packages in 1ms\n",
+      "projection": "Byte-exact returned output retained."
+    },
+    {
+      "name": "pip-check-attempt3.stdout",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "returned_text": "",
+      "projection": "Byte-exact returned output retained."
+    },
+    {
+      "name": "pip-check-attempt3.stderr",
+      "original_bytes": 149,
+      "original_sha256": "405b032b61e912c72cf4dadd112c5035d54310caf5e33f8c23ef5e1d04d4a370",
+      "returned_text": "Using Python 3.12.3 environment at: <runtime>/.venv\nChecked 187 packages in 2ms\nAll installed packages are compatible\n",
+      "projection": "Only runtime locator replaced by <runtime>; original_sha256 hashes original private bytes."
+    }
+  ],
+  "prior_native_evidence": {
+    "installation_and_24_checks": {
+      "source_receipt_sha256": "1a29f1572326dca40c853d3b7fbc26bc9dd12388262ef50ee38e13246dd821ff",
+      "recorded_at_utc": "2026-10-08T13:50:35Z",
+      "lock_sha256": "17221888e8f3017d61e8a96eacd87a8bd8eda60ff6b1738eb683ed52980e175a",
+      "pyproject_sha256": "25d95481cd5cf509ffd4ce60fc8848d489b53fc402ae4dbd3cc65d528354c270",
+      "install_exit_code": 0,
+      "acceptance_exit_code": 0,
+      "acceptance_pass": 24,
+      "evidence_class": "local_integration",
+      "scope": "Original intermediate installation/acceptance, not a final-lock run."
+    },
+    "dev_addition": {
+      "source_receipt_sha256": "8843ccd2f7ee4c6a1f9fafdb2a887fe27e8abb76d1266d364bb9685db20e0e52",
+      "execution_provenance_sha256": "1d11cd31700da1ff1d90518b168db97533f6093ee9981693cdedfd09b9698617",
+      "added_packages": {
+        "pytest": "9.1.1",
+        "pluggy": "1.6.0",
+        "iniconfig": "2.3.1"
+      },
+      "status": "Recorded native dev-addition/sync; imported, not repeated."
+    }
+  },
+  "retained_failed_conditions": [
+    {
+      "kind": "initial_native_path_attempt",
+      "exit_code": 1,
+      "condition": "Guessed managed uv executable did not exist; failure occurred before uv execution."
+    },
+    {
+      "kind": "retired_cutoff_sync_attempt",
+      "exit_code": 1,
+      "condition": "Reintroducing global exclude-newer conflicts with final lock options; --locked refused update. No relock occurred."
+    },
+    {
+      "kind": "prepared_currency_host_guard",
+      "exit_code": 64,
+      "condition": "Currency shell lacked native WSL metadata; original installer refused wrong-distribution before host writes. Later native operator used existing WSL entrypoint, without manufactured variables."
+    }
+  ],
+  "inverse": {
+    "executed": false,
+    "original": {
+      "lock_sha256": "1fb9f8ca6fef9c47a4ded826ddf20012f78d6643926cce3a36b86c674f55eb9c",
+      "pyproject_sha256": "30f47dfbcb247c01e8e3ed8733fbf63bf5de6ad4ea7e4c0807e3ea484b975958"
+    },
+    "dev_baseline": {
+      "lock_sha256": "17221888e8f3017d61e8a96eacd87a8bd8eda60ff6b1738eb683ed52980e175a",
+      "pyproject_sha256": "25d95481cd5cf509ffd4ce60fc8848d489b53fc402ae4dbd3cc65d528354c270"
+    },
+    "physical_metadata_hashes_verified": true,
+    "condition": "Serialized writer must confirm current inputs and no later owner's changes before restoring selected saved metadata and its corresponding supported sync/removal vector; preserve later-owned packages."
+  },
+  "limitations": [
+    "No new install, sync, relock, acceptance script or engine execution occurred in source publication.",
+    "Dependency verification on f451ef97 does not turn intermediate24/24 into final-lock acceptance.",
+    "The final source recipe has28prospective checks, including14research/3devimports; final-lock28/28 remains unexecuted.",
+    "No unchanged full upstream test suite, Layer1.5 historical E2E, strategy, point-in-time data, SEC, broker or paper gate is established.",
+    "Nautilus2.0.0rc6 remains watch/hold onrc5. The separate vLLM foundation record changes no trading lock.",
+    "No credential value, native auth store, private client configuration or installed runtime state was written."
+  ]
+}

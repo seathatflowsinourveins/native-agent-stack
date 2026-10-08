@@ -11,6 +11,8 @@ umask 077
 readonly project="$HOME/projects/us-equities-runtime"
 readonly python="$project/.venv/bin/python"
 readonly adapter="$project/vendor/adaptive-paper"
+readonly project_hash=aa370e42e29dc2419e586358254ff2e821df48a693aa9a3ee16b65d30036ee0b
+readonly lock_hash=f451ef979cdb1ae3686a30df1c883c257402b32753478c1f9c686c057e9c3989
 readonly quickstart_hash=487e6807dedd1a38062638eb671f6110799451611819542bf0f0c10646cb2c53
 readonly adapter_commit=dca821cca85dce3647fa7b488d5a23fbe5b85d4a
 readonly ib_image='ghcr.io/gnzsnz/ib-gateway@sha256:91165c0752ca534c0dad3c40683ae7c2745974d4d277651a90e90411ca609d8d'
@@ -22,18 +24,25 @@ specs=(
     'numpy|2.5.3|numpy'
     'pandas|3.0.6|pandas'
     'alpaca-py|0.44.0|alpaca'
-    'edgartools|5.60.0|edgar'
+    'edgartools|5.61.1|edgar'
     'exchange-calendars|4.13.2|exchange_calendars'
     'duckdb|1.5.5|duckdb'
     'pandera|0.33.1|pandera.pandas'
-    'skfolio|1.2.9|skfolio'
+    'skfolio|1.7.0|skfolio'
+    'lightgbm|4.7.0|lightgbm'
     'fincore|0.5.1|fincore.metrics.ratios'
     'mlflow|3.16.1|mlflow'
     'arch|8.0.0|arch'
     'purgedcv|0.1.10|purgedcv'
 )
+# Development checks are separate from the fourteen research distributions.
+dev_specs=(
+    'pytest|9.1.1|pytest'
+    'pluggy|1.6.0|pluggy'
+    'iniconfig|2.3.1|iniconfig'
+)
 names=(offline_isolation python)
-for spec in "${specs[@]}"; do
+for spec in "${specs[@]}" "${dev_specs[@]}"; do
     IFS='|' read -r distribution expected module <<< "$spec"
     names+=("import_$distribution")
 done
@@ -47,8 +56,13 @@ blocked() {
     exit 1
 }
 [[ ${WSL_DISTRO_NAME:-} == NativeStack2604 && $EUID != 0 ]] || blocked 64
-for tool in bwrap timeout docker env mkdir mktemp; do command -v "$tool" >/dev/null || blocked 69 "missing $tool"; done
+for tool in bwrap timeout docker env mkdir mktemp sha256sum; do command -v "$tool" >/dev/null || blocked 69 "missing $tool"; done
 [[ ! -L "$HOME/projects" && ! -L "$project" && -O "$project" && -x "$python" ]] || blocked 69
+for entry in "pyproject.toml|$project_hash" "uv.lock|$lock_hash"; do
+    IFS='|' read -r filename expected_hash <<< "$entry"
+    [[ ! -L "$project/$filename" && -f "$project/$filename" ]] || blocked 73 'runtime metadata is unavailable'
+    printf '%s  %s\n' "$expected_hash" "$project/$filename" | sha256sum --check --status || blocked 65 'runtime metadata differs from the published final bundle'
+done
 [[ ! -L "$project/.trading-2604-owner" && ! -L "$project/.trading-2604-complete" ]] || blocked 73
 [[ -f "$project/.trading-2604-owner" && -d "$project/.python" && -d "$project/.upstream" ]] || blocked 69
 IFS= read -r recorded_owner < "$project/.trading-2604-owner" || blocked 73
@@ -63,7 +77,7 @@ done
 [[ -d "$project/.install-home" && -d "$project/.docker-config" ]] || blocked 69
 
 # Read only the context endpoint, then use it explicitly with a clean config.
-# No image pull or container start occurs; failed staging cannot become 24/24.
+# No image pull or container start occurs; failed staging cannot become acceptance.
 if ! docker_host=$(docker context inspect --format '{{.Endpoints.docker.Host}}' 2>/dev/null); then
     blocked 69 'selected Docker context endpoint is unavailable'
 fi
@@ -125,7 +139,7 @@ else
 fi
 
 check python "$python" -I -c 'import sys; assert sys.version.split()[0] == "3.12.3"; print(sys.version)'
-for spec in "${specs[@]}"; do
+for spec in "${specs[@]}" "${dev_specs[@]}"; do
     IFS='|' read -r distribution expected module <<< "$spec"
     check "import_$distribution" "$python" -I -c \
         'import importlib, importlib.metadata as m, sys; importlib.import_module(sys.argv[3]); actual=m.version(sys.argv[1]); print(actual); assert actual == sys.argv[2], (actual, sys.argv[2])' \
