@@ -746,7 +746,7 @@
       "repository": "https://github.com/anthropics/sandbox-runtime",
       "layer_id": "isolation",
       "owner_layer_id": "isolation",
-      "pin": "0.0.78",
+      "pin": "0.0.79",
       "component_id": "sandbox-runtime",
       "source_selection_layer": "isolation",
       "source_selection_name": "sandbox-runtime (srt)",
@@ -758,25 +758,25 @@
       "default_install": false,
       "blocking_gaps": [],
       "artifact": {
-        "name": "sandbox-runtime-0.0.78.tgz",
-        "url": "https://registry.npmjs.org/@anthropic-ai/sandbox-runtime/-/sandbox-runtime-0.0.78.tgz"
+        "name": "sandbox-runtime-0.0.79.tgz",
+        "url": "https://registry.npmjs.org/@anthropic-ai/sandbox-runtime/-/sandbox-runtime-0.0.79.tgz"
       },
       "checksum": {
         "algorithm": "sha256",
-        "value": "a9cf9e35068a4c71d2d94de8b0abe8de51c7d44daef537cc92906848ccc67240",
-        "source": "https://registry.npmjs.org/%40anthropic-ai%2Fsandbox-runtime/0.0.78",
+        "value": "5a730e4367c264ccc4b592af01dab038a6c39db7c184efbd132841688fa854f1",
+        "source": "https://registry.npmjs.org/@anthropic-ai%2Fsandbox-runtime/0.0.79",
         "kind": "artifact"
       },
       "integrity_observation": "downloaded_and_rehashed",
       "install": {
-        "command": "npm install -g @anthropic-ai/sandbox-runtime@0.0.78",
-        "source": "https://github.com/anthropics/sandbox-runtime/blob/v0.0.78/README.md#L14",
+        "command": "npm install --global --prefix \"$STACK_HOME/tools/sandbox-runtime-0.0.79\" @anthropic-ai/sandbox-runtime@0.0.79",
+        "source": "https://github.com/anthropics/sandbox-runtime/blob/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/README.md#L14",
         "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install",
-        "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version."
+        "scope": "Reviewed upstream npm global package form, with the verified 0.0.79 release supplied explicitly. The owned versioned prefix is a prospective portability adaptation; the retained installation used its existing global prefix. Removing --ignore-scripts aligns the lifecycle mode with that receipted route, without claiming new prefix or dependency-script acceptance."
       },
       "acceptance": {
         "command": "srt echo \"hello world\"",
-        "source": "https://github.com/anthropics/sandbox-runtime/blob/v0.0.78/README.md#L168",
+        "source": "https://github.com/anthropics/sandbox-runtime/blob/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/README.md#L168",
         "evidence_class": "documented_upstream_example_not_executed"
       },
       "provisioning_status": "unprovisioned_source_review",
@@ -788,11 +788,13 @@
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
         "https://github.com/anthropics/sandbox-runtime/blob/v0.0.78/README.md",
         "https://github.com/anthropics/sandbox-runtime/blob/v0.0.78/README.md",
-        "docs/decisions/2026-10-04-2604-e2e-fix-wave-g8-base-gateway.md"
+        "docs/decisions/2026-10-04-2604-e2e-fix-wave-g8-base-gateway.md",
+        "evidence/receipts/native-sandbox-codex-binding-20261008.json",
+        "https://github.com/anthropics/sandbox-runtime/releases/tag/v0.0.79"
       ],
       "release": {
-        "tag": "0.0.78",
-        "source": "https://registry.npmjs.org/%40anthropic-ai%2Fsandbox-runtime/0.0.78",
+        "tag": "0.0.79",
+        "source": "https://registry.npmjs.org/@anthropic-ai%2Fsandbox-runtime/0.0.79",
         "kind": "native_package_release"
       },
       "source_pin_kind": "release_or_artifact_version"

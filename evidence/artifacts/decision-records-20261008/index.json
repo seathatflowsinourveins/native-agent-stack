@@ -1,0 +1,708 @@
+{
+  "schema_version": 1,
+  "kind": "dated_decision_receipt_correction_index",
+  "date": "2026-10-08",
+  "recorded_at_utc": "2026-10-08T14:41:17Z",
+  "source_snapshot_revision": "58d235e83c308d97947e623bb7d8503ef6eec369",
+  "authority": "CC133934Z section5, extended by CC142518Z to corrections66-77",
+  "scope": "Findable repository navigation and sanitized retained correction summaries; no new incident execution, deployment acceptance, gate closure or current inventory claim.",
+  "source_provenance": {
+    "numbered_corrections": "Retained command-center correction ledger cc-corrections-20261005.md, October8 headings66-77 including66a/67a; safe summaries only, no raw private ledger or credential incident payload exported.",
+    "retention_pr": 833,
+    "retention_head": "f51075cc386acdbd382555780f4cafe94e4318ca",
+    "retention_merge": "36654a8174b5cad1380bd13ed1fffc0f135aac2c",
+    "retention_merged_at": "2026-10-07T23:47:08Z",
+    "native_pr_readback": "gh api --cache 5m retained PR metadata and changed-file identities; native returns 0. Primary document rules are read at the source snapshot.",
+    "source_artifacts": {
+      "catalogs/landscape/component-evidence-matrix.json": "c761d3e6ec61a3c2d822d36f0afc7d49c6cb0da0269245e1c06516818b23aa00",
+      "catalogs/landscape/new-host-grand-list.json": "c14b646026cf2956e22ef7d118edb8e97eba76117a4181c2052fca72272b5dca",
+      "docs/decisions/2026-10-07-clean-upstream-install-finalizes-a-candidate.md": "694871937e1408b396eb3b24a5abdf9714bf37b6f5bc942ad93a71dfb2cf1e45",
+      "docs/decisions/2026-10-06-upstream-evidence-over-local-evaluation.md": "84d221fd7d059107e586a353889401ac950e85955f79334c57c716731b9156a3"
+    }
+  },
+  "decisions": [
+    {
+      "path": "docs/decisions/2026-10-08-philosophy-only-rules.md",
+      "subject": "Always-loaded philosophy and on-demand operating guidance",
+      "classification": "dated_owner_direction"
+    },
+    {
+      "path": "docs/decisions/2026-10-08-skills-cc-lanes-picks.md",
+      "subject": "Vendor skill source/tree pins and CC/lane selections",
+      "classification": "pinned_source_and_skill_lifecycle_record"
+    },
+    {
+      "path": "docs/decisions/2026-10-08-ao-adoption.md",
+      "subject": "AO bounded owning-session feedback adoption",
+      "classification": "historical_native_trial_with_current_scope_limits"
+    },
+    {
+      "path": "docs/decisions/2026-10-08-dependabot-frozen-evidence-ignore.md",
+      "subject": "Frozen evidence dependency-update boundary",
+      "classification": "source_review_and_workflow_policy_record"
+    },
+    {
+      "path": "docs/decisions/2026-10-08-cc-lanes-rate-cost-gateway.md",
+      "subject": "CC/lane rate, cost and gateway telemetry semantics",
+      "classification": "source_review_and_synthetic_wiring_record"
+    }
+  ],
+  "receipts": [
+    {
+      "path": "evidence/receipts/ao-bounded-feedback-20261008.json",
+      "classification": "historical_native_integration_receipt_excerpt",
+      "scope": "Two prior feedback deliveries; comparative G1UNKNOWN/G3UNTESTED, no new run."
+    },
+    {
+      "path": "evidence/receipts/ao-orchestration-landscape-20261008.json",
+      "classification": "dated_source_execution_landscape",
+      "scope": "Dated prior survey; v0.13.4 latest observation precedes the later v0.13.5 release."
+    },
+    {
+      "path": "evidence/receipts/2604-drift-version-readback-20261008.json",
+      "classification": "upstream_provenance",
+      "scope": "Version/artifact identity; no current functional acceptance."
+    },
+    {
+      "path": "evidence/receipts/native-sandbox-smoke-20261008.json",
+      "classification": "retained_native_cli_e2e",
+      "scope": "Source-reported Claude echo leg; Codex0.0.79 leg not qualified by that receipt."
+    }
+  ],
+  "corrections": [
+    {
+      "number": "66",
+      "title": "OIDC federation subject mismatch",
+      "record_date": "2026-10-08",
+      "summary": "The repository uses its verified immutable subject claims. The prior mutable-subject guide did not describe the subject this repository presents.",
+      "private_source_locator": {
+        "record": "cc-corrections-20261005.md",
+        "heading": "66",
+        "line": 471
+      },
+      "public_context_paths": [
+        "docs/github-automation.md",
+        ".github/workflows/harness-audit.yml"
+      ],
+      "primary_source_pins": [],
+      "evidence_boundary": "Sanitized native incident receipt is not published in this source snapshot.",
+      "incident_evidence_class": "retained_private_correction_summary",
+      "new_incident_execution": false
+    },
+    {
+      "number": "66a",
+      "title": "Federation rule identification amendment",
+      "record_date": "2026-10-08",
+      "summary": "Correct the earlier rule-ID confusion: the Console subject was subsequently observed to match. Creation versus later editing remains unknown; no chronology is inferred.",
+      "private_source_locator": {
+        "record": "cc-corrections-20261005.md",
+        "heading": "66a",
+        "line": 481
+      },
+      "public_context_paths": [
+        "docs/github-automation.md",
+        ".github/workflows/harness-audit.yml"
+      ],
+      "primary_source_pins": [],
+      "evidence_boundary": "Sanitized native incident receipt is not published in this source snapshot.",
+      "incident_evidence_class": "retained_private_correction_summary",
+      "new_incident_execution": false
+    },
+    {
+      "number": "67",
+      "title": "Anthropic route header diagnosis",
+      "record_date": "2026-10-08",
+      "summary": "The initial credit explanation was replaced by a header/route compatibility finding. Read this together with67a; the beta header alone does not establish supported client identification.",
+      "private_source_locator": {
+        "record": "cc-corrections-20261005.md",
+        "heading": "67",
+        "line": 476
+      },
+      "public_context_paths": [
+        "docs/decisions/2026-09-30-omniroute-rebuild.md",
+        "manifests/stack.json"
+      ],
+      "primary_source_pins": [
+        {
+          "repository": "https://github.com/diegosouzapw/OmniRoute",
+          "revision": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+          "path": "open-sse/config/anthropicHeaders.ts"
+        }
+      ],
+      "evidence_boundary": "Sanitized native incident receipt is not published in this source snapshot.",
+      "incident_evidence_class": "retained_private_correction_summary",
+      "new_incident_execution": false
+    },
+    {
+      "number": "67a",
+      "title": "Claude Code identification boundary",
+      "record_date": "2026-10-08",
+      "summary": "The earlier diagnosis was too broad: genuine Claude Code identification passed the retained check. General API traffic uses the supported route that omits that client label; no credits or route acceptance is inferred here.",
+      "private_source_locator": {
+        "record": "cc-corrections-20261005.md",
+        "heading": "67a",
+        "line": 491
+      },
+      "public_context_paths": [
+        "docs/decisions/2026-09-30-omniroute-rebuild.md"
+      ],
+      "primary_source_pins": [],
+      "evidence_boundary": "Sanitized native incident receipt is not published in this source snapshot.",
+      "incident_evidence_class": "retained_private_correction_summary",
+      "new_incident_execution": false
+    },
+    {
+      "number": "68",
+      "title": "Duplicate scheduled S4 disposition",
+      "record_date": "2026-10-08",
+      "summary": "Manual and scheduled messages repeated the same S4 disposition after compaction. The later03:58:38Z row is canonical; check scheduled pending work before resending.",
+      "private_source_locator": {
+        "record": "cc-corrections-20261005.md",
+        "heading": "68",
+        "line": 486
+      },
+      "public_context_paths": [
+        "docs/harness-defaults.md",
+        "docs/command-center.md"
+      ],
+      "primary_source_pins": [],
+      "evidence_boundary": "Sanitized native incident receipt is not published in this source snapshot.",
+      "incident_evidence_class": "retained_private_correction_summary",
+      "new_incident_execution": false
+    },
+    {
+      "number": "69",
+      "title": "Claude telemetry absence claim",
+      "record_date": "2026-10-08",
+      "summary": "A capped combined-prefix query did not establish absence. The retained live observation found eight Claude metric families and60series; public policy/source semantics remain distinct from that observation.",
+      "private_source_locator": {
+        "record": "cc-corrections-20261005.md",
+        "heading": "69",
+        "line": 499
+      },
+      "public_context_paths": [
+        "docs/decisions/2026-10-08-cc-lanes-rate-cost-gateway.md",
+        "docs/native-telemetry-resolution.md"
+      ],
+      "primary_source_pins": [],
+      "evidence_boundary": "Sanitized native incident receipt is not published in this source snapshot.",
+      "incident_evidence_class": "retained_private_correction_summary",
+      "new_incident_execution": false
+    },
+    {
+      "number": "70",
+      "title": "Off-host passwordless backup exposure",
+      "record_date": "2026-10-08",
+      "summary": "The earlier claim of equal exposure to the local machine was wrong. Keep the external backup's protection boundary separate; this entry publishes no credential values, private host paths or remediation claim.",
+      "private_source_locator": {
+        "record": "cc-corrections-20261005.md",
+        "heading": "70",
+        "line": 504
+      },
+      "public_context_paths": [
+        "docs/secret-storage.md",
+        "evidence/receipts/native-offhost-restic-20260920.json"
+      ],
+      "primary_source_pins": [
+        {
+          "repository": "https://github.com/restic/restic",
+          "revision": "v0.19.1",
+          "path": "doc/070_encryption.rst"
+        }
+      ],
+      "evidence_boundary": "The September receipt is historical context; no sanitized October8 incident/remediation receipt is published in this snapshot.",
+      "incident_evidence_class": "retained_private_correction_summary",
+      "new_incident_execution": false
+    },
+    {
+      "number": "71",
+      "title": "Estimated Window U completion time",
+      "record_date": "2026-10-08",
+      "summary": "Replace the typed05:40Z estimate with the retained tool-derived05:32:45Z completion. The index does not substitute a current installed version for the unresolved operation pin.",
+      "private_source_locator": {
+        "record": "cc-corrections-20261005.md",
+        "heading": "71",
+        "line": 510
+      },
+      "public_context_paths": [
+        "docs/acceptance-evidence-policy.md",
+        "docs/harness-defaults.md"
+      ],
+      "primary_source_pins": [],
+      "evidence_boundary": "Owner must publish the exact corrected Window U receipt locator and applicable source pin; the retained private time correction is indexed only.",
+      "incident_evidence_class": "retained_private_correction_summary",
+      "new_incident_execution": false
+    },
+    {
+      "number": "72",
+      "title": "Window U installation and failed readback",
+      "record_date": "2026-10-08",
+      "summary": "Promptfoo installation preceded the window at04:54:24Z–04:54:52Z. Retain the failed05:10:39Z–05:10:41Z fresh-client readback beside the later successful retry.",
+      "private_source_locator": {
+        "record": "cc-corrections-20261005.md",
+        "heading": "72",
+        "line": 515
+      },
+      "public_context_paths": [
+        "docs/acceptance-evidence-policy.md",
+        "docs/harness-defaults.md"
+      ],
+      "primary_source_pins": [],
+      "evidence_boundary": "Exact corrected receipt locator and incident promptfoo pin remain owner deliverables; no installation or replay occurs here.",
+      "incident_evidence_class": "retained_private_correction_summary",
+      "new_incident_execution": false
+    },
+    {
+      "number": "73",
+      "title": "Credential-output incident boundary",
+      "record_date": "2026-10-08",
+      "summary": "An IB Gateway restart token was reported exposed in a command-center conversation at12:57Z. Index the boundary violation and credential-output policy only; remediation and rotation status remain unknown.",
+      "private_source_locator": {
+        "record": "cc-corrections-20261005.md",
+        "heading": "73",
+        "line": 521
+      },
+      "public_context_paths": [
+        "docs/secret-storage.md"
+      ],
+      "primary_source_pins": [],
+      "evidence_boundary": "The incident payload is excluded. No sanitized remediation receipt is published; no credential value is read, printed or copied by this index.",
+      "incident_evidence_class": "retained_private_correction_summary",
+      "new_incident_execution": false
+    },
+    {
+      "number": "74",
+      "title": "RAW/SPLIT observation independence",
+      "record_date": "2026-10-08",
+      "summary": "Distinct response hashes are required when a verified split lies inside the page's sessions. Otherwise distinct bound raw/split queries, query index and observation can establish independence even when honest result pages match. The omitted verification-leg clock finding remains part of the correction.",
+      "private_source_locator": {
+        "record": "cc-corrections-20261005.md",
+        "heading": "74",
+        "line": 530
+      },
+      "public_context_paths": [
+        "docs/decisions/2026-10-01-trading-layer-verdicts.md",
+        "docs/acceptance-evidence-policy.md"
+      ],
+      "primary_source_pins": [
+        {
+          "repository": "https://github.com/QuantConnect/Lean",
+          "revision": "985ef30ad3ac774218c5ac516b4cb0aa2655730f",
+          "path": "README.md"
+        }
+      ],
+      "evidence_boundary": "Layer15-build owns current runtime/reviewed correction acceptance. The linked verdict document is historical context, not that new receipt.",
+      "incident_evidence_class": "retained_private_correction_summary",
+      "new_incident_execution": false
+    },
+    {
+      "number": "75",
+      "title": "Default gh page mistaken for inventory",
+      "record_date": "2026-10-08",
+      "summary": "The13:39:56Z explicit-limit snapshot had47open PRs:15ready and32drafts. The30-row premise came from gh's default page limit. The contemporaneous branch count was132; neither count is a current inventory claim.",
+      "private_source_locator": {
+        "record": "cc-corrections-20261005.md",
+        "heading": "75",
+        "line": 537
+      },
+      "public_context_paths": [
+        "docs/github-automation.md"
+      ],
+      "primary_source_pins": [],
+      "evidence_boundary": "This is the CC/co-op's dated native snapshot, not a new inventory run; use explicit --limit and fresh returned output for current state.",
+      "incident_evidence_class": "retained_private_correction_summary",
+      "new_incident_execution": false
+    },
+    {
+      "number": "76",
+      "title": "Inline search bypassed the research runtime",
+      "record_date": "2026-10-08",
+      "summary": "Inline search results are discovery leads. Send the selected question through the existing research-runtime gatherers and record their native receipts; enforcement/dispatch completion is not implied.",
+      "private_source_locator": {
+        "record": "cc-corrections-20261005.md",
+        "heading": "76",
+        "line": 542
+      },
+      "public_context_paths": [
+        "blueprints/runtime-workers/skills/README.md",
+        "blueprints/us-equities/research-runtime/README.md"
+      ],
+      "primary_source_pins": [
+        {
+          "repository": "https://github.com/assafelovic/gpt-researcher",
+          "revision": "0957c301ed06c2a5857b834358c7227c739041d4",
+          "path": "README.md"
+        },
+        {
+          "repository": "https://github.com/bytedance/deer-flow",
+          "revision": "42334f26d7025d905678f9075b079fc65f9beaf9",
+          "path": "README.md"
+        }
+      ],
+      "evidence_boundary": "Existing public entry points are linked; the requested enforcement/dispatch change remains its owner's deliverable.",
+      "incident_evidence_class": "retained_private_correction_summary",
+      "new_incident_execution": false
+    },
+    {
+      "number": "77",
+      "title": "Gateway spanmetrics endpoint correction",
+      "record_date": "2026-10-08",
+      "summary": "The absence claim queried collector-self metrics instead of its Prometheus exporter. The retained14:20Z observation found gateway series; today's deployed exporter observation still needs the owner's sanitized receipt.",
+      "private_source_locator": {
+        "record": "cc-corrections-20261005.md",
+        "heading": "77",
+        "line": 553
+      },
+      "public_context_paths": [
+        "docs/decisions/2026-10-08-cc-lanes-rate-cost-gateway.md",
+        "evidence/receipts/otelcol-contrib-0162-qualification-20261003.json"
+      ],
+      "primary_source_pins": [
+        {
+          "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+          "revision": "v0.162.0",
+          "path": "connector/spanmetricsconnector/README.md"
+        },
+        {
+          "repository": "https://github.com/diegosouzapw/OmniRoute",
+          "revision": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+          "path": "open-sse/services/routing/otel.ts"
+        }
+      ],
+      "evidence_boundary": "Sanitized native incident receipt is not published in this source snapshot.",
+      "incident_evidence_class": "retained_private_correction_summary",
+      "new_incident_execution": false
+    }
+  ],
+  "layer_evidence": {
+    "universe": "Existing generated source union keyed by catalog/layer_id; changing source catalog selection or adoption is outside this index.",
+    "foundation_layers": 20,
+    "trading_layers": 12,
+    "total_layers": 32,
+    "source_matrix": "catalogs/landscape/component-evidence-matrix.json",
+    "source_and_native_receipts": "catalogs/landscape/new-host-grand-list.json",
+    "receipt_registry": "manifests/evidence.json",
+    "host_acceptance": "evidence/hosts/",
+    "rows": [
+      {
+        "catalog": "foundation",
+        "layer_id": "agent-sdks",
+        "title": "Agent SDKs and runtime workers",
+        "selectors": {
+          "catalog": "foundation",
+          "layer_id": "agent-sdks"
+        }
+      },
+      {
+        "catalog": "foundation",
+        "layer_id": "ci-supply-chain",
+        "title": "CI and supply chain",
+        "selectors": {
+          "catalog": "foundation",
+          "layer_id": "ci-supply-chain"
+        }
+      },
+      {
+        "catalog": "foundation",
+        "layer_id": "code-navigation",
+        "title": "Code navigation",
+        "selectors": {
+          "catalog": "foundation",
+          "layer_id": "code-navigation"
+        }
+      },
+      {
+        "catalog": "foundation",
+        "layer_id": "document-retrieval",
+        "title": "Documents and ingestion",
+        "selectors": {
+          "catalog": "foundation",
+          "layer_id": "document-retrieval"
+        }
+      },
+      {
+        "catalog": "foundation",
+        "layer_id": "durable-memory",
+        "title": "Durable memory",
+        "selectors": {
+          "catalog": "foundation",
+          "layer_id": "durable-memory"
+        }
+      },
+      {
+        "catalog": "foundation",
+        "layer_id": "git-github-automation",
+        "title": "Git practice and GitHub automation",
+        "selectors": {
+          "catalog": "foundation",
+          "layer_id": "git-github-automation"
+        }
+      },
+      {
+        "catalog": "foundation",
+        "layer_id": "hosting-services",
+        "title": "Application and service hosting",
+        "selectors": {
+          "catalog": "foundation",
+          "layer_id": "hosting-services"
+        }
+      },
+      {
+        "catalog": "foundation",
+        "layer_id": "instructions-skills",
+        "title": "Instructions and skills",
+        "selectors": {
+          "catalog": "foundation",
+          "layer_id": "instructions-skills"
+        }
+      },
+      {
+        "catalog": "foundation",
+        "layer_id": "isolation",
+        "title": "Isolation",
+        "selectors": {
+          "catalog": "foundation",
+          "layer_id": "isolation"
+        }
+      },
+      {
+        "catalog": "foundation",
+        "layer_id": "mcp-surfaces",
+        "title": "MCP servers and client surfaces",
+        "selectors": {
+          "catalog": "foundation",
+          "layer_id": "mcp-surfaces"
+        }
+      },
+      {
+        "catalog": "foundation",
+        "layer_id": "native-clients",
+        "title": "Native clients",
+        "selectors": {
+          "catalog": "foundation",
+          "layer_id": "native-clients"
+        }
+      },
+      {
+        "catalog": "foundation",
+        "layer_id": "observation-inference",
+        "title": "Observation and optional inference",
+        "selectors": {
+          "catalog": "foundation",
+          "layer_id": "observation-inference"
+        }
+      },
+      {
+        "catalog": "foundation",
+        "layer_id": "quality-evaluation",
+        "title": "Quality and evaluation",
+        "selectors": {
+          "catalog": "foundation",
+          "layer_id": "quality-evaluation"
+        }
+      },
+      {
+        "catalog": "foundation",
+        "layer_id": "recovery-portability",
+        "title": "Recovery and portability",
+        "selectors": {
+          "catalog": "foundation",
+          "layer_id": "recovery-portability"
+        }
+      },
+      {
+        "catalog": "foundation",
+        "layer_id": "scheduling-supervision",
+        "title": "Scheduling and supervision",
+        "selectors": {
+          "catalog": "foundation",
+          "layer_id": "scheduling-supervision"
+        }
+      },
+      {
+        "catalog": "foundation",
+        "layer_id": "secrets-credentials",
+        "title": "Secrets and credentials",
+        "selectors": {
+          "catalog": "foundation",
+          "layer_id": "secrets-credentials"
+        }
+      },
+      {
+        "catalog": "foundation",
+        "layer_id": "semantic-rag",
+        "title": "Semantic code retrieval",
+        "selectors": {
+          "catalog": "foundation",
+          "layer_id": "semantic-rag"
+        }
+      },
+      {
+        "catalog": "foundation",
+        "layer_id": "token-efficiency",
+        "title": "Context and usage efficiency",
+        "selectors": {
+          "catalog": "foundation",
+          "layer_id": "token-efficiency"
+        }
+      },
+      {
+        "catalog": "foundation",
+        "layer_id": "web-research",
+        "title": "Web research",
+        "selectors": {
+          "catalog": "foundation",
+          "layer_id": "web-research"
+        }
+      },
+      {
+        "catalog": "foundation",
+        "layer_id": "workers",
+        "title": "Workers and task ownership",
+        "selectors": {
+          "catalog": "foundation",
+          "layer_id": "workers"
+        }
+      },
+      {
+        "catalog": "us-equities",
+        "layer_id": "agents-models-workers",
+        "title": "Agents, models and workers",
+        "selectors": {
+          "catalog": "us-equities",
+          "layer_id": "agents-models-workers"
+        }
+      },
+      {
+        "catalog": "us-equities",
+        "layer_id": "backtesting-engine",
+        "title": "Backtesting engine",
+        "selectors": {
+          "catalog": "us-equities",
+          "layer_id": "backtesting-engine"
+        }
+      },
+      {
+        "catalog": "us-equities",
+        "layer_id": "data-quality-orchestration",
+        "title": "Data quality and orchestration",
+        "selectors": {
+          "catalog": "us-equities",
+          "layer_id": "data-quality-orchestration"
+        }
+      },
+      {
+        "catalog": "us-equities",
+        "layer_id": "evaluation-experiments",
+        "title": "Evaluation and experiments",
+        "selectors": {
+          "catalog": "us-equities",
+          "layer_id": "evaluation-experiments"
+        }
+      },
+      {
+        "catalog": "us-equities",
+        "layer_id": "execution-broker",
+        "title": "Execution and broker adapters",
+        "selectors": {
+          "catalog": "us-equities",
+          "layer_id": "execution-broker"
+        }
+      },
+      {
+        "catalog": "us-equities",
+        "layer_id": "identity-provenance",
+        "title": "Identity, provenance and lineage",
+        "selectors": {
+          "catalog": "us-equities",
+          "layer_id": "identity-provenance"
+        }
+      },
+      {
+        "catalog": "us-equities",
+        "layer_id": "market-data-reference",
+        "title": "Market data and reference",
+        "selectors": {
+          "catalog": "us-equities",
+          "layer_id": "market-data-reference"
+        }
+      },
+      {
+        "catalog": "us-equities",
+        "layer_id": "observability-hosting",
+        "title": "Observability and hosting",
+        "selectors": {
+          "catalog": "us-equities",
+          "layer_id": "observability-hosting"
+        }
+      },
+      {
+        "catalog": "us-equities",
+        "layer_id": "portfolio-risk",
+        "title": "Portfolio and risk",
+        "selectors": {
+          "catalog": "us-equities",
+          "layer_id": "portfolio-risk"
+        }
+      },
+      {
+        "catalog": "us-equities",
+        "layer_id": "research-factors-ml",
+        "title": "Research, factors and ML",
+        "selectors": {
+          "catalog": "us-equities",
+          "layer_id": "research-factors-ml"
+        }
+      },
+      {
+        "catalog": "us-equities",
+        "layer_id": "security-supply-chain",
+        "title": "Security and supply chain",
+        "selectors": {
+          "catalog": "us-equities",
+          "layer_id": "security-supply-chain"
+        }
+      },
+      {
+        "catalog": "us-equities",
+        "layer_id": "storage-compute",
+        "title": "Storage and compute",
+        "selectors": {
+          "catalog": "us-equities",
+          "layer_id": "storage-compute"
+        }
+      }
+    ]
+  },
+  "retention": {
+    "action": "Keep original historical documents at their original paths and append scoped replacement pointers to two unprotected dated docs. Existing failed/incomplete observations remain historical; no deletion or relocation.",
+    "canonical_paths": [
+      "docs/decisions/2026-10-06-upstream-evidence-over-local-evaluation.md",
+      "docs/decisions/2026-10-07-clean-upstream-install-finalizes-a-candidate.md"
+    ],
+    "appended_pointer_paths": [
+      "docs/decisions/2026-10-04-new-wsl-token-layer-default.md",
+      "docs/decisions/2026-10-04-round2-plan-g4-config.md"
+    ],
+    "protected_historical_paths": [
+      "docs/decisions/2026-10-04-repository-quality-rule.md",
+      "docs/decisions/2026-10-04-token-full-stack-owner-default.md"
+    ],
+    "scope_boundary": "Only component-selection and readiness gates are superseded; application engineering, wiring/CI, strategy and paper checks retain their own scope. Frozen consensus-bound documents are linked, not edited."
+  },
+  "pending_owned_publication": {
+    "pr": 862,
+    "head": "caa4beacd9f47c3e4b4f63e075788fc9ee413889",
+    "path": "evidence/receipts/ao-bounded-effect-20261008.json",
+    "url": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/caa4beacd9f47c3e4b4f63e075788fc9ee413889/evidence/receipts/ao-bounded-effect-20261008.json",
+    "scope": "Separate pending synthetic native-engine qualifier; not part of this landed source snapshot. Its evidence-only metadata correction adds no install component or adoption claim."
+  },
+  "navigation_updates": [
+    {
+      "path": "docs/foundation-layer-map-20261008.md",
+      "source_revision": "64a8cda01700d5e823c18e4b989e856de2ee2241",
+      "classification": "owner-maintained navigation joined from the accepted base; its own pins/readiness boundaries remain separate from this index snapshot"
+    }
+  ],
+  "completeness_boundary": "A policy-context link does not supply native returned incident evidence. Missing sanitized incident/operation receipts remain explicitly owner-held. Future sources join by stable layer IDs and their own source/evidence revision, not copied winner snapshots."
+}

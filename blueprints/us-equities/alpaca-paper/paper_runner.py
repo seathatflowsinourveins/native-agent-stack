@@ -339,11 +339,11 @@ class Runner:
         quote = self.broker.quote()
         bid, ask = number(quote["bid"]), number(quote["ask"])
         age = self.gate.now() + offset - timestamp(quote["at"])
+        self.quote_observations.append({"bid": str(bid), "ask": str(ask), "age_seconds": round(age, 3)})
         if not -1 <= age <= self.config["max_quote_age_seconds"]:
             raise SafetyError("quote_not_fresh")
         if ask < bid or ask - bid > number(self.config["max_spread_usd"]):
             raise SafetyError("quote_spread_invalid")
-        self.quote_observations.append({"bid": str(bid), "ask": str(ask), "age_seconds": round(age, 3)})
         self.last_quote = (quote["at"], offset)
         return bid, ask
 

@@ -1,0 +1,9 @@
+test_the_committed_outputs_are_current_and_the_handbook_receipt_names_them (tests.test_new_wsl_handbook.NewWslHandbookTests.test_the_committed_outputs_are_current_and_the_handbook_receipt_names_them) ... ok
+test_profile_fills_fields_without_claiming_execution (tests.test_new_wsl_handbook.NewWslHandbookTests.test_profile_fills_fields_without_claiming_execution) ... ok
+test_no_recipe_command_is_typed_into_the_generator_or_the_profile (tests.test_new_wsl_handbook.NewWslHandbookTests.test_no_recipe_command_is_typed_into_the_generator_or_the_profile) ... ok
+test_native_prerequisite_cli_carries_source_review_boundaries (tests.test_new_wsl_profile.NewWslProfileCliTests.test_native_prerequisite_cli_carries_source_review_boundaries) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 2.037s
+
+OK

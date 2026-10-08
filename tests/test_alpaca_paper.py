@@ -240,6 +240,31 @@ class PaperTests(unittest.TestCase):
                 self.runner.preflight(self.account)
         self.assertEqual(self.broker.submits, [])
 
+    def test_quote_refusals_retain_prices_and_age_without_writes(self):
+        cases = [
+            ("770.45", "770.40", 0, "quote_spread_invalid"),
+            ("770.00", "771.00", 0, "quote_spread_invalid"),
+            ("770.40", "770.45", 16, "quote_not_fresh"),
+        ]
+        for bid, ask, age, reason in cases:
+            with self.subTest(reason=reason, bid=bid, ask=ask):
+                self.broker.quote_override = {
+                    "bid": bid, "ask": ask, "at": self.clock.now() - age,
+                }
+                with self.assertRaisesRegex(paper.SafetyError, reason):
+                    self.runner.preflight(self.account)
+                receipt = self.runner.receipt("needs_attention", reason)
+                observation = receipt["quote_observations"][-1]
+                self.assertEqual(observation["bid"], bid)
+                self.assertEqual(observation["ask"], ask)
+                self.assertGreaterEqual(observation["age_seconds"], age)
+                self.assertEqual(receipt["write_attempts"], 0)
+                self.assertIsNone(self.journal.first("trial"))
+                self.assertIsNone(self.runner.last_quote)
+        self.assertEqual(len(self.runner.quote_observations), len(cases))
+        self.assertEqual(self.broker.submits, [])
+        self.assertEqual(self.broker.cancels, [])
+
     def test_nonfinite_and_malformed_numbers_rejected(self):
         for value in ["NaN", "Infinity", "-1", True, 0.5, "1e9", "0", "1.000000001"]:
             with self.assertRaises(paper.SafetyError):
