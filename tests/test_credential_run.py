@@ -37,7 +37,7 @@ import credential_run as run_mod  # noqa: E402
 import set_credential as writer  # noqa: E402
 
 INJECTABLE_IDS = {"alpaca-paper", "alpaca-paper-2", "sec-contact", "databento", "typesafe", "omniroute", "tavily",
-                  "claude-oauth-token", "canary-e2e", "anthropic-api"}
+                  "claude-oauth-token", "canary-e2e", "anthropic-api", "anthropic-api-2"}
 NOT_INJECTABLE_IDS = ("grafana-admin", "nativestack-generation-key", "openhands-session", "claude-native",
                       "codex-native", "gh-native", "huggingface-native", "huggingface-native-stored", "ibkr-gateway",
                       "github-actions")
@@ -380,6 +380,50 @@ class RunnerCase(unittest.TestCase):
 
 
 class InjectionTests(RunnerCase):
+    def test_second_anthropic_key_uses_the_same_setter_and_runner_grammar(self):
+        name = "ANTHROPIC_API_KEY"
+        first_path = self.store / "anthropic-api.env"
+        for tail in ("", " space;tilde~"):
+            values = {entry_id: fake("sk-test-", tail)
+                      for entry_id in ("anthropic-api", "anthropic-api-2")}
+            first_before = None
+            for entry_id, value in values.items():
+                with self.subTest(id=entry_id, quoted=bool(tail)):
+                    self.values.append(value)
+                    path = self.store / (entry_id + ".env")
+                    answers = iter(["replace", value] if path.exists() else [value])
+                    output = io.StringIO()
+                    code = writer.run(entry_id, env=self.env, prompt=lambda _p: next(answers), out=output)
+                    self.assertEqual(code, 0)
+                    self.assertEqual(path.read_text(encoding="ascii"), writer.encode(name, value))
+                    self.assertEqual(path.stat().st_mode & 0o777, 0o600)
+                    self.assert_never_echoed(output.getvalue())
+                    if entry_id == "anthropic-api":
+                        first_before = first_path.read_bytes()
+                    else:
+                        self.assertEqual(first_path.read_bytes(), first_before)
+            for entry_id, value in values.items():
+                with self.subTest(id=entry_id, quoted=bool(tail)):
+                    result = self.run_tool(entry_id, *py(REPORT, json.dumps([name, "TAVILY_API_KEY"])))
+                    self.assertEqual(result.returncode, 0, result.stderr)
+                    self.assertEqual(json.loads(result.stdout), {name: sha(value), "TAVILY_API_KEY": None})
+                    self.assertEqual(result.stderr, b"")
+                    self.assert_never_echoed(result.stdout, result.stderr)
+        for entry_id in values:
+            with self.subTest(id=entry_id, refused="expansion"):
+                path = self.store / (entry_id + ".env")
+                before = path.read_bytes()
+                answers = iter(["replace", "dollar$sign"])
+                output = io.StringIO()
+                with self.assertRaises(writer.Refused):
+                    writer.run(entry_id, env=self.env, prompt=lambda _p: next(answers), out=output)
+                self.assertEqual(path.read_bytes(), before)
+                path.write_text(f"export {name}=dollar$sign\n", encoding="ascii")
+                result = self.run_tool(entry_id, *py("print('unexpected-child')"))
+                self.assertEqual(result.returncode, 1)
+                self.assertNotIn(b"unexpected-child", result.stdout)
+                self.assertNotIn(b"dollar$sign", result.stdout + result.stderr)
+
     def test_injects_only_the_ids_declared_variables(self):
         key, secret = self.alpaca()
         names = ["APCA_API_KEY_ID", "APCA_API_SECRET_KEY", "APCA_API_BASE_URL", "TAVILY_API_KEY", "SEC_USER_AGENT"]

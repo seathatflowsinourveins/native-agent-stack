@@ -5261,8 +5261,8 @@
     },
     {
       "path": "adoption/credential-inventory.json",
-      "sha256": "c1b31e324e665b63410bc40f139d6e13fbcdf0893877732cd4d002b6ce24cd36",
-      "bytes": 25930
+      "sha256": "e689a8d584a62f9551be7a0befa93eebf193d59d2dd1b5b8e62afe2ba300fb06",
+      "bytes": 27732
     },
     {
       "path": "adoption/hardware-profiles.json",
@@ -18146,6 +18146,11 @@
       "bytes": 15329
     },
     {
+      "path": "docs/decisions/2026-10-08-anthropic-api-second-key.md",
+      "sha256": "de6a666964db0916dcaf23015a0a06c39db867d56f336ef43cdd3fd44b272bc6",
+      "bytes": 7076
+    },
+    {
       "path": "docs/decisions/2026-10-08-coordinator-research-routing.md",
       "sha256": "cc0177503b26b84954e7a67ec4d2aac7d39a5520794ada3edf06346527955a10",
       "bytes": 14363
@@ -18322,8 +18327,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "7bc165d8723bca7205e5d4df9c38d6b2c5d5b99eab259de0239fc5d19b677994",
-      "bytes": 251915
+      "sha256": "d25b8168702228217100f8249b89353881533d9061c3abf7d6fabda6a481b089",
+      "bytes": 252667
     },
     {
       "path": "docs/harness-rule-enforcement.md",
@@ -18502,8 +18507,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "fbd856952122a18992f6f70fb82bdbbb855d8988280af09f0522a3261e9a39a2",
-      "bytes": 191376
+      "sha256": "0b0122c707592c525166e4e578d8746ea3ca791c54ba5dd59d38fe89d2d79599",
+      "bytes": 192864
     },
     {
       "path": "docs/stack.md",
@@ -57927,8 +57932,8 @@
     },
     {
       "path": "tests/test_credential_run.py",
-      "sha256": "f309ca11cf9a70375a3bec07d4ad1a8096cd2726300caea2cde0ebb5952b8424",
-      "bytes": 130105
+      "sha256": "8896ee149fcd42440408f98d4b6c86cef50fc9f181dec44a22771580101f3a42",
+      "bytes": 132878
     },
     {
       "path": "tests/test_credential_status.py",
