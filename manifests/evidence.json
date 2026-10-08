@@ -5136,8 +5136,8 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "9772e8a8381912fc12aecced585b859054ecbeedee270285c056d2024bcbe573",
-      "bytes": 2162
+      "sha256": "490e1d7fcc56f2211c845b01a61aae2e0b6ecacc34132fab4909eb0933dd40af",
+      "bytes": 2331
     },
     {
       "path": "CLAUDE.md",
@@ -5396,8 +5396,8 @@
     },
     {
       "path": "adoption/new-wsl/claude-user-instructions.md",
-      "sha256": "4ecfa5e70260171362741848536363ff63c6a1d7f99e4da66aa528abbe60f71f",
-      "bytes": 1642
+      "sha256": "9b3ad2f70c4fa1baeadcf326d8c648420011bb1ee0c1f562610524a027aaa90e",
+      "bytes": 1811
     },
     {
       "path": "adoption/new-wsl/client-config-map.json",
@@ -5406,8 +5406,8 @@
     },
     {
       "path": "adoption/new-wsl/codex-user-instructions.md",
-      "sha256": "f172676d00eb58b6581d82d7289d4b598fb568115ae85e2f34149ff6e26d1968",
-      "bytes": 2329
+      "sha256": "749619fa1b104ef2456f9d4e83664b6d5fff9a879382dd4acb931881c45c2620",
+      "bytes": 2498
     },
     {
       "path": "adoption/new-wsl/templates/claude-user.mcp.additions.json",
@@ -5501,8 +5501,8 @@
     },
     {
       "path": "adoption/scaffold/AGENTS.md",
-      "sha256": "9ebe108f02176f1d8a76405ca5427b7c8b22ee05d98301cb38ee3b71f152edc5",
-      "bytes": 2296
+      "sha256": "897fb86cb1bc62f668b785558de3e988253c7464b1b934fedb54abd0feba5f21",
+      "bytes": 2465
     },
     {
       "path": "adoption/sdk/README.md",
@@ -5541,8 +5541,8 @@
     },
     {
       "path": "adoption/templates/codex.AGENTS.template.md",
-      "sha256": "f172676d00eb58b6581d82d7289d4b598fb568115ae85e2f34149ff6e26d1968",
-      "bytes": 2329
+      "sha256": "749619fa1b104ef2456f9d4e83664b6d5fff9a879382dd4acb931881c45c2620",
+      "bytes": 2498
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
@@ -17667,8 +17667,8 @@
     },
     {
       "path": "docs/decisions/2026-09-28-top-rule-templates.md",
-      "sha256": "6d6b012c5e26da10b38dbd17075836533d27ac6dea90063373b66ed38cd3bcac",
-      "bytes": 31022
+      "sha256": "826140eac711a22332bf65f7ed7c0d30cb0846502efbd06d3f92eeb1d466a69d",
+      "bytes": 31908
     },
     {
       "path": "docs/decisions/2026-09-29-frozen-check-grader.md",
@@ -18166,6 +18166,11 @@
       "bytes": 5631
     },
     {
+      "path": "docs/decisions/2026-10-08-harness-rules-consolidation.md",
+      "sha256": "cfcaaba02b60cd71d797a3aac287d32193fc32d68e4c4b551230c86539ee8cd8",
+      "bytes": 9249
+    },
+    {
       "path": "docs/decisions/2026-10-08-philosophy-only-rules.md",
       "sha256": "f4b4f1d9952db662d8c0c9f1f9aec24da40c4666e4655e105c0617a689e6826c",
       "bytes": 10028
@@ -18319,6 +18324,11 @@
       "path": "docs/harness-defaults.md",
       "sha256": "7bc165d8723bca7205e5d4df9c38d6b2c5d5b99eab259de0239fc5d19b677994",
       "bytes": 251915
+    },
+    {
+      "path": "docs/harness-rule-enforcement.md",
+      "sha256": "6f4f0d5ac7d20128945c62e0ddc892212f32c70b4c60aa7e41400518a8a2803e",
+      "bytes": 7966
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -34759,6 +34769,36 @@
       "path": "evidence/artifacts/gpt6-family-tiering-20260927/run-record.json",
       "sha256": "8dc946bd48daa06e417452b3b8a8b8afd5d7bd846b33c144d7fbaa452b691b3d",
       "bytes": 15311
+    },
+    {
+      "path": "evidence/artifacts/harness-rules-20261008/B-run-receipts.json",
+      "sha256": "9ab28797579bc392a8536fbe9a5e6a2f8f6daa2f5e3c90c0e7279b65f5485c4d",
+      "bytes": 7859
+    },
+    {
+      "path": "evidence/artifacts/harness-rules-20261008/B-source-receipts.md",
+      "sha256": "f92c352bc5a3600ff37227a7a72e380b9f99e54a051a4f78c109c59f5413d2ad",
+      "bytes": 16255
+    },
+    {
+      "path": "evidence/artifacts/harness-rules-20261008/D-native-two-scope-before.json",
+      "sha256": "6ebc204eb51e7707419bc045628ec60d1244655077e1fdaadac22402ee6ae06d",
+      "bytes": 7067
+    },
+    {
+      "path": "evidence/artifacts/harness-rules-20261008/D-native-two-scope-proposed.json",
+      "sha256": "2b8e2859190e9212e6d32e035c73599e171335a34277f60676c642adcc0babd9",
+      "bytes": 7086
+    },
+    {
+      "path": "evidence/artifacts/harness-rules-20261008/D-test-impact.json",
+      "sha256": "1c0a8c4181a2ba61cb137d9a0982b1743cb1ea22b1dbe7a05e8d6435c5cf730a",
+      "bytes": 4586
+    },
+    {
+      "path": "evidence/artifacts/harness-rules-20261008/README.md",
+      "sha256": "7732d8d57c5e28304919db7e59d9ba1d32e3696ef7ca16dd4ea5da029fbf8629",
+      "bytes": 1599
     },
     {
       "path": "evidence/artifacts/harness-rules-convergence-20260922/codex-agent-roles-source.json",
@@ -56297,8 +56337,8 @@
     },
     {
       "path": "examples/claude-native/CLAUDE.md",
-      "sha256": "4ecfa5e70260171362741848536363ff63c6a1d7f99e4da66aa528abbe60f71f",
-      "bytes": 1642
+      "sha256": "9b3ad2f70c4fa1baeadcf326d8c648420011bb1ee0c1f562610524a027aaa90e",
+      "bytes": 1811
     },
     {
       "path": "examples/claude-native/agents/blind-adjudicator.md",
@@ -57852,7 +57892,7 @@
     },
     {
       "path": "tests/test_codex_worker_lane.py",
-      "sha256": "1e915cd8c53e08be44e5fa3fcfce0597e9e4fefb2de29e4187be6cf108f19658",
+      "sha256": "a3b4451ae9751d5430061a7057dba5b196225ae1a17ef24699bf48b213bd7e15",
       "bytes": 193146
     },
     {
@@ -58077,8 +58117,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "6c3ebe5047496138cacc4d4a0d673179e42aa990a8076d35d0b175a0aa73ec6b",
-      "bytes": 134263
+      "sha256": "b35dc500dc809033782fad235a8eb74a73b37d75a45aa1ea26a253315dc2b421",
+      "bytes": 134454
     },
     {
       "path": "tests/test_install_skills.py",

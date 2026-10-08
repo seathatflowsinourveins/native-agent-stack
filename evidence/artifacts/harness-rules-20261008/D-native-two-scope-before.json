@@ -1,0 +1,206 @@
+[
+  {
+    "client": "Claude Code",
+    "version": "2.1.294",
+    "mode": "before",
+    "command": [
+      "<author-home>/.local/bin/claude",
+      "-p",
+      "/context",
+      "--output-format",
+      "json",
+      "--strict-mcp-config",
+      "--mcp-config",
+      "{\"mcpServers\":{}}",
+      "--settings",
+      "{\"disableAllHooks\":true}",
+      "--setting-sources",
+      "user,project,local",
+      "--no-session-persistence"
+    ],
+    "cwd": "<author-home>/.local/state/native-agent-stack/research/harness-rules-20261008/D-measurement/claude/probe",
+    "exit": 0,
+    "native_context": {
+      "model": "claude-opus-5-5",
+      "total_tokens": 22824,
+      "raw_max_tokens": 1000000,
+      "percentage": 2,
+      "categories": [
+        {
+          "name": "System prompt",
+          "tokens": 2605,
+          "kind": "used"
+        },
+        {
+          "name": "System tools (deferred)",
+          "tokens": 14036,
+          "kind": "deferred"
+        },
+        {
+          "name": "Custom agents",
+          "tokens": 1704,
+          "kind": "used"
+        },
+        {
+          "name": "Memory files",
+          "tokens": 2007,
+          "kind": "used"
+        },
+        {
+          "name": "Skills",
+          "tokens": 16498,
+          "kind": "used"
+        },
+        {
+          "name": "Messages",
+          "tokens": 10,
+          "kind": "used"
+        },
+        {
+          "name": "Autocompact buffer",
+          "tokens": 33000,
+          "kind": "buffer"
+        },
+        {
+          "name": "Free space",
+          "tokens": 944176,
+          "kind": "free"
+        }
+      ],
+      "memory_files": [
+        {
+          "path": "<author-home>/.claude/CLAUDE.md",
+          "type": "User",
+          "tokens": 499
+        },
+        {
+          "path": "<author-home>/.claude/RTK.md",
+          "type": "User",
+          "tokens": 151
+        },
+        {
+          "path": "<author-home>/.local/state/native-agent-stack/research/harness-rules-20261008/D-measurement/claude/probe/CLAUDE.md",
+          "type": "Project",
+          "tokens": 24
+        },
+        {
+          "path": "<author-home>/.local/state/native-agent-stack/research/harness-rules-20261008/D-measurement/claude/probe/projected-user.md",
+          "type": "Project",
+          "tokens": 499
+        },
+        {
+          "path": "<author-home>/.local/state/native-agent-stack/research/harness-rules-20261008/D-measurement/claude/probe/RTK.md",
+          "type": "Project",
+          "tokens": 151
+        },
+        {
+          "path": "<author-home>/.local/state/native-agent-stack/research/harness-rules-20261008/D-measurement/claude/probe/AGENTS.md",
+          "type": "Project",
+          "tokens": 683
+        }
+      ]
+    },
+    "native_counter_boundary": "/context local command; estimates, not provider usage",
+    "observed_utc": "2026-10-08T15:37:54.358056+00:00",
+    "source_receipt_sha256": "f7cd0188f1e6264d5d458872b1b07edd6be979d251594a73ed9f2c3b00868886",
+    "retention_note": "Exact native memory/usage values and argv retained. Unrelated agent, skill and MCP detail arrays omitted from this compact copy; the full receipt is retained in the sealed G6 bundle.",
+    "publication_source_sha256": "f7cd0188f1e6264d5d458872b1b07edd6be979d251594a73ed9f2c3b00868886",
+    "publication_sanitization": "Publication copy replaces personal home prefixes and local session IDs. Native measurements, source pins and evidence boundaries are retained; the full original receipt remains in the sealed external bundle."
+  },
+  {
+    "client": "Codex",
+    "version": "0.161.0",
+    "mode": "before",
+    "command_shape": [
+      "<author-home>/.local/bin/codex",
+      "exec",
+      "--json",
+      "--skip-git-repo-check",
+      "--ephemeral",
+      "-C",
+      "<author-home>/.local/state/native-agent-stack/research/harness-rules-20261008/D-measurement/codex/probe",
+      "-m",
+      "cx/gpt-6.1-sol",
+      "-c",
+      "service_tier=\"fast\"",
+      "-c",
+      "model_provider=\"g6_counter\"",
+      "-c",
+      "model_providers.g6_counter.name=\"G6 native counter probe\"",
+      "-c",
+      "model_providers.g6_counter.base_url=\"http://127.0.0.1:21128/v1\"",
+      "-c",
+      "model_providers.g6_counter.wire_api=\"responses\"",
+      "-c",
+      "model_providers.g6_counter.requires_openai_auth=false",
+      "-c",
+      "features.hooks=false",
+      "-c",
+      "features.multi_agent=false",
+      "-c",
+      "mcp_servers.ai-memory.enabled=false",
+      "-c",
+      "mcp_servers.context-mode.enabled=false",
+      "-c",
+      "mcp_servers.hindsight.enabled=false",
+      "-c",
+      "mcp_servers.jcodemunch.enabled=false",
+      "-c",
+      "mcp_servers.qmd.enabled=false",
+      "-c",
+      "mcp_servers.serena.enabled=false",
+      "-c",
+      "mcp_servers.socraticode.enabled=false",
+      "-c",
+      "mcp_servers.codebase-memory-mcp.enabled=false",
+      "-c",
+      "model_providers.g6_counter.http_headers={x-omniroute-session-id=\"harness-rules\"}",
+      "-c",
+      "developer_instructions=<exact projected user file>",
+      "Diagnostic token count only. Reply exactly OK. Do not call tools or change files."
+    ],
+    "exit": 0,
+    "native_events": [
+      {
+        "type": "thread.started",
+        "thread_id": "<native-session-id>"
+      },
+      {
+        "type": "turn.started"
+      },
+      {
+        "type": "item.completed",
+        "item": {
+          "id": "item_0",
+          "type": "agent_message",
+          "text": "OK"
+        }
+      },
+      {
+        "type": "turn.completed",
+        "usage": {
+          "input_tokens": 17165,
+          "cached_input_tokens": 0,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 5,
+          "reasoning_output_tokens": 0
+        }
+      }
+    ],
+    "native_usage": {
+      "input_tokens": 17165,
+      "cached_input_tokens": 0,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 5,
+      "reasoning_output_tokens": 0
+    },
+    "native_counter_boundary": "Codex exec turn.completed usage, gateway-reported; no tokenizer approximation",
+    "observed_utc": "2026-10-08T15:37:59.047510+00:00",
+    "live_user_instruction_sha256": "c0176ee1ba349f5339fca8318e5a2aa520eb9ee03ba7dc4d19e9a03b081f6dd9",
+    "projection_note": "Exact user instructions projected as developer_instructions; exact repository AGENTS through project discovery; unchanged live user instructions load in both controls.",
+    "source_receipt_sha256": "f7cd0188f1e6264d5d458872b1b07edd6be979d251594a73ed9f2c3b00868886",
+    "retention_note": "Exact native memory/usage values and argv retained. Unrelated agent, skill and MCP detail arrays omitted from this compact copy; the full receipt is retained in the sealed G6 bundle.",
+    "publication_source_sha256": "f7cd0188f1e6264d5d458872b1b07edd6be979d251594a73ed9f2c3b00868886",
+    "publication_sanitization": "Publication copy replaces personal home prefixes and local session IDs. Native measurements, source pins and evidence boundaries are retained; the full original receipt remains in the sealed external bundle."
+  }
+]

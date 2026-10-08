@@ -1,0 +1,129 @@
+{
+  "schema": "harness-rules-research-run-receipts-v1",
+  "recorded_at_utc": "2026-10-08T15:43:01Z",
+  "baseline_repository_commit": "8ee8b3bd796c738592e92acd94d7902db3692311",
+  "query": "October 2026 public primary-source survey: Claude Code 2.1.294 CLAUDE.md memory, settings, hooks, skills, subagents, plugins, output styles; Codex 0.161.0 AGENTS.md discovery, config, hooks, skills; agents.md open format; small always-loaded core, progressive disclosure, rules-as-code with hooks/CI/GitHub rulesets/scheduled sweeps. Cite official versioned source or mark unverified. Sources https://code.claude.com/docs/en/memory https://code.claude.com/docs/en/hooks https://developers.openai.com/codex/guides/agents-md https://developers.openai.com/codex/skills https://agents.md/ https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/about-rulesets",
+  "research_routes": [
+    {
+      "route": "GPT Researcher",
+      "installed_launcher": "<author-home>/.config/new-wsl-native-stack/gpt-researcher.sh",
+      "installed_launcher_sha256": "af4f3a075679f00a2b10b1502fe5ebf2dbe8c1491276e66d8cd5b5f522b56af2",
+      "repository_launcher": "tools/research/gpt_researcher.sh",
+      "repository_launcher_matches_installed": true,
+      "upstream_checkout_commit": "0957c301ed06c2a5857b834358c7227c739041d4",
+      "run_directory": "<author-home>/.local/state/new-wsl-native-stack/research/gptr/20261008T152809Z-2671343",
+      "exit_code": 0,
+      "completion_observed_at_utc": "2026-10-08T15:37:27Z",
+      "source_report": {
+        "path": "<author-home>/.local/state/new-wsl-native-stack/research/gptr/20261008T152809Z-2671343/outputs/Agent_Policy_Survey.md",
+        "bytes": 41328,
+        "sha256": "b28ae22494559bc0363c44842e0297a327eb69bd62ec215cf8b0bdb47670eb88",
+        "lines": 558
+      },
+      "deliverable_copy": {
+        "path": "<author-home>/.local/state/native-agent-stack/research/harness-rules-20261008/B-gpt-researcher-report.md",
+        "bytes": 41329,
+        "sha256": "39a921edc648f4e384c8103f33affef976f0c18e8bdf73d89b884a4675ef34d4",
+        "normalization": "Native apply_patch appended exactly one final LF to the original report, which had no final LF; all preceding bytes match.",
+        "source_plus_exactly_one_lf_verified": true
+      },
+      "outcome": "Saved report; retrieval degraded. Several References explicitly say the official endpoint contents were not independently inspected. Primary-source verification was completed separately.",
+      "retrieval_diagnostics": [
+        "Public Wikipedia opensearch DNS failure.",
+        "Public DuckDuckGo HTML request transport failures and timeouts.",
+        "No-content search results during some subtasks."
+      ],
+      "provider_api_error_observed": false
+    },
+    {
+      "route": "Embedded DeerFlow",
+      "installed_launcher": "<author-home>/.config/new-wsl-native-stack/deer-flow-research.sh",
+      "installed_launcher_sha256": "beefa76dfa36dfc1a768c7328d0c3412f72bb08a39b40f5d2d7363575dee276b",
+      "upstream_checkout_commit": "345f08be00c8a9495079b732a39b46aa9af1584e",
+      "run_directory": "<author-home>/.local/state/native-agent-stack/research/deer-flow/run.D61Stflv",
+      "exit_code": 0,
+      "completion_observed_at_utc": "2026-10-08T15:37:27Z",
+      "source_answer": {
+        "path": "<author-home>/.local/state/native-agent-stack/research/deer-flow/run.D61Stflv/answer.md",
+        "bytes": 20714,
+        "sha256": "579bd464865afd2fafbfe70dd67d244c43d632da73cb8a03d684305cc234b2e6",
+        "lines": 173
+      },
+      "deliverable_copy": {
+        "path": "<author-home>/.local/state/native-agent-stack/research/harness-rules-20261008/B-deer-flow-answer.md",
+        "bytes": 20715,
+        "sha256": "40cf864f278e643477f336aa6ea5cda3de11490094d9daa85f74cdf224fb549f",
+        "normalization": "Native apply_patch appended exactly one final LF to the original answer, which had no final LF; all preceding bytes match.",
+        "source_plus_exactly_one_lf_verified": true
+      },
+      "native_retrieval_receipt": {
+        "source_path": "<author-home>/.local/state/native-agent-stack/research/deer-flow/run.D61Stflv/native-retrieval-metadata.json",
+        "deliverable_path": "<author-home>/.local/state/native-agent-stack/research/harness-rules-20261008/B-deer-flow-native-retrieval-metadata.json",
+        "source_and_copy_sha256": "3d75e3fb0387363581a9635ad4f036645fe681f85f6af428a81d9ea4d01f7035",
+        "source_and_copy_bytes": 21313,
+        "copy_matches_source": true,
+        "integration_assertion_pass": true,
+        "current_run_web_search_witnesses": 22,
+        "current_run_web_fetch_witnesses": 19,
+        "cited_retrieved_url_matches": 17,
+        "invalid_required_web_arguments": 0,
+        "ambiguous_call_ids": 0
+      },
+      "runtime_package_readback": {
+        "deerflow-harness": "2.1.0",
+        "langchain-core": "1.4.9",
+        "langchain-openai": "1.2.1",
+        "langgraph": "1.2.9",
+        "ddgs": "9.14.1"
+      },
+      "native_sdk_usage": {
+        "input_tokens": 181374,
+        "output_tokens": 12343,
+        "total_tokens": 193717
+      },
+      "outcome": "Saved answer and successful native retrieval integration assertion; intermediate search failures were retained separately.",
+      "retrieval_diagnostics": [
+        "Public DuckDuckGo HTML request transport failures.",
+        "Some public searches returned no results.",
+        "A tool-frequency warning occurred."
+      ],
+      "provider_api_error_observed": false
+    }
+  ],
+  "excluded_usage_probes": [
+    {
+      "route": "GPT Researcher",
+      "argument": "--help",
+      "run_directory": "<author-home>/.local/state/new-wsl-native-stack/research/gptr/20261008T152719Z-2630551",
+      "outcome": "CLI help only; no research report. Excluded from research evidence."
+    },
+    {
+      "route": "Embedded DeerFlow",
+      "argument": "--help",
+      "run_directory": "<author-home>/.local/state/native-agent-stack/research/deer-flow/run.qPBS778u",
+      "outcome": "Launcher treated the single argument as a query, failed native retrieval assertion, and retained an empty answer.md. Excluded from research evidence.",
+      "exit_code": "UNVERIFIED: batch tool did not surface the process exit code"
+    }
+  ],
+  "independent_primary_fetch_diagnostics": [
+    {
+      "source": "https://raw.githubusercontent.com/openai/codex/979011409de0a60b52f179721948e65531d26144/codex-rs/core/src/project_doc.rs",
+      "outcome": "HTTP 404: obsolete path. Recovered by reading the pinned source tree and using core/src/agents_md.rs.",
+      "observed_no_later_than_utc": "2026-10-08T15:34:23Z"
+    },
+    {
+      "source": "https://code.claude.com/docs/en/*.md",
+      "outcome": "Direct Python urllib requests returned HTTP 403. The same required official pages had already been successfully fetched through ctx_fetch_and_index and those source reads were retained.",
+      "observed_at_clock_utc": "2026-10-08T15:34:23Z"
+    }
+  ],
+  "boundaries": [
+    "No live client configuration, environment dump, credential value or raw research log is included.",
+    "Native runtime integration success does not prove every report claim.",
+    "Mutable current official documentation is not silently treated as pinned-release source.",
+    "Always-loaded token measurements are owned by deliverable D and were not duplicated.",
+    "Research outputs are copied in B-prefixed files; original runtime directories remain separately named."
+  ],
+  "publication_source_sha256": "0f4ae93d2feffba676ad2c17b5ca5f807e5aa417a2c76bb477e80da8efa5c9ae",
+  "publication_sanitization": "Publication copy replaces personal home prefixes and local session IDs. Native measurements, source pins and evidence boundaries are retained; the full original receipt remains in the sealed external bundle."
+}
