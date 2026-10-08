@@ -65,6 +65,8 @@ class NewWorkflowSecurityCoverageTests(unittest.TestCase):
             "practice-references-freshness.yml",
             "runtime-worker-skills-freshness.yml",
             "harness-audit.yml",
+            "claude-security-review.yml",
+            "security-review-flag.yml",
             # Its offline zizmor pass/fail assertions live in tests/test_sota_sources_gate.py.
             "sota-sources-gate.yml",
         }
@@ -120,6 +122,28 @@ class NewWorkflowSecurityCoverageTests(unittest.TestCase):
     def test_harness_audit_workflow_has_no_offline_findings(self):
         with tempfile.TemporaryDirectory() as temporary:
             result = _analyze(WORKFLOWS_DIR / "harness-audit.yml", Path(temporary))
+        try:
+            findings = json.loads(result.stdout)
+        except json.JSONDecodeError:
+            self.fail(f"zizmor did not return JSON (exit {result.returncode}): "
+                      f"{result.stderr[:2000]}")
+        self.assertEqual(result.returncode, 0, result.stderr[:2000])
+        self.assertEqual(findings, [])
+
+    def test_claude_security_review_workflow_has_no_offline_findings(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            result = _analyze(WORKFLOWS_DIR / "claude-security-review.yml", Path(temporary))
+        try:
+            findings = json.loads(result.stdout)
+        except json.JSONDecodeError:
+            self.fail(f"zizmor did not return JSON (exit {result.returncode}): "
+                      f"{result.stderr[:2000]}")
+        self.assertEqual(result.returncode, 0, result.stderr[:2000])
+        self.assertEqual(findings, [])
+
+    def test_security_review_flag_workflow_has_no_offline_findings(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            result = _analyze(WORKFLOWS_DIR / "security-review-flag.yml", Path(temporary))
         try:
             findings = json.loads(result.stdout)
         except json.JSONDecodeError:

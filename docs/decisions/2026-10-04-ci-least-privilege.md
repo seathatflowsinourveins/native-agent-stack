@@ -419,6 +419,15 @@ reference, <https://docs.github.com/en/actions/reference/security/oidc> (subject
 "Immutable subject claims"); Anthropic, Workload identity federation,
 <https://platform.claude.com/docs/en/manage-claude/workload-identity-federation> ("Match"); all read 2026-10-08.
 
+### Addendum (2026-10-08): the security-review job on the federation rule
+
+`claude-security-review.yml:review` requests a token for the same rule, so, as the Overturn paragraph above requires,
+it has its own entry in the reviewed inventory (`id-token: write`, its only write grant) and its own `id-token-write`
+exemption in `tests/test_workflow_policy.py`. Its only trigger is a manual dispatch, and its job requires
+`refs/heads/main` and the owner. The companion `security-review-flag.yml` runs on `pull_request` with
+`permissions: {}` and `cache-mode: none` and requests no token
+([2026-10-08-claude-actions-security-review.md](2026-10-08-claude-actions-security-review.md)).
+
 ## Alternatives considered
 
 - **Keep workflow-level `contents: read`.** It already met OpenSSF Scorecard's Token-Permissions top score (read-only

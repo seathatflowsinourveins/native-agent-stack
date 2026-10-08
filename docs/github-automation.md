@@ -74,6 +74,13 @@ The Actions allow-list and harness description below were checked against live s
   The owner checks the native [Claude Console federation history](https://platform.claude.com/settings/workload-identity-federation?tab=history)
   for the reason and corrects the relevant rule or claim; the Console denial reason is not established by the retained
   workflow evidence.
+- **Security review on demand.** [`security-review-flag.yml`](../.github/workflows/security-review-flag.yml) runs on
+  pull requests that touch workflows, `scripts/hooks/`, `tools/credentials/`, the credential inventory or the
+  paper-trading blueprints, and only writes a notice with the dispatch command; it runs no model and holds no scope.
+  [`claude-security-review.yml`](../.github/workflows/claude-security-review.yml) is that review: dispatched by hand
+  from `main` for one pull request head, only while `CLAUDE_SECURITY_REVIEW_ENABLED` is `true`, with the action pin,
+  federation, read-only fence and bounds of the on-demand pull request review and a security-review prompt
+  ([decision](decisions/2026-10-08-claude-actions-security-review.md)). No hosted run has been made.
 - **Against the final catalog of 2026-10-01** (`docs/final-catalog-20261001.md`, #595): the picks each blind model
   family made for these layers. The clean-room definitive round announced there decides one pick per slot.
   - git-github-automation: both families picked git, gh, Worktrunk and sem (the Claude pick keeps sem only if a
