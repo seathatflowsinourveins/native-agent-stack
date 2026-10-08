@@ -4876,6 +4876,21 @@
         "No S4 closure, complete memory/lifecycle acceptance, token savings or new-host upgrade is asserted."
       ],
       "path": "evidence/receipts/row70-records-b-e-20261008.json"
+    },
+    {
+      "id": "srt-source-citations-20261008",
+      "kind": "artifact_measurement",
+      "component_ids": [
+        "sandbox-runtime"
+      ],
+      "claim": "The two non-executed worker-support SRT citations now reference immutable sandbox-runtime d9aac209 README174. Existing native plan consistency and bounded source-diff observation pass; executable commands and all other plan/acceptance/history fields remain unchanged.",
+      "limitations": [
+        "Reference-only source repair; no native install, sandbox/client/policy/model/runtime/provider/broker or new-host acceptance.",
+        "Immutable primary source verification is reused at unchanged d9/README hash; no fresh source or vendor installation claim.",
+        "Plan inventory counts describe source rows, not fresh host installations.",
+        "No catalogue/workflow/credential/configuration/frozen native evidence or N2 gate changed."
+      ],
+      "path": "evidence/receipts/srt-source-citations-20261008.json"
     }
   ],
   "files": [
@@ -40822,8 +40837,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
-      "sha256": "26f8bdf84cb49332a08dbfe686b21eb0b3e477601cba1642e2abd120cc2b2a1c",
-      "bytes": 227759
+      "sha256": "0eb00e4a6617884e3f1d351cbca6e0a27fe1253c41fd9c22275a26b9bc89d685",
+      "bytes": 227790
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/VALIDATION.md",
@@ -41267,8 +41282,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
-      "sha256": "a12ef9e9fe82bd016ef977ba4f06a576cda8516febdb1156e69fa9602d85ee87",
-      "bytes": 487688
+      "sha256": "7cec8b6cd896836f85ef57dc9cee33b0acbe44a7d9fc5ac2cf53a13450dd51eb",
+      "bytes": 487716
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
@@ -51731,6 +51746,11 @@
       "bytes": 2639
     },
     {
+      "path": "evidence/artifacts/srt-source-citations-20261008/source-checks.json",
+      "sha256": "7446816d5c5b17ba3a91e605377ae37d60546c8c396a266c2f53b5f8a299a52f",
+      "bytes": 6424
+    },
+    {
       "path": "evidence/artifacts/suite-parallelism-trial-20261003/README.md",
       "sha256": "0a9faceaf4268eb54b76c174609ea8e597d50a9ea39170317944f62caea474e4",
       "bytes": 9207
@@ -56069,6 +56089,11 @@
       "path": "evidence/receipts/source-map-js-122-qualification-20261005.json",
       "sha256": "7b08474683f67c1f8a1512bf0e7cfee8b878f3d9cb72c264b61e31c10cdac630",
       "bytes": 4832
+    },
+    {
+      "path": "evidence/receipts/srt-source-citations-20261008.json",
+      "sha256": "f6925caa4ddd8a4ba9194dfdb0e344646faefaff5b7115198b59eb44fc83bf23",
+      "bytes": 1938
     },
     {
       "path": "evidence/receipts/suite-parallelism-trial-20261003.json",

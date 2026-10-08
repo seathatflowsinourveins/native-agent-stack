@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "id": "srt-source-citations-20261008",
+  "kind": "artifact_measurement",
+  "evidence_class": "local_integration",
+  "recorded_date_utc": "2026-10-08",
+  "component_ids": [
+    "sandbox-runtime"
+  ],
+  "claim": "The two non-executed worker-support SRT citations now reference immutable sandbox-runtime d9aac209 README174. Existing native plan consistency and bounded source-diff observation pass; executable commands and all other plan/acceptance/history fields remain unchanged.",
+  "limitations": [
+    "Reference-only source repair; no native install, sandbox/client/policy/model/runtime/provider/broker or new-host acceptance.",
+    "Immutable primary source verification is reused at unchanged d9/README hash; no fresh source or vendor installation claim.",
+    "Plan inventory counts describe source rows, not fresh host installations.",
+    "No catalogue/workflow/credential/configuration/frozen native evidence or N2 gate changed."
+  ],
+  "data": {
+    "source_base": "be7273a43c35f25002be8b481683c475482d661c",
+    "practice_source": {
+      "repository": "anthropics/sandbox-runtime",
+      "pin": "d9aac2098351ca17f3743fbaf6ecbd0051b7e00e",
+      "file": "README.md",
+      "line": 174,
+      "url": "https://github.com/anthropics/sandbox-runtime/blob/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/README.md#L174"
+    },
+    "artifact": {
+      "path": "evidence/artifacts/srt-source-citations-20261008/source-checks.json",
+      "bytes": 6424,
+      "sha256": "7446816d5c5b17ba3a91e605377ae37d60546c8c396a266c2f53b5f8a299a52f"
+    },
+    "check_plan_exit_code": 0,
+    "independent_source_observation": "Retained bounded assessment in source-check artifact; only one supporting-source object and corresponding one SOURCES label/link change.",
+    "native_operation": false,
+    "inverse": "Revert only the two citation edits and this unit's new evidence/registry bindings; host state is unchanged."
+  }
+}
