@@ -46,15 +46,18 @@ from scripts import adoption_status  # noqa: E402
 
 TEMPLATES = ROOT / "adoption" / "templates"
 FIXTURES = ROOT / "tests" / "fixtures" / "codex-worker-lane"
-# The canonical routing move is recorded in 2026-10-05-harness-context-budget.md.
-# The session-lanes local-time line is recorded in 2026-10-05-user-facing-local-time.md.
 # RTK's unchanged 0.51.0 awareness fixture is pinned to e001f773 and checked
-# byte for byte in the rendered block, with local exceptions kept separately.
-# Protected canonical block stops at the session-lanes marker. The current pre-RTK
-# prefix also includes the approved session guidance; those are separate scopes.
-# Both pins are recomputed for the trimmed block of 2026-10-07-instruction-core.md.
-TOP_RULE_SHA256 = "0f6b14d8b59cc7b6e39236d2e42241d5769d4bdffe9d75f7608b8bf0542b1f71"
-PRE_RTK_SHA256 = "7c747c0a8cf80220a2782beef46f26608eb554f30d272af680bc9ef1f994a2e2"
+# byte for byte in the rendered block. Since the owner's direction of 2026-10-08
+# the block before it is the top-rule marker and the philosophy core only: the
+# routing paragraph, the session-lanes section and the local exceptions left, so
+# the former pre-RTK and session-lanes pins collapse into this one pin.
+TOP_RULE_SHA256 = "2618406a99bf3414e291651c17446e159c9da5885bb8a72091dc77b35c91fb62"
+# The template's RTK section since 2026-10-08 (Codex audit F5): rtk-ai/rtk v0.51.0's default awareness paragraph,
+# hooks/rtk-awareness.md at e001f773, byte for byte. With the `rtk hook codex` PreToolUse hook the full text is not
+# needed (AWARENESS_CONFIG.md:12-13,34-38 at e001f773), and the default paragraph is verbatim at every awareness level
+# (same file, lines 22-23), so it is also a slice of the pinned full file below.
+TEMPLATE_RTK_MARKER = "<!-- native-agent-stack:rtk-upstream"
+RTK_DEFAULT_AWARENESS_SHA256 = "dc37dc6afdf513200c2aae1931496e433d323f313877a49b0d5ba11992c33ac7"
 RTK_AWARENESS_SHA256 = "278274ef3d08c858d4247cc91419c4d74ef922b95719e987b22e896aef10e1fc"
 UPSTREAM_MARKER = '<!-- native-agent-stack:rtk-upstream rtk-ai/rtk v0.51.0 hooks/rtk-awareness-full.md, verbatim -->\n'
 
@@ -416,13 +419,21 @@ def write_fixture_mcp_server(directory: Path) -> Path:
     return path
 
 
-def template_segments() -> tuple[str, str, str]:
-    """(pre-RTK prefix, upstream awareness text, exceptions block) of the rendered instructions."""
+def template_segments() -> tuple[str, str]:
+    """(the block before the RTK section, the upstream RTK text after its one-line marker) of the rendered
+    instructions. Since 2026-10-08 the RTK text is rtk-ai/rtk v0.51.0's default awareness paragraph and the local
+    exceptions are not a segment; see rtk_exceptions_section()."""
     text = lane.agents_block()
     body = text.split("\n", 1)[1]  # after the begin marker line
-    top, rest = body.split("\n" + UPSTREAM_MARKER, 1)
-    upstream, exceptions = rest.split("\n<!-- native-agent-stack:rtk-exceptions -->\n", 1)
-    return top, upstream, exceptions
+    top, rest = body.split("\n" + TEMPLATE_RTK_MARKER, 1)
+    return top, rest.split("\n", 1)[1].split(lane.BLOCK_END, 1)[0]
+
+
+def rtk_exceptions_section() -> str:
+    """The local RTK exceptions, on demand in docs/token-practice.md between their two markers since 2026-10-08."""
+    doc = (ROOT / "docs" / "token-practice.md").read_text(encoding="utf-8")
+    return doc.split("<!-- native-agent-stack:rtk-exceptions -->\n", 1)[1].split(
+        "<!-- native-agent-stack:rtk-exceptions:end -->", 1)[0]
 
 
 class TemplateTests(unittest.TestCase):
@@ -432,76 +443,75 @@ class TemplateTests(unittest.TestCase):
         self.assertTrue(text.endswith(lane.BLOCK_END + "\n"))
         self.assertEqual(text.count(lane.BLOCK_BEGIN), 1)
         self.assertEqual(text.count(lane.TOP_RULE_MARKER), 1)
-        self.assertEqual(text.count(lane.EXCEPTIONS_MARKER), 1)
+        # The exceptions left the always-loaded block on 2026-10-08 (docs/token-practice.md holds them).
+        self.assertEqual(text.count(lane.EXCEPTIONS_MARKER), 0)
         rendered = lane.agents_block()
         self.assertEqual(rendered, lane.managed_block.codex_block(text))
-        self.assertIn(lane.managed_block.RTK_INCLUDE, text)
-        self.assertNotIn(lane.managed_block.RTK_INCLUDE, rendered)
-        # Codex expands no @ reference (codex-rs/core/src/agents_md.rs at rust-v0.157.1): the text is inline.
+        # Since 2026-10-08 the RTK paragraph is inline in the template itself, so nothing is included at render time.
+        self.assertNotIn(lane.managed_block.RTK_INCLUDE, text)
+        self.assertEqual(rendered, text)
+        # Codex expands no @ reference (codex-rs/core/src/agents_md.rs at rust-v0.157.1 and rust-v0.161.0): the text
+        # is inline.
         self.assertFalse([line for line in rendered.splitlines() if line.startswith("@")])
-        # This local 8,192-byte check covers the compact source (7,418 bytes).
-        # The rendered Codex carrier is 8,484 bytes, counted by the startup budget.
+        # This local 8,192-byte check covers the template, 2,105 bytes since 2026-10-08, which is also the rendered
+        # Codex carrier counted by the startup budget.
         self.assertLess(len(text.encode("utf-8")), 8192)
 
     def test_top_rule_is_pinned_and_rendered_rtk_is_the_unchanged_pinned_source(self):
-        top, upstream, _ = template_segments()
-        self.assertEqual(hashlib.sha256(top.encode("utf-8")).hexdigest(), PRE_RTK_SHA256)
-        session_marker = "<!-- native-agent-stack:session-lanes -->"
-        self.assertEqual(top.count(session_marker), 1)
-        canonical = top.split(session_marker, 1)[0]
-        self.assertEqual(hashlib.sha256(canonical.encode("utf-8")).hexdigest(), TOP_RULE_SHA256)
+        top, upstream = template_segments()
+        self.assertEqual(hashlib.sha256(top.encode("utf-8")).hexdigest(), TOP_RULE_SHA256)
+        self.assertEqual(top.count("<!-- native-agent-stack:session-lanes -->"), 0)
+        # The full awareness file stays pinned: the Codex role carriers still carry it (codex_roles.f4_block).
         native = (FIXTURES / "rtk-awareness-full.md").read_text(encoding="utf-8")
         self.assertEqual(hashlib.sha256(native.encode("utf-8")).hexdigest(), RTK_AWARENESS_SHA256)
         fragment = (ROOT / lane.managed_block.RTK_AWARENESS_REL).read_bytes()
         self.assertEqual(fragment, native.encode("utf-8"))
-        self.assertEqual(upstream.encode("utf-8"), fragment)
+        # The block's RTK text is the default paragraph, byte for byte, and a slice of the full file.
+        self.assertEqual(hashlib.sha256(upstream.encode("utf-8")).hexdigest(), RTK_DEFAULT_AWARENESS_SHA256)
+        self.assertIn(upstream, native)
+        self.assertTrue(upstream.startswith("# Command output\n\n" + lane.RTK_OUTPUT_CONTRACT))
+        self.assertNotIn("Prefix every shell command with", upstream)
 
-    # The standing clauses of docs/decisions/2026-09-30-rule-text-every-layer.md, as the Codex block states them,
-    # with the Sol-primary routing of docs/decisions/2026-09-30-sol-primary-quality-defaults.md and skill matching.
-    STANDING_PHRASES = (
-        "`search-first`", "`find-skills`", "`skill-creator`", "`$skill-name`", "its description", "SKILL.md",
-        "native workflow", "A coordinator, not a bounded worker, invokes", "when no skill fits",
-        "promptfoo", "paired benchmark", "Harbor or Inspect", "never a self-written runner", "completeness critic",
-        "next landscape sweep", "lifecycle task", "each coordinator unit names the north-star action",
-        "For unpinned work, `gpt-6.1-sol` at ultra", "`gpt-6-astra` at ultra", "complex workflow that needs Astra",
-        "single consequential judgment", "complex changes across systems", "one bounded Sol repair",
-        "children inherit that pin", "a spawn call names neither", "a coordinator records the trigger",
-        "never a delegated child, starts a cross-family lane", "OmniRoute", "`codex -p omniroute`", "Opus 5.5 at max",
-        "cooperation lanes", "A coordinator records each decision", "`docs/decisions/YYYY-MM-DD-<slug>.md`",
-        "No audits, trials or network at startup", "due-file line", "one lane per artifact")
-
-    def test_top_rule_carries_the_standing_clauses_and_a_lane_for_every_configured_server(self):
-        # Each MCP server the user config template registers needs a token lane in this block, so a server added to
-        # codex.config.template.toml without one fails here.
-        top, _, _ = template_segments()
+    def test_every_configured_server_has_a_row_in_the_handbooks_activation_table(self):
+        # Since 2026-10-08 the always-loaded block names no token lanes. Each MCP server the user config template
+        # registers still needs its on-demand row in docs/token-session-handbook.md ("What runs automatically and what
+        # you select"), keyed by repository ID: the server name, or the name with upstream's "-mcp" suffix. A server
+        # added to codex.config.template.toml without one fails here.
         servers = tomllib.loads((TEMPLATES / "codex.config.template.toml").read_text(encoding="utf-8"))["mcp_servers"]
-        lanes = next((line for line in top.splitlines() if line.startswith("Token lanes")), "")
-        self.assertEqual([name for name in servers if f"`{name}`" not in lanes], [])
-        self.assertEqual([phrase for phrase in self.STANDING_PHRASES if phrase not in top], [])
+        handbook = (ROOT / "docs" / "token-session-handbook.md").read_text(encoding="utf-8")
+        start = handbook.index("## What runs automatically and what you select")
+        rows = set(re.findall(r"(?m)^\| \[`([^`]+)`\]", handbook[start:handbook.index("\n## ", start + 1)]))
+        self.assertTrue(servers)
+        self.assertEqual([name for name in servers if name not in rows and f"{name}-mcp" not in rows], [])
 
     def test_exceptions_name_every_raw_sensitive_form(self):
-        _, _, exceptions = template_segments()
+        exceptions = rtk_exceptions_section()
         for needle in ("`git show REV:path`", "git -C DIR show REV:path", "`diff`", "`git branch`", "`git log`",
                        "`jq`", "`find`", "`rtk proxy <command>`", "`cd`", "`export`", "`source`", "127"):
             self.assertIn(needle, exceptions)
 
     def test_adoption_status_requires_the_entire_native_rtk_text(self):
-        native = (FIXTURES / "rtk-awareness-full.md").read_text(encoding="utf-8")
+        # RTK.md as rtk-ai/rtk v0.51.0's `rtk init --codex` writes it: its ownership comment and the default awareness
+        # paragraph, which is the block's RTK text since 2026-10-08.
+        _, default = template_segments()
+        native = ("<!-- rtk-owned: written by `rtk init --codex`, removed by `rtk init --codex --uninstall` -->\n\n"
+                  + default)
         with tempfile.TemporaryDirectory() as tmp:
             home = Path(tmp)
             (home / "RTK.md").write_text(native, encoding="utf-8")
             (home / "AGENTS.md").write_text(lane.agents_block(), encoding="utf-8")
             self.assertTrue(adoption_status.rtk_instructions_inline(home))
-            for omitted in ("- `rtk discover`", " Commands RTK has no filter for\nrun as-is, so the prefix is always safe.",
-                            "; behavior and exit code are unchanged"):
+            for omitted in ("Truncated results state their recovery path in their own output. ",
+                            "dropping costly noise. ", ", or garbled"):
                 with self.subTest(omitted=omitted):
+                    self.assertEqual(lane.agents_block().count(omitted), 1)  # the mutation removes real text
                     (home / "AGENTS.md").write_text(lane.agents_block().replace(omitted, ""))
                     self.assertFalse(adoption_status.rtk_instructions_inline(home))
 
     def test_adoption_status_finds_the_rtk_text_inline(self):
         # scripts/adoption_status.py (#368) counts RTK as wired only when RTK.md's text is inline in what Codex
         # reads; the rendered block carries it verbatim, and a bare pointer stays false.
-        _, upstream, _ = template_segments()
+        _, upstream = template_segments()
         with tempfile.TemporaryDirectory() as tmp:
             home = Path(tmp)
             (home / "RTK.md").write_text(upstream, encoding="utf-8")
@@ -644,8 +654,11 @@ class TemplateTests(unittest.TestCase):
         self.assertEqual({k: profile[k] for k in ("model", "model_provider", "model_reasoning_effort", "web_search")},
                          {"model": "cx/gpt-6-astra", "model_provider": "omniroute", "model_reasoning_effort": "max",
                           "web_search": "live"})
-        self.assertEqual(set(profile), {"model", "model_provider", "model_reasoning_effort", "web_search",
-                                        "model_providers", "shell_environment_policy", "features"})
+        self.assertEqual(set(profile), {"model", "model_provider", "model_reasoning_effort", "model_context_window",
+                                        "web_search", "model_providers", "shell_environment_policy", "features"})
+        # Codex 0.161.0 falls back to the bundled 272K entry for this provider (the comment above the key cites the
+        # source lines); the gateway's live catalog serves 800K, which a 631,410-token request confirmed on 2026-10-08.
+        self.assertEqual(profile["model_context_window"], 800000)
         provider = profile["model_providers"]["omniroute"]
         self.assertEqual(provider["name"], "OmniRoute")  # "OpenAI" would switch on is_openai() paths
         self.assertEqual(provider["base_url"], "http://127.0.0.1:20128/v1")
@@ -768,7 +781,7 @@ class FakeHost:
             "projects": {"/home/example/code/x": {"trust_level": "trusted"}},
         }
         self.write_config(self.config)
-        _, upstream, _ = template_segments()
+        _, upstream = template_segments()
         (self.codex_home / "RTK.md").write_text(upstream)
         (self.codex_home / "AGENTS.md").write_text("@/home/example/.codex/RTK.md\n")
         (self.codex_home / "AGENTS.md").chmod(0o600)

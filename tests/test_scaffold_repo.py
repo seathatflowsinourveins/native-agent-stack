@@ -77,13 +77,15 @@ class ScaffoldContentTests(unittest.TestCase):
         for text in (scaffold, template):
             self.assertEqual(text.count(TOP_RULE_MARKER), 1)
         block = top_rule_block(template)
-        self.assertTrue(block.startswith("Top rule: research convergence first;"), block[:80])
+        # The philosophy core of 2026-10-08, heading first.
+        self.assertTrue(block.startswith("# Native engineering defaults\n\n**Research convergence first;"), block[:80])
         self.assertEqual(top_rule_block(scaffold), block)
 
     def test_a_drifted_top_rule_is_caught(self):
         scaffold = (SCAFFOLD / "AGENTS.md").read_text(encoding="utf-8")
         block = top_rule_block(CODEX_AGENTS_TEMPLATE.read_text(encoding="utf-8"))
-        for old, new in (("research convergence first", "research first"), ("that turn.\n", "that turn. \n")):
+        for old, new in (("Research convergence first", "Research first"),
+                         ("record the correction.\n", "record the correction. \n")):
             with self.subTest(drift=new):
                 self.assertEqual(scaffold.count(old), 1)
                 self.assertNotEqual(top_rule_block(scaffold.replace(old, new)), block)

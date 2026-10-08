@@ -63,6 +63,25 @@ command.
 Preserve canonical generated instructions and the host's hook policy; historical
 hook acceptance is not authorization to enable capture on every runtime.
 
+The measured RTK caveats below moved verbatim from the Codex user-level block on
+2026-10-08. The Codex role carriers in `adoption/agents/codex/` still carry the
+same lines, and `tools/adoption/codex_roles.py` reads them from this section.
+
+<!-- native-agent-stack:rtk-exceptions -->
+
+RTK prefix/output/exit exceptions:
+rtk 0.51.0 needs `--shell` for positional expansion; explicit `rtk` prefix bypasses exclusions. For the forms below use native commands or `rtk proxy <command>`:
+- A skill's `SKILL.md`: read it with plain `sed -n '1,400p' <path>` (no `rtk` prefix, not `cat`/`head`/`tail`) so Codex counts the load as `codex.skill.injected`.
+- `git show REV:path` (any; `git -C DIR show REV:path` too): ~8 KiB cap.
+- `diff`: rtk 0.51.0 read errors exit 2 (bf23cff); 0.50.0: 1.
+- `git branch`: may mark other-worktree branches remote-only.
+- `git log` full: silent 10-commit cap; no merges.
+- `jq`: <=40 lines of <=120 chars.
+- `find`, path may be absent: exit 0, no output.
+
+Never `rtk` shell builtins (`cd`/`export`/`source`): exit 127 stops `&&`.
+<!-- native-agent-stack:rtk-exceptions:end -->
+
 1. Retrieve what the current decision needs: exact code with rg/Serena,
    structural patterns with ast-grep, conceptual code with SocratiCode, selected
    Markdown with scoped QMD, and durable decisions with scoped ai-memory.

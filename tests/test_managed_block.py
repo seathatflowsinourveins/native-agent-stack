@@ -110,7 +110,8 @@ class ClaudeMdBlockTests(ManagedBlockCase):
 
     def test_an_older_hand_copy_is_refused_with_nothing_written(self):
         self.target.parent.mkdir()
-        older = "@RTK.md\n\n" + EXAMPLE.replace("Core rule", "Core rules", 1)
+        older = "@RTK.md\n\n" + EXAMPLE.replace("Decide by evidence", "Decide by evidences", 1)
+        self.assertNotEqual(older, "@RTK.md\n\n" + EXAMPLE)  # the copy really differs from the current example
         self.target.write_text(older, encoding="utf-8")
         code, _, err = self.apply()
         self.assertEqual(code, managed_block.EXIT_REFUSED)
@@ -309,7 +310,8 @@ class DecisionMdBlockTests(ManagedBlockCase):
                        "# RTK\r\nKeep the existing inline RTK pack.\r\n@RTK.md\r\n\r\n")
         self.target.write_bytes(self.legacy.encode())
         self.target.chmod(0o600)
-        self.rule = managed_block.decision_rule(managed_block.CODEX_TEMPLATE.read_text())
+        # The fragment is the paragraph's only source since it left the Codex template on 2026-10-08.
+        self.rule = managed_block.decision_rule(managed_block.DECISION_TEMPLATE.read_text())
         self.fragment = managed_block.decision_block(self.rule)
 
     def digest(self):

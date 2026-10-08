@@ -8,9 +8,10 @@ not retained. Beside its rows it names no path and no identifier of one: `codex_
 docs/acceptance-evidence-policy.md and the JSON evidence fields.
 
 Static checks (no model call):
-  marker        `env -C / codex debug prompt-input probe < /dev/null | grep -c 'native-agent-stack:top-rule'` is 1;
-                the RTK exceptions marker is on one line too, upstream's "Prefix every shell command with" is
-                there, and scripts/adoption_status.py finds RTK.md's text inline
+  marker        `env -C / codex debug prompt-input probe < /dev/null | grep -c 'native-agent-stack:top-rule'` is 1,
+                upstream's default awareness paragraph ("Command output here is condensed to save tokens") is there,
+                and scripts/adoption_status.py finds RTK.md's text inline; the RTK exceptions marker count is reported
+                only, since the exceptions left the block on 2026-10-08 (docs/token-practice.md holds them on demand)
   blind         the same render from an empty run-scoped CODEX_HOME and HOME, the way blind and sweep lanes run,
                 holds no marker
   binding       `codex mcp get context-mode --json` from / and from --checkout: upstream start.mjs of the npm pin
@@ -182,10 +183,10 @@ def static_checks(codex: str, codex_home: Path, eco_root: str, checkout: Path, r
     env = lane.codex_env(codex_home)
     got = lane.run_codex(codex, ["debug", "prompt-input", "probe"], env, "/")
     top, exceptions = grep_count(got.stdout, lane.TOP_RULE_MARKER), grep_count(got.stdout, lane.EXCEPTIONS_MARKER)
-    prefix = grep_count(got.stdout, "Prefix every shell command with")
-    results.add("marker", got.returncode == 0 and top == 1 and exceptions == 1 and prefix >= 1,
+    contract = grep_count(got.stdout, lane.RTK_OUTPUT_CONTRACT)
+    results.add("marker", got.returncode == 0 and top == 1 and contract >= 1,
                 f"exit {got.returncode}; grep -c top-rule {top}, rtk-exceptions {exceptions}, "
-                f"'Prefix every shell command with' {prefix}")
+                f"'{lane.RTK_OUTPUT_CONTRACT}' {contract}")
     inline = adoption_status.rtk_instructions_inline(codex_home)
     results.add("rtk-inline", inline is True, f"scripts/adoption_status.py rtk_instructions_inline: {inline}")
 

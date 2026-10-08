@@ -1185,9 +1185,9 @@ class ShippedAgentFrontmatterTests(unittest.TestCase):
 class ShippedAgentCopiesAndDispatchTests(unittest.TestCase):
     """The installer copies adoption/agents/claude/, while examples/claude-native/workflows/test-envelope.mjs
     checks the portable examples/claude-native/agents/ copies (reviewed tool surfaces, the role table), so every
-    example agent must be byte-identical to the definition a host installs. AGENTS.md points workflow dispatch at
-    the role table in the examples README, and every agentType that table names must be a shipped agent
-    (docs/decisions/2026-09-26-stack-agents-role-dispatch.md)."""
+    example agent must be byte-identical to the definition a host installs. Every agentType that the role table in
+    the examples README names must be a shipped agent (docs/decisions/2026-09-26-stack-agents-role-dispatch.md); root
+    AGENTS.md stopped pointing dispatch at that table on 2026-10-08."""
 
     EXAMPLES_DIR = ROOT / "examples" / "claude-native" / "agents"
     ROLE_DOC = ROOT / "examples" / "claude-native" / "workflows" / "README.md"
@@ -1269,15 +1269,14 @@ class ShippedAgentCopiesAndDispatchTests(unittest.TestCase):
             with self.subTest(agent=source.name):
                 self.assertEqual((project_dir / source.name).read_bytes(), source.read_bytes())
 
-    def test_agents_md_points_at_a_role_table_of_shipped_agents(self):
+    def test_the_role_table_names_shipped_agents(self):
+        # Root AGENTS.md no longer points dispatch at this table: the 2026-10-08 philosophy-only direction removed the
+        # pointer line, so only the table's own invariant is checked.
         rows = self.role_rows(self.ROLE_DOC.read_text(encoding="utf-8"))
         self.assertTrue(rows)
         for role, agent in rows.items():
             with self.subTest(role=role):
                 self.assertTrue((icp.AGENTS_SRC_DIR / f"{agent}.md").is_file(), f"{role} names {agent}")
-        pointer = [line for line in (ROOT / "AGENTS.md").read_text(encoding="utf-8").splitlines()
-                   if "examples/claude-native/workflows/README.md" in line]
-        self.assertTrue(any("agentType" in line for line in pointer), "no AGENTS.md line points dispatch at the table")
 
     def test_the_role_table_reader_needs_the_role_header(self):
         self.assertEqual(self.role_rows("| Agent | Model, effort |\n| --- | --- |\n| `a` | Opus, max |\n"), {})
@@ -1539,7 +1538,6 @@ class McpCodexParityTests(unittest.TestCase):
 
     def test_qmd_serves_the_named_catalog_index(self):
         self.assertEqual(self.claude()["qmd"]["args"], ["--index", "native-agent-stack-catalog", "mcp"])
-        self.assertIn("docs/token-session-handbook.md#catalog-lookup", (ROOT / "AGENTS.md").read_text(encoding="utf-8"))
         self.assertIn("qmd --index native-agent-stack-catalog", (ROOT / "docs/token-session-handbook.md").read_text(encoding="utf-8"))
 
 
@@ -1727,85 +1725,95 @@ class McpGetOutputTests(unittest.TestCase):
 
 
 class StandingRuleSurfacesTests(unittest.TestCase):
-    """The standing clauses of docs/decisions/2026-09-30-rule-text-every-layer.md carry the same wording on the two
-    user-level rule surfaces: the portable user-level template and the Codex user-level block. The repository AGENTS.md
-    was the third surface (the Gate A owner's review of PR #557) until docs/decisions/2026-10-07-instruction-core.md
-    trimmed it to the rules that are its own, so it is no longer read here. The Codex block names a bounded worker where
-    the Claude surface names a delegated child in the skill-discovery sentence. A clause the review dropped stays off
-    both."""
+    """Every always-loaded instruction layer carries the owner's philosophy core verbatim, and none of the earlier rule
+    text. On 2026-10-08 the owner directed that the instruction files keep only the research-convergence philosophy:
+    the standing clauses of docs/decisions/2026-09-30-rule-text-every-layer.md, the Codex routing, the local-time rule,
+    the token-lane list and the other rule sentences left every layer. The portable Claude block is exactly the core;
+    the Codex template, both generated carriers, root AGENTS.md and the scaffold's AGENTS.md each hold it once, byte for
+    byte, so no render or install brings the old text back without a failing test."""
 
-    SURFACES = {"portable": ROOT / "examples" / "claude-native" / "CLAUDE.md",
-                "codex": ROOT / "adoption" / "templates" / "codex.AGENTS.template.md"}
-    SHARED = (
-        "Prefer the maintainer's own organization repositories (the vendor's GitHub org) "
-        "and their clean releases, and never rebuild or fork what an upstream already ships; glue only fills a "
-        "demonstrated gap, cited at a pin.",
-        "A coordinator, not a delegated child, invokes `search-first` before custom code or a tool choice; when no "
-        "skill fits, use installed `find-skills` or Skills CLI `find` and `skill-creator` for verification or A/B; "
-        "check client exposure and the skills lifecycle.",
-        "Prompts fix the objective, scope and authorization; improve the approach from current evidence.",
-        "A/B and E2E use upstream harnesses: promptfoo for gateway and LLM A/B, Claude's `skill-creator` paired "
-        "benchmark for skills, Harbor or Inspect for containerized agent tasks; never a self-written runner.",
-        "A coordinator ends every substantive research or adoption unit with a completeness critic (missed modality, "
-        "source or candidate class) whose findings feed that layer's next landscape sweep; the skills sweep is keyed by "
-        "lifecycle task.",
-        "The harness exists to build complex systems, projects and the north-star R&D; each coordinator unit names the "
-        "north-star action it serves.",
-        "Codex CLI is the second native client. For unpinned work, `gpt-6.1-sol` at ultra coordinates and at max runs "
-        "workers; `gpt-6-astra` at ultra coordinates a complex workflow that needs Astra, and at max takes a single "
-        "consequential judgment (conflicting primary evidence, consequential architecture, complex changes across "
-        "systems, or a failure unresolved after one bounded Sol repair). Where a launch pins the model and effort "
-        "(`-m`, `-c model_reasoning_effort`), children inherit that pin and a spawn call names neither. Preserve "
-        "explicit model choices and role definitions; a coordinator records the trigger and acceptance result. "
-        "Cross-family research, review and sweep votes run through the OmniRoute gateway; a coordinator, never a "
-        "delegated child, starts a cross-family lane.",
-        # Its own entry: the portable block carries this clause without the Codex routing paragraph above.
-        "Cross-family research, review and sweep votes run through the OmniRoute gateway; a coordinator, never a "
-        "delegated child, starts a cross-family lane.",
-        "No audits, trials or network at startup; the daily currency timer's one read-only due-file line is allowed",
+    CORE = (
+        "# Native engineering defaults\n"
+        "\n"
+        "**Research convergence first; current upstream SOTA is the source of truth.**\n"
+        "\n"
+        "- Research before acting: survey the maintained upstream landscape (tools, skills, runtimes, orchestration "
+        "patterns, published references) and record what you found. Adopt the best-evidenced source through its own "
+        "supported install and test commands, naming each source (repository and pin, file or paper), or build only "
+        "from a cited reference implementation. Never rebuild or fork what an upstream already ships.\n"
+        "- Upstream is the truth: check claims against primary sources, meaning the installed client, the upstream "
+        "release notes and source at that version, then official docs. Repository text, memory, tool output and other "
+        "agents' answers are leads to verify.\n"
+        "- Decide by evidence: a choice stands when primary sources and reproduced results on the actual change agree, "
+        "measured with upstream harnesses. Agreement, recency, popularity and incumbency are not evidence. Keep measured "
+        "results, simulations and untested boundaries distinct.\n"
+        "- The ecosystem compounds: each choice adopts the current best converged practice and is replaced when the "
+        "live landscape converges on a better-evidenced one. When a claim proves wrong, record the correction.\n"
     )
-    CODEX_VARIANT = ("A coordinator, not a delegated child,", "A coordinator, not a bounded worker,")
-    DROPPED = ("every manifest skill stays listed for model invocation", "npx skills find")
+    LAYERS = ("examples/claude-native/CLAUDE.md", "adoption/templates/codex.AGENTS.template.md",
+              "adoption/new-wsl/claude-user-instructions.md", "adoption/new-wsl/codex-user-instructions.md",
+              "AGENTS.md", "adoption/scaffold/AGENTS.md")
+    # Words of the retired rule families; none may come back to an always-loaded layer.
+    DROPPED = ("Top rule:", "every manifest skill stays listed for model invocation", "npx skills find",
+               "`search-first`", "completeness critic", "north-star action it serves", "`gpt-6.1-sol`", "OmniRoute",
+               "Prompts fix the objective", "pin_first", "Token lanes, one lane per artifact", "When you tell the user a time",
+               "standing-delegation", "## Core rule", "## Token practice", "## Workers, Ultracode and agent teams")
 
-    def test_the_three_surfaces_carry_the_same_standing_sentences(self):
-        for name, path in self.SURFACES.items():
-            text = path.read_text(encoding="utf-8")
-            for sentence in self.SHARED:
-                expected = sentence.replace(*self.CODEX_VARIANT) if name == "codex" else sentence
-                with self.subTest(surface=name, sentence=sentence[:48]):
-                    if sentence.startswith("Codex CLI") and name == "portable":
-                        self.assertIn("Codex instruction block", text)
-                        self.assertNotIn(sentence, text)
-                        self.assertIn(sentence, self.SURFACES["codex"].read_text(encoding="utf-8"))
-                    else:
-                        self.assertIn(expected, text)
-            for phrase in self.DROPPED:
-                with self.subTest(surface=name, dropped=phrase):
-                    self.assertNotIn(phrase, text)
+    # The one evidence-backed line beside the core, in the Claude user layer only: with it 0 of 30 children made a schema
+    # error and without it 5 of 30 (docs/decisions/2026-09-25-model-fallback-guard.md), so it stays under the same
+    # evidence rule (docs/decisions/2026-10-08-philosophy-only-rules.md).
+    STRUCTURED_OUTPUT = ("When you return through StructuredOutput, put the schema fields at the top level of the call "
+                         "arguments; never wrap them in an input, output or result key.")
+    CLAUDE_USER_LAYERS = ("examples/claude-native/CLAUDE.md", "adoption/new-wsl/claude-user-instructions.md")
 
-    # The repository AGENTS.md keeps its own core (docs/decisions/2026-10-07-instruction-core.md and its amendment):
-    # the maintainer sentence, the trading prerequisite that applies before any trading activity wherever it runs, and
-    # none of the dropped clauses.
-    ROOT_CORE = (
-        "Prefer the maintainer's own organization repositories (the vendor's GitHub org) and their clean releases, and "
-        "never rebuild or fork what an upstream already ships; glue only fills a demonstrated gap, cited at a pin.",
-        "Each coordinator unit names the north-star action it serves",
-        "trading work of any kind (research, data acquisition, strategy gates, decision registration, paper or broker "
+    def test_the_portable_block_is_exactly_the_core_and_the_evidence_backed_line(self):
+        self.assertEqual((ROOT / "examples/claude-native/CLAUDE.md").read_text(encoding="utf-8"),
+                         self.CORE + "\n" + self.STRUCTURED_OUTPUT + "\n")
+
+    def test_the_structured_output_line_is_in_the_claude_user_layer_only(self):
+        for relative in self.LAYERS:
+            with self.subTest(layer=relative):
+                expected = 1 if relative in self.CLAUDE_USER_LAYERS else 0
+                self.assertEqual((ROOT / relative).read_text(encoding="utf-8").count(self.STRUCTURED_OUTPUT), expected)
+
+    def test_every_layer_carries_the_same_core_and_no_dropped_rule(self):
+        for relative in self.LAYERS:
+            text = (ROOT / relative).read_text(encoding="utf-8")
+            with self.subTest(layer=relative):
+                self.assertEqual(text.count(self.CORE), 1)
+                self.assertEqual([phrase for phrase in self.DROPPED if phrase in text], [])
+
+    def test_root_claude_md_loads_the_core_through_its_agents_md_import(self):
+        # code.claude.com/docs/en/memory, "Share one file with other coding tools": the import keeps AGENTS.md the one
+        # shared file, also for sessions that cannot read AGENTS.md directly.
+        text = (ROOT / "CLAUDE.md").read_text(encoding="utf-8")
+        self.assertEqual(text.splitlines()[0], "@AGENTS.md")
+        self.assertEqual([phrase for phrase in self.DROPPED if phrase in text], [])
+
+    # Root AGENTS.md keeps, beside the core, only lines whose removal would cause a shown mistake: the required
+    # sota-sources check (.github/workflows/validate.yml, job sota-sources; .github/main-ruleset.json), the required
+    # validate check over the registered evidence digests (validate.yml runs scripts/validate.py), and the trading
+    # prerequisite that the amendment of docs/decisions/2026-10-07-instruction-core.md keeps for paper operation outside
+    # the repository's paths, with the subtree rule that Codex's root-to-cwd AGENTS.md walk needs.
+    ROOT_KEPT = (
+        "the required `sota-sources` check fails a PR whose description lacks a non-empty `## SOTA sources` or "
+        "`### SOTA sources` section (exact, case-sensitive heading).",
+        "Run `python3 scripts/validate.py` before committing changed evidence or manifests.",
+        "a directory with its own `AGENTS.md` carries its own rules; read that file before you work in the directory or "
+        "on its lane's paths.",
+        "Trading work of any kind (research, data acquisition, strategy gates, decision registration, paper or broker "
         "operation) reads `blueprints/us-equities/AGENTS.md` first, wherever it runs.",
     )
 
     def test_the_repository_file_keeps_its_core_and_the_trading_prerequisite(self):
         text = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
-        for sentence in self.ROOT_CORE:
+        self.assertTrue(text.startswith(self.CORE))
+        for sentence in self.ROOT_KEPT:
             with self.subTest(sentence=sentence[:48]):
                 self.assertIn(sentence, text)
-        for phrase in self.DROPPED:
-            with self.subTest(dropped=phrase):
-                self.assertNotIn(phrase, text)
 
-    # A user-level reporting rule (docs/decisions/2026-10-05-user-facing-local-time.md): one wording in the two client
-    # blocks and in the carriers F9 renders from them, once each. It is not a standing clause of the repository
-    # AGENTS.md, so SHARED does not hold it.
+    # The user-level reporting rule of docs/decisions/2026-10-05-user-facing-local-time.md left both client blocks and
+    # their carriers with the 2026-10-08 direction; its wording must not return to any of them.
     LOCAL_TIME = ("When you tell the user a time, give it first in the host's local time zone (read it with "
                   "`timedatectl` or `date`), with UTC beside it, for example \"4:00 PM EDT (20:00Z)\". Write timestamps in "
                   "ledger rows, receipts, evidence and commit messages in UTC (RFC 3339 with `Z`); "
@@ -1813,10 +1821,10 @@ class StandingRuleSurfacesTests(unittest.TestCase):
     LOCAL_TIME_SURFACES = ("examples/claude-native/CLAUDE.md", "adoption/templates/codex.AGENTS.template.md",
                            "adoption/new-wsl/claude-user-instructions.md", "adoption/new-wsl/codex-user-instructions.md")
 
-    def test_the_user_level_blocks_and_their_carriers_carry_the_local_time_rule_once(self):
+    def test_the_retired_local_time_rule_stays_off_the_user_level_blocks_and_carriers(self):
         for relative in self.LOCAL_TIME_SURFACES:
             with self.subTest(surface=relative):
-                self.assertEqual((ROOT / relative).read_text(encoding="utf-8").count(self.LOCAL_TIME), 1)
+                self.assertNotIn(self.LOCAL_TIME, (ROOT / relative).read_text(encoding="utf-8"))
 
 
 class PortableTopRuleTests(unittest.TestCase):
@@ -1826,66 +1834,54 @@ class PortableTopRuleTests(unittest.TestCase):
     2.1.289 exposes only -h/--help, and the upstream 2.1.283 changelog adds the
     slash command. These are local integration checks, not an upstream audit.
     A budget change needs a dated comparison and review, never an automatic
-    re-baseline: docs/decisions/2026-10-05-harness-context-budget.md.
+    re-baseline: docs/decisions/2026-10-05-harness-context-budget.md. Since the
+    owner's direction of 2026-10-08 the procedure checked here is the four-rule
+    philosophy core.
     """
 
     TEMPLATE = ROOT / "examples" / "claude-native" / "CLAUDE.md"
     # Fixed UTF-8 ceilings: measured scope + 5%, rounded upward. The dated PR #726
     # addendum records 23062/19102 -> 24458/20103 and the required restorations;
     # docs/decisions/2026-10-07-instruction-core.md lowers them to 20880/16783 (the landing tree + 5%).
-    STARTUP_BUDGET_BYTES = {"claude": 20880, "codex": 16783}
-    MECHANICS = ROOT / "examples" / "claude-native" / "workflows" / "README.md"
-    ROUTING = ROOT / "adoption" / "templates" / "codex.AGENTS.template.md"
-    # Upstream as the source of truth and reuse, the check order and the absence wording, worker
-    # answers as leads, the token practice in every lane, and recording a proven mistake.
+    # The philosophy-only blocks of 2026-10-08 (docs/decisions/2026-10-08-philosophy-only-rules.md: the Claude block
+    # keeps the StructuredOutput line, the Codex block carries rtk's default awareness paragraph) measure 3942 (Claude)
+    # and 4043 (Codex) bytes with startup_files below, so the ceilings are 4140 and 4246.
+    STARTUP_BUDGET_BYTES = {"claude": 4140, "codex": 4246}
+    # The four rules of the core (2026-10-08): research before acting with named sources, upstream as the truth with
+    # the check order, decisions by evidence measured with upstream harnesses, and the compounding ecosystem with the
+    # recorded correction.
     PROCEDURE_PHRASES = (
-        "never self-write without a SOTA source",
-        "never rebuild or fork what an upstream already ships; glue only fills a demonstrated gap, cited at a pin",
-        "source of truth",
+        "Research convergence first",
+        "current upstream SOTA is the source of truth",
+        "survey the maintained upstream landscape",
         "orchestration patterns",
-        "installed client",
-        "upstream changelog or release notes",
-        "upstream source at that tag",
-        "official docs",
-        "absence claim needs at least the first two",
-        '"not found in X, Y"',
-        "leads, not authority",
-        "upstream citation",
-        "token practice below in every lane",
-        "same turn",
-        "anti-pattern log",
+        "record what you found",
+        "supported install and test commands",
+        "naming each source (repository and pin, file or paper)",
+        "build only from a cited reference implementation",
+        "Never rebuild or fork what an upstream already ships",
+        "the installed client",
+        "the upstream release notes and source at that version",
+        "then official docs",
+        "leads to verify",
+        "reproduced results on the actual change",
+        "measured with upstream harnesses",
+        "Agreement, recency, popularity and incumbency are not evidence",
+        "measured results, simulations and untested boundaries",
+        "current best converged practice",
+        "record the correction",
     )
     # A relative path such as docs/harness-defaults.md; one that exists here is absent from other projects.
     RELATIVE_PATH = re.compile(r"[\w.-]+(?:/[\w.-]+)+")
-    # Checked anywhere in the file, since this template became the single managed source of the operator's
-    # user-level file (docs/decisions/2026-09-30-rule-text-every-layer.md): the six standing clauses of 2026-09-30
-    # with the Sol-primary Codex routing, skill matching, the rules that file held beyond this template, and its
-    # worker, model, Ultracode and agent-team rules.
-    STANDING_PHRASES = (
-        "OmniRoute gateway", "`gpt-6.1-sol` at ultra", "`gpt-6-astra` at ultra", "complex workflow that needs Astra",
-        "single consequential judgment", "complex changes across systems", "one bounded Sol repair",
-        "Codex CLI is the second native client", "Keep context small", "match available skill descriptions",
-        "`SKILL.md`",
-        "completeness critic", "next landscape sweep", "lifecycle task",
-        "`search-first`", "`find-skills`", "`skill-creator`", "A coordinator, not a delegated child, invokes",
-        "when no skill fits", "children inherit that pin", "a spawn call names neither",
-        "never a delegated child, starts a cross-family lane", "each coordinator unit names the north-star action",
-        "promptfoo", "paired benchmark", "Harbor or Inspect", "never a self-written runner",
-        "audits, trials or network at startup", "due-file line",
-        "record what you found", "build only from a cited reference implementation", "from the selected source revision",
-        "popularity guide discovery", "More tools, more reasoning and reviewer agreement alone do not prove quality",
-        "retain source pins and reasons", "Research only the relevant layers", "Use a short plan for bounded work",
-        "so the reads, searches and dead ends stay in the child",
-        "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1", "CLAUDE_CODE_SUBAGENT_MODEL=opus", "CLAUDE_CODE_EFFORT_LEVEL",
-        "CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS", "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH=1", "safety refusal",
-    )
 
     @staticmethod
     def top_rule(text: str) -> str:
-        """The text from the bold top rule to the first section heading."""
-        start = text.find("**Top rule:")
+        """The core: from its bold first rule to the next section heading, or to the end of the text."""
+        start = text.find("**Research convergence first;")
+        if start < 0:
+            return ""
         end = text.find("\n## ", start)
-        return text[start:end] if 0 <= start < end else ""
+        return text[start:] if end < 0 else text[start:end]
 
     @classmethod
     def errors(cls, text: str) -> list[str]:
@@ -1897,11 +1893,6 @@ class PortableTopRuleTests(unittest.TestCase):
 
     def test_the_template_states_the_upstream_verification_procedure(self):
         self.assertEqual(self.errors(self.TEMPLATE.read_text(encoding="utf-8")), [])
-
-    def test_the_ab_backed_schema_rule_and_cross_family_dispatch_are_in_the_user_block(self):
-        text = self.TEMPLATE.read_text(encoding="utf-8")
-        self.assertIn("When you return through StructuredOutput, put the schema fields at the top level of the call arguments; never wrap them in an input, output or result key.", text)
-        self.assertIn("Cross-family research, review and sweep votes run through the OmniRoute gateway; a coordinator, never a delegated child, starts a cross-family lane.", text)
 
     def scratch_startup(self, root):
         (root / "AGENTS.md").write_text("repository instructions\n")
@@ -1992,17 +1983,6 @@ class PortableTopRuleTests(unittest.TestCase):
             loaded = {path.removeprefix(".claude/rules/nested/") for path in files if path.startswith(".claude/rules/")}
             self.assertEqual(loaded, {"plain.md", "empty.md", "other.md"})
 
-    def test_the_template_carries_the_standing_clauses_and_the_user_level_rules(self):
-        # Relocated mechanics stay verbatim and reachable; dispatch rules stay in the template.
-        text = self.TEMPLATE.read_text(encoding="utf-8")
-        self.assertIn("workflows/README.md#native-workflow-mechanics-relocated-2026-10-05", text)
-        self.assertIn("Codex instruction block", text)
-        for mode in ("**Solo coordinator:**", "**One subagent:**", "**Ultracode workflow:**", "**Agent team**"):
-            self.assertIn(mode, text)
-        text += self.section(self.MECHANICS.read_bytes(), "## Native workflow mechanics relocated (2026-10-05)").decode()
-        text += self.ROUTING.read_text(encoding="utf-8").split("<!-- native-agent-stack:session-lanes -->")[0]
-        self.assertEqual([phrase for phrase in self.STANDING_PHRASES if phrase not in text], [])
-
     @staticmethod
     def section(content: bytes, heading: str) -> bytes:
         """Bound a passage check to its destination heading and child headings."""
@@ -2020,7 +2000,8 @@ class PortableTopRuleTests(unittest.TestCase):
                 passage = (fixtures / contract["fixture"]).read_bytes()
                 content = (ROOT / contract["to"]).read_bytes()
                 if contract["heading"].startswith("<!--"):
-                    content = content.split(contract["heading"].encode(), 1)[1].split(b"<!-- native-agent-stack:session-lanes -->", 1)[0]
+                    # A marker heading's section ends at the next native-agent-stack marker.
+                    content = content.split(contract["heading"].encode(), 1)[1].split(b"<!-- native-agent-stack:", 1)[0]
                 else:
                     content = self.section(content, contract["heading"])
                 self.assertEqual(len(passage), contract["bytes"])
@@ -2047,8 +2028,9 @@ class PortableTopRuleTests(unittest.TestCase):
 
     def test_the_check_rejects_a_missing_step_and_a_repository_path(self):
         text = self.TEMPLATE.read_text(encoding="utf-8")
-        self.assertEqual(len(self.errors(text.replace("upstream citation", "citation"))), 1)
-        self.assertEqual(len(self.errors(text.replace("same turn", "same turn (docs/harness-defaults.md)"))), 1)
+        self.assertEqual(len(self.errors(text.replace("record the correction", "note it"))), 1)
+        self.assertEqual(len(self.errors(text.replace("then official docs", "then official docs (docs/harness-defaults.md)"))),
+                         1)
         self.assertEqual(len(self.errors("# Native engineering defaults\n\nNo rule.\n")), len(self.PROCEDURE_PHRASES))
 
 

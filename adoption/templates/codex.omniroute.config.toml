@@ -22,6 +22,13 @@
 model = "cx/gpt-6-astra"
 model_provider = "omniroute"
 model_reasoning_effort = "max"
+# Context window: with this provider Codex 0.161.0 serves its bundled catalog (codex-rs/models-manager/src/manager.rs
+# L429-440 at rust-v0.161.0) and matches cx/gpt-6-astra to the bundled gpt-6-astra entry by its namespaced suffix
+# (L883-911), whose context_window is 272000 (codex-rs/models-manager/models.json L4 and L34; the gpt-6.1-sol entry,
+# L178 and L207, carries the same), while the gateway's live catalog lists 800K. A 631,410-token request through the
+# gateway on port 21128 answered correctly on 2026-10-08T02:53Z (coordination record
+# e2e-truth-20261006/omni-context-window-20261008T025328Z).
+model_context_window = 800000
 # Live search as in the stack-worker profile. The bundled catalog runs gpt-6-astra on Responses Lite
 # (use_responses_lite, codex-rs/models-manager/models.json L4-23), which sends no hosted tools
 # (codex-rs/core/src/tools/spec_plan.rs L598-601), so a search reaches it only as Codex's standalone web search

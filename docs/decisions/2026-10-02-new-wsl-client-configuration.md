@@ -1192,3 +1192,31 @@ the historical inventories remain intact; this amendment supplies no host apply.
 
 ```text
 ```
+
+### Amendment 2026-10-08 — philosophy-only current instruction inventory
+
+On 2026-10-08 the owner directed that both instruction sources keep only the
+research-convergence philosophy, so `new_wsl_client_config.py --write-blocks` rewrote
+both carriers. The Claude source keeps one evidence-backed line beside it (the
+StructuredOutput sentence), and the Codex source's RTK text is now rtk-ai/rtk v0.51.0's
+default awareness paragraph ([philosophy-only record](2026-10-08-philosophy-only-rules.md)).
+The native `new_wsl_client_config.py --check --markdown` inventory below supersedes the
+2026-10-07 one. The three tables above are unchanged and no unit is left out. The rest
+of the "Instruction lines" item above, the context-mode and semble lines, also leaves
+both sources. The ai-memory routing sentence leaves them too, so the map's
+`dependent_sentences` list is empty. The same change adds two wired pieces:
+`codex/config/features.tool_suggest` (practice, `false`) and
+`codex/omniroute/model_context_window` (through the gateway slot). Today: 400 pieces,
+360 wired (208 practice, 152 through a slot), 24 not wired (0 through a slot that does not
+install, 24 by their own entry) and 16 authorization pieces. The historical inventories
+remain intact; this amendment supplies no host apply.
+
+`examples/claude-native/CLAUDE.md`, written to `adoption/new-wsl/claude-user-instructions.md` (0 unit(s) left out; 10 of 10 lines stay):
+
+```text
+```
+
+`adoption/templates/codex.AGENTS.template.md`, written to `adoption/new-wsl/codex-user-instructions.md` (0 unit(s) left out; 21 of 21 lines stay):
+
+```text
+```

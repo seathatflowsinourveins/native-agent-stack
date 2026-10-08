@@ -1082,6 +1082,35 @@ def without_interim(slot: str):
     return change
 
 
+# The ai-memory routing line both block sources carried until the philosophy-only blocks of 2026-10-08, and the map
+# declaration of its dependent sentence that went with it. The committed blocks now name no tool, so the tests that follow
+# a tool's sentence through the filter add this line and declaration to a scratch catalog.
+AI_MEMORY_LINE = ("Bound discovery to task-filtered names, descriptions and source locators; load only selected tool "
+                  "schemas. For maintained decisions, and before describing deployed architecture after compaction/resume, "
+                  "query scoped ai-memory with `pin_first=true, limit=2` when supported by the installed schema. Check "
+                  "relevance; retry without pin priority or widen if needed, then read the relevant exact path and verify "
+                  "current canonical sources.")
+AI_MEMORY_DEPENDENT = {"starts": "Check relevance; retry without pin priority", "on": "previous",
+                       "why": "It refines the ai-memory query the sentence before it describes ('pin priority' is that "
+                              "query's `pin_first`), so without that sentence it points at nothing to check or retry."}
+
+
+def with_ai_memory_line(root: Path) -> None:
+    """Add AI_MEMORY_LINE to both block sources of a scratch catalog (inside the Codex block, before its RTK section),
+    declare its dependent sentence in the map and write the blocks again, so the catalog starts clean."""
+    for piece, relative in cfg.BLOCK_TEXT_REL.items():
+        path = root / relative
+        text = path.read_text(encoding="utf-8")
+        if piece == cfg.CODEX_MD_PIECE:
+            marker = "<!-- native-agent-stack:rtk-upstream"
+            text = text.replace(marker, AI_MEMORY_LINE + "\n\n" + marker, 1)
+        else:
+            text += "\n" + AI_MEMORY_LINE + "\n"
+        path.write_text(text, encoding="utf-8")
+    edit_json(root / cfg.MAP_REL, lambda data: data["dependent_sentences"].append(dict(AI_MEMORY_DEPENDENT)))
+    write_blocks(root)
+
+
 def tree(home: Path) -> dict:
     """{relative path: sha256 of its bytes, or the link target} of every file and link under home."""
     found = {}
@@ -1964,15 +1993,16 @@ class InstructionBlockTests(unittest.TestCase):
         for piece in self.PIECES:
             sources = source_lines(piece)
             kept = [line for line in generated_text(piece).split("\n") if line.strip()]
-            self.assertGreater(len(kept), 10, piece)
+            # At least the philosophy core's six lines (heading, bold rule, four bullets) since 2026-10-08.
+            self.assertGreaterEqual(len(kept), 6, piece)
             self.assertEqual([line for line in kept if not line_is_verbatim(line, sources)], [], piece)
         # Controls: the same check rejects a reworded line, a line with an added sentence, a sentence cut off inside a
         # word or after a word, and a line the source never had.
         sources = source_lines(cfg.CODEX_MD_PIECE)
-        line = sources[2]
+        line = next(source for source in sources if source.startswith("- Research before acting:"))
         self.assertTrue(line_is_verbatim(line, sources))
-        for changed in (line.replace("research", "Research"), line + " An added sentence.", line[:-12], line[:-15],
-                        "A line the source never had.", line.replace(". The ecosystem", ". An ecosystem")):
+        for changed in (line.replace("upstream", "Upstream"), line + " An added sentence.", line[:-12], line[:-15],
+                        "A line the source never had.", line.replace(". Never rebuild", ". Always rebuild")):
             self.assertNotEqual(changed, line)
             self.assertFalse(line_is_verbatim(changed, sources), changed)
         # A line with a sentence taken out of its middle is what a filter may produce, and passes.
@@ -2105,15 +2135,18 @@ class InstructionBlockTests(unittest.TestCase):
 
     def test_the_two_blocks_lose_the_sentence_that_only_made_sense_with_the_ai_memory_one_and_list_it(self):
         # ai-memory is wired while the memory-owner row carries its interim install; without it, as before wave 2, the
-        # sentence that names ai-memory goes and takes the declared dependent with it.
+        # sentence that names ai-memory goes and takes the declared dependent with it. The committed blocks name no tool
+        # since 2026-10-08, so a scratch catalog carries the ai-memory line and its declaration (with_ai_memory_line).
         with tempfile.TemporaryDirectory() as tmp:
             root = make_catalog(Path(tmp))
+            with_ai_memory_line(root)
             edit_json(root / cfg.MANIFEST_REL, without_interim("memory-owner"))
             results, manifest, *_ = cfg.analyse(root, check_blocks=False)
             generated = cfg.generate_blocks(root, cfg.unwired_names(results, manifest))
+            scratch_sources = {piece: cfg.block_text(root, piece).split("\n") for piece in self.PIECES}
         for piece, (_, text, dropped) in generated.items():
             self.assertNotIn("Check relevance; retry without pin priority", text, piece)
-            sources = source_lines(piece)
+            sources = scratch_sources[piece]
             unit = next(u for u in dropped if cfg.DEPENDS_NOTE in u.note)
             self.assertTrue(unit.text.startswith("Check relevance; retry without pin priority or widen if needed, then "
                                                  "read the relevant exact path and verify current canonical sources."))
@@ -2127,7 +2160,7 @@ class InstructionBlockTests(unittest.TestCase):
         cases = {
             "no block holds it": ({"starts": "A sentence that no block holds", "on": "previous", "why": "a control"},
                                   "no instruction block holds it"),
-            "it starts its line": ({"starts": "Top rule: research convergence first", "on": "previous", "why": "a control"},
+            "it starts its line": ({"starts": "**Research convergence first;", "on": "previous", "why": "a control"},
                                    "starts its line"),
         }
         for name, (declaration, expected) in cases.items():
@@ -2147,8 +2180,9 @@ class InstructionBlockTests(unittest.TestCase):
     def test_a_slot_that_starts_installing_brings_back_the_sentence_that_names_its_tool(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = make_catalog(Path(tmp))
+            with_ai_memory_line(root)            # the committed blocks name no tool since 2026-10-08
             blocks = {piece: root / cfg.GENERATED_BLOCKS[piece] for piece in self.PIECES}
-            for path in blocks.values():         # the committed blocks: ai-memory is an interim install
+            for path in blocks.values():         # the scratch blocks: ai-memory is an interim install
                 self.assertEqual(path.read_text().count("query scoped ai-memory"), 1)
             # Without the interim, as before wave 2, the memory-owner row installs nothing and the sentence goes.
             edit_json(root / cfg.MANIFEST_REL, without_interim("memory-owner"))
@@ -2189,9 +2223,12 @@ class BlocksSentenceTests(unittest.TestCase):
         self.assertEqual([e for e in json.loads(MAP.read_text())["entries"] if "Phoenix" in json.dumps(e)], [])
         with tempfile.TemporaryDirectory() as tmp:
             root = make_catalog(Path(tmp))
+            # The committed blocks name no skill or timer since 2026-10-08, so a line that names all four, and no tool,
+            # stands in for them below.
             for source in cfg.BLOCK_TEXT_REL.values():
                 path = root / source
-                path.write_text(path.read_text() + "\nUse Phoenix and skill-creator.\n")
+                path.write_text(path.read_text() + "\nUse Phoenix and skill-creator.\n"
+                                "Keep search-first, find-skills, skill-creator and the daily currency timer.\n")
             generated = cfg.generate_blocks(root, names)
         for piece, (_, kept, dropped) in generated.items():
             with self.subTest(block=piece):
@@ -2719,7 +2756,9 @@ class ApplyTests(ApplyCase):
         self.assertIn("claude-md current", out)
         self.assertIn("codex-md current", out)
         # A block that a person edited between the markers is replaced by the filtered one, text outside kept.
-        (self.home / ".claude/CLAUDE.md").write_text(claude_md.replace("Core rule", "An edited rule"), encoding="utf-8")
+        edited = claude_md.replace("Decide by evidence", "An edited rule")
+        self.assertNotEqual(edited, claude_md)  # the edit lands between the markers
+        (self.home / ".claude/CLAUDE.md").write_text(edited, encoding="utf-8")
         self.assertEqual(self.apply()[0], 0)
         self.assertEqual((self.home / ".claude/CLAUDE.md").read_text(), claude_md)
 

@@ -418,20 +418,22 @@ class WorkerSentenceTests(unittest.TestCase):
 
 
 class RuleSourceCitationTests(unittest.TestCase):
-    """The passage a rule's source cites holds what the source says it holds. The exact_shapes source cites the Codex
-    AGENTS template's seven RTK exceptions by their marker, not by line: the rule text above them moved them from lines
-    41-46 to 49-54 (unit F1, #557; docs/decisions/2026-09-30-rule-text-every-layer.md, "Stale line citation") and to
-    50-55 a day later (#568), so a line range there goes stale with each edit of that text."""
+    """The passage a rule's source cites holds what the source says it holds. The exact_shapes source cites the seven
+    RTK exceptions by their marker, not by line: the rule text above them moved them from lines 41-46 to 49-54 of the
+    Codex AGENTS template (unit F1, #557; docs/decisions/2026-09-30-rule-text-every-layer.md, "Stale line citation")
+    and to 50-55 a day later (#568), so a line range goes stale with each edit of the surrounding text. On 2026-10-08
+    they moved verbatim from that template to docs/token-practice.md, between the same marker and an end marker."""
 
-    def test_the_exact_shapes_source_cites_the_templates_seven_exceptions_by_marker(self):
+    def test_the_exact_shapes_source_cites_the_seven_exceptions_by_marker(self):
         module = roles(self)
         [source] = [source for rule, _roles, source, _check in module.RULES if rule == "exact_shapes"]
-        self.assertIn("adoption/templates/codex.AGENTS.template.md, the seven exceptions after its rtk-exceptions marker",
-                      source)
-        self.assertIsNone(re.search(r"codex\.AGENTS\.template\.md:\d", source), source)
-        text = (ROOT / "adoption" / "templates" / "codex.AGENTS.template.md").read_text(encoding="utf-8")
+        self.assertIn("docs/token-practice.md, the seven exceptions after its rtk-exceptions marker", source)
+        self.assertIsNone(re.search(r"token-practice\.md:\d", source), source)
+        template = (ROOT / "adoption" / "templates" / "codex.AGENTS.template.md").read_text(encoding="utf-8")
+        self.assertEqual(template.count(module.EXCEPTIONS_MARKER), 0)
+        text = (ROOT / "docs" / "token-practice.md").read_text(encoding="utf-8")
         self.assertEqual(text.count(module.EXCEPTIONS_MARKER), 1)
-        block = text.split(module.EXCEPTIONS_MARKER, 1)[1].split(module.END_MARKER, 1)[0]
+        block = text.split(module.EXCEPTIONS_MARKER, 1)[1].split(module.EXCEPTIONS_END_MARKER, 1)[0]
         bullets = [line for line in block.splitlines() if line.startswith("- ")]
         commands = ("A skill's `SKILL.md`", "`git show REV:path`", "`diff`", "`git branch`", "`git log`", "`jq`", "`find`")
         self.assertEqual(len(bullets), len(commands), bullets)

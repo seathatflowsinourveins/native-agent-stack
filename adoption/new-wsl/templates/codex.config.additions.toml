@@ -12,8 +12,16 @@
 # for gpt-6-sol and gpt-6-luna (openai/codex rust-v0.160.0, codex-rs/models-manager/models.json:512,680;
 # codex-rs/tui/src/service_tier_resolution.rs:35-42). /fast toggles and persists config.toml: "fast" on, "default" off
 # (codex-rs/tui/src/chatwidget/service_tiers.rs:47-56; codex-rs/tui/src/config_update.rs:105-121 at the same tag).
-# For one run, use -c service_tier=fast. See docs/decisions/2026-10-04-new-wsl-changelog-parity.md's 2026-10-05 amendment.
+# For one run, use -c service_tier=priority: Codex 0.161.0 reads legacy "fast" as the same tier and sends it as "priority"
+# (codex-rs/protocol/src/config_types.rs L542 and L549 at rust-v0.161.0). See
+# docs/decisions/2026-10-04-new-wsl-changelog-parity.md's 2026-10-05 amendment.
 service_tier = "default"
+
+# Codex 0.161.0 offers its tool-suggestion tool only while the tool_suggest, apps and plugins features are all on
+# (codex-rs/core/src/tools/spec_plan.rs L657-662 at rust-v0.161.0); with tool_suggest off the model's tool list does not
+# carry it. This table merges key by key with the shared template's [features].
+[features]
+tool_suggest = false
 
 # ai-memory, the memory slot's interim install (definitive manifest, amendment 3): its tools carry no MCP annotations, so
 # under approval_policy = "never" Codex refuses every call unless the approval mode approves it (codex-rs/core/src/

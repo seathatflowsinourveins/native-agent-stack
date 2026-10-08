@@ -209,8 +209,9 @@ clients. `client_wiring` checks three places:
   not count, and neither does an inline copy that no longer matches `RTK.md`; the
   comparison ignores whitespace and RTK's `<!-- rtk-owned: ... -->` line. To make it
   true, apply the [Codex worker lane](../recipes/README.md#codex-worker-lane), which
-  changed after `v2026.09.26.2`: its `AGENTS.md` block carries `RTK.md`'s text verbatim,
-  followed by this catalog's exceptions, and leaves rtk's own pointer line in place.
+  changed after `v2026.09.26.2`: its `AGENTS.md` block carries `RTK.md`'s text verbatim
+  (this catalog's exceptions followed it until 2026-10-08 and are now on demand in
+  [token practice](token-practice.md)), and leaves rtk's own pointer line in place.
   Apply it again whenever an RTK update changes `RTK.md`; `codex debug prompt-input`
   then shows that text in the model's input. Codex runs a
   `hooks.json` hook only when it is enabled and trusted: the user `config.toml`'s

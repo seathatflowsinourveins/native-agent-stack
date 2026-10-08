@@ -10,9 +10,10 @@ The lane (docs/decisions/2026-09-26-codex-worker-lane.md) is four changes, five 
                 headroom's four offline variables when headroom is registered, and the template's
                 `startup_timeout_sec` for serena and socraticode when they are registered (`codex mcp add` takes no
                 timeout option, so a server it registered has none). No other key is sent.
-  AGENTS.md     the managed block of adoption/templates/codex.AGENTS.template.md (the top rule, rtk-ai/rtk
-                v0.50.0's awareness text verbatim, this catalog's exceptions), inserted or replaced between its
-                begin and end markers; every other line is kept. Hash-guarded atomic write.
+  AGENTS.md     the managed block of adoption/templates/codex.AGENTS.template.md (the philosophy core and
+                rtk-ai/rtk v0.51.0's default awareness paragraph, hooks/rtk-awareness.md, verbatim; since 2026-10-08
+                the catalog's RTK exceptions are on demand in docs/token-practice.md), inserted or replaced between
+                its begin and end markers; every other line is kept. Hash-guarded atomic write.
   stack-worker.config.toml
                 the worker profile, adoption/templates/codex.stack-worker.config.toml, for `codex exec -p
                 stack-worker`. Created only when absent (or already identical).
@@ -126,6 +127,9 @@ BLOCK_BEGIN = "<!-- native-agent-stack:codex-user-instructions:begin"
 BLOCK_END = "<!-- native-agent-stack:codex-user-instructions:end -->"
 TOP_RULE_MARKER = "native-agent-stack:top-rule"
 EXCEPTIONS_MARKER = "native-agent-stack:rtk-exceptions"
+# The opening words of rtk-ai/rtk v0.51.0's default awareness paragraph (hooks/rtk-awareness.md), the only rtk text the
+# Codex block carries since 2026-10-08; it is verbatim at every awareness level (AWARENESS_CONFIG.md:22-23 at e001f773).
+RTK_OUTPUT_CONTRACT = "Command output here is condensed to save tokens"
 # adoption/pins-linux-x86_64.json "codex" (tests/test_codex_worker_lane.py keeps the two equal). The writer's
 # behaviour below was read and probed at 0.157.1; at 0.159.2 the source it cites is unchanged (compared at the two tag
 # commits on 2026-09-30) and CodexIntegrationTests ran again against the real binary. Those checks vouch for the
@@ -872,7 +876,7 @@ def bwrap_wrapper(root: Path) -> list[str] | None:
 
 def prompt_input_counts(stdout: str) -> dict:
     return {"top_rule": stdout.count(TOP_RULE_MARKER), "rtk_exceptions": stdout.count(EXCEPTIONS_MARKER),
-            "prefix_rule": stdout.count("Prefix every shell command with"),
+            "rtk_output_contract": stdout.count(RTK_OUTPUT_CONTRACT),
             "no_spawn_unless_asked": "Do not spawn sub-agents unless" in stdout,
             "proactive_delegation": "Proactive multi-agent delegation is active" in stdout}
 
@@ -973,7 +977,9 @@ def check_readbacks(found: dict, eco_root: str) -> list[str]:
                         f"effort: {', '.join(failure['names_best_effort']) or 'none'}): {failure['text']}")
     labelled = [(label, counts) for label, counts in labelled if label not in not_started]
     for label, counts in labelled:
-        if counts.get("top_rule") != 1 or counts.get("rtk_exceptions") != 1 or counts.get("prefix_rule", 0) < 1:
+        # rtk_exceptions stays in the reported counts but is not required: the exceptions left the block on 2026-10-08,
+        # and the rtk text the block carries since then is the default output-contract paragraph.
+        if counts.get("top_rule") != 1 or counts.get("rtk_output_contract", 0) < 1:
             problems.append(f"{label} prompt input: {counts}")
     for label, counts in labelled:
         if label == "default":

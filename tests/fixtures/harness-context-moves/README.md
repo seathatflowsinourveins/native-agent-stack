@@ -49,3 +49,13 @@ line 43 of the portable Claude block at the same commit. Each is a new bullet at
 the end of the README's `## Native workflow mechanics relocated (2026-10-05)`
 section, and neither fixture includes a trailing newline. They bind moved text;
 they are not context-savings measurements.
+
+## Philosophy-only blocks (2026-10-08)
+
+On 2026-10-08 the owner directed that the always-loaded instruction blocks keep
+only the research-convergence philosophy. The Codex template now holds that core
+and the verbatim RTK awareness, so its model-routing paragraph is gone. Contract
+08 leaves `contracts.json`, and `08.txt` stays as the 782-byte snapshot, bound to
+no destination, as `01.txt` is. The routing contract itself remains
+`docs/decisions/2026-09-30-sol-primary-quality-defaults.md`. All other contracts
+keep their bytes.
