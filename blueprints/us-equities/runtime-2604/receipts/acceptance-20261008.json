@@ -1,0 +1,112 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-08",
+  "kind": "trading_2604_offline_acceptance",
+  "task": "task-ns2604-coop-20261008T060802Z",
+  "status": "passed",
+  "evidence_class": "native_repository_offline_integration",
+  "classification": "Native host execution of this repository's offline integration acceptance; not an upstream test-suite pass or a repeated installation.",
+  "script": {
+    "path": "blueprints/us-equities/runtime-2604/accept-trading-2604.sh",
+    "sha256": "900be972121b8be41a54871ec12eb2b61d11dbc077bc2af61dd208743664a26d",
+    "byte_identical_repository_revisions": ["70250efe", "9f085f62477f"],
+    "host_guard": "Line 49 requires WSL_DISTRO_NAME == NativeStack2604 and a non-root user. The successful co-op shell inherited the variable from WSL; neither the variable nor the guard was changed."
+  },
+  "runtime": {
+    "nautilus_trader_version": "2.0.0rc5",
+    "alpaca_py_version": "0.44.0",
+    "uv_lock_sha256": "1fb9f8ca6fef9c47a4ded826ddf20012f78d6643926cce3a36b86c674f55eb9c",
+    "installation_repeated": false
+  },
+  "upstream_sources": [
+    {
+      "repository": "nautechsystems/nautilus_trader",
+      "revision": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+      "version": "2.0.0rc5",
+      "path": "docs/getting_started/quickstart.py",
+      "sha256": "487e6807dedd1a38062638eb671f6110799451611819542bf0f0c10646cb2c53"
+    },
+    {
+      "repository": "alpacahq/alpaca-py",
+      "revision": "cc4cb3b7ba50ae250e621983c2779047fb16bb28",
+      "version": "0.44.0"
+    }
+  ],
+  "check_ids": [
+    "offline_isolation",
+    "python",
+    "import_nautilus-trader",
+    "import_numpy",
+    "import_pandas",
+    "import_alpaca-py",
+    "import_edgartools",
+    "import_exchange-calendars",
+    "import_duckdb",
+    "import_pandera",
+    "import_skfolio",
+    "import_fincore",
+    "import_mlflow",
+    "import_arch",
+    "import_purgedcv",
+    "ibkr_adapter",
+    "alpaca_adapter_source",
+    "alpaca_adapter_import",
+    "nautilus_quickstart_sha256",
+    "nautilus_quickstart",
+    "duckdb_query",
+    "pandera_example",
+    "skfolio_example",
+    "arch_example"
+  ],
+  "returned_attempts": [
+    {
+      "attempt": 1,
+      "id": "TRADING-2604-5A-20261008T061705Z",
+      "started_utc": "2026-10-08T06:17:05Z",
+      "executor": "readiness-runner",
+      "overall_exit_code": 1,
+      "check_count": 24,
+      "status_of_every_check": "BLOCKED",
+      "exit_code_of_every_check": 64,
+      "first_condition": "offline_isolation blocked because the Codex execution shell had no native WSL_DISTRO_NAME",
+      "original_receipt": {
+        "file": "acceptance.receipt.txt",
+        "sha256": "144c626517ae19e9f9da4166b0685aef5186b525c9a36c4b7b3a3f2efb6279bb",
+        "bytes": 2736
+      },
+      "preserved": true
+    },
+    {
+      "attempt": 2,
+      "id": "TRADING-2604-5A-COOP-20261008T062048Z",
+      "started_utc": "2026-10-08T06:20:48Z",
+      "finished_utc": "2026-10-08T06:21:25Z",
+      "executor": "native co-op shell",
+      "overall_exit_code": 0,
+      "check_count": 24,
+      "status_of_every_check": "PASS",
+      "exit_code_of_every_check": 0,
+      "original_receipt": {
+        "file": "RECEIPT.md",
+        "sha256": "4670f1df7d7c357d69cdb337481bf847ef54f7d9bac3e4cbc46d69184ce5ee3f"
+      },
+      "stdout": {
+        "file": "acceptance.out",
+        "sha256": "0a0bb6fa3a4705a292fa6117a8d65ec6fcfad14f83455b45d34be729515bdf76",
+        "bytes": 893
+      },
+      "stderr": {
+        "file": "acceptance.err",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    }
+  ],
+  "verification": "The retained original receipt and returned stdout hashes match; all 24 accepted check lines are PASS with exit code 0. The original 24 BLOCKED/64 lines remain preserved. No acceptance or installation was rerun to publish this derivative.",
+  "limitations": [
+    "Version and import probes and local examples are repository integration checks; their success does not represent unchanged upstream test-suite acceptance.",
+    "Offline acceptance does not qualify broker credentials, paper orders, historical strategy data or strategy performance.",
+    "Later WSL-guarded checks require a native co-op shell; exporting the host variable by hand is not acceptance."
+  ],
+  "sanitization": "Allowlisted receipt IDs, source pins, hashes, check names and aggregate results only. Personal and host paths, account and credential identifiers, private active configuration, conversations and machine process fields are omitted. Original private receipts remain unchanged."
+}
