@@ -27,7 +27,8 @@
     "CLAUDE_CODE_SUBAGENT_MODEL": "opus",
     "MCP_TIMEOUT": "120000",
     "BASH_MAX_TIMEOUT_MS": "1800000",
-    "ENABLE_CLAUDEAI_MCP_SERVERS": "false"
+    "ENABLE_CLAUDEAI_MCP_SERVERS": "false",
+    "SOCRATICODE_SPEC": "socraticode@1.16.0"
   },
   "permissions": {
     "deny": [
@@ -341,9 +342,17 @@
   "enabledPlugins": {
     "context-mode@context-mode": true,
     "claude-hud@claude-hud": true,
-    "codex@openai-codex": true
+    "codex@openai-codex": true,
+    "socraticode@socraticode": true
   },
   "extraKnownMarketplaces": {
+    "socraticode": {
+      "source": {
+        "source": "github",
+        "repo": "giancarloerra/SocratiCode",
+        "ref": "v1.16.0"
+      }
+    },
     "context-mode": {
       "source": {
         "source": "github",

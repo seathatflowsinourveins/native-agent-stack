@@ -532,7 +532,7 @@ GitHub-hosted macOS runner; see
      than the builder's worktree.
    - **MCP servers**: for each entry in
      [`adoption/mcp/claude-user.json`](mcp/claude-user.json) (`ai-memory`
-     and `qmd` over http; `serena`, `socraticode`, `headroom`, `codebase-memory`
+     and `qmd` over http; `serena`, `socraticode`, `headroom`, `codebase-memory-mcp`
      and `jcodemunch` over stdio), renders its `${HOME}` and
      `${ECO_ROOT}` placeholders (`--eco-root`, default `$ECO_INSTALL_ROOT` or
      `~/.local/share/codex-ecosystem`), then uses native `claude mcp add --scope

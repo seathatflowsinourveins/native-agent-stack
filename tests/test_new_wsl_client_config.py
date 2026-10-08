@@ -1370,7 +1370,7 @@ class AgentGapTests(unittest.TestCase):
         self.assertEqual(errors, [])
         gaps = cfg.agent_gaps(ROOT, results, plan)
         # Wave 3 wires the token servers; context-mode's plugin tools and skill retain their native names.
-        wired_servers = {"serena", "qmd", "ai-memory", "semble", "socraticode", "headroom", "codebase-memory",
+        wired_servers = {"serena", "qmd", "ai-memory", "semble", "socraticode", "headroom", "codebase-memory-mcp",
                          "jcodemunch", "plugin_context-mode_context-mode"}
         for path in sorted((ROOT / cfg.CLAUDE_AGENTS_REL).glob("*.md")):
             text = path.read_text()
@@ -1432,7 +1432,9 @@ class ManifestRuleTests(unittest.TestCase):
     def test_a_split_slot_that_is_changed_to_installing_wires_its_piece_and_back(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = make_catalog(Path(tmp))
-            keys = ("claude/mcp/server/socraticode", "codex/config/mcp_servers.socraticode.command")
+            keys = ("claude/mcp/server/socraticode", "codex/config/mcp_servers.socraticode.command",
+                    "claude/settings/env/SOCRATICODE_SPEC", "claude/settings/plugin/socraticode@socraticode",
+                    "claude/settings/marketplace/socraticode")
 
             def wired():
                 write_blocks(root)  # the names a block is filtered by follow the manifest
@@ -1447,7 +1449,7 @@ class ManifestRuleTests(unittest.TestCase):
 
             # Wave 3's split-slot interim installs both semble and SocratiCode.
             before = wired()
-            self.assertEqual([before[k] for k in keys], [True, True])
+            self.assertEqual([before[k] for k in keys], [True] * len(keys))
             self.assertIn("socraticode", servers()[0])
             self.assertIn("socraticode", servers()[1])
             manifest = root / cfg.MANIFEST_REL
@@ -1460,18 +1462,24 @@ class ManifestRuleTests(unittest.TestCase):
                 row.pop("interim", None)       # a decided default replaces the interim install
             edit_json(manifest, install)
             after = wired()
-            self.assertEqual([after[k] for k in keys], [True, True])
+            self.assertEqual([after[k] for k in keys], [True] * len(keys))
             self.assertIn("socraticode", servers()[0])
             self.assertIn("[mcp_servers.socraticode]", servers()[1])
             manifest.write_text(original, encoding="utf-8")
             restored = wired()
-            self.assertEqual([restored[k] for k in keys], [True, True])
+            self.assertEqual([restored[k] for k in keys], [True] * len(keys))
             self.assertIn("socraticode", servers()[0])
             # The slot installs a different owner: the piece for SocratiCode stays out, and the check says so.
             edit_json(manifest, lambda data: install(data, default="semble"))
             other = wired()
-            self.assertEqual([other[k] for k in keys], [False, False])
+            self.assertEqual([other[k] for k in keys], [False] * len(keys))
             self.assertTrue(any("installs 'semble'" in w for w in cfg.analyse(root)[4]))
+            plan = cfg.analyse(root)
+            files = cfg.render(root, plan[0], plan[2], cfg.host_values(EXAMPLE_HOST, plan[2], None, []))
+            settings = json.loads(files["settings.json"])
+            self.assertNotIn("SOCRATICODE_SPEC", settings.get("env", {}))
+            self.assertNotIn("socraticode@socraticode", settings.get("enabledPlugins", {}))
+            self.assertNotIn("socraticode", settings.get("extraKnownMarketplaces", {}))
 
     def test_a_slot_that_stops_installing_unwires_its_pieces(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -1554,8 +1562,10 @@ class RenderTests(unittest.TestCase):
         # The wave-2 rows: context-mode's plugin (an interim install) and claude-hud 0.10.0 (the statusline row), whose
         # status line is the command its setup.mjs writes; the codex plugin for Claude Code stays out.
         self.assertEqual(settings["enabledPlugins"], {"context-mode@context-mode": True, "claude-hud@claude-hud": True,
-                                                      "cc-plugin-you-should-know@builtin": True})
-        self.assertEqual(sorted(settings["extraKnownMarketplaces"]), ["claude-hud", "context-mode"])
+                                                      "cc-plugin-you-should-know@builtin": True, "socraticode@socraticode": True})
+        self.assertEqual(sorted(settings["extraKnownMarketplaces"]), ["claude-hud", "context-mode", "socraticode"])
+        self.assertEqual(settings["env"]["SOCRATICODE_SPEC"], "socraticode@1.16.0")
+        self.assertEqual(settings["extraKnownMarketplaces"]["socraticode"]["source"]["ref"], "v1.16.0")
         self.assertEqual(settings["extraKnownMarketplaces"]["claude-hud"]["source"]["ref"], "v0.10.0")
         self.assertEqual(settings["statusLine"], {
             "type": "command", "refreshInterval": 5,
@@ -1594,7 +1604,7 @@ class RenderTests(unittest.TestCase):
     def test_the_wired_servers_are_registered_and_serena_and_qmd_by_the_command_their_readmes_give(self):
         servers = json.loads(self.files["mcp-servers.json"])["mcpServers"]
         # The owner-selected token stack joins Serena, QMD and the interim memory/search installs.
-        self.assertEqual(list(servers), ["ai-memory", "serena", "socraticode", "headroom", "codebase-memory", "qmd",
+        self.assertEqual(list(servers), ["ai-memory", "serena", "socraticode", "headroom", "codebase-memory-mcp", "qmd",
                                          "jcodemunch", "semble", "chrome-devtools"])
         self.assertEqual(servers["serena"]["command"], "serena")
         self.assertEqual(servers["serena"]["args"][:1] + servers["serena"]["args"][3:6],
@@ -1611,14 +1621,19 @@ class RenderTests(unittest.TestCase):
         config = tomllib.loads(self.files["codex.config.toml"])
         self.assertEqual(config["mcp_servers"]["qmd"], {"url": servers["qmd"]["url"]})
         # semble comes from the new distribution's additions, merged after the shared template's servers.
-        self.assertEqual(list(config["mcp_servers"]), ["serena", "ai-memory", "socraticode", "headroom", "codebase-memory",
+        self.assertEqual(list(config["mcp_servers"]), ["serena", "ai-memory", "socraticode", "headroom", "codebase-memory-mcp",
                                                       "qmd", "context-mode", "jcodemunch", "semble", "chrome-devtools"])
         # Round-2 browser verdict: one stdio server serves automation and diagnostics.
         chrome_args = ["-y", "chrome-devtools-mcp@1.10.1", "--headless", "--isolated", "--no-usage-statistics", "--no-performance-crux"]
         self.assertEqual(servers["chrome-devtools"], {"type": "stdio", "command": "npx", "args": chrome_args})
         self.assertEqual(config["mcp_servers"]["chrome-devtools"], {"command": "npx", "args": chrome_args})
         pinned_search = host["ECO_ROOT"] + "/tools/socraticode-1.15.0/lib/node_modules/socraticode/dist/index.js"
-        self.assertEqual(servers["socraticode"]["args"], [pinned_search.replace(host["ECO_ROOT"], "${ECO_ROOT}")])
+        self.assertEqual(servers["socraticode"]["command"], "npx")
+        self.assertEqual(servers["socraticode"]["args"],
+                         ["-y", "--prefer-online", "$${SOCRATICODE_SPEC:-socraticode@latest}"])
+        native = cfg.icp.render_servers({"mcpServers": servers}, Path("/home/example"), Path(host["ECO_ROOT"]))
+        self.assertEqual(native["socraticode"]["args"],
+                         ["-y", "--prefer-online", "${SOCRATICODE_SPEC:-socraticode@latest}"])
         self.assertEqual(config["mcp_servers"]["socraticode"]["args"], [pinned_search])
         # jCodeMunch at user scope, with the documented opt-out of its anonymous savings counter in the server's env block
         # (the user's directive of 2026-10-04; JCODEMUNCH_SHARE_SAVINGS=0, CONFIGURATION.md at the pinned revision).
@@ -1698,7 +1713,7 @@ class RenderTests(unittest.TestCase):
         # All installed servers' worker policies remain; without the option no approval mode.
         self.assertEqual(profile["mcp_servers"], {
             "serena": {"startup_timeout_sec": 60, "required": True},
-            "codebase-memory": {"startup_timeout_sec": 60},
+            "codebase-memory-mcp": {"startup_timeout_sec": 60},
             "ai-memory": {"enabled_tools": ["memory_query", "memory_read_page", "memory_recent", "memory_status",
                                             "memory_briefing"]},
             "socraticode": {"enabled_tools": ["codebase_search", "codebase_status", "codebase_list_projects", "codebase_health"],
@@ -2727,7 +2742,7 @@ class ApplyTests(ApplyCase):
                              icp.expected_sha256(icp.HOOKS[name]))
         self.assertEqual(len(list((self.home / ".claude/agents").iterdir())), 11)
         self.assertEqual(sorted(json.loads((self.home / ".stub-claude-mcp.json").read_text())),
-                         ["ai-memory", "chrome-devtools", "codebase-memory", "headroom", "jcodemunch", "qmd", "semble", "serena", "socraticode"])
+                         ["ai-memory", "chrome-devtools", "codebase-memory-mcp", "headroom", "jcodemunch", "qmd", "semble", "serena", "socraticode"])
         settings = json.loads((self.home / ".claude/settings.json").read_text())
         # The repository's hooks and the overlay's Notification, and the events ai-memory's hooks take (an interim install).
         self.assertEqual(sorted(settings["hooks"]), ["ConfigChange", "Notification", "PostToolUse", "PreCompact", "PreToolUse",
@@ -2948,10 +2963,10 @@ class ApplyTests(ApplyCase):
         code, out, _ = self.apply()
         self.assertEqual(code, 0, out[-800:])
         settings = json.loads((claude / "settings.json").read_text())
-        # The destination's own marketplace stays, beside the two the wave-2 rows wire (context-mode and claude-hud).
+        # The destination's marketplace stays beside context-mode, claude-hud and the selected SocratiCode plugin.
         self.assertEqual(settings["extraKnownMarketplaces"]["trailofbits"],
                          DESTINATION_CLAUDE["extraKnownMarketplaces"]["trailofbits"])
-        self.assertEqual(sorted(settings["extraKnownMarketplaces"]), ["claude-hud", "context-mode", "trailofbits"])
+        self.assertEqual(sorted(settings["extraKnownMarketplaces"]), ["claude-hud", "context-mode", "socraticode", "trailofbits"])
         self.assertEqual(settings["theme"], "auto")
         self.assertIn('kept your theme: "auto" (the render has "dark")', out)
         for key in ("model", "effortLevel", "hooks", "permissions", "env"):

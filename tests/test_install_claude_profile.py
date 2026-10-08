@@ -38,7 +38,7 @@ CARRIER_BLOCK_NAMES = ("token-lanes-block.builder.md", "token-lanes-block.main.m
                        "token-lanes-block.verifier.md")
 CODEX_TEMPLATE = ROOT / "adoption" / "templates" / "codex.config.template.toml"
 HOST_EXAMPLE = ROOT / "adoption" / "hosts" / "example.json"
-USER_SCOPE_SERVERS = {"ai-memory", "serena", "socraticode", "headroom", "codebase-memory", "qmd", "jcodemunch"}
+USER_SCOPE_SERVERS = {"ai-memory", "serena", "socraticode", "headroom", "codebase-memory-mcp", "qmd", "jcodemunch"}
 # A server the carrier names that the user-scope template leaves out, with each file and the phrase in it that keeps
 # it out. None now: jCodeMunch was the one (registered per project since the 2026-09-25 addendum of
 # docs/decisions/2026-09-23-claude-user-profile.md) until the user's directive of 2026-10-04 put it back at user scope
@@ -85,15 +85,11 @@ def carrier_coverage_errors(carrier_text: str, registered: set[str], exceptions:
 
 
 # Arguments that differ by client on purpose, Codex value -> Claude value. serena runs its `claude-code` context under
-# Claude and `codex` under Codex (oraios/serena c6fbd1c src/serena/resources/config/contexts/). SocratiCode's script
-# is the npm bin link both bootstraps' install_npm create (adoption/bootstrap-linux.sh install_npm,
-# adoption/bootstrap-macos.sh install_npm), because the Claude installer renders only ${HOME} and ${ECO_ROOT}, never
-# the Codex template's per-platform ${SOCRATICODE_VERSION}; node runs the link's target (--preserve-symlinks-main is off
-# by default).
+# Claude and `codex` under Codex (oraios/serena c6fbd1c src/serena/resources/config/contexts/).
+# SocratiCode's documented Claude plugin launch differs from Codex's independently pinned Node route
+# (giancarloerra/SocratiCode v1.16.0 .claude-plugin/mcp.json); both keep matching backend environment settings.
 CLIENT_ARGS = {
     "serena": {"codex": "claude-code"},
-    "socraticode": {"${ECO_ROOT}/tools/socraticode-${SOCRATICODE_VERSION}/lib/node_modules/socraticode/dist/index.js":
-                    "${ECO_ROOT}/bin/socraticode"},
 }
 
 
@@ -120,11 +116,18 @@ def codex_parity_errors(claude: dict, codex: dict, values: dict) -> list[str]:
             if (entry.get("type"), entry.get("url")) != ("http", render(other["url"])):
                 errors.append(f"{name}: transport or URL differs")
             continue
-        if entry.get("type") != "stdio" or entry.get("command") != other.get("command"):
-            errors.append(f"{name}: transport or command differs")
-        mapped = [CLIENT_ARGS.get(name, {}).get(arg, arg) for arg in other.get("args", [])]
-        if entry.get("args", []) != mapped:
-            errors.append(f"{name}: arguments differ")
+        if name == "socraticode":
+            if entry.get("type") != "stdio" or entry.get("command") != "npx" or other.get("command") != "${ECO_ROOT}/bin/node":
+                errors.append(f"{name}: documented client launch commands differ")
+            if entry.get("args") != ["-y", "--prefer-online", "$${SOCRATICODE_SPEC:-socraticode@latest}"] or other.get("args") != [
+                    "${ECO_ROOT}/tools/socraticode-${SOCRATICODE_VERSION}/lib/node_modules/socraticode/dist/index.js"]:
+                errors.append(f"{name}: documented client launch arguments differ")
+        else:
+            if entry.get("type") != "stdio" or entry.get("command") != other.get("command"):
+                errors.append(f"{name}: transport or command differs")
+            mapped = [CLIENT_ARGS.get(name, {}).get(arg, arg) for arg in other.get("args", [])]
+            if entry.get("args", []) != mapped:
+                errors.append(f"{name}: arguments differ")
         expected_env = {key: render(value) for key, value in other.get("env", {}).items() if key not in CODEX_ONLY_ENV}
         if set(entry.get("env", {})) != set(expected_env):
             errors.append(f"{name}: env names differ")
@@ -1444,7 +1447,7 @@ class McpCarrierCoverageTests(unittest.TestCase):
         # only (no mcp__ ids), so the union is the general block's set.
         self.assertEqual(sorted(path.name for path in self.BLOCKS.glob("token-lanes-block*.md")),
                          sorted(CARRIER_BLOCK_NAMES))
-        lanes = {"serena", "jcodemunch", "socraticode", "qmd", "ai-memory", "codebase-memory", "headroom"}
+        lanes = {"serena", "jcodemunch", "socraticode", "qmd", "ai-memory", "codebase-memory-mcp", "headroom"}
         self.assertEqual(carrier_servers(carrier_blocks_text(self.BLOCKS)), lanes)
         self.assertEqual(carrier_servers(CARRIER.read_text(encoding="utf-8")), lanes)
         self.assertEqual(carrier_servers("mcp__plugin_context-mode_context-mode__ctx_execute, mcp__qmd__get"), {"qmd"})
@@ -1519,8 +1522,10 @@ class McpCodexParityTests(unittest.TestCase):
             "command": ("headroom", lambda entry: entry.update(command="${ECO_ROOT}/bin/headroom-x")),
             "argument": ("headroom", lambda entry: entry.update(args=["mcp", "serve", "--proxy-url", "http://127.0.0.1:2"])),
             "env name missing": ("headroom", lambda entry: entry["env"].pop("DO_NOT_TRACK")),
-            "env name added": ("codebase-memory", lambda entry: entry.setdefault("env", {}).update(X="1")),
+            "env name added": ("codebase-memory-mcp", lambda entry: entry.setdefault("env", {}).update(X="1")),
             "env value": ("socraticode", lambda entry: entry["env"].update(QDRANT_URL="http://127.0.0.1:1")),
+            "plugin command": ("socraticode", lambda entry: entry.update(command="node")),
+            "plugin argument": ("socraticode", lambda entry: entry.update(args=["-y", "socraticode@latest"])),
             "url": ("ai-memory", lambda entry: entry.update(url="http://127.0.0.1:1/mcp")),
         }
         for label, (name, change) in mutants.items():
@@ -1532,7 +1537,7 @@ class McpCodexParityTests(unittest.TestCase):
     def test_codebase_memory_is_the_bare_frontend_of_the_shared_daemon(self):
         # Each session's codebase-memory-mcp is a frontend of one shared daemon, so the entry is the binary itself:
         # no wrapper (a bounded runner that stops its scope would take a daemon it started down with it), no args.
-        entry = self.claude()["codebase-memory"]
+        entry = self.claude()["codebase-memory-mcp"]
         self.assertEqual(entry["command"], "${ECO_ROOT}/bin/codebase-memory-mcp")
         self.assertEqual(entry.get("args", []), [])
         self.assertEqual(entry.get("env", {}), {})
@@ -1549,7 +1554,12 @@ class McpRenderAndCommandTests(unittest.TestCase):
         servers = icp.render_servers(json.loads(icp.MCP_TEMPLATE.read_text()),
                                      Path("/home/example"), Path("/opt/eco"))
         self.assertEqual(servers["serena"]["command"], "/opt/eco/bin/serena")
-        self.assertNotIn("${", json.dumps(servers))
+        rendered = json.dumps(servers)
+        self.assertNotIn("${HOME}", rendered)
+        self.assertNotIn("${ECO_ROOT}", rendered)
+        self.assertEqual(servers["socraticode"]["args"],
+                         ["-y", "--prefer-online", "${SOCRATICODE_SPEC:-socraticode@latest}"])
+        self.assertNotIn("${", rendered.replace("${SOCRATICODE_SPEC:-socraticode@latest}", ""))
 
     def test_home_and_eco_root_are_rendered_in_command_and_env_values(self):
         servers = icp.render_servers({"mcpServers": {"jcodemunch": JCODEMUNCH_SPEC}},
@@ -1562,6 +1572,19 @@ class McpRenderAndCommandTests(unittest.TestCase):
     def test_unknown_placeholder_fails(self):
         with self.assertRaises(icp.InstallError):
             icp.render_servers({"mcpServers": {"x": {"command": "${NOPE}/bin/x"}}}, Path("/h"), Path("/e"))
+
+    def test_native_plugin_spec_reaches_mcp_add_as_literal_argv(self):
+        servers = icp.render_servers(json.loads(icp.MCP_TEMPLATE.read_text()),
+                                     Path("/home/example"), Path("/opt/eco"))
+        spec = servers["socraticode"]
+        self.assertEqual(len(spec["env"]), 17)
+        self.assertEqual(spec["env"]["QDRANT_COLLECTION_PREFIX"], "")
+        self.assertEqual(spec["env"]["SOCRATICODE_AUTO_RESUME"], "off")
+        self.assertEqual(spec["env"]["TMPDIR"], "/tmp")
+        command = icp.mcp_add_command("fixture-claude", "socraticode", spec)
+        self.assertEqual(command[5], "socraticode")
+        self.assertEqual(command[-5:], ["--", "npx", "-y", "--prefer-online",
+                                       "${SOCRATICODE_SPEC:-socraticode@latest}"])
 
     def test_name_precedes_env_and_command_follows_double_dash(self):
         cmd = icp.mcp_add_command("claude", "jcodemunch", {

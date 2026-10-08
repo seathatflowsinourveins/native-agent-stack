@@ -93,6 +93,7 @@ startup_timeout_sec = 120
 RTK_TELEMETRY_DISABLED = "1"
 PATH = "${ECO_ROOT}/bin:${HOST_PATH}"
 QDRANT_MODE = "external"
+QDRANT_COLLECTION_PREFIX = ""
 QDRANT_URL = "http://${QDRANT_URL}"
 EMBEDDING_PROVIDER = "lmstudio"
 LMSTUDIO_URL = "http://${EMBED_URL}/v1"
@@ -108,6 +109,8 @@ RESPECT_GITIGNORE = "true"
 # Read those files directly; indexing them is a separate, measured change of scope.
 INCLUDE_DOT_FILES = "false"
 SOCRATICODE_WATCHER = "auto"
+SOCRATICODE_AUTO_RESUME = "off"
+TMPDIR = "/tmp"
 SEARCH_DEFAULT_LIMIT = "3"
 
 [mcp_servers.headroom]
@@ -127,7 +130,7 @@ HF_HUB_OFFLINE = "1"
 TRANSFORMERS_OFFLINE = "1"
 DO_NOT_TRACK = "1"
 
-[mcp_servers.codebase-memory]
+[mcp_servers.codebase-memory-mcp]
 command = "${ECO_ROOT}/bin/codebase-memory-mcp"
 
 [mcp_servers.qmd]

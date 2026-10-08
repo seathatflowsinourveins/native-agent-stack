@@ -411,16 +411,26 @@
         "socraticode"
       ],
       "override": {
-        "args": [
-          "${ECO_ROOT}/tools/socraticode-1.15.0/lib/node_modules/socraticode/dist/index.js"
-        ],
         "env": {
           "QDRANT_URL": "http://${QDRANT_URL}",
           "LMSTUDIO_URL": "http://${EMBED_URL}/v1"
         }
       },
-      "source": "https://github.com/giancarloerra/SocratiCode/blob/f6191f076a42405f0d5508139f3a8b505cfef93a/README.md#configuration documents QDRANT_URL and LMSTUDIO_URL (including /v1). https://code.claude.com/docs/en/mcp documents the native server env object. Fill both endpoint variables from the selected host, as adoption/templates/codex.config.template.toml does, and retain the template's other env settings.",
+      "source": "SocratiCode v1.16.0 .claude-plugin/plugin.json selects .claude-plugin/mcp.json: bare npx -y --prefer-online with the native SOCRATICODE_SPEC default token. Keep the shared Claude template's escaped args untouched until install_claude_profile.py renders them once; the client expands the token from settings.env.SOCRATICODE_SPEC. README.md documents registry or local-folder specifications; the portable settings pin is socraticode@1.16.0. Keep this host's QDRANT_URL and LMSTUDIO_URL overrides and other env settings. docs/decisions/2026-10-07-clean-upstream-install-finalizes-a-candidate.md:150-158 records plugin plus same-command user entry; installed Claude 2.1.295 suppresses a matching plugin registration.",
       "note": "The code-search slot is split between semble and SocratiCode and waits for the measurement; the owner's full-stack decision of 2026-10-04 makes both its interim install."
+    },
+    {
+      "match": [
+        "claude/settings/env/SOCRATICODE_SPEC",
+        "claude/settings/plugin/socraticode@socraticode",
+        "claude/settings/marketplace/socraticode"
+      ],
+      "wiring": "slot:code-search",
+      "owner": "SocratiCode",
+      "names": [
+        "socraticode"
+      ],
+      "source": "https://github.com/giancarloerra/SocratiCode/tree/v1.16.0/.claude-plugin: plugin.json selects the Claude-specific mcp.json and marketplace.json defines socraticode@socraticode. README.md documents SOCRATICODE_SPEC in user settings. Pin the registry engine to socraticode@1.16.0 on a fresh host; an existing same-version local-folder override remains host-owned. This group is included only when the code-search slot installs SocratiCode."
     },
     {
       "match": [
@@ -445,13 +455,13 @@
     },
     {
       "match": [
-        "claude/mcp/server/codebase-memory",
-        "codex/*/mcp_servers.codebase-memory.*"
+        "claude/mcp/server/codebase-memory-mcp",
+        "codex/*/mcp_servers.codebase-memory-mcp.*"
       ],
       "wiring": "slot:code-graph",
       "owner": "codebase-memory",
       "names": [
-        "codebase-memory"
+        "codebase-memory-mcp"
       ],
       "source": "DeusData/codebase-memory-mcp v0.11.0, installed by the code-graph row of evidence/artifacts/new-wsl-install-plan-20261002/install.sh. docs/decisions/2026-09-25-codex-mcp-scope.md requires explicit index_repository and auto_index=false; this entry registers only the MCP server and never invokes indexing."
     },
@@ -626,17 +636,6 @@
       "names": [
         "ai-memory"
       ]
-    },
-    {
-      "match": [
-        "codex/config/mcp_servers.socraticode.args"
-      ],
-      "wiring": "slot:code-search",
-      "owner": "SocratiCode",
-      "override": [
-        "${ECO_ROOT}/tools/socraticode-1.15.0/lib/node_modules/socraticode/dist/index.js"
-      ],
-      "source": "The install plan's code-search row installs socraticode 1.15.0 into this versioned prefix and creates no bin/socraticode link; docs/decisions/2026-09-25-codex-mcp-scope.md requires the pinned dist/index.js path."
     },
     {
       "match": [

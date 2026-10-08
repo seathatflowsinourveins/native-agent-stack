@@ -585,7 +585,7 @@ class TemplateTests(unittest.TestCase):
         # config/src/config_layer_source.rs: profile 21 < project 25 < session 30.
         profile = tomllib.loads((TEMPLATES / "codex.stack-worker.config.toml").read_text(encoding="utf-8"))
         user = tomllib.loads((TEMPLATES / "codex.config.template.toml").read_text(encoding="utf-8"))
-        for name in ("serena", "codebase-memory"):
+        for name in ("serena", "codebase-memory-mcp"):
             with self.subTest(server=name):
                 self.assertIn("command", user["mcp_servers"][name])
                 expected = {"startup_timeout_sec": 60}
@@ -1368,7 +1368,7 @@ class SerenaReadbackTests(unittest.TestCase):
         self.assertIn("-p stack-worker serena required is False (default)", out)
 
     def test_a_recorded_lookup_error_fails_the_read_back(self):
-        for name in ("serena", "codebase-memory"):  # neither table has a key the old comparisons read
+        for name in ("serena", "codebase-memory-mcp"):  # neither table has a key the old comparisons read
             with self.subTest(server=name):
                 host = FakeHost(self)
                 (host.codex.parent / "mcp-get-fail").write_text(name + "\n")

@@ -94,8 +94,8 @@ NEEDS = (
     (r"\bqmd query\b", "mcp__qmd__query"),
     (r"\bget a line window\b", "mcp__qmd__get"),
     (r"\bmemory_query\b", "mcp__ai-memory__memory_query"),
-    (r"\bsearch_graph\b", "mcp__codebase-memory__search_graph"),
-    (r"\btrace_path\b", "mcp__codebase-memory__trace_path"),
+    (r"\bsearch_graph\b", "mcp__codebase-memory-mcp__search_graph"),
+    (r"\btrace_path\b", "mcp__codebase-memory-mcp__trace_path"),
     (r"\bheadroom_compress\b", "mcp__headroom__headroom_compress"),
     (r"\bheadroom_retrieve\b", "mcp__headroom__headroom_retrieve"),
 )
@@ -161,8 +161,8 @@ class TokenLanesHookTests(unittest.TestCase):
         self.assertIn("Select names exposed by the active client", bootstrap)
         for tool in ("mcp__jcodemunch__route", "mcp__jcodemunch__menu", "mcp__jcodemunch__order",
                      "mcp__socraticode__codebase_search", "mcp__qmd__query", "mcp__qmd__get",
-                     "mcp__ai-memory__memory_query", "mcp__codebase-memory__search_graph",
-                     "mcp__codebase-memory__trace_path", "mcp__headroom__headroom_compress",
+                     "mcp__ai-memory__memory_query", "mcp__codebase-memory-mcp__search_graph",
+                     "mcp__codebase-memory-mcp__trace_path", "mcp__headroom__headroom_compress",
                      "mcp__headroom__headroom_retrieve"):
             with self.subTest(tool=tool):
                 self.assertIn(tool, bootstrap)

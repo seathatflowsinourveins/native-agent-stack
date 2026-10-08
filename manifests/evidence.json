@@ -5256,8 +5256,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "c33b28072ffee4b92e2ea61100acd75b2289f35e9e878ffa21ac855fa010e963",
-      "bytes": 73702
+      "sha256": "bd2eb6bf8b89cd929c32527fbb7d9c14f11c78e49c3618ad9724b5b7315f9d72",
+      "bytes": 73706
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -5276,7 +5276,7 @@
     },
     {
       "path": "adoption/hooks/claude/SHA256SUMS",
-      "sha256": "9db7433fa8c7d1c37a55b027e8eb3b66ed400ad375403abfa9808aa86fb82c66",
+      "sha256": "e75e11e21ed9572f60f6c9a62cbe0e5d1b068e8e262685c5e6034354b1ee79fc",
       "bytes": 1229
     },
     {
@@ -5291,13 +5291,13 @@
     },
     {
       "path": "adoption/hooks/claude/token-lanes-block.main.md",
-      "sha256": "71ce1ea778e04c3b888135182c832fd0f15f6985dcdaad69e779e40e39914509",
-      "bytes": 2327
+      "sha256": "f20d5a9055b4add7eb93df8fcbbcc9cb95807f1bcb3a03d19a93dc04c69c7d34",
+      "bytes": 2331
     },
     {
       "path": "adoption/hooks/claude/token-lanes-block.md",
-      "sha256": "d456fa0474c2aeb5662ae49dc9e489de1b47167303c306f1ce3cef84bd09b0cc",
-      "bytes": 4087
+      "sha256": "802f3d3cf9ecb667f3438ead781afcb0dc22c315c7cde47d4bc1e0900fb790f6",
+      "bytes": 4099
     },
     {
       "path": "adoption/hooks/claude/token-lanes-block.researcher.md",
@@ -5381,8 +5381,8 @@
     },
     {
       "path": "adoption/mcp/claude-user.json",
-      "sha256": "c916169c777d023ea2c57e8b5e0d2594b5b7f0ac80249fb9fb2240a5240d8d65",
-      "bytes": 7694
+      "sha256": "21afc91a2a139b3ff8d913ce6f8683f3530b600011841767679a045c945657ce",
+      "bytes": 5338
     },
     {
       "path": "adoption/new-wsl-profile.json",
@@ -5401,8 +5401,8 @@
     },
     {
       "path": "adoption/new-wsl/client-config-map.json",
-      "sha256": "b5a998e63e4690fd4c58c448697965d7ec6dfccb585dfdb149947e9f0bddd4d4",
-      "bytes": 56432
+      "sha256": "8901c40d1fc5512de339dbb9f1a187fd0420bc4469caf68bf64124ceaf7663fa",
+      "bytes": 56895
     },
     {
       "path": "adoption/new-wsl/codex-user-instructions.md",
@@ -5536,8 +5536,8 @@
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "ae6c0bd5bf02d0b8e5b06cb46a5ce0b1ea33acf0cbd3e9f440a0e08197d0e67d",
-      "bytes": 13668
+      "sha256": "0ca6289767986bbdc66fc3991f23afdb0bc2826bfae50a019dd49fa6d55ae1d9",
+      "bytes": 13903
     },
     {
       "path": "adoption/templates/codex.AGENTS.template.md",
@@ -5546,8 +5546,8 @@
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
-      "sha256": "ad55a812006e6d25038a75c3f213460fccd40f7dd79faa21ab521eec1e88701e",
-      "bytes": 19167
+      "sha256": "26f8c564c2d77785fd25e5f03a6075739ed48ccecd6eab9864130cb92c596aaa",
+      "bytes": 19249
     },
     {
       "path": "adoption/templates/codex.omniroute.config.toml",
@@ -5556,8 +5556,8 @@
     },
     {
       "path": "adoption/templates/codex.stack-worker.config.toml",
-      "sha256": "8e5fc36343b9db548aeadd15578342a59eb22f955f591e5086cdf7e7fa848462",
-      "bytes": 5451
+      "sha256": "e03951dd2101f1f465ad4318b2c96f33bc310c770ed6224c6e1126215e894ad0",
+      "bytes": 5455
     },
     {
       "path": "adoption/templates/decision-routing.md",
@@ -17752,8 +17752,8 @@
     },
     {
       "path": "docs/decisions/2026-10-02-new-wsl-client-configuration.md",
-      "sha256": "498634a2a6b27e9d70143b6b8e43ce00c0914c914dec1d346dca38807c4941f5",
-      "bytes": 147135
+      "sha256": "2441749355b8cdf91f6196dccd828669e03ed17021e7a2d09bd7cd39b119c5c2",
+      "bytes": 148432
     },
     {
       "path": "docs/decisions/2026-10-02-omniroute-mac-rebuild.md",
@@ -18144,6 +18144,11 @@
       "path": "docs/decisions/2026-10-07-validate-module-shards.md",
       "sha256": "f10a8c8f8841c91d5050611dfc7ec15ab278d5650bc5aff9ba65bf746b733c64",
       "bytes": 15329
+    },
+    {
+      "path": "docs/decisions/2026-10-08-claude-mcp-template-alignment.md",
+      "sha256": "c0bdf2410823dfe8e857fbffe7b60de129165f901eb31953e240bce9f26004f2",
+      "bytes": 9736
     },
     {
       "path": "docs/decisions/2026-10-08-coordinator-research-routing.md",
@@ -18582,8 +18587,8 @@
     },
     {
       "path": "docs/token-session-handbook.md",
-      "sha256": "aec069f49d6fa9692b0b17444b5b209004d3bfd7d8c98d3ab06dcff25954e554",
-      "bytes": 113465
+      "sha256": "0206ec6281cbe1965bf9bbfa616b2c84ed5478c9efeb78d583af917a573e1d24",
+      "bytes": 113477
     },
     {
       "path": "docs/ultracode-token-routing-20260921.md",
@@ -57892,8 +57897,8 @@
     },
     {
       "path": "tests/test_codex_worker_lane.py",
-      "sha256": "a3b4451ae9751d5430061a7057dba5b196225ae1a17ef24699bf48b213bd7e15",
-      "bytes": 193146
+      "sha256": "c8437f697dbe3bfd2a4e2f51bd2fed4ab9956153b42a3bcde539fbf84af47e4c",
+      "bytes": 193154
     },
     {
       "path": "tests/test_codex_worker_skill.py",
@@ -58117,8 +58122,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "b35dc500dc809033782fad235a8eb74a73b37d75a45aa1ea26a253315dc2b421",
-      "bytes": 134454
+      "sha256": "9b4c835bcf9a131c322033675388b7bea40a93a849e512eee272e87f228f2074",
+      "bytes": 136088
     },
     {
       "path": "tests/test_install_skills.py",
@@ -58317,8 +58322,8 @@
     },
     {
       "path": "tests/test_new_wsl_client_config.py",
-      "sha256": "cb9ef8fc8934713a5d341dbbb96d82026d15ec44816a36e2d3909c08b96bc5d0",
-      "bytes": 343281
+      "sha256": "ff01c0f3f0b31d19aca00ef516d797477fabd824789417e17ff6f4ea08ef7f21",
+      "bytes": 344567
     },
     {
       "path": "tests/test_new_wsl_definitive_defaults.py",
@@ -58652,8 +58657,8 @@
     },
     {
       "path": "tests/test_token_lanes_subagent_start.py",
-      "sha256": "7c98878632be2ca51e0f1fb6e90f4ce8f91a83359f2451477566f646288aca6c",
-      "bytes": 32021
+      "sha256": "9d754d391f92ef6bb0be03a42becf51a112c55600fe7e410e34d68168040662e",
+      "bytes": 32037
     },
     {
       "path": "tests/test_token_measurement.py",

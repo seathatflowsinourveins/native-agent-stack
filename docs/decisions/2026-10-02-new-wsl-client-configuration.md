@@ -1309,3 +1309,24 @@ Today: 403 pieces, 363 wired (212 practice, 151 through a slot), 24 not wired
 (0 through a slot that does not install, 24 by their own entry) and 16 authorization
 pieces. This is repository source consistency, not fresh native-client, model or
 provider acceptance. The existing Inspector plan warnings remain separate.
+
+## Addendum 2026-10-08: Claude native SocratiCode pairing
+
+The same-command Claude user/plugin projection follows SocratiCode v1.16.0's
+Claude-specific MCP file and version setting. The settings pin, plugin and
+marketplace share the code-search owner gate; the manual registration keeps its
+socraticode identity and the complete seventeen-setting carrier. Portable
+namespace, startup-resume and temporary-directory defaults remain explicit.
+Codex retains its independently selected platform version through the shared
+template rather than a fixed map argument override. The folded code-graph
+registration alias is codebase-memory-mcp while its slot owner remains
+codebase-memory. Earlier dated projections above remain historical.
+
+The native repository-only check reports: Today: 409 pieces, 369 wired
+(212 practice, 157 through a slot), 24 not wired (0 through a slot that does not
+install, 24 by their own entry) and 16 authorization pieces. The existing
+`authorization: 16`, and 24 pieces are not wired, remain unchanged. This is
+source consistency, not a fresh client session or native installation. The
+same-command contract, source pins, pending direct log citation and draft-hunk
+reconciliation are recorded in
+[the dated alignment decision](2026-10-08-claude-mcp-template-alignment.md).
