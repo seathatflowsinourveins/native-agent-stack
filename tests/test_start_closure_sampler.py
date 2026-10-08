@@ -1,0 +1,330 @@
+"""Synthetic sampler controls; these tests run no designated reads or upstream acceptance.
+
+Set G5_R3_GENERATOR to the original SHA-pinned R3 generator. G5_PROFILE_PROTOCOL
+may point at the read-only profile worker source before its commit is integrated.
+Neither environment variable supplies a credential or changes the required pins.
+"""
+from __future__ import annotations
+
+import copy
+from contextlib import redirect_stderr
+import hashlib
+import importlib.util
+import io
+import json
+import os
+from pathlib import Path
+import tempfile
+import unittest
+
+from jsonschema import Draft202012Validator, ValidationError
+
+TOOL = Path(__file__).resolve().parents[1] / "tools/sota-convergence/start_closure_sampler.py"
+SPEC = importlib.util.spec_from_file_location("start_closure_sampler_test", TOOL)
+sampler = importlib.util.module_from_spec(SPEC)
+SPEC.loader.exec_module(sampler)
+
+
+def digest(raw):
+    return hashlib.sha256(raw).hexdigest()
+
+
+def raw(value):
+    return (json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False) + "\n").encode()
+
+
+class FileGuardTests(unittest.TestCase):
+    def test_changed_pinned_file_is_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "input.json"
+            path.write_bytes(b"original")
+            expected = digest(path.read_bytes())
+            path.write_bytes(b"changed")
+            with self.assertRaisesRegex(ValueError, "Pinned input changed"):
+                sampler.pinned_bytes(path, expected)
+
+    def test_stratum_contract_exact_hash(self):
+        contract = json.loads(sampler.pinned_bytes(sampler.CONTRACT, sampler.CONTRACT_SHA256))
+        self.assertEqual(contract["profile"], sampler.PROFILE)
+        self.assertEqual(contract["seed"], 202610081850)
+        self.assertEqual(contract["r3_generator_sha256"], sampler.R3_SHA256)
+
+    def test_profile_must_be_explicit(self):
+        with redirect_stderr(io.StringIO()), self.assertRaises(SystemExit) as error:
+            sampler.main([])
+        self.assertEqual(error.exception.code, 2)
+        with self.assertRaisesRegex(ValueError, "explicitly"):
+            sampler.build_packet(profile=None, manifest_path=None, manifest_sha256=None,
+                origin_map_path=None, origin_map_sha256=None, protocol_sha256=None, r3_generator=None,
+                head="a" * 40, output_root=None, output_name=None)
+
+    def test_output_confinement_and_no_overwrite(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for name in ("../escape", "/absolute", ".", "..", "nested/output", "C:\\escape"):
+                with self.subTest(name=name), self.assertRaises(ValueError):
+                    sampler.output_directory(root, name)
+            (root / "existing").mkdir()
+            with self.assertRaisesRegex(ValueError, "already exists"):
+                sampler.output_directory(root, "existing")
+            (root / "link").symlink_to(root / "existing", target_is_directory=True)
+            with self.assertRaises(ValueError):
+                sampler.output_directory(root / "link", "packet")
+            self.assertEqual(sampler.output_directory(root, "new-packet"), root / "new-packet")
+
+    def test_oversized_or_invalid_hash_input_is_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "input"
+            path.write_bytes(b"bytes")
+            with self.assertRaisesRegex(ValueError, "oversized"):
+                sampler.pinned_bytes(path, digest(b"bytes"), limit=1)
+            with self.assertRaisesRegex(ValueError, "lowercase SHA256"):
+                sampler.pinned_bytes(path, "not-a-hash")
+
+
+class NativeSamplerTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        source = os.environ.get("G5_R3_GENERATOR")
+        if not source:
+            raise unittest.SkipTest("Set G5_R3_GENERATOR to the original sealed generator for native draw controls")
+        cls.r3_path = Path(source)
+        cls.r3 = sampler.load_r3(cls.r3_path)
+        cls.protocol = Path(os.environ.get("G5_PROFILE_PROTOCOL", str(sampler.PROTOCOL)))
+        cls.protocol_sha = digest(cls.protocol.read_bytes())
+        cls.native, cls.repo = sampler.load_native(cls.protocol, cls.protocol_sha, cls.r3)
+        cls.schema_raw = (cls.repo / sampler.ROW_SCHEMA).read_bytes()
+        cls.validator = Draft202012Validator(cls.native.load(cls.schema_raw))
+        print("G5_SAMPLER_TEST_INPUTS " + json.dumps({"protocol_sha256": cls.protocol_sha,
+            "row_schema_sha256": digest(cls.schema_raw), "r3_generator_sha256": sampler.R3_SHA256}, sort_keys=True))
+
+    def setUp(self):
+        self.rows = []
+        self.bindings = []
+        self.fragment_sha = digest(b"synthetic original fragment bytes")
+        self.fragment_ref = {"source_id": "fixture-fragment", "sha256": self.fragment_sha,
+            "archive_member": "captures/original-fragment.json", "pointer": "/rows/0",
+            "owner_lane": "synthetic-controls"}
+
+    def add_row(self, disposition="WATCH", *, flags=(), held_action=False):
+        number = len(self.rows)
+        repository = f"example/project-{number:03d}"
+        pin = {"kind": "commit", "version_or_commit": "a" * 40,
+            "repository_or_source": repository, "subject": "implementation"}
+        ref = {**self.fragment_ref, "pointer": f"/rows/{number}"}
+        row = {"repository_or_entry": repository, "slot": "native-clients", "disposition": disposition,
+            "evidence_class": "SOURCE-REVIEW", "pin": pin,
+            "primary_sources": [{"locator": f"https://github.com/{repository}/blob/{'a' * 40}/README.md",
+                "pin": pin, "subject": "pinned implementation README",
+                "capture_sha256": self.fragment_sha, "archive_member": ref["archive_member"]}],
+            "capture_sha256": self.fragment_sha, "archive_member": ref["archive_member"],
+            "owner_lane": "synthetic-controls", "refresh_date": "2026-10-08", "source_refs": [ref]}
+        if disposition == "PENDING":
+            row["pending"] = {"provisional_disposition": "WATCH", "measurement": "Read the pinned primary README", "owner": "synthetic-controls"}
+        if disposition == "REJECT":
+            row["searched"] = "Pinned primary README"
+        if disposition == "ADOPT-NOW":
+            row["evidence_class"] = "RECORDED-LIVE-ACCEPTANCE"
+            row["acceptance_witness"] = {"archive_member": ref["archive_member"], "sha256": self.fragment_sha, "pointer": "/acceptance"}
+        if "pending_pin" in flags:
+            row["pin"] = row["primary_sources"][0]["pin"] = None
+            row.setdefault("closure", {})["pending_pin"] = {"reason_code": "no-match", "measurement": "Find a tree containing the captured blob"}
+        if "pending_locator" in flags:
+            row["primary_sources"][0]["locator"] = "UNKNOWN"
+            row.setdefault("closure", {})["pending_locator"] = {"reason_code": "unsupported-transport", "measurement": "Establish the primary locator"}
+        fragment = {"fragment": "fixture-fragment", "artifact_sha256": self.fragment_sha,
+            "owner_lane": "synthetic-controls", "parent_family": "a-stars", "source_refs": [ref]}
+        if held_action:
+            row["choices"] = [{"disposition": "ADOPT-NOW", "source_refs": [ref]}]
+            fragment["held_action_claims"] = [{"disposition": "ADOPT-NOW", "source_refs": [ref]}]
+        self.rows.append(row)
+        self.bindings.append({"key": {"repository_or_entry": repository, "slot": "native-clients"}, "fragments": [fragment]})
+        return row
+
+    def inputs(self):
+        manifest = {"schema_version": 1, "kind": "g5-compact-landscape", "release_tag": "v2026.10.08",
+            "validation": {"status": "PASS", "profile": sampler.PROFILE, "blockers": []},
+            "row_schema": {"path": sampler.ROW_SCHEMA, "sha256": digest(self.schema_raw)},
+            "asset": {"sha256": digest(b"synthetic declared release asset")}, "rows": copy.deepcopy(self.rows)}
+        manifest_sha = digest(raw(manifest))
+        origins = {"schema_version": 1, "manifest_sha256": manifest_sha,
+            "stratum_contract_sha256": sampler.CONTRACT_SHA256, "origins": copy.deepcopy(self.bindings)}
+        return manifest, origins, manifest_sha
+
+    def validated(self, manifest=None, origins=None, manifest_sha=None):
+        if manifest is None:
+            manifest, origins, manifest_sha = self.inputs()
+        return sampler.rows_and_origins(manifest, origins, manifest_sha, self.native, self.validator, self.r3)
+
+    def draw(self):
+        rows, origins, fragments = self.validated()
+        return rows, sampler.select(rows, origins, fragments, list(self.native.CLASSES), self.r3)
+
+    @staticmethod
+    def bucket(packets, name):
+        return next(p for p in packets if p["stratum"]["disposition"] == name)
+
+    def test_native_r3_stream_repeatable_and_minimum_population(self):
+        for _ in range(70):
+            self.add_row("WATCH")
+        for _ in range(4):
+            self.add_row("REJECT")
+        rows, origins, fragments = self.validated()
+        classes = self.validator.schema["properties"]["disposition"]["enum"]
+        first = sampler.select(rows, origins, fragments, classes, self.r3)
+        second = sampler.select(dict(reversed(list(rows.items()))), origins, fragments, classes, self.r3)
+        self.assertEqual(first, second)
+        self.assertEqual(self.bucket(first, "WATCH")["selected_count"], 59)
+        self.assertEqual(self.bucket(first, "REJECT")["selected_count"], 4)
+        direct = self.r3.select(rows, {key: [{**f, "held_action_claims": []} for f in value] for key, value in origins.items()}, fragments, classes, sampler.SEED, 59)
+        self.assertEqual([i["native_key"] for i in self.bucket(first, "WATCH")["selected"]],
+            [i["native_key"] for i in self.bucket(direct, "WATCH")["selected"]])
+
+    def test_final_actions_are_full_census_and_held_claims_do_not_qualify(self):
+        for _ in range(70):
+            self.add_row("TRIAL")
+        self.add_row("ADOPT-NOW")
+        pending = self.add_row("PENDING", held_action=True)
+        rows, packets = self.draw()
+        self.assertEqual(self.bucket(packets, "TRIAL")["selected_count"], 70)
+        self.assertEqual(self.bucket(packets, "ADOPT-NOW")["selected_count"], 1)
+        self.assertTrue(all(p["stratum"]["bucket_kind"] == "FINAL-DISPOSITION" for p in packets))
+        manifest, _, manifest_sha = self.inputs()
+        actions = sampler.action_read_set(rows, manifest, manifest_sha, "f" * 40)
+        self.assertEqual(len(actions["rows"]), 71)
+        self.assertNotIn(list(self.native.decision_key(pending)), [r["row_id"] for r in actions["rows"]])
+        selected_pending = self.bucket(packets, "PENDING")["selected"][0]
+        self.assertEqual(selected_pending["row"], pending)
+        self.assertEqual(selected_pending["origin_bindings"], self.bindings[-1]["fragments"])
+
+    def test_each_closure_flag_is_a_seeded_overlapping_stratum(self):
+        for _ in range(70):
+            self.add_row("PENDING", flags=("pending_pin", "pending_locator"))
+        rows, packets = self.draw()
+        for label in ("PENDING", "PENDING-PIN", "PENDING-LOCATOR"):
+            packet = self.bucket(packets, label)
+            self.assertEqual(packet["population_size"], 70)
+            self.assertEqual(packet["selected_count"], 59)
+            self.assertEqual(packet["selection_mode"], "SAMPLED")
+            self.assertTrue(all(i["row"]["disposition"] == "PENDING" for i in packet["selected"]))
+            self.assertTrue(all(i["row"] == rows[tuple(i["native_key"])]["row"] for i in packet["selected"]))
+        counts = sampler.packet_counts(packets, rows)
+        self.assertEqual(counts["sample_memberships"], 177)
+        self.assertEqual(counts["rows_with_both_closure_flags"], 70)
+        self.assertLessEqual(counts["unique_sampled_rows"], 70)
+        self.assertEqual(counts["sample_overlap_memberships"], 177 - counts["unique_sampled_rows"])
+
+    def test_no_family_read_or_zero_defect_acceptance_is_inferred(self):
+        self.add_row()
+        _, packets = self.draw()
+        for packet in packets:
+            self.assertEqual(packet["family_review"]["status"], "NOT_RUN")
+            self.assertFalse(packet["family_review"]["zero_defects_established"])
+            self.assertEqual(packet["acceptance_number"], 0)
+
+    def test_profile_pass_and_exact_manifest_binding_are_required(self):
+        self.add_row()
+        for field, value in (("status", "BLOCKED"), ("profile", "default"), ("blockers", ["defect"])):
+            manifest, origins, manifest_sha = self.inputs()
+            manifest["validation"][field] = value
+            with self.subTest(field=field), self.assertRaises(ValueError):
+                self.validated(manifest, origins, manifest_sha)
+        manifest, origins, manifest_sha = self.inputs()
+        origins["manifest_sha256"] = "0" * 64
+        with self.assertRaisesRegex(ValueError, "exact manifest"):
+            self.validated(manifest, origins, manifest_sha)
+
+    def test_native_key_uniqueness_and_full_origin_coverage(self):
+        self.add_row()
+        manifest, origins, manifest_sha = self.inputs()
+        manifest["rows"].append(copy.deepcopy(manifest["rows"][0]))
+        with self.assertRaisesRegex(ValueError, "Duplicate native"):
+            self.validated(manifest, origins, manifest_sha)
+        manifest, origins, manifest_sha = self.inputs()
+        origins["origins"] = []
+        with self.assertRaisesRegex(ValueError, "every final row"):
+            self.validated(manifest, origins, manifest_sha)
+
+    def test_action_row_and_every_primary_source_remain_pinned(self):
+        self.add_row("TRIAL")
+        for target in ("row", "source"):
+            manifest, origins, manifest_sha = self.inputs()
+            row = manifest["rows"][0]
+            if target == "row":
+                row["pin"] = None
+            else:
+                row["primary_sources"][0]["pin"] = None
+            with self.subTest(target=target), self.assertRaises((ValueError, ValidationError)):
+                self.validated(manifest, origins, manifest_sha)
+
+    def test_action_row_cannot_carry_pending_closure_flag(self):
+        self.add_row("TRIAL")
+        manifest, origins, manifest_sha = self.inputs()
+        manifest["rows"][0]["closure"] = {"pending_pin": {"reason_code": "no-match", "measurement": "settle"}}
+        with self.assertRaises((ValueError, ValidationError)):
+            self.validated(manifest, origins, manifest_sha)
+
+    def test_unsafe_locator_and_archive_reference_are_rejected(self):
+        self.add_row("PENDING", flags=("pending_locator",))
+        for locator in ("file:/private", "/private", "https://name:secret@github.com/example/repo", "https://github.com/example/repo/blob/main/README.md"):
+            manifest, origins, manifest_sha = self.inputs()
+            manifest["rows"][0]["primary_sources"][0]["locator"] = locator
+            with self.subTest(locator=locator), self.assertRaises(ValueError):
+                self.validated(manifest, origins, manifest_sha)
+        manifest, origins, manifest_sha = self.inputs()
+        origins["origins"][0]["fragments"][0]["source_refs"][0]["archive_member"] = "../escape"
+        with self.assertRaises(ValueError):
+            self.validated(manifest, origins, manifest_sha)
+
+    def test_capture_and_original_fragment_evidence_cannot_drift(self):
+        self.add_row()
+        manifest, origins, manifest_sha = self.inputs()
+        manifest["rows"][0]["capture_sha256"] = "0" * 64
+        with self.assertRaisesRegex(ValueError, "Hash-mismatched"):
+            self.validated(manifest, origins, manifest_sha)
+        manifest, origins, manifest_sha = self.inputs()
+        origins["origins"][0]["fragments"][0]["source_refs"][0]["pointer"] = "/unbound"
+        with self.assertRaisesRegex(ValueError, "original row reference"):
+            self.validated(manifest, origins, manifest_sha)
+
+    def test_packet_hashes_projection_and_not_run_status(self):
+        self.add_row("TRIAL")
+        self.add_row("PENDING", held_action=True)
+        manifest, origins, manifest_sha = self.inputs()
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            manifest_path, origin_path = root / "input.json", root / "origin.json"
+            manifest_path.write_bytes(raw(manifest))
+            origin_path.write_bytes(raw(origins))
+            kwargs = dict(profile=sampler.PROFILE, manifest_path=manifest_path, manifest_sha256=manifest_sha,
+                origin_map_path=origin_path, origin_map_sha256=digest(raw(origins)), protocol_sha256=self.protocol_sha,
+                r3_generator=self.r3_path, head="f" * 40, output_root=root, output_name="packet", protocol=self.protocol)
+            result = sampler.build_packet(**kwargs)
+            packet = root / "packet"
+            summary = json.loads((packet / "manifest.json").read_bytes())
+            actions = json.loads((packet / "action-read-set.json").read_bytes())
+            self.assertEqual(result["action_rows"], 1)
+            self.assertEqual(result["reads"], "NOT_RUN")
+            self.assertEqual(result["action_read_set_sha256"], digest((packet / "action-read-set.json").read_bytes()))
+            self.assertEqual(actions["asset_sha256"], manifest["asset"]["sha256"])
+            self.assertEqual(actions["head"], "f" * 40)
+            self.assertEqual(actions["rows"][0]["row_id"], list(self.native.decision_key(self.rows[0])))
+            self.assertEqual(actions["rows"][0]["locator"], [s["locator"] for s in self.rows[0]["primary_sources"]])
+            self.assertEqual(summary["family_review"]["profile_code_and_tests"], "NOT_RUN")
+            self.assertEqual(len(summary["profile_review_sources"]), 4)
+            for source in summary["profile_review_sources"]:
+                self.assertEqual(digest((packet / source["path"]).read_bytes()), source["sha256"])
+            for line in (packet / "manifest.sha256").read_text().splitlines():
+                expected, name = line.split("  ", 1)
+                self.assertEqual(digest((packet / name).read_bytes()), expected)
+            with self.assertRaisesRegex(ValueError, "already exists"):
+                sampler.build_packet(**kwargs)
+            manifest_path.write_bytes(raw({**manifest, "tampered": True}))
+            kwargs["output_name"] = "second"
+            with self.assertRaisesRegex(ValueError, "Pinned input changed"):
+                sampler.build_packet(**kwargs)
+            self.assertFalse((root / "second").exists())
+
+
+if __name__ == "__main__":
+    unittest.main()
