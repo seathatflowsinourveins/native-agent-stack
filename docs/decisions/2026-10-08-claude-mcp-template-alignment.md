@@ -82,20 +82,27 @@ Both loaders use the same accepted `process.env` value. An absent Spec takes
 the fallback; an explicitly empty value remains present. This is source review,
 not a new session or fresh-host acceptance run.
 
-The existing private CC builder facts record has SHA256
-`e7a6879335c71395736216347d133e9e944627f965ab738aeae391ec33a243fd`.
-It reports a native 2.1.295 session, one connected manual server and this client
-diagnostic twice:
+The retained 2.1.295 headless-session debug file is
+`${HOME}/.local/state/native-agent-stack/research/claude-side-20261008/guard-onfailure-probe/z-live-mcp/live.log`
+(private host path). Its size is 151,998 bytes; the co-op verified SHA256
+`f9305f7437c5ea13694bf8f4d11acb36f39e0f8c40dacd6d4d813508afef719f`
+at 23:41Z. A targeted native read confirmed the suppression diagnostic at
+**line 86** (22:24:08.745Z) and **line 355** (22:24:10.647Z).
+The line at 86 is:
 
 ```text
-Suppressing plugin MCP server "plugin:socraticode:socraticode": duplicates manually-configured "socraticode"
+2026-10-08T22:24:08.745Z [DEBUG] Suppressing plugin MCP server "plugin:socraticode:socraticode": duplicates manually-configured "socraticode"
 ```
 
-That record does not name the original debug file. Q129 requests its existing
-pathname so the event can be read directly and cited with its original line
-number. The documented `~/.claude/debug/latest` alias was absent; no directory
-scan or new debug session was performed. **The direct event-file citation is
-pending.** This quoted reported measurement is not a substitute for that gate.
+This directly inspected retained client event answers Q129. Only those two
+diagnostic lines were selected, stopping at line 355; the rest of the log was
+not inspected or copied, and the hash is the co-op's recorded verification.
+The existing facts record, SHA256
+`e7a6879335c71395736216347d133e9e944627f965ab738aeae391ec33a243fd`,
+separately reports one connected manual server. The event proves suppression
+in that recorded session; it is not a new client run or fresh-host acceptance.
+The builder's archive move explains the old `latest` target; no directory scan
+or new debug session was needed.
 
 ## Draft reconciliation
 
@@ -151,8 +158,9 @@ privately and reported in the draft PR.
 
 The read-only critic found the stale template comment, which is corrected, and
 confirmed namespace, owner gates, token rendering and generated carrier hashes.
-Remaining evidence boundaries are the pending original suppression-log citation,
-a fresh host's registry/plugin acquisition and a fresh native client session.
+The original suppression-log citation is now attached. Remaining evidence
+boundaries are a fresh host's registry/plugin acquisition and a fresh native
+client session.
 No host configuration, plugin/MCP state, credentials, running paper session or
 N2 bundle was changed. No fresh-host success is claimed.
 

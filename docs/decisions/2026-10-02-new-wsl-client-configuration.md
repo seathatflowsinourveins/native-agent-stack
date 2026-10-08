@@ -1327,6 +1327,6 @@ The native repository-only check reports: Today: 409 pieces, 369 wired
 install, 24 by their own entry) and 16 authorization pieces. The existing
 `authorization: 16`, and 24 pieces are not wired, remain unchanged. This is
 source consistency, not a fresh client session or native installation. The
-same-command contract, source pins, pending direct log citation and draft-hunk
+same-command contract, source pins, retained client log citation and draft-hunk
 reconciliation are recorded in
 [the dated alignment decision](2026-10-08-claude-mcp-template-alignment.md).

@@ -17752,8 +17752,8 @@
     },
     {
       "path": "docs/decisions/2026-10-02-new-wsl-client-configuration.md",
-      "sha256": "2441749355b8cdf91f6196dccd828669e03ed17021e7a2d09bd7cd39b119c5c2",
-      "bytes": 148432
+      "sha256": "f3aee37252f8e2bfdabd840f0076cdd3beb03e6da788405958b4e1e3ecba919e",
+      "bytes": 148433
     },
     {
       "path": "docs/decisions/2026-10-02-omniroute-mac-rebuild.md",
@@ -18147,8 +18147,8 @@
     },
     {
       "path": "docs/decisions/2026-10-08-claude-mcp-template-alignment.md",
-      "sha256": "c0bdf2410823dfe8e857fbffe7b60de129165f901eb31953e240bce9f26004f2",
-      "bytes": 9736
+      "sha256": "c556153562e00101415fd7254a1d98044a81fbb5b1a6293c2a542d81190b6bbf",
+      "bytes": 10226
     },
     {
       "path": "docs/decisions/2026-10-08-coordinator-research-routing.md",
