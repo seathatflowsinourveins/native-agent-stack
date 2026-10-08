@@ -1,0 +1,124 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-08T09:40:08Z",
+  "scope": "Recorded Hindsight research-memory native integration on NativeStack2604; publication reads reuse the original execution evidence.",
+  "component": {
+    "repository": "https://github.com/vectorize-io/hindsight",
+    "version": "0.10.2",
+    "source_commit": "5fc4ce20917b916240cef27c212c387a177f115b",
+    "job": "Research hypotheses and experiment records",
+    "bank": "trading-research",
+    "coding_memory": "ai-memory"
+  },
+  "installation": {
+    "executor": "memory-h2h lane",
+    "evidence_class": "native_proven",
+    "python_version": "3.13.16",
+    "packages": [
+      {
+        "name": "hindsight-api",
+        "version": "0.10.2",
+        "official_pypi_wheel_sha256": "de4c85e3553671224c5a319f9dc5ca560ff5edd14505736c162404c2d0407e52"
+      },
+      {
+        "name": "hindsight-client",
+        "version": "0.10.2",
+        "official_pypi_wheel_sha256": "6843e625d813333a42ca4bff38e8cab39b58ec6ed5a33d7eb596f71e16c7ef64"
+      }
+    ],
+    "native_install_exit_code": 0,
+    "local_embeddings": {
+      "model": "BAAI/bge-small-en-v1.5",
+      "device": "cpu",
+      "dimensions": 384
+    },
+    "local_reranker": {
+      "model": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+      "device": "cpu"
+    }
+  },
+  "numeric_http_mcp_roundtrip": {
+    "executor": "memory-h2h lane",
+    "completed_at_utc": "2026-10-08T07:23:00Z",
+    "evidence_class": "synthetic",
+    "route": "Separately initialized source and receiver HTTP MCP sessions",
+    "llm_provider": "openai-responses",
+    "llm_model": "cx/gpt-6.1-sol",
+    "llm_startup_verification": "passed",
+    "extraction_mode": "verbatim",
+    "hypotheses": 2,
+    "full_text_exact_matches": 2,
+    "recall_fact_types": ["world", "experience"],
+    "strict_tag_single_experiment_recalls": 2,
+    "disjoint_tag_conjunction_results": 0,
+    "untagged_exclusion_separately_tested": false,
+    "native_tool_errors": 0,
+    "actual_llm_calls": {
+      "verification": 1,
+      "retain_metadata": 2,
+      "automatic_consolidation": 2
+    },
+    "artifact_sha256": {
+      "retain_a_return": "23f090c035da9e8a0d762cb89c0de0ed754826dfcf5b63f63a462c8543ab4fb5",
+      "retain_b_return": "86407af50842d009b64438f4b2a762db77c4e0e1c83d661057b1aeb0c8800b16",
+      "recall_a_return": "76b4a2d03c8e0d78cc10ab5345673ed8f22fae2b90cd50d777386d04a62c73c9",
+      "recall_b_return": "2931fee242d83474d99f49bd4f7fffd14df2d8437c37d00395874e346bfe0f0c",
+      "recall_disjoint_return": "6e925f32050fb473d7ed7637b54e7edf94e20c6eb11f69aaf2fc92bd7d59bcb7"
+    }
+  },
+  "unit_and_native_clients": {
+    "executor": "command center",
+    "evidence_class": "native_proven",
+    "installed_at_utc": "2026-10-08T09:21:43Z",
+    "enabled_started_at_utc": "2026-10-08T09:22:00Z",
+    "systemd_verify_exit_code": 0,
+    "active_state": "active",
+    "sub_state": "running",
+    "restart_count": 0,
+    "bind": "127.0.0.1:8888",
+    "listener_owner": "unit MainPID",
+    "health_http_status": 200,
+    "database": "connected",
+    "llm_startup_verification": "passed",
+    "mcp_tools_after_allowlist": 15,
+    "native_client_registration_exit_codes": {
+      "claude": 0,
+      "codex": 0
+    },
+    "cross_client_roundtrip": {
+      "evidence_class": "synthetic",
+      "source_client": "fresh Claude session",
+      "source_tool": "sync_retain",
+      "receiver_client": "fresh Codex thread",
+      "receiver_tool": "recall",
+      "matching_memory_id": true,
+      "world_text_byte_equal": true,
+      "synthesized_observation_also_returned": true
+    },
+    "template_sha256": {
+      "unit": "d824e9c46babe8d7c2ba5a8e59a066c325f420b71161010fd901682909e9255e",
+      "mcp_allowlist": "f50cba4db858faabe66d24d734df2be92021242a9ffc06a616bca2d477a0d2a9"
+    }
+  },
+  "source_receipts": [
+    {
+      "record": "lane Hindsight stage receipt, 2026-10-08T06:24Z",
+      "sha256": "600b7741a83c1cccccbb6a8a44fb2e76ed8e35e7c19bb7697b2472faf3f1f77d"
+    },
+    {
+      "record": "lane tested-operation receipt, 2026-10-08T07:23Z",
+      "sha256": "21820afb9a1f6c98f292cdd29ce34eee2e46592148ae48c7da62a1fdfbacf328"
+    },
+    {
+      "record": "command-center Hindsight unit and native-client receipt, 2026-10-08",
+      "sha256": "5ea26fec38d6cd617aa6d81f0fbb4a2c3eeca70331cd404edaaf58e047c5f1f0"
+    }
+  ],
+  "limitations": [
+    "Recall cannot hard-filter by time; backtest research never relies on it for point-in-time exclusion.",
+    "Research jobs select world and experience fact types for verbatim text; observations are synthesized paraphrases.",
+    "Synthetic integration checks are not trading results, research recall-quality acceptance, organic use or an unchanged upstream test suite.",
+    "Private native returns and client streams remain outside the checkout; this sanitized receipt preserves their executor attribution and declared results.",
+    "This publication does not repeat the original installations, model calls or native client round trip."
+  ]
+}

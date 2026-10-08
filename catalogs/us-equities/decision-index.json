@@ -416,10 +416,10 @@
     "repositories": 875,
     "public_star_repositories": 357,
     "beyond_public_stars": 518,
-    "references": 2072,
+    "references": 2073,
     "repositories_by_record_type": {
       "catalog_card": 148,
-      "component_record": 69,
+      "component_record": 70,
       "legacy_candidate": 34,
       "public_star": 357,
       "research_supplement": 584,
@@ -22336,6 +22336,7 @@
       "public_star": true,
       "record_types": [
         "catalog_card",
+        "component_record",
         "legacy_candidate",
         "public_star",
         "research_supplement",
@@ -22410,6 +22411,12 @@
           "path": "manifests/candidates.json",
           "pointer": "/candidates/2",
           "decision": "Research option for structured long-term memory that extracts facts, consolidates beliefs and reflects. Heavier than the current coding stack; do not activate merely for a higher benchmark claim."
+        },
+        {
+          "kind": "component_record",
+          "path": "manifests/stack.json",
+          "pointer": "/components/69",
+          "id": "hindsight"
         }
       ]
     },

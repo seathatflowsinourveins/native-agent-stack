@@ -23,12 +23,12 @@
     "change_rule": "Retain accepted selections until a named capability gap and representative comparison justify an adjustment. Metadata recency alone is insufficient."
   },
   "summary": {
-    "selected_components": 69,
-    "unique_github_repositories": 69,
-    "repository_metadata_successes": 69,
+    "selected_components": 70,
+    "unique_github_repositories": 70,
+    "repository_metadata_successes": 70,
     "archived_repositories": 0,
     "disabled_repositories": 0,
-    "latest_stable_release_successes": 64,
+    "latest_stable_release_successes": 65,
     "unavailable_latest_stable_endpoints": [
       "shanraisshan/claude-code-best-practice",
       "skills-ref",
@@ -36,7 +36,7 @@
       "poppler",
       "tavily-cli"
     ],
-    "api_commands": 289,
+    "api_commands": 293,
     "api_nonzero_results": 8,
     "corrected_invalid_archive_digest_ref_attempts": 2,
     "newer_stable_release_review_queue": [
@@ -53,7 +53,7 @@
       }
     ],
     "recommendation": "Retain current qualified pins; review the 4 newer stable releases against actual capability gaps before upgrading. Dagu 2.16.6 remains held by the trading lane; the separate new-WSL profile selects 2.18.2. Refresh canonical Headroom identity in future manifest maintenance without treating its transfer as a functional replacement.",
-    "selected_component_api_commands": 272,
+    "selected_component_api_commands": 276,
     "initial_star_delta_commands": 1,
     "complete_star_snapshot_commands": 7,
     "added_candidate_source_screen_commands": 9,
@@ -5558,6 +5558,80 @@
       "source_pin_kind": "git_commit",
       "primary_repository": "https://github.com/nautechsystems/nautilus_trader",
       "release_relationship": "selected_development_or_prerelease_channel"
+    },
+    {
+      "component_id": "hindsight",
+      "repository": "https://github.com/vectorize-io/hindsight",
+      "selected_repository_url": "https://github.com/vectorize-io/hindsight",
+      "selected_version": "0.10.2",
+      "selected_source_pin": "5fc4ce20917b916240cef27c212c387a177f115b",
+      "checked_at": "2026-10-08T14:04:04.619Z",
+      "checks": [
+        {
+          "endpoint": "repos/vectorize-io/hindsight",
+          "exit_code": 0,
+          "started_at": "2026-10-08T14:03:36.235Z",
+          "ended_at": "2026-10-08T14:03:36.695Z",
+          "stdout_sha256": "f11dda5e2ac9382eb2b6ee35045f222b6109faba037c7b842f91965df9988321",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/vectorize-io/hindsight/releases/latest",
+          "exit_code": 0,
+          "started_at": "2026-10-08T14:03:36.238Z",
+          "ended_at": "2026-10-08T14:03:36.567Z",
+          "stdout_sha256": "aadc7a327fdcdff12b0f773d5fcd514f41c24f2e1f5d1483f90f70f6e9d8cd81",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/vectorize-io/hindsight/commits/5fc4ce20917b916240cef27c212c387a177f115b",
+          "exit_code": 0,
+          "started_at": "2026-10-08T14:03:36.240Z",
+          "ended_at": "2026-10-08T14:03:36.650Z",
+          "stdout_sha256": "3327040622b17c631f893b24ddbde4789f604b8927a04ec60457b2c75396f483",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/vectorize-io/hindsight/commits/v0.10.2",
+          "exit_code": 0,
+          "started_at": "2026-10-08T14:04:04.117Z",
+          "ended_at": "2026-10-08T14:04:04.619Z",
+          "stdout_sha256": "3327040622b17c631f893b24ddbde4789f604b8927a04ec60457b2c75396f483",
+          "status": "ok"
+        }
+      ],
+      "canonical_repository": "https://github.com/vectorize-io/hindsight",
+      "archived": false,
+      "disabled": false,
+      "default_branch": "main",
+      "pushed_at": "2026-10-08T13:12:44Z",
+      "license_spdx": "MIT",
+      "latest_stable_release": {
+        "tag_name": "v0.10.2",
+        "published_at": "2026-09-29T10:06:40Z",
+        "html_url": "https://github.com/vectorize-io/hindsight/releases/tag/v0.10.2",
+        "target_commitish": "main",
+        "prerelease": false,
+        "draft": false
+      },
+      "selected_pin_source": {
+        "ref": "5fc4ce20917b916240cef27c212c387a177f115b",
+        "sha": "5fc4ce20917b916240cef27c212c387a177f115b",
+        "html_url": "https://github.com/vectorize-io/hindsight/commit/5fc4ce20917b916240cef27c212c387a177f115b",
+        "committed_at": "2026-09-29T09:40:54Z"
+      },
+      "latest_release_source": {
+        "ref": "v0.10.2",
+        "sha": "5fc4ce20917b916240cef27c212c387a177f115b",
+        "html_url": "https://github.com/vectorize-io/hindsight/commit/5fc4ce20917b916240cef27c212c387a177f115b",
+        "committed_at": "2026-09-29T09:40:54Z"
+      },
+      "status": "metadata_checked",
+      "adoption_recommendation": "retain_selected_pending_capability_comparison",
+      "source_pin_kind": "git_commit",
+      "primary_repository": "https://github.com/vectorize-io/hindsight",
+      "release_relationship": "selected_version_matches_latest_stable",
+      "selected_pin_matches_latest_release_commit": true
     }
   ],
   "stars": {
@@ -6897,6 +6971,13 @@
         "headroom"
       ],
       "methodology": "Current selection identities synchronized with installed CLI readbacks and vendor release pins in evidence/receipts/2604-drift-version-readback-20261008.json; original dated checks, release observations and snapshot summary retained. This refresh establishes metadata only."
+    },
+    {
+      "checked_at": "2026-10-08T14:04:04.619Z",
+      "component_ids": ["hindsight"],
+      "api_commands": 4,
+      "api_nonzero_results": 0,
+      "methodology": "Add the missing selected Hindsight component using the existing native gh api endpoint method: repository, latest stable release, selected commit and release tag commit. The current release and both commit responses agree at v0.10.2/5fc4ce20917b916240cef27c212c387a177f115b. Summary counts include this four-call addition; every earlier component, star observation and dated refresh remains unchanged. This is public metadata verification, not a new host or provider acceptance run."
     }
   ]
 }

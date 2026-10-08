@@ -1747,8 +1747,11 @@ class StandingRuleSurfacesTests(unittest.TestCase):
         "- Decide by evidence: a choice stands when primary sources and reproduced results on the actual change agree, "
         "measured with upstream harnesses. Agreement, recency, popularity and incumbency are not evidence. Keep measured "
         "results, simulations and untested boundaries distinct.\n"
-        "- The ecosystem compounds: each choice adopts the current best converged practice and is replaced when the "
-        "live landscape converges on a better-evidenced one. When a claim proves wrong, record the correction.\n"
+        "- The ecosystem compounds: a request is a starting point, not a boundary. Proceed where the evidence "
+        "converges, and apply or propose the related improvements the work surfaces, at a moment that keeps the "
+        "current focus and any protected window intact. Each choice adopts the current best converged practice and "
+        "is replaced when the live landscape converges on a better-evidenced one. When a claim proves wrong, record "
+        "the correction.\n"
     )
     LAYERS = ("examples/claude-native/CLAUDE.md", "adoption/templates/codex.AGENTS.template.md",
               "adoption/new-wsl/claude-user-instructions.md", "adoption/new-wsl/codex-user-instructions.md",
@@ -1845,8 +1848,9 @@ class PortableTopRuleTests(unittest.TestCase):
     # docs/decisions/2026-10-07-instruction-core.md lowers them to 20880/16783 (the landing tree + 5%).
     # The philosophy-only blocks of 2026-10-08 (docs/decisions/2026-10-08-philosophy-only-rules.md: the Claude block
     # keeps the StructuredOutput line, the Codex block carries rtk's default awareness paragraph) measure 3942 (Claude)
-    # and 4043 (Codex) bytes with startup_files below, so the ceilings are 4140 and 4246.
-    STARTUP_BUDGET_BYTES = {"claude": 4140, "codex": 4246}
+    # and 4043 (Codex) bytes with startup_files below. The owner's proactive amendment on 2026-10-08 adds 224 bytes
+    # to each core copy; two loaded copies per client measure 4390/4491 bytes. The same 5% formula gives 4610/4716.
+    STARTUP_BUDGET_BYTES = {"claude": 4610, "codex": 4716}
     # The four rules of the core (2026-10-08): research before acting with named sources, upstream as the truth with
     # the check order, decisions by evidence measured with upstream harnesses, and the compounding ecosystem with the
     # recorded correction.
