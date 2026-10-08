@@ -154,8 +154,8 @@ first establish that it contains only that task's immutable tool files, not a
 database, model cache, project checkout or account store. Package deletion was
 not required to establish the retained native execution results.
 
-The working WSL vLLM pin is 0.30.0 since 2026-09-25, qualified against 0.25.0
-on the same host before the switch; 0.25.0 stays installed for rollback.
+The working WSL vLLM pin is 0.31.0 ([current installed binding](../evidence/receipts/vllm-031-working-pin-binding-20261008.json)); keep the retained 0.30.0 prefix for rollback. This records existing active state, without a new install/restart/model run or complete both-client operation acceptance.
+The dated 0.30.0 qualification from 2026-09-25 compared 0.25.0; its original input/dependency scope and 0.25.0 rollback remain historical.
 Version 0.29.0 failed real startup with unavailable UVA support. Preserve the
 accepted environment and model/vector data; repeating installation until the
 version number is newer would not resolve such a compatibility failure, so a

@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "id": "vllm-031-working-pin-binding-20261008",
+  "kind": "upstream_provenance",
+  "recorded_at_utc": "2026-10-08",
+  "component_ids": [
+    "vllm"
+  ],
+  "claim": "Current foundation vLLM0.31.0 is active and its selected executable/version is bound to the official unyankedwheel via retainednativeuvdownload/index metadata, cachearchive/installedhardlinks and vendorRECORD. This corrects the stale0.30workingpin; no new install/restart/modelrun occurs.",
+  "limitations": [
+    "Installation binding and active nativeunit/version metadata only; not dual-readerS4/clientoperation, model/GPUquality, fullpayload/wholewheelrehash, crashrecovery or newprovideracceptance.",
+    "The currentClaudehistoricalrow45readerPASS and laterGPToperation-barFAIL are retained separately. Bothconfirminstallbinding; completeclientproduceroperationgate remainsopen.",
+    "Originalinstallactor/argv/exitreceipt not fully recovered; cachedoriginassociation/3hardlinkpairs are the reproducedevidence, not a reconstructedinstallercommand.",
+    "0.30prefixretainedforrollback butcurrentTorch2.13 dependencygraphdoesnotreplaySeptember'sexactenvironment;0.29WSL UVA failure remainshistorical.",
+    "No new host/client/runtime/modelroute changes, secrets/authstore access, providerbilling or token-efficiencyclaim."
+  ],
+  "data": {
+    "authorization": "co-opA56dated2026-10-08T14:29:41Z explicitlyrecordlivefoundationpin0.31.0; noinstall/restart/lockchange",
+    "source": {
+      "repository": "https://github.com/vllm-project/vllm",
+      "tag": "v0.31.0",
+      "commit": "db9527a46873454610df6dbedf79a36d6bf1a7f6",
+      "published_at": "2026-10-05T06:44:55Z",
+      "wheel_sha256": "39132b433967f0962d03d8a5f633b9bee6b32708f566c7d5637b79f8d0ef3433",
+      "yanked": false
+    },
+    "safe_native_observations": {
+      "observed_window": "2026-10-08T15:25Z–15:27Z",
+      "active_state": {
+        "command": "systemctl --user show vllm-embed.service --property=ActiveState --value",
+        "exit_code": 0,
+        "returned": "active"
+      },
+      "executable_match": {
+        "expected_logical_prefix": "foundation-vllm-0.31.0/bin/vllm",
+        "exit_code": 0,
+        "returned_boolean": true,
+        "scope": "Only fixedboolean surfaced; no otherExecStartargumentbytes printed."
+      },
+      "metadata_only": {
+        "current_vllm": "0.31.0",
+        "rollback_vllm": "0.30.0",
+        "python": "3.13.16",
+        "exit_code": 0,
+        "method": "prefixPython -I -S readsdistributionmetadatawithoutimportingvLLM"
+      },
+      "historical_pipcheck": {
+        "source_receipt_sha256": "34a43a97ecb7a7e326a81c2b6f5f6cbcf8ef126a493dd125019dced9630fe274",
+        "date": "2026-10-06",
+        "current_and_rollback_exit_code": 0,
+        "reused_not_rerun": true
+      }
+    },
+    "bindings": {
+      "install_join_sha256": "74a69d871cf0b766d39613df6d0f9f72be718b9cc18bea105b57e53c4dfc9112",
+      "download_record_sha256": "14d2ada8dd62623d76136326c8b1958bdfcea95754ab290a57298688b6ba5d79",
+      "digest_ascii_offset": 39,
+      "archive_id_offset": 5,
+      "index_record_sha256": "8537ec1ca8104d14505a55396f68486a34167a8d0c6a5cb42c7b4647a9047817",
+      "digest_binary_offset": 81329,
+      "installed_file_hardlink_matches": 3,
+      "files": [
+        {
+          "path": "vllm-0.31.0.dist-info/METADATA",
+          "sha256": "a9d740caaeff8f0490b2223fe513c555b237e80fa6f8a839f14aa882d7712669"
+        },
+        {
+          "path": "vllm-0.31.0.dist-info/WHEEL",
+          "sha256": "3195b844c385a39b126f4c647a4bee9c534d9bc9d95a3025edc887ed33933941"
+        },
+        {
+          "path": "vllm/__init__.py",
+          "sha256": "087e15875e49ba50f4969c2229d450bb8397302ea9344b3a3bd06ee400263ebd"
+        }
+      ],
+      "record_sha256": "42b2205c6fa3ede3ad329ec24a4f0ce5358534c47ffc73c0d67d7e844c929d2d",
+      "installer": "uv",
+      "installer_sha256": "e6184ce10e266134fdcfa401e8f1a95005bcd4f18d16b62b757323e2833fe9a9"
+    },
+    "readers": [
+      {
+        "family": "Claude",
+        "sha256": "3e463f71e32fc3d87d5f678fd9a7f91641a0ae814a550356ca946e617011fefb",
+        "dated_verdict": "row45PASS; limits retained"
+      },
+      {
+        "family": "GPT",
+        "sha256": "330de2e3d3c5b5153ace869a1ccd1cdfcf606db9a331acd7ae62915924909e95",
+        "verdict": "installbindingCONFIRMED; completeoperationbarFAIL"
+      }
+    ],
+    "corrected_history": "Originalvendorcomparisonheld_vllm_as_tradingruntime wasmisclassified. CurrentA56andprimarynativeproofestablishalreadyrunningfoundationpin; retainoriginalsweeprecordwiththisadditivecorrection.",
+    "inverse": "Keepcurrent0.30rollbackprefix/model/vectorstate; no inverse executed, no service restart. Futureactualrollback requiresareaowner/currentinputcheckandnativecost/GPUgate."
+  }
+}

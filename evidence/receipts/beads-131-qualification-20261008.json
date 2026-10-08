@@ -1,0 +1,495 @@
+{
+  "schema_version": 1,
+  "id": "beads-131-qualification-20261008",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-10-08",
+  "component_ids": [
+    "beads"
+  ],
+  "claim": "Beads1.3.1@c1c4b642 passed a new isolated embedded-Dolt task lifecycle: open, claim/in_progress, separate-process show, close and empty ready queue. Publisher checksum and native gh attestation verified. The owned installation/project were retired after all processes exited.",
+  "limitations": [
+    "No upstream test suite was run; local native fixture establishes bounded embedded-Dolt task lifecycle only.",
+    "No upgrade/migration of an existing 1.3.0 issue store, live daemon, concurrent writers, remote sync, real-agent integration, macOS or second-host acceptance.",
+    "No repository pin, selected host binary, launcher, service or us-equities-runtime changed; parent integrates only accepted scope.",
+    "Init printed vendor anonymous metrics notice before bd metrics off in the owned XDG config. No usage counters or network observation was captured; transmission during initial init is unknown.",
+    "No model/provider/GPU/broker/credential/auth-store calls. Public release, archive and attestation network retrieval only; initial metrics transmission unknown as above."
+  ],
+  "data": {
+    "original_private_receipt_sha256": "5da0af8b5c369085e6cc6f6ce00d5493498afa841397df2e59d3503155d773e7",
+    "projection": {
+      "component_id": "beads",
+      "version": "1.3.1",
+      "source_pin": "c1c4b642ac1c08d8c828007a1c2f96e47e43ef7c",
+      "result": "PASS",
+      "evidence_class": "native_fixture",
+      "scope": "Official Linux x86_64 release archive installed in a private prefix; disposable embedded-Dolt task lifecycle; scoped retirement.",
+      "primary_sources": {
+        "repository": "https://github.com/gastownhall/beads",
+        "release": "https://github.com/gastownhall/beads/releases/tag/v1.3.1",
+        "immutable_source": "https://github.com/gastownhall/beads/tree/c1c4b642ac1c08d8c828007a1c2f96e47e43ef7c",
+        "release_metadata": {
+          "id": 400512291,
+          "tag_name": "v1.3.1",
+          "prerelease": false,
+          "draft": false,
+          "published_at": "2026-09-30T23:37:36Z"
+        },
+        "tag_commit_read": {
+          "observed_utc": "2026-10-08T14:06:01.815209Z",
+          "argv": [
+            "gh",
+            "api",
+            "--cache",
+            "120s",
+            "repos/gastownhall/beads/commits/v1.3.1",
+            "--jq",
+            "{sha,html_url}"
+          ],
+          "rc": 0,
+          "returned_metadata": {
+            "html_url": "https://github.com/gastownhall/beads/commit/c1c4b642ac1c08d8c828007a1c2f96e47e43ef7c",
+            "sha": "c1c4b642ac1c08d8c828007a1c2f96e47e43ef7c"
+          },
+          "stderr": ""
+        },
+        "official_docs": [
+          "https://github.com/gastownhall/beads/blob/c1c4b642ac1c08d8c828007a1c2f96e47e43ef7c/docs/getting-started/installation.md",
+          "https://github.com/gastownhall/beads/blob/c1c4b642ac1c08d8c828007a1c2f96e47e43ef7c/docs/cli-reference/init.md",
+          "https://github.com/gastownhall/beads/blob/c1c4b642ac1c08d8c828007a1c2f96e47e43ef7c/docs/architecture/dolt.md",
+          "https://github.com/gastownhall/beads/blob/c1c4b642ac1c08d8c828007a1c2f96e47e43ef7c/docs/recovery/uninstalling.md"
+        ],
+        "upstream_release_notes": "v1.3.1 tagged qualified rc.2 code; release notes list green publisher release pipeline and archived binaries. Publisher reported tests are source_review, distinct from local native fixture."
+      },
+      "installation": {
+        "archive_url": "https://github.com/gastownhall/beads/releases/download/v1.3.1/beads_1.3.1_linux_amd64.tar.gz",
+        "archive_sha256": "3219443a9734b89b93fb16ee8d65844759fa1b3cd3cf139c606b7353cfb0715c",
+        "publisher_checksums_url": "https://github.com/gastownhall/beads/releases/download/v1.3.1/checksums.txt",
+        "checksums_sha256": "8c4f1d28c26b179e471534c16712aef66ba57e3060ca339a6601b919ec3ab204",
+        "checksums_native_argv": [
+          "sha256sum",
+          "--check",
+          "--ignore-missing",
+          "checksums.txt"
+        ],
+        "checksums_cwd": "<qualification-root>/qualify-beads/downloads",
+        "checksums_rc": 0,
+        "checksums_stdout": "beads_1.3.1_linux_amd64.tar.gz: OK\n",
+        "checksums_stderr": "",
+        "archive_entries": [
+          "CHANGELOG.md",
+          "LICENSE",
+          "README.md",
+          "bd"
+        ],
+        "extract_native_argv": [
+          "tar",
+          "--extract",
+          "--gzip",
+          "--file",
+          "downloads/beads_1.3.1_linux_amd64.tar.gz",
+          "--directory",
+          "prefix-1.3.1"
+        ],
+        "extract_rc": 0,
+        "installed_binary_sha256": "a8f48d771b9e11eccfced4aed72923b59eda746f7a9b425e7ca1af7a51251653",
+        "version_native_argv": [
+          "prefix-1.3.1/bd",
+          "version"
+        ],
+        "version_rc": 0,
+        "version_stdout": "bd version 1.3.1 (c1c4b642a: HEAD@c1c4b642ac1c)\n",
+        "version_stderr": "",
+        "installation_timestamps": "Download, extract and version command UTC start/end not retained; native lifecycle below has original start/end. Do not infer them from receipt creation time."
+      },
+      "attestation": {
+        "native_argv": [
+          "gh",
+          "attestation",
+          "verify",
+          "downloads/beads_1.3.1_linux_amd64.tar.gz",
+          "--repo",
+          "gastownhall/beads",
+          "--format",
+          "json"
+        ],
+        "submitted_wrapper_argv": [
+          "rtk",
+          "proxy",
+          "gh",
+          "attestation",
+          "verify",
+          "downloads/beads_1.3.1_linux_amd64.tar.gz",
+          "--repo",
+          "gastownhall/beads",
+          "--format",
+          "json"
+        ],
+        "cwd": "<qualification-root>/qualify-beads",
+        "rc": 0,
+        "raw_stdout_file": "evidence/attestation-json.stdout",
+        "raw_stdout_sha256": "aaa0cee333df96fc4150af8ed4dd79f57122f2b9c5d280e181c2f6af7c4171da",
+        "raw_stderr_file": "evidence/attestation-json.stderr",
+        "stderr": "",
+        "returned_projection": {
+          "certificate": {
+            "subjectAlternativeName": "https://github.com/gastownhall/beads/.github/workflows/release.yml@refs/tags/v1.3.1",
+            "issuer": "https://token.actions.githubusercontent.com",
+            "githubWorkflowSHA": "c1c4b642ac1c08d8c828007a1c2f96e47e43ef7c",
+            "githubWorkflowRepository": "gastownhall/beads",
+            "githubWorkflowRef": "refs/tags/v1.3.1",
+            "sourceRepositoryDigest": "c1c4b642ac1c08d8c828007a1c2f96e47e43ef7c",
+            "buildConfigURI": "https://github.com/gastownhall/beads/.github/workflows/release.yml@refs/tags/v1.3.1",
+            "runInvocationURI": "https://github.com/gastownhall/beads/actions/runs/36775172697/attempts/1"
+          },
+          "verifiedTimestamps": [
+            {
+              "type": "Tlog",
+              "uri": "https://rekor.sigstore.dev",
+              "timestamp": "2026-09-30T20:26:14-04:00"
+            }
+          ],
+          "statement_subject": [
+            {
+              "name": "beads_1.3.1_linux_amd64.tar.gz",
+              "digest": {
+                "sha256": "3219443a9734b89b93fb16ee8d65844759fa1b3cd3cf139c606b7353cfb0715c"
+              }
+            }
+          ]
+        },
+        "utc_start_end": null
+      },
+      "native_invocation": {
+        "launch": "exec_command shell invoked vendor bd through env -i. Native output redirected before any summarization; exact returned output retained in evidence files.",
+        "git_preparation_rc": 0,
+        "environment": {
+          "PATH": "/usr/bin:/bin",
+          "GIT_CONFIG_GLOBAL": "/dev/null",
+          "GIT_CONFIG_NOSYSTEM": "1",
+          "XDG_CONFIG_HOME": "<qualification-root>/qualify-beads/config",
+          "XDG_CACHE_HOME": "<qualification-root>/qualify-beads/cache",
+          "BEADS_DIR": "<qualification-root>/qualify-beads/project/.beads",
+          "BD_ACTOR": "currency-qualification"
+        },
+        "fixture_data": "One synthetic task in new owned project; fixture identity is example.invalid. No live issue DB or credential store read.",
+        "native_results": [
+          {
+            "name": "init",
+            "start_utc": "2026-10-08T14:22:30.636857113Z",
+            "end_utc": "2026-10-08T14:22:36.537236028Z",
+            "rc": 0,
+            "stdout": "  Repository ID: e55d6694\n  Clone ID: 7369d96f09023605\n  ✓ Committed beads files to git\n\n✓ bd initialized successfully!\n\n  Backend: dolt\n  Mode: embedded\n  Database: qbd\n  Issue prefix: qbd\n  Issues will be named: qbd-<hash> (e.g., qbd-a3f2dd)\n\nRun bd quickstart to get started.\n\n",
+            "stderr": "Thanks for using bd! Quick heads-up: bd shares anonymous usage metrics —\n   just which commands get run (plus the bd version and OS platform), never your\n   issues, paths, remotes, identity, or anything you type. Seeing how people use\n   bd is how we decide what to improve next, so it genuinely makes bd better for\n   everyone.\n      Curious what's sent?   bd metrics example\n      Prefer to opt out?     bd metrics off    (one command, no restart needed)\n\n\n⚠ No Dolt remote configured\n  Issues are stored in local Dolt. .beads/issues.jsonl is an export,\n  not cross-machine sync or the source of truth.\n  To enable durable sync, add a git origin and then run:\n    bd dolt push\n",
+            "stdout_sha256": "040b5740f278e7dd72cb9825d4225ada44b3ae7b44b3a004fd059b646034689c",
+            "stderr_sha256": "d58f782e500347fff9cae0e499a3d0a8a36c902340f6408ca274013bf7bf18b8",
+            "native_argv": [
+              "<qualification-root>/qualify-beads/prefix-1.3.1/bd",
+              "init",
+              "--skip-agents",
+              "--skip-hooks",
+              "--non-interactive",
+              "--prefix",
+              "qbd"
+            ],
+            "cwd": "<qualification-root>/qualify-beads/project",
+            "raw_stdout_file": "evidence/init.stdout",
+            "raw_stderr_file": "evidence/init.stderr",
+            "evidence_class": "native_fixture",
+            "upstream_test_run": false
+          },
+          {
+            "name": "metrics-off",
+            "start_utc": "2026-10-08T14:23:09.951376664Z",
+            "end_utc": "2026-10-08T14:23:10.036132373Z",
+            "rc": 0,
+            "stdout": "Anonymous usage metrics are now OFF. No usage data will be collected or sent.\nTurn them back on anytime with `bd metrics on`. Thanks for giving them a try!\n",
+            "stderr": "",
+            "stdout_sha256": "b2d2eaf673a4a2aabb4345e33cadaff9f25c4537a0f81e1b1c2f84b32644a6f5",
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "native_argv": [
+              "<qualification-root>/qualify-beads/prefix-1.3.1/bd",
+              "metrics",
+              "off"
+            ],
+            "cwd": "<qualification-root>/qualify-beads/project",
+            "raw_stdout_file": "evidence/metrics-off.stdout",
+            "raw_stderr_file": "evidence/metrics-off.stderr",
+            "evidence_class": "native_fixture",
+            "upstream_test_run": false
+          },
+          {
+            "name": "ready-before",
+            "start_utc": "2026-10-08T14:23:10.040687688Z",
+            "end_utc": "2026-10-08T14:23:10.416351354Z",
+            "rc": 0,
+            "stdout": "[]\n",
+            "stderr": "",
+            "stdout_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "native_argv": [
+              "<qualification-root>/qualify-beads/prefix-1.3.1/bd",
+              "ready",
+              "--json"
+            ],
+            "cwd": "<qualification-root>/qualify-beads/project",
+            "raw_stdout_file": "evidence/ready-before.stdout",
+            "raw_stderr_file": "evidence/ready-before.stderr",
+            "evidence_class": "native_fixture",
+            "upstream_test_run": false
+          },
+          {
+            "name": "create",
+            "start_utc": "2026-10-08T14:23:10.420516891Z",
+            "end_utc": "2026-10-08T14:23:11.027554118Z",
+            "rc": 0,
+            "stdout": "{\n  \"created_at\": \"2026-10-08T14:23:10.839290606Z\",\n  \"created_by\": \"currency-qualification\",\n  \"id\": \"qbd-sjj\",\n  \"issue_type\": \"task\",\n  \"owner\": \"fixture@example.invalid\",\n  \"priority\": 2,\n  \"schema_version\": 1,\n  \"status\": \"open\",\n  \"title\": \"Disposable currency qualification task\",\n  \"updated_at\": \"2026-10-08T14:23:10.839290606Z\"\n}\n",
+            "stderr": "",
+            "stdout_sha256": "c00e72b338537dc4fca66d1192812ce3ee1a106da0845c7da9add30f1dbebd9b",
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "native_argv": [
+              "<qualification-root>/qualify-beads/prefix-1.3.1/bd",
+              "create",
+              "Disposable currency qualification task",
+              "--type",
+              "task",
+              "--json"
+            ],
+            "cwd": "<qualification-root>/qualify-beads/project",
+            "raw_stdout_file": "evidence/create.stdout",
+            "raw_stderr_file": "evidence/create.stderr",
+            "evidence_class": "native_fixture",
+            "upstream_test_run": false
+          },
+          {
+            "name": "ready-after-create",
+            "start_utc": "2026-10-08T14:23:37.610180863Z",
+            "end_utc": "2026-10-08T14:23:37.884956772Z",
+            "rc": 0,
+            "stdout": "[\n  {\n    \"id\": \"qbd-sjj\",\n    \"title\": \"Disposable currency qualification task\",\n    \"status\": \"open\",\n    \"priority\": 2,\n    \"issue_type\": \"task\",\n    \"owner\": \"fixture@example.invalid\",\n    \"created_at\": \"2026-10-08T14:23:11Z\",\n    \"created_by\": \"currency-qualification\",\n    \"updated_at\": \"2026-10-08T14:23:11Z\",\n    \"dependency_count\": 0,\n    \"dependent_count\": 0,\n    \"comment_count\": 0\n  }\n]\n",
+            "stderr": "",
+            "stdout_sha256": "1dbd58de88b94c250c66df9edd65c1836a2d1e06403aefa14367937030037555",
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "native_argv": [
+              "<qualification-root>/qualify-beads/prefix-1.3.1/bd",
+              "ready",
+              "--json"
+            ],
+            "cwd": "<qualification-root>/qualify-beads/project",
+            "raw_stdout_file": "evidence/ready-after-create.stdout",
+            "raw_stderr_file": "evidence/ready-after-create.stderr",
+            "evidence_class": "native_fixture",
+            "upstream_test_run": false
+          },
+          {
+            "name": "claim",
+            "start_utc": "2026-10-08T14:23:37.889019702Z",
+            "end_utc": "2026-10-08T14:23:38.378225741Z",
+            "rc": 0,
+            "stdout": "[\n  {\n    \"id\": \"qbd-sjj\",\n    \"title\": \"Disposable currency qualification task\",\n    \"status\": \"in_progress\",\n    \"priority\": 2,\n    \"issue_type\": \"task\",\n    \"assignee\": \"currency-qualification\",\n    \"owner\": \"fixture@example.invalid\",\n    \"created_at\": \"2026-10-08T14:23:11Z\",\n    \"created_by\": \"currency-qualification\",\n    \"updated_at\": \"2026-10-08T14:23:38Z\",\n    \"started_at\": \"2026-10-08T14:23:38Z\",\n    \"lease_expires_at\": \"2026-10-08T14:28:38Z\",\n    \"heartbeat_at\": \"2026-10-08T14:23:38Z\"\n  }\n]\n",
+            "stderr": "",
+            "stdout_sha256": "e5619afa098ad5d19410f7d2b90b45d6710cfcae7383b3e91020828dc3aebbb0",
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "native_argv": [
+              "<qualification-root>/qualify-beads/prefix-1.3.1/bd",
+              "update",
+              "qbd-sjj",
+              "--claim",
+              "--json"
+            ],
+            "cwd": "<qualification-root>/qualify-beads/project",
+            "raw_stdout_file": "evidence/claim.stdout",
+            "raw_stderr_file": "evidence/claim.stderr",
+            "evidence_class": "native_fixture",
+            "upstream_test_run": false
+          },
+          {
+            "name": "show",
+            "start_utc": "2026-10-08T14:23:38.382376055Z",
+            "end_utc": "2026-10-08T14:23:38.846892603Z",
+            "rc": 0,
+            "stdout": "[\n  {\n    \"id\": \"qbd-sjj\",\n    \"title\": \"Disposable currency qualification task\",\n    \"status\": \"in_progress\",\n    \"priority\": 2,\n    \"issue_type\": \"task\",\n    \"assignee\": \"currency-qualification\",\n    \"owner\": \"fixture@example.invalid\",\n    \"created_at\": \"2026-10-08T14:23:11Z\",\n    \"created_by\": \"currency-qualification\",\n    \"updated_at\": \"2026-10-08T14:23:38Z\",\n    \"started_at\": \"2026-10-08T14:23:38Z\",\n    \"lease_expires_at\": \"2026-10-08T14:28:38Z\",\n    \"heartbeat_at\": \"2026-10-08T14:23:38Z\",\n    \"dependent_count\": 0,\n    \"dependency_count\": 0,\n    \"comment_count\": 0,\n    \"revision\": \"-436899880182287154\"\n  }\n]\n",
+            "stderr": "",
+            "stdout_sha256": "8906c2fce4c1b4fad0f6a8287792d307220f43954689dd7c29f40d22e9c8534b",
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "native_argv": [
+              "<qualification-root>/qualify-beads/prefix-1.3.1/bd",
+              "show",
+              "qbd-sjj",
+              "--json"
+            ],
+            "cwd": "<qualification-root>/qualify-beads/project",
+            "raw_stdout_file": "evidence/show.stdout",
+            "raw_stderr_file": "evidence/show.stderr",
+            "evidence_class": "native_fixture",
+            "upstream_test_run": false
+          },
+          {
+            "name": "close",
+            "start_utc": "2026-10-08T14:23:38.852053901Z",
+            "end_utc": "2026-10-08T14:23:39.396597590Z",
+            "rc": 0,
+            "stdout": "[\n  {\n    \"id\": \"qbd-sjj\",\n    \"title\": \"Disposable currency qualification task\",\n    \"status\": \"closed\",\n    \"priority\": 2,\n    \"issue_type\": \"task\",\n    \"assignee\": \"currency-qualification\",\n    \"owner\": \"fixture@example.invalid\",\n    \"created_at\": \"2026-10-08T14:23:11Z\",\n    \"created_by\": \"currency-qualification\",\n    \"updated_at\": \"2026-10-08T14:23:39Z\",\n    \"started_at\": \"2026-10-08T14:23:38Z\",\n    \"closed_at\": \"2026-10-08T14:23:39Z\",\n    \"close_reason\": \"Native disposable qualification complete\"\n  }\n]\n",
+            "stderr": "",
+            "stdout_sha256": "0a9e0d806f14facd55066b02777c060b85574695729b37c37c34ee1556d66f7b",
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "native_argv": [
+              "<qualification-root>/qualify-beads/prefix-1.3.1/bd",
+              "close",
+              "qbd-sjj",
+              "--reason",
+              "Native disposable qualification complete",
+              "--json"
+            ],
+            "cwd": "<qualification-root>/qualify-beads/project",
+            "raw_stdout_file": "evidence/close.stdout",
+            "raw_stderr_file": "evidence/close.stderr",
+            "evidence_class": "native_fixture",
+            "upstream_test_run": false
+          },
+          {
+            "name": "ready-after-close",
+            "start_utc": "2026-10-08T14:23:39.400518956Z",
+            "end_utc": "2026-10-08T14:23:39.666295379Z",
+            "rc": 0,
+            "stdout": "[]\n",
+            "stderr": "",
+            "stdout_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "native_argv": [
+              "<qualification-root>/qualify-beads/prefix-1.3.1/bd",
+              "ready",
+              "--json"
+            ],
+            "cwd": "<qualification-root>/qualify-beads/project",
+            "raw_stdout_file": "evidence/ready-after-close.stdout",
+            "raw_stderr_file": "evidence/ready-after-close.stderr",
+            "evidence_class": "native_fixture",
+            "upstream_test_run": false
+          },
+          {
+            "name": "show-closed",
+            "start_utc": "2026-10-08T14:23:39.671214219Z",
+            "end_utc": "2026-10-08T14:23:40.151265189Z",
+            "rc": 0,
+            "stdout": "[\n  {\n    \"id\": \"qbd-sjj\",\n    \"title\": \"Disposable currency qualification task\",\n    \"status\": \"closed\",\n    \"priority\": 2,\n    \"issue_type\": \"task\",\n    \"assignee\": \"currency-qualification\",\n    \"owner\": \"fixture@example.invalid\",\n    \"created_at\": \"2026-10-08T14:23:11Z\",\n    \"created_by\": \"currency-qualification\",\n    \"updated_at\": \"2026-10-08T14:23:39Z\",\n    \"started_at\": \"2026-10-08T14:23:38Z\",\n    \"closed_at\": \"2026-10-08T14:23:39Z\",\n    \"close_reason\": \"Native disposable qualification complete\",\n    \"dependent_count\": 0,\n    \"dependency_count\": 0,\n    \"comment_count\": 0,\n    \"revision\": \"1057391950092621125\"\n  }\n]\n",
+            "stderr": "",
+            "stdout_sha256": "3bffc9aac9a41997a1d90e29345a73c744fcf60bae358d4ad6084acaf15cd1f0",
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "native_argv": [
+              "<qualification-root>/qualify-beads/prefix-1.3.1/bd",
+              "show",
+              "qbd-sjj",
+              "--json"
+            ],
+            "cwd": "<qualification-root>/qualify-beads/project",
+            "raw_stdout_file": "evidence/show-closed.stdout",
+            "raw_stderr_file": "evidence/show-closed.stderr",
+            "evidence_class": "native_fixture",
+            "upstream_test_run": false
+          }
+        ]
+      },
+      "useful_observation": {
+        "returned_task_id": "qbd-sjj",
+        "before_ready": [],
+        "created_status": "open",
+        "ready_after_create_contains_returned_id": true,
+        "claimed_status": "in_progress",
+        "claimed_assignee": "currency-qualification",
+        "show_in_separate_process_status": "in_progress",
+        "close_status": "closed",
+        "after_ready": [],
+        "show_closed_in_separate_process_status": "closed",
+        "all_native_lifecycle_rcs": 0
+      },
+      "inverse": {
+        "mode": "scoped_retirement",
+        "process_check": {
+          "name": "process-check",
+          "start_utc": "2026-10-08T14:24:59.138342113Z",
+          "end_utc": "2026-10-08T14:24:59.478456982Z",
+          "rc": 1,
+          "stdout": "",
+          "stderr": "",
+          "native_argv": [
+            "fuser",
+            "--silent",
+            "prefix-1.3.1/bd"
+          ],
+          "cwd": "<qualification-root>/qualify-beads",
+          "rc_interpretation": "fuser rc1 with empty output means no process found mapping the owned binary; all prior native CLI processes returned."
+        },
+        "retirement": {
+          "name": "inverse",
+          "start_utc": "2026-10-08T14:24:59.485613921Z",
+          "end_utc": "2026-10-08T14:24:59.498734754Z",
+          "rc": 0,
+          "stdout": "owned disposable prefix, project, config and cache retired under retired/; original paths absent; downloads and evidence retained\n",
+          "stderr": "",
+          "native_argv": [
+            "mv",
+            "--",
+            "prefix-1.3.1",
+            "project",
+            "config",
+            "cache",
+            "retired/"
+          ],
+          "cwd": "<qualification-root>/qualify-beads"
+        },
+        "post_observation": {
+          "original_prefix_exists": false,
+          "original_project_exists": false,
+          "retired_prefix_exists": true,
+          "retired_project_exists": true
+        },
+        "old_host_binary_database": "untouched",
+        "retained": "retired private prefix/project/config/cache plus original download and native output; not uninstalled/deleted"
+      },
+      "failed_or_unusable_attempts": [
+        {
+          "kind": "output_unusable",
+          "argv": [
+            "gh",
+            "attestation",
+            "verify",
+            "downloads/beads_1.3.1_linux_amd64.tar.gz",
+            "--repo",
+            "gastownhall/beads"
+          ],
+          "rc": 0,
+          "stdout": "",
+          "stderr": "",
+          "raw_output_files": [
+            "evidence/attestation.stdout",
+            "evidence/attestation.stderr"
+          ],
+          "resolution": "Empty output was insufficient provenance. Native gh attestation re-read via RTK proxy and --format json; actual JSON retained; pass separated from initial empty presentation."
+        },
+        {
+          "kind": "tool_policy_rejection_before_execution",
+          "action": "rm -rf -- prefix-1.3.1 project config cache",
+          "reason": "rm -f style commands are not permitted. Use a safer approach",
+          "native_executed": false,
+          "rc": null,
+          "resolution": "Safer native mv retirement, original active paths absent; original rejection retained here, no forced deletion."
+        }
+      ],
+      "limits": [
+        "No upstream test suite was run; local native fixture establishes bounded embedded-Dolt task lifecycle only.",
+        "No upgrade/migration of an existing 1.3.0 issue store, live daemon, concurrent writers, remote sync, real-agent integration, macOS or second-host acceptance.",
+        "No repository pin, selected host binary, launcher, service or us-equities-runtime changed; parent integrates only accepted scope.",
+        "Init printed vendor anonymous metrics notice before bd metrics off in the owned XDG config. No usage counters or network observation was captured; transmission during initial init is unknown.",
+        "No model/provider/GPU/broker/credential/auth-store calls. Public release, archive and attestation network retrieval only; initial metrics transmission unknown as above."
+      ],
+      "completeness_critic": "Scoped native oracle present and exercised through separate persisted commands. Migration/concurrency/remote/platform boundaries remain held; clean release identity, publisher checksum and cryptographic attestation agree. Do not promote this isolated fixture to full upstream acceptance."
+    },
+    "projection_note": "Compact sanitized projection of the actual native receipt/output; path and opaque runtime locators abstracted. Original native bytes/hash retained privately. No upstream test claim except unchanged promptfoo vendor fixtures."
+  },
+  "independent_completeness_critic": {
+    "result": "No bounded behavioral gap; public sanitation required",
+    "scope": "Cross-author Beads69artifact hashes and10native outputs; Promptfoo22artifact hashes/3unchanged fixtures and returned results verified. Syft/uv classes preserved without self-retest.",
+    "evidence_class": "Source/artifact review; no new native execution",
+    "remaining_boundaries": "Platform migration/concurrency/provider/signature/tracing and runtime SDK acceptance retain original receipt limits."
+  }
+}

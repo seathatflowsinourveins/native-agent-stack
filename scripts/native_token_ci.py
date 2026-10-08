@@ -59,7 +59,7 @@ SERENA_COMMIT = "c6fbd1c5932df2494ffa0020af5a9fbe80b82143"
 PINS = {"rtk": "0.51.0", "qmd": "2.8.3", "repomix": "1.18.1", "toon": "4.1.1",
         "mcporter": "0.14.2", "markitdown": "0.1.8", "ast-grep": "0.45.3",
         "ccusage": "20.0.26", "codebase-memory-mcp": "0.11.0", "headroom": "0.40.0",
-        "jcodemunch-mcp": "1.108.327", "context-mode": "1.0.169",
+        "jcodemunch-mcp": "1.108.333", "context-mode": "1.0.169",
         "serena": f"2.0.0.dev0 @ {SERENA_COMMIT}", "ai-memory": "2.4.1", "context-hub": "0.1.4",
         "agentsview": "0.44.0"}
 # The Linux adoption pins, checked against PINS for every tool they list (version, and Serena's
@@ -107,11 +107,11 @@ UV_TOOLS = {"markitdown": "markitdown", "headroom": "headroom-ai[mcp]",
 UV_GIT_TOOLS = {"serena": {"url": "https://github.com/oraios/serena", "commit": SERENA_COMMIT,
                            "environment": "serena-agent", "distribution": "serena_agent"}}
 # uv itself is plumbing, not one of the measured tools: pinned and hash-verified the
-# same way as adoption/pins-linux-x86_64.json's own uv 0.12.17 entry, so uv-tool-kind
+# same way as adoption/pins-linux-x86_64.json's own uv 0.12.23 entry, so uv-tool-kind
 # installs never depend on whatever the runner happens to have on PATH.
-UV_PIN = {"version": "0.12.17",
-          "url": "https://github.com/astral-sh/uv/releases/download/0.12.17/uv-x86_64-unknown-linux-gnu.tar.gz",
-          "sha256": "fa82fd8dde8e8eefdecada6aa0889666556cfceb690d06e0c3bca49eb3070a63"}
+UV_PIN = {"version": "0.12.23",
+          "url": "https://github.com/astral-sh/uv/releases/download/0.12.23/uv-x86_64-unknown-linux-gnu.tar.gz",
+          "sha256": "9167d72b3319674b6303c4cbe071854bba13ebdf3d76b1a7cbdc175471fb66d6"}
 # Harness, workflow, pin manifest and fixture inputs whose bytes each receipt records.
 SOURCE_FILES = ("scripts/native_token_ci.py", ".github/workflows/native-token-e2e.yml",
                 "manifests/stack.json", "fixtures/rag-note.md", "fixtures/records.json",

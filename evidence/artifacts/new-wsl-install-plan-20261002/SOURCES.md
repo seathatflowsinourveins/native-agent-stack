@@ -941,8 +941,8 @@ in this builder.
   and the authentication boundary of an overridden CODEX_HOME; `:232` documents
   `codex_path_override`
   ([provider](https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/site/docs/providers/openai-codex-sdk.md#L62)).
-  Retain the existing published 0.123.1 tarball SHA256 and unchanged upstream
-  echo fixtures documented above. `npm ls --global --prefix <owned-prefix>
+  Retain the unchanged 0.123.1 upstream echo fixtures documented above. The
+  current tarball digest is recorded in the 2026-10-08 target section below. `npm ls --global --prefix <owned-prefix>
   --all @anthropic-ai/claude-agent-sdk @openai/codex-sdk` checks both optional
   providers, as the verdict's install note requires. Native provider execution
   remains owed. The config explicitly selects both host binaries and native
@@ -1216,3 +1216,17 @@ This #723 source integration reuses the prior B2 metadata and preserves its fail
 - The handbook's maintained current-output contract is native-stack@4e07a17d55860d3ae15c7437a348d59ff2fc40a1:docs/decisions/2026-10-01-new-wsl-handbook-generator.md:665 and tests/test_new_wsl_handbook.py:1672-1689. The generator-owned receipt retains the previous pair while binding its current outputs exactly; all prior validation observations remain unchanged.
 
 J723c extends the existing test contracts, using CPython3.13's [Path.rglob](https://docs.python.org/3.13/library/pathlib.html#pathlib.Path.rglob) and [Path.is_file](https://docs.python.org/3.13/library/pathlib.html#pathlib.Path.is_file), matching this repository's check_plan.py recursive config reader at native-stack@4e07a17d55860d3ae15c7437a348d59ff2fc40a1:649. Nested drop-in contents remain part of port checks, and the exact root script set explicitly includes the frozen Inspector probe. The AgentsView current repin classification follows tests/test_agentsview_qualification.py:50-76,292-347; the older launcher fixtures remain dated predecessor inputs, not current pins. Native Git/Python/env commands no longer require RTK in CI or at runtime; optional parsing of earlier RTK-shaped client events remains supported. The already-landed currency update supplies the native git-grep registry recipe. Historical RTK observations and component-specific tests are retained.
+
+## Current portable version targets (2026-10-08, source projection)
+
+The current plan targets are jcodemunch-mcp 1.108.333, Promptfoo 0.124.0 and
+Syft 1.54.1; uv 0.12.23 remains the native bootstrap toolchain owner. This
+changes installation targets and exact version controls, with no destination
+execution claimed. Historical fixture sources and judge observations retain
+their original pins.
+
+- jCodeMunch: [bbe30fa299c4f82251233f25b8a0c5c56e2d407a README:91](https://github.com/jgravelle/jcodemunch-mcp/blob/bbe30fa299c4f82251233f25b8a0c5c56e2d407a/README.md#L91) supports `uv tool install`; [README:113](https://github.com/jgravelle/jcodemunch-mcp/blob/bbe30fa299c4f82251233f25b8a0c5c56e2d407a/README.md#L113) supplies the version command. The PyPI target is `jcodemunch-mcp==1.108.333`.
+- Promptfoo: [0.124.0 package metadata](https://registry.npmjs.org/promptfoo/0.124.0), source `30949931ee90c963acd487e97828c9441db0bcd4`; the native downloaded npm archive SHA256 is `d0aa69e35d40be9b37454ce7569e04c62af67f3b45dd679182e53b170ef69c24`. Installation preserves the optional SDK checks and all existing echo/failing/provider/paired-skill controls. Files named `promptfoo-0.123.1-basic.yaml` and `promptfoo-0.123.1-failing.yaml`, and the immutable SDK fixture fetches, remain their original unchanged inputs.
+- Syft: [v1.54.1 release](https://github.com/anchore/syft/releases/tag/v1.54.1), source `b254e6d92f28c3868a755f62fb3ca8f26e9fee76`; [README:48](https://github.com/anchore/syft/blob/b254e6d92f28c3868a755f62fb3ca8f26e9fee76/README.md#L48) documents the public-image scan retained by the destination gate. The Linux archive SHA256 is `c069905b391cc4c20a5ba65ad5c10be2a7ba074f8ea6ad203e24d14e303dad47`; the plan keeps the supported `mise use -g syft@1.54.1` route and exact source-commit check.
+- uv: [0.12.23 release](https://github.com/astral-sh/uv/releases/tag/0.12.23), source `46b84fd0bfec23b72f29e8e2185ba68a65052f48`; Linux archive SHA256 `9167d72b3319674b6303c4cbe071854bba13ebdf3d76b1a7cbdc175471fb66d6`. The source profile keeps CPython 3.13.15 and its original interpreter metadata unchanged. Platform installation and acceptance remain separately scoped.
+- Beads: [v1.3.1 release](https://github.com/gastownhall/beads/releases/tag/v1.3.1), source `c1c4b642ac1c08d8c828007a1c2f96e47e43ef7c`; no new install-plan owner is added for the selected optional task workflow.

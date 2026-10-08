@@ -1894,13 +1894,13 @@
     {
       "layer": "token-efficiency",
       "slot": "code-index",
-      "owner": "jcodemunch-mcp 1.108.327",
+      "owner": "jcodemunch-mcp 1.108.333",
       "repository": "https://github.com/jgravelle/jcodemunch-mcp",
-      "release": "v1.108.327",
+      "release": "v1.108.333",
       "installed": true,
       "route": "uv-tool",
       "commands": [
-        "UV_TOOL_DIR=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/python-tools\" UV_TOOL_BIN_DIR=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin\" uv tool install --python 3.13 jcodemunch-mcp==1.108.327"
+        "UV_TOOL_DIR=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/python-tools\" UV_TOOL_BIN_DIR=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin\" uv tool install --python 3.13 jcodemunch-mcp==1.108.333"
       ],
       "needs": {
         "sudo": false,
@@ -1912,16 +1912,16 @@
       },
       "version_pinned": true,
       "install_source": {
-        "url": "https://raw.githubusercontent.com/jgravelle/jcodemunch-mcp/6d5ae86c130f96624e2ca2d797fa3b853c210b9d/README.md#L91",
+        "url": "https://raw.githubusercontent.com/jgravelle/jcodemunch-mcp/bbe30fa299c4f82251233f25b8a0c5c56e2d407a/README.md#L91",
         "line": 91
       },
       "service": null,
       "acceptance": {
         "post_install": {
-          "command": "[[ \"$(\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/jcodemunch-mcp\" --version)\" == \"jcodemunch-mcp 1.108.327\" ]]",
+          "command": "[[ \"$(\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/jcodemunch-mcp\" --version)\" == \"jcodemunch-mcp 1.108.333\" ]]",
           "kind": "smoke",
           "source": {
-            "url": "https://raw.githubusercontent.com/jgravelle/jcodemunch-mcp/6d5ae86c130f96624e2ca2d797fa3b853c210b9d/README.md#L113",
+            "url": "https://raw.githubusercontent.com/jgravelle/jcodemunch-mcp/bbe30fa299c4f82251233f25b8a0c5c56e2d407a/README.md#L113",
             "line": 113
           }
         }
@@ -2568,7 +2568,7 @@
           "scope": "Empty public template; operator separately supplies canonical native roots in a private registry"
         },
         "readback_gate": "Provisioned cc-lanes UID plus panel-query results for1h/24h and browser readback of current native identities, freshness and unknown rows; not accepted by source rendering",
-          "rollback": "File-based rollback under the same Token efficiency provider: restore the previous grafana-dashboards/lanes.json if retaining Lanes. To withdraw cc-lanes, remove only that lanes.json and temporarily set disableDeletion=false on the nativestack2604-token-layer provider. Restart ns2604-grafana.service in a permitted slot; verify the anonymous /api/dashboards/uid/cc-lanes returns 404, then restore disableDeletion=true and restart/read back the provider configuration. Preserve token-layer.json, the provider, all other dashboards and the private registry. No administrator login or Grafana UI mutation is required."
+        "rollback": "File-based rollback under the same Token efficiency provider: restore the previous grafana-dashboards/lanes.json if retaining Lanes. To withdraw cc-lanes, remove only that lanes.json and temporarily set disableDeletion=false on the nativestack2604-token-layer provider. Restart ns2604-grafana.service in a permitted slot; verify the anonymous /api/dashboards/uid/cc-lanes returns 404, then restore disableDeletion=true and restart/read back the provider configuration. Preserve token-layer.json, the provider, all other dashboards and the private registry. No administrator login or Grafana UI mutation is required."
       }
     },
     {
@@ -3087,14 +3087,14 @@
     {
       "layer": "quality-evaluation",
       "slot": "promptfoo",
-      "owner": "Promptfoo 0.123.1",
+      "owner": "Promptfoo 0.124.0",
       "repository": "https://github.com/promptfoo/promptfoo",
-      "release": "0.123.1",
+      "release": "0.124.0",
       "installed": true,
       "route": "npm-global",
       "commands": [
-        "fetch_verified https://registry.npmjs.org/promptfoo/-/promptfoo-0.123.1.tgz 53471b239132b5e7a270fda458f78a1f1b920abb617ef4dc2b096608d480ee2f \"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/downloads/promptfoo-0.123.1/promptfoo-0.123.1.tgz\"",
-        "e=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}\"; npm install --global --include=optional --prefix \"$e/tools/promptfoo-0.123.1\" \"$e/downloads/promptfoo-0.123.1/promptfoo-0.123.1.tgz\"; mkdir -p \"$e/bin\"; ln -sfn \"$e/tools/promptfoo-0.123.1/bin/promptfoo\" \"$e/bin/promptfoo\"",
+        "fetch_verified https://registry.npmjs.org/promptfoo/-/promptfoo-0.124.0.tgz d0aa69e35d40be9b37454ce7569e04c62af67f3b45dd679182e53b170ef69c24 \"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/downloads/promptfoo-0.124.0/promptfoo-0.124.0.tgz\"",
+        "e=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}\"; npm install --global --include=optional --prefix \"$e/tools/promptfoo-0.124.0\" \"$e/downloads/promptfoo-0.124.0/promptfoo-0.124.0.tgz\"; mkdir -p \"$e/bin\"; ln -sfn \"$e/tools/promptfoo-0.124.0/bin/promptfoo\" \"$e/bin/promptfoo\"",
         "e=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}\"; if ! claude mcp get promptfoo >/dev/null 2>&1; then claude mcp add --scope user --transport stdio promptfoo -- env \"PROMPTFOO_CONFIG_DIR=$config_root/promptfoo-state\" PROMPTFOO_DISABLE_TELEMETRY=1 PROMPTFOO_DISABLE_UPDATE=1 \"$e/bin/promptfoo\" mcp --transport stdio; fi",
         "e=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}\"; codex mcp add --env \"PROMPTFOO_CONFIG_DIR=$config_root/promptfoo-state\" --env PROMPTFOO_DISABLE_TELEMETRY=1 --env PROMPTFOO_DISABLE_UPDATE=1 promptfoo -- \"$e/bin/promptfoo\" mcp --transport stdio; python3 -B \"$config_root/promptfoo-codex-env.py\"",
         "fetch_verified https://raw.githubusercontent.com/promptfoo/promptfoo/34f74d34e140b5e17d23770dfb2340057b1936b8/examples/openai-codex-sdk/skill-comparison/fixtures/v2/src/auth.ts 8ccab7495b98ca267dac72d66b8718bb96b5ab4333cbbc2121e7ff5511efac58 \"$tool_root/promptfoo-skill-fixtures/auth.ts\"",
@@ -3110,13 +3110,13 @@
       },
       "version_pinned": true,
       "install_source": {
-        "url": "https://raw.githubusercontent.com/promptfoo/promptfoo/34f74d34e140b5e17d23770dfb2340057b1936b8/site/docs/installation.md#L19",
-        "line": 19
+        "url": "https://registry.npmjs.org/promptfoo/0.124.0",
+        "line": 1
       },
       "service": null,
       "acceptance": {
         "post_install": {
-          "command": "pf=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/promptfoo\"\nexport PROMPTFOO_CONFIG_DIR=\"$config_root/promptfoo-state\" PROMPTFOO_DISABLE_TELEMETRY=1 PROMPTFOO_DISABLE_UPDATE=1\n[[ \"$(\"$pf\" --version)\" == \"0.123.1\" ]]\n\"$pf\" mcp --help >/dev/null\nnpm ls --global --prefix \"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/tools/promptfoo-0.123.1\" --all @anthropic-ai/claude-agent-sdk @openai/codex-sdk\nreceipt=\"$(mktemp -d \"${TMPDIR:-/tmp}/new-wsl-promptfoo.XXXXXX\")\"\ntrap 'rm -rf -- \"$receipt\"' EXIT\n\"$pf\" eval --config \"$config_root/promptfoo-0.123.1-basic.yaml\" --no-cache --no-share --no-write --no-table --no-progress-bar --output \"$receipt/pass.json\"\njq -e '.results.stats | .successes == 1 and .failures == 0 and .errors == 0' \"$receipt/pass.json\" >/dev/null\nrc=0\n\"$pf\" eval --config \"$config_root/promptfoo-0.123.1-failing.yaml\" --no-cache --no-share --no-write --no-table --no-progress-bar --output \"$receipt/fail.json\" || rc=$?\n[[ \"$rc\" == 100 ]]\njq -e '.results.stats | .successes == 0 and .failures == 1 and .errors == 0' \"$receipt/fail.json\" >/dev/null\nclaude mcp get promptfoo > \"$receipt/claude-wiring.txt\"\nrg -Fq \"Scope: User config\" \"$receipt/claude-wiring.txt\"\nrg -Fq \"Type: stdio\" \"$receipt/claude-wiring.txt\"\nrg -Fq -- \"$pf mcp --transport stdio\" \"$receipt/claude-wiring.txt\"\ncodex mcp get promptfoo --json | jq -e --arg pf \"$pf\" '.transport.command == $pf and .transport.args == [\"mcp\", \"--transport\", \"stdio\"] and (.transport.env_vars | index(\"GATEWAY_API_KEY\")) != null' >/dev/null",
+          "command": "pf=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/promptfoo\"\nexport PROMPTFOO_CONFIG_DIR=\"$config_root/promptfoo-state\" PROMPTFOO_DISABLE_TELEMETRY=1 PROMPTFOO_DISABLE_UPDATE=1\n[[ \"$(\"$pf\" --version)\" == \"0.124.0\" ]]\n\"$pf\" mcp --help >/dev/null\nnpm ls --global --prefix \"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/tools/promptfoo-0.124.0\" --all @anthropic-ai/claude-agent-sdk @openai/codex-sdk\nreceipt=\"$(mktemp -d \"${TMPDIR:-/tmp}/new-wsl-promptfoo.XXXXXX\")\"\ntrap 'rm -rf -- \"$receipt\"' EXIT\n\"$pf\" eval --config \"$config_root/promptfoo-0.123.1-basic.yaml\" --no-cache --no-share --no-write --no-table --no-progress-bar --output \"$receipt/pass.json\"\njq -e '.results.stats | .successes == 1 and .failures == 0 and .errors == 0' \"$receipt/pass.json\" >/dev/null\nrc=0\n\"$pf\" eval --config \"$config_root/promptfoo-0.123.1-failing.yaml\" --no-cache --no-share --no-write --no-table --no-progress-bar --output \"$receipt/fail.json\" || rc=$?\n[[ \"$rc\" == 100 ]]\njq -e '.results.stats | .successes == 0 and .failures == 1 and .errors == 0' \"$receipt/fail.json\" >/dev/null\nclaude mcp get promptfoo > \"$receipt/claude-wiring.txt\"\nrg -Fq \"Scope: User config\" \"$receipt/claude-wiring.txt\"\nrg -Fq \"Type: stdio\" \"$receipt/claude-wiring.txt\"\nrg -Fq -- \"$pf mcp --transport stdio\" \"$receipt/claude-wiring.txt\"\ncodex mcp get promptfoo --json | jq -e --arg pf \"$pf\" '.transport.command == $pf and .transport.args == [\"mcp\", \"--transport\", \"stdio\"] and (.transport.env_vars | index(\"GATEWAY_API_KEY\")) != null' >/dev/null",
           "kind": "smoke",
           "source": {
             "url": "https://raw.githubusercontent.com/promptfoo/promptfoo/34f74d34e140b5e17d23770dfb2340057b1936b8/test/smoke/eval.test.ts#L65",
@@ -3151,7 +3151,7 @@
         }
       },
       "config_paths": [
-        "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/tools/promptfoo-0.123.1",
+        "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/tools/promptfoo-0.124.0",
         "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/promptfoo",
         "$config_root/promptfoo-state",
         "$config_root/promptfoo-0.123.1-basic.yaml",
@@ -3287,11 +3287,11 @@
       "slot": "syft",
       "owner": "Syft",
       "repository": "https://github.com/anchore/syft",
-      "release": "v1.54.0",
+      "release": "v1.54.1",
       "installed": true,
       "route": "mise",
       "commands": [
-        "mise use -g syft@1.54.0"
+        "mise use -g syft@1.54.1"
       ],
       "needs": {
         "sudo": false,
@@ -3309,10 +3309,10 @@
       "service": null,
       "acceptance": {
         "post_install": {
-          "command": "syft version -o json | jq -e '.version == \"1.54.0\" and .gitCommit == \"cc326e45a6213360266dda4b30cc68095946d676\"' >/dev/null\nreceipt=\"$(mktemp \"${TMPDIR:-/tmp}/new-wsl-syft.XXXXXX.json\")\"\ntrap 'rm -f -- \"$receipt\"' EXIT\nsyft alpine:latest -o \"syft-json=$receipt\"\njq -e '.source.type == \"image\" and (.artifacts | length) > 0 and any(.artifacts[]; .name == \"alpine-baselayout\")' \"$receipt\" >/dev/null",
+          "command": "syft version -o json | jq -e '.version == \"1.54.1\" and .gitCommit == \"b254e6d92f28c3868a755f62fb3ca8f26e9fee76\"' >/dev/null\nreceipt=\"$(mktemp \"${TMPDIR:-/tmp}/new-wsl-syft.XXXXXX.json\")\"\ntrap 'rm -f -- \"$receipt\"' EXIT\nsyft alpine:latest -o \"syft-json=$receipt\"\njq -e '.source.type == \"image\" and (.artifacts | length) > 0 and any(.artifacts[]; .name == \"alpine-baselayout\")' \"$receipt\" >/dev/null",
           "kind": "smoke",
           "source": {
-            "url": "https://raw.githubusercontent.com/anchore/syft/cc326e45a6213360266dda4b30cc68095946d676/README.md#L48",
+            "url": "https://raw.githubusercontent.com/anchore/syft/b254e6d92f28c3868a755f62fb3ca8f26e9fee76/README.md#L48",
             "line": 48
           }
         }

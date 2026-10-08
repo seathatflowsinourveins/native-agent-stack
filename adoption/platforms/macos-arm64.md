@@ -242,7 +242,7 @@ machine-readable copy with each `checksum_source` and `checksum_ref` is
 | Component | Version | Asset | SHA-256 | checksum_source |
 | --- | --- | --- | --- | --- |
 | `node` | 24.21.0 | `node-v24.21.0-darwin-arm64.tar.xz` | `6239d4cf92d864487ec8cd3615038f7b67e7f58b77b21cd2f09ea9fbd68065fe` | `publisher_checksum_file` |
-| `uv` | 0.12.17 | `uv-aarch64-apple-darwin.tar.gz` | `85f00cbdc6dd3e97eba4c31b4d014375a9fdfe8f570023b84e5102fc3456896b` | `publisher_checksum_sidecar` |
+| `uv` | 0.12.23 | `uv-aarch64-apple-darwin.tar.gz` | `50487ae565ccd96e499056b4674d438f4c53170202617b4c759defe0c6a1b544` | `publisher_checksum_sidecar` |
 | `gh` | 2.101.0 | `gh_2.101.0_macOS_arm64.zip` | `e4303e39d8f07141c4bad4b99b01079f05029c59b27076e8fbc825c985ecdd8b` | `publisher_checksum_file` |
 | `codex` | 0.155.1 | `codex-0.155.1.tgz` | `fded5b71797aaaf9b1c3229c0e2747b53b39887ef25f36ec7196f6d511db1a66` | `npm_registry_integrity_crosscheck` |
 | `claude-code` | 2.1.284 | `darwin-arm64/claude` (native, not npm; the release manifest's value, whose gpg signature verified, and a direct download of the 2.1.284 binary re-hashed on 2026-09-29) | `50a14c2f50f56668380fdda490167f1d3630d5cc18fb8aed3073c2c7ea7314fe` | `manifest_crosscheck` |

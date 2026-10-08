@@ -556,10 +556,10 @@ output-compression() {
 }
 
 code-index() {
-  # jcodemunch-mcp 1.108.327 | uv-tool | planned
+  # jcodemunch-mcp 1.108.333 | uv-tool | planned
   # UNRUN on every distribution: added from the wave-3 batch of 2026-10-04 (the owner's decision, amendment 4), after every recorded run of this plan.
-  # Planned. Source: https://raw.githubusercontent.com/jgravelle/jcodemunch-mcp/6d5ae86c130f96624e2ca2d797fa3b853c210b9d/README.md#L91 (uv tool install jcodemunch-mcp); https://github.com/seathatflowsinourveins/native-agent-stack/blob/f640b53094ed4de5a526cda44d6341de9598df30/recipes/README.md#L554-L560 (--python 3.13, the selected pin, UV_TOOL_DIR/UV_TOOL_BIN_DIR under the ecosystem root, and --version); manifests/stack.json (jcodemunch-mcp 1.108.327, source 6d5ae86c130f96624e2ca2d797fa3b853c210b9d); evidence/receipts/jcodemunch-1108327-qualification-20261003.json (recorded W1 qualification and limitations; this plan row remains UNRUN)
-  run_command 'UV_TOOL_DIR="${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/python-tools" UV_TOOL_BIN_DIR="${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin" uv tool install --python 3.13 jcodemunch-mcp==1.108.327' || return "$?"
+  # Planned. Source: https://raw.githubusercontent.com/jgravelle/jcodemunch-mcp/bbe30fa299c4f82251233f25b8a0c5c56e2d407a/README.md#L91 (uv tool install jcodemunch-mcp); https://github.com/seathatflowsinourveins/native-agent-stack/blob/f640b53094ed4de5a526cda44d6341de9598df30/recipes/README.md#L554-L560 (--python 3.13, the selected pin, UV_TOOL_DIR/UV_TOOL_BIN_DIR under the ecosystem root, and --version); manifests/stack.json (jcodemunch-mcp 1.108.333, source bbe30fa299c4f82251233f25b8a0c5c56e2d407a); evidence/receipts/jcodemunch-1108327-qualification-20261003.json (historical 1.108.327 W1 qualification and limitations; the current version target is source projection and this plan row remains UNRUN)
+  run_command 'UV_TOOL_DIR="${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/python-tools" UV_TOOL_BIN_DIR="${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin" uv tool install --python 3.13 jcodemunch-mcp==1.108.333' || return "$?"
 }
 
 code-graph() {
@@ -778,7 +778,7 @@ harbor-containerized-agent-e2e-runner() {
 }
 
 promptfoo() {
-  # Promptfoo 0.123.1 | npm-global | planned
+  # Promptfoo 0.124.0 | npm-global | planned
   # UNRUN on every distribution: the 2026-10-04 verified-E2E plan fix (wave-4 owner default).
   # Planned. Source: https://raw.githubusercontent.com/promptfoo/promptfoo/34f74d34e140b5e17d23770dfb2340057b1936b8/test/smoke/fixtures/configs/basic.yaml#L1; https://raw.githubusercontent.com/promptfoo/promptfoo/34f74d34e140b5e17d23770dfb2340057b1936b8/examples/openai-compatible-gateway/promptfooconfig.yaml#L1 (preserving config placement)
   copy_config 'promptfoo-0.123.1-basic.yaml' || return "$?"
@@ -789,9 +789,9 @@ promptfoo() {
   copy_config 'promptfoo-codex-env.py' || return "$?"
   copy_config 'promptfoo-session.jq' || return "$?"
   # Planned. Source: https://raw.githubusercontent.com/promptfoo/promptfoo/34f74d34e140b5e17d23770dfb2340057b1936b8/site/docs/installation.md#L19; https://docs.npmjs.com/cli/v11/commands/npm-install
-  run_command 'fetch_verified https://registry.npmjs.org/promptfoo/-/promptfoo-0.123.1.tgz 53471b239132b5e7a270fda458f78a1f1b920abb617ef4dc2b096608d480ee2f "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/downloads/promptfoo-0.123.1/promptfoo-0.123.1.tgz"' || return "$?"
+  run_command 'fetch_verified https://registry.npmjs.org/promptfoo/-/promptfoo-0.124.0.tgz d0aa69e35d40be9b37454ce7569e04c62af67f3b45dd679182e53b170ef69c24 "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/downloads/promptfoo-0.124.0/promptfoo-0.124.0.tgz"' || return "$?"
   # Planned. Source: https://raw.githubusercontent.com/promptfoo/promptfoo/34f74d34e140b5e17d23770dfb2340057b1936b8/site/docs/integrations/mcp-server.md#L13 (include the optional MCP SDK); https://docs.npmjs.com/cli/v11/commands/npm-install
-  run_command 'e="${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}"; npm install --global --include=optional --prefix "$e/tools/promptfoo-0.123.1" "$e/downloads/promptfoo-0.123.1/promptfoo-0.123.1.tgz"; mkdir -p "$e/bin"; ln -sfn "$e/tools/promptfoo-0.123.1/bin/promptfoo" "$e/bin/promptfoo"' || return "$?"
+  run_command 'e="${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}"; npm install --global --include=optional --prefix "$e/tools/promptfoo-0.124.0" "$e/downloads/promptfoo-0.124.0/promptfoo-0.124.0.tgz"; mkdir -p "$e/bin"; ln -sfn "$e/tools/promptfoo-0.124.0/bin/promptfoo" "$e/bin/promptfoo"' || return "$?"
   # Planned. Source: https://code.claude.com/docs/en/mcp; https://raw.githubusercontent.com/promptfoo/promptfoo/34f74d34e140b5e17d23770dfb2340057b1936b8/site/docs/integrations/mcp-server.md#L32
   run_command 'e="${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}"; if ! claude mcp get promptfoo >/dev/null 2>&1; then claude mcp add --scope user --transport stdio promptfoo -- env "PROMPTFOO_CONFIG_DIR=$config_root/promptfoo-state" PROMPTFOO_DISABLE_TELEMETRY=1 PROMPTFOO_DISABLE_UPDATE=1 "$e/bin/promptfoo" mcp --transport stdio; fi' || return "$?"
   # Planned. Source: https://developers.openai.com/codex/mcp; https://raw.githubusercontent.com/promptfoo/promptfoo/34f74d34e140b5e17d23770dfb2340057b1936b8/site/docs/integrations/mcp-server.md#L32; docs/decisions/2026-10-04-2604-e2e-fix-wave-g6-eval-supply.md
@@ -813,7 +813,7 @@ zizmor() {
 syft() {
   # Syft | mise | planned
   # Planned. Source: https://raw.githubusercontent.com/jdx/mise/v2026.10.0/registry/syft.toml#L1
-  run_command 'mise use -g syft@1.54.0' || return "$?"
+  run_command 'mise use -g syft@1.54.1' || return "$?"
   refresh_path || return "$?"
 }
 
@@ -1082,7 +1082,7 @@ if $list; then
   printf '%s\n' 'statusline | claude-hud 0.10.0 (Claude Code status line plugin); Codex shows its native footer, tui.status_line | none | planned'
   printf '%s\n' 'command-output | RTK 0.51.0 | release-binary | planned'
   printf '%s\n' 'output-compression | Headroom 0.40.0 (headroom-ai[mcp], MCP server only) | uv-tool | planned'
-  printf '%s\n' 'code-index | jcodemunch-mcp 1.108.327 | uv-tool | planned'
+  printf '%s\n' 'code-index | jcodemunch-mcp 1.108.333 | uv-tool | planned'
   printf '%s\n' 'code-graph | codebase-memory-mcp 0.11.0 | release-binary | planned'
   printf '%s\n' 'repo-packing | Repomix 1.18.1 | none | planned'
   printf '%s\n' 'structured-data | TOON 4.1.1 (@toon-format/cli) | none | planned'
@@ -1101,7 +1101,7 @@ if $list; then
   printf '%s\n' 'session-analytics | agentsview 0.44.0 (local archive only) | release-binary | planned'
   printf '%s\n' 'inspect-ai | Inspect AI | uv-tool | planned'
   printf '%s\n' 'harbor-containerized-agent-e2e-runner | Harbor (containerized agent E2E runner) | uv-tool | planned'
-  printf '%s\n' 'promptfoo | Promptfoo 0.123.1 | npm-global | planned'
+  printf '%s\n' 'promptfoo | Promptfoo 0.124.0 | npm-global | planned'
   printf '%s\n' 'zizmor | zizmor | mise | planned'
   printf '%s\n' 'attest | attest | none | excluded'
   printf '%s\n' 'syft | Syft | mise | planned'

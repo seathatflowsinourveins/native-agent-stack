@@ -835,3 +835,20 @@ This local source preparation serves research and historical-simulation usage
 accounting. It changes no host alias, data, daemon or client configuration.
 Co-op alone applies at the #723 boundary. Historical receipts do not qualify
 this upgrade; current native observations are separately recorded.
+
+## Current portable version targets (2026-10-08, destination UNRUN)
+
+The current `code-index`, `promptfoo` and `syft` rows target jcodemunch-mcp
+1.108.333, Promptfoo 0.124.0 and Syft 1.54.1. The source profile and native
+bootstrap target uv 0.12.23. Version and source-commit controls follow those
+current targets; earlier judge, source-review and native-run records above
+retain their dated pins and scope. The supported install routes, row owners,
+MCP bindings and acceptance gates remain intact. Promptfoo retains its
+unchanged 0.123.1 echo configs and pinned skill fixture inputs while installing
+the digest-verified 0.124.0 package in its own prefix. The exact sources and
+archive digests are in [SOURCES.md](SOURCES.md#current-portable-version-targets-2026-10-08-source-projection).
+
+CPython 3.13.15, the SDK lock and the accepted trading runtime are separate
+inputs. These projections install nothing and establish no destination,
+provider, migration or Mac acceptance. Beads 1.3.1 stays a selected task tool
+without adding a new default install-plan row.

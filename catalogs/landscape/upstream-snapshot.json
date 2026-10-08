@@ -1913,8 +1913,8 @@
       "component_id": "promptfoo",
       "repository": "https://github.com/promptfoo/promptfoo",
       "selected_repository_url": "https://github.com/promptfoo/promptfoo",
-      "selected_version": "0.123.1",
-      "selected_source_pin": null,
+      "selected_version": "0.124.0",
+      "selected_source_pin": "30949931ee90c963acd487e97828c9441db0bcd4",
       "checks": [
         {
           "endpoint": "repos/promptfoo/promptfoo",
@@ -1948,24 +1948,57 @@
       "pushed_at": "2026-09-21T16:04:17Z",
       "license_spdx": "MIT",
       "latest_stable_release": {
-        "tag_name": "0.123.1",
-        "published_at": "2026-09-18T01:07:54Z",
-        "html_url": "https://github.com/promptfoo/promptfoo/releases/tag/0.123.1",
-        "target_commitish": "34f74d34e140b5e17d23770dfb2340057b1936b8",
+        "tag_name": "0.124.0",
+        "published_at": "2026-10-06T01:09:20Z",
+        "html_url": "https://github.com/promptfoo/promptfoo/releases/tag/0.124.0",
         "prerelease": false,
         "draft": false
       },
       "latest_release_source": {
-        "ref": "0.123.1",
-        "sha": "34f74d34e140b5e17d23770dfb2340057b1936b8",
-        "html_url": "https://github.com/promptfoo/promptfoo/commit/34f74d34e140b5e17d23770dfb2340057b1936b8",
-        "committed_at": "2026-09-18T01:07:35Z"
+        "ref": "0.124.0",
+        "sha": "30949931ee90c963acd487e97828c9441db0bcd4",
+        "html_url": "https://github.com/promptfoo/promptfoo/commit/30949931ee90c963acd487e97828c9441db0bcd4"
       },
       "status": "metadata_checked",
-      "adoption_recommendation": "retain_selected_pending_capability_comparison",
-      "source_pin_kind": "version_only",
+      "adoption_recommendation": "retain_scoped_qualified_pin_with_recorded_limits",
+      "source_pin_kind": "git_commit",
       "primary_repository": "https://github.com/promptfoo/promptfoo",
-      "release_relationship": "selected_version_matches_latest_stable"
+      "release_relationship": "selected_version_matches_latest_stable",
+      "historical_observations": [
+        {
+          "preserved_at_utc": "2026-10-08",
+          "observation": {
+            "component_id": "promptfoo",
+            "selected_version": "0.123.1",
+            "selected_source_pin": null,
+            "latest_stable_release": {
+              "tag_name": "0.123.1",
+              "published_at": "2026-09-18T01:07:54Z",
+              "html_url": "https://github.com/promptfoo/promptfoo/releases/tag/0.123.1",
+              "target_commitish": "34f74d34e140b5e17d23770dfb2340057b1936b8",
+              "prerelease": false,
+              "draft": false
+            },
+            "latest_release_source": {
+              "ref": "0.123.1",
+              "sha": "34f74d34e140b5e17d23770dfb2340057b1936b8",
+              "html_url": "https://github.com/promptfoo/promptfoo/commit/34f74d34e140b5e17d23770dfb2340057b1936b8",
+              "committed_at": "2026-09-18T01:07:35Z"
+            },
+            "selected_pin_source": null,
+            "exact_original_row_source": "native-agent-stack@eb5fee4db9a494729deb29bdf38dbabac23ee643:catalogs/landscape/upstream-snapshot.json#/components[component_id=promptfoo]"
+          }
+        }
+      ],
+      "selected_pin_source": {
+        "ref": "30949931ee90c963acd487e97828c9441db0bcd4",
+        "sha": "30949931ee90c963acd487e97828c9441db0bcd4",
+        "html_url": "https://github.com/promptfoo/promptfoo/commit/30949931ee90c963acd487e97828c9441db0bcd4"
+      },
+      "selected_pin_matches_latest_release_commit": true,
+      "scoped_refresh_at": "2026-10-08",
+      "scoped_refresh_receipt": "evidence/receipts/promptfoo-01240-qualification-20261008.json",
+      "checks_scope": "Original dated checks retain their historical scope; current live cached release/tag metadata and native qualification are retained in the scoped receipt and vendor-currency comparison."
     },
     {
       "component_id": "qdrant",
@@ -3754,8 +3787,8 @@
       "component_id": "syft",
       "repository": "https://github.com/anchore/syft",
       "selected_repository_url": "https://github.com/anchore/syft",
-      "selected_version": "1.54.0",
-      "selected_source_pin": "cc326e45a6213360266dda4b30cc68095946d676",
+      "selected_version": "1.54.1",
+      "selected_source_pin": "b254e6d92f28c3868a755f62fb3ca8f26e9fee76",
       "checks": [
         {
           "endpoint": "repos/anchore/syft",
@@ -3797,27 +3830,24 @@
       "pushed_at": "2026-10-02T20:50:41Z",
       "license_spdx": "Apache-2.0",
       "latest_stable_release": {
-        "tag_name": "v1.54.0",
-        "published_at": "2026-10-01T20:54:29Z",
-        "html_url": "https://github.com/anchore/syft/releases/tag/v1.54.0",
-        "target_commitish": "main",
+        "tag_name": "v1.54.1",
+        "published_at": "2026-10-06T15:35:10Z",
+        "html_url": "https://github.com/anchore/syft/releases/tag/v1.54.1",
         "prerelease": false,
         "draft": false
       },
       "selected_pin_source": {
-        "ref": "cc326e45a6213360266dda4b30cc68095946d676",
-        "sha": "cc326e45a6213360266dda4b30cc68095946d676",
-        "html_url": "https://github.com/anchore/syft/commit/cc326e45a6213360266dda4b30cc68095946d676",
-        "committed_at": "2026-10-01T19:00:50Z"
+        "ref": "b254e6d92f28c3868a755f62fb3ca8f26e9fee76",
+        "sha": "b254e6d92f28c3868a755f62fb3ca8f26e9fee76",
+        "html_url": "https://github.com/anchore/syft/commit/b254e6d92f28c3868a755f62fb3ca8f26e9fee76"
       },
       "latest_release_source": {
-        "ref": "v1.54.0",
-        "sha": "cc326e45a6213360266dda4b30cc68095946d676",
-        "html_url": "https://github.com/anchore/syft/commit/cc326e45a6213360266dda4b30cc68095946d676",
-        "committed_at": "2026-10-01T19:00:50Z"
+        "ref": "v1.54.1",
+        "sha": "b254e6d92f28c3868a755f62fb3ca8f26e9fee76",
+        "html_url": "https://github.com/anchore/syft/commit/b254e6d92f28c3868a755f62fb3ca8f26e9fee76"
       },
       "status": "metadata_checked",
-      "adoption_recommendation": "retain_selected_pending_capability_comparison",
+      "adoption_recommendation": "retain_scoped_qualified_pin_with_recorded_limits",
       "source_pin_kind": "git_commit",
       "primary_repository": "https://github.com/anchore/syft",
       "release_relationship": "selected_version_matches_latest_stable",
@@ -3898,9 +3928,41 @@
             "release_relationship": "selected_version_matches_latest_stable",
             "selected_pin_matches_latest_release_commit": true
           }
+        },
+        {
+          "preserved_at_utc": "2026-10-08",
+          "observation": {
+            "component_id": "syft",
+            "selected_version": "1.54.0",
+            "selected_source_pin": "cc326e45a6213360266dda4b30cc68095946d676",
+            "latest_stable_release": {
+              "tag_name": "v1.54.0",
+              "published_at": "2026-10-01T20:54:29Z",
+              "html_url": "https://github.com/anchore/syft/releases/tag/v1.54.0",
+              "target_commitish": "main",
+              "prerelease": false,
+              "draft": false
+            },
+            "latest_release_source": {
+              "ref": "v1.54.0",
+              "sha": "cc326e45a6213360266dda4b30cc68095946d676",
+              "html_url": "https://github.com/anchore/syft/commit/cc326e45a6213360266dda4b30cc68095946d676",
+              "committed_at": "2026-10-01T19:00:50Z"
+            },
+            "selected_pin_source": {
+              "ref": "cc326e45a6213360266dda4b30cc68095946d676",
+              "sha": "cc326e45a6213360266dda4b30cc68095946d676",
+              "html_url": "https://github.com/anchore/syft/commit/cc326e45a6213360266dda4b30cc68095946d676",
+              "committed_at": "2026-10-01T19:00:50Z"
+            },
+            "exact_original_row_source": "native-agent-stack@eb5fee4db9a494729deb29bdf38dbabac23ee643:catalogs/landscape/upstream-snapshot.json#/components[component_id=syft]"
+          }
         }
       ],
-      "checked_at": "2026-10-03T05:50:29.732600+00:00"
+      "checked_at": "2026-10-03T05:50:29.732600+00:00",
+      "scoped_refresh_at": "2026-10-08",
+      "scoped_refresh_receipt": "evidence/receipts/syft-1541-qualification-20261008.json",
+      "checks_scope": "Original dated checks retain their historical scope; current live cached release/tag metadata and native qualification are retained in the scoped receipt and vendor-currency comparison."
     },
     {
       "component_id": "alpaca-py",
@@ -4389,8 +4451,8 @@
       "component_id": "beads",
       "repository": "https://github.com/gastownhall/beads",
       "selected_repository_url": "https://github.com/gastownhall/beads",
-      "selected_version": "1.3.0",
-      "selected_source_pin": "f45b249ce6b40ba62aecc03949e6371e8f7c79d8",
+      "selected_version": "1.3.1",
+      "selected_source_pin": "c1c4b642ac1c08d8c828007a1c2f96e47e43ef7c",
       "checks": [
         {
           "endpoint": "repos/gastownhall/beads",
@@ -4432,31 +4494,62 @@
       "pushed_at": "2026-09-21T09:49:16Z",
       "license_spdx": "MIT",
       "latest_stable_release": {
-        "tag_name": "v1.3.0",
-        "published_at": "2026-09-15T19:33:18Z",
-        "html_url": "https://github.com/gastownhall/beads/releases/tag/v1.3.0",
-        "target_commitish": "main",
+        "tag_name": "v1.3.1",
+        "published_at": "2026-09-30T23:37:36Z",
+        "html_url": "https://github.com/gastownhall/beads/releases/tag/v1.3.1",
         "prerelease": false,
         "draft": false
       },
       "selected_pin_source": {
-        "ref": "f45b249ce6b40ba62aecc03949e6371e8f7c79d8",
-        "sha": "f45b249ce6b40ba62aecc03949e6371e8f7c79d8",
-        "html_url": "https://github.com/gastownhall/beads/commit/f45b249ce6b40ba62aecc03949e6371e8f7c79d8",
-        "committed_at": "2026-09-15T19:13:59Z"
+        "ref": "c1c4b642ac1c08d8c828007a1c2f96e47e43ef7c",
+        "sha": "c1c4b642ac1c08d8c828007a1c2f96e47e43ef7c",
+        "html_url": "https://github.com/gastownhall/beads/commit/c1c4b642ac1c08d8c828007a1c2f96e47e43ef7c"
       },
       "latest_release_source": {
-        "ref": "v1.3.0",
-        "sha": "f45b249ce6b40ba62aecc03949e6371e8f7c79d8",
-        "html_url": "https://github.com/gastownhall/beads/commit/f45b249ce6b40ba62aecc03949e6371e8f7c79d8",
-        "committed_at": "2026-09-15T19:13:59Z"
+        "ref": "v1.3.1",
+        "sha": "c1c4b642ac1c08d8c828007a1c2f96e47e43ef7c",
+        "html_url": "https://github.com/gastownhall/beads/commit/c1c4b642ac1c08d8c828007a1c2f96e47e43ef7c"
       },
       "status": "metadata_checked",
-      "adoption_recommendation": "retain_selected_pending_capability_comparison",
+      "adoption_recommendation": "retain_scoped_qualified_pin_with_recorded_limits",
       "source_pin_kind": "git_commit",
       "primary_repository": "https://github.com/gastownhall/beads",
       "release_relationship": "selected_version_matches_latest_stable",
-      "selected_pin_matches_latest_release_commit": true
+      "selected_pin_matches_latest_release_commit": true,
+      "historical_observations": [
+        {
+          "preserved_at_utc": "2026-10-08",
+          "observation": {
+            "component_id": "beads",
+            "selected_version": "1.3.0",
+            "selected_source_pin": "f45b249ce6b40ba62aecc03949e6371e8f7c79d8",
+            "latest_stable_release": {
+              "tag_name": "v1.3.0",
+              "published_at": "2026-09-15T19:33:18Z",
+              "html_url": "https://github.com/gastownhall/beads/releases/tag/v1.3.0",
+              "target_commitish": "main",
+              "prerelease": false,
+              "draft": false
+            },
+            "latest_release_source": {
+              "ref": "v1.3.0",
+              "sha": "f45b249ce6b40ba62aecc03949e6371e8f7c79d8",
+              "html_url": "https://github.com/gastownhall/beads/commit/f45b249ce6b40ba62aecc03949e6371e8f7c79d8",
+              "committed_at": "2026-09-15T19:13:59Z"
+            },
+            "selected_pin_source": {
+              "ref": "f45b249ce6b40ba62aecc03949e6371e8f7c79d8",
+              "sha": "f45b249ce6b40ba62aecc03949e6371e8f7c79d8",
+              "html_url": "https://github.com/gastownhall/beads/commit/f45b249ce6b40ba62aecc03949e6371e8f7c79d8",
+              "committed_at": "2026-09-15T19:13:59Z"
+            },
+            "exact_original_row_source": "native-agent-stack@eb5fee4db9a494729deb29bdf38dbabac23ee643:catalogs/landscape/upstream-snapshot.json#/components[component_id=beads]"
+          }
+        }
+      ],
+      "scoped_refresh_at": "2026-10-08",
+      "scoped_refresh_receipt": "evidence/receipts/beads-131-qualification-20261008.json",
+      "checks_scope": "Original dated checks retain their historical scope; current live cached release/tag metadata and native qualification are retained in the scoped receipt and vendor-currency comparison."
     },
     {
       "component_id": "skills-ref",
@@ -4673,8 +4766,8 @@
       "component_id": "jcodemunch-mcp",
       "repository": "https://github.com/jgravelle/jcodemunch-mcp",
       "selected_repository_url": "https://github.com/jgravelle/jcodemunch-mcp",
-      "selected_version": "1.108.327",
-      "selected_source_pin": "6d5ae86c130f96624e2ca2d797fa3b853c210b9d",
+      "selected_version": "1.108.333",
+      "selected_source_pin": "bbe30fa299c4f82251233f25b8a0c5c56e2d407a",
       "checks": [
         {
           "endpoint": "repos/jgravelle/jcodemunch-mcp",
@@ -4716,27 +4809,24 @@
       "pushed_at": "2026-10-02T18:15:32Z",
       "license_spdx": "NOASSERTION",
       "latest_stable_release": {
-        "tag_name": "v1.108.327",
-        "published_at": "2026-10-02T18:21:53Z",
-        "html_url": "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.327",
-        "target_commitish": "main",
+        "tag_name": "v1.108.333",
+        "published_at": "2026-10-07T23:00:32Z",
+        "html_url": "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.333",
         "prerelease": false,
         "draft": false
       },
       "selected_pin_source": {
-        "ref": "6d5ae86c130f96624e2ca2d797fa3b853c210b9d",
-        "sha": "6d5ae86c130f96624e2ca2d797fa3b853c210b9d",
-        "html_url": "https://github.com/jgravelle/jcodemunch-mcp/commit/6d5ae86c130f96624e2ca2d797fa3b853c210b9d",
-        "committed_at": "2026-10-02T18:09:09Z"
+        "ref": "bbe30fa299c4f82251233f25b8a0c5c56e2d407a",
+        "sha": "bbe30fa299c4f82251233f25b8a0c5c56e2d407a",
+        "html_url": "https://github.com/jgravelle/jcodemunch-mcp/commit/bbe30fa299c4f82251233f25b8a0c5c56e2d407a"
       },
       "latest_release_source": {
-        "ref": "v1.108.327",
-        "sha": "6d5ae86c130f96624e2ca2d797fa3b853c210b9d",
-        "html_url": "https://github.com/jgravelle/jcodemunch-mcp/commit/6d5ae86c130f96624e2ca2d797fa3b853c210b9d",
-        "committed_at": "2026-10-02T18:09:09Z"
+        "ref": "v1.108.333",
+        "sha": "bbe30fa299c4f82251233f25b8a0c5c56e2d407a",
+        "html_url": "https://github.com/jgravelle/jcodemunch-mcp/commit/bbe30fa299c4f82251233f25b8a0c5c56e2d407a"
       },
       "status": "metadata_checked",
-      "adoption_recommendation": "retain_selected_pending_capability_comparison",
+      "adoption_recommendation": "retain_scoped_qualified_pin_with_recorded_limits",
       "source_pin_kind": "git_commit",
       "primary_repository": "https://github.com/jgravelle/jcodemunch-mcp",
       "release_relationship": "selected_version_matches_latest_stable",
@@ -4817,9 +4907,41 @@
             "release_relationship": "selected_version_matches_latest_stable",
             "selected_pin_matches_latest_release_commit": true
           }
+        },
+        {
+          "preserved_at_utc": "2026-10-08",
+          "observation": {
+            "component_id": "jcodemunch-mcp",
+            "selected_version": "1.108.327",
+            "selected_source_pin": "6d5ae86c130f96624e2ca2d797fa3b853c210b9d",
+            "latest_stable_release": {
+              "tag_name": "v1.108.327",
+              "published_at": "2026-10-02T18:21:53Z",
+              "html_url": "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.327",
+              "target_commitish": "main",
+              "prerelease": false,
+              "draft": false
+            },
+            "latest_release_source": {
+              "ref": "v1.108.327",
+              "sha": "6d5ae86c130f96624e2ca2d797fa3b853c210b9d",
+              "html_url": "https://github.com/jgravelle/jcodemunch-mcp/commit/6d5ae86c130f96624e2ca2d797fa3b853c210b9d",
+              "committed_at": "2026-10-02T18:09:09Z"
+            },
+            "selected_pin_source": {
+              "ref": "6d5ae86c130f96624e2ca2d797fa3b853c210b9d",
+              "sha": "6d5ae86c130f96624e2ca2d797fa3b853c210b9d",
+              "html_url": "https://github.com/jgravelle/jcodemunch-mcp/commit/6d5ae86c130f96624e2ca2d797fa3b853c210b9d",
+              "committed_at": "2026-10-02T18:09:09Z"
+            },
+            "exact_original_row_source": "native-agent-stack@eb5fee4db9a494729deb29bdf38dbabac23ee643:catalogs/landscape/upstream-snapshot.json#/components[component_id=jcodemunch-mcp]"
+          }
         }
       ],
-      "checked_at": "2026-10-03T05:50:27.407841+00:00"
+      "checked_at": "2026-10-03T05:50:27.407841+00:00",
+      "scoped_refresh_at": "2026-10-08",
+      "scoped_refresh_receipt": "evidence/receipts/jcodemunch-1108333-qualification-20261008.json",
+      "checks_scope": "Original dated checks retain their historical scope; current live cached release/tag metadata and native qualification are retained in the scoped receipt and vendor-currency comparison."
     },
     {
       "component_id": "nextjs",

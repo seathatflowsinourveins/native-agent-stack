@@ -1,0 +1,371 @@
+{
+  "schema_version": 1,
+  "id": "syft-1541-qualification-20261008",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-10-08",
+  "component_ids": [
+    "syft"
+  ],
+  "claim": "Syft1.54.1@b254e6d publisher installation and checksum verification passed in an owned prefix. Native CLI scanned an unchanged upstream Bun lock into exactly10expected npm package versions and converted them to CycloneDX1.7 with all10package URLs preserved; inverse retirement passed.",
+  "limitations": [
+    "Signature attestation not verified because cosign was absent; SHA256 archive and checksum-manifest publisher digests agree.",
+    "Native conversion emitted the vendor experimental-feature warning; it is retained.",
+    "This small fixture does not qualify all Syft catalogers, runtime SDK inventory, vulnerability scanning, container-daemon/image access, host lifecycle migration or cross-platform behavior.",
+    "No provider/model/GPU/broker use. Provider usage and cost are not applicable to these native CLI invocations; no invented token accounting.",
+    "Native SBOMs are private local artifacts and include default machine-derived paths; this receipt sanitizes paths as <owned-prefix> and embeds no private active configuration."
+  ],
+  "data": {
+    "original_private_receipt_sha256": "0de002ea1b2ea70e8ec5c075a54f073f7b10d7f475ed2f0a4b890b5ceec78dba",
+    "projection": {
+      "component_id": "syft",
+      "version": "1.54.1",
+      "status": "passed_bounded_native_cli_integration",
+      "evidence_class": "native_cli_integration_observation",
+      "source_review_release": {
+        "tag_name": "v1.54.1",
+        "published_at": "2026-10-06T15:35:10Z",
+        "prerelease": false,
+        "draft": false,
+        "html_url": "https://github.com/anchore/syft/releases/tag/v1.54.1",
+        "target_commitish": "main"
+      },
+      "repository": "https://github.com/anchore/syft",
+      "source_commit": "b254e6d92f28c3868a755f62fb3ca8f26e9fee76",
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/anchore/syft/b254e6d92f28c3868a755f62fb3ca8f26e9fee76/install.sh",
+          "sha256": "787fe2aa12311f7dd8e1d9337dfc6e25f091396c958937293a2d3c0eca2ff8ce",
+          "role": "Release-specific unchanged publisher installer"
+        },
+        {
+          "url": "https://get.anchore.io/syft/v1.54.1/install.sh",
+          "sha256": "787fe2aa12311f7dd8e1d9337dfc6e25f091396c958937293a2d3c0eca2ff8ce",
+          "role": "Publisher-supported native install route; byte-identical to pinned source"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/anchore/syft/b254e6d92f28c3868a755f62fb3ca8f26e9fee76/README.md",
+          "sha256": "b072fd6c75f6ba759933b4f035bb9e263309f535e2128f13e6ed50860c328aef",
+          "role": "Primary source documents installer and output formats"
+        },
+        {
+          "url": "https://oss.anchore.com/docs/installation/syft/",
+          "sha256": "8d14438a7eefa235334c35493cd6f91d5c4551de5b2db39ce004bb616cf512dd",
+          "role": "Official custom install prefix and optional signature-verification docs"
+        },
+        {
+          "url": "https://oss.anchore.com/docs/guides/sbom/getting-started/",
+          "sha256": "204587149ad673e59510e0bb2b1f89076c288cbc3974f336badf03edd09539e5",
+          "role": "Official SBOM output usage"
+        }
+      ],
+      "archive": {
+        "name": "syft_1.54.1_linux_amd64.tar.gz",
+        "url": "https://github.com/anchore/syft/releases/download/v1.54.1/syft_1.54.1_linux_amd64.tar.gz",
+        "sha256": "c069905b391cc4c20a5ba65ad5c10be2a7ba074f8ea6ad203e24d14e303dad47",
+        "size": 30968256,
+        "publisher_asset_digest": "sha256:c069905b391cc4c20a5ba65ad5c10be2a7ba074f8ea6ad203e24d14e303dad47",
+        "checksum_manifest_url": "https://github.com/anchore/syft/releases/download/v1.54.1/syft_1.54.1_checksums.txt",
+        "checksum_manifest_sha256": "7577f0d0b3fb16f65a2e56b413862f69aa5eaa2379d5760cb73d691ca7986059",
+        "publisher_checksum_line": "c069905b391cc4c20a5ba65ad5c10be2a7ba074f8ea6ad203e24d14e303dad47  syft_1.54.1_linux_amd64.tar.gz",
+        "installed_binary_sha256": "dbf75864e7a7ff9e1fbf00552c31483f693188632a9f68f343cd7653dac513d6",
+        "signature_verification": "UNVERIFIED: cosign absent; the supported installer always checked SHA256. Optional -v signature route was not claimed."
+      },
+      "fixture": {
+        "source_path": "syft/pkg/cataloger/javascript/test-fixtures/bun/bun.lock",
+        "repository_commit": "b254e6d92f28c3868a755f62fb3ca8f26e9fee76",
+        "git_blob_sha": "07a0a3d42e2dd7f92a56e282aae18f139b26b11f",
+        "sha256": "64a2e7a6a303f0f755646e54f14feb7458dbbb3f0af9fb776f485151baea0a1c",
+        "unchanged": true,
+        "expected_packages": [
+          "@img/sharp-darwin-arm64@0.33.5",
+          "@img/sharp-linux-x64@0.33.5",
+          "axios@1.6.0",
+          "color@4.2.3",
+          "eslint-visitor-keys@4.0.0",
+          "eslint@9.0.0",
+          "follow-redirects@1.15.3",
+          "lodash@4.17.21",
+          "sharp@0.33.5",
+          "typescript@5.0.0"
+        ],
+        "download_url": "https://raw.githubusercontent.com/anchore/syft/b254e6d92f28c3868a755f62fb3ca8f26e9fee76/syft/pkg/cataloger/javascript/test-fixtures/bun/bun.lock"
+      },
+      "process_results": [
+        {
+          "step": "existing-host-client-read-only",
+          "native_argv": [
+            "syft",
+            "version",
+            "-o",
+            "json"
+          ],
+          "rc": 0,
+          "stdout": {
+            "application": "syft",
+            "buildDate": "2026-10-06T15:32:19Z",
+            "compiler": "gc",
+            "gitCommit": "b254e6d92f28c3868a755f62fb3ca8f26e9fee76",
+            "gitDescription": "v1.54.1",
+            "goVersion": "go1.26.8",
+            "platform": "linux/amd64",
+            "schemaVersion": "16.1.11",
+            "version": "1.54.1"
+          },
+          "stderr": "",
+          "observation": "Host client already returned1.54.1; no host launcher or host prefix was changed."
+        },
+        {
+          "step": "publisher-install",
+          "native_argv": [
+            "sh",
+            "<owned-prefix>/source/publisher-install.sh",
+            "-b",
+            "<owned-prefix>/versions/1.54.1/bin",
+            "v1.54.1"
+          ],
+          "environment_names_and_public_settings": {
+            "TMPDIR": "<owned-prefix>/tmp"
+          },
+          "rc": 0,
+          "stdout": "",
+          "stderr": "[info] checking github for release tag='v1.54.1' \n[info] fetching release script for tag='v1.54.1' \n[info] checking github for release tag='v1.54.1' \n[info] using release tag='v1.54.1' version='1.54.1' os='linux' arch='amd64' \n[info] installed <owned-prefix>/versions/1.54.1/bin/syft \n",
+          "route_source": "anchore/syft@b254e6d92f28c3868a755f62fb3ca8f26e9fee76:install.sh:800-822,637-688,879-892"
+        },
+        {
+          "step": "native-publisher-checksum",
+          "native_argv": [
+            "sha256sum",
+            "--check",
+            "--ignore-missing",
+            "syft_1.54.1_checksums.txt"
+          ],
+          "cwd": "<owned-prefix>/downloads",
+          "rc": 0,
+          "stdout": "syft_1.54.1_linux_amd64.tar.gz: OK\n",
+          "stderr": ""
+        },
+        {
+          "step": "isolated-client-identity",
+          "native_argv": [
+            "<owned-prefix>/versions/1.54.1/bin/syft",
+            "-c",
+            "<owned-prefix>/source/syft.yaml",
+            "version",
+            "-o",
+            "json"
+          ],
+          "rc": 0,
+          "stdout": {
+            "application": "syft",
+            "version": "1.54.1",
+            "gitCommit": "b254e6d92f28c3868a755f62fb3ca8f26e9fee76",
+            "gitDescription": "v1.54.1",
+            "buildDate": "2026-10-06T15:32:19Z",
+            "compiler": "gc",
+            "goVersion": "go1.26.8",
+            "platform": "linux/amd64",
+            "schemaVersion": "16.1.11"
+          },
+          "stderr": ""
+        },
+        {
+          "step": "vendor-default-config",
+          "native_argv": [
+            "<owned-prefix>/versions/1.54.1/bin/syft",
+            "config",
+            "--load=false"
+          ],
+          "rc": 0,
+          "stdout_artifact": "source/vendor-default-config.yaml",
+          "stdout_sha256": "0e2667c36c10b310419262029375431ea37ad21c16cb16e1327091c6d91b85bd",
+          "stderr": "",
+          "observed_supported_keys": [
+            "check-for-app-update",
+            "javascript.include-dev-dependencies"
+          ]
+        },
+        {
+          "step": "accepted-native-scan",
+          "native_argv": [
+            "<owned-prefix>/versions/1.54.1/bin/syft",
+            "-c",
+            "<owned-prefix>/source/syft-with-dev.yaml",
+            "scan",
+            "dir:<owned-prefix>/fixture/bun",
+            "--source-name",
+            "syft-upstream-bun-fixture",
+            "--source-version",
+            "b254e6d",
+            "-o",
+            "syft-json=<owned-prefix>/outputs/fixture-all-final.syft.json",
+            "-o",
+            "table"
+          ],
+          "rc": 0,
+          "stdout": "NAME                     VERSION  TYPE  \n@img/sharp-darwin-arm64  0.33.5   npm   \n@img/sharp-linux-x64     0.33.5   npm   \naxios                    1.6.0    npm   \ncolor                    4.2.3    npm   \neslint                   9.0.0    npm   \neslint-visitor-keys      4.0.0    npm   \nfollow-redirects         1.15.3   npm   \nlodash                   4.17.21  npm   \nsharp                    0.33.5   npm   \ntypescript               5.0.0    npm\n",
+          "stderr": "",
+          "observed_result": {
+            "packages": 10,
+            "expected_packages_matched": 10,
+            "unexpected_packages": 0,
+            "types": [
+              "npm"
+            ],
+            "cataloger": "javascript-lock-cataloger",
+            "include_dev_dependencies": true,
+            "sbom_schema": "16.1.11"
+          },
+          "stdout_artifact": "outputs/scan-all-final.stdout",
+          "stderr_artifact": "outputs/scan-all-final.stderr",
+          "sbom_artifact": "outputs/fixture-all-final.syft.json",
+          "sbom_sha256": "e28823012a15f2b1b2492247b3d3f2e38e48dab1c42d2da047c049c04af603b6"
+        },
+        {
+          "step": "supported-native-convert",
+          "native_argv": [
+            "<owned-prefix>/versions/1.54.1/bin/syft",
+            "-c",
+            "<owned-prefix>/source/syft-with-dev.yaml",
+            "convert",
+            "<owned-prefix>/outputs/fixture-all-final.syft.json",
+            "-o",
+            "cyclonedx-json=<owned-prefix>/outputs/fixture-all-final.cdx.json"
+          ],
+          "rc": 0,
+          "stdout": "",
+          "stderr": "[0000]  WARN convert is an experimental feature, run `syft convert -h` for help\n",
+          "observed_result": {
+            "bomFormat": "CycloneDX",
+            "specVersion": "1.7",
+            "components": 11,
+            "library_components": 10,
+            "file_components": 1,
+            "package_urls_equal_to_scan": true,
+            "purls": [
+              "pkg:npm/%40img/sharp-darwin-arm64@0.33.5",
+              "pkg:npm/%40img/sharp-linux-x64@0.33.5",
+              "pkg:npm/axios@1.6.0",
+              "pkg:npm/color@4.2.3",
+              "pkg:npm/eslint-visitor-keys@4.0.0",
+              "pkg:npm/eslint@9.0.0",
+              "pkg:npm/follow-redirects@1.15.3",
+              "pkg:npm/lodash@4.17.21",
+              "pkg:npm/sharp@0.33.5",
+              "pkg:npm/typescript@5.0.0"
+            ]
+          },
+          "output_artifact": "outputs/fixture-all-final.cdx.json",
+          "sha256": "5af639cbcb5fda1a18eea8e6b62917d3f05ef7ac8110d2da6fcf6d165994d5fe"
+        },
+        {
+          "step": "owned-process-liveness-before-retirement",
+          "native_argv": [
+            "pgrep",
+            "-f",
+            "^<owned-prefix>/versions/1[.]54[.]1/bin/syft( |$)"
+          ],
+          "rc": 1,
+          "stdout": "",
+          "stderr": "",
+          "interpretation": "No matching owned Syft process; all foreground native Syft invocations completed."
+        },
+        {
+          "step": "inverse-retirement",
+          "native_argv": [
+            "mv",
+            "<owned-prefix>/versions/1.54.1",
+            "<owned-prefix>/retired/1.54.1"
+          ],
+          "rc": 0,
+          "stdout": "",
+          "stderr": "",
+          "postcondition": "Active owned version prefix retired; binary bytes, fixture, downloads, receipts and SBOM data retained."
+        }
+      ],
+      "native_acceptance_scope": "Released vendor CLI execution on an unchanged upstream Bun lock fixture, using supported public config. No local scanner/test runner was built. The observer compared exact dependency names+versions and native CycloneDX package URLs.",
+      "upstream_test_execution": {
+        "executed": false,
+        "reason": "This bounded qualification used the released vendor CLI and unchanged upstream fixture; upstream Go unit/integration tests require a separate source build/dependency environment and were not executed. These CLI observations are not promoted to unchanged upstream test acceptance."
+      },
+      "integration_observation_corrections": [
+        {
+          "attempt": "default-native-scan",
+          "rc": 0,
+          "returned_packages": 7,
+          "outputs": [
+            "outputs/fixture.syft.json",
+            "outputs/scan.stdout",
+            "outputs/scan.stderr"
+          ],
+          "initial_analysis": "Compared against all10 lock entries; exact_match=false.",
+          "correction": "Vendor default includes production dependencies only, include-dev-dependencies=false; three development packages excluded. This was an analysis expectation error, not an upstream scan failure.",
+          "stderr": "[0000]  WARN no explicit name and version provided for directory source, deriving artifact ID from the given path (which is not ideal)\n"
+        },
+        {
+          "attempt": "first-all-dependency-config",
+          "rc": 0,
+          "returned_packages": 7,
+          "outputs": [
+            "outputs/fixture-all.syft.json",
+            "outputs/scan-all.stdout",
+            "outputs/scan-all.stderr"
+          ],
+          "attempted_public_config": "packages.javascript.include-dev-dependencies=true",
+          "correction": "Descriptor nesting was mistaken for CLI config nesting. Vendor config --load=false declares top-leveljavascript.include-dev-dependencies. Corrected only owned config; upstream fixture and scanner unchanged."
+        }
+      ],
+      "limitations": [
+        "Signature attestation not verified because cosign was absent; SHA256 archive and checksum-manifest publisher digests agree.",
+        "Native conversion emitted the vendor experimental-feature warning; it is retained.",
+        "This small fixture does not qualify all Syft catalogers, runtime SDK inventory, vulnerability scanning, container-daemon/image access, host lifecycle migration or cross-platform behavior.",
+        "No provider/model/GPU/broker use. Provider usage and cost are not applicable to these native CLI invocations; no invented token accounting.",
+        "Native SBOMs are private local artifacts and include default machine-derived paths; this receipt sanitizes paths as <owned-prefix> and embeds no private active configuration."
+      ],
+      "inverse": {
+        "executed": true,
+        "owned_processes_remaining": 0,
+        "retirement_command": [
+          "mv",
+          "<owned-prefix>/versions/1.54.1",
+          "<owned-prefix>/retired/1.54.1"
+        ],
+        "retired_binary": "retired/1.54.1/bin/syft",
+        "preserved_artifacts": [
+          "source",
+          "fixture",
+          "downloads",
+          "outputs"
+        ],
+        "host_client_touched": false,
+        "services_touched": false,
+        "credentials_touched": false
+      },
+      "completeness_critic": {
+        "checked_channels": [
+          "Pinned release source installer",
+          "Publisher installer URL",
+          "GitHub release/tag metadata",
+          "Publisher checksum manifest and archive asset digest",
+          "Official install/output docs",
+          "Installed host-client identity",
+          "Unchanged upstream fixture",
+          "Native config schema",
+          "Native scan plus output conversion"
+        ],
+        "unmeasured_modalities": [
+          "Signature verification",
+          "Unchanged upstream Go test suite",
+          "Full runtime inventory and lifecycle"
+        ],
+        "boundary": "Passed result covers only isolated released CLI inventory and conversion at the immutable source and archive pin."
+      }
+    },
+    "projection_note": "Compact sanitized projection of the actual native receipt/output; path and opaque runtime locators abstracted. Original native bytes/hash retained privately. No upstream test claim except unchanged promptfoo vendor fixtures."
+  },
+  "independent_completeness_critic": {
+    "result": "No bounded behavioral gap; public sanitation required",
+    "scope": "Cross-author Beads69artifact hashes and10native outputs; Promptfoo22artifact hashes/3unchanged fixtures and returned results verified. Syft/uv classes preserved without self-retest.",
+    "evidence_class": "Source/artifact review; no new native execution",
+    "remaining_boundaries": "Platform migration/concurrency/provider/signature/tracing and runtime SDK acceptance retain original receipt limits."
+  }
+}

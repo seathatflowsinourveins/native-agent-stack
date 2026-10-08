@@ -58,9 +58,9 @@ rollback checks passing in scope. That page's own boundary applies here too:
 fresh Linux userspace on the existing WSL kernel is not a booted new PC, an
 independent kernel, or a full-foundation deployment.
 
-## vLLM pin: 0.30.0 (0.29.0 fails on WSL)
+## vLLM pin: 0.31.0 (0.30.0 rollback; 0.29.0 fails on WSL)
 
-The working WSL vLLM pin is **0.30.0** since 2026-09-25
+The working WSL vLLM pin is **0.31.0**, bound to the active foundation unit and official wheel in the [current binding](../../evidence/receipts/vllm-031-working-pin-binding-20261008.json); retain 0.30.0 as the recorded rollback. This corrects metadata, with no install/restart or model run. Complete both-client operations remain open. Historical 0.30.0 qualification since 2026-09-25 is below
 ([`evidence/receipts/vllm-030-switch-20260925.json`](../../evidence/receipts/vllm-030-switch-20260925.json)).
 0.30.0 carries the pinned-memory fallback for WSL (vllm-project/vllm PR
 #56908) and closes GHSA-25q3-v2hm-8vpf and GHSA-5fj9-pfhr-6j48. On the
@@ -70,7 +70,7 @@ owned instance and then in production; 0.25.0 stays installed for rollback.
 Version **0.29.0 failed real startup with "UVA is not available"** on this
 WSL GPU path (unified virtual addressing unsupported by the WSL GPU driver
 surface at that release).
-[`adoption/lifecycle.md`](../lifecycle.md) records this exactly: "The working
+[`adoption/lifecycle.md`](../lifecycle.md) retains the historical qualification: "The working
 WSL vLLM pin is 0.30.0 since 2026-09-25, qualified against 0.25.0 on the same
 host before the switch; 0.25.0 stays installed for rollback. Version 0.29.0
 failed real startup with unavailable UVA support. Preserve the accepted

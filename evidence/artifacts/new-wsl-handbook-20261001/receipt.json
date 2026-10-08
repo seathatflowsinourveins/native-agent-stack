@@ -4,10 +4,10 @@
   "source_main": "424b8a778222ae8857aade42c49ae6f7a13b3138",
   "evidence_class": "local_integration",
   "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
-  "profile_sha256": "f811217299d2f488e918fd25517838804929d08de5276809858ad77e1c5f42ee",
+  "profile_sha256": "dd6b7788960c63dbebe166f1e4f8324e3b9995529e6be9ab40355bdd2be1121b",
   "outputs": {
-    "docs/new-wsl-handbook.md": "f683090521e28889672b995714a0b35b1e31dfc5df3a52211d233767bae4444b",
-    "docs/new-wsl-handbook.json": "9b5900c995ae258057099ad0819f3cb55ec2ce3bf3c1b5c41d8c299bc1177a19"
+    "docs/new-wsl-handbook.md": "6c5de2a8a623aece8ef71767eae87ddbd362f06e5c74f77b3fb39871776dbd5a",
+    "docs/new-wsl-handbook.json": "4ba85876d645388c2e74d716f59b893a97e13fcfaa2936b8c0ea6083214287e5"
   },
   "inventory": {
     "layers": 37,
@@ -137,6 +137,18 @@
       "returned_outputs": {
         "docs/new-wsl-handbook.json": "a93532300fc174884d0d6feba2466780f87b300ad21362a5daa0b62a2e49c31c",
         "docs/new-wsl-handbook.md": "1eb9a9cb1b3d8f10bbfffb8eea33a2f67a2500a208e3b77e59fed73d680f4dae"
+      }
+    },
+    {
+      "date_utc": "2026-10-08",
+      "recorded_at_utc": "2026-10-08T14:48:55.345262+00:00",
+      "scope": "Current qualified tool pins/projections joined with canonical stack; local deterministic generation only, not new-host/upstream/provider acceptance. Prior validation records remain historical.",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "native_exit_code": 0,
+      "returned_status": "written",
+      "returned_outputs": {
+        "docs/new-wsl-handbook.md": "6c5de2a8a623aece8ef71767eae87ddbd362f06e5c74f77b3fb39871776dbd5a",
+        "docs/new-wsl-handbook.json": "4ba85876d645388c2e74d716f59b893a97e13fcfaa2936b8c0ea6083214287e5"
       }
     }
   ],

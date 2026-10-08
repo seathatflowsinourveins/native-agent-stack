@@ -1,0 +1,398 @@
+{
+  "schema_version": 1,
+  "kind": "native_cli_integration_artifact",
+  "id": "uv-01223-qualification-20261008",
+  "claim": "uv0.12.23 checksum/native offline project lock/run/check passed; unchanged generated console entry returned Hello from uv-qualification!, inverse retired ownedprefix/project.",
+  "scope": "uv is an adoption toolchain pin, not a manifests/stack.json component; this artifact is not enrolled as a fictitious component receipt.",
+  "data": {
+    "original_private_receipt_sha256": "4cfdf9bac4688dc7b75f898b6393799c565a15e52f8b1c4c6bbc27837e3dec8c",
+    "projection": {
+      "component_id": "uv",
+      "version": "0.12.23",
+      "status": "passed_bounded_native_cli_workflow",
+      "evidence_class": "native_cli_synthetic_workflow",
+      "source_repository": "https://github.com/astral-sh/uv",
+      "source_commit": "46b84fd0bfec23b72f29e8e2185ba68a65052f48",
+      "release_observation": {
+        "label": "release",
+        "argv": [
+          "gh",
+          "api",
+          "--cache",
+          "120s",
+          "repos/astral-sh/uv/releases/tags/0.12.23"
+        ],
+        "rc": 0,
+        "observed_utc": "2026-10-08T14:27:21.732256+00:00",
+        "metadata": {
+          "tag_name": "0.12.23",
+          "published_at": "2026-10-03T17:34:11Z",
+          "prerelease": false,
+          "draft": false,
+          "html_url": "https://github.com/astral-sh/uv/releases/tag/0.12.23",
+          "target_commitish": "46b84fd0bfec23b72f29e8e2185ba68a65052f48"
+        },
+        "assets": [
+          {
+            "name": "uv-installer.sh",
+            "url": "https://github.com/astral-sh/uv/releases/download/0.12.23/uv-installer.sh",
+            "digest": "sha256:b8e6c43099ee9f9a550984d3ad56948457c689e7a99c090b35377234ac241491",
+            "size": 71308
+          },
+          {
+            "name": "uv-x86_64-unknown-linux-gnu.tar.gz",
+            "url": "https://github.com/astral-sh/uv/releases/download/0.12.23/uv-x86_64-unknown-linux-gnu.tar.gz",
+            "digest": "sha256:9167d72b3319674b6303c4cbe071854bba13ebdf3d76b1a7cbdc175471fb66d6",
+            "size": 19906150
+          },
+          {
+            "name": "uv-x86_64-unknown-linux-gnu.tar.gz.sha256",
+            "url": "https://github.com/astral-sh/uv/releases/download/0.12.23/uv-x86_64-unknown-linux-gnu.tar.gz.sha256",
+            "digest": "sha256:105953d7c9f58b45273f12f97eb511476269ab5e23452a64806f90233cd0af04",
+            "size": 101
+          }
+        ],
+        "returned_release_body_excerpt": "## Release Notes\n\nReleased on 2026-10-03.\n\n### Python\n\n- Add CPython 3.15.0rc3 ([#22164](https://github.com/astral-sh/uv/pull/22164))\n\n### Preview features\n\n- Sync from `uv.lock` without a workspace manifest using `uv sync --frozen` with `frozen-lockfile` ([#22018](https://github.com/astral-sh/uv/pull/22018))\n- Export from `uv.lock` without a workspace manifest using `uv export --frozen` with `frozen-lockfile` ([#22007](https://github.com/astral-sh/uv/pull/22007))\n- Inspect dependency trees from `uv.lock` without a workspace manifest using `uv tree --frozen` with `frozen-lockfile` ([#22016](https://github.com/astral-sh/uv/pull/22016))\n- Inspect workspace metadata and optionally sync its environment from `uv.lock` without a workspace manifest using `uv workspace metadata --frozen` with `frozen-lockfile` ([#22017](https://github.com/astral-sh/uv/pull/22017), [#22018](https://github.com/astral-sh/uv/pull/22018))\n\n### Bug fixes\n\n- Reject alternate sources for workspace members across conflicting dependency selections, avoiding lockfiles that cannot be installed ([#22153](https://github.com/astral-sh/uv/pull/22153))\n- Allow x86-64 Python interpreters running under emulation on Windows ARM64 to install compatible `win_amd64` wheels instead of building from source ([#22099](https://github.com/astral-sh/uv/pull/22099))\n\n## Install uv 0.12.23\n\n### Install prebuilt binaries via shell script\n\n```sh\ncurl --proto '=https' --tlsv1.2 -LsSf https://releases.astral.sh/github/uv/releases/download/0.12.23/uv-installer.sh | sh\n```\n\n### Install prebuilt binaries via powershell script\n\n```sh\npowershell -ExecutionPolicy Bypass -c \"irm https://releases.astral.sh/github/uv/releases/download/0.12.23/uv-installer.ps1 | iex\"\n```\n\n"
+      },
+      "sources": [
+        {
+          "path": "docs/guides/projects.md",
+          "url": "https://raw.githubusercontent.com/astral-sh/uv/46b84fd0bfec23b72f29e8e2185ba68a65052f48/docs/guides/projects.md",
+          "sha256": "73764800867b03fa82b8f692917604a07727901f44b63678ebcf967de38a12c0",
+          "claims": "Vendor uv init creates src package/console entry; uv run entrypoint; project venv/uv.lock, lines12-55."
+        },
+        {
+          "path": "docs/getting-started/installation.md",
+          "url": "https://raw.githubusercontent.com/astral-sh/uv/46b84fd0bfec23b72f29e8e2185ba68a65052f48/docs/getting-started/installation.md",
+          "sha256": "8995e08dbe14f746cd9f54be8d15f590f3c55d173fed9d21fda213dafb48c1de",
+          "claims": "Specific-version standalone installer and direct released binaries supported, lines25-28,63-66,130-136."
+        },
+        {
+          "path": "docs/reference/installer.md",
+          "url": "https://raw.githubusercontent.com/astral-sh/uv/46b84fd0bfec23b72f29e8e2185ba68a65052f48/docs/reference/installer.md",
+          "sha256": "ebf56db7014a059a3860e6bbdc4919245127e3a39eb4b676e30a7fe89d269dd7",
+          "claims": "UV_UNMANAGED_INSTALL preserves shell profiles/environment and disables self updates, lines39-48."
+        }
+      ],
+      "checksums": {
+        "archive_sha256": "9167d72b3319674b6303c4cbe071854bba13ebdf3d76b1a7cbdc175471fb66d6",
+        "checksum_asset_sha256": "105953d7c9f58b45273f12f97eb511476269ab5e23452a64806f90233cd0af04",
+        "installer_sha256": "b8e6c43099ee9f9a550984d3ad56948457c689e7a99c090b35377234ac241491",
+        "publisher_checksum_line": "9167d72b3319674b6303c4cbe071854bba13ebdf3d76b1a7cbdc175471fb66d6  uv-x86_64-unknown-linux-gnu.tar.gz\n",
+        "publisher_api_digests_equal": true,
+        "native_sha256sum_check": {
+          "argv": [
+            "sha256sum",
+            "--check",
+            "uv-x86_64-unknown-linux-gnu.tar.gz.sha256"
+          ],
+          "cwd": "<owned-prefix>/downloads",
+          "rc": 0,
+          "stdout": "uv-x86_64-unknown-linux-gnu.tar.gz: OK\n",
+          "stderr": ""
+        },
+        "uv_binary_sha256": "abdc39eab8b4ad341dca91f3823a23a343fae94bdb22ebdd9e91694415206f2f",
+        "uvx_binary_sha256": "452ed5ec13033e3930bcc75725e8e6bf11ec496d2f392e666893afdefdb9d775",
+        "attestation_verification": "UNVERIFIED; this qualification used publisher SHA256 plus API asset digests, no GitHub attestation verification claim."
+      },
+      "installation": {
+        "native_argv": [
+          "sh",
+          "<owned-prefix>/source/uv-installer.sh"
+        ],
+        "public_environment_settings": {
+          "UV_UNMANAGED_INSTALL": "<owned-prefix>/versions/0.12.23/bin"
+        },
+        "rc": 0,
+        "stdout": "installing to <owned-prefix>/versions/0.12.23/bin\n  uv\n  uvx\neverything's installed!\n",
+        "stderr": "downloading uv 0.12.23 x86_64-unknown-linux-gnu\nWARN: The following commands are shadowed by other commands in your PATH: uv uvx\n",
+        "route": "Unchanged publisher-generated release installer; verifies hardcoded Linux archive checksum. No self updater, install receipt or shell-profile/PATH change; ownedbin contained onlyuv/uvx."
+      },
+      "fixture": {
+        "class": "vendor_cli_generated_synthetic_project",
+        "source_workflow": "astral-sh/uv@46b84fd0bfec23b72f29e8e2185ba68a65052f48:docs/guides/projects.md:12-55",
+        "no_upstream_test_claim": true,
+        "native_generated_files": [
+          ".python-version",
+          ".venv",
+          "README.md",
+          "pyproject.toml",
+          "src",
+          "uv.lock"
+        ],
+        "generated_entrypoint": "def main() -> None:\n    print(\"Hello from uv-qualification!\")\n",
+        "generated_entrypoint_unchanged_after_init": true,
+        "sha256": {
+          "entrypoint": "bf84b0bbb6f644d963019f22745d0badfb5d63f978d8a59a05dec4d4d8445b88",
+          "pyproject": "17587a194089166b09420ef8dad2e5028648f84051de63adaf6e47c5df3b183b",
+          "lock": "e1375fbd54dae2d3b93b5c4c1596336b4d1d4ca86f76ce46283e322c1ae219a5",
+          "python_pin": "02e735b3dfe1c32833eb550b7ff8ffa17f5f2bc3fa1e7bae61a8f5a3883ce398",
+          "uv": "abdc39eab8b4ad341dca91f3823a23a343fae94bdb22ebdd9e91694415206f2f",
+          "uvx": "452ed5ec13033e3930bcc75725e8e6bf11ec496d2f392e666893afdefdb9d775"
+        },
+        "lock_text": "version = 1\nrevision = 5\nrequires-python = \">=3.13\"\n\n[[package]]\nname = \"uv-qualification\"\nversion = \"0.1.0\"\nsource = { editable = \".\" }\n",
+        "dependencies": "Only local editableuv-qualification0.1.0; no third-party runtime dependencies or Python interpreter downloads. Offline flags applied to every project step."
+      },
+      "native_results": [
+        {
+          "step": "version",
+          "native_argv": [
+            "<owned-prefix>/versions/0.12.23/bin/uv",
+            "--version"
+          ],
+          "rc": 0,
+          "stdout": "uv 0.12.23 (x86_64-unknown-linux-gnu)\n",
+          "stderr": ""
+        },
+        {
+          "step": "init",
+          "native_argv": [
+            "<owned-prefix>/versions/0.12.23/bin/uv",
+            "init",
+            "--app",
+            "--vcs",
+            "none",
+            "--author-from",
+            "none",
+            "--no-workspace",
+            "--python",
+            "<existing-python>",
+            "--offline",
+            "--no-config",
+            "--no-python-downloads",
+            "--cache-dir",
+            "<owned-prefix>/cache",
+            "--name",
+            "uv-qualification",
+            "<owned-prefix>/project"
+          ],
+          "rc": 0,
+          "stdout": "",
+          "stderr": "Initialized project `uv-qualification` at `<owned-prefix>/project`\n"
+        },
+        {
+          "step": "lock",
+          "native_argv": [
+            "<owned-prefix>/versions/0.12.23/bin/uv",
+            "lock",
+            "--directory",
+            "<owned-prefix>/project",
+            "--python",
+            "<existing-python>",
+            "--offline",
+            "--no-config",
+            "--no-python-downloads",
+            "--cache-dir",
+            "<owned-prefix>/cache"
+          ],
+          "rc": 0,
+          "stdout": "",
+          "stderr": "Using CPython 3.13.16 interpreter at: <existing-python>\nResolved 1 package in 2ms\n"
+        },
+        {
+          "step": "run-final",
+          "native_argv": [
+            "<owned-prefix>/versions/0.12.23/bin/uv",
+            "run",
+            "--directory",
+            "<owned-prefix>/project",
+            "--python",
+            "<existing-python>",
+            "--locked",
+            "--offline",
+            "--no-config",
+            "--no-python-downloads",
+            "--cache-dir",
+            "<owned-prefix>/cache",
+            "uv-qualification"
+          ],
+          "rc": 0,
+          "stdout": "Hello from uv-qualification!\n",
+          "stderr": ""
+        },
+        {
+          "step": "lock-check",
+          "native_argv": [
+            "<owned-prefix>/versions/0.12.23/bin/uv",
+            "lock",
+            "--check",
+            "--directory",
+            "<owned-prefix>/project",
+            "--python",
+            "<existing-python>",
+            "--offline",
+            "--no-config",
+            "--no-python-downloads",
+            "--cache-dir",
+            "<owned-prefix>/cache"
+          ],
+          "rc": 0,
+          "stdout": "",
+          "stderr": "Resolved 1 package in 1ms\n"
+        },
+        {
+          "step": "python-observation",
+          "native_argv": [
+            "<owned-prefix>/versions/0.12.23/bin/uv",
+            "run",
+            "--directory",
+            "<owned-prefix>/project",
+            "--python",
+            "<existing-python>",
+            "--locked",
+            "--offline",
+            "--no-config",
+            "--no-python-downloads",
+            "--cache-dir",
+            "<owned-prefix>/cache",
+            "python",
+            "-c",
+            "import sys, json; print(json.dumps({\"python_version\": list(sys.version_info[:3]), \"in_venv\": sys.prefix != sys.base_prefix}))"
+          ],
+          "rc": 0,
+          "stdout": "{\"python_version\": [3, 13, 16], \"in_venv\": true}\n",
+          "stderr": ""
+        }
+      ],
+      "useful_result": {
+        "generated_entrypoint_stdout": "Hello from uv-qualification!\n",
+        "native_run_rc": 0,
+        "lock_check_rc": 0,
+        "python_version": [
+          3,
+          13,
+          16
+        ],
+        "python_in_owned_venv": true,
+        "generated_lock_format": {
+          "version": 1,
+          "revision": 5
+        },
+        "existing_python_only": true
+      },
+      "failed_attempts": [
+        {
+          "step": "run",
+          "native_argv": [
+            "<owned-prefix>/versions/0.12.23/bin/uv",
+            "run",
+            "--directory",
+            "<owned-prefix>/project",
+            "--python",
+            "<existing-python>",
+            "--locked",
+            "--offline",
+            "--no-config",
+            "--no-python-downloads",
+            "--cache-dir",
+            "<owned-prefix>/cache",
+            "main.py"
+          ],
+          "rc": 2,
+          "stdout": "",
+          "stderr": "Using CPython 3.13.16 interpreter at: <existing-python>\nCreating virtual environment at: .venv\n   Building uv-qualification @ file://<owned-prefix>/project\n      Built uv-qualification @ file://<owned-prefix>/project\nInstalled 1 package in 2ms\nerror: Failed to spawn: main.py\n  cause: No such file or directory (os error 2)\n",
+          "classification": "Incorrect integration invocation; missingmain.py. Upstream-generatedsrc console entry was intact.",
+          "correction": "Pinned guide explicitly says run generated entrypoint; changed command touv-qualification only, preserving project, lock and generatedsource."
+        },
+        {
+          "owner": "parent-source-discovery-history",
+          "attempted_paths": [
+            "docs/getting-started/projects.md",
+            "docs/reference/cli.md"
+          ],
+          "rc_class": "HTTP404",
+          "executed_here": false,
+          "retained_in_parent_status": "OMNI-ERROR",
+          "correction": "Actual immutable source tree discovered; read docs/guides/projects.md. No invented source capability claim."
+        }
+      ],
+      "upstream_tests": {
+        "executed": false,
+        "scope": "No unchanged upstream Rust/unit/integration suite executed; this is vendor CLI syntheticproject workflow evidence."
+      },
+      "cleanliness": {
+        "host_uv_before": "uv0.12.22(x86_64-unknown-linux-gnu)",
+        "host_uv_after": "uv0.12.22(x86_64-unknown-linux-gnu)",
+        "host_python_before": "Python3.13.16",
+        "host_python_after": "Python3.13.16",
+        "live_launchers_modified": false,
+        "shell_profiles_modified": false,
+        "accepted_runtime_or_SDK_modified": false,
+        "shared_worktree_modified": false,
+        "credentials_or_authstores_read": false,
+        "dependency_downloads_outside_owned_prefix": false,
+        "interpreter_downloads": false,
+        "owned_process_check": {
+          "argv": [
+            "pgrep",
+            "-f",
+            "^<owned-prefix>/(versions/0[.]12[.]23/bin/(uv|uvx)|project/[.]venv/bin/python)( |$)"
+          ],
+          "rc": 1,
+          "stdout": "",
+          "interpretation": "No matching owned foregrounduv/uvx/Pythonprocess; all prior commands completed."
+        }
+      },
+      "inverse": {
+        "executed": true,
+        "native_argv": [
+          [
+            "mv",
+            "<owned-prefix>/versions/0.12.23",
+            "<owned-prefix>/retired/0.12.23"
+          ],
+          [
+            "mv",
+            "<owned-prefix>/project",
+            "<owned-prefix>/retired/project"
+          ]
+        ],
+        "rc": [
+          0,
+          0
+        ],
+        "preserved": [
+          "retired/0.12.23",
+          "retired/project",
+          "source",
+          "downloads",
+          "outputs",
+          "cache"
+        ],
+        "active_owned_prefix_retired": true,
+        "disposable_project_retired": true,
+        "host_data_erased": false
+      },
+      "limitations": [
+        "Linuxx86_64/nativeCPython3.13.16only; no Macpin qualification or Pythonfamily change.",
+        "No live runtime/SDK lock schema update; generated revision5 belongs only to this disposable project.",
+        "No provider/model/GPU/broker use. Providerusage/cost not applicable to native CLI; unknown native resource usage not fabricated.",
+        "No release-specific Python3.15rc3 download or workspace conflicting-source regression reproduced.",
+        "Failedobsoletefilename invocation remains retained; success is only the corrected documented vendorentrypoint workflow."
+      ],
+      "completeness_critic": {
+        "covered": [
+          "Immutable tag and source-tree discovery",
+          "Publisher installer andarchive/checksumasset identities",
+          "Pinned official install/project docs",
+          "Installedclient identity before/after",
+          "Offline native init/lock/run/check with generated project",
+          "Ownedvenv uses existingPython",
+          "Recoverable isolated-prefix/project retirement"
+        ],
+        "unmeasured": [
+          "Mac/Windows/ARM acceptance",
+          "Release-specific resolver conflict/Python3.15rc3 behavior",
+          "GitHub Artifact Attestationverification",
+          "Native upstream test suite"
+        ],
+        "boundary": "Passing synthetic native CLI project behavior permits a scoped repositorypin review, not host/SDKruntime changes."
+      }
+    },
+    "projection_note": "Compact sanitized projection of the actual native receipt/output; path and opaque runtime locators abstracted. Original native bytes/hash retained privately. No upstream test claim except unchanged promptfoo vendor fixtures."
+  },
+  "limits": [
+    "No SDK interpreter change, third-party download, accepted runtime-lock change, Mac execution or upstream test-suite acceptance.",
+    "Actual obsolete-main.py failure and corrected generated-entrypoint use remain retained; private original receipts/outputs remain outside the checkout."
+  ]
+}

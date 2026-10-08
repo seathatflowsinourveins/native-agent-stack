@@ -85,7 +85,7 @@ Locally-run model weights a host receipt recorded qualifying on a runtime compon
 | Quality and evaluation | retain | `promptfoo` | 0.123.1 | local_integration | host_verified | untested | — | 9 / 11 |
 |  |  | `playwright-test` | 1.63.0 | local_integration | conditional | untested | — |  |
 | Recovery and portability | keep_but_compare | `restic` | 0.19.1 | synthetic | host_verified | untested | recovery | 4 / 12 |
-|  |  | `candidate:astral-sh-uv` | unpinned | synthetic | conditional, bootstrap 0.12.17 | untested, bootstrap 0.12.17 | — |  |
+|  |  | `candidate:astral-sh-uv` | unpinned | synthetic | conditional, bootstrap 0.12.23 | untested, bootstrap 0.12.23 | — |  |
 | Scheduling and supervision | keep_but_compare | `dagu` | 2.16.6 (behind v2.17.0) | local_integration | host_verified | untested | research-runtime | 5 / 13 |
 |  |  | `systemd` | 255.4-1ubuntu8.17 | local_integration | host_verified | untested | research-runtime |  |
 | Secrets and credentials | keep_but_compare | `gitleaks` | 8.30.1 | local_integration | host_verified | host_verified | — | 5 / 9 |

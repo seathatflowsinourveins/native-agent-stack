@@ -21,11 +21,11 @@
     },
     {
       "id": "uv",
-      "version": "0.12.17",
+      "version": "0.12.23",
       "kind": "tarball",
-      "url": "https://github.com/astral-sh/uv/releases/download/0.12.17/uv-x86_64-unknown-linux-gnu.tar.gz",
-      "sha256": "fa82fd8dde8e8eefdecada6aa0889666556cfceb690d06e0c3bca49eb3070a63",
-      "install_note": "Verified against the release's .sha256 sidecar fetched 2026-09-22; matches the existing agent-lab devcontainer pin. Archive also contains uvx; install both.",
+      "url": "https://github.com/astral-sh/uv/releases/download/0.12.23/uv-x86_64-unknown-linux-gnu.tar.gz",
+      "sha256": "9167d72b3319674b6303c4cbe071854bba13ebdf3d76b1a7cbdc175471fb66d6",
+      "install_note": "Archive contains uv and uvx. Publisher release digest and checksum sidecar checked on2026-10-08. Isolated Linux qualification/inverse are in evidence/artifacts/vendor-currency-20261008/uv-01223-qualification.json. Mac source metadata only; no Mac runtime/platform acceptance.",
       "version_probe": {
         "method": "exec",
         "command": "uv",

@@ -1727,7 +1727,7 @@
       "purpose": "Explicitly scoped code index and exact symbol retrieval through a six-tool MCP surface",
       "upstream_commands": {
         "install": [
-          "uv tool install jcodemunch-mcp==1.108.327"
+          "uv tool install jcodemunch-mcp==1.108.333"
         ],
         "use": [
           "order({\"action\":\"search_symbols\",\"args\":{\"repo\":\"RETURNED_REPOSITORY_ID\",\"query\":\"requested_function\",\"kind\":\"function\",\"max_results\":1}})",

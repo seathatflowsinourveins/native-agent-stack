@@ -88,7 +88,7 @@
   },
   "consensus": {
    "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-   "sha256": "d5441b11b0641c3a1666851443db76e1703697962badb28f0fe48eac40f8171e"
+   "sha256": "2bc9391829ac9d01e35f7d52a7cb9d583105846bc5f44f381c9dcae49d0386bd"
   }
  },
  "counts": {
@@ -2063,7 +2063,7 @@
    "layer_id": "token-efficiency",
    "slot_id": "code-index",
    "row_kind": "owner_decision",
-   "default": "jcodemunch-mcp 1.108.327",
+   "default": "jcodemunch-mcp 1.108.333",
    "repository": "https://github.com/jgravelle/jcodemunch-mcp",
    "installs_nothing_extra": false,
    "definitive": false,
@@ -2079,8 +2079,8 @@
     "by": "the owner's decision of 2026-10-04",
     "batch": "wave3",
     "reason": "the owner's order installs the token-efficiency repositories by default; jcodemunch-mcp is a core row of docs/token-efficiency-stack.json (explicitly scoped code index and exact symbol retrieval)",
-    "pin": "PyPI jcodemunch-mcp==1.108.327, source 6d5ae86c130f96624e2ca2d797fa3b853c210b9d (manifests/stack.json); the Linux pins file records no artifact digest for it, so uv's index hashes are the only artifact check",
-    "install": "the install plan's code-index function: uv tool install --python 3.13 jcodemunch-mcp==1.108.327 with UV_TOOL_DIR ${ECO_ROOT}/python-tools and UV_TOOL_BIN_DIR ${ECO_ROOT}/bin",
+    "pin": "PyPI jcodemunch-mcp==1.108.333, source bbe30fa299c4f82251233f25b8a0c5c56e2d407a (manifests/stack.json); the Linux pins file records no artifact digest for it, so uv's index hashes are the only artifact check",
+    "install": "the install plan's code-index function: uv tool install --python 3.13 jcodemunch-mcp==1.108.333 with UV_TOOL_DIR ${ECO_ROOT}/python-tools and UV_TOOL_BIN_DIR ${ECO_ROOT}/bin",
     "usage_rules": [
      "registered per project, never at user scope (docs/token-session-handbook.md:108)",
      "index only the selected code; sharing, AI summaries, watchers, cross-repository defaults and external context providers off (manifests/stack.json, jcodemunch-mcp command_scope)"
@@ -2096,7 +2096,8 @@
      "docs/token-session-handbook.md (uv tool specifications, line 334)",
      "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.327",
      "manifests/stack.json (components[id=jcodemunch-mcp])",
-     "evidence/receipts/jcodemunch-1108327-qualification-20261003.json"
+     "evidence/receipts/jcodemunch-1108327-qualification-20261003.json",
+     "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.333"
     ]
    }
   },
@@ -2828,7 +2829,7 @@
    "layer_id": "quality-evaluation",
    "slot_id": "promptfoo",
    "row_kind": "first_round",
-   "default": "Promptfoo 0.123.1",
+   "default": "Promptfoo 0.124.0",
    "repository": "https://github.com/promptfoo/promptfoo",
    "installs_nothing_extra": false,
    "definitive": false,
@@ -2843,8 +2844,8 @@
     "outcome": "owner_default",
     "by": "the owner's repository-quality rule of 2026-10-04",
     "batch": "wave4",
-    "reason": "Decide round 2, under the owner's repository-quality rule, named promptfoo the owner of paired skill verification in both clients (its Test Agent Skills guide drives the claude-agent-sdk and codex-sdk providers), and the Opus check upheld it. The row's decided default installed nothing, so the owner default installs Promptfoo 0.123.1 with G6's pinned recipe; Inspect AI keeps model and task evaluation.",
-    "pin": "Promptfoo 0.123.1; source 34f74d34e140b5e17d23770dfb2340057b1936b8",
+    "reason": "Decide round 2, under the owner's repository-quality rule, named promptfoo the owner of paired skill verification in both clients (its Test Agent Skills guide drives the claude-agent-sdk and codex-sdk providers), and the Opus check upheld it. The row's decided default installed nothing, so the owner default installs Promptfoo 0.123.1 with G6's pinned recipe; Inspect AI keeps model and task evaluation. Current version target refreshed to Promptfoo 0.124.0 on 2026-10-08 after bounded native qualification; the earlier judge observations retain their original 0.123.1 scope.",
+    "pin": "Promptfoo 0.124.0; source 30949931ee90c963acd487e97828c9441db0bcd4",
     "overturn": "the verified overturn check: run promptfoo and Harbor v0.23.0 (--skill injection plus Rewardkit) on the same frozen skill regressions with oracle-labelled outcomes, in both clients; transfer ownership if Harbor detects strictly more true regressions, with no more false flags and complete reproducible records, scoring verification correctness separately from the agents' task success; or failed upstream fixture/control or uncached two-route gateway/fresh-client MCP acceptance; each reports to the owner and removes nothing by itself.",
     "sources": [
      "docs/decisions/2026-10-04-2604-e2e-fix-wave.md",
@@ -2852,7 +2853,8 @@
      "evidence/artifacts/new-wsl-fix-wave-20261004/repository-quality-promptfoo.json",
      "docs/decisions/2026-10-04-2604-e2e-fix-wave-g6-eval-supply.md",
      "https://github.com/promptfoo/promptfoo/blob/0.123.1/site/docs/guides/test-agent-skills.md",
-     "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/examples/openai-compatible-gateway/promptfooconfig.yaml"
+     "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/examples/openai-compatible-gateway/promptfooconfig.yaml",
+     "https://github.com/promptfoo/promptfoo/releases/tag/0.124.0"
     ]
    },
    "overturned": {

@@ -49,13 +49,17 @@
       "source_commit": "f6191f076a42405f0d5508139f3a8b505cfef93a"
     },
     {
-      "tag_name": "v0.29.0",
-      "published_at": "2026-09-09T08:54:49Z",
+      "tag_name": "v0.31.0",
+      "published_at": "2026-10-05T06:44:55Z",
       "prerelease": false,
-      "html_url": "https://github.com/vllm-project/vllm/releases/tag/v0.29.0",
+      "html_url": "https://github.com/vllm-project/vllm/releases/tag/v0.31.0",
       "target_commitish": "main",
       "repo": "vllm-project/vllm",
-      "source_commit": "98dff2a81d747d1dba01a47f939f48c3526d4206"
+      "source_commit": "db9527a46873454610df6dbedf79a36d6bf1a7f6",
+      "scoped_checked_at": "2026-10-08",
+      "scoped_source_receipt": "evidence/receipts/vllm-031-working-pin-binding-20261008.json",
+      "historical_observation": {"tag_name": "v0.29.0", "published_at": "2026-09-09T08:54:49Z", "source_commit": "98dff2a81d747d1dba01a47f939f48c3526d4206", "source": "native-agent-stack@eb5fee4db9a494729deb29bdf38dbabac23ee643:manifests/landscape.json#/current_core_releases[repo=vllm-project/vllm]"},
+      "acceptance_boundary": "Current live foundation installed binding; no new model/GPU run or both-client operation closure. Historical0.29WSLfailure retains its own version/inputscope."
     },
     {
       "tag_name": "v1.19.1",

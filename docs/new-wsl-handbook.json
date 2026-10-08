@@ -210,7 +210,7 @@
         },
         "consensus": {
           "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-          "sha256": "d5441b11b0641c3a1666851443db76e1703697962badb28f0fe48eac40f8171e"
+          "sha256": "2bc9391829ac9d01e35f7d52a7cb9d583105846bc5f44f381c9dcae49d0386bd"
         },
         "convergence": {
           "file": "convergence.json",
@@ -2609,7 +2609,7 @@
             "catalog": "foundation",
             "claude": "not judged: an owner decision of 2026-10-04 (wave 3); no family review is on record yet",
             "coincides_with_lane_record": null,
-            "default": "jcodemunch-mcp 1.108.327",
+            "default": "jcodemunch-mcp 1.108.333",
             "definitive": false,
             "gpt": "not judged: an owner decision of 2026-10-04 (wave 3); no family review is on record yet",
             "installs_nothing_extra": false,
@@ -2621,14 +2621,14 @@
             "resolution": {
               "batch": "wave3",
               "by": "the owner's decision of 2026-10-04",
-              "install": "the install plan's code-index function: uv tool install --python 3.13 jcodemunch-mcp==1.108.327 with UV_TOOL_DIR ${ECO_ROOT}/python-tools and UV_TOOL_BIN_DIR ${ECO_ROOT}/bin",
+              "install": "the install plan's code-index function: uv tool install --python 3.13 jcodemunch-mcp==1.108.333 with UV_TOOL_DIR ${ECO_ROOT}/python-tools and UV_TOOL_BIN_DIR ${ECO_ROOT}/bin",
               "open_acceptance_gates": [
                 "${ECO_ROOT}/bin/jcodemunch-mcp runs from the uv tool",
                 "a project-scoped registration indexes a selected folder, and order search_symbols then get_symbol_source returns the requested definition"
               ],
               "outcome": "added_by_owner_decision",
               "overturn": "the F-token ablation of the Gate A multi-agent E2E on the new distribution (the stack without jcodemunch-mcp against the full stack and the lean base), or the fresh-session invocation census, reports that it adds nothing at equal task success; the result goes to the owner and removes nothing by itself",
-              "pin": "PyPI jcodemunch-mcp==1.108.327, source 6d5ae86c130f96624e2ca2d797fa3b853c210b9d (manifests/stack.json); the Linux pins file records no artifact digest for it, so uv's index hashes are the only artifact check",
+              "pin": "PyPI jcodemunch-mcp==1.108.333, source bbe30fa299c4f82251233f25b8a0c5c56e2d407a (manifests/stack.json); the Linux pins file records no artifact digest for it, so uv's index hashes are the only artifact check",
               "reason": "the owner's order installs the token-efficiency repositories by default; jcodemunch-mcp is a core row of docs/token-efficiency-stack.json (explicitly scoped code index and exact symbol retrieval)",
               "sources": [
                 "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
@@ -2636,7 +2636,8 @@
                 "docs/token-session-handbook.md (uv tool specifications, line 334)",
                 "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.327",
                 "manifests/stack.json (components[id=jcodemunch-mcp])",
-                "evidence/receipts/jcodemunch-1108327-qualification-20261003.json"
+                "evidence/receipts/jcodemunch-1108327-qualification-20261003.json",
+                "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.333"
               ],
               "usage_rules": [
                 "registered per project, never at user scope (docs/token-session-handbook.md:108)",
@@ -3124,7 +3125,7 @@
             "catalog": "foundation",
             "claude": "Opus checks of both decide rounds (2026-10-04): round 1's contested check upheld its critic's switch from skill-creator to promptfoo on capability fit; round 2's verification upheld the owner and adopt true against live upstream, read at promptfoo 0.123.1 (site/docs/guides/test-agent-skills.md), and corrected the overturn comparator and the existing-evaluator premise; not a new blind judgment of this row",
             "coincides_with_lane_record": null,
-            "default": "Promptfoo 0.123.1",
+            "default": "Promptfoo 0.124.0",
             "definitive": false,
             "gpt": "decide round 2 (2026-10-04): both blind GPT-6.1 Sol deciders and the GPT Astra critic named promptfoo for paired skill verification (the deciders took it for the existing evaluator); not a new blind judgment of this row",
             "installs_nothing_extra": false,
@@ -3177,15 +3178,16 @@
               "by": "the owner's repository-quality rule of 2026-10-04",
               "outcome": "owner_default",
               "overturn": "the verified overturn check: run promptfoo and Harbor v0.23.0 (--skill injection plus Rewardkit) on the same frozen skill regressions with oracle-labelled outcomes, in both clients; transfer ownership if Harbor detects strictly more true regressions, with no more false flags and complete reproducible records, scoring verification correctness separately from the agents' task success; or failed upstream fixture/control or uncached two-route gateway/fresh-client MCP acceptance; each reports to the owner and removes nothing by itself.",
-              "pin": "Promptfoo 0.123.1; source 34f74d34e140b5e17d23770dfb2340057b1936b8",
-              "reason": "Decide round 2, under the owner's repository-quality rule, named promptfoo the owner of paired skill verification in both clients (its Test Agent Skills guide drives the claude-agent-sdk and codex-sdk providers), and the Opus check upheld it. The row's decided default installed nothing, so the owner default installs Promptfoo 0.123.1 with G6's pinned recipe; Inspect AI keeps model and task evaluation.",
+              "pin": "Promptfoo 0.124.0; source 30949931ee90c963acd487e97828c9441db0bcd4",
+              "reason": "Decide round 2, under the owner's repository-quality rule, named promptfoo the owner of paired skill verification in both clients (its Test Agent Skills guide drives the claude-agent-sdk and codex-sdk providers), and the Opus check upheld it. The row's decided default installed nothing, so the owner default installs Promptfoo 0.123.1 with G6's pinned recipe; Inspect AI keeps model and task evaluation. Current version target refreshed to Promptfoo 0.124.0 on 2026-10-08 after bounded native qualification; the earlier judge observations retain their original 0.123.1 scope.",
               "sources": [
                 "docs/decisions/2026-10-04-2604-e2e-fix-wave.md",
                 "docs/decisions/2026-10-04-repository-quality-rule.md",
                 "evidence/artifacts/new-wsl-fix-wave-20261004/repository-quality-promptfoo.json",
                 "docs/decisions/2026-10-04-2604-e2e-fix-wave-g6-eval-supply.md",
                 "https://github.com/promptfoo/promptfoo/blob/0.123.1/site/docs/guides/test-agent-skills.md",
-                "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/examples/openai-compatible-gateway/promptfooconfig.yaml"
+                "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/examples/openai-compatible-gateway/promptfooconfig.yaml",
+                "https://github.com/promptfoo/promptfoo/releases/tag/0.124.0"
               ]
             },
             "row_kind": "first_round",
@@ -7832,11 +7834,11 @@
         "updated_at"
       ],
       "path": "adoption/manifest.json",
-      "sha256": "67d53c69ab322a37437aeaaceaec73655710657abc08ec269d5e5bbb115abdfb"
+      "sha256": "7007e75bca15ac4afc7e7fc60e721884ca80274996cdf758a419d0860248a2e8"
     },
     {
       "path": "adoption/new-wsl-profile.json",
-      "sha256": "f811217299d2f488e918fd25517838804929d08de5276809858ad77e1c5f42ee"
+      "sha256": "dd6b7788960c63dbebe166f1e4f8324e3b9995529e6be9ab40355bdd2be1121b"
     },
     {
       "path": "adoption/platforms/linux-wsl2-new-distro.md",
@@ -7960,7 +7962,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
-      "sha256": "901916dbfe24a40e377ba238c41648150b70eed4696421fa61da07d08f1ee150"
+      "sha256": "c2afbff6da9241f842ac3bcd3d78dd68c4d8d1d1646ff458a3951b9c5e00f195"
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/foundation-definitive.compact.json",
@@ -7984,7 +7986,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-      "sha256": "d5441b11b0641c3a1666851443db76e1703697962badb28f0fe48eac40f8171e"
+      "sha256": "2bc9391829ac9d01e35f7d52a7cb9d583105846bc5f44f381c9dcae49d0386bd"
     },
     {
       "path": "evidence/artifacts/ns2604-requalification-20261005/review-715-corrections.json",
@@ -10224,11 +10226,11 @@
         "evidence_class": "upstream_test_command_not_executed",
         "execution_status": "UNRUN",
         "prerequisites": [
-          "Run from the 0.123.1 source checkout after the contributing guide's developer setup.",
+          "Run from the 0.124.0 source checkout after the contributing guide's developer setup.",
           "The tagged package.json maps npm test to vitest run; integration, smoke, browser and provider benchmark scripts are separate."
         ],
         "scope": "Documented source install and test commands only; no installed CLI/provider evaluation or new-host acceptance.",
-        "source": "https://github.com/promptfoo/promptfoo/blob/0.123.1/site/docs/contributing.md",
+        "source": "https://github.com/promptfoo/promptfoo/blob/30949931ee90c963acd487e97828c9441db0bcd4/site/docs/contributing.md",
         "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       },
       "aliases": [
@@ -10239,8 +10241,8 @@
       "checksum": {
         "algorithm": "sha256",
         "kind": "artifact",
-        "source": "https://registry.npmjs.org/promptfoo/0.123.1",
-        "value": "53471b239132b5e7a270fda458f78a1f1b920abb617ef4dc2b096608d480ee2f"
+        "source": "https://registry.npmjs.org/promptfoo/0.124.0",
+        "value": "d0aa69e35d40be9b37454ce7569e04c62af67f3b45dd679182e53b170ef69c24"
       },
       "documented_install": [
         {
@@ -10254,16 +10256,17 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/quality-evaluation.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
         "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/README.md",
-        "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
+        "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json",
+        "https://github.com/promptfoo/promptfoo/releases/tag/0.124.0"
       ],
       "install": {
         "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh --only promptfoo",
         "execution_status": "UNRUN",
         "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install",
         "prerequisites": [
-          "Node/npm and an owned global install scope for promptfoo 0.123.1."
+          "Node/npm and an owned global install scope for promptfoo 0.124.0."
         ],
-        "scope": "Plan row: checksum-verified 0.123.1 tarball in an owned prefix, optional MCP SDK and both clients' native registration; run the install plan instead of an unverified global npm command.",
+        "scope": "Plan row: checksum-verified 0.124.0 tarball in an owned prefix, optional MCP SDK and both clients' native registration; run the install plan instead of an unverified global npm command.",
         "source": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
         "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       },
@@ -10271,7 +10274,7 @@
       "owner_layer_id": "quality-evaluation",
       "ownership_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
       "package_id": "npm:promptfoo",
-      "pin": "0.123.1",
+      "pin": "0.124.0",
       "position": 11,
       "provisioning_status": "unprovisioned_source_review",
       "repository": "https://github.com/promptfoo/promptfoo",
@@ -10421,7 +10424,7 @@
         "evidence_class": "documented_upstream_example_not_executed",
         "execution_status": "UNRUN",
         "scope": "Upstream public-image smoke; destination WSL acceptance is owed. The bounded Linux check is recorded separately in the fix-wave decision.",
-        "source": "https://raw.githubusercontent.com/anchore/syft/cc326e45a6213360266dda4b30cc68095946d676/README.md#L48",
+        "source": "https://raw.githubusercontent.com/anchore/syft/b254e6d92f28c3868a755f62fb3ca8f26e9fee76/README.md",
         "source_review_ref": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g6-eval-supply.md"
       },
       "aliases": [
@@ -10431,8 +10434,8 @@
       "checksum": {
         "algorithm": "sha256",
         "kind": "artifact",
-        "source": "https://github.com/anchore/syft/releases/download/v1.54.0/syft_1.54.0_checksums.txt",
-        "value": "54a87372498168b2d033e876fd41fa4e8035b872699e525a57046e1f2f09c860"
+        "source": "https://github.com/anchore/syft/releases/download/v1.54.1/syft_1.54.1_checksums.txt",
+        "value": "c069905b391cc4c20a5ba65ad5c10be2a7ba074f8ea6ad203e24d14e303dad47"
       },
       "documented_install": [
         {
@@ -10446,10 +10449,11 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/ci-supply-chain.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
         "https://github.com/anchore/syft/blob/02ba369d13b4248395b20a504eca94b0cab564d8/README.md",
-        "docs/decisions/2026-10-04-2604-e2e-fix-wave-g6-eval-supply.md"
+        "docs/decisions/2026-10-04-2604-e2e-fix-wave-g6-eval-supply.md",
+        "https://github.com/anchore/syft/releases/tag/v1.54.1"
       ],
       "install": {
-        "command": "mise use -g syft@1.54.0",
+        "command": "mise use -g syft@1.54.1",
         "execution_status": "UNRUN",
         "scope": "The reviewed user-owned mise registry recipe used by the install plan; no destination WSL run.",
         "source": "https://github.com/jdx/mise/blob/v2026.10.0/registry/syft.toml#L1",
@@ -10458,7 +10462,7 @@
       "name": "Syft",
       "owner_layer_id": "ci-supply-chain",
       "ownership_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
-      "pin": "1.54.0",
+      "pin": "1.54.1",
       "position": 5,
       "provisioning_status": "unprovisioned_source_review",
       "repository": "https://github.com/anchore/syft",
@@ -11854,7 +11858,7 @@
         "command": "uv run --no-project --python 3.13.15 - <<'PY'\nprint(\"hello world!\")\nPY",
         "evidence_class": "documented_upstream_example_not_executed",
         "scope": "Pin-specific adaptation of upstream's documented stdin hello-world example; not executed.",
-        "source": "https://github.com/astral-sh/uv/blob/0.12.17/docs/guides/scripts.md"
+        "source": "https://github.com/astral-sh/uv/blob/0.12.23/docs/guides/scripts.md"
       },
       "aliases": [
         "uv"
@@ -11863,8 +11867,8 @@
       "checksum": {
         "algorithm": "sha256",
         "kind": "artifact",
-        "source": "https://api.github.com/repos/astral-sh/uv/releases/tags/0.12.17",
-        "value": "fa82fd8dde8e8eefdecada6aa0889666556cfceb690d06e0c3bca49eb3070a63"
+        "source": "https://github.com/astral-sh/uv/releases/download/0.12.23/uv-x86_64-unknown-linux-gnu.tar.gz.sha256",
+        "value": "9167d72b3319674b6303c4cbe071854bba13ebdf3d76b1a7cbdc175471fb66d6"
       },
       "documented_install": [],
       "evidence_refs": [
@@ -11873,17 +11877,18 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/recovery-portability.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
         "https://github.com/astral-sh/uv/releases/tag/0.12.17",
-        "https://github.com/astral-sh/uv/blob/0.12.17/docs/guides/scripts.md"
+        "https://github.com/astral-sh/uv/blob/0.12.17/docs/guides/scripts.md",
+        "https://github.com/astral-sh/uv/releases/tag/0.12.23"
       ],
       "install": {
-        "command": "curl --proto '=https' --tlsv1.2 -LsSf https://releases.astral.sh/github/uv/releases/download/0.12.17/uv-installer.sh | sh",
+        "command": "curl --proto '=https' --tlsv1.2 -LsSf https://releases.astral.sh/github/uv/releases/download/0.12.23/uv-installer.sh | sh",
         "scope": "Explicit version argument from the user's requirement and tagged uv download metadata; native --help verifies the install options. No interpreter was installed.",
-        "source": "https://github.com/astral-sh/uv/releases/tag/0.12.17"
+        "source": "https://github.com/astral-sh/uv/releases/tag/0.12.23"
       },
       "name": "uv",
       "owner_layer_id": "recovery-portability",
       "ownership_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
-      "pin": "0.12.17",
+      "pin": "0.12.23",
       "position": 3,
       "provisioning_status": "unprovisioned_source_review",
       "repository": "https://github.com/astral-sh/uv",
@@ -12090,7 +12095,7 @@
           "A project-scoped registration and an index of the selected code."
         ],
         "scope": "Upstream's confirmation after a search_symbols and get_symbol_source answer, in a project that registered the server; its counter is an upstream estimate in its own scope, not a provider saving.",
-        "source": "https://github.com/jgravelle/jcodemunch-mcp/blob/6d5ae86c130f96624e2ca2d797fa3b853c210b9d/README.md#L141"
+        "source": "https://github.com/jgravelle/jcodemunch-mcp/blob/bbe30fa299c4f82251233f25b8a0c5c56e2d407a/README.md"
       },
       "aliases": [
         "jcodemunch-mcp"
@@ -12103,8 +12108,8 @@
       "checksum": {
         "algorithm": "git-sha1",
         "kind": "source",
-        "source": "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.327",
-        "value": "6d5ae86c130f96624e2ca2d797fa3b853c210b9d"
+        "source": "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.333",
+        "value": "bbe30fa299c4f82251233f25b8a0c5c56e2d407a"
       },
       "documented_install": [],
       "evidence_refs": [
@@ -12114,21 +12119,22 @@
         "docs/token-efficiency-stack.json",
         "https://github.com/jgravelle/jcodemunch-mcp/blob/6d5ae86c130f96624e2ca2d797fa3b853c210b9d/README.md#L91",
         "manifests/stack.json (components[id=jcodemunch-mcp])",
-        "evidence/receipts/jcodemunch-1108327-qualification-20261003.json"
+        "evidence/receipts/jcodemunch-1108327-qualification-20261003.json",
+        "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.333"
       ],
       "install": {
-        "command": "uv tool install jcodemunch-mcp==1.108.327",
+        "command": "uv tool install jcodemunch-mcp==1.108.333",
         "execution_status": "UNRUN",
         "prerequisites": [
           "uv with CPython 3.13."
         ],
         "scope": "The pinned PyPI package as a uv tool (docs/token-efficiency-stack.json, upstream_commands.install); the install plan sets UV_TOOL_DIR and UV_TOOL_BIN_DIR to the ecosystem root the client templates run. uv checks the index's hashes. Registered at user scope for Claude Code and Codex on the user's directive of 2026-10-04 (docs/decisions/2026-10-04-new-wsl-jcodemunch-user-scope.md); jcodemunch-mcp init, which writes a prompt policy and hooks, is not run.",
-        "source": "https://github.com/jgravelle/jcodemunch-mcp/blob/6d5ae86c130f96624e2ca2d797fa3b853c210b9d/README.md#L91"
+        "source": "https://github.com/jgravelle/jcodemunch-mcp/blob/bbe30fa299c4f82251233f25b8a0c5c56e2d407a/README.md"
       },
       "name": "jcodemunch-mcp",
       "owner_layer_id": "token-efficiency",
       "ownership_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
-      "pin": "1.108.327",
+      "pin": "1.108.333",
       "position": 17,
       "provisioning_status": "unprovisioned_source_review",
       "repository": "https://github.com/jgravelle/jcodemunch-mcp",

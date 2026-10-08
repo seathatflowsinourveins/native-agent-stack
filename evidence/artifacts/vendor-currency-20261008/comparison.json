@@ -1,0 +1,2221 @@
+{
+  "schema_version": 1,
+  "kind": "live_vendor_currency_comparison",
+  "source_commit": "eb5fee4db9a494729deb29bdf38dbabac23ee643",
+  "checked_date": "2026-10-08",
+  "components_checked": 69,
+  "rows": [
+    {
+      "id": "affaan-m/ECC",
+      "selected_at_base": "dd6ee538aee0f548d4a6b520118f875431fd749e",
+      "vendor": "affaan-m/ECC",
+      "latest_published": {
+        "tag": "v2.2.3",
+        "published_at": "2026-10-01T23:00:36Z",
+        "prerelease": false,
+        "source": "https://github.com/affaan-m/ECC/releases/tag/v2.2.3"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "v2.2.3",
+        "published_at": "2026-10-01T23:00:36Z",
+        "prerelease": false,
+        "source": "https://github.com/affaan-m/ECC/releases/tag/v2.2.3"
+      },
+      "release_observed_at": "2026-10-08T14:06:00.340101Z",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/affaan-m/ECC/releases?per_page=10",
+        "--jq",
+        "[.[] | {id,tag_name,published_at,prerelease,draft,target_commitish,html_url}]"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "held_source_guidance",
+      "reason": "Selected component is a source commit, not a release version. Published tagged release recorded; no ancestry, byte comparison or paired skill acceptance performed.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "9b22ba9955df5b49b99fdc424bca504f8feb679f9d383a0eb9c90593521b9295"
+    },
+    {
+      "id": "agent-browser",
+      "selected_at_base": "0.38.2",
+      "vendor": "vercel-labs/agent-browser",
+      "latest_published": {
+        "tag": "v0.38.2",
+        "published_at": "2026-10-01T21:44:28Z",
+        "prerelease": false,
+        "source": "https://github.com/vercel-labs/agent-browser/releases/tag/v0.38.2"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "v0.38.2",
+        "published_at": "2026-10-01T21:44:28Z",
+        "prerelease": false,
+        "source": "https://github.com/vercel-labs/agent-browser/releases/tag/v0.38.2"
+      },
+      "release_observed_at": "2026-10-08T14:06:00.340786Z",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/vercel-labs/agent-browser/releases?per_page=10",
+        "--jq",
+        "[.[] | {id,tag_name,published_at,prerelease,draft,target_commitish,html_url}]"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "safe_metadata_current",
+      "reason": "Selected semantic version equals clean stable vendor release; retain matching historical acceptance at its existing scope. This sweep is metadata only.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "9b22ba9955df5b49b99fdc424bca504f8feb679f9d383a0eb9c90593521b9295"
+    },
+    {
+      "id": "agentsview",
+      "selected_at_base": "0.44.0",
+      "vendor": "kenn-io/agentsview",
+      "latest_published": {
+        "tag": "v0.44.0",
+        "published_at": "2026-09-21T13:56:12Z",
+        "prerelease": false,
+        "source": "https://github.com/kenn-io/agentsview/releases/tag/v0.44.0"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "v0.44.0",
+        "published_at": "2026-09-21T13:56:12Z",
+        "prerelease": false,
+        "source": "https://github.com/kenn-io/agentsview/releases/tag/v0.44.0"
+      },
+      "release_observed_at": "2026-10-08T14:06:00.341150Z",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/kenn-io/agentsview/releases?per_page=10",
+        "--jq",
+        "[.[] | {id,tag_name,published_at,prerelease,draft,target_commitish,html_url}]"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "safe_metadata_current",
+      "reason": "Selected semantic version equals clean stable vendor release; retain matching historical acceptance at its existing scope. This sweep is metadata only.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "9b22ba9955df5b49b99fdc424bca504f8feb679f9d383a0eb9c90593521b9295"
+    },
+    {
+      "id": "ai-memory",
+      "selected_at_base": "2.4.1",
+      "vendor": "akitaonrails/ai-memory",
+      "latest_published": {
+        "tag": "v2.6.1",
+        "published_at": "2026-10-08T06:22:27Z",
+        "prerelease": false,
+        "source": "https://github.com/akitaonrails/ai-memory/releases/tag/v2.6.1"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "v2.6.1",
+        "published_at": "2026-10-08T06:22:27Z",
+        "prerelease": false,
+        "source": "https://github.com/akitaonrails/ai-memory/releases/tag/v2.6.1"
+      },
+      "release_observed_at": "2026-10-08T14:06:00.342176Z",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/akitaonrails/ai-memory/releases?per_page=10",
+        "--jq",
+        "[.[] | {id,tag_name,published_at,prerelease,draft,target_commitish,html_url}]"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "held_stateful_cutover",
+      "reason": "2.4.1 to2.6.1 affects persistent memory/hook deployment; cold-copy inverse and native lifecycle qualification required; no state touched.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "9b22ba9955df5b49b99fdc424bca504f8feb679f9d383a0eb9c90593521b9295"
+    },
+    {
+      "id": "alertmanager",
+      "selected_at_base": "0.34.1",
+      "vendor": "prometheus/alertmanager",
+      "latest_published": {
+        "tag": "v0.34.1",
+        "published_at": "2026-09-17T08:12:07Z",
+        "prerelease": false,
+        "source": "https://github.com/prometheus/alertmanager/releases/tag/v0.34.1"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "v0.34.1",
+        "published_at": "2026-09-17T08:12:07Z",
+        "prerelease": false,
+        "source": "https://github.com/prometheus/alertmanager/releases/tag/v0.34.1"
+      },
+      "release_observed_at": "2026-10-08T14:06:00.342583Z",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/prometheus/alertmanager/releases?per_page=10",
+        "--jq",
+        "[.[] | {id,tag_name,published_at,prerelease,draft,target_commitish,html_url}]"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "safe_metadata_current",
+      "reason": "Selected semantic version equals clean stable vendor release; retain matching historical acceptance at its existing scope. This sweep is metadata only.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "9b22ba9955df5b49b99fdc424bca504f8feb679f9d383a0eb9c90593521b9295"
+    },
+    {
+      "id": "alpaca-py",
+      "selected_at_base": "0.44.0",
+      "vendor": "alpacahq/alpaca-py",
+      "latest_published": {
+        "tag": "v0.44.0",
+        "published_at": "2026-08-11T10:11:55Z",
+        "prerelease": false,
+        "source": "https://github.com/alpacahq/alpaca-py/releases/tag/v0.44.0"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "v0.44.0",
+        "published_at": "2026-08-11T10:11:55Z",
+        "prerelease": false,
+        "source": "https://github.com/alpacahq/alpaca-py/releases/tag/v0.44.0"
+      },
+      "release_observed_at": "2026-10-08T14:06:00.343004Z",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/alpacahq/alpaca-py/releases?per_page=10",
+        "--jq",
+        "[.[] | {id,tag_name,published_at,prerelease,draft,target_commitish,html_url}]"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "safe_metadata_current",
+      "reason": "Selected semantic version equals clean stable vendor release; retain matching historical acceptance at its existing scope. This sweep is metadata only.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "9b22ba9955df5b49b99fdc424bca504f8feb679f9d383a0eb9c90593521b9295"
+    },
+    {
+      "id": "apple-container",
+      "selected_at_base": "1.4.1",
+      "vendor": "apple/container",
+      "latest_published": {
+        "tag": "1.5.0",
+        "published_at": "2026-09-29T02:33:21Z",
+        "prerelease": false,
+        "source": "https://github.com/apple/container/releases/tag/1.5.0"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "1.5.0",
+        "published_at": "2026-09-29T02:33:21Z",
+        "prerelease": false,
+        "source": "https://github.com/apple/container/releases/tag/1.5.0"
+      },
+      "release_observed_at": "2026-10-08T14:06:01.212843Z",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/apple/container/releases?per_page=10",
+        "--jq",
+        "[.[] | {id,tag_name,published_at,prerelease,draft,target_commitish,html_url}]"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "held_platform_acceptance",
+      "reason": "New1.5.0 requires native macOS container lifecycle/image and inverse qualification; this WSL metadata sweep provides none.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "9b22ba9955df5b49b99fdc424bca504f8feb679f9d383a0eb9c90593521b9295"
+    },
+    {
+      "id": "ast-grep",
+      "selected_at_base": "0.45.3",
+      "vendor": "ast-grep/ast-grep",
+      "latest_published": {
+        "tag": "0.45.3",
+        "published_at": "2026-08-31T01:42:23Z",
+        "prerelease": false,
+        "source": "https://github.com/ast-grep/ast-grep/releases/tag/0.45.3"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "0.45.3",
+        "published_at": "2026-08-31T01:42:23Z",
+        "prerelease": false,
+        "source": "https://github.com/ast-grep/ast-grep/releases/tag/0.45.3"
+      },
+      "release_observed_at": "2026-10-08T14:06:01.255457Z",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/ast-grep/ast-grep/releases?per_page=10",
+        "--jq",
+        "[.[] | {id,tag_name,published_at,prerelease,draft,target_commitish,html_url}]"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "safe_metadata_current",
+      "reason": "Selected semantic version equals clean stable vendor release; retain matching historical acceptance at its existing scope. This sweep is metadata only.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "9b22ba9955df5b49b99fdc424bca504f8feb679f9d383a0eb9c90593521b9295"
+    },
+    {
+      "id": "beads",
+      "selected_at_base": "1.3.0",
+      "vendor": "gastownhall/beads",
+      "latest_published": {
+        "tag": "v1.3.2-rc.1",
+        "published_at": "2026-10-05T05:29:43Z",
+        "prerelease": true,
+        "source": "https://github.com/gastownhall/beads/releases/tag/v1.3.2-rc.1"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "v1.3.1",
+        "published_at": "2026-09-30T23:37:36Z",
+        "prerelease": false,
+        "source": "https://github.com/gastownhall/beads/releases/tag/v1.3.1"
+      },
+      "release_observed_at": "2026-10-08T14:06:01.300691Z",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/gastownhall/beads/releases?per_page=10",
+        "--jq",
+        "[.[] | {id,tag_name,published_at,prerelease,draft,target_commitish,html_url}]"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "safe_candidate_for_isolated_qualification",
+      "reason": "Publishedstable1.3.1 supersedes1.3.0; latestpublished1.3.2-rc.1 is excluded. Isolated vendor installation/task-queue smoke and inverse still required before adoption.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "9b22ba9955df5b49b99fdc424bca504f8feb679f9d383a0eb9c90593521b9295"
+    },
+    {
+      "id": "ccusage",
+      "selected_at_base": "20.0.26",
+      "vendor": "ccusage/ccusage",
+      "latest_published": {
+        "tag": "v20.0.26",
+        "published_at": "2026-09-27T16:26:00Z",
+        "prerelease": false,
+        "source": "https://github.com/ccusage/ccusage/releases/tag/v20.0.26"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "v20.0.26",
+        "published_at": "2026-09-27T16:26:00Z",
+        "prerelease": false,
+        "source": "https://github.com/ccusage/ccusage/releases/tag/v20.0.26"
+      },
+      "release_observed_at": "2026-10-08T14:06:01.422761Z",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/ccusage/ccusage/releases?per_page=10",
+        "--jq",
+        "[.[] | {id,tag_name,published_at,prerelease,draft,target_commitish,html_url}]"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "safe_metadata_current",
+      "reason": "Selected semantic version equals clean stable vendor release; retain matching historical acceptance at its existing scope. This sweep is metadata only.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "9b22ba9955df5b49b99fdc424bca504f8feb679f9d383a0eb9c90593521b9295"
+    },
+    {
+      "id": "claude-code",
+      "selected_at_base": "2.1.284",
+      "vendor": "anthropics/claude-code",
+      "latest_published": {
+        "tag": "v2.1.294",
+        "published_at": "2026-10-08T05:03:54Z",
+        "prerelease": false,
+        "source": "https://github.com/anthropics/claude-code/releases/tag/v2.1.294"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "v2.1.294",
+        "published_at": "2026-10-08T05:03:54Z",
+        "prerelease": false,
+        "source": "https://github.com/anthropics/claude-code/releases/tag/v2.1.294"
+      },
+      "release_observed_at": "2026-10-08T14:06:01.486994Z",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/anthropics/claude-code/releases?per_page=10",
+        "--jq",
+        "[.[] | {id,tag_name,published_at,prerelease,draft,target_commitish,html_url}]"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "held_channel_disagreement",
+      "reason": "GitHubcleanstable2.1.294 and npm latest2.1.293 differ; native installer channel metadata retained. Preserve native install route and coordinated client acceptance.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "9b22ba9955df5b49b99fdc424bca504f8feb679f9d383a0eb9c90593521b9295"
+    },
+    {
+      "id": "claude-hud",
+      "selected_at_base": "0.10.0",
+      "vendor": "jarrodwatts/claude-hud",
+      "latest_published": {
+        "tag": "v0.10.0",
+        "published_at": "2026-10-01T19:11:24Z",
+        "prerelease": false,
+        "source": "https://github.com/jarrodwatts/claude-hud/releases/tag/v0.10.0"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "v0.10.0",
+        "published_at": "2026-10-01T19:11:24Z",
+        "prerelease": false,
+        "source": "https://github.com/jarrodwatts/claude-hud/releases/tag/v0.10.0"
+      },
+      "release_observed_at": "2026-10-08T14:06:01.521215Z",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/jarrodwatts/claude-hud/releases?per_page=10",
+        "--jq",
+        "[.[] | {id,tag_name,published_at,prerelease,draft,target_commitish,html_url}]"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "safe_metadata_current",
+      "reason": "Selected semantic version equals clean stable vendor release; retain matching historical acceptance at its existing scope. This sweep is metadata only.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "9b22ba9955df5b49b99fdc424bca504f8feb679f9d383a0eb9c90593521b9295"
+    },
+    {
+      "id": "codebase-memory-mcp",
+      "selected_at_base": "0.11.0",
+      "vendor": "DeusData/codebase-memory-mcp",
+      "latest_published": {
+        "tag": "v0.11.0",
+        "published_at": "2026-09-15T23:40:39Z",
+        "prerelease": false,
+        "source": "https://github.com/DeusData/codebase-memory-mcp/releases/tag/v0.11.0"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "v0.11.0",
+        "published_at": "2026-09-15T23:40:39Z",
+        "prerelease": false,
+        "source": "https://github.com/DeusData/codebase-memory-mcp/releases/tag/v0.11.0"
+      },
+      "release_observed_at": "2026-10-08T14:06:02.107225Z",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/DeusData/codebase-memory-mcp/releases?per_page=10",
+        "--jq",
+        "[.[] | {id,tag_name,published_at,prerelease,draft,target_commitish,html_url}]"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "safe_metadata_current",
+      "reason": "Selected semantic version equals clean stable vendor release; retain matching historical acceptance at its existing scope. This sweep is metadata only.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "9b22ba9955df5b49b99fdc424bca504f8feb679f9d383a0eb9c90593521b9295"
+    },
+    {
+      "id": "codex",
+      "selected_at_base": "0.160.0",
+      "vendor": "openai/codex",
+      "latest_published": {
+        "tag": "rust-v0.162.0-alpha.17.2",
+        "published_at": "2026-10-08T07:30:45Z",
+        "prerelease": true,
+        "source": "https://github.com/openai/codex/releases/tag/rust-v0.162.0-alpha.17.2"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "rust-v0.161.0",
+        "published_at": "2026-10-07T15:58:45Z",
+        "prerelease": false,
+        "source": "https://github.com/openai/codex/releases/tag/rust-v0.161.0"
+      },
+      "release_observed_at": "2026-10-08T14:06:02.132618Z",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/openai/codex/releases?per_page=10",
+        "--jq",
+        "[.[] | {id,tag_name,published_at,prerelease,draft,target_commitish,html_url}]"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "held_coordinated_client_acceptance",
+      "reason": "Cleanstable0.161.0 recorded; alpha0.162.0-alpha.17.2 excluded. Coordinated native client/gateway/daemon acceptance and inverse required; sweep changes no client.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "9b22ba9955df5b49b99fdc424bca504f8feb679f9d383a0eb9c90593521b9295"
+    },
+    {
+      "id": "codex-for-claude",
+      "selected_at_base": "1.0.6 @ db52e28f4d9ded852ab3942cea316258ae4ef346",
+      "vendor": "openai/codex-plugin-cc",
+      "latest_published": {
+        "tag": "v1.0.6",
+        "published_at": "2026-07-08T00:17:32Z",
+        "prerelease": false,
+        "source": "https://github.com/openai/codex-plugin-cc/releases/tag/v1.0.6"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "v1.0.6",
+        "published_at": "2026-07-08T00:17:32Z",
+        "prerelease": false,
+        "source": "https://github.com/openai/codex-plugin-cc/releases/tag/v1.0.6"
+      },
+      "release_observed_at": "2026-10-08T14:06:02.276923Z",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/openai/codex-plugin-cc/releases?per_page=10",
+        "--jq",
+        "[.[] | {id,tag_name,published_at,prerelease,draft,target_commitish,html_url}]"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "safe_metadata_current",
+      "reason": "Selected semantic version equals clean stable vendor release; retain matching historical acceptance at its existing scope. This sweep is metadata only.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "9b22ba9955df5b49b99fdc424bca504f8feb679f9d383a0eb9c90593521b9295"
+    },
+    {
+      "id": "context-hub",
+      "selected_at_base": "0.1.4",
+      "vendor": "andrewyng/context-hub",
+      "latest_published": {
+        "tag": "v0.1.4",
+        "published_at": "2026-04-27T22:10:03Z",
+        "prerelease": false,
+        "source": "https://github.com/andrewyng/context-hub/releases/tag/v0.1.4"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "v0.1.4",
+        "published_at": "2026-04-27T22:10:03Z",
+        "prerelease": false,
+        "source": "https://github.com/andrewyng/context-hub/releases/tag/v0.1.4"
+      },
+      "release_observed_at": "2026-10-08T14:06:02.277988Z",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/andrewyng/context-hub/releases?per_page=10",
+        "--jq",
+        "[.[] | {id,tag_name,published_at,prerelease,draft,target_commitish,html_url}]"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "safe_metadata_current",
+      "reason": "Selected semantic version equals clean stable vendor release; retain matching historical acceptance at its existing scope. This sweep is metadata only.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "9b22ba9955df5b49b99fdc424bca504f8feb679f9d383a0eb9c90593521b9295"
+    },
+    {
+      "id": "context-mode",
+      "selected_at_base": "1.0.169",
+      "vendor": "mksglu/context-mode",
+      "latest_published": {
+        "tag": "v1.0.169",
+        "published_at": "2026-06-29T18:18:53Z",
+        "prerelease": false,
+        "source": "https://github.com/mksglu/context-mode/releases/tag/v1.0.169"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "v1.0.169",
+        "published_at": "2026-06-29T18:18:53Z",
+        "prerelease": false,
+        "source": "https://github.com/mksglu/context-mode/releases/tag/v1.0.169"
+      },
+      "release_observed_at": "2026-10-08T14:06:02.351986Z",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/mksglu/context-mode/releases?per_page=10",
+        "--jq",
+        "[.[] | {id,tag_name,published_at,prerelease,draft,target_commitish,html_url}]"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "safe_metadata_current",
+      "reason": "Selected semantic version equals clean stable vendor release; retain matching historical acceptance at its existing scope. This sweep is metadata only.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "9b22ba9955df5b49b99fdc424bca504f8feb679f9d383a0eb9c90593521b9295"
+    },
+    {
+      "id": "dagu",
+      "selected_at_base": "2.16.6",
+      "vendor": "dagucloud/dagu",
+      "latest_published": {
+        "tag": "v2.18.2",
+        "published_at": "2026-10-04T03:54:02Z",
+        "prerelease": false,
+        "source": "https://github.com/dagucloud/dagu/releases/tag/v2.18.2"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "v2.18.2",
+        "published_at": "2026-10-04T03:54:02Z",
+        "prerelease": false,
+        "source": "https://github.com/dagucloud/dagu/releases/tag/v2.18.2"
+      },
+      "release_observed_at": "2026-10-08T14:06:02.385104Z",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/dagucloud/dagu/releases?per_page=10",
+        "--jq",
+        "[.[] | {id,tag_name,published_at,prerelease,draft,target_commitish,html_url}]"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "held_service_acceptance",
+      "reason": "2.16.6 to2.18.2 requires selected DAG validation and lifecycle/history/service inverse; no workflow or service changed.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "9b22ba9955df5b49b99fdc424bca504f8feb679f9d383a0eb9c90593521b9295"
+    },
+    {
+      "id": "davila7/claude-code-templates",
+      "selected_at_base": "c840d6f626be7ba418da60aeb0f2080413562451",
+      "vendor": "davila7/claude-code-templates",
+      "latest_published": {
+        "tag": "v1.29.6",
+        "published_at": "2026-09-17T01:14:32Z",
+        "prerelease": false,
+        "source": "https://github.com/davila7/claude-code-templates/releases/tag/v1.29.6"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "v1.29.6",
+        "published_at": "2026-09-17T01:14:32Z",
+        "prerelease": false,
+        "source": "https://github.com/davila7/claude-code-templates/releases/tag/v1.29.6"
+      },
+      "release_observed_at": "2026-10-08T14:06:02.980976Z",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/davila7/claude-code-templates/releases?per_page=10",
+        "--jq",
+        "[.[] | {id,tag_name,published_at,prerelease,draft,target_commitish,html_url}]"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "held_source_guidance",
+      "reason": "Selected component is a source commit, not a release version. Published tagged release recorded; no ancestry, byte comparison or paired skill acceptance performed.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "9b22ba9955df5b49b99fdc424bca504f8feb679f9d383a0eb9c90593521b9295"
+    },
+    {
+      "id": "difftastic",
+      "selected_at_base": "0.71.0",
+      "vendor": "Wilfred/difftastic",
+      "latest_published": {
+        "tag": "0.71.0",
+        "published_at": "2026-09-18T22:57:29Z",
+        "prerelease": false,
+        "source": "https://github.com/Wilfred/difftastic/releases/tag/0.71.0"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "0.71.0",
+        "published_at": "2026-09-18T22:57:29Z",
+        "prerelease": false,
+        "source": "https://github.com/Wilfred/difftastic/releases/tag/0.71.0"
+      },
+      "release_observed_at": "2026-10-08T14:06:03.098006Z",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/Wilfred/difftastic/releases?per_page=10",
+        "--jq",
+        "[.[] | {id,tag_name,published_at,prerelease,draft,target_commitish,html_url}]"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "safe_metadata_current",
+      "reason": "Selected semantic version equals clean stable vendor release; retain matching historical acceptance at its existing scope. This sweep is metadata only.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "9b22ba9955df5b49b99fdc424bca504f8feb679f9d383a0eb9c90593521b9295"
+    },
+    {
+      "id": "duckdb",
+      "selected_at_base": "1.5.5",
+      "vendor": "duckdb/duckdb",
+      "latest_published": {
+        "tag": "v1.5.6",
+        "published_at": "2026-09-28T13:35:11Z",
+        "prerelease": false,
+        "source": "https://github.com/duckdb/duckdb/releases/tag/v1.5.6"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "v1.5.6",
+        "published_at": "2026-09-28T13:35:11Z",
+        "prerelease": false,
+        "source": "https://github.com/duckdb/duckdb/releases/tag/v1.5.6"
+      },
+      "release_observed_at": "2026-10-08T14:06:03.109688Z",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/duckdb/duckdb/releases?per_page=10",
+        "--jq",
+        "[.[] | {id,tag_name,published_at,prerelease,draft,target_commitish,html_url}]"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "held_cc_runtime_gate",
+      "reason": "1.5.6 metadata agrees with PyPI; us-equities-runtime changes require CC first and native Python3.12 data-engine acceptance.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "9b22ba9955df5b49b99fdc424bca504f8feb679f9d383a0eb9c90593521b9295"
+    },
+    {
+      "id": "edgartools",
+      "selected_at_base": "5.60.0",
+      "vendor": "dgunning/edgartools",
+      "latest_published": {
+        "tag": "v5.61.1",
+        "published_at": "2026-10-06T22:30:02Z",
+        "prerelease": false,
+        "source": "https://github.com/dgunning/edgartools/releases/tag/v5.61.1"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "v5.61.1",
+        "published_at": "2026-10-06T22:30:02Z",
+        "prerelease": false,
+        "source": "https://github.com/dgunning/edgartools/releases/tag/v5.61.1"
+      },
+      "release_observed_at": "2026-10-08T14:06:03.234289Z",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/dgunning/edgartools/releases?per_page=10",
+        "--jq",
+        "[.[] | {id,tag_name,published_at,prerelease,draft,target_commitish,html_url}]"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "held_active_owner_runtime_gate",
+      "reason": "5.61.1 agrees with PyPI; rnd-r1 owns authorized runtime packet and parent owns EDGAR inventoryPR. Sweep does not duplicate installation; CC runtime gate and native SEC receipt remain separate.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "9b22ba9955df5b49b99fdc424bca504f8feb679f9d383a0eb9c90593521b9295"
+    },
+    {
+      "id": "exchange-calendars",
+      "selected_at_base": "4.13.2",
+      "vendor": "gerrymanoim/exchange_calendars",
+      "latest_published": {
+        "tag": "4.13.2",
+        "published_at": "2026-03-10T03:24:04Z",
+        "prerelease": false,
+        "source": "https://github.com/gerrymanoim/exchange_calendars/releases/tag/4.13.2"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "4.13.2",
+        "published_at": "2026-03-10T03:24:04Z",
+        "prerelease": false,
+        "source": "https://github.com/gerrymanoim/exchange_calendars/releases/tag/4.13.2"
+      },
+      "release_observed_at": "2026-10-08T14:06:03.406714Z",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/gerrymanoim/exchange_calendars/releases?per_page=10",
+        "--jq",
+        "[.[] | {id,tag_name,published_at,prerelease,draft,target_commitish,html_url}]"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "safe_metadata_current",
+      "reason": "Selected semantic version equals clean stable vendor release; retain matching historical acceptance at its existing scope. This sweep is metadata only.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "9b22ba9955df5b49b99fdc424bca504f8feb679f9d383a0eb9c90593521b9295"
+    },
+    {
+      "id": "fastapi",
+      "selected_at_base": "0.141.1",
+      "vendor": "fastapi/fastapi",
+      "latest_published": {
+        "tag": "0.143.0",
+        "published_at": "2026-10-08T12:29:29Z",
+        "prerelease": false,
+        "source": "https://github.com/fastapi/fastapi/releases/tag/0.143.0"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "0.143.0",
+        "published_at": "2026-10-08T12:29:29Z",
+        "prerelease": false,
+        "source": "https://github.com/fastapi/fastapi/releases/tag/0.143.0"
+      },
+      "release_observed_at": "2026-10-08T14:05:24.852Z",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/fastapi/fastapi/releases?per_page=10"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "held_candidate_acceptance_owed",
+      "reason": "New0.143.0 release explicitly lists Breaking Changes; do not change application dependency without exact migration/source review and acceptance.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "5af68469f191514bb365d31401a0f43f36b70a40bdb4cf1e48fb97518c8df579"
+    },
+    {
+      "id": "gitleaks",
+      "selected_at_base": "8.30.1",
+      "vendor": "gitleaks/gitleaks",
+      "latest_published": {
+        "tag": "v8.30.1",
+        "published_at": "2026-03-21T02:17:58Z",
+        "prerelease": false,
+        "source": "https://github.com/gitleaks/gitleaks/releases/tag/v8.30.1"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "v8.30.1",
+        "published_at": "2026-03-21T02:17:58Z",
+        "prerelease": false,
+        "source": "https://github.com/gitleaks/gitleaks/releases/tag/v8.30.1"
+      },
+      "release_observed_at": "2026-10-08T14:05:24.858Z",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/gitleaks/gitleaks/releases?per_page=10"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "same_published_stable",
+      "reason": "No new distribution pin found in this bounded publication read; no deployment claim.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "5af68469f191514bb365d31401a0f43f36b70a40bdb4cf1e48fb97518c8df579"
+    },
+    {
+      "id": "grafana",
+      "selected_at_base": "13.2.3",
+      "vendor": "grafana/grafana",
+      "latest_published": {
+        "tag": "v13.2.3",
+        "published_at": "2026-09-29T09:02:18Z",
+        "prerelease": false,
+        "source": "https://github.com/grafana/grafana/releases/tag/v13.2.3"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "v13.2.3",
+        "published_at": "2026-09-29T09:02:18Z",
+        "prerelease": false,
+        "source": "https://github.com/grafana/grafana/releases/tag/v13.2.3"
+      },
+      "release_observed_at": "2026-10-08T14:05:24.861Z",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/grafana/grafana/releases?per_page=10"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "held_recorded_regression",
+      "reason": "Pin matches current release; canonical manifest records grafana#133835/#133856 regression hold and host activation pending. This sweep did not requalify or clear it.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "5af68469f191514bb365d31401a0f43f36b70a40bdb4cf1e48fb97518c8df579"
+    },
+    {
+      "id": "headroom",
+      "selected_at_base": "0.40.0",
+      "vendor": "headroomlabs-ai/headroom",
+      "latest_published": {
+        "tag": "v0.40.0",
+        "published_at": "2026-10-06T03:06:48Z",
+        "prerelease": false,
+        "source": "https://github.com/headroomlabs-ai/headroom/releases/tag/v0.40.0"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "v0.40.0",
+        "published_at": "2026-10-06T03:06:48Z",
+        "prerelease": false,
+        "source": "https://github.com/headroomlabs-ai/headroom/releases/tag/v0.40.0"
+      },
+      "release_observed_at": "2026-10-08T14:05:24.862Z",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/headroomlabs-ai/headroom/releases?per_page=10"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "same_published_stable",
+      "reason": "No new distribution pin found in this bounded publication read; no deployment claim.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "5af68469f191514bb365d31401a0f43f36b70a40bdb4cf1e48fb97518c8df579"
+    },
+    {
+      "id": "huggingface-hub-native",
+      "selected_at_base": "1.32.0",
+      "vendor": "huggingface/huggingface_hub",
+      "latest_published": {
+        "tag": "v2.1.1",
+        "published_at": "2026-10-01T12:46:14Z",
+        "prerelease": false,
+        "source": "https://github.com/huggingface/huggingface_hub/releases/tag/v2.1.1"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "v2.1.1",
+        "published_at": "2026-10-01T12:46:14Z",
+        "prerelease": false,
+        "source": "https://github.com/huggingface/huggingface_hub/releases/tag/v2.1.1"
+      },
+      "release_observed_at": "2026-10-08T14:05:24.864Z",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/huggingface/huggingface_hub/releases?per_page=10"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "held_candidate_acceptance_owed",
+      "reason": "Major-version2.1.1 publication differs from1.32.0; inspect vendor migration and CLI changes, use hf-cli, preserve native sign-in, then scoped isolated native acceptance.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "5af68469f191514bb365d31401a0f43f36b70a40bdb4cf1e48fb97518c8df579"
+    },
+    {
+      "id": "jcodemunch-mcp",
+      "selected_at_base": "1.108.327",
+      "vendor": "jgravelle/jcodemunch-mcp",
+      "latest_published": {
+        "tag": "v1.108.333",
+        "published_at": "2026-10-07T23:00:32Z",
+        "prerelease": false,
+        "source": "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.333"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "v1.108.333",
+        "published_at": "2026-10-07T23:00:32Z",
+        "prerelease": false,
+        "source": "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.333"
+      },
+      "release_observed_at": "2026-10-08T14:05:25.725Z",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/jgravelle/jcodemunch-mcp/releases?per_page=10"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "held_candidate_acceptance_owed",
+      "reason": "Different publication from selected pin; supported installation, upstream acceptance and integration check remain owed.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "5af68469f191514bb365d31401a0f43f36b70a40bdb4cf1e48fb97518c8df579"
+    },
+    {
+      "id": "lean",
+      "selected_at_base": "985ef30 with documented dependency remediation",
+      "vendor": "QuantConnect/Lean",
+      "latest_published": {
+        "tag": "v2.4.0.1",
+        "published_at": "2017-08-08T20:57:57Z",
+        "prerelease": false,
+        "source": "https://github.com/QuantConnect/Lean/releases/tag/v2.4.0.1"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "v2.4.0.1",
+        "published_at": "2017-08-08T20:57:57Z",
+        "prerelease": false,
+        "source": "https://github.com/QuantConnect/Lean/releases/tag/v2.4.0.1"
+      },
+      "release_observed_at": "2026-10-08T14:05:25.744Z",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/QuantConnect/Lean/releases?per_page=10"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "source_pinned_runtime_held",
+      "reason": "Newest GitHub release2017 v2.4.0.1 predates the selected source pin; no downgrade inferred. Current head not queried and source-only lane/runtime changes require CC first.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "5af68469f191514bb365d31401a0f43f36b70a40bdb4cf1e48fb97518c8df579"
+    },
+    {
+      "id": "llama-cpp",
+      "selected_at_base": "b11057 (0.4.1-dev)",
+      "vendor": "ggml-org/llama.cpp",
+      "latest_published": {
+        "tag": "b11503",
+        "published_at": "2026-10-08T13:29:54Z",
+        "prerelease": true,
+        "source": "https://github.com/ggml-org/llama.cpp/releases/tag/b11503"
+      },
+      "latest_clean_component_candidate": null,
+      "release_observed_at": "2026-10-08T14:05:25.789Z",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/ggml-org/llama.cpp/releases?per_page=10"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "held_prerelease_gpu",
+      "reason": "Newest ten publication entries are prereleases; b11503 is observed, no stable in bounded page. GPU/provider qualification omitted by assignment.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "5af68469f191514bb365d31401a0f43f36b70a40bdb4cf1e48fb97518c8df579"
+    },
+    {
+      "id": "loki",
+      "selected_at_base": "3.7.8",
+      "vendor": "grafana/loki",
+      "latest_published": {
+        "tag": "operator/v0.12.0",
+        "published_at": "2026-10-07T17:51:23Z",
+        "prerelease": false,
+        "source": "https://github.com/grafana/loki/releases/tag/operator/v0.12.0"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "operator/v0.12.0",
+        "published_at": "2026-10-07T17:51:23Z",
+        "prerelease": false,
+        "source": "https://github.com/grafana/loki/releases/tag/operator/v0.12.0"
+      },
+      "release_observed_at": "2026-10-08T14:05:26.140Z",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/grafana/loki/releases?per_page=10"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "same_published_stable",
+      "reason": "No new distribution pin found in this bounded publication read; no deployment claim.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "5af68469f191514bb365d31401a0f43f36b70a40bdb4cf1e48fb97518c8df579"
+    },
+    {
+      "id": "markitdown",
+      "selected_at_base": "0.1.8",
+      "vendor": "microsoft/markitdown",
+      "latest_published": {
+        "tag": "v0.1.8",
+        "published_at": "2026-09-21T21:22:51Z",
+        "prerelease": false,
+        "source": "https://github.com/microsoft/markitdown/releases/tag/v0.1.8"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "v0.1.8",
+        "published_at": "2026-09-21T21:22:51Z",
+        "prerelease": false,
+        "source": "https://github.com/microsoft/markitdown/releases/tag/v0.1.8"
+      },
+      "release_observed_at": "2026-10-08T14:05:26.260Z",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/microsoft/markitdown/releases?per_page=10"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "same_published_stable",
+      "reason": "No new distribution pin found in this bounded publication read; no deployment claim.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "5af68469f191514bb365d31401a0f43f36b70a40bdb4cf1e48fb97518c8df579"
+    },
+    {
+      "id": "mcp-inspector",
+      "selected_at_base": "2.9.0",
+      "vendor": "modelcontextprotocol/inspector",
+      "latest_published": {
+        "tag": "2.10.1",
+        "published_at": "2026-10-08T05:05:05Z",
+        "prerelease": false,
+        "source": "https://github.com/modelcontextprotocol/inspector/releases/tag/2.10.1"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "2.10.1",
+        "published_at": "2026-10-08T05:05:05Z",
+        "prerelease": false,
+        "source": "https://github.com/modelcontextprotocol/inspector/releases/tag/2.10.1"
+      },
+      "release_observed_at": "2026-10-08T14:05:26.766Z",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/modelcontextprotocol/inspector/releases?per_page=10"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "held_candidate_acceptance_owed",
+      "reason": "Different publication from selected pin; supported installation, upstream acceptance and integration check remain owed.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "5af68469f191514bb365d31401a0f43f36b70a40bdb4cf1e48fb97518c8df579"
+    },
+    {
+      "id": "mcporter",
+      "selected_at_base": "0.14.2",
+      "vendor": "openclaw/mcporter",
+      "latest_published": {
+        "tag": "v0.14.2",
+        "published_at": "2026-10-01T18:24:07Z",
+        "prerelease": false,
+        "source": "https://github.com/openclaw/mcporter/releases/tag/v0.14.2"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "v0.14.2",
+        "published_at": "2026-10-01T18:24:07Z",
+        "prerelease": false,
+        "source": "https://github.com/openclaw/mcporter/releases/tag/v0.14.2"
+      },
+      "release_observed_at": "2026-10-08T14:05:26.857Z",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/openclaw/mcporter/releases?per_page=10"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "same_published_stable",
+      "reason": "No new distribution pin found in this bounded publication read; no deployment claim.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "5af68469f191514bb365d31401a0f43f36b70a40bdb4cf1e48fb97518c8df579"
+    },
+    {
+      "id": "nautilus-trader",
+      "selected_at_base": "2.0.0rc5",
+      "vendor": "nautechsystems/nautilus_trader",
+      "latest_published": {
+        "tag": "v2.0.0rc6",
+        "published_at": "2026-10-05T03:03:18Z",
+        "prerelease": true,
+        "source": "https://github.com/nautechsystems/nautilus_trader/releases/tag/v2.0.0rc6"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "v1.231.0",
+        "published_at": "2026-08-02T18:53:49Z",
+        "prerelease": false,
+        "source": "https://github.com/nautechsystems/nautilus_trader/releases/tag/v1.231.0"
+      },
+      "release_observed_at": "2026-10-08T14:05:27.041Z",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/nautechsystems/nautilus_trader/releases?per_page=10"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "held_selected_prerelease_runtime",
+      "reason": "v2.0.0rc6 is newer published prerelease, immutable7b766f8825b2539c5b2ac1375e9d97b41c509edb; latest stable1.231.0 is another major line. Preserve selectedrc5; runtime changes require CC first and N2 STOP stays latched.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "5af68469f191514bb365d31401a0f43f36b70a40bdb4cf1e48fb97518c8df579"
+    },
+    {
+      "id": "nextjs",
+      "selected_at_base": "16.3.8",
+      "vendor": "vercel/next.js",
+      "latest_published": {
+        "tag": "v16.5.0-canary.3",
+        "published_at": "2026-10-07T23:50:30Z",
+        "prerelease": true,
+        "source": "https://github.com/vercel/next.js/releases/tag/v16.5.0-canary.3"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "v16.4.0",
+        "published_at": "2026-10-07T10:03:29Z",
+        "prerelease": false,
+        "source": "https://github.com/vercel/next.js/releases/tag/v16.4.0"
+      },
+      "release_observed_at": "2026-10-08T14:05:27.291Z",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/vercel/next.js/releases?per_page=10"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "held_candidate_acceptance_owed",
+      "reason": "Stable16.4.0 corroborates npm; newer16.5.0-canary.3 remains prerelease. Locked application migration/build/browser acceptance owed, active owner not resolved by this worker.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "5af68469f191514bb365d31401a0f43f36b70a40bdb4cf1e48fb97518c8df579"
+    },
+    {
+      "id": "ntfy",
+      "selected_at_base": "2.28.0",
+      "vendor": "binwiederhier/ntfy",
+      "latest_published": {
+        "tag": "v2.29.0",
+        "published_at": "2026-10-07T15:30:57Z",
+        "prerelease": false,
+        "source": "https://github.com/binwiederhier/ntfy/releases/tag/v2.29.0"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "v2.29.0",
+        "published_at": "2026-10-07T15:30:57Z",
+        "prerelease": false,
+        "source": "https://github.com/binwiederhier/ntfy/releases/tag/v2.29.0"
+      },
+      "release_observed_at": "2026-10-08T14:05:27.470Z",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/binwiederhier/ntfy/releases?per_page=10"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "held_candidate_acceptance_owed",
+      "reason": "Different publication from selected pin; supported installation, upstream acceptance and integration check remain owed.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "5af68469f191514bb365d31401a0f43f36b70a40bdb4cf1e48fb97518c8df579"
+    },
+    {
+      "id": "omniroute",
+      "selected_at_base": "3.8.51",
+      "vendor": "diegosouzapw/OmniRoute",
+      "latest_published": {
+        "tag": "v3.8.51",
+        "published_at": "2026-09-30T01:41:50Z",
+        "prerelease": false,
+        "source": "https://github.com/diegosouzapw/OmniRoute/releases/tag/v3.8.51"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "v3.8.51",
+        "published_at": "2026-09-30T01:41:50Z",
+        "prerelease": false,
+        "source": "https://github.com/diegosouzapw/OmniRoute/releases/tag/v3.8.51"
+      },
+      "release_observed_at": "2026-10-08T14:05:27.610Z",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/diegosouzapw/OmniRoute/releases?per_page=10"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "same_published_stable",
+      "reason": "No new distribution pin found in this bounded publication read; no deployment claim.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "5af68469f191514bb365d31401a0f43f36b70a40bdb4cf1e48fb97518c8df579"
+    },
+    {
+      "id": "openresearch",
+      "selected_at_base": "0.2.15",
+      "vendor": "alphaXiv/OpenResearch",
+      "latest_published": {
+        "tag": "v0.2.17",
+        "published_at": "2026-10-07T08:23:38Z",
+        "prerelease": false,
+        "source": "https://github.com/alphaXiv/OpenResearch/releases/tag/v0.2.17"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "v0.2.17",
+        "published_at": "2026-10-07T08:23:38Z",
+        "prerelease": false,
+        "source": "https://github.com/alphaXiv/OpenResearch/releases/tag/v0.2.17"
+      },
+      "release_observed_at": "2026-10-08T14:05:28.138Z",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/alphaXiv/OpenResearch/releases?per_page=10"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "held_candidate_acceptance_owed",
+      "reason": "Different publication from selected pin; supported installation, upstream acceptance and integration check remain owed.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "5af68469f191514bb365d31401a0f43f36b70a40bdb4cf1e48fb97518c8df579"
+    },
+    {
+      "id": "opentelemetry-collector-contrib",
+      "selected_at_base": "0.162.0",
+      "vendor": "open-telemetry/opentelemetry-collector-contrib",
+      "latest_published": {
+        "tag": "v0.162.0",
+        "published_at": "2026-09-29T10:11:33Z",
+        "prerelease": false,
+        "source": "https://github.com/open-telemetry/opentelemetry-collector-contrib/releases/tag/v0.162.0"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "v0.162.0",
+        "published_at": "2026-09-29T10:11:33Z",
+        "prerelease": false,
+        "source": "https://github.com/open-telemetry/opentelemetry-collector-contrib/releases/tag/v0.162.0"
+      },
+      "release_observed_at": "2026-10-08T14:05:28.153Z",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/open-telemetry/opentelemetry-collector-contrib/releases?per_page=10"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "held_recorded_failed_vendor_harness",
+      "reason": "Pin matches current release; canonical manifest retains release-tag build-and-test failure and host acceptance pending. No failed condition cleared.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "5af68469f191514bb365d31401a0f43f36b70a40bdb4cf1e48fb97518c8df579"
+    },
+    {
+      "id": "otel-tui",
+      "selected_at_base": "0.7.5",
+      "vendor": "ymtdzzz/otel-tui",
+      "latest_published": {
+        "tag": "v0.7.5",
+        "published_at": "2026-09-12T10:28:45Z",
+        "prerelease": false,
+        "source": "https://github.com/ymtdzzz/otel-tui/releases/tag/v0.7.5"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "v0.7.5",
+        "published_at": "2026-09-12T10:28:45Z",
+        "prerelease": false,
+        "source": "https://github.com/ymtdzzz/otel-tui/releases/tag/v0.7.5"
+      },
+      "release_observed_at": "2026-10-08T14:05:28.324Z",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/ymtdzzz/otel-tui/releases?per_page=10"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "same_published_stable",
+      "reason": "No new distribution pin found in this bounded publication read; no deployment claim.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "5af68469f191514bb365d31401a0f43f36b70a40bdb4cf1e48fb97518c8df579"
+    },
+    {
+      "id": "pandas",
+      "selected_at_base": "3.0.6",
+      "vendor": "pandas-dev/pandas",
+      "latest_published": {
+        "tag": "v3.1.0rc0",
+        "published_at": "2026-09-30T14:13:00Z",
+        "prerelease": true,
+        "source": "https://github.com/pandas-dev/pandas/releases/tag/v3.1.0rc0"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "v3.0.6",
+        "published_at": "2026-09-17T21:32:36Z",
+        "prerelease": false,
+        "source": "https://github.com/pandas-dev/pandas/releases/tag/v3.0.6"
+      },
+      "release_observed_at": "2026-10-08T14:05:28.488Z",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/pandas-dev/pandas/releases?per_page=10"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "same_published_stable",
+      "reason": "No new distribution pin found in this bounded publication read; no deployment claim.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "5af68469f191514bb365d31401a0f43f36b70a40bdb4cf1e48fb97518c8df579"
+    },
+    {
+      "id": "playwright-cli",
+      "selected_at_base": "0.1.22; Playwright 1.64.0-alpha-1790635538000",
+      "vendor": "microsoft/playwright-cli",
+      "latest_published": {
+        "tag": "v0.1.22",
+        "published_at": "2026-09-28T23:23:13Z",
+        "prerelease": false,
+        "source": "https://github.com/microsoft/playwright-cli/releases/tag/v0.1.22"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "v0.1.22",
+        "published_at": "2026-09-28T23:23:13Z",
+        "prerelease": false,
+        "source": "https://github.com/microsoft/playwright-cli/releases/tag/v0.1.22"
+      },
+      "release_observed_at": "2026-10-08T14:05:29.038Z",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/microsoft/playwright-cli/releases?per_page=10"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "same_published_stable",
+      "reason": "CLI0.1.22 remains current, but pinned package still bundles Playwright1.64.0-alpha-1790635538000. Keep browser lifecycle acceptance distinct from CLI release flags.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "5af68469f191514bb365d31401a0f43f36b70a40bdb4cf1e48fb97518c8df579"
+    },
+    {
+      "id": "playwright-test",
+      "selected_at_base": "1.63.0",
+      "vendor": "microsoft/playwright",
+      "latest_published": {
+        "tag": "v1.64.0",
+        "published_at": "2026-10-07T20:40:43Z",
+        "prerelease": false,
+        "source": "https://github.com/microsoft/playwright/releases/tag/v1.64.0"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "v1.64.0",
+        "published_at": "2026-10-07T20:40:43Z",
+        "prerelease": false,
+        "source": "https://github.com/microsoft/playwright/releases/tag/v1.64.0"
+      },
+      "release_observed_at": "2026-10-08T14:05:29.150Z",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/microsoft/playwright/releases?per_page=10"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "held_candidate_acceptance_owed",
+      "reason": "Stable1.64.0 corroborates npm and tag; release lists Breaking Changes; Node>=20 and browser fixture/version lock qualification owed.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "5af68469f191514bb365d31401a0f43f36b70a40bdb4cf1e48fb97518c8df579"
+    },
+    {
+      "id": "poppler",
+      "selected_at_base": "26.09.0",
+      "vendor": "tsdgeos/poppler_mirror",
+      "latest_published": null,
+      "latest_clean_component_candidate": null,
+      "release_observed_at": "2026-10-08T14:05:29.191Z",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/tsdgeos/poppler_mirror/releases?per_page=10"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "held_native_build_acceptance",
+      "reason": "Official release26.10.0 differs from26.09.0; new required libbrotlidec and native text/page fixture/build acceptance owed. GitHub CI mirror is not the release authority.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "5af68469f191514bb365d31401a0f43f36b70a40bdb4cf1e48fb97518c8df579"
+    },
+    {
+      "id": "postgresql",
+      "selected_at_base": "18.6",
+      "vendor": "postgres/postgres",
+      "latest_published": null,
+      "latest_clean_component_candidate": null,
+      "release_observed_at": "2026-10-08T14:05:21.556338+00:00",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/postgres/postgres/releases?per_page=10"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "retain_supported_minor_pin",
+      "reason": "Official vendor support table names18.6 as current minor for supported18; GitHub has no published releases. Source pin is a tarball checksum, not a Git commit.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "7bf8ee45ae340f52c53fa8c453a14a4c6624e9e1841d593d49f7476994f60585"
+    },
+    {
+      "id": "prometheus",
+      "selected_at_base": "3.15.0",
+      "vendor": "prometheus/prometheus",
+      "latest_published": {
+        "tag": "v3.13.4",
+        "published_at": "2026-10-02T14:46:21Z",
+        "prerelease": false,
+        "source": "https://github.com/prometheus/prometheus/releases/tag/v3.13.4"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "v3.15.0",
+        "published_at": "2026-09-25T08:56:22Z",
+        "prerelease": false,
+        "source": "https://github.com/prometheus/prometheus/releases/tag/v3.15.0"
+      },
+      "release_observed_at": "2026-10-08T14:05:21.854720+00:00",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/prometheus/prometheus/releases?per_page=10"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "retain_pin",
+      "reason": "Newest-published v3.13.4 is an older maintenance branch; highest numeric clean component version in this page remains v3.15.0. No downgrade or head-movement upgrade.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "7bf8ee45ae340f52c53fa8c453a14a4c6624e9e1841d593d49f7476994f60585"
+    },
+    {
+      "id": "promptfoo",
+      "selected_at_base": "0.123.1",
+      "vendor": "promptfoo/promptfoo",
+      "latest_published": {
+        "tag": "code-scan-action-0.2.1",
+        "published_at": "2026-10-06T01:48:46Z",
+        "prerelease": false,
+        "source": "https://github.com/promptfoo/promptfoo/releases/tag/code-scan-action-0.2.1"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "0.124.0",
+        "published_at": "2026-10-06T01:09:20Z",
+        "prerelease": false,
+        "source": "https://github.com/promptfoo/promptfoo/releases/tag/0.124.0"
+      },
+      "release_observed_at": "2026-10-08T14:05:21.726709+00:00",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/promptfoo/promptfoo/releases?per_page=10"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "clean_release_metadata_candidate_no_native_acceptance",
+      "reason": "npm latest 0.124.0 confirms CLI release; newer-published code-scan-action tag is another distribution.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "7bf8ee45ae340f52c53fa8c453a14a4c6624e9e1841d593d49f7476994f60585"
+    },
+    {
+      "id": "qdrant",
+      "selected_at_base": "1.19.1",
+      "vendor": "qdrant/qdrant",
+      "latest_published": {
+        "tag": "v1.19.2",
+        "published_at": "2026-10-05T14:16:50Z",
+        "prerelease": false,
+        "source": "https://github.com/qdrant/qdrant/releases/tag/v1.19.2"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "v1.19.2",
+        "published_at": "2026-10-05T14:16:50Z",
+        "prerelease": false,
+        "source": "https://github.com/qdrant/qdrant/releases/tag/v1.19.2"
+      },
+      "release_observed_at": "2026-10-08T14:05:21.793279+00:00",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/qdrant/qdrant/releases?per_page=10"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "held_stateful_acceptance",
+      "reason": "Clean v1.19.2 versus pinned 1.19.1; storage recovery/migration and rollback acceptance not reproduced.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "7bf8ee45ae340f52c53fa8c453a14a4c6624e9e1841d593d49f7476994f60585"
+    },
+    {
+      "id": "qmd",
+      "selected_at_base": "2.8.3",
+      "vendor": "tobi/qmd",
+      "latest_published": {
+        "tag": "v2.8.3",
+        "published_at": "2026-08-16T22:30:34Z",
+        "prerelease": false,
+        "source": "https://github.com/tobi/qmd/releases/tag/v2.8.3"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "v2.8.3",
+        "published_at": "2026-08-16T22:30:34Z",
+        "prerelease": false,
+        "source": "https://github.com/tobi/qmd/releases/tag/v2.8.3"
+      },
+      "release_observed_at": "2026-10-08T14:05:21.728774+00:00",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/tobi/qmd/releases?per_page=10"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "retain_pin",
+      "reason": null,
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "7bf8ee45ae340f52c53fa8c453a14a4c6624e9e1841d593d49f7476994f60585"
+    },
+    {
+      "id": "react",
+      "selected_at_base": "19.3.0",
+      "vendor": "facebook/react",
+      "latest_published": {
+        "tag": "v19.3.0",
+        "published_at": "2026-09-09T18:01:33Z",
+        "prerelease": false,
+        "source": "https://github.com/react/react/releases/tag/v19.3.0"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "v19.3.0",
+        "published_at": "2026-09-09T18:01:33Z",
+        "prerelease": false,
+        "source": "https://github.com/react/react/releases/tag/v19.3.0"
+      },
+      "release_observed_at": "2026-10-08T14:05:22.098226+00:00",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/facebook/react/releases?per_page=10"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "retain_pin",
+      "reason": null,
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "7bf8ee45ae340f52c53fa8c453a14a4c6624e9e1841d593d49f7476994f60585"
+    },
+    {
+      "id": "repomix",
+      "selected_at_base": "1.18.1",
+      "vendor": "yamadashy/repomix",
+      "latest_published": {
+        "tag": "v1.18.1",
+        "published_at": "2026-09-21T08:34:49Z",
+        "prerelease": false,
+        "source": "https://github.com/yamadashy/repomix/releases/tag/v1.18.1"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "v1.18.1",
+        "published_at": "2026-09-21T08:34:49Z",
+        "prerelease": false,
+        "source": "https://github.com/yamadashy/repomix/releases/tag/v1.18.1"
+      },
+      "release_observed_at": "2026-10-08T14:05:22.519794+00:00",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/yamadashy/repomix/releases?per_page=10"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "retain_pin",
+      "reason": null,
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "7bf8ee45ae340f52c53fa8c453a14a4c6624e9e1841d593d49f7476994f60585"
+    },
+    {
+      "id": "restic",
+      "selected_at_base": "0.19.1",
+      "vendor": "restic/restic",
+      "latest_published": {
+        "tag": "v0.19.1",
+        "published_at": "2026-07-05T08:13:33Z",
+        "prerelease": false,
+        "source": "https://github.com/restic/restic/releases/tag/v0.19.1"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "v0.19.1",
+        "published_at": "2026-07-05T08:13:33Z",
+        "prerelease": false,
+        "source": "https://github.com/restic/restic/releases/tag/v0.19.1"
+      },
+      "release_observed_at": "2026-10-08T14:05:22.686960+00:00",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/restic/restic/releases?per_page=10"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "retain_pin",
+      "reason": null,
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "7bf8ee45ae340f52c53fa8c453a14a4c6624e9e1841d593d49f7476994f60585"
+    },
+    {
+      "id": "rtk",
+      "selected_at_base": "0.51.0",
+      "vendor": "rtk-ai/rtk",
+      "latest_published": {
+        "tag": "dev-0.51.1-rc.516",
+        "published_at": "2026-10-07T16:11:56Z",
+        "prerelease": true,
+        "source": "https://github.com/rtk-ai/rtk/releases/tag/dev-0.51.1-rc.516"
+      },
+      "latest_clean_component_candidate": null,
+      "release_observed_at": "2026-10-08T14:05:22.706689+00:00",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/rtk-ai/rtk/releases?per_page=10"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "retain_pin_prereleases_only_in_first_page",
+      "reason": "Ten development prereleases fill first page; v0.51.0 stable exists outside that page. Global latest stable not established by this bounded page.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "7bf8ee45ae340f52c53fa8c453a14a4c6624e9e1841d593d49f7476994f60585"
+    },
+    {
+      "id": "sandbox-runtime",
+      "selected_at_base": "0.0.79",
+      "vendor": "anthropics/sandbox-runtime",
+      "latest_published": {
+        "tag": "v0.0.79",
+        "published_at": "2026-10-07T17:12:35Z",
+        "prerelease": false,
+        "source": "https://github.com/anthropics/sandbox-runtime/releases/tag/v0.0.79"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "v0.0.79",
+        "published_at": "2026-10-07T17:12:35Z",
+        "prerelease": false,
+        "source": "https://github.com/anthropics/sandbox-runtime/releases/tag/v0.0.79"
+      },
+      "release_observed_at": "2026-10-08T14:05:22.660311+00:00",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/anthropics/sandbox-runtime/releases?per_page=10"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "retain_pin",
+      "reason": null,
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "7bf8ee45ae340f52c53fa8c453a14a4c6624e9e1841d593d49f7476994f60585"
+    },
+    {
+      "id": "serena",
+      "selected_at_base": "2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+      "vendor": "oraios/serena",
+      "latest_published": {
+        "tag": "v1.7.0",
+        "published_at": "2026-08-09T18:38:06Z",
+        "prerelease": false,
+        "source": "https://github.com/oraios/serena/releases/tag/v1.7.0"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "v1.7.0",
+        "published_at": "2026-08-09T18:38:06Z",
+        "prerelease": false,
+        "source": "https://github.com/oraios/serena/releases/tag/v1.7.0"
+      },
+      "release_observed_at": "2026-10-08T14:05:23.166028+00:00",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/oraios/serena/releases?per_page=10"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "held_development_vs_stable_channel_decision",
+      "reason": "Pinned2.0.0.dev0 source cannot be ordered as an upgrade to stable1.7.0; main source movement is not a release upgrade.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "7bf8ee45ae340f52c53fa8c453a14a4c6624e9e1841d593d49f7476994f60585"
+    },
+    {
+      "id": "shanraisshan/claude-code-best-practice",
+      "selected_at_base": "15969ed2471a177d938c889255d2f23f07e4742a",
+      "vendor": "shanraisshan/claude-code-best-practice",
+      "latest_published": null,
+      "latest_clean_component_candidate": null,
+      "release_observed_at": "2026-10-08T14:05:23.339369+00:00",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/shanraisshan/claude-code-best-practice/releases?per_page=10"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "source_only_no_release_upgrade",
+      "reason": "Live head changed but no published GitHub release; source movement alone is not upgrade authority.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "7bf8ee45ae340f52c53fa8c453a14a4c6624e9e1841d593d49f7476994f60585"
+    },
+    {
+      "id": "shellcheck",
+      "selected_at_base": "0.11.0",
+      "vendor": "koalaman/shellcheck",
+      "latest_published": {
+        "tag": "v0.11.0",
+        "published_at": "2025-08-04T00:27:19Z",
+        "prerelease": false,
+        "source": "https://github.com/koalaman/shellcheck/releases/tag/v0.11.0"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "v0.11.0",
+        "published_at": "2025-08-04T00:27:19Z",
+        "prerelease": false,
+        "source": "https://github.com/koalaman/shellcheck/releases/tag/v0.11.0"
+      },
+      "release_observed_at": "2026-10-08T14:05:23.568360+00:00",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/koalaman/shellcheck/releases?per_page=10"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "retain_pin",
+      "reason": null,
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "7bf8ee45ae340f52c53fa8c453a14a4c6624e9e1841d593d49f7476994f60585"
+    },
+    {
+      "id": "skfolio",
+      "selected_at_base": "1.2.9",
+      "vendor": "skfolio/skfolio",
+      "latest_published": {
+        "tag": "v1.7.0",
+        "published_at": "2026-10-07T21:05:56Z",
+        "prerelease": false,
+        "source": "https://github.com/skfolio/skfolio/releases/tag/v1.7.0"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "v1.7.0",
+        "published_at": "2026-10-07T21:05:56Z",
+        "prerelease": false,
+        "source": "https://github.com/skfolio/skfolio/releases/tag/v1.7.0"
+      },
+      "release_observed_at": "2026-10-08T14:05:23.685065+00:00",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/skfolio/skfolio/releases?per_page=10"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "held_CC_runtime_decision",
+      "reason": "GitHub and PyPI agree on 1.7.0; actual us-equities-runtime mutation requires CC decision and its own prepared-lock/native acceptance.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "7bf8ee45ae340f52c53fa8c453a14a4c6624e9e1841d593d49f7476994f60585"
+    },
+    {
+      "id": "skills-ref",
+      "selected_at_base": "0.1.0",
+      "vendor": "agentskills/agentskills",
+      "latest_published": null,
+      "latest_clean_component_candidate": null,
+      "release_observed_at": "2026-10-08T14:05:23.452781+00:00",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/agentskills/agentskills/releases?per_page=10"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "source_only_no_release_upgrade",
+      "reason": "Live source head equals existing pinned commit; pinned pyproject version0.1.0 confirmed. No GitHub published release.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "7bf8ee45ae340f52c53fa8c453a14a4c6624e9e1841d593d49f7476994f60585"
+    },
+    {
+      "id": "socraticode",
+      "selected_at_base": "1.15.0",
+      "vendor": "giancarloerra/SocratiCode",
+      "latest_published": {
+        "tag": "v1.16.0",
+        "published_at": "2026-09-28T12:19:47Z",
+        "prerelease": false,
+        "source": "https://github.com/giancarloerra/SocratiCode/releases/tag/v1.16.0"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "v1.16.0",
+        "published_at": "2026-09-28T12:19:47Z",
+        "prerelease": false,
+        "source": "https://github.com/giancarloerra/SocratiCode/releases/tag/v1.16.0"
+      },
+      "release_observed_at": "2026-10-08T14:05:23.793330+00:00",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/giancarloerra/SocratiCode/releases?per_page=10"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "held_package_source_binding_and_owner_acceptance",
+      "reason": "GitHub v1.16.0 commit3d3a4a4 differs from npm1.16.0 gitHead3e3b4b3; neither package/source equivalence nor new MCP/index acceptance established.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "7bf8ee45ae340f52c53fa8c453a14a4c6624e9e1841d593d49f7476994f60585"
+    },
+    {
+      "id": "syft",
+      "selected_at_base": "1.54.0",
+      "vendor": "anchore/syft",
+      "latest_published": {
+        "tag": "v1.54.1",
+        "published_at": "2026-10-06T15:35:10Z",
+        "prerelease": false,
+        "source": "https://github.com/anchore/syft/releases/tag/v1.54.1"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "v1.54.1",
+        "published_at": "2026-10-06T15:35:10Z",
+        "prerelease": false,
+        "source": "https://github.com/anchore/syft/releases/tag/v1.54.1"
+      },
+      "release_observed_at": "2026-10-08T14:05:24.259940+00:00",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/anchore/syft/releases?per_page=10"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "clean_patch_release_metadata_candidate_no_native_acceptance",
+      "reason": "Clean1.54.1 versus1.54.0; native schema/version/inventory smoke remains owed at the new source and distribution.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "7bf8ee45ae340f52c53fa8c453a14a4c6624e9e1841d593d49f7476994f60585"
+    },
+    {
+      "id": "systemd",
+      "selected_at_base": "255.4-1ubuntu8.17",
+      "vendor": "systemd/systemd",
+      "latest_published": {
+        "tag": "v262",
+        "published_at": "2026-09-22T13:19:16Z",
+        "prerelease": false,
+        "source": "https://github.com/systemd/systemd/releases/tag/v262"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "v262",
+        "published_at": "2026-09-22T13:19:16Z",
+        "prerelease": false,
+        "source": "https://github.com/systemd/systemd/releases/tag/v262"
+      },
+      "release_observed_at": "2026-10-08T14:05:23.978516+00:00",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/systemd/systemd/releases?per_page=10"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "held_OS_distribution_channel_unverified",
+      "reason": "Upstreamv262 is a separate channel from Ubuntu255.4-1ubuntu8.17. Official Ubuntu package read timed out; no OS upgrade inference.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "7bf8ee45ae340f52c53fa8c453a14a4c6624e9e1841d593d49f7476994f60585"
+    },
+    {
+      "id": "tavily-cli",
+      "selected_at_base": "0.1.8",
+      "vendor": "tavily-ai/tavily-cli",
+      "latest_published": null,
+      "latest_clean_component_candidate": null,
+      "release_observed_at": "2026-10-08T14:05:24.272708+00:00",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/tavily-ai/tavily-cli/releases?per_page=10"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "retain_pin",
+      "reason": "GitHub release list empty, actual PyPI distribution latest0.1.8 matches pin; wheel/sdist SHA256 recorded.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "7bf8ee45ae340f52c53fa8c453a14a4c6624e9e1841d593d49f7476994f60585"
+    },
+    {
+      "id": "toon",
+      "selected_at_base": "4.1.1",
+      "vendor": "toon-format/toon",
+      "latest_published": {
+        "tag": "v4.1.1",
+        "published_at": "2026-08-05T11:49:55Z",
+        "prerelease": false,
+        "source": "https://github.com/toon-format/toon/releases/tag/v4.1.1"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "v4.1.1",
+        "published_at": "2026-08-05T11:49:55Z",
+        "prerelease": false,
+        "source": "https://github.com/toon-format/toon/releases/tag/v4.1.1"
+      },
+      "release_observed_at": "2026-10-08T14:05:24.515115+00:00",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/toon-format/toon/releases?per_page=10"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "retain_pin",
+      "reason": null,
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "7bf8ee45ae340f52c53fa8c453a14a4c6624e9e1841d593d49f7476994f60585"
+    },
+    {
+      "id": "vllm",
+      "selected_at_base": "0.30.0",
+      "vendor": "vllm-project/vllm",
+      "latest_published": {
+        "tag": "v0.31.0",
+        "published_at": "2026-10-05T06:44:55Z",
+        "prerelease": false,
+        "source": "https://github.com/vllm-project/vllm/releases/tag/v0.31.0"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "v0.31.0",
+        "published_at": "2026-10-05T06:44:55Z",
+        "prerelease": false,
+        "source": "https://github.com/vllm-project/vllm/releases/tag/v0.31.0"
+      },
+      "release_observed_at": "2026-10-08T14:05:24.813103+00:00",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/vllm-project/vllm/releases?per_page=10"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "held_CC_runtime_GPU_acceptance",
+      "reason": "GitHub and PyPI agree on 0.31.0; no GPU/model run, embedding comparison or rollback acceptance.",
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "7bf8ee45ae340f52c53fa8c453a14a4c6624e9e1841d593d49f7476994f60585"
+    },
+    {
+      "id": "worktrunk",
+      "selected_at_base": "0.80.0",
+      "vendor": "max-sixty/worktrunk",
+      "latest_published": {
+        "tag": "v0.80.0",
+        "published_at": "2026-09-27T21:18:46Z",
+        "prerelease": false,
+        "source": "https://github.com/max-sixty/worktrunk/releases/tag/v0.80.0"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "v0.80.0",
+        "published_at": "2026-09-27T21:18:46Z",
+        "prerelease": false,
+        "source": "https://github.com/max-sixty/worktrunk/releases/tag/v0.80.0"
+      },
+      "release_observed_at": "2026-10-08T14:05:24.902820+00:00",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/max-sixty/worktrunk/releases?per_page=10"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "retain_pin",
+      "reason": null,
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "7bf8ee45ae340f52c53fa8c453a14a4c6624e9e1841d593d49f7476994f60585"
+    },
+    {
+      "id": "zizmor",
+      "selected_at_base": "1.30.1",
+      "vendor": "zizmorcore/zizmor",
+      "latest_published": {
+        "tag": "v1.30.1",
+        "published_at": "2026-09-09T05:34:10Z",
+        "prerelease": false,
+        "source": "https://github.com/zizmorcore/zizmor/releases/tag/v1.30.1"
+      },
+      "latest_clean_component_candidate": {
+        "tag": "v1.30.1",
+        "published_at": "2026-09-09T05:34:10Z",
+        "prerelease": false,
+        "source": "https://github.com/zizmorcore/zizmor/releases/tag/v1.30.1"
+      },
+      "release_observed_at": "2026-10-08T14:05:24.829322+00:00",
+      "native_release_argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/zizmorcore/zizmor/releases?per_page=10"
+      ],
+      "release_rc": 0,
+      "disposition_at_sweep": "retain_pin",
+      "reason": null,
+      "evidence_class": "source_review",
+      "private_source_receipt_sha256": "7bf8ee45ae340f52c53fa8c453a14a4c6624e9e1841d593d49f7476994f60585"
+    }
+  ],
+  "adoption_independent_pins": [
+    {
+      "id": "uv",
+      "locator": "adoption/manifest.json#/toolchain/uv/version",
+      "current": "0.12.17",
+      "installed_client_observation": "uv0.12.22 (x86_64-unknown-linux-gnu)",
+      "latest_clean": "0.12.23",
+      "latest_release": "0.12.23",
+      "release_utc": "2026-10-03T17:34:11Z",
+      "source": "https://github.com/astral-sh/uv/releases/tag/0.12.23",
+      "source_pin": "46b84fd0bfec23b72f29e8e2185ba68a65052f48",
+      "native_metadata_commands": [
+        [
+          "gh",
+          "api",
+          "--cache",
+          "120s",
+          "repos/astral-sh/uv/releases?per_page=10"
+        ],
+        [
+          "gh",
+          "api",
+          "--cache",
+          "120s",
+          "repos/astral-sh/uv/releases/tags/0.12.23"
+        ],
+        [
+          "git",
+          "ls-remote",
+          "--tags",
+          "https://github.com/astral-sh/uv",
+          "refs/tags/0.12.23",
+          "refs/tags/0.12.23^{}"
+        ]
+      ],
+      "returned_tag_stdout": "46b84fd0bfec23b72f29e8e2185ba68a65052f48\trefs/tags/0.12.23\n",
+      "metadata_exit_codes": [
+        0,
+        0,
+        0
+      ],
+      "archive": {
+        "name": "uv-x86_64-unknown-linux-gnu.tar.gz",
+        "sha256": "9167d72b3319674b6303c4cbe071854bba13ebdf3d76b1a7cbdc175471fb66d6",
+        "publisher_checksum_asset_sha256": "105953d7c9f58b45273f12f97eb511476269ab5e23452a64806f90233cd0af04",
+        "url": "https://github.com/astral-sh/uv/releases/download/0.12.23/uv-x86_64-unknown-linux-gnu.tar.gz"
+      },
+      "clean_decision": "Published stable patch candidate; source release notes add CPython3.15rc3 and lock-source bug fixes. Native qualified adoption still owed in owned prefix after gateway pause; no runtime lock or live launcher mutation.",
+      "vendor_route": "Publisher standalone installer/versioned prefix or official archive+matching publisher checksum and attestation; useful native lock/sync check per adoption recipe, retain old prefix inverse."
+    },
+    {
+      "id": "sdk-python",
+      "locator": "adoption/manifest.json#/acceptance_target/sdk_python",
+      "current": "3.13.15",
+      "latest_clean_overall": "3.14.8",
+      "latest_clean_same_branch": "3.13.16",
+      "latest_prerelease": "3.15.0rc2 from installed uv0.12.22 distribution metadata; official3.15 page is pre-release",
+      "same_branch_release_utc": "2026-09-30",
+      "source": "https://www.python.org/downloads/latest/python3.13/",
+      "source_pin": "cbc944f4bc59639a444dd971c737788ba2283a91",
+      "overall_source": "https://www.python.org/downloads/latest/python3.14/",
+      "overall_source_pin": "8e6e75d9102e39bed2a2b279203a396741180f12",
+      "native_metadata_commands": [
+        [
+          "gh",
+          "api",
+          "--cache",
+          "120s",
+          "repos/python/cpython/releases?per_page=10"
+        ],
+        [
+          "gh",
+          "api",
+          "--cache",
+          "120s",
+          "repos/python/cpython/tags?per_page=100"
+        ],
+        [
+          "uv",
+          "python",
+          "list",
+          "--all-versions",
+          "--only-downloads",
+          "--output-format",
+          "json"
+        ],
+        [
+          "uv",
+          "python",
+          "list",
+          "3.13",
+          "--all-versions",
+          "--only-downloads",
+          "--output-format",
+          "json"
+        ]
+      ],
+      "metadata_exit_codes": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "upstream_gh_releases_returned": [],
+      "known_source_gap": "CPython ships no GitHub Releases metadata; official Python release page and exact tag commit are the primary release evidence.",
+      "returned_selected_distribution": {
+        "key": "cpython-3.13.16-linux-x86_64-gnu",
+        "version": "3.13.16",
+        "version_parts": {
+          "major": 3,
+          "minor": 13,
+          "patch": 16
+        },
+        "path": null,
+        "symlink": null,
+        "url": "https://releases.astral.sh/github/python-build-standalone/releases/download/20261001/cpython-3.13.16%2B20261001-x86_64-unknown-linux-gnu-install_only_stripped.tar.gz",
+        "os": "linux",
+        "variant": "default",
+        "implementation": "cpython",
+        "arch": "x86_64",
+        "libc": "gnu"
+      },
+      "clean_decision": "3.13.16 is a same-branch stable maintenance candidate with a supported native downloadable distribution;3.14.8 is a major/minor family change and not automatically clean for the accepted3.13SDK. Fresh-prefix native acceptance is still owed. Runtime Python3.12 and north-star acceptance lock remain separate; no runtime interpreter update."
+    },
+    {
+      "id": "adoption-source-release",
+      "locator": "adoption/manifest.json#/source",
+      "current_release": "v2026.10.05.1",
+      "current_pin": "77d7516d81a94b1cb0e77a7b6c910c28c8104dc9",
+      "latest_clean": "v2026.10.05.1",
+      "latest_release": "v2026.10.05.1",
+      "release_utc": "2026-10-05T07:08:36Z",
+      "source": "https://github.com/seathatflowsinourveins/native-agent-stack/releases/tag/v2026.10.05.1",
+      "native_metadata_commands": [
+        [
+          "gh",
+          "api",
+          "--cache",
+          "120s",
+          "repos/seathatflowsinourveins/native-agent-stack/releases?per_page=10"
+        ]
+      ],
+      "metadata_exit_codes": [
+        0
+      ],
+      "clean_decision": "Current attested adoption release matches latest published; do not replace with main or a source commit without a published attested release. Baseline commit is historical provenance, not a moving version pin."
+    }
+  ],
+  "limits": [
+    "Live source metadata and bounded10-release pages; not an exhaustive release-history search or acceptance of every candidate.",
+    "One official Ubuntu package page timed out rc28; OS-package comparison remainsUNVERIFIED. GitHub systemd release and distro package are distinct.",
+    "Selected source/development/prerelease pins are not downgraded to stable tags by lexical version ordering. Applicable distributions and package-channel disagreements are retained.",
+    "Repomix/sandbox-runtime/TOON/skills-ref additional package channels remain unverified; their current qualified pins are retained.",
+    "New runtime pins/SDKPython/major-state-service-platform changes are held for their stated decisions and native acceptance. No live client/service/provider configuration changed.",
+    "Raw observations remain private; source projection retains native metadata locator and original source-receipt hash. Exact native qualification lives in its separate current-pin receipt."
+  ]
+}

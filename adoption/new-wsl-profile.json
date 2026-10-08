@@ -280,7 +280,7 @@
       "repository": "https://github.com/astral-sh/uv",
       "layer_id": "recovery-portability",
       "owner_layer_id": "recovery-portability",
-      "pin": "0.12.17",
+      "pin": "0.12.23",
       "component_id": null,
       "source_selection_layer": "recovery-portability",
       "source_selection_name": "uv",
@@ -293,23 +293,23 @@
       "blocking_gaps": [],
       "artifact": {
         "name": "uv-x86_64-unknown-linux-gnu.tar.gz",
-        "url": "https://github.com/astral-sh/uv/releases/download/0.12.17/uv-x86_64-unknown-linux-gnu.tar.gz"
+        "url": "https://github.com/astral-sh/uv/releases/download/0.12.23/uv-x86_64-unknown-linux-gnu.tar.gz"
       },
       "checksum": {
         "algorithm": "sha256",
-        "value": "fa82fd8dde8e8eefdecada6aa0889666556cfceb690d06e0c3bca49eb3070a63",
-        "source": "https://api.github.com/repos/astral-sh/uv/releases/tags/0.12.17",
+        "value": "9167d72b3319674b6303c4cbe071854bba13ebdf3d76b1a7cbdc175471fb66d6",
+        "source": "https://github.com/astral-sh/uv/releases/download/0.12.23/uv-x86_64-unknown-linux-gnu.tar.gz.sha256",
         "kind": "artifact"
       },
-      "integrity_observation": "published_digest_not_rehashed",
+      "integrity_observation": "downloaded_and_rehashed",
       "install": {
-        "command": "curl --proto '=https' --tlsv1.2 -LsSf https://releases.astral.sh/github/uv/releases/download/0.12.17/uv-installer.sh | sh",
-        "source": "https://github.com/astral-sh/uv/releases/tag/0.12.17",
+        "command": "curl --proto '=https' --tlsv1.2 -LsSf https://releases.astral.sh/github/uv/releases/download/0.12.23/uv-installer.sh | sh",
+        "source": "https://github.com/astral-sh/uv/releases/tag/0.12.23",
         "scope": "Explicit version argument from the user's requirement and tagged uv download metadata; native --help verifies the install options. No interpreter was installed."
       },
       "acceptance": {
         "command": "uv run --no-project --python 3.13.15 - <<'PY'\nprint(\"hello world!\")\nPY",
-        "source": "https://github.com/astral-sh/uv/blob/0.12.17/docs/guides/scripts.md",
+        "source": "https://github.com/astral-sh/uv/blob/0.12.23/docs/guides/scripts.md",
         "evidence_class": "documented_upstream_example_not_executed",
         "scope": "Pin-specific adaptation of upstream's documented stdin hello-world example; not executed."
       },
@@ -321,7 +321,8 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/recovery-portability.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
         "https://github.com/astral-sh/uv/releases/tag/0.12.17",
-        "https://github.com/astral-sh/uv/blob/0.12.17/docs/guides/scripts.md"
+        "https://github.com/astral-sh/uv/blob/0.12.17/docs/guides/scripts.md",
+        "https://github.com/astral-sh/uv/releases/tag/0.12.23"
       ],
       "release": null,
       "source_pin_kind": "release_or_artifact_version"
@@ -1192,7 +1193,7 @@
       "repository": "https://github.com/jgravelle/jcodemunch-mcp",
       "layer_id": "token-efficiency",
       "owner_layer_id": "token-efficiency",
-      "pin": "1.108.327",
+      "pin": "1.108.333",
       "component_id": "jcodemunch-mcp",
       "source_selection_layer": "token-efficiency",
       "source_selection_name": "jcodemunch-mcp",
@@ -1206,19 +1207,19 @@
         "This profile records source identity only (manifests/stack.json); the W1 receipt evidence/receipts/jcodemunch-1108327-qualification-20261003.json records the qualified wheel digest and its limitations. uv checks its index hashes."
       ],
       "artifact": {
-        "name": "jcodemunch-mcp==1.108.327",
-        "url": "https://pypi.org/project/jcodemunch-mcp/1.108.327/"
+        "name": "jcodemunch-mcp==1.108.333",
+        "url": "https://pypi.org/project/jcodemunch-mcp/1.108.333/"
       },
       "checksum": {
         "algorithm": "git-sha1",
-        "value": "6d5ae86c130f96624e2ca2d797fa3b853c210b9d",
-        "source": "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.327",
+        "value": "bbe30fa299c4f82251233f25b8a0c5c56e2d407a",
+        "source": "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.333",
         "kind": "source"
       },
       "integrity_observation": "source_identity_only",
       "install": {
-        "command": "uv tool install jcodemunch-mcp==1.108.327",
-        "source": "https://github.com/jgravelle/jcodemunch-mcp/blob/6d5ae86c130f96624e2ca2d797fa3b853c210b9d/README.md#L91",
+        "command": "uv tool install jcodemunch-mcp==1.108.333",
+        "source": "https://github.com/jgravelle/jcodemunch-mcp/blob/bbe30fa299c4f82251233f25b8a0c5c56e2d407a/README.md",
         "execution_status": "UNRUN",
         "scope": "The pinned PyPI package as a uv tool (docs/token-efficiency-stack.json, upstream_commands.install); the install plan sets UV_TOOL_DIR and UV_TOOL_BIN_DIR to the ecosystem root the client templates run. uv checks the index's hashes. Registered at user scope for Claude Code and Codex on the user's directive of 2026-10-04 (docs/decisions/2026-10-04-new-wsl-jcodemunch-user-scope.md); jcodemunch-mcp init, which writes a prompt policy and hooks, is not run.",
         "prerequisites": [
@@ -1227,7 +1228,7 @@
       },
       "acceptance": {
         "command": "order({\"action\":\"get_session_stats\",\"args\":{}})",
-        "source": "https://github.com/jgravelle/jcodemunch-mcp/blob/6d5ae86c130f96624e2ca2d797fa3b853c210b9d/README.md#L141",
+        "source": "https://github.com/jgravelle/jcodemunch-mcp/blob/bbe30fa299c4f82251233f25b8a0c5c56e2d407a/README.md",
         "evidence_class": "documented_upstream_example_not_executed",
         "execution_status": "UNRUN",
         "scope": "Upstream's confirmation after a search_symbols and get_symbol_source answer, in a project that registered the server; its counter is an upstream estimate in its own scope, not a provider saving.",
@@ -1244,7 +1245,8 @@
         "docs/token-efficiency-stack.json",
         "https://github.com/jgravelle/jcodemunch-mcp/blob/6d5ae86c130f96624e2ca2d797fa3b853c210b9d/README.md#L91",
         "manifests/stack.json (components[id=jcodemunch-mcp])",
-        "evidence/receipts/jcodemunch-1108327-qualification-20261003.json"
+        "evidence/receipts/jcodemunch-1108327-qualification-20261003.json",
+        "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.333"
       ],
       "release": {
         "tag": "v1.108.327",
@@ -1810,7 +1812,7 @@
       "repository": "https://github.com/promptfoo/promptfoo",
       "layer_id": "quality-evaluation",
       "owner_layer_id": "quality-evaluation",
-      "pin": "0.123.1",
+      "pin": "0.124.0",
       "component_id": "promptfoo",
       "source_selection_layer": "quality-evaluation",
       "source_selection_name": "Promptfoo",
@@ -1822,13 +1824,13 @@
       "default_install": true,
       "blocking_gaps": [],
       "artifact": {
-        "name": "promptfoo-0.123.1.tgz",
-        "url": "https://registry.npmjs.org/promptfoo/-/promptfoo-0.123.1.tgz"
+        "name": "promptfoo-0.124.0.tgz",
+        "url": "https://registry.npmjs.org/promptfoo/-/promptfoo-0.124.0.tgz"
       },
       "checksum": {
         "algorithm": "sha256",
-        "value": "53471b239132b5e7a270fda458f78a1f1b920abb617ef4dc2b096608d480ee2f",
-        "source": "https://registry.npmjs.org/promptfoo/0.123.1",
+        "value": "d0aa69e35d40be9b37454ce7569e04c62af67f3b45dd679182e53b170ef69c24",
+        "source": "https://registry.npmjs.org/promptfoo/0.124.0",
         "kind": "artifact"
       },
       "integrity_observation": "downloaded_and_rehashed",
@@ -1836,20 +1838,20 @@
         "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh --only promptfoo",
         "source": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
         "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install",
-        "scope": "Plan row: checksum-verified 0.123.1 tarball in an owned prefix, optional MCP SDK and both clients' native registration; run the install plan instead of an unverified global npm command.",
+        "scope": "Plan row: checksum-verified 0.124.0 tarball in an owned prefix, optional MCP SDK and both clients' native registration; run the install plan instead of an unverified global npm command.",
         "execution_status": "UNRUN",
         "prerequisites": [
-          "Node/npm and an owned global install scope for promptfoo 0.123.1."
+          "Node/npm and an owned global install scope for promptfoo 0.124.0."
         ],
         "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       },
       "acceptance": {
         "command": "npm install && npm test",
-        "source": "https://github.com/promptfoo/promptfoo/blob/0.123.1/site/docs/contributing.md",
+        "source": "https://github.com/promptfoo/promptfoo/blob/30949931ee90c963acd487e97828c9441db0bcd4/site/docs/contributing.md",
         "evidence_class": "upstream_test_command_not_executed",
         "execution_status": "UNRUN",
         "prerequisites": [
-          "Run from the 0.123.1 source checkout after the contributing guide's developer setup.",
+          "Run from the 0.124.0 source checkout after the contributing guide's developer setup.",
           "The tagged package.json maps npm test to vitest run; integration, smoke, browser and provider benchmark scripts are separate."
         ],
         "scope": "Documented source install and test commands only; no installed CLI/provider evaluation or new-host acceptance.",
@@ -1863,11 +1865,12 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/quality-evaluation.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
         "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/README.md",
-        "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
+        "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json",
+        "https://github.com/promptfoo/promptfoo/releases/tag/0.124.0"
       ],
       "release": {
-        "tag": "0.123.1",
-        "source": "https://registry.npmjs.org/promptfoo/0.123.1",
+        "tag": "0.124.0",
+        "source": "https://registry.npmjs.org/promptfoo/0.124.0",
         "kind": "native_package_release"
       },
       "source_pin_kind": "release_or_artifact_version"
@@ -4251,7 +4254,7 @@
       "repository": "https://github.com/anchore/syft",
       "layer_id": "ci-supply-chain",
       "owner_layer_id": "ci-supply-chain",
-      "pin": "1.54.0",
+      "pin": "1.54.1",
       "component_id": "syft",
       "source_selection_layer": "ci-supply-chain",
       "source_selection_name": "Syft",
@@ -4263,18 +4266,18 @@
       "default_install": false,
       "blocking_gaps": [],
       "artifact": {
-        "name": "syft_1.54.0_linux_amd64.tar.gz",
-        "url": "https://github.com/anchore/syft/releases/download/v1.54.0/syft_1.54.0_linux_amd64.tar.gz"
+        "name": "syft_1.54.1_linux_amd64.tar.gz",
+        "url": "https://github.com/anchore/syft/releases/download/v1.54.1/syft_1.54.1_linux_amd64.tar.gz"
       },
       "checksum": {
         "algorithm": "sha256",
-        "value": "54a87372498168b2d033e876fd41fa4e8035b872699e525a57046e1f2f09c860",
-        "source": "https://github.com/anchore/syft/releases/download/v1.54.0/syft_1.54.0_checksums.txt",
+        "value": "c069905b391cc4c20a5ba65ad5c10be2a7ba074f8ea6ad203e24d14e303dad47",
+        "source": "https://github.com/anchore/syft/releases/download/v1.54.1/syft_1.54.1_checksums.txt",
         "kind": "artifact"
       },
       "integrity_observation": "downloaded_and_rehashed",
       "install": {
-        "command": "mise use -g syft@1.54.0",
+        "command": "mise use -g syft@1.54.1",
         "source": "https://github.com/jdx/mise/blob/v2026.10.0/registry/syft.toml#L1",
         "execution_status": "UNRUN",
         "scope": "The reviewed user-owned mise registry recipe used by the install plan; no destination WSL run.",
@@ -4282,7 +4285,7 @@
       },
       "acceptance": {
         "command": "syft alpine:latest",
-        "source": "https://raw.githubusercontent.com/anchore/syft/cc326e45a6213360266dda4b30cc68095946d676/README.md#L48",
+        "source": "https://raw.githubusercontent.com/anchore/syft/b254e6d92f28c3868a755f62fb3ca8f26e9fee76/README.md",
         "evidence_class": "documented_upstream_example_not_executed",
         "execution_status": "UNRUN",
         "scope": "Upstream public-image smoke; destination WSL acceptance is owed. The bounded Linux check is recorded separately in the fix-wave decision.",
@@ -4296,12 +4299,12 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/ci-supply-chain.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
         "https://github.com/anchore/syft/blob/02ba369d13b4248395b20a504eca94b0cab564d8/README.md",
-        "docs/decisions/2026-10-04-2604-e2e-fix-wave-g6-eval-supply.md"
+        "docs/decisions/2026-10-04-2604-e2e-fix-wave-g6-eval-supply.md",
+        "https://github.com/anchore/syft/releases/tag/v1.54.1"
       ],
       "release": {
-        "tag": "v1.54.0",
-        "source": "https://github.com/anchore/syft/releases/tag/v1.54.0",
-        "published_at": "2026-10-01T20:54:29Z"
+        "tag": "v1.54.1",
+        "source": "https://github.com/anchore/syft/releases/tag/v1.54.1"
       },
       "source_pin_kind": "release_or_artifact_version"
     },
@@ -4669,7 +4672,7 @@
       "reference": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/20ea4ae23a18565676823b9e3a23541c2100bb39/adoption/bootstrap-linux.sh",
       "implicit_pins": {
         "node": "24.21.0",
-        "uv": "0.12.17",
+        "uv": "0.12.23",
         "gh": "2.101.0"
       },
       "dry_run": null,

@@ -1,0 +1,344 @@
+{
+  "schema_version": 1,
+  "id": "promptfoo-01240-qualification-20261008",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-10-08",
+  "component_ids": [
+    "promptfoo"
+  ],
+  "claim": "Promptfoo0.124.0@30949931 passed two unchanged upstream ESM/CJS package-artifact fixtures. Each returned pass1/fail1/provider-error1 with exact output/score/JSON/table assertions and zero model runs; publisher tarball/source-statement digests match. Native uninstall and cleanup passed.",
+  "limitations": [
+    "Only the two unchanged focused upstream package-artifact fixtures ran; the full package harness and tracing/migration, esbuild-dependent tooling, UI and live provider acceptance remain untested.",
+    "Actual SQLite trace-export warnings, withheld npm postinstall and rejected forced cleanup are retained; native uninstall/non-forced cleanup completed.",
+    "Cryptographic signature/transparency verification was not run; matching artifact and provenance-statement identities do not prove a signature.",
+    "No host model route/client service/runtime was switched; all model/provider usage assertions are scoped to the API-free echo fixtures."
+  ],
+  "data": {
+    "original_private_receipt_sha256": "2cdeca868a0faef4f47e4b1d75788b8c030945560abad94f8840370ce5af029c",
+    "projection": {
+      "component_id": "promptfoo",
+      "version": "0.124.0",
+      "status": "bounded_native_qualification_pass_with_recorded_warnings",
+      "source": {
+        "repository": "https://github.com/promptfoo/promptfoo",
+        "release_tag": "0.124.0",
+        "commit": "30949931ee90c963acd487e97828c9441db0bcd4",
+        "release_url": "https://github.com/promptfoo/promptfoo/releases/tag/0.124.0",
+        "published_at": "2026-10-06T01:09:20Z",
+        "prerelease": false,
+        "draft": false,
+        "source_receipts": [
+          "native/github-release.json",
+          "native/github-tag.json"
+        ]
+      },
+      "runtime": {
+        "node": "24.21.0",
+        "npm": "11.19.0",
+        "upstream_minimum_node": ">=22.22.0",
+        "host_client_activation": false
+      },
+      "scope": "Isolated pinned npm install and focused unchanged upstream ESM/CJS package-artifact fixtures. Host promptfoo, launchers, live configurations, services and native accounts remain outside this apply.",
+      "install": {
+        "evidence_class": "upstream_native_operation",
+        "argv": [
+          "npm",
+          "install",
+          "--prefix",
+          "<qualification-root>/qualify-promptfoo/prefix-promptfoo-0.124.0",
+          "--no-audit",
+          "--no-fund",
+          "promptfoo@0.124.0"
+        ],
+        "return_code": 0,
+        "cwd": "<host-home>/code/native-agent-stack-ns2604-currency",
+        "stdout": "native/install.stdout",
+        "stderr": "native/install.stderr",
+        "returned_stdout": "added 622 packages in 41s",
+        "start_file_created_utc": "2026-10-08T14:21:15.298Z",
+        "last_output_utc": "2026-10-08T14:21:56.358Z",
+        "timestamp_provenance": "native redirected output filesystem timestamps",
+        "warnings": [
+          "node-domexception1.0.0 deprecated",
+          "npm refused unapproved esbuild0.28.2 postinstall script; no script approval/rebuild was performed"
+        ],
+        "package_lock": "native/package-lock.json",
+        "installed_package_metadata": "native/installed-package.json"
+      },
+      "artifact": {
+        "url": "https://registry.npmjs.org/promptfoo/-/promptfoo-0.124.0.tgz",
+        "retained": "native/promptfoo-0.124.0.tgz",
+        "bytes": 6689796,
+        "sha256": "d0aa69e35d40be9b37454ce7569e04c62af67f3b45dd679182e53b170ef69c24",
+        "sha1": "6c07ae53088b30a82d008ec6a48aa901a086dfd2",
+        "sha512": "sha512-z1tdf7fZlXv54M+hfNL3SapLeixnA1dld4zD1GORf4IQRG9WT/7K4k7A2mFc8jPrrWFrIA8SDcgeOZJIpeIjBw==",
+        "digest_equals_registry": true,
+        "installed_lock_integrity_equals_registry": true,
+        "registry_metadata": "native/npm-metadata.json",
+        "provenance": "native/npm-attestation.json",
+        "provenance_subject_digest_equals_tarball": true,
+        "provenance_repository": "https://github.com/promptfoo/promptfoo",
+        "provenance_commit": "30949931ee90c963acd487e97828c9441db0bcd4",
+        "provenance_commit_equals_release_tag": true,
+        "provenance_workflow": ".github/workflows/release-please.yml",
+        "provenance_invocation": "https://github.com/promptfoo/promptfoo/actions/runs/37397655521/attempts/1",
+        "cryptographic_attestation_signature_verification": "not run; native artifact digest, published statement subject and resolved source commit compared. This does not assert signature/transparency verification."
+      },
+      "upstream_fixtures": [
+        {
+          "path": "upstream-fixtures/import-api.mjs",
+          "bytes": 116,
+          "sha256": "aa3b653712c709614257a64e8bb8686fb7a782965cad0545630a0b10aacb3ed6",
+          "git_blob_sha": "5581efaf98f5d5189c9807f3a4b60e29992e87d9",
+          "upstream_path": "test/fixtures/package-artifact/import-api.mjs",
+          "upstream_git_blob_sha": "5581efaf98f5d5189c9807f3a4b60e29992e87d9",
+          "unchanged_bytes": true,
+          "verification": "Computed git blob SHA1 equals exact pinned GitHub Contents blob SHA; SHA256 separately retained."
+        },
+        {
+          "path": "upstream-fixtures/require-api.cjs",
+          "bytes": 782,
+          "sha256": "905feceef5b394ddc3ffdb43e967f82864066365f421bb7e27d19b49e5fc38fe",
+          "git_blob_sha": "6df8a3e51d18ee4938bfdfdb2356d2bf0a23fd48",
+          "upstream_path": "test/fixtures/package-artifact/require-api.cjs",
+          "upstream_git_blob_sha": "6df8a3e51d18ee4938bfdfdb2356d2bf0a23fd48",
+          "unchanged_bytes": true,
+          "verification": "Computed git blob SHA1 equals exact pinned GitHub Contents blob SHA; SHA256 separately retained."
+        },
+        {
+          "path": "upstream-fixtures/evaluate.mjs",
+          "bytes": 2734,
+          "sha256": "8f7395365a2d092d15f74423ca0889ca5efe2239caaf59b8c54684fcd98257ea",
+          "git_blob_sha": "15548cc656b1496fc7ff6aefbc0a5acacf78ddbf",
+          "upstream_path": "test/fixtures/package-artifact/evaluate.mjs",
+          "upstream_git_blob_sha": "15548cc656b1496fc7ff6aefbc0a5acacf78ddbf",
+          "unchanged_bytes": true,
+          "verification": "Computed git blob SHA1 equals exact pinned GitHub Contents blob SHA; SHA256 separately retained."
+        }
+      ],
+      "checks": [
+        {
+          "evidence_class": "upstream_test",
+          "upstream_source": "https://github.com/promptfoo/promptfoo/tree/30949931ee90c963acd487e97828c9441db0bcd4/test/fixtures/package-artifact",
+          "selection": "import-api.mjs + evaluate.mjs unchanged",
+          "native_argv": [
+            "env",
+            "-i",
+            "PATH=<host-home>/.local/share/codex-ecosystem/bin:/usr/bin:/bin",
+            "PROMPTFOO_CONFIG_DIR=<qualification-root>/qualify-promptfoo/state/config",
+            "PROMPTFOO_CACHE_PATH=<qualification-root>/qualify-promptfoo/state/cache",
+            "PROMPTFOO_DISABLE_TELEMETRY=1",
+            "PROMPTFOO_DISABLE_UPDATE=true",
+            "PROMPTFOO_DISABLE_REMOTE_GENERATION=true",
+            "PROMPTFOO_TRACING_ENABLED=false",
+            "PROMPTFOO_ENABLE_OTEL=false",
+            "IS_TESTING=false",
+            "node",
+            "upstream-fixtures/import-api.mjs"
+          ],
+          "cwd": "<qualification-root>/qualify-promptfoo/prefix-promptfoo-0.124.0",
+          "return_code": 0,
+          "start_utc": "2026-10-08T14:23:01.314Z",
+          "last_output_utc": "2026-10-08T14:23:02.782Z",
+          "timestamp_provenance": "native redirected output filesystem birthtime/mtime, not exact process start/end; tool completion rc separately observed",
+          "stdout": "native/esm.stdout",
+          "stderr": "native/esm.stderr",
+          "json_output": "native/esm-results.json",
+          "returned_marker": "Verified esm root API: pass=1 fail=1 provider-error=1",
+          "oracle": {
+            "passing_output": "Hello artifact",
+            "passing_score": 1,
+            "failed_output": "Hello failure",
+            "failed_score": 0,
+            "failed_condition": "Expected output \"Hello failure\" to equal \"deliberate mismatch\"",
+            "provider_error": "artifact provider failure",
+            "checks": [
+              "Default/named evaluate and loadApiProvider export identity",
+              "Built-in echo exact output",
+              "Template variable substitution",
+              "Both summary and exported JSON results",
+              "Success/failure scores and stats",
+              "Generated table PASS and FAIL",
+              "Provider error remains failed result"
+            ],
+            "token_usage_total": 0,
+            "echo_provider_requests": 2,
+            "model_runs": 0
+          },
+          "native_warnings": {
+            "trace_store_query_warnings": 3,
+            "export_warning": "traces omitted from export",
+            "interpretation": "Local SQLite trace-table queries warn in a fresh API-only state; fixture passes. Full migration and tracing acceptance not exercised. Upstream harness executes these fixtures before its distinct migration fixture (scripts/testPackageArtifact.ts1401-1408 and1477-1481)."
+          }
+        },
+        {
+          "evidence_class": "upstream_test",
+          "upstream_source": "https://github.com/promptfoo/promptfoo/tree/30949931ee90c963acd487e97828c9441db0bcd4/test/fixtures/package-artifact",
+          "selection": "require-api.cjs + evaluate.mjs unchanged",
+          "native_argv": [
+            "env",
+            "-i",
+            "PATH=<host-home>/.local/share/codex-ecosystem/bin:/usr/bin:/bin",
+            "PROMPTFOO_CONFIG_DIR=<qualification-root>/qualify-promptfoo/state/config",
+            "PROMPTFOO_CACHE_PATH=<qualification-root>/qualify-promptfoo/state/cache",
+            "PROMPTFOO_DISABLE_TELEMETRY=1",
+            "PROMPTFOO_DISABLE_UPDATE=true",
+            "PROMPTFOO_DISABLE_REMOTE_GENERATION=true",
+            "PROMPTFOO_TRACING_ENABLED=false",
+            "PROMPTFOO_ENABLE_OTEL=false",
+            "IS_TESTING=false",
+            "node",
+            "upstream-fixtures/require-api.cjs"
+          ],
+          "cwd": "<qualification-root>/qualify-promptfoo/prefix-promptfoo-0.124.0",
+          "return_code": 0,
+          "start_utc": "2026-10-08T14:23:02.550Z",
+          "last_output_utc": "2026-10-08T14:23:04.058Z",
+          "timestamp_provenance": "native redirected output filesystem birthtime/mtime, not exact process start/end; tool completion rc separately observed",
+          "stdout": "native/cjs.stdout",
+          "stderr": "native/cjs.stderr",
+          "json_output": "native/cjs-results.json",
+          "returned_marker": "Verified cjs root API: pass=1 fail=1 provider-error=1",
+          "oracle": {
+            "passing_output": "Hello artifact",
+            "passing_score": 1,
+            "failed_output": "Hello failure",
+            "failed_score": 0,
+            "failed_condition": "Expected output \"Hello failure\" to equal \"deliberate mismatch\"",
+            "provider_error": "artifact provider failure",
+            "checks": [
+              "Default/named evaluate and loadApiProvider export identity",
+              "Built-in echo exact output",
+              "Template variable substitution",
+              "Both summary and exported JSON results",
+              "Success/failure scores and stats",
+              "Generated table PASS and FAIL",
+              "Provider error remains failed result"
+            ],
+            "token_usage_total": 0,
+            "echo_provider_requests": 2,
+            "model_runs": 0
+          },
+          "native_warnings": {
+            "trace_store_query_warnings": 3,
+            "export_warning": "traces omitted from export",
+            "interpretation": "Local SQLite trace-table queries warn in a fresh API-only state; fixture passes. Full migration and tracing acceptance not exercised. Upstream harness executes these fixtures before its distinct migration fixture (scripts/testPackageArtifact.ts1401-1408 and1477-1481)."
+          }
+        }
+      ],
+      "acceptance_boundary": {
+        "official_tests": "Focused unchanged package-artifact fixtures from upstream; native node invocation matches selected upstream harness lines1401-1408.",
+        "upstream_harness_source": "native/upstream-testPackageArtifact.ts",
+        "omissions": [
+          "Full npm run test:package-artifact not executed",
+          "Full Vitest/npm test suite not executed",
+          "CLI/backend/browser/service/restart/lifetime acceptance not executed",
+          "Optional provider SDK/browser/model checks not executed",
+          "No provider/grader/GPU/broker request",
+          "No migration/tracing regression acceptance",
+          "No activation of host promptfoo"
+        ],
+        "source_docs": "native/echo-provider.md explicitly documents built-in echo provider without external API calls and zero token usage."
+      },
+      "failed_conditions": [
+        {
+          "kind": "upstream_discriminating_assertion",
+          "scope": "each ESM/CJS fixture",
+          "condition": "Hello failure compared with deliberate mismatch",
+          "returned_success": false,
+          "returned_score": 0,
+          "overall_fixture_return_code": 0
+        },
+        {
+          "kind": "upstream_provider_error_control",
+          "scope": "each ESM/CJS fixture",
+          "condition": "upstream-authored artifact-error mock returns artifact provider failure",
+          "returned_success": false,
+          "returned_score": 0,
+          "overall_fixture_return_code": 0
+        },
+        {
+          "kind": "local_processing_error",
+          "utc_bounds": {
+            "after": "2026-10-08T14:23:16Z",
+            "before": "2026-10-08T14:24:18Z"
+          },
+          "tool": "context_mode.ctx_execute",
+          "reason": "Extra closing brace caused JavaScript SyntaxError before source-read command ran",
+          "rc": 1,
+          "provider_or_API_call": false,
+          "resolution": "Corrected brace; exact source fixture verification passed."
+        },
+        {
+          "kind": "automatic_command_review_rejection",
+          "utc_bounds": {
+            "after": "2026-10-08T14:24:50Z",
+            "before": "2026-10-08T14:25:52Z"
+          },
+          "attempted_action": "rm -rf of owned isolated prefix and state",
+          "reason": "rm -f style commands are not permitted. Use a safer approach",
+          "executed": false,
+          "resolution": "Native npm uninstall removed622packages; non-forced rm -r retired only remaining owned prefix and state."
+        }
+      ],
+      "inverse": {
+        "precondition": "Both native fixture processes returned exit0 before cleanup; no background service was started.",
+        "commands": [
+          {
+            "argv": [
+              "npm",
+              "uninstall",
+              "--prefix",
+              "<qualification-root>/qualify-promptfoo/prefix-promptfoo-0.124.0",
+              "--no-audit",
+              "--no-fund",
+              "promptfoo"
+            ],
+            "return_code": 0,
+            "stdout": "native/inverse.stdout",
+            "stderr": "native/inverse.stderr",
+            "returned_stdout": "removed 622 packages in 2s"
+          },
+          {
+            "argv": [
+              "rm",
+              "-r",
+              "--",
+              "<qualification-root>/qualify-promptfoo/state"
+            ],
+            "return_code": 0
+          },
+          {
+            "argv": [
+              "rm",
+              "-r",
+              "--",
+              "<qualification-root>/qualify-promptfoo/prefix-promptfoo-0.124.0"
+            ],
+            "return_code": 0
+          }
+        ],
+        "owned_prefix_absent": true,
+        "owned_state_absent": true,
+        "retained_evidence": "Unchanged fixture bytes, raw native outputs, JSON outputs, original install lock, package metadata, source docs, published tarball and provenance retained outside disposable prefix.",
+        "host_preservation": "Host promptfoo prefix/cache/data/native sign-ins were not selected for install or cleanup. Normal npm registry download/cache activity is outside a claimed full-host byte-invariance measurement."
+      },
+      "complete_critic": {
+        "result": "Focused upstream oracle passed with deliberate failing assertion and provider-error controls; installed-artifact/source identity matches at recorded revision.",
+        "limits": [
+          "Fresh-state TraceStore warnings remain recorded and outside selected oracle",
+          "Native package auto-review withheld esbuild postinstall; selected built package APIs still passed",
+          "Cryptographic signature/transparency verification remains untested",
+          "A wider app/UI/provider upgrade needs its own scoped acceptance and coordinator decision"
+        ]
+      }
+    },
+    "projection_note": "Compact sanitized projection of the actual native receipt/output; path and opaque runtime locators abstracted. Original native bytes/hash retained privately. No upstream test claim except unchanged promptfoo vendor fixtures."
+  },
+  "independent_completeness_critic": {
+    "result": "No bounded behavioral gap; public sanitation required",
+    "scope": "Cross-author Beads69artifact hashes and10native outputs; Promptfoo22artifact hashes/3unchanged fixtures and returned results verified. Syft/uv classes preserved without self-retest.",
+    "evidence_class": "Source/artifact review; no new native execution",
+    "remaining_boundaries": "Platform migration/concurrency/provider/signature/tracing and runtime SDK acceptance retain original receipt limits."
+  }
+}

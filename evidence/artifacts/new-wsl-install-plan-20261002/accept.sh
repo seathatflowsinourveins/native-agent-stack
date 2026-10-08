@@ -784,12 +784,12 @@ output-compression() {
   esac
 }
 code-index() {
-  # jcodemunch-mcp 1.108.327 (owner row, amendment 4); https://github.com/jgravelle/jcodemunch-mcp
+  # jcodemunch-mcp 1.108.333 (owner row, amendment 4); https://github.com/jgravelle/jcodemunch-mcp
   # UNRUN on every distribution: added from the wave-3 batch of 2026-10-04, after every recorded run of this plan.
   case "$stage" in
     post_install)
-      # Kind: smoke; Source: https://raw.githubusercontent.com/jgravelle/jcodemunch-mcp/6d5ae86c130f96624e2ca2d797fa3b853c210b9d/README.md#L113 (jcodemunch-mcp --version); manifests/stack.json (jcodemunch-mcp 1.108.327, source 6d5ae86c130f96624e2ca2d797fa3b853c210b9d); evidence/receipts/jcodemunch-1108327-qualification-20261003.json (recorded W1 qualification and limitations; this plan row remains UNRUN)
-      check code-index smoke '[[ "$("${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/jcodemunch-mcp" --version)" == "jcodemunch-mcp 1.108.327" ]]'
+      # Kind: smoke; Source: https://raw.githubusercontent.com/jgravelle/jcodemunch-mcp/bbe30fa299c4f82251233f25b8a0c5c56e2d407a/README.md#L113 (jcodemunch-mcp --version); manifests/stack.json (jcodemunch-mcp 1.108.333, source bbe30fa299c4f82251233f25b8a0c5c56e2d407a); evidence/receipts/jcodemunch-1108327-qualification-20261003.json (historical 1.108.327 W1 qualification and limitations; the current version target is source projection and this plan row remains UNRUN)
+      check code-index smoke '[[ "$("${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/jcodemunch-mcp" --version)" == "jcodemunch-mcp 1.108.333" ]]'
       ;;
     *) skipped code-index ;;
   esac
@@ -1391,9 +1391,9 @@ promptfoo() {
       # Kind: smoke; Source: https://raw.githubusercontent.com/promptfoo/promptfoo/34f74d34e140b5e17d23770dfb2340057b1936b8/test/smoke/eval.test.ts#L65
       check promptfoo smoke 'pf="${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/promptfoo"
 export PROMPTFOO_CONFIG_DIR="$config_root/promptfoo-state" PROMPTFOO_DISABLE_TELEMETRY=1 PROMPTFOO_DISABLE_UPDATE=1
-[[ "$("$pf" --version)" == "0.123.1" ]]
+[[ "$("$pf" --version)" == "0.124.0" ]]
 "$pf" mcp --help >/dev/null
-npm ls --global --prefix "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/tools/promptfoo-0.123.1" --all @anthropic-ai/claude-agent-sdk @openai/codex-sdk
+npm ls --global --prefix "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/tools/promptfoo-0.124.0" --all @anthropic-ai/claude-agent-sdk @openai/codex-sdk
 receipt="$(mktemp -d "${TMPDIR:-/tmp}/new-wsl-promptfoo.XXXXXX")"
 trap '"'"'rm -rf -- "$receipt"'"'"' EXIT
 "$pf" eval --config "$config_root/promptfoo-0.123.1-basic.yaml" --no-cache --no-share --no-write --no-table --no-progress-bar --output "$receipt/pass.json"
@@ -1509,8 +1509,8 @@ syft() {
   # UNRUN on every distribution: the 2026-10-04 verified-E2E plan fix.
   case "$stage" in
     post_install)
-      # Kind: smoke; Source: https://raw.githubusercontent.com/anchore/syft/cc326e45a6213360266dda4b30cc68095946d676/README.md#L48
-      check syft smoke 'syft version -o json | jq -e '"'"'.version == "1.54.0" and .gitCommit == "cc326e45a6213360266dda4b30cc68095946d676"'"'"' >/dev/null
+      # Kind: smoke; Source: https://raw.githubusercontent.com/anchore/syft/b254e6d92f28c3868a755f62fb3ca8f26e9fee76/README.md#L48
+      check syft smoke 'syft version -o json | jq -e '"'"'.version == "1.54.1" and .gitCommit == "b254e6d92f28c3868a755f62fb3ca8f26e9fee76"'"'"' >/dev/null
 receipt="$(mktemp "${TMPDIR:-/tmp}/new-wsl-syft.XXXXXX.json")"
 trap '"'"'rm -f -- "$receipt"'"'"' EXIT
 syft alpine:latest -o "syft-json=$receipt"

@@ -125,7 +125,7 @@ part of this artifact.
 Install and acceptance primary citations are retained per entry in the JSON.
 The core paths are [Codex's tagged README](https://github.com/openai/codex/blob/rust-v0.160.0/README.md),
 [Claude's version and channel installer](https://code.claude.com/docs/en/setup#install-a-specific-version),
-[uv 0.12.17](https://github.com/astral-sh/uv/releases/tag/0.12.17),
+[uv 0.12.23](https://github.com/astral-sh/uv/releases/tag/0.12.23),
 [uv's tagged Python guide](https://github.com/astral-sh/uv/blob/0.12.17/docs/guides/install-python.md),
 the [Node 24.21.0 distribution](https://nodejs.org/dist/v24.21.0/SHASUMS256.txt),
 and [gh's tagged native installation reference](https://github.com/cli/cli/blob/v2.101.0/docs/install_linux.md).
@@ -208,7 +208,7 @@ have no default-install precedence.
 | Entry | Source pin | Install citation |
 |---|---|---|
 | Node 24 | 24.21.0 | [reviewed install source](https://github.com/seathatflowsinourveins/native-agent-stack/blob/20ea4ae23a18565676823b9e3a23541c2100bb39/adoption/bootstrap-linux.sh), [upstream reproduction source](https://github.com/jdx/mise/blob/v2026.10.1/docs/cli/install.md), [official distribution integrity](https://nodejs.org/dist/v24.21.0/SHASUMS256.txt) |
-| uv | 0.12.17 | [reviewed install source](https://github.com/astral-sh/uv/releases/tag/0.12.17) |
+| uv | 0.12.23 | [reviewed install source](https://github.com/astral-sh/uv/releases/tag/0.12.23) |
 | gh | 2.101.0 | [reviewed install source](https://github.com/seathatflowsinourveins/native-agent-stack/blob/20ea4ae23a18565676823b9e3a23541c2100bb39/adoption/bootstrap-linux.sh), [upstream Linux installation](https://github.com/cli/cli/blob/v2.101.0/docs/install_linux.md) |
 | CPython 3.13 | 3.13.15 | [reviewed install source](https://github.com/astral-sh/uv/blob/0.12.17/docs/guides/install-python.md) |
 | Codex | 0.160.0 | [reviewed install source](https://github.com/openai/codex/blob/rust-v0.160.0/README.md), [npm version syntax](https://docs.npmjs.com/cli/v11/commands/npm-install) |
@@ -222,7 +222,7 @@ have no default-install precedence.
 | Chrome DevTools MCP | 1.10.1 | [reviewed install source](https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/docs/client-configurations.md#L71); one `chrome-devtools` stdio server in both clients, also for diagnostics |
 | Inspect AI | 0321960a92aa52390413ce011d67ffb5962a2b11 | [reviewed install source](https://github.com/UKGovernmentBEIS/inspect_ai/blob/0321960a92aa52390413ce011d67ffb5962a2b11/README.md) |
 | Harbor | 0.23.0 | [reviewed install source](https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/README.md) |
-| promptfoo | 0.123.1 | [reviewed install source](https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/README.md) |
+| promptfoo | 0.124.0 | [reviewed install source](https://github.com/promptfoo/promptfoo/blob/30949931ee90c963acd487e97828c9441db0bcd4/README.md) |
 | Claude Agent SDK | 0.2.163 | [reviewed install source](https://github.com/anthropics/claude-agent-sdk-python/blob/1ef6d8c71bb0e44a6b33fe61497864f21e17fdb7/README.md) |
 | Codex TypeScript SDK | 0.159.3 | [reviewed install source](https://github.com/openai/codex/blob/rust-v0.159.3/sdk/typescript/README.md) |
 | Codex Python SDK | 0.160.0 | [reviewed install source](https://github.com/openai/codex/blob/rust-v0.160.0/sdk/python/README.md), [pip version syntax](https://pip.pypa.io/en/stable/cli/pip_install/) |
@@ -292,3 +292,13 @@ job; that observation is separate from the still-UNRUN destination profile.
 The historical source-review references and trading receipts are retained.
 The row's two source-review command gaps are now filled. Shared aggregate counts
 and registry receipts are the coordinator's integration work.
+
+## Current portable tool targets (2026-10-08)
+
+The current source projection uses uv 0.12.23, jcodemunch-mcp 1.108.333,
+Promptfoo 0.124.0 and Syft 1.54.1. Their exact release sources and integrity
+values are in the JSON entries and the install plan. The dated corrections
+and judge observations above retain their original versions. CPython 3.13.15
+and its original interpreter artifact and metadata digest stay unchanged.
+Beads 1.3.1 is a selected stack task tool; this source profile adds no Beads
+install owner. All destination provisioning and acceptance remain UNRUN.

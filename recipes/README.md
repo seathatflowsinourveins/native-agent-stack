@@ -100,7 +100,7 @@ Commands assume the selected upstream executable is on the current shell's PATH.
 | `mcporter` · `0.14.2` | `npm install --global --prefix "$STACK_HOME/tools/mcporter-0.14.2" mcporter@0.14.2` | `mcporter --config "$MCPORTER_CONFIG" list socraticode --brief --no-oauth`, then [local semantic search](#local-semantic-code-search) or [Context Mode](#retained-context-mode). Node >=24 is required, and so is `ps` on the PATH of whatever launches the daemon: 0.14.x finds `ps` through PATH, and without it the daemon cannot connect keep-alive servers and `mcporter daemon stop` refuses. Before switching versions, stop a running daemon once `mcporter daemon status --json` shows `activeCalls` 0 on every server; both versions speak daemon protocol 3, so an old daemon keeps serving new clients. 0.14.1 replaced 0.13.13 on the NativeStack WSL2 host on 2026-09-25 after a matched 37-step comparison (`evidence/receipts/mcporter-0141-qualification-20260925.json`). With `--stdio`, `--name` only names the ad-hoc server ([`ephemeral-flags.ts` L97-105](https://github.com/openclaw/mcporter/blob/v0.14.1/src/cli/ephemeral-flags.ts#L97-L105)); without `--server` or a `server.tool` selector, 0.14.1 takes the first positional token, such as `content=@file`, as the server ([`call-arguments.ts` L164-192](https://github.com/openclaw/mcporter/blob/v0.14.1/src/cli/call-arguments.ts#L164-L192)), so the argument never reaches the tool. Pass `--server NAME --tool TOOL` with `--name NAME`. A successful call is transport acceptance, not a token saving. 0.14.2 [host receipt](../evidence/receipts/mcporter-0142-qualification-20261004.json) retains failed configured-daemon calls and successful ad-hoc stdio calls; no daemon recovery was attempted. |
 | `openresearch` · `0.2.15` | Official [alphaXiv/OpenResearch v0.2.15](https://github.com/alphaXiv/OpenResearch/releases/tag/v0.2.15), asset `openresearch-cli-x86_64-unknown-linux-musl.tar.xz`; [qualified archive and rollback](native-upgrades-20260921.md) | `orx --no-telemetry discover keyword 'agent memory' --published-after 2026-06-21 --published-before 2026-09-19 --limit 3`; retrieve only a selected result with `orx --no-telemetry paper "$PAPER_ID" --full`. Public literature access, not a model-quality ranking. The [0.2.15 qualification](../evidence/receipts/openresearch-0215-qualification-20261003.json) covers archive integrity and isolated version output; discover/paper did not run. Retain 0.2.7 as the rollback source. |
 | `playwright-cli` · `0.1.22` | `npm install --global --prefix "$STACK_HOME/tools/playwright-cli-0.1.22" @playwright/cli@0.1.22`; bundled Playwright `1.64.0-alpha-1790635538000` | Optional alternative to agent-browser. `playwright-cli --help` checks installation only; consult its native skill for the chosen browser workflow. Historical installation evidence is Windows-scoped, not a claimed Linux browser E2E. The [0.1.22 qualification](../evidence/receipts/playwright-cli-0122-qualification-20261003.json) covers version/help only; the existing-Chrome fixture was not repeated. Its help/version invocations may perform the upstream anonymous update check and cache write. |
-| `promptfoo` · `0.123.1` | `npm install --global --prefix "$STACK_HOME/tools/promptfoo-0.123.1" promptfoo@0.123.1` | `PROMPTFOO_DISABLE_TELEMETRY=1 promptfoo eval --config "$EVAL_CONFIG" --no-cache --no-table --no-progress-bar --no-share --no-write --output "$EVAL_RESULT"`. The retained native fixture used a local echo provider and passed two exact assertions with zero model tokens. Select the intended provider/data explicitly; no paid default is supplied. |
+| `promptfoo` · `0.124.0` | `npm install --global --prefix "$STACK_HOME/tools/promptfoo-0.124.0" promptfoo@0.124.0` | `PROMPTFOO_DISABLE_TELEMETRY=1 promptfoo eval --config "$EVAL_CONFIG" --no-cache --no-table --no-progress-bar --no-share --no-write --output "$EVAL_RESULT"`. The [current0.124.0 qualification](../evidence/receipts/promptfoo-01240-qualification-20261008.json) passed the unchanged upstream ESM/CJS package-artifact fixtures with zero model runs; historical local-echo evidence remains dated. Tracing/migration/esbuild-dependent and live-provider acceptance remain outside that qualification. Select the intended provider/data explicitly; no paid default is supplied. |
 | `qdrant` · `1.19.1` | Official [qdrant/qdrant v1.19.1](https://github.com/qdrant/qdrant/releases/tag/v1.19.1), archive/hash above; retain Apache-2.0 license | `qdrant --config-path "$QDRANT_CONFIG" --disable-telemetry`; [loopback service and RAG](#local-semantic-code-search). Persistent data paths are separate from the versioned binary. |
 | `qmd` · `2.8.3` | `npm install --global --prefix "$STACK_HOME/tools/qmd-2.8.3" @tobilu/qmd@2.8.3` | [Document workflow](#documents-and-selected-artifacts). BM25 `search` uses no model weights; native dependencies can still occupy substantial disk. `query`/`embed` are separate model-enabled choices; the MCP `query` tool expands plain text and reranks by default, so a lexical call passes typed `lex` searches with `rerank: false` ([document workflow](#documents-and-selected-artifacts)). |
 | `repomix` · `1.18.1` | [Qualified isolated-prefix installation](native-upgrades-20260921.md#installation) with explicit candidate executable | `repomix "$PROJECT_ROOT" --include 'fixtures/before.py,fixtures/after.py' --style xml --parsable-style --compress --token-count-encoding o200k_base --output "$STACK_HOME/output/selected-code.xml"`. Explicit two-file artifact; compression omits details, so read originals before editing. `--compress` keeps a Python definition only when the first physical line of its signature matches one regex, so a multi-line signature drops the whole definition without notice ([`PythonParseStrategy.ts` L81-86 at v1.18.1](https://github.com/yamadashy/repomix/blob/v1.18.1/src/core/treeSitter/parseStrategies/PythonParseStrategy.ts#L81-L86); both E2E receipts lost `status_body`). For exact definitions, signatures or inventories, use an uncompressed pack or the original source, compare every required name, and count that recovery read. Before a handoff, check the pack's file list and the command's exit status. |
@@ -110,19 +110,19 @@ Commands assume the selected upstream executable is on the current shell's PATH.
 | `shanraisshan/claude-code-best-practice` · `15969ed2471a177d938c889255d2f23f07e4742a` | `git clone https://github.com/shanraisshan/claude-code-best-practice.git "$STACK_HOME/tools/claude-code-best-practice"`, then `git -C "$STACK_HOME/tools/claude-code-best-practice" checkout --detach 15969ed2471a177d938c889255d2f23f07e4742a` | Optional reference: read selected README guidance; verify advice against current native docs. No runtime or bulk plugin installation. |
 | `shellcheck` · `0.11.0` | Official [koalaman/shellcheck v0.11.0](https://github.com/koalaman/shellcheck/releases/tag/v0.11.0), asset `shellcheck-v0.11.0.linux.x86_64.tar.xz`; archive procedure | `shellcheck --norc --format=json1 fixtures/example.sh`; inspect all diagnostics. Static shell analysis is not a product test suite. |
 | `socraticode` · `1.15.0` | `npm install --global --prefix "$STACK_HOME/tools/socraticode-1.15.0" --ignore-scripts --before=2026-09-24T12:00:00Z socraticode@1.15.0` | [Local semantic code search](#local-semantic-code-search). Source `f6191f076a42405f0d5508139f3a8b505cfef93a`; AGPL-3.0-only with upstream commercial alternative. This profile uses external local services, not Docker or a cloud key. `--before` reproduces the qualified dependency tree; the package ships no shrinkwrap. The macOS pin stays 1.14.0 until a Mac qualifies 1.15.0. |
-| `syft` · `1.54.0` | Official [anchore/syft v1.54.0](https://github.com/anchore/syft/releases/tag/v1.54.0); [verified Linux archive and rollback](#syft-1540-linux-archive-and-rollback) | `syft version -o json`; the [W1 receipt](../evidence/receipts/syft-1540-qualification-20261003.json) retains the SDK inventory command and output. Preserve 1.52.0 for rollback; hosted SBOM and signature acceptance remain pending. |
+| `syft` · `1.54.1` | Official [anchore/syft v1.54.1](https://github.com/anchore/syft/releases/tag/v1.54.1); [verified Linux archive and rollback](#syft-1541-linux-archive-and-rollback) | `syft version -o json`; the [current1.54.1 receipt](../evidence/receipts/syft-1541-qualification-20261008.json) retains exact upstream Bun inventory and CycloneDX conversion; the [W1 SDK receipt](../evidence/receipts/syft-1540-qualification-20261003.json) remains historical. Preserve 1.52.0 for rollback; hosted SBOM and signature acceptance remain pending. |
 | `toon` · `4.1.1` | `npm install --global --prefix "$STACK_HOME/tools/toon-4.1.1" @toon-format/cli@4.1.1` | `toon fixtures/records.json --stats -o "$STACK_HOME/output/records.toon"`; `toon "$STACK_HOME/output/records.toon" --decode --strict -o "$STACK_HOME/output/records.recovered.json"`. Compare decoded JSON values to the original, including numeric precision. Token estimates are not provider billing. Keep the original JSON unless the strict decode is value-equal: 4.1.1 emits a root string that starts with U+FEFF unquoted, and decoding strips it, which can change the value or its type (open [#339](https://github.com/toon-format/toon/issues/339)). Choose TOON by the exact encoded size and that equality. No record count is an upstream threshold: the tabular encoder takes any number of non-empty objects that share one key set, with columns of primitives or, recursively, of non-empty objects that share one key set; an empty object or an array-valued column falls back to list form ([`tabular.ts` L6-78](https://github.com/toon-format/toon/blob/v4.1.1/packages/toon/src/encode/tabular.ts#L6-L78)). |
-| `vllm` · `0.30.0` | `uv venv --python 3.13 "$STACK_HOME/tools/vllm-0.30.0"`; `uv pip install --python "$STACK_HOME/tools/vllm-0.30.0/bin/python" vllm==0.30.0` | [Pinned local GPU embedding service](#local-semantic-code-search). 0.30.0 carries the WSL pinned-memory fallback and serves the production embeddings on the NativeStack WSL2 host since 2026-09-25, qualified against 0.25.0 first (identical embeddings and code-index results; `evidence/receipts/vllm-030-switch-20260925.json`). 0.29.0 failed GPU startup under WSL with unavailable UVA; keep 0.25.0 installed for rollback until the new pin has run a while. |
+| `vllm` · `0.31.0` | `uv venv --python 3.13 "$STACK_HOME/tools/vllm-0.31.0"`; `uv pip install --python "$STACK_HOME/tools/vllm-0.31.0/bin/python" vllm==0.31.0` | [Pinned local GPU embedding service](#local-semantic-code-search). The [current installed binding](../evidence/receipts/vllm-031-working-pin-binding-20261008.json) records the already active0.31.0 foundation unit, official wheel/cache/hardlink provenance and metadata-only readback; no new install/restart/model run or complete both-client operation acceptance. Keep0.30.0 as the recorded inverse. Historical0.30/0.25 comparisons and0.29WSL UVA failure retain their dated scope. |
 | `worktrunk` · `0.80.0` | Official [max-sixty/worktrunk v0.80.0](https://github.com/max-sixty/worktrunk/releases/tag/v0.80.0); [qualified archive and rollback](native-upgrades-20260921.md) | `wt list --format json`; for an actual owned writing task, `wt switch --create "$BRANCH" --base "$BASE_REF" --no-cd --no-hooks --format json`. The retained 0.79.0 disposable lifecycle verified selection and `wt remove "$BRANCH" --foreground --no-hooks --format json`, leaving only the original worktree. The [0.80.0 scratch qualification](../evidence/receipts/worktrunk-0800-qualification-20261003.json) ran `wt list` in a synthetic repository only; retain 0.79.0 for rollback. |
 
-## Syft 1.54.0 Linux archive and rollback
+## Syft 1.54.1 Linux archive and rollback
 
-The current Syft recipe uses [anchore/syft v1.54.0](https://github.com/anchore/syft/releases/tag/v1.54.0),
-source commit `cc326e45a6213360266dda4b30cc68095946d676`.
+The current Syft recipe uses [anchore/syft v1.54.1](https://github.com/anchore/syft/releases/tag/v1.54.1),
+source commit `b254e6d92f28c3868a755f62fb3ca8f26e9fee76`.
 Download the Linux amd64 archive and its publisher checksums into an explicit
 scratch directory, check the archive before extracting into a versioned prefix,
-and invoke that executable directly. These are the native archive and validation
-commands retained in the [W1 receipt](../evidence/receipts/syft-1540-qualification-20261003.json).
+and invoke that executable directly. This is a supported equivalent archive recipe;
+the [current qualification receipt](../evidence/receipts/syft-1541-qualification-20261008.json) retains the actually executed publisher installer and checksum commands.
 The commands are joined with `&&`: each one runs only after the previous one
 succeeded. A failed download, a checksum mismatch, or a checksum file that names
 no downloaded file (`--ignore-missing` then reports that no file was verified
@@ -130,18 +130,18 @@ and exits 1) stops the chain before anything is extracted or executed. The
 chain does not depend on the shell's `errexit` setting.
 
 ```sh
-SYFT_W1_DOWNLOAD="$STACK_HOME/downloads/syft-1.54.0"
-SYFT_W1_PREFIX="$STACK_HOME/tools/syft-1.54.0"
+SYFT_W1_DOWNLOAD="$STACK_HOME/downloads/syft-1.54.1"
+SYFT_W1_PREFIX="$STACK_HOME/tools/syft-1.54.1"
 mkdir -p "$SYFT_W1_DOWNLOAD" "$SYFT_W1_PREFIX" &&
-gh release download v1.54.0 --repo anchore/syft --dir "$SYFT_W1_DOWNLOAD" --pattern syft_1.54.0_linux_amd64.tar.gz --pattern syft_1.54.0_checksums.txt &&
-(cd "$SYFT_W1_DOWNLOAD" && sha256sum --check --ignore-missing syft_1.54.0_checksums.txt) &&
-tar --no-same-owner -xzf "$SYFT_W1_DOWNLOAD/syft_1.54.0_linux_amd64.tar.gz" -C "$SYFT_W1_PREFIX" &&
+gh release download v1.54.1 --repo anchore/syft --dir "$SYFT_W1_DOWNLOAD" --pattern syft_1.54.1_linux_amd64.tar.gz --pattern syft_1.54.1_checksums.txt &&
+(cd "$SYFT_W1_DOWNLOAD" && sha256sum --check --ignore-missing syft_1.54.1_checksums.txt) &&
+tar --no-same-owner -xzf "$SYFT_W1_DOWNLOAD/syft_1.54.1_linux_amd64.tar.gz" -C "$SYFT_W1_PREFIX" &&
 "$SYFT_W1_PREFIX/syft" version -o json
 ```
 
-The [publisher checksum file](https://github.com/anchore/syft/releases/download/v1.54.0/syft_1.54.0_checksums.txt)
-and the receipt carry the accepted archive digest. The receipt's native SDK
-inventory remains its bounded functional evidence; it did not verify the new
+The [publisher checksum file](https://github.com/anchore/syft/releases/download/v1.54.1/syft_1.54.1_checksums.txt)
+and the receipt carry the accepted archive digest. The receipt's native Bun
+inventory/conversion remains its bounded functional evidence; it did not verify the
 Sigstore bundle format, and the first hosted `sbom-vuln` and `publish-catalog`
 installation paths remain pending. Preserve the previous 1.52.0 prefix for
 rollback, with [its official release](https://github.com/anchore/syft/releases/tag/v1.52.0)
@@ -320,7 +320,7 @@ hf download nvidia/Nemotron-3-Embed-1B-BF16 \
 
 qdrant --config-path "$QDRANT_CONFIG" --disable-telemetry
 # In a second terminal, or via the reviewed user unit:
-"$STACK_HOME/tools/vllm-0.30.0/bin/vllm" serve "$MODEL_DIRECTORY" \
+"$STACK_HOME/tools/vllm-0.31.0/bin/vllm" serve "$MODEL_DIRECTORY" \
   --served-model-name nvidia/Nemotron-3-Embed-1B-BF16 \
   --host 127.0.0.1 --port 8231 --max-model-len 4096 --max-num-seqs 4 \
   --gpu-memory-utilization 0.16 --enforce-eager --no-enable-log-requests
@@ -467,8 +467,8 @@ no verified cumulative token-savings counters.
 Install the upstream npm package in an owned prefix:
 
 ```sh
-npm install --prefix "$STACK_HOME/tools/beads-1.3.0" @beads/bd@1.3.0
-"$STACK_HOME/tools/beads-1.3.0/node_modules/.bin/bd" version
+npm install --prefix "$STACK_HOME/tools/beads-1.3.1" @beads/bd@1.3.1
+"$STACK_HOME/tools/beads-1.3.1/node_modules/.bin/bd" version
 ```
 
 The package's postinstall downloads the upstream release. If the package manager
@@ -476,8 +476,8 @@ reports that it withheld that specific script, inspect the upstream package and
 use its supported per-package approval before
 `npm rebuild @beads/bd --foreground-scripts` in the prefix. Do not disable script
 protection globally.
-The tested release archive `beads_1.3.0_linux_amd64.tar.gz` has SHA-256
-`2f92b904ecf35b607e44dc5c39229173af69c54f1183e8d709f1773540cdcf3b`.
+The [current native archive qualification](../evidence/receipts/beads-131-qualification-20261008.json) used `beads_1.3.1_linux_amd64.tar.gz`, SHA-256
+`3219443a9734b89b93fb16ee8d65844759fa1b3cd3cf139c606b7353cfb0715c`; npm route is supported source metadata, not this archive install result. The isolated embedded-Dolt lifecycle and inverse passed; no live issue-store migration is claimed.
 
 For a selected project that needs persistent dependency and claim state, set
 `BEADS_DIR` to its owned task directory and run from that project's Git root:
@@ -556,8 +556,8 @@ rendered entry would name a missing file (changed after `v2026.09.26.2`):
 ```sh
 eco="${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}"
 UV_TOOL_DIR="$eco/python-tools" UV_TOOL_BIN_DIR="$eco/bin" \
-  uv tool install --python 3.13 jcodemunch-mcp==1.108.327
-"$eco/bin/jcodemunch-mcp" --version   # jcodemunch-mcp 1.108.327
+  uv tool install --python 3.13 jcodemunch-mcp==1.108.333
+"$eco/bin/jcodemunch-mcp" --version   # jcodemunch-mcp 1.108.333
 ```
 
 The retained upstream license is **Dual-Use License 1.1**; the bounded local

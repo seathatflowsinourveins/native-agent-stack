@@ -1,0 +1,466 @@
+{
+  "schema_version": 1,
+  "id": "jcodemunch-1108333-qualification-20261008",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-10-08",
+  "component_ids": [
+    "jcodemunch-mcp"
+  ],
+  "claim": "jcodemunch-mcp1.108.333@bbe30fa3 passed isolated keyless native MCP indexing of an unchanged upstream Python fixture, returning5symbols and exact authenticate source with matchingSHA256. Explicit denied-state-change control behaved as specified; scoped cache invalidation, native uninstall and cleanup passed.",
+  "limitations": [
+    "Native MCP/client integration using an unchanged upstream fixture, not unchanged upstream pytest acceptance.",
+    "AI summaries/semantic/model operations were disabled; no live index or other-client activation was tested.",
+    "Published wheel digest and five installed source files match the pinned release; cryptographic provenance verification remains outside this receipt unless explicitly recorded in the actual projection.",
+    "The expected API state-change refusal is retained separately from successful explicit scoped indexing; no error or unknown usage is suppressed.",
+    "No live host MCP configuration, runtime lock, broker key, credential-value, provider/GPU/model operation was changed by this qualification."
+  ],
+  "data": {
+    "original_private_receipt_sha256": "1598dde776f611bef7c4591e3ad128983fea57efdce856b363655088deae4379",
+    "projection": {
+      "schema_version": 1,
+      "component_id": "jcodemunch-mcp",
+      "version": "1.108.333",
+      "recorded_at_utc": "2026-10-08T14:40:47Z",
+      "status": "bounded_native_qualification_pass",
+      "evidence_class": "local_integration",
+      "scope": "Isolated supported uv tool install; unchanged upstream Python parser fixture indexed and retrieved through installed native MCPorter0.14.2 using supported stdio tools. Full upstream test suite was not run. Host client/server configurations, active index, services, native auth and runtime were outside ownership.",
+      "source": {
+        "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+        "release_tag": "v1.108.333",
+        "commit": "bbe30fa299c4f82251233f25b8a0c5c56e2d407a",
+        "annotated_tag_object": "5dc2645cd02e4142fe2668b61f4d776f081dc0de",
+        "published_at": "2026-10-07T23:00:32Z",
+        "prerelease": false,
+        "draft": false,
+        "release_url": "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.333",
+        "primary_sources": [
+          "native/github-release.json",
+          "native/github-tag.json",
+          "native/github-tag-peel.json",
+          "native/pypi.json",
+          "native/upstream-README.md",
+          "native/upstream-SECURITY.md",
+          "native/upstream-server.py",
+          "native/upstream-config.py"
+        ]
+      },
+      "runtime": {
+        "uv": "0.12.22",
+        "python_requested": "3.13",
+        "mcp_client": "mcporter0.14.2",
+        "mcporter_upstream_pin": "aa0f55f9bffcde9d2070c86145f37d4dd3525f6c",
+        "node": "24.21.0"
+      },
+      "install": {
+        "native_argv": [
+          "env",
+          "UV_TOOL_DIR=<qualification-root>/tool-prefix",
+          "UV_TOOL_BIN_DIR=<qualification-root>/tool-bin",
+          "UV_CACHE_DIR=<qualification-root>/uv-cache",
+          "uv",
+          "tool",
+          "install",
+          "--python",
+          "3.13",
+          "jcodemunch-mcp==1.108.333"
+        ],
+        "shell_environment_assignments": true,
+        "return_code": 0,
+        "stdout": "native/install.stdout",
+        "stderr": "native/install.stderr",
+        "returned": [
+          "Resolved38packages",
+          "jcodemunch-mcp==1.108.333",
+          "tree-sitter-language-pack==0.13.0",
+          "Installed3executables:gcm,jcodemunch-mcp,munch-bench"
+        ],
+        "warning": "Owned tool-bin is not on PATH; did not modify PATH globally or run uv tool update-shell.",
+        "boundary": "Base vendor package only; no semantic/vector/provider extras installed. Bundled0.13.0 grammar pack keeps selected Python parsing local (README.md:228)."
+      },
+      "artifact": {
+        "package": "jcodemunch-mcp",
+        "version": "1.108.333",
+        "wheel": "native/jcodemunch_mcp-1.108.333-py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/73/e4/0d57aa2f7903327477f9c0e72f90980b406d75ff27b72a47fec45f8d82b5/jcodemunch_mcp-1.108.333-py3-none-any.whl",
+        "bytes": 1754915,
+        "sha256": "a1783cfb245b04e220a08c5d5dd18f48df0884ff6d3549d7f328b12e22bbe892",
+        "pypi_digest_matches": true,
+        "yanked": false,
+        "signature_or_pypi_provenance": "not checked; distribution digest plus five installed-source/pinned-release byte comparisons establish the recorded scope."
+      },
+      "installed_source_identity": [
+        {
+          "path": "src/jcodemunch_mcp/server.py",
+          "sha256": "03c08934bd298ddcda62986f2449f558ea2b378ca7371f1fd1ec4fa2c6c71f94",
+          "bytes_equal_pinned_source": true
+        },
+        {
+          "path": "src/jcodemunch_mcp/config.py",
+          "sha256": "680d2067d3f18284a87d17b696217a0e08048588e8dab421be397b5b298736e7",
+          "bytes_equal_pinned_source": true
+        },
+        {
+          "path": "src/jcodemunch_mcp/tools/index_folder.py",
+          "sha256": "a42e1f3bfc84183212fb23b7f3a25958f2f4c9e142664b8c22dd118ccd4621d4",
+          "bytes_equal_pinned_source": true
+        },
+        {
+          "path": "src/jcodemunch_mcp/tools/get_file_outline.py",
+          "sha256": "bfe62ca0d150a3f790bf2549c39dd6180febf679f25a37d453add4234d6a3b38",
+          "bytes_equal_pinned_source": true
+        },
+        {
+          "path": "src/jcodemunch_mcp/tools/get_symbol.py",
+          "sha256": "b785fca569744030ec5a8eaff46f0d44c128bcdb3377740ece9249b9d01a1184",
+          "bytes_equal_pinned_source": true
+        }
+      ],
+      "fixture": {
+        "retained": "fixture/sample.py",
+        "upstream_path": "tests/fixtures/python/sample.py",
+        "upstream_commit": "bbe30fa299c4f82251233f25b8a0c5c56e2d407a",
+        "source_url": "https://github.com/jgravelle/jcodemunch-mcp/blob/bbe30fa299c4f82251233f25b8a0c5c56e2d407a/tests/fixtures/python/sample.py",
+        "bytes": 374,
+        "sha256": "3375b2374a8ee482e1edaec0699b2fb57e0cc4a01276e4822ded2465b8863861",
+        "git_blob_sha": "ff6964f898b550b85568a75bb49afd9f7d94f7c2",
+        "independent_upstream_git_blob_sha": "ff6964f898b550b85568a75bb49afd9f7d94f7c2",
+        "unchanged_bytes": true
+      },
+      "isolation": {
+        "native_mcp_config": "mcporter.json",
+        "explicit_config": true,
+        "imports": [],
+        "client_environment": "env -i; PATH points to existing Node24.21.0, XDG client config/cache/state and daemon directories all within owned scope",
+        "server_environment": {
+          "CODE_INDEX_PATH": "<qualification-root>/index",
+          "JCODEMUNCH_USE_AI_SUMMARIES": "false",
+          "JCODEMUNCH_SHARE_SAVINGS": "0",
+          "JCODEMUNCH_CONTEXT_PROVIDERS": "false",
+          "JCODEMUNCH_EAGER_EMBED_IMPORT": "0",
+          "JCODEMUNCH_LIVE_JOURNAL": "0",
+          "JCODEMUNCH_TRUSTED_FOLDERS": "<qualification-root>/fixture"
+        },
+        "documented_controls": {
+          "storage": "SECURITY.md:156-158;config.py119-127",
+          "summaries": "config.py46 andserver.py1607-1610; per-call use_ai_summaries=false",
+          "telemetry": "SECURITY.md311,393; JCODEMUNCH_SHARE_SAVINGS=0",
+          "eager_embeddings": "SECURITY.md397; JCODEMUNCH_EAGER_EMBED_IMPORT=0",
+          "client_scope": "openclaw/mcporter@aa0f55f9 docs/config.md38,66,212: explicitconfig only andimports[]"
+        },
+        "no_default_auth_or_keys_forwarded": true,
+        "transport": "ephemeral stdio; every native CLI process exited; no daemon/service started"
+      },
+      "native_calls": [
+        {
+          "purpose": "menu",
+          "submitted_shell_command": "env -i PATH=<host-home>/.local/share/mise/installs/node/24.21.0/bin:/usr/bin:/bin XDG_CONFIG_HOME=<qualification-root>/client-config XDG_CACHE_HOME=<qualification-root>/client-cache XDG_STATE_HOME=<qualification-root>/client-state MCPORTER_DAEMON_DIR=<qualification-root>/client-daemon <host-home>/.local/share/mise/installs/node/24.21.0/bin/mcporter --config <qualification-root>/mcporter.json call qualification.menu --args '{\"query\":\"index_folder get_file_outline get_symbol\",\"limit\":6}' --output json --no-oauth > <qualification-root>/native/menu.json 2> <qualification-root>/native/menu.stderr",
+          "cwd": "<qualification-root>",
+          "return_code": 0,
+          "native_initial_return": {
+            "chunk_id": "bf8747",
+            "wall_time_seconds": 1.001596005,
+            "session_id": 35208,
+            "original_token_count": 0,
+            "output": ""
+          },
+          "stdout": "native/menu.json",
+          "stderr": "native/menu.stderr"
+        },
+        {
+          "purpose": "negative_index_guard",
+          "submitted_shell_command": "env -i PATH=<host-home>/.local/share/mise/installs/node/24.21.0/bin:/usr/bin:/bin XDG_CONFIG_HOME=<qualification-root>/client-config XDG_CACHE_HOME=<qualification-root>/client-cache XDG_STATE_HOME=<qualification-root>/client-state MCPORTER_DAEMON_DIR=<qualification-root>/client-daemon <host-home>/.local/share/mise/installs/node/24.21.0/bin/mcporter --config <qualification-root>/mcporter.json call qualification.order --args '{\"action\":\"index_folder\",\"args\":{\"path\":\"<qualification-root>/fixture\",\"use_ai_summaries\":false},\"allow_state_change\":false}' --output json --no-oauth > <qualification-root>/native/index-denied.json 2> <qualification-root>/native/index-denied.stderr",
+          "cwd": "<qualification-root>",
+          "return_code": 1,
+          "native_initial_return": {
+            "chunk_id": "e94c46",
+            "wall_time_seconds": 1.001600462,
+            "session_id": 81096,
+            "original_token_count": 0,
+            "output": ""
+          },
+          "stdout": "native/index-denied.json",
+          "stderr": "native/index-denied.stderr"
+        },
+        {
+          "purpose": "index",
+          "submitted_shell_command": "env -i PATH=<host-home>/.local/share/mise/installs/node/24.21.0/bin:/usr/bin:/bin XDG_CONFIG_HOME=<qualification-root>/client-config XDG_CACHE_HOME=<qualification-root>/client-cache XDG_STATE_HOME=<qualification-root>/client-state MCPORTER_DAEMON_DIR=<qualification-root>/client-daemon <host-home>/.local/share/mise/installs/node/24.21.0/bin/mcporter --config <qualification-root>/mcporter.json call qualification.order --args '{\"action\":\"index_folder\",\"args\":{\"path\":\"<qualification-root>/fixture\",\"use_ai_summaries\":false},\"allow_state_change\":true}' --output json --no-oauth > <qualification-root>/native/index.json 2> <qualification-root>/native/index.stderr",
+          "cwd": "<qualification-root>",
+          "return_code": 0,
+          "native_initial_return": {
+            "chunk_id": "7628b3",
+            "wall_time_seconds": 1.001295676,
+            "session_id": 2211,
+            "original_token_count": 0,
+            "output": ""
+          },
+          "stdout": "native/index.json",
+          "stderr": "native/index.stderr"
+        },
+        {
+          "purpose": "outline",
+          "submitted_shell_command": "env -i PATH=<host-home>/.local/share/mise/installs/node/24.21.0/bin:/usr/bin:/bin XDG_CONFIG_HOME=<qualification-root>/client-config XDG_CACHE_HOME=<qualification-root>/client-cache XDG_STATE_HOME=<qualification-root>/client-state MCPORTER_DAEMON_DIR=<qualification-root>/client-daemon <host-home>/.local/share/mise/installs/node/24.21.0/bin/mcporter --config <qualification-root>/mcporter.json call qualification.order --args '{\"action\":\"get_file_outline\",\"args\":{\"repo\":\"local/fixture-5a04a955\",\"file_path\":\"sample.py\"}}' --output json --no-oauth > <qualification-root>/native/outline.json 2> <qualification-root>/native/outline.stderr",
+          "cwd": "<qualification-root>",
+          "return_code": 0,
+          "native_initial_return": {
+            "chunk_id": "789eed",
+            "wall_time_seconds": 1.001497693,
+            "session_id": 79533,
+            "original_token_count": 0,
+            "output": ""
+          },
+          "stdout": "native/outline.json",
+          "stderr": "native/outline.stderr"
+        },
+        {
+          "purpose": "source",
+          "submitted_shell_command": "env -i PATH=<host-home>/.local/share/mise/installs/node/24.21.0/bin:/usr/bin:/bin XDG_CONFIG_HOME=<qualification-root>/client-config XDG_CACHE_HOME=<qualification-root>/client-cache XDG_STATE_HOME=<qualification-root>/client-state MCPORTER_DAEMON_DIR=<qualification-root>/client-daemon <host-home>/.local/share/mise/installs/node/24.21.0/bin/mcporter --config <qualification-root>/mcporter.json call qualification.order --args '{\"action\":\"get_symbol_source\",\"args\":{\"repo\":\"local/fixture-5a04a955\",\"symbol_id\":\"sample.py::authenticate#function\",\"verify\":true}}' --output json --no-oauth > <qualification-root>/native/source.json 2> <qualification-root>/native/source.stderr",
+          "cwd": "<qualification-root>",
+          "return_code": 0,
+          "native_initial_return": {
+            "chunk_id": "3693a7",
+            "wall_time_seconds": 1.001037638,
+            "session_id": 65980,
+            "original_token_count": 0,
+            "output": ""
+          },
+          "stdout": "native/source.json",
+          "stderr": "native/source.stderr"
+        },
+        {
+          "purpose": "stats",
+          "submitted_shell_command": "env -i PATH=<host-home>/.local/share/mise/installs/node/24.21.0/bin:/usr/bin:/bin XDG_CONFIG_HOME=<qualification-root>/client-config XDG_CACHE_HOME=<qualification-root>/client-cache XDG_STATE_HOME=<qualification-root>/client-state MCPORTER_DAEMON_DIR=<qualification-root>/client-daemon <host-home>/.local/share/mise/installs/node/24.21.0/bin/mcporter --config <qualification-root>/mcporter.json call qualification.order --args '{\"action\":\"get_session_stats\",\"args\":{}}' --output json --no-oauth > <qualification-root>/native/stats.json 2> <qualification-root>/native/stats.stderr",
+          "cwd": "<qualification-root>",
+          "return_code": 0,
+          "native_initial_return": {
+            "chunk_id": "b96516",
+            "wall_time_seconds": 1.000879773,
+            "session_id": 55061,
+            "original_token_count": 0,
+            "output": ""
+          },
+          "stdout": "native/stats.json",
+          "stderr": "native/stats.stderr"
+        },
+        {
+          "purpose": "inverse_invalidate",
+          "submitted_shell_command": "env -i PATH=<host-home>/.local/share/mise/installs/node/24.21.0/bin:/usr/bin:/bin XDG_CONFIG_HOME=<qualification-root>/client-config XDG_CACHE_HOME=<qualification-root>/client-cache XDG_STATE_HOME=<qualification-root>/client-state MCPORTER_DAEMON_DIR=<qualification-root>/client-daemon <host-home>/.local/share/mise/installs/node/24.21.0/bin/mcporter --config <qualification-root>/mcporter.json call qualification.order --args '{\"action\":\"invalidate_cache\",\"args\":{\"repo\":\"local/fixture-5a04a955\"},\"allow_state_change\":true}' --output json --no-oauth > <qualification-root>/native/invalidate.json 2> <qualification-root>/native/invalidate.stderr",
+          "cwd": "<qualification-root>",
+          "return_code": 0,
+          "native_initial_return": {
+            "chunk_id": "a8cb99",
+            "wall_time_seconds": 1.001261342,
+            "session_id": 35918,
+            "original_token_count": 0,
+            "output": ""
+          },
+          "stdout": "native/invalidate.json",
+          "stderr": "native/invalidate.stderr"
+        }
+      ],
+      "returned_results": {
+        "schema": {
+          "status": "ok",
+          "visible_tools": [
+            "set_tool_tier",
+            "announce_model",
+            "jcodemunch_guide",
+            "order",
+            "menu",
+            "route"
+          ]
+        },
+        "menu": {
+          "total_actions": 91,
+          "meaning": "Dispatchable action count, distinct from catalog_tools94"
+        },
+        "index": {
+          "success": true,
+          "repo": "local/fixture-5a04a955",
+          "file_count": 1,
+          "symbol_count": 5,
+          "file_summary_count": 1,
+          "languages": {
+            "python": 1
+          },
+          "indexed_at_returned": "2026-10-08T10:33:21.795299",
+          "returned_timestamp_scope": "Vendor naive local-time value; retain literally; filesystem captured UTC timestamps below are independent"
+        },
+        "outline": {
+          "encoding": "MUNCH/1 fo1",
+          "isError": false,
+          "expected_symbols": [
+            "MAX_RETRIES",
+            "UserService",
+            "UserService.get_user",
+            "UserService.delete_user",
+            "authenticate"
+          ],
+          "expected_symbol_ids_present": true
+        },
+        "source": {
+          "id": "sample.py::authenticate#function",
+          "line": 13,
+          "end_line": 15,
+          "source": "def authenticate(token: str) -> bool:\n    \"\"\"Authenticate a token.\"\"\"\n    return len(token) > 0",
+          "content_verified": true,
+          "content_hash": "8017f8cb0f9f5b79982bd102070227be8e444e3b192fa7aa76e8c568d7aa9a2f",
+          "computed_source_sha256": "8017f8cb0f9f5b79982bd102070227be8e444e3b192fa7aa76e8c568d7aa9a2f",
+          "independent_source_equals_upstream_fixture_lines13_to15": true,
+          "hash_verification_boundary": "Server content_verified checks its cache; independent pinned-upstream fixture slice equality separately proves returned bytes for this symbol."
+        },
+        "stats": {
+          "visible_tools": 6,
+          "catalog_tools": 94,
+          "schema_tokens_visible": 1050,
+          "schema_tokens_catalog": 27880,
+          "basis": "Schema sizes only; fresh server per CLI call resets session counters; no sums/savings/billing estimate derived."
+        }
+      },
+      "failed_conditions": [
+        {
+          "kind": "deliberate_native_MCP_guard",
+          "submitted_action": "order/index_folder",
+          "allow_state_change": false,
+          "return_code": 1,
+          "stdout": "native/index-denied.json",
+          "returned_error": "'index_folder' changes index/session state. Re-issue with allow_state_change=true to proceed. (Read-only actions need no opt-in.)",
+          "resolution": "Same indexing call with allow_state_change=true returned success and5symbols. Reported immediately to parent as expected negative MCP result."
+        },
+        {
+          "kind": "local_context_processing_error",
+          "utc_bounds": {
+            "after": "2026-10-08T14:31:05Z",
+            "before": "2026-10-08T14:31:42Z"
+          },
+          "return_code": 1,
+          "reason": "Extra closing brace caused JavaScript syntax error before command execution",
+          "resolution": "Corrected analysis only; no host/provider/API action in failed cell."
+        },
+        {
+          "kind": "local_source_locator_error",
+          "utc_bounds": {
+            "after": "2026-10-08T14:34:13Z",
+            "before": "2026-10-08T14:34:58Z"
+          },
+          "return_code": 1,
+          "reason": "tools/get_symbol_source.py is not a file; public server dispatch actually imports tools/get_symbol.py",
+          "resolution": "Inspected exact dispatch6090 and verified installedtools/get_symbol.py bytes against releasepin."
+        }
+      ],
+      "inverse": {
+        "native_index_call": "order(action=invalidate_cache,args={repo:local/fixture-5a04a955},allow_state_change=true)",
+        "return_code": 0,
+        "stdout": "native/invalidate.json",
+        "returned": {
+          "success": true,
+          "message": "Index and cached files deleted for local/fixture-5a04a955"
+        },
+        "owned_process_presence_files_before_retirement": 0,
+        "uninstall": {
+          "native_argv": [
+            "env",
+            "UV_TOOL_DIR=<qualification-root>/tool-prefix",
+            "UV_TOOL_BIN_DIR=<qualification-root>/tool-bin",
+            "UV_CACHE_DIR=<qualification-root>/uv-cache",
+            "uv",
+            "tool",
+            "uninstall",
+            "jcodemunch-mcp"
+          ],
+          "shell_environment_assignments": true,
+          "return_code": 0,
+          "stdout": "native/uninstall.stdout",
+          "stderr": "native/uninstall.stderr",
+          "returned": "Uninstalled3executables:gcm,jcodemunch-mcp,munch-bench"
+        },
+        "retirement": {
+          "native_argv": [
+            "rm",
+            "-r",
+            "--",
+            "<qualification-root>/index",
+            "<qualification-root>/tool-bin",
+            "<qualification-root>/uv-cache"
+          ],
+          "return_code": 0,
+          "forced": false
+        },
+        "independent_absence_observations": [
+          {
+            "path": "index",
+            "absent": true
+          },
+          {
+            "path": "tool-prefix",
+            "absent": true
+          },
+          {
+            "path": "tool-bin",
+            "absent": true
+          },
+          {
+            "path": "uv-cache",
+            "absent": true
+          },
+          {
+            "path": "client-config",
+            "absent": true
+          },
+          {
+            "path": "client-cache",
+            "absent": true
+          },
+          {
+            "path": "client-state",
+            "absent": true
+          },
+          {
+            "path": "client-daemon",
+            "absent": true
+          }
+        ],
+        "preserved": "Pinned fixture and native output/source/metadata receipts retained; host toolprefix/index/cache/clientconfig/services/signins untouched."
+      },
+      "usage": {
+        "model_runs": 0,
+        "provider_calls": 0,
+        "gpu_operations": 0,
+        "semantic_or_vector_model_downloads": 0,
+        "billing_estimate": "not computed",
+        "provider_usage": "not applicable to this local parser/MCP metadata operation",
+        "tool_schema_bytes": "Native sizes separately retained; no savings inference"
+      },
+      "errors": {
+        "upstream_http_api_errors": 0,
+        "expected_MCP_negative_controls": 1,
+        "local_processing_errors": 2
+      },
+      "acceptance_boundary": {
+        "upstream_test_suite": false,
+        "local_integration": true,
+        "published_fixture_unchanged": true,
+        "useful_operation": "Index a nativePythonfixture and retrieve its exact outline/symbolsource through supported upstreamclient/server protocols",
+        "omitted": [
+          "Full upstream pytest suite",
+          "Semantic/vector retrieval",
+          "AI summaries",
+          "Cross-client host activation",
+          "Other languages or folder sizes",
+          "Watcher/service lifecycle",
+          "Provider/model/broker/GPU operations",
+          "Native keyring/auth integration"
+        ]
+      },
+      "completeness_critic": {
+        "result": "Useful1file/5symbol indexing, exact source retrieval and inverse passed; version/stats alone did not decide acceptance.",
+        "corrections": [
+          "Supported native action is get_symbol_source, implemented bytools/get_symbol.py",
+          "menu.total_actions91 differs from catalog_tools94",
+          "Vendor naiveindexed_at retained separately from UTC filesystem timestamps",
+          "Unknown provider usage is not turned into a billed model-run estimate"
+        ],
+        "remaining": "Coordinator integrates oneupdatePR and decides host activation separately; receipt is privately scoped with host paths and must be sanitized before public copying."
+      }
+    }
+  }
+}

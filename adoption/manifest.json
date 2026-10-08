@@ -449,11 +449,11 @@
   ],
   "toolchain": {
     "uv": {
-      "version": "0.12.17",
+      "version": "0.12.23",
       "repository": "https://github.com/astral-sh/uv",
-      "source": "https://github.com/astral-sh/uv/releases/tag/0.12.17",
+      "source": "https://github.com/astral-sh/uv/releases/tag/0.12.23",
       "purpose": "Existing native dependency tool; hash-locked SDK synchronization",
-      "acceptance_ref": "adoption/receipt.json"
+      "acceptance_ref": "evidence/artifacts/vendor-currency-20261008/uv-01223-qualification.json"
     },
     "sdk_lock": "adoption/sdk/requirements-linux-x86_64-py313.lock",
     "sdk_direct_requirements": "blueprints/us-equities/workers/requirements.txt",
