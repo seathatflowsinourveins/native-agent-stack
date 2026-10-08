@@ -4,6 +4,7 @@
   "checked_at": "2026-09-30",
   "scope": "The lifecycle tasks the landscape sweep's skills modality sweeps (tools/sota-convergence/landscape-sweep/README.md, Skills modality), the installed skills of adoption/skills/manifest.json that serve each task, and the skill sources it searches. Each task is one skills-* layer. Inclusion does not install, accept or authorize a skill; adoption/skills/manifest.json stays the only place a skill is pinned.",
   "notes": [
+    "2026-10-08 amendment (docs/decisions/2026-10-08-skills-cc-lanes-picks.md): the three verified vendor pins serve existing tasks once each: hcom-agent-messaging and loki serve debugging, and promptfoo-evals serves skill-lifecycle evaluation. The task field named installed follows the central manifest's selected pins; this metadata addition performs no client installation. Host installation follows the PR's landing, as the decision records. The original catalog checked_at date is retained.",
     "Each GitHub source's pin is its default-branch HEAD commit, read on 2026-09-30 with gh api repos/<owner>/<repo>/commits/<default branch> (read-only). None of the sources was archived.",
     "Each task's source_ids come from the SKILL.md folder names at those pins (gh api repos/<owner>/<repo>/git/trees/<pin>?recursive=1), matched by task keyword and reviewed: product-scoped matches (Azure, Notion, Figma, trading) were dropped, and the registry and the curated list serve every task.",
     "skills-sh-registry is searched with the manifest's pinned CLI, DISABLE_TELEMETRY=1 npx skills@1.7.0 find <query> (vercel-labs/skills README.md at v1.7.0, lines 150 and 170-182). The registry has no commit, so its pin is the commit of the CLI's v1.7.0 tag.",
@@ -38,7 +39,10 @@
     {"source_id": "typesafe-ai-skills", "kind": "github-skills-repo", "url": "https://github.com/typesafe-ai/skills", "pin": "65a39f393687675ce170e6094757de20370365b9"},
     {"source_id": "vercel-labs-agent-browser", "kind": "github-skills-repo", "url": "https://github.com/vercel-labs/agent-browser", "pin": "d01253d9db28d75080e36da3c1c31ef89454731e"},
     {"source_id": "vercel-labs-agent-skills", "kind": "github-skills-repo", "url": "https://github.com/vercel-labs/agent-skills", "pin": "063bee94c3f4df8453406c830b0a7df0f2860278"},
-    {"source_id": "vercel-labs-skills", "kind": "github-skills-repo", "url": "https://github.com/vercel-labs/skills", "pin": "3694740352eeef5cdd689af694c485f1ff62eec3"}
+    {"source_id": "vercel-labs-skills", "kind": "github-skills-repo", "url": "https://github.com/vercel-labs/skills", "pin": "3694740352eeef5cdd689af694c485f1ff62eec3"},
+    {"source_id": "aannoo-hcom", "kind": "github-skills-repo", "url": "https://github.com/aannoo/hcom", "pin": "b2a7c192003e7fd67ed93265289e4ac36276f965"},
+    {"source_id": "promptfoo-promptfoo", "kind": "github-skills-repo", "url": "https://github.com/promptfoo/promptfoo", "pin": "30949931ee90c963acd487e97828c9441db0bcd4"},
+    {"source_id": "grafana-skills", "kind": "github-skills-repo", "url": "https://github.com/grafana/skills", "pin": "1ccacf29049fde66637fe01ab93a83a772da323b"}
   ],
   "tasks": [
     {
@@ -54,8 +58,8 @@
       "layer_id": "skills-skill-lifecycle",
       "lifecycle_task": "skill-lifecycle",
       "requirement": "Run a skill's lifecycle end to end: discover (registry and source search), evaluate (source review at a pinned commit and audits), install (pinned through adoption/skills/manifest.json only), verify (listing and invocation on each host), A/B (a paired with-skill/without-skill comparison) and record (the manifest row and a decision record). Anything a registry search finds must still be pinned in the manifest before install.",
-      "installed": ["find-skills", "skill-creator"],
-      "source_ids": ["vercel-labs-skills", "anthropics-skills", "openai-skills", "microsoft-skills", "obra-superpowers", "getsentry-skills", "superagent-ai-skills", "anthropics-claude-code", "bgauryy-octocode", "skills-sh-registry", "composiohq-awesome-claude-skills"],
+      "installed": ["find-skills", "skill-creator", "promptfoo-evals"],
+      "source_ids": ["vercel-labs-skills", "anthropics-skills", "openai-skills", "microsoft-skills", "obra-superpowers", "getsentry-skills", "superagent-ai-skills", "anthropics-claude-code", "bgauryy-octocode", "skills-sh-registry", "composiohq-awesome-claude-skills", "promptfoo-promptfoo"],
       "open_gaps": [
         "skill-creator, a trial skill unit F3 (#553) pinned on 2026-09-30, covers authoring, evaluation and the paired with-skill/without-skill A/B in Claude; the manifest keeps it off in Codex (codex_enabled false), whose own .system/skill-creator is a different skill.",
         "No pinned skill covers verify or record: none checks a skill's listing and invocation on each host, or writes or verifies a manifest row."
@@ -110,8 +114,8 @@
       "layer_id": "skills-debug",
       "lifecycle_task": "debug",
       "requirement": "A debugging procedure for failing tests, CI checks and paper-engine faults, which are otherwise diagnosed ad hoc.",
-      "installed": ["diagnosing-bugs"],
-      "source_ids": ["mattpocock-skills", "obra-superpowers", "addyosmani-agent-skills", "affaan-m-ecc", "getsentry-skills", "skills-sh-registry", "composiohq-awesome-claude-skills"],
+      "installed": ["diagnosing-bugs", "hcom-agent-messaging", "loki"],
+      "source_ids": ["mattpocock-skills", "obra-superpowers", "addyosmani-agent-skills", "affaan-m-ecc", "getsentry-skills", "skills-sh-registry", "composiohq-awesome-claude-skills", "aannoo-hcom", "grafana-skills"],
       "open_gaps": [
         "diagnosing-bugs is a trial skill; obra/superpowers systematic-debugging is excluded as a duplicate of it under the manifest's single-winner rule."
       ],

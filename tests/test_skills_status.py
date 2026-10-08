@@ -1069,7 +1069,7 @@ class SkillsStatusTests(unittest.TestCase):
         real = ss.load_manifest(ROOT / "adoption" / "skills" / "manifest.json")
         budget = ss.inspect(real, self.home, self.env)["budget"]
         self.assertEqual(budget["codex_configured_budget_tokens"], 6000)
-        self.assertEqual(budget["codex_catalog_skills"], 24)  # 25 until semgrep was retired on 2026-10-03
+        self.assertEqual(budget["codex_catalog_skills"], 27)  # three CC/lane picks added on 2026-10-08
         self.assertTrue(budget["codex_catalog_description_chars"]["matches_manifest"])
         self.assertLess(budget["codex_catalog_estimated_tokens"], 6000)
         self.assertTrue(budget["codex_within_budget"])
