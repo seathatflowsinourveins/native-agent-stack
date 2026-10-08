@@ -384,10 +384,7 @@
       ],
       "wiring": "slot:tobi-qmd",
       "owner": "qmd",
-      "override": {
-        "command": "qmd"
-      },
-      "source": "tobi/qmd v2.8.3 README.md L119-130 (command qmd, args mcp) and src/cli/qmd.ts: --index is a global option read before the mcp command (L3022, L3645, L4739). The template names the catalog index of AGENTS.md."
+      "source": "tobi/qmd v2.8.3 at facd35e01359e59d938bc9418e93fb9318addee3, README native shared HTTP and installed dist/mcp/server.js /mcp and /health. Both portable clients use the same HTTP URL; the service owns the named index. Native transport, service scope and inverse are in docs/decisions/2026-10-08-qmd-shared-mcp.md."
     },
     {
       "match": [
@@ -571,14 +568,6 @@
       ],
       "wiring": "slot:serena",
       "owner": "Serena"
-    },
-    {
-      "match": [
-        "codex/config/mcp_servers.qmd.command"
-      ],
-      "wiring": "slot:tobi-qmd",
-      "owner": "qmd",
-      "override": "qmd"
     },
     {
       "match": [

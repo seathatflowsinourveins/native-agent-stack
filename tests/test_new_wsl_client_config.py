@@ -1599,7 +1599,7 @@ class RenderTests(unittest.TestCase):
         self.assertEqual(servers["serena"]["command"], "serena")
         self.assertEqual(servers["serena"]["args"][:1] + servers["serena"]["args"][3:6],
                          ["start-mcp-server", "--project-from-cwd", "--context", "claude-code"])
-        self.assertEqual((servers["qmd"]["command"], servers["qmd"]["args"][-1]), ("qmd", "mcp"))
+        self.assertEqual(servers["qmd"], {"type": "http", "url": "http://127.0.0.1:21851/mcp"})
         host = json.loads((ROOT / "adoption/hosts/example.json").read_text())
         self.assertEqual(servers["ai-memory"], {"type": "http", "url": f"http://{host['AI_MEMORY_URL']}/mcp"})
         # semble: the pinned model's local snapshot and Claude Code's own cache (wave-2 code-search ruling, changes 4, 5);
@@ -1609,6 +1609,7 @@ class RenderTests(unittest.TestCase):
             "SEMBLE_MODEL_NAME": "${HOME}/.local/share/semble/potion-code-16M-v2-e9d2a44c",
             "SEMBLE_CACHE_LOCATION": "${HOME}/.cache/semble-claude"})
         config = tomllib.loads(self.files["codex.config.toml"])
+        self.assertEqual(config["mcp_servers"]["qmd"], {"url": servers["qmd"]["url"]})
         # semble comes from the new distribution's additions, merged after the shared template's servers.
         self.assertEqual(list(config["mcp_servers"]), ["serena", "ai-memory", "socraticode", "headroom", "codebase-memory",
                                                       "qmd", "context-mode", "jcodemunch", "semble", "chrome-devtools"])

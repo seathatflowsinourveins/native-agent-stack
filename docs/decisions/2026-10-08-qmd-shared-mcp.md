@@ -1,15 +1,16 @@
 # QMD shared native transport — 2026-10-08
 
-The Codex user template connects its existing `qmd` entry to QMD's native
-Streamable HTTP service at `http://127.0.0.1:21851/mcp`. This replaces the
+Both portable client templates connect their existing `qmd` entries to QMD's
+native Streamable HTTP service at `http://127.0.0.1:21851/mcp`. This replaces the
 per-session stdio launch while preserving the server name and all four tools:
 `get`, `multi_get`, `query` and `status`.
 
-The command center accepted the two-lane pilot and directed this small template
-rollout on 2026-10-08. Template landing requires its explicit cue. The change
-rides the scheduled setup window, has low priority beside memory allocation and
-idle-session trimming, and gates no foundation or research launch. The command
-center applies the user-level configuration; this PR does not apply it.
+The dated trigger is the command-center pilot acceptance and rollout request on
+2026-10-08. The practice follows the native vendor transport and selected PSS
+observation below. Deployment uses the controlled setup window with registration
+before-images, native readiness checks and the scoped inverse. Template landing
+requires the explicit configuration-owner cue; publishing the template performs
+no user-level configuration change.
 
 ## Sources and acceptance scope
 
@@ -38,6 +39,15 @@ Its retained before/after observation hashes are
 and `05b5d5bf71e5bc0639df27028ceefdc035cd90dc847e3b9e5510669f5b4e301d`.
 This public projection omits private launch prompts, account/session identifiers,
 process IDs, command arrays, host paths and raw client records.
+
+The portable Claude MCP specification uses the same HTTP endpoint as Codex.
+Its existing installer already generates native user-scope HTTP registration;
+changing the portable file does not hand-edit a user's registration store. The
+native-input map retains the QMD slot while removing stdio command overrides and
+the obsolete Codex command-leaf selector. The dated source projection remains
+separate from runtime acceptance. The installer processes every server in its
+selected input; a host QMD-only change therefore uses direct native commands or
+a QMD-only input, rather than replacement of the full server set.
 
 ## Native pilot receipt
 
@@ -128,6 +138,21 @@ For the template inverse, restore only its prior block:
 command = "${ECO_ROOT}/bin/qmd"
 args = ["--index", "native-agent-stack-catalog", "mcp"]
 ```
+
+Restore the corresponding portable Claude entry as well:
+
+```json
+"qmd": {
+  "type": "stdio",
+  "command": "${ECO_ROOT}/bin/qmd",
+  "args": ["--index", "native-agent-stack-catalog", "mcp"],
+  "env": {}
+}
+```
+
+For repository rendering, restore the QMD command override and command-leaf
+selector from the pre-change map, then append the resulting native count
+projection. Preserve earlier dated observations; do not rewrite their counts.
 
 For an applied host inverse, restore the exact captured QMD transport and
 selected lane-launch fragments through supported native configuration tooling.

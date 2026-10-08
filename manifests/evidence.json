@@ -5290,8 +5290,8 @@
     },
     {
       "path": "adoption/mcp/claude-user.json",
-      "sha256": "ba633108732e65149dfa1439bac5594a6306ebf6c20284acc357150c1852d0b8",
-      "bytes": 7805
+      "sha256": "c916169c777d023ea2c57e8b5e0d2594b5b7f0ac80249fb9fb2240a5240d8d65",
+      "bytes": 7694
     },
     {
       "path": "adoption/new-wsl-profile.json",
@@ -5310,8 +5310,8 @@
     },
     {
       "path": "adoption/new-wsl/client-config-map.json",
-      "sha256": "3bdd66593a88d05db354f9aad01a7a87aed03b159fa1e135eeb40fadd368cbc4",
-      "bytes": 56546
+      "sha256": "b5a998e63e4690fd4c58c448697965d7ec6dfccb585dfdb149947e9f0bddd4d4",
+      "bytes": 56432
     },
     {
       "path": "adoption/new-wsl/codex-user-instructions.md",
@@ -5455,8 +5455,8 @@
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
-      "sha256": "d928901b3819c6e08d05ad24772b2f551c580886cb8998a311d75aa7f5489b86",
-      "bytes": 19238
+      "sha256": "ad55a812006e6d25038a75c3f213460fccd40f7dd79faa21ab521eec1e88701e",
+      "bytes": 19167
     },
     {
       "path": "adoption/templates/codex.omniroute.config.toml",
@@ -17661,8 +17661,8 @@
     },
     {
       "path": "docs/decisions/2026-10-02-new-wsl-client-configuration.md",
-      "sha256": "5d3cef379f928f4d1c9e2bbc605f7ae3abf9bc443f84a5c2eda5823f3be46fd9",
-      "bytes": 145832
+      "sha256": "498634a2a6b27e9d70143b6b8e43ce00c0914c914dec1d346dca38807c4941f5",
+      "bytes": 147135
     },
     {
       "path": "docs/decisions/2026-10-02-omniroute-mac-rebuild.md",
@@ -18076,8 +18076,8 @@
     },
     {
       "path": "docs/decisions/2026-10-08-qmd-shared-mcp.md",
-      "sha256": "591117ceef0874ba0444833349daf4c257c0ba0ca0ea9e214303f7b9e736fd1a",
-      "bytes": 7635
+      "sha256": "1d29497593bf453c497bb806062ee2865517c03977a70b0a1aed1d07faf2b055",
+      "bytes": 8745
     },
     {
       "path": "docs/decisions/2026-10-08-skills-cc-lanes-picks.md",
@@ -57881,8 +57881,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "91077495dea93cf82b5d874c47342720314d232769f7a08e5e1871f33661f4c9",
-      "bytes": 134028
+      "sha256": "4098ee6c74015c3a07cf7b03ba44662b4cef5c6e8f4ce6273656cf79c3ef80e2",
+      "bytes": 134217
     },
     {
       "path": "tests/test_install_skills.py",
@@ -58081,8 +58081,8 @@
     },
     {
       "path": "tests/test_new_wsl_client_config.py",
-      "sha256": "7f9945df17d32757966d38a7b100326c17c8a78a959042b6c4578fd4f699d956",
-      "bytes": 343196
+      "sha256": "cb9ef8fc8934713a5d341dbbb96d82026d15ec44816a36e2d3909c08b96bc5d0",
+      "bytes": 343281
     },
     {
       "path": "tests/test_new_wsl_definitive_defaults.py",
