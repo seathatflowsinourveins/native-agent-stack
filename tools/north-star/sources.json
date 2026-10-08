@@ -1,0 +1,428 @@
+{
+  "schema_version": 1,
+  "sources": {
+    "foundation": {"root": "repo", "path": "catalogs/landscape/foundation.json"},
+    "stack": {"root": "repo", "path": "manifests/stack.json"},
+    "evidence": {"root": "repo", "path": "manifests/evidence.json"},
+    "profile": {"root": "repo", "path": "adoption/new-wsl-profile.json"},
+    "sdk_rows": {"root": "state", "path": "research/fullspeed-20261008/sdk-harness-ready/rows.json"},
+    "sdk_contract": {"root": "state", "path": "research/fullspeed-20261008/sdk-harness-ready/receipt-contract.json", "expected_sha256": "055cc67f1ac78cfd5bff5153d6f6552df16b06f64b63e36f87696e8d6ba3f636"},
+    "sdk_route_correction": {"root": "state", "path": "research/fullspeed-20261008/sdk-harness-ready/route-correction.receipt.json", "expected_sha256": "830b95975df7d01a90c68dd355a98a442e3dfa38ce03a1a6c0a63d280f474b38"},
+    "sdk_route_reconciliation": {"root": "state", "path": "research/fullspeed-20261008/sdk-harness-ready/route-reconciliation-final.receipt.json", "expected_sha256": "fad6c1703ea5b5d48b6cf4ed3eb98eba3d05cbf84404a5d35e36ed3f76b0249f"},
+    "cc_g1": {"root": "state", "path": "coordination/command-center/ROW-ns2604-coop-20261008T1725Z-g1met.md", "expected_sha256": "3c8d21d687bc94bee07cb6e2c14179bd010804047c14d562b76e3d2842b16690"},
+    "cc_g2": {"root": "state", "path": "coordination/command-center/ITEM-ns2604-coop-20261008T160905Z.md", "expected_sha256": "1e24ca907495004513483d9f7c8756c8847ddfe89e22b2e61a32d09d9b6ccd31"},
+    "cc_g3": {"root": "state", "path": "coordination/command-center/ITEM-ns2604-coop-20261008T164839Z.md", "expected_sha256": "e8bfce23b3d90ec3da6902f530b0a5d15ee718a03c79463141c50c832150d586"},
+    "cc_batch": {"root": "state", "path": "coordination/command-center/ITEM-ns2604-coop-20261008T175944Z.md", "expected_sha256": "001341383c83daf6cebc25e620eb9551c7231ff280efe8d05c812c7893a2a78a"},
+    "cc_g5": {"root": "state", "path": "coordination/command-center/ROW-ns2604-coop-20261008T1822Z-g5shape.md", "expected_sha256": "9ec37ed6667227745db87827577a33c32ca2a8e3fedd777693097e39b8702d36"},
+    "paper_hold": {"root": "state", "path": "coordination/command-center/ROW-ns2604-coop-20261008T1805Z-n2hold.md", "expected_sha256": "f2aab57b19131fe3e380918e9f7534abc0fe959f3ef18737404edb9b63f33ada"},
+    "fullspeed": {"root": "state", "path": "coordination/command-center/ITEM-ns2604-coop-20261008T181214Z.md", "expected_sha256": "026403fe2adb38075db447ff3485edb6d8cf20ddef8ae68836dba6b29ebe7cba"},
+    "rnd_launch": {"root": "state", "path": "coordination/command-center/north-star-rnd-launch-spec-20261008.md", "expected_sha256": "ca67d9cabdb4f0ed490e5f9fb70eef0786f7ceb96df372e5bbf04e50929fdbf1"},
+    "g1_actual": {"root": "state", "path": "coordination/ns2604-coop/lanes/layer15-acceptance-f8334c2/20261008T163552Z-l41z4e3s/receipt.json", "expected_sha256": "418cc9d6706955ed79daf394cb50e8d334123c8849dd6725067dd211098f43de"},
+    "g1_event_binding": {"root": "state", "path": "coordination/ns2604-coop/lanes/layer15-acceptance-f8334c2/20261008T163552Z-l41z4e3s/execution-provenance-addendum-original-event-binding.json", "expected_sha256": "87a171d4eed448ffc68b0b245b693770e96e1f98ef7dcfcf9bbcebf8ff44e4d7"},
+    "native24": {"root": "repo", "path": "evidence/receipts/runtime-final-native-24-acceptance-20261008.json", "expected_sha256": "cc32a1462171763446809fb675bd946f3b45875c797bea5049d1a925d4809086"},
+    "native24_run": {"root": "repo", "path": "evidence/artifacts/runtime-final-lock-binding-20261008/final-native-24-acceptance.json", "expected_sha256": "c1f82a1357cc5685826e3d6829cb7a8d5df6ee0c107acf91badde53ab3d8d217"},
+    "roadmap_inputs": {"root": "state", "path": "coordination/command-center/cc-tools/roadmap/roadmap-inputs.json"},
+    "runner_inputs": {"root": "state", "path": "coordination/ns2604-coop/lanes/readiness-runner.inputs-20261008T1830Z.json", "expected_sha256": "285833177b33137da8cfe192d28e9a331fb7d0b1ef53c0fb0b813df46ade2eb7"},
+    "monitoring_status": {"root": "state", "path": "coordination/ns2604-coop/lanes/runtime-workers.status.md"}
+  },
+  "sdk_qualifications": [
+    {
+      "id": "current-gateway-fresh-session", "title": "Current bounded gateway fresh-session scope",
+      "fields": {
+        "state": {"source": "sdk_route_reconciliation", "pointer": "/state/placeholder_profile_invocation"},
+        "owner": {"source": "sdk_contract", "pointer": "/index/owner_lane"},
+        "designated_readers": {"source": "sdk_route_reconciliation", "pointer": "/state/designated_reader_qualification"},
+        "supersedes": {"source": "sdk_route_reconciliation", "pointer": "/supersedes/sha256"},
+        "primary_sources": {"source": "sdk_route_reconciliation", "pointer": "/primary_sources"}
+      }
+    },
+    {
+      "id": "historical-route-correction-r3", "title": "Historical SDK route correction before supported loopback requalification",
+      "fields": {
+        "state": {"source": "sdk_route_correction", "regex": "^  \"correction\": \"Earlier public-placeholder/client-default Codex invocations are retained as (?P<value>SMOKE_ONLY)\\.[^\\n]+$"},
+        "owner": {"source": "sdk_contract", "pointer": "/index/owner_lane"},
+        "measured_gate": {"source": "sdk_route_correction", "pointer": "/measured_gate"},
+        "primary_sources": {"source": "sdk_route_correction", "pointer": "/primary_sources"}
+      }
+    }
+  ],
+  "sdk": {
+    "expected_ids": [
+      "claude-agent-sdk",
+      "codex-sdk",
+      "openhands-sdk",
+      "deerflow",
+      "gpt-researcher",
+      "exact-query-route-875",
+      "nautilus-trader-ibkr",
+      "alpaca-py",
+      "edgartools",
+      "skfolio",
+      "lean"
+    ]
+  },
+  "gates": [
+    {
+      "id": "G1", "title": "Layer 1.5 data integrity",
+      "fields": {
+        "state": {"source": "cc_g1", "regex": "^## 1\\. G1 is (?P<value>MET) \\(CC, 17:2xZ\\)$"},
+        "owner": {"source": "fullspeed", "regex": "^- \\*\\*(?P<value>layer15-build):\\*\\* the follow-up PR\\.$"},
+        "acceptance_status": {"source": "g1_actual", "pointer": "/status"},
+        "source_revision": {"source": "g1_actual", "pointer": "/source_revision"}
+      }
+    },
+    {
+      "id": "G2", "title": "Ranking protocol transfer to R&D",
+      "fields": {
+        "state": {"source": "cc_g2", "regex": "^\\*\\*1\\. G2 \\(the R3 freeze\\) (?P<value>leaves the foundation gate set and becomes R&D task 1)\\.\\*\\*$"},
+        "owner": {"source": "fullspeed", "regex": "^- \\*\\*(?P<value>rnd-r1):\\*\\* the R3 options-source item\\.$"},
+        "freeze_deadline": {"source": "rnd_launch", "regex": "^   - \\*\\*Freeze deadline:\\*\\* before (?P<value>2026-10-14)\\.[^\\n]+$"}
+      }
+    },
+    {
+      "id": "G3", "title": "Lanes ready",
+      "fields": {
+        "state": {"source": "cc_g3", "regex": "^## 4\\. G3 is recorded as (?P<value>MET) \\(CC, 16:2xZ\\)$"},
+        "owner": {"source": "fullspeed", "regex": "^to: (?P<value>ns2604-coop)$"},
+        "probe_result": {"source": "cc_g3", "regex": "^Receipt: [^\\n]+the probe passed (?P<value>11/11) with 0 denials,[^\\n]+$"},
+        "probe_denials": {"source": "cc_g3", "regex": "^Receipt: [^\\n]+the probe passed 11/11 with (?P<value>0) denials,[^\\n]+$"}
+      }
+    },
+    {
+      "id": "G4", "title": "S4 foundation",
+      "fields": {
+        "state": {"source": "cc_batch", "regex": "^## 11\\. G4 (?P<value>MET): S4 38/40 \\(the ceiling\\)$"},
+        "count": {"source": "cc_batch", "regex": "^## 11\\. G4 MET: S4 (?P<value>38/40) \\(the ceiling\\)$"},
+        "passed": {"source": "cc_batch", "regex": "^## 11\\. G4 MET: S4 (?P<value>38)/40 \\(the ceiling\\)$"},
+        "total": {"source": "cc_batch", "regex": "^## 11\\. G4 MET: S4 38/(?P<value>40) \\(the ceiling\\)$"},
+        "owner": {"source": "fullspeed", "regex": "^- \\*\\*(?P<value>currency):\\*\\* #873\\.$"},
+        "row70_merge": {"source": "cc_batch", "regex": "^- #876 merged as (?P<value>1222838c)\\.$"},
+        "sandbox_runtime_version": {"source": "cc_batch", "regex": "^- The CC's mechanical check on main passed: `install\\.sh:327` runs (?P<value>0\\.0\\.79), and `check_plan\\.py` returns rc 0\\.$"}
+      }
+    },
+    {
+      "id": "G5", "title": "Landscape catalog",
+      "fields": {
+        "state": {"source": "cc_batch", "regex": "^\\*\\*Gates:\\*\\* G1, G3 and G4 are MET\\. (?P<value>G5 and G6 remain)\\.$"},
+        "owner": {"source": "fullspeed", "regex": "^- \\*\\*(?P<value>grand-catalog):\\*\\* #878\\.$"},
+        "pull_request": {"source": "cc_g5", "regex": "^1\\. grand-catalog restructures (?P<value>#878) into the compact manifest[^\\n]+$"},
+        "review_stage": {"source": "cc_g5", "regex": "^1\\. grand-catalog restructures #878[^\\n]+Keep it a (?P<value>draft) and build the asset locally;[^\\n]+$"}
+      }
+    },
+    {
+      "id": "G6", "title": "Harness consolidation",
+      "fields": {
+        "state": {"source": "cc_batch", "regex": "^## 1\\. G6: (?P<value>HOLD) at bace9b29, split into G6a, G6b and G6c \\(harness-rules; top priority after the N2 r2 fixes\\)$"},
+        "owner": {"source": "fullspeed", "regex": "^- \\*\\*(?P<value>harness-rules):\\*\\* G6a first\\.$"},
+        "held_head": {"source": "cc_batch", "regex": "^## 1\\. G6: HOLD at (?P<value>bace9b29), split into G6a, G6b and G6c[^\\n]+$"},
+        "blocking_part": {"source": "cc_batch", "regex": "^- \\*\\*(?P<value>G6a) is START-blocking:\\*\\*[^\\n]+$"}
+      }
+    }
+  ],
+  "data": [
+    {
+      "id": "layer15", "title": "Layer 1.5 historical accounting diagnostic",
+      "fields": {
+        "state": {"source": "g1_actual", "pointer": "/status"},
+        "gate_state": {"source": "cc_g1", "regex": "^## 1\\. G1 is (?P<value>MET) \\(CC, 17:2xZ\\)$"},
+        "owner": {"source": "fullspeed", "regex": "^- \\*\\*(?P<value>layer15-build):\\*\\* the follow-up PR\\.$"},
+        "classification": {"source": "g1_actual", "pointer": "/classification"},
+        "evidence_class": {"source": "g1_actual", "pointer": "/evidence_class"},
+        "source_revision": {"source": "g1_actual", "pointer": "/source_revision"},
+        "runtime_lock_sha256": {"source": "g1_actual", "pointer": "/runtime_lock_sha256"},
+        "native_exit_code": {"source": "g1_actual", "pointer": "/runs/0/exit_code"},
+        "strategy_citation_allowed": {"source": "g1_actual", "pointer": "/strategy_citation_allowed"},
+        "source_commit_unchanged": {"source": "g1_actual", "pointer": "/source_commit_unchanged"}
+      }
+    }
+  ],
+  "paper": [
+    {
+      "id": "N2", "title": "N2 paper auto-gate and executor",
+      "fields": {
+        "state": {"source": "paper_hold", "regex": "^\\[CC-DECISION\\] N2 auto-gate \\+ executor bundle a93def7c: \\*\\*(?P<value>HOLD), fix and resubmit tonight\\*\\* \\(paper-open-e2e\\)\\.$"},
+        "owner": {"source": "fullspeed", "regex": "^- \\*\\*(?P<value>paper-open-e2e):\\*\\* N2 r2\\.$"},
+        "held_bundle": {"source": "paper_hold", "regex": "^\\[CC-DECISION\\] N2 auto-gate \\+ executor bundle (?P<value>a93def7c):[^\\n]+$"},
+        "freeze": {"source": "rnd_launch", "regex": "^7\\. \\*\\*Paper:\\*\\* the n2-open-20261009 FREEZE \\((?P<value>454c6c0d)\\) and its gate outcome\\.$"},
+        "execution_outcome": {"source": "paper_hold", "regex": "^## N2-EXECUTION-OUTCOME (?P<value>[^\\n]+)$"}
+      }
+    }
+  ],
+  "rnd_inputs": [
+    {
+      "id": "g6_rules", "title": "G6 consolidated rules",
+      "fields": {
+        "input": {"source": "rnd_launch", "regex": "^1\\. \\*\\*The (?P<value>G6 consolidated rules),\\*\\*[^\\n]+$"},
+        "state": {"source": "cc_batch", "regex": "^## 1\\. G6: (?P<value>HOLD) at bace9b29,[^\\n]+$"},
+        "owner": {"source": "fullspeed", "regex": "^- \\*\\*(?P<value>harness-rules):\\*\\* G6a first\\.$"}
+      }
+    },
+    {
+      "id": "g5_catalog", "title": "G5 catalog on main",
+      "fields": {
+        "input": {"source": "rnd_launch", "regex": "^2\\. \\*\\*The (?P<value>G5 grand catalog)\\*\\*[^\\n]+$"},
+        "state": {"source": "cc_batch", "regex": "^\\*\\*Gates:\\*\\* G1, G3 and G4 are MET\\. (?P<value>G5 and G6 remain)\\.$"},
+        "owner": {"source": "fullspeed", "regex": "^- \\*\\*(?P<value>grand-catalog):\\*\\* #878\\.$"}
+      }
+    },
+    {
+      "id": "s4_count", "title": "S4 final count",
+      "fields": {
+        "input": {"source": "rnd_launch", "regex": "^3\\. \\*\\*The (?P<value>S4 final count):\\*\\*[^\\n]+$"},
+        "count": {"source": "cc_batch", "regex": "^## 11\\. G4 MET: S4 (?P<value>38/40) \\(the ceiling\\)$"},
+        "owner": {"source": "fullspeed", "regex": "^to: (?P<value>ns2604-coop)$"}
+      }
+    },
+    {
+      "id": "g1_result", "title": "G1 Layer 1.5 result",
+      "fields": {
+        "input": {"source": "rnd_launch", "regex": "^4\\. \\*\\*(?P<value>G1 Layer 1\\.5):\\*\\*[^\\n]+$"},
+        "state": {"source": "g1_actual", "pointer": "/status"},
+        "gate_state": {"source": "cc_g1", "regex": "^## 1\\. G1 is (?P<value>MET) \\(CC, 17:2xZ\\)$"},
+        "owner": {"source": "fullspeed", "regex": "^- \\*\\*(?P<value>layer15-build):\\*\\* the follow-up PR\\.$"}
+      }
+    },
+    {
+      "id": "ranking_protocol", "title": "Ranking protocol R&D input",
+      "fields": {
+        "input": {"source": "rnd_launch", "regex": "^5\\. \\*\\*(?P<value>R&D task 1):\\*\\*[^\\n]+$"},
+        "revision": {"source": "rnd_launch", "regex": "^5\\. \\*\\*R&D task 1:\\*\\*[^\\n]+R3B is (?P<value>bc8ec9b8), held\\.[^\\n]+$"},
+        "state": {"source": "rnd_launch", "regex": "^5\\. \\*\\*R&D task 1:\\*\\*[^\\n]+R3B is bc8ec9b8, (?P<value>held)\\.[^\\n]+$"},
+        "freeze_deadline": {"source": "rnd_launch", "regex": "^   - \\*\\*Freeze deadline:\\*\\* before (?P<value>2026-10-14)\\.[^\\n]+$"},
+        "development_years": {"source": "rnd_launch", "regex": "^   - \\*\\*First question:\\*\\*[^\\n]+over (?P<value>2017-2023) only,[^\\n]+$"},
+        "first_scored_decision": {"source": "rnd_launch", "regex": "^   - \\*\\*Freeze deadline:\\*\\*[^\\n]+the first scored decision is (?P<value>2026-10-21)\\.$"},
+        "owner": {"source": "fullspeed", "regex": "^- \\*\\*(?P<value>rnd-r1):\\*\\* the R3 options-source item\\.$"}
+      }
+    },
+    {
+      "id": "research_inbox", "title": "Research inbox package",
+      "fields": {
+        "input_path": {"source": "rnd_launch", "regex": "^6\\. [^\\n]*`(?P<value>research/inbox/north-star/)`[^\\n]+$"},
+        "loaded_receipt": {"source": "rnd_launch", "regex": "^6\\. LOADED-RECEIPT (?P<value>[^\\n]+)$"},
+        "owner": {"source": "rnd_launch", "regex": "^- Command: `claude -n (?P<value>north-star-rnd) --effort max`\\.$"}
+      }
+    },
+    {
+      "id": "paper_freeze", "title": "N2 paper freeze and outcome",
+      "fields": {
+        "input": {"source": "rnd_launch", "regex": "^7\\. \\*\\*(?P<value>Paper):\\*\\*[^\\n]+$"},
+        "freeze": {"source": "rnd_launch", "regex": "^7\\. \\*\\*Paper:\\*\\* the n2-open-20261009 FREEZE \\((?P<value>454c6c0d)\\) and its gate outcome\\.$"},
+        "state": {"source": "paper_hold", "regex": "^\\[CC-DECISION\\] N2 auto-gate \\+ executor bundle a93def7c: \\*\\*(?P<value>HOLD), fix and resubmit tonight\\*\\* \\(paper-open-e2e\\)\\.$"},
+        "execution_outcome": {"source": "paper_hold", "regex": "^## N2-EXECUTION-OUTCOME (?P<value>[^\\n]+)$"},
+        "owner": {"source": "fullspeed", "regex": "^- \\*\\*(?P<value>paper-open-e2e):\\*\\* N2 r2\\.$"}
+      }
+    }
+  ],
+  "open_items": [
+    {
+      "id": "per-layer-provenance", "title": "Current per-layer install and invoke provenance",
+      "fields": {
+        "owner": {"source": "fullspeed", "regex": "^\\| \\*\\*(?P<value>ns-readiness-manifest)\\*\\* \\|[^\\n]+$"},
+        "state": {"source": "fullspeed", "regex": "^## PER-LAYER-PROVENANCE (?P<value>OPEN|CLOSED|HOLD|PENDING)$"}
+      }
+    },
+    {
+      "id": "G6a", "title": "G6a landing and fresh-client checks",
+      "fields": {
+        "state": {"source": "cc_batch", "regex": "^## 1\\. G6: (?P<value>HOLD) at bace9b29,[^\\n]+$"},
+        "owner": {"source": "fullspeed", "regex": "^- \\*\\*(?P<value>harness-rules):\\*\\* G6a first\\.$"}
+      }
+    },
+    {
+      "id": "N2-r2", "title": "N2 revised auto-gate and executor",
+      "fields": {
+        "state": {"source": "paper_hold", "regex": "^\\[CC-DECISION\\] N2 auto-gate \\+ executor bundle a93def7c: \\*\\*(?P<value>HOLD), fix and resubmit tonight\\*\\* \\(paper-open-e2e\\)\\.$"},
+        "owner": {"source": "fullspeed", "regex": "^- \\*\\*(?P<value>paper-open-e2e):\\*\\* N2 r2\\.$"}
+      }
+    },
+    {
+      "id": "G5-878", "title": "G5 compact catalog and release asset",
+      "fields": {
+        "state": {"source": "cc_batch", "regex": "^\\*\\*Gates:\\*\\* G1, G3 and G4 are MET\\. (?P<value>G5 and G6 remain)\\.$"},
+        "owner": {"source": "fullspeed", "regex": "^- \\*\\*(?P<value>grand-catalog):\\*\\* #878\\.$"}
+      }
+    },
+    {
+      "id": "g5-fields-a", "title": "G5 field fragment 1–22",
+      "fields": {
+        "owner": {"source": "fullspeed", "regex": "^\\| \\*\\*(?P<value>g5-fields-a)\\*\\* \\|[^\\n]+$"},
+        "state": {"source": "fullspeed", "regex": "^## g5-fields-a (?P<value>OPEN|CLOSED|HOLD|PENDING)$"}
+      }
+    },
+    {
+      "id": "g5-fields-b", "title": "G5 field fragment 23–45",
+      "fields": {
+        "owner": {"source": "fullspeed", "regex": "^\\| \\*\\*(?P<value>g5-fields-b)\\*\\* \\|[^\\n]+$"},
+        "state": {"source": "fullspeed", "regex": "^## g5-fields-b (?P<value>OPEN|CLOSED|HOLD|PENDING)$"}
+      }
+    },
+    {
+      "id": "g5-stars-gap", "title": "Remaining starred-repository dispositions",
+      "fields": {
+        "owner": {"source": "fullspeed", "regex": "^\\| \\*\\*(?P<value>g5-stars-gap)\\*\\* \\|[^\\n]+$"},
+        "state": {"source": "fullspeed", "regex": "^## g5-stars-gap (?P<value>OPEN|CLOSED|HOLD|PENDING)$"}
+      }
+    },
+    {
+      "id": "sdk-checks", "title": "SDK and harness receipt delivery",
+      "fields": {
+        "owner": {"source": "fullspeed", "regex": "^\\| \\*\\*(?P<value>sdk-harness-ready)\\*\\* \\|[^\\n]+$"},
+        "state": {"source": "sdk_rows", "pointer": "/status"}
+      }
+    },
+    {
+      "id": "readiness-manifest", "title": "Readiness manifest delivery",
+      "fields": {
+        "owner": {"source": "fullspeed", "regex": "^\\| \\*\\*(?P<value>ns-readiness-manifest)\\*\\* \\|[^\\n]+$"},
+        "state": {"source": "fullspeed", "regex": "^## ns-readiness-manifest (?P<value>OPEN|CLOSED|HOLD|PENDING)$"}
+      }
+    },
+    {
+      "id": "overnight-r2-io", "title": "Overnight restart revision and I/O",
+      "fields": {
+        "owner": {"source": "fullspeed", "regex": "^- \\*\\*(?P<value>fixwave-defects):\\*\\* overnight r2, then I/O and O4/O5\\.$"},
+        "state": {"source": "fullspeed", "regex": "^## overnight-r2-io (?P<value>OPEN|CLOSED|HOLD|PENDING)$"}
+      }
+    },
+    {
+      "id": "currency-873", "title": "Currency wave #873",
+      "fields": {
+        "owner": {"source": "fullspeed", "regex": "^- \\*\\*(?P<value>currency):\\*\\* #873\\.$"},
+        "state": {"source": "fullspeed", "regex": "^## #873 (?P<value>OPEN|CLOSED|HOLD|PENDING)$"}
+      }
+    },
+    {
+      "id": "layer15-followup", "title": "Layer 1.5 follow-up",
+      "fields": {
+        "owner": {"source": "fullspeed", "regex": "^- \\*\\*(?P<value>layer15-build):\\*\\* the follow-up PR\\.$"},
+        "state": {"source": "fullspeed", "regex": "^## layer15-followup (?P<value>OPEN|CLOSED|HOLD|PENDING)$"}
+      }
+    },
+    {
+      "id": "R9", "title": "R9 consolidation guard",
+      "fields": {
+        "owner": {"source": "fullspeed", "regex": "^- \\*\\*(?P<value>github-consolidation):\\*\\* R9, O1 and O2\\.$"},
+        "state": {"source": "fullspeed", "regex": "^## R9 (?P<value>OPEN|CLOSED|HOLD|PENDING)$"}
+      }
+    },
+    {
+      "id": "O1", "title": "Operational item O1",
+      "fields": {
+        "owner": {"source": "fullspeed", "regex": "^- \\*\\*(?P<value>github-consolidation):\\*\\* R9, O1 and O2\\.$"},
+        "state": {"source": "fullspeed", "regex": "^## O1 (?P<value>OPEN|CLOSED|HOLD|PENDING)$"}
+      }
+    },
+    {
+      "id": "O2", "title": "Operational item O2",
+      "fields": {
+        "owner": {"source": "fullspeed", "regex": "^- \\*\\*(?P<value>github-consolidation):\\*\\* R9, O1 and O2\\.$"},
+        "state": {"source": "fullspeed", "regex": "^## O2 (?P<value>OPEN|CLOSED|HOLD|PENDING)$"}
+      }
+    },
+    {
+      "id": "token-877", "title": "Token overlap #877",
+      "fields": {
+        "owner": {"source": "fullspeed", "regex": "^- \\*\\*(?P<value>overlap-token):\\*\\* #877 and O3\\.$"},
+        "state": {"source": "fullspeed", "regex": "^## #877 (?P<value>OPEN|CLOSED|HOLD|PENDING)$"}
+      }
+    },
+    {
+      "id": "O3", "title": "Operational item O3",
+      "fields": {
+        "owner": {"source": "fullspeed", "regex": "^- \\*\\*(?P<value>overlap-token):\\*\\* #877 and O3\\.$"},
+        "state": {"source": "fullspeed", "regex": "^## O3 (?P<value>OPEN|CLOSED|HOLD|PENDING)$"}
+      }
+    },
+    {
+      "id": "O4", "title": "Operational item O4",
+      "fields": {
+        "owner": {"source": "fullspeed", "regex": "^- \\*\\*(?P<value>fixwave-defects):\\*\\* overnight r2, then I/O and O4/O5\\.$"},
+        "state": {"source": "fullspeed", "regex": "^## O4 (?P<value>OPEN|CLOSED|HOLD|PENDING)$"}
+      }
+    },
+    {
+      "id": "O5", "title": "Operational item O5",
+      "fields": {
+        "owner": {"source": "fullspeed", "regex": "^- \\*\\*(?P<value>fixwave-defects):\\*\\* overnight r2, then I/O and O4/O5\\.$"},
+        "state": {"source": "fullspeed", "regex": "^## O5 (?P<value>OPEN|CLOSED|HOLD|PENDING)$"}
+      }
+    },
+    {
+      "id": "O6", "title": "Operational item O6",
+      "fields": {
+        "owner": {"source": "fullspeed", "regex": "^- \\*\\*(?P<value>github-ci-finalize):\\*\\* O6\\.$"},
+        "state": {"source": "fullspeed", "regex": "^## O6 (?P<value>OPEN|CLOSED|HOLD|PENDING)$"}
+      }
+    },
+    {
+      "id": "api-credit-S", "title": "API-credit S phase",
+      "fields": {
+        "owner": {"source": "fullspeed", "regex": "^- \\*\\*(?P<value>api-credit-sota):\\*\\* the S phase\\.$"},
+        "state": {"source": "fullspeed", "regex": "^## S-PHASE (?P<value>OPEN|CLOSED|HOLD|PENDING)$"}
+      }
+    },
+    {
+      "id": "R3-options-sources", "title": "R3 options-history sources",
+      "fields": {
+        "owner": {"source": "fullspeed", "regex": "^- \\*\\*(?P<value>rnd-r1):\\*\\* the R3 options-source item\\.$"},
+        "state": {"source": "fullspeed", "regex": "^## R3-options-sources (?P<value>OPEN|CLOSED|HOLD|PENDING)$"}
+      }
+    },
+    {
+      "id": "trading-trials", "title": "Trading TRIAL fixes",
+      "fields": {
+        "owner": {"source": "fullspeed", "regex": "^- \\*\\*(?P<value>landscape-live-trading and readiness-runner):\\*\\* the TRIAL fixes\\.$"},
+        "state": {"source": "fullspeed", "regex": "^## TRIAL-FIXES (?P<value>OPEN|CLOSED|HOLD|PENDING)$"}
+      }
+    },
+    {
+      "id": "memory-measurements", "title": "Memory settling measurements",
+      "fields": {
+        "owner": {"source": "fullspeed", "regex": "^- \\*\\*(?P<value>memory-h2h):\\*\\* the no-spend measurements\\.$"},
+        "state": {"source": "fullspeed", "regex": "^## MEMORY-MEASUREMENTS (?P<value>OPEN|CLOSED|HOLD|PENDING)$"}
+      }
+    }
+  ],
+  "observations": [
+    {
+      "id": "native24-offline", "title": "Native24 offline runtime acceptance",
+      "fields": {
+        "state": {"source": "native24", "pointer": "/status"},
+        "scope": {"source": "native24", "pointer": "/limitations/0"},
+        "excluded_scope": {"source": "native24", "pointer": "/limitations/1"},
+        "actual_execution": {"source": "native24_run", "pointer": "/actual_execution"},
+        "imported_observation": {"source": "native24_run", "pointer": "/imported_observation"},
+        "case_count": {"source": "native24_run", "pointer": "/case_count"},
+        "passed": {"source": "native24_run", "pointer": "/passed"},
+        "exit_code": {"source": "native24_run", "pointer": "/actual_native_exit_code"},
+        "lock_before": {"source": "native24_run", "pointer": "/observed_lock/before"},
+        "lock_after": {"source": "native24_run", "pointer": "/observed_lock/after"}
+      }
+    },
+    {
+      "id": "runner-inputs", "title": "Readiness runner source inventory",
+      "fields": {
+        "owner": {"source": "runner_inputs", "pointer": "/owner"},
+        "inputs": {"source": "runner_inputs", "pointer": "/inputs"},
+        "observed_at_utc": {"source": "runner_inputs", "pointer": "/observed_at_utc"}
+      }
+    },
+    {
+      "id": "rnd-launch", "title": "Staged R&D session",
+      "fields": {
+        "session_name": {"source": "rnd_launch", "regex": "^- Command: `claude -n (?P<value>north-star-rnd) --effort max`\\.$"},
+        "model": {"source": "rnd_launch", "regex": "^- Model: (?P<value>Opus 5\\.5) at max effort\\.$"},
+        "start_session_id": {"source": "rnd_launch", "regex": "^## START-SESSION-ID (?P<value>[^\\n]+)$"}
+      }
+    }
+  ],
+  "monitoring": [
+    {
+      "id": "runtime-workers", "title": "Runtime monitoring final readiness",
+      "fields": {
+        "state": {"source": "monitoring_status", "regex": "^## (?P<value>MONITORINGREADY)(?: [^\\n]*)?$"},
+        "owner": {"source": "monitoring_status", "regex": "^## LANE-READY tier=fast role=(?P<value>runtime-workers)$"}
+      }
+    }
+  ]
+}
