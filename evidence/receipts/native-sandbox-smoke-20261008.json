@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "id": "native-sandbox-smoke-20261008",
+  "kind": "native_cli_e2e",
+  "recorded_date_utc": "2026-10-08",
+  "component_ids": [
+    "sandbox-runtime"
+  ],
+  "claim": "Retained command-center evidence records sandbox-runtime 0.0.79 installed and read back on NativeStack2604, followed by a successful native Claude echo smoke with retained stdout/stderr hashes.",
+  "limitations": [
+    "Publication imports the retained command-center observation; currency performed no new installation or native smoke.",
+    "Only the Claude 0.0.79 echo leg is recorded here. The source receipt marks the Codex 0.0.79 leg pending.",
+    "The 0.0.77 filesystem/network receipts remain historical and do not qualify those policies at 0.0.79.",
+    "No upstream test suite, dual-client, filesystem-policy, network-policy or general security qualification is asserted.",
+    "Source-reported command text is retained, but its original Claude post-hook argument vector was not supplied with the imported receipt and remains UNVERIFIED."
+  ],
+  "data": {
+    "package": "@anthropic-ai/sandbox-runtime",
+    "package_version": "0.0.79",
+    "source_pin": "d9aac2098351ca17f3743fbaf6ecbd0051b7e00e",
+    "source_receipt": {
+      "reference": "command-center S4 row 70, srt-0079-20261008 RECEIPT.md",
+      "sha256": "a35a0577099469de70996dcfa9841a669da20452f1d22432d50df666c7273a61",
+      "imported_observation": true
+    },
+    "install": {
+      "source_reported_command": "nice -n 10 npm install -g @anthropic-ai/sandbox-runtime@0.0.79",
+      "started_at_utc": "2026-10-08T09:19:30Z",
+      "ended_at_utc": "2026-10-08T09:19:32Z",
+      "exit_code": 0,
+      "before_version": "0.0.78",
+      "exact_post_hook_command": null
+    },
+    "readback": {
+      "version": "0.0.79",
+      "version_exit_code": 0,
+      "npm_global_version": "0.0.79",
+      "integrity": "sha512-WjBmS9fbTpnQwQkM9SU+JjhM2CcXo9eWEELktY1100RMvTy/jPhP44yZ3NXhh+GHB350OgPbM3+FubE5WVRtSA==",
+      "shasum": "89b8735f51ad38791cb1a2913b616745dc5c04dc",
+      "registry_match_reported_by_source": true,
+      "lockfile_claim": false
+    },
+    "claude_smoke": {
+      "client": "Claude Code 2.1.294",
+      "source_reported_command": "nice -n 19 ionice -c3 srt echo 'hello world' < /dev/null",
+      "started_at_utc": "2026-10-08T09:19:55Z",
+      "ended_at_utc": "2026-10-08T09:19:56Z",
+      "exit_code": 0,
+      "stdout_bytes": 12,
+      "stdout_sha256": "a948904f2f0f479b8f8197694b30184b0d2ed1c1cd2a1ec0fb85d299a192a447",
+      "stderr_bytes": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output_hashes_independently_checked_at_import": true,
+      "exact_post_hook_command": null
+    },
+    "codex_smoke_status": "pending_in_source",
+    "inverse_source_reported": "npm install -g @anthropic-ai/sandbox-runtime@0.0.78; verify srt --version returns 0.0.78",
+    "source_urls": [
+      "https://github.com/anthropics/sandbox-runtime/blob/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/README.md",
+      "https://registry.npmjs.org/@anthropic-ai%2fsandbox-runtime/0.0.79"
+    ]
+  }
+}

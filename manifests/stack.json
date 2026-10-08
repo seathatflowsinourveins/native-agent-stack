@@ -868,7 +868,7 @@
     {
       "id": "sandbox-runtime",
       "repository": "https://github.com/anthropics/sandbox-runtime",
-      "version": "0.0.77",
+      "version": "0.0.79",
       "license": "Apache-2.0",
       "profile": "supporting",
       "role": "On-demand OS isolation for selected native commands",
@@ -880,13 +880,13 @@
         "component-history",
         "token-practice-coverage-20260920",
         "native-sandbox-network-20260920",
-        "claude-repository-evidence-20260921"
+        "claude-repository-evidence-20260921", "native-sandbox-smoke-20261008"
       ],
       "upstream_sources": [
         "https://github.com/anthropics/sandbox-runtime"
       ],
-      "source_pin": "6fa731368807419ee157f9a3fac955fefe1019c6",
-      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json."
+      "source_pin": "d9aac2098351ca17f3743fbaf6ecbd0051b7e00e",
+      "freshness": "Repository pin updated on 2026-10-08 to upstream v0.0.79 after tag, release and package-version verification. Historical functional evidence remains dated; this metadata change performs no host installation or acceptance."
     },
     {
       "id": "serena",

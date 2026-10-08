@@ -2239,8 +2239,8 @@
       "component_id": "sandbox-runtime",
       "repository": "https://github.com/anthropics/sandbox-runtime",
       "selected_repository_url": "https://github.com/anthropics/sandbox-runtime",
-      "selected_version": "0.0.77",
-      "selected_source_pin": "6fa731368807419ee157f9a3fac955fefe1019c6",
+      "selected_version": "0.0.79",
+      "selected_source_pin": "d9aac2098351ca17f3743fbaf6ecbd0051b7e00e",
       "checks": [
         {
           "endpoint": "repos/anthropics/sandbox-runtime",
@@ -2282,24 +2282,24 @@
       "pushed_at": "2026-09-21T20:40:59Z",
       "license_spdx": "Apache-2.0",
       "latest_stable_release": {
-        "tag_name": "v0.0.77",
-        "published_at": "2026-09-18T22:09:16Z",
-        "html_url": "https://github.com/anthropics/sandbox-runtime/releases/tag/v0.0.77",
+        "tag_name": "v0.0.79",
+        "published_at": "2026-10-07T17:12:35Z",
+        "html_url": "https://github.com/anthropics/sandbox-runtime/releases/tag/v0.0.79",
         "target_commitish": "main",
         "prerelease": false,
         "draft": false
       },
       "selected_pin_source": {
-        "ref": "6fa731368807419ee157f9a3fac955fefe1019c6",
-        "sha": "6fa731368807419ee157f9a3fac955fefe1019c6",
-        "html_url": "https://github.com/anthropics/sandbox-runtime/commit/6fa731368807419ee157f9a3fac955fefe1019c6",
-        "committed_at": "2026-09-18T20:54:45Z"
+        "ref": "d9aac2098351ca17f3743fbaf6ecbd0051b7e00e",
+        "sha": "d9aac2098351ca17f3743fbaf6ecbd0051b7e00e",
+        "html_url": "https://github.com/anthropics/sandbox-runtime/commit/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e",
+        "committed_at": "2026-10-07T17:06:30Z"
       },
       "latest_release_source": {
-        "ref": "v0.0.77",
-        "sha": "6fa731368807419ee157f9a3fac955fefe1019c6",
-        "html_url": "https://github.com/anthropics/sandbox-runtime/commit/6fa731368807419ee157f9a3fac955fefe1019c6",
-        "committed_at": "2026-09-18T20:54:45Z"
+        "ref": "v0.0.79",
+        "sha": "d9aac2098351ca17f3743fbaf6ecbd0051b7e00e",
+        "html_url": "https://github.com/anthropics/sandbox-runtime/commit/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e",
+        "committed_at": "2026-10-07T17:06:30Z"
       },
       "status": "metadata_checked",
       "adoption_recommendation": "retain_selected_pending_capability_comparison",

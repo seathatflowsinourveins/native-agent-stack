@@ -7634,10 +7634,10 @@
     {
       "component_id": "sandbox-runtime",
       "repository": "https://github.com/anthropics/sandbox-runtime",
-      "version": "0.0.77",
+      "version": "0.0.79",
       "profile": "supporting",
       "role": "On-demand OS isolation for selected native commands",
-      "installation_assessment": "runtime present at retained native operation date",
+      "installation_assessment": "Retained command-center 0.0.79 install/readback imported; this audit did not rerun host qualification.",
       "current_host_recertified_by_this_audit": false,
       "native_integration": {
         "recipe_source": "adoption/manifest.json#/recipe_map/sandbox-runtime",
@@ -7674,6 +7674,11 @@
             "id": "claude-repository-evidence-20260921",
             "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-sandbox-smoke-20261008",
+            "path": "evidence/receipts/native-sandbox-smoke-20261008.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -7681,38 +7686,40 @@
           "fresh-srt-allowed-write",
           "fresh-srt-denied-read-corrected"
         ],
-        "scope": "Native fixture/SDK/transport operation with scope and checks in its operation receipts; not full-stack model acceptance.",
-        "network_scope": "Native allowed, explicit-deny and default-deny IPv4 loopback HTTP cases passed. Initial listener readiness race retained; bounded connection-refused retries accepted."
+        "scope": "Historical 0.0.77 filesystem/network operations remain version-scoped. Retained 0.0.79 evidence covers command-center installation/readback and the Claude echo smoke only; no full-stack model acceptance.",
+        "network_scope": "Historical 0.0.77 allowed, explicit-deny and default-deny IPv4 loopback HTTP cases passed. Initial listener readiness race and bounded retries remain historical; no 0.0.79 network rerun is recorded."
       },
       "artifact_baselines": [],
       "exact_causal_lifetime_provider_tokens_saved": null,
-      "next_action": "Reuse the accepted filesystem and HTTP proxy scopes; no general sandbox-escape or TLS/SOCKS coverage claimed.",
+      "next_action": "Qualify the 0.0.79 Codex and policy-specific paths before treating historical 0.0.77 filesystem/network acceptance as current-version acceptance.",
       "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
       "lifecycle_evidence": {
         "assessment": "bounded_role_evidence",
-        "scope": "Scoped filesystem cases and allowed/denied loopback HTTP proxy cases accepted. General sandbox escape/TLS/SOCKS/IPv6 not tested.",
+        "scope": "0.0.79 installation/readback and Claude echo smoke retained. Filesystem and loopback HTTP policy coverage is historical at 0.0.77; general sandbox escape/TLS/SOCKS/IPv6 not tested.",
         "all_optional_features_exercised": false
       },
       "remaining_install_gap": null,
       "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit.",
-      "source_pin": "6fa731368807419ee157f9a3fac955fefe1019c6",
+      "source_pin": "d9aac2098351ca17f3743fbaf6ecbd0051b7e00e",
       "lifecycle_stages": {
         "install": {
           "status": "observed_installed",
-          "scope": "Dated native runtime/library availability is recorded. This does not by itself establish clean-prefix reinstall, uninstall or dependency rollback.",
+          "scope": "Retained 0.0.79 command-center installation/readback; earlier policy-operation evidence remains scoped to 0.0.77. No current host rerun by this audit.",
           "evidence_refs": [
             "evidence/receipts/runtime-tools.json",
             "evidence/receipts/component-history.json",
             "evidence/receipts/token-practice-coverage-20260920.json",
-            "evidence/receipts/native-sandbox-network-20260920.json"
+            "evidence/receipts/native-sandbox-network-20260920.json",
+            "evidence/receipts/native-sandbox-smoke-20261008.json"
           ]
         },
         "use": {
           "status": "accepted_within_scope",
-          "scope": "Native fixture/SDK/transport operation with scope and checks in its operation receipts; not full-stack model acceptance.",
+          "scope": "Retained 0.0.79 command-center Claude echo smoke; earlier policy-operation evidence remains scoped to 0.0.77. No current host rerun by this audit.",
           "evidence_refs": [
             "evidence/receipts/runtime-tools.json",
-            "evidence/receipts/native-sandbox-network-20260920.json"
+            "evidence/receipts/native-sandbox-network-20260920.json",
+            "evidence/receipts/native-sandbox-smoke-20261008.json"
           ]
         },
         "persistence": {
