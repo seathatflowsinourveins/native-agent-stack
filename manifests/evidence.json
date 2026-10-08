@@ -5311,8 +5311,8 @@
     },
     {
       "path": "adoption/skills/manifest.json",
-      "sha256": "2f7d132c5d5bb48605730f7d23bc3ec2f59ec3086600b24192f41dec70d715ef",
-      "bytes": 61089
+      "sha256": "731b79c977c430e0dd37e7ffa85b8a70df22c1ff1e53998b7cb0dc4923292259",
+      "bytes": 56885
     },
     {
       "path": "adoption/templates/claude.settings.linux-wsl2.overlay.json",
@@ -5321,8 +5321,8 @@
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "f45d21674c9be549b530e03fc14839b5814b66ac4c32be1bbc77408ffd25e00b",
-      "bytes": 13029
+      "sha256": "a0e293941482230a1ccaaf8a3206a5c7e72b73690d47e3a211883e9dd6279abc",
+      "bytes": 12948
     },
     {
       "path": "adoption/templates/codex.AGENTS.template.md",
@@ -5331,8 +5331,8 @@
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
-      "sha256": "39a91de20dcb449a3d774a18af80d45c35944e548d9a1bf1fcfe652adbece6ed",
-      "bytes": 19125
+      "sha256": "22c63a470891feb957e595fea65b7c02592df108e1bc567f1297783fb27985ba",
+      "bytes": 19129
     },
     {
       "path": "adoption/templates/codex.omniroute.config.toml",
@@ -11052,8 +11052,8 @@
     },
     {
       "path": "blueprints/runtime-workers/skills/README.md",
-      "sha256": "904301a5d51361ae003ea278b86432d20e1cdf3ed4e60990cfb056bb347d8dfb",
-      "bytes": 45037
+      "sha256": "3275aff838a94516cd0dfb6cc29364fec492e59d7c60975ae91e8693ace219ae",
+      "bytes": 44474
     },
     {
       "path": "blueprints/runtime-workers/skills/freshness-20260927.json",
@@ -11062,8 +11062,8 @@
     },
     {
       "path": "blueprints/runtime-workers/skills/manifest.json",
-      "sha256": "76b750a7a758830c7730379ff2a9b17864ee92a89ad44fe2c4b01a55724ae205",
-      "bytes": 188365
+      "sha256": "1a2db8d0ba28a0cf9ea330d31ade083d6e111ac5b58525157a415978f54b4499",
+      "bytes": 186836
     },
     {
       "path": "blueprints/runtime-workers/skills/research.md",
@@ -17894,11 +17894,6 @@
       "path": "docs/decisions/2026-10-08-philosophy-only-rules.md",
       "sha256": "f4b4f1d9952db662d8c0c9f1f9aec24da40c4666e4655e105c0617a689e6826c",
       "bytes": 10028
-    },
-    {
-      "path": "docs/decisions/2026-10-08-skills-cc-lanes-picks.md",
-      "sha256": "acea4e448dfb9e47851dd6425a3369ad6a79e588ff9ebfc4decc82bba4bff6e1",
-      "bytes": 7317
     },
     {
       "path": "docs/direct-results.md",
