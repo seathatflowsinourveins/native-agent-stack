@@ -1626,6 +1626,344 @@
           "sort": "none"
         }
       }
+    },
+    {
+      "id": 21,
+      "title": "Per-lane native tool-result rate",
+      "type": "timeseries",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 180,
+        "w": 24,
+        "h": 9
+      },
+      "description": "Result records per second over 5m, using the native ecosystem_lane resource label. Includes failed results and outer code-mode tool rows; this is not an MCP-call count. Missing lane labels or records remain UNKNOWN. Root/child ownership uses the lookup above.",
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (ecosystem_lane) (rate({service_name=~\"codex-app-server|codex_exec|codex_cli_rs\"} | event_name=\"codex.tool_result\" | ecosystem_lane!=\"\" [5m]))",
+          "queryType": "range",
+          "legendFormat": "{{ecosystem_lane}} \u00b7 Codex",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          }
+        },
+        {
+          "refId": "B",
+          "expr": "sum by (ecosystem_lane) (rate({service_name=\"claude-code\"} | event_name=\"tool_result\" | ecosystem_lane!=\"\" [5m]))",
+          "queryType": "range",
+          "legendFormat": "{{ecosystem_lane}} \u00b7 Claude",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "UNKNOWN",
+          "unit": "ops",
+          "custom": {
+            "spanNulls": false
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "last"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      }
+    },
+    {
+      "id": 22,
+      "title": "Per-lane Codex API attempt rate",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ns2604-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 189,
+        "w": 24,
+        "h": 9
+      },
+      "description": "Native API attempt counters per second, including retries; not completed user turns. rate is applied to each writer before aggregation so counter resets are handled. No failure series is UNKNOWN, not an invented zero.",
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (ecosystem_lane) (rate(codex_api_request_total{ecosystem_lane!=\"\"}[5m]))",
+          "legendFormat": "{{ecosystem_lane}} \u00b7 attempts",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ns2604-prometheus"
+          },
+          "instant": false,
+          "range": true,
+          "format": "time_series"
+        },
+        {
+          "refId": "B",
+          "expr": "sum by (ecosystem_lane) (rate(codex_api_request_total{ecosystem_lane!=\"\",success=\"false\"}[5m]))",
+          "legendFormat": "{{ecosystem_lane}} \u00b7 failed attempts",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ns2604-prometheus"
+          },
+          "instant": false,
+          "range": true,
+          "format": "time_series"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "UNKNOWN",
+          "unit": "ops",
+          "custom": {
+            "spanNulls": false
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "last"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      }
+    },
+    {
+      "id": 23,
+      "title": "Per-lane estimated Claude API cost",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ns2604-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 198,
+        "w": 24,
+        "h": 9
+      },
+      "description": "Estimated USD over the selected count window, from the native Claude cost counter only. Counter increase is summed per writer; cumulative snapshots are not added. This is API-equivalent cost, not a Max subscription bill. Codex cost and gateway spend are separate, unqualified sources; missing cost or lane coverage remains UNKNOWN.",
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (ecosystem_lane) (increase(claude_code_cost_usage_USD_total{ecosystem_lane!=\"\",instance!=\"unscoped\"}[${window}]))",
+          "legendFormat": "{{ecosystem_lane}} \u00b7 estimated USD",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ns2604-prometheus"
+          },
+          "instant": false,
+          "range": true,
+          "format": "time_series"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "UNKNOWN",
+          "unit": "currencyUSD",
+          "custom": {
+            "spanNulls": false
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "last"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      }
+    },
+    {
+      "id": 24,
+      "title": "Per-lane estimated Codex turn cost \u2014 conditional coverage",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ns2604-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 207,
+        "w": 24,
+        "h": 9
+      },
+      "description": "Native Codex 0.161.0 turn-cost counter in micro-USD, converted to estimated USD. Requires provider analytics/codex/turn-costs enrichment; absent amounts stay UNKNOWN. First samples and dropped/export-missing usage can be omitted; increase extrapolates window boundaries, so this is not an exact total or a guaranteed lower bound. Keep separate from Claude cost, SDK cumulative snapshots and gateway estimates.",
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (ecosystem_lane) (increase(codex_turn_cost_microusd_total{ecosystem_lane!=\"\",instance!=\"unscoped\"}[${window}])) / 1000000",
+          "legendFormat": "{{ecosystem_lane}} \u00b7 estimated USD",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ns2604-prometheus"
+          },
+          "instant": false,
+          "range": true,
+          "format": "time_series"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "UNKNOWN",
+          "unit": "currencyUSD",
+          "custom": {
+            "spanNulls": false
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "last"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      }
+    },
+    {
+      "id": 25,
+      "title": "Gateway routing rate by provider and model",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ns2604-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 216,
+        "w": 24,
+        "h": 9
+      },
+      "description": "Routing events per second after the CC enables native OmniRoute OTLP and applies the collector source. Native gateway spans have no lane/session parentage, so these provider/model totals are not assigned to lanes or added to client request rates. No received routing series remains UNKNOWN.",
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (gen_ai_provider_name,gen_ai_request_model) (rate(traces_span_metrics_calls_total{service_name=\"omniroute\"}[5m]))",
+          "legendFormat": "{{gen_ai_provider_name}} \u00b7 {{gen_ai_request_model}}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ns2604-prometheus"
+          },
+          "instant": false,
+          "range": true,
+          "format": "time_series"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "UNKNOWN",
+          "unit": "ops",
+          "custom": {
+            "spanNulls": false
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "last"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      }
+    },
+    {
+      "id": 26,
+      "title": "Gateway routing rate by outcome and HTTP status",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ns2604-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 225,
+        "w": 24,
+        "h": 9
+      },
+      "description": "Uses vendor omniroute.routing.outcome/status dimensions, not OTel status.code: the gateway does not set span status. Native status 0 means unknown, not success. The existing metrics/spans export guard preserves these dimensions. Deployment and received-event coverage remain the CC host read-back.",
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (gen_ai_provider_name,omniroute_routing_outcome,omniroute_routing_status) (rate(traces_span_metrics_calls_total{service_name=\"omniroute\"}[5m]))",
+          "legendFormat": "{{gen_ai_provider_name}} \u00b7 {{omniroute_routing_outcome}} \u00b7 HTTP {{omniroute_routing_status}}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ns2604-prometheus"
+          },
+          "instant": false,
+          "range": true,
+          "format": "time_series"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "UNKNOWN",
+          "unit": "ops",
+          "custom": {
+            "spanNulls": false
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "last"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      }
     }
   ],
   "templating": {

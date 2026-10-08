@@ -3,6 +3,10 @@
 Sources: grafana/grafana v13.2.3 JSON dashboards and table transformations;
 grafana/loki v3.7.8 LogQL range aggregations and label_replace/vector;
 openai/codex rust-v0.160.1 d27764b8 otel/src/events/session_telemetry.rs:1106.
+Rate/cost: Prometheus rate/increase; Claude Code monitoring-usage#cost-counter.
+Gateway: opentelemetry-collector-contrib v0.162.0 spanmetricsconnector/README.md;
+semantic-conventions-genai 06ec68e7 client-inference.md (Development);
+OmniRoute c1e30b76 open-sse/services/routing/otel.ts:193-216.
 The named nested-call stream was qualified once on 2026-10-06. Result rows,
 started turns, request token counters and native status are distinct measures.
 """
@@ -285,4 +289,75 @@ def dashboard():
             {'color': 'green', 'value': None}, {'color': 'yellow', 'value': 0.050},
         ]}), ('custom.thresholdsStyle', {'mode': 'dashed'}),
     ])
+
+    def plot(title, expressions, description, unit, datasource=LOKI):
+        item = panel(title, expressions, description, 'timeseries')
+        item['datasource'] = datasource
+        item['fieldConfig']['defaults'].update(
+            unit=unit, custom={'spanNulls': False})
+        item['options'] = {
+            'legend': {'displayMode': 'table', 'placement': 'bottom', 'calcs': ['last']},
+            'tooltip': {'mode': 'multi', 'sort': 'none'},
+        }
+        for target in item['targets']:
+            target['datasource'] = datasource
+            if datasource == PROMETHEUS:
+                target.pop('queryType', None)
+                target.update(instant=False, range=True, format='time_series')
+            else:
+                target['queryType'] = 'range'
+        return item
+
+    plot('Per-lane native tool-result rate', [
+        (f'{{{{ecosystem_lane}}}} · {client}',
+         f'sum by (ecosystem_lane) (rate({selector} | event_name="{event}" '
+         '| ecosystem_lane!="" [5m]))')
+        for client, selector, event in [('Codex', CODEX, 'codex.tool_result'),
+                                        ('Claude', CLAUDE, 'tool_result')]],
+        'Result records per second over 5m, using the native ecosystem_lane resource label. '
+        'Includes failed results and outer code-mode tool rows; this is not an MCP-call count. '
+        'Missing lane labels or records remain UNKNOWN. Root/child ownership uses the lookup above.', 'ops')
+    plot('Per-lane Codex API attempt rate', [
+        ('{{ecosystem_lane}} · attempts',
+         'sum by (ecosystem_lane) (rate(codex_api_request_total{ecosystem_lane!=""}[5m]))'),
+        ('{{ecosystem_lane}} · failed attempts',
+         'sum by (ecosystem_lane) (rate(codex_api_request_total{ecosystem_lane!="",success="false"}[5m]))')],
+        'Native API attempt counters per second, including retries; not completed user turns. '
+        'rate is applied to each writer before aggregation so counter resets are handled. '
+        'No failure series is UNKNOWN, not an invented zero.', 'ops', PROMETHEUS)
+    plot('Per-lane estimated Claude API cost', [
+        ('{{ecosystem_lane}} · estimated USD',
+         f'sum by (ecosystem_lane) (increase(claude_code_cost_usage_USD_total'
+         f'{{ecosystem_lane!="",instance!="unscoped"}}[{WINDOW}]))')],
+        'Estimated USD over the selected count window, from the native Claude cost counter only. '
+        'Counter increase is summed per writer; cumulative snapshots are not added. '
+        'This is API-equivalent cost, not a Max subscription bill. Codex cost and gateway spend '
+        'are separate, unqualified sources; missing cost or lane coverage remains UNKNOWN.',
+        'currencyUSD', PROMETHEUS)
+    plot('Per-lane estimated Codex turn cost — conditional coverage', [
+        ('{{ecosystem_lane}} · estimated USD',
+         f'sum by (ecosystem_lane) (increase(codex_turn_cost_microusd_total'
+         f'{{ecosystem_lane!="",instance!="unscoped"}}[{WINDOW}])) / 1000000')],
+        'Native Codex 0.161.0 turn-cost counter in micro-USD, converted to estimated USD. '
+        'Requires provider analytics/codex/turn-costs enrichment; absent amounts stay UNKNOWN. '
+        'First samples and dropped/export-missing usage can be omitted; increase extrapolates '
+        'window boundaries, so this is not an exact total or a guaranteed lower bound. '
+        'Keep separate from Claude cost, SDK cumulative snapshots and gateway estimates.',
+        'currencyUSD', PROMETHEUS)
+    plot('Gateway routing rate by provider and model', [
+        ('{{gen_ai_provider_name}} · {{gen_ai_request_model}}',
+         'sum by (gen_ai_provider_name,gen_ai_request_model) '
+         '(rate(traces_span_metrics_calls_total{service_name="omniroute"}[5m]))')],
+        'Routing events per second after the CC enables native OmniRoute OTLP and applies '
+        'the collector source. Native gateway spans have no lane/session parentage, so these '
+        'provider/model totals are not assigned to lanes or added to client request rates. '
+        'No received routing series remains UNKNOWN.', 'ops', PROMETHEUS)
+    plot('Gateway routing rate by outcome and HTTP status', [
+        ('{{gen_ai_provider_name}} · {{omniroute_routing_outcome}} · HTTP {{omniroute_routing_status}}',
+         'sum by (gen_ai_provider_name,omniroute_routing_outcome,omniroute_routing_status) '
+         '(rate(traces_span_metrics_calls_total{service_name="omniroute"}[5m]))')],
+        'Uses vendor omniroute.routing.outcome/status dimensions, not OTel status.code: '
+        'the gateway does not set span status. Native status 0 means unknown, not success. '
+        'The existing metrics/spans export guard preserves these dimensions. Deployment '
+        'and received-event coverage remain the CC host read-back.', 'ops', PROMETHEUS)
     return base
