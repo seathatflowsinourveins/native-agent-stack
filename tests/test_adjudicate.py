@@ -519,8 +519,8 @@ class CodexTests(AdjudicateFixture):
 
     def run_codex(self, repo=None, model="gpt-6-astra", effort=None, **env):
         with mock.patch.dict(os.environ, {**self.env, **env}):
-            return quiet(adjudicate.main, ["codex", "--work-dir", str(self.work), "--repo", str(repo or self.repo),
-                                           "--timeout", "30", "--model", model]
+            return quiet(adjudicate.main, ["codex", "--provider", "native", "--work-dir", str(self.work), "--repo", str(repo or self.repo),
+                                           "--timeout", "30", "--model", model, "--provider", "native"]
                          + (["--effort", effort] if effort else []))
 
     def calls(self):
@@ -555,7 +555,7 @@ class CodexTests(AdjudicateFixture):
     def test_model_is_required_and_must_match_the_openai_pattern(self):
         with mock.patch.dict(os.environ, self.env), contextlib.redirect_stderr(io.StringIO()):
             with self.assertRaises(SystemExit) as raised:
-                adjudicate.main(["codex", "--work-dir", str(self.work), "--repo", str(self.repo)])
+                adjudicate.main(["codex", "--provider", "native", "--work-dir", str(self.work), "--repo", str(self.repo)])
         self.assertEqual(raised.exception.code, 2)
         for model in ("unknown", "claude-opus-5-5"):
             code, err = self.run_codex(model=model)
@@ -1105,7 +1105,7 @@ class RootDepthTests(AdjudicateFixture):
         code, err = quiet(adjudicate.main, ["claude-args", "--work-dir", str(self.work), "--repo", str(shallow), "--run-dir", str(shallow)])
         self.assertEqual(code, 2)
         self.assertIn("blind-adjudicator refuses", err)
-        code, err = quiet(adjudicate.main, ["codex", "--work-dir", str(self.work), "--repo", "/home",
+        code, err = quiet(adjudicate.main, ["codex", "--provider", "native", "--work-dir", str(self.work), "--repo", "/home",
                                             "--model", "gpt-6-astra"])
         self.assertEqual(code, 2)
         self.assertIn("/home", err)
@@ -1173,7 +1173,7 @@ class EighthRereviewOf145Tests(AdjudicateFixture):
         with mock.patch.object(adjudicate, "packets_changed", side_effect=changed_after_first_check), \
                 mock.patch.object(adjudicate, "run_codex_call", writes_events(call)), \
                 mock.patch.object(adjudicate.shutil, "which", return_value="/usr/bin/codex"):
-            code, _ = quiet(adjudicate.main, ["codex", "--work-dir", str(self.work), "--repo", str(self.repo),
+            code, _ = quiet(adjudicate.main, ["codex", "--provider", "native", "--work-dir", str(self.work), "--repo", str(self.repo),
                                               "--model", "gpt-6-astra", "--jobs", "1"])
         self.assertEqual(code, 1)
         records = [json.loads(path.read_text(encoding="utf-8")) for path in
@@ -1221,7 +1221,7 @@ class NinthRereviewOf145Tests(AdjudicateFixture):
         with mock.patch.object(adjudicate, "tree_sha256", side_effect=lambda repo: next(trees, later)), \
                 mock.patch.object(adjudicate, "run_codex_call", writes_events(call, events)), \
                 mock.patch.object(adjudicate.shutil, "which", return_value="/usr/bin/codex"):
-            return quiet(adjudicate.main, ["codex", "--work-dir", str(self.work), "--repo", str(self.repo),
+            return quiet(adjudicate.main, ["codex", "--provider", "native", "--work-dir", str(self.work), "--repo", str(self.repo),
                                            "--model", "gpt-6-astra"])
 
     def test_a_tree_changed_during_the_codex_run_voids_every_judgment_of_the_run(self):
@@ -1320,7 +1320,7 @@ class TenthRereviewOf145Tests(AdjudicateFixture):
         with mock.patch.object(adjudicate, "inputs_changed", side_effect=inputs_changed), \
                 mock.patch.object(adjudicate, "run_codex_call", writes_events(call)), \
                 mock.patch.object(adjudicate.shutil, "which", return_value="/usr/bin/codex"):
-            code, err = quiet(adjudicate.main, ["codex", "--work-dir", str(self.work), "--repo", str(self.repo),
+            code, err = quiet(adjudicate.main, ["codex", "--provider", "native", "--work-dir", str(self.work), "--repo", str(self.repo),
                                                 "--model", "gpt-6-astra", "--jobs", "1"])
         return code, err, call
 
@@ -1421,7 +1421,7 @@ class TwelfthRereviewOf145Tests(AdjudicateFixture):
         missing = self.base / "hosts" / "blind" / "gone"
         for argv in (["claude-args", "--work-dir", str(self.work), "--repo", str(missing), "--run-dir", str(missing),
                       "--agent-file", str(adjudicate.VENDORED_ADJUDICATOR)],
-                     ["codex", "--work-dir", str(self.work), "--repo", str(missing), "--model", "gpt-6-astra"]):
+                     ["codex", "--provider", "native", "--work-dir", str(self.work), "--repo", str(missing), "--model", "gpt-6-astra"]):
             code, err = quiet(adjudicate.main, argv)
             self.assertEqual(code, 2, argv[0])
             self.assertIn("is not an existing directory", err)
@@ -1617,7 +1617,7 @@ class SixteenthRereviewOf145Tests(AdjudicateFixture):
         with mock.patch.object(adjudicate, "tree_sha256", return_value="a" * 64), \
                 mock.patch.object(adjudicate, "run_codex_call", writes_events(call, flagged)), \
                 mock.patch.object(adjudicate.shutil, "which", return_value="/usr/bin/codex"):
-            quiet(adjudicate.main, ["codex", "--work-dir", str(self.work), "--repo", str(self.repo),
+            quiet(adjudicate.main, ["codex", "--provider", "native", "--work-dir", str(self.work), "--repo", str(self.repo),
                                     "--model", "gpt-6-astra", "--jobs", "1"])
         self.assertEqual(adjudicate.recorded_leaks(self.work), set())
 
@@ -1640,7 +1640,7 @@ class SixteenthRereviewOf145Tests(AdjudicateFixture):
                 mock.patch.object(adjudicate, "run_codex_call", writes_events(mock.Mock(side_effect=[
                     (self.JUDGE, "gpt-6-astra", [0], None, None), (self.REFUTE, "gpt-6-astra", [0], None, None)] * 2))), \
                 mock.patch.object(adjudicate.shutil, "which", return_value="/usr/bin/codex"):
-            code, err = quiet(adjudicate.main, ["codex", "--work-dir", str(self.work), "--repo", str(self.repo),
+            code, err = quiet(adjudicate.main, ["codex", "--provider", "native", "--work-dir", str(self.work), "--repo", str(self.repo),
                                                 "--model", "gpt-6-astra", "--jobs", "1"])
         self.assertEqual(code, 1)
         self.assertIn("the input changed after `inputs` built it", err)
@@ -1690,7 +1690,7 @@ class CodexLeakTests(AdjudicateFixture):
 
     def run_codex(self):
         with mock.patch.dict(os.environ, self.env):
-            return quiet(adjudicate.main, ["codex", "--work-dir", str(self.work), "--repo", str(self.repo),
+            return quiet(adjudicate.main, ["codex", "--provider", "native", "--work-dir", str(self.work), "--repo", str(self.repo),
                                            "--timeout", "30", "--model", "gpt-6-astra"])
 
     def test_a_codex_judge_leak_is_missing_listed_and_not_retried(self):
@@ -1837,7 +1837,7 @@ class CallBindingRound4Tests(AdjudicateFixture):
         with mock.patch.object(adjudicate, "tree_sha256", return_value="a" * 64), \
                 mock.patch.object(adjudicate, "run_codex_call", writes_events(mock.Mock(side_effect=answers), events)), \
                 mock.patch.object(adjudicate.shutil, "which", return_value="/usr/bin/codex"):
-            return quiet(adjudicate.main, ["codex", "--work-dir", str(self.work), "--repo", str(self.repo),
+            return quiet(adjudicate.main, ["codex", "--provider", "native", "--work-dir", str(self.work), "--repo", str(self.repo),
                                            "--model", "gpt-6-astra", "--jobs", jobs])
 
     def test_a_stale_refuter_events_file_does_not_void_a_clean_judge_leak(self):
@@ -1869,7 +1869,7 @@ class CallBindingRound4Tests(AdjudicateFixture):
                     RuntimeError("killed")]))), \
                 mock.patch.object(adjudicate.shutil, "which", return_value="/usr/bin/codex"):
             with self.assertRaises(RuntimeError):
-                quiet(adjudicate.main, ["codex", "--work-dir", str(self.work), "--repo", str(self.repo),
+                quiet(adjudicate.main, ["codex", "--provider", "native", "--work-dir", str(self.work), "--repo", str(self.repo),
                                         "--model", "gpt-6-astra", "--jobs", "1"])
         record = json.loads((self.work / "adjudication-judgments" / "codex" / f"{NAME}.AB.json").read_text(encoding="utf-8"))
         self.assertEqual(record["failure"], adjudicate.TREE_CHANGED)
@@ -1914,7 +1914,7 @@ class CallBindingRound4Tests(AdjudicateFixture):
         call = mock.Mock(side_effect=judge_then_stop)
         with mock.patch.object(adjudicate, "run_codex_call", call), \
                 mock.patch.object(adjudicate.shutil, "which", return_value="/usr/bin/codex"):
-            quiet(adjudicate.main, ["codex", "--work-dir", str(self.work), "--repo", str(self.repo),
+            quiet(adjudicate.main, ["codex", "--provider", "native", "--work-dir", str(self.work), "--repo", str(self.repo),
                                     "--model", "gpt-6-astra", "--jobs", "1"])
         self.assertEqual(call.call_count, 1)
         self.assertEqual(sorted((self.work / "adjudication-judgments" / "codex").glob("*.AB.json")), [])

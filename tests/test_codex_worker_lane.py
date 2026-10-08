@@ -16,6 +16,7 @@ Evidence classes (docs/acceptance-evidence-policy.md):
 
 from __future__ import annotations
 
+import argparse
 import concurrent.futures
 import contextlib
 from datetime import date
@@ -2036,6 +2037,20 @@ def fixture_events(name: str) -> list[dict]:
 
 
 class ProveVerdictTests(unittest.TestCase):
+    def test_gateway_proof_environment_skips_key_value_before_public_placeholder(self):
+        class ValueGuard(dict):
+            def __getitem__(self, key):
+                if key == "OMNIROUTE_API_KEY":
+                    raise AssertionError("inherited gateway key must not be accessed")
+                return super().__getitem__(key)
+        inherited = ValueGuard({"OMNIROUTE_API_KEY": object(), "PATH": "/usr/bin", "HOME": "operator-home"})
+        with mock.patch.object(prove.os, "environ", inherited):
+            env = prove.provider_routes.provider_env("omniroute", prove.worker_env(Path("codex-home"), provider="omniroute"))
+        self.assertEqual(env["OMNIROUTE_API_KEY"], "local")
+        self.assertEqual(env["CODEX_HOME"], "codex-home")
+        self.assertEqual(env["HOME"], "operator-home")
+        self.assertEqual(env["PATH"], "/usr/bin")
+
     """Real codex-cli 0.157.1 event shapes, plus explicitly synthetic adversarial cases."""
 
     def test_pwd_verdict_on_a_bound_and_an_unbound_worker(self):
@@ -2134,17 +2149,93 @@ class ProveVerdictTests(unittest.TestCase):
         pins = lane.worker_pins()
         self.assertEqual(pins, ["-m", "gpt-6.1-sol", "-c", 'model_reasoning_effort="max"', "-c", 'web_search="live"'])
         for profile in (True, False):
-            argv = prove.exec_argv("codex", "prompt", profile)
+            argv = prove.exec_argv("codex", "prompt", profile, provider="native")
             self.assertEqual(argv[:2], ["codex", "exec"])
             self.assertEqual("-p" in argv, profile)
             joined = " ".join(argv)
             self.assertIn(" ".join(pins), joined)
             self.assertIn("-s read-only", joined)
+            self.assertIn('model_provider="openai"', argv)
+            self.assertIn('service_tier="fast"', argv)
         self.assertEqual(lane.worker_command(), "codex exec -p stack-worker -m gpt-6.1-sol "
                          "-c 'model_reasoning_effort=\"max\"' -c 'web_search=\"live\"' -s <sandbox> ... < /dev/null")
         recipe = (ROOT / "recipes" / "README.md").read_text(encoding="utf-8")
         self.assertIn('codex exec -p stack-worker -m gpt-6.1-sol -c model_reasoning_effort="max" -c web_search="live"',
                       recipe)
+
+    def test_live_requires_explicit_provider_before_any_client_or_worker_setup(self):
+        for arguments in [["--live"], ["--live", "--provider", ""],
+                          ["--live", "--provider", "unsupported"],
+                          ["--live", "--provider", "omniroute"],
+                          ["--live", "--provider", "omniroute", "--omniroute-base-url", "https://example.org/v1"]]:
+            with self.subTest(arguments=arguments), mock.patch.object(prove, "make_repo") as setup, \
+                 mock.patch.object(prove, "static_checks") as static, \
+                 mock.patch.object(prove, "quota_gate") as quota, \
+                 mock.patch.object(prove, "live_checks") as live, \
+                 contextlib.redirect_stderr(io.StringIO()):
+                with self.assertRaises(SystemExit) as raised:
+                    prove.main(["--codex", "/synthetic/codex", *arguments])
+                self.assertEqual(raised.exception.code, 2)
+                setup.assert_not_called()
+                static.assert_not_called()
+                quota.assert_not_called()
+                live.assert_not_called()
+
+    def test_static_proof_needs_no_provider_or_provider_helper(self):
+        with mock.patch.object(prove, "make_repo", return_value=b"synthetic blob"), \
+             mock.patch.object(prove, "static_checks") as static, \
+             mock.patch.object(prove, "quota_gate") as quota, \
+             mock.patch.object(prove, "live_checks") as live, \
+             mock.patch.object(prove.provider_routes, "provider_args") as route, \
+             contextlib.redirect_stdout(io.StringIO()):
+            code = prove.main(["--codex", "/synthetic/codex"])
+        self.assertEqual(code, 0)
+        static.assert_called_once()
+        quota.assert_not_called()
+        live.assert_not_called()
+        route.assert_not_called()
+
+    def test_gateway_provider_does_not_replace_profile_or_control_and_keeps_pins(self):
+        base_url = "http://127.0.0.1:21128/v1"
+        route = prove.provider_routes.provider_args("omniroute", base_url)
+        for profile in (True, False):
+            argv = prove.exec_argv("codex", "literal prompt", profile, provider="omniroute", base_url=base_url)
+            self.assertEqual(argv.count("-p"), int(profile))
+            if profile:
+                self.assertEqual(argv[argv.index("-p") + 1], lane.PROFILE_NAME)
+            self.assertIn(" ".join(lane.worker_pins()), " ".join(argv))
+            self.assertEqual(argv[-1], "literal prompt")
+            self.assertTrue(any('model_provider="omniroute"' == option for option in argv))
+            self.assertIn('service_tier="fast"', argv)
+            route_start = argv.index(route[1]) - 1
+            self.assertEqual(argv[route_start:route_start + len(route)], route)
+        with self.assertRaises(TypeError):
+            prove.exec_argv("codex", "prompt", True)
+
+    def test_gateway_live_workers_and_no_profile_control_share_explicit_provider_and_public_env(self):
+        captured = []
+        def worker_runs(specs, timeout):
+            captured.extend(specs)
+            return [{"name": spec["name"], "exit": 0, "timed_out": False, "seconds": 0,
+                     "cleanup_error": None, "events": []} for spec in specs]
+        with tempfile.TemporaryDirectory() as tmp:
+            scratch = Path(tmp)
+            skill = scratch / "SKILL.md"
+            skill.write_text("# Synthetic installed skill\n")
+            args = argparse.Namespace(provider="omniroute", omniroute_base_url="http://127.0.0.1:21128/v1",
+                                      timeout=1, memory_workspace="synthetic", memory_project="synthetic", skill_file=str(skill))
+            with mock.patch.object(prove, "run_workers", side_effect=worker_runs), \
+                 mock.patch.dict(os.environ, {"SYNTHETIC_ROUTE_FLAG": "kept"}, clear=True), \
+                 contextlib.redirect_stdout(io.StringIO()):
+                prove.live_checks("/synthetic/codex", scratch / "native-home", scratch,
+                                  scratch / "repo", b"synthetic blob", args, prove.Results())
+        self.assertEqual(len(captured), 6)
+        for spec in captured:
+            self.assertIn('model_provider="omniroute"', spec["argv"])
+            self.assertEqual(spec["env"]["OMNIROUTE_API_KEY"], "local")
+            self.assertEqual(spec["env"]["SYNTHETIC_ROUTE_FLAG"], "kept")
+        control = next(spec for spec in captured if spec["name"] == "approval control (no profile)")
+        self.assertNotIn("-p", control["argv"])
 
     def test_prove_json_declares_local_integration_and_retention_limits(self):
         # Exercise main -> live_checks -> JSON without a model call or real Codex home.
@@ -2165,7 +2256,7 @@ class ProveVerdictTests(unittest.TestCase):
                  mock.patch.object(prove, "run_workers", side_effect=worker_runs), \
                  contextlib.redirect_stdout(io.StringIO()):
                 code = prove.main(["--codex", "/synthetic/codex", "--codex-home", tmp,
-                                   "--live", "--skill-file", str(skill_path), "--json", str(report_path)])
+                                   "--live", "--provider", "native", "--skill-file", str(skill_path), "--json", str(report_path)])
             self.assertEqual(code, 1)
             report = json.loads(report_path.read_text())
         self.assertEqual(report.get("evidence_class"), "local integration check")
@@ -2216,7 +2307,7 @@ class ProveVerdictTests(unittest.TestCase):
                  mock.patch.object(prove, "quota_gate", return_value=(True, "synthetic open gate")), \
                  mock.patch.object(prove, "run_workers", side_effect=worker_runs), \
                  contextlib.redirect_stdout(io.StringIO()):
-                prove.main(["--codex", "/synthetic/codex", "--codex-home", tmp, "--live", "--skill-file",
+                prove.main(["--codex", "/synthetic/codex", "--codex-home", tmp, "--live", "--provider", "native", "--skill-file",
                             str(skill_path), "--json", str(report_path)])
                 default_path = Path(tmp) / "default.json"
                 with mock.patch.dict(os.environ, {"CODEX_HOME": tmp}):

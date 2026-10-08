@@ -34,7 +34,7 @@ A gate row passes only when every class returns that row's own fresh token and n
 ## Run
 
 ```sh
-python3 tools/capability-gate/run_gate.py {jcodemunch,ai-memory,m13} [--keep]
+python3 tools/capability-gate/run_gate.py {jcodemunch,ai-memory,m13} --provider native [--keep]
 ```
 
 **Prerequisites:**

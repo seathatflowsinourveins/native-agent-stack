@@ -13,6 +13,8 @@ PATH.
 from __future__ import annotations
 
 import json
+import contextlib
+import io
 import os
 import re
 import shutil
@@ -298,7 +300,7 @@ class EnvironmentTests(unittest.TestCase):
         inherited = {"PROMPTFOO_LOG_DIR": "/elsewhere/logs", "PROMPTFOO_CACHE_PATH": "/elsewhere/cache",
                      "PROMPTFOO_CONFIG_DIR": "/elsewhere/config"}
         with mock.patch.dict(os.environ, inherited):
-            env = run_gate.promptfoo_env(private, "/main")
+            env = run_gate.promptfoo_env(private, "/main", provider="native")
         self.assertEqual(env["PROMPTFOO_LOG_DIR"], "/private-dir/logs")
         self.assertEqual(env["PROMPTFOO_CONFIG_DIR"], "/private-dir/promptfoo")
         self.assertNotIn("PROMPTFOO_CACHE_PATH", env)
@@ -587,6 +589,79 @@ def _subset(expected, actual):
     if not isinstance(expected, dict):
         return expected == actual
     return isinstance(actual, dict) and all(k in actual and _subset(v, actual[k]) for k, v in expected.items())
+
+
+class ExplicitProviderTests(unittest.TestCase):
+    def test_gate_refuses_absent_or_invalid_provider_before_process_or_state(self):
+        for flags in [[], ["--provider", ""], ["--provider", "unsupported"], ["--provider", "omniroute"],
+                      ["--provider", "omniroute", "--omniroute-base-url", "https://example.org/v1"]]:
+            with self.subTest(flags=flags), mock.patch.object(run_gate, "run") as process, \
+                 mock.patch.object(run_gate.tempfile, "mkdtemp") as state, contextlib.redirect_stderr(io.StringIO()):
+                with self.assertRaises(SystemExit) as raised:
+                    run_gate.main(["ai-memory", *flags])
+                self.assertEqual(raised.exception.code, 2)
+                process.assert_not_called()
+                state.assert_not_called()
+
+    def test_gateway_env_skips_credential_by_name_before_value_lookup(self):
+        class ValueGuard(dict):
+            def __getitem__(self, key):
+                if key == "OMNIROUTE_API_KEY":
+                    raise AssertionError("credential value must not be retrieved")
+                return super().__getitem__(key)
+        inherited = ValueGuard({"PATH": os.defpath, "OMNIROUTE_API_KEY": "synthetic-not-read",
+                                "NAS_CODEX_PROVIDER": "unvalidated", "NAS_CODEX_BASE_URL": "unvalidated",
+                                "PROMPTFOO_LOG_DIR": "/elsewhere"})
+        with mock.patch.object(run_gate.os, "environ", inherited):
+            env = run_gate.promptfoo_env(Path("/private"), "/main", provider="omniroute", base_url="http://127.0.0.1:21128/v1")
+        self.assertEqual(env["OMNIROUTE_API_KEY"], "local")
+        self.assertEqual(env["NAS_CODEX_PROVIDER"], "omniroute")
+        self.assertEqual(env["NAS_CODEX_BASE_URL"], "http://127.0.0.1:21128/v1")
+        self.assertEqual(env["PROMPTFOO_LOG_DIR"], "/private/logs")
+        with mock.patch.dict(os.environ, {"NAS_CODEX_BASE_URL": "unvalidated"}, clear=True):
+            native = run_gate.promptfoo_env(Path("/private"), "/main", provider="native")
+        self.assertEqual(native["NAS_CODEX_PROVIDER"], "native")
+        self.assertNotIn("NAS_CODEX_BASE_URL", native)
+
+    def test_actual_wrapper_forwards_explicit_provider_fast_profile_and_sdk_arguments(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            fake = Path(tmp) / "codex"
+            fake.write_text(f"#!{sys.executable}\nimport json,os,sys\nprint(json.dumps({{'argv':sys.argv[1:], 'public_key':os.environ.get('OMNIROUTE_API_KEY'), 'stdin':sys.stdin.read()}}))\n")
+            fake.chmod(0o755)
+            for provider in ["native", "omniroute"]:
+                env = {"PATH": os.environ["PATH"], "CAPABILITY_GATE_CODEX": str(fake), "CODEX_PROFILE": "stack-worker",
+                       "NAS_CODEX_PROVIDER": provider, "PYTHONDONTWRITEBYTECODE": "1"}
+                if provider == "omniroute":
+                    env["NAS_CODEX_BASE_URL"] = "http://127.0.0.1:21128/v1"
+                sdk_args = ["--experimental-json", "--cd", "/synthetic-worktree", "-c", 'mcp_servers.synthetic.enabled=false', "literal prompt"]
+                result = subprocess.run([str(GATE / "codex-profile-exec"), "exec", *sdk_args], env=env,
+                                        input="synthetic SDK prompt\nsecond line\n", text=True, capture_output=True, timeout=5)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                record = json.loads(result.stdout)
+                self.assertEqual(record["stdin"], "synthetic SDK prompt\nsecond line\n")
+                argv = record["argv"]
+                self.assertEqual(argv[:3], ["exec", "--profile", "stack-worker"])
+                self.assertEqual(argv[-len(sdk_args):], sdk_args)
+                self.assertIn('service_tier="fast"', argv)
+                self.assertIn('model_provider="openai"' if provider == "native" else 'model_provider="omniroute"', argv)
+                if provider == "omniroute":
+                    self.assertEqual(record["public_key"], "local")
+
+    def test_invalid_wrapper_metadata_fails_closed_without_legacy_fallback(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            marker = Path(tmp) / "executed"
+            fake = Path(tmp) / "codex"
+            fake.write_text(f"#!/bin/sh\ntouch '{marker}'\n")
+            fake.chmod(0o755)
+            base = {"PATH": os.environ["PATH"], "CAPABILITY_GATE_CODEX": str(fake), "CODEX_PROFILE": "stack-worker",
+                    "PYTHONDONTWRITEBYTECODE": "1"}
+            for metadata in [{"NAS_CODEX_PROVIDER": ""}, {"NAS_CODEX_PROVIDER": "unsupported"},
+                             {"NAS_CODEX_PROVIDER": "omniroute"}, {"NAS_CODEX_BASE_URL": "http://127.0.0.1:21128/v1"},
+                             {"NAS_CODEX_PROVIDER": "omniroute", "NAS_CODEX_BASE_URL": "http://example.org/v1"}]:
+                result = subprocess.run([str(GATE / "codex-profile-exec"), "exec", "literal prompt"],
+                                        env={**base, **metadata}, text=True, capture_output=True, timeout=5)
+                self.assertEqual(result.returncode, 2, result.stderr)
+                self.assertFalse(marker.exists())
 
 
 if __name__ == "__main__":

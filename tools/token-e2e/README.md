@@ -324,6 +324,9 @@ integration check, not upstream acceptance, and its judge calls are separate mod
   `75`, rerun to resume) and `--accept-unavailable` finishes with the unrun packets as `judge_unavailable`. Both windows
   must be closed (`E_WINDOW_OPEN window=W_C` or `W_X`). `judge rehearse --route codex|claude` sends two planted controls
   through a route before Amendment 4 and skips the window check.
+  A Codex model dispatch or rehearsal additionally requires `--provider native|omniroute`;
+  OmniRoute requires `--omniroute-base-url http://127.0.0.1:PORT/v1` for the keyless
+  loopback route. The fixed judge model/effort and blind context home remain in place.
 - **Controls.** `controls` runs the planted class A, B and C answers with known verdicts (`calibration/oracle-controls.json`),
   the E1 answers at their pinned keys and the class D calibration files (`calibration/T*.json`: per template a reference, a
   paraphrased correct and at least two planted wrong answers, and extraction controls for the payload and unittest

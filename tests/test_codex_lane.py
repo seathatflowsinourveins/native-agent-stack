@@ -143,6 +143,7 @@ class CodexLaneFixture(unittest.TestCase):
     def run_lane(self, extra_args=None):
         args = [
             "--work-dir", str(self.work_dir), "--repo", str(self.repo),
+            "--provider", "native",
             "--prompt", str(FIXTURE_PROMPT), "--schema", str(FIXTURE_SCHEMA),
         ]
         args.extend(extra_args or [])

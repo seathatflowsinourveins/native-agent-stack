@@ -274,6 +274,10 @@ marks that status on other lanes. The counts remain available but do not establi
 (`codex-rs/exec/src/lib.rs:1636-1638`, `codex-rs/exec/src/event_processor_with_jsonl_output.rs:509-511,533-535`).
 The model remains a per-run choice (`build_args.py --gpt6-model`,
 default `gpt-6-astra`), recorded in `staged.json`, in each job directory and in every GPT-6 vote.
+`--gpt6-provider native|omniroute` is required at staging, and the runner refuses
+an omitted or empty `codex.provider` before model execution. Existing explicit
+gateway homes keep their provider/profile contract. Native is an explicit
+choice rather than an implicit host-account fallback; both routes pass the fast tier.
 If staged settings change between binding inputs and launching the detached runner, the attempt is refused with
 exit 2, failure kind `inputs_changed`, including invalid restaging; `exit`, `done` and `failure.json` record it.
 Initial invalid settings are refused before any job state changes; a refusal against a running job leaves its
@@ -353,7 +357,7 @@ Before a full run through the gateway, run the lane's parity check on the staged
 Stage a native lane with an explicit fallback to the keyless loopback gateway:
 
 ```sh
-python3 "$H/build_args.py" --work-dir "$W" --sweep-id "$LANE" --date "$DATE" --layers "$LAYERS" \
+python3 "$H/build_args.py" --gpt6-provider native --work-dir "$W" --sweep-id "$LANE" --date "$DATE" --layers "$LAYERS" \
   --gpt6-fallback omniroute --fallback-codex-host 127.0.0.1:20128
 ```
 
@@ -586,7 +590,7 @@ python3 tools/sota-convergence/build_manifest.py --work-dir "$W/work" --lanes "$
 python3 $H/build_inputs.py --work-dir "$W" --freshness-manifest "$W/freshness/manifest-$STAMP.json"
 
 # 4. Stage a one-layer smoke run and probe the GPT-6 lane with one cheap call.
-python3 $H/build_args.py --work-dir "$W" --sweep-id "$LANE" --date "$DATE" --smoke mcp-surfaces
+python3 $H/build_args.py --gpt6-provider native --work-dir "$W" --sweep-id "$LANE" --date "$DATE" --smoke mcp-surfaces
 bash "$W/codex_call.sh" start gpt6-probe "$W/prompts/gpt6-probe.txt" "$W/schemas/probe.json"
 bash "$W/codex_call.sh" wait gpt6-probe 600; bash "$W/codex_call.sh" result gpt6-probe   # expect exit 0, limit false
 ```
@@ -600,7 +604,7 @@ restage while `gpt6/` holds jobs, because a finished job with the same id would 
 **6. Full run.** Stage the due layers, then call `Workflow({scriptPath: "<W>/sweep.embedded.js"})` again:
 
 ```sh
-python3 $H/build_args.py --work-dir "$W" --sweep-id "$LANE" --date "$DATE" --due-report "$W/report.json"
+python3 $H/build_args.py --gpt6-provider native --work-dir "$W" --sweep-id "$LANE" --date "$DATE" --due-report "$W/report.json"
 ```
 
 The embedded copy carries the ~12 KB of templates and schemas, so they never pass through the coordinator's
@@ -901,7 +905,7 @@ npm install --prefix "$HOME/.local/share/codex-ecosystem/tools/skills-yaml-2.9.0
   --no-fund --save-exact yaml@2.9.0
 python3 $H/build_inputs.py --skills-scope > "$W/scope.json"
 python3 $H/build_inputs.py --work-dir "$W" --modality skills
-python3 $H/build_args.py --work-dir "$W" --sweep-id "landscape-sweep-skills-$STAMP" --date "$DATE" --smoke skills-research
+python3 $H/build_args.py --gpt6-provider native --work-dir "$W" --sweep-id "landscape-sweep-skills-$STAMP" --date "$DATE" --smoke skills-research
 # Smoke, full run (--due-report "$W/report.json" from step 1, or --layers skills-research,skills-debug,...), usage,
 # convert, manifest, source reviews, RESULT.json, --append and --check as in "Run it"; then:
 python3 $H/make_result.py --decision-record "$W/RESULT.json"

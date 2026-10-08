@@ -1457,6 +1457,12 @@ workflow, not from this repository). It is a subprocess/text pipeline over
 `codex exec`, not a schema validator: full validation of the returned JSON
 against `lane-return.schema.json` is `record_verdicts.py`'s job.
 
+Model execution requires `--provider native|omniroute`. OmniRoute also requires
+an explicit keyless loopback `--omniroute-base-url http://127.0.0.1:PORT/v1`.
+Blind runs keep their isolated homes and ignored user configuration; supported
+inline provider overrides select the route and fast tier. Model and effort pins
+stay caller-owned. See the [provider decision](../../docs/decisions/2026-10-08-codex-exec-explicit-provider.md).
+
 For every packet under `<work-dir>/packets/<catalog>__<layer_id>.json`
 (written by `lane_packets.py`) without an already-valid
 `<work-dir>/codex/<catalog>__<layer_id>.json` on disk -- valid meaning: the
@@ -1515,15 +1521,15 @@ exits 2, because the checkout has `.git`):
 ```sh
 python3 tools/sota-convergence/blind_checkout.py \
   --source . --rev HEAD --dest /path/outside/repos/blind-checkout --export /path/outside/repos/blind-export
-python3 tools/sota-convergence/codex_lane.py \
+python3 tools/sota-convergence/codex_lane.py --provider native \
   --work-dir /path/to/work-dir --repo /path/outside/repos/blind-export --effort max   # max is the default
-python3 tools/sota-convergence/codex_lane.py \
+python3 tools/sota-convergence/codex_lane.py --provider native \
   --work-dir /path/to/work-dir --repo /path/outside/repos/blind-export --layers native-clients,market-data-reference
-python3 tools/sota-convergence/codex_lane.py \
+python3 tools/sota-convergence/codex_lane.py --provider native \
   --work-dir /path/to/work-dir --repo /path/outside/repos/blind-export --dry-run   # prints the command per pending layer, writes nothing
 git worktree remove --force /path/outside/repos/blind-checkout
 # Not blind: a run against the checkout itself, whose git history recovers every stripped label.
-python3 tools/sota-convergence/codex_lane.py \
+python3 tools/sota-convergence/codex_lane.py --provider native \
   --work-dir /path/to/work-dir --repo . --allow-git-history
 ```
 
@@ -1717,7 +1723,7 @@ where the two lanes chose different winner components (2026-09-23 re-record).
 ```sh
 python3 tools/sota-convergence/adjudicate.py inputs --work-dir W --lane-repo-root <blind export> \
   --packet-keys <keys>/packet-keys.json   # AB and BA inputs, adjudication-index.json
-python3 tools/sota-convergence/adjudicate.py codex --work-dir W --repo <blind export> --model <model>
+python3 tools/sota-convergence/adjudicate.py codex --work-dir W --repo <blind export> --model <model> --provider native
 python3 tools/sota-convergence/adjudicate.py claude-args --work-dir W --repo <blind export> --run-dir <blind export> > args.json
 # run tools/sota-convergence/adjudication-lane.js with args.json (blind-adjudicator agents)
 python3 tools/sota-convergence/adjudicate.py claude-collect --work-dir W --result <workflow result> --model <resolved>
@@ -2454,4 +2460,3 @@ to `nautilustrader`, and `duckdb`, `edgartools` and `exchange-calendars` to thei
 - An explicit entry is required where one repository serves several manifest ids. nautechsystems/nautilus_trader
   is both `nautilustrader` and `nautilus-ibkr-adapter`, and a repository match cannot tell which component a
   receipt exercised.
-

@@ -791,10 +791,12 @@ def refuse_git_repo(repo: Path):
 
 # ---------------------------------------------------------------- codex
 
-def run_codex_call(repo, schema, out_tmp, effort, prompt, model, timeout, events_path, validate):
+def run_codex_call(repo, schema, out_tmp, effort, prompt, model, timeout, events_path, validate,
+                   *, provider=None, base_url=None):
     """Run one codex exec call, retried once. Returns (object or None, event model or None, exit codes, failure,
     leak text or None). A ``leak: true`` answer is final: it is not retried and never returns an object."""
-    cmd = codex_lane.build_command(repo, schema, out_tmp, effort, prompt, model, codex_lane.ISOLATION_ARGS)
+    cmd = codex_lane.build_command(repo, schema, out_tmp, effort, prompt, model, codex_lane.ISOLATION_ARGS,
+                                   provider=provider, base_url=base_url)
     exit_codes, event_model, failure = [], None, "no attempt ran"
     events_path.write_text("", encoding="utf-8")
     for _attempt in (1, 2):
@@ -835,6 +837,11 @@ def run_codex_call(repo, schema, out_tmp, effort, prompt, model, timeout, events
 
 
 def run_codex(args) -> int:
+    try:
+        codex_lane.provider_args(args.provider, args.omniroute_base_url)
+    except ValueError as error:
+        print(f"adjudicate: {error}", file=sys.stderr)
+        return 2
     work_dir = args.work_dir.resolve()
     repo = args.repo.resolve()
     if model_issue(args.model, "openai"):
@@ -963,7 +970,8 @@ def judge_pending(args, work_dir, repo, index, packets, items, pending, failures
         judge, judge_model, judge_codes, failure, judge_leak = run_codex_call(
             repo, schemas["judge"], out_dir / f"{stem}.judge.out.tmp", args.effort,
             fill(judge_template, input_path, repo, packet_path=packets.get(name, "")), args.model, args.timeout,
-            events_dir / f"{stem}.judge.jsonl", valid_judge)
+            events_dir / f"{stem}.judge.jsonl", valid_judge,
+            provider=args.provider, base_url=args.omniroute_base_url)
         refuter, refute_model, refute_codes = None, None, []
         if codex_lane.STOP.is_set():
             # A stop signal: no refute stage starts and no record is written (round 7, ISO-R7-3).
@@ -975,7 +983,8 @@ def judge_pending(args, work_dir, repo, index, packets, items, pending, failures
             refuter, refute_model, refute_codes, failure, refute_leak = run_codex_call(
                 repo, schemas["refute"], out_dir / f"{stem}.refute.out.tmp", args.effort,
                 fill(refute_template, input_path, repo, judge, packets.get(name, "")), args.model, args.timeout,
-                events_dir / f"{stem}.refute.jsonl", valid_refuter)
+                events_dir / f"{stem}.refute.jsonl", valid_refuter,
+                provider=args.provider, base_url=args.omniroute_base_url)
             if codex_lane.STOP.is_set():
                 return
             if refute_leak is not None:
@@ -1714,6 +1723,9 @@ def parse_args(argv=None):
     codex.add_argument("--model", required=True,
                        help="Model passed to codex exec -m and recorded on each judgment; must match the openai "
                             "pattern of scripts/landscape.py FAMILY_MODEL_PATTERNS.")
+    codex.add_argument("--provider", required=True, choices=("native", "omniroute"),
+                       help="Explicit model provider; blind context isolation remains in place.")
+    codex.add_argument("--omniroute-base-url", help="Required with omniroute: keyless HTTP loopback endpoint with port and /v1.")
     codex.add_argument("--effort", default="max",
                        help="model_reasoning_effort for the judge and the refuter (default max, the standing GPT-6 lane setting; a judgment made at another effort is rerun).")
     codex.add_argument("--jobs", type=int, default=1)
