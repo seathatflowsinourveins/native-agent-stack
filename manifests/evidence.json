@@ -40492,8 +40492,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/README.md",
-      "sha256": "2436ec8832588b4cbf1a94ad8c85fe7a1f29cab0e6affe02e434dd4c6b65a825",
-      "bytes": 97777
+      "sha256": "1d04d9e1d16d7f351476b7bc394c9e86bc651899e4e7515403f48a343d8fc05b",
+      "bytes": 97923
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
@@ -40527,13 +40527,13 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/agentsview.sh",
-      "sha256": "35291136542644861147b9f65770524cfba62305bb08462bc87ae8325d72bffb",
-      "bytes": 528
+      "sha256": "6de86214772d0302659bb27ee660e1dec425ab1fe9f237dcbc4474903aaf88b7",
+      "bytes": 527
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/agentsview.toml",
-      "sha256": "97ecce87a1fa7cf0e61fcee9af71cb95f0e5770170273e1774bb0f26e3c37e4b",
-      "bytes": 269
+      "sha256": "1ad4432c9120ed04e4047a2cc96a10830b25911f750880c2a4e55df2349ee0f2",
+      "bytes": 268
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/alertmanager-telegram.yaml",
@@ -40802,8 +40802,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/otel.yaml",
-      "sha256": "fa2f6e73ea0bbaa8795d3334c032e90a1e4c29da8efc8d4b93dc1e2290dd676e",
-      "bytes": 53131
+      "sha256": "4b103f0bcdc6a57f8be7316bd56c951d1fb40acc84a5154d8957d7b3bfd8d5fb",
+      "bytes": 53465
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/prometheus-alerts.test.yaml",
