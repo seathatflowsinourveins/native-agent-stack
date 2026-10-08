@@ -8,6 +8,19 @@ checked against `SHA256SUMS`, and `adoption/templates/claude.settings.template.j
 | `effort-default-guard.py` | SessionStart | effort self-heal |
 | `currency-due-notice.py` | SessionStart | the stack-currency due line |
 | `../../../scripts/hooks/secret_path_guard.py` | PreToolUse (Bash) | the secret-path guard |
+| `research-routing-guard.py` | PreToolUse (search/fetch), UserPromptSubmit | coordinator-session research routing and bounded verification log |
+
+## Coordinator research routing
+
+Use [the CC #76 decision and application recipe](../../../docs/decisions/2026-10-08-coordinator-research-routing.md)
+when applying the research gate through F9 or updating a CC/co-op launcher. The
+launcher sets a role and the exact native session ID; ordinary lanes and separately
+launched research sessions have neither marker. The generic ecosystem launcher
+does not set them. In a marked session, WebSearch returns the native denial and
+`tools/research/dispatch --question '<question>'` redirect. Targeted WebFetch and
+context-mode fetches retain normal permissions and record requested verification
+URLs; UserPromptSubmit resets the turn counter. These are hook-protocol fixtures
+until the CC applies F9 and runs the fresh-session acceptance after landing.
 
 ## Held out of the default: the token-lane carriers
 

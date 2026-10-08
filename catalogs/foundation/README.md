@@ -6,6 +6,11 @@ Start with the layer needed for the task in [manifest.json](manifest.json), then
 read its scoped capability decision in [decisions.json](decisions.json). A default
 is a selected way to do a task, not permission to install or activate every tool.
 
+The [October 8 layer map](../../docs/foundation-layer-map-20261008.md) joins all
+twenty foundation layers with the current repository pins, exact evidence paths
+and recorded dates at its named source commit. It keeps historical verdicts,
+profile proposals and partial qualification separate from adoption.
+
 The [October 7 memory/RAG architecture recommendations](../../docs/decisions/2026-10-07-memory-rag-source-stacks.md)
 give five proposed source-review architectures by workload, with an
 [18-repository source review](../../evidence/artifacts/memory-rag-stacks-20261007/review.json)

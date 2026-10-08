@@ -399,6 +399,27 @@ class InjectionTests(RunnerCase):
                                        b"APCA_API_BASE_URL=https://paper-api.alpaca.markets\n")
         self.assert_never_echoed(result.stdout, result.stderr, shown.stdout, shown.stderr)
 
+    def test_sec_contact_optional_rate_cap_is_public_and_identities_stay_masked(self):
+        contact, identity = fake("contact-"), fake("identity-")
+        self.values += [contact, identity]
+        text = f"export SEC_USER_AGENT={contact}\nexport EDGAR_IDENTITY={identity}\n"
+        code = ("import os, sys\n"
+                "for stream in (sys.stdout, sys.stderr):\n"
+                "    for name in ('SEC_USER_AGENT', 'EDGAR_IDENTITY'):\n"
+                "        print(name + '=' + os.environ[name], file=stream)\n"
+                "    print('EDGAR_RATE_LIMIT_PER_SEC=' + os.environ.get('EDGAR_RATE_LIMIT_PER_SEC', '<unset>'), "
+                "file=stream)\n")
+        for cap in (None, "5"):
+            with self.subTest(cap=cap):
+                self.plant("sec-contact", text + (f"export EDGAR_RATE_LIMIT_PER_SEC={cap}\n" if cap else ""))
+                # An inherited cap must not fill in an optional setting absent from the selected store.
+                result = self.run_tool("sec-contact", *py(code), env={"EDGAR_RATE_LIMIT_PER_SEC": "8"})
+                expected = ("SEC_USER_AGENT=[REDACTED:SEC_USER_AGENT]\n"
+                            "EDGAR_IDENTITY=[REDACTED:EDGAR_IDENTITY]\n"
+                            f"EDGAR_RATE_LIMIT_PER_SEC={cap if cap else '<unset>'}\n").encode()
+                self.assertEqual((result.returncode, result.stdout, result.stderr), (0, expected, expected))
+                self.assert_never_echoed(result.stdout, result.stderr)
+
     def test_strips_other_inventory_names_from_the_child(self):
         value = self.tavily()
         # The pointer variables of the other entries (paths of their store files, which the documented shell profile sets
@@ -2090,7 +2111,8 @@ class InventoryAndGrammarTests(unittest.TestCase):
         # Every optional variable of an injectable entry, classified; a new one must be reviewed here.
         self.assertEqual(classified, {("alpaca-paper", "APCA_API_BASE_URL"): "public",
                                       ("alpaca-paper-2", "APCA_API_BASE_URL"): "public",
-                                      ("sec-contact", "EDGAR_IDENTITY"): "masked"})
+                                      ("sec-contact", "EDGAR_IDENTITY"): "masked",
+                                      ("sec-contact", "EDGAR_RATE_LIMIT_PER_SEC"): "public"})
 
     def test_a_required_variable_is_masked_even_when_a_planted_entry_lists_it_public(self):
         # Review of 2026-09-29: masked_names() trusted public_variables as written. It now comes from the schema

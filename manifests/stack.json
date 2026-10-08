@@ -66,8 +66,8 @@
     },
     {
       "id": "agentsview",
-      "repository": "https://github.com/kenn-io/agentsview/releases/tag/v0.43.0",
-      "version": "0.43.0",
+      "repository": "https://github.com/kenn-io/agentsview/releases/tag/v0.44.0",
+      "version": "0.44.0",
       "license": "MIT",
       "profile": "supporting",
       "role": "Scoped historical Codex/Claude transcript lexical search",
@@ -83,13 +83,13 @@
         "native-returned-results-20260921",
         "full-stack-convergence-20260921",
         "claude-upstream-checks-20260921",
-        "claude-repository-evidence-20260921"
+        "claude-repository-evidence-20260921", "2604-drift-version-readback-20261008"
       ],
       "upstream_sources": [
-        "https://github.com/kenn-io/agentsview/releases/tag/v0.43.0"
+        "https://github.com/kenn-io/agentsview/releases/tag/v0.44.0"
       ],
-      "source_pin": null,
-      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json.",
+      "source_pin": "413a87f7bfbd67b2815b1119ac51abc1efbeeaba",
+      "freshness": "Installed version read back on 2026-10-08 as agentsview v0.44.0 (commit 413a87f7bfbd67b2815b1119ac51abc1efbeeaba, built 2026-09-21T12:48:49Z), matching the vendor's v0.44.0 release commit. This metadata check does not refresh historical functional evidence.",
       "command_scope": "Metadata/help/setup reference only; historical functional evidence retained separately. See native recipe for selected live workflow."
     },
     {
@@ -520,7 +520,7 @@
     {
       "id": "headroom",
       "repository": "https://github.com/headroomlabs-ai/headroom",
-      "version": "0.37.0",
+      "version": "0.40.0",
       "license": "Apache-2.0",
       "profile": "supporting",
       "role": "On-demand upstream MCP compression/retrieval and separately guarded offline artifact compression",
@@ -543,14 +543,14 @@
         "native-returned-results-20260921",
         "full-stack-convergence-20260921",
         "claude-upstream-checks-20260921",
-        "claude-repository-evidence-20260921"
+        "claude-repository-evidence-20260921", "2604-drift-version-readback-20261008"
       ],
       "upstream_sources": [
         "https://github.com/headroomlabs-ai/headroom",
-        "https://github.com/headroomlabs-ai/headroom/releases/tag/v0.37.0"
+        "https://github.com/headroomlabs-ai/headroom/releases/tag/v0.40.0"
       ],
-      "source_pin": null,
-      "freshness": "Installed tested pin 0.37.0 is stale through v0.39.1, the latest stable release published 2026-09-26T20:31:39Z (https://github.com/headroomlabs-ai/headroom/releases/tag/v0.39.1; GitHub releases/latest checked 2026-09-26). Canonical upstream is headroomlabs-ai/headroom; the historical repository identity remains an alias for catalog joins.",
+      "source_pin": "855390d6110e0bbb199d9b97025baac16c2f5cf3",
+      "freshness": "Installed version read back on 2026-10-08 as headroom, version 0.40.0, matching the vendor's v0.40.0 release at commit 855390d6110e0bbb199d9b97025baac16c2f5cf3. This metadata check does not refresh historical functional evidence. Canonical upstream is headroomlabs-ai/headroom; the historical repository identity remains an alias for catalog joins.",
       "command_scope": "Direct synthetic MCP compression/retrieval passed; global and isolated fixture ledgers remain separate. No automatic provider interception."
     },
     {
@@ -868,7 +868,7 @@
     {
       "id": "sandbox-runtime",
       "repository": "https://github.com/anthropics/sandbox-runtime",
-      "version": "0.0.77",
+      "version": "0.0.79",
       "license": "Apache-2.0",
       "profile": "supporting",
       "role": "On-demand OS isolation for selected native commands",
@@ -880,13 +880,13 @@
         "component-history",
         "token-practice-coverage-20260920",
         "native-sandbox-network-20260920",
-        "claude-repository-evidence-20260921"
+        "claude-repository-evidence-20260921", "native-sandbox-smoke-20261008"
       ],
       "upstream_sources": [
         "https://github.com/anthropics/sandbox-runtime"
       ],
-      "source_pin": "6fa731368807419ee157f9a3fac955fefe1019c6",
-      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json."
+      "source_pin": "d9aac2098351ca17f3743fbaf6ecbd0051b7e00e",
+      "freshness": "Repository pin updated on 2026-10-08 to upstream v0.0.79 after tag, release and package-version verification. Historical functional evidence remains dated; this metadata change performs no host installation or acceptance."
     },
     {
       "id": "serena",
@@ -1992,6 +1992,28 @@
         "https://nautilustrader.io/docs/latest/getting_started/installation/"
       ],
       "freshness": "Exact requested release candidate in isolated native prefix; upstream synthetic and later AAPL diagnostic replays accepted within their receipts. Frozen SPY parity and native Nautilus broker acceptance remain open; separate Alpaca paper evidence does not qualify the Nautilus adapter."
+    },
+    {
+      "id": "hindsight",
+      "repository": "https://github.com/vectorize-io/hindsight",
+      "version": "0.10.2",
+      "license": "MIT",
+      "profile": "supporting",
+      "role": "Research hypotheses and experiment records in trading-research; ai-memory remains the clients' coding memory",
+      "commands": [
+        "python3.13 -m venv ~/.local/share/hindsight/venv",
+        "~/.local/share/hindsight/venv/bin/pip install hindsight-api==0.10.2 hindsight-client==0.10.2",
+        "~/.local/share/hindsight/venv/bin/hindsight-api --host 127.0.0.1 --port 8888"
+      ],
+      "evidence_ids": [
+        "hindsight-research-memory-20261008"
+      ],
+      "source_pin": "5fc4ce20917b916240cef27c212c387a177f115b",
+      "upstream_sources": [
+        "https://github.com/vectorize-io/hindsight/tree/5fc4ce20917b916240cef27c212c387a177f115b",
+        "https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/hindsight-docs/docs/developer/installation.md#L229"
+      ],
+      "freshness": "Recorded NativeStack2604 vendor installation, CPU retrieval, gateway startup verification and synthetic native round trips accepted on 2026-10-08. Repository template recovery/allowlist fixes await a separate CC-cued host apply; recall quality, point-in-time exclusion and unchanged upstream tests remain outside this acceptance."
     }
   ],
   "profiles": [
@@ -2021,6 +2043,7 @@
       "component_ids": [
         "toon",
         "headroom",
+        "hindsight",
         "context-hub",
         "ast-grep",
         "repomix",

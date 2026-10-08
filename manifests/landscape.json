@@ -67,13 +67,13 @@
       "source_commit": "6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de"
     },
     {
-      "tag_name": "v0.0.77",
-      "published_at": "2026-09-18T22:09:16Z",
+      "tag_name": "v0.0.79",
+      "published_at": "2026-10-07T17:12:35Z",
       "prerelease": false,
-      "html_url": "https://github.com/anthropics/sandbox-runtime/releases/tag/v0.0.77",
+      "html_url": "https://github.com/anthropics/sandbox-runtime/releases/tag/v0.0.79",
       "target_commitish": "main",
       "repo": "anthropics/sandbox-runtime",
-      "source_commit": "6fa731368807419ee157f9a3fac955fefe1019c6"
+      "source_commit": "d9aac2098351ca17f3743fbaf6ecbd0051b7e00e"
     },
     {
       "tag_name": "v20.0.26",
@@ -91,6 +91,31 @@
     "https://code.claude.com/docs/en/best-practices",
     "https://docs.github.com/en/actions/reference/security/secure-use",
     "https://docs.github.com/en/billing/concepts/product-billing/github-actions"
+  ],
+  "research_memory_jobs": [
+    {
+      "id": "hindsight-research-memory",
+      "component_id": "hindsight",
+      "repo": "vectorize-io/hindsight",
+      "version": "0.10.2",
+      "source_commit": "5fc4ce20917b916240cef27c212c387a177f115b",
+      "job": "Retain and recall research hypotheses and experiment records for the research harness.",
+      "bank": "trading-research",
+      "status": "native operation accepted; coding memory remains ai-memory",
+      "recipe_path": "recipes/hindsight-research-memory.md",
+      "unit_template": "adoption/templates/systemd/hindsight-research.service",
+      "mcp_allowlist_template": "adoption/templates/systemd/hindsight-research.service.d/10-mcp-tools.conf",
+      "mcp_allowlist_environment_template": "adoption/templates/systemd/hindsight-research.mcp-tools.env.template",
+      "evidence_path": "evidence/artifacts/hindsight-research-memory-20261008/receipt.json",
+      "sources": [
+        "https://github.com/vectorize-io/hindsight/tree/5fc4ce20917b916240cef27c212c387a177f115b"
+      ],
+      "limitations": [
+        "Verbatim research recall selects types world and experience; observations are synthesized paraphrases.",
+        "Recall cannot hard-filter by time; backtest research must not rely on it for point-in-time exclusion.",
+        "Recorded synthetic integration checks do not establish research recall quality or trading results."
+      ]
+    }
   ],
   "recent_models": [
     {

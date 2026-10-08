@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "kind": "historical_native_integration_receipt_excerpt",
+  "recorded_at": "2026-10-08",
+  "authority": "CC082012Z section 1; bounded adoption after CC084038Z resume",
+  "original_private_receipt_sha256": "acc503d994e3e8a5e674d3b7818a93047f8982028682af2c381bf71b2175da88",
+  "new_model_run": false,
+  "upstream": {
+    "repository": "https://github.com/OrchestratorInc/agent-orchestrator",
+    "tag": "v0.13.4",
+    "commit": "e8a77577c14b015b947057d67c9171a78cdd5099",
+    "release_asset_sha256": "9f74ccdc2d5b518541a4079603fa0c19848ecf5d19857a3819274e1a00faa379",
+    "executable_sha256": "0f586960ef88f7e03e8b45f6cf1c1b10fca4576db7d5745d33a6d474306afb05"
+  },
+  "execution": {
+    "codex": "0.161.0",
+    "model": "gpt-6.1-sol",
+    "effort": "max",
+    "mode": "chat",
+    "authentication": "owner-approved AO native sign-in import inside isolated container",
+    "gateway_pool_used": false,
+    "rootless_container_runtime": "Docker 29.8.2",
+    "container_base": "rust@sha256:408fe88047cef61a2087653b0c5255fa51c0f2d6d94ddedd7a2562a9b91a46f6",
+    "ready_status": "ready/health ok",
+    "admission_http_status": 200,
+    "source_signin_bind_readonly": true,
+    "shared_native_home_direct_worker_launched": false
+  },
+  "fixture": {
+    "evidence_class": "local_integration",
+    "stimulus_class": "synthetic",
+    "repository": "seathatflowsinourveins/agent-harness",
+    "pr": 1,
+    "head": "9613571b4419a1dd0535d476d1e9b5eb5e44235b",
+    "check_id": 55867048325,
+    "check_context": "ao/trial2-deliberate",
+    "check_state": "failure",
+    "inline_finding_id": 4215868860,
+    "review_id": 5452807739,
+    "review_commit": "9613571b4419a1dd0535d476d1e9b5eb5e44235b",
+    "observed_at": "2026-10-08T06:56:05.768320316Z"
+  },
+  "historical_reported_gate_results": {
+    "G1": "PASS",
+    "G2": "PASS",
+    "G3": "PASS",
+    "scope": "one bounded PR/head/process; automatic feedback and acknowledgements only"
+  },
+  "current_evidence_assessment": {
+    "G1": "UNKNOWN",
+    "G2": "PASS for native owner/head/check view at the observed head",
+    "G3": "UNTESTED",
+    "G1_reason": "No vendor manual-cue counter or matched manual baseline measured; observed deliveries do not establish comparative reduction",
+    "G3_reason": "Poll count UNKNOWN and no repeated unresolved-condition evaluation recorded; one delivery per item does not demonstrate duplicate suppression",
+    "new_trial_or_baseline": false,
+    "original_private_receipt_changed": false
+  },
+  "native_counts": {
+    "claimed_prs": 1,
+    "failing_deliberate_checks": 1,
+    "unresolved_inline_findings": 1,
+    "automation_feedback_messages": 2,
+    "feedback_dedup_send_attempts": [1, 1],
+    "assistant_ack_ci_once": 1,
+    "assistant_ack_review_once": 1,
+    "completed_provider_turns": 3,
+    "poll_count": null,
+    "manual_cue_counter": null
+  },
+  "operator_observation": {
+    "manual_feedback_send_commands": 0,
+    "separate_manual_baseline_measured": false
+  },
+  "native_message_observations": [
+    {
+      "kind": "CI",
+      "automation_message_id_sha256": "a5b7c61d80237a94362c6a2b116d10b63c462a10bdf21e957ac261dc6a6dd551",
+      "provider_ack_message_id_sha256": "c853a39b686398773866450ae0a3aad80dc39c3e74b34fd248acf13ff2073ce7",
+      "matching_turn_id_sha256": "dba69f6a212311d27d41f1de6664b419cd7c6c7aa75f7af54332965cf5691e60",
+      "head_binding": "native check row and persisted CI signature; no head SHA in automation text"
+    },
+    {
+      "kind": "review",
+      "automation_message_id_sha256": "dd33487c183886e453adc2462b87ae6d2fe6db53b29cdc0e7ba3f340d231e1d6",
+      "provider_ack_message_id_sha256": "d60f79ef229a4b389fb4f9bb120030c8973cf4eeacf794b53ed213a25746ba9a",
+      "matching_turn_id_sha256": "4fbc9ce0010538258df24121c5a091d9af41f297d097a4b7cec008de3744513a",
+      "head_binding": "inline finding commit and supplied exact head"
+    }
+  ],
+  "limits": [
+    "Poll count and vendor manual-cue counter UNKNOWN; no elapsed-time estimate substituted",
+    "One delivery per item observed; repeated-opportunity duplicate suppression and persistence-failure/restart behavior not exercised",
+    "Changed-head feedback and control-session receiver not exercised",
+    "Worker command runner unavailable; independent worker head inspection and pushed fix not established",
+    "Earlier fixture omitted codex-code-mode-host; no repair or coding acceptance run",
+    "Before/after shared config and hooks hashes not captured; source mounts were not writable",
+    "Synthetic fixtures and local integration are not unchanged upstream acceptance tests"
+  ],
+  "preserved_failed_conditions": {
+    "clean_home_attempt": "HTTP 409 CODEX_ACCOUNT_AUTH_UNVERIFIED",
+    "clean_home_receipt_sha256": "50d8b9d394b4baff305d1d30ffa01de95233ff63481c8c2f9de45b738fea3f51",
+    "expanded_direct_route": "STOP_BEFORE_LAUNCH: actual workers inherit shared daemon CODEX_HOME without project override",
+    "direct_route_receipt_sha256": "869b6ca6193e91d25d900b408bddb0f66a2b5bb55368c97ff083db9bfd57219f"
+  },
+  "inverse_observations": {
+    "native_stop_exec_exit": 137,
+    "stop_exec_output_empty": true,
+    "container_exited_pid_zero": true,
+    "native_daemon_clean_shutdown": true,
+    "trial_listener_absent": true,
+    "test_pr_closed": true,
+    "merged": false,
+    "trial_branch_deleted": true,
+    "owned_container_worktree_and_state_removed": true,
+    "post_undo_login_status_exit": 0,
+    "post_undo_login_status": "Logged in using ChatGPT"
+  },
+  "counter_scope": "Native stored counts, separate operator send-command count; message/turn identifiers SHA256-normalized; no conversation text, credential values or private host configuration included"
+}

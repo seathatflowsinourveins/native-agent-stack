@@ -1,0 +1,133 @@
+{
+  "schema_version": 1,
+  "kind": "repository_integration_repair",
+  "recorded_at": "2026-10-08T14:41:40Z",
+  "pr": 854,
+  "failed_head": "22ec8936a41d646374af0fca1051053a68f79c6c",
+  "base_main": "eb5fee4db9a494729deb29bdf38dbabac23ee643",
+  "evidence_class": "local_integration",
+  "hosted_failure": {
+    "run_id": 37786314228,
+    "url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/37786314228",
+    "failed_shards": [0, 2, 3, 5, 7],
+    "required_job_id": 113344399443,
+    "counts": {"ran": 10010, "failures": 5, "errors": 1, "skipped": 769},
+    "native_result": "failure",
+    "scope": "The required validate job aggregates native shard modules. The earlier scripts/validate.py exit zero established manifest integrity only."
+  },
+  "corrections": [
+    {
+      "cause": "The selected Hindsight component was absent from the freshness snapshot.",
+      "red_command": "python3 scripts/landscape.py --root .",
+      "red_exit_code": 1,
+      "returned_error": "freshness snapshot must cover every selected component exactly once",
+      "repair": "Add only Hindsight through the existing snapshot component/scoped_refreshes convention, retaining four successful native public gh API observations and their output hashes.",
+      "path": "catalogs/landscape/upstream-snapshot.json",
+      "selected_version": "0.10.2",
+      "selected_and_release_source_pin": "5fc4ce20917b916240cef27c212c387a177f115b",
+      "primary_metadata_endpoints": ["repos/vectorize-io/hindsight", "repos/vectorize-io/hindsight/releases/latest", "repos/vectorize-io/hindsight/commits/5fc4ce20917b916240cef27c212c387a177f115b", "repos/vectorize-io/hindsight/commits/v0.10.2"],
+      "green_exit_code": 0
+    },
+    {
+      "cause": "The Hindsight recipe-map registration changed the maintained adoption-manifest source hash in the handbook projection.",
+      "red_command": "python3 scripts/build_new_wsl_handbook.py --check",
+      "red_exit_code": 1,
+      "returned_error": "stale generated output: docs/new-wsl-handbook.md; run --write",
+      "repair_command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "repair_exit_code": 0,
+      "scope": "The unchanged native builder generated both outputs. Mutable producer/output receipt bindings were refreshed with previous bindings and histories retained. Generated files were not edited by hand."
+    },
+    {
+      "cause": "The component/profile insertion moved the unchanged Nemotron revision's exact source line.",
+      "red_test": "tests.test_ecosystem_manifest.EcosystemManifestTests.test_repository_architecture_links_cite_the_owners_current_pin_fields",
+      "red_exit_code": 1,
+      "repair": "Change only the architecture selector manifests/stack.json:2095 to manifests/stack.json:2118; retain model revision c0c9fea93ea424587517f2c59e20db9f1d6bf615. Native-regenerate dependent source-hash projections again.",
+      "source": "docs/decisions/2026-10-01-new-wsl-architecture-edition.md",
+      "green_exit_code": 0
+    }
+  ],
+  "local_environment": {
+    "observed_hosted_image": "actions/runner-images ubuntu24/20261004.327, image 20261004.327.1",
+    "official_ubuntu_base": "ubuntu@sha256:534baea6a22c03a63003dbc8dbe78fe34bc0d7e595d9a9dc9834884ff530eb55",
+    "final_local_image_id": "sha256:56589137b95a4f475360e810c147747fa5dbe7bc966b84eea96476b9c83b2770",
+    "ubuntu_version": "24.04.5",
+    "python_version": "3.12.3",
+    "node_version": "22.23.3",
+    "npm_version": "10.9.9",
+    "git_version": "2.55.0",
+    "git_native_package": "1:2.55.0-0ppa1~ubuntu24.04.2 from git-core/ppa, matching the runner's supported install source",
+    "uv_version": "0.12.17",
+    "pip_version": "24.0",
+    "jq_version": "1.7",
+    "main_interpreter": "Ubuntu system CPython with the workflow's hash-locked requirements-ci/calendar packages and enabled user-site semantics",
+    "promotion_interpreter": "Separate native uv environment synced from blueprints/us-equities/data/requirements.lock",
+    "native_parser_pins": ["web-tree-sitter 0.27.0", "tree-sitter-bash 0.25.1", "yaml 2.9.0"],
+    "execution_user": "nonroot uid 1000",
+    "checkout": "Disposable writable copied full-history checkout; actual repair bytes were applied with native git apply. No host credential or client configuration was mounted.",
+    "remaining_boundaries": ["The Docker host kernel and Azure VM are not reproduced.", "Unneeded hosted preinstalled tools are not claimed equivalent.", "Native namespace and optional-tool skips remain skips, not acceptance."]
+  },
+  "native_first_attempts": [
+    {"shard":0,"shards":8,"ran":1625,"failures":23,"errors":2,"skipped":290,"executed_modules":31,"exit_code":1,"report_sha256":"f49b5b9f320eeed7fdf3e459fc9265d74f735fcc7c6c362bb5a6f90e3af82b72","log_sha256":"020b398b1d8a745ff0109d5f2761c07688c936944204e8ba281db4717f7256b1"},
+    {"shard":2,"shards":8,"ran":1747,"failures":8,"errors":0,"skipped":55,"executed_modules":35,"exit_code":1,"report_sha256":"020d988a3b911684b6d15b854abe1c3c6b3290c95ea62d9faa7afc8b3cd2eee0","log_sha256":"2f252126ad62e6ba82dca3dbdc3bbca08088e3bce82b2ee1449e766a7d893423"},
+    {"shard":3,"shards":8,"ran":1451,"failures":19,"errors":12,"skipped":163,"executed_modules":35,"exit_code":1,"report_sha256":"31fa0cd2e39b7480f6c4cfd99b54199bb983811818e1655b89d6c4ebcb29549d","log_sha256":"8ab9e2efe9d84d774a29765426c95d8b864f11454258837e12408951f5ab649c"},
+    {"shard":5,"shards":8,"ran":1298,"failures":0,"errors":1,"skipped":144,"executed_modules":35,"exit_code":1,"report_sha256":"7a94c0f48aa614dffd1ff25e3c67b197fd05ce327c11bd6f2c4d2b0a580bec35","log_sha256":"7d70a5f337094555267f458d80cff26a2b4aa20cb800f9eb3a8c02f5900105c6"},
+    {"shard":7,"shards":8,"ran":1485,"failures":3,"errors":37,"skipped":133,"executed_modules":35,"exit_code":1,"report_sha256":"3c1e20367b1e687d7ec01a1a7c516c01aadbfa3dbad1af4ee5dea1a1b15ea05b","log_sha256":"ab44e8aa4d8d92e376fc9bcaa80404424d6020abe7c3735f2eadcd1a48813b84"}
+  ],
+  "native_shard_command": "timeout --signal=ABRT --kill-after=60s 55m python3 scripts/validate_shards.py run -v --shard <observed shard> --shards 8 --report <owned report> --durations 50",
+  "first_attempt_interpretation": "All five hosted failing shard module groups were run without changing tests. Their original Hindsight failure paths passed; other existing fixtures exposed local environment differences. Preserve these failed local reports as failures, not an aggregate green suite.",
+  "environment_corrections": [
+    "Install demonstrated missing jq and runner utilities only inside the disposable image; retain all first-attempt failures.",
+    "Use nonroot execution to match the hosted install-plan fixtures.",
+    "Use writable disposable source for fixtures that create temporary files in the checkout.",
+    "Use system CPython user-site semantics for the native environment-mutation fixture.",
+    "Copy Git objects into the container's writable layer before the native --local hardlink fixture; retain the cross-device/overlay failures separately."
+  ],
+  "completed_module_rechecks": [
+    {"modules":["tests.test_frozen_evidence_reporting"],"ran":13,"failures":0,"errors":0,"skipped":0,"exit_code":0,"returned_output":"Ran 13 tests in 1.454s; OK","log_sha256":"f8d4418bba8b656c92d64d3d123063ec3a9d510921c1a9975e6f56bb2fc5adaf"},
+    {"modules":["tests.test_new_wsl_client_config","tests.test_new_wsl_definitive_defaults"],"ran":357,"failures":0,"errors":0,"skipped":1,"exit_code":0,"returned_output":"Ran 357 tests in 127.753s; OK (skipped=1)","log_sha256":"c9d77f19dddb168f5c936097a496f345866d096efae78773f965898762b0fd4e"},
+    {"modules":["tests.test_spy_parity"],"ran":179,"failures":0,"errors":0,"skipped":0,"exit_code":0,"returned_output":"Ran 179 tests in 0.134s; OK","log_sha256":"18607b589755a85b53285eff23694e3e81467dca5a28967311e5456cff9ff155"},
+    {"modules":["tests.test_adaptive_paper_credential_race","tests.test_render_config"],"ran":86,"failures":0,"errors":0,"skipped":0,"exit_code":0,"returned_output":"Ran 86 tests in 37.009s; OK","log_sha256":"0a19a55c9ac45944987a2dbd708703415f5f7790137e3be0716b8aa8e1989ecc"},
+    {"modules":["tests.test_adoption_version_probes","tests.test_osv_lockfile_coverage"],"additional_native_tests":["tests.test_token_e2e_grader.F19_Mutants.test_M31_user_base_dropped_from_the_allowlist","tests.test_token_e2e_grader.F27c_KeysOnRealContent.test_keys_at_the_pinned_revision"],"ran":85,"failures":0,"errors":0,"skipped":8,"exit_code":0,"returned_output":"Ran 85 tests in 34.677s; OK (skipped=8)","log_sha256":"7de70c10d65be268d18e74d856e78805e80bf364094c1204f42ffe0f99e75505"}
+  ],
+  "complete_original_affected_modules": {
+    "command": "python3 -m unittest tests.test_ecosystem_manifest tests.test_new_wsl_profile tests.test_new_wsl_handbook tests.test_catalog_freshness_propose tests.test_verdict_review_gate -v",
+    "ran":440,
+    "failures":0,
+    "errors":0,
+    "skipped":0,
+    "exit_code":0,
+    "returned_output":"Ran 440 tests in 211.711s; OK",
+    "log_sha256":"a3e6ad40249053d70c1569abc325a0c9065e3d4f358f0a37dd05c79874a70043",
+    "environment":"final_local_image_id, same hosted-runtime versions and exact workflow dependency pins"
+  },
+  "counting_scope":"The first shard attempts, failed intermediate rechecks and final module checks overlap. Their counts are separate observations and are never summed into a unique passing-test or provider-usage claim.",
+  "other_failed_attempts_retained":[
+    "The initial tracked-explorer fixture class exceeded an explicit 30000ms observation timeout; that result is unavailable, not passing.",
+    "Two intermediate targeted groups found the moved source locator and subsequent regenerated-source hash; the later seven-test group passed both.",
+    "An initial multi-check Python3.12 observation exceeded its explicit 20000ms timer; individually observable native checks later returned results.",
+    "Disposable clone preparation encountered local ownership/permission failures; a root-prepared copy was assigned to the nonroot test user. No host permission was changed.",
+    "The first 85-test environment recheck still failed the native hardlink fixture on an image-layer object. A copied writable object tree made the unchanged fixture and final 85-test group pass."
+  ],
+  "pending_at_recording": ["Final integrity/checksum registration", "New-head hosted checks"],
+  "correction_log": [
+    {"anti_pattern":"Selected-component registration without derived freshness coverage","prevention":"Run the selected-ID coverage and native generated-output checks plus actual hosted modules before treating integrity validation as CI readiness."},
+    {"anti_pattern":"Source insertion without exact locator rebinding","prevention":"Verify the owning ID and exact version/revision field after every source-line shift; keep dated pins intact."},
+    {"anti_pattern":"Minimal distribution image treated as the complete hosted runner","prevention":"Match actual interpreter/tool versions and job locks, reproduce nonroot/writable/user-site semantics, retain every environment failure and leave AzureVM/kernel differences explicit."}
+  ],
+  "sources": [
+    "https://github.com/vectorize-io/hindsight/tree/5fc4ce20917b916240cef27c212c387a177f115b",
+    "https://github.com/seathatflowsinourveins/native-agent-stack/blob/22ec8936a41d646374af0fca1051053a68f79c6c/.github/workflows/validate.yml",
+    "https://github.com/actions/runner-images/blob/ubuntu24/20261004.327/images/ubuntu/Ubuntu2404-Readme.md",
+    "https://github.com/actions/runner-images/blob/ubuntu24/20261004.327/images/ubuntu/scripts/build/install-git.sh",
+    "https://raw.githubusercontent.com/docker-library/official-images/master/library/ubuntu",
+    "https://nodejs.org/dist/v22.23.3/SHASUMS256.txt",
+    "https://github.com/astral-sh/uv/releases/tag/0.12.17",
+    "scripts/host_receipts.py",
+    "scripts/build_new_wsl_handbook.py",
+    "scripts/validate_shards.py",
+    "docs/decisions/2026-10-01-new-wsl-architecture-edition.md"
+  ],
+  "provenance": "Native logs/reports and post-hook CommandExecution events are retained in lane-owned private state. Public commands are container-internal native invocations or path-parameter templates, not a claim of byte-identical host argv. Log hashes bind the actual retained outputs.",
+  "not_claimed": ["A passing complete hosted run at this recorded time", "All eight native local shards passing as one aggregate", "New unchanged upstream tests", "Provider/model/GPU execution", "Research recall quality or trading acceptance", "Host template apply or deployment", "A causal token-saving measurement"],
+  "usage": {"new_provider_acceptance_calls":0,"provider_session_usage":null,"usage_scope":"Ordinary native coordination sessions are not a new provider acceptance experiment; exact session usage is unknown."}
+}

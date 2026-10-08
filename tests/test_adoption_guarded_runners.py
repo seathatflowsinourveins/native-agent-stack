@@ -408,7 +408,7 @@ class BoundedRunContainmentTests(unittest.TestCase):
             'cat /proc/self/cgroup > "$ORACLE_CGROUP"\n'
             'job_path=$(cut -d: -f3 /proc/self/cgroup)\n'
             '/usr/bin/systemctl --user show "${job_path##*/}"'
-            ' -p TasksCurrent -p MemoryMax -p SubState --value > "$ORACLE_UNIT"\n'
+            ' -p TasksCurrent -p MemoryMax -p SubState > "$ORACLE_UNIT"\n'
             'cat "/sys/fs/cgroup$job_path/memory.max"'
             ' "/sys/fs/cgroup$job_path/pids.max" > "$ORACLE_LIMITS"\n'
         )
@@ -442,12 +442,15 @@ class BoundedRunContainmentTests(unittest.TestCase):
         #    scope holding this job while the job is still inside it.
         self.assertTrue(unit_oracle.is_file(),
                         "the job could not query its own systemd unit")
-        properties = unit_oracle.read_text(encoding="utf-8").split()
+        properties = dict(line.split("=", 1) for line in
+                          unit_oracle.read_text(encoding="utf-8").splitlines() if "=" in line)
         self.assertEqual(
             len(properties), 3,
             f"systemd did not report {unit} as a unit: {properties!r}",
         )
-        tasks_inside, memory_max, sub_state = properties
+        self.assertEqual(set(properties), {"TasksCurrent", "MemoryMax", "SubState"})
+        tasks_inside, memory_max, sub_state = (properties[name] for name in
+                                             ("TasksCurrent", "MemoryMax", "SubState"))
         self.assertTrue(
             tasks_inside.isdigit() and int(tasks_inside) >= 1,
             f"{unit} reported TasksCurrent={tasks_inside!r} while the job ran",

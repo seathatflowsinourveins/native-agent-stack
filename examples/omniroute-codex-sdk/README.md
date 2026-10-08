@@ -52,7 +52,7 @@ dispatcher, called this worker through Bash, and the full native SDK result
 shows one unchanged `npm test` command with exit0. This bounded read-only call
 qualifies the caller path; the separate Claude SDK gateway bridge remains a trial.
 
-The default endpoint is the selected loopback gateway at port 20128. An owned
+The default endpoint is the NativeStack2604 loopback gateway at port 21128. An owned
 reverse observer can be supplied with `--base-url`; the worker never changes
 gateway compression engines or native coordinator configuration. The default
 model is the explicit `cx/gpt-6.1-sol-max` route, with native reasoning effort

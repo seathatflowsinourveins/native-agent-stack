@@ -1,0 +1,145 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-08",
+  "kind": "trading_2604_backtest_pipeline",
+  "label": "pipeline-E2E",
+  "task": "task-ns2604-coop-20261008T063928Z: 5b re-scope",
+  "status": "passed",
+  "exit_code": 0,
+  "evidence_class": "native_pipeline_integration_with_simulated_execution",
+  "scope": "Official SDK acquisition -> ParquetDataCatalog -> BacktestNode -> native reports; pipeline E2E only.",
+  "metrics_evidence_class": "pipeline checks only",
+  "strategy_evidence_eligible": false,
+  "source_receipts": [
+    {
+      "file": "receipt.json",
+      "sha256": "09d108addb6f21ea539c56703d78b87cf2725e97527524a3fc9318e37bd9d52e",
+      "completed_at": "2026-10-08T06:30:17.957144+00:00",
+      "preserved_unchanged": true
+    },
+    {
+      "file": "receipt.pipeline-E2E.json",
+      "sha256": "d6686e1c0500ed22367cda5d458007c1b5939b386b96933b39a20a800a4d4447",
+      "recorded_at": "2026-10-08T06:46:46Z",
+      "relationship": "Classifies the original observation; it does not replace or alter the original native results or raw reports."
+    }
+  ],
+  "runtime": {
+    "nautilus_trader_version": "2.0.0rc5",
+    "alpaca_py_version": "0.44.0",
+    "uv_lock_sha256": "1fb9f8ca6fef9c47a4ded826ddf20012f78d6643926cce3a36b86c674f55eb9c"
+  },
+  "upstream_sources": [
+    {
+      "repository": "nautechsystems/nautilus_trader",
+      "revision": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+      "version": "2.0.0rc5",
+      "retained_files": [
+        {"path": "docs/getting_started/quickstart.py", "sha256": "487e6807dedd1a38062638eb671f6110799451611819542bf0f0c10646cb2c53"},
+        {"path": "docs/getting_started/backtest_high_level.py", "sha256": "98a8de7fcde50331741cbd5919df9b049fa58c168bb61469bc0129711473863c"},
+        {"path": "docs/concepts/instruments/equity.md", "sha256": "b2bb259314a6e9f83453d08da103a583df40e8d5d845675f787cb36087f35db8"},
+        {"path": "examples/backtest/model_configs_example.py", "sha256": "0cb7ce8fd4a7cd1b825b4eac39e424bafaea484cd9487dcddab6a304d472f332"},
+        {"path": "crates/backtest/src/python/node.rs", "sha256": "c32a2578c3d8e6fb3cf601a608422e7d2a77dcde23b594db6047fb851daf5ab0"},
+        {"path": "crates/analysis/src/statistics/max_drawdown.rs", "sha256": "75332f21b025a41587d175fd5eed3105a9a4f13b795c6837714388efadce0344"}
+      ]
+    },
+    {
+      "repository": "alpacahq/alpaca-py",
+      "revision": "cc4cb3b7ba50ae250e621983c2779047fb16bb28",
+      "version": "0.44.0",
+      "native_interfaces": ["StockHistoricalDataClient", "StockBarsRequest", "CorporateActionsClient"]
+    }
+  ],
+  "inputs": {
+    "symbols": ["AAPL", "MSFT", "AMZN", "GOOG"],
+    "session_dates": ["2025-01-06", "2025-01-31"],
+    "timeframe": "1Day",
+    "feed": "sip",
+    "adjustment": "raw",
+    "bar_counts": {"AAPL": 18, "AMZN": 18, "GOOG": 18, "MSFT": 18},
+    "price_policy": "Four-decimal raw OHLC values preserved exactly; SIM whole-share instruments, not broker instrument qualification.",
+    "timestamp_policy_as_executed": "Provider daily-session midnight + 24h; ts_event=ts_init",
+    "timestamp_qualification": "The original convention is retained as executed. Its XNYS-close correction belongs to the later Layer 1.5 entrance exam; this derivative does not retime or rerun the original bars.",
+    "catalog_receipt_sha256": "171591ff04b895bea4f29d383e148e57b64471f7ea2baad4508e41586e724d26",
+    "retained_responses": [
+      {"kind": "historical_bars", "http_status": 200, "observed_at": "2026-10-08T06:24:40.259797+00:00", "bytes": 8174, "sha256": "b46bd832130939c8a7a0e65c8f8d7fc0bcdeb8a22354467f72d91051e4d165b9", "next_page_token": null},
+      {"kind": "corporate_actions", "http_status": 200, "observed_at": "2026-10-08T06:24:40.351724+00:00", "bytes": 47, "sha256": "fea17f17380b7eb24c760478974fddd2b3525612ac6076eb0b5bc5ab078d3b08", "next_page_token": null}
+    ],
+    "new_acquisition_during_classification_or_publication": false
+  },
+  "simulation": {
+    "venue": "SIM",
+    "account_type": "CASH",
+    "oms": "NETTING",
+    "bar_execution": true,
+    "fees_and_slippage": "Vendor default simulated fills and zero instrument fees; execution realism is unqualified.",
+    "fixed_schedule": "Buy 10 whole shares per symbol at bars 1 and 12; close at bars 10 and 16; cleanup at stop.",
+    "fixed_schedule_reference": "docs/getting_started/quickstart.py:61-70,89-108 at the rc5 source pin",
+    "strategy_source_sha256": "fdb2e0f131b86ebf5e376217ca77ce9be6e134a9be2fa0ac693d65ced95c747b",
+    "broker_order_submissions": 0,
+    "llm_labeler_calls": 0,
+    "package_adapter_reused": false
+  },
+  "returned_runs": {
+    "run_count": 2,
+    "exit_codes": [0, 0],
+    "economic_result_json_sha256_for_both": "a80a5c43ce1481822e05a24247181f8a1a0af214372ebd24bd8cab4dda3d8020",
+    "economic_results_exactly_identical": true,
+    "native_summary_sha256_for_both": "19d2ef25296d71fa01384476dd4672efd51cd0a56e14356a09f1f4aacab941a2",
+    "account_csv_sha256_for_both": "6c6b7ce76dbf463a608d41bd5602feddf3f1f757efeee2fc55278230e418124a",
+    "report_hashes": [
+      {"run": 1, "fills.csv": "ec5740be27ae32dd4afd8369ae840da7026fe577f5ce15db1ddabfefb8689189", "order-fills.csv": "aa62e6278bfc4e157a92ea80af746a926f4379f73cff0ae42a287f1caa948ddf", "positions.csv": "a6732dce47ea26762b5fdbe0a97db95cc567791cd3bfd5aa6660adb52f18c327", "native-drawdown.json": "408f4d8637ea1b6d71f0f40c554511af0c702ccdc1835cfc700e230c572ce9f3"},
+      {"run": 2, "fills.csv": "96708315bacda20277b14db87cb0a3ad8f7c85bf617663213c544ad45e4dd7f6", "order-fills.csv": "26be9fcb0301de5a3aa7cc1074d8095f469eb0c0d71be27f84731be24f6da20a", "positions.csv": "34f105da021acfb5ba488f1111daf8e5d5d8f50170690ae089b274fae65da6db", "native-drawdown.json": "9c2e38e02f475cbf569ebfa9f5a79b2758c2251c1f0ef799e6dcfb97a0ce0d3c"}
+    ],
+    "raw_reports_byte_identical": false,
+    "report_equality_boundary": "Native init/event UUIDs and closed-position snapshot UUIDs differ. Original reports remain unchanged; report equality requires normalization of only UUID strings.",
+    "new_backtests_during_classification_or_publication": false
+  },
+  "pipeline_metrics": {
+    "interpretation": "Native pipeline diagnostics only; ineligible for strategy performance, edge, ranking quality or north-star strategy acceptance.",
+    "order_count": 16,
+    "trade_count_closed_round_trips": 8,
+    "pnl_usd": -63.69999999999709,
+    "return_percent": -0.06369999999999709,
+    "sharpe_ratio_252_days": -0.3708004940592432,
+    "max_drawdown_fraction": -0.004065999999999792
+  },
+  "metric_sources": {
+    "pnl_and_return": "Native BacktestResult.stats_pnls USD PnL (total) and PnL% (total)",
+    "sharpe": "Native BacktestResult.stats_returns Sharpe Ratio (252 days)",
+    "trade_count": "Native BacktestResult.total_positions, eight closed rows in each positions report and zero open cache positions",
+    "max_drawdown": "Absent from rc5's default result set; rc5 native MaxDrawdown.calculate_from_returns was applied to each retained native returns_series with equal returned values. No local formula."
+  },
+  "layer_1_5": {
+    "entrance_exam_green": false,
+    "cik_anchored_identity_map": "Not performed or accepted for this run",
+    "split_triple_check": "Not performed; only the retained official Alpaca corporate-actions response is available",
+    "terminal_price_resolution": "Not performed or accepted for this run",
+    "single_provider_corporate_actions": "An empty result for the selected symbols and dates, with terminal pagination retained, is a stand-in and does not satisfy the Layer 1.5 gates.",
+    "citation_boundary": "No strategy number is qualified while these gates remain unmet."
+  },
+  "retained_failed_conditions": {
+    "attempts_log_sha256": "084858f5e1caaef5d728f48b53054e67d5ef678393f639ac7c2ddefdd2d0c0f7",
+    "conditions": [
+      "Initial runtime API inspection exited 1: BacktestNode uses the 2.x nautilus_trader.backtest export, not the older backtest.node path. No HTTP request or simulation occurred.",
+      "Two guessed rc5 documentation paths returned HTTP 404; the upstream source tree supplied docs/getting_started/backtest_high_level.py. These were historical discovery failures.",
+      "Acquisition attempt 1 exited 1 before any HTTP call because request metadata's TimeFrame required string serialization; original source was retained and no raw response was overwritten.",
+      "Catalog attempt 1 exited 1 because the native ParquetDataCatalog local root did not yet exist; original driver was retained and no bar or instrument had been written."
+    ]
+  },
+  "verification": {
+    "matched_original_artifact_hashes": 39,
+    "matched_original_vendor_source_hashes": 6,
+    "mismatches": 0,
+    "scope": "Read-only verification of retained anchors to publish this derivative; no native acquisition, simulation or unchanged upstream test suite was rerun."
+  },
+  "limitations": [
+    "Layer 1.5 CIK mapping, independent split reconciliation and terminal-price resolution remain unperformed and unaccepted.",
+    "Historical bars observed in October 2026 do not reconstruct as-known historical information or a point-in-time universe.",
+    "The original provider-midnight-plus-24h timestamp convention remains as executed; XNYS-close correction is a later entrance-exam action.",
+    "Default simulated bar fills and zero instrument fees do not demonstrate execution realism or the package's cost assumptions.",
+    "No package adapter adoption, LLM-labelled feature, strategy optimization, performance ranking, broker operation or north-star strategy acceptance occurred.",
+    "The classification and public receipt reuse the two retained native runs; they are not new model, acquisition or backtest runs."
+  ],
+  "sanitization": "Allowlisted pins, artifact hashes, aggregate native results and qualification limits only. Personal and host paths, account and credential identifiers, private active configuration, conversations, process fields and raw provider/report contents are omitted. Original private receipts and failed-attempt records remain unchanged."
+}

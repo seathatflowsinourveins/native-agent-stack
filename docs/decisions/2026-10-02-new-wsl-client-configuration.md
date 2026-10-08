@@ -1220,3 +1220,71 @@ remain intact; this amendment supplies no host apply.
 
 ```text
 ```
+### Amendment 2026-10-08 — NativeStack2604 shell identity
+
+CC065432Z adds `WSL_DISTRO_NAME = "NativeStack2604"` to the explicit Codex
+environment so host-guarded scripts retain the distribution identity under
+`inherit = "none"`. The native `new_wsl_client_config.py --check --json`
+command returned 0 and supplies these current counts: Today: 401 pieces,
+361 wired (209 practice, 152 through a slot), 24 not wired (0 through a slot that does not
+install, 24 by their own entry) and 16 authorization pieces. Earlier dated
+counts remain historical. This is render consistency, without a host apply.
+
+### Declared test changes — PR #846 (2026-10-08)
+
+CC115648Z (2026-10-08 11:56:48Z) rules these two changed expectations under
+[`docs/command-center.md`, Landing](../command-center.md#landing). The old
+contracts are from PR base `7a3637f5`; the new contracts are present at
+`20e52faf`. This declaration records the existing changes.
+
+1. `tests.test_adoption_bootstrap_macos.TokenEfficiencyPlanTests.test_the_headroom_plan_line_names_the_wheel_install_uv_tool_verifies`
+
+   The expected plan line follows the Headroom version, macOS arm64 wheel and
+   SHA256 in [`adoption/pins-macos-arm64.json`](../../adoption/pins-macos-arm64.json).
+   The test accepts whitespace between plan columns. Old expected line:
+
+   ```text
+   plan headroom 0.37.0 uv-tool headroom_ai-0.37.0-cp310-abi3-macosx_11_0_arm64.whl sha256=b4392f68a8d02d74c62c1734cf5bf327511dcc72678f01669f44f0612944d59c
+   ```
+
+   New expected line:
+
+   ```text
+   plan headroom 0.40.0 uv-tool headroom_ai-0.40.0-cp310-abi3-macosx_11_0_arm64.whl sha256=f7b0186ad5e76d5c8f75e5de6c57e001637258ead75481575ccca4d57557f5fb
+   ```
+
+   This matches the Headroom 0.40.0 upgrade in Window U, the vendor's
+   [0.40.0 release](https://pypi.org/project/headroom-ai/0.40.0/), and the
+   [recorded native version readback](../../evidence/receipts/2604-drift-version-readback-20261008.json).
+   The wheel suffix, exact digest, successful plan and no-download assertions
+   remain required.
+
+2. `tests.test_new_wsl_client_config.RenderTests.test_the_codex_config_meets_what_the_codex_home_tool_requires`
+
+   The old sorted `shell_environment_policy.set` key list was
+   `DOCKER_HOST, HOME, LANG, MCP_AUTO_OPEN_ENABLED, PATH, RTK_TELEMETRY_DISABLED, TERM, TMPDIR, XDG_RUNTIME_DIR`.
+   The new list is
+   `DOCKER_HOST, HOME, LANG, MCP_AUTO_OPEN_ENABLED, PATH, RTK_TELEMETRY_DISABLED, TERM, TMPDIR, WSL_DISTRO_NAME, XDG_RUNTIME_DIR`,
+   with the added assertion `WSL_DISTRO_NAME == "NativeStack2604"`.
+   `inherit == "none"` remains required. The new contract follows
+   [`adoption/new-wsl/templates/codex.config.additions.toml`](../../adoption/new-wsl/templates/codex.config.additions.toml)
+   and preserves the distribution identity checked by
+   [`accept-trading-2604.sh:49`](../../blueprints/us-equities/runtime-2604/accept-trading-2604.sh#L49).
+   CC115648Z records that the host fix was applied on 2026-10-08, confirmed
+   HOST-OK in a fresh session, and closes readiness-runner's host-guard gap.
+   That confirmation is CC-recorded host evidence; this amendment is source review.
+
+## Addendum 2026-10-08: coordinator research-routing hook
+
+CC correction #76 adds three wired practice pieces: the research-routing guard's
+PreToolUse handler, its UserPromptSubmit reset handler and its checksum-bound
+copied hook file. The native `new_wsl_client_config.py --check` at the reviewed
+integration reports this updated projection; earlier dated counts above remain
+historical observations. The hook scope, producer adapter, test contracts and
+post-landing application are in
+[the coordinator research-routing decision](2026-10-08-coordinator-research-routing.md).
+
+Today: 404 pieces, 364 wired (212 practice, 152 through a slot), 24 not wired
+(0 through a slot that does not install, 24 by their own entry) and 16 authorization
+pieces. The existing `authorization: 16`, and 24 pieces are not wired, remain
+unchanged. This is the repository wiring projection, not fresh host acceptance.

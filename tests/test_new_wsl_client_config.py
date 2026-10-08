@@ -1391,7 +1391,7 @@ class AgentGapTests(unittest.TestCase):
         selected = {skill["name"] for skill in json.loads((ROOT / cfg.SKILLS_MANIFEST_REL).read_text())["skills"]
                     if skill.get("status") not in ("pruned", "held")}
         self.assertEqual(plan["skills"], frozenset(selected))
-        self.assertEqual(len(plan["skills"]), 24)
+        self.assertEqual(len(plan["skills"]), 27)
         self.assertTrue({"tdd", "diagnosing-bugs", "codebase-design", "writing-for-agents", "skill-creator"} <= plan["skills"])
         self.assertEqual({"grill-me", "improve-codebase-architecture", "semgrep", "agent-browser", "domain-modeling",
                           "setup-matt-pocock-skills"} & plan["skills"], set())
@@ -1569,7 +1569,7 @@ class RenderTests(unittest.TestCase):
         ai_memory = "/home/example/.local/bin/ai-memory "
         audit = "jq -c '{timestamp: now | todate, source: .source, file: .file_path}' >> ~/claude-config-audit.log || true"
         self.assertEqual(events["ConfigChange"], [audit])
-        self.assertEqual(sum(".claude/hooks/" in command for command in commands), 4)
+        self.assertEqual(sum(".claude/hooks/" in command for command in commands), 6)
         self.assertTrue(all(".claude/hooks/" in command or command.startswith(ai_memory) or command in ("rtk hook claude", audit)
                             for command in commands), commands)
         self.assertTrue(any(command.startswith(ai_memory) for command in events["SessionStart"]), events)
@@ -1670,8 +1670,9 @@ class RenderTests(unittest.TestCase):
         policy = config["shell_environment_policy"]
         self.assertEqual(policy["inherit"], "none")
         self.assertEqual(sorted(policy["set"]), ["DOCKER_HOST", "HOME", "LANG", "MCP_AUTO_OPEN_ENABLED", "PATH",
-                                                 "RTK_TELEMETRY_DISABLED", "TERM", "TMPDIR", "XDG_RUNTIME_DIR"])
+                                                 "RTK_TELEMETRY_DISABLED", "TERM", "TMPDIR", "WSL_DISTRO_NAME", "XDG_RUNTIME_DIR"])
         self.assertEqual(policy["set"]["HOME"], "/home/example")
+        self.assertEqual(policy["set"]["WSL_DISTRO_NAME"], "NativeStack2604")
         # The user's systemd runtime directory, for systemctl --user and the messaging courier, and the rootless Docker
         # socket in it (wave-2 custody ruling, change 7; synthesis X12): the id of the user the tool runs as.
         self.assertEqual(policy["set"]["XDG_RUNTIME_DIR"], f"/run/user/{os.getuid()}")
@@ -1704,7 +1705,7 @@ class RenderTests(unittest.TestCase):
             "headroom": {"enabled_tools": ["headroom_compress", "headroom_retrieve", "headroom_stats"]},
             "context-mode": {"disabled_tools": ["ctx_upgrade", "ctx_purge"]}})
 
-    def test_no_text_names_a_tool_that_the_manifest_does_not_install(self):
+    def test_no_service_reference_names_a_tool_that_the_manifest_does_not_install(self):
         names = unwired_names_independently()
         # Reproduced failure: hcom was still asserted unwired after wave 5 made
         # it an installed owner. Keep the original name set and verify both
@@ -1733,7 +1734,7 @@ class RenderTests(unittest.TestCase):
                 if name == "wiring.json":
                     continue
                 # The scan is the tool's: --check runs the same function on the same renders, with the tool's names.
-                self.assertEqual(cfg.name_hits(text, names), [], f"{label} the option: {name}")
+                self.assertEqual(cfg.rendered_name_hits(name, text, names), [], f"{label} the option: {name}")
 
     def test_the_same_scan_finds_those_names_in_the_old_full_profile_render(self):
         # Negative control: the render of the old workstation profile (every template piece) is full of them.
@@ -1810,6 +1811,23 @@ class RenderTests(unittest.TestCase):
             with self.subTest(mode=mode):
                 self.assertEqual(run_main(*mode, "--host", "../example")[0], 2)
 
+    def test_coordinator_research_hooks_render_native_matchers_without_globally_marking_sessions(self):
+        settings = json.loads(self.files["settings.json"])
+        self.assertNotIn("NAS_RESEARCH_COORDINATOR_ROLE", settings["env"])
+        self.assertNotIn("NAS_RESEARCH_COORDINATOR_SESSION_ID", settings["env"])
+        command = 'python3 "/home/example/.claude/hooks/research-routing-guard.py"'
+        groups = [group for group in settings["hooks"]["PreToolUse"]
+                  if any(hook["command"] == command for hook in group["hooks"])]
+        self.assertEqual(len(groups), 1)
+        matcher = groups[0]["matcher"]
+        for tool in ("WebSearch", "WebFetch", "mcp__plugin_context-mode_context-mode__ctx_fetch_and_index",
+                     "mcp__context-mode__ctx_fetch_and_index", "mcp__context_mode__ctx_fetch_and_index"):
+            self.assertIsNotNone(re.fullmatch(matcher, tool), tool)
+        for tool in ("Bash", "UnrelatedWebSearch", "mcp__unrelated__ctx_fetch_and_index"):
+            self.assertIsNone(re.search(matcher, tool), tool)
+        resets = [hook for group in settings["hooks"]["UserPromptSubmit"] for hook in group["hooks"]]
+        self.assertEqual([hook["command"] for hook in resets], [command])
+
     def test_every_wired_hook_runs_a_file_the_repository_copies_with_its_checksum(self):
         settings = json.loads(self.files["settings.json"])
         overlay = json.loads(self.files["settings.linux-wsl2.overlay.json"])
@@ -1819,7 +1837,8 @@ class RenderTests(unittest.TestCase):
                 for group in groups:
                     for hook in group["hooks"]:
                         referenced.update(re.findall(r"\.claude/hooks/([A-Za-z0-9_.-]+)", hook["command"]))
-        self.assertEqual(referenced, {"secret_path_guard.py", "effort-default-guard.py", "currency-due-notice.py"})
+        self.assertEqual(referenced, {"secret_path_guard.py", "effort-default-guard.py", "currency-due-notice.py",
+                                      "research-routing-guard.py"})
         for name in referenced:
             source = icp.HOOKS[name]
             self.assertTrue(source.is_file(), name)
@@ -2700,7 +2719,8 @@ class ApplyTests(ApplyCase):
         code, out, _ = self.apply()
         self.assertEqual(code, 0, out[-800:])
         hooks = sorted(p.name for p in (self.home / ".claude/hooks").iterdir())
-        self.assertEqual(hooks, ["currency-due-notice.py", "effort-default-guard.py", "secret_path_guard.py"])
+        self.assertEqual(hooks, ["currency-due-notice.py", "effort-default-guard.py", "research-routing-guard.py",
+                                 "secret_path_guard.py"])
         for name in hooks:
             self.assertEqual(hashlib.sha256((self.home / ".claude/hooks" / name).read_bytes()).hexdigest(),
                              icp.expected_sha256(icp.HOOKS[name]))
@@ -2711,7 +2731,7 @@ class ApplyTests(ApplyCase):
         # The repository's hooks and the overlay's Notification, and the events ai-memory's hooks take (an interim install).
         self.assertEqual(sorted(settings["hooks"]), ["ConfigChange", "Notification", "PostToolUse", "PreCompact", "PreToolUse",
                                                      "SessionEnd", "SessionStart", "Stop", "SubagentStart",
-                                                     "SubagentStop"])
+                                                     "SubagentStop", "UserPromptSubmit"])
         self.assertEqual(settings["env"]["PATH"].split(":")[:3],
                          [f"{self.eco}/bin", f"{self.home}/.local/bin", f"{self.home}/.local/share/mise/shims"])
         codex = self.home / ".codex"
@@ -3841,6 +3861,23 @@ class AcknowledgementGateTests(ApplyCase):
 
 class RenderedScanTests(unittest.TestCase):
     """--check renders the example host, without and with the authorization settings, and scans every file."""
+
+    def test_a_skill_override_identifier_does_not_require_its_namesake_service(self):
+        rendered = {"settings.json": json.dumps({"skillOverrides": {"loki": "on"}})}
+        with mock.patch.object(cfg, "render", return_value=rendered):
+            self.assertEqual(cfg.rendered_name_errors(ROOT), [])
+
+    def test_an_unwired_service_reference_is_found_outside_skill_identifiers(self):
+        for settings in (
+            {"skillOverrides": {"loki": "on"}, "env": {"LOG_ENDPOINT": "http://loki:3100"}},
+            {"skillOverrides": {"loki": "on"}, "mcpServers": {"loki": {"command": "loki"}}},
+            {"skillOverrides": {"loki": "use loki"}},
+        ):
+            with self.subTest(settings=settings):
+                with mock.patch.object(cfg, "render", return_value={"settings.json": json.dumps(settings)}):
+                    errors = cfg.rendered_name_errors(ROOT)
+                self.assertEqual(len(errors), 2)
+                self.assertTrue(all("settings.json names Loki, which is not wired" in error for error in errors), errors)
 
     def test_the_repository_render_names_no_tool_that_is_not_wired_either_way(self):
         self.assertEqual(cfg.rendered_name_errors(ROOT), [])

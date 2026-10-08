@@ -26,6 +26,8 @@ the coordinator removed `validate-macos` from live ruleset 23739774 at 2026-10-0
 The coordinator's read-back at 02:52Z confirmed the seven contexts below, strict false and enforcement active.
 The committed target [`.github/main-ruleset.json`](../.github/main-ruleset.json) carries the same contexts.
 
+The Actions allow-list and harness description below were checked against live settings and pinned sources on 2026-10-08.
+
 - **Required checks** (job IDs from GitHub Actions, app ID 15368; strict up-to-date checks off): `validate`,
   `token-report`, `secret-scan`, `dependency-review`, `osv-scanner`, `verdict-review-gate` and
   `sota-sources`. Renaming one of these jobs, or giving it a job-level `name:`, orphans its required check.
@@ -54,15 +56,30 @@ The committed target [`.github/main-ruleset.json`](../.github/main-ruleset.json)
   carries the osv-scanner, zizmor and Scorecard SARIF. Dependabot version updates cover GitHub Actions only (weekly,
   7-day cooldown), and Dependabot security updates are on.
 - **Actions.** Every `uses:` is pinned to a full commit SHA, which the repository also requires. The allow-list is
-  GitHub-owned actions plus `step-security/harden-runner` and `ossf/scorecard-action`. No agent action runs in CI:
-  only the catalog-freshness `propose` job holds `pull-requests: write`, and no workflow reviews or approves a pull
+  GitHub-owned actions plus the four external patterns `step-security/harden-runner@*`, `ossf/scorecard-action@*`,
+  `anthropics/claude-code-action@*` and `oven-sh/setup-bun@*`; verified-publisher actions are not separately allowed.
+  The pinned Claude action's composite bootstrap uses `oven-sh/setup-bun` when no custom Bun executable is supplied;
+  the repository has no direct workflow reference to it. Only the catalog-freshness `propose` job holds
+  `pull-requests: write`, and no workflow reviews or approves a pull
   request (`test_pull_requests_write_is_granted_only_to_the_propose_job`,
   `test_no_workflow_reviews_or_approves_a_pull_request`).
+- **Harness audit.** The weekly and manually dispatched [`harness-audit.yml`](../.github/workflows/harness-audit.yml)
+  runs only on `main`, using `anthropics/claude-code-action` v1.0.245 at
+  [`6fed3ca145920b639991cb756090506e1bcaf515`](https://github.com/anthropics/claude-code-action/blob/6fed3ca145920b639991cb756090506e1bcaf515/action.yml).
+  Its job grants `contents: read`, `id-token: write` and `issues: write` over an empty workflow permission default.
+  Anthropic workload identity federation exchanges GitHub's OIDC token using the four configured repository variables;
+  the workflow fetches a pinned, SHA-256-verified audit prompt, asks for a project-scoped read-only audit and one
+  scorecard issue, and allows only `gh issue create` as a Bash tool. Hosted acceptance remains open after
+  [run 37739403956 failed](https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/37739403956).
+  The owner checks the native [Claude Console federation history](https://platform.claude.com/settings/workload-identity-federation?tab=history)
+  for the reason and corrects the relevant rule or claim; the Console denial reason is not established by the retained
+  workflow evidence.
 - **Against the final catalog of 2026-10-01** (`docs/final-catalog-20261001.md`, #595): the picks each blind model
   family made for these layers. The clean-room definitive round announced there decides one pick per slot.
   - git-github-automation: both families picked git, gh, Worktrunk and sem (the Claude pick keeps sem only if a
     structural-diff comparison shows a gain); one picked difftastic and claude-code-action. difftastic remains the
-    selection of record, and claude-code-action stays unadopted (decision M45).
+    selection of record; decision M45 recorded claude-code-action as unadopted. The later configured harness above
+    still awaits hosted acceptance.
   - ci-supply-chain: both families picked attest, Syft, Dependabot, actionlint (kjanat) and zizmor, all in use;
     `github/codeql-action`, picked by one, is the `upload-sarif` step above.
   - secrets-credentials: both families picked betterleaks, and one picked trufflehog. gitleaks stays the required

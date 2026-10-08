@@ -1,0 +1,16 @@
+[Unit]
+Description=Hindsight research memory
+Wants=omniroute.service
+After=omniroute.service
+
+[Service]
+Type=exec
+WorkingDirectory=%h/.local/share/hindsight
+EnvironmentFile=%h/.local/share/hindsight/stage.env
+ExecStart=%h/.local/share/hindsight/venv/bin/hindsight-api --host 127.0.0.1 --port 8888
+KillSignal=SIGINT
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=default.target

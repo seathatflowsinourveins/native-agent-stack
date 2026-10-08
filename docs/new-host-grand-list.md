@@ -93,7 +93,7 @@ Locally-run model weights a host receipt recorded qualifying on a runtime compon
 |  |  | `qdrant` | 1.19.1 | native_proven | host_verified | untested, bootstrap 1.19.1 | semantic-rag, recovery, macos-arm64-foundation |  |
 |  |  | `vllm` | 0.25.0 (behind v0.30.0) | native_proven | host_verified | untested | semantic-rag |  |
 | Context and usage efficiency | keep_but_compare | `rtk` | 0.49.0 | synthetic | host_verified, bootstrap 0.51.0 | host_verified, bootstrap 0.51.0 | foundation-cpu, token-efficiency | 4 / 6 |
-|  |  | `headroom` | 0.37.0 (behind v0.38.0) | synthetic | host_verified, bootstrap 0.37.0 | untested, bootstrap 0.37.0 | token-efficiency |  |
+|  |  | `headroom` | 0.37.0 (behind v0.38.0) | synthetic | host_verified, bootstrap 0.40.0 | untested, bootstrap 0.40.0 | token-efficiency |  |
 |  |  | `ccusage` | 20.0.24 | synthetic | host_verified, bootstrap 20.0.26 | untested, bootstrap 20.0.26 | token-efficiency |  |
 | Web research | retain | `tavily-cli` | 0.1.8 | local_integration | conditional, bootstrap 0.1.8 | untested | — | 7 / 9 |
 |  |  | `agent-browser` | 0.38.1 | local_integration | conditional, bootstrap 0.38.2 | untested | — |  |

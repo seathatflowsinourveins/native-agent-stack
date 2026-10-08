@@ -57,6 +57,7 @@ class NewWorkflowSecurityCoverageTests(unittest.TestCase):
             "adoption-bootstrap.yml",
             "scorecard.yml",
             "security-scan.yml",
+            "frozen-evidence-risk.yml",
             "dependency-review.yml",
             "hardware-profile-smoke.yml",
             "receipt-staleness.yml",

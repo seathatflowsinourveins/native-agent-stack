@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "id": "ao-orchestration-landscape-20261008",
+  "kind": "historical_inventory",
+  "component_ids": [
+    "codex"
+  ],
+  "claim": "Dated Oct7/8 primary-source and retained execution landscape remains historical comparison evidence; its v0.13.4 latest readback predates the separately recorded v0.13.5 release.",
+  "limitations": [
+    "Historical record only; not a new source survey, runtime trial or live acceptance.",
+    "Registry envelope only; retain original source pins, evidence classification and observations unchanged. The measured-effect receipt carries current release correction."
+  ],
+  "retained_original": {
+    "path": "evidence/receipts/ao-orchestration-landscape-20261008.json",
+    "sha256": "0167f5eee0471073d645d6d4ac0cd2de7e925b830985a20f47f799d57bc9fddb",
+    "classification": "dated_orchestration_source_and_execution_comparison"
+  }
+}

@@ -94,6 +94,46 @@ the conclusion.
   checks; a rule that reviewers apply by hand is moved into a required check as
   soon as it is stable.
 
+### Codex cloud review thread triage
+
+Before declaring a head landing-ready under the command center's standing cue,
+the lane reads every `chatgpt-codex-connector` review thread on that pull request
+and records its disposition. Codex cloud review remains enabled; this step uses
+the [official GitHub review integration](https://developers.openai.com/codex/integrations/github)
+and GitHub's existing conversation controls.
+
+Read the PR head SHA and all review threads, including resolved and outdated
+threads, in GitHub or through the native `gh api graphql` interface. Match the
+connector's author login, including its `[bot]` spelling when returned. With the
+API, finish every `reviewThreads` page and every thread's `comments` page;
+`first: 100` alone is not a complete read. The native
+[gh pagination contract](https://cli.github.com/manual/gh_api) requires the
+cursor and `pageInfo` for the connection being paged.
+
+For every connector thread, retain its original comment URL, the current landing
+head SHA (and the original reviewed commit when returned), and one of these
+dispositions in the lane's landing record:
+
+| Disposition | Evidence the lane records |
+| --- | --- |
+| `fixed` | The fixing commit or file/line, the change that answers the finding and its relevant check. |
+| `replied` | A substantive answer in that thread and its reply URL; name any remaining work. A reply alone does not resolve a finding. |
+| `not-applicable` | A reason grounded in the actual code or scoped contract, with the supporting reference and an answer in the original thread. |
+
+Record answers with native replies; use **Resolve conversation** only after the
+finding's disposition is justified. An outdated flag, a bot summary, a resolved flag or
+green CI does not supply that justification. Hold a thread with a remaining
+valid finding; do not mark it resolved merely to clear the merge condition.
+If no connector thread exists, record `0` after the complete read.
+
+Re-read the PR head and all review threads and comments immediately before the
+landing-ready declaration: the head must match the triage record, every connector
+thread must have its current disposition and every review thread must be resolved.
+A new push, review thread or comment requires an updated read. GitHub's native
+[GraphQL pagination](https://docs.github.com/en/graphql/guides/using-pagination-in-the-graphql-api)
+and [conversation-resolution controls](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/reviewing-changes-in-pull-requests/commenting-on-a-pull-request#resolving-conversations)
+carry the thread state; this procedure adds no workflow, bot or ruleset change.
+
 ## Tools windows
 
 A window script is read before it runs: a dry run in every flag combination,

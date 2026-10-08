@@ -258,7 +258,7 @@ machine-readable copy with each `checksum_source` and `checksum_ref` is
 | `repomix` | 1.18.1 | `repomix-1.18.1.tgz` | `d4d278310b33f245d4abbc7f757cc3815ff362f6d69225692f837c7dcee83c8f` | `npm_registry_integrity_crosscheck` |
 | `toon` | 4.1.1 | `cli-4.1.1.tgz` (`@toon-format/cli`) | `93ec1d3f44a608332d6f1fa811adda4237983841baec9b165e40252f20d83ca6` | `npm_registry_integrity_crosscheck` |
 | `ccusage` | 20.0.26 | `ccusage-20.0.26.tgz` | `b8d59c191f357d5e847c109f306cf522e60496fc9219be2ab72d201fd59eb1f2` | `npm_registry_integrity_crosscheck` |
-| `headroom` | 0.37.0 | `headroom_ai-0.37.0-cp310-abi3-macosx_11_0_arm64.whl` | `b4392f68a8d02d74c62c1734cf5bf327511dcc72678f01669f44f0612944d59c` | `pypi_json_digest_plus_local_rehash` |
+| `headroom` | 0.40.0 | `headroom_ai-0.40.0-cp310-abi3-macosx_11_0_arm64.whl` | `f7b0186ad5e76d5c8f75e5de6c57e001637258ead75481575ccca4d57557f5fb` | `pypi_json_digest_plus_local_rehash` |
 | `markitdown` | 0.1.8 | `markitdown-0.1.8.tar.gz` (sdist, platform-independent) | `17188ad827ea79fc264c7b1ca8cf5a242a16278d84cc32f2edc475dbe92812ed` | `pypi_json_digest_plus_local_rehash` |
 | `serena` | 2.0.0.dev0 | git commit `c6fbd1c5932df2494ffa0020af5a9fbe80b82143` on oraios/serena (no released archive) | sha256 null; the commit above is the integrity anchor | `github_commit_existence_verified` |
 
@@ -282,7 +282,7 @@ dependencies are unpinned, like the `rolldown` dependency in `mcporter`'s `insta
 [`adoption/pins-macos-arm64.json`](../pins-macos-arm64.json). `headroom` and
 `markitdown` use the new `uv-tool` kind and `serena` the new `uv-tool-from-git` kind, whose
 functions `adoption/bootstrap-macos.sh` copies verbatim from `adoption/bootstrap-linux.sh`.
-`headroom` pins its `macosx_11_0_arm64` wheel: headroom-ai 0.37.0 publishes compiled abi3
+`headroom` pins its `macosx_11_0_arm64` wheel: headroom-ai 0.40.0 publishes compiled abi3
 wheels per platform plus a maturin (Rust) sdist that would need a local Rust build, and this
 is its only arm64-compatible macOS wheel. `markitdown` pins the same platform-independent
 sdist as the Linux pin. `adoption/bootstrap-macos.sh` changed after `v2026.09.26` to carry
@@ -928,3 +928,8 @@ qualification on this platform, not a port:
 - Every native sign-in, service start, and acceptance test named above.
 
 The 2026-10-04 Darwin RTK 0.51.0 archive is artifact-checked only; no Mac executed it in the retained host records. MCPorter stays at 0.13.13 until a Mac qualifies 0.14.2; the Linux host upgrade does not qualify the Mac. Claude HUD 0.10.0 remains a native plugin from tag v0.10.0. The [RTK](../../evidence/receipts/rtk-051-qualification-20261004.json), [MCPorter](../../evidence/receipts/mcporter-0142-qualification-20261004.json) and [Claude HUD](../../evidence/receipts/claude-hud-0100-qualification-20261004.json) receipts retain the host failures and evidence limits.
+The current Headroom 0.40.0 row was verified on 2026-10-08 against official
+PyPI metadata and an independent artifact download, recorded in
+[the drift readback receipt](../../evidence/receipts/2604-drift-version-readback-20261008.json).
+The September digest check above remains historical; no Mac runtime acceptance
+was added by this artifact refresh.

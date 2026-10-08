@@ -1,0 +1,376 @@
+# Native OSV reports for inactive, hash-bound evidence. Findings and scanner errors
+# stay visible in this non-required workflow; live inputs remain in security-scan.yml.
+# Decision: docs/decisions/2026-10-07-frozen-evidence-osv-reporting.md
+# Sources: google/osv-scanner@e840a6e8adb14b7777c78e26cfbf6e2abc1d1fc6:docs/configuration.md
+# and GitHub Actions required status / job condition documentation.
+name: Frozen evidence risk
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '37 5 * * 3'
+  workflow_dispatch:
+
+permissions: {}
+cache-mode: none
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  frozen-evidence-risk:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+      - name: Record the frozen report attempt
+        id: report_attempt
+        if: ${{ always() }}
+        shell: bash
+        env:
+          REPORT_OWNER: github-ci-finalize
+        run: |
+          mkdir -p "$RUNNER_TEMP/frozen-evidence-risk"
+          REPORT_ATTEMPT_STARTED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ | tee "$RUNNER_TEMP/frozen-evidence-risk/report_attempt_started_at")" \
+            python3 - "$RUNNER_TEMP/frozen-evidence-risk/report.json" <<'PY'
+          from datetime import datetime, timedelta
+          from pathlib import Path
+          import json
+          import os
+          import sys
+
+          started = os.environ["REPORT_ATTEMPT_STARTED_AT"]
+          due = datetime.fromisoformat(started.replace("Z", "+00:00")) + timedelta(hours=24)
+          report = {
+              "schema_version": 1,
+              "owner": os.environ["REPORT_OWNER"],
+              "report_attempt_started_at": started,
+              "review_due": due.isoformat().replace("+00:00", "Z"),
+              "run_id": os.environ["GITHUB_RUN_ID"],
+              "run_attempt": os.environ["GITHUB_RUN_ATTEMPT"],
+              "head_sha": os.environ["GITHUB_SHA"],
+              "event_name": os.environ["GITHUB_EVENT_NAME"],
+              "decision": "docs/decisions/2026-10-07-frozen-evidence-osv-reporting.md",
+              "status": "unknown",
+              "inputs": None,
+              "native_exit_codes": {"json": None, "sarif": None},
+              "errors": ["the report attempt has not produced scanner output"],
+          }
+          Path(sys.argv[1]).write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+          PY
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Validate the frozen inventory and bind report inputs
+        id: preflight
+        shell: bash
+        run: |
+          set +e -u -o pipefail
+          report_dir="$RUNNER_TEMP/frozen-evidence-risk"
+          python3 -m unittest \
+            tests.test_osv_lockfile_coverage.LockfileInventoryTests \
+            tests.test_osv_lockfile_coverage.FrozenScanTests \
+            tests.test_wsl_retrieval.RetiredRunnerTests \
+            2>&1 | tee "$report_dir/preflight.log"
+          code=$?
+          printf '%s\n' "$code" > "$report_dir/preflight.exit_code"
+          if [ "$code" -ne 0 ]; then
+            exit "$code"
+          fi
+          python3 - "$report_dir/report.json" <<'PY'
+          from pathlib import Path
+          import hashlib
+          import json
+          import sys
+          from tests.test_osv_lockfile_coverage import FROZEN_CONFIG, FROZEN_LOCKS, INVENTORY, ROOT
+
+          report_path = Path(sys.argv[1])
+          report = json.loads(report_path.read_text(encoding="utf-8"))
+          inventory = json.loads(INVENTORY.read_text(encoding="utf-8"))
+          entries = [entry for entry in inventory["lockfiles"] if entry.get("config") == FROZEN_CONFIG]
+          bound = []
+          for entry in entries:
+              grant = FROZEN_LOCKS[entry["path"]]
+              bound.append({
+                  "path": entry["path"],
+                  "parser": entry.get("parser", ""),
+                  "config": entry["config"],
+                  "sha256": hashlib.sha256((ROOT / entry["path"]).read_bytes()).hexdigest(),
+                  "evidence": grant["evidence"],
+                  "owner": grant["owner"],
+                  "disposition_review_until": grant["disposition_review_until"],
+                  "decision": grant["decision"],
+              })
+          report["inputs"] = bound
+          report["config_sha256"] = hashlib.sha256((ROOT / FROZEN_CONFIG).read_bytes()).hexdigest()
+          report["eligibility"] = "validated"
+          report_path.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+          PY
+      - name: Install checksum-verified pinned OSV-Scanner
+        id: install
+        env:
+          OSV_SCANNER_VERSION: '2.6.0'
+          OSV_SCANNER_SHA256: ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108
+        run: |
+          exec > >(tee "$RUNNER_TEMP/frozen-evidence-risk/install.log") 2>&1
+          mkdir -p "$RUNNER_TEMP/osv-scanner"
+          curl --fail --silent --show-error --location --retry 3 \
+            "https://github.com/google/osv-scanner/releases/download/v${OSV_SCANNER_VERSION}/osv-scanner_linux_amd64" \
+            --output "$RUNNER_TEMP/osv-scanner/osv-scanner"
+          printf '%s  %s\n' "$OSV_SCANNER_SHA256" "$RUNNER_TEMP/osv-scanner/osv-scanner" | sha256sum --check
+          chmod 0755 "$RUNNER_TEMP/osv-scanner/osv-scanner"
+          "$RUNNER_TEMP/osv-scanner/osv-scanner" --version
+      - name: Scan only frozen evidence without suppression
+        id: scan
+        shell: bash
+        run: |
+          set +e -u -o pipefail
+          inventory=.github/osv-scanner-lockfiles.json
+          frozen_config=.github/osv-scanner-frozen-report.toml
+          report_dir="$RUNNER_TEMP/frozen-evidence-risk"
+          frozen=()
+          while IFS= read -r lockfile; do
+            frozen+=("$lockfile")
+          done < <(jq -r --arg config "$frozen_config" '.lockfiles[] | select(.config == $config) | "--lockfile=\(.parser // ""):\(.path)"' "$inventory")
+          # A missing/unknown assignment is an error, never a successful empty scan.
+          jq -e --arg config "$frozen_config" '
+            .lockfiles as $entries | ($entries | map(.path)) as $paths |
+            (($paths | length) == ($paths | unique | length)) and
+            ([$entries[] | select(.config == $config) | .path] ==
+              ["evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml"]) and
+            (all($entries[]; (has("config") | not) or .config == $config))
+          ' "$inventory" > /dev/null || exit 2
+          if [ "${#frozen[@]}" -eq 0 ]; then
+            exit 2
+          fi
+          # OSV applies this explicit empty config globally; only this frozen array reaches it.
+          # Each native format invocation retains its own exit code and log.
+          scan=("$RUNNER_TEMP/osv-scanner/osv-scanner" scan source --config "$frozen_config"
+                --no-resolve "${frozen[@]}")
+          "${scan[@]}" --format json --output-file "$report_dir/osv-scanner-frozen-macos.json" \
+            > "$report_dir/json.log" 2>&1
+          json_status=$?
+          printf '%s\n' "$json_status" > "$report_dir/json.exit_code"
+          cat "$report_dir/json.log"
+          "${scan[@]}" --format sarif --output-file "$report_dir/osv-scanner-frozen-macos.sarif" \
+            > "$report_dir/sarif.log" 2>&1
+          sarif_status=$?
+          printf '%s\n' "$sarif_status" > "$report_dir/sarif.exit_code"
+          cat "$report_dir/sarif.log"
+          status="$json_status"
+          if [ "$sarif_status" -gt "$status" ]; then
+            status="$sarif_status"
+          fi
+          exit "$status"
+      - name: Summarize native report and unavailable evidence
+        if: ${{ always() }}
+        shell: bash
+        env:
+          REPORT_OWNER: github-ci-finalize
+          ATTEMPT_OUTCOME: ${{ steps.report_attempt.outcome }}
+          PREFLIGHT_OUTCOME: ${{ steps.preflight.outcome }}
+          INSTALL_OUTCOME: ${{ steps.install.outcome }}
+          SCAN_OUTCOME: ${{ steps.scan.outcome }}
+        run: |
+          report_dir="$RUNNER_TEMP/frozen-evidence-risk"
+          mkdir -p "$report_dir"
+          REPORT_SUMMARY_STARTED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            python3 - "$report_dir" <<'PY'
+          from datetime import datetime, timedelta
+          from pathlib import Path
+          import json
+          import os
+          import sys
+
+          directory = Path(sys.argv[1])
+          report_path = directory / "report.json"
+          errors = []
+          try:
+              report = json.loads(report_path.read_text(encoding="utf-8"))
+          except (OSError, ValueError):
+              # Bootstrap's clock survives an incomplete JSON record; recovery does not reset the deadline.
+              started = (directory / "report_attempt_started_at").read_text(encoding="utf-8").strip()
+              due = datetime.fromisoformat(started.replace("Z", "+00:00")) + timedelta(hours=24)
+              report = {
+                  "schema_version": 1, "owner": os.environ["REPORT_OWNER"],
+                  "report_attempt_started_at": started,
+                  "review_due": due.isoformat().replace("+00:00", "Z"),
+                  "run_id": os.environ["GITHUB_RUN_ID"],
+                  "run_attempt": os.environ["GITHUB_RUN_ATTEMPT"],
+                  "head_sha": os.environ["GITHUB_SHA"], "event_name": os.environ["GITHUB_EVENT_NAME"],
+                  "decision": "docs/decisions/2026-10-07-frozen-evidence-osv-reporting.md",
+                  "inputs": None,
+              }
+              errors.append("the initial attempt record was unavailable")
+          codes = {}
+          valid_reports = {}
+          for name, filename in (("json", "osv-scanner-frozen-macos.json"),
+                                 ("sarif", "osv-scanner-frozen-macos.sarif")):
+              try:
+                  codes[name] = int((directory / (name + ".exit_code")).read_text().strip())
+              except (OSError, ValueError):
+                  codes[name] = None
+                  errors.append(name + ": native exit code unavailable")
+              try:
+                  data = json.loads((directory / filename).read_text(encoding="utf-8"))
+                  valid = (isinstance(data, dict) and
+                           isinstance(data.get("results" if name == "json" else "runs"), list))
+                  if not valid:
+                      raise ValueError("unexpected native result shape")
+                  valid_reports[name] = True
+              except (OSError, ValueError) as error:
+                  valid_reports[name] = False
+                  errors.append(name + ": report unavailable or malformed (" + str(error) + ")")
+          outcomes = {name: os.environ.get(name.upper() + "_OUTCOME", "")
+                      for name in ("attempt", "preflight", "install", "scan")}
+          report["phase_outcomes"] = outcomes
+          report["native_exit_codes"] = codes
+          report["errors"] = errors
+          report["finding_state"] = "available" if all(valid_reports.values()) else "unknown"
+          if any(code is not None and code not in (0, 1) for code in codes.values()):
+              report["status"] = "error"
+              report["finding_state"] = "unknown"
+          elif errors or not report.get("inputs") or report.get("eligibility") != "validated":
+              report["status"] = "unknown"
+          elif any(code == 1 for code in codes.values()):
+              report["status"] = "findings"
+          else:
+              report["status"] = "clear"
+          report_path.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+          with Path(os.environ["GITHUB_STEP_SUMMARY"]).open("a", encoding="utf-8") as summary:
+              summary.write("### Frozen evidence risk\n\n")
+              summary.write("| State | Owner | Review due | Native JSON / SARIF codes |\n")
+              summary.write("| --- | --- | --- | --- |\n")
+              summary.write("| " + report["status"] + " | " + report["owner"] + " | " +
+                            report["review_due"] + " | " + str(codes["json"]) + " / " +
+                            str(codes["sarif"]) + " |\n\n")
+              summary.write("Native findings are retained in the artifact and the existing frozen SARIF category. "
+                            "Unavailable evidence remains unknown. The trusted review job links existing alerts "
+                            "and public review metadata without copying finding text or logs.\n")
+          # A malformed/missing report cannot mint a clean advisory result.
+          if report["status"] == "unknown":
+              raise SystemExit(2)
+          PY
+      - name: Retain the frozen native reports and diagnostics
+        if: ${{ always() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: frozen-evidence-risk-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/frozen-evidence-risk/
+          if-no-files-found: error
+          retention-days: 7
+
+  frozen-osv-sarif-upload:
+    needs: frozen-evidence-risk
+    if: ${{ !cancelled() && github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Download the frozen native reports
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: frozen-evidence-risk-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/frozen-evidence-risk/
+      - name: Preserve the existing frozen SARIF alert category
+        uses: github/codeql-action/upload-sarif@1c5b675653bb5c22dbe9b12b556ec555138e09fd # v4.38.1
+        with:
+          sarif_file: ${{ runner.temp }}/frozen-evidence-risk/osv-scanner-frozen-macos.sarif
+          category: osv-scanner-frozen-macos
+
+  frozen-risk-review:
+    name: Upsert the frozen evidence review issue
+    needs: frozen-evidence-risk
+    if: ${{ !cancelled() && github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      issues: write
+    concurrency:
+      group: frozen-risk-review-${{ github.repository }}
+      cancel-in-progress: false
+    steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+      - name: Download frozen review metadata
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: frozen-evidence-risk-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/frozen-evidence-risk/
+      - name: Create or edit the single frozen review issue
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          ALERTS_URL: ${{ github.server_url }}/${{ github.repository }}/security/code-scanning?query=is%3Aopen
+          ASSIGNEE: seathatflowsinourveins
+          REVIEWER: command center
+        run: |
+          set -euo pipefail
+          report="$RUNNER_TEMP/frozen-evidence-risk/report.json"
+          # Read only the report's public metadata. A missing/invalid record is an error, not an empty review.
+          jq -e '
+            .schema_version == 1 and .owner == "github-ci-finalize" and
+            (.status == "clear" or .status == "findings" or .status == "error" or .status == "unknown") and
+            (.report_attempt_started_at | type == "string") and
+            (.review_due | type == "string") and
+            (.head_sha | type == "string")
+          ' "$report" > /dev/null
+          owner="$(jq -r '.owner' "$report")"
+          status="$(jq -r '.status' "$report")"
+          started="$(jq -r '.report_attempt_started_at' "$report")"
+          due="$(jq -r '.review_due' "$report")"
+          head="$(jq -r '.head_sha' "$report")"
+          start_seconds="$(date -u --date="$started" +%s)"
+          due_seconds="$(date -u --date="$due" +%s)"
+          interval=$((due_seconds - start_seconds))
+          test "$interval" -gt 0
+          test "$interval" -le 86400
+          body="$RUNNER_TEMP/frozen-review-issue-body.md"
+          {
+            printf 'Review owner: %s\nAssignee: %s\nReviewer: %s\n' "$owner" "$ASSIGNEE" "$REVIEWER"
+            printf 'Report state: %s\nFirst native report attempt: %s\nReview due: %s\nHead: %s\n\n' \
+              "$status" "$started" "$due" "$head"
+            printf 'Existing code-scanning category: \140osv-scanner-frozen-macos\140.\n\n'
+            printf '[Open code-scanning alerts](%s)\n\n[Native attempt and report artifact](%s)\n\n' \
+              "$ALERTS_URL" "$RUN_URL"
+            printf 'The command center records per-advisory dispositions separately. This issue carries review metadata and links.\n'
+          } > "$body"
+          label='frozen-evidence-risk'
+          title='Frozen evidence risk: retained macOS lock disposition'
+          # A failed listing stops delivery. Serialize writers and retain one open issue, as saturation-tracking does.
+          listing="$(gh issue list --label "$label" --state open --limit 100 \
+            --json number --jq 'sort_by(.number) | .[].number')"
+          read -r -a numbers <<< "${listing//$'\n'/ }"
+          if [ "${#numbers[@]}" -eq 0 ]; then
+            gh label create "$label" --color 5319E7 \
+              --description 'Frozen evidence review metadata; links existing code-scanning alerts' --force
+            gh issue create --title "$title" --label "$label" --assignee "$ASSIGNEE" --body-file "$body"
+          else
+            gh issue edit "${numbers[0]}" --title "$title" --add-assignee "$ASSIGNEE" --body-file "$body"
+            for extra in "${numbers[@]:1}"; do
+              gh issue close "$extra" --comment "Duplicate of #${numbers[0]}; this workflow keeps one open frozen evidence review issue."
+            done
+          fi

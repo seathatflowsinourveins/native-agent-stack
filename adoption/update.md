@@ -62,8 +62,10 @@ flow, recorded so a host can check what it receives.
 1. Tag a validated `main` commit `vYYYY.MM.DD` (or `vYYYY.MM.DD.N`) and push the
    tag. [`publish-catalog.yml`](../.github/workflows/publish-catalog.yml) runs on
    `v*` tags: its `publish` job validates the commit, builds the `git archive`
-   and an SPDX SBOM, attests both with SLSA provenance and uploads them; its
-   `release` job (tag pushes only) re-checks both files against the attested
+   and an SPDX SBOM, attests the archive with SLSA provenance and the SBOM with
+   the `https://spdx.dev/Document` predicate, and uploads them; its
+   `release` job admits this repository's `refs/tags/v*` runs, including
+   matching-tag dispatches. It re-checks both files against the attested
    digests, creates the GitHub Release with both attached at creation, and
    fails unless the published release is immutable and carries exactly those
    digests.

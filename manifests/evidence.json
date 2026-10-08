@@ -2,6 +2,50 @@
   "schema_version": 1,
   "receipts": [
     {
+      "id": "ao-bounded-effect-20261008",
+      "kind": "artifact_measurement",
+      "component_ids": [
+        "codex"
+      ],
+      "claim": "One fixed synthetic failed-CI task reached the recording receiver with one native AO automatic notification and zero simulated manual sends, versus one explicit simulated manual send with the observer bypassed; native inverse and unchanged vendor checks passed.",
+      "limitations": [
+        "The task uses synthetic SCM observations and the vendor recording messenger with the real AO observer, lifecycle manager and SQLite. No model or real GitHub PR was exercised.",
+        "The no-AO arm bypasses the observer and makes one explicitly simulated manual send. Actual human effort, live cue reduction, provider usage and coding repair remain unmeasured.",
+        "The policy-disabled arm is an inverse within AO; the separate observer-bypassed arm is the no-AO orchestration control.",
+        "Two explicit same-input polls establish suppression in this fixture. Restart, replay, persistence-failure, cross-session and changed-head behavior remain untested.",
+        "The native subtest durations are rounded and include fixture setup/cache effects. They do not establish a production speed comparison.",
+        "The install-only route was withdrawn. Persistent AO deployment, shared user-unit installation, gateway/profile admission and fast-tier forwarding for AO-launched Codex remain separate qualification work.",
+        "Six selected read-only Codex MCP calls passed, one per exposed server; the other88 exposed tools and Claude's MCP wiring are outside this lane smoke."
+      ],
+      "path": "evidence/receipts/ao-bounded-effect-20261008.json"
+    },
+    {
+      "id": "ao-bounded-feedback-20261008",
+      "kind": "historical_inventory",
+      "component_ids": [
+        "codex"
+      ],
+      "claim": "Historical AO v0.13.4 native feedback observations retained from the original private receipt; comparative G1 is UNKNOWN and repeated-opportunity G3 UNTESTED.",
+      "limitations": [
+        "Historical record only; not a new execution or live acceptance.",
+        "Registry envelope only; retain original receipt payload, evidence classification, counts and historical observations unchanged."
+      ],
+      "path": "evidence/receipts/ao-bounded-feedback-20261008-registration.json"
+    },
+    {
+      "id": "ao-orchestration-landscape-20261008",
+      "kind": "historical_inventory",
+      "component_ids": [
+        "codex"
+      ],
+      "claim": "Dated Oct7/8 primary-source and retained execution landscape remains historical comparison evidence; its v0.13.4 latest readback predates the separately recorded v0.13.5 release.",
+      "limitations": [
+        "Historical record only; not a new source survey, runtime trial or live acceptance.",
+        "Registry envelope only; retain original source pins, evidence classification and observations unchanged. The measured-effect receipt carries current release correction."
+      ],
+      "path": "evidence/receipts/ao-orchestration-landscape-20261008-registration.json"
+    },
+    {
       "id": "memory-lifecycle-probe-20260921",
       "kind": "native_cli_e2e",
       "component_ids": [
@@ -4676,6 +4720,52 @@
         "All three CVE reachability statements concern repository provisioning only. The upgrade preserves the database; existing users/Editor memberships, Grafana-managed alert rules, shared dashboards/sharing tokens, and additional datasources/stored credential configuration were not inspected. The live-database check remains an open host item."
       ],
       "path": "evidence/receipts/grafana-1323-qualification-20261003.json"
+    },
+    {
+      "id": "2604-drift-version-readback-20261008",
+      "kind": "upstream_provenance",
+      "component_ids": [
+        "agentsview",
+        "headroom"
+      ],
+      "claim": "Fresh installed CLI version readbacks match AgentsView 0.44.0 and Headroom 0.40.0; vendor release identities and the Headroom macOS artifact digest were independently checked.",
+      "limitations": [
+        "Metadata and artifact identity only; no installation, service activation, provider call or functional acceptance was performed.",
+        "Historical functional receipts and lifecycle observations retain their original versions and scope.",
+        "The macOS wheel was hashed on Linux; no Mac has run this install or qualified its runtime behavior."
+      ],
+      "path": "evidence/receipts/2604-drift-version-readback-20261008.json"
+    },
+    {
+      "id": "native-sandbox-smoke-20261008",
+      "path": "evidence/receipts/native-sandbox-smoke-20261008.json",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "sandbox-runtime"
+      ],
+      "claim": "Retained command-center evidence records sandbox-runtime 0.0.79 installed and read back on NativeStack2604, followed by a successful native Claude echo smoke with retained stdout/stderr hashes.",
+      "limitations": [
+        "Publication imports the retained command-center observation; currency performed no new installation or native smoke.",
+        "Only the Claude 0.0.79 echo leg is recorded here. The source receipt marks the Codex 0.0.79 leg pending.",
+        "The 0.0.77 filesystem/network receipts remain historical and do not qualify those policies at 0.0.79.",
+        "No upstream test suite, dual-client, filesystem-policy, network-policy or general security qualification is asserted.",
+        "Source-reported command text is retained, but its original Claude post-hook argument vector was not supplied with the imported receipt and remains UNVERIFIED."
+      ]
+    },
+    {
+      "id": "hindsight-research-memory-20261008",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "hindsight"
+      ],
+      "claim": "Recorded native Hindsight 0.10.2 vendor installation, CPU embeddings/reranker and successful OpenAI Responses startup verification through the gateway. Two numeric synthetic hypotheses were retained verbatim and recalled exactly through separate HTTP MCP sessions with strict experiment tags. The command center then installed the user unit, exposed 15 allowlisted MCP tools and accepted a fresh Claude-to-Codex byte-equal round trip.",
+      "limitations": [
+        "This registration reuses the original attributed host execution; it does not replay installation, model calls or native client acceptance.",
+        "Synthetic round trips qualify the exercised integration, not research recall quality, trading results or an unchanged upstream test suite.",
+        "Research recall selects world and experience fact types; observations are synthesized paraphrases. Recall cannot hard-filter by time and never supplies point-in-time exclusion for backtests.",
+        "The recovery and environment-file precedence fixes are repository templates pending a separate CC-cued host apply. The immutable artifact retains the originally installed unit/drop-in hashes."
+      ],
+      "path": "evidence/receipts/hindsight-research-memory-20261008.json"
     }
   ],
   "files": [
@@ -4736,8 +4826,8 @@
     },
     {
       "path": ".github/dependabot.yml",
-      "sha256": "40d7f3bcf927a13088a126f70c71da3dba2e6181f52de2c451ab9f31193b8554",
-      "bytes": 2529
+      "sha256": "623a1b9e1dbd165f25ee8856eab5ed5587554326d238bfc71a3d6a075865b0d9",
+      "bytes": 2926
     },
     {
       "path": ".github/main-ruleset.json",
@@ -4750,9 +4840,14 @@
       "bytes": 15625
     },
     {
+      "path": ".github/osv-scanner-frozen-report.toml",
+      "sha256": "c0ea1976499ea0d41b10b169ed206f821437e5a418ba33957100c2bd500abf64",
+      "bytes": 382
+    },
+    {
       "path": ".github/osv-scanner-lockfiles.json",
-      "sha256": "3c7bed9c3899e22a022acf4172719dd510124d45664f24cf656def14e6ad999b",
-      "bytes": 15176
+      "sha256": "c7cbfee447c2e5c2a71d9db5f56bba3af7084f197e084aeecc8e17456d38bfad",
+      "bytes": 15304
     },
     {
       "path": ".github/osv-scanner.toml",
@@ -4803,6 +4898,11 @@
       "path": ".github/workflows/dependency-review.yml",
       "sha256": "861a5e0eb2dd6e1d253e43c67602fcada04f80cac0ac379b0268db480812e889",
       "bytes": 1549
+    },
+    {
+      "path": ".github/workflows/frozen-evidence-risk.yml",
+      "sha256": "1615eecc2cd06567123f457a69040a6740dd7abdcb289930e56d2aa29d0ed7c7",
+      "bytes": 19212
     },
     {
       "path": ".github/workflows/hardware-profile-smoke.yml",
@@ -4866,8 +4966,8 @@
     },
     {
       "path": ".github/workflows/security-scan.yml",
-      "sha256": "f1fcc7f05ecd9eab1b59f6d84d2e0274981da7046914c1a0d26c9189ea876ac6",
-      "bytes": 13178
+      "sha256": "44547b18f6b2551fb488cfeadaf7b1acb4d0432274f0787fe092ce2a7397d937",
+      "bytes": 12313
     },
     {
       "path": ".github/workflows/sota-sources-gate.yml",
@@ -4911,8 +5011,8 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "9439744eefd0ed33e045df5f577661817fdab8ae044a79ab352502879afbd5dc",
-      "bytes": 1938
+      "sha256": "9772e8a8381912fc12aecced585b859054ecbeedee270285c056d2024bcbe573",
+      "bytes": 2162
     },
     {
       "path": "CLAUDE.md",
@@ -5021,8 +5121,8 @@
     },
     {
       "path": "adoption/bootstrap-linux.sh",
-      "sha256": "487d25bff2a412883e4875f98be230c89ea37bf9737d71dd558da20d8e94f2ad",
-      "bytes": 74740
+      "sha256": "3d67d227f55f5de44e93158511240fcf8ce7e14da73dec4483aabaa1231151d8",
+      "bytes": 74811
     },
     {
       "path": "adoption/bootstrap-macos.sh",
@@ -5036,8 +5136,8 @@
     },
     {
       "path": "adoption/credential-inventory.json",
-      "sha256": "2115b56acbcbf6268ae98ef9aef49325d3b9ebdefc67225393e5ccceca708266",
-      "bytes": 25686
+      "sha256": "c1b31e324e665b63410bc40f139d6e13fbcdf0893877732cd4d002b6ce24cd36",
+      "bytes": 25930
     },
     {
       "path": "adoption/hardware-profiles.json",
@@ -5045,9 +5145,19 @@
       "bytes": 12174
     },
     {
+      "path": "adoption/hooks/claude/README.md",
+      "sha256": "3b816a3f8f9539f89e7b0c7d1df562ed6cd72e730de42921393b0b7a289b53b7",
+      "bytes": 4343
+    },
+    {
       "path": "adoption/hooks/claude/SHA256SUMS",
-      "sha256": "d13a02c67ef551437c21de11b85352cda58ac6a1cfac1167336158fc992d11b5",
-      "bytes": 1137
+      "sha256": "9db7433fa8c7d1c37a55b027e8eb3b66ed400ad375403abfa9808aa86fb82c66",
+      "bytes": 1229
+    },
+    {
+      "path": "adoption/hooks/claude/research-routing-guard.py",
+      "sha256": "43f95fb0ff59954680c780b3bf015cbc7548285f57d5956313b704d5de280bac",
+      "bytes": 10391
     },
     {
       "path": "adoption/hooks/claude/token-lanes-block.builder.md",
@@ -5131,8 +5241,8 @@
     },
     {
       "path": "adoption/launchd/launchd-agents.sh",
-      "sha256": "8d607da363de3a92552e76c88043fc0576168a015e5f30898d07ee3cf4839e6e",
-      "bytes": 37719
+      "sha256": "4ae29eb1831f0a5ac403dccc8cc406b962d9420962364d504e9ef7a09c26a81d",
+      "bytes": 37790
     },
     {
       "path": "adoption/lifecycle.md",
@@ -5141,8 +5251,8 @@
     },
     {
       "path": "adoption/manifest.json",
-      "sha256": "16d9708777667b29a4c25b363fca5644b94ab7932d0735c7323ac48188f7eaec",
-      "bytes": 20038
+      "sha256": "0574d44ab020bc9ac419b2bd12103769e2970a0732a71129c48ec3441c254233",
+      "bytes": 20095
     },
     {
       "path": "adoption/mcp/claude-user.json",
@@ -5161,18 +5271,18 @@
     },
     {
       "path": "adoption/new-wsl/claude-user-instructions.md",
-      "sha256": "ff9b8157f975c196adce55bfdc7021ad05a7c7cc10c8f5c1eb298a62b8640fa0",
-      "bytes": 1418
+      "sha256": "4ecfa5e70260171362741848536363ff63c6a1d7f99e4da66aa528abbe60f71f",
+      "bytes": 1642
     },
     {
       "path": "adoption/new-wsl/client-config-map.json",
-      "sha256": "ba33408c82deda5f30aa6253bdbcf209c02a4e49844b3108a4973d29b7729719",
-      "bytes": 55814
+      "sha256": "3bdd66593a88d05db354f9aad01a7a87aed03b159fa1e135eeb40fadd368cbc4",
+      "bytes": 56546
     },
     {
       "path": "adoption/new-wsl/codex-user-instructions.md",
-      "sha256": "fa7040de0d83aa2a0a4678808e6002d174afb473de189a7f583fe2980993674e",
-      "bytes": 2105
+      "sha256": "f172676d00eb58b6581d82d7289d4b598fb568115ae85e2f34149ff6e26d1968",
+      "bytes": 2329
     },
     {
       "path": "adoption/new-wsl/templates/claude-user.mcp.additions.json",
@@ -5186,8 +5296,8 @@
     },
     {
       "path": "adoption/new-wsl/templates/codex.config.additions.toml",
-      "sha256": "a10fbc7b2bc034c824e22c292d71700fd2760234998c03f390d79a965e3bc159",
-      "bytes": 5085
+      "sha256": "07da39f8e7bc5211d51cfc5997301ade00e86cf00f7bc9d9160a7c7b7ed3e055",
+      "bytes": 5207
     },
     {
       "path": "adoption/paired/README.md",
@@ -5221,13 +5331,13 @@
     },
     {
       "path": "adoption/pins-linux-x86_64.json",
-      "sha256": "0ede232552fa0ac9666f6a52ea6f037539668e1517e6de9c2fc4602b2e797691",
-      "bytes": 37218
+      "sha256": "0c2a0d7fb2b35f9c3f85462dcac514254645116ae3eb7735cf444f1735e894c3",
+      "bytes": 36650
     },
     {
       "path": "adoption/pins-macos-arm64.json",
-      "sha256": "dc9162a3c70a1b0fcb31749c969e743cf72833db06d068b5c28c6ca1744dd218",
-      "bytes": 43485
+      "sha256": "1ba0586b360e136da0acf0b65d41075e14de0c86f3275f2e1e40937f1f24866a",
+      "bytes": 42810
     },
     {
       "path": "adoption/platforms/linux-wsl2-new-distro.md",
@@ -5241,8 +5351,8 @@
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "a840ee74dfd23efb640bc19d00a4d0b75781a2b9fe01c37039a7216e0b0243f1",
-      "bytes": 66120
+      "sha256": "cadc9b9e4f5559ed6c7a833a2f2f313f06606ff7f89b0bc040f2dec4dc23604f",
+      "bytes": 66472
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -5263,6 +5373,11 @@
       "path": "adoption/research.md",
       "sha256": "10e83b515760e86ffd1a9b6540aaeea769f94af5d569c001954f0031548ca75b",
       "bytes": 2735
+    },
+    {
+      "path": "adoption/scaffold/AGENTS.md",
+      "sha256": "9ebe108f02176f1d8a76405ca5427b7c8b22ee05d98301cb38ee3b71f152edc5",
+      "bytes": 2296
     },
     {
       "path": "adoption/sdk/README.md",
@@ -5286,8 +5401,8 @@
     },
     {
       "path": "adoption/skills/manifest.json",
-      "sha256": "731b79c977c430e0dd37e7ffa85b8a70df22c1ff1e53998b7cb0dc4923292259",
-      "bytes": 56885
+      "sha256": "53298efae3fb0d9f86e30ed92d512c2ac693ab9891e10156ec9adb28ff29092c",
+      "bytes": 61133
     },
     {
       "path": "adoption/templates/claude.settings.linux-wsl2.overlay.json",
@@ -5296,18 +5411,18 @@
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "a0e293941482230a1ccaaf8a3206a5c7e72b73690d47e3a211883e9dd6279abc",
-      "bytes": 12948
+      "sha256": "ae6c0bd5bf02d0b8e5b06cb46a5ce0b1ea33acf0cbd3e9f440a0e08197d0e67d",
+      "bytes": 13668
     },
     {
       "path": "adoption/templates/codex.AGENTS.template.md",
-      "sha256": "fa7040de0d83aa2a0a4678808e6002d174afb473de189a7f583fe2980993674e",
-      "bytes": 2105
+      "sha256": "f172676d00eb58b6581d82d7289d4b598fb568115ae85e2f34149ff6e26d1968",
+      "bytes": 2329
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
-      "sha256": "22c63a470891feb957e595fea65b7c02592df108e1bc567f1297783fb27985ba",
-      "bytes": 19129
+      "sha256": "39a91de20dcb449a3d774a18af80d45c35944e548d9a1bf1fcfe652adbece6ed",
+      "bytes": 19125
     },
     {
       "path": "adoption/templates/codex.omniroute.config.toml",
@@ -5328,6 +5443,21 @@
       "path": "adoption/templates/project.codex.config.template.toml",
       "sha256": "c449bf7f17f650d06e4e5a1e00a438c06331c32269dd1326f6c683627303c1ff",
       "bytes": 2953
+    },
+    {
+      "path": "adoption/templates/systemd/hindsight-research.mcp-tools.env.template",
+      "sha256": "40194cdcdcb29db3976e5d5541204ca08d0909bfa45ae48cc992ba7e75ec3a1d",
+      "bytes": 228
+    },
+    {
+      "path": "adoption/templates/systemd/hindsight-research.service",
+      "sha256": "66deb19ba135b3619173c060d783f1f6b7508ad1f88fc5418645081fd61da100",
+      "bytes": 383
+    },
+    {
+      "path": "adoption/templates/systemd/hindsight-research.service.d/10-mcp-tools.conf",
+      "sha256": "b7ac7e061c542f84849879efd3024093d9e013f0506dd10a205d44ec4859af53",
+      "bytes": 356
     },
     {
       "path": "adoption/templates/systemd/mineru.service",
@@ -5401,8 +5531,8 @@
     },
     {
       "path": "adoption/update.md",
-      "sha256": "c0489f8630abca88258caa3136d6a8b4b4db575c6b90ad6669b4e04e08512a88",
-      "bytes": 32041
+      "sha256": "40ef24b2098d73381484a5e13ae8f092100267d6cc70050edf8901a59e1e3a08",
+      "bytes": 32181
     },
     {
       "path": "blueprints/blind-catalog-convergence/README.md",
@@ -5448,6 +5578,21 @@
       "path": "blueprints/convergence-practice/README.md",
       "sha256": "5e259cc7d810606100601771d010b562f8e7e2242762773d7814133802d3d273",
       "bytes": 10645
+    },
+    {
+      "path": "blueprints/convergence-practice/ao-bounded-effect/README.md",
+      "sha256": "5f12d79ed7611ec753a3ac0b4244903950f9ae2d86b6d97cc3113c6a2c605cd2",
+      "bytes": 5157
+    },
+    {
+      "path": "blueprints/convergence-practice/ao-bounded-effect/ao_bounded_effect_test.go",
+      "sha256": "0eef18b04dadc49f089e950c6a3c6dd01aa683c946cdddcac46b4624a02d1f9d",
+      "bytes": 7427
+    },
+    {
+      "path": "blueprints/convergence-practice/ao-bounded-effect/experiment.json",
+      "sha256": "d22bbdbcb4111860444cbf464fe362b861195ebf963ac5ebed4c6f6f3205293a",
+      "bytes": 12295
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/.gitignore",
@@ -11027,8 +11172,8 @@
     },
     {
       "path": "blueprints/runtime-workers/skills/README.md",
-      "sha256": "3275aff838a94516cd0dfb6cc29364fec492e59d7c60975ae91e8693ace219ae",
-      "bytes": 44474
+      "sha256": "904301a5d51361ae003ea278b86432d20e1cdf3ed4e60990cfb056bb347d8dfb",
+      "bytes": 45037
     },
     {
       "path": "blueprints/runtime-workers/skills/freshness-20260927.json",
@@ -11037,8 +11182,8 @@
     },
     {
       "path": "blueprints/runtime-workers/skills/manifest.json",
-      "sha256": "1a2db8d0ba28a0cf9ea330d31ade083d6e111ac5b58525157a415978f54b4499",
-      "bytes": 186836
+      "sha256": "76b750a7a758830c7730379ff2a9b17864ee92a89ad44fe2c4b01a55724ae205",
+      "bytes": 188365
     },
     {
       "path": "blueprints/runtime-workers/skills/research.md",
@@ -11052,8 +11197,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "57b0a8b511d4141c6d587d6a4254428b1e0e843f26e3c79a94daa70152b75f88",
-      "bytes": 495718
+      "sha256": "02e25082b775317417eef1341734f08739c96bf7a9ba1a727ddb9d3c256a4e78",
+      "bytes": 502002
     },
     {
       "path": "blueprints/trials-20260926/README.md",
@@ -14651,6 +14796,11 @@
       "bytes": 5117
     },
     {
+      "path": "blueprints/us-equities/engine-nautilus/rc6-gate-rulings-20261007.json",
+      "sha256": "65e86c9f688de8e16d7168b73924f0f7c231dafb2cb97aae71d8d31b8209f24b",
+      "bytes": 8460
+    },
+    {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/PREREGISTRATION-v2.md",
       "sha256": "4393a1b7d896b2f49c4091c18701bd08cfc72a8d313f0ad2a628e91db26d6f0c",
       "bytes": 8223
@@ -16142,8 +16292,8 @@
     },
     {
       "path": "blueprints/us-equities/runtime-2604/README.md",
-      "sha256": "9fc77cb8e74405aa38e396fc29dd06f35659bb591e2dab1dcb6001c8119bf1df",
-      "bytes": 26246
+      "sha256": "5b51b79a4e9c395ea967e5b4c2b399ef577c00679d29b75cc2a4c7ea639addf0",
+      "bytes": 27894
     },
     {
       "path": "blueprints/us-equities/runtime-2604/accept-trading-2604.sh",
@@ -16154,6 +16304,16 @@
       "path": "blueprints/us-equities/runtime-2604/install-trading-2604.sh",
       "sha256": "1ee8707a248d2c988f468ac721a85b22103d0f2c4a95076e2e2b5ca86c4d0b92",
       "bytes": 19205
+    },
+    {
+      "path": "blueprints/us-equities/runtime-2604/receipts/acceptance-20261008.json",
+      "sha256": "19d4b8be66b16d0bf6d5681c4954b2dbc1dd77b3c04aeedae166f2dfba75acfd",
+      "bytes": 4581
+    },
+    {
+      "path": "blueprints/us-equities/runtime-2604/receipts/backtest-pipeline-20261008.json",
+      "sha256": "dbb236c08d197a9201df07f9414d0ea8b5141501bc30b9d97f1786a7452737e0",
+      "bytes": 10023
     },
     {
       "path": "blueprints/us-equities/runtime-2604/sync-trading-2604.sh",
@@ -16542,8 +16702,8 @@
     },
     {
       "path": "catalogs/foundation/README.md",
-      "sha256": "cdbd873798f3e200a38911733a4f81c0ac046164c4bb7e16ba858125414f15c3",
-      "bytes": 16480
+      "sha256": "752e2fbc8cef933140dd0ef921ae97d3bc2d89e24f7ff747535155eff8f96c63",
+      "bytes": 16787
     },
     {
       "path": "catalogs/foundation/automation.json",
@@ -16587,7 +16747,7 @@
     },
     {
       "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
-      "sha256": "79487183570d6d875dfaebea9e6c7b9a207b1f91ea6b65a931b5a57793472ab8",
+      "sha256": "e35a8d2c2a4199a14799f65f1a25ed572bfcc0f974315a864cd7d768a6fcba1c",
       "bytes": 326276
     },
     {
@@ -16612,7 +16772,7 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "ce6441dbbe6b455d685b8a705de959d1fa6ad3b3258a362f2aca61f16591bbc4",
+      "sha256": "57acb614811c01a6f5b1e70da8eb7f7e00c01671a2620191c39fc2c6edb14e83",
       "bytes": 159863
     },
     {
@@ -16692,7 +16852,7 @@
     },
     {
       "path": "catalogs/landscape/new-host-grand-list.json",
-      "sha256": "aabf9027d87fb0a4287569e2c15bfd486b190fe577bcdb9f9f89fc817196bc95",
+      "sha256": "c14b646026cf2956e22ef7d118edb8e97eba76117a4181c2052fca72272b5dca",
       "bytes": 287577
     },
     {
@@ -16701,9 +16861,14 @@
       "bytes": 21449
     },
     {
+      "path": "catalogs/landscape/skills-lifecycle.json",
+      "sha256": "affdb8d3969dd13ae5d4edbf63448fd4a461f574434f2890c050ff39a74a62f6",
+      "bytes": 26356
+    },
+    {
       "path": "catalogs/landscape/upstream-snapshot.json",
-      "sha256": "da49a384a240c28ee7dbee035c8b163ff423ccacd9a05a32dc92f498f82b0090",
-      "bytes": 294837
+      "sha256": "e9274e0cb5f5aae9eeb3056eb9ccfee9076306762381986aff724fdc94af33e8",
+      "bytes": 299238
     },
     {
       "path": "catalogs/landscape/us-equities.json",
@@ -16917,8 +17082,8 @@
     },
     {
       "path": "catalogs/us-equities/decision-index.json",
-      "sha256": "a518e665434de59659414ff03ddb26abf744656809ac5d82222dcb7b5a306a6e",
-      "bytes": 765056
+      "sha256": "7140c17550cb18275f23c60392867cb55d2372ea9ece664e55bec98d110cb991",
+      "bytes": 765252
     },
     {
       "path": "catalogs/us-equities/engines-strategies.json",
@@ -17032,8 +17197,8 @@
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
-      "sha256": "110b4c884323b0ead55981925bdb0645fedcff1ed02af375a5f12be0e3a2c617",
-      "bytes": 25545
+      "sha256": "2f2033acc4c730102f1f7b4b90d181d5d2ca2db3d5a3c91ef933711f727480c5",
+      "bytes": 27707
     },
     {
       "path": "catalogs/us-equities/security-identity-review.json",
@@ -17122,8 +17287,8 @@
     },
     {
       "path": "docs/catalog-provenance.md",
-      "sha256": "15c20a89ad95ffb37d8c4b02f28addf9ff9939b6c2f6bb853017497733522c4e",
-      "bytes": 14270
+      "sha256": "17af1d0d61759effdecf73ae99573a83578d6af6c752fa388401a52b55c472b2",
+      "bytes": 21902
     },
     {
       "path": "docs/catalog-reconciliation-20260922.md",
@@ -17167,8 +17332,8 @@
     },
     {
       "path": "docs/command-center.md",
-      "sha256": "cdd34e09170ffc5374aed6eeb1c15632a0044e239f6a28930f2f0f66d8de1fda",
-      "bytes": 6743
+      "sha256": "6a7bf985ece9ad8edc9272b72535285c719d804e90589d6e8b5d22bdc15534b5",
+      "bytes": 9409
     },
     {
       "path": "docs/community-native-practice.md",
@@ -17377,8 +17542,8 @@
     },
     {
       "path": "docs/decisions/2026-09-28-top-rule-templates.md",
-      "sha256": "85002f8d31fe6ee4d333bf0ee4e2510bb34d549020ea29a6b5345907ef1c92c6",
-      "bytes": 15185
+      "sha256": "6d6b012c5e26da10b38dbd17075836533d27ac6dea90063373b66ed38cd3bcac",
+      "bytes": 31022
     },
     {
       "path": "docs/decisions/2026-09-29-frozen-check-grader.md",
@@ -17437,7 +17602,7 @@
     },
     {
       "path": "docs/decisions/2026-10-01-new-wsl-definitive-defaults.md",
-      "sha256": "1d3e6dd6d86df768a2683cd9f64bd478111467efdf6f35b3c71526af93b9f1d6",
+      "sha256": "1b59e7b2100199d2b3a2125a811c7959c11dc55be9d029d4c0f676bbd9059ff5",
       "bytes": 80195
     },
     {
@@ -17462,8 +17627,8 @@
     },
     {
       "path": "docs/decisions/2026-10-02-new-wsl-client-configuration.md",
-      "sha256": "1f6b9dc7245ed4caced4a3e3583f0a95b4e50fa090f77c3efe5fa17e80b99408",
-      "bytes": 141809
+      "sha256": "5d3cef379f928f4d1c9e2bbc605f7ae3abf9bc443f84a5c2eda5823f3be46fd9",
+      "bytes": 145832
     },
     {
       "path": "docs/decisions/2026-10-02-omniroute-mac-rebuild.md",
@@ -17816,6 +17981,11 @@
       "bytes": 15271
     },
     {
+      "path": "docs/decisions/2026-10-07-frozen-evidence-osv-reporting.md",
+      "sha256": "40daa2dddbcfd16db5805d9412cc11c082510234433fecf2541a38943f26bcde",
+      "bytes": 13035
+    },
+    {
       "path": "docs/decisions/2026-10-07-instruction-core.md",
       "sha256": "3d86b5fce26c0c5621b69dfaa1e82de35d1d1cdd0b512dfb647eeaae98f8863c",
       "bytes": 24191
@@ -17846,9 +18016,24 @@
       "bytes": 15329
     },
     {
+      "path": "docs/decisions/2026-10-08-coordinator-research-routing.md",
+      "sha256": "cc0177503b26b84954e7a67ec4d2aac7d39a5520794ada3edf06346527955a10",
+      "bytes": 14363
+    },
+    {
+      "path": "docs/decisions/2026-10-08-dependabot-frozen-evidence-ignore.md",
+      "sha256": "8bbe3a48eabd72d3fb9dae4f0abfcae6a01d5920ad58ad4e2809a279e6af667f",
+      "bytes": 3229
+    },
+    {
       "path": "docs/decisions/2026-10-08-philosophy-only-rules.md",
       "sha256": "f4b4f1d9952db662d8c0c9f1f9aec24da40c4666e4655e105c0617a689e6826c",
       "bytes": 10028
+    },
+    {
+      "path": "docs/decisions/2026-10-08-skills-cc-lanes-picks.md",
+      "sha256": "e115a46c4509631399147f1d34a70c25cc6cc3d088c9a522059238a91cda5c02",
+      "bytes": 16124
     },
     {
       "path": "docs/direct-results.md",
@@ -17912,8 +18097,8 @@
     },
     {
       "path": "docs/examples/sec-contact.env.example",
-      "sha256": "183e956761139218262df4046126d785f2aea20e946b13d667700353afedf2a7",
-      "bytes": 316
+      "sha256": "e8331c8d52cf65c9d8b1b84930dff6d3ea3bbfe65b389148c3352a4f5c52599a",
+      "bytes": 520
     },
     {
       "path": "docs/foundation-closure-20260921.md",
@@ -17924,6 +18109,11 @@
       "path": "docs/foundation-convergence-20260921.md",
       "sha256": "2a8fe0a5f1bc9008d322a9199cec5c9750ab0d141c755852bb68cfad2d3a71d3",
       "bytes": 7028
+    },
+    {
+      "path": "docs/foundation-layer-map-20261008.md",
+      "sha256": "1c2fe5e89fec00fbe589b7092b35d8c903c865696161309441113348cefc27b9",
+      "bytes": 33978
     },
     {
       "path": "docs/foundation-rd-readiness.md",
@@ -17972,8 +18162,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "d5f2c827e9f9da7ff769d0a833c9a2b8e9a3433cab9b8979e095a74f07a7ad7e",
-      "bytes": 99371
+      "sha256": "f489ff42d80b1c2e1ece353250c477605730ee41d47dcd54245d06e11c8d13f2",
+      "bytes": 101058
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -17982,8 +18172,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "102d525c279431abd6debcb033037c512fe3bc0ff564b4ae0822cf867d81aadc",
-      "bytes": 251307
+      "sha256": "7bc165d8723bca7205e5d4df9c38d6b2c5d5b99eab259de0239fc5d19b677994",
+      "bytes": 251915
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -18107,7 +18297,7 @@
     },
     {
       "path": "docs/new-host-grand-list.md",
-      "sha256": "10be0b93bf691307de4bfbf32101b02a2f550a6c0dded95e12d46d20c4ddfefd",
+      "sha256": "2e25c946a55d8c97ccb48681dd6a5c93f2fc50b54de42ebd102f83d26787d0db",
       "bytes": 18484
     },
     {
@@ -18117,12 +18307,12 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "d6f48ee6d88f208713fe65b99cb8d0ad8f74d2378fee02c0fcc29871a59738aa",
-      "bytes": 692762
+      "sha256": "31c4c71ab485b2db9dc21b5ee23a25baa6dbccc07beb905476b8be9eef3a682f",
+      "bytes": 692787
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "0a49c71d2e8ccfa1b05f5535b6a0c30268507a03afa22ad106c145fe0d4f01ee",
+      "sha256": "c4644145f06a1b1f8b42ed35966a932817009eab90d7c86446294aade0d44efa",
       "bytes": 368763
     },
     {
@@ -18157,8 +18347,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "483982770b1282d5c3541e968aba7e76e073da768aa8dae4ab3bf9e84c60fe32",
-      "bytes": 187123
+      "sha256": "3f7a32151ef22e2273840d8e6a33f45424c657e93720768b81217a3976e47b01",
+      "bytes": 188099
     },
     {
       "path": "docs/stack.md",
@@ -18217,8 +18407,8 @@
     },
     {
       "path": "docs/token-efficiency-stack.json",
-      "sha256": "a0f70bf8793b30e152ec5f97779d26057ddff0e8d54e01dc1cc111df03ac37ea",
-      "bytes": 595149
+      "sha256": "fa273390dfb7914f48d89189764e8c417d393f354f664909c50a38bcc0ac3ca3",
+      "bytes": 595355
     },
     {
       "path": "docs/token-efficiency-stack.md",
@@ -20094,6 +20284,16 @@
       "path": "evidence/artifacts/disk-headroom-enospc-20261005/receipt.json",
       "sha256": "c0fc8c156929ec9af44a020753b5175e252ba665e4474e34461ce10ea3691348",
       "bytes": 25377
+    },
+    {
+      "path": "evidence/artifacts/edgar-rate-limit-inventory-20261008/ci-citation-repair.json",
+      "sha256": "d2f097590e0a75d768b69df3930a161638e35a12579476cdac5eea5e34990024",
+      "bytes": 2552
+    },
+    {
+      "path": "evidence/artifacts/edgar-rate-limit-inventory-20261008/receipt.json",
+      "sha256": "e3f95be8fdbe3a98347fc96a9180cc12e20af9cd73869c3db1f677c5e09b4527",
+      "bytes": 9097
     },
     {
       "path": "evidence/artifacts/edgartools-5600-20261004/freeze-5.60.0.txt",
@@ -34456,6 +34656,21 @@
       "bytes": 17286
     },
     {
+      "path": "evidence/artifacts/hindsight-research-memory-20261008/ci-repair.json",
+      "sha256": "d6c152707b2192838aa8db8d59047ca65d5851fa34e31d1ef814ac91902d7a8e",
+      "bytes": 12798
+    },
+    {
+      "path": "evidence/artifacts/hindsight-research-memory-20261008/receipt.json",
+      "sha256": "79efaaa3b4000de19fcf367d0de1ad243e2730c3330e632272709831de334b9a",
+      "bytes": 4981
+    },
+    {
+      "path": "evidence/artifacts/hindsight-research-memory-20261008/review-resolution.json",
+      "sha256": "4ede69f884d0085136dcb5f690e2d0c7b8a7664e276127bfd60d7120e0f57f2e",
+      "bytes": 3803
+    },
+    {
       "path": "evidence/artifacts/host-baseline-20261004/coreutils-2604-upgrade.json",
       "sha256": "5869c88fa349ed59bea95887ca5596e0f6f482ba8b8c3cd4ff406342accd6130",
       "bytes": 597
@@ -39712,8 +39927,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
-      "sha256": "e8f90d3e6826de0bedb2dda0efc89c8f41795fb59f812504acc3bd6b235935a7",
-      "bytes": 229932
+      "sha256": "901916dbfe24a40e377ba238c41648150b70eed4696421fa61da07d08f1ee150",
+      "bytes": 229957
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/foundation-definitive.compact.json",
@@ -40467,8 +40682,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "0d20722fd01a37564df9cb657a6089022d7a176ef2841e4b9a0bb94b91503b35",
-      "bytes": 50922
+      "sha256": "0912d958700b8d03b9b71a463c3994adb98bcefa4b62c8dbbacdc1efbee48d07",
+      "bytes": 54872
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/slot-state-and-core-recipes.json",
@@ -40477,8 +40692,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/README.md",
-      "sha256": "2436ec8832588b4cbf1a94ad8c85fe7a1f29cab0e6affe02e434dd4c6b65a825",
-      "bytes": 97777
+      "sha256": "1d04d9e1d16d7f351476b7bc394c9e86bc651899e4e7515403f48a343d8fc05b",
+      "bytes": 97923
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
@@ -40512,13 +40727,13 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/agentsview.sh",
-      "sha256": "35291136542644861147b9f65770524cfba62305bb08462bc87ae8325d72bffb",
-      "bytes": 528
+      "sha256": "6de86214772d0302659bb27ee660e1dec425ab1fe9f237dcbc4474903aaf88b7",
+      "bytes": 527
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/agentsview.toml",
-      "sha256": "97ecce87a1fa7cf0e61fcee9af71cb95f0e5770170273e1774bb0f26e3c37e4b",
-      "bytes": 269
+      "sha256": "1ad4432c9120ed04e4047a2cc96a10830b25911f750880c2a4e55df2349ee0f2",
+      "bytes": 268
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/alertmanager-telegram.yaml",
@@ -40632,8 +40847,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/grafana-lanes.json",
-      "sha256": "b0ede411130ae0a9c8ccac0445b52836d23c5903c071ea3dca42c34cc885486c",
-      "bytes": 71384
+      "sha256": "01f95f3cf7353644ba93b2bc234356982f6612bc5232de02a0d5e1c16bfa55da",
+      "bytes": 81763
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/grafana-native-foundation-data.json",
@@ -40787,8 +41002,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/otel.yaml",
-      "sha256": "fa2f6e73ea0bbaa8795d3334c032e90a1e4c29da8efc8d4b93dc1e2290dd676e",
-      "bytes": 53131
+      "sha256": "4b103f0bcdc6a57f8be7316bd56c951d1fb40acc84a5154d8957d7b3bfd8d5fb",
+      "bytes": 53465
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/prometheus-alerts.test.yaml",
@@ -40927,12 +41142,12 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
-      "sha256": "3b5b29ba85c86037766bda1bb869efd2cc450eea21facef0ad333a1c497354c1",
+      "sha256": "d7181dc3eb48d99e1c3a3d5f421b4b011c60e18807376eab71071e1f94b73c8f",
       "bytes": 487472
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
-      "sha256": "f40f9023f10c273be1445d2fb4f3f4105e876e71c137bc87b1f3bd9e1f48f031",
+      "sha256": "8f60f6def61bf40ee6e5a9ac620e4a4a2da114634a0c0495dbc33bc753a8aa77",
       "bytes": 134338
     },
     {
@@ -40957,7 +41172,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/owners.json",
-      "sha256": "cb7158adf07a41fccee3fbe376773e304417cec7fedaa24c598f23e33216b282",
+      "sha256": "bdc81ba3fafd6b4ce8fb4d3652655cd06a46c28e4dbe015c5f7a1c9533dd1bc3",
       "bytes": 35189
     },
     {
@@ -40997,8 +41212,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-      "sha256": "31589b8d0547b3302913595c3bae76d8e740b5eab8ec2da76c8ec89127f603d3",
-      "bytes": 142783
+      "sha256": "d5441b11b0641c3a1666851443db76e1703697962badb28f0fe48eac40f8171e",
+      "bytes": 142808
     },
     {
       "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/copy-notes.json",
@@ -54676,6 +54891,11 @@
       "bytes": 195
     },
     {
+      "path": "evidence/receipts/2604-drift-version-readback-20261008.json",
+      "sha256": "e3ec4d7ffa9493de0cef96f13a3ffd012906e3dd213e420e9dd92a669dc32691",
+      "bytes": 2373
+    },
+    {
       "path": "evidence/receipts/adaptive-paper-practice-20260921.json",
       "sha256": "f8d965b15517bfc7de9bc5f80b7dd328b1f19dff48b4508ac53531819a1c02a8",
       "bytes": 1125
@@ -54714,6 +54934,31 @@
       "path": "evidence/receipts/alpaca-paper-e2e-20260921.json",
       "sha256": "dc77da98626554db016f1b519eba1db891a76af9b5f49849aad8aad2c126d461",
       "bytes": 866
+    },
+    {
+      "path": "evidence/receipts/ao-bounded-effect-20261008.json",
+      "sha256": "fc3e64d8649beb0e6716753e97954b6a9a774887799252fbfb83360954abc6ae",
+      "bytes": 18042
+    },
+    {
+      "path": "evidence/receipts/ao-bounded-feedback-20261008-registration.json",
+      "sha256": "0c446ccc84361687c2408b6c658c00ce501eae7c0755f1fa1f1abc4aafa84f88",
+      "bytes": 789
+    },
+    {
+      "path": "evidence/receipts/ao-bounded-feedback-20261008.json",
+      "sha256": "528ea20a234c4d2ec4676f6c1248be50078c1727cc6422c15d10af2d02d5a022",
+      "bytes": 5684
+    },
+    {
+      "path": "evidence/receipts/ao-orchestration-landscape-20261008-registration.json",
+      "sha256": "cfc486d1d9bc0f3fde7724277909b269bffc0b543cadf285c95604833b560ddc",
+      "bytes": 889
+    },
+    {
+      "path": "evidence/receipts/ao-orchestration-landscape-20261008.json",
+      "sha256": "0167f5eee0471073d645d6d4ac0cd2de7e925b830985a20f47f799d57bc9fddb",
+      "bytes": 4922
     },
     {
       "path": "evidence/receipts/artifact-reductions.json",
@@ -55001,6 +55246,11 @@
       "bytes": 3678
     },
     {
+      "path": "evidence/receipts/hindsight-research-memory-20261008.json",
+      "sha256": "c1c912314f815470bad085494cf1dd0a3d1ce43a8e749d391f4bd8d22e1b9e90",
+      "bytes": 2074
+    },
+    {
       "path": "evidence/receipts/host-baseline-coreutils-2604-upgrade-20261004.json",
       "sha256": "834593fa86965850d7c94abb7ab1893e0388960140f383f6dad178cca4de2143",
       "bytes": 2310
@@ -55239,6 +55489,11 @@
       "path": "evidence/receipts/native-sandbox-network-20260920.json",
       "sha256": "e934457a442f01bcf564fa1e37777f35e6a64eff0455c572efb382a6c652dd4b",
       "bytes": 2504
+    },
+    {
+      "path": "evidence/receipts/native-sandbox-smoke-20261008.json",
+      "sha256": "28aa0c7d0f4df1f8048c2b3478ac063dc2ef5b9aadc427714f6fe6d8f7081405",
+      "bytes": 3113
     },
     {
       "path": "evidence/receipts/native-sdk-acceptance-20261002.json",
@@ -55742,8 +55997,8 @@
     },
     {
       "path": "examples/claude-native/CLAUDE.md",
-      "sha256": "ff9b8157f975c196adce55bfdc7021ad05a7c7cc10c8f5c1eb298a62b8640fa0",
-      "bytes": 1418
+      "sha256": "4ecfa5e70260171362741848536363ff63c6a1d7f99e4da66aa528abbe60f71f",
+      "bytes": 1642
     },
     {
       "path": "examples/claude-native/agents/blind-adjudicator.md",
@@ -56007,8 +56262,8 @@
     },
     {
       "path": "examples/omniroute-codex-sdk/README.md",
-      "sha256": "edcd00175931191ae19336c00405291eef92ca97a4a791295ebc9cd1aeaff434",
-      "bytes": 20410
+      "sha256": "c228b2f0e7b7be2226e11e8ac3c4602b2da9a25f5ce0bce0418542dc22cc0409",
+      "bytes": 20417
     },
     {
       "path": "examples/omniroute-codex-sdk/acceptance-plan.json",
@@ -56057,7 +56312,7 @@
     },
     {
       "path": "examples/omniroute-codex-sdk/worker.py",
-      "sha256": "e1f06bf5c161ecf66a2172cee27c288b7a03a16c75a6f155099f381a532ac3ea",
+      "sha256": "f1a2489fc059b5ab055392e26a1f13d1748623baed130d8808ddc99fc1c08610",
       "bytes": 26572
     },
     {
@@ -56217,13 +56472,13 @@
     },
     {
       "path": "manifests/landscape.json",
-      "sha256": "5af66a7bce3e2d8d6cdde10f353a49b65a86becbecb2dc23ad4d01ebea623dfc",
-      "bytes": 21467
+      "sha256": "bb8859c96ced031c23fbaa2438c2ce94d83b68a4f8eaba7a5d9fd4a55e2c0519",
+      "bytes": 22889
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "c191a297c89b884e5639fc676ce90d4b543d32e6b9eb2c26156e253b74c0326b",
-      "bytes": 128113
+      "sha256": "025fb71c5cbbb616c8554e5aebb866ac55919f831e01e2244a47241f54cd9f86",
+      "bytes": 129984
     },
     {
       "path": "observability/README.md",
@@ -56437,8 +56692,8 @@
     },
     {
       "path": "observability/lanes_dashboard.py",
-      "sha256": "03809caa625ce71be92a3649ae4e9036ea1b5305b0345f2dc54a96f65f9cfafd",
-      "bytes": 20106
+      "sha256": "f97b8cb68ca0e3fad8ce24d243c46d2a4d69ddc925ea50c671279d2c905caf9f",
+      "bytes": 25250
     },
     {
       "path": "observability/memory-scheduled-20260923.json",
@@ -56532,8 +56787,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "afd953e486ccd90e5a15e3d4f144e67e4c099c0d9cfd31274020c5fb35c06404",
-      "bytes": 133027
+      "sha256": "959a4d207f73ecf9732eb20cb7062a6c2168e4bf1ff1564ff7d54c115ff817dc",
+      "bytes": 133092
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
@@ -56554,6 +56809,11 @@
       "path": "recipes/claude-native-ultracode.md",
       "sha256": "27f43c56d1f1a70f065a5d313b9273a8b55709362b15ed4a56b83da1e3c37437",
       "bytes": 39979
+    },
+    {
+      "path": "recipes/hindsight-research-memory.md",
+      "sha256": "8a3fbea4cb2ae58fa3220b865098caa487783c18fb652ddfa8ccf32eb8645ffb",
+      "bytes": 6586
     },
     {
       "path": "recipes/mineru-local-service.md",
@@ -56609,6 +56869,11 @@
       "path": "scripts/component_matrix.py",
       "sha256": "ab4cbdd0521d2a42108395509589b12a82e83afef76e6377574177ff54c5d899",
       "bytes": 72137
+    },
+    {
+      "path": "scripts/credential_boot_receipt.py",
+      "sha256": "643e27d66c509c4177761c84db7d10749127024eb0d5d9a6ee41fe0e5f87dbb6",
+      "bytes": 24112
     },
     {
       "path": "scripts/credential_status.py",
@@ -56667,7 +56932,7 @@
     },
     {
       "path": "scripts/native_token_ci.py",
-      "sha256": "95d45da579b1035c4cfa54f330f1ab179b949bbdb49555dd82c5163d2367300a",
+      "sha256": "fa83183c61407724083dfac2f5441859268a4de93663dae5d024eea7c733681d",
       "bytes": 117733
     },
     {
@@ -57072,7 +57337,7 @@
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",
-      "sha256": "c4ccf548196cd115103738f7c8de2637618e6bd038f7167973ef79d4f7701044",
+      "sha256": "d7aadf37028c6037adc055f3a9cdfddcea1c16c2e5ba38baa9ecc9294100ab53",
       "bytes": 230581
     },
     {
@@ -57092,8 +57357,8 @@
     },
     {
       "path": "tests/test_adoption_guarded_runners.py",
-      "sha256": "c8db8b668f3f75c2ef1e13a736223e05ffcdc747861062850aa9eac3049a5f14",
-      "bytes": 41460
+      "sha256": "ba4fbe64f4c5e39bb5f5f25ce27999dab9d950b3456972218180fbaa663da4cb",
+      "bytes": 41727
     },
     {
       "path": "tests/test_adoption_launchd.py",
@@ -57287,7 +57552,7 @@
     },
     {
       "path": "tests/test_codex_worker_lane.py",
-      "sha256": "896a9e1162e1637c20f806ee08c24731edf269f23ea81e832df5c87625da09d6",
+      "sha256": "1e915cd8c53e08be44e5fa3fcfce0597e9e4fefb2de29e4187be6cf108f19658",
       "bytes": 193146
     },
     {
@@ -57322,13 +57587,13 @@
     },
     {
       "path": "tests/test_credential_run.py",
-      "sha256": "3cb959529bb6b26848e66cbc60de9560820964f78430df44027246b1b54d8338",
-      "bytes": 128524
+      "sha256": "f309ca11cf9a70375a3bec07d4ad1a8096cd2726300caea2cde0ebb5952b8424",
+      "bytes": 130105
     },
     {
       "path": "tests/test_credential_status.py",
-      "sha256": "cb618c08a5f23599f7c741f9f4f85a4a3fa635c0e570ee99e5c13fe5c49bbe08",
-      "bytes": 56680
+      "sha256": "4bd34f8f18938f527b0c4945e92bf401b30130fd874c5baeee13a3a7975eb1ff",
+      "bytes": 56960
     },
     {
       "path": "tests/test_credential_tools.py",
@@ -57396,9 +57661,14 @@
       "bytes": 211565
     },
     {
+      "path": "tests/test_frozen_evidence_reporting.py",
+      "sha256": "af33af1c0acb43c56602d4555e3f697bcff49549e22d6ba909c36945facddb0f",
+      "bytes": 22436
+    },
+    {
       "path": "tests/test_frozen_macos_variant_no_use.py",
-      "sha256": "509e5eb6ba4f58958f366e78652cb21ff9b285634d956ad9b7e5494d9ce90212",
-      "bytes": 36760
+      "sha256": "be95d00ec0f12735d3f35c950138fc50a7391d01e22de26f803e4499c19dbc30",
+      "bytes": 37392
     },
     {
       "path": "tests/test_gap_crosswalk.py",
@@ -57507,8 +57777,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "71118370ec274bc28e796e985d28bd8912d7c97db026557650fbe9813ff95d4c",
-      "bytes": 133629
+      "sha256": "91077495dea93cf82b5d874c47342720314d232769f7a08e5e1871f33661f4c9",
+      "bytes": 134028
     },
     {
       "path": "tests/test_install_skills.py",
@@ -57707,8 +57977,8 @@
     },
     {
       "path": "tests/test_new_wsl_client_config.py",
-      "sha256": "a31f44e0259efbfdcda5ab19f50663cb932973b6c9f0fa73d4dc2b1ae9a9295c",
-      "bytes": 340618
+      "sha256": "7f9945df17d32757966d38a7b100326c17c8a78a959042b6c4578fd4f699d956",
+      "bytes": 343196
     },
     {
       "path": "tests/test_new_wsl_definitive_defaults.py",
@@ -57752,8 +58022,8 @@
     },
     {
       "path": "tests/test_observability_writer_identity.py",
-      "sha256": "f8f95aa3a2163dbd2131c80263da5937ad811a9c257ce0eff30d19a89816e48d",
-      "bytes": 45397
+      "sha256": "f8d97269a2ad4ae950fe67c2a25ae5cf1088d0d906bf84ff04a292660c19f90a",
+      "bytes": 48820
     },
     {
       "path": "tests/test_observability_writer_identity_host.py",
@@ -57797,8 +58067,8 @@
     },
     {
       "path": "tests/test_osv_lockfile_coverage.py",
-      "sha256": "63d6f353511c4900a1cd63e529e7e676b9999a5ab4d81d4a447b1a7bde1769a1",
-      "bytes": 75443
+      "sha256": "872353e08e80d23d52c6ec59a24de5cae7447f3d8e9be5b0b75edbb0bf0d5405",
+      "bytes": 79565
     },
     {
       "path": "tests/test_overfitting_riskl_parity.py",
@@ -57871,6 +58141,11 @@
       "bytes": 47956
     },
     {
+      "path": "tests/test_research_dispatch.py",
+      "sha256": "dab1a2c3720848845b560a27cab4066160b64fa2718db4e7c20400fc7cdb1806",
+      "bytes": 19847
+    },
+    {
       "path": "tests/test_research_efficiency.py",
       "sha256": "d4f894db6ccc964ff94f8628274d388c1a8af19bd33aaa655d6d64c1787eaed5",
       "bytes": 11548
@@ -57879,6 +58154,11 @@
       "path": "tests/test_research_evaluation.py",
       "sha256": "aff6a30e8caf6267e7aa440ec0db01e5c0ca09782eff6585c6e17b778ab1c6ba",
       "bytes": 5563
+    },
+    {
+      "path": "tests/test_research_routing_guard.py",
+      "sha256": "c6765e7b41d75984e903a4401d01781ee4261f5cab73cc1fcabd159e2470d303",
+      "bytes": 12393
     },
     {
       "path": "tests/test_research_workflow.py",
@@ -57977,8 +58257,8 @@
     },
     {
       "path": "tests/test_skills_status.py",
-      "sha256": "7c7ffee80a370d9a6c0d7510c16cd96abc0d7314e93579816400b317ab169fb5",
-      "bytes": 67576
+      "sha256": "ef28cf26ea0515628d4d92fafff7a45a3bbad4b55c286b18259295f7df2c78ac",
+      "bytes": 67573
     },
     {
       "path": "tests/test_sota_convergence.py",
@@ -58097,13 +58377,13 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "397ec09d6c2c17dfa10a5366cd93988f4b39057733c7b455a5cfb180ada7c614",
-      "bytes": 164745
+      "sha256": "02e5704fabec34058b2cd8645a086f6dbb2fbabe23ecc6bec755d15758106607",
+      "bytes": 165554
     },
     {
       "path": "tests/test_workflow_policy.py",
-      "sha256": "1927a9a769425323a3fd4b7dba879ada5052667185a7c8762baf674cb0b47000",
-      "bytes": 83603
+      "sha256": "347ea2553d9e2f436965d1cbfbd3cfab6b507d9aa72787404c117cc7330e237e",
+      "bytes": 83757
     },
     {
       "path": "tests/test_workflow_security.py",
@@ -58112,8 +58392,8 @@
     },
     {
       "path": "tests/test_workflow_security_coverage.py",
-      "sha256": "bb486ad07dea82027b40f88bcc43c6bde580005ad5a33ec2cf33573ae89e143c",
-      "bytes": 12126
+      "sha256": "2bde9456da1901d7e4a1978e16c7bc2c85279ac6ac4adba50cacc0395fe26e05",
+      "bytes": 12166
     },
     {
       "path": "tests/test_wsl_memory_maintenance.py",
@@ -58187,8 +58467,8 @@
     },
     {
       "path": "tools/adoption/install_claude_profile.py",
-      "sha256": "ba00dc062d4f38e24911f0ff9e4f8793e3b26083d66d5c3966a78b077f2d86c1",
-      "bytes": 25010
+      "sha256": "aacf9c7e02560732b42b74f0eab27ed5a5546fd8659c5dd04d3ad044d95bf4ba",
+      "bytes": 25134
     },
     {
       "path": "tools/adoption/install_skills.py",
@@ -58202,8 +58482,8 @@
     },
     {
       "path": "tools/adoption/new_wsl_client_config.py",
-      "sha256": "d8b061081776fb4406a8e2b70e992ecfbc6846033b7a8cbe7144d50653b13006",
-      "bytes": 165000
+      "sha256": "2a0878760da8f20fdd2a3020ae8793e4dd2818ab941ced824d76d82339ae3e00",
+      "bytes": 165834
     },
     {
       "path": "tools/adoption/prove_codex_lane.py",
@@ -58354,6 +58634,11 @@
       "path": "tools/omniroute/gateway_record.py",
       "sha256": "d5cfcfbd61bcfcb1808270deab7e793d4021c8dd0c3079fe5ff71ee723ab46e6",
       "bytes": 4963
+    },
+    {
+      "path": "tools/research/dispatch",
+      "sha256": "40815882b5387ebf9b7fd2dce59bbebb55eb38f09e8650c0729e61ff7544662e",
+      "bytes": 14053
     },
     {
       "path": "tools/runtime-worker-evidence/README.md",
@@ -58782,6 +59067,7 @@
     }
   ],
   "convergence_records": [
+    "blueprints/convergence-practice/ao-bounded-effect/experiment.json",
     "blueprints/blind-catalog-convergence/experiment.json",
     "blueprints/blind-catalog-convergence/memory-experiment.json",
     "blueprints/catalog-runtime-review/experiment.json",

@@ -6,8 +6,8 @@
   "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
   "profile_sha256": "f811217299d2f488e918fd25517838804929d08de5276809858ad77e1c5f42ee",
   "outputs": {
-    "docs/new-wsl-handbook.md": "0a49c71d2e8ccfa1b05f5535b6a0c30268507a03afa22ad106c145fe0d4f01ee",
-    "docs/new-wsl-handbook.json": "d6f48ee6d88f208713fe65b99cb8d0ad8f74d2378fee02c0fcc29871a59738aa"
+    "docs/new-wsl-handbook.md": "c4644145f06a1b1f8b42ed35966a932817009eab90d7c86446294aade0d44efa",
+    "docs/new-wsl-handbook.json": "31c4c71ab485b2db9dc21b5ee23a25baa6dbccc07beb905476b8be9eef3a682f"
   },
   "inventory": {
     "layers": 37,
@@ -769,6 +769,42 @@
       },
       "native_exit_code": 0,
       "check": "python3 scripts/build_new_wsl_handbook.py --check"
+    },
+    {
+      "date": "2026-10-08",
+      "recorded_at_utc": "2026-10-08T14:05:12Z",
+      "source_head": "22ec8936a41d646374af0fca1051053a68f79c6c",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "cause": "PR #854's Hindsight recipe registration changes the maintained adoption-manifest source hash. CI run 37786314228 and the native --check reproduced stale generated handbook bytes. Regenerate through the unchanged native builder and refresh only its current output bindings; prior observations and histories remain unchanged.",
+      "previous_outputs": {
+        "docs/new-wsl-handbook.md": "f683090521e28889672b995714a0b35b1e31dfc5df3a52211d233767bae4444b",
+        "docs/new-wsl-handbook.json": "9b5900c995ae258057099ad0819f3cb55ec2ce3bf3c1b5c41d8c299bc1177a19"
+      },
+      "current_outputs": {
+        "docs/new-wsl-handbook.md": "472fcf331240a1601743f87c562f597e0295e77577e58f061d4df20558a7a667",
+        "docs/new-wsl-handbook.json": "f838d99cacb06146231bc1128dc2791b7a7c4d3b62f513a9923fd57a90068d19"
+      },
+      "native_exit_code": 0,
+      "check": "python3 scripts/build_new_wsl_handbook.py --check",
+      "evidence_class": "local_integration"
+    },
+    {
+      "date": "2026-10-08",
+      "recorded_at_utc": "2026-10-08T14:08:45Z",
+      "source_head": "22ec8936a41d646374af0fca1051053a68f79c6c",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "cause": "The same bounded CI repair corrects the shifted architecture Nemotron revision citation from stack line2095 to2118. The cited revision is unchanged. The architecture source hash changed, so regenerate the handbook once more through its unchanged native builder; preserve the first repair output bindings and every prior observation.",
+      "previous_outputs": {
+        "docs/new-wsl-handbook.md": "472fcf331240a1601743f87c562f597e0295e77577e58f061d4df20558a7a667",
+        "docs/new-wsl-handbook.json": "f838d99cacb06146231bc1128dc2791b7a7c4d3b62f513a9923fd57a90068d19"
+      },
+      "current_outputs": {
+        "docs/new-wsl-handbook.md": "c4644145f06a1b1f8b42ed35966a932817009eab90d7c86446294aade0d44efa",
+        "docs/new-wsl-handbook.json": "31c4c71ab485b2db9dc21b5ee23a25baa6dbccc07beb905476b8be9eef3a682f"
+      },
+      "native_exit_code": 0,
+      "check": "python3 scripts/build_new_wsl_handbook.py --check",
+      "evidence_class": "local_integration"
     }
   ],
   "previous_outputs": [
@@ -804,6 +840,33 @@
       "outputs": {
         "docs/new-wsl-handbook.md": "31a48ab41085815989d066fa9a5b76a7f9ca9f26fc51887600f37e70121ea278",
         "docs/new-wsl-handbook.json": "62a34bba39a6f18a13f218569cd8eebc5aaeff201be54fdab93f81cfb158ea3f"
+      }
+    },
+    {
+      "superseded_at_utc": "2026-10-08T09:13:58Z",
+      "source_head": "3f7bc63ed80cb97f552cb0dba40174b5f0ee40b4",
+      "reason": "CC065432Z vendor drift refresh; native handbook builder regenerated current recommendations. Prior bindings remain historical.",
+      "outputs": {
+        "docs/new-wsl-handbook.md": "0a49c71d2e8ccfa1b05f5535b6a0c30268507a03afa22ad106c145fe0d4f01ee",
+        "docs/new-wsl-handbook.json": "d6f48ee6d88f208713fe65b99cb8d0ad8f74d2378fee02c0fcc29871a59738aa"
+      }
+    },
+    {
+      "superseded_at_utc": "2026-10-08T14:05:12Z",
+      "source_head": "22ec8936a41d646374af0fca1051053a68f79c6c",
+      "reason": "PR #854 source-hash regeneration after reproduced CI failure; preserve the previous maintained output binding as historical evidence.",
+      "outputs": {
+        "docs/new-wsl-handbook.md": "f683090521e28889672b995714a0b35b1e31dfc5df3a52211d233767bae4444b",
+        "docs/new-wsl-handbook.json": "9b5900c995ae258057099ad0819f3cb55ec2ce3bf3c1b5c41d8c299bc1177a19"
+      }
+    },
+    {
+      "superseded_at_utc": "2026-10-08T14:08:45Z",
+      "source_head": "22ec8936a41d646374af0fca1051053a68f79c6c",
+      "reason": "PR #854 architecture locator correction changes a second hashed handbook input; preserve the first CI repair's generated binding.",
+      "outputs": {
+        "docs/new-wsl-handbook.md": "472fcf331240a1601743f87c562f597e0295e77577e58f061d4df20558a7a667",
+        "docs/new-wsl-handbook.json": "f838d99cacb06146231bc1128dc2791b7a7c4d3b62f513a9923fd57a90068d19"
       }
     }
   ]

@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "id": "hindsight-research-memory-20261008",
+  "kind": "native_model_e2e",
+  "recorded_at_utc": "2026-10-08T12:10:00Z",
+  "component_ids": [
+    "hindsight"
+  ],
+  "claim": "Recorded native Hindsight 0.10.2 vendor installation, CPU embeddings/reranker and successful OpenAI Responses startup verification through the gateway. Two numeric synthetic hypotheses were retained verbatim and recalled exactly through separate HTTP MCP sessions with strict experiment tags. The command center then installed the user unit, exposed 15 allowlisted MCP tools and accepted a fresh Claude-to-Codex byte-equal round trip.",
+  "limitations": [
+    "This registration reuses the original attributed host execution; it does not replay installation, model calls or native client acceptance.",
+    "Synthetic round trips qualify the exercised integration, not research recall quality, trading results or an unchanged upstream test suite.",
+    "Research recall selects world and experience fact types; observations are synthesized paraphrases. Recall cannot hard-filter by time and never supplies point-in-time exclusion for backtests.",
+    "The recovery and environment-file precedence fixes are repository templates pending a separate CC-cued host apply. The immutable artifact retains the originally installed unit/drop-in hashes."
+  ],
+  "data": {
+    "artifact_path": "evidence/artifacts/hindsight-research-memory-20261008/receipt.json",
+    "source_pin": "5fc4ce20917b916240cef27c212c387a177f115b",
+    "recipe_document": "recipes/hindsight-research-memory.md",
+    "coding_memory": "ai-memory",
+    "restart_scope": "Command-center unit enable/start and subsequent MCP-allowlist restart recorded in the source receipt; the revised retry policy was not installed or tested.",
+    "restart_source_receipt_sha256": "5ea26fec38d6cd617aa6d81f0fbb4a2c3eeca70331cd404edaaf58e047c5f1f0",
+    "persistence_scope": "Named pg0 data-directory persistence is documented; same-record durability after restart and backup/restore are not established by this wrapper."
+  }
+}
