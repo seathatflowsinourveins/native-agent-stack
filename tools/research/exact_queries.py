@@ -1,7 +1,7 @@
 """Mechanical retention adapter for installed deedy5/ddgs 9.16.0.
 
-Sources: deedy5/ddgs 9.16.0 installed ddgs/ddgs.py:135-271 and
-ddgs/engines/duckduckgo.py:15-44, source hashes below. Native text() receives
+Sources: deedy5/ddgs 9.16.0 installed ddgs/ddgs.py:135-272 and
+ddgs/engines/duckduckgo.py:15-42, source hashes below. Native text() receives
 each exact approved Q string; DDGS owns search, filtering, ranking and extract().
 The demonstrated gap is that DeerFlow dispatch plans research with a model and
 does not guarantee exact search strings or a zero-model-call capture phase.
@@ -128,6 +128,10 @@ def public_url(url):
     try:
         parts = urlsplit(url)
         if parts.scheme not in {"http", "https"} or parts.username or parts.password or not parts.hostname:
+            return False
+        # Native transports can canonicalize encoded/non-ASCII host spellings
+        # into nonpublic addresses. Refuse them rather than rewriting vendor URLs.
+        if "%" in parts.hostname or not parts.hostname.isascii():
             return False
         hostname = parts.hostname.lower().rstrip(".")
         if hostname == "localhost" or hostname.endswith((".localhost", ".local")):
