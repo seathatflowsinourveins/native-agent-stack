@@ -16598,8 +16598,8 @@
     },
     {
       "path": "catalogs/foundation/README.md",
-      "sha256": "cdbd873798f3e200a38911733a4f81c0ac046164c4bb7e16ba858125414f15c3",
-      "bytes": 16480
+      "sha256": "752e2fbc8cef933140dd0ef921ae97d3bc2d89e24f7ff747535155eff8f96c63",
+      "bytes": 16787
     },
     {
       "path": "catalogs/foundation/automation.json",
@@ -17995,6 +17995,11 @@
       "path": "docs/foundation-convergence-20260921.md",
       "sha256": "2a8fe0a5f1bc9008d322a9199cec5c9750ab0d141c755852bb68cfad2d3a71d3",
       "bytes": 7028
+    },
+    {
+      "path": "docs/foundation-layer-map-20261008.md",
+      "sha256": "1c2fe5e89fec00fbe589b7092b35d8c903c865696161309441113348cefc27b9",
+      "bytes": 33978
     },
     {
       "path": "docs/foundation-rd-readiness.md",
