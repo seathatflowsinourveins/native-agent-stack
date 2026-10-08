@@ -76,6 +76,14 @@ class LocalPagesTests(unittest.TestCase):
         self.write_json(self.road_path, self.roadmap)
         self.road_inputs = self.cc / "roadmap/roadmap-inputs.json"
         self.write_json(self.road_inputs, {"board_base": str(self.state / "unavailable-board.json"), "handbook_commit": "fixture-only"})
+        self.current_path = self.state / "coordination/command-center/pages/cc-now.json"
+        self.current = {"schema": "cc-now/1", "updated_utc": "2024-07-08T09:10:00Z", "timezone_for_display": "America/New_York", "headline": "Fixture current headline", "readiness": {"start_gates_met": 4, "start_gates_total": 5, "estimate_percent": 75, "basis": "Authored fixture estimate"}, "gates": [{"id": "G-test", "state": "MET", "what": "Current test receipt", "blocks_start": True}, {"id": "G-other", "state": "OPEN", "what": "Optional fixture task", "blocks_start": False}], "next_events": [{"utc": "2024-07-09T13:15:00Z", "what": "Summer fixture event"}, {"utc": "2024-12-09T13:15:00Z", "what": "Winter fixture event"}], "waiting_on_owner": [{"what": "Review a source", "by_utc": "2024-07-09T18:00:00Z"}], "workstation": {"windows_available_gib": 17.4, "wsl_available_gib": 70.7, "swap_used_gib": 0, "read_utc": "2024-07-08T08:00:00Z"}}
+        self.write_json(self.current_path, self.current)
+        self.workstation_result = {key: {"value_gib": self.current["workstation"][key], "source": "cc-now fallback", "read_utc": self.current["workstation"]["read_utc"]} for key in ("windows_available_gib", "wsl_available_gib", "swap_used_gib")}
+        self.workstation_result["API_errors"] = []
+        self.workstation_patch = patch.object(BUILDER, "collect_workstation", return_value=self.workstation_result)
+        self.workstation_patch.start()
+        self.addCleanup(self.workstation_patch.stop)
 
     @staticmethod
     def write_json(path: Path, value: object) -> None:
@@ -89,14 +97,14 @@ class LocalPagesTests(unittest.TestCase):
         return {path.relative_to(self.output).as_posix(): path.read_bytes() for path in self.output.rglob("*") if path.is_file()}
 
     def test_full_documents_native_digest_and_local_resources(self) -> None:
-        source_bytes = {path: path.read_bytes() for path in (self.source_index, self.gate, self.gaps_path, self.road_path)}
+        source_bytes = {path: path.read_bytes() for path in (self.source_index, self.gate, self.gaps_path, self.road_path, self.current_path)}
         receipt = self.refresh()
         native, _ = BUILDER.load_native(self.root)
         expected = hashlib.sha256(native.render(native.build(self.root, self.state, self.source_index))).hexdigest()
         self.assertEqual(receipt["native_readiness_manifest_sha256"], expected)
         self.assertEqual(json.loads(self.receipt.read_text()), receipt)
-        self.assertEqual(len(receipt["outputs"]), 6)
-        for name in ("index", "readiness", "gaps", "roadmap"):
+        self.assertEqual(len(receipt["outputs"]), 7)
+        for name in ("index", "readiness", "gaps", "roadmap", "sources"):
             text = (self.output / (name + ".html")).read_text()
             audit = DocumentAudit()
             audit.feed(text)
@@ -122,15 +130,63 @@ class LocalPagesTests(unittest.TestCase):
         self.refresh()
         gap = (self.output / "gaps.html").read_text()
         readiness = (self.output / "readiness.html").read_text()
+        sources = (self.output / "sources.html").read_text()
         roadmap = (self.output / "roadmap.html").read_text()
         self.assertIn("updated_utc = 2024-05-06T07:08Z", gap)
-        self.assertIn("updated_utc = 2024-04-05T06:07:08Z", readiness)
-        self.assertIn("checked_at = 2024-03-04T05:06:07Z", readiness)
+        self.assertIn("updated_utc = 2024-04-05T06:07:08Z", sources)
+        self.assertIn("checked_at = 2024-03-04T05:06:07Z", sources)
+        self.assertNotIn('<ul class="source-list">', readiness)
         self.assertIn("Source-owned snapshot date unspecified", roadmap)
         self.assertIn("file metadata, not event or acceptance time", roadmap)
         self.assertIn("2024-06-07T08:09:00Z", roadmap)
-        self.assertIn("These are retained event dates", roadmap)
-        self.assertIn("Passing a date does not record completion", roadmap)
+        self.assertEqual(roadmap.count('class="evidence-footnote"'), 1)
+        self.assertNotIn("Passing a date does not record completion", roadmap)
+
+    def test_current_view_precedes_dated_manifest_without_mutating_sources(self) -> None:
+        original = self.current_path.read_bytes()
+        receipt = self.refresh()
+        text = (self.output / "readiness.html").read_text()
+        self.assertLess(text.index('id="now-view"'), text.index('id="manifest-title"'))
+        self.assertIn("4 of 5 START gates met", text)
+        self.assertIn("CC estimate 75%", text)
+        self.assertIn("Authored fixture estimate", text)
+        self.assertIn("command-center current view", text)
+        self.assertIn("retained pending measurement", text)
+        self.assertIn("superseded in the current view", text)
+        self.assertEqual(self.current_path.read_bytes(), original)
+        self.assertEqual(receipt["command_center_current_view"]["sha256"], hashlib.sha256(original).hexdigest())
+        for name in ("index", "readiness"):
+            html = (self.output / (name + ".html")).read_text()
+            self.assertLess(html.index('data-gate="G-test"'), html.index('data-gate="G-other"'))
+            self.assertEqual(html.count('class="evidence-footnote"'), 1)
+
+    def test_current_view_times_keep_new_york_first_and_exact_utc(self) -> None:
+        self.refresh()
+        text = (self.output / "readiness.html").read_text()
+        self.assertLess(text.index("Jul 09, 09:15:00 EDT"), text.index("Jul 09, 13:15:00 UTC"))
+        self.assertLess(text.index("Dec 09, 08:15:00 EST"), text.index("Dec 09, 13:15:00 UTC"))
+        self.assertIn("2024-07-08T08:00:00Z", text)
+        self.assertIn("cc-now fallback", text)
+
+    def test_cc_current_schema_failure_preserves_last_successful_render(self) -> None:
+        self.refresh()
+        old = self.generated_bytes()
+        old_receipt = self.receipt.read_bytes()
+        self.current["schema"] = "cc-now/unsupported"
+        self.write_json(self.current_path, self.current)
+        with self.assertRaises(ValueError):
+            self.refresh()
+        self.assertEqual(self.generated_bytes(), old)
+        self.assertEqual(self.receipt.read_bytes(), old_receipt)
+
+    def test_current_links_allow_https_and_reject_executable_urls(self) -> None:
+        self.current["waiting_on_owner"] = [{"what": "Allowed external source", "link": "https://example.org/document", "by_utc": "2024-07-09T18:00:00Z"}, {"what": "Unsafe URL remains text", "link": "javascript:alert(1)"}]
+        self.write_json(self.current_path, self.current)
+        self.refresh()
+        text = (self.output / "readiness.html").read_text()
+        self.assertIn('href="https://example.org/document"', text)
+        self.assertNotIn("javascript:", text)
+        self.assertIn("Unsafe URL remains text", text)
 
     def test_untrusted_text_does_not_create_markup_or_account_links(self) -> None:
         attack = '<img src="https://attacker.invalid/x" onerror="alert(1)">'

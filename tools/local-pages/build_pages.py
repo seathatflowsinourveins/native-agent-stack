@@ -29,7 +29,7 @@ DATE_KEYS = ("as_of_utc", "updated_utc", "generated_utc", "generated_at",
              "checked_at", "recorded_utc", "captured_at", "captured_utc")
 ACCOUNT_URL = re.compile(r"https?://(?:claude\.ai/artifact|chatgpt\.com/|chat\.openai\.com/)[^\s<>\"']*", re.I)
 TEMPLATE = re.compile(r"\$?\{[A-Za-z_][A-Za-z0-9_]*\}")
-PAGES = {"index": "Overview", "readiness": "Readiness", "gaps": "Gap register", "roadmap": "Roadmap"}
+PAGES = {"index": "Home", "readiness": "Readiness", "gaps": "Gap board", "roadmap": "Roadmap", "sources": "Sources"}
 
 
 def utc_now() -> str:
@@ -106,9 +106,9 @@ def source_scope(item: dict[str, Any], document: dict[str, Any]) -> str:
 
 
 def document(page: str, title: str, lede: str, scope: str, body: str,
-             refreshed: str, manifest_sha: str, source_notes: list[str]) -> bytes:
+             refreshed: str, manifest_sha: str, source_notes: list[str], leading: str | None = None) -> bytes:
     nav = "".join(f'<a href="{name}.html"' + (' aria-current="page"' if name == page else '') + f'>{text}</a>' for name, text in PAGES.items())
-    sources = "".join(f"<li>{note}</li>" for note in source_notes)
+    heading = leading if leading is not None else f'<header class="page-header"><h1>{esc(title)}</h1><p class="lede">{esc(lede)}</p></header>'
     return (f'''<!doctype html>
 <html lang="en">
 <head>
@@ -131,16 +131,15 @@ def document(page: str, title: str, lede: str, scope: str, body: str,
   </label>
 </header>
 <main id="main-content">
-  <header class="page-header"><p class="eyebrow">Retained source view</p><h1>{esc(title)}</h1><p class="lede">{esc(lede)}</p></header>
+  {heading}
+  {body}
+</main>
+<footer class="site-footer"><p><a href="sources.html#{page}">Sources and dates for this page</a></p>
   <div class="snapshot-note"><p><strong>Source as of:</strong> {esc(scope)}</p>
     <p><strong>Page refreshed:</strong> <time datetime="{esc(refreshed)}">{esc(refreshed)}</time></p>
     <p><strong>Native readiness manifest SHA-256:</strong> <code>{manifest_sha}</code></p>
-    <p>Recorded source states retain their original scope. Rendering does not establish fresh execution, reader approval or landing.</p>
   </div>
-  {body}
-</main>
-<footer class="site-footer"><h2>Source scope</h2><ul class="source-list">{sources}</ul>
-  <p>Input hashes and refresh custody are retained outside this served directory. Source-linked operational records are shown; attributed direction sections and account artifact links are omitted.</p>
+  <p class="evidence-footnote">Current views and dated receipts retain their source scope; this page does not establish new execution, approval or landing.</p>
 </footer>
 </div>
 </body>
@@ -196,13 +195,18 @@ def roadmap_body(status: dict[str, Any]) -> str:
         raise ValueError("ladder entries must be source text")
     sequence = "".join(f'<li>{esc(item.replace("**", ""))}</li>' for item in ladder)
     return f'''<div class="metric-grid" aria-label="Source row counts"><p><strong>{len(milestones)}</strong> milestones</p><p><strong>{len(servers)}</strong> server records</p></div>
-<section class="panel"><div class="section-header"><h2>Source-listed milestones</h2><p>These are retained event dates and source states. Passing a date does not record completion.</p></div><ol class="milestone-rail">{events}</ol></section>
-<section class="panel"><div class="section-header"><h2>Server records</h2><p>Verdicts are copied from this roadmap snapshot; they are not a new host check.</p></div><div class="table-wrap"><table><thead><tr><th>Server</th><th>Role</th><th>Paired client evidence</th><th>Source verdict</th><th>Next action</th></tr></thead><tbody>{server_rows}</tbody></table></div></section>
+<section class="panel"><div class="section-header"><h2>Milestones</h2></div><ol class="milestone-rail">{events}</ol></section>
+<section class="panel"><div class="section-header"><h2>Server records</h2></div><div class="table-wrap"><table><thead><tr><th>Server</th><th>Role</th><th>Paired client evidence</th><th>Source verdict</th><th>Next action</th></tr></thead><tbody>{server_rows}</tbody></table></div></section>
 <section class="panel"><div class="section-header"><h2>Recorded finalization sequence</h2></div><ol class="source-sequence">{sequence}</ol></section>'''
 
 
-def readiness_body(native: Any, manifest: dict[str, Any]) -> str:
-    gates = "".join(f'<article class="gate-card"><h3>{esc(row["id"])}</h3><p class="gate-state">{esc(fact(row["fields"].get("state")))}</p><p>Operational owner: {esc(fact(row["fields"].get("owner")))}</p></article>' for row in manifest["gates"])
+def readiness_body(native: Any, manifest: dict[str, Any], current: dict[str, Any], view: Any) -> str:
+    cards = []
+    for row in manifest["gates"]:
+        state = fact(row["fields"].get("state"))
+        superseded = '<p class="superseded-note">superseded in the current view</p>' if view.superseded(row["id"], state, current) else ''
+        cards.append(f'<article class="gate-card" data-manifest-gate="{esc(row["id"])}"><h3>{esc(row["id"])}</h3><p class="gate-state">{esc(state)}</p>{superseded}<p>Operational owner: {esc(fact(row["fields"].get("owner")))}</p></article>')
+    gates = "".join(cards)
     fragment = display(native.render_fragment(manifest))
     fragment = fragment.replace('<table>', '<div class="table-wrap"><table>').replace('</table>', '</table></div>')
     summary = manifest["summary"]
@@ -221,10 +225,25 @@ def load_native(root: Path) -> tuple[Any, dict[str, Any]]:
     return native, item
 
 
+def load_local(name: str) -> Any:
+    path = Path(__file__).resolve().parent / (name + ".py")
+    spec = importlib.util.spec_from_file_location("local_pages_" + name, path)
+    if spec is None or spec.loader is None:
+        raise ValueError("local presentation module is unavailable")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def collect_workstation(fallback: dict[str, Any]) -> dict[str, Any]:
+    return load_local("workstation").collect(fallback)
+
+
 def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
             sources: Path = Path("tools/north-star/sources.json"),
             gaps_source: Path | None = None, roadmap_source: Path | None = None,
-            roadmap_inputs: Path | None = None, refreshed: str | None = None) -> dict[str, Any]:
+            roadmap_inputs: Path | None = None, refreshed: str | None = None,
+            current_source: Path | None = None) -> dict[str, Any]:
     root, state_root = no_symlinks(root), no_symlinks(state_root)
     output_dir, receipt = no_symlinks(output_dir), no_symlinks(receipt)
     if receipt.is_relative_to(output_dir):
@@ -283,6 +302,13 @@ def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
     gap_input = capture("gaps", gaps_source or cc_tools / "gaps/gaps.json")
     road_input = capture("roadmap", roadmap_source or cc_tools / "roadmap/roadmap-status.json")
     road_index = capture("roadmap_inputs", roadmap_inputs or cc_tools / "roadmap/roadmap-inputs.json")
+    current_input = capture("cc_now", current_source or state_root / "coordination/command-center/pages/cc-now.json")
+    current = strict_json(current_input["raw"])
+    view = load_local("current_view")
+    view.validate(current)
+    for name in ("current_view", "workstation"):
+        capture("module:" + name, Path(__file__).resolve().parent / (name + ".py"))
+    workstation = collect_workstation(current["workstation"])
     gaps, roadmap, road_links = (strict_json(item["raw"]) for item in (gap_input, road_input, road_index))
     if any(not isinstance(item, dict) for item in (gaps, roadmap, road_links)):
         raise ValueError("CC page source must be a JSON object")
@@ -310,13 +336,22 @@ def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
     road_scope = source_scope(road_input, roadmap)
     gap_notes = [f'<code>{esc(label_path(gap_input["path"], root, state_root))}</code> — {esc(gap_scope)}', "Counts describe rows and severity labels in this gap snapshot. Due dates are source-listed deadlines."]
     road_notes = [f'<code>{esc(label_path(road_input["path"], root, state_root))}</code> — {esc(road_scope)}', f'<code>{esc(label_path(road_index["path"], root, state_root))}</code> — retained input bindings; hashes remain in the nonserved receipt.', "Milestone dates are event dates. No single roadmap snapshot date was inferred from them."]
-    overview = '<section class="panel"><div class="section-header"><h2>Choose a source view</h2></div><ul class="page-index"><li><a href="readiness.html">Readiness receipts</a><p>Native gate, layer and SDK records, with retained source boundaries.</p></li><li><a href="gaps.html">Gap register</a><p>Search and filter the CC snapshot by group and severity.</p></li><li><a href="roadmap.html">Roadmap</a><p>Source-listed milestones, server records and finalization sequence.</p></li></ul></section>'
+    overview = '<section class="panel"><h2>Choose a page</h2><ul class="page-index"><li><a href="readiness.html">North-star readiness</a><p>What is done, what is left and what needs a decision.</p></li><li><a href="gaps.html">Grand Gap Board</a><p>Find open gaps and their next actions.</p></li><li><a href="roadmap.html">Roadmap</a><p>Read the dated milestones and server records.</p></li><li><a href="sources.html">Sources</a><p>Check input dates, hashes and evidence scope.</p></li></ul></section>'
+    current_scope = 'command-center current view; updated_utc = ' + current["updated_utc"]
+    current_notes = [f'<code>{esc(label_path(current_input["path"], root, state_root))}</code> — {esc(current_scope)}; SHA-256 <code>{current_input["sha256"]}</code>', 'Workstation readings use an exact Prometheus metric when present, otherwise the CC-owned value and its recorded read time.']
+    source_groups = {"index": current_notes, "readiness": current_notes + readiness_notes, "gaps": gap_notes, "roadmap": road_notes}
+    source_body = "".join(f'<section id="{key}" class="panel"><h2>{esc(PAGES[key])}</h2><ul class="source-list">' + "".join(f'<li>{note}</li>' for note in notes) + '</ul></section>' for key, notes in source_groups.items())
+    custody_rows = "".join(f'<tr><td><code>{esc(label_path(item["path"], root, state_root))}</code></td><td><code>{esc(item.get("sha256") or item.get("status", "UNVERIFIED"))}</code></td></tr>' for item in inputs.values())
+    source_body += f'<section id="sources" class="panel"><h2>Input identity</h2><div class="table-wrap"><table><thead><tr><th>Source</th><th>SHA-256 or status</th></tr></thead><tbody>{custody_rows}</tbody></table></div></section>'
+    index_leading = f'<header class="page-header"><h1>North-star readiness and next steps</h1><p class="current-stamp">{esc(current_scope)}</p><p>{esc(current["headline"])}</p><p class="now-score"><strong>{current["readiness"]["start_gates_met"]} of {current["readiness"]["start_gates_total"]} START gates met</strong></p></header>' + view.gate_strip(current)
+    manifest_body = f'<section class="manifest-section" aria-labelledby="manifest-title"><h2 id="manifest-title" class="manifest-title">repository manifest at <code>{manifest_sha}</code>, dated receipts</h2><p><a href="sources.html#readiness">Source dates and retained receipt identities</a></p>' + readiness_body(native, manifest, current, view) + '</section>'
     common = (refreshed, manifest_sha)
     outputs = {
-        "index.html": document("index", "Engineering source views", "Read the records and their dates before following the next action.", "Mixed snapshots. Each page names its own source date scope.", overview, *common, ["Gap snapshot: " + esc(gap_scope), "Roadmap snapshot: " + esc(road_scope), "Readiness: per-source retained dates; no combined snapshot timestamp."]),
-        "readiness.html": document("readiness", "Readiness receipts", "The native manifest joins retained receipt facts. Each claim keeps its source status.", "Per-source dates below; no combined source-owned snapshot timestamp.", readiness_body(native, manifest), *common, readiness_notes),
-        "gaps.html": document("gaps", "Gap register", "Source-listed open measurements and next actions, in one searchable register.", gap_scope, gap_body(rows(gaps, "gaps", ("id", "group", "sev", "title"))), *common, gap_notes),
-        "roadmap.html": document("roadmap", "Roadmap", "Retained milestone events and server records from the command-center roadmap snapshot.", road_scope, roadmap_body(roadmap), *common, road_notes),
+        "index.html": document("index", "North-star readiness and next steps", "", current_scope, overview, *common, [], leading=index_leading),
+        "readiness.html": document("readiness", "North-star readiness: what is done, what is left, what needs a decision", "", current_scope, manifest_body, *common, [], leading=view.render(current, workstation)),
+        "gaps.html": document("gaps", "Grand Gap Board", "Find the open gaps, who owns them and what happens next.", gap_scope, gap_body(rows(gaps, "gaps", ("id", "group", "sev", "title"))), *common, []),
+        "roadmap.html": document("roadmap", "Roadmap", "Read the dated milestones and server records.", road_scope, roadmap_body(roadmap), *common, []),
+        "sources.html": document("sources", "Sources and dates", "Check the dates and identities behind each page.", 'Current view and dated repository receipts remain distinct.', source_body, *common, []),
     }
     for name in ("site.css", "site.js"):
         item = capture("asset:" + name, ASSETS / name)
@@ -327,9 +362,13 @@ def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
             raise ValueError("generated destination overlaps an input")
     if any(Path(item["path"]) == receipt for item in inputs.values()):
         raise ValueError("refresh receipt overlaps an input")
+    if snapshot(Path(current_input["path"]))["sha256"] != current_input["sha256"]:
+        raise ValueError("CC current view changed during refresh")
     receipt_doc = {"schema_version": 1, "kind": "local_page_refresh", "generated_utc": refreshed,
                    "output_dir": str(output_dir), "native_readiness_manifest_sha256": manifest_sha,
-                   "native_readiness_summary": manifest["summary"],
+                    "native_readiness_summary": manifest["summary"],
+                    "command_center_current_view": {"updated_utc": current["updated_utc"], "sha256": current_input["sha256"], "schema": current["schema"]},
+                    "workstation": workstation,
                    "source_scope": {"readiness": "Per-source retained dates; no combined snapshot timestamp", "gaps": gap_scope, "roadmap": road_scope},
                    "inputs": {key: {field: value for field, value in item.items() if field != "raw"} for key, item in inputs.items()},
                    "outputs": {key: {"sha256": hashlib.sha256(value).hexdigest(), "bytes": len(value)} for key, value in outputs.items()},
@@ -380,14 +419,15 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--gaps-source", type=Path)
     parser.add_argument("--roadmap-source", type=Path)
     parser.add_argument("--roadmap-inputs", type=Path)
+    parser.add_argument("--current-source", type=Path, help="CC-owned cc-now/1 current view (read only)")
     args = parser.parse_args(argv)
     output = args.output_dir or args.state_root / "coordination/command-center/local-pages"
     receipt = args.receipt or args.state_root / "research/fullspeed-20261008/g5-stars-gap/local-pages/refresh-receipt.json"
     try:
-        result = refresh(args.root, args.state_root, output, receipt, args.sources, args.gaps_source, args.roadmap_source, args.roadmap_inputs)
+        result = refresh(args.root, args.state_root, output, receipt, args.sources, args.gaps_source, args.roadmap_source, args.roadmap_inputs, current_source=args.current_source)
     except (OSError, ValueError, KeyError, TypeError, ImportError) as error:
         parser.exit(1, f"local-pages: refresh failed ({type(error).__name__}): {error}\n")
-    print(json.dumps({"output_dir": str(output), "receipt": str(receipt), "generated_utc": result["generated_utc"], "native_readiness_manifest_sha256": result["native_readiness_manifest_sha256"], "pages": 4}, sort_keys=True))
+    print(json.dumps({"output_dir": str(output), "receipt": str(receipt), "generated_utc": result["generated_utc"], "native_readiness_manifest_sha256": result["native_readiness_manifest_sha256"], "pages": 5, "API_errors": result["workstation"].get("API_errors", [])}, sort_keys=True))
     return 0
 
 

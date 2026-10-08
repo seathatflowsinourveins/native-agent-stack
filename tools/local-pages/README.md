@@ -1,7 +1,7 @@
 # Local engineering pages
 
-`build_pages.py` presents the native readiness receipts, CC gap snapshot and CC
-roadmap snapshot as four complete local HTML documents. It uses the existing
+`build_pages.py` presents the CC current view, native readiness receipts,
+gap board, roadmap and sources as five complete local HTML documents. It uses the existing
 `tools/north-star/build_readiness.py` functions `build`, `render` and
 `render_fragment`; it adds presentation and refresh custody without deciding
 gate acceptance. The initial reference is repository commit
@@ -30,6 +30,24 @@ and receipt defaults to
 `research/fullspeed-20261008/g5-stars-gap/local-pages/refresh-receipt.json`
 under the chosen state root.
 
+`--current-source` selects a read-only `cc-now/1` JSON file; its default is
+`state-root/coordination/command-center/pages/cc-now.json`. It supplies the
+readiness page's compact current view and the index's shared gate strip.
+The CC-owned headline, gate count, estimate and basis are presented as recorded.
+Events and owner deadlines show America/New_York first and UTC second, using
+Python's `zoneinfo` with the date's actual daylight-saving offset. Manifest
+cards keep their original dated states; disagreement with the current gate
+or its split successors adds “superseded in the current view.” Sources and
+long per-input date lists are on `sources.html`, linked from each page.
+
+`workstation.py` uses the installed Prometheus HTTP API at
+`http://127.0.0.1:19090` to read exact available-memory and swap metrics when
+present. Ambiguous, missing, stale or invalid series retain the CC's value
+and read time. Each displayed figure identifies its provenance and timestamp;
+no free-memory metric is relabelled as available. Requests have finite server
+and client bounds. Query identity, sample metadata and any API error are
+retained in the nonserved refresh receipt. There is no new exporter or dependency.
+
 All input reads and rendering complete before publication. Generated HTML and
 assets are prepared in nonserved staging, then each destination is atomically
 replaced with `os.replace`; the receipt is replaced last. This is atomic per
@@ -44,8 +62,8 @@ source paths, input hashes and generated output hashes without copying source
 bytes into the served directory. No source CC HTML or JSON is overwritten.
 
 Every page distinguishes its generated refresh time from source-owned dates.
-The gap page preserves `updated_utc`; readiness lists the date fields in each
-retained input when available. A roadmap without a source-owned snapshot date
+The gap page preserves `updated_utc`; the sources page lists the date fields
+in each retained input when available. A roadmap without a source-owned snapshot date
 says so and identifies its file modification time as file metadata. Milestone
 dates remain event dates. The SHA on every page is the SHA-256 of the JSON
 produced by native `render`, rather than an invented readiness digest.
@@ -54,7 +72,7 @@ following the custodian's `cc-tools/roadmap/build_roadmap.py:284` schema. Relati
 `when` labels are displayed verbatim without inventing an ISO date. A milestone
 with neither timing field stops the refresh.
 Missing native retained receipts remain `UNVERIFIED` under the native builder's
-existing semantics. Gap/roadmap source failure stops the refresh.
+existing semantics. Gap/roadmap/current-view source failure stops the refresh.
 
 The pages load only the local stylesheet and script. Navigation, a labelled
 system/light/dark selector and gap search/group/severity filters are their
@@ -72,6 +90,7 @@ Run only the focused builder module:
 
 ```sh
 nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages.py
+nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_workstation.py
 ```
 
 The fixtures use the repository's real native builder and local temporary
@@ -84,4 +103,7 @@ Primary references: the native readiness API at the commit above; the retained
 [`html.escape`](https://docs.python.org/3.13/library/html.html#html.escape),
 [`os.replace`](https://docs.python.org/3.13/library/os.html#os.replace),
 [`tempfile`](https://docs.python.org/3.13/library/tempfile.html) and
-[`importlib.util`](https://docs.python.org/3.13/library/importlib.html#importlib.util.spec_from_file_location).
+[`importlib.util`](https://docs.python.org/3.13/library/importlib.html#importlib.util.spec_from_file_location),
+[`zoneinfo`](https://docs.python.org/3.13/library/zoneinfo.html), and the
+[Prometheus3.15 query API](https://prometheus.io/docs/prometheus/latest/querying/api/#instant-queries).
+The exact exporter metric contracts and pins are recorded in `workstation.py`.

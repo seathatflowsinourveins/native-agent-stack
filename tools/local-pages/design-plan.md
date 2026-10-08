@@ -44,6 +44,25 @@ The first plan would normally turn every metric and gap into a card. That would 
 
 ## Implementation critique
 
+The current operator view uses the read-only `cc-now/1` source at native state
+root's `coordination/command-center/pages/cc-now.json`. Its compact headline,
+gate count, authored estimate and START-first gate strip precede three desktop
+columns for next events, owner actions and workstation readings. Dates put
+America/New_York before UTC. Each figure identifies a live sample or dated CC
+fallback; the manifest below retains its own gate values and marks superseded
+cards. The full input scope moves to a separate sources page. The home page
+repeats the same gate strip and links the pages. One short evidence footnote
+appears per page.
+
+An actual first desktop measurement placed the summary's bottom at
+1004.64px in a 1440×1000 viewport. Smaller checklist row padding and consistent
+date sizing retained all actions and placed it at960.55px in both themes.
+The browser also checked320px and390px document widths. These are measured
+local layout results, separate from CC content approval. An optional pool
+disclosure was simplified to plain text after the Vercel review, so the summary
+adds no new disclosure state. The original source timestamps and authored
+estimate remain visible even when the input merits a custodian correction.
+
 The second pass found that the approved pending foreground `#996421` on the first pale amber fill computed to 4.47:1. Retain that foreground and lighten only the badge fill to `#fff6e8`, which computes to 4.67:1. All other reviewed normal text pairs compute above 4.5:1; the light control border computes to 3.39:1 against its white surface. These are calculations from the stylesheet tokens, not rendered browser measurements.
 
 Long gap titles, milestone titles, source paths, and code identifiers can break at narrow widths instead of forcing page overflow. The system dark fallback is limited to screen media so a script-free preview still prints with the light palette. Gap filtering preserves control focus and uses a polite result-count announcement; an optional reset returns focus to search. No motion or card hover effects were added because they do not explain the evidence.
