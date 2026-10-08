@@ -1,0 +1,6 @@
+# The scans by hand of the unit's journal (`bash journal-save-failures.sh`, scripts/journal-save-failures.sh.txt): at the end of the acceptance and 30 minutes later, over the new unit's journal since its start (2026-10-07 19:41:48 EDT); exit 0 = clean
+## at the end of the acceptance (2026-10-08T00:23:03Z, exit 0)
+journal_failed_to_save_call_log=0 (journalctl --user -u omniroute.service --since Wed 2026-10-07 19:41:48 EDT -o cat --no-pager | grep -c 'Failed to save call log')
+
+## 30 minutes later (2026-10-08T00:53:14Z, exit 0)
+journal_failed_to_save_call_log=0 (journalctl --user -u omniroute.service --since Wed 2026-10-07 19:41:48 EDT -o cat --no-pager | grep -c 'Failed to save call log')

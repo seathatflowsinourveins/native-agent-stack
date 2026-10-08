@@ -1,0 +1,38 @@
+# value-free receipt: after-switch
+taken 2026-10-07T23:42:11Z
+
+## 20128 omniroute.service
+DropInPaths: $HOME/.config/systemd/user/omniroute.service.d/show-log.conf
+OMNIROUTE_SHOW_LOG=1 present in the unit's environment: True
+ActiveState: active
+SubState: running
+MainPID: 339027
+ActiveEnterTimestamp: Wed 2026-10-07 19:41:48 EDT
+NRestarts: 0
+drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+health: 200 {'status': 'ok', 'timestamp': '2026-10-07T23:42:11.185Z'}
+journal lines since the unit's start: 109
+one journal line that shows the child's output reaches journald: [DB] SQLite database ready: $HOME/.local/share/omniroute/storage.sqlite (DATA_DIR=$HOME/.local/share/omniroute, SQLITE_FILE=$HOME/.local/share/omniroute/storage.sqlite)
+counts of credential-shaped strings in that journal (no values): {'bearer_token': 0, 'sk_key': 0, 'refresh_token': 0, 'id_token': 0, 'email_shaped': 0, 'api_key_assignment_with_value': 0}
+log tags of the email-shaped matches (the addresses are not printed): none
+
+## 20129 omniroute-fw.service
+DropInPaths: $HOME/.config/systemd/user/omniroute-fw.service.d/show-log.conf
+OMNIROUTE_SHOW_LOG=1 present in the unit's environment: True
+ActiveState: active
+SubState: running
+MainPID: 340
+ActiveEnterTimestamp: Tue 2026-10-06 09:51:19 EDT
+NRestarts: 0
+drop-in file: OMNIROUTE_SHOW_LOG=1 declared by its own line: True | section headers: ['[Service]'] | other non-comment lines: 0 (not printed) | size 43 bytes | mode 0o600
+health: 200 {'status': 'ok', 'timestamp': '2026-10-07T23:42:11.218Z'}
+journal lines since the unit's start: 714
+one journal line that shows the child's output reaches journald: ✓ Ready in 0ms
+counts of credential-shaped strings in that journal (no values): {'bearer_token': 0, 'sk_key': 0, 'refresh_token': 0, 'id_token': 0, 'email_shaped': 0, 'api_key_assignment_with_value': 0}
+log tags of the email-shaped matches (the addresses are not printed): none
+
+## user journal
+Archived and active journals take up 923.6M in the file system.
+retention keys set in /etc/systemd/journald.conf(.d): none (the journald defaults apply)
+
+observations not obtained: none

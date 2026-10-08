@@ -1,0 +1,12 @@
+# Publication note: UUID-shaped strings (the gateway's correlation ids) are shortened to their first 8 hex digits and an ellipsis, because the repository's publication check rejects full UUIDs; sha256 of this text before the shortening: 709c4bdd979652feeb12091cde381700f69418d2ba13830fea9fdc1035997028; the unshortened text is kept in the first host's private artifact directory (checks/logs/MANIFEST.txt)
+# The wrapper's own log of the canary acceptance (the real-run gate line, the identity at its start, the summary of each run, the wrapper result; its exit status was 0)
+acceptance start 2026-10-07T23:45:41Z
+REAL-RUN-GATE clean: no ACCEPT_TEST_ variable in the environment, and run-acceptance-20261006.sh has the expected sha256 0e74b3b15616b809a907c8ad197247a637fd7a8b7d706f81f1ab41b5119ca33d
+IDENTITY label=start-of-wrapper time=2026-10-07T23:45:41Z unit=omniroute.service MainPID=339027 ExecMainStartTimestamp=Wed_2026-10-07_19:41:48_EDT NRestarts=0 running_prefix=omniroute-3.8.51-c1e30b76-affinity-pr15167-drain-b7c68690 BUILD_SHA=2a41147b7 health=ok pending_total=0 expect_prefix_ok=True expect_build_ok=True
+live-acceptance-canary-raw.txt: SUMMARY {"PASS": 20} end=2026-10-07T23:54:45.164Z exit=0 status=0
+live-acceptance-canary-race.txt: SUMMARY {"PASS": 6} end=2026-10-07T23:57:01.673Z exit=0 status=0
+live-acceptance-canary-native.txt: SUMMARY {'PASS': 4} end=2026-10-08T00:05:21.483Z exit=0 status=0
+live-acceptance-canary-native-tworequest.txt: SUMMARY {'PASS': 8} end=2026-10-08T00:22:40.282Z exit=0 status=0
+WRAPPER-RESULT kind=canary status=0 runs: live-acceptance-canary-raw.txt:0 live-acceptance-canary-race.txt:0 live-acceptance-canary-native.txt:0 live-acceptance-canary-native-tworequest.txt:0 (4 VOID, 1 FAIL, 2 INCONCLUSIVE, 0 ok); outputs in $HOME/.cache/canary-w2-20261007T2325Z/acceptance
+acceptance-exit=0
+acceptance end 2026-10-08T00:22:40Z
