@@ -17827,8 +17827,8 @@
     },
     {
       "path": "docs/decisions/2026-10-07-frozen-evidence-osv-reporting.md",
-      "sha256": "9c0d648f042e2a7dd190296b0861035ba671f1f88966da6596c74388fdac2e9d",
-      "bytes": 12361
+      "sha256": "40daa2dddbcfd16db5805d9412cc11c082510234433fecf2541a38943f26bcde",
+      "bytes": 13035
     },
     {
       "path": "docs/decisions/2026-10-07-instruction-core.md",

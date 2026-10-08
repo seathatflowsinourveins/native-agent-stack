@@ -137,6 +137,8 @@ In `tests.test_osv_lockfile_coverage`, the changed methods are:
 
 | Method | New contract |
 | --- | --- |
+| `FrozenScanTests.test_the_split_is_exhaustive_and_disjoint` | Ordinary and frozen-report groups cover every inventory entry exactly once, with no unscanned config or overlapping assignment. |
+| `FrozenScanTests.test_only_the_frozen_locks_name_a_config` | Only the reviewed frozen locks name the active `.github/osv-scanner-frozen-report.toml` config; ordinary inputs name none. |
 | `FrozenScanTests.test_the_ordinary_config_has_no_exception_for_a_frozen_advisory` | Reviewed historical identities still cannot be suppressed in ordinary coverage. |
 | `FrozenScanTests.test_each_frozen_config_holds_exactly_the_advisories_of_its_locks` | Active frozen report config is exactly empty; no advisory or package suppression. |
 | `FrozenScanTests.test_each_frozen_lock_matches_its_reviewed_digest_and_names_evidence` | Same artifact digest and evidence are preserved with the new config binding. |
@@ -145,6 +147,7 @@ In `tests.test_osv_lockfile_coverage`, the changed methods are:
 | `SyntheticWorkflowInvocationTests.test_each_primary_and_sarif_status_is_retained` | Every ordinary primary/SARIF outcome still affects the required exit code. |
 | `SyntheticWorkflowInvocationTests.test_pr_collects_both_primary_statuses_without_sarif` | Required PR caller runs ordinary primary only; frozen native outcomes are retained separately. |
 | `SyntheticWorkflowInvocationTests.test_the_step_catches_a_mutant_of_itself` | Caller mutation controls enforce the new exhaustive group separation. |
+| `SyntheticWorkflowInvocationTests.test_unknown_duplicate_missing_and_wrong_archive_assignments_fail_before_scan` | The missing-archive and wrong-archive-lock subtests reject absent or wrongly bound frozen-report inputs before any scan, alongside unknown-config and duplicate assignments. |
 | `FrozenPolicyMutationTests.test_frozen_advisory_or_package_override_cannot_leak_to_ordinary_inputs` | Historical identities remain forbidden ordinary suppressions; active frozen suppression is rejected. |
 | `FrozenPolicyMutationTests.test_expired_config_is_rejected_by_the_actual_preflight_guard` | The actual required guard rejects an expired inactive-disposition review rather than an inactive historical ignore expiry. |
 
