@@ -1,0 +1,153 @@
+{
+  "schema_version": 1,
+  "kind": "integration_evidence",
+  "id": "edgar-rate-limit-inventory-20261008",
+  "date": "2026-10-08",
+  "base_commit": "eb5fee4db9a494729deb29bdf38dbabac23ee643",
+  "north_star_action": "Expose the upstream EDGAR request-rate cap through the existing credential inventory so historical-research commands can opt in without exposing contact identity; no research, data acquisition or broker operation occurs in this declaration.",
+  "sources": [
+    {
+      "repository": "https://github.com/dgunning/edgartools",
+      "tag": "v5.61.1",
+      "commit": "7338aa335f6442c52dfa0695422cf1cd27e946e0",
+      "files": [
+        "edgar/httpclient.py:196-202",
+        "docs/resources/sec-compliance.md",
+        "docs/configuration.md"
+      ],
+      "release_published_at": "2026-10-06T22:30:02Z",
+      "source_url": "https://github.com/dgunning/edgartools/blob/7338aa335f6442c52dfa0695422cf1cd27e946e0/edgar/httpclient.py#L196-L202"
+    },
+    {
+      "repository": "https://github.com/dgunning/edgartools",
+      "tag": "v5.60.0",
+      "commit": "1e7a61b3a142dbf5d19bc82444f85239c1786348",
+      "source_url": "https://github.com/dgunning/edgartools/blob/1e7a61b3a142dbf5d19bc82444f85239c1786348/edgar/httpclient.py#L196-L202",
+      "role": "Installed distribution source review at13:43Z, before a different lane's later runtime sync; not a current-runtime version claim."
+    },
+    {
+      "source_url": "https://www.sec.gov/search-filings/edgar-search-assistance/accessing-edgar-data",
+      "section": "Fair access",
+      "role": "Official current maximum10 requests/sec is distinct from the library default9."
+    },
+    {
+      "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+      "commit": "eb5fee4db9a494729deb29bdf38dbabac23ee643",
+      "files": [
+        "adoption/credential-inventory.json",
+        "tools/credentials/credential_run.py",
+        "scripts/credential_status.py",
+        "docs/secret-storage.md"
+      ],
+      "role": "Reuse existing optional/public classification and child-environment isolation; no runner implementation changes."
+    }
+  ],
+  "claims": [
+    {
+      "claim": "EDGAR_RATE_LIMIT_PER_SEC is optional and public in sec-contact; SEC_USER_AGENT remains required/private and EDGAR_IDENTITY optional/private.",
+      "evidence_class": "local_integration"
+    },
+    {
+      "claim": "A missing stored cap stays absent despite an inherited cap; stored5 passes through unmasked; both contact identities are masked on stdout and stderr.",
+      "evidence_class": "synthetic"
+    },
+    {
+      "claim": "The selected vendor function reads int(environment value), default9; official SEC Fair access says maximum10.",
+      "evidence_class": "source_review"
+    },
+    {
+      "claim": "Full edgar/httpclient.py was identical in the installed5.60.0 distribution and official5.60.0/5.61.1 source pins at13:43Z.",
+      "evidence_class": "source_review",
+      "sha256": "63675da6f438d5e06422882a07b20802eded59a944a8357242969b53d7876ecc"
+    }
+  ],
+  "integration_check": {
+    "oracle": "Repository-authored unittest integration/synthetic tests, not unchanged upstream vendor tests",
+    "invocation": [
+      "python3",
+      "-m",
+      "unittest",
+      "tests.test_credential_status.CredentialStatusTests.test_public_variables_classify_every_optional_stored_variable",
+      "tests.test_credential_run.InventoryAndGrammarTests.test_every_injected_name_is_masked_or_public",
+      "tests.test_credential_run.InventoryAndGrammarTests.test_a_required_variable_is_masked_even_when_a_planted_entry_lists_it_public",
+      "tests.test_credential_run.InjectionTests.test_sec_contact_optional_rate_cap_is_public_and_identities_stay_masked",
+      "tests.test_credential_run.InjectionTests.test_parser_never_expands",
+      "tests.test_credential_run.CheckAndIsolationTests.test_check_mode_prints_names_only",
+      "-v"
+    ],
+    "launch": "context-mode Python subprocess.run(argv, cwd=owned_checkout, env={'PATH':'/usr/bin:/bin'}, capture_output=True, text=True, timeout=90); no shell/RTK command rewrite",
+    "python": "System Python3.14, as identified by returned initial-failure standard-library path; separate from runtime Python3.12.",
+    "attempts": [
+      {
+        "attempt": 1,
+        "exit_code": 1,
+        "stdout": "",
+        "stderr_excerpt": "  File \"<system-python>/unittest/loader.py\", line 137, in loadTestsFromName\n    module = __import__(module_name)\n  File \"tests/test_credential_run.py\", line 400\n    self.assert_never_echoed(result.stdout, result.stderr, shown.stdout, shown.stderr)\nIndentationError: unexpected indent\n",
+        "scope": "No tests ran; introduced whitespace typo corrected before attempt2.",
+        "timestamp": null
+      },
+      {
+        "attempt": 2,
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "test_public_variables_classify_every_optional_stored_variable (tests.test_credential_status.CredentialStatusTests.test_public_variables_classify_every_optional_stored_variable) ... ok\ntest_every_injected_name_is_masked_or_public (tests.test_credential_run.InventoryAndGrammarTests.test_every_injected_name_is_masked_or_public) ... ok\ntest_a_required_variable_is_masked_even_when_a_planted_entry_lists_it_public (tests.test_credential_run.InventoryAndGrammarTests.test_a_required_variable_is_masked_even_when_a_planted_entry_lists_it_public) ... ok\ntest_sec_contact_optional_rate_cap_is_public_and_identities_stay_masked (tests.test_credential_run.InjectionTests.test_sec_contact_optional_rate_cap_is_public_and_identities_stay_masked) ... ok\ntest_parser_never_expands (tests.test_credential_run.InjectionTests.test_parser_never_expands) ... ok\ntest_check_mode_prints_names_only (tests.test_credential_run.CheckAndIsolationTests.test_check_mode_prints_names_only) ... ok\n\n----------------------------------------------------------------------\nRan 6 tests in 1.192s\n\nOK\n",
+        "timestamp": null
+      }
+    ],
+    "output_provenance": "Successful stderr and original failed excerpt recovered from worker's retained tool response, not reconstructed or re-executed; host paths in the failure excerpt replaced by logical locators.",
+    "timestamp_limitation": "The subprocess calls emitted no UTC timestamp; exact execution instants are unknown."
+  },
+  "diff_check": {
+    "argv": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "patch_observation": {
+    "observed_at": "2026-10-08T13:48:53.797180+00:00",
+    "argv": [
+      "git",
+      "diff",
+      "--binary",
+      "eb5fee4db9a494729deb29bdf38dbabac23ee643",
+      "--",
+      "adoption/credential-inventory.json",
+      "docs/examples/sec-contact.env.example",
+      "docs/secret-storage.md",
+      "tests/test_credential_status.py",
+      "tests/test_credential_run.py"
+    ],
+    "sha256": "3e952a0100cf5dd4f95fbf1b0d8886344446c934c3491ae9d1e90b2e1ea8c653",
+    "bytes": 9456,
+    "scope": "Five-file source patch observation, not a test artifact hash."
+  },
+  "independent_review": {
+    "result": "No blocking finding",
+    "reviewer_role": "Separate read-only completeness critic",
+    "scope": "Current5-file diff and existing runner/classification source with explicit graph coverage fallback; no retest",
+    "boundary": "Generic runner does not validate numeric cap values, measure aggregate pacing or enforce SEC compliance. Actual vendor cap consumption/throttling was not exercised. No missing candidate class/assertion for this bounded inventory declaration."
+  },
+  "graph_coverage": {
+    "project": "currency-edgar-inventory-20261008",
+    "generation": "2026-10-08T13:39:52Z",
+    "mode": "fast",
+    "paths_checked": 8,
+    "scope": "inventory/tests initially metadata-match; docs/scripts/tools excluded; exact-source fallback used. Changed paths reviewed from current source by critic, not graph completeness."
+  },
+  "inverse": {
+    "description": "Revert the inventory/docs/tests and this receipt with the corresponding registration updates; no host/runtime configuration was installed or changed by this PR.",
+    "native_command": "git revert <landed-commit>; refresh registered hashes with the supported evidence-manifest workflow and validate.py"
+  },
+  "limitations": [
+    "No native SEC request, data acquisition, vendor throttling harness, numeric input validation, aggregate rate budget or broker acceptance.",
+    "No global/client cap is set; the example opt-in remains commented and unset preserves the existing vendor default.",
+    "Synthetic tests use isolated invented contact fixtures; no real credential/store value or authentication store was accessed.",
+    "No runtime package install/sync or selected component re-pin; the separate runtime installer lane owns its native receipt.",
+    "No live provider, GPU or LLM run; worker/parent token usage unknown and no efficiency claim."
+  ],
+  "adoption_decision": "Expose the maintained upstream control in the existing inventory; no new package, custom runner, skill install or alternate scheduler."
+}

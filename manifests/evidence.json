@@ -5077,8 +5077,8 @@
     },
     {
       "path": "adoption/credential-inventory.json",
-      "sha256": "2115b56acbcbf6268ae98ef9aef49325d3b9ebdefc67225393e5ccceca708266",
-      "bytes": 25686
+      "sha256": "c1b31e324e665b63410bc40f139d6e13fbcdf0893877732cd4d002b6ce24cd36",
+      "bytes": 25930
     },
     {
       "path": "adoption/hardware-profiles.json",
@@ -16668,7 +16668,7 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "3c0f531c88431dd19a8844ef0255235f4f21056944220aaf015b703112894127",
+      "sha256": "57acb614811c01a6f5b1e70da8eb7f7e00c01671a2620191c39fc2c6edb14e83",
       "bytes": 159863
     },
     {
@@ -17983,8 +17983,8 @@
     },
     {
       "path": "docs/examples/sec-contact.env.example",
-      "sha256": "183e956761139218262df4046126d785f2aea20e946b13d667700353afedf2a7",
-      "bytes": 316
+      "sha256": "e8331c8d52cf65c9d8b1b84930dff6d3ea3bbfe65b389148c3352a4f5c52599a",
+      "bytes": 520
     },
     {
       "path": "docs/foundation-closure-20260921.md",
@@ -18228,8 +18228,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "61039915b9fe31c5931f3cffbd60bdc686fa3433a495ce91dd56501bb67b0ef7",
-      "bytes": 184073
+      "sha256": "b55aab699f3fd9dad9c1984986dfcdafc6a2ee0450636b95f6b62aafc996791a",
+      "bytes": 185049
     },
     {
       "path": "docs/stack.md",
@@ -20165,6 +20165,16 @@
       "path": "evidence/artifacts/disk-headroom-enospc-20261005/receipt.json",
       "sha256": "c0fc8c156929ec9af44a020753b5175e252ba665e4474e34461ce10ea3691348",
       "bytes": 25377
+    },
+    {
+      "path": "evidence/artifacts/edgar-rate-limit-inventory-20261008/ci-citation-repair.json",
+      "sha256": "d2f097590e0a75d768b69df3930a161638e35a12579476cdac5eea5e34990024",
+      "bytes": 2552
+    },
+    {
+      "path": "evidence/artifacts/edgar-rate-limit-inventory-20261008/receipt.json",
+      "sha256": "e3f95be8fdbe3a98347fc96a9180cc12e20af9cd73869c3db1f677c5e09b4527",
+      "bytes": 9097
     },
     {
       "path": "evidence/artifacts/edgartools-5600-20261004/freeze-5.60.0.txt",
@@ -57413,13 +57423,13 @@
     },
     {
       "path": "tests/test_credential_run.py",
-      "sha256": "3cb959529bb6b26848e66cbc60de9560820964f78430df44027246b1b54d8338",
-      "bytes": 128524
+      "sha256": "f309ca11cf9a70375a3bec07d4ad1a8096cd2726300caea2cde0ebb5952b8424",
+      "bytes": 130105
     },
     {
       "path": "tests/test_credential_status.py",
-      "sha256": "3840065b72c62fe51278b513baee5a01eeff623eb7a3f814e55e3f345c282bf4",
-      "bytes": 53736
+      "sha256": "c47dd8e9d5d2d4e6a898de389f2f3c0cd21f0ccfbc6295c24a35806cfa1261d1",
+      "bytes": 54016
     },
     {
       "path": "tests/test_credential_tools.py",

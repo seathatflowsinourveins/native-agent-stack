@@ -116,7 +116,10 @@ class CredentialStatusTests(unittest.TestCase):
         rows = {e["id"]: e for e in self.inventory["entries"]}
         self.assertEqual(rows["alpaca-paper"]["public_variables"], ["APCA_API_BASE_URL"])
         self.assertEqual(rows["alpaca-paper-2"]["public_variables"], ["APCA_API_BASE_URL"])
-        self.assertEqual(rows["sec-contact"]["public_variables"], [])  # EDGAR_IDENTITY is private contact data
+        self.assertEqual(rows["sec-contact"]["variables"], ["SEC_USER_AGENT"])
+        self.assertEqual(rows["sec-contact"]["optional_variables"], ["EDGAR_IDENTITY", "EDGAR_RATE_LIMIT_PER_SEC"])
+        self.assertEqual(rows["sec-contact"]["public_variables"], ["EDGAR_RATE_LIMIT_PER_SEC"])
+        self.assertEqual(cs.masked_names(rows["sec-contact"]), ["SEC_USER_AGENT", "EDGAR_IDENTITY"])
         self.assertEqual(rows["grafana-admin"]["public_variables"], [])
         self.assertEqual([i for i, e in rows.items() if "public_variables" in e and not e["optional_variables"]], [])
         cases = [
