@@ -1,0 +1,56 @@
+{
+  "base_commit": "8ee8b3bd796c738592e92acd94d7902db3692311",
+  "method": "Existing upstream-integration unittest classes, in-memory exact-text Path read overlay, constants patched in-memory only. No repository mutation.",
+  "base": {
+    "tests_run": 32,
+    "failures": [],
+    "errors": [],
+    "successful": true,
+    "summary": "----------------------------------------------------------------------\nRan 32 tests in 0.103s\n\nOK\n"
+  },
+  "main_tests_on_proposed_text": {
+    "tests_run": 32,
+    "failures": [
+      "tests.test_install_claude_profile.StandingRuleSurfacesTests.test_every_layer_carries_the_same_core_and_no_dropped_rule (layer='examples/claude-native/CLAUDE.md')",
+      "tests.test_install_claude_profile.StandingRuleSurfacesTests.test_every_layer_carries_the_same_core_and_no_dropped_rule (layer='adoption/templates/codex.AGENTS.template.md')",
+      "tests.test_install_claude_profile.StandingRuleSurfacesTests.test_every_layer_carries_the_same_core_and_no_dropped_rule (layer='adoption/new-wsl/claude-user-instructions.md')",
+      "tests.test_install_claude_profile.StandingRuleSurfacesTests.test_every_layer_carries_the_same_core_and_no_dropped_rule (layer='adoption/new-wsl/codex-user-instructions.md')",
+      "tests.test_install_claude_profile.StandingRuleSurfacesTests.test_every_layer_carries_the_same_core_and_no_dropped_rule (layer='AGENTS.md')",
+      "tests.test_install_claude_profile.StandingRuleSurfacesTests.test_every_layer_carries_the_same_core_and_no_dropped_rule (layer='adoption/scaffold/AGENTS.md')",
+      "tests.test_install_claude_profile.StandingRuleSurfacesTests.test_the_portable_block_is_exactly_the_core_and_the_evidence_backed_line",
+      "tests.test_install_claude_profile.StandingRuleSurfacesTests.test_the_repository_file_keeps_its_core_and_the_trading_prerequisite",
+      "tests.test_install_claude_profile.PortableTopRuleTests.test_growth_in_any_loaded_file_crosses_the_fixed_budget",
+      "tests.test_install_claude_profile.PortableTopRuleTests.test_rendered_startup_files_fit_each_clients_fixed_byte_budget (client='claude')",
+      "tests.test_install_claude_profile.PortableTopRuleTests.test_rendered_startup_files_fit_each_clients_fixed_byte_budget (client='codex')",
+      "tests.test_codex_worker_lane.TemplateTests.test_top_rule_is_pinned_and_rendered_rtk_is_the_unchanged_pinned_source"
+    ],
+    "errors": [],
+    "successful": false,
+    "summary": "pinned_source (tests.test_codex_worker_lane.TemplateTests.test_top_rule_is_pinned_and_rendered_rtk_is_the_unchanged_pinned_source)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<author-home>/code/native-agent-stack-ns2604-harness-rules/tests/test_codex_worker_lane.py\", line 462, in test_top_rule_is_pinned_and_rendered_rtk_is_the_unchanged_pinned_source\n    self.assertEqual(hashlib.sha256(top.encode(\"utf-8\")).hexdigest(), TOP_RULE_SHA256)\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 'bf363f0fdc267ac9fb5d814d950e7e9fb6b1cb436587f739d93e16cd0338ef42' != 'bc9f31381973206657685bd1169ff18ce1f64304c3cf287be20fec314bd2aae7'\n- bf363f0fdc267ac9fb5d814d950e7e9fb6b1cb436587f739d93e16cd0338ef42\n+ bc9f31381973206657685bd1169ff18ce1f64304c3cf287be20fec314bd2aae7\n\n\n----------------------------------------------------------------------\nRan 32 tests in 0.086s\n\nFAILED (failures=12)\n"
+  },
+  "candidate_tests_with_declared_expectation_cochanges": {
+    "tests_run": 32,
+    "failures": [],
+    "errors": [],
+    "successful": true,
+    "summary": "----------------------------------------------------------------------\nRan 32 tests in 0.088s\n\nOK\n"
+  },
+  "top_rule_sha_before": "bc9f31381973206657685bd1169ff18ce1f64304c3cf287be20fec314bd2aae7",
+  "top_rule_sha_proposed": "bf363f0fdc267ac9fb5d814d950e7e9fb6b1cb436587f739d93e16cd0338ef42",
+  "top_rule_bytes_proposed": 1692,
+  "top_rule_words_proposed": 245,
+  "startup_bytes_proposed": {
+    "claude": 4728,
+    "codex": 4829
+  },
+  "startup_budget_proposed": {
+    "claude": 4965,
+    "codex": 5071
+  },
+  "core_bytes_before": 1486,
+  "core_bytes_proposed": 1655,
+  "core_words_before": 220,
+  "core_words_proposed": 242,
+  "publication_source_sha256": "821f431bfa312cf05a718d842de9adb1592217ef9f0aa7d8909241750f0fdcae",
+  "publication_sanitization": "Publication copy replaces personal home prefixes and local session IDs. Native measurements, source pins and evidence boundaries are retained; the full original receipt remains in the sealed external bundle."
+}

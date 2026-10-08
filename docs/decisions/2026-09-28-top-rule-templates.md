@@ -176,12 +176,12 @@ No second GPT-6 round was run.
 
 - The ecosystem compounds: a request is a starting point, not a boundary. Proceed where the evidence converges, and apply or propose the related improvements the work surfaces, at a moment that keeps the current focus and any protected window intact. Each choice adopts the current best converged practice and is replaced when the live landscape converges on a better-evidenced one. When a claim proves wrong, record the correction.
 
-The approval consolidates the owner's repeated direction, recorded in the coordination note `escalation-harness-rule-proactive-20261008.md`:
+The coordination note `escalation-harness-rule-proactive-20261008.md` tracks the proactive-convergence amendment. The practice uses supported upstream capabilities:
 
-- 2026-10-04 01:35Z: "my prompt just a inspriation or starting point ... proceed with auto suggestion for sota convergence practice for our future wsl harness rules".
-- 2026-10-04 22:05Z: "the auto proceed with sota references ... and auto suggestion with full landscape deep dived evidances driven resolution should be the norm".
-- 2026-10-05 04:06Z: "always auto proceed with sota convergence practice ... improve my prompt to latest sota convergence practice".
-- 2026-10-08 13:4xZ: "always yes for the improvements, we need full set of automation, tool set etc ... please enforce it".
+- The harness researches and applies maintained practice even when a prompt omits a mechanism, while preserving evidence, focus and protected windows. Native instruction discovery carries this responsibility: [Codex 0.161.0 AGENTS loader](https://github.com/openai/codex/blob/979011409de0a60b52f179721948e65531d26144/codex-rs/core/src/agents_md.rs).
+- Use runtime event hooks for supported automation: [Claude Code hooks](https://code.claude.com/docs/en/hooks) and [Codex 0.161.0 hook discovery](https://github.com/openai/codex/blob/979011409de0a60b52f179721948e65531d26144/codex-rs/hooks/src/engine/discovery.rs). Verify each handler against the installed client and retain its action boundaries.
+- Keep the shared startup core concise and disclose task detail through native rules and skills: [Claude Code memory](https://code.claude.com/docs/en/memory), [skills](https://code.claude.com/docs/en/skills) and [best practices](https://code.claude.com/docs/en/best-practices).
+- Enforce configured repository conditions with [GitHub rulesets](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/about-rulesets) and run recurring work through [scheduled workflows](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule). These mechanisms do not establish successful adoption by themselves. Official documentation above was fetched 2026-10-08.
 
 The earlier longer proposal in that note is historical context; the exact tightened text approved above governs. Apply or propose related improvements when the evidence supports them and the timing preserves the active focus and protected windows. Existing authority, credential handling, landing cues and protected-window instructions continue to govern actions.
 

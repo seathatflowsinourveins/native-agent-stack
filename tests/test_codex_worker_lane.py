@@ -51,7 +51,7 @@ FIXTURES = ROOT / "tests" / "fixtures" / "codex-worker-lane"
 # the block before it is the top-rule marker and the philosophy core only: the
 # routing paragraph, the session-lanes section and the local exceptions left, so
 # the former pre-RTK and session-lanes pins collapse into this one pin.
-TOP_RULE_SHA256 = "bc9f31381973206657685bd1169ff18ce1f64304c3cf287be20fec314bd2aae7"
+TOP_RULE_SHA256 = "bf363f0fdc267ac9fb5d814d950e7e9fb6b1cb436587f739d93e16cd0338ef42"
 # The template's RTK section since 2026-10-08 (Codex audit F5): rtk-ai/rtk v0.51.0's default awareness paragraph,
 # hooks/rtk-awareness.md at e001f773, byte for byte. With the `rtk hook codex` PreToolUse hook the full text is not
 # needed (AWARENESS_CONFIG.md:12-13,34-38 at e001f773), and the default paragraph is verbatim at every awareness level
