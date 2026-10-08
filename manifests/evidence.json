@@ -54746,6 +54746,16 @@
       "bytes": 866
     },
     {
+      "path": "evidence/receipts/ao-bounded-feedback-20261008.json",
+      "sha256": "528ea20a234c4d2ec4676f6c1248be50078c1727cc6422c15d10af2d02d5a022",
+      "bytes": 5684
+    },
+    {
+      "path": "evidence/receipts/ao-orchestration-landscape-20261008.json",
+      "sha256": "0167f5eee0471073d645d6d4ac0cd2de7e925b830985a20f47f799d57bc9fddb",
+      "bytes": 4922
+    },
+    {
       "path": "evidence/receipts/artifact-reductions.json",
       "sha256": "7d222b20b6f42dd340137df3ea46c012c8d10cb47efc911ab839aa3ad135d7dc",
       "bytes": 3450
