@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "kind": "ci_source_locator_repair",
+  "pr": 858,
+  "failed_head": "e77598bb1bded543f4d009a68bcd3166acbb125c",
+  "failed_job_url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/37788362452/job/113348881692",
+  "aggregate_url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/37788362452/job/113351590019",
+  "failure": "Exactly5 cited-line-name assertions failed after the12-line EDGAR documentation insertion. No contact-classification failure is recorded.",
+  "repair": "Update only5 source line numbers in catalogs/foundation/upstream-surface-dispositions.json after reading the exact shifted lines; no disposition, policy, gate or test-oracle change.",
+  "source": "native-agent-stack@eb5fee4db9a494729deb29bdf38dbabac23ee643:tests/test_upstream_surface_watch.py:DispositionCitationTests.test_every_cited_line_names_the_key",
+  "native_ci_summary": "Ran1767tests in223.370s; FAILED(failures=5,skipped=47); shard2,modules35",
+  "local_affected_test": {
+    "argv": [
+      "python3",
+      "-m",
+      "unittest",
+      "tests.test_upstream_surface_watch.DispositionCitationTests.test_every_cited_line_names_the_key",
+      "-v"
+    ],
+    "started_at": "2026-10-08T14:12:10.480063+00:00",
+    "finished_at": "2026-10-08T14:12:10.717771+00:00",
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": "test_every_cited_line_names_the_key (tests.test_upstream_surface_watch.DispositionCitationTests.test_every_cited_line_names_the_key) ... ok\n\n----------------------------------------------------------------------\nRan 1 test in 0.065s\n\nOK\n"
+  },
+  "check_class": "repository_integration",
+  "native_log_provenance": {
+    "argv": [
+      "gh",
+      "api",
+      "--cache",
+      "120s",
+      "--allow-escape-sequences",
+      "repos/seathatflowsinourveins/native-agent-stack/actions/jobs/113348881692/logs"
+    ],
+    "observed_at": "2026-10-08T14:10:42.777469Z",
+    "exit_code": 0,
+    "scope": "Actual selected failure frames forwarded after ANSI strip inside sandbox; initial CLI guard refusal retained under OMNI-ERROR."
+  },
+  "limitations": [
+    "Original failed hosted attempt retained; a passing affected local test does not establish final hosted success.",
+    "No model, provider, GPU, SEC or broker execution; no credential-store value access.",
+    "Standalone locator metadata repair, not a new upstream capability or harness."
+  ],
+  "inverse": "Revert this follow-up with its registry hashes; the original failure/repair receipt is retained."
+}
