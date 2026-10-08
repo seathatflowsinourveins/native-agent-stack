@@ -4,10 +4,10 @@
   "source_main": "424b8a778222ae8857aade42c49ae6f7a13b3138",
   "evidence_class": "local_integration",
   "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
-  "profile_sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389",
+  "profile_sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5",
   "outputs": {
-    "docs/new-wsl-handbook.md": "281ec98c555ab4430199ea4f60ba5d003d5ce0c1f8521d57d161cecb2dc21737",
-    "docs/new-wsl-handbook.json": "dc579a24c5d9c2d03b418ca6563a0d4e36be9b64d72811bec1928c8a13d73da5"
+    "docs/new-wsl-handbook.md": "981e9634500ce4ab0d3083990236ada854d845f24e3dbdcd32d37b262f91dfb7",
+    "docs/new-wsl-handbook.json": "f14476918ca459c3cefc5336dd3ac76b9d187f14aeae482935bfbf51300b55d1"
   },
   "inventory": {
     "layers": 37,
@@ -829,6 +829,24 @@
       "native_exit_code": 0,
       "check": "python3 scripts/build_new_wsl_handbook.py --check",
       "evidence_class": "local_integration"
+    },
+    {
+      "recorded_at_utc": "2026-10-08T17:42:22Z",
+      "source_base": "0d5672b08beb87a06daee792afeb66481d0c71e6",
+      "cause": "Keep each current vendor reference unique at immutable sandbox-runtime d9aac209 and regenerate its derived handbook through the unchanged pinned builder. This is source/document consistency, not native acceptance or policy qualification.",
+      "trigger_recorded_at_utc": "2026-10-08T16:52:05Z",
+      "command": "nice -n10 ionice -c2 -n7 python3 scripts/build_new_wsl_handbook.py --write",
+      "native_exit_code": 0,
+      "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
+      "profile_sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5",
+      "current_outputs": {
+        "docs/new-wsl-handbook.md": "981e9634500ce4ab0d3083990236ada854d845f24e3dbdcd32d37b262f91dfb7",
+        "docs/new-wsl-handbook.json": "f14476918ca459c3cefc5336dd3ac76b9d187f14aeae482935bfbf51300b55d1"
+      },
+      "check": "nice -n10 ionice -c2 -n7 python3 scripts/build_new_wsl_handbook.py --check",
+      "check_exit_code": 0,
+      "evidence_class": "local_integration",
+      "scope": "Current generated-byte binding; all earlier native/evidence observations remain unchanged."
     }
   ],
   "previous_outputs": [
@@ -901,6 +919,23 @@
       "outputs": {
         "docs/new-wsl-handbook.md": "c4644145f06a1b1f8b42ed35966a932817009eab90d7c86446294aade0d44efa",
         "docs/new-wsl-handbook.json": "31c4c71ab485b2db9dc21b5ee23a25baa6dbccc07beb905476b8be9eef3a682f"
+      },
+      "inventory": {
+        "layers": 37,
+        "profile_entries": 78,
+        "projected_tools": 82,
+        "canonical_package_ids": 25
+      }
+    },
+    {
+      "superseded_at_utc": "2026-10-08T17:42:22Z",
+      "source_base": "0d5672b08beb87a06daee792afeb66481d0c71e6",
+      "reason": "Preserve the prior maintained output/input binding before Row70 B-E metadata/README-reference correction.",
+      "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
+      "profile_sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389",
+      "outputs": {
+        "docs/new-wsl-handbook.md": "281ec98c555ab4430199ea4f60ba5d003d5ce0c1f8521d57d161cecb2dc21737",
+        "docs/new-wsl-handbook.json": "dc579a24c5d9c2d03b418ca6563a0d4e36be9b64d72811bec1928c8a13d73da5"
       },
       "inventory": {
         "layers": 37,

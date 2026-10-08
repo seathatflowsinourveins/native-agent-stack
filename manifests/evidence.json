@@ -4860,6 +4860,22 @@
         "No uv lock/sync, runtime metadata/venv mutation, provider/broker/model request or N2 resume; owned synthetic acceptance outputs only."
       ],
       "path": "evidence/receipts/runtime-final-native-24-acceptance-20261008.json"
+    },
+    {
+      "id": "row70-records-b-e-20261008",
+      "kind": "artifact_measurement",
+      "component_ids": [
+        "sandbox-runtime"
+      ],
+      "claim": "Bounded source-record corrections name the separately retained Claude and Codex 0.0.79 echo observations, document the unchanged event digest's derivation, repair descriptive spacing and project one immutable current README reference through the unchanged handbook builder.",
+      "limitations": [
+        "Source-record and derived-byte consistency only; no native sandbox, policy, host, model, provider, runtime, broker or upstream test suite was run.",
+        "The frozen Claude receipt remains unchanged with its original pending_in_source field; the separate later Codex evidence is additive.",
+        "The original event digest's method is now explicit; the full private identifier and raw rollout are not published or read.",
+        "The separate living install-plan defect A is outside this B-E unit; no catalogue, plan, workflow, service or client-config changes are included.",
+        "No S4 closure, complete memory/lifecycle acceptance, token savings or new-host upgrade is asserted."
+      ],
+      "path": "evidence/receipts/row70-records-b-e-20261008.json"
     }
   ],
   "files": [
@@ -5355,8 +5371,8 @@
     },
     {
       "path": "adoption/new-wsl-profile.json",
-      "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389",
-      "bytes": 261338
+      "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5",
+      "bytes": 261291
     },
     {
       "path": "adoption/new-wsl-profile.md",
@@ -11291,8 +11307,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "1243a2c8659e61665956868b04cf17e27ea9c49579fbb19f647be1ee600cc4ed",
-      "bytes": 502551
+      "sha256": "4442c37ac9de4049d53a747e18d71baa614b7deb308b0aec2e0b33e752e831a5",
+      "bytes": 502946
     },
     {
       "path": "blueprints/trials-20260926/README.md",
@@ -18411,12 +18427,12 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "dc579a24c5d9c2d03b418ca6563a0d4e36be9b64d72811bec1928c8a13d73da5",
-      "bytes": 693318
+      "sha256": "f14476918ca459c3cefc5336dd3ac76b9d187f14aeae482935bfbf51300b55d1",
+      "bytes": 693271
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "281ec98c555ab4430199ea4f60ba5d003d5ce0c1f8521d57d161cecb2dc21737",
+      "sha256": "981e9634500ce4ab0d3083990236ada854d845f24e3dbdcd32d37b262f91dfb7",
       "bytes": 369144
     },
     {
@@ -40791,8 +40807,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "08bdd178b8c1843e4291bb0dfd4aa54f303e41695320e453986fdc9d68453c02",
-      "bytes": 56944
+      "sha256": "f3622a6cb459b2c53004d05a1a17fa97ce8bdb191724bc2a0d05750a96614e48",
+      "bytes": 59039
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/slot-state-and-core-recipes.json",
@@ -48271,8 +48287,8 @@
     },
     {
       "path": "evidence/artifacts/row70-codex-binding-20261008/source-binding.json",
-      "sha256": "8f0b2682af187aa083c89d3b29abcc98804b28e3fd9a241f3373abe6058c28b5",
-      "bytes": 12658
+      "sha256": "20a70fb540dc2164a31985e2f3734bf7187feed6e79c14fc41a6b5b86a670902",
+      "bytes": 13459
     },
     {
       "path": "evidence/artifacts/row70-codex-binding-20261008/stdout.txt",
@@ -48298,6 +48314,16 @@
       "path": "evidence/artifacts/row70-defect-a-20261008/source-checks.json",
       "sha256": "1fd43b67b8804f24920bb335ab1667e1ea85247ae922a22449009632648b4632",
       "bytes": 4575
+    },
+    {
+      "path": "evidence/artifacts/row70-records-b-e-20261008/independent-critic.json",
+      "sha256": "bdf53e7609e865baa9388ef8ce863ff3a65c937c552bd2529e69a9b59ef5d384",
+      "bytes": 9811
+    },
+    {
+      "path": "evidence/artifacts/row70-records-b-e-20261008/source-checks.json",
+      "sha256": "6b6a950c48877604b0dbb197c46986d54bc7dd9a6394ce5959d352e6400bcded",
+      "bytes": 14162
     },
     {
       "path": "evidence/artifacts/rtk-051-file-list-control-20261004/README.md",
@@ -55696,8 +55722,8 @@
     },
     {
       "path": "evidence/receipts/native-sandbox-codex-binding-20261008.json",
-      "sha256": "01c147e16d146bebd8db2cf11fc267f4b2d7d32a98dcddf1ed2fe8c5a5a1860e",
-      "bytes": 5335
+      "sha256": "06b6e15783396c437e5470db1fec73e101b778712cc9ff90041daf901532c34d",
+      "bytes": 6166
     },
     {
       "path": "evidence/receipts/native-sandbox-network-20260920.json",
@@ -55963,6 +55989,11 @@
       "path": "evidence/receipts/row70-defect-a-install-plan-20261008.json",
       "sha256": "c2494b1c34117a3769d67903db07cb3e80ce8257c94c91f5dd87e07ef65d4261",
       "bytes": 6074
+    },
+    {
+      "path": "evidence/receipts/row70-records-b-e-20261008.json",
+      "sha256": "bf047960c1c056fdaba40acf4a1611c19da1c78bd8afe2b8aad49c6ad980e551",
+      "bytes": 6063
     },
     {
       "path": "evidence/receipts/rtk-050-qualification-20260925.json",
@@ -56706,8 +56737,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c",
-      "bytes": 130270
+      "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d",
+      "bytes": 130275
     },
     {
       "path": "observability/README.md",

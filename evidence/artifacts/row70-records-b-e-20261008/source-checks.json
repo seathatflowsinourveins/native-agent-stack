@@ -1,0 +1,292 @@
+{
+  "schema_version": 1,
+  "kind": "row70_records_source_checks",
+  "evidence_class": "local_integration",
+  "recorded_at_utc": "2026-10-08T18:12:35Z",
+  "source_base": "0d5672b08beb87a06daee792afeb66481d0c71e6",
+  "scope": "Four bounded B-E source-record corrections plus a preserved unknown attribution note; deterministic derived-document binding and independent source/evidence-association critique only.",
+  "trigger": {
+    "recorded_at_utc": "2026-10-08T16:52:05Z",
+    "scope": "Separate records correction after the living install-path handoff."
+  },
+  "practice_basis": [
+    {
+      "repository": "anthropics/sandbox-runtime",
+      "pin": "d9aac2098351ca17f3743fbaf6ecbd0051b7e00e",
+      "file": "README.md",
+      "url": "https://github.com/anthropics/sandbox-runtime/blob/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/README.md",
+      "scope": "Version-scoped vendor echo and settings source; existing operation evidence remains unchanged."
+    },
+    {
+      "repository": "python/cpython",
+      "version": "3.12",
+      "urls": [
+        "https://docs.python.org/3.12/library/hashlib.html",
+        "https://docs.python.org/3.12/library/stdtypes.html#str.encode"
+      ],
+      "scope": "Raw UTF-8 bytes and SHA-256 derivation; the original donor event digest was independently recomputed before adding method metadata."
+    },
+    {
+      "repository": "openai/codex",
+      "release": "rust-v0.161.0",
+      "source_pin": "979011409de0a60b52f179721948e65531d26144",
+      "url": "https://github.com/openai/codex/tree/979011409de0a60b52f179721948e65531d26144/codex-rs",
+      "scope": "Version-scoped producer/event-record schema reference for the retained Codex CLI 0.161.0 session_meta and CommandExecution association; no current-client inference or new execution."
+    },
+    {
+      "repository": "seathatflowsinourveins/native-agent-stack",
+      "source_base": "0d5672b08beb87a06daee792afeb66481d0c71e6",
+      "file": "scripts/build_new_wsl_handbook.py",
+      "sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
+      "scope": "Unchanged supported repository generator projects the unique current vendor reference and binds its source hash; no new generator or selection."
+    }
+  ],
+  "source_inputs": [
+    {
+      "path": "manifests/stack.json",
+      "bytes": 130275,
+      "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
+    },
+    {
+      "path": "blueprints/token-native-focus/saturation-audit.json",
+      "bytes": 502946,
+      "sha256": "4442c37ac9de4049d53a747e18d71baa614b7deb308b0aec2e0b33e752e831a5"
+    },
+    {
+      "path": "evidence/receipts/native-sandbox-codex-binding-20261008.json",
+      "bytes": 6166,
+      "sha256": "06b6e15783396c437e5470db1fec73e101b778712cc9ff90041daf901532c34d"
+    },
+    {
+      "path": "evidence/artifacts/row70-codex-binding-20261008/source-binding.json",
+      "bytes": 13459,
+      "sha256": "20a70fb540dc2164a31985e2f3734bf7187feed6e79c14fc41a6b5b86a670902"
+    },
+    {
+      "path": "adoption/new-wsl-profile.json",
+      "bytes": 261291,
+      "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
+    },
+    {
+      "path": "docs/new-wsl-handbook.md",
+      "bytes": 369144,
+      "sha256": "981e9634500ce4ab0d3083990236ada854d845f24e3dbdcd32d37b262f91dfb7"
+    },
+    {
+      "path": "docs/new-wsl-handbook.json",
+      "bytes": 693271,
+      "sha256": "f14476918ca459c3cefc5336dd3ac76b9d187f14aeae482935bfbf51300b55d1"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
+      "bytes": 59039,
+      "sha256": "f3622a6cb459b2c53004d05a1a17fa97ce8bdb191724bc2a0d05750a96614e48"
+    }
+  ],
+  "records": {
+    "B": {
+      "changed": "Current sandbox saturation prose and the use-stage evidence reference name the two separate retained Claude/Codex 0.0.79 echoes.",
+      "preserved": "The historical 0.0.77 filesystem/network proofs, all stage status values, install/persistence/restart/cleanup/recovery data and current_host_recertified_by_this_audit=false are unchanged."
+    },
+    "C": {
+      "changed": "Both Codex binding records add an explicit event_id_sha256_method beside the unchanged original digest.",
+      "algorithm": "SHA-256",
+      "encoding": "UTF-8",
+      "input_bytes": 41,
+      "source_receipt_sha256": "41a34c6427fab9f9378a7cca9491804f9f8456ca296dbba3849d26fc7664c28b",
+      "source_json_pointer": "/capture/codex_rollout_exec_event/event_id",
+      "derivation": "Digest of the complete raw string bytes, with no JSON quoting, normalization, trailing newline or domain label; the complete identifier remains private.",
+      "digest": "2f74ee226b1555b76d739394684c56773a586ae1e9d20fef9e0dd887d4ab9611",
+      "prefix_only_digest_matches": false,
+      "separate_domain_labelled_event_digest": "97bc5a65a31744f420d930810dd4bdbed85df35cf4e380e2185ef5cadabff330"
+    },
+    "D": {
+      "changed": "Spacing only in the current sandbox stack/saturation descriptive text and the imported producer's line 1 / line 3805 association note.",
+      "preserved": "Every original native command, exit, stdout/stderr, time, source digest, event identity and producer proof field remains unchanged."
+    },
+    "E": {
+      "changed": "Replace the duplicated old README pointers in the sandbox profile with one immutable d9aac209 README and regenerate the two handbook projections.",
+      "preserved": "All other profile rows, installation/acceptance/provisioning fields, the v0.0.79 release reference and the historical packet/source references remain unchanged."
+    }
+  },
+  "optional_attribution_note": {
+    "claude_session_identifier": "unknown",
+    "status": "No retained compact proof supplies the identifier; no attribution was added, and the original Claude receipt was not changed."
+  },
+  "checks": [
+    {
+      "name": "native_handbook_write",
+      "argv": [
+        "nice",
+        "-n",
+        "10",
+        "ionice",
+        "-c2",
+        "-n7",
+        "python3",
+        "scripts/build_new_wsl_handbook.py",
+        "--write"
+      ],
+      "cwd": "<owned-records-checkout>",
+      "observed_initial_tool_call_utc": "2026-10-08T17:41:57Z",
+      "observed_completion_tool_call_utc": "2026-10-08T17:42:22Z",
+      "rc": 0,
+      "actual_tool_returned_output": "{\"outputs\": {\"docs/new-wsl-handbook.json\": \"f14476918ca459c3cefc5336dd3ac76b9d187f14aeae482935bfbf51300b55d1\", \"docs/new-wsl-handbook.md\": \"981e9634500ce4ab0d3083990236ada854d845f24e3dbdcd32d37b262f91dfb7\"}, \"status\": \"written\"}\n",
+      "output_scope": "Actual exec_command tool-returned output, including its standard JSON spacing and final newline. No separate raw stdout/stderr files or stream hash capture.",
+      "source_or_native_acceptance": "local derived-document check only"
+    },
+    {
+      "name": "native_handbook_check",
+      "argv": [
+        "nice",
+        "-n",
+        "10",
+        "ionice",
+        "-c2",
+        "-n7",
+        "python3",
+        "scripts/build_new_wsl_handbook.py",
+        "--check"
+      ],
+      "cwd": "<owned-records-checkout>",
+      "observed_tool_call_utc": "2026-10-08T17:42:22Z",
+      "rc": 0,
+      "actual_tool_returned_output": "{\"outputs\": {\"docs/new-wsl-handbook.json\": \"f14476918ca459c3cefc5336dd3ac76b9d187f14aeae482935bfbf51300b55d1\", \"docs/new-wsl-handbook.md\": \"981e9634500ce4ab0d3083990236ada854d845f24e3dbdcd32d37b262f91dfb7\"}, \"status\": \"passed\"}\n",
+      "output_scope": "Actual exec_command tool-returned output. No separate raw stdout/stderr files or stream hash capture.",
+      "source_or_native_acceptance": "local derived-document check only"
+    },
+    {
+      "name": "maintained_handbook_current_binding_test",
+      "argv": [
+        "nice",
+        "-n",
+        "10",
+        "ionice",
+        "-c2",
+        "-n7",
+        "python3",
+        "-m",
+        "unittest",
+        "tests.test_new_wsl_handbook.NewWslHandbookTests.test_the_committed_outputs_are_current_and_the_handbook_receipt_names_them",
+        "-v"
+      ],
+      "cwd": "<owned-records-checkout>",
+      "observed_initial_tool_call_utc": "2026-10-08T18:02:07Z",
+      "observed_completion_tool_call_utc": "2026-10-08T18:02:35Z",
+      "rc": 0,
+      "tests": 1,
+      "actual_tool_returned_chunks": [
+        "test_the_committed_outputs_are_current_and_the_handbook_receipt_names_them (tests.test_new_wsl_handbook.NewWslHandbookTests.test_the_committed_outputs_are_current_and_the_handbook_receipt_names_them) ... ",
+        "ok\n\n----------------------------------------------------------------------\nRan 1 test in 1.063s\n\nOK\n"
+      ],
+      "output_scope": "Parent-supplied actual tool-returned chunks: initial exec_command and final write_stdin output, not raw subprocess stdout/stderr files or hashes. Timestamp bounds are observed tool-call times. Later rationale wording correction did not change the profile/output/inventory/assertion fields; this test was not rerun.",
+      "upstream_test": false
+    },
+    {
+      "name": "reviewed_source_diff_whitespace",
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "rc": 0,
+      "stdout": "",
+      "stderr": "",
+      "scope": "Read-only reviewed source diff; no new native operation."
+    },
+    {
+      "name": "independent_source_critic",
+      "result": "PASS within bounded source-record scope",
+      "artifact": "evidence/artifacts/row70-records-b-e-20261008/independent-critic.json",
+      "bytes": 9811,
+      "sha256": "bdf53e7609e865baa9388ef8ce863ff3a65c937c552bd2529e69a9b59ef5d384",
+      "actual_output_field": "/actual_output",
+      "actual_output_bytes": 9171,
+      "actual_output_sha256": "16fe799f6a9075b9856fae3eb584c0ed4deb667233bf5e288bb47997392489e3",
+      "scope": "The public JSON artifact is retrievable and hash-bound; decoding its actual_output string preserves every original UTF-8 report byte. Source/evidence associations and prior handbook history are checked, not a new operational acceptance."
+    }
+  ],
+  "preservation": {
+    "all_original_codex_binding_proof_fields_equal_base_except_authorized_spacing_and_added_method": [
+      {
+        "path": "evidence/receipts/native-sandbox-codex-binding-20261008.json",
+        "all_original_proof_fields_equal": true
+      },
+      {
+        "path": "evidence/artifacts/row70-codex-binding-20261008/source-binding.json",
+        "all_original_proof_fields_equal": true
+      }
+    ],
+    "unchanged_frozen_native_proofs": [
+      {
+        "path": "evidence/receipts/native-sandbox-smoke-20261008.json",
+        "byte_equal_base": true,
+        "sha256": "28aa0c7d0f4df1f8048c2b3478ac063dc2ef5b9aadc427714f6fe6d8f7081405"
+      },
+      {
+        "path": "evidence/artifacts/row70-codex-binding-20261008/codex-producer.json",
+        "byte_equal_base": true,
+        "sha256": "aa835b20736fa1fb7bf77683ef6390818331c76a4af3affa2258f88af8f2cfa7"
+      },
+      {
+        "path": "evidence/artifacts/row70-codex-binding-20261008/stdout.txt",
+        "byte_equal_base": true,
+        "sha256": "a948904f2f0f479b8f8197694b30184b0d2ed1c1cd2a1ec0fb85d299a192a447"
+      },
+      {
+        "path": "evidence/artifacts/row70-codex-binding-20261008/version.stdout.txt",
+        "byte_equal_base": true,
+        "sha256": "8c52412b1e17f6490f8ce8a10dbe32111d809b052a85bf828b52eef9c34add77"
+      }
+    ],
+    "changed_component_rows_only": [
+      {
+        "path": "manifests/stack.json",
+        "index": 28,
+        "component_id": "sandbox-runtime"
+      },
+      {
+        "path": "blueprints/token-native-focus/saturation-audit.json",
+        "index": 53,
+        "component_id": "sandbox-runtime"
+      },
+      {
+        "path": "adoption/new-wsl-profile.json",
+        "index": 12,
+        "component_id": "sandbox-runtime"
+      }
+    ],
+    "outside_component_rows_and_top_level_fields_equal_base": true,
+    "saturation_other_lifecycle_equal_base": true,
+    "saturation_use_status_equal_base": true,
+    "new_native_runtime_execution": false,
+    "new_native_client_execution": false
+  },
+  "critic_copy": {
+    "source_locator": "<owned-records-unit>/independent-critic.md",
+    "target": "evidence/artifacts/row70-records-b-e-20261008/independent-critic.json",
+    "source_bytes": 9171,
+    "target_bytes": 9811,
+    "source_sha256": "16fe799f6a9075b9856fae3eb584c0ed4deb667233bf5e288bb47997392489e3",
+    "target_sha256": "bdf53e7609e865baa9388ef8ce863ff3a65c937c552bd2529e69a9b59ef5d384",
+    "encoded_field": "/actual_output",
+    "decoded_actual_output_bytes": 9171,
+    "decoded_actual_output_sha256": "16fe799f6a9075b9856fae3eb584c0ed4deb667233bf5e288bb47997392489e3",
+    "decoded_exact_byte_equal": true,
+    "encoding_scope": "Verbatim UTF-8 output in a JSON string preserves the original final blank line; original private report remains unchanged."
+  },
+  "maintained_handbook_receipt": {
+    "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
+    "bytes": 59039,
+    "sha256": "f3622a6cb459b2c53004d05a1a17fa97ce8bdb191724bc2a0d05750a96614e48",
+    "integration_scope": "Parent-maintained current binding with prior records retained; this final integration does not rewrite its bytes."
+  },
+  "limitations": [
+    "Source-record and derived-byte consistency only; no native sandbox, policy, host, model, provider, runtime, broker or upstream test suite was run.",
+    "The frozen Claude receipt remains unchanged with its original pending_in_source field; the separate later Codex evidence is additive.",
+    "The original event digest's method is now explicit; the full private identifier and raw rollout are not published or read.",
+    "The separate living install-plan defect A is outside this B-E unit; no catalogue, plan, workflow, service or client-config changes are included.",
+    "No S4 closure, complete memory/lifecycle acceptance, token savings or new-host upgrade is asserted."
+  ],
+  "completeness_critic": "The four records corrections are bounded and separately reviewed. The optional Claude attribution remains unknown; later metadata requires a retained same-operation compact source. Original native outputs and historical acceptance limits are preserved."
+}

@@ -7691,16 +7691,16 @@
           "fresh-srt-allowed-write",
           "fresh-srt-denied-read-corrected"
         ],
-        "scope": "Historical 0.0.77 filesystem/network operations remain version-scoped. Retained 0.0.79 evidence covers command-center installation/readback and the Claude echo smoke only; no full-stack model acceptance. Separate laterCodex0.0.79echo/version evidence is imported with source/event/output hashes andexit0; pending status in the earlierreceipt and0.77policyproof remain historical. No rerun was performed.",
+        "scope": "Historical 0.0.77 filesystem/network operations remain version-scoped. Retained 0.0.79 command-center evidence covers installation/readback and the Claude echo smoke; the separate later Codex echo/version observation is imported in native-sandbox-codex-binding-20261008 with source, event and output hashes and exit 0. The earlier pinned receipt keeps its original pending_in_source status. Neither echo establishes 0.0.79 filesystem/network policy or full-stack model acceptance; no rerun was performed.",
         "network_scope": "Historical 0.0.77 allowed, explicit-deny and default-deny IPv4 loopback HTTP cases passed. Initial listener readiness race and bounded retries remain historical; no 0.0.79 network rerun is recorded."
       },
       "artifact_baselines": [],
       "exact_causal_lifetime_provider_tokens_saved": null,
-      "next_action": "Qualify the 0.0.79 Codex and policy-specific paths before treating historical 0.0.77 filesystem/network acceptance as current-version acceptance.",
+      "next_action": "Qualify the policy-specific 0.0.79 paths before treating historical 0.0.77 filesystem/network acceptance as current-version acceptance. The separate retained Claude and Codex 0.0.79 echo observations are already bound; no new echo rerun is implied.",
       "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
       "lifecycle_evidence": {
         "assessment": "bounded_role_evidence",
-        "scope": "0.0.79 installation/readback and Claude echo smoke retained. Filesystem and loopback HTTP policy coverage is historical at 0.0.77; general sandbox escape/TLS/SOCKS/IPv6 not tested.",
+        "scope": "0.0.79 installation/readback and separate retained Claude and Codex echo observations are bound within their recorded scopes. Filesystem and loopback HTTP policy coverage is historical at 0.0.77; general sandbox escape/TLS/SOCKS/IPv6 not tested.",
         "all_optional_features_exercised": false
       },
       "remaining_install_gap": null,
@@ -7720,11 +7720,12 @@
         },
         "use": {
           "status": "accepted_within_scope",
-          "scope": "Retained 0.0.79 command-center Claude echo smoke; earlier policy-operation evidence remains scoped to 0.0.77. No current host rerun by this audit.",
+          "scope": "Separate retained 0.0.79 command-center Claude echo smoke and later Codex echo/version observation; earlier policy-operation evidence remains scoped to 0.0.77. No current host rerun by this audit.",
           "evidence_refs": [
             "evidence/receipts/runtime-tools.json",
             "evidence/receipts/native-sandbox-network-20260920.json",
-            "evidence/receipts/native-sandbox-smoke-20261008.json"
+            "evidence/receipts/native-sandbox-smoke-20261008.json",
+            "evidence/receipts/native-sandbox-codex-binding-20261008.json"
           ]
         },
         "persistence": {

@@ -786,8 +786,7 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/isolation.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/anthropics/sandbox-runtime/blob/v0.0.78/README.md",
-        "https://github.com/anthropics/sandbox-runtime/blob/v0.0.78/README.md",
+        "https://github.com/anthropics/sandbox-runtime/blob/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/README.md",
         "docs/decisions/2026-10-04-2604-e2e-fix-wave-g8-base-gateway.md",
         "evidence/receipts/native-sandbox-codex-binding-20261008.json",
         "https://github.com/anthropics/sandbox-runtime/releases/tag/v0.0.79"
