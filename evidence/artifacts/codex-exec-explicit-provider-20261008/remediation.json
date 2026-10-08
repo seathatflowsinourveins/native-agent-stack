@@ -1,0 +1,306 @@
+{
+  "schema_version": 1,
+  "id": "codex-exec-explicit-provider-remediation-20261008",
+  "kind": "artifact_measurement",
+  "component_ids": [
+    "codex"
+  ],
+  "claim": "PR887's reported secret-scan finding is a computed source digest; narrowly scoped gitleaks rules, explicit-provider fixture expectations and current native provenance repair the reproduced offline failures after one rebase.",
+  "limitations": [
+    "Local integration and synthetic module evidence only. Historical publication receipts are preserved.",
+    "Hosted checks and latest-main landing acceptance remain separate; no live model/provider run or account/configuration change."
+  ],
+  "evidence_class": "local_integration",
+  "checked_at": "2026-10-08T22:07:23Z",
+  "base": "9f7b38b23d15e47ceb6f68c6651b86088f621797",
+  "source_parent": "d31617958500252f5287f903ce500104e7d8a0a7",
+  "previous_published_head": "100fccb49c034f3802e8fb5e58d15771977c6613",
+  "rebase": {
+    "invocations": 1,
+    "target": "9f7b38b23d15e47ceb6f68c6651b86088f621797",
+    "correction_source": "Co-op lane questions direction 2026-10-08T21:47:24Z",
+    "registry_conflict_only": true,
+    "registry_recovery": "freshness_propose.register_receipt + host_receipts.register_file for22original-ownedpaths; evidence_manifest --write; continue same rebase"
+  },
+  "upstream": [
+    {
+      "repository": "https://github.com/openai/codex",
+      "tag": "rust-v0.161.0",
+      "commit": "979011409de0a60b52f179721948e65531d26144",
+      "files": [
+        "codex-rs/model-provider-info/src/lib.rs",
+        "codex-rs/config/src/loader/mod.rs",
+        "codex-rs/core/config.schema.json"
+      ],
+      "scope": "Retained explicit-provider constructor contract; no new model acceptance"
+    },
+    {
+      "repository": "https://github.com/gitleaks/gitleaks",
+      "tag": "v8.30.1",
+      "files": [
+        "README.md",
+        "cmd/generate/config/rules/generic.go"
+      ],
+      "scope": "Workflow-pinned native scanner and supported rule-scoped AND/whole-line format"
+    },
+    {
+      "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+      "commit": "9f7b38b23d15e47ceb6f68c6651b86088f621797",
+      "files": [
+        ".github/workflows/validate.yml",
+        "scripts/host_receipts.py",
+        "scripts/freshness_propose.py",
+        "scripts/evidence_manifest.py",
+        "tools/sota-convergence/README.md"
+      ],
+      "scope": "Native scanner recipe, evidence registration primitives and append-only lane-provenance contract"
+    }
+  ],
+  "secret_scan": {
+    "real": false,
+    "rule": "generic-api-key",
+    "file": "evidence/artifacts/codex-exec-explicit-provider-20261008/receipt.json",
+    "line": 42,
+    "source": {
+      "run": 37840030279,
+      "artifact": 11577048510,
+      "artifact_digest_verified": true,
+      "reported_findings": 1
+    },
+    "source_digest_equality_verified": true,
+    "matched_text_retained": false,
+    "allowlist": {
+      "rule": "generic-api-key",
+      "condition": "AND",
+      "path_exact": true,
+      "source_field_exact": true,
+      "regex_target": "line",
+      "whole_line_anchored": true,
+      "lowercase_hex_length": 64
+    },
+    "regression_boundaries": [
+      "reviewed field exempt",
+      "credential field in same receipt detected",
+      "same source field in other file detected",
+      "second credential field on same line detected",
+      "allowlisted value must equal named source digest"
+    ],
+    "pinned_binary": "8.30.1",
+    "native_working_tree_scan": {
+      "command": "gitleaks dir . --config .gitleaks.toml --max-target-megabytes 2 --redact --no-banner",
+      "cwd": "repository-root",
+      "exit_code": 0,
+      "findings": 0
+    },
+    "final_history_scan": "Recorded separately after the remediation source commit; hosted scan remains separate."
+  },
+  "changed_test_expectations": [
+    {
+      "module": "tests.test_landscape_sweep_harness",
+      "test": "RunnerTests.test_codex_command_line_stdin_and_directory",
+      "change": "Strict expected argv includes existing -c service_tier=\"fast\" pair"
+    },
+    {
+      "module": "tests.test_landscape_sweep_harness",
+      "test": "RunnerTests.test_ultra_defaults_and_idle_refusal_precede_state_changes",
+      "change": "Direct staged fixture declares codex.provider=native; assertions retained"
+    },
+    {
+      "module": "tests.test_landscape_sweep_harness",
+      "test": "RecoveryRunnerTests.test_default_budgets_clear_observed_healthy_silence_and_research_duration",
+      "change": "Direct staged fixture declares codex.provider=native; budget assertions retained"
+    },
+    {
+      "module": "tests.test_landscape_sweep_harness",
+      "test": "ShellTests.test_staged_copy_needs_no_work_dir_argument",
+      "change": "Preserve generated codex metadata while overriding polling intervals"
+    },
+    {
+      "module": "tests.test_codex_worker_skill",
+      "test": "SkillLaunchTests.test_live_probe_uses_installed_skill_and_persists_the_observed_route",
+      "change": "Explicit native provider and temporary home, mock worker environment, existing exec/prompt/route/six-runs assertions retained plus environment assertions"
+    },
+    {
+      "module": "tests.test_codex_worker_skill",
+      "test": "SkillLaunchTests.test_missing_installed_skill_fails_without_fabricating_a_sixth_run",
+      "change": "Explicit native provider and temporary home reach missing-skill path; five-runs assertion retained"
+    }
+  ],
+  "fresh_modules": [
+    {
+      "module": "tests.test_landscape_sweep_harness",
+      "ran": 291,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 3,
+      "exit_code": 0,
+      "duration_s": 92.158,
+      "baseline": {
+        "ran": 291,
+        "failures": 2,
+        "errors": 2,
+        "skipped": 3,
+        "exit_code": 1
+      },
+      "run_workspace": "separate-owned-worktree",
+      "integration_bytes_verified": true
+    },
+    {
+      "module": "tests.test_codex_worker_skill",
+      "ran": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "exit_code": 0,
+      "duration_s": 0.014,
+      "baseline": {
+        "ran": 10,
+        "failures": 0,
+        "errors": 2,
+        "exit_code": 1
+      },
+      "run_workspace": "separate-owned-worktree",
+      "integration_bytes_verified": true
+    },
+    {
+      "module": "tests.test_verdict_lane_vendoring",
+      "ran": 14,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "exit_code": 0,
+      "duration_s": 0.027,
+      "baseline": {
+        "ran": 14,
+        "failures": 2,
+        "errors": 0,
+        "exit_code": 1
+      },
+      "repair": "Append actual codex_lane.lane_provenance and adjudicate.adjudication_provenance outputs; merged entries unchanged; assertions unchanged"
+    },
+    {
+      "module": "tests.test_gitleaks_config",
+      "ran": 41,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "exit_code": 0,
+      "duration_s": 91.16,
+      "scanner": "gitleaks8.30.1",
+      "required_presence": true
+    },
+    {
+      "module": "tests.test_codex_worker_lane",
+      "ran": 128,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 12,
+      "exit_code": 0,
+      "duration_s": 51.019,
+      "scope": "Merged base changed this source; validate fresh bytes separately from retained receipt",
+      "warning": "ResourceWarning for child process; independent follow-up confirmed it no longer existed"
+    },
+    {
+      "module": "tests.test_codex_provider_route",
+      "ran": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "exit_code": 0,
+      "duration_s": 0.003
+    }
+  ],
+  "test_command_contract": "Each module invocation uses nice -n10 ionice -c2 -n7 timeout600 python3 -m unittest <named module or named module class>; no bare discovery.",
+  "module_totals": {
+    "distinct_tests": 492,
+    "passed": 477,
+    "skipped": 15,
+    "failures": 0,
+    "errors": 0,
+    "scope": "Six named modules; intermediate repeats and focused class runs are not summed"
+  },
+  "native_validator": {
+    "exit_code": 0,
+    "components": 70,
+    "hashed_files": 10906,
+    "profiles": 4,
+    "receipts": 241,
+    "scope": "Actual returned integrity and scope validation; no live provider or GPU execution"
+  },
+  "historical_receipt": {
+    "path": "evidence/artifacts/codex-exec-explicit-provider-20261008/receipt.json",
+    "bytes_preserved": true,
+    "selected_source_digest_now_historical": [
+      "tests/test_codex_worker_lane.py"
+    ],
+    "new_provider_execution": false,
+    "retained_tests_not_promoted": true
+  },
+  "failed_conditions_retained": [
+    {
+      "phase": "native publication validator",
+      "exit_code": 1,
+      "reason": "New remediation receipt limitations was a string; native schema requires a nonempty array",
+      "recovery": "Corrected receipt metadata, re-registered through existing helpers, reran native validator"
+    },
+    {
+      "phase": "secret diagnosis",
+      "command": "pinned gitleaks scan before config repair",
+      "exit_code": 1,
+      "finding_count": 1,
+      "matched_text_retained": false
+    },
+    {
+      "phase": "negative regression",
+      "tests": 3,
+      "exit_code": 1,
+      "failures": 2,
+      "errors": 0,
+      "scope": "Red run before allowlist"
+    },
+    {
+      "phase": "absolute subtree scanner",
+      "exit_code": 1,
+      "finding_count": 1,
+      "reason": "Exact repo-relative path allowlist intentionally does not match an absolute subtree path",
+      "matched_text_retained": false
+    },
+    {
+      "phase": "module baseline",
+      "modules": [
+        "tests.test_landscape_sweep_harness",
+        "tests.test_codex_worker_skill",
+        "tests.test_verdict_lane_vendoring"
+      ],
+      "failures": 4,
+      "errors": 4
+    },
+    {
+      "phase": "native GitHub job-log reads",
+      "api_attempts_failed": 3,
+      "reason": "gh rejected terminal escape sequences before returning output",
+      "recovered": "supported --allow-escape-sequences on authorized validation-job-only endpoints; output sanitized"
+    }
+  ],
+  "provenance": {
+    "merged_entries_preserved": true,
+    "native_generators": [
+      "codex_lane.lane_provenance",
+      "adjudicate.adjudication_provenance"
+    ],
+    "generation_executes_provider": false,
+    "new_writer_created": false
+  },
+  "boundaries": {
+    "draft": true,
+    "landing": false,
+    "provider_execution": false,
+    "credentials_read": false,
+    "account_or_service_change": false,
+    "check_expectations_relaxed": false,
+    "source_repair_rebase_once": true
+  },
+  "inverse": "Revert only this remediation change to remove the bounded allowlist, fixture updates, new source provenance and remediation evidence; no host/configuration inverse is needed.",
+  "completeness_critic": "Independent source and test critics completed; preserve historical evidence, list expectation changes and failed path-format condition, verify child exit and final native validator. All findings applied; comparative canary outcome remains outside this task."
+}
+

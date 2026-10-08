@@ -55,17 +55,28 @@
    "transcript_audit_py_sha256": "af78e463833f5759dcc4d8a6d8b0738352b99ccba654792d1327ddc6a1b3c032",
    "workflow_sha256": "7caa3411bc5d715c5fcd6371a3c45fd729570a1b62c3f98b1a26bcb1ebfb3464"
   },
-  {
-   "adjudicate_py_sha256": "81645780e37d87756f10c5a023068105b9a4f32de8fcf3ca858ef60683caaad5",
-   "adjudicator_role_sha256": "ef8d07f15b7c219f1b5ada705cf185146088fd013974b5ca51c1d29fdeee9fc4",
-   "codex_lane_py_sha256": "5b089c486a061d2aeb7fff75ac80e219a82929997f7961e8b00fef1cd88345f9",
-   "judge_schema_sha256": "b7279c9e70070c525144390c67e7f3eb7358b173675fae4e7efe3b798e1f5014",
-   "prompt_sha256": "f82b527d179cc60ed985d9266d74071f936e4fa73f29c680a3d3f7635516004e",
-   "refute_schema_sha256": "b70af9cca33eec7c47d5ae02819bebbc76820d33a13f537ee7c375d4e6f2c736",
-   "registered_at": "2026-10-03",
-   "transcript_audit_py_sha256": "af78e463833f5759dcc4d8a6d8b0738352b99ccba654792d1327ddc6a1b3c032",
-   "workflow_sha256": "7caa3411bc5d715c5fcd6371a3c45fd729570a1b62c3f98b1a26bcb1ebfb3464"
-  }
+    {
+      "adjudicate_py_sha256": "81645780e37d87756f10c5a023068105b9a4f32de8fcf3ca858ef60683caaad5",
+      "adjudicator_role_sha256": "ef8d07f15b7c219f1b5ada705cf185146088fd013974b5ca51c1d29fdeee9fc4",
+      "codex_lane_py_sha256": "5b089c486a061d2aeb7fff75ac80e219a82929997f7961e8b00fef1cd88345f9",
+      "judge_schema_sha256": "b7279c9e70070c525144390c67e7f3eb7358b173675fae4e7efe3b798e1f5014",
+      "prompt_sha256": "f82b527d179cc60ed985d9266d74071f936e4fa73f29c680a3d3f7635516004e",
+      "refute_schema_sha256": "b70af9cca33eec7c47d5ae02819bebbc76820d33a13f537ee7c375d4e6f2c736",
+      "registered_at": "2026-10-03",
+      "transcript_audit_py_sha256": "af78e463833f5759dcc4d8a6d8b0738352b99ccba654792d1327ddc6a1b3c032",
+      "workflow_sha256": "7caa3411bc5d715c5fcd6371a3c45fd729570a1b62c3f98b1a26bcb1ebfb3464"
+    },
+    {
+      "adjudicate_py_sha256": "372b23788f31156eb098b85bc5b181692aadda19973136f5e711a91f0e457ebc",
+      "adjudicator_role_sha256": "ef8d07f15b7c219f1b5ada705cf185146088fd013974b5ca51c1d29fdeee9fc4",
+      "codex_lane_py_sha256": "1ae0f1a4354a2a8438641e5aea61b445705f4dadc955e98c5f090fe84467cb3f",
+      "judge_schema_sha256": "b7279c9e70070c525144390c67e7f3eb7358b173675fae4e7efe3b798e1f5014",
+      "prompt_sha256": "f82b527d179cc60ed985d9266d74071f936e4fa73f29c680a3d3f7635516004e",
+      "refute_schema_sha256": "b70af9cca33eec7c47d5ae02819bebbc76820d33a13f537ee7c375d4e6f2c736",
+      "registered_at": "2026-10-08",
+      "transcript_audit_py_sha256": "af78e463833f5759dcc4d8a6d8b0738352b99ccba654792d1327ddc6a1b3c032",
+      "workflow_sha256": "7caa3411bc5d715c5fcd6371a3c45fd729570a1b62c3f98b1a26bcb1ebfb3464"
+    }
  ],
  "claude": [
   {
@@ -210,11 +221,16 @@
    "prompt_sha256": "d3ef2cc0c06d33d6a4a058f5e74a1cf5be8a3760cc2b0b5572598f0e0e4288e4",
    "registered_at": "2026-09-29"
   },
-  {
-   "codex_lane_py_sha256": "5b089c486a061d2aeb7fff75ac80e219a82929997f7961e8b00fef1cd88345f9",
-   "prompt_sha256": "d3ef2cc0c06d33d6a4a058f5e74a1cf5be8a3760cc2b0b5572598f0e0e4288e4",
-   "registered_at": "2026-10-03"
-  }
+    {
+      "codex_lane_py_sha256": "5b089c486a061d2aeb7fff75ac80e219a82929997f7961e8b00fef1cd88345f9",
+      "prompt_sha256": "d3ef2cc0c06d33d6a4a058f5e74a1cf5be8a3760cc2b0b5572598f0e0e4288e4",
+      "registered_at": "2026-10-03"
+    },
+    {
+      "codex_lane_py_sha256": "1ae0f1a4354a2a8438641e5aea61b445705f4dadc955e98c5f090fe84467cb3f",
+      "prompt_sha256": "d3ef2cc0c06d33d6a4a058f5e74a1cf5be8a3760cc2b0b5572598f0e0e4288e4",
+      "registered_at": "2026-10-08"
+    }
  ],
  "schema_version": 1,
  "scope": "Append-only registry of the lane code a layer-verdict return outside the grandfathered 2026-09-22 wave may name in its provenance (2026-09-23 verdict-integrity review). tools/sota-convergence/record_verdicts.py accepts a Claude return only when its (workflow_path, workflow_sha256) is listed here and equals the current examples/claude-native/workflows/SHA256SUMS entry of the listed vendored_path, and a Codex return only when its (codex_lane_py_sha256, prompt_sha256) is listed here and equals this checkout's codex_lane.py and lane-prompt.md; scripts/landscape.py re-checks every sealed new-wave return against this list in CI. Append an entry (never edit or remove one) when codex_lane.py, lane-prompt.md or the vendored workflow changes; tests/test_verdict_lane_vendoring.py fails until the current bytes are listed. The \"adjudication\" list registers adjudicate.py, adjudication-prompt.md, both adjudication schemas, adjudication-lane.js and the vendored blind-adjudicator.md by sha256; record_verdicts.py and scripts/landscape.py refuse a new-wave adjudication whose provenance names unlisted code (append an entry when any of them changes)."

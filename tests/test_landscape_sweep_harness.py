@@ -2604,7 +2604,7 @@ class RunnerTests(RunnerCase):
         self.assertEqual(json.loads((directory / "failure.json").read_text())["kind"], "inputs_changed")
 
     def test_ultra_defaults_and_idle_refusal_precede_state_changes(self):
-        write_json(self.work / "staged.json", {"codex": {"model": "gpt-6.1-sol", "effort": "ultra"}})
+        write_json(self.work / "staged.json", {"codex": {"provider": "native", "model": "gpt-6.1-sol", "effort": "ultra"}})
         config = codex_job.settings(self.work)
         self.assertEqual((config["idle_timeout_s"], config["timeout_s"], config["request_effort"]),
                          (4200, 14400, "xhigh"))
@@ -2802,6 +2802,7 @@ class RunnerTests(RunnerCase):
         self.assertEqual(self.record()["argv"], [
             "exec", "--ignore-user-config", "--skip-git-repo-check", "-s", "read-only",
             "-m", "gpt-6-astra", "-c", 'model_reasoning_effort="max"', "-c", 'web_search="live"',
+            "-c", 'service_tier="fast"',
             "--output-schema", str(directory / "schema.json"), "-o", str(directory / "last.json"), "--json",
             "Reply in JSON."])  # the prompt without its trailing newline, as "$(cat prompt.txt)" gave it
         self.assertEqual(self.record()["cwd"], str(self.work / "empty"))
@@ -3329,7 +3330,7 @@ class RecoveryRunnerTests(RunnerCase):
         self.assertFalse(result["limit_marker"])
 
     def test_default_budgets_clear_observed_healthy_silence_and_research_duration(self):
-        write_json(self.work / "staged.json", {"codex": {}})
+        write_json(self.work / "staged.json", {"codex": {"provider": "native"}})
         config = codex_job.settings(self.work)
         self.assertEqual((config["idle_timeout_s"], config["timeout_s"]), (1800, 4000))
         self.assertLess(config["timeout_s"] + config["quota_timeout_s"] + codex_job.QUOTA_BACKSTOP_S
@@ -3491,8 +3492,9 @@ class ShellTests(RunnerCase):
         work = stage_work(self, ("alpha",))
         self.assertEqual(build(work).returncode, 0)
         self.fake(last=LAST, events=[COMPLETED])
-        write_json(work / "staged.json", {**json.loads((work / "staged.json").read_text()),
-                                          "codex": {"wait_poll_s": 0.05, "slot_poll_s": 0.05}})
+        staged = json.loads((work / "staged.json").read_text())
+        write_json(work / "staged.json", {**staged,
+                                          "codex": {**staged["codex"], "wait_poll_s": 0.05, "slot_poll_s": 0.05}})
         env = dict(self.env, SWEEP_WORK_DIR=str(self.work))  # ignored: the staged copy uses its own directory
         started = run(["bash", work / "codex_call.sh", "start", "gpt6-probe", work / "prompts/gpt6-probe.txt",
                        work / "schemas/probe.json"], env=env)

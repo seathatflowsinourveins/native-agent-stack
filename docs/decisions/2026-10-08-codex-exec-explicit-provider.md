@@ -63,3 +63,26 @@ configuration or credential mutation. A supported upstream execution interface
 that both preserves blind isolation and proves the selected provider could
 replace this glue. Compare the same constructor/environment and missing-choice
 tests before changing it.
+
+PR #887 remediation on 2026-10-08 first diagnosed the hosted secret-scan finding
+from its rule/file/line metadata, then verified it was a computed test-source
+digest without reporting its matched text. The native gitleaks 8.30.1 rule uses
+an exact receipt path and source field with an AND, whole-line, lowercase-hex
+condition. Positive and negative native fixtures preserve detection on other
+fields, paths and shared lines; a separate integrity assertion binds the allowed
+value to the actual named source. This follows gitleaks/gitleaks v8.30.1
+README's rules.allowlists contract and its generic-api-key implementation.
+
+The sole rebase followed the corrected current-main target
+`9f7b38b23d15e47ceb6f68c6651b86088f621797`. The conflicting evidence registry
+was recovered with existing register_receipt/register_file APIs and its sorter.
+The lane source registry separately received append-only native provenance;
+merged entries and the registry tests' expectations remain intact.
+
+Six older fixtures/argv expectations now declare the explicit native provider,
+preserve generated stage metadata or expect the existing fast service tier.
+These expectation changes are enumerated in remediation.json and the PR body;
+no runtime routing behavior was weakened. The fresh checks are module-scoped
+local integration and synthetic evidence. Historical receipt bytes and source
+digests remain dated evidence, including the test changed by the new base;
+that merged test module was checked afresh. No model/provider run occurred.
