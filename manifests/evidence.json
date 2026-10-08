@@ -48750,6 +48750,16 @@
       "bytes": 20488
     },
     {
+      "path": "evidence/artifacts/s4-record-corrections-20261008/README.md",
+      "sha256": "1ee7ec996cb72c7efb43e501c84585939e1389a521552625b2234419e4ef8704",
+      "bytes": 4423
+    },
+    {
+      "path": "evidence/artifacts/s4-record-corrections-20261008/record.json",
+      "sha256": "9314564911e6f49b2b6c94afcb95175a85d941427ad7980fa55476312ecc9090",
+      "bytes": 11884
+    },
+    {
       "path": "evidence/artifacts/sdk-runtime-coverage-20260922/agent-sdks.json",
       "sha256": "e494120421102202312b567d699025c96e85c0e925a88a143c4ea11af2a791a2",
       "bytes": 169217
