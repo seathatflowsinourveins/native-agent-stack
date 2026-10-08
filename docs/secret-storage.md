@@ -2118,10 +2118,14 @@ python3 scripts/credential_status.py --json     # machine-readable
 python3 scripts/credential_status.py --client-guards   # also check the user-level guard keys
 ```
 
-The checker uses `lstat` only and never opens a credential file. For each
-entry it reports existence, type, mode, owner, directory mode, whether the
-file is inside a worktree or tracked by Git, and the file's age. It also
-reports:
+For each entry the checker reports existence, type, mode, owner, directory
+mode, whether the file is inside a worktree or tracked by Git, and its age.
+Runner-eligible private files that pass those checks are read through
+`credential_run.py`'s checked file descriptor and validated by the same
+`parse_line` function the runner uses. Every refused line reports only its
+number and reason code; values never enter the report. `values_read` records
+whether a grammar check read a file. Native sign-in and service-held stores
+remain metadata-only. It also reports:
 
 - secret variable names that are set in the current environment, names only;
 - native store path overrides that are set (`HF_TOKEN_PATH`), names only; each
@@ -2173,7 +2177,7 @@ the 0700 directory
 named `<sequence>-<UTC stamp>-<boot id prefix>.json`; `compare` orders
 receipts by the sequence number, never by the clock, which can step back on
 WSL. It holds the boot id, uptime, systemd version, linger, the checkout revision,
-the checker's rows (states, findings, warnings and path templates), each file
+the checker's metadata-only rows (states, findings, warnings and path templates), each file
 row's `lstat` mode, size and mtime_ns, the checker's coverage names, the names
 of live `native-agent-stack:*` kernel keys, and `claude_user_guard_matches_pin`
 (the installed user-scope guard's sha256 against its line in

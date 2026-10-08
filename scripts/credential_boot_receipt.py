@@ -148,7 +148,8 @@ def build_receipt(root: Path, inventory: dict, env, *, proc_keys: Path | None, f
     files = {entry["id"]: cs.expand_template(entry["store"]["path_template"], env)
              for entry in inventory["entries"] if entry["store"]["kind"] in cs.LOCAL_KINDS}
     before = {identifier: observe(path) for identifier, path in files.items()}
-    report = cs.inspect(root, inventory, env, proc_keys=proc_keys)
+    # Boot receipts observe metadata only; the interactive status command also checks store-line grammar.
+    report = cs.inspect(root, inventory, env, proc_keys=proc_keys, check_store_lines=False)
     after = {identifier: observe(path) for identifier, path in files.items()}
     rows = []
     for entry in report["entries"]:
