@@ -5092,13 +5092,13 @@
     },
     {
       "path": "adoption/hooks/claude/SHA256SUMS",
-      "sha256": "aa9f61f9721da184fd4cb0d93ba7b60b8a69bc3ab2905992b60a679006fc494a",
+      "sha256": "9db7433fa8c7d1c37a55b027e8eb3b66ed400ad375403abfa9808aa86fb82c66",
       "bytes": 1229
     },
     {
       "path": "adoption/hooks/claude/research-routing-guard.py",
-      "sha256": "a28f9dc44af3332f93c7e75b5841d8de4552ec5a7b3337bc3d026a706cf61658",
-      "bytes": 10082
+      "sha256": "43f95fb0ff59954680c780b3bf015cbc7548285f57d5956313b704d5de280bac",
+      "bytes": 10391
     },
     {
       "path": "adoption/hooks/claude/token-lanes-block.builder.md",
@@ -17923,8 +17923,8 @@
     },
     {
       "path": "docs/decisions/2026-10-08-coordinator-research-routing.md",
-      "sha256": "67598c2bd472f259f6f9d54b65d57f3461ca0a1b76a0e61b2e177b7a2dfe9a58",
-      "bytes": 10751
+      "sha256": "cc0177503b26b84954e7a67ec4d2aac7d39a5520794ada3edf06346527955a10",
+      "bytes": 14363
     },
     {
       "path": "docs/decisions/2026-10-08-dependabot-frozen-evidence-ignore.md",
@@ -57988,8 +57988,8 @@
     },
     {
       "path": "tests/test_research_dispatch.py",
-      "sha256": "86a3632e8ef60f918170e539a7e7757b4480fe361fc868f87649638af874eb4f",
-      "bytes": 12660
+      "sha256": "dab1a2c3720848845b560a27cab4066160b64fa2718db4e7c20400fc7cdb1806",
+      "bytes": 19847
     },
     {
       "path": "tests/test_research_efficiency.py",
@@ -58003,8 +58003,8 @@
     },
     {
       "path": "tests/test_research_routing_guard.py",
-      "sha256": "3053a703c66f16a3444899c3c5f30c1204b0daf87a2468767c521ed4d02484db",
-      "bytes": 12443
+      "sha256": "c6765e7b41d75984e903a4401d01781ee4261f5cab73cc1fcabd159e2470d303",
+      "bytes": 12393
     },
     {
       "path": "tests/test_research_workflow.py",
@@ -58483,8 +58483,8 @@
     },
     {
       "path": "tools/research/dispatch",
-      "sha256": "63b1c764133749842c631f6a79837b6f1ebbe07ce9d64e5ee2ce064b988bce9c",
-      "bytes": 9524
+      "sha256": "40815882b5387ebf9b7fd2dce59bbebb55eb38f09e8650c0729e61ff7544662e",
+      "bytes": 14053
     },
     {
       "path": "tools/runtime-worker-evidence/README.md",
