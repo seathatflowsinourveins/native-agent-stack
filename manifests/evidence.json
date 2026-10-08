@@ -48245,6 +48245,11 @@
       "bytes": 5689
     },
     {
+      "path": "evidence/artifacts/research-extraction-host-spelling-20261008/receipt.json",
+      "sha256": "857db12f3c32b110b23d5c1313e9d9bccad2b88efe2ec9e7f1a158917f54edc3",
+      "bytes": 2491
+    },
+    {
       "path": "evidence/artifacts/retrieved-code.txt",
       "sha256": "228c4bc674c606fc6cfbbb57fba4164fe30066de34bba396fe68a335799f035f",
       "bytes": 2166
@@ -58871,8 +58876,8 @@
     },
     {
       "path": "tools/research/exact_queries.py",
-      "sha256": "e7eae7f413b92a22a88e6ad000f3089b082c68a8d1f731226b6240f6591996e3",
-      "bytes": 24487
+      "sha256": "9858e72e517bfeeec7186d031168bc396cf7c24f0c20ab9458ccd2d1bb9fa8c9",
+      "bytes": 24739
     },
     {
       "path": "tools/runtime-worker-evidence/README.md",
