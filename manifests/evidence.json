@@ -4811,8 +4811,8 @@
     },
     {
       "path": ".github/dependabot.yml",
-      "sha256": "40d7f3bcf927a13088a126f70c71da3dba2e6181f52de2c451ab9f31193b8554",
-      "bytes": 2529
+      "sha256": "623a1b9e1dbd165f25ee8856eab5ed5587554326d238bfc71a3d6a075865b0d9",
+      "bytes": 2926
     },
     {
       "path": ".github/main-ruleset.json",
@@ -5486,8 +5486,8 @@
     },
     {
       "path": "adoption/update.md",
-      "sha256": "c0489f8630abca88258caa3136d6a8b4b4db575c6b90ad6669b4e04e08512a88",
-      "bytes": 32041
+      "sha256": "40ef24b2098d73381484a5e13ae8f092100267d6cc70050edf8901a59e1e3a08",
+      "bytes": 32181
     },
     {
       "path": "blueprints/blind-catalog-convergence/README.md",
@@ -16657,8 +16657,8 @@
     },
     {
       "path": "catalogs/foundation/README.md",
-      "sha256": "cdbd873798f3e200a38911733a4f81c0ac046164c4bb7e16ba858125414f15c3",
-      "bytes": 16480
+      "sha256": "752e2fbc8cef933140dd0ef921ae97d3bc2d89e24f7ff747535155eff8f96c63",
+      "bytes": 16787
     },
     {
       "path": "catalogs/foundation/automation.json",
@@ -17242,8 +17242,8 @@
     },
     {
       "path": "docs/catalog-provenance.md",
-      "sha256": "15c20a89ad95ffb37d8c4b02f28addf9ff9939b6c2f6bb853017497733522c4e",
-      "bytes": 14270
+      "sha256": "17af1d0d61759effdecf73ae99573a83578d6af6c752fa388401a52b55c472b2",
+      "bytes": 21902
     },
     {
       "path": "docs/catalog-reconciliation-20260922.md",
@@ -17971,6 +17971,11 @@
       "bytes": 15329
     },
     {
+      "path": "docs/decisions/2026-10-08-dependabot-frozen-evidence-ignore.md",
+      "sha256": "8bbe3a48eabd72d3fb9dae4f0abfcae6a01d5920ad58ad4e2809a279e6af667f",
+      "bytes": 3229
+    },
+    {
       "path": "docs/decisions/2026-10-08-philosophy-only-rules.md",
       "sha256": "f4b4f1d9952db662d8c0c9f1f9aec24da40c4666e4655e105c0617a689e6826c",
       "bytes": 10028
@@ -18054,6 +18059,11 @@
       "path": "docs/foundation-convergence-20260921.md",
       "sha256": "2a8fe0a5f1bc9008d322a9199cec5c9750ab0d141c755852bb68cfad2d3a71d3",
       "bytes": 7028
+    },
+    {
+      "path": "docs/foundation-layer-map-20261008.md",
+      "sha256": "1c2fe5e89fec00fbe589b7092b35d8c903c865696161309441113348cefc27b9",
+      "bytes": 33978
     },
     {
       "path": "docs/foundation-rd-readiness.md",
@@ -57567,8 +57577,8 @@
     },
     {
       "path": "tests/test_frozen_macos_variant_no_use.py",
-      "sha256": "c8b5bfcece446aba7e9a8c87c0837ffdc8bac71b4c8c948a7d3831baaa7d5ff2",
-      "bytes": 37245
+      "sha256": "be95d00ec0f12735d3f35c950138fc50a7391d01e22de26f803e4499c19dbc30",
+      "bytes": 37392
     },
     {
       "path": "tests/test_gap_crosswalk.py",

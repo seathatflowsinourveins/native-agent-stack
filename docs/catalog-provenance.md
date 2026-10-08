@@ -1,9 +1,15 @@
 # Catalog archive provenance
 
-The manual [catalog publication workflow](../.github/workflows/publish-catalog.yml)
-packages one validated `main` commit and uses GitHub's native artifact attestation
-service to identify its origin. It has no schedule, model execution, release,
-registry push or Pages deployment. A dispatch on another branch is skipped.
+The [catalog publication workflow](../.github/workflows/publish-catalog.yml)
+packages one validated event commit and uses GitHub's native artifact attestation
+service to identify its origin. A manual dispatch on `main` publishes the source
+archive, SPDX SBOM, generated explorer and verification evidence as Actions
+artifacts. A `v*` tag push also runs the release job, which attaches the archive
+and SBOM to an immutable GitHub Release. There is no schedule, model execution,
+registry push or Pages deployment. Other branch refs are skipped; matching tag
+refs are admitted by the job guards, including a manual dispatch on such a tag.
+The coordinator's tag-first, verify-then-re-pin procedure is in
+[Moving a host to a new release](../adoption/update.md#moving-a-host-to-a-new-release).
 
 **Qualified on 2026-09-20:** [publication run 35541322881](https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/35541322881)
 succeeded at `d0fe136c218fedff93c93ac674e302ae19b2d924`. Independent consumer
@@ -12,16 +18,29 @@ content validation passed. [PR #26](https://github.com/seathatflowsinourveins/na
 retains the qualification record; [the automation manifest](../catalogs/foundation/automation.json)
 records exact artifact identity and remaining limits. Historical local observations
 below remain separate from this hosted result.
+That qualification covers the named commit's archive publication only. It does
+not establish the later SBOM, explorer or immutable-release behavior. The current
+description was reconciled on 2026-10-08 against this repository at
+[`eb5fee4db9a494729deb29bdf38dbabac23ee643`](https://github.com/seathatflowsinourveins/native-agent-stack/tree/eb5fee4db9a494729deb29bdf38dbabac23ee643),
+the workflow and adoption procedure above, GitHub's
+[attestation guide](https://docs.github.com/en/actions/security-for-github-actions/using-artifact-attestations/using-artifact-attestations-to-establish-provenance-for-builds)
+and [immutable-release contract](https://docs.github.com/en/code-security/supply-chain-security/understanding-your-software-supply-chain/immutable-releases).
+This reconciliation is source review, not a new hosted publication qualification.
 An attestation proves origin and byte integrity; catalog correctness and practical
 usefulness still need their own [acceptance evidence](acceptance-evidence-policy.md).
 
 ## Scope and maintained interfaces
 
-The default token is read-only. Only the publication job has `id-token: write`
-and `attestations: write`, alongside `contents: read`. Its repository and ref
-guard admits only this repository's `refs/heads/main`; no revision input or
-pull-request trigger can select unreviewed code. Checkout does not persist
-credentials. The job has a ten-minute timeout and uses a standard GitHub runner.
+Top-level `permissions: {}` grants no token scopes by default. The `publish` job
+has `contents: read`, `id-token: write` and `attestations: write`. Its repository
+and ref guard admits only this repository's `refs/heads/main` or `refs/tags/v*`.
+The dependent `release` job has `contents: write` to create the GitHub Release
+and attach its two files; its guard requires the same repository and a matching
+tag ref. Release-tag custody is therefore part of the trust boundary. There is
+no revision input or pull-request trigger. Checkout does not persist credentials.
+Each job has a ten-minute timeout and uses `ubuntu-24.04` with the pinned runner
+hardening action in audit mode. Runs on the same ref are serialized and a started
+run is not cancelled by a newer one.
 
 The existing integrity, catalog, foundation, convergence and explorer validators
 must pass before packaging. These remain structural validation and recorded
@@ -34,36 +53,106 @@ evidence, manifests, validators and licenses. Its output goes into runner
 temporary storage. A recursive archive of the worktree could collect runtime or
 untracked files; this workflow never uses that approach. It confirms the checkout
 SHA equals the triggering event SHA and rejects a changed working tree.
+The generated explorer is a separate, scanned and attested HTML artifact; it is
+not part of the tracked source archive. The SPDX SBOM is generated from the
+checkout using checksum-verified Syft. The tag-ref release job downloads only
+the archive and SBOM by their publication artifact IDs, rejects download digest
+mismatches, and rechecks both files against the SHA256 digests attested and
+uploaded by `publish` before attaching them to the release.
 
 | Interface | Reviewed revision | Selection |
 | --- | --- | --- |
 | [actions/checkout](https://github.com/actions/checkout/tree/3d3c42e5aac5ba805825da76410c181273ba90b1) | `v7.0.1`, `3d3c42e5aac5ba805825da76410c181273ba90b1` | Reuse the repository's exact checkout pin; event commit and no persisted credentials. |
 | [actions/attest](https://github.com/actions/attest/tree/1e69f48acb82d1966a394da916b4c1698aa569d6) | `v4.2.2`, `1e69f48acb82d1966a394da916b4c1698aa569d6` | Maintained native provenance interface with an explicit archive subject. |
 | [actions/upload-artifact](https://github.com/actions/upload-artifact/tree/043fb46d1a93c77aae656e7c1c64a875d1fc6a0a) | `v7.0.1`, `043fb46d1a93c77aae656e7c1c64a875d1fc6a0a` | Existing pin; supported single-file `archive: false` preserves the subject bytes and digest. |
-| [GitHub CLI attestation verification](https://cli.github.com/manual/gh_attestation_verify) | Local verification used `gh 2.101.0`; hosted version is captured per run | Native signer workflow, source SHA/ref, runner policy and detached-bundle verification. |
+| [actions/download-artifact](https://github.com/actions/download-artifact/tree/3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c) | `v8.0.1`, `3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c` | Release job selects the publication artifact IDs with `digest-mismatch: error`. |
+| [anchore/syft](https://github.com/anchore/syft/releases/tag/v1.54.0) | `v1.54.0`; Linux archive SHA256 `54a87372498168b2d033e876fd41fa4e8035b872699e525a57046e1f2f09c860` | Generate the SPDX SBOM using the workflow's exact upstream binary and checksum. |
+| [GitHub CLI attestation verification](https://cli.github.com/manual/gh_attestation_verify) | Historical verification used `gh 2.101.0`; current command contracts checked with installed `gh 2.102.0`; hosted version is captured per run | Native signer workflow, source SHA/ref, predicate and detached-bundle verification; `gh release verify-asset` verifies the separate release attestation. |
 
 [attest-build-provenance v4](https://github.com/actions/attest-build-provenance/tree/4d101475d8b20a2381f78447822ac1eab6504dd8)
 is a compatibility wrapper and directs new implementations to `actions/attest`.
-The selected action defaults to SLSA provenance. Registry and storage-record
-creation are explicitly disabled; `artifact-metadata: write`, package writes and
-repository content writes are unnecessary. Subject autodiscovery is not used.
+The selected action uses its default SLSA provenance predicate for the archive
+and explorer. The SBOM file is its own attestation subject, with the SPDX document
+as the `https://spdx.dev/Document` predicate. Registry and storage-record creation
+are explicitly disabled; `artifact-metadata: write` and package writes are
+unnecessary. Repository content writes belong only to the release job. Subject
+autodiscovery is not used.
 
 `archive: false` accepts exactly one file and names the artifact after that file;
 the upload action ignores its `name` input in this mode. The evidence logs and
-detached bundle are uploaded separately with the ordinary ZIP behavior. Do not
-compare that evidence ZIP's digest with the catalog archive's attested digest.
+detached bundles are uploaded separately with the ordinary ZIP behavior. Do not
+compare that evidence ZIP's digest with an attested file's digest. The release
+does not attach the explorer or this evidence ZIP; it requires exactly the
+archive and SBOM assets.
 
 ## Run and verify
 
-After integration, the maintainer can dispatch the default branch:
+A maintainer can dispatch the default branch for Actions artifact publication:
 
 ```bash
 gh workflow run publish-catalog.yml --ref main \
   --repo seathatflowsinourveins/native-agent-stack
 ```
 
+This `main` dispatch creates no release. A release uses the coordinator's
+[tag-first procedure](../adoption/update.md#moving-a-host-to-a-new-release):
+review the commit and tag, push the `v*` tag, wait for the publication and release
+jobs, verify the published files, then open the adoption re-pin PR. A tag-ref
+dispatch also satisfies the release guard, so do not use it as an upload-only
+replay or try to recreate a release that already exists.
+
+### Download and verify an immutable release
+
+Use a fresh directory and the reviewed tag and its full source commit. Inspect
+the release before downloading: require the expected tag, `isDraft: false`,
+`isImmutable: true` and exactly the archive and SBOM assets. Compare each file's
+SHA256 with its `assets[].digest` value, then verify both artifact attestations
+and their membership in the release:
+
+```bash
+repo=seathatflowsinourveins/native-agent-stack
+tag=REVIEWED_RELEASE_TAG
+commit=FULL_SOURCE_COMMIT_FROM_THE_REVIEWED_TAG
+archive="native-agent-stack-${commit}.tar.gz"
+sbom="native-agent-stack-${commit}.spdx.json"
+gh release view "$tag" --repo "$repo" \
+  --json tagName,isDraft,isImmutable,assets,url
+gh release download "$tag" --repo "$repo" \
+  --pattern "$archive" --pattern "$sbom" --dir .
+sha256sum "$archive" "$sbom"
+gh attestation verify "$archive" --repo "$repo" \
+  --signer-workflow "$repo/.github/workflows/publish-catalog.yml" \
+  --source-ref "refs/tags/$tag" --source-digest "$commit" \
+  --deny-self-hosted-runners --format json
+gh attestation verify "$sbom" --repo "$repo" \
+  --signer-workflow "$repo/.github/workflows/publish-catalog.yml" \
+  --source-digest "$commit" --predicate-type https://spdx.dev/Document \
+  --deny-self-hosted-runners --format json
+gh release verify-asset "$tag" "$archive" --repo "$repo"
+gh release verify-asset "$tag" "$sbom" --repo "$repo"
+```
+
+The archive uses the default SLSA predicate. The SBOM verification selects the
+SPDX predicate explicitly, matching the workflow's SBOM command; do not apply
+the archive's default predicate to it. GitHub generates a separate release
+attestation when an immutable release is published. `gh release verify-asset`
+checks that a downloaded file matches that release's attested asset digest; it
+complements the workflow artifact attestations. Neither check establishes the
+correctness or currency of the catalog or the completeness of the SBOM.
+
+The workflow uses `gh release create --verify-tag` with both files. The installed
+[GitHub CLI implementation at v2.102.0](https://github.com/cli/cli/blob/v2.102.0/pkg/cmd/release/create/create.go)
+creates a draft, uploads assets and publishes it, following GitHub's
+[recommended immutable-release sequence](https://docs.github.com/en/code-security/supply-chain-security/understanding-your-software-supply-chain/immutable-releases#best-practices-for-publishing-immutable-releases).
+The final workflow check fails unless the release is published, immutable and
+has exactly the two expected assets with their attested digests. This describes
+the source contract; require a successful run and consumer verification for
+each selected release.
+
+### Actions artifacts and detached verification
+
 The workflow preserves source/run identity, validation output, archive checksum,
-attestation bundle, verification results and upload digest. It fetches the native
+attestation bundles, verification results and upload digests. It fetches the native
 [trusted root](https://cli.github.com/manual/gh_attestation_trusted-root) once for
 detached-bundle verification. It verifies the original, requires rejection of a
 copy with appended bytes, then rechecks the original under the same offline
@@ -71,8 +160,9 @@ policy. Failure output survives in the evidence artifact, including the CLI's
 nonzero negative-control result. Unexpected acceptance or failure of the final
 original verification fails the job. No failure is ignored to turn the run green.
 
-Download the catalog archive and evidence artifact from the same successful run
-into a fresh directory. Inspect the run and artifact list first:
+For a `main` dispatch, download the catalog archive and evidence artifact from
+the same successful run into a fresh directory. Inspect the run and artifact
+list first:
 
 ```bash
 repo=seathatflowsinourveins/native-agent-stack
@@ -83,7 +173,10 @@ gh api "repos/$repo/actions/runs/$run_id/artifacts" \
   --jq '.artifacts[] | {id,name,expired,digest}'
 ```
 
-Confirm `main`, the expected workflow path and a successful conclusion. Set the
+Confirm `main`, the expected workflow path and a successful conclusion; the
+retained `source.log` must agree on repository, commit and `refs/heads/main`.
+For tag-run evidence, use the reviewed `refs/tags/<tag>` source ref instead.
+Set the
 following values from those records, selecting the nonexpired archive whose name
 contains the source SHA. The [REST artifact download endpoint](https://docs.github.com/en/rest/actions/artifacts#download-an-artifact)
 returns the stored payload through a redirect; retain those bytes directly. Use
@@ -110,14 +203,22 @@ the first hosted round trip is recorded above. Verify the archive itself:
 repo=seathatflowsinourveins/native-agent-stack
 commit=FULL_SOURCE_COMMIT_FROM_THE_RUN
 archive="native-agent-stack-${commit}.tar.gz"
-sha256sum -c archive.sha256
+source_ref=refs/heads/main
+awk -v name="$archive" '$2 == name' archive.sha256 | sha256sum --check --strict
 gh attestation verify "$archive" --repo "$repo" \
   --signer-workflow "$repo/.github/workflows/publish-catalog.yml" \
-  --source-ref refs/heads/main --source-digest "$commit" \
+  --source-ref "$source_ref" --source-digest "$commit" \
   --deny-self-hosted-runners --format json
 ```
 
+`archive.sha256` also lists the separate SBOM and explorer; the command above
+selects the archive's checksum instead of requiring files not downloaded here.
+When verifying a tag-run archive, set `source_ref="refs/tags/$tag"` from the
+reviewed tag and run identity before executing the verification command.
+
 For verification from the retained bundle, add `--bundle attestation.json`.
+The SBOM has its own `attestation-sbom.json` bundle and still requires
+`--predicate-type https://spdx.dev/Document` when verified separately.
 On an offline consumer, obtain trusted root material independently through
 `gh attestation trusted-root` while connected and pass it using
 `--custom-trusted-root /path/to/trusted-root.jsonl`. A trusted root supplied by an
@@ -146,8 +247,9 @@ The following observations were collected on 2026-09-20:
 - An obsolete GitHub documentation URL returned HTTP 404. Research recovered
   through the current official [attestation guide](https://docs.github.com/en/actions/how-tos/secure-your-work/use-artifact-attestations/use-artifact-attestations).
 
-The workflow-specific checks used the implementation in this change and the
-unmodified base commit above for the clean packaging replay:
+The 2026-09-20 workflow-specific checks used that revision's implementation and
+the unmodified base commit above for the clean packaging replay. They are
+historical results, not reruns of the current workflow:
 
 | Command or replay | Actual result |
 | --- | --- |
@@ -206,17 +308,25 @@ versions into accepted runtime status.
 are available for public repositories on current GitHub plans. Standard public
 GitHub-hosted runner execution is free; artifact storage is a separate allowance
 described by [GitHub Actions billing](https://docs.github.com/en/billing/concepts/product-billing/github-actions).
-One manual run uploads roughly a few megabytes plus bounded logs, with seven-day
-retention. No larger runner, model subscription or paid entitlement is enabled.
-The archive is an expiring Actions artifact, not a permanent release channel.
+Actions artifacts have seven-day retention, including publication evidence and
+the separate explorer. Sizes depend on the selected commit and are recorded per
+run; the 2026-09-20 archive sizes above are historical. Tag-ref runs additionally
+publish the archive and SBOM as GitHub Release assets, which are not subject to
+that Actions-artifact retention. No larger runner, model subscription or paid
+entitlement is enabled.
 
 The run's artifact ID, URL, commit, actual compressed size and digest must be
-recorded during hosted qualification. Artifact expiry does not retract public
+recorded during hosted qualification. For a release, also retain the tag, source
+commit, release URL, immutability result and both release-asset digests. GitHub's
+immutable-release contract locks the associated tag and assets while the release
+exists; title and notes can still change. Artifact expiry does not retract public
 attestation records, and attestations do not guarantee the truth, adequacy or
 currency of the evidence inside. Failure during service or artifact upload can
 also prevent evidence preservation; workflow logs remain the fallback record.
 
-Rollback: disable `publish-catalog.yml` to stop future dispatches, or revert this
-workflow and guide through a reviewed change. Existing validation and maintenance
-continue independently. Previously published bytes and attestation records are
+Rollback: disable `publish-catalog.yml` to stop future publications, or revert a
+workflow or guide change through review. Existing validation and maintenance
+continue independently. Published immutable assets and their tag cannot be
+rewritten in place; a corrected catalog needs a new reviewed tag, publication
+and adoption re-pin. Previously published bytes and attestation records remain
 historical results and must not be silently relabeled or treated as new evidence.
