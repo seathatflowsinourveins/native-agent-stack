@@ -18076,8 +18076,8 @@
     },
     {
       "path": "docs/decisions/2026-10-08-qmd-shared-mcp.md",
-      "sha256": "c6dd69ac2afcf73dd37170c6fd086d4ab61a83e6695b1a2ff91cb9d1f0971c8b",
-      "bytes": 9360
+      "sha256": "e4101b004347c0b5b1bb61be436d0ea4c1bc4176b9dffbe41aa33d3abe87be78",
+      "bytes": 12311
     },
     {
       "path": "docs/decisions/2026-10-08-skills-cc-lanes-picks.md",

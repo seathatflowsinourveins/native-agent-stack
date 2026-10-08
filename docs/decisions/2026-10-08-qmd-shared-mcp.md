@@ -49,6 +49,24 @@ separate from runtime acceptance. The installer processes every server in its
 selected input; a host QMD-only change therefore uses direct native commands or
 a QMD-only input, rather than replacement of the full server set.
 
+## Changed test expectations
+
+The following four existing test methods change their expectations to match the
+native HTTP contract. These are repository integration checks; their successful
+fixtures do not establish fresh-host, macOS or final-name runtime acceptance.
+
+| Existing test method | Old contract | New contract | Why the old assertion no longer applies |
+| --- | --- | --- | --- |
+| `tests/test_install_claude_profile.py`: `McpTemplateShapeTests.test_template_names_the_expected_servers` | Only `ai-memory` was HTTP; every other user-scope server, including QMD, had to be stdio. | Both `ai-memory` and `qmd` must be HTTP; every remaining server still must be stdio and the exact server set remains required. | QMD now uses its native shared HTTP transport. Keeping the blanket stdio classification would reject the intended supported registration. |
+| `tests/test_install_claude_profile.py`: `McpCodexParityTests.test_the_parity_check_rejects_each_kind_of_drift` | The argument-corruption mutant replaced QMD's stdio index arguments. | The same argument-drift control corrupts Headroom's stdio proxy argument, and must still produce exactly one parity error. Other drift controls remain. | HTTP QMD has no launcher arguments; the parity helper checks its transport/URL and returns before stdio argument comparison. Moving the mutant preserves the actual stdio argument guard. |
+| `tests/test_install_claude_profile.py`: `McpCodexParityTests.test_qmd_serves_the_named_catalog_index` | Claude QMD's client args selected `native-agent-stack-catalog`; the handbook had to contain its stdio command. | The complete Claude QMD entry must equal the shared HTTP spec. The decision must contain the native shared-service command with explicit `native-agent-stack-catalog-lex`, host and port. | An HTTP client selects an endpoint, while the service owns the index. The earlier generic client-argument/handbook assertion cannot establish service-side selection; the new command assertion records the observed lexical host scope without claiming runtime acceptance. |
+| `tests/test_new_wsl_client_config.py`: `RenderTests.test_the_wired_servers_are_registered_and_serena_and_qmd_by_the_command_their_readmes_give` | Rendered Claude QMD's command and final argument had to be `(qmd, mcp)`. | Rendered Claude QMD must exactly equal the HTTP type/URL spec, and rendered Codex `mcp_servers.qmd` must exactly equal the same URL entry. All other server/render assertions remain. | The shared registration has no stdio command. Exact whole-entry checks prevent leftover stdio fields or client endpoint drift in the new native configuration. |
+
+The handbook-to-service-command replacement belongs to the named-index parity
+test in `test_install_claude_profile.py`; the new-WSL render test supplies the
+separate Claude whole-entry and Codex URL assertions. The dated native-input
+projection records the resulting source shape while preserving earlier counts.
+
 ## Native pilot receipt
 
 Samples were taken at `2026-10-08T17:19:34Z` and
