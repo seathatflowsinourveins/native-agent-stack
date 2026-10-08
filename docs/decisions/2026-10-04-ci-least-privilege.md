@@ -419,6 +419,14 @@ reference, <https://docs.github.com/en/actions/reference/security/oidc> (subject
 "Immutable subject claims"); Anthropic, Workload identity federation,
 <https://platform.claude.com/docs/en/manage-claude/workload-identity-federation> ("Match"); all read 2026-10-08.
 
+### Addendum (2026-10-08): the lane triage's two jobs
+
+`claude-triage.yml:classify` requests a token for the same rule, so it has its own inventory entry
+(`id-token: write`, its only write grant) and its own `id-token-write` exemption; it runs on schedule and owner
+dispatch on `main` only. `claude-triage.yml:apply` runs no model and holds `issues: write`, which is in the reviewed
+inventory; neither job runs on a pull request
+([2026-10-08-claude-actions-triage.md](2026-10-08-claude-actions-triage.md)).
+
 ## Alternatives considered
 
 - **Keep workflow-level `contents: read`.** It already met OpenSSF Scorecard's Token-Permissions top score (read-only

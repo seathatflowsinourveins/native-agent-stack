@@ -113,6 +113,9 @@ EXEMPTIONS = {
     "pull-request-cache-mode": {},
     # 2026-10-08 (docs/decisions/2026-10-04-ci-least-privilege.md, "Federation exemption (2026-10-08)").
     "id-token-write": {
+        # 2026-10-08 (docs/decisions/2026-10-08-claude-actions-triage.md): the model job of the lane triage.
+        "claude-triage.yml:classify": "Anthropic workload identity federation, not provenance. Schedule and owner "
+                                      "dispatch on main only; no write scope in this job, read-only model tools",
         "harness-audit.yml:audit": "Anthropic workload identity federation, not provenance: the action exchanges the "
                                    "job's GitHub OIDC token for a short-lived Claude API token. The federation rule "
                                    "accepts workflows on this repository's main and never pull requests; which "
@@ -123,6 +126,10 @@ EXEMPTIONS = {
 # Every write grant in the repository, by job. A new one is a reviewed change to this inventory.
 WRITE_GRANTS = {
     "catalog-freshness.yml:propose": ["contents: write", "pull-requests: write"],
+    # Federation needs id-token (EXEMPTIONS, id-token-write); the model job returns labels and writes nothing.
+    "claude-triage.yml:classify": ["id-token: write"],
+    # No model: adds one allow-listed lane label to an open issue that has none, after re-reading it.
+    "claude-triage.yml:apply": ["issues: write"],
     # Federation needs id-token (EXEMPTIONS, id-token-write); the result is one issue.
     "harness-audit.yml:audit": ["id-token: write", "issues: write"],
     "publish-catalog.yml:publish": ["id-token: write", "attestations: write"],
