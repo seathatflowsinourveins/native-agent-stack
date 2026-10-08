@@ -38,7 +38,11 @@ def render(data: dict[str, Any]) -> str:
         lane_rows.append(f'<tr data-lane="{esc(row["lane"])}"><th scope="row">{esc(row["lane"])}</th><td>{text(row.get("status"))}</td><td>{tier(row.get("tier"))}</td><td>{text(row.get("cli_version"))}{held}</td><td>{number(row.get("subagents_running"))}</td><td>{number(row.get("subagent_uncached_share_pct"), "%")}</td></tr>')
     parked_items = "".join(f'<li data-parked-lane="{esc(row["lane"])}"><strong>{esc(row["lane"])}</strong><small>{tier(row.get("tier"))} · CLI {text(row.get("cli_version"))}</small></li>' for row in parked)
     subgroups = data.get("claude_subagents_running", {})
-    sessions = "".join(f'<li><strong>{text(row.get("name"))}</strong> <span>{text(row.get("status"))}</span></li>' for row in data.get("claude_sessions", [])) or '<li>not reported</li>'
+    # CC source role: this named session belongs to the owner, not our workers.
+    session_rows = data.get("claude_sessions", [])
+    owner_count = sum(row.get("name") == "native-agent-stack-1a" for row in session_rows)
+    worker_count = len(session_rows) - owner_count
+    sessions = "".join(f'<li data-session-role="{"owner" if row.get("name") == "native-agent-stack-1a" else "worker"}"><strong>{"owner session (reports to CC)" if row.get("name") == "native-agent-stack-1a" else text(row.get("name"))}</strong> <span>{text(row.get("status"))}</span></li>' for row in session_rows) or '<li>not reported</li>'
     named_groups = []
     for key, label in (("coop", "Co-op"), ("cc", "Command center"), ("api_actions", "API actions")):
         group = subgroups.get(key, {})
@@ -62,7 +66,7 @@ def render(data: dict[str, Any]) -> str:
     held_names = ', '.join(f'{esc(name)} {esc(version)}' for name, version in holds.items()) or 'none listed'
     return f'''<section id="fleet-view" class="fleet-view" aria-labelledby="fleet-title">
 <header class="page-header"><h1 id="fleet-title">Worker fleet</h1><p class="fleet-stamp">{text(data.get("fleet_source"))} · {stamp}</p></header>
-<div class="fleet-counts"><p><strong>{len(lanes) if reported else "not reported"}</strong> live Codex lanes</p><p><strong>{len(parked) if reported else "not reported"}</strong> parked</p><p><strong>{len(data.get("claude_sessions", [])) if reported else "not reported"}</strong> Claude sessions</p><p><strong>{number(data.get("fresh_total_pct"), "%")}</strong> fresh pool used</p></div>
+<div class="fleet-counts"><p><strong>{len(lanes) if reported else "not reported"}</strong> live Codex lanes</p><p><strong>{len(parked) if reported else "not reported"}</strong> parked</p><p><strong>{worker_count if reported else "not reported"}</strong> Claude worker sessions{f' + {owner_count} owner session' if owner_count else ''}</p><p><strong>{number(data.get("fresh_total_pct"), "%")}</strong> fresh pool used</p></div>
 <div class="fleet-grid"><div class="fleet-left">
 <section class="fleet-codex"><h2>Codex lanes</h2><div class="table-wrap fleet-table-wrap" tabindex="0" role="region" aria-label="Codex lanes; scroll horizontally on narrow screens"><table class="fleet-table"><thead><tr><th>Lane</th><th>State</th><th>Tier</th><th>CLI</th><th>Subagents running</th><th>Subagents' uncached share</th></tr></thead><tbody>{''.join(lane_rows)}</tbody></table></div></section>
 <section class="fleet-parked"><h2>Parked lanes</h2><ul>{parked_items}</ul></section>

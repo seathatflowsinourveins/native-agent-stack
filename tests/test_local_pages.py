@@ -354,9 +354,18 @@ class LocalPagesTests(unittest.TestCase):
                 self.refresh()
                 text = (self.output / "fleet.html").read_text()
                 self.assertNotIn('<strong>0</strong> live Codex lanes', text)
-                self.assertNotIn('<strong>0</strong> Claude sessions', text)
+                self.assertNotIn('<strong>0</strong> Claude worker sessions', text)
                 self.assertIn('<strong>not reported</strong> live Codex lanes', text)
                 self.assertNotIn('datetime=""', text)
+
+    def test_owner_claude_session_is_named_by_role_and_excluded_from_workers(self) -> None:
+        self.fleet_result["claude_sessions"] = [{"name": "native-agent-stack-1a", "status": "idle"}, {"name": "fixture-worker", "status": "busy"}]
+        self.refresh()
+        text = (self.output / "fleet.html").read_text()
+        self.assertIn("owner session (reports to CC)", text)
+        self.assertIn('<strong>1</strong> Claude worker sessions + 1 owner session', text)
+        self.assertNotIn("native-agent-stack-1a", text)
+        self.assertIn('data-session-role="owner"', text)
 
     def test_untrusted_text_does_not_create_markup_or_account_links(self) -> None:
         attack = '<img src="https://attacker.invalid/x" onerror="alert(1)">'
