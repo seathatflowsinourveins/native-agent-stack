@@ -26,7 +26,7 @@ The initial G6 inventory at 8ee8b3bd covered 182 exact rule surfaces. Live obser
 | Subtree/trading prerequisite | Native path discovery and the root prerequisite. | G03: no universal pre-read check was observed. Existing role launchers can supply the same prerequisite for out-of-tree work; a load event is not adherence proof. |
 | Exact confirmation, shared acknowledgement and cue | Command-center/lane procedures. | G04: zero required approving reviews in the observed main ruleset; GitHub does not prove authority/cue semantics. Required native reviews or a workflow checking recorded cue/hash provenance are candidates. |
 | Consolidated records | Maintained-record review. | G04: pattern detection is discovery, not provenance or semantic-preservation proof. Records state practice with cited SOTA sources; review changed records against their sources and retain frozen originals. |
-| Secrets | Claude Bash guards and required committed-content secret-scan. | G05: duplicated Claude guards, non-Bash boundaries and the observed Codex registration gap require compatibility review. Reuse supported existing guards/native command hooks rather than claiming universal protection. |
+| Secrets | Claude Bash guards and required committed-content secret-scan. | G05: guard coverage across tools and clients requires bounded compatibility review. Reuse supported existing guards/native command hooks rather than claiming universal protection. |
 | Disclosure/installed consistency | Native loaders, carrier equality/pins and skill precedence. | G06: unconditional imports remain loaded; host-local tails and source/name collisions need bounded review. |
 | Expectation-change control | Declared expectations and the independent 5f comparison of main's tests against the candidate. | G07: ordinary validate is not proof of the independent landing review. Keep both receipts. |
 | Frozen integrity | Registered digests and relevant validators/tests; scheduled frozen-evidence risk reporting. | G08: no required context literally named frozen-evidence or frozen-evidence-risk was present in the observed main ruleset. Scheduled reporting is not a required status. |
@@ -35,7 +35,7 @@ The initial G6 inventory at 8ee8b3bd covered 182 exact rule surfaces. Live obser
 
 The observed main ruleset required exactly validate, token-report, secret-scan, dependency-review, osv-scanner, verdict-review-gate and sota-sources. It also requires review-thread resolution and zero approving reviews. Current live ruleset receipts take precedence over a stale local ruleset copy.
 
-#868's research guard is role/session scoped. Its later F9 receipt records installation of its two hook groups after the initial inventory observation. A marked coordinator's WebSearch can be denied; attempted primary fetches are warned/logged by the hook's declared threshold. Unmarked lanes and warning-only cases are not global enforcement. The separate G6b settings follow-up distinguishes that targeted apply from a full template merge; it is outside this core/enforcement change.
+#868's research guard is role/session scoped. A marked coordinator's WebSearch can be denied; attempted primary fetches are warned/logged by the hook's declared threshold. Unmarked lanes and warning-only cases are not global enforcement.
 
 ## Sources and verification
 
@@ -44,7 +44,7 @@ The observed main ruleset required exactly validate, token-report, secret-scan, 
 - Claude Code 2.1.294: anthropics/claude-code@71cdddec623889d38af14b7a489670a03186f659:CHANGELOG.md:38,444,1249; official [hooks](https://code.claude.com/docs/en/hooks), [memory](https://code.claude.com/docs/en/memory), [skills](https://code.claude.com/docs/en/skills) and [best practices](https://code.claude.com/docs/en/best-practices), fetched 2026-10-08.
 - Codex 0.161.0: openai/codex@979011409de0a60b52f179721948e65531d26144:codex-rs/core/src/agents_md.rs:1; codex-rs/codex-home/src/instructions/mod.rs:43; codex-rs/features/src/lib.rs:1254; codex-rs/hooks/src/engine/discovery.rs:637; codex-rs/ext/skills/src/host_prompt.rs:61.
 - GitHub official [rulesets](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/about-rulesets) and [scheduled workflow events](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule), fetched 2026-10-08.
-- #868 landed source 618dd6c0 and CC F9 research-guard receipt, 2026-10-08. The full settings-render/ownership comparison belongs to the G6b follow-up.
+- #868 landed source 618dd6c0, 2026-10-08, for the research guard's bounded role/session behavior.
 
 The [published G6 receipt index](../evidence/artifacts/harness-rules-20261008/README.md) links the versioned sources, native research/counter receipts and declared core-test comparison cited by the dated decision.
 

@@ -18327,8 +18327,8 @@
     },
     {
       "path": "docs/harness-rule-enforcement.md",
-      "sha256": "6f4f0d5ac7d20128945c62e0ddc892212f32c70b4c60aa7e41400518a8a2803e",
-      "bytes": 7966
+      "sha256": "963b22ce1a036dc0a4e6d211a092a4897c917b8e2cf3d5fa21cb58523ed8100e",
+      "bytes": 7628
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
