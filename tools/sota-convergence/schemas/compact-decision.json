@@ -1,0 +1,143 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/tools/sota-convergence/schemas/compact-decision.json",
+  "title": "G5 compact decision row",
+  "description": "One repository or mined entry, explicit slot and literal qualification. Capture bytes live in a hash-bound TAR.ZST release asset containing compact/rows.json. Null pins and UNKNOWN fields are retained blockers. A source-review row never establishes executed native acceptance.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["repository_or_entry", "slot", "disposition", "evidence_class", "pin", "primary_sources", "capture_sha256", "archive_member", "owner_lane", "refresh_date"],
+  "properties": {
+    "repository_or_entry": {"type": "string", "minLength": 1},
+    "slot": {"type": "string", "pattern": "^(UNKNOWN|[a-z0-9][a-z0-9._-]*)$"},
+    "qualification": {
+      "type": "object",
+      "default": {},
+      "additionalProperties": false,
+      "properties": {
+        "catalog": {"type": "string", "minLength": 1},
+        "role": {"type": "string", "minLength": 1},
+        "slot": {"type": "string", "minLength": 1}
+      }
+    },
+    "disposition": {"enum": ["ADOPT-NOW", "TRIAL", "WATCH", "REJECT", "NO-GAP", "OUT-OF-SCOPE", "PENDING"]},
+    "evidence_class": {"enum": ["SOURCE-REVIEW", "DOCUMENTARY", "RECORDED-UPSTREAM-TEST", "RECORDED-INTEGRATION-CHECK", "RECORDED-LIVE-ACCEPTANCE", "UNKNOWN"]},
+    "decision_scope": {"enum": ["source-entry-screen", "implementation-merit", "reference-artifact"]},
+    "candidate_implementation_status": {"const": "UNESTABLISHED"},
+    "pin": {"anyOf": [{"$ref": "#/$defs/pin"}, {"type": "null"}]},
+    "primary_sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/primarySource"}
+    },
+    "capture_sha256": {"$ref": "#/$defs/sha256"},
+    "archive_member": {"$ref": "#/$defs/member"},
+    "owner_lane": {"type": "string", "minLength": 1},
+    "refresh_date": {"type": "string", "format": "date", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+    "pending": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provisional_disposition", "measurement", "owner"],
+      "properties": {
+        "provisional_disposition": {"enum": ["TRIAL", "WATCH", "REJECT", "NO-GAP", "OUT-OF-SCOPE"]},
+        "measurement": {"type": "string", "minLength": 1},
+        "owner": {"type": "string", "minLength": 1},
+        "status": {"enum": ["PROPOSED", "NOT-RUN", "SOURCE-AUDIT-ONLY", "EXECUTED-PENDING-RULING"]}
+      }
+    },
+    "choices": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["disposition", "source_refs"],
+        "properties": {
+          "disposition": {"enum": ["ADOPT-NOW", "TRIAL", "WATCH", "REJECT", "NO-GAP", "OUT-OF-SCOPE"]},
+          "source_refs": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/sourceRef"}},
+          "qualification": {"$ref": "#/properties/qualification"}
+        }
+      }
+    },
+    "source_refs": {"type": "array", "items": {"$ref": "#/$defs/sourceRef"}},
+    "source_pointer": {"type": "string", "pattern": "^($|/.*)$"},
+    "acceptance_witness": {
+      "description": "Retained original JSON receipt. Its exact selected object must bind identity, slot, qualification, pin, evidence_class, executed=true and status=PASS. This records prior execution and does not run a native test.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["archive_member", "sha256", "pointer"],
+      "properties": {
+        "archive_member": {"$ref": "#/$defs/member"},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "pointer": {"type": "string", "pattern": "^($|/.*)$"}
+      }
+    },
+    "searched": {"type": "string", "minLength": 1},
+    "reopen_when": {"type": "string", "minLength": 1},
+    "note": {"type": "string", "minLength": 1}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"disposition": {"const": "PENDING"}}},
+      "then": {"required": ["pending"]},
+      "else": {"not": {"required": ["pending"]}}
+    },
+    {
+      "if": {"properties": {"disposition": {"const": "REJECT"}}},
+      "then": {"required": ["searched"]}
+    },
+    {
+      "if": {"properties": {"evidence_class": {"enum": ["RECORDED-UPSTREAM-TEST", "RECORDED-INTEGRATION-CHECK", "RECORDED-LIVE-ACCEPTANCE"]}}},
+      "then": {"required": ["acceptance_witness"]},
+      "else": {"not": {"required": ["acceptance_witness"]}}
+    },
+    {
+      "if": {"properties": {"disposition": {"const": "ADOPT-NOW"}}},
+      "then": {"properties": {"evidence_class": {"const": "RECORDED-LIVE-ACCEPTANCE"}}, "required": ["acceptance_witness"]}
+    }
+  ],
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "member": {"type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.?(?:/|$))(?!.*\\\\)[^\\u0000-\\u001f\\u007f]+$"},
+    "pin": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "version_or_commit", "repository_or_source", "subject"],
+      "properties": {
+        "kind": {"enum": ["commit", "version"]},
+        "version_or_commit": {"type": "string", "minLength": 1},
+        "repository_or_source": {"type": "string", "minLength": 1},
+        "subject": {"enum": ["implementation", "source-entry", "reference"]}
+      },
+      "allOf": [
+        {"if": {"properties": {"kind": {"const": "commit"}}}, "then": {"properties": {"version_or_commit": {"pattern": "^[0-9a-f]{40}$"}}}},
+        {"if": {"properties": {"kind": {"const": "version"}}}, "then": {"properties": {"version_or_commit": {"pattern": "^(?!.*(?:[Ll][Aa][Tt][Ee][Ss][Tt]|[Mm][Aa][Ii][Nn]|[Mm][Aa][Ss][Tt][Ee][Rr]|[Hh][Ee][Aa][Dd]))[A-Za-z0-9._+-]*[0-9][A-Za-z0-9._+-]*$"}}}}
+      ]
+    },
+    "primarySource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["locator", "pin", "subject"],
+      "properties": {
+        "locator": {"type": "string", "minLength": 1},
+        "pin": {"anyOf": [{"$ref": "#/$defs/pin"}, {"type": "null"}]},
+        "subject": {"type": "string", "minLength": 1},
+        "capture_sha256": {"$ref": "#/$defs/sha256"},
+        "archive_member": {"$ref": "#/$defs/member"},
+        "pointer": {"type": "string", "pattern": "^($|/.*)$"}
+      },
+      "dependentRequired": {"capture_sha256": ["archive_member"], "archive_member": ["capture_sha256"]}
+    },
+    "sourceRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sha256", "pointer"],
+      "properties": {
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "pointer": {"type": "string", "minLength": 1},
+        "archive_member": {"$ref": "#/$defs/member"},
+        "source_id": {"type": "string", "minLength": 1},
+        "owner_lane": {"type": "string", "minLength": 1},
+        "occurrence_id": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}
