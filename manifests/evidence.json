@@ -17842,8 +17842,8 @@
     },
     {
       "path": "docs/decisions/2026-10-07-validate-module-shards.md",
-      "sha256": "ed39b46b1406909d88632c13d80805b077c65bae0bf0bfbf8d60575e8619c6c7",
-      "bytes": 14641
+      "sha256": "f10a8c8f8841c91d5050611dfc7ec15ab278d5650bc5aff9ba65bf746b733c64",
+      "bytes": 15329
     },
     {
       "path": "docs/direct-results.md",
@@ -56842,8 +56842,8 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "bbd35d1e524835d69a4af9cc0f7df4afb08d5a7cbd5373a9446d37df2781fe01",
-      "bytes": 162528
+      "sha256": "397ec09d6c2c17dfa10a5366cd93988f4b39057733c7b455a5cfb180ada7c614",
+      "bytes": 164745
     },
     {
       "path": "tests/test_workflow_policy.py",
