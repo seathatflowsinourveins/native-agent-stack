@@ -702,6 +702,22 @@ def name_hits(text: str, names) -> list:
     return [name for name in names if re.search(r"(?<![A-Za-z0-9])" + re.escape(name) + r"(?![A-Za-z0-9])", text, re.I)]
 
 
+def rendered_name_hits(filename: str, text: str, names) -> list:
+    """Scan rendered service references, keeping native skill identifiers in their separate namespace."""
+    scan_text = text
+    if filename == "settings.json":
+        try:
+            settings = json.loads(text)
+        except (json.JSONDecodeError, TypeError):
+            pass  # Keep the conservative raw-text scan for an invalid render.
+        else:
+            if isinstance(settings, dict) and isinstance(settings.get("skillOverrides"), dict):
+                # Keep override values and all other fields; the actual rendered config is unchanged.
+                settings["skillOverrides"] = list(settings["skillOverrides"].values())
+                scan_text = json.dumps(settings, ensure_ascii=False)
+    return name_hits(scan_text, names)
+
+
 def scan_names(text: str, names: list) -> list:
     """[(line number, line, [names])] for the lines of text that name a tool in names."""
     hits = []
@@ -1468,7 +1484,7 @@ def rendered_name_errors(root: Path) -> list:
             continue
         names = unwired_names(results, manifest)
         for name, text in files.items():
-            hits = name_hits(text, names)
+            hits = rendered_name_hits(name, text, names)
             if hits:
                 errors.append(f"the render for the example host {label}: {name} names {', '.join(hits)}, "
                               f"which {'is' if len(hits) == 1 else 'are'} not wired")

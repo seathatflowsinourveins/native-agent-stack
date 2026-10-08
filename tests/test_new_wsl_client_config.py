@@ -1391,7 +1391,7 @@ class AgentGapTests(unittest.TestCase):
         selected = {skill["name"] for skill in json.loads((ROOT / cfg.SKILLS_MANIFEST_REL).read_text())["skills"]
                     if skill.get("status") not in ("pruned", "held")}
         self.assertEqual(plan["skills"], frozenset(selected))
-        self.assertEqual(len(plan["skills"]), 24)
+        self.assertEqual(len(plan["skills"]), 27)
         self.assertTrue({"tdd", "diagnosing-bugs", "codebase-design", "writing-for-agents", "skill-creator"} <= plan["skills"])
         self.assertEqual({"grill-me", "improve-codebase-architecture", "semgrep", "agent-browser", "domain-modeling",
                           "setup-matt-pocock-skills"} & plan["skills"], set())
@@ -1705,7 +1705,7 @@ class RenderTests(unittest.TestCase):
             "headroom": {"enabled_tools": ["headroom_compress", "headroom_retrieve", "headroom_stats"]},
             "context-mode": {"disabled_tools": ["ctx_upgrade", "ctx_purge"]}})
 
-    def test_no_text_names_a_tool_that_the_manifest_does_not_install(self):
+    def test_no_service_reference_names_a_tool_that_the_manifest_does_not_install(self):
         names = unwired_names_independently()
         # Reproduced failure: hcom was still asserted unwired after wave 5 made
         # it an installed owner. Keep the original name set and verify both
@@ -1734,7 +1734,7 @@ class RenderTests(unittest.TestCase):
                 if name == "wiring.json":
                     continue
                 # The scan is the tool's: --check runs the same function on the same renders, with the tool's names.
-                self.assertEqual(cfg.name_hits(text, names), [], f"{label} the option: {name}")
+                self.assertEqual(cfg.rendered_name_hits(name, text, names), [], f"{label} the option: {name}")
 
     def test_the_same_scan_finds_those_names_in_the_old_full_profile_render(self):
         # Negative control: the render of the old workstation profile (every template piece) is full of them.
@@ -3842,6 +3842,23 @@ class AcknowledgementGateTests(ApplyCase):
 
 class RenderedScanTests(unittest.TestCase):
     """--check renders the example host, without and with the authorization settings, and scans every file."""
+
+    def test_a_skill_override_identifier_does_not_require_its_namesake_service(self):
+        rendered = {"settings.json": json.dumps({"skillOverrides": {"loki": "on"}})}
+        with mock.patch.object(cfg, "render", return_value=rendered):
+            self.assertEqual(cfg.rendered_name_errors(ROOT), [])
+
+    def test_an_unwired_service_reference_is_found_outside_skill_identifiers(self):
+        for settings in (
+            {"skillOverrides": {"loki": "on"}, "env": {"LOG_ENDPOINT": "http://loki:3100"}},
+            {"skillOverrides": {"loki": "on"}, "mcpServers": {"loki": {"command": "loki"}}},
+            {"skillOverrides": {"loki": "use loki"}},
+        ):
+            with self.subTest(settings=settings):
+                with mock.patch.object(cfg, "render", return_value={"settings.json": json.dumps(settings)}):
+                    errors = cfg.rendered_name_errors(ROOT)
+                self.assertEqual(len(errors), 2)
+                self.assertTrue(all("settings.json names Loki, which is not wired" in error for error in errors), errors)
 
     def test_the_repository_render_names_no_tool_that_is_not_wired_either_way(self):
         self.assertEqual(cfg.rendered_name_errors(ROOT), [])

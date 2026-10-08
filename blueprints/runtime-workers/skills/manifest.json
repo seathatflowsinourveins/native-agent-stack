@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "skills_trial_manifest",
   "scope": "project",
-  "checked_at": "2026-09-27",
+  "checked_at": "2026-10-08",
   "decision_record": "blueprints/runtime-workers/skills/research.md",
   "cli": {
     "package": "skills",
@@ -4022,6 +4022,27 @@
       "upstream_disable_model_invocation": false,
       "reason": "Main retired it on 2026-10-03 (adoption/skills/manifest.json, excluded, retired 2026-10-03; wave-2 skills ruling, evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json): its plan-approval gate (SKILL.md lines 5, 14, 24 and 184) conflicts with AGENTS.md's no separate planning approval for bounded work. The reuse_ref entry and its coverage selections left with it, as adoption/skills/lifecycle.md (Retire and remove) asks; its scenarios were security and its roles coding, orchestration. Main no longer lists it among its skills, so this exclusion carries no adoption_ref; the pin fields record the revision main read.",
       "overturn": "Main re-admits it, that is adoption/skills/manifest.json lists it under skills again; then replace this exclusion with a reuse_ref entry at main's pin and restore its scenarios and roles."
+    },
+    {
+      "name": "hcom-agent-messaging",
+      "source": "aannoo/hcom",
+      "adoption_ref": "adoption/skills/manifest.json",
+      "reason": "Selected for command-center and native lane setup and troubleshooting; outside the current frozen runtime-worker deployment scope (docs/decisions/2026-10-08-skills-cc-lanes-picks.md).",
+      "overturn": "A dated owner or command-center assignment selects this skill for an identified runtime-worker role and authorizes its separately pinned worker deployment."
+    },
+    {
+      "name": "promptfoo-evals",
+      "source": "promptfoo/promptfoo",
+      "adoption_ref": "adoption/skills/manifest.json",
+      "reason": "Selected for command-center and native lane evaluation work; outside the current frozen runtime-worker deployment scope (docs/decisions/2026-10-08-skills-cc-lanes-picks.md).",
+      "overturn": "A dated owner or command-center assignment selects this skill for an identified runtime-worker role and authorizes its separately pinned worker deployment."
+    },
+    {
+      "name": "loki",
+      "source": "grafana/skills",
+      "adoption_ref": "adoption/skills/manifest.json",
+      "reason": "Selected for command-center and native lane log queries and monitoring; outside the current frozen runtime-worker deployment scope (docs/decisions/2026-10-08-skills-cc-lanes-picks.md).",
+      "overturn": "A dated owner or command-center assignment selects this skill for an identified runtime-worker role and authorizes its separately pinned worker deployment."
     }
   ],
   "openhands_inventory": [

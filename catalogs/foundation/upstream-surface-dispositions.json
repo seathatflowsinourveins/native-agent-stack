@@ -958,8 +958,8 @@
   {
    "key": "claude:hook:PostToolUseFailure",
    "disposition": "declined",
-   "reason": "off on both hosts (read 2026-10-04)); the repository record at adoption/skills/manifest.json:785 names it",
-   "source": "adoption/skills/manifest.json:785",
+   "reason": "off on both hosts (read 2026-10-04)); the repository record at adoption/skills/manifest.json:866 names it",
+   "source": "adoption/skills/manifest.json:866",
    "carrier": null,
    "value": null,
    "scope": null,
