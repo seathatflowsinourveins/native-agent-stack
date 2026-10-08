@@ -1964,6 +1964,253 @@
           "sort": "none"
         }
       }
+    },
+    {
+      "id": 27,
+      "title": "Claude completed tool invocations/s by tool and MCP server",
+      "type": "timeseries",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 234,
+        "w": 24,
+        "h": 9
+      },
+      "description": "Completed native tool results per second over 5m, including failures. Permission decisions and connection events are separate. MCP server and tool names come from native tool_parameters.mcp_server_name/mcp_tool_name, retained by the collector. Claude sessions need OTEL_LOG_TOOL_DETAILS=1 for user-configured MCP names.",
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (tool_name,mcp_server_name,mcp_tool_name) (rate({service_name=\"claude-code\"} | event_name=\"tool_result\" | keep tool_name,mcp_server_name,mcp_tool_name [5m]))",
+          "queryType": "range",
+          "legendFormat": "{{tool_name}} \u00b7 {{mcp_server_name}} \u00b7 {{mcp_tool_name}}",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "UNKNOWN",
+          "unit": "ops",
+          "custom": {
+            "spanNulls": false
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "last"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      }
+    },
+    {
+      "id": 28,
+      "title": "Codex completed tool invocations/s by namespace and tool",
+      "type": "timeseries",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 243,
+        "w": 24,
+        "h": 9
+      },
+      "description": "Completed native tool results per second over 5m, including failures. Namespace and leaf tool name are retained verbatim. Each code-mode wrapper and each nested call has its own series; adding wrapper rates to nested rates counts the same work twice. Permission decisions remain separate.",
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (client,tool_namespace,tool_name) (rate({service_name=~\"codex-app-server|codex_exec|codex_cli_rs\"} | event_name=\"codex.tool_result\" | keep client,tool_namespace,tool_name [5m]))",
+          "queryType": "range",
+          "legendFormat": "{{client}} \u00b7 {{tool_namespace}} \u00b7 {{tool_name}}",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "UNKNOWN",
+          "unit": "ops",
+          "custom": {
+            "spanNulls": false
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "last"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      }
+    },
+    {
+      "id": 29,
+      "title": "Claude MCP completed invocations/s by server and tool",
+      "type": "timeseries",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 252,
+        "w": 24,
+        "h": 9
+      },
+      "description": "Native MCP server/tool names, including plugin aliases. Missing names remain visible as UNKNOWN: enable native tool details in a new Claude session to name user-configured servers. mcp_server_scope is a configuration scope, not a server name. Results include failures and may omit interrupted calls.",
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (mcp_server_name,mcp_tool_name) (rate({service_name=\"claude-code\"} | event_name=\"tool_result\" | tool_family=\"mcp\" | label_format mcp_server_name=`{{ .mcp_server_name | default \"UNKNOWN\" }}`, mcp_tool_name=`{{ .mcp_tool_name | default \"UNKNOWN\" }}` | keep mcp_server_name,mcp_tool_name [5m]))",
+          "queryType": "range",
+          "legendFormat": "{{mcp_server_name}} \u00b7 {{mcp_tool_name}}",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "UNKNOWN",
+          "unit": "ops",
+          "custom": {
+            "spanNulls": false
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "last"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      }
+    },
+    {
+      "id": 30,
+      "title": "Claude effective tok/s (includes prefill)",
+      "type": "table",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 261,
+        "w": 24,
+        "h": 9
+      },
+      "description": "Total output tokens divided by total request seconds over the selected count window. Native request duration includes prefill; this is not generation-only speed. Main, auxiliary, workflow and subagent actors stay separate. Missing speed is normal (unset). Session names come from the latest native hcom root record; unmatched child identities stay visible with their session ID. Missing names leave IDs visible; sessions with no qualifying request have no throughput row.",
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "((1000 * (sum by (identity,session_id,query_source,actor,speed) (sum_over_time({service_name=\"claude-code\"} | event_name=\"api_request\" | duration_ms>0 | output_tokens>=0 | label_format identity=`{{ .session_id }}`, speed=`{{ .speed | default \"normal (unset)\" }}` | keep identity,session_id,query_source,actor,speed,output_tokens,duration_ms | unwrap output_tokens | __error__=\"\" [${window}]))) / (sum by (identity,session_id,query_source,actor,speed) (sum_over_time({service_name=\"claude-code\"} | event_name=\"api_request\" | duration_ms>0 | output_tokens>=0 | label_format identity=`{{ .session_id }}`, speed=`{{ .speed | default \"normal (unset)\" }}` | keep identity,session_id,query_source,actor,speed,output_tokens,duration_ms | unwrap duration_ms | __error__=\"\" [${window}])))) * on (identity) group_left (name,lane) ((topk by (identity) (1, max by (identity,name,lane) (max_over_time({service_name=\"agent-stack-lanes\",record_kind=\"hcom\"} | json | identity!=\"\" | name!=\"\" | observed_unix>0 | keep identity,name,lane,observed_unix | unwrap observed_unix | __error__=\"\" [${window}])))) > bool 0)) or on (identity,session_id,query_source,actor,speed) (1000 * (sum by (identity,session_id,query_source,actor,speed) (sum_over_time({service_name=\"claude-code\"} | event_name=\"api_request\" | duration_ms>0 | output_tokens>=0 | label_format identity=`{{ .session_id }}`, speed=`{{ .speed | default \"normal (unset)\" }}` | keep identity,session_id,query_source,actor,speed,output_tokens,duration_ms | unwrap output_tokens | __error__=\"\" [${window}]))) / (sum by (identity,session_id,query_source,actor,speed) (sum_over_time({service_name=\"claude-code\"} | event_name=\"api_request\" | duration_ms>0 | output_tokens>=0 | label_format identity=`{{ .session_id }}`, speed=`{{ .speed | default \"normal (unset)\" }}` | keep identity,session_id,query_source,actor,speed,output_tokens,duration_ms | unwrap duration_ms | __error__=\"\" [${window}]))))",
+          "queryType": "instant",
+          "legendFormat": "Effective tok/s",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "UNKNOWN"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Effective tok/s"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "suffix:tok/s"
+              },
+              {
+                "id": "decimals",
+                "value": 1
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true
+      },
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "mode": "columns"
+          }
+        },
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "identity": true
+            },
+            "indexByName": {
+              "name": 0,
+              "lane": 1,
+              "session_id": 2,
+              "actor": 3,
+              "query_source": 4,
+              "speed": 5,
+              "Value #A": 6
+            },
+            "renameByName": {
+              "name": "Session name",
+              "lane": "Lane",
+              "session_id": "Session identity",
+              "actor": "Actor",
+              "query_source": "Query source",
+              "speed": "Speed",
+              "Value": "Effective tok/s",
+              "Value #A": "Effective tok/s"
+            }
+          }
+        }
+      ]
     }
   ],
   "templating": {

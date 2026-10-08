@@ -2,7 +2,8 @@
 
 Sources: grafana/grafana v13.2.3 JSON dashboards and table transformations;
 grafana/loki v3.7.8 LogQL range aggregations and label_replace/vector;
-openai/codex rust-v0.160.1 d27764b8 otel/src/events/session_telemetry.rs:1106.
+openai/codex rust-v0.161.0 979011409de0a60b52f179721948e65531d26144
+otel/src/tool_result.rs; Claude Code v2.1.294 monitoring-usage/tool-result-event.
 Rate/cost: Prometheus rate/increase; Claude Code monitoring-usage#cost-counter.
 Gateway: opentelemetry-collector-contrib v0.162.0 spanmetricsconnector/README.md;
 semantic-conventions-genai 06ec68e7 client-inference.md (Development);
@@ -360,4 +361,79 @@ def dashboard():
         'the gateway does not set span status. Native status 0 means unknown, not success. '
         'The existing metrics/spans export guard preserves these dimensions. Deployment '
         'and received-event coverage remain the CC host read-back.', 'ops', PROMETHEUS)
+
+    plot('Claude completed tool invocations/s by tool and MCP server', [
+        ('{{tool_name}} · {{mcp_server_name}} · {{mcp_tool_name}}',
+         f'sum by (tool_name,mcp_server_name,mcp_tool_name) (rate({CLAUDE} '
+         '| event_name="tool_result" | keep tool_name,mcp_server_name,mcp_tool_name [5m]))')],
+        'Completed native tool results per second over 5m, including failures. '
+        'Permission decisions and connection events are separate. MCP server and tool names '
+        'come from native tool_parameters.mcp_server_name/mcp_tool_name, retained by the collector. '
+        'Claude sessions need OTEL_LOG_TOOL_DETAILS=1 for user-configured MCP names.', 'ops')
+    plot('Codex completed tool invocations/s by namespace and tool', [
+        ('{{client}} · {{tool_namespace}} · {{tool_name}}',
+         f'sum by (client,tool_namespace,tool_name) (rate({CODEX} '
+         '| event_name="codex.tool_result" | keep client,tool_namespace,tool_name [5m]))')],
+        'Completed native tool results per second over 5m, including failures. '
+        'Namespace and leaf tool name are retained verbatim. Each code-mode wrapper and '
+        'each nested call has its own series; adding wrapper rates to nested rates counts '
+        'the same work twice. Permission decisions remain separate.', 'ops')
+    plot('Claude MCP completed invocations/s by server and tool', [
+        ('{{mcp_server_name}} · {{mcp_tool_name}}',
+         f'sum by (mcp_server_name,mcp_tool_name) (rate({CLAUDE} '
+         '| event_name="tool_result" | tool_family="mcp" '
+         '| label_format mcp_server_name=`{{ .mcp_server_name | default "UNKNOWN" }}`, '
+         'mcp_tool_name=`{{ .mcp_tool_name | default "UNKNOWN" }}` '
+         '| keep mcp_server_name,mcp_tool_name [5m]))')],
+        'Native MCP server/tool names, including plugin aliases. Missing names remain '
+        'visible as UNKNOWN: enable native tool details in a new Claude session to name '
+        'user-configured servers. mcp_server_scope is a configuration scope, not a server name. '
+        'Results include failures and may omit interrupted calls.', 'ops')
+
+    request_groups = 'identity,session_id,query_source,actor,speed'
+    claude_requests = (
+        f'{CLAUDE} | event_name="api_request" | duration_ms>0 | output_tokens>=0 '
+        '| label_format identity=`{{ .session_id }}`, '
+        'speed=`{{ .speed | default "normal (unset)" }}` '
+        '| keep identity,session_id,query_source,actor,speed,output_tokens,duration_ms')
+    request_totals = {
+        field: f'sum by ({request_groups}) (sum_over_time({claude_requests} '
+               f'| unwrap {field} | __error__="" [{WINDOW}]))'
+        for field in ('output_tokens', 'duration_ms')}
+    effective_rate = (f'1000 * ({request_totals["output_tokens"]}) / '
+                      f'({request_totals["duration_ms"]})')
+    latest_names = (
+        'topk by (identity) (1, max by (identity,name,lane) (max_over_time('
+        '{service_name="agent-stack-lanes",record_kind="hcom"} | json '
+        '| identity!="" | name!="" | observed_unix>0 '
+        '| keep identity,name,lane,observed_unix | unwrap observed_unix '
+        f'| __error__="" [{WINDOW}])))')
+    # Native many-to-one label join; the set fallback keeps unmatched sessions.
+    named_rate = (f'(({effective_rate}) * on (identity) group_left (name,lane) '
+                  f'(({latest_names}) > bool 0)) or on ({request_groups}) ({effective_rate})')
+    throughput = panel('Claude effective tok/s (includes prefill)', [
+        ('Effective tok/s', named_rate)],
+        'Total output tokens divided by total request seconds over the selected count window. '
+        'Native request duration includes prefill; this is not generation-only speed. '
+        'Main, auxiliary, workflow and subagent actors stay separate. Missing speed is normal (unset). '
+        'Session names come from the latest native hcom root record; unmatched child identities '
+        'stay visible with their session ID. Missing names leave IDs visible; sessions '
+        'with no qualifying request have no throughput row.')
+    throughput['transformations'] = [
+        {'id': 'labelsToFields', 'options': {'mode': 'columns'}},
+        {'id': 'merge', 'options': {}},
+        {'id': 'organize', 'options': {
+            'excludeByName': {'Time': True, 'identity': True},
+            'indexByName': {'name': 0, 'lane': 1, 'session_id': 2, 'actor': 3,
+                            'query_source': 4, 'speed': 5, 'Value #A': 6},
+            'renameByName': {'name': 'Session name', 'lane': 'Lane',
+                             'session_id': 'Session identity', 'actor': 'Actor',
+                             'query_source': 'Query source', 'speed': 'Speed',
+                             'Value': 'Effective tok/s', 'Value #A': 'Effective tok/s'},
+        }},
+    ]
+    throughput['fieldConfig']['overrides'] = [{
+        'matcher': {'id': 'byName', 'options': 'Effective tok/s'},
+        'properties': [{'id': 'unit', 'value': 'suffix:tok/s'}, {'id': 'decimals', 'value': 1}],
+    }]
     return base

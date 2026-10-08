@@ -1,0 +1,350 @@
+{
+  "schema_version": "1.0",
+  "task": "CC133502Z assignment9",
+  "lane": "foundation",
+  "base_commit": "eb5fee4db9a494729deb29bdf38dbabac23ee643",
+  "scope": "Source candidate and native read-only queries; host publication remains with CC",
+  "native_sources": {
+    "claude_code": {
+      "version": "2.1.294",
+      "release_tag_commit": "71cdddec623889d38af14b7a489670a03186f659",
+      "installed_internal_revision": "8f033c6ebe3d82a87f502e199307f38f5d55ccca",
+      "binary_sha256": "27122ca7b624f537546fbef35b80c66370d974ff258f3d9b10ac50bb8771f262"
+    },
+    "codex": {
+      "version": "0.161.0",
+      "tag_commit": "979011409de0a60b52f179721948e65531d26144"
+    },
+    "loki": {
+      "version": "3.7.8",
+      "tag_commit": "09e6ce2ff1bdc19763a10265b870c86f51c98655"
+    },
+    "grafana": {
+      "version": "13.2.3",
+      "source_tag_commit": "6193dc03311b631b9727b560d24369e683dc396e",
+      "observed_build_commit": "90ffed056f0884267356c12a0eeb72a022af53f1"
+    }
+  },
+  "native_loki_checks": {
+    "evidence_class": "native_operation",
+    "requests": {
+      "format": {
+        "method": "GET",
+        "route": "/loki/api/v1/format_query"
+      },
+      "execute": {
+        "method": "GET",
+        "route": "/loki/api/v1/query"
+      },
+      "query_source": "evidence/artifacts/new-wsl-install-plan-20261002/config/grafana-lanes.json panels27-30 targetsA expr; replace ${window} with1h",
+      "oracle": "HTTP200/status success; nonempty finite nonnegative values; inverse must fail rows-present condition",
+      "inverse": "Panels27/29 replace tool_result with __assignment9_absent_event; panel28 replaces codex.tool_result; panel30 inserts speed=\"normal\" after each api_request filter",
+      "sanitization": "Actual response summaries; private identifiers/raw vectors excluded, numeric field cardinalities and public source labels retained"
+    },
+    "checked_utc": "2026-10-08T14:04:45.900Z",
+    "time": "2026-10-08T13:51:59.766Z",
+    "count_window": "1h",
+    "rows": [
+      {
+        "panel_id": 27,
+        "title": "Claude completed tool invocations/s by tool and MCP server",
+        "query_sha256": "8a109689bdb2a9448ea1ba457aac52adcb988f37d4728ac362707bddf4b8e0d2",
+        "format_http": 200,
+        "format_status": "success",
+        "query_http": 200,
+        "query_status": "success",
+        "series": 11,
+        "finite_nonnegative": true,
+        "inverse_http": 200,
+        "inverse_status": "success",
+        "inverse_series": 0,
+        "inverse_rows_present": false
+      },
+      {
+        "panel_id": 28,
+        "title": "Codex completed tool invocations/s by namespace and tool",
+        "query_sha256": "cb1f7b8a52a21e9f5edab09c1b3844e9dda3e15a03fe15eade4ee7c3b7d631e8",
+        "format_http": 200,
+        "format_status": "success",
+        "query_http": 200,
+        "query_status": "success",
+        "series": 22,
+        "finite_nonnegative": true,
+        "inverse_http": 200,
+        "inverse_status": "success",
+        "inverse_series": 0,
+        "inverse_rows_present": false
+      },
+      {
+        "panel_id": 29,
+        "title": "Claude MCP completed invocations/s by server and tool",
+        "query_sha256": "e7cef13d4f2d1b463a7377c422bfb31fdf70df7c4023b4692962a0b8af6af99b",
+        "format_http": 200,
+        "format_status": "success",
+        "query_http": 200,
+        "query_status": "success",
+        "series": 4,
+        "finite_nonnegative": true,
+        "inverse_http": 200,
+        "inverse_status": "success",
+        "inverse_series": 0,
+        "inverse_rows_present": false
+      },
+      {
+        "panel_id": 30,
+        "title": "Claude effective tok/s (includes prefill)",
+        "query_sha256": "722a0520df88880ff3b2893765a778626e9082be933476867e214cfbfae54deb",
+        "format_http": 200,
+        "format_status": "success",
+        "query_http": 200,
+        "query_status": "success",
+        "series": 16,
+        "finite_nonnegative": true,
+        "speed_values": [
+          "normal (unset)"
+        ],
+        "actors": [
+          "auxiliary",
+          "main",
+          "subagent",
+          "workflow"
+        ],
+        "named_series": 0,
+        "inverse_http": 200,
+        "inverse_status": "success",
+        "inverse_series": 0,
+        "inverse_rows_present": false
+      }
+    ]
+  },
+  "native_grafana_datasource_checks": {
+    "evidence_class": "native_operation",
+    "checked_utc": "2026-10-08T13:53:43.083Z",
+    "route": "POST /api/ds/query",
+    "frozen_time": "2026-10-08T13:51:59.766Z",
+    "inputs": "Native targetA model, datasource ns2604-loki; ${window}=1h, intervalMs60000,maxDataPoints60; from/to fixed one hour",
+    "actual_returned": [
+      {
+        "panel": 27,
+        "http": 200,
+        "result_status": 200,
+        "frames": 35,
+        "points": 632,
+        "request_body_sha256": "07e6a2fc961808456c4f6bcbc80979343ff91ad33eaaf056924c060521e55bb5"
+      },
+      {
+        "panel": 28,
+        "http": 200,
+        "result_status": 200,
+        "frames": 67,
+        "points": 1179,
+        "request_body_sha256": "2ec760b9d426b411840ab1c17c8e806dfa08d76096f143b5ee0cfd74ba5d5c92"
+      },
+      {
+        "panel": 29,
+        "http": 200,
+        "result_status": 200,
+        "frames": 19,
+        "points": 199,
+        "request_body_sha256": "70d14e98a6e04229ade9eee9c97639154f8f272db6b3ee9133fef45676ba83f2"
+      },
+      {
+        "panel": 30,
+        "http": 200,
+        "result_status": 200,
+        "frames": 16,
+        "points": 16,
+        "request_body_sha256": "fb3a3279b6b6223dbcf3e8660c8334a68fbb70f63bb01060fb16c1859008469a"
+      }
+    ],
+    "source_boundary": "Datasource check preceded the name-validity guards and UI organize copy; the final Loki checks above use the final query. Positive name lookup was empty in both."
+  },
+  "ui_observation": {
+    "evidence_class": "local_integration",
+    "runtime": "Owned isolated native Grafana13.2.3, read-only native Loki datasource, Chrome154.0.8037.97 fresh private profile",
+    "operation": "Native google-chrome --headless --screenshot with1920x1080 and10000ms virtual-time budget; private paths/loopback preview locator removed from public argv",
+    "actual_returned": "211874 bytes written; Chrome exit0",
+    "screenshot_sha256": "3a37fa0855b70544e38262b074545b741ac3e29b094b6a8cec523f1a1146a4b5",
+    "observed_rows": 19,
+    "observed_columns": [
+      "Session identity",
+      "Actor",
+      "Query source",
+      "Speed",
+      "Effective tok/s"
+    ],
+    "observed_actors": [
+      "auxiliary",
+      "main",
+      "subagent",
+      "workflow"
+    ],
+    "observed_speed": "normal (unset)",
+    "observation": "One merged table, native tok/s suffix/one decimal, duplicate correlation alias/Time removed",
+    "sanitization": "Original screenshot and full private arguments retained outside checkout; no public image containing session IDs",
+    "diagnostics": "Chrome emitted local D-Bus/software-WebGL warnings; screenshots and exit0 returned"
+  },
+  "local_dashboard_tests": {
+    "evidence_class": "local_integration",
+    "argv": [
+      "python3",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests",
+      "-p",
+      "test_ns2604_dashboards.py"
+    ],
+    "first_attempt": {
+      "exit_code": 1,
+      "actual_returned": "Ran12tests; FAILED(failures=1): stale grafana-lanes.json after source description changed"
+    },
+    "repair": {
+      "argv": [
+        "python3",
+        "observability/ns2604_dashboards.py"
+      ],
+      "exit_code": 0,
+      "actual_returned": "Rendered five config artifacts"
+    },
+    "after_repair": {
+      "exit_code": 0,
+      "actual_returned": "Ran12tests in1.070s; OK"
+    }
+  },
+  "mcp_server_smoke": {
+    "evidence_class": "native_operation",
+    "observed_start_utc": "2026-10-08T13:42:48Z",
+    "observed_end_utc": "2026-10-08T13:45:09Z",
+    "pass": 8,
+    "total": 8,
+    "denominator": "One representative read-only tool per exposed MCP server; not126 tool schemas",
+    "probes": [
+      {
+        "server": "ai_memory",
+        "schemas": 23,
+        "tool": "memory_query",
+        "arguments": {
+          "global": true,
+          "query": "native-agent-stack telemetry",
+          "limit": 1,
+          "pin_first": false
+        },
+        "returned": {
+          "hits": 0,
+          "global_hits": 1
+        },
+        "pass": true
+      },
+      {
+        "server": "codebase_memory_mcp",
+        "schemas": 17,
+        "tool": "index_status",
+        "arguments": {
+          "project": "ns2604-foundation-panels-20261008",
+          "diagnostics": "none",
+          "format": "json",
+          "verbose": false
+        },
+        "returned": {
+          "status": "ready",
+          "nodes": 273128,
+          "edges": 463223
+        },
+        "pass": true
+      },
+      {
+        "server": "context_mode",
+        "schemas": 11,
+        "tool": "ctx_stats",
+        "arguments": {},
+        "returned_excerpt": "v1.0.169",
+        "pass": true
+      },
+      {
+        "server": "hindsight",
+        "schemas": 15,
+        "tool": "list_tags",
+        "arguments": {
+          "limit": 1,
+          "offset": 0,
+          "q": "project:*"
+        },
+        "returned": {
+          "items": [],
+          "total": 0,
+          "limit": 1,
+          "offset": 0
+        },
+        "pass": true
+      },
+      {
+        "server": "jcodemunch",
+        "schemas": 6,
+        "tool": "menu",
+        "arguments": {
+          "query": "list indexed repositories",
+          "limit": 1
+        },
+        "returned": {
+          "count": 1,
+          "total_actions": 91,
+          "action": "list_repos",
+          "state_changing": false
+        },
+        "pass": true
+      },
+      {
+        "server": "qmd",
+        "schemas": 4,
+        "tool": "status",
+        "arguments": {},
+        "returned": {
+          "totalDocuments": 425,
+          "needsEmbedding": 425,
+          "hasVectorIndex": false
+        },
+        "pass": true
+      },
+      {
+        "server": "serena",
+        "schemas": 24,
+        "tool": "initial_instructions",
+        "arguments": {},
+        "returned_excerpt": "Manual provided; active Python language server",
+        "pass": true
+      },
+      {
+        "server": "socraticode",
+        "schemas": 26,
+        "tool": "codebase_health",
+        "arguments": {},
+        "returned": {
+          "qdrant": "Reachable",
+          "lm_studio": "Reachable",
+          "embedding_model": "nvidia/Nemotron-3-Embed-8B-BF16 Loaded"
+        },
+        "pass": true
+      }
+    ]
+  },
+  "limits": [
+    "Native hcom records/lookup returned0 for1h and24h; live positive names and mixed enriched/fallback rendering are unqualified.",
+    "Equal conflicting maximal observed_unix values can yield an encounter-dependent name; timestamp uniqueness is unproven.",
+    "Mappings are latest recorded within selected window, not fresh liveness.",
+    "ai-memory global server-health probe excludes implicit current-project routing; QMD probe does not establish vector search; graph reports coverage gaps.",
+    "No full organic window, all126-tool execution coverage, model generation, broker operation or fast-tier A/B decision claimed."
+  ],
+  "reported_errors": [
+    {
+      "utc": "2026-10-08T13:38:08Z",
+      "what": "ai-memory implicit project-scope mismatch, MCP-32603 page not found"
+    },
+    {
+      "utc": "2026-10-08T13:40:33Z",
+      "what": "Two public Grafana docs paths HTTP404, recovered through published index"
+    }
+  ],
+  "paid_gateway_reader_calls": 0
+}
