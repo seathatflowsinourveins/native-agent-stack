@@ -330,7 +330,9 @@ therefore declare `effort: max` beside their task-matched models (Sonnet for
 `source-scout` and Opus for every other shipped role; `isolated-builder` and
 `stack-verifier` declare Opus since 2026-09-27, per item 1 of the
 [settings decision](../docs/decisions/2026-09-27-claude-harness-settings.md);
-Haiku is not routed), and workflow stages pass
+no shipped definition declares Haiku, and since 2026-10-07 a `source-scout` stage
+may run Haiku 5.5 for cheap exact extraction through a per-call `model: 'haiku'`, per
+the [workflows README](../examples/claude-native/workflows/README.md#haiku-55-for-cheap-exact-extraction-2026-10-07)), and workflow stages pass
 `effort: 'max'` explicitly: a stage without its own effort inherited the
 coordinator's `xhigh` on 2.1.281 unless its agent's frontmatter sets one, and a stage's
 effort overrides the frontmatter (probe Q3). Verify each child's resolved

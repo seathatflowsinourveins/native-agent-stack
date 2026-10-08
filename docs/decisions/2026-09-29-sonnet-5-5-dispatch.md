@@ -177,7 +177,9 @@ until the branch merges. `~/.claude/CLAUDE.md` gains the portable file's Quality
 - A sweep of xhigh against max on a routed coding class shows xhigh at least as good at lower cost (the card's FrontierCode result points
   that way): route that class at xhigh.
 - Claude Code restores `ultracode` precedence over saved effort (the guard's test names the behaviour), a new Sonnet or Haiku ships
-  (the alias rows and the settings pins move together), or Anthropic's guidance on orchestrator-worker use changes.
+  (the alias rows and the settings pins move together), or Anthropic's guidance on orchestrator-worker use changes. When Haiku 5.5
+  shipped (2026-10-07) the `haiku` alias row moved and the settings pin was left out on purpose: Anthropic advises `xhigh` or `max`
+  on Haiku 5.5 only where evals show a gain, and its routed stages pass `max` themselves (workflows README, Haiku 5.5 section).
 
 ## Unresolved
 

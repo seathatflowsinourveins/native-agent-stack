@@ -582,30 +582,19 @@
     },
     {
       "id": "background-haiku",
-      "role": "Simple Claude Code background tasks: titles, safety checks and quick summaries",
-      "consumer": "Claude Code 2.1.292 background slot",
-      "model_id": "claude-haiku-4-5-20251001",
-      "revision": "claude-haiku-4-5-20251001",
-      "release_date": "2025-10-15",
-      "release_source": "https://www.anthropic.com/news/claude-haiku-4-5",
+      "role": "Simple Claude Code background tasks (titles, safety checks and quick summaries) and, since 2026-10-07, cheap exact extraction: source-scout stages with a per-call model 'haiku' at effort max that relay no command output",
+      "consumer": "Claude Code 2.1.293 background slot and haiku alias on the Anthropic API (CHANGELOG 2.1.293: the default Haiku model), plus the haiku-routed source-scout extraction stages qualified by receipt haiku55-extraction-trial-20261007",
+      "model_id": "claude-haiku-5-5",
+      "revision": "claude-haiku-5-5",
+      "release_date": "2026-10-07",
+      "release_source": "https://platform.claude.com/docs/en/release-notes/overview#october-7-2026-4",
       "checked_at": "2026-10-07",
       "status": "in_use",
       "release_line": {
         "kind": "vendor_page",
-        "url": "https://platform.claude.com/docs/en/models/haiku-4-5/overview"
+        "url": "https://platform.claude.com/docs/en/release-notes/overview"
       },
-      "landscape_check": {
-        "date": "2026-10-07",
-        "sources": [
-          "https://platform.claude.com/docs/en/about-claude/models/overview",
-          "https://platform.claude.com/docs/en/models/haiku-4-5/overview",
-          "https://platform.claude.com/docs/en/about-claude/models/model-ids-and-versions",
-          "https://www.anthropic.com/news/claude-haiku-4-5"
-        ],
-        "newer_candidates": [],
-        "reason": "The current official model overview and Haiku model page list Haiku 4.5 with the exact API ID claude-haiku-4-5-20251001; no newer Haiku ID was identified in those sources. Retain it as a dated exception for simple background work. Currency is assessed within the Haiku line; Sonnet and Opus are different task and model lines, so their newer releases do not justify promoting this slot. The release announcement and current specification describe Haiku as a fast, economical option suitable for low-latency tasks. This is source review, not a new quality or native-usage measurement."
-      },
-      "overturn": "An Anthropic Haiku 5.x model ID becomes available; the background slot then follows the Haiku line through the owner's review and application."
+      "overturn": "A maintainer release-note entry publishes a newer Haiku model ID; the background slot and the extraction route then follow the Haiku line through the owner's review, and the extraction route returns to Sonnet when a routed Haiku stage returns an unanchored or misattributed citation that a later check finds, or when a haiku child resolves a model older than Haiku 5.5."
     }
   ]
 }

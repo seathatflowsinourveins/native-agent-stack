@@ -150,7 +150,7 @@ this table records the qualification behind each choice.
 Following the user's rule of 2026-09-27 (Opus at effort max for design, build,
 research, review, verification and synthesis; never a weaker model to save tokens),
 `isolated-builder` and `stack-verifier` declare `model: opus`. Sonnet stays only for
-`source-scout`'s exact extraction and command running, and Haiku is not routed. The
+`source-scout`'s exact extraction and command running, and Haiku is not routed (until 2026-10-07; see below). The
 builder no longer declares `isolation: worktree`: that field branches from the
 default branch rather than the exact base
 ([sub-agents](https://code.claude.com/docs/en/sub-agents#supported-frontmatter-fields)),
@@ -176,6 +176,16 @@ neither raises nor overrides effort, so a Sonnet 5.5 session ran at medium until
 the coordinator or teammates at `xhigh`, or that raising the lead to `max` turns orchestration off, are dated 2026-09-23 to 2026-09-27
 and were measured on Claude Code 2.1.281; on 2.1.284 the reminder stayed present at `max`, and the terminal default is now `max` through the ecosystem launcher ([decision record](../docs/decisions/2026-09-29-max-default-effort.md)).
 
+**2026-10-07: Haiku 5.5 takes cheap exact extraction.** Claude Code 2.1.293 made
+`haiku` Claude Haiku 5.5 on the Anthropic API. A `source-scout` stage may run it with a
+per-call `model: 'haiku'` at `max` for inventories and line-cited extraction that relay
+no command output; running commands and relaying their output keep the scout's Sonnet
+default, and judgment stays on Opus. The
+[workflows README](../examples/claude-native/workflows/README.md#haiku-55-for-cheap-exact-extraction-2026-10-07)
+has the boundaries and the repeat trial that met the overturn condition recorded on
+2026-09-21, no unanchored citation on two distinct extraction packets
+([receipt](../evidence/receipts/haiku55-extraction-trial-20261007.json)).
+
 | Role | Starting choice | Qualification |
 | --- | --- | --- |
 | Requirements, decomposition, integration and hard judgments | Opus 5.5 at Ultracode (`max` in a terminal session started through the ecosystem launcher, else saved `xhigh`, plus dynamic workflow orchestration), the default for every session (a Sonnet 5.5 coordinator, the user's choice, sends each judgment to an `opus` stage); escalate to Fable 5.1 for a task needing its previously demonstrated graph-coordination behavior | Coordinator observed as Opus 5.5/xhigh on this host as of 2026-09-23; Fable 5.1/xhigh's own multi-agent-graph coordination (Sonnet 5 and Opus 5 workers) remains the escalation's own qualification below |
@@ -188,7 +198,7 @@ and were measured on Claude Code 2.1.281; on 2.1.284 the reminder stayed present
 | Review of supplied semantic (TypeSafe) judgments against original source | `semantic-evidence-reviewer` (Opus, max; Read, Glob and Grep, `typesafe-ai` skill preloaded) | One probe, `wf_20a5e69a-84d`, measured the skill preload (first prompt 15,059 tokens; [convergence record](../docs/harness-rules-convergence-20260922.md)); no quality comparison with another reviewer is recorded. The vendored layer-verdict lane no longer uses it (next row) |
 | Proposing, refuting and re-checking one stripped layer-verdict packet | `blind-lane-reviewer` (Opus, max; Read, Glob and Grep, no preloaded skill, no project instructions) | Every stage of the vendored [layer-verdict lane](../examples/claude-native/workflows/layer-verdict-lane.js) names it (agent-lab `e070125`, vendored with the lane). A skill it preloaded could be one of the candidates a packet judges, and project instructions can name incumbent selections, so it carries neither; this catalog records no dated run of the lane with it |
 | Judging or refuting one sealed comparison packet | `blind-judge` (Opus, max; Read only, no project instructions) | Its frontmatter was checked against the agent contract in the [convergence record](../docs/harness-rules-convergence-20260922.md); its body was not reviewed there, and this catalog records no dated run of the role |
-| Cheap exact extraction | Haiku | Not routed: on one byte-identical packet the Opus verifier scored Sonnet 14/14 lane rows and Haiku 9/14 with a quote attributed to a file that does not contain it; overturn only after a repeat trial with no unanchored citation on two distinct packets. Haiku 4.5 takes no effort level, so `max` does not apply to it |
+| Cheap exact extraction (inventories and line-cited extraction that relay no command output) | `source-scout` with a per-call `model: 'haiku'` (Haiku 5.5, max; Claude Code 2.1.293 or later on the Anthropic API) since 2026-10-07 | Repeat trial `wf_aa532ddc-f32` on 2.1.293 ([receipt](../evidence/receipts/haiku55-extraction-trial-20261007.json)): on two distinct extraction packets Haiku 5.5 returned 8 of 8 runs exact (28/28 and 48/48 rows) with no unanchored citation, as Sonnet 5.5 did, at under a tenth of Sonnet's executor-token cost per child (cached LiteLLM prices; the session's Fable advisor is billed apart), and a blind Opus reviewer found no defect in any of the 16 extraction runs. The advisor answered 7 of 8 Sonnet runs and 2 of 8 Haiku runs; the 6 unassisted Haiku runs were exact too. Verbatim command relay was byte-exact in 5 of 6 Haiku runs and 6 of 6 Sonnet runs, so relay stays on Sonnet. Before: on one byte-identical packet the Opus verifier scored Sonnet 14/14 lane rows and Haiku 4.5 9/14 with a quote attributed to a file that does not contain it, and Haiku 4.5 takes no effort level |
 | Independent cross-family review | Existing official Codex companion | Reuse its separately recorded native acceptance; this trial did not run Codex inside a Workflow graph. Its reasoning effort follows the Codex configuration, not this table |
 
 These are starting choices, not a universal quality ranking. Set worker model
@@ -403,8 +413,10 @@ wherever a child is defined:
   2026-09-23).
 
 The docs list `max` for Opus 5.5, Fable 5.1 and Sonnet 5 (the probes observed
-it on Opus 5.5 and Sonnet 5); a model without it falls back to its highest
-supported level, and Haiku 4.5 takes no effort level. The
+it on Opus 5.5 and Sonnet 5), and for Haiku 5.5, whose default is `medium`
+([effort](https://platform.claude.com/docs/en/build-with-claude/effort), read
+2026-10-07; its trial children recorded `max`); a model without it falls back to
+its highest supported level, and Haiku 4.5 takes no effort level. The
 official docs warn that `max` "may show diminishing returns and is prone to
 overthinking" and advise testing before adopting it broadly. Children are
 expected to spend more output tokens, and no sweep has measured that cost or a

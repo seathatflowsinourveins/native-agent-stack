@@ -262,3 +262,15 @@ binds the current generator, profile and outputs, linking the preserved receipt.
 The existing publication test reads this current receipt; its exact hash and
 inventory assertions remain unchanged. The failed stale-output and old-binding
 checks are retained in that new record, not removed from the evidence history.
+
+Later on October 7, Claude Code 2.1.293 (on npm at 2026-10-07T17:18:04Z) made
+Claude Haiku 5.5 (`claude-haiku-5-5`) the default Haiku model on the Anthropic API
+([release-note entry](https://platform.claude.com/docs/en/release-notes/overview#october-7-2026-4);
+[CHANGELOG line 5 at `79babc37`](https://github.com/anthropics/claude-code/blob/79babc372d64101f981bd2b52c3dbe588596dc56/CHANGELOG.md#L5)).
+That is the Haiku 5.x ID the ruling above named, so the `background-haiku` row and
+its `manifests/stack.json` model row now record `claude-haiku-5-5`, released
+October 7, 2026. The row also carries the cheap exact extraction route that a
+same-day repeat trial qualified
+([receipt](../../evidence/receipts/haiku55-extraction-trial-20261007.json)). The
+background slot's own requests were not read back: that trial's collector count of
+Haiku 5.5 records did not tell background-slot calls from explicit Haiku children.
