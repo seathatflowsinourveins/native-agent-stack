@@ -106,14 +106,20 @@ requires.
 
 | Client | Scope before | Old ceiling | Scope after | New ceiling | Headroom |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| Claude | 23,896 | 24,458 | 19,471 | 20,445 | 974 |
-| Codex | 20,101 | 20,103 | 15,778 | 16,567 | 789 |
+| Claude | 23,896 | 24,458 | 19,885 | 20,880 | 995 |
+| Codex | 20,101 | 20,103 | 15,983 | 16,783 | 800 |
 
 The Claude scope is the managed block (11,411 bytes with its markers), root
 `AGENTS.md` and root `CLAUDE.md`. The Codex scope is the rendered block and root
-`AGENTS.md`. The Claude scope falls by 4,425 bytes (18.5%) and the Codex scope by
-4,323 bytes (21.5%). These are file bytes. No session was started and no token
+`AGENTS.md`. The Claude scope falls by 4,011 bytes (16.8%) and the Codex scope by
+4,118 bytes (20.5%). These are file bytes. No session was started and no token
 count was taken.
+
+The "after" figures were re-measured at the landing head bcc9f677 with the test's own
+`PortableTopRuleTests.startup_files()`: Claude 11,411 + 7,499 + 975 bytes, Codex 8,484 + 7,499 bytes.
+The first draft's 19,471 and 15,778 predated the restored trading sentence in root `AGENTS.md` and
+#833's pointer line in root `CLAUDE.md`. A review thread on the PR found the mismatch, and the
+ceilings remain measured scope + 5%, rounded upward.
 
 The Codex template's two pins, computed with the segmentation of
 `tests/test_codex_worker_lane.py`, change as follows.
@@ -157,7 +163,7 @@ of the two test modules changes.
 | 2 | The same test | The first standing sentence no longer holds the Alpaca example. | Behaviour changed | The wording that the official-upstream record put on the three surfaces |
 | 3 | `tests.test_install_claude_profile.PortableTopRuleTests.test_each_relocated_passage_is_byte_bound_to_its_destination_section` | Contract 01 leaves `tests/fixtures/harness-context-moves/contracts.json`; `01.txt` stays as a snapshot. Contracts 12 and 13 are added. | Assertion relaxed; two assertions added | The temporary full routing paragraph in root `AGENTS.md` of the PR #726 addendum |
 | 4 | `tests.test_codex_worker_lane.TemplateTests.test_top_rule_is_pinned_and_rendered_rtk_is_the_unchanged_pinned_source` | `TOP_RULE_SHA256` and `PRE_RTK_SHA256` take the values above. | Behaviour changed | The two pins at the base commit |
-| 5 | `tests.test_install_claude_profile.PortableTopRuleTests.test_rendered_startup_files_fit_each_clients_fixed_byte_budget` and `test_growth_in_any_loaded_file_crosses_the_fixed_budget` | `STARTUP_BUDGET_BYTES` changes from 24,458 and 20,103 to 20,445 and 16,567. | Tightened | The amended ceilings of the PR #726 addendum |
+| 5 | `tests.test_install_claude_profile.PortableTopRuleTests.test_rendered_startup_files_fit_each_clients_fixed_byte_budget` and `test_growth_in_any_loaded_file_crosses_the_fixed_budget` | `STARTUP_BUDGET_BYTES` changes from 24,458 and 20,103 to 20,880 and 16,783. | Tightened | The amended ceilings of the PR #726 addendum |
 
 ## What this record supersedes and what it keeps
 

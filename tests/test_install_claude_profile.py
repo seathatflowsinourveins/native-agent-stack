@@ -1832,8 +1832,8 @@ class PortableTopRuleTests(unittest.TestCase):
     TEMPLATE = ROOT / "examples" / "claude-native" / "CLAUDE.md"
     # Fixed UTF-8 ceilings: measured scope + 5%, rounded upward. The dated PR #726
     # addendum records 23062/19102 -> 24458/20103 and the required restorations;
-    # docs/decisions/2026-10-07-instruction-core.md lowers them to 20445/16567.
-    STARTUP_BUDGET_BYTES = {"claude": 20445, "codex": 16567}
+    # docs/decisions/2026-10-07-instruction-core.md lowers them to 20880/16783 (the landing tree + 5%).
+    STARTUP_BUDGET_BYTES = {"claude": 20880, "codex": 16783}
     MECHANICS = ROOT / "examples" / "claude-native" / "workflows" / "README.md"
     ROUTING = ROOT / "adoption" / "templates" / "codex.AGENTS.template.md"
     # Upstream as the source of truth and reuse, the check order and the absence wording, worker

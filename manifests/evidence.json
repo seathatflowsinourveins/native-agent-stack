@@ -17817,8 +17817,8 @@
     },
     {
       "path": "docs/decisions/2026-10-07-instruction-core.md",
-      "sha256": "10414a1ba8463c1fbc8902c98bd0ba39bebd25749f38cfa67c24d6fb02b0029a",
-      "bytes": 23755
+      "sha256": "3d86b5fce26c0c5621b69dfaa1e82de35d1d1cdd0b512dfb647eeaae98f8863c",
+      "bytes": 24191
     },
     {
       "path": "docs/decisions/2026-10-07-memory-rag-source-stacks.md",
@@ -56232,8 +56232,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "68722aac753475035eec0130b349476e48768426b32ebff8bb81680dfb032480",
-      "bytes": 135441
+      "sha256": "85587adac1bb7a1911a17dc28e15e28a0609ea0c160b48a236e50feb1b4fe398",
+      "bytes": 135465
     },
     {
       "path": "tests/test_install_skills.py",
