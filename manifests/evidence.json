@@ -4952,8 +4952,8 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "9439744eefd0ed33e045df5f577661817fdab8ae044a79ab352502879afbd5dc",
-      "bytes": 1938
+      "sha256": "9772e8a8381912fc12aecced585b859054ecbeedee270285c056d2024bcbe573",
+      "bytes": 2162
     },
     {
       "path": "CLAUDE.md",
@@ -5202,8 +5202,8 @@
     },
     {
       "path": "adoption/new-wsl/claude-user-instructions.md",
-      "sha256": "ff9b8157f975c196adce55bfdc7021ad05a7c7cc10c8f5c1eb298a62b8640fa0",
-      "bytes": 1418
+      "sha256": "4ecfa5e70260171362741848536363ff63c6a1d7f99e4da66aa528abbe60f71f",
+      "bytes": 1642
     },
     {
       "path": "adoption/new-wsl/client-config-map.json",
@@ -5212,8 +5212,8 @@
     },
     {
       "path": "adoption/new-wsl/codex-user-instructions.md",
-      "sha256": "fa7040de0d83aa2a0a4678808e6002d174afb473de189a7f583fe2980993674e",
-      "bytes": 2105
+      "sha256": "f172676d00eb58b6581d82d7289d4b598fb568115ae85e2f34149ff6e26d1968",
+      "bytes": 2329
     },
     {
       "path": "adoption/new-wsl/templates/claude-user.mcp.additions.json",
@@ -5306,6 +5306,11 @@
       "bytes": 2735
     },
     {
+      "path": "adoption/scaffold/AGENTS.md",
+      "sha256": "9ebe108f02176f1d8a76405ca5427b7c8b22ee05d98301cb38ee3b71f152edc5",
+      "bytes": 2296
+    },
+    {
       "path": "adoption/sdk/README.md",
       "sha256": "3f5f1f6eac2e437853ad9b9f050186b3c7919e6df2fa786a87d4d162c4b0b6de",
       "bytes": 5415
@@ -5342,8 +5347,8 @@
     },
     {
       "path": "adoption/templates/codex.AGENTS.template.md",
-      "sha256": "fa7040de0d83aa2a0a4678808e6002d174afb473de189a7f583fe2980993674e",
-      "bytes": 2105
+      "sha256": "f172676d00eb58b6581d82d7289d4b598fb568115ae85e2f34149ff6e26d1968",
+      "bytes": 2329
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
@@ -17438,8 +17443,8 @@
     },
     {
       "path": "docs/decisions/2026-09-28-top-rule-templates.md",
-      "sha256": "85002f8d31fe6ee4d333bf0ee4e2510bb34d549020ea29a6b5345907ef1c92c6",
-      "bytes": 15185
+      "sha256": "6d6b012c5e26da10b38dbd17075836533d27ac6dea90063373b66ed38cd3bcac",
+      "bytes": 31022
     },
     {
       "path": "docs/decisions/2026-09-29-frozen-check-grader.md",
@@ -55833,8 +55838,8 @@
     },
     {
       "path": "examples/claude-native/CLAUDE.md",
-      "sha256": "ff9b8157f975c196adce55bfdc7021ad05a7c7cc10c8f5c1eb298a62b8640fa0",
-      "bytes": 1418
+      "sha256": "4ecfa5e70260171362741848536363ff63c6a1d7f99e4da66aa528abbe60f71f",
+      "bytes": 1642
     },
     {
       "path": "examples/claude-native/agents/blind-adjudicator.md",
@@ -57378,7 +57383,7 @@
     },
     {
       "path": "tests/test_codex_worker_lane.py",
-      "sha256": "896a9e1162e1637c20f806ee08c24731edf269f23ea81e832df5c87625da09d6",
+      "sha256": "1e915cd8c53e08be44e5fa3fcfce0597e9e4fefb2de29e4187be6cf108f19658",
       "bytes": 193146
     },
     {
@@ -57603,8 +57608,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "71118370ec274bc28e796e985d28bd8912d7c97db026557650fbe9813ff95d4c",
-      "bytes": 133629
+      "sha256": "91077495dea93cf82b5d874c47342720314d232769f7a08e5e1871f33661f4c9",
+      "bytes": 134028
     },
     {
       "path": "tests/test_install_skills.py",
