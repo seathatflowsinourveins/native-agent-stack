@@ -215,7 +215,7 @@ have no default-install precedence.
 | Claude Code | 2.1.284 | [reviewed install source](https://code.claude.com/docs/en/setup#install-a-specific-version) |
 | mcporter | 0.14.2 | [reviewed install source](https://github.com/openclaw/mcporter/blob/aa0f55f9bffcde9d2070c86145f37d4dd3525f6c/README.md) |
 | MCP Inspector | 2.9.0 | [reviewed install source](https://github.com/modelcontextprotocol/inspector/blob/ae865a19178ddf6f375780a02e9c77c4cf4da184/README.md) |
-| sandbox-runtime | 0.0.78 | [reviewed install source](https://github.com/anthropics/sandbox-runtime/blob/v0.0.78/README.md) |
+| sandbox-runtime | 0.0.79 | [reviewed install source](https://github.com/anthropics/sandbox-runtime/blob/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/README.md#L14) |
 | Worktrunk | 0.80.0 | [exact release installer and shell setup](https://github.com/max-sixty/worktrunk/releases/tag/v0.80.0) |
 | Serena | c6fbd1c5932df2494ffa0020af5a9fbe80b82143 | [local install from the exact source checkout](https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/CONTRIBUTING.md#L70) |
 | trafilatura | 2.2.0 | [tagged installation guide](https://github.com/adbar/trafilatura/blob/v2.2.0/docs/installation.rst#L73) |
@@ -292,3 +292,20 @@ job; that observation is separate from the still-UNRUN destination profile.
 The historical source-review references and trading receipts are retained.
 The row's two source-review command gaps are now filled. Shared aggregate counts
 and registry receipts are the coordinator's integration work.
+
+## Sandbox-runtime Codex binding (2026-10-08)
+
+The current sandbox-runtime source row targets 0.0.79 at
+`d9aac2098351ca17f3743fbaf6ecbd0051b7e00e`. The npm archive was downloaded
+and rehashed for this projection; its SHA256 is
+`5a730e4367c264ccc4b592af01dab038a6c39db7c184efbd132841688fa854f1`.
+The separate [Codex binding](../evidence/receipts/native-sandbox-codex-binding-20261008.json)
+imports the retained 13:20Z native echo and version readback. The earlier
+Claude receipt remains unchanged, including its earlier Codex pending field.
+
+The recipe keeps a prospective owned versioned npm prefix and omits
+`--ignore-scripts`, matching the lifecycle mode of the receipted global npm
+installation. That source used its existing global prefix; this projection
+does not claim an owned-prefix reinstall. Destination provisioning stays
+unprovisioned source review. The 0.0.77 policy tests remain historical, and
+no client, provider or filesystem/network-policy check was rerun here.

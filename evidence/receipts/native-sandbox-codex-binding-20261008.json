@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "id": "native-sandbox-codex-binding-20261008",
+  "kind": "native_cli_e2e",
+  "recorded_date_utc": "2026-10-08",
+  "component_ids": [
+    "sandbox-runtime"
+  ],
+  "claim": "A separate bounded binding imports the returned native Codex sandbox-runtime 0.0.79 echo and version readback, and ties their exact returned output hashes and exit codes to the owner-provided receipt and completed rollout event.",
+  "limitations": [
+    "This binds an already returned native Codex echo and version readback, not a rerun or an upstream test-suite pass.",
+    "The pinned earlier Claude receipt remains byte-identical and keeps pending_in_source; this is a separate later Codex observation.",
+    "The rollout event identity is published as prefix plus SHA256; private source paths and the exact original command vector remain private, with its digest retained.",
+    "The 0.0.77 filesystem/network policy proofs remain historical. Echo success does not qualify those policies, dependency-script safety, Mac, recovery or a new-host installation at 0.0.79.",
+    "Release metadata source review and archive integrity are separate from the imported native operation; no provider/model/broker/GPU/runtime/service/client changes were made."
+  ],
+  "data": {
+    "package": "@anthropic-ai/sandbox-runtime",
+    "package_version": "0.0.79",
+    "source_pin": "d9aac2098351ca17f3743fbaf6ecbd0051b7e00e",
+    "imported_observation": true,
+    "new_native_client_execution": false,
+    "native_client_producer": {
+      "client": "codex-tui",
+      "source": "cli",
+      "recorded_cli_version": "0.161.0",
+      "identifying_artifact": "evidence/artifacts/row70-codex-binding-20261008/codex-producer.json",
+      "original_sanitized_supplement_sha256": "f7b4c4b594d644a9e5b111d340a13883219277cbbfe820d2b0bccc7a98cb8a78",
+      "canonical_metadata_sha256": "532081a053cce234d0eb4a33de5bf40d96f5870d5aaf981a639c451ae16e7cbd",
+      "association": "First session_meta header at line1 and the unique completed CommandExecution at line3805 were extracted from the same original owned rollout; no inference from current CLI or file label.",
+      "session_identity": {"prefix": "01a11a29", "sha256": "03195225a78d8f7fa98d8759309a48b72ce0eef2fb860d5699d1fcbfb27b1963", "hash_domain": "native-agent-stack:row70:session_meta:id:v1"},
+      "event_identity": {"prefix": "exec-cef8131b", "sha256": "97bc5a65a31744f420d930810dd4bdbed85df35cf4e380e2185ef5cadabff330", "hash_domain": "native-agent-stack:row70:CommandExecution:item_completed:v1"},
+      "output_boundary": "The completed capture-event stdout digest b365f10327ab77b3a37dc57344fdd619be08ba700d31a83451e495b9e6aaca3c identifies its JSON capture output. The native echo stdout remains separately bound to a948904f2f0f479b8f8197694b30184b0d2ed1c1cd2a1ec0fb85d299a192a447.",
+      "scope": "Recorded native producer metadata only, not a client rerun, new model test, or unavailable CLI build identity."
+    },
+    "artifact": "evidence/artifacts/row70-codex-binding-20261008/source-binding.json",
+    "source_receipt": {
+      "reference": "fixwave-defects/S4 row70 Codex leg recorded 2026-10-08T13:20:04.019Z",
+      "sha256": "41a34c6427fab9f9378a7cca9491804f9f8456ca296dbba3849d26fc7664c28b",
+      "immutable_prior_public_receipt": "evidence/receipts/native-sandbox-smoke-20261008.json",
+      "prior_codex_status_preserved": "pending_in_source"
+    },
+    "source_event": {
+      "event_prefix": "exec-cef8131b",
+      "event_id_sha256": "2f74ee226b1555b76d739394684c56773a586ae1e9d20fef9e0dd887d4ab9611",
+      "timestamp": "2026-10-08T13:20:04.019Z",
+      "status": "completed",
+      "exit_code": 0
+    },
+    "native_echo": {
+      "source_reported_command": "nice -n 19 ionice -c3 srt echo 'hello world' < /dev/null",
+      "exit_code": 0,
+      "stdout_bytes": 12,
+      "stdout_sha256": "a948904f2f0f479b8f8197694b30184b0d2ed1c1cd2a1ec0fb85d299a192a447",
+      "stdout": "hello world\n",
+      "stderr_bytes": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    },
+    "version_readback": {
+      "source_reported_command": "srt --version < /dev/null",
+      "exit_code": 0,
+      "stdout": "0.0.79\n",
+      "stdout_bytes": 7,
+      "stdout_sha256": "8c52412b1e17f6490f8ce8a10dbe32111d809b052a85bf828b52eef9c34add77",
+      "stderr_bytes": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "original_post_hook_argv_sha256": "95c72de542fcaeb2097437a25c6e1b681defdf7f3bd0e1baada75f3be30acfe6",
+    "post_hook_argv_digest_method": "SHA256 over original argument vector as UTF-8 JSON, compact separators, ensure_ascii=False",
+    "independent_output_hash_check_at_import": true,
+    "inverse": "No installation or persistent configuration was performed by the imported Codex operation or this binding; no native inverse is needed. Repository inverse reverts the additive binding and current profile/recipe projection.",
+    "source_urls": [
+      "https://github.com/anthropics/sandbox-runtime/blob/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/README.md",
+      "https://github.com/anthropics/sandbox-runtime/blob/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/package.json",
+      "https://registry.npmjs.org/@anthropic-ai%2Fsandbox-runtime/0.0.79"
+    ]
+  }
+}

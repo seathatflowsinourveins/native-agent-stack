@@ -4722,6 +4722,22 @@
         "The recovery and environment-file precedence fixes are repository templates pending a separate CC-cued host apply. The immutable artifact retains the originally installed unit/drop-in hashes."
       ],
       "path": "evidence/receipts/hindsight-research-memory-20261008.json"
+    },
+    {
+      "id": "native-sandbox-codex-binding-20261008",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "sandbox-runtime"
+      ],
+      "claim": "A separate bounded binding imports the returned native Codex sandbox-runtime 0.0.79 echo and version readback, and ties their exact returned output hashes and exit codes to the owner-provided receipt and completed rollout event.",
+      "limitations": [
+        "This binds an already returned native Codex echo and version readback, not a rerun or an upstream test-suite pass.",
+        "The pinned earlier Claude receipt remains byte-identical and keeps pending_in_source; this is a separate later Codex observation.",
+        "The rollout event identity is published as prefix plus SHA256; private source paths and the exact original command vector remain private, with its digest retained.",
+        "The 0.0.77 filesystem/network policy proofs remain historical. Echo success does not qualify those policies, dependency-script safety, Mac, recovery or a new-host installation at 0.0.79.",
+        "Release metadata source review and archive integrity are separate from the imported native operation; no provider/model/broker/GPU/runtime/service/client changes were made."
+      ],
+      "path": "evidence/receipts/native-sandbox-codex-binding-20261008.json"
     }
   ],
   "files": [
@@ -5207,13 +5223,13 @@
     },
     {
       "path": "adoption/new-wsl-profile.json",
-      "sha256": "f811217299d2f488e918fd25517838804929d08de5276809858ad77e1c5f42ee",
-      "bytes": 260809
+      "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389",
+      "bytes": 261338
     },
     {
       "path": "adoption/new-wsl-profile.md",
-      "sha256": "b7eb6d322b71d6416cfc1e3bbf4c997d42a37300edb31c62a0a7785d82e2bfb8",
-      "bytes": 25021
+      "sha256": "d3532503a511bda45ebb4a4ce7ab882aaf544001ccf1a60ae2e74afac4a7109c",
+      "bytes": 26039
     },
     {
       "path": "adoption/new-wsl/claude-user-instructions.md",
@@ -11128,8 +11144,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "02e25082b775317417eef1341734f08739c96bf7a9ba1a727ddb9d3c256a4e78",
-      "bytes": 502002
+      "sha256": "1243a2c8659e61665956868b04cf17e27ea9c49579fbb19f647be1ee600cc4ed",
+      "bytes": 502551
     },
     {
       "path": "blueprints/trials-20260926/README.md",
@@ -18233,13 +18249,13 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "31c4c71ab485b2db9dc21b5ee23a25baa6dbccc07beb905476b8be9eef3a682f",
-      "bytes": 692787
+      "sha256": "dc579a24c5d9c2d03b418ca6563a0d4e36be9b64d72811bec1928c8a13d73da5",
+      "bytes": 693318
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "c4644145f06a1b1f8b42ed35966a932817009eab90d7c86446294aade0d44efa",
-      "bytes": 368763
+      "sha256": "281ec98c555ab4430199ea4f60ba5d003d5ce0c1f8521d57d161cecb2dc21737",
+      "bytes": 369144
     },
     {
       "path": "docs/next-host-stages.md",
@@ -40598,8 +40614,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "0912d958700b8d03b9b71a463c3994adb98bcefa4b62c8dbbacdc1efbee48d07",
-      "bytes": 54872
+      "sha256": "08bdd178b8c1843e4291bb0dfd4aa54f303e41695320e453986fdc9d68453c02",
+      "bytes": 56944
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/slot-state-and-core-recipes.json",
@@ -48052,6 +48068,41 @@
       "bytes": 2166
     },
     {
+      "path": "evidence/artifacts/row70-codex-binding-20261008/ci-citation-repair.json",
+      "sha256": "3bbd1b050288eb7380ddb53a029dd9d5d1fef0fbcd8fea50ecd7150f1d4af123",
+      "bytes": 19815
+    },
+    {
+      "path": "evidence/artifacts/row70-codex-binding-20261008/codex-producer.json",
+      "sha256": "aa835b20736fa1fb7bf77683ef6390818331c76a4af3affa2258f88af8f2cfa7",
+      "bytes": 4033
+    },
+    {
+      "path": "evidence/artifacts/row70-codex-binding-20261008/metadata-tests.stderr.txt",
+      "sha256": "ffcc9577a371df80d50305eb103dcbab74a88493cb7baf94babe5ca18ba8115a",
+      "bytes": 839
+    },
+    {
+      "path": "evidence/artifacts/row70-codex-binding-20261008/repository-checks.json",
+      "sha256": "a5e2473ec8acbc6ced6612029f1455db7d2c3a27c94f586df5b10787b8a27b87",
+      "bytes": 7185
+    },
+    {
+      "path": "evidence/artifacts/row70-codex-binding-20261008/source-binding.json",
+      "sha256": "8f0b2682af187aa083c89d3b29abcc98804b28e3fd9a241f3373abe6058c28b5",
+      "bytes": 12658
+    },
+    {
+      "path": "evidence/artifacts/row70-codex-binding-20261008/stdout.txt",
+      "sha256": "a948904f2f0f479b8f8197694b30184b0d2ed1c1cd2a1ec0fb85d299a192a447",
+      "bytes": 12
+    },
+    {
+      "path": "evidence/artifacts/row70-codex-binding-20261008/version.stdout.txt",
+      "sha256": "8c52412b1e17f6490f8ce8a10dbe32111d809b052a85bf828b52eef9c34add77",
+      "bytes": 7
+    },
+    {
       "path": "evidence/artifacts/rtk-051-file-list-control-20261004/README.md",
       "sha256": "159b488a8754ee0a573962d910f006693c13748cb50a49d486f262dd854e148f",
       "bytes": 6038
@@ -55387,6 +55438,11 @@
       "bytes": 8357
     },
     {
+      "path": "evidence/receipts/native-sandbox-codex-binding-20261008.json",
+      "sha256": "01c147e16d146bebd8db2cf11fc267f4b2d7d32a98dcddf1ed2fe8c5a5a1860e",
+      "bytes": 5335
+    },
+    {
       "path": "evidence/receipts/native-sandbox-network-20260920.json",
       "sha256": "e934457a442f01bcf564fa1e37777f35e6a64eff0455c572efb382a6c652dd4b",
       "bytes": 2504
@@ -56378,8 +56434,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "025fb71c5cbbb616c8554e5aebb866ac55919f831e01e2244a47241f54cd9f86",
-      "bytes": 129984
+      "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c",
+      "bytes": 130270
     },
     {
       "path": "observability/README.md",
@@ -56688,8 +56744,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "959a4d207f73ecf9732eb20cb7062a6c2168e4bf1ff1564ff7d54c115ff817dc",
-      "bytes": 133092
+      "sha256": "b80ffe344f68fbfedcf46f067b2bb5ed3f5aae4f26a2636f819f3c892e015473",
+      "bytes": 133396
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
