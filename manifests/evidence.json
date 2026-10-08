@@ -5020,6 +5020,11 @@
       "bytes": 26872
     },
     {
+      "path": ".github/workflows/claude-triage.yml",
+      "sha256": "d7836f703f187401f6c07307e7110fd08d9639e64e742f700ffc16b2163c90d7",
+      "bytes": 17949
+    },
+    {
       "path": ".github/workflows/dependency-review.yml",
       "sha256": "861a5e0eb2dd6e1d253e43c67602fcada04f80cac0ac379b0268db480812e889",
       "bytes": 1549
@@ -17867,8 +17872,8 @@
     },
     {
       "path": "docs/decisions/2026-10-04-ci-least-privilege.md",
-      "sha256": "609d0f963dca45ad79f080b36ba3e43692a8c37d70f1b9d35555d0d5e4ba7594",
-      "bytes": 40734
+      "sha256": "15a837aebea0fb781e8b10e9a040f005265a7086e4fabf97fa746ceb3d2825d2",
+      "bytes": 41242
     },
     {
       "path": "docs/decisions/2026-10-04-claude-template-holds-out-token-lane-carriers.md",
@@ -18146,6 +18151,11 @@
       "bytes": 15329
     },
     {
+      "path": "docs/decisions/2026-10-08-claude-actions-triage.md",
+      "sha256": "a2039d9c27ec421524065a0aba6c43645184d4e06731aa52122b3ab85494e76b",
+      "bytes": 7948
+    },
+    {
       "path": "docs/decisions/2026-10-08-coordinator-research-routing.md",
       "sha256": "cc0177503b26b84954e7a67ec4d2aac7d39a5520794ada3edf06346527955a10",
       "bytes": 14363
@@ -18312,8 +18322,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "f489ff42d80b1c2e1ece353250c477605730ee41d47dcd54245d06e11c8d13f2",
-      "bytes": 101058
+      "sha256": "276a95cf13e4a9f806f062b04a2fb9095ef0eb33de6ee0a52ec29a823cf463b5",
+      "bytes": 101647
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -57871,6 +57881,11 @@
       "bytes": 5507
     },
     {
+      "path": "tests/test_claude_triage_workflow.py",
+      "sha256": "9d222066f883ca3f1b7c85b39155bb6cc3f40851e53abac83d4ec9bdcfcef503",
+      "bytes": 17805
+    },
+    {
       "path": "tests/test_codex_agents.py",
       "sha256": "520e1712174fe4ec252590ecf40e85765d5ee82345da10622c8fb58d3a6f680d",
       "bytes": 40406
@@ -58722,8 +58737,8 @@
     },
     {
       "path": "tests/test_workflow_policy.py",
-      "sha256": "347ea2553d9e2f436965d1cbfbd3cfab6b507d9aa72787404c117cc7330e237e",
-      "bytes": 83757
+      "sha256": "5a5690f6e19ff3f2d4c7c90f32f260b42d319524bdd7b162da959ea6f3f7b607",
+      "bytes": 84414
     },
     {
       "path": "tests/test_workflow_security.py",
@@ -58732,8 +58747,8 @@
     },
     {
       "path": "tests/test_workflow_security_coverage.py",
-      "sha256": "2bde9456da1901d7e4a1978e16c7bc2c85279ac6ac4adba50cacc0395fe26e05",
-      "bytes": 12166
+      "sha256": "1b869f049d4d88e3f0f55d27b6e37ffa66e4ccddf17c163df21015c93f3f8977",
+      "bytes": 12745
     },
     {
       "path": "tests/test_wsl_memory_maintenance.py",
