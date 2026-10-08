@@ -244,6 +244,7 @@ class MechanicalRetentionTests(ExactQueryFixtures):
         _, manifest, records, _ = self.capture(client, top_k=1)
         client.extract.assert_not_called()
         self.assertEqual(manifest["fetch_calls"], 0)
+        self.assertTrue(records)
         for record in records:
             self.assertEqual(record["raw_vendor_results"], results)
             self.assertEqual(record["sources"], [{"vendor_result_rank": 1, "url": url,
@@ -260,6 +261,27 @@ class MechanicalRetentionTests(ExactQueryFixtures):
 
     def test_percent_encoded_dot_loopback_host_is_retained_without_extraction(self):
         self.assert_host_spelling_is_retained_without_extraction("http://127%2e0.0.1/")
+
+    def test_backslash_host_is_retained_without_extraction(self):
+        # Conservative host-spelling refusal, not a reproduced native sink.
+        self.assert_host_spelling_is_retained_without_extraction("http://127.0.0.1\\.evil.com/")
+
+    def test_explicit_auto_passes_literal_query_to_native_api_without_rewrite_or_repeat(self):
+        directory = self.root / "auto-capture"
+        directory.mkdir()
+        client = mock.Mock()
+        client.text.return_value = [{"href": "https://example.org/source", "body": "complete snippet"}]
+        query = "  literal café AUTO — \"query\"\n"
+        rows = [{"layer_id": "synthetic-canonical-field", "modality": "repository", "queries": [query]}]
+        manifest = exact.capture(rows, directory, 0, mock.Mock(return_value=client), backend="auto")
+        client.text.assert_called_once_with(query, region="wt-wt", safesearch="moderate", max_results=5, page=1, backend="auto")
+        client.extract.assert_not_called()
+        self.assertEqual(manifest["search_calls"], 1)
+        self.assertEqual(manifest["backend"]["requested"], "auto")
+        self.assertIsNone(manifest["backend"]["observed_providers"])
+        record = json.loads(Path(manifest["queries"][0]["path"]).read_text())
+        self.assertEqual(record["query"], query)
+        self.assertEqual(record["query_sha256"], exact.sha(query.encode("utf-8")))
 
 
 class ExactDispatchWiringTests(ExactQueryFixtures):
@@ -296,7 +318,7 @@ class ExactDispatchWiringTests(ExactQueryFixtures):
         stdout.write(json.dumps({"name": "gala", "session_id": "synthetic-native-caller", "tool": "codex"}).encode())
         return subprocess.CompletedProcess(command, 0)
 
-    def completed_manifest(self, directory, errors=0):
+    def completed_manifest(self, directory, errors=0, backend="duckduckgo"):
         queries = [query for field in self.packet["fields"] for query in field["queries"]]
         records = []
         for index, query in enumerate(queries):
@@ -304,9 +326,17 @@ class ExactDispatchWiringTests(ExactQueryFixtures):
             if index < errors:
                 record.update(error_type="TimeoutException", error_kind="native_timeout")
             records.append(exact.retained(directory / f"synthetic-query-{index}.json", record))
+        native_record = {"backend": exact.backend_witness(backend)}
+        if backend == "auto":
+            native_record["auto_sources"] = {
+                "registry": {"path": "/synthetic/ddgs/engines/__init__.py", "bytes": 1, "sha256": exact.AUTO_REGISTRY_SHA256},
+                "enabled_engine_sources": {"synthetic-engine": {"path": "/synthetic/ddgs/engines/fixture.py", "bytes": 1, "sha256": "0" * 64}},
+                "evidence_boundary": "Synthetic source-metadata fixture; actual providers and engine qualification unknown.",
+            }
         return {"status": "captured_with_errors" if errors else "captured", "error_count": errors,
                 "search_calls": len(queries), "fetch_calls": 0, "completed_query_count": len(queries),
-                "empty_query_count": 0, "queries": records,
+                "empty_query_count": 0, "queries": records, "backend": exact.backend_witness(backend),
+                "native_ddgs": native_record,
                 "parsed_queries": {"sha256": exact.sha(self.query_file.read_bytes()), "bytes": self.query_file.stat().st_size}}
 
     def test_cli_defaults_to_validation_without_runtime_or_network(self):
@@ -317,6 +347,7 @@ class ExactDispatchWiringTests(ExactQueryFixtures):
         self.assertEqual(receipt["status"], "validated_no_network")
         self.assertEqual(receipt["logical_search_bound"], 90)
         self.assertEqual(receipt["source_fetch_bound"], 0)
+        self.assertEqual(receipt["backend"]["requested"], "duckduckgo")
         self.assertNotIn("native_exit_code", receipt)
         self.assertNotIn("runtime", receipt)
         self.assertEqual((receipt_path.parent / "frozen-queries.json").read_bytes(), self.query_file.read_bytes())
@@ -363,6 +394,10 @@ class ExactDispatchWiringTests(ExactQueryFixtures):
                       ["--question", "question", "--approved-scope-sha256", ""],
                       ["--question", "question", "--approved-scope-file", ""],
                       ["--question", "question", "--mechanical-python", ""],
+                      ["--question", "question", "--backend", "auto"],
+                      ["--question", "question", "--backend", ""],
+                      [*self.exact_arguments(), "--backend", "brave"],
+                      [*self.exact_arguments(), "--backend", "auto,duckduckgo"],
                       ["--question", "question", "--fetch-top-k", "1"]]:
             with self.subTest(args=extra):
                 result = self.cli(*extra)
@@ -376,6 +411,7 @@ class ExactDispatchWiringTests(ExactQueryFixtures):
             self.assertIsNone(question)
             self.assertEqual(command[0], sys.executable)
             self.assertEqual(command[1], str(HELPER))
+            self.assertEqual(command[command.index("--backend") + 1], "duckduckgo")
             self.assertEqual(env, {"PATH": os.defpath, "PYTHONNOUSERSITE": "1", "PYTHONUNBUFFERED": "1"})
             self.assertEqual(Path(command[command.index("--worker-file") + 1]).read_bytes(), self.query_file.read_bytes())
             self.assertEqual(command[command.index("--query-sha256") + 1], exact.sha(self.query_file.read_bytes()))
@@ -394,6 +430,67 @@ class ExactDispatchWiringTests(ExactQueryFixtures):
         self.assertEqual(receipt["source_fetch_bound"], 90)
         self.assertEqual(receipt["worker_parsed_queries"]["sha256"], receipt["frozen_queries"]["sha256"])
         self.assertEqual(receipt["producer.stdout"]["sha256"], exact.sha((seen["directory"] / "producer.stdout").read_bytes()))
+
+    def test_explicit_auto_forwards_once_and_binds_partial_worker_witness_to_requested_backend(self):
+        args = self.args()
+        args.backend = "auto"
+        calls = []
+        def producer(launcher, question, directory, tools, *, command, env):
+            calls.append(command)
+            self.assertEqual(command[command.index("--backend") + 1], "auto")
+            self.assertEqual(Path(command[command.index("--worker-file") + 1]).read_bytes(), self.query_file.read_bytes())
+            exact.retained(directory / "manifest.json", self.completed_manifest(directory, errors=2, backend="auto"))
+            return 1, None, None
+        with mock.patch.dict(os.environ, self.env, clear=True), mock.patch.object(exact.subprocess, "run", side_effect=self.fake_identity):
+            with contextlib.redirect_stdout(io.StringIO()) as output:
+                code = exact.dispatch_exact(args, self.file_record, exact.utc, lambda: ({}, {}), producer)
+        self.assertEqual(code, 1)
+        self.assertEqual(len(calls), 1)
+        receipt = json.loads(Path(output.getvalue().strip()).read_text())
+        self.assertEqual(receipt["status"], "captured_with_errors")
+        self.assertEqual(receipt["worker_backend"], exact.backend_witness("auto"))
+        self.assertIsNone(receipt["worker_backend"]["observed_providers"])
+        self.assertEqual(receipt["capture_counts"]["completed_query_count"], 90)
+        self.assertEqual(receipt["worker_parsed_queries"]["sha256"], exact.sha(self.query_file.read_bytes()))
+
+    def test_changed_or_guessed_worker_backend_never_receives_completion_credit(self):
+        for change in ["manifest_backend", "native_backend", "guessed_provider", "missing_auto_sources"]:
+            with self.subTest(change=change):
+                args = self.args()
+                args.backend = "auto"
+                def producer(launcher, question, directory, tools, **kwargs):
+                    manifest = self.completed_manifest(directory, backend="auto")
+                    if change == "manifest_backend":
+                        manifest["backend"] = exact.backend_witness("duckduckgo")
+                    elif change == "native_backend":
+                        manifest["native_ddgs"]["backend"] = exact.backend_witness("duckduckgo")
+                    elif change == "guessed_provider":
+                        manifest["backend"]["observed_providers"] = ["unobserved-provider"]
+                    else:
+                        manifest["native_ddgs"].pop("auto_sources")
+                    exact.retained(directory / "manifest.json", manifest)
+                    return 0, None, None
+                with mock.patch.dict(os.environ, self.env, clear=True), mock.patch.object(exact.subprocess, "run", side_effect=self.fake_identity):
+                    with contextlib.redirect_stdout(io.StringIO()) as output:
+                        code = exact.dispatch_exact(args, self.file_record, exact.utc, lambda: ({}, {}), producer)
+                self.assertEqual(code, 1)
+                receipt = json.loads(Path(output.getvalue().strip()).read_text())
+                self.assertEqual(receipt["status"], "failed")
+                self.assertIn("source witness" if change == "missing_auto_sources" else "backend witness", receipt["error"])
+                self.assertNotIn("capture_outcome", receipt)
+
+    def test_unknown_backend_refuses_before_native_caller_or_worker(self):
+        args = self.args()
+        args.backend = "brave"
+        producer = mock.Mock()
+        with mock.patch.dict(os.environ, self.env, clear=True), mock.patch.object(exact.subprocess, "run") as native:
+            with contextlib.redirect_stdout(io.StringIO()) as output:
+                code = exact.dispatch_exact(args, self.file_record, exact.utc, lambda: ({}, {}), producer)
+        self.assertEqual(code, 1)
+        native.assert_not_called()
+        producer.assert_not_called()
+        receipt = json.loads(Path(output.getvalue().strip()).read_text())
+        self.assertIn("Unsupported", receipt["error"])
 
     def test_unresolved_identity_and_nonabsolute_runtime_never_start_retrieval(self):
         producer = mock.Mock()
@@ -506,6 +603,27 @@ class FrozenWorkerBoundaryTests(ExactQueryFixtures):
                 "--scope-file", str(self.scope_file), "--scope-sha256", self.scope_sha,
                 "--out", str(self.root), "--fetch-top-k", "0"]
 
+    def test_native_worker_forwards_explicit_auto_for_every_original_frozen_query(self):
+        client = mock.Mock()
+        client.text.return_value = [{"href": "https://example.org/public", "body": "complete native fixture snippet"}]
+        witness = exact.backend_witness("auto")
+        factory = mock.Mock(return_value=client)
+        with mock.patch.object(exact, "native_ddgs", return_value=(factory, {"backend": witness})) as native:
+            code = exact.main([*self.worker_arguments(exact.sha(self.query_file.read_bytes())), "--backend", "auto"])
+        self.assertEqual(code, 0)
+        native.assert_called_once_with("auto")
+        frozen_queries = [query for row in self.packet["fields"] for query in row["queries"]]
+        self.assertEqual([call.args[0] for call in client.text.call_args_list], frozen_queries)
+        self.assertTrue(all(call.kwargs["backend"] == "auto" for call in client.text.call_args_list))
+        client.extract.assert_not_called()
+        receipt = json.loads((self.root / "manifest.json").read_text())
+        self.assertEqual(receipt["search_calls"], 90)
+        self.assertEqual(receipt["completed_query_count"], 90)
+        self.assertEqual(receipt["parsed_queries"]["sha256"], exact.sha(self.query_file.read_bytes()))
+        self.assertEqual(receipt["backend"], witness)
+        self.assertEqual(receipt["native_ddgs"]["backend"], witness)
+        self.assertIsNone(receipt["backend"]["observed_providers"])
+
     def test_mutation_before_worker_read_is_rejected_without_native_retrieval(self):
         original_sha = exact.sha(self.query_file.read_bytes())
         self.packet["fields"][0]["queries"][0] = "different query after parent freezes and records it"
@@ -604,6 +722,33 @@ class InstalledDDGSContractTests(unittest.TestCase):
         query = "  literal café — \"query\"\n"
         payload = engine.build_payload(query, region="wt-wt", safesearch="moderate", timelimit=None, page=1)
         self.assertEqual(payload, {"q": query, "b": "", "l": "wt-wt"})
+
+    def test_installed_native_auto_api_accepts_literal_query_at_offline_engine_seam(self):
+        try:
+            version = importlib.metadata.version("ddgs")
+        except importlib.metadata.PackageNotFoundError:
+            self.skipTest("native DDGS auto seam requires the installed runtime")
+        if version != exact.DDGS_VERSION:
+            self.skipTest("installed DDGS version differs from the qualified source")
+        _, source_record = exact.native_ddgs("auto")
+        self.assertEqual(source_record["backend"], exact.backend_witness("auto"))
+        self.assertIsNone(source_record["backend"]["observed_providers"])
+        self.assertEqual(source_record["auto_sources"]["registry"]["sha256"], exact.AUTO_REGISTRY_SHA256)
+        self.assertTrue(source_record["auto_sources"]["enabled_engine_sources"])
+        for record in source_record["auto_sources"]["enabled_engine_sources"].values():
+            self.assertEqual(record["sha256"], exact.sha(Path(record["path"]).read_bytes()))
+        from ddgs.ddgs import DDGS
+        from ddgs.exceptions import DDGSException
+        engine = mock.Mock(provider="synthetic-no-network", name="synthetic-empty-engine")
+        engine.search.return_value = []
+        query = "  literal café native AUTO\n"
+        with mock.patch.dict(os.environ, {}, clear=True):
+            client = DDGS(timeout=15)
+        with mock.patch.object(DDGS, "_get_engines", return_value=[engine]) as engines:
+            with self.assertRaises(DDGSException):
+                client.text(query, region="wt-wt", safesearch="moderate", max_results=5, page=1, backend="auto")
+        engines.assert_called_once_with("text", "auto")
+        engine.search.assert_called_once_with(query, region="wt-wt", safesearch="moderate", timelimit=None, page=1)
 
     def test_installed_native_empty_engine_exception_is_retained_separately_from_transport_timeout(self):
         try:

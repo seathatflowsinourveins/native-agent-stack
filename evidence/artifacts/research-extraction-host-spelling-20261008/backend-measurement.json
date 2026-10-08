@@ -1,0 +1,215 @@
+{
+  "schema_version": 1,
+  "evidence_class": "native_proven",
+  "subject": "DDGS9.16 native literal-query parameter measurement",
+  "source_pin": {
+    "repository": "https://github.com/deedy5/ddgs",
+    "tag": "v9.16.0",
+    "commit": "70a5635510fb8d5b15d5ba6ceced6a67e212149b",
+    "source_functions": [
+      "ddgs/ddgs.py:_get_engines",
+      "ddgs/ddgs.py:_search_sync",
+      "ddgs/ddgs.py:text"
+    ]
+  },
+  "actual_started_at": "2026-10-08T18:40:04.220026Z",
+  "actual_ended_at": "2026-10-08T18:42:06.929213Z",
+  "native_exit": 0,
+  "logical_calls": 15,
+  "source_fetch_calls": 0,
+  "model_calls": 0,
+  "cost_usd": 0,
+  "counts": {
+    "default": {
+      "queries_with_results": 2,
+      "raw_hits": 10,
+      "errors_or_empty": 3
+    },
+    "auto": {
+      "queries_with_results": 2,
+      "raw_hits": 6,
+      "errors_or_empty": 3
+    },
+    "engines": {
+      "queries_with_results": 0,
+      "raw_hits": 0,
+      "errors_or_empty": 5
+    }
+  },
+  "records": [
+    {
+      "field": "quality-evaluation",
+      "query_order": 0,
+      "query_sha256": "ac9ca49e3994879059a963636a2299d0aff4da426932bc324fe0e357703ca24f",
+      "arm": "default",
+      "backend_keyword": null,
+      "status": "failed",
+      "vendor_result_count": 0,
+      "error_type": "TimeoutException",
+      "native_record_sha256": "c6adea5930a247dc888e2c9573f6fabf19f490b91b4d16ca59fcf88bbae7db0b"
+    },
+    {
+      "field": "quality-evaluation",
+      "query_order": 0,
+      "query_sha256": "ac9ca49e3994879059a963636a2299d0aff4da426932bc324fe0e357703ca24f",
+      "arm": "auto",
+      "backend_keyword": "auto",
+      "status": "returned",
+      "vendor_result_count": 1,
+      "error_type": null,
+      "native_record_sha256": "11693e1f1a80a8a85ff213efdce1fae83ed29bcc1eb6902f94baed540f89da0d"
+    },
+    {
+      "field": "quality-evaluation",
+      "query_order": 0,
+      "query_sha256": "ac9ca49e3994879059a963636a2299d0aff4da426932bc324fe0e357703ca24f",
+      "arm": "engines",
+      "backend_keyword": "brave,mojeek",
+      "status": "empty_native_exception",
+      "vendor_result_count": 0,
+      "error_type": "DDGSException",
+      "native_record_sha256": "189aef4133ebb5289c2a8398252028dd17059421282e9973bbd49a505572f6d4"
+    },
+    {
+      "field": "web-research",
+      "query_order": 1,
+      "query_sha256": "999d49b7c72d87ea605f3c1faa677845af32d8c93b29568f9401075109fecef4",
+      "arm": "default",
+      "backend_keyword": null,
+      "status": "returned",
+      "vendor_result_count": 5,
+      "error_type": null,
+      "native_record_sha256": "393e713db9b4cbefcffcdb2775223998af09c4d478d602944eb748f51b905d74"
+    },
+    {
+      "field": "web-research",
+      "query_order": 1,
+      "query_sha256": "999d49b7c72d87ea605f3c1faa677845af32d8c93b29568f9401075109fecef4",
+      "arm": "auto",
+      "backend_keyword": "auto",
+      "status": "failed",
+      "vendor_result_count": 0,
+      "error_type": "TimeoutException",
+      "native_record_sha256": "894a9d3603ea39212e5559ec60e2c6e0869a3537bdf02ec262e1c0862fc2b3fe"
+    },
+    {
+      "field": "web-research",
+      "query_order": 1,
+      "query_sha256": "999d49b7c72d87ea605f3c1faa677845af32d8c93b29568f9401075109fecef4",
+      "arm": "engines",
+      "backend_keyword": "brave,mojeek",
+      "status": "empty_native_exception",
+      "vendor_result_count": 0,
+      "error_type": "DDGSException",
+      "native_record_sha256": "53630c08ffe2a149d8f0352f8a4fe21bd70e33349d2e3a6bacb3436a80189867"
+    },
+    {
+      "field": "skills-debug",
+      "query_order": 0,
+      "query_sha256": "2d8effe2be033196c22f7eb1a92165149fcdf5d5d5fe4e0ae84d6a0d952c71af",
+      "arm": "default",
+      "backend_keyword": null,
+      "status": "returned",
+      "vendor_result_count": 5,
+      "error_type": null,
+      "native_record_sha256": "43a928570e55f0b118f7c9695294c187bfe625c3de0013f7160526ae0938529d"
+    },
+    {
+      "field": "skills-debug",
+      "query_order": 0,
+      "query_sha256": "2d8effe2be033196c22f7eb1a92165149fcdf5d5d5fe4e0ae84d6a0d952c71af",
+      "arm": "auto",
+      "backend_keyword": "auto",
+      "status": "failed",
+      "vendor_result_count": 0,
+      "error_type": "TimeoutException",
+      "native_record_sha256": "5364fff57f50e3a9f6350ae1116eee3f01597cfdb1b005a627daa1b5981027bc"
+    },
+    {
+      "field": "skills-debug",
+      "query_order": 0,
+      "query_sha256": "2d8effe2be033196c22f7eb1a92165149fcdf5d5d5fe4e0ae84d6a0d952c71af",
+      "arm": "engines",
+      "backend_keyword": "brave,mojeek",
+      "status": "empty_native_exception",
+      "vendor_result_count": 0,
+      "error_type": "DDGSException",
+      "native_record_sha256": "af8fe8554d46a48f2623b5dd9463adcb6de574896ed111882f85e91df5902b82"
+    },
+    {
+      "field": "skills-mcp-build",
+      "query_order": 0,
+      "query_sha256": "b7f5f9f06e80b4e941fb2b6e5422185adcf43329b7a1c502f86a87aa657fd18f",
+      "arm": "default",
+      "backend_keyword": null,
+      "status": "failed",
+      "vendor_result_count": 0,
+      "error_type": "TimeoutException",
+      "native_record_sha256": "a7dda3654837d375839d2cc320529b61bf397a2e311b7008813c0d685ce9aea4"
+    },
+    {
+      "field": "skills-mcp-build",
+      "query_order": 0,
+      "query_sha256": "b7f5f9f06e80b4e941fb2b6e5422185adcf43329b7a1c502f86a87aa657fd18f",
+      "arm": "auto",
+      "backend_keyword": "auto",
+      "status": "failed",
+      "vendor_result_count": 0,
+      "error_type": "TimeoutException",
+      "native_record_sha256": "4e85446d7e6bc808a4d4096b19bdbd6ee9900c8b4941024935c36b1592ce5651"
+    },
+    {
+      "field": "skills-mcp-build",
+      "query_order": 0,
+      "query_sha256": "b7f5f9f06e80b4e941fb2b6e5422185adcf43329b7a1c502f86a87aa657fd18f",
+      "arm": "engines",
+      "backend_keyword": "brave,mojeek",
+      "status": "empty_native_exception",
+      "vendor_result_count": 0,
+      "error_type": "DDGSException",
+      "native_record_sha256": "9054112e543cc4e5dba51d9ce6d094ac82380a8c11a1184010df731f4974df32"
+    },
+    {
+      "field": "agent-sdks",
+      "query_order": 0,
+      "query_sha256": "6f0f4d68ed4744e9c1b80fed202333ea61922468d8c53d2fa90c898ef822656d",
+      "arm": "default",
+      "backend_keyword": null,
+      "status": "failed",
+      "vendor_result_count": 0,
+      "error_type": "DDGSException",
+      "native_record_sha256": "4000980a18b3ae916fff78eaab70f3be6c8d7ec8da5c25132550bc4d361310df"
+    },
+    {
+      "field": "agent-sdks",
+      "query_order": 0,
+      "query_sha256": "6f0f4d68ed4744e9c1b80fed202333ea61922468d8c53d2fa90c898ef822656d",
+      "arm": "auto",
+      "backend_keyword": "auto",
+      "status": "returned",
+      "vendor_result_count": 5,
+      "error_type": null,
+      "native_record_sha256": "e6031cab42f4b8682230ebcf227c3b69113e85a120275af575280b1ebf4b6c82"
+    },
+    {
+      "field": "agent-sdks",
+      "query_order": 0,
+      "query_sha256": "6f0f4d68ed4744e9c1b80fed202333ea61922468d8c53d2fa90c898ef822656d",
+      "arm": "engines",
+      "backend_keyword": "brave,mojeek",
+      "status": "empty_native_exception",
+      "vendor_result_count": 0,
+      "error_type": "DDGSException",
+      "native_record_sha256": "acd47f94d155d8261479a7668dc20741a43d2b33b810c63145bbf9ae5d78648b"
+    }
+  ],
+  "native_parent_receipt_sha256": "5b4e1d8c5caa0e314fe83149cc711ae9a5fc299bb8f26c091f94f9ddb8d9cbfe",
+  "measurement_manifest_sha256": "0277a6c3dd6f6b769c57d0249aee63ecdc6c3dedbd6f6d14cfe8e1c0b71ff78b",
+  "vendor_invocation_adapter_sha256": "4c15b7a5eceb58706e6ad801623b48af0b4ba58ac671a21d0a5b87a0bbaf2a13",
+  "boundaries": [
+    "Historical actual15-search execution by authorized measure owner, not a new run by this receipt builder.",
+    "Omitted native default already selects auto; arm differences prove no provider/reliability/parity advantage.",
+    "HTTPstatus/internalrequestcount areUNKNOWN. No modelrewrite, sourcefetch, fullbulkpass or S acceptance.",
+    "All timeout/native-no-results outcomes retained; no universalabsence inference."
+  ]
+}

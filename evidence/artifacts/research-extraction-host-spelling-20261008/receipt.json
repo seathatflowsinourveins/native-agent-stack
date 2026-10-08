@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "evidence_class": "local_integration",
-  "subject": "PR875 post-merge P3 extraction-host/citation follow-up",
-  "checked_at": "2026-10-08T18:34:33Z",
+  "subject": "PR875 extraction-host/citation and measured native AUTO follow-up",
+  "checked_at": "2026-10-08T18:54:10Z",
   "base": "a484989a43f70ff2575b6fb054cf00c9834e7679",
   "upstream": {
     "repository": "https://github.com/deedy5/ddgs",
@@ -15,8 +15,9 @@
     ]
   },
   "source_hashes": {
-    "tools/research/exact_queries.py": "9858e72e517bfeeec7186d031168bc396cf7c24f0c20ab9458ccd2d1bb9fa8c9",
-    "tests/test_research_dispatch_exact_queries.py": "95d4654f94fb4f5198916a225cf1f55e9df8da79a2d489be9e64ef791495f27f"
+    "tools/research/exact_queries.py": "1537119d35ebb8361f68d2f78050ac384d3034aea2a179593ca17f22860e83ac",
+    "tests/test_research_dispatch_exact_queries.py": "4e40bd9fe3e451f65ec44a7c796b471a75bdf837fd0451e3718b79d15d581a9d",
+    "tools/research/dispatch": "0561d05c4b4aeb383399e743b354d4d5be32439c8783bdcdab083f8c32fc5a65"
   },
   "native_designated_review": {
     "evidence_class": "native_proven",
@@ -39,13 +40,13 @@
       "reason": "extraction invoked for refused host"
     },
     "after": {
-      "tests": 31,
+      "tests": 38,
       "failures": 0,
       "errors": 0,
       "skips": 0,
       "exit_code": 0,
       "command": "nice -n 10 ionice -c2 -n7 env PYTHONDONTWRITEBYTECODE=1 <native GPTR Python> -B -m unittest discover -s tests -p test_research_dispatch_exact_queries.py",
-      "duration_seconds": 1.034
+      "duration_seconds": 1.3
     },
     "preserves": [
       "original vendor URL",
@@ -54,13 +55,60 @@
       "all existing input/witness/partial/interruption contracts"
     ]
   },
-  "source_critic": "COMPLETE",
-  "independent_reader": "PENDING",
+  "source_critic": "COMPLETE_FINAL_BACKEND",
+  "independent_reader": {
+    "prior_P3": {
+      "verdict": "ACK",
+      "head": "cae36093a685c645268d2a7b9c6013752b2bb991",
+      "native_estimate_usd": 1.9160376,
+      "route": "native Max; not API-credit/invoice",
+      "scope": "source-only, not final backend revision"
+    },
+    "final_backend": "PENDING"
+  },
   "boundaries": [
     "No live network or model call, installer or active configuration change by these checks.",
     "No DNS, redirect, arbitrary-URL or broad IDNA qualification.",
     "This small P3 follow-up is separate from the G5 diagnostic/subset/backend feature.",
-    "Known initial HOLD, failed fixtures and native review evidence remain retained."
+    "Known initial HOLD, failed fixtures and native review evidence remain retained.",
+    "New explicit AUTO mechanism passes literal queries unchanged, no model rewrite, retry, subset/status framework or automatic bulk pass.",
+    "Backslash host refusal is conservative from a reasoned parser difference; no newly measured native sink claim."
   ],
-  "inverse": "Repository rollback only; no host apply or dependency install."
+  "inverse": "Repository rollback only; no host apply or dependency install.",
+  "default_dispatch_check": {
+    "tests": 13,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0,
+    "exit_code": 0,
+    "duration_seconds": 18.371,
+    "scope": "actual root native checks after final backend/flag change"
+  },
+  "backend": {
+    "default": "duckduckgo",
+    "explicit_option": "auto",
+    "native_measured_receipt_sha256": "5b4e1d8c5caa0e314fe83149cc711ae9a5fc299bb8f26c091f94f9ddb8d9cbfe",
+    "logical_calls": 15,
+    "queries_per_arm": 5,
+    "counts": {
+      "default": {
+        "queries_with_results": 2,
+        "raw_hits": 10,
+        "errors_or_empty": 3
+      },
+      "auto": {
+        "queries_with_results": 2,
+        "raw_hits": 6,
+        "errors_or_empty": 3
+      },
+      "engines": {
+        "queries_with_results": 0,
+        "raw_hits": 0,
+        "errors_or_empty": 5
+      }
+    },
+    "witness": "manifest and native-source requested backend must match original request before completion",
+    "observed_providers": null,
+    "selection_boundary": "AUTO enabled-engine source hashes are observations, not complete engine or HTTP qualification; default and explicit AUTO semantics equivalent in native DDGS"
+  }
 }
