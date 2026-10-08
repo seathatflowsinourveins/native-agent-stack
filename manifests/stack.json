@@ -2420,20 +2420,20 @@
       "runtime": "codebase-memory-mcp"
     },
     {
-      "id": "claude-haiku-4-5-20251001",
-      "revision": "claude-haiku-4-5-20251001",
-      "release_date": "2025-10-15",
-      "release_source": "https://www.anthropic.com/news/claude-haiku-4-5",
-      "release_date_basis": "Vendor public release date; the identifier suffix is its earlier snapshot date.",
-      "role": "Simple Claude Code background tasks",
-      "consumer_limit": "Titles, safety checks and quick summaries; latest Haiku line retained as the owner's dated exception, without heavier-line promotion for currency.",
+      "id": "claude-haiku-5-5",
+      "revision": "claude-haiku-5-5",
+      "release_date": "2026-10-07",
+      "release_source": "https://platform.claude.com/docs/en/release-notes/overview#october-7-2026-4",
+      "release_date_basis": "Anthropic's dated product-release entry, October 7, 2026 (the page's Haiku 5.5 section, whose RSS permalink uses this anchor); the dateless ID and the release date re-read from the models overview and the Haiku 5.5 model page.",
+      "role": "Simple Claude Code background tasks; cheap exact extraction stages",
+      "consumer_limit": "Titles, safety checks and quick summaries through the Claude Code 2.1.293 default Haiku, and source-scout stages that pass a per-call model 'haiku' for inventories and line-cited extraction with no command relay; verbatim command relay stays on Sonnet. On the Anthropic API only: other providers still resolve haiku to Haiku 4.5.",
       "currency_status": "in_use",
       "currency_rows": ["background-haiku"],
-      "landscape_checked_at": "2026-10-07",
-      "overturn": "An Anthropic Haiku 5.x model ID becomes available.",
-      "selection_scope": "Owner ruling and reported application at 2026-10-07T04:15Z; no new configuration read-back or model run by this wave.",
+      "evidence_ids": ["haiku55-extraction-trial-20261007"],
+      "overturn": "A newer Anthropic Haiku model ID becomes available; or the extraction route returns to Sonnet when a routed Haiku stage returns an unanchored or misattributed citation that a later check finds, or when a haiku child resolves a model older than Haiku 5.5.",
+      "selection_scope": "Owner ruling of 2026-10-07T04:15Z (the background slot follows the Haiku line) applied to the default Haiku of Claude Code 2.1.293; the extraction route rests on the 2026-10-07 repeat trial. No configuration read-back of the background slot itself.",
       "route": "Native Claude account",
-      "distribution": "Hosted dated snapshot ID; no local weights or CI calls"
+      "distribution": "Hosted canonical model ID; no local weights or CI calls"
     },
     {
       "id": "unsloth/Qwen3.8-27B-GGUF",

@@ -4676,6 +4676,26 @@
         "All three CVE reachability statements concern repository provisioning only. The upgrade preserves the database; existing users/Editor memberships, Grafana-managed alert rules, shared dashboards/sharing tokens, and additional datasources/stored credential configuration were not inspected. The live-database check remains an open host item."
       ],
       "path": "evidence/receipts/grafana-1323-qualification-20261003.json"
+    },
+    {
+      "id": "haiku55-extraction-trial-20261007",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "claude-code"
+      ],
+      "claim": "On one Mac running Claude Code 2.1.293 (workflow wf_aa532ddc-f32, 2026-10-07T21:31Z to 23:48Z), byte-identical packets sent to source-scout with a per-call model of haiku and of sonnet at effort max showed Claude Haiku 5.5 (claude-haiku-5-5) returning 8 of 8 extraction runs exact on two distinct packets with no unanchored citation (P1, 7 MCP server rows with 29 line citations a run: 28/28 rows; P2, 12 Markdown table rows with line numbers and 80-character quotes: 48/48 rows), the same as Sonnet 5.5; the session's Fable 5.1 advisor answered 2 of the 8 Haiku and 7 of the 8 Sonnet extraction runs, and the 6 unassisted Haiku runs were exact as well. A blind Opus evidence-reviewer found no defect in any of the 16 extraction runs of both rounds, and the deterministic answer key, re-run for this receipt on the packets' source commit b16cb8cf, reproduced the retained scores of all 28 runs. At the cached LiteLLM prices the mean executor-model cost per child was $0.0220 against $0.2405 (P1) and $0.0180 against $0.2132 (P2), and with the advisor's sub-inferences $0.2407 against $0.6509 and $0.0180 against $0.4672. On a verbatim relay of a 2,511-character command output Haiku was byte-exact in 5 of 6 runs (the miss backslash-escaped all 360 double quotes) and Sonnet in 6 of 6. Every Haiku child resolved claude-haiku-5-5 and recorded effort max, and the trial's native probes of claude -p and claude --bg with --model haiku resolved claude-haiku-5-5 and returned the exact requested reply.",
+      "limitations": [
+        "Local observation of one Mac, one account and one client version (2.1.293) on the Anthropic API; the model and effort are the client's own per-message transcript records, not an API-side confirmation, and other providers still resolve haiku to Haiku 4.5.",
+        "Two extraction packets drawn from this repository's own files at commit b16cb8cf, four runs per packet per arm: a qualification for line-cited extraction from JSON, Python and Markdown sources of that size, not a general extraction benchmark.",
+        "Every child inherited the session's advisor (Fable 5.1), so the arms were not held equal on it: it answered 7 of 8 Sonnet and 2 of 8 Haiku extraction runs (rate limits refused the advisor call of 5 Haiku runs and 1 Sonnet run, and one Haiku run made no call), no relay run called it, and it answered 15 of the 16 verifiers. The Haiku result also holds on its 6 unassisted runs (2 P1, 4 P2); a comparison that holds the advisor equal would run with CLAUDE_CODE_DISABLE_ADVISOR_TOOL=1.",
+        "The runs span two rounds. A network outage ended the first run's integration stage (a <synthetic> API-error row and no result), and the resumed run repeated the trial. The retained evidence files carry only the second round's verdicts; the first round's eight were read from the run's journal, which stays private on the host.",
+        "Each verifier saw the worker's output as text in its prompt, not as bytes, so look-alike characters were not checked (some verifiers recorded this gap); the answer key compares exact strings.",
+        "Costs multiply each child's client-recorded usage by the LiteLLM price table that ccusage caches: Haiku 5.5 at $0.10 input and $0.50 output per million tokens, the base rate the 2.1.293 CHANGELOG states for prompts up to 100K tokens (the largest Haiku request totalled 83,171 prompt tokens over two iterations around an advisor call); Sonnet 5.5 at $2 and $10; the advisor's Fable 5.1 at $10 and $50. Executor and advisor costs are reported apart, the advisor costs depend on the rate limits above, neither is provider billing, and ccusage 20.0.26 itself reported claude-haiku-5-5 and claude-sonnet-5-5 as unpriced in the trial's network-free runs.",
+        "Every child ran at effort max, the repository's stage rule. Anthropic advises xhigh or max on Haiku 5.5 only where evals show a gain over its medium default; no lower Haiku effort was compared.",
+        "The probe results are what the trial's probe children reported from commands they ran; they were not re-run for this receipt. The claude --bg probe ran at a saved xhigh level, not max. The collector scan counted claude-haiku-5-5 records on the host without telling background-slot calls from explicit Haiku children, so the background slot's move to Haiku 5.5 rests on the vendor CHANGELOG and docs, not on a read-back.",
+        "Raw outputs, transcripts, the run's journal, the workflow script and the oracle stay private on the host; this receipt keeps derived counts, timings, prices and file hashes only."
+      ],
+      "path": "evidence/receipts/haiku55-extraction-trial-20261007.json"
     }
   ],
   "files": [
@@ -5156,8 +5176,8 @@
     },
     {
       "path": "adoption/new-wsl/claude-user-instructions.md",
-      "sha256": "2f1d38a12e5714c6178e33f7ade258cf7b5751f174afd059c37d2947ae6261ed",
-      "bytes": 11905
+      "sha256": "28497e4714d9502ca2dc732f2a924fd03dd2827921c5291854cfb05fd9dd7f92",
+      "bytes": 12059
     },
     {
       "path": "adoption/new-wsl/client-config-map.json",
@@ -16552,8 +16572,8 @@
     },
     {
       "path": "catalogs/foundation/decisions.json",
-      "sha256": "89091ead1eecd0cf5f030f75ef721fe750b34023705f770539923180b7e87163",
-      "bytes": 140288
+      "sha256": "d3db143563a49919b72425c3bbb2c42aa26b15edde0066abfc563ca33bab7469",
+      "bytes": 141350
     },
     {
       "path": "catalogs/foundation/manifest.json",
@@ -16572,8 +16592,8 @@
     },
     {
       "path": "catalogs/foundation/model-currency.json",
-      "sha256": "8fd235096256010af2704c9c68e4c15d2d2dd7e83dce6331bbad528b27526e60",
-      "bytes": 34044
+      "sha256": "27812f83bde74becec568ca2c6d0f87bbd82970ea8185752cd347ac422eb017d",
+      "bytes": 33571
     },
     {
       "path": "catalogs/foundation/model-currency.schema.json",
@@ -17397,8 +17417,8 @@
     },
     {
       "path": "docs/decisions/2026-09-29-sonnet-5-5-dispatch.md",
-      "sha256": "93a7459d627c02946f41b4284467801187435114082d928ee014fc7bccc3a747",
-      "bytes": 28168
+      "sha256": "bb3bd2fd1816a1b97bf769bd836e7974fab36ada56dedaba7bb7bf553e12ebb5",
+      "bytes": 28443
     },
     {
       "path": "docs/decisions/2026-09-30-bounded-native-decision-routing.md",
@@ -17817,8 +17837,8 @@
     },
     {
       "path": "docs/decisions/2026-10-07-model-currency-enforcement.md",
-      "sha256": "b1454ff36b35030f12ad7d853386bf8b0e92b52f7e509251870ab10c75e05335",
-      "bytes": 18041
+      "sha256": "5c95cb64b5c4e4fc779db37f3a508671ccd7cc77b3bde8eaab17e1da999ece3c",
+      "bytes": 18960
     },
     {
       "path": "docs/decisions/2026-10-07-qmd-instruction-landing-composition.md",
@@ -18022,8 +18042,8 @@
     },
     {
       "path": "docs/model-currency.md",
-      "sha256": "6ff91f2c3d3f883214c60ef348db703cd10dc485c4da3247ffd018edebfc2811",
-      "bytes": 9451
+      "sha256": "415ddf20dbf6358f2f32f9a1e23783d73c1e5314a8b730e409541805b8575859",
+      "bytes": 9710
     },
     {
       "path": "docs/native-dashboard-data.md",
@@ -53711,6 +53731,11 @@
       "bytes": 11220
     },
     {
+      "path": "evidence/receipts/haiku55-extraction-trial-20261007.json",
+      "sha256": "5a8e62670f2a444eb34f810dba72f8cef8994d85a14c519855c21954fa9b1883",
+      "bytes": 45370
+    },
+    {
       "path": "evidence/receipts/harbor-e2e-token-tools-20260930.json",
       "sha256": "a8e37af489566ef8ec25a33dfe9041cb64d2bc32e91959a9226bd9c2ec1c8fa6",
       "bytes": 44466
@@ -54467,8 +54492,8 @@
     },
     {
       "path": "examples/claude-native/CLAUDE.md",
-      "sha256": "2f1d38a12e5714c6178e33f7ade258cf7b5751f174afd059c37d2947ae6261ed",
-      "bytes": 11905
+      "sha256": "28497e4714d9502ca2dc732f2a924fd03dd2827921c5291854cfb05fd9dd7f92",
+      "bytes": 12059
     },
     {
       "path": "examples/claude-native/agents/blind-adjudicator.md",
@@ -54522,12 +54547,12 @@
     },
     {
       "path": "examples/claude-native/workflows/README.md",
-      "sha256": "b3405f0b93a738d2e3b2ff5f032c2874acb7dd8d15b0800fe8010bbd4dfc0ece",
-      "bytes": 111528
+      "sha256": "db63000e2cbc9de13f135456e0e1542bed7a984e6bc47f2b54776c80f8e0706f",
+      "bytes": 118525
     },
     {
       "path": "examples/claude-native/workflows/SHA256SUMS",
-      "sha256": "db0a5b521a760e2d259b4353f217e884f23c490054e311e7ad94cfc0aa98ef97",
+      "sha256": "4b524b1659abd3d7d967d9de2af95dc0ca8367c1c5e0d4ba2ffe9d7f183c5e5b",
       "bytes": 1217
     },
     {
@@ -54537,8 +54562,8 @@
     },
     {
       "path": "examples/claude-native/workflows/child-usage.mjs",
-      "sha256": "3e5189342734135e88a2295c1c2152275d9e26c0c7731ed5cbc8905bbccd98a4",
-      "bytes": 264386
+      "sha256": "9363d30269b972b90e8e6bdcb28f688a4a4d2ea36826e5eb97c24725b7701105",
+      "bytes": 264531
     },
     {
       "path": "examples/claude-native/workflows/codex-cross-review.mjs",
@@ -54567,8 +54592,8 @@
     },
     {
       "path": "examples/claude-native/workflows/test-child-usage.mjs",
-      "sha256": "4f45b0f613d9d73fbd75792ed6a9b2cfad50ab98d3e3dcd54cd6b53791e32674",
-      "bytes": 117347
+      "sha256": "396b2c92aa4071e877ded154b8aaead946c9b423183e14b2f5242f487a5f6cb5",
+      "bytes": 119026
     },
     {
       "path": "examples/claude-native/workflows/test-codex-envelope.mjs",
@@ -54947,8 +54972,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "c191a297c89b884e5639fc676ce90d4b543d32e6b9eb2c26156e253b74c0326b",
-      "bytes": 128113
+      "sha256": "fb1e7b88a73ca32549efc2086cccced316f0ac6752d6562acee0b58e3f6bbab3",
+      "bytes": 128837
     },
     {
       "path": "observability/README.md",
@@ -55272,13 +55297,13 @@
     },
     {
       "path": "recipes/claude-native-profile.md",
-      "sha256": "889aba2511afec00769d7e344812e0493be040e58e858e934dd66225894ab46a",
-      "bytes": 39973
+      "sha256": "34a60df70c4652adeb1a4b35875ef448e2f7be3bd53d6e54eec75b748f967976",
+      "bytes": 40238
     },
     {
       "path": "recipes/claude-native-ultracode.md",
-      "sha256": "27f43c56d1f1a70f065a5d313b9273a8b55709362b15ed4a56b83da1e3c37437",
-      "bytes": 39979
+      "sha256": "112d1b428096d2c3a02707f13c4c4eb43afcf331913feceb702d5acfc9f7129c",
+      "bytes": 41667
     },
     {
       "path": "recipes/mineru-local-service.md",
