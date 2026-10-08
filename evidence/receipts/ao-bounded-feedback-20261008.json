@@ -40,11 +40,20 @@
     "review_commit": "9613571b4419a1dd0535d476d1e9b5eb5e44235b",
     "observed_at": "2026-10-08T06:56:05.768320316Z"
   },
-  "gate_results": {
+  "historical_reported_gate_results": {
     "G1": "PASS",
     "G2": "PASS",
     "G3": "PASS",
     "scope": "one bounded PR/head/process; automatic feedback and acknowledgements only"
+  },
+  "current_evidence_assessment": {
+    "G1": "UNKNOWN",
+    "G2": "PASS for native owner/head/check view at the observed head",
+    "G3": "UNTESTED",
+    "G1_reason": "No vendor manual-cue counter or matched manual baseline measured; observed deliveries do not establish comparative reduction",
+    "G3_reason": "Poll count UNKNOWN and no repeated unresolved-condition evaluation recorded; one delivery per item does not demonstrate duplicate suppression",
+    "new_trial_or_baseline": false,
+    "original_private_receipt_changed": false
   },
   "native_counts": {
     "claimed_prs": 1,
@@ -80,7 +89,7 @@
   ],
   "limits": [
     "Poll count and vendor manual-cue counter UNKNOWN; no elapsed-time estimate substituted",
-    "Exactly-once observed only for one process/head; persistence-failure/restart duplication not exercised",
+    "One delivery per item observed; repeated-opportunity duplicate suppression and persistence-failure/restart behavior not exercised",
     "Changed-head feedback and control-session receiver not exercised",
     "Worker command runner unavailable; independent worker head inspection and pushed fix not established",
     "Earlier fixture omitted codex-code-mode-host; no repair or coding acceptance run",

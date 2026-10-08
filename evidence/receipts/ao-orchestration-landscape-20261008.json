@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "kind": "dated_orchestration_source_and_execution_comparison",
+  "survey_window_utc": "2026-10-07T23:40:33Z through 2026-10-08",
+  "retained_private_survey_sha256": "b30f6920810fa692945a52a2400a41d9c6f0fa1b29a809778be30c3eafbdcb15",
+  "basis": "Pinned primary source/CLI landscape and already completed native qualification attempts",
+  "new_model_run": false,
+  "matched_head_to_head_feedback_comparison": false,
+  "overall_superiority_measured": false,
+  "candidates": [
+    {
+      "repository": "https://github.com/OrchestratorInc/agent-orchestrator",
+      "tag": "v0.13.4",
+      "commit": "e8a77577c14b015b947057d67c9171a78cdd5099",
+      "primary_sources": ["docs/self-hosted-remote.md", "docs/scm-observer.md", "backend/internal/session_manager/manager.go", "backend/internal/adapters/scm/github/observer_provider.go"],
+      "latest_release_readback_date": "2026-10-08",
+      "latest_release_command": "gh api repos/OrchestratorInc/agent-orchestrator/releases/latest",
+      "release_published_at": "2026-10-07T09:09:57Z",
+      "native_execution": "Clean-home admission HTTP409; approved isolated native-import attempt delivered two fixture feedbacks; direct shared-home route STOPPED before launch",
+      "native_receipt_sha256": "acc503d994e3e8a5e674d3b7818a93047f8982028682af2c381bf71b2175da88",
+      "assessment": "G1 UNKNOWN; G2 native view observed; G3 UNTESTED; no coding/pushed-fix or repeated-opportunity deduplication acceptance"
+    },
+    {
+      "repository": "https://github.com/omnigent-ai/omnigent",
+      "tag": "v0.17.0",
+      "commit": "12b5f67d2529b43eab7366a7288fb89f7587e48b",
+      "primary_sources": ["deploy/docker/README.md", "deploy/docker/Dockerfile", "deploy/docker/Dockerfile.ubi"],
+      "latest_release_readback_date": "2026-10-08",
+      "latest_release_command": "gh api repos/omnigent-ai/omnigent/releases/latest",
+      "tag_commit_command": "gh api repos/omnigent-ai/omnigent/commits/v0.17.0",
+      "release_published_at": "2026-10-06T02:02:33Z",
+      "native_install_exits": [1, 1],
+      "native_install_outcomes": ["Published host image could not map UID/GID1000660000 under existing rootless runtime", "Unchanged vendor UBI target failed because dnf could not find tmux"],
+      "runtime_gates_exercised": false,
+      "CC_disposition": "Excluded; stopped, no further image builds"
+    },
+    {
+      "class": "installed Codex lane composition",
+      "sources": [
+        {"repository": "https://github.com/aannoo/hcom", "tag": "v0.7.28", "commit": "b2a7c192003e7fd67ed93265289e4ac36276f965", "file": "README.md"},
+        {"repository": "https://github.com/kenn-io/agentsview", "tag": "v0.44.0", "commit": "413a87f7bfbd67b2815b1119ac51abc1efbeeaba", "files": ["README.md", "docs/stats.md"]},
+        {"repository": "https://github.com/max-sixty/worktrunk", "tag": "v0.80.0", "commit": "b49ca7eea9b03145791a5b94eccaf9c59412ed37", "file": "README.md"}
+      ],
+      "role": "Lane transport/observation/archive/worktree lifecycle",
+      "matched_feedback_trial": "NOT_RUN"
+    },
+    {
+      "repository": "https://github.com/openai/symphony",
+      "commit": "be10a1b79df723d6d7612b5651c8522704dafb2e",
+      "primary_sources": ["README.md", "SPEC.md", "elixir/README.md", "elixir/WORKFLOW.md"],
+      "role": "Experimental Linear-driven worker reference",
+      "evidence_class": "source_review",
+      "matched_feedback_trial": "NOT_RUN"
+    },
+    {
+      "repository": "https://github.com/doordash-oss/agentic-orchestrator",
+      "tag": "v0.160.0",
+      "primary_sources": ["README.md"],
+      "role": "Desktop development workflow orchestrator with local agentico server/CLI",
+      "evidence_class": "source_review",
+      "matched_feedback_trial": "NOT_RUN"
+    },
+    {
+      "repository": "https://github.com/github/gh-aw",
+      "tag": "v0.89.21",
+      "primary_sources": ["README.md"],
+      "role": "GitHub-hosted agentic workflows",
+      "evidence_class": "source_review",
+      "matched_feedback_trial": "NOT_RUN"
+    },
+    {
+      "repository": "https://github.com/dagucloud/dagu",
+      "tag": "v2.18.2",
+      "commit": "5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4",
+      "primary_sources": ["README.md", "internal/cmn/schema/dag.schema.json"],
+      "role": "Local operations DAGs, scheduled commands and run history",
+      "evidence_class": "source_review",
+      "matched_feedback_trial": "NOT_RUN"
+    }
+  ],
+  "quota_boundary": {
+    "CC_stop_rule": "REST resources.core.remaining below500 -> native AO stop",
+    "GraphQL_allowance_and_AO_consumption": "UNKNOWN; separately metered in resources.graphql",
+    "new_threshold_or_guard": false,
+    "native_returned_error_cooldown_is_daemon_stop": false
+  },
+  "interpretation": "CC operational adoption records observed feedback and supported-route outcomes; no reproduced comparative gate, universal exactly-once property or current-best superiority claim"
+}
