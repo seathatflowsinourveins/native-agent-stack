@@ -107,6 +107,7 @@ jobs:
             path and the concrete fix. You have at most 20 turns, so read in parallel and write the report in good time.
           claude_args: |
             --model claude-opus-5-5
+            --effort max
             --max-turns 20
             --max-budget-usd 3
             --tools Read,Glob,Grep
