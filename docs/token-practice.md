@@ -150,6 +150,98 @@ Project registration metadata to safe names/status before returning it; client
 configuration can contain environment/header credentials. Configuration listings
 establish registration, not a connected tool's schema or successful use.
 
+### Shared files and native discovery
+
+For files outside the selected worktree, process the known path inside
+`ctx_execute` or `ctx_batch_execute`. Keep `ctx_execute_file` for worktree
+paths. context-mode 1.0.169 documents its file boundary at
+[mksglu/context-mode@6f0cc684:README.md:1561](https://github.com/mksglu/context-mode/blob/6f0cc6841c687e754059f36714a11233fda1a02b/README.md#L1561)
+and execution-tool access at
+[README.md:1575](https://github.com/mksglu/context-mode/blob/6f0cc6841c687e754059f36714a11233fda1a02b/README.md#L1575).
+For a batch command whose first word is `for`, wrap the loop in
+`bash -c '...'`: the installed batch builder prefixes POSIX commands with
+an environment assignment
+([src/server.ts:1456](https://github.com/mksglu/context-mode/blob/6f0cc6841c687e754059f36714a11233fda1a02b/src/server.ts#L1456)).
+Use the execution tool to return the derived answer instead of a whole file.
+
+In Codex code mode, filter `ALL_TOOLS` before returning its metadata and retain
+only the selected complete schemas. Deferred nested tools can be omitted from
+the exec description
+([openai/codex@979011409:codex-rs/code-mode-protocol/src/description.rs:16](https://github.com/openai/codex/blob/979011409de0a60b52f179721948e65531d26144/codex-rs/code-mode-protocol/src/description.rs#L16)).
+An inventory count alone does not measure request-schema tokens, and code mode
+still renders descriptions for enabled tools. Keep measured input and returned
+artifact characters separate. Reuse each selected skill body within a thread.
+
+Select a parent's MCP set through its native launch configuration.
+`mcp_servers.<id>.enabled=false` is the documented setting
+([OpenAI configuration reference](https://developers.openai.com/codex/config-reference/)).
+The selected `<name>.config.toml` layer loads after the user layer
+([codex-rs/config/src/loader/mod.rs:130](https://github.com/openai/codex/blob/979011409de0a60b52f179721948e65531d26144/codex-rs/config/src/loader/mod.rs#L130)).
+Agent-role files project a narrower set of overrides; the role model fields are
+listed at
+[codex-rs/core/src/agent/role.rs:36](https://github.com/openai/codex/blob/979011409de0a60b52f179721948e65531d26144/codex-rs/core/src/agent/role.rs#L36).
+Measure token effects and server-start resource costs independently.
+
+For a selected skill, finish its first required body read, then reuse that body
+within the thread while its source still matches. Count raw read calls, partial
+windows and repeated complete bodies separately.
+
+RTK 0.51.0 documents shell `cat`, `head` and `tail` rewrite coverage
+([rtk-ai/rtk@e001f773:README.md:153](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/README.md#L153)).
+A `sed -n` range can pass through without an RTK equivalent; that is distinct
+from a broken hook. Use a supported exact window for a prefix/tail read, or an
+execution tool for range analysis. `rtk read` defaults to level `none`; supported
+head/tail windows preserve the selected bytes and do not imply additional token
+savings. When `rtk rewrite` returns command text with exit 3, that status means
+its ask/default permission classification, not missing command coverage
+([src/hooks/rewrite_cmd.rs:71](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/hooks/rewrite_cmd.rs#L71)).
+This workflow does not modify the hook or its permission policy.
+
+Serena activation requires both `project` and the session identifier returned
+by `initial_instructions`
+([oraios/serena@c6fbd1c5:src/serena/tools/config_tools.py:44](https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/src/serena/tools/config_tools.py#L44)).
+Retain that identifier, and pass `session_id` if activation is required.
+If the manual already reports the required project active, reuse that state.
+A prior validation failure does not justify omitting a required field again.
+
+### Cache and terminal attribution
+
+Group gateway observations by the returned session and connection fields,
+then describe request position only within the available collection page.
+A clipped page can begin mid-session. Unknown cache counts remain unknown.
+A rate-limit reset identifier is an account-meter observation; it does not
+identify the account that served a particular response.
+
+When a spawn call selects no model, `agents.default_subagent_model` can replace
+the constructor's parent-derived `model_info.slug`. Leaving the effective key
+unset retains that constructor value
+([codex-rs/core/src/agent/child_config.rs:109](https://github.com/openai/codex/blob/979011409de0a60b52f179721948e65531d26144/codex-rs/core/src/agent/child_config.rs#L109),
+[override at :204](https://github.com/openai/codex/blob/979011409de0a60b52f179721948e65531d26144/codex-rs/core/src/agent/child_config.rs#L204)).
+Explicit roles and per-spawn selections retain their native precedence. The key
+must be unset across contributing layers; omitting a higher profile entry cannot
+mask a lower value. Verify root/child request models before claiming raw alias
+parity, then qualify provider routing and cache effects independently.
+
+For direct-provider cache continuity, OmniRoute ships session affinity:
+`sessionAffinityTtlMs` selects its lifetime, and the documented default is zero
+([diegosouzapw/OmniRoute@c1e30b76:docs/guides/CODEX-CLI-CONFIGURATION.md:470](https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/docs/guides/CODEX-CLI-CONFIGURATION.md#L470)).
+An available affinity connection is selected before round-robin routing
+([src/sse/services/auth.ts:1985](https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/src/sse/services/auth.ts#L1985)).
+Recorded historical settings do not establish the running settings or a
+measured repair. Preserve a bounded before/after native observation before
+claiming reduced cache rebuilds.
+
+Treat hcom `pty:approval` as an inferred action-required terminal state.
+hcom 0.7.28 detects a title containing `Action Required` or visible prompt
+patterns
+([aannoo/hcom@b2a7c192:src/pty/screen.rs:309](https://github.com/aannoo/hcom/blob/b2a7c192003e7fd67ed93265289e4ac36276f965/src/pty/screen.rs#L309),
+[screen.rs:439](https://github.com/aannoo/hcom/blob/b2a7c192003e7fd67ed93265289e4ac36276f965/src/pty/screen.rs#L439)).
+Its emitted event retains prior status-detail text
+([src/pty/shared.rs:394](https://github.com/aannoo/hcom/blob/b2a7c192003e7fd67ed93265289e4ac36276f965/src/pty/shared.rs#L394)).
+A retained command preview therefore does not identify the detector input.
+Native approval, interactive hooks and classifier false positives require
+their own evidence.
+
 The [reported Mac rollout](decisions/2026-09-30-bounded-native-decision-routing.md)
 retained an oversized initial discovery and a missed current decision. These
 rules address those observed failure modes; semantic answer quality and complete
