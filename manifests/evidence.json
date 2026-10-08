@@ -13982,7 +13982,7 @@
     },
     {
       "path": "blueprints/us-equities/alpaca-paper/paper_runner.py",
-      "sha256": "da10425f4498626b5bd22a8c639bbff54b5e6209e05a47fc46698f38243113f8",
+      "sha256": "eff2701da806a82efab621fc4cbb00e22e992af8c888bb27214f76c8da948a43",
       "bytes": 30441
     },
     {
@@ -57397,8 +57397,8 @@
     },
     {
       "path": "tests/test_alpaca_paper.py",
-      "sha256": "7ba298cb285f812d65a35f6c9269b47def5fc6cebfc0265235936b6b22fdcd73",
-      "bytes": 20931
+      "sha256": "50051999c4c878dc2c934050fddc0a6b1c36b63c98c627da8637d2a2ac0eadeb",
+      "bytes": 22270
     },
     {
       "path": "tests/test_apply_claude_settings.py",
