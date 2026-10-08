@@ -21,6 +21,7 @@ against it.
 | `omniroute` | OmniRoute local gateway key, one per lane. The workstation gateway runs keyless on loopback, so callers pass the placeholder `local-loopback` ([decision](decisions/2026-09-27-omniroute-account-pool.md)) | optional | `<store>/omniroute.env` | `OMNIROUTE_API_KEY` |
 | `tavily` | Tavily API key. Until 2026-09-29 it lived only in the kernel keyring; its first file write comes from that copy through the create-only chain in [Kernel keyring](#kernel-keyring-transport-and-per-boot-spare-2026-09-29) | optional | `<store>/tavily.env` | `TAVILY_API_KEY` |
 | `grafana-admin` | Local Grafana admin account and secret key | generated locally | `~/.config/ecosystem-observability/ecosystem-grafana.env` | `GF_SECURITY_*` |
+| `anthropic-admin` | Claude Console Admin API key ([official key type](https://platform.claude.com/docs/en/manage-claude/admin-api-keys)) | optional, owner stores later | `<store>/anthropic-admin.env` | `ANTHROPIC_ADMIN_KEY` ([official Usage and Cost API examples](https://platform.claude.com/docs/en/manage-claude/usage-cost-api)) |
 | `nativestack-generation-key` | Host service key | generated locally | `~/.config/nativestack/generation.key` | none |
 | `openhands-session` | OpenHands agent-server session key for one runtime-worker attempt ([decision](decisions/2026-09-28-openhands-resolver-isolation.md)) | generated locally, per attempt; deleted after the attempt's containers are confirmed removed | `~/.local/state/native-agent-stack/runtime-workers/openhands/secrets/<run-id>-<arm>.server.env`, plus the `.headers` file beside it | none on the host; `OH_SESSION_API_KEYS_0` exists only inside the agent-server container (Docker `--env-file`) |
 | `claude-native`, `codex-native`, `gh-native` | Native sign-ins | stored by each tool | each tool's own store | none |
@@ -29,6 +30,15 @@ against it.
 | `github-actions` | `FOUNDATION_RESTORE_FIXTURE_20260920` and the per-job `github.token` | CI only | GitHub's encrypted secret store | none locally |
 
 `<store>` means `${XDG_CONFIG_HOME:-$HOME/.config}/native-agent-stack`.
+
+The `anthropic-admin` inventory entry contains metadata only. The owner stores
+the key later with `tools/credentials/set_credential.py anthropic-admin` in their
+own terminal. Anthropic's [Admin key documentation](https://platform.claude.com/docs/en/manage-claude/admin-api-keys)
+requires an organization admin to create a Console Admin key and states that it
+has no selectable scopes: it carries full access to endpoints that accept Admin
+API keys. The variable name comes from the official
+[Usage and Cost API examples](https://platform.claude.com/docs/en/manage-claude/usage-cost-api).
+No Admin API client or authenticated probe is introduced by this entry.
 
 These should stay unset on the host, and child processes should never get
 them: `GITHUB_TOKEN`, `GH_TOKEN`, `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`,
