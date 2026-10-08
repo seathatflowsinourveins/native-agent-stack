@@ -94,7 +94,10 @@ const MUTATIONS = [
   ['the routing table restates source-scout at medium', ROUTING_DOC_FILE, 'running acceptance commands | `source-scout` | Sonnet, max |', 'running acceptance commands | `source-scout` | Sonnet, medium |', 'lists every project agent once with the model and effort its file declares'],
   ['the routing table restates a default child at high', ROUTING_DOC_FILE, '| default workflow subagent | Opus, max |', '| default workflow subagent | Opus, high |', 'every default workflow subagent row binds a model at effort max'],
   ['the routing table drops the saved xhigh fallback from the coordinator row', ROUTING_DOC_FILE, '| coordinator | Opus 5.5, max from the launcher, else saved xhigh, under `ultracode`', '| coordinator | Opus 5.5, max under `ultracode`', 'the coordinator row states the launcher max and the saved xhigh fallback under ultracode'],
-  ['the instructions stop stating the stage effort literal', INSTRUCTIONS_FILE, "`effort: 'max'`", "`effort: 'high'`", 'state the effort literal every stage binds'],
+  // A sixth field `true` replaces every occurrence. Since 2026-10-08 the instructions binding is the workflows README,
+  // which states the stage effort rule in several sections, so one statement left behind must not hide the defect.
+  ['the instructions stop stating the stage effort literal', INSTRUCTIONS_FILE, "`effort: 'max'`", "`effort: 'high'`", 'state the effort literal every stage binds', true],
+  ['the instructions stop naming the size guideline the settings select', INSTRUCTIONS_FILE, '`unrestricted` size guideline', '`large` size guideline', 'workflowSizeGuideline is a documented value and the project instructions name the same one', true],
   // CLAUDE_CODE_EFFORT_LEVEL overrides every stage's and agent's effort at any value (docs; probes P6 and P9 at max), and any
   // value other than xhigh also turned ultracode's orchestration off on 2.1.281 (P1); an effort cap below max clamps the stages.
   ['the settings env sets CLAUDE_CODE_EFFORT_LEVEL=max', SETTINGS_FILE, 'env', { ...ENV, CLAUDE_CODE_EFFORT_LEVEL: 'max' }, 'CLAUDE_CODE_EFFORT_LEVEL stays unset and no maxEffortLevel caps the stage effort'],
@@ -133,7 +136,7 @@ expect('config: every binding in contract.config.json is a relative path', relat
   expect('placement: a binding that climbs past the root is refused, never copied', outside.escaped.length === 1 && outside.copies.length === 0)
 }
 let baseline = null
-for (const [name, file, from, to, expectFail] of [['(baseline, no mutation)', null, '', '', undefined], ...MUTATIONS]) {
+for (const [name, file, from, to, expectFail, every] of [['(baseline, no mutation)', null, '', '', undefined], ...MUTATIONS]) {
   const root = mkdtempSync(join(tmpdir(), 'contract-mutation-'))
   try {
     const copyRoot = join(root, ...Array.from({ length: DEPTH }, (_, i) => 'level' + i), 'tree')
@@ -153,7 +156,7 @@ for (const [name, file, from, to, expectFail] of [['(baseline, no mutation)', nu
     } else if (file) {
       const src = readFileSync(join(copyRoot, file), 'utf8')
       if (!src.includes(from)) { expect('mutation applies: ' + name, false); continue }
-      writeFileSync(join(copyRoot, file), src.replace(from, to))
+      writeFileSync(join(copyRoot, file), every ? src.split(from).join(to) : src.replace(from, to))
     }
     const run = spawnSync(process.execPath, [join(copyRoot, 'workflows/test-envelope.mjs')], { cwd: copyRoot, encoding: 'utf8' })
     const fails = run.stdout.split('\n').filter((l) => l.startsWith('FAIL '))

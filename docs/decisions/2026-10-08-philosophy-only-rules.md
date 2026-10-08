@@ -97,6 +97,7 @@ about 1.3 KB per client.
 | `test_codex_roles`, `test_codex_agents` | The exceptions are cited and read from `docs/token-practice.md`, and the awareness from the pinned full file. |
 | `test_new_wsl_client_config` | The scratch catalog carries the ai-memory line for the dependent-sentence tests, the kept-line bound is 6, and the record holds the new counts. |
 | `test_landscape_sweep_harness`, `test_managed_block`, `test_scaffold_repo` | Adjusted to the default paragraph, the fragment source and the core's opening. |
+| `examples/claude-native/workflows/test-envelope.mjs` (lines 459 and 480) and `test-contract-mutations.mjs` | The `instructions` binding in `contract.config.json` moves from the portable Claude block to the workflows README, whose mechanics section carries the stage effort literal and the `unrestricted` size guideline. The effort mutation now replaces every occurrence, because the README states the rule in several sections. A new mutation removes the size guideline. `SHA256SUMS` was regenerated for the two changed files. |
 
 ## Overturn conditions
 

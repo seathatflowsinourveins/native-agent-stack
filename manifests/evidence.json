@@ -17847,8 +17847,8 @@
     },
     {
       "path": "docs/decisions/2026-10-08-philosophy-only-rules.md",
-      "sha256": "d820beb68920fd0488765370ccc455f70365c6062e321ce84c1f8c9ff97f372c",
-      "bytes": 9498
+      "sha256": "f4b4f1d9952db662d8c0c9f1f9aec24da40c4666e4655e105c0617a689e6826c",
+      "bytes": 10028
     },
     {
       "path": "docs/direct-results.md",
@@ -54547,12 +54547,12 @@
     },
     {
       "path": "examples/claude-native/workflows/README.md",
-      "sha256": "3d81d17304568702fca8d4787446b61dd5576cf0e22227622a63d37e262ccf0b",
-      "bytes": 112338
+      "sha256": "b9eb9e159ccec19d55d9073a7f4e50beca2b2e64538294496e9af31ac27eaabe",
+      "bytes": 112714
     },
     {
       "path": "examples/claude-native/workflows/SHA256SUMS",
-      "sha256": "db0a5b521a760e2d259b4353f217e884f23c490054e311e7ad94cfc0aa98ef97",
+      "sha256": "d287061d1002fe87906ab671161ddc83795b29daad7c7c600cac4ccf5e83b3b7",
       "bytes": 1217
     },
     {
@@ -54572,8 +54572,8 @@
     },
     {
       "path": "examples/claude-native/workflows/contract.config.json",
-      "sha256": "2e73ed523e115e6a1f55a4cc992bf052e157d9cdd85aeb09cf4ef93d3f996771",
-      "bytes": 350
+      "sha256": "ff73c08c0ec55af194794b614840575d32c9e4174371907e12bffb1aacff70ab",
+      "bytes": 349
     },
     {
       "path": "examples/claude-native/workflows/readiness-audit.js",
@@ -54602,8 +54602,8 @@
     },
     {
       "path": "examples/claude-native/workflows/test-contract-mutations.mjs",
-      "sha256": "cfc4908cea1f53da4e269a10cb5ebb6a4311f9bc477e61c62e245452719eede3",
-      "bytes": 22049
+      "sha256": "2867a2c7ae3a313d346c34338f13ecb23699045d6533013889285cc87f4c7625",
+      "bytes": 22586
     },
     {
       "path": "examples/claude-native/workflows/test-envelope.mjs",
