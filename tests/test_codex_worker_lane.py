@@ -51,7 +51,7 @@ FIXTURES = ROOT / "tests" / "fixtures" / "codex-worker-lane"
 # the block before it is the top-rule marker and the philosophy core only: the
 # routing paragraph, the session-lanes section and the local exceptions left, so
 # the former pre-RTK and session-lanes pins collapse into this one pin.
-TOP_RULE_SHA256 = "2618406a99bf3414e291651c17446e159c9da5885bb8a72091dc77b35c91fb62"
+TOP_RULE_SHA256 = "bc9f31381973206657685bd1169ff18ce1f64304c3cf287be20fec314bd2aae7"
 # The template's RTK section since 2026-10-08 (Codex audit F5): rtk-ai/rtk v0.51.0's default awareness paragraph,
 # hooks/rtk-awareness.md at e001f773, byte for byte. With the `rtk hook codex` PreToolUse hook the full text is not
 # needed (AWARENESS_CONFIG.md:12-13,34-38 at e001f773), and the default paragraph is verbatim at every awareness level
@@ -453,7 +453,7 @@ class TemplateTests(unittest.TestCase):
         # Codex expands no @ reference (codex-rs/core/src/agents_md.rs at rust-v0.157.1 and rust-v0.161.0): the text
         # is inline.
         self.assertFalse([line for line in rendered.splitlines() if line.startswith("@")])
-        # This local 8,192-byte check covers the template, 2,105 bytes since 2026-10-08, which is also the rendered
+        # This local 8,192-byte check covers the template, 2,329 bytes since 2026-10-08, which is also the rendered
         # Codex carrier counted by the startup budget.
         self.assertLess(len(text.encode("utf-8")), 8192)
 
