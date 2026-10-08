@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "id": "decision-record-index-20261008",
+  "kind": "artifact_measurement",
+  "component_ids": [
+    "codex",
+    "claude-code"
+  ],
+  "claim": "One dated repository index makes five October8 decisions, four dated receipts, corrections66-77 plus66a/67a, and all32 existing layer evidence rows findable; PR833 retention is applied as two appended scoped pointers while original historical bodies are preserved.",
+  "limitations": [
+    "Navigation and sanitized retained correction summaries only; no native incident replay, provider/GPU/model/broker execution or new runtime acceptance.",
+    "A related policy/source link does not establish returned incident evidence. Missing sanitized incident and operation receipts remain explicit owner-held deliverables.",
+    "The dated source snapshot has20foundation and12trading layers. The index joins stable IDs and existing evidence views; it does not freeze a winner list or change catalog selections.",
+    "The historical13:39:56Z count47open=15ready+32drafts/132branches is not a current inventory; all current inventory commands need an explicit limit.",
+    "PR833 contains scoped evidence/gate supersession with historical retention, not a document archive/deletion policy. No historical file is deleted or relocated; protected consensus-bound documents remain unchanged.",
+    "The AO effect qualifier is separately pending in PR862 at its bound source head and remains synthetic integration evidence, not live human/provider acceptance."
+  ],
+  "evidence_class": "local_artifact_index_and_pinned_source_retention_check",
+  "authority": "CC133934Z section5; CC142518Z extends correction range66-77",
+  "source_snapshot_revision": "58d235e83c308d97947e623bb7d8503ef6eec369",
+  "recorded_at_utc": "2026-10-08T14:44:24Z",
+  "native_primary_metadata": {
+    "pr": 833,
+    "head": "f51075cc386acdbd382555780f4cafe94e4318ca",
+    "merge": "36654a8174b5cad1380bd13ed1fffc0f135aac2c",
+    "merged_at": "2026-10-07T23:47:08Z",
+    "readback_cache": "5m",
+    "pr_and_file_calls_exit_code": 0,
+    "executed_command_vector": "The gh child commands were supplied directly as subprocess vectors; complete public endpoint/field selectors are retained in private source-check receipt, separate from sanitized summaries."
+  },
+  "index_paths": [
+    "docs/decisions/2026-10-08-decision-record-index.md",
+    "evidence/artifacts/decision-records-20261008/index.json"
+  ],
+  "source_artifact_digests": {
+    "catalogs/landscape/component-evidence-matrix.json": "c761d3e6ec61a3c2d822d36f0afc7d49c6cb0da0269245e1c06516818b23aa00",
+    "catalogs/landscape/new-host-grand-list.json": "c14b646026cf2956e22ef7d118edb8e97eba76117a4181c2052fca72272b5dca",
+    "docs/decisions/2026-10-07-clean-upstream-install-finalizes-a-candidate.md": "694871937e1408b396eb3b24a5abdf9714bf37b6f5bc942ad93a71dfb2cf1e45",
+    "docs/decisions/2026-10-06-upstream-evidence-over-local-evaluation.md": "84d221fd7d059107e586a353889401ac950e85955f79334c57c716731b9156a3"
+  },
+  "observed_coverage": {
+    "decision_paths": 5,
+    "dated_receipt_paths": 4,
+    "correction_entries": 14,
+    "correction_numbers": [
+      "66",
+      "66a",
+      "67",
+      "67a",
+      "68",
+      "69",
+      "70",
+      "71",
+      "72",
+      "73",
+      "74",
+      "75",
+      "76",
+      "77"
+    ],
+    "foundation_layers": 20,
+    "trading_layers": 12,
+    "total_layers": 32,
+    "all_layer_pairs_match_both_native_views": true,
+    "referenced_public_source_paths": 30,
+    "missing_referenced_public_source_paths": [],
+    "dated_host_receipts_in_snapshot": 0,
+    "dated_other_evidence_artifacts_in_snapshot": 0
+  },
+  "retention_observation": {
+    "pointer_paths": [
+      "docs/decisions/2026-10-04-new-wsl-token-layer-default.md",
+      "docs/decisions/2026-10-04-round2-plan-g4-config.md"
+    ],
+    "original_body_is_identical_prefix": true,
+    "original_digests": [
+      {
+        "path": "docs/decisions/2026-10-04-new-wsl-token-layer-default.md",
+        "original_sha256": "51bb422d713c5df21d6228f7e83440dafa48a576e424a02db5e867dfd8d7b2c5",
+        "source_revision": "58d235e83c308d97947e623bb7d8503ef6eec369"
+      },
+      {
+        "path": "docs/decisions/2026-10-04-round2-plan-g4-config.md",
+        "original_sha256": "9e9dccd3aa0959299b36f8b07c8d4e13fa61e33800a44ecf212925dc4f813dc0",
+        "source_revision": "58d235e83c308d97947e623bb7d8503ef6eec369"
+      }
+    ],
+    "protected_history_byte_unchanged": true,
+    "deleted_or_relocated_files": 0,
+    "scope": "Foundation selection/readiness gates only. Application/wiring/CI/strategy/paper checks retain their separate scope."
+  },
+  "independent_observation": {
+    "retention_critic": "PASS at source snapshot; original bodies are byte-identical prefixes, protected documents unchanged, no archive/deletion policy invented.",
+    "index_completeness_critic": "14unique correction entries and amendment boundaries, 5decision/4receipt paths, 32IDs and both native source hashes match; value-free incident entries and missing receipts explicit. Documentation cache syntax corrected and publication receipt supplied.",
+    "pending_pr_boundary": "PR862 head is an external pinned artifact link, not a local landed receipt or new incident acceptance."
+  },
+  "inverse": "Withdraw only this index/receipt and appended scope pointers by reverting the bounded publication commit. Retained historical bodies and canonical native layer maps remain at their original source paths. No host installation/state or credential inverse is needed.",
+  "research_sources": [
+    "https://cli.github.com/manual/gh_api",
+    "https://cli.github.com/manual/gh_pr_list",
+    "https://github.com/seathatflowsinourveins/native-agent-stack/pull/833"
+  ],
+  "next_sweep": "Join newly published owner incident receipts and current layer15/gateway evidence by their exact source/evidence revisions; keep credential incident payloads private and verify any claimed remediation through value-free native records."
+}

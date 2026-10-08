@@ -125,3 +125,8 @@ sentence, so whichever of the two lands second recounts it.
   2026-10-02 rulings.
 - context-supply resolving to no layer. The rtk pieces unwire with the slot automatically.
 - A filtered carrier for the installed lanes. It replaces the shared carrier on this distribution.
+
+
+## Retained scope after PR833 — 2026-10-08
+
+The Harbor/token-component selection and future comparative retention gates in this dated record are historical. Foundation selection/readiness follows upstream evidence and the maintained vendor installation/check; its earlier results, usage boundaries and wiring evidence keep their original scope. Read the [October6 supersession record](2026-10-06-upstream-evidence-over-local-evaluation.md) with the [October7 amendment](2026-10-07-clean-upstream-install-finalizes-a-candidate.md) for the current rule. This appended pointer preserves the preceding historical text and line citations. The [daily decision/receipt/correction index](2026-10-08-decision-record-index.md) keeps the original and replacement evidence findable.
