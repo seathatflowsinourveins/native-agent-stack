@@ -288,8 +288,9 @@ class SecurityScanTests(unittest.TestCase):
 
     def test_the_write_token_never_reaches_an_installed_tool(self):
         self.assertIn("GH_TOKEN: ${{ github.token }}", jobs(self.text)["zizmor-online"])
-        # OSV uploads the ordinary and frozen macOS reports under separate categories.
-        for tool_job, upload_job, uploads in (("osv-scanner", "osv-sarif-upload", 2), ("zizmor-online", "zizmor-sarif-upload", 1)):
+        # Frozen SARIF moves to its separate report-only workflow; the required
+        # ordinary scan retains its own upload and installed tools stay read-only.
+        for tool_job, upload_job, uploads in (("osv-scanner", "osv-sarif-upload", 1), ("zizmor-online", "zizmor-sarif-upload", 1)):
             upload = jobs(self.text)[upload_job]
             self.assertIn(f"needs: {tool_job}", upload, upload_job)
             self.assertNotRegex(upload, r"(?m)^\s+(- )?run:", f"{upload_job} (write scope) runs no shell step")
@@ -311,12 +312,22 @@ class SecurityScanTests(unittest.TestCase):
         self.assertIn("github.event_name != 'pull_request'", block_if(upload))
         self.assertIn(UPLOAD_SARIF, upload)
         self.assertIn("category: osv-scanner\n", upload)
-        self.assertIn("category: osv-scanner-frozen-macos", upload)
-        # Every group writes a report; all primary and SARIF statuses participate in the final status.
-        for report in ("osv-scanner.sarif", "osv-scanner-frozen-macos.sarif"):
-            self.assertIn(report, job)
-            self.assertIn(report, upload)
-        self.assertIn("frozen_status", job)
+        self.assertNotIn("category: osv-scanner-frozen-macos", upload)
+        # Native ordinary scan and SARIF outcomes both gate the required job.
+        self.assertIn("osv-scanner.sarif", job)
+        self.assertIn("osv-scanner.sarif", upload)
+        self.assertIn('statuses=("$status")', job)
+        self.assertIn('statuses+=("$sarif_status")', job)
+        self.assertIn('for code in "${statuses[@]}"', job)
+        self.assertNotIn("frozen_status", job)
+        self.assertNotIn("scan_frozen", job)
+        # Required artifact eligibility guards remain, even though advisories
+        # now report in a separately named, non-required context.
+        self.assertIn("tests.test_osv_lockfile_coverage.FrozenScanTests", job)
+        frozen = (ROOT / ".github/workflows/frozen-evidence-risk.yml").read_text(encoding="utf-8")
+        self.assertIn("category: osv-scanner-frozen-macos", frozen)
+        self.assertIn("osv-scanner-frozen-macos.sarif", frozen)
+        self.assertNotIn("continue-on-error", frozen)
         # The retired WSL group's scan and upload went with its lock's rename out of discovery (2026-10-04).
         self.assertNotIn("frozen-wsl", self.text)
         self.assertNotIn("frozen_wsl", self.text)
@@ -346,13 +357,12 @@ class SecurityScanTests(unittest.TestCase):
         # guard even if `uses:` were reordered ahead of `if:`.
         # The artifact step and the downstream upload job both need it.
         osv_job = jobs(self.text)["osv-scanner"]
-        upload = jobs(self.text)["osv-sarif-upload"]
-        for name in ("Upload the frozen-artifact OSV-Scanner SARIF to code scanning",):
-            guard = block_if(step_block(upload, name))
-            self.assertIsNotNone(guard, f"{name} must run after an earlier upload fails")
-            self.assertRegex(guard, r"!\s*cancelled\(\)", name)
+        frozen_jobs = jobs((ROOT / ".github/workflows/frozen-evidence-risk.yml").read_text(encoding="utf-8"))
         for label, block in (("OSV SARIF artifact step", step_block(osv_job, "Keep the OSV-Scanner SARIF for the upload job")),
-                             ("osv-sarif-upload job", jobs(self.text)["osv-sarif-upload"])):
+                             ("osv-sarif-upload job", jobs(self.text)["osv-sarif-upload"]),
+                             ("frozen report artifact step", step_block(frozen_jobs["frozen-evidence-risk"],
+                                                                       "Retain the frozen native reports and diagnostics")),
+                             ("frozen SARIF upload job", frozen_jobs["frozen-osv-sarif-upload"])):
             guard = block_if(block)
             self.assertIsNotNone(guard, f"the {label} must have its own if: guard")
             self.assertRegex(guard, r"!\s*cancelled\(\)|always\(\)",

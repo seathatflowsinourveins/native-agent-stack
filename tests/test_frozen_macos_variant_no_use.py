@@ -2,10 +2,13 @@
 
 ARTIFACT (below) keeps the run summary and, under variant/, the package.json and pnpm-lock.yaml of the application
 that ran on the Mac on 2026-09-24. The lock pins next 16.3.5, in the range of GHSA-vcvr-r3jv-pc5j (critical, fixed in
-16.3.6). .github/osv-scanner-frozen-macos.toml excepts that advisory for this one lock until 2026-12-24, and Dependabot
+16.3.6). The retained historical .github/osv-scanner-frozen-macos.toml records that exception until 2026-12-24;
+maintained workflows now report unfiltered frozen findings separately and never load that old exception file
+(docs/decisions/2026-10-07-frozen-evidence-osv-reporting.md). Dependabot
 alert 16 on the variant's package.json was dismissed as not_used
 (docs/decisions/2026-09-22-github-automation-closure.md, evidence/receipts/dependabot-alert-16-dismissal-20261003.json),
-because nothing in this repository installs, builds or serves the variant. These tests fail when:
+after the retained review found no supported install, build or serving route for the variant. This tripwire's
+direct-reference coverage does not prove universal unreachability. These tests fail when:
 
 - the artifact directory holds a file besides run-summary.json, variant/package.json and variant/pnpm-lock.yaml
   (ARTIFACT_FILES), on disk or in Git, apart from OS metadata files (OS_METADATA). The whole directory is watched, not
@@ -103,8 +106,8 @@ REVIEW_DATE = datetime.date(2026, 12, 24)
 EXCEPTION_KEYS = {"id", "ignoreUntil", "reason"}
 
 REOPEN = (
-    "reopen Dependabot alert 16 and remove the frozen OSV exception (its config .github/osv-scanner-frozen-macos.toml, "
-    "its inventory key in .github/osv-scanner-lockfiles.json and its FROZEN_LOCKS row in "
+    "reopen Dependabot alert 16, move the lock into the required ordinary scan in "
+    ".github/osv-scanner-lockfiles.json and remove its report-only FROZEN_LOCKS eligibility row in "
     "tests/test_osv_lockfile_coverage.py) before installing, building or serving from the lock "
     "(docs/decisions/2026-09-22-github-automation-closure.md, 'Dependabot alert 16')"
 )
@@ -176,6 +179,10 @@ PINNED_LINES: dict[str, list[tuple[str, str]]] = {
     ],
     # The OSV job's check that the frozen config is assigned to this lock alone.
     ".github/workflows/security-scan.yml": [(SCAN_ASSIGNMENT, "the frozen config's assignment check")],
+    ".github/workflows/frozen-evidence-risk.yml": [
+        ("351433a1e19559754ec9f115b4ed30b44af29f8312a2db9015c75d808cfc8eeb",
+         "the report-only scanner's exact frozen assignment check; no install/build/server route"),
+    ],
     # The convergence record of the 2026-09-24 run: hashed paths in frozen_inputs and in the observations' artifacts.
     EXPERIMENT: [
         (LOCK_PATH, "frozen_inputs.sources: the variant lock"),

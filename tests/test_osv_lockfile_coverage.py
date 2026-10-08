@@ -7,9 +7,10 @@ when an ignore in .github/osv-scanner.toml lacks an id, a reason or an ignoreUnt
 days away, and when a repo-wide ignore would hide a pin that IGNORE_ALLOWED_LOCKS does not allow
 for that lock and advisory at the lock's reviewed sha256. That guard follows includes and fails
 closed on a version or line it cannot parse strictly; an allowed lock must be self-contained, and
-an ignore counts as active only before its ignoreUntil date. A dated exception for one frozen artifact lives in a config of its own
-that only that lock's scan uses (FROZEN_LOCKS). The workflow and these policy checks enforce the split and scope;
-OSV applies an explicit config to every invocation input and does not enforce that path boundary itself.
+an ignore counts as active only before its ignoreUntil date. Inactive frozen evidence is reported without exceptions
+in a separate non-required workflow (FROZEN_LOCKS). Its digest, owner, evidence and disposition review remain required
+metadata checks. The prior dated TOML is retained as immutable historical evidence, not an active scanner config.
+OSV applies an explicit config to every invocation input; the callers and these checks enforce the input boundary.
 """
 
 from datetime import date, datetime, timedelta, timezone
@@ -29,7 +30,11 @@ from unittest.mock import patch
 ROOT = Path(__file__).resolve().parents[1]
 INVENTORY = ROOT / ".github/osv-scanner-lockfiles.json"
 CONFIG = ROOT / ".github/osv-scanner.toml"
-FROZEN_CONFIG = ".github/osv-scanner-frozen-macos.toml"
+FROZEN_CONFIG = ".github/osv-scanner-frozen-report.toml"
+RETIRED_FROZEN_CONFIG = ".github/osv-scanner-frozen-macos.toml"
+RETIRED_FROZEN_CONFIG_SHA256 = "a00d1e2df72d7aca121ae39380e9c0f761a5d3d32d0392fa598502bdae2a89c6"
+FROZEN_DECISION = "docs/decisions/2026-10-07-frozen-evidence-osv-reporting.md"
+FROZEN_REPORT_WORKFLOW = ROOT / ".github/workflows/frozen-evidence-risk.yml"
 WORKFLOW = ROOT / ".github/workflows/security-scan.yml"
 # Dependency lockfile and manifest names in this repository or supported by OSV-Scanner v2's
 # source extractors (docs/supported_languages_and_lockfiles.md at v2.6.0).
@@ -81,21 +86,22 @@ IGNORE_ALLOWED_LOCKS = {
         "evidence": "evidence/receipts/osv-openhands-fsspec-relock-20261005.json",
     },
 }
-# A dated exception for one frozen artifact is not a repo-wide ignore: OSV-Scanner 2.6.0 applies an explicit --config to every input of its
-# invocation (docs/configuration.md, internal/config/manager.go Manager.Get), so the exception lives in a config of its own and security-scan.yml
-# scans the inventory entries that name it in an invocation of their own, and every other entry under CONFIG, which holds no exception for the
-# advisory. FROZEN_LOCKS binds each such config to the one lock it is for: its advisories, the lock's sha256 (a changed lock needs a new review)
-# and the repository path of the evidence.
+# OSV's explicit config has invocation-wide scope (v2.6.0 docs/configuration.md and Manager.Get).
+# FROZEN_LOCKS binds the independent, unsuppressed report to reviewed bytes and an inactive disposition.
+# The historical advisory IDs prevent their exceptions leaking into production; they grant no suppression.
 FROZEN_LOCKS = {
-    # Frozen macOS application variant (2026-09-24): package.json and this lock only, no source, installed by nothing here.
+    # Package.json and this retained lock only. The direct-use tripwire is bounded, not universal unreachability.
     "evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml": {
         "config": FROZEN_CONFIG,
-        "advisories": ["GHSA-vcvr-r3jv-pc5j", "GHSA-68fv-2mgg-jv7q", "GHSA-wq5f-xc86-pv6w",
+        "historical_advisories": ["GHSA-vcvr-r3jv-pc5j", "GHSA-68fv-2mgg-jv7q", "GHSA-wq5f-xc86-pv6w",
                        # next 16.3.5; first patched in 16.3.8 (advisories published 2026-10-07)
                        "GHSA-39w2-rjm5-chcv", "GHSA-3w37-wq28-93x7", "GHSA-4jqv-mc3x-m676",
                        "GHSA-cjq9-62q9-8jv4", "GHSA-f87g-xv8r-7p7x", "GHSA-mcj8-r9mp-w47p"],
         "sha256": "f1c707b8295e85bd396e49b990de92dc82bc0d58eca1e4e4bef31262d9898cd2",
         "evidence": "evidence/receipts/osv-frozen-macos-next-1638-20261007.json",
+        "owner": "github-ci-finalize",
+        "disposition_review_until": "2026-12-24",
+        "decision": FROZEN_DECISION,
     },
 }
 
@@ -594,6 +600,30 @@ class IgnorePolicyTests(unittest.TestCase):
             self.assertLessEqual(until, latest, f"{entry}: effectiveUntil more than 90 days away")
 
 
+def frozen_disposition_problems(grants=None, today=None):
+    """Required eligibility metadata, separate from the advisory scanner's findings."""
+    grants = FROZEN_LOCKS if grants is None else grants
+    today = datetime.now(timezone.utc).date() if today is None else today
+    problems = []
+    for path, grant in grants.items():
+        if grant.get("owner") != "github-ci-finalize":
+            problems.append(f"{path}: missing or unassigned disposition owner")
+        if grant.get("decision") != FROZEN_DECISION or not (ROOT / grant.get("decision", "")).is_file():
+            problems.append(f"{path}: disposition must bind its existing decision record")
+        until = grant.get("disposition_review_until")
+        if not isinstance(until, str) or not re.fullmatch(r"\d{4}-\d{2}-\d{2}", until):
+            problems.append(f"{path}: disposition_review_until must be an ISO date scalar")
+            continue
+        try:
+            deadline = date.fromisoformat(until)
+        except ValueError:
+            problems.append(f"{path}: invalid disposition_review_until date")
+            continue
+        if deadline <= today:
+            problems.append(f"{path}: inactive disposition review has lapsed (UTC)")
+    return problems
+
+
 class FrozenScanTests(unittest.TestCase):
     """The workflow and policy preflight bind each explicit OSV config to its reviewed artifact; OSV itself applies it to all inputs."""
 
@@ -621,8 +651,8 @@ class FrozenScanTests(unittest.TestCase):
     def test_the_ordinary_config_has_no_exception_for_a_frozen_advisory(self):
         self.assertEqual(ignore_entry_problems(self.ordinary_config), [])
         ids = {entry["id"] for entry in self.ordinary_config.get("IgnoredVulns", [])}
-        frozen_ids = {advisory for lock in FROZEN_LOCKS.values() for advisory in lock["advisories"]}
-        self.assertEqual(ids & frozen_ids, set(), "the exception belongs in the frozen config, which only the frozen scan uses")
+        frozen_ids = {advisory for lock in FROZEN_LOCKS.values() for advisory in lock["historical_advisories"]}
+        self.assertEqual(ids & frozen_ids, set(), "historical frozen exceptions must not suppress production inputs")
         self.assertEqual({override.get("name") for override in self.ordinary_config.get("PackageOverrides", [])} & {"next", "braces"}, set())
         self.assertEqual(override_problems(self.ordinary_config), [])
 
@@ -649,32 +679,46 @@ class FrozenScanTests(unittest.TestCase):
                 self.assertNotEqual(override_problems({"PackageOverrides": [override]}), [], override)
 
     def test_each_frozen_config_holds_exactly_the_advisories_of_its_locks(self):
+        """Amended policy: the active frozen report config holds zero exceptions."""
         for config_path in sorted({lock["config"] for lock in FROZEN_LOCKS.values()}):
             config = tomllib.loads((ROOT / config_path).read_text(encoding="utf-8"))
-            self.assertEqual(set(config), {"IgnoredVulns"}, "a frozen config holds ignores only, no package override")
-            expected = sorted(advisory for lock in FROZEN_LOCKS.values() if lock["config"] == config_path for advisory in lock["advisories"])
-            self.assertEqual(sorted(entry["id"] for entry in config["IgnoredVulns"]), expected)
-            self.assertEqual(ignore_entry_problems(config), [])
-            self.assertEqual(active_ignores(config), set(expected), 'an archive exception must still be active (UTC)')
+            self.assertEqual(config, {}, "the frozen native report must use an explicit empty config")
+
+    def test_each_frozen_disposition_has_an_owner_decision_and_current_review(self):
+        self.assertEqual(frozen_disposition_problems(), [])
+
+    def test_retired_frozen_config_keeps_its_historical_bytes(self):
+        self.assertEqual(hashlib.sha256((ROOT / RETIRED_FROZEN_CONFIG).read_bytes()).hexdigest(),
+                         RETIRED_FROZEN_CONFIG_SHA256, "historical exception TOML bytes are immutable")
 
     def test_each_frozen_lock_matches_its_reviewed_digest_and_names_evidence(self):
         for path, lock in FROZEN_LOCKS.items():
             self.assertTrue((ROOT / path).is_file(), path)
             self.assertEqual(hashlib.sha256((ROOT / path).read_bytes()).hexdigest(), lock["sha256"],
-                             f"{path} changed after its review: re-review whether it reaches the advisories of its config, then record the new sha256")
+                             f"{path} changed after its review: re-review its inactive classification and required coverage")
             self.assertTrue((ROOT / lock["evidence"]).is_file(), lock["evidence"])
 
     def test_the_workflow_scans_each_config_in_its_own_invocation(self):
+        """The required workflow scans production; the independent report scans only frozen inputs."""
         text = self.workflow
+        report = FROZEN_REPORT_WORKFLOW.read_text(encoding="utf-8")
         configs = {lock["config"] for lock in FROZEN_LOCKS.values()}
         self.assertEqual(re.findall(r"(?m)^\s+frozen_config=(\S+)$", text), sorted(configs))
-        for needle in ('select(has("config") | not)', 'select(.config == $config)', "--config .github/osv-scanner.toml", '--config "$frozen_config"',
+        self.assertEqual(re.findall(r"(?m)^\s+frozen_config=(\S+)$", report), sorted(configs))
+        for needle in ('select(has("config") | not)', 'select(.config == $config)', "--config .github/osv-scanner.toml",
                        '$(( ${#lockfiles[@]} + ${#frozen[@]} ))',
-                       'jq \'.lockfiles | length\' "$inventory"', "osv-scanner-frozen-macos.sarif"):
+                       'jq \'.lockfiles | length\' "$inventory"'):
             self.assertIn(needle, text, needle)
-        # the frozen scan never gets the ordinary lock list, and the ordinary scan never gets the frozen one
-        self.assertEqual(text.count('"${frozen[@]}")'), 1)
+        for needle in ('select(.config == $config)', '--config "$frozen_config"', '--no-resolve "${frozen[@]}"',
+                       "osv-scanner-frozen-macos.sarif"):
+            self.assertIn(needle, report, needle)
+        self.assertNotIn('--config "$frozen_config"', text)
+        self.assertNotIn("osv-scanner-frozen-macos.sarif", text)
         self.assertEqual(text.count('"${lockfiles[@]}")'), 1)
+        self.assertEqual(report.count('"${frozen[@]}")'), 1)
+        for maintained in (text, report):
+            self.assertNotIn("--config " + RETIRED_FROZEN_CONFIG, maintained)
+            self.assertNotIn("frozen_config=" + RETIRED_FROZEN_CONFIG, maintained)
         # The retired WSL group went on 2026-10-04, when its lock was renamed out of discovery; only the
         # preflight's retirement tests still name that partition.
         rest = [line for line in text.splitlines() if "tests.test_wsl_retrieval.RetiredRunnerTests" not in line]
@@ -752,6 +796,7 @@ class SyntheticWorkflowInvocationTests(unittest.TestCase):
         return result, calls, artifacts
 
     def test_two_invocations_keep_every_input_and_parser_separate(self):
+        """Required primary/SARIF invocations now cover ordinary inputs only; the report owns frozen inputs."""
         result, calls, artifacts = self.run_step()
         self.assertEqual(result.returncode, 0, result.stderr)
         preflight = [call for call in calls if call['kind'] == 'preflight']
@@ -760,11 +805,11 @@ class SyntheticWorkflowInvocationTests(unittest.TestCase):
         self.assertIn('tests.test_osv_lockfile_coverage.FrozenScanTests', preflight[0]['argv'])
         self.assertIn('tests.test_wsl_retrieval.RetiredRunnerTests', preflight[0]['argv'])
         scanners = [call['argv'] for call in calls if call['kind'] == 'scanner']
-        self.assertEqual(len(scanners), 4)
+        self.assertEqual(len(scanners), 2)
         for argv in scanners:
             self.assertEqual(sum(arg == '--config' or arg.startswith('--config=') for arg in argv), 1, argv)
         inventory = json.loads(INVENTORY.read_text(encoding='utf-8'))
-        for config in self.configs:
+        for config in self.configs[:1]:
             group = [argv for argv in scanners
                      if [argv[index + 1] if arg == '--config' else arg.split('=', 1)[1]
                          for index, arg in enumerate(argv) if arg == '--config' or arg.startswith('--config=')] == [config]]
@@ -777,25 +822,30 @@ class SyntheticWorkflowInvocationTests(unittest.TestCase):
                 self.assertEqual(argv[:2], ['scan', 'source'])
                 self.assertIn('--no-resolve', argv)
                 self.assertEqual([arg for arg in argv if arg.startswith('--lockfile=')], expected)
-        self.assertEqual(artifacts, ['osv-scanner-frozen-macos.sarif', 'osv-scanner.sarif'])
+        self.assertTrue(all(FROZEN_CONFIG not in argv for argv in scanners))
+        self.assertEqual(artifacts, ['osv-scanner.sarif'])
 
     def test_each_primary_and_sarif_status_is_retained(self):
-        cases = [((1, 0), (0, 0), 1), ((0, 1), (0, 0), 1),
+        cases = [((1, 0), (0, 0), 1), ((0, 1), (0, 0), 0),
                  ((2, 0), (0, 0), 2), ((0, 0), (1, 0), 1),
-                 ((0, 0), (0, 1), 1), ((0, 0), (0, 7), 7),
-                 ((0, 7), (2, 0), 7), ((0, 127), (0, 0), 127)]
+                 ((0, 0), (0, 1), 0), ((0, 0), (0, 7), 0),
+                 ((0, 7), (2, 0), 2), ((0, 127), (0, 0), 0),
+                 ((7, 0), (1, 0), 7), ((127, 1), (0, 7), 127)]
         for primary, sarif, expected in cases:
             with self.subTest(primary=primary, sarif=sarif):
                 result, calls, artifacts = self.run_step(primary=primary, sarif=sarif)
                 self.assertEqual(result.returncode, expected, result.stderr)
-                self.assertEqual(len([call for call in calls if call['kind'] == 'scanner']), 4)
-                self.assertEqual(len(artifacts), 2)
+                self.assertEqual(len([call for call in calls if call['kind'] == 'scanner']), 2)
+                self.assertEqual(len(artifacts), 1)
 
     def test_pr_collects_both_primary_statuses_without_sarif(self):
-        result, calls, artifacts = self.run_step(primary=(0, 1), write_sarif=False)
-        self.assertEqual(result.returncode, 1, result.stderr)
-        self.assertEqual(len([call for call in calls if call['kind'] == 'scanner']), 2)
-        self.assertEqual(artifacts, [])
+        """Frozen findings/errors no longer enter the required PR primary result."""
+        for primary, expected in (((0, 1), 0), ((1, 0), 1), ((2, 127), 2)):
+            with self.subTest(primary=primary):
+                result, calls, artifacts = self.run_step(primary=primary, write_sarif=False)
+                self.assertEqual(result.returncode, expected, result.stderr)
+                self.assertEqual(len([call for call in calls if call['kind'] == 'scanner']), 1)
+                self.assertEqual(artifacts, [])
 
     def test_unknown_duplicate_missing_and_wrong_archive_assignments_fail_before_scan(self):
         for mutation in ['unknown-config', 'duplicate', 'missing-archive', 'wrong-archive-lock']:
@@ -849,13 +899,13 @@ class SyntheticWorkflowInvocationTests(unittest.TestCase):
             ('R2 omitted ordinary input and weakened count', routing, [
                 ('| select(has("config") | not) |', '| select(has("config") | not) | select(.path != ".github/requirements-ci.txt") |'),
                 (count_guard, count_guard.replace('-eq', '-le'))]),
-            ('macOS scan uses ordinary config', routing, [
-                ('scan_frozen=("$RUNNER_TEMP/osv-scanner/osv-scanner" scan source --config "$frozen_config"',
-                 'scan_frozen=("$RUNNER_TEMP/osv-scanner/osv-scanner" scan source --config .github/osv-scanner.toml')]),
+            ('ordinary scan uses frozen config', routing, [
+                ('scan=("$RUNNER_TEMP/osv-scanner/osv-scanner" scan source --config .github/osv-scanner.toml',
+                 'scan=("$RUNNER_TEMP/osv-scanner/osv-scanner" scan source --config "$frozen_config"')]),
             ('primary status dropped', statuses, [
-                ('statuses=("$status" "$frozen_status")', 'statuses=("$status")')]),
+                ('status=$?\nstatuses=("$status")', 'status=0\nstatuses=("$status")')]),
             ('R3 SARIF statuses dropped', statuses, [
-                ('statuses+=("$sarif_status" "$frozen_sarif_status")\n', '')]),
+                ('statuses+=("$sarif_status")\n', '')]),
             ('scanner error no longer wins', statuses, [
                 ('if [ "$code" -gt "$status" ]; then', 'if [ "$code" -eq 1 ]; then')]),
             ('preflight failure ignored', 'test_preflight_failure_is_returned_before_scan', [
@@ -901,6 +951,12 @@ class FrozenPolicyMutationTests(unittest.TestCase):
             evidence = self.scratch / grant['evidence']
             evidence.parent.mkdir(parents=True, exist_ok=True)
             evidence.write_text('{"synthetic_policy_fixture": true}\n', encoding='utf-8')
+            decision = self.scratch / grant["decision"]
+            decision.parent.mkdir(parents=True, exist_ok=True)
+            decision.write_bytes((ROOT / grant["decision"]).read_bytes())
+        retired = self.scratch / RETIRED_FROZEN_CONFIG
+        retired.parent.mkdir(parents=True, exist_ok=True)
+        retired.write_bytes((ROOT / RETIRED_FROZEN_CONFIG).read_bytes())
         # The frozen macOS archive is the one config-bound lock since the WSL group's removal (2026-10-04).
         self.lock, grant = next(iter(FROZEN_LOCKS.items()))
         self.config = self.scratch / grant['config']
@@ -947,7 +1003,7 @@ class FrozenPolicyMutationTests(unittest.TestCase):
                 if mutation == 'advisory':
                     # Well formed, so the frozen-id check is the only one that can reject it.
                     config.setdefault('IgnoredVulns', []).append({
-                        'id': FROZEN_LOCKS[self.lock]['advisories'][0], 'reason': 'synthetic leaked exception',
+                        'id': FROZEN_LOCKS[self.lock]['historical_advisories'][0], 'reason': 'synthetic leaked exception',
                         'ignoreUntil': date.today() + timedelta(days=30)})
                     self.assertEqual(ignore_entry_problems(config), [])
                 else:
@@ -964,11 +1020,29 @@ class FrozenPolicyMutationTests(unittest.TestCase):
         self.assert_rejected('test_each_frozen_config_holds_exactly_the_advisories_of_its_locks')
 
     def test_expired_config_is_rejected_by_the_actual_preflight_guard(self):
-        text = self.config.read_text(encoding='utf-8')
-        expired = re.sub(r'(?m)^ignoreUntil = \S+$', 'ignoreUntil = 2000-01-01', text)
-        self.assertNotEqual(expired, text, 'the frozen config has no ignoreUntil line to expire')
-        self.config.write_text(expired, encoding='utf-8')
-        self.assert_rejected('test_each_frozen_config_holds_exactly_the_advisories_of_its_locks')
+        """Expiry now belongs to required inactive eligibility, not the retired ignore table."""
+        method = 'test_each_frozen_disposition_has_an_owner_decision_and_current_review'
+        self.assertTrue(self.check(method).wasSuccessful())
+        for until in ("2000-01-01", datetime.now(timezone.utc).date().isoformat()):
+            grants = {path: dict(grant, disposition_review_until=until) for path, grant in FROZEN_LOCKS.items()}
+            with patch(__name__ + ".FROZEN_LOCKS", grants):
+                self.assert_rejected(method)
+
+    def test_missing_owner_decision_and_invalid_review_are_rejected(self):
+        method = 'test_each_frozen_disposition_has_an_owner_decision_and_current_review'
+        for key, value in (("owner", ""), ("decision", "evidence/no-such-decision.md"),
+                           ("disposition_review_until", "not-a-date")):
+            with self.subTest(field=key):
+                grants = {path: dict(grant, **{key: value}) for path, grant in FROZEN_LOCKS.items()}
+                with patch(__name__ + ".FROZEN_LOCKS", grants):
+                    self.assert_rejected(method)
+
+    def test_retired_config_cannot_change_its_historical_bytes(self):
+        method = 'test_retired_frozen_config_keeps_its_historical_bytes'
+        self.assertTrue(self.check(method).wasSuccessful())
+        retired = self.scratch / RETIRED_FROZEN_CONFIG
+        retired.write_bytes(retired.read_bytes() + b"\n# synthetic changed byte\n")
+        self.assert_rejected(method)
 
     def test_ordinary_inventory_omission_is_rejected_by_the_actual_preflight_guard(self):
         inventory = json.loads(INVENTORY.read_text(encoding='utf-8'))
