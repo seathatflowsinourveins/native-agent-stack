@@ -1,0 +1,5 @@
+# Explicit empty OSV-Scanner v2.6.0 configuration for frozen evidence reporting.
+# The workflow selects only FROZEN_LOCKS and preserves native findings/errors.
+# No vulnerability, package or license exceptions are active in this config.
+# The prior frozen macOS TOML remains byte-identical historical evidence.
+# Decision: docs/decisions/2026-10-07-frozen-evidence-osv-reporting.md

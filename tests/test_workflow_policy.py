@@ -129,6 +129,8 @@ WRITE_GRANTS = {
     "publish-catalog.yml:release": ["contents: write"],
     "saturation-tracking.yml:issue": ["issues: write"],
     "scorecard.yml:analysis": ["security-events: write"],
+    "frozen-evidence-risk.yml:frozen-osv-sarif-upload": ["security-events: write"],
+    "frozen-evidence-risk.yml:frozen-risk-review": ["issues: write"],
     "security-scan.yml:osv-sarif-upload": ["security-events: write"],
     "security-scan.yml:zizmor-sarif-upload": ["security-events: write"],
 }
