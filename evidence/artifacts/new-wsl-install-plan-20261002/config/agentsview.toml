@@ -4,4 +4,4 @@ host = "127.0.0.1"
 port = 21808
 no_browser = true
 disable_update_check = true
-archive_content = "usage"
+archive_content = "full"

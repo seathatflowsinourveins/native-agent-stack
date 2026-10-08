@@ -5,5 +5,5 @@ set -euo pipefail
 export AGENTSVIEW_DATA_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/new-wsl-native-stack/agentsview"
 export AGENTSVIEW_TELEMETRY_ENABLED=0
 export AGENTSVIEW_DISABLE_UPDATE_CHECK=1
-export AGENTSVIEW_ARCHIVE_CONTENT=usage
+export AGENTSVIEW_ARCHIVE_CONTENT=full
 exec "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/tools/agentsview-0.44.0/agentsview" "$@"

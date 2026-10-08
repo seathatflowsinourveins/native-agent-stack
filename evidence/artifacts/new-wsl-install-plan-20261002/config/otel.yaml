@@ -488,7 +488,9 @@ connectors:
   # OmniRoute v3.8.51 open-sse/services/routing/otel.ts emits gen_ai usage attributes;
   # this accepts its supported OTLP route without changing its unit environment.
   span_metrics:
-    dimensions: [{name: gen_ai.tool.name}, {name: gen_ai.request.model}]
+    # 2026-10-08: OmniRoute request spans (open-sse/services/routing/otel.ts) carry routing status/outcome and provider;
+    # these bounded dimensions put gateway status and errors into Prometheus via traces_span_metrics_calls_total.
+    dimensions: [{name: gen_ai.tool.name}, {name: gen_ai.request.model}, {name: omniroute.routing.status}, {name: omniroute.routing.outcome}, {name: gen_ai.provider.name}]
     # Span names may contain producer text; the connector exports only bounded dimensions.
     exclude_dimensions: [span.name]
     metrics_expiration: 30m
