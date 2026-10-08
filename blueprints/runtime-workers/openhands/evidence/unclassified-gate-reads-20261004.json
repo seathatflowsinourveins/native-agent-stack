@@ -1,7 +1,7 @@
 {
-  "base_commit": "3636e7182b220be945818a367e4daefa643bfc26",
-  "count": 321,
-  "date": "2026-10-04",
+  "base_commit": "0ca21c31b36e0a9aa99de949fe77dd5b7dff83c3",
+  "count": 330,
+  "date": "2026-10-08",
   "mode": "monitoring_only",
   "unclassified": [
     "blueprints/blind-catalog-convergence/audit_reports.py:35",
@@ -21,11 +21,11 @@
     "scripts/component_matrix.py:539",
     "scripts/component_matrix.py:540",
     "scripts/component_matrix.py:880",
-    "scripts/credential_status.py:323",
-    "scripts/credential_status.py:469",
-    "scripts/credential_status.py:526",
-    "scripts/credential_status.py:533",
-    "scripts/credential_status.py:536",
+    "scripts/credential_status.py:345",
+    "scripts/credential_status.py:491",
+    "scripts/credential_status.py:548",
+    "scripts/credential_status.py:555",
+    "scripts/credential_status.py:558",
     "scripts/host_receipts.py:1174",
     "scripts/host_receipts.py:1175",
     "scripts/host_receipts.py:1205",
@@ -54,10 +54,10 @@
     "scripts/landscape.py:780",
     "scripts/landscape.py:781",
     "scripts/native_token_ci.py:1116",
-    "scripts/native_token_ci.py:1787",
-    "scripts/native_token_ci.py:1789",
+    "scripts/native_token_ci.py:1824",
+    "scripts/native_token_ci.py:1826",
     "scripts/native_token_ci.py:268",
-    "scripts/release_due.py:262",
+    "scripts/release_due.py:277",
     "scripts/saturation_ledger.py:1759",
     "scripts/saturation_ledger.py:1760",
     "scripts/saturation_ledger.py:189",
@@ -100,75 +100,75 @@
     "tests/test_catalogs.py:293",
     "tests/test_catalogs.py:294",
     "tests/test_catalogs.py:435",
-    "tools/adoption/apply_claude_settings.py:223",
-    "tools/adoption/apply_claude_settings.py:225",
-    "tools/adoption/apply_claude_settings.py:226",
-    "tools/adoption/apply_claude_settings.py:228",
-    "tools/adoption/apply_claude_settings.py:236",
-    "tools/adoption/apply_claude_settings.py:300",
-    "tools/adoption/apply_codex_lane.py:1044",
-    "tools/adoption/apply_codex_lane.py:1045",
-    "tools/adoption/apply_codex_lane.py:1046",
-    "tools/adoption/apply_codex_lane.py:1047",
-    "tools/adoption/apply_codex_lane.py:1048",
-    "tools/adoption/apply_codex_lane.py:1049",
-    "tools/adoption/apply_codex_lane.py:1050",
-    "tools/adoption/apply_codex_lane.py:1052",
-    "tools/adoption/apply_codex_lane.py:1053",
+    "tools/adoption/apply_claude_settings.py:352",
+    "tools/adoption/apply_claude_settings.py:354",
+    "tools/adoption/apply_claude_settings.py:355",
+    "tools/adoption/apply_claude_settings.py:357",
+    "tools/adoption/apply_claude_settings.py:365",
+    "tools/adoption/apply_claude_settings.py:442",
+    "tools/adoption/apply_codex_lane.py:1054",
+    "tools/adoption/apply_codex_lane.py:1055",
+    "tools/adoption/apply_codex_lane.py:1056",
+    "tools/adoption/apply_codex_lane.py:1057",
     "tools/adoption/apply_codex_lane.py:1058",
-    "tools/adoption/apply_codex_lane.py:1075",
-    "tools/adoption/apply_codex_lane.py:1081",
+    "tools/adoption/apply_codex_lane.py:1059",
+    "tools/adoption/apply_codex_lane.py:1060",
+    "tools/adoption/apply_codex_lane.py:1062",
+    "tools/adoption/apply_codex_lane.py:1063",
+    "tools/adoption/apply_codex_lane.py:1068",
+    "tools/adoption/apply_codex_lane.py:1085",
     "tools/adoption/apply_codex_lane.py:1091",
-    "tools/adoption/apply_codex_lane.py:1170",
-    "tools/adoption/apply_codex_lane.py:1171",
-    "tools/adoption/apply_codex_lane.py:1191",
-    "tools/adoption/apply_codex_lane.py:1192",
-    "tools/adoption/apply_codex_lane.py:1193",
-    "tools/adoption/apply_codex_lane.py:1195",
-    "tools/adoption/apply_codex_lane.py:1196",
-    "tools/adoption/apply_codex_lane.py:1208",
-    "tools/adoption/apply_codex_lane.py:1209",
-    "tools/adoption/apply_codex_lane.py:1211",
-    "tools/adoption/apply_codex_lane.py:1212",
-    "tools/adoption/apply_codex_lane.py:1245",
-    "tools/adoption/apply_codex_lane.py:1246",
-    "tools/adoption/apply_codex_lane.py:1247",
-    "tools/adoption/apply_codex_lane.py:565",
-    "tools/adoption/apply_codex_lane.py:566",
-    "tools/adoption/apply_codex_lane.py:567",
-    "tools/adoption/apply_codex_lane.py:568",
-    "tools/adoption/apply_codex_lane.py:569",
-    "tools/adoption/apply_codex_lane.py:570",
-    "tools/adoption/apply_codex_lane.py:571",
+    "tools/adoption/apply_codex_lane.py:1101",
+    "tools/adoption/apply_codex_lane.py:1180",
+    "tools/adoption/apply_codex_lane.py:1181",
+    "tools/adoption/apply_codex_lane.py:1201",
+    "tools/adoption/apply_codex_lane.py:1202",
+    "tools/adoption/apply_codex_lane.py:1203",
+    "tools/adoption/apply_codex_lane.py:1205",
+    "tools/adoption/apply_codex_lane.py:1206",
+    "tools/adoption/apply_codex_lane.py:1218",
+    "tools/adoption/apply_codex_lane.py:1219",
+    "tools/adoption/apply_codex_lane.py:1221",
+    "tools/adoption/apply_codex_lane.py:1222",
+    "tools/adoption/apply_codex_lane.py:1255",
+    "tools/adoption/apply_codex_lane.py:1256",
+    "tools/adoption/apply_codex_lane.py:1257",
     "tools/adoption/apply_codex_lane.py:573",
     "tools/adoption/apply_codex_lane.py:574",
     "tools/adoption/apply_codex_lane.py:575",
+    "tools/adoption/apply_codex_lane.py:576",
+    "tools/adoption/apply_codex_lane.py:577",
+    "tools/adoption/apply_codex_lane.py:578",
+    "tools/adoption/apply_codex_lane.py:579",
     "tools/adoption/apply_codex_lane.py:581",
-    "tools/adoption/apply_codex_lane.py:585",
-    "tools/adoption/apply_codex_lane.py:586",
-    "tools/adoption/apply_codex_lane.py:587",
+    "tools/adoption/apply_codex_lane.py:582",
+    "tools/adoption/apply_codex_lane.py:583",
+    "tools/adoption/apply_codex_lane.py:589",
+    "tools/adoption/apply_codex_lane.py:593",
+    "tools/adoption/apply_codex_lane.py:594",
     "tools/adoption/apply_codex_lane.py:595",
-    "tools/adoption/apply_codex_lane.py:596",
+    "tools/adoption/apply_codex_lane.py:603",
     "tools/adoption/apply_codex_lane.py:604",
     "tools/adoption/apply_codex_lane.py:612",
-    "tools/adoption/apply_codex_lane.py:616",
-    "tools/adoption/apply_codex_lane.py:625",
-    "tools/adoption/apply_codex_lane.py:628",
-    "tools/adoption/apply_codex_lane.py:700",
-    "tools/adoption/apply_codex_lane.py:769",
-    "tools/adoption/apply_codex_lane.py:775",
-    "tools/adoption/apply_codex_lane.py:776",
-    "tools/adoption/apply_codex_lane.py:778",
-    "tools/adoption/apply_codex_lane.py:779",
-    "tools/adoption/apply_codex_lane.py:780",
+    "tools/adoption/apply_codex_lane.py:620",
+    "tools/adoption/apply_codex_lane.py:624",
+    "tools/adoption/apply_codex_lane.py:633",
+    "tools/adoption/apply_codex_lane.py:636",
+    "tools/adoption/apply_codex_lane.py:708",
+    "tools/adoption/apply_codex_lane.py:777",
+    "tools/adoption/apply_codex_lane.py:783",
     "tools/adoption/apply_codex_lane.py:784",
+    "tools/adoption/apply_codex_lane.py:786",
+    "tools/adoption/apply_codex_lane.py:787",
     "tools/adoption/apply_codex_lane.py:788",
-    "tools/adoption/apply_codex_lane.py:799",
-    "tools/adoption/apply_codex_lane.py:800",
-    "tools/adoption/apply_codex_lane.py:804",
-    "tools/adoption/apply_codex_lane.py:805",
-    "tools/adoption/apply_codex_lane.py:918",
-    "tools/adoption/apply_codex_lane.py:920",
+    "tools/adoption/apply_codex_lane.py:792",
+    "tools/adoption/apply_codex_lane.py:796",
+    "tools/adoption/apply_codex_lane.py:807",
+    "tools/adoption/apply_codex_lane.py:808",
+    "tools/adoption/apply_codex_lane.py:812",
+    "tools/adoption/apply_codex_lane.py:813",
+    "tools/adoption/apply_codex_lane.py:926",
+    "tools/adoption/apply_codex_lane.py:928",
     "tools/adoption/codex_home.py:269",
     "tools/adoption/codex_home.py:270",
     "tools/adoption/codex_home.py:272",
@@ -179,19 +179,19 @@
     "tools/adoption/install_skills.py:587",
     "tools/adoption/install_skills.py:614",
     "tools/adoption/install_skills.py:615",
-    "tools/adoption/managed_block.py:367",
-    "tools/adoption/managed_block.py:368",
-    "tools/adoption/managed_block.py:371",
-    "tools/adoption/managed_block.py:375",
-    "tools/adoption/managed_block.py:379",
-    "tools/adoption/managed_block.py:380",
-    "tools/adoption/managed_block.py:383",
-    "tools/adoption/managed_block.py:384",
-    "tools/adoption/managed_block.py:386",
     "tools/adoption/managed_block.py:387",
+    "tools/adoption/managed_block.py:388",
     "tools/adoption/managed_block.py:391",
-    "tools/adoption/managed_block.py:392",
-    "tools/adoption/managed_block.py:394",
+    "tools/adoption/managed_block.py:395",
+    "tools/adoption/managed_block.py:399",
+    "tools/adoption/managed_block.py:400",
+    "tools/adoption/managed_block.py:403",
+    "tools/adoption/managed_block.py:404",
+    "tools/adoption/managed_block.py:406",
+    "tools/adoption/managed_block.py:407",
+    "tools/adoption/managed_block.py:411",
+    "tools/adoption/managed_block.py:412",
+    "tools/adoption/managed_block.py:414",
     "tools/adoption/render_config.py:285",
     "tools/adoption/render_config.py:287",
     "tools/adoption/render_config.py:289",
@@ -204,6 +204,15 @@
     "tools/adoption/render_config.py:93",
     "tools/adoption/render_config.py:94",
     "tools/adoption/render_config.py:95",
+    "tools/credentials/credential_run.py:169",
+    "tools/credentials/credential_run.py:210",
+    "tools/credentials/credential_run.py:226",
+    "tools/credentials/credential_run.py:660",
+    "tools/credentials/credential_run.py:774",
+    "tools/credentials/set_credential.py:103",
+    "tools/credentials/set_credential.py:129",
+    "tools/credentials/set_credential.py:153",
+    "tools/credentials/set_credential.py:69",
     "tools/sota-convergence/blind_checkout.py:1004",
     "tools/sota-convergence/blind_checkout.py:484",
     "tools/sota-convergence/blind_checkout.py:513",
@@ -218,7 +227,7 @@
     "tools/sota-convergence/blind_checkout.py:776",
     "tools/sota-convergence/blind_checkout.py:996",
     "tools/sota-convergence/blind_checkout.py:999",
-    "tools/sota-convergence/build_manifest.py:701",
+    "tools/sota-convergence/build_manifest.py:765",
     "tools/sota-convergence/build_verdicts.py:206",
     "tools/sota-convergence/build_verdicts.py:540",
     "tools/sota-convergence/codex_lane.py:1228",
@@ -258,11 +267,11 @@
     "tools/sota-convergence/codex_lane.py:630",
     "tools/sota-convergence/codex_lane.py:632",
     "tools/sota-convergence/codex_lane.py:633",
-    "tools/sota-convergence/export_isolation_check.py:495",
-    "tools/sota-convergence/export_isolation_check.py:497",
-    "tools/sota-convergence/export_isolation_check.py:513",
-    "tools/sota-convergence/export_isolation_check.py:519",
-    "tools/sota-convergence/export_isolation_check.py:523",
+    "tools/sota-convergence/export_isolation_check.py:496",
+    "tools/sota-convergence/export_isolation_check.py:498",
+    "tools/sota-convergence/export_isolation_check.py:514",
+    "tools/sota-convergence/export_isolation_check.py:522",
+    "tools/sota-convergence/export_isolation_check.py:527",
     "tools/sota-convergence/gap_crosswalk.py:65",
     "tools/sota-convergence/gap_wave_ledger.py:77",
     "tools/sota-convergence/gap_wave_ledger.py:78",
@@ -339,13 +348,13 @@
     "scripts/component_matrix.py:880": [
       "*/*"
     ],
-    "scripts/credential_status.py:526": [
+    "scripts/credential_status.py:548": [
       "*/.claude"
     ],
-    "scripts/credential_status.py:533": [
+    "scripts/credential_status.py:555": [
       "*/.codex"
     ],
-    "scripts/credential_status.py:536": [
+    "scripts/credential_status.py:558": [
       "*/.codex"
     ],
     "scripts/landscape.py:1359": [
@@ -354,7 +363,7 @@
     "scripts/native_token_ci.py:1116": [
       "cbm-daemon-*"
     ],
-    "scripts/release_due.py:262": [
+    "scripts/release_due.py:277": [
       "*^{commit}"
     ],
     "scripts/saturation_ledger.py:189": [
@@ -463,31 +472,40 @@
     "scripts/verdict_review_gate.py:428": [
       "*__*.json"
     ],
-    "tools/adoption/apply_codex_lane.py:1195": [
+    "tools/adoption/apply_codex_lane.py:1205": [
       "* is *; roll it back first: --rollback *"
     ],
-    "tools/adoption/apply_codex_lane.py:778": [
+    "tools/adoption/apply_codex_lane.py:786": [
       "*: sha256 * (expected *)",
       "*: sha256 missing (expected *)"
     ],
-    "tools/adoption/apply_codex_lane.py:784": [
+    "tools/adoption/apply_codex_lane.py:792": [
       "* missing",
       "* present"
     ],
-    "tools/adoption/apply_codex_lane.py:799": [
+    "tools/adoption/apply_codex_lane.py:807": [
       "* exists and differs from the template"
     ],
-    "tools/adoption/apply_codex_lane.py:800": [
+    "tools/adoption/apply_codex_lane.py:808": [
       "* exists and differs from the template"
     ],
-    "tools/adoption/apply_codex_lane.py:804": [
+    "tools/adoption/apply_codex_lane.py:812": [
       "* exists and differs from the template; move it aside privately first"
     ],
-    "tools/adoption/apply_codex_lane.py:805": [
+    "tools/adoption/apply_codex_lane.py:813": [
       "* exists and differs from the template; move it aside privately first"
     ],
     "tools/adoption/install_skills.py:587": [
       "/*"
+    ],
+    "tools/credentials/credential_run.py:774": [
+      "/proc/*/stat"
+    ],
+    "tools/credentials/set_credential.py:129": [
+      ".*.*.tmp"
+    ],
+    "tools/credentials/set_credential.py:153": [
+      ".*.*.tmp"
     ],
     "tools/sota-convergence/blind_checkout.py:1004": [
       "*.hmac-key"
@@ -504,7 +522,7 @@
     "tools/sota-convergence/blind_checkout.py:999": [
       "*.hmac-key"
     ],
-    "tools/sota-convergence/build_manifest.py:701": [
+    "tools/sota-convergence/build_manifest.py:765": [
       "/tmp/[^\\s\\\"']*(?:*",
       "/tmp/[^\\s\\\"']*(?:*|claude-\\d+|scratchpad)[^\\s\\\"']*"
     ],
@@ -565,7 +583,7 @@
     "tools/sota-convergence/codex_lane.py:564": [
       "*.lock"
     ],
-    "tools/sota-convergence/export_isolation_check.py:513": [
+    "tools/sota-convergence/export_isolation_check.py:514": [
       "**"
     ],
     "tools/sota-convergence/landscape-sweep/source_reviews.py:1194": [

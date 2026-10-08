@@ -2527,3 +2527,41 @@ assertion on the mutant, in a scratch copy under `/tmp`.
   and the network allowlist the runners need). The measurement must include a
   check that sandboxed commands cannot reach the user systemd bus
   (`systemd-run --user`).
+
+## Declared test contracts for credential-status grammar (2026-10-08, PR #849)
+
+The CC's credential-status ruling of about 08:00Z requires the status tool to
+report every line the native runner refuses, without returning a credential
+value. The shared runner grammar and checked reader therefore replace the old
+metadata-only inspection contract. The following main-version methods have
+changed expectations; no production credential store was used to check them:
+
+- `tests.test_credential_status.CredentialStatusTests.test_undeclared_store_file_is_reported_by_name_only`:
+  an undeclared file is still reported by name only. The old assertion also
+  prohibited every read under the store directory; the new fixture allows the
+  checked reader to validate the declared export-form file in that directory.
+- `tests.test_credential_status.CredentialStatusTests.test_private_file_is_ok_and_output_is_value_free`:
+  a safe private file is `ok` only when its contents satisfy the runner's export
+  grammar. The positive fixture now uses export form; output remains value-free.
+- `tests.test_credential_status.CredentialStatusTests.test_never_opens_or_reads_credential_files`:
+  the old metadata-only/no-content-read test is replaced by
+  `tests.test_credential_status.CredentialStatusTests.test_private_env_file_uses_checked_reader_without_path_reads`.
+  Credential content may reach the native checked reader for grammar validation;
+  the replacement verifies that boundary and retains value-free output.
+- `tests.test_credential_status.CredentialStatusTests.test_guard_pin_check_hashes_only_the_installed_guard`:
+  the guard pin still hashes only the installed guard. The old assertion also
+  prohibited store reads; the new contract permits the checked grammar read of
+  the declared export-form fixture, while never publishing its value or digest.
+
+Main's test file at `64a8cda01700d5e823c18e4b989e856de2ee2241`, run against the
+PR source at `0ca21c31b36e0a9aa99de949fe77dd5b7dff83c3`, returned exactly these
+four failures in 44 tests. The PR's own affected modules pass separately. These
+are repository integration checks, not upstream runtime or host-store acceptance.
+
+The same lazy shared-reader import exposes nine pre-existing read sites to the
+OpenHands advisory import-closure report: five in the runner and four in the
+setter. The branch-specific monitoring baseline now records 330 unclassified
+reads and 97 shape locations, with no lost sites, no enforced unresolved reads,
+and the existing breadth limits unchanged. The monitoring classification,
+resolver, workflow and assertions remain unchanged. This snapshot belongs to
+the PR's source; current main's 321-read baseline is retained on main.
