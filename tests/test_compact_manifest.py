@@ -390,6 +390,75 @@ class CompactManifestTests(unittest.TestCase):
         with self.assertRaises(compact.CompactError):
             self.closure_build()
 
+    def closure_origin_claim(self):
+        row = self.rows[0]
+        row["disposition"] = "TRIAL"
+        row["origin_pointer"] = "unresolved"
+        row["origin_claim_ids"] = ["original113:shared-action-claim"]
+        claim = {"row_id": row["origin_claim_ids"][0], "repository": "example/project-0", "slots": ["native-clients"],
+                 "original_disposition": "TRIAL", "source_lane": "synthetic-original-lane"}
+        row["source_refs"].append(self.witness("original-origin-claims", {"rows": [claim]}) | {"pointer": "/rows/0"})
+        return claim
+
+    def test_closure_one_original_origin_claim_counts_once_across_two_qualified_rows(self):
+        self.closure_origin_claim()
+        second = deepcopy(self.rows[0])
+        second["qualification"] = {"role": "worker"}
+        second["source_refs"] = [ref for ref in second["source_refs"] if "occurrence_id" not in ref]
+        self.rows.append(second)
+        self.coverage["expected_keys"].append(self.row_key(second))
+        with self.assertRaises(compact.CompactError):
+            self.build()
+        manifest, _ = self.closure_build()
+        self.assertEqual(manifest["validation"]["status"], "PASS", manifest["validation"]["blockers"])
+        self.assertEqual(manifest["counts"]["action_rows"], 2)
+        self.assertEqual(manifest["counts"]["origin_pointer_unresolved"], 1)
+        self.assertEqual(manifest["counts"]["origin_pointer_unresolved_rows"], 2)
+        self.assertEqual(manifest["counts"]["origin_pointer_unresolved_claims"], 1)
+        self.assertIn("distinct hash-bound original", manifest["coverage"]["count_units"]["origin_pointer_unresolved"])
+        self.rows[1]["origin_pointer"] = "unresolved"
+        manifest, _ = self.closure_build()
+        self.assertEqual(manifest["counts"]["origin_pointer_unresolved"], 2)
+        self.assertEqual(manifest["counts"]["origin_pointer_unresolved_rows"], 3)
+
+    def test_closure_origin_claim_ids_require_exact_original_id_hash_repository_slot_and_unresolved(self):
+        original = deepcopy((self.rows, self.files, self.coverage))
+        for defect in ("id", "hash", "repository", "slot", "selector", "no-unresolved", "duplicate-id"):
+            with self.subTest(defect=defect):
+                self.rows, self.files, self.coverage = deepcopy(original)
+                claim = self.closure_origin_claim()
+                row = self.rows[0]
+                if defect == "id":
+                    row["origin_claim_ids"] = ["invented-claim-id"]
+                elif defect == "hash":
+                    row["source_refs"][-1]["sha256"] = "e" * 64
+                elif defect in {"repository", "slot"}:
+                    if defect == "repository":
+                        claim["repository"] = "example/project-1"
+                    else:
+                        claim["slots"] = ["workers"]
+                    row["source_refs"][-1] = self.witness("original-origin-claims", {"rows": [claim]}) | {"pointer": "/rows/0"}
+                elif defect == "selector":
+                    row["source_refs"][-1]["pointer"] = "/missing"
+                elif defect == "no-unresolved":
+                    row.pop("origin_pointer")
+                else:
+                    row["origin_claim_ids"] *= 2
+                try:
+                    manifest, _ = self.closure_build()
+                except compact.CompactError:
+                    pass
+                else:
+                    self.assertEqual(manifest["validation"]["status"], "BLOCKED")
+
+    def test_closure_origin_claim_metadata_slots_compatibility_does_not_change_source_claim(self):
+        claim = self.closure_origin_claim()
+        claim["metadata"] = {"slots": claim.pop("slots")}
+        self.rows[0]["source_refs"][-1] = self.witness("original-origin-claims", {"rows": [claim]}) | {"pointer": "/rows/0"}
+        manifest, _ = self.closure_build()
+        self.assertEqual(manifest["validation"]["status"], "PASS")
+        self.assertEqual(manifest["counts"]["origin_pointer_unresolved"], 1)
+
     def test_closure_missing_residue_declaration_and_unsafe_null_pin_locator_still_block(self):
         self.closure_pending(pin_residue=True)
         self.rows[0].pop("closure")

@@ -406,6 +406,16 @@
           ]
         }
       ]
+    },
+    "origin_claim_ids": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "description": "Original row_id claims bound by retained source_refs selecting matching row_id, canonical repository and top-level slots (or metadata.slots). Qualified decision keys may share one original claim."
     }
   },
   "allOf": [
@@ -579,6 +589,23 @@
         "properties": {
           "disposition": {
             "const": "PENDING"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "origin_claim_ids"
+        ]
+      },
+      "then": {
+        "required": [
+          "origin_pointer"
+        ],
+        "properties": {
+          "origin_pointer": {
+            "const": "unresolved"
           }
         }
       }

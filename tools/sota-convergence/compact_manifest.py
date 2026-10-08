@@ -476,7 +476,7 @@ def closure_locator(source, label, closure, blockers):
 
 def validate_row(row, index, profile=None):
     start_closure = validation_profile(profile)
-    closed(row, ROW_REQUIRED, ROW_OPTIONAL | ({"closure", "provenance", "origin_pointer"} if start_closure else set()), "row")
+    closed(row, ROW_REQUIRED, ROW_OPTIONAL | ({"closure", "provenance", "origin_pointer", "origin_claim_ids"} if start_closure else set()), "row")
     identity, slot, _ = decision_key(row)
     require(row["disposition"] in CLASSES and row["evidence_class"] in EVIDENCE, "unsupported disposition/evidence class")
     blockers = []
@@ -492,6 +492,13 @@ def validate_row(row, index, profile=None):
         else:
             closed(origin, {"archive_member", "sha256", "pointer"}, REF_KEYS - {"archive_member", "sha256", "pointer"}, "origin pointer")
             validate_ref(origin, index)
+    if "origin_claim_ids" in row:
+        require(row.get("origin_pointer") == "unresolved", "origin claim ids require a literal unresolved origin pointer")
+        claim_ids = row["origin_claim_ids"]
+        require(isinstance(claim_ids, list) and bool(claim_ids), "origin_claim_ids must be a nonempty array")
+        for claim_id in claim_ids:
+            text(claim_id, "origin claim id")
+        require(len(claim_ids) == len(set(claim_ids)), "duplicate origin claim id on row")
     pin_blockers = []
     validate_pin(row["pin"], "row", pin_blockers)
     if "pending_pin" not in closure:
@@ -896,6 +903,30 @@ def validate_origin_pointer(row, captures, cache, blockers):
         slot = next((original[name] for name in ("slot", "layer_fit", "layer_id", "field") if isinstance(original.get(name), str)), None)
     if identity is None or slot != row["slot"] or canonical(identity) != canonical(row["repository_or_entry"]):
         blockers.append({"code": "origin-pointer-repository-slot-unbound", "source": label})
+
+
+def validate_origin_claims(row, captures, cache, blockers):
+    claim_ids = row.get("origin_claim_ids", [])
+    if not claim_ids:
+        return
+    expected = set(claim_ids)
+    matched = set()
+    label = canonical(row["repository_or_entry"]) + ":" + row["slot"]
+    for ref in row.get("source_refs", []):
+        if "archive_member" not in ref:
+            continue
+        original = selected_capture(ref["archive_member"], ref["pointer"], captures, cache, blockers, "origin-claim:" + label)
+        if not isinstance(original, dict) or original.get("row_id") not in expected:
+            continue
+        identity = next((original[name] for name in ("repository_or_entry", "repository", "entry") if isinstance(original.get(name), str)), None)
+        metadata = original.get("metadata", {})
+        slots = original.get("slots")
+        if slots is None and isinstance(metadata, dict):
+            slots = metadata.get("slots")
+        if identity is not None and canonical(identity) == canonical(row["repository_or_entry"]) and isinstance(slots, list) and row["slot"] in slots:
+            matched.add(original["row_id"])
+    for claim_id in sorted(expected - matched):
+        blockers.append({"code": "origin-claim-id-repository-slot-unbound", "source": label, "row_id": claim_id})
 
 
 def validate_acceptance(row, captures):
@@ -1355,6 +1386,7 @@ def build_manifest(asset, release_tag, witnesses=(), profile=None):
     if start_closure:
         for row in rows:
             validate_origin_pointer(row, receipts, cache, blockers)
+            validate_origin_claims(row, receipts, cache, blockers)
     for row in rows:
         validate_native_source_entry(row, index, receipts, cache, blockers)
         validate_native_skill_entry(row, index, receipts, cache, blockers)
@@ -1413,16 +1445,25 @@ def build_manifest(asset, release_tag, witnesses=(), profile=None):
         residue_counts["pending_conflict_rows"] = sum("pending_conflict" in row.get("closure", {}) for row in rows)
         residue_counts["origin_pointer_unresolved_rows"] = sum(row.get("origin_pointer") == "unresolved" for row in rows)
         residue_counts["origin_pointer_unresolved_action_rows"] = sum(row.get("origin_pointer") == "unresolved" and row["disposition"] in ACTION_CLASSES for row in rows)
+        unresolved_claims = {claim_id for row in rows for claim_id in row.get("origin_claim_ids", [])}
+        unresolved_legacy_rows = sum(row.get("origin_pointer") == "unresolved" and not row.get("origin_claim_ids") for row in rows)
+        residue_counts["origin_pointer_unresolved_claims"] = len(unresolved_claims)
+        residue_counts["origin_pointer_unresolved_legacy_rows"] = unresolved_legacy_rows
+        residue_counts["origin_pointer_unresolved"] = len(unresolved_claims) + unresolved_legacy_rows
         counts.update({"action_rows": sum(row["disposition"] in ACTION_CLASSES for row in rows),
                        "pending_conflict": residue_counts["pending_conflict_rows"],
                        "action_read_rows": sum(row["disposition"] in ACTION_CLASSES for row in rows) + residue_counts["pending_conflict_rows"],
-                       "origin_pointer_unresolved": residue_counts["origin_pointer_unresolved_rows"],
+                       "origin_pointer_unresolved": residue_counts["origin_pointer_unresolved"],
+                       "origin_pointer_unresolved_rows": residue_counts["origin_pointer_unresolved_rows"],
+                       "origin_pointer_unresolved_claims": len(unresolved_claims),
                        "origin_pointer_bound": sum(isinstance(row.get("origin_pointer"), dict) for row in rows),
                        "pinned_rows": sum(row["pin"] is not None for row in rows),
                        "pending_pin": residue_counts["pending_pin_rows"], "pending_locator": residue_counts["pending_locator_rows"],
                        "disagreements_resolved": sum(item["status"] == "RESOLVED" for item in disagreements), "disagreements_total": len(disagreements)})
         manifest["validation"].update({"profile": START_CLOSURE_PROFILE, "nonblocking_counts": residue_counts, "disagreements": disagreements,
                                        "status": "BLOCKED" if blockers else "PASS"})
+        coverage["count_units"].update({"origin_pointer_unresolved": "distinct hash-bound original origin_claim_ids plus one legacy unit per unresolved row without declared claim ids",
+                                        "origin_pointer_unresolved_rows": "retained decision rows with literal origin_pointer unresolved, including qualified keys sharing one original claim"})
     raw = json_text(sorted_tree(manifest), indent=2).encode("utf-8")
     require(len(raw) < MANIFEST_LIMIT, "compact manifest must remain below GitHub's 100 MiB regular-file limit")
     return manifest, raw
