@@ -166,6 +166,7 @@ PINNED_LINES: dict[str, list[tuple[str, str]]] = {
     },
     ".github/dependabot.yml": [
         ("0aff72e75928d5620d72d7ca2d8b83710b80b66df2fb13bbcd1efbebc8fd1385", "comment on the frozen npm manifests"),
+        ("8297503834b1561129f7b81269c7712f2cb8e69c662d5c6931d90f56532889c1", "directory-scoped Dependabot ignore; no install/build/server route"),
     ],
     ".github/osv-scanner-frozen-macos.toml": [
         ("b1da0e974ad07fe290e4eb8ab11fed6c9542794f21952c417e4e0cc347a7f510", "header comment naming its one lock"),
