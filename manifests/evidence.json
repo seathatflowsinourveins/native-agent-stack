@@ -48245,9 +48245,14 @@
       "bytes": 5689
     },
     {
+      "path": "evidence/artifacts/research-extraction-host-spelling-20261008/backend-measurement.json",
+      "sha256": "ed500a10b98cf3a20ec7cada87554fd220d2e5595f1bd8cdbf93ad0bc873df40",
+      "bytes": 7937
+    },
+    {
       "path": "evidence/artifacts/research-extraction-host-spelling-20261008/receipt.json",
-      "sha256": "857db12f3c32b110b23d5c1313e9d9bccad2b88efe2ec9e7f1a158917f54edc3",
-      "bytes": 2491
+      "sha256": "4d14678951d4312b225e599d422b27187838895e8a181d24f855bdf5a012e93c",
+      "bytes": 4314
     },
     {
       "path": "evidence/artifacts/retrieved-code.txt",
@@ -58871,13 +58876,13 @@
     },
     {
       "path": "tools/research/dispatch",
-      "sha256": "8a72a88c90405f3b8bccb5b695480a59020cc253b93ac7031ddfff0a1fc6da12",
-      "bytes": 15730
+      "sha256": "0561d05c4b4aeb383399e743b354d4d5be32439c8783bdcdab083f8c32fc5a65",
+      "bytes": 15911
     },
     {
       "path": "tools/research/exact_queries.py",
-      "sha256": "9858e72e517bfeeec7186d031168bc396cf7c24f0c20ab9458ccd2d1bb9fa8c9",
-      "bytes": 24739
+      "sha256": "1537119d35ebb8361f68d2f78050ac384d3034aea2a179593ca17f22860e83ac",
+      "bytes": 28730
     },
     {
       "path": "tools/runtime-worker-evidence/README.md",
