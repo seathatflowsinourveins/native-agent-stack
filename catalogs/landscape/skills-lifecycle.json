@@ -41,7 +41,7 @@
     {"source_id": "vercel-labs-agent-skills", "kind": "github-skills-repo", "url": "https://github.com/vercel-labs/agent-skills", "pin": "063bee94c3f4df8453406c830b0a7df0f2860278"},
     {"source_id": "vercel-labs-skills", "kind": "github-skills-repo", "url": "https://github.com/vercel-labs/skills", "pin": "3694740352eeef5cdd689af694c485f1ff62eec3"},
     {"source_id": "aannoo-hcom", "kind": "github-skills-repo", "url": "https://github.com/aannoo/hcom", "pin": "b2a7c192003e7fd67ed93265289e4ac36276f965"},
-    {"source_id": "promptfoo-promptfoo", "kind": "github-skills-repo", "url": "https://github.com/promptfoo/promptfoo", "pin": "30949931ee90c963acd487e97828c9441db0bcd4"},
+    {"source_id": "promptfoo-promptfoo", "kind": "github-skills-repo", "url": "https://github.com/promptfoo/promptfoo", "pin": "34f74d34e140b5e17d23770dfb2340057b1936b8"},
     {"source_id": "grafana-skills", "kind": "github-skills-repo", "url": "https://github.com/grafana/skills", "pin": "1ccacf29049fde66637fe01ab93a83a772da323b"}
   ],
   "tasks": [
@@ -119,7 +119,7 @@
       "open_gaps": [
         "diagnosing-bugs is a trial skill; obra/superpowers systematic-debugging is excluded as a duplicate of it under the manifest's single-winner rule."
       ],
-      "overturn_when": "A skill-creator paired benchmark (or a promptfoo config) on frozen failing-test, CI-failure and engine-fault reproductions shows a candidate reaching the root cause more often than diagnosing-bugs at no higher token or time cost, in Claude Code and in Codex; or diagnosing-bugs' upstream is archived, removed or relicensed."
+      "overturn_when": "A skill-creator paired benchmark (or a promptfoo config) on frozen failing-test, CI-failure and engine-fault reproductions shows a candidate reaching the root cause more often than diagnosing-bugs at no higher token or time cost, in Claude Code and in Codex; or diagnosing-bugs' upstream is archived, removed or relicensed. For hcom-agent-messaging and loki, the scoped primary-source alternatives and task-specific overturn conditions are recorded in docs/decisions/2026-10-08-skills-cc-lanes-picks.md; native bootstrap/help or a wired operation route that fully covers the actual task replaces the additional skill listing."
     },
     {
       "layer_id": "skills-review",

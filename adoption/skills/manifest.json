@@ -701,8 +701,8 @@
     {
       "name": "promptfoo-evals",
       "source": "promptfoo/promptfoo",
-      "url": "https://github.com/promptfoo/promptfoo/tree/30949931ee90c963acd487e97828c9441db0bcd4/.claude/skills/promptfoo-evals",
-      "ref": "30949931ee90c963acd487e97828c9441db0bcd4",
+      "url": "https://github.com/promptfoo/promptfoo/tree/34f74d34e140b5e17d23770dfb2340057b1936b8/.claude/skills/promptfoo-evals",
+      "ref": "34f74d34e140b5e17d23770dfb2340057b1936b8",
       "path": ".claude/skills/promptfoo-evals",
       "tree_sha": "5c0e65e6c185b6a1ea6212626b8de5442193ed76",
       "skill_md_sha256": "40d2426fa520133b276d1efa888254f1e9a649c18289da18a75bfc2c75ea48c5",
@@ -720,7 +720,7 @@
         "note": "Marketplace scan verdicts were not checked; the URL is a source locator."
       },
       "status": "trial",
-      "gap": "Command-center and native lane A/B and regression work needs promptfoo's own evaluation-suite guidance. Selected from promptfoo/promptfoo 0.124.0; the skill's npx command may resolve another version, so later checks use the selected pinned executable. Pinning runs no evaluation and changes no runtime worker grants (docs/decisions/2026-10-08-skills-cc-lanes-picks.md).",
+      "gap": "Command-center and native lane A/B and regression work needs promptfoo's own evaluation-suite guidance. Selected from promptfoo/promptfoo 0.123.1 to match the supported profile and capability gate; its whole skill folder is identical at 0.124.0. Later checks use the profile's pinned executable. Pinning runs no evaluation and changes no runtime worker grants (docs/decisions/2026-10-08-skills-cc-lanes-picks.md).",
       "claude_listing": "on",
       "codex_enabled": true,
       "added": "2026-10-08"
