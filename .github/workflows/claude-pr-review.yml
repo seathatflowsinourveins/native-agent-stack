@@ -186,6 +186,7 @@ jobs:
             the smallest fix, then the files you did not read. You have at most 12 turns, so read in parallel.
           claude_args: |
             --model claude-opus-5-5
+            --effort max
             --max-turns 12
             --max-budget-usd 3
             --tools Read,Glob,Grep

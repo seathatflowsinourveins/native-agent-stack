@@ -69,6 +69,10 @@ estimate, read the prompt cache, had no MCP server and had none of Bash, Write, 
 WebFetch, WebSearch, Task, Agent or an `mcp__` tool. The review text is published only when that check passed,
 escaped, inside `<pre>`, capped at 60,000 bytes.
 
+## Effort
+
+`--effort max` in `claude_args`, set under the command center's effort mapping of 2026-10-08, which runs judgment work (designated reads, adjudication, pull request and security reviews, audits) at `max`. Every job records its level and the reason, because an unset level is a defect. The level has to be in `claude_args`: `--restricted` ignores the settings files that would otherwise carry a session's level, and on the Claude API Opus 5.5 runs at `medium` when a request leaves effort unset (bundled `claude-api` skill 2.1.295, `shared/model-migration.md`). `claude --help` (2.1.295) lists `low, medium, high, xhigh, max`. A loopback dry run of the installed 2.1.295 client with this workflow's `claude_args` sent `output_config.effort: "max"`, adaptive thinking and no `speed` field on every request. At `max`, thinking takes a larger share of the output than at the default level, so the estimate below is a floor; the client budget still bounds each run.
+
 ## Cost of one run
 
 Dry estimate at Claude Opus 5.5's $4 input, $5 five-minute cache write, $0.20 cache read and $20 output per million
