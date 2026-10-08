@@ -111,10 +111,20 @@ EXEMPTIONS = {
     # bootstrap-macos no longer runs on pull_request (macOS CI advisory, docs/decisions/2026-10-05-macos-ci-advisory.md),
     # so its former exemption is gone; test_each_exemption_is_still_needed keeps this table honest.
     "pull-request-cache-mode": {},
+    # 2026-10-08 (docs/decisions/2026-10-04-ci-least-privilege.md, "Federation exemption (2026-10-08)").
+    "id-token-write": {
+        "harness-audit.yml:audit": "Anthropic workload identity federation, not provenance: the action exchanges the "
+                                   "job's GitHub OIDC token for a short-lived Claude API token. The federation rule "
+                                   "accepts workflows on this repository's main and never pull requests; which "
+                                   "workflows may request a token is the reviewed WRITE_GRANTS inventory. Schedule "
+                                   "and dispatch only, on main",
+    },
 }
 # Every write grant in the repository, by job. A new one is a reviewed change to this inventory.
 WRITE_GRANTS = {
     "catalog-freshness.yml:propose": ["contents: write", "pull-requests: write"],
+    # Federation needs id-token (EXEMPTIONS, id-token-write); the result is one issue.
+    "harness-audit.yml:audit": ["id-token: write", "issues: write"],
     "publish-catalog.yml:publish": ["id-token: write", "attestations: write"],
     "publish-catalog.yml:release": ["contents: write"],
     "saturation-tracking.yml:issue": ["issues: write"],

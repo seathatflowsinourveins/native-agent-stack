@@ -46,6 +46,7 @@ The existing write grants stay on their own jobs, and none runs on `pull_request
 | Job | Grant | Why it is not reachable from a pull request |
 | --- | --- | --- |
 | `catalog-freshness.yml:propose` | `contents: write`, `pull-requests: write` | schedule and dispatch only |
+| `harness-audit.yml:audit` (2026-10-08) | `id-token: write`, `issues: write` | schedule and dispatch only, on `main`; federation, not attestation ("Federation exemption (2026-10-08)") |
 | `publish-catalog.yml:publish` | `id-token: write`, `attestations: write` | tag push and dispatch only; attests provenance |
 | `publish-catalog.yml:release` | `contents: write` | tag push only |
 | `saturation-tracking.yml:issue` | `issues: write` | schedule and dispatch only |
@@ -168,6 +169,7 @@ inventories.
 | `catalog-freshness.yml` | `{}` | `freshness: contents: read` | | job-scoped (kept) | |
 | `dependency-review.yml` | `{}` | `contents: read` | `none` | kept | |
 | `hardware-profile-smoke.yml` | `{}` | `contents: read` on both jobs | `none` | kept | |
+| `harness-audit.yml` (added 2026-10-08) | `{}` | `audit`: `contents: read`, `id-token: write`, `issues: write` | | added | `id-token-write` exemption |
 | `native-foundation-e2e.yml` | `{}` | `contents: read` | `none` | added | |
 | `native-offhost-app-state.yml` | unchanged (`contents: read`) | | | | hash-bound |
 | `native-offhost-restore.yml` | unchanged (`contents: read`) | | | | hash-bound |
@@ -383,6 +385,39 @@ new rule yet.
   <https://docs.github.com/en/actions/reference/workflows-and-actions/contexts>; Evaluate expressions in workflows and
   actions, "Literals" (single-quoted strings only) and `format` (doubled braces):
   <https://docs.github.com/en/actions/reference/workflows-and-actions/expressions> (both read 2026-10-04 at 14:15Z).
+
+## Federation exemption (2026-10-08)
+
+`harness-audit.yml` runs anthropics/claude-code-action v1.0.245 weekly and on dispatch, authenticated by Anthropic
+workload identity federation: the action exchanges the job's GitHub OIDC token for a short-lived Claude API token, so
+no Anthropic key is stored in this repository. That needs `id-token: write` on a job that attests nothing, which
+`id-token-write` refuses, so `EXEMPTIONS` names the one job (`harness-audit.yml:audit`) with its reason and
+`test_each_exemption_is_still_needed` drops the entry once it suppresses nothing. The job's two write grants,
+`id-token: write` and `issues: write` (its one scorecard issue), are in the reviewed inventory.
+
+The federation rule accepts workflows on this repository's `main` and never pull requests: it matches the OIDC subject
+of a run on `main`, and a pull request run's subject ends in `:pull_request` instead (GitHub's OpenID Connect reference,
+"Filtering for pull_request events" and "Filtering for a specific branch"). It has no `workflow_ref` condition, by
+design, so other workflows on `main` may use it later. Which workflows may request an OIDC token is therefore governed
+by the reviewed write-grant inventory (`id-token: write`) that `tests/test_workflow_policy.py` enforces, and this
+exemption names the one job that may request a token without an attestation.
+
+This repository was created on 2026-09-19, after GitHub's 2026-07-15 move to immutable subject claims, and
+`GET repos/seathatflowsinourveins/native-agent-stack/actions/oidc/customization/sub` returned
+`use_immutable_subject: true` on 2026-10-08 (03:37Z). A run on `main` therefore presents
+`repo:seathatflowsinourveins@234074349/native-agent-stack@1376766892:ref:refs/heads/main`, and the rule's subject must
+be that string: Anthropic matches `subject_prefix` exactly unless it ends in `*` (Workload identity federation,
+"Match"), so the name-only form `repo:seathatflowsinourveins/native-agent-stack:ref:refs/heads/main` never matches.
+
+**Overturn.** The audit moves to a flow that needs no OIDC token, or the workflow is removed: drop the exemption and
+the `id-token: write` grant together (the inventory test and `test_each_exemption_is_still_needed` force both). A
+second workflow that requests a token for this rule needs its own reviewed inventory entry and exemption.
+
+Sources: anthropics/claude-code-action `action.yml` at `6fed3ca145920b639991cb756090506e1bcaf515` (v1.0.245: the four
+federation inputs, and `anthropic_oidc_audience` defaulting to `https://api.anthropic.com`); GitHub, OpenID Connect
+reference, <https://docs.github.com/en/actions/reference/security/oidc> (subject formats, the `workflow_ref` claim and
+"Immutable subject claims"); Anthropic, Workload identity federation,
+<https://platform.claude.com/docs/en/manage-claude/workload-identity-federation> ("Match"); all read 2026-10-08.
 
 ## Alternatives considered
 

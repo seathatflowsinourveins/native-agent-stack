@@ -2,7 +2,7 @@
   "allowed_actions": "selected",
   "github_owned_allowed": true,
   "verified_allowed": false,
-  "patterns_allowed": ["step-security/harden-runner@*", "ossf/scorecard-action@*"],
+  "patterns_allowed": ["step-security/harden-runner@*", "ossf/scorecard-action@*", "anthropics/claude-code-action@*", "oven-sh/setup-bun@*"],
   "sha_pinning_required": true,
   "enabled": true,
   "workflow_permissions": {
