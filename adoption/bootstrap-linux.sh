@@ -44,7 +44,9 @@ usage() {
 # --configure-full-profile's steps, in the order they run (adoption/bootstrap.md, step 2).
 full_profile_steps=(claude-profile claude-settings claude-md skills codex-lane path-block login-shell)
 
-script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd -P)"
+script_dir="${BASH_SOURCE[0]%/*}"
+[[ "$script_dir" != "${BASH_SOURCE[0]}" ]] || script_dir=.
+script_dir="$(cd -- "$script_dir" >/dev/null 2>&1 && pwd -P)"
 repo_root="$(cd -- "$script_dir/.." >/dev/null 2>&1 && pwd -P)"
 
 profile_id=""

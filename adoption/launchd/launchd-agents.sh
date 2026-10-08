@@ -62,7 +62,9 @@ usage() {
     'default set for install/status/remove when no --label is given.'
 }
 
-script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd -P)"
+script_dir="${BASH_SOURCE[0]%/*}"
+[[ "$script_dir" != "${BASH_SOURCE[0]}" ]] || script_dir=.
+script_dir="$(cd -- "$script_dir" >/dev/null 2>&1 && pwd -P)"
 repo_root="$(cd -- "$script_dir/../.." >/dev/null 2>&1 && pwd -P)"
 
 eco_root="${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}"

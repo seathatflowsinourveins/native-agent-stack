@@ -317,12 +317,12 @@
     },
     {
       "id": "headroom",
-      "version": "0.37.0",
+      "version": "0.40.0",
       "kind": "uv-tool",
       "package": "headroom-ai[mcp]",
-      "url": "https://files.pythonhosted.org/packages/72/b8/16878cf4fe6fc390a0d22025b671468619db690ff14c1b103ace4b5e35f9/headroom_ai-0.37.0-cp310-abi3-manylinux_2_28_x86_64.whl",
-      "sha256": "2efc5cdf681a10c5fc7a2a271a471179c409074537045f682b10e4d724976f46",
-      "install_note": "2026-09-25 fetch to complete the `token-efficiency` profile's Linux pin coverage. PyPI package `headroom-ai` (repository headroomlabs-ai/headroom) 0.37.0 with the `[mcp]` extra recipes/README.md's upstream-MCP recipe installs (`headroom mcp serve`). url/sha256 above are the `manylinux_2_28_x86_64` wheel this exact platform resolves (PyPI JSON https://pypi.org/pypi/headroom-ai/0.37.0/json urls[].digests.sha256, read 2026-09-25); the wheel was independently downloaded and re-hashed and matches exactly. `install_uv_tool` takes an optional `package` (this entry's `headroom-ai[mcp]`; every other uv-tool pin falls back to its own `.id`) and, since 2026-09-26, consumes a wheel url: fetch() downloads the wheel above and verifies this sha256, exiting 1 before uv runs on a mismatch, so the installed spec is `uv tool install --python 3.13 'headroom-ai[mcp] @ file://<ECO_INSTALL_ROOT>/downloads/headroom_ai-0.37.0-cp310-abi3-manylinux_2_28_x86_64.whl'` (the path percent-encoded per segment), the same distribution, version and extra as recipes/README.md's `'headroom-ai[mcp]==0.37.0'` and the version manifests/stack.json already pins; the wheel's own dependencies still resolve from uv's index. `headroom --version` prints `headroom, version 0.37.0` and exits; confirmed 2026-09-25 in an isolated `UV_TOOL_DIR`/`UV_TOOL_BIN_DIR` scratch install, not the shared host copy.",
+      "url": "https://files.pythonhosted.org/packages/03/1c/383f4a2d33ad18d40869037ca6221e1db24bc4da5e92befe70793220b138/headroom_ai-0.40.0-cp310-abi3-manylinux_2_28_x86_64.whl",
+      "sha256": "49b6d8a01c8eceb5b9e9a675720ed5e4cb24e467282642653aac7f2fd8faf47f",
+      "install_note": "2026-10-08 drift fix: synchronize the Linux wheel and native-token harness with manifests/stack.json's installed Headroom 0.40.0. Vendor release headroomlabs-ai/headroom v0.40.0 is commit 855390d6110e0bbb199d9b97025baac16c2f5cf3. URL and SHA256 come from https://pypi.org/pypi/headroom-ai/0.40.0/json; the official manylinux_2_28_x86_64 wheel was independently downloaded and hashed, matching the declared digest. install_uv_tool verifies the wheel SHA256 before invoking uv tool install --python 3.13 with headroom-ai[mcp] at that local verified wheel; dependencies still resolve from uv's index. The current host's headroom --version returned headroom, version 0.40.0. No installation or new functional acceptance was performed by this metadata refresh; the prior 0.37.0 qualification remains historical.",
       "version_probe": {
         "method": "exec",
         "command": "headroom",

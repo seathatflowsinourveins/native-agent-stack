@@ -549,10 +549,10 @@ command-output() {
 }
 
 output-compression() {
-  # Headroom 0.37.0 (headroom-ai[mcp], MCP server only) | uv-tool | planned
+  # Headroom 0.40.0 (headroom-ai[mcp], MCP server only) | uv-tool | planned
   # UNRUN on every distribution: added from the wave-3 batch of 2026-10-04 (the owner's decision, amendment 4), after every recorded run of this plan.
   # Planned. Source: https://raw.githubusercontent.com/headroomlabs-ai/headroom/v0.37.0/README.md#L92 (uv tool install --python 3.13; the [mcp] extra of adoption/pins-linux-x86_64.json instead of [all]); https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/f77a35eb2bf30bc4bf6f3b4ee51bc9ce5397b4c5/adoption/bootstrap-linux.sh#L988 (UV_TOOL_DIR and UV_TOOL_BIN_DIR in the ecosystem root, where the client templates run ${ECO_ROOT}/bin)
-  run_command 'UV_TOOL_DIR="${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/python-tools" UV_TOOL_BIN_DIR="${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin" uv tool install --python 3.13 '\''headroom-ai[mcp]==0.37.0'\''' || return "$?"
+  run_command 'UV_TOOL_DIR="${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/python-tools" UV_TOOL_BIN_DIR="${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin" uv tool install --python 3.13 '\''headroom-ai[mcp]==0.40.0'\''' || return "$?"
 }
 
 code-index() {
@@ -1081,7 +1081,7 @@ if $list; then
   printf '%s\n' 'context-supply | context-mode 1.0.169 | none | planned'
   printf '%s\n' 'statusline | claude-hud 0.10.0 (Claude Code status line plugin); Codex shows its native footer, tui.status_line | none | planned'
   printf '%s\n' 'command-output | RTK 0.51.0 | release-binary | planned'
-  printf '%s\n' 'output-compression | Headroom 0.37.0 (headroom-ai[mcp], MCP server only) | uv-tool | planned'
+  printf '%s\n' 'output-compression | Headroom 0.40.0 (headroom-ai[mcp], MCP server only) | uv-tool | planned'
   printf '%s\n' 'code-index | jcodemunch-mcp 1.108.327 | uv-tool | planned'
   printf '%s\n' 'code-graph | codebase-memory-mcp 0.11.0 | release-binary | planned'
   printf '%s\n' 'repo-packing | Repomix 1.18.1 | none | planned'
@@ -1098,7 +1098,7 @@ if $list; then
   printf '%s\n' 'local-model-server | Ollama | mise | planned'
   printf '%s\n' 'alerting | Alertmanager | release-binary | planned'
   printf '%s\n' 'local-generation-model | Swift-1.5-Qwen3.8-27B IQ3_S through Ollama (swift-iq3s-s2o-64k, context 64,000) | model-server | planned'
-  printf '%s\n' 'session-analytics | agentsview 0.43.0 (local archive only) | release-binary | planned'
+  printf '%s\n' 'session-analytics | agentsview 0.44.0 (local archive only) | release-binary | planned'
   printf '%s\n' 'inspect-ai | Inspect AI | uv-tool | planned'
   printf '%s\n' 'harbor-containerized-agent-e2e-runner | Harbor (containerized agent E2E runner) | uv-tool | planned'
   printf '%s\n' 'promptfoo | Promptfoo 0.123.1 | npm-global | planned'

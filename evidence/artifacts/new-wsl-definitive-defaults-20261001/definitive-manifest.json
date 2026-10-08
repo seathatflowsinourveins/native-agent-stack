@@ -88,7 +88,7 @@
   },
   "consensus": {
    "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-   "sha256": "31589b8d0547b3302913595c3bae76d8e740b5eab8ec2da76c8ec89127f603d3"
+   "sha256": "d5441b11b0641c3a1666851443db76e1703697962badb28f0fe48eac40f8171e"
   }
  },
  "counts": {
@@ -2022,7 +2022,7 @@
    "layer_id": "token-efficiency",
    "slot_id": "output-compression",
    "row_kind": "owner_decision",
-   "default": "Headroom 0.37.0 (headroom-ai[mcp], MCP server only)",
+   "default": "Headroom 0.40.0 (headroom-ai[mcp], MCP server only)",
    "repository": "https://github.com/headroomlabs-ai/headroom",
    "installs_nothing_extra": false,
    "definitive": false,
@@ -2038,8 +2038,8 @@
     "by": "the owner's decision of 2026-10-04",
     "batch": "wave3",
     "reason": "the owner's order installs the token-efficiency repositories by default; Headroom is a core row of docs/token-efficiency-stack.json (on-demand MCP compression and retrieval)",
-    "pin": "PyPI headroom-ai[mcp]==0.37.0; wheel headroom_ai-0.37.0-cp310-abi3-manylinux_2_28_x86_64.whl, sha256 2efc5cdf681a10c5fc7a2a271a471179c409074537045f682b10e4d724976f46 (adoption/pins-linux-x86_64.json)",
-    "install": "the install plan's output-compression function: uv tool install --python 3.13 'headroom-ai[mcp]==0.37.0' with UV_TOOL_DIR ${ECO_ROOT}/python-tools and UV_TOOL_BIN_DIR ${ECO_ROOT}/bin",
+    "pin": "PyPI headroom-ai[mcp]==0.40.0; wheel headroom_ai-0.40.0-cp310-abi3-manylinux_2_28_x86_64.whl, sha256 49b6d8a01c8eceb5b9e9a675720ed5e4cb24e467282642653aac7f2fd8faf47f (adoption/pins-linux-x86_64.json; CC065432Z drift refresh)",
+    "install": "the existing output-compression recipe at the refreshed pin: uv tool install --python 3.13 'headroom-ai[mcp]==0.40.0' with UV_TOOL_DIR ${ECO_ROOT}/python-tools and UV_TOOL_BIN_DIR ${ECO_ROOT}/bin",
     "usage_rules": [
      "the [mcp] extra only, never [all]; the server runs as headroom mcp serve --proxy-url http://127.0.0.1:1, a dead proxy URL that reroutes no model traffic (docs/decisions/2026-09-25-codex-mcp-scope.md:73-74)",
      "HEADROOM_OFFLINE=1, HF_HUB_OFFLINE=1, TRANSFORMERS_OFFLINE=1 and DO_NOT_TRACK=1 in its MCP environment (adoption/templates/codex.config.template.toml)",
@@ -2054,7 +2054,7 @@
      "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
      "docs/token-efficiency-stack.json (rows[component_id=headroom].upstream_commands)",
      "recipes/README.md (the headroom row)",
-     "https://github.com/headroomlabs-ai/headroom/releases/tag/v0.37.0"
+     "https://github.com/headroomlabs-ai/headroom/releases/tag/v0.40.0"
     ]
    }
   },
@@ -2696,7 +2696,7 @@
    "layer_id": "observation-inference",
    "slot_id": "session-analytics",
    "row_kind": "added",
-   "default": "agentsview 0.43.0 (local archive only)",
+   "default": "agentsview 0.44.0 (local archive only)",
    "repository": "https://github.com/kenn-io/agentsview",
    "installs_nothing_extra": false,
    "definitive": false,
@@ -2712,8 +2712,8 @@
     "by": "the owner's decision of 2026-10-04",
     "batch": "wave3",
     "reason": "the owner's order asks for monitored token use and invocation rates across new sessions; agentsview is the scoped historical transcript search of docs/token-efficiency-stack.json, and both blind GPT orders had picked it for this slot",
-    "pin": "release v0.43.0 asset agentsview_0.43.0_linux_amd64.tar.gz, sha256 4520c6698772d2db7220212abf58d7d58c0966d7435f0a5ab134371f874df6d9 (the GitHub asset digest read 2026-10-04); the release's SHA256SUMS lists the asset, as the workstation's install receipt of 2026-09-25 checked (evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--agentsview--install--20260925.json)",
-    "install": "the install plan's session-analytics function: the release archive through the plan's checksum-verified download, extracted into ${ECO_ROOT}/tools/agentsview-0.43.0 and linked into ${ECO_ROOT}/bin",
+    "pin": "release v0.44.0 asset agentsview_0.44.0_linux_amd64.tar.gz, sha256 037ea7a46d52e06b20363b4aa7cd7f28e32f31d8215803d6e9a0c96bac5818e3 (vendor GitHub asset digest read 2026-10-08); installed build commit 413a87f7bfbd67b2815b1119ac51abc1efbeeaba matches the release, per evidence/receipts/2604-drift-version-readback-20261008.json. Historical 0.43.0 host receipts retain their scope.",
+    "install": "the existing session-analytics archive procedure at the refreshed pin: checksum-verified release v0.44.0, extracted into ${ECO_ROOT}/tools/agentsview-0.44.0 and linked into ${ECO_ROOT}/bin",
     "usage_rules": [
      "a local archive only: AGENTSVIEW_DATA_DIR on an owned directory, AGENTSVIEW_TELEMETRY_ENABLED=0 and AGENTSVIEW_DISABLE_UPDATE_CHECK=1 on every call (docs/token-efficiency-stack.json, the agentsview use commands)",
      "a blank archive is not evidence of zero historical usage (recipes/README.md, the agentsview row)"

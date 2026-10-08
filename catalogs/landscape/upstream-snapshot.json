@@ -276,9 +276,9 @@
     {
       "component_id": "agentsview",
       "repository": "https://github.com/kenn-io/agentsview",
-      "selected_repository_url": "https://github.com/kenn-io/agentsview/releases/tag/v0.43.0",
-      "selected_version": "0.43.0",
-      "selected_source_pin": null,
+      "selected_repository_url": "https://github.com/kenn-io/agentsview/releases/tag/v0.44.0",
+      "selected_version": "0.44.0",
+      "selected_source_pin": "413a87f7bfbd67b2815b1119ac51abc1efbeeaba",
       "checks": [
         {
           "endpoint": "repos/kenn-io/agentsview",
@@ -327,9 +327,9 @@
       },
       "status": "metadata_checked",
       "adoption_recommendation": "retain_selected_pending_capability_comparison",
-      "source_pin_kind": "version_only",
+      "source_pin_kind": "commit",
       "primary_repository": "https://github.com/kenn-io/agentsview",
-      "release_relationship": "newer_stable_release_review_pending"
+      "release_relationship": "selected_version_matches_latest_stable"
     },
     {
       "component_id": "ai-memory",
@@ -1248,9 +1248,9 @@
     {
       "component_id": "headroom",
       "repository": "https://github.com/chopratejas/headroom",
-      "selected_repository_url": "https://github.com/chopratejas/headroom",
-      "selected_version": "0.37.0",
-      "selected_source_pin": null,
+      "selected_repository_url": "https://github.com/headroomlabs-ai/headroom",
+      "selected_version": "0.40.0",
+      "selected_source_pin": "855390d6110e0bbb199d9b97025baac16c2f5cf3",
       "checks": [
         {
           "endpoint": "repos/chopratejas/headroom",
@@ -1299,9 +1299,9 @@
       },
       "status": "metadata_checked",
       "adoption_recommendation": "retain_selected_pending_capability_comparison",
-      "source_pin_kind": "version_only",
+      "source_pin_kind": "commit",
       "primary_repository": "https://github.com/headroomlabs-ai/headroom",
-      "release_relationship": "selected_version_matches_latest_stable"
+      "release_relationship": "selected_newer_than_dated_release_snapshot"
     },
     {
       "component_id": "huggingface-hub-native",
@@ -6889,6 +6889,14 @@
       "api_commands": 8,
       "api_nonzero_results": 0,
       "methodology": "Existing gh api endpoint method, four calls per component: repository, latest stable release, selected commit, release tag commit. Original observations remain in each refreshed row dated_observations; all other rows and the original snapshot-wide summary retain their earlier scope."
+    },
+    {
+      "checked_at": "2026-10-08T08:32:38Z",
+      "component_ids": [
+        "agentsview",
+        "headroom"
+      ],
+      "methodology": "Current selection identities synchronized with installed CLI readbacks and vendor release pins in evidence/receipts/2604-drift-version-readback-20261008.json; original dated checks, release observations and snapshot summary retained. This refresh establishes metadata only."
     }
   ]
 }

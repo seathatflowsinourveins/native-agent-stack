@@ -1853,13 +1853,13 @@
     {
       "layer": "token-efficiency",
       "slot": "output-compression",
-      "owner": "Headroom 0.37.0 (headroom-ai[mcp], MCP server only)",
+      "owner": "Headroom 0.40.0 (headroom-ai[mcp], MCP server only)",
       "repository": "https://github.com/headroomlabs-ai/headroom",
       "release": "v0.37.0",
       "installed": true,
       "route": "uv-tool",
       "commands": [
-        "UV_TOOL_DIR=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/python-tools\" UV_TOOL_BIN_DIR=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin\" uv tool install --python 3.13 'headroom-ai[mcp]==0.37.0'"
+        "UV_TOOL_DIR=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/python-tools\" UV_TOOL_BIN_DIR=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin\" uv tool install --python 3.13 'headroom-ai[mcp]==0.40.0'"
       ],
       "needs": {
         "sudo": false,
@@ -2848,7 +2848,7 @@
     {
       "layer": "observation-inference",
       "slot": "session-analytics",
-      "owner": "agentsview 0.43.0 (local archive only)",
+      "owner": "agentsview 0.44.0 (local archive only)",
       "repository": "https://github.com/kenn-io/agentsview",
       "release": "v0.44.0",
       "installed": true,

@@ -1217,7 +1217,7 @@
       "purpose": "On-demand upstream MCP compression/retrieval and separately guarded offline artifact compression",
       "upstream_commands": {
         "install": [
-          "uv tool install --python 3.13 'headroom-ai[mcp]==0.37.0'"
+          "uv tool install --python 3.13 'headroom-ai[mcp]==0.40.0'"
         ],
         "use": [
           "HEADROOM_OFFLINE=1 HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 DO_NOT_TRACK=1 headroom mcp serve --proxy-url http://127.0.0.1:1",
@@ -1229,10 +1229,10 @@
           "headroom_stats({})"
         ],
         "command_kind": "Upstream CLI/MCP commands and portable placeholders from linked recipes; documentation is not execution evidence.",
-        "install_note": "`uv tool install --python 3.13 'headroom-ai[mcp]==0.37.0'`",
+        "install_note": "`uv tool install --python 3.13 'headroom-ai[mcp]==0.40.0'`",
         "statistics_note": "Upstream savings estimate; keep its own scope."
       },
-      "returned_result_summary": "2026-09-20 14:55:58.113162 UTC global headroom savings JSON still returned 0 estimated saved tokens. Separate earlier fixture ledger: 1 call and 36,719 estimated saved. Later clean-prefix fixture: 9,616 original, 2,128 compressed and 7,488 saved upstream tokens. Exact original recovery passed across server restart; uninstall removed created entrypoints while retaining source artifacts.",
+      "returned_result_summary": "Historical observations at Headroom 0.37.0; the current 0.40.0 selection has a version readback only. 2026-09-20 14:55:58.113162 UTC global headroom savings JSON still returned 0 estimated saved tokens. Separate earlier fixture ledger: 1 call and 36,719 estimated saved. Later clean-prefix fixture: 9,616 original, 2,128 compressed and 7,488 saved upstream tokens. Exact original recovery passed across server restart; uninstall removed created entrypoints while retaining source artifacts.",
       "session_statistics": {
         "availability": "upstream_estimate",
         "value": 7488,
@@ -6370,7 +6370,7 @@
       "purpose": "Scoped historical Codex/Claude transcript lexical search",
       "upstream_commands": {
         "install": [
-          "gh release view v0.43.0 --repo kenn-io/agentsview --json assets"
+          "gh release view v0.44.0 --repo kenn-io/agentsview --json assets"
         ],
         "use": [
           "AGENTSVIEW_DATA_DIR=\"$STACK_HOME/state/selected-history\" AGENTSVIEW_TELEMETRY_ENABLED=0 AGENTSVIEW_DISABLE_UPDATE_CHECK=1 AGENTSVIEW_NO_DAEMON=1 agentsview sync",
@@ -6378,10 +6378,10 @@
           "AGENTSVIEW_DATA_DIR=\"$STACK_HOME/state/selected-history\" AGENTSVIEW_TELEMETRY_ENABLED=0 AGENTSVIEW_DISABLE_UPDATE_CHECK=1 agentsview daemon stop"
         ],
         "statistics": [],
-        "install_note": "Official [kenn-io/agentsview v0.43.0](https://github.com/kenn-io/agentsview/releases/tag/v0.43.0) archive; select the host asset through `gh release view v0.43.0 --repo kenn-io/agentsview --json assets`, then the archive procedure",
+        "install_note": "Official [kenn-io/agentsview v0.44.0](https://github.com/kenn-io/agentsview/releases/tag/v0.44.0) archive; select the host asset through `gh release view v0.44.0 --repo kenn-io/agentsview --json assets`, then the archive procedure",
         "command_kind": "Upstream documented commands; only the retained receipt establishes execution."
       },
-      "returned_result_summary": "2026-09-20 one explicitly scoped historical session was indexed and exact message retrieval passed through the explicit endpoint. Archive vectors false; server stopped and ephemeral token file deleted. New sessions require an explicit scoped refresh; no token saving counter.",
+      "returned_result_summary": "Historical observations at AgentsView 0.43.0; the current 0.44.0 selection has a version readback only. 2026-09-20 one explicitly scoped historical session was indexed and exact message retrieval passed through the explicit endpoint. Archive vectors false; server stopped and ephemeral token file deleted. New sessions require an explicit scoped refresh; no token saving counter.",
       "session_statistics": {
         "availability": "none",
         "value": null,

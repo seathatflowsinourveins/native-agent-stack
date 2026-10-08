@@ -62,6 +62,8 @@ HOME = "${HOME}"
 LANG = "C.UTF-8"
 TERM = "xterm-256color"
 TMPDIR = "/tmp"
+# Preserve the distribution identity used by 2604 host guards under inherit = "none".
+WSL_DISTRO_NAME = "NativeStack2604"
 XDG_RUNTIME_DIR = "${XDG_RUNTIME_DIR}"
 DOCKER_HOST = "unix://${XDG_RUNTIME_DIR}/docker.sock"
 

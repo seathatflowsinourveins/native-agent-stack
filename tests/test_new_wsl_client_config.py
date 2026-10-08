@@ -1670,8 +1670,9 @@ class RenderTests(unittest.TestCase):
         policy = config["shell_environment_policy"]
         self.assertEqual(policy["inherit"], "none")
         self.assertEqual(sorted(policy["set"]), ["DOCKER_HOST", "HOME", "LANG", "MCP_AUTO_OPEN_ENABLED", "PATH",
-                                                 "RTK_TELEMETRY_DISABLED", "TERM", "TMPDIR", "XDG_RUNTIME_DIR"])
+                                                 "RTK_TELEMETRY_DISABLED", "TERM", "TMPDIR", "WSL_DISTRO_NAME", "XDG_RUNTIME_DIR"])
         self.assertEqual(policy["set"]["HOME"], "/home/example")
+        self.assertEqual(policy["set"]["WSL_DISTRO_NAME"], "NativeStack2604")
         # The user's systemd runtime directory, for systemctl --user and the messaging courier, and the rootless Docker
         # socket in it (wave-2 custody ruling, change 7; synthesis X12): the id of the user the tool runs as.
         self.assertEqual(policy["set"]["XDG_RUNTIME_DIR"], f"/run/user/{os.getuid()}")

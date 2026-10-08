@@ -39,7 +39,7 @@ from openai_codex.types import ReasoningEffort
 SDK_VERSION = "0.160.0"
 PROVIDER = "omniroute_runtime"
 DEFAULT_MODEL = "cx/gpt-6.1-sol-max"
-DEFAULT_BASE_URL = "http://127.0.0.1:20128/v1"
+DEFAULT_BASE_URL = "http://127.0.0.1:21128/v1"
 # OmniRoute 0585aba5589d5a1f49243a13a8db249558e7c9e3:
 # open-sse/executors/codex/reasoningSuffix.ts: suffix tokens for a lexical
 # fail-closed guard, independent of gateway alias sets.

@@ -4676,6 +4676,21 @@
         "All three CVE reachability statements concern repository provisioning only. The upgrade preserves the database; existing users/Editor memberships, Grafana-managed alert rules, shared dashboards/sharing tokens, and additional datasources/stored credential configuration were not inspected. The live-database check remains an open host item."
       ],
       "path": "evidence/receipts/grafana-1323-qualification-20261003.json"
+    },
+    {
+      "id": "2604-drift-version-readback-20261008",
+      "kind": "upstream_provenance",
+      "component_ids": [
+        "agentsview",
+        "headroom"
+      ],
+      "claim": "Fresh installed CLI version readbacks match AgentsView 0.44.0 and Headroom 0.40.0; vendor release identities and the Headroom macOS artifact digest were independently checked.",
+      "limitations": [
+        "Metadata and artifact identity only; no installation, service activation, provider call or functional acceptance was performed.",
+        "Historical functional receipts and lifecycle observations retain their original versions and scope.",
+        "The macOS wheel was hashed on Linux; no Mac has run this install or qualified its runtime behavior."
+      ],
+      "path": "evidence/receipts/2604-drift-version-readback-20261008.json"
     }
   ],
   "files": [
@@ -5031,8 +5046,8 @@
     },
     {
       "path": "adoption/bootstrap-linux.sh",
-      "sha256": "487d25bff2a412883e4875f98be230c89ea37bf9737d71dd558da20d8e94f2ad",
-      "bytes": 74740
+      "sha256": "3d67d227f55f5de44e93158511240fcf8ce7e14da73dec4483aabaa1231151d8",
+      "bytes": 74811
     },
     {
       "path": "adoption/bootstrap-macos.sh",
@@ -5141,8 +5156,8 @@
     },
     {
       "path": "adoption/launchd/launchd-agents.sh",
-      "sha256": "8d607da363de3a92552e76c88043fc0576168a015e5f30898d07ee3cf4839e6e",
-      "bytes": 37719
+      "sha256": "4ae29eb1831f0a5ac403dccc8cc406b962d9420962364d504e9ef7a09c26a81d",
+      "bytes": 37790
     },
     {
       "path": "adoption/lifecycle.md",
@@ -5176,8 +5191,8 @@
     },
     {
       "path": "adoption/new-wsl/client-config-map.json",
-      "sha256": "ba33408c82deda5f30aa6253bdbcf209c02a4e49844b3108a4973d29b7729719",
-      "bytes": 55814
+      "sha256": "0d12f8a2dacfa0ac87261bedc4b349a39939aec41c030b64a2fa7a3d798e1487",
+      "bytes": 55883
     },
     {
       "path": "adoption/new-wsl/codex-user-instructions.md",
@@ -5196,8 +5211,8 @@
     },
     {
       "path": "adoption/new-wsl/templates/codex.config.additions.toml",
-      "sha256": "a10fbc7b2bc034c824e22c292d71700fd2760234998c03f390d79a965e3bc159",
-      "bytes": 5085
+      "sha256": "07da39f8e7bc5211d51cfc5997301ade00e86cf00f7bc9d9160a7c7b7ed3e055",
+      "bytes": 5207
     },
     {
       "path": "adoption/paired/README.md",
@@ -5231,13 +5246,13 @@
     },
     {
       "path": "adoption/pins-linux-x86_64.json",
-      "sha256": "0ede232552fa0ac9666f6a52ea6f037539668e1517e6de9c2fc4602b2e797691",
-      "bytes": 37218
+      "sha256": "0c2a0d7fb2b35f9c3f85462dcac514254645116ae3eb7735cf444f1735e894c3",
+      "bytes": 36650
     },
     {
       "path": "adoption/pins-macos-arm64.json",
-      "sha256": "dc9162a3c70a1b0fcb31749c969e743cf72833db06d068b5c28c6ca1744dd218",
-      "bytes": 43485
+      "sha256": "1ba0586b360e136da0acf0b65d41075e14de0c86f3275f2e1e40937f1f24866a",
+      "bytes": 42810
     },
     {
       "path": "adoption/platforms/linux-wsl2-new-distro.md",
@@ -5251,8 +5266,8 @@
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "a840ee74dfd23efb640bc19d00a4d0b75781a2b9fe01c37039a7216e0b0243f1",
-      "bytes": 66120
+      "sha256": "cadc9b9e4f5559ed6c7a833a2f2f313f06606ff7f89b0bc040f2dec4dc23604f",
+      "bytes": 66472
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -11062,8 +11077,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "57b0a8b511d4141c6d587d6a4254428b1e0e843f26e3c79a94daa70152b75f88",
-      "bytes": 495718
+      "sha256": "0a273166ad4ebc1273a68c50c7b3e09edcda29c05aecd4639feb9674f7a9dfa4",
+      "bytes": 496564
     },
     {
       "path": "blueprints/trials-20260926/README.md",
@@ -16717,7 +16732,7 @@
     },
     {
       "path": "catalogs/landscape/new-host-grand-list.json",
-      "sha256": "aabf9027d87fb0a4287569e2c15bfd486b190fe577bcdb9f9f89fc817196bc95",
+      "sha256": "c14b646026cf2956e22ef7d118edb8e97eba76117a4181c2052fca72272b5dca",
       "bytes": 287577
     },
     {
@@ -16727,8 +16742,8 @@
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
-      "sha256": "da49a384a240c28ee7dbee035c8b163ff423ccacd9a05a32dc92f498f82b0090",
-      "bytes": 294837
+      "sha256": "79cc4092d0767791911edf6b5ba3f8cc97f2b24d9d072cabc5b8c00863d3381e",
+      "bytes": 295341
     },
     {
       "path": "catalogs/landscape/us-equities.json",
@@ -17462,7 +17477,7 @@
     },
     {
       "path": "docs/decisions/2026-10-01-new-wsl-definitive-defaults.md",
-      "sha256": "1d3e6dd6d86df768a2683cd9f64bd478111467efdf6f35b3c71526af93b9f1d6",
+      "sha256": "1b59e7b2100199d2b3a2125a811c7959c11dc55be9d029d4c0f676bbd9059ff5",
       "bytes": 80195
     },
     {
@@ -17487,8 +17502,8 @@
     },
     {
       "path": "docs/decisions/2026-10-02-new-wsl-client-configuration.md",
-      "sha256": "1f6b9dc7245ed4caced4a3e3583f0a95b4e50fa090f77c3efe5fa17e80b99408",
-      "bytes": 141809
+      "sha256": "75e71dc50b2d2536809ad53ba5718e8efc0edf7b5cd0b70b4fd7b481e53dd76f",
+      "bytes": 144933
     },
     {
       "path": "docs/decisions/2026-10-02-omniroute-mac-rebuild.md",
@@ -18137,7 +18152,7 @@
     },
     {
       "path": "docs/new-host-grand-list.md",
-      "sha256": "10be0b93bf691307de4bfbf32101b02a2f550a6c0dded95e12d46d20c4ddfefd",
+      "sha256": "2e25c946a55d8c97ccb48681dd6a5c93f2fc50b54de42ebd102f83d26787d0db",
       "bytes": 18484
     },
     {
@@ -18147,12 +18162,12 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "d6f48ee6d88f208713fe65b99cb8d0ad8f74d2378fee02c0fcc29871a59738aa",
-      "bytes": 692762
+      "sha256": "9b5900c995ae258057099ad0819f3cb55ec2ce3bf3c1b5c41d8c299bc1177a19",
+      "bytes": 692787
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "0a49c71d2e8ccfa1b05f5535b6a0c30268507a03afa22ad106c145fe0d4f01ee",
+      "sha256": "f683090521e28889672b995714a0b35b1e31dfc5df3a52211d233767bae4444b",
       "bytes": 368763
     },
     {
@@ -18247,8 +18262,8 @@
     },
     {
       "path": "docs/token-efficiency-stack.json",
-      "sha256": "a0f70bf8793b30e152ec5f97779d26057ddff0e8d54e01dc1cc111df03ac37ea",
-      "bytes": 595149
+      "sha256": "fa273390dfb7914f48d89189764e8c417d393f354f664909c50a38bcc0ac3ca3",
+      "bytes": 595355
     },
     {
       "path": "docs/token-efficiency-stack.md",
@@ -39742,8 +39757,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
-      "sha256": "e8f90d3e6826de0bedb2dda0efc89c8f41795fb59f812504acc3bd6b235935a7",
-      "bytes": 229932
+      "sha256": "901916dbfe24a40e377ba238c41648150b70eed4696421fa61da07d08f1ee150",
+      "bytes": 229957
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/foundation-definitive.compact.json",
@@ -40497,8 +40512,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "0d20722fd01a37564df9cb657a6089022d7a176ef2841e4b9a0bb94b91503b35",
-      "bytes": 50922
+      "sha256": "7c1b12dafa110f54cc6fd7a19a7202477e53ea33bc1fd70ccd5a62a40c7be696",
+      "bytes": 51433
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/slot-state-and-core-recipes.json",
@@ -40957,12 +40972,12 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
-      "sha256": "3b5b29ba85c86037766bda1bb869efd2cc450eea21facef0ad333a1c497354c1",
+      "sha256": "d7181dc3eb48d99e1c3a3d5f421b4b011c60e18807376eab71071e1f94b73c8f",
       "bytes": 487472
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
-      "sha256": "f40f9023f10c273be1445d2fb4f3f4105e876e71c137bc87b1f3bd9e1f48f031",
+      "sha256": "8f60f6def61bf40ee6e5a9ac620e4a4a2da114634a0c0495dbc33bc753a8aa77",
       "bytes": 134338
     },
     {
@@ -40987,7 +41002,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/owners.json",
-      "sha256": "cb7158adf07a41fccee3fbe376773e304417cec7fedaa24c598f23e33216b282",
+      "sha256": "bdc81ba3fafd6b4ce8fb4d3652655cd06a46c28e4dbe015c5f7a1c9533dd1bc3",
       "bytes": 35189
     },
     {
@@ -41027,8 +41042,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-      "sha256": "31589b8d0547b3302913595c3bae76d8e740b5eab8ec2da76c8ec89127f603d3",
-      "bytes": 142783
+      "sha256": "d5441b11b0641c3a1666851443db76e1703697962badb28f0fe48eac40f8171e",
+      "bytes": 142808
     },
     {
       "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/copy-notes.json",
@@ -54706,6 +54721,11 @@
       "bytes": 195
     },
     {
+      "path": "evidence/receipts/2604-drift-version-readback-20261008.json",
+      "sha256": "e3ec4d7ffa9493de0cef96f13a3ffd012906e3dd213e420e9dd92a669dc32691",
+      "bytes": 2373
+    },
+    {
       "path": "evidence/receipts/adaptive-paper-practice-20260921.json",
       "sha256": "f8d965b15517bfc7de9bc5f80b7dd328b1f19dff48b4508ac53531819a1c02a8",
       "bytes": 1125
@@ -56047,8 +56067,8 @@
     },
     {
       "path": "examples/omniroute-codex-sdk/README.md",
-      "sha256": "edcd00175931191ae19336c00405291eef92ca97a4a791295ebc9cd1aeaff434",
-      "bytes": 20410
+      "sha256": "c228b2f0e7b7be2226e11e8ac3c4602b2da9a25f5ce0bce0418542dc22cc0409",
+      "bytes": 20417
     },
     {
       "path": "examples/omniroute-codex-sdk/acceptance-plan.json",
@@ -56097,7 +56117,7 @@
     },
     {
       "path": "examples/omniroute-codex-sdk/worker.py",
-      "sha256": "e1f06bf5c161ecf66a2172cee27c288b7a03a16c75a6f155099f381a532ac3ea",
+      "sha256": "f1a2489fc059b5ab055392e26a1f13d1748623baed130d8808ddc99fc1c08610",
       "bytes": 26572
     },
     {
@@ -56262,8 +56282,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "c191a297c89b884e5639fc676ce90d4b543d32e6b9eb2c26156e253b74c0326b",
-      "bytes": 128113
+      "sha256": "05ce01679cbd9961c6c5e8ffe5dc931b11f14114772059d3a6f860e87305343a",
+      "bytes": 128437
     },
     {
       "path": "observability/README.md",
@@ -56572,8 +56592,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "afd953e486ccd90e5a15e3d4f144e67e4c099c0d9cfd31274020c5fb35c06404",
-      "bytes": 133027
+      "sha256": "bab6e6cbdf5212e37646a088ea304a362d75e77c548231d0470d8cf35c26ebbe",
+      "bytes": 132889
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
@@ -56707,7 +56727,7 @@
     },
     {
       "path": "scripts/native_token_ci.py",
-      "sha256": "95d45da579b1035c4cfa54f330f1ab179b949bbdb49555dd82c5163d2367300a",
+      "sha256": "fa83183c61407724083dfac2f5441859268a4de93663dae5d024eea7c733681d",
       "bytes": 117733
     },
     {
@@ -57112,7 +57132,7 @@
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",
-      "sha256": "c4ccf548196cd115103738f7c8de2637618e6bd038f7167973ef79d4f7701044",
+      "sha256": "d7aadf37028c6037adc055f3a9cdfddcea1c16c2e5ba38baa9ecc9294100ab53",
       "bytes": 230581
     },
     {
@@ -57132,8 +57152,8 @@
     },
     {
       "path": "tests/test_adoption_guarded_runners.py",
-      "sha256": "c8db8b668f3f75c2ef1e13a736223e05ffcdc747861062850aa9eac3049a5f14",
-      "bytes": 41460
+      "sha256": "ba4fbe64f4c5e39bb5f5f25ce27999dab9d950b3456972218180fbaa663da4cb",
+      "bytes": 41727
     },
     {
       "path": "tests/test_adoption_launchd.py",
@@ -57752,8 +57772,8 @@
     },
     {
       "path": "tests/test_new_wsl_client_config.py",
-      "sha256": "a31f44e0259efbfdcda5ab19f50663cb932973b6c9f0fa73d4dc2b1ae9a9295c",
-      "bytes": 340618
+      "sha256": "b0985b113221595697b61c31a373eb0ca33b73b92a6f477943faa6674b464afd",
+      "bytes": 340715
     },
     {
       "path": "tests/test_new_wsl_definitive_defaults.py",
