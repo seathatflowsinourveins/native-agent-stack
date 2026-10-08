@@ -1,0 +1,200 @@
+#!/usr/bin/env python3
+"""Return the installed embedded DeerFlow producer's original cited answer path.
+
+Sources: bytedance/deer-flow@345f08be00c8a9495079b732a39b46aa9af1584e,
+README.md embedded-client example and client.py stream/chat contract; the
+installed deer-flow-research.sh owns configuration, retrieval checks and its
+1500-second watchdog. aannoo/hcom@b2a7c192003e7fd67ed93265289e4ac36276f965
+and installed hcom 0.7.28: ``hcom list self --json [--name <caller>]``.
+
+Neither upstream supplies this repository's single-path dispatch return. This
+adapter resolves the native caller, invokes the existing producer once, and
+retains its output/verdict unchanged. It does not start an agent, send messages,
+register host scripts, select a model, or grade research/adoption readiness.
+"""
+
+import argparse
+import hashlib
+import json
+import os
+import signal
+import subprocess
+import sys
+import tempfile
+from datetime import datetime, timezone
+from pathlib import Path
+
+
+def utc_now():
+    return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
+def file_record(path):
+    data = path.read_bytes()
+    return {"path": str(path), "bytes": len(data), "sha256": hashlib.sha256(data).hexdigest()}
+
+
+def native_run_directory(stdout):
+    # The supported launcher prints this first, before setup/model output.
+    # A later quoted marker in the answer must never replace the producer path.
+    with stdout.open(encoding="utf-8") as stream:
+        first = stream.readline().rstrip("\r\n")
+    prefix = "run directory: "
+    if not first.startswith(prefix) or not first[len(prefix):].strip():
+        raise ValueError("The producer did not return its native run-directory header")
+    directory = Path(first[len(prefix):])
+    if not directory.is_absolute():
+        raise ValueError("The producer run-directory path is not absolute")
+    return directory
+
+
+def run_producer(launcher, question, directory):
+    """Leave the upstream watchdog intact; forward cancellation to its group."""
+    with (directory / "producer.stdout").open("wb") as stdout, (directory / "producer.stderr").open("wb") as stderr:
+        process = subprocess.Popen(
+            ["bash", str(launcher), question], stdout=stdout, stderr=stderr, start_new_session=True,
+        )
+        previous = {}
+
+        def cancelled(signum, _frame):
+            raise InterruptedError(signum)
+
+        try:
+            for signum in (signal.SIGINT, signal.SIGTERM):
+                previous[signum] = signal.signal(signum, cancelled)
+            return process.wait(), None
+        except InterruptedError as error:
+            signum = error.args[0]
+            for caught_signal in previous:
+                signal.signal(caught_signal, signal.SIG_IGN)
+            try:
+                os.killpg(process.pid, signum)
+            except ProcessLookupError:
+                pass
+            try:
+                process.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                pass
+            # The leader can exit while a descendant ignores TERM. Retire the
+            # entire owned group even when the leader has already been reaped.
+            try:
+                os.killpg(process.pid, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+            process.wait()
+            return process.returncode, signum
+        finally:
+            for signum, handler in previous.items():
+                signal.signal(signum, handler)
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--name", "--hcom-name", help="Native hcom caller identity; otherwise hcom resolves the current session")
+    parser.add_argument("--question", dest="option_question", help="One bounded public-research question")
+    parser.add_argument("question", nargs="?", help="Positional alternative to --question; include known source URLs")
+    args = parser.parse_args(argv)
+    if (args.question is None) == (args.option_question is None):
+        parser.error("provide exactly one question, with --question or as a positional argument")
+    question = args.option_question if args.option_question is not None else args.question
+    if not question.strip():
+        parser.error("question must not be empty")
+
+    os.umask(0o077)
+    state_root = Path(os.environ.get("XDG_STATE_HOME", str(Path.home() / ".local/state")))
+    run_root = state_root / "native-agent-stack/research/dispatch"
+    run_root.mkdir(parents=True, exist_ok=True, mode=0o700)
+    directory = Path(tempfile.mkdtemp(prefix="run.", dir=run_root)).resolve()
+    receipt = {
+        "schema_version": 1,
+        "status": "failed",
+        "started_at_utc": utc_now(),
+        "question_sha256": hashlib.sha256(question.encode("utf-8")).hexdigest(),
+        "native_exit_code": None,
+        "evidence_boundary": "Native producer verdict only; citation correctness, completeness and adoption readiness require primary-source review.",
+    }
+    returncode = 1
+    answer = None
+    try:
+        config_root = Path(os.environ.get("XDG_CONFIG_HOME", str(Path.home() / ".config")))
+        launcher = config_root / "new-wsl-native-stack/deer-flow-research.sh"
+        receipt["launcher"] = file_record(launcher)
+        command = ["hcom", "list", "self", "--json"]
+        if args.name:
+            command.extend(["--name", args.name])
+        receipt["hcom_command"] = command
+        with (directory / "hcom.stdout").open("wb") as stdout, (directory / "hcom.stderr").open("wb") as stderr:
+            identity_result = subprocess.run(command, stdout=stdout, stderr=stderr, timeout=30)
+        receipt["hcom_exit_code"] = identity_result.returncode
+        if identity_result.returncode:
+            raise ValueError("Native hcom caller resolution failed; research was not started")
+        identity = json.loads((directory / "hcom.stdout").read_text(encoding="utf-8"))
+        if not isinstance(identity, dict) or not identity.get("name") or not identity.get("session_id"):
+            raise ValueError("Native hcom returned no participating caller/session; research was not started")
+        receipt["hcom_identity"] = {key: identity.get(key) for key in ("name", "session_id", "tool")}
+
+        native_exit_code, interrupted_by = run_producer(launcher, question, directory)
+        receipt["native_exit_code"] = native_exit_code
+        for filename in ("producer.stdout", "producer.stderr"):
+            receipt[filename] = file_record(directory / filename)
+        try:
+            native_directory = native_run_directory(directory / "producer.stdout")
+            receipt["native_run_directory"] = str(native_directory)
+        except ValueError:
+            if native_exit_code or interrupted_by:
+                native_directory = None
+            else:
+                raise
+        metadata = None
+        if native_directory is not None:
+            answer = native_directory / "answer.md"
+            metadata_path = native_directory / "native-retrieval-metadata.json"
+            try:
+                if answer.is_file():
+                    receipt["answer"] = file_record(answer)
+                if metadata_path.is_file():
+                    receipt["native_metadata"] = file_record(metadata_path)
+                    metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+                    if not isinstance(metadata, dict):
+                        raise ValueError("The native retrieval metadata is not an object")
+                    receipt["native_citations"] = {
+                        key: metadata.get(key) for key in (
+                            "integration_assertion_pass", "cited_retrieved_url_matches", "cited_retrieved_url_sha256",
+                        )
+                    }
+            except (OSError, ValueError) as error:
+                receipt["native_metadata_error"] = str(error)
+                if not native_exit_code and not interrupted_by:
+                    raise
+        if interrupted_by:
+            receipt["interrupted_by_signal"] = interrupted_by
+            returncode = 128 + interrupted_by
+            raise ValueError("Research cancelled; original producer output and run directory are retained")
+        if native_exit_code:
+            returncode = native_exit_code if native_exit_code > 0 else 128 - native_exit_code
+            raise ValueError("Native research failed; original producer output and run directory are retained")
+
+        if metadata is None or "answer" not in receipt:
+            raise ValueError("The native answer or retrieval metadata is missing")
+        matches = metadata.get("cited_retrieved_url_matches")
+        if (
+            metadata.get("integration_assertion_pass") is not True
+            or type(matches) is not int or matches < 1
+            or not answer.read_text(encoding="utf-8").strip()
+        ):
+            raise ValueError("No successful native cited-answer verdict; retained result is not returned as completed")
+        receipt["status"] = "completed"
+        returncode = 0
+    except (OSError, ValueError, subprocess.TimeoutExpired) as error:
+        receipt["error"] = str(error)
+        print(f"Research dispatch failed: {error}. Receipt: {directory / 'dispatch.json'}", file=sys.stderr)
+    finally:
+        receipt["finished_at_utc"] = utc_now()
+        (directory / "dispatch.json").write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
+    if returncode == 0:
+        print(answer)
+    return returncode
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

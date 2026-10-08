@@ -1569,7 +1569,7 @@ class RenderTests(unittest.TestCase):
         ai_memory = "/home/example/.local/bin/ai-memory "
         audit = "jq -c '{timestamp: now | todate, source: .source, file: .file_path}' >> ~/claude-config-audit.log || true"
         self.assertEqual(events["ConfigChange"], [audit])
-        self.assertEqual(sum(".claude/hooks/" in command for command in commands), 4)
+        self.assertEqual(sum(".claude/hooks/" in command for command in commands), 6)
         self.assertTrue(all(".claude/hooks/" in command or command.startswith(ai_memory) or command in ("rtk hook claude", audit)
                             for command in commands), commands)
         self.assertTrue(any(command.startswith(ai_memory) for command in events["SessionStart"]), events)
@@ -1811,6 +1811,23 @@ class RenderTests(unittest.TestCase):
             with self.subTest(mode=mode):
                 self.assertEqual(run_main(*mode, "--host", "../example")[0], 2)
 
+    def test_coordinator_research_hooks_render_native_matchers_without_globally_marking_sessions(self):
+        settings = json.loads(self.files["settings.json"])
+        self.assertNotIn("NAS_RESEARCH_COORDINATOR_ROLE", settings["env"])
+        self.assertNotIn("NAS_RESEARCH_COORDINATOR_SESSION_ID", settings["env"])
+        command = 'python3 "/home/example/.claude/hooks/research-routing-guard.py"'
+        groups = [group for group in settings["hooks"]["PreToolUse"]
+                  if any(hook["command"] == command for hook in group["hooks"])]
+        self.assertEqual(len(groups), 1)
+        matcher = groups[0]["matcher"]
+        for tool in ("WebSearch", "WebFetch", "mcp__plugin_context-mode_context-mode__ctx_fetch_and_index",
+                     "mcp__context-mode__ctx_fetch_and_index", "mcp__context_mode__ctx_fetch_and_index"):
+            self.assertIsNotNone(re.fullmatch(matcher, tool), tool)
+        for tool in ("Bash", "UnrelatedWebSearch", "mcp__unrelated__ctx_fetch_and_index"):
+            self.assertIsNone(re.search(matcher, tool), tool)
+        resets = [hook for group in settings["hooks"]["UserPromptSubmit"] for hook in group["hooks"]]
+        self.assertEqual([hook["command"] for hook in resets], [command])
+
     def test_every_wired_hook_runs_a_file_the_repository_copies_with_its_checksum(self):
         settings = json.loads(self.files["settings.json"])
         overlay = json.loads(self.files["settings.linux-wsl2.overlay.json"])
@@ -1820,7 +1837,8 @@ class RenderTests(unittest.TestCase):
                 for group in groups:
                     for hook in group["hooks"]:
                         referenced.update(re.findall(r"\.claude/hooks/([A-Za-z0-9_.-]+)", hook["command"]))
-        self.assertEqual(referenced, {"secret_path_guard.py", "effort-default-guard.py", "currency-due-notice.py"})
+        self.assertEqual(referenced, {"secret_path_guard.py", "effort-default-guard.py", "currency-due-notice.py",
+                                      "research-routing-guard.py"})
         for name in referenced:
             source = icp.HOOKS[name]
             self.assertTrue(source.is_file(), name)
@@ -2701,7 +2719,8 @@ class ApplyTests(ApplyCase):
         code, out, _ = self.apply()
         self.assertEqual(code, 0, out[-800:])
         hooks = sorted(p.name for p in (self.home / ".claude/hooks").iterdir())
-        self.assertEqual(hooks, ["currency-due-notice.py", "effort-default-guard.py", "secret_path_guard.py"])
+        self.assertEqual(hooks, ["currency-due-notice.py", "effort-default-guard.py", "research-routing-guard.py",
+                                 "secret_path_guard.py"])
         for name in hooks:
             self.assertEqual(hashlib.sha256((self.home / ".claude/hooks" / name).read_bytes()).hexdigest(),
                              icp.expected_sha256(icp.HOOKS[name]))
@@ -2712,7 +2731,7 @@ class ApplyTests(ApplyCase):
         # The repository's hooks and the overlay's Notification, and the events ai-memory's hooks take (an interim install).
         self.assertEqual(sorted(settings["hooks"]), ["ConfigChange", "Notification", "PostToolUse", "PreCompact", "PreToolUse",
                                                      "SessionEnd", "SessionStart", "Stop", "SubagentStart",
-                                                     "SubagentStop"])
+                                                     "SubagentStop", "UserPromptSubmit"])
         self.assertEqual(settings["env"]["PATH"].split(":")[:3],
                          [f"{self.eco}/bin", f"{self.home}/.local/bin", f"{self.home}/.local/share/mise/shims"])
         codex = self.home / ".codex"
