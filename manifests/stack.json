@@ -5,6 +5,30 @@
   "source_snapshot_commit": "44750edc",
   "components": [
     {
+      "id": "agent-orchestrator",
+      "repository": "https://github.com/OrchestratorInc/agent-orchestrator",
+      "version": "0.13.5",
+      "license": "Apache-2.0",
+      "profile": "optional",
+      "role": "Bounded native orchestration reference; synthetic failure-delivery engine task qualified, live gateway/profile/session deployment remains separate",
+      "commands": [
+        "AO_HOST_INSTALL_DIR=<owned-prefix> AO_DATA_DIR=<owned-state> AO_RUN_FILE=<owned-state>/running.json bash scripts/setup-self-hosted.sh --install-only",
+        "go test -overlay <private-overlay.json> -count=1 -v ./internal/integration -run '^TestCC133502ZAOEffect$'",
+        "ao stop --timeout 10s --json"
+      ],
+      "evidence_ids": [
+        "ao-bounded-effect-20261008",
+        "ao-bounded-feedback-20261008",
+        "ao-orchestration-landscape-20261008"
+      ],
+      "source_pin": "c95ae361eee48d33c2f443c6d2fe69c445f548a8",
+      "upstream_sources": [
+        "https://github.com/OrchestratorInc/agent-orchestrator/releases/tag/v0.13.5",
+        "https://github.com/OrchestratorInc/agent-orchestrator/blob/c95ae361eee48d33c2f443c6d2fe69c445f548a8/docs/development.md"
+      ],
+      "freshness": "2026-10-08 scoped reference/trial registration only. Official isolated install-only resources and native engine fixture passed and were withdrawn; no startup install, model-route acceptance or operational-default promotion."
+    },
+    {
       "id": "affaan-m/ECC",
       "repository": "https://github.com/affaan-m/ECC",
       "version": "dd6ee538aee0f548d4a6b520118f875431fd749e",
@@ -2063,6 +2087,7 @@
       "id": "optional",
       "purpose": "Specialist integrations or references with explicit limitations",
       "component_ids": [
+        "agent-orchestrator",
         "affaan-m/ECC",
         "claude-hud",
         "codex-for-claude",

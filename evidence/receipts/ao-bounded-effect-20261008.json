@@ -1,0 +1,302 @@
+{
+  "schema_version": 1,
+  "id": "ao-bounded-effect-20261008",
+  "kind": "artifact_measurement",
+  "component_ids": ["agent-orchestrator"],
+  "claim": "One fixed synthetic failed-CI task reached the recording receiver with one native AO automatic notification and zero simulated manual sends, versus one explicit simulated manual send with the observer bypassed; native inverse and unchanged vendor checks passed.",
+  "recorded_at_utc": "2026-10-08T14:01:07Z",
+  "authority": "CC133502Z assignment14",
+  "evidence_class": "local_integration_synthetic_fixture_using_upstream_native_engine",
+  "task": "Deliver the same failed build information to its owning receiver; compare native AO observation/feedback with observer-bypassed explicit delivery.",
+  "upstream": {
+    "repository": "https://github.com/OrchestratorInc/agent-orchestrator",
+    "tag": "v0.13.5",
+    "commit": "c95ae361eee48d33c2f443c6d2fe69c445f548a8",
+    "release_published_at": "2026-10-08T10:28:32Z",
+    "verified_linux_release_asset_sha256": "5f4262c1b5fad5e63c0b1291d5a2e4c878c953496f5ca430edfe4c061987bf28",
+    "installed_daemon_sha256": "2bb908e9d9e73a485f40a731f0b43f55f854921efc73ab46185deebdd8db0be7",
+    "native_version_readback": "dev",
+    "install_script": "scripts/setup-self-hosted.sh",
+    "install_script_sha256": "463366604181029d8cdb16cbc1a5d8771eaf4bc498594b09759a5b42b79bee7d",
+    "supported_install": "AO_HOST_INSTALL_DIR=<owned-prefix> AO_DATA_DIR=<owned-state> AO_RUN_FILE=<owned-state>/running.json bash scripts/setup-self-hosted.sh --install-only",
+    "install_exit_code": 0,
+    "install_created_service": false,
+    "install_changed_global_cli_link": false,
+    "helper_source": "backend/internal/integration/scm_observer_test.go",
+    "helper_source_sha256": "2f55eb4194e9a73722890f0941bda596c97620d9208d5b2716bc3efa84e02767"
+  },
+  "qualification": {
+    "fixture": "blueprints/convergence-practice/ao-bounded-effect/ao_bounded_effect_test.go",
+    "fixture_sha256": "0eef18b04dadc49f089e950c6a3c6dd01aa683c946cdddcac46b4624a02d1f9d",
+    "input_sha256": "cc665ee541f5eba767876e0d770209a8444c158a4c224306004b0cc98c359e47",
+    "independent_fresh_fixture_per_arm": true,
+    "observation": [
+      {
+        "arm": "ao",
+        "evidence": "locally_authored_integration_synthetic_stimulus_recording_receiver",
+        "input_sha256": "cc665ee541f5eba767876e0d770209a8444c158a4c224306004b0cc98c359e47",
+        "observer_polls": 2,
+        "recorder_sends": 1,
+        "simulated_manual_sends": 0,
+        "notification_source": "native_ao_observer_lifecycle",
+        "expected_head_sha": "deadbeef",
+        "expected_failed_check": "build",
+        "persisted_pr": true,
+        "persisted_head_sha": "deadbeef",
+        "persisted_checks": 1,
+        "received_same_failure_info": true,
+        "dedup_signature_persisted": true,
+        "dedup_signature_stable_after_second_poll": true
+      },
+      {
+        "arm": "no_ao",
+        "evidence": "locally_authored_integration_synthetic_stimulus_recording_receiver",
+        "input_sha256": "cc665ee541f5eba767876e0d770209a8444c158a4c224306004b0cc98c359e47",
+        "observer_polls": 0,
+        "recorder_sends": 1,
+        "simulated_manual_sends": 1,
+        "notification_source": "explicit_simulated_manual_send",
+        "expected_head_sha": "deadbeef",
+        "expected_failed_check": "build",
+        "persisted_pr": false,
+        "persisted_head_sha": "",
+        "persisted_checks": 0,
+        "received_same_failure_info": true,
+        "dedup_signature_persisted": false,
+        "dedup_signature_stable_after_second_poll": false
+      },
+      {
+        "arm": "ao_policy_disabled",
+        "evidence": "locally_authored_integration_synthetic_stimulus_recording_receiver",
+        "input_sha256": "cc665ee541f5eba767876e0d770209a8444c158a4c224306004b0cc98c359e47",
+        "observer_polls": 2,
+        "recorder_sends": 0,
+        "simulated_manual_sends": 0,
+        "notification_source": "none_policy_disabled",
+        "expected_head_sha": "deadbeef",
+        "expected_failed_check": "build",
+        "persisted_pr": true,
+        "persisted_head_sha": "deadbeef",
+        "persisted_checks": 1,
+        "received_same_failure_info": false,
+        "dedup_signature_persisted": false,
+        "dedup_signature_stable_after_second_poll": false
+      }
+    ],
+    "effect": {
+      "automatic_notifications_with_ao": 1,
+      "automatic_notifications_without_ao": 0,
+      "simulated_manual_sends_with_ao": 0,
+      "simulated_manual_sends_without_ao": 1,
+      "simulated_manual_send_difference": -1,
+      "inverse_policy_disabled_notifications": 0,
+      "scope": "Observed local recording receiver and explicit call counts; actual human benefit remains unmeasured."
+    }
+  },
+  "returned_check": {
+    "sanitized_native_argv": [
+      "<native-go-bootstrap>",
+      "test",
+      "-overlay",
+      "<private-overlay.json>",
+      "-count=1",
+      "-v",
+      "./internal/integration",
+      "./internal/lifecycle",
+      "./internal/storage/sqlite/store",
+      "-run",
+      "^TestCC133502ZAOEffect$|^TestPRObservation_(CIFailingNudgesAgentWithLogs|CIFailureNotInjectedWhenPRPolicyDisabled)$|^TestPRAutoInjectCITracksSessionPolicyChanges$|TestSCMObserverEndToEnd/CI_failing_observation_persists_rows,_nudges_once,_and_is_idempotent_on_re-poll$"
+    ],
+    "private_exact_native_argv_sha256": "1a0bcc59c285c7d1a00e5e4cd49252f23ef73cefbb5fced74faee9c0a4ae8478",
+    "argv_hash_serialization": "UTF-8 compact JSON array",
+    "exact_command_provenance": "Native child argv supplied directly to subprocess.run in MCP analysis runtime, avoiding shell RTK rewriting. Public argv is sanitized; complete vector is retained only in private receipt.",
+    "runtime_go": "1.27.1",
+    "bootstrap_go": "1.25.12",
+    "native_env_override": {
+      "GOTOOLCHAIN": "auto"
+    },
+    "exit_code": 0,
+    "elapsed_seconds": 3.373,
+    "native_stdout": "=== RUN   TestCC133502ZAOEffect\n=== RUN   TestCC133502ZAOEffect/ao\n    cc133502z_ao_effect_test.go:181: CC133502Z_AO_EFFECT {\"arm\":\"ao\",\"evidence\":\"locally_authored_integration_synthetic_stimulus_recording_receiver\",\"input_sha256\":\"cc665ee541f5eba767876e0d770209a8444c158a4c224306004b0cc98c359e47\",\"observer_polls\":2,\"recorder_sends\":1,\"simulated_manual_sends\":0,\"notification_source\":\"native_ao_observer_lifecycle\",\"expected_head_sha\":\"deadbeef\",\"expected_failed_check\":\"build\",\"persisted_pr\":true,\"persisted_head_sha\":\"deadbeef\",\"persisted_checks\":1,\"received_same_failure_info\":true,\"dedup_signature_persisted\":true,\"dedup_signature_stable_after_second_poll\":true}\n=== RUN   TestCC133502ZAOEffect/no_ao\n    cc133502z_ao_effect_test.go:181: CC133502Z_AO_EFFECT {\"arm\":\"no_ao\",\"evidence\":\"locally_authored_integration_synthetic_stimulus_recording_receiver\",\"input_sha256\":\"cc665ee541f5eba767876e0d770209a8444c158a4c224306004b0cc98c359e47\",\"observer_polls\":0,\"recorder_sends\":1,\"simulated_manual_sends\":1,\"notification_source\":\"explicit_simulated_manual_send\",\"expected_head_sha\":\"deadbeef\",\"expected_failed_check\":\"build\",\"persisted_pr\":false,\"persisted_head_sha\":\"\",\"persisted_checks\":0,\"received_same_failure_info\":true,\"dedup_signature_persisted\":false,\"dedup_signature_stable_after_second_poll\":false}\n=== RUN   TestCC133502ZAOEffect/ao_policy_disabled\n    cc133502z_ao_effect_test.go:181: CC133502Z_AO_EFFECT {\"arm\":\"ao_policy_disabled\",\"evidence\":\"locally_authored_integration_synthetic_stimulus_recording_receiver\",\"input_sha256\":\"cc665ee541f5eba767876e0d770209a8444c158a4c224306004b0cc98c359e47\",\"observer_polls\":2,\"recorder_sends\":0,\"simulated_manual_sends\":0,\"notification_source\":\"none_policy_disabled\",\"expected_head_sha\":\"deadbeef\",\"expected_failed_check\":\"build\",\"persisted_pr\":true,\"persisted_head_sha\":\"deadbeef\",\"persisted_checks\":1,\"received_same_failure_info\":false,\"dedup_signature_persisted\":false,\"dedup_signature_stable_after_second_poll\":false}\n--- PASS: TestCC133502ZAOEffect (0.78s)\n    --- PASS: TestCC133502ZAOEffect/ao (0.75s)\n    --- PASS: TestCC133502ZAOEffect/no_ao (0.01s)\n    --- PASS: TestCC133502ZAOEffect/ao_policy_disabled (0.02s)\n=== RUN   TestSCMObserverEndToEnd\n=== RUN   TestSCMObserverEndToEnd/CI_failing_observation_persists_rows,_nudges_once,_and_is_idempotent_on_re-poll\n--- PASS: TestSCMObserverEndToEnd (0.03s)\n    --- PASS: TestSCMObserverEndToEnd/CI_failing_observation_persists_rows,_nudges_once,_and_is_idempotent_on_re-poll (0.03s)\nPASS\nok  \tgithub.com/aoagents/agent-orchestrator/backend/internal/integration\t0.833s\n=== RUN   TestPRObservation_CIFailingNudgesAgentWithLogs\n--- PASS: TestPRObservation_CIFailingNudgesAgentWithLogs (0.00s)\n=== RUN   TestPRObservation_CIFailureNotInjectedWhenPRPolicyDisabled\n--- PASS: TestPRObservation_CIFailureNotInjectedWhenPRPolicyDisabled (0.00s)\nPASS\nok  \tgithub.com/aoagents/agent-orchestrator/backend/internal/lifecycle\t0.025s\n=== RUN   TestPRAutoInjectCITracksSessionPolicyChanges\n--- PASS: TestPRAutoInjectCITracksSessionPolicyChanges (0.67s)\nPASS\nok  \tgithub.com/aoagents/agent-orchestrator/backend/internal/storage/sqlite/store\t0.709s\n",
+    "native_stderr": "",
+    "unchanged_upstream_tests": [
+      "TestSCMObserverEndToEnd/CI failing observation persists rows, nudges once, and is idempotent on re-poll",
+      "TestPRObservation_CIFailingNudgesAgentWithLogs",
+      "TestPRObservation_CIFailureNotInjectedWhenPRPolicyDisabled",
+      "TestPRAutoInjectCITracksSessionPolicyChanges"
+    ],
+    "authored_integration_test": "TestCC133502ZAOEffect",
+    "classification_boundary": "Unchanged upstream tests and the authored paired fixture share the native Go invocation but remain separate evidence classes."
+  },
+  "retained_attempts": [
+    {
+      "id": "go-shim-preflight",
+      "scope": "Before current-release selection, native Go shim had no selected version and never compiled tests.",
+      "exit_code": 1,
+      "elapsed_seconds": 0.048,
+      "native_stderr": "mise ERROR No version is set for shim: go",
+      "usage": "No provider run; token usage not applicable.",
+      "recovery": "Use the installed Go1.25.12 executable directly with its supported auto toolchain; required Go1.27.1 was fetched."
+    },
+    {
+      "id": "upstream-v0134-check",
+      "source_pin": "e8a77577c14b015b947057d67c9171a78cdd5099",
+      "exit_code": 0,
+      "elapsed_seconds": 34.537,
+      "scope": "Earlier unchanged native checks; historical, outside the v0.13.5 paired qualification.",
+      "usage": "No provider run; token usage not applicable."
+    },
+    {
+      "id": "worker-fixture-check",
+      "source_pin": "c95ae361eee48d33c2f443c6d2fe69c445f548a8",
+      "exit_code": 0,
+      "elapsed_seconds": 7.562,
+      "scope": "Initial authored fixture check before a whitespace-only gofmt correction; final bound bytes were rerun by coordinator.",
+      "usage": "No provider run; token usage not applicable."
+    },
+    {
+      "id": "cleanup-force-command",
+      "process_launched": false,
+      "exit_code": null,
+      "scope": "Local automatic execution review rejected rm -f-style cleanup; bounded non-force removal then passed.",
+      "usage": "No provider run; rejected command was not executed."
+    }
+  ],
+  "correction_log": [
+    {
+      "mistake": "The earlier retained AO v0.13.4 landscape was treated as the latest release.",
+      "correction": "Fresh primary API/tag readbacks identified v0.13.5 published10:28:32Z; this qualification selects the new clean source/install while retaining original receipts.",
+      "source": "v0.13.5 release API and tag c95ae361eee48d33c2f443c6d2fe69c445f548a8"
+    },
+    {
+      "mistake": "A service comment implied CI injection toggles affect only future PRs.",
+      "correction": "Actual transactional Store.SetSessionAutoInjectCI updates the session and all currently owned PRs. The native store regression and policy-disabled arm pass.",
+      "source": "backend/internal/storage/sqlite/store/session_store.go:578; backend/internal/storage/sqlite/queries/pr.sql:220; TestPRAutoInjectCITracksSessionPolicyChanges"
+    }
+  ],
+  "inverse": {
+    "native_stop_sanitized_command": "ao stop --timeout 10s --json",
+    "native_stop_exit_code": 0,
+    "native_stop_returned_state": "stopped",
+    "runtime_ever_started": false,
+    "scope": "Already-stopped install-only withdrawal, plus observed policy-disabled inverse; no live shutdown acceptance.",
+    "owned_install_prefix_removed": true,
+    "owned_run_file_absent": true,
+    "upstream_source_post_undo_clean": true,
+    "public_fixture_preserved": true,
+    "private_native_receipt_preserved": true
+  },
+  "native_counter_scope": {
+    "model_calls": 0,
+    "provider_token_usage": null,
+    "paid_provider_cost_usd": 0,
+    "observed_poll_calls": [
+      {
+        "arm": "ao",
+        "polls": 2
+      },
+      {
+        "arm": "no_ao",
+        "polls": 0
+      },
+      {
+        "arm": "ao_policy_disabled",
+        "polls": 2
+      }
+    ],
+    "api_rate_readback": {
+      "core_remaining": 5000,
+      "graphql_remaining": 4993,
+      "scope": "One native pre-install snapshot; concurrent client activity prevents AO-attributable delta claims."
+    }
+  },
+  "mcp_smoke": {
+    "client": "Codex",
+    "argv_tier": "fast",
+    "argv_model": "cx/gpt-6.1-sol",
+    "argv_effort": "max",
+    "passed": 6,
+    "total": 6,
+    "total_exposed_tools": 94,
+    "selected_calls": [
+      {
+        "server": "ai_memory",
+        "tool": "mcp__ai_memory__memory_query",
+        "started_utc": "2026-10-08T13:40:41.456Z",
+        "finished_utc": "2026-10-08T13:40:41.737Z",
+        "isError": false,
+        "status": "PASS",
+        "returned_content_blocks": 1
+      },
+      {
+        "server": "codebase_memory_mcp",
+        "tool": "mcp__codebase_memory_mcp__list_projects",
+        "started_utc": "2026-10-08T13:40:41.456Z",
+        "finished_utc": "2026-10-08T13:40:41.709Z",
+        "isError": false,
+        "status": "PASS",
+        "returned_content_blocks": 1
+      },
+      {
+        "server": "context_mode",
+        "tool": "mcp__context_mode__ctx_execute",
+        "started_utc": "2026-10-08T13:40:41.456Z",
+        "finished_utc": "2026-10-08T13:40:42.627Z",
+        "isError": false,
+        "status": "PASS",
+        "returned_content_blocks": 1
+      },
+      {
+        "server": "hindsight",
+        "tool": "mcp__hindsight__get_bank",
+        "started_utc": "2026-10-08T13:40:41.456Z",
+        "finished_utc": "2026-10-08T13:40:42.867Z",
+        "isError": false,
+        "status": "PASS",
+        "returned_content_blocks": 1
+      },
+      {
+        "server": "qmd",
+        "tool": "mcp__qmd__status",
+        "started_utc": "2026-10-08T13:40:41.456Z",
+        "finished_utc": "2026-10-08T13:40:42.769Z",
+        "isError": false,
+        "status": "PASS",
+        "returned_content_blocks": 1
+      },
+      {
+        "server": "serena",
+        "tool": "mcp__serena__list_memories",
+        "started_utc": "2026-10-08T13:40:41.456Z",
+        "finished_utc": "2026-10-08T13:40:42.846Z",
+        "isError": false,
+        "status": "PASS",
+        "returned_content_blocks": 1
+      }
+    ],
+    "scope": "One read-only call per exposed MCP server. No mutating tool, all-tools or Claude smoke assertion."
+  },
+  "source_verification": {
+    "graph_project": "ao-v0-13-5-cc133502z",
+    "graph_generation": "2026-10-08T13:50:08Z",
+    "tier": "2",
+    "coverage": "Integration subtree excluded in fast index and verified from exact source; SQL partial ranges read directly; relevant store/lifecycle/service source had no recorded coverage issue.",
+    "no_exhaustive_absence_claim": true
+  },
+  "private_native_receipt_sha256": "9fbfc1d037fb1e31e3c22cc160730811625febdb83e1c3fa1645b192e9e3ffe1",
+  "private_overlay_sha256": "c77bc05ab9272ebefa2865d6deba36ea362a2a207509fba271d0dafbeefc2e22",
+  "decision": "Retain AO's bounded operational role; qualify only this native-engine synthetic failure-delivery task. No general model-route or production promotion.",
+  "limitations": [
+    "The task uses synthetic SCM observations and the vendor recording messenger with the real AO observer, lifecycle manager and SQLite. No model or real GitHub PR was exercised.",
+    "The no-AO arm bypasses the observer and makes one explicitly simulated manual send. Actual human effort, live cue reduction, provider usage and coding repair remain unmeasured.",
+    "The policy-disabled arm is an inverse within AO; the separate observer-bypassed arm is the no-AO orchestration control.",
+    "Two explicit same-input polls establish suppression in this fixture. Restart, replay, persistence-failure, cross-session and changed-head behavior remain untested.",
+    "The native subtest durations are rounded and include fixture setup/cache effects. They do not establish a production speed comparison.",
+    "The install-only route was withdrawn. Persistent AO deployment, shared user-unit installation, gateway/profile admission and fast-tier forwarding for AO-launched Codex remain separate qualification work.",
+    "Six selected read-only Codex MCP calls passed, one per exposed server; the other88 exposed tools and Claude's MCP wiring are outside this lane smoke."
+  ],
+  "completeness_critic": {
+    "prior_research": "Require identical input hash, independent fixtures, observed polls/sends, receiver assertions, stable signature and explicit synthetic scope.",
+    "current_independent_review": "PASS after a documentation-only shell-continuation correction. Independent source/receipt review confirms three native observations equal the receipt, exact fixture digest, fresh matching input, no-observer control separate from policy inverse, and synthetic/human/provider boundaries. No runtime source changed after its bound passing check."
+  }
+}
