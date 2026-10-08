@@ -41,3 +41,13 @@ updates:
     # option; security updates are exempt). Matches agent-lab's setting.
     cooldown:
       default-days: 7
+  # Captured dependency evidence keeps its recorded hashes. The separate frozen
+  # risk workflow reports advisories; automatic security relocks are ignored here.
+  - package-ecosystem: npm
+    directory: /evidence/artifacts/macos-application-20260924/variant
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 0
+    ignore:
+      - dependency-name: '*'
+        versions: ['>= 0']

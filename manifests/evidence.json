@@ -4767,8 +4767,8 @@
     },
     {
       "path": ".github/dependabot.yml",
-      "sha256": "40d7f3bcf927a13088a126f70c71da3dba2e6181f52de2c451ab9f31193b8554",
-      "bytes": 2529
+      "sha256": "623a1b9e1dbd165f25ee8856eab5ed5587554326d238bfc71a3d6a075865b0d9",
+      "bytes": 2926
     },
     {
       "path": ".github/main-ruleset.json",
@@ -17910,6 +17910,11 @@
       "path": "docs/decisions/2026-10-07-validate-module-shards.md",
       "sha256": "f10a8c8f8841c91d5050611dfc7ec15ab278d5650bc5aff9ba65bf746b733c64",
       "bytes": 15329
+    },
+    {
+      "path": "docs/decisions/2026-10-08-dependabot-frozen-evidence-ignore.md",
+      "sha256": "8bbe3a48eabd72d3fb9dae4f0abfcae6a01d5920ad58ad4e2809a279e6af667f",
+      "bytes": 3229
     },
     {
       "path": "docs/decisions/2026-10-08-philosophy-only-rules.md",
@@ -57493,8 +57498,8 @@
     },
     {
       "path": "tests/test_frozen_macos_variant_no_use.py",
-      "sha256": "c8b5bfcece446aba7e9a8c87c0837ffdc8bac71b4c8c948a7d3831baaa7d5ff2",
-      "bytes": 37245
+      "sha256": "be95d00ec0f12735d3f35c950138fc50a7391d01e22de26f803e4499c19dbc30",
+      "bytes": 37392
     },
     {
       "path": "tests/test_gap_crosswalk.py",
