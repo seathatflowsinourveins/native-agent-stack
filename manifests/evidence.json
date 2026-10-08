@@ -17477,8 +17477,8 @@
     },
     {
       "path": "docs/decisions/2026-10-02-new-wsl-client-configuration.md",
-      "sha256": "49708065369976764880249193b07efd372dbcdd69e3c82fc2bcbc969dc2efdd",
-      "bytes": 142408
+      "sha256": "75e71dc50b2d2536809ad53ba5718e8efc0edf7b5cd0b70b4fd7b481e53dd76f",
+      "bytes": 144933
     },
     {
       "path": "docs/decisions/2026-10-02-omniroute-mac-rebuild.md",
