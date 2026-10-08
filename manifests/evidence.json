@@ -4891,6 +4891,20 @@
         "No catalogue/workflow/credential/configuration/frozen native evidence or N2 gate changed."
       ],
       "path": "evidence/receipts/srt-source-citations-20261008.json"
+    },
+    {
+      "id": "codex-exec-explicit-provider-20261008",
+      "kind": "artifact_measurement",
+      "component_ids": [
+        "codex"
+      ],
+      "claim": "Six repository model-executing caller categories require an explicit provider; preserved role/isolation/SDK-stdin contracts pass 327 of 328 bounded offline checks with one dated optional skip.",
+      "limitations": [
+        "Offline integration and source verification only; no new provider/account/model or deployed acceptance.",
+        "Legacy credential-canary wrapper consumers and private coordinator scripts retain separate routing contracts.",
+        "Missing provider is an intentional CLI/input contract refusal; historical native fixtures now declare their provider."
+      ],
+      "path": "evidence/artifacts/codex-exec-explicit-provider-20261008/receipt.json"
     }
   ],
   "files": [
@@ -18146,6 +18160,11 @@
       "bytes": 15329
     },
     {
+      "path": "docs/decisions/2026-10-08-codex-exec-explicit-provider.md",
+      "sha256": "bacbe891ab39bd32ffac05773b89d0f6ea6242434efc15ed92a2b667dc05d1ca",
+      "bytes": 4327
+    },
+    {
       "path": "docs/decisions/2026-10-08-coordinator-research-routing.md",
       "sha256": "cc0177503b26b84954e7a67ec4d2aac7d39a5520794ada3edf06346527955a10",
       "bytes": 14363
@@ -19764,6 +19783,11 @@
       "path": "evidence/artifacts/codex-01592-qualification-20260930/qualification.json",
       "sha256": "7d634ff5a9195a589923f9be2bf64070fe507bf50b2efc82629150e967ec896e",
       "bytes": 14536
+    },
+    {
+      "path": "evidence/artifacts/codex-exec-explicit-provider-20261008/receipt.json",
+      "sha256": "6ce3868d99f1b68a77bbc394de3504609d1981a7922084ffd539964753870c96",
+      "bytes": 7957
     },
     {
       "path": "evidence/artifacts/codex-service-tier-migration-20261005/ci-validate-repair-20261006.json",
@@ -57662,8 +57686,8 @@
     },
     {
       "path": "tests/test_adjudicate.py",
-      "sha256": "daf7ecccf2bca035416a41ebfe984e9bcb8a8e579a69edabbd847b5c352ec752",
-      "bytes": 124081
+      "sha256": "215966f4d602ef76dc0cd82de74510bde932ec56b01d02888837d9e0e21ad7a2",
+      "bytes": 124417
     },
     {
       "path": "tests/test_adoption_bootstrap.py",
@@ -57797,8 +57821,8 @@
     },
     {
       "path": "tests/test_capability_gate.py",
-      "sha256": "60252de360d48a773ce32165f8eb0ab2e8e9f166d052bce280db54b68b0102ae",
-      "bytes": 38580
+      "sha256": "4a50e8843bce76ff4095690ecc5aa37a1e70edc701c42640a05d110030b21c19",
+      "bytes": 43803
     },
     {
       "path": "tests/test_catalog_decisions.py",
@@ -57881,6 +57905,16 @@
       "bytes": 65996
     },
     {
+      "path": "tests/test_codex_lane.py",
+      "sha256": "06f206f22961f765d11c044a3ce78c5b0f16dd0a30195b8cbdc03ff8c731f7d2",
+      "bytes": 99145
+    },
+    {
+      "path": "tests/test_codex_provider_route.py",
+      "sha256": "c5244a1779e9421ff7dd4904de7d35c5d5f9d24f170c4db4cce2cb8f24feec39",
+      "bytes": 5731
+    },
+    {
       "path": "tests/test_codex_quota.py",
       "sha256": "c8b3f1a4841201eabc5f9f6b2fa4d75e0cd33373b2e9f96d5ea142d6bde5fbc4",
       "bytes": 17722
@@ -57892,8 +57926,8 @@
     },
     {
       "path": "tests/test_codex_worker_lane.py",
-      "sha256": "a3b4451ae9751d5430061a7057dba5b196225ae1a17ef24699bf48b213bd7e15",
-      "bytes": 193146
+      "sha256": "533d9833af96ed58178036a855d78e66d20ec34de3df1604abe89ad0f4429c19",
+      "bytes": 198751
     },
     {
       "path": "tests/test_codex_worker_skill.py",
@@ -58162,8 +58196,8 @@
     },
     {
       "path": "tests/test_landscape_sweep_harness.py",
-      "sha256": "f304d37a896cd8cbc188167253d944f85ae8016247bfff2603d80333cc5613ce",
-      "bytes": 377919
+      "sha256": "c09fb337a209db8ecc9403cad96d73e40e6532701be4b10d7d14ac4fe9d5e1f2",
+      "bytes": 379745
     },
     {
       "path": "tests/test_landscape_sweep_skills.py",
@@ -58627,8 +58661,8 @@
     },
     {
       "path": "tests/test_token_e2e_grader.py",
-      "sha256": "42708be8476b880f4288f8cfc44622123ea18e8ae8198ca0c98a379460932cd3",
-      "bytes": 524375
+      "sha256": "2316d4f00e0198e0c7d8193d18738fe4536c52e92051012c4e86729061e6dc1a",
+      "bytes": 530878
     },
     {
       "path": "tests/test_token_e2e_preregistration.py",
@@ -58827,8 +58861,8 @@
     },
     {
       "path": "tools/adoption/prove_codex_lane.py",
-      "sha256": "d7ac218de484f3044ba48c905d9a608da82b05b1e10450d447b3fc439a7a2b1e",
-      "bytes": 35301
+      "sha256": "4ed7a38eca5146e5319947ec2eff04de1272932aa904a0f5cc70be05b617812a",
+      "bytes": 36678
     },
     {
       "path": "tools/adoption/render_config.py",
@@ -58847,8 +58881,8 @@
     },
     {
       "path": "tools/capability-gate/README.md",
-      "sha256": "9cd718c7161adccdd77d65f3a398bb699531568e065b341c6911181c3916ce99",
-      "bytes": 12956
+      "sha256": "e65b1386bd699940afde7efa27899e04845d685f985be5a3543c8a7399062bf4",
+      "bytes": 12974
     },
     {
       "path": "tools/capability-gate/ai-memory.yaml",
@@ -58887,8 +58921,8 @@
     },
     {
       "path": "tools/capability-gate/codex-profile-exec",
-      "sha256": "b159f6b5883bfd43041eb548c1b5c193d2ebada0360260af55149d78d0845b13",
-      "bytes": 619
+      "sha256": "5c5a198f02eee616bc4743787c6a564051cdbc8733351afaccb2eee0b630431a",
+      "bytes": 1846
     },
     {
       "path": "tools/capability-gate/jcodemunch.yaml",
@@ -58912,8 +58946,8 @@
     },
     {
       "path": "tools/capability-gate/run_gate.py",
-      "sha256": "3efdc4b54ba33b11c67f8f2449167de03b558e8c53c7e09cdb5a9f66593311a7",
-      "bytes": 22476
+      "sha256": "da439cc6f16e0514ba570d3e5b8ae30a08ceebded2dc5b8983d7bba13cc5b427",
+      "bytes": 23598
     },
     {
       "path": "tools/credentials/canary_lane_consumer.sh",
@@ -59022,13 +59056,13 @@
     },
     {
       "path": "tools/sota-convergence/README.md",
-      "sha256": "d74fac1613c59d6b4abe629d87758d672b50f19efda520b7fe444c7a5932b10a",
-      "bytes": 189511
+      "sha256": "63d6dbf48259ca651ebab1d7665947efff4a205e644c76125f62946f71af1b95",
+      "bytes": 190031
     },
     {
       "path": "tools/sota-convergence/adjudicate.py",
-      "sha256": "81645780e37d87756f10c5a023068105b9a4f32de8fcf3ca858ef60683caaad5",
-      "bytes": 108384
+      "sha256": "372b23788f31156eb098b85bc5b181692aadda19973136f5e711a91f0e457ebc",
+      "bytes": 109152
     },
     {
       "path": "tools/sota-convergence/adjudication-prompt.md",
@@ -59049,6 +59083,11 @@
       "path": "tools/sota-convergence/build_verdicts.py",
       "sha256": "715c98a3ea23e71768326b19250cac5ce3e3bc1c568f540771ba64e45976a4ee",
       "bytes": 27482
+    },
+    {
+      "path": "tools/sota-convergence/codex_lane.py",
+      "sha256": "1ae0f1a4354a2a8438641e5aea61b445705f4dadc955e98c5f090fe84467cb3f",
+      "bytes": 82707
     },
     {
       "path": "tools/sota-convergence/export_isolation_check.py",
@@ -59077,13 +59116,13 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/README.md",
-      "sha256": "08d84a2e57f9c45293636d4e5f8f41865ff855cba29bc54673ca05ca4e44bc3d",
-      "bytes": 112744
+      "sha256": "1aa49d79e19919a5893da157c7d606599b26c307d6823a3b57c527e08dc99a6e",
+      "bytes": 113157
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/build_args.py",
-      "sha256": "4663c0ba3a3f63ce03314900b23f6f15d854d16c3490d37a3d911f3fa7b34410",
-      "bytes": 51739
+      "sha256": "853379c59de2aa7fce45539128bfd77565ce9b1a9d6391ba915005637c56c21e",
+      "bytes": 51772
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/build_inputs.py",
@@ -59097,8 +59136,8 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/codex_job.py",
-      "sha256": "beae25c90f40f9ccaed90f940507dfb63ca4737bcba3e8681540373a767cde32",
-      "bytes": 81310
+      "sha256": "2067d29561017d49589a594b4efedcec5b9d1e1885105d907be3b1cc9498b340",
+      "bytes": 81629
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/convert.py",
@@ -59207,8 +59246,8 @@
     },
     {
       "path": "tools/token-e2e/README.md",
-      "sha256": "5555451a8f5b8a6d80757d62205b70e00f8d59852799898a2b64848138db7bd4",
-      "bytes": 43223
+      "sha256": "43e942ec7a650053855d94cab4dc7c05bdb395299be9ef127eda99183630dcd5",
+      "bytes": 43486
     },
     {
       "path": "tools/token-e2e/calibration/T0.json",
@@ -59342,8 +59381,8 @@
     },
     {
       "path": "tools/token-e2e/grade.py",
-      "sha256": "35be55c2ff2418111f617b75a901e196bcd94fa50f9681e20c4a360204d11113",
-      "bytes": 64508
+      "sha256": "f703cef47ad4d440af804f93a5ba0ca121c40f899c4f1c78044a60d64f5a45c8",
+      "bytes": 65138
     },
     {
       "path": "tools/token-e2e/grading-block.schema.json",
@@ -59357,8 +59396,8 @@
     },
     {
       "path": "tools/token-e2e/judge.py",
-      "sha256": "40c3876bb68420c016f56f7bc978e7173c181b932900cc4614c1aad4316c6f45",
-      "bytes": 76685
+      "sha256": "ed83cda682e5b22d23fc4b068a8e2a6c23d5bdd8a183c11aebbdc5c5691031ba",
+      "bytes": 77929
     },
     {
       "path": "tools/token-e2e/judgment.schema.json",
