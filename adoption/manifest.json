@@ -146,6 +146,7 @@
     "gitleaks": "recipes/README.md",
     "grafana": "observability/backends/README.md",
     "headroom": "recipes/README.md",
+    "hindsight": "recipes/hindsight-research-memory.md",
     "huggingface-hub-native": "recipes/README.md",
     "jcodemunch-mcp": "recipes/README.md",
     "lean": "blueprints/us-equities/engine/README.md",

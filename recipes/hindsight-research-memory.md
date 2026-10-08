@@ -10,7 +10,7 @@ not research recall quality or trading results.
 
 Source: [vectorize-io/hindsight v0.10.2](https://github.com/vectorize-io/hindsight/tree/5fc4ce20917b916240cef27c212c387a177f115b),
 commit `5fc4ce20917b916240cef27c212c387a177f115b`. Use its
-[pip installation](https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/hindsight-docs/docs/developer/installation.md#L222):
+[pip installation](https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/hindsight-docs/docs/developer/installation.md#L229):
 
 ```sh
 python3.13 -m venv ~/.local/share/hindsight/venv
@@ -37,6 +37,14 @@ runs the vendor CLI with that environment file. Its
 [MCP drop-in](../adoption/templates/systemd/hindsight-research.service.d/10-mcp-tools.conf)
 sets the vendor `HINDSIGHT_API_MCP_ENABLED_TOOLS` allowlist
 ([config.py:680](https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/hindsight-api-slim/hindsight_api/config.py#L680)).
+The [immutable-source review](../evidence/artifacts/hindsight-research-memory-20261008/review-resolution.json)
+records independently matched GitHub blob hashes and exact configuration
+locators; `config.py:4792–4794` parses the allowlist at the same pin.
+The [nonsecret allowlist environment file](../adoption/templates/systemd/hindsight-research.mcp-tools.env.template)
+is copied to `~/.local/share/hindsight/mcp-tools.env`. The drop-in reads it
+after the base unit's `stage.env`: systemd's later `EnvironmentFile=` values
+override earlier files and all `Environment=` assignments
+([systemd v259](https://github.com/systemd/systemd/blob/v259/man/systemd.exec.xml)).
 It exposes 15 tools: `retain`, `sync_retain`, `recall`, `reflect`,
 `list_memories`, `get_memory`, `list_tags`, `get_bank`, `list_documents`,
 `get_document`, `list_operations`, `get_operation`, `list_mental_models`,
@@ -44,8 +52,14 @@ It exposes 15 tools: `retain`, `sync_retain`, `recall`, `reflect`,
 directive tools are excluded. The host operator installs the template and
 drop-in under `~/.config/systemd/user/`, then runs `daemon-reload` and
 `enable --now hindsight-research.service`; stop an existing foreground
-instance first. This repository publishes the installed forms and does not
-apply host or client settings.
+instance first. The template now orders startup after and requests
+`omniroute.service`, and retries crashes with `Restart=on-failure` and
+`RestartSec=5s` ([systemd v259](https://github.com/systemd/systemd/blob/v259/man/systemd.service.xml)).
+Ordering establishes unit startup order, not HTTP readiness. Hindsight's
+[startup verification](https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/hindsight-api-slim/hindsight_api/engine/memory_engine.py#L5371)
+warns and continues if the gateway is unavailable. These template fixes
+require a separate host-operator apply; the historical receipt preserves
+the previously installed forms. This publication changes no live unit.
 
 The bank HTTP MCP endpoint is `http://127.0.0.1:8888/mcp/trading-research/`.
 The accepted host's operator registered it with the native clients:
@@ -71,7 +85,7 @@ when its inputs match instead of describing a receipt read as a new run.
 
 Inverse: remove the native clients' Hindsight registrations, run
 `systemctl --user disable --now hindsight-research.service`, remove the unit
-and its drop-in, then `systemctl --user daemon-reload`. The vendor foreground
+and its drop-in and allowlist environment file, then `systemctl --user daemon-reload`. The vendor foreground
 start remains available with the existing private environment file. For full
 retirement, stop the server before removing its venv and owned named pg0
 instance; deleting that database deletes the bank. The accepted instance is

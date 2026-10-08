@@ -95,6 +95,7 @@
   "research_memory_jobs": [
     {
       "id": "hindsight-research-memory",
+      "component_id": "hindsight",
       "repo": "vectorize-io/hindsight",
       "version": "0.10.2",
       "source_commit": "5fc4ce20917b916240cef27c212c387a177f115b",
@@ -104,6 +105,7 @@
       "recipe_path": "recipes/hindsight-research-memory.md",
       "unit_template": "adoption/templates/systemd/hindsight-research.service",
       "mcp_allowlist_template": "adoption/templates/systemd/hindsight-research.service.d/10-mcp-tools.conf",
+      "mcp_allowlist_environment_template": "adoption/templates/systemd/hindsight-research.mcp-tools.env.template",
       "evidence_path": "evidence/artifacts/hindsight-research-memory-20261008/receipt.json",
       "sources": [
         "https://github.com/vectorize-io/hindsight/tree/5fc4ce20917b916240cef27c212c387a177f115b"
