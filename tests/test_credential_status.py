@@ -46,6 +46,13 @@ class CredentialStatusTests(unittest.TestCase):
         # The kernel's key list is a fixture file: no test reads this host's /proc/keys.
         self.proc_keys = Path(temporary.name) / "proc-keys"
         self.proc_keys.write_text("")
+        # Use a synthetic native core-pattern input as well as synthetic stores.
+        # The collector-refusal test supplies its own pipe pattern explicitly.
+        self.core_pattern = Path(temporary.name) / "core-pattern"
+        self.core_pattern.write_bytes(b"core\n")
+        sys.path.insert(0, str(ROOT / "tools" / "credentials"))
+        import credential_run as runner
+        self.enterContext(patch.object(runner, "CORE_PATTERN_FILE", str(self.core_pattern)))
 
     def keyring_inventory(self, status="optional"):
         """The inventory with the tavily row back in the kernel keyring, its store until 2026-09-29.
@@ -84,8 +91,18 @@ class CredentialStatusTests(unittest.TestCase):
 
     def run_cli(self, *args):
         env = {"PATH": os.environ.get("PATH", ""), **self.env}
-        result = subprocess.run([sys.executable, str(SCRIPT), "--root", str(ROOT), "--proc-keys", str(self.proc_keys),
-                                 *args], env=env, capture_output=True, text=True, timeout=60)
+        # Run the same native entrypoint with a fixture for the kernel input;
+        # neither the production CLI nor the real host core pattern changes.
+        driver = (
+            "import sys; sys.path.insert(0, sys.argv[1]); sys.path.insert(0, sys.argv[2]); "
+            "import credential_run; credential_run.CORE_PATTERN_FILE = sys.argv[3]; "
+            "from scripts import credential_status; "
+            "raise SystemExit(credential_status.main(sys.argv[4:]))"
+        )
+        result = subprocess.run([sys.executable, "-c", driver, str(ROOT),
+                                 str(ROOT / "tools" / "credentials"), str(self.core_pattern),
+                                 "--root", str(ROOT), "--proc-keys", str(self.proc_keys), *args],
+                                env=env, capture_output=True, text=True, timeout=60)
         self.assert_no_values(result.stdout, result.stderr)
         return result
 

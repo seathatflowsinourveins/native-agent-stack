@@ -2542,6 +2542,17 @@ assertion on the mutant, in a scratch copy under `/tmp`.
 
 ## Declared test contracts for credential-status grammar (2026-10-08, PR #849)
 
+The writer's existing
+`tests.test_credential_tools.StoreFromEnvTests.test_a_leftover_temporary_file_is_a_listed_dot_file_and_never_the_stored_file`
+now explicitly requests `check_store_lines=False` for its metadata observation.
+Its old and new expectations are identical: before linking, the final entry is
+`missing`; after storing, it is `ok`; in both cases the temporary dot-file is
+listed as undeclared. This method tests native writer identity and name-only
+coverage, independently of the host's runner/core-dump eligibility. The full
+default status command still performs the protected grammar check. The separate
+main-version failure set below contains the four changed status contracts;
+this writer method has no changed expected value.
+
 The CC's credential-status ruling of about 08:00Z requires the status tool to
 report every line the native runner refuses, without returning a credential
 value. The shared runner grammar and checked reader therefore replace the old
@@ -2591,3 +2602,26 @@ in a disjoint checkout, still returned exactly the four declared methods above
 in 44 tests. The affected credential modules passed 141 tests separately. These
 results supplement the earlier measurements without relabeling them as host or
 upstream acceptance.
+Shared fixture correction after hosted run37815646323: the status tests now
+provide a temporary native core-pattern file for both in-process calls and the
+same main(argv) entrypoint in a subprocess. This follows the existing runner
+fixture launcher at tests/test_credential_run.py:67,280-309; no production CLI
+override or host core setting is introduced. The native core-dump guard remains
+active, and its pipe-collector regression still verifies refusal before reads.
+
+These methods keep their existing assertions and now use the synthetic kernel
+input rather than the CI host's collector configuration:
+- CredentialStatusTests.test_cli_output_never_contains_values_in_any_mode
+- CredentialStatusTests.test_export_form_store_stays_ok_and_value_free
+- CredentialStatusTests.test_guard_pin_check_hashes_only_the_installed_guard
+- CredentialStatusTests.test_old_file_is_a_warning_not_a_failure
+- CredentialStatusTests.test_private_env_file_uses_checked_reader_without_path_reads
+- CredentialStatusTests.test_private_file_is_ok_and_output_is_value_free
+- CredentialStatusTests.test_runner_refused_store_lines_are_unsafe_and_value_free
+- CredentialStatusTests.test_tavily_row_is_a_stored_file_entry
+- CredentialStatusTests.test_undeclared_store_file_is_reported_by_name_only
+
+The writer metadata method declared above keeps its identical expectations and
+explicitly skips content inspection. The kernel-fixture correction passed the
+status and writer modules together: 82 tests, rc0. Hosted failure21 remains
+recorded separately from this local fixture verification.

@@ -278,7 +278,9 @@ class StoreFromEnvTests(unittest.TestCase):
         inventory = json.loads((ROOT / cs.INVENTORY).read_text(encoding="utf-8"))
 
         def tavily_state_and_undeclared():
-            report = cs.inspect(ROOT, inventory, self.env)
+            # This writer test observes names and metadata, independently of the
+            # host's runner grammar/core-dump eligibility.
+            report = cs.inspect(ROOT, inventory, self.env, check_store_lines=False)
             row = next(e for e in report["entries"] if e["id"] == "tavily")
             return row["state"], report["coverage"]["undeclared_store_files"], report["warnings"]
 
