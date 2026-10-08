@@ -133,7 +133,7 @@ def fold(path):
 
 # Inputs, not outputs: Claude Code's project settings file, and the directory the
 # repository's relative core.hooksPath names (scripts/git-hooks/pre-commit:2-3;
-# docs/secret-storage.md:199-200). Everything else is derived from their text.
+# docs/secret-storage.md:442-443). Everything else is derived from their text.
 SETTINGS = ".claude/settings.json"
 HOOKS_DIR = "scripts/git-hooks"
 SETTINGS_RULE_KEYS = ("permissions", "$schema")
