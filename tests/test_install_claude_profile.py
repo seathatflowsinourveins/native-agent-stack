@@ -1727,15 +1727,17 @@ class McpGetOutputTests(unittest.TestCase):
 
 
 class StandingRuleSurfacesTests(unittest.TestCase):
-    """The standing clauses of docs/decisions/2026-09-30-rule-text-every-layer.md carry the same wording on the three
-    rule surfaces (the Gate A owner's review of PR #557): the repository AGENTS.md, the portable user-level template and
-    the Codex user-level block. The Codex block names a bounded worker where the Claude surfaces name a delegated child
-    in the skill-discovery sentence. A clause the review dropped stays off all three."""
+    """The standing clauses of docs/decisions/2026-09-30-rule-text-every-layer.md carry the same wording on the two
+    user-level rule surfaces: the portable user-level template and the Codex user-level block. The repository AGENTS.md
+    was the third surface (the Gate A owner's review of PR #557) until docs/decisions/2026-10-07-instruction-core.md
+    trimmed it to the rules that are its own, so it is no longer read here. The Codex block names a bounded worker where
+    the Claude surface names a delegated child in the skill-discovery sentence. A clause the review dropped stays off
+    both."""
 
-    SURFACES = {"AGENTS.md": ROOT / "AGENTS.md", "portable": ROOT / "examples" / "claude-native" / "CLAUDE.md",
+    SURFACES = {"portable": ROOT / "examples" / "claude-native" / "CLAUDE.md",
                 "codex": ROOT / "adoption" / "templates" / "codex.AGENTS.template.md"}
     SHARED = (
-        "Prefer the maintainer's own organization repositories (the vendor's GitHub org, such as alpacahq for Alpaca) "
+        "Prefer the maintainer's own organization repositories (the vendor's GitHub org) "
         "and their clean releases, and never rebuild or fork what an upstream already ships; glue only fills a "
         "demonstrated gap, cited at a pin.",
         "A coordinator, not a delegated child, invokes `search-first` before custom code or a tool choice; when no "
@@ -1757,7 +1759,7 @@ class StandingRuleSurfacesTests(unittest.TestCase):
         "explicit model choices and role definitions; a coordinator records the trigger and acceptance result. "
         "Cross-family research, review and sweep votes run through the OmniRoute gateway; a coordinator, never a "
         "delegated child, starts a cross-family lane.",
-        # AGENTS.md follows this clause with the path of its decision record.
+        # Its own entry: the portable block carries this clause without the Codex routing paragraph above.
         "Cross-family research, review and sweep votes run through the OmniRoute gateway; a coordinator, never a "
         "delegated child, starts a cross-family lane.",
         "No audits, trials or network at startup; the daily currency timer's one read-only due-file line is allowed",
@@ -1780,6 +1782,26 @@ class StandingRuleSurfacesTests(unittest.TestCase):
             for phrase in self.DROPPED:
                 with self.subTest(surface=name, dropped=phrase):
                     self.assertNotIn(phrase, text)
+
+    # The repository AGENTS.md keeps its own core (docs/decisions/2026-10-07-instruction-core.md and its amendment):
+    # the maintainer sentence, the trading prerequisite that applies before any trading activity wherever it runs, and
+    # none of the dropped clauses.
+    ROOT_CORE = (
+        "Prefer the maintainer's own organization repositories (the vendor's GitHub org) and their clean releases, and "
+        "never rebuild or fork what an upstream already ships; glue only fills a demonstrated gap, cited at a pin.",
+        "Each coordinator unit names the north-star action it serves",
+        "trading work of any kind (research, data acquisition, strategy gates, decision registration, paper or broker "
+        "operation) reads `blueprints/us-equities/AGENTS.md` first, wherever it runs.",
+    )
+
+    def test_the_repository_file_keeps_its_core_and_the_trading_prerequisite(self):
+        text = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
+        for sentence in self.ROOT_CORE:
+            with self.subTest(sentence=sentence[:48]):
+                self.assertIn(sentence, text)
+        for phrase in self.DROPPED:
+            with self.subTest(dropped=phrase):
+                self.assertNotIn(phrase, text)
 
     # A user-level reporting rule (docs/decisions/2026-10-05-user-facing-local-time.md): one wording in the two client
     # blocks and in the carriers F9 renders from them, once each. It is not a standing clause of the repository
@@ -1808,9 +1830,10 @@ class PortableTopRuleTests(unittest.TestCase):
     """
 
     TEMPLATE = ROOT / "examples" / "claude-native" / "CLAUDE.md"
-    # Fixed UTF-8 ceilings: repaired scope + 5%, rounded upward. The dated PR #726
-    # addendum records 23062/19102 -> 24458/20103 and the required restorations.
-    STARTUP_BUDGET_BYTES = {"claude": 24458, "codex": 20103}
+    # Fixed UTF-8 ceilings: measured scope + 5%, rounded upward. The dated PR #726
+    # addendum records 23062/19102 -> 24458/20103 and the required restorations;
+    # docs/decisions/2026-10-07-instruction-core.md lowers them to 20880/16783 (the landing tree + 5%).
+    STARTUP_BUDGET_BYTES = {"claude": 20880, "codex": 16783}
     MECHANICS = ROOT / "examples" / "claude-native" / "workflows" / "README.md"
     ROUTING = ROOT / "adoption" / "templates" / "codex.AGENTS.template.md"
     # Upstream as the source of truth and reuse, the check order and the absence wording, worker

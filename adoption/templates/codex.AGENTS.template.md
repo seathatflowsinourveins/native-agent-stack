@@ -2,7 +2,7 @@
 <!-- native-agent-stack:top-rule -->
 Top rule: research convergence first; current upstream SOTA is the source of truth. The installed client is also a source of truth; never self-write without a SOTA source. The ecosystem compounds: each choice adopts the current best converged practice and is replaced when the live landscape converges on a better-evidenced one.
 Reuse maintained upstream tools, runtimes and orchestration patterns through their supported install and test commands, naming each source (repository and pin, file or paper); with none, stop and report.
-Prefer the maintainer's own organization repositories (the vendor's GitHub org, such as alpacahq for Alpaca) and their clean releases, and never rebuild or fork what an upstream already ships; glue only fills a demonstrated gap, cited at a pin.
+Prefer the maintainer's own organization repositories (the vendor's GitHub org) and their clean releases, and never rebuild or fork what an upstream already ships; glue only fills a demonstrated gap, cited at a pin.
 Prompts fix the objective, scope and authorization; improve the approach from current evidence.
 Check capability claims in order: installed client (commands, --help, settings), upstream changelog for that version (gh api), upstream source at that tag, official docs. Absence claims need the first two, else say "not found in X, Y".
 Worker, docs-agent and cross-family answers are leads; relay claims only with upstream citations.
@@ -26,9 +26,7 @@ Catalog: qmd for keyword search and document retrieval; codebase_search with the
 Run large command output via `context-mode` (`ctx_execute`, `ctx_batch_execute`); set `cwd` to your working directory (a writer's owned worktree).
 If `semble` MCP is connected, use `search` for conceptual/natural-language code queries with the absolute repo path; omit `content`, which overrides the code default per call. `find_related` gives embedding-similar chunks only; get callers, implementations and references from Serena.
 Long commands: set `yield_time_ms` 30000; while a `session_id` returns, poll `write_stdin` (empty `chars`) until exit, then read output.
-Web research: if the stack installs GPT Researcher, run `bash ~/code/native-agent-stack/tools/research/gpt_researcher.sh "<short current-month query>"` as a long command (stops at 1,500 s); use short, unseeded current-month queries; reports are leads: re-read facts in primary sources.
-Message Claude Code in one long command: set `msg` via a quoted heredoc (`msg=$(cat <<'MSG'`, text, `MSG`, `)` each on its own line), then `printf '%s\n\nreply: codex queue --thread %s\n' "$msg" "$CODEX_THREAD_ID" | claude -p -n "codex-$(printf '%.8s' "$CODEX_THREAD_ID")" --permission-mode bypassPermissions --max-turns 3 --output-format stream-json --verbose "Send the text on stdin, complete and verbatim, to the session named <name> with exactly one SendMessage call, then stop."`.
-Codex receives queued messages only between turns; idle delay is up to ~20 s.
+To message a Claude Code session, read `examples/claude-native/workflows/README.md#native-workflow-mechanics-relocated-2026-10-05` in the portable foundation, https://github.com/seathatflowsinourveins/native-agent-stack.
 When you tell the user a time, give it first in the host's local time zone (read it with `timedatectl` or `date`), with UTC beside it, for example "4:00 PM EDT (20:00Z)". Write timestamps in ledger rows, receipts, evidence and commit messages in UTC (RFC 3339 with `Z`); Git author/committer metadata retains its native format.
 
 <!-- native-agent-stack:rtk-upstream rtk-ai/rtk v0.51.0 hooks/rtk-awareness-full.md, verbatim -->

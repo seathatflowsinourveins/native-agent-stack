@@ -1,0 +1,1 @@
+Upstream practice: [agent teams](https://code.claude.com/docs/en/agent-teams), [multi-agent research system](https://www.anthropic.com/engineering/multi-agent-research-system), [building effective agents](https://www.anthropic.com/engineering/building-effective-agents), and the bundled `/workflow-authoring` reference.
