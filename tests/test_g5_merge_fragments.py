@@ -23,6 +23,101 @@ def write_json(path, value):
 
 
 class MergeFragmentTests(unittest.TestCase):
+    @staticmethod
+    def compact_row(label="WATCH", pin="a" * 40, role=None):
+        result = {"repository_or_entry": "example/project", "slot": "workers", "qualification": {} if role is None else {"role": role},
+                  "disposition": label, "evidence_class": "SOURCE-REVIEW", "pin": {"kind": "commit", "version_or_commit": pin,
+                  "repository_or_source": "example/project", "subject": "implementation"},
+                  "primary_sources": [{"locator": "example/project@" + pin + ":README.md:1",
+                                       "pin": {"kind": "commit", "version_or_commit": pin, "repository_or_source": "example/project", "subject": "implementation"},
+                                       "subject": "Pinned vendor documentation"}],
+                  "archive_member": "captures/source.json", "capture_sha256": "c" * 64,
+                  "owner_lane": "source-lane", "refresh_date": "2026-10-08"}
+        if label == "PENDING":
+            result["pending"] = {"provisional_disposition": "WATCH", "measurement": "Verify source", "owner": "source-lane"}
+        return result
+
+    def test_compact_duplicates_preserve_origins_and_exact_role_scope(self):
+        row = self.compact_row()
+        rows, receipt = merge.merge_compact_groups([
+            ([row], "inputs/a.json", "1" * 64, "stars"),
+            ([dict(row)], "inputs/b.json", "2" * 64, "fields"),
+            ([self.compact_row(role="worker")], "inputs/c.json", "3" * 64, "role"),
+        ])
+        self.assertEqual(len(rows), 2)
+        duplicate = next(x for x in rows if not x["qualification"])
+        self.assertEqual(duplicate["disposition"], "WATCH")
+        self.assertEqual({x["archive_member"] for x in duplicate["source_refs"]}, {"inputs/a.json", "inputs/b.json"})
+        origin = next(x for x in receipt["origins"] if not x["qualification"])
+        self.assertEqual(origin["fragments"], ["fields", "stars"])
+
+    def test_compact_pin_or_label_disagreement_stays_pending_without_vote(self):
+        a, b = self.compact_row("TRIAL"), self.compact_row("REJECT", "b" * 40)
+        b["searched"] = "Pinned README and vendor test source"
+        inputs = [([a, a], "inputs/a.json", "1" * 64, "popular"), ([b], "inputs/b.json", "2" * 64, "one-reject")]
+        rows, receipt = merge.merge_compact_groups(inputs)
+        self.assertEqual(rows[0]["disposition"], "PENDING")
+        self.assertEqual(rows[0]["pending"]["provisional_disposition"], "REJECT")
+        self.assertEqual(len(rows[0]["primary_sources"]), 2)
+        self.assertEqual({x["disposition"] for x in rows[0]["choices"]}, {"TRIAL", "REJECT"})
+        self.assertEqual(len(rows[0]["source_refs"]), 3)
+        again, _ = merge.merge_compact_groups(list(reversed(inputs)))
+        self.assertEqual(rows, again)
+        self.assertEqual(len(receipt["pending"]), 1)
+
+    def test_compact_unknown_bundle_and_nested_choices_cannot_disappear(self):
+        good = self.compact_row()
+        unknown = self.compact_row()
+        unknown["primary_sources"][0]["locator"] = "UNKNOWN"
+        rows, receipt = merge.merge_compact_groups([([good, unknown], "inputs/rows.json", "a" * 64, "original")])
+        self.assertEqual(rows[0]["disposition"], "PENDING")
+        self.assertEqual(len(receipt["pending"]), 1)
+        self.assertEqual(len(rows[0]["source_refs"]), 2)
+        good["choices"] = [{"disposition": "REJECT", "source_refs": [{"archive_member": "captures/reject.json", "sha256": "b" * 64, "pointer": "/row"}]}]
+        rows, _ = merge.merge_compact_groups([([good], "inputs/rows.json", "a" * 64, "original")])
+        self.assertEqual(rows[0]["disposition"], "PENDING")
+        self.assertEqual({x["disposition"] for x in rows[0]["choices"]}, {"REJECT", "WATCH"})
+
+    def test_compact_reserved_origins_and_late_output_symlinks_fail_before_write(self):
+        with tempfile.TemporaryDirectory() as directory, tempfile.TemporaryDirectory() as other:
+            root, stage = Path(directory), Path(other) / "asset"
+            rows = root / "rows.json"
+            sha = write_json(rows, [self.compact_row()])
+            manifest = root / "intake.json"
+            for member in ("compact/rows.json", "provenance/compact-origin-map.json"):
+                write_json(manifest, {"fragments": [{"source": str(rows), "sha256": sha, "archive_member": member, "fragment_id": "original"}]})
+                with self.assertRaises(merge.FragmentError):
+                    merge.compact_intake([manifest], stage, root, True)
+                self.assertFalse(stage.exists())
+            stage.mkdir()
+            (stage / "provenance").symlink_to(Path(other) / "aliased", target_is_directory=True)
+            write_json(manifest, {"fragments": [{"source": str(rows), "sha256": sha, "archive_member": "inputs/rows.json", "fragment_id": "original"}]})
+            with self.assertRaises(merge.decisions.InvalidDecisionIndex):
+                merge.compact_intake([manifest], stage, root, True)
+            self.assertFalse((stage / "inputs").exists())
+            self.assertFalse((stage / "compact").exists())
+
+    def test_compact_intake_bad_hash_or_private_capture_fails_before_write(self):
+        with tempfile.TemporaryDirectory() as directory, tempfile.TemporaryDirectory() as other:
+            root, stage = Path(directory), Path(other) / "asset"
+            rows = root / "rows.json"
+            sha = write_json(rows, [self.compact_row()])
+            capture = root / "capture.json"
+            capture.write_text(str(Path.home()) + "/private-custody")
+            manifest = root / "intake.json"
+            packet = {"fragments": [{"source": str(rows), "sha256": sha, "archive_member": "inputs/rows.json", "fragment_id": "source"}],
+                      "captures": [{"source": str(capture), "sha256": merge.digest(capture.read_bytes()), "archive_member": "captures/source.json"}]}
+            write_json(manifest, packet)
+            with self.assertRaises(merge.FragmentError):
+                merge.compact_intake([manifest], stage, root, True)
+            self.assertFalse(stage.exists())
+            packet["captures"] = []
+            packet["fragments"][0]["sha256"] = "0" * 64
+            write_json(manifest, packet)
+            with self.assertRaises(merge.FragmentError):
+                merge.compact_intake([manifest], stage, root, True)
+            self.assertFalse(stage.exists())
+
     def test_lifecycle_reconciliation_preserves_facts_and_rejects_unreviewed_groups(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

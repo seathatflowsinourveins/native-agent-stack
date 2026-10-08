@@ -17,11 +17,13 @@ import sys
 import tempfile
 
 REPO = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(REPO / "tools/sota-convergence/landscape-sweep"))
 sys.path.insert(0, str(REPO / "scripts"))
 from sweep_common import canon, json_text
 from host_receipts import register_file, unique_json
 import catalog_decisions as decisions
+import compact_manifest as compact
 
 CLASSES = {"ADOPT-NOW", "TRIAL", "WATCH", "REJECT", "NO-GAP", "OUT-OF-SCOPE"}
 VERDICT_FIELDS = (
@@ -572,6 +574,136 @@ def lifecycle_union(root: Path, base_ref: str):
     return {LIFECYCLE_TARGET: json_text(result, indent=2).encode("utf-8"), receipt: json_text(record, indent=2).encode("utf-8")}
 
 
+def compact_primary_bundle(row):
+    """A valid source bundle is serialization metadata, never a version/quality vote."""
+    blockers = []
+    try:
+        compact.validate_pin(row.get("pin"), "fragment pin", blockers)
+        if row.get("pin") is None:
+            return False
+        for primary in row.get("primary_sources", []):
+            compact.validate_pin(primary.get("pin"), "fragment primary", blockers)
+            compact.validate_locator(primary.get("locator"), primary.get("pin"), "fragment primary", blockers)
+        return bool(row.get("primary_sources")) and not blockers
+    except (compact.CompactError, KeyError, TypeError):
+        return False
+
+
+def merge_compact_groups(inputs):
+    """CC scope rules over exact compact keys, preserving every immutable origin row."""
+    groups = {}
+    for rows, member, sha, fragment in inputs:
+        for index, row in enumerate(rows):
+            if not isinstance(row, dict):
+                raise FragmentError("compact fragment rows must be objects")
+            key = compact.decision_key(row)
+            groups.setdefault(key, []).append((row, {"archive_member": member, "sha256": sha, "pointer": f"/{index}",
+                                                   "source_id": fragment, "owner_lane": row.get("owner_lane", fragment)}))
+    merged, origins, disagreements = [], [], []
+    def stable(value):
+        return json.dumps(value, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
+    def union(values):
+        distinct = {stable(value): value for value in values}
+        return [distinct[key] for key in sorted(distinct)]
+    for key, candidates in sorted(groups.items()):
+        candidates = sorted(candidates, key=lambda item: stable(item[0]))
+        valid = [item for item in candidates if compact_primary_bundle(item[0])]
+        base, _ = (valid or candidates)[0]
+        output = dict(base)
+        output["repository_or_entry"] = key[0]
+        source_refs = union([ref for row, _ in candidates for ref in row.get("source_refs", [])] + [ref for _, ref in candidates])
+        output["source_refs"] = source_refs
+        primaries = union([primary for row, _ in valid for primary in row.get("primary_sources", [])])
+        if primaries:
+            output["primary_sources"] = primaries
+        labels = {row["disposition"] for row, _ in candidates if row.get("disposition") in CLASSES}
+        choices = []
+        for row, ref in candidates:
+            if row.get("disposition") in CLASSES:
+                choices.append({"disposition": row["disposition"], "source_refs": [ref], "qualification": row.get("qualification", {})})
+            for choice in row.get("choices", []):
+                if choice.get("disposition") not in CLASSES:
+                    raise FragmentError("pending compact choices must retain actual six-class source labels")
+                labels.add(choice["disposition"])
+                choices.append(choice)
+        output["choices"] = union(choices)
+        signatures = {stable({field: row.get(field) for field in ("disposition", "pin", "evidence_class", "decision_scope")}) for row, _ in candidates}
+        pending = any(row.get("disposition") == "PENDING" for row, _ in candidates) or len(signatures) != 1 or len(labels) != 1 or len(valid) != len(candidates)
+        if pending:
+            output["disposition"] = "PENDING"
+            # A conflicting execution assertion remains in its original receipt, not a synthetic new acceptance.
+            output["evidence_class"] = "SOURCE-REVIEW"
+            output.pop("acceptance_witness", None)
+            output["pending"] = {"provisional_disposition": conservative(labels),
+                                 "measurement": f"Verify every retained original source row's pinned primary claims and role qualification for {key[0]} in {key[1]}, including unresolved source bundles; run one supported same-task comparison only after its native fixture is bound.",
+                                 "owner": "grand-catalog", "status": "PROPOSED"}
+            disagreements.append({"repository_or_entry": key[0], "slot": key[1], "qualification": json.loads(key[2]),
+                                  "labels": sorted(labels), "original_rows": [ref for _, ref in candidates], "pending": output["pending"]})
+        else:
+            output.pop("pending", None)
+        if "REJECT" in labels:
+            notes = sorted({row["searched"] for row, _ in candidates if isinstance(row.get("searched"), str) and row["searched"].strip()})
+            if notes:
+                output["searched"] = " | ".join(notes)
+        output["note"] = "One deterministic source bundle represents serialization metadata; no primary pin is selected by recency, lane count or quality voting. Every original class, pin and literal role is retained in hash-bound source_refs. " + str(base.get("note", ""))
+        merged.append(output)
+        origins.append({"repository_or_entry": key[0], "slot": key[1], "qualification": json.loads(key[2]),
+                        "fragments": sorted({ref["source_id"] for _, ref in candidates}), "source_refs": [ref for _, ref in candidates]})
+    return merged, {"schema_version": 1, "key": "canonical entry + literal slot + canonical literal qualification",
+                    "origins": origins, "pending": disagreements,
+                    "boundary": "Source data integration only; candidate implementation, native execution, designated readers and complete corpus coverage are independently checked."}
+
+
+def compact_intake(manifests: list[Path], stage: Path, root: Path, write: bool):
+    stage = stage.resolve()
+    if stage.is_relative_to(root.resolve()):
+        raise FragmentError("the unpublished asset stage must be outside the repository")
+    planned, inputs = {}, []
+    for manifest in manifests:
+        packet = read_json(manifest)
+        if not isinstance(packet, dict):
+            raise FragmentError("compact intake manifest must be an object")
+        for kind, entries in (("captures", packet.get("captures", [])), ("fragments", packet.get("fragments", []))):
+            if not isinstance(entries, list):
+                raise FragmentError("compact intake entries must be arrays")
+            for entry in entries:
+                if not isinstance(entry, dict) or not isinstance(entry.get("source"), str):
+                    raise FragmentError("compact intake requires source text")
+                member = compact.member_name(entry["archive_member"])
+                if member in {"compact/rows.json", "provenance/compact-origin-map.json"}:
+                    raise FragmentError("original capture cannot use a derived compact output member")
+                destination = decisions.safe_file(stage, member)
+                source = Path(entry["source"])
+                if not source.is_absolute():
+                    source = manifest.parent / source
+                raw = checked_bytes(source, entry["sha256"])
+                public_bytes(raw)
+                if member in planned and planned[member] != raw:
+                    raise FragmentError("compact intake aliases different capture bytes")
+                if destination.exists() and destination.read_bytes() != raw:
+                    raise FragmentError("compact intake cannot rewrite a retained source member")
+                planned[member] = raw
+                if kind == "fragments":
+                    rows = json.loads(raw, object_pairs_hook=unique_json)
+                    if not isinstance(rows, list):
+                        raise FragmentError("compact fragment requires the original row array")
+                    inputs.append((rows, member, entry["sha256"], entry["fragment_id"]))
+    if not inputs:
+        raise FragmentError("compact intake requires at least one fragment")
+    rows, receipt = merge_compact_groups(inputs)
+    planned["compact/rows.json"] = json_text(rows, indent=2).encode("utf-8")
+    planned["provenance/compact-origin-map.json"] = json_text(receipt, indent=2).encode("utf-8")
+    for member, raw in sorted(planned.items()):
+        decisions.safe_file(stage, member)
+        public_bytes(raw)
+    for member, raw in sorted(planned.items()):
+        if write:
+            atomic_bytes(decisions.safe_file(stage, member), raw)
+    return {"mode": "write" if write else "check", "compact_rows": len(rows), "pending": len(receipt["pending"]),
+            "fragment_inputs": len(inputs), "captures": len(planned)-2, "row_sha256": digest(planned["compact/rows.json"]),
+            "origin_map_sha256": digest(planned["provenance/compact-origin-map.json"]), "coverage": "Separate frozen original census and asset-only check required"}
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=REPO)
@@ -583,11 +715,18 @@ def main(argv=None):
     parser.add_argument("--scope-overlay", type=Path)
     parser.add_argument("--scope-overlay-sha256")
     parser.add_argument("--reconcile-lifecycle-base", help="Pinned pre-G5 union; reconcile source inventory counters only")
+    parser.add_argument("--compact-intake", type=Path, action="append", default=[])
+    parser.add_argument("--asset-stage", type=Path)
     parser.add_argument("--supplement", action="append", default=[])
     parser.add_argument("--write", action="store_true")
     args = parser.parse_args(argv)
     root = args.root.resolve()
     try:
+        if args.compact_intake:
+            if args.asset_stage is None or args.manifest or args.stars or args.supplement or args.reconcile_lifecycle_base:
+                raise FragmentError("compact asset intake needs --asset-stage and its own sequential call")
+            print(json.dumps(compact_intake(args.compact_intake, args.asset_stage, root, args.write), sort_keys=True))
+            return 0
         planned, summary = {}, {"stars": None, "stars_total": 368}
         for manifest in args.manifest:
             additions = manifest_files(root, manifest)
@@ -649,7 +788,7 @@ def main(argv=None):
                           "targets": sorted(planned), "sha256": {key: digest(value) for key, value in sorted(planned.items())}},
                          sort_keys=True))
         return 0
-    except (FragmentError, OSError, ValueError, KeyError, decisions.InvalidDecisionIndex, subprocess.CalledProcessError) as error:
+    except (FragmentError, OSError, ValueError, KeyError, compact.CompactError, decisions.InvalidDecisionIndex, subprocess.CalledProcessError) as error:
         print(f"merge_fragments: {error}", file=sys.stderr)
         return 2
 
