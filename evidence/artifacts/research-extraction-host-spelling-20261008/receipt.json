@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "evidence_class": "local_integration",
-  "subject": "PR875 extraction-host/citation and measured native AUTO follow-up",
-  "checked_at": "2026-10-08T18:54:10Z",
+  "subject": "PR875 P3 extraction-host/citation follow-up; restored scope",
+  "checked_at": "2026-10-08T19:10:38Z",
   "base": "a484989a43f70ff2575b6fb054cf00c9834e7679",
   "upstream": {
     "repository": "https://github.com/deedy5/ddgs",
@@ -15,9 +15,9 @@
     ]
   },
   "source_hashes": {
-    "tools/research/exact_queries.py": "1537119d35ebb8361f68d2f78050ac384d3034aea2a179593ca17f22860e83ac",
-    "tests/test_research_dispatch_exact_queries.py": "4e40bd9fe3e451f65ec44a7c796b471a75bdf837fd0451e3718b79d15d581a9d",
-    "tools/research/dispatch": "0561d05c4b4aeb383399e743b354d4d5be32439c8783bdcdab083f8c32fc5a65"
+    "tools/research/exact_queries.py": "94175be78f81aeb60fcb76dd6cf0f6ab0c7089ff192fba2b7846aff5a4a5be5f",
+    "tests/test_research_dispatch_exact_queries.py": "6b54cddf5e3fb9ab75600c3f9f4be7e60a6465bcc0d66ee66cd408e32d110da9",
+    "tools/research/dispatch": "8a72a88c90405f3b8bccb5b695480a59020cc253b93ac7031ddfff0a1fc6da12"
   },
   "native_designated_review": {
     "evidence_class": "native_proven",
@@ -40,13 +40,13 @@
       "reason": "extraction invoked for refused host"
     },
     "after": {
-      "tests": 38,
+      "tests": 32,
       "failures": 0,
       "errors": 0,
       "skips": 0,
       "exit_code": 0,
       "command": "nice -n 10 ionice -c2 -n7 env PYTHONDONTWRITEBYTECODE=1 <native GPTR Python> -B -m unittest discover -s tests -p test_research_dispatch_exact_queries.py",
-      "duration_seconds": 1.3
+      "duration_seconds": 0.953
     },
     "preserves": [
       "original vendor URL",
@@ -55,60 +55,25 @@
       "all existing input/witness/partial/interruption contracts"
     ]
   },
-  "source_critic": "COMPLETE_FINAL_BACKEND",
-  "independent_reader": {
-    "prior_P3": {
-      "verdict": "ACK",
-      "head": "cae36093a685c645268d2a7b9c6013752b2bb991",
-      "native_estimate_usd": 1.9160376,
-      "route": "native Max; not API-credit/invoice",
-      "scope": "source-only, not final backend revision"
-    },
-    "final_backend": "PENDING"
-  },
+  "source_critic": "PENDING_RESTORED_DELTA",
+  "independent_reader": "Prior P3 ACK retained; restored scope plus conservative backslash refusal pending exact native main-test comparison",
   "boundaries": [
     "No live network or model call, installer or active configuration change by these checks.",
     "No DNS, redirect, arbitrary-URL or broad IDNA qualification.",
     "This small P3 follow-up is separate from the G5 diagnostic/subset/backend feature.",
     "Known initial HOLD, failed fixtures and native review evidence remain retained.",
-    "New explicit AUTO mechanism passes literal queries unchanged, no model rewrite, retry, subset/status framework or automatic bulk pass.",
-    "Backslash host refusal is conservative from a reasoned parser difference; no newly measured native sink claim."
+    "Backend parameter, backend witness, registration and measurement records removed from this PR; original dispatcher/capture contracts preserved.",
+    "Backslash refusal is conservative; no native backslash sink measurement is claimed."
   ],
   "inverse": "Repository rollback only; no host apply or dependency install.",
-  "default_dispatch_check": {
-    "tests": 13,
-    "failures": 0,
-    "errors": 0,
-    "skips": 0,
-    "exit_code": 0,
-    "duration_seconds": 18.371,
-    "scope": "actual root native checks after final backend/flag change"
-  },
-  "backend": {
-    "default": "duckduckgo",
-    "explicit_option": "auto",
-    "native_measured_receipt_sha256": "5b4e1d8c5caa0e314fe83149cc711ae9a5fc299bb8f26c091f94f9ddb8d9cbfe",
-    "logical_calls": 15,
-    "queries_per_arm": 5,
-    "counts": {
-      "default": {
-        "queries_with_results": 2,
-        "raw_hits": 10,
-        "errors_or_empty": 3
-      },
-      "auto": {
-        "queries_with_results": 2,
-        "raw_hits": 6,
-        "errors_or_empty": 3
-      },
-      "engines": {
-        "queries_with_results": 0,
-        "raw_hits": 0,
-        "errors_or_empty": 5
-      }
-    },
-    "witness": "manifest and native-source requested backend must match original request before completion",
-    "observed_providers": null,
-    "selection_boundary": "AUTO enabled-engine source hashes are observations, not complete engine or HTTP qualification; default and explicit AUTO semantics equivalent in native DDGS"
+  "scope_restore": {
+    "trigger": "2026-10-08 scope ruling",
+    "removed_commits": [
+      "152acc2193da056b1848f0a652f37067fa24a6ae",
+      "2d284a63709bcc071bc9c4b3bf52e032c04f4a65"
+    ],
+    "restored_content": "cae36093 plus conservative backslash refusal/test and non-vacuous retained-record assertion",
+    "main_test_against_fresh_merge": "PENDING",
+    "historical_failure": "Expanded backend added mandatory witness fields and failed3of27 unchanged main tests; rejected feature history retained."
   }
 }

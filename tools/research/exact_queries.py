@@ -20,14 +20,6 @@ empty results. That condition is recorded separately from transport exceptions,
 without copying arbitrary exception text. A finished capture with any errors
 retains exit 1 and status captured_with_errors after the parent verifies the
 original-byte witness and all approved-query progress; interruption is incomplete.
-
-Explicit auto uses DDGS 9.16.0's native _get_engines backend contract: no adapter
-query rewrite or retry. CC183121's 15-call measurement returned results for
-two of five explicit-auto queries (six hits), not a reliability or provider-parity
-claim. Measurement manifest SHA256 0277a6c3dd6f6b769c57d0249aee63ecdc6c3dedbd6f6d14cfe8e1c0b71ff78b;
-measure.py SHA256 4c15b7a5eceb58706e6ad801623b48af0b4ba58ac671a21d0a5b87a0bbaf2a13.
-The default remains fixed DuckDuckGo. Auto's internal providers and HTTP fanout
-stay unknown; backend witnesses record the requested native parameter only.
 """
 
 import argparse
@@ -47,8 +39,6 @@ from pathlib import Path
 from urllib.parse import urlsplit
 
 DDGS_VERSION = "9.16.0"
-BACKENDS = {"duckduckgo", "auto"}
-AUTO_REGISTRY_SHA256 = "1dc5518a67cfaf8e642d5ec839d930774a7ac679ccab21d692de6d03ac38dda0"
 DDGS_SOURCE_HASHES = {
     "ddgs/ddgs.py": "1cd33c4c5dd81ab865d6257327c4f079fae0cbe2e37ec8c7a9c575df771f27b1",
     "ddgs/engines/duckduckgo.py": "91ff4d7443e229cab28c25732df8e046f5730f8d21fe5ee22421d3536bdf71bb",
@@ -170,26 +160,16 @@ def native_error_kind(error):
     return "retrieval_failure"
 
 
-def backend_witness(backend):
-    if backend not in BACKENDS:
-        raise ValueError("Unsupported exact-query backend; retrieval was not started")
-    return {"requested": backend, "selection": "native_auto" if backend == "auto" else "fixed",
-            "observed_providers": None,
-            "measurement_ref": "CC183121-backend-measure" if backend == "auto" else None}
-
-
-def capture(rows, directory, fetch_top_k, client_factory, manifest=None, *, backend="duckduckgo"):
+def capture(rows, directory, fetch_top_k, client_factory, manifest=None):
     # The worker owns this same mutable receipt throughout capture; interruption
     # cannot replace observed progress with a newly initialized zero-count receipt.
-    witness = backend_witness(backend)
     if manifest is None:
         manifest = {}
     manifest.update(schema_version=1, status="capturing", started_at_utc=utc(), search_calls=0,
                     fetch_calls=0, error_count=0, empty_query_count=0, completed_query_count=0,
                     queries=[], provider_model_calls=0, network_request_count=None,
                     inflight_operation=None, published_month_validation="pending_primary_review",
-                    counter_boundary="Logical attempts started; vendor HTTP request counts are unknown.",
-                    backend=witness)
+                    counter_boundary="Logical attempts started; vendor HTTP request counts are unknown.")
     for field_order, row in enumerate(rows):
         for query_order, query in enumerate(row["queries"]):
             slug = f"{field_order:02d}-{query_order:02d}"
@@ -214,7 +194,7 @@ def capture(rows, directory, fetch_top_k, client_factory, manifest=None, *, back
             try:
                 client = client_factory(timeout=15)
                 results = client.text(query, region="wt-wt", safesearch="moderate",
-                                      max_results=5, page=1, backend=backend)
+                                      max_results=5, page=1, backend="duckduckgo")
                 record["raw_vendor_results"] = results
                 if not isinstance(results, list) or any(not isinstance(hit, dict) for hit in results):
                     raise ValueError("native DDGS returned an unsupported result shape")
@@ -267,9 +247,8 @@ def capture(rows, directory, fetch_top_k, client_factory, manifest=None, *, back
     return manifest
 
 
-def native_ddgs(backend="duckduckgo"):
+def native_ddgs():
     """Check the installed version/source before using the supported vendor API."""
-    witness = backend_witness(backend)
     distribution = importlib.metadata.distribution("ddgs")
     if distribution.version != DDGS_VERSION:
         raise ValueError("DDGS version changed; reverify native source before retrieval")
@@ -282,30 +261,10 @@ def native_ddgs(backend="duckduckgo"):
             raise ValueError("DDGS native source changed; reverify before retrieval")
     from ddgs import DDGS
     from ddgs.engines import ENGINES
-    if backend == "duckduckgo" and "duckduckgo" not in ENGINES.get("text", {}):
+    if "duckduckgo" not in ENGINES.get("text", {}):
         raise ValueError("Fixed DDGS duckduckgo backend unavailable; no fallback is allowed")
-    if backend == "auto" and not ENGINES.get("text"):
-        raise ValueError("Native DDGS auto has no enabled text engines; retrieval was not started")
-    metadata = {"distribution": "ddgs", "version": distribution.version,
-                "repository": "https://github.com/deedy5/ddgs", "sources": sources, "backend": witness}
-    if backend == "auto":
-        auto_sources = {"enabled_engine_sources": {},
-                        "evidence_boundary": "Source hashes observed; enabled engine implementations and underlying HTTP paths are not fully qualified. Providers actually used remain unknown."}
-        modules = {"registry": "ddgs.engines"}
-        modules.update({name: engine.__module__ for name, engine in ENGINES["text"].items()})
-        for name, module in modules.items():
-            relative = "ddgs/engines/__init__.py" if name == "registry" else module.replace(".", "/") + ".py"
-            path = Path(distribution.locate_file(relative))
-            raw = path.read_bytes()
-            record = {"path": str(path), "sha256": sha(raw), "bytes": len(raw)}
-            if name == "registry":
-                if record["sha256"] != AUTO_REGISTRY_SHA256:
-                    raise ValueError("DDGS auto engine registry changed; reverify before retrieval")
-                auto_sources["registry"] = record
-            else:
-                auto_sources["enabled_engine_sources"][name] = record
-        metadata["auto_sources"] = auto_sources
-    return DDGS, metadata
+    return DDGS, {"distribution": "ddgs", "version": distribution.version,
+                  "repository": "https://github.com/deedy5/ddgs", "sources": sources}
 
 
 def dispatch_exact(args, file_record, utc_now, native_session_tools, run_producer):
@@ -318,10 +277,6 @@ def dispatch_exact(args, file_record, utc_now, native_session_tools, run_produce
                "evidence_boundary": "Mechanical DDGS capture only; no cited-answer, landscape workflow, usage or adoption verdict."}
     code = 1
     try:
-        backend = getattr(args, "backend", None)
-        backend = "duckduckgo" if backend is None else backend
-        witness = backend_witness(backend)
-        receipt["backend"] = witness
         raw, rows, scope_raw = validate(args.exact_queries_file, args.approved_scope_file, args.approved_scope_sha256)
         expected_query_sha, expected_query_bytes = sha(raw), len(raw)
         receipt["queries"] = {"path": str(args.exact_queries_file), "sha256": expected_query_sha, "bytes": expected_query_bytes}
@@ -361,7 +316,7 @@ def dispatch_exact(args, file_record, utc_now, native_session_tools, run_produce
             command = [str(args.mechanical_python), str(helper), "--worker-file", str(frozen),
                        "--query-sha256", expected_query_sha,
                        "--scope-file", str(frozen_scope), "--scope-sha256", args.approved_scope_sha256,
-                       "--out", str(directory), "--fetch-top-k", str(args.fetch_top_k), "--backend", backend]
+                       "--out", str(directory), "--fetch-top-k", str(args.fetch_top_k)]
             # This mechanical worker inherits no native accounts, provider keys,
             # proxy variables or client config. The ordinary producer's env is unchanged.
             worker_env = {"PATH": os.defpath, "PYTHONNOUSERSITE": "1", "PYTHONUNBUFFERED": "1"}
@@ -399,19 +354,6 @@ def dispatch_exact(args, file_record, utc_now, native_session_tools, run_produce
                     or parsed_queries.get("bytes") != expected_query_bytes):
                 raise ValueError("Worker parsed-query witness does not match the frozen query bytes")
             receipt["worker_parsed_queries"] = parsed_queries
-            source_record = manifest.get("native_ddgs")
-            if (manifest.get("backend") != witness or not isinstance(source_record, dict)
-                    or source_record.get("backend") != witness):
-                raise ValueError("Worker backend witness does not match the requested exact-query backend")
-            receipt["worker_backend"] = witness
-            if backend == "auto":
-                auto_sources = source_record.get("auto_sources")
-                if (not isinstance(auto_sources, dict) or not isinstance(auto_sources.get("registry"), dict)
-                        or auto_sources["registry"].get("sha256") != AUTO_REGISTRY_SHA256
-                        or not isinstance(auto_sources.get("enabled_engine_sources"), dict)
-                        or not auto_sources["enabled_engine_sources"] or not isinstance(auto_sources.get("evidence_boundary"), str)):
-                    raise ValueError("Worker auto registry/engine source witness is missing")
-                receipt["auto_sources"] = auto_sources
             bound = receipt["logical_search_bound"]
             if (type(manifest.get("search_calls")) is not int or manifest["search_calls"] != bound
                     or type(manifest.get("completed_query_count")) is not int or manifest["completed_query_count"] != bound
@@ -451,7 +393,6 @@ def main(argv=None):
     parser.add_argument("--scope-sha256", required=True)
     parser.add_argument("--out", required=True, type=Path)
     parser.add_argument("--fetch-top-k", type=int, choices=range(6), default=0)
-    parser.add_argument("--backend", choices=sorted(BACKENDS), default="duckduckgo")
     args = parser.parse_args(argv)
     os.umask(0o077)
     receipt = {"schema_version": 1, "status": "failed", "provider_model_calls": 0,
@@ -466,10 +407,10 @@ def main(argv=None):
             previous[signum] = signal.signal(signum, interrupted)
         raw, rows, _ = validate(args.worker_file, args.scope_file, args.scope_sha256, args.query_sha256)
         receipt["parsed_queries"] = {"path": str(args.worker_file), "sha256": sha(raw), "bytes": len(raw)}
-        client, source_record = native_ddgs(args.backend)
+        client, source_record = native_ddgs()
         retained(args.out / "native-ddgs.json", source_record)
         receipt["native_ddgs"] = source_record
-        capture(rows, args.out, args.fetch_top_k, client, receipt, backend=args.backend)
+        capture(rows, args.out, args.fetch_top_k, client, receipt)
         receipt["status"] = "captured_with_errors" if receipt["error_count"] else "captured"
     except KeyboardInterrupt as error:
         for signum in previous:
