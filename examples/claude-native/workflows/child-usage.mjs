@@ -62,12 +62,13 @@ const SYNTHETIC = '<synthetic>'
 // Documented resolution of an alias on the Anthropic API by the client version that wrote the
 // transcript entry, as [first client version, model] rows in ascending order (model-config doc,
 // "version history" table, fetched 2026-09-29: opus is Opus 5.5 from v2.1.280, Opus 5 from v2.1.219, Opus 4.8
-// from v2.1.154; sonnet is Sonnet 5.5 from v2.1.284, Sonnet 5 from v2.1.197; fable is Fable 5.1 from v2.1.257).
-// An entry older than the first row, and an alias without rows (haiku, or any alias not listed here),
+// from v2.1.154; sonnet is Sonnet 5.5 from v2.1.284, Sonnet 5 from v2.1.197; fable is Fable 5.1 from v2.1.257; read
+// 2026-10-07: haiku is Haiku 5.5 from v2.1.293, and Haiku 4.5 on "Earlier" clients, a row with no version).
+// An entry older than the first row, and an alias without rows (any alias not listed here),
 // has no expectation. An ANTHROPIC_DEFAULT_OPUS_MODEL pin to an older model would be flagged; none is set here. The sub-agents
 // doc ("Choose a model") adds one exception: a family alias resolves to the lead's exact model when the lead belongs to that
 // family, so a `sonnet` child under a lead pinned to an older Sonnet is flagged here although the client did as documented.
-export const ALIAS_RESOLUTION = { opus: [['2.1.154', 'claude-opus-4-8'], ['2.1.219', 'claude-opus-5'], ['2.1.280', 'claude-opus-5-5']], sonnet: [['2.1.197', 'claude-sonnet-5'], ['2.1.284', 'claude-sonnet-5-5']], fable: [['2.1.257', 'claude-fable-5-1']] }
+export const ALIAS_RESOLUTION = { opus: [['2.1.154', 'claude-opus-4-8'], ['2.1.219', 'claude-opus-5'], ['2.1.280', 'claude-opus-5-5']], sonnet: [['2.1.197', 'claude-sonnet-5'], ['2.1.284', 'claude-sonnet-5-5']], fable: [['2.1.257', 'claude-fable-5-1']], haiku: [['2.1.293', 'claude-haiku-5-5']] }
 const semver = (v) => { const m = /^(\d+)\.(\d+)\.(\d+)/.exec(typeof v === 'string' ? v : ''); return m ? m.slice(1).map(Number) : null }
 const compareParts = (a, b) => { for (let i = 0; i < Math.max(a.length, b.length); i++) { const d = (a[i] || 0) - (b[i] || 0); if (d) return d < 0 ? -1 : 1 } return 0 }
 // claude-opus-5-5 -> { family: 'opus', version: [5, 5] }; a date suffix and a [1m] suffix are ignored; other shapes -> null.

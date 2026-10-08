@@ -62,8 +62,11 @@ exception field cannot be ignored. Primary source URLs must be HTTPS without
 credentials, whitespace or control characters, and their ports must parse.
 
 Currency follows the newest release within a model's own line. The background
-slot retains Haiku 4.5 as a dated exception for simple work; currency alone does
-not promote it to Sonnet or Opus. A published Haiku 5.x ID reopens that selection.
+slot stays on the Haiku line for simple work; currency alone does not promote it
+to Sonnet or Opus. It kept Haiku 4.5 as a dated exception until Claude Code 2.1.293
+made Claude Haiku 5.5 (`claude-haiku-5-5`, released 2026-10-07) the default Haiku
+model on the Anthropic API, and its `background-haiku` row now records Haiku 5.5, which also serves the
+cheap exact extraction stages that a 2026-10-07 repeat trial qualified.
 
 ## Daily review proposals
 

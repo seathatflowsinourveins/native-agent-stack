@@ -2659,7 +2659,7 @@
       ],
       "selection": "conditional",
       "review_status": "accepted_within_scope",
-      "activation": "Name `agentType` where the role fits: `source-scout` (Sonnet/max) for extraction, inventories and acceptance commands, `evidence-reviewer` (Opus/max, read-only) for independent review, `isolated-builder` (Opus/max, own worktree) for bounded implementation; keep the default child for a stage that must re-run commands and judge them; never omit a stage's model or effort, and since 2026-09-23 bind effort `max` on every stage and agent with the models unchanged while the coordinator stays at xhigh under Ultracode (docs/decisions/2026-09-23-max-effort-default.md); run `workflowSizeGuideline: unrestricted` with `CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS=8` (the committed settings example) and size by task; record every run with `child-usage.mjs --latest`.",
+      "activation": "Name `agentType` where the role fits: `source-scout` (Sonnet/max) for extraction, inventories and acceptance commands, or since 2026-10-07 with a per-call `model: 'haiku'` (Haiku 5.5/max on Claude Code 2.1.293 or later) for cheap exact extraction that relays no command output, `evidence-reviewer` (Opus/max, read-only) for independent review, `isolated-builder` (Opus/max, own worktree) for bounded implementation; keep the default child for a stage that must re-run commands and judge them; never omit a stage's model or effort, and since 2026-09-23 bind effort `max` on every stage and agent with the models unchanged while the coordinator stays at xhigh under Ultracode (docs/decisions/2026-09-23-max-effort-default.md); run `workflowSizeGuideline: unrestricted` with `CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS=8` (the committed settings example) and size by task; record every run with `child-usage.mjs --latest`.",
       "component_ids": [
         "claude-code",
         "codex"
@@ -2667,12 +2667,13 @@
       "candidate": null,
       "evidence_ids": [
         "ultracode-token-routing-20260921",
-        "portable-claude-native-qualification-20260921"
+        "portable-claude-native-qualification-20260921",
+        "haiku55-extraction-trial-20261007"
       ],
-      "evidence_scope": "On one identical task the provider-returned first prompt fell from 42,396 tokens (default child) to 12,164 (named MCP grants behind ToolSearch) and 8,048 (source-scout); eight native review-changes runs, two readiness audits, one builder run and one Codex cross-family review are retained as sanitized receipts; the portable copies were adopted into a scratch project and run natively under the full host profile with the observational layer recorded; the project-only profile was not qualified (provider errors, then a permission-layer refusal of the Workflow tool).",
+      "evidence_scope": "On one identical task the provider-returned first prompt fell from 42,396 tokens (default child) to 12,164 (named MCP grants behind ToolSearch) and 8,048 (source-scout); eight native review-changes runs, two readiness audits, one builder run and one Codex cross-family review are retained as sanitized receipts; the portable copies were adopted into a scratch project and run natively under the full host profile with the observational layer recorded; the project-only profile was not qualified (provider errors, then a permission-layer refusal of the Workflow tool). A 2026-10-07 repeat trial on one Mac (Claude Code 2.1.293, workflow wf_aa532ddc-f32) qualified Haiku 5.5 for cheap exact extraction: on two distinct extraction packets it returned 8 of 8 runs exact with no unanchored citation, as Sonnet 5.5 did, while its verbatim command relay was byte-exact in 5 of 6 runs against Sonnet's 6 of 6.",
       "limitations": [
         "First-prompt figures bound one tiny task on one host and model; they are not a savings rate.",
-        "Haiku is not routed on one packet and one Opus verifier (Sonnet 14/14 lane rows, Haiku 9/14 with a misattributed quote).",
+        "Haiku 5.5 is routed only for cheap exact extraction on the Anthropic API, qualified on one Mac, one client version (2.1.293) and two extraction packets at effort max, with the session's Fable advisor answering 7 of 8 Sonnet and 2 of 8 Haiku extraction runs (the 6 unassisted Haiku runs were exact as well); verbatim command relay stays on Sonnet after Haiku's 5 of 6 byte-exact relays, and the earlier Haiku 4.5 result (9/14 lane rows against Sonnet's 14/14, with a misattributed quote, on one packet and one Opus verifier) stays on record.",
         "The review workflow's strict accepted status was never returned during the deployment; the gate was fix-and-commit after independent review.",
         "Local suites are stubbed or synthetic; only the native runs and the Prometheus deltas are provider evidence. Per-session scoping of the exported metric is unavailable by design (the collector keeps no session id on metrics), so observational deltas are host-wide time windows with concurrent activity declared.",
         "Codex agent examples inherit model and effort and have no end-to-end run of their own.",
@@ -2686,7 +2687,7 @@
         "examples/claude-native/workflows/README.md",
         "docs/decisions/2026-09-23-max-effort-default.md"
       ],
-      "next_gap": "Overturn only on evidence: Haiku after a repeat trial with no unanchored citation on two distinct extraction packets; the unrestricted guideline if recorded runs exceed their independent units or pause on fan-out rate limits; a one-hour child cache class only for a child that idles more than five minutes between requests; the Codex agent examples after a task-level run of their own.",
+      "next_gap": "Overturn only on evidence: the Haiku extraction route back to Sonnet if a routed Haiku stage returns an unanchored or misattributed citation that a later check finds or a haiku child resolves a model older than Haiku 5.5; the unrestricted guideline if recorded runs exceed their independent units or pause on fan-out rate limits; a one-hour child cache class only for a child that idles more than five minutes between requests; the Codex agent examples after a task-level run of their own.",
       "lifecycle": {
         "source_path": "blueprints/token-native-focus/saturation-audit.json",
         "scope": "Native Workflow child routing, packet identity, acceptance reproduction and usage accounting with owned local integration and one scratch adoption under the full host profile.",

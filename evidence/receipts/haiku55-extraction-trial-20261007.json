@@ -1,0 +1,1371 @@
+{
+  "schema_version": 1,
+  "id": "haiku55-extraction-trial-20261007",
+  "kind": "native_model_e2e",
+  "component_ids": [
+    "claude-code"
+  ],
+  "claim": "On one Mac running Claude Code 2.1.293 (workflow wf_aa532ddc-f32, 2026-10-07T21:31Z to 23:48Z), byte-identical packets sent to source-scout with a per-call model of haiku and of sonnet at effort max showed Claude Haiku 5.5 (claude-haiku-5-5) returning 8 of 8 extraction runs exact on two distinct packets with no unanchored citation (P1, 7 MCP server rows with 29 line citations a run: 28/28 rows; P2, 12 Markdown table rows with line numbers and 80-character quotes: 48/48 rows), the same as Sonnet 5.5; the session's Fable 5.1 advisor answered 2 of the 8 Haiku and 7 of the 8 Sonnet extraction runs, and the 6 unassisted Haiku runs were exact as well. A blind Opus evidence-reviewer found no defect in any of the 16 extraction runs of both rounds, and the deterministic answer key, re-run for this receipt on the packets' source commit b16cb8cf, reproduced the retained scores of all 28 runs. At the cached LiteLLM prices the mean executor-model cost per child was $0.0220 against $0.2405 (P1) and $0.0180 against $0.2132 (P2), and with the advisor's sub-inferences $0.2407 against $0.6509 and $0.0180 against $0.4672. On a verbatim relay of a 2,511-character command output Haiku was byte-exact in 5 of 6 runs (the miss backslash-escaped all 360 double quotes) and Sonnet in 6 of 6. Every Haiku child resolved claude-haiku-5-5 and recorded effort max, and the trial's native probes of claude -p and claude --bg with --model haiku resolved claude-haiku-5-5 and returned the exact requested reply.",
+  "limitations": [
+    "Local observation of one Mac, one account and one client version (2.1.293) on the Anthropic API; the model and effort are the client's own per-message transcript records, not an API-side confirmation, and other providers still resolve haiku to Haiku 4.5.",
+    "Two extraction packets drawn from this repository's own files at commit b16cb8cf, four runs per packet per arm: a qualification for line-cited extraction from JSON, Python and Markdown sources of that size, not a general extraction benchmark.",
+    "Every child inherited the session's advisor (Fable 5.1), so the arms were not held equal on it: it answered 7 of 8 Sonnet and 2 of 8 Haiku extraction runs (rate limits refused the advisor call of 5 Haiku runs and 1 Sonnet run, and one Haiku run made no call), no relay run called it, and it answered 15 of the 16 verifiers. The Haiku result also holds on its 6 unassisted runs (2 P1, 4 P2); a comparison that holds the advisor equal would run with CLAUDE_CODE_DISABLE_ADVISOR_TOOL=1.",
+    "The runs span two rounds. A network outage ended the first run's integration stage (a <synthetic> API-error row and no result), and the resumed run repeated the trial. The retained evidence files carry only the second round's verdicts; the first round's eight were read from the run's journal, which stays private on the host.",
+    "Each verifier saw the worker's output as text in its prompt, not as bytes, so look-alike characters were not checked (some verifiers recorded this gap); the answer key compares exact strings.",
+    "Costs multiply each child's client-recorded usage by the LiteLLM price table that ccusage caches: Haiku 5.5 at $0.10 input and $0.50 output per million tokens, the base rate the 2.1.293 CHANGELOG states for prompts up to 100K tokens (the largest Haiku request totalled 83,171 prompt tokens over two iterations around an advisor call); Sonnet 5.5 at $2 and $10; the advisor's Fable 5.1 at $10 and $50. Executor and advisor costs are reported apart, the advisor costs depend on the rate limits above, neither is provider billing, and ccusage 20.0.26 itself reported claude-haiku-5-5 and claude-sonnet-5-5 as unpriced in the trial's network-free runs.",
+    "Every child ran at effort max, the repository's stage rule. Anthropic advises xhigh or max on Haiku 5.5 only where evals show a gain over its medium default; no lower Haiku effort was compared.",
+    "The probe results are what the trial's probe children reported from commands they ran; they were not re-run for this receipt. The claude --bg probe ran at a saved xhigh level, not max. The collector scan counted claude-haiku-5-5 records on the host without telling background-slot calls from explicit Haiku children, so the background slot's move to Haiku 5.5 rests on the vendor CHANGELOG and docs, not on a read-back.",
+    "Raw outputs, transcripts, the run's journal, the workflow script and the oracle stay private on the host; this receipt keeps derived counts, timings, prices and file hashes only."
+  ],
+  "evidence_class": "independent observation: one native Claude Code 2.1.293 Workflow run on this host with two arms on byte-identical packets, scored by a deterministic answer key (re-run for this receipt) and by a blind Opus reviewer, with each child's model, effort, client version and advisor use read from its own transcript",
+  "recorded_at_utc": "2026-10-08T01:06:46Z",
+  "host_scope": {
+    "profile": "macos-arm64",
+    "platform": "Mac17,9, Apple M5 Pro, 64 GB unified memory, macOS 27.0.1 (26A434)",
+    "identity": "one personal Mac and one Claude account; host paths, session identifiers and agent identifiers are withheld",
+    "import_limit": "Evidence for this host, account and client version only; another host qualifies the route with its own run."
+  },
+  "data": {
+    "client_version": "2.1.293 (Claude Code), recorded on every assistant row of all 51 child transcripts",
+    "workflow_run": "wf_aa532ddc-f32",
+    "question": "Does Claude Haiku 5.5 meet the overturn condition recorded for the Cheap exact extraction row (a repeat trial in which Haiku returns no unanchored citation on two distinct extraction packets), and may it relay command output?",
+    "design": {
+      "arms": [
+        {
+          "arm": "haiku",
+          "agent_type": "source-scout",
+          "per_call_model": "haiku",
+          "effort": "max"
+        },
+        {
+          "arm": "sonnet",
+          "agent_type": "source-scout",
+          "per_call_model": "sonnet",
+          "effort": "max"
+        }
+      ],
+      "prompts": "byte-identical per packet across the two arms; only the per-call model differs in the request, while the session's advisor, which every child inherited, answered the arms unequally (data.advisor)",
+      "packet_source": {
+        "repository": "seathatflowsinourveins/native-agent-stack",
+        "commit": "b16cb8cf7cb8e37bf0d0edb9924502beb3e6a276",
+        "files": [
+          "adoption/mcp/claude-user.json",
+          "tools/invocation-monitoring/claude_counter.py",
+          "recipes/claude-native-ultracode.md"
+        ]
+      },
+      "packets": [
+        {
+          "id": "P1",
+          "task": "for each of the 7 servers under mcpServers in adoption/mcp/claude-user.json, in file order: its name, command or url, the line of its key with that line quoted exactly, and every line of tools/invocation-monitoring/claude_counter.py naming it, each with its number and exact text",
+          "rows": 7,
+          "citations_per_run": 29,
+          "runs_per_arm_per_round": 2
+        },
+        {
+          "id": "P2",
+          "task": "for each data row of the role table in recipes/claude-native-ultracode.md: the first cell, the first backticked identifier and the first model word of the second cell, the row line number and the line's first 80 characters",
+          "rows": 12,
+          "runs_per_arm_per_round": 2
+        },
+        {
+          "id": "C1",
+          "task": "run one python3 -c command that prints a 60-item JSON array and return its stdout verbatim, with its exit code, in a structured field",
+          "chars": 2511,
+          "runs_per_arm_per_round": 3
+        }
+      ],
+      "scoring": "a deterministic answer key built from the packet checkout compares every row field and every quote exactly; a blind Opus evidence-reviewer, told only that an anonymous worker produced the extraction, re-checked each P1 and P2 run against the files"
+    },
+    "rounds": [
+      {
+        "round": 1,
+        "probe": {
+          "children": 3,
+          "first_utc": "2026-10-07T21:31:32Z",
+          "last_utc": "2026-10-07T21:45:22Z"
+        },
+        "trial": {
+          "children": 14,
+          "first_utc": "2026-10-07T21:31:32Z",
+          "last_utc": "2026-10-07T21:40:10Z"
+        },
+        "verify": {
+          "children": 8,
+          "first_utc": "2026-10-07T21:37:32Z",
+          "last_utc": "2026-10-07T21:48:59Z"
+        },
+        "integration": {
+          "children": 1,
+          "first_utc": "2026-10-07T21:48:59Z",
+          "last_utc": "2026-10-07T22:02:21Z"
+        },
+        "note": "The integration stage did not finish: its child holds a <synthetic> client-written API-error row and no result entry in the journal (child-usage.mjs: no result entry in journal; resolved model outside requested family: claude-sonnet-5-5,<synthetic>). The resumed run started every stage again except the CLI probe: the background and background-slot probes, the trial, the verifiers and the integration stage."
+      },
+      {
+        "round": 2,
+        "probe": {
+          "children": 2,
+          "first_utc": "2026-10-07T22:58:10Z",
+          "last_utc": "2026-10-07T23:22:12Z"
+        },
+        "trial": {
+          "children": 14,
+          "first_utc": "2026-10-07T22:58:10Z",
+          "last_utc": "2026-10-07T23:04:55Z"
+        },
+        "verify": {
+          "children": 8,
+          "first_utc": "2026-10-07T23:02:18Z",
+          "last_utc": "2026-10-07T23:09:38Z"
+        },
+        "integration": {
+          "children": 1,
+          "first_utc": "2026-10-07T23:22:12Z",
+          "last_utc": "2026-10-07T23:48:22Z"
+        },
+        "note": "Every child of this round is complete. The CLI probe did not run again; the run's output carries its first-round result."
+      }
+    ],
+    "summary": {
+      "C1:haiku": {
+        "runs": 6,
+        "mean_executor_cost_usd_per_child": 0.0096,
+        "mean_cost_usd_per_child_including_advisor": 0.0096,
+        "mean_output_tokens_per_child": 15453,
+        "mean_requests_per_child": 2.33,
+        "runs_answered_by_advisor": 0,
+        "runs_with_a_refused_advisor_call": 0,
+        "runs_without_advisor_call": 6,
+        "byte_exact_runs": 5
+      },
+      "C1:sonnet": {
+        "runs": 6,
+        "mean_executor_cost_usd_per_child": 0.1418,
+        "mean_cost_usd_per_child_including_advisor": 0.1418,
+        "mean_output_tokens_per_child": 10994,
+        "mean_requests_per_child": 3.17,
+        "runs_answered_by_advisor": 0,
+        "runs_with_a_refused_advisor_call": 0,
+        "runs_without_advisor_call": 6,
+        "byte_exact_runs": 6
+      },
+      "P1:haiku": {
+        "runs": 4,
+        "mean_executor_cost_usd_per_child": 0.022,
+        "mean_cost_usd_per_child_including_advisor": 0.2407,
+        "mean_output_tokens_per_child": 31772,
+        "mean_requests_per_child": 6.25,
+        "runs_answered_by_advisor": 2,
+        "runs_with_a_refused_advisor_call": 2,
+        "runs_without_advisor_call": 0,
+        "exact_runs": 4,
+        "rows_exact": 28,
+        "rows_expected": 28,
+        "unanchored_quotes": 0,
+        "unassisted_runs": 2,
+        "unassisted_exact_runs": 2
+      },
+      "P1:sonnet": {
+        "runs": 4,
+        "mean_executor_cost_usd_per_child": 0.2405,
+        "mean_cost_usd_per_child_including_advisor": 0.6509,
+        "mean_output_tokens_per_child": 15852,
+        "mean_requests_per_child": 7.25,
+        "runs_answered_by_advisor": 4,
+        "runs_with_a_refused_advisor_call": 0,
+        "runs_without_advisor_call": 0,
+        "exact_runs": 4,
+        "rows_exact": 28,
+        "rows_expected": 28,
+        "unanchored_quotes": 0,
+        "unassisted_runs": 0,
+        "unassisted_exact_runs": 0
+      },
+      "P2:haiku": {
+        "runs": 4,
+        "mean_executor_cost_usd_per_child": 0.018,
+        "mean_cost_usd_per_child_including_advisor": 0.018,
+        "mean_output_tokens_per_child": 27243,
+        "mean_requests_per_child": 5.0,
+        "runs_answered_by_advisor": 0,
+        "runs_with_a_refused_advisor_call": 3,
+        "runs_without_advisor_call": 1,
+        "exact_runs": 4,
+        "rows_exact": 48,
+        "rows_expected": 48,
+        "unanchored_quotes": 0,
+        "unassisted_runs": 4,
+        "unassisted_exact_runs": 4
+      },
+      "P2:sonnet": {
+        "runs": 4,
+        "mean_executor_cost_usd_per_child": 0.2132,
+        "mean_cost_usd_per_child_including_advisor": 0.4672,
+        "mean_output_tokens_per_child": 14939,
+        "mean_requests_per_child": 5.25,
+        "runs_answered_by_advisor": 3,
+        "runs_with_a_refused_advisor_call": 1,
+        "runs_without_advisor_call": 0,
+        "exact_runs": 4,
+        "rows_exact": 48,
+        "rows_expected": 48,
+        "unanchored_quotes": 0,
+        "unassisted_runs": 1,
+        "unassisted_exact_runs": 1
+      }
+    },
+    "runs": [
+      {
+        "round": 1,
+        "run": "P1-r1-haiku",
+        "packet": "P1",
+        "arm": "haiku",
+        "rows_expected": 7,
+        "rows_returned": 7,
+        "rows_exact": 7,
+        "unanchored_quotes": 0,
+        "citation_errors": 0,
+        "field_errors": 0,
+        "blind_opus_verdict": {
+          "rows_checked": 7,
+          "rows_correct": 7,
+          "unanchored_citations": 0,
+          "misanchored_citations": 0,
+          "wrong_values": 0,
+          "missing_rows": 0,
+          "extra_rows": 0
+        },
+        "requested": "source-scout/haiku",
+        "resolved_models": [
+          "claude-haiku-5-5"
+        ],
+        "efforts": [
+          "max"
+        ],
+        "client_versions": [
+          "2.1.293"
+        ],
+        "complete": true,
+        "requests": 4,
+        "output_tokens": 24849,
+        "advisor_calls": {
+          "answered": 1,
+          "refused_too_many_requests": 0
+        },
+        "executor_cost_usd": 0.0167,
+        "advisor_cost_usd": 0.4489
+      },
+      {
+        "round": 1,
+        "run": "P2-r1-haiku",
+        "packet": "P2",
+        "arm": "haiku",
+        "rows_expected": 12,
+        "rows_returned": 12,
+        "rows_exact": 12,
+        "unanchored_quotes": 0,
+        "citation_errors": 0,
+        "field_errors": 0,
+        "blind_opus_verdict": {
+          "rows_checked": 12,
+          "rows_correct": 12,
+          "unanchored_citations": 0,
+          "misanchored_citations": 0,
+          "wrong_values": 0,
+          "missing_rows": 0,
+          "extra_rows": 0
+        },
+        "requested": "source-scout/haiku",
+        "resolved_models": [
+          "claude-haiku-5-5"
+        ],
+        "efforts": [
+          "max"
+        ],
+        "client_versions": [
+          "2.1.293"
+        ],
+        "complete": true,
+        "requests": 4,
+        "output_tokens": 27713,
+        "advisor_calls": {
+          "answered": 0,
+          "refused_too_many_requests": 1
+        },
+        "executor_cost_usd": 0.0189,
+        "advisor_cost_usd": 0.0
+      },
+      {
+        "round": 1,
+        "run": "P1-r1-sonnet",
+        "packet": "P1",
+        "arm": "sonnet",
+        "rows_expected": 7,
+        "rows_returned": 7,
+        "rows_exact": 7,
+        "unanchored_quotes": 0,
+        "citation_errors": 0,
+        "field_errors": 0,
+        "blind_opus_verdict": {
+          "rows_checked": 7,
+          "rows_correct": 7,
+          "unanchored_citations": 0,
+          "misanchored_citations": 0,
+          "wrong_values": 0,
+          "missing_rows": 0,
+          "extra_rows": 0
+        },
+        "requested": "source-scout/sonnet",
+        "resolved_models": [
+          "claude-sonnet-5-5"
+        ],
+        "efforts": [
+          "max"
+        ],
+        "client_versions": [
+          "2.1.293"
+        ],
+        "complete": true,
+        "requests": 8,
+        "output_tokens": 19610,
+        "advisor_calls": {
+          "answered": 1,
+          "refused_too_many_requests": 0
+        },
+        "executor_cost_usd": 0.2942,
+        "advisor_cost_usd": 0.3905
+      },
+      {
+        "round": 1,
+        "run": "P2-r1-sonnet",
+        "packet": "P2",
+        "arm": "sonnet",
+        "rows_expected": 12,
+        "rows_returned": 12,
+        "rows_exact": 12,
+        "unanchored_quotes": 0,
+        "citation_errors": 0,
+        "field_errors": 0,
+        "blind_opus_verdict": {
+          "rows_checked": 12,
+          "rows_correct": 12,
+          "unanchored_citations": 0,
+          "misanchored_citations": 0,
+          "wrong_values": 0,
+          "missing_rows": 0,
+          "extra_rows": 0
+        },
+        "requested": "source-scout/sonnet",
+        "resolved_models": [
+          "claude-sonnet-5-5"
+        ],
+        "efforts": [
+          "max"
+        ],
+        "client_versions": [
+          "2.1.293"
+        ],
+        "complete": true,
+        "requests": 5,
+        "output_tokens": 19426,
+        "advisor_calls": {
+          "answered": 0,
+          "refused_too_many_requests": 1
+        },
+        "executor_cost_usd": 0.2711,
+        "advisor_cost_usd": 0.0
+      },
+      {
+        "round": 1,
+        "run": "P1-r2-haiku",
+        "packet": "P1",
+        "arm": "haiku",
+        "rows_expected": 7,
+        "rows_returned": 7,
+        "rows_exact": 7,
+        "unanchored_quotes": 0,
+        "citation_errors": 0,
+        "field_errors": 0,
+        "blind_opus_verdict": {
+          "rows_checked": 7,
+          "rows_correct": 7,
+          "unanchored_citations": 0,
+          "misanchored_citations": 0,
+          "wrong_values": 0,
+          "missing_rows": 0,
+          "extra_rows": 0
+        },
+        "requested": "source-scout/haiku",
+        "resolved_models": [
+          "claude-haiku-5-5"
+        ],
+        "efforts": [
+          "max"
+        ],
+        "client_versions": [
+          "2.1.293"
+        ],
+        "complete": true,
+        "requests": 7,
+        "output_tokens": 37883,
+        "advisor_calls": {
+          "answered": 0,
+          "refused_too_many_requests": 1
+        },
+        "executor_cost_usd": 0.0257,
+        "advisor_cost_usd": 0.0
+      },
+      {
+        "round": 1,
+        "run": "P2-r2-haiku",
+        "packet": "P2",
+        "arm": "haiku",
+        "rows_expected": 12,
+        "rows_returned": 12,
+        "rows_exact": 12,
+        "unanchored_quotes": 0,
+        "citation_errors": 0,
+        "field_errors": 0,
+        "blind_opus_verdict": {
+          "rows_checked": 12,
+          "rows_correct": 12,
+          "unanchored_citations": 0,
+          "misanchored_citations": 0,
+          "wrong_values": 0,
+          "missing_rows": 0,
+          "extra_rows": 0
+        },
+        "requested": "source-scout/haiku",
+        "resolved_models": [
+          "claude-haiku-5-5"
+        ],
+        "efforts": [
+          "max"
+        ],
+        "client_versions": [
+          "2.1.293"
+        ],
+        "complete": true,
+        "requests": 4,
+        "output_tokens": 28252,
+        "advisor_calls": {
+          "answered": 0,
+          "refused_too_many_requests": 0
+        },
+        "executor_cost_usd": 0.0167,
+        "advisor_cost_usd": 0.0
+      },
+      {
+        "round": 1,
+        "run": "P1-r2-sonnet",
+        "packet": "P1",
+        "arm": "sonnet",
+        "rows_expected": 7,
+        "rows_returned": 7,
+        "rows_exact": 7,
+        "unanchored_quotes": 0,
+        "citation_errors": 0,
+        "field_errors": 0,
+        "blind_opus_verdict": {
+          "rows_checked": 7,
+          "rows_correct": 7,
+          "unanchored_citations": 0,
+          "misanchored_citations": 0,
+          "wrong_values": 0,
+          "missing_rows": 0,
+          "extra_rows": 0
+        },
+        "requested": "source-scout/sonnet",
+        "resolved_models": [
+          "claude-sonnet-5-5"
+        ],
+        "efforts": [
+          "max"
+        ],
+        "client_versions": [
+          "2.1.293"
+        ],
+        "complete": true,
+        "requests": 6,
+        "output_tokens": 13661,
+        "advisor_calls": {
+          "answered": 1,
+          "refused_too_many_requests": 0
+        },
+        "executor_cost_usd": 0.204,
+        "advisor_cost_usd": 0.4784
+      },
+      {
+        "round": 1,
+        "run": "P2-r2-sonnet",
+        "packet": "P2",
+        "arm": "sonnet",
+        "rows_expected": 12,
+        "rows_returned": 12,
+        "rows_exact": 12,
+        "unanchored_quotes": 0,
+        "citation_errors": 0,
+        "field_errors": 0,
+        "blind_opus_verdict": {
+          "rows_checked": 12,
+          "rows_correct": 12,
+          "unanchored_citations": 0,
+          "misanchored_citations": 0,
+          "wrong_values": 0,
+          "missing_rows": 0,
+          "extra_rows": 0
+        },
+        "requested": "source-scout/sonnet",
+        "resolved_models": [
+          "claude-sonnet-5-5"
+        ],
+        "efforts": [
+          "max"
+        ],
+        "client_versions": [
+          "2.1.293"
+        ],
+        "complete": true,
+        "requests": 6,
+        "output_tokens": 16949,
+        "advisor_calls": {
+          "answered": 1,
+          "refused_too_many_requests": 0
+        },
+        "executor_cost_usd": 0.2303,
+        "advisor_cost_usd": 0.3686
+      },
+      {
+        "round": 1,
+        "run": "C1-r1-haiku",
+        "packet": "C1",
+        "arm": "haiku",
+        "byte_exact": true,
+        "chars_returned": 2511,
+        "chars_expected": 2511,
+        "exit_code": 0,
+        "requested": "source-scout/haiku",
+        "resolved_models": [
+          "claude-haiku-5-5"
+        ],
+        "efforts": [
+          "max"
+        ],
+        "client_versions": [
+          "2.1.293"
+        ],
+        "complete": true,
+        "requests": 2,
+        "output_tokens": 21170,
+        "advisor_calls": {
+          "answered": 0,
+          "refused_too_many_requests": 0
+        },
+        "executor_cost_usd": 0.0135,
+        "advisor_cost_usd": 0.0
+      },
+      {
+        "round": 1,
+        "run": "C1-r1-sonnet",
+        "packet": "C1",
+        "arm": "sonnet",
+        "byte_exact": true,
+        "chars_returned": 2511,
+        "chars_expected": 2511,
+        "exit_code": 0,
+        "requested": "source-scout/sonnet",
+        "resolved_models": [
+          "claude-sonnet-5-5"
+        ],
+        "efforts": [
+          "max"
+        ],
+        "client_versions": [
+          "2.1.293"
+        ],
+        "complete": true,
+        "requests": 3,
+        "output_tokens": 15227,
+        "advisor_calls": {
+          "answered": 0,
+          "refused_too_many_requests": 0
+        },
+        "executor_cost_usd": 0.202,
+        "advisor_cost_usd": 0.0
+      },
+      {
+        "round": 1,
+        "run": "C1-r2-haiku",
+        "packet": "C1",
+        "arm": "haiku",
+        "byte_exact": true,
+        "chars_returned": 2511,
+        "chars_expected": 2511,
+        "exit_code": 0,
+        "requested": "source-scout/haiku",
+        "resolved_models": [
+          "claude-haiku-5-5"
+        ],
+        "efforts": [
+          "max"
+        ],
+        "client_versions": [
+          "2.1.293"
+        ],
+        "complete": true,
+        "requests": 3,
+        "output_tokens": 19205,
+        "advisor_calls": {
+          "answered": 0,
+          "refused_too_many_requests": 0
+        },
+        "executor_cost_usd": 0.012,
+        "advisor_cost_usd": 0.0
+      },
+      {
+        "round": 1,
+        "run": "C1-r2-sonnet",
+        "packet": "C1",
+        "arm": "sonnet",
+        "byte_exact": true,
+        "chars_returned": 2511,
+        "chars_expected": 2511,
+        "exit_code": 0,
+        "requested": "source-scout/sonnet",
+        "resolved_models": [
+          "claude-sonnet-5-5"
+        ],
+        "efforts": [
+          "max"
+        ],
+        "client_versions": [
+          "2.1.293"
+        ],
+        "complete": true,
+        "requests": 3,
+        "output_tokens": 9633,
+        "advisor_calls": {
+          "answered": 0,
+          "refused_too_many_requests": 0
+        },
+        "executor_cost_usd": 0.1203,
+        "advisor_cost_usd": 0.0
+      },
+      {
+        "round": 1,
+        "run": "C1-r3-haiku",
+        "packet": "C1",
+        "arm": "haiku",
+        "byte_exact": false,
+        "chars_returned": 2871,
+        "chars_expected": 2511,
+        "exit_code": 0,
+        "requested": "source-scout/haiku",
+        "resolved_models": [
+          "claude-haiku-5-5"
+        ],
+        "efforts": [
+          "max"
+        ],
+        "client_versions": [
+          "2.1.293"
+        ],
+        "complete": true,
+        "requests": 2,
+        "output_tokens": 20582,
+        "advisor_calls": {
+          "answered": 0,
+          "refused_too_many_requests": 0
+        },
+        "executor_cost_usd": 0.0119,
+        "advisor_cost_usd": 0.0
+      },
+      {
+        "round": 1,
+        "run": "C1-r3-sonnet",
+        "packet": "C1",
+        "arm": "sonnet",
+        "byte_exact": true,
+        "chars_returned": 2511,
+        "chars_expected": 2511,
+        "exit_code": 0,
+        "requested": "source-scout/sonnet",
+        "resolved_models": [
+          "claude-sonnet-5-5"
+        ],
+        "efforts": [
+          "max"
+        ],
+        "client_versions": [
+          "2.1.293"
+        ],
+        "complete": true,
+        "requests": 4,
+        "output_tokens": 22289,
+        "advisor_calls": {
+          "answered": 0,
+          "refused_too_many_requests": 0
+        },
+        "executor_cost_usd": 0.273,
+        "advisor_cost_usd": 0.0
+      },
+      {
+        "round": 2,
+        "run": "P1-r1-haiku",
+        "packet": "P1",
+        "arm": "haiku",
+        "rows_expected": 7,
+        "rows_returned": 7,
+        "rows_exact": 7,
+        "unanchored_quotes": 0,
+        "citation_errors": 0,
+        "field_errors": 0,
+        "blind_opus_verdict": {
+          "rows_checked": 7,
+          "rows_correct": 7,
+          "unanchored_citations": 0,
+          "misanchored_citations": 0,
+          "wrong_values": 0,
+          "missing_rows": 0,
+          "extra_rows": 0
+        },
+        "requested": "source-scout/haiku",
+        "resolved_models": [
+          "claude-haiku-5-5"
+        ],
+        "efforts": [
+          "max"
+        ],
+        "client_versions": [
+          "2.1.293"
+        ],
+        "complete": true,
+        "requests": 7,
+        "output_tokens": 35900,
+        "advisor_calls": {
+          "answered": 1,
+          "refused_too_many_requests": 0
+        },
+        "executor_cost_usd": 0.0253,
+        "advisor_cost_usd": 0.4263
+      },
+      {
+        "round": 2,
+        "run": "P1-r1-sonnet",
+        "packet": "P1",
+        "arm": "sonnet",
+        "rows_expected": 7,
+        "rows_returned": 7,
+        "rows_exact": 7,
+        "unanchored_quotes": 0,
+        "citation_errors": 0,
+        "field_errors": 0,
+        "blind_opus_verdict": {
+          "rows_checked": 7,
+          "rows_correct": 7,
+          "unanchored_citations": 0,
+          "misanchored_citations": 0,
+          "wrong_values": 0,
+          "missing_rows": 0,
+          "extra_rows": 0
+        },
+        "requested": "source-scout/sonnet",
+        "resolved_models": [
+          "claude-sonnet-5-5"
+        ],
+        "efforts": [
+          "max"
+        ],
+        "client_versions": [
+          "2.1.293"
+        ],
+        "complete": true,
+        "requests": 9,
+        "output_tokens": 14314,
+        "advisor_calls": {
+          "answered": 1,
+          "refused_too_many_requests": 0
+        },
+        "executor_cost_usd": 0.236,
+        "advisor_cost_usd": 0.3723
+      },
+      {
+        "round": 2,
+        "run": "P2-r1-sonnet",
+        "packet": "P2",
+        "arm": "sonnet",
+        "rows_expected": 12,
+        "rows_returned": 12,
+        "rows_exact": 12,
+        "unanchored_quotes": 0,
+        "citation_errors": 0,
+        "field_errors": 0,
+        "blind_opus_verdict": {
+          "rows_checked": 12,
+          "rows_correct": 12,
+          "unanchored_citations": 0,
+          "misanchored_citations": 0,
+          "wrong_values": 0,
+          "missing_rows": 0,
+          "extra_rows": 0
+        },
+        "requested": "source-scout/sonnet",
+        "resolved_models": [
+          "claude-sonnet-5-5"
+        ],
+        "efforts": [
+          "max"
+        ],
+        "client_versions": [
+          "2.1.293"
+        ],
+        "complete": true,
+        "requests": 5,
+        "output_tokens": 9649,
+        "advisor_calls": {
+          "answered": 1,
+          "refused_too_many_requests": 0
+        },
+        "executor_cost_usd": 0.1547,
+        "advisor_cost_usd": 0.2988
+      },
+      {
+        "round": 2,
+        "run": "P2-r1-haiku",
+        "packet": "P2",
+        "arm": "haiku",
+        "rows_expected": 12,
+        "rows_returned": 12,
+        "rows_exact": 12,
+        "unanchored_quotes": 0,
+        "citation_errors": 0,
+        "field_errors": 0,
+        "blind_opus_verdict": {
+          "rows_checked": 12,
+          "rows_correct": 12,
+          "unanchored_citations": 0,
+          "misanchored_citations": 0,
+          "wrong_values": 0,
+          "missing_rows": 0,
+          "extra_rows": 0
+        },
+        "requested": "source-scout/haiku",
+        "resolved_models": [
+          "claude-haiku-5-5"
+        ],
+        "efforts": [
+          "max"
+        ],
+        "client_versions": [
+          "2.1.293"
+        ],
+        "complete": true,
+        "requests": 6,
+        "output_tokens": 21320,
+        "advisor_calls": {
+          "answered": 0,
+          "refused_too_many_requests": 1
+        },
+        "executor_cost_usd": 0.0155,
+        "advisor_cost_usd": 0.0
+      },
+      {
+        "round": 2,
+        "run": "P1-r2-haiku",
+        "packet": "P1",
+        "arm": "haiku",
+        "rows_expected": 7,
+        "rows_returned": 7,
+        "rows_exact": 7,
+        "unanchored_quotes": 0,
+        "citation_errors": 0,
+        "field_errors": 0,
+        "blind_opus_verdict": {
+          "rows_checked": 7,
+          "rows_correct": 7,
+          "unanchored_citations": 0,
+          "misanchored_citations": 0,
+          "wrong_values": 0,
+          "missing_rows": 0,
+          "extra_rows": 0
+        },
+        "requested": "source-scout/haiku",
+        "resolved_models": [
+          "claude-haiku-5-5"
+        ],
+        "efforts": [
+          "max"
+        ],
+        "client_versions": [
+          "2.1.293"
+        ],
+        "complete": true,
+        "requests": 7,
+        "output_tokens": 28455,
+        "advisor_calls": {
+          "answered": 0,
+          "refused_too_many_requests": 1
+        },
+        "executor_cost_usd": 0.0202,
+        "advisor_cost_usd": 0.0
+      },
+      {
+        "round": 2,
+        "run": "P2-r2-haiku",
+        "packet": "P2",
+        "arm": "haiku",
+        "rows_expected": 12,
+        "rows_returned": 12,
+        "rows_exact": 12,
+        "unanchored_quotes": 0,
+        "citation_errors": 0,
+        "field_errors": 0,
+        "blind_opus_verdict": {
+          "rows_checked": 12,
+          "rows_correct": 12,
+          "unanchored_citations": 0,
+          "misanchored_citations": 0,
+          "wrong_values": 0,
+          "missing_rows": 0,
+          "extra_rows": 0
+        },
+        "requested": "source-scout/haiku",
+        "resolved_models": [
+          "claude-haiku-5-5"
+        ],
+        "efforts": [
+          "max"
+        ],
+        "client_versions": [
+          "2.1.293"
+        ],
+        "complete": true,
+        "requests": 6,
+        "output_tokens": 31685,
+        "advisor_calls": {
+          "answered": 0,
+          "refused_too_many_requests": 1
+        },
+        "executor_cost_usd": 0.0211,
+        "advisor_cost_usd": 0.0
+      },
+      {
+        "round": 2,
+        "run": "P1-r2-sonnet",
+        "packet": "P1",
+        "arm": "sonnet",
+        "rows_expected": 7,
+        "rows_returned": 7,
+        "rows_exact": 7,
+        "unanchored_quotes": 0,
+        "citation_errors": 0,
+        "field_errors": 0,
+        "blind_opus_verdict": {
+          "rows_checked": 7,
+          "rows_correct": 7,
+          "unanchored_citations": 0,
+          "misanchored_citations": 0,
+          "wrong_values": 0,
+          "missing_rows": 0,
+          "extra_rows": 0
+        },
+        "requested": "source-scout/sonnet",
+        "resolved_models": [
+          "claude-sonnet-5-5"
+        ],
+        "efforts": [
+          "max"
+        ],
+        "client_versions": [
+          "2.1.293"
+        ],
+        "complete": true,
+        "requests": 6,
+        "output_tokens": 15823,
+        "advisor_calls": {
+          "answered": 1,
+          "refused_too_many_requests": 0
+        },
+        "executor_cost_usd": 0.2276,
+        "advisor_cost_usd": 0.4007
+      },
+      {
+        "round": 2,
+        "run": "P2-r2-sonnet",
+        "packet": "P2",
+        "arm": "sonnet",
+        "rows_expected": 12,
+        "rows_returned": 12,
+        "rows_exact": 12,
+        "unanchored_quotes": 0,
+        "citation_errors": 0,
+        "field_errors": 0,
+        "blind_opus_verdict": {
+          "rows_checked": 12,
+          "rows_correct": 12,
+          "unanchored_citations": 0,
+          "misanchored_citations": 0,
+          "wrong_values": 0,
+          "missing_rows": 0,
+          "extra_rows": 0
+        },
+        "requested": "source-scout/sonnet",
+        "resolved_models": [
+          "claude-sonnet-5-5"
+        ],
+        "efforts": [
+          "max"
+        ],
+        "client_versions": [
+          "2.1.293"
+        ],
+        "complete": true,
+        "requests": 5,
+        "output_tokens": 13732,
+        "advisor_calls": {
+          "answered": 1,
+          "refused_too_many_requests": 0
+        },
+        "executor_cost_usd": 0.1966,
+        "advisor_cost_usd": 0.3488
+      },
+      {
+        "round": 2,
+        "run": "C1-r1-haiku",
+        "packet": "C1",
+        "arm": "haiku",
+        "byte_exact": true,
+        "chars_returned": 2511,
+        "chars_expected": 2511,
+        "exit_code": 0,
+        "requested": "source-scout/haiku",
+        "resolved_models": [
+          "claude-haiku-5-5"
+        ],
+        "efforts": [
+          "max"
+        ],
+        "client_versions": [
+          "2.1.293"
+        ],
+        "complete": true,
+        "requests": 3,
+        "output_tokens": 9219,
+        "advisor_calls": {
+          "answered": 0,
+          "refused_too_many_requests": 0
+        },
+        "executor_cost_usd": 0.0065,
+        "advisor_cost_usd": 0.0
+      },
+      {
+        "round": 2,
+        "run": "C1-r1-sonnet",
+        "packet": "C1",
+        "arm": "sonnet",
+        "byte_exact": true,
+        "chars_returned": 2511,
+        "chars_expected": 2511,
+        "exit_code": 0,
+        "requested": "source-scout/sonnet",
+        "resolved_models": [
+          "claude-sonnet-5-5"
+        ],
+        "efforts": [
+          "max"
+        ],
+        "client_versions": [
+          "2.1.293"
+        ],
+        "complete": true,
+        "requests": 3,
+        "output_tokens": 8830,
+        "advisor_calls": {
+          "answered": 0,
+          "refused_too_many_requests": 0
+        },
+        "executor_cost_usd": 0.1221,
+        "advisor_cost_usd": 0.0
+      },
+      {
+        "round": 2,
+        "run": "C1-r2-haiku",
+        "packet": "C1",
+        "arm": "haiku",
+        "byte_exact": true,
+        "chars_returned": 2511,
+        "chars_expected": 2511,
+        "exit_code": 0,
+        "requested": "source-scout/haiku",
+        "resolved_models": [
+          "claude-haiku-5-5"
+        ],
+        "efforts": [
+          "max"
+        ],
+        "client_versions": [
+          "2.1.293"
+        ],
+        "complete": true,
+        "requests": 2,
+        "output_tokens": 10303,
+        "advisor_calls": {
+          "answered": 0,
+          "refused_too_many_requests": 0
+        },
+        "executor_cost_usd": 0.0061,
+        "advisor_cost_usd": 0.0
+      },
+      {
+        "round": 2,
+        "run": "C1-r2-sonnet",
+        "packet": "C1",
+        "arm": "sonnet",
+        "byte_exact": true,
+        "chars_returned": 2511,
+        "chars_expected": 2511,
+        "exit_code": 0,
+        "requested": "source-scout/sonnet",
+        "resolved_models": [
+          "claude-sonnet-5-5"
+        ],
+        "efforts": [
+          "max"
+        ],
+        "client_versions": [
+          "2.1.293"
+        ],
+        "complete": true,
+        "requests": 3,
+        "output_tokens": 4214,
+        "advisor_calls": {
+          "answered": 0,
+          "refused_too_many_requests": 0
+        },
+        "executor_cost_usd": 0.063,
+        "advisor_cost_usd": 0.0
+      },
+      {
+        "round": 2,
+        "run": "C1-r3-haiku",
+        "packet": "C1",
+        "arm": "haiku",
+        "byte_exact": true,
+        "chars_returned": 2511,
+        "chars_expected": 2511,
+        "exit_code": 0,
+        "requested": "source-scout/haiku",
+        "resolved_models": [
+          "claude-haiku-5-5"
+        ],
+        "efforts": [
+          "max"
+        ],
+        "client_versions": [
+          "2.1.293"
+        ],
+        "complete": true,
+        "requests": 2,
+        "output_tokens": 12241,
+        "advisor_calls": {
+          "answered": 0,
+          "refused_too_many_requests": 0
+        },
+        "executor_cost_usd": 0.0077,
+        "advisor_cost_usd": 0.0
+      },
+      {
+        "round": 2,
+        "run": "C1-r3-sonnet",
+        "packet": "C1",
+        "arm": "sonnet",
+        "byte_exact": true,
+        "chars_returned": 2511,
+        "chars_expected": 2511,
+        "exit_code": 0,
+        "requested": "source-scout/sonnet",
+        "resolved_models": [
+          "claude-sonnet-5-5"
+        ],
+        "efforts": [
+          "max"
+        ],
+        "client_versions": [
+          "2.1.293"
+        ],
+        "complete": true,
+        "requests": 3,
+        "output_tokens": 5770,
+        "advisor_calls": {
+          "answered": 0,
+          "refused_too_many_requests": 0
+        },
+        "executor_cost_usd": 0.0706,
+        "advisor_cost_usd": 0.0
+      }
+    ],
+    "advisor": {
+      "model": "claude-fable-5-1",
+      "extraction_runs_answered": {
+        "haiku": 2,
+        "sonnet": 7,
+        "of_each": 8
+      },
+      "unassisted_haiku_extraction_runs_exact": 6,
+      "relay_runs_with_an_advisor_call": 0,
+      "verifiers": {
+        "round_1": {
+          "verifiers": 8,
+          "answered_by_advisor": 7
+        },
+        "round_2": {
+          "verifiers": 8,
+          "answered_by_advisor": 8
+        }
+      },
+      "note": "Advisor sub-inferences are reported by the API as usage.iterations entries outside the top-level usage that child-usage.mjs counts as the child's own; their cost is kept apart here."
+    },
+    "blind_verdict_totals": {
+      "runs": 16,
+      "rows_checked": 152,
+      "rows_correct": 152,
+      "defects": 0,
+      "source": "the run journal for both rounds; the second round also in workflow-output.json, identical"
+    },
+    "c1_haiku_miss": {
+      "round": 1,
+      "run": "C1-r3-haiku",
+      "chars_returned": 2871,
+      "chars_expected": 2511,
+      "escaped_double_quotes": 360,
+      "double_quotes_expected": 360,
+      "equal_after_unescaping": true
+    },
+    "identity_and_effort": {
+      "haiku_children": 14,
+      "haiku_resolved_models": [
+        "claude-haiku-5-5"
+      ],
+      "haiku_recorded_efforts": [
+        "max"
+      ],
+      "haiku_requests": 59,
+      "haiku_largest_request_prompt_tokens": 83171,
+      "haiku_requests_split_by_an_advisor_call": 7,
+      "haiku_largest_single_iteration_prompt_tokens": 44981,
+      "haiku_requests_over_100k_prompt_tokens": 0,
+      "workflow_status": "incomplete: 1 child(ren) incomplete (the first round's integration child; every trial and verifier child is complete)",
+      "by_resolved_model": {
+        "claude-sonnet-5-5": {
+          "children": 21,
+          "input_tokens": 15648,
+          "output_tokens": 710856,
+          "cache_read_input_tokens": 13803925,
+          "cache_creation_input_tokens": 1062470
+        },
+        "claude-haiku-5-5": {
+          "children": 14,
+          "input_tokens": 19201,
+          "output_tokens": 328777,
+          "cache_read_input_tokens": 971994,
+          "cache_creation_input_tokens": 333434
+        },
+        "claude-opus-5-5": {
+          "children": 16,
+          "input_tokens": 3139,
+          "output_tokens": 375005,
+          "cache_read_input_tokens": 2263938,
+          "cache_creation_input_tokens": 538675
+        },
+        "<synthetic>": {
+          "children": 1,
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "cache_read_input_tokens": 0,
+          "cache_creation_input_tokens": 0
+        }
+      }
+    },
+    "prices_usd_per_token": {
+      "source": "LiteLLM model_prices_and_context_window.json as cached by ccusage",
+      "etag": "W/\"35442afac19b8c20555fa17a4f487c7998c99b658444f04820628f1010f40a85\"",
+      "models": {
+        "claude-haiku-5-5": {
+          "input_cost_per_token": 1e-07,
+          "output_cost_per_token": 5e-07,
+          "cache_read_input_token_cost": 1e-08,
+          "cache_creation_input_token_cost": 1.25e-07
+        },
+        "claude-sonnet-5-5": {
+          "input_cost_per_token": 2e-06,
+          "output_cost_per_token": 1e-05,
+          "cache_read_input_token_cost": 1e-07,
+          "cache_creation_input_token_cost": 2.5e-06
+        },
+        "claude-fable-5-1": {
+          "input_cost_per_token": 1e-05,
+          "output_cost_per_token": 5e-05,
+          "cache_read_input_token_cost": 2.5e-07,
+          "cache_creation_input_token_cost": 1.25e-05
+        }
+      }
+    },
+    "native_probes_reported_by_the_trial": [
+      {
+        "command": "claude -p --model haiku --effort max --output-format json",
+        "exit_code": 0,
+        "reply_exact": true,
+        "resolved_model": "claude-haiku-5-5",
+        "recorded_effort": "max"
+      },
+      {
+        "command": "claude -p --model claude-haiku-5-5 --output-format json",
+        "exit_code": 0,
+        "reply_exact": true,
+        "resolved_model": "claude-haiku-5-5",
+        "recorded_effort": "medium (no --effort; matches the documented Haiku 5.5 default; the probe did not determine its source)"
+      },
+      {
+        "command": "claude --bg --model haiku -n <name>",
+        "exit_code": 0,
+        "reply_exact": true,
+        "resolved_model": "claude-haiku-5-5",
+        "recorded_effort": "xhigh, from a saved per-model level; the session was removed with claude rm"
+      }
+    ],
+    "tooling_scan_reported_by_the_trial": "examples/claude-native/workflows/child-usage.mjs parsed claude-haiku-5-5 but had no haiku alias row (added with this receipt); test-envelope.mjs already accepts the haiku alias; no pricing table exists in tools/, scripts/, observability/ or examples/claude-native/workflows/; ccusage 20.0.26 listed claude-haiku-5-5 with its tokens but no cost",
+    "retained_private_files_sha256": {
+      "all-rounds.json": "d4a686078aad79c22b8dde4f48ad5de762b9fb2d61aef03910b1ff0a5557da52",
+      "child-usage.json": "3b7cbfc8578383925bd4d50808d7b583a6599cd83782aa7ac46566ea17115e1e",
+      "oracle.py": "40e0877e49f0cd51bce92d8fa68ba901230c3b3c4978416d1e17264e95c4c03e",
+      "scores-all-rounds.json": "3f2f75671fbf42ba48943f4cca6064ac2fae844ecc53d8e46e2bf7975dd1f136",
+      "scores.json": "fbd13aba170ec70f1cfdb378192f925818bcda6285fdb61439651748c089becb",
+      "workflow-output.json": "01f53296e87e991c31a35a657887c9d928825714a55c98b42e9c9063089120c8",
+      "workflow-script.js": "dae71afe64fa655781a89e7a868c7ec14377488ceb646154f01ad70956132065"
+    }
+  },
+  "provenance": {
+    "oracle": {
+      "sha256": "40e0877e49f0cd51bce92d8fa68ba901230c3b3c4978416d1e17264e95c4c03e",
+      "command": "python3 -I oracle.py <packet checkout at b16cb8cf> all-rounds.json <out.json>",
+      "rerun_at_utc": "2026-10-08T01:06:46Z",
+      "rerun_result": "identical to the retained scores-all-rounds.json"
+    },
+    "workflow_script_sha256": "dae71afe64fa655781a89e7a868c7ec14377488ceb646154f01ad70956132065",
+    "run_journal_sha256": "ff02bc74a2329e1c6b2cc46e2b4ca997e055febd34174a65771a1ad3200523f3",
+    "child_usage": "child-usage.json is the output of examples/claude-native/workflows/child-usage.mjs over the run's transcript directory",
+    "cost_method": "executor cost per child: the sum over its usage_by_model of input, output, cache-read and cache-creation tokens times the price fields input_cost_per_token, output_cost_per_token, cache_read_input_token_cost and cache_creation_input_token_cost of that model; advisor cost: the same over the child's advisor_iterations (lanes.measurement.usage) at the advisor model's prices; means rounded half up",
+    "vendor_sources_read_2026_10_07": {
+      "release_note": "https://platform.claude.com/docs/en/release-notes/overview#october-7-2026-4",
+      "model_page": "https://platform.claude.com/docs/en/models/haiku-5-5/overview",
+      "announcement": "https://www.anthropic.com/claude-haiku-5-5",
+      "models_overview": "https://platform.claude.com/docs/en/about-claude/models/overview",
+      "effort": "https://platform.claude.com/docs/en/build-with-claude/effort",
+      "alias_version_history": "https://code.claude.com/docs/en/model-config#version-history",
+      "advisor": "https://code.claude.com/docs/en/advisor",
+      "changelog": "https://github.com/anthropics/claude-code/blob/79babc372d64101f981bd2b52c3dbe588596dc56/CHANGELOG.md#L5",
+      "npm_publish_2_1_293_utc": "2026-10-07T17:18:04.464Z"
+    }
+  }
+}
