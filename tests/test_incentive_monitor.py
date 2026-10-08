@@ -1138,11 +1138,17 @@ class Coexistence(unittest.TestCase):
 
     def test_a_follower_holds_no_news_or_opra_connection_and_polls_neither_edgar_nor_the_rss(self):
         market, streams = Market(), FakeStreams()
+        monitor_run = M.run
+
+        async def bounded_run(args):
+            # Keep the real follower pipeline, but fail instead of waiting through a suite deadline.
+            return await asyncio.wait_for(monitor_run(args), timeout=2.0)
+
         with tempfile.TemporaryDirectory() as tmp:
             tmp = Path(tmp)
             v1, out = tmp / "v1", tmp / "out"
             v1_day = self.v1_files(v1, market)
-            with streams.patch():
+            with streams.patch(), mock.patch.object(M, "run", bounded_run):
                 rc = market.run(["run", "--follow-v1", str(v1), "--out", str(out), "--until-et", "00:00", "--no-corporate-actions"], tmp)
             files = day_files(out)
             v1_listing = sorted(p.name for p in v1_day.iterdir())
