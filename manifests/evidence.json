@@ -4905,6 +4905,19 @@
         "Missing provider is an intentional CLI/input contract refusal; historical native fixtures now declare their provider."
       ],
       "path": "evidence/artifacts/codex-exec-explicit-provider-20261008/receipt.json"
+    },
+    {
+      "id": "codex-exec-explicit-provider-remediation-20261008",
+      "kind": "artifact_measurement",
+      "component_ids": [
+        "codex"
+      ],
+      "claim": "PR887's reported secret-scan finding is a computed source digest; narrowly scoped gitleaks rules, explicit-provider fixture expectations and current native provenance repair the reproduced offline failures after one rebase.",
+      "limitations": [
+        "Local integration and synthetic module evidence only. Historical publication receipts are preserved.",
+        "Hosted checks and latest-main landing acceptance remain separate; no live model/provider run or account/configuration change."
+      ],
+      "path": "evidence/artifacts/codex-exec-explicit-provider-20261008/remediation.json"
     }
   ],
   "files": [
@@ -5135,8 +5148,8 @@
     },
     {
       "path": ".gitleaks.toml",
-      "sha256": "36d8049cef393b9786c912975cbad5eddf676d1e357f2773ed47afee0dc7d342",
-      "bytes": 32556
+      "sha256": "a6162e1a4cf245ec6a6cbedf9b8b0b823d44425760e18709f9d50b9ec3db2af1",
+      "bytes": 33201
     },
     {
       "path": ".gitleaksignore",
@@ -18161,8 +18174,8 @@
     },
     {
       "path": "docs/decisions/2026-10-08-codex-exec-explicit-provider.md",
-      "sha256": "bacbe891ab39bd32ffac05773b89d0f6ea6242434efc15ed92a2b667dc05d1ca",
-      "bytes": 4327
+      "sha256": "9fb776c97480eeddd9150610b28747ef0feb4b6b3f7881e884ad7927ba84436b",
+      "bytes": 5852
     },
     {
       "path": "docs/decisions/2026-10-08-coordinator-research-routing.md",
@@ -19788,6 +19801,11 @@
       "path": "evidence/artifacts/codex-exec-explicit-provider-20261008/receipt.json",
       "sha256": "6ce3868d99f1b68a77bbc394de3504609d1981a7922084ffd539964753870c96",
       "bytes": 7957
+    },
+    {
+      "path": "evidence/artifacts/codex-exec-explicit-provider-20261008/remediation.json",
+      "sha256": "d13daa36322350444d66c872ceca3f9e7b939ff6b1ce34b1bc63a2e47db1608d",
+      "bytes": 11012
     },
     {
       "path": "evidence/artifacts/codex-service-tier-migration-20261005/ci-validate-repair-20261006.json",
@@ -57931,8 +57949,8 @@
     },
     {
       "path": "tests/test_codex_worker_skill.py",
-      "sha256": "95de88e374a4f3db7dcc82f86d937643782d2bb63c501b4510ab65866f3f8aec",
-      "bytes": 12476
+      "sha256": "8421da6dfa2c2c59934b5b0e2946126d9b169a00446632c44124b7ffb32a97be",
+      "bytes": 13308
     },
     {
       "path": "tests/test_command_position_oracle.py",
@@ -58071,8 +58089,8 @@
     },
     {
       "path": "tests/test_gitleaks_config.py",
-      "sha256": "af4fcd8fc06c207a0fed3ceafdfafff46092278e733c0ad29309c59da538ec2d",
-      "bytes": 61987
+      "sha256": "871a85dfade6b153f2483eca550bd611f9f04ddc5d649dbd8efe84196e4f0610",
+      "bytes": 64908
     },
     {
       "path": "tests/test_gitleaks_guarded_macos.py",
@@ -58196,8 +58214,8 @@
     },
     {
       "path": "tests/test_landscape_sweep_harness.py",
-      "sha256": "c09fb337a209db8ecc9403cad96d73e40e6532701be4b10d7d14ac4fe9d5e1f2",
-      "bytes": 379745
+      "sha256": "fb8e6ae16dd00fde637721c767828062bbcf6ffd5d4b38b1f6a9b02dcee7dc37",
+      "bytes": 379871
     },
     {
       "path": "tests/test_landscape_sweep_skills.py",
@@ -59231,8 +59249,8 @@
     },
     {
       "path": "tools/sota-convergence/lane-provenance.json",
-      "sha256": "2d41e61a25e03789f51c0dfe1a5849f15c5f7cd84812ec554d78a1ef5df8188f",
-      "bytes": 13526
+      "sha256": "55b73b4820add93d3a3903061a6674ac19dfa67f906cf5cd959f00d803ef42b4",
+      "bytes": 14637
     },
     {
       "path": "tools/sota-convergence/practice_references.py",
