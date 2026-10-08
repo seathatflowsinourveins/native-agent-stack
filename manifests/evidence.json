@@ -4750,9 +4750,14 @@
       "bytes": 15625
     },
     {
+      "path": ".github/osv-scanner-frozen-report.toml",
+      "sha256": "c0ea1976499ea0d41b10b169ed206f821437e5a418ba33957100c2bd500abf64",
+      "bytes": 382
+    },
+    {
       "path": ".github/osv-scanner-lockfiles.json",
-      "sha256": "3c7bed9c3899e22a022acf4172719dd510124d45664f24cf656def14e6ad999b",
-      "bytes": 15176
+      "sha256": "c7cbfee447c2e5c2a71d9db5f56bba3af7084f197e084aeecc8e17456d38bfad",
+      "bytes": 15304
     },
     {
       "path": ".github/osv-scanner.toml",
@@ -4803,6 +4808,11 @@
       "path": ".github/workflows/dependency-review.yml",
       "sha256": "861a5e0eb2dd6e1d253e43c67602fcada04f80cac0ac379b0268db480812e889",
       "bytes": 1549
+    },
+    {
+      "path": ".github/workflows/frozen-evidence-risk.yml",
+      "sha256": "1615eecc2cd06567123f457a69040a6740dd7abdcb289930e56d2aa29d0ed7c7",
+      "bytes": 19212
     },
     {
       "path": ".github/workflows/hardware-profile-smoke.yml",
@@ -4866,8 +4876,8 @@
     },
     {
       "path": ".github/workflows/security-scan.yml",
-      "sha256": "f1fcc7f05ecd9eab1b59f6d84d2e0274981da7046914c1a0d26c9189ea876ac6",
-      "bytes": 13178
+      "sha256": "44547b18f6b2551fb488cfeadaf7b1acb4d0432274f0787fe092ce2a7397d937",
+      "bytes": 12313
     },
     {
       "path": ".github/workflows/sota-sources-gate.yml",
@@ -17814,6 +17824,11 @@
       "path": "docs/decisions/2026-10-07-clean-upstream-install-finalizes-a-candidate.md",
       "sha256": "694871937e1408b396eb3b24a5abdf9714bf37b6f5bc942ad93a71dfb2cf1e45",
       "bytes": 15271
+    },
+    {
+      "path": "docs/decisions/2026-10-07-frozen-evidence-osv-reporting.md",
+      "sha256": "9c0d648f042e2a7dd190296b0861035ba671f1f88966da6596c74388fdac2e9d",
+      "bytes": 12361
     },
     {
       "path": "docs/decisions/2026-10-07-instruction-core.md",
@@ -57396,9 +57411,14 @@
       "bytes": 211565
     },
     {
+      "path": "tests/test_frozen_evidence_reporting.py",
+      "sha256": "af33af1c0acb43c56602d4555e3f697bcff49549e22d6ba909c36945facddb0f",
+      "bytes": 22436
+    },
+    {
       "path": "tests/test_frozen_macos_variant_no_use.py",
-      "sha256": "509e5eb6ba4f58958f366e78652cb21ff9b285634d956ad9b7e5494d9ce90212",
-      "bytes": 36760
+      "sha256": "c8b5bfcece446aba7e9a8c87c0837ffdc8bac71b4c8c948a7d3831baaa7d5ff2",
+      "bytes": 37245
     },
     {
       "path": "tests/test_gap_crosswalk.py",
@@ -57797,8 +57817,8 @@
     },
     {
       "path": "tests/test_osv_lockfile_coverage.py",
-      "sha256": "63d6f353511c4900a1cd63e529e7e676b9999a5ab4d81d4a447b1a7bde1769a1",
-      "bytes": 75443
+      "sha256": "872353e08e80d23d52c6ec59a24de5cae7447f3d8e9be5b0b75edbb0bf0d5405",
+      "bytes": 79565
     },
     {
       "path": "tests/test_overfitting_riskl_parity.py",
@@ -58097,13 +58117,13 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "397ec09d6c2c17dfa10a5366cd93988f4b39057733c7b455a5cfb180ada7c614",
-      "bytes": 164745
+      "sha256": "02e5704fabec34058b2cd8645a086f6dbb2fbabe23ecc6bec755d15758106607",
+      "bytes": 165554
     },
     {
       "path": "tests/test_workflow_policy.py",
-      "sha256": "1927a9a769425323a3fd4b7dba879ada5052667185a7c8762baf674cb0b47000",
-      "bytes": 83603
+      "sha256": "347ea2553d9e2f436965d1cbfbd3cfab6b507d9aa72787404c117cc7330e237e",
+      "bytes": 83757
     },
     {
       "path": "tests/test_workflow_security.py",
@@ -58112,8 +58132,8 @@
     },
     {
       "path": "tests/test_workflow_security_coverage.py",
-      "sha256": "bb486ad07dea82027b40f88bcc43c6bde580005ad5a33ec2cf33573ae89e143c",
-      "bytes": 12126
+      "sha256": "2bde9456da1901d7e4a1978e16c7bc2c85279ac6ac4adba50cacc0395fe26e05",
+      "bytes": 12166
     },
     {
       "path": "tests/test_wsl_memory_maintenance.py",
