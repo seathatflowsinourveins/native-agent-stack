@@ -296,6 +296,82 @@ td a, td code { overflow-wrap: anywhere; }
 .manifest-title { color: var(--muted); font-size: 1rem; line-height: 1.4; overflow-wrap: anywhere; }
 .superseded-note { margin: .6rem 0 0; padding-left: .6rem; border-left: 2px solid var(--link); color: var(--muted); font-size: .85rem; line-height: 1.4; }
 
+/* Fleet density is scoped to this page; approved readiness spacing is unchanged. */
+#main-content:has(> #fleet-view) { padding-top: 1.1rem; }
+.fleet-view { min-width: 0; }
+.fleet-view .page-header { margin-bottom: .6rem; }
+.fleet-view h1 { max-width: none; margin-bottom: .35rem; font-size: clamp(1.8rem, 2.8vw, 2.5rem); }
+.fleet-view .fleet-stamp { max-width: none; margin: 0 0 .5rem; color: var(--muted); font-size: .8rem; line-height: 1.4; overflow-wrap: anywhere; }
+.fleet-view .fleet-counts { display: flex; flex-wrap: wrap; align-items: baseline; gap: .35rem 1.35rem; margin: 0 0 .65rem; padding: 0; font-size: .85rem; line-height: 1.4; list-style: none; }
+.fleet-view .fleet-counts > * { min-width: 0; margin: 0; }
+.fleet-view .fleet-counts strong { font-variant-numeric: tabular-nums; }
+.fleet-view .fleet-grid { display: grid; grid-template-columns: minmax(0, 1.38fr) minmax(0, 1fr); align-items: start; gap: 1.1rem; }
+.fleet-view .fleet-grid > * { min-width: 0; }
+.fleet-view .fleet-grid section { min-width: 0; margin: 0 0 .55rem; }
+.fleet-view h2 { margin-bottom: .45rem; padding-bottom: .35rem; border-bottom: 1px solid var(--rule); font-size: 1.05rem; }
+.fleet-view h3 { margin-bottom: .35rem; font-size: .9rem; }
+.fleet-view p { margin-bottom: .45rem; font-size: .8rem; line-height: 1.4; overflow-wrap: anywhere; }
+.fleet-view small { color: var(--muted); font-size: .75rem; line-height: 1.4; }
+.fleet-view .fleet-table-wrap { min-width: 0; max-width: 100%; overflow-x: auto; border: 1px solid var(--rule); border-radius: .4rem; background: var(--surface); }
+.fleet-view .fleet-table { min-width: 0; table-layout: fixed; font-size: .8rem; line-height: 1.4; }
+.fleet-view .fleet-table th, .fleet-view .fleet-table td { padding: .3rem .4rem; overflow-wrap: anywhere; }
+.fleet-view .fleet-table th { font-size: .75rem; line-height: 1.3; }
+.fleet-view .fleet-table :is(th, td):first-child { width: 27%; }
+.fleet-view .fleet-table :is(th, td):nth-child(2) { width: 11%; }
+.fleet-view .fleet-table :is(th, td):nth-child(3) { width: 10%; }
+.fleet-view .fleet-table :is(th, td):nth-child(4) { width: 13%; }
+.fleet-view .fleet-table :is(th, td):nth-child(5) { width: 16%; }
+.fleet-view .fleet-table :is(th, td):nth-child(6) { width: 23%; }
+.fleet-view .fleet-table td:first-child { font-weight: 550; }
+.fleet-view .fleet-table :is(th, td):nth-child(n+5) { text-align: right; font-variant-numeric: tabular-nums; }
+.fleet-view .fleet-table small { display: block; font-size: .7rem; }
+.fleet-view .fleet-parked > ul { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .45rem .55rem; margin: .5rem 0 0; padding: 0; list-style: none; }
+.fleet-view .fleet-parked > ul > li { min-width: 0; margin: 0; padding: .3rem .45rem; border: 1px solid var(--rule); border-radius: .2rem; background: var(--surface); font-size: .75rem; line-height: 1.35; overflow-wrap: anywhere; }
+.fleet-view .fleet-parked strong { display: block; font-weight: 550; }
+.fleet-view .fleet-parked small { display: block; font-size: .7rem; }
+.fleet-view :is(.fleet-claude, .fleet-reads, .fleet-actions) ul { margin: 0; padding: 0; list-style: none; }
+.fleet-view :is(.fleet-claude, .fleet-reads, .fleet-actions) li { min-width: 0; margin: 0; padding: .25rem 0; border-bottom: 1px solid var(--rule); font-size: .8rem; line-height: 1.4; overflow-wrap: anywhere; }
+.fleet-view :is(.fleet-claude, .fleet-reads, .fleet-actions) li:last-child { border-bottom: 0; }
+.fleet-view .fleet-claude li > strong { font-size: .85rem; }
+.fleet-view .fleet-claude :is(.claude-sessions, .claude-subagents) small { display: block; }
+.fleet-view .fleet-claude li ul { margin-top: .15rem; padding-left: .8rem; }
+.fleet-view .fleet-claude li li { padding: .1rem 0; border: 0; font-size: .75rem; }
+.fleet-view .fleet-reads { font-size: .8rem; line-height: 1.4; overflow-wrap: anywhere; }
+.fleet-view .fleet-sdk dl { margin: 0; font-size: .8rem; line-height: 1.4; }
+.fleet-view .fleet-sdk dl > div { display: grid; grid-template-columns: minmax(0, .7fr) minmax(0, 1fr); gap: .3rem .7rem; padding: .3rem 0; border-bottom: 1px solid var(--rule); }
+.fleet-view .fleet-sdk dl > div:last-child { border-bottom: 0; }
+.fleet-view .fleet-sdk dt { color: var(--muted); }
+.fleet-view .fleet-sdk dd { min-width: 0; margin: 0; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.fleet-view .fleet-actions li :is(time, small) { color: var(--muted); font-size: .7rem; }
+.fleet-view .fleet-pool { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: .4rem; margin: .25rem 0 .5rem; padding: 0; list-style: none; }
+.fleet-view .fleet-pool > h2 { grid-column: 1 / -1; margin-bottom: 0; }
+.fleet-view .pool-account { min-width: 0; margin: 0; padding: .35rem .55rem; border: 1px solid var(--rule); border-radius: .25rem; background: var(--surface); font-size: .8rem; line-height: 1.4; overflow-wrap: anywhere; }
+.fleet-view .pool-account > strong { display: block; font-size: .85rem; }
+.fleet-view .pool-account :is(time, small) { display: block; font-size: .7rem; }
+.fleet-view .fleet-policy { margin: .35rem 0 0; padding-top: .35rem; border-top: 1px solid var(--rule); color: var(--muted); font-size: .75rem; line-height: 1.4; overflow-wrap: anywhere; }
+
+@media (min-width: 72rem) {
+  .fleet-view .fleet-right { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: .5rem .8rem; }
+  .fleet-view .fleet-right > section { margin-bottom: 0; }
+  .fleet-view .fleet-right > :is(.fleet-claude, .fleet-actions) { grid-column: 1 / -1; }
+  .fleet-view .fleet-claude { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 0 .8rem; }
+  .fleet-view .fleet-claude > h2 { grid-column: 1 / -1; }
+}
+
+@media (max-width: 72rem) {
+  .fleet-view .fleet-grid { grid-template-columns: minmax(0, 1fr); gap: .6rem; }
+  .fleet-view .fleet-pool { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (max-width: 40rem) {
+  .fleet-view .fleet-counts { gap: .4rem .8rem; }
+  .fleet-view .fleet-table { min-width: 38rem; }
+  .fleet-view .fleet-parked > ul { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .fleet-view .fleet-pool { grid-template-columns: minmax(0, 1fr); }
+  .fleet-view .pool-account { padding: .6rem .7rem; }
+  .fleet-view .fleet-grid section { margin-bottom: 1rem; }
+}
+
 @media (min-width: 72rem) {
   .readiness-content .wrap { display: grid; grid-template-columns: minmax(15rem, .85fr) minmax(0, 2fr); gap: 1.4rem 2.2rem; align-items: start; }
   .readiness-content .wrap > * { grid-column: 2; }

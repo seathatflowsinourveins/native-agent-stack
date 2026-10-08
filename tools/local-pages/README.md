@@ -1,7 +1,7 @@
 # Local engineering pages
 
 `build_pages.py` presents the CC current view, native readiness receipts,
-gap board, roadmap and sources as five complete local HTML documents. It uses the existing
+gap board, roadmap, fleet and sources as six complete local HTML documents. It uses the existing
 `tools/north-star/build_readiness.py` functions `build`, `render` and
 `render_fragment`; it adds presentation and refresh custody without deciding
 gate acceptance. The initial reference is repository commit
@@ -33,6 +33,38 @@ With no output or receipt flags, output defaults to `coordination/command-center
 and receipt defaults to
 `research/fullspeed-20261008/g5-stars-gap/local-pages/refresh-receipt.json`
 under the chosen state root.
+
+The Fleet page uses the supported read-only
+`coordination/ns2604-coop/tools/fleet_block.py --json --no-gh` producer on
+each refresh. Direct values fall back to the dated
+`coordination/ns2604-coop/watchers/fleet-now.json` snapshot if collection
+fails. The co-op's named subagents always use that snapshot and its own time,
+because a direct invocation cannot observe them. CC named agents come from
+`cc-now.json`; tier, version holds and parking policy come from
+`command-center/lane-tiers.json`. Parked CLI versions remain unreported when
+the source supplies no observation; policy versions are separate.
+
+`fleet_data.py` projects whitelisted labels/counts from those native sources,
+omitting prompts, task text, emails and credential fields. Pool labels accept
+the producer's anonymous `position N`, `fresh(HH:MM:SS)` and reset-time forms;
+arbitrary account identities are rejected. A missing
+`coordination/api-actions-20261008/api-actions-ledger.jsonl` displays “no spend
+yet”; an unknown ceiling or job count remains unreported. Existing ledger
+rows contribute only explicit cumulative `spend_usd` and `ceiling_usd` fields.
+
+Actions use one native `gh run list` invocation for the newest100 repository
+runs, then filter against checked-out workflow files that actually invoke a
+model. Only workflow/status/time/run-ID fields are requested; prompt-like
+display titles and branch names are omitted. The native CLI has no cache flag
+for this command, so a600-second nonserved JSON cache with a native file lock
+coordinates refreshes. Fresh cache hits make no additional CLI request;
+failure preserves earlier observations with their original time, never an
+invented zero. The Fleet section identifies its bounded Actions scope.
+
+The native refresh runtime needs the installed hcom, Claude and gh directories
+on PATH for the upstream producer and Actions command. This is runtime setup
+in the owned systemd unit, separate from client configuration or exporter
+installation. The Fleet view uses local assets and the existing refresh timer.
 
 `--current-source` selects the exact approved read-only `cc-now/1` JSON path,
 currently only `state-root/coordination/command-center/pages/cc-now.json`.
@@ -118,6 +150,7 @@ nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p t
 nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_sanitization.py
 nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_source_policy.py
 nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_north_star_readiness.py
+nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_fleet_data.py
 ```
 
 The fixtures use the repository's real native builder and local temporary
@@ -135,3 +168,8 @@ Primary references: the native readiness API at the commit above; the retained
 [`zoneinfo`](https://docs.python.org/3.13/library/zoneinfo.html), and the
 [Prometheus3.15 query API](https://prometheus.io/docs/prometheus/latest/querying/api/#instant-queries).
 The exact exporter metric contracts and pins are recorded in `workstation.py`.
+The Fleet source contract is `coop-fleet/1` from the native producer above;
+the privacy projection also follows read-only `cc-now/1` and `lane-tiers/1`.
+Native Actions reference: [gh2.102.0 run-list source](https://github.com/cli/cli/blob/v2.102.0/pkg/cmd/run/list/list.go)
+and the [upstream command manual](https://cli.github.com/manual/gh_run_list).
+Cache locking uses Python3.13's [`fcntl`](https://docs.python.org/3.13/library/fcntl.html).

@@ -121,7 +121,11 @@ def render(view: dict, workstation: dict) -> str:
     readings = []
     for key, label in (("windows_available_gib", "Windows available"), ("wsl_available_gib", "WSL available"), ("swap_used_gib", "Swap used")):
         reading = workstation[key]
-        readings.append(f'<div class="workstation-metric"><dt>{label}</dt><dd><strong>{reading["value_gib"]:.1f}</strong> GiB <small class="reading-meta">{esc(reading["source"])} · metric read {observation_time(reading.get("read_utc"))}</small></dd></div>')
+        total_key = {"windows_available_gib": "windows_total_gib", "wsl_available_gib": "wsl_total_gib"}.get(key)
+        total = workstation.get(total_key) if total_key else None
+        total_label = f'<span class="memory-total"> / {total["value_gib"]:.1f} GiB total</span>' if total else ''
+        total_time = f'<small class="reading-meta">Total: {esc(total["source"])} · metric read {observation_time(total.get("read_utc"))}</small>' if total and (total["source"], total.get("read_utc")) != (reading["source"], reading.get("read_utc")) else ''
+        readings.append(f'<div class="workstation-metric"><dt>{label}</dt><dd><strong>{reading["value_gib"]:.1f}</strong> GiB{total_label} <small class="reading-meta">{esc(reading["source"])} · metric read {observation_time(reading.get("read_utc"))}</small>{total_time}</dd></div>')
     pool = view["workstation"].get("codex_pool")
     pool_note = f'<p class="pool-note"><strong>Pool note:</strong> {esc(pool)}</p>' if pool else ''
     return f'''<section id="now-view" class="now-view" aria-labelledby="now-title">

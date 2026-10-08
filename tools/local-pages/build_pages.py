@@ -37,7 +37,7 @@ ROAD_REFERENCE_FILES = {
     "css_from": ("coordination/command-center/cc-tools/invoke-evidence/build_page.py",),
 }
 _SANITIZER = None
-PAGES = {"index": "Home", "readiness": "Readiness", "gaps": "Gap board", "roadmap": "Roadmap", "sources": "Sources"}
+PAGES = {"index": "Home", "readiness": "Readiness", "gaps": "Gap board", "roadmap": "Roadmap", "fleet": "Fleet", "sources": "Sources"}
 
 
 def utc_now() -> str:
@@ -270,6 +270,10 @@ def collect_workstation(fallback: dict[str, Any]) -> dict[str, Any]:
     return load_local("workstation").collect(fallback)
 
 
+def collect_fleet(state_root: Path, cache_dir: Path, root: Path) -> dict[str, Any]:
+    return load_local("fleet_data").collect(state_root, cache_dir, root)
+
+
 def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
             sources: Path = Path("tools/north-star/sources.json"),
             gaps_source: Path | None = None, roadmap_source: Path | None = None,
@@ -361,9 +365,14 @@ def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
     current = strict_json(current_input["raw"])
     view = load_local("current_view")
     view.validate(current)
-    for name in ("current_view", "workstation", "sanitization"):
+    for name in ("current_view", "workstation", "sanitization", "fleet_data", "fleet_view"):
         capture("module:" + name, Path(__file__).resolve().parent / (name + ".py"))
     workstation = collect_workstation(current["workstation"])
+    fleet_cache = no_symlinks(receipt.parent / "fleet/cache")
+    if fleet_cache.is_relative_to(output_dir):
+        raise ValueError("fleet cache must remain outside the served root")
+    fleet = collect_fleet(state_root, fleet_cache, root)
+    fleet_view = load_local("fleet_view")
     gaps, roadmap, road_links = (strict_json(item["raw"]) for item in (gap_input, road_input, road_index))
     if any(not isinstance(item, dict) for item in (gaps, roadmap, road_links)):
         raise ValueError("CC page source must be a JSON object")
@@ -401,10 +410,17 @@ def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
         if name.startswith("roadmap:"):
             description = "; ".join(f"{key} = {value}" for key, value in item.get("source_dates", {}).items()) or item.get("status") or "source date unspecified"
             road_notes.append('<code>' + esc(label_path(item["path"], root, state_root)) + '</code> — ' + esc(description))
-    overview = '<section class="panel"><h2>Choose a page</h2><ul class="page-index"><li><a href="readiness.html">North-star readiness</a><p>What is done, what is left and what needs a decision.</p></li><li><a href="gaps.html">Grand Gap Board</a><p>Find open gaps and their next actions.</p></li><li><a href="roadmap.html">Roadmap</a><p>Read the dated milestones and server records.</p></li><li><a href="sources.html">Sources</a><p>Check input dates, hashes and evidence scope.</p></li></ul></section>'
+    overview = '<section class="panel"><h2>Choose a page</h2><ul class="page-index"><li><a href="readiness.html">North-star readiness</a><p>What is done, what is left and what needs a decision.</p></li><li><a href="gaps.html">Grand Gap Board</a><p>Find open gaps and their next actions.</p></li><li><a href="roadmap.html">Roadmap</a><p>Read the dated milestones and server records.</p></li><li><a href="fleet.html">Worker fleet</a><p>See the lanes, sessions, jobs and spend.</p></li><li><a href="sources.html">Sources</a><p>Check input dates, hashes and evidence scope.</p></li></ul></section>'
     current_scope = 'command-center current view snapshot; ' + view.observation_time(current["updated_utc"], plain=True)
     current_notes = [f'<code>{esc(label_path(current_input["path"], root, state_root))}</code> — {esc(current_scope)}; SHA-256 <code>{current_input["sha256"]}</code>', 'Workstation readings use an exact Prometheus metric when present, otherwise the CC-owned value and its recorded read time.']
-    source_groups = {"index": current_notes, "readiness": current_notes + readiness_notes, "gaps": gap_notes, "roadmap": road_notes}
+    fleet_notes = [f'<code>{esc(key)}</code> — {esc(value or "not reported")}' for key, value in fleet.get("source_times", {}).items()]
+    fleet_notes += ['Native source: <code>coordination/ns2604-coop/tools/fleet_block.py --json --no-gh</code>; direct fleet values use the snapshot only as fallback. Co-op subagents always retain their separate snapshot time.', 'Read-only inputs: <code>coordination/ns2604-coop/watchers/fleet-now.json</code>, <code>command-center/pages/cc-now.json</code>, <code>command-center/lane-tiers.json</code>, <code>coordination/api-actions-20261008/api-actions-ledger.jsonl</code>.', 'Actions use one bounded native <code>gh run list</code> invocation through a ten-minute nonserved cache; the retained newest-run scope is shown on the Fleet page. Unknown jobs, CLI observations and ceiling are not converted to zero.']
+    fleet_policy = fleet.get("tiers", {})
+    fleet_notes.append('Tier policy: default ' + esc(fleet_policy.get("default") or "not reported") + '; fast exceptions ' + esc(', '.join(fleet_policy.get("fast") or []) or "none reported") + '. Live lane tiers remain the observed values from the direct fleet source.')
+    fleet_notes.append('Parking keep-alive exceptions: ' + esc(', '.join(fleet_policy.get("parking", {}).get("keep_alive") or []) or "not reported") + '. Thresholds and policy time remain source-bound.')
+    for lane, deadline in fleet_policy.get("versions", {}).get("hold_until", {}).items():
+        fleet_notes.append('Version hold for ' + esc(lane) + ': ' + esc(deadline))
+    source_groups = {"index": current_notes, "readiness": current_notes + readiness_notes, "gaps": gap_notes, "roadmap": road_notes, "fleet": fleet_notes}
     source_body = "".join(f'<section id="{key}" class="panel"><h2>{esc(PAGES[key])}</h2><ul class="source-list">' + "".join(f'<li>{note}</li>' for note in notes) + '</ul></section>' for key, notes in source_groups.items())
     custody_rows = "".join(f'<tr><td><code>{esc(label_path(item["path"], root, state_root))}</code></td><td><code>{esc(item.get("sha256") or item.get("status", "UNVERIFIED"))}</code></td></tr>' for item in inputs.values())
     source_body += f'<section id="sources" class="panel"><h2>Input identity</h2><div class="table-wrap"><table><thead><tr><th>Source</th><th>SHA-256 or status</th></tr></thead><tbody>{custody_rows}</tbody></table></div></section>'
@@ -417,6 +433,7 @@ def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
         "readiness.html": document("readiness", "North-star readiness: what is done, what is left, what needs a decision", "", current_scope, manifest_body, *common, [], leading=view.render(current, workstation)),
         "gaps.html": document("gaps", "Grand Gap Board", "Find the open gaps, who owns them and what happens next.", gap_scope, gap_body(rows(gaps, "gaps", ("id", "group", "sev", "title"))), *common, []),
         "roadmap.html": document("roadmap", "Roadmap", "Read the dated milestones and server records.", road_scope, roadmap_body(roadmap), *common, []),
+        "fleet.html": document("fleet", "Worker fleet", "", 'Native fleet as of ' + str(fleet.get("at") or "not reported"), '', *common, [], leading=fleet_view.render(fleet)),
         "sources.html": document("sources", "Sources and dates", "Check the dates and identities behind each page.", 'Current view and dated repository receipts remain distinct.', source_body, *common, []),
     }
     for name in ("site.css", "site.js"):
@@ -435,6 +452,7 @@ def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
                     "native_readiness_summary": manifest["summary"],
                     "command_center_current_view": {"updated_utc": current["updated_utc"], "sha256": current_input["sha256"], "schema": current["schema"]},
                     "workstation": workstation,
+                    "fleet": fleet,
                    "source_scope": {"readiness": "Per-source retained dates; no combined snapshot timestamp", "gaps": gap_scope, "roadmap": road_scope},
                    "inputs": {key: {field: value for field, value in item.items() if field != "raw"} for key, item in inputs.items()},
                    "outputs": {key: {"sha256": hashlib.sha256(value).hexdigest(), "bytes": len(value)} for key, value in outputs.items()},
@@ -493,7 +511,7 @@ def main(argv: list[str] | None = None) -> int:
         result = refresh(args.root, args.state_root, output, receipt, args.sources, args.gaps_source, args.roadmap_source, args.roadmap_inputs, current_source=args.current_source)
     except (OSError, ValueError, KeyError, TypeError, AttributeError, ImportError) as error:
         parser.exit(1, f"local-pages: refresh failed ({type(error).__name__}): {error}\n")
-    print(json.dumps({"output_dir": str(output), "receipt": str(receipt), "generated_utc": result["generated_utc"], "native_readiness_manifest_sha256": result["native_readiness_manifest_sha256"], "pages": 5, "API_errors": result["workstation"].get("API_errors", [])}, sort_keys=True))
+    print(json.dumps({"output_dir": str(output), "receipt": str(receipt), "generated_utc": result["generated_utc"], "native_readiness_manifest_sha256": result["native_readiness_manifest_sha256"], "pages": 6, "API_errors": result["workstation"].get("API_errors", []) + result["fleet"].get("API_errors", [])}, sort_keys=True))
     return 0
 
 

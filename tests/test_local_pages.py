@@ -94,6 +94,10 @@ class LocalPagesTests(unittest.TestCase):
         self.policy_patch = patch.object(BUILDER, "SOURCE_POLICY_PATH", self.policy_path)
         self.policy_patch.start()
         self.addCleanup(self.policy_patch.stop)
+        self.fleet_result = {"schema": "local-fleet/1", "at": "2024-07-08T09:00:00Z", "fleet_source": "fixture native", "lanes_live": [{"lane": "fixture-lane", "status": "active", "tier": "standard", "cli_version": "0.161.0", "subagents_running": 0, "subagent_uncached_share_pct": None}], "lanes_parked": [{"lane": "fixture-parked", "tier": "standard", "cli_version": None}], "claude_sessions": [], "claude_subagents_running": {}, "exec_reads_in_flight": None, "sdk": {"status": "no spend yet", "jobs_running": None, "spend_usd": 0, "ceiling_usd": None, "read_utc": "2024-07-08T09:00:00Z"}, "actions": {"runs": [], "scope": "fixture only", "read_utc": "2024-07-08T09:00:00Z"}, "pool_accounts": [{"account": "reset 01:00Z", "used_pct": 0}], "fresh_total_pct": 0, "tiers": {}, "source_times": {"fleet_direct": "2024-07-08T09:00:00Z"}, "API_errors": []}
+        self.fleet_patch = patch.object(BUILDER, "collect_fleet", return_value=self.fleet_result)
+        self.fleet_patch.start()
+        self.addCleanup(self.fleet_patch.stop)
 
     @staticmethod
     def write_json(path: Path, value: object) -> None:
@@ -244,8 +248,8 @@ class LocalPagesTests(unittest.TestCase):
         expected = hashlib.sha256(native.render(native.build(self.root, self.state, self.source_index))).hexdigest()
         self.assertEqual(receipt["native_readiness_manifest_sha256"], expected)
         self.assertEqual(json.loads(self.receipt.read_text()), receipt)
-        self.assertEqual(len(receipt["outputs"]), 7)
-        for name in ("index", "readiness", "gaps", "roadmap", "sources"):
+        self.assertEqual(len(receipt["outputs"]), 8)
+        for name in ("index", "readiness", "gaps", "roadmap", "fleet", "sources"):
             text = (self.output / (name + ".html")).read_text()
             audit = DocumentAudit()
             audit.feed(text)
@@ -329,6 +333,30 @@ class LocalPagesTests(unittest.TestCase):
         self.assertIn('href="https://example.org/document"', text)
         self.assertNotIn("javascript:", text)
         self.assertIn("Unsafe URL remains text", text)
+
+    def test_fleet_links_every_worker_and_distinguishes_unknown_from_zero(self) -> None:
+        receipt = self.refresh()
+        fleet = (self.output / "fleet.html").read_text()
+        for name in ("fixture-lane", "fixture-parked"):
+            self.assertIn(name, fleet)
+        self.assertIn("no spend yet", fleet)
+        self.assertIn("not reported", fleet)
+        self.assertIn("0% used", fleet)
+        self.assertEqual(fleet.count('class="evidence-footnote"'), 1)
+        self.assertIn('href="fleet.html"', (self.output / "index.html").read_text())
+        self.assertIn('id="fleet"', (self.output / "sources.html").read_text())
+        self.assertEqual(receipt["fleet"]["lanes_live"], self.fleet_result["lanes_live"])
+
+    def test_partial_fleet_observation_does_not_claim_zero_workers(self) -> None:
+        for source in (None, "", "not reported"):
+            with self.subTest(source=source):
+                self.fleet_result.update(fleet_source=source, at=None, lanes_live=[], lanes_parked=[], claude_sessions=[])
+                self.refresh()
+                text = (self.output / "fleet.html").read_text()
+                self.assertNotIn('<strong>0</strong> live Codex lanes', text)
+                self.assertNotIn('<strong>0</strong> Claude sessions', text)
+                self.assertIn('<strong>not reported</strong> live Codex lanes', text)
+                self.assertNotIn('datetime=""', text)
 
     def test_untrusted_text_does_not_create_markup_or_account_links(self) -> None:
         attack = '<img src="https://attacker.invalid/x" onerror="alert(1)">'
