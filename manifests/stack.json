@@ -886,7 +886,7 @@
         "https://github.com/anthropics/sandbox-runtime"
       ],
       "source_pin": "d9aac2098351ca17f3743fbaf6ecbd0051b7e00e",
-      "freshness": "Repository pin updated on 2026-10-08 to upstream v0.0.79 after tag, release and package-version verification. Historical functional evidence remains dated; this metadata change performs no host installation or acceptance. Separate imported Codex0.0.79 echo/version source binding is recorded in native-sandbox-codex-binding-20261008; the earlier pinned source receipt remains pending_in_source. No new model run or0.0.79filesystem/networkpolicyqualification is claimed."
+      "freshness": "Repository pin updated on 2026-10-08 to upstream v0.0.79 after tag, release and package-version verification. Historical functional evidence remains dated; this metadata change performs no host installation or acceptance. Separate imported Codex 0.0.79 echo/version source binding is recorded in native-sandbox-codex-binding-20261008; the earlier pinned source receipt remains pending_in_source. No new model run or 0.0.79 filesystem/network policy qualification is claimed."
     },
     {
       "id": "serena",

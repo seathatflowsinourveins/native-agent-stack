@@ -27,7 +27,7 @@
       "identifying_artifact": "evidence/artifacts/row70-codex-binding-20261008/codex-producer.json",
       "original_sanitized_supplement_sha256": "f7b4c4b594d644a9e5b111d340a13883219277cbbfe820d2b0bccc7a98cb8a78",
       "canonical_metadata_sha256": "532081a053cce234d0eb4a33de5bf40d96f5870d5aaf981a639c451ae16e7cbd",
-      "association": "First session_meta header at line1 and the unique completed CommandExecution at line3805 were extracted from the same original owned rollout; no inference from current CLI or file label.",
+      "association": "First session_meta header at line 1 and the unique completed CommandExecution at line 3805 were extracted from the same original owned rollout; no inference from current CLI or file label.",
       "session_identity": {"prefix": "01a11a29", "sha256": "03195225a78d8f7fa98d8759309a48b72ce0eef2fb860d5699d1fcbfb27b1963", "hash_domain": "native-agent-stack:row70:session_meta:id:v1"},
       "event_identity": {"prefix": "exec-cef8131b", "sha256": "97bc5a65a31744f420d930810dd4bdbed85df35cf4e380e2185ef5cadabff330", "hash_domain": "native-agent-stack:row70:CommandExecution:item_completed:v1"},
       "output_boundary": "The completed capture-event stdout digest b365f10327ab77b3a37dc57344fdd619be08ba700d31a83451e495b9e6aaca3c identifies its JSON capture output. The native echo stdout remains separately bound to a948904f2f0f479b8f8197694b30184b0d2ed1c1cd2a1ec0fb85d299a192a447.",
@@ -43,6 +43,20 @@
     "source_event": {
       "event_prefix": "exec-cef8131b",
       "event_id_sha256": "2f74ee226b1555b76d739394684c56773a586ae1e9d20fef9e0dd887d4ab9611",
+      "event_id_sha256_method": {
+        "algorithm": "SHA-256",
+        "encoding": "UTF-8",
+        "input_scope": "Complete original event identifier string, including its exec prefix and full suffix",
+        "serialization": "Raw string bytes, without JSON quoting",
+        "normalization": "none",
+        "trailing_newline": false,
+        "domain_label": null,
+        "input_bytes": 41,
+        "source_receipt_sha256": "41a34c6427fab9f9378a7cca9491804f9f8456ca296dbba3849d26fc7664c28b",
+        "source_json_pointer": "/capture/codex_rollout_exec_event/event_id",
+        "complete_identifier_published": false,
+        "distinct_from": "The domain-labelled native_client_producer.event_identity SHA256 uses native-agent-stack:row70:CommandExecution:item_completed:v1 and is a separate identity derivation."
+      },
       "timestamp": "2026-10-08T13:20:04.019Z",
       "status": "completed",
       "exit_code": 0

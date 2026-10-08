@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "id": "row70-records-b-e-20261008",
+  "kind": "artifact_measurement",
+  "evidence_class": "local_integration",
+  "recorded_date_utc": "2026-10-08",
+  "component_ids": [
+    "sandbox-runtime"
+  ],
+  "claim": "Bounded source-record corrections name the separately retained Claude and Codex 0.0.79 echo observations, document the unchanged event digest's derivation, repair descriptive spacing and project one immutable current README reference through the unchanged handbook builder.",
+  "limitations": [
+    "Source-record and derived-byte consistency only; no native sandbox, policy, host, model, provider, runtime, broker or upstream test suite was run.",
+    "The frozen Claude receipt remains unchanged with its original pending_in_source field; the separate later Codex evidence is additive.",
+    "The original event digest's method is now explicit; the full private identifier and raw rollout are not published or read.",
+    "The separate living install-plan defect A is outside this B-E unit; no catalogue, plan, workflow, service or client-config changes are included.",
+    "No S4 closure, complete memory/lifecycle acceptance, token savings or new-host upgrade is asserted."
+  ],
+  "data": {
+    "trigger": {
+      "recorded_at_utc": "2026-10-08T16:52:05Z",
+      "scope": "Separate records correction after the living install-path handoff."
+    },
+    "source_base": "0d5672b08beb87a06daee792afeb66481d0c71e6",
+    "records": [
+      "B: separate retained echo/use bindings",
+      "C: additive event digest method",
+      "D: descriptive spacing",
+      "E: unique immutable README and derived handbook"
+    ],
+    "optional_note": {
+      "claude_session_identifier": "unknown",
+      "status": "No retained compact proof supplies the identifier; no attribution was added, and the original Claude receipt was not changed."
+    },
+    "new_native_client_execution": false,
+    "new_native_runtime_execution": false,
+    "practice_basis": [
+      {
+        "repository": "anthropics/sandbox-runtime",
+        "pin": "d9aac2098351ca17f3743fbaf6ecbd0051b7e00e",
+        "file": "README.md",
+        "url": "https://github.com/anthropics/sandbox-runtime/blob/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/README.md",
+        "scope": "Version-scoped vendor echo and settings source; existing operation evidence remains unchanged."
+      },
+      {
+        "repository": "python/cpython",
+        "version": "3.12",
+        "urls": [
+          "https://docs.python.org/3.12/library/hashlib.html",
+          "https://docs.python.org/3.12/library/stdtypes.html#str.encode"
+        ],
+        "scope": "Raw UTF-8 bytes and SHA-256 derivation; the original donor event digest was independently recomputed before adding method metadata."
+      },
+      {
+        "repository": "openai/codex",
+        "release": "rust-v0.161.0",
+        "source_pin": "979011409de0a60b52f179721948e65531d26144",
+        "url": "https://github.com/openai/codex/tree/979011409de0a60b52f179721948e65531d26144/codex-rs",
+        "scope": "Version-scoped producer/event-record schema reference for the retained Codex CLI 0.161.0 session_meta and CommandExecution association; no current-client inference or new execution."
+      },
+      {
+        "repository": "seathatflowsinourveins/native-agent-stack",
+        "source_base": "0d5672b08beb87a06daee792afeb66481d0c71e6",
+        "file": "scripts/build_new_wsl_handbook.py",
+        "sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
+        "scope": "Unchanged supported repository generator projects the unique current vendor reference and binds its source hash; no new generator or selection."
+      }
+    ],
+    "source_checks": {
+      "path": "evidence/artifacts/row70-records-b-e-20261008/source-checks.json",
+      "bytes": 13902,
+      "sha256": "281c5a6d60588156cfb445a1ecaeb02138eed584159e76e5dc08866487b276ab",
+      "hash_scope": "published_sanitized_bytes"
+    },
+    "independent_critic": {
+      "path": "evidence/artifacts/row70-records-b-e-20261008/independent-critic.json",
+      "bytes": 9811,
+      "sha256": "bdf53e7609e865baa9388ef8ce863ff3a65c937c552bd2529e69a9b59ef5d384",
+      "output_field": "/actual_output",
+      "actual_output_bytes": 9171,
+      "actual_output_sha256": "16fe799f6a9075b9856fae3eb584c0ed4deb667233bf5e288bb47997392489e3",
+      "decoded_bytes_equal_original": true,
+      "output_class": "Verbatim retained sanitized independent source review encoded as a JSON string; no actual output byte removed."
+    },
+    "native_generator_exit_codes": {
+      "write": 0,
+      "check": 0
+    },
+    "existing_binding_test": {
+      "tests": 1,
+      "rc": 0,
+      "evidence_class": "local_integration",
+      "scope": "Actual parent tool-returned chunks retained in source-checks.json, not a new native operational or upstream acceptance run."
+    },
+    "preserved_native_proofs": [
+      {
+        "path": "evidence/receipts/native-sandbox-smoke-20261008.json",
+        "byte_equal_base": true,
+        "sha256": "28aa0c7d0f4df1f8048c2b3478ac063dc2ef5b9aadc427714f6fe6d8f7081405"
+      },
+      {
+        "path": "evidence/artifacts/row70-codex-binding-20261008/codex-producer.json",
+        "byte_equal_base": true,
+        "sha256": "aa835b20736fa1fb7bf77683ef6390818331c76a4af3affa2258f88af8f2cfa7"
+      },
+      {
+        "path": "evidence/artifacts/row70-codex-binding-20261008/stdout.txt",
+        "byte_equal_base": true,
+        "sha256": "a948904f2f0f479b8f8197694b30184b0d2ed1c1cd2a1ec0fb85d299a192a447"
+      },
+      {
+        "path": "evidence/artifacts/row70-codex-binding-20261008/version.stdout.txt",
+        "byte_equal_base": true,
+        "sha256": "8c52412b1e17f6490f8ce8a10dbe32111d809b052a85bf828b52eef9c34add77"
+      }
+    ],
+    "inverse": {
+      "publication_only": "Revert these source/document records and their new receipt/artifacts, restoring the prior maintained binding through the same generator. No installed host state was changed or rolled back.",
+      "native_inverse_executed": false
+    }
+  }
+}

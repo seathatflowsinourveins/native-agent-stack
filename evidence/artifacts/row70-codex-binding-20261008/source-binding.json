@@ -13,6 +13,20 @@
   "source_event": {
     "event_prefix": "exec-cef8131b",
     "event_id_sha256": "2f74ee226b1555b76d739394684c56773a586ae1e9d20fef9e0dd887d4ab9611",
+    "event_id_sha256_method": {
+      "algorithm": "SHA-256",
+      "encoding": "UTF-8",
+      "input_scope": "Complete original event identifier string, including its exec prefix and full suffix",
+      "serialization": "Raw string bytes, without JSON quoting",
+      "normalization": "none",
+      "trailing_newline": false,
+      "domain_label": null,
+      "input_bytes": 41,
+      "source_receipt_sha256": "41a34c6427fab9f9378a7cca9491804f9f8456ca296dbba3849d26fc7664c28b",
+      "source_json_pointer": "/capture/codex_rollout_exec_event/event_id",
+      "complete_identifier_published": false,
+      "distinct_from": "The domain-labelled native_client_producer.event_identity SHA256 uses native-agent-stack:row70:CommandExecution:item_completed:v1 and is a separate identity derivation."
+    },
     "timestamp": "2026-10-08T13:20:04.019Z",
     "status": "completed",
     "exit_code": 0
