@@ -7679,6 +7679,11 @@
             "id": "native-sandbox-smoke-20261008",
             "path": "evidence/receipts/native-sandbox-smoke-20261008.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-sandbox-codex-binding-20261008",
+            "path": "evidence/receipts/native-sandbox-codex-binding-20261008.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -7686,7 +7691,7 @@
           "fresh-srt-allowed-write",
           "fresh-srt-denied-read-corrected"
         ],
-        "scope": "Historical 0.0.77 filesystem/network operations remain version-scoped. Retained 0.0.79 evidence covers command-center installation/readback and the Claude echo smoke only; no full-stack model acceptance.",
+        "scope": "Historical 0.0.77 filesystem/network operations remain version-scoped. Retained 0.0.79 evidence covers command-center installation/readback and the Claude echo smoke only; no full-stack model acceptance. Separate laterCodex0.0.79echo/version evidence is imported with source/event/output hashes andexit0; pending status in the earlierreceipt and0.77policyproof remain historical. No rerun was performed.",
         "network_scope": "Historical 0.0.77 allowed, explicit-deny and default-deny IPv4 loopback HTTP cases passed. Initial listener readiness race and bounded retries remain historical; no 0.0.79 network rerun is recorded."
       },
       "artifact_baselines": [],
@@ -9641,32 +9646,44 @@
         "install": {
           "status": "accepted_within_scope",
           "scope": "Recorded clean venv/vendor pip install and later command-center unit/client installation.",
-          "evidence_refs": ["evidence/receipts/hindsight-research-memory-20261008.json"]
+          "evidence_refs": [
+            "evidence/receipts/hindsight-research-memory-20261008.json"
+          ]
         },
         "use": {
           "status": "accepted_within_scope",
           "scope": "Gateway startup verification, byte-equal synthetic records, strict experiment-tag isolation and native cross-client round trip.",
-          "evidence_refs": ["evidence/receipts/hindsight-research-memory-20261008.json"]
+          "evidence_refs": [
+            "evidence/receipts/hindsight-research-memory-20261008.json"
+          ]
         },
         "persistence": {
           "status": "documented_not_replayed",
           "scope": "Named pg0 data-directory persistence is documented; the mapped receipt does not establish same-record durability after restart or backup/restore.",
-          "evidence_refs": ["recipes/hindsight-research-memory.md"]
+          "evidence_refs": [
+            "recipes/hindsight-research-memory.md"
+          ]
         },
         "restart": {
           "status": "partial_acceptance",
           "scope": "The command center recorded unit start and a later MCP-allowlist restart; the revised crash-retry template and failure recovery are not installed or exercised here.",
-          "evidence_refs": ["evidence/receipts/hindsight-research-memory-20261008.json"]
+          "evidence_refs": [
+            "evidence/receipts/hindsight-research-memory-20261008.json"
+          ]
         },
         "cleanup": {
           "status": "documented_not_replayed",
           "scope": "Recorded inverse removes registration, unit and owned data after stop; full package/data retirement was not replayed.",
-          "evidence_refs": ["recipes/hindsight-research-memory.md"]
+          "evidence_refs": [
+            "recipes/hindsight-research-memory.md"
+          ]
         },
         "recovery": {
           "status": "documented_not_replayed",
           "scope": "Vendor foreground fallback and repository crash-retry template are documented; failure recovery is not established by retained acceptance.",
-          "evidence_refs": ["recipes/hindsight-research-memory.md"]
+          "evidence_refs": [
+            "recipes/hindsight-research-memory.md"
+          ]
         }
       },
       "baseline_applicability": {

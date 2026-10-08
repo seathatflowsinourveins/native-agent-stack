@@ -1,0 +1,302 @@
+{
+  "schema_version": 1,
+  "kind": "row70_codex_native_operation_binding",
+  "recorded_at_utc": "2026-10-08T15:28:36Z",
+  "imported_observation": true,
+  "new_native_client_execution": false,
+  "source_receipt": {
+    "reference": "fixwave-defects/S4 row70 Codex leg recorded 2026-10-08T13:20:04.019Z",
+    "sha256": "41a34c6427fab9f9378a7cca9491804f9f8456ca296dbba3849d26fc7664c28b",
+    "immutable_prior_public_receipt": "evidence/receipts/native-sandbox-smoke-20261008.json",
+    "prior_codex_status_preserved": "pending_in_source"
+  },
+  "source_event": {
+    "event_prefix": "exec-cef8131b",
+    "event_id_sha256": "2f74ee226b1555b76d739394684c56773a586ae1e9d20fef9e0dd887d4ab9611",
+    "timestamp": "2026-10-08T13:20:04.019Z",
+    "status": "completed",
+    "exit_code": 0
+  },
+  "native_operation": {
+    "source_model_emitted_command": "nice -n 19 ionice -c3 srt echo 'hello world' < /dev/null",
+    "source_post_hook_shell_line": "nice -n 19 ionice -c3 srt echo 'hello world' < /dev/null > \"<source-run>/stdout.txt\" 2> \"<source-run>/stderr.txt\"",
+    "source_executed_shell": "/bin/bash -lc",
+    "emitted_matches_executed_shell_command": true,
+    "original_post_hook_argv_sha256": "95c72de542fcaeb2097437a25c6e1b681defdf7f3bd0e1baada75f3be30acfe6",
+    "post_hook_argv_digest_method": "SHA256 over original argument vector as UTF-8 JSON, compact separators, ensure_ascii=False",
+    "exact_unsanitized_argv_public": false,
+    "exit_code": 0,
+    "stdout": {
+      "name": "stdout.txt",
+      "bytes": 12,
+      "sha256": "a948904f2f0f479b8f8197694b30184b0d2ed1c1cd2a1ec0fb85d299a192a447",
+      "text": "hello world\n"
+    },
+    "stderr": {
+      "name": "stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "text": ""
+    }
+  },
+  "native_version_readback": {
+    "source_command": "srt --version < /dev/null",
+    "exit_code": 0,
+    "stdout": {
+      "name": "version.stdout.txt",
+      "bytes": 7,
+      "sha256": "8c52412b1e17f6490f8ce8a10dbe32111d809b052a85bf828b52eef9c34add77",
+      "text": "0.0.79\n"
+    },
+    "stderr": {
+      "name": "version.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "text": ""
+    }
+  },
+  "independent_import_observation": {
+    "checked_at_utc": "2026-10-08T15:28:36Z",
+    "source_receipt_sha256_matches_cc": true,
+    "event_prefix_matches_cc": true,
+    "event_status": "completed",
+    "event_exit_code": 0,
+    "native_rc_files": [
+      {
+        "name": "rc.txt",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "text": "0\n"
+      },
+      {
+        "name": "version.rc.txt",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "text": "0\n"
+      }
+    ],
+    "source_output_bytes_hashes_and_exact_text_match": true,
+    "scope": "Read only the owner-provided bounded receipt and six native operation output/return-code files; no raw rollout, conversation, account or configuration reads."
+  },
+  "release_package_metadata": {
+    "source_pin": "d9aac2098351ca17f3743fbaf6ecbd0051b7e00e",
+    "release_read": {
+      "argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/anthropics/sandbox-runtime/releases/tags/v0.0.79",
+        "--jq",
+        "{tag_name,published_at,prerelease,draft,target_commitish,html_url}"
+      ],
+      "start_utc": "2026-10-08T15:26:40.725890Z",
+      "end_utc": "2026-10-08T15:26:41.136209Z",
+      "rc": 0,
+      "stdout_bytes": 200,
+      "stdout_sha256": "07c2dc41f89ace7d35f47f4cdbeef8c25137ac783068bc6aa2561a9eb64d7c5d",
+      "stderr": "",
+      "returned_metadata": {
+        "draft": false,
+        "html_url": "https://github.com/anthropics/sandbox-runtime/releases/tag/v0.0.79",
+        "prerelease": false,
+        "published_at": "2026-10-07T17:12:35Z",
+        "tag_name": "v0.0.79",
+        "target_commitish": "main"
+      }
+    },
+    "tag_read": {
+      "argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/anthropics/sandbox-runtime/commits/v0.0.79",
+        "--jq",
+        "{sha,html_url}"
+      ],
+      "start_utc": "2026-10-08T15:26:41.136334Z",
+      "end_utc": "2026-10-08T15:26:41.538607Z",
+      "rc": 0,
+      "stdout_bytes": 158,
+      "stdout_sha256": "185c39c271c8ce367307242f6fda90c76448cd9b57a507912263c3d05292036b",
+      "stderr": "",
+      "returned_metadata": {
+        "html_url": "https://github.com/anthropics/sandbox-runtime/commit/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e",
+        "sha": "d9aac2098351ca17f3743fbaf6ecbd0051b7e00e"
+      }
+    },
+    "registry_read": {
+      "argv": [
+        "curl",
+        "--fail",
+        "--silent",
+        "--show-error",
+        "--max-time",
+        "25",
+        "https://registry.npmjs.org/@anthropic-ai%2Fsandbox-runtime/0.0.79"
+      ],
+      "start_utc": "2026-10-08T15:26:41.538668Z",
+      "end_utc": "2026-10-08T15:26:41.760288Z",
+      "rc": 0,
+      "stdout_bytes": 4472,
+      "stdout_sha256": "eb280f7149a98b68a6f7e99f06cddfc9e824359bca1fd90c024811fc315babac",
+      "stderr": "",
+      "returned_metadata": {
+        "name": "@anthropic-ai/sandbox-runtime",
+        "version": "0.0.79",
+        "repository": {
+          "url": "git+https://github.com/anthropics/sandbox-runtime.git",
+          "type": "git"
+        },
+        "dist": {
+          "shasum": "89b8735f51ad38791cb1a2913b616745dc5c04dc",
+          "tarball": "https://registry.npmjs.org/@anthropic-ai/sandbox-runtime/-/sandbox-runtime-0.0.79.tgz",
+          "fileCount": 175,
+          "integrity": "sha512-WjBmS9fbTpnQwQkM9SU+JjhM2CcXo9eWEELktY1100RMvTy/jPhP44yZ3NXhh+GHB350OgPbM3+FubE5WVRtSA==",
+          "signatures": [
+            {
+              "sig": "MEYCIQCamm3t7qUOrWAx5ajdWNexr13hMENNsiYkW3JJHNGDZAIhAKaCGmHpVLHmGHeEgIuzzTBnOOmlJi5C08xaTpHvXlzG",
+              "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+            },
+            {
+              "sig": "MEUCIQC/bIYKFxKmveZUG0bkCRknnJN71/XLgasDIFTl5zlJYQIgc5koM1FV86ilIVxwja/JJBruk2UGtUmbIGahF7f/BDs=",
+              "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+            }
+          ],
+          "attestations": {
+            "url": "https://registry.npmjs.org/-/npm/v1/attestations/@anthropic-ai%2fsandbox-runtime@0.0.79",
+            "provenance": {
+              "predicateType": "https://slsa.dev/provenance/v1"
+            }
+          },
+          "unpackedSize": 8963868
+        },
+        "scripts": {
+          "lint": "eslint 'src/**/*.ts' --fix --cache --cache-location=node_modules/.cache/.eslintcache",
+          "test": "bun test",
+          "build": "tsc",
+          "clean": "rm -rf dist",
+          "format": "prettier --write 'src/**/*.ts' --cache --log-level warn",
+          "prepare": "husky",
+          "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.test.json",
+          "lint:check": "eslint 'src/**/*.ts' --cache --cache-location=node_modules/.cache/.eslintcache",
+          "build:seccomp": "bun vendor/seccomp/build.ts",
+          "build:srt-win": "bun vendor/srt-win/build.ts",
+          "prepublishOnly": "npm run clean && npm run build",
+          "build:java-agent": "bun vendor/java-proxy-agent/build.ts"
+        },
+        "bin": {
+          "srt": "dist/cli.js"
+        }
+      }
+    },
+    "archive_observation": {
+      "argv": [
+        "curl",
+        "--fail",
+        "--silent",
+        "--show-error",
+        "--max-time",
+        "25",
+        "--location",
+        "https://registry.npmjs.org/@anthropic-ai/sandbox-runtime/-/sandbox-runtime-0.0.79.tgz"
+      ],
+      "start_utc": "2026-10-08T15:26:41.760409Z",
+      "end_utc": "2026-10-08T15:26:42.060557Z",
+      "rc": 0,
+      "stdout_bytes": 3975831,
+      "stdout_sha256": "5a730e4367c264ccc4b592af01dab038a6c39db7c184efbd132841688fa854f1",
+      "stderr": "",
+      "sha512_integrity": "sha512-WjBmS9fbTpnQwQkM9SU+JjhM2CcXo9eWEELktY1100RMvTy/jPhP44yZ3NXhh+GHB350OgPbM3+FubE5WVRtSA==",
+      "sha1": "89b8735f51ad38791cb1a2913b616745dc5c04dc",
+      "integrity_matches_registry": true,
+      "sha1_matches_registry": true,
+      "packaged_metadata": {
+        "name": "@anthropic-ai/sandbox-runtime",
+        "version": "0.0.79",
+        "scripts": {
+          "build": "tsc",
+          "build:seccomp": "bun vendor/seccomp/build.ts",
+          "build:srt-win": "bun vendor/srt-win/build.ts",
+          "build:java-agent": "bun vendor/java-proxy-agent/build.ts",
+          "clean": "rm -rf dist",
+          "test": "bun test",
+          "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.test.json",
+          "lint": "eslint 'src/**/*.ts' --fix --cache --cache-location=node_modules/.cache/.eslintcache",
+          "lint:check": "eslint 'src/**/*.ts' --cache --cache-location=node_modules/.cache/.eslintcache",
+          "format": "prettier --write 'src/**/*.ts' --cache --log-level warn",
+          "prepublishOnly": "npm run clean && npm run build",
+          "prepare": "husky"
+        },
+        "bin": {
+          "srt": "dist/cli.js"
+        },
+        "files": [
+          "dist",
+          "vendor/seccomp",
+          "vendor/srt-win",
+          "vendor/java-proxy-agent",
+          "README.md",
+          "LICENSE"
+        ]
+      },
+      "archive_retained": false,
+      "tarball_sha256": "5a730e4367c264ccc4b592af01dab038a6c39db7c184efbd132841688fa854f1",
+      "scope": "Public npm archive downloaded and rehashed in a read-only analysis sandbox; no install or native smoke run."
+    },
+    "upstream_readme": {
+      "argv": [
+        "curl",
+        "--fail",
+        "--silent",
+        "--show-error",
+        "--max-time",
+        "25",
+        "https://raw.githubusercontent.com/anthropics/sandbox-runtime/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/README.md"
+      ],
+      "observed_utc": "2026-10-08T15:27:56.154020+00:00",
+      "rc": 0,
+      "stdout_sha256": "2b18ce30672734247519435d5755875ed5f962ef9d0dbfe00994f6097bbe4b93",
+      "stdout_bytes": 78382,
+      "stderr": "",
+      "selected_lines": [
+        {
+          "line": 14,
+          "text": "npm install -g @anthropic-ai/sandbox-runtime"
+        },
+        {
+          "line": 168,
+          "text": "srt echo \"hello world\""
+        },
+        {
+          "line": 174,
+          "text": "srt --settings /path/to/srt-settings.json npm install"
+        },
+        {
+          "line": 468,
+          "text": "- `javaAgentJarPath` - macOS/Linux: absolute path to `srt-proxy-agent.jar`, the JVM agent injected via `JAVA_TOOL_OPTIONS` (see \"JVM tools\" under Network Isolation). Only needed by consumers that bundle sandbox-runtime and ship the jar separately; a normal npm install finds it under `vendor/java-proxy-agent/`."
+        },
+        {
+          "line": 678,
+          "text": "npm install"
+        }
+      ]
+    }
+  },
+  "route_alignment": {
+    "retained_install_command": "nice -n 10 npm install -g @anthropic-ai/sandbox-runtime@0.0.79",
+    "source": "evidence/receipts/native-sandbox-smoke-20261008.json#/data/install/source_reported_command",
+    "prospective_repository_recipe": "npm install --global --prefix \"$STACK_HOME/tools/sandbox-runtime-0.0.79\" @anthropic-ai/sandbox-runtime@0.0.79",
+    "ignore_scripts_removed": true,
+    "prefix_difference": "The imported command used its existing global prefix, not a newly chosen owned versioned prefix. The repository's explicit owned prefix is a prospective portability adaptation and was not qualified by this smoke.",
+    "package_lifecycle_scope": "The shipped package maps srt to dist/cli.js and has no install/postinstall script. It lists prepare=husky and prepublishOnly. Dependency install scripts and suppressed-script route equivalence were not measured."
+  },
+  "limits": [
+    "This binds an already returned native Codex echo and version readback, not a rerun or an upstream test-suite pass.",
+    "The pinned earlier Claude receipt remains byte-identical and keeps pending_in_source; this is a separate later Codex observation.",
+    "The rollout event identity is published as prefix plus SHA256; private source paths and the exact original command vector remain private, with its digest retained.",
+    "The 0.0.77 filesystem/network policy proofs remain historical. Echo success does not qualify those policies, dependency-script safety, Mac, recovery or a new-host installation at 0.0.79.",
+    "Release metadata source review and archive integrity are separate from the imported native operation; no provider/model/broker/GPU/runtime/service/client changes were made."
+  ]
+}

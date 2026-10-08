@@ -880,13 +880,13 @@
         "component-history",
         "token-practice-coverage-20260920",
         "native-sandbox-network-20260920",
-        "claude-repository-evidence-20260921", "native-sandbox-smoke-20261008"
+        "claude-repository-evidence-20260921", "native-sandbox-smoke-20261008", "native-sandbox-codex-binding-20261008"
       ],
       "upstream_sources": [
         "https://github.com/anthropics/sandbox-runtime"
       ],
       "source_pin": "d9aac2098351ca17f3743fbaf6ecbd0051b7e00e",
-      "freshness": "Repository pin updated on 2026-10-08 to upstream v0.0.79 after tag, release and package-version verification. Historical functional evidence remains dated; this metadata change performs no host installation or acceptance."
+      "freshness": "Repository pin updated on 2026-10-08 to upstream v0.0.79 after tag, release and package-version verification. Historical functional evidence remains dated; this metadata change performs no host installation or acceptance. Separate imported Codex0.0.79 echo/version source binding is recorded in native-sandbox-codex-binding-20261008; the earlier pinned source receipt remains pending_in_source. No new model run or0.0.79filesystem/networkpolicyqualification is claimed."
     },
     {
       "id": "serena",
@@ -1093,7 +1093,7 @@
         "https://github.com/max-sixty/worktrunk/releases/tag/v0.80.0"
       ],
       "source_pin": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
-      "freshness": "2026-10-03 W1 scratch qualification: The recorded version command printed \"wt v0.80.0\" (exit 0). The synthetic repository wt list smoke printed \"\u25cb Showing 1 worktree\" (exit 0). Current upstream metadata is in catalogs/landscape/upstream-snapshot.json. This integration changes repository pins; it does not switch a host installation. Prior 0.79.0 receipts retain their original scope.",
+      "freshness": "2026-10-03 W1 scratch qualification: The recorded version command printed \"wt v0.80.0\" (exit 0). The synthetic repository wt list smoke printed \"○ Showing 1 worktree\" (exit 0). Current upstream metadata is in catalogs/landscape/upstream-snapshot.json. This integration changes repository pins; it does not switch a host installation. Prior 0.79.0 receipts retain their original scope.",
       "optional_reason": "Useful specialist/reference component; not a required condition for the demonstrated native core."
     },
     {
