@@ -14,6 +14,12 @@ Search attempts and explicitly bounded top-k extract attempts are counted
 separately; vendor HTTP fanout/retries and source publication dates are unknown.
 Literal/credentialed nonpublic URL forms are refused for optional extraction;
 DNS resolution and redirects remain unverified native vendor behavior.
+
+DDGS 9.16.0 _search_sync raises DDGSException("No results found.") for native
+empty results. That condition is recorded separately from transport exceptions,
+without copying arbitrary exception text. A finished capture with any errors
+retains exit 1 and status captured_with_errors after the parent verifies the
+original-byte witness and all approved-query progress; interruption is incomplete.
 """
 
 import argparse
@@ -24,6 +30,7 @@ import json
 import os
 import re
 import signal
+import socket
 import subprocess
 import sys
 import tempfile
@@ -60,13 +67,22 @@ def retained(path, value):
     return {"path": str(path), "sha256": sha(data), "bytes": len(data)}
 
 
+def unique_object(pairs):
+    value = {}
+    for key, item in pairs:
+        if key in value:
+            raise ValueError("Duplicate JSON keys are not permitted in approved query or scope input")
+        value[key] = item
+    return value
+
+
 def validate(query_file, scope_file, scope_sha, query_sha=None):
     if not scope_file or not scope_sha or not re.fullmatch(r"[0-9a-f]{64}", scope_sha):
         raise ValueError("approved scope file and pinned SHA256 are required")
     scope_raw = scope_file.read_bytes()
     if sha(scope_raw) != scope_sha:
         raise ValueError("approved scope SHA256 mismatch")
-    scope = json.loads(scope_raw)
+    scope = json.loads(scope_raw, object_pairs_hook=unique_object)
     active = scope.get("active_fields") if isinstance(scope, dict) else None
     if not isinstance(active, list) or len(active) != 45:
         raise ValueError("approved scope must contain 45 unique layer IDs")
@@ -80,7 +96,7 @@ def validate(query_file, scope_file, scope_sha, query_sha=None):
     raw = query_file.read_bytes()
     if query_sha is not None and (not re.fullmatch(r"[0-9a-f]{64}", query_sha) or sha(raw) != query_sha):
         raise ValueError("frozen query SHA256 mismatch; retrieval was not started")
-    data = json.loads(raw)
+    data = json.loads(raw, object_pairs_hook=unique_object)
     if (not isinstance(data, dict) or set(data) != {"schema_version", "fields"}
             or type(data["schema_version"]) is not int or data["schema_version"] != 1):
         raise ValueError("exact query envelope must use schema_version 1 and fields")
@@ -113,14 +129,31 @@ def public_url(url):
         parts = urlsplit(url)
         if parts.scheme not in {"http", "https"} or parts.username or parts.password or not parts.hostname:
             return False
-        if parts.hostname.lower() == "localhost" or parts.hostname.lower().endswith((".localhost", ".local")):
+        hostname = parts.hostname.lower().rstrip(".")
+        if hostname == "localhost" or hostname.endswith((".localhost", ".local")):
             return False
         try:
-            return ipaddress.ip_address(parts.hostname).is_global
+            return ipaddress.ip_address(hostname).is_global
         except ValueError:
-            return "." in parts.hostname
+            try:
+                # Native numeric parsing only, with no DNS lookup: URL clients
+                # also recognize short/octal/hex IPv4 literals such as 127.1.
+                return ipaddress.ip_address(socket.inet_aton(hostname)).is_global
+            except OSError:
+                return "." in hostname
     except ValueError:
         return False
+
+
+def native_error_kind(error):
+    error_type = type(error)
+    if (error_type.__module__ == "ddgs.exceptions" and error_type.__name__ == "DDGSException"
+            and error.args == ("No results found.",)):
+        return "native_no_results"
+    if ((error_type.__module__ == "ddgs.exceptions" and error_type.__name__ == "TimeoutException")
+            or isinstance(error, TimeoutError)):
+        return "native_timeout"
+    return "retrieval_failure"
 
 
 def capture(rows, directory, fetch_top_k, client_factory, manifest=None):
@@ -187,7 +220,7 @@ def capture(rows, directory, fetch_top_k, client_factory, manifest=None):
                             value = client.extract(url, fmt="text")
                             source.update(status="captured", raw=retained(directory / f"{slug}-source-{rank:02d}.json", value))
                         except Exception as error:
-                            source.update(status="failed", error_type=type(error).__name__)
+                            source.update(status="failed", error_type=type(error).__name__, error_kind=native_error_kind(error))
                             manifest["error_count"] += 1
                         source["ended_at_utc"] = utc()
                         manifest["inflight_operation"] = None
@@ -195,7 +228,11 @@ def capture(rows, directory, fetch_top_k, client_factory, manifest=None):
                     elif rank <= fetch_top_k:
                         source["status"] = "refused_nonpublic_url_form"
             except Exception as error:
-                record.update(status="failed", error_type=type(error).__name__)
+                kind = native_error_kind(error)
+                record.update(status="empty_native_exception" if kind == "native_no_results" else "failed",
+                              error_type=type(error).__name__, error_kind=kind)
+                if kind == "native_no_results":
+                    manifest["empty_query_count"] += 1
                 manifest["error_count"] += 1
             manifest["inflight_operation"] = None
             record["ended_at_utc"] = utc()
@@ -281,27 +318,54 @@ def dispatch_exact(args, file_record, utc_now, native_session_tools, run_produce
             worker_env = {"PATH": os.defpath, "PYTHONNOUSERSITE": "1", "PYTHONUNBUFFERED": "1"}
             exit_code, interrupted, cancellation = run_producer(None, None, directory, tools, command=command, env=worker_env)
             receipt.update(native_exit_code=exit_code, interrupted_by_signal=interrupted, cancellation=cancellation)
-            if exit_code or interrupted:
+            manifest = None
+            if (directory / "manifest.json").is_file():
+                receipt["manifest"] = file_record(directory / "manifest.json")
+                manifest = json.loads((directory / "manifest.json").read_text(encoding="utf-8"))
+                if not isinstance(manifest, dict):
+                    raise ValueError("Mechanical worker manifest is not an object")
+            if (directory / "progress.json").is_file():
+                receipt["progress"] = file_record(directory / "progress.json")
+            if (interrupted or (isinstance(exit_code, int) and exit_code < 0)
+                    or manifest is not None and manifest.get("status") == "interrupted"):
+                receipt["failure_kind"] = "cancelled_or_terminated"
                 receipt["interruption_boundary"] = (
                     "Worker did not complete; retained progress counts started attempts. "
                     "In-flight result and uncheckpointed completion are unknown."
                 )
-                if (directory / "manifest.json").is_file():
-                    receipt["manifest"] = file_record(directory / "manifest.json")
-                if (directory / "progress.json").is_file():
-                    receipt["progress"] = file_record(directory / "progress.json")
-                code = 128 + interrupted if interrupted else exit_code if exit_code and exit_code > 0 else 1
-                raise ValueError("mechanical worker failed or was cancelled; owned evidence retained")
-            manifest = json.loads((directory / "manifest.json").read_text(encoding="utf-8"))
-            receipt["manifest"] = file_record(directory / "manifest.json")
+                if interrupted:
+                    code = 128 + interrupted
+                elif isinstance(exit_code, int) and exit_code < 0:
+                    code = 128 - exit_code
+                else:
+                    code = exit_code if isinstance(exit_code, int) and exit_code > 0 else 1
+                raise ValueError("Mechanical capture cancelled or terminated; owned evidence retained")
+            if manifest is None or manifest.get("status") not in {"captured", "captured_with_errors"}:
+                receipt["failure_kind"] = "incomplete_capture"
+                code = exit_code if isinstance(exit_code, int) and exit_code > 0 else 1
+                raise ValueError("Mechanical worker did not finish capture; incomplete evidence retained")
             parsed_queries = manifest.get("parsed_queries")
             if (not isinstance(parsed_queries, dict)
                     or parsed_queries.get("sha256") != expected_query_sha
                     or parsed_queries.get("bytes") != expected_query_bytes):
                 raise ValueError("Worker parsed-query witness does not match the frozen query bytes")
             receipt["worker_parsed_queries"] = parsed_queries
-            receipt["status"] = "captured_with_errors" if manifest["error_count"] else "captured"
-            code = 1 if manifest["error_count"] else 0
+            bound = receipt["logical_search_bound"]
+            if (type(manifest.get("search_calls")) is not int or manifest["search_calls"] != bound
+                    or type(manifest.get("completed_query_count")) is not int or manifest["completed_query_count"] != bound
+                    or not isinstance(manifest.get("queries"), list) or len(manifest["queries"]) != bound
+                    or type(manifest.get("error_count")) is not int or manifest["error_count"] < 0):
+                raise ValueError("Worker completed-capture counts do not match all approved logical queries")
+            expected_code = 1 if manifest["error_count"] else 0
+            expected_status = "captured_with_errors" if manifest["error_count"] else "captured"
+            if exit_code != expected_code or manifest["status"] != expected_status:
+                raise ValueError("Worker exit code disagrees with completed-capture error verdict")
+            receipt["capture_counts"] = {key: manifest.get(key) for key in (
+                "search_calls", "fetch_calls", "completed_query_count", "error_count", "empty_query_count",
+            )}
+            receipt["capture_outcome"] = "all_logical_queries_finished"
+            receipt["status"] = expected_status
+            code = expected_code
         else:
             receipt["status"] = "validated_no_network"
             code = 0

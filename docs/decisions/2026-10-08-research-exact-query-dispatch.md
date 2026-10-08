@@ -66,7 +66,21 @@ native dependency/source checks, logical search/extraction counts, process
 exit/cancellation, original output files and their hashes. Search/source errors
 remain errors. Validation, mechanical capture and failed attempts have separate
 statuses; none becomes a cited-answer, landscape Workflow, complete measured
-usage record or adoption verdict.
+usage record or adoption verdict. A finished capture with retained query/source
+errors has status `captured_with_errors` and native exit 1. The parent accepts
+that partial record only after checking the original parsed-input witness and
+that every approved logical query finished. This exit is distinct from an
+interrupted or failed worker. Consumers must inspect the status, witness and
+per-field source/error records, rather than treating exit 1 as cancellation or
+as complete usable source coverage.
+
+DDGS 9.16.0 raises its native `No results found.` exception for an empty search;
+the adapter records that exact vendor observation separately from a transport
+timeout. An empty bounded query is not evidence that a whole field or candidate
+class is absent. Partial records may support fields with actual usable sources;
+empty, failed and missing-source occurrences remain explicit and cannot close
+those fields. Duplicate keys in the query or scope JSON are refused rather than
+silently choosing one value.
 
 ## Validation and limits
 

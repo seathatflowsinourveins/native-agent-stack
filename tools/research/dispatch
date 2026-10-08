@@ -174,7 +174,7 @@ def main(argv=None):
     parser.add_argument("--approved-scope-sha256", help="Approved SHA256 of the exact scope-file bytes")
     parser.add_argument("--mechanical-python", type=Path, help="Absolute installed DDGS 9.16.0 Python; never installs dependencies")
     parser.add_argument("--fetch-top-k", type=int, choices=range(6), help="Explicit source-fetch bound per query; default is search only")
-    parser.add_argument("--execute", action="store_true", help="Execute mechanical capture; otherwise validate without network")
+    parser.add_argument("--execute", action="store_true", default=None, help="Execute mechanical capture; otherwise validate without network")
     args = parser.parse_args(argv)
     if args.exact_queries_file is not None:
         if args.question is not None or args.option_question is not None:
@@ -183,7 +183,8 @@ def main(argv=None):
             args.fetch_top_k = 0
         from exact_queries import dispatch_exact
         return dispatch_exact(args, file_record, utc_now, native_session_tools, run_producer)
-    if any((args.approved_scope_file, args.approved_scope_sha256, args.mechanical_python, args.fetch_top_k is not None, args.execute)):
+    if any(value is not None for value in (
+            args.approved_scope_file, args.approved_scope_sha256, args.mechanical_python, args.fetch_top_k, args.execute)):
         parser.error("mechanical options require --exact-queries-file")
     if (args.question is None) == (args.option_question is None):
         parser.error("provide exactly one question, with --question or as a positional argument")

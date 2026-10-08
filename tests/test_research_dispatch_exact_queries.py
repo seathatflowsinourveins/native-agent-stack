@@ -120,6 +120,22 @@ class ApprovedQueryValidationTests(ExactQueryFixtures):
         with self.assertRaisesRegex(ValueError, "unique IDs"):
             self.validate()
 
+    def test_duplicate_json_keys_in_query_and_scope_are_ambiguous_inverse_failures(self):
+        self.query_file.write_text(self.query_file.read_text().replace('"schema_version": 1', '"schema_version": 1, "schema_version": 1', 1))
+        with self.assertRaisesRegex(ValueError, "Duplicate JSON keys"):
+            self.validate()
+        self.write_queries()
+        self.query_file.write_text(self.query_file.read_text().replace('"layer_id": "canonical-field-0"',
+            '"layer_id": "canonical-field-0", "layer_id": "canonical-field-0"', 1))
+        with self.assertRaisesRegex(ValueError, "Duplicate JSON keys"):
+            self.validate()
+        self.write_queries()
+        self.scope_file.write_text(self.scope_file.read_text().replace('"modality": "repository"',
+            '"modality": "repository", "modality": "repository"', 1))
+        self.scope_sha = exact.sha(self.scope_file.read_bytes())
+        with self.assertRaisesRegex(ValueError, "Duplicate JSON keys"):
+            self.validate()
+
 
 class MechanicalRetentionTests(ExactQueryFixtures):
     def capture(self, client, top_k=0):
@@ -198,6 +214,7 @@ class MechanicalRetentionTests(ExactQueryFixtures):
 
     def test_nonpublic_and_credentialed_url_forms_are_not_fetched(self):
         denied = ["http://127.0.0.1/", "http://[::1]/", "http://10.0.0.1/", "http://localhost/",
+                  "http://127.1/", "http://0x7f.0.0.1/", "http://0177.0.0.1/", "http://127.0.0.1./", "http://localhost./",
                   "http://host.local/", "https://fixture-user:fixture-password@example.org/", "file:///tmp/source",
                   "http://[invalid/", None]
         for url in denied:
@@ -209,6 +226,16 @@ class MechanicalRetentionTests(ExactQueryFixtures):
         self.assertEqual(manifest["fetch_calls"], 0)
         client.extract.assert_not_called()
         self.assertEqual(records[0]["sources"][0]["status"], "refused_nonpublic_url_form")
+
+    def test_numeric_url_aliases_are_retained_but_never_extracted(self):
+        urls = ["http://127.1/", "http://0x7f.0.0.1/", "http://0177.0.0.1/", "http://127.0.0.1./", "http://localhost./"]
+        client = mock.Mock()
+        client.text.return_value = [{"href": url} for url in urls]
+        _, manifest, records, _ = self.capture(client, top_k=5)
+        client.extract.assert_not_called()
+        self.assertEqual(manifest["fetch_calls"], 0)
+        self.assertEqual([source["url"] for source in records[0]["sources"]], urls)
+        self.assertEqual([source["status"] for source in records[0]["sources"]], ["refused_nonpublic_url_form"] * 5)
 
 
 class ExactDispatchWiringTests(ExactQueryFixtures):
@@ -244,6 +271,19 @@ class ExactDispatchWiringTests(ExactQueryFixtures):
         self.assertEqual(command, ["hcom", "list", "self", "--json", "--name", "gala"])
         stdout.write(json.dumps({"name": "gala", "session_id": "synthetic-native-caller", "tool": "codex"}).encode())
         return subprocess.CompletedProcess(command, 0)
+
+    def completed_manifest(self, directory, errors=0):
+        queries = [query for field in self.packet["fields"] for query in field["queries"]]
+        records = []
+        for index, query in enumerate(queries):
+            record = {"query": query, "status": "failed" if index < errors else "returned"}
+            if index < errors:
+                record.update(error_type="TimeoutException", error_kind="native_timeout")
+            records.append(exact.retained(directory / f"synthetic-query-{index}.json", record))
+        return {"status": "captured_with_errors" if errors else "captured", "error_count": errors,
+                "search_calls": len(queries), "fetch_calls": 0, "completed_query_count": len(queries),
+                "empty_query_count": 0, "queries": records,
+                "parsed_queries": {"sha256": exact.sha(self.query_file.read_bytes()), "bytes": self.query_file.stat().st_size}}
 
     def test_cli_defaults_to_validation_without_runtime_or_network(self):
         result = self.cli(*self.exact_arguments())
@@ -296,6 +336,9 @@ class ExactDispatchWiringTests(ExactQueryFixtures):
                       [*self.exact_arguments(), "--question", "question"],
                       ["--exact-queries-file", str(self.query_file), "--fetch-top-k", "6"],
                       ["--question", "question", "--fetch-top-k", "0"],
+                      ["--question", "question", "--approved-scope-sha256", ""],
+                      ["--question", "question", "--approved-scope-file", ""],
+                      ["--question", "question", "--mechanical-python", ""],
                       ["--question", "question", "--fetch-top-k", "1"]]:
             with self.subTest(args=extra):
                 result = self.cli(*extra)
@@ -315,10 +358,7 @@ class ExactDispatchWiringTests(ExactQueryFixtures):
             self.assertEqual(Path(command[command.index("--scope-file") + 1]).read_bytes(), self.scope_file.read_bytes())
             (directory / "producer.stdout").write_text("synthetic mechanical output")
             (directory / "producer.stderr").write_text("")
-            exact.retained(directory / "manifest.json", {
-                "error_count": 0, "search_calls": 90, "fetch_calls": 90,
-                "parsed_queries": {"sha256": exact.sha(self.query_file.read_bytes()), "bytes": self.query_file.stat().st_size},
-            })
+            exact.retained(directory / "manifest.json", self.completed_manifest(directory))
             seen["directory"] = directory
             return 0, None, None
         with mock.patch.dict(os.environ, self.env, clear=True), mock.patch.object(exact.subprocess, "run", side_effect=self.fake_identity):
@@ -366,6 +406,7 @@ class ExactDispatchWiringTests(ExactQueryFixtures):
         receipt = json.loads(Path(output.getvalue().strip()).read_text())
         self.assertEqual(receipt["status"], "failed")
         self.assertEqual(receipt["cancellation"]["status"], "retired")
+        self.assertEqual(receipt["failure_kind"], "cancelled_or_terminated")
         self.assertIn("manifest", receipt)
         self.assertIn("producer.stdout", receipt)
         self.assertIn("progress", receipt)
@@ -373,9 +414,9 @@ class ExactDispatchWiringTests(ExactQueryFixtures):
 
     def test_successful_worker_without_matching_parsed_byte_witness_is_rejected(self):
         def wrong_witness(launcher, question, directory, tools, **kwargs):
-            exact.retained(directory / "manifest.json", {
-                "error_count": 0, "parsed_queries": {"sha256": "0" * 64, "bytes": self.query_file.stat().st_size},
-            })
+            manifest = self.completed_manifest(directory)
+            manifest["parsed_queries"]["sha256"] = "0" * 64
+            exact.retained(directory / "manifest.json", manifest)
             return 0, None, None
         with mock.patch.dict(os.environ, self.env, clear=True), mock.patch.object(exact.subprocess, "run", side_effect=self.fake_identity):
             with contextlib.redirect_stdout(io.StringIO()) as output:
@@ -384,6 +425,55 @@ class ExactDispatchWiringTests(ExactQueryFixtures):
         receipt = json.loads(Path(output.getvalue().strip()).read_text())
         self.assertEqual(receipt["status"], "failed")
         self.assertIn("parsed-query witness", receipt["error"])
+
+    def test_finished_partial_capture_keeps_nonzero_exit_all_errors_and_verified_input_witness(self):
+        def partial(launcher, question, directory, tools, **kwargs):
+            manifest = self.completed_manifest(directory, errors=2)
+            exact.retained(directory / "manifest.json", manifest)
+            exact.retained(directory / "progress.json", manifest)
+            return 1, None, None
+        with mock.patch.dict(os.environ, self.env, clear=True), mock.patch.object(exact.subprocess, "run", side_effect=self.fake_identity):
+            with contextlib.redirect_stdout(io.StringIO()) as output:
+                code = exact.dispatch_exact(self.args(), self.file_record, exact.utc, lambda: ({}, {}), partial)
+        self.assertEqual(code, 1)
+        receipt = json.loads(Path(output.getvalue().strip()).read_text())
+        self.assertEqual(receipt["status"], "captured_with_errors")
+        self.assertEqual(receipt["capture_outcome"], "all_logical_queries_finished")
+        self.assertEqual(receipt["native_exit_code"], 1)
+        self.assertEqual(receipt["worker_parsed_queries"]["sha256"], receipt["queries"]["sha256"])
+        self.assertEqual(receipt["capture_counts"]["completed_query_count"], 90)
+        self.assertEqual(receipt["capture_counts"]["error_count"], 2)
+        self.assertNotIn("failure_kind", receipt)
+        manifest = json.loads(Path(receipt["manifest"]["path"]).read_text())
+        self.assertEqual(len(manifest["queries"]), 90)
+        for artifact in manifest["queries"][:2]:
+            self.assertEqual(artifact["sha256"], exact.sha(Path(artifact["path"]).read_bytes()))
+            record = json.loads(Path(artifact["path"]).read_text())
+            self.assertEqual(record["error_type"], "TimeoutException")
+            self.assertEqual(record["error_kind"], "native_timeout")
+        self.assertIn("progress", receipt)
+
+    def test_nonzero_partial_cannot_bypass_input_witness_or_all_query_progress(self):
+        for failure in ["wrong_witness", "missing_progress"]:
+            with self.subTest(failure=failure):
+                def partial(launcher, question, directory, tools, **kwargs):
+                    manifest = self.completed_manifest(directory, errors=2)
+                    if failure == "wrong_witness":
+                        manifest["parsed_queries"]["sha256"] = "0" * 64
+                    else:
+                        manifest["completed_query_count"] -= 1
+                        manifest["queries"].pop()
+                    exact.retained(directory / "manifest.json", manifest)
+                    return 1, None, None
+                with mock.patch.dict(os.environ, self.env, clear=True), mock.patch.object(exact.subprocess, "run", side_effect=self.fake_identity):
+                    with contextlib.redirect_stdout(io.StringIO()) as output:
+                        code = exact.dispatch_exact(self.args(), self.file_record, exact.utc, lambda: ({}, {}), partial)
+                self.assertEqual(code, 1)
+                receipt = json.loads(Path(output.getvalue().strip()).read_text())
+                self.assertEqual(receipt["status"], "failed")
+                self.assertNotIn("capture_outcome", receipt)
+                self.assertIn("manifest", receipt)
+                self.assertIn("witness" if failure == "wrong_witness" else "counts", receipt["error"])
 
 
 class FrozenWorkerBoundaryTests(ExactQueryFixtures):
@@ -490,6 +580,45 @@ class InstalledDDGSContractTests(unittest.TestCase):
         query = "  literal café — \"query\"\n"
         payload = engine.build_payload(query, region="wt-wt", safesearch="moderate", timelimit=None, page=1)
         self.assertEqual(payload, {"q": query, "b": "", "l": "wt-wt"})
+
+    def test_installed_native_empty_engine_exception_is_retained_separately_from_transport_timeout(self):
+        try:
+            version = importlib.metadata.version("ddgs")
+        except importlib.metadata.PackageNotFoundError:
+            self.skipTest("native DDGS empty-engine check requires the installed runtime")
+        if version != exact.DDGS_VERSION:
+            self.skipTest("installed DDGS version differs from the qualified source")
+        exact.native_ddgs()
+        from ddgs.ddgs import DDGS
+        from ddgs.exceptions import DDGSException, TimeoutException
+        class EmptyEngine:
+            provider = "synthetic-no-network"
+            name = "synthetic-empty-engine"
+            def search(self, query, **kwargs):
+                return []
+        with mock.patch.dict(os.environ, {}, clear=True):
+            client = DDGS(timeout=15)
+        with mock.patch.object(DDGS, "_get_engines", return_value=[EmptyEngine()]):
+            with self.assertRaises(DDGSException) as raised:
+                client.text("literal no-network empty-engine query", max_results=5, page=1, backend="duckduckgo")
+            self.assertEqual(raised.exception.args, ("No results found.",))
+            with tempfile.TemporaryDirectory() as temporary:
+                directory = Path(temporary)
+                rows = [{"layer_id": "synthetic-canonical-field", "modality": "repository",
+                         "queries": ["literal no-network empty-engine query"]}]
+                manifest = exact.capture(rows, directory, 0, lambda timeout: client)
+                record = json.loads(Path(manifest["queries"][0]["path"]).read_text())
+                self.assertEqual(manifest["completed_query_count"], 1)
+                self.assertEqual(manifest["error_count"], 1)
+                self.assertEqual(manifest["empty_query_count"], 1)
+                self.assertEqual(manifest["fetch_calls"], 0)
+                self.assertEqual(record["status"], "empty_native_exception")
+                self.assertEqual(record["error_kind"], "native_no_results")
+                self.assertEqual(record["error_type"], "DDGSException")
+                self.assertNotIn("raw_vendor_results", record)
+                self.assertEqual(record["sources"], [])
+        self.assertEqual(exact.native_error_kind(TimeoutException("fixture-private-header-text")), "native_timeout")
+        self.assertEqual(exact.native_error_kind(DDGSException("fixture-private-header-text")), "retrieval_failure")
 
 
 if __name__ == "__main__":
