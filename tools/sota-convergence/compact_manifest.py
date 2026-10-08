@@ -33,6 +33,23 @@ from sweep_common import canon, json_text
 
 SCHEMA = Path(__file__).parent / "schemas/compact-decision.json"
 COVERAGE_SCHEMA = SCHEMA.with_name("compact-coverage.json")
+START_CLOSURE_PROFILE = "start-closure/1"
+START_ROW_SCHEMA = SCHEMA.with_name("compact-decision-start-closure-1.json")
+START_COVERAGE_SCHEMA = SCHEMA.with_name("compact-coverage-start-closure-1.json")
+ACTION_CLASSES = {"ADOPT-NOW", "TRIAL"}
+PIN_REASONS = {"no-body", "no-match", "not-a-repository-file"}
+LOCATOR_REASONS = {"unsupported-transport", "unestablished-pinned-locator", "source-disagreement"}
+OMISSION_FOLLOW_UPS = {"complete-typed-list-populations-not-frozen": "G5-F1",
+                     "source-primary-qualification-unresolved": "G5-F2", "missing-list-capture": "G5-F1"}
+POPULATION_FACTS = ("source_repository", "pin", "path", "capture_sha256", "archive_member", "parser")
+COUNT_UNITS = {"physical_entries": "physical entries in the frozen source list before deduplication",
+               "typed_source_ids": "distinct typed source ids already present in the retained mining input",
+               "groups": "distinct groups in the retained mining input",
+               "duplicates_removed": "physical entries removed by the declared deduplication rule",
+               "overlap_stars": "physical entries whose identities overlap retained star rows",
+               "overlap_fields": "physical entries whose identities overlap retained field rows",
+               "promoted_entries": "physical entries retained in expected_occurrences by the promotion rule",
+               "unpromoted_entries": "physical entries counted only, bound by their unpromoted id-list witness"}
 ROWS_MEMBER = "compact/rows.json"
 COVERAGE_MEMBER = "compact/coverage.json"
 ASSET_LIMIT = 2 * 1024**3
@@ -308,8 +325,138 @@ def validate_ref(ref, index):
         match_capture(ref["archive_member"], ref["sha256"], index)
 
 
-def validate_row(row, index):
-    closed(row, ROW_REQUIRED, ROW_OPTIONAL, "row")
+def validation_profile(profile):
+    require(profile in {None, START_CLOSURE_PROFILE}, "unsupported validation profile")
+    return profile == START_CLOSURE_PROFILE
+
+
+def closure_metadata(row, index):
+    """Validate explicit residue declarations; none is evidence or a source pin."""
+    closure = row.get("closure", {})
+    closed(closure, set(), {"pending_pin", "pending_locator", "disagreements"}, "closure")
+    for name, reasons in (("pending_pin", PIN_REASONS), ("pending_locator", LOCATOR_REASONS)):
+        if name in closure:
+            residue = closure[name]
+            closed(residue, {"reason_code", "measurement"}, set(), "closure." + name)
+            require(residue["reason_code"] in reasons, "unsupported " + name + " reason code")
+            text(residue["measurement"], "closure." + name + ".measurement")
+            require(row["disposition"] == "PENDING", name + " residue must be PENDING and can never be an action row")
+    null_pins = row["pin"] is None or any(source["pin"] is None for source in row["primary_sources"])
+    require("pending_pin" not in closure or null_pins, "pending_pin requires an actual null row or primary pin")
+    disagreements = closure.get("disagreements", [])
+    require(isinstance(disagreements, list), "closure.disagreements must be an array")
+    for item in disagreements:
+        closed(item, {"id", "kind", "status", "recorded_locator", "recorded_repository", "resolution", "explanation", "measurement", "evidence_refs"},
+               {"recorded_pin"}, "closure disagreement")
+        for name in ("id", "recorded_locator", "recorded_repository", "resolution", "explanation"):
+            text(item[name], "disagreement." + name)
+        canonical(item["recorded_repository"])
+        require(item["kind"] in {"source-repository", "repo-pin"}, "unsupported disagreement kind")
+        require(item["status"] in {"RESOLVED", "PENDING"}, "unsupported disagreement status")
+        require(isinstance(item["measurement"], str), "disagreement.measurement must be a string")
+        require(isinstance(item["evidence_refs"], list), "disagreement evidence_refs must be an array")
+        for ref in item["evidence_refs"]:
+            validate_ref(ref, index)
+        if "recorded_pin" in item:
+            defects = []
+            validate_pin(item["recorded_pin"], "disagreement.recorded_pin", defects)
+            require(not defects, "disagreement recorded pin must be established")
+            require(canonical(item["recorded_pin"]["repository_or_source"]) == canonical(item["recorded_repository"]),
+                    "disagreement recorded repository differs from its recorded pin")
+        require(item["kind"] != "repo-pin" or "recorded_pin" in item, "repo-pin disagreement must retain its original pin")
+        recorded_pin = item.get("recorded_pin")
+        if recorded_pin is None:
+            recorded_pin = next((source["pin"] for source in row["primary_sources"] if source["pin"] is not None
+                                 and canonical(source["pin"]["repository_or_source"]) == canonical(item["recorded_repository"])), None)
+        require(recorded_pin is not None, "disagreement must retain its original pin when the source pin is corrected")
+        original_defect = None
+        try:
+            validate_locator(item["recorded_locator"], recorded_pin, "recorded disagreement", [])
+        except CompactError as error:
+            original_defect = str(error)
+        require(original_defect in {"primary locator names a different source repository", "primary repo@pin locator does not match its declared source/pin",
+                                    "primary locator ref does not match its declared pin"}, "declared disagreement is not detected in its retained original locator/pin claims")
+        at_pin = re.fullmatch(r"(.+)@([^:]+):(.+)", item["recorded_locator"])
+        source_defect = original_defect == "primary locator names a different source repository" or (at_pin is not None and canonical(at_pin[1]) != canonical(recorded_pin["repository_or_source"]))
+        require(item["kind"] == ("source-repository" if source_defect else "repo-pin"), "declared disagreement kind differs from its detected original defect")
+        if item["status"] == "PENDING":
+            require(row["disposition"] == "PENDING", "an action or non-PENDING row cannot retain an unresolved disagreement")
+            text(item["measurement"], "disagreement.measurement")
+            require(closure.get("pending_locator", {}).get("reason_code") == "source-disagreement", "unresolved disagreement requires PENDING-LOCATOR residue")
+        else:
+            require(bool(item["evidence_refs"]), "resolved disagreement requires primary evidence references")
+    if "provenance" in row:
+        provenance = row["provenance"]
+        closed(provenance, {"pin_resolution"}, set(), "provenance")
+        require(isinstance(provenance["pin_resolution"], list) and bool(provenance["pin_resolution"]), "pin resolution provenance must be a nonempty array")
+        seen_targets = set()
+        for resolution in provenance["pin_resolution"]:
+            closed(resolution, {"target", "method", "resolved_at", "blob_id", "commit", "repository", "path"}, set(), "pin resolution")
+            target = text(resolution["target"], "pin resolution target")
+            require(target not in seen_targets, "duplicate pin resolution target")
+            seen_targets.add(target)
+            require(resolution["method"] in {"git-blob-default-tree", "git-blob-path-history"}, "unsupported pin resolution method")
+            require(COMMIT.fullmatch(text(resolution["blob_id"], "pin resolution blob id")) and COMMIT.fullmatch(text(resolution["commit"], "pin resolution commit")), "pin resolution uses full Git object ids")
+            require(re.fullmatch(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z", text(resolution["resolved_at"], "pin resolution time")), "pin resolution time must be UTC RFC3339")
+            canonical(resolution["repository"])
+            member_name(resolution["path"])
+            match = re.fullmatch(r"primary\[([0-9]+)\]", target)
+            require(target == "row" or match is not None, "pin resolution target must name row or primary[N]")
+            if target == "row":
+                resolved_pin = row["pin"]
+            else:
+                require(int(match[1]) < len(row["primary_sources"]), "pin resolution target is out of range")
+                resolved_pin = row["primary_sources"][int(match[1])]["pin"]
+            require(resolved_pin is not None and resolved_pin["kind"] == "commit" and resolved_pin["version_or_commit"] == resolution["commit"]
+                    and canonical(resolved_pin["repository_or_source"]) == canonical(resolution["repository"]), "pin resolution provenance differs from its final pin")
+    return closure
+
+
+def closure_locator(source, label, closure, blockers):
+    """Keep unsafe locators fatal and detect every explicitly deferred disagreement."""
+    locator = text(source["locator"], label)
+    unknown = locator.upper() in {"UNKNOWN", "UNVERIFIED", "PENDING", "NONE", "N/A"}
+    at_pin = re.fullmatch(r"(.+)@([^:]+):(.+)", locator)
+    if not unknown and at_pin is not None:
+        canonical(at_pin[1])
+        require(at_pin[1].startswith("https://") or ":" not in at_pin[1], "primary repo@pin source must not name an unsafe transport")
+        if at_pin[1].startswith("https://"):
+            repo_url = urlsplit(at_pin[1])
+            require(bool(repo_url.hostname) and not repo_url.username and not repo_url.password, "primary URL must be HTTPS and credential-free")
+        require(COMMIT.fullmatch(at_pin[2]) or VERSION.fullmatch(at_pin[2]) and not any(word in at_pin[2].lower() for word in ("latest", "main", "master", "head")),
+                "primary repo@pin locator must retain an exact commit or version")
+        member_name(re.sub(r":[1-9][0-9]*$", "", at_pin[3]))
+    elif not unknown:
+        require(locator.startswith("https://"), "primary locator must name an upstream HTTPS source or repo@pin:file")
+        url = urlsplit(locator)
+        require(url.scheme == "https" and bool(url.hostname) and not url.username and not url.password, "primary URL must be HTTPS and credential-free")
+    if not unknown:
+        require(not re.search(r"[\x00-\x20\x7f]", locator), "primary locator must not contain controls or whitespace")
+    failures = []
+    try:
+        validate_locator(locator, source["pin"], label, failures)
+    except CompactError as error:
+        message = str(error)
+        permitted = {"primary locator names a different source repository", "primary repo@pin locator does not match its declared source/pin",
+                     "primary locator ref does not match its declared pin"}
+        require(message in permitted, message)
+        matching = [item for item in closure.get("disagreements", []) if item["status"] == "PENDING"
+                    and item["recorded_locator"] == locator and source["pin"] is not None
+                    and canonical(item["recorded_repository"]) == canonical(source["pin"]["repository_or_source"])
+                    and (item["kind"] == "source-repository" if message == "primary locator names a different source repository" else item.get("recorded_pin") == source["pin"])]
+        require(bool(matching) and closure.get("pending_locator", {}).get("reason_code") == "source-disagreement", message)
+        return True
+    if "pending_locator" in closure:
+        allowed = {label + ":unknown-primary-locator", label + ":unestablished-pinned-primary-locator"}
+        blockers.extend(code for code in failures if code not in allowed)
+        return bool(set(failures) & allowed)
+    blockers.extend(failures)
+    return False
+
+
+def validate_row(row, index, profile=None):
+    start_closure = validation_profile(profile)
+    closed(row, ROW_REQUIRED, ROW_OPTIONAL | ({"closure", "provenance"} if start_closure else set()), "row")
     identity, slot, _ = decision_key(row)
     require(row["disposition"] in CLASSES and row["evidence_class"] in EVIDENCE, "unsupported disposition/evidence class")
     blockers = []
@@ -317,7 +464,11 @@ def validate_row(row, index):
         blockers.append("unknown-field-scope")
     if row["evidence_class"] == "UNKNOWN":
         blockers.append("unknown-evidence-class")
-    validate_pin(row["pin"], "row", blockers)
+    closure = closure_metadata(row, index) if start_closure else {}
+    pin_blockers = []
+    validate_pin(row["pin"], "row", pin_blockers)
+    if "pending_pin" not in closure:
+        blockers.extend(pin_blockers)
     if "decision_scope" in row:
         require(row["decision_scope"] in {"source-entry-screen", "implementation-merit", "reference-artifact"}, "unsupported decision scope")
     if "candidate_implementation_status" in row:
@@ -353,16 +504,25 @@ def validate_row(row, index):
         raise CompactError("invalid refresh date") from error
     sources = row["primary_sources"]
     require(isinstance(sources, list) and bool(sources), "every row must retain a primary source")
+    pending_locator_detected = False
     for i, source in enumerate(sources):
         closed(source, {"locator", "pin", "subject"}, {"capture_sha256", "archive_member", "pointer"}, "primary source")
         text(source["subject"], "primary source subject")
-        validate_pin(source["pin"], f"primary[{i}]", blockers)
-        validate_locator(source["locator"], source["pin"], f"primary[{i}].locator", blockers)
+        pin_blockers = []
+        validate_pin(source["pin"], f"primary[{i}]", pin_blockers)
+        if "pending_pin" not in closure:
+            blockers.extend(pin_blockers)
+        if start_closure:
+            pending_locator_detected |= closure_locator(source, f"primary[{i}].locator", closure, blockers)
+        else:
+            validate_locator(source["locator"], source["pin"], f"primary[{i}].locator", blockers)
         require(("capture_sha256" in source) == ("archive_member" in source), "primary capture hash/member must be paired")
         if "archive_member" in source:
             match_capture(source["archive_member"], source["capture_sha256"], index)
         if "pointer" in source:
             require(isinstance(source["pointer"], str) and (source["pointer"] == "" or source["pointer"].startswith("/")), "primary pointer must be JSON Pointer")
+    require("pending_locator" not in closure or pending_locator_detected or any(item["status"] == "PENDING" for item in closure.get("disagreements", [])),
+            "pending_locator requires an actual unknown locator or recorded disagreement")
     if row["pin"] is not None:
         require(any(source["pin"] == row["pin"] for source in sources), "no primary source binds the row's exact subject and implementation/source pin")
     for name in ("source_pointer",):
@@ -721,9 +881,57 @@ def validate_acceptance(row, captures):
                 "ADOPT-NOW lacks passing native routing in both clients")
 
 
-def validate_coverage(coverage, rows, index, captures, cache):
+def closure_omissions(omissions, index):
+    approved, unresolved = [], []
+    for omission in omissions:
+        if not isinstance(omission, dict):
+            unresolved.append(omission)
+            continue
+        closed(omission, {"code", "count", "cc_disposition_id", "follow_up_id", "resolution"}, set(POPULATION_FACTS), "closure omission")
+        require(type(omission["count"]) is int and omission["count"] >= 0, "omission count must be a measured nonnegative integer")
+        text(omission["resolution"], "omission resolution")
+        code = text(omission["code"], "omission code")
+        if (not isinstance(omission["cc_disposition_id"], str) or not omission["cc_disposition_id"].strip()
+                or OMISSION_FOLLOW_UPS.get(code) != omission["follow_up_id"]):
+            unresolved.append(omission)
+            continue
+        if code == "missing-list-capture":
+            require(set(POPULATION_FACTS) <= omission.keys(), "missing list capture omission must retain its source reference")
+            canonical(omission["source_repository"])
+            failures = []
+            validate_pin(omission["pin"], "missing population", failures)
+            require(not failures and canonical(omission["pin"]["repository_or_source"]) == canonical(omission["source_repository"]), "missing list capture must retain its snapshot pin")
+            text(omission["path"], "missing list path")
+            text(omission["parser"], "missing list parser")
+            sha(omission["capture_sha256"], "missing list capture hash")
+            member_name(omission["archive_member"])
+            require(omission["archive_member"] not in index, "missing-list-capture omission must identify an absent capture")
+        approved.append(omission)
+    return approved, unresolved
+
+
+def counted_population(population, index, captures, cache, blockers):
+    counted = population["counted"]
+    closed(counted, set(COUNT_UNITS) - {"unpromoted_entries"} | {"promotion_rule", "unpromoted_ids"}, set(), "counted population")
+    for name in set(COUNT_UNITS) - {"unpromoted_entries"}:
+        require(type(counted[name]) is int and counted[name] >= 0, "counted " + name + " must be a nonnegative integer")
+    text(counted["promotion_rule"], "promotion rule")
+    require(counted["promoted_entries"] == len({item["occurrence_id"] for item in population["expected_occurrences"]}), "promoted count differs from physical promoted occurrence census")
+    for name in ("duplicates_removed", "overlap_stars", "overlap_fields", "promoted_entries"):
+        require(counted[name] <= counted["physical_entries"], "counted " + name + " exceeds physical entries")
+    ids = declared_witness(counted["unpromoted_ids"], index, captures, cache, blockers, "unpromoted-list-id-witness")
+    if ids is not None:
+        require(isinstance(ids, list) and all(isinstance(value, str) and value.strip() for value in ids), "unpromoted list ids must be an untyped string array")
+        require(len(ids) == len(set(ids)), "duplicate unpromoted list ids")
+        require(counted["physical_entries"] == counted["promoted_entries"] + len(ids), "physical entries do not reconcile promoted and unpromoted ids")
+    return ids
+
+
+def validate_coverage(coverage, rows, index, captures, cache, profile=None):
+    start_closure = validation_profile(profile)
     closed(coverage, {"schema_version", "status", "expected_keys", "starred_identities", "list_populations", "omissions"},
-           {"source_inventory", "source_inventory_witness", "field_inventory_witness", "star_inventory_witness", "note"}, "coverage")
+           {"source_inventory", "source_inventory_witness", "field_inventory_witness", "star_inventory_witness", "note"}
+           | ({"document_inventory_witness"} if start_closure else set()), "coverage")
     require(type(coverage["schema_version"]) is int and coverage["schema_version"] == 1, "invalid coverage schema version")
     require(coverage["status"] in {"FROZEN", "INCOMPLETE"}, "coverage status must explicitly name frozen or incomplete union")
     require(isinstance(coverage["expected_keys"], list) and isinstance(coverage["omissions"], list), "coverage census/omissions must be arrays")
@@ -735,8 +943,12 @@ def validate_coverage(coverage, rows, index, captures, cache):
         blockers.append({"code": "row-census-mismatch", "missing": len(set(expected) - set(actual)), "unexpected": len(set(actual) - set(expected))})
     if coverage["status"] != "FROZEN":
         blockers.append({"code": "complete-list-union-not-frozen"})
-    if coverage["omissions"]:
-        blockers.append({"code": "declared-omissions", "count": len(coverage["omissions"])})
+    approved_omissions = []
+    unresolved_omissions = coverage["omissions"]
+    if start_closure:
+        approved_omissions, unresolved_omissions = closure_omissions(coverage["omissions"], index)
+    if unresolved_omissions:
+        blockers.append({"code": "declared-omissions", "count": len(unresolved_omissions)})
     inventory = declared_witness(coverage.get("source_inventory_witness"), index, captures, cache, blockers, "frozen-source-inventory-witness")
     field_inventory = declared_witness(coverage.get("field_inventory_witness"), index, captures, cache, blockers, "frozen-field-inventory-witness")
     allowed_fields = set()
@@ -755,6 +967,24 @@ def validate_coverage(coverage, rows, index, captures, cache):
                 blockers.append({"code": "unbound-field-selector", "repository_or_entry": canonical(row["repository_or_entry"]), "slot": row["slot"]})
     elif field_inventory is not None:
         blockers.append({"code": "field-inventory-unfrozen-or-unsupported"})
+    document_count = 0
+    if start_closure and "document_inventory_witness" in coverage:
+        documents = declared_witness(coverage["document_inventory_witness"], index, captures, cache, blockers, "frozen-document-inventory-witness")
+        if isinstance(documents, dict) and documents.get("status") == "FROZEN" and isinstance(documents.get("documents"), list):
+            paths, members = set(), set()
+            document_count = len(documents["documents"])
+            for document in documents["documents"]:
+                closed(document, {"path", "archive_member", "sha256"}, {"source_reference"}, "document inventory item")
+                member_name(document["path"])
+                match_capture(document["archive_member"], document["sha256"], index)
+                paths.add(document["path"])
+                members.add(document["archive_member"])
+                if "source_reference" in document:
+                    text(document["source_reference"], "document source reference")
+            if document_count != 2 or len(paths) != 2 or len(members) != 2:
+                blockers.append({"code": "document-inventory-not-2-or-unretained"})
+        elif documents is not None:
+            blockers.append({"code": "document-inventory-unfrozen-or-unsupported"})
     require(isinstance(coverage["starred_identities"], list), "starred identity census must be an array")
     stars = [canonical(value) for value in coverage["starred_identities"]]
     require(all(value.startswith("https://github.com/") for value in stars) and len(set(stars)) == len(stars), "starred census must contain unique GitHub identities")
@@ -785,16 +1015,21 @@ def validate_coverage(coverage, rows, index, captures, cache):
     require(isinstance(populations, list), "list_populations must be an array")
     if not populations:
         blockers.append({"code": "no-mined-list-population-census"})
-    occurrence_keys, summary = set(), []
+    occurrence_keys, occurrence_mappings, unpromoted_keys, summary = set(), set(), set(), []
+    occurrence_bindings = {}
+    retained_ids = set()
+    counted_lists = counted_census_witnesses = 0
     retained_count = 0
     ref_map = {}
     for row in rows:
         for ref in row.get("source_refs", []):
             if "occurrence_id" in ref:
-                require(ref["occurrence_id"] not in ref_map, "duplicate retained occurrence_id")
-                ref_map[ref["occurrence_id"]] = (decision_key(row), ref)
+                ref_key = (ref["occurrence_id"], decision_key(row)) if start_closure else ref["occurrence_id"]
+                require(ref_key not in ref_map, "duplicate retained occurrence_id" + (" and decision mapping" if start_closure else ""))
+                ref_map[ref_key] = (decision_key(row), ref)
     for population in populations:
-        closed(population, {"source_repository", "pin", "path", "capture_sha256", "archive_member", "parser", "expected_occurrences"}, {"source_witness", "census_witness"}, "list population")
+        closed(population, {"source_repository", "pin", "path", "capture_sha256", "archive_member", "parser", "expected_occurrences"},
+               {"source_witness", "census_witness"} | ({"counted"} if start_closure else set()), "list population")
         canonical(population["source_repository"])
         pin_blockers = []
         validate_pin(population["pin"], "population", pin_blockers)
@@ -809,14 +1044,31 @@ def validate_coverage(coverage, rows, index, captures, cache):
         if source_witness is not None and (not isinstance(source_witness, dict) or any(source_witness.get(name) != population[name] for name in ("source_repository", "pin", "path", "capture_sha256"))):
             blockers.append({"code": "pinned-list-source-witness-mismatch", "population": population["archive_member"]})
         census = declared_witness(population.get("census_witness"), index, captures, cache, blockers, "original-list-census-witness")
-        if census is not None and (not isinstance(census, dict) or census.get("status") != "FROZEN" or census.get("expected_occurrences") != population["expected_occurrences"]):
+        counted = start_closure and "counted" in population
+        if census is not None and (not isinstance(census, dict) or census.get("status") not in ({"FROZEN", "COUNTED"} if counted else {"FROZEN"})
+                                   or census.get("expected_occurrences") != population["expected_occurrences"]
+                                   or counted and census.get("counted") != population["counted"]):
             blockers.append({"code": "original-list-census-unfrozen-or-mismatched", "population": population["archive_member"]})
+        if counted:
+            counted_lists += 1
+            counted_census_witnesses += isinstance(census, dict) and census.get("status") == "COUNTED"
+            ids = counted_population(population, index, captures, cache, blockers)
+            if ids is not None:
+                require(not set(ids) & unpromoted_keys, "duplicate unpromoted occurrence id across populations")
+                unpromoted_keys.update(ids)
         for occurrence in population["expected_occurrences"]:
             closed(occurrence, {"occurrence_id", "repository_or_entry", "slot", "capture_sha256", "archive_member", "pointer"}, {"qualification"}, "list occurrence")
             occurrence_id = text(occurrence["occurrence_id"], "occurrence_id")
-            require(occurrence_id not in occurrence_keys, "duplicate list occurrence census ID")
-            occurrence_keys.add(occurrence_id)
             occurrence_key = decision_key(occurrence)
+            occurrence_mapping = (occurrence_id, occurrence_key)
+            if start_closure:
+                require(occurrence_mapping not in occurrence_mappings, "duplicate promoted occurrence decision mapping")
+            binding = tuple(json.dumps(population[name], sort_keys=True) for name in POPULATION_FACTS) + tuple(occurrence[name] for name in ("archive_member", "capture_sha256", "pointer"))
+            if occurrence_id in occurrence_keys:
+                require(counted and occurrence_bindings[occurrence_id] == binding, "duplicate list occurrence census ID")
+            occurrence_keys.add(occurrence_id)
+            occurrence_mappings.add(occurrence_mapping)
+            occurrence_bindings[occurrence_id] = binding
             match_capture(occurrence["archive_member"], occurrence["capture_sha256"], index)
             text(occurrence["pointer"], "occurrence.pointer")
             original = selected_capture(occurrence["archive_member"], occurrence["pointer"], captures, cache, blockers, occurrence_id)
@@ -832,30 +1084,51 @@ def validate_coverage(coverage, rows, index, captures, cache):
                         blockers.append({"code": "original-list-occurrence-identity-scope-mismatch", "occurrence_id": occurrence_id})
                 else:
                     blockers.append({"code": "original-list-occurrence-scope-unverified", "occurrence_id": occurrence_id})
-            actual_ref = ref_map.get(occurrence_id)
+            actual_ref = ref_map.get(occurrence_mapping if start_closure else occurrence_id)
             if actual_ref is None or actual_ref[0] != occurrence_key or any(actual_ref[1].get(name) != occurrence[source] for name, source in
                     (("sha256", "capture_sha256"), ("archive_member", "archive_member"), ("pointer", "pointer"))):
                 blockers.append({"code": "unretained-list-occurrence", "occurrence_id": occurrence_id})
             else:
                 retained_count += 1
+                retained_ids.add(occurrence_id)
         summary.append({name: population[name] for name in ("source_repository", "pin", "path", "capture_sha256", "archive_member", "parser", "source_witness", "census_witness") if name in population} |
                        {"expected_occurrences": len(population["expected_occurrences"])})
+        if counted:
+            summary[-1]["counted"] = population["counted"] | {"unpromoted_entries": population["counted"]["physical_entries"] - population["counted"]["promoted_entries"]}
+            summary[-1]["promoted_mappings"] = len(population["expected_occurrences"])
+            summary[-1]["expected_occurrences"] = population["counted"]["promoted_entries"]
     def population_fact(value):
         return {name: value[name] for name in ("source_repository", "pin", "path", "capture_sha256", "archive_member", "parser")}
     if inventory is not None:
+        inventory_populations = populations + [omission for omission in approved_omissions if omission["code"] == "missing-list-capture"]
         if (not isinstance(inventory, dict) or inventory.get("status") != "FROZEN" or not isinstance(inventory.get("list_populations"), list)
-                or sorted((population_fact(p) for p in inventory["list_populations"]), key=lambda p: json.dumps(p, sort_keys=True))
-                != sorted((population_fact(p) for p in populations), key=lambda p: json.dumps(p, sort_keys=True))):
+                 or sorted((population_fact(p) for p in inventory["list_populations"]), key=lambda p: json.dumps(p, sort_keys=True))
+                 != sorted((population_fact(p) for p in inventory_populations), key=lambda p: json.dumps(p, sort_keys=True))):
             blockers.append({"code": "source-inventory-unfrozen-or-population-mismatch"})
-    extra = set(ref_map) - occurrence_keys
+    extra = set(ref_map) - (occurrence_mappings if start_closure else occurrence_keys)
     if extra:
         blockers.append({"code": "occurrences-outside-declared-union", "count": len(extra)})
+    require(not occurrence_keys & unpromoted_keys, "an occurrence cannot be both promoted and unpromoted")
     coverage_summary = {"status": coverage["status"], "omissions": coverage["omissions"], "list_populations": summary}
     coverage_summary.update({name: coverage[name] for name in ("source_inventory_witness", "field_inventory_witness", "star_inventory_witness") if name in coverage})
-    return blockers, coverage_summary, {
+    counts = {
         "expected_rows": len(expected), "starred_identities": len(stars), "represented_stars": len(stars) - len(missing_stars),
         "list_populations": len(populations), "expected_occurrences": len(occurrence_keys),
         "retained_occurrences": retained_count}
+    if start_closure:
+        counts["promoted_mappings"] = len(occurrence_mappings)
+        counts["retained_mappings"] = retained_count
+        counts["retained_occurrences"] = len(retained_ids)
+        coverage_summary["count_units"] = COUNT_UNITS | {"promoted_mappings": "distinct physical occurrence id to retained decision key mappings; one physical entry may have several mappings"}
+        if "document_inventory_witness" in coverage:
+            coverage_summary["document_inventory_witness"] = coverage["document_inventory_witness"]
+            counts["documents"] = document_count
+        counts.update({"counted_list_populations": counted_lists, "counted_census_witnesses": counted_census_witnesses,
+                       "unpromoted_list_occurrences": len(unpromoted_keys),
+                       "approved_omissions": len(approved_omissions), "approved_omissions_by_follow_up": dict(sorted(Counter(o["follow_up_id"] for o in approved_omissions).items())),
+                       "missing_list_captures": sum(o["code"] == "missing-list-capture" for o in approved_omissions),
+                       "missing_list_capture_entries": sum(o["count"] for o in approved_omissions if o["code"] == "missing-list-capture")})
+    return blockers, coverage_summary, counts
 
 
 def row_list(raw):
@@ -881,7 +1154,8 @@ def sorted_tree(value):
     return value
 
 
-def build_manifest(asset, release_tag, witnesses=()):
+def build_manifest(asset, release_tag, witnesses=(), profile=None):
+    start_closure = validation_profile(profile)
     require(release_tag == "v2026.10.08", "G5 release tag must be v2026.10.08; this binds a planned release without claiming publication")
     asset = Path(asset)
     asset_sha, index, captured = read_archive(asset)
@@ -892,7 +1166,7 @@ def build_manifest(asset, release_tag, witnesses=()):
     blockers = []
     for row in rows:
         blockers.extend({"code": code, "repository_or_entry": decision_key(row)[0], "slot": row["slot"],
-                         "qualification": qualification(row.get("qualification", {}))} for code in validate_row(row, index))
+                         "qualification": qualification(row.get("qualification", {}))} for code in validate_row(row, index, profile))
     rows = normalized_rows(rows)
     if witnesses:
         witness_rows = [row for witness in witnesses for row in row_list(Path(witness).read_bytes())]
@@ -905,11 +1179,17 @@ def build_manifest(asset, release_tag, witnesses=()):
     wanted |= {ref["archive_member"] for row in rows for choice in row.get("choices", []) for ref in choice["source_refs"] if "archive_member" in ref}
     wanted |= {source["archive_member"] for row in rows for source in row["primary_sources"] if "pointer" in source and "archive_member" in source}
     wanted |= {source["archive_member"] for row in rows if NATIVE_SKILL_REF.fullmatch(row["repository_or_entry"]) for source in row["primary_sources"] if "archive_member" in source}
+    if start_closure:
+        wanted |= {ref["archive_member"] for row in rows for item in row.get("closure", {}).get("disagreements", []) for ref in item["evidence_refs"] if "archive_member" in ref}
     if isinstance(coverage_raw, dict):
         wanted |= {coverage_raw[name]["archive_member"] for name in ("source_inventory_witness", "field_inventory_witness", "star_inventory_witness") if isinstance(coverage_raw.get(name), dict) and "archive_member" in coverage_raw[name]}
+        if start_closure and isinstance(coverage_raw.get("document_inventory_witness"), dict):
+            wanted.add(coverage_raw["document_inventory_witness"]["archive_member"])
         for population in coverage_raw.get("list_populations", []):
             wanted |= {o["archive_member"] for o in population.get("expected_occurrences", [])}
             wanted |= {population[name]["archive_member"] for name in ("source_witness", "census_witness") if isinstance(population.get(name), dict) and "archive_member" in population[name]}
+            if start_closure and isinstance(population.get("counted", {}).get("unpromoted_ids"), dict):
+                wanted.add(population["counted"]["unpromoted_ids"]["archive_member"])
     receipts = {}
     if wanted:
         second_sha, second_index, receipts = read_archive(asset, wanted)
@@ -921,7 +1201,7 @@ def build_manifest(asset, release_tag, witnesses=()):
     for row in rows:
         validate_native_source_entry(row, index, receipts, cache, blockers)
         validate_native_skill_entry(row, index, receipts, cache, blockers)
-    coverage_blockers, coverage, counts = validate_coverage(coverage_raw, rows, index, receipts, cache)
+    coverage_blockers, coverage, counts = validate_coverage(coverage_raw, rows, index, receipts, cache, profile)
     blockers.extend(coverage_blockers)
     counts.update({"rows": len(rows), "identities": len({decision_key(row)[0] for row in rows}),
                    "pending_measurements": sum(row["disposition"] == "PENDING" for row in rows),
@@ -932,9 +1212,11 @@ def build_manifest(asset, release_tag, witnesses=()):
                    "by_slot": dict(sorted(Counter(row["slot"] for row in rows).items())),
                    "by_qualification": dict(sorted(Counter(decision_key(row)[2] for row in rows).items())),
                    "by_owner_lane": dict(sorted(Counter(row["owner_lane"] for row in rows).items()))})
+    row_schema = START_ROW_SCHEMA if start_closure else SCHEMA
+    coverage_schema = START_COVERAGE_SCHEMA if start_closure else COVERAGE_SCHEMA
     manifest = {"schema_version": 1, "kind": "g5-compact-landscape", "release_tag": release_tag,
-                "row_schema": {"path": "tools/sota-convergence/schemas/compact-decision.json", "sha256": hashlib.sha256(SCHEMA.read_bytes()).hexdigest()},
-                "coverage_schema": {"path": "tools/sota-convergence/schemas/compact-coverage.json", "sha256": hashlib.sha256(COVERAGE_SCHEMA.read_bytes()).hexdigest()},
+                "row_schema": {"path": str(row_schema.relative_to(REPO)), "sha256": hashlib.sha256(row_schema.read_bytes()).hexdigest()},
+                "coverage_schema": {"path": str(coverage_schema.relative_to(REPO)), "sha256": hashlib.sha256(coverage_schema.read_bytes()).hexdigest()},
                 "asset": {"name": asset.name, "format": "tar.zst", "sha256": asset_sha, "bytes": asset.stat().st_size,
                           "rows_member": ROWS_MEMBER, "rows_sha256": index[ROWS_MEMBER]["sha256"],
                           "coverage_member": COVERAGE_MEMBER, "coverage_sha256": index[COVERAGE_MEMBER]["sha256"]},
@@ -942,6 +1224,41 @@ def build_manifest(asset, release_tag, witnesses=()):
                 "validation": {"status": "BLOCKED" if blockers else "PASS", "blockers": blockers,
                                "contract": "Byte integrity and declared census consistency only; parser names are provenance, not executed coverage research. Recorded execution receipts remain historical; no vendor/native test or install runs here. Open measured-case proposals remain open, not missing coverage."},
                 "rows": rows}
+    if start_closure:
+        disagreements = [item | {"repository_or_entry": row["repository_or_entry"], "slot": row["slot"]}
+                         for row in rows for item in row.get("closure", {}).get("disagreements", [])]
+        require(len({item["id"] for item in disagreements}) == len(disagreements), "duplicate declared disagreement id")
+        for row in rows:
+            for item in row.get("closure", {}).get("disagreements", []):
+                for ref in item["evidence_refs"]:
+                    if "archive_member" in ref:
+                        selected_capture(ref["archive_member"], ref["pointer"], receipts, cache, blockers, item["id"])
+        residue_counts = {}
+        for name in ("pending_pin", "pending_locator"):
+            residue_counts[name + "_rows"] = sum(name in row.get("closure", {}) for row in rows)
+            residue_counts[name + "_by_reason"] = dict(sorted(Counter(row["closure"][name]["reason_code"] for row in rows if name in row.get("closure", {})).items()))
+        pin_items = Counter()
+        for row in rows:
+            if "pending_pin" in row.get("closure", {}):
+                pin_items[row["closure"]["pending_pin"]["reason_code"]] += (row["pin"] is None) + sum(source["pin"] is None for source in row["primary_sources"])
+        residue_counts["pending_pin_items_by_reason"] = dict(sorted(pin_items.items()))
+        residue_counts["pending_pin_items"] = sum(pin_items.values())
+        locator_items = Counter()
+        for row in rows:
+            if "pending_locator" in row.get("closure", {}):
+                for i, source in enumerate(row["primary_sources"]):
+                    if closure_locator(source, f"primary[{i}].locator", row["closure"], []):
+                        locator_items[row["closure"]["pending_locator"]["reason_code"]] += 1
+        residue_counts["pending_locator_items_by_reason"] = dict(sorted(locator_items.items()))
+        residue_counts["pending_locator_items"] = sum(locator_items.values())
+        residue_counts.update({name: counts[name] for name in ("counted_list_populations", "counted_census_witnesses", "unpromoted_list_occurrences", "approved_omissions", "approved_omissions_by_follow_up", "missing_list_captures", "missing_list_capture_entries")})
+        residue_counts["pending_disagreements"] = sum(item["status"] == "PENDING" for item in disagreements)
+        counts.update({"action_rows": sum(row["disposition"] in ACTION_CLASSES for row in rows),
+                       "pinned_rows": sum(row["pin"] is not None for row in rows),
+                       "pending_pin": residue_counts["pending_pin_rows"], "pending_locator": residue_counts["pending_locator_rows"],
+                       "disagreements_resolved": sum(item["status"] == "RESOLVED" for item in disagreements), "disagreements_total": len(disagreements)})
+        manifest["validation"].update({"profile": START_CLOSURE_PROFILE, "nonblocking_counts": residue_counts, "disagreements": disagreements,
+                                       "status": "BLOCKED" if blockers else "PASS"})
     raw = json_text(sorted_tree(manifest), indent=2).encode("utf-8")
     require(len(raw) < MANIFEST_LIMIT, "compact manifest must remain below GitHub's 100 MiB regular-file limit")
     return manifest, raw
@@ -952,6 +1269,8 @@ def main(argv=None):
     parser.add_argument("--rows", action="append", type=Path, default=[], help="optional equality witness; never used instead of asset-contained rows")
     parser.add_argument("--asset", required=True, type=Path)
     parser.add_argument("--release-tag", default="v2026.10.08")
+    parser.add_argument("--profile", choices=[START_CLOSURE_PROFILE], default=None,
+                        help="explicit versioned START closure contract; omission keeps the strict default unchanged")
     parser.add_argument("--manifest", required=True, type=Path)
     mode = parser.add_mutually_exclusive_group(required=True)
     mode.add_argument("--write", action="store_true", help="atomically write rebuilt metadata, including explicit blocked/incomplete state")
@@ -960,7 +1279,7 @@ def main(argv=None):
     try:
         require(not args.manifest.is_symlink(), "manifest output must not be a symlink")
         require(args.manifest.resolve() != args.asset.resolve() and args.manifest.resolve() not in {p.resolve() for p in args.rows}, "manifest output overlaps immutable inputs")
-        manifest, raw = build_manifest(args.asset, args.release_tag, args.rows)
+        manifest, raw = build_manifest(args.asset, args.release_tag, args.rows, args.profile)
         if args.write:
             args.manifest.parent.mkdir(parents=True, exist_ok=True)
             temporary = None

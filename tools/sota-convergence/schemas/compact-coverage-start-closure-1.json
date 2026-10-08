@@ -1,0 +1,407 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/tools/sota-convergence/schemas/compact-coverage-start-closure-1.json",
+  "title": "G5 counted inventory under explicit start-closure/1 profile",
+  "description": "Asset member compact/coverage.json. Subset exports retain INCOMPLETE and explicit omissions. The assembler's final census must exactly match all canonical decision keys, disposition all 368 stars and bind every relevant physical mined-list occurrence. Parser names are provenance; this validator never executes them or proves search completeness from a declared census alone.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "status",
+    "expected_keys",
+    "starred_identities",
+    "list_populations",
+    "omissions"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "status": {
+      "enum": [
+        "FROZEN",
+        "INCOMPLETE"
+      ]
+    },
+    "expected_keys": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/key"
+      }
+    },
+    "starred_identities": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "list_populations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/population"
+      }
+    },
+    "omissions": {
+      "type": "array",
+      "description": "An explicitly CC-dispositioned G5-F1/F2 omission is visible and nonblocking only under start-closure/1. Undispositioned omissions still block.",
+      "items": {
+        "anyOf": [
+          {
+            "type": "string",
+            "minLength": 1
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "code",
+              "count",
+              "cc_disposition_id",
+              "follow_up_id",
+              "resolution"
+            ],
+            "properties": {
+              "code": {
+                "enum": [
+                  "complete-typed-list-populations-not-frozen",
+                  "source-primary-qualification-unresolved",
+                  "missing-list-capture"
+                ]
+              },
+              "count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "cc_disposition_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "follow_up_id": {
+                "enum": [
+                  "G5-F1",
+                  "G5-F2"
+                ]
+              },
+              "resolution": {
+                "type": "string",
+                "minLength": 1
+              },
+              "source_repository": {
+                "type": "string",
+                "minLength": 1
+              },
+              "pin": {
+                "anyOf": [
+                  {
+                    "$ref": "compact-decision-start-closure-1.json#/$defs/pin"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "path": {
+                "type": "string",
+                "minLength": 1
+              },
+              "capture_sha256": {
+                "$ref": "compact-decision-start-closure-1.json#/$defs/sha256"
+              },
+              "archive_member": {
+                "$ref": "compact-decision-start-closure-1.json#/$defs/member"
+              },
+              "parser": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "code": {
+                      "const": "missing-list-capture"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "source_repository",
+                    "pin",
+                    "path",
+                    "capture_sha256",
+                    "archive_member",
+                    "parser"
+                  ],
+                  "properties": {
+                    "follow_up_id": {
+                      "const": "G5-F1"
+                    },
+                    "pin": {
+                      "$ref": "compact-decision-start-closure-1.json#/$defs/pin"
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "code": {
+                      "const": "complete-typed-list-populations-not-frozen"
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "follow_up_id": {
+                      "const": "G5-F1"
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "code": {
+                      "const": "source-primary-qualification-unresolved"
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "follow_up_id": {
+                      "const": "G5-F2"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "source_inventory": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "minProperties": 1
+      }
+    },
+    "source_inventory_witness": {
+      "$ref": "compact-decision-start-closure-1.json#/properties/acceptance_witness"
+    },
+    "field_inventory_witness": {
+      "$ref": "compact-decision-start-closure-1.json#/properties/acceptance_witness"
+    },
+    "star_inventory_witness": {
+      "$ref": "compact-decision-start-closure-1.json#/properties/acceptance_witness"
+    },
+    "note": {
+      "type": "string",
+      "minLength": 1
+    },
+    "document_inventory_witness": {
+      "$ref": "compact-decision-start-closure-1.json#/properties/acceptance_witness"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "FROZEN"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "starred_identities": {
+            "minItems": 368,
+            "maxItems": 368
+          },
+          "expected_keys": {
+            "minItems": 368
+          },
+          "list_populations": {
+            "minItems": 1
+          },
+          "omissions": {
+            "maxItems": 0
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "key": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repository_or_entry",
+        "slot"
+      ],
+      "properties": {
+        "repository_or_entry": {
+          "type": "string",
+          "minLength": 1
+        },
+        "slot": {
+          "$ref": "compact-decision-start-closure-1.json#/properties/slot"
+        },
+        "qualification": {
+          "$ref": "compact-decision-start-closure-1.json#/properties/qualification"
+        }
+      }
+    },
+    "population": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_repository",
+        "pin",
+        "path",
+        "capture_sha256",
+        "archive_member",
+        "parser",
+        "expected_occurrences"
+      ],
+      "properties": {
+        "source_repository": {
+          "type": "string",
+          "minLength": 1
+        },
+        "pin": {
+          "anyOf": [
+            {
+              "$ref": "compact-decision-start-closure-1.json#/$defs/pin"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "capture_sha256": {
+          "$ref": "compact-decision-start-closure-1.json#/$defs/sha256"
+        },
+        "archive_member": {
+          "$ref": "compact-decision-start-closure-1.json#/$defs/member"
+        },
+        "parser": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expected_occurrences": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/occurrence"
+          }
+        },
+        "source_witness": {
+          "$ref": "compact-decision-start-closure-1.json#/properties/acceptance_witness"
+        },
+        "census_witness": {
+          "$ref": "compact-decision-start-closure-1.json#/properties/acceptance_witness"
+        },
+        "counted": {
+          "$ref": "#/$defs/counted"
+        }
+      }
+    },
+    "occurrence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "occurrence_id",
+        "repository_or_entry",
+        "slot",
+        "capture_sha256",
+        "archive_member",
+        "pointer"
+      ],
+      "properties": {
+        "occurrence_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "repository_or_entry": {
+          "type": "string",
+          "minLength": 1
+        },
+        "slot": {
+          "$ref": "compact-decision-start-closure-1.json#/properties/slot"
+        },
+        "qualification": {
+          "$ref": "compact-decision-start-closure-1.json#/properties/qualification"
+        },
+        "capture_sha256": {
+          "$ref": "compact-decision-start-closure-1.json#/$defs/sha256"
+        },
+        "archive_member": {
+          "$ref": "compact-decision-start-closure-1.json#/$defs/member"
+        },
+        "pointer": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "counted": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "physical_entries",
+        "typed_source_ids",
+        "groups",
+        "duplicates_removed",
+        "overlap_stars",
+        "overlap_fields",
+        "promoted_entries",
+        "promotion_rule",
+        "unpromoted_ids"
+      ],
+      "properties": {
+        "physical_entries": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "typed_source_ids": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "groups": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "duplicates_removed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "overlap_stars": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "overlap_fields": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "promoted_entries": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "promotion_rule": {
+          "type": "string",
+          "minLength": 1
+        },
+        "unpromoted_ids": {
+          "$ref": "compact-decision-start-closure-1.json#/properties/acceptance_witness"
+        }
+      }
+    }
+  }
+}

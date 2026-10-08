@@ -100,6 +100,267 @@ class CompactManifestTests(unittest.TestCase):
     def build(self):
         return compact.build_manifest(self.archive(), "v2026.10.08")
 
+    def closure_build(self):
+        return compact.build_manifest(self.archive(), "v2026.10.08", profile=compact.START_CLOSURE_PROFILE)
+
+    def closure_pending(self, *, pin_residue=False, locator_residue=False):
+        row = self.rows[0]
+        row["disposition"] = "PENDING"
+        row["pending"] = {"provisional_disposition": "WATCH", "measurement": "verify retained primary bytes and exact upstream pin", "owner": "synthetic-controls"}
+        row["closure"] = {}
+        if pin_residue:
+            row["pin"] = None
+            row["primary_sources"][0]["pin"] = None
+            row["closure"]["pending_pin"] = {"reason_code": "no-body", "measurement": "capture upstream repository file and locate its blob in a commit tree"}
+        if locator_residue:
+            row["primary_sources"][0]["locator"] = "UNKNOWN"
+            row["closure"]["pending_locator"] = {"reason_code": "unsupported-transport", "measurement": "establish the source repository file locator from primary evidence"}
+
+    def closure_counted(self):
+        population = self.coverage["list_populations"][0]
+        population["expected_occurrences"].pop()
+        self.rows[0]["source_refs"].pop()
+        population["counted"] = {"physical_entries": 3, "typed_source_ids": 3, "groups": 2, "duplicates_removed": 1,
+                                 "overlap_stars": 1, "overlap_fields": 0, "promoted_entries": 1,
+                                 "promotion_rule": "promote a claimed retained decision row; count all other physical entries",
+                                 "unpromoted_ids": self.witness("unpromoted-list-ids", ["awesome:entry:1", "awesome:entry:2"])}
+        population["census_witness"] = self.witness("counted-list-census", {"status": "COUNTED", "expected_occurrences": deepcopy(population["expected_occurrences"]), "counted": deepcopy(population["counted"])})
+
+    def closure_omission(self, code="source-primary-qualification-unresolved"):
+        omission = {"code": code, "count": 1, "cc_disposition_id": "CC-item-212958Z",
+                    "follow_up_id": compact.OMISSION_FOLLOW_UPS[code], "resolution": "retain the measured residue in the declared follow-up"}
+        self.coverage["omissions"].append(omission)
+        return omission
+
+    def closure_missing_list(self):
+        omission = self.closure_omission("missing-list-capture")
+        omission.update({"source_repository": "example/missing-list", "pin": pin("example/missing-list", "c" * 40, "source-entry"),
+                         "path": "README.md", "capture_sha256": "d" * 64, "archive_member": "captures/missing-list.md", "parser": "measured-source-list-v1", "count": 7})
+        inventory = json.loads(self.files[self.coverage["source_inventory_witness"]["archive_member"]])
+        inventory["list_populations"].append({name: omission[name] for name in compact.POPULATION_FACTS})
+        self.coverage["source_inventory_witness"] = self.witness("source-inventory", inventory)
+
+    def closure_disagreement(self):
+        self.closure_pending()
+        row = self.rows[0]
+        source = row["primary_sources"][0]
+        source["locator"] = f"https://github.com/example/wrong-repository/blob/{source['pin']['version_or_commit']}/README.md"
+        row["closure"]["pending_locator"] = {"reason_code": "source-disagreement", "measurement": "capture the original repository README and settle which recorded source identity is correct"}
+        row["closure"]["disagreements"] = [{"id": "locator-source-1", "kind": "source-repository", "status": "PENDING",
+                                                 "recorded_locator": source["locator"], "recorded_repository": source["pin"]["repository_or_source"],
+                                                 "recorded_pin": deepcopy(source["pin"]), "resolution": "retain unresolved original claims",
+                                                 "explanation": "the captured locator and declared repository disagree", "measurement": "verify the original primary README",
+                                                 "evidence_refs": []}]
+
+    def closure_relaxation(self, rule):
+        if rule == "pending-pin":
+            self.closure_pending(pin_residue=True)
+        elif rule == "pending-locator":
+            self.closure_pending(locator_residue=True)
+        elif rule == "counted-inventory":
+            self.closure_counted()
+        elif rule == "typed-list-omission":
+            self.closure_omission("complete-typed-list-populations-not-frozen")
+        elif rule == "source-qualification-omission":
+            self.closure_omission()
+        elif rule == "missing-list-capture":
+            self.closure_missing_list()
+        elif rule == "pending-disagreement":
+            self.closure_disagreement()
+        else:
+            self.fail("unknown relaxation fixture")
+
+    def test_closure_each_relaxed_rule_still_fails_the_strict_default(self):
+        original = deepcopy((self.rows, self.files, self.coverage))
+        for rule in ("pending-pin", "pending-locator", "counted-inventory", "typed-list-omission", "source-qualification-omission", "missing-list-capture", "pending-disagreement"):
+            with self.subTest(rule=rule):
+                self.rows, self.files, self.coverage = deepcopy(original)
+                self.closure_relaxation(rule)
+                asset = self.archive()
+                try:
+                    default, _ = compact.build_manifest(asset, "v2026.10.08")
+                except compact.CompactError:
+                    pass
+                else:
+                    self.assertEqual(default["validation"]["status"], "BLOCKED")
+                closure, _ = compact.build_manifest(asset, "v2026.10.08", profile=compact.START_CLOSURE_PROFILE)
+                self.assertEqual(closure["validation"]["status"], "PASS", closure["validation"]["blockers"])
+                self.assertEqual(closure["validation"]["profile"], "start-closure/1")
+
+    def test_closure_each_relaxation_keeps_action_hash_locator_and_omission_guards(self):
+        original = deepcopy((self.rows, self.files, self.coverage))
+        for rule in ("pending-pin", "pending-locator", "counted-inventory", "typed-list-omission", "source-qualification-omission", "missing-list-capture", "pending-disagreement"):
+            for defect in ("null-action-row-pin", "null-action-primary-pin", "capture-hash", "unsafe-locator", "undispositioned-omission"):
+                with self.subTest(rule=rule, defect=defect):
+                    self.rows, self.files, self.coverage = deepcopy(original)
+                    self.closure_relaxation(rule)
+                    target = self.rows[2]
+                    if defect.startswith("null-action"):
+                        target["disposition"] = "TRIAL"
+                        if defect == "null-action-row-pin":
+                            target["pin"] = None
+                        else:
+                            target["primary_sources"][0]["pin"] = None
+                    elif defect == "capture-hash":
+                        target["capture_sha256"] = "e" * 64
+                    elif defect == "unsafe-locator":
+                        target["primary_sources"][0]["locator"] = "file:/tmp/unsafe-primary"
+                    else:
+                        self.closure_omission()["cc_disposition_id"] = ""
+                    try:
+                        manifest, _ = self.closure_build()
+                    except compact.CompactError:
+                        pass
+                    else:
+                        self.assertEqual(manifest["validation"]["status"], "BLOCKED")
+
+    def test_closure_both_pending_flags_remain_independent_and_require_measurements(self):
+        self.closure_pending(pin_residue=True, locator_residue=True)
+        manifest, _ = self.closure_build()
+        self.assertEqual(manifest["validation"]["status"], "PASS")
+        self.assertEqual(manifest["counts"]["pending_pin"], 1)
+        self.assertEqual(manifest["counts"]["pending_locator"], 1)
+        face = manifest["validation"]["nonblocking_counts"]
+        self.assertEqual(face["pending_pin_by_reason"], {"no-body": 1})
+        self.assertEqual(face["pending_pin_items_by_reason"], {"no-body": 2})
+        self.assertEqual(face["pending_locator_items_by_reason"], {"unsupported-transport": 1})
+        self.assertEqual(face["pending_locator_by_reason"], {"unsupported-transport": 1})
+        for flag in ("pending_pin", "pending_locator"):
+            with self.subTest(flag=flag):
+                saved = self.rows[0]["closure"][flag].pop("measurement")
+                with self.assertRaises(compact.CompactError):
+                    self.closure_build()
+                self.rows[0]["closure"][flag]["measurement"] = saved
+
+    def test_closure_pending_residue_cannot_be_relabelled_as_an_action(self):
+        for flag in ("pending_pin", "pending_locator"):
+            with self.subTest(flag=flag):
+                self.closure_pending(pin_residue=flag == "pending_pin", locator_residue=flag == "pending_locator")
+                self.rows[0]["disposition"] = "TRIAL"
+                self.rows[0].pop("pending")
+                with self.assertRaises(compact.CompactError):
+                    self.closure_build()
+
+    def test_closure_missing_residue_declaration_and_unsafe_null_pin_locator_still_block(self):
+        self.closure_pending(pin_residue=True)
+        self.rows[0].pop("closure")
+        manifest, _ = self.closure_build()
+        self.assertEqual(manifest["validation"]["status"], "BLOCKED")
+        self.rows[0]["closure"] = {"pending_pin": {"reason_code": "no-body", "measurement": "capture exact source file"}}
+        for locator in ("https://user:secret@github.com/example/repo/blob/" + "a" * 40 + "/README.md", "https://github.com/example/repo/blob/main/README.md", "/tmp/primary", "github://example/repo",
+                        "example/project-0@" + "a" * 40 + ":../../unsafe", "javascript:bad@" + "a" * 40 + ":README.md"):
+            with self.subTest(locator=locator):
+                self.rows[0]["primary_sources"][0]["locator"] = locator
+                with self.assertRaises(compact.CompactError):
+                    self.closure_build()
+
+    def test_closure_counted_inventory_keeps_promoted_bijection_and_hash_bound_untyped_ids(self):
+        self.closure_counted()
+        manifest, _ = self.closure_build()
+        self.assertEqual(manifest["counts"]["retained_occurrences"], 1)
+        self.assertEqual(manifest["counts"]["unpromoted_list_occurrences"], 2)
+        self.rows[0]["source_refs"].clear()
+        manifest, _ = self.closure_build()
+        self.assertTrue(any(item["code"] == "unretained-list-occurrence" for item in manifest["validation"]["blockers"]))
+        population = self.coverage["list_populations"][0]
+        population["counted"]["unpromoted_ids"]["sha256"] = "e" * 64
+        with self.assertRaises(compact.CompactError):
+            self.closure_build()
+
+    def test_closure_counted_id_overlap_and_census_drift_fail(self):
+        self.closure_counted()
+        population = self.coverage["list_populations"][0]
+        population["counted"]["unpromoted_ids"] = self.witness("unpromoted-list-ids", ["awesome:entry:0", "awesome:entry:2"])
+        population["census_witness"] = self.witness("counted-list-census", {"status": "COUNTED", "expected_occurrences": deepcopy(population["expected_occurrences"]), "counted": deepcopy(population["counted"])})
+        with self.assertRaises(compact.CompactError):
+            self.closure_build()
+        population["counted"]["unpromoted_ids"] = self.witness("unpromoted-list-ids", ["awesome:entry:1", "awesome:entry:2"])
+        manifest, _ = self.closure_build()
+        self.assertTrue(any(item["code"] == "original-list-census-unfrozen-or-mismatched" for item in manifest["validation"]["blockers"]))
+
+    def test_closure_counted_physical_entry_can_have_multiple_exact_retained_mappings(self):
+        row = self.native_entry()
+        member = row["source_entry_witness"]["archive_member"]
+        occurrence = {"occurrence_id": "example/awesome:README.md:2", "repository_or_entry": row["repository_or_entry"], "slot": row["slot"],
+                      "archive_member": member, "capture_sha256": digest(self.files[member]), "pointer": "line:2"}
+        ref = {"occurrence_id": occurrence["occurrence_id"], "archive_member": member, "sha256": occurrence["capture_sha256"], "pointer": "line:2"}
+        row["source_refs"] = [ref]
+        second = deepcopy(row)
+        second["qualification"] = {"role": "worker"}
+        self.rows.append(second)
+        self.coverage["expected_keys"].append(self.row_key(second))
+        population = self.coverage["list_populations"][0]
+        population.update(archive_member=row["archive_member"], capture_sha256=row["capture_sha256"],
+                          expected_occurrences=[occurrence, occurrence | {"qualification": second["qualification"]}])
+        population["counted"] = {"physical_entries": 2, "typed_source_ids": 1, "groups": 1, "duplicates_removed": 0, "overlap_stars": 1, "overlap_fields": 0,
+                                 "promoted_entries": 1, "promotion_rule": "retain both literal roles for the same physical entry",
+                                 "unpromoted_ids": self.witness("unpromoted-list-ids", ["example/awesome:README.md:3"])}
+        self.add_authority_witnesses()
+        population["census_witness"] = self.witness("counted-list-census", {"status": "COUNTED", "expected_occurrences": deepcopy(population["expected_occurrences"]), "counted": deepcopy(population["counted"])})
+        with self.assertRaisesRegex(compact.CompactError, "duplicate retained occurrence_id"):
+            self.build()
+        manifest, _ = self.closure_build()
+        self.assertEqual(manifest["validation"]["status"], "PASS", manifest["validation"]["blockers"])
+        self.assertEqual(manifest["counts"]["expected_occurrences"], 1)
+        self.assertEqual(manifest["counts"]["retained_occurrences"], 1)
+        self.assertEqual(manifest["counts"]["promoted_mappings"], 2)
+        self.assertEqual(manifest["counts"]["retained_mappings"], 2)
+        second["source_refs"][0]["pointer"] = "line:1"
+        manifest, _ = self.closure_build()
+        self.assertTrue(any(item["code"] == "unretained-list-occurrence" for item in manifest["validation"]["blockers"]))
+
+    def test_closure_omission_followup_and_missing_source_reference_are_not_guessed(self):
+        omission = self.closure_omission()
+        omission["follow_up_id"] = "G5-F1"
+        manifest, _ = self.closure_build()
+        self.assertEqual(manifest["validation"]["status"], "BLOCKED")
+        self.coverage["omissions"].clear()
+        self.closure_missing_list()
+        omission = self.coverage["omissions"][0]
+        omission.pop("source_repository")
+        with self.assertRaises(compact.CompactError):
+            self.closure_build()
+
+    def test_closure_disagreements_are_visible_and_unrelated_notes_do_not_waive_detection(self):
+        self.closure_disagreement()
+        manifest, _ = self.closure_build()
+        self.assertEqual(manifest["validation"]["nonblocking_counts"]["pending_disagreements"], 1)
+        self.assertEqual(manifest["validation"]["disagreements"][0]["recorded_repository"], "example/project-0")
+        self.rows[0]["closure"]["disagreements"][0]["recorded_locator"] += "?different=1"
+        with self.assertRaises(compact.CompactError):
+            self.closure_build()
+
+    def test_closure_cli_requires_explicit_profile_and_profile_schemas_preserve_default_hashes(self):
+        self.closure_pending(pin_residue=True)
+        asset = self.archive()
+        manifest_path = self.directory / "profile-manifest.json"
+        args = ["--asset", str(asset), "--manifest", str(manifest_path), "--profile", "start-closure/1"]
+        with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
+            self.assertEqual(compact.main([*args, "--write"]), 0)
+            self.assertEqual(compact.main([*args, "--check"]), 0)
+            self.assertEqual(compact.main(["--asset", str(asset), "--manifest", str(manifest_path), "--check"]), 2)
+        result = json.loads(manifest_path.read_bytes())
+        self.assertTrue(result["row_schema"]["path"].endswith("compact-decision-start-closure-1.json"))
+        self.assertTrue(result["coverage_schema"]["path"].endswith("compact-coverage-start-closure-1.json"))
+        self.assertEqual(digest(compact.SCHEMA.read_bytes())[:8], "716f69bb")
+        self.assertEqual(digest(compact.COVERAGE_SCHEMA.read_bytes())[:8], "ca1be75e")
+
+    def test_closure_document_inventory_counts_two_hash_bound_artifacts(self):
+        docs = []
+        for name in ("architecture-index", "refresh-procedure"):
+            member = "documents/" + name + ".md"
+            self.files[member] = ("# synthetic " + name + "\n").encode()
+            docs.append({"path": "docs/g5-" + name + ".md", "archive_member": member, "sha256": digest(self.files[member])})
+        self.coverage["document_inventory_witness"] = self.witness("document-inventory", {"status": "FROZEN", "documents": docs})
+        manifest, _ = self.closure_build()
+        self.assertEqual(manifest["counts"]["documents"], 2)
+        with self.assertRaises(compact.CompactError):
+            self.build()
+        docs[0]["sha256"] = "e" * 64
+        self.coverage["document_inventory_witness"] = self.witness("document-inventory", {"status": "FROZEN", "documents": docs})
+        with self.assertRaises(compact.CompactError):
+            self.closure_build()
+
     def assertBlocked(self, code):
         manifest, _ = self.build()
         self.assertEqual(manifest["validation"]["status"], "BLOCKED")
