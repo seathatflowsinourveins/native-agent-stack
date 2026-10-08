@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "evidence_class": "local_integration",
+  "kind": "publication_source_repair",
+  "recorded_at_utc": "2026-10-08T16:25:51Z",
+  "prior_public_head": "cc3d7461c2eaf22edd9d002a61e6028db3a6313b",
+  "review_url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/873#discussion_r4221431671",
+  "defect": "Approved original/intermediate environments could retain obsolete DVC/dvc-data/diskcache under --inexact while the final completion marker was written.",
+  "repair": "Future uv0.12.17 sync uses its supported default exact behavior: --locked --group dev, without --inexact. Existing migration metadata guards remain unchanged.",
+  "upstream": {
+    "source": "https://github.com/astral-sh/uv/blob/0.12.17/docs/concepts/projects/sync.md#L92-L100",
+    "raw_document_sha256": "5c6a534a81111800ff37455f8c547bbb67f304b9d0cb02543c7185266dbef218",
+    "observed_at_utc": "2026-10-08T16:26:58Z",
+    "quoted_contract": "`uv sync` performs \"exact\" syncing by default, which means it will remove any packages that are not present in the lockfile.",
+    "installed_help": "uv0.12.17 sync --help: --inexact / Do not remove extraneous packages present in the environment"
+  },
+  "source_inputs": [
+    {
+      "path": "blueprints/us-equities/runtime-2604/README.md",
+      "bytes": 33592,
+      "sha256": "7c70a2dd47d0d28f61f3aec6115b3ef28c69fcbe4e2b62f141f8133eaba274c2"
+    },
+    {
+      "path": "blueprints/us-equities/runtime-2604/install-trading-2604.sh",
+      "bytes": 20381,
+      "sha256": "dbe61ddab078356a24430cf7b5ef91643a88506fbb6748c888bb3665f2900ee9"
+    },
+    {
+      "path": "blueprints/us-equities/runtime-2604/sync-trading-2604.sh",
+      "bytes": 1000,
+      "sha256": "fd150296759b07d037b1dfd65048aaf49a84306dc0488df90ec4a08da481f7f1"
+    },
+    {
+      "path": "tests/test_trading_2604_lock.py",
+      "bytes": 10502,
+      "sha256": "43ec520d08fb78e6a6dae5df82ea251ca8d9c44dec51f02ef54e7e2d30a22a3f"
+    }
+  ],
+  "unchanged": {
+    "lock_sha256": "f451ef979cdb1ae3686a30df1c883c257402b32753478c1f9c686c057e9c3989",
+    "manifest_sha256": "aa370e42e29dc2419e586358254ff2e821df48a693aa9a3ee16b65d30036ee0b",
+    "imported_native_verification_sha256": "1128a5697d40ad8e2573d2d37c3a9d343a151f74b4ba7d85144729a1c23f947b",
+    "historical_native_receipt_sha256": "95cb1caebc07e725fa46c6408ae31ea0e4806b14ec75416ab999b18df143e56b",
+    "historical_vector": "--locked --group dev --inexact",
+    "approved_legacy_metadata_guards_preserved": true
+  },
+  "checks": [
+    {
+      "name": "focused_source_contract_tests",
+      "argv": [
+        "nice",
+        "-n",
+        "10",
+        "ionice",
+        "-c2",
+        "-n7",
+        "python3",
+        "-m",
+        "unittest",
+        "tests.test_trading_2604_lock",
+        "-v"
+      ],
+      "exit_code": 0,
+      "tests_run": 13,
+      "evidence_class": "local_integration",
+      "output": "test_checked_in_lock_contract (tests.test_trading_2604_lock.Trading2604LockTests.test_checked_in_lock_contract) ... ok\ntest_package_without_any_wheel_fails (tests.test_trading_2604_lock.Trading2604LockTests.test_package_without_any_wheel_fails) ... ok\ntest_project_installer_and_acceptance_pins_agree (tests.test_trading_2604_lock.Trading2604LockTests.test_project_installer_and_acceptance_pins_agree) ... ok\ntest_reintroduced_diskcache_fails (tests.test_trading_2604_lock.Trading2604LockTests.test_reintroduced_diskcache_fails) ... ok\ntest_stale_manifest_constraint_fails (tests.test_trading_2604_lock.Trading2604LockTests.test_stale_manifest_constraint_fails) ... ok\ntest_unused_build_constraint_fails (tests.test_trading_2604_lock.Trading2604LockTests.test_unused_build_constraint_fails) ... ok\ntest_bundle_hashes_and_final_completion_marker_agree (tests.test_trading_2604_lock.Trading2604SyncVectorTests.test_bundle_hashes_and_final_completion_marker_agree) ... ok\ntest_changed_shared_file_without_hash_refresh_fails (tests.test_trading_2604_lock.Trading2604SyncVectorTests.test_changed_shared_file_without_hash_refresh_fails) ... ok\ntest_each_failure_stops_before_next_step (tests.test_trading_2604_lock.Trading2604SyncVectorTests.test_each_failure_stops_before_next_step) ... ok\ntest_inexact_legacy_migration_fails_even_with_refreshed_hash (tests.test_trading_2604_lock.Trading2604SyncVectorTests.test_inexact_legacy_migration_fails_even_with_refreshed_hash) ... ok\ntest_installer_and_ci_source_have_byte_identical_argv (tests.test_trading_2604_lock.Trading2604SyncVectorTests.test_installer_and_ci_source_have_byte_identical_argv) ... ok\ntest_installer_one_byte_change_fails (tests.test_trading_2604_lock.Trading2604SyncVectorTests.test_installer_one_byte_change_fails) ... ok\ntest_retyped_installer_step_fails (tests.test_trading_2604_lock.Trading2604SyncVectorTests.test_retyped_installer_step_fails) ... ok\n\n----------------------------------------------------------------------\nRan 13 tests in 0.266s\n\nOK\n",
+      "output_scope": "Actual tool-returned test text; not a raw subprocess stdout/stderr hash."
+    },
+    {
+      "name": "owned_source_bash_syntax_sync",
+      "argv": [
+        "bash",
+        "-n",
+        "blueprints/us-equities/runtime-2604/sync-trading-2604.sh"
+      ],
+      "exit_code": 0,
+      "reported_at_utc": "2026-10-08T16:34:29Z",
+      "stdout": "",
+      "source": "parent native returned check"
+    },
+    {
+      "name": "owned_source_bash_syntax_install",
+      "argv": [
+        "bash",
+        "-n",
+        "blueprints/us-equities/runtime-2604/install-trading-2604.sh"
+      ],
+      "exit_code": 0,
+      "reported_at_utc": "2026-10-08T16:34:29Z",
+      "stdout": "",
+      "source": "parent native returned check"
+    },
+    {
+      "name": "owned_source_diff_check",
+      "exit_code": 0,
+      "reported_at_utc": "2026-10-08T16:25:35Z",
+      "source": "owned source worker result"
+    }
+  ],
+  "corrections": [
+    {
+      "finding": "The initial syntax-check argv representation paired two script paths after bash -n, which parses only the first file; it could not substantiate two separate checks.",
+      "resolution": "Recorded distinct native bash -n calls for sync and installer, both rc0 with empty output at16:34:29Z. Source, imported native verification and test results are unchanged.",
+      "source": "independent completeness critic"
+    }
+  ],
+  "regression_control": "The added case injects --inexact and refreshes the shared-vector hash; it must still fail the exact-migration contract. Existing failure-stop and hash/argv controls remain.",
+  "main_version_modified_test_declaration": {
+    "path": "tests/test_trading_2604_lock.py",
+    "expected_failing_methods": [
+      "tests.test_trading_2604_lock.Trading2604SyncVectorTests.test_installer_and_ci_source_have_byte_identical_argv"
+    ],
+    "reason": "Main's historical test requires the retired exclude-newer cutoff. This publication copies the already measured final lock without it and tests the prospective exact vector instead.",
+    "execution_on_fresh_merge": "owed to the landing turn; this declaration is not a passed main-test run"
+  },
+  "limits": [
+    "This source repair performs no native uv sync, installation, legacy cleanup or runtime acceptance.",
+    "The original imported95cb verification remains an inexact run. It does not prove execution of the prospective exact recipe.",
+    "Thirteen cases are repository source/argv/synthetic-negative-control checks, not upstream acceptance or a host cleanup test.",
+    "The original source-checks.json remains the dated pre-repair snapshot; this artifact binds the repaired sources.",
+    "Final28-case runtime acceptance, R3/Layer1.5 historical E2E and strategy/broker gates remain separately owned."
+  ],
+  "inverse": {
+    "publication": "Revert only this source repair and its new evidence binding; installed runtime state is unchanged.",
+    "future_host": "Before exact migration, retain prior installed inventory and metadata under the serialized writer. To reverse a later executed migration, restore the selected prior pair and matching supported sync so removed prior dependencies can be reinstalled, preserving later owners.",
+    "executed": false
+  }
+}

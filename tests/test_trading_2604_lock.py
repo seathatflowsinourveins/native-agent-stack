@@ -108,6 +108,8 @@ class Trading2604SyncVectorTests(unittest.TestCase):
         digest = re.search(rb"^readonly sync_vector_hash=([0-9a-f]{64})$", installer, re.M)
         self.assertIsNotNone(digest, "installer must verify shared-vector bytes before sourcing")
         self.assertEqual(digest[1].decode(), hashlib.sha256(vector).hexdigest())
+        self.assertNotRegex(vector, rb"--inexact",
+                            "approved legacy migrations must remove the obsolete DVC closure")
 
     def record_vector(self, installer=None, fail_stage=""):
         # This records argv only. No uv command, host installer or host guard is run.
@@ -141,9 +143,15 @@ fail_stage=$2
         self.assertEqual([line.split(b"\0", 1)[0] for line in host.stdout.splitlines()],
                          [b"lock-check", b"package-sync", b"dependency-check"])
         lock = tomllib.loads((PROJECT / "uv.lock").read_text())
-        cutoff = re.search(rb"^readonly exclude_newer=(.+)$", self.vector, re.M)[1].decode()
         python = re.search(rb"^readonly python_pin=(.+)$", self.vector, re.M)[1].decode()
-        self.assertEqual(cutoff, lock["options"]["exclude-newer"])
+        self.assertNotIn("exclude-newer", lock.get("options", {}))
+        self.assertNotRegex(self.vector, rb"--exclude-newer|^readonly exclude_newer=",
+                            "the measured final lock removed the historical global cutoff")
+        argv = [line.split(b"\0")[1:-1] for line in host.stdout.splitlines()]
+        self.assertEqual(argv[1], [b"uv", b"--no-config", b"sync", b"--project",
+                                  b"/tmp/contract project", b"--python",
+                                  b"/tmp/managed python/bin/python3.12", b"--no-python-downloads",
+                                  b"--locked", b"--group", b"dev"])
         self.assertEqual("==" + python, lock["requires-python"])
 
     def test_installer_one_byte_change_fails(self):
@@ -167,6 +175,17 @@ fail_stage=$2
                 result = self.record_vector(self.installer, fail_stage=step)
                 self.assertEqual(result.returncode, 23)
                 self.assertEqual(len(result.stdout.splitlines()), index)
+
+    def test_inexact_legacy_migration_fails_even_with_refreshed_hash(self):
+        changed_vector = self.vector.replace(b"--group dev", b"--group dev --inexact")
+        self.assertNotEqual(changed_vector, self.vector)
+        changed_installer = re.sub(
+            rb"(?m)^readonly sync_vector_hash=[0-9a-f]{64}$",
+            b"readonly sync_vector_hash=" + hashlib.sha256(changed_vector).hexdigest().encode(),
+            self.installer,
+        )
+        with self.assertRaisesRegex(AssertionError, "must remove the obsolete DVC closure"):
+            self.assert_shared_source(changed_installer, changed_vector)
 
     def test_bundle_hashes_and_final_completion_marker_agree(self):
         for field, name in (("project_hash", "pyproject.toml"), ("lock_hash", "uv.lock")):

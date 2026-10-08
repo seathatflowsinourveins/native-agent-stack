@@ -1,0 +1,186 @@
+{
+  "schema_version": 1,
+  "kind": "native_offline_runtime_acceptance",
+  "evidence_class": "local_integration",
+  "actual_execution": true,
+  "imported_observation": false,
+  "authorized_by": "CC172905Z; SUITE-GO2026-10-08T17:47:56Z after876ready",
+  "run_started_utc": "2026-10-08T17:48:39Z",
+  "run_ended_utc": "2026-10-08T17:49:09Z",
+  "original_native_receipt_sha256": "4a064e39026f205b8e2f273d396044b9145dbcb58a1510b8c9dbf45c56c5a2a5",
+  "actual_native_exit_code": 0,
+  "native_entrypoint": "Windows wsl.exe --distribution NativeStack2604 --exec; existing nonroot/native host guard",
+  "submitted_vector": "env TMPDIR=<owned-scratch> nice -n10 ionice -c2 -n7 mise exec uv@0.12.17 -- bash <receipt-envelope>",
+  "acceptance_command": "bash <unchanged-retained-24-case-script>",
+  "acceptance_source": {
+    "path": "blueprints/us-equities/runtime-2604/accept-trading-2604.sh",
+    "sha256": "4d7b784aa2b24ccfe05910fd652fb4d7ef99f0298b7200e3a864b7c186207ade",
+    "scope": "Retained later24-case revision, unchanged; differs from prospective28-case publication source."
+  },
+  "receipt_envelope_sha256": "df83b47c7b71136a80f08ff70b5953c9747fa4c31233359be0b1813e6226edff",
+  "observed_lock": {
+    "before": "f451ef979cdb1ae3686a30df1c883c257402b32753478c1f9c686c057e9c3989",
+    "after": "f451ef979cdb1ae3686a30df1c883c257402b32753478c1f9c686c057e9c3989",
+    "source": "sha256sum uv.lock immediately before/after native24 acceptance in the SAME returned output stream",
+    "matches_freeze": true
+  },
+  "cases": [
+    {
+      "name": "offline_isolation",
+      "status": "PASS",
+      "exit_code": 0
+    },
+    {
+      "name": "import_nautilus-trader",
+      "status": "PASS",
+      "exit_code": 0
+    },
+    {
+      "name": "import_numpy",
+      "status": "PASS",
+      "exit_code": 0
+    },
+    {
+      "name": "import_pandas",
+      "status": "PASS",
+      "exit_code": 0
+    },
+    {
+      "name": "import_alpaca-py",
+      "status": "PASS",
+      "exit_code": 0
+    },
+    {
+      "name": "import_edgartools",
+      "status": "PASS",
+      "exit_code": 0
+    },
+    {
+      "name": "import_exchange-calendars",
+      "status": "PASS",
+      "exit_code": 0
+    },
+    {
+      "name": "import_duckdb",
+      "status": "PASS",
+      "exit_code": 0
+    },
+    {
+      "name": "import_pandera",
+      "status": "PASS",
+      "exit_code": 0
+    },
+    {
+      "name": "import_skfolio",
+      "status": "PASS",
+      "exit_code": 0
+    },
+    {
+      "name": "import_lightgbm",
+      "status": "PASS",
+      "exit_code": 0
+    },
+    {
+      "name": "import_fincore",
+      "status": "PASS",
+      "exit_code": 0
+    },
+    {
+      "name": "import_mlflow",
+      "status": "PASS",
+      "exit_code": 0
+    },
+    {
+      "name": "import_arch",
+      "status": "PASS",
+      "exit_code": 0
+    },
+    {
+      "name": "import_purgedcv",
+      "status": "PASS",
+      "exit_code": 0
+    },
+    {
+      "name": "ibkr_adapter",
+      "status": "PASS",
+      "exit_code": 0
+    },
+    {
+      "name": "alpaca_adapter_source",
+      "status": "PASS",
+      "exit_code": 0
+    },
+    {
+      "name": "alpaca_adapter_import",
+      "status": "PASS",
+      "exit_code": 0
+    },
+    {
+      "name": "nautilus_quickstart_sha256",
+      "status": "PASS",
+      "exit_code": 0
+    },
+    {
+      "name": "nautilus_quickstart",
+      "status": "PASS",
+      "exit_code": 0
+    },
+    {
+      "name": "duckdb_query",
+      "status": "PASS",
+      "exit_code": 0
+    },
+    {
+      "name": "pandera_example",
+      "status": "PASS",
+      "exit_code": 0
+    },
+    {
+      "name": "skfolio_example",
+      "status": "PASS",
+      "exit_code": 0
+    },
+    {
+      "name": "arch_example",
+      "status": "PASS",
+      "exit_code": 0
+    }
+  ],
+  "case_count": 24,
+  "passed": 24,
+  "outputs": [
+    {
+      "name": "native.stdout",
+      "original_bytes": 1361,
+      "original_sha256": "e176e06192e9d027669f42b58b86b395c3df3dfe9dc02a4e439917d23b906313",
+      "returned_output_sanitized": "started_utc=2026-10-08T17:48:39Z\nacceptance_scope=unchanged-native-24-case-offline-runtime\nscript_sha256_output=4d7b784aa2b24ccfe05910fd652fb4d7ef99f0298b7200e3a864b7c186207ade  <private-source>\nlock_before_sha256_output=f451ef979cdb1ae3686a30df1c883c257402b32753478c1f9c686c057e9c3989  <private-source>\noffline_isolation | PASS | 0\nimport_nautilus-trader | PASS | 0\nimport_numpy | PASS | 0\nimport_pandas | PASS | 0\nimport_alpaca-py | PASS | 0\nimport_edgartools | PASS | 0\nimport_exchange-calendars | PASS | 0\nimport_duckdb | PASS | 0\nimport_pandera | PASS | 0\nimport_skfolio | PASS | 0\nimport_lightgbm | PASS | 0\nimport_fincore | PASS | 0\nimport_mlflow | PASS | 0\nimport_arch | PASS | 0\nimport_purgedcv | PASS | 0\nibkr_adapter | PASS | 0\nalpaca_adapter_source | PASS | 0\nalpaca_adapter_import | PASS | 0\nnautilus_quickstart_sha256 | PASS | 0\nnautilus_quickstart | PASS | 0\nduckdb_query | PASS | 0\npandera_example | PASS | 0\nskfolio_example | PASS | 0\narch_example | PASS | 0\nlock_after_sha256_output=f451ef979cdb1ae3686a30df1c883c257402b32753478c1f9c686c057e9c3989  <private-source>\nacceptance_exit=0\nended_utc=2026-10-08T17:49:09Z\n",
+      "sanitization": "Private source path tokens replaced; actual hash/time/case/exit bytes are otherwise retained."
+    },
+    {
+      "name": "native.stderr",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "returned_output": ""
+    }
+  ],
+  "controls": {
+    "lock_or_sync_called": false,
+    "venv_or_metadata_mutated": false,
+    "clear_environment": true,
+    "no_network_namespaces": true,
+    "read_only_runtime_mounts": true,
+    "owned_synthetic_outputs_only": true,
+    "n2_stop_latched": true
+  },
+  "limitations": [
+    "24cases =1isolation+14research-distribution/Python3.12.3probes+9offlineadapter/examplechecks.",
+    "No28-case/dev-probe run, prospective exact legacy cleanup, Layer1.5 historical engineE2E, strategy/performance/data/provider/broker/paper/GPU/model qualification or global readiness.",
+    "Earlier24/24 observations remain separately historical; their receipt-reported1fb/writer-reported172 metadata does not establish this finalf451 run.",
+    "The original95cb inexact dev sync/dependency verification remains byte-identical and separate from this new acceptance."
+  ],
+  "inverse": {
+    "runtime_inverse_executed": false,
+    "runtime_state_change": false,
+    "publication": "Revert only the fresh acceptance projection/receipt binding; retain original native logs and earlier observations."
+  }
+}

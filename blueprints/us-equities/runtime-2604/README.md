@@ -1,4 +1,39 @@
-# NativeStack2604 offline research runtime — October 4, 2026
+# NativeStack2604 offline research runtime — final lock binding, October 8, 2026
+
+The published bundle is the existing native runtime's measured final metadata:
+lock SHA256 `f451ef979cdb1ae3686a30df1c883c257402b32753478c1f9c686c057e9c3989`
+and manifest SHA256 `aa370e42e29dc2419e586358254ff2e821df48a693aa9a3ee16b65d30036ee0b`.
+It contains EdgarTools **5.61.1**, skfolio **1.7.0**, LightGBM **4.7.0**, and the
+pytest **9.1.1** dev group (pluggy **1.6.0**, iniconfig **2.3.1**). CPython
+**3.12.3**, NautilusTrader **2.0.0rc5**, the adapter pins and their gates stay fixed.
+The lock/manifest were copied from the measured native pair without relocking.
+
+The [imported final-lock verification](../../../evidence/receipts/runtime-final-lock-binding-20261008.json)
+reuses the native **14:09:06Z** receipt: locked dev sync **with `--inexact`** and `uv pip check` returned
+**rc 0**, with the lock unchanged. An independent **15:29:03Z** coordinator
+readback bound the same pair and installed versions. That imported record is
+dependency-verification evidence; it is separate from the acceptance runs below.
+
+The fresh [final-lock 24-case acceptance](../../../evidence/artifacts/runtime-final-lock-binding-20261008/final-native-24-acceptance.json)
+ran once on **2026-10-08, 17:48:39Z–17:49:09Z**, after the authorized suite slot,
+and returned **24/24 PASS, rc 0**. Its own stdout printed the full `f451ef97…`
+lock SHA256 immediately before and after the unchanged retained 24-case script;
+both matched. This fresh run is the only acceptance claim bound to the final lock.
+It performed no lock, sync, venv or installer change. It does not execute the
+publication's **28 prospective checks**, its three dev probes, an exact migration,
+or Layer1.5 historical E2E.
+
+Two distinct earlier **24/24** runs remain historical: the co-op's
+**06:20:48Z–06:21:25Z** run has **receipt-reported `1fb9f8ca…`**; the later
+**13:45:33.120Z–13:45:58.886Z** LightGBM run has **writer-reported `17221888…`**.
+Neither printed a lock in its acceptance stdout. The later separate
+**13:46:01.921Z–13:46:02.069Z** native readback printed `17221888…` after that run;
+it is not a same-stream acceptance lock capture. The
+[dated historical reconciliation](../../../evidence/artifacts/runtime-final-lock-binding-20261008/historical-run-reconciliation.json)
+names both original receipts, output hashes and associations without rewriting
+them or retroactively attaching either run to `f451ef97…`.
+
+## Earlier native execution and dependency changes
 
 The selected research runtime installed successfully on NativeStack2604 and all
 **25 offline acceptance checks passed** on October 4, 2026, from
@@ -9,17 +44,17 @@ repeat installation or acceptance. That recorded run used **EdgarTools 5.58.0**
 and lock SHA256 `c6b5f25cd3198c1b847c1cb602fe5441dce7e038aa16976c46ecf5f0beb7b086`.
 No paper or broker execution occurred.
 
-The current bundle selects **EdgarTools 5.60.0**, matching the catalog after
+The earlier bundle selected **EdgarTools 5.60.0**, matching its catalog after
 [native SEC index acceptance on NativeStack](../catalyst-provenance/native-network-edgartools-5600-20261004.json).
 NativeStack2604's recorded installation and **25/25 offline checks passed** at this
 pin on **2026-10-05, 01:00:17Z–01:01:07Z**, at commit `d02c0827` on lock
 `4c98672d14147a1b`. The [rerun receipt](../../../evidence/receipts/native-trading-runtime-2604-rerun-20261005.json)
 records this separate execution; independent review remains pending. The earlier
 receipt continues to describe its 5.58.0 execution. These runs predate the current
-DVC-free bundle; its separate [24/24 acceptance](#current-acceptance-and-pipeline-evidence--2026-10-08)
+DVC-free bundle; its separate [24/24 acceptance](#historical-acceptance-and-pipeline-evidence--2026-10-08)
 is recorded below.
 
-The current lock SHA256 is
+The DVC-removal lock SHA256 was
 `1fb9f8ca6fef9c47a4ded826ddf20012f78d6643926cce3a36b86c674f55eb9c`.
 The [2026-10-05 DVC removal](../../../evidence/artifacts/trading-runtime-2604-20261004/diskcache-removal-20261005.json)
 reduces the lock from 242 to 188 entries, including project metadata. All 187
@@ -41,8 +76,8 @@ succeed with that native binary and the identical settings below. The
 [destination-host rerun](../../../evidence/receipts/native-trading-runtime-2604-rerun-20261005.json)
 records successful installation and offline acceptance. Under
 `mise exec uv@0.12.17`, the install script ran the shared sync vector:
-`uv lock --check`, `uv sync --locked --no-dev` and `uv pip check`, as
-[sync-trading-2604.sh](sync-trading-2604.sh#L14) shows. Both relocks used the
+`uv lock --check`, `uv sync --locked --no-dev` and `uv pip check`. That historical
+vector differs from the final dev vector published below. Both relocks used the
 installed native uv 0.12.17 executable on the packaging worker, with mise
 unavailable: the EdgarTools upgrade (`uv lock --upgrade-package edgartools`)
 produced lock `6b4e6a4d`, as recorded in the
@@ -71,19 +106,44 @@ matrix below. These supplemental pins remain subject to trading-lane ratificatio
 
 ## Files and use
 
-Keep both host scripts and `sync-trading-2604.sh` beside `trading-2604-runtime/`. Its `pyproject.toml` and
-`uv.lock` carry the directed 5.60.0 pin move and the 2026-10-05 removal of unused DVC.
-The lock contains
-188 package entries, including project metadata; it is not a claim of 188
-installed distributions. The installer checks both embedded SHA256 values and
-refuses arbitrary modified project metadata on rerun. It can migrate the exact
-approved round-1 or recorded round-c project/lock hashes, including a partly completed migration;
-both files are checked before either is replaced atomically. It checks the lock,
-runs `uv sync --locked --no-dev`, then runs `uv pip check` on the project
-environment, failing closed at every step. The mise route below supplies uv
-0.12.17, enforced by the installer's version gate. The retained `exclude-newer`
-cutoff is `2026-10-06T04:00:00Z`, after 5.60.0's October 2 publication, so it needs
-no change. The delivered lock freezes the set.
+Keep both host scripts and `sync-trading-2604.sh` beside `trading-2604-runtime/`.
+The final lock has **192 entries**, including project metadata. Compared with
+the measured intermediate `17221888…` lock's 189 entries, only pytest, pluggy
+and iniconfig were added; existing distribution records, versions and archive
+hashes are unchanged. The project's dev metadata changed and the prior global
+`exclude-newer` option was removed. Reintroducing that cutoff makes `--locked`
+refuse the final native vector; its failed attempt remains in the imported receipt.
+
+The installer checks the exact final SHA256 pair and refuses arbitrary local
+metadata. It preserves the approved `1fb9f8ca…`/`30f47dfb…` and intermediate
+`17221888…`/`25d95481…` migration inputs, alongside the older `4c98672d…` and
+`c6b5f25c…` records. Both files are validated before either atomic replacement;
+the only destination is the published final pair. These allowances do not
+authorize an uncoordinated host migration or overwrite another writer's changes.
+The installer keeps its native host, ownership, interpreter and Docker guards.
+The current installed pair already matches; **do not rerun installation** to
+republish its evidence. A future authorized new-prefix installation uses the
+recipe's existing native route, then needs its own acceptance.
+
+The prospective shared vector checks the lock, performs
+`uv --no-config sync --project "$project" --python "$runtime_python" --no-python-downloads --locked --group dev`,
+then `uv --no-config pip check --python "$project/.venv/bin/python"`, failing
+closed at every step. This uses uv's default exact sync, which removes installed
+distributions absent from the final lock, including DVC, dvc-data and diskcache
+when migrating the approved older bundles. The source intentionally omits
+`--inexact`: retaining extraneous packages would leave that removed dependency
+chain installed while allowing the completion marker to be written. This follows
+[uv 0.12.17's documented exact-sync default](https://github.com/astral-sh/uv/blob/0.12.17/docs/concepts/projects/sync.md#L92-L100).
+The historical `95cb…` receipt keeps its original inexact command and output;
+it does not establish an executed exact migration or removal of legacy packages.
+
+For an existing installation `runtime_python` is its `.venv/bin/python`,
+matching the interpreter in the reused native receipt. A fresh prefix uses the
+verified managed interpreter to create its venv. Index configuration comes from
+the exact manifest; no retired global cutoff or `--no-dev` override is added.
+The source publication itself runs neither operation; exact host migration and
+the prospective 28-case acceptance remain unexecuted. The separately authorized
+fresh 24-case run is the final-lock acceptance recorded above.
 
 Both scripts require NativeStack2604, Linux x86_64 and a non-root user. Foundation
 prerequisites are uv **0.12.17**, Git, curl, core utilities, an already responding
@@ -111,11 +171,34 @@ passed explicitly with a clean configuration. Default system sockets are refused
 an unavailable daemon blocks installation before Python work. The installer
 removes a stale completion marker and writes a replacement atomically only after
 both immutable images have been inspected. Acceptance requires that marker and
-both images. An incomplete install blocks all 24 checks in the current recipe.
+both images. An incomplete install blocks all 28 checks in the final recipe.
+Acceptance also checks the installed metadata against the final SHA256 pair.
+
+## Retained inverses and writer custody
+
+The measured final receipt preserves two prior metadata pairs: original
+`1fb9f8ca…` lock / `30f47dfb…` manifest, and the dev baseline `17221888…` lock /
+`25d95481…` manifest. Their hashes were independently rechecked. No rollback was
+run. Before any future inverse, the runtime writer must confirm no later owner
+changed metadata or installed packages. Restore only the selected saved pair and
+its corresponding supported locked sync; the dev inverse removes only the three
+proven additions after that check. Never replay the final installer as a downgrade.
+Before a future exact migration, also retain the prior installed inventory and
+metadata under that writer's custody. To reverse an executed exact migration,
+restore the selected prior pair and use its matching supported sync to reinstall
+dependencies removed from that environment; an inexact sync of the final pair
+cannot restore the old set. Preserve any later owner's changes when selecting
+the inverse. Neither exact migration nor this inverse has been executed here.
+Reverting this publication restores repository files, without changing host state.
+
+Rnd-r1 released the runtime writer to layer15-build for the dev addition;
+layer15-build returned it for rnd-r1's final locked sync/dependency check, and
+rnd-r1 released it afterwards. R3 protocol, Layer1.5 E2E, broker and strategy
+custody remain with their owners. This publication assigns no runtime writer.
 
 ## Wheel census and shared sync
 
-The current lock has no nonvirtual package without any wheel. Removing DVC
+The final lock has no nonvirtual package without any wheel. Removing DVC
 also removes `antlr4-python3-runtime`, its only such package, and the runtime
 `setuptools` dependency. The unused build constraint and lock manifest entry
 are removed together. The source-build evidence below remains historical.
@@ -130,11 +213,13 @@ has no distribution archive and is excluded from the census. This test does not
 check target-compatible wheel coverage under Linux markers.
 
 [sync-trading-2604.sh](sync-trading-2604.sh) defines the sole host/CI argument
-vector and its Python/uv/cutoff pins. The installer verifies its SHA256 before
+vector and its Python/uv pins. The installer verifies its SHA256 before
 sourcing and calling `sync_trading_2604`; future trading-native CI will source
 and call the same function with its own clean `safe` command-prefix array,
 `project` and managed `runtime_python`. It checks the lock, syncs with
-`--locked --no-dev`, then checks installed dependencies, stopping on any error.
+`--locked --group dev` with uv's default exact behavior, then checks installed
+dependencies, stopping on any error. The imported historical verification's
+`--inexact` remains a separate recorded command, not the prospective source vector.
 The test compares every recorded argv byte between the installer call and a
 direct shared-source call, rejects retyped or altered installer calls and stale
 source hashes, and plants failures at all three steps. This follows the
@@ -165,7 +250,8 @@ evidence**; NativeStack2604's rerun on that round-c lock is recorded in its
 [separate receipt](../../../evidence/receipts/native-trading-runtime-2604-rerun-20261005.json),
 with installation and 25/25 offline checks passing. Independent review remains
 pending.
-The current DVC-free bundle uses a new completion marker and still needs its own rerun.
+The later DVC-free and intermediate acceptance receipts below retain their own
+metadata scope; none is a final-lock rerun.
 
 ## Pinned sources
 
@@ -175,11 +261,13 @@ The current DVC-free bundle uses a new completion marker and still needs its own
 | NautilusTrader / IBKR adapter | 2.0.0rc5; source `1b0a49d2792a9432a3aca3fcb617ce7a630d905e`; in-tree Rust ibapi 3.3.0 | [Installation](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/docs/getting_started/installation.md), [IBKR integration](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/docs/integrations/interactive_brokers.md) |
 | alpaca-py | 0.44.0 | [README at cc4cb3b7](https://github.com/alpacahq/alpaca-py/blob/cc4cb3b7ba50ae250e621983c2779047fb16bb28/README.md) |
 | Separate Alpaca adapter | `dca821cca85dce3647fa7b488d5a23fbe5b85d4a` | [Native adapter source](https://github.com/seathatflowsinourveins/native-agent-stack/blob/dca821cca85dce3647fa7b488d5a23fbe5b85d4a/blueprints/us-equities/adaptive-paper/native_adapter.py) |
-| EdgarTools | 5.60.0; source `1e7a61b3a142dbf5d19bc82444f85239c1786348` | [Release](https://github.com/dgunning/edgartools/releases/tag/v5.60.0), [README at the tag commit](https://github.com/dgunning/edgartools/blob/1e7a61b3a142dbf5d19bc82444f85239c1786348/README.md), [native SEC index receipt](../catalyst-provenance/native-network-edgartools-5600-20261004.json) |
+| EdgarTools | 5.61.1 | [Version-specific PyPI metadata](https://pypi.org/pypi/edgartools/5.61.1/json); [imported native installation/verification scopes](../../../evidence/receipts/runtime-final-lock-binding-20261008.json). The older SEC index receipt remains at 5.60.0. |
 | exchange_calendars | 4.13.2 | [README at dbe38b1f](https://github.com/gerrymanoim/exchange_calendars/blob/dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a/README.md) |
 | DuckDB | 1.5.5 | [Python README at b236c819](https://github.com/duckdb/duckdb-python/blob/b236c8194ed14c7a7c685e0534dde501cc855b3a/README.md) |
 | pandera[pandas] | 0.33.1 | [README at 62f55e2d](https://github.com/unionai-oss/pandera/blob/62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6/README.md) |
-| skfolio | 1.2.9 | [Installation at c99fcf71](https://github.com/skfolio/skfolio/blob/c99fcf71349e2df4a7a1033ee85ca2e9ced9abee/docs/user_guide/install.rst) |
+| skfolio | 1.7.0 | [Version-specific PyPI metadata](https://pypi.org/pypi/skfolio/1.7.0/json); recorded native import/version acceptance remains scoped to its dated metadata pair. |
+| LightGBM | 4.7.0; source `8f7036f03627054d5a54a6f965b13f4b9ff2cb63` | [Version-specific PyPI metadata](https://pypi.org/pypi/lightgbm/4.7.0/json), [unchanged vendor example](https://github.com/lightgbm-org/LightGBM/blob/8f7036f03627054d5a54a6f965b13f4b9ff2cb63/examples/python-guide/simple_example.py). Its separate recorded run is not a study or saved-model reload acceptance. |
+| Dev test tools | pytest 9.1.1; pluggy 1.6.0; iniconfig 2.3.1 | [pytest metadata](https://pypi.org/pypi/pytest/9.1.1/json), [pluggy metadata](https://pypi.org/pypi/pluggy/1.6.0/json), [iniconfig metadata](https://pypi.org/pypi/iniconfig/2.3.1/json); separate dev acceptance probes and locked dev group. |
 | fincore | 0.5.1 | [README at 576459c4](https://github.com/cloudQuant/fincore/blob/576459c495a8f7ff839f55e0d3057daa636174cc/README.md) |
 | mlflow[mcp] | 3.16.1 | [MCP guide at 32792afe](https://github.com/mlflow/mlflow/blob/32792afe5b0183fce10532d3a023f5cfa8612d09/docs/docs/genai/mcp/index.mdx) |
 | arch | 8.0.0 | [README at 038d78b7](https://github.com/bashtage/arch/blob/038d78b709e75f2590890757af32705817a6fad8/README.md) |
@@ -210,8 +298,12 @@ unchanged Nautilus quickstart's checksum and execution, and four example checks.
 The host receipt's `native_proven` claim is scoped to actual native engine use;
 the companion receipt labels each local probe and adapted example separately.
 No complete unchanged upstream test suite was run.
-The current recipe has 24 checks with 13 import probes and no DVC import;
-its NativeStack2604 qualification is pending.
+The final recipe has **28 prospective checks** with **14 research import probes**,
+**3 dev import probes**, Python/isolation and nine retained example/adapter checks.
+The 28-case recipe remains unexecuted. The retained 24-case script, with fourteen
+imports and Python verification inside each probe, passed the fresh final-lock
+run described above. It does not include the three development probes. Neither
+the fresh nor historical 24-case receipts are rewritten to the current case count.
 
 Each check uses [Bubblewrap 0.9.0's options](https://github.com/containers/bubblewrap/blob/v0.9.0/bubblewrap.c)
 with a cleared environment, fresh network/process/user namespaces and read-only
@@ -321,15 +413,26 @@ red/green scans. These are packaging-worker checks; the historical destination
 host receipts remain unchanged. A future demonstrated DVC workflow requires a
 separate reviewed dependency and cache-security decision before reinstatement.
 
-## Current acceptance and pipeline evidence — 2026-10-08
+## Historical acceptance and pipeline evidence — 2026-10-08
 
 The [5a acceptance receipt](receipts/acceptance-20261008.json) records **rc 0,
 24/24 PASS** on NativeStack2604 from **06:20:48Z to 06:21:25Z**, using the installed
-runtime at lock `1fb9f8ca6fef9c47`. The unchanged `accept-trading-2604.sh` ran from
+runtime with **receipt-reported lock `1fb9f8ca6fef9c47`**. Its own stdout printed
+start/end, rc and the 24 results, but no lock SHA256. The unchanged script ran from
 the co-op's native WSL shell. This is this repository's offline integration
 acceptance; it establishes no upstream test-suite pass and did not repeat
 installation. The prior 25/25 result on lock `4c98672d14147a1b` remains historical,
 with its independent review pending.
+
+The separate later LightGBM installation/acceptance receipt was recorded at
+**13:50:35Z**, SHA256 `1a29f1572326dca40c853d3b7fbc26bc9dd12388262ef50ee38e13246dd821ff`.
+Its acceptance event ran **13:45:33.120Z–13:45:58.886Z**, returning 24 PASS rows
+in stdout SHA256 `29bed249663d682153014481b98d7278bbaa2f2ae8a63b783614041bc8dd4e10`.
+The original receipt reports the intermediate `17221888…` lock at its writer
+snapshot. A retained compact owner supplement separately identifies the later
+`17221888…` native readback. Neither supplies a lock printed within that
+acceptance stream. No original lock value has been proved wrong; this dated
+correction makes the two historical associations explicit and retains their scope.
 
 Attempt 1 is retained: the readiness-runner's shell lacked `WSL_DISTRO_NAME`, so
 the script's own host guard at line 49 returned rc 1 with all 24 checks BLOCKED.

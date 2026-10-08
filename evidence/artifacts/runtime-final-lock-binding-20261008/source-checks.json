@@ -1,0 +1,211 @@
+{
+  "schema_version": 1,
+  "evidence_class": "structural_validation",
+  "kind": "publication_source_checks",
+  "recorded_at_utc": "2026-10-08T16:03:11Z",
+  "source_base": "a6f3ee76edc32f71350382eed497029026a6242f",
+  "integration_note": "The working-tree source test hash includes the parent-owned test update, which the parent stages in its separate integration commit. This worker stages only owned runtime source and new evidence; its source commit alone does not claim registered/publication validation PASS.",
+  "source_inputs": [
+    {
+      "path": "blueprints/us-equities/runtime-2604/README.md",
+      "bytes": 32205,
+      "sha256": "cb5bab95ef1a44eceb79553cfcf56f5039a6a5e66812a32c1440dc9da3f43870"
+    },
+    {
+      "path": "blueprints/us-equities/runtime-2604/accept-trading-2604.sh",
+      "bytes": 13990,
+      "sha256": "c0b2dc45cbe77949969eeb94f65e5b98750a720333b9fd337ca5903337baac44"
+    },
+    {
+      "path": "blueprints/us-equities/runtime-2604/install-trading-2604.sh",
+      "bytes": 20381,
+      "sha256": "4d3a82c8a2707a1755d0be559c49c75da1b79c9ac84a1b1822bb87eac4f2145d"
+    },
+    {
+      "path": "blueprints/us-equities/runtime-2604/sync-trading-2604.sh",
+      "bytes": 1010,
+      "sha256": "ca14c4aad9e26a881fffa89c89e8f9ed0c315d51b5f23fd4bff021954042ffa9"
+    },
+    {
+      "path": "blueprints/us-equities/runtime-2604/trading-2604-runtime/pyproject.toml",
+      "bytes": 571,
+      "sha256": "aa370e42e29dc2419e586358254ff2e821df48a693aa9a3ee16b65d30036ee0b"
+    },
+    {
+      "path": "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock",
+      "bytes": 308332,
+      "sha256": "f451ef979cdb1ae3686a30df1c883c257402b32753478c1f9c686c057e9c3989"
+    },
+    {
+      "path": "tests/test_trading_2604_lock.py",
+      "bytes": 9750,
+      "sha256": "eb6b4a3c77a34eb1412050f04af267c2305fc31915c3caa59b90fb56b3bda24e"
+    }
+  ],
+  "checks": [
+    {
+      "name": "bash_syntax",
+      "argv": [
+        "bash",
+        "-n",
+        "blueprints/us-equities/runtime-2604/install-trading-2604.sh",
+        "blueprints/us-equities/runtime-2604/sync-trading-2604.sh",
+        "blueprints/us-equities/runtime-2604/accept-trading-2604.sh"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "git_diff_check",
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "isolated_source_lock_consistency",
+      "native_submitted_command": "UV_CACHE_DIR=<source-checks>/uv-cache mise exec uv@0.12.17 -- uv --no-config lock --offline --check --project blueprints/us-equities/runtime-2604/trading-2604-runtime --python <existing-python3.12> --no-python-downloads",
+      "exit_code": 0,
+      "output": "Resolved192packages",
+      "interpreter": "CPython3.12.3",
+      "runtime_write": false,
+      "relock": false,
+      "source_lock_sha256_before_and_after": "f451ef979cdb1ae3686a30df1c883c257402b32753478c1f9c686c057e9c3989"
+    },
+    {
+      "name": "existing_source_contract_tests",
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "tests.test_trading_2604_lock",
+        "-v"
+      ],
+      "started_at": "2026-10-08T15:59:21.152441+00:00",
+      "finished_at": "2026-10-08T15:59:21.466687+00:00",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "test_checked_in_lock_contract (tests.test_trading_2604_lock.Trading2604LockTests.test_checked_in_lock_contract) ... ok\ntest_package_without_any_wheel_fails (tests.test_trading_2604_lock.Trading2604LockTests.test_package_without_any_wheel_fails) ... ok\ntest_project_installer_and_acceptance_pins_agree (tests.test_trading_2604_lock.Trading2604LockTests.test_project_installer_and_acceptance_pins_agree) ... ok\ntest_reintroduced_diskcache_fails (tests.test_trading_2604_lock.Trading2604LockTests.test_reintroduced_diskcache_fails) ... ok\ntest_stale_manifest_constraint_fails (tests.test_trading_2604_lock.Trading2604LockTests.test_stale_manifest_constraint_fails) ... ok\ntest_unused_build_constraint_fails (tests.test_trading_2604_lock.Trading2604LockTests.test_unused_build_constraint_fails) ... ok\ntest_bundle_hashes_and_final_completion_marker_agree (tests.test_trading_2604_lock.Trading2604SyncVectorTests.test_bundle_hashes_and_final_completion_marker_agree) ... ok\ntest_changed_shared_file_without_hash_refresh_fails (tests.test_trading_2604_lock.Trading2604SyncVectorTests.test_changed_shared_file_without_hash_refresh_fails) ... ok\ntest_each_failure_stops_before_next_step (tests.test_trading_2604_lock.Trading2604SyncVectorTests.test_each_failure_stops_before_next_step) ... ok\ntest_installer_and_ci_source_have_byte_identical_argv (tests.test_trading_2604_lock.Trading2604SyncVectorTests.test_installer_and_ci_source_have_byte_identical_argv) ... ok\ntest_installer_one_byte_change_fails (tests.test_trading_2604_lock.Trading2604SyncVectorTests.test_installer_one_byte_change_fails) ... ok\ntest_retyped_installer_step_fails (tests.test_trading_2604_lock.Trading2604SyncVectorTests.test_retyped_installer_step_fails) ... ok\n\n----------------------------------------------------------------------\nRan 12 tests in 0.254s\n\nOK\n",
+      "scope": "Existing repository source/argv fixtures with parent-owned current-contract expectation update. Negative controls remain; no runtime installer/sync/native acceptance or provider operation.",
+      "native_invocation": "context-modePython subprocess.run(argv,cwd=ownedsourceworktree,capture_output=True,text=True)",
+      "fixture_sha256": "eb6b4a3c77a34eb1412050f04af267c2305fc31915c3caa59b90fb56b3bda24e",
+      "original_private_record_sha256": "b961311fa72392f827e6550b83819f08acd0b204c20bfe9de1a31b11a07ec197",
+      "evidence_class": "local_integration",
+      "passed": 12
+    },
+    {
+      "name": "pre_registry_publication_validation",
+      "argv": [
+        "python3",
+        "scripts/validate.py"
+      ],
+      "exit_code": 1,
+      "expected_remaining_gap": "Six runtime source files plus parent-owned test hash/byte registration and new publication evidence registration. No passing validation claim; parent registers last and runs final validation."
+    }
+  ],
+  "failed_conditions": [
+    {
+      "kind": "local_native_read_guard",
+      "condition": "Consecutive-read PreToolUse counter refused one accept-script source read before reading; counter reset and same bounded read succeeded.",
+      "api_provider_request": false
+    },
+    {
+      "kind": "initial_source_lock_interpreter_path",
+      "exit_code": 2,
+      "condition": "No interpreter at /usr/bin/python3.12; corrected to the existing CPython3.12.3 executable.",
+      "model_provider_call": false
+    },
+    {
+      "kind": "existing_stale_source_contract",
+      "exit_code": 1,
+      "tests_run": 12,
+      "condition": "Original test read lock.options.exclude-newer; actual measured final lock has no such option, causing TypeError. Parent replaced only this current-contract expectation with absent-cutoff and exact locked-dev argv assertions.",
+      "resolution": "Existing12tests passed with original negative controls retained; full returned stderr above."
+    }
+  ],
+  "native_outputs": [
+    {
+      "name": "bash-syntax.stdout",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sanitized_text": ""
+    },
+    {
+      "name": "bash-syntax.stderr",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sanitized_text": ""
+    },
+    {
+      "name": "diff-check.stdout",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sanitized_text": ""
+    },
+    {
+      "name": "diff-check.stderr",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sanitized_text": ""
+    },
+    {
+      "name": "uv-lock-check.stdout",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sanitized_text": ""
+    },
+    {
+      "name": "uv-lock-check.stderr",
+      "original_bytes": 58,
+      "original_sha256": "6bf05eb2d87a72070a72a39473d3ca0ef370c49182f50072d8934c44bbc7f850",
+      "sanitized_text": "error: No interpreter found at path `/usr/bin/python3.12`\n"
+    },
+    {
+      "name": "uv-lock-check-retry.stdout",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sanitized_text": ""
+    },
+    {
+      "name": "uv-lock-check-retry.stderr",
+      "original_bytes": 100,
+      "original_sha256": "e7790b880adbafa09b61ff928618c3345d261f4829ec3bb749e6ca89983de1b3",
+      "sanitized_text": "Using CPython 3.12.3 interpreter at: <existing-python3.12>\nResolved 192 packages in 8ms\n"
+    },
+    {
+      "name": "focused-unittest.stdout",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sanitized_text": ""
+    },
+    {
+      "name": "focused-unittest.stderr",
+      "original_bytes": 934,
+      "original_sha256": "d39c061cd2c6aaccf57dca1d68f94efa13831da51cee67f0e60cd24ef6c8c35d",
+      "sanitized_text": ".........E..\n======================================================================\nERROR: test_installer_and_ci_source_have_byte_identical_argv (tests.test_trading_2604_lock.Trading2604SyncVectorTests.test_installer_and_ci_source_have_byte_identical_argv)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<source-checkout>/tests/test_trading_2604_lock.py\", line 144, in test_installer_and_ci_source_have_byte_identical_argv\n    cutoff = re.search(rb\"^readonly exclude_newer=(.+)$\", self.vector, re.M)[1].decode()\n             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^\nTypeError: 'NoneType' object is not subscriptable\n\n----------------------------------------------------------------------\nRan 12 tests in 0.292s\n\nFAILED (errors=1)\n"
+    },
+    {
+      "name": "validate-before-registration.stdout",
+      "original_bytes": 1293,
+      "original_sha256": "3c6fe0f1291146e480208fad513855959e4f40c8ee2af72c6cffe6336592b11e",
+      "sanitized_text": "Publication validation failed:\nblueprints/us-equities/runtime-2604/README.md: SHA-256 mismatch\nblueprints/us-equities/runtime-2604/README.md: byte count mismatch\nblueprints/us-equities/runtime-2604/accept-trading-2604.sh: SHA-256 mismatch\nblueprints/us-equities/runtime-2604/accept-trading-2604.sh: byte count mismatch\nblueprints/us-equities/runtime-2604/install-trading-2604.sh: SHA-256 mismatch\nblueprints/us-equities/runtime-2604/install-trading-2604.sh: byte count mismatch\nblueprints/us-equities/runtime-2604/sync-trading-2604.sh: SHA-256 mismatch\nblueprints/us-equities/runtime-2604/sync-trading-2604.sh: byte count mismatch\nblueprints/us-equities/runtime-2604/trading-2604-runtime/pyproject.toml: SHA-256 mismatch\nblueprints/us-equities/runtime-2604/trading-2604-runtime/pyproject.toml: byte count mismatch\nblueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock: SHA-256 mismatch\nblueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock: byte count mismatch\ntests/test_trading_2604_lock.py: SHA-256 mismatch\ntests/test_trading_2604_lock.py: byte count mismatch\nevidence/artifacts/runtime-final-lock-binding-20261008/native-verification.json: evidence file is not hash-listed\nevidence/receipts/runtime-final-lock-binding-20261008.json: evidence file is not hash-listed\n"
+    },
+    {
+      "name": "validate-before-registration.stderr",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sanitized_text": ""
+    }
+  ],
+  "inverse": {
+    "publication_only": "Revert the six runtime source files and this unit's new evidence paths from its source commit. Parent-owned test/registry and sole-assembler catalog updates remain separate integration ownership.",
+    "runtime_inverse_executed": false
+  },
+  "limits": [
+    "This is source/lock/contract evidence, separate from imported native dependency verification95cb.",
+    "No copied lock bytes were regenerated; actual native runtime, R3/E2E/strategy/broker/paper custody stays unchanged.",
+    "Full prospective28-case acceptance and Layer1.5 historical engine E2E were not executed.",
+    "Current package192lock entries are not a count of installed distributions."
+  ]
+}
