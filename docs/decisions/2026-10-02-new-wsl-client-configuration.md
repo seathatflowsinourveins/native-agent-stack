@@ -1273,3 +1273,18 @@ contracts are from PR base `7a3637f5`; the new contracts are present at
    CC115648Z records that the host fix was applied on 2026-10-08, confirmed
    HOST-OK in a fresh session, and closes readiness-runner's host-guard gap.
    That confirmation is CC-recorded host evidence; this amendment is source review.
+
+## Addendum 2026-10-08: coordinator research-routing hook
+
+CC correction #76 adds three wired practice pieces: the research-routing guard's
+PreToolUse handler, its UserPromptSubmit reset handler and its checksum-bound
+copied hook file. The native `new_wsl_client_config.py --check` at the reviewed
+integration reports this updated projection; earlier dated counts above remain
+historical observations. The hook scope, producer adapter, test contracts and
+post-landing application are in
+[the coordinator research-routing decision](2026-10-08-coordinator-research-routing.md).
+
+Today: 404 pieces, 364 wired (212 practice, 152 through a slot), 24 not wired
+(0 through a slot that does not install, 24 by their own entry) and 16 authorization
+pieces. The existing `authorization: 16`, and 24 pieces are not wired, remain
+unchanged. This is the repository wiring projection, not fresh host acceptance.

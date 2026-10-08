@@ -171,6 +171,17 @@
   "model": "opus[1m]",
   "advisorModel": "opus",
   "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${HOME}/.claude/hooks/research-routing-guard.py\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "Bash",
@@ -183,6 +194,16 @@
             "type": "command",
             "command": "f=\"${HOME}/.claude/hooks/secret_path_guard.py\"; [ ! -f \"$$f\" ] || exec python3 \"$$f\"",
             "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "^(WebSearch|WebFetch|mcp__plugin_context-mode_context-mode__ctx_fetch_and_index|mcp__context-mode__ctx_fetch_and_index|mcp__context_mode__ctx_fetch_and_index)$$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${HOME}/.claude/hooks/research-routing-guard.py\"",
+            "timeout": 5
           }
         ]
       },

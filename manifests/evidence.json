@@ -5145,9 +5145,19 @@
       "bytes": 12174
     },
     {
+      "path": "adoption/hooks/claude/README.md",
+      "sha256": "3b816a3f8f9539f89e7b0c7d1df562ed6cd72e730de42921393b0b7a289b53b7",
+      "bytes": 4343
+    },
+    {
       "path": "adoption/hooks/claude/SHA256SUMS",
-      "sha256": "d13a02c67ef551437c21de11b85352cda58ac6a1cfac1167336158fc992d11b5",
-      "bytes": 1137
+      "sha256": "9db7433fa8c7d1c37a55b027e8eb3b66ed400ad375403abfa9808aa86fb82c66",
+      "bytes": 1229
+    },
+    {
+      "path": "adoption/hooks/claude/research-routing-guard.py",
+      "sha256": "43f95fb0ff59954680c780b3bf015cbc7548285f57d5956313b704d5de280bac",
+      "bytes": 10391
     },
     {
       "path": "adoption/hooks/claude/token-lanes-block.builder.md",
@@ -5266,8 +5276,8 @@
     },
     {
       "path": "adoption/new-wsl/client-config-map.json",
-      "sha256": "0d12f8a2dacfa0ac87261bedc4b349a39939aec41c030b64a2fa7a3d798e1487",
-      "bytes": 55883
+      "sha256": "3bdd66593a88d05db354f9aad01a7a87aed03b159fa1e135eeb40fadd368cbc4",
+      "bytes": 56546
     },
     {
       "path": "adoption/new-wsl/codex-user-instructions.md",
@@ -5401,8 +5411,8 @@
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "f45d21674c9be549b530e03fc14839b5814b66ac4c32be1bbc77408ffd25e00b",
-      "bytes": 13029
+      "sha256": "ae6c0bd5bf02d0b8e5b06cb46a5ce0b1ea33acf0cbd3e9f440a0e08197d0e67d",
+      "bytes": 13668
     },
     {
       "path": "adoption/templates/codex.AGENTS.template.md",
@@ -17617,8 +17627,8 @@
     },
     {
       "path": "docs/decisions/2026-10-02-new-wsl-client-configuration.md",
-      "sha256": "75e71dc50b2d2536809ad53ba5718e8efc0edf7b5cd0b70b4fd7b481e53dd76f",
-      "bytes": 144933
+      "sha256": "5d3cef379f928f4d1c9e2bbc605f7ae3abf9bc443f84a5c2eda5823f3be46fd9",
+      "bytes": 145832
     },
     {
       "path": "docs/decisions/2026-10-02-omniroute-mac-rebuild.md",
@@ -18004,6 +18014,11 @@
       "path": "docs/decisions/2026-10-07-validate-module-shards.md",
       "sha256": "f10a8c8f8841c91d5050611dfc7ec15ab278d5650bc5aff9ba65bf746b733c64",
       "bytes": 15329
+    },
+    {
+      "path": "docs/decisions/2026-10-08-coordinator-research-routing.md",
+      "sha256": "cc0177503b26b84954e7a67ec4d2aac7d39a5520794ada3edf06346527955a10",
+      "bytes": 14363
     },
     {
       "path": "docs/decisions/2026-10-08-dependabot-frozen-evidence-ignore.md",
@@ -57957,8 +57972,8 @@
     },
     {
       "path": "tests/test_new_wsl_client_config.py",
-      "sha256": "799fbebe59b55a16c0ec3ef515e805d74d15c2b006dd07771a68f9929b0e07fe",
-      "bytes": 341802
+      "sha256": "7f9945df17d32757966d38a7b100326c17c8a78a959042b6c4578fd4f699d956",
+      "bytes": 343196
     },
     {
       "path": "tests/test_new_wsl_definitive_defaults.py",
@@ -58121,6 +58136,11 @@
       "bytes": 47956
     },
     {
+      "path": "tests/test_research_dispatch.py",
+      "sha256": "dab1a2c3720848845b560a27cab4066160b64fa2718db4e7c20400fc7cdb1806",
+      "bytes": 19847
+    },
+    {
       "path": "tests/test_research_efficiency.py",
       "sha256": "d4f894db6ccc964ff94f8628274d388c1a8af19bd33aaa655d6d64c1787eaed5",
       "bytes": 11548
@@ -58129,6 +58149,11 @@
       "path": "tests/test_research_evaluation.py",
       "sha256": "aff6a30e8caf6267e7aa440ec0db01e5c0ca09782eff6585c6e17b778ab1c6ba",
       "bytes": 5563
+    },
+    {
+      "path": "tests/test_research_routing_guard.py",
+      "sha256": "c6765e7b41d75984e903a4401d01781ee4261f5cab73cc1fcabd159e2470d303",
+      "bytes": 12393
     },
     {
       "path": "tests/test_research_workflow.py",
@@ -58437,8 +58462,8 @@
     },
     {
       "path": "tools/adoption/install_claude_profile.py",
-      "sha256": "ba00dc062d4f38e24911f0ff9e4f8793e3b26083d66d5c3966a78b077f2d86c1",
-      "bytes": 25010
+      "sha256": "aacf9c7e02560732b42b74f0eab27ed5a5546fd8659c5dd04d3ad044d95bf4ba",
+      "bytes": 25134
     },
     {
       "path": "tools/adoption/install_skills.py",
@@ -58604,6 +58629,11 @@
       "path": "tools/omniroute/gateway_record.py",
       "sha256": "d5cfcfbd61bcfcb1808270deab7e793d4021c8dd0c3079fe5ff71ee723ab46e6",
       "bytes": 4963
+    },
+    {
+      "path": "tools/research/dispatch",
+      "sha256": "40815882b5387ebf9b7fd2dce59bbebb55eb38f09e8650c0729e61ff7544662e",
+      "bytes": 14053
     },
     {
       "path": "tools/runtime-worker-evidence/README.md",

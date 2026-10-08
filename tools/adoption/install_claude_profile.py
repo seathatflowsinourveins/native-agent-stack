@@ -67,6 +67,7 @@ SHA256SUMS = ROOT / "adoption" / "hooks" / "claude" / "SHA256SUMS"
 HOOKS = {
     "currency-due-notice.py": GUARD_SRC.with_name("currency-due-notice.py"),  # SessionStart currency due line
     "effort-default-guard.py": GUARD_SRC,
+    "research-routing-guard.py": GUARD_SRC.with_name("research-routing-guard.py"),  # CC/co-op native-session research gate
     "secret_path_guard.py": SECRET_GUARD_SRC,
 }
 # The token-lane carriers and their sibling blocks: this repository's own adaptation, held out of the default pending

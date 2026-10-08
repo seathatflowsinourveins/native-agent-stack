@@ -166,6 +166,14 @@
     },
     {
       "match": [
+        "claude/settings/hook/*/*research-routing-guard.py*",
+        "claude/profile/hook-file/research-routing-guard.py"
+      ],
+      "wiring": "practice",
+      "note": "CC correction #76: the native Claude 2.1.294 hook gates WebSearch only when the CC or co-op launcher marks the exact native session ID; targeted WebFetch/context-mode fetches keep their normal permission checks and append bounded verification records with a warning at three URLs per turn. UserPromptSubmit resets the session turn counter. The generic launcher never sets the coordinator markers (docs/decisions/2026-10-08-coordinator-research-routing.md)."
+    },
+    {
+      "match": [
         "codex/hooks/hook/*",
         "codex/hooks/setting/description"
       ],
