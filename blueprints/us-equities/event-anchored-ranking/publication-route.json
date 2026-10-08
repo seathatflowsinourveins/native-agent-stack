@@ -54,13 +54,13 @@
   },
   "reviewed_subject": {
     "id": "n1-extreme-mover-ranking-20261008",
-    "revision": "R3B after GPT7bfd7bef's two C1/C8 metadata corrections; scientific method unchanged",
-    "protocol_sha256": "cc8a62836fd38a3f826f0afb28f1037b0bfb16997c1752f59d2f1739e057c239",
-    "registry_sha256": "6fbd2598f746f4f70c486e8df3035d3e8c346e47189fcec54a70d4acb542e574",
-    "canonical_manifest_sha256": "d611476eee6a93f9c95d04f0cd278424226dbb8675a861112ee110b9a053e9bc",
-    "submission_sha256": "3d0c7cd08097a7c73dd1264bda71cb96ab8cd979bfa3f7ab730eb9120cce3cd0",
+    "revision": "R3 after CC134735Z",
+    "protocol_sha256": "f5f4498084cc931a46450f410b3b1fde640b0377a7b51ab5219736ea97d56ebb",
+    "registry_sha256": "f0664418e2d01b0cbaab6779623c4f22f2776efb67415fc0cc036c1f23aba6d6",
+    "canonical_manifest_sha256": "304ffa29bd63e1f47b9ef38bcf0d2e36539b2b605bdb552dad2544204d0eee82",
+    "submission_sha256": "42580555d984039c77da4bd885b08f25e7e22a934c24b67ee5c63c48e01794b4",
     "runtime_lock_sha256": "f451ef979cdb1ae3686a30df1c883c257402b32753478c1f9c686c057e9c3989",
-    "candidate_files": 18,
+    "candidate_files": 17,
     "reader_state": {
       "co_op_GPT": "PENDING",
       "CC_Claude": "PENDING"
