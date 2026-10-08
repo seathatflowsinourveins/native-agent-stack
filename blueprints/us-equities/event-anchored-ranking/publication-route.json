@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "id": "r3-event-anchored-ranking-publication-route-20261008",
+  "status": "draft_route_only",
+  "authority": {
+    "assignment": "B8 under CC142518Z, relayed2026-10-08T14:47:52Z",
+    "draft_preparation_authorized": true,
+    "frozen_input_exception": true,
+    "landing_custody": "5f",
+    "landing_requires": "BOTH named reader PASS on the exact final subject AND explicit CC cue; no standing-cue bypass."
+  },
+  "publication": {
+    "path": "blueprints/us-equities/event-anchored-ranking/protocol.json",
+    "contract_directory": "blueprints/us-equities/event-anchored-ranking/contracts",
+    "registry_path": "blueprints/us-equities/event-anchored-ranking/inspection-registry.json",
+    "manifest_path": "blueprints/us-equities/event-anchored-ranking/SHA256SUMS",
+    "freeze_receipt_path": "blueprints/us-equities/event-anchored-ranking/freeze-receipt.json",
+    "branch": "codex/ns2604-r3-publication-route-20261008",
+    "pr_title": "docs(trading): prepare R3 event-anchored ranking publication",
+    "publication_profile": "Dedicated trading blueprint; preserve predecessor catalyst/mover protocols and their evidence bindings.",
+    "materialized_in_this_draft": [
+      "README.md",
+      "publication-route.json"
+    ],
+    "protocol_materialized": false,
+    "registry_materialized": false,
+    "freeze_receipt_materialized": false
+  },
+  "precedent": {
+    "repository": "seathatflowsinourveins/native-agent-stack",
+    "source_commit": "64a8cda01700d5e823c18e4b989e856de2ee2241",
+    "records": [
+      {
+        "path": "blueprints/us-equities/catalyst-experiment/README.md",
+        "lines": "5-7",
+        "claim": "A dedicated blueprint's protocol.json is authoritative for frozen research parameters and result criteria; native receipt separately retains the executed hash."
+      },
+      {
+        "path": "blueprints/us-equities/catalyst-experiment/protocol.json",
+        "pointer": "/status",
+        "claim": "Existing frozen exploratory protocol explicitly does not claim empirical execution."
+      },
+      {
+        "path": "blueprints/us-equities/mover-early-entry/README.md",
+        "lines": "7-14",
+        "claim": "Separate protocol files/versioned successors and dated deviations preserve prior preregistered studies."
+      },
+      {
+        "path": "blueprints/us-equities/mover-early-entry/protocol.json",
+        "pointer": "/frozen_before_outcomes",
+        "claim": "Freezing precedes outcomes; publication does not establish strategy performance."
+      }
+    ]
+  },
+  "reviewed_subject": {
+    "id": "n1-extreme-mover-ranking-20261008",
+    "revision": "R3 after CC134735Z",
+    "protocol_sha256": "f5f4498084cc931a46450f410b3b1fde640b0377a7b51ab5219736ea97d56ebb",
+    "registry_sha256": "f0664418e2d01b0cbaab6779623c4f22f2776efb67415fc0cc036c1f23aba6d6",
+    "canonical_manifest_sha256": "304ffa29bd63e1f47b9ef38bcf0d2e36539b2b605bdb552dad2544204d0eee82",
+    "submission_sha256": "42580555d984039c77da4bd885b08f25e7e22a934c24b67ee5c63c48e01794b4",
+    "runtime_lock_sha256": "f451ef979cdb1ae3686a30df1c883c257402b32753478c1f9c686c057e9c3989",
+    "candidate_files": 17,
+    "reader_state": {
+      "co_op_GPT": "PENDING",
+      "CC_Claude": "PENDING"
+    },
+    "frozen": false,
+    "freeze_at": null
+  },
+  "portable_publication": {
+    "private_evidence_remains_private": true,
+    "raw_logs_outcomes_credentials_machine_paths_included": false,
+    "content_change_rule": "A portability edit to any reviewed candidate content requires a successor hash and both new reader passes before freeze. No sanitization is silently called byte-identical.",
+    "receipt": "Use compact sanitized source/hash/verdict/native-result summaries, with exact source-to-destination mapping and preserved native/synthetic/integration/source-review evidence classes. Do not publish the private source packet wholesale."
+  },
+  "execution_gates": {
+    "study_fit": false,
+    "broker_operations": false,
+    "layer15_accepted": false,
+    "exact_LightGBM_parameters_determinism": "NOT_RUN; required before study fitting",
+    "skfolio_1_7_0_execution_pin": "Compatibility/amendment still required",
+    "PIT04_counts_receipt": "Unavailable until accepted Layer1.5",
+    "KZ_options": "Original compatible data not acquired",
+    "historical_economic_E2E": "Still required"
+  },
+  "inverse": "While this route is draft and unconsumed, revert only this PR's two route files. Do not delete private candidates, reader packets or any predecessor protocol. A later accepted/frozen scientific publication needs its own dated successor/deviation, not silent replacement.",
+  "completeness_critic": "This route provides exact destination, branch/title and frozen-input custody while keeping current private reviewed bytes unchanged. Both returned reviews, CC cue and a portable final publication hash set remain outstanding; route validation is not document/strategy acceptance."
+}
