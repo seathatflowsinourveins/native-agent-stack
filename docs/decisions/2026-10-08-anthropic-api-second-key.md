@@ -41,7 +41,6 @@ provide. The actual key type and workspace configuration remain unmeasured.
 
 ## Sources and research convergence
 
-The coordinator applied the installed `search-first` skill before editing.
 Public primary documentation was checked on 2026-10-08; these are dated
 documentation observations rather than versioned execution acceptance:
 
@@ -100,11 +99,10 @@ now expects eleven injectable ids instead of ten. These are local integration
 and synthetic checks, not unchanged upstream tests or live-provider evidence.
 The PR declares every changed existing test expectation separately.
 
-The independent completeness critic identified key type, actual workspace
-spend limits, installed consumer acceptance and provider execution as
-unmeasured boundaries. They remain distinct from the declaration and local
-temporary-store checks. No credit or fast-mode result is inferred from the
-entry's label.
+Key type, actual workspace spend limits, installed consumer acceptance and
+provider execution are unmeasured boundaries. They remain distinct from the
+declaration and local temporary-store checks. No credit or fast-mode result
+is inferred from the entry's label.
 
 ## Inverse
 

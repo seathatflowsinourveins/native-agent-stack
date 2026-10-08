@@ -18147,8 +18147,8 @@
     },
     {
       "path": "docs/decisions/2026-10-08-anthropic-api-second-key.md",
-      "sha256": "de6a666964db0916dcaf23015a0a06c39db867d56f336ef43cdd3fd44b272bc6",
-      "bytes": 7076
+      "sha256": "ccedf4766467974b092306934ace409193f71e2918fce7ac8449b054d6461049",
+      "bytes": 6955
     },
     {
       "path": "docs/decisions/2026-10-08-coordinator-research-routing.md",
