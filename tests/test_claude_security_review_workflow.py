@@ -256,7 +256,7 @@ class SecurityReviewShapeTests(unittest.TestCase):
 
     def test_claude_has_three_read_tools_and_fixed_bounds(self):
         arguments = [line.strip() for line in step(REVIEW)["with"]["claude_args"].split("\n") if line.strip()]
-        for expected in ("--model claude-opus-5-5", "--max-turns 12", "--max-budget-usd 3",
+        for expected in ("--model claude-opus-5-5", "--effort max", "--max-turns 12", "--max-budget-usd 3",
                          "--tools Read,Glob,Grep", "--allowedTools Read,Glob,Grep",
                          "--restricted", "--permission-prompts none",
                          "--setting-sources user", "--strict-mcp-config",
