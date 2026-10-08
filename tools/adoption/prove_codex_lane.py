@@ -47,7 +47,11 @@ first and a reached gate refuses them):
   skill-worker  a sixth worker reads one installed SKILL.md (default: first under ~/.agents/skills, or --skill-file).
                 Its completed ctx_execute_file or `rtk cat` output must match the file's actual first line.
                 The result names the successful route; a project-boundary refusal can fall back to the shell.
-Every live check reads the `codex exec --json` item events, never the model's prose.
+Every live check requires --provider native|omniroute. Gateway calls also require
+--omniroute-base-url; the shared provider helper supplies inline transport config
+without replacing the stack-worker profile or its no-profile control. Static
+checks need no provider. Every live check reads the `codex exec --json` item
+events, never the model's prose.
 
 Exit status: 0 every check passed, 1 a check failed, 2 could not start (no codex, or the quota gate refused).
 """
@@ -71,8 +75,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(ROOT / "tools" / "sota-convergence"))
 import apply_codex_lane as lane  # noqa: E402
 import codex_roles  # noqa: E402
+import codex_lane as provider_routes  # noqa: E402
 from scripts import adoption_status  # noqa: E402
 from scripts.codex_quota import group_alive  # noqa: E402
 
@@ -239,16 +245,19 @@ def static_checks(codex: str, codex_home: Path, eco_root: str, checkout: Path, r
 # ---------------------------------------------------------------------------------------------------------------
 # live checks
 
-def worker_env(codex_home: Path) -> dict:
-    env = {key: value for key, value in os.environ.items() if key not in UNSET_FOR_WORKERS}
+def worker_env(codex_home: Path, *, provider: str = None) -> dict:
+    env = {key: os.environ[key] for key in os.environ
+           if key not in UNSET_FOR_WORKERS and not (provider == "omniroute" and key == "OMNIROUTE_API_KEY")}
     env["CODEX_HOME"] = str(codex_home)
     return env
 
 
-def exec_argv(codex: str, prompt: str, profile: bool, extra: list[str] | None = None) -> list[str]:
+def exec_argv(codex: str, prompt: str, profile: bool, extra: list[str] | None = None, *,
+              provider: str, base_url: str | None = None) -> list[str]:
     """A worker exactly as the lane starts one: the profile when asked for, and always the pinned model, effort and
     web search (lane.worker_pins), which a project config could otherwise override."""
-    return [codex, "exec", *(["-p", lane.PROFILE_NAME] if profile else []), *lane.worker_pins(), "-s", "read-only",
+    route = provider_routes.provider_args(provider, base_url)
+    return [codex, "exec", *(["-p", lane.PROFILE_NAME] if profile else []), *lane.worker_pins(), *route, "-s", "read-only",
             "--skip-git-repo-check", "--ephemeral", "--json", *(extra or []), prompt]
 
 
@@ -507,14 +516,15 @@ def skill_prompt(skill: Path) -> str:
 
 def live_checks(codex: str, codex_home: Path, scratch: Path, repo: Path, blob: bytes, args: argparse.Namespace,
                 results: Results) -> list[dict]:
-    env = worker_env(codex_home)
+    env = provider_routes.provider_env(args.provider, worker_env(codex_home, provider=args.provider))
+    route = {"provider": args.provider, "base_url": args.omniroute_base_url}
     one, two, neutral = scratch / "worker-one", scratch / "worker-two", scratch / "neutral"
     for path in (one, two, neutral):
         path.mkdir()
     one, two = str(one.resolve()), str(two.resolve())
     runs = run_workers([
-        {"name": "worker-one (cwd)", "argv": exec_argv(codex, PWD_PROMPT, True), "cwd": one, "env": env},
-        {"name": "worker-two (-C)", "argv": exec_argv(codex, PWD_PROMPT, True, ["-C", two]), "cwd": str(neutral),
+        {"name": "worker-one (cwd)", "argv": exec_argv(codex, PWD_PROMPT, True, **route), "cwd": one, "env": env},
+        {"name": "worker-two (-C)", "argv": exec_argv(codex, PWD_PROMPT, True, ["-C", two], **route), "cwd": str(neutral),
          "env": env},
     ], args.timeout)
     for run, own, other in ((runs[0], one, two), (runs[1], two, one)):
@@ -522,10 +532,10 @@ def live_checks(codex: str, codex_home: Path, scratch: Path, repo: Path, blob: b
         results.add(f"workers {run['name']}", ok, detail)
     memory = MEMORY_PROMPT % (args.memory_workspace, args.memory_project)
     more = run_workers([
-        {"name": "approval (profile)", "argv": exec_argv(codex, memory, True), "cwd": str(neutral), "env": env},
-        {"name": "approval control (no profile)", "argv": exec_argv(codex, memory, False), "cwd": str(neutral),
+        {"name": "approval (profile)", "argv": exec_argv(codex, memory, True, **route), "cwd": str(neutral), "env": env},
+        {"name": "approval control (no profile)", "argv": exec_argv(codex, memory, False, **route), "cwd": str(neutral),
          "env": env},
-        {"name": "rtk-worker", "argv": exec_argv(codex, RTK_PROMPT, True), "cwd": str(repo), "env": env},
+        {"name": "rtk-worker", "argv": exec_argv(codex, RTK_PROMPT, True, **route), "cwd": str(repo), "env": env},
     ], args.timeout)
     ok, detail = approval_verdict(more[0], expect_refusal=False)
     results.add("approval with the profile", ok, detail)
@@ -541,7 +551,7 @@ def live_checks(codex: str, codex_home: Path, scratch: Path, repo: Path, blob: b
         results.add("skill-worker", False, "route none; no installed SKILL.md found (or invalid --skill-file)")
     else:
         skill_runs = run_workers([
-            {"name": "skill-worker", "argv": exec_argv(codex, skill_prompt(skill), True),
+            {"name": "skill-worker", "argv": exec_argv(codex, skill_prompt(skill), True, **route),
              "cwd": str(neutral), "env": env},
         ], args.timeout)
         ok, detail = skill_verdict(skill_runs[0], skill)
@@ -571,6 +581,8 @@ def main(argv: list[str] | None = None) -> int:
                         help="the second directory for the binding read-back (default: ~/code/native-agent-stack)")
     parser.add_argument("--codex", help="default: codex on PATH")
     parser.add_argument("--live", action="store_true", help="also run the worker checks (model calls)")
+    parser.add_argument("--provider", choices=("native", "omniroute"), help="required for --live; select the model provider explicitly")
+    parser.add_argument("--omniroute-base-url", help="public loopback gateway base URL; required for --live --provider omniroute")
     parser.add_argument("--quota-gate", type=float, default=90.0, metavar="PERCENT",
                         help="--live refuses when a usage window is at or above PERCENT (default 90)")
     parser.add_argument("--timeout", type=float, default=900.0, help="seconds per batch of live workers")
@@ -580,6 +592,13 @@ def main(argv: list[str] | None = None) -> int:
                         help="installed skill for --live (default: first ~/.agents/skills/*/SKILL.md)")
     parser.add_argument("--json", metavar="FILE", help="also write the results as JSON")
     args = parser.parse_args(argv)
+    if args.live:
+        if args.provider is None:
+            parser.error("--live requires an explicit --provider native|omniroute")
+        try:
+            provider_routes.provider_args(args.provider, args.omniroute_base_url)
+        except ValueError as error:
+            parser.error(str(error))
     codex = args.codex or shutil.which("codex")
     if not codex:
         print("cannot start: no codex executable on PATH")

@@ -23,7 +23,8 @@ SDK arrive as service_name "codex_sdk_ts": the bundled @openai/codex-sdk 0.153.4
 CODEX_INTERNAL_ORIGINATOR_OVERRIDE=codex_sdk_ts unless the environment already carries it. conversation_id is the
 thread id, and MCP records are keyed on tool_namespace "mcp__<server>" (observability/collector/README.md).
 
-Usage: run_gate.py {jcodemunch,ai-memory,m13} [--keep]
+Usage: run_gate.py {jcodemunch,ai-memory,m13} --provider native|omniroute
+       [--omniroute-base-url http://127.0.0.1:PORT/v1] [--keep]
 
 Retention: CAPABILITY_GATE_RETAIN overrides the state directory (see retain_root).
 """
@@ -46,6 +47,8 @@ from collections import Counter
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE.parent / "sota-convergence"))
+import codex_lane as provider_routes  # noqa: E402
 PROMPTFOO_VERSION = "0.123.1"
 # Per gate: the MCP servers it counts, whether it needs the two M13 worktrees, promptfoo's concurrency, and the exact
 # number of rows each arm must produce (the configs' tests and repeats; m13_tests.js for M13).
@@ -297,16 +300,22 @@ def retain(results_path: Path, root: Path, name: str) -> tuple[str, str]:
     return hashlib.sha256(data).hexdigest(), f"{name}/results.json"
 
 
-def promptfoo_env(private: Path, main_checkout: str) -> dict[str, str]:
+def promptfoo_env(private: Path, main_checkout: str, *, provider: str, base_url: str | None = None) -> dict[str, str]:
     """The environment for promptfoo and, through inherit_process_env, Codex. Inherited PROMPTFOO_* settings are
     dropped, so none can move promptfoo's database, logs or cache out of the private directory, and the log directory
     is pinned inside it: promptfoo 0.123.1 src/logger.ts#L227 honors PROMPTFOO_LOG_DIR and otherwise uses
     <config dir>/logs."""
-    env = {key: value for key, value in os.environ.items() if not key.startswith("PROMPTFOO_")}
+    provider_routes.provider_args(provider, base_url)
+    env = {key: os.environ[key] for key in os.environ
+           if not key.startswith("PROMPTFOO_") and key not in {"NAS_CODEX_PROVIDER", "NAS_CODEX_BASE_URL"}
+           and not (provider == "omniroute" and key == "OMNIROUTE_API_KEY")}
+    env = provider_routes.provider_env(provider, env)
     env.update({"PROMPTFOO_DISABLE_TELEMETRY": "1", "PROMPTFOO_DISABLE_UPDATE": "1",
                 "PROMPTFOO_CONFIG_DIR": str(private / "promptfoo"), "PROMPTFOO_LOG_DIR": str(private / "logs"),
                 "CAPABILITY_GATE_LAUNCHER": str(HERE / "codex-profile-exec"),
-                "CAPABILITY_GATE_MAIN_CHECKOUT": main_checkout})
+                "CAPABILITY_GATE_MAIN_CHECKOUT": main_checkout, "NAS_CODEX_PROVIDER": provider})
+    if base_url is not None:
+        env["NAS_CODEX_BASE_URL"] = base_url
     return env
 
 
@@ -314,11 +323,18 @@ def run(cmd: list[str], **kw) -> str:
     return subprocess.run(cmd, check=True, text=True, capture_output=True, **kw).stdout.strip()
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("gate", choices=sorted(GATES))
     parser.add_argument("--keep", action="store_true", help="keep the private directory (results, log, worktrees)")
-    args = parser.parse_args()
+    parser.add_argument("--provider", choices=("native", "omniroute"), required=True,
+                        help="explicit Codex model provider for every gate and control")
+    parser.add_argument("--omniroute-base-url", help="explicit public loopback gateway base URL ending /v1")
+    args = parser.parse_args(argv)
+    try:
+        provider_routes.provider_args(args.provider, args.omniroute_base_url)
+    except ValueError as error:
+        parser.error(str(error))
     spec = GATES[args.gate]
 
     repo = Path(run(["git", "-C", str(HERE), "rev-parse", "--show-toplevel"]))
@@ -331,7 +347,7 @@ def main() -> int:
 
     private = Path(tempfile.mkdtemp(prefix="capability-gate-"))
     worktrees: list[Path] = []
-    env = promptfoo_env(private, main_checkout)
+    env = promptfoo_env(private, main_checkout, provider=args.provider, base_url=args.omniroute_base_url)
     try:
         found = run([promptfoo, "--version"], env=env).splitlines()[-1].strip()
         if found != PROMPTFOO_VERSION:

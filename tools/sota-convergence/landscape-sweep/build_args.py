@@ -580,7 +580,7 @@ def stage(work: Path, *, sweep_id: str, run_date: str, selected: list, test: boo
     args_text = json.dumps(args, ensure_ascii=False, separators=(",", ":"))
     (work / "args.json").write_text(args_text + "\n", encoding="utf-8")
     pinned = {entry["name"]: entry for entry in manifest.get("skills") or []}
-    codex = {"model": gpt6_model, "effort": "max", "slots": slots}
+    codex = {"provider": "native", "model": gpt6_model, "effort": "max", "slots": slots}
     if lock_dir:
         codex["lock_dir"] = str(Path(lock_dir).expanduser().resolve())
     if quota_stop_percent is not None:
@@ -631,8 +631,8 @@ def main(argv=None) -> int:
     stars.add_argument("--no-stars", action="store_true")
     parser.add_argument("--gpt6-model", default=None,
                         help=f"default gpt-6-astra; {OMNIROUTE_DEFAULT_MODEL} with --gpt6-provider omniroute")
-    parser.add_argument("--gpt6-provider", choices=PROVIDERS, default="native",
-                        help="native: Codex's own login (default). omniroute: a lane-local CODEX_HOME that routes "
+    parser.add_argument("--gpt6-provider", choices=PROVIDERS, required=True,
+                        help="required: native selects Codex's own login; omniroute selects a lane-local CODEX_HOME that routes "
                              f"Codex through the local OmniRoute gateway with the token-stack MCP servers; the key "
                              f"comes from ${OMNIROUTE_KEY_ENV} in the harness's environment")
     parser.add_argument("--gpt6-fallback", choices=("omniroute",),

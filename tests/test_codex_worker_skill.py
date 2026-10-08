@@ -152,6 +152,8 @@ class SkillLaunchTests(unittest.TestCase):
     def test_live_probe_uses_installed_skill_and_persists_the_observed_route(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
+            codex_home = root / ".codex"
+            worker_env = {"CODEX_HOME": str(codex_home)}
             skill = root / ".agents" / "skills" / "example" / "SKILL.md"
             skill.parent.mkdir(parents=True)
             skill.write_text("# Unprompted answer\n", encoding="utf-8")
@@ -169,22 +171,26 @@ class SkillLaunchTests(unittest.TestCase):
                  mock.patch.object(prove, "make_repo", return_value=b"fixture"), \
                  mock.patch.object(prove, "static_checks"), \
                  mock.patch.object(prove, "quota_gate", return_value=(True, "synthetic gate")), \
+                 mock.patch.object(prove, "worker_env", return_value=worker_env) as env_factory, \
                  mock.patch.object(prove, "run_workers", side_effect=workers), \
                  mock.patch.object(prove, "pwd_verdict", return_value=(True, "synthetic")), \
                  mock.patch.object(prove, "approval_verdict", return_value=(True, "synthetic")), \
                  mock.patch.object(prove, "rtk_verdict", return_value=(True, "synthetic")), \
                  contextlib.redirect_stdout(io.StringIO()):
-                code = prove.main(["--codex", "/synthetic/codex", "--live", "--json", str(report)])
+                code = prove.main(["--codex", "/synthetic/codex", "--codex-home", str(codex_home),
+                                   "--provider", "native", "--live", "--json", str(report)])
+            env_factory.assert_called_once_with(codex_home, provider="native")
             self.assertEqual(code, 0)
             data = json.loads(report.read_text())
         self.assertEqual(len(launched), 6)
+        self.assertTrue(all(spec["env"] == worker_env for spec in launched))
         probe = next(spec for spec in launched if spec["name"] == "skill-worker")
         prompt = probe["argv"][-1]
         self.assertIn(str(skill), prompt)
         self.assertIn("ctx_execute_file", prompt)
         self.assertIn("rtk cat", prompt)
         self.assertNotIn("# Unprompted answer", prompt)
-        self.assertEqual(probe["argv"], prove.exec_argv("/synthetic/codex", prompt, True))
+        self.assertEqual(probe["argv"], prove.exec_argv("/synthetic/codex", prompt, True, provider="native"))
         row = next(row for row in data["checks"] if row["check"] == "skill-worker")
         self.assertTrue(row["ok"])
         self.assertIn("route shell (rtk cat)", row["detail"])
@@ -193,6 +199,8 @@ class SkillLaunchTests(unittest.TestCase):
     def test_missing_installed_skill_fails_without_fabricating_a_sixth_run(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
+            codex_home = root / ".codex"
+            worker_env = {"CODEX_HOME": str(codex_home)}
             report = root / "report.json"
 
             def workers(specs, timeout):
@@ -203,12 +211,15 @@ class SkillLaunchTests(unittest.TestCase):
                  mock.patch.object(prove, "make_repo", return_value=b"fixture"), \
                  mock.patch.object(prove, "static_checks"), \
                  mock.patch.object(prove, "quota_gate", return_value=(True, "synthetic gate")), \
+                 mock.patch.object(prove, "worker_env", return_value=worker_env) as env_factory, \
                  mock.patch.object(prove, "run_workers", side_effect=workers), \
                  mock.patch.object(prove, "pwd_verdict", return_value=(True, "synthetic")), \
                  mock.patch.object(prove, "approval_verdict", return_value=(True, "synthetic")), \
                  mock.patch.object(prove, "rtk_verdict", return_value=(True, "synthetic")), \
                  contextlib.redirect_stdout(io.StringIO()):
-                code = prove.main(["--codex", "/synthetic/codex", "--live", "--json", str(report)])
+                code = prove.main(["--codex", "/synthetic/codex", "--codex-home", str(codex_home),
+                                   "--provider", "native", "--live", "--json", str(report)])
+            env_factory.assert_called_once_with(codex_home, provider="native")
             self.assertEqual(code, 1)
             data = json.loads(report.read_text())
         row = next(row for row in data["checks"] if row["check"] == "skill-worker")

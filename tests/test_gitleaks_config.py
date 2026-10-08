@@ -25,6 +25,7 @@ class).
 """
 
 import ast
+import hashlib
 import io
 import json
 import os
@@ -58,6 +59,16 @@ GH_PAT_SHAPED_VALUE = "".join(_GH_PAT_SHAPE_PARTS)
 CURSOR = "QU1EfER8MTU5NTkwODgwMDAwMDAwMDAwMA=="
 
 GITLEAKS = shutil.which("gitleaks")
+
+
+class CodexRouteSourceDigestTests(unittest.TestCase):
+    def test_reviewed_receipt_value_matches_its_named_source(self):
+        receipt_path = ROOT / "evidence/artifacts/codex-exec-explicit-provider-20261008/receipt.json"
+        receipt = json.loads(receipt_path.read_text())
+        relative = "tests/test_token_e2e_grader.py"
+        observed = hashlib.sha256((ROOT / relative).read_bytes()).hexdigest()
+        self.assertTrue(receipt["source_sha256"][relative] == observed,
+                        "the allowlisted receipt value must remain the named source's digest")
 
 
 class GitleaksPresenceTests(unittest.TestCase):
@@ -572,6 +583,47 @@ class GitleaksConfigContextRestrictionTests(unittest.TestCase):
                              f"the reviewed manifest's own path-keyed line must stay exempt: {by_file}")
             self.assertEqual(len(by_file.get(other_path, [])), 1,
                              f"the identical path-keyed line in a different file must still be detected: {by_file}")
+
+    CODEX_ROUTE_RECEIPT_PATH = "evidence/artifacts/codex-exec-explicit-provider-20261008/receipt.json"
+    CODEX_ROUTE_SOURCE_PATH = "tests/test_token_e2e_grader.py"
+
+    def test_codex_route_source_digest_is_not_detected(self):
+        """Only the verified source-path digest in this exact receipt is exempt."""
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp)
+            self._source_hashes_fixture(target, self.CODEX_ROUTE_RECEIPT_PATH, {
+                self.CODEX_ROUTE_SOURCE_PATH: HEX64,
+            })
+            findings = [f for f in self._scan(target) if f["RuleID"] == "generic-api-key"]
+            self.assertEqual(len(findings), 0, "the reviewed source digest must not be flagged")
+
+    def test_codex_route_other_fields_and_paths_stay_detected(self):
+        """The same digest shape outside the reviewed source field remains detected."""
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp)
+            self._source_hashes_fixture(target, self.CODEX_ROUTE_RECEIPT_PATH, {
+                self.CODEX_ROUTE_SOURCE_PATH: HEX64,
+                "api_key": HEX64[::-1],
+            })
+            other = "evidence/artifacts/codex-exec-explicit-provider-20261008/other.json"
+            self._source_hashes_fixture(target, other, {self.CODEX_ROUTE_SOURCE_PATH: HEX64})
+            by_file = {}
+            for finding in self._scan(target):
+                if finding["RuleID"] == "generic-api-key":
+                    by_file.setdefault(finding["File"], []).append(finding["StartLine"])
+            self.assertEqual(len(by_file.get(self.CODEX_ROUTE_RECEIPT_PATH, [])), 1)
+            self.assertEqual(len(by_file.get(other, [])), 1)
+
+    def test_codex_route_same_line_secret_stays_detected(self):
+        """Whole-line anchoring refuses a second credential field on the same line."""
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp)
+            self._source_hashes_fixture(target, self.CODEX_ROUTE_RECEIPT_PATH, {
+                self.CODEX_ROUTE_SOURCE_PATH: HEX64,
+                "api_key": HEX64[::-1],
+            }, compact=True)
+            findings = [f for f in self._scan(target) if f["RuleID"] == "generic-api-key"]
+            self.assertTrue(findings, "a second credential field must remain detected")
 
     def test_exit_code_zero_flag_always_returns_zero_even_with_findings(self):
         """`--exit-code 0` must return process exit code 0 even when real leaks are found.

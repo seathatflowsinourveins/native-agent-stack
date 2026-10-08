@@ -252,6 +252,13 @@ class Proc:
 def run_grade(args, *, env=None, cwd=None):
     """The grader CLI: a subprocess normally, this process while a mutant run needs mock patches to apply."""
     args = [str(a) for a in args]
+    # Historical synthetic judge fixtures explicitly select their fake native
+    # account; missing-provider controls call the parser/action directly.
+    codex_action = len(args) >= 2 and args[:2] == ["judge", "codex"]
+    codex_rehearsal = (len(args) >= 2 and args[:2] == ["judge", "rehearse"] and "--route" in args
+                      and args[args.index("--route") + 1] == "codex")
+    if (codex_action or codex_rehearsal) and "--provider" not in args:
+        args += ["--provider", "native"]
     if INPROC[0]:
         grade = load("grade")
         out, err = io.StringIO(), io.StringIO()
@@ -6802,8 +6809,9 @@ class F35_JudgeRoutes(GraderCase):
             self.assertEqual(argv[argv.index("--sandbox") + 1], "read-only")
             for flag in ("--ephemeral", "--output-schema", "--skip-git-repo-check", "--json"):
                 self.assertIn(flag, argv)
-            self.assertEqual(argv[-(len(jd.cl.ISOLATION_ARGS) + 2):],
-                             ["-c", "model_reasoning_effort=max", *jd.cl.ISOLATION_ARGS])
+            provider_args = jd.cl.provider_args("native")
+            self.assertEqual(argv[-(len(jd.cl.ISOLATION_ARGS) + len(provider_args) + 2):],
+                             ["-c", "model_reasoning_effort=max", *jd.cl.ISOLATION_ARGS, *provider_args])
             self.assertEqual(call["path"], jd.cl.BLIND_CHILD_PATH)
             self.assertEqual(call["home_entries"], [])
             self.assertEqual(Path(call["home"]).name, "home")
@@ -6818,7 +6826,7 @@ class F35_JudgeRoutes(GraderCase):
         source = (TOOLS / "judge.py").read_text(encoding="utf-8")
         self.assertNotIn("DEFAULT_EFFORT", source)
         self.assertEqual((jd.JUDGE_EFFORT, jd.JUDGE_MODEL), ("max", "gpt-6-astra"))
-        argv = jd.codex_argv(Path("empty-dir"), Path("schema.json"), Path("out.json"), "prompt")
+        argv = jd.codex_argv(Path("empty-dir"), Path("schema.json"), Path("out.json"), "prompt", provider="native")
         self.assertIn("model_reasoning_effort=max", argv)
         self.assertEqual(sum(1 for item in argv if item.startswith("model_reasoning_effort=")), 1)
         self.assertEqual(argv[argv.index("-m") + 1], "gpt-6-astra")
@@ -8435,6 +8443,100 @@ class F19d_RepairRoundMutants(GraderCase):
         flipped = ["F7_T0.test_words_for_numbers_are_unparsed_until_d_extract_quotes_them",
                    "F7_T0.test_the_number_word_reader_is_extraction_only_and_g1_is_unchanged"]
         repair_mutant(self, [mock.patch.object(fc, "spelled_numbers_to_digits", lambda text: text)], held, flipped)
+
+
+class CodexJudgeProviderContractTests(unittest.TestCase):
+    """Provider selection is explicit at the executing action; blind isolation remains intact."""
+
+    def test_model_executing_cli_requires_a_provider(self):
+        grade = load("grade")
+        fc = load("frozen_checks")
+        with self.assertRaises(fc.Refusal) as refused:
+            grade.build_parser().parse_args(["judge", "codex", "--index", "synthetic-index"])
+        self.assertEqual(refused.exception.code, "E_ARGS")
+
+    def test_raw_cli_never_supplies_an_implicit_provider(self):
+        for args in [
+            ["judge", "codex", "--index", "synthetic-nonexistent-index"],
+            ["judge", "rehearse", "--route", "codex", "--out-dir", "synthetic-nonexistent-out"],
+            ["judge", "codex", "--index", "synthetic-nonexistent-index", "--provider", "omniroute"],
+        ]:
+            with self.subTest(args=args):
+                process = subprocess.run([sys.executable, "-B", str(TOOLS / "grade.py"), *args],
+                                         capture_output=True, text=True, stdin=subprocess.DEVNULL, timeout=30)
+                self.assertEqual(process.returncode, 2)
+                self.assertEqual(process.stdout, "")
+                self.assertIn("E_ARGS", process.stderr)
+
+    def test_missing_rehearsal_provider_refuses_before_probes_or_state(self):
+        jd = jdm()
+        grade = load("grade")
+        fc = load("frozen_checks")
+        args = grade.build_parser().parse_args(["judge", "rehearse", "--route", "codex", "--out-dir", "synthetic-out"])
+        services = mock.Mock()
+        with mock.patch.object(jd, "isolation_issue") as probe, mock.patch.object(jd, "_dispatch_codex") as dispatch:
+            with self.assertRaises(fc.Refusal) as refused:
+                jd.cmd_rehearse(args, services)
+        self.assertEqual(refused.exception.code, "E_ARGS")
+        services.refuse_output.assert_not_called()
+        probe.assert_not_called()
+        dispatch.assert_not_called()
+
+    def test_gateway_endpoint_is_required_before_judge_index_or_state(self):
+        jd = jdm()
+        grade = load("grade")
+        fc = load("frozen_checks")
+        args = grade.build_parser().parse_args(["judge", "codex", "--index", "synthetic-index", "--provider", "omniroute"])
+        with mock.patch.object(jd, "read_index") as read_index:
+            with self.assertRaises(fc.Refusal) as refused:
+                jd.cmd_codex(args, mock.Mock())
+        self.assertEqual(refused.exception.code, "E_ARGS")
+        read_index.assert_not_called()
+
+    def test_static_actions_need_no_model_provider(self):
+        parser = load("grade").build_parser()
+        args = parser.parse_args(["judge", "packets", "--from", "synthetic-private", "--repo", "synthetic-repo", "--out-dir", "synthetic-out"])
+        self.assertEqual(args.judge_command, "packets")
+        self.assertFalse(hasattr(args, "provider"))
+        args = parser.parse_args(["judge", "claude-args", "--index", "synthetic-index"])
+        self.assertEqual(args.judge_command, "claude-args")
+        self.assertFalse(hasattr(args, "provider"))
+        args = parser.parse_args(["judge", "collect", "--index", "synthetic-index", "--result", "synthetic-result", "--transcripts", "synthetic-transcripts"])
+        self.assertEqual(args.judge_command, "collect")
+        self.assertFalse(hasattr(args, "provider"))
+
+    def test_selected_provider_keeps_fixed_model_effort_fast_and_blind_flags(self):
+        jd = jdm()
+        for provider, base_url in [("native", None), ("omniroute", "http://127.0.0.1:20128/v1")]:
+            with self.subTest(provider=provider):
+                argv = jd.codex_argv(Path("empty-dir"), Path("schema.json"), Path("out.json"), "prompt",
+                                     provider=provider, base_url=base_url)
+                self.assertEqual(argv[argv.index("-m") + 1], "gpt-6-astra")
+                self.assertEqual(sum(part == "model_reasoning_effort=max" for part in argv), 1)
+                self.assertIn('service_tier="fast"', argv)
+                self.assertIn("--ignore-user-config", argv)
+                self.assertIn('web_search="disabled"', argv)
+                self.assertIn("features.hooks=false", argv)
+                self.assertIn("features.plugin_hooks=false", argv)
+                self.assertIn('model_provider="openai"' if provider == "native" else 'model_provider="omniroute"', argv)
+                if provider == "omniroute":
+                    self.assertTrue(any("model_providers.omniroute=" in part and base_url in part for part in argv))
+
+    def test_direct_judge_call_routes_public_placeholder_in_the_isolated_environment(self):
+        jd = jdm()
+        environment = {"CODEX_HOME": "synthetic-codex-home", "HOME": "synthetic-empty-home", "TMPDIR": "synthetic-tmp", "PATH": "synthetic-path"}
+        with tempfile.TemporaryDirectory(prefix="judge-provider-fixture-") as temporary:
+            root = Path(temporary)
+            run = jd.CodexRun(root, {}, root / "codex-home", 1, provider="omniroute", base_url="http://127.0.0.1:20128/v1")
+            with mock.patch.object(jd.cl, "child_env", return_value=environment), mock.patch.object(jd.cl, "blind_child_argv", side_effect=lambda argv: argv):
+                with mock.patch.object(jd.subprocess, "run", return_value=mock.Mock(stdout="", returncode=1)) as process:
+                    self.assertEqual(run.call("synthetic-packet", "judge", "synthetic-prompt")["kind"], "infra")
+            passed = process.call_args.kwargs["env"]
+            self.assertEqual(passed, {**environment, "OMNIROUTE_API_KEY": "local"})
+            self.assertEqual(environment, {key: value for key, value in passed.items() if key != "OMNIROUTE_API_KEY"})
+            argv = process.call_args.args[0]
+            self.assertIn('model_provider="omniroute"', argv)
+            self.assertIn('service_tier="fast"', argv)
 
 
 if __name__ == "__main__":

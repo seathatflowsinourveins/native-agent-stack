@@ -719,9 +719,20 @@ def isolation_issue(work_dir, export):
     return None
 
 
-def codex_argv(empty_dir, schema_path, out_path, prompt):
+def codex_argv(empty_dir, schema_path, out_path, prompt, *, provider, base_url=None):
     """The judge's command line. The effort is the literal JUDGE_EFFORT and the model JUDGE_MODEL: never the lane default."""
-    return cl.build_command(Path(empty_dir), Path(schema_path), Path(out_path), JUDGE_EFFORT, prompt, JUDGE_MODEL, cl.ISOLATION_ARGS)
+    return cl.build_command(Path(empty_dir), Path(schema_path), Path(out_path), JUDGE_EFFORT, prompt,
+                            JUDGE_MODEL, cl.ISOLATION_ARGS, provider=provider, base_url=base_url)
+
+
+def codex_provider(args):
+    """Require a provider at the model-executing action, before native probes or state changes."""
+    provider, base_url = getattr(args, "provider", None), getattr(args, "omniroute_base_url", None)
+    try:
+        cl.provider_args(provider, base_url)
+    except ValueError:
+        raise fc.Refusal("E_ARGS", field="provider") from None
+    return provider, base_url
 
 
 # ---- Index and private files ----------------------------------------------------------------------------------------------------
@@ -900,8 +911,9 @@ def read_quota():
 class CodexRun:
     """One run of the codex route over the index: the run-scoped home, the per-call bookkeeping and the resume state."""
 
-    def __init__(self, index_dir, index, home, timeout):
+    def __init__(self, index_dir, index, home, timeout, *, provider, base_url=None):
         self.dir, self.index, self.home, self.timeout = Path(index_dir), index, home, timeout
+        self.provider, self.base_url = provider, base_url
         schema = self.dir / "work" / "judgment.schema.json"
         refute = self.dir / "work" / "refutation.schema.json"
         for path, document in ((schema, load_judgment_schema()), (refute, REFUTATION_SCHEMA)):
@@ -923,10 +935,12 @@ class CodexRun:
         os.makedirs(work, mode=0o700, exist_ok=True)
         out_path = self.dir / "work" / f"{pid}.{stage}.out.tmp"
         out_path.unlink(missing_ok=True)
-        argv = cl.blind_child_argv(codex_argv(work, self.schemas[stage], out_path, prompt))
+        argv = cl.blind_child_argv(codex_argv(work, self.schemas[stage], out_path, prompt,
+                                           provider=self.provider, base_url=self.base_url))
         timed_out = False
         try:
-            done = subprocess.run(argv, env=cl.child_env(self.home), stdin=subprocess.DEVNULL, capture_output=True, text=True,
+            done = subprocess.run(argv, env=cl.provider_env(self.provider, cl.child_env(self.home)),
+                                  stdin=subprocess.DEVNULL, capture_output=True, text=True,
                                   timeout=self.timeout)
             stdout, code = done.stdout or "", done.returncode
         except subprocess.TimeoutExpired as stop:
@@ -1078,7 +1092,7 @@ def _jsonl(rows):
     return "".join(json.dumps(row, sort_keys=True, separators=(",", ":"), ensure_ascii=False) + "\n" for row in rows).encode("utf-8")
 
 
-def _dispatch_codex(index_dir, index, packets, timeout):
+def _dispatch_codex(index_dir, index, packets, timeout, *, provider, base_url=None):
     """Judge every packet of the codex route that has no result yet, in id order, inside the run-scoped home. Returns
     (paused, {packet id: result}): a usage limit stops the dispatch at once (a retained failed attempt, never a retry)."""
     items = [item for item in index["packets"] if item["route"] == "codex"]
@@ -1094,7 +1108,7 @@ def _dispatch_codex(index_dir, index, packets, timeout):
         except cl.CodexHomeRefused:
             raise fc.Refusal("E_JUDGE_ISOLATION", check="codex_home") from None
         try:
-            run = CodexRun(index_dir, index, home, timeout)
+            run = CodexRun(index_dir, index, home, timeout, provider=provider, base_url=base_url)
             for item in items:
                 if isinstance(_load_results(index_dir, item["id"]), dict):
                     continue
@@ -1117,6 +1131,7 @@ def _totals(results, keys):
 def cmd_codex(args, services):
     """`judge codex`: judge every packet of the codex route (Claude answers) with gpt-6-astra at max effort, blind and
     isolated. Exit 0 when the judgments are written, 75 when a usage limit paused the run (rerun to resume), 2 on a refusal."""
+    provider, base_url = codex_provider(args)
     index_dir = Path(args.index)
     index = read_index(index_dir)
     packets = preflight_dispatch(index_dir, index, "codex")
@@ -1126,7 +1141,8 @@ def cmd_codex(args, services):
     issue = isolation_issue(index_dir, index.get("export_root"))
     if issue:
         raise fc.Refusal("E_JUDGE_ISOLATION", check=issue)
-    paused, results = _dispatch_codex(index_dir, index, packets, args.timeout)
+    paused, results = _dispatch_codex(index_dir, index, packets, args.timeout,
+                                     provider=provider, base_url=base_url)
     if paused and not args.accept_unavailable:
         total = sum(1 for item in index["packets"] if item["route"] == "codex")
         print(json.dumps({"paused": True, "judged": len(results), "remaining": total - len(results)}, sort_keys=True))
@@ -1353,6 +1369,10 @@ def cmd_rehearse(args, services):
     print a receipt of counts and booleans; the raw judgments and the tool versions stay in the private directory. The codex
     route runs the codex exec calls; the claude route prepares a two-item Workflow run (`--export-dir`) and, given `--result`
     and `--transcripts` from that run, collects and audits it. Exit 0 when the known pass holds and the known fail does not."""
+    if args.route == "codex":
+        provider, base_url = codex_provider(args)
+    elif getattr(args, "provider", None) is not None or getattr(args, "omniroute_base_url", None) is not None:
+        raise fc.Refusal("E_ARGS", field="provider")
     out = Path(args.out_dir)
     if args.route == "claude" and args.result:
         return _rehearse_collect(out, args)
@@ -1365,7 +1385,8 @@ def cmd_rehearse(args, services):
         fc.private_dir(str(out))
         index = _write_rehearsal(out, None, entries)
         packets = {item["id"]: read_packet(out, item) for item in index["packets"]}
-        paused, results = _dispatch_codex(out, index, packets, args.timeout)
+        paused, results = _dispatch_codex(out, index, packets, args.timeout,
+                                         provider=provider, base_url=base_url)
         pass_holds, fail_holds, judged = _verdicts(index, results)
         calls, usage_calls, _ = _totals(results, USAGE_KEYS)
         receipt = {"route": "codex", "model": JUDGE_MODEL, "effort": JUDGE_EFFORT, "judgments": judged,

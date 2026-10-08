@@ -1176,11 +1176,24 @@ def stage_work(case, layers=("alpha", "beta", "gamma"), work=None):
 
 
 def build(work, *extra):
+    if "--gpt6-provider" not in extra:
+        extra = ("--gpt6-provider", "native", *extra)
     return run([sys.executable, HARNESS / "build_args.py", "--work-dir", work, "--sweep-id", "landscape-sweep-20261026",
                 "--date", "2026-10-26", *extra])
 
 
 class BuildArgsTests(unittest.TestCase):
+    def test_missing_empty_or_unknown_provider_refuses_before_state_is_staged(self):
+        for flags in [[], ["--gpt6-provider", ""], ["--gpt6-provider", "unsupported"]]:
+            with self.subTest(flags=flags):
+                work = stage_work(self)
+                done = run([sys.executable, HARNESS / "build_args.py", "--work-dir", work,
+                            "--sweep-id", "synthetic-provider-refusal", "--date", "2026-10-26", *flags])
+                self.assertEqual(done.returncode, 2, done.stderr)
+                self.assertIn("--gpt6-provider", done.stderr)
+                for name in ["staged.json", "args.json", "templates.json", "gpt6", "codex-home", "codex_job.py"]:
+                    self.assertFalse((work / name).exists(), name)
+
     def test_args_are_compact_and_the_run_is_staged(self):
         work = stage_work(self)
         done = build(work)
@@ -1211,7 +1224,7 @@ class BuildArgsTests(unittest.TestCase):
         probe = (ROOT / "scripts" / "codex_quota.py").read_bytes()
         self.assertEqual((work / "codex_quota.py").read_bytes(), probe)
         staged = json.loads((work / "staged.json").read_text())
-        self.assertEqual(staged["codex"], {"model": "gpt-6-astra", "effort": "max", "slots": 3})  # no quota gate
+        self.assertEqual(staged["codex"], {"provider": "native", "model": "gpt-6-astra", "effort": "max", "slots": 3})  # no quota gate
         self.assertEqual(staged["harness"]["quota_probe"], {"path": "scripts/codex_quota.py",
                                                             "sha256": hashlib.sha256(probe).hexdigest()})
         self.assertEqual(staged["prompts_sha256"], summary["prompts_sha256"])
@@ -1269,7 +1282,7 @@ class BuildArgsTests(unittest.TestCase):
         inside = repo / "sweep"
         inside.mkdir()
         done = run([sys.executable, HARNESS / "build_args.py", "--work-dir", inside, "--sweep-id", "s", "--date",
-                    "2026-10-26"])
+                    "2026-10-26", "--gpt6-provider", "native"])
         self.assertEqual(done.returncode, 2)
         self.assertIn("inside the git repository", done.stderr)
         newline = temp_dir(self) / "line\nbreak"
@@ -1615,7 +1628,7 @@ class OmniRouteLaneBuildTests(unittest.TestCase):
                   "--date", "2026-10-26"]
         done = run([*common, "--gpt6-provider", "omniroute", "--codex-host", "example", "--stack-worker-profile", profile],
                    env=env)
-        return home, work, done, lambda: run(common, env=env)
+        return home, work, done, lambda: run([*common, "--gpt6-provider", "native"], env=env)
 
     def test_lane_allows_context_mode_exactly_the_skill_files(self):
         # context-mode 1.0.169 refuses ctx_execute_file paths outside the runner's cwd unless a Read(...) allow rule in
@@ -1798,12 +1811,12 @@ class OmniRouteLaneBuildTests(unittest.TestCase):
         self.assertEqual(done.returncode, 0, done.stderr)
         self.assertNotIn("api_key_placeholder", json.loads((work / "staged.json").read_text())["codex"])
 
-    def test_native_default_is_unchanged(self):
+    def test_explicit_native_preserves_model_and_caller_home(self):
         work = stage_work(self)
         done = build(work)
         self.assertEqual(done.returncode, 0, done.stderr)
         codex = json.loads((work / "staged.json").read_text())["codex"]
-        self.assertNotIn("provider", codex)
+        self.assertEqual(codex["provider"], "native")
         self.assertEqual(codex["model"], "gpt-6-astra")
         self.assertFalse((work / "codex-home").exists())
         self.assertEqual(codex_job.settings(work)["codex_home"], None)
@@ -1826,7 +1839,7 @@ class RunnerCase(unittest.TestCase):
         self.env.pop("SWEEP_WORK_DIR", None)
 
     def settings(self, codex_settings):
-        write_json(self.work / "staged.json", {"codex": {"wait_poll_s": 0.05, "slot_poll_s": 0.05, "timeout_s": 30,
+        write_json(self.work / "staged.json", {"codex": {"provider": "native", "wait_poll_s": 0.05, "slot_poll_s": 0.05, "timeout_s": 30,
                                                          **codex_settings}})
 
     def fake(self, **config):
@@ -1956,6 +1969,19 @@ class ProcessGroupStopTests(unittest.TestCase):
 
 
 class OmniRouteLaneRunnerTests(RunnerCase):
+    def test_missing_or_empty_staged_provider_refuses_before_codex(self):
+        for value in [None, ""]:
+            with self.subTest(provider=value):
+                settings = {"model": "gpt-6-astra"}
+                if value is not None:
+                    settings["provider"] = value
+                write_json(self.work / "staged.json", {"codex": settings})
+                with self.assertRaisesRegex(codex_job.UsageError, "explicitly select"):
+                    codex_job.settings(self.work)
+                with self.assertRaisesRegex(codex_job.UsageError, "explicitly select"):
+                    codex_job.codex_argv("/synthetic/codex", self.work, "gpt-6-astra", "literal prompt",
+                                         lane=None if value is None else {"provider": value})
+
     """A gateway lane runs Codex with CODEX_HOME set to the staged lane-local home, -p stack-worker and no
     --ignore-user-config, and never starts without its key variable."""
 
@@ -2003,6 +2029,7 @@ class OmniRouteLaneRunnerTests(RunnerCase):
             "exec", "-p", "stack-worker",
             "--skip-git-repo-check", "-s", "read-only",
             "-m", "cx/gpt-6-astra", "-c", 'model_reasoning_effort="max"', "-c", 'web_search="live"',
+            "-c", 'service_tier="fast"',
             "--output-schema", str(directory / "schema.json"), "-o", str(directory / "last.json"), "--json",
             "Reply in JSON."])
         self.assertEqual(self.record()["codex_home"], str(self.work / "codex-home"))
@@ -2577,7 +2604,7 @@ class RunnerTests(RunnerCase):
         self.assertEqual(json.loads((directory / "failure.json").read_text())["kind"], "inputs_changed")
 
     def test_ultra_defaults_and_idle_refusal_precede_state_changes(self):
-        write_json(self.work / "staged.json", {"codex": {"model": "gpt-6.1-sol", "effort": "ultra"}})
+        write_json(self.work / "staged.json", {"codex": {"provider": "native", "model": "gpt-6.1-sol", "effort": "ultra"}})
         config = codex_job.settings(self.work)
         self.assertEqual((config["idle_timeout_s"], config["timeout_s"], config["request_effort"]),
                          (4200, 14400, "xhigh"))
@@ -2775,6 +2802,7 @@ class RunnerTests(RunnerCase):
         self.assertEqual(self.record()["argv"], [
             "exec", "--ignore-user-config", "--skip-git-repo-check", "-s", "read-only",
             "-m", "gpt-6-astra", "-c", 'model_reasoning_effort="max"', "-c", 'web_search="live"',
+            "-c", 'service_tier="fast"',
             "--output-schema", str(directory / "schema.json"), "-o", str(directory / "last.json"), "--json",
             "Reply in JSON."])  # the prompt without its trailing newline, as "$(cat prompt.txt)" gave it
         self.assertEqual(self.record()["cwd"], str(self.work / "empty"))
@@ -3302,7 +3330,7 @@ class RecoveryRunnerTests(RunnerCase):
         self.assertFalse(result["limit_marker"])
 
     def test_default_budgets_clear_observed_healthy_silence_and_research_duration(self):
-        write_json(self.work / "staged.json", {"codex": {}})
+        write_json(self.work / "staged.json", {"codex": {"provider": "native"}})
         config = codex_job.settings(self.work)
         self.assertEqual((config["idle_timeout_s"], config["timeout_s"]), (1800, 4000))
         self.assertLess(config["timeout_s"] + config["quota_timeout_s"] + codex_job.QUOTA_BACKSTOP_S
@@ -3464,8 +3492,9 @@ class ShellTests(RunnerCase):
         work = stage_work(self, ("alpha",))
         self.assertEqual(build(work).returncode, 0)
         self.fake(last=LAST, events=[COMPLETED])
-        write_json(work / "staged.json", {**json.loads((work / "staged.json").read_text()),
-                                          "codex": {"wait_poll_s": 0.05, "slot_poll_s": 0.05}})
+        staged = json.loads((work / "staged.json").read_text())
+        write_json(work / "staged.json", {**staged,
+                                          "codex": {**staged["codex"], "wait_poll_s": 0.05, "slot_poll_s": 0.05}})
         env = dict(self.env, SWEEP_WORK_DIR=str(self.work))  # ignored: the staged copy uses its own directory
         started = run(["bash", work / "codex_call.sh", "start", "gpt6-probe", work / "prompts/gpt6-probe.txt",
                        work / "schemas/probe.json"], env=env)

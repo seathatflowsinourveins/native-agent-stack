@@ -125,6 +125,9 @@ def build_parser():
     packets.add_argument("--out-dir", required=True, help="new private judge directory (index, packets, results)")
     codex = judge_sub.add_parser("codex", help="judge the Claude answers with gpt-6-astra at max effort (after both windows)")
     codex.add_argument("--index", required=True, help="the judge directory `judge packets` wrote")
+    codex.add_argument("--provider", required=True, choices=["native", "omniroute"],
+                       help="explicit native-account or keyless-loopback provider for the blind Codex judge")
+    codex.add_argument("--omniroute-base-url", help="required with --provider omniroute: explicit loopback URL ending in /v1")
     codex.add_argument("--accept-unavailable", action="store_true",
                        help="after a usage limit, finish with the unrun packets as unknown(judge_unavailable)")
     codex.add_argument("--timeout", type=float, default=jd.CALL_TIMEOUT, help="seconds allowed per codex call")
@@ -136,6 +139,9 @@ def build_parser():
     collect.add_argument("--transcripts", required=True, help="the run's agent transcript directory")
     rehearse = judge_sub.add_parser("rehearse", help="two planted controls through a route, before Amendment 4")
     rehearse.add_argument("--route", required=True, choices=["codex", "claude"])
+    rehearse.add_argument("--provider", choices=["native", "omniroute"],
+                          help="required for --route codex; native-account or keyless-loopback provider")
+    rehearse.add_argument("--omniroute-base-url", help="required with the Codex omniroute provider: loopback URL ending in /v1")
     rehearse.add_argument("--out-dir", required=True, help="new private directory (the claude collect step reuses it)")
     rehearse.add_argument("--export-dir", help="claude route: new neutral directory for the two packets")
     rehearse.add_argument("--result", help="claude route, second step: the Workflow's returned JSON")

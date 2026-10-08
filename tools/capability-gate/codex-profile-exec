@@ -6,4 +6,30 @@
 CODEX=${CAPABILITY_GATE_CODEX:-codex}
 [ "$1" = exec ] || exec "$CODEX" "$@"
 shift
+# Gate calls carry validated public route metadata. Legacy consumers without
+# metadata keep the original profile-only path; their routing is a separate contract.
+if [ "${NAS_CODEX_PROVIDER+x}" = x ] || [ "${NAS_CODEX_BASE_URL+x}" = x ]; then
+  ROUTE_DIR=$(CDPATH= cd -- "$(dirname -- "$0")/../sota-convergence" && pwd) || exit 2
+  # -c keeps the SDK's prompt pipe on stdin while the interpreter reads its code.
+  exec python3 -c '
+import os
+import sys
+sys.path.insert(0, sys.argv[1])
+from codex_lane import provider_args, provider_env
+provider = os.environ.get("NAS_CODEX_PROVIDER")
+try:
+    route = provider_args(provider, os.environ.get("NAS_CODEX_BASE_URL"))
+except ValueError as error:
+    print(f"capability-gate provider refused: {error}", file=sys.stderr)
+    raise SystemExit(2)
+env = {key: os.environ[key] for key in os.environ
+       if not (provider == "omniroute" and key == "OMNIROUTE_API_KEY")}
+env = provider_env(provider, env)
+profile = os.environ.get("CODEX_PROFILE")
+if not profile:
+    print("CODEX_PROFILE must name the Codex profile", file=sys.stderr)
+    raise SystemExit(2)
+os.execvpe(sys.argv[2], [sys.argv[2], "exec", "--profile", profile, *route, *sys.argv[3:]], env)
+' "$ROUTE_DIR" "$CODEX" "$@"
+fi
 exec "$CODEX" exec --profile "${CODEX_PROFILE:?CODEX_PROFILE must name the Codex profile}" "$@"

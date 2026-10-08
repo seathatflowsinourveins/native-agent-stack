@@ -1,0 +1,115 @@
+{
+  "schema_version": 1,
+  "id": "codex-exec-explicit-provider-20261008",
+  "kind": "artifact_measurement",
+  "component_ids": [
+    "codex"
+  ],
+  "claim": "Six repository model-executing caller categories require an explicit provider; preserved role/isolation/SDK-stdin contracts pass 327 of 328 bounded offline checks with one dated optional skip.",
+  "limitations": [
+    "Offline integration and source verification only; no new provider/account/model or deployed acceptance.",
+    "Legacy credential-canary wrapper consumers and private coordinator scripts retain separate routing contracts.",
+    "Missing provider is an intentional CLI/input contract refusal; historical native fixtures now declare their provider."
+  ],
+  "evidence_class": "local_integration",
+  "subject": "Explicit provider selection for the six repository Codex executor categories",
+  "checked_at": "2026-10-08T20:00:00Z",
+  "base": "be7273a43c35f25002be8b481683c475482d661c",
+  "upstream": {
+    "repository": "https://github.com/openai/codex",
+    "tag": "rust-v0.161.0",
+    "commit": "979011409de0a60b52f179721948e65531d26144",
+    "files": [
+      "codex-rs/model-provider-info/src/lib.rs",
+      "codex-rs/config/src/loader/mod.rs",
+      "codex-rs/core/config.schema.json"
+    ],
+    "installed_cli": "0.161.0",
+    "official_docs": [
+      "https://developers.openai.com/codex/config-advanced",
+      "https://developers.openai.com/codex/config-reference"
+    ],
+    "repository_reference": "tools/sota-convergence/landscape-sweep/codex_job.py transport_only at the base pin"
+  },
+  "source_sha256": {
+    "docs/decisions/2026-10-08-codex-exec-explicit-provider.md": "bacbe891ab39bd32ffac05773b89d0f6ea6242434efc15ed92a2b667dc05d1ca",
+    "tests/test_adjudicate.py": "215966f4d602ef76dc0cd82de74510bde932ec56b01d02888837d9e0e21ad7a2",
+    "tests/test_capability_gate.py": "4a50e8843bce76ff4095690ecc5aa37a1e70edc701c42640a05d110030b21c19",
+    "tests/test_codex_lane.py": "06f206f22961f765d11c044a3ce78c5b0f16dd0a30195b8cbdc03ff8c731f7d2",
+    "tests/test_codex_provider_route.py": "c5244a1779e9421ff7dd4904de7d35c5d5f9d24f170c4db4cce2cb8f24feec39",
+    "tests/test_codex_worker_lane.py": "e9d4293607abaca89060174c55855d6c407b3226bdccdc45d9604825f2d65043",
+    "tests/test_landscape_sweep_harness.py": "c09fb337a209db8ecc9403cad96d73e40e6532701be4b10d7d14ac4fe9d5e1f2",
+    "tests/test_token_e2e_grader.py": "2316d4f00e0198e0c7d8193d18738fe4536c52e92051012c4e86729061e6dc1a",
+    "tools/adoption/prove_codex_lane.py": "4ed7a38eca5146e5319947ec2eff04de1272932aa904a0f5cc70be05b617812a",
+    "tools/capability-gate/README.md": "e65b1386bd699940afde7efa27899e04845d685f985be5a3543c8a7399062bf4",
+    "tools/capability-gate/codex-profile-exec": "5c5a198f02eee616bc4743787c6a564051cdbc8733351afaccb2eee0b630431a",
+    "tools/capability-gate/run_gate.py": "da439cc6f16e0514ba570d3e5b8ae30a08ceebded2dc5b8983d7bba13cc5b427",
+    "tools/sota-convergence/README.md": "63d6dbf48259ca651ebab1d7665947efff4a205e644c76125f62946f71af1b95",
+    "tools/sota-convergence/adjudicate.py": "372b23788f31156eb098b85bc5b181692aadda19973136f5e711a91f0e457ebc",
+    "tools/sota-convergence/codex_lane.py": "1ae0f1a4354a2a8438641e5aea61b445705f4dadc955e98c5f090fe84467cb3f",
+    "tools/sota-convergence/landscape-sweep/README.md": "1aa49d79e19919a5893da157c7d606599b26c307d6823a3b57c527e08dc99a6e",
+    "tools/sota-convergence/landscape-sweep/build_args.py": "853379c59de2aa7fce45539128bfd77565ce9b1a9d6391ba915005637c56c21e",
+    "tools/sota-convergence/landscape-sweep/codex_job.py": "2067d29561017d49589a594b4efedcec5b9d1e1885105d907be3b1cc9498b340",
+    "tools/token-e2e/README.md": "43e942ec7a650053855d94cab4dc7c05bdb395299be9ef127eda99183630dcd5",
+    "tools/token-e2e/grade.py": "f703cef47ad4d440af804f93a5ba0ca121c40f899c4f1c78044a60d64f5a45c8",
+    "tools/token-e2e/judge.py": "ed83cda682e5b22d23fc4b068a8e2a6c23d5bdd8a183c11aebbdc5c5691031ba"
+  },
+  "contract_changes": [
+    "Missing provider previously inherited the host account; model-executing actions now refuse before process/state setup.",
+    "Native is an explicit built-in openai provider selection; keyless gateway selection requires an explicit HTTP loopback endpoint with port and /v1.",
+    "Existing role model/effort pins, blind homes/isolation/audits, stack-worker/control profiles and staged gateway-home contracts are preserved.",
+    "Calls carry the standing fast tier; actual provider service-tier delivery is not newly measured.",
+    "Capability SDK wrapper carries supported overrides on validated gate metadata, preserving argv and the prompt stdin stream; legacy canary branch without metadata is preserved."
+  ],
+  "checks": [
+    {
+      "selection": "test_codex_lane + test_adjudicate + test_codex_provider_route + ProveVerdictTests + CodexJudgeProviderContractTests + three exact native judge/rehearsal methods",
+      "cases": 237,
+      "passed": 237,
+      "skips": 0,
+      "exit_code": 0,
+      "seconds": 27.482,
+      "output_sha256": "828e19abad007c18ef7f30089c7fb5ebbf34c6e0e702102f30173f1366374e58",
+      "command": "nice -n 10 ionice -c2 -n7 env PYTHONDONTWRITEBYTECODE=1 TMPDIR=<clean-non-repository-temp-root> PYTHONPATH=tests PATH=<native-tools-path> python3 -B -m unittest <declared selections>"
+    },
+    {
+      "selection": "BuildArgsTests + OmniRouteFallbackBuildTests + OmniRouteLaneBuildTests + OmniRouteLaneRunnerTests + OmniRouteFallbackRunnerTests",
+      "cases": 60,
+      "passed": 59,
+      "skips": 1,
+      "exit_code": 0,
+      "seconds": 21.971,
+      "skip": "Existing optional installed Context Mode security module is not configured.",
+      "method": "Worker execution, copied source/test bytes verified identical in integration checkout."
+    },
+    {
+      "selection": "test_capability_gate including actual fake-Codex wrapper stdin/argv/env observation",
+      "cases": 31,
+      "passed": 31,
+      "skips": 0,
+      "exit_code": 0,
+      "seconds": 0.906
+    }
+  ],
+  "unique_selected_cases": {
+    "total": 328,
+    "passed": 327,
+    "skips": 1
+  },
+  "source_critic": "COMPLETE on all six executor categories, including the repaired proof key guard and SDK stdin path; review is source verification, separate from root execution evidence",
+  "failed_conditions_retained": [
+    "Initial context-mode temporary root had a Git ancestor marker, so blind suites refused it; clean non-repository TMPDIR preserves the boundary.",
+    "Initial TOML-only assertion parsed the existing literal-fallback effort flag incorrectly; native CLI help establishes that fallback.",
+    "Initial combined selector named F35 instead of F35b_Rehearse; retained loader failure was corrected, then the whole 237-case selection passed.",
+    "Independent source critique found proof environment copying a key before discarding it; names-first guards and integrated ValueGuard tests repaired it.",
+    "Independent source critique found a flag inserted into a quoted script filename; corrected usage keeps filename and arguments separate.",
+    "Capability wrapper initially used a Python heredoc, replacing the SDK prompt stdin; -c plus actual stdin observation repaired it."
+  ],
+  "boundaries": [
+    "Offline integration/source verification only; no live model/provider/network acceptance, host installer, active configuration change, credential-store read or new cost.",
+    "The explicitly staged isolated gateway home is preserved. Static version/features/app-server probes and evidence parsers do not launch a model.",
+    "Private coordinator launch scripts and the legacy credential-canary launcher contract are outside this repository task; no blanket default-account coverage is claimed.",
+    "No complete repository suite or new cross-family provider review is claimed. Existing historical receipts remain historical."
+  ],
+  "inverse": "Revert the dedicated source commit and its evidence registration; no host configuration or credential rollback is required."
+}

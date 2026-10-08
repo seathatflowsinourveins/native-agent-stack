@@ -347,12 +347,14 @@ def settings(base: Path) -> dict:
 
 
 def lane_settings(base: Path, staged: dict) -> dict:
-    """The GPT-6 lane's provider. native (the default) runs Codex with --ignore-user-config against the caller's
+    """The GPT-6 lane's explicit staged provider. native runs Codex with --ignore-user-config against the caller's
     login. A gateway provider (omniroute) runs Codex with CODEX_HOME set to the staged lane-local home
     <work-dir>/<codex_home>: its config.toml (the provider block and the token MCP servers) and its profile file are
     the lane's whole configuration, and the provider's API key comes from the named environment variable. Its static
     provider headers (codex.http_headers) must be the ones that config.toml carries."""
-    provider = str(staged.get("provider") or "native")
+    provider = staged.get("provider")
+    if not provider:
+        raise UsageError("codex.provider must explicitly select native or omniroute; restage with build_args.py")
     if provider not in PROVIDERS:
         raise UsageError(f"codex.provider {provider!r} must be one of {', '.join(PROVIDERS)}")
     headers = staged.get("http_headers")
@@ -686,6 +688,8 @@ def archive_attempt(directory: Path, *, keep_runner_log: bool = False) -> int | 
 def codex_argv(codex: str, directory: Path, model: str, prompt: str, lane: dict | None = None,
                version: str | None = None, effort: str = DEFAULT_EFFORT,
                web_search: str = DEFAULT_WEB_SEARCH) -> list[str]:
+    if lane is None or lane.get("provider") not in PROVIDERS:
+        raise UsageError("codex.provider must explicitly select native or omniroute")
     if lane is not None and lane.get("codex_home") is not None:
         # The lane-local CODEX_HOME is the whole configuration, so --ignore-user-config (which drops
         # $CODEX_HOME/config.toml) must not be passed; the profile layers <profile>.config.toml over it (profile-v2).
@@ -706,6 +710,7 @@ def codex_argv(codex: str, directory: Path, model: str, prompt: str, lane: dict 
     # retried once, budget permitting (codex-rs/core/src/responses_retry.rs:71-96). Error notices are not progress.
     return [*head, "--skip-git-repo-check", "-s", "read-only",
             "-m", model, "-c", f'model_reasoning_effort="{effort}"', "-c", f'web_search="{web_search}"',
+            "-c", 'service_tier="fast"',
             "--output-schema", str(directory / "schema.json"), "-o", str(directory / "last.json"), "--json", prompt]
 
 
@@ -1175,7 +1180,7 @@ def run_attempts(base: Path, job: str, directory: Path, config: dict, lock_fd: i
             attempt_config["route"]["native_attempt"] = number
             native_failure = None
         with open(directory / "events.jsonl", "wb") as output, open(directory / "stderr.txt", "wb") as errors:
-            process = subprocess.Popen(codex_argv(codex, directory, attempt_config["model"], prompt, lane, version,
+            process = subprocess.Popen(codex_argv(codex, directory, attempt_config["model"], prompt, lane or config, version,
                                                  config["effort"], config["web_search"]),
                                        cwd=str(base / "empty"), stdin=subprocess.DEVNULL, stdout=output, stderr=errors,
                                        pass_fds=(slot_fd, lock_fd), start_new_session=True, env=codex_env(lane))

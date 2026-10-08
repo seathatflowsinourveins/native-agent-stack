@@ -252,6 +252,19 @@ regexes = [
   '''^\s*"(?:blueprints/us-equities/adaptive-paper|tests)/(?:[A-Za-z0-9_\-][A-Za-z0-9_\-.]*/)*[A-Za-z0-9_\-][A-Za-z0-9_\-.]*\.(?:py|json|sh|txt)":\s*"[0-9a-f]{64}",?\s*$''',
 ]
 
+# PR #887: this exact receipt's named test source maps to its computed SHA-256.
+# The false positive was verified against the tracked source before this rule was
+# added. Keep credential fields, other paths and compact same-line secrets visible.
+# Upstream format: gitleaks/gitleaks v8.30.1 README, rules.allowlists AND/line.
+[[rules.allowlists]]
+description = "Verified source digest in the explicit Codex provider-route receipt"
+condition = "AND"
+paths = ['''^evidence/artifacts/codex-exec-explicit-provider-20261008/receipt\.json$''']
+regexTarget = "line"
+regexes = [
+  '''^\s*"tests/test_token_e2e_grader\.py":\s*"[0-9a-f]{64}",?\s*$''',
+]
+
 # Opaque Alpaca pagination cursor retained in one historical-bars receipt. Anchored
 # to the WHOLE line and keyed on the literal "next_page_token" field name (not just
 # the cursor's base64-with-padding shape): an earlier revision used
