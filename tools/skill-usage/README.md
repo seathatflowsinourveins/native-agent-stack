@@ -11,17 +11,20 @@ host does with the numbers, this tool only produces them.
   literal string `custom_skill` unless `OTEL_LOG_TOOL_DETAILS=1` — and that flag also exports full
   commands and tool inputs, i.e. transcript content, to reach the one field this report needs.
   Turning on OTel to get a skill name would mean exporting far more than a name and a count.
-- **Not a custom hook.** A `PreToolUse`/`PostToolUse` hook could watch tool calls, but it would
-  need to run continuously, write its own log outside the checkout, and reimplement exactly what
-  native `/skill-doctor` already aggregates for Claude (uses, last-used, context cost). It also
-  could not see anything on the Codex side: Codex has no skill-invocation event at all, so a hook
-  only ever answers half the question this tool answers.
+- **Native signals before a custom hook.** A continuously running tool-call hook would duplicate
+  Claude's native `/skill-doctor` aggregation. Codex 0.161.0 already emits the OTel log event
+  [`codex.skill_invocation`](https://github.com/openai/codex/blob/979011409de0a60b52f179721948e65531d26144/codex-rs/otel/src/skill_invocation.rs#L30-L59)
+  for explicit injection and detected implicit use; a new hook is not needed to create that signal.
 - **Not agentsview or ccusage.** Both report cost and token usage per session/model; neither
   exposes "which skill fired" as a dimension. They answer "how much did this session cost", not
   "was this skill used".
-- **native `/skill-doctor`** is therefore the only source for Claude's side, and Codex's own
-  `rollout-*.jsonl` transcripts (there is no equivalent event) are the only source for its side.
-  Both are read here, jointly, so a trial verdict has one report instead of two disconnected ones.
+- **Measurement inputs.** This tool reads native `/skill-doctor` output for Claude and explicitly
+  supplied Codex `rollout-*.jsonl` files. The native Codex event is a complementary signal: the
+  current collector drops `skill.invocation_type`, `skill.scope` and `skill.plugin_id`, and
+  effective `rtk`-wrapped read inputs need a coverage check before replacing the rollout scan.
+  See the [2026-10-08 overturn addendum](../../docs/decisions/2026-09-25-skills-trial-and-usage.md#addendum-2026-10-08-codex-native-skill-event-overturn-condition)
+  for pinned source and directly read rollout locators. Invocation, rollout reads and successful
+  task completion are separate observations.
 
 ## Privacy boundary
 

@@ -1765,3 +1765,51 @@ mattpocock skills are the coordinator's steps (wave-2 synthesis 1.6). The overtu
 entry; for agent-browser, the browser-tool measurement's result.
 
 > **Amendment 2026-10-05 (pinned Listing column):** the five rows that read `name-only` (typesafe-ai, iterative-retrieval, search-first, agent-browser, security-audit) now read `on`, the state the user's every-skill-on directive set on 2026-09-30 ([2026-09-30-skills-llm-native-listing.md](2026-09-30-skills-llm-native-listing.md), :43) and that `adoption/skills/manifest.json` already carries. The find-skills row now reads `on` and Codex `yes`, matching the manifest's `claude_listing: "on"` and `codex_enabled: true`; its gap names model-invoked registry discovery ([manifest at main `2d849ba1f`, :542-564](https://github.com/seathatflowsinourveins/native-agent-stack/blob/2d849ba1f/adoption/skills/manifest.json#L542-L564)). The table is the pinned listing source that `tests/test_install_claude_profile.py` reads.
+
+## Addendum 2026-10-08: Codex native skill-event overturn condition
+
+The capability condition at the original lines 280-281 has occurred by Codex
+0.161.0. At [openai/codex rust-v0.161.0, commit `979011409de0a60b52f179721948e65531d26144`](https://github.com/openai/codex/tree/979011409de0a60b52f179721948e65531d26144),
+[`codex-rs/otel/src/skill_invocation.rs:30-59`](https://github.com/openai/codex/blob/979011409de0a60b52f179721948e65531d26144/codex-rs/otel/src/skill_invocation.rs#L30-L59)
+defines and emits the OTel log event `codex.skill_invocation`.
+The [event contract](https://github.com/openai/codex/blob/979011409de0a60b52f179721948e65531d26144/codex-rs/otel/README.md#L99-L113)
+covers explicit skill injection and detected implicit use; shell implicit detection
+is deduplicated per skill within a turn. An invocation signal does not establish successful
+skill execution or task completion.
+
+Primary rollout records were read directly, using the existing report only as a
+locator lead. In
+`sessions/2026/10/08/rollout-2026-10-08T16-20-37-<redacted>.jsonl`,
+record/line **1** is `session_meta`, timestamp `2026-10-08T20:20:37.807Z`,
+with `cli_version = "0.161.0"`; record/line **66**, timestamp
+`2026-10-08T20:22:25.682Z`, is a `response_item/custom_tool_call` to `exec`
+requesting a `sed` read of the installed `search-first/SKILL.md`.
+These locators establish the observed client version and requested read.
+The native event is an OTel log; its definition is the pinned source above.
+The exact filename mapping is retained in the private observation receipt
+`skills-overturn-observation-20261008.json`, outside the checkout. No raw rollout
+contents, prompt or skill body are retained here.
+
+Keep the rollout scan as a complementary input for now. The
+[collector allowlist at the observation base](https://github.com/seathatflowsinourveins/native-agent-stack/blob/9f7b38b23d15e47ceb6f68c6651b86088f621797/observability/collector/collector.yaml#L367)
+retains `skill.name` and `turn.id`, but drops `skill.invocation_type`,
+`skill.scope` and `skill.plugin_id`, which the
+[native emitter](https://github.com/openai/codex/blob/979011409de0a60b52f179721948e65531d26144/codex-rs/otel/src/skill_invocation.rs#L44-L52)
+supplies when available. The stored event therefore loses invocation-type and
+source/plugin distinctions. For an effective shell input headed by `rtk`,
+the pinned [command normalizer](https://github.com/openai/codex/blob/979011409de0a60b52f179721948e65531d26144/codex-rs/shell-command/src/parse_command.rs#L1636-L1653)
+and [reader dispatch](https://github.com/openai/codex/blob/979011409de0a60b52f179721948e65531d26144/codex-rs/shell-command/src/parse_command.rs#L2290-L2739)
+do not unwrap it into a recognized read; the [skill detector](https://github.com/openai/codex/blob/979011409de0a60b52f179721948e65531d26144/codex-rs/skills/src/invocation.rs#L129-L143)
+requires that parsed-read result and a known skill-document path.
+Hook-rewritten effective inputs must be accounted for before claiming coverage
+of RTK-wrapped reads.
+
+Replacing this scan now needs evidence that the deployed collector preserves
+those three attributes when present and that native coverage includes the effective wrapped
+read inputs. This refines the replacement recommendation after the capability
+trigger occurred. Source capability, stored telemetry and rollout read counts
+remain separate evidence; this addendum makes no fresh telemetry-count claim.
+The report `SKILL-ACTIVATION-TOP10.md` (SHA-256
+`db87a47088db3b17882117c754918e6c617023d579152c5e643a09e297040064`),
+sections 2c and “Found on the way, not acted on”, supplied discovery leads.
+This documentation change leaves the parser and collector unchanged.
