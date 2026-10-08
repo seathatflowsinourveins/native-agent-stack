@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "evidence_class": "local_integration",
+  "subject": "G5 exact-query native research dispatch",
+  "observed_at": "2026-10-08T16:41:31Z",
+  "source_base": "618dd6c05ff6750705b52426261748d11e003477",
+  "upstream_sources": [
+    {
+      "repository": "https://github.com/deedy5/ddgs",
+      "tag": "v9.16.0",
+      "commit": "70a5635510fb8d5b15d5ba6ceced6a67e212149b",
+      "files": [
+        "ddgs/ddgs.py",
+        "ddgs/engines/duckduckgo.py",
+        "ddgs/http_client.py"
+      ],
+      "role": "unchanged native retrieval/extraction dependency"
+    }
+  ],
+  "material_files": {
+    "tools/research/dispatch": "1b98898c33645766850b13a275eb2cd5850316d0f62d10f6f5ecd0231c83f1dd",
+    "tools/research/exact_queries.py": "19a9e5698b1c553fbe02cc5e403ac41a69287bd0985c1eb751039f71a7e7a22a",
+    "tests/test_research_dispatch_exact_queries.py": "19f4129973d519d67c3ea9bc892d4896f0f0cdfe71dade0875836cc8397035c1"
+  },
+  "returned_checks": [
+    {
+      "command": "native GPTR Python -m unittest discover -s tests -p test_research_dispatch_exact_queries.py",
+      "python_version": "3.13.16",
+      "scheduling": "nice -n 10 ionice -c2 -n7",
+      "exit_code": 0,
+      "tests": 22,
+      "duration_seconds": 0.578,
+      "stdout": "......................\n----------------------------------------------------------------------\nRan 22 tests in 0.578s\n\nOK\n",
+      "evidence_classes": [
+        "local_integration",
+        "synthetic"
+      ],
+      "observer": "integrating lane native execution"
+    },
+    {
+      "command": "native GPTR Python -m unittest discover -s tests -p test_research_dispatch.py",
+      "exit_code": 0,
+      "tests": 13,
+      "duration_seconds": 17.865,
+      "evidence_classes": [
+        "local_integration",
+        "synthetic"
+      ],
+      "observer": "owned production worker native execution; exact unchanged default/cancellation inputs retained"
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "evidence_class": "local_integration"
+    }
+  ],
+  "source_critic": {
+    "status": "COMPLETE",
+    "evidence_class": "source_review",
+    "findings_preserved": [
+      "Original frozen-query worker hash was not bound to the bytes parsed.",
+      "Interrupted worker could publish false zero counters.",
+      "Narrower freeze-to-file-record window could promote a changed query snapshot."
+    ],
+    "resolutions": [
+      "Worker expected SHA/length derive from the original validated bytes; frozen-file record must match and worker parsed-byte witness is checked against the same identity.",
+      "Live started/completed counters and returned hits are checkpointed; interruption preserves observed progress with explicit in-flight unknown outcome.",
+      "Regressions mutate the frozen file before recording and interrupt after a returned query and during extraction."
+    ]
+  },
+  "independent_native_opus": {
+    "status": "PENDING",
+    "route": "native subscription",
+    "prepaid_API_run": false,
+    "live_research": false
+  },
+  "boundaries": [
+    "No live DDGS query or source retrieval was run by this change's checks.",
+    "Mechanical capture is not a cited-answer, landscape Workflow, complete measured-usage or adoption verdict.",
+    "No host installation, active configuration, credential, coordinator marker or existing default question-route change was applied.",
+    "Logical native search/fetch attempts are bounded; total vendor HTTP fanout, bandwidth, DNS/redirect controls and source publication dates remain unverified.",
+    "Failed reviewer/source snapshots and historical checks are retained separately; counters are not summed across overlapping scopes."
+  ],
+  "inverse": "Omit mechanical flags to use the ordinary native DeerFlow question route; repository rollback removes the opt-in helper. No host configuration inverse is owed."
+}
