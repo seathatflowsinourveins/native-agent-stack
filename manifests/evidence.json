@@ -5311,8 +5311,8 @@
     },
     {
       "path": "adoption/skills/manifest.json",
-      "sha256": "731b79c977c430e0dd37e7ffa85b8a70df22c1ff1e53998b7cb0dc4923292259",
-      "bytes": 56885
+      "sha256": "53298efae3fb0d9f86e30ed92d512c2ac693ab9891e10156ec9adb28ff29092c",
+      "bytes": 61133
     },
     {
       "path": "adoption/templates/claude.settings.linux-wsl2.overlay.json",
@@ -5321,8 +5321,8 @@
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "a0e293941482230a1ccaaf8a3206a5c7e72b73690d47e3a211883e9dd6279abc",
-      "bytes": 12948
+      "sha256": "f45d21674c9be549b530e03fc14839b5814b66ac4c32be1bbc77408ffd25e00b",
+      "bytes": 13029
     },
     {
       "path": "adoption/templates/codex.AGENTS.template.md",
@@ -5331,8 +5331,8 @@
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
-      "sha256": "22c63a470891feb957e595fea65b7c02592df108e1bc567f1297783fb27985ba",
-      "bytes": 19129
+      "sha256": "39a91de20dcb449a3d774a18af80d45c35944e548d9a1bf1fcfe652adbece6ed",
+      "bytes": 19125
     },
     {
       "path": "adoption/templates/codex.omniroute.config.toml",
@@ -11052,8 +11052,8 @@
     },
     {
       "path": "blueprints/runtime-workers/skills/README.md",
-      "sha256": "3275aff838a94516cd0dfb6cc29364fec492e59d7c60975ae91e8693ace219ae",
-      "bytes": 44474
+      "sha256": "904301a5d51361ae003ea278b86432d20e1cdf3ed4e60990cfb056bb347d8dfb",
+      "bytes": 45037
     },
     {
       "path": "blueprints/runtime-workers/skills/freshness-20260927.json",
@@ -11062,8 +11062,8 @@
     },
     {
       "path": "blueprints/runtime-workers/skills/manifest.json",
-      "sha256": "1a2db8d0ba28a0cf9ea330d31ade083d6e111ac5b58525157a415978f54b4499",
-      "bytes": 186836
+      "sha256": "76b750a7a758830c7730379ff2a9b17864ee92a89ad44fe2c4b01a55724ae205",
+      "bytes": 188365
     },
     {
       "path": "blueprints/runtime-workers/skills/research.md",
@@ -16652,7 +16652,7 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "ce6441dbbe6b455d685b8a705de959d1fa6ad3b3258a362f2aca61f16591bbc4",
+      "sha256": "3c0f531c88431dd19a8844ef0255235f4f21056944220aaf015b703112894127",
       "bytes": 159863
     },
     {
@@ -16739,6 +16739,11 @@
       "path": "catalogs/landscape/research-state.json",
       "sha256": "fe142c1b8b8ec8b92d69ec5971d68028225899c101ffc43cea618883b119332a",
       "bytes": 21449
+    },
+    {
+      "path": "catalogs/landscape/skills-lifecycle.json",
+      "sha256": "affdb8d3969dd13ae5d4edbf63448fd4a461f574434f2890c050ff39a74a62f6",
+      "bytes": 26356
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
@@ -17894,6 +17899,11 @@
       "path": "docs/decisions/2026-10-08-philosophy-only-rules.md",
       "sha256": "f4b4f1d9952db662d8c0c9f1f9aec24da40c4666e4655e105c0617a689e6826c",
       "bytes": 10028
+    },
+    {
+      "path": "docs/decisions/2026-10-08-skills-cc-lanes-picks.md",
+      "sha256": "e115a46c4509631399147f1d34a70c25cc6cc3d088c9a522059238a91cda5c02",
+      "bytes": 16124
     },
     {
       "path": "docs/direct-results.md",
@@ -57772,8 +57782,8 @@
     },
     {
       "path": "tests/test_new_wsl_client_config.py",
-      "sha256": "b0985b113221595697b61c31a373eb0ca33b73b92a6f477943faa6674b464afd",
-      "bytes": 340715
+      "sha256": "799fbebe59b55a16c0ec3ef515e805d74d15c2b006dd07771a68f9929b0e07fe",
+      "bytes": 341802
     },
     {
       "path": "tests/test_new_wsl_definitive_defaults.py",
@@ -58042,8 +58052,8 @@
     },
     {
       "path": "tests/test_skills_status.py",
-      "sha256": "7c7ffee80a370d9a6c0d7510c16cd96abc0d7314e93579816400b317ab169fb5",
-      "bytes": 67576
+      "sha256": "ef28cf26ea0515628d4d92fafff7a45a3bbad4b55c286b18259295f7df2c78ac",
+      "bytes": 67573
     },
     {
       "path": "tests/test_sota_convergence.py",
@@ -58267,8 +58277,8 @@
     },
     {
       "path": "tools/adoption/new_wsl_client_config.py",
-      "sha256": "d8b061081776fb4406a8e2b70e992ecfbc6846033b7a8cbe7144d50653b13006",
-      "bytes": 165000
+      "sha256": "2a0878760da8f20fdd2a3020ae8793e4dd2818ab941ced824d76d82339ae3e00",
+      "bytes": 165834
     },
     {
       "path": "tools/adoption/prove_codex_lane.py",
