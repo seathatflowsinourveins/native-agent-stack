@@ -134,8 +134,54 @@ class WorkflowProvisioningContract(unittest.TestCase):
         self.assertIn('echo "REQUIRE_PROMOTION_GATE_VENV=1" >> "$GITHUB_ENV"', body)
 
     def test_unittest_step_runs_the_full_suite(self):
-        steps = dict(self._step_bodies())
-        self.assertIn("python3 -m unittest", steps["Test validation failure modes"])
+        # Kind 3: docs/decisions/2026-10-07-validate-module-shards.md.
+        # Only the serial workflow binding changes; promotion assertions remain.
+        from tests.test_workflow_hardening import (
+            ValidateShardFinalStepRuns, block_if, jobs, step_block,
+            validate_shard_invocations,
+        )
+
+        workflow = (ROOT / ".github/workflows/validate.yml").read_text(encoding="utf-8")
+        matrix = jobs(workflow)["validate"]
+        self.assertTrue(validate_shard_invocations(step_block(matrix, "Test validation failure modes")))
+        self.assertRegex(matrix, r"(?m)^        shard: \[0, 1, 2, 3, 4, 5, 6, 7\]$")
+        self.assertIsNone(block_if(matrix.split("\n    steps:\n", 1)[0]))
+        provision = step_block(matrix, "Provision the promotion gate's isolated venv")
+        self.assertIsNone(block_if(provision), "every shard must provision the promotion environment")
+        self.assertNotIn("continue-on-error", provision)
+        final = jobs(workflow)["validate-result"]
+        self.assertRegex(final, r"(?m)^    name: validate$")
+        self.assertEqual(block_if(final), "always()")
+        self.assertRegex(final, r"(?m)^    needs: validate$")
+
+        # Reuse the tiny native fixture, without running another repository test
+        # method. An isolated subclass owns its setup and cleanup state.
+        class NativeFixture(ValidateShardFinalStepRuns):
+            pass
+
+        NativeFixture.setUpClass()
+        self.addCleanup(NativeFixture.doClassCleanups)
+        fixture = NativeFixture("test_final_step_reports_the_native_fixture_counts_and_complete_module_coverage")
+        proc, receipt, _ = fixture.run_final()
+        self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
+        self.assertEqual(set(receipt["executed_modules"]), {"tests", "tests.test_gate_fixture"})
+        self.assertEqual(len(receipt["executed_modules"]), receipt["discovered_modules"])
+        for state in ("failure", "cancelled", "skipped"):
+            with self.subTest(dependency=state):
+                failed, _, _ = fixture.run_final(job_result=state)
+                self.assertNotEqual(failed.returncode, 0)
+
+        def omit_executed_module(directory):
+            for path in directory.glob("*/report.json"):
+                row = json.loads(path.read_text(encoding="utf-8"))
+                if row["executed_modules"]:
+                    row["executed_modules"].pop()
+                    path.write_text(json.dumps(row), encoding="utf-8")
+                    return
+            self.fail("the native fixture provided no module coverage to remove")
+
+        missing, _, _ = fixture.run_final(mutate=omit_executed_module)
+        self.assertNotEqual(missing.returncode, 0, "discovery without executed coverage must fail")
 
 
 class PurePythonParsing(unittest.TestCase):

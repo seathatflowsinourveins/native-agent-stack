@@ -19,7 +19,12 @@ concurrency:
 
 jobs:
   validate:
+    name: validate-shard-${{ matrix.shard }}
     runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7]
     # Was 5 minutes with a fetch-depth: 1 checkout; raised to 10 to cover the added full-history
     # clone (the secret-scan job's comment below records ~34s locally for the same clone).
     # Raised to 20 on 2026-09-26: the unittest step alone ran 534s in run 36265075411, main's
@@ -33,7 +38,8 @@ jobs:
     # 37085570699 (limit 2400s), and the three serial runs of run 37109532421 took 1186s to 1688s for the
     # unittest step alone; the suite grew about fourfold in a week, and a hosted trial of a parallel runner
     # (unittest-parallel 1.8.6, run 37109532421) could not run it (it pickles live test instances), so the
-    # job stays serial for now. The limit remains a hang guard.
+    # job stayed serial after that trial. Independent matrix cells now avoid pickling; the
+    # limit remains a per-cell hang guard (docs/decisions/2026-10-07-validate-module-shards.md).
     timeout-minutes: 60
     permissions:
       contents: read # the checkout, and the read-only token zizmor's online audits use
@@ -52,10 +58,12 @@ jobs:
         # <catalog_revision>^{commit}` check can actually resolve a receipt's
         # recorded catalog_revision when it is an earlier commit than HEAD.
       - name: Check example workflow byte identity
+        if: matrix.shard == 0
         run: |
           cd examples/claude-native/workflows
           sha256sum --check --strict SHA256SUMS
       - name: Run the example workflow contract suites
+        if: matrix.shard == 0
         run: |
           cd examples/claude-native/workflows
           node test-envelope.mjs
@@ -67,6 +75,7 @@ jobs:
           --index-url https://pypi.org/simple
           -r .github/requirements-ci.txt
       - name: Audit GitHub workflows and Dependabot config with zizmor, including its online audits (read-only token)
+        if: matrix.shard == 0
         env:
           # The token selects zizmor's online audits (impostor-commit, known-vulnerable-actions,
           # ref-confusion, ref-version-mismatch); findings exit 11-14 and fail this required check.
@@ -77,6 +86,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: zizmor --no-config --no-ignores --persona regular --strict-collection .
       - name: Check workflow syntax and expressions with pinned kjanat/actionlint
+        if: matrix.shard == 0
         # kjanat/actionlint, the maintained fork of rhysd/actionlint, replaced rhysd 1.7.12 in this step
         # on 2026-09-28 (plan move M2): rhysd's main has had no commit since 2026-04-19
         # (rhysd/actionlint#719, "rhysd (the author) inactive", open). Before the swap, the non-required
@@ -103,38 +113,52 @@ jobs:
           "$RUNNER_TEMP/actionlint/actionlint" -version
           "$RUNNER_TEMP/actionlint/actionlint" -color
       - name: Validate manifests and evidence integrity
+        if: matrix.shard == 0
         run: python3 scripts/validate.py
       - name: Validate host evidence contribution receipts
+        if: matrix.shard == 0
         run: python3 scripts/host_receipts.py validate
       - name: Report release-due new-machine paths (strict only on a re-pin)
+        if: matrix.shard == 0
         shell: bash
         env:
           BASE_REF: ${{ github.base_ref }}
         run: python3 scripts/release_due.py --strict-if-repinned "origin/${BASE_REF:-main}" | tee -a "$GITHUB_STEP_SUMMARY"
       - name: Validate catalog evidence and coverage joins
+        if: matrix.shard == 0
         run: python3 scripts/validate_catalogs.py
       - name: Validate general foundation capability claims
+        if: matrix.shard == 0
         run: python3 scripts/validate_foundation.py --root . --json
       - name: Validate landscape choices and alternative evidence
+        if: matrix.shard == 0
         run: python3 scripts/landscape.py --root .
       - name: Reproduce independent source-report accounting
+        if: matrix.shard == 0
         run: python3 blueprints/blind-catalog-convergence/audit_reports.py --check
       - name: Validate declared convergence evidence and scope
+        if: matrix.shard == 0
         run: >-
           python3 scripts/validate_convergence.py
           --all-recorded --root . --json
       - name: Check layer-verdict generator output is current
+        if: matrix.shard == 0
         run: python3 tools/sota-convergence/build_verdicts.py --check
       - name: Check per-component independent-review and E2E matrix is current
+        if: matrix.shard == 0
         run: python3 scripts/component_matrix.py --check
       - name: Check the new-host grand list is current
+        if: matrix.shard == 0
         run: python3 scripts/new_host_grand_list.py --check
       - name: Report layer-winner rows whose evidence could flip their platform_status (report-only)
+        if: matrix.shard == 0
         shell: bash
         run: python3 scripts/verdict_flip_candidates.py | tee -a "$GITHUB_STEP_SUMMARY"
       - name: Check the gap crosswalk reproduces from its fixed source revision (92bb279; does not detect drift against current open_gaps)
+        if: matrix.shard == 0
         run: python3 tools/sota-convergence/gap_crosswalk.py build --check
       - name: Check the gap-resolution wave ledger reproduces from its checked-in receipts (does not detect drift against the current crosswalk)
+        if: matrix.shard == 0
         # The exact invocation that reproduces the checked-in combined ledger
         # (catalogs/landscape/gap-wave2-20260923+gap-wave3-20260923--gap-resolution.json);
         # --wave/--owner are required by the script and there is no single canonical
@@ -143,6 +167,7 @@ jobs:
           python3 tools/sota-convergence/gap_wave_ledger.py
           --wave gap-wave2-20260923 --wave gap-wave3-20260923 --owner gap-resolution --check
       - name: Check offline ecosystem explorer rebuild
+        if: matrix.shard == 0
         run: python3 scripts/build_ecosystem.py --check
       - name: Provision the promotion gate's isolated venv
         env:
@@ -232,22 +257,73 @@ jobs:
         # below, and pipefail keeps the exit status of timeout and unittest as the step's.
         env:
           PYTHONFAULTHANDLER: '1'
+          VALIDATE_SHARD: ${{ matrix.shard }}
         run: |
           set -o pipefail
           mkdir -p "$RUNNER_TEMP/suite"
           timeout --signal=ABRT --kill-after=60s 55m \
-            python3 -m unittest -v --durations 50 2>&1 | tee "$RUNNER_TEMP/suite/unittest-verbose.log"
+            python3 scripts/validate_shards.py run -v \
+              --shard "$VALIDATE_SHARD" --shards 8 \
+              --report "$RUNNER_TEMP/suite/report.json" --durations 50 \
+              2>&1 | tee "$RUNNER_TEMP/suite/unittest-verbose.log"
       - name: Upload the verbose test suite log
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: validate-unittest-verbose-${{ github.run_id }}-${{ github.run_attempt }}
-          path: ${{ runner.temp }}/suite/unittest-verbose.log
+          name: validate-shard-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.shard }}
+          path: |
+            ${{ runner.temp }}/suite/unittest-verbose.log
+            ${{ runner.temp }}/suite/report.json
           if-no-files-found: warn
           include-hidden-files: false
           retention-days: 30
       - name: Test semantic evidence contract boundaries
+        if: matrix.shard == 0
         run: node --test blueprints/native-skill-practice/test-contract.cjs
+
+  validate-result:
+    name: validate
+    if: always()
+    needs: validate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+      - name: Check out repository with full history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Download this attempt's shard reports and native logs
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          pattern: validate-shard-${{ github.run_id }}-${{ github.run_attempt }}-*
+          path: ${{ runner.temp }}/shards
+          merge-multiple: false
+          digest-mismatch: error
+      - name: Require complete discovery coverage and success from every shard
+        if: always()
+        shell: bash
+        env:
+          VALIDATE_SHARDS_RESULT: ${{ needs.validate.result }}
+        run: |
+          python3 scripts/validate_shards.py aggregate \
+            --reports "$RUNNER_TEMP/shards" --shards 8 \
+            --job-result "$VALIDATE_SHARDS_RESULT" --summary "$GITHUB_STEP_SUMMARY"
+      - name: Upload the aggregate shard receipt
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: validate-shard-summary-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/shards/aggregate.json
+          if-no-files-found: warn
+          include-hidden-files: false
+          retention-days: 30
 
   verdict-review-gate:
     # Required check (docs/decisions/2026-09-22-github-automation-closure.md, "verdict-review-gate
