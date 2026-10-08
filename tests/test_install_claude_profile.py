@@ -1404,8 +1404,9 @@ class McpTemplateShapeTests(unittest.TestCase):
         # socraticode, headroom, codebase-memory and qmd joined on 2026-09-30, the Codex user template's set.
         data = json.loads(icp.MCP_TEMPLATE.read_text())
         self.assertEqual(set(data["mcpServers"].keys()), USER_SCOPE_SERVERS)
-        self.assertEqual(data["mcpServers"]["ai-memory"]["type"], "http")
-        for name in USER_SCOPE_SERVERS - {"ai-memory"}:
+        for name in {"ai-memory", "qmd"}:
+            self.assertEqual(data["mcpServers"][name]["type"], "http")
+        for name in USER_SCOPE_SERVERS - {"ai-memory", "qmd"}:
             self.assertEqual(data["mcpServers"][name]["type"], "stdio")
         self.assertIn("--project-from-cwd", data["mcpServers"]["serena"]["args"])
 

@@ -57881,8 +57881,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "4098ee6c74015c3a07cf7b03ba44662b4cef5c6e8f4ce6273656cf79c3ef80e2",
-      "bytes": 134217
+      "sha256": "6c3ebe5047496138cacc4d4a0d673179e42aa990a8076d35d0b175a0aa73ec6b",
+      "bytes": 134263
     },
     {
       "path": "tests/test_install_skills.py",
