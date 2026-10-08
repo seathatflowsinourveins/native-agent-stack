@@ -1,6 +1,10 @@
 # Workstation upkeep jobs
 
-Six definitions port the functions read on NativeStack after the cold-boot hold.
+Seven definitions include the original six ports and the missing native-data
+collector identified by the Oct8 retirement inventory. Read
+[RETIREMENT-20261008.md](RETIREMENT-20261008.md) before the historical apply steps:
+it selects only missing functions, preserves the current progress/disk owners,
+and carries the current freeze and quiet-window direction.
 See [source-map.md](source-map.md) for the native times/hashes, commands and timer
 differences, and the [dated decision](../../../docs/decisions/2026-10-06-upkeep-dagu.md)
 for the hindsight-ensure not-needed row. The co-op installs and measures them;
@@ -14,6 +18,7 @@ authoring/fixture checks do not establish host acceptance.
 | token-report-refresh | Maintained native lifetime refresh with private config pointer | 15 min |
 | host-requests-workstation | Read-only GitHub polling and Alertmanager notices | 2 min |
 | native-agent-stack-sync | Main pin, live clone, scoped QMD text update | 6 min |
+| ecosystem-native-data | Existing bounded native-data collector and Loki publish with a private config pointer | 90 s |
 
 All fields use the [Dagu 2.18.2 embedded schema](https://github.com/dagucloud/dagu/blob/5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4/internal/cmn/schema/dag.schema.json):
 description, schedule, catchup_window, overlap_policy, hist_retention_days,

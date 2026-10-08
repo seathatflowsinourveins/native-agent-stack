@@ -1,0 +1,23 @@
+# Dagu 2.18.2 schema: dagucloud/dagu@5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4
+# NativeStack source: ecosystem-native-data.service:15 / timer:5-8, read 2026-10-08T08:59:48Z.
+# Existing unchanged collector: native-agent-stack@28af9b93 observability/native-data/snapshot.py.
+description: "Collect and publish bounded native foundation metadata through the existing collector"
+schedule: "CRON_TZ=America/New_York */2 * * * *"
+hist_retention_days: 60
+timeout_sec: 90
+env:
+  NATIVE_STACK_REPOSITORY: "${HOME}/code/native-agent-stack-live"
+  NATIVE_STACK_DATA_CONFIG: "${HOME}/.config/ecosystem-observability/native-data.json"
+  RTK_TELEMETRY_DISABLED: "1"
+  PYTHONDONTWRITEBYTECODE: "1"
+  PATH: "${HOME}/.local/share/mise/shims:${HOME}/.local/bin:/usr/local/bin:/usr/bin:/bin"
+steps:
+  - name: collect-and-publish
+    timeout_sec: 90
+    run: |
+      umask 0077
+      exec /usr/bin/setpriv --no-new-privs /usr/bin/python3 -B \
+        "${NATIVE_STACK_REPOSITORY}/observability/native-data/snapshot.py" \
+        --config "${NATIVE_STACK_DATA_CONFIG}" --publish
+    with:
+      shell: ["/bin/bash", "-e", "-u", "-o", "pipefail"]

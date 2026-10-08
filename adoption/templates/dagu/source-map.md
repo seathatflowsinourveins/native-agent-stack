@@ -1,5 +1,10 @@
 # Native upkeep source mapping (2026-10-06)
 
+Oct8 retirement supplement: [RETIREMENT-20261008.md](RETIREMENT-20261008.md)
+records current destination ownership and the additional native-data port. The
+original six-definition mapping below remains historical source evidence;
+its dated resource guard is not current Oct8 coverage.
+
 Evidence class: **source review**, not a host deployment, model run or measured
 scheduler acceptance. Read-only NativeStack interop first ran at
 **2026-10-06T04:26:27Z**, after the cold-boot hold. Stdin/output declarations were

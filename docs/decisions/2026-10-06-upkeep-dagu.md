@@ -1,5 +1,11 @@
 # Move the upkeep functions to Dagu (2026-10-06)
 
+CC082012Z's Oct8 retirement continuation is recorded in
+[RETIREMENT-20261008.md](../../adoption/templates/dagu/RETIREMENT-20261008.md).
+It adds the missing native-data invocation, preserves the already deployed
+progress/disk owners and current paper-window holds, and records deployment gaps
+without promoting the original authoring checks to host acceptance.
+
 ## Decision and scope
 
 The approved environment-transfer plan selects Dagu for the workstation's

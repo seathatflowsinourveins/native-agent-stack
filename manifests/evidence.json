@@ -5320,6 +5320,26 @@
       "bytes": 5451
     },
     {
+      "path": "adoption/templates/dagu/README.md",
+      "sha256": "3e557acd91b9c6e9286f43a5a484bfacec04d13b4cd31f21300b3601748c0bc4",
+      "bytes": 10920
+    },
+    {
+      "path": "adoption/templates/dagu/RETIREMENT-20261008.md",
+      "sha256": "37533c7f384e374f1bb5529fab47857d1085cd720ecec90e8cba1e256ba9881b",
+      "bytes": 4934
+    },
+    {
+      "path": "adoption/templates/dagu/ecosystem-native-data.yaml",
+      "sha256": "a4b7e18896869bb46f5ed23144b5fb56162d0d9a207575b05a47839e13a97d59",
+      "bytes": 1122
+    },
+    {
+      "path": "adoption/templates/dagu/source-map.md",
+      "sha256": "5268e32c2be005eb459a2c9eed2707fb525a3e97b2c38dcaa90f30e20297a2a7",
+      "bytes": 9082
+    },
+    {
       "path": "adoption/templates/decision-routing.md",
       "sha256": "3158ac5563469cccabc2e025236a297b44bbf2f4d22fc0c4c3b2ac14ccec96ed",
       "bytes": 601
@@ -17819,6 +17839,11 @@
       "path": "docs/decisions/2026-10-06-sharp-live-relock-frozen-variant.md",
       "sha256": "7fad1a25a8f3b1c151a7c1f125c1635d32d631757c68509588b55d72c1cf6f89",
       "bytes": 3898
+    },
+    {
+      "path": "docs/decisions/2026-10-06-upkeep-dagu.md",
+      "sha256": "32b8077b209a256f4c98fbbefef05fd57708702f968483107f068680244f8c5a",
+      "bytes": 8364
     },
     {
       "path": "docs/decisions/2026-10-06-upstream-evidence-over-local-evaluation.md",
