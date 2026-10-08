@@ -5166,8 +5166,8 @@
     },
     {
       "path": "adoption/new-wsl/client-config-map.json",
-      "sha256": "ba33408c82deda5f30aa6253bdbcf209c02a4e49844b3108a4973d29b7729719",
-      "bytes": 55814
+      "sha256": "0d12f8a2dacfa0ac87261bedc4b349a39939aec41c030b64a2fa7a3d798e1487",
+      "bytes": 55883
     },
     {
       "path": "adoption/new-wsl/codex-user-instructions.md",
@@ -5186,8 +5186,8 @@
     },
     {
       "path": "adoption/new-wsl/templates/codex.config.additions.toml",
-      "sha256": "a10fbc7b2bc034c824e22c292d71700fd2760234998c03f390d79a965e3bc159",
-      "bytes": 5085
+      "sha256": "07da39f8e7bc5211d51cfc5997301ade00e86cf00f7bc9d9160a7c7b7ed3e055",
+      "bytes": 5207
     },
     {
       "path": "adoption/paired/README.md",
@@ -5221,8 +5221,8 @@
     },
     {
       "path": "adoption/pins-linux-x86_64.json",
-      "sha256": "0ede232552fa0ac9666f6a52ea6f037539668e1517e6de9c2fc4602b2e797691",
-      "bytes": 37218
+      "sha256": "0c2a0d7fb2b35f9c3f85462dcac514254645116ae3eb7735cf444f1735e894c3",
+      "bytes": 36650
     },
     {
       "path": "adoption/pins-macos-arm64.json",
@@ -56007,8 +56007,8 @@
     },
     {
       "path": "examples/omniroute-codex-sdk/README.md",
-      "sha256": "edcd00175931191ae19336c00405291eef92ca97a4a791295ebc9cd1aeaff434",
-      "bytes": 20410
+      "sha256": "c228b2f0e7b7be2226e11e8ac3c4602b2da9a25f5ce0bce0418542dc22cc0409",
+      "bytes": 20417
     },
     {
       "path": "examples/omniroute-codex-sdk/acceptance-plan.json",
@@ -56057,7 +56057,7 @@
     },
     {
       "path": "examples/omniroute-codex-sdk/worker.py",
-      "sha256": "e1f06bf5c161ecf66a2172cee27c288b7a03a16c75a6f155099f381a532ac3ea",
+      "sha256": "f1a2489fc059b5ab055392e26a1f13d1748623baed130d8808ddc99fc1c08610",
       "bytes": 26572
     },
     {
@@ -56222,8 +56222,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "c191a297c89b884e5639fc676ce90d4b543d32e6b9eb2c26156e253b74c0326b",
-      "bytes": 128113
+      "sha256": "122c1c78ee2e794404b43a2d319460d916a6e1e78521084e2dcccb4117921737",
+      "bytes": 128357
     },
     {
       "path": "observability/README.md",
@@ -56667,7 +56667,7 @@
     },
     {
       "path": "scripts/native_token_ci.py",
-      "sha256": "95d45da579b1035c4cfa54f330f1ab179b949bbdb49555dd82c5163d2367300a",
+      "sha256": "fa83183c61407724083dfac2f5441859268a4de93663dae5d024eea7c733681d",
       "bytes": 117733
     },
     {
@@ -57707,8 +57707,8 @@
     },
     {
       "path": "tests/test_new_wsl_client_config.py",
-      "sha256": "a31f44e0259efbfdcda5ab19f50663cb932973b6c9f0fa73d4dc2b1ae9a9295c",
-      "bytes": 340618
+      "sha256": "b0985b113221595697b61c31a373eb0ca33b73b92a6f477943faa6674b464afd",
+      "bytes": 340715
     },
     {
       "path": "tests/test_new_wsl_definitive_defaults.py",
