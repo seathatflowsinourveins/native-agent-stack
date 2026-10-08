@@ -15461,6 +15461,81 @@
       "bytes": 10783
     },
     {
+      "path": "blueprints/us-equities/event-anchored-ranking/R2-COMPARISON.json",
+      "sha256": "da89c13fa9f2e2113eebd3b0e517757ed8eb39c40d6c35b2cc38a55d348286a7",
+      "bytes": 27384
+    },
+    {
+      "path": "blueprints/us-equities/event-anchored-ranking/R2-CONSTRUCTION.json",
+      "sha256": "237c4d3dfdef5b4aeac6a4ab388f1f02f1812be568c54e85f9ef528c088101ba",
+      "bytes": 25074
+    },
+    {
+      "path": "blueprints/us-equities/event-anchored-ranking/R2-INSPECTION.json",
+      "sha256": "6a21266974134ecfba560be1ad3b97bd0a677e184600775aa3725419352d112d",
+      "bytes": 12962
+    },
+    {
+      "path": "blueprints/us-equities/event-anchored-ranking/R2-LOGIT-OPERATORS.json",
+      "sha256": "b26bf0fac3102f5aae6477dcb5f19ee0844c2a7e2b22d74390879eb7ab51d644",
+      "bytes": 11092
+    },
+    {
+      "path": "blueprints/us-equities/event-anchored-ranking/R2-SURVIVORSHIP.json",
+      "sha256": "71229fdb6204dc10fbc7d8a109e9bb6e513f569c7809906748a559937c91ab1b",
+      "bytes": 9274
+    },
+    {
+      "path": "blueprints/us-equities/event-anchored-ranking/R3-RUNTIME-ACCEPTANCE.json",
+      "sha256": "1a29f1572326dca40c853d3b7fbc26bc9dd12388262ef50ee38e13246dd821ff",
+      "bytes": 6099
+    },
+    {
+      "path": "blueprints/us-equities/event-anchored-ranking/R3-RUNTIME-LOCK-VERIFICATION.json",
+      "sha256": "95cb1caebc07e725fa46c6408ae31ea0e4806b14ec75416ab999b18df143e56b",
+      "bytes": 4370
+    },
+    {
+      "path": "blueprints/us-equities/event-anchored-ranking/R3-VERIFY.py",
+      "sha256": "8d86e1d3cc517c549ad4f7b9dff660a50bc95cc3804822989b1d72086b9f5018",
+      "bytes": 6744
+    },
+    {
+      "path": "blueprints/us-equities/event-anchored-ranking/README.md",
+      "sha256": "37ce6de89c5a6ce5ff8032942e6efb2ade0f755818cfa8e924749880c168a7be",
+      "bytes": 5519
+    },
+    {
+      "path": "blueprints/us-equities/event-anchored-ranking/ROW14-SUBMISSION-R3.json",
+      "sha256": "ea4404c7b1ef9d5963e83b0bd56e5a555e7003bfadc57bfea9b6fab66fa52536",
+      "bytes": 9693
+    },
+    {
+      "path": "blueprints/us-equities/event-anchored-ranking/SHA256SUMS",
+      "sha256": "a05ee8f8adc71908e28965ae321d3d1bd619791c8a662e785ea9f4b76f9e9849",
+      "bytes": 1056
+    },
+    {
+      "path": "blueprints/us-equities/event-anchored-ranking/SHA256SUMS.R3",
+      "sha256": "a05ee8f8adc71908e28965ae321d3d1bd619791c8a662e785ea9f4b76f9e9849",
+      "bytes": 1056
+    },
+    {
+      "path": "blueprints/us-equities/event-anchored-ranking/SHA256SUMS.R3B",
+      "sha256": "a05ee8f8adc71908e28965ae321d3d1bd619791c8a662e785ea9f4b76f9e9849",
+      "bytes": 1056
+    },
+    {
+      "path": "blueprints/us-equities/event-anchored-ranking/inspection-registry.draft.json",
+      "sha256": "a64e61cccb5db24c51326364961ebeb630e6da1983732aae369d5e6be1a9c55d",
+      "bytes": 14565
+    },
+    {
+      "path": "blueprints/us-equities/event-anchored-ranking/protocol.draft.json",
+      "sha256": "8e203bcea1f3df307db3ccabb0294d5bad07cc24125eab77b6d1e320e3e9e704",
+      "bytes": 44761
+    },
+    {
       "path": "blueprints/us-equities/execution-realism/ExecutionSensitivityAlgorithm.cs",
       "sha256": "644e86aaeef1324a8e11c48c61857667f96c3804ce6ec587aba9b66c69131c34",
       "bytes": 1723
