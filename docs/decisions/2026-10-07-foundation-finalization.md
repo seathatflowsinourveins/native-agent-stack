@@ -119,11 +119,18 @@ These are each tool's own estimates, not net provider savings. jCodeMunch is
 installed and was not called on the Mac. Under the
 [clean-install decision](2026-10-07-clean-upstream-install-finalizes-a-candidate.md)
 (#833, rule 4), zero use is an install gap first and never a reason for removal; its
-state there is release owed (1.108.332). The ai-memory swap waits for its gate and runs: stop the agent,
-`ai-memory backup --to <dated tarball>`, copy the 2.5.2 directory to a 2.6.0
-directory, run `ai-memory upgrade --version v2.6.0` from the copy, repoint the
-launchd program and `~/.local/bin/ai-memory`, start, then `ai-memory doctor` and an
-MCP status read from both clients. Rollback restores the backup and the 2.5.2 path.
+state there is release owed (1.108.332). The ai-memory swap waits for its gate and runs in this order:
+1. While 2.5.2 is still serving, take `ai-memory backup --to <dated tarball>`. The
+   command is a thin HTTP client that needs the running server
+   (`adoption/lifecycle.md` L282-283).
+2. Verify the archive by restoring it into a new empty fixture directory.
+3. Stop the agent.
+4. Copy the 2.5.2 directory to a 2.6.0 directory and run
+   `ai-memory upgrade --version v2.6.0` from the copy.
+5. Repoint the launchd program and `~/.local/bin/ai-memory`, then start.
+6. Run `ai-memory doctor` and an MCP status read from both clients.
+
+Rollback restores the verified backup and the 2.5.2 path.
 `claude-plugins-official` publishes no tags and stays unpinned.
 
 ## NativeStack2604 readiness dispositions (proposed for the readiness owner)
@@ -146,7 +153,7 @@ groups:
 
 1. **Re-adjudicate with existing evidence:** native-clients/codex (at the selected 0.160.1, then 0.161.0 after its gate), agent-sdks/codex-sdk-and-codex-exec-app-server, ci-supply-chain/syft, code-navigation/serena, code-navigation/structural-search, cross:credential-practice/credential-guard, document-retrieval/tobi-qmd, git-github-automation/git, instructions-skills/engineering-process-skills, instructions-skills/research-skill, instructions-skills/trail-of-bits-security-skills, observation-inference/local-generation-model, observation-inference/otel-collector-contrib, secrets-credentials/betterleaks, semantic-rag/embedding-model, the nine token-efficiency slots (api-docs, code-graph, code-index, command-output, context-supply, doc-conversion, output-compression, repo-packing, structured-data), workers/agent-messaging (2026-10-06 launch-and-close gate), web-research/playwright-cli (2026-10-06 Chrome DevTools fixture), quality-evaluation/harbor-containerized-agent-e2e-runner, observation-inference/alerting (user-accepted Telegram receiver), token-efficiency/statusline (user observation) and durable-memory/memory-owner (ai-memory 2.6.0 after its gate; the head-to-head no longer gates).
 2. **BY_DESIGN:** secrets-credentials/credential-custody (private 0600-file practice), token-efficiency/token-lane-carriers (documented holdout), token-efficiency/trace-viewer (traces are off by the 2026-09-26 decision) and document-retrieval/mineru (Docling owns parsing; MinerU is the runner-up).
-3. **Fix and smoke on the host:** observation-inference/session-analytics (agentsview v0.44.0), token-efficiency/ccusage, cross:gpt6-harnesses/gpt-gateway (smoke the running composition; the canary is superseded), cross:runtime-workers/agent-runtime-worker (OpenHands v1.53.0), cross:runtime-workers/research-harnesses, cross:wsl-distro/base-distribution (the binfmt unit), git-github-automation/cross-family-review (Claude turn limit), git-github-automation/difftastic and worktrunk (empty print prompt in the staged check), instructions-skills/skill-authoring (rerun after PyYAML provisioning), isolation/sandbox-runtime-srt, mcp-surfaces/mcp-inspector (libnspr4 for the web smoke), observation-inference/grafana (configuration drift), observation-inference/local-model-server, quality-evaluation/inspect-ai (non-relative example path), quality-evaluation/promptfoo.
+3. **Fix and smoke on the host:** observation-inference/session-analytics (agentsview v0.44.0), token-efficiency/ccusage, cross:gpt6-harnesses/gpt-gateway (smoke the running composition; the canary is superseded), cross:runtime-workers/agent-runtime-worker (OpenHands v1.53.0), cross:runtime-workers/research-harnesses, cross:wsl-distro/base-distribution (the binfmt unit), git-github-automation/cross-family-review (Claude turn limit), git-github-automation/difftastic and worktrunk (empty print prompt in the staged check), instructions-skills/skill-authoring (rerun after PyYAML provisioning), isolation/sandbox-runtime-srt, mcp-surfaces/mcp-inspector (libnspr4 for the web smoke), observation-inference/grafana (configuration drift), observation-inference/local-model-server, quality-evaluation/inspect-ai (non-relative example path), quality-evaluation/promptfoo, and semantic-rag/code-search. Code search is INTERIM in `evidence/artifacts/ns2604-requalification-20261005/slots.json`. Under #833's table semble is final there, while SocratiCode is install owed: release 1.16.0 with the vendor's plugin, then its own `codebase_health` check. The Mac's semble evidence below does not adjudicate this host's slot.
 
 **Code search (settled by #833):** the two engines have one job each. SocratiCode
 serves indexed projects on the local embedding model, and semble serves any other
