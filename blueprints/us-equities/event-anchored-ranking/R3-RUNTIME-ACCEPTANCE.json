@@ -1,0 +1,129 @@
+{
+  "schema_version": 1,
+  "task": "CC133502Z assignment2; native LightGBM4.7.0 through the existing prepared action7 locked uv route",
+  "recorded_at": "2026-10-08T13:50:35Z",
+  "north_star_action": "Qualify the native research runtime for the reviewed event-anchored ranking protocol; no strategy evaluation or broker operation.",
+  "authority": {
+    "paper_window_closed": "2026-10-08T13:35:00Z",
+    "n2_stop_latched": true,
+    "landing": "command-center cue through5f only"
+  },
+  "native_entrypoint": {
+    "launcher": "Windows wsl.exe --distribution NativeStack2604 --exec",
+    "native_distribution_observed": "NativeStack2604",
+    "guard_bypassed": false,
+    "wsl_variables_manufactured": false,
+    "uv": "0.12.17",
+    "python": "3.12.3",
+    "outer_argv_evidence": "Recorded entrypoint and source hashes identify the requested native route; no independent post-hook outer shell-argv read is claimed."
+  },
+  "source": {
+    "prepared_packet": "currency-work/7-runtime-lock-20261008/checkout/blueprints/us-equities/runtime-2604",
+    "prepared_diff_sha256": "b83686d47410bddee3bb8d0195bcfc0ec1afc5510cd99000997f3d2b8e4f310b",
+    "installer_sha256": "691f9b15673f4f96b0ad61b0ec6785a324f2f390f8450ca113779f725dedcaf6",
+    "acceptance_script_sha256": "4d7b784aa2b24ccfe05910fd652fb4d7ef99f0298b7200e3a864b7c186207ade",
+    "shared_sync_sha256": "4e46729e4ca8acc87f2108cf3cb5d88495ddac8929378644d85442dad0de2e7b",
+    "vendor": "lightgbm-org/LightGBM",
+    "tag": "v4.7.0",
+    "commit": "8f7036f03627054d5a54a6f965b13f4b9ff2cb63",
+    "pypi": "https://pypi.org/pypi/lightgbm/4.7.0/json",
+    "alias_correction": "The microsoft/LightGBM tag API redirects to the current maintainer repository lightgbm-org/LightGBM."
+  },
+  "install": {
+    "exit_code": 0,
+    "returned_status": "install | PASS",
+    "uv_route": "Shared source sync_trading_2604: uv0.12.17 lock--check, sync--locked--no-dev, pipcheck; matching prepared cutoff2026-10-08T07:15:08Z",
+    "runtime_pyproject_sha256": "25d95481cd5cf509ffd4ce60fc8848d489b53fc402ae4dbd3cc65d528354c270",
+    "runtime_lock_sha256": "17221888e8f3017d61e8a96eacd87a8bd8eda60ff6b1738eb683ed52980e175a",
+    "native_readback": {
+      "lightgbm": "4.7.0",
+      "edgartools": "5.61.1",
+      "skfolio": "1.7.0"
+    },
+    "scope": "Native installed state at the writer-release snapshot. Layer15's later authorized pytest dev addition may change the lock; this receipt does not claim its future current hash."
+  },
+  "checks": {
+    "repository_runtime_acceptance": {
+      "exit_code": 0,
+      "passed": 24,
+      "total": 24,
+      "scope": "Existing prepared repository integration/acceptance script, with unchanged upstream examples inside it. Not the upstream full test suites, historical-data Layer1.5 E2E or a strategy result."
+    },
+    "unchanged_vendor_example": {
+      "path": "examples/python-guide/simple_example.py",
+      "exit_code": 0,
+      "source_tree_clean": true,
+      "scope": "Unchanged vendor regression train/save/predict example on its own public fixture. Prediction uses the in-memory model; no saved-model reload acceptance is claimed. No study data or scientific model fitting."
+    },
+    "exact_protocol_binary_parameters": {
+      "status": "NOT_RUN",
+      "must_pass_before_study_fit": true
+    },
+    "protocol_determinism": {
+      "status": "NOT_RUN",
+      "must_pass_before_study_fit": true
+    }
+  },
+  "inverse": {
+    "path": "inverse/",
+    "saved_pyproject_sha256": "30f47dfbcb247c01e8e3ed8733fbf63bf5de6ad4ea7e4c0807e3ea484b975958",
+    "saved_lock_sha256": "1fb9f8ca6fef9c47a4ded826ddf20012f78d6643926cce3a36b86c674f55eb9c",
+    "instructions": "INVERSE.md",
+    "rollback_executed": false
+  },
+  "native_output_artifacts": {
+    "install.stdout": "d8962eedb95ae4fbd3eb7d53ac2ecc48c14231d9353cd8f9240293f47775bbcd",
+    "install.stderr": "212c44ea8515e7cf5bac170b3080330651441b4130ef66d23dd00f547a9e8d36",
+    "accept.stdout": "29bed249663d682153014481b98d7278bbaa2f2ae8a63b783614041bc8dd4e10",
+    "accept.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "vendor-example.stdout": "025eef7049481a2ad8e28cd62094f8e8fc06d7ec5458d6602f75bb18574e2f79",
+    "vendor-example.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "lane": {
+    "model": "cx/gpt-6.1-sol",
+    "effort": "max",
+    "tier": "fast",
+    "tier_source": "native current Codex argv",
+    "exposed_servers": 5,
+    "exposed_tools": 70,
+    "tools_smoke_pass": 5,
+    "tools_smoke_total": 5,
+    "smoked_tools": [
+      {
+        "tool": "ai_memory.memory_status",
+        "pass": true
+      },
+      {
+        "tool": "codebase_memory_mcp.list_projects",
+        "pass": true
+      },
+      {
+        "tool": "context_mode.ctx_execute",
+        "pass": true
+      },
+      {
+        "tool": "hindsight.get_bank",
+        "pass": true
+      },
+      {
+        "tool": "qmd.status",
+        "pass": true
+      }
+    ],
+    "smoke_scope": "Five representative read-only tools, one per exposed MCP server, on this Codex client; no all70-tools or Claude-client assertion."
+  },
+  "boundaries": {
+    "credentials_read_printed_copied": false,
+    "broker_key_use": false,
+    "orders": false,
+    "new_study_outcomes_read": false,
+    "study_model_fit": false,
+    "paid_claude_gateway_call": false,
+    "accepted_layer15_receipt": false,
+    "protocol_frozen": false,
+    "freeze_or_commit": false,
+    "runtime_writer_released_to": "layer15-build for its separately authorized pytest9.1.1 dev addition",
+    "skfolio_execution_pin_amendment": "Still owed before study execution; the1.7.0 package import/vendor example does not silently amend the reviewed1.2.9 CPCV method."
+  },
+  "completeness_critic": "Vendor/native installation and primitive example now pass. Exact protocol binary-parameter/determinism, skfolio1.7.0 study compatibility, accepted Layer1.5/PIT04 counts, original KZ options and historical economic E2E remain separate gates. Both named readers must review the refreshed full R3 hash set; no strategy-performance or complete fleet readiness claim."
+}

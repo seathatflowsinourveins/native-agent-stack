@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "task": "CC134735Z item1 existing relock verification and item2 native library assignments",
+  "recorded_at": "2026-10-08T14:09:06Z",
+  "north_star_action": "Qualify native inference/runtime primitives for the reviewed ranking protocol; no strategy execution.",
+  "runtime_lock_sha256": "f451ef979cdb1ae3686a30df1c883c257402b32753478c1f9c686c057e9c3989",
+  "runtime_pyproject_sha256": "aa370e42e29dc2419e586358254ff2e821df48a693aa9a3ee16b65d30036ee0b",
+  "old_runtime_lock_sha256": "1fb9f8ca6fef9c47a4ded826ddf20012f78d6643926cce3a36b86c674f55eb9c",
+  "held_intermediate_lock_sha256": "17221888e8f3017d61e8a96eacd87a8bd8eda60ff6b1738eb683ed52980e175a",
+  "writer": {
+    "prior": "layer15-build released dev writer, hcom44118",
+    "this_unit_relocked": false,
+    "this_unit_added_packages": false
+  },
+  "commands": [
+    {
+      "requested_inner_vector": "mise exec uv@0.12.17 -- uv --no-config sync --project <owned runtime> --python <owned runtime>/.venv/bin/python --no-python-downloads --locked --group dev --inexact",
+      "exit_code": 0,
+      "returned_stderr": "Resolved 192 packages in 1ms\nChecked 187 packages in 1ms\n",
+      "stdout_artifact": "sync-attempt3.stdout",
+      "stderr_artifact": "sync-attempt3.stderr"
+    },
+    {
+      "requested_inner_vector": "mise exec uv@0.12.17 -- uv --no-config pip check --python <owned runtime>/.venv/bin/python",
+      "exit_code": 0,
+      "stdout_artifact": "pip-check-attempt3.stdout",
+      "stderr_artifact": "pip-check-attempt3.stderr",
+      "observation": "All installed packages are compatible; inspect retained native stderr for exact output."
+    }
+  ],
+  "native_entrypoint": "Windows wsl.exe --distribution NativeStack2604 --exec; no WSL variable manufactured",
+  "delta_from_held": {
+    "added": {
+      "pytest": "9.1.1",
+      "pluggy": "1.6.0",
+      "iniconfig": "2.3.1"
+    },
+    "removed": [],
+    "existing_version_changes": [],
+    "existing_package_record_changes": [
+      "us-equities-runtime dev metadata only"
+    ],
+    "existing_distribution_versions_and_archives_preserved": true
+  },
+  "observed_versions": {
+    "python": "3.12.3",
+    "edgartools": "5.61.1",
+    "lightgbm": "4.7.0",
+    "pytest": "9.1.1",
+    "arch": "8.0.0",
+    "fincore": "0.5.1",
+    "purgedcv": "0.1.10",
+    "nautilus_trader": "2.0.0rc5"
+  },
+  "inverse": {
+    "original_metadata": "../rnd-r1-lightgbm-native-20261008T1343Z/inverse/",
+    "original_pyproject_sha256": "30f47dfbcb247c01e8e3ed8733fbf63bf5de6ad4ea7e4c0807e3ea484b975958",
+    "original_uv_lock_sha256": "1fb9f8ca6fef9c47a4ded826ddf20012f78d6643926cce3a36b86c674f55eb9c",
+    "dev_addition_inverse": "layer15-revise3/runtime-dev-inverse-17221888/",
+    "rollback_executed": false,
+    "condition": "Coordinate the writer before rollback; restore the retained pair and its supported prior locked sync. Do not remove another owner's later packages."
+  },
+  "prior_writer_evidence": {
+    "receipt_sha256": "8843ccd2f7ee4c6a1f9fafdb2a887fe27e8abb76d1266d364bb9685db20e0e52",
+    "execution_provenance_sha256": "1d11cd31700da1ff1d90518b168db97533f6093ee9981693cdedfd09b9698617",
+    "scope": "Reused reported dev-addition results plus independent current native comparison/readback; not a repeated add or relock."
+  },
+  "failed_attempts": [
+    {
+      "commands": "sync/pipcheck first attempt",
+      "exit_code": 1,
+      "reason": "Guessed direct managed uv executable path did not exist; native WSL failed before executing uv.",
+      "artifacts": [
+        "sync.stdout",
+        "sync.stderr",
+        "pip-check.stdout",
+        "pip-check.stderr"
+      ]
+    },
+    {
+      "command": "sync attempt2",
+      "exit_code": 1,
+      "reason": "Adding the retired global exclude-newer cutoff conflicted with f451ef97's native lock options. --locked refused to update; no relock occurred.",
+      "artifacts": [
+        "sync-attempt2.stdout",
+        "sync-attempt2.stderr"
+      ]
+    }
+  ],
+  "correction": "Use the supported mise exec pinned uv route, and the actual final lock/writer sync vector without the retired global exclude-newer option. --locked protects the existing final lock.",
+  "scope": "Native installed-state/dependency verification on f451ef97, not full pytest/Layer1.5 historical E2E, study fitting, inference or strategy acceptance; no credentials or broker/SEC/model-provider calls."
+}

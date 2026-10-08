@@ -1,0 +1,186 @@
+{
+  "schema_version": 1,
+  "revision": "R3: deterministic assignment, closed main inputs, scoped training recollection and label basis",
+  "population": {
+    "scope": "Event-conditioned main experiment; all model arms rank the identical eligible Item1.01 cohort, not an undisclosed full-universe cohort",
+    "background_universe_U": "Dated US ordinary-common-share listing intervals admitted by Layer1.5; no ETF/warrant/unit/right, current-ticker-only or CIK-only security identity",
+    "screens": "At anchor a use actual traded raw regular close(not future/back-adjustedclose)>=1USD, raw sessionVWAP*raw sharevolume>=1000000USD, median preceding20complete-session dollar volume>=1000000USD. All cutoff information must be qualified.",
+    "warmup_relation": "20sessions is only the universe/liquidity screen. Scored_C also needs every model's fullsupport, including18completecalendar months turnover. Insufficient history is a pre-cutoff common-cohort rejection, not a relaxed252-row substitute.",
+    "common_cohort_C": "Universe_U intersect qualifying historical event join, inspection exclusion, and complete valid pre-cutoff predictors for LightGBM and BOTH required logits. One score row per stable security and decision session; no arm-specific denominator or missing-data substitution.",
+    "background_controls": "Controls may come from_U without a qualifying catalyst only when complete indexed coverage proves that absence. They are for the fixed matched-control return comparison, never silently mixed into main-model training/ranking.",
+    "option_scope": "Background_U remains the declared US ordinary-share universe. Scored_C is restricted to historically listed-option stocks with every mandatory KZ option/forward/rate/exercise-equivalence predictor qualified, alongside CKX/main inputs. This is an explicit model-comparison scope restriction, not a claim about all ordinary shares. Missing listed options or compatible data is a counted pre-cutoff common-cohort exclusion; no mandatory-arm deletion.",
+    "training_scope": "Retrospective fixed2022-2023 training may use the frozen reconstructed-bar quality lane defined below. It does not qualify historical point-in-time simulation; prospective inputs remain available-by-q_t and unchanged events/accounting/options require their original provenance."
+  },
+  "clocks": {
+    "calendar": "XNYS in pinned exchange-calendars; same accepted session table for every arm",
+    "cutoff_q_t": "09:20:00 America/New_York on decision session_t",
+    "score_publication": "09:25:00ET on_t, before any_t outcome",
+    "anchor_a": "Immediately preceding completed XNYS session",
+    "entry": "At most one full entry per sealed slot. Search causal supported quotes with evaluation timestamp in [09:35:00,09:40:00)ET. Select the earliest evaluation timestamp at which at least one whole share is feasible; equal timestamps use accepted quote source/artifact UTF-8 ID then native row/sequence index. At that instant use current positive finite bid/ask, ask>=bid, spread10000*(ask-bid)/mid<=100bps, quoteage<=15seconds and supported active session/halt evidence. Choose largest whole q satisfying portfolio budget/cash/gross/concurrency, q<=floor(0.01*eligible cumulative traded shares observed since09:35 with event/available clocks<=that instant), and q<=floor(0.10*current executable ask size). Apply the fixed adverse impact/tick rounding once to that ask. No working order, quote replenishment, later/accumulated partial entry, future volume, topK refill or control rematch. No feasible supported quote yields a retained nonfill. Exact shared rule R2-COMPARISON.json#/portfolio/entry_fill_rule.",
+    "exit": "First supported executable bid at/after15:55ET on the fifth holding session, counting_t as1, within5minutes; on an early close use5minutes before that session's calendar close",
+    "missing_execution": "No supported entry is a nonfill retained with idle cash. Missing exit, terminal entitlement or unresolved economic state is censored and blocks net-return acceptance; never assign zero proceeds."
+  },
+  "event_definition": {
+    "accepted_form": "8-K only; exclude8-K/A",
+    "positive_item": "Item1.01 explicitly present in a complete native parsed item index, bound to original filing bytes and accession; no inferred positive from title/news",
+    "public_availability": "Original demonstrated dissemination timestamp and original version, not acceptance time alone, current filing_date or retrieval observation backdated into history",
+    "t0": "The originalissuer/accession's first supported public_available_at timestamp. This protocol admits only explicitItem1.01agreement events, not genericnews/trial/meme/haltclasses; that scope is intentional.",
+    "first_cutoff_session_s0": "Earliest XNYS session_s for which event.available_at<=q_s. The mapping is calculated from timestamp evidence before label access.",
+    "age_window": "At cutoff_q_t include first-cutoff ages index(t)-index(s0) in{0,1,2,3}; equivalently first-cutoff session is_t through_t-3. No event older than3sessions.",
+    "economic_date": "Contract signing/economic event date is descriptive only; it does not determine information availability or cohort membership",
+    "amendments": "Retain version history. An8-K/A cannot retroactively replace the admitted original or reset event age. A separately admitted original8-K has its own accession event."
+  },
+  "historical_join": {
+    "issuer_id": "Canonical10-digit CIK, from original filing identity",
+    "security_id": "Immutable provider security identity plus dated share-class/listing interval; distinct from the issuer CIK and symbol",
+    "join_predicate": "The security's issuer-link and listing interval contain cutoff_q_t and are supported by evidence available by_q_t; form.accession maps to that issuer_CIK. A current ticker or an undated issuer link is not sufficient.",
+    "share_classes": "Keep each admitted class as a distinct security; all share classes from one accession share the issuer/event group",
+    "event_key": "CIK|original_accession",
+    "row_key": "security_id|XNYS_session|event_key",
+    "ambiguity": "One-to-many conflicting issuer/security links, unqualified historical aliases or unknown lifetime are rejected as unknown. Do not select a mapping using subsequent returns."
+  },
+  "accession_repetition": {
+    "first_eligible_row": "An accession/security pair produces at most one candidate row: the earliest cutoff within age0..3 satisfying all pre-cutoff eligibility predicates. If never eligible, retain the reason and produce no score.",
+    "consumption": "Consume an emitted row even if it is not in topK, is filtered by_v2 or later fails an entry quote; no repeat prediction for that accession/security",
+    "same_session_competition": "If multiple unseen qualifying accessions map to one security in a session, choose the most recently demonstrated available_at; break equal timestamps by accession lexicographic ascending. Retain unselected accessions and consume them for that session, without merging future outcomes.",
+    "new_events": "A later distinct original accession can produce a new row. No future merger, news similarity, economic outcome or model label is used to collapse events."
+  },
+  "treated_and_controls": {
+    "protocol_id": "The exact UTF-8 protocol.draft.json.id literal n1-extreme-mover-ranking-20261008. It remains stable across reviewed draft corrections and is distinct from each artifact/revision SHA256; all control-map hashing uses that literal under the fixed serialization.",
+    "treated": "An event-conditioned cohort_C row emitted under the fixedpositiveItem1.01/t0/age/join rule; treated does not mean a futuremover or a topKwinner",
+    "non_catalyst": "Background_U security with complete supported event coverage proving no qualifyingItem1.01in the identical age0..3cutoffwindow; unknownabsence is not negative",
+    "exclusions": "Exclude every treatedsecurity, treatedissuer/shareclass and any positivecatalyst from controls; no outcome-based matching",
+    "bins": "Use the joint pair (price_bin, liquidity_bin), where 2^price_bin <= actual raw traded regular close_a < 2^(price_bin+1), and 10^liquidity_bin <= median preceding20 complete-session raw dollar volume < 10^(liquidity_bin+1). This is the fixed floor(log2(price)), floor(log10(median prior20 dollar volume)) rule, with exact Decimal comparisons at boundaries. Dollar volume is raw session VWAP times raw share volume; the median of20 is the exact mean of the sorted tenth and eleventh values. No future or back-adjusted price supplies a level or bin.",
+    "eligible_pool": "At each cutoff q_t first seal the Background_U identities passing the existing date-correct identity, actual raw price/liquidity screens, inspection exclusions, valid basis and qualified pre-cutoff source availability. Retain as controls only identities with complete supported negative Item1.01 coverage in the identical age0..3 window. Remove all treated securities, every treated issuer's share classes and every other positive qualifying catalyst. Unknown identity, basis or catalyst absence cannot enter. For each treated row the eligible pool is exactly those surviving controls in its SAME joint price/liquidity bin; do not widen a bin or borrow a later session. Future fills, quotes, label values, returns and eventual terminal status never determine this pool.",
+    "stable_ids": "treated_id is the canonical historical_join.row_key string from the admitted identity/event/session join; control_id is the admitted canonical immutable security_id string. The accepted manifest fixes their exact UTF-8 bytes. Require unique treated_id rows and unique control_id rows per cutoff; duplicates or conflicting identity/bin records make assignment input invalid rather than choosing the first observed record.",
+    "traversal": "Traverse ALL treated cohort_C_t rows in strictly ascending treated_id UTF-8 byte order, before any model/K-specific subset is chosen. Incoming order, iterator order, model score and eventual fill never set traversal. One empty used_control_ids set is shared across the entire cutoff, not reset for a treated row, bin, model, K or cost scenario.",
+    "hash_input": "For each remaining eligible pair compute SHA256 of the UTF-8 bytes of json.dumps([protocol_id, XNYS_session_ISO_date, treated_id, control_id], ensure_ascii=False, separators=(',', ':')). There is no BOM, whitespace or newline. All four values are strings. This fixes the former pipe-concatenation ambiguity; Python3.12.3's native json and hashlib supply serialization and SHA256, with no custom hash or matching solver.",
+    "match": "In the fixed treated traversal, form the same-bin eligible pool minus used_control_ids. Choose the minimum pair (SHA256 hexadecimal digest, control_id UTF-8 bytes), reserve that control_id immediately, and emit one assignment row. This fixed ordered greedy rule, rather than incoming-order greedy matching, is the complete assignment contract.",
+    "collisions": "If two treated rows prefer one control, the earlier treated_id in the fixed traversal reserves it; the later row chooses the next remaining eligible control. If two candidate controls have the same digest, ascending control_id UTF-8 bytes break the tie. A reserved control is never evicted or reassigned. Every matched control security is used at most once within that cutoff.",
+    "exhaustion": "If the original same-bin eligible pool is empty emit control_id=null and reason=NO_ELIGIBLE_CONTROL_IN_BIN. If that original pool was nonempty but all members are reserved emit control_id=null and reason=CONTROL_POOL_EXHAUSTED. Retain the treated row and its fixed pick/precision denominator. Never widen bins, borrow controls, refill or drop an unmatched row. Unmatched and unfilled/censored pairs stay separately counted; matched coverage and minimum filled pairs follow R2-COMPARISON.json and may yield INSUFFICIENT_EVIDENCE.",
+    "shared_map": "Prebind one map for the entire treated cohort_C_t, not one map per selected top-K. Reuse the exact treated-to-control identities for all model arms, all K and both cost scenarios. Later unsupported control execution remains nonfill/censored under the existing rules; it does not trigger replacement or recomputation.",
+    "sealing": "Before loading any outcome values, seal and SHA256-bind the input cohort/pool metadata, their admitted source and accepted Layer1.5 receipt/manifest hashes, joint bins, fixed traversal and the complete output map. Map rows carry treated_id, both bins, original pool size, selected control_id or null and the unmatched reason; totals carry treated, matched and each unmatched reason count. Output rows follow the fixed treated traversal. Bind the accepted protocol hash and assignment-rule version in the map receipt; score-key hashing uses the fixed protocol_id, so it introduces no self-hash cycle. Later results consume this sealed map without rematching."
+  },
+  "price_basis_and_recollection": {
+    "level_features": "TheUSD1screen, logpriorclose andcontrolpricebins always use actualtradedrawanchorprice. Dollarvolume uses rawVWAP*rawsharevolume; do not let future reverse/forward splits change a past dollar-pricelevel.",
+    "lagged_ratio_features": "For a pastwindow ending_a normalize into the anchor's known sharebasis using only splitactions effective<=a and evidencedby_q_t; also normalize volume/shares consistently. No action effectiveafter_a changes a feature.",
+    "future_labels": "All six binary labels are PRICE-ONLY on the declared anchor-share basis below. Wealth including dividends/terminal entitlements is a separate economic-return basis, never silently substituted for an observed regular-session price.",
+    "invalid_basis": "Unknownsecurity/issuer/shareclass, actiondirection/factor/effectivephase, duplicateadjustment, inconsistent price/volume/shareunits, missing required dividendcurrency/entitlement, unresolved terminalproceeds, or futureaction applied to a pastlevel. These are unknown/unqualified, never ordinary negative labels.",
+    "recollected_bars": "Recollected RAW bars with retained bytes/hash, request adjustment/feed/window, observed-at and version/asof disclosure MAY train the fixed forward model on2022-2023, if captured and quality-admitted before the frozen fit snapshot and before any prospective decision. This is retrospective reconstructed-bar training, NOT an original-publication claim. Future split actions cannot change a historical feature's share basis; source capture time never becomes historical availability. Actual historical publication/version proof remains required to claim a point-in-time historical backtest. At prospective q_t, the current accepted bar/feature version must truly be available by that cutoff. No2024/2025 fitting, no forbidden2026 outcome training, no refit after forward outcomes.",
+    "training_admission": "Retrospective price/volume training uses an accepted Layer1.5 quality receipt scoped to training capture/fit time, with historical identity/event clocks and split-effective feature cutoffs retained. Do not mislabel that receipt as original 2022-2023 availability. Historical event, financial, listing/identity, options/forward/rate and entitlement evidence keep their stated original-time rules. Every training transform and coefficient uses only the fixed development partition.",
+    "label_basis": {
+      "price_labels": "One share held at anchor_a. Let S(a,s)=product(new_shares/old_shares) of accepted splits effective in(a,s], exactly once. Define P_anchor(s)=raw_regular_price(s)*S(a,s). All label ratios compare these anchor-share prices at their specified opens/highs/closes; P_anchor(a)=raw_price_a. A4:1split converts raw25 to anchor-share100, not a price loss.",
+      "intraday": "For same-session high/open both numerator and denominator use the same S(a,t), which cancels. Actual raw levels still supply theUSD1/log-price/control-bin screens.",
+      "cash_distributions": "The six price-only labels exclude dividend/distribution/cash-in-lieu proceeds. Unsupported price-changing actions still invalidate the basis. A terminal payout is not invented as a regular-session closing price; missing required price observations remain censored unless the label predicate is already logically established by supported observed prices.",
+      "economic_wealth": "Simulation/paired returns and NAV use actual share quantity updated once per accepted split, credited qualified dividends/distributions and fully resolved terminal/cash-in-lieu entitlements, minus explicit fees/impact. No cash or split credit is doubled. Unknown required entitlements block economic acceptance; existing N1's uncredited dividends do not qualify this wealth basis.",
+      "feature_basis": "For lagged prices before_a, convert into anchor_a share units using only split events effective<=a (divide earlier raw prices by the applicable earlier-to-anchor share ratio). Never apply a future-after_a action to a cutoff feature or past dollar level."
+    }
+  },
+  "encoding": {
+    "item101_positive_1": "Complete indexed original8-K, explicit Item1.01, proven pre-cutoff dissemination and eligible age",
+    "item101_negative_0": "Complete supported filing/event coverage establishes no qualifying Item1.01 in the fixed age window; controls only, not the event-conditioned scored cohort",
+    "item101_unknown_null": "Incomplete index, unknown coverage, ambiguous item/form, missing original version or unproven dissemination. Exclude from scored cohort and known-negative controls; count as unknown, not0.",
+    "event_age": "Exact XNYS first-cutoff-session difference0..3; no naive calendar-day subtraction",
+    "continuous_features": "Each named operator has finite numeric units and only admissible pre-cutoff inputs. Missing or invalid financial/share/option input is unknown and excludes the row from every model arm.",
+    "zero": "Retain a supported genuine zero value. Do not use zero for a missing rate, volatility, volume, item or historical price.",
+    "absence_vs_outcome": "No future mover status, return sign, missing future horizon or post-event classification becomes a candidate/feature flag. Future-label unknowns are handled only during later scoring, never cohort selection."
+  },
+  "feature_operators": {
+    "r_s": "ln(split-consistent close_s/close_s-1) over consecutive supported sessions; no future split enters a past cutoff",
+    "ret1_5_20": "ln(close_a/close_a-h), h in{1,5,20}",
+    "rv20_60": "Sample standard deviation(ddof1) of the preceding_n daily log returns ending_a times sqrt252, n in{20,60}",
+    "max20": "Maximum known simple1-session price return among the20completed return intervals ending_a",
+    "skew20": "Adjusted Fisher-Pearson sample skewness of the20daily log returns ending_a; zero dispersion is a known zero-skew case",
+    "relative_volume": "volume_a/median(volume_a-20..a-1) in a single cutoff-consistent share basis; positive supported denominator required",
+    "dollar_volume": "Actual sessionVWAP times share volume in matching units, not a closing-price substitute",
+    "log_price_liquidity": "ln(close_a) and ln(median prior20session dollar volume)",
+    "shared_clock": "Prospective scoring and any historical PIT claim use completed bars at their XNYS close with the actual qualified version available by_q_t. Retrospective2022-2023 training uses the explicitly permitted frozen reconstructed-bar training-quality lane; capture time is never relabeled as historical availability. Event, identity, financial and option provenance retain their stated cutoff rules."
+  },
+  "grouping_and_fit": {
+    "session_group": "All securities and model-arm rows for one decision session travel together in train/test partitioning",
+    "issuer_event_group": "CIK|original_accession; same group includes every share class, alias and model row for that event. Remove the full group from training if any member is in evaluation.",
+    "overlapping_horizons": "Purge training rows whose planned label/return evidence intervals overlap evaluation rows, regardless of different symbols; at least5complete XNYS sessions is only the coarse minimum",
+    "native_splitter": "skfolio.model_selection.CombinatorialPurgedCV(n_folds=6,n_test_folds=2,purged_size=5,embargo_size=5) on ordered session rows",
+    "causal_training_filter": "For each native split, retain only training rows whose complete label_end precedes the earliest test decision cutoff; remove future-side training. Empty/insufficient splits are retained as insufficient, not silently dropped or used to justify a favorable model.",
+    "preprocessing": "Training-fold-only winsor limits, means and scales; no full-sample normalization, filling or label-derived feature selection",
+    "final_fit": "Fit each fixed arm on development2022-2023 only, with all label support within that period and the explicitly scoped reconstructed-bar training rule. Other original-time provenance remains required. Never fit on2024/2025 or forbidden2026outcomes and never refit/reselect from forward outcomes."
+  },
+  "LLM_successor_rule": {
+    "current_arm": "No LLM-labelled feature and no Jev arm",
+    "mandatory_masks": "Any successor removes company/person identifiers, names, tickers, explicit calendar dates and identity-revealing aliases before the labeler; unsupported masking means the row/arm is not enabled",
+    "model_cutoff": "Bind every exact model/version to its supported primary-source training-cutoff record. Unknown cutoff prevents enabling the arm.",
+    "post_cutoff_share": "100percent of primary evaluation cases must be after that model's confirmed cutoff; any before-cutoff analysis is separate descriptive output, never pooled into the primary score",
+    "date_shift_canary": "Mandatorypaired original-date/+28calendar-year canary for any successorlabeler, preserving relativechronology and identifiers' opaque mapping. Shift before masking, verify no identifying/dateinformation survives; retain prompt/responsehashes and changes separately. A date-sensitive or leakedlabel blocks thatarm. Currentno-LLMversion performs no canarycalls; the packagecanary is not inherited as a new passedresult.",
+    "successor": "New named labeling task, masked-input contract, inspection accounting, source hash and both-reader-approved successor protocol before any labeling or spend; freezing this no-LLM protocol does not authorize a Batch job"
+  },
+  "excluded_result": "The package finding 'gap AUC0.976' is excluded from predictors, featureselection, targets, weights, calibration and promotion until independently verified leakageanalysis and a reviewed successor. No current/premarket/open/gap feature is present; high/open remains only a separately declared ex-postlabel.",
+  "sources": [
+    "native-agent-stack@ee01dd1274b3e6339ac388b53e2fea3d3b1ec52b blueprints/us-equities/catalyst-experiment/protocol.json source_contract/duplicates and daily/intraday catalyst windows; the new09:20 clock and age3window are declared adaptations",
+    "CC action10 timing-key page bc39dd5da7e6d9b720ebb18de23afec94f36bada7d2ec1f31e504c65e29b9d9a; original dissemination proof remains separate from schedule documentation"
+  ],
+  "closed_LightGBM_inputs": {
+    "count": 11,
+    "ordered_columns": [
+      {
+        "name": "RET1",
+        "operator": "ret1_5_20",
+        "h": 1
+      },
+      {
+        "name": "RET5",
+        "operator": "ret1_5_20",
+        "h": 5
+      },
+      {
+        "name": "RET20",
+        "operator": "ret1_5_20",
+        "h": 20
+      },
+      {
+        "name": "RV20",
+        "operator": "rv20_60",
+        "n": 20
+      },
+      {
+        "name": "RV60",
+        "operator": "rv20_60",
+        "n": 60
+      },
+      {
+        "name": "MAX20",
+        "operator": "max20"
+      },
+      {
+        "name": "SKEW20",
+        "operator": "skew20"
+      },
+      {
+        "name": "REL_VOLUME",
+        "operator": "relative_volume"
+      },
+      {
+        "name": "LOG_RAW_CLOSE_A",
+        "operator": "log_price_liquidity",
+        "component": "raw close"
+      },
+      {
+        "name": "LOG_MEDIAN_DV20",
+        "operator": "log_price_liquidity",
+        "component": "median prior20 dollar volume"
+      },
+      {
+        "name": "EVENT_AGE",
+        "operator": "encoding.event_age",
+        "values": [
+          0,
+          1,
+          2,
+          3
+        ]
+      }
+    ],
+    "constant_item101_flag": "Excluded from model columns; all scored cohort rows are positive Item1.01.",
+    "closed_rule": "Exactly the 11 numeric columns and operators in R2-CONSTRUCTION.json closed_LightGBM_inputs. EVENT_AGE is included. The constant positive Item1.01 flag defines cohort eligibility and is excluded as an input. No CIK, security/ticker/name, calendar-date, news, XBRL, accounting, option or LLM column is silently added to the main model.",
+    "missing": "Every listed input must be finite and qualified under the declared training/scoring scope; no hidden-column addition or missing-as-zero substitution."
+  }
+}

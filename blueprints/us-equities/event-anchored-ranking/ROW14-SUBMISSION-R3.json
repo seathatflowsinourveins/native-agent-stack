@@ -1,0 +1,141 @@
+{
+  "task": "R3 census-2018 successor under CC223631Z: revised dates/session grid/R3-F1, availability rationale and explicit unresolved KZ sources; both designated R3 reads before any count",
+  "recorded_at": "2026-10-08T22:38:00Z",
+  "recorded_at_scope": "Dated CC disposition; this is not a new source/runtime acceptance timestamp",
+  "protocol": {
+    "path": "protocol.draft.json",
+    "sha256": "8e203bcea1f3df307db3ccabb0294d5bad07cc24125eab77b6d1e320e3e9e704"
+  },
+  "registry": {
+    "path": "inspection-registry.draft.json",
+    "sha256": "a64e61cccb5db24c51326364961ebeb630e6da1983732aae369d5e6be1a9c55d"
+  },
+  "contracts": {
+    "R2-CONSTRUCTION.json": "237c4d3dfdef5b4aeac6a4ab388f1f02f1812be568c54e85f9ef528c088101ba",
+    "R2-COMPARISON.json": "da89c13fa9f2e2113eebd3b0e517757ed8eb39c40d6c35b2cc38a55d348286a7",
+    "R2-INSPECTION.json": "6a21266974134ecfba560be1ad3b97bd0a677e184600775aa3725419352d112d",
+    "R2-SURVIVORSHIP.json": "71229fdb6204dc10fbc7d8a109e9bb6e513f569c7809906748a559937c91ab1b"
+  },
+  "unchanged_logit_operators": {
+    "path": "R2-LOGIT-OPERATORS.json",
+    "sha256": "b26bf0fac3102f5aae6477dcb5f19ee0844c2a7e2b22d74390879eb7ab51d644"
+  },
+  "canonical_hash_carrier": "SHA256SUMS; identical SHA256SUMS.R3",
+  "reader_sources": {
+    "GPT": "7f47b785efb193f43e2cc943b46eba63bdc4181ab92c71042adc653a26f7f0c3",
+    "Claude": "1585f6d0f8a073a3676abce38162ad703133759b01171b891320c29e889dc6ca",
+    "CC110116Z": "c861616b7d577965136393449530abefad66d26bd59d8c3ed76e439a1effb685",
+    "GPT_R3": "7bfd7beffce26c190fc78815fc0f31aef1f1a2e40e0a0eccc3d6cd72c3056f3b",
+    "CC_Claude_R3": "579577ccd4e317f858122e0812a8737244e2f3a7d1ee765d5f4207782ce0fc1e"
+  },
+  "required_change_counts": {
+    "blocking": 5,
+    "same_revision": 5,
+    "execution_gaps": 2,
+    "GPT_required": 2,
+    "combined_CC_R3B_required": 7,
+    "combined_CC_R3B_optional": 7
+  },
+  "prior_snapshots": [
+    "attempt-r1-232ad868/",
+    "attempt-r2-bec914/",
+    "attempt-r2-bc8cba78/",
+    "attempt-r3-a2e298ab-pre-runtime/",
+    "attempt-r3-f6a0250c-pre-sweep/",
+    "attempt-r3-f5f44980-gpt-revise/",
+    "attempt-r3b-cc8a6283-before-claude/ (WITHDRAWN; notused)"
+  ],
+  "accepted_layer15_receipt": null,
+  "native_PIT04_exclusion_count": null,
+  "native_acceptance": "INCOMPLETE; source/corpus counts and document checks do not supply a passed receipt.",
+  "control_checks": {
+    "receipt": "R3-CHECKS.json",
+    "sha256": "f50d487190831df77067a514e96de32fc20af7c98bd2156803d0e80902054bc9",
+    "cohorts": 200,
+    "input_permutations": 1200,
+    "exhaustive_small_permutations": 36,
+    "scope": "Finite synthetic specification checks, not upstream acceptance or an installed production implementation."
+  },
+  "method_corrections": "Fixed eligible-bin pool/traversal/collision/exhaustion/sealing; accepted-receipt-only PIT04 identities/reasons/count reporting;100000USD whole-share5K-capped fee/impact/NAVbooks; equal-weight session precision/capture and net slot-excess; closed11inputs; scoped retrospective training; price-label versus economic-wealth basis; applied disposition and development/prior-summary exposure.; combinedR3Bfixesinternalhash/status/installflag/receiptchronology,2020-2021exposure,citationpointers,nativequantile/drop5/undefineddrawrules,andonesinglefullentry withqualifiedmarks; nooutcomedependenttuning",
+  "forward_window": {
+    "scheduled_sessions": 126,
+    "potentially_scored_sessions": 121,
+    "first_scored": "2026-10-21",
+    "last_decision": "2027-04-15",
+    "last_label": "2027-04-21",
+    "no_extension": true
+  },
+  "gaps": {
+    "LightGBM": "Installed/native pin4.7.0 verified under CC133502Z through the guarded native prepared uv0.12.17 locked route. Prepared repository runtime acceptance24/24PASS and unchanged vendor regression example rc0. Exact binary-study parameter/determinism acceptance remains NOT_RUN before study fitting; skfolio1.7.0 also awaits study compatibility/execution-pin amendment.",
+    "KZ": "Compatible original European-equivalent option/forward/rate data not acquired; explicit listed-option common-cohort restriction. Unready fixed start records NOT_RUN/INSUFFICIENT_EVIDENCE, never shifted dates or deleted arm."
+  },
+  "economic_execution": "Exact formula frozen for review; actual upstream native fee/impact/cash/NAV and historical-data E2E acceptance still owed. N1df92a20d is engine evidence only.",
+  "review_state": {
+    "co_op_GPT": "PENDING same census-2018 revised bytes and complete carrier/internal bindings; co-op schedules",
+    "CC_Claude": "PENDING same census-2018 revised bytes and complete carrier/internal bindings; co-op/CC schedules"
+  },
+  "freeze_record_written": false,
+  "commit_written": false,
+  "commit_written_scope": "Frozen acceptance/publication commit only; ordinary draft candidate commits do not declare the protocol frozen",
+  "descriptive_census": {"start": "2018-01-02", "end": "2023-12-29", "sessions": 1509, "previous_sessions": 1760, "lost_sessions": 251, "lost_events": "unknown", "power_change": "unknown", "count_values_opened": false, "follow_up": "R3-F1 requires verified2017 coverage AND publication grant", "KZ_source_status": "unresolved", "no_count_before_both_R3_reads_PASS": true},
+  "new_study_outcome_values_read": false,
+  "model_fit_run": false,
+  "market_acquisition_run": false,
+  "runtime_install_performed": true,
+  "vendor_fixture_model_fit_performed": true,
+  "runtime_acceptance": {
+    "path": "R3-RUNTIME-ACCEPTANCE.json",
+    "sha256": "1a29f1572326dca40c853d3b7fbc26bc9dd12388262ef50ee38e13246dd821ff",
+    "native_repository_cases": "24/24PASS",
+    "unchanged_vendor_example": "PASS rc0 at LightGBM v4.7.0 commit8f7036f0",
+    "study_model_fit": false,
+    "exact_study_parameters_determinism": "NOT_RUN; mandatory before study fitting",
+    "scope": "Original13:50:35Zreceipt restored byte-for-byte, only17221888snapshot24/24/vendorprimitive. Currentf451onlyinruntime_lock_verification. Noamendedtimestampfiction."
+  },
+  "alpaca_paper_key_used": false,
+  "runtime_lock_sha256": "f451ef979cdb1ae3686a30df1c883c257402b32753478c1f9c686c057e9c3989",
+  "runtime_lock_scope": "Current final existing lock after pytest9.1.1 dev addition: independent native locked sync/pipcheck/version/delta verification passed without a second relock. The original24/24installation acceptance remains its historical17221888 snapshot.",
+  "runtime_lock_verification": {
+    "path": "R3-RUNTIME-LOCK-VERIFICATION.json",
+    "sha256": "95cb1caebc07e725fa46c6408ae31ea0e4806b14ec75416ab999b18df143e56b",
+    "sync_exit_code": 0,
+    "pip_check_exit_code": 0,
+    "relocked": false
+  },
+  "native_library_adoptions": {
+    "path": "R3-SWEEP-ADOPTIONS.json",
+    "sha256": "41471ca5fb0cd9d459c92970174ee858b0eaf617a6387204f2c4bee7a7ab35e1",
+    "arch": "8.0.0CircularBlockBootstrap assigned; index-only native smoke PASS, study inference NOT_RUN",
+    "fincore": "0.5.1ZERO_USE_IN_R3",
+    "purgedcv": "0.1.10ZERO_USE_NOT_RUN; both bounded trials NOT_RUN",
+    "Nautilus": "2.0.0rc5 retained; rc6WATCH",
+    "full_index_digest": "R3B-NATIVE-METHOD-EVIDENCE.json: newindex-only49999drawn121measurement281cc481, notstudyinference"
+  },
+  "verification_scope": "NativecarrierplusinternalJSONreference/statusstructuralchecks; unchangedhistoricalsyntheticcontroloutputs,original172installedreceipt/finalf451verification, andnewNumPy/archsyntheticindexprimitive. No source-onlytruthpromotion,upstreamfulltest,acceptedLayer1.5/historicalE2E/strategy/provider/GPUacceptance.",
+  "processing_diagnostics": "Two obsolete backtest.models import probes failed locally and were corrected through installed rc5 execution exports. An oversized known-document capture was indexed instead of returned, then exact edit bytes were recovered through the native file-read surface. No provider API failure, key disclosure or market/model attempt.",
+  "completeness_critic": "All7documentblockers/7cheapadvisoriesfoldedfreshafterbothR3returns. Quantiles/duplicates/undefineddraws,singlefullfill/markfreshnessarefixedexantechoicesrequiringnativeintegration; FOK/cachefallbacksoverclaimisavoided. Originalreceiptandcurrentlockfactsareseparate. Metadataexposure713vs715andhorizon/viewdepthremainhonest. Exactstudyfit/skfolio/PIT04/KZ/economicgatesstillheld;correction78holdsbytes/publicationuntilbothnamedreturns.",
+  "read_hold": "CC223631Z authorises this new census-2018 draft candidate and ordinary PR commit before its designated reads. Once those reads start, hold its bytes until both returns; any REVISE awaits both before one combined successor. No count before both same-byte PASS and qualified inputs; freeze/landing still need explicit CC cue through5f. Historical correction78 and predecessor subjects remain retained, not inherited acceptance.",
+  "R3B_corrections": {
+    "authority": "CC152445Z",
+    "required_count": 7,
+    "optional_advisories": 7,
+    "change_record": {
+      "path": "R3B-CHANGES.md",
+      "sha256": "bb8a07b3d092900fa0e5362c1804a85aa133e8d3145c250093ee008f2310bf94"
+    },
+    "native_primitives": {
+      "path": "R3B-NATIVE-METHOD-EVIDENCE.json",
+      "sha256": "0f68adc8a3b69e30632e4756a6e43e380fa22d316d17bee42c255417c068332e"
+    },
+    "packet_boundaries": {
+      "path": "R3B-PACKET-BOUNDARIES.json",
+      "sha256": "cf1a54eea39c1b2c0300bd44879b2b2e5a5b66bc0cdaa261639e393b1a13c99a"
+    },
+    "verifier": {
+      "path": "R3-VERIFY.py",
+      "sha256": "8d86e1d3cc517c549ad4f7b9dff660a50bc95cc3804822989b1d72086b9f5018",
+      "source": "CPython3.12.3json.load/hashlib.file_digest; nativeuutils0.10.0sha256sumtextcarrier; smallstructuraljoinglueforCC-R3-1,notupstreamtest/A-B/E2Erunner"
+    },
+    "withdrawn_early_attempt_used": false
+  }
+}

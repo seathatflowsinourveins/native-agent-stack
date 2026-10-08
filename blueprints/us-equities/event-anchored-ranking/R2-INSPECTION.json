@@ -1,0 +1,171 @@
+{
+  "schema_version": 1,
+  "revision": "R3: applied disposition, complete known development/summary exposure and PIT-04 cross-reference",
+  "scope": "Inspection accounting over retained E2 metadata plus the72known5b cases; no new outcome calculation",
+  "e1": "Did not run; action1 remains the closed CC0735Z owner-held dated gap. This inventory does not reopen the missing-input search.",
+  "e2": {
+    "state": "Complete retained event/request/snapshot metadata; immutable historical issuer/security identity unproven",
+    "inventory": {
+      "path": "r2-sources/e2/e2-inspection-metadata.json",
+      "sha256": "791a4bd37bdbe96a62be47d86ec1c334a6b4c82abb1e56218ae8d361fa28d2db",
+      "cases": 715
+    },
+    "existing_label_keys": {
+      "path": "r2-sources/e2/e2-label-key-metadata.json",
+      "sha256": "0ea488fb39de46f17df34e3b651a3f7b15419b2322ef58c9c340491879de64b9",
+      "original_labels_sha256": "19e276665707e3ec2ba70aad365afaf6d2277240d4619681627ec87dd8993108",
+      "keys": 713,
+      "dated2025": 280,
+      "dated2024": 278,
+      "values_present": false
+    },
+    "year2025_scope": {
+      "path": "r2-sources/e2/e2-inspection-2025.json",
+      "sha256": "79381bafee2af4d571dcad408fc10c27e03aa5bb41ad406590d546821d14ce9d",
+      "event_dates_in2025": 281,
+      "requests_intersecting2025": 286,
+      "returns_intersecting2025": 285
+    },
+    "year2024_scope": {
+      "event_dates_in2024": 279,
+      "requests_intersecting2024": 339,
+      "returns_intersecting2024": 337
+    },
+    "summary": {
+      "path": "r2-sources/e2/e2-inspection-summary.json",
+      "sha256": "897dfc6cc99ec572ff5f785e4358c77d27cf2f9a236f09c64588eb01afd10d6b"
+    },
+    "source_ledger": {
+      "path": "r2-sources/e2/e2-source-ledger.json",
+      "sha256": "a48cbf7929a17dba4193a10bcc6369b007a0300257cfc061decab41342a03397"
+    },
+    "symbol_interval_index": {
+      "path": "r2-sources/e2/e2-identity-interval-index.json",
+      "sha256": "0dcdcc94d55bd021fd00f7dccf5b0154edf9b902a40ed67d1443e93dc2d03ba9",
+      "recorded_alias_strings": 662
+    },
+    "integrity": "All11originalprivate hashes match the committed receipt; all3585requests map once to snapshots,715event IDs join both maps and source forward-input record indices. Original files unchanged.",
+    "time_modalities": "Include every actual requested interval, returned bar session timestamp, auction session_date and nested open/close quote timestamp after ET conversion; the three adjustment legs and repeated lookbacks are overlapping exposures, not independent trials.",
+    "empty_requests": "Retain requested intervals even for absent/null responses; an empty response does not establish untouched eligibility.",
+    "package_horizons": "28source-package rows have T1/T5/T20date metadata in2026. This is distinct from E2returned/requested price scope and does not establish which old outcome fields were viewed. Do not compute any forbidden2026outcome.",
+    "financial_values_in_projection": false
+  },
+  "conservative_current_disposition": {
+    "CC_disposition": "APPLIED CC095919Z conservative exclusion of every untraceable E2-touched2025event. Both named R3 reads still precede a protocol freeze; no inspection-completeness disposition is currently pending.",
+    "reserve2025": "APPLIED CC095919Z disposition: all286E2-touched2025request cases and all280dated2025keys excluded; entirecalendar2025remains quarantined from untouched-reserve access. No current disposition is pending. Only a later explicit reviewed narrower release could change the policy.",
+    "validation2024": "APPLIED disposition:2024is previously inspected diagnostic data, quarantined from a fresh confirmatory superiority claim. No current disposition is pending and no substitute favorable dates/cohort are chosen.",
+    "reason": "E2 spans cover adjacent-year outcomes and there is no proven historical issuer/security mapping. The72case registry cannot establish exhaustive E2closure or globally unseen evaluation data.",
+    "source": "ITEM-ns2604-coop-20261008T095919Z.md SHA2569e8d8f1bbf10de712edb3c11c84fc4ebe24699eb6716d9ed19f7516b6e81f9a6",
+    "count_disposition": "Excludeall286E2eventcases with2025requestspans(including285returnedcases andall280existingdated2025labelkeys), plus72known5bname-sessionexposures. Whole2025remainsquarantinedbecause broader-v1/universeinspections alsoexist; representations overlap andarenot summed.",
+    "prior_exposure": "Broad-universe documented2024-01-01..2026-08-14reads; mover-early-entryv1read2024-2025validation; E2labelled278dated2024events.2024is not a newcleanholdout. Forward126sessions from2026-10-14is the fixedunreadconfirmatoryperiod."
+  },
+  "boundary_gaps": {
+    "placement": "Evaluation-side gap: remove the first5XNYS decision sessions of each new evaluation partition, before creating/scoring its cases",
+    "validation_first5": [
+      "2024-01-02",
+      "2024-01-03",
+      "2024-01-04",
+      "2024-01-05",
+      "2024-01-08"
+    ],
+    "reserved_first5": [
+      "2025-01-02",
+      "2025-01-03",
+      "2025-01-06",
+      "2025-01-07",
+      "2025-01-08"
+    ],
+    "training_side": "Additionally purge any earlier-row outcome/holding interval not wholly completed before the partition boundary; never relax actual-interval purging to the coarse5session minimum",
+    "warmup": "Feature-only earlier observations may initialize lagged operators when their availability is qualified. No scored label, return or holding interval may cross a partition boundary or forbidden period.",
+    "forward_first5": [
+      "2026-10-14",
+      "2026-10-15",
+      "2026-10-16",
+      "2026-10-19",
+      "2026-10-20"
+    ],
+    "forward_scoring": "126scheduled sessions minus five boundary-gap sessions leaves121potentially scored sessions, first2026-10-21. Fixedlastdecision2027-04-15 andlastlabel2027-04-21remain; no extension."
+  },
+  "exclusion_algorithm": {
+    "phase": "Run on case/identity/time metadata before outcome values are loaded; freeze candidate exclusions and source hashes",
+    "identity_resolution": "For each exposure's event/current/requested/returned symbol and recorded alias, obtain the complete historical issuer, immutable security and dated listing-interval closure from admitted Layer1.5identity evidence. CIK alone does not identify a share class; current ticker equality or post-event SECURL is not identity proof.",
+    "inspection_sets": "For each resolved issuer/security include union of full requested and returned session intervals, nested auction timestamps, all72known5b observation sessions, and every known related issuer/accession event group. Use broad session intervals when subday availability is not proven.",
+    "planned_future_support": "For each candidate at_q_t form the UNION of post-cutoff evidence needed by all6declared labels and the executable-entry/exit return: sessions_t..t+4, t's open/high/close, the entry-to-exit quote interval, and terminal/action proceeds required during the holding horizon. Use planned support even when a future value will be missing.",
+    "reject_if_overlap": "Exclude when that planned future-support intersects an inspected interval for the same historical security OR linked issuer/event group. This excludes earlier unlisted candidates whose outcomes use already-inspected later prices, not merely exact listed event dates.",
+    "unknown_identity": "If exposure identity/alias closure or prior view depth is unresolved, do not treat it as an unrelated security. Current policy keeps2024/2025quarantined. Any narrower exception requires explicit CC disposition and a reviewed successor with immutable evidence fixed before outcomes.",
+    "cross_source_dedup": "Deduplicate by canonical issuer/security/event/time source keys, preserving all provenance. Never sum repeated adjusted/raw legs as new cases.",
+    "unknown_rows": "Missing original inspection evidence means UNKNOWN/EXCLUDED, not unread, negative or safe. Record exclusion reason/count and policy version without outputting price/return/label values.",
+    "freeze_order": "Both named R3 readers must pass the exact complete canonical hash set before freeze/commit. The explicit CC095919Z conservative disposition is already applied and supplies no invented unread historical cases. Evaluation still requires accepted Layer1.5/data/runtime and the separate action12cue."
+  },
+  "correction": "R1 correctly preserved E1not-run and72known5b provenance but did not close independently executed E2inspection. The current source-backed inventory and interval/identity closure supersede that incomplete accounting without altering prior observations.",
+  "prior_exposure_disclosed": {
+    "pre_development_or_warmup": {
+      "E2_requested_cases_touching2020": 13,
+      "E2_requested_cases_touching2021": 65,
+      "E2_returned_session_cases_touching2020": 12,
+      "E2_returned_session_cases_touching2021": 64,
+      "E2_existing_label_keys_dated2021": 52,
+      "E2_existing_label_keys_dated2020": 0,
+      "scope": "Existing pre-development/warm-up exposure; requested-calendar-year populations overlap and are not additional dated label keys. No historical unreadness or outcome-value-view depth claim."
+    },
+    "complete_dated_key_accounting": {
+      "total": 713,
+      "dated2021": 52,
+      "dated2022": 52,
+      "dated2023": 51,
+      "dated2024": 278,
+      "dated2025": 280,
+      "development2022_2023": 103,
+      "metadata_event_population": 715,
+      "scope": "713 label keys versus715 metadata events; both different overlapping populations, never added together."
+    },
+    "forward_horizon_metadata": {
+      "T1_T5_T20_metadata_events_in2022": 24,
+      "T1_T5_T20_metadata_events_in2023": 23,
+      "source": "r2-sources/e2/e2-inspection-summary.json#/requested_returned_calendar_year_overlap/{2022,2023}/forward_source_T1_T5_T20_metadata_event_count",
+      "interpretation": "Date metadata only; every event states this is not proof of which outcome columns were viewed in the original run.",
+      "values_read": false
+    },
+    "development": {
+      "E2_requested_cases_touching2022": 66,
+      "E2_requested_cases_touching2023": 118,
+      "E2_existing_label_keys_dated2022": 52,
+      "E2_existing_label_keys_dated2023": 51,
+      "total_dated2022_2023_keys": 103,
+      "metadata_source": "r2-sources/e2/e2-inspection-summary.json sha256897dfc6cc99ec572ff5f785e4358c77d27cf2f9a236f09c64588eb01afd10d6b; labelkeymetadata0ea488fb",
+      "values_read_by_this_revision": false
+    },
+    "broad_universe": {
+      "inspected_development": "2017-2021",
+      "inspected_validation": "2022-2023",
+      "inspected_reserve": "2024-01-01..2026-08-14",
+      "source": "blueprints/us-equities/broad-universe/README.md:95",
+      "sha256": "b0aaac2a7d6124eb769fab5d2964bd554a9ebd132df59c0570517771878fc674",
+      "meaning": "Existing broad-universe research exposure, not a new read of its case outcome data."
+    },
+    "known_numerical_context": [
+      {
+        "figure": "v2 capture11.7% and approximately0.25%precision",
+        "source": "R2-COMPARISON.json#/v2_adaptation/capture and cited predecessor v2 summary",
+        "exposure": "Already present in the R2 document read by the drafter; contextual historical summaries only."
+      },
+      {
+        "figure": "gap AUC0.976",
+        "source": "CC063928Z date-shift/leakage ruling and existing R2-CONSTRUCTION.json excluded_result",
+        "exposure": "Known before R3; explicitly excluded from features, selection, calibration, evidence and promotion."
+      },
+      {
+        "figure": "WaveH premarket leadership77%, rho0.04",
+        "source": "blueprints/us-equities/mover-early-entry/protocol.json:7 prior_exposure_disclosed",
+        "exposure": "Predecessor author's documented exposure; the drafter has now read that disclosure during R3 source verification. It is a historical package summary, not new case-label/return inspection or strategy evidence."
+      },
+      {
+        "figure": "5b pipeline PnL-63.70USD; return-0.0637%; trades8; maxdrawdown_fraction-0.004065999999999792; Sharpe252d-0.3708004940592432",
+        "source": "Own already-posted5Bline, receipt09d108addb6f21ea539c56703d78b87cf2725e97527524a3fc9318e37bd9d52e",
+        "exposure": "Own pipeline economics viewed06:24-06:30;72known5bname/session cases are quarantined. Pipeline checks only, not strategy evidence."
+      }
+    ],
+    "N1": "Own df92a20d2019-2021 entrance exam account/fill economics were viewed; engine evidence only, single-leg split glue and uncredited dividends. Receipt remains bound; no new exam outcome was calculated.",
+    "view_depth": "No complete reconstruction of every prior person's/model's viewed case values is claimed. The E2 projection excludes values, and this revision does not open its originals' label/return columns. All historical development/validation exposure and whole2025quarantine are disclosed; the fixed future window is the only fresh confirmatory holdout."
+  }
+}
