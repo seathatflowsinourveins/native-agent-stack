@@ -1,0 +1,243 @@
+{
+  "schema_version": 1,
+  "id": "s4-record-corrections-20261008",
+  "recorded_on": "2026-10-08",
+  "kind": "records_only_supersession",
+  "evidence_class": "source_review",
+  "rows": [18, 45, 64],
+  "scope": "Five CC record defects and two designated GPT reader advisories. This derivative corrects the cited claims and locators; original artifact bytes, failed conditions and prior acceptance decisions are preserved.",
+  "basis_private_facts_sha256": "c4a6e9d386e85c0cbf7ccbb800568da6651547b8970d7b32a9dfc15c993602d4",
+  "prior_acceptance": {
+    "gpt": {
+      "file": "GPT-REVIEW-s4-rows18-45-64-r2-exec.md",
+      "sha256": "a8482c23e5f22f8d6d9a2dea9304883ea94bf6a64e3c8a26d391f8ce50da377f",
+      "verdict": "PASS/PASS/PASS"
+    },
+    "claude": {
+      "file": "s4-rows-18-45-64-r2-claude-reader-20261008.md",
+      "sha256": "af9f33ae160b1b80a063514d604232cb37a74e911944408391a078713de9a52d",
+      "verdict": "PASS/PASS/PASS"
+    },
+    "cc_amendment": {
+      "number": 6,
+      "file": "s4-disposition-20261008T0400Z.amend-1615Z.md",
+      "sha256": "a166a8d7230f26b18b538416107a887187ecb200963b87ec70694dc4930f755e",
+      "strict_pass": 37,
+      "total": 40
+    },
+    "author_self_check": {
+      "sha256": "9d6473a6118ac1b0fd851237c88e6ccf6aebedc09452a37b583b72894d08649e",
+      "classification": "SELF-CHECK",
+      "counted_as_designated_reader": false
+    }
+  },
+  "preserved_subjects": {
+    "ops_markdown": {
+      "job_id": "ROWS-18-45-OPS-20261008T1520Z",
+      "file": "RECEIPT.md",
+      "sha256": "2bc7e91e305b9215be5dec617974ae32fe5980c312fadd8260e355199f79ad75"
+    },
+    "ops_json": {
+      "job_id": "ROWS-18-45-OPS-20261008T1520Z",
+      "file": "receipt.json",
+      "sha256": "348897ff6ee3aa9895b327ba8a01489508d80887f2dd44b4e0b27e1b14ba8c17"
+    },
+    "joins_r2": {
+      "job_id": "S4-RECORD-JOINS-20261008T005138Z",
+      "file": "rows-18-45-64-install-provenance-r2-20261008.md",
+      "sha256": "36a1f65b87fb2e00b1616c6762c463913acfc59edefa027461da36cc9c4223d2"
+    },
+    "row64_json": {
+      "job_id": "ROW64-VENDOR-VERIFY-20261008T1345Z",
+      "file": "receipt.r2.json",
+      "sha256": "61616ef5f15b6948936ee068c800e63617d70d1de104f9a29d419f226991ffaf"
+    },
+    "row64_markdown": {
+      "job_id": "ROW64-VENDOR-VERIFY-20261008T1345Z",
+      "file": "RECEIPT.r2.md",
+      "sha256": "428567218a285d3f5c05fbaffd1c98ec7e4576e71797660bca544e56771e7380"
+    }
+  },
+  "corrections": {
+    "a_codex_orchestration_scope": {
+      "supersedes": ["ops_markdown:8", "ops_json:470-546"],
+      "replacement": "Three Codex orchestration exec events are distinct from three selected native MCP attempts, of which two completed. The initial model admitted that discovery violated the no-other-tools instruction.",
+      "native_rollouts": [
+        {
+          "private_thread_identity_sha256": "761e6d26a764762fa21384895dab06ca2060d43e871a64690ef9620d218c37e6",
+          "private_rollout_sha256": "cb58b92a903908c2fe7b2d55d16ff70b2404bd586c6735cf516210c2daeb3a1d",
+          "orchestration_events": [
+            {
+              "line": 16,
+              "utc": "2026-10-08T15:26:16.417Z",
+              "purpose": "ALL_TOOLS name discovery; no MCP invocation",
+              "input_sha256": "3a626052f28715e62467c81a977f96ccd2df9b466399315dddfdcca6c7028144",
+              "event_lf_sha256": "9a0519e86cf0e579084882bec46810e39c80e44ca3840cb6d75f0ec4f3030837"
+            },
+            {
+              "line": 22,
+              "utc": "2026-10-08T15:26:35.563Z",
+              "purpose": "Code-mode selected MCP dispatch via Promise.allSettled",
+              "input_sha256": "934cb1702aaecd47c95bff355edb0d5aa3c3ea3e4c1a508354dfc10b91618dbe",
+              "event_lf_sha256": "0871d7b493e46cd3bd94a671c7071e34559c2c3dbf28fa10f603a92862ad508c"
+            }
+          ]
+        },
+        {
+          "private_thread_identity_sha256": "a59638d5b0ffe49a9d9a19e51bf8ca40a315edd2350f818cad44293aaa95324c",
+          "private_rollout_sha256": "5dd7246c456538957a4a8a6b6aa455282eda490b356fa1fb9500bc1e385bfbb4",
+          "orchestration_events": [
+            {
+              "line": 16,
+              "utc": "2026-10-08T15:29:44.262Z",
+              "purpose": "Code-mode registry lookup, tool selection and single SocratiCode dispatch",
+              "input_sha256": "840b2a5ed4b7d96a8784a40183c97ab0d90e1fec5919daaa31c08415d5b181a7",
+              "event_lf_sha256": "0848b5f479c0c36129c3b8992c4cb1603a6dbd638de32e120cb7e83de22cb5e7"
+            }
+          ]
+        }
+      ],
+      "selected_native_mcp_attempts": {
+        "attempts": 3,
+        "completed": 2,
+        "conditions": [
+          "Initial Semble search completed once.",
+          "Initial SocratiCode search was rejected for approval before server dispatch.",
+          "Repair SocratiCode search completed once."
+        ]
+      }
+    },
+    "b_persistent_claude_transcripts": {
+      "supersedes": ["ops_markdown:26"],
+      "context_only_locators": ["ops_json:551", "ops_json:707"],
+      "context_note": "These unchanged JSON fields hash Codex rollouts. They show existing coverage and are not superseded Claude transcript hashes; missing Claude bindings are added below.",
+      "replacement": "Persistent Claude transcripts are identified by session and full-file hash below. The raw transcripts remain private.",
+      "private_transcripts": [
+        {
+          "private_session_identity_sha256": "9bbf3f56627868a888fe0d12fe03c262b08e56603dee5dad39800b6cf80911d9",
+          "scope": "OPS initial",
+          "bytes": 123067,
+          "lines": 40,
+          "sha256": "0fe52c2b22abe6eff4c23a0736b2b9d7d1eb3a9827052bbe1af59d8d50864693"
+        },
+        {
+          "private_session_identity_sha256": "3ce0e85568bb6b00fa9f676e0571b8a718f128ce9f42b7b4ec16403c902adbdc",
+          "scope": "OPS repair",
+          "bytes": 122606,
+          "lines": 36,
+          "sha256": "8ec9dc68961d4c8153d46a802459ed8c99eee74cdf633098b18bc9fcf17eb103"
+        },
+        {
+          "private_session_identity_sha256": "5e5d07b8f618040eee18829e81bb918309222b7b956a12960e32c26cc05751ab",
+          "scope": "Row 64 review",
+          "bytes": 515025,
+          "lines": 32,
+          "sha256": "1b224d6319cc2e4e99939b6cf256df34acb89f6548ba9592ef441218d03e3348"
+        }
+      ]
+    },
+    "c_selected_codex_route_observation": {
+      "supersedes": ["ops_json:834"],
+      "replacement": "A later observation retained the selected SocratiCode route excerpt privately. Its source mtime predates the jobs; this supplies no contemporaneous whole-configuration snapshot.",
+      "route_port_metadata": 28231,
+      "private_excerpt": {
+        "bytes": 363,
+        "sha256": "22f9b1eb9360d4cbf983840fc613bdc8c8aa147288791cf4d8be4c39678c43b0",
+        "private_source_locator": "config.toml:766-771",
+        "observed_utc_start": "2026-10-08T16:13:26.058Z",
+        "observed_utc_end": "2026-10-08T16:13:26.062Z",
+        "observed_source_mtime_utc": "2026-10-08T09:25:49.715Z",
+        "contents_published": false
+      }
+    },
+    "d_claude_exact_call_window": {
+      "supersedes": ["ops_json:283-295", "ops_json:389-401", "ops_markdown:20"],
+      "replacement": "The Claude repair's HTTP 200 embedding POST falls inside the actual MCP request/response window. Exclusive causal attribution remains unproved. Semble uses CPU Model2Vec and does not use the vLLM endpoint.",
+      "private_session_identity_sha256": "3ce0e85568bb6b00fa9f676e0571b8a718f128ce9f42b7b4ec16403c902adbdc",
+      "request": {
+        "transcript_line": 22,
+        "stream_line": 29,
+        "utc": "2026-10-08T15:23:29.266Z",
+        "event_lf_sha256": "8d71cb74612a27ccb49e6fd11c9a108669694a4bfe7bec10bc0debbd8ab003f3"
+      },
+      "response": {
+        "transcript_line": 24,
+        "stream_line": 35,
+        "utc": "2026-10-08T15:23:34.678Z",
+        "event_lf_sha256": "e5d09ef973ff224e66c443b17445a479bbd27be2b16530b165c356f5d71718d8",
+        "is_error_field": "absent"
+      },
+      "matched_post": {
+        "job_relative_file": "claude-repair/vllm.journal",
+        "line": 1,
+        "utc": "2026-10-08T15:23:30.542680Z",
+        "http": 200,
+        "event_lf_sha256": "b81c07a24da49dc536d9c28ec676d7df2f1fdf10bacdbf674e649976bc56bd8a",
+        "file_sha256": "25743afe7cb49f8c8bc88366fd32e10805f6a0d2135f97509240cab8b163d1ca"
+      }
+    },
+    "e_vendor_equality_scope": {
+      "supersedes": ["joins_r2:9"],
+      "replacement": "The existing Claude binary matches the freshly fetched publisher manifest checksum. The freshly downloaded Codex archive's extracted bin/codex matches the existing Codex binary.",
+      "limits": "No freshly downloaded Claude binary comparison is claimed. The existing executable's checksum equality with the fresh publisher manifest is recorded; publisher build references, signature observations and returned backend limits remain as recorded."
+    },
+    "gpt_install_plan_locator": {
+      "supersedes": ["joins_r2:39"],
+      "replacement": "The private retained install plan uses line 3918; the supplied repository archive uses line 3955. The owner object is identical at /owners/70.",
+      "private_retained_plan": {
+        "line": 3918,
+        "sha256": "fe7ae08164bea16e31e913d983fb3ec7aa6e3ad36f3f917597c9966f7f0a73ef"
+      },
+      "supplied_repository_archive": {
+        "file": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+        "line": 3955,
+        "sha256": "d7181dc3eb48d99e1c3a3d5f421b4b011c60e18807376eab71071e1f94b73c8f"
+      },
+      "json_pointer": "/owners/70"
+    },
+    "gpt_completed_codex_rc_locator": {
+      "supersedes": ["row64_markdown:20"],
+      "replacement": "capture-r2/codex-inline/codex.rc",
+      "value": 0,
+      "limits": "This expands the Markdown shorthand; the structured receipt already supplies the exact completed path. Intermediate capture-r2/codex.rc=0 remains NOT COMPLETED and excluded."
+    }
+  },
+  "sources": [
+    {
+      "repository": "MinishLab/semble",
+      "version": "0.6.2",
+      "url": "https://github.com/MinishLab/semble",
+      "publisher_metadata_url": "https://pypi.org/pypi/semble/0.6.2/json",
+      "reference": "Published uv wheel origin and MCP search schema."
+    },
+    {
+      "repository": "giancarloerra/SocratiCode",
+      "version": "1.16.0",
+      "url": "https://github.com/giancarloerra/SocratiCode",
+      "publisher_artifact_url": "https://registry.npmjs.org/socraticode/-/socraticode-1.16.0.tgz",
+      "reference": "Vendor dist/index.js and LM Studio-compatible embedding provider."
+    },
+    {
+      "repository": "vllm-project/vllm",
+      "version": "0.31.0",
+      "url": "https://github.com/vllm-project/vllm",
+      "publisher_metadata_url": "https://pypi.org/pypi/vllm/0.31.0/json",
+      "reference": "Official PyPI wheel and existing native server."
+    },
+    {
+      "repository": "openai/codex",
+      "pin": "rust-v0.161.0",
+      "url": "https://github.com/openai/codex/blob/rust-v0.161.0/codex-rs/core/config.schema.json",
+      "reference": "Installed 0.161.0 supported configuration schema."
+    },
+    {
+      "repository": "anthropics/claude-code",
+      "version": "2.1.294",
+      "url": "https://downloads.claude.ai/claude-code-releases/2.1.294/manifest.json",
+      "reference": "Official publisher manifest and native client."
+    }
+  ],
+  "publication_boundary": "Native metadata, session/line hashes and opaque private-artifact digests only. Raw conversations, personal host paths, active client configuration contents and credential values are omitted.",
+  "new_work": "Records-only source review. Prior named native operations are retained; no native operation, installation or upstream test suite is repeated and no row status changes are made by this record.",
+  "inverse": "None: records-only correction; original artifacts and failed conditions preserved, no install/call/configuration repeated."
+}
