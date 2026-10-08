@@ -4726,8 +4726,8 @@
     },
     {
       "path": ".github/actions-permissions.json",
-      "sha256": "6136c77ffa84849ef0dc3d1a1267eef72b7e2921c05627e5f8b5ebd4eae3a74a",
-      "bytes": 750
+      "sha256": "49f9a1464b2648153eb14c5ef67c986b852d91b2419d02099475cf39b8b65a5c",
+      "bytes": 808
     },
     {
       "path": ".github/agent-branch-ruleset.json",
@@ -17232,8 +17232,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-github-automation-closure.md",
-      "sha256": "d6999be5e233e7a6c6f249e29584a9143d0de4be60d15ab87e1a1ef97664f4ca",
-      "bytes": 158403
+      "sha256": "5cd35591a82a8502d17da26adca21019edefeda076c3462fd98cf29dd53c6b66",
+      "bytes": 159318
     },
     {
       "path": "docs/decisions/2026-09-24-secret-storage.md",
@@ -17577,8 +17577,8 @@
     },
     {
       "path": "docs/decisions/2026-10-04-ci-least-privilege.md",
-      "sha256": "4efed6abf346d5ae4a9742ba8a527625d5d95f252f58611c2de9e98dc486e174",
-      "bytes": 37516
+      "sha256": "609d0f963dca45ad79f080b36ba3e43692a8c37d70f1b9d35555d0d5e4ba7594",
+      "bytes": 40734
     },
     {
       "path": "docs/decisions/2026-10-04-claude-template-holds-out-token-lane-carriers.md",
@@ -58102,8 +58102,8 @@
     },
     {
       "path": "tests/test_workflow_policy.py",
-      "sha256": "1c518c3b82f265c9567bfeb9034e48329b9f3d8e83999776917647462cf3523e",
-      "bytes": 82779
+      "sha256": "1927a9a769425323a3fd4b7dba879ada5052667185a7c8762baf674cb0b47000",
+      "bytes": 83603
     },
     {
       "path": "tests/test_workflow_security.py",
@@ -58112,8 +58112,8 @@
     },
     {
       "path": "tests/test_workflow_security_coverage.py",
-      "sha256": "828069fc1925a5332aefbcdb1476a5138f7e803ab7ae82a0efb826c373193ae6",
-      "bytes": 11547
+      "sha256": "bb486ad07dea82027b40f88bcc43c6bde580005ad5a33ec2cf33573ae89e143c",
+      "bytes": 12126
     },
     {
       "path": "tests/test_wsl_memory_maintenance.py",

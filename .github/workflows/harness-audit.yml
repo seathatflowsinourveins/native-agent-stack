@@ -1,0 +1,70 @@
+name: harness-audit
+
+# Weekly audit of the always-loaded harness context with the owner's chosen reference, the claude-code-ultimate-guide
+# audit prompt v5.0 (pinned commit and sha256 below). Authenticates by Anthropic workload identity federation: GitHub
+# issues a short-lived OIDC token per run and no Anthropic key is stored in this repository. The federation rule accepts
+# workflows on this repository's main and never pull requests; which workflows may request an OIDC token is governed by
+# the reviewed write-grant inventory (id-token: write) that tests.test_workflow_policy enforces. Claude reads with its
+# read-only tools and may run only `gh issue create` (claude_args); id-token: write here is a reviewed exemption from
+# the tripwire's id-token-write rule (docs/decisions/2026-10-04-ci-least-privilege.md, "Federation exemption
+# (2026-10-08)").
+on:
+  schedule:
+    - cron: "17 9 * * 1"
+  workflow_dispatch:
+
+# No token scope by default; each job grants its own (docs/decisions/2026-10-04-ci-least-privilege.md).
+permissions: {}
+
+concurrency:
+  group: harness-audit
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    name: Audit the harness context and open the scorecard issue
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    permissions:
+      contents: read
+      id-token: write # the GitHub OIDC token the action exchanges for a short-lived Claude API token; no attestation
+      issues: write # the one scorecard issue; this job only
+    steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # In its own directory, which claude_args adds with --add-dir: Claude Code reads without approval only inside
+      # its working and additional directories.
+      - name: Fetch the pinned audit prompt
+        run: |
+          mkdir -p "$RUNNER_TEMP/harness-audit"
+          curl -fsSL "https://raw.githubusercontent.com/FlorianBruniaux/claude-code-ultimate-guide/585c2030cd590e991d84dae4d6614cd449f245b1/tools/audit-prompt.md" -o "$RUNNER_TEMP/harness-audit/audit-prompt.md"
+          echo "1d1fb98d87d40d0141b5243d60afe898d982a14f6e02c1d2d2931df89a7c0ede  $RUNNER_TEMP/harness-audit/audit-prompt.md" | sha256sum -c -
+
+      - name: Run the audit
+        uses: anthropics/claude-code-action@6fed3ca145920b639991cb756090506e1bcaf515 # v1.0.245
+        with:
+          anthropic_federation_rule_id: ${{ vars.ANTHROPIC_FEDERATION_RULE_ID }}
+          anthropic_organization_id: ${{ vars.ANTHROPIC_ORGANIZATION_ID }}
+          anthropic_service_account_id: ${{ vars.ANTHROPIC_SERVICE_ACCOUNT_ID }}
+          anthropic_workspace_id: ${{ vars.ANTHROPIC_WORKSPACE_ID }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          prompt: |
+            Read ${{ runner.temp }}/harness-audit/audit-prompt.md, section "4. The prompt", and run that audit on this
+            repository (project scope only; read-only; make no edits, commits or pull requests). Where a step there
+            uses a shell command you are not allowed to run, get the same facts with Read, Glob and Grep.
+            Then open one GitHub issue titled "Harness audit" with `gh issue create`, holding the dimension scorecard
+            and the findings ranked by severity, each with its file path and the concrete fix.
+          claude_args: |
+            --model claude-opus-5-5
+            --max-turns 60
+            --add-dir ${{ runner.temp }}/harness-audit
+            --allowedTools "Bash(gh issue create:*)"

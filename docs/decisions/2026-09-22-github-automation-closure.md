@@ -2024,6 +2024,19 @@ follows. The `gh api` GETs quoted below were taken by the coordinator on
   `github_owned_allowed`/`patterns_allowed` (add a `patterns_allowed` entry
   here with a dated reason), or a currently-used GitHub-owned action becomes
   blocked under `selected`.
+- **Allow-list entries added (2026-10-08).** `anthropics/claude-code-action@*`:
+  the weekly harness audit (`.github/workflows/harness-audit.yml`) runs it
+  pinned to v1.0.245 (`6fed3ca145920b639991cb756090506e1bcaf515`), authenticated
+  by Anthropic workload identity federation with no stored key.
+  `oven-sh/setup-bun@*`: that composite action's `Install Bun` step uses
+  `oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6` (v2.2.0,
+  `action.yml` at the same pin). Whether the selected-actions policy also checks
+  a nested `uses:` is untested (M45 in
+  `docs/decisions/2026-09-28-community-sweep.md`), so it is listed rather than
+  risk a blocked first run; `sha_pinning_required` still applies to both. A live
+  GET on 2026-10-08 (03:28Z) still listed only the two earlier patterns: send the
+  `selected-actions` PUT above with all four `patterns_allowed[]` values before
+  the workflow's first run.
 
 ### Four production relocks and preserved receipt inputs (2026-10-06)
 
