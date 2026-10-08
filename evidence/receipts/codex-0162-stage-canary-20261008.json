@@ -1,0 +1,130 @@
+{
+  "schema_version": 1,
+  "id": "codex-0162-stage-canary-20261008",
+  "recorded_date": "2026-10-08",
+  "scope": "Linux x86_64 publisher stage and two co-op-run native client canaries; daily automation and units are proposals only",
+  "source_review": {
+    "repository": "https://github.com/openai/codex",
+    "tag": "rust-v0.162.0",
+    "commit": "c1382380de69521303b416720a52f42d51af6248",
+    "release": "https://github.com/openai/codex/releases/tag/rust-v0.162.0",
+    "install_documentation": "https://developers.openai.com/codex/cli",
+    "tagged_installation": "https://github.com/openai/codex/blob/rust-v0.162.0/README.md",
+    "extraction_reference": "https://github.com/openai/codex/blob/rust-v0.162.0/scripts/install/install.sh#L947-L969",
+    "declared_breaking_section": false,
+    "compatibility_items": [
+      "Partial-history subagent forks removed: #51329 and #51335",
+      "Strict validation rejects unknown TUI keys: #50525",
+      "Server model and summary defaults respect explicit launch overrides",
+      "Linux denied-file, writable-executable and ripgrep-mask fixes",
+      "Custom provider web and remote-compaction capabilities",
+      "Retry-After handling and default CRLF preservation",
+      "Stable installer alias and Windows installer/checksum fixes; Windows not executed"
+    ]
+  },
+  "stage": {
+    "evidence_class": "native_proven",
+    "distribution": "0.162.0-x86_64-unknown-linux-musl",
+    "asset": "codex-package-x86_64-unknown-linux-musl.tar.gz",
+    "checksum_source": "https://github.com/openai/codex/releases/download/rust-v0.162.0/codex-package_SHA256SUMS",
+    "archive_sha256": "4f573944c1d2059109d75a2f4d0cc9c03697288224a5e407717a9de98fc010c5",
+    "published_checksum_manifest_sha256": "80697e9c89ee8a06aa2b74efa81a086dc4ad6f16609daf506d6ddeac9440cc23",
+    "binary_sha256": "50ed828f357c655a3c82054d346cab8434f24901f14ec19b8267571bdd008b38",
+    "native_version_stdout": "codex-cli 0.162.0\n",
+    "native_checksum_stdout": "codex-package_SHA256SUMS: OK\ncodex-package-x86_64-unknown-linux-musl.tar.gz: OK\ncodex-package-x86_64-unknown-linux-musl.tar.gz: OK\n",
+    "full_package_retained": true,
+    "old_0161_executable_hash_check": "OK",
+    "old_identity_launcher_hash_check": "OK",
+    "standalone_current_link_comparison": "equal",
+    "installed_default_changed_by_this_lane": false,
+    "attestation_verified": false
+  },
+  "canary": {
+    "evidence_class": "native_proven",
+    "verdict": "PASS",
+    "verdict_scope": "Seven shared MCP smoke families and one real queued reconciliation task per lane, with recovered non-client failures and explicit unknown hidden totals",
+    "shared_smoke_families": ["serena", "ai_memory", "codebase_memory_mcp", "codex_worktrees", "context_mode", "hindsight", "qmd"],
+    "counter_scope": "Native outer response_item calls only; wrappers and nested invocations are separate, never added",
+    "lanes": [
+      {
+        "lane": "harness-rules",
+        "shared_smoke_passed": 7,
+        "shared_smoke_total": 7,
+        "all_smoke_passed": 10,
+        "all_smoke_total": 10,
+        "queued_task": "PR881 required-check and actual merge-state reconciliation",
+        "queued_task_complete": true,
+        "native_task_result": "GitHub MERGED at 2026-10-08T20:41:37Z; seven required checks SUCCESS; merge e48de2e6fa1dd3b740af4793ea5824ea35476dba",
+        "baseline": {
+          "cli_version": "0.161.0", "turn_scope": "last completed turn; exact private locator retained",
+          "started": "2026-10-08T20:19:26.713Z", "completed": "2026-10-08T20:37:56.766Z",
+          "outer_tool_calls": 34, "outer_tool_names": {"functions.exec": 30, "collaboration.spawn_agent": 1, "collaboration.send_message": 2, "collaboration.followup_task": 1},
+          "command_failure_outputs": 1, "mcp_failure_outputs": 1,
+          "persisted_provider_transport_error_retry_events": 0, "hidden_provider_transport_total": null, "hidden_retry_total": null
+        },
+        "current": {
+          "cli_version": "0.162.0", "turn_scope": "completed queued-task canary turn; exact private locator retained",
+          "started": "2026-10-08T21:32:26.911Z", "completed": "2026-10-08T21:40:00.667Z",
+          "model": "cx/gpt-6.1-sol", "effort": "max", "approval_policy": "never",
+          "outer_tool_calls": 13, "outer_tool_names": {"functions.exec": 13},
+          "command_failure_outputs": 0, "mcp_failure_outputs": 1,
+          "persisted_provider_transport_error_retry_events": 0, "explicit_retry_calls_reported": 0,
+          "hidden_provider_transport_total": null, "hidden_retry_total": null
+        },
+        "error_disposition": "Same context-mode ctx_execute_file outside-project guard (#852) observed in both versions; authorized native scoped read recovered it"
+      },
+      {
+        "lane": "skills-lifecycle",
+        "shared_smoke_passed": 7,
+        "shared_smoke_total": 7,
+        "all_smoke_passed": 8,
+        "all_smoke_total": 8,
+        "queued_task": "PR887 required-check and base reconciliation",
+        "queued_task_complete": true,
+        "native_task_result": "Native state readback: five passing and two failing required checks, diverged base; task complete, PR readiness not established",
+        "baseline": {
+          "cli_version": "0.161.0", "turn_scope": "last completed turn; exact private locator retained",
+          "started": "2026-10-08T20:37:53.964Z", "completed": "2026-10-08T20:38:05.715Z",
+          "outer_tool_calls": 0, "outer_tool_names": {}, "command_failure_outputs": 0, "mcp_failure_outputs": 0,
+          "persisted_provider_transport_error_retry_events": 0, "hidden_provider_transport_total": null, "hidden_retry_total": null
+        },
+        "current": {
+          "cli_version": "0.162.0", "turn_scope": "completed queued-task canary turn; exact private locator retained",
+          "started": "2026-10-08T21:28:25.023Z", "completed": "2026-10-08T21:40:52.134Z",
+          "model": "cx/gpt-6.1-sol", "effort": "max", "approval_policy": "never",
+          "outer_tool_calls": 23, "outer_tool_names": {"functions.exec": 22, "collaboration.spawn_agent": 1},
+          "command_failure_outputs": 1, "mcp_failure_outputs": 1,
+          "persisted_provider_transport_error_retry_events": 0, "workflow_recovery_episodes_reported": 3,
+          "hidden_provider_transport_total": null, "hidden_retry_total": null
+        },
+        "error_disposition": "Strict resume= extraction failed against a files= checkpoint; known context-mode #852 guard refused a research-file read; targeted native reads recovered both"
+      }
+    ],
+    "native_worktree_tools": ["mcp__codex_worktrees__create_worktree", "mcp__codex_worktrees__get_worktree_creation_status", "mcp__codex_worktrees__list_worktrees"],
+    "namespace_inventory_timestamp": "2026-10-08T21:29:23.390Z",
+    "namespace_inventory_source": "Exhaustive native namespace result; exact private call locator retained",
+    "worktree_tool_spec_source": "https://github.com/openai/codex/blob/rust-v0.162.0/codex-rs/tui/src/managed_worktree_tool_specs.rs#L7-L16",
+    "worktree_create_or_remove_executed": false,
+    "default_rollout_authority": "CC cue; this receipt selects no installed default",
+    "paper_path_changed": false,
+    "performance_ab_claim": false,
+    "limitations": ["Baselines and real canary tasks differ", "Hidden provider/transport/retry totals remain unknown", "Later PR887 repair activity is excluded", "Windows and general sandbox behavior are source-reviewed only"]
+  },
+  "automation_proposal": {
+    "evidence_class": "local_integration",
+    "synthetic_inputs": true,
+    "tests": 19,
+    "native_module_stdout": "...................\n----------------------------------------------------------------------\nRan 19 tests in 4.456s\n\nOK\n",
+    "bash_syntax_exit": 0,
+    "dagu_2_18_2_validate_exit": 0,
+    "systemd_259_5_proposal_verify_exit": 0,
+    "first_dagu_validation_failure": "entrypoint document must not define name",
+    "independent_source_critic": "No remaining material blocker to draft publication; deployment/adapter gaps remain documented",
+    "co_op_adapter_implemented_in_this_pr": false,
+    "unit_installed_enabled_or_started": false,
+    "live_automation_or_recovery_acceptance": false,
+    "sources": ["https://github.com/dagucloud/dagu/tree/v2.18.2", "https://github.com/cli/cli/tree/v2.102.0", "https://github.com/aannoo/hcom/tree/b2a7c192003e7fd67ed93265289e4ac36276f965", "https://github.com/systemd/systemd/blob/v259/man/systemd.service.xml", "https://github.com/systemd/systemd/blob/v259/man/systemd.timer.xml"]
+  },
+  "retained_private_native_artifact_names": ["native-version.txt", "downloads/codex-package_SHA256SUMS", "downloads/selected.sha256", "staged-binary.sha256", "previous-before.sha256", "previous-after-check.txt", "current-before.txt", "current-after.txt", "harness-last-turn-native-summary.json", "canary-comparison.md", "integration-native.txt", "dagu-native.txt", "systemd-native.txt"],
+  "decision": "docs/decisions/2026-10-08-codex-0162-stage-and-currency-proposal.md"
+}

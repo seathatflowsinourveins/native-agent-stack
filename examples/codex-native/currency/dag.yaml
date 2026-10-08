@@ -1,0 +1,28 @@
+# Proposal only. Sources: dagucloud/dagu v2.18.2 schema, specs/023-preconditions.md,
+# openai/codex rust-v0.162.0 README.md and scripts/install/install.sh.
+type: graph
+timeout_sec: 1800
+description: Stage a publisher release, require two co-op canaries, then select future launches.
+working_dir: ${env.CURRENCY_SOURCE}/examples/codex-native/currency
+env:
+  - CURRENCY_RUN: ${context.run.id}
+steps:
+  - id: stage
+    run: bash ./currency.sh stage
+    stdout: {artifact: stage-native.txt}
+    stderr: {artifact: stage-native.stderr}
+  - id: canary
+    depends: [stage]
+    run: bash ./currency.sh canary
+    stdout: {artifact: canary-native.txt}
+    stderr: {artifact: canary-native.stderr}
+  - id: promote
+    depends: [canary]
+    run: bash ./currency.sh promote
+    stdout: {artifact: promote-native.txt}
+    stderr: {artifact: promote-native.stderr}
+handler_on:
+  failure:
+    run: bash ./currency.sh rollback
+  abort:
+    run: bash ./currency.sh rollback
