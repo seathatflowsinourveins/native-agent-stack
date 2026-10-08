@@ -5165,8 +5165,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "ea016397578031197af672c2777ab3d70b740997f45cf3d31dda99f69c6d7980",
-      "bytes": 69220
+      "sha256": "c33b28072ffee4b92e2ea61100acd75b2289f35e9e878ffa21ac855fa010e963",
+      "bytes": 73702
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -5385,8 +5385,8 @@
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "cadc9b9e4f5559ed6c7a833a2f2f313f06606ff7f89b0bc040f2dec4dc23604f",
-      "bytes": 66472
+      "sha256": "b2286b97f8b2df2ba9297367bd78bc97b3238ad113edec97cf0c359d613c4582",
+      "bytes": 66805
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -18076,8 +18076,8 @@
     },
     {
       "path": "docs/decisions/2026-10-08-qmd-shared-mcp.md",
-      "sha256": "1d29497593bf453c497bb806062ee2865517c03977a70b0a1aed1d07faf2b055",
-      "bytes": 8745
+      "sha256": "c6dd69ac2afcf73dd37170c6fd086d4ab61a83e6695b1a2ff91cb9d1f0971c8b",
+      "bytes": 9360
     },
     {
       "path": "docs/decisions/2026-10-08-skills-cc-lanes-picks.md",

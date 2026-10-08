@@ -69,7 +69,12 @@ release, the note is history and the step is in your checkout (`test -e
    components ([embedding backend decision](#embedding-backend-decision)).
 3. Native sign-in and config rendering: [`adoption/bootstrap.md`](../bootstrap.md)
    steps 3–4 (Codex, Claude and GitHub device flows; `tools/adoption/render_config.py`
-   with this host's own `adoption/hosts/<host>.json`). Its step 4a installs
+   with this host's own `adoption/hosts/<host>.json`). Before HTTP client
+   registration or automatic configure flags, complete step 4's native QMD
+   daemon/health prerequisite on this Mac. The vendor detached daemon is
+   cross-platform source support, not an observed macOS runtime or boot-autostart
+   pass; its native start/check/stop and exact client inverse are required here.
+   Its step 4a installs
    Serena and jcodemunch-mcp into the ecosystem prefix, registers the
    user-scope MCP servers (`ai-memory` and `serena`) and gives jCodeMunch's
    per-project opt-in. The MCP template `adoption/mcp/claude-user.json`

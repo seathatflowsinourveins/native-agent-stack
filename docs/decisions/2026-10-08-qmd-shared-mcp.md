@@ -119,6 +119,15 @@ checks and restart-on-failure do not establish continuous availability or
 recovery after an intentional stop. The template alone does not install, start
 or qualify a service on another host.
 
+[Bootstrap step 4](../../adoption/bootstrap.md) supplies the native vendor
+daemon start/check/stop before either portable client is configured, on Linux
+and macOS. Fresh-host automatic configure flags are deferred until that
+prerequisite passes. The daemon's named-index PID and shutdown identity check
+come from QMD's installed `dist/cli/qmd.js`, `dist/cli/mcp-pid.js` and README at
+the pinned revision; it is not a custom runtime. Its unsupervised lifecycle and
+macOS execution limits are explicit. Existing Linux systemd-owned service
+supervision remains separate, with its tested restart/health receipt above.
+
 ## Setup and inverse
 
 Before expanded client relaunch, the command center starts/checks the owned
