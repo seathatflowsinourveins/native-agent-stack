@@ -7,6 +7,13 @@ primary docs checked 2026-10-08). Denial uses hookSpecificOutput, not a top-leve
 decision. Fetch warnings use additionalContext without permissionDecision or
 updatedInput, so the client's normal permissions still apply.
 
+Correction 2026-10-08: the live unversioned UserPromptSubmit documentation led
+to an earlier top-level additionalContext implementation. Installed 2.1.294
+requires it inside hookSpecificOutput: public native binary SHA-256
+27122ca7b624f537546fbef35b80c66370d974ff258f3d9b10ac50bb8771f262;
+output schema at byte 211365006, nested UserPromptSubmit at 211365933, and
+translation at 215326530. The installed contract governs both event outputs.
+
 Only coordinator launchers supply NAS_RESEARCH_COORDINATOR_ROLE (command-center
 or co-op) and NAS_RESEARCH_COORDINATOR_SESSION_ID matching the native session_id.
 An inherited marker cannot mark a new lane or research session. A nonempty
@@ -176,10 +183,7 @@ def update_state(session, role, event, tool=None, items=None):
 
 
 def emit(event, **fields):
-    if event == "UserPromptSubmit":
-        print(json.dumps(fields))  # Native UserPromptSubmit context is top-level.
-    else:
-        print(json.dumps({"hookSpecificOutput": {"hookEventName": event, **fields}}))
+    print(json.dumps({"hookSpecificOutput": {"hookEventName": event, **fields}}))
 
 
 def main():

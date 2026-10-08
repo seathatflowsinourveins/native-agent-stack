@@ -15,7 +15,9 @@ with the command center after landing.
   [official hooks reference](https://code.claude.com/docs/en/hooks), read
   2026-10-08: matcher evaluation, common input fields, PreToolUse decision control
   and UserPromptSubmit decision control. The current live documentation is a
-  dated source review, rather than an immutable versioned client test.
+  dated source review, rather than an immutable versioned client test. The
+  installed client's native output schema takes precedence; its review
+  correction below binds the UserPromptSubmit warning shape.
 - [bytedance/deer-flow](https://github.com/bytedance/deer-flow/tree/345f08be00c8a9495079b732a39b46aa9af1584e)
   at `345f08be00c8a9495079b732a39b46aa9af1584e` (v2.1.0), its embedded
   `DeerFlowClient.chat()` interface and the installed `deer-flow-research.sh`
@@ -85,6 +87,13 @@ credential query fields, fragments, headers and complete tool inputs are omitted
 These are **attempt records**: PreToolUse occurs before permissions and fetching,
 so a log line does not prove a successful fetch or verified claim.
 
+For the installed **2.1.294** client, UserPromptSubmit failure notices use
+`hookSpecificOutput.hookEventName = "UserPromptSubmit"` and nested
+`additionalContext`. The inspected native binary schema/translation below
+supports this shape, even though the current live docs describe a top-level
+field. Successful resets emit nothing. PreToolUse retains its own nested
+event-specific fields.
+
 Private state lives at
 `${XDG_STATE_HOME:-$HOME/.local/state}/native-agent-stack/research-routing/`
 under the SHA256 of the native session ID. A locked `turn.json` counter resets
@@ -115,6 +124,17 @@ argument rather than evaluated as shell code. Consult the command's `--help`
 for the optional explicit HCOM identity. The producer is the existing
 `new-wsl-native-stack/deer-flow-research.sh` under the caller's XDG config root;
 this adapter does not introduce another producer selector or model route.
+
+The selected Linux/WSL host uses the existing **procps-ng 4.0.4** native
+`pkill --session` and `ps --sid` controls. The dispatcher checks those
+interfaces and Python's `waitid(..., WNOWAIT)` before resolving HCOM or starting
+research. Cancellation signals the whole owned producer session, including
+the timer's separate process group, while holding the unreaped leader to keep
+its numeric session ID from reuse. After the grace period it retires remaining
+session members and records the native controls and outcome. The original
+producer/watchdog is unchanged. A missing native prerequisite refuses before
+research. macOS and descendants that deliberately start a different session
+are unqualified boundaries; the selected Linux/WSL route is the tested target.
 
 After 5f lands the reviewed head, the CC performs its existing F9 render/apply
 from that head, including the checksum-verified hook file. The CC/co-op launcher
@@ -149,8 +169,9 @@ Their updated contracts add the checksum-bound `research-routing-guard.py`:
   idempotent application checks retain their existing contracts.
 - `tests.test_new_wsl_client_config.RenderTests.test_settings_keep_the_practice_pieces_and_drop_the_old_profile_pieces`:
   the copied-hook command count grows from four to six because the new single
-  hook runs at PreToolUse and UserPromptSubmit; the rendered file count grows
-  by one, and all remaining practice/profile permission assertions are kept.
+  hook runs at PreToolUse and UserPromptSubmit; all remaining practice/profile
+  permission assertions are kept. The copied-file list is asserted by the
+  separate ApplyTests method named above.
 
 The added
 `RenderTests.test_coordinator_research_hooks_render_native_matchers_without_globally_marking_sessions`
@@ -164,6 +185,41 @@ The exact class names were checked in source. This declaration does not turn
 fixture evidence into upstream acceptance.
 
 ## Recovery and next observation
+
+### Installed-native review corrections, 2026-10-08
+
+The independent Claude Opus reader's installed-source and harmless process
+probes exposed two gaps in the initial `26118b8` integration. Its earlier
+passing fixture/readback records remain retained; they are not rewritten as
+acceptance of the repaired source.
+
+1. The live hooks page led the initial UserPromptSubmit error notice to use
+   top-level `additionalContext`. Installed Claude **2.1.294**, native binary
+   SHA256 `27122ca7b624f537546fbef35b80c66370d974ff258f3d9b10ac50bb8771f262`
+   (252,755,128 bytes), defines the top-level output object at byte 211365006
+   without that field. Its nested UserPromptSubmit schema around byte 211365933
+   and event translation around byte 215326530 consume
+   `hookSpecificOutput.additionalContext`. The repaired hook and protocol test
+   use the installed shape. This is a native-source correction to unversioned
+   documentation guidance, not a fresh-session host-application claim.
+2. The original cancellation fixture used one process group, while the actual
+   producer has a non-final `timeout` command in Bash. Native probes with
+   **uutils coreutils 0.10.0** `timeout` and **GNU coreutils 9.7** `gnutimeout`
+   reproduced a timer/child group that survived `killpg(launcher_pid)` in the
+   same producer session. Both are existing host executables, not new installs.
+   The maintainer-provided **procps-ng 4.0.4** session selectors close this gap:
+   see [the pinned pkill implementation](https://gitlab.com/procps-ng/procps/-/blob/v4.0.4/src/pgrep.c)
+   and installed `pkill --help` / `pgrep --help`. New native timer regressions
+   fail the old adapter and pass session cancellation, keep an isolated peer
+   session alive, and retain partial producer output/interruption. These are
+   local integration checks with synthetic research fixtures using real native
+   process tools; no model/research operation is credited.
+
+The initial short timeout probe allowed Bash to exec the timer as its own
+leader and reported zero survivors. That shape did not exercise the real
+producer's separate timer group; the corrected producer-shaped observation is
+the evidence. This records the scope correction rather than inferring complete
+cancellation from the earlier limited probe.
 
 Before host application, the inverse is reverting this PR's repository changes;
 the existing host is untouched. After application, CC/co-op launchers can remove

@@ -2,7 +2,9 @@
 
 The fixtures stand in for hcom's documented ``list self --json`` and the
 installed embedded DeerFlow launcher's run-directory/answer/metadata contract.
-No model, credential, network, service, or installed runtime is used.
+No model, credential, network, service, or installed research runtime is used.
+Cancellation controls use native procps and available real uutils/GNU timeout
+executables to exercise their separate process groups within the owned session.
 """
 
 import hashlib
@@ -21,6 +23,19 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DISPATCH = ROOT / "tools/research/dispatch"
+NATIVE_PKILL = shutil.which("pkill")
+NATIVE_PS = shutil.which("ps")
+
+
+def native_session_tools_available():
+    if not NATIVE_PKILL or not NATIVE_PS:
+        return False
+    pkill = subprocess.run([NATIVE_PKILL, "--help"], capture_output=True, text=True)
+    ps = subprocess.run([NATIVE_PS, "--help", "all"], capture_output=True, text=True)
+    return "--session" in pkill.stdout + pkill.stderr and "--sid" in ps.stdout + ps.stderr
+
+
+NATIVE_SESSION_TOOLS = native_session_tools_available()
 
 
 class ResearchDispatchTests(unittest.TestCase):
@@ -53,6 +68,18 @@ class ResearchDispatchTests(unittest.TestCase):
             encoding="utf-8",
         )
         self.hcom.chmod(0o755)
+        # The ordinary CLI tests isolate the prerequisite contract too. Actual
+        # cancellation tests remove these fixtures and use native procps.
+        for tool, help_text in (("pkill", "--session SID"), ("ps", "--sid SID")):
+            fixture = self.bin / tool
+            fixture.write_text(
+                f"#!{sys.executable}\n"
+                + "import sys\n"
+                + f"print({help_text!r}) if '--help' in sys.argv else None\n"
+                + "raise SystemExit(0 if '--help' in sys.argv else 1)\n",
+                encoding="utf-8",
+            )
+            fixture.chmod(0o755)
         self.launcher = self.config / "deer-flow-research.sh"
         self.launcher.write_text(
             "#!/usr/bin/env bash\n"
@@ -92,6 +119,10 @@ class ResearchDispatchTests(unittest.TestCase):
 
     def receipts(self):
         return list((self.directory / "state").rglob("dispatch.json"))
+
+    def use_native_session_tools(self):
+        for tool in ("pkill", "ps"):
+            (self.bin / tool).unlink()
 
     def test_one_question_returns_the_original_cited_result_with_native_hcom_identity(self):
         question = "Compare maintained tools; literal $(touch NEVER) and `echo text` stay text."
@@ -173,6 +204,16 @@ class ResearchDispatchTests(unittest.TestCase):
         self.assertFalse((self.directory / "launcher-call.json").exists())
         self.assertEqual(len(self.receipts()), 1)
 
+    def test_missing_native_session_control_prevents_hcom_and_research(self):
+        (self.bin / "pkill").unlink()
+        self.env["PATH"] = str(self.bin)
+        result = self.run_dispatch("--name", "gala", "question")
+        self.assertEqual(result.returncode, 1, result.stderr)
+        self.assertIn("pkill", result.stderr)
+        self.assertFalse((self.directory / "hcom-call.json").exists())
+        self.assertFalse((self.directory / "launcher-call.json").exists())
+        self.assertEqual(len(self.receipts()), 1)
+
     def test_empty_and_duplicate_questions_are_usage_failures_without_runtime_work(self):
         for args in ((), ("--question", " "), ("one", "--question", "two")):
             with self.subTest(args=args):
@@ -189,8 +230,9 @@ class ResearchDispatchTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(result.stdout, f"{self.directory / 'producer run/answer.md'}\n")
 
-    @unittest.skipUnless(hasattr(os, "killpg"), "the installed native research launcher needs POSIX")
+    @unittest.skipUnless(NATIVE_SESSION_TOOLS and hasattr(os, "killpg"), "needs the native procps session route")
     def test_cancellation_retires_a_term_ignoring_descendant_and_retains_the_failure(self):
+        self.use_native_session_tools()
         self.launcher.write_text(
             "#!/usr/bin/env bash\n"
             + f"exec '{sys.executable}' - <<'PY'\n"
@@ -244,6 +286,94 @@ class ResearchDispatchTests(unittest.TestCase):
                     os.killpg(int(group.read_text()), signal.SIGKILL)
                 except ProcessLookupError:
                     pass
+            if process.poll() is None:
+                process.kill()
+                process.communicate(timeout=5)
+
+    @unittest.skipUnless(NATIVE_SESSION_TOOLS and Path("/usr/bin/timeout").is_file(), "needs native procps and selected timeout")
+    def test_cancellation_retires_real_selected_timeout_groups_without_terminating_a_peer(self):
+        self.check_real_timeout_cancellation("/usr/bin/timeout")
+
+    @unittest.skipUnless(NATIVE_SESSION_TOOLS and Path("/usr/bin/gnutimeout").is_file(), "needs native procps and GNU timeout")
+    def test_cancellation_retires_real_gnu_timeout_groups_without_terminating_a_peer(self):
+        self.check_real_timeout_cancellation("/usr/bin/gnutimeout")
+
+    def check_real_timeout_cancellation(self, timer):
+        self.use_native_session_tools()
+        self.launcher.write_text(
+            "#!/usr/bin/env bash\n"
+            + 'printf "run directory: %s\\n" "$SYNTHETIC_FIXTURE_ROOT/producer run"\n'
+            + f"'{timer}' 60 '{sys.executable}' - <<'PY'\n"
+            + textwrap.dedent(
+                """
+                import json, os, subprocess, sys, time
+                from pathlib import Path
+                root = Path(os.environ["SYNTHETIC_FIXTURE_ROOT"])
+                run = root / "producer run"
+                run.mkdir()
+                (run / "answer.md").write_text("Retained partial synthetic answer.\\n")
+                (run / "native-retrieval-metadata.json").write_text(json.dumps({
+                    "integration_assertion_pass": False, "cited_retrieved_url_matches": 0,
+                }))
+                child_code = (
+                    "import pathlib,signal,time;"
+                    "signal.signal(signal.SIGTERM,signal.SIG_IGN);"
+                    "pathlib.Path('child.ready').touch();time.sleep(60)"
+                )
+                child = subprocess.Popen([sys.executable, "-c", child_code], cwd=root)
+                (root / "child.pid").write_text(str(child.pid))
+                scope = {"sid": os.getsid(0), "pgid": os.getpgrp(), "python_pid": os.getpid(), "timeout_pid": os.getppid()}
+                (root / "producer.scope.json").write_text(json.dumps(scope))
+                while not (root / "child.ready").exists():
+                    time.sleep(0.01)
+                (root / "producer.ready").touch()
+                time.sleep(60)
+                """
+            )
+            + "PY\nstatus=$?\nexit \"$status\"\n"
+        )
+        peer = subprocess.Popen(
+            [sys.executable, "-c", "import time;time.sleep(60)"],
+            start_new_session=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+        )
+        process = subprocess.Popen(
+            [sys.executable, str(DISPATCH), "--name", "gala", "question"],
+            env=self.env, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
+        )
+        scope = None
+        try:
+            deadline = time.monotonic() + 5
+            while not (self.directory / "producer.ready").exists() and time.monotonic() < deadline:
+                time.sleep(0.01)
+            self.assertTrue((self.directory / "producer.ready").exists())
+            scope = json.loads((self.directory / "producer.scope.json").read_text())
+            self.assertNotEqual(scope["sid"], scope["pgid"], "the real timer must exercise a separate producer process group")
+            self.assertNotEqual(scope["sid"], os.getsid(peer.pid))
+            process.send_signal(signal.SIGTERM)
+            stdout, stderr = process.communicate(timeout=12)
+            self.assertEqual(process.returncode, 143, stderr)
+            self.assertEqual(stdout, "")
+            self.assertIsNone(peer.poll(), "cancellation terminated an unrelated peer session")
+            states = subprocess.run(
+                [NATIVE_PS, "--sid", str(scope["sid"]), "-o", "pid=,stat="], capture_output=True, text=True,
+            )
+            live = [line for line in states.stdout.splitlines() if not line.split()[1].startswith("Z")]
+            self.assertEqual(live, [], f"native timeout session members survived cancellation: {live}")
+            receipt = json.loads(self.receipts()[0].read_text())
+            self.assertEqual(receipt["status"], "failed")
+            self.assertIsInstance(receipt["native_exit_code"], int)
+            self.assertNotEqual(receipt["native_exit_code"], 0)
+            self.assertEqual(receipt["interrupted_by_signal"], signal.SIGTERM)
+            self.assertEqual(receipt["cancellation"]["session_id"], scope["sid"])
+            self.assertEqual(receipt["cancellation"]["status"], "retired")
+            self.assertEqual(receipt["answer"]["sha256"], hashlib.sha256(b"Retained partial synthetic answer.\n").hexdigest())
+            self.assertFalse(receipt["native_citations"]["integration_assertion_pass"])
+            self.assertEqual((self.receipts()[0].parent / "producer.stdout").read_text().splitlines()[0], f"run directory: {self.directory / 'producer run'}")
+        finally:
+            if scope:
+                subprocess.run([NATIVE_PKILL, "--signal", "KILL", "--session", str(scope["sid"])], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            os.killpg(peer.pid, signal.SIGKILL)
+            peer.wait(timeout=5)
             if process.poll() is None:
                 process.kill()
                 process.communicate(timeout=5)

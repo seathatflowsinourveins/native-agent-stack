@@ -163,11 +163,9 @@ class ResearchRoutingGuardTests(unittest.TestCase):
         for event in [self.fetch(), {"session_id": SESSION, "hook_event_name": "UserPromptSubmit"}]:
             with self.subTest(event=event["hook_event_name"]):
                 result = self.run_guard(event)
-                if event["hook_event_name"] == "UserPromptSubmit":
-                    self.assertNotIn("hookSpecificOutput", result)
-                    fields = result
-                else:
-                    fields = result["hookSpecificOutput"]
+                self.assertNotIn("additionalContext", result)
+                fields = result["hookSpecificOutput"]
+                self.assertEqual(fields["hookEventName"], event["hook_event_name"])
                 self.assertIn("verification unavailable", fields["additionalContext"])
                 self.assertNotIn("permissionDecision", fields)
                 self.assertNotIn("decision", fields)
