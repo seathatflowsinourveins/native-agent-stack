@@ -2130,10 +2130,14 @@ python3 scripts/credential_status.py --json     # machine-readable
 python3 scripts/credential_status.py --client-guards   # also check the user-level guard keys
 ```
 
-The checker uses `lstat` only and never opens a credential file. For each
-entry it reports existence, type, mode, owner, directory mode, whether the
-file is inside a worktree or tracked by Git, and the file's age. It also
-reports:
+For each entry the checker reports existence, type, mode, owner, directory
+mode, whether the file is inside a worktree or tracked by Git, and its age.
+Runner-eligible private files that pass those checks are read through
+`credential_run.py`'s checked file descriptor and validated by the same
+`parse_line` function the runner uses. Every refused line reports only its
+number and reason code; values never enter the report. `values_read` records
+whether a grammar check read a file. Native sign-in and service-held stores
+remain metadata-only. It also reports:
 
 - secret variable names that are set in the current environment, names only;
 - native store path overrides that are set (`HF_TOKEN_PATH`), names only; each
@@ -2185,7 +2189,7 @@ the 0700 directory
 named `<sequence>-<UTC stamp>-<boot id prefix>.json`; `compare` orders
 receipts by the sequence number, never by the clock, which can step back on
 WSL. It holds the boot id, uptime, systemd version, linger, the checkout revision,
-the checker's rows (states, findings, warnings and path templates), each file
+the checker's metadata-only rows (states, findings, warnings and path templates), each file
 row's `lstat` mode, size and mtime_ns, the checker's coverage names, the names
 of live `native-agent-stack:*` kernel keys, and `claude_user_guard_matches_pin`
 (the installed user-scope guard's sha256 against its line in
@@ -2535,3 +2539,89 @@ assertion on the mutant, in a scratch copy under `/tmp`.
   and the network allowlist the runners need). The measurement must include a
   check that sandboxed commands cannot reach the user systemd bus
   (`systemd-run --user`).
+
+## Declared test contracts for credential-status grammar (2026-10-08, PR #849)
+
+The writer's existing
+`tests.test_credential_tools.StoreFromEnvTests.test_a_leftover_temporary_file_is_a_listed_dot_file_and_never_the_stored_file`
+now explicitly requests `check_store_lines=False` for its metadata observation.
+Its old and new expectations are identical: before linking, the final entry is
+`missing`; after storing, it is `ok`; in both cases the temporary dot-file is
+listed as undeclared. This method tests native writer identity and name-only
+coverage, independently of the host's runner/core-dump eligibility. The full
+default status command still performs the protected grammar check. The separate
+main-version failure set below contains the four changed status contracts;
+this writer method has no changed expected value.
+
+The CC's credential-status ruling of about 08:00Z requires the status tool to
+report every line the native runner refuses, without returning a credential
+value. The shared runner grammar and checked reader therefore replace the old
+metadata-only inspection contract. The following main-version methods have
+changed expectations; no production credential store was used to check them:
+
+- `tests.test_credential_status.CredentialStatusTests.test_undeclared_store_file_is_reported_by_name_only`:
+  an undeclared file is still reported by name only. The old assertion also
+  prohibited every read under the store directory; the new fixture allows the
+  checked reader to validate the declared export-form file in that directory.
+- `tests.test_credential_status.CredentialStatusTests.test_private_file_is_ok_and_output_is_value_free`:
+  a safe runner-eligible private env file is `ok` only when its contents satisfy
+  the runner's export grammar. The positive fixture now uses export form; raw
+  private files retain metadata-only inspection and output remains value-free.
+- `tests.test_credential_status.CredentialStatusTests.test_never_opens_or_reads_credential_files`:
+  the old metadata-only/no-content-read test is replaced by
+  `tests.test_credential_status.CredentialStatusTests.test_private_env_file_uses_checked_reader_without_path_reads`.
+  Credential content may reach the native checked reader for grammar validation;
+  the replacement verifies that boundary and retains value-free output.
+- `tests.test_credential_status.CredentialStatusTests.test_guard_pin_check_hashes_only_the_installed_guard`:
+  the guard pin still hashes only the installed guard. The old assertion also
+  prohibited store reads; the new contract permits the checked grammar read of
+  the declared export-form fixture, while never publishing its value or digest.
+
+Main's test file at `64a8cda01700d5e823c18e4b989e856de2ee2241`, run against the
+PR source at `0ca21c31b36e0a9aa99de949fe77dd5b7dff83c3`, returned exactly these
+four failures in 44 tests. The PR's own affected modules pass separately. These
+are repository integration checks, not upstream runtime or host-store acceptance.
+
+The same lazy shared-reader import exposes nine pre-existing read sites to the
+OpenHands advisory import-closure report: five in the runner and four in the
+setter. The branch-specific monitoring baseline now records 330 unclassified
+reads and 97 shape locations, with no lost sites, no enforced unresolved reads,
+and the existing breadth limits unchanged. The monitoring classification,
+resolver, workflow and assertions remain unchanged. This snapshot belongs to
+the PR's source; current main's 321-read baseline is retained on main.
+The review repair uses the runner's exact `injectable()` predicate and calls its
+`disable_core_dumps()` guard before the checked reader. Raw private files retain
+metadata-only inspection. Text output discloses possible checked grammar reads
+and retains the value-free contract. Synthetic regressions verify that a raw
+private file is not parsed and that a native core-collector refusal prevents any
+store read; they never inspect an operator's store or print fixture values.
+
+Main's current test file at `618dd6c05ff6750705b52426261748d11e003477`, blob
+`6c666faa014422064f8927c8ee145be0e3256e1a`, run against the review-fixed source
+in a disjoint checkout, still returned exactly the four declared methods above
+in 44 tests. The affected credential modules passed 141 tests separately. These
+results supplement the earlier measurements without relabeling them as host or
+upstream acceptance.
+Shared fixture correction after hosted run37815646323: the status tests now
+provide a temporary native core-pattern file for both in-process calls and the
+same main(argv) entrypoint in a subprocess. This follows the existing runner
+fixture launcher at tests/test_credential_run.py:67,280-309; no production CLI
+override or host core setting is introduced. The native core-dump guard remains
+active, and its pipe-collector regression still verifies refusal before reads.
+
+These methods keep their existing assertions and now use the synthetic kernel
+input rather than the CI host's collector configuration:
+- CredentialStatusTests.test_cli_output_never_contains_values_in_any_mode
+- CredentialStatusTests.test_export_form_store_stays_ok_and_value_free
+- CredentialStatusTests.test_guard_pin_check_hashes_only_the_installed_guard
+- CredentialStatusTests.test_old_file_is_a_warning_not_a_failure
+- CredentialStatusTests.test_private_env_file_uses_checked_reader_without_path_reads
+- CredentialStatusTests.test_private_file_is_ok_and_output_is_value_free
+- CredentialStatusTests.test_runner_refused_store_lines_are_unsafe_and_value_free
+- CredentialStatusTests.test_tavily_row_is_a_stored_file_entry
+- CredentialStatusTests.test_undeclared_store_file_is_reported_by_name_only
+
+The writer metadata method declared above keeps its identical expectations and
+explicitly skips content inspection. The kernel-fixture correction passed the
+status and writer modules together: 82 tests, rc0. Hosted failure21 remains
+recorded separately from this local fixture verification.

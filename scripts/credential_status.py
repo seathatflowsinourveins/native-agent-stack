@@ -2,10 +2,12 @@
 """Report where this host's credentials live and whether each store is safe.
 
 Nonmutating and value-free. For every entry in adoption/credential-inventory.json
-it uses os.lstat only: existence, file type, mode, owner, parent-directory mode,
-whether the path sits inside a Git worktree (and, if so, whether Git tracks it)
-and mtime age. It never opens, reads, hashes or follows a credential file, and
-it prints path templates, variable names and reason codes, never values or
+it checks existence, file type, mode, owner, parent-directory mode, whether the
+path sits inside a Git worktree (and, if so, whether Git tracks it), and mtime age.
+Runner-eligible private env files use the runner's core-dump guard, checked reader and shared
+line parser to report grammar refusals. Native sign-in and service-held files
+remain metadata-only. It never hashes a credential file or follows its links,
+and it prints path templates, variable names and reason codes, never values or
 expanded host paths. Environment checks report variable NAMES that are set,
 never their values. That includes a native store's path override (such as
 HF_TOKEN_PATH), which moves the store away from the path this checker inspects.
@@ -238,7 +240,7 @@ def native_store_overrides(entries, env) -> list[str]:
                    for name in entry["pointer_variables"] if name in env})
 
 
-def inspect_entry(entry: dict, env, uid: int, now: float) -> dict:
+def inspect_entry(entry: dict, env, uid: int, now: float, *, check_store_lines: bool = True) -> dict:
     store = entry["store"]
     names = entry["variables"] + entry["optional_variables"]
     report = {
@@ -306,6 +308,27 @@ def inspect_entry(entry: dict, env, uid: int, now: float) -> dict:
     report["age_days"] = age_days
     if age_days > AGE_WARNING_DAYS:
         report["warnings"].append(f"older_than_{AGE_WARNING_DAYS}_days")
+    if check_store_lines and store["kind"] == "private_env_file" and not findings:
+        # Lazy import: the runner already imports this module for inventory/path helpers.
+        directory = str(ROOT / "tools" / "credentials")
+        if directory not in sys.path:
+            sys.path.insert(0, directory)
+        import credential_run as runner
+
+        if runner.injectable(entry):
+            try:
+                runner.disable_core_dumps()
+                data = runner.read_store(entry, env, uid)
+            except runner.Refused as refusal:
+                findings.append(refusal.detail)
+            else:
+                report["values_read"] = True
+                parsed = {}
+                for number, raw in enumerate(data.split(b"\n"), 1):
+                    try:
+                        runner.parse_line(number, raw, names, parsed)
+                    except runner.Refused as refusal:
+                        findings.append(refusal.detail)
     report["state"] = "unsafe" if findings else "ok"
     return report
 
@@ -541,12 +564,13 @@ def client_guards(env, root: Path = ROOT) -> dict:
 
 
 def inspect(root: Path, inventory: dict, env=None, *, uid=None, now=None,
-            with_client_guards=False, proc_keys: Path | None = None) -> dict:
+            with_client_guards=False, proc_keys: Path | None = None, check_store_lines: bool = True) -> dict:
     """The report. proc_keys is the kernel's key list to scan (the CLI passes PROC_KEYS); None skips it."""
     env = os.environ if env is None else env
     uid = os.getuid() if uid is None else uid
     now = time.time() if now is None else now
-    entries = [inspect_entry(entry, env, uid, now) for entry in inventory["entries"]]
+    entries = [inspect_entry(entry, env, uid, now, check_store_lines=check_store_lines)
+               for entry in inventory["entries"]]
     exported = sorted(n for n in inventory["must_not_be_set"] if n in env)
     tracked = tracked_sensitive_names(root)
     coverage = {"undeclared_store_files": undeclared_store_files(inventory["entries"], env),
@@ -566,7 +590,7 @@ def inspect(root: Path, inventory: dict, env=None, *, uid=None, now=None,
             "gitleaks_on_path": shutil.which("gitleaks") is not None,
             "project_guard_settings_present": (root / ".claude/settings.json").is_file(),
         },
-        "values_read": False,
+        "values_read": any(entry.get("values_read", False) for entry in entries),
     }
     if with_client_guards:
         report["client_guards"] = client_guards(env, root)
@@ -615,7 +639,8 @@ def render_text(report: dict) -> str:
             lines.append("claude telemetry logs content: true. Any value pasted into a prompt or passed through "
                          "a tool call is copied into the local telemetry store; rotate a pasted key "
                          "(docs/secret-storage.md)")
-    lines.append(f"result: {report['result']} (lstat and names only; no credential file was opened)")
+    lines.append(f"result: {report['result']} (metadata checks; eligible private env files may be read "
+                 "through the runner's checked grammar reader; credential values are never reported)")
     return "\n".join(lines)
 
 

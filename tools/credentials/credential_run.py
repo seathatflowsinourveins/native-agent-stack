@@ -249,6 +249,34 @@ def read_store(entry: dict, env, uid: int) -> bytes:
         os.close(dfd)
 
 
+def parse_line(number: int, raw: bytes, declared: list[str], values: dict) -> None:
+    """Shared runner/status grammar; refusals contain a line number and reason code only."""
+    for byte in raw:
+        if byte >= 0x80:
+            raise Refused(f"line {number}: not_ascii", "unsafe")
+        if byte < 0x20 or byte == 0x7F:
+            raise Refused(f"line {number}: control_character", "unsafe")
+    line = raw.decode("ascii").strip(" ")
+    if not line or line.startswith("#"):
+        return
+    match = LINE.fullmatch(line)
+    if match is None:
+        raise Refused(f"line {number}: not_an_export_line", "unsafe")
+    name, value = match.groups()
+    if name not in declared:  # not repeated: a value pasted where a name belongs matches the name pattern
+        raise Refused(f"line {number}: undeclared_variable", "unsafe")
+    if name in values:
+        raise Refused(f"line {number}: duplicate_variable", "unsafe")
+    quote = value[0] if len(value) >= 2 and value[0] == value[-1] and value[0] in "'\"" else ""
+    if quote:
+        value = value[1:-1]
+    if not value:
+        raise Refused(f"line {number}: empty_value", "unsafe")
+    if not in_writer_grammar(name, value, quote):
+        raise Refused(f"line {number}: outside_writer_grammar", "unsafe")
+    values[name] = value
+
+
 def parse(entry_id: str, data: bytes, entry: dict) -> dict:
     """`export NAME=value` lines; blank lines and # comments are skipped. Lines are reported by number only.
 
@@ -258,30 +286,7 @@ def parse(entry_id: str, data: bytes, entry: dict) -> dict:
     declared = entry["variables"] + entry["optional_variables"]
     values = {}
     for number, raw in enumerate(data.split(b"\n"), 1):
-        for byte in raw:
-            if byte >= 0x80:
-                raise Refused(f"line {number}: not_ascii", "unsafe")
-            if byte < 0x20 or byte == 0x7F:
-                raise Refused(f"line {number}: control_character", "unsafe")
-        line = raw.decode("ascii").strip(" ")
-        if not line or line.startswith("#"):
-            continue
-        match = LINE.fullmatch(line)
-        if match is None:
-            raise Refused(f"line {number}: not_an_export_line", "unsafe")
-        name, value = match.groups()
-        if name not in declared:  # not repeated: a value pasted where a name belongs matches the name pattern
-            raise Refused(f"line {number}: undeclared_variable", "unsafe")
-        if name in values:
-            raise Refused(f"line {number}: duplicate_variable", "unsafe")
-        quote = value[0] if len(value) >= 2 and value[0] == value[-1] and value[0] in "'\"" else ""
-        if quote:
-            value = value[1:-1]
-        if not value:
-            raise Refused(f"line {number}: empty_value", "unsafe")
-        if not in_writer_grammar(name, value, quote):
-            raise Refused(f"line {number}: outside_writer_grammar", "unsafe")
-        values[name] = value
+        parse_line(number, raw, declared, values)
     return values
 
 

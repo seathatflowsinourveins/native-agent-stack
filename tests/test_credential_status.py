@@ -1,4 +1,4 @@
-"""Credential status checker: lstat-only, names-only, never prints or opens values.
+"""Credential status checker: value-free grammar findings; native stores remain metadata-only.
 
 Local integration class: temporary fixture files carry fake sentinel values
 generated at test time; no real credential store is read.
@@ -46,6 +46,13 @@ class CredentialStatusTests(unittest.TestCase):
         # The kernel's key list is a fixture file: no test reads this host's /proc/keys.
         self.proc_keys = Path(temporary.name) / "proc-keys"
         self.proc_keys.write_text("")
+        # Use a synthetic native core-pattern input as well as synthetic stores.
+        # The collector-refusal test supplies its own pipe pattern explicitly.
+        self.core_pattern = Path(temporary.name) / "core-pattern"
+        self.core_pattern.write_bytes(b"core\n")
+        sys.path.insert(0, str(ROOT / "tools" / "credentials"))
+        import credential_run as runner
+        self.enterContext(patch.object(runner, "CORE_PATTERN_FILE", str(self.core_pattern)))
 
     def keyring_inventory(self, status="optional"):
         """The inventory with the tavily row back in the kernel keyring, its store until 2026-09-29.
@@ -84,8 +91,18 @@ class CredentialStatusTests(unittest.TestCase):
 
     def run_cli(self, *args):
         env = {"PATH": os.environ.get("PATH", ""), **self.env}
-        result = subprocess.run([sys.executable, str(SCRIPT), "--root", str(ROOT), "--proc-keys", str(self.proc_keys),
-                                 *args], env=env, capture_output=True, text=True, timeout=60)
+        # Run the same native entrypoint with a fixture for the kernel input;
+        # neither the production CLI nor the real host core pattern changes.
+        driver = (
+            "import sys; sys.path.insert(0, sys.argv[1]); sys.path.insert(0, sys.argv[2]); "
+            "import credential_run; credential_run.CORE_PATTERN_FILE = sys.argv[3]; "
+            "from scripts import credential_status; "
+            "raise SystemExit(credential_status.main(sys.argv[4:]))"
+        )
+        result = subprocess.run([sys.executable, "-c", driver, str(ROOT),
+                                 str(ROOT / "tools" / "credentials"), str(self.core_pattern),
+                                 "--root", str(ROOT), "--proc-keys", str(self.proc_keys), *args],
+                                env=env, capture_output=True, text=True, timeout=60)
         self.assert_no_values(result.stdout, result.stderr)
         return result
 
@@ -312,8 +329,9 @@ class CredentialStatusTests(unittest.TestCase):
                 patch.object(Path, "read_text", side_effect=AssertionError("read_text called")), \
                 patch.object(Path, "read_bytes", side_effect=AssertionError("read_bytes called")):
             report = self.report()
-        self.assertFalse([p for p in opened if str(self.store) in p])
+        self.assertEqual([p for p in opened if str(self.store) in p], [str(self.store)])
         names = [".tavily.env.0123456789abcdef.tmp", "link.env", "stray.env"]
+        self.assertTrue(all(name not in opened for name in names), "an undeclared file was opened")
         self.assertEqual(report["coverage"]["undeclared_store_files"], names)
         self.assertIn("undeclared_store_file", report["warnings"])
         self.assertEqual(report["result"], "ok")  # a warning, not a failure
@@ -459,11 +477,98 @@ class CredentialStatusTests(unittest.TestCase):
         self.assertEqual(entry["mode"], "0600")
         self.assertEqual(entry["directory_mode"], "0700")
         self.assertFalse(entry["inside_git_worktree"])
-        self.assertFalse(report["values_read"])
+        self.assertTrue(report["values_read"])
         self.assert_no_values(json.dumps(report), cs.render_text(report))
         result = self.run_cli("--json")
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(json.loads(result.stdout)["result"], "ok")
+
+    def test_raw_private_file_remains_metadata_only(self):
+        sys.path.insert(0, str(ROOT / "tools" / "credentials"))
+        import credential_run as runner
+
+        inventory = copy.deepcopy(self.inventory)
+        declared = next(entry for entry in inventory["entries"] if entry["id"] == "sec-contact")
+        declared["status"] = "optional"
+        declared["store"]["kind"] = "private_file"
+        declared["store"]["path_template"] = cs.STORE_ROOT + "/raw-private.key"
+        path = self.store / "raw-private.key"
+        path.write_text(self.fake_a)
+        path.chmod(0o600)
+        with patch.object(runner, "read_store",
+                          side_effect=AssertionError("raw private files must not be read")) as reader:
+            report = cs.inspect(ROOT, inventory, self.env, proc_keys=self.proc_keys)
+        reader.assert_not_called()
+        entry = self.entry(report, "sec-contact")
+        self.assertEqual(entry["state"], "ok")
+        self.assertEqual(entry["findings"], [])
+        self.assertFalse(report["values_read"])
+        self.assertTrue(self.fake_a not in json.dumps(report) + cs.render_text(report),
+                        "credential content appeared in status output")
+
+    def test_core_collector_refusal_precedes_any_store_read(self):
+        sys.path.insert(0, str(ROOT / "tools" / "credentials"))
+        import credential_run as runner
+
+        self.write_alpaca()
+        pattern = self.home / "core-pattern"
+        pattern.write_bytes(b"|fixture-collector\n")
+        with patch.object(runner, "CORE_PATTERN_FILE", str(pattern)), \
+                patch.object(runner, "read_store",
+                             side_effect=AssertionError("store read before core safety")) as reader:
+            report = self.report()
+        reader.assert_not_called()
+        entry = self.entry(report, "alpaca-paper")
+        self.assertEqual(entry["state"], "unsafe")
+        self.assertTrue(any(finding.startswith("core_pattern_pipe:") for finding in entry["findings"]))
+        self.assertFalse(report["values_read"])
+        self.assertTrue(self.fake_a not in json.dumps(report) + cs.render_text(report),
+                        "credential content appeared in status output")
+
+    def test_runner_refused_store_lines_are_unsafe_and_value_free(self):
+        path = self.store / "sec-contact.env"
+        cases = (
+            (b"NAME=dummy\n", ["line 1: not_an_export_line"]),
+            (b"export SEC_USER_AGENT=dummy\x80\n", ["line 1: not_ascii"]),
+            (b"export SEC_USER_AGENT=dummy\r\n", ["line 1: control_character"]),
+            (b"export NAME=dummy\n", ["line 1: undeclared_variable"]),
+            (b"export SEC_USER_AGENT=dummy\nexport SEC_USER_AGENT=dummy\n",
+             ["line 2: duplicate_variable"]),
+            (b"export SEC_USER_AGENT=\n", ["line 1: empty_value"]),
+            (b"export SEC_USER_AGENT=unquoted whitespace\n", ["line 1: outside_writer_grammar"]),
+            (b"# comment\n\nNAME=dummy\nexport NAME=dummy\n",
+             ["line 3: not_an_export_line", "line 4: undeclared_variable"]),
+        )
+        for data, expected in cases:
+            with self.subTest(findings=expected):
+                path.write_bytes(data)
+                path.chmod(0o600)
+                report = self.report()
+                entry = self.entry(report, "sec-contact")
+                self.assertEqual(entry["findings"], expected)
+                self.assertEqual(entry["state"], "unsafe")
+                rendered = json.dumps(report) + cs.render_text(report)
+                self.assertTrue("dummy" not in rendered and "unquoted whitespace" not in rendered,
+                                "credential content appeared in status output")
+        result = self.run_cli("--json")
+        self.assertEqual(result.returncode, 1)
+        self.assertEqual(self.entry(json.loads(result.stdout), "sec-contact")["findings"], expected)
+
+    def test_export_form_store_stays_ok_and_value_free(self):
+        path = self.store / "sec-contact.env"
+        path.write_bytes(b"\n# comment\nexport SEC_USER_AGENT=dummy\n")
+        path.chmod(0o600)
+        report = self.report()
+        entry = self.entry(report, "sec-contact")
+        self.assertEqual(entry["state"], "ok")
+        self.assertEqual(entry["findings"], [])
+        self.assertTrue("dummy" not in json.dumps(report) + cs.render_text(report),
+                        "credential content appeared in status output")
+        result = self.run_cli("--json")
+        self.assertEqual(result.returncode, 0)
+        self.assertEqual(self.entry(json.loads(result.stdout), "sec-contact")["state"], "ok")
+        self.assertTrue("dummy" not in result.stdout + result.stderr,
+                        "credential content appeared in CLI output")
 
     def test_group_readable_required_file_fails_closed(self):
         for mode in (0o644, 0o640, 0o400):
@@ -544,7 +649,7 @@ class CredentialStatusTests(unittest.TestCase):
             result = self.run_cli("--json")
         self.assertIn("GH_TOKEN", result.stdout)
 
-    def test_never_opens_or_reads_credential_files(self):
+    def test_private_env_file_uses_checked_reader_without_path_reads(self):
         self.write_alpaca()
         opened = []
         real_open, real_os_open = builtins.open, os.open
@@ -561,7 +666,8 @@ class CredentialStatusTests(unittest.TestCase):
                 patch.object(Path, "read_text", side_effect=AssertionError("read_text called")), \
                 patch.object(Path, "read_bytes", side_effect=AssertionError("read_bytes called")):
             self.report()
-        self.assertFalse([p for p in opened if str(self.store) in p])
+        self.assertEqual([p for p in opened if str(self.store) in p], [str(self.store)])
+        self.assertIn("alpaca-paper.env", opened)
 
     def test_client_guards_reports_booleans_only(self):
         claude = self.home / ".claude"
@@ -634,7 +740,9 @@ class CredentialStatusTests(unittest.TestCase):
                 patch("os.open", watch(real_os_open)):
             self.assertIs(matches(), False)
         self.assertTrue(opened)  # the watch saw the guard path
-        self.assertFalse([p for p in opened if str(self.store) in p])
+        # Status checks the declared env file through a directory fd; the guard symlink is never followed.
+        self.assertEqual([p for p in opened if str(self.store) in p], [str(self.store)])
+        self.assertEqual(opened.count("alpaca-paper.env"), 1)
         installed.unlink()
         # A synthetic checkout: its pin line decides, and a checkout without one never matches.
         checkout = self.home / "checkout"
