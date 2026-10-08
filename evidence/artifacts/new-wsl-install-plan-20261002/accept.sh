@@ -366,11 +366,11 @@ sandbox-runtime-srt() {
   # sandbox-runtime (srt); https://github.com/anthropics/sandbox-runtime
   case "$stage" in
     post_install)
-      # Kind: smoke; Source: https://raw.githubusercontent.com/anthropics/sandbox-runtime/v0.0.78/README.md#L168
+      # Kind: smoke; Source: https://raw.githubusercontent.com/anthropics/sandbox-runtime/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/README.md#L168
       check sandbox-runtime-srt smoke 'srt echo "hello world"'
       ;;
     after_sign_in)
-      # Kind: native client integration; Source: https://raw.githubusercontent.com/anthropics/sandbox-runtime/v0.0.78/README.md#L168
+      # Kind: native client integration; Source: https://raw.githubusercontent.com/anthropics/sandbox-runtime/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/README.md#L168
       check sandbox-runtime-srt 'native client integration' 'bash "$plan_dir/config/srt-client-accept.sh"'
       ;;
     *) skipped sandbox-runtime-srt ;;

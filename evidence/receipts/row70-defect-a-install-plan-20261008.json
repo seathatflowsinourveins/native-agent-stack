@@ -1,0 +1,147 @@
+{
+  "schema_version": 1,
+  "id": "row70-defect-a-install-plan-20261008",
+  "kind": "artifact_measurement",
+  "evidence_class": "local_integration",
+  "claim": "The living new-WSL sandbox-runtime selector, actual npm install function, owner release metadata and current source citations consistently target0.0.79 at d9aac209. Eight file sites are classified as live or history-kept; native plan consistency, separate script syntax and retained independent source assessment cover the expanded live scope. No host install, policy or client/model operation was executed.",
+  "component_ids": [
+    "sandbox-runtime"
+  ],
+  "recorded_at_utc": "2026-10-08T17:02:52Z",
+  "status": "living_recipe_corrected",
+  "sources": [
+    "https://github.com/anthropics/sandbox-runtime/blob/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/README.md",
+    "https://github.com/anthropics/sandbox-runtime/releases/tag/v0.0.79"
+  ],
+  "artifacts": [
+    {
+      "path": "evidence/artifacts/row70-defect-a-20261008/expanded-source-critic.md",
+      "bytes": 10230,
+      "sha256": "92b7170350d3d923006638c028566db42b33acfe1aa40df6210c7f6b3a379c95",
+      "hash_scope": "actual_retained_sanitized_critic_output"
+    },
+    {
+      "path": "evidence/artifacts/row70-defect-a-20261008/live-site-review.json",
+      "bytes": 9160,
+      "sha256": "db1dbcd46415d8a61dabe733b5b726c2d083100e6a793ae9f32d37f172a78ee8",
+      "hash_scope": "published_sanitized_bytes"
+    },
+    {
+      "path": "evidence/artifacts/row70-defect-a-20261008/source-checks.json",
+      "bytes": 4575,
+      "sha256": "1fd43b67b8804f24920bb335ab1667e1ea85247ae922a22449009632648b4632",
+      "hash_scope": "published_sanitized_bytes"
+    }
+  ],
+  "site_classification": [
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/owners.json",
+      "class": "live",
+      "lines": [
+        139,
+        140,
+        141
+      ],
+      "action": "tag_name v0.0.79 and published_at2026-10-07T17:12:35Z; preserve original pushed_at2026-10-01T14:23:34Z"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
+      "class": "live",
+      "lines": [
+        369,
+        373
+      ],
+      "action": "Pinned d9aac209 README168 source comments; all smoke/integration commands and noncomment bytes unchanged"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
+      "class": "live",
+      "lines": [
+        327,
+        948
+      ],
+      "action": "0.0.79 npm execution path and d9aac209 README174 settings citation; no unrelated command change"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/openhands-job@.service",
+      "class": "live",
+      "lines": [
+        2
+      ],
+      "action": "Pinned d9aac209 README174; noncomment service bytes unchanged"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/openhands-worker-skill.md",
+      "class": "live",
+      "lines": [
+        28
+      ],
+      "action": "Pinned d9aac209 README174; instructions/frontmatter otherwise unchanged"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/srt-client-accept.sh",
+      "class": "live",
+      "lines": [
+        2
+      ],
+      "action": "Pinned README166-179 and actual CLI274-341 settings/load/refusal anchors; all noncomment bytes unchanged"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
+      "class": "mixed",
+      "live_lines": [
+        682,
+        690
+      ],
+      "history_lines": [
+        1054,
+        1122
+      ],
+      "action": "Current installation/source/npm-integrity block moves to0.0.79; dated validation/repair lines kept byte-identical",
+      "history_line_sha256": [
+        "2976d6704c1558d0e3e6c0fc03d3a274896b18a1a784002ad81ee2390999520f",
+        "f0e761cd6f32921a230b258a0e2a608887d363329ffb7359fb2d2f492c6aa1f6"
+      ]
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/validation.json",
+      "class": "history_kept",
+      "lines": [
+        94
+      ],
+      "action": "Whole original file remains byte-identical",
+      "sha256": "3e45b756af99d7683eb329af5672d48b14c2cac35e058f1900a87d6c19532552"
+    }
+  ],
+  "checks": [
+    {
+      "name": "native_plan_checker",
+      "result": "pass",
+      "exit_code": 0,
+      "scope": "84rows/193commands/113acceptance entries match their source scripts; source/list checks only."
+    },
+    {
+      "name": "separate_script_bash_syntax",
+      "result": "pass",
+      "exit_code": 0
+    },
+    {
+      "name": "expanded_live_site_independent_source_critic",
+      "result": "pass",
+      "scope": "Eight-file live/history table, actual dispatcher/function/selector/owner release/current citations, unchanged rows and acceptance behavior; actual assessment retained as a bound artifact."
+    }
+  ],
+  "limitations": [
+    "This is a prospective install-plan/source correction, not a new npm install, sandbox/client/model run, policy qualification or new-host acceptance.",
+    "The pinned earlier Claude receipt and all existing0.0.77/0.0.78 native/policy observations retain their original bytes and scopes.",
+    "DefectA alone is changed. RecordsB-E and the optional retained Claude-session note are reserved for a separate records PR.",
+    "Generator discovery was bounded to plan/scripts/tools; the original U2 gen_plan.py export is historical, while current check_plan.py supplies the available native consistency route.",
+    "Catalogue/profile/handbook/workflow/credential/runtime/broker state is unchanged; S4 closure remains CC-owned.",
+    "The initial source-checks.json remains its dated three-file/pre-review snapshot; live-site-review.json and the retained expanded critic bind the later review fixes."
+  ],
+  "inverse": {
+    "publication": "Revert only this unit's classified live install-plan edits and new receipt/artifact/registry bindings; preserve pushed_at, SOURCES dated history and validation.json.",
+    "host_inverse_executed": false,
+    "host_state_changed": false
+  }
+}

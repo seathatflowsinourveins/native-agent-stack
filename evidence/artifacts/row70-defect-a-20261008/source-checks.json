@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "kind": "living_install_plan_source_checks",
+  "evidence_class": "local_integration",
+  "recorded_at_utc": "2026-10-08T17:01:38Z",
+  "source_base": "8c1428d222f2bb815a742f6a80715573f8971a15",
+  "assignment": "CC16:52Z Row70 defectA; three living plan files only",
+  "source": {
+    "repository": "https://github.com/anthropics/sandbox-runtime",
+    "version": "0.0.79",
+    "commit": "d9aac2098351ca17f3743fbaf6ecbd0051b7e00e",
+    "readme": "https://github.com/anthropics/sandbox-runtime/blob/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/README.md",
+    "prior_binding": "evidence/artifacts/row70-codex-binding-20261008/source-binding.json"
+  },
+  "maintenance": {
+    "route": "Direct living-plan edit followed by existing native check_plan.py",
+    "scope": "Bounded plan/scripts/tools filename/content discovery found check_plan.py, with no maintained plan generator there. README's original U2 gen_plan.py citation remains historical, not evidence of current availability.",
+    "cc_authorization": "Living plans may be updated by a validated PR under NO-REWRITE; standing cue for defectA."
+  },
+  "inputs": [
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
+      "bytes": 134371,
+      "sha256": "531c3f70b0f1189a6a0ebbabba8c5ac1dd281f2df726b17e613ef3c7400984b5"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+      "bytes": 487688,
+      "sha256": "a12ef9e9fe82bd016ef977ba4f06a576cda8516febdb1156e69fa9602d85ee87"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/README.md",
+      "bytes": 97988,
+      "sha256": "f399735ce298ce3644f3516e526b0c9edd0b7324e72723b38dda1ee428080919"
+    }
+  ],
+  "delta": {
+    "executed_install_recipe": "npm install -g @anthropic-ai/sandbox-runtime@0.0.79",
+    "selector_release": "v0.0.79",
+    "immutable_citations": true,
+    "other_rows_unchanged": true,
+    "acceptance_commands_and_kinds_unchanged": true,
+    "existing_native_proof_unchanged": true
+  },
+  "checks": [
+    {
+      "name": "native_plan_checker",
+      "argv": [
+        "nice",
+        "-n",
+        "10",
+        "ionice",
+        "-c2",
+        "-n7",
+        "python3",
+        "-B",
+        "evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py"
+      ],
+      "start_utc": "2026-10-08T16:57:43.688Z",
+      "end_utc": "2026-10-08T16:57:44.078Z",
+      "exit_code": 0,
+      "stdout": "OK: 84 rows: 63 installed (60 by the default run, 3 only when named), 2 measurement-only, 19 not installed; 193 commands and 113 acceptance entries agree with the scripts (2 additional checks included)\n",
+      "stderr": "",
+      "observation_source": "Owned worker's actual returned native result; independent source/diff critic is separate."
+    },
+    {
+      "name": "install_script_bash_syntax",
+      "argv": [
+        "nice",
+        "-n",
+        "10",
+        "ionice",
+        "-c2",
+        "-n7",
+        "bash",
+        "-n",
+        "evidence/artifacts/new-wsl-install-plan-20261002/install.sh"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "",
+      "observation_source": "Owned worker native result"
+    },
+    {
+      "name": "git_diff_check",
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "",
+      "observation_source": "Owned worker native result"
+    }
+  ],
+  "failed_conditions": [
+    {
+      "name": "pre_registration_validator",
+      "exit_code": 1,
+      "reported_at_utc": "2026-10-08T16:59:05Z",
+      "condition": "Validator started before parent registration and reported only expected SHA/byte mismatches for the three changed living files. No other error or validation pass is claimed; final registered validation follows separately.",
+      "raw_output_hash": "unknown",
+      "scope": "Worker returned condition; not a preserved raw-output digest."
+    }
+  ],
+  "inverse": {
+    "publication": "Revert only the three living plan edits and this unit's receipt/registry bindings; no installed host state changed.",
+    "host_inverse_executed": false
+  },
+  "limits": [
+    "Source recipe correction and plan consistency, not a new npm install, sandbox echo/policy/client/model run or new-host acceptance.",
+    "Historical0.0.77/0.0.78 policy, architecture and native observations retain their input/version scopes.",
+    "RecordsB-E and optional Claude-session supplement remain outside defectA.",
+    "No catalogue/profile/handbook/workflow/credential/runtime/broker change."
+  ]
+}

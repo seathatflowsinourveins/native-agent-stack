@@ -1,0 +1,270 @@
+{
+  "schema_version": 1,
+  "kind": "expanded_living_install_plan_source_review",
+  "evidence_class": "local_integration",
+  "recorded_at_utc": "2026-10-08T17:23:00Z",
+  "prior_public_head": "d159831f6a019a745bd3d1dc8879fb115829c1f3",
+  "cc_assignment": "171625Z: eight file-site classifications plus retained actual critic output",
+  "correction": "Initial three-file scope left current owner metadata and other live source mirrors stale. This expanded unit follows the exact current-plan/history-kept precedent; the initial source-check snapshot remains retained as pre-review history.",
+  "site_count": 8,
+  "sites": [
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/owners.json",
+      "class": "live",
+      "lines": [
+        139,
+        140,
+        141
+      ],
+      "action": "tag_name v0.0.79 and published_at2026-10-07T17:12:35Z; preserve original pushed_at2026-10-01T14:23:34Z"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
+      "class": "live",
+      "lines": [
+        369,
+        373
+      ],
+      "action": "Pinned d9aac209 README168 source comments; all smoke/integration commands and noncomment bytes unchanged"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
+      "class": "live",
+      "lines": [
+        327,
+        948
+      ],
+      "action": "0.0.79 npm execution path and d9aac209 README174 settings citation; no unrelated command change"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/openhands-job@.service",
+      "class": "live",
+      "lines": [
+        2
+      ],
+      "action": "Pinned d9aac209 README174; noncomment service bytes unchanged"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/openhands-worker-skill.md",
+      "class": "live",
+      "lines": [
+        28
+      ],
+      "action": "Pinned d9aac209 README174; instructions/frontmatter otherwise unchanged"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/srt-client-accept.sh",
+      "class": "live",
+      "lines": [
+        2
+      ],
+      "action": "Pinned README166-179 and actual CLI274-341 settings/load/refusal anchors; all noncomment bytes unchanged"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
+      "class": "mixed",
+      "live_lines": [
+        682,
+        690
+      ],
+      "history_lines": [
+        1054,
+        1122
+      ],
+      "action": "Current installation/source/npm-integrity block moves to0.0.79; dated validation/repair lines kept byte-identical",
+      "history_line_sha256": [
+        "2976d6704c1558d0e3e6c0fc03d3a274896b18a1a784002ad81ee2390999520f",
+        "f0e761cd6f32921a230b258a0e2a608887d363329ffb7359fb2d2f492c6aa1f6"
+      ]
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/validation.json",
+      "class": "history_kept",
+      "lines": [
+        94
+      ],
+      "action": "Whole original file remains byte-identical",
+      "sha256": "3e45b756af99d7683eb329af5672d48b14c2cac35e058f1900a87d6c19532552"
+    }
+  ],
+  "source_inputs": [
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/owners.json",
+      "bytes": 35189,
+      "sha256": "a75511675f56df573e2700b04c40db69f35f2c44225f5eff304d1521d15369ab"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
+      "bytes": 199902,
+      "sha256": "01ed1c58366004111f68923550d6ef7240fbfd25feb7176f01a94359d638412d"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
+      "bytes": 134397,
+      "sha256": "4b29a0a0ef8675c1a472f08cf829a7bc071c5146ea25d55eee634aa58bab96b6"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/openhands-job@.service",
+      "bytes": 1114,
+      "sha256": "89628798b1a147a5f2173539cc919712a3eeb08e06bc1a3a423806119deeb24b"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/openhands-worker-skill.md",
+      "bytes": 1763,
+      "sha256": "5c9c225171ee83e8a4146e1419f7030e11e0c8d57c13c2f6e153e5e171571784"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/srt-client-accept.sh",
+      "bytes": 12192,
+      "sha256": "877e8c4ddc2d1dd7d66551e3fc027b8c578a21e0e74c21297eac7d356f00f8d9"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
+      "bytes": 227759,
+      "sha256": "26f8bdf84cb49332a08dbfe686b21eb0b3e477601cba1642e2abd120cc2b2a1c"
+    }
+  ],
+  "primary_sources": {
+    "repository": "anthropics/sandbox-runtime",
+    "version": "0.0.79",
+    "commit": "d9aac2098351ca17f3743fbaf6ecbd0051b7e00e",
+    "release": {
+      "argv": [
+        "gh",
+        "api",
+        "--cache",
+        "120s",
+        "repos/anthropics/sandbox-runtime/releases/tags/v0.0.79",
+        "--jq",
+        "{tag_name,published_at,prerelease,draft,target_commitish,html_url}"
+      ],
+      "observed_at_utc": "2026-10-08T17:20:13.415463Z",
+      "exit_code": 0,
+      "tag_name": "v0.0.79",
+      "published_at": "2026-10-07T17:12:35Z",
+      "draft": false,
+      "prerelease": false,
+      "actual_returned_output_sha256": "07c2dc41f89ace7d35f47f4cdbeef8c25137ac783068bc6aa2561a9eb64d7c5d",
+      "output_provenance": "Worker-retained native source observation"
+    },
+    "readme": {
+      "url": "https://raw.githubusercontent.com/anthropics/sandbox-runtime/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/README.md",
+      "bytes": 78382,
+      "sha256": "2b18ce30672734247519435d5755875ed5f962ef9d0dbfe00994f6097bbe4b93",
+      "observed_at_utc": "2026-10-08T17:20:13.795Z",
+      "exit_code": 0,
+      "anchors": {
+        "npm": 14,
+        "echo": 168,
+        "settings": 174
+      }
+    },
+    "cli": {
+      "url": "https://raw.githubusercontent.com/anthropics/sandbox-runtime/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/src/cli.ts",
+      "bytes": 23557,
+      "sha256": "b4a509dc9ec253f7f66459f0dc6fc2ad9a000bbd95e5cf72e436d9c9f445085a",
+      "observed_at_utc": "2026-10-08T17:21:08.420Z",
+      "exit_code": 0,
+      "anchors": {
+        "settings": 274,
+        "load_refusal_start": 307,
+        "load_refusal_end": 341
+      }
+    },
+    "npm_archive_sha256": "5a730e4367c264ccc4b592af01dab038a6c39db7c184efbd132841688fa854f1"
+  },
+  "checks": [
+    {
+      "name": "expanded_native_plan_checker",
+      "argv": [
+        "nice",
+        "-n",
+        "10",
+        "ionice",
+        "-c2",
+        "-n7",
+        "python3",
+        "-B",
+        "evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py"
+      ],
+      "start_utc": "2026-10-08T17:23:00.308Z",
+      "end_utc": "2026-10-08T17:23:00.767Z",
+      "exit_code": 0,
+      "stdout": "OK: 84 rows: 63 installed (60 by the default run, 3 only when named), 2 measurement-only, 19 not installed; 193 commands and 113 acceptance entries agree with the scripts (2 additional checks included)\n",
+      "stderr": "",
+      "observation_source": "Owned worker actual native return"
+    },
+    {
+      "name": "separate_bash_syntax_install.sh",
+      "argv": [
+        "nice",
+        "-n",
+        "10",
+        "ionice",
+        "-c2",
+        "-n7",
+        "bash",
+        "-n",
+        "evidence/artifacts/new-wsl-install-plan-20261002/install.sh"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "",
+      "observation_source": "Owned worker separate native invocation"
+    },
+    {
+      "name": "separate_bash_syntax_accept.sh",
+      "argv": [
+        "nice",
+        "-n",
+        "10",
+        "ionice",
+        "-c2",
+        "-n7",
+        "bash",
+        "-n",
+        "evidence/artifacts/new-wsl-install-plan-20261002/accept.sh"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "",
+      "observation_source": "Owned worker separate native invocation"
+    },
+    {
+      "name": "separate_bash_syntax_config/srt-client-accept.sh",
+      "argv": [
+        "nice",
+        "-n",
+        "10",
+        "ionice",
+        "-c2",
+        "-n7",
+        "bash",
+        "-n",
+        "evidence/artifacts/new-wsl-install-plan-20261002/config/srt-client-accept.sh"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "",
+      "observation_source": "Owned worker separate native invocation"
+    },
+    {
+      "name": "expanded_git_diff_check",
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "limits": [
+    "Source/metadata consistency only; no install, policy, native client/model, runtime or broker operation.",
+    "Old pushed_at and dated source/validation/native observations remain unchanged.",
+    "Initial source-checks.json is a pre-review snapshot; this artifact binds the expanded live-site changes.",
+    "The expanded independent critic's actual assessment is retained separately; its public artifact/hash must be bound before declaring that check passing.",
+    "RecordsB-E, catalogues/profile/handbook/always-loaded rules/workflows/credentials remain outside this defectA unit."
+  ]
+}

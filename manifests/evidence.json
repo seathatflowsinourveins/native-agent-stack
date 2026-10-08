@@ -4800,6 +4800,23 @@
         "Release metadata source review and archive integrity are separate from the imported native operation; no provider/model/broker/GPU/runtime/service/client changes were made."
       ],
       "path": "evidence/receipts/native-sandbox-codex-binding-20261008.json"
+    },
+    {
+      "id": "row70-defect-a-install-plan-20261008",
+      "kind": "artifact_measurement",
+      "component_ids": [
+        "sandbox-runtime"
+      ],
+      "claim": "The living new-WSL sandbox-runtime selector, actual npm install function, owner release metadata and current source citations consistently target0.0.79 at d9aac209. Eight file sites are classified as live or history-kept; native plan consistency, separate script syntax and retained independent source assessment cover the expanded live scope. No host install, policy or client/model operation was executed.",
+      "limitations": [
+        "This is a prospective install-plan/source correction, not a new npm install, sandbox/client/model run, policy qualification or new-host acceptance.",
+        "The pinned earlier Claude receipt and all existing0.0.77/0.0.78 native/policy observations retain their original bytes and scopes.",
+        "DefectA alone is changed. RecordsB-E and the optional retained Claude-session note are reserved for a separate records PR.",
+        "Generator discovery was bounded to plan/scripts/tools; the original U2 gen_plan.py export is historical, while current check_plan.py supplies the available native consistency route.",
+        "Catalogue/profile/handbook/workflow/credential/runtime/broker state is unchanged; S4 closure remains CC-owned.",
+        "The initial source-checks.json remains its dated three-file/pre-review snapshot; live-site-review.json and the retained expanded critic bind the later review fixes."
+      ],
+      "path": "evidence/receipts/row70-defect-a-install-plan-20261008.json"
     }
   ],
   "files": [
@@ -40741,13 +40758,13 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/README.md",
-      "sha256": "1d04d9e1d16d7f351476b7bc394c9e86bc651899e4e7515403f48a343d8fc05b",
-      "bytes": 97923
+      "sha256": "f399735ce298ce3644f3516e526b0c9edd0b7324e72723b38dda1ee428080919",
+      "bytes": 97988
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
-      "sha256": "f541de45552c2954c6656206ae0b9401d74805df8d5b84abdaf109b254f48bc3",
-      "bytes": 227641
+      "sha256": "26f8bdf84cb49332a08dbfe686b21eb0b3e477601cba1642e2abd120cc2b2a1c",
+      "bytes": 227759
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/VALIDATION.md",
@@ -40756,8 +40773,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
-      "sha256": "a69bf615b832e4b1d7b9619ed25206686c6bfbf277bdb087a7aed8abe7ecde55",
-      "bytes": 199836
+      "sha256": "01ed1c58366004111f68923550d6ef7240fbfd25feb7176f01a94359d638412d",
+      "bytes": 199902
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py",
@@ -41031,8 +41048,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/openhands-job@.service",
-      "sha256": "3aca1ab5fb390eecc1f81ab58d2c98ab3b18e587e6ad88881188736f5713d60c",
-      "bytes": 1089
+      "sha256": "89628798b1a147a5f2173539cc919712a3eeb08e06bc1a3a423806119deeb24b",
+      "bytes": 1114
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/openhands-srt.json",
@@ -41041,8 +41058,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/openhands-worker-skill.md",
-      "sha256": "5076b1d69995c28740f75787db1ac862bbe4900dbf3cdb9c8e20882e0208ddc9",
-      "bytes": 1737
+      "sha256": "5c9c225171ee83e8a4146e1419f7030e11e0c8d57c13c2f6e153e5e171571784",
+      "bytes": 1763
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/openhands-worker.py",
@@ -41121,8 +41138,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/srt-client-accept.sh",
-      "sha256": "1004ef72ec7902897deb539707f7d679a065f8bfae8e39883be45c6023a5bbfa",
-      "bytes": 12159
+      "sha256": "877e8c4ddc2d1dd7d66551e3fc027b8c578a21e0e74c21297eac7d356f00f8d9",
+      "bytes": 12192
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/container-validation.json",
@@ -41191,13 +41208,13 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
-      "sha256": "d7181dc3eb48d99e1c3a3d5f421b4b011c60e18807376eab71071e1f94b73c8f",
-      "bytes": 487472
+      "sha256": "a12ef9e9fe82bd016ef977ba4f06a576cda8516febdb1156e69fa9602d85ee87",
+      "bytes": 487688
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
-      "sha256": "8f60f6def61bf40ee6e5a9ac620e4a4a2da114634a0c0495dbc33bc753a8aa77",
-      "bytes": 134338
+      "sha256": "4b29a0a0ef8675c1a472f08cf829a7bc071c5146ea25d55eee634aa58bab96b6",
+      "bytes": 134397
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/mise.toml",
@@ -41221,7 +41238,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/owners.json",
-      "sha256": "bdc81ba3fafd6b4ce8fb4d3652655cd06a46c28e4dbe015c5f7a1c9533dd1bc3",
+      "sha256": "a75511675f56df573e2700b04c40db69f35f2c44225f5eff304d1521d15369ab",
       "bytes": 35189
     },
     {
@@ -48218,6 +48235,21 @@
       "path": "evidence/artifacts/row70-codex-binding-20261008/version.stdout.txt",
       "sha256": "8c52412b1e17f6490f8ce8a10dbe32111d809b052a85bf828b52eef9c34add77",
       "bytes": 7
+    },
+    {
+      "path": "evidence/artifacts/row70-defect-a-20261008/expanded-source-critic.md",
+      "sha256": "92b7170350d3d923006638c028566db42b33acfe1aa40df6210c7f6b3a379c95",
+      "bytes": 10230
+    },
+    {
+      "path": "evidence/artifacts/row70-defect-a-20261008/live-site-review.json",
+      "sha256": "db1dbcd46415d8a61dabe733b5b726c2d083100e6a793ae9f32d37f172a78ee8",
+      "bytes": 9160
+    },
+    {
+      "path": "evidence/artifacts/row70-defect-a-20261008/source-checks.json",
+      "sha256": "1fd43b67b8804f24920bb335ab1667e1ea85247ae922a22449009632648b4632",
+      "bytes": 4575
     },
     {
       "path": "evidence/artifacts/rtk-051-file-list-control-20261004/README.md",
@@ -55848,6 +55880,11 @@
       "path": "evidence/receipts/prometheus-3150-qualification-20260926.json",
       "sha256": "8687b8fd444c6673ab03f28e02d9599d64030a8c1438e2280d6e8c56b6548452",
       "bytes": 17112
+    },
+    {
+      "path": "evidence/receipts/row70-defect-a-install-plan-20261008.json",
+      "sha256": "c2494b1c34117a3769d67903db07cb3e80ce8257c94c91f5dd87e07ef65d4261",
+      "bytes": 6074
     },
     {
       "path": "evidence/receipts/rtk-050-qualification-20260925.json",

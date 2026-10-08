@@ -25,5 +25,5 @@ not a completed coding task. Return the actual result and artifact locations.
 
 Sources: [SDK example](https://github.com/OpenHands/software-agent-sdk/blob/v1.50.1/examples/01_standalone_sdk/01_hello_world.py#L9),
 [SDK metrics](https://github.com/OpenHands/software-agent-sdk/blob/v1.50.1/openhands-sdk/openhands/sdk/llm/utils/metrics.py#L113),
-[sandbox runtime](https://github.com/anthropic-experimental/sandbox-runtime/blob/v0.0.78/README.md),
+[sandbox runtime](https://github.com/anthropics/sandbox-runtime/blob/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/README.md#L174),
 and the repository install-plan's `config/openhands-worker.py` dispatch glue.

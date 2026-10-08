@@ -871,11 +871,11 @@
       "slot": "sandbox-runtime-srt",
       "owner": "sandbox-runtime (srt)",
       "repository": "https://github.com/anthropics/sandbox-runtime",
-      "release": "v0.0.78",
+      "release": "v0.0.79",
       "installed": true,
       "route": "npm-global",
       "commands": [
-        "npm install -g @anthropic-ai/sandbox-runtime@0.0.78"
+        "npm install -g @anthropic-ai/sandbox-runtime@0.0.79"
       ],
       "needs": {
         "sudo": true,
@@ -887,7 +887,7 @@
       },
       "version_pinned": true,
       "install_source": {
-        "url": "https://raw.githubusercontent.com/anthropics/sandbox-runtime/v0.0.78/README.md#L14",
+        "url": "https://raw.githubusercontent.com/anthropics/sandbox-runtime/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/README.md#L14",
         "line": 14
       },
       "service": null,
@@ -896,7 +896,7 @@
           "command": "srt echo \"hello world\"",
           "kind": "smoke",
           "source": {
-            "url": "https://raw.githubusercontent.com/anthropics/sandbox-runtime/v0.0.78/README.md#L168",
+            "url": "https://raw.githubusercontent.com/anthropics/sandbox-runtime/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/README.md#L168",
             "line": 168
           }
         },
@@ -904,7 +904,7 @@
           "command": "bash \"$plan_dir/config/srt-client-accept.sh\"",
           "kind": "native client integration",
           "source": {
-            "url": "https://raw.githubusercontent.com/anthropics/sandbox-runtime/v0.0.78/README.md#L168",
+            "url": "https://raw.githubusercontent.com/anthropics/sandbox-runtime/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/README.md#L168",
             "line": 168
           }
         }
@@ -913,10 +913,10 @@
         "$config_root/srt-client-accept.sh",
         "$config_root/acceptance-execution-instructions.txt"
       ],
-      "notes": "Pinned sandbox-runtime 0.0.78, reconciled with the stack/profile/architecture selectors. The unchanged upstream smoke is srt echo \"hello world\"; the after_sign_in check is separate native-client integration. Supply the executor's existing disposable policy and denyRead, protected-write and denied-domain fixtures, with unsandboxed controls; the script requires a fresh Claude native Bash use and successful policy enforcement in returned tool_use/tool_result events. SRT_ACCEPT_CLIENT=codex uses Codex's native command_execution/turn.completed events and is recommended as the second client proof. A version call cannot satisfy it. The designed consumer remains per-job srt, not a session-wide sandbox or a mandatory ~/.srt-settings.json. The runtime-worker owner must also bind an OpenHands check_report or exit 0 under srt; starts alone are not successful job evidence. This plan check is unrun in this builder job. Repair 2026-10-05: the worktree's acceptance program runs the current source helper, embeds shell-quoted synthetic fixture bindings for inherit=none, and retains native streams privately; Claude uses the native task-first print mode with a 48-turn limit with Bash tools only. Codex starts in the nongit fixture directory with --skip-git-repo-check. Repair 2026-10-05 readiness Job3: explicit exit checks on every positive command and nested read/hash; validate unique zero positive markers, denial exits1-255, permitted write and protected-file preservation. Bind successful native output to the exact supplied foreground recipe, require one successful terminal and completed Codex item. Sources: anthropics/sandbox-runtime@v0.0.78:README.md:166-179; openai/codex@rust-v0.160.0:codex-rs/exec/src/exec_events.rs:159; seathatflowsinourveins/native-agent-stack@dd9b06ba69c77a62f5553cdc119061082c783564:evidence/artifacts/new-wsl-install-plan-20261002/accept.sh:2117-2122,2229 (existing completion and wrapper decoding). No production-policy widening or broad environment inheritance.",
+      "notes": "Pinned sandbox-runtime 0.0.79 on the living install path, matching the current stack/profile target. Historical policy and architecture evidence retains its original scope. The unchanged upstream smoke is srt echo \"hello world\"; the after_sign_in check is separate native-client integration. Supply the executor's existing disposable policy and denyRead, protected-write and denied-domain fixtures, with unsandboxed controls; the script requires a fresh Claude native Bash use and successful policy enforcement in returned tool_use/tool_result events. SRT_ACCEPT_CLIENT=codex uses Codex's native command_execution/turn.completed events and is recommended as the second client proof. A version call cannot satisfy it. The designed consumer remains per-job srt, not a session-wide sandbox or a mandatory ~/.srt-settings.json. The runtime-worker owner must also bind an OpenHands check_report or exit 0 under srt; starts alone are not successful job evidence. This plan check is unrun in this builder job. Repair 2026-10-05: the worktree's acceptance program runs the current source helper, embeds shell-quoted synthetic fixture bindings for inherit=none, and retains native streams privately; Claude uses the native task-first print mode with a 48-turn limit with Bash tools only. Codex starts in the nongit fixture directory with --skip-git-repo-check. Repair 2026-10-05 readiness Job3: explicit exit checks on every positive command and nested read/hash; validate unique zero positive markers, denial exits1-255, permitted write and protected-file preservation. Bind successful native output to the exact supplied foreground recipe, require one successful terminal and completed Codex item. Sources: anthropics/sandbox-runtime@v0.0.78:README.md:166-179; openai/codex@rust-v0.160.0:codex-rs/exec/src/exec_events.rs:159; seathatflowsinourveins/native-agent-stack@dd9b06ba69c77a62f5553cdc119061082c783564:evidence/artifacts/new-wsl-install-plan-20261002/accept.sh:2117-2122,2229 (existing completion and wrapper decoding). No production-policy widening or broad environment inheritance.",
       "supporting_sources": [
         {
-          "url": "https://raw.githubusercontent.com/anthropics/sandbox-runtime/v0.0.78/README.md#L174",
+          "url": "https://raw.githubusercontent.com/anthropics/sandbox-runtime/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/README.md#L174",
           "line": 174
         },
         {

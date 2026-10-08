@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# anthropics/sandbox-runtime@v0.0.78:README.md:166-179, src/cli.ts:276-324.
+# anthropics/sandbox-runtime@d9aac2098351ca17f3743fbaf6ecbd0051b7e00e:README.md:166-179, src/cli.ts:274-341.
 # Fresh-session integration, separate from the unchanged upstream smoke.
 # Fixtures are existing disposable deny/allow controls from the host executor;
 # never point these variables at credentials or operator files.
