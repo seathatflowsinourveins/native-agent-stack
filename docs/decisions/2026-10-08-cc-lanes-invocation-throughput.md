@@ -40,3 +40,18 @@ Pinned Grafana source disproved the initial plan to join independent log/name fr
 
 The independent source critic checked native schema distinctions, bool/set matching, latest-name ties, empty/stale lookup windows, wrapper counting and table frame completeness. The resolved findings and unqualified positive-name branch feed the next observability sweep. Landings and publication remain on the CC/5f cue; window closure did not authorize either.
 
+## CC76 emitter-contract correction, 2026-10-08
+
+The independent existing-emitter check found that the selected Collector source
+(`collector.yaml` SHA256 `d46d57617085cc4cba494d27e4c33df4a02648d82cd31c33103d373a0c201bf7`)
+omits `speed` from its log privacy allowlist at line 367 and from metric attribute
+aggregation/allowlists at lines 412–426. The OTLP log pipeline applies that privacy
+processor before Loki and the sanitized event file. Consequently absent Loki
+`speed` cannot distinguish native producer omission from Collector removal. The
+observed `normal (unset)` rows prove that the panel preserves absent retained
+metadata; they do not prove what the client originally emitted. Future emitted
+`fast`/`normal` values are not yet qualified through this Collector. The earlier
+implied producer-absence explanation is corrected here. A supported safe-field
+retention change belongs to the Collector owner and needs source/native read-back
+before claiming speed separation on the host. No lane configuration is changed
+under CC76's research-only review scope.

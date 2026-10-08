@@ -17913,8 +17913,8 @@
     },
     {
       "path": "docs/decisions/2026-10-08-cc-lanes-invocation-throughput.md",
-      "sha256": "37a1f2dcf8ae385c62aa373cd76824e847523f5f3143cfeb65d57eef285da5cb",
-      "bytes": 7807
+      "sha256": "7338ac87284bac4111cfbe5eede478ed4a2fd714da5bb6403c3b71961ad6dfd7",
+      "bytes": 8874
     },
     {
       "path": "docs/decisions/2026-10-08-philosophy-only-rules.md",
@@ -54838,8 +54838,8 @@
     },
     {
       "path": "evidence/receipts/cc-lanes-invocation-throughput-20261008.json",
-      "sha256": "50e38f8d0a752122e2bcc23120b71f76abd958ae9fce431e86f2339464fe52ac",
-      "bytes": 13363
+      "sha256": "50b8c16b242cd1facfafd5bb5fb3abb88f61d05e4f903512577bedc121bb377b",
+      "bytes": 13804
     },
     {
       "path": "evidence/receipts/ccusage-20026-qualification-20260927.json",

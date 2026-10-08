@@ -330,6 +330,7 @@
     ]
   },
   "limits": [
+    "CC76 correction: selected collector.yaml d46d57617085cc4cba494d27e4c33df4a02648d82cd31c33103d373a0c201bf7 drops speed at log privacy allowlist367 and metric attributes412-426. Empty Loki speed does not identify producer-unset versus Collector-dropped. Future fast/normal speed separation is unqualified until the Collector owner retains the native safe field and reads it back. No lane configuration change is made in research scope.",
     "Native hcom records/lookup returned0 for1h and24h; live positive names and mixed enriched/fallback rendering are unqualified.",
     "Equal conflicting maximal observed_unix values can yield an encounter-dependent name; timestamp uniqueness is unproven.",
     "Mappings are latest recorded within selected window, not fresh liveness.",
