@@ -15,6 +15,8 @@
     "cc_g3": {"root": "state", "path": "coordination/command-center/ITEM-ns2604-coop-20261008T164839Z.md", "expected_sha256": "e8bfce23b3d90ec3da6902f530b0a5d15ee718a03c79463141c50c832150d586"},
     "cc_batch": {"root": "state", "path": "coordination/command-center/ITEM-ns2604-coop-20261008T175944Z.md", "expected_sha256": "001341383c83daf6cebc25e620eb9551c7231ff280efe8d05c812c7893a2a78a"},
     "cc_g5": {"root": "state", "path": "coordination/command-center/ROW-ns2604-coop-20261008T1822Z-g5shape.md", "expected_sha256": "9ec37ed6667227745db87827577a33c32ca2a8e3fedd777693097e39b8702d36"},
+    "cc_g5_closure": {"root": "state", "path": "coordination/command-center/ITEM-ns2604-coop-20261008T210228Z.md", "expected_sha256": "d3868b6a0a81826407ade426c6f8a2c6511401177d3801eb24b3ae0e9023aa43"},
+    "cc_g6_f9": {"root": "state", "path": "coordination/command-center/windows/f9-g6a-881-20261008/RECEIPT.md", "expected_sha256": "24906eaf9cc3f041ed6bd500dd41095e4282a551ad1403d80a76a709ce7cf6a1"},
     "paper_hold": {"root": "state", "path": "coordination/command-center/ROW-ns2604-coop-20261008T1805Z-n2hold.md", "expected_sha256": "f2aab57b19131fe3e380918e9f7534abc0fe959f3ef18737404edb9b63f33ada"},
     "fullspeed": {"root": "state", "path": "coordination/command-center/ITEM-ns2604-coop-20261008T181214Z.md", "expected_sha256": "026403fe2adb38075db447ff3485edb6d8cf20ddef8ae68836dba6b29ebe7cba"},
     "rnd_launch": {"root": "state", "path": "coordination/command-center/north-star-rnd-launch-spec-20261008.md", "expected_sha256": "ca67d9cabdb4f0ed490e5f9fb70eef0786f7ceb96df372e5bbf04e50929fdbf1"},
@@ -104,19 +106,46 @@
     {
       "id": "G5", "title": "Landscape catalog",
       "fields": {
-        "state": {"source": "cc_batch", "regex": "^\\*\\*Gates:\\*\\* G1, G3 and G4 are MET\\. (?P<value>G5 and G6 remain)\\.$"},
+        "state": {"source": "cc_g5_closure", "regex": "^\\*\\*Why this row\\.\\*\\* G5 is the (?P<value>only START gate left)\\.[^\\n]+$"},
         "owner": {"source": "fullspeed", "regex": "^- \\*\\*(?P<value>grand-catalog):\\*\\* #878\\.$"},
         "pull_request": {"source": "cc_g5", "regex": "^1\\. grand-catalog restructures (?P<value>#878) into the compact manifest[^\\n]+$"},
-        "review_stage": {"source": "cc_g5", "regex": "^1\\. grand-catalog restructures #878[^\\n]+Keep it a (?P<value>draft) and build the asset locally;[^\\n]+$"}
+        "review_stage": {"source": "cc_g5", "regex": "^1\\. grand-catalog restructures #878[^\\n]+Keep it a (?P<value>draft) and build the asset locally;[^\\n]+$"},
+        "closure_criterion_1_population_witnesses": {"source": "cc_g5_closure", "regex": "^1\\. \\*\\*Population, each with a hash-pinned witness:\\*\\* (?P<value>[^\\n]+)$"},
+        "closure_criterion_2_row_evidence": {"source": "cc_g5_closure", "regex": "^2\\. \\*\\*Rows:\\*\\* (?P<value>[^\\n]+)$"},
+        "closure_criterion_3_mined_list_population_census": {"source": "cc_g5_closure", "regex": "^3\\. \\*\\*Mined lists are a counted population, not a row set\\.\\*\\* (?P<value>[^\\n]+)$"},
+        "closure_criterion_4_full_asset_validation": {"source": "cc_g5_closure", "regex": "^4\\. \\*\\*Mechanical check:\\*\\* (?P<value>[^\\n]+)$"},
+        "closure_criterion_5_reader_coverage": {"source": "cc_g5_closure", "regex": "^5\\. \\*\\*Reads:\\*\\* (?P<value>[^\\n]+)$"},
+        "closure_criterion_6_cued_release": {"source": "cc_g5_closure", "regex": "^6\\. \\*\\*Landing:\\*\\* (?P<value>[^\\n]+)$"}
       }
     },
     {
-      "id": "G6", "title": "Harness consolidation",
+      "id": "G6a", "title": "Harness consolidation and fresh-session loading",
       "fields": {
-        "state": {"source": "cc_batch", "regex": "^## 1\\. G6: (?P<value>HOLD) at bace9b29, split into G6a, G6b and G6c \\(harness-rules; top priority after the N2 r2 fixes\\)$"},
+        "state": {"source": "cc_g6_f9", "regex": "^- \\*\\*Result:\\*\\* G6a is (?P<value>MET)\\. G6b \\(settings ownership\\) and G6c \\(#885, #886\\) continue and do not block START\\.$"},
         "owner": {"source": "fullspeed", "regex": "^- \\*\\*(?P<value>harness-rules):\\*\\* G6a first\\.$"},
-        "held_head": {"source": "cc_batch", "regex": "^## 1\\. G6: HOLD at (?P<value>bace9b29), split into G6a, G6b and G6c[^\\n]+$"},
-        "blocking_part": {"source": "cc_batch", "regex": "^- \\*\\*(?P<value>G6a) is START-blocking:\\*\\*[^\\n]+$"}
+        "pull_request": {"source": "cc_g6_f9", "regex": "^- \\*\\*Landing:\\*\\* (?P<value>#881) merged 2026-10-08T20:41:37Z as [0-9a-f]{40}[^\\n]+$"},
+        "merge_commit": {"source": "cc_g6_f9", "regex": "^- \\*\\*Landing:\\*\\* #881 merged 2026-10-08T20:41:37Z as (?P<value>[0-9a-f]{40})[^\\n]+$"},
+        "merged_at": {"source": "cc_g6_f9", "regex": "^- \\*\\*Landing:\\*\\* #881 merged (?P<value>2026-10-08T20:41:37Z) as [0-9a-f]{40}[^\\n]+$"},
+        "f9_applied_at": {"source": "cc_g6_f9", "regex": "^- \\*\\*Tool:\\*\\*[^\\n]+Dry run rc 0, then the run at (?P<value>2026-10-08T20:44:38Z), rc 0\\.$"},
+        "f9_exit_code": {"source": "cc_g6_f9", "regex": "^- \\*\\*Tool:\\*\\*[^\\n]+Dry run rc 0, then the run at 2026-10-08T20:44:38Z, rc (?P<value>0)\\.$"},
+        "claude_fresh_session_exit_code": {"source": "cc_g6_f9", "regex": "^[ ]+- Claude Code 2\\.1\\.295,[^\\n]+rc (?P<value>0)\\.$"},
+        "codex_fresh_session_exit_code": {"source": "cc_g6_f9", "regex": "^[ ]+- Codex CLI 0\\.161\\.0,[^\\n]+rc (?P<value>0)\\.$"}
+      }
+    },
+    {
+      "id": "G6b", "title": "Harness settings ownership",
+      "fields": {
+        "state": {"source": "cc_g6_f9", "regex": "^- \\*\\*Result:\\*\\* G6a is MET\\. G6b \\(settings ownership\\) and G6c \\(#885, #886\\) (?P<value>continue) and do not block START\\.$"},
+        "scope": {"source": "cc_g6_f9", "regex": "^- \\*\\*Result:\\*\\* G6a is MET\\. G6b \\((?P<value>settings ownership)\\) and G6c \\(#885, #886\\) continue and do not block START\\.$"},
+        "start_policy": {"source": "cc_g6_f9", "regex": "^- \\*\\*Result:\\*\\* G6a is MET\\. G6b \\(settings ownership\\) and G6c \\(#885, #886\\) continue and (?P<value>do not block START)\\.$"}
+      }
+    },
+    {
+      "id": "G6c", "title": "Harness records grounded in upstream sources",
+      "fields": {
+        "state": {"source": "cc_g6_f9", "regex": "^- \\*\\*Result:\\*\\* G6a is MET\\. G6b \\(settings ownership\\) and G6c \\(#885, #886\\) (?P<value>continue) and do not block START\\.$"},
+        "pull_requests": {"source": "cc_g6_f9", "regex": "^- \\*\\*Result:\\*\\* G6a is MET\\. G6b \\(settings ownership\\) and G6c \\((?P<value>#885, #886)\\) continue and do not block START\\.$"},
+        "start_policy": {"source": "cc_g6_f9", "regex": "^- \\*\\*Result:\\*\\* G6a is MET\\. G6b \\(settings ownership\\) and G6c \\(#885, #886\\) continue and (?P<value>do not block START)\\.$"}
       }
     }
   ],
@@ -151,10 +180,10 @@
   ],
   "rnd_inputs": [
     {
-      "id": "g6_rules", "title": "G6 consolidated rules",
+      "id": "g6a_rules", "title": "G6a consolidated rules",
       "fields": {
         "input": {"source": "rnd_launch", "regex": "^1\\. \\*\\*The (?P<value>G6 consolidated rules),\\*\\*[^\\n]+$"},
-        "state": {"source": "cc_batch", "regex": "^## 1\\. G6: (?P<value>HOLD) at bace9b29,[^\\n]+$"},
+        "state": {"source": "cc_g6_f9", "regex": "^- \\*\\*Result:\\*\\* G6a is (?P<value>MET)\\. G6b \\(settings ownership\\) and G6c \\(#885, #886\\) continue and do not block START\\.$"},
         "owner": {"source": "fullspeed", "regex": "^- \\*\\*(?P<value>harness-rules):\\*\\* G6a first\\.$"}
       }
     },
@@ -162,7 +191,7 @@
       "id": "g5_catalog", "title": "G5 catalog on main",
       "fields": {
         "input": {"source": "rnd_launch", "regex": "^2\\. \\*\\*The (?P<value>G5 grand catalog)\\*\\*[^\\n]+$"},
-        "state": {"source": "cc_batch", "regex": "^\\*\\*Gates:\\*\\* G1, G3 and G4 are MET\\. (?P<value>G5 and G6 remain)\\.$"},
+        "state": {"source": "cc_g5_closure", "regex": "^\\*\\*Why this row\\.\\*\\* G5 is the (?P<value>only START gate left)\\.[^\\n]+$"},
         "owner": {"source": "fullspeed", "regex": "^- \\*\\*(?P<value>grand-catalog):\\*\\* #878\\.$"}
       }
     },
@@ -225,7 +254,7 @@
     {
       "id": "G6a", "title": "G6a landing and fresh-client checks",
       "fields": {
-        "state": {"source": "cc_batch", "regex": "^## 1\\. G6: (?P<value>HOLD) at bace9b29,[^\\n]+$"},
+        "state": {"source": "cc_g6_f9", "regex": "^- \\*\\*Result:\\*\\* G6a is (?P<value>MET)\\. G6b \\(settings ownership\\) and G6c \\(#885, #886\\) continue and do not block START\\.$"},
         "owner": {"source": "fullspeed", "regex": "^- \\*\\*(?P<value>harness-rules):\\*\\* G6a first\\.$"}
       }
     },
@@ -239,7 +268,7 @@
     {
       "id": "G5-878", "title": "G5 compact catalog and release asset",
       "fields": {
-        "state": {"source": "cc_batch", "regex": "^\\*\\*Gates:\\*\\* G1, G3 and G4 are MET\\. (?P<value>G5 and G6 remain)\\.$"},
+        "state": {"source": "cc_g5_closure", "regex": "^\\*\\*Why this row\\.\\*\\* G5 is the (?P<value>only START gate left)\\.[^\\n]+$"},
         "owner": {"source": "fullspeed", "regex": "^- \\*\\*(?P<value>grand-catalog):\\*\\* #878\\.$"}
       }
     },
