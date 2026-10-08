@@ -53,14 +53,33 @@ The fragment uses the existing page's section/table elements. Its generation doe
 not edit the command center's durable page. The page custodian inserts or refreshes
 that section through its own publication route.
 
+The finite publisher is prepared for that custodian. Preview its output hashes
+against the exact approved page bytes:
+
+```sh
+nice -n 10 ionice -c2 -n7 python3 -I tools/north-star/build_readiness.py --check \
+  --publish-page ~/.local/state/native-agent-stack/coordination/command-center/pages/north-star-readiness.html \
+  --expected-page-sha256 <approved-page-sha256> --dry-run
+```
+
+After the custodian's publication cue, the same command without `--dry-run` adds
+or replaces one managed fragment, keeps surrounding markup, and retains a byte
+backup named with the preceding page hash. It refuses changed page bytes, ambiguous
+anchors, malformed managed markers and symlink targets. A repeated refresh replaces
+the same block. It creates no service or watcher. The hash guard checks the input
+bytes; it is not a concurrent multi-writer lock. The CC remains the sole page
+custodian. Older narrative/card material outside the managed block keeps its dated
+scope until that custodian reconciles it.
+
 ## Refresh on a gate change
 
 After the accepted gate-change receipt arrives, update that gate's source path,
 complete digest and exact selector in `sources.json`, then run `--write` and
 `--check`. Rehash the resulting JSON and publish the lane's READY record with its
 new digest. Immutable receipt changes invalidate their bound claims rather than
-silently granting a new pass. Mutable SDK `rows.json` changes are read on each
-build; each item remains individually pinned to its immutable normalized receipt.
+silently granting a new pass. SDK `rows.json` is bound to the producer's sealed
+handoff digest. A replacement handoff cue updates that binding before rebuilding;
+each item remains individually pinned to its immutable normalized receipt.
 
 The existing command-center status/ledger notification consumer is the integration
 point for calling this sequence. Deployment of that external handler and insertion

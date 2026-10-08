@@ -12,8 +12,10 @@ import argparse
 import hashlib
 import html
 import json
+import os
 from pathlib import Path
 import re
+import tempfile
 from typing import Any
 
 
@@ -415,6 +417,69 @@ def render_fragment(manifest: dict[str, Any]) -> str:
     return "\n".join(lines) + "\n"
 
 
+def publish_page(manifest: dict[str, Any], page: Path, expected_sha256: str,
+                 dry_run: bool = False) -> dict[str, Any]:
+    """Publish one managed fragment only against the custodian's expected bytes."""
+    if not re.fullmatch(r"[0-9a-f]{64}", expected_sha256):
+        raise ValueError("expected page SHA-256 must be 64 lowercase hex characters")
+    if page.is_symlink():
+        raise ValueError("page target must be a regular file, not a symlink")
+    original = page.read_bytes()
+    original_hash = hashlib.sha256(original).hexdigest()
+    if original_hash != expected_sha256:
+        raise ValueError("page bytes differ from the custodian's expected SHA-256")
+    text = original.decode("utf-8")
+    start, end = "<!-- north-star-readiness:start -->", "<!-- north-star-readiness:end -->"
+    counts = text.count(start), text.count(end)
+    block = start + "\n" + render_fragment(manifest) + end
+    if counts == (1, 1):
+        first, last = text.index(start), text.index(end)
+        if last < first:
+            raise ValueError("page managed markers are reversed")
+        updated = text[:first] + block + text[last + len(end):]
+    elif counts != (0, 0):
+        raise ValueError("page managed markers are missing, nested or duplicated")
+    else:
+        # The CC's retained HTML fragment omits body/main closing tags and
+        # ends with one named links section; full HTML documents use their
+        # ordinary closing container. Unknown layouts fail rather than append.
+        if text.count("</main>") == 1:
+            anchor = "</main>"
+        elif text.count("</body>") == 1:
+            anchor = "</body>"
+        else:
+            anchor = '<section aria-labelledby="l" class="foot">'
+        if text.count(anchor) != 1:
+            raise ValueError("page requires one unambiguous insertion anchor")
+        updated = text.replace(anchor, block + "\n" + anchor)
+    output = updated.encode("utf-8")
+    result = {"original_sha256": original_hash, "output_sha256": hashlib.sha256(output).hexdigest(),
+              "output_bytes": len(output), "dry_run": dry_run}
+    if dry_run:
+        return result
+    if output == original:
+        return result | {"unchanged": True}
+    backup = page.with_name(page.name + ".receipt-backup-" + original_hash[:16])
+    if backup.exists() and backup.read_bytes() != original:
+        raise ValueError("existing page backup does not match the original bytes")
+    if not backup.exists():
+        backup.write_bytes(original)
+    if hashlib.sha256(page.read_bytes()).hexdigest() != original_hash:
+        raise ValueError("page changed while preparing the publication")
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(dir=page.parent, prefix=f".{page.name}.", delete=False) as handle:
+            temporary = Path(handle.name)
+            handle.write(output)
+        os.chmod(temporary, page.stat().st_mode & 0o777)
+        temporary.replace(page)
+    finally:
+        if temporary is not None and temporary.exists():
+            temporary.unlink()
+    result["backup"] = str(backup)
+    return result
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=ROOT)
@@ -425,6 +490,9 @@ def main(argv: list[str] | None = None) -> int:
     group.add_argument("--write", action="store_true")
     group.add_argument("--check", action="store_true")
     parser.add_argument("--html-fragment", type=Path, help="write a local fragment; never alters the durable page")
+    parser.add_argument("--publish-page", type=Path, help="finite managed-fragment publication for the page custodian")
+    parser.add_argument("--expected-page-sha256", help="required digest of the custodian-approved page input")
+    parser.add_argument("--dry-run", action="store_true", help="report page publication hashes without changing the page")
     args = parser.parse_args(argv)
     try:
         manifest = build(args.root, args.state_root, args.sources)
@@ -439,8 +507,15 @@ def main(argv: list[str] | None = None) -> int:
         if args.html_fragment:
             args.html_fragment.parent.mkdir(parents=True, exist_ok=True)
             args.html_fragment.write_text(render_fragment(manifest), encoding="utf-8")
-        print(json.dumps({"path": str(output), "sha256": hashlib.sha256(expected).hexdigest(),
-                          "bytes": len(expected), "summary": manifest["summary"]}, sort_keys=True))
+        result = {"path": str(output), "sha256": hashlib.sha256(expected).hexdigest(),
+                  "bytes": len(expected), "summary": manifest["summary"]}
+        if args.publish_page:
+            if not args.expected_page_sha256:
+                raise ValueError("--publish-page requires --expected-page-sha256")
+            result["page_publication"] = publish_page(manifest, args.publish_page, args.expected_page_sha256, args.dry_run)
+        elif args.dry_run or args.expected_page_sha256:
+            raise ValueError("page publication options require --publish-page")
+        print(json.dumps(result, sort_keys=True))
         return 0
     except (OSError, ValueError, KeyError, TypeError) as error:
         print(f"UNVERIFIED: {error}")

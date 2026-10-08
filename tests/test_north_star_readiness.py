@@ -319,6 +319,19 @@ class ReadinessBuilderTests(unittest.TestCase):
             self.assertEqual(original, manifest["gates"][0]["fields"][field]["value"])
         self.assertEqual(raw, (self.root / "gate.json").read_bytes())
 
+    def test_cli_publication_requires_the_expected_page_digest(self):
+        page = self.state / "synthetic-readiness.html"
+        original = b"<html><body><main>Retained markup</main></body></html>\n"
+        page.write_bytes(original)
+        with contextlib.redirect_stderr(io.StringIO()):
+            try:
+                code, _ = self.run_main("--write", "--publish-page", str(page))
+            except SystemExit as error:
+                code = error.code
+        self.assertEqual(2, code)
+        self.assertEqual(original, page.read_bytes())
+        self.assertEqual([page], list(self.state.iterdir()))
+
     def test_write_check_is_deterministic_and_detects_source_drift(self):
         output = self.root / READINESS.OUTPUT
         self.assertEqual(1, self.run_main("--check")[0])
@@ -398,6 +411,151 @@ class ReadinessBuilderTests(unittest.TestCase):
         for escaped in ("&lt;img", "&lt;script&gt;", "owner &amp; &quot;quoted&quot;",
                         "&lt;Layer&amp;&gt;", "&lt;tool&gt;", "&lt;v&amp;&gt;", "&lt;SDK&gt;", "&lt;MATCH&gt;"):
             self.assertIn(escaped, fragment)
+
+
+class PagePublicationTests(unittest.TestCase):
+    START = b"<!-- north-star-readiness:start -->"
+    END = b"<!-- north-star-readiness:end -->"
+
+    def setUp(self):
+        temporary = tempfile.TemporaryDirectory(prefix="north-star-page-")
+        self.addCleanup(temporary.cleanup)
+        self.directory = Path(temporary.name)
+        self.page = self.directory / "synthetic-readiness.html"
+        self.original = (
+            b'<!doctype html>\r\n<html><body class="command-center">\r\n'
+            b'<main id="retained-status">\r\n<h1>Retained readiness</h1>\r\n'
+            b'<p data-keep="true">Retained markup: \xce\xb1.</p>\r\n'
+            b'</main>\r\n<footer>Retained footer</footer>\r\n</body></html>\r\n'
+        )
+        self.page.write_bytes(self.original)
+        self.manifest = {
+            "gates": [{"id": "G1", "fields": {
+                "state": {"value": "open", "status": "RECORDED"},
+                "owner": {"value": "fixture-lane", "status": "RECORDED"},
+            }}],
+            "layers": [], "sdk_frameworks": {"items": []},
+        }
+
+    def files(self):
+        return {path.name: path.read_bytes() for path in self.directory.iterdir()}
+
+    def publish(self, *, expected=None, dry_run=False):
+        digest = expected if expected is not None else hashlib.sha256(self.page.read_bytes()).hexdigest()
+        return READINESS.publish_page(self.manifest, self.page, digest, dry_run=dry_run)
+
+    def test_wrong_page_digest_never_mutates_or_creates_files(self):
+        before = self.files()
+        with self.assertRaises(ValueError):
+            self.publish(expected="0" * 64)
+        self.assertEqual(before, self.files())
+
+    def test_dry_run_creates_no_files_and_predicts_publication(self):
+        before = self.files()
+        preview = self.publish(dry_run=True)
+        self.assertEqual(before, self.files())
+        self.assertIs(preview["dry_run"], True)
+        self.assertEqual(hashlib.sha256(self.original).hexdigest(), preview["original_sha256"])
+        self.assertNotEqual(preview["original_sha256"], preview["output_sha256"])
+        self.assertGreater(preview["output_bytes"], len(self.original))
+        published = self.publish()
+        self.assertIs(published["dry_run"], False)
+        self.assertEqual(preview["output_sha256"], hashlib.sha256(self.page.read_bytes()).hexdigest())
+        self.assertEqual(preview["output_bytes"], len(self.page.read_bytes()))
+
+    def test_publication_keeps_surrounding_bytes_and_exact_backup(self):
+        old_digest = hashlib.sha256(self.original).hexdigest()
+        result = self.publish()
+        output = self.page.read_bytes()
+        anchor = self.original.index(b"</main>")
+        self.assertTrue(output.startswith(self.original[:anchor]))
+        self.assertTrue(output.endswith(self.original[anchor:]))
+        self.assertEqual(1, output.count(self.START))
+        self.assertEqual(1, output.count(self.END))
+        self.assertEqual(old_digest, result["original_sha256"])
+        self.assertEqual(hashlib.sha256(output).hexdigest(), result["output_sha256"])
+        backup = self.page.with_name(self.page.name + ".receipt-backup-" + old_digest[:16])
+        self.assertEqual(self.original, backup.read_bytes())
+
+    def test_repeated_publication_replaces_one_block_idempotently(self):
+        self.publish()
+        first = self.page.read_bytes()
+        self.publish()
+        self.assertEqual(first, self.page.read_bytes())
+        self.manifest["gates"][0]["fields"]["owner"]["value"] = "next-fixture-lane"
+        self.publish()
+        refreshed = self.page.read_bytes()
+        self.assertEqual(1, refreshed.count(self.START))
+        self.assertEqual(1, refreshed.count(self.END))
+        self.assertIn(b"next-fixture-lane", refreshed)
+        self.assertNotEqual(first, refreshed)
+        anchor = self.original.index(b"</main>")
+        self.assertTrue(refreshed.startswith(self.original[:anchor]))
+        self.assertTrue(refreshed.endswith(self.original[anchor:]))
+
+    def test_body_is_fallback_when_main_is_not_unique(self):
+        for raw in (
+            b"<html><body><p>No main here</p></body></html>\n",
+            b"<html><body><main>One</main><main>Two</main></body></html>\n",
+        ):
+            with self.subTest(raw=raw):
+                self.page.write_bytes(raw)
+                self.publish()
+                output = self.page.read_bytes()
+                anchor = raw.index(b"</body>")
+                self.assertTrue(output.startswith(raw[:anchor]))
+                self.assertTrue(output.endswith(raw[anchor:]))
+                self.assertEqual(1, output.count(self.START))
+
+    def test_fragment_footer_fallback_preserves_the_wrapper(self):
+        footer = b'<section aria-labelledby="l" class="foot">'
+        raw = (
+            b'<div id="retained-wrapper">\r\n'
+            b'<section aria-labelledby="r"><h1>Retained readiness</h1></section>\r\n'
+            + footer + b'<p>Retained footer</p></section>\r\n</div>\r\n'
+        )
+        self.page.write_bytes(raw)
+        self.publish()
+        output = self.page.read_bytes()
+        anchor = raw.index(footer)
+        self.assertTrue(output.startswith(raw[:anchor]))
+        self.assertTrue(output.endswith(raw[anchor:]))
+        self.assertLess(output.index(self.START), output.index(footer))
+        self.assertEqual(1, output.count(self.START))
+        self.assertEqual(1, output.count(self.END))
+        self.publish()
+        self.assertEqual(output, self.page.read_bytes())
+
+    def test_broken_marker_blocks_fail_before_backup_or_mutation(self):
+        blocks = (
+            self.START + b" orphan",
+            b"orphan " + self.END,
+            self.END + b" reversed " + self.START,
+            self.START + self.START + b" nested " + self.END + self.END,
+            self.START + b"one" + self.END + self.START + b"two" + self.END,
+            self.START + b"one" + self.END + self.END,
+        )
+        for block in blocks:
+            with self.subTest(block=block):
+                self.page.write_bytes(b"<html><body><main>" + block + b"</main></body></html>\n")
+                before = self.files()
+                with self.assertRaises(ValueError):
+                    self.publish()
+                self.assertEqual(before, self.files())
+
+    def test_missing_or_ambiguous_anchors_fail_before_backup_or_mutation(self):
+        for raw in (
+            b"<html><p>No insertion anchor</p></html>\n",
+            b"<main>One</main><main>Two</main>\n",
+            b"<body>One</body><body>Two</body>\n",
+            b"<body><main>One</main><main>Two</main></body></body>\n",
+        ):
+            with self.subTest(raw=raw):
+                self.page.write_bytes(raw)
+                before = self.files()
+                with self.assertRaises(ValueError):
+                    self.publish()
+                self.assertEqual(before, self.files())
 
 
 if __name__ == "__main__":

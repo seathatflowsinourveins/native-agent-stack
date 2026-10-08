@@ -5,7 +5,8 @@
     "stack": {"root": "repo", "path": "manifests/stack.json"},
     "evidence": {"root": "repo", "path": "manifests/evidence.json"},
     "profile": {"root": "repo", "path": "adoption/new-wsl-profile.json"},
-    "sdk_rows": {"root": "state", "path": "research/fullspeed-20261008/sdk-harness-ready/rows.json"},
+    "sdk_rows": {"root": "state", "path": "research/fullspeed-20261008/sdk-harness-ready/rows.json", "expected_sha256": "affc6ee209a92cad2a18e1cddea78ffcf19560268f527a1afc2865ad877fdf3d"},
+    "sdk_handoff": {"root": "state", "path": "research/fullspeed-20261008/sdk-harness-ready/handoff.receipt.json", "expected_sha256": "a6518c1b865ca4825614cf365730e839edd0a74afa17adc39863911b52f73108"},
     "sdk_contract": {"root": "state", "path": "research/fullspeed-20261008/sdk-harness-ready/receipt-contract.json", "expected_sha256": "055cc67f1ac78cfd5bff5153d6f6552df16b06f64b63e36f87696e8d6ba3f636"},
     "sdk_route_correction": {"root": "state", "path": "research/fullspeed-20261008/sdk-harness-ready/route-correction.receipt.json", "expected_sha256": "830b95975df7d01a90c68dd355a98a442e3dfa38ce03a1a6c0a63d280f474b38"},
     "sdk_route_reconciliation": {"root": "state", "path": "research/fullspeed-20261008/sdk-harness-ready/route-reconciliation-final.receipt.json", "expected_sha256": "fad6c1703ea5b5d48b6cf4ed3eb98eba3d05cbf84404a5d35e36ed3f76b0249f"},
@@ -384,6 +385,16 @@
     }
   ],
   "observations": [
+    {
+      "id": "sdk-harness-handoff", "title": "Final SDK and harness packet",
+      "fields": {
+        "owner": {"source": "sdk_handoff", "pointer": "/owner_lane"},
+        "items": {"source": "sdk_handoff", "pointer": "/items"},
+        "bounded_passes": {"source": "sdk_handoff", "pointer": "/bounded_native_and_fresh_passes"},
+        "partial_items": {"source": "sdk_handoff", "pointer": "/partial_items"},
+        "separate_acceptance_gates": {"source": "sdk_handoff", "pointer": "/separate_acceptance_gates"}
+      }
+    },
     {
       "id": "native24-offline", "title": "Native24 offline runtime acceptance",
       "fields": {
