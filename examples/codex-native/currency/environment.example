@@ -1,0 +1,9 @@
+# Proposal only. Paths/native lookup only; put no credential values here.
+# Replace placeholders with reviewed absolute paths before any future unit installation.
+CURRENCY_SOURCE=@REPOSITORY@
+CURRENCY_STATE=@STATE_DIR@
+CURRENCY_RELEASES=@VERSIONED_CODEX_RELEASES@
+CURRENCY_LAUNCHER=@EXISTING_CODEX_IDENTITY_LAUNCHER@
+CURRENCY_PROTECTED=@STATE_DIR@/protected-window
+CURRENCY_RECORD=@STATE_DIR@/currency.md
+CURRENCY_CANARY=@COOP_OWNED_CANARY_DISPATCH_EXECUTABLE@

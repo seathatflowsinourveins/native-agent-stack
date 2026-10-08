@@ -1,0 +1,18 @@
+# PROPOSED ONLY: review workflow, co-op adapter and paths before installing any unit.
+# Sources: systemd v259 systemd.service(5), systemd.unit(5); Dagu v2.18.2 native start.
+# @REPOSITORY@, @DAGU_BIN@ and @FLOCK_BIN@ are operator-reviewed absolute paths.
+[Unit]
+Description=Proposed guarded Codex release staging and two-lane canary
+
+[Service]
+Type=oneshot
+EnvironmentFile=%h/.config/native-agent-stack/codex-currency.env
+WorkingDirectory=@REPOSITORY@
+StateDirectory=native-agent-stack/codex-currency
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+TimeoutStartSec=35min
+TimeoutStopSec=1min
+ExecCondition=/bin/bash @REPOSITORY@/examples/codex-native/currency/currency.sh condition
+ExecStart=@FLOCK_BIN@ --nonblock %h/.local/state/native-agent-stack/codex-currency/currency.lock @DAGU_BIN@ start --context local --dagu-home %h/.local/state/native-agent-stack/codex-currency/dagu @REPOSITORY@/examples/codex-native/currency/dag.yaml

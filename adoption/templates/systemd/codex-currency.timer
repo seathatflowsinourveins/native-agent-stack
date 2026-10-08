@@ -1,0 +1,12 @@
+# PROPOSED ONLY. Source: systemd v259 systemd.timer(5).
+[Unit]
+Description=Proposed daily Codex upstream release check
+
+[Timer]
+OnCalendar=daily
+Persistent=true
+RandomizedDelaySec=15m
+Unit=codex-currency.service
+
+[Install]
+WantedBy=timers.target

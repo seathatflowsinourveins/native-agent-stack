@@ -5570,6 +5570,16 @@
       "bytes": 2953
     },
     {
+      "path": "adoption/templates/systemd/codex-currency.service",
+      "sha256": "97c8a4584c0940a12e2297a0cbe4d5edd263c0de60cde2f32a4fae5c80b48e77",
+      "bytes": 944
+    },
+    {
+      "path": "adoption/templates/systemd/codex-currency.timer",
+      "sha256": "2184004f685d4ce2e3701cca595585ce28f9c86bf1f5428dc7f7056ee5a7ca64",
+      "bytes": 246
+    },
+    {
       "path": "adoption/templates/systemd/hindsight-research.mcp-tools.env.template",
       "sha256": "40194cdcdcb29db3976e5d5541204ca08d0909bfa45ae48cc992ba7e75ec3a1d",
       "bytes": 228
@@ -18144,6 +18154,11 @@
       "path": "docs/decisions/2026-10-07-validate-module-shards.md",
       "sha256": "f10a8c8f8841c91d5050611dfc7ec15ab278d5650bc5aff9ba65bf746b733c64",
       "bytes": 15329
+    },
+    {
+      "path": "docs/decisions/2026-10-08-codex-0162-stage-and-currency-proposal.md",
+      "sha256": "1789cbcaf5708454002a2ed207d64446bcf82fee075b56f2d61b241ba4fbe1a8",
+      "bytes": 6948
     },
     {
       "path": "docs/decisions/2026-10-08-coordinator-research-routing.md",
@@ -55391,6 +55406,11 @@
       "bytes": 9942
     },
     {
+      "path": "evidence/receipts/codex-0162-stage-canary-20261008.json",
+      "sha256": "d7b889d62673bdbe00376804a4dc26333b7e6b7f8316684b413915420ca14ee8",
+      "bytes": 9045
+    },
+    {
       "path": "evidence/receipts/codex-desktop-live-20260920.json",
       "sha256": "4333ca2c8b4f78caee98f9e38ae624104e6cbd410134a9f103153d47d5c97551",
       "bytes": 12905
@@ -56529,6 +56549,26 @@
       "path": "examples/codex-native/config.agents.toml.example",
       "sha256": "c3247195b40f2c1b042b70c90b6273412f5019c5cc0b3d814241d25910b769fd",
       "bytes": 2139
+    },
+    {
+      "path": "examples/codex-native/currency/README.md",
+      "sha256": "59df438809374738c6dea2da95c886df456df53227b98ee6e5c1ae8bf8868429",
+      "bytes": 10165
+    },
+    {
+      "path": "examples/codex-native/currency/currency.sh",
+      "sha256": "e15169d96d7307fd59aea79b8f188a3b41f46ae409a2cdc09de3724e4f159658",
+      "bytes": 15808
+    },
+    {
+      "path": "examples/codex-native/currency/dag.yaml",
+      "sha256": "d4d85bfde8ea7256d9cdcd7473c41422d111cef97c624dfef238fea74ca697fa",
+      "bytes": 958
+    },
+    {
+      "path": "examples/codex-native/currency/environment.example",
+      "sha256": "f6057b6adf3e5e06080c252ea07e000b73345acb0a6ec1502eb23dae8d2d93c4",
+      "bytes": 461
     },
     {
       "path": "examples/deepagents-omniroute/README.md",
@@ -57874,6 +57914,11 @@
       "path": "tests/test_codex_agents.py",
       "sha256": "520e1712174fe4ec252590ecf40e85765d5ee82345da10622c8fb58d3a6f680d",
       "bytes": 40406
+    },
+    {
+      "path": "tests/test_codex_currency.py",
+      "sha256": "d91259935c72a0c30bde44d5f87f46e09861fdd90db0dc4e6402e799c6e62733",
+      "bytes": 16014
     },
     {
       "path": "tests/test_codex_hook_trust.py",
