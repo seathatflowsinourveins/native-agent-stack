@@ -323,8 +323,8 @@ agent-messaging() {
 
 sandbox-runtime-srt() {
   # sandbox-runtime (srt) | npm-global | planned
-  # Planned. Source: https://raw.githubusercontent.com/anthropics/sandbox-runtime/v0.0.78/README.md#L14
-  run_command 'npm install -g @anthropic-ai/sandbox-runtime@0.0.78' || return "$?"
+  # Planned. Source: https://raw.githubusercontent.com/anthropics/sandbox-runtime/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/README.md#L14
+  run_command 'npm install -g @anthropic-ai/sandbox-runtime@0.0.79' || return "$?"
   copy_config 'srt-client-accept.sh' || return "$?"
   copy_config 'acceptance-execution-instructions.txt' || return "$?"
 }

@@ -527,8 +527,8 @@ no gateway operation and no credential read. The earlier global counts and run h
   Its remaining upstream assertions then run separately; the script's exit 1 stays an upstream failure.
   Interop records `cmd.exe`'s own exit and its version line. F3 failed OpenHands user units belong to the runtime-worker
   owner. No extra client-session check applies to an OS image.
-- **`sandbox-runtime-srt`** keeps the upstream `npm install -g @anthropic-ai/sandbox-runtime@0.0.78` route and
-  `srt echo "hello world"` smoke. The stack, profile, tarball checksum and architecture selectors now match 0.0.78.
+- **`sandbox-runtime-srt`** keeps the upstream `npm install -g @anthropic-ai/sandbox-runtime@0.0.79` route and
+  `srt echo "hello world"` smoke. The living install plan now targets 0.0.79, matching the current stack/profile; dated policy and architecture evidence retains its original scope.
   `accept.sh --only sandbox-runtime-srt --stage after_sign_in` adds a fresh Claude native Bash execution of that smoke
   and the documented `srt --settings` policy form. Set `SRT_ACCEPT_FIXTURE_ROOT`, `SRT_ACCEPT_POLICY`,
   `SRT_ACCEPT_DENY_READ`, `SRT_ACCEPT_DENY_WRITE` and `SRT_ACCEPT_ALLOWED_DIR` to existing disposable synthetic fixtures,

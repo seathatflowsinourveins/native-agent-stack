@@ -4800,6 +4800,22 @@
         "Release metadata source review and archive integrity are separate from the imported native operation; no provider/model/broker/GPU/runtime/service/client changes were made."
       ],
       "path": "evidence/receipts/native-sandbox-codex-binding-20261008.json"
+    },
+    {
+      "id": "row70-defect-a-install-plan-20261008",
+      "kind": "artifact_measurement",
+      "component_ids": [
+        "sandbox-runtime"
+      ],
+      "claim": "The living new-WSL sandbox-runtime selector, actual npm install function and plan record consistently target0.0.79 at d9aac209. Existing native plan consistency, script syntax and source checks pass; no host install, policy or client/model operation was executed.",
+      "limitations": [
+        "This is a prospective install-plan/source correction, not a new npm install, sandbox/client/model run, policy qualification or new-host acceptance.",
+        "The pinned earlier Claude receipt and all existing0.0.77/0.0.78 native/policy observations retain their original bytes and scopes.",
+        "DefectA alone is changed. RecordsB-E and the optional retained Claude-session note are reserved for a separate records PR.",
+        "Generator discovery was bounded to plan/scripts/tools; the original U2 gen_plan.py export is historical, while current check_plan.py supplies the available native consistency route.",
+        "Catalogue/profile/handbook/workflow/credential/runtime/broker state is unchanged; S4 closure remains CC-owned."
+      ],
+      "path": "evidence/receipts/row70-defect-a-install-plan-20261008.json"
     }
   ],
   "files": [
@@ -40741,8 +40757,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/README.md",
-      "sha256": "1d04d9e1d16d7f351476b7bc394c9e86bc651899e4e7515403f48a343d8fc05b",
-      "bytes": 97923
+      "sha256": "f399735ce298ce3644f3516e526b0c9edd0b7324e72723b38dda1ee428080919",
+      "bytes": 97988
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
@@ -41191,13 +41207,13 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
-      "sha256": "d7181dc3eb48d99e1c3a3d5f421b4b011c60e18807376eab71071e1f94b73c8f",
-      "bytes": 487472
+      "sha256": "a12ef9e9fe82bd016ef977ba4f06a576cda8516febdb1156e69fa9602d85ee87",
+      "bytes": 487688
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
-      "sha256": "8f60f6def61bf40ee6e5a9ac620e4a4a2da114634a0c0495dbc33bc753a8aa77",
-      "bytes": 134338
+      "sha256": "531c3f70b0f1189a6a0ebbabba8c5ac1dd281f2df726b17e613ef3c7400984b5",
+      "bytes": 134371
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/mise.toml",
@@ -48218,6 +48234,11 @@
       "path": "evidence/artifacts/row70-codex-binding-20261008/version.stdout.txt",
       "sha256": "8c52412b1e17f6490f8ce8a10dbe32111d809b052a85bf828b52eef9c34add77",
       "bytes": 7
+    },
+    {
+      "path": "evidence/artifacts/row70-defect-a-20261008/source-checks.json",
+      "sha256": "1fd43b67b8804f24920bb335ab1667e1ea85247ae922a22449009632648b4632",
+      "bytes": 4575
     },
     {
       "path": "evidence/artifacts/rtk-051-file-list-control-20261004/README.md",
@@ -55838,6 +55859,11 @@
       "path": "evidence/receipts/prometheus-3150-qualification-20260926.json",
       "sha256": "8687b8fd444c6673ab03f28e02d9599d64030a8c1438e2280d6e8c56b6548452",
       "bytes": 17112
+    },
+    {
+      "path": "evidence/receipts/row70-defect-a-install-plan-20261008.json",
+      "sha256": "1b16663a9d577e8b90a356ba646cfa940b6738d23913545bbfc9407f40821464",
+      "bytes": 2535
     },
     {
       "path": "evidence/receipts/rtk-050-qualification-20260925.json",

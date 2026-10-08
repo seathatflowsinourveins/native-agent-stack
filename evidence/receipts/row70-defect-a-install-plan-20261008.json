@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "id": "row70-defect-a-install-plan-20261008",
+  "kind": "artifact_measurement",
+  "evidence_class": "local_integration",
+  "claim": "The living new-WSL sandbox-runtime selector, actual npm install function and plan record consistently target0.0.79 at d9aac209. Existing native plan consistency, script syntax and source checks pass; no host install, policy or client/model operation was executed.",
+  "component_ids": [
+    "sandbox-runtime"
+  ],
+  "recorded_at_utc": "2026-10-08T17:02:52Z",
+  "status": "living_recipe_corrected",
+  "sources": [
+    "https://github.com/anthropics/sandbox-runtime/blob/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/README.md",
+    "https://github.com/anthropics/sandbox-runtime/releases/tag/v0.0.79"
+  ],
+  "artifacts": [
+    {
+      "path": "evidence/artifacts/row70-defect-a-20261008/source-checks.json",
+      "bytes": 4575,
+      "sha256": "1fd43b67b8804f24920bb335ab1667e1ea85247ae922a22449009632648b4632",
+      "hash_scope": "published_sanitized_bytes"
+    }
+  ],
+  "checks": [
+    {
+      "name": "native_plan_checker",
+      "result": "pass",
+      "exit_code": 0,
+      "scope": "84rows/193commands/113acceptance entries match their source scripts; source/list checks only."
+    },
+    {
+      "name": "install_script_bash_syntax",
+      "result": "pass",
+      "exit_code": 0
+    },
+    {
+      "name": "three_file_independent_source_critic",
+      "result": "pass",
+      "scope": "Actual dispatcher/function/selector/release/pinned citations; other rows and acceptance commands/kinds unchanged."
+    }
+  ],
+  "limitations": [
+    "This is a prospective install-plan/source correction, not a new npm install, sandbox/client/model run, policy qualification or new-host acceptance.",
+    "The pinned earlier Claude receipt and all existing0.0.77/0.0.78 native/policy observations retain their original bytes and scopes.",
+    "DefectA alone is changed. RecordsB-E and the optional retained Claude-session note are reserved for a separate records PR.",
+    "Generator discovery was bounded to plan/scripts/tools; the original U2 gen_plan.py export is historical, while current check_plan.py supplies the available native consistency route.",
+    "Catalogue/profile/handbook/workflow/credential/runtime/broker state is unchanged; S4 closure remains CC-owned."
+  ],
+  "inverse": {
+    "publication": "Revert only the three living plan edits and this unit's new receipt/artifact/registry bindings.",
+    "host_inverse_executed": false,
+    "host_state_changed": false
+  }
+}
