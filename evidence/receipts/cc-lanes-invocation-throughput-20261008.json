@@ -346,5 +346,5 @@
       "what": "Two public Grafana docs paths HTTP404, recovered through published index"
     }
   ],
-  "paid_gateway_reader_calls": 0
+  "explicit_claude_gateway_reader_calls": 0
 }

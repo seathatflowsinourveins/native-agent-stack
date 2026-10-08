@@ -17912,6 +17912,11 @@
       "bytes": 15329
     },
     {
+      "path": "docs/decisions/2026-10-08-cc-lanes-invocation-throughput.md",
+      "sha256": "37a1f2dcf8ae385c62aa373cd76824e847523f5f3143cfeb65d57eef285da5cb",
+      "bytes": 7807
+    },
+    {
       "path": "docs/decisions/2026-10-08-philosophy-only-rules.md",
       "sha256": "f4b4f1d9952db662d8c0c9f1f9aec24da40c4666e4655e105c0617a689e6826c",
       "bytes": 10028
@@ -40703,8 +40708,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/grafana-lanes.json",
-      "sha256": "01f95f3cf7353644ba93b2bc234356982f6612bc5232de02a0d5e1c16bfa55da",
-      "bytes": 81763
+      "sha256": "b91af83428120cba43a7e232d4c76081ecac7fd7f4c4697d8350c77fa761453e",
+      "bytes": 91275
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/grafana-native-foundation-data.json",
@@ -54832,6 +54837,11 @@
       "bytes": 1231
     },
     {
+      "path": "evidence/receipts/cc-lanes-invocation-throughput-20261008.json",
+      "sha256": "919c08548c1d57c3b154916da53819f889c939279b2912780e5f48ac2d61b057",
+      "bytes": 11542
+    },
+    {
       "path": "evidence/receipts/ccusage-20026-qualification-20260927.json",
       "sha256": "0d610a6415fbd9eb173047e57286626205f5312b2c90aba1aae7c67a4b69b427",
       "bytes": 14696
@@ -56528,8 +56538,8 @@
     },
     {
       "path": "observability/lanes_dashboard.py",
-      "sha256": "f97b8cb68ca0e3fad8ce24d243c46d2a4d69ddc925ea50c671279d2c905caf9f",
-      "bytes": 25250
+      "sha256": "b11feeb09a09adb8c1dd1675dd26c2fbffab3d434da7cbe8d73203c4eaef5080",
+      "bytes": 30388
     },
     {
       "path": "observability/memory-scheduled-20260923.json",
