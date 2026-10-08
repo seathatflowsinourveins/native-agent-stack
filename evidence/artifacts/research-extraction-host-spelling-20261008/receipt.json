@@ -2,7 +2,7 @@
   "schema_version": 1,
   "evidence_class": "local_integration",
   "subject": "PR875 P3 extraction-host/citation follow-up; restored scope",
-  "checked_at": "2026-10-08T19:10:38Z",
+  "checked_at": "2026-10-08T19:13:56Z",
   "base": "a484989a43f70ff2575b6fb054cf00c9834e7679",
   "upstream": {
     "repository": "https://github.com/deedy5/ddgs",
@@ -55,8 +55,8 @@
       "all existing input/witness/partial/interruption contracts"
     ]
   },
-  "source_critic": "PENDING_RESTORED_DELTA",
-  "independent_reader": "Prior P3 ACK retained; restored scope plus conservative backslash refusal pending exact native main-test comparison",
+  "source_critic": "COMPLETE_RESTORED_DELTA",
+  "independent_reader": "Prior P3 ACK retained; restored source critic COMPLETE and unchanged main-test comparison passed 27/27; no new provider read claimed",
   "boundaries": [
     "No live network or model call, installer or active configuration change by these checks.",
     "No DNS, redirect, arbitrary-URL or broad IDNA qualification.",
@@ -73,7 +73,30 @@
       "2d284a63709bcc071bc9c4b3bf52e032c04f4a65"
     ],
     "restored_content": "cae36093 plus conservative backslash refusal/test and non-vacuous retained-record assertion",
-    "main_test_against_fresh_merge": "PENDING",
-    "historical_failure": "Expanded backend added mandatory witness fields and failed3of27 unchanged main tests; rejected feature history retained."
+    "main_test_against_fresh_merge": {
+      "base": "be7273a43c35f25002be8b481683c475482d661c",
+      "tested_head": "d3c0c019eff51d50c35bc1ea8617a5de62dd7a85",
+      "merge_index_tree": "d202935697ae2c710a0c9a277e87e4011b1e3f01",
+      "source_file": "tests/test_research_dispatch_exact_queries.py",
+      "source_sha256": "14459ef71db5b6118dacbb93acd68112a3faa99dc5685a1aa58cc4fdcdece59d",
+      "bytes": 37274,
+      "tests": 27,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "exit_code": 0,
+      "seconds": 0.838,
+      "method": "Unchanged main bytefile temporarily used only in a disposable detached merge copy; same bytes verified after run, PR test restored."
+    },
+    "historical_failure": "Expanded backend added mandatory witness fields and failed3of27 unchanged main tests; rejected feature history retained.",
+    "PR_tests_against_same_merge": {
+      "source_sha256": "6b54cddf5e3fb9ab75600c3f9f4be7e60a6465bcc0d66ee66cd408e32d110da9",
+      "tests": 32,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "exit_code": 0,
+      "seconds": 0.863
+    }
   }
 }
