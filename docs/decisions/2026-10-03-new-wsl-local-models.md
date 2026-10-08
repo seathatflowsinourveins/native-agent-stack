@@ -76,10 +76,10 @@ with the embedder resident; `qwen3.8:27b` stayed at 92.6% and failed. By the rul
 slot. A1b also showed that with the server-wide context of 64,000 the embedder loaded at its full context and took
 5.78 GB; the context belongs to each model, not to the server.
 
-**The extension (amendment 3, 19:18:52Z, before any trial of a new arm).** At about 18:20Z the owner asked, verbatim:
-"please only using the latest sota models, with newest advanced releases, you can use the hf key and essential stacks
-it related repos of local model optimization etc". The result above was kept as historical, and new arms, selected from
-primary sources by the Codex lane, entered under rules hashed before their first trial:
+**The extension (amendment 3, 19:18:52Z, before any trial of a new arm).** The 18:20Z review reopened current model candidates.
+The comparison uses publisher source/packing declarations and the [Ollama Modelfile contract](https://docs.ollama.com/modelfile);
+embedding evaluation retains the [MTEB task methodology](https://arxiv.org/abs/2210.07316). The earlier result stays historical.
+New arms selected from those primary sources entered under rules hashed before their first trial:
 
 - S1 and S1b: Ternary-Bonsai-2-27B in the packings PTQ1_0 and PQ2_0 (S1b only on S1's failure), on PrismML's
   llama.cpp, a second model server.

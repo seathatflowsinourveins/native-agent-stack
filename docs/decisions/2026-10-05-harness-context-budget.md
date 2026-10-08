@@ -210,8 +210,8 @@ behavior while bounding the owned surface. Overturn this choice when:
   adopt it and remove the redundant local gate.
 - A document watch or client update changes file discovery, imports, skill listing
   or native RTK initialization; verify the new source and remeasure before adoption.
-- The user revises the standing LLM-native invocation directive or an upstream
-  change supplies better native discovery while preserving proactive invocation;
+- An upstream interface or the required invocation scope changes; repeat the same byte and activation checks,
+  preserving the bounded measurement and its native evidence-class limits.
   compare host listings and invocation evidence in a dated listing decision.
   Startup file savings alone do not justify hiding a skill's description.
 - Real task evidence shows a relocated rule is not reached through its pointer;
@@ -358,7 +358,7 @@ seeds 0.05 and an unrelated host key, proves dry-run preservation, checks both
 after apply, and checks the backup and identical second apply. Actual 2604
 read-back of 0.05 and the native Skills row remain a coordinator host gate. The
 native 1% default documented by [Claude](https://code.claude.com/docs/en/skills)
-does not supersede the user's invocation directive.
+does not establish a new invocation scope; native source support and the retained activation checks govern that claim.
 
 ### Expanded byte scope and fixed amended ceilings
 

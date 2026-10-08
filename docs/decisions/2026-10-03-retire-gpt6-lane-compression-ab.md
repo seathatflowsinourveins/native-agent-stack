@@ -41,13 +41,13 @@ a new preregistration for work whose bindings have changed.
 
 ## Scope: the instrument only. It does not decide compression on 20128.
 
-Main's open decision (a) is unchanged. The relevant wording in
-[2026-09-30-omniroute-rebuild.md L276-279][decision-a-quote] is:
+Compression on 20128 remains an open scoped comparison as of the dated 2026-09-30 review.
+The [upstream compression/exclusion implementation][compression-gate-source] defines the route's supported behavior.
 
-> **Open user decisions.** (a) Compression on 20128 (the Codex lane itself; it would rewrite real Codex CLI traffic). The
-> user's conditional answer of 2026-09-30 about 02:25Z, relayed by another session and not seen first-hand here, was "yes
-> if SOTA converged, the quality itself needs to be maintained at suitable high output": a reproduced saving on real
-> traffic and no output regression. It is **not applied**.
+A qualifying change must reproduce savings on the actual Codex route, retain the tool-output contract, and pass
+the same frozen quality and recovery gates with and without compression. Use the upstream harness for that comparison;
+a headerless diagnostic that compresses zero tokens supplies no saving result for a different route.
+The change remains **not applied**; recorded native passthrough and the open comparison are preserved.
 
 The unchanged [foundation-stack.md L250][foundation-l250] says:
 
@@ -72,7 +72,7 @@ the instrument would change its treatments, harness qualification and scope.
 ## What main already records about the question
 
 The following retain the evidence qualifications in
-[2026-09-30-omniroute-rebuild.md L276-295][decision-a]. These are a reading of
+[2026-09-30-omniroute-rebuild.md L280-293][decision-a], scoped by [native compression behavior][compression-gate-source]. These are a reading of
 main's dated record, not a new model run or a rerun of its probes:
 
 - **Headerless:** 0 compressed tokens in all 115 joined rows of the three-arm
@@ -385,7 +385,7 @@ The other twelve stay unchanged as dated, frozen or convergence-bound records:
   coordination evidence retained on 2026-09-28.
 
 Related decision text that does not name #431 also stays unchanged:
-[2026-09-30-omniroute-rebuild.md L276-295][decision-a] and
+[2026-09-30-omniroute-rebuild.md L280-293][decision-a], scoped by [native compression behavior][compression-gate-source], and
 [foundation-stack.md L249-252][foundation-compression], including open
 decision (a) and every "reported, not reproduced here" qualification.
 
@@ -408,7 +408,7 @@ build**, if upstream rewrites Codex content-part-array tool outputs, a measured
 saving appears on main's untested boundaries (string-shaped shell outputs or
 very long sessions), or the user asks. The comparison that would overturn
 retirement is a current, qualified treatment demonstrating savings while
-meeting the frozen quality and exact-value gates. Main's [L276-295][decision-a]
+meeting the frozen quality and exact-value gates. Main's [L280-293][decision-a], scoped by [native compression behavior][compression-gate-source],
 remains the acceptance condition for decision (a); an obsolete or unrun draft
 cannot supply it.
 
@@ -458,9 +458,9 @@ every `#431` reference on main at the source-review base.
 [apply]: https://github.com/seathatflowsinourveins/native-agent-stack/pull/431#issuecomment-5863011729
 [vela]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-09-25-retire-vela-velanext.md
 [rebuild]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-09-30-omniroute-rebuild.md#L1
-[decision-a]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-09-30-omniroute-rebuild.md#L276-L295
-[decision-a-quote]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-09-30-omniroute-rebuild.md#L276-L279
-[settings]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-09-30-omniroute-rebuild.md#L64-L85
+[decision-a]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-09-30-omniroute-rebuild.md#L280-L293
+[compression-gate-source]: https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/open-sse/handlers/chatCore.ts#L1429-L1449
+[settings]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-09-30-omniroute-rebuild.md#L69-L85
 [stored-combos]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-09-30-omniroute-rebuild.md#L81-L85
 [omniglyph-off]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-09-30-omniroute-rebuild.md#L115
 [removed-scoping]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-09-30-omniroute-rebuild.md#L117

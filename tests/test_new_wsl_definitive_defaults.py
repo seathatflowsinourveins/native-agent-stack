@@ -1059,17 +1059,17 @@ class Manifest(unittest.TestCase):
                                       row["interim"]["authority"]["kind"].replace("_", " "), row["interim"]["decided_by"]]
                                      for row in self.rows if row.get("interim")])
 
-    def test_consensus_decision_record_quotes_the_rule_and_the_owner(self):
+    def test_current_consensus_record_keeps_contracts_and_uses_primary_sources(self):
         text = CONSENSUS_RECORD.read_text(encoding="utf-8")
         self.assertIn(self.consensus["rule"], text)
         self.assertIn(self.wave2["interim_rule"], text)
         self.assertIn(self.wave2["no_install_rule_exception"], text)
-        self.assertIn(self.consensus["authorization"]["verbatim"], text)
+        self.assertNotIn(self.consensus["authorization"]["verbatim"], text)
         for sid in list(self.consensus_rows) + [entry["slot_id"] for entry in self.amend_rows] + list(self.interims):
             self.assertIn(f"`{sid}`", text, sid)
         for sentence in self.consensus["not_established"]:
             self.assertIn(sentence, text)
-        # The earlier record points to this one outside its generated tables.
+        self.assertRegex(text, r"https://github\.com/[^/]+/[^/]+/blob/[0-9a-f]{40}/")
         earlier = RECORD.read_text(encoding="utf-8")
         outside = earlier[:earlier.index("<!-- tables:begin")] + earlier[earlier.index("<!-- tables:end -->"):]
         self.assertIn(CONSENSUS_RECORD.name, outside)

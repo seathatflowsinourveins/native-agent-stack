@@ -1,18 +1,18 @@
 # Decision: the token layer is the new distribution's client default (2026-10-04)
 
-## Directive
+## Native configuration practice
 
-The owner's instruction of 2026-10-04, verbatim:
+The dated 2026-10-04 configuration review triggered the native integration scope below.
 
-> WE NEED TO ENABLE FULL SOTA STACKS FOR THE TOKEN EFFICIENCY REPOS INSTALL CLEANLY MAKE SURETHEY LIVE SEAMLESSLY AS
-> OUR NATIVE WORKFLWO FOR FUTURE SESSION DEFAULT TO LAUNCH AND INVOKE ,CLENA RESOLUTE AND REPORT THE MAIN SESSION WHEN
-> READY with real new session launched e2e monitor invoke rate and upstream commands e2e with using of the sota related
-> full lifecycle skills, the token save is essential layer make sure we are monitored token use and sota token save
-> repos invoke rate with new session launched e2e m keep resolute untill the upstream are fully resoluted and live
-> within our native workflow including ultracode subagent,experimental agent team in our wsl with upstream commands for
-> showing the real saved and sota resoluted practices upstream clean installed
+Install selected token integrations through their shipped lifecycle interfaces and retained source pins,
+including [RTK's native initializer](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/hooks/init/codex.rs) and [Context Mode 1.0.169](https://github.com/mksglu/context-mode/blob/v1.0.169/README.md).
+SessionStart notices and task-specific SubagentStart carriers retain separate loading and lifecycle checks.
+Monitor invocation and native usage counters without treating installed components or unexecuted plans as savings.
+The profile's Ultracode/subagent and experimental-team settings remain the declared configuration choices below;
+they do not turn the repository's token-stack diagnostic into a qualified upstream A/B result.
+Destination loading, useful invocation and native counter observations are required for a new execution claim.
 
-This record applies that directive to NativeStack2604's client configuration. The configuration is built by
+This record states NativeStack2604's client configuration practice. The configuration is built by
 `tools/adoption/new_wsl_client_config.py` from `adoption/new-wsl/client-config-map.json`. The workstation
 (NativeStack) already runs these pieces.
 
@@ -32,7 +32,7 @@ distribution does not install stays unwired.
 
 ### How each piece works
 
-1. **The `directive` field.** A slot entry may name the dated record of an owner's directive. The builder then wires
+1. **The `directive` field.** A slot entry may name its dated, source-backed configuration record. The builder then wires
    the entry's owner beside what the slot installs, but only while the slot installs anything. If the slot's deciding
    measurement ends with the slot installing nothing, the rtk pieces unwire along with it. `--check` fails when the
    record is not a file of the repository. The manifest is not changed: context-supply's decided default and its

@@ -8,10 +8,10 @@ install installs the defaults and nothing else. The other finalists of a slot ar
 head-to-head that used to gate the slot is now the default's overturn check: the one comparison, and the result in
 it, that would replace the default.
 
-The user asked for this on 2026-10-01 at about 20:35Z, verbatim: "WE NEED DEFINTIVE CONVERGENCED ARCHITECTURE, WITH
-EVIDACNE FORM UPSTREAM EVL, NO MORE ONE OF ,OR MISSING LAYERS, A FINALIZED CLEAN ARCHITECTURE, a clean resoluted form
-codex convergence , via gpt powered sdks harness frameworks of research etc, deerflow,gptr,openhand and beyond, using
-them as they are already harness built , evl the best repos in each layer for our new wsl codex-cc ecosystem".
+The 2026-10-01 selection records one clean-install default per slot for the new WSL Codex/Claude ecosystem.
+Native clients and the DeerFlow, GPT Researcher and OpenHands research/worker arms use their shipped interfaces.
+Comparisons retain upstream harness provenance, including [Harbor's native task interface](https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/README.md), with source review and executed results distinguished.
+The slot tables below preserve the dated decisions, open comparisons and destination acceptance limits.
 
 What a default is, what makes it definitive, and what neither is:
 
@@ -443,15 +443,15 @@ retrieval adverse; medium-low confidence", and if the head-to-head installs ai-m
 
 ## The rows that had been missing
 
-- **cross:gpt6-harnesses:** OmniRoute as the GPT gateway, pinned by the user's directives ("docker cli via omni powered
-  by highest quality gpt6.1 sol", "keep max utilization of gpt lane via omni"). It was never judged blind. No committed
+- **cross:gpt6-harnesses:** OmniRoute is the recorded GPT gateway at the dated Sol/max configuration;
+  [its pinned model/effort code](https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/executors/codex/reasoningSuffix.ts) supplies the native interface. It was never judged blind. No committed
   gateway configuration names a GPT-6.1 Sol model id, and the gateway's cached provider limits read 0 remaining on all
   six accounts at the 2026-10-01T20:59Z sync.
 - **cross:runtime-workers:** the OpenHands software-agent-sdk as the agent runtime worker, and GPT Researcher and
-  DeerFlow as two independent evidence gatherers, all named by the user's directive above. None has a run on GPT-6.1
+  DeerFlow are two separately named evidence gatherers in this dated selection. None has a run on GPT-6.1
   Sol through the gateway on record, and the three recipes on pull request 535 reject the Sol model id; a bounded
   repair is requested there. Each recipe wraps upstream in project-written dispatch code; running the three from
-  their upstream entry points, as the directive asks, is a separate follow-up.
+  their upstream entry points, with retained native task evidence and limits, is a separate follow-up.
 - **cross:credential-practice and cross:convergence-practice:** the project's own guard and validators. They are
   project practice, not third-party repositories, and their closure records settle them.
 - **The 12 us-equities layers:** the trading lane's rows. NautilusTrader 2.0.0rc5, its IBKR path and the Alpaca adapter

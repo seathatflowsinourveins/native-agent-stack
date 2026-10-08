@@ -8,9 +8,9 @@ North-star action: preserve the evidence and durable failure lessons needed for 
 
 ## Directive and review boundary
 
-The user's directive at **2026-10-05T05:51:21Z**, quoted verbatim:
+The 2026-10-05T05:51:21Z review triggered a bounded publication of already archived evidence.
 
-> "we can update all the sota convergence practice into github and sota local file practice,make sure the new session are clean sota with the sota repos upstream practice rather than inherited our without sota convergence, the new wsl need to stay clean sota itself"
+Immutable [Git object identities](https://git-scm.com/book/en/v2/Git-Internals-Git-Objects) preserve source custody; current adoption still follows versioned upstream recipes and independent destination acceptance.
 
 The job-077 cross-family read (`verdict-claude-triage.md`, 2026-10-05) defines the "Publish now" scope. Its findings replace the earlier `TRIAGE.md` and `publication-plan.json` publication proposal; those files supply row data only. The index below retains all **191 unique paths** and the original triage classes: **127 conclusion-landed-elsewhere, 59 publish-as-dated-historical-record, 5 scratch**. All **189 available archive blobs** match their triage SHA-256 values. The two owner-withheld paths have specific superseding sources instead of nonexistent archive links.
 

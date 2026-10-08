@@ -1741,14 +1741,14 @@ except for the dated exception below. Turning any of them on is a deliberate
 choice to copy tool traffic into the local store; the checker then reports
 `claude_telemetry_logs_content: true`.
 
-**Exception: tool details (user decision, 2026-09-26).** Asked in the
-workstation coordinator session whether to enable `OTEL_LOG_TOOL_DETAILS=1`
-with name-only filtering in the Collector, the user answered "1 and full sota
-convergence practice we proceed". `adoption/templates/claude.settings.template.json`
-changed after `v2026.09.26.2` accordingly: it sets the flag to `"1"`, where a
-host at that tag writes `"false"`. Bash commands and tool input still reach the
-local Collector, so the control sits there
-([decision record](decisions/2026-09-26-tool-invoke-rates.md)):
+**Tool-detail boundary (2026-09-26).** The workstation profile enables
+`OTEL_LOG_TOOL_DETAILS=1` while the Collector exports only the bounded name projection below.
+The [versioned OTel transform processor](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.161.0/processor/transformprocessor/README.md) supplies the transformation primitives; local canary evidence supplies the privacy result.
+`adoption/templates/claude.settings.template.json` changed after `v2026.09.26.2`:
+it sets the flag to `"1"`, whereas a host at that tag writes `"false"`.
+Bash commands and tool input still reach the local Collector, so its projection and deletion
+controls remain the export boundary. Installation state and a native-client flag alone do not prove that boundary.
+The configured processors and retained proof are:
 
 - `transform/tool_names`, in both logs pipelines before `transform/privacy`,
   copies out of `tool_parameters` only the MCP server and tool names and the
