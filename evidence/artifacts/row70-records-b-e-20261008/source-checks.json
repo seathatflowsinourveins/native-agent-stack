@@ -197,10 +197,13 @@
     {
       "name": "independent_source_critic",
       "result": "PASS within bounded source-record scope",
-      "artifact": "evidence/artifacts/row70-records-b-e-20261008/independent-critic.md",
-      "bytes": 9171,
-      "sha256": "16fe799f6a9075b9856fae3eb584c0ed4deb667233bf5e288bb47997392489e3",
-      "scope": "Actual sanitized independent output retained byte-for-byte; source/evidence associations and prior handbook history checked, not a new operational acceptance."
+      "artifact": "evidence/artifacts/row70-records-b-e-20261008/independent-critic.json",
+      "bytes": 9811,
+      "sha256": "bdf53e7609e865baa9388ef8ce863ff3a65c937c552bd2529e69a9b59ef5d384",
+      "actual_output_field": "/actual_output",
+      "actual_output_bytes": 9171,
+      "actual_output_sha256": "16fe799f6a9075b9856fae3eb584c0ed4deb667233bf5e288bb47997392489e3",
+      "scope": "The public JSON artifact is retrievable and hash-bound; decoding its actual_output string preserves every original UTF-8 report byte. Source/evidence associations and prior handbook history are checked, not a new operational acceptance."
     }
   ],
   "preservation": {

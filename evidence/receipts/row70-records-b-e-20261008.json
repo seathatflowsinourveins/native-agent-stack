@@ -67,8 +67,8 @@
     ],
     "source_checks": {
       "path": "evidence/artifacts/row70-records-b-e-20261008/source-checks.json",
-      "bytes": 13902,
-      "sha256": "281c5a6d60588156cfb445a1ecaeb02138eed584159e76e5dc08866487b276ab",
+      "bytes": 14162,
+      "sha256": "6b6a950c48877604b0dbb197c46986d54bc7dd9a6394ce5959d352e6400bcded",
       "hash_scope": "published_sanitized_bytes"
     },
     "independent_critic": {
