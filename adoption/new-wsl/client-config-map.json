@@ -705,6 +705,7 @@
         "codex/config/shell_environment_policy.set.LANG",
         "codex/config/shell_environment_policy.set.TERM",
         "codex/config/shell_environment_policy.set.TMPDIR",
+        "codex/config/shell_environment_policy.set.WSL_DISTRO_NAME",
         "codex/config/shell_environment_policy.set.XDG_RUNTIME_DIR"
       ],
       "wiring": "practice",
