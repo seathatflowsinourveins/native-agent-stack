@@ -1,0 +1,4 @@
+# The official PyPI wheel of graphiti-core 0.30.2, pinned by version and sha256
+# (https://pypi.org/pypi/graphiti-core/0.30.2/json). Install it only with --require-hashes
+# and -c graphiti-0.30.2.constraints.txt, in an interpreter of its own; see README.md.
+graphiti-core[falkordb]==0.30.2 --hash=sha256:97674a49514130db175faecf23221ce9338240be3cbe13a7e23e5a5033892b9f

@@ -4746,8 +4746,8 @@
     },
     {
       "path": ".github/osv-scanner-lockfiles.json",
-      "sha256": "3c7bed9c3899e22a022acf4172719dd510124d45664f24cf656def14e6ad999b",
-      "bytes": 15176
+      "sha256": "adb035111e2f87ee46f88e49b1f305d90f04b9bdfb9505d8797c58e3d7dba156",
+      "bytes": 15467
     },
     {
       "path": ".github/osv-scanner.toml",
@@ -16927,13 +16927,13 @@
     },
     {
       "path": "catalogs/us-equities/foundation-memory.json",
-      "sha256": "8e94846d16a9a5a16fcbe09cf3e2e6c5b205287b7cd354d2b4ec73cc8ceb578e",
-      "bytes": 80200
+      "sha256": "78221deddaf36ab5b9db06a8004fdf02d4e6f95c77f73dc41407977ad18e3a66",
+      "bytes": 82757
     },
     {
       "path": "catalogs/us-equities/foundation-memory.md",
-      "sha256": "effe53a745b895b1683634bf0e174a62012a0bb62d2f173d40582cea2476f7d9",
-      "bytes": 47825
+      "sha256": "f7d558f31b0472ffb33500b7d5f07a81cb8c32ba9a62fa83f07b290847e82676",
+      "bytes": 50101
     },
     {
       "path": "catalogs/us-equities/foundation-source-review.md",
@@ -54937,8 +54937,8 @@
     },
     {
       "path": "manifests/candidates.json",
-      "sha256": "58832b3c13b6b7c5f85a1ddbdaec7305b6d05273f8cebef35b4b8bfd4f8bca9e",
-      "bytes": 54594
+      "sha256": "b106f709e4e6f9aaa7d54d392f5dd51d0145042603387c10bcd835690637ed15",
+      "bytes": 56937
     },
     {
       "path": "manifests/landscape.json",
@@ -56156,6 +56156,11 @@
       "bytes": 22863
     },
     {
+      "path": "tests/test_graphiti_smoke.py",
+      "sha256": "e2dfad932aff327c6d9fc668a3962ecb65ca6aeb8d4e0ac72888a866a9812658",
+      "bytes": 10883
+    },
+    {
       "path": "tests/test_grype_known_cve_fixture.py",
       "sha256": "049395b4926374199da4c95d047d4359e9e5174c2be078b59388019bc0d6daf9",
       "bytes": 6657
@@ -57019,6 +57024,31 @@
       "path": "tools/credentials/credential_run.py",
       "sha256": "bcab1b94a1cdf73b630b50c45c6a8a0189de089e987abb21b327e4238bd04222",
       "bytes": 55887
+    },
+    {
+      "path": "tools/graphiti-smoke/README.md",
+      "sha256": "2b9650bfa80b7aa6b141f0f2ec8ac743c897b1577ffd34a77cdd6d1709da9267",
+      "bytes": 13395
+    },
+    {
+      "path": "tools/graphiti-smoke/expected-freeze.txt",
+      "sha256": "0a6df221a9f5413d27f12b4a74f30680c6b68578a004b3f9e91672fbc374cfc4",
+      "bytes": 525
+    },
+    {
+      "path": "tools/graphiti-smoke/graphiti-0.30.2.constraints.txt",
+      "sha256": "e3026f265a36e8c5c0dfc787146e5162dfa722e4606bfc0dd99658c0cb4ea870",
+      "bytes": 41237
+    },
+    {
+      "path": "tools/graphiti-smoke/requirements.txt",
+      "sha256": "4cbca1b3448ad3568e7d834d2a3fb93008d83d0cddc12e47f5129c50f2438531",
+      "bytes": 369
+    },
+    {
+      "path": "tools/graphiti-smoke/smoke.py",
+      "sha256": "95d08ba8a58fd0587cd4cc6b0c250380c167a8f7cb812c6d65a4a0abe1e41aed",
+      "bytes": 6637
     },
     {
       "path": "tools/invocation-monitoring/README.md",
