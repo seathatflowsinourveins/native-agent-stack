@@ -126,6 +126,45 @@ class CompactManifestTests(unittest.TestCase):
                                  "unpromoted_ids": self.witness("unpromoted-list-ids", ["awesome:entry:1", "awesome:entry:2"])}
         population["census_witness"] = self.witness("counted-list-census", {"status": "COUNTED", "expected_occurrences": deepcopy(population["expected_occurrences"]), "counted": deepcopy(population["counted"])})
 
+    def closure_physical_aliases(self):
+        row = self.native_entry()
+        raw_id = "example/awesome:README.md:2"
+        physical = {"occurrence_id": raw_id, "original_ledger_input_id": raw_id, "source_repository": "example/awesome", "source_path": "README.md",
+                    "source_line": 2, "source_pin": "b" * 40, "source_content_sha256": row["capture_sha256"], "archive_member": row["archive_member"],
+                    "linked_targets": [{"label": "Candidate", "repository": "example/project-0", "url": "https://github.com/example/project-0"},
+                                       {"label": "Another candidate on the same line", "repository": "example/project-1", "url": "https://github.com/example/project-1"}]}
+        physical_ref = self.witness("original-physical-receipt", {"occurrences": [physical]}) | {"pointer": "/occurrences/0"}
+        canonical_member = row["source_entry_witness"]["archive_member"]
+        mappings = [{"occurrence_id": raw_id, "repository_or_entry": row["repository_or_entry"], "slot": row["slot"],
+                     "archive_member": canonical_member, "capture_sha256": digest(self.files[canonical_member]), "pointer": "line:2"}]
+        original_aliases = []
+        for ordinal, prefix in enumerate(("list-screen:", "second-explicit-alias:")):
+            member = "captures/alias-representation-" + str(ordinal) + ".json"
+            self.files[member] = raw({"entry": {"entry": row["repository_or_entry"], "slot": row["slot"], "source_line": 2}})
+            record = {"occurrence_id": prefix + raw_id, "source_line": 2, "entry": row["repository_or_entry"], "slot": row["slot"],
+                      "archive_member": member, "capture_sha256": digest(self.files[member]), "pointer": "/entry", "kind": "awesome-list", "ordinal": None}
+            original_aliases.append(record)
+            mappings.append({name: record[name] for name in ("occurrence_id", "slot", "archive_member", "capture_sha256", "pointer")} |
+                            {"repository_or_entry": row["repository_or_entry"], "physical_occurrence_id": raw_id})
+        platform = {"collection": [{"source_repository": "example/awesome", "pin": "b" * 40, "file": "README.md", "occurrences": original_aliases}]}
+        platform_ref = self.witness("original-alias-receipt", platform)
+        aliases = []
+        for ordinal, record in enumerate(original_aliases):
+            aliases.append({name: record[name] for name in ("occurrence_id", "archive_member", "capture_sha256", "pointer")} |
+                           {"physical_occurrence_id": raw_id, "original_id": raw_id, "source_repository": "example/awesome", "path": "README.md", "line": 2,
+                            "physical_witness": physical_ref, "alias_collection_witness": platform_ref | {"pointer": "/collection/0"},
+                            "alias_occurrence_witness": platform_ref | {"pointer": "/collection/0/occurrences/" + str(ordinal)}})
+        row["source_refs"] = [{"occurrence_id": item["occurrence_id"], "archive_member": item["archive_member"], "sha256": item["capture_sha256"], "pointer": item["pointer"]} for item in mappings]
+        population = self.coverage["list_populations"][0]
+        population.update(archive_member=row["archive_member"], capture_sha256=row["capture_sha256"], expected_occurrences=mappings)
+        self.add_authority_witnesses()
+        alias_document = {"status": "FROZEN", "aliases": aliases}
+        population["counted"] = {"physical_entries": 1, "typed_source_ids": 1, "groups": 1, "duplicates_removed": 0, "overlap_stars": 1, "overlap_fields": 0,
+                                 "promoted_entries": 1, "promotion_rule": "retain original literal references; count physical source entries once",
+                                 "unpromoted_ids": self.witness("unpromoted-list-ids", []), "alias_witness": self.witness("physical-alias-map", alias_document)}
+        population["census_witness"] = self.witness("counted-list-census", {"status": "COUNTED", "expected_occurrences": deepcopy(mappings), "counted": deepcopy(population["counted"])})
+        return alias_document
+
     def closure_omission(self, code="source-primary-qualification-unresolved"):
         omission = {"code": code, "count": 1, "cc_disposition_id": "CC-item-212958Z",
                     "follow_up_id": compact.OMISSION_FOLLOW_UPS[code], "resolution": "retain the measured residue in the declared follow-up"}
@@ -308,6 +347,70 @@ class CompactManifestTests(unittest.TestCase):
         second["source_refs"][0]["pointer"] = "line:1"
         manifest, _ = self.closure_build()
         self.assertTrue(any(item["code"] == "unretained-list-occurrence" for item in manifest["validation"]["blockers"]))
+
+    def test_closure_two_receipt_proven_aliases_and_original_count_one_physical_entry(self):
+        self.closure_physical_aliases()
+        with self.assertRaises(compact.CompactError):
+            self.build()
+        manifest, _ = self.closure_build()
+        self.assertEqual(manifest["validation"]["status"], "PASS", manifest["validation"]["blockers"])
+        self.assertEqual(manifest["counts"]["expected_occurrences"], 1)
+        self.assertEqual(manifest["counts"]["retained_occurrences"], 1)
+        self.assertEqual(manifest["counts"]["literal_promoted_occurrences"], 3)
+        self.assertEqual(manifest["counts"]["promoted_mappings"], 3)
+        self.assertEqual(manifest["counts"]["physical_aliases"], 2)
+        self.rows[0]["source_refs"].pop()
+        manifest, _ = self.closure_build()
+        self.assertTrue(any(item["code"] == "unretained-list-occurrence" for item in manifest["validation"]["blockers"]))
+
+    def test_closure_physical_alias_missing_or_hash_mismatched_original_receipt_blocks(self):
+        original = deepcopy((self.rows, self.files, self.coverage))
+        for defect in ("missing-alias-map", "map-hash", "physical-hash", "platform-hash", "outside-collection"):
+            with self.subTest(defect=defect):
+                self.rows, self.files, self.coverage = deepcopy(original)
+                aliases = self.closure_physical_aliases()
+                population = self.coverage["list_populations"][0]
+                if defect == "missing-alias-map":
+                    population["counted"].pop("alias_witness")
+                elif defect == "map-hash":
+                    population["counted"]["alias_witness"]["sha256"] = "e" * 64
+                else:
+                    alias = aliases["aliases"][0]
+                    if defect == "physical-hash":
+                        alias["physical_witness"]["sha256"] = "e" * 64
+                    elif defect == "platform-hash":
+                        alias["alias_occurrence_witness"]["sha256"] = "e" * 64
+                    else:
+                        alias["alias_occurrence_witness"]["pointer"] = "/collection/0"
+                    population["counted"]["alias_witness"] = self.witness("physical-alias-map", aliases)
+                population["census_witness"] = self.witness("counted-list-census", {"status": "COUNTED", "expected_occurrences": deepcopy(population["expected_occurrences"]), "counted": deepcopy(population["counted"])})
+                with self.assertRaises(compact.CompactError):
+                    self.closure_build()
+
+    def test_closure_physical_alias_wrong_source_line_candidate_slot_and_count_block(self):
+        original = deepcopy((self.rows, self.files, self.coverage))
+        for defect in ("source-line", "candidate", "slot", "double-count", "unpromoted-collision"):
+            with self.subTest(defect=defect):
+                self.rows, self.files, self.coverage = deepcopy(original)
+                aliases = self.closure_physical_aliases()
+                population = self.coverage["list_populations"][0]
+                occurrence = population["expected_occurrences"][1]
+                if defect == "source-line":
+                    aliases["aliases"][0]["line"] = 3
+                    population["counted"]["alias_witness"] = self.witness("physical-alias-map", aliases)
+                elif defect == "candidate":
+                    occurrence["repository_or_entry"] = "example/project-2"
+                elif defect == "slot":
+                    occurrence["slot"] = "workers"
+                elif defect == "double-count":
+                    population["counted"]["promoted_entries"] = 3
+                    population["counted"]["physical_entries"] = 3
+                else:
+                    population["counted"]["physical_entries"] = 2
+                    population["counted"]["unpromoted_ids"] = self.witness("unpromoted-list-ids", ["example/awesome:README.md:2"])
+                population["census_witness"] = self.witness("counted-list-census", {"status": "COUNTED", "expected_occurrences": deepcopy(population["expected_occurrences"]), "counted": deepcopy(population["counted"])})
+                with self.assertRaises(compact.CompactError):
+                    self.closure_build()
 
     def test_closure_omission_followup_and_missing_source_reference_are_not_guessed(self):
         omission = self.closure_omission()

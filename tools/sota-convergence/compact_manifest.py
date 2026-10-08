@@ -912,11 +912,11 @@ def closure_omissions(omissions, index):
 
 def counted_population(population, index, captures, cache, blockers):
     counted = population["counted"]
-    closed(counted, set(COUNT_UNITS) - {"unpromoted_entries"} | {"promotion_rule", "unpromoted_ids"}, set(), "counted population")
+    closed(counted, set(COUNT_UNITS) - {"unpromoted_entries"} | {"promotion_rule", "unpromoted_ids"}, {"alias_witness"}, "counted population")
     for name in set(COUNT_UNITS) - {"unpromoted_entries"}:
         require(type(counted[name]) is int and counted[name] >= 0, "counted " + name + " must be a nonnegative integer")
     text(counted["promotion_rule"], "promotion rule")
-    require(counted["promoted_entries"] == len({item["occurrence_id"] for item in population["expected_occurrences"]}), "promoted count differs from physical promoted occurrence census")
+    require(counted["promoted_entries"] == len({item.get("physical_occurrence_id", item["occurrence_id"]) for item in population["expected_occurrences"]}), "promoted count differs from physical promoted occurrence census")
     for name in ("duplicates_removed", "overlap_stars", "overlap_fields", "promoted_entries"):
         require(counted[name] <= counted["physical_entries"], "counted " + name + " exceeds physical entries")
     ids = declared_witness(counted["unpromoted_ids"], index, captures, cache, blockers, "unpromoted-list-id-witness")
@@ -925,6 +925,71 @@ def counted_population(population, index, captures, cache, blockers):
         require(len(ids) == len(set(ids)), "duplicate unpromoted list ids")
         require(counted["physical_entries"] == counted["promoted_entries"] + len(ids), "physical entries do not reconcile promoted and unpromoted ids")
     return ids
+
+
+def counted_aliases(population, index, captures, cache, blockers):
+    """Bind literal aliases to a physical source line through both original receipts."""
+    witness = population["counted"].get("alias_witness")
+    if witness is None:
+        return {}
+    original = declared_witness(witness, index, captures, cache, blockers, "physical-list-alias-witness")
+    require(isinstance(original, dict) and original.get("status") == "FROZEN" and isinstance(original.get("aliases"), list), "alias witness must select a frozen alias array")
+    result = {}
+    for alias in original["aliases"]:
+        closed(alias, {"occurrence_id", "physical_occurrence_id", "source_repository", "path", "line", "original_id", "archive_member", "capture_sha256", "pointer",
+                       "physical_witness", "alias_collection_witness", "alias_occurrence_witness"}, set(), "physical list alias")
+        for name in ("occurrence_id", "physical_occurrence_id", "source_repository", "path", "original_id", "pointer"):
+            text(alias[name], "alias." + name)
+        require(type(alias["line"]) is int and alias["line"] > 0, "alias source line must be a positive physical line number")
+        match_capture(alias["archive_member"], alias["capture_sha256"], index)
+        require(alias["physical_occurrence_id"] == alias["original_id"], "physical alias id must retain the exact original source id")
+        parts = alias["original_id"].rsplit(":", 2)
+        require(len(parts) == 3 and canonical(parts[0]) == canonical(population["source_repository"]) == canonical(alias["source_repository"])
+                and parts[1] == population["path"] == alias["path"] and parts[2] == str(alias["line"]), "physical alias id differs from its source repository/path/line")
+        physical = declared_witness(alias["physical_witness"], index, captures, cache, blockers, "original-physical-occurrence-witness")
+        collection = declared_witness(alias["alias_collection_witness"], index, captures, cache, blockers, "original-alias-collection-witness")
+        record = declared_witness(alias["alias_occurrence_witness"], index, captures, cache, blockers, "original-alias-occurrence-witness")
+        require(isinstance(physical, dict) and isinstance(collection, dict) and isinstance(record, dict), "physical alias original receipts must select original objects")
+        require(physical.get("occurrence_id") == alias["original_id"] and physical.get("original_ledger_input_id") == alias["original_id"]
+                and canonical(physical.get("source_repository")) == canonical(alias["source_repository"])
+                and physical.get("source_path") == alias["path"] and physical.get("source_line") == alias["line"]
+                and physical.get("source_pin") == population["pin"]["version_or_commit"]
+                and physical.get("source_content_sha256") == population["capture_sha256"], "original physical occurrence differs from its declared source identity/pin/capture")
+        match_capture(physical.get("archive_member"), physical["source_content_sha256"], index)
+        collection_pin = collection.get("pin")
+        if isinstance(collection_pin, dict):
+            require(canonical(collection_pin["repository_or_source"]) == canonical(alias["source_repository"]), "alias collection pin names a different source repository")
+            collection_pin = collection_pin["version_or_commit"]
+        require(canonical(collection.get("source_repository")) == canonical(alias["source_repository"])
+                and collection.get("file") == alias["path"] and collection_pin == population["pin"]["version_or_commit"], "original alias collection differs from its source repository/path/pin")
+        collection_ref, occurrence_ref = alias["alias_collection_witness"], alias["alias_occurrence_witness"]
+        require(collection_ref["archive_member"] == occurrence_ref["archive_member"] and collection_ref["sha256"] == occurrence_ref["sha256"], "alias collection and occurrence must come from the same original receipt")
+        relative_pointer = occurrence_ref["pointer"].removeprefix(collection_ref["pointer"])
+        require(occurrence_ref["pointer"].startswith(collection_ref["pointer"] + "/occurrences/") and re.fullmatch(r"/occurrences/(?:0|[1-9][0-9]*)", relative_pointer)
+                and pointer(collection, relative_pointer) == record, "alias occurrence is not the selected original collection member")
+        require(record.get("occurrence_id") == alias["occurrence_id"] and record.get("source_line") == alias["line"]
+                and all(record.get(name) == alias[name] for name in ("archive_member", "capture_sha256", "pointer")), "original alias occurrence differs from its literal id/source line/captured representation")
+        candidate, slot = canonical(record.get("entry")), text(record.get("slot"), "original alias slot")
+        targets = physical.get("linked_targets")
+        require(isinstance(targets, list) and any(isinstance(target, dict) and isinstance(target.get("repository"), str)
+                and canonical(target["repository"]) == candidate and github_repository_href(target.get("url")) == candidate for target in targets), "alias candidate is not an exact original physical source link")
+        require(population["archive_member"] in captures, "physical alias source Markdown bytes are unavailable")
+        try:
+            primary_lines = captures[population["archive_member"]].decode("utf-8").split("\n")
+        except UnicodeError as error:
+            raise CompactError("physical alias source Markdown is not UTF-8") from error
+        require(alias["line"] <= len(primary_lines), "physical alias source line is absent from its original Markdown")
+        links = set()
+        for match in re.finditer(r"(?<!!)\[[^\]\r\n]*\]\((https://github\.com/[^\s)]+)\)", primary_lines[alias["line"] - 1], re.I):
+            try:
+                links.add(github_repository_href(match[1]))
+            except CompactError:
+                continue
+        require(candidate in links, "physical alias original Markdown line does not contain the exact candidate repository link")
+        alias_key = (alias["occurrence_id"], alias["physical_occurrence_id"], alias["archive_member"], alias["capture_sha256"], alias["pointer"])
+        require(alias_key not in result, "duplicate physical alias captured representation")
+        result[alias_key] = {"linked_repository": candidate, "layer_fit": slot}
+    return result
 
 
 def validate_coverage(coverage, rows, index, captures, cache, profile=None):
@@ -1015,8 +1080,10 @@ def validate_coverage(coverage, rows, index, captures, cache, profile=None):
     require(isinstance(populations, list), "list_populations must be an array")
     if not populations:
         blockers.append({"code": "no-mined-list-population-census"})
-    occurrence_keys, occurrence_mappings, unpromoted_keys, summary = set(), set(), set(), []
+    occurrence_keys, physical_occurrence_keys, occurrence_mappings, unpromoted_keys, summary = set(), set(), set(), set(), []
     occurrence_bindings = {}
+    occurrence_physical_ids, physical_population_bindings, verified_alias_ids = {}, {}, set()
+    physical_alias_count = 0
     retained_ids = set()
     counted_lists = counted_census_witnesses = 0
     retained_count = 0
@@ -1049,26 +1116,46 @@ def validate_coverage(coverage, rows, index, captures, cache, profile=None):
                                    or census.get("expected_occurrences") != population["expected_occurrences"]
                                    or counted and census.get("counted") != population["counted"]):
             blockers.append({"code": "original-list-census-unfrozen-or-mismatched", "population": population["archive_member"]})
+        aliases = {}
         if counted:
             counted_lists += 1
             counted_census_witnesses += isinstance(census, dict) and census.get("status") == "COUNTED"
             ids = counted_population(population, index, captures, cache, blockers)
+            aliases = counted_aliases(population, index, captures, cache, blockers)
+            physical_alias_count += len(aliases)
             if ids is not None:
                 require(not set(ids) & unpromoted_keys, "duplicate unpromoted occurrence id across populations")
                 unpromoted_keys.update(ids)
         for occurrence in population["expected_occurrences"]:
-            closed(occurrence, {"occurrence_id", "repository_or_entry", "slot", "capture_sha256", "archive_member", "pointer"}, {"qualification"}, "list occurrence")
+            closed(occurrence, {"occurrence_id", "repository_or_entry", "slot", "capture_sha256", "archive_member", "pointer"},
+                   {"qualification"} | ({"physical_occurrence_id"} if start_closure else set()), "list occurrence")
             occurrence_id = text(occurrence["occurrence_id"], "occurrence_id")
+            physical_id = text(occurrence.get("physical_occurrence_id", occurrence_id), "physical_occurrence_id")
+            require(counted or physical_id == occurrence_id, "physical occurrence aliases require a counted population")
             occurrence_key = decision_key(occurrence)
             occurrence_mapping = (occurrence_id, occurrence_key)
             if start_closure:
                 require(occurrence_mapping not in occurrence_mappings, "duplicate promoted occurrence decision mapping")
-            binding = tuple(json.dumps(population[name], sort_keys=True) for name in POPULATION_FACTS) + tuple(occurrence[name] for name in ("archive_member", "capture_sha256", "pointer"))
+            source_binding = tuple(json.dumps(population[name], sort_keys=True) for name in POPULATION_FACTS)
+            binding = source_binding + tuple(occurrence[name] for name in ("archive_member", "capture_sha256", "pointer"))
+            alias_key = (occurrence_id, physical_id, occurrence["archive_member"], occurrence["capture_sha256"], occurrence["pointer"])
+            if physical_id != occurrence_id:
+                proof = aliases.get(alias_key)
+                require(proof is not None, "physical occurrence alias lacks its exact original receipt proof")
+                require(canonical(proof["linked_repository"]) == occurrence_key[0] and proof["layer_fit"] == occurrence_key[1], "physical alias original candidate/slot differs from its retained decision key")
+                cache[("native-entry-bound", occurrence_key, occurrence["archive_member"], occurrence["capture_sha256"], occurrence["pointer"])] = proof
+                verified_alias_ids.add(occurrence_id)
             if occurrence_id in occurrence_keys:
-                require(counted and occurrence_bindings[occurrence_id] == binding, "duplicate list occurrence census ID")
+                require(counted and occurrence_physical_ids[occurrence_id] == physical_id
+                        and (occurrence_bindings[occurrence_id] == binding or physical_id != occurrence_id and occurrence_id in verified_alias_ids), "duplicate list occurrence census ID")
+            if physical_id in physical_occurrence_keys:
+                require(counted and physical_population_bindings[physical_id] == source_binding, "physical occurrence belongs to conflicting source populations")
             occurrence_keys.add(occurrence_id)
+            physical_occurrence_keys.add(physical_id)
             occurrence_mappings.add(occurrence_mapping)
             occurrence_bindings[occurrence_id] = binding
+            occurrence_physical_ids[occurrence_id] = physical_id
+            physical_population_bindings[physical_id] = source_binding
             match_capture(occurrence["archive_member"], occurrence["capture_sha256"], index)
             text(occurrence["pointer"], "occurrence.pointer")
             original = selected_capture(occurrence["archive_member"], occurrence["pointer"], captures, cache, blockers, occurrence_id)
@@ -1090,7 +1177,7 @@ def validate_coverage(coverage, rows, index, captures, cache, profile=None):
                 blockers.append({"code": "unretained-list-occurrence", "occurrence_id": occurrence_id})
             else:
                 retained_count += 1
-                retained_ids.add(occurrence_id)
+                retained_ids.add(physical_id)
         summary.append({name: population[name] for name in ("source_repository", "pin", "path", "capture_sha256", "archive_member", "parser", "source_witness", "census_witness") if name in population} |
                        {"expected_occurrences": len(population["expected_occurrences"])})
         if counted:
@@ -1108,7 +1195,7 @@ def validate_coverage(coverage, rows, index, captures, cache, profile=None):
     extra = set(ref_map) - (occurrence_mappings if start_closure else occurrence_keys)
     if extra:
         blockers.append({"code": "occurrences-outside-declared-union", "count": len(extra)})
-    require(not occurrence_keys & unpromoted_keys, "an occurrence cannot be both promoted and unpromoted")
+    require(not physical_occurrence_keys & unpromoted_keys, "an occurrence cannot be both promoted and unpromoted")
     coverage_summary = {"status": coverage["status"], "omissions": coverage["omissions"], "list_populations": summary}
     coverage_summary.update({name: coverage[name] for name in ("source_inventory_witness", "field_inventory_witness", "star_inventory_witness") if name in coverage})
     counts = {
@@ -1116,10 +1203,14 @@ def validate_coverage(coverage, rows, index, captures, cache, profile=None):
         "list_populations": len(populations), "expected_occurrences": len(occurrence_keys),
         "retained_occurrences": retained_count}
     if start_closure:
+        counts["expected_occurrences"] = len(physical_occurrence_keys)
+        counts["literal_promoted_occurrences"] = len(occurrence_keys)
+        counts["physical_aliases"] = physical_alias_count
         counts["promoted_mappings"] = len(occurrence_mappings)
         counts["retained_mappings"] = retained_count
         counts["retained_occurrences"] = len(retained_ids)
-        coverage_summary["count_units"] = COUNT_UNITS | {"promoted_mappings": "distinct physical occurrence id to retained decision key mappings; one physical entry may have several mappings"}
+        coverage_summary["count_units"] = COUNT_UNITS | {"promoted_mappings": "distinct literal occurrence id to retained decision key mappings; one physical entry may have several mappings",
+                                                        "physical_aliases": "exact literal id/captured representation aliases verified against both original receipts"}
         if "document_inventory_witness" in coverage:
             coverage_summary["document_inventory_witness"] = coverage["document_inventory_witness"]
             counts["documents"] = document_count
@@ -1190,12 +1281,33 @@ def build_manifest(asset, release_tag, witnesses=(), profile=None):
             wanted |= {population[name]["archive_member"] for name in ("source_witness", "census_witness") if isinstance(population.get(name), dict) and "archive_member" in population[name]}
             if start_closure and isinstance(population.get("counted", {}).get("unpromoted_ids"), dict):
                 wanted.add(population["counted"]["unpromoted_ids"]["archive_member"])
+            if start_closure and isinstance(population.get("counted", {}).get("alias_witness"), dict):
+                wanted.add(population["counted"]["alias_witness"]["archive_member"])
+                wanted.add(population["archive_member"])
     receipts = {}
     if wanted:
         second_sha, second_index, receipts = read_archive(asset, wanted)
         require(second_sha == asset_sha and second_index == index, "asset changed before acceptance-witness check")
         for row in rows:
             validate_acceptance(row, receipts)
+    if start_closure:
+        alias_members, alias_cache = set(), {}
+        for population in coverage_raw.get("list_populations", []):
+            alias_ref = population.get("counted", {}).get("alias_witness")
+            if alias_ref is None:
+                continue
+            alias_body = declared_witness(alias_ref, index, receipts, alias_cache, blockers, "physical-list-alias-witness")
+            require(isinstance(alias_body, dict) and isinstance(alias_body.get("aliases"), list), "alias witness must select an alias array")
+            for alias in alias_body["aliases"]:
+                for name in ("physical_witness", "alias_collection_witness", "alias_occurrence_witness"):
+                    ref = alias.get(name)
+                    closed(ref, {"archive_member", "sha256", "pointer"}, set(), "alias original receipt reference")
+                    match_capture(ref["archive_member"], ref["sha256"], index)
+                    alias_members.add(ref["archive_member"])
+        if alias_members - receipts.keys():
+            alias_sha, alias_index, alias_captures = read_archive(asset, alias_members)
+            require(alias_sha == asset_sha and alias_index == index, "asset changed before original alias receipt check")
+            receipts.update(alias_captures)
     cache = {}
     validate_reference_pointers(rows, receipts, blockers, cache)
     for row in rows:

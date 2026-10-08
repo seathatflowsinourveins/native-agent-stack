@@ -348,6 +348,11 @@
         "pointer": {
           "type": "string",
           "minLength": 1
+        },
+        "physical_occurrence_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Canonical physical source entry id. Defaults to occurrence_id; a renamed literal id requires counted.alias_witness proof against both original receipts."
         }
       }
     },
@@ -399,6 +404,9 @@
           "minLength": 1
         },
         "unpromoted_ids": {
+          "$ref": "compact-decision-start-closure-1.json#/properties/acceptance_witness"
+        },
+        "alias_witness": {
           "$ref": "compact-decision-start-closure-1.json#/properties/acceptance_witness"
         }
       }
