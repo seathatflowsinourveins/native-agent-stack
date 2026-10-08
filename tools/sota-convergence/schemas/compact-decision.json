@@ -59,6 +59,17 @@
     },
     "source_refs": {"type": "array", "items": {"$ref": "#/$defs/sourceRef"}},
     "source_pointer": {"type": "string", "pattern": "^($|/.*)$"},
+    "source_entry_witness": {
+      "description": "Original native trading list-screen TSV with its exact 20-column header and one-based physical line. Used only for a documentary source-entry screen, with a separately retained pinned upstream Markdown capture. The TSV source metadata and literal repository/layer_fit must bind the row and the pinned source line; no generated JSON wrapper qualifies as this witness.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["archive_member", "sha256", "pointer"],
+      "properties": {
+        "archive_member": {"$ref": "#/$defs/member"},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "pointer": {"type": "string", "pattern": "^(line:[1-9][0-9]*|#L[1-9][0-9]*)$"}
+      }
+    },
     "acceptance_witness": {
       "description": "Retained original JSON receipt. Its exact selected object must bind identity, slot, qualification, pin, evidence_class, executed=true and status=PASS. This records prior execution and does not run a native test.",
       "type": "object",

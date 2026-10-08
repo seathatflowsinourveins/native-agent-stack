@@ -13,6 +13,8 @@ import subprocess
 import tarfile
 import tempfile
 import unittest
+import csv
+import os
 
 TOOL = Path(__file__).resolve().parents[1] / "tools/sota-convergence/compact_manifest.py"
 SPEC = importlib.util.spec_from_file_location("compact_manifest", TOOL)
@@ -455,6 +457,159 @@ class CompactManifestTests(unittest.TestCase):
     def test_duplicate_json_keys_reject_without_last_write_wins(self):
         with self.assertRaises(compact.CompactError):
             compact.load(b'{"rows": [], "rows": []}')
+
+    def native_entry(self):
+        """A bounded synthetic native-format witness, not an upstream mining replay."""
+        repository = "example/project-0"
+        markdown = b"# Pinned list\n- [Candidate](https://github.com/example/project-0)\n"
+        self.files["captures/native-list.md"] = markdown
+        values = {name: "" for name in compact.NATIVE_LIST_HEADER}
+        values.update(input_id="example/awesome:README.md:2", source_kind="awesome-list", source_repository="example/awesome", source_pin="b" * 40,
+                      source_path="README.md", source_line="2", source_content_sha256=digest(markdown), linked_repository=repository,
+                      linked_targets_json=json.dumps([{"url": "https://github.com/EXAMPLE/project-0", "repository": repository}]),
+                      layer_fit="native-clients", relevant_slot="true", disposition="WATCH", verification_status="SOURCE-LIST-SCOPE-CHECKED; LINKED-CODE-UNVERIFIED")
+        self.native_values = values
+        self.bind_native_tsv()
+        row = self.rows[0]
+        row.update(pin=pin("example/awesome", "b" * 40, "source-entry"), decision_scope="source-entry-screen", candidate_implementation_status="UNESTABLISHED",
+                   archive_member="captures/native-list.md", capture_sha256=digest(markdown),
+                   source_entry_witness={"archive_member": "captures/native-list-screen.tsv", "sha256": digest(self.files["captures/native-list-screen.tsv"]), "pointer": "line:2"})
+        row["primary_sources"] = [{"locator": "example/awesome@" + "b" * 40 + ":README.md:2", "pin": row["pin"], "subject": "original pinned list entry, not implementation acceptance"}]
+        return row
+
+    def bind_native_tsv(self):
+        stream = io.StringIO(newline="")
+        writer = csv.writer(stream, delimiter="\t", lineterminator="\n")
+        writer.writerow(compact.NATIVE_LIST_HEADER)
+        writer.writerow([self.native_values[name] for name in compact.NATIVE_LIST_HEADER])
+        self.files["captures/native-list-screen.tsv"] = stream.getvalue().encode()
+        if "source_entry_witness" in self.rows[0]:
+            self.rows[0]["source_entry_witness"]["sha256"] = digest(self.files["captures/native-list-screen.tsv"])
+
+    def test_native_original_tsv_binds_pinned_markdown_repository_and_literal_slot(self):
+        row = self.native_entry()
+        manifest, _ = self.build()
+        self.assertEqual(manifest["validation"]["status"], "PASS")
+        self.assertEqual(manifest["counts"]["candidate_implementation_unestablished"], 1)
+        row["source_entry_witness"]["pointer"] = "#L2"
+        row["primary_sources"][0]["locator"] = "https://github.com/example/awesome/blob/" + "b" * 40 + "/README.md#L2"
+        manifest, _ = self.build()
+        self.assertEqual(manifest["validation"]["status"], "PASS")
+
+    def test_native_tsv_source_metadata_mismatches_are_blocked(self):
+        row = self.native_entry()
+        original = deepcopy(self.native_values)
+        for name, value in (("layer_fit", "workers"), ("source_pin", "c" * 40), ("source_repository", "another/awesome"),
+                            ("source_path", "Different.md"), ("source_line", "3"), ("source_content_sha256", "d" * 64),
+                            ("linked_repository", "another/project"), ("input_id", "wrong-id")):
+            with self.subTest(field=name):
+                self.native_values = {**original, name: value}
+                self.bind_native_tsv()
+                self.assertBlocked("native-source-entry-witness-unverified")
+        self.native_values = original
+        self.bind_native_tsv()
+        row["qualification"] = {"slot": "workers"}
+        self.coverage["expected_keys"][0] = self.row_key(row)
+        self.assertBlocked("native-source-entry-witness-unverified")
+
+    def test_native_tsv_rejects_ambiguous_physical_lines_header_and_width(self):
+        row = self.native_entry()
+        valid = self.files["captures/native-list-screen.tsv"]
+        for data in (valid.replace(b"input_id", b"renamed_id", 1), valid.rstrip(b"\n") + b"\textra\n",
+                     valid.replace(b"example/awesome:README.md:2", b'"example/awesome:\nREADME.md:2"', 1)):
+            with self.subTest(data_sha=digest(data)):
+                self.files["captures/native-list-screen.tsv"] = data
+                row["source_entry_witness"]["sha256"] = digest(data)
+                self.assertBlocked("native-source-entry-witness-unverified")
+        self.files["captures/native-list-screen.tsv"] = valid
+        row["source_entry_witness"]["sha256"] = digest(valid)
+        for locator in ("line:1", "line:3"):
+            row["source_entry_witness"]["pointer"] = locator
+            self.assertBlocked("native-source-entry-witness-unverified")
+
+    def test_native_tsv_generated_json_wrapper_is_not_an_original_entry(self):
+        row = self.native_entry()
+        wrapper = raw({"rows": [self.native_values]})
+        self.files["captures/native-list-screen.tsv"] = wrapper
+        row["source_entry_witness"]["sha256"] = digest(wrapper)
+        row["source_entry_witness"]["pointer"] = "line:1"
+        self.assertBlocked("native-source-entry-witness-unverified")
+
+    def test_native_tsv_candidate_link_is_exact_without_domain_query_or_path_guesses(self):
+        row = self.native_entry()
+        for link in ("https://github.example.com/example/project-0", "https://github.com/example/project-0?x=1", "https://github.com/example/project-0/tree/main",
+                     "https://github.com/another/project", "https://github.com/example/project-0#readme"):
+            with self.subTest(link=link):
+                markdown = ("# Pinned list\n- [Candidate](" + link + ")\n").encode()
+                self.files["captures/native-list.md"] = markdown
+                row["capture_sha256"] = digest(markdown)
+                self.native_values["source_content_sha256"] = digest(markdown)
+                self.bind_native_tsv()
+                self.assertBlocked("native-source-entry-witness-unverified")
+
+    def test_native_tsv_href_rejects_dot_segments_and_invalid_github_owners(self):
+        for href in ("https://github.com/example/.", "https://github.com/example/..", "https://github.com/-owner/repository"):
+            with self.subTest(href=href):
+                with self.assertRaises(compact.CompactError):
+                    compact.github_repository_href(href)
+
+    def test_native_tsv_link_metadata_must_match_primary_markdown_href(self):
+        self.native_entry()
+        for target in ({"url": "https://github.com/another/project", "repository": "example/project-0"},
+                       {"url": "https://github.com/example/project-0", "repository": "another/project"},
+                       {"url": "https://github.com/example/project-0?x=1", "repository": "example/project-0"}):
+            self.native_values["linked_targets_json"] = json.dumps([target])
+            self.bind_native_tsv()
+            self.assertBlocked("native-source-entry-witness-unverified")
+
+    def test_native_tsv_markdown_line_number_uses_physical_newlines_only(self):
+        row = self.native_entry()
+        markdown = "# Pinned list\u2028- [Candidate](https://github.com/example/project-0)\n".encode()
+        self.files["captures/native-list.md"] = markdown
+        row["capture_sha256"] = digest(markdown)
+        self.native_values["source_content_sha256"] = digest(markdown)
+        self.bind_native_tsv()
+        self.assertBlocked("native-source-entry-witness-unverified")
+
+    def test_native_tsv_source_entry_cannot_promote_implementation_merit_or_execution(self):
+        row = self.native_entry()
+        row["decision_scope"] = "implementation-merit"
+        self.assertBlocked("native-source-entry-witness-scope-unqualified")
+        row["disposition"] = "ADOPT-NOW"
+        with self.assertRaises(compact.CompactError):
+            self.build()
+
+    @unittest.skipUnless(os.environ.get("G5_NATIVE_ENTRY_EXAMPLES"), "immutable external native-example packet is not supplied")
+    def test_three_immutable_native_trading_examples_without_mining_replay(self):
+        example_path = Path(os.environ["G5_NATIVE_ENTRY_EXAMPLES"])
+        packet = example_path.read_bytes()
+        self.assertEqual(digest(packet), "0addb266fbcc32969e67fd3117d41f531879826809787fcb9ca02f9a24fc13d4")
+        examples = json.loads(packet)["examples"]
+        base = example_path.parent.parent
+        for example in examples:
+            with self.subTest(repository=example["repository_or_entry"]):
+                tsv, primary = example["original_native_tsv"], example["original_primary_list"]
+                captures = {}
+                for member, expected in ((tsv["archive_member"], tsv["sha256"]), (primary["archive_member"], primary["capture_sha256"])):
+                    local = base / member.removeprefix("g5-fields-b/")
+                    captured = local.read_bytes()
+                    self.assertEqual(digest(captured), expected)
+                    captures[member] = captured
+                p = pin(primary["repository"], primary["pin"], "source-entry")
+                row = {"repository_or_entry": example["repository_or_entry"], "slot": example["qualification"]["slot"],
+                       "qualification": example["qualification"], "disposition": "WATCH", "evidence_class": "SOURCE-REVIEW", "pin": p,
+                       "primary_sources": [{"locator": primary["repository"] + "@" + primary["pin"] + ":" + primary["path"] + ":" + str(primary["line"]), "pin": p, "subject": "original pinned list entry"}],
+                       "capture_sha256": primary["capture_sha256"], "archive_member": primary["archive_member"], "owner_lane": "g5-fields-b",
+                       "refresh_date": "2026-10-08", "decision_scope": "source-entry-screen", "candidate_implementation_status": "UNESTABLISHED",
+                       "source_entry_witness": {"archive_member": tsv["archive_member"], "sha256": tsv["sha256"], "pointer": "line:" + str(tsv["line"])}}
+                index = {member: {"sha256": digest(value), "bytes": len(value)} for member, value in captures.items()}
+                self.assertEqual(compact.validate_row(row, index), [])
+                blockers, cache = [], {}
+                result = compact.validate_native_source_entry(row, index, captures, cache, blockers)
+                self.assertEqual(result, example["literal_dispatch_matches"])
+                self.assertEqual(bool(blockers), not example["literal_dispatch_matches"])
+                if not result:
+                    self.assertIn("layer_fit differs", blockers[0]["reason"])
 
 
 if __name__ == "__main__":

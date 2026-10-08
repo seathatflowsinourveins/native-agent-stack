@@ -11,8 +11,10 @@ from __future__ import annotations
 
 import argparse
 from collections import Counter
+import csv
 from datetime import date
 import hashlib
+import io
 import json
 from pathlib import Path, PurePosixPath
 import re
@@ -26,7 +28,7 @@ from urllib.parse import urlsplit
 REPO = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO / "scripts"))
 sys.path.insert(0, str(REPO / "tools/sota-convergence/landscape-sweep"))
-from catalog_decisions import InvalidDecisionIndex, safe_file, unique_json
+from catalog_decisions import InvalidDecisionIndex, identity as github_identity, safe_file, unique_json
 from sweep_common import canon, json_text
 
 SCHEMA = Path(__file__).parent / "schemas/compact-decision.json"
@@ -48,8 +50,14 @@ EVIDENCE = RECORDED | {"SOURCE-REVIEW", "DOCUMENTARY", "UNKNOWN"}
 ROW_REQUIRED = {"repository_or_entry", "slot", "disposition", "evidence_class", "pin", "primary_sources",
                 "capture_sha256", "archive_member", "owner_lane", "refresh_date"}
 ROW_OPTIONAL = {"qualification", "pending", "choices", "source_refs", "source_pointer", "acceptance_witness",
-                "searched", "reopen_when", "note", "decision_scope", "candidate_implementation_status"}
+                "searched", "reopen_when", "note", "decision_scope", "candidate_implementation_status", "source_entry_witness"}
 REF_KEYS = {"sha256", "pointer", "archive_member", "source_id", "owner_lane", "occurrence_id"}
+NATIVE_LIST_HEADER = (
+    "input_id", "source_kind", "source_repository", "source_pin", "source_path", "source_line",
+    "source_content_sha256", "source_heading", "entry_kind", "canonical_english", "entry_label",
+    "linked_repository", "linked_targets_json", "layer_fit", "relevant_slot", "disposition", "reason",
+    "verification_status", "searched_evidence", "evidence_json",
+)
 
 
 class CompactError(ValueError):
@@ -308,8 +316,17 @@ def validate_row(row, index):
         if foreign:
             require(row["pin"]["subject"] in {"source-entry", "reference"}, "foreign source pin is not an implementation pin")
             require(row["evidence_class"] in {"SOURCE-REVIEW", "DOCUMENTARY"}, "foreign primary source pin cannot establish recorded execution")
-            if row.get("decision_scope") != "source-entry-screen" or row.get("candidate_implementation_status") != "UNESTABLISHED" or "source_pointer" not in row:
+            if row.get("decision_scope") != "source-entry-screen" or row.get("candidate_implementation_status") != "UNESTABLISHED" or not {"source_pointer", "source_entry_witness"} & row.keys():
                 blockers.append("foreign-primary-pin-scope-unqualified")
+    if "source_entry_witness" in row:
+        witness = row["source_entry_witness"]
+        closed(witness, {"archive_member", "sha256", "pointer"}, set(), "source entry witness")
+        match_capture(witness["archive_member"], witness["sha256"], index)
+        require(isinstance(witness["pointer"], str) and re.fullmatch(r"(?:line:|#L)[1-9][0-9]*", witness["pointer"]), "native TSV witness requires a one-based physical line locator")
+        if (row["evidence_class"] not in {"SOURCE-REVIEW", "DOCUMENTARY"} or row.get("decision_scope") != "source-entry-screen"
+                or row.get("candidate_implementation_status") != "UNESTABLISHED" or row["pin"] is None
+                or row["pin"]["subject"] != "source-entry"):
+            blockers.append("native-source-entry-witness-scope-unqualified")
     match_capture(row["archive_member"], row["capture_sha256"], index)
     text(row["owner_lane"], "owner_lane")
     value = text(row["refresh_date"], "refresh_date")
@@ -427,6 +444,124 @@ def declared_witness(value, index, captures, cache, blockers, label):
     match_capture(value["archive_member"], value["sha256"], index)
     require(isinstance(value["pointer"], str) and (value["pointer"] == "" or value["pointer"].startswith("/")), label + " must use a JSON Pointer")
     return selected_capture(value["archive_member"], value["pointer"], captures, cache, blockers, label)
+
+
+def native_list_record(member, locator, captures, cache):
+    """Read the retained 20-column TSV using stdlib csv, not a mining replay.
+
+    csv.reader(strict=True), newline='' and line_num follow Python's supported
+    csv interface (https://docs.python.org/3/library/csv.html). Each record
+    must consume exactly one physical line; generated JSON and multiline CSV
+    are outside this single native-format contract.
+    """
+    require(member in captures, "native TSV capture is unavailable or exceeds the pointer bound")
+    cache_key = ("native-list-tsv", member)
+    if cache_key not in cache:
+        decoded = captures[member].decode("utf-8")
+        reader = csv.reader(io.StringIO(decoded, newline=""), delimiter="\t", strict=True)
+        header = next(reader, None)
+        require(header == list(NATIVE_LIST_HEADER) and reader.line_num == 1, "native TSV header must match the exact 20-column retained format")
+        records = {}
+        previous = reader.line_num
+        for values in reader:
+            require(reader.line_num == previous + 1, "native TSV embedded multiline records are unsupported")
+            require(len(values) == len(NATIVE_LIST_HEADER), "native TSV physical record width is not 20")
+            records[reader.line_num] = dict(zip(NATIVE_LIST_HEADER, values))
+            previous = reader.line_num
+        cache[cache_key] = records
+    line = int(re.fullmatch(r"(?:line:|#L)([1-9][0-9]*)", locator)[1])
+    require(line in cache[cache_key], "native TSV physical line is absent or selects its header")
+    return cache[cache_key][line]
+
+
+def github_repository_href(value):
+    """An exact Markdown repository href; never guess from another domain/path."""
+    require(isinstance(value, str) and re.fullmatch(r"https://github\.com/[A-Za-z0-9-]+/[A-Za-z0-9._-]+/?", value, re.I),
+            "native source entry requires an exact GitHub repository href without query/fragment/subpath")
+    try:
+        return "https://github.com/" + github_identity(value)
+    except InvalidDecisionIndex as error:
+        raise CompactError("native source entry href does not identify a valid GitHub owner/repository") from error
+
+
+def markdown_source_locator(locator):
+    at_pin = re.fullmatch(r"(.+)@([0-9a-f]{40}):([^:\r\n]+):([1-9][0-9]*)", locator)
+    if at_pin:
+        source, pin, path, line = at_pin.groups()
+        return canonical(source), pin, path, int(line)
+    url = urlsplit(locator)
+    require(url.scheme == "https" and not url.query and not url.username and not url.password and url.port is None,
+            "native Markdown source locator is not an exact upstream HTTPS file")
+    fragment = re.fullmatch(r"L([1-9][0-9]*)", url.fragment)
+    require(fragment, "native Markdown source locator requires one exact source line")
+    parts = url.path.strip("/").split("/")
+    if url.hostname in {"github.com", "www.github.com"} and len(parts) >= 5 and parts[2] in {"blob", "raw"}:
+        return canonical("/".join(parts[:2])), parts[3], "/".join(parts[4:]), int(fragment[1])
+    if url.hostname == "raw.githubusercontent.com" and len(parts) >= 4:
+        return canonical("/".join(parts[:2])), parts[2], "/".join(parts[3:]), int(fragment[1])
+    raise CompactError("native Markdown locator format is unsupported")
+
+
+def validate_native_source_entry(row, index, captures, cache, blockers):
+    if "source_entry_witness" not in row:
+        return
+    witness = row["source_entry_witness"]
+    label = canonical(row["repository_or_entry"]) + ":" + row["slot"]
+    try:
+        require(row["evidence_class"] in {"SOURCE-REVIEW", "DOCUMENTARY"} and row.get("decision_scope") == "source-entry-screen"
+                and row.get("candidate_implementation_status") == "UNESTABLISHED", "native TSV proves only documentary source-entry screening")
+        p = row["pin"]
+        require(p is not None and p["kind"] == "commit" and p["subject"] == "source-entry", "native TSV requires its source-entry Git commit pin")
+        record = native_list_record(witness["archive_member"], witness["pointer"], captures, cache)
+        candidate = canonical(row["repository_or_entry"])
+        require(canonical(record["linked_repository"]) == candidate, "native TSV linked_repository differs from row identity")
+        require(record["layer_fit"] == row["slot"] and record["layer_fit"] != "UNKNOWN", "native TSV literal layer_fit differs from row slot")
+        if "slot" in row.get("qualification", {}):
+            require(row["qualification"]["slot"] == record["layer_fit"], "native TSV literal slot differs from qualification.slot")
+        require(record["relevant_slot"] == "true", "native TSV entry does not declare relevant slot")
+        require(canonical(record["source_repository"]) == canonical(p["repository_or_source"])
+                and record["source_pin"] == p["version_or_commit"], "native TSV source repository/pin differs from primary source pin")
+        member_name(record["source_path"])
+        require(Path(record["source_path"]).suffix.lower() in {".md", ".markdown"}, "native TSV adapter requires an upstream Markdown file")
+        require(re.fullmatch(r"[1-9][0-9]*", record["source_line"]), "native TSV source line is not one-based canonical text")
+        line_number = int(record["source_line"])
+        require(record["input_id"] == record["source_repository"] + ":" + record["source_path"] + ":" + record["source_line"],
+                "native TSV input_id differs from its exact source repository/path/line")
+        require(record["source_content_sha256"] == row["capture_sha256"], "native TSV source hash differs from retained primary capture")
+        match_capture(row["archive_member"], record["source_content_sha256"], index)
+        require(row["archive_member"] in captures, "pinned primary Markdown capture is unavailable or exceeds the pointer bound")
+        source_binding = (canonical(record["source_repository"]), record["source_pin"], record["source_path"], line_number)
+        bound = False
+        for source in row["primary_sources"]:
+            if source["pin"] != p:
+                continue
+            try:
+                bound |= markdown_source_locator(source["locator"]) == source_binding
+            except (CompactError, ValueError):
+                continue
+        require(bound, "primary locator differs from the original TSV source repository/pin/file/line")
+        # The retained mining source numbers physical LF/CRLF lines; Unicode
+        # separators or embedded control characters must not create new lines.
+        primary_lines = captures[row["archive_member"]].decode("utf-8").split("\n")
+        require(line_number <= len(primary_lines), "native TSV source line is absent from the pinned Markdown")
+        primary_line = primary_lines[line_number - 1]
+        links = set()
+        for match in re.finditer(r"(?<!!)\[[^\]\r\n]*\]\((https://github\.com/[^\s)]+)\)", primary_line, re.I):
+            try:
+                links.add(github_repository_href(match[1]))
+            except CompactError:
+                continue
+        require(candidate in links, "pinned Markdown line does not contain the exact candidate repository link")
+        targets = load(record["linked_targets_json"])
+        require(isinstance(targets, list), "native TSV linked_targets_json must be its original array")
+        require(any(isinstance(target, dict) and isinstance(target.get("repository"), str)
+                    and canonical(target["repository"]) == candidate and github_repository_href(target.get("url")) == candidate
+                    for target in targets), "native TSV linked-target URL/identity does not match the pinned Markdown repository link")
+        cache[("native-entry-bound", decision_key(row), witness["archive_member"], witness["sha256"], witness["pointer"])] = record
+        return True
+    except (CompactError, csv.Error, UnicodeError, ValueError, TypeError) as error:
+        blockers.append({"code": "native-source-entry-witness-unverified", "source": label, "reason": str(error)})
+        return False
 
 
 def validate_reference_pointers(rows, captures, blockers, cache):
@@ -584,6 +719,12 @@ def validate_coverage(coverage, rows, index, captures, cache):
                 if isinstance(original, dict) and {"repository_or_entry", "slot"} <= original.keys():
                     if decision_key(original) != occurrence_key:
                         blockers.append({"code": "original-list-occurrence-identity-scope-mismatch", "occurrence_id": occurrence_id})
+                elif ("native-entry-bound", occurrence_key, occurrence["archive_member"], occurrence["capture_sha256"], occurrence["pointer"]) in cache:
+                    # An exact native TSV record already bound against its pinned Markdown;
+                    # qualification still comes from the separate frozen field inventory.
+                    native = cache[("native-entry-bound", occurrence_key, occurrence["archive_member"], occurrence["capture_sha256"], occurrence["pointer"])]
+                    if canonical(native["linked_repository"]) != occurrence_key[0] or native["layer_fit"] != occurrence_key[1]:
+                        blockers.append({"code": "original-list-occurrence-identity-scope-mismatch", "occurrence_id": occurrence_id})
                 else:
                     blockers.append({"code": "original-list-occurrence-scope-unverified", "occurrence_id": occurrence_id})
             actual_ref = ref_map.get(occurrence_id)
@@ -653,7 +794,8 @@ def build_manifest(asset, release_tag, witnesses=()):
         require(normalized_rows(witness_rows) == rows, "local --rows witness union differs from retained asset rows")
     coverage_raw = load(captured[COVERAGE_MEMBER])
     wanted = {row["acceptance_witness"]["archive_member"] for row in rows if "acceptance_witness" in row}
-    wanted |= {row["archive_member"] for row in rows if "source_pointer" in row}
+    wanted |= {row["archive_member"] for row in rows if "source_pointer" in row or "source_entry_witness" in row}
+    wanted |= {row["source_entry_witness"]["archive_member"] for row in rows if "source_entry_witness" in row}
     wanted |= {ref["archive_member"] for row in rows for ref in row.get("source_refs", []) if "archive_member" in ref}
     wanted |= {ref["archive_member"] for row in rows for choice in row.get("choices", []) for ref in choice["source_refs"] if "archive_member" in ref}
     wanted |= {source["archive_member"] for row in rows for source in row["primary_sources"] if "pointer" in source and "archive_member" in source}
@@ -670,6 +812,8 @@ def build_manifest(asset, release_tag, witnesses=()):
             validate_acceptance(row, receipts)
     cache = {}
     validate_reference_pointers(rows, receipts, blockers, cache)
+    for row in rows:
+        validate_native_source_entry(row, index, receipts, cache, blockers)
     coverage_blockers, coverage, counts = validate_coverage(coverage_raw, rows, index, receipts, cache)
     blockers.extend(coverage_blockers)
     counts.update({"rows": len(rows), "identities": len({decision_key(row)[0] for row in rows}),
