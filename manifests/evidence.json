@@ -48131,6 +48131,11 @@
       "bytes": 3039
     },
     {
+      "path": "evidence/artifacts/research-exact-query-dispatch-20261008/receipt.json",
+      "sha256": "f200896bfc730259db2e92b2e25446c0e03f261d16da43bba6af49167dd103cb",
+      "bytes": 3859
+    },
+    {
       "path": "evidence/artifacts/retrieved-code.txt",
       "sha256": "228c4bc674c606fc6cfbbb57fba4164fe30066de34bba396fe68a335799f035f",
       "bytes": 2166
@@ -58632,8 +58637,13 @@
     },
     {
       "path": "tools/research/dispatch",
-      "sha256": "40815882b5387ebf9b7fd2dce59bbebb55eb38f09e8650c0729e61ff7544662e",
-      "bytes": 14053
+      "sha256": "1b98898c33645766850b13a275eb2cd5850316d0f62d10f6f5ecd0231c83f1dd",
+      "bytes": 15684
+    },
+    {
+      "path": "tools/research/exact_queries.py",
+      "sha256": "19a9e5698b1c553fbe02cc5e403ac41a69287bd0985c1eb751039f71a7e7a22a",
+      "bytes": 20754
     },
     {
       "path": "tools/runtime-worker-evidence/README.md",
