@@ -10902,8 +10902,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261004.json",
-      "sha256": "426f94947d3defb5f22371daea6226011390ca0206a10ebb039fbd44514d2a39",
-      "bytes": 23058
+      "sha256": "3fe9bc2e0d2bafec7b1c6b214be9b59c8fe19ebaa771eda72343cac87bbb9578",
+      "bytes": 23703
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unit-pass.txt",
@@ -18157,8 +18157,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "fe187e896ab627b29b7b1cbab23f0df92c6dbbbf246821a3746b0e1ab2a6d371",
-      "bytes": 184416
+      "sha256": "483982770b1282d5c3541e968aba7e76e073da768aa8dae4ab3bf9e84c60fe32",
+      "bytes": 187123
     },
     {
       "path": "docs/stack.md",
