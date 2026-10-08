@@ -54838,8 +54838,8 @@
     },
     {
       "path": "evidence/receipts/cc-lanes-invocation-throughput-20261008.json",
-      "sha256": "919c08548c1d57c3b154916da53819f889c939279b2912780e5f48ac2d61b057",
-      "bytes": 11542
+      "sha256": "50e38f8d0a752122e2bcc23120b71f76abd958ae9fce431e86f2339464fe52ac",
+      "bytes": 13363
     },
     {
       "path": "evidence/receipts/ccusage-20026-qualification-20260927.json",

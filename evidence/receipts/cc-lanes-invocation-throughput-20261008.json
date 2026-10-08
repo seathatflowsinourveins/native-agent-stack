@@ -346,5 +346,32 @@
       "what": "Two public Grafana docs paths HTTP404, recovered through published index"
     }
   ],
+  "execution_provenance": {
+    "historical_test_and_validator_argv": "Model-emitted only; no matching RTK history or optional audit execution record was found. Passing returned output remains separately retained.",
+    "fresh_validator": {
+      "evidence_class": "native_operation",
+      "emitted_argv": ["python3", "-i", "scripts/validate.py"],
+      "kernel_observed_argv_sanitized": ["<native Python 3.13.16 executable>", "-i", "scripts/validate.py"],
+      "argv_observed_utc": "2026-10-08T14:26:20.556Z",
+      "cwd": "Source-owned worktree, private absolute path retained in lane records",
+      "actual_returned": [
+        "components69, hashed_files10832, profiles4, receipts228, statuspassed",
+        "Integrity and scope checks only; no live provider or GPU execution.",
+        "SystemExit: 0",
+        "VALIDATION_SYSTEMEXIT 0"
+      ],
+      "completed_utc": "2026-10-08T14:26:32Z",
+      "exit_code": 0,
+      "sanitization": "Only interpreter/cwd absolute paths are replaced. Exact benign native argv and the Python interactive exit command are retained in the private lane answer. Added -i keeps the child alive for kernel observation and is a distinct execution. This predates this provenance-only receipt update."
+    }
+  },
+  "independent_critic": {
+    "verdict": "ACCEPT source and observed fallback UI; no required fixes remain",
+    "method": "Exact final source read and independent image inspection/hash, no live queries or mutations",
+    "image_sha256": "3a37fa0855b70544e38262b074545b741ac3e29b094b6a8cec523f1a1146a4b5",
+    "bytes": 211874,
+    "rows_observed": 19,
+    "limits": "Positive names, mixed enriched/fallback UI, conflicting timestamp ties and current mapping freshness stay unqualified. This current UI window is separate from the frozen16-series native query window."
+  },
   "explicit_claude_gateway_reader_calls": 0
 }
