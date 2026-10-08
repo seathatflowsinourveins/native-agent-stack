@@ -1,5 +1,6 @@
 # Native OSV reports for inactive, hash-bound evidence. Findings and scanner errors
-# stay visible in this non-required workflow; live inputs remain in security-scan.yml.
+# stay visible in this non-required workflow; findings report successfully while
+# scanner/data errors fail. Live inputs remain in security-scan.yml.
 # Decision: docs/decisions/2026-10-07-frozen-evidence-osv-reporting.md
 # Sources: google/osv-scanner@e840a6e8adb14b7777c78e26cfbf6e2abc1d1fc6:docs/configuration.md
 # and GitHub Actions required status / job condition documentation.
@@ -169,6 +170,11 @@ jobs:
           status="$json_status"
           if [ "$sarif_status" -gt "$status" ]; then
             status="$sarif_status"
+          fi
+          # OSV exit 1 means findings, not a failed report. Keep both native code
+          # witnesses/logs above; scanner errors and unknown data still fail.
+          if [ "$status" -eq 1 ]; then
+            exit 0
           fi
           exit "$status"
       - name: Summarize native report and unavailable evidence

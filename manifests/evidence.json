@@ -5026,8 +5026,8 @@
     },
     {
       "path": ".github/workflows/frozen-evidence-risk.yml",
-      "sha256": "1615eecc2cd06567123f457a69040a6740dd7abdcb289930e56d2aa29d0ed7c7",
-      "bytes": 19212
+      "sha256": "5cd476f7dd0b31d8d9166ddb2418009fbd56c9dd4fe4bbff7d24e6ac0cf20e2a",
+      "bytes": 19506
     },
     {
       "path": ".github/workflows/hardware-profile-smoke.yml",
@@ -18159,6 +18159,11 @@
       "path": "docs/decisions/2026-10-08-dependabot-frozen-evidence-ignore.md",
       "sha256": "8bbe3a48eabd72d3fb9dae4f0abfcae6a01d5920ad58ad4e2809a279e6af667f",
       "bytes": 3229
+    },
+    {
+      "path": "docs/decisions/2026-10-08-frozen-risk-report-result.md",
+      "sha256": "432d735add877a5e3a447285d9b3499552f10c6caf62ae7dd540ae64ea83f781",
+      "bytes": 5631
     },
     {
       "path": "docs/decisions/2026-10-08-philosophy-only-rules.md",
@@ -34724,6 +34729,11 @@
       "path": "evidence/artifacts/github-ci-measurements-20261003/later-reads-20261003.json",
       "sha256": "b100809511623c4cc13ef62939f7cf52e3113b40eae63952146657ed47f56ab3",
       "bytes": 56770
+    },
+    {
+      "path": "evidence/artifacts/github-ci-opt6-report-status-20261008.json",
+      "sha256": "938cd56336e3243974e013c7e3c57165418ef88cf1087bd1b0453f8649a45d71",
+      "bytes": 11924
     },
     {
       "path": "evidence/artifacts/gitleaks-macos-memory-bound-20260924/measure.py",
@@ -57947,8 +57957,8 @@
     },
     {
       "path": "tests/test_frozen_evidence_reporting.py",
-      "sha256": "af33af1c0acb43c56602d4555e3f697bcff49549e22d6ba909c36945facddb0f",
-      "bytes": 22436
+      "sha256": "d1a1b72bc3e7ac350da86508b545624a230c38b0520097cf1bda24c4abbd1fbf",
+      "bytes": 22800
     },
     {
       "path": "tests/test_frozen_macos_variant_no_use.py",

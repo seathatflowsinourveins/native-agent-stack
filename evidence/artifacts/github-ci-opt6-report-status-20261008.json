@@ -1,0 +1,319 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-08 18:28:02 UTC",
+  "scope": "O6 report success for known frozen findings while native operational failures remain failures",
+  "base_commit": "89e89852161d8157e464f4bd07c2b5c747ad4706",
+  "source_policy": "Separate non-required frozen report from required live dependency scan; scanner semantic exit1 is findings, errors remain nonzero.",
+  "sources": [
+    {
+      "repository": "google/osv-scanner",
+      "pin": "e840a6e8adb14b7777c78e26cfbf6e2abc1d1fc6",
+      "version": "2.6.0",
+      "files": [
+        "cmd/osv-scanner/main.go",
+        "cmd/osv-scanner/internal/cmd/run.go"
+      ],
+      "run_go_git_blob": "e57f6818d06afe80a1effe1e6d7d9b49e1cf3211",
+      "url": "https://github.com/google/osv-scanner/blob/e840a6e8adb14b7777c78e26cfbf6e2abc1d1fc6/cmd/osv-scanner/internal/cmd/run.go",
+      "scope": "VulnerabilitiesFound→1; NoPackagesFound→128; APIFailed→129; main exits cmd.Run return code"
+    },
+    {
+      "repository": "seathatflowsinourveins/native-agent-stack",
+      "pr": 845,
+      "head": "18f9276f",
+      "merge": "3462d9b5",
+      "path": "docs/decisions/2026-10-07-frozen-evidence-osv-reporting.md",
+      "scope": "Historical independent report design; new report outcome refinement is dated, history/input bytes preserved"
+    },
+    {
+      "url": "https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#jobsjob_idstepsrun",
+      "scope": "Shell exit codes determine step success; no blanket continue-on-error"
+    },
+    {
+      "url": "https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/control-jobs-with-conditions",
+      "scope": "Always-retained evidence and trusted downstream guards remain intact"
+    }
+  ],
+  "before": {
+    "evidence_class": "native_proven",
+    "source_receipt_sha256": "5fc05c934c9210af3e6336d9db06d086a5b30286efaf2cdee8fe8dd6e1c87236",
+    "before": {
+      "check_conclusion": "failure",
+      "scan_step_conclusion": "failure",
+      "other_steps": "Preflight/install/report summary/artifact retention all success; see native job receipt.",
+      "report_status": "findings",
+      "report_finding_state": "available",
+      "report_errors": [],
+      "native_exit_codes": {
+        "preflight": 0,
+        "json": 1,
+        "sarif": 1
+      },
+      "packages_affected": 3,
+      "vulnerability_occurrences": 9,
+      "unique_advisories": 9,
+      "sarif_result_count": 9,
+      "severity_groups": {
+        "Critical": 1,
+        "High": 3,
+        "Medium": 5,
+        "Low": 0,
+        "Unknown": 0
+      },
+      "severity_basis": "Derived from native OSV JSON groups max_severity5.4,6.3,6.3,8.3,6.3,6.3,9.5,8.9,8.7, and matching SARIF security-severity fields.",
+      "operational_error_observed": false,
+      "classification": "Visible retained findings on unchanged inactive captured lock; workflow failure is native scanner findings rc1, not a scanner/preflight/install/report/upload operational error.",
+      "clean_or_safe_claim": false
+    },
+    "pr": 873,
+    "pr_head": "7a3027f4e4ded104519dfdbc57308e3c05f5f95e",
+    "run": 37821865072,
+    "job": 113464648417,
+    "merge_head": "442b16d55be06c73d681648f97799af3d5de345b",
+    "workflow_sha256": "1615eecc2cd06567123f457a69040a6740dd7abdcb289930e56d2aa29d0ed7c7",
+    "artifact_sha256": "07cbf2156d4a73254e9ea32d5a3a438fa80321dccb29a97a030b5ea393b71016",
+    "input_sha256": "f1c707b8295e85bd396e49b990de92dc82bc0d58eca1e4e4bef31262d9898cd2",
+    "config_sha256": "c0ea1976499ea0d41b10b169ed206f821437e5a418ba33957100c2bd500abf64",
+    "run_url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/37821865072",
+    "job_url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/37821865072/job/113464648417",
+    "scope": "Retained actual hosted baseline; report merge input bound separately from API PR head"
+  },
+  "after": {
+    "evidence_class": "synthetic",
+    "native_checked_in_shell": true,
+    "fixtures": [
+      {
+        "native_json": 0,
+        "native_sarif": 0,
+        "report_step_exit": 0,
+        "invocations": 2,
+        "native_code_witnesses": {
+          "json.exit_code": "0",
+          "sarif.exit_code": "0"
+        },
+        "raw_report_log_code_hashes_preserved": true
+      },
+      {
+        "native_json": 1,
+        "native_sarif": 0,
+        "report_step_exit": 0,
+        "invocations": 2,
+        "native_code_witnesses": {
+          "json.exit_code": "1",
+          "sarif.exit_code": "0"
+        },
+        "raw_report_log_code_hashes_preserved": true
+      },
+      {
+        "native_json": 0,
+        "native_sarif": 1,
+        "report_step_exit": 0,
+        "invocations": 2,
+        "native_code_witnesses": {
+          "json.exit_code": "0",
+          "sarif.exit_code": "1"
+        },
+        "raw_report_log_code_hashes_preserved": true
+      },
+      {
+        "native_json": 1,
+        "native_sarif": 1,
+        "report_step_exit": 0,
+        "invocations": 2,
+        "native_code_witnesses": {
+          "json.exit_code": "1",
+          "sarif.exit_code": "1"
+        },
+        "raw_report_log_code_hashes_preserved": true
+      },
+      {
+        "native_json": 2,
+        "native_sarif": 0,
+        "report_step_exit": 2,
+        "invocations": 2,
+        "native_code_witnesses": {
+          "json.exit_code": "2",
+          "sarif.exit_code": "0"
+        },
+        "raw_report_log_code_hashes_preserved": true
+      },
+      {
+        "native_json": 0,
+        "native_sarif": 7,
+        "report_step_exit": 7,
+        "invocations": 2,
+        "native_code_witnesses": {
+          "json.exit_code": "0",
+          "sarif.exit_code": "7"
+        },
+        "raw_report_log_code_hashes_preserved": true
+      },
+      {
+        "native_json": 1,
+        "native_sarif": 2,
+        "report_step_exit": 2,
+        "invocations": 2,
+        "native_code_witnesses": {
+          "json.exit_code": "1",
+          "sarif.exit_code": "2"
+        },
+        "raw_report_log_code_hashes_preserved": true
+      },
+      {
+        "native_json": 2,
+        "native_sarif": 1,
+        "report_step_exit": 2,
+        "invocations": 2,
+        "native_code_witnesses": {
+          "json.exit_code": "2",
+          "sarif.exit_code": "1"
+        },
+        "raw_report_log_code_hashes_preserved": true
+      }
+    ],
+    "all_raw_report_log_code_hashes_equal_before": true,
+    "native128_129_controls": {
+      "test": "tests.test_frozen_evidence_reporting.FrozenReportWorkflowTests.test_native_findings_errors_and_both_logs_are_retained",
+      "additional_pairs": [
+        [
+          128,
+          1
+        ],
+        [
+          1,
+          129
+        ]
+      ],
+      "result": "PASS rc0,0.892s; native error codes remain failure exits"
+    },
+    "hosted_after": "PENDING; local fixture does not establish hosted job or publishing acceptance",
+    "clear_or_safe_claim": false
+  },
+  "validation": {
+    "evidence_class": "local_integration",
+    "focused": {
+      "argv": [
+        "/usr/bin/python3",
+        "-m",
+        "unittest",
+        "tests.test_frozen_evidence_reporting",
+        "tests.test_osv_lockfile_coverage",
+        "tests.test_frozen_macos_variant_no_use",
+        "tests.test_workflow_hardening",
+        "tests.test_workflow_policy",
+        "tests.test_workflow_security_coverage",
+        "-q"
+      ],
+      "result": 0,
+      "tests_run": 254,
+      "skips": 1,
+      "seconds": 38.71,
+      "output_sha256": "32d12349f1572de65e791d3e978303edcc0fc22e15894197ed5294ac3c360a8d"
+    },
+    "post_source_case_extension": {
+      "method": "FrozenReportWorkflowTests.test_native_findings_errors_and_both_logs_are_retained",
+      "result": 0,
+      "tests_run": 1,
+      "seconds": 0.892
+    },
+    "actionlint": {
+      "vendor": "kjanat/actionlint",
+      "version": "1.17.0",
+      "result": 0
+    },
+    "unchanged_main_tests_on_candidate": {
+      "phase": "BASE_TESTS_ON_CANDIDATE_WORKFLOW",
+      "base_sha": "89e89852161d8157e464f4bd07c2b5c747ad4706",
+      "testsRun": 13,
+      "failures": [
+        "test_native_findings_errors_and_both_logs_are_retained (opt6_main_tests_against_candidate.FrozenReportWorkflowTests.test_native_findings_errors_and_both_logs_are_retained) (json=1, sarif=0)",
+        "test_native_findings_errors_and_both_logs_are_retained (opt6_main_tests_against_candidate.FrozenReportWorkflowTests.test_native_findings_errors_and_both_logs_are_retained) (json=0, sarif=1)"
+      ],
+      "errors": [],
+      "expected_changed_method": "FrozenReportWorkflowTests.test_native_findings_errors_and_both_logs_are_retained",
+      "exact_declared_failure_set": true,
+      "output_sha256": "02d22a0ce07afc25516641b3ab5b97f0fb3557eecc298c5c3ebbf92631b1cb77"
+    },
+    "full_repository_suite_run": false
+  },
+  "declared_contract_change": {
+    "kind": 3,
+    "methods": [
+      "tests.test_frozen_evidence_reporting.FrozenReportWorkflowTests.test_native_findings_errors_and_both_logs_are_retained"
+    ],
+    "exact_old_failures": [
+      {
+        "json": 1,
+        "sarif": 0
+      },
+      {
+        "json": 0,
+        "sarif": 1
+      }
+    ],
+    "reason": "The completed frozen report treats scanner findings as data; production vulnerability gates and operational failures remain blocking."
+  },
+  "inverse": {
+    "evidence_class": "local_integration",
+    "scope": "Only2owneduncommittedimplementationfiles",
+    "restore_result": true,
+    "reapply_result": true,
+    "base_sha256": {
+      ".github/workflows/frozen-evidence-risk.yml": "1615eecc2cd06567123f457a69040a6740dd7abdcb289930e56d2aa29d0ed7c7",
+      "tests/test_frozen_evidence_reporting.py": "af33af1c0acb43c56602d4555e3f697bcff49549e22d6ba909c36945facddb0f"
+    },
+    "candidate_sha256": {
+      ".github/workflows/frozen-evidence-risk.yml": "5cd476f7dd0b31d8d9166ddb2418009fbd56c9dd4fe4bbff7d24e6ac0cf20e2a",
+      "tests/test_frozen_evidence_reporting.py": "d1a1b72bc3e7ac350da86508b545624a230c38b0520097cf1bda24c4abbd1fbf"
+    },
+    "steps": [
+      {
+        "native_operation": [
+          "git",
+          "apply",
+          "--check"
+        ],
+        "result": 0
+      },
+      {
+        "native_operation": [
+          "git",
+          "apply",
+          "<owned-inverse-patch>"
+        ],
+        "result": 0
+      },
+      {
+        "native_operation": [
+          "git",
+          "apply",
+          "--check"
+        ],
+        "result": 0
+      },
+      {
+        "native_operation": [
+          "git",
+          "apply",
+          "<owned-forward-patch>"
+        ],
+        "result": 0
+      }
+    ],
+    "future_landed_inverse": "Reviewed inverse PR restoring only this change on CC cue through5f; retain actual merge/head/tree and re-register evidence hashes."
+  },
+  "untouched": {
+    ".github/workflows/security-scan.yml": "44547b18f6b2551fb488cfeadaf7b1acb4d0432274f0787fe092ce2a7397d937",
+    ".github/osv-scanner-lockfiles.json": "c7cbfee447c2e5c2a71d9db5f56bba3af7084f197e084aeecc8e17456d38bfad",
+    ".github/osv-scanner-frozen-report.toml": "c0ea1976499ea0d41b10b169ed206f821437e5a418ba33957100c2bd500abf64",
+    ".github/osv-scanner-frozen-macos.toml": "a00d1e2df72d7aca121ae39380e9c0f761a5d3d32d0392fa598502bdae2a89c6",
+    "evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml": "f1c707b8295e85bd396e49b990de92dc82bc0d58eca1e4e4bef31262d9898cd2"
+  },
+  "limits": [
+    "No local OSV installation or new native scan; hosted baseline is the retained existing pinned scan.",
+    "No assertion that risk disappeared: nine advisories remain visible, with original raw JSON/SARIF/log/code witnesses and owner/deadline.",
+    "Per-advisory disposition/delivery and hosted after remain separate duties.",
+    "Scanner/data/eligibility/install errors, unknown/malformed/missing output remain failures; no generic continue-on-error.",
+    "Workflow landing requires explicit CC cue through5f."
+  ]
+}
