@@ -92,6 +92,29 @@
     "https://docs.github.com/en/actions/reference/security/secure-use",
     "https://docs.github.com/en/billing/concepts/product-billing/github-actions"
   ],
+  "research_memory_jobs": [
+    {
+      "id": "hindsight-research-memory",
+      "repo": "vectorize-io/hindsight",
+      "version": "0.10.2",
+      "source_commit": "5fc4ce20917b916240cef27c212c387a177f115b",
+      "job": "Retain and recall research hypotheses and experiment records for the research harness.",
+      "bank": "trading-research",
+      "status": "native operation accepted; coding memory remains ai-memory",
+      "recipe_path": "recipes/hindsight-research-memory.md",
+      "unit_template": "adoption/templates/systemd/hindsight-research.service",
+      "mcp_allowlist_template": "adoption/templates/systemd/hindsight-research.service.d/10-mcp-tools.conf",
+      "evidence_path": "evidence/artifacts/hindsight-research-memory-20261008/receipt.json",
+      "sources": [
+        "https://github.com/vectorize-io/hindsight/tree/5fc4ce20917b916240cef27c212c387a177f115b"
+      ],
+      "limitations": [
+        "Verbatim research recall selects types world and experience; observations are synthesized paraphrases.",
+        "Recall cannot hard-filter by time; backtest research must not rely on it for point-in-time exclusion.",
+        "Recorded synthetic integration checks do not establish research recall quality or trading results."
+      ]
+    }
+  ],
   "recent_models": [
     {
       "id": "Qwen/Qwen3.8-27B",
