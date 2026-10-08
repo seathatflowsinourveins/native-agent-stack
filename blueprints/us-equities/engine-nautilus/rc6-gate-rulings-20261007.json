@@ -6,7 +6,8 @@
   "decided_by": [
     "the command center's item task-native-agent-stack-5f-20261006T194228Z (section 2, the grand-catalog lane's question Q26)",
     "the gate owner's report of 2026-10-07T00:35:54Z",
-    "the command center's item task-native-agent-stack-5f-20261007T003642Z (rulings 1 and 2)"
+    "the command center's item task-native-agent-stack-5f-20261007T003642Z (rulings 1 and 2)",
+    "the command center's item task-ns2604-coop-20261008T060802Z (section 6, superseding the historical host restriction)"
   ],
   "candidate": {
     "pr": 761,
@@ -58,7 +59,7 @@
       "status": "EXCLUDED",
       "excluded_date_utc": "2026-10-07",
       "cases": ["AAPL baseline", "AAPL fee_slippage_stress"],
-      "reason": "qualifying inputs not present on the hosts that could hold them: NativeStack (searched 2026-10-07, see search) and the Mac host (searched 2026-10-08, see standing_note_outcome_2026-10-08); NativeStack2604 holds no trading data by design; no reacquisition without a hash gate",
+      "reason": "Qualifying inputs were not found in the recorded NativeStack search (2026-10-07, see search) or the Mac search (2026-10-08, see standing_note_outcome_2026-10-08). The then-current restriction against trading data on NativeStack2604 was superseded by command-center item task-ns2604-coop-20261008T060802Z, section 6: NativeStack2604 is now the only trading host, holding the runtime, trading data and paper credentials. These historical searches do not establish absence on NativeStack2604; G4 remains EXCLUDED until hash-matching inputs are restored or its hash-gated overturn route qualifies.",
       "required_inputs": {
         "source": "blueprints/us-equities/engine-nautilus/equity-replay/receipt.json (input block) at the source pin",
         "alpaca_receipt_sha256": "a59c6ed74e839ca43ee704033e207865ed938a22e4738afce22ec197e91b6bcd",
@@ -73,7 +74,7 @@
         "scope": "the paper-lane and Alpaca state under the native-agent-stack state root, this session's worktrees and the user cache, by SHA-256 of every candidate file; private stores outside the session's scope were not opened",
         "files_hashed": {"alpaca_path_json": 7785, "receipt_or_aapl_named": 46980},
         "matches": 0,
-        "NativeStack2604": "holds no trading data by design"
+        "NativeStack2604": "Not searched in this historical attempt under the then-current no-trading-data restriction. Superseded 2026-10-08 by command-center item task-ns2604-coop-20261008T060802Z, section 6: NativeStack2604 is the only trading host, holding the runtime, trading data and paper credentials. No new G4 input search is claimed."
       },
       "overturn_route": "A dated deviation for a hash-gated reacquisition of the 15 AAPL sessions 2020-08-10..2020-08-28, qualifying only if the reacquired selected rows hash to adb2a240727bcd0c309c0c0ae34c649387ba23a0eba3da5d99c067d25bb06ad0. A new Alpaca receipt cannot reproduce a59c6ed74e839ca43ee704033e207865ed938a22e4738afce22ec197e91b6bcd. It runs in the trading lane's next data wave, not now.",
       "standing_note": "When the Mac host is next online, its lane searches for the two hashes first; a match there restores the original inputs without any reacquisition.",
@@ -84,6 +85,6 @@
   },
   "limitations": [
     "This record rules on the gates; it runs nothing, reacquires nothing and changes no rc6 source, oracle or launcher.",
-    "The search proves absence only within its stated scope on NativeStack; the Mac host was not searched."
+    "The searches establish absence only within their stated dated scopes on NativeStack and the Mac host. No new G4 input search on NativeStack2604 is claimed by the host-ruling amendment."
   ]
 }

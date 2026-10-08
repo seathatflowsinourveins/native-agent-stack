@@ -15,8 +15,9 @@ NativeStack2604's recorded installation and **25/25 offline checks passed** at t
 pin on **2026-10-05, 01:00:17Z–01:01:07Z**, at commit `d02c0827` on lock
 `4c98672d14147a1b`. The [rerun receipt](../../../evidence/receipts/native-trading-runtime-2604-rerun-20261005.json)
 records this separate execution; independent review remains pending. The earlier
-receipt continues to describe its 5.58.0 execution. Neither run qualifies the
-current DVC-free bundle; its destination-host install and offline rerun are pending.
+receipt continues to describe its 5.58.0 execution. These runs predate the current
+DVC-free bundle; its separate [24/24 acceptance](#current-acceptance-and-pipeline-evidence--2026-10-08)
+is recorded below.
 
 The current lock SHA256 is
 `1fb9f8ca6fef9c47a4ded826ddf20012f78d6643926cce3a36b86c674f55eb9c`.
@@ -320,11 +321,34 @@ red/green scans. These are packaging-worker checks; the historical destination
 host receipts remain unchanged. A future demonstrated DVC workflow requires a
 separate reviewed dependency and cache-security decision before reinstatement.
 
+## Current acceptance and pipeline evidence — 2026-10-08
+
+The [5a acceptance receipt](receipts/acceptance-20261008.json) records **rc 0,
+24/24 PASS** on NativeStack2604 from **06:20:48Z to 06:21:25Z**, using the installed
+runtime at lock `1fb9f8ca6fef9c47`. The unchanged `accept-trading-2604.sh` ran from
+the co-op's native WSL shell. This is this repository's offline integration
+acceptance; it establishes no upstream test-suite pass and did not repeat
+installation. The prior 25/25 result on lock `4c98672d14147a1b` remains historical,
+with its independent review pending.
+
+Attempt 1 is retained: the readiness-runner's shell lacked `WSL_DISTRO_NAME`, so
+the script's own host guard at line 49 returned rc 1 with all 24 checks BLOCKED.
+The co-op's shell receives the NativeStack2604 value from WSL itself; the guard
+was unchanged and no value was set by hand. Later guarded scripts run through
+the co-op's native shell.
+
+The [5b pipeline receipt](receipts/backtest-pipeline-20261008.json) records a
+completed Alpaca-history-to-NautilusTrader rc5 backtest on NativeStack2604,
+repeated with identical results. Its inputs are AAPL, MSFT, AMZN and GOOG daily
+bars for 2025-01-06 through 2025-01-31 and a fixed buy/close schedule. This
+establishes the pipeline only. The original run used provider midnight plus
+24 hours for bar timestamps; the XNYS-close correction belongs to the later
+entrance exam. Layer 1.5 CIK identity, split verification, delisting and
+terminal-price gates remain unaccepted, so this receipt establishes no strategy
+eligibility or performance claim.
+
 ## Open qualification
 
-- Re-run installation and the current **24 offline checks** on NativeStack2604
-  against lock `1fb9f8ca6fef9c47`; record a new receipt. The prior 25/25 result
-  on lock `4c98672d14147a1b` remains historical, with independent review pending.
 - Ratify supplemental **CPython 3.12.3 against 3.13**, including the foundation's
   3.13.15 alternative, and ratify the complete runtime matrix on frozen matching
   engine/adapter inputs. A successful 3.12.3 smoke does not complete this comparison.
@@ -340,9 +364,12 @@ separate reviewed dependency and cache-security decision before reinstatement.
   supplied second Claude PASS concerns prepared r2 files; its verdict artifact
   and a post-run independent observation were not included in the staged bundle.
 
-Paper credentials stay on NativeStack and are never copied across distributions.
-Later paper operation on 2604 needs its own placement/configuration, native
-sign-in and entitlements, unique client IDs and coordinated single-writer
-ownership. Existing paper authorization remains as recorded in
+The command center's 2026-10-08 item `task-ns2604-coop-20261008T060802Z`, §6,
+designates **NativeStack2604 as the only trading host**, holding the runtime,
+trading data and paper credentials. It supersedes the earlier NativeStack-only
+credential placement statement. Historical NativeStack receipts retain their
+original host and scope. Paper operation on NativeStack2604 still requires
+broker-specific configuration, native sign-in and entitlements, unique client
+IDs and coordinated single-writer ownership. Existing paper authorization remains as recorded in
 [paper-lane-policy.md](../../../docs/paper-lane-policy.md). This package creates
 no paper runner, live entrypoint, credential provision, service or paid hosting.

@@ -233,10 +233,36 @@
     "recipe": "blueprints/us-equities/runtime-2604/README.md",
     "receipt": "evidence/receipts/native-trading-runtime-2604-20261004.json",
     "host_receipt": "evidence/hosts/native-stack-2604-20261004/native-stack-2604-20261004--nautilustrader--use--20261004.json",
+    "current_acceptance_20261008": {
+      "status": "passed",
+      "host": "NativeStack2604",
+      "run_started_utc": "2026-10-08T06:20:48Z",
+      "run_finished_utc": "2026-10-08T06:21:25Z",
+      "exit_code": 0,
+      "checks": {"pass": 24, "fail": 0, "blocked": 0},
+      "lock_sha256": "1fb9f8ca6fef9c47a4ded826ddf20012f78d6643926cce3a36b86c674f55eb9c",
+      "receipt": "blueprints/us-equities/runtime-2604/receipts/acceptance-20261008.json",
+      "evidence_class": "native_proven",
+      "scope": "The co-op ran the unchanged acceptance script from its native WSL shell on the already installed runtime. Installation was not repeated; this is not an upstream test-suite pass and changes no engine, strategy or broker gate.",
+      "host_guard": "Attempt 1 is retained: readiness-runner's shell lacked WSL_DISTRO_NAME, so accept-trading-2604.sh:49 blocked all 24 checks with rc 1. WSL supplied the NativeStack2604 value in the co-op's shell; the guard was unchanged and no value was set by hand. Later guarded scripts run through the co-op's native shell."
+    },
+    "pipeline_e2e_20261008": {
+      "status": "completed_repeated_identically",
+      "host": "NativeStack2604",
+      "engine": "NautilusTrader 2.0.0rc5",
+      "receipt": "blueprints/us-equities/runtime-2604/receipts/backtest-pipeline-20261008.json",
+      "scope": "Alpaca daily history for AAPL, MSFT, AMZN and GOOG from 2025-01-06 through 2025-01-31, through a fixed buy/close backtest schedule, repeated with identical results. Pipeline evidence only; no strategy eligibility or performance claim.",
+      "timestamp_convention": "Original provider midnight plus 24 hours; the XNYS-close correction belongs to the later entrance exam.",
+      "unaccepted_gates": ["Layer 1.5 CIK identity", "split verification", "delisting and terminal-price resolution"]
+    },
+    "trading_host_ruling_20261008": {
+      "source": "Command-center item task-ns2604-coop-20261008T060802Z, section 6",
+      "host": "NativeStack2604",
+      "ruling": "The only trading host; holds the runtime, trading data and paper credentials. Supersedes the earlier NativeStack-only credential placement and no-trading-data-on-2604 statements; historical receipts keep their original host and scope."
+    },
     "open": [
       "Ratify CPython 3.12.3 against 3.13 and the complete canonical runtime matrix.",
-      "Independent post-run host-receipt review, per-check outputs and all existing data, strategy, oracle and broker gates remain separate.",
-      "Re-run installation and the 24 offline checks on NativeStack2604 against current lock 1fb9f8ca6fef9c47 and record a new receipt; this lock is not yet qualified on that host. The 2604 co-op will run install-trading-2604.sh and accept-trading-2604.sh."
+      "Independent post-run review of the historical host receipts and all existing data, strategy, oracle and broker gates remain separate. The current lock's 24/24 offline integration acceptance is recorded in current_acceptance_20261008; installation was not repeated."
     ],
     "edgartools_pin_move_20261004": {
       "runtime_pin": "5.60.0",
@@ -248,7 +274,7 @@
       "receipt_id": "native-sec-edgartools-5600-20261004",
       "evidence_ref": "blueprints/us-equities/catalyst-provenance/native-network-edgartools-5600-20261004.json",
       "historical_2604_run_edgartools": "5.58.0",
-      "native_stack_2604_rerun": "recorded historical qualification: native-trading-runtime-2604-rerun-d02c0827-20261005 (evidence/receipts/native-trading-runtime-2604-rerun-20261005.json); install PASS and 25/25 offline acceptance at d02c0827 on lock 4c98672d14147a1b (before the 2026-10-05 DVC removal), 2026-10-05T01:00:17Z-01:01:07Z, through mise exec uv@0.12.17; independent review pending. Current lock 1fb9f8ca6fef9c47 is not yet qualified on NativeStack2604; the 2604 co-op will re-run installation and accept-trading-2604.sh and write a separate receipt.",
+      "native_stack_2604_rerun": "recorded historical qualification: native-trading-runtime-2604-rerun-d02c0827-20261005 (evidence/receipts/native-trading-runtime-2604-rerun-20261005.json); install PASS and 25/25 offline acceptance at d02c0827 on lock 4c98672d14147a1b (before the 2026-10-05 DVC removal), 2026-10-05T01:00:17Z-01:01:07Z, through mise exec uv@0.12.17; independent review pending. Superseding current-lock acceptance is recorded in current_acceptance_20261008: NativeStack2604, 24/24 PASS, rc 0, 2026-10-08T06:20:48Z-06:21:25Z, lock 1fb9f8ca6fef9c47. Installation was not repeated.",
       "scope": "Bounded SEC index acceptance on NativeStack; no strategy, point-in-time data, paper or broker gate changes."
     }
   }
