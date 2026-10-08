@@ -679,15 +679,15 @@ source/tarball inspection, syntax checks and project unittests are distinct from
   with the WSL change at [microsoft/WSL PR40621](https://github.com/microsoft/WSL/pull/40621).
   The image install stays that recipe's W2-W6, separate from Linux acceptance.
 - **srt install and native use:**
-  [anthropics/sandbox-runtime@v0.0.78:README.md:14](https://github.com/anthropics/sandbox-runtime/blob/v0.0.78/README.md#L14),
-  [README.md:166-179](https://github.com/anthropics/sandbox-runtime/blob/v0.0.78/README.md#L166) and
-  [src/cli.ts:276-324](https://github.com/anthropics/sandbox-runtime/blob/v0.0.78/src/cli.ts#L276)
+  [anthropics/sandbox-runtime@d9aac209:README.md:14](https://github.com/anthropics/sandbox-runtime/blob/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/README.md#L14),
+  [README.md:166-179](https://github.com/anthropics/sandbox-runtime/blob/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/README.md#L166) and
+  [src/cli.ts:274-341](https://github.com/anthropics/sandbox-runtime/blob/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/src/cli.ts#L274)
   supply installation, the unchanged smoke, the settings interface and refusal when an explicit policy cannot load.
-  GitHub's tag API resolves v0.0.78 to `6f0ce155ccb136bda33a8a72201fe7f54fe47d9b`; its
-  [release notes](https://github.com/anthropics/sandbox-runtime/releases/tag/v0.0.78) were checked.
-  The [npm metadata](https://registry.npmjs.org/%40anthropic-ai%2Fsandbox-runtime/0.0.78) and downloaded archive agree on
+  GitHub's tag API resolves v0.0.79 to `d9aac2098351ca17f3743fbaf6ecbd0051b7e00e`; its
+  [release metadata](https://github.com/anthropics/sandbox-runtime/releases/tag/v0.0.79) was rechecked on 2026-10-08.
+  The [npm metadata](https://registry.npmjs.org/%40anthropic-ai%2Fsandbox-runtime/0.0.79) and downloaded archive agree on
   SHA-512 integrity; its independently computed SHA-256 is
-  `a9cf9e35068a4c71d2d94de8b0abe8de51c7d44daef537cc92906848ccc67240`.
+  `5a730e4367c264ccc4b592af01dab038a6c39db7c184efbd132841688fa854f1`.
   Fresh-session controls are local integration checks on the executor's existing synthetic fixtures, not unchanged
   upstream tests. Native Claude Code 2.1.289 help and the original host-1 tool events establish the headless lane;
   [headless docs](https://code.claude.com/docs/en/headless) are a locator (the worker's direct fetch returned 403).

@@ -945,7 +945,7 @@ agent-runtime-worker() {
   run_command 'install -m 0600 -- "$plan_dir/config/openhands-worker.py" "$config_root/openhands/worker.py"' || return "$?"
   # Source: https://github.com/OpenHands/software-agent-sdk/blob/v1.50.1/examples/01_standalone_sdk/01_hello_world.py#L9
   run_command 'install -m 0600 -- "$plan_dir/config/openhands-job.json" "$config_root/openhands/job-template.json"' || return "$?"
-  # Source: https://github.com/anthropic-experimental/sandbox-runtime/blob/v0.0.78/README.md
+  # Source: https://github.com/anthropics/sandbox-runtime/blob/d9aac2098351ca17f3743fbaf6ecbd0051b7e00e/README.md#L174
   run_command 'install -m 0600 -- "$plan_dir/config/openhands-srt.json" "$config_root/openhands/srt-template.json"' || return "$?"
   # Source: https://www.freedesktop.org/software/systemd/man/latest/systemd.service.html
   run_command 'install -m 0600 -- "$plan_dir/config/openhands-job@.service" "$HOME/.config/systemd/user/openhands-job@.service" && systemctl --user daemon-reload' || return "$?"
