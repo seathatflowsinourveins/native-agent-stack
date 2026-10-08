@@ -7832,7 +7832,7 @@
         "updated_at"
       ],
       "path": "adoption/manifest.json",
-      "sha256": "67d53c69ab322a37437aeaaceaec73655710657abc08ec269d5e5bbb115abdfb"
+      "sha256": "c0d7c2efbd2a954e020f432b8cf677a7a4027a54f2deb3b2fb6e0c70bdd01368"
     },
     {
       "path": "adoption/new-wsl-profile.json",
@@ -7844,7 +7844,7 @@
     },
     {
       "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
-      "sha256": "79487183570d6d875dfaebea9e6c7b9a207b1f91ea6b65a931b5a57793472ab8"
+      "sha256": "e35a8d2c2a4199a14799f65f1a25ed572bfcc0f974315a864cd7d768a6fcba1c"
     },
     {
       "path": "catalogs/landscape/research-state.json",

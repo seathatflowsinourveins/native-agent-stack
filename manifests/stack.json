@@ -1992,6 +1992,28 @@
         "https://nautilustrader.io/docs/latest/getting_started/installation/"
       ],
       "freshness": "Exact requested release candidate in isolated native prefix; upstream synthetic and later AAPL diagnostic replays accepted within their receipts. Frozen SPY parity and native Nautilus broker acceptance remain open; separate Alpaca paper evidence does not qualify the Nautilus adapter."
+    },
+    {
+      "id": "hindsight",
+      "repository": "https://github.com/vectorize-io/hindsight",
+      "version": "0.10.2",
+      "license": "MIT",
+      "profile": "supporting",
+      "role": "Research hypotheses and experiment records in trading-research; ai-memory remains the clients' coding memory",
+      "commands": [
+        "python3.13 -m venv ~/.local/share/hindsight/venv",
+        "~/.local/share/hindsight/venv/bin/pip install hindsight-api==0.10.2 hindsight-client==0.10.2",
+        "~/.local/share/hindsight/venv/bin/hindsight-api --host 127.0.0.1 --port 8888"
+      ],
+      "evidence_ids": [
+        "hindsight-research-memory-20261008"
+      ],
+      "source_pin": "5fc4ce20917b916240cef27c212c387a177f115b",
+      "upstream_sources": [
+        "https://github.com/vectorize-io/hindsight/tree/5fc4ce20917b916240cef27c212c387a177f115b",
+        "https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/hindsight-docs/docs/developer/installation.md#L229"
+      ],
+      "freshness": "Recorded NativeStack2604 vendor installation, CPU retrieval, gateway startup verification and synthetic native round trips accepted on 2026-10-08. Repository template recovery/allowlist fixes await a separate CC-cued host apply; recall quality, point-in-time exclusion and unchanged upstream tests remain outside this acceptance."
     }
   ],
   "profiles": [
@@ -2021,6 +2043,7 @@
       "component_ids": [
         "toon",
         "headroom",
+        "hindsight",
         "context-hub",
         "ast-grep",
         "repomix",

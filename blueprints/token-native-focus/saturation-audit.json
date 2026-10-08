@@ -31,9 +31,9 @@
     ]
   },
   "counts": {
-    "selected_components": 69,
+    "selected_components": 70,
     "catalog_identities": 875,
-    "nonselected_catalog_identities": 806,
+    "nonselected_catalog_identities": 805,
     "exclusive_identity_groups": {
       "star_review": 281,
       "component_record": 69,
@@ -9594,6 +9594,88 @@
         "regression_policy": "Keep the cheaper adequate native path when a candidate expands tokens or fails required information/quality checks."
       },
       "source_pin": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e"
+    },
+    {
+      "component_id": "hindsight",
+      "repository": "https://github.com/vectorize-io/hindsight",
+      "version": "0.10.2",
+      "profile": "supporting",
+      "role": "Research hypotheses and experiment records in trading-research; ai-memory remains the clients' coding memory",
+      "installation_assessment": "Vendor Python installation recorded on NativeStack2604 on 2026-10-08; this row reuses that execution.",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/hindsight",
+        "documented_commands": [
+          "python3.13 -m venv ~/.local/share/hindsight/venv",
+          "~/.local/share/hindsight/venv/bin/pip install hindsight-api==0.10.2 hindsight-client==0.10.2",
+          "~/.local/share/hindsight/venv/bin/hindsight-api --host 127.0.0.1 --port 8888"
+        ],
+        "scope": "Research memory in the trading-research bank; private configuration remains host-owned.",
+        "recipe_document": "recipes/hindsight-research-memory.md",
+        "lifecycle_guide": "adoption/lifecycle.md"
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "hindsight-research-memory-20261008",
+            "path": "evidence/receipts/hindsight-research-memory-20261008.json",
+            "kind": "native_model_e2e"
+          }
+        ],
+        "retained_operation_ids": [],
+        "scope": "Original attributed lane/command-center native operations and synthetic numeric/client round trips; no new acceptance is inferred from publication."
+      },
+      "artifact_baselines": [],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse scoped evidence; host operator applies the reviewed recovery/allowlist template changes separately.",
+      "integration_mode": "User service plus bank-scoped HTTP MCP in the selected research clients.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Original install/use/stop/start observations are retained; a new host, crash recovery and full retirement are not inferred.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "The accepted host has the installed service and client registrations; template fixes remain a separate host-operator apply.",
+      "source_pin": "5fc4ce20917b916240cef27c212c387a177f115b",
+      "lifecycle_stages": {
+        "install": {
+          "status": "accepted_within_scope",
+          "scope": "Recorded clean venv/vendor pip install and later command-center unit/client installation.",
+          "evidence_refs": ["evidence/receipts/hindsight-research-memory-20261008.json"]
+        },
+        "use": {
+          "status": "accepted_within_scope",
+          "scope": "Gateway startup verification, byte-equal synthetic records, strict experiment-tag isolation and native cross-client round trip.",
+          "evidence_refs": ["evidence/receipts/hindsight-research-memory-20261008.json"]
+        },
+        "persistence": {
+          "status": "documented_not_replayed",
+          "scope": "Named pg0 data-directory persistence is documented; the mapped receipt does not establish same-record durability after restart or backup/restore.",
+          "evidence_refs": ["recipes/hindsight-research-memory.md"]
+        },
+        "restart": {
+          "status": "partial_acceptance",
+          "scope": "The command center recorded unit start and a later MCP-allowlist restart; the revised crash-retry template and failure recovery are not installed or exercised here.",
+          "evidence_refs": ["evidence/receipts/hindsight-research-memory-20261008.json"]
+        },
+        "cleanup": {
+          "status": "documented_not_replayed",
+          "scope": "Recorded inverse removes registration, unit and owned data after stop; full package/data retirement was not replayed.",
+          "evidence_refs": ["recipes/hindsight-research-memory.md"]
+        },
+        "recovery": {
+          "status": "documented_not_replayed",
+          "scope": "Vendor foreground fallback and repository crash-retry template are documented; failure recovery is not established by retained acceptance.",
+          "evidence_refs": ["recipes/hindsight-research-memory.md"]
+        }
+      },
+      "baseline_applicability": {
+        "category": "supporting_workflow",
+        "scope": "Research record storage/retrieval has no matched provider-token saving baseline in these receipts.",
+        "retained_artifact_comparisons": 0,
+        "matched_lifetime_provider_baseline": "not_established",
+        "regression_policy": "Recheck the affected native operation when inputs change; preserve historical failures and scoped acceptance."
+      }
     }
   ],
   "remaining_boundaries": [

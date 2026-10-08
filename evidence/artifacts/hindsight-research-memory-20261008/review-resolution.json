@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-08T12:14:00Z",
+  "scope": "PR 854 repository template and registration review; no live Hindsight/gateway restart, client change or model call.",
+  "upstream": {
+    "repository": "https://github.com/vectorize-io/hindsight",
+    "source_pin": "5fc4ce20917b916240cef27c212c387a177f115b",
+    "primary_content_observations": [
+      {
+        "path": "hindsight-docs/docs/developer/configuration.mdx",
+        "github_blob_sha": "1068e01cae78837930a4c3b15aba6030a41d47c7",
+        "sha256": "54effd2ecc231f2a6ea1d80f8b1b69ffb7d2a7f3d76ac82c130908601c6b3057"
+      },
+      {
+        "path": "hindsight-api-slim/hindsight_api/config.py",
+        "github_blob_sha": "f36afae10efb5528d46cac6470ac226ebf98b87e",
+        "sha256": "b534275629100dda24635992f18b4e3f8eda9b5c9ff6dc78e53f77378f78c164"
+      }
+    ],
+    "verification": "Independent raw immutable-pin and GitHub Contents API reads returned identical decoded bytes; no line mapping was inferred from the review comment."
+  },
+  "threads": [
+    {
+      "comment_id": 4218604516,
+      "verdict": "Crash recovery holds; gateway-down startup failure premise does not apply.",
+      "change": "Wants/After omniroute.service; Restart=on-failure; RestartSec=5s.",
+      "source": "Installed systemd 259.5 unit/service docs; pinned memory_engine.py:5371-5381 catches verification exceptions and warns while continuing startup.",
+      "limit": "Unit ordering does not prove HTTP readiness; actual host apply/recovery remains CC-cued."
+    },
+    {
+      "comment_id": 4218604521,
+      "verdict": "EnvironmentFile precedence finding holds.",
+      "change": "Required nonsecret mcp-tools.env is read after stage.env; preserve vendor ExecStart.",
+      "native_reproduction": {
+        "evidence_class": "local_integration",
+        "fixture": "Isolated transient user units run only /usr/bin/printenv HINDSIGHT_API_MCP_ENABLED_TOOLS with nonsecret synthetic environment files.",
+        "before": "An EnvironmentFile value delete_bank overrides the 15-tool Environment assignment.",
+        "after": "The later allowlist EnvironmentFile overrides the earlier broad value and returns the exact 15 tools.",
+        "exit_codes": [0, 0],
+        "retained_journal_sha256": {
+          "before": "f335972e024eb8565f1365ccabff6280c718fc9a81116692c5506cdecf121a0f",
+          "after": "429cdbe3cdd992275eae6f3d581c41d5ac7803ff4fc6889eb419f17fcd61f8ff"
+        },
+        "command_provenance": "Native journal records the executed printenv target. Exact outer shell command after RTK is not separately captured here; no exact-outer-command claim is made.",
+        "live_service_touched": false
+      }
+    },
+    {
+      "comment_id": 4218604530,
+      "verdict": "Proposed configuration/config.py line shifts contradict the immutable primary source.",
+      "verified_locators": {
+        "DATABASE_URL": 26,
+        "MCP_ENABLED": 2388,
+        "MCP_ENABLED_TOOLS_documentation": 2389,
+        "MCP_LOCAL_BANK_ID": 2392,
+        "ENV_MCP_ENABLED_TOOLS_constant": 680,
+        "mcp_enabled_tools_parser": "4792-4794"
+      },
+      "refinement": "Pip citation points directly to installation.md:229; CLI flags are at 265-266. Existing correct configuration locators remain."
+    },
+    {
+      "comment_id": 4218604540,
+      "verdict": "Accepted-component registration finding holds.",
+      "change": "Register supporting component hindsight, its evidence wrapper, recipe map, lifecycle row and canonical component reference; preserve coding memory and historical artifacts."
+    }
+  ],
+  "historical_artifact": "evidence/artifacts/hindsight-research-memory-20261008/receipt.json",
+  "historical_artifact_modified": false,
+  "native_model_calls": 0,
+  "host_template_apply": "pending separate CC cue"
+}
