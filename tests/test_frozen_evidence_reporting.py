@@ -131,10 +131,15 @@ class FrozenReportWorkflowTests(unittest.TestCase):
         self.assertIn("osv-scanner-frozen-macos.sarif", artifacts)
 
     def test_native_findings_errors_and_both_logs_are_retained(self):
-        for json_code, sarif_code in ((1, 0), (0, 1), (2, 0), (0, 7)):
+        for json_code, sarif_code in ((0, 0), (1, 0), (0, 1), (1, 1),
+                                      (2, 0), (0, 7), (1, 2), (2, 1),
+                                      (128, 1), (1, 129)):
             with self.subTest(json=json_code, sarif=sarif_code):
                 result, calls, artifacts = self.run_scan(json_code=json_code, sarif_code=sarif_code)
-                self.assertEqual(result.returncode, max(json_code, sarif_code), result.stderr)
+                # Reported findings do not make the advisory job fail; native
+                # operational errors still do, including mixed-format outcomes.
+                expected = 0 if max(json_code, sarif_code) <= 1 else max(json_code, sarif_code)
+                self.assertEqual(result.returncode, expected, result.stderr)
                 self.assertEqual(len(calls), 2)
                 self.assertEqual(artifacts["json.exit_code"].strip(), str(json_code))
                 self.assertEqual(artifacts["sarif.exit_code"].strip(), str(sarif_code))
