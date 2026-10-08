@@ -466,6 +466,48 @@ class CredentialStatusTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(json.loads(result.stdout)["result"], "ok")
 
+    def test_raw_private_file_remains_metadata_only(self):
+        sys.path.insert(0, str(ROOT / "tools" / "credentials"))
+        import credential_run as runner
+
+        inventory = copy.deepcopy(self.inventory)
+        declared = next(entry for entry in inventory["entries"] if entry["id"] == "sec-contact")
+        declared["status"] = "optional"
+        declared["store"]["kind"] = "private_file"
+        declared["store"]["path_template"] = cs.STORE_ROOT + "/raw-private.key"
+        path = self.store / "raw-private.key"
+        path.write_text(self.fake_a)
+        path.chmod(0o600)
+        with patch.object(runner, "read_store",
+                          side_effect=AssertionError("raw private files must not be read")) as reader:
+            report = cs.inspect(ROOT, inventory, self.env, proc_keys=self.proc_keys)
+        reader.assert_not_called()
+        entry = self.entry(report, "sec-contact")
+        self.assertEqual(entry["state"], "ok")
+        self.assertEqual(entry["findings"], [])
+        self.assertFalse(report["values_read"])
+        self.assertTrue(self.fake_a not in json.dumps(report) + cs.render_text(report),
+                        "credential content appeared in status output")
+
+    def test_core_collector_refusal_precedes_any_store_read(self):
+        sys.path.insert(0, str(ROOT / "tools" / "credentials"))
+        import credential_run as runner
+
+        self.write_alpaca()
+        pattern = self.home / "core-pattern"
+        pattern.write_bytes(b"|fixture-collector\n")
+        with patch.object(runner, "CORE_PATTERN_FILE", str(pattern)), \
+                patch.object(runner, "read_store",
+                             side_effect=AssertionError("store read before core safety")) as reader:
+            report = self.report()
+        reader.assert_not_called()
+        entry = self.entry(report, "alpaca-paper")
+        self.assertEqual(entry["state"], "unsafe")
+        self.assertTrue(any(finding.startswith("core_pattern_pipe:") for finding in entry["findings"]))
+        self.assertFalse(report["values_read"])
+        self.assertTrue(self.fake_a not in json.dumps(report) + cs.render_text(report),
+                        "credential content appeared in status output")
+
     def test_runner_refused_store_lines_are_unsafe_and_value_free(self):
         path = self.store / "sec-contact.env"
         cases = (

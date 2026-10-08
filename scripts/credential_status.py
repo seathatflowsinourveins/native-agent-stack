@@ -4,7 +4,7 @@
 Nonmutating and value-free. For every entry in adoption/credential-inventory.json
 it checks existence, file type, mode, owner, parent-directory mode, whether the
 path sits inside a Git worktree (and, if so, whether Git tracks it), and mtime age.
-Runner-eligible private files also use the runner's checked reader and shared
+Runner-eligible private env files use the runner's core-dump guard, checked reader and shared
 line parser to report grammar refusals. Native sign-in and service-held files
 remain metadata-only. It never hashes a credential file or follows its links,
 and it prints path templates, variable names and reason codes, never values or
@@ -308,15 +308,16 @@ def inspect_entry(entry: dict, env, uid: int, now: float, *, check_store_lines: 
     report["age_days"] = age_days
     if age_days > AGE_WARNING_DAYS:
         report["warnings"].append(f"older_than_{AGE_WARNING_DAYS}_days")
-    if check_store_lines and store["kind"] in {"private_env_file", "private_file"} and not findings:
+    if check_store_lines and store["kind"] == "private_env_file" and not findings:
         # Lazy import: the runner already imports this module for inventory/path helpers.
         directory = str(ROOT / "tools" / "credentials")
         if directory not in sys.path:
             sys.path.insert(0, directory)
         import credential_run as runner
 
-        if entry["status"] in runner.INJECTABLE_STATUSES:
+        if runner.injectable(entry):
             try:
+                runner.disable_core_dumps()
                 data = runner.read_store(entry, env, uid)
             except runner.Refused as refusal:
                 findings.append(refusal.detail)
@@ -638,7 +639,8 @@ def render_text(report: dict) -> str:
             lines.append("claude telemetry logs content: true. Any value pasted into a prompt or passed through "
                          "a tool call is copied into the local telemetry store; rotate a pasted key "
                          "(docs/secret-storage.md)")
-    lines.append(f"result: {report['result']} (lstat and names only; no credential file was opened)")
+    lines.append(f"result: {report['result']} (metadata checks; eligible private env files may be read "
+                 "through the runner's checked grammar reader; credential values are never reported)")
     return "\n".join(lines)
 
 

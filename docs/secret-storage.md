@@ -2553,8 +2553,9 @@ changed expectations; no production credential store was used to check them:
   prohibited every read under the store directory; the new fixture allows the
   checked reader to validate the declared export-form file in that directory.
 - `tests.test_credential_status.CredentialStatusTests.test_private_file_is_ok_and_output_is_value_free`:
-  a safe private file is `ok` only when its contents satisfy the runner's export
-  grammar. The positive fixture now uses export form; output remains value-free.
+  a safe runner-eligible private env file is `ok` only when its contents satisfy
+  the runner's export grammar. The positive fixture now uses export form; raw
+  private files retain metadata-only inspection and output remains value-free.
 - `tests.test_credential_status.CredentialStatusTests.test_never_opens_or_reads_credential_files`:
   the old metadata-only/no-content-read test is replaced by
   `tests.test_credential_status.CredentialStatusTests.test_private_env_file_uses_checked_reader_without_path_reads`.
@@ -2577,3 +2578,16 @@ reads and 97 shape locations, with no lost sites, no enforced unresolved reads,
 and the existing breadth limits unchanged. The monitoring classification,
 resolver, workflow and assertions remain unchanged. This snapshot belongs to
 the PR's source; current main's 321-read baseline is retained on main.
+The review repair uses the runner's exact `injectable()` predicate and calls its
+`disable_core_dumps()` guard before the checked reader. Raw private files retain
+metadata-only inspection. Text output discloses possible checked grammar reads
+and retains the value-free contract. Synthetic regressions verify that a raw
+private file is not parsed and that a native core-collector refusal prevents any
+store read; they never inspect an operator's store or print fixture values.
+
+Main's current test file at `618dd6c05ff6750705b52426261748d11e003477`, blob
+`6c666faa014422064f8927c8ee145be0e3256e1a`, run against the review-fixed source
+in a disjoint checkout, still returned exactly the four declared methods above
+in 44 tests. The affected credential modules passed 141 tests separately. These
+results supplement the earlier measurements without relabeling them as host or
+upstream acceptance.
