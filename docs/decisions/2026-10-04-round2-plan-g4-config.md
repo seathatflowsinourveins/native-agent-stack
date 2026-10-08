@@ -244,3 +244,8 @@ owners. The existing OpenHands worker row remains 1.50.1; telemetry now checks
 that installed version. Qualification of 1.51.0 is handed to its owner.
 Native telemetry corpus, provider sign-ins and destination runs remain
 external acceptance. Source: this PR:docs/decisions/2026-10-04-final-architecture-round2.md:37.
+
+
+## Retained scope after PR833 — 2026-10-08
+
+The skills S1 skill-used/paired-comparison assertions as foundation selection or readiness gates in this dated plan are historical. The vendor installation and named native check now settle that scope; application correctness, wiring, CI and paper gates retain their separate requirements. Read the [October6 supersession record](2026-10-06-upstream-evidence-over-local-evaluation.md) with the [October7 amendment](2026-10-07-clean-upstream-install-finalizes-a-candidate.md) for the current rule. This appended pointer preserves the preceding historical text and line citations. The [daily decision/receipt/correction index](2026-10-08-decision-record-index.md) keeps the original and replacement evidence findable.

@@ -2,6 +2,24 @@
   "schema_version": 1,
   "receipts": [
     {
+      "id": "decision-record-index-20261008",
+      "kind": "artifact_measurement",
+      "component_ids": [
+        "codex",
+        "claude-code"
+      ],
+      "claim": "One dated repository index makes five October8 decisions, four dated receipts, corrections66-77 plus66a/67a, and all32 existing layer evidence rows findable; PR833 retention is applied as two appended scoped pointers while original historical bodies are preserved.",
+      "limitations": [
+        "Navigation and sanitized retained correction summaries only; no native incident replay, provider/GPU/model/broker execution or new runtime acceptance.",
+        "A related policy/source link does not establish returned incident evidence. Missing sanitized incident and operation receipts remain explicit owner-held deliverables.",
+        "The dated source snapshot has20foundation and12trading layers. The index joins stable IDs and existing evidence views; it does not freeze a winner list or change catalog selections.",
+        "The historical13:39:56Z count47open=15ready+32drafts/132branches is not a current inventory; all current inventory commands need an explicit limit.",
+        "PR833 contains scoped evidence/gate supersession with historical retention, not a document archive/deletion policy. No historical file is deleted or relocated; protected consensus-bound documents remain unchanged.",
+        "The AO effect qualifier is separately pending in PR862 at its bound source head and remains synthetic integration evidence, not live human/provider acceptance."
+      ],
+      "path": "evidence/receipts/decision-record-index-20261008.json"
+    },
+    {
       "id": "ao-bounded-effect-20261008",
       "kind": "artifact_measurement",
       "component_ids": [
@@ -17792,8 +17810,8 @@
     },
     {
       "path": "docs/decisions/2026-10-04-new-wsl-token-layer-default.md",
-      "sha256": "51bb422d713c5df21d6228f7e83440dafa48a576e424a02db5e867dfd8d7b2c5",
-      "bytes": 10057
+      "sha256": "98e53fa2f1054599165493011557d05bc2fb636ab5b064419ef49267e6cd893b",
+      "bytes": 10832
     },
     {
       "path": "docs/decisions/2026-10-04-ns2604-verified-e2e.md",
@@ -17809,6 +17827,11 @@
       "path": "docs/decisions/2026-10-04-round2-plan-g1-messaging.md",
       "sha256": "fd77b23847ac8a365893167de37e25052aabb15e3b1a098c2efb86a23cb2e6d8",
       "bytes": 15472
+    },
+    {
+      "path": "docs/decisions/2026-10-04-round2-plan-g4-config.md",
+      "sha256": "80b7d981710f6fd516d1f4436dcce783b9a9839ac11bcaec0cff720d9036dff6",
+      "bytes": 16730
     },
     {
       "path": "docs/decisions/2026-10-04-rtk-file-list-control.md",
@@ -18019,6 +18042,11 @@
       "path": "docs/decisions/2026-10-08-coordinator-research-routing.md",
       "sha256": "cc0177503b26b84954e7a67ec4d2aac7d39a5520794ada3edf06346527955a10",
       "bytes": 14363
+    },
+    {
+      "path": "docs/decisions/2026-10-08-decision-record-index.md",
+      "sha256": "28e2f6152faeee1fa1e3dc8f845b7d0f6a4624c4e60197b4ab26e25dc685afcb",
+      "bytes": 23340
     },
     {
       "path": "docs/decisions/2026-10-08-dependabot-frozen-evidence-ignore.md",
@@ -20214,6 +20242,11 @@
       "path": "evidence/artifacts/dashboard-render-e2e-20260921/rendered-observations.json",
       "sha256": "9d443e1005ed9917b1a1c0b0c5f0c8d383583836907171c46cd72ef4a33eee65",
       "bytes": 27781
+    },
+    {
+      "path": "evidence/artifacts/decision-records-20261008/index.json",
+      "sha256": "aa768ebf9d5aa0d02d9c496e86c7d83ed7604bde1a5abb891f9caf098c58d2eb",
+      "bytes": 28100
     },
     {
       "path": "evidence/artifacts/delegated-decisions-20260928/README.md",
@@ -55134,6 +55167,11 @@
       "path": "evidence/receipts/dashboard-render-e2e-20260921.json",
       "sha256": "15e85ee331ee29c5cff07bb0e73ef48dfb0df93be1d3a845b93728213e5a93a5",
       "bytes": 2641
+    },
+    {
+      "path": "evidence/receipts/decision-record-index-20261008.json",
+      "sha256": "6a4876326883aa958e34ea60607df55409af898b31fee5562c22c25b6e12d41b",
+      "bytes": 5993
     },
     {
       "path": "evidence/receipts/dependabot-alert-16-dismissal-20261003.json",
