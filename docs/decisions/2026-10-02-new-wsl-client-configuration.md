@@ -1288,3 +1288,24 @@ Today: 404 pieces, 364 wired (212 practice, 152 through a slot), 24 not wired
 (0 through a slot that does not install, 24 by their own entry) and 16 authorization
 pieces. The existing `authorization: 16`, and 24 pieces are not wired, remain
 unchanged. This is the repository wiring projection, not fresh host acceptance.
+
+## Addendum 2026-10-08: QMD native shared HTTP projection
+
+Both portable client specifications follow QMD 2.8.3's supported shared HTTP
+transport at `facd35e01359e59d938bc9418e93fb9318addee3`. The practice, native
+two-Codex pilot, service-owned lexical index, lifecycle and inverse are in
+[the QMD transport decision](2026-10-08-qmd-shared-mcp.md). The CLI registration
+contract follows the installed Claude 2.1.294 HTTP commands and Codex 0.161.0
+native URL registration; no live user configuration is written by this projection.
+
+The map keeps the complete Claude QMD server in its existing QMD slot, removes
+the obsolete stdio command override, and uses the existing Codex QMD wildcard
+for its URL. The unused Codex command-leaf rule is retired. Every other map entry,
+server and generated instruction carrier keeps its prior scope. Native
+`new_wsl_client_config.py --check --json` reproduces the following dated counts;
+earlier projections above remain historical observations.
+
+Today: 403 pieces, 363 wired (212 practice, 151 through a slot), 24 not wired
+(0 through a slot that does not install, 24 by their own entry) and 16 authorization
+pieces. This is repository source consistency, not fresh native-client, model or
+provider acceptance. The existing Inspector plan warnings remain separate.

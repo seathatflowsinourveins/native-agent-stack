@@ -87,7 +87,11 @@ GitHub-hosted macOS runner; see
    [the macOS page](platforms/macos-arm64.md#prerequisites); that page is
    drafted, not accepted.
 
-2. **Run the platform bootstrap script.** `adoption/bootstrap-linux.sh --profile <id>
+2. **Run the platform bootstrap script.** Before the optional client-configure
+   flags below, install packages without those flags and complete the
+   [shared QMD start/health prerequisite](../docs/decisions/2026-10-08-qmd-shared-mcp.md#setup-and-inverse). An automatic
+   client configuration pass does not start the external HTTP service for you.
+   `adoption/bootstrap-linux.sh --profile <id>
    [--skip-system-packages] [--allow-unpinned <id,id,...>]
    [--configure-claude-user-profile | --configure-full-profile --host <name> [--skip <step>]...]` on Linux/WSL2, or
    `adoption/bootstrap-macos.sh --profile <id> [--skip-system-packages]
@@ -247,7 +251,8 @@ GitHub-hosted macOS runner; see
    `tools/adoption/managed_block.py`, `tools/adoption/codex_home.py` and
    `scripts/adoption_status.py --launcher-resolution` added after `v2026.09.26.2`, so a
    checkout at that tag runs steps 4 and 4a by hand).
-   After native sign-in (step 3), `adoption/bootstrap-linux.sh --profile <id>
+   After native sign-in (step 3) and the shared QMD prerequisite (step 4),
+   `adoption/bootstrap-linux.sh --profile <id>
    --configure-full-profile --host <name>` replaces the hand steps with the
    repository's own tools, in this order, each skippable with `--skip <step>`
    (repeat it, or give a comma-separated list):
@@ -315,7 +320,66 @@ GitHub-hosted macOS runner; see
    [`docs/secret-storage.md`](../docs/secret-storage.md) and check with
    `python3 scripts/credential_status.py` (both added after `v2026.09.24.1`).
 
-4. **Render configs.** Use [`tools/adoption/render_config.py`](../tools/adoption/render_config.py)
+4. **Start and check shared QMD, then render configs.** The portable Claude and
+   Codex templates require QMD's native HTTP endpoint on loopback port 21851.
+   A newly installed package is not a running server. Complete this prerequisite
+   before exporting the URL or using step 2's `--configure-full-profile` or
+   `--configure-claude-user-profile` flags; install packages first without those
+   flags on a fresh host, then configure clients after the service check.
+   This applies to Linux and macOS. No client account or credential is copied.
+   This is an operator preflight: the existing configuration helpers register
+   the supplied endpoints and do not enforce HTTP health themselves. Check
+   service/index readiness before registration; require native client catalogs
+   and status after registration before accepting the setup. A failed latter
+   check invokes the captured registration inverse.
+
+   QMD 2.8.3's [vendor MCP lifecycle](https://github.com/tobi/qmd/blob/facd35e01359e59d938bc9418e93fb9318addee3/README.md)
+   supplies shared foreground HTTP and a detached daemon, with named-index PID
+   files and `mcp stop`. Install the selected pinned package through
+   [its native recipe](../recipes/README.md#recipe-index) if the chosen profile
+   did not install it. Use the actual native `qmd` executable on this host and
+   select its existing intended index; the portable default is
+   `native-agent-stack-catalog`. A host that already adopted a lexical index
+   retains that index. Confirm the host's adopted collections, masks, contexts
+   and model settings as part of index selection; do not merge unrelated catalog
+   setups just because they share an index name. For a new foundation catalog,
+   follow the separately scoped [catalog setup](../docs/catalog-retrieval.md).
+   This lifecycle step does not index, embed or download model data.
+
+   On a host without an already owned service, the vendor's portable daemon
+   route is:
+
+   ```sh
+   QMD_INDEX="native-agent-stack-catalog" # select the existing intended index on this host
+   env -u INDEX_PATH qmd --index "$QMD_INDEX" status
+   env -u INDEX_PATH qmd --index "$QMD_INDEX" mcp --http --host 127.0.0.1 --port 21851 --daemon
+   curl --fail --silent --show-error --retry 10 --retry-delay 1 --retry-connrefused --retry-max-time 20 --max-time 3 http://127.0.0.1:21851/health
+   ```
+
+   Confirm the index identity/population in the first status result. If the
+   named daemon or port is already owned, retain its recorded lifecycle and
+   check it instead of starting a second process. Native daemon startup returns
+   before readiness; require `/health` HTTP 200 and then the native four-tool
+   client catalog plus `status` before accepting the registrations. Health
+   alone does not prove index contents or tools. The native daemon is not
+   supervised or automatically started after reboot: repeat its start/check
+   after a stop or reboot. A Linux host may instead use its explicitly owned
+   systemd user unit; the [reviewed unit's restart, startup health and inverse](../docs/decisions/2026-10-08-qmd-shared-mcp.md#service-lifecycle-receipt)
+   are a separate host receipt, not macOS lifecycle acceptance.
+
+   For the native daemon inverse, first restore this host's exact prior QMD
+   client entries, then run `env -u INDEX_PATH qmd --index "$QMD_INDEX" mcp stop`
+   only for the daemon created by this setup. Named PID files isolate indexes
+   and native shutdown checks process identity before signaling it. Retain the
+   PID returned by this setup and confirm its termination after `mcp stop`;
+   the native command signals and unlinks the PID file without waiting for
+   shutdown, and its identity check alone does not prove the port/index. An existing
+   systemd-owned process uses that unit's own inverse instead. Preserve the
+   package, index/model data, native sign-ins and all other services. If the
+   endpoint or native catalog check fails, do not apply the HTTP registrations;
+   retain the prior working entries and diagnose the native service.
+
+   Use [`tools/adoption/render_config.py`](../tools/adoption/render_config.py)
    with the selected host's `adoption/hosts/<host>.json` (gitignored; copy
    [`adoption/hosts/example.json`](hosts/example.json) and fill in this host's
    `HOME`, `ECO_ROOT`, `PROJECT_ROOT`, `HOST_PATH`, `CODE_INDEX_PATH`,
@@ -468,11 +532,12 @@ GitHub-hosted macOS runner; see
      than the builder's worktree.
    - **MCP servers**: for each entry in
      [`adoption/mcp/claude-user.json`](mcp/claude-user.json) (`ai-memory`
-     over http; `serena`, `socraticode`, `headroom`, `codebase-memory`, `qmd`
+     and `qmd` over http; `serena`, `socraticode`, `headroom`, `codebase-memory`
      and `jcodemunch` over stdio), renders its `${HOME}` and
      `${ECO_ROOT}` placeholders (`--eco-root`, default `$ECO_INSTALL_ROOT` or
-     `~/.local/share/codex-ecosystem`), then runs `claude mcp add --scope user
-     <name> [-e KEY=VALUE ...] -- <command> [args...]`; skipped when `claude
+     `~/.local/share/codex-ecosystem`), then uses native `claude mcp add --scope
+     user --transport http <name> <url>` for HTTP, or `claude mcp add --scope user
+     <name> [-e KEY=VALUE ...] -- <command> [args...]` for stdio; skipped when `claude
      mcp get <name>` already reports a matching transport, command/URL, args
      and env variable names (values are not compared -- the running host owns
      them). `adoption/mcp/claude-user.json` changed after `v2026.10.05.1`:

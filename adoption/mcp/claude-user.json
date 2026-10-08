@@ -70,14 +70,8 @@
       "env": {}
     },
     "qmd": {
-      "type": "stdio",
-      "command": "${ECO_ROOT}/bin/qmd",
-      "args": [
-        "--index",
-        "native-agent-stack-catalog",
-        "mcp"
-      ],
-      "env": {}
+      "type": "http",
+      "url": "http://127.0.0.1:21851/mcp"
     },
     "jcodemunch": {
       "type": "stdio",

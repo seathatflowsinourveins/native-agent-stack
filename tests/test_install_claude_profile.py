@@ -1404,8 +1404,9 @@ class McpTemplateShapeTests(unittest.TestCase):
         # socraticode, headroom, codebase-memory and qmd joined on 2026-09-30, the Codex user template's set.
         data = json.loads(icp.MCP_TEMPLATE.read_text())
         self.assertEqual(set(data["mcpServers"].keys()), USER_SCOPE_SERVERS)
-        self.assertEqual(data["mcpServers"]["ai-memory"]["type"], "http")
-        for name in USER_SCOPE_SERVERS - {"ai-memory"}:
+        for name in {"ai-memory", "qmd"}:
+            self.assertEqual(data["mcpServers"][name]["type"], "http")
+        for name in USER_SCOPE_SERVERS - {"ai-memory", "qmd"}:
             self.assertEqual(data["mcpServers"][name]["type"], "stdio")
         self.assertIn("--project-from-cwd", data["mcpServers"]["serena"]["args"])
 
@@ -1516,7 +1517,7 @@ class McpCodexParityTests(unittest.TestCase):
         base = self.claude()
         mutants = {
             "command": ("headroom", lambda entry: entry.update(command="${ECO_ROOT}/bin/headroom-x")),
-            "argument": ("qmd", lambda entry: entry.update(args=["--index", "other", "mcp"])),
+            "argument": ("headroom", lambda entry: entry.update(args=["mcp", "serve", "--proxy-url", "http://127.0.0.1:2"])),
             "env name missing": ("headroom", lambda entry: entry["env"].pop("DO_NOT_TRACK")),
             "env name added": ("codebase-memory", lambda entry: entry.setdefault("env", {}).update(X="1")),
             "env value": ("socraticode", lambda entry: entry["env"].update(QDRANT_URL="http://127.0.0.1:1")),
@@ -1537,8 +1538,10 @@ class McpCodexParityTests(unittest.TestCase):
         self.assertEqual(entry.get("env", {}), {})
 
     def test_qmd_serves_the_named_catalog_index(self):
-        self.assertEqual(self.claude()["qmd"]["args"], ["--index", "native-agent-stack-catalog", "mcp"])
-        self.assertIn("qmd --index native-agent-stack-catalog", (ROOT / "docs/token-session-handbook.md").read_text(encoding="utf-8"))
+        self.assertEqual(self.claude()["qmd"], {"type": "http", "url": "http://127.0.0.1:21851/mcp"})
+        # Shared clients select the endpoint; the native service owns its index.
+        self.assertIn("qmd --index native-agent-stack-catalog-lex mcp --http --host 127.0.0.1 --port 21851",
+                      (ROOT / "docs/decisions/2026-10-08-qmd-shared-mcp.md").read_text(encoding="utf-8"))
 
 
 class McpRenderAndCommandTests(unittest.TestCase):
