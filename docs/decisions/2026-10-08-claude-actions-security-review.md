@@ -10,6 +10,36 @@ read-only fence, bounds and accounting as the on-demand pull request review
 ([2026-10-08-claude-actions-pr-review.md](2026-10-08-claude-actions-pr-review.md)). It runs only while the
 repository variable `CLAUDE_SECURITY_REVIEW_ENABLED` is `true`. Nothing in this change starts a model run.
 
+## What the workflows do, by name
+
+Both workflows are new, so this is all of their behaviour. The list follows the pre-cue read of the sibling
+harness-audit PR (#892, 2026-10-09), which found changes its record had not named; the same review was applied here.
+
+- `security-review-flag.yml`: `pull_request` on the listed paths; `permissions: {}` and `cache-mode: none` at the
+  workflow level; one notice in the job summary with the `gh workflow run` command for that head; no checkout, model,
+  secret, variable or OIDC token.
+- `claude-security-review.yml`: `workflow_dispatch` only, with inputs `pr_number`, `head_sha` and optional `paths`;
+  a concurrency group per pull request, without cancelling a run in progress.
+- Its job condition: this repository (slug guard), the `main` ref, `github.actor` and `github.triggering_actor` both
+  the repository owner, the first attempt of a run, and `CLAUDE_SECURITY_REVIEW_ENABLED == 'true'`. A dispatch by
+  anyone else, or a re-run, is skipped.
+- `timeout-minutes: 20`. Grants: `contents: read`, `pull-requests: read` and `id-token: write`.
+- A guard step stops the job with exit 2 on debug signals, a pre-existing `~/.claude/settings.json` (a dangling
+  symlink included) or a malformed input; a binding step stops it with exit 2 unless the pull request is open, from
+  this repository, targets `main` and has exactly the requested head.
+- The head is checked out as data under `pr-head/` with main at the root, and the diff is written by git in the root
+  only, with diff drivers off.
+- The action step pins `ACTIONS_STEP_DEBUG: 'false'` and passes `show_full_output`, `display_report` and
+  `track_progress` as `'false'`; the last two are their defaults, declared in the pinned `action.yml` (lines
+  136-139 and 152-155 at `2dca132f`).
+- A numbers step checks the bounds (an allow-list of Read, Glob and Grep, tool and MCP lists present, 1 to 12
+  assistant turns, at most $3, a cache read, result text; every unmet bound is named), and an artifact keeps
+  `usage.json` (numbers only) for 14 days. The review, the last non-empty result, goes to the job summary only when
+  the bounds passed, capped at 60,000 bytes on a character boundary with a line saying so when it was longer.
+  Nothing is posted to the pull request.
+- The pin, v1.0.247, is hours old: the user ended the seven-day cooldown for clean releases on 2026-10-03
+  (`docs/decisions/2026-10-03-currency-wave-w1.md`, "Holds and cooldown waiver"), which keeps qualification.
+
 ## Why not `anthropics/claude-code-security-review`
 
 Read at its only pin, `0c6a49f1fa56a1d472575da86a94dbc1edb78eda` (the repository has no release and no tag; last
@@ -72,10 +102,13 @@ standard prices, a $3 client budget checked again from the run's own numbers, 12
 - `tests.test_workflow_security_coverage.NewWorkflowSecurityCoverageTests`: the coverage set gains both workflows,
   each with its own offline zizmor test.
 
-New, in `tests/test_claude_security_review_workflow.py` (28 tests): the review workflow's shape and steps, tested the
+New, in `tests/test_claude_security_review_workflow.py` (32 tests): the review workflow's shape and steps, tested the
 same way as the pull request review's, and the flag's trigger paths, empty permissions, absence of any secret,
 variable, OIDC token, checkout or model, and its notice. Eleven weakened copies of the two workflows each fail at
-least one test.
+least one test (measured on 2026-10-08 against that day's bounds). The 2026-10-09 bound changes have their own tests
+(an unknown tool, a start record without lists, an empty result, the named failures, the character-safe cap and the
+last non-empty result), the turn bound was checked with three mutants, and the step tests no longer skip without
+PyYAML.
 
 ## Alternatives considered
 
@@ -98,8 +131,11 @@ least one test.
 
 ## Evidence class
 
-`native_proven` for the shared flag set on the installed client
-(`evidence/artifacts/claude-actions-fence-smoke-20261008/receipt.json`, recorded with the pull request review).
+`native_proven` for the fence flags on the installed client (`--restricted`, `--tools`/`--allowedTools`
+Read,Glob,Grep, `--strict-mcp-config`, `--permission-prompts none`, `--settings` with hooks off and three deny rules,
+on Claude Haiku 5.5 with 10 turns and $0.50; `evidence/artifacts/claude-actions-fence-smoke-20261008/receipt.json`,
+recorded with the pull request review). This workflow adds `--setting-sources user`, `--add-dir`, `--effort max` and
+more deny rules and runs Opus 5.5 with 12 turns and $3; it has not run, locally or hosted.
 `local_static_analysis`: actionlint 1.17.0 and zizmor 1.30.1 (offline, regular and pedantic), no findings on either
 workflow. `local_integration`: the unit tests above with PyYAML 6.0.3 on Python 3.12. `source_review`: the sources
 below. No hosted run of either workflow is part of this record.
