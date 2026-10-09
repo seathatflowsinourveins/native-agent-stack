@@ -4,8 +4,9 @@ name: claude-pr-review
 # (docs/decisions/2026-10-08-claude-actions-pr-review.md). A maintainer dispatches it from main with the PR number and
 # the exact head commit to review. The workflow code is main's; the PR head is checked out as data into the `pr-head`
 # subdirectory with the base ref at the workspace root, the pattern the action's docs/security.md prescribes. Claude
-# has Read, Glob and Grep only, at most 30 turns and a $5 client budget. The job holds no write scope beyond the
-# OIDC token: a model-free step copies the review to the job summary, and nothing is posted to the pull request.
+# has Read, Glob and Grep only and a $5 client budget; a run of more than 30 assistant turns fails its bounds check.
+# The job holds no write scope beyond the OIDC token: a model-free step copies the review to the job summary, and
+# nothing is posted to the pull request.
 #
 # Authentication is Anthropic workload identity federation (no Anthropic key in this repository). A dispatch on main
 # presents the subject the federation rule accepts; a pull_request run does not, which is why there is no
@@ -46,7 +47,7 @@ jobs:
       github.run_attempt == 1 &&
       vars.CLAUDE_PR_REVIEW_ENABLED == 'true'
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 30
     permissions:
       contents: read
       pull-requests: read # the pull request's state, base and head, read once to bind the request to it
@@ -167,7 +168,9 @@ jobs:
       # workflow passes none. --restricted removes the tools that run code and WebFetch, ignores every settings file
       # and keeps the file tools inside the workspace and the diff directory; --permission-prompts none denies
       # whatever would ask; --settings carries the deny rules, because a settings file would be ignored. The tool
-      # list, not the prompt, is what keeps the run read-only.
+      # list, not the prompt, is what keeps the run read-only. There is no --max-turns: the pinned action fails its
+      # own step when a successful result's num_turns, a count of transcript messages, exceeds it, so the numbers step
+      # bounds assistant turns instead and the budget bounds a runaway.
       - name: Review the diff
         id: claude_review
         uses: anthropics/claude-code-action@2dca132ff0e0c4094ce6048b422c6915a071210b # v1.0.247
@@ -203,7 +206,6 @@ jobs:
           claude_args: |
             --model claude-opus-5-5
             --effort max
-            --max-turns 30
             --max-budget-usd 5
             --tools Read,Glob,Grep
             --allowedTools Read,Glob,Grep
@@ -222,13 +224,21 @@ jobs:
       # The turn bound counts distinct assistant message ids. The result's num_turns counts transcript
       # messages, tool results included (a 12-request run on Claude Code 2.1.295 reported 57), so it is
       # kept in the record only.
+      # The client checks its budget after a turn, so a run can end a little above it: the cost bound is the $5
+      # budget times 1.10, the largest overrun measured on J8's $5-budget runs (9.2%) rounded up. A run above it
+      # fails, budget stop or not; a budget stop (error_max_budget_usd) at or under it passes, and the text the model
+      # wrote before the stop stands in for the report, which the client does not write then. The job summary names
+      # an overrun and a budget stop.
       - name: Keep the run's numbers and check the bounds
+        id: numbers
         if: ${{ always() && steps.claude_review.outputs.execution_file != '' }}
         shell: bash
         env:
           EXECUTION_FILE: ${{ steps.claude_review.outputs.execution_file }}
         run: |
           set -euo pipefail
+          # --max-budget-usd above, and the cost bound: that budget times the measured overrun factor 1.10.
+          budget=5 cost_bound=5.5
           out="$RUNNER_TEMP/pr-review-usage"
           mkdir -p "$out"
           jq -e '
@@ -244,12 +254,17 @@ jobs:
             ($init.tools // []) as $listed |
             ($listed | map(select(type == "string"))) as $tools |
             ([.[] | select(.type == "result") | .result // "" | select(type == "string" and . != "")] | last // "")
-              as $text |
+              as $result_text |
+            ([.[] | select(.type == "assistant") | .message | objects | .content | arrays | .[] | objects
+              | select(.type == "text") | .text | strings | select(. != "")] | join("\n\n")) as $written |
+            (if $result_text != "" then $result_text
+             elif $result.subtype == "error_max_budget_usd" then $written else "" end) as $text |
             ([.[] | select(.type == "assistant") | .message.id? | select(type == "string")] | unique | length) as $turns |
             {total_cost_usd: $result.total_cost_usd, num_turns: $result.num_turns, assistant_turns: $turns,
              result_chars: ($text | length),
              tools_listed: (($init.tools | type) == "array" and ($init.mcp_servers | type) == "array"),
              successful_result: ($result.subtype == "success" and $result.is_error == false),
+             budget_stop: ($result.subtype == "error_max_budget_usd"),
              session_started: ($init != null),
              claude_code_version: (($init.claude_code_version // "unknown") | name),
              tools: ($tools | map(name)),
@@ -269,15 +284,23 @@ jobs:
           {
             echo '### Pull request review: run numbers'
             echo
-            jq -r '"| assistant turns | messages | client cost estimate (USD) | completed | Claude Code | tools | MCP servers |",
+            jq -r --argjson budget "$budget" --argjson bound "$cost_bound" '
+                   "| assistant turns | messages | client cost estimate (USD) | completed | Claude Code | tools | MCP servers |",
                    "| ---: | ---: | ---: | --- | --- | --- | ---: |",
                    "| \(.assistant_turns) | \(.num_turns) | \(.total_cost_usd) | \(.successful_result) | \(.claude_code_version) | \(.tools | join(" ")) | \(.mcp_servers) |",
+                   (if .budget_stop
+                    then "", "Budget stop: the client stopped the run at its \($budget) USD budget (error_max_budget_usd), before a final report."
+                    else empty end),
+                   (if .total_cost_usd > $bound
+                    then "", "Over the cost bound: the client cost estimate is \(.total_cost_usd) USD, above \($bound) USD (the \($budget) USD budget times its measured overrun factor 1.10)."
+                    else empty end),
                    "", "| model | input | cache write | cache read | output |", "| --- | ---: | ---: | ---: | ---: |",
                    (.models[] | "| \(.model) | \(.input_tokens) | \(.cache_creation_input_tokens) | \(.cache_read_input_tokens) | \(.output_tokens) |")' \
               "$out/usage.json"
           } >> "$GITHUB_STEP_SUMMARY"
-          failed="$(jq -r '[
-            (if .successful_result != true then "the run did not end in success" else empty end),
+          failed="$(jq -r --argjson budget "$budget" --argjson bound "$cost_bound" '[
+            (if .successful_result != true and .budget_stop != true
+             then "the run did not end in success or in a budget stop" else empty end),
             (if .session_started != true then "no session start record" else empty end),
             (if .tools_listed != true then "the session start record lists no tools or MCP servers" else empty end),
             (if (.forbidden_tools | length) > 0 then "tools outside Read, Glob and Grep: \(.forbidden_tools | join(" "))"
@@ -285,7 +308,9 @@ jobs:
             (if .mcp_servers != 0 then "\(.mcp_servers) MCP servers in the session" else empty end),
             (if .assistant_turns < 1 or .assistant_turns > 30 then "\(.assistant_turns) assistant turns, outside 1 to 30"
              else empty end),
-            (if .total_cost_usd > 5 then "client cost estimate \(.total_cost_usd) USD, above 5" else empty end),
+            (if .total_cost_usd > $bound
+             then "client cost estimate \(.total_cost_usd) USD, above the \($bound) USD bound (the \($budget) USD budget times its measured overrun factor 1.10)"
+             else empty end),
             (if ((.models | map(.cache_read_input_tokens) | add) // 0) <= 0 then "no cache read" else empty end),
             (if .result_chars < 1 then "no result text" else empty end)
           ] | join("; ")' "$out/usage.json")"
@@ -294,10 +319,14 @@ jobs:
             exit 1
           fi
 
-      # The review is the last non-empty result text, capped and shown as preformatted text so nothing in it renders
-      # as Markdown or HTML on the run page.
+      # The review is the last non-empty result text or, after a budget stop the numbers step accepted, the text the
+      # model wrote before the stop, with a line naming the stop. It is published when the numbers step accepted the
+      # run, whatever the review step's own status: the action fails its own step on any result other than an
+      # error-free success, a budget stop the numbers step accepts among them, but keeps its execution_file output;
+      # the job then stays failed with the review published. It is capped and shown as preformatted text so nothing
+      # in it renders as Markdown or HTML on the run page.
       - name: Publish the review to the job summary
-        if: ${{ success() && steps.claude_review.outputs.execution_file != '' }}
+        if: ${{ !cancelled() && steps.numbers.outcome == 'success' }}
         shell: bash
         env:
           EXECUTION_FILE: ${{ steps.claude_review.outputs.execution_file }}
@@ -306,8 +335,17 @@ jobs:
         run: |
           set -euo pipefail
           report="$(mktemp)"
-          jq -j '[.[] | select(.type == "result") | .result // "" | select(type == "string" and . != "")] | last // ""' \
-            "$EXECUTION_FILE" > "$report"
+          jq -j '
+            ([.[] | select(.type == "result") | .result // "" | select(type == "string" and . != "")] | last // "")
+              as $result_text |
+            if $result_text != "" then $result_text
+            elif (map(select(.type == "result")) | last | .subtype) == "error_max_budget_usd" then
+              [.[] | select(.type == "assistant") | .message | objects | .content | arrays | .[] | objects
+               | select(.type == "text") | .text | strings | select(. != "")] | join("\n\n")
+            else "" end
+          ' "$EXECUTION_FILE" > "$report"
+          stop="$(jq -r 'map(select(.type == "result")) | last | .subtype // "" | select(. == "error_max_budget_usd")' \
+            "$EXECUTION_FILE")"
           size="$(wc -c < "$report")"
           {
             echo "### Pull request review: #$PR_NUMBER at $HEAD_SHA"
@@ -320,6 +358,9 @@ jobs:
             echo '</pre>'
             if [ "$size" -gt 60000 ]; then
               echo "The report is $size bytes; the first 60,000 are shown."
+            fi
+            if [ -n "$stop" ]; then
+              echo "Budget stop: the client stopped the run at its budget (error_max_budget_usd) before a final report; shown is the text the model wrote until then."
             fi
           } >> "$GITHUB_STEP_SUMMARY"
           rm -f "$report"
