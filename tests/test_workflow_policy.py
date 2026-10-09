@@ -122,6 +122,10 @@ EXEMPTIONS = {
                                    "accepts workflows on this repository's main and never pull requests; which "
                                    "workflows may request a token is the reviewed WRITE_GRANTS inventory. Schedule "
                                    "and dispatch only, on main",
+        # 2026-10-09 (docs/decisions/2026-10-09-claude-actions-pr-toolkit-review.md): another job on that rule.
+        "claude-pr-toolkit-review.yml:review": "Anthropic workload identity federation, not provenance. Manual "
+                                               "dispatch on main by the owner only; no pull_request trigger, no "
+                                               "write scope, read-only model tools and the Agent tool",
     },
 }
 # Every write grant in the repository, by job. A new one is a reviewed change to this inventory.
@@ -129,6 +133,8 @@ WRITE_GRANTS = {
     "catalog-freshness.yml:propose": ["contents: write", "pull-requests: write"],
     # Federation needs id-token (EXEMPTIONS, id-token-write); the review goes to the job summary, not to the PR.
     "claude-pr-review.yml:review": ["id-token: write"],
+    # Federation needs id-token (EXEMPTIONS, id-token-write); the reports go to the job summary, not to the PR.
+    "claude-pr-toolkit-review.yml:review": ["id-token: write"],
     # Federation needs id-token (EXEMPTIONS, id-token-write); the result is one issue.
     "harness-audit.yml:audit": ["id-token: write", "issues: write"],
     "publish-catalog.yml:publish": ["id-token: write", "attestations: write"],
