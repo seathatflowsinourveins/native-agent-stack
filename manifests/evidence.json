@@ -5026,8 +5026,8 @@
     },
     {
       "path": ".github/workflows/claude-pr-toolkit-review.yml",
-      "sha256": "e10800c47158eeb6b976a9926783c50f463f990a2c02c73ae37a10264faf61a0",
-      "bytes": 26682
+      "sha256": "3873e2680e5db90b19f126171f045a17c9a74fd30f938fd68f89138131e65be9",
+      "bytes": 32939
     },
     {
       "path": ".github/workflows/dependency-review.yml",
@@ -18312,8 +18312,8 @@
     },
     {
       "path": "docs/decisions/2026-10-09-claude-actions-pr-toolkit-review.md",
-      "sha256": "5d2719567cdba30973898d43131098dc29d5645a349b08ada369c477e4ed010d",
-      "bytes": 16290
+      "sha256": "2154ab6a25fe84f22c720c778375fd0cd30fa0cbcacdca5b60d7e3cdc493bfaa",
+      "bytes": 37422
     },
     {
       "path": "docs/decisions/2026-10-09-claude-code-floor.md",
@@ -18457,8 +18457,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "e40c3e2458a27519b9f9ffb3721ae55ebed92bf7db4fb911728c6cf6fce44002",
-      "bytes": 102983
+      "sha256": "19ed98531ef163007d9e6b514fbc0d704d473766fb76dc9063c4dee199af6c15",
+      "bytes": 102982
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -58592,8 +58592,8 @@
     },
     {
       "path": "tests/test_claude_pr_toolkit_review_workflow.py",
-      "sha256": "fb3c8702ac4cdc18663a1a37b2096acea09e99d561ed1babb7a43d3a830285b4",
-      "bytes": 37662
+      "sha256": "391b4e4965dae47aa6fd078e9d5c3983036048c4603fbbca8ed4a4631672481b",
+      "bytes": 67120
     },
     {
       "path": "tests/test_claude_recovery.py",

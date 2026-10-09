@@ -1,4 +1,5 @@
-"""The pre-cue pull request toolkit read: run its guard, binding, diff, toolkit and accounting steps on synthetic inputs.
+"""The pre-cue pull request toolkit read: run its guard, binding, link removal, diff, toolkit and accounting steps on
+synthetic inputs.
 
 No model, network or credential is involved. The shell of each step is taken from
 .github/workflows/claude-pr-toolkit-review.yml as written and executed with a throwaway HOME and
@@ -6,6 +7,7 @@ RUNNER_TEMP, a local stand-in for `gh` (and for `git` where the toolkit's pinned
 local git repository, so the tests fail when the workflow's own text stops enforcing a bound.
 """
 
+import hashlib
 import json
 import os
 import shlex
@@ -28,6 +30,30 @@ WORKFLOW = ROOT / ".github/workflows/claude-pr-toolkit-review.yml"
 ACTION = "anthropics/claude-code-action@2dca132ff0e0c4094ce6048b422c6915a071210b"
 TOOLKIT_COMMIT = "602df92bf481ed904533e95c09f740f40aab5aed"
 AGENTS = ("pr-review-toolkit:pr-test-analyzer", "pr-review-toolkit:silent-failure-hunter")
+MODEL = "claude-opus-5-5"
+# The SHA-256 values the toolkit check records, and the synthetic stand-ins the step tests write in their place.
+RECORDED_HASHES = {
+    "agents/pr-test-analyzer.md": "d369fd3946a814bb7a9d4f32e971722fe259e301878986bc6312d6f6c56014a8",
+    "agents/silent-failure-hunter.md": "fa9b0daec5a267e7e66435cc48b3328301fc9f70c3af259fe248881327a1babc",
+    ".claude-plugin/plugin.json": "9435cc134fc72d56175f222894d401b0cf20f700d5bc0098c4257455314695ca",
+}
+SYNTHETIC_TOOLKIT = {"agents/pr-test-analyzer.md": "synthetic agent\n",
+                     "agents/silent-failure-hunter.md": "synthetic agent\n", ".claude-plugin/plugin.json": "{}\n"}
+# GitHub substitutes ${{ runner.temp }} before the action parses claude_args; the exact-pin test does the same.
+RUNNER_TEMP_STANDIN = "/runner-temp"
+EXPECTED_SETTINGS = {
+    "disableAllHooks": True, "autoMemoryEnabled": False, "claudeMdExcludes": ["**/pr-head/**"],
+    "permissions": {"blockReadsOutsideWorkingDirectories": True,
+                    "deny": ["Read(./.git/**)", "Read(./**/.git/**)", "Read(./pr-head/.git/**)", "Read(./**/.env)",
+                             "Read(./**/.env.*)", "Read(./**/*.pem)", "Read(./**/*.key)"]},
+}
+EXPECTED_ARGUMENTS = [
+    ["--model", MODEL], ["--effort", "max"], ["--max-turns", "12"], ["--max-budget-usd", "22"],
+    ["--tools", "Read,Glob,Grep,Agent"], ["--allowedTools", "Read,Glob,Grep,Agent"], ["--restricted"],
+    ["--permission-prompts", "none"], ["--setting-sources", "user"], ["--strict-mcp-config"],
+    ["--plugin-dir", RUNNER_TEMP_STANDIN + "/claude-code/plugins/pr-review-toolkit"],
+    ["--settings", EXPECTED_SETTINGS], ["--add-dir", RUNNER_TEMP_STANDIN + "/pr-toolkit"],
+]
 REPOSITORY = "synthetic/example"
 HEAD = "a" * 40
 TRANSCRIPT_MARKER = "SYNTHETIC-TRANSCRIPT-TEXT-MUST-NOT-LEAVE-THE-RUNNER"
@@ -37,6 +63,8 @@ BODY_MARKER = "SYNTHETIC-PULL-REQUEST-BODY"
 
 GUARD = "Refuse debug logging, pre-existing Claude settings and malformed inputs"
 BIND = "Bind the request to an open same-repository pull request"
+HEAD_CHECKOUT = "Check out the pull request head as data"
+STRIP = "Remove symbolic links from the pull request head"
 DIFF = "Write the diff from the merge base"
 TOOLKIT = "Check out the pr-review-toolkit plugin at its pinned commit"
 TOOLKIT_CHECK = "Move the toolkit outside the workspace and check it"
@@ -70,6 +98,14 @@ def cli_settings():
     return json.loads(value)
 
 
+def parsed_arguments():
+    """Every claude_args line split as a shell would, after GitHub's substitution of ${{ runner.temp }}; the value of
+    --settings is parsed as JSON."""
+    lines = [shlex.split(line.replace("${{ runner.temp }}", RUNNER_TEMP_STANDIN)) for line in arguments()]
+    return [[words[0], json.loads(words[1])] if words[0] == "--settings" and len(words) == 2 else words
+            for words in lines]
+
+
 def pull(**changes):
     data = {"state": "open", "title": TITLE_MARKER, "body": BODY_MARKER,
             "head": {"repo": {"full_name": REPOSITORY}, "sha": HEAD},
@@ -84,12 +120,14 @@ def pull(**changes):
 
 
 def model_usage(read=4000000, cost=4.3):
-    return {"claude-sonnet-5-5": {"inputTokens": 90, "outputTokens": 240000, "cacheReadInputTokens": read,
-                                  "cacheCreationInputTokens": 400000, "costUSD": cost}}
+    return {MODEL: {"inputTokens": 90, "outputTokens": 240000, "cacheReadInputTokens": read,
+                    "cacheCreationInputTokens": 400000, "costUSD": cost}}
 
 
 def execution(result=None, tools=("Task", "Glob", "Grep", "Read"), mcp_servers=(), init=True, turns=None, lists=True,
-              subagent_turns=0, handbacks=None, **changes):
+              subagent_turns=0, handbacks=None, agents=AGENTS, results=None, **changes):
+    """A synthetic execution file. The coordinator's first turn calls `agents` in parallel; `handbacks` maps an agent
+    to the report its SubagentHandback carries (None: no handback); `results` replaces the one final result record."""
     final = {"type": "result", "subtype": "success", "is_error": False, "num_turns": 3,
              "total_cost_usd": 4.3, "modelUsage": model_usage(), "result": REPORT_TEXT}
     final.update(changes)
@@ -101,20 +139,22 @@ def execution(result=None, tools=("Task", "Glob", "Grep", "Read"), mcp_servers=(
         if lists:
             start.update(tools=list(tools), mcp_servers=list(mcp_servers))
         messages.append(start)
+    for index, agent in enumerate(agents):
+        # The client streams one message per content block, so the first turn's parallel Agent calls share its id.
+        messages.append({"type": "assistant", "parent_tool_use_id": None, "message": {
+            "id": "msg_00", "content": [{"type": "tool_use", "id": f"toolu_agent_{index}", "name": "Agent",
+                                         "input": {"subagent_type": agent, "prompt": "task"}}]}})
     for turn in range(final["num_turns"] if turns is None else turns):
-        # The client streams one message per content block, so one API turn spans several messages with one id.
+        # One API turn spans several messages with one id.
         messages.append({"type": "assistant", "parent_tool_use_id": None, "message": {
             "id": f"msg_{turn:02d}", "content": [{"type": "thinking", "thinking": ""}]}})
         messages.append({"type": "assistant", "parent_tool_use_id": None, "message": {
             "id": f"msg_{turn:02d}", "content": [{"type": "text", "text": TRANSCRIPT_MARKER}]}})
-    for index, (agent, text) in enumerate((handbacks or {}).items()):
-        # The coordinator's Agent call, then the agent's own SubagentHandback carrying its full report.
-        call = f"toolu_agent_{index}"
-        messages.append({"type": "assistant", "parent_tool_use_id": None, "message": {
-            "id": f"msg_call_{index}", "content": [{"type": "tool_use", "id": call, "name": "Agent",
-                                                    "input": {"subagent_type": agent, "prompt": "task"}}]}})
+    for index, agent in enumerate(agents):
+        # The agent's own SubagentHandback carries its full report; its parent is the coordinator's Agent call.
+        text = (handbacks or {}).get(agent)
         if text is not None:
-            messages.append({"type": "assistant", "parent_tool_use_id": call, "message": {
+            messages.append({"type": "assistant", "parent_tool_use_id": f"toolu_agent_{index}", "message": {
                 "id": f"msg_handback_{index}", "content": [{"type": "tool_use", "id": f"toolu_hb_{index}",
                                                             "name": "SubagentHandback", "input": {"message": text}}]}})
     for turn in range(subagent_turns):
@@ -122,13 +162,45 @@ def execution(result=None, tools=("Task", "Glob", "Grep", "Read"), mcp_servers=(
         # coordinator's.
         messages.append({"type": "assistant", "parent_tool_use_id": "toolu_agent_1", "message": {
             "id": f"msg_sub_{turn:03d}", "content": [{"type": "text", "text": TRANSCRIPT_MARKER}]}})
-    messages.append(final)
+    messages.extend([final] if results is None else results)
     return messages
 
 
-def run_step(name, env_changes=None, execution_file=None, settings=None, pull_request=None, cwd=None, setup=None):
+def budget_stop_records(cost=5.0007):
+    """The five result records that ended api-actions J8 #894's stream (2026-10-09), in order and with their subtypes,
+    error flags, turn counts and text presence, at one cost; the text is synthetic. The coordinator's last turn
+    ended in a success with a short note; each agent's handback then woke it into a budget stop, and each stop was
+    followed by an idle success without text."""
+    def record(subtype, num_turns, **fields):
+        return {"type": "result", "subtype": subtype, "is_error": subtype != "success", "num_turns": num_turns,
+                "total_cost_usd": cost, "modelUsage": model_usage(cost=cost), **fields}
+    return [record("success", 3, result="Both review agents are running in the background."),
+            record("error_max_budget_usd", 1, errors=["Reached maximum budget ($5)"]),
+            record("success", 0, result=""),
+            record("error_max_budget_usd", 1, errors=["Reached maximum budget ($5)"]),
+            record("success", 0, result="")]
+
+
+def with_message_usage(log, usage, models=None):
+    """Give every assistant message of `log` the usage its message id maps to in `usage`, and a model."""
+    for message in log:
+        if message.get("type") == "assistant":
+            identifier = message["message"]["id"]
+            message["message"]["usage"] = dict(usage[identifier])
+            message["message"]["model"] = (models or {}).get(identifier, MODEL)
+    return log
+
+
+def run_step(name, env_changes=None, execution_file=None, settings=None, pull_request=None, cwd=None, setup=None,
+             replacements=None, after=None):
     """Run one step's shell; returns (exit code, console + step outputs, summary, usage.json or None, files left in
-    pr-toolkit)."""
+    pr-toolkit). `replacements` maps a text that must occur exactly once in the step's script to its stand-in;
+    `after` is called with the temporary directory once the step has run."""
+    script = step(name)["run"]
+    for old, new in (replacements or {}).items():
+        if script.count(old) != 1:
+            raise AssertionError(f"{old!r} occurs {script.count(old)} times in the step {name!r}, not once")
+        script = script.replace(old, new)
     with tempfile.TemporaryDirectory() as temporary:
         directory = Path(temporary)
         home = directory / "home"
@@ -171,8 +243,10 @@ def run_step(name, env_changes=None, execution_file=None, settings=None, pull_re
         env.update(env_changes or {})
         if name == DIFF:
             (directory / "pr-toolkit").mkdir()
-        done = subprocess.run(["bash", "-c", step(name)["run"]], env=env, capture_output=True, text=True,
+        done = subprocess.run(["bash", "-c", script], env=env, capture_output=True, text=True,
                               check=False, cwd=cwd or directory)
+        if after:
+            after(directory)
         usage = directory / "pr-toolkit-usage/usage.json"
         toolkit_dir = directory / "pr-toolkit"
         left = {p.name: p.read_text(encoding="utf-8", errors="replace") for p in toolkit_dir.iterdir()} \
@@ -221,19 +295,21 @@ def repository_pair(directory, filler_lines=0):
     return clone, head
 
 
-def toolkit_tree(commit, tamper=False, hooks=False):
+def toolkit_tree(commit, tamper=False, extra=None):
     """A stand-in `.toolkit-src` with a `git` that reports the given commit; the agent files are synthetic, so the
-    hash check fails on them unless the step refused earlier."""
+    hash check fails on them unless the step refused earlier or runs with their own hashes. `extra` adds a `hooks` or
+    `scripts` directory or an `.mcp.json` file."""
     def make(directory, bin_dir):
         source = directory / ".toolkit-src/plugins/pr-review-toolkit"
         (source / "agents").mkdir(parents=True)
         (source / ".claude-plugin").mkdir()
-        for name in ("pr-test-analyzer.md", "silent-failure-hunter.md"):
-            (source / "agents" / name).write_text("synthetic agent\n" + ("tampered\n" if tamper else ""),
-                                                  encoding="utf-8")
-        (source / ".claude-plugin/plugin.json").write_text("{}\n", encoding="utf-8")
-        if hooks:
-            (source / "hooks").mkdir()
+        for path, text in SYNTHETIC_TOOLKIT.items():
+            (source / path).write_text(text + ("tampered\n" if tamper and path.startswith("agents/") else ""),
+                                       encoding="utf-8")
+        if extra in ("hooks", "scripts"):
+            (source / extra).mkdir()
+        elif extra == ".mcp.json":
+            (source / extra).write_text("{}\n", encoding="utf-8")
         tool = bin_dir / "git"
         tool.write_text(f"#!/bin/sh\necho {commit}\n", encoding="utf-8")
         tool.chmod(0o755)
@@ -291,13 +367,26 @@ class PullRequestToolkitShapeTests(unittest.TestCase):
 
     def test_steps_run_in_the_order_the_binding_depends_on(self):
         names = [item.get("name") for item in job()["steps"]]
-        order = [GUARD, "Check out main at the workspace root", BIND, "Check out the pull request head as data",
+        order = [GUARD, "Check out main at the workspace root", BIND, HEAD_CHECKOUT, STRIP,
                  DIFF, TOOLKIT, TOOLKIT_CHECK, REVIEW, NUMBERS, REPORT]
         self.assertEqual([n for n in names if n in order], order)
         self.assertEqual(names[0], "Harden the runner (audit-only network egress)")
 
+    def test_the_symbolic_links_are_removed_right_after_the_head_checkout_on_every_run(self):
+        names = [item.get("name") for item in job()["steps"]]
+        self.assertEqual(names.index(STRIP), names.index(HEAD_CHECKOUT) + 1)
+        strip = step(STRIP)
+        self.assertEqual(strip["run"],
+                         "set -euo pipefail\nfind pr-head -path pr-head/.git -prune -o -type l -exec rm -f {} +\n")
+        self.assertEqual(strip["shell"], "bash")
+        self.assertEqual(sorted(strip), ["name", "run", "shell"], "no if:, continue-on-error or other key")
+
     def test_no_step_executes_anything_from_the_pull_request_head(self):
         for item in job()["steps"]:
+            if item.get("name") == STRIP:
+                # find walks the head as data and passes the links it finds to rm; nothing from the tree runs. Its
+                # exact script is pinned in the test above.
+                continue
             script = item.get("run", "")
             for token in ("pr-head/", "./pr-head", "cd pr-head", "bash pr-head", "source "):
                 self.assertNotIn(token, script, item.get("name"))
@@ -338,7 +427,7 @@ class PullRequestToolkitShapeTests(unittest.TestCase):
         self.assertEqual(step(DIFF)["id"], "diff")
 
     def test_claude_has_read_tools_and_the_agent_tool_with_fixed_bounds(self):
-        for expected in ("--model claude-sonnet-5-5", "--effort max", "--max-turns 12", "--max-budget-usd 5",
+        for expected in ("--model claude-opus-5-5", "--effort max", "--max-turns 12", "--max-budget-usd 22",
                          "--tools Read,Glob,Grep,Agent", "--allowedTools Read,Glob,Grep,Agent",
                          "--restricted", "--permission-prompts none",
                          "--setting-sources user", "--strict-mcp-config",
@@ -374,6 +463,20 @@ class PullRequestToolkitShapeTests(unittest.TestCase):
             self.assertIn(rule, settings["permissions"]["deny"])
         self.assertNotIn("allow", settings["permissions"])
 
+    def test_claude_args_and_settings_are_pinned_exactly(self):
+        # Every line and every settings key: a widened or repeated --add-dir, a second budget or turn flag, or
+        # permissions.additionalDirectories fails here.
+        self.assertEqual(parsed_arguments(), EXPECTED_ARGUMENTS)
+        self.assertEqual(cli_settings(), EXPECTED_SETTINGS)
+
+    def test_the_numbers_steps_cost_bound_is_the_budget_in_claude_args_times_1_10(self):
+        # The command center's decision of 2026-10-09: the bound is the budget times the measured overrun factor.
+        settings = [line for line in step(NUMBERS)["run"].split("\n") if line.startswith("budget=")]
+        self.assertEqual(settings, ["budget=22 cost_bound=24.2"])
+        (budget,) = [words[1] for words in parsed_arguments() if words[0] == "--max-budget-usd"]
+        self.assertEqual(budget, "22")
+        self.assertEqual(round(float(budget) * 1.10, 2), 24.2)
+
     def test_a_green_run_always_has_an_execution_file(self):
         check = step("Require the run's execution file")
         self.assertEqual(check["if"], "${{ success() && steps.claude_toolkit.outputs.execution_file == '' }}")
@@ -385,7 +488,11 @@ class PullRequestToolkitShapeTests(unittest.TestCase):
         self.assertEqual(script.count('${scope[@]+"${scope[@]}"}'), 2)
 
     def test_the_reports_are_published_only_after_the_bounds_check_passed_and_only_numbers_are_uploaded(self):
-        self.assertIn("success()", step(REPORT)["if"])
+        # The action fails its own step on any result other than a success, so the gate is the numbers step's
+        # outcome, not success(): an accepted budget stop still publishes.
+        self.assertEqual(step(NUMBERS)["id"], "numbers")
+        self.assertEqual(step(REPORT)["if"], "${{ always() && steps.numbers.outcome == 'success' && "
+                                             "steps.claude_toolkit.outputs.execution_file != '' }}")
         self.assertIn("always()", step(NUMBERS)["if"])
         upload = step("Keep the numeric usage record")
         self.assertTrue(upload["with"]["path"].endswith("/pr-toolkit-usage/usage.json"))
@@ -457,6 +564,38 @@ class PullRequestToolkitStepTests(unittest.TestCase):
                 self.assertNotIn("pr-body.md", left)
                 self.assertNotIn(TITLE_MARKER, console)
 
+    def test_every_symbolic_link_in_the_head_is_removed_and_nothing_else(self):
+        links = ("environ", "config-link", "sub/deeper/inner")
+        regular = ("kept.txt", "sub/deeper/kept.md", ".git/config", ".git/HEAD")
+        state = {}
+
+        def tree(directory, bin_dir):
+            (directory / ".git").mkdir()
+            (directory / ".git/config").write_text("ROOT-CHECKOUT-CONFIG\n", encoding="utf-8")
+            head = directory / "pr-head"
+            (head / ".git").mkdir(parents=True)
+            (head / "sub/deeper").mkdir(parents=True)
+            for path in regular:
+                (head / path).write_text(f"regular {path}\n", encoding="utf-8")
+            (head / "environ").symlink_to("/proc/self/environ")
+            (head / "config-link").symlink_to("../.git/config")
+            (head / "sub/deeper/inner").symlink_to("../../kept.txt")
+
+        def inspect(directory):
+            head = directory / "pr-head"
+            state["links"] = [path for path in links if os.path.lexists(head / path)]
+            state["regular"] = {path: (head / path).read_text(encoding="utf-8") for path in regular
+                                if (head / path).is_file() and not (head / path).is_symlink()}
+            state["root config"] = (directory / ".git/config").read_text(encoding="utf-8")
+            state["git directory"] = (head / ".git").is_dir()
+
+        code, console, *_ = run_step(STRIP, setup=tree, after=inspect)
+        self.assertEqual(code, 0, console)
+        self.assertEqual(state["links"], [], "every link, at the top and in a subdirectory, is removed")
+        self.assertEqual(state["regular"], {path: f"regular {path}\n" for path in regular})
+        self.assertTrue(state["git directory"])
+        self.assertEqual(state["root config"], "ROOT-CHECKOUT-CONFIG\n", "the links go, not their targets")
+
     def test_the_diff_is_taken_from_the_merge_base_in_the_trusted_checkout(self):
         with tempfile.TemporaryDirectory() as temporary:
             clone, head = repository_pair(Path(temporary))
@@ -511,27 +650,54 @@ class PullRequestToolkitStepTests(unittest.TestCase):
                 self.assertNotEqual(code, 0, console)
                 self.assertIn("FAILED", console)
 
+    def test_a_toolkit_with_hooks_an_mcp_configuration_or_scripts_is_refused_after_its_hashes_match(self):
+        # The synthetic files cannot match the recorded hashes, so this runs a copy of the step with the synthetic
+        # files' own SHA-256 values in place of the recorded ones: the hash check passes, and the refusal is the only
+        # thing left that can stop the step.
+        own = {RECORDED_HASHES[path]: hashlib.sha256(text.encode("utf-8")).hexdigest()
+               for path, text in SYNTHETIC_TOOLKIT.items()}
+        for extra in (None, "hooks", ".mcp.json", "scripts"):
+            with self.subTest(extra=extra):
+                code, console, *_ = run_step(TOOLKIT_CHECK, setup=toolkit_tree(TOOLKIT_COMMIT, extra=extra),
+                                             replacements=own)
+                self.assertEqual(console.count(": OK"), 3, console)
+                if extra is None:
+                    self.assertEqual(code, 0, console)
+                    self.assertNotIn("Refused", console)
+                else:
+                    self.assertEqual(code, 2, console)
+                    self.assertIn("Refused: the toolkit carries hooks, an MCP configuration or scripts.", console)
+
     def test_a_bounded_cached_run_with_both_reports_is_accepted_and_only_numbers_and_fixed_names_are_kept(self):
         code, console, summary, usage, _ = run_step(NUMBERS, execution_file=execution(subagent_turns=40))
         self.assertEqual(code, 0, console)
         record = json.loads(usage)
-        self.assertEqual(sorted(record), ["assistant_turns", "claude_code_version", "forbidden_tools", "mcp_servers",
+        self.assertEqual(sorted(record), ["agents_called", "assistant_turns", "claude_code_version", "complete",
+                                          "forbidden_tools", "handbacks", "lower_bound_models", "mcp_servers",
                                           "models", "num_turns", "report_sections", "report_source", "result_chars",
-                                          "session_started", "successful_result", "tools", "tools_listed",
-                                          "total_cost_usd"])
+                                          "result_subtypes", "session_started", "successful_result", "tools",
+                                          "tools_listed", "total_cost_usd"])
         self.assertEqual(record["tools"], ["Task", "Glob", "Grep", "Read"])
         self.assertEqual(record["forbidden_tools"], [])
         self.assertEqual(record["report_sections"], list(AGENTS))
         self.assertEqual(record["assistant_turns"], 3)
+        self.assertIs(record["complete"], True)
+        self.assertEqual(record["result_subtypes"], ["success"])
+        self.assertEqual(record["agents_called"], list(AGENTS))
+        self.assertEqual(record["handbacks"], 0)
+        self.assertEqual(record["lower_bound_models"], [])
+        self.assertEqual([model["model"] for model in record["models"]], [MODEL])
         for text in (usage, summary, console):
             self.assertNotIn(TRANSCRIPT_MARKER, text)
             self.assertNotIn("Finding 1", text)
         self.assertIn("| 3 | 3 | 4.3 | true | 2 | 2.1.295 | Task Glob Grep Read | 0 |", summary)
+        self.assertIn(f"Result records: success. Agents called: {AGENTS[0]} {AGENTS[1]}. Handbacks: 0 of 2.",
+                      summary)
 
     def test_an_unmet_bound_fails_after_the_numbers_were_kept(self):
         cases = {
             "no cache read": {"modelUsage": model_usage(read=0)},
-            "over the budget and its allowance": {"total_cost_usd": 7.01},
+            "over the cost bound": {"total_cost_usd": 24.21},
             "over the coordinator's turn limit": {"turns": 13},
             "an error result": {"is_error": True},
             "a turn-limit stop": {"subtype": "error_max_turns"},
@@ -552,12 +718,63 @@ class PullRequestToolkitStepTests(unittest.TestCase):
                 self.assertIsInstance(json.loads(usage)["total_cost_usd"], (int, float))
 
     def test_the_step_names_every_unmet_bound(self):
-        code, console, *_ = run_step(NUMBERS, execution_file=execution(turns=13, total_cost_usd=7.5,
+        code, console, *_ = run_step(NUMBERS, execution_file=execution(turns=13, total_cost_usd=24.5,
                                                                        tools=("Read", "Skill"), result=""))
         self.assertNotEqual(code, 0)
-        for words in ("13 coordinator turns, outside 1 to 12", "above 7", "Skill", "no result text",
-                      "0 of 2 agent reports"):
+        for words in ("13 coordinator turns, outside 1 to 12", "client cost estimate 24.5 USD, above the 24.2 USD bound",
+                      "Skill", "no result text", "0 of 2 agent reports"):
             self.assertIn(words, console)
+
+    def test_the_cost_bound_is_the_budget_times_the_measured_overrun_factor(self):
+        # The command center's decision of 2026-10-09: the bound is the 22 USD budget times 1.10, the largest overrun
+        # measured on J8's 5 USD-budget runs (9.2%) rounded up. A success at 24.20 passes; one at 24.21 fails, and the
+        # failure and the job summary both name the overrun.
+        code, console, summary, usage, _ = run_step(NUMBERS, execution_file=execution(
+            total_cost_usd=24.2, modelUsage=model_usage(cost=24.2)))
+        self.assertEqual(code, 0, console)
+        self.assertEqual(json.loads(usage)["total_cost_usd"], 24.2)
+        self.assertNotIn("Over the cost bound", summary)
+        self.assertNotIn("Budget stop", summary)
+        code, console, summary, *_ = run_step(NUMBERS, execution_file=execution(total_cost_usd=24.21))
+        self.assertNotEqual(code, 0)
+        self.assertEqual(console.strip(), "Bounds not met: client cost estimate 24.21 USD, above the 24.2 USD bound "
+                                          "(the 22 USD budget times its measured overrun factor 1.10)")
+        self.assertIn("Over the cost bound: the client cost estimate is 24.21 USD, above 24.2 USD (the 22 USD budget "
+                      "times its measured overrun factor 1.10).", summary)
+
+    def test_a_budget_stop_after_both_handbacks_publishes_up_to_the_cost_bound(self):
+        both = {AGENTS[0]: "TEST-ANALYZER-REPORT", AGENTS[1]: "SILENT-FAILURE-REPORT"}
+        stop = "Budget stop: the client stopped the run at its 22 USD budget (error_max_budget_usd), with 2 of 2 handbacks."
+        for cost in (22.40, 24.20):
+            # The five records of J8 #894's shape, and the budget stop alone, as a hosted file that ends at the first
+            # result record would hold it.
+            for shape, records in (("five records", budget_stop_records(cost)),
+                                   ("the budget stop alone", budget_stop_records(cost)[1:2])):
+                with self.subTest(cost=cost, shape=shape):
+                    log = execution(turns=2, handbacks=both, results=records)
+                    code, console, summary, usage, _ = run_step(NUMBERS, execution_file=log)
+                    self.assertEqual(code, 0, console)
+                    self.assertIs(json.loads(usage)["successful_result"], True)
+                    self.assertIn(stop, summary)
+                    self.assertNotIn("Over the cost bound", summary)
+                    code, console, summary, *_ = run_step(REPORT, execution_file=log)
+                    self.assertEqual(code, 0, console)
+                    self.assertIn("TEST-ANALYZER-REPORT", summary)
+                    self.assertIn("SILENT-FAILURE-REPORT", summary)
+        # Above the bound the same stop fails, named in the failure and in the summary.
+        code, console, summary, *_ = run_step(NUMBERS, execution_file=execution(
+            turns=2, handbacks=both, results=budget_stop_records(24.21)))
+        self.assertNotEqual(code, 0)
+        self.assertEqual(console.strip(), "Bounds not met: client cost estimate 24.21 USD, above the 24.2 USD bound "
+                                          "(the 22 USD budget times its measured overrun factor 1.10)")
+        self.assertIn(stop, summary)
+        self.assertIn("Over the cost bound: the client cost estimate is 24.21 USD", summary)
+        # With one handback, a stop under the bound still fails.
+        code, console, summary, *_ = run_step(NUMBERS, execution_file=execution(
+            turns=2, handbacks={AGENTS[0]: "TEST-ANALYZER-REPORT"}, results=budget_stop_records(22.40)))
+        self.assertNotEqual(code, 0)
+        self.assertIn("the run did not end in success, or in a budget stop after both agents handed back", console)
+        self.assertIn("with 1 of 2 handbacks.", summary)
 
     def test_the_turn_bound_counts_the_coordinators_turns_only(self):
         # The agents' own turns carry a parent tool use and do not count against the coordinator's --max-turns.
@@ -568,7 +785,7 @@ class PullRequestToolkitStepTests(unittest.TestCase):
 
     def test_names_that_are_not_plain_identifiers_are_replaced(self):
         hostile = "<img src=x onerror=alert(1)> | injected"
-        log = execution(tools=("Read", hostile), modelUsage={hostile: model_usage()["claude-sonnet-5-5"]})
+        log = execution(tools=("Read", hostile), modelUsage={hostile: model_usage()[MODEL]})
         log[0]["claude_code_version"] = hostile
         _, console, summary, usage, _ = run_step(NUMBERS, execution_file=log)
         for text in (usage, summary, console):
@@ -619,6 +836,12 @@ class PullRequestToolkitStepTests(unittest.TestCase):
         code, console, summary, *_ = run_step(REPORT, execution_file=execution(result="a" + "é" * 40000))
         self.assertEqual(code, 0, console)
         self.assertNotIn("�", summary)
+        # The 60,000th byte is the first half of the 30,000th é: iconv drops that half character and keeps the
+        # 59,999 bytes before it, so the published text is exactly that prefix.
+        published = summary.split("<pre>\n", 1)[1].split("</pre>", 1)[0]
+        self.assertEqual(published.rstrip("\n"), "a" + "é" * 29999)
+        self.assertEqual(summary.count("é"), 29999)
+        self.assertIn("The report is 80001 bytes; the first 60,000 are shown.", summary)
         code, console, summary, *_ = run_step(REPORT, execution_file=execution(result="short report"))
         self.assertNotIn("are shown.", summary)
 
@@ -661,6 +884,210 @@ class PullRequestToolkitStepTests(unittest.TestCase):
         self.assertIn("Finding 2", summary)
         code, console, *_ = run_step(NUMBERS, execution_file=log)
         self.assertEqual(code, 0, console)
+
+    def test_in_the_measured_order_a_budget_stop_after_both_handbacks_passes_wherever_the_file_ends(self):
+        # J8 #894's stream, read from the client directly, in its measured order: the coordinator's Agent calls
+        # (records 4 and 5), both agents' handbacks (563 and 580), then the five result records (598 to 602, all at
+        # the whole run's cost). execution() writes the same order. The pinned action's file ends at the first result
+        # record; cut there or after any later record, the file holds both handbacks, so every cut passes, and the
+        # reports come from the handbacks.
+        records = budget_stop_records()
+        handbacks = {AGENTS[0]: "TEST-ANALYZER-REPORT", AGENTS[1]: "SILENT-FAILURE-REPORT"}
+        for end in range(1, len(records) + 1):
+            with self.subTest(records=end):
+                log = execution(turns=2, handbacks=handbacks, results=records[:end])
+                kinds = [("handback" if any(block.get("name") == "SubagentHandback"
+                                            for block in item.get("message", {}).get("content", []))
+                          else item["type"]) for item in log]
+                self.assertLess(max(i for i, kind in enumerate(kinds) if kind == "handback"),
+                                kinds.index("result"), "both handbacks come before the first result record")
+                code, console, summary, usage, _ = run_step(NUMBERS, execution_file=log)
+                self.assertEqual(code, 0, console)
+                record = json.loads(usage)
+                self.assertIs(record["successful_result"], True)
+                self.assertEqual(record["result_subtypes"], [item["subtype"] for item in records[:end]])
+                self.assertEqual(record["handbacks"], 2)
+                self.assertEqual(record["total_cost_usd"], 5.0007)
+                self.assertEqual(record["num_turns"], 3)
+                self.assertEqual(record["report_source"], "handbacks")
+                self.assertIn("Handbacks: 2 of 2.", summary)
+                # The summary names the budget stop once a budget-stop record is among those read.
+                self.assertEqual("Budget stop: the client stopped the run" in summary, end >= 2)
+        code, console, summary, *_ = run_step(REPORT, execution_file=execution(turns=2, handbacks=handbacks,
+                                                                                results=records))
+        self.assertEqual(code, 0, console)
+        self.assertIn("TEST-ANALYZER-REPORT", summary)
+        self.assertIn("SILENT-FAILURE-REPORT", summary)
+
+    def test_a_file_that_ends_before_the_handbacks_fails_closed(self):
+        # Not measured: if the client, run through the action's SDK path, emitted its first result record after the
+        # coordinator's first turn instead of waiting for the background agents, the pinned action's file would end
+        # there, before any handback. Then only the coordinator's note is there to publish: the report bound fails,
+        # the numbers step fails, and the publish step, which needs its success, publishes nothing.
+        handbacks = {AGENTS[0]: "TEST-ANALYZER-REPORT", AGENTS[1]: "SILENT-FAILURE-REPORT"}
+        records = budget_stop_records()
+        note = dict(records[0], num_turns=1, total_cost_usd=0.4, modelUsage=model_usage(cost=0.4))
+        log = execution(turns=1, handbacks=handbacks, results=[note] + records[1:])
+        first_handback = next(i for i, item in enumerate(log) if any(
+            block.get("name") == "SubagentHandback" for block in item.get("message", {}).get("content", [])))
+        log.insert(first_handback, log.pop(log.index(note)))
+        cut = log[:log.index(note) + 1]
+        code, console, summary, usage, _ = run_step(NUMBERS, execution_file=cut)
+        self.assertNotEqual(code, 0)
+        self.assertEqual(console.strip(), "Bounds not met: 0 of 2 agent reports")
+        record = json.loads(usage)
+        self.assertEqual((record["handbacks"], record["report_sections"], record["result_subtypes"]),
+                         (0, [], ["success"]))
+        for text in (usage, summary, console):
+            self.assertNotIn("TEST-ANALYZER-REPORT", text)
+        # The same run with the rest of its records, the handbacks among them, passes from the handbacks.
+        code, console, _, usage, _ = run_step(NUMBERS, execution_file=log)
+        self.assertEqual(code, 0, console)
+        self.assertEqual(json.loads(usage)["report_source"], "handbacks")
+
+    def test_the_model_usage_is_the_costliest_result_records(self):
+        records = budget_stop_records()
+        both = {AGENTS[0]: "TEST-ANALYZER-REPORT", AGENTS[1]: "SILENT-FAILURE-REPORT"}
+        log = execution(turns=2, handbacks=both, results=[
+            dict(records[0], total_cost_usd=4.0, modelUsage=model_usage(read=1000, cost=4.0)),
+            dict(records[1], total_cost_usd=23.0, modelUsage=model_usage(read=2000, cost=23.0)),
+            dict(records[2], total_cost_usd=9.0, modelUsage=model_usage(read=3000, cost=9.0))])
+        code, console, summary, usage, _ = run_step(NUMBERS, execution_file=log)
+        self.assertEqual(code, 0, console)
+        record = json.loads(usage)
+        self.assertEqual(record["total_cost_usd"], 23.0)
+        self.assertEqual(record["models"], [{"model": MODEL, "input_tokens": 90, "output_tokens": 240000,
+                                             "cache_read_input_tokens": 2000, "cache_creation_input_tokens": 400000,
+                                             "cost_usd": 23.0}])
+        self.assertIn(f"| {MODEL} | 90 | 400000 | 2000 | 240000 |", summary)
+
+    def test_a_budget_stop_without_both_handbacks_and_any_other_error_record_fail(self):
+        records = budget_stop_records()
+        both = {AGENTS[0]: "TEST-ANALYZER-REPORT", AGENTS[1]: "SILENT-FAILURE-REPORT"}
+        cases = {
+            "a budget stop with one handback": execution(turns=2, handbacks={AGENTS[0]: "TEST-ANALYZER-REPORT"},
+                                                         results=records),
+            # The relay carries both sections, so only the handback condition can refuse it.
+            "a budget stop after a full relay but no handback": execution(
+                turns=2, results=[dict(records[0], result=REPORT_TEXT), records[1]]),
+            "a turn-limit stop among the records": execution(
+                turns=2, handbacks=both, results=[records[0], dict(records[1], subtype="error_max_turns"), records[2]]),
+            "an execution error among the records": execution(
+                turns=2, handbacks=both, results=[dict(records[1], subtype="error_during_execution"), records[2]]),
+            "an idle success flagged as an error": execution(
+                turns=2, handbacks=both, results=[records[0], dict(records[2], is_error=True)]),
+        }
+        for label, log in cases.items():
+            with self.subTest(case=label):
+                code, console, _, usage, _ = run_step(NUMBERS, execution_file=log)
+                self.assertNotEqual(code, 0)
+                self.assertIs(json.loads(usage)["successful_result"], False)
+                self.assertIn("the run did not end in success, or in a budget stop after both agents handed back",
+                              console)
+
+    def test_the_cost_is_the_highest_any_result_record_reports(self):
+        records = budget_stop_records()
+        both = {AGENTS[0]: "TEST-ANALYZER-REPORT", AGENTS[1]: "SILENT-FAILURE-REPORT"}
+        log = execution(turns=2, handbacks=both, results=[dict(records[0], total_cost_usd=4.0),
+                                                          dict(records[1], total_cost_usd=24.5),
+                                                          dict(records[2], total_cost_usd=5.0)])
+        code, console, _, usage, _ = run_step(NUMBERS, execution_file=log)
+        self.assertNotEqual(code, 0)
+        self.assertEqual(json.loads(usage)["total_cost_usd"], 24.5)
+        self.assertIn("client cost estimate 24.5 USD, above the 24.2 USD bound", console)
+
+    def test_a_run_cut_off_before_its_result_keeps_a_lower_bound_of_its_usage_and_fails(self):
+        # The action writes the messages it has read when the client stops with an error; such a file has no result
+        # record. Each message id's usage counts once, however many messages carry it.
+        log = [message for message in execution(turns=2, subagent_turns=2,
+                                                handbacks={AGENTS[0]: "TEST-ANALYZER-REPORT"})
+               if message.get("type") != "result"]
+        usage_by_id = {"msg_00": {"input_tokens": 2, "output_tokens": 5, "cache_read_input_tokens": 1000,
+                                  "cache_creation_input_tokens": 300},
+                       "msg_01": {"input_tokens": 2, "output_tokens": 7, "cache_read_input_tokens": 2000,
+                                  "cache_creation_input_tokens": 50},
+                       "msg_handback_0": {"input_tokens": 1, "output_tokens": 3, "cache_read_input_tokens": 400,
+                                          "cache_creation_input_tokens": 20},
+                       "msg_sub_000": {"input_tokens": 4, "output_tokens": 11, "cache_read_input_tokens": 600,
+                                       "cache_creation_input_tokens": 70},
+                       "msg_sub_001": {"input_tokens": 3, "output_tokens": 13, "cache_read_input_tokens": 800,
+                                       "cache_creation_input_tokens": 90}}
+        with_message_usage(log, usage_by_id, models={"msg_sub_000": "claude-haiku-5-5",
+                                                     "msg_sub_001": "claude-haiku-5-5"})
+        code, console, summary, usage, _ = run_step(NUMBERS, execution_file=log)
+        self.assertNotEqual(code, 0)
+        record = json.loads(usage)
+        self.assertIs(record["complete"], False)
+        self.assertIsNone(record["total_cost_usd"])
+        self.assertIsNone(record["num_turns"])
+        self.assertEqual(record["models"], [])
+        self.assertEqual(record["result_subtypes"], [])
+        self.assertEqual(record["lower_bound_models"], [
+            {"model": "claude-haiku-5-5", "input_tokens": 7, "output_tokens": 24, "cache_read_input_tokens": 1400,
+             "cache_creation_input_tokens": 160},
+            {"model": MODEL, "input_tokens": 5, "output_tokens": 15, "cache_read_input_tokens": 3400,
+             "cache_creation_input_tokens": 370}])
+        self.assertIn("no result record, or one without usable usage: the token counts kept are a lower bound", console)
+        self.assertIn("the run did not end in success", console)
+        self.assertIn(f"| {MODEL} (lower bound from the assistant messages) | 5 | 370 | 3400 | 15 |", summary)
+        self.assertIn("| 2 | none | none | false |", summary)
+        for text in (usage, summary, console):
+            self.assertNotIn(TRANSCRIPT_MARKER, text)
+            self.assertNotIn("TEST-ANALYZER-REPORT", text)
+        # One result record among usable ones whose model usage has a counter that is not a whole number: the same
+        # lower bound, not a cost taken from the other records.
+        records = budget_stop_records()
+        broken = dict(records[2], modelUsage={MODEL: dict(model_usage()[MODEL], outputTokens="240000")})
+        log = execution(turns=2, subagent_turns=2, handbacks={AGENTS[0]: "TEST-ANALYZER-REPORT",
+                                                              AGENTS[1]: "SILENT-FAILURE-REPORT"},
+                        results=records[:2] + [broken] + records[3:])
+        usage_by_id["msg_handback_1"] = usage_by_id["msg_handback_0"]
+        with_message_usage(log, usage_by_id)
+        code, console, _, usage, _ = run_step(NUMBERS, execution_file=log)
+        self.assertNotEqual(code, 0)
+        record = json.loads(usage)
+        self.assertIs(record["complete"], False)
+        self.assertIsNone(record["total_cost_usd"])
+        self.assertEqual(record["result_subtypes"], [item["subtype"] for item in records])
+        self.assertEqual(record["lower_bound_models"], [
+            {"model": MODEL, "input_tokens": 13, "output_tokens": 42, "cache_read_input_tokens": 5200,
+             "cache_creation_input_tokens": 550}])
+        self.assertIn("no result record, or one without usable usage", console)
+
+    def test_the_coordinator_must_call_both_toolkit_agents_and_no_other(self):
+        # The set of agents called must be exactly the two: a retried agent passes; a third or a missing one fails.
+        code, console, _, usage, _ = run_step(NUMBERS, execution_file=execution(agents=(AGENTS[0], AGENTS[1],
+                                                                                        AGENTS[1])))
+        self.assertEqual(code, 0, console)
+        self.assertEqual(json.loads(usage)["agents_called"], [AGENTS[0], AGENTS[1], AGENTS[1]])
+        cases = {
+            "a third agent": (AGENTS[0], AGENTS[1], "general-purpose"),
+            "a missing agent": (AGENTS[0],),
+            "a missing agent, the other retried": (AGENTS[0], AGENTS[0]),
+            "no agent": (),
+        }
+        for label, agents in cases.items():
+            with self.subTest(case=label):
+                code, console, _, usage, _ = run_step(NUMBERS, execution_file=execution(agents=agents))
+                self.assertNotEqual(code, 0)
+                self.assertIn("the coordinator did not call both toolkit agents and no other agent", console)
+                # The relay carries both sections, so no other bound fails.
+                self.assertEqual(console.count("; "), 0, console)
+        # Only the two fixed names are kept; any other agent is recorded as "other".
+        _, console, summary, usage, _ = run_step(NUMBERS, execution_file=execution(
+            agents=(AGENTS[0], AGENTS[1], "<b>injected</b> ghp_example")))
+        self.assertEqual(json.loads(usage)["agents_called"], ["other", AGENTS[0], AGENTS[1]])
+        for text in (usage, summary, console):
+            self.assertNotIn("injected", text)
+
+    def test_a_tool_entry_that_is_not_a_string_is_a_forbidden_tool(self):
+        for entry in ({"name": "Bash"}, None, 17):
+            with self.subTest(entry=entry):
+                code, console, _, usage, _ = run_step(NUMBERS, execution_file=execution(
+                    tools=("Task", "Glob", "Grep", "Read", entry)))
+                self.assertNotEqual(code, 0)
+                self.assertEqual(json.loads(usage)["forbidden_tools"], ["non-string tool entry"])
+                self.assertIn("tools outside Read, Glob, Grep and Agent: non-string tool entry", console)
 
 
 if __name__ == "__main__":

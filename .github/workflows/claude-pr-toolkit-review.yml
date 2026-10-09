@@ -7,7 +7,7 @@ name: claude-pr-toolkit-review
 # request description does not declare. The toolkit is checked out at a full commit of anthropics/claude-code and
 # loaded with --plugin-dir; nothing is installed from a marketplace at run time. The workflow code is main's; the PR
 # head is checked out as data into `pr-head` with main at the workspace root. Claude has Read, Glob, Grep and the
-# Agent tool only, a $5 client budget, and a time limit scaled by the diff's size. The job holds no write scope beyond
+# Agent tool only, a $22 client budget, and a time limit scaled by the diff's size. The job holds no write scope beyond
 # the OIDC token: a model-free step copies the two reports to the job summary, and nothing is posted to the pull
 # request. The output is an input to the command center before its cue, never a designated read.
 #
@@ -134,6 +134,15 @@ jobs:
           path: pr-head
           persist-credentials: false
 
+      # Git checks a symbolic link out as a link, so one in the head could point the agents' file tools at a file
+      # outside the tree, such as the job's own environment under /proc or the root checkout's .git/config. Every link
+      # is removed before anything reads the tree; pr-head/.git is the checkout's own and is left as it is.
+      - name: Remove symbolic links from the pull request head
+        shell: bash
+        run: |
+          set -euo pipefail
+          find pr-head -path pr-head/.git -prune -o -type l -exec rm -f {} +
+
       # git runs in the trusted root checkout only; external diff drivers and text conversion are off. The paths are
       # expanded as ${scope[@]+"${scope[@]}"} because bash before 4.4 (macOS /bin/bash 3.2) treats an empty array as
       # unset under set -u. The time the
@@ -252,10 +261,10 @@ jobs:
             confidence of each finding you listed, in order>]}
             ----- end of task -----
           claude_args: |
-            --model claude-sonnet-5-5
+            --model claude-opus-5-5
             --effort max
             --max-turns 12
-            --max-budget-usd 5
+            --max-budget-usd 22
             --tools Read,Glob,Grep,Agent
             --allowedTools Read,Glob,Grep,Agent
             --restricted
@@ -267,34 +276,55 @@ jobs:
             --add-dir ${{ runner.temp }}/pr-toolkit
 
       # Numbers and fixed names only: the execution file holds the whole transcript and is never printed or uploaded.
-      # The record is written first, so a failed or over-budget run still leaves its cost; the acceptance check
+      # The record is written first, so a failed or over-budget run still leaves its numbers; the acceptance check
       # follows. It reads the session's own tool list: a missing list, any tool outside the allow-list (the session
-      # reports the Agent tool as Task) or an MCP server fails the run, and the step names every bound it finds unmet.
-      # The turn bound counts the coordinator's own assistant turns (distinct message ids without a parent tool use);
-      # the subagents' turns are theirs. The reports come from the relay or, when it lacks a section, from the agents'
-      # handbacks, as in the report step. The cost bound is the $5 budget plus a $2 allowance, because the client
-      # checks its budget after a turn and the background agents' last requests can land after that check.
+      # reports the Agent tool as Task), an entry in it that is not a string, or an MCP server fails the run, and the
+      # step names every bound it finds unmet. The turn bound counts the coordinator's own assistant turns (distinct
+      # message ids without a parent tool use); the subagents' turns are theirs. The coordinator must have called both
+      # toolkit agents, each at least once (a retry is allowed), and no other agent. Every result record in the file is
+      # read, not only the last, so an idle success at the end cannot hide an earlier error: each must be a success, or
+      # a budget stop (error_max_budget_usd) after both agents handed back their reports, and the cost is the highest
+      # any record reports, with the model usage of that record. The file holds only what the action read before it
+      # stopped, which at the pinned action is up to the first result record, so a file that ends before the agents
+      # handed back fails the report bound. When there is no result record (a run cut off before its result), or one
+      # without a whole cost, turn count and model usage, the record keeps the assistant messages' token counts, once
+      # per message id, as a lower bound without a cost, and the step fails. An execution file with neither leaves no
+      # record. The reports come from the relay or, when it lacks a
+      # section, from the agents' handbacks, as in the report step. The client checks its budget after a turn, so a
+      # run can end a little above it: the cost bound is the $22 budget times 1.10, the largest overrun measured on
+      # J8's $5-budget runs (9.2%) rounded up. A run above it fails, budget stop or not; a budget stop at or under it,
+      # after both agents handed back, passes. The job summary names an overrun and a budget stop.
       - name: Keep the run's numbers and check the bounds
+        id: numbers
         if: ${{ always() && steps.claude_toolkit.outputs.execution_file != '' }}
         shell: bash
         env:
           EXECUTION_FILE: ${{ steps.claude_toolkit.outputs.execution_file }}
         run: |
           set -euo pipefail
+          # --max-budget-usd above, and the cost bound: that budget times the measured overrun factor 1.10.
+          budget=22 cost_bound=24.2
           out="$RUNNER_TEMP/pr-toolkit-usage"
           mkdir -p "$out"
           jq -e '
             . as $all |
             def count: type == "number" and . >= 0 and . == floor;
             def name: if type == "string" and test("^[A-Za-z0-9_.:@/-]{1,80}$") then . else "other" end;
+            def agent: if IN("pr-review-toolkit:pr-test-analyzer", "pr-review-toolkit:silent-failure-hunter") then .
+              else "other" end;
+            def usable: (.total_cost_usd | type == "number" and . >= 0) and (.num_turns | count) and
+              (.modelUsage | type == "object" and length > 0 and all(.[]; (.inputTokens | count) and
+                (.outputTokens | count) and (.cacheReadInputTokens | count) and (.cacheCreationInputTokens | count)
+                and (.costUSD | type == "number" and . >= 0)));
             if type != "array" then error("unsupported execution shape") else . end |
             (map(select(.type == "system" and .subtype == "init")) | first) as $init |
-            (map(select(.type == "result")) | last) as $result |
-            if $result == null then error("no result") else . end |
-            if ($result.total_cost_usd | type == "number" and . >= 0) and ($result.num_turns | count) and
-               ($result.modelUsage | type == "object" and length > 0)
-            then . else error("usage unavailable") end |
-            (($init.tools // []) | map(select(type == "string"))) as $tools |
+            map(select(.type == "result")) as $results |
+            (($results | length) > 0 and all($results[]; usable)) as $complete |
+            ([.[] | select(.type == "assistant") | .message | select(type == "object" and (.usage | type) == "object")]
+              | group_by(.id) | map(first)) as $messages |
+            if $complete or ($messages | length) > 0 then . else error("usage unavailable") end |
+            ($init.tools // []) as $listed |
+            ($listed | map(select(type == "string"))) as $tools |
             ([.[] | select(.type == "result") | .result // "" | select(type == "string" and . != "")] | last // "")
               as $relay |
             ([.[] | select(.type == "assistant" and (.parent_tool_use_id == null)) | .message.content[]?
@@ -304,55 +334,93 @@ jobs:
               | ([$all[] | select(.type == "assistant" and .parent_tool_use_id == $c.id) | .message.content[]?
                   | select(.type == "tool_use" and .name == "SubagentHandback") | .input.message
                   | select(type == "string" and . != "")] | last) as $m
-              | select($m != null) | "## \($c.agent)\n\n\($m)\n"] | join("\n")) as $handbacks |
+              | select($m != null) | {agent: $c.agent, text: "## \($c.agent)\n\n\($m)\n"}]) as $returned |
+            ($returned | map(.text) | join("\n")) as $handbacks |
             (if ($relay | contains("## pr-review-toolkit:pr-test-analyzer") and
                  contains("## pr-review-toolkit:silent-failure-hunter")) then $relay
              elif $handbacks != "" then $handbacks else $relay end) as $text |
+            ([("pr-review-toolkit:pr-test-analyzer", "pr-review-toolkit:silent-failure-hunter")
+              | select(. as $agent | any($returned[]; .agent == $agent))] | length) as $handed_back |
             ([.[] | select(.type == "assistant" and (.parent_tool_use_id == null)) | .message.id?
               | select(type == "string")] | unique | length) as $turns |
-            {total_cost_usd: $result.total_cost_usd, num_turns: $result.num_turns, assistant_turns: $turns,
+            {complete: $complete,
+             total_cost_usd: (if $complete then ([$results[].total_cost_usd] | max) else null end),
+             num_turns: (if $complete then ([$results[].num_turns] | max) else null end),
+             assistant_turns: $turns,
              result_chars: ($text | length),
              report_source: (if $text == $relay then "relay" else "handbacks" end),
              report_sections: ([("pr-review-toolkit:pr-test-analyzer", "pr-review-toolkit:silent-failure-hunter")
                | select(. as $agent | $text | contains("## " + $agent))]),
+             agents_called: ($calls | map(.agent | agent) | sort),
+             handbacks: $handed_back,
+             result_subtypes: ($results | map(.subtype | name)),
              tools_listed: (($init.tools | type) == "array" and ($init.mcp_servers | type) == "array"),
-             successful_result: ($result.subtype == "success" and $result.is_error == false),
+             successful_result: (($results | length) > 0 and all($results[];
+               (.subtype == "success" and .is_error == false) or
+               (.subtype == "error_max_budget_usd" and $handed_back == 2))),
              session_started: ($init != null),
              claude_code_version: (($init.claude_code_version // "unknown") | name),
              tools: ($tools | map(name)),
-             forbidden_tools: ($tools | map(select(IN("Read", "Glob", "Grep", "Task", "Agent") | not)) | map(name)),
+             forbidden_tools: ($listed | map(if type == "string"
+               then select(IN("Read", "Glob", "Grep", "Task", "Agent") | not) | name
+               else "non-string tool entry" end)),
              mcp_servers: (($init.mcp_servers // []) | length),
-             models: ($result.modelUsage | to_entries | map(
-               if (.value.inputTokens | count) and (.value.outputTokens | count) and
-                  (.value.cacheReadInputTokens | count) and (.value.cacheCreationInputTokens | count) and
-                  (.value.costUSD | type == "number" and . >= 0)
-               then {model: (.key | name), input_tokens: .value.inputTokens, output_tokens: .value.outputTokens,
-                     cache_read_input_tokens: .value.cacheReadInputTokens,
-                     cache_creation_input_tokens: .value.cacheCreationInputTokens, cost_usd: .value.costUSD}
-               else error("model usage unavailable") end))}
+             models: (if $complete then ($results | max_by(.total_cost_usd) | .modelUsage | to_entries | map(
+               {model: (.key | name), input_tokens: .value.inputTokens, output_tokens: .value.outputTokens,
+                cache_read_input_tokens: .value.cacheReadInputTokens,
+                cache_creation_input_tokens: .value.cacheCreationInputTokens, cost_usd: .value.costUSD}))
+               else [] end),
+             lower_bound_models: (if $complete then [] else ($messages | group_by(.model) | map(
+               if all(.[]; .usage | all(.input_tokens, .output_tokens, .cache_read_input_tokens,
+                                        .cache_creation_input_tokens; count))
+               then {model: (.[0].model | name), input_tokens: (map(.usage.input_tokens) | add),
+                     output_tokens: (map(.usage.output_tokens) | add),
+                     cache_read_input_tokens: (map(.usage.cache_read_input_tokens) | add),
+                     cache_creation_input_tokens: (map(.usage.cache_creation_input_tokens) | add)}
+               else error("assistant usage unavailable") end)) end)}
           ' "$EXECUTION_FILE" > "$out/usage.json.tmp"
           mv "$out/usage.json.tmp" "$out/usage.json"
           {
             echo '### Pull request toolkit read: run numbers'
             echo
-            jq -r '"| coordinator turns | messages | client cost estimate (USD) | completed | reports | Claude Code | tools | MCP servers |",
+            jq -r --argjson budget "$budget" --argjson bound "$cost_bound" '
+                   def listed: if length > 0 then join(" ") else "none" end;
+                   "| coordinator turns | messages | client cost estimate (USD) | completed | reports | Claude Code | tools | MCP servers |",
                    "| ---: | ---: | ---: | --- | ---: | --- | --- | ---: |",
-                   "| \(.assistant_turns) | \(.num_turns) | \(.total_cost_usd) | \(.successful_result) | \(.report_sections | length) | \(.claude_code_version) | \(.tools | join(" ")) | \(.mcp_servers) |",
+                   "| \(.assistant_turns) | \(.num_turns // "none") | \(.total_cost_usd // "none") | \(.successful_result) | \(.report_sections | length) | \(.claude_code_version) | \(.tools | join(" ")) | \(.mcp_servers) |",
+                   "", "Result records: \(.result_subtypes | listed). Agents called: \(.agents_called | listed). Handbacks: \(.handbacks) of 2.",
+                   (if any(.result_subtypes[]; . == "error_max_budget_usd")
+                    then "", "Budget stop: the client stopped the run at its \($budget) USD budget (error_max_budget_usd), with \(.handbacks) of 2 handbacks."
+                    else empty end),
+                   (if (.total_cost_usd // 0) > $bound
+                    then "", "Over the cost bound: the client cost estimate is \(.total_cost_usd) USD, above \($bound) USD (the \($budget) USD budget times its measured overrun factor 1.10)."
+                    else empty end),
                    "", "| model | input | cache write | cache read | output |", "| --- | ---: | ---: | ---: | ---: |",
-                   (.models[] | "| \(.model) | \(.input_tokens) | \(.cache_creation_input_tokens) | \(.cache_read_input_tokens) | \(.output_tokens) |")' \
+                   (.models[] | "| \(.model) | \(.input_tokens) | \(.cache_creation_input_tokens) | \(.cache_read_input_tokens) | \(.output_tokens) |"),
+                   (.lower_bound_models[] | "| \(.model) (lower bound from the assistant messages) | \(.input_tokens) | \(.cache_creation_input_tokens) | \(.cache_read_input_tokens) | \(.output_tokens) |")' \
               "$out/usage.json"
           } >> "$GITHUB_STEP_SUMMARY"
-          failed="$(jq -r '[
-            (if .successful_result != true then "the run did not end in success" else empty end),
+          failed="$(jq -r --argjson budget "$budget" --argjson bound "$cost_bound" '
+            def listed: if length > 0 then join(" ") else "none" end; [
+            (if .complete != true then "no result record, or one without usable usage: the token counts kept are a lower bound from the assistant messages, without a cost"
+             else empty end),
+            (if .successful_result != true then "the run did not end in success, or in a budget stop after both agents handed back (result records: \(.result_subtypes | listed); handbacks: \(.handbacks) of 2)"
+             else empty end),
             (if .session_started != true then "no session start record" else empty end),
             (if .tools_listed != true then "the session start record lists no tools or MCP servers" else empty end),
             (if (.forbidden_tools | length) > 0 then "tools outside Read, Glob, Grep and Agent: \(.forbidden_tools | join(" "))"
              else empty end),
             (if .mcp_servers != 0 then "\(.mcp_servers) MCP servers in the session" else empty end),
+            (if (.agents_called | unique) != ["pr-review-toolkit:pr-test-analyzer", "pr-review-toolkit:silent-failure-hunter"]
+             then "the coordinator did not call both toolkit agents and no other agent (agents called: \(.agents_called | listed))"
+             else empty end),
             (if .assistant_turns < 1 or .assistant_turns > 12 then "\(.assistant_turns) coordinator turns, outside 1 to 12"
              else empty end),
-            (if .total_cost_usd > 7 then "client cost estimate \(.total_cost_usd) USD, above 7" else empty end),
-            (if ((.models | map(.cache_read_input_tokens) | add) // 0) <= 0 then "no cache read" else empty end),
+            (if (.total_cost_usd // 0) > $bound
+             then "client cost estimate \(.total_cost_usd) USD, above the \($bound) USD bound (the \($budget) USD budget times its measured overrun factor 1.10)"
+             else empty end),
+            (if .complete == true and ((.models | map(.cache_read_input_tokens) | add) // 0) <= 0 then "no cache read"
+             else empty end),
             (if .result_chars < 1 then "no result text" else empty end),
             (if (.report_sections | length) < 2 then "\(.report_sections | length) of 2 agent reports" else empty end)
           ] | join("; ")' "$out/usage.json")"
@@ -363,10 +431,13 @@ jobs:
 
       # The reports are the coordinator's relay when it carries both sections, and otherwise each agent's own handback
       # (its SubagentHandback message): a coordinator that hits its budget after both agents finished never relays
-      # (api-actions J8 #894, 2026-10-09). They are capped and shown as preformatted text so nothing in them renders
-      # as Markdown or HTML on the run page.
+      # (api-actions J8 #894, 2026-10-09). They are published when the numbers step accepted the run, whatever the
+      # read step's own status: the action fails its own step on a first result that is not a plain success, a budget
+      # stop the numbers step accepts among them, and on a success whose num_turns exceeds --max-turns, a count the
+      # numbers step does not use; the job then stays failed with the reports published. They are capped and shown as
+      # preformatted text so nothing in them renders as Markdown or HTML on the run page.
       - name: Publish the reports to the job summary
-        if: ${{ success() && steps.claude_toolkit.outputs.execution_file != '' }}
+        if: ${{ always() && steps.numbers.outcome == 'success' && steps.claude_toolkit.outputs.execution_file != '' }}
         shell: bash
         env:
           EXECUTION_FILE: ${{ steps.claude_toolkit.outputs.execution_file }}

@@ -87,8 +87,8 @@ The Actions allow-list and harness description below were checked against live s
   `602df92bf481ed904533e95c09f740f40aab5aed` (checked out with its three files' SHA-256 verified, loaded with
   `--plugin-dir`, never installed from a marketplace at run time), read one pull request head in parallel and list
   every behaviour and test change its description does not declare. Dispatched by hand from `main` by the owner, and
-  only while `CLAUDE_PR_TOOLKIT_ENABLED` is `true`; Sonnet 5.5 at `max` effort, Read, Glob, Grep and the Agent tool, a
-  $5 client budget and a time limit scaled by the diff's size; a model-free step copies both reports to the job
+  only while `CLAUDE_PR_TOOLKIT_ENABLED` is `true`; Opus 5.5 at `max` effort, Read, Glob, Grep and the Agent tool, a
+  $22 client budget and a time limit scaled by the diff's size; a model-free step copies both reports to the job
   summary and nothing is posted to the pull request ([decision](decisions/2026-10-09-claude-actions-pr-toolkit-review.md)).
   Its output is an input before the command center's cue, never a designated read. No hosted run has been made.
 - **Against the final catalog of 2026-10-01** (`docs/final-catalog-20261001.md`, #595): the picks each blind model
