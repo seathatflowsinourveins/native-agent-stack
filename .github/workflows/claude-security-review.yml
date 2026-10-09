@@ -97,7 +97,6 @@ jobs:
       # The pull request must be open, from a branch of this repository, target main and have exactly the requested
       # head. Everything after this step names the commit by that id, so a later push to the branch changes nothing.
       - name: Bind the request to an open same-repository pull request
-        id: bind
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}

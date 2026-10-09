@@ -7,8 +7,9 @@ commit. It runs no model, checks out nothing, holds no token scope and requests 
 `claude-security-review.yml` is that review: dispatched by hand from `main` with the pull request number and the
 exact head commit, it runs `anthropics/claude-code-action` v1.0.247 with a security-review prompt and the same
 read-only fence, bounds and accounting as the on-demand pull request review
-([2026-10-08-claude-actions-pr-review.md](2026-10-08-claude-actions-pr-review.md)). It runs only while the
-repository variable `CLAUDE_SECURITY_REVIEW_ENABLED` is `true`. Nothing in this change starts a model run.
+([2026-10-08-claude-actions-pr-review.md](2026-10-08-claude-actions-pr-review.md); that file comes with #894, which
+lands before this pull request, and the link resolves once #894 has landed). It runs only while the repository
+variable `CLAUDE_SECURITY_REVIEW_ENABLED` is `true`. Nothing in this change starts a model run.
 
 ## What the workflows do, by name
 
@@ -26,9 +27,11 @@ harness-audit PR (#892, 2026-10-09), which found changes its record had not name
 - `timeout-minutes: 20`. Grants: `contents: read`, `pull-requests: read` and `id-token: write`.
 - A guard step stops the job with exit 2 on debug signals, a pre-existing `~/.claude/settings.json` (a dangling
   symlink included) or a malformed input; a binding step stops it with exit 2 unless the pull request is open, from
-  this repository, targets `main` and has exactly the requested head.
+  this repository, targets `main` and has exactly the requested head. The binding step has no step id: its id `bind`
+  was referenced nowhere and was removed.
 - The head is checked out as data under `pr-head/` with main at the root, and the diff is written by git in the root
-  only, with diff drivers off.
+  only, with diff drivers off. The optional paths expand as `${scope[@]+"${scope[@]}"}`, so an empty list does not
+  trip `set -u` on bash before 4.4 (macOS `/bin/bash` 3.2), which treats an empty array as unset.
 - The action step pins `ACTIONS_STEP_DEBUG: 'false'` and passes `show_full_output`, `display_report` and
   `track_progress` as `'false'`; the last two are their defaults, declared in the pinned `action.yml` (lines
   136-139 and 152-155 at `2dca132f`).
@@ -36,9 +39,25 @@ harness-audit PR (#892, 2026-10-09), which found changes its record had not name
   assistant turns, at most $3, a cache read, result text; every unmet bound is named), and an artifact keeps
   `usage.json` (numbers only) for 14 days. The review, the last non-empty result, goes to the job summary only when
   the bounds passed, capped at 60,000 bytes on a character boundary with a line saying so when it was longer.
-  Nothing is posted to the pull request.
+  Nothing is posted to the pull request. A final step, "Require the run's execution file", fails the job when the
+  review step reports success without an execution file, so a green run always means the bounds were checked.
+- The job summary, and with it the published review, is public, as the repository is; a finding that should not be
+  public before a fix belongs on the local route instead ("Visibility" below).
 - The pin, v1.0.247, is hours old: the user ended the seven-day cooldown for clean releases on 2026-10-03
   (`docs/decisions/2026-10-03-currency-wave-w1.md`, "Holds and cooldown waiver"), which keeps qualification.
+
+Outside this record, `docs/github-automation.md` gains the "Security review on demand" bullet, which names #894 as
+where the shared action pin, federation, read-only fence and bounds are defined and says #894 lands first, and
+`docs/decisions/2026-10-04-ci-least-privilege.md` lists the review job in its write-grant table and both workflows in
+its per-workflow table, names each exempt job in "Federation exemption (2026-10-08)" and adds an addendum for the
+review job's exemption.
+
+The pre-cue read of 459777d6 left these findings standing at df440f48, fixed on 2026-10-09: the link to the pull
+request review's record now says that file comes with #894 and resolves once #894 lands; the
+`docs/github-automation.md` bullet names #894 as where the shared pin, federation, fence and bounds are defined and
+says #894 lands first; the binding step's unused id `bind` is removed (no workflow step or test referred to it); this
+section now names the final step, the bash 3.2 expansion and the Visibility section that df440f48 added, and the
+documentation outside this record; and the test count below, stale at 32, is 34, with df440f48's two tests named.
 
 ## Why not `anthropics/claude-code-security-review`
 
@@ -110,13 +129,15 @@ standard prices, a $3 client budget checked again from the run's own numbers, 12
 - `tests.test_workflow_security_coverage.NewWorkflowSecurityCoverageTests`: the coverage set gains both workflows,
   each with its own offline zizmor test.
 
-New, in `tests/test_claude_security_review_workflow.py` (32 tests): the review workflow's shape and steps, tested the
+New, in `tests/test_claude_security_review_workflow.py` (34 tests): the review workflow's shape and steps, tested the
 same way as the pull request review's, and the flag's trigger paths, empty permissions, absence of any secret,
 variable, OIDC token, checkout or model, and its notice. Eleven weakened copies of the two workflows each fail at
 least one test (measured on 2026-10-08 against that day's bounds). The 2026-10-09 bound changes have their own tests
 (an unknown tool, a start record without lists, an empty result, the named failures, the character-safe cap and the
 last non-empty result), the turn bound was checked with three mutants, and the step tests no longer skip without
-PyYAML.
+PyYAML. df440f48 added `test_a_green_run_always_has_an_execution_file` and
+`test_no_paths_expands_safely_under_set_u_on_old_bash`, and `test_the_action_is_pinned_and_takes_federation_inputs_only`
+now also asserts `display_report` and `track_progress` as `'false'`.
 
 ## Alternatives considered
 
@@ -142,7 +163,8 @@ PyYAML.
 `native_proven` for the fence flags on the installed client (`--restricted`, `--tools`/`--allowedTools`
 Read,Glob,Grep, `--strict-mcp-config`, `--permission-prompts none`, `--settings` with hooks off and three deny rules,
 on Claude Haiku 5.5 with 10 turns and $0.50; `evidence/artifacts/claude-actions-fence-smoke-20261008/receipt.json`,
-recorded with the pull request review). This workflow adds `--setting-sources user`, `--add-dir`, `--effort max` and
+recorded with the pull request review; #892 and #894 add that file and land before this pull request, so it is on
+`main` before this record is). This workflow adds `--setting-sources user`, `--add-dir`, `--effort max` and
 more deny rules and runs Opus 5.5 with 12 turns and $3; it has not run, locally or hosted.
 `local_static_analysis`: actionlint 1.17.0 and zizmor 1.30.1 (offline, regular and pedantic), no findings on either
 workflow. `local_integration`: the unit tests above with PyYAML 6.0.3 on Python 3.12. `source_review`: the sources

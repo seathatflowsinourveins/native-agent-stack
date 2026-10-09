@@ -5021,8 +5021,8 @@
     },
     {
       "path": ".github/workflows/claude-security-review.yml",
-      "sha256": "6cedf5ac74e5e8a2f0e70854be38a2be5e10a0e0e949672efe97c04e1af52046",
-      "bytes": 20953
+      "sha256": "1063e111fb504be9c9f93ca14bed0ed2caebeab79e9898d05fc75ebb25022cbf",
+      "bytes": 20936
     },
     {
       "path": ".github/workflows/dependency-review.yml",
@@ -18162,8 +18162,8 @@
     },
     {
       "path": "docs/decisions/2026-10-08-claude-actions-security-review.md",
-      "sha256": "86f1ac150b971e51c967f257c5fa5cd7b7bd578075fe54a0d5a05ebd13dde7c9",
-      "bytes": 12702
+      "sha256": "9422b8ffcf64e27a9a0ad3217cdee3efaf4f24de6daaf7d4e5f39e7da92c72a0",
+      "bytes": 14972
     },
     {
       "path": "docs/decisions/2026-10-08-coordinator-research-routing.md",
@@ -18332,8 +18332,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "20a4eaa9346fd2e4af21ffbb55476a95e50c2bdd33f3e5c544f6d594863ec891",
-      "bytes": 101844
+      "sha256": "ceb37cf216757e2b78ca189ff984c9cbfafab1404b15387710e5e10b0823e48c",
+      "bytes": 101931
     },
     {
       "path": "docs/grand-catalog-handbook.md",
