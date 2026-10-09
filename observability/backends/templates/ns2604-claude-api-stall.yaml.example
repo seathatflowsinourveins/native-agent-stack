@@ -1,0 +1,75 @@
+# NativeStack2604 Grafana-managed rule: a Claude Code session whose last API request failed (file provisioning,
+# Grafana v13.2.3). Format: grafana/grafana@v13.2.3 docs/sources/alerting/set-up/provision-alerting-resources/
+# file-provisioning/index.md, the same shape as the host's ns2604-staleness.yaml.
+#
+# Signal: Claude Code's native api_error and api_request events (code.claude.com/docs/en/monitoring-usage, "Detect
+# retry exhaustion": group by session.id and look for a later api_request), as the Collector keeps them in Loki with
+# session_id and event_sequence. event_sequence counts every event of a session, so a session is stalled when its
+# newest api_error has a higher sequence than its newest api_request, or when it has errors and no request at all.
+# A session that recovers sends a later request and leaves the result. `for: 10m` lets a retry inside the client
+# land first. Only the last 2 h are read, so a session that ended after an error drops out after 2 h.
+# Known false positive: a session that ended or sits idle after its last error matches until then.
+#
+# Routing: no notification_settings, so the rule follows Grafana's default policy and its watch-only receiver, as
+# the staleness rules do. The command center provisions this file on the host; nothing here is applied by a merge.
+apiVersion: 1
+
+groups:
+  - orgId: 1
+    name: ns2604-claude-api
+    folder: Ecosystem
+    interval: 1m
+    rules:
+      - uid: ns2604-claude-api-stall
+        title: Claude session stopped after an API error
+        condition: B
+        data:
+          - refId: A
+            queryType: instant
+            relativeTimeRange:
+              from: 7200
+              to: 0
+            datasourceUid: ns2604-loki
+            model:
+              refId: A
+              editorMode: code
+              queryType: instant
+              expr: >-
+                (
+                max by (session_id) (max_over_time({service_name="claude-code"} | event_name="api_error" | unwrap event_sequence | __error__="" [2h]))
+                > on (session_id)
+                max by (session_id) (max_over_time({service_name="claude-code"} | event_name="api_request" | unwrap event_sequence | __error__="" [2h]))
+                )
+                or
+                (
+                max by (session_id) (max_over_time({service_name="claude-code"} | event_name="api_error" | unwrap event_sequence | __error__="" [2h]))
+                unless on (session_id)
+                max by (session_id) (max_over_time({service_name="claude-code"} | event_name="api_request" | unwrap event_sequence | __error__="" [2h]))
+                )
+              intervalMs: 60000
+              maxDataPoints: 43200
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              refId: B
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [0]
+              datasource:
+                type: __expr__
+                uid: __expr__
+        noDataState: OK
+        execErrState: Error
+        for: 10m
+        labels:
+          severity: warning
+          scope: ns2604-claude
+        annotations:
+          summary: "Claude session {{ $labels.session_id }}: last API request failed and none followed for 10 min"
+          description: >-
+            Source: Claude Code api_error and api_request events in Loki (service_name claude-code), compared by
+            event_sequence per session over 2 h. The value is the sequence number of the session's last API error.
+            A session that ended or sits idle after its last error also matches.
