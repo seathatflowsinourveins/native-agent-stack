@@ -104,7 +104,7 @@ across both catalogs. The tables below are generated from it.
 | quality-evaluation | inspect-ai | model and task evaluation | **Inspect AI** | definitive | both families: the Claude record and 2 of 2 blind GPT samples |
 | quality-evaluation | harbor-containerized-agent-e2e-runner | agent evaluation in containers | **Harbor (containerized agent E2E runner)** | definitive | both families: the Claude record and 2 of 2 blind GPT samples |
 | quality-evaluation | promptfoo | prompt and provider regression tests | Promptfoo 0.123.1 | resolved | owner decision of 2026-10-04 (wave 4, amendment 4): the owner's repository-quality rule; installed because decide round 2 named promptfoo the owner of paired skill verification in both clients; the blind no-install decision stays under overturned; live acceptance unrun; not a blind result, consensus or measurement |
-| quality-evaluation | trajectory-analysis | scanning agent transcripts and trajectories for behaviours and failures | Inspect Scout 0.5.3 (in the Inspect AI owner's environment, with harbor 0.24.0 for ATIF import) | resolved | owner decision of 2026-10-04 (wave 5, amendment 4): the owner's repository-quality rule; decide round 2 and its Opus verification named this owner; not a blind result, a consensus or a measurement; its removal check reports to the owner |
+| quality-evaluation | trajectory-analysis | scanning agent transcripts and trajectories for behaviours and failures | Inspect Scout 0.5.3 (in the Inspect AI owner's environment, with harbor 0.24.0 for ATIF import) | resolved | owner decision of 2026-10-04 (wave 5, amendment 4): the owner's repository-quality rule; decide round 2 and its Opus verification named this owner; not a blind result, a consensus or a measurement; its removal check reports to the owner; current companion pin amended on 2026-10-09 (docs/decisions/2026-10-09-harbor-0240-profile.md supersedes only the Harbor companion pin; the 2026-10-04 owner decision selected Harbor 0.23.0); the original owner decision is retained under prior_owner_decision |
 | ci-supply-chain | zizmor | workflow security audit | **zizmor** | definitive | both families: the Claude record and at least 2 of 3 blind GPT samples |
 | ci-supply-chain | attest | build provenance attestation | **attest** (nothing additional installed) | definitive | both families: the Claude record and at least 2 of 3 blind GPT samples |
 | ci-supply-chain | syft | software bill of materials | **Syft** | definitive | both families: the Claude record and at least 2 of 3 blind GPT samples |
@@ -218,7 +218,7 @@ A row the owner added, or gave a default, prints that default in the tables abov
 | api-docs | 2026-10-04 | added: Context Hub 0.1.4 (context-hub, the chub CLI) | nothing: a row the owner added |
 | trace-viewer | 2026-10-04 | added: otel-tui 0.7.5 | nothing: a row the owner added |
 | token-lane-carriers | 2026-10-04 | added: token-lanes carriers: the SubagentStart block and a SessionStart main-session block (Claude Code hooks) | nothing: a row the owner added |
-| trajectory-analysis | 2026-10-04 | added: Inspect Scout 0.5.3 (in the Inspect AI owner's environment, with harbor 0.24.0 for ATIF import) | nothing: a row the owner added |
+| trajectory-analysis | 2026-10-04 | added: Inspect Scout 0.5.3 (in the Inspect AI owner's environment, with harbor 0.23.0 for ATIF import) | nothing: a row the owner added |
 | lm-program-optimization | 2026-10-04 | added: DSPy 3.4.0 (dspy.GEPA and the other DSPy optimizers; GEPA 0.1.4 comes in as its pinned dependency) | nothing: a row the owner added |
 | agent-messaging | 2026-10-04 | hcom 0.7.27 (the Claude Code <-> Codex message transport only; Claude <-> Claude stays on native cross-session messaging) becomes the slot's owner default; the split's decided no-install default stays under overturned | Not installed until the deciding measurement returns (split, split) |
 | code-search | 2026-10-04 | the interim installs both arms of the frozen code-search confirmatory, semble 0.6.1 and SocratiCode 1.15.0, until it removes one | the interim semble 0.6.1 |
@@ -227,6 +227,12 @@ A row the owner added, or gave a default, prints that default in the tables abov
 | context-supply | 2026-10-04 | context-mode 1.0.169 becomes the slot's owner default; its wave-2 interim is dropped | **No context-supply layer: the usage meter only** (definitive, kept); the interim context-mode 1.0.169 |
 | session-analytics | 2026-10-04 | agentsview 0.43.0 becomes the slot's owner default, reading a local archive only | Not installed: both agents write full local transcripts, have session pickers and usage commands and export per-session telemetry; agentsview (picked by both blind GPT orders) is the named challenger, decided by a measurement on a fixed question set (resolved, not_installed) |
 | promptfoo | 2026-10-04 | Promptfoo 0.123.1 installs as the owner of the row's prompt and provider regression tests and of the paired skill-version regression verification in both clients that decide round 2 gave it; skill-authoring (skill-creator) keeps authoring and authoring-time evaluation; the blind no-install decision stays under overturned. | Not installed: prompt and provider evaluation is owned by Inspect AI; neither blind Sol-ultra order picked it (resolved, not_installed) |
+
+### Current owner pin amendments
+
+The current tables carry these later pins; the owner-decision table above retains its original dated selections.
+
+- `trajectory-analysis` (2026-10-09; the owner's Harbor 0.24.0 profile amendment): docs/decisions/2026-10-09-harbor-0240-profile.md supersedes only the Harbor companion pin; the 2026-10-04 owner decision selected Harbor 0.23.0. Current companion: harbor 0.24.0; previous: 0.23.0. Source: `evidence/artifacts/harbor-0240-currency-20261009/receipt.json`.
 
 <!-- tables:end -->
 

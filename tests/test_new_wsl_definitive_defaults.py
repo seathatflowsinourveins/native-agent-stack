@@ -232,7 +232,8 @@ class Manifest(unittest.TestCase):
                     self.assertNotIn(resolution["outcome"], RESOLVED + ("kept",))
                 elif row["row_kind"] == "owner_decision":
                     self.assertEqual(row["job"], self.owner_rows[sid]["job"])
-                    self.assertEqual(resolution, self.owner_rows[sid]["resolution"])
+                    self.assertEqual(row.get("prior_owner_decision", row)["resolution"],
+                                     self.owner_rows[sid]["resolution"])
                     self.assertEqual(resolution["outcome"], "added_by_owner_decision")
                 elif sid in OWNER_DEFAULTS:
                     # The owner default's resolution is the batch's; the rounds' resolution stays under overturned.
@@ -1330,9 +1331,10 @@ class Manifest(unittest.TestCase):
         for sid, recorded in self.owner_rows.items():
             row = rows[sid]
             with self.subTest(slot=sid):
-                # Copied as the batch gives it, with the manifest's row fields.
-                self.assertEqual(row, recorded)
-                self.assertEqual(tuple(row), assembler.ROW_FIELDS)
+                # The original batch row survives a later dated pin projection.
+                original = row.get("prior_owner_decision", row)
+                self.assertEqual(original, recorded)
+                self.assertEqual(tuple(original), assembler.ROW_FIELDS)
                 expected_layer = {
                     "lm-program-optimization": "cross:gpt6-harnesses",
                     "skill-vetting": "instructions-skills",
@@ -1400,8 +1402,43 @@ class Manifest(unittest.TestCase):
         self.assertEqual(set(wave5), set(WAVE5_OWNER_ADDED) | WAVE5_OWNER_DEFAULTS)
         for sid, recorded in wave5.items():
             with self.subTest(destination_pin=sid):
-                self.assertEqual(rows[sid]["default"], recorded["default"])
-                self.assertEqual(rows[sid]["resolution"]["pin"], recorded["resolution"]["pin"])
+                original = rows[sid].get("prior_owner_decision", rows[sid])
+                self.assertEqual(original["default"], recorded["default"])
+                self.assertEqual(original["resolution"]["pin"], recorded["resolution"]["pin"])
+
+    def test_harbor_companion_amendment_preserves_the_original_dated_decision(self):
+        source = next(row for row in self.wave5["add_rows"] if row["slot_id"] == "trajectory-analysis")
+        current = next(row for row in self.rows if row["slot_id"] == "trajectory-analysis")
+        self.assertIn("harbor 0.23.0", source["default"])
+        self.assertIn("harbor==0.23.0", source["resolution"]["install"])
+        self.assertEqual(current["prior_owner_decision"], source)
+        self.assertIn("harbor 0.24.0", current["default"])
+        for field in ("pin", "install"):
+            self.assertIn("harbor==0.24.0", current["resolution"][field])
+            self.assertNotIn("harbor==0.23.0", current["resolution"][field])
+        amendment = current["current_owner_pin_amendment"]
+        self.assertEqual(amendment["date_utc"], "2026-10-09")
+        self.assertEqual(sha(ROOT / amendment["source"]["path"]), amendment["source"]["sha256"])
+        self.assertIn("current companion pin amended on 2026-10-09", current["label"])
+        self.assertIn("2026-10-09-harbor-0240-profile.md", current["label"])
+        lines = RECORD.read_text(encoding="utf-8").splitlines()
+        historical = next(line for line in lines if line.startswith("| trajectory-analysis | 2026-10-04 |"))
+        self.assertIn("harbor 0.23.0", historical)
+        self.assertNotIn("harbor 0.24.0", historical)
+        self.assertTrue(any(line.startswith("- `trajectory-analysis` (2026-10-09;") for line in lines))
+        for field in ("repository", "job", "row_kind", "state", "claude", "gpt"):
+            self.assertEqual(current[field], source[field])
+
+    def test_owner_pin_projection_refuses_an_unmatched_predecessor_without_mutation(self):
+        assembler = load_assembler()
+        source = next(row for row in self.wave5["add_rows"] if row["slot_id"] == "trajectory-analysis")
+        entry = self.consensus["current_owner_pin_amendments"][0]
+        for change in ({"previous_pin": "0.22.0"}, {"current_pin": "0.25.0"}):
+            with self.subTest(change=change):
+                row = json.loads(json.dumps(source))
+                with self.assertRaises(ValueError):
+                    assembler.apply_owner_pin_amendments({"trajectory-analysis": row}, [{**entry, **change}])
+                self.assertEqual(row, source)
 
     def test_owner_defaults_keep_what_they_replace(self):
         assembler = load_assembler()

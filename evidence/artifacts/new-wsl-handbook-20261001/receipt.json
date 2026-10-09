@@ -6,8 +6,8 @@
   "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
   "profile_sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
   "outputs": {
-    "docs/new-wsl-handbook.md": "0b696d6e7aa8e068be0ea7e5aadb1fcf2f6c255ef8fb3836ac99565440dee500",
-    "docs/new-wsl-handbook.json": "b8244970897da8383c13ab47af62a4e8b88a700fdadd81854a55c13dfc600ee5"
+    "docs/new-wsl-handbook.md": "a1f801ddb392e34b0b4bf76d96de2cf7ee425489fdca1e143ba6ce2bebe24a5d",
+    "docs/new-wsl-handbook.json": "7fccf1605ed7a8fe37f72391046eef7445bdd5cfb902e38e60a2cd2a05814b51"
   },
   "inventory": {
     "layers": 37,
@@ -926,6 +926,23 @@
       "check_exit_code": 0,
       "evidence_class": "local_integration",
       "scope": "Current operative-owner/generated-byte consistency; no native install or acceptance run."
+    },
+    {
+      "recorded_at_utc": "2026-10-09T22:29:50Z",
+      "source_head": "b67a28264d84c9e9b51e0671ee1db046270ff833",
+      "cause": "PR927 four-thread repair: preserve the 2026-10-04 Scout owner decision at Harbor0.23.0 and generate its separately dated 2026-10-09 current companion projection. The amended input and regenerated definitive manifest change the handbook source binding; retain every earlier observation and history row.",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "native_exit_code": 0,
+      "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
+      "profile_sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
+      "current_outputs": {
+        "docs/new-wsl-handbook.md": "8a869f457069928a270da2f25ad6ff027576f2f758cd898bb8ace9346cf72e3d",
+        "docs/new-wsl-handbook.json": "f4a7f2e937e82d15fc5da9f8c81bd0a068196ebe5a85cbf55c495d6ad3665ed2"
+      },
+      "check": "python3 scripts/build_new_wsl_handbook.py --check",
+      "check_exit_code": 0,
+      "evidence_class": "local_integration",
+      "scope": "Current generated-byte consistency only; no native install, provider execution or host acceptance."
     }
   ],
   "previous_outputs": [
@@ -1077,6 +1094,17 @@
         "profile_entries": 78,
         "projected_tools": 82,
         "canonical_package_ids": 26
+      }
+    },
+    {
+      "superseded_at_utc": "2026-10-09T22:29:50Z",
+      "source_head": "b67a28264d84c9e9b51e0671ee1db046270ff833",
+      "reason": "Preserve the last published binding before the PR927 four-thread repair and dated companion projection.",
+      "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
+      "profile_sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
+      "outputs": {
+        "docs/new-wsl-handbook.md": "a156622556f005f037ba42a41305fe2b864aadc1f2d26fe71ed93b57ddcf7e27",
+        "docs/new-wsl-handbook.json": "e642cb97c7fa8548fc12cab3d0c169b413cb67a38f8b528b5d0b6da5b701fd57"
       }
     }
   ]

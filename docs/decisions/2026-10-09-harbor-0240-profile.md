@@ -85,9 +85,11 @@ acceptance gap explicit.
 
 The operative Inspect Scout owner selection also requires Harbor for ATIF
 import in its shared Inspect AI environment. The authorized review repair
-updates that current companion summary, pin and install requirement to
-0.24.0 in the operative consensus source, then rebuilds the definitive
-manifest and its current tables with their existing generators. The current
+records a dated 2026-10-09 companion-pin amendment in the consensus source,
+while its 2026-10-04 owner row retains the original 0.23.0 summary, pin and
+install requirement. The assembler preserves that row under
+`prior_owner_decision` and generates the current 0.24.0 projection with an
+explicit dated amendment marker and a hash-bound source receipt. The current
 trajectory-analysis install-plan row and mirrored scripts use the verified
 0.24.0 wheel and version assertion in the same Scout-owned environment;
 they remain unexecuted. The plan's other rows and separate pinned Harbor
@@ -108,8 +110,43 @@ history while recording the new profile/output hashes and generator checks.
 The repository's existing profile/handbook tests and `scripts/validate.py`
 verify the projection and evidence consistency; they do not install Harbor.
 
-The inverse restores the former profile row and regenerates the handbook
-through the same builder. It changes source recommendation metadata and
-does not alter an installed launcher or client configuration. Both
-designated reads, required CI, pre-cue and explicit command-center cue remain
-landing gates for this draft PR.
+The inverse restores every operative Harbor input to the previous 0.23.0
+selection before regenerating any derived output:
+
+1. Restore the Harbor entry in `adoption/new-wsl-profile.json`, including its
+   pin, checksum, install/acceptance references and prior receipt binding.
+2. Remove the 2026-10-09 Harbor entry from
+   `evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json`'s
+   `current_owner_pin_amendments`. Its original 2026-10-04 Scout owner row
+   already retains 0.23.0. Rebuild
+   `evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json`
+   through `assemble_manifest.py` and regenerate the decision tables with
+   `render_tables.py --write docs/decisions/2026-10-01-new-wsl-definitive-defaults.md`.
+3. Restore the Harbor owner and Scout companion fields in
+   `evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json`, and
+   the Harbor release metadata in the adjacent `owners.json`. Restore all
+   executable mirrors together: the Scout wheel URL/checksum in
+   `install.sh:1034,1036` and version assertion in `accept.sh:2726`; the direct
+   Harbor wheel URL/checksum, version assertion and source-checkout commit
+   in those same scripts; and the exact Harbor checkout in
+   `config/harbor-worker-telemetry-accept.sh`. Use the retained 0.23.0 source
+   records for its wheel checksum and commit, preserving the historical
+   timestamp qualification in `owners.json` and the dated README wording.
+4. Regenerate `docs/new-wsl-handbook.json` and `.md` through
+   `python3 scripts/build_new_wsl_handbook.py --write`. Append a new binding
+   to the rolling handbook integration receipt, preserving its earlier
+   derivation history; register changed evidence through
+   `scripts.host_receipts.register_file`, then normalize with
+   `python3 scripts/evidence_manifest.py --write`.
+5. Restore pin-dependent regression fixtures/expectations in
+   `tests/test_new_wsl_definitive_defaults.py` and
+   `tests/test_new_wsl_handbook.py` with the same prior selection. Require
+   the affected definitive-defaults, handbook and evidence tests,
+   both generator checks, and FULL `python3 scripts/validate.py` to pass
+   before publishing the inverse. The current companion/direct-owner pin
+   consistency check must again agree on 0.23.0.
+
+This inverse restores repository source recommendations and executable plan
+inputs; it is not a host downgrade procedure or an installed launcher/client
+configuration change. Both designated reads, required CI, pre-cue and the
+explicit command-center cue remain landing gates.

@@ -128,7 +128,8 @@ def render():
                   "An amendment records a later decision on its row and replaces none of the row's fields in the tables above.", "",
                   "| Slot | Date | Decision |", "| --- | --- | --- |"]
         lines += [f"| {slot_id} | {amendment['date_utc']} | {amendment['decision']} |" for slot_id, amendment in amendments]
-    owner_rows = [row for row in man["slots"] if row["row_kind"] == "owner_decision"]
+    owner_rows = [row.get("prior_owner_decision", row) for row in man["slots"]
+                  if row["row_kind"] == "owner_decision"]
     overturned = [row for row in man["slots"] if row.get("overturned")]
     if owner_rows or overturned:
         # Amendment 4: an owner row or an owner default prints its default in the tables above, and an interim the owner amended
@@ -149,6 +150,15 @@ def render():
             if kept.get("interim"):
                 replaced.append(f"the interim {kept['interim']['default']}")
             lines.append(f"| {row['slot_id']} | {kept['amendment']['date_utc']} | {kept['amendment']['decision']} | {'; '.join(replaced)} |")
+    pin_amendments = [row for row in man["slots"] if row.get("current_owner_pin_amendment")]
+    if pin_amendments:
+        lines += ["", "### Current owner pin amendments", "",
+                  "The current tables carry these later pins; the owner-decision table above retains its original dated selections.", ""]
+        for row in pin_amendments:
+            amendment = row["current_owner_pin_amendment"]
+            lines.append(f"- `{row['slot_id']}` ({amendment['date_utc']}; {amendment['by']}): "
+                         f"{amendment['decision']}. Current companion: {amendment['package']} {amendment['current_pin']}; "
+                         f"previous: {amendment['previous_pin']}. Source: `{amendment['source']['path']}`.")
     lines += ["", END]
     return "\n".join(lines)
 

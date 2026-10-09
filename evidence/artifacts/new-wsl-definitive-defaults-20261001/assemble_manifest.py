@@ -685,6 +685,46 @@ def apply_interims(rows, by_slot, entries):
         row["interim"] = json.loads(json.dumps(interim))
 
 
+def apply_owner_pin_amendments(by_slot, amendments):
+    """Project a dated companion refresh while retaining the original owner decision.
+
+    Only an added owner row can gain this projection. Its owner, job and decision
+    stay fixed; the source receipt binds the new version, and all three textual
+    pin carriers must still contain the recorded predecessor before any change.
+    """
+    for entry in amendments:
+        sid = entry["slot_id"]
+        row = by_slot.get(sid)
+        if not row or row["row_kind"] != OWNER_ROW_KIND or "prior_owner_decision" in row:
+            raise ValueError(f"consensus {sid}: a pin amendment needs an unamended added owner row")
+        for key in ("date_utc", "by", "decision", "package", "previous_pin", "current_pin"):
+            if not isinstance(entry.get(key), str) or not entry[key].strip():
+                raise ValueError(f"consensus {sid}: a pin amendment needs a non-empty {key}")
+        verify_evidence(entry["source"], "source", f"consensus {sid} pin amendment")
+        source = json.loads((ROOT / entry["source"]["path"]).read_text(encoding="utf-8"))
+        if source.get("selected_version") != entry["current_pin"]:
+            raise ValueError(f"consensus {sid}: the pin amendment disagrees with its source receipt")
+        package, previous, current = (entry[key] for key in ("package", "previous_pin", "current_pin"))
+        replacements = ((f"{package} {previous}", f"{package} {current}"),
+                        (f"{package}=={previous}", f"{package}=={current}"))
+        updates = {}
+        for key, text in (("default", row["default"]), ("pin", row["resolution"]["pin"]),
+                          ("install", row["resolution"]["install"])):
+            updated = text
+            for old, new in replacements:
+                updated = re.sub(re.escape(old) + r"(?![\w.+-])", lambda _: new, updated)
+            if updated == text:
+                raise ValueError(f"consensus {sid}: {key} lacks the recorded predecessor pin")
+            updates[key] = updated
+        row["prior_owner_decision"] = json.loads(json.dumps(row))
+        row["current_owner_pin_amendment"] = {key: json.loads(json.dumps(value))
+                                             for key, value in entry.items() if key != "slot_id"}
+        row["default"] = updates["default"]
+        row["resolution"].update({key: updates[key] for key in ("pin", "install")})
+        row["label"] += (f"; current companion pin amended on {entry['date_utc']} "
+                         f"({entry['decision']}); the original owner decision is retained under prior_owner_decision")
+
+
 def apply_consensus(rows, layers):
     """Add the consensus record's rows and record its amendments; no field that the rounds decided changes.
 
@@ -794,6 +834,7 @@ def apply_consensus(rows, layers):
     for name, batch in batches:
         if is_owner_batch(batch):
             apply_owner_amendments(rows, by_slot, name, batch)
+    apply_owner_pin_amendments(by_slot, data.get("current_owner_pin_amendments", []))
     return data
 
 

@@ -479,7 +479,7 @@
    "owner": "Harbor (containerized agent E2E runner)",
    "repository": "https://github.com/harbor-framework/harbor",
    "installed": true,
-   "note": "",
+   "note": "The v0.24.0 tag and published_at come from the 2026-10-09 release capture linked by current_release_source. pushed_at and default_branch are retained historical repository metadata from the 2026-10-01 observation; they are not one snapshot with the amended release fields.",
    "tag_name": "v0.24.0",
    "published_at": "2026-10-05T05:04:52Z",
    "pushed_at": "2026-10-01T15:35:19Z",

@@ -1400,9 +1400,11 @@ class NewWslHandbookTests(unittest.TestCase):
         self.assertEqual(len(added), 14)
         for slot_id, row in added.items():
             with self.subTest(owner_row=slot_id):
+                current = next(record for record in manifest["slots"] if record["slot_id"] == slot_id)
+                self.assertEqual(current.get("prior_owner_decision", current), row)
                 cells = lines[slot_id]
                 self.assertEqual((cells[1], cells[4], cells[6], cells[7]),
-                                 (row["state"], "installed", "added_by_owner_decision", row["label"]))
+                                 (current["state"], "installed", "added_by_owner_decision", current["label"]))
                 self.assertIn(f"{row['catalog']} / {row['layer_id']} / owner_decision", cells[9])
         overturned = [row for row in manifest["slots"] if row.get("overturned")]
         self.assertEqual(sorted(row["slot_id"] for row in overturned),
