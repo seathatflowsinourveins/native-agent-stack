@@ -15497,32 +15497,32 @@
     },
     {
       "path": "blueprints/us-equities/event-anchored-ranking/R3-VERIFY.py",
-      "sha256": "8d86e1d3cc517c549ad4f7b9dff660a50bc95cc3804822989b1d72086b9f5018",
-      "bytes": 6744
+      "sha256": "dd89dd9af5d7b8a2faad05715fda3787741b82c8dcb6e00a139b5c4d7e4adc63",
+      "bytes": 13260
     },
     {
       "path": "blueprints/us-equities/event-anchored-ranking/README.md",
-      "sha256": "37ce6de89c5a6ce5ff8032942e6efb2ade0f755818cfa8e924749880c168a7be",
-      "bytes": 5519
+      "sha256": "1b3f37d95ba70f610bb1bd23fdf318fa729d0701ff7935a2381e98026c08b0b8",
+      "bytes": 7275
     },
     {
       "path": "blueprints/us-equities/event-anchored-ranking/ROW14-SUBMISSION-R3.json",
-      "sha256": "5252d7243f0ad5606a80c56f9dec364f03bd7ecfd84a1d45c5f290eabfcf22aa",
-      "bytes": 13494
+      "sha256": "188a30b82b9bb813f05eb4e0a700e3babe2b0dd78591908d104ea4f99cf982f8",
+      "bytes": 13683
     },
     {
       "path": "blueprints/us-equities/event-anchored-ranking/SHA256SUMS",
-      "sha256": "a920411fe56e9bb86b41d0d9d785625fefd66ca66833fa4fdb1200e267b3b775",
+      "sha256": "3138a05a008167f0195e99298d5ef32b85d9b1a034b50fe12c1051aa5427340f",
       "bytes": 1056
     },
     {
       "path": "blueprints/us-equities/event-anchored-ranking/SHA256SUMS.R3",
-      "sha256": "a920411fe56e9bb86b41d0d9d785625fefd66ca66833fa4fdb1200e267b3b775",
+      "sha256": "3138a05a008167f0195e99298d5ef32b85d9b1a034b50fe12c1051aa5427340f",
       "bytes": 1056
     },
     {
       "path": "blueprints/us-equities/event-anchored-ranking/SHA256SUMS.R3B",
-      "sha256": "a920411fe56e9bb86b41d0d9d785625fefd66ca66833fa4fdb1200e267b3b775",
+      "sha256": "3138a05a008167f0195e99298d5ef32b85d9b1a034b50fe12c1051aa5427340f",
       "bytes": 1056
     },
     {
@@ -58549,6 +58549,11 @@
       "path": "tests/test_promotion_gate_codex_review.py",
       "sha256": "ac1a31d28a737ca208d58595173e2f57ef43828088dc0c4e286de3c95f76d4ab",
       "bytes": 20781
+    },
+    {
+      "path": "tests/test_r3_verify.py",
+      "sha256": "eb1ff6e71c8e497ad45f2bb6a4b03271a920625446020ceb9aacb4a5d2376973",
+      "bytes": 13540
     },
     {
       "path": "tests/test_receipt_staleness.py",
