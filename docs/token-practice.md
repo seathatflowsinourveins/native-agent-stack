@@ -690,3 +690,133 @@ computation and made no Context Mode calls. Their aggregate reported tokens were
 The rejected setup attempt remains separate and included in campaign totals.
 Keep the existing smallest-sufficient-context policy rather than forcing a tool
 call or promoting this single-fixture observation into a universal default.
+
+## Generic child model default omission
+
+The October 9, 2026 template change removes
+`agents.default_subagent_model = "${CODEX_MODEL}"` and keeps
+`agents.default_subagent_reasoning_effort = "max"`. A generic child whose
+spawn supplies no model now retains its parent step's `model_info.slug`.
+Previously the template's model default could replace that value with the
+rendered `CODEX_MODEL`. For a parent on another model, the forced Sol default
+therefore ends. This changes model selection; no token or cache savings were
+measured.
+
+The launcher's default client is 0.162.0
+(`coordination/command-center/lane-tiers.json:39`; its two held lanes are
+listed at lines 41–42). The source is
+[openai/codex rust-v0.162.0, child_config.rs](https://github.com/openai/codex/blob/rust-v0.162.0/codex-rs/core/src/agent/child_config.rs#L109):
+the spawn constructor copies the parent step's slug at line 115, and the
+full-history constructor copies the parent turn's slug at line 137. The
+generic model override is selected at line 204 and applied at lines 211–240;
+the effort-only path at lines 243–249 leaves the inherited model in place.
+The same file at
+[rust-v0.161.0](https://github.com/openai/codex/blob/rust-v0.161.0/codex-rs/core/src/agent/child_config.rs)
+is byte-identical: both are 13,496 bytes with SHA-256
+`33d4dd6f70e6640af1059398272c48b88e16e0005105fbd1ef13e30456d39a39`.
+Explicit spawn selections and role configuration retain their native
+precedence. The effective key must be absent across contributing layers;
+removing this template entry does not mask an existing lower-layer value.
+
+The lane inventory below is a source review of the co-op registries at
+2026-10-09 00:20 UTC. `H` means a source line in
+`coordination/ns2604-coop/lanes/hcom-lanes.json`; `T` means a source line in
+`coordination/ns2604-coop/lanes/threads.json`. Those snapshots have SHA-256
+`fe550f1eec77ace1537e3a9546b703118cd4aafba4cbdf0d55345d78d133a830`
+and `965d884240b0d6e8bceddcd4517ca16c6940bf3e488edf1f4254947b99814d63`,
+respectively. They identify lanes, rather than recording each request's model.
+The shared launch command supplies `-m cx/gpt-6.1-sol` at
+`coordination/ns2604-coop/omniroute-canary-20261008/launch_lane_omni.sh:80`
+(SHA-256 `5100497bdd1235ea9d5cc7e69e075b8f59269430b459301281695b96bc45d7bc`).
+Under that launch setting, none of the 28 non-closed registered Codex root lanes changes
+model family when it spawns a generic child. Inheriting the routed slug can
+still differ from forcing the plain rendered model ID; this inventory does
+not claim byte-identical requests or a measured routing or cache improvement.
+
+| Codex lane on the shared Sol launch setting | Registry source lines |
+| --- | --- |
+| orch-records | H:2 |
+| rnd-r1 | H:36 |
+| layer15-build | H:65 |
+| paper-open-e2e | H:89 |
+| api-credit-sota | H:104 |
+| github-consolidation | H:123 |
+| landscape-gap | H:176 |
+| landscape-mcp | H:195 |
+| landscape-stars | H:212 |
+| runtime-workers | H:232 |
+| landscape-live-foundation | H:251 |
+| landscape-live-trading | H:268 |
+| harness-rules | H:293 |
+| g5-fields-a | H:317 |
+| g5-fields-b | H:337 |
+| g5-stars-gap | H:358 |
+| sdk-harness-ready | H:374 |
+| ns-readiness-manifest | H:395 |
+| currency | H:415, T:3 |
+| codex-token-parity | H:426, T:7 |
+| convergence-practice | H:441, T:8 |
+| fixwave-defects | H:454, T:2 |
+| github-ci-finalize | H:467, T:4 |
+| grand-catalog | H:480, T:5 |
+| readiness-runner | H:491, T:30 |
+| skills-lifecycle | H:504, T:23 |
+| memory-h2h | H:523, T:6 |
+| overlap-token | H:541, T:38 |
+
+`fixwave-mcp` (H:149) and `github-ci-finalize-read` (H:161) are registered
+Claude sessions, so this Codex template does not select their child models;
+the latter is marked closed. `rnd-r3` (H:22), `lm-qmd` (H:52, T:39),
+`supersession-ledger` (T:24) and `overlap-codenav` (T:31) are also marked
+closed; `overlap-codenav` was absorbed by `readiness-runner`.
+
+The repository's builtin role names are `default`, `explorer` and `worker`
+([codex_roles.py:67](../tools/adoption/codex_roles.py#L67)); each generic spawn
+without a role model override follows the behavior above. The configured
+roles have these effects:
+
+| Role | Source | Effect of omitting the generic model default |
+| --- | --- | --- |
+| isolated-builder | [workers/isolated-builder.toml:18](../adoption/agents/codex/workers/isolated-builder.toml#L18), [inherited model role at codex_roles.py:74](../tools/adoption/codex_roles.py#L74) | Names no model and keeps Max. With no explicit spawn model, it now inherits its parent; a non-Sol parent can therefore change this child's model family. |
+| stack-researcher | [stack-researcher.toml:12](../adoption/agents/codex/stack-researcher.toml#L12) | Its explicit Astra/Max selection remains. A generic child spawned from this Astra parent now inherits Astra rather than the template's Sol default. |
+| stack-verifier | [stack-verifier.toml:12](../adoption/agents/codex/stack-verifier.toml#L12) | Its explicit Astra/Max selection remains; generic children of this Astra parent can change from forced Sol to inherited Astra. |
+| evidence-reviewer | [workers/evidence-reviewer.toml:15](../adoption/agents/codex/workers/evidence-reviewer.toml#L15) | Its explicit Astra/Max selection remains; generic children of this Astra parent can change from forced Sol to inherited Astra. |
+| semantic-evidence-reviewer | [workers/semantic-evidence-reviewer.toml:16](../adoption/agents/codex/workers/semantic-evidence-reviewer.toml#L16) | Its explicit Astra/Max selection remains; generic children of this Astra parent can change from forced Sol to inherited Astra. |
+
+These nested-role effects are source-derived conditions, not observed new
+spawns. The retained 0.161.0 synthetic recorder checked an unset-default root
+and full-history fork using `cx/gpt-6.1-sol/max`; it did not execute a paired
+default-present arm or measure provider usage. Byte-identical 0.162.0 source
+does not turn that retained fixture into a new native run.
+
+The existing template-read tests now require the generic model key to be
+absent while preserving the root model, Max effort and explicit role checks.
+The intentionally failing original-head checks below declare the expected
+method set for the lander's comparison against main. The lander must still
+run main's versions on a fresh merge and compare the actual failing set.
+
+| Module | Intentionally changed unittest methods |
+| --- | --- |
+| tests.test_render_config | RenderConfigTests.test_codex_user_template_sets_the_verified_base_keys |
+| tests.test_render_config | CodexModelTests.test_the_template_names_its_models_only_through_the_placeholder |
+| tests.test_render_config | CodexModelTests.test_each_platform_renders_the_model_its_pinned_codex_lists |
+| tests.test_render_config | CodexModelTests.test_a_host_supplied_model_wins_over_the_pin |
+| tests.test_render_config | CodexModelTests.test_a_platform_without_a_pins_file_fails_closed_unless_the_model_is_given |
+| tests.test_codex_roles | WorkerRoleSourceTests.test_the_builder_takes_the_lanes_model_at_max |
+| tests.test_task_model_routing | TaskModelRoutingRecordTests.test_every_quoted_value_is_in_its_cited_file |
+| tests.test_task_model_routing | TaskModelRoutingRecordTests.test_gpt_6_1_sol_is_routed_where_the_sol_primary_record_routes_it_and_nowhere_else |
+| tests.test_task_model_routing | TaskModelRoutingRecordTests.test_the_user_template_renders_on_each_platform_the_model_its_rows_name |
+
+All 11 test modules mentioning this template ran separately under
+`timeout 600`. Ten passed. The unchanged `tests.test_windows_terminal_defaults`
+module failed only
+`OverlayTests.test_the_installed_client_knows_no_notification_type_without_a_decision`:
+the installed Claude Code 2.1.295 binary exposes `plugin_notification`, which
+the existing notification decision table does not list. The same assertion
+failed when executed from the original draft head's byte-identical source.
+That host-dependent policy gap is retained separately from the nine deliberate
+Codex checks; this change does not resolve it or claim all 11 modules passed.
+
+This is a proposed template change. Both designated reads, the pre-cue tool,
+CI and an explicit command-center cue gate landing. F9 alone applies the
+landed template from a reviewed diff; this PR performs no live application.

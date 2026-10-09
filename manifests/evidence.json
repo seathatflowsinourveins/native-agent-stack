@@ -5546,8 +5546,8 @@
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
-      "sha256": "ad55a812006e6d25038a75c3f213460fccd40f7dd79faa21ab521eec1e88701e",
-      "bytes": 19167
+      "sha256": "2642da698bc15584c5001c03c10aad33714e00c6635035ca2cdf6ea1b9a20da2",
+      "bytes": 19097
     },
     {
       "path": "adoption/templates/codex.omniroute.config.toml",
@@ -18662,8 +18662,8 @@
     },
     {
       "path": "docs/token-practice.md",
-      "sha256": "51809360276e42c867843556b8fa5bb862e80d680f358e20de476d264411fd28",
-      "bytes": 48878
+      "sha256": "0472591d527cfc3989c2be2fbcbe49cd9c623cbe4a3749e431928450d2bc1f03",
+      "bytes": 57165
     },
     {
       "path": "docs/token-session-handbook.md",
@@ -57972,8 +57972,8 @@
     },
     {
       "path": "tests/test_codex_roles.py",
-      "sha256": "1c1a5900db768ea81b5aa609c3458f798dd5a37c7c5ab76b03c6e6a500d8cf60",
-      "bytes": 33470
+      "sha256": "cc127f85af185d05ab8331989f3fa578f7f193e2c7490e73eb4d3653700057d3",
+      "bytes": 33416
     },
     {
       "path": "tests/test_codex_worker_lane.py",
@@ -58562,8 +58562,8 @@
     },
     {
       "path": "tests/test_render_config.py",
-      "sha256": "9eae1b97d637079056994268e754f878bbafd4702fe8182cfef21f2f7b9bfcec",
-      "bytes": 47956
+      "sha256": "03d31001eef58ba1d6cf1498d9a7e9c6d6fe391d5ff9a4d02a9174bdc89dc136",
+      "bytes": 47826
     },
     {
       "path": "tests/test_research_dispatch.py",

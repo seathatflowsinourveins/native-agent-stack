@@ -6,7 +6,9 @@ upstream acceptance and not a model run. Every value the record's table quotes f
 must still be in that file as a whole value, not as the tail or head of a longer name, at least once for each distinct
 line the table quotes it from, and every `path:line` the table cites must exist. The record reads its line numbers at
 the revisions it names, so an edit that only moves a quoted value passes here, while a change to an agent's
-frontmatter, a settings template key, a Codex profile or a lane constant fails until the record is restated.
+frontmatter, a settings template key, a Codex profile or a lane constant fails until the record is restated. The dated
+generic-child model override is the one historical quote: the current template omits that key so children inherit
+the active parent's model. Its Max effort and the coordinator's platform model remain checked against live files.
 GPT-6.1 Sol is routed where the Sol-primary routing record of unit D4 (#542) routes it and nowhere else: the table's
 Sol rows are the Codex coordinator, the primary workers and the generic children, the Codex user template renders on
 each pinned platform the model the coordinator row names for it, and each GPT-6.1 binding in a routing file, one by
@@ -58,6 +60,7 @@ SOL_ROUTES = {"interactive codex": "ultra", "primary codex workers": "max", "gen
 USER_TEMPLATE = "adoption/templates/codex.config.template.toml"
 STACK_WORKER = "adoption/templates/codex.stack-worker.config.toml"
 PLACEHOLDER = "${CODEX_MODEL}"
+HISTORICAL_CHILD_MODEL_QUOTE = f'default_subagent_model = "{PLACEHOLDER}"'
 RENDER_CONFIG = ROOT / "tools" / "adoption" / "render_config.py"
 # The coordinator row's statement of what the user template renders on one platform: "`<platform>` renders `<model>`".
 RENDERS = re.compile(r"`([a-z0-9]+-[a-z0-9_]+)` renders `([\w.-]+)`")
@@ -82,6 +85,7 @@ TABLE_HEADER = re.compile(r"\[[^\[\]]+\]")
 # The GPT-6.1 bindings D4 makes (docs/decisions/2026-09-27-model-currency.md:414-422 and :484-487 at 1f2cdce5): the user
 # template's coordinator `model` and `[agents] default_subagent_model`, the constant that renders their placeholder, the
 # stack-worker profile's `model`, and the stack-worker command's `-m` wherever that command is written.
+# The generic-child model override is historical; the current template leaves that binding absent.
 D4_BINDINGS = {(USER_TEMPLATE, "model"), (USER_TEMPLATE, "agents.default_subagent_model"),
                ("tools/adoption/render_config.py", "CODEX_MODEL_CURRENT"), (STACK_WORKER, "model")}
 D4_COMMAND = "-p stack-worker -m"
@@ -227,15 +231,22 @@ class TaskModelRoutingRecordTests(unittest.TestCase):
         # A value counts only as a whole: `model = "${CODEX_MODEL}"` inside `default_subagent_model = "${CODEX_MODEL}"`
         # is not the template's model line.
         cited: dict[tuple[str, str], set[str]] = {}
+        cited_rows: dict[tuple[str, str], set[str]] = {}
         for row in self.rows:
             for path, first, last, said in SAYS.findall(row[4]):
                 quotes = re.findall(r"`([^`]+)`", said)
                 self.assertTrue(quotes, f"{row[0]}: {path}:{first} quotes nothing")
                 for quote in quotes:
                     cited.setdefault((path, quote), set()).add(f"{first}-{last or first}")
+                    cited_rows.setdefault((path, quote), set()).add(row[0])
         self.assertGreaterEqual(sum(map(len, cited.values())), 30, "the table quotes its enforcement points")
         for (path, quote), spans in sorted(cited.items()):
             with self.subTest(cited=path, quote=quote):
+                if (path, quote) == (USER_TEMPLATE, HISTORICAL_CHILD_MODEL_QUOTE):
+                    self.assertTrue(all("generic codex children" in row.lower()
+                                        for row in cited_rows[(path, quote)]))
+                    self.assertNotIn("default_subagent_model", tomllib.loads((ROOT / path).read_text())["agents"])
+                    continue
                 whole = re.compile(rf"(?<![\w.-]){re.escape(quote)}(?![\w.-])")
                 found = len(whole.findall((ROOT / path).read_text(encoding="utf-8")))
                 self.assertGreaterEqual(found, len(spans), sorted(spans))
@@ -270,19 +281,24 @@ class TaskModelRoutingRecordTests(unittest.TestCase):
                 [row] = [row for row in sol if route in row[0].lower()]
                 self.assertEqual((row[1], effort(row)), ("Codex CLI", wanted))
         # Nowhere else, binding by binding: each GPT-6.1 binding in a routing file is one a Sol row cites by file and
-        # name, and one D4 makes. The scan must find the user template's two keys by table and the stack-worker
-        # profile's `model`, so a scan that finds nothing cannot pass.
+        # name, and one D4 makes. The scan must find the user template's coordinator key by table and the stack-worker
+        # profile's `model`, while its historical generic-child override is absent.
         texts = routing_texts()
         template = sol_bindings(USER_TEMPLATE, texts[USER_TEMPLATE])
-        self.assertEqual((template["model"], template["agents.default_subagent_model"]), (1, 1))
+        self.assertEqual(template["model"], 1)
+        self.assertNotIn("agents.default_subagent_model", template)
         self.assertEqual(sol_bindings(STACK_WORKER, texts[STACK_WORKER])["model"], 1)
         self.assertEqual(routing_problems(self.rows, texts), [])
-        # Each Sol row cites at least one binding.
+        # The generic-child row records its former override; the other Sol rows still cite live bindings.
         for row in sol:
             with self.subTest(row=row[0]):
                 names = [name for path, _first, _last, said in SAYS.findall(row[4])
                          for name in cited_sol_bindings(path, re.findall(r"`([^`]+)`", said), texts[path])[0]]
-                self.assertTrue(names, row[4])
+                if "generic codex children" in row[0].lower():
+                    self.assertIn(f"`{HISTORICAL_CHILD_MODEL_QUOTE}`", row[4])
+                    self.assertEqual(names, [])
+                else:
+                    self.assertTrue(names, row[4])
 
     def test_a_gpt_6_1_binding_planted_in_a_cited_file_is_caught(self):
         # The cross-family review of round 2: a profile added to the user template, a file the coordinator row already
@@ -309,9 +325,9 @@ class TaskModelRoutingRecordTests(unittest.TestCase):
             "binding"])
 
     def test_the_user_template_renders_on_each_platform_the_model_its_rows_name(self):
-        # The coordinator and generic-children rows quote the template's placeholder lines, while a host runs the
-        # render. Render the template through tools/adoption/render_config.py for every platform that has a pin file,
-        # as tests/test_render_config.py's CodexModelTests do, and hold both rows to the result.
+        # The coordinator row still names the rendered platform model. The generic-child row's model override is
+        # historical, while its Max effort remains current. Render each pinned platform and require that the child
+        # model stays unbound, as tests/test_render_config.py's CodexModelTests do.
         [coordinator] = [row for row in self.rows if "interactive codex" in row[0].lower()]
         [children] = [row for row in self.rows if "generic codex children" in row[0].lower()]
         stated = dict(RENDERS.findall(coordinator[2]))
@@ -325,8 +341,8 @@ class TaskModelRoutingRecordTests(unittest.TestCase):
             with self.subTest(platform=platform_id):
                 config = tomllib.loads(renderer.render_one(ROOT / USER_TEMPLATE, values, platform_id))
                 self.assertEqual((config["model"], config["model_reasoning_effort"]), (model, effort(coordinator)))
-                self.assertEqual((config["agents"]["default_subagent_model"],
-                                  config["agents"]["default_subagent_reasoning_effort"]), (model, effort(children)))
+                self.assertNotIn("default_subagent_model", config["agents"])
+                self.assertEqual(config["agents"]["default_subagent_reasoning_effort"], effort(children))
 
     def test_the_token_efficiency_profile_is_accepted_by_this_record_and_leaves_the_three_tools_out(self):
         # The Decision's "Profile acceptance" and "Three tools stay outside the profile" paragraphs make claims about
