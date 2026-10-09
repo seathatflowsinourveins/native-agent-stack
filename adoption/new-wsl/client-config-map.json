@@ -124,7 +124,7 @@
         "claude/settings/hook/*/*secret_path_guard.py*"
       ],
       "wiring": "practice",
-      "note": "The secret-path guard: scripts/hooks/secret_path_guard.py, copied with its checksum by install_claude_profile.py."
+      "note": "The secret-path guard: scripts/hooks/secret_path_guard.py, copied with its checksum by install_claude_profile.py. Its hook declares onFailure \"block\" (Claude Code 2.1.295 or later), so a guard that cannot start, times out or exits with an unexpected code blocks the Bash call instead of letting it through (docs/decisions/2026-10-08-guard-hook-fails-closed.md)."
     },
     {
       "match": [

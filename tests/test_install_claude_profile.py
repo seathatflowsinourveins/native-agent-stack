@@ -603,6 +603,33 @@ class SecretGuardProfileTests(unittest.TestCase):
         commands = [h["command"] for g in bash_groups for h in g["hooks"]]
         self.assertTrue(any("secret_path_guard.py" in c for c in commands))
 
+    def test_only_the_secret_guard_hook_fails_closed(self):
+        # Claude Code 2.1.295's `onFailure: "block"` makes a hook that cannot start, times out or exits with an
+        # unexpected code block the action instead of letting it through
+        # (docs/decisions/2026-10-08-guard-hook-fails-closed.md). Every declaration of the secret guard carries it; no
+        # other hook does, so a routing, effort or memory hook that fails still lets the action through.
+        def command_hooks(value):
+            if isinstance(value, dict):
+                if value.get("type") == "command" and isinstance(value.get("command"), str):
+                    yield value
+                for item in value.values():
+                    yield from command_hooks(item)
+            elif isinstance(value, list):
+                for item in value:
+                    yield from command_hooks(item)
+
+        declaring = set()
+        for path in [ROOT / ".claude" / "settings.json", *sorted((ROOT / "adoption").rglob("*.json"))]:
+            relative = path.relative_to(ROOT).as_posix()
+            for hook in command_hooks(json.loads(path.read_text(encoding="utf-8"))):
+                with self.subTest(file=relative, command=hook["command"][:80]):
+                    if "secret_path_guard.py" in hook["command"]:
+                        declaring.add(relative)
+                        self.assertEqual(hook.get("onFailure"), "block")
+                    else:
+                        self.assertNotIn("onFailure", hook)
+        self.assertLessEqual({".claude/settings.json", "adoption/templates/claude.settings.template.json"}, declaring)
+
     def rendered_hook(self, home: Path) -> str:
         text = string.Template(self.TEMPLATE.read_text()).safe_substitute(HOME=str(home))
         for group in json.loads(text)["hooks"]["PreToolUse"]:
