@@ -5021,8 +5021,8 @@
     },
     {
       "path": ".github/workflows/claude-triage.yml",
-      "sha256": "97d95e593463271a45e185ffe55ecee815b850c3f946e8003e45a2bcd767b55c",
-      "bytes": 17974
+      "sha256": "0e5f5a6cbbc1ca92f4afa9a47d8faf9757055382db33932b0b023108a395e14c",
+      "bytes": 18424
     },
     {
       "path": ".github/workflows/dependency-review.yml",
@@ -18152,8 +18152,8 @@
     },
     {
       "path": "docs/decisions/2026-10-08-claude-actions-triage.md",
-      "sha256": "c5585b323140266cb734df31739a5632c9cfb03c5ac8b59096a524ae397f7280",
-      "bytes": 8686
+      "sha256": "f22d2899864504ed48651d035980b76893075309d2ba0a541ecf008cb2de9152",
+      "bytes": 8874
     },
     {
       "path": "docs/decisions/2026-10-08-coordinator-research-routing.md",
@@ -57882,8 +57882,8 @@
     },
     {
       "path": "tests/test_claude_triage_workflow.py",
-      "sha256": "a644006cf248514ec194194deb60937b94d38d063a8e4b82fe29c84e33f121f6",
-      "bytes": 17821
+      "sha256": "0b54bfb95ddb95daa50ebf0896bf544efa560dfb4d4b47c58f1cd851196ee696",
+      "bytes": 18934
     },
     {
       "path": "tests/test_codex_agents.py",

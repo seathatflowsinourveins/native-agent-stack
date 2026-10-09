@@ -93,12 +93,15 @@ def model_usage(read=9000, cost=0.25):
                                 "cacheCreationInputTokens": 9000, "costUSD": cost}}
 
 
-def execution(tools=("Glob", "Grep", "Read", "StructuredOutput"), **changes):
+def execution(tools=("Glob", "Grep", "Read", "StructuredOutput"), turns=None, **changes):
     final = {"type": "result", "subtype": "success", "is_error": False, "num_turns": 3,
              "total_cost_usd": 0.25, "modelUsage": model_usage()}
     final.update(changes)
+    # The client streams one message per content block, so one API turn spans several messages with one id.
+    assistants = [{"type": "assistant", "message": {"id": f"msg_{turn:02d}", "content": []}}
+                  for turn in range(final["num_turns"] if turns is None else turns) for _ in range(2)]
     return [{"type": "system", "subtype": "init", "tools": list(tools), "mcp_servers": [],
-             "claude_code_version": "2.1.295"}, final]
+             "claude_code_version": "2.1.295"}, *assistants, final]
 
 
 class Run:
@@ -342,10 +345,25 @@ class TriageStepTests(unittest.TestCase):
             self.assertEqual(code, 0, console)
             self.assertEqual(json.loads(run.read("triage-usage/usage.json"))["tools"],
                              ["Glob", "Grep", "Read", "StructuredOutput"])
-            for changes in ({"tools": ("Read", "Bash")}, {"total_cost_usd": 1.01}, {"num_turns": 7},
+            for changes in ({"tools": ("Read", "Bash")}, {"total_cost_usd": 1.01}, {"turns": 7},
                             {"modelUsage": model_usage(read=0)}):
                 path.write_text(json.dumps(execution(**changes)), encoding="utf-8")
                 self.assertNotEqual(run.run(NUMBERS, EXECUTION_FILE=str(path))[0], 0, changes)
+        finally:
+            run.close()
+
+
+    def test_the_turn_bound_counts_assistant_turns_not_transcript_messages(self):
+        # On Claude Code 2.1.295 a 12-request run with parallel reads reported num_turns 57 (api-actions LR
+        # receipt, 2026-10-08): num_turns counts transcript messages, tool results included.
+        run = Run()
+        try:
+            path = run.dir / "execution.json"
+            path.write_text(json.dumps(execution(turns=6, num_turns=57)), encoding="utf-8")
+            code, console = run.run(NUMBERS, EXECUTION_FILE=str(path))
+            self.assertEqual(code, 0, console)
+            path.write_text(json.dumps(execution(turns=7, num_turns=7)), encoding="utf-8")
+            self.assertNotEqual(run.run(NUMBERS, EXECUTION_FILE=str(path))[0], 0)
         finally:
             run.close()
 

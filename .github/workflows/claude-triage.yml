@@ -148,6 +148,9 @@ jobs:
       # Numbers and fixed names only: the execution file holds the whole transcript and is never printed or uploaded.
       # The record is written first, so a failed or over-budget run still leaves its cost; the acceptance check
       # follows. It also reads the session's own tool list: a shell, write, web, subagent or MCP tool fails the run.
+      # The turn bound counts distinct assistant message ids. The result's num_turns counts transcript
+      # messages, tool results included (a 12-request run on Claude Code 2.1.295 reported 57), so it is
+      # kept in the record only.
       - name: Keep the run's numbers and check the bounds
         if: ${{ always() && steps.claude_triage.outputs.execution_file != '' }}
         shell: bash
@@ -168,7 +171,8 @@ jobs:
                ($result.modelUsage | type == "object" and length > 0)
             then . else error("usage unavailable") end |
             (($init.tools // []) | map(select(type == "string"))) as $tools |
-            {total_cost_usd: $result.total_cost_usd, num_turns: $result.num_turns,
+            ([.[] | select(.type == "assistant") | .message.id? | select(type == "string")] | unique | length) as $turns |
+            {total_cost_usd: $result.total_cost_usd, num_turns: $result.num_turns, assistant_turns: $turns,
              successful_result: ($result.subtype == "success" and $result.is_error == false),
              session_started: ($init != null),
              claude_code_version: (($init.claude_code_version // "unknown") | name),
@@ -190,15 +194,15 @@ jobs:
           {
             echo '### Triage: run numbers'
             echo
-            jq -r '"| turns | client cost estimate (USD) | completed | Claude Code | tools | MCP servers |",
-                   "| ---: | ---: | --- | --- | --- | ---: |",
-                   "| \(.num_turns) | \(.total_cost_usd) | \(.successful_result) | \(.claude_code_version) | \(.tools | join(" ")) | \(.mcp_servers) |",
+            jq -r '"| assistant turns | messages | client cost estimate (USD) | completed | Claude Code | tools | MCP servers |",
+                   "| ---: | ---: | ---: | --- | --- | --- | ---: |",
+                   "| \(.assistant_turns) | \(.num_turns) | \(.total_cost_usd) | \(.successful_result) | \(.claude_code_version) | \(.tools | join(" ")) | \(.mcp_servers) |",
                    "", "| model | input | cache write | cache read | output |", "| --- | ---: | ---: | ---: | ---: |",
                    (.models[] | "| \(.model) | \(.input_tokens) | \(.cache_creation_input_tokens) | \(.cache_read_input_tokens) | \(.output_tokens) |")' \
               "$out/usage.json"
           } >> "$GITHUB_STEP_SUMMARY"
           jq -e '.successful_result == true and .session_started == true and (.forbidden_tools | length) == 0 and
-                 .mcp_servers == 0 and .num_turns >= 1 and .num_turns <= 6 and .total_cost_usd <= 1 and
+                 .mcp_servers == 0 and .assistant_turns >= 1 and .assistant_turns <= 6 and .total_cost_usd <= 1 and
                  (.models | map(.cache_read_input_tokens) | add) > 0' "$out/usage.json" > /dev/null
 
       # Every entry must name an item this run collected, an allow-listed label and confidence, and appear once. Only

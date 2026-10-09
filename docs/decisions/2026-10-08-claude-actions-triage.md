@@ -50,7 +50,7 @@ does not depend on it.
 
 Up to 30 items of at most about 2,200 characters, read once, plus the prompt: about 3 requests, $0.20 to $0.35 at
 Claude Opus 5.5's standard prices, inside the $1 client budget. The same accounting step as the other Claude
-workflows keeps the numbers and fails the job unless the run succeeded, used 1 to 6 turns, cost at most $1, read
+workflows keeps the numbers and fails the job unless the run succeeded, used 1 to 6 assistant turns (distinct assistant message ids; the client's `num_turns` counts transcript messages, tool results included, so a 12-request run on 2.1.295 reported 57, and it is only recorded), cost at most $1, read
 the prompt cache and had no forbidden tool or MCP server; a failed `classify` means `apply` does not run. The session
 adds a `StructuredOutput` tool for `--json-schema` (seen in the local check), which is not on the forbidden list.
 
