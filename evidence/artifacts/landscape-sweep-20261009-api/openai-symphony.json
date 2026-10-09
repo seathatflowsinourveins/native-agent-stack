@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-openai-symphony",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/openai/symphony",
+ "reviewed_commit": "be10a1b79df723d6d7612b5651c8522704dafb2e",
+ "readme_path": "README.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "agent-sdks"
+ ],
+ "claim": "Source and documentation review of openai/symphony at commit be10a1b79df723d6d7612b5651c8522704dafb2e (license Apache-2.0), read from README.md at that commit. Repository description: \"Symphony turns project work into isolated, autonomous implementation runs, allowing teams to manage work instead of supervising coding agents.\". Survived the landscape-sweep-20261009-api facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 27603,
+  "pushed_at": "2026-09-15T22:14:59Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@be10a1b79df723d6d7612b5651c8522704dafb2e",
+   "text": "Symphony turns project work into isolated, autonomous implementation runs, allowing teams to manage work instead of supervising coding agents."
+  },
+  {
+   "source": "README.md@be10a1b79df723d6d7612b5651c8522704dafb2e",
+   "text": "_In this [demo video](https://player.vimeo.com/video/1186371009?h=5626e4b899), Symphony monitors a Linear board for work and spawns agents to handle the tasks. The agents complete the tasks and provide proof of work: CI status, PR review feedback, complexity analysis, and walkthrough videos. When accepted, the agents land the PR safely. Engineers do not need to supervise Codex; they can manage the work at a higher level._"
+  },
+  {
+   "source": "README.md@be10a1b79df723d6d7612b5651c8522704dafb2e",
+   "text": "> [!WARNING] > Symphony is a low-key engineering preview for testing in trusted environments."
+  }
+ ]
+}

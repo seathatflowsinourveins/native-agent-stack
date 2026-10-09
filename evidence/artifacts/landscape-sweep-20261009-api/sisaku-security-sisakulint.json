@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-sisaku-security-sisakulint",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/sisaku-security/sisakulint",
+ "reviewed_commit": "17c2d82151a966e6e388a17619b060ae2919712e",
+ "readme_path": "README.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "ci-supply-chain"
+ ],
+ "claim": "Source and documentation review of sisaku-security/sisakulint at commit 17c2d82151a966e6e388a17619b060ae2919712e (license Apache-2.0), read from README.md at that commit. Repository description: \"CI-Friendly static linter with autofix, SAST, semantic analysis for GitHub Actions\". Survived the landscape-sweep-20261009-api facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 48,
+  "pushed_at": "2026-09-10T13:13:05Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@17c2d82151a966e6e388a17619b060ae2919712e",
+   "text": "**A fast, security-first static analyzer with heuristic auto-fix for GitHub Actions workflows.**"
+  },
+  {
+   "source": "README.md@17c2d82151a966e6e388a17619b060ae2919712e",
+   "text": "Find injection, credential leakage, supply-chain, and pipeline-poisoning bugs in `.github/workflows/` — and let `-fix` repair most of them for you."
+  },
+  {
+   "source": "README.md@17c2d82151a966e6e388a17619b060ae2919712e",
+   "text": "- **Security-first by design.** Full coverage of the [OWASP Top 10 CI/CD Security Risks](https://owasp.org/www-project-top-10-ci-cd-security-risks/) — code/env/path/output injection, untrusted checkouts, artifact & cache poisoning, ref confusion, impostor commits, and more. - **Semantic, not regex.** A real AST + expression parser + shell taint analyzer (`mvdan.cc/sh`) — not string matching. Cross-step and cross-file taint propagation through `$GITHUB_ENV`, reusable workflow boundaries, and shel"
+  }
+ ]
+}

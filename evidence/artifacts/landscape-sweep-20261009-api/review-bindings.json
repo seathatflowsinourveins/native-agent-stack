@@ -1,0 +1,229 @@
+[
+ {
+  "repository": "https://github.com/aaif-goose/goose",
+  "path": "aaif-goose-goose.json",
+  "layers": [
+   "agent-sdks"
+  ]
+ },
+ {
+  "repository": "https://github.com/agent-sh/agnix",
+  "path": "agent-sh-agnix.json",
+  "layers": [
+   "instructions-skills"
+  ]
+ },
+ {
+  "repository": "https://github.com/anthropics/claude-code-action",
+  "path": "anthropics-claude-code-action.json",
+  "layers": [
+   "git-github-automation"
+  ]
+ },
+ {
+  "repository": "https://github.com/anthropics/claude-code-base-action",
+  "path": "anthropics-claude-code-base-action.json",
+  "layers": [
+   "git-github-automation"
+  ]
+ },
+ {
+  "repository": "https://github.com/anthropics/claude-tag-plugins",
+  "path": "anthropics-claude-tag-plugins.json",
+  "layers": [
+   "git-github-automation"
+  ]
+ },
+ {
+  "repository": "https://github.com/anthropics/claude-tag-wif-gateway-sample",
+  "path": "anthropics-claude-tag-wif-gateway-sample.json",
+  "layers": [
+   "secrets-credentials"
+  ]
+ },
+ {
+  "repository": "https://github.com/Ataraxy-Labs/sem",
+  "path": "ataraxy-labs-sem.json",
+  "layers": [
+   "git-github-automation"
+  ]
+ },
+ {
+  "repository": "https://github.com/Ataraxy-Labs/weave",
+  "path": "ataraxy-labs-weave.json",
+  "layers": [
+   "git-github-automation"
+  ]
+ },
+ {
+  "repository": "https://github.com/Bachmann1234/diff_cover",
+  "path": "bachmann1234-diff-cover.json",
+  "layers": [
+   "quality-evaluation"
+  ]
+ },
+ {
+  "repository": "https://github.com/betterleaks/betterleaks",
+  "path": "betterleaks-betterleaks.json",
+  "layers": [
+   "secrets-credentials"
+  ]
+ },
+ {
+  "repository": "https://github.com/harbor-framework/harbor",
+  "path": "harbor-framework-harbor.json",
+  "layers": [
+   "quality-evaluation"
+  ]
+ },
+ {
+  "repository": "https://github.com/JetBrains/Mellum",
+  "path": "jetbrains-mellum.json",
+  "layers": [
+   "observation-inference"
+  ]
+ },
+ {
+  "repository": "https://github.com/microsoft/FrogNano",
+  "path": "microsoft-frognano.json",
+  "layers": [
+   "observation-inference"
+  ]
+ },
+ {
+  "repository": "https://github.com/ml-explore/mlx-lm",
+  "path": "ml-explore-mlx-lm.json",
+  "layers": [
+   "observation-inference"
+  ]
+ },
+ {
+  "repository": "https://github.com/modelcontextprotocol/conformance",
+  "path": "modelcontextprotocol-conformance.json",
+  "layers": [
+   "mcp-surfaces"
+  ]
+ },
+ {
+  "repository": "https://github.com/modelcontextprotocol/inspector",
+  "path": "modelcontextprotocol-inspector.json",
+  "layers": [
+   "mcp-surfaces"
+  ]
+ },
+ {
+  "repository": "https://github.com/mostlygeek/llama-swap",
+  "path": "mostlygeek-llama-swap.json",
+  "layers": [
+   "observation-inference"
+  ]
+ },
+ {
+  "repository": "https://github.com/NVIDIA/SkillEvaluator",
+  "path": "nvidia-skillevaluator.json",
+  "layers": [
+   "instructions-skills"
+  ]
+ },
+ {
+  "repository": "https://github.com/ollama/ollama",
+  "path": "ollama-ollama.json",
+  "layers": [
+   "observation-inference"
+  ]
+ },
+ {
+  "repository": "https://github.com/openai/codex",
+  "path": "openai-codex.json",
+  "layers": [
+   "git-github-automation",
+   "secrets-credentials"
+  ]
+ },
+ {
+  "repository": "https://github.com/openai/codex-security",
+  "path": "openai-codex-security.json",
+  "layers": [
+   "ci-supply-chain"
+  ]
+ },
+ {
+  "repository": "https://github.com/openai/sign-in-with-chatgpt-devkit",
+  "path": "openai-sign-in-with-chatgpt-devkit.json",
+  "layers": [
+   "secrets-credentials"
+  ]
+ },
+ {
+  "repository": "https://github.com/openai/skills",
+  "path": "openai-skills.json",
+  "layers": [
+   "instructions-skills"
+  ]
+ },
+ {
+  "repository": "https://github.com/openai/symphony",
+  "path": "openai-symphony.json",
+  "layers": [
+   "agent-sdks"
+  ]
+ },
+ {
+  "repository": "https://github.com/openai/tunnel-client",
+  "path": "openai-tunnel-client.json",
+  "layers": [
+   "secrets-credentials"
+  ]
+ },
+ {
+  "repository": "https://github.com/praetorian-inc/noseyparker",
+  "path": "praetorian-inc-noseyparker.json",
+  "layers": [
+   "secrets-credentials"
+  ]
+ },
+ {
+  "repository": "https://github.com/PrismML-Eng/llama.cpp",
+  "path": "prismml-eng-llama-cpp.json",
+  "layers": [
+   "observation-inference"
+  ]
+ },
+ {
+  "repository": "https://github.com/schemathesis/schemathesis",
+  "path": "schemathesis-schemathesis.json",
+  "layers": [
+   "quality-evaluation"
+  ]
+ },
+ {
+  "repository": "https://github.com/sisaku-security/sisakulint",
+  "path": "sisaku-security-sisakulint.json",
+  "layers": [
+   "ci-supply-chain"
+  ]
+ },
+ {
+  "repository": "https://github.com/UKGovernmentBEIS/inspect_ai",
+  "path": "ukgovernmentbeis-inspect-ai.json",
+  "layers": [
+   "quality-evaluation"
+  ]
+ },
+ {
+  "repository": "https://github.com/utkuozdemir/nvidia_gpu_exporter",
+  "path": "utkuozdemir-nvidia-gpu-exporter.json",
+  "layers": [
+   "observation-inference"
+  ]
+ },
+ {
+  "repository": "https://codeberg.org/mergiraf/mergiraf",
+  "path": "mergiraf-review-pending.json",
+  "layers": [
+   "git-github-automation"
+  ],
+  "status": "pending",
+  "kind": "pending_upstream_provenance"
+ }
+]

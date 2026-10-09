@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-openai-sign-in-with-chatgpt-devkit",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/openai/sign-in-with-chatgpt-devkit",
+ "reviewed_commit": "0a36fefeb913055c8c7a1a29b63d82b96b2e841a",
+ "readme_path": "README.md",
+ "license": "NOASSERTION",
+ "layers": [
+  "secrets-credentials"
+ ],
+ "claim": "Source and documentation review of openai/sign-in-with-chatgpt-devkit at commit 0a36fefeb913055c8c7a1a29b63d82b96b2e841a (license NOASSERTION), read from README.md at that commit. Repository description: \"Sign-in with ChatGPT DevKit — local SDK, reusable React components, design assets, and the Paste Perfect desktop example.\". Survived the landscape-sweep-20261009-api facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 35,
+  "pushed_at": "2026-10-07T16:37:23Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@0a36fefeb913055c8c7a1a29b63d82b96b2e841a",
+   "text": "[Sign in with ChatGPT](https://learn.chatgpt.com/docs/sign-in-with-chatgpt) lets users sign in to your app with their ChatGPT account. With their permission, eligible users can also use their ChatGPT plan to power your app's AI features without setting up an API key."
+  },
+  {
+   "source": "README.md@0a36fefeb913055c8c7a1a29b63d82b96b2e841a",
+   "text": "This DevKit is for developers building open-source apps that run on a user's own machine. It gives you a local Node.js SDK, React components, and design assets to integrate Sign in with ChatGPT, plus Paste Perfect, a working macOS example app you can learn from."
+  },
+  {
+   "source": "README.md@0a36fefeb913055c8c7a1a29b63d82b96b2e841a",
+   "text": "Follow the [Paste Perfect cookbook](https://developers.openai.com/cookbook/articles/sign-in-with-chatgpt) for a step-by-step integration. See the [developer documentation](https://developers.openai.com/siwc) for authentication and ChatGPT plan usage."
+  }
+ ]
+}

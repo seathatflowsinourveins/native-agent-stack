@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-agent-sh-agnix",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/agent-sh/agnix",
+ "reviewed_commit": "004b7ea143de549c13e89614fd73be0497abbdd0",
+ "readme_path": "README.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "instructions-skills"
+ ],
+ "claim": "Source and documentation review of agent-sh/agnix at commit 004b7ea143de549c13e89614fd73be0497abbdd0 (license Apache-2.0), read from README.md at that commit. Repository description: \"The missing linter and lsp for AI coding assistants. Validate CLAUDE.md, AGENTS.md, SKILL.md, hooks, MCP. Plugin for all major IDEs included, with autofixes.\". Survived the landscape-sweep-20261009-api facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 446,
+  "pushed_at": "2026-10-09T00:24:58Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@004b7ea143de549c13e89614fd73be0497abbdd0",
+   "text": "> Running open models for your company? [**Tiyuvta**](https://tiyuvta.ai/services/) helps with model choice, deployment and optimization, and fine-tuning on your hardware or cloud account."
+  },
+  {
+   "source": "README.md@004b7ea143de549c13e89614fd73be0497abbdd0",
+   "text": "**Your skills don't trigger.** Vercel's research found skills [invoke at 0%](https://vercel.com/blog/agents-md-outperforms-skills-in-our-agent-evals) without correct syntax. One wrong field and your skill is invisible."
+  },
+  {
+   "source": "README.md@004b7ea143de549c13e89614fd73be0497abbdd0",
+   "text": "**\"Almost right\" is the worst outcome.** [66% of developers](https://survey.stackoverflow.co/2025/ai) cite it as their biggest AI frustration. Misconfigured agents produce exactly this."
+  }
+ ]
+}

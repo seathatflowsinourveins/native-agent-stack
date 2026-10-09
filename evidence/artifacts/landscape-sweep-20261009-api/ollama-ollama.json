@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-ollama-ollama",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/ollama/ollama",
+ "reviewed_commit": "c2b7368d4156656ddb9a23b43f721a841b9c23e0",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "observation-inference"
+ ],
+ "claim": "Source and documentation review of ollama/ollama at commit c2b7368d4156656ddb9a23b43f721a841b9c23e0 (license MIT), read from README.md at that commit. Repository description: \"Get up and running with Kimi, GLM, MiniMax, DeepSeek, gpt-oss, Qwen, Gemma and other models.\". Survived the landscape-sweep-20261009-api facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 182432,
+  "pushed_at": "2026-10-09T04:37:14Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@c2b7368d4156656ddb9a23b43f721a841b9c23e0",
+   "text": "or [download manually](https://ollama.com/download/Ollama.dmg)"
+  },
+  {
+   "source": "README.md@c2b7368d4156656ddb9a23b43f721a841b9c23e0",
+   "text": "or [download manually](https://ollama.com/download/OllamaSetup.exe)"
+  },
+  {
+   "source": "README.md@c2b7368d4156656ddb9a23b43f721a841b9c23e0",
+   "text": "[Manual install instructions](https://docs.ollama.com/linux#manual-install)"
+  }
+ ]
+}

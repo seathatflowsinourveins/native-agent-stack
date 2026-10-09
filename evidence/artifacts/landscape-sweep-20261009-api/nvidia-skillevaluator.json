@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-nvidia-skillevaluator",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/NVIDIA/SkillEvaluator",
+ "reviewed_commit": "f32c88455b6007b7afca9d1d3909283226d52efa",
+ "readme_path": "README.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "instructions-skills"
+ ],
+ "claim": "Source and documentation review of NVIDIA/SkillEvaluator at commit f32c88455b6007b7afca9d1d3909283226d52efa (license Apache-2.0), read from README.md at that commit. Repository description: \"Multi-tier framework for evaluating AI agent skills with quality gates, semantic overlap detection, synthetic evaluation dataset generation, and live agent evaluation that measures how skills affect agent behavior.\". Survived the landscape-sweep-20261009-api facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 552,
+  "pushed_at": "2026-10-08T20:04:08Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@f32c88455b6007b7afca9d1d3909283226d52efa",
+   "text": "> 📺 **Livestream:** [Ask the Experts: Evaluating Agent Skills](https://www.youtube.com/watch?v=4rI0zATFxYI)"
+  },
+  {
+   "source": "README.md@f32c88455b6007b7afca9d1d3909283226d52efa",
+   "text": "SkillEvaluator is an open-source, multi-tier framework for evaluating AI agent artifacts, starting with agent skills: deterministic quality gates, semantic overlap detection, synthetic eval dataset generation, and live agent evaluation."
+  },
+  {
+   "source": "README.md@f32c88455b6007b7afca9d1d3909283226d52efa",
+   "text": "Agent skills extend AI agents with instructions and supporting files, as defined by the [Agent Skills specification](https://agentskills.io/). SkillEvaluator is part of the [NVIDIA Verified Skills pipeline](https://github.com/NVIDIA/skills). Skills that pass are published to the [NVIDIA skills catalog](https://github.com/NVIDIA/skills)."
+  }
+ ]
+}

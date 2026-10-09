@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-modelcontextprotocol-inspector",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/modelcontextprotocol/inspector",
+ "reviewed_commit": "0d2bc1d91ce177ea8d497ee3efe91bcc59e40a1c",
+ "readme_path": "README.md",
+ "license": "NOASSERTION",
+ "layers": [
+  "mcp-surfaces"
+ ],
+ "claim": "Source and documentation review of modelcontextprotocol/inspector at commit 0d2bc1d91ce177ea8d497ee3efe91bcc59e40a1c (license NOASSERTION), read from README.md at that commit. Repository description: \"Visual testing tool for MCP servers\". Survived the landscape-sweep-20261009-api facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 11044,
+  "pushed_at": "2026-10-08T05:05:05Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@0d2bc1d91ce177ea8d497ee3efe91bcc59e40a1c",
+   "text": "A developer tool for inspecting [Model Context Protocol](https://modelcontextprotocol.io) (MCP) servers. It ships as a single package, `@modelcontextprotocol/inspector`, that provides four ways to inspect a server:"
+  },
+  {
+   "source": "README.md@0d2bc1d91ce177ea8d497ee3efe91bcc59e40a1c",
+   "text": "- **Web** — a Vite + React + [Mantine](https://mantine.dev) single-page app with a Node backend. - **CLI** — a scriptable command-line client for automation, CI, and fast agent feedback loops. - **TUI** — an interactive terminal UI built with [Ink](https://github.com/vadimdemedes/ink). - **mcpdo** _(experimental)_ — a connection CLI: connect once, then run many commands against the named connection through an implicit local daemon. See [`clients/mcpdo`](./clients/mcpdo/README.md)."
+  },
+  {
+   "source": "README.md@0d2bc1d91ce177ea8d497ee3efe91bcc59e40a1c",
+   "text": "The first three run through one global `mcp-inspector` binary; `mcpdo` is a second binary in the same package:"
+  }
+ ]
+}

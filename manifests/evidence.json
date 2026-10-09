@@ -17002,8 +17002,8 @@
     },
     {
       "path": "catalogs/landscape/component-evidence-matrix.json",
-      "sha256": "c761d3e6ec61a3c2d822d36f0afc7d49c6cb0da0269245e1c06516818b23aa00",
-      "bytes": 314853
+      "sha256": "7f04a02bd1f1ff92cc3924c68efc16fe11b6fc7e6d41ce5cebca3ae09723ea19",
+      "bytes": 316217
     },
     {
       "path": "catalogs/landscape/foundation.json",
@@ -17087,13 +17087,13 @@
     },
     {
       "path": "catalogs/saturation/ledger.json",
-      "sha256": "4a37a821f5608da528a8fa1f1774a7ba7ad82b6af17d11815c2d3ac6283b3375",
-      "bytes": 403074
+      "sha256": "10789db54a64e6b3cee523e96357678982374f32aad4c91281a98a3b2242cc82",
+      "bytes": 476196
     },
     {
       "path": "catalogs/sota-convergence/README.md",
-      "sha256": "76ee44ca2cdb48b6ce62379b6b1b7fd71276b868c5724138751b333331b1106c",
-      "bytes": 16558
+      "sha256": "3c0a9ac2e22cb6edc3097dbce9e5f22c32ea92eb0beaaa8cf09636f63774163b",
+      "bytes": 17786
     },
     {
       "path": "catalogs/sota-convergence/layer-verdicts-20260922.json",
@@ -17119,6 +17119,11 @@
       "path": "catalogs/sota-convergence/manifest-20260929.json",
       "sha256": "af4e0314b28acafe2b5e8a0bce71d1ced2efe911a3c3757557b23bd71c63c9ee",
       "bytes": 1149103
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20261009-api.json",
+      "sha256": "91d42fdf17882844760b384fad819b7f4a1944ab333c2e61a328636b03816063",
+      "bytes": 817346
     },
     {
       "path": "catalogs/sota-convergence/sdk-runtime-coverage-20260922.json",
@@ -17557,8 +17562,8 @@
     },
     {
       "path": "docs/component-evidence-matrix.md",
-      "sha256": "a1af27458583cabaebfe3d0299b239fdf23f42740165f02f9323d33f0647d26f",
-      "bytes": 32903
+      "sha256": "c6281ef59cbe2245a270000b03383492ab2de9145ed827ac788bed532db959a2",
+      "bytes": 33268
     },
     {
       "path": "docs/contributing-evidence.md",
@@ -35979,6 +35984,201 @@
       "path": "evidence/artifacts/landscape-sweep-20260929/vshulcz-deja-vu.json",
       "sha256": "1ecffbbd16d616fe5a3728d23cf16824fd84579c55544c4fc131086486b628d1",
       "bytes": 2160
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261009-api-attempts/child-usage-wf_b7a6dece-81b.json",
+      "sha256": "722ffd7cff49eb0e7b990e470857f1879e8d4c31d1c5763557caf7d8c698afd6",
+      "bytes": 3574138
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261009-api/RESULT.json",
+      "sha256": "c11b0bf6e71e4c3110d83cd576f21d47f68b57cbf3e6193c17d2b35ecceaa4f8",
+      "bytes": 61204
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261009-api/aaif-goose-goose.json",
+      "sha256": "25bfced37f6cfd3a33fbe30363d0655b844f579887d7a290d81a53f03cd0a6e9",
+      "bytes": 1703
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261009-api/agent-sh-agnix.json",
+      "sha256": "2b580a7cc9e8fe7fb0a97ff4da2a87361ee54f3153b586c1be4b9f9f0e029d2a",
+      "bytes": 1885
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261009-api/anthropics-claude-code-action.json",
+      "sha256": "46077a296406fd6fd4bedcd0072b9321f6a5f129a41c2c8c273744f233eef8d0",
+      "bytes": 2384
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261009-api/anthropics-claude-code-base-action.json",
+      "sha256": "2ab981c52aad4473e51e6eaa447a3151c4bd55ee08f455e5fd8b2345b1cafab0",
+      "bytes": 1797
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261009-api/anthropics-claude-tag-plugins.json",
+      "sha256": "f45c10d6e1fce4be952f5cda7f9fe7991c647a9989687c1ad4f653ea6c6b5c85",
+      "bytes": 1552
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261009-api/anthropics-claude-tag-wif-gateway-sample.json",
+      "sha256": "74570ae2b8fc7a84bb696d8fc02ab41e6553094a53525286d2ab1e721e89e955",
+      "bytes": 2477
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261009-api/ataraxy-labs-sem.json",
+      "sha256": "07344ad255fe605933f0e807e6e380423ba78b00de02c614f7a7504d5e54fc5a",
+      "bytes": 2322
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261009-api/ataraxy-labs-weave.json",
+      "sha256": "476fac6bfc64c8a88a75137ce40bfecbeed3002420e1c115b4ad5536130d7d33",
+      "bytes": 2494
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261009-api/bachmann1234-diff-cover.json",
+      "sha256": "09db9df4403fc9d8858f09b2286d4b336fcda172f29c5ad34c9b4275e41a8154",
+      "bytes": 1849
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261009-api/betterleaks-betterleaks.json",
+      "sha256": "d1719034efcfb5bd95e85d4aa3933079910d31cac058c701ec703f43467f90d8",
+      "bytes": 1975
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261009-api/harbor-framework-harbor.json",
+      "sha256": "21c36d195f07ef5d22004aee4790236437179bcc11c2f868ea610597be47237e",
+      "bytes": 1830
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261009-api/jetbrains-mellum.json",
+      "sha256": "28f408dc0d49bff758d721d4d081469bb5a48d74656ad16c53f72e1a061945b3",
+      "bytes": 1149
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261009-api/mergiraf-review-pending.json",
+      "sha256": "b0ed5c3607b2946fa01132aa5acb2d8129ea44276c865a09123f25ecd2602617",
+      "bytes": 1686
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261009-api/microsoft-frognano.json",
+      "sha256": "01b2e30d91f3d1362a834b31f26d3427417337b5d431de9b4ac59f284580c3fa",
+      "bytes": 2038
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261009-api/ml-explore-mlx-lm.json",
+      "sha256": "04d5a4dd762e82cf40931fb46114d2f1c4303515952b39e7486499f4ae37a26f",
+      "bytes": 1692
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261009-api/modelcontextprotocol-conformance.json",
+      "sha256": "2d96d20bc59b708ce0c22a4fdafc1e6d86493e20d40c79abe96e2fadca4af325",
+      "bytes": 1664
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261009-api/modelcontextprotocol-inspector.json",
+      "sha256": "0fb889e212e4ec892bc287f916674e5d5f0fdbd05a9ac70a3ca3904e2d3f6aa9",
+      "bytes": 2032
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261009-api/mostlygeek-llama-swap.json",
+      "sha256": "f42b2510329e68223646d5760c21996adf0fb20bc3a00a3d5b11077d8f49a25b",
+      "bytes": 2150
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261009-api/nvidia-skillevaluator.json",
+      "sha256": "ea24b4671b3bf23c3b72192afe2528056a7a2f31dcbb707ce66bd1a7b5bd3903",
+      "bytes": 2054
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261009-api/ollama-ollama.json",
+      "sha256": "d23e3b8a11be5362e02332a44d445091a95f85f135ae78f2ae5176915879a11a",
+      "bytes": 1419
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261009-api/openai-codex-security.json",
+      "sha256": "d5ded7d04634221343b3060e20ed52f9bd7473aeb376381882d60e409bbc25ff",
+      "bytes": 2063
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261009-api/openai-codex.json",
+      "sha256": "293d1c37f2198e6e286e09b8d575a911c2f2afb597ff6198d8189f32fa756066",
+      "bytes": 1661
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261009-api/openai-sign-in-with-chatgpt-devkit.json",
+      "sha256": "6dbbc7896413bc87c3a7a57d64efe4c80796ed95b0ffc16b4030173a522e019c",
+      "bytes": 2098
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261009-api/openai-skills.json",
+      "sha256": "a0e1b5fc98ee885e40763be0748350a0be33bd1203917462a9d327ae073d59e7",
+      "bytes": 1876
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261009-api/openai-symphony.json",
+      "sha256": "171d2e3ef1f90b2414f60cb4525624dad25a5c73994319a2e60e9f758c9d1d07",
+      "bytes": 1933
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261009-api/openai-tunnel-client.json",
+      "sha256": "667616130bfb56bfd07cf1c8050210573b45d8117232955a88ca897d3484916b",
+      "bytes": 2258
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261009-api/praetorian-inc-noseyparker.json",
+      "sha256": "e797e9d9e71642882044b38bfd88df3f512c14489ff2876e24bd75fdd00932be",
+      "bytes": 1689
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261009-api/prismml-eng-llama-cpp.json",
+      "sha256": "0d47f4ffc3fd0d5f2e9ff40d7c4370fc0ed7d854746ef2a3ad7d26169f13b585",
+      "bytes": 2482
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261009-api/publication.md",
+      "sha256": "28d1eee2413bcc5f81ed8c4ad5b704110a7479e41b7d6fac1d3e5802c713d82c",
+      "bytes": 11308
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261009-api/returns.json",
+      "sha256": "91a31f46e6583994954b01a23e7dd2178df7b8a9df92ae2c2f847063a5b13259",
+      "bytes": 1717957
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261009-api/review-bindings.json",
+      "sha256": "20f5487d28e7ac84deb053be0c5dd966f371a805d85aab17e8cced15db61dd2e",
+      "bytes": 4983
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261009-api/reviews.json",
+      "sha256": "f4050736f39f04b447b51d848600b24f9ea16c2f077e4c489bb6dbf12dd233ca",
+      "bytes": 4767
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261009-api/schemathesis-schemathesis.json",
+      "sha256": "137dc63f9b840de024395f4a7031b1b1689f41598c13ade78dea1c99bba250f5",
+      "bytes": 1557
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261009-api/sisaku-security-sisakulint.json",
+      "sha256": "1e81ba2f5da6d4b2dc195280bf6f25b2bb6dd579666bb151e8b55c2c38e36356",
+      "bytes": 1997
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261009-api/source-reviews.stderr.txt",
+      "sha256": "a01b840cd7118d906204d8fd924d27a5a09c5e63f39784999071a5b8eadabc83",
+      "bytes": 169
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261009-api/ukgovernmentbeis-inspect-ai.json",
+      "sha256": "ab3dc976122490ca3cd43a095af3d8255150d4cbf6bb4254813d5db335a34581",
+      "bytes": 1721
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261009-api/utkuozdemir-nvidia-gpu-exporter.json",
+      "sha256": "6d8498482252963c8d3c848492985e3a46abfae9c0af28178e5f87d3bc8ada17",
+      "bytes": 2205
     },
     {
       "path": "evidence/artifacts/layer-closure-assessment-20261001/README.md",

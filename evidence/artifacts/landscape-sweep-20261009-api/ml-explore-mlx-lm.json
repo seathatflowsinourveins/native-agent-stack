@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-ml-explore-mlx-lm",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/ml-explore/mlx-lm",
+ "reviewed_commit": "9d8abd94d63a9b3c72e7e9b146e43af1005368fa",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "observation-inference"
+ ],
+ "claim": "Source and documentation review of ml-explore/mlx-lm at commit 9d8abd94d63a9b3c72e7e9b146e43af1005368fa (license MIT), read from README.md at that commit. Repository description: \"Run LLMs with MLX\". Survived the landscape-sweep-20261009-api facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 7255,
+  "pushed_at": "2026-10-09T02:46:36Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@9d8abd94d63a9b3c72e7e9b146e43af1005368fa",
+   "text": "MLX LM is a Python package for generating text and fine-tuning large language models on Apple silicon with MLX."
+  },
+  {
+   "source": "README.md@9d8abd94d63a9b3c72e7e9b146e43af1005368fa",
+   "text": "* Integration with the Hugging Face Hub to easily use thousands of LLMs with a single command. * Support for quantizing and uploading models to the Hugging Face Hub. * [Low-rank and full model fine-tuning](https://github.com/ml-explore/mlx-lm/blob/main/mlx_lm/LORA.md) with support for quantized models. * Distributed inference and fine-tuning with `mx.distributed`"
+  },
+  {
+   "source": "README.md@9d8abd94d63a9b3c72e7e9b146e43af1005368fa",
+   "text": "The easiest way to get started is to install the `mlx-lm` package:"
+  }
+ ]
+}

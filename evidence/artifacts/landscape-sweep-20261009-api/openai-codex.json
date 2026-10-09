@@ -1,0 +1,35 @@
+{
+ "schema_version": 1,
+ "id": "source-review-openai-codex",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/openai/codex",
+ "reviewed_commit": "2351d9e1b608e6f9d9a3699b71d7eb39ee41cfa4",
+ "readme_path": "README.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "git-github-automation",
+  "secrets-credentials"
+ ],
+ "claim": "Source and documentation review of openai/codex at commit 2351d9e1b608e6f9d9a3699b71d7eb39ee41cfa4 (license Apache-2.0), read from README.md at that commit. Repository description: \"Lightweight coding agent that runs in your terminal\". Survived the landscape-sweep-20261009-api facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 128266,
+  "pushed_at": "2026-10-09T05:13:10Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@2351d9e1b608e6f9d9a3699b71d7eb39ee41cfa4",
+   "text": "```shell curl -fsSL https://chatgpt.com/codex/install.sh | sh ```"
+  },
+  {
+   "source": "README.md@2351d9e1b608e6f9d9a3699b71d7eb39ee41cfa4",
+   "text": "```shell powershell -ExecutionPolicy ByPass -c \"irm https://chatgpt.com/codex/install.ps1 | iex\" ```"
+  },
+  {
+   "source": "README.md@2351d9e1b608e6f9d9a3699b71d7eb39ee41cfa4",
+   "text": "The standalone installers download from `https://releases.openai.com/codex` by default and fall back to GitHub Releases if a metadata or asset download is unavailable. To force GitHub Releases, set `CODEX_INSTALLER_USE_RELEASES_OPENAI_COM` to `false` (`0` and `no` are also accepted):"
+  }
+ ]
+}

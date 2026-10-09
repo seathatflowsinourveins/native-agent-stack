@@ -1,0 +1,26 @@
+{
+ "schema_version": 1,
+ "id": "source-review-jetbrains-mellum",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/JetBrains/Mellum",
+ "reviewed_commit": "7997d9bb7f13ae9c5d1795f995086424a0bcc2da",
+ "readme_path": "README.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "observation-inference"
+ ],
+ "claim": "Source and documentation review of JetBrains/Mellum at commit 7997d9bb7f13ae9c5d1795f995086424a0bcc2da (license Apache-2.0), read from README.md at that commit. Repository description: \"Additional release materials for Mellum — JetBrains' language model for code completion\". Survived the landscape-sweep-20261009-api facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 15,
+  "pushed_at": "2025-07-29T15:07:54Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@7997d9bb7f13ae9c5d1795f995086424a0bcc2da",
+   "text": "# Mellum Additional release materials for Mellum — JetBrains' language model for code completion"
+  }
+ ]
+}

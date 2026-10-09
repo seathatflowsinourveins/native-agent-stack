@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-modelcontextprotocol-conformance",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/modelcontextprotocol/conformance",
+ "reviewed_commit": "c37eec888e1c6ff140af79987a40008548b7cc5f",
+ "readme_path": "README.md",
+ "license": "NOASSERTION",
+ "layers": [
+  "mcp-surfaces"
+ ],
+ "claim": "Source and documentation review of modelcontextprotocol/conformance at commit c37eec888e1c6ff140af79987a40008548b7cc5f (license NOASSERTION), read from README.md at that commit. Repository description: \"Conformance Tests for MCP\". Survived the landscape-sweep-20261009-api facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 129,
+  "pushed_at": "2026-10-05T06:14:04Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@c37eec888e1c6ff140af79987a40008548b7cc5f",
+   "text": "A framework for testing MCP (Model Context Protocol) client and server implementations against the specification."
+  },
+  {
+   "source": "README.md@c37eec888e1c6ff140af79987a40008548b7cc5f",
+   "text": "**For SDK maintainers:** See [SDK Integration Guide](./SDK_INTEGRATION.md) for a streamlined guide on integrating conformance tests into your SDK repository."
+  },
+  {
+   "source": "README.md@c37eec888e1c6ff140af79987a40008548b7cc5f",
+   "text": "```bash # Using the everything-client (recommended) npx @modelcontextprotocol/conformance client --command \"tsx examples/clients/typescript/everything-client.ts\" --scenario initialize"
+  }
+ ]
+}
