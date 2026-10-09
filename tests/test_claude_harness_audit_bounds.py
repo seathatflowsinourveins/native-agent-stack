@@ -27,6 +27,21 @@ ACTION = "anthropics/claude-code-action@2dca132ff0e0c4094ce6048b422c6915a071210b
 TRANSCRIPT_MARKER = "SYNTHETIC-TRANSCRIPT-TEXT-MUST-NOT-LEAVE-THE-RUNNER"
 SETTINGS_MARKER = "SYNTHETIC-SETTINGS-CONTENT-MUST-NOT-BE-PRINTED"
 
+# The whole of claude_args, each line split with shlex.split as cli_settings() splits the --settings line. GitHub
+# substitutes ${{ runner.temp }} before the action parses the text, so its three tokens here are the workflow's text,
+# not the value Claude Code receives.
+SETTINGS_TEXT = ('{"disableAllHooks":true,"permissions":{"blockReadsOutsideWorkingDirectories":true,"deny":['
+                 '"Read(./.git/**)","Read(./**/.git/**)","Read(./**/.env)","Read(./**/.env.*)","Read(./**/*.pem)",'
+                 '"Read(./**/*.key)"]}}')
+CLAUDE_ARGS = ["--model", "claude-opus-5-5", "--effort", "max", "--max-turns", "20", "--max-budget-usd", "5",
+               "--tools", "Read,Glob,Grep", "--allowedTools", "Read,Glob,Grep", "--restricted",
+               "--permission-prompts", "none", "--setting-sources", "user", "--strict-mcp-config",
+               "--settings", SETTINGS_TEXT, "--add-dir", "${{", "runner.temp", "}}/harness-audit"]
+SETTINGS = {"disableAllHooks": True,
+            "permissions": {"blockReadsOutsideWorkingDirectories": True,
+                            "deny": ["Read(./.git/**)", "Read(./**/.git/**)", "Read(./**/.env)", "Read(./**/.env.*)",
+                                     "Read(./**/*.pem)", "Read(./**/*.key)"]}}
+
 GUARD = "Refuse debug logging and pre-existing Claude settings"
 AUDIT = "Run the audit"
 NUMBERS = "Keep the run's numbers and check the bounds"
@@ -110,7 +125,6 @@ def run_step(name, execution_file=None, env_changes=None, settings=None):
                 usage.read_text(encoding="utf-8") if usage.exists() else None)
 
 
-@unittest.skipUnless(yaml, "PyYAML is needed to read the workflow's steps")
 class HarnessAuditShapeTests(unittest.TestCase):
     def test_the_job_needs_main_this_repository_a_first_attempt_and_the_enabling_variable(self):
         condition = " ".join(job()["if"].split())
@@ -146,7 +160,7 @@ class HarnessAuditShapeTests(unittest.TestCase):
             self.assertNotIn(static_credential, text)
 
     def test_claude_has_three_read_tools_and_fixed_bounds(self):
-        for expected in ("--model claude-opus-5-5", "--effort max", "--max-turns 20", "--max-budget-usd 3",
+        for expected in ("--model claude-opus-5-5", "--effort max", "--max-turns 20", "--max-budget-usd 5",
                          "--tools Read,Glob,Grep", "--allowedTools Read,Glob,Grep",
                          "--restricted", "--permission-prompts none",
                          "--setting-sources user", "--strict-mcp-config"):
@@ -166,6 +180,13 @@ class HarnessAuditShapeTests(unittest.TestCase):
         for rule in ("Read(./.git/**)", "Read(./**/.git/**)"):
             self.assertIn(rule, settings["permissions"]["deny"])
         self.assertNotIn("allow", settings["permissions"])
+
+    def test_claude_args_and_the_settings_json_are_pinned_exactly(self):
+        # The checks above look for one flag or rule at a time, so a widened or repeated --add-dir, a second turn or
+        # budget flag, or a new settings key such as permissions.additionalDirectories passed them (command center
+        # security read of #892, 2026-10-09). These compare the whole token list and the whole JSON.
+        self.assertEqual([token for line in arguments() for token in shlex.split(line)], CLAUDE_ARGS)
+        self.assertEqual(cli_settings(), SETTINGS)
 
     def test_the_guard_runs_before_checkout_and_before_the_action(self):
         names = [item.get("name") for item in job()["steps"]]
@@ -239,7 +260,7 @@ class HarnessAuditStepTests(unittest.TestCase):
     def test_an_unmet_bound_fails_after_the_numbers_were_kept(self):
         cases = {
             "no cache read": {"modelUsage": model_usage(read=0)},
-            "over the client budget": {"total_cost_usd": 3.01},
+            "over the client budget": {"total_cost_usd": 5.01},
             "over the turn limit": {"turns": 21},
             "an error result": {"is_error": True},
             "a turn-limit stop": {"subtype": "error_max_turns"},
@@ -259,11 +280,21 @@ class HarnessAuditStepTests(unittest.TestCase):
                 self.assertNotEqual(code, 0)
                 self.assertIsInstance(json.loads(usage)["total_cost_usd"], (int, float))
 
+    def test_a_non_string_tool_entry_is_a_forbidden_tool(self):
+        # GPT designated read of #895 (2026-10-09, P2): the step filtered non-string entries out of the session's tool
+        # list, so a list holding {"name": "Bash"}, null or 17 passed the bounds and reached publication.
+        for entry in ({"name": "Bash"}, None, 17):
+            with self.subTest(entry=entry):
+                code, console, _, usage = run_step(NUMBERS, execution(tools=("Read", "Glob", "Grep", entry)))
+                self.assertNotEqual(code, 0)
+                self.assertIn("Bounds not met: tools outside Read, Glob and Grep: non-string tool entry\n", console)
+                self.assertEqual(json.loads(usage)["forbidden_tools"], ["non-string tool entry"])
+
     def test_the_step_names_every_unmet_bound(self):
-        code, console, *_ = run_step(NUMBERS, execution(turns=21, total_cost_usd=3.5,
+        code, console, *_ = run_step(NUMBERS, execution(turns=21, total_cost_usd=5.5,
                                                          tools=("Read", "Skill"), result=""))
         self.assertNotEqual(code, 0)
-        for words in ("21 assistant turns, outside 1 to 20", "above 3", "Skill", "no result text"):
+        for words in ("21 assistant turns, outside 1 to 20", "above 5", "Skill", "no result text"):
             self.assertIn(words, console)
 
     def test_a_run_that_did_not_succeed_is_named_by_its_result_subtype(self):
@@ -306,6 +337,19 @@ class HarnessAuditStepTests(unittest.TestCase):
         self.assertEqual(code, 0, console)
         code, *_ = run_step(NUMBERS, execution_file=execution(turns=21, num_turns=21))
         self.assertNotEqual(code, 0)
+        # The lower bound too: a run with no assistant message fails, although its num_turns of 9 is within bounds.
+        code, console, *_ = run_step(NUMBERS, execution_file=execution(turns=0, num_turns=9))
+        self.assertNotEqual(code, 0)
+        self.assertIn("Bounds not met: 0 assistant turns, outside 1 to 20\n", console)
+
+    def test_the_cost_bound_is_the_five_dollar_budget(self):
+        # Caps from measurement (command center, 2026-10-09): the budget is $5, and the step's own check with it. A run
+        # that cost exactly the budget passes; one a cent above it fails, named.
+        code, console, *_ = run_step(NUMBERS, execution(total_cost_usd=5))
+        self.assertEqual(code, 0, console)
+        code, console, *_ = run_step(NUMBERS, execution(total_cost_usd=5.01))
+        self.assertNotEqual(code, 0)
+        self.assertIn("Bounds not met: client cost estimate 5.01 USD, above 5\n", console)
 
     def test_names_that_are_not_plain_identifiers_are_replaced(self):
         hostile = "<img src=x onerror=alert(1)> | injected"
@@ -368,6 +412,8 @@ class HarnessAuditStepTests(unittest.TestCase):
         summary.encode("utf-8")  # the summary file decoded as UTF-8 when it was read
         self.assertNotIn("\ufffd", summary)
         code, console, summary, _ = run_step(REPORT, execution(result="short report"))
+        self.assertEqual(code, 0, console)
+        self.assertIn("<pre>\nshort report\n</pre>", summary)
         self.assertNotIn("are shown.", summary)
 
     def test_the_report_is_the_last_result_with_text(self):

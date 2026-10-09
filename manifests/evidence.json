@@ -5051,8 +5051,8 @@
     },
     {
       "path": ".github/workflows/harness-audit.yml",
-      "sha256": "6f958276e2389c898f027e95eba56dcaf9cd93e634cfedcee322262a1755ee7b",
-      "bytes": 15639
+      "sha256": "41a65650c9dab342177492033fed192dc5a41ddd9a6e44b153bb263c8e8c416d",
+      "bytes": 15759
     },
     {
       "path": ".github/workflows/native-foundation-e2e.yml",
@@ -18317,8 +18317,8 @@
     },
     {
       "path": "docs/decisions/2026-10-08-claude-actions-harness-audit-bounds.md",
-      "sha256": "552a3dd663a5eeb33e8bb44934309bda95ef508e2b5a0acde274d666f9775a53",
-      "bytes": 31263
+      "sha256": "36dbbfaefe5a75e41e12a3b8727f1ac1c7f7f8e397426f3fa9c90d261d7a51ee",
+      "bytes": 41964
     },
     {
       "path": "docs/decisions/2026-10-08-claude-actions-pr-review.md",
@@ -18537,7 +18537,7 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "f712e5697eec314e5241610574544ac9c103a8ce810b19c1b1faa4b3009ac638",
+      "sha256": "1d9dac541bbd054a8643de6466670909f89e2f361bb9d84f49927e9f3be225b1",
       "bytes": 103888
     },
     {
@@ -59802,8 +59802,8 @@
     },
     {
       "path": "tests/test_claude_harness_audit_bounds.py",
-      "sha256": "4e6aab5660b9f3b44c5aecce1b3e94ed4c1bbe577dcc099ded8f7e98f74b84ff",
-      "bytes": 21635
+      "sha256": "c611effaa1323cef031d40e643ee5138221cce9484b0afdd8973a25c323d4bca",
+      "bytes": 25150
     },
     {
       "path": "tests/test_claude_pr_review_workflow.py",

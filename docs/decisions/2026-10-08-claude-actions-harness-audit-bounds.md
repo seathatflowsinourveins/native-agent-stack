@@ -1,7 +1,7 @@
 # Bounded harness audit on the current Claude action pin — 2026-10-08
 
 `harness-audit.yml` moves from `anthropics/claude-code-action` v1.0.245 to v1.0.247 and becomes a bounded,
-read-only job: Claude gets Read, Glob and Grep under `--restricted`, at most 20 turns and a $3 client budget; the
+read-only job: Claude gets Read, Glob and Grep under `--restricted`, at most 20 turns and a $5 client budget; the
 job holds `contents: read` and `id-token: write` and nothing else; a model-free step copies the report to the job
 summary and keeps the run's token and cost numbers. The job runs only while the repository variable
 `CLAUDE_HARNESS_AUDIT_ENABLED` is `true`, and only on the first attempt of a run. Nothing in this change starts a
@@ -32,21 +32,23 @@ step and the `show_full_output` input were still missing. All are listed here.
   explicitly, `show_full_output: 'false'`, `display_report: 'false'` and `track_progress: 'false'` (declared in the
   pinned `action.yml` at `2dca132f`, lines 156-159, 152-155 and 136-139, each with default `"false"`), and pins
   `ACTIONS_STEP_DEBUG: 'false'` in its environment.
-- `claude_args` carries the bounds (`--model`, `--effort max`, `--max-turns 20`, `--max-budget-usd 3`, `--tools`,
+- `claude_args` carries the bounds (`--model`, `--effort max`, `--max-turns 20`, `--max-budget-usd 5`, `--tools`,
   `--allowedTools`, `--restricted`, `--permission-prompts none`, `--setting-sources user`, `--strict-mcp-config`,
   `--settings` with the deny rules, `--add-dir`).
 - New step "Keep the run's numbers and check the bounds" (`always()`, when the action left an execution file) writes
   `usage.json` with `total_cost_usd`, `num_turns`, `assistant_turns`, `result_chars`, `tools_listed`,
   `successful_result`, `result_subtype` (the result's `subtype` through the step's name filter: `unknown` when
   missing, `other` when not a plain identifier), `session_started`, `claude_code_version`, `tools`,
-  `forbidden_tools`, `mcp_servers` and per-model `models` (`model`, `input_tokens`, `output_tokens`,
-  `cache_read_input_tokens`, `cache_creation_input_tokens`, `cost_usd`). It adds two tables to the job summary,
+  `forbidden_tools` (each string entry of the session's tool list outside Read, Glob and Grep, then one
+  `non-string tool entry` for each entry that is not a string), `mcp_servers` and per-model `models` (`model`,
+  `input_tokens`, `output_tokens`, `cache_read_input_tokens`, `cache_creation_input_tokens`, `cost_usd`). It adds two
+  tables to the job summary,
   "Harness audit: run numbers" (assistant turns, messages, client cost estimate, completed, result subtype, Claude
   Code, tools, MCP servers) and the per-model tokens (model, input, cache write, cache read, output). It then exits 1
   with "Bounds not met:" and the message of every unmet bound:
   "the run did not end in success (subtype <subtype>)", "no session start record", "the session start record lists
   no tools or MCP servers", "tools outside Read, Glob and Grep: <names>", "<n> MCP servers in the session", "<n>
-  assistant turns, outside 1 to 20", "client cost estimate <x> USD, above 3", "no cache read" and "no result text".
+  assistant turns, outside 1 to 20", "client cost estimate <x> USD, above 5", "no cache read" and "no result text".
 - New step "Publish the report to the job summary" (`success()`, with an execution file) copies the report (After
   the run, below).
 - New step "Require the run's execution file" (`success()`, without an execution file) fails the job with "The audit
@@ -101,7 +103,7 @@ keeps qualification. This pin's qualification is the fence receipt and the local
 | no MCP server | `--strict-mcp-config` | same `--help` |
 | hooks off; no read of any `.git` directory, `.env` or key file (Glob, Grep and Read measured as bound by the deny rules against a control run, below) | `--settings` JSON (`disableAllHooks`, `permissions.deny`) | `--settings` still applies under `--restricted`; the action sets git authentication in the root checkout (`src/github/operations/git-config.ts`) |
 | 20 turns | `--max-turns 20` | accepted by the 2.1.295 argument parser (`option '--max-turns <turns>'`); checked again after the run as distinct assistant message ids, because the result's `num_turns` counts transcript messages |
-| $3 per run | `--max-budget-usd 3` | same `--help`: "Maximum dollar amount to spend on API calls"; a client estimate, checked again from the run's own numbers |
+| $5 per run | `--max-budget-usd 5` | same `--help`: "Maximum dollar amount to spend on API calls"; a client estimate, checked again from the run's own numbers |
 | no full model output in a public log | `show_full_output: 'false'`, `ACTIONS_STEP_DEBUG: 'false'` in the action step's environment, and a first guard step that refuses a run with runner debugging on | `showFullOutput = options.showFullOutput === "true" \|\| isDebugMode`, where `isDebugMode` is `ACTIONS_STEP_DEBUG === "true"` (`base-action/src/parse-sdk-options.ts` at the pin) |
 | no key in GitHub | federation inputs only; the workflow passes no static credential | "a static credential takes precedence and federation will not be used" (`docs/setup.md` at the pin) |
 | one spend per request | `github.run_attempt == 1`, and for a dispatch the owner as both actor and triggering actor | GitHub contexts reference: a re-run keeps `github.actor`; `github.triggering_actor` is who re-ran it. A re-run, the case the triggering-actor clause exists for, is already skipped by the first-attempt clause; the triggering-actor clause stays as an independent second guard, so a dispatch stays owner-only if the first-attempt clause is ever relaxed (for example to let the owner re-run a failed attempt), and removing either clause fails a test |
@@ -127,7 +129,7 @@ The fence was run on the installed client (Claude Code 2.1.295, the version the 
 | `--model` | `claude-haiku-5-5` | `claude-opus-5-5` |
 | `--effort` | not passed | `max` |
 | `--max-turns` | `10` | `20` |
-| `--max-budget-usd` | `0.5` | `3` |
+| `--max-budget-usd` | `0.5` | `5` |
 | `--setting-sources` | not passed (run1), `user` (run2-user), `user,project,local` (run2-user-project-local) | `user` |
 | `--add-dir` | not passed | `${{ runner.temp }}/harness-audit` |
 | `--settings`, `claudeMdExcludes` | `["**/pr-head/**"]` | not set |
@@ -183,7 +185,7 @@ One step reads the action's execution file and keeps only numbers and fixed name
 the result's subtype, the Claude Code version, the session's tool list, the number of MCP servers and per-model token
 counts. The record is written before the check, so a failed or over-budget run still leaves its cost. The step then
 fails the job
-unless the run succeeded, used 1 to 20 assistant turns (distinct assistant message ids; the client's `num_turns` counts transcript messages, tool results included: a 12-request run on 2.1.295 reported 57, `local-parity-receipt.json`; it is only recorded), cost at most $3 by the client's estimate, read the prompt cache, had
+unless the run succeeded, used 1 to 20 assistant turns (distinct assistant message ids; the client's `num_turns` counts transcript messages, tool results included: a 12-request run on 2.1.295 reported 57, `local-parity-receipt.json`; it is only recorded), cost at most $5 by the client's estimate, read the prompt cache, had
 no MCP server, listed its tools and MCP servers in the session start record (a missing list fails instead of passing
 as empty), used no tool outside Read, Glob and Grep (an allow-list, so a tool name it does not know also fails) and
 returned result text. The step names every bound it finds unmet. A run that did not succeed is named by its result
@@ -207,14 +209,23 @@ success without an execution file fails the job in a final step, so a green run 
 
 ## Effort
 
-`--effort max` in `claude_args`, set under the command center's effort mapping of 2026-10-08, which runs judgment work (designated reads, adjudication, pull request and security reviews, audits) at `max`. Every job records its level and the reason, because an unset level is a defect. The level has to be in `claude_args`: `--restricted` ignores the settings files that would otherwise carry a session's level, and on the Claude API Opus 5.5 runs at `medium` when a request leaves effort unset (bundled `claude-api` skill 2.1.295, `shared/model-migration.md`). `claude --help` (2.1.295) lists `low, medium, high, xhigh, max`. A loopback dry run of the installed 2.1.295 client with this workflow's `claude_args` sent `output_config.effort: "max"`, adaptive thinking and no `speed` field on every request. At `max`, thinking takes a larger share of the output than at the default level, so the estimate below is a floor; the client budget still bounds each run. A local run of this workflow's prompt and `claude_args` at `max` (Opus 5.5, Claude Code 2.1.295, billed to a second Anthropic key through the credential runner) used 10 of 20 assistant turns and a client cost estimate of about $2.03 of the $3 budget, and its result's `num_turns` was 46 (`evidence/artifacts/claude-actions-fence-smoke-20261008/local-parity-receipt.json`). The same file's LR entry, the 12-request run cited under After the run, also records its target pull request (#897 at `24821c57`), its report's two blocking findings and the report's sha256, amended on 2026-10-09 from that run's harness receipt.
+`--effort max` in `claude_args`, set under the command center's effort mapping of 2026-10-08, which runs judgment work (designated reads, adjudication, pull request and security reviews, audits) at `max`. Every job records its level and the reason, because an unset level is a defect. The level has to be in `claude_args`: `--restricted` ignores the settings files that would otherwise carry a session's level, and on the Claude API Opus 5.5 runs at `medium` when a request leaves effort unset (bundled `claude-api` skill 2.1.295, `shared/model-migration.md`). `claude --help` (2.1.295) lists `low, medium, high, xhigh, max`. A loopback dry run of the installed 2.1.295 client with this workflow's `claude_args` sent `output_config.effort: "max"`, adaptive thinking and no `speed` field on every request. At `max`, thinking takes a larger share of the output than at the default level, so the dry estimate this record first gave was a floor (Cost of one run withdraws it); the client budget still bounds each run. A local run of this workflow's prompt and `claude_args` at `max` (Opus 5.5, Claude Code 2.1.295, billed to a second Anthropic key through the credential runner) used 10 of 20 assistant turns and a client cost estimate of about $2.03 of the $3 budget it ran with, and its result's `num_turns` was 46 (`evidence/artifacts/claude-actions-fence-smoke-20261008/local-parity-receipt.json`). The same file's LR entry, the 12-request run cited under After the run, also records its target pull request (#897 at `24821c57`), its report's two blocking findings and the report's sha256, amended on 2026-10-09 from that run's harness receipt.
 
 ## Cost of one run
 
-Dry estimate, Claude Opus 5.5 at $4 input, $5 five-minute cache write, $0.20 cache read and $20 output per million
-tokens: about 30,000 uncached input, 60,000 to 90,000 cache-written, 300,000 to 500,000 cache-read and 20,000 output
-tokens, $0.90 to $1.10. An all-uncached reading of the same volume stays under the $3 budget. These are estimates;
-the first activated run's `usage.json` replaces them.
+This record first gave a dry estimate of $0.90 to $1.10 a run, from Opus 5.5 prices ($4 input, $5 five-minute cache
+write, $0.20 cache read and $20 output per million tokens) and an assumed 30,000 uncached input, 60,000 to 90,000
+cache-written, 300,000 to 500,000 cache-read and 20,000 output tokens. It is withdrawn: it was below the measured
+cost of a run of this shape, the $2.03 of the local run under Effort, which replaces it. The first activated run's
+`usage.json` will replace that measurement in turn.
+
+The caps come from measurement (command center, 2026-10-09): a cap bounds a runaway at about twice the measured p95
+and never trims a normal run. This workflow has one measured run of its own prompt and `claude_args`, the local run
+under Effort: 10 assistant turns and $2.03, billed to the second Anthropic key on the installed 2.1.295 and not
+through the action. With one run, its figures stand in for the p95. Twice them is 20 turns and about $4.1, so the
+turn limit stays 20 and the budget moves from $3 to $5, rounded up. The expected cost of a run is about $2. Hosted
+runs bill the Console organization named below, not the second key, so $5 is this workflow's spend limit per run
+once `CLAUDE_HARNESS_AUDIT_ENABLED` is set; from then on each weekly schedule tick and each owner dispatch is one run.
 
 The pinned audit prompt has four phases and eight dimensions and was written for a session with a shell; `main`
 gave it 60 turns. Twenty turns without a shell may not finish it. The prompt tells the model its limit, and a run
@@ -240,7 +251,7 @@ Runs spend from the Console organization that the repository variables `ANTHROPI
   entry for `harness-audit.yml:audit` changes from `["id-token: write", "issues: write"]` to `["id-token: write"]`.
   No other entry and no exemption changes.
 
-New, in `tests/test_claude_harness_audit_bounds.py` (26 tests): the job's condition, permissions, pin, inputs, flags
+New, in `tests/test_claude_harness_audit_bounds.py` (29 tests): the job's condition, permissions, pin, inputs, flags
 and settings are asserted from the workflow file, and the guard, numbers and report steps are executed as written on
 synthetic inputs. Sixteen weakened copies of the workflow each fail at least one test: a $30 budget check, a
 600,000-byte cap, 60 or 200 turns, a settings check that passes a symlink, a cache check that accepts zero, an added
@@ -287,6 +298,106 @@ was. The step now writes the text with `jq -j`, which adds none, and a test publ
 60,001 bytes (no notice, then the notice); a copy that writes with `jq -r` again fails it. The step's comment now
 says it publishes the last non-empty result text, which it does.
 
+## R5: quality and correctness (2026-10-09)
+
+The command center's security read of this PR at `0be47ac7` (2026-10-09, changes requested) asked for exact pins on
+`claude_args` and the `--settings` JSON, for the shape tests to run without PyYAML and for two weak assertions to be
+fixed. A designated GPT read of #895 (P2) found a tool-list filter that this workflow's numbers step shares. Under
+the command center's scope decision of 2026-10-09 this round makes quality and correctness changes only, together
+with the caps the command center approved from measurement the same day. Every change, by name:
+
+- Step "Keep the run's numbers and check the bounds": the session start record's tool list is now bound whole as
+  `$listed`, and its string entries as `$tools`, as before. `forbidden_tools` keeps the string entries outside Read,
+  Glob and Grep, found as before, and adds one `non-string tool entry` for each entry of `$listed` that is not a
+  string, so such a list fails with "Bounds not met: tools outside Read, Glob and Grep: non-string tool entry". At
+  `0be47ac7` the step dropped those entries: a list holding Read, Glob, Grep and `{"name":"Bash"}`, `null` or `17`
+  exited 0 with an empty `forbidden_tools`, which lets the publish step run (measured on the numbers step's shell,
+  2026-10-09). The by-name list above now says what `forbidden_tools` holds. Apart from this and the budget below,
+  no workflow line changes; the guard step is as at `0be47ac7`.
+- The budget moves from $3 to $5 and the turn limit stays 20 (the derivation is under Cost of one run). In the
+  workflow: `--max-budget-usd 3` becomes `--max-budget-usd 5` in `claude_args`; the numbers step's cost check becomes
+  `.total_cost_usd > 5`, with the message "client cost estimate <x> USD, above 5"; and the header comment's "$3
+  client budget" becomes "$5 client budget". In the tests: the exact pin and
+  `test_claude_has_three_read_tools_and_fixed_bounds` expect `--max-budget-usd 5`; the "over the client budget" case
+  of `test_an_unmet_bound_fails_after_the_numbers_were_kept` costs 5.01 instead of 3.01;
+  `test_the_step_names_every_unmet_bound` costs 5.5 and looks for "above 5"; and the new test
+  `test_the_cost_bound_is_the_five_dollar_budget` requires a run that cost exactly $5 to pass and one that cost $5.01
+  to fail with "Bounds not met: client cost estimate 5.01 USD, above 5". The turn limit's tests at 20 and 21 are
+  unchanged. In this record, these now say $5 or 5: the opening paragraph, the `claude_args` bullet and the cost
+  message in the by-name list, the $5 row of the bounds table, this workflow's column of the flag table under What
+  was checked at runtime, and the cost bound under After the run. Under Effort, the local run's $3 budget is now
+  "the $3 budget it ran with"; Cost of one run gains the derivation paragraph. Outside this record, the Harness audit
+  entry of `docs/github-automation.md` now says "a $5 client budget".
+- Cost of one run withdraws the dry estimate of $0.90 to $1.10 a run that this record first gave, together with its
+  sentence that an all-uncached reading of the same volume stays under the budget: the estimate was below the
+  measured cost of a run of this shape, $2.03, which replaces it. The sentence under Effort that called the estimate
+  a floor now says it was one and points to the withdrawal.
+- `HarnessAuditShapeTests` loses its `@unittest.skipUnless(yaml, "PyYAML is needed to read the workflow's steps")`.
+  Without PyYAML its ten tests, the nine that skipped and the new pin test below, read the workflow with the policy
+  test's strict loader
+  (`tests.test_workflow_policy.load_workflow`), as the step tests already did, and
+  `tests.test_workflow_policy.StrictLoaderTests.test_the_loader_agrees_with_pyyaml` holds that loader to PyYAML's
+  reading of every workflow, this one included. The sentence under Changed existing test contracts that the step
+  tests no longer skip without PyYAML was true but incomplete: the nine shape tests still skipped until this round.
+- New test `test_claude_args_and_the_settings_json_are_pinned_exactly` compares the whole `claude_args` token list,
+  each line split with `shlex.split`, and the whole parsed `--settings` JSON with exact copies. `${{ runner.temp }}`
+  stays as the three tokens `${{`, `runner.temp` and `}}/harness-audit`: GitHub substitutes it before the action
+  parses the text, so the list pins the workflow's text, not the path Claude Code receives. The earlier tests look
+  for one flag or rule at a time, so a widened or repeated `--add-dir`, a second turn or budget flag or a new key
+  such as `permissions.additionalDirectories` passed them.
+- `test_the_cap_never_splits_a_character_and_a_short_report_has_no_notice` now requires the short report's step to
+  exit 0 and to publish `<pre>`, the report and `</pre>` on their own lines; it checked only that no notice was
+  printed.
+- `test_the_turn_bound_counts_assistant_turns_not_transcript_messages` now also requires a run with no assistant
+  message and a `num_turns` of 9 to fail with "Bounds not met: 0 assistant turns, outside 1 to 20". Before, removing
+  `.assistant_turns < 1` from the bounds failed no test.
+- New test `test_a_non_string_tool_entry_is_a_forbidden_tool`: for `{"name":"Bash"}`, `null` and `17` in turn, next
+  to Read, Glob and Grep, the step exits non-zero with the message above and records `forbidden_tools` as
+  `["non-string tool entry"]`.
+- The module runs 29 tests with PyYAML 6.0.3 and 29 without PyYAML, none skipped (Python 3.12). The count under
+  Changed existing test contracts changes from 26 to 29, and the `local_integration` line under Evidence class now
+  names the run without PyYAML.
+
+Weakened copies of the workflow, each run against the module as at `0be47ac7` and as changed here (a script outside
+the repository; measured 2026-10-09 with PyYAML 6.0.3 and without PyYAML, with the same result except where noted).
+The module at `0be47ac7` expects the $3 budget, so it runs on each copy with the three budget texts put back at 3;
+for a copy that weakens the budget itself, that comparison does not apply:
+
+| Weakened copy | Tests at `0be47ac7` that fail | Tests of this round that fail |
+| --- | --- | --- |
+| none (control) | none | none |
+| `--add-dir ${{ runner.temp }}`, widened from its `harness-audit` subdirectory | none | the pin test |
+| a second `--add-dir /` | none | the pin test |
+| a second `--max-turns 200` | none | the pin test |
+| a second `--max-budget-usd 30` | none | the pin test |
+| `"additionalDirectories":["/"]` added to `permissions` | none | the pin test |
+| `--max-turns 60` | `test_claude_has_three_read_tools_and_fixed_bounds` with PyYAML; none without, where the shape tests skipped | that test and the pin test |
+| the report step publishes nothing | three other report tests | those three and the short-report test |
+| the report step exits 1 after publishing | five report tests, the short-report test among them (its long report checked the exit) | the same five |
+| no newline before `</pre>` | none | the short-report test |
+| `.assistant_turns < 1` removed | none | the turn-bound test |
+| the string filter put back on `$listed` | none | the non-string test, for all three entries |
+| `forbidden_tools` as at `0be47ac7`, without the non-string term | none | the non-string test, for all three entries |
+| the non-string label sent through the name filter, so it reads `other` | none | the non-string test, for all three entries |
+| `--max-budget-usd` back to 3 | does not apply | the pin test and `test_claude_has_three_read_tools_and_fixed_bounds` |
+| the cost check back at 3, with its message | does not apply | the cost-bound test and `test_the_step_names_every_unmet_bound` |
+| the cost check raised to 50 | does not apply | the cost-bound test, `test_the_step_names_every_unmet_bound` and the "over the client budget" case |
+| the cost check refusing the budget itself (`>= 5`) | does not apply | the cost-bound test |
+
+Also recorded in this round:
+
+- The round's first common item, removing symbolic links from a checked-out pull request head, does not apply: this
+  job checks out this repository at the run's own ref (the `Check out` step passes no `ref`), which the job
+  condition limits to `refs/heads/main`, and checks out no pull request head, so there is no `pr-head/` tree and no
+  removal step is added.
+- In agent mode the action rewrites the checkout's `origin` URL with the job token (`src/github/operations/git-config.ts:129-134`, called from `src/modes/agent/index.ts:52-61` at `2dca132f`), so `persist-credentials: false` does not keep the token out of `.git/config`; the deny rules `Read(./.git/**)` and `Read(./**/.git/**)` are what keep the model from reading it, as two 2026-10-09 probes on the installed 2.1.295 measured.
+- The read's gap 5 is an owner Console decision outside this PR: if the Anthropic federation rule matches only the
+  OIDC subject, another workflow of this repository that holds `id-token: write` on `main` (today
+  `publish-catalog.yml`, whose publish job a dispatch on `main` runs with no environment, so with the same subject)
+  could exchange its token for a Claude token. Binding the rule to the token's `job_workflow_ref` claim is a Console
+  setting, so it is the owner's credential decision; nothing here changes the rule.
+- Security hardening from the 2026-10-09 read (debug-value widening, tool-list shape, extra deny rules, token-source and guard-step assertions) is filed as follow-ups before any enabling variable is set.
+
 ## Alternatives considered
 
 - **Keep `gh issue create`.** Rejected: it is the one write path the model had, and `--body-file` makes it a read
@@ -314,7 +425,7 @@ says it publishes the last non-empty result text, which it does.
 `native_proven` for the receipt's own flag set on the installed client (`receipt.json`; the table under What was
 checked at runtime lists every way it differs from this workflow's `claude_args`), not for this workflow's flags, and
 not through the action or on a GitHub runner. `local_static_analysis`: actionlint 1.17.0 and zizmor 1.30.1
-(offline, regular and pedantic), no findings. `local_integration`: the unit tests named above, PyYAML 6.0.3 on Python 3.12, and the
+(offline, regular and pedantic), no findings. `local_integration`: the unit tests named above, on Python 3.12 with PyYAML 6.0.3 and without PyYAML, and the
 2026-10-09 local probe of the `.git` and `.env` deny rules and its control without them (`deny-probe-receipt.json`; two subscription runs on
 the installed client with this workflow's fence flags; their streams stay outside the repository). `documented_api_check`: the `gh api` reads
 named above. No hosted run of this workflow is part of this record.

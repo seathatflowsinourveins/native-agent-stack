@@ -9,7 +9,7 @@ name: harness-audit
 # "Federation exemption (2026-10-08)").
 #
 # Bounded since 2026-10-08 (docs/decisions/2026-10-08-claude-actions-harness-audit-bounds.md): Claude has Read, Glob and
-# Grep only, at most 20 turns and a $3 client budget; the job holds no write scope beyond the OIDC token;
+# Grep only, at most 20 turns and a $5 client budget; the job holds no write scope beyond the OIDC token;
 # a model-free step copies the report
 # to the job summary and keeps the run's token and cost numbers. The job runs only while the repository variable
 # CLAUDE_HARNESS_AUDIT_ENABLED is 'true', and only on the first attempt of a run: a re-run would spend again without a
@@ -115,7 +115,7 @@ jobs:
             --model claude-opus-5-5
             --effort max
             --max-turns 20
-            --max-budget-usd 3
+            --max-budget-usd 5
             --tools Read,Glob,Grep
             --allowedTools Read,Glob,Grep
             --restricted
@@ -153,7 +153,8 @@ jobs:
             if ($result.total_cost_usd | type == "number" and . >= 0) and ($result.num_turns | count) and
                ($result.modelUsage | type == "object" and length > 0)
             then . else error("usage unavailable") end |
-            (($init.tools // []) | map(select(type == "string"))) as $tools |
+            ($init.tools // []) as $listed |
+            ($listed | map(select(type == "string"))) as $tools |
             ([.[] | select(.type == "result") | .result // "" | select(type == "string" and . != "")] | last // "")
               as $text |
             ([.[] | select(.type == "assistant") | .message.id? | select(type == "string")] | unique | length) as $turns |
@@ -165,7 +166,8 @@ jobs:
              session_started: ($init != null),
              claude_code_version: (($init.claude_code_version // "unknown") | name),
              tools: ($tools | map(name)),
-             forbidden_tools: ($tools | map(select(IN("Read", "Glob", "Grep") | not)) | map(name)),
+             forbidden_tools: (($tools | map(select(IN("Read", "Glob", "Grep") | not)) | map(name)) +
+               ($listed | map(select(type != "string") | "non-string tool entry"))),
              mcp_servers: (($init.mcp_servers // []) | length),
              models: ($result.modelUsage | to_entries | map(
                if (.value.inputTokens | count) and (.value.outputTokens | count) and
@@ -197,7 +199,7 @@ jobs:
             (if .mcp_servers != 0 then "\(.mcp_servers) MCP servers in the session" else empty end),
             (if .assistant_turns < 1 or .assistant_turns > 20 then "\(.assistant_turns) assistant turns, outside 1 to 20"
              else empty end),
-            (if .total_cost_usd > 3 then "client cost estimate \(.total_cost_usd) USD, above 3" else empty end),
+            (if .total_cost_usd > 5 then "client cost estimate \(.total_cost_usd) USD, above 5" else empty end),
             (if ((.models | map(.cache_read_input_tokens) | add) // 0) <= 0 then "no cache read" else empty end),
             (if .result_chars < 1 then "no result text" else empty end)
           ] | join("; ")' "$out/usage.json")"
