@@ -156,8 +156,8 @@
     },
     "verifier": {
       "path": "R3-VERIFY.py",
-      "sha256": "8d86e1d3cc517c549ad4f7b9dff660a50bc95cc3804822989b1d72086b9f5018",
-      "source": "CPython3.12.3json.load/hashlib.file_digest; nativeuutils0.10.0sha256sumtextcarrier; smallstructuraljoinglueforCC-R3-1,notupstreamtest/A-B/E2Erunner"
+      "sha256": "069b02a4fe697606207390daf7e91bedbaca82fe03507a64a85f75144a3becbf",
+      "source": "CPython 3.13.16 json.loads/hashlib.sha256, json.JSONDecodeError, pathlib/OSError and re.fullmatch; native uutils-coreutils 0.10.0 sha256sum text carrier. Small structural join glue for CC-R3-1 at native-agent-stack@36e36ea498e23ffd5bfc103035a2da883a6a08e4, hardened by R3-F2. Local structural checks and synthetic unittest mutations; not an upstream test, A/B or E2E runner or scientific acceptance."
     },
     "withdrawn_early_attempt_used": false
   }
