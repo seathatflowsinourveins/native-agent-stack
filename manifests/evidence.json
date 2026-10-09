@@ -17732,8 +17732,8 @@
     },
     {
       "path": "docs/decisions/2026-09-27-model-currency.md",
-      "sha256": "745ad71ad16dd817254fa8f8b19f4a0840743d04ad6e669e7ff2595a7877e7fe",
-      "bytes": 61192
+      "sha256": "755133f33364c46b21482700fdf8240b26869abd1df7a10e67ccd796319bf287",
+      "bytes": 61175
     },
     {
       "path": "docs/decisions/2026-09-27-omniroute-account-pool.md",
@@ -17787,8 +17787,8 @@
     },
     {
       "path": "docs/decisions/2026-09-29-codex-lane-default-effort.md",
-      "sha256": "29b92f10b98a6ba5f0bce9bec0bfa2386d7dfd26641bda0b716cf2084c842916",
-      "bytes": 9080
+      "sha256": "144a42febfbe9788f6b0b30af252294fbd1804b49b73bd658f60a046d0dbb3d1",
+      "bytes": 8980
     },
     {
       "path": "docs/decisions/2026-09-29-frozen-check-grader.md",

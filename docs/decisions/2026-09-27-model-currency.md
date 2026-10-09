@@ -513,10 +513,10 @@ installs it verbatim, passes its model as `-m` and refuses any Codex but its `CO
 
 ### Addendum 2026-10-04: template advisor becomes Opus 5.5
 
-The dated advisor configuration selects Opus 5.5 on 2026-10-04 at about 15:10Z. The template
+The user chose Opus 5.5 as the advisor on 2026-10-04 at about 15:10Z. The template
 `adoption/templates/claude.settings.template.json` now carries `"advisorModel": "opus"`. See
 [the October 4 advisor decision](2026-10-04-coordinator-dispatch-and-spend.md#advisor-model) and
-[PR #691](https://github.com/seathatflowsinourveins/native-agent-stack/pull/691) for the configuration change, historical
+[PR #691](https://github.com/seathatflowsinourveins/native-agent-stack/pull/691) for the user's choice, historical
 Fable cost share and supplied workstation read-back. The
 [native advisor setting](https://code.claude.com/docs/en/advisor#set-advisormodel-in-settings) supports this alias.
 The north-star action is to preserve research and historical-simulation capacity while attributing coordinator spend.
