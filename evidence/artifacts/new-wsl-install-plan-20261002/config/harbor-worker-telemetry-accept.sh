@@ -70,7 +70,7 @@ run="$(mktemp -d "$state_root/worker-telemetry.XXXXXXXX")"
 # No provider account, credential store, or collector configuration is copied.
 harbor run --config "$HARBOR_TELEMETRY_JOB_CONFIG" -p "$HARBOR_TELEMETRY_TASKS" \
   -e docker --force-build -n 1 -o "$run" --job-name worker-telemetry
-python3 - "$run/worker-telemetry" "$tool_root/harbor-v0.23.0" <<'PY'
+python3 - "$run/worker-telemetry" "$tool_root/harbor-v0.24.0" <<'PY'
 import json
 import os
 import subprocess

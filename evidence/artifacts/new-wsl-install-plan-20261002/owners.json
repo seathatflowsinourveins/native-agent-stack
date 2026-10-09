@@ -480,10 +480,11 @@
    "repository": "https://github.com/harbor-framework/harbor",
    "installed": true,
    "note": "",
-   "tag_name": "v0.23.0",
-   "published_at": "2026-09-12T04:55:17Z",
+   "tag_name": "v0.24.0",
+   "published_at": "2026-10-05T05:04:52Z",
    "pushed_at": "2026-10-01T15:35:19Z",
-   "default_branch": "main"
+   "default_branch": "main",
+   "current_release_source": "evidence/artifacts/harbor-0240-currency-20261009/upstream/release.json"
   },
   {
    "layer": "quality-evaluation",

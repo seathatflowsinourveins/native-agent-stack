@@ -191,8 +191,9 @@ SDK qualification.
 
 Harbor's selected Linux source test requires its upstream developer setup,
 including Python 3.13, Docker/Compose and Deno, and excludes the runtime suite.
-Its wheel digest is **published PyPI metadata only**; the wheel was not downloaded
-or rehashed, and the profile's integrity gap is unchanged. promptfoo's `npm test`
+Its official 0.24.0 wheel was downloaded and independently rehashed against
+the published PyPI digest; native installation and acceptance remain unrun.
+The profile records `downloaded_and_rehashed`. promptfoo's `npm test`
 maps to `vitest run`; provider evaluations remain separate. mise requires its
 upstream development setup, and the selected E2E regex runs only `test_use`.
 The receipt retains the prior mise source-fetch 404 and researcher capacity
@@ -221,7 +222,7 @@ have no default-install precedence.
 | trafilatura | 2.2.0 | [tagged installation guide](https://github.com/adbar/trafilatura/blob/v2.2.0/docs/installation.rst#L73) |
 | Chrome DevTools MCP | 1.10.1 | [reviewed install source](https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/docs/client-configurations.md#L71); one `chrome-devtools` stdio server in both clients, also for diagnostics |
 | Inspect AI | 0321960a92aa52390413ce011d67ffb5962a2b11 | [reviewed install source](https://github.com/UKGovernmentBEIS/inspect_ai/blob/0321960a92aa52390413ce011d67ffb5962a2b11/README.md) |
-| Harbor | 0.23.0 | [reviewed install source](https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/README.md) |
+| Harbor | 0.24.0 | [reviewed install source](https://github.com/harbor-framework/harbor/blob/b53b8134e1241686dca7759af188f987ecc48e8b/README.md) |
 | promptfoo | 0.123.1 | [reviewed install source](https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/README.md) |
 | Claude Agent SDK | 0.2.163 | [reviewed install source](https://github.com/anthropics/claude-agent-sdk-python/blob/1ef6d8c71bb0e44a6b33fe61497864f21e17fdb7/README.md) |
 | Codex TypeScript SDK | 0.159.3 | [reviewed install source](https://github.com/openai/codex/blob/rust-v0.159.3/sdk/typescript/README.md) |

@@ -766,15 +766,15 @@ inspect-ai() {
 }
 
 harbor-containerized-agent-e2e-runner() {
-  # Harbor 0.23.0: published wheel hash, unchanged upstream tests and native recipe.
+  # Harbor 0.24.0: verified wheel hash, unchanged upstream tests and native recipe.
   copy_config 'harbor-worker-telemetry-accept.sh' || return "$?"
   copy_config 'harbor-worker-telemetry-contract.md' || return "$?"
-  # Source: https://pypi.org/pypi/harbor/0.23.0/json
-  run_command 'fetch_verified https://files.pythonhosted.org/packages/19/c7/607ff037dff1f40d1f941b9854742d66fd43630274fd4e7b8de8480dad34/harbor-0.23.0-py3-none-any.whl 8747400dbb2a5e2298e1338e17e88eba38433c0433fd700f34d1a9021bba5c37 "$tool_root/downloads/harbor-0.23.0-py3-none-any.whl"' || return "$?"
-  # Source: https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/README.md#L22
-  run_command 'uv tool install --python 3.13 "$tool_root/downloads/harbor-0.23.0-py3-none-any.whl"' || return "$?"
-  # Source: https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/README.md#L32
-  run_command 'checkout_tag https://github.com/harbor-framework/harbor.git v0.23.0 "$tool_root/harbor-v0.23.0"; [[ "$(git -C "$tool_root/harbor-v0.23.0" rev-parse HEAD)" == 1e5c5c6db929a10a140d05e606882c671ae20729 ]]' || return "$?"
+  # Source: https://pypi.org/pypi/harbor/0.24.0/json
+  run_command 'fetch_verified https://files.pythonhosted.org/packages/9e/63/0e3d788e8d1ed116125507c6a01e3fb95cf82be71f2ea7040a1458709d21/harbor-0.24.0-py3-none-any.whl 23b7ba616a3aae4eff561ced5e2c51c7186f2981e53a770dea9c689d3969877c "$tool_root/downloads/harbor-0.24.0-py3-none-any.whl"' || return "$?"
+  # Source: https://github.com/harbor-framework/harbor/blob/b53b8134e1241686dca7759af188f987ecc48e8b/README.md#L22
+  run_command 'uv tool install --python 3.13 "$tool_root/downloads/harbor-0.24.0-py3-none-any.whl"' || return "$?"
+  # Source: https://github.com/harbor-framework/harbor/blob/b53b8134e1241686dca7759af188f987ecc48e8b/README.md
+  run_command 'checkout_tag https://github.com/harbor-framework/harbor.git v0.24.0 "$tool_root/harbor-v0.24.0"; [[ "$(git -C "$tool_root/harbor-v0.24.0" rev-parse HEAD)" == b53b8134e1241686dca7759af188f987ecc48e8b ]]' || return "$?"
 }
 
 promptfoo() {

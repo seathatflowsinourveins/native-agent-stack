@@ -1,9 +1,15 @@
-# Worker telemetry contract qualification through Harbor 0.23.0
+# Worker telemetry contract qualification through Harbor 0.24.0
 
 This is an acceptance recipe, UNRUN. Harbor qualifies the contract. Codex
 rust-v0.160.0 and OpenHands software-agent-sdk v1.50.1 produce the events; OTel
 Collector Contrib v0.162.0 collects and routes them in its own slot. The existing
 Harbor oracle/nop hello-user acceptance remains the runner READY gate.
+
+The current Harbor owner and Scout ATIF companion use 0.24.0 at
+`b53b8134e1241686dca7759af188f987ecc48e8b`. The pinned source still ships
+the hello-user task, its oracle/nop integration test and the trajectory
+validator unit test. The source-method references below retain the recipe's
+original provenance; current executable checkout paths use v0.24.0.
 
 The qualification needs a maintained, versioned Harbor task corpus with native
 verifiers, its full source commit, and a public Harbor JSON job recipe with all

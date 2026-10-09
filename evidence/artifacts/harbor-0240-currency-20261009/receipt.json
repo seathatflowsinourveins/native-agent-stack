@@ -1,7 +1,9 @@
 {
   "schema_version": 1,
   "kind": "harbor-profile-currency-source-and-artifact-review",
-  "recorded_at_utc": "2026-10-09T10:08:09Z",
+  "recorded_at_utc": "2026-10-09T17:26:38Z",
+  "initial_draft_recorded_at_utc": "2026-10-09T10:08:09Z",
+  "record_time_correction": "The initial draft time predates the later bound 11:16-11:31 source captures and owner amendment. This current envelope is recorded after those inputs; original per-source capture times and bytes remain unchanged.",
   "base_commit": "958a6d1ab770c807c5ee59748475a5c14df7ba52",
   "repository": "https://github.com/harbor-framework/harbor",
   "previous_profile_version": "0.23.0",

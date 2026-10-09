@@ -1691,6 +1691,27 @@ class NewWslHandbookTests(unittest.TestCase):
                 self.assertEqual(pin, harbor["pin"],
                                  "operative owner installs must use the current Harbor profile pin")
 
+        plan_root = "evidence/artifacts/new-wsl-install-plan-20261002/"
+        plan = json.loads(self.committed(plan_root + "install-plan.json"))
+        direct, = [row for row in plan["owners"]
+                   if row["slot"] == "harbor-containerized-agent-e2e-runner"]
+        with self.subTest(carrier="direct Harbor owner"):
+            self.assertEqual(direct["release"], "v" + harbor["pin"])
+            self.assertEqual(direct["source_checkout"]["tag"], "v" + harbor["pin"])
+        executable = "\n".join(direct["commands"])
+        executable += "\n" + "\n".join(stage["command"]
+                                       for stage in direct["acceptance"].values())
+        for filename in ("install.sh", "accept.sh", "config/harbor-worker-telemetry-accept.sh"):
+            executable += "\n" + self.committed(plan_root + filename)
+        installed_pins = re.findall(r"harbor-(\d+\.\d+\.\d+)(?:-py3-none-any\.whl|[\"/])",
+                                    executable)
+        installed_pins += re.findall(r"harbor-v(\d+\.\d+\.\d+)", executable)
+        self.assertTrue(installed_pins, "the direct owner and its executable mirrors must be checked")
+        for pin in installed_pins:
+            with self.subTest(carrier="Harbor executable pin", pin=pin):
+                self.assertEqual(pin, harbor["pin"],
+                                 "the CLI producing ATIF must match the companion reading it")
+
     def test_the_committed_outputs_are_current_and_the_handbook_receipt_names_them(self):
         result = subprocess.run([sys.executable, str(ROOT / "scripts/build_new_wsl_handbook.py"), "--check"],
                                 capture_output=True, text=True)

@@ -5491,8 +5491,8 @@
     },
     {
       "path": "adoption/new-wsl-profile.md",
-      "sha256": "d3532503a511bda45ebb4a4ce7ab882aaf544001ccf1a60ae2e74afac4a7109c",
-      "bytes": 26039
+      "sha256": "322889d0185960fe4ea4767f6792a26093d77c0433da013604e0f9ab26a7df51",
+      "bytes": 26096
     },
     {
       "path": "adoption/new-wsl/claude-user-instructions.md",
@@ -35332,8 +35332,8 @@
     },
     {
       "path": "evidence/artifacts/harbor-0240-currency-20261009/receipt.json",
-      "sha256": "7454e5f3f70992563ad9ef6c49292da728e7609dcc67624f5776f36ddb5a4ceb",
-      "bytes": 8754
+      "sha256": "bdf43454a627229df2de864ba4e56556d6748af97baaef98f341899ec3668981",
+      "bytes": 9057
     },
     {
       "path": "evidence/artifacts/harbor-0240-currency-20261009/upstream/README.md",
@@ -41987,7 +41987,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/README.md",
-      "sha256": "f399735ce298ce3644f3516e526b0c9edd0b7324e72723b38dda1ee428080919",
+      "sha256": "f804a687bb2574b0ec6fc9e0a4d0dcdcd6c01e6a12e6380741c71189ad8534c4",
       "bytes": 97988
     },
     {
@@ -42002,7 +42002,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
-      "sha256": "9f61e3d885b107b75020ccab1a935418d5d90633539cfff366d07cd57e8e7e47",
+      "sha256": "f292b06ab4d1fd18db2875d10d1e125c48da74a6e2f65f51ed349889ac515ff6",
       "bytes": 199902
     },
     {
@@ -42167,13 +42167,13 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/harbor-worker-telemetry-accept.sh",
-      "sha256": "a79b419cd4fe40faa26e9f45810d6111dfc932200b03cda04bd113e33a2d2490",
+      "sha256": "54c9159afdb62ea4282eddab74c5df6438585f673ef1b20013a973b86a04e9d9",
       "bytes": 5470
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/harbor-worker-telemetry-contract.md",
-      "sha256": "780d12cc74d414f7014d98f756acbe6f68737ca1d319e8176e6b69606835e94c",
-      "bytes": 5004
+      "sha256": "02b2f109819feee5798a21f01ca38332a52df889e16177eb753fd16dbb5092ed",
+      "bytes": 5359
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/hcom-client-config.py",
@@ -42437,13 +42437,13 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
-      "sha256": "4967930d69e16ea9e7a6d86d2b03f515a2fc7c971277a3df1c47cc5f2fd22ac7",
-      "bytes": 487716
+      "sha256": "d050b78949bfba8eb6eee37d9e065bcfb239fef2324f8d75165d168bcff8c5e7",
+      "bytes": 488749
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
-      "sha256": "4fbc7389c4a494acec09043654952ecebb3bf3dab6487cc27d5ef64a957f6821",
-      "bytes": 134397
+      "sha256": "09e547b277b81f4a6a8e3e6a8eb28a288985d170e82e4177b75583984e756f92",
+      "bytes": 134392
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/mise.toml",
@@ -42467,8 +42467,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/owners.json",
-      "sha256": "b3453c5e51587a0811d8fd9bf12345c03857390d22a9483685b68f0577390a83",
-      "bytes": 35189
+      "sha256": "c4ce11ac6ee48395fa0de4c639fbc59bc810aa143baa736301129daa380318f3",
+      "bytes": 35292
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/real-distribution-validation.json",
@@ -60692,8 +60692,8 @@
     },
     {
       "path": "tests/test_new_wsl_handbook.py",
-      "sha256": "0c1d05dbe70d1334a956d86abe8ad85563661dffa7d7b323fb24fa45a92b4205",
-      "bytes": 106029
+      "sha256": "152c1abbe8d2b45b121ed514f5f6e32cc98f357f8f5ce7635965156b55d60a5a",
+      "bytes": 107447
     },
     {
       "path": "tests/test_new_wsl_profile.py",
