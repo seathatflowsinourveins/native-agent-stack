@@ -285,24 +285,25 @@ class TriageShapeTests(unittest.TestCase):
     def test_claude_args_are_pinned_exactly(self):
         # Each line is split as a shell splits it (the action runs shell-quote over the whole input) after GitHub
         # fills in runner.temp, and the two JSON values are parsed. A flag added, dropped or given twice (a second
-        # --add-dir, budget or turn limit), a wider --add-dir, or any change to the settings or the schema fails here.
+        # --add-dir or budget), a wider --add-dir, or any change to the settings or the schema fails here.
         # --restricted and --setting-sources user each keep the repository's project settings out (six runs of
         # Claude Code 2.1.295, 2026-10-09: either flag alone did), so both stay and either holds if the other changes.
+        # No --max-turns in any form or place (on its own line, after another flag, as --max-turns=8): the action fails
+        # a success whose num_turns exceeds it, and num_turns counts transcript messages, not turns; the numbers step
+        # bounds the assistant turns instead. It is checked first, on the raw text, so it holds if the list is edited.
+        self.assertNotIn("--max-turns", step(CLASSIFY)["with"]["claude_args"])
         parsed = []
         for line in arguments():
             flag, *values = shlex.split(line.replace("${{ runner.temp }}", RUNNER_TEMP_EXAMPLE))
             parsed.append([flag] + [json.loads(value) if flag in ("--settings", "--json-schema") else value
                                     for value in values])
-        # Compared as canonical JSON, because the list holds the parsed JSON values, where 1 == True. No --max-turns:
-        # the action fails a success whose num_turns exceeds it, and num_turns counts transcript messages, not turns;
-        # the numbers step bounds the assistant turns instead.
+        # Compared as canonical JSON, because the list holds the parsed JSON values, where 1 == True.
         self.assertEqual(canonical(parsed), canonical([
             ["--model", "claude-opus-5-5"], ["--effort", "high"], ["--max-budget-usd", "2"],
             ["--tools", "Read,Glob,Grep"], ["--allowedTools", "Read,Glob,Grep"], ["--restricted"],
             ["--permission-prompts", "none"], ["--setting-sources", "user"], ["--strict-mcp-config"],
             ["--settings", SETTINGS],
             ["--json-schema", SCHEMA], ["--add-dir", RUNNER_TEMP_EXAMPLE + "/triage"]]))
-        self.assertNotIn("--max-turns", [words[0] for words in parsed])
 
     def test_a_green_run_with_items_always_has_an_execution_file(self):
         check = step("Require the run's execution file")
@@ -715,8 +716,8 @@ class TriageStepTests(unittest.TestCase):
             run.close()
 
     def test_the_caps_hold_at_eight_turns_and_two_dollars_and_fail_just_above(self):
-        # The caps (8 turns, $2) bound a runaway and never trim a normal run, so a run exactly at both passes; one
-        # more turn or one more cent fails, and the step names the bound.
+        # The bounds (8 assistant turns, $2) are set to fail a runaway and never a normal run, so a run exactly at both
+        # passes; one more turn or one more cent fails, and the step names the bound.
         run = Run()
         try:
             path = run.dir / "execution.json"
@@ -737,12 +738,15 @@ class TriageStepTests(unittest.TestCase):
         # The deliberate exception to the budget-times-1.10 cost bound of the other Claude workflows: with
         # --json-schema the pinned action sets structured_output only for a successful result, so a run that stops at
         # its budget leaves nothing to apply. It fails here at the budget itself, and at $2.20, the bound the factor
-        # would give, the overrun is named as well.
+        # would give, the overrun is named as well. The job summary names the stop too, and only a budget stop: the
+        # step appends to the summary, so it is removed before each run.
         run = Run()
         try:
             path = run.dir / "execution.json"
+            summary = run.dir / "summary.md"
             for cost, overrun in ((2, False), (2.2, True)):
                 with self.subTest(cost=cost):
+                    summary.unlink(missing_ok=True)
                     path.write_text(json.dumps(execution(subtype="error_max_budget_usd", is_error=True,
                                                          total_cost_usd=cost, structured_output=None)),
                                     encoding="utf-8")
@@ -751,9 +755,41 @@ class TriageStepTests(unittest.TestCase):
                     self.assertIn("Bounds not met: the run did not end in success (result subtype "
                                   "error_max_budget_usd)", console)
                     self.assertIn("no structured output", console)
-                    self.assertEqual("client cost estimate 2.2 USD, above 2" in console, overrun, console)
+                    if overrun:
+                        self.assertIn("client cost estimate 2.2 USD, above 2", console)
+                    else:  # at the budget itself no overrun is named, so a bound of >= 2 fails here
+                        self.assertNotIn("above 2", console)
                     self.assertEqual(json.loads(run.read("triage-usage/usage.json"))["result_subtype"],
                                      "error_max_budget_usd")
+                    self.assertIn("Budget stop: the client stopped the run at its 2 USD budget (error_max_budget_usd), "
+                                  "before a structured output, so no label is proposed or applied.",
+                                  run.read("summary.md") or "")
+            summary.unlink(missing_ok=True)
+            path.write_text(json.dumps(execution(subtype="error_during_execution", is_error=True,
+                                                 structured_output=None)), encoding="utf-8")
+            code, console = run.run(NUMBERS, EXECUTION_FILE=str(path))
+            self.assertNotEqual(code, 0, console)
+            self.assertNotIn("Budget stop", run.read("summary.md") or "")
+        finally:
+            run.close()
+
+    def test_a_success_subtype_whose_is_error_is_not_false_names_is_error(self):
+        # A successful result needs subtype "success" and is_error false. One with that subtype and is_error true, null
+        # or another value fails, and the message names is_error, which the subtype alone would hide. The usage record
+        # keeps it: a boolean as it is, null (or no key) as `missing`, anything else as `other`.
+        run = Run()
+        try:
+            path = run.dir / "execution.json"
+            for is_error, shown, recorded in ((True, "true", True), (None, "missing", "missing"),
+                                              ("false", "other", "other")):
+                with self.subTest(is_error=is_error):
+                    path.write_text(json.dumps(execution(is_error=is_error)), encoding="utf-8")
+                    code, console = run.run(NUMBERS, EXECUTION_FILE=str(path))
+                    self.assertNotEqual(code, 0, console)
+                    self.assertIn("Bounds not met: the run did not end in success (result subtype success, is_error "
+                                  f"{shown})", console)
+                    self.assertEqual(canonical(json.loads(run.read("triage-usage/usage.json"))["result_is_error"]),
+                                     canonical(recorded))
         finally:
             run.close()
 

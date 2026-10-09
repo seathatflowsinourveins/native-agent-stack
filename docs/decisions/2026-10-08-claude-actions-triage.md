@@ -25,9 +25,11 @@ PR (#892, 2026-10-09), which found changes its record had not named; the same re
   `action.yml`, lines 136-139 and 152-155 at `2dca132f`) and answers only through `--json-schema`; a numbers step that
   checks the bounds (an allow-list of Glob, Grep, Read and StructuredOutput, in which an entry that is not a string is
   a forbidden tool, tool and MCP lists present, Claude Code 2.1.295, 1 to 8 assistant turns, at most $2, a cache read,
-  a structured output; every unmet bound is named); a validation step that keeps only allowed labels for collected
-  issues (it checks every answer, not that every item is answered: an item the model leaves out gets no label and is
-  collected again by the next run); and an artifact that keeps `usage.json` (numbers only) for 14 days.
+  a structured output; every unmet bound is named, a result that is not a success by its subtype, and by its
+  `is_error` as well when the subtype is `success`; the job summary names a budget stop); a validation step that
+  keeps only allowed labels for collected issues (it checks every answer, not that every item is answered: an item the
+  model leaves out gets no label and is collected again by the next run); and an artifact that keeps `usage.json`
+  (numbers only) for 14 days.
 - `apply` job: no model; `timeout-minutes: 5`; `issues: write` only; it re-reads every proposed issue and adds one
   allow-listed lane label to an open issue that still has none. It refuses (exit 2) a proposal that is not a non-empty
   list of allow-listed `{number, lane}` entries, builds its rows before the loop and refuses (exit 2) a row count that
@@ -45,8 +47,8 @@ PR (#892, 2026-10-09), which found changes its record had not named; the same re
   title to 200 and each body to 2,000 characters, keeps the 30 newest and writes them to a file the model reads as
   data. The numbers and kinds of the collected items are kept outside the model's directories. Claude runs under the
   same read-only fence as the on-demand reviews (`--restricted`, `--permission-prompts none`, Read, Glob and Grep,
-  deny rules in `--settings`), at `high` effort, at most 8 turns and a $2 client budget, and answers only through
-  `--json-schema`:
+  deny rules in `--settings`), at `high` effort with a $2 client budget and no client turn limit (the numbers step
+  fails a run of more than 8 assistant turns once it has ended), and answers only through `--json-schema`:
   per item a number, a lane from a fixed enum or `none`, a confidence and a reason of at most 160 characters. The
   job holds `contents: read`, `issues: read`, `pull-requests: read` and `id-token: write`, nothing that writes.
 - A model-free step in `classify` then checks the structured output: every number must be one the run collected,
@@ -96,8 +98,9 @@ at about twice its measured p95, so that a cap bounds a runaway and never trims 
 about 2,200 characters, read once, are about 27,000 input tokens; at `high` effort up to about 15,000 output tokens are
 assumed. That is about $0.41 at Claude Opus 5.5's standard prices, so a run is expected to cost about $0.40. Twice
 that, with a margin for high-effort thinking, gives the $2 client budget (`--max-budget-usd 2`; $1 before R5). One read
-and one answer is the typical run, so 8 assistant turns bound a runaway (`--max-turns 8` until R6, 6 before R5;
-since R6 the numbers step alone applies the bound, after the run). The same accounting
+and one answer is the typical run, so the numbers step fails a run of more than 8 assistant turns, once the run has
+ended (until R6 `--max-turns 8` also capped the run itself, 6 before R5); while a run lasts, the $2 budget and the
+job's 15-minute timeout bound a runaway. The same accounting
 step as the other Claude workflows keeps the numbers and fails the job unless the run succeeded, used 1 to 8
 assistant turns (distinct assistant message ids; the client's `num_turns` counts transcript messages, tool results
 included, so a 12-request run on 2.1.295 reported 57, and it is only recorded), cost at most $2, ran Claude Code
@@ -116,8 +119,8 @@ Runs spend from the Console organization that the four `ANTHROPIC_*` repository 
 - `tests.test_workflow_security_coverage.NewWorkflowSecurityCoverageTests`: the coverage set gains
   `claude-triage.yml`, with its own offline zizmor test.
 
-New, in `tests/test_claude_triage_workflow.py` (36 tests since R6; 35 at R5, 27 before): triggers, conditions, permissions per job, the pin, the
-flags, the schema's enums and the settings are asserted from the workflow file; the collect, numbers, validation and
+New, in `tests/test_claude_triage_workflow.py` (37 tests since R7; 36 at R6, 35 at R5, 27 before): triggers,
+conditions, permissions per job, the pin, the flags, the schema's enums and the settings are asserted from the workflow file; the collect, numbers, validation and
 apply steps are executed as written against a local stand-in for `gh`. Thirteen weakened copies of the workflow each
 fail at least one test (no check that a number was collected, labels for pull requests or low confidence passed on,
 no pull request or existing-label re-check before writing, no allow-list in the apply job, no cap of 30 items or
@@ -366,6 +369,49 @@ them apart; the schema's `additionalProperties: false` is held the same way. The
 `"disableAllHooks":1` and `"blockReadsOutsideWorkingDirectories":1` (this workflow has no `autoMemoryEnabled` key, so
 the second copy writes its other settings boolean as `1`) each fail both tests. The script now holds 36 copies, and
 each fails the test named for it.
+
+## R7: the J8 micro read of R5 and R6 (2026-10-09)
+
+The J8 micro read of the combined delta `e1ba3bb3..19cf2a0a` (Anthropic's pr-review-toolkit agents
+`pr-test-analyzer` and `silent-failure-hunter` on Claude Opus 5.5 at `max`) found 5 or 6 of the 7 listed findings
+fixed and 2 partly fixed. This round fixes those 2 and the new findings, as the command center ruled.
+
+- **New finding 1 (confidence 70) and F3's remaining part: the record still said "at most 8 turns".**
+  - The by-name list and "Cost of one run" now say what R6 made true: there is no client turn limit; the numbers
+    step fails a run of more than 8 assistant turns once it has ended; and while a run lasts, the $2 budget and the
+    job's 15-minute timeout bound a runaway.
+  - The pull request description's matching sentences are corrected with this push.
+- **F5's remaining part: the job summary did not name a budget stop.** A run that ends with subtype
+  `error_max_budget_usd` now adds a "Budget stop: ..." line to the job summary, saying no label is proposed or
+  applied. A run that ends any other way adds no such line.
+- **New finding 2 (confidence 30): the failure message could say "result subtype success".**
+  - The usage record keeps `result_is_error` (a boolean, or `missing`, or `other`).
+  - When the subtype is `success` but `is_error` is not `false`, the message names it, for example "(result subtype
+    success, is_error true)".
+  - New test: `test_a_success_subtype_whose_is_error_is_not_false_names_is_error`.
+- **New finding 3 (confidence 30): the `--max-turns` check read only the first word of each line.**
+  `test_claude_args_are_pinned_exactly` now checks the raw `claude_args` text first, so `--max-turns` fails in any
+  form or place.
+- **New finding 5 (confidence 25): the $2 case could not see an overrun message.** At the budget itself the test now
+  asserts that no "above 2" message appears.
+- **New finding 4 (confidence 25), disposition: no change.** A runaway could reach the 15-minute timeout before the
+  $2 budget and leave no usage record.
+  - That needs about 100K output tokens at `high` effort within 15 minutes, against a measured run of about 15,000.
+  - A timed-out run fails the job and applies no label either way, so nothing wrong is written.
+  - The read was speculative: it could not see the action's behaviour on cancel.
+- **New finding 6 (confidence 20), disposition: no change.** Four tests assert the first unmet bound, so they depend
+  on the order of the bounds list. That order is part of what the numbers step promises, so a reorder that breaks
+  them should be reviewed.
+
+**Tests and copies.**
+- The module runs 37 tests, up from 36: the is_error test is new, and the budget-stop test now also checks the
+  summary line.
+- Five weakened copies, each run against the test named for it, all fail:
+  - `--max-turns=8` appended to the budget line;
+  - `--max-turns 8` on its own line;
+  - the summary's budget-stop line renamed;
+  - `is_error` dropped from the failure message;
+  - the cost bound changed to `>= 2`.
 
 ## Alternatives considered
 

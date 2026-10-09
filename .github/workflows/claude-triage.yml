@@ -163,7 +163,8 @@ jobs:
       # kept in the record only.
       # The cost bound is the $2 budget itself, not the budget times 1.10 that the other Claude workflows allow: a run
       # that stops at its budget leaves no structured output, so nothing could be applied, and it fails here with its
-      # result subtype named.
+      # result subtype named. The job summary names a budget stop as well. A result of subtype success whose is_error
+      # is not false fails too, and the message names its is_error.
       - name: Keep the run's numbers and check the bounds
         if: ${{ always() && steps.claude_triage.outputs.execution_file != '' }}
         shell: bash
@@ -191,6 +192,7 @@ jobs:
              tools_listed: (($init.tools | type) == "array" and ($init.mcp_servers | type) == "array"),
              successful_result: ($result.subtype == "success" and $result.is_error == false),
              result_subtype: ($result.subtype | name),
+             result_is_error: ($result.is_error | if type == "boolean" then . elif . == null then "missing" else "other" end),
              session_started: ($init != null),
              claude_code_version: (($init.claude_code_version // "unknown") | name),
              tools: ($tools | map(name)),
@@ -213,12 +215,16 @@ jobs:
             jq -r '"| assistant turns | messages | client cost estimate (USD) | completed | Claude Code | tools | MCP servers |",
                    "| ---: | ---: | ---: | --- | --- | --- | ---: |",
                    "| \(.assistant_turns) | \(.num_turns) | \(.total_cost_usd) | \(.successful_result) | \(.claude_code_version) | \(.tools | join(" ")) | \(.mcp_servers) |",
+                   (if .result_subtype == "error_max_budget_usd"
+                    then "", "Budget stop: the client stopped the run at its 2 USD budget (error_max_budget_usd), before a structured output, so no label is proposed or applied."
+                    else empty end),
                    "", "| model | input | cache write | cache read | output |", "| --- | ---: | ---: | ---: | ---: |",
                    (.models[] | "| \(.model) | \(.input_tokens) | \(.cache_creation_input_tokens) | \(.cache_read_input_tokens) | \(.output_tokens) |")' \
               "$out/usage.json"
           } >> "$GITHUB_STEP_SUMMARY"
           failed="$(jq -r '[
-            (if .successful_result != true then "the run did not end in success (result subtype \(.result_subtype))"
+            (if .successful_result != true then "the run did not end in success (result subtype \(.result_subtype)" +
+               (if .result_subtype == "success" then ", is_error \(.result_is_error)" else "" end) + ")"
              else empty end),
             (if .session_started != true then "no session start record" else empty end),
             (if .tools_listed != true then "the session start record lists no tools or MCP servers" else empty end),
