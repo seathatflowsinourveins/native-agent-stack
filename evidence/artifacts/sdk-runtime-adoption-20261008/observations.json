@@ -1,29 +1,156 @@
 {
   "acceptance": {
+    "designated_claude": "CHANGES_REQUESTED",
+    "designated_gpt_exec": "CHANGES_REQUESTED",
+    "ci": "PREVIOUS_HEAD_PASSED_REVISION_PENDING",
+    "ci_head": "45cbdbad4439dba6422fc6617eceee58502a8aaf",
+    "pre_cue": "PENDING",
     "cc_cue": "PENDING",
-    "designated_claude": "PENDING",
-    "designated_gpt_exec": "PENDING",
     "owner_decisions": "PENDING",
-    "pre_cue": "PENDING_CANONICAL_ENTRYPOINT",
-    "wiring_or_retirement_deployed": false
+    "g5_release_binding": "PENDING",
+    "wiring_or_retirement_deployed": false,
+    "delta_reads": "PENDING_REVISION_HEAD",
+    "schema_label_note": "Gate status uses PENDING; missing canonical entry point is a separate gap field.",
+    "pre_cue_entrypoint": null,
+    "memory_cost_gate": "PENDING_COMPONENT_SPECIFIC_PSS"
   },
   "adoption_observation": {
-    "claude_total_sessions": 63,
-    "codex_total_conversations": 841,
-    "counted_layers": [
-      "browser",
-      "client-native",
-      "code intelligence",
-      "evaluation",
-      "memory and retrieval",
-      "observability",
-      "session context and token efficiency"
+    "historical_snapshot": {
+      "bytes": 46103,
+      "path": "${STATE_ROOT}/coordination/command-center/pages/adoption-now.json",
+      "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/adoption.5de97cf238b3d28aa9f7d5110a05857204a847b0c75cda8971de8e142e362e36.json",
+      "sha256": "5de97cf238b3d28aa9f7d5110a05857204a847b0c75cda8971de8e142e362e36"
+    },
+    "historical_generated_utc": "2026-10-08T23:42:51Z",
+    "window_hours": 24,
+    "sdk_snapshot_binding": "BOUND_IMMUTABLE_COOP_SNAPSHOT",
+    "native_loki_aggregates": [
+      {
+        "end_utc": "2026-10-09T01:06:56.047839+00:00",
+        "id": "typescript_sdk_events",
+        "query": "sum by (ecosystem_lane) (count_over_time({service_name=\"codex_sdk_ts\"}[24h]))",
+        "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/typescript_sdk_events.cdaa239e16af4499f87dd4b41886eca64f87af4d3e51fed940b4da280dd8a76d.loki.json",
+        "rows": [
+          {
+            "count": 138109,
+            "labels": {}
+          }
+        ],
+        "sha256": "cdaa239e16af4499f87dd4b41886eca64f87af4d3e51fed940b4da280dd8a76d",
+        "total": 138109,
+        "window_hours": 24
+      },
+      {
+        "end_utc": "2026-10-09T01:06:56.047839+00:00",
+        "id": "typescript_sdk_tool_results",
+        "query": "sum by (ecosystem_lane) (count_over_time({service_name=\"codex_sdk_ts\"} | event_name=\"codex.tool_result\" [24h]))",
+        "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/typescript_sdk_tool_results.ad183319137c43fad6a30453c71ecdab7499e19007cbc23c533ee1f609d9fbbe.loki.json",
+        "rows": [
+          {
+            "count": 708,
+            "labels": {}
+          }
+        ],
+        "sha256": "ad183319137c43fad6a30453c71ecdab7499e19007cbc23c533ee1f609d9fbbe",
+        "total": 708,
+        "window_hours": 24
+      },
+      {
+        "end_utc": "2026-10-09T01:06:56.047839+00:00",
+        "id": "typescript_sdk_conversations",
+        "query": "count by (ecosystem_lane) (sum by (ecosystem_lane, conversation_id) (count_over_time({service_name=\"codex_sdk_ts\"} | event_name=\"codex.tool_result\" [24h])))",
+        "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/typescript_sdk_conversations.5155c4089174502e28aa676fab0bdc793108d25ddb4e8c7440ad8f73893ca542.loki.json",
+        "rows": [
+          {
+            "count": 80,
+            "labels": {}
+          }
+        ],
+        "sha256": "5155c4089174502e28aa676fab0bdc793108d25ddb4e8c7440ad8f73893ca542",
+        "total": 80,
+        "window_hours": 24
+      },
+      {
+        "end_utc": "2026-10-09T01:06:56.047839+00:00",
+        "id": "python_sdk_receipt_events",
+        "query": "sum (count_over_time({service_name=\"codex-sdk-receipt\"}[24h]))",
+        "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/python_sdk_receipt_events.145e231eda2d3d1d9210bc829f05580c149d5047eaffe3c39294967ec43fe11e.loki.json",
+        "rows": [],
+        "sha256": "145e231eda2d3d1d9210bc829f05580c149d5047eaffe3c39294967ec43fe11e",
+        "total": 0,
+        "window_hours": 24
+      },
+      {
+        "end_utc": "2026-10-09T01:06:56.047839+00:00",
+        "id": "app_server_events_by_client",
+        "query": "sum by (ecosystem_lane, client) (count_over_time({service_name=\"codex-app-server\"}[24h]))",
+        "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/app_server_events_by_client.f5a6eac9d40b5d5233694fc8f8e773a632f6f0dc7a426a262453ed5e03894b66.loki.json",
+        "rows": [
+          {
+            "count": 30,
+            "labels": {}
+          }
+        ],
+        "sha256": "f5a6eac9d40b5d5233694fc8f8e773a632f6f0dc7a426a262453ed5e03894b66",
+        "total": 30,
+        "window_hours": 24
+      },
+      {
+        "end_utc": "2026-10-09T01:06:56.047839+00:00",
+        "id": "claude_sdk_query_sources",
+        "query": "sum by (query_source) (count_over_time({service_name=\"claude-code\"} | query_source=~\"sdk.*\" [24h]))",
+        "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/claude_sdk_query_sources.1dcaf1644038547fca635340996755bae05edba9bdf0ef27143851f31d31df77.loki.json",
+        "rows": [
+          {
+            "count": 540,
+            "labels": {
+              "query_source": "sdk"
+            }
+          }
+        ],
+        "sha256": "1dcaf1644038547fca635340996755bae05edba9bdf0ef27143851f31d31df77",
+        "total": 540,
+        "window_hours": 24
+      }
     ],
-    "generated_utc": "2026-10-08T23:42:51Z",
-    "reason": "Counter enumerates MCP servers; SDK/runtime workers have no native per-role organic invocation series in this file. Missing is not zero.",
-    "schema": "adoption-now/1",
-    "sdk_runtime_worker_calls": null,
-    "window_hours": 24
+    "counting_units": {
+      "typescript_sdk_events": "all log events",
+      "typescript_sdk_tool_results": "native codex.tool_result events",
+      "typescript_sdk_conversations": "distinct conversations containing native tool results",
+      "python_sdk_receipt_events": "SDK receipt-spool events",
+      "app_server_events_by_client": "all app-server events",
+      "claude_sdk_query_sources": "events with query_source=sdk"
+    },
+    "limits": [
+      "All events are not invocations or tasks.",
+      "codex_sdk_ts does not identify a standalone versus bundled package path.",
+      "Claude sdk query_source observations are not joined to coordinator role identities.",
+      "An empty receipt spool series is a count for that series, not absence of SDK usage."
+    ],
+    "hourly_sdk_snapshot": {
+      "path": "${STATE_ROOT}/coordination/ns2604-coop/notes/adoption-evidence-20261008/adoption-now-e129759fe91ffbb1.json",
+      "sha256": "e129759fe91ffbb133de2719a7d5194fe96ac65c44b222adf7fdd4d65af0e872",
+      "generated_utc": "2026-10-09T01:39:38Z",
+      "window_hours": 24,
+      "claude_population": 79,
+      "codex_population": 931,
+      "role_rows": {
+        "sdk:codex_sdk_ts:unlabelled": {
+          "conversations": 80,
+          "servers": {
+            "context-mode": {
+              "calls": 107,
+              "conversations": 64
+            },
+            "serena": {
+              "calls": 18,
+              "conversations": 13
+            }
+          }
+        }
+      },
+      "attribution_limit": "SDK native service row remains unlabelled; no natural owning-role attribution inferred."
+    }
   },
   "base_commit": "aba02ec3456d383bcc2fc72883db098f9be7918a",
   "captured_utc": "2026-10-08T23:57:41.565449+00:00",
@@ -162,6 +289,38 @@
         "exists": false,
         "path": "${USER_HOME}/.agents/skills/claude-to-deerflow/SKILL.md"
       }
+    ],
+    "promptfoo_callers": [
+      {
+        "bundled_codex_sdk": "0.153.4",
+        "package_path": "${USER_HOME}/.local/share/codex-ecosystem/tools/promptfoo-0.123.1/lib/node_modules/promptfoo/node_modules/@openai/codex-sdk/package.json",
+        "promptfoo": "0.123.1"
+      },
+      {
+        "bundled_codex_sdk": "0.156.1",
+        "package_path": "${USER_HOME}/.local/share/codex-ecosystem/tools/promptfoo-0.124.0/lib/node_modules/promptfoo/node_modules/@openai/codex-sdk/package.json",
+        "promptfoo": "0.124.0"
+      }
+    ],
+    "openhands": [
+      {
+        "environment": "${USER_HOME}/.local/share/new-wsl-native-stack/tools/agent-runtime-worker",
+        "sdk_metadata": "1.53.0",
+        "tools_metadata": "1.53.0",
+        "editable": false,
+        "dispatcher_selected": true,
+        "source_pin": "54daf056bd863bb46f922a2fe9324dd736b37ff6"
+      },
+      {
+        "environment": "${USER_HOME}/.local/share/new-wsl-native-stack/tools/openhands-source/.venv",
+        "sdk_metadata": "1.50.1",
+        "tools_metadata": "1.50.1",
+        "editable": true,
+        "source_version": "1.53.0",
+        "source_pin": "54daf056bd863bb46f922a2fe9324dd736b37ff6",
+        "dispatcher_selected": false,
+        "restore_boundary": "Vendor source resync produces metadata1.53.0; no supported restore preserves the stale1.50.1/source1.53 mix."
+      }
     ]
   },
   "g5_binding": {
@@ -198,11 +357,22 @@
         "pointer": "/16"
       }
     ],
-    "observed_published_head": "ae6cc2286643822d3a0218136722c69d0127fcd4",
+    "observed_published_head": "083800f288ee7a0a4e836ff06279538d0332b8e2",
     "pr": 878,
-    "status": "PENDING_LANDED_CATALOG"
+    "status": "LANDED_FOUNDATION_RECONCILED_G5_RELEASE_PENDING",
+    "landed_foundation": {
+      "path": "catalogs/landscape/foundation.json",
+      "sha256": "868d193a31080ab913400725140bd0d01e0afe97e28564fd12777f737d22951a",
+      "commit": "aba02ec3456d383bcc2fc72883db098f9be7918a",
+      "pointers": [
+        "/layers/2",
+        "/layers/8",
+        "/layers/16"
+      ],
+      "mutations": []
+    }
   },
-  "schema": "sdk-runtime-adoption-evidence/1",
+  "schema": "sdk-runtime-adoption-evidence/2",
   "sealed_native_evidence": [
     {
       "fresh_client": "claude",
@@ -344,12 +514,6 @@
     }
   ],
   "source_refs": {
-    "adoption": {
-      "bytes": 46103,
-      "path": "${STATE_ROOT}/coordination/command-center/pages/adoption-now.json",
-      "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/adoption.5de97cf238b3d28aa9f7d5110a05857204a847b0c75cda8971de8e142e362e36.json",
-      "sha256": "5de97cf238b3d28aa9f7d5110a05857204a847b0c75cda8971de8e142e362e36"
-    },
     "claude_gateway_trial": {
       "bytes": 19873,
       "path": "${REPO_ROOT}/examples/claude-runtime-sdk/worker.py",
@@ -379,12 +543,6 @@
       "path": "${USER_HOME}/.local/share/new-wsl-native-stack/tools/codex-sdk/node_modules/@openai/codex-sdk/package.json",
       "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/codex_ts_package.e8c2fd59b5499439b33c8fa6f1b6e5d3a51d9a38ca6cca8d8d95f5aa69576338.json",
       "sha256": "e8c2fd59b5499439b33c8fa6f1b6e5d3a51d9a38ca6cca8d8d95f5aa69576338"
-    },
-    "counter": {
-      "bytes": 6657,
-      "path": "${STATE_ROOT}/coordination/command-center/cc-tools/adoption_invoke.py",
-      "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/counter.10784aa8862eaed3a5e0520ecdb2eb58cdf0277f4bab62f8868a86b703954408.py",
-      "sha256": "10784aa8862eaed3a5e0520ecdb2eb58cdf0277f4bab62f8868a86b703954408"
     },
     "deer_vendor_http_skill": {
       "bytes": 6864,
@@ -433,6 +591,114 @@
       "path": "${STATE_ROOT}/research/token-efficiency-20261008/WORKFLOW-BASELINE-20261008.json",
       "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/workflow_baseline.c6e9f24e207520b1dfa1d83f094b9d7c8996dbd6cd1d9019a0c4f115e7407ad8.json",
       "sha256": "c6e9f24e207520b1dfa1d83f094b9d7c8996dbd6cd1d9019a0c4f115e7407ad8"
+    },
+    "historical_adoption": {
+      "bytes": 46103,
+      "path": "${STATE_ROOT}/coordination/command-center/pages/adoption-now.json",
+      "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/adoption.5de97cf238b3d28aa9f7d5110a05857204a847b0c75cda8971de8e142e362e36.json",
+      "sha256": "5de97cf238b3d28aa9f7d5110a05857204a847b0c75cda8971de8e142e362e36"
+    },
+    "historical_counter": {
+      "bytes": 6657,
+      "path": "${STATE_ROOT}/coordination/command-center/cc-tools/adoption_invoke.py",
+      "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/counter.10784aa8862eaed3a5e0520ecdb2eb58cdf0277f4bab62f8868a86b703954408.py",
+      "sha256": "10784aa8862eaed3a5e0520ecdb2eb58cdf0277f4bab62f8868a86b703954408"
+    },
+    "capability_gate_caller": {
+      "bytes": 22476,
+      "path": "${REPO_ROOT}/tools/capability-gate/run_gate.py",
+      "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/capability_gate_caller.3efdc4b54ba33b11c67f8f2449167de03b558e8c53c7e09cdb5a9f66593311a7.py",
+      "sha256": "3efdc4b54ba33b11c67f8f2449167de03b558e8c53c7e09cdb5a9f66593311a7"
+    },
+    "capability_gate_contract": {
+      "bytes": 12956,
+      "path": "${REPO_ROOT}/tools/capability-gate/README.md",
+      "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/capability_gate_contract.9cd718c7161adccdd77d65f3a398bb699531568e065b341c6911181c3916ce99.md",
+      "sha256": "9cd718c7161adccdd77d65f3a398bb699531568e065b341c6911181c3916ce99"
+    },
+    "claude_designated_read": {
+      "bytes": 5143,
+      "path": "${STATE_ROOT}/coordination/command-center/research-cc-role-20261008/pr903-claude-read-45cbdbad.md",
+      "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/claude_designated_read.90bf98f56ab0f5b67028fd358399aaa30a370fd6c67c6f767d6960c40acc7cd5.md",
+      "sha256": "90bf98f56ab0f5b67028fd358399aaa30a370fd6c67c6f767d6960c40acc7cd5"
+    },
+    "collector": {
+      "bytes": 52875,
+      "path": "${REPO_ROOT}/observability/collector/collector.yaml",
+      "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/collector.d46d57617085cc4cba494d27e4c33df4a02648d82cd31c33103d373a0c201bf7.yaml",
+      "sha256": "d46d57617085cc4cba494d27e4c33df4a02648d82cd31c33103d373a0c201bf7"
+    },
+    "deepagents_live_trial": {
+      "bytes": 14694,
+      "path": "${REPO_ROOT}/examples/deepagents-omniroute/README.md",
+      "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/deepagents_live_trial.db694d5948539b98a36b62c08b7a641a2b6cc14ad7a9d2ac1829b15e8c29064b.md",
+      "sha256": "db694d5948539b98a36b62c08b7a641a2b6cc14ad7a9d2ac1829b15e8c29064b"
+    },
+    "deepagents_trial_lock": {
+      "bytes": 137489,
+      "path": "${REPO_ROOT}/examples/deepagents-omniroute/requirements.lock",
+      "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/deepagents_trial_lock.3832e6cc94f9108112a10ec0eb11b5b6b7dfc55d60fc4fada2f752d650879e11.lock",
+      "sha256": "3832e6cc94f9108112a10ec0eb11b5b6b7dfc55d60fc4fada2f752d650879e11"
+    },
+    "gptr_source_review": {
+      "bytes": 18637,
+      "path": "${REPO_ROOT}/evidence/artifacts/new-wsl-layer-consensus-20261002/codex-decisions.md",
+      "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/gptr_source_review.464608b928709f5fd987b44ce2a019b29bb85f886b38c1bc095dc326c02cbac6.md",
+      "sha256": "464608b928709f5fd987b44ce2a019b29bb85f886b38c1bc095dc326c02cbac6"
+    },
+    "landed_foundation_catalog": {
+      "bytes": 479154,
+      "path": "${REPO_ROOT}/catalogs/landscape/foundation.json",
+      "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/landed_foundation_catalog.868d193a31080ab913400725140bd0d01e0afe97e28564fd12777f737d22951a.json",
+      "sha256": "868d193a31080ab913400725140bd0d01e0afe97e28564fd12777f737d22951a"
+    },
+    "layer_consensus": {
+      "bytes": 50007,
+      "path": "${REPO_ROOT}/docs/decisions/2026-10-02-new-wsl-layer-consensus.md",
+      "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/layer_consensus.a3a0e724c2997ce1323b87b07f80e72e57d50d9bb1ce75f4a4a356409225be39.md",
+      "sha256": "a3a0e724c2997ce1323b87b07f80e72e57d50d9bb1ce75f4a4a356409225be39"
+    },
+    "promptfoo_0.123.1": {
+      "bytes": 14821,
+      "path": "${USER_HOME}/.local/share/codex-ecosystem/tools/promptfoo-0.123.1/lib/node_modules/promptfoo/package.json",
+      "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/promptfoo_0.123.1.208ce88e9e2a9e7518f0c29d384a30250a7708c19267b2db0971afafdadc86e3.json",
+      "sha256": "208ce88e9e2a9e7518f0c29d384a30250a7708c19267b2db0971afafdadc86e3"
+    },
+    "promptfoo_0.124.0": {
+      "bytes": 15169,
+      "path": "${USER_HOME}/.local/share/codex-ecosystem/tools/promptfoo-0.124.0/lib/node_modules/promptfoo/package.json",
+      "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/promptfoo_0.124.0.deb8f6569cd90b7ceb17dd57bc051bcd17401bf489ab2dd4019448ffaf37e101.json",
+      "sha256": "deb8f6569cd90b7ceb17dd57bc051bcd17401bf489ab2dd4019448ffaf37e101"
+    },
+    "promptfoo_bundled_sdk_0.123.1": {
+      "bytes": 1955,
+      "path": "${USER_HOME}/.local/share/codex-ecosystem/tools/promptfoo-0.123.1/lib/node_modules/promptfoo/node_modules/@openai/codex-sdk/package.json",
+      "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/promptfoo_bundled_sdk_0.123.1.dd4237ae1ac769713faa1eed2676cf70e25fff94457803a534ffd90f4d85b296.json",
+      "sha256": "dd4237ae1ac769713faa1eed2676cf70e25fff94457803a534ffd90f4d85b296"
+    },
+    "promptfoo_bundled_sdk_0.124.0": {
+      "bytes": 1955,
+      "path": "${USER_HOME}/.local/share/codex-ecosystem/tools/promptfoo-0.124.0/lib/node_modules/promptfoo/node_modules/@openai/codex-sdk/package.json",
+      "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/promptfoo_bundled_sdk_0.124.0.93744cad85efeecf9d2378f1b817662fc505a7eae6b3aa9e3646bae1c267f665.json",
+      "sha256": "93744cad85efeecf9d2378f1b817662fc505a7eae6b3aa9e3646bae1c267f665"
+    },
+    "sdk_producer": {
+      "bytes": 8705,
+      "path": "${STATE_ROOT}/coordination/command-center/cc-tools/adoption_invoke.py",
+      "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/sdk_producer.efff86d46ee7b76d1634d067a5c53126a0120294bbf38372f4318677d556a2a9.py",
+      "sha256": "efff86d46ee7b76d1634d067a5c53126a0120294bbf38372f4318677d556a2a9"
+    },
+    "selected_openhands_unit": {
+      "bytes": 1089,
+      "path": "${USER_HOME}/.config/systemd/user/openhands-job@.service",
+      "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/selected_openhands_unit.3aca1ab5fb390eecc1f81ab58d2c98ab3b18e587e6ad88881188736f5713d60c.service",
+      "sha256": "3aca1ab5fb390eecc1f81ab58d2c98ab3b18e587e6ad88881188736f5713d60c"
+    },
+    "sdk_hourly_snapshot": {
+      "path": "${STATE_ROOT}/coordination/ns2604-coop/notes/adoption-evidence-20261008/adoption-now-e129759fe91ffbb1.json",
+      "sha256": "e129759fe91ffbb133de2719a7d5194fe96ac65c44b222adf7fdd4d65af0e872",
+      "bytes": 60932,
+      "mutable": false
     }
   },
   "workflow_measurement": {
@@ -440,5 +706,129 @@
     "baseline_ref": "workflow_baseline",
     "definitions": "Reuse the referenced baseline definitions and scope; no new measurement run.",
     "saving_claim": null
+  },
+  "revision_utc": "2026-10-09T01:06:56.047839+00:00",
+  "review_correction": {
+    "reviewed_head": "45cbdbad4439dba6422fc6617eceee58502a8aaf",
+    "correction": "The MCP-only historical snapshot was wrongly generalized to absence of SDK use. Native SDK services are measured; per-role/path attribution is a distinct gap.",
+    "claude_read": {
+      "bytes": 5143,
+      "path": "${STATE_ROOT}/coordination/command-center/research-cc-role-20261008/pr903-claude-read-45cbdbad.md",
+      "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/claude_designated_read.90bf98f56ab0f5b67028fd358399aaa30a370fd6c67c6f767d6960c40acc7cd5.md",
+      "sha256": "90bf98f56ab0f5b67028fd358399aaa30a370fd6c67c6f767d6960c40acc7cd5"
+    },
+    "retention_rule": "docs/decisions/2026-10-07-clean-upstream-install-finalizes-a-candidate.md:67-78 (#833): low use is an installation gap; retirement needs a better-evidenced upstream replacement for the same job or an official install shown unable to work."
+  },
+  "retained_additional_evidence": [
+    {
+      "path": "examples/deepagents-omniroute/README.md",
+      "sha256": "db694d5948539b98a36b62c08b7a641a2b6cc14ad7a9d2ac1829b15e8c29064b",
+      "pin": "4394bcd00b8eb46e7c423939643a0dfcfb5d8773",
+      "version": "deepagents0.7.21",
+      "scope": "Historical failed initial live research, successful saved-context repair and fresh-process SQLite continuation; separate from SDK0.7.23 and dcode0.1.83."
+    },
+    {
+      "path": "${STATE_ROOT}/research/deer-flow/run.IHU83nIK/native-retrieval-metadata.json",
+      "sha256": "bc49079455731ec759af7148d42e67599626986b855449de0e1e614d5867d419",
+      "scope": "3 search witnesses,13 fetch witnesses,11 matching citations,197818 native tokens; role/client not attributed."
+    }
+  ],
+  "vendor_claude_skill_routing": {
+    "vendor_instruction_snapshot": {
+      "source_url": "https://code.claude.com/docs/en/skills.md",
+      "path": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/claude-native-skill-routing.vendor-snapshot.md",
+      "sha256": "44ef73f373fd7a38205e9af4c78289bf7c20c7975b03081d9061cb671d7cfded",
+      "bytes": 1650,
+      "scope": "Retained exact relevant vendor instruction excerpts; whole-page and CLI-release equality not asserted",
+      "locators": [
+        "/Extend Claude with skills",
+        "/Test the skill",
+        "/Choose where skills load"
+      ],
+      "retained_bytes": "# Retained Claude native Skill routing instructions\n\nVendor URL: https://code.claude.com/docs/en/skills.md\nRetrieved: 2026-10-09T01:19:16Z, context-mode native fetch and indexed search.\nScope: exact relevant instruction excerpts, not the whole page or a claim\nthat the closed-source CLI implementation matches a particular source release.\n\n## Extend Claude with skills\n\n> Skills extend what Claude can do. Create a `SKILL.md` file with instructions, and Claude adds it to its toolkit. Claude uses skills when relevant, or you can invoke one directly with `/skill-name`.\n\n## Test the skill\n\n> **Let Claude invoke it automatically** by asking something that matches the description:\n\n```text\nWhat did I change?\n```\n\n## Choose where skills load\n\n> Where you save a skill decides which sessions load it. Save it under your home directory to get it in every project, commit it to a repository to share it with everyone who works there, or distribute it through a plugin or managed settings to reach a whole team.\n\n| Location | Path | Loads in |\n| :- | :- | :- |\n| Personal | `~/.claude/skills/<skill-name>/SKILL.md` | All your projects on this machine, but not Cowork or cloud sessions |\n| Project | `.claude/skills/<skill-name>/SKILL.md` | Sessions in this repository. Commit it so your team gets it too |\n\nThe table is the relevant vendor excerpt with hyperlink labels retained as\nplain text. The surrounding notes are capture metadata. This file is the\nimmutable retained instruction snapshot named by the revision; its digest\nbinds exactly these bytes. The project-owned coordinator Skill is separately\nbound by its repository commit and file digest.\n"
+    },
+    "project_skill": {
+      "commit": "aba02ec3456d383bcc2fc72883db098f9be7918a",
+      "path": ".claude/skills/omniroute-runtime-worker/SKILL.md",
+      "sha256": "feacd5b6324649e3fff16d4f7f469f994e2984dccbb462f84e6fa8bf8e93da48",
+      "bytes": 3840,
+      "locators": [
+        "description:3",
+        "host-port:38",
+        "execution-source-and-gap:63-65"
+      ]
+    },
+    "execution_sdk_source": "openai/codex@a956835d020762cb2b570053af06f643a11c0ecc:sdk/python"
+  },
+  "vendor_source_bindings": {
+    "claude_sdk_current": {
+      "repository": "anthropics/claude-agent-sdk-python",
+      "version": "0.2.163",
+      "pin": "1ef6d8c71bb0e44a6b33fe61497864f21e17fdb7",
+      "source": "src/claude_agent_sdk/types.py:2297",
+      "scope": "SDK child settings and skills; no coordinator dispatch"
+    },
+    "claude_sdk_trial": {
+      "repository": "anthropics/claude-agent-sdk-python",
+      "version": "0.2.162",
+      "pin": "f2204bb956bab02907aaf3cb88eb9dead28eaa35",
+      "source": "examples/claude-runtime-sdk/verification.md",
+      "scope": "Existing separate gateway trial remains unselected"
+    },
+    "openai_agents": {
+      "repository": "openai/openai-agents-python",
+      "version": "0.23.1 candidate",
+      "pin": "26345c1e45ebede8e2fc9b0bc7341dedab5e01fc",
+      "source": "README.md and landed /layers/16 candidate"
+    },
+    "codex_sdk": {
+      "repository": "openai/codex",
+      "version": "0.160.0",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "source": "sdk/python; sdk/typescript"
+    },
+    "gptr_mcp": {
+      "repository": "assafelovic/gptr-mcp",
+      "pin": "63884773685b1f12c7f0d9e283b3d71a5b9b5fda",
+      "source": "README.md; server.py",
+      "installation_scope": "Existing selected vendor route held at consensus activation gate"
+    },
+    "deerflow": {
+      "repository": "bytedance/deer-flow",
+      "pin": "345f08be00c8a9495079b732a39b46aa9af1584e",
+      "source": "skills/public/claude-to-deerflow/SKILL.md; backend/Makefile"
+    },
+    "deepagents_trial": {
+      "repository": "langchain-ai/deepagents",
+      "version": "0.7.21",
+      "pin": "4394bcd00b8eb46e7c423939643a0dfcfb5d8773",
+      "source": "examples/deepagents-omniroute/README.md"
+    }
+  },
+  "designated_read_records": {
+    "claude": {
+      "bytes": 5143,
+      "path": "${STATE_ROOT}/coordination/command-center/research-cc-role-20261008/pr903-claude-read-45cbdbad.md",
+      "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/claude_designated_read.90bf98f56ab0f5b67028fd358399aaa30a370fd6c67c6f767d6960c40acc7cd5.md",
+      "sha256": "90bf98f56ab0f5b67028fd358399aaa30a370fd6c67c6f767d6960c40acc7cd5"
+    },
+    "gpt_exec": {
+      "path": "${STATE_ROOT}/coordination/cc-reads-20261005/pr903/GPT-VERDICT-45cbdbad4.full.md",
+      "sha256": "a45c81305e5e51bd8c9dfc5b369bcffb924a830e625642c4cfa8e6d152e9a23b",
+      "reviewed_head": "45cbdbad4439dba6422fc6617eceee58502a8aaf",
+      "verdict": "CHANGES_REQUESTED"
+    }
+  },
+  "memory_cost_evidence": {
+    "required_method": "Per-session/process-tree PSS from /proc/<pid>/smaps_rollup for the actual role/client/task configuration; startup/idle/warm-use phases separated.",
+    "component_pss_kb": null,
+    "status": "PENDING_COMPONENT_SPECIFIC_MEASUREMENT",
+    "adopt_now_allowed": false,
+    "missing_reason": "No owned active instance was measured for each SDK/runtime surface in this revision. Libraries need attributed client/child process-tree measurements; missing is not zero.",
+    "reference_role_trial": {
+      "path": "${STATE_ROOT}/research/coverage-gap-20261008/O3/ROLE-MCP-TRIAL-PLAN-20261008/ROLE-MCP-TRIAL-REPORT-20261009.md",
+      "sha256": "f0afc2c734b3ad1b70e68cd38d3c844c7f4b1338cc030c8fc40fc88db1e53989",
+      "scope": "Whole role-MCP profile measurements; not SDK/library component PSS. Do not substitute for missing component figure."
+    }
   }
 }

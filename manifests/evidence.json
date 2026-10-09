@@ -18267,8 +18267,8 @@
     },
     {
       "path": "docs/decisions/2026-10-08-sdk-runtime-worker-adoption.md",
-      "sha256": "3dbdae5d49fd39b36fbc313b7df546941a188ca8d1dd18faafc0822ea6edb7b2",
-      "bytes": 11746
+      "sha256": "ba36d65f9ad51be9193e36d136a3bcbd62b3bc438fa92079a2e10c2d49ee27ec",
+      "bytes": 20708
     },
     {
       "path": "docs/decisions/2026-10-08-skills-cc-lanes-picks.md",
@@ -49057,13 +49057,13 @@
     },
     {
       "path": "evidence/artifacts/sdk-runtime-adoption-20261008/decisions.json",
-      "sha256": "6d4a92ab341838222b9fc42aa38fd3a1a5ea30879e3cf966b83034435c82318e",
-      "bytes": 9563
+      "sha256": "2de55eb908d4728e48055fa248ccc093e1cdac745f80339f159061ff6c2917a5",
+      "bytes": 68619
     },
     {
       "path": "evidence/artifacts/sdk-runtime-adoption-20261008/observations.json",
-      "sha256": "fbb63db4db5efec42664d543bae8ce5bf9e09658fe3f3a3a455f79746cd8aeee",
-      "bytes": 22399
+      "sha256": "7a7ed73a67b60748f16aa78f60f23450ebeea2fda797fa07bbae6561b00b0b75",
+      "bytes": 45369
     },
     {
       "path": "evidence/artifacts/sdk-runtime-coverage-20260922/agent-sdks.json",
