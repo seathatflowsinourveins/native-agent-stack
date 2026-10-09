@@ -12,7 +12,8 @@ matching the live unit's optional additive file reported by the native
 No environment-file content was opened. `%h` is a systemd specifier; proposed
 shell commands in the [vendor wiring packets](../../../docs/decisions/memory-adoption-835/README.md)
 use `$HOME`. Every client/CLI install and smoke remains OUTSTANDING for the CC.
- Each service requires the operator marker
+
+Each service requires the operator marker
 `%h/.config/native-stack/memory-maintenance.approved`, which this PR does not
 create. Timers have no catch-up (`Persistent=false`), use UTC and add 15-minute
 jitter. Services have a 600-second bound and reduced CPU/I/O priority.
