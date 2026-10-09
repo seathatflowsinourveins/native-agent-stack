@@ -572,15 +572,27 @@ nothing out and reads no secret.
   - is not a draft;
   - comes from this repository (a fork never qualifies);
   - targets main;
-  - has no review of its current head yet. A review leaves the artifact `claude-pr-review-usage-pr<N>-<sha>`, so a
-    head with one is skipped, and a new push is a new head.
+  - has no completed review of its current head yet, and a new push is a new head.
+- **What counts as a completed review.** A review leaves the completion marker `claude-pr-review-done-pr<N>-<sha>`
+  only when its bounds check passed and its review was published. A failed or unpublished review leaves only its
+  usage record, and the head is tried again on a later tick.
+  - A marker counts only when the run that uploaded it is looked up through the API and is this workflow's own
+    (`workflow_id`), a `schedule` or `workflow_dispatch` run, on `main`, in this repository. An artifact's name and its
+    branch name can come from anywhere, including a fork's branch named `main`.
+  - The marker is kept 90 days. A head still open and unchanged after that is reviewed again.
 - **Limits:** at most 2 heads per tick, oldest pull request first. None once today's reviews reach the daily ceiling:
   the repository variable `CLAUDE_PR_REVIEW_DAILY_USD`, default 55, counted at the 5.50 USD cost bound per review
-  from this workflow's runs since 00:00 UTC. A tick at the ceiling skips and says so in its summary.
+  from this workflow's schedule and dispatch runs on main since 00:00 UTC. A tick at the ceiling skips and says so
+  in its summary.
+- **Every list is read to its last page:** the open pull requests, today's runs, each run's jobs and each marker
+  name's artifacts (`gh api --paginate`).
 - **Failure:** an API failure fails the job, and nothing is reviewed.
 
 **The review.** The review job runs once per chosen head as a matrix (`max-parallel: 2`), with a concurrency group
 per pull request and head.
+- **The recheck.** Once it holds its head's group, a scheduled review first looks for a trusted completion marker
+  again (`actions: read`). A dispatch of the same head may have completed while it waited, and the scheduled review
+  then skips every later step. A dispatch always reviews.
 - Its binding step reads the pull request again with its own read before any token step, and fails closed. The pull
   request must be open, from this repository, targeting main and at the chosen commit, and on a scheduled review not
   a draft.
@@ -596,7 +608,7 @@ per pull request and head.
 - **Cost:** a tick with nothing to review costs runner time only. Each review's spend is in its usage artifact; the
   api-actions lane enters it in its ledger.
 
-**Tests** (tests/test_claude_pr_review_workflow.py: 58 tests, 11 of them new for the resolve job). They run the
+**Tests** (tests/test_claude_pr_review_workflow.py: 69 tests; 26 cover the resolve and recheck steps). They run the
 resolve step against a stand-in `gh`:
 - a fork head, a draft, another base and a closed pull request are never chosen;
 - a head already reviewed is skipped, and a new head of the same pull request is chosen;
@@ -630,13 +642,36 @@ instance (claude-code-action at `2dca132f`, job `review`).
 - **Who can cause a run.** Anyone who can push a branch to this repository and open a non-draft pull request
   against main, which the daily ceiling bounds. A fork never qualifies (`head.repo.full_name` is checked in both
   jobs).
-- **Fixed before the PR (Medium, gate evasion).** The first version of the resolve step counted any artifact named
-  `claude-pr-review-usage-pr<N>-<sha>`, and any run of `claude-pr-review.yml`, toward the dedupe and the daily
-  ceiling. A pull request's branch runs its own copies of the workflows on pull_request events. So it could upload
-  an artifact with that name and have its head skipped, or add review-named runs to exhaust the ceiling for
-  everyone. The step now counts only artifacts from runs on main, and only schedule or dispatch runs on main.
-  `test_an_artifact_or_a_run_from_a_pull_request_branch_cannot_suppress_or_ration_reviews` plants both and shows
-  the head still chosen.
+- **Found by the audit before the PR (Medium, gate evasion), and fixed only by the GPT read's round.** The first
+  version counted any artifact with the review's name, and any run of `claude-pr-review.yml`, toward the dedupe and
+  the ceiling. The pre-PR fix filtered artifacts on `head_branch == "main"`. That filter was not enough: a fork's
+  branch can be named `main` (GPT read of a22c483d, P2 1). The uploading run is now looked up and must be this
+  workflow's own schedule or dispatch run on main in this repository.
+
+**GPT read of a22c483d (CHANGES_REQUESTED, four P2s), fixed in one commit:**
+1. **A fork's branch named `main` passed the marker filter.** Fixed by the run lookup above. Test:
+   `test_a_marker_from_anything_but_this_workflows_schedule_or_dispatch_on_main_here_is_ignored` (a fork's branch
+   named main, a pull_request run, another workflow, another branch).
+2. **No pagination.** Every list now pages to its end. Tests: 101 eligible pull requests with the oldest 100
+   completed choose the 101st; 100 newer runs without reviews ahead of an older run with ten still reach the ceiling.
+   The stand-in `gh` returns pages of 100.
+3. **A failed review's usage record was the dedupe marker.** Fixed with the separate completion marker, gated on the
+   bounds check and the publish step (`id: publish`). Tests: the gate, and a head with only a usage record is
+   chosen again.
+4. **A scheduled review that waited behind a dispatch of the same head reviewed it again.** Fixed by the recheck.
+   Tests: a head completed meanwhile is skipped, one not completed goes ahead, a dispatch always reviews, and an API
+   failure fails the step.
+
+The two copies of the marker check (resolve and recheck) are held identical by a test. An API failure inside the
+check stops the step: the result is assigned first, so the shell's errexit applies. Seven weakened copies each fail
+the module:
+- any uploading run trusted;
+- the old branch-name filter;
+- pull requests not paginated;
+- runs not paginated;
+- the marker written whatever the outcome;
+- no recheck;
+- the check's result compared inside `[ ]` (which swallowed an API failure in the first draft).
 
 ## Alternatives considered
 
