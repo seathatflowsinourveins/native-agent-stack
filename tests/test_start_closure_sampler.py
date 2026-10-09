@@ -1,6 +1,7 @@
 """Synthetic sampler controls; these tests run no designated reads or upstream acceptance.
 
-Set G5_R3_GENERATOR to the original SHA-pinned R3 generator. G5_PROFILE_PROTOCOL
+Set G5_R3_GENERATOR to tools/sota-convergence/sealed_r3_generator.py, the
+tracked SHA-pinned privacy reseal. G5_PROFILE_PROTOCOL
 may point at the read-only profile worker source before its commit is integrated.
 Neither environment variable supplies a credential or changes the required pins.
 """
@@ -17,7 +18,10 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from jsonschema import Draft202012Validator, ValidationError
+try:
+    from jsonschema import Draft202012Validator, ValidationError
+except ImportError as error:
+    raise unittest.SkipTest("jsonschema is not installed; sampler validation controls require it") from error
 
 TOOL = Path(__file__).resolve().parents[1] / "tools/sota-convergence/start_closure_sampler.py"
 SPEC = importlib.util.spec_from_file_location("start_closure_sampler_test", TOOL)
@@ -92,7 +96,7 @@ class NativeSamplerTests(unittest.TestCase):
     def setUpClass(cls):
         source = os.environ.get("G5_R3_GENERATOR")
         if not source:
-            raise unittest.SkipTest("Set G5_R3_GENERATOR to the original sealed generator for native draw controls")
+            raise unittest.SkipTest("Set G5_R3_GENERATOR to tools/sota-convergence/sealed_r3_generator.py for native draw controls")
         cls.r3_path = Path(source)
         cls.r3 = sampler.load_r3(cls.r3_path)
         cls.protocol = Path(os.environ.get("G5_PROFILE_PROTOCOL", str(sampler.PROTOCOL)))
@@ -192,6 +196,37 @@ class NativeSamplerTests(unittest.TestCase):
         direct = self.r3.select(rows, {key: [{**f, "held_action_claims": []} for f in value] for key, value in origins.items()}, fragments, classes, sampler.SEED, 59)
         self.assertEqual([i["native_key"] for i in self.bucket(first, "WATCH")["selected"]],
             [i["native_key"] for i in self.bucket(direct, "WATCH")["selected"]])
+
+    def test_new_population_redraw_uses_recorded_seed_without_changing_sealed_source(self):
+        for _ in range(80):
+            self.add_row("PENDING", flags=("pending_pin", "pending_locator"))
+        rows, origins, fragments = self.validated()
+        classes = list(self.native.CLASSES)
+        historic = sampler.select(rows, origins, fragments, classes, self.r3)
+        redraw = sampler.select(rows, origins, fragments, classes, self.r3, seed=202610090430)
+        again = sampler.select(dict(reversed(list(rows.items()))), origins, fragments, classes, self.r3, seed=202610090430)
+        self.assertEqual(redraw, again)
+        self.assertEqual(self.r3.SEED, sampler.SEED)
+        self.assertEqual(digest(self.r3_path.read_bytes()), sampler.R3_SHA256)
+        self.assertEqual({packet["stratum_id"] for packet in historic}, {packet["stratum_id"] for packet in redraw})
+        historical_by_id = {packet["stratum_id"]: packet for packet in historic}
+        for packet in redraw:
+            previous = historical_by_id[packet["stratum_id"]]
+            self.assertEqual(packet["population_key_sha256"], previous["population_key_sha256"])
+            self.assertNotEqual(packet["derived_seed"], previous["derived_seed"])
+            self.assertEqual(len(packet["selected"]), min(59, packet["population_size"]))
+        for invalid in (0, -1, True, 2**64):
+            with self.subTest(seed=invalid), self.assertRaisesRegex(ValueError, "positive 64-bit integer"):
+                sampler.select(rows, origins, fragments, classes, self.r3, seed=invalid)
+
+    def test_f4_precedence_keeps_historical_pin_flag_out_of_counted_pin_stratum(self):
+        self.add_row("PENDING", flags=("pending_pin",))
+        self.rows[0]["evidence_class"] = "UNKNOWN"
+        self.rows[0]["closure"]["residue"] = [{"reason_code": "evidence-class-unassessed", "bucket": "G5-F4", "count": 1, "measurement": "Assess retained evidence"}]
+        rows, packets = self.draw()
+        self.assertTrue("pending_pin" in self.rows[0]["closure"])
+        self.assertFalse(any(p["stratum"]["disposition"] == "PENDING-PIN" and p["population_size"] for p in packets))
+        self.assertEqual(self.bucket(packets, "PENDING")["selected_count"], 1)
 
     def test_final_actions_are_full_census_and_held_claims_do_not_qualify(self):
         for _ in range(70):
@@ -343,6 +378,13 @@ class NativeSamplerTests(unittest.TestCase):
         manifest, origins, manifest_sha = self.inputs()
         origins["origins"] = []
         with self.assertRaisesRegex(ValueError, "every final row"):
+            self.validated(manifest, origins, manifest_sha)
+
+    def test_origin_map_must_bind_exact_start_stratum_contract(self):
+        self.add_row("WATCH")
+        manifest, origins, manifest_sha = self.inputs()
+        origins["stratum_contract_sha256"] = "d" * 64
+        with self.assertRaisesRegex(ValueError, "START stratum contract"):
             self.validated(manifest, origins, manifest_sha)
 
     def test_declared_pending_action_origin_remains_full_census_without_sample_inference(self):

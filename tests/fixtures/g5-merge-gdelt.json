@@ -1,0 +1,32 @@
+{
+  "source_member": "g5-fields-b/trading-platform/public-safe/fragments/market-data-reference/rows.json",
+  "source_pointer": "/14",
+  "source_sha256": "eae5f5f78378d4f7960a7a8abb0a4d18b7660a5d2ccd7d4f72e1bf5781cd0bc2",
+  "row_sha256": "16525d5ee11a4b8a00b1e465bd0711bec476bbaa0dc0756141921379b90c94c5",
+  "row": {
+    "archive_member": "g5-fields-b/trading-platform/public-safe/captures/market-data-reference/custody.capture.json",
+    "capture_sha256": "391ae2d6ac1e35415c46d6fcdb323c6beee474e62b1632fdda3394baa8ac9621",
+    "disposition": "PENDING",
+    "evidence_class": "UNKNOWN",
+    "note": "Exact original source occurrences retained. Custody refresh does not establish current candidate behavior, implementation quality, host fit or historical strategy acceptance. Public-safe capture wrappers may project host metadata and identifiers; wrappers are not original upstream source-byte authority. Sealed original custody remains private.",
+    "owner_lane": "g5-fields-b",
+    "pending": {
+      "measurement": "Resolve the exact upstream entry/implementation locator and pin from the retained source occurrence, then run the unchanged vendor fixture against this frozen field requirement. Preserve input-screen scope and candidate version UNKNOWN until observed; reconcile every contradictory leg independently before a disposition ruling.",
+      "owner": "g5-fields-b; downstream vendor-harness execution owner unassigned",
+      "provisional_disposition": "WATCH",
+      "status": "SOURCE-AUDIT-ONLY"
+    },
+    "pin": null,
+    "primary_sources": [{"locator": "UNKNOWN: exact upstream primary locator unresolved from retained documentary occurrence", "pin": null, "subject": "unresolved source entry; candidate version UNKNOWN"}],
+    "qualification": {"catalog": "us-equities", "role": "referral-source-screen", "slot": "market-data-reference"},
+    "refresh_date": "2026-10-08",
+    "reopen_when": "Freeze one rights-permitted all-equity historical cohort containing a delisting, ticker reuse, split and revised filing. Compare timestamp, feed, identity, adjustment, correction and original-availability coverage before any upstream-engine historical replay. Do not promote provider SDK support into historical dataset acceptance.",
+    "repository_or_entry": "alex9smith/gdelt-doc-api",
+    "slot": "market-data-reference",
+    "source_pointer": "/source_assembly_row/alternatives/278",
+    "source_refs": [
+      {"archive_member": "g5-fields-b/trading-platform/public-safe/captures/market-data-reference/custody.capture.json", "owner_lane": "g5-fields-b", "pointer": "/source_assembly_row/alternatives/278", "sha256": "391ae2d6ac1e35415c46d6fcdb323c6beee474e62b1632fdda3394baa8ac9621"},
+      {"archive_member": "g5-fields-b/trading-platform/public-safe/captures/market-data-reference/custody.capture.json", "occurrence_id": "frozen-field:us-equities/market-data-reference/alex9smith/gdelt-doc-api", "owner_lane": "g5-fields-b", "pointer": "/occurrences/278/exact_ledger_rows/0", "sha256": "391ae2d6ac1e35415c46d6fcdb323c6beee474e62b1632fdda3394baa8ac9621", "source_id": "frozen-field"}
+    ]
+  }
+}

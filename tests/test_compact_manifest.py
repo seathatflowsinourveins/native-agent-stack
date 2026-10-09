@@ -76,7 +76,7 @@ class CompactManifestTests(unittest.TestCase):
 
     def row(self, repository):
         p = pin(repository)
-        return {"repository_or_entry": repository, "slot": "native-clients", "disposition": "WATCH", "evidence_class": "SOURCE-REVIEW",
+        return {"repository_or_entry": repository, "slot": "native-clients", "disposition": "WATCH", "evidence_class": "DOCUMENTARY",
                 "pin": p, "primary_sources": [{"locator": f"https://github.com/{repository}/blob/{p['version_or_commit']}/README.md", "pin": p, "subject": "pinned implementation README"}],
                 "capture_sha256": digest(self.capture), "archive_member": "captures/source.json", "owner_lane": "synthetic-controls", "refresh_date": "2026-10-08"}
 
@@ -103,6 +103,47 @@ class CompactManifestTests(unittest.TestCase):
 
     def closure_build(self):
         return compact.build_manifest(self.archive(), "v2026.10.08", profile=compact.START_CLOSURE_PROFILE)
+
+    def test_primary_url_colon_line_and_range_are_rejected_with_and_without_pin(self):
+        p = pin("example/project")
+        for selector in (":26", ":26-31"):
+            for declared_pin in (p, None):
+                with self.subTest(selector=selector, declared_pin=declared_pin):
+                    locator = f"https://github.com/example/project/blob/{p['version_or_commit']}/README.md{selector}"
+                    with self.assertRaisesRegex(compact.CompactError, "URL path must not encode a line selector"):
+                        compact.validate_locator(locator, declared_pin, "primary", [])
+        for selector in ("#L26", "#L26-L31"):
+            blockers = []
+            compact.validate_locator(f"https://github.com/example/project/blob/{p['version_or_commit']}/README.md{selector}", p, "primary", blockers)
+            self.assertFalse(blockers)
+
+    def test_unknown_evidence_is_strict_by_disposition_and_counted_on_start_face(self):
+        self.closure_pending(pin_residue=True)
+        self.rows[0]["evidence_class"] = "UNKNOWN"
+        default_row = deepcopy(self.rows[0])
+        default_row.pop("closure")
+        self.rows[0] = default_row
+        default, _ = self.build()
+        self.assertIn("unknown-evidence-class", [item["code"] for item in default["validation"]["blockers"]])
+        self.rows[0]["closure"] = {"pending_pin": {"reason_code": "no-body", "measurement": "Historical missing pin retained during class assessment"}}
+        closure, _ = self.closure_build()
+        self.assertEqual(closure["validation"]["status"], "PASS")
+        residue = [item for row in closure["rows"] for item in row.get("closure", {}).get("residue", [])
+                   if item["reason_code"] == "evidence-class-unassessed"]
+        self.assertEqual(closure["validation"]["nonblocking_counts"]["f4"], sum(item["count"] for item in residue))
+        self.assertEqual(closure["validation"]["nonblocking_counts"]["residue_by_bucket"]["G5-F4"], 1)
+        self.assertEqual(closure["counts"]["pending_pin"], 0)
+        self.assertEqual(closure["counts"]["f4"], 1)
+        self.assertEqual(closure["validation"]["nonblocking_counts"]["pending_pin_historical_flags_on_f4_rows"], 1)
+        self.assertTrue("pending_pin" in closure["rows"][0]["closure"])
+        self.rows[0]["disposition"] = "TRIAL"
+        self.rows[0].pop("pending")
+        self.rows[0].pop("closure")
+        self.rows[0]["pin"] = pin(self.rows[0]["repository_or_entry"])
+        self.rows[0]["primary_sources"][0]["pin"] = self.rows[0]["pin"]
+        action, _ = self.closure_build()
+        self.assertIn("unknown-evidence-class", [item["code"] for item in action["validation"]["blockers"]])
+        self.assertFalse(action["rows"][0].get("closure", {}).get("residue"))
 
     def closure_pending(self, *, pin_residue=False, locator_residue=False):
         row = self.rows[0]
@@ -210,7 +251,7 @@ class CompactManifestTests(unittest.TestCase):
         return row
 
     def test_each_blocker_class_default_action_and_non_action_profile_counts(self):
-        for code in compact.RESIDUE_BUCKETS:
+        for code in compact.RESIDUE_BUCKETS.keys() - {"evidence-class-unassessed", "source-review-claim-unpinned"}:
             with self.subTest(code=code):
                 case = CompactManifestTests()
                 case.setUp()
@@ -279,7 +320,7 @@ class CompactManifestTests(unittest.TestCase):
         self.assertEqual(refreshed["counts"]["origin_pointer_bound"], 1)
         self.assertEqual(refreshed["counts"]["origin_unresolved"], 0)
 
-    def test_global_f3_requires_exact_declared_count_hash_and_keeps_action_ids(self):
+    def test_f3_counts_non_action_mappings_and_action_mappings_stay_blocked(self):
         extra = deepcopy(self.rows[0]["source_refs"][0])
         extra["occurrence_id"] = "outside-declared-union:1"
         self.rows[0]["source_refs"].append(extra)
@@ -289,13 +330,19 @@ class CompactManifestTests(unittest.TestCase):
         self.assertIn("occurrences-outside-declared-union", {item["code"] for item in unapproved["validation"]["blockers"]})
         omission = self.closure_omission("occurrences-outside-declared-union")
         omission.update(cc_disposition_id="G5-F3", occurrence_ids_sha256=digest(compact.json_text([extra["occurrence_id"]], indent=2).encode()))
-        for disposition in ("WATCH", "TRIAL"):
-            self.rows[0]["disposition"] = disposition
-            manifest, _ = self.closure_build()
-            self.assertEqual(manifest["validation"]["status"], "PASS")
-            self.assertEqual(manifest["counts"]["f3"], 1)
-            self.assertEqual(manifest["coverage"]["outside_declared_union"]["occurrence_ids"], [extra["occurrence_id"]])
-            self.assertFalse(self.rows[0].get("closure", {}).get("residue"))
+        manifest, _ = self.closure_build()
+        self.assertEqual(manifest["validation"]["status"], "PASS")
+        self.assertEqual(manifest["counts"]["f3"], 1)
+        self.assertEqual(manifest["coverage"]["outside_declared_union"]["occurrence_ids"], [extra["occurrence_id"]])
+        self.rows[0]["disposition"] = "TRIAL"
+        omission.update(count=0, occurrence_ids_sha256=digest(compact.json_text([], indent=2).encode()))
+        action, _ = self.closure_build()
+        self.assertEqual(action["validation"]["status"], "BLOCKED")
+        self.assertEqual(action["counts"]["f3"], 0)
+        self.assertEqual(action["counts"]["outside_union_action_mappings"], 1)
+        self.assertEqual(action["validation"]["blockers"][0]["occurrence_id"], extra["occurrence_id"])
+        self.rows[0]["disposition"] = "WATCH"
+        omission.update(count=1, occurrence_ids_sha256=digest(compact.json_text([extra["occurrence_id"]], indent=2).encode()))
         omission["count"] = 2
         with self.assertRaisesRegex(compact.CompactError, "count/hash"):
             self.closure_build()
@@ -309,6 +356,42 @@ class CompactManifestTests(unittest.TestCase):
         self.coverage["omissions"].append(deepcopy(omission))
         with self.assertRaisesRegex(compact.CompactError, "duplicate G5-F3"):
             self.closure_build()
+
+    def test_f3_mixed_union_partition_preserves_non_action_count_with_action_blockers(self):
+        watch_ref = deepcopy(self.rows[0]["source_refs"][0])
+        watch_ref["occurrence_id"] = "outside:watch"
+        self.rows[0]["source_refs"].append(watch_ref)
+        self.rows[1]["disposition"] = "TRIAL"
+        trial_ref = deepcopy(watch_ref)
+        trial_ref["occurrence_id"] = "outside:trial"
+        self.rows[1]["source_refs"] = [trial_ref]
+        omission = self.closure_omission("occurrences-outside-declared-union")
+        omission.update(cc_disposition_id="G5-F3", occurrence_ids_sha256=digest(compact.json_text(["outside:watch"], indent=2).encode()))
+        manifest, _ = self.closure_build()
+        self.assertEqual(manifest["validation"]["status"], "BLOCKED")
+        self.assertEqual(manifest["counts"]["f3"], 1)
+        self.assertEqual(manifest["counts"]["outside_union_action_mappings"], 1)
+        self.assertEqual(manifest["coverage"]["outside_declared_union"]["occurrence_ids"], ["outside:watch"])
+        self.assertEqual(manifest["validation"]["blockers"][0]["occurrence_id"], "outside:trial")
+        self.acceptance()
+        omission.update(count=0, occurrence_ids_sha256=digest(compact.json_text([], indent=2).encode()))
+        adopted, _ = self.closure_build()
+        self.assertEqual(adopted["counts"]["outside_union_action_mappings"], 2)
+        self.assertEqual(adopted["validation"]["status"], "BLOCKED")
+
+    def test_profile_input_witness_matches_before_computed_residue_and_symlinked_source_load(self):
+        self.residue_case("foreign-primary-pin-scope-unqualified")
+        witness = self.directory / "immutable-input.json"
+        witness.write_bytes(raw(self.rows))
+        manifest, _ = compact.build_manifest(self.archive(), "v2026.10.08", [witness], compact.START_CLOSURE_PROFILE)
+        self.assertEqual(manifest["counts"]["residue_by_class"]["foreign-primary-pin-scope-unqualified"], 1)
+        alias = self.directory / "compact-alias.py"
+        alias.symlink_to(TOOL)
+        spec = importlib.util.spec_from_file_location("compact_symlink_fixture", alias)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        result, _ = module.build_manifest(self.archive(), "v2026.10.08", [witness], module.START_CLOSURE_PROFILE)
+        self.assertEqual(result["row_schema"]["path"], "tools/sota-convergence/schemas/compact-decision-start-closure-1.json")
 
     def scoped_occurrence(self):
         population = self.coverage["list_populations"][0]
@@ -444,6 +527,7 @@ class CompactManifestTests(unittest.TestCase):
                     self.rows, self.files, self.coverage = deepcopy(original)
                     self.closure_relaxation(rule)
                     target = self.rows[2]
+                    target["disposition"] = "TRIAL"
                     if defect.startswith("null-action"):
                         target["disposition"] = "TRIAL"
                         if defect == "null-action-row-pin":
@@ -458,8 +542,11 @@ class CompactManifestTests(unittest.TestCase):
                         self.closure_omission()["cc_disposition_id"] = ""
                     try:
                         manifest, _ = self.closure_build()
-                    except compact.CompactError:
-                        pass
+                    except compact.CompactError as error:
+                        expected = {"capture-hash": "capture is missing or hash-mismatched", "unsafe-locator": "primary locator",
+                                    "null-action-primary-pin": "no primary source binds the row's exact subject and implementation/source pin"}
+                        self.assertIn(defect, expected, "only the named defect may raise CompactError")
+                        self.assertIn(expected[defect], str(error))
                     else:
                         self.assertEqual(manifest["validation"]["status"], "BLOCKED")
 

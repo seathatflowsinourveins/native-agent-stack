@@ -17,7 +17,6 @@ from pathlib import Path
 import re
 import shutil
 import sys
-from jsonschema.exceptions import ValidationError
 
 PROFILE = "start-closure/1"
 SEED = 202610081850
@@ -231,21 +230,29 @@ def rows_and_origins(manifest, origin_map, manifest_sha, native, validator, r3):
     return rows, origins, fragments
 
 
-def select(rows, origins, fragments, classes, r3):
+def in_closure_bucket(row, label, flag):
+    residue = row.get("closure", {}).get("residue", [])
+    if label == "PENDING-PIN" and any(item["bucket"] == "G5-F4" for item in residue):
+        return False
+    return flag in row.get("closure", {}) or any(item["bucket"] == label for item in residue)
+
+
+def select(rows, origins, fragments, classes, r3, *, seed=SEED):
     """Call the sealed draw helper and restore original, unprojected evidence."""
+    require(type(seed) is int and 0 < seed < 2**64, "Draw seed must be a positive 64-bit integer")
     eligible = {key: item for key, item in rows.items() if CONFLICT_FLAG not in item["row"].get("closure", {}) and origins[key]}
     draw_origins = copy.deepcopy(origins)
     for bindings in draw_origins.values():
         for fragment in bindings:
             fragment["held_action_claims"] = []
-    packets = [p for p in r3.select(eligible, draw_origins, fragments, classes, SEED, QUOTA)
+    packets = [p for p in r3.select(eligible, draw_origins, fragments, classes, seed, QUOTA)
                if p["stratum"]["bucket_kind"] == r3.FINAL_BUCKET]
     for label, flag in FLAGS.items():
         projected = {}
         for key, item in eligible.items():
-            if flag in item["row"].get("closure", {}) or any(residue["bucket"] == label for residue in item["row"].get("closure", {}).get("residue", [])):
+            if in_closure_bucket(item["row"], label, flag):
                 projected[key] = {**item, "row": {**item["row"], "disposition": label}}
-        packets.extend(p for p in r3.select(projected, draw_origins, fragments, [label], SEED, QUOTA)
+        packets.extend(p for p in r3.select(projected, draw_origins, fragments, [label], seed, QUOTA)
                        if p["stratum"]["bucket_kind"] == r3.FINAL_BUCKET)
     for packet in packets:
         packet.pop("held_action_source_witnesses", None)
@@ -276,9 +283,9 @@ def packet_counts(packets, rows):
             "sample_overlap_memberships": memberships - len(sampled_keys), "unique_selected_rows": len(selected_keys | conflicts | actions),
             "pending_origin_census_rows": sum("origin_pending" in item for item in rows.values()),
             "pending_origins_excluded_from_samples": sum("origin_pending" in item for item in rows.values()),
-            "rows_with_both_closure_flags": sum(all(f in i["row"].get("closure", {}) or any(residue["bucket"] == label for residue in i["row"].get("closure", {}).get("residue", [])) for label, f in FLAGS.items()) for i in rows.values()),
+            "rows_with_both_closure_flags": sum(all(in_closure_bucket(i["row"], label, f) for label, f in FLAGS.items()) for i in rows.values()),
             "pending_conflict_excluded_from_samples": len(conflicts),
-            "conflict_sample_flag_exclusions": {label: sum(flag in rows[key]["row"].get("closure", {}) or any(residue["bucket"] == label for residue in rows[key]["row"].get("closure", {}).get("residue", [])) for key in conflicts)
+            "conflict_sample_flag_exclusions": {label: sum(in_closure_bucket(rows[key]["row"], label, flag) for key in conflicts)
                                                 for label, flag in FLAGS.items()},
             "origin_pointer_unresolved_rows": sum(i["row"].get("origin_pointer") == "unresolved" for i in rows.values()),
             "action_origin_pointer_unresolved_rows": sum(rows[key]["row"].get("origin_pointer") == "unresolved" for key in actions),
@@ -350,7 +357,7 @@ def output_directory(root, name):
 
 
 def build_packet(*, profile, manifest_path, manifest_sha256, origin_map_path, origin_map_sha256,
-                 protocol_sha256, r3_generator, head, output_root, output_name, protocol=PROTOCOL):
+                 protocol_sha256, r3_generator, head, output_root, output_name, protocol=PROTOCOL, redraw_seed=None):
     require(profile == PROFILE, "Select --profile start-closure/1 explicitly")
     require(isinstance(head, str) and re.fullmatch(r"[0-9a-f]{40}", head), "Head must be a full lowercase commit ID")
     output = output_directory(output_root, output_name)
@@ -366,7 +373,11 @@ def build_packet(*, profile, manifest_path, manifest_sha256, origin_map_path, or
     validator = Draft202012Validator(native.load(schema_raw))
     rows, origins, fragments = rows_and_origins(manifest, origin_map, manifest_sha256, native, validator, r3)
     classes = validator.schema["properties"]["disposition"]["enum"]
-    packets = select(rows, origins, fragments, classes, r3)
+    if redraw_seed is not None:
+        require(type(redraw_seed) is int and 0 < redraw_seed < 2**64 and redraw_seed != SEED,
+                "Redraw seed must be a new positive 64-bit integer")
+    seed = SEED if redraw_seed is None else redraw_seed
+    packets = select(rows, origins, fragments, classes, r3, seed=seed)
     actions = action_read_set(rows, manifest, manifest_sha256, head)
     actions["count"] = len(actions["rows"])
     conflicts = pending_conflict_census(rows, origins, manifest, manifest_sha256, head)
@@ -392,8 +403,10 @@ def build_packet(*, profile, manifest_path, manifest_sha256, origin_map_path, or
         files["strata/" + packet["stratum_id"] + ".json"] = (r3.canonical(packet) + "\n").encode()
     counts = packet_counts(packets, rows)
     summary = {"schema_version": 1, "kind": "g5-start-closure-sample-packet", "profile": PROFILE,
-               "seed": SEED, "head": head, "manifest_sha256": manifest_sha256,
-               "asset_sha256": manifest["asset"]["sha256"], "origin_map_sha256": origin_map_sha256,
+               "seed": seed, "head": head, "manifest_sha256": manifest_sha256,
+                "asset_sha256": manifest["asset"]["sha256"], "origin_map_sha256": origin_map_sha256,
+                "redraw": {"enabled": redraw_seed is not None, "historical_sealed_seed": SEED,
+                           "population_scope": "every sampled stratum", "seed": seed},
                "stratum_contract_sha256": CONTRACT_SHA256,
                "implementations": {"sealed_r3_generator_sha256": R3_SHA256, "native_protocol_sha256": protocol_sha256,
                                    "random_sha256": r3.PINS["random"], "sampler_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest()},
@@ -464,13 +477,20 @@ def main(argv=None):
     parser.add_argument("--derive-origin-map", action="store_true")
     parser.add_argument("--draw-proof", action="store_true")
     parser.add_argument("--proof-r3-sha256")
+    parser.add_argument("--redraw-seed", type=int)
     for name in ("manifest", "manifest-sha256", "origin-map", "origin-map-sha256", "protocol-sha256", "r3-generator", "head", "output-root", "output"):
         parser.add_argument("--" + name)
     for name in ("origin-provenance", "origin-provenance-sha256", "family-declarations", "family-declarations-sha256", "origin-map-output"):
         parser.add_argument("--" + name)
     args = parser.parse_args(argv)
     try:
+        from jsonschema.exceptions import ValidationError
+    except ImportError:
+        parser.exit(2, "start_closure_sampler: jsonschema is required to validate a draw; install the declared dependency before running this mode\n")
+    try:
         require(not (args.derive_origin_map and args.draw_proof), "Choose one native preparation mode")
+        require(args.redraw_seed is None or not (args.derive_origin_map or args.draw_proof),
+                "Redraw seed applies only to the new production packet, never the historical equivalence proof")
         if args.derive_origin_map:
             for name in ("manifest", "manifest_sha256", "protocol_sha256", "r3_generator", "origin_provenance", "origin_provenance_sha256", "family_declarations", "family_declarations_sha256", "origin_map_output"):
                 require(getattr(args, name) is not None, "Missing --" + name.replace("_", "-"))
@@ -501,7 +521,7 @@ def main(argv=None):
         result = build_packet(profile=args.profile, manifest_path=args.manifest, manifest_sha256=args.manifest_sha256,
                               origin_map_path=args.origin_map, origin_map_sha256=args.origin_map_sha256,
                               protocol_sha256=args.protocol_sha256, r3_generator=args.r3_generator, head=args.head,
-                              output_root=args.output_root, output_name=args.output)
+                               output_root=args.output_root, output_name=args.output, redraw_seed=args.redraw_seed)
     except (ValueError, OSError, KeyError, TypeError, ValidationError) as error:
         parser.exit(2, "start_closure_sampler: " + str(error) + "\n")
     print(json.dumps(result, sort_keys=True))

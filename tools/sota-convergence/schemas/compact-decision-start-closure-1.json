@@ -209,6 +209,7 @@
         }
       }
     },
+    "evidence_class_witness": {"allOf": [{"$ref": "#/$defs/sourceRef"}, {"required": ["archive_member"]}]},
     "acceptance_witness": {
       "description": "Retained original JSON receipt. Its exact selected object must bind identity, slot, qualification, pin, evidence_class, executed=true and status=PASS. This records prior execution and does not run a native test.",
       "type": "object",
@@ -255,14 +256,18 @@
             "additionalProperties": false,
             "required": ["reason_code", "bucket", "count", "measurement"],
             "properties": {
-              "reason_code": {"enum": ["foreign-primary-pin-scope-unqualified", "skill-entry-primary-bytes-unestablished", "native-skill-entry-witness-unverified", "original-source-entry-identity-unbound", "unsupported-json-pointer-capture", "unbound-field-selector", "original-list-occurrence-scope-unverified"]},
-              "bucket": {"enum": ["PENDING-PIN", "PENDING-LOCATOR", "counted-inventory", "origin-unresolved", "G5-F1"]},
+              "reason_code": {"enum": ["foreign-primary-pin-scope-unqualified", "skill-entry-primary-bytes-unestablished", "native-skill-entry-witness-unverified", "original-source-entry-identity-unbound", "unsupported-json-pointer-capture", "unbound-field-selector", "original-list-occurrence-scope-unverified", "evidence-class-unassessed", "source-review-claim-unpinned"]},
+              "bucket": {"enum": ["PENDING-PIN", "PENDING-LOCATOR", "counted-inventory", "origin-unresolved", "G5-F1", "G5-F4"]},
               "count": {"const": 1},
               "measurement": {"type": "string", "minLength": 1},
               "occurrence_id": {"type": "string", "minLength": 1},
               "origin_pointer_before": {"anyOf": [{"type": "null"}, {"const": "unresolved"}, {"$ref": "#/$defs/sourceRef"}]}
             }
           }
+        },
+        "unknown_evidence_reasons": {
+          "type": "array", "minItems": 1, "uniqueItems": true,
+          "items": {"enum": ["skill-entry-primary-bytes-unestablished", "native-skill-entry-witness-unverified", "original-source-entry-identity-unbound", "unsupported-json-pointer-capture", "source-review-claim-unpinned"]}
         },
         "pending_pin": {
           "type": "object",
@@ -706,6 +711,15 @@
         }
       ]
     },
+    "pinWitness": {
+      "type": "object", "additionalProperties": false,
+      "required": ["archive_member", "sha256", "pointer"],
+      "properties": {
+        "archive_member": {"$ref": "#/$defs/member"},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "pointer": {"type": "string", "pattern": "^($|/.*)$"}
+      }
+    },
     "primarySource": {
       "type": "object",
       "additionalProperties": false,
@@ -733,6 +747,7 @@
           "type": "string",
           "minLength": 1
         },
+        "pin_witness": {"$ref": "#/$defs/pinWitness"},
         "capture_sha256": {
           "$ref": "#/$defs/sha256"
         },

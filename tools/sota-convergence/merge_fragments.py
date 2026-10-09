@@ -441,7 +441,7 @@ def committed_bytes(root: Path, relative: str):
 
 def public_bytes(raw: bytes):
     # Reject known personal host material rather than silently weakening provenance.
-    if any(token in raw for token in (str(Path.home()).encode(), b"/mnt/v/evey", b"api_key\":", b"Bearer sk-")):
+    if any(token in raw for token in (str(Path.home()).encode(), b"/mnt/", b"api_key\":", b"Bearer sk-")):
         raise FragmentError("public fragment contains personal host or credential material")
 
 
@@ -589,8 +589,30 @@ def compact_primary_bundle(row):
         return False
 
 
-def merge_compact_groups(inputs):
+def compact_witnessed_class(row, index, captures, cache):
+    """Reuse the asset's unmerged-row witness checks, without profile waivers.
+
+    Pin/locator qualification blockers remain the asset's independent gates.
+    They do not erase a witnessed documentary claim. Missing or invalid capture
+    bindings, selectors, native entry witnesses and execution receipts do.
+    """
+    evidence = row.get("evidence_class", "UNKNOWN")
+    if evidence == "UNKNOWN" or evidence not in compact.EVIDENCE:
+        return "UNKNOWN"
+    try:
+        blockers = []
+        return compact.validate_evidence_witness(row, index, captures, cache, blockers, require_primary_pin=True)
+    except (compact.CompactError, KeyError, TypeError, ValueError):
+        return "UNKNOWN"
+
+
+def merge_compact_groups(inputs, *, captures=None):
     """CC scope rules over exact compact keys, preserving every immutable origin row."""
+    captures = {} if captures is None else captures
+    capture_index = {member: {"sha256": digest(raw)} for member, raw in captures.items()}
+    cache = {}
+    evidence_order = {"UNKNOWN": 0, "DOCUMENTARY": 1, "SOURCE-REVIEW": 2,
+                      **{evidence: 3 for evidence in compact.RECORDED}}
     groups = {}
     for rows, member, sha, fragment in inputs:
         for index, row in enumerate(rows):
@@ -632,7 +654,9 @@ def merge_compact_groups(inputs):
         if pending:
             output["disposition"] = "PENDING"
             # A conflicting execution assertion remains in its original receipt, not a synthetic new acceptance.
-            output["evidence_class"] = "SOURCE-REVIEW"
+            witnessed = [compact_witnessed_class(row, capture_index, captures, cache) for row, _ in candidates]
+            strongest = max(witnessed, key=evidence_order.__getitem__)
+            output["evidence_class"] = "SOURCE-REVIEW" if strongest in compact.RECORDED else strongest
             output.pop("acceptance_witness", None)
             output["pending"] = {"provisional_disposition": conservative(labels),
                                  "measurement": f"Verify every retained original source row's pinned primary claims and role qualification for {key[0]} in {key[1]}, including unresolved source bundles; run one supported same-task comparison only after its native fixture is bound.",
@@ -645,10 +669,12 @@ def merge_compact_groups(inputs):
             notes = sorted({row["searched"] for row, _ in candidates if isinstance(row.get("searched"), str) and row["searched"].strip()})
             if notes:
                 output["searched"] = " | ".join(notes)
-        output["note"] = "One deterministic source bundle represents serialization metadata; no primary pin is selected by recency, lane count or quality voting. Every original class, pin and literal role is retained in hash-bound source_refs. " + str(base.get("note", ""))
+        output["note"] = ("One deterministic source bundle represents serialization metadata; no primary pin is selected by recency, lane count or quality voting. Every original class, pin and literal role is retained in hash-bound source_refs. " + str(base.get("note", ""))).rstrip()
         merged.append(output)
         origins.append({"repository_or_entry": key[0], "slot": key[1], "qualification": json.loads(key[2]),
                         "fragments": sorted({ref["source_id"] for _, ref in candidates}), "source_refs": [ref for _, ref in candidates]})
+    if "_primary_git_cache" in cache:
+        cache["_primary_git_cache"][0].cleanup()
     return merged, {"schema_version": 1, "key": "canonical entry + literal slot + canonical literal qualification",
                     "origins": origins, "pending": disagreements,
                     "boundary": "Source data integration only; candidate implementation, native execution, designated readers and complete corpus coverage are independently checked."}
@@ -690,7 +716,7 @@ def compact_intake(manifests: list[Path], stage: Path, root: Path, write: bool):
                     inputs.append((rows, member, entry["sha256"], entry["fragment_id"]))
     if not inputs:
         raise FragmentError("compact intake requires at least one fragment")
-    rows, receipt = merge_compact_groups(inputs)
+    rows, receipt = merge_compact_groups(inputs, captures=planned)
     planned["compact/rows.json"] = json_text(rows, indent=2).encode("utf-8")
     planned["provenance/compact-origin-map.json"] = json_text(receipt, indent=2).encode("utf-8")
     for member, raw in sorted(planned.items()):
@@ -702,6 +728,68 @@ def compact_intake(manifests: list[Path], stage: Path, root: Path, write: bool):
     return {"mode": "write" if write else "check", "compact_rows": len(rows), "pending": len(receipt["pending"]),
             "fragment_inputs": len(inputs), "captures": len(planned)-2, "row_sha256": digest(planned["compact/rows.json"]),
             "origin_map_sha256": digest(planned["provenance/compact-origin-map.json"]), "coverage": "Separate frozen original census and asset-only check required"}
+
+
+def reconcile_compact_classes(rows, inputs, captures, *, assessed_keys=()):
+    """Refresh native class claims while preserving explicit final owner decisions.
+
+    Retained source rows are never rewritten. A separately declared source
+    assessment may witness a final class; every other class comes from the
+    native merger over original claims with their retained pin/body bindings.
+    """
+    native_rows, provenance = merge_compact_groups(inputs, captures=captures)
+    native = {compact.decision_key(row): row for row in native_rows}
+    assessed_keys = {tuple(value) for value in assessed_keys}
+    final = {compact.decision_key(row): row for row in rows}
+    if len(final) != len(rows) or not set(native) <= set(final) or not assessed_keys <= set(final):
+        raise FragmentError("class reconciliation has duplicate or missing decision keys")
+    index = {member: {"sha256": digest(raw)} for member, raw in captures.items()}
+    cache, result, changes = {}, [], []
+    input_claims = {}
+    for original_rows, member, source_sha, fragment in inputs:
+        for pointer, original in enumerate(original_rows):
+            input_claims.setdefault(compact.decision_key(original), []).append((original, member, source_sha, pointer))
+    for key, row in sorted(final.items()):
+        output = {**row, "closure": {**row.get("closure", {})}}
+        output["closure"].pop("residue", None)
+        if key in assessed_keys:
+            failures = []
+            supported = compact.validate_evidence_witness(row, index, captures, cache, failures, require_primary_pin=True)
+            if supported == "UNKNOWN" or failures:
+                raise FragmentError("declared fresh class assessment has no retained witness")
+            output["evidence_class"] = "SOURCE-REVIEW" if supported in compact.RECORDED else supported
+        elif key in native:
+            output["evidence_class"] = native[key]["evidence_class"]
+            if output["evidence_class"] == "UNKNOWN":
+                candidates = input_claims[key]
+                original, member, source_sha, pointer = next((item for item in candidates if item[0]["evidence_class"] != "UNKNOWN"), candidates[0])
+                # Bind the checked native input rather than trusting reason labels.
+                ref = {"archive_member": member, "sha256": source_sha, "pointer": f"/{pointer}"}
+                output["evidence_class_witness"] = ref
+                if not any(all(source.get(name) == ref[name] for name in ref) for source in output.get("source_refs", [])):
+                    output["source_refs"] = list(output.get("source_refs", [])) + [ref]
+                failures = []
+                compact.validate_evidence_witness(original, index, captures, cache, failures, require_primary_pin=True)
+                reasons = {item if isinstance(item, str) else item["code"] for item in failures}
+                allowed = {"skill-entry-primary-bytes-unestablished", "native-skill-entry-witness-unverified",
+                           "original-source-entry-identity-unbound", "unsupported-json-pointer-capture"}
+                if reasons and reasons <= allowed:
+                    output["closure"]["unknown_evidence_reasons"] = sorted(reasons)
+                elif original["evidence_class"] == "SOURCE-REVIEW" and original["pin"] is None and reasons == {"source-review-primary-pin-unwitnessed"}:
+                    output["closure"]["unknown_evidence_reasons"] = ["source-review-claim-unpinned"]
+                else:
+                    output["closure"].pop("unknown_evidence_reasons", None)
+        if output["evidence_class"] != row["evidence_class"]:
+            changes.append({"key": list(key), "before": row["evidence_class"], "after": output["evidence_class"]})
+        if not output["closure"]:
+            output.pop("closure")
+        result.append(output)
+    if "_primary_git_cache" in cache:
+        cache["_primary_git_cache"][0].cleanup()
+    return result, {"schema_version": 1, "kind": "g5-native-class-reconciliation", "rows": len(result),
+                    "original_native_rows": len(native_rows), "fresh_assessments": len(assessed_keys),
+                    "changes": changes, "provenance": provenance,
+                    "boundary": "Final source owners, qualification keys, dispositions and retained original captures unchanged; source class claims are recomputed by native witnesses."}
 
 
 def main(argv=None):

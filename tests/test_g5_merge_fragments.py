@@ -2,8 +2,10 @@
 from __future__ import annotations
 
 import hashlib
+import copy
 import importlib.util
 import json
+import os
 from pathlib import Path
 import subprocess
 import tempfile
@@ -36,6 +38,379 @@ class MergeFragmentTests(unittest.TestCase):
         if label == "PENDING":
             result["pending"] = {"provisional_disposition": "WATCH", "measurement": "Verify source", "owner": "source-lane"}
         return result
+
+    def witnessed_row(self, evidence="SOURCE-REVIEW", label="WATCH"):
+        row = self.compact_row(label)
+        row["evidence_class"] = evidence
+        directory = tempfile.TemporaryDirectory()
+        self.addCleanup(directory.cleanup)
+        repository = Path(directory.name) / "source.git"
+        environment = {"PATH": os.defpath, "GIT_CONFIG_NOSYSTEM": "1", "GIT_CONFIG_GLOBAL": os.devnull,
+                       "GIT_AUTHOR_NAME": "Synthetic control", "GIT_AUTHOR_EMAIL": "control@example.invalid",
+                       "GIT_COMMITTER_NAME": "Synthetic control", "GIT_COMMITTER_EMAIL": "control@example.invalid",
+                       "GIT_AUTHOR_DATE": "2026-10-08T00:00:00Z", "GIT_COMMITTER_DATE": "2026-10-08T00:00:00Z"}
+        subprocess.run(["git", "init", "--quiet", "--bare", str(repository)], check=True, env=environment)
+        def git(*args, raw=None):
+            return subprocess.run(["git", "--git-dir", str(repository), *args], input=raw,
+                                  capture_output=True, check=True, env=environment).stdout
+        primary_body = b"# Synthetic vendor source\nA local witness control; no candidate execution.\n"
+        blob_id = git("hash-object", "-w", "--stdin", raw=primary_body).decode().strip()
+        tree_id = git("mktree", raw=f"100644 blob {blob_id}\tREADME.md\n".encode()).decode().strip()
+        commit_id = git("commit-tree", tree_id, raw=b"Synthetic source custody\n").decode().strip()
+        row["pin"]["version_or_commit"] = commit_id
+        primary = row["primary_sources"][0]
+        primary["pin"]["version_or_commit"] = commit_id
+        primary["locator"] = f"example/project@{commit_id}:README.md:1"
+        primary["archive_member"] = "captures/README.md"
+        primary["capture_sha256"] = hashlib.sha256(primary_body).hexdigest()
+        captures = {primary["archive_member"]: primary_body}
+        objects = []
+        for kind, object_id in (("commit", commit_id), ("tree", tree_id)):
+            member = f"captures/{kind}.git-object"
+            data = git("cat-file", kind, object_id)
+            captures[member] = data
+            objects.append({"object_type": kind, "object_id": object_id, "archive_member": member,
+                            "sha256": hashlib.sha256(data).hexdigest()})
+        proof = {"schema_version": 1, "repository": "example/project", "commit": commit_id,
+                 "path": "README.md", "blob_id": blob_id, "objects": objects,
+                 "body": {"archive_member": primary["archive_member"], "sha256": primary["capture_sha256"]}}
+        proof_raw = json.dumps(proof, sort_keys=True).encode()
+        captures["captures/pin-witness.json"] = proof_raw
+        primary["pin_witness"] = {"archive_member": "captures/pin-witness.json", "sha256": hashlib.sha256(proof_raw).hexdigest(), "pointer": ""}
+        body = {"source": "Pinned vendor source; local synthetic witness control"}
+        row["source_pointer"] = "/source"
+        if evidence in merge.compact.RECORDED:
+            body["receipt"] = {
+                "repository_or_entry": row["repository_or_entry"], "slot": row["slot"],
+                "qualification": row["qualification"], "pin": row["pin"],
+                "evidence_class": evidence, "executed": True, "status": "PASS", "exit_code": 0,
+                "command": "vendor-test --fixture synthetic", "evidence_scope": "synthetic recorded receipt control",
+            }
+            row["acceptance_witness"] = {"archive_member": row["archive_member"], "pointer": "/receipt"}
+        raw = json.dumps(body, sort_keys=True).encode()
+        sha = hashlib.sha256(raw).hexdigest()
+        row["capture_sha256"] = sha
+        if "acceptance_witness" in row:
+            row["acceptance_witness"]["sha256"] = sha
+        captures[row["archive_member"]] = raw
+        return row, captures
+
+    def merge_witness_rows(self, rows, captures):
+        captures = dict(captures)
+        inputs = []
+        for i, row in enumerate(rows):
+            member = f"inputs/{i}.json"
+            raw = json.dumps([row], sort_keys=True).encode()
+            captures[member] = raw
+            inputs.append(([row], member, hashlib.sha256(raw).hexdigest(), f"fragment-{i}"))
+        result, receipt = merge.merge_compact_groups(inputs, captures=captures)
+        index = {member: {"sha256": hashlib.sha256(raw).hexdigest()} for member, raw in captures.items()}
+        return result[0], receipt, index
+
+    def test_pending_all_unknown_keeps_default_guard_and_start_residue(self):
+        row, captures = self.witnessed_row("UNKNOWN", "PENDING")
+        result, _, index = self.merge_witness_rows([row], captures)
+        self.assertEqual(result["evidence_class"], "UNKNOWN")
+        for profile in (None, "start-closure/1"):
+            with self.subTest(profile=profile):
+                checked = copy.deepcopy(result)
+                if profile is None:
+                    for source in checked["primary_sources"]:
+                        source.pop("pin_witness", None)
+                blockers = merge.compact.validate_row(checked, index, profile)
+                if profile is None:
+                    self.assertIn("unknown-evidence-class", blockers)
+                else:
+                    self.assertNotIn("unknown-evidence-class", blockers)
+                    self.assertEqual(checked["closure"]["residue"][0]["reason_code"], "evidence-class-unassessed")
+                    self.assertEqual(checked["closure"]["residue"][0]["bucket"], "G5-F4")
+        action = copy.deepcopy(result)
+        action["disposition"] = "TRIAL"
+        action.pop("pending")
+        self.assertIn("unknown-evidence-class", merge.compact.validate_row(action, index, "start-closure/1"))
+        self.assertNotIn("closure", action)
+
+    def test_pending_witnessed_recorded_and_source_review_caps_execution(self):
+        for evidence in sorted(merge.compact.RECORDED):
+            with self.subTest(evidence=evidence):
+                recorded, captures = self.witnessed_row(evidence, "TRIAL")
+                reviewed = copy.deepcopy(recorded)
+                reviewed["evidence_class"] = "SOURCE-REVIEW"
+                reviewed.pop("acceptance_witness")
+                result, _, _ = self.merge_witness_rows([recorded, reviewed], captures)
+                self.assertEqual(result["evidence_class"], "SOURCE-REVIEW")
+                self.assertNotIn("acceptance_witness", result)
+
+    def test_pending_witnessed_source_review_is_not_erased_by_unknown(self):
+        reviewed, captures = self.witnessed_row()
+        unknown = copy.deepcopy(reviewed)
+        unknown["evidence_class"] = "UNKNOWN"
+        result, _, _ = self.merge_witness_rows([unknown, reviewed], captures)
+        self.assertEqual(result["evidence_class"], "SOURCE-REVIEW")
+
+    def test_pending_unwitnessed_source_review_and_unknown_gives_unknown(self):
+        reviewed = self.compact_row()
+        unknown = copy.deepcopy(reviewed)
+        unknown["evidence_class"] = "UNKNOWN"
+        result, _, _ = self.merge_witness_rows([reviewed, unknown], {})
+        self.assertEqual(result["evidence_class"], "UNKNOWN")
+
+    def test_profile_residue_cannot_establish_candidate_class_witness(self):
+        reviewed, captures = self.witnessed_row()
+        raw = b"Retained text cannot satisfy the declared JSON source selector.\n"
+        reviewed["capture_sha256"] = hashlib.sha256(raw).hexdigest()
+        captures[reviewed["archive_member"]] = raw
+        index = {member: {"sha256": hashlib.sha256(data).hexdigest()} for member, data in captures.items()}
+        for profile in (None, "start-closure/1"):
+            with self.subTest(profile=profile):
+                row = copy.deepcopy(reviewed)
+                blockers = []
+                cache = {}
+                try:
+                    self.assertEqual(merge.compact.validate_evidence_witness(row, index, captures, cache, blockers, profile), "UNKNOWN")
+                finally:
+                    if "_primary_git_cache" in cache:
+                        cache["_primary_git_cache"][0].cleanup()
+                if profile is None:
+                    self.assertEqual([item["code"] for item in blockers], ["unsupported-json-pointer-capture"])
+                else:
+                    self.assertFalse(blockers)
+                    self.assertEqual(row["closure"]["residue"][0]["reason_code"], "unsupported-json-pointer-capture")
+
+    def test_pending_uses_strongest_witnessed_class_without_upgrading_documentary(self):
+        documentary, captures = self.witnessed_row("DOCUMENTARY")
+        unknown = copy.deepcopy(documentary)
+        unknown["evidence_class"] = "UNKNOWN"
+        result, _, _ = self.merge_witness_rows([documentary, unknown], captures)
+        self.assertEqual(result["evidence_class"], "DOCUMENTARY")
+
+        reviewed = copy.deepcopy(documentary)
+        reviewed["evidence_class"] = "SOURCE-REVIEW"
+        reviewed["source_pointer"] = "/missing"
+        result, _, _ = self.merge_witness_rows([reviewed, documentary], captures)
+        self.assertEqual(result["evidence_class"], "DOCUMENTARY")
+
+    def test_unknown_claim_residue_uses_final_disposition_and_cannot_be_forged(self):
+        claim, captures = self.witnessed_row("SOURCE-REVIEW", "TRIAL")
+        claim["source_pointer"] = "/missing"
+        claim_raw = json.dumps([claim], sort_keys=True).encode()
+        member = "captures/original-claim.json"
+        captures[member] = claim_raw
+        ref = {"archive_member": member, "sha256": hashlib.sha256(claim_raw).hexdigest(), "pointer": "/0"}
+        index = {name: {"sha256": hashlib.sha256(data).hexdigest()} for name, data in captures.items()}
+        row = copy.deepcopy(claim)
+        row["disposition"], row["evidence_class"] = "PENDING", "UNKNOWN"
+        row["pending"] = {"provisional_disposition": "WATCH", "measurement": "Assess original unsupported claim", "owner": "synthetic-controls"}
+        row["evidence_class_witness"] = ref
+        row["source_refs"] = [ref]
+        row["closure"] = {"unknown_evidence_reasons": ["unresolved-capture-pointer"]}
+        # Only CC's enumerated unsupported-claim classes can replace F4.
+        with self.assertRaisesRegex(merge.compact.CompactError, "unsupported UNKNOWN evidence reason"):
+            merge.compact.validate_row(row, index, "start-closure/1")
+        raw = b"Opaque retained text, unavailable as the declared JSON selector.\n"
+        claim["capture_sha256"] = hashlib.sha256(raw).hexdigest()
+        captures[claim["archive_member"]] = raw
+        captures[member] = json.dumps([claim], sort_keys=True).encode()
+        ref["sha256"] = hashlib.sha256(captures[member]).hexdigest()
+        row["capture_sha256"] = claim["capture_sha256"]
+        row["closure"] = {"unknown_evidence_reasons": ["unsupported-json-pointer-capture"]}
+        index = {name: {"sha256": hashlib.sha256(data).hexdigest()} for name, data in captures.items()}
+        blockers = []
+        self.assertNotIn("unknown-evidence-class", merge.compact.validate_row(row, index, "start-closure/1"))
+        cache = {}
+        self.assertEqual(merge.compact.validate_evidence_witness(row, index, captures, cache, blockers, "start-closure/1"), "UNKNOWN")
+        self.assertFalse(blockers)
+        self.assertEqual([item["reason_code"] for item in row["closure"]["residue"]], ["unsupported-json-pointer-capture"])
+        action = copy.deepcopy(row)
+        action["disposition"] = "TRIAL"
+        action.pop("pending")
+        action["closure"].pop("residue")
+        self.assertIn("unknown-evidence-class", merge.compact.validate_row(action, index, "start-closure/1"))
+        blockers = []
+        merge.compact.validate_evidence_witness(action, index, captures, {}, blockers, "start-closure/1")
+        self.assertEqual([item["code"] for item in blockers], ["unsupported-json-pointer-capture"])
+        forged = copy.deepcopy(row)
+        forged["closure"]["unknown_evidence_reasons"] = ["original-source-entry-identity-unbound"]
+        with self.assertRaisesRegex(merge.compact.CompactError, "reasons differ from the original native"):
+            merge.compact.validate_evidence_witness(forged, index, captures, {}, [], "start-closure/1")
+
+    def test_pending_invalid_recorded_receipt_cannot_support_source_review(self):
+        recorded, captures = self.witnessed_row("RECORDED-UPSTREAM-TEST", "TRIAL")
+        body = json.loads(captures[recorded["archive_member"]])
+        body["receipt"]["executed"] = False
+        raw = json.dumps(body, sort_keys=True).encode()
+        sha = hashlib.sha256(raw).hexdigest()
+        captures[recorded["archive_member"]] = raw
+        recorded["capture_sha256"] = recorded["acceptance_witness"]["sha256"] = sha
+        unknown = copy.deepcopy(recorded)
+        unknown["evidence_class"] = "UNKNOWN"
+        unknown.pop("acceptance_witness")
+        result, _, _ = self.merge_witness_rows([recorded, unknown], captures)
+        self.assertEqual(result["evidence_class"], "UNKNOWN")
+
+    def test_native_reconciliation_preserves_final_actions_and_requires_fresh_assessment(self):
+        original, captures = self.witnessed_row("UNKNOWN", "PENDING")
+        raw = json.dumps([original], sort_keys=True).encode()
+        member = "inputs/original.json"
+        captures[member] = raw
+        ref = {"archive_member": member, "sha256": hashlib.sha256(raw).hexdigest(), "pointer": "/0"}
+        inputs = [([original], member, ref["sha256"], "original")]
+        final = copy.deepcopy(original)
+        final["disposition"], final["evidence_class"] = "TRIAL", "SOURCE-REVIEW"
+        final.pop("pending")
+        final["source_refs"] = [ref]
+        rows, receipt = merge.reconcile_compact_classes([final], inputs, captures)
+        self.assertEqual(rows[0]["disposition"], "TRIAL")
+        self.assertEqual(rows[0]["evidence_class"], "UNKNOWN")
+        self.assertEqual(rows[0]["evidence_class_witness"], ref)
+        index = {name: {"sha256": hashlib.sha256(data).hexdigest()} for name, data in captures.items()}
+        self.assertIn("unknown-evidence-class", merge.compact.validate_row(rows[0], index, "start-closure/1"))
+        key = merge.compact.decision_key(final)
+        rows, receipt = merge.reconcile_compact_classes([final], inputs, captures, assessed_keys=[key])
+        self.assertEqual(rows[0]["evidence_class"], "SOURCE-REVIEW")
+        self.assertEqual(receipt["fresh_assessments"], 1)
+        self.assertEqual(rows[0]["source_refs"], final["source_refs"])
+        final["primary_sources"][0].pop("pin_witness")
+        with self.assertRaisesRegex(merge.FragmentError, "assessment has no retained witness"):
+            merge.reconcile_compact_classes([final], inputs, captures, assessed_keys=[key])
+
+    def test_native_pin_witness_rejects_tampered_objects_and_line_bounds(self):
+        row, captures = self.witnessed_row()
+        source = row["primary_sources"][0]
+        index = {name: {"sha256": hashlib.sha256(data).hexdigest()} for name, data in captures.items()}
+        cache = {}
+        try:
+            self.assertTrue(merge.compact.validate_primary_pin_witness(source, index, captures, cache))
+            wrong = copy.deepcopy(source)
+            wrong["locator"] = wrong["locator"].rsplit(":", 1)[0] + ":99"
+            with self.assertRaisesRegex(merge.compact.CompactError, "line selector lies outside"):
+                merge.compact.validate_primary_pin_witness(wrong, index, captures, cache)
+        finally:
+            cache["_primary_git_cache"][0].cleanup()
+
+    def test_native_pin_witness_rejects_reforged_object_hashes(self):
+        row, captures = self.witnessed_row()
+        source = row["primary_sources"][0]
+        proof_ref = source["pin_witness"]
+        proof = json.loads(captures[proof_ref["archive_member"]])
+        object_member = proof["objects"][0]["archive_member"]
+        altered = captures[object_member] + b"tampered\n"
+        captures[object_member] = altered
+        proof["objects"][0]["sha256"] = hashlib.sha256(altered).hexdigest()
+        proof_raw = json.dumps(proof, sort_keys=True).encode()
+        captures[proof_ref["archive_member"]] = proof_raw
+        proof_ref["sha256"] = hashlib.sha256(proof_raw).hexdigest()
+        index = {name: {"sha256": hashlib.sha256(data).hexdigest()} for name, data in captures.items()}
+        cache = {}
+        try:
+            with self.assertRaisesRegex(merge.compact.CompactError, "object ID differs"):
+                merge.compact.validate_primary_pin_witness(source, index, captures, cache)
+        finally:
+            cache["_primary_git_cache"][0].cleanup()
+
+    def test_native_tree_pin_witness_verifies_metadata_and_never_release_text(self):
+        row, captures = self.witnessed_row()
+        primary = row["primary_sources"][0]
+        old = json.loads(captures[primary["pin_witness"]["archive_member"]])
+        listing = b"100644 blob " + old["blob_id"].encode() + b"\tREADME.md\0"
+        listing_member = "captures/tree-listing.z"
+        captures[listing_member] = listing
+        proof = {"schema_version": 1, "repository": "example/project", "declared_pin": old["commit"],
+                 "declared_pin_kind": "commit", "non_file_kind": "tree", "commit": old["commit"],
+                 "object_id": old["commit"], "root_tree_id": old["objects"][1]["object_id"],
+                 "objects": old["objects"], "tag_object_type": None, "release_note_text_attested": False,
+                 "boundary": "Git metadata only",
+                 "native_recursive_tree_listing": {"archive_member": listing_member, "sha256": hashlib.sha256(listing).hexdigest()}}
+        raw = json.dumps(proof, sort_keys=True).encode()
+        member = "captures/tree-witness.json"
+        captures[member] = raw
+        primary.update(locator=f"https://github.com/example/project/tree/{old['commit']}",
+                       archive_member=member, capture_sha256=hashlib.sha256(raw).hexdigest(), pointer="",
+                       pin_witness={"archive_member": member, "sha256": hashlib.sha256(raw).hexdigest(), "pointer": ""})
+        index = {name: {"sha256": hashlib.sha256(data).hexdigest()} for name, data in captures.items()}
+        self.assertTrue(merge.compact.validate_primary_pin_witness(primary, index, captures, {}))
+        proof["commit"] = "0" * 40
+        raw = json.dumps(proof, sort_keys=True).encode()
+        captures[member] = raw
+        primary["capture_sha256"] = primary["pin_witness"]["sha256"] = hashlib.sha256(raw).hexdigest()
+        index[member]["sha256"] = primary["capture_sha256"]
+        with self.assertRaisesRegex(merge.compact.CompactError, "tag/commit mapping differs"):
+            merge.compact.validate_primary_pin_witness(primary, index, captures, {})
+
+    def test_real_gdelt_fragment_keeps_unknown(self):
+        fixture = json.loads((Path(__file__).parent / "fixtures/g5-merge-gdelt.json").read_text())
+        row = fixture["row"]
+        canonical = json.dumps(row, sort_keys=True, ensure_ascii=False, separators=(",", ":")).encode()
+        self.assertEqual(hashlib.sha256(canonical).hexdigest(), fixture["row_sha256"])
+        self.assertEqual(fixture["source_pointer"], "/14")
+        self.assertEqual(row["repository_or_entry"], "alex9smith/gdelt-doc-api")
+        rows, _ = merge.merge_compact_groups([
+            ([row], fixture["source_member"], fixture["source_sha256"], "g5-fields-b/us-equities/market-data-reference/public-safe"),
+        ])
+        self.assertEqual(rows[0]["evidence_class"], "UNKNOWN")
+
+    def test_unpinned_source_claim_keeps_pin_residue_without_an_f4_event(self):
+        original, captures = self.witnessed_row("SOURCE-REVIEW", "PENDING")
+        original["pin"] = None
+        original["primary_sources"][0]["pin"] = None
+        original["primary_sources"][0].pop("pin_witness")
+        raw = json.dumps([original], sort_keys=True).encode()
+        member = "inputs/unpinned-original.json"
+        captures[member] = raw
+        ref = {"archive_member": member, "sha256": hashlib.sha256(raw).hexdigest(), "pointer": "/0"}
+        final = copy.deepcopy(original)
+        final["source_refs"] = [ref]
+        final["closure"] = {"pending_pin": {"reason_code": "no-body", "measurement": "Retain the cited source at an established pin"}}
+        rows, _ = merge.reconcile_compact_classes([final], [([original], member, ref["sha256"], "original")], captures)
+        row = rows[0]
+        self.assertEqual(row["evidence_class"], "UNKNOWN")
+        self.assertEqual(row["closure"]["unknown_evidence_reasons"], ["source-review-claim-unpinned"])
+        index = {name: {"sha256": hashlib.sha256(data).hexdigest()} for name, data in captures.items()}
+        blockers = merge.compact.validate_row(row, index, "start-closure/1")
+        self.assertNotIn("unknown-evidence-class", blockers)
+        merge.compact.validate_evidence_witness(row, index, captures, {}, blockers, "start-closure/1")
+        self.assertEqual([item["reason_code"] for item in row["closure"]["residue"]], ["source-review-claim-unpinned"])
+        self.assertTrue(merge.compact.closure_bucket(row, "PENDING-PIN"))
+        self.assertFalse(any(item["bucket"] == "G5-F4" for item in row["closure"]["residue"]))
+        strict = copy.deepcopy(row)
+        strict.pop("closure")
+        strict.pop("evidence_class_witness")
+        self.assertIn("unknown-evidence-class", merge.compact.validate_row(strict, index))
+        action = copy.deepcopy(row)
+        action["disposition"] = "TRIAL"
+        action.pop("pending")
+        action["closure"].pop("residue")
+        action["closure"].pop("pending_pin")
+        self.assertIn("unknown-evidence-class", merge.compact.validate_row(action, index, "start-closure/1"))
+
+    def test_unknown_skill_claim_residue_uses_final_locator_gap(self):
+        from tests.test_compact_manifest import CompactManifestTests
+        fixture = CompactManifestTests()
+        fixture.setUp()
+        self.addCleanup(fixture.doCleanups)
+        fixture.native_skill()
+        fixture.skill_doc["proposed"][0]["pin"] = "b" * 40
+        fixture.rebind_skill_doc()
+        original = copy.deepcopy(fixture.rows[0])
+        captures = dict(fixture.files)
+        member = "inputs/original-skill.json"
+        raw = json.dumps([original], sort_keys=True).encode()
+        captures[member] = raw
+        ref = {"archive_member": member, "sha256": hashlib.sha256(raw).hexdigest(), "pointer": "/0"}
+        final = copy.deepcopy(original)
+        final["evidence_class"] = "UNKNOWN"
+        final["evidence_class_witness"] = ref
+        final["source_refs"] = list(final.get("source_refs", [])) + [ref]
+        final["primary_sources"][0]["locator"] = "UNKNOWN"
+        final["closure"] = {"pending_locator": {"reason_code": "unestablished-pinned-locator", "measurement": "Bind the exact containing-repository locator"},
+                            "unknown_evidence_reasons": ["native-skill-entry-witness-unverified"]}
+        index = {name: {"sha256": hashlib.sha256(data).hexdigest()} for name, data in captures.items()}
+        blockers = []
+        merge.compact.validate_evidence_witness(final, index, captures, {}, blockers, "start-closure/1")
+        self.assertFalse(blockers)
+        self.assertEqual([item["bucket"] for item in final["closure"]["residue"]], ["PENDING-LOCATOR"])
+        merge.compact.closure_metadata(final, index)
+        self.assertFalse(merge.compact.validate_row(final, index, "start-closure/1", record_residue=False))
 
     def test_compact_duplicates_preserve_origins_and_exact_role_scope(self):
         row = self.compact_row()

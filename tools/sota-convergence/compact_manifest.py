@@ -16,6 +16,7 @@ from datetime import date
 import hashlib
 import io
 import json
+import os
 from pathlib import Path, PurePosixPath
 import re
 import shutil
@@ -31,7 +32,7 @@ sys.path.insert(0, str(REPO / "tools/sota-convergence/landscape-sweep"))
 from catalog_decisions import InvalidDecisionIndex, identity as github_identity, safe_file, unique_json
 from sweep_common import canon, json_text
 
-SCHEMA = Path(__file__).parent / "schemas/compact-decision.json"
+SCHEMA = Path(__file__).resolve().parent / "schemas/compact-decision.json"
 COVERAGE_SCHEMA = SCHEMA.with_name("compact-coverage.json")
 START_CLOSURE_PROFILE = "start-closure/1"
 START_ROW_SCHEMA = SCHEMA.with_name("compact-decision-start-closure-1.json")
@@ -47,8 +48,10 @@ RESIDUE_BUCKETS = {"foreign-primary-pin-scope-unqualified": "PENDING-PIN",
                    "native-skill-entry-witness-unverified": "PENDING-PIN",
                    "original-source-entry-identity-unbound": "origin-unresolved",
                    "unsupported-json-pointer-capture": "PENDING-LOCATOR",
-                   "unbound-field-selector": "G5-F1",
-                   "original-list-occurrence-scope-unverified": "counted-inventory"}
+                    "unbound-field-selector": "G5-F1",
+                    "original-list-occurrence-scope-unverified": "counted-inventory",
+                    "evidence-class-unassessed": "G5-F4",
+                    "source-review-claim-unpinned": "PENDING-PIN"}
 RESIDUE_MEASUREMENTS = {
     "foreign-primary-pin-scope-unqualified": "Establish the candidate/source-entry subject from pinned primary evidence.",
     "skill-entry-primary-bytes-unestablished": "Retain and bind the exact upstream SKILL.md bytes and locator.",
@@ -56,7 +59,9 @@ RESIDUE_MEASUREMENTS = {
     "original-source-entry-identity-unbound": "Bind the original source entry identity to this retained decision.",
     "unsupported-json-pointer-capture": "Establish a supported locator into the retained original capture.",
     "unbound-field-selector": "Complete the frozen typed list and field census.",
-    "original-list-occurrence-scope-unverified": "Verify the original occurrence against its pinned list scope."}
+    "original-list-occurrence-scope-unverified": "Verify the original occurrence against its pinned list scope.",
+    "evidence-class-unassessed": "Assess the row against its retained primary sources and record a witnessed class.",
+    "source-review-claim-unpinned": "Pin the cited source, retain its bytes at that pin, then re-assess the class."}
 POPULATION_FACTS = ("source_repository", "pin", "path", "capture_sha256", "archive_member", "parser")
 COUNT_UNITS = {"physical_entries": "physical entries in the frozen source list before deduplication",
                "typed_source_ids": "distinct typed source ids already present in the retained mining input",
@@ -294,6 +299,9 @@ def validate_locator(locator, pin, label, blockers):
     require(not re.search(r"/(?:blob|tree|raw)/(?:main|master|HEAD|latest)(?:/|$)|raw\.githubusercontent\.com/[^/]+/[^/]+/(?:main|master|HEAD|latest)(?:/|$)", locator, re.I),
             "primary locator uses a floating ref")
     require(locator.startswith("https://") or re.search(r"@[^:]+:", locator), "primary locator must name an upstream HTTPS source or repo@pin:file")
+    if locator.startswith("https://"):
+        require(not re.search(r":[1-9][0-9]*(?:-[1-9][0-9]*)?$", urlsplit(locator).path),
+                "primary URL path must not encode a line selector; use #L<n> or #L<a>-L<b>")
     if pin is None:
         return
     source = canonical(pin["repository_or_source"])
@@ -368,6 +376,8 @@ def profile_blocker(row, code, blockers, profile=None, detail=None):
 
 
 def closure_bucket(row, bucket):
+    if bucket == "PENDING-PIN" and any(item["bucket"] == "G5-F4" for item in row.get("closure", {}).get("residue", [])):
+        return False
     flag = {"PENDING-PIN": "pending_pin", "PENDING-LOCATOR": "pending_locator"}[bucket]
     return flag in row.get("closure", {}) or any(item["bucket"] == bucket for item in row.get("closure", {}).get("residue", []))
 
@@ -375,7 +385,15 @@ def closure_bucket(row, bucket):
 def closure_metadata(row, index):
     """Validate explicit residue declarations; none is evidence or a source pin."""
     closure = row.get("closure", {})
-    closed(closure, set(), {"pending_pin", "pending_locator", "pending_conflict", "disagreements", "residue"}, "closure")
+    closed(closure, set(), {"pending_pin", "pending_locator", "pending_conflict", "disagreements", "residue", "unknown_evidence_reasons"}, "closure")
+    if "unknown_evidence_reasons" in closure:
+        reasons = closure["unknown_evidence_reasons"]
+        require(row["evidence_class"] == "UNKNOWN" and "evidence_class_witness" in row,
+                "unsupported UNKNOWN class reasons need an original evidence claim witness")
+        require(isinstance(reasons, list) and bool(reasons) and len(set(reasons)) == len(reasons)
+                and set(reasons) <= {"skill-entry-primary-bytes-unestablished", "native-skill-entry-witness-unverified",
+                                    "original-source-entry-identity-unbound", "unsupported-json-pointer-capture", "source-review-claim-unpinned"},
+                "unsupported UNKNOWN evidence reason codes")
     for item in closure.get("residue", []):
         closed(item, {"reason_code", "bucket", "count", "measurement"}, {"occurrence_id", "origin_pointer_before"}, "closure.residue")
         require(row["disposition"] not in ACTION_CLASSES, "closure residue can never carry ADOPT-NOW or TRIAL")
@@ -534,14 +552,19 @@ def validate_row(row, index, profile=None, *, record_residue=True):
     start_closure = validation_profile(profile)
     if not record_residue:
         row = {**row, "closure": {**row.get("closure", {}), "residue": list(row.get("closure", {}).get("residue", []))}} if start_closure else dict(row)
-    closed(row, ROW_REQUIRED, ROW_OPTIONAL | ({"closure", "provenance", "origin_pointer", "origin_claim_ids"} if start_closure else set()), "row")
+    closed(row, ROW_REQUIRED, ROW_OPTIONAL | ({"closure", "provenance", "origin_pointer", "origin_claim_ids", "evidence_class_witness"} if start_closure else set()), "row")
     identity, slot, _ = decision_key(row)
     require(row["disposition"] in CLASSES and row["evidence_class"] in EVIDENCE, "unsupported disposition/evidence class")
     blockers = []
     if slot == "UNKNOWN":
         blockers.append("unknown-field-scope")
     if row["evidence_class"] == "UNKNOWN":
-        blockers.append("unknown-evidence-class")
+        if start_closure and row["disposition"] not in ACTION_CLASSES and row.get("closure", {}).get("unknown_evidence_reasons"):
+            pass  # Original reason append sites are recomputed from the bound claim below.
+        elif start_closure and row["disposition"] not in ACTION_CLASSES:
+            profile_blocker(row, "evidence-class-unassessed", blockers, profile)
+        else:
+            blockers.append("unknown-evidence-class")
     closure = closure_metadata(row, index) if start_closure else {}
     if "origin_pointer" in row:
         origin = row["origin_pointer"]
@@ -571,11 +594,15 @@ def validate_row(row, index, profile=None, *, record_residue=True):
         foreign = canonical(row["pin"]["repository_or_source"]) != parent_identity
         if foreign:
             require(row["pin"]["subject"] in {"source-entry", "reference"}, "foreign source pin is not an implementation pin")
-            require(row["evidence_class"] in {"SOURCE-REVIEW", "DOCUMENTARY"}, "foreign primary source pin cannot establish recorded execution")
+            require(row["evidence_class"] in {"SOURCE-REVIEW", "DOCUMENTARY"}
+                    or start_closure and row["evidence_class"] == "UNKNOWN" and "evidence_class_witness" in row,
+                    "foreign primary source pin cannot establish recorded execution")
             if row.get("decision_scope") != "source-entry-screen" or row.get("candidate_implementation_status") != "UNESTABLISHED" or not {"source_pointer", "source_entry_witness"} & row.keys():
                 profile_blocker(row, "foreign-primary-pin-scope-unqualified", blockers, profile)
         if skill:
-            if (row["evidence_class"] not in {"SOURCE-REVIEW", "DOCUMENTARY"} or row["disposition"] != "PENDING"
+            if (row["evidence_class"] not in {"SOURCE-REVIEW", "DOCUMENTARY"}
+                    and not (start_closure and row["evidence_class"] == "UNKNOWN" and "evidence_class_witness" in row)
+                    or row["disposition"] != "PENDING"
                     or row["pin"]["kind"] != "commit" or row["pin"]["subject"] != "implementation" or "source_pointer" not in row):
                 blockers.append("skill-entry-source-scope-unqualified")
     if "source_entry_witness" in row:
@@ -583,7 +610,9 @@ def validate_row(row, index, profile=None, *, record_residue=True):
         closed(witness, {"archive_member", "sha256", "pointer"}, set(), "source entry witness")
         match_capture(witness["archive_member"], witness["sha256"], index)
         require(isinstance(witness["pointer"], str) and re.fullmatch(r"(?:line:|#L)[1-9][0-9]*", witness["pointer"]), "native TSV witness requires a one-based physical line locator")
-        if (row["evidence_class"] not in {"SOURCE-REVIEW", "DOCUMENTARY"} or row.get("decision_scope") != "source-entry-screen"
+        if (row["evidence_class"] not in {"SOURCE-REVIEW", "DOCUMENTARY"}
+                and not (start_closure and row["evidence_class"] == "UNKNOWN" and "evidence_class_witness" in row)
+                or row.get("decision_scope") != "source-entry-screen"
                 or row.get("candidate_implementation_status") != "UNESTABLISHED" or row["pin"] is None
                 or row["pin"]["subject"] != "source-entry"):
             blockers.append("native-source-entry-witness-scope-unqualified")
@@ -598,7 +627,7 @@ def validate_row(row, index, profile=None, *, record_residue=True):
     require(isinstance(sources, list) and bool(sources), "every row must retain a primary source")
     pending_locator_detected = False
     for i, source in enumerate(sources):
-        closed(source, {"locator", "pin", "subject"}, {"capture_sha256", "archive_member", "pointer"}, "primary source")
+        closed(source, {"locator", "pin", "subject"}, {"capture_sha256", "archive_member", "pointer"} | ({"pin_witness"} if start_closure else set()), "primary source")
         text(source["subject"], "primary source subject")
         pin_blockers = []
         validate_pin(source["pin"], f"primary[{i}]", pin_blockers)
@@ -613,6 +642,11 @@ def validate_row(row, index, profile=None, *, record_residue=True):
             match_capture(source["archive_member"], source["capture_sha256"], index)
         if "pointer" in source:
             require(isinstance(source["pointer"], str) and (source["pointer"] == "" or source["pointer"].startswith("/")), "primary pointer must be JSON Pointer")
+        if "pin_witness" in source:
+            witness = source["pin_witness"]
+            closed(witness, {"archive_member", "sha256", "pointer"}, set(), "primary pin witness")
+            match_capture(witness["archive_member"], witness["sha256"], index)
+            require(isinstance(witness["pointer"], str) and (witness["pointer"] == "" or witness["pointer"].startswith("/")), "primary pin witness needs a JSON Pointer")
     require("pending_locator" not in closure or pending_locator_detected or any(item["status"] == "PENDING" for item in closure.get("disagreements", [])),
             "pending_locator requires an actual unknown locator or recorded disagreement")
     if row["pin"] is not None:
@@ -653,6 +687,8 @@ def validate_row(row, index, profile=None, *, record_residue=True):
         closed(witness, {"archive_member", "sha256", "pointer"}, set(), "acceptance witness")
         match_capture(witness["archive_member"], witness["sha256"], index)
         require(isinstance(witness["pointer"], str) and (witness["pointer"] == "" or witness["pointer"].startswith("/")), "acceptance witness needs a JSON Pointer")
+    if "evidence_class_witness" in row:
+        validate_ref(row["evidence_class_witness"], index)
     require(row["disposition"] != "ADOPT-NOW" or row["evidence_class"] == "RECORDED-LIVE-ACCEPTANCE", "source-only or test-only evidence cannot establish ADOPT-NOW")
     require(row["disposition"] != "ADOPT-NOW" or (row["pin"] is not None and row["pin"]["subject"] == "implementation"), "ADOPT-NOW requires an implementation pin, not a reference/source-entry pin")
     return blockers
@@ -1014,6 +1050,237 @@ def validate_acceptance(row, captures):
                 "ADOPT-NOW lacks passing native routing in both clients")
 
 
+def validate_primary_pin_witness(source, index, captures, cache):
+    """Verify retained Git custody with native Git 2.x, entirely offline.
+
+    Reference: git/git v2.53.0 git-hash-object, git-rev-parse and git-ls-tree.
+    Raw commit/tree/blob bytes establish the declaration's exact file pin;
+    a generated statement of object IDs alone is never sufficient.
+    """
+    witness = source.get("pin_witness")
+    if witness is None:
+        return False
+    preview_blockers = []
+    preview = declared_witness(witness, index, captures, cache, preview_blockers, "primary-pin-witness")
+    if isinstance(preview, dict) and "non_file_kind" in preview:
+        return validate_nonfile_pin_witness(source, preview, index, captures, cache)
+    witness_key = (witness["archive_member"], witness["sha256"], witness["pointer"])
+    verified = cache.setdefault("_verified_primary_pins", {})
+    if witness_key not in verified:
+        proof_blockers = []
+        proof = declared_witness(witness, index, captures, cache, proof_blockers, "primary-pin-witness")
+        require(not proof_blockers and isinstance(proof, dict), "primary pin witness does not resolve")
+        closed(proof, {"schema_version", "repository", "commit", "path", "blob_id", "objects", "body"}, set(), "primary Git pin witness")
+        require(proof["schema_version"] == 1 and COMMIT.fullmatch(proof["commit"]) and COMMIT.fullmatch(proof["blob_id"]), "primary pin witness uses exact Git objects")
+        repository, path = canonical(proof["repository"]), member_name(proof["path"])
+        body_ref = proof["body"]
+        closed(body_ref, {"archive_member", "sha256"}, set(), "primary Git body")
+        match_capture(body_ref["archive_member"], body_ref["sha256"], index)
+        require(body_ref["archive_member"] in captures, "primary Git body bytes not retained")
+        body = captures[body_ref["archive_member"]]
+        require(hashlib.sha256(body).hexdigest() == body_ref["sha256"], "primary Git body hash differs")
+        environment = {"PATH": os.defpath, "GIT_CONFIG_NOSYSTEM": "1", "GIT_CONFIG_GLOBAL": os.devnull,
+                       "GIT_NO_LAZY_FETCH": "1", "GIT_TERMINAL_PROMPT": "0"}
+        def native_git(*args, raw=None):
+            result = subprocess.run(["git", "--git-dir", str(object_directory), *args], input=raw,
+                                    capture_output=True, env=environment, timeout=30)
+            require(result.returncode == 0, "native Git cannot verify retained primary custody")
+            return result.stdout
+        if "_primary_git_cache" not in cache:
+            directory = tempfile.TemporaryDirectory(prefix="g5-offline-git-")
+            object_directory = Path(directory.name) / "objects.git"
+            result = subprocess.run(["git", "init", "--bare", "--quiet", str(object_directory)],
+                                    capture_output=True, env=environment, timeout=30)
+            require(result.returncode == 0, "native Git cannot initialize offline witness cache")
+            cache["_primary_git_cache"] = (directory, object_directory)
+        object_directory = cache["_primary_git_cache"][1]
+        require(isinstance(proof["objects"], list) and bool(proof["objects"]), "primary Git witness requires raw commit/tree custody")
+        for item in proof["objects"]:
+            closed(item, {"object_id", "object_type", "archive_member", "sha256"}, set(), "primary Git object")
+            require(item["object_type"] in {"commit", "tree"} and COMMIT.fullmatch(item["object_id"]), "unsupported primary Git object")
+            match_capture(item["archive_member"], item["sha256"], index)
+            require(item["archive_member"] in captures, "primary Git object bytes not retained")
+            raw = captures[item["archive_member"]]
+            require(hashlib.sha256(raw).hexdigest() == item["sha256"], "primary Git object hash differs")
+            actual = native_git("hash-object", "-w", "-t", item["object_type"], "--stdin", raw=raw).decode().strip()
+            require(actual == item["object_id"], "primary Git object ID differs from retained bytes")
+        actual_blob = native_git("hash-object", "-w", "--stdin", raw=body).decode().strip()
+        require(actual_blob == proof["blob_id"], "primary Git blob differs from retained body")
+        native_git("rev-parse", "--verify", proof["commit"] + "^{commit}")
+        listing = native_git("ls-tree", "-z", proof["commit"], "--", path)
+        entries = listing.split(b"\0")
+        require(len(entries) == 2 and entries[1] == b"", "primary Git path does not resolve to one object")
+        metadata, actual_path = entries[0].split(b"\t", 1)
+        mode, object_type, object_id = metadata.split(b" ")
+        require(object_type == b"blob" and mode in {b"100644", b"100755", b"120000"}
+                and object_id.decode() == proof["blob_id"] and actual_path.decode() == path,
+                "primary Git commit/tree/path/blob binding differs")
+        verified[witness_key] = (repository, proof["commit"], path, body_ref)
+    repository, commit, path, body_ref = verified[witness_key]
+    pin = source.get("pin")
+    require(pin is not None and pin["kind"] == "commit" and pin["version_or_commit"] == commit
+            and canonical(pin["repository_or_source"]) == repository, "primary Git witness differs from declared pin")
+    require(source.get("archive_member") == body_ref["archive_member"] and source.get("capture_sha256") == body_ref["sha256"],
+            "primary declaration does not bind its verified source body")
+    locator = source["locator"]
+    at_pin = re.fullmatch(r"(.+)@([^:]+):(.+)", locator)
+    if at_pin is not None:
+        locator_path = re.sub(r":[1-9][0-9]*$", "", at_pin[3])
+    else:
+        url = urlsplit(locator)
+        if url.hostname == "raw.githubusercontent.com":
+            parts = url.path.split("/", 4)
+            require(len(parts) == 5 and parts[3] == commit, "raw primary Git witness requires its declared commit")
+            locator_path = parts[4]
+        else:
+            parts = url.path.split("/", 5)
+            require(url.hostname == "github.com" and len(parts) == 6 and parts[3] == "blob", "primary Git witness requires a pinned file locator")
+            locator_path = parts[5]
+    require(locator_path == path, "primary Git witness differs from locator path")
+    if at_pin is not None:
+        selector = re.search(r":([1-9][0-9]*)(?:-([1-9][0-9]*))?$", at_pin[3])
+    else:
+        selector = re.fullmatch(r"L([1-9][0-9]*)(?:-L([1-9][0-9]*))?", urlsplit(locator).fragment)
+    if selector:
+        first, last = int(selector[1]), int(selector[2] or selector[1])
+        body_lines = captures[body_ref["archive_member"]].decode("utf-8").splitlines()
+        require(1 <= first <= last <= len(body_lines), "primary Git line selector lies outside its retained blob")
+    return True
+
+
+def validate_nonfile_pin_witness(source, proof, index, captures, cache):
+    """Witness a declared repository tree/tag as Git metadata, not release text."""
+    require(proof.get("schema_version") == 1 and proof.get("non_file_kind") in {"tree", "releases"}, "unsupported non-file primary witness")
+    pin = source.get("pin")
+    require(pin is not None and canonical(pin["repository_or_source"]) == canonical(proof["repository"])
+            and pin["kind"] == proof["declared_pin_kind"] and pin["version_or_commit"] == proof["declared_pin"],
+            "non-file witness differs from declared pin")
+    require(COMMIT.fullmatch(proof["commit"]) and COMMIT.fullmatch(proof["root_tree_id"]), "non-file custody needs exact Git IDs")
+    environment = {"PATH": os.defpath, "GIT_CONFIG_NOSYSTEM": "1", "GIT_CONFIG_GLOBAL": os.devnull,
+                   "GIT_NO_LAZY_FETCH": "1", "GIT_TERMINAL_PROMPT": "0"}
+    with tempfile.TemporaryDirectory(prefix="g5-offline-tree-") as directory:
+        result = subprocess.run(["git", "init", "--bare", "--quiet", directory], capture_output=True, env=environment, timeout=30)
+        require(result.returncode == 0, "native Git cannot initialize tree custody cache")
+        def native(*args, raw=None):
+            result = subprocess.run(["git", "--git-dir", directory, *args], input=raw, capture_output=True, env=environment, timeout=30)
+            require(result.returncode == 0, "native Git cannot verify non-file custody")
+            return result.stdout.decode().strip()
+        for item in proof["objects"]:
+            require(item["object_type"] in {"commit", "tree", "tag"}, "unsupported non-file Git object type")
+            match_capture(item["archive_member"], item["sha256"], index)
+            require(item["archive_member"] in captures, "non-file raw object bytes not retained")
+            raw = captures[item["archive_member"]]
+            require(hashlib.sha256(raw).hexdigest() == item["sha256"] and
+                    native("hash-object", "-w", "-t", item["object_type"], "--stdin", raw=raw) == item["object_id"],
+                    "non-file Git object differs from retained bytes")
+        require(native("rev-parse", "--verify", proof["object_id"] + "^{commit}") == proof["commit"], "non-file tag/commit mapping differs")
+        require(native("rev-parse", "--verify", proof["commit"] + "^{tree}") == proof["root_tree_id"], "non-file commit/root tree binding differs")
+    listing = proof["native_recursive_tree_listing"]
+    match_capture(listing["archive_member"], listing["sha256"], index)
+    require(listing["archive_member"] in captures and hashlib.sha256(captures[listing["archive_member"]]).hexdigest() == listing["sha256"],
+            "non-file tree listing capture differs")
+    require(proof["release_note_text_attested"] is False, "Git metadata cannot attest release-note text")
+    return True
+
+
+def validate_evidence_witness(row, index, captures, cache, blockers, profile=None, *, require_primary_pin=False):
+    """Check original evidence bindings for both asset rows and merge candidates.
+
+    Primary pin, locator and field qualification remain separate row gates.
+    The returned class is supported only when its retained witnesses pass.
+    """
+    evidence = row.get("evidence_class", "UNKNOWN")
+    if evidence == "UNKNOWN" and "evidence_class_witness" in row:
+        ref = row["evidence_class_witness"]
+        validate_ref(ref, index)
+        original_refs = list(row.get("source_refs", [])) + [source_ref for choice in row.get("choices", []) for source_ref in choice["source_refs"]]
+        require(any(all(source_ref.get(name) == ref[name] for name in ("archive_member", "sha256", "pointer")) for source_ref in original_refs),
+                "UNKNOWN evidence witness is not a retained original row reference")
+        witness_blockers = []
+        claim = selected_capture(ref["archive_member"], ref["pointer"], captures, cache, witness_blockers, "evidence-class-claim")
+        require(not witness_blockers and isinstance(claim, dict) and decision_key(claim) == decision_key(row),
+                "UNKNOWN evidence claim witness has a different decision key")
+        claim = {**claim, "closure": {**claim.get("closure", {}), "residue": []}}
+        claim.pop("evidence_class_witness", None)
+        # Original class, pin, selectors and captures remain the claim's inputs.
+        supported = validate_evidence_witness(claim, index, captures, cache, witness_blockers, require_primary_pin=True)
+        require(supported == "UNKNOWN", "UNKNOWN evidence claim is supported and needs a new declared assessment")
+        reasons = {item if isinstance(item, str) else item["code"] for item in witness_blockers}
+        declared = set(row.get("closure", {}).get("unknown_evidence_reasons", []))
+        if declared:
+            if declared == {"source-review-claim-unpinned"}:
+                require(claim["evidence_class"] == "SOURCE-REVIEW" and claim["pin"] is None
+                        and reasons == {"source-review-primary-pin-unwitnessed"},
+                        "unpinned source-review residue is not its original native witness gap")
+                profile_blocker(row, "source-review-claim-unpinned", blockers, profile)
+                return "UNKNOWN"
+            require(declared == reasons, "UNKNOWN evidence reasons differ from the original native witness check")
+            if validation_profile(profile):
+                profile_failures = []
+                # The claim's strict witness was already checked at its original
+                # class/pin/disposition. Qualification residue follows the final
+                # disposition and preserves this final row's origin replay value.
+                gate_claim = {**claim, "disposition": row["disposition"],
+                              "closure": {**claim.get("closure", {}), **row.get("closure", {}), "residue": []}}
+                gate_claim["closure"].pop("unknown_evidence_reasons", None)
+                if "origin_pointer" in row:
+                    gate_claim["origin_pointer"] = row["origin_pointer"]
+                else:
+                    gate_claim.pop("origin_pointer", None)
+                validate_evidence_witness(gate_claim, index, captures, cache, profile_failures, profile)
+                blockers.extend(profile_failures)
+                row.setdefault("closure", {}).setdefault("residue", []).extend(gate_claim.get("closure", {}).get("residue", []))
+                if "original-source-entry-identity-unbound" in reasons:
+                    row["origin_pointer"] = "unresolved"
+            else:
+                blockers.extend(witness_blockers)
+        return "UNKNOWN"
+    require(evidence in EVIDENCE, "unsupported evidence class")
+    require((evidence in RECORDED) == ("acceptance_witness" in row),
+            "recorded execution requires an original witness; source review cannot carry execution")
+    match_capture(row["archive_member"], row["capture_sha256"], index)
+    require(row["archive_member"] in captures, "evidence witness requires retained capture bytes")
+    require(hashlib.sha256(captures[row["archive_member"]]).hexdigest() == row["capture_sha256"],
+            "evidence witness capture bytes differ from their declared hash")
+    refs = list(row.get("source_refs", []))
+    refs += [ref for choice in row.get("choices", []) for ref in choice["source_refs"]]
+    for ref in refs:
+        validate_ref(ref, index)
+    for source in row["primary_sources"]:
+        require(("capture_sha256" in source) == ("archive_member" in source), "primary capture hash/member must be paired")
+        if "archive_member" in source:
+            match_capture(source["archive_member"], source["capture_sha256"], index)
+        if "pin_witness" in source:
+            validate_primary_pin_witness(source, index, captures, cache)
+    for name in ("source_entry_witness", "acceptance_witness"):
+        if name in row:
+            match_capture(row[name]["archive_member"], row[name]["sha256"], index)
+    # Witness support is strict under every profile. Profile residue describes
+    # a qualification gap; it cannot make an unsupported class witnessed.
+    witness_blockers = []
+    validate_reference_pointers([row], captures, witness_blockers, cache)
+    validate_native_source_entry(row, index, captures, cache, witness_blockers)
+    validate_native_skill_entry(row, index, captures, cache, witness_blockers)
+    validate_acceptance(row, captures)
+    if (require_primary_pin or validation_profile(profile)) and evidence == "SOURCE-REVIEW" and not witness_blockers and not any(
+            source.get("pin") == row.get("pin") and source.get("pin") is not None
+            and validate_primary_pin_witness(source, index, captures, cache)
+            for source in row["primary_sources"]):
+        witness_blockers.append({"code": "source-review-primary-pin-unwitnessed",
+                                 "repository_or_entry": decision_key(row)[0], "slot": row["slot"],
+                                 "qualification": row.get("qualification", {})})
+    supported = "UNKNOWN" if evidence == "UNKNOWN" or witness_blockers else evidence
+    if witness_blockers and validation_profile(profile):
+        # Reuse the original append sites for disposition-gated face residue.
+        validate_reference_pointers([row], captures, blockers, cache, profile)
+        validate_native_source_entry(row, index, captures, cache, blockers)
+        validate_native_skill_entry(row, index, captures, cache, blockers, profile)
+        blockers.extend(item for item in witness_blockers if isinstance(item, dict) and item.get("code") == "source-review-primary-pin-unwitnessed")
+    else:
+        blockers.extend(witness_blockers)
+    return supported
+
+
 def closure_omissions(omissions, index):
     approved, unresolved = [], []
     for omission in omissions:
@@ -1337,21 +1604,30 @@ def validate_coverage(coverage, rows, index, captures, cache, profile=None):
                  != sorted((population_fact(p) for p in inventory_populations), key=lambda p: json.dumps(p, sort_keys=True))):
             blockers.append({"code": "source-inventory-unfrozen-or-population-mismatch"})
     extra = set(ref_map) - (occurrence_mappings if start_closure else occurrence_keys)
+    action_extra = set()
+    if start_closure:
+        action_extra = {mapping for mapping in extra if actual[ref_map[mapping][0]]["disposition"] in ACTION_CLASSES}
+        for mapping in sorted(action_extra):
+            row_key, _ = ref_map[mapping]
+            blockers.append({"code": "occurrences-outside-declared-union", "occurrence_id": mapping[0],
+                             "repository_or_entry": row_key[0], "slot": row_key[1],
+                             "qualification": json.loads(row_key[2]), "disposition": actual[row_key]["disposition"]})
+    non_action_extra = extra - action_extra
     outside_union = None
-    ids = sorted(item[0] if start_closure else item for item in extra)
+    ids = sorted(item[0] if start_closure else item for item in non_action_extra)
     ids_sha = hashlib.sha256(json_text(ids, indent=2).encode("utf-8")).hexdigest()
     union_omissions = [o for o in approved_omissions if o["code"] == "occurrences-outside-declared-union"]
     require(len(union_omissions) <= 1, "duplicate G5-F3 outside-union omission")
     omission = union_omissions[0] if union_omissions else None
-    if extra or omission is not None:
+    if non_action_extra or omission is not None:
         if start_closure and omission is not None:
             require(omission["cc_disposition_id"] == "G5-F3", "outside-union omission requires CC disposition G5-F3")
-            require(omission["count"] == len(extra) and omission.get("occurrence_ids_sha256") == ids_sha,
-                    "G5-F3 occurrence count/hash differs from actual outside-union census")
-            outside_union = {"count": len(extra), "occurrence_ids": ids, "occurrence_ids_sha256": ids_sha,
+            require(omission["count"] == len(non_action_extra) and omission.get("occurrence_ids_sha256") == ids_sha,
+                    "G5-F3 occurrence count/hash differs from actual non-action outside-union census")
+            outside_union = {"count": len(non_action_extra), "occurrence_ids": ids, "occurrence_ids_sha256": ids_sha,
                              "cc_disposition_id": "G5-F3", "follow_up_id": "G5-F3"}
         else:
-            blockers.append({"code": "occurrences-outside-declared-union", "count": len(extra)})
+            blockers.append({"code": "occurrences-outside-declared-union", "count": len(non_action_extra)})
     require(not physical_occurrence_keys & unpromoted_keys, "an occurrence cannot be both promoted and unpromoted")
     coverage_summary = {"status": coverage["status"], "omissions": coverage["omissions"], "list_populations": summary}
     if outside_union is not None:
@@ -1362,6 +1638,7 @@ def validate_coverage(coverage, rows, index, captures, cache, profile=None):
         "list_populations": len(populations), "expected_occurrences": len(occurrence_keys),
         "retained_occurrences": retained_count}
     if start_closure:
+        counts["outside_union_action_mappings"] = len(action_extra)
         counts["expected_occurrences"] = len(physical_occurrence_keys)
         counts["literal_promoted_occurrences"] = len(occurrence_keys)
         counts["physical_aliases"] = physical_alias_count
@@ -1477,6 +1754,9 @@ def build_manifest(asset, release_tag, witnesses=(), profile=None):
     asset_sha, index, captured = read_archive(asset)
     require(ROWS_MEMBER in captured and COVERAGE_MEMBER in captured, "asset requires compact/rows.json and compact/coverage.json")
     rows = row_list(captured[ROWS_MEMBER])
+    if witnesses:
+        witness_rows = [row for witness in witnesses for row in row_list(Path(witness).read_bytes())]
+        require(normalized_rows(witness_rows) == normalized_rows(rows), "local --rows witness union differs from retained asset rows")
     if start_closure:
         # Output residue is recomputed from original defects, never trusted as a waiver.
         for row in rows:
@@ -1497,11 +1777,12 @@ def build_manifest(asset, release_tag, witnesses=(), profile=None):
         blockers.extend({"code": code, "repository_or_entry": decision_key(row)[0], "slot": row["slot"],
                          "qualification": qualification(row.get("qualification", {}))} for code in validate_row(row, index, profile))
     rows = normalized_rows(rows)
-    if witnesses:
-        witness_rows = [row for witness in witnesses for row in row_list(Path(witness).read_bytes())]
-        require(normalized_rows(witness_rows) == rows, "local --rows witness union differs from retained asset rows")
     coverage_raw = load(captured[COVERAGE_MEMBER])
     wanted = {row["acceptance_witness"]["archive_member"] for row in rows if "acceptance_witness" in row}
+    wanted |= {row["archive_member"] for row in rows}
+    wanted |= {row["evidence_class_witness"]["archive_member"] for row in rows if "evidence_class_witness" in row}
+    wanted |= {source["archive_member"] for row in rows for source in row["primary_sources"] if "archive_member" in source}
+    wanted |= {source["pin_witness"]["archive_member"] for row in rows for source in row["primary_sources"] if "pin_witness" in source}
     wanted |= {row["archive_member"] for row in rows if "source_pointer" in row or "source_entry_witness" in row}
     wanted |= {row["source_entry_witness"]["archive_member"] for row in rows if "source_entry_witness" in row}
     wanted |= {ref["archive_member"] for row in rows for ref in row.get("source_refs", []) if "archive_member" in ref}
@@ -1532,8 +1813,40 @@ def build_manifest(asset, release_tag, witnesses=(), profile=None):
     if wanted:
         second_sha, second_index, receipts = read_archive(asset, wanted)
         require(second_sha == asset_sha and second_index == index, "asset changed before acceptance-witness check")
-        for row in rows:
-            validate_acceptance(row, receipts)
+    pin_members = set()
+    claim_sources = []
+    for row in rows:
+        if "evidence_class_witness" in row:
+            ref = row["evidence_class_witness"]
+            claim = pointer(load(receipts[ref["archive_member"]]), ref["pointer"])
+            require(isinstance(claim, dict), "evidence class claim must select an original row")
+            claim_sources += claim["primary_sources"]
+            pin_members.add(claim["archive_member"])
+            pin_members |= {ref["archive_member"] for ref in claim.get("source_refs", []) if "archive_member" in ref}
+            pin_members |= {ref["archive_member"] for choice in claim.get("choices", []) for ref in choice["source_refs"] if "archive_member" in ref}
+            pin_members |= {claim[name]["archive_member"] for name in ("acceptance_witness", "source_entry_witness") if name in claim}
+            pin_members |= {source["pin_witness"]["archive_member"] for source in claim["primary_sources"] if "pin_witness" in source}
+    if pin_members - receipts.keys():
+        pin_sha, pin_index, pin_captures = read_archive(asset, pin_members)
+        require(pin_sha == asset_sha and pin_index == index, "asset changed before original class custody check")
+        receipts.update(pin_captures)
+    for source in [source for row in rows for source in row["primary_sources"]] + claim_sources:
+            if "archive_member" in source:
+                pin_members.add(source["archive_member"])
+            if "pin_witness" not in source:
+                continue
+            ref = source["pin_witness"]
+            proof = pointer(load(receipts[ref["archive_member"]]), ref["pointer"])
+            require(isinstance(proof, dict), "primary Git witness must select an object")
+            if "body" in proof:
+                pin_members.add(proof["body"]["archive_member"])
+            else:
+                pin_members.add(proof["native_recursive_tree_listing"]["archive_member"])
+            pin_members |= {item["archive_member"] for item in proof["objects"]}
+    if pin_members - receipts.keys():
+        pin_sha, pin_index, pin_captures = read_archive(asset, pin_members)
+        require(pin_sha == asset_sha and pin_index == index, "asset changed before primary Git custody check")
+        receipts.update(pin_captures)
     if start_closure:
         alias_members, alias_cache = set(), {}
         for population in coverage_raw.get("list_populations", []):
@@ -1563,7 +1876,8 @@ def build_manifest(asset, release_tag, witnesses=(), profile=None):
             require(alias_sha == asset_sha and alias_index == index, "asset changed before original alias receipt check")
             receipts.update(alias_captures)
     cache = {}
-    validate_reference_pointers(rows, receipts, blockers, cache, profile)
+    for row in rows:
+        validate_evidence_witness(row, index, receipts, cache, blockers, profile)
     if start_closure:
         for row in rows:
             for residue in row.get("closure", {}).get("residue", []):
@@ -1571,9 +1885,6 @@ def build_manifest(asset, release_tag, witnesses=(), profile=None):
                     validate_origin_pointer({**row, "origin_pointer": residue["origin_pointer_before"]}, receipts, cache, blockers)
             validate_origin_pointer(row, receipts, cache, blockers)
             validate_origin_claims(row, receipts, cache, blockers)
-    for row in rows:
-        validate_native_source_entry(row, index, receipts, cache, blockers)
-        validate_native_skill_entry(row, index, receipts, cache, blockers, profile)
     coverage_blockers, coverage, counts = validate_coverage(coverage_raw, rows, index, receipts, cache, profile)
     blockers.extend(coverage_blockers)
     counts.update({"rows": len(rows), "identities": len({decision_key(row)[0] for row in rows}),
@@ -1610,8 +1921,9 @@ def build_manifest(asset, release_tag, witnesses=(), profile=None):
         for name in ("pending_pin", "pending_locator"):
             bucket = {"pending_pin": "PENDING-PIN", "pending_locator": "PENDING-LOCATOR"}[name]
             residue_counts[name + "_rows"] = sum(closure_bucket(row, bucket) for row in rows)
-            residue_counts[name + "_by_reason"] = dict(sorted(Counter(row["closure"][name]["reason_code"] for row in rows if name in row.get("closure", {})).items()))
-            residue_counts[name + "_declared_rows"] = sum(name in row.get("closure", {}) for row in rows)
+            residue_counts[name + "_by_reason"] = dict(sorted(Counter(row["closure"][name]["reason_code"] for row in rows if name in row.get("closure", {}) and closure_bucket(row, bucket)).items()))
+            residue_counts[name + "_declared_rows"] = sum(name in row.get("closure", {}) and closure_bucket(row, bucket) for row in rows)
+            residue_counts[name + "_historical_flags_on_f4_rows"] = sum(name in row.get("closure", {}) and any(item["bucket"] == "G5-F4" for item in row.get("closure", {}).get("residue", [])) for row in rows)
         class_counts, bucket_counts = Counter(), Counter()
         for row in rows:
             for item in row.get("closure", {}).get("residue", []):
@@ -1619,18 +1931,19 @@ def build_manifest(asset, release_tag, witnesses=(), profile=None):
                 bucket_counts[item["bucket"]] += item["count"]
         residue_counts["residue_by_class"] = {code: class_counts[code] for code in RESIDUE_BUCKETS}
         residue_counts["residue_by_bucket"] = {bucket: bucket_counts[bucket] for bucket in
-                                                ("PENDING-PIN", "PENDING-LOCATOR", "counted-inventory", "origin-unresolved", "G5-F1")}
+                                                ("PENDING-PIN", "PENDING-LOCATOR", "counted-inventory", "origin-unresolved", "G5-F1", "G5-F4")}
         residue_counts["residue_events"] = sum(class_counts.values())
         residue_counts["residue_rows"] = sum(bool(row.get("closure", {}).get("residue")) for row in rows)
         residue_counts["counted_inventory"] = bucket_counts["counted-inventory"]
         residue_counts["f1"] = class_counts["unbound-field-selector"]
         residue_counts["f2"] = sum(class_counts[code] for code in ("skill-entry-primary-bytes-unestablished", "native-skill-entry-witness-unverified"))
         residue_counts["f3"] = coverage.get("outside_declared_union", {}).get("count", 0)
+        residue_counts["f4"] = class_counts["evidence-class-unassessed"]
         residue_counts["residue_by_class"]["occurrences-outside-declared-union"] = residue_counts["f3"]
-        residue_counts["residue_by_bucket"].update({"G5-F2": residue_counts["f2"], "G5-F3": residue_counts["f3"]})
+        residue_counts["residue_by_bucket"].update({"G5-F2": residue_counts["f2"], "G5-F3": residue_counts["f3"], "G5-F4": residue_counts["f4"]})
         pin_items = Counter()
         for row in rows:
-            if "pending_pin" in row.get("closure", {}):
+            if "pending_pin" in row.get("closure", {}) and closure_bucket(row, "PENDING-PIN"):
                 pin_items[row["closure"]["pending_pin"]["reason_code"]] += (row["pin"] is None) + sum(source["pin"] is None for source in row["primary_sources"])
         residue_counts["pending_pin_items_by_reason"] = dict(sorted(pin_items.items()))
         residue_counts["pending_pin_items"] = sum(pin_items.values())
@@ -1663,21 +1976,29 @@ def build_manifest(asset, release_tag, witnesses=(), profile=None):
                        "pending_pin": residue_counts["pending_pin_rows"], "pending_locator": residue_counts["pending_locator_rows"],
                        "counted_inventory": residue_counts["counted_inventory"],
                        "origin_unresolved": residue_counts["origin_pointer_unresolved"],
-                       "f1": residue_counts["f1"], "f2": residue_counts["f2"], "f3": residue_counts["f3"],
+                       "f1": residue_counts["f1"], "f2": residue_counts["f2"], "f3": residue_counts["f3"], "f4": residue_counts["f4"],
                        "residue_by_class": residue_counts["residue_by_class"], "residue_by_bucket": residue_counts["residue_by_bucket"],
                        "disagreements_resolved": sum(item["status"] == "RESOLVED" for item in disagreements), "disagreements_total": len(disagreements)})
         manifest["validation"].update({"profile": START_CLOSURE_PROFILE, "nonblocking_counts": residue_counts, "disagreements": disagreements,
                                        "status": "BLOCKED" if blockers else "PASS"})
         coverage["count_units"].update({"origin_pointer_unresolved": "distinct hash-bound original origin_claim_ids plus one legacy unit per unresolved row without declared claim ids",
+                                        "pending_pin": "distinct retained rows with an explicit pending_pin flag or PENDING-PIN residue bucket",
+                                        "pending_locator": "distinct retained rows with an explicit pending_locator flag or PENDING-LOCATOR residue bucket",
+                                        "origin_unresolved": "alias of origin_pointer_unresolved: distinct original claim IDs plus legacy unresolved rows without claim IDs",
+                                        "source-primary-qualification-unresolved": "historical PENDING decision-row census at preparation, measured from provenance/r4-input-rows.original.json (SHA256 3f9db58d7082cac1165813a6a33d48474d1089fdb043ff8df8ad6bfe42212243); separate from current row buckets and F2 residue events",
                                         "origin_pointer_unresolved_rows": "retained decision rows with literal origin_pointer unresolved, including qualified keys sharing one original claim",
                                         "residue_by_class": "original append events on non-action rows; G5-F3 instead counts outside-union occurrence mappings",
                                         "residue_by_bucket": "sum of per-row residue events; G5-F2 overlaps its pin/locator bucket and G5-F3 is global",
                                         "counted_inventory": "non-action original-list scope append events, separate from unpromoted physical inventory",
                                         "f1": "unbound-field-selector residue events, separate from the declared typed-census omission count",
                                         "f2": "skill-source qualification residue events, overlapping PENDING-PIN or PENDING-LOCATOR",
-                                        "f3": "outside-union occurrence mappings bound to the sorted occurrence-id list SHA256"})
+                                         "f3": "non-action outside-union occurrence mappings bound to the sorted occurrence-id list SHA256",
+                                         "f4": "non-action declared UNKNOWN evidence-class rows requiring a witnessed assessment",
+                                        "outside_union_action_mappings": "outside-union mappings on ADOPT-NOW or TRIAL rows; always blocking under every profile"})
     raw = json_text(sorted_tree(manifest), indent=2).encode("utf-8")
     require(len(raw) < MANIFEST_LIMIT, "compact manifest must remain below GitHub's 100 MiB regular-file limit")
+    if "_primary_git_cache" in cache:
+        cache["_primary_git_cache"][0].cleanup()
     return manifest, raw
 
 

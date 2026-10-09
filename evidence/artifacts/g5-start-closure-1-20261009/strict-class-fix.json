@@ -1,0 +1,180 @@
+{
+  "asset": {
+    "bytes": 56392501,
+    "coverage_member": "compact/coverage.json",
+    "coverage_sha256": "6c0535a581b5788a1fb2c61587db01f6dd5769084814b8641cc703b8b488caa9",
+    "format": "tar.zst",
+    "name": "g5-landscape-evidence-2026-10-08.tar.zst",
+    "rows_member": "compact/rows.json",
+    "rows_sha256": "5a5e79f8f29e17a01ab992ccccccf22b7816bfe2516fe37fc6d8c024174c4e1b",
+    "sha256": "bb076b04c5afd6ca0eccdfbc7905ba547c5eb189c2e19d657f947c51ae48d4e7"
+  },
+  "boundary": "Mechanical consistency and retained source bytes only. No installed candidate, live execution, designated read, publication or G5 MET inferred.",
+  "check_stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "check_stdout": {
+    "bytes": 15201,
+    "sha256": "2ed956a23b6a6fc142a4fcb8701f6896488f93ca58811bd91f204c5450ef856f"
+  },
+  "default_row_schema_sha256": "716f69bb20ed4b60b21e8d32b6fb44902b069eb2cb2acaf6c6a109fdceed2e27",
+  "default_schema_changed": false,
+  "f4_pin_row_intersection": 0,
+  "face": {
+    "action_rows": 83,
+    "by_disposition": {
+      "NO-GAP": 48,
+      "OUT-OF-SCOPE": 10,
+      "PENDING": 4058,
+      "REJECT": 6,
+      "TRIAL": 83,
+      "WATCH": 401
+    },
+    "by_evidence_class": {
+      "DOCUMENTARY": 2167,
+      "SOURCE-REVIEW": 826,
+      "UNKNOWN": 1613
+    },
+    "counted_inventory": 1082,
+    "disagreements_resolved": 10,
+    "disagreements_total": 10,
+    "f1": 10,
+    "f2": 166,
+    "f3": 797,
+    "f4": 476,
+    "list_populations": 1047,
+    "origin_unresolved": 143,
+    "pending_locator": 2117,
+    "pending_pin": 3340,
+    "pinned_rows": 1648,
+    "residue_by_bucket": {
+      "G5-F1": 10,
+      "G5-F2": 166,
+      "G5-F3": 797,
+      "G5-F4": 476,
+      "PENDING-LOCATOR": 52,
+      "PENDING-PIN": 1731,
+      "counted-inventory": 1082,
+      "origin-unresolved": 96
+    },
+    "residue_by_class": {
+      "evidence-class-unassessed": 476,
+      "foreign-primary-pin-scope-unqualified": 706,
+      "native-skill-entry-witness-unverified": 53,
+      "occurrences-outside-declared-union": 797,
+      "original-list-occurrence-scope-unverified": 1082,
+      "original-source-entry-identity-unbound": 96,
+      "skill-entry-primary-bytes-unestablished": 113,
+      "source-review-claim-unpinned": 875,
+      "unbound-field-selector": 10,
+      "unsupported-json-pointer-capture": 36
+    },
+    "rows": 4606
+  },
+  "full_suite_comparison": {
+    "baseline_commit": "2ecce6ec2221704db642ddec8f70f7152ed2afb6",
+    "status": "PENDING",
+    "unprepared_errors": 23,
+    "unprepared_failures": 11,
+    "unprepared_run_exit_code": 1,
+    "unprepared_skips": 914,
+    "unprepared_tests": 10814
+  },
+  "historical_pin_flags_on_f4_rows": 476,
+  "hot_file_citations": {
+    "already_pinned": 4,
+    "candidates": 159,
+    "current_head_substitution": false,
+    "historical_rebindings": 152,
+    "narrower_proposal_hunk": 1,
+    "pending_locator": 2,
+    "plan_sha256": "adcdd61ad35afea52e5fc918f27ecaf81037ad9c4cf2c6bff8e084792b47c3b4"
+  },
+  "kind": "g5-start-closure-strict-class-fix",
+  "manifest_sha256": "e03c802ca06cec8af18f4bb7d69329dc1c677862a1c89b7ca18ce8214007846b",
+  "merger_sha256": "7f358cc77d5b55091ccb9136c133ebd602a0ac5860310c3a4927ae9aa23387f6",
+  "native_check_exit_code": 0,
+  "native_retention": {
+    "REST_content_requests": 0,
+    "capture_scope": "Native raw Git commit/root/intermediate tree/blob custody and whole bodies; typed tag/commit/root/listing metadata; symlink text distinct from target bytes",
+    "existing_bodies_rebound": 99,
+    "existing_summary_sha256": "4494a4e6a288d209fb70760a2a087611a80410362816b86ce309210d583d3c93",
+    "file_failures": 0,
+    "file_tuples": 828,
+    "new_file_tuples": 729,
+    "new_summary_sha256": "3f2ff40c3cc3170cac8bee5973cea1e94d7c72fcf8236c74a29e59ef7c5a7423",
+    "nonfile_failures": 0,
+    "nonfile_instances": 500
+  },
+  "native_sampler_row_origin_validation": {
+    "exit_code": 0,
+    "fragments": 46,
+    "origins": 4606,
+    "rows": 4606,
+    "selection_executed": false,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout_sha256": "a65775adab4c7dab432ae978a780bca52047b4fac39b2e54f4b833a385816ce3"
+  },
+  "native_write_exit_code": 0,
+  "origin_map_sha256": "676cd4e5374b8dff156e4cb3b619a5b0a9e03f83b92eee2f33dd7c58b0c01c2c",
+  "per_row_bucket_sums": {
+    "G5-F1": 10,
+    "G5-F4": 476,
+    "PENDING-LOCATOR": 52,
+    "PENDING-PIN": 1731,
+    "counted-inventory": 1082,
+    "origin-unresolved": 96
+  },
+  "profile": "start-closure/1",
+  "protocol_sha256": "7a0ebf0c99e2587de1c7fdad6ffca8a23bc6ad29f721a67f16a86607745ee558",
+  "readiness_follow_ups_open": [
+    "G5-F1",
+    "G5-F2",
+    "G5-F3",
+    "G5-F4"
+  ],
+  "required_acceptance": {
+    "CI": "NOT_RUN_ON_FIX_HEAD",
+    "J8": "NOT_RUN_ON_FIX_HEAD",
+    "both_families": "NOT_RUN_ON_FIX_HEAD",
+    "explicit_cue": "NOT_RECEIVED",
+    "pre_cue": "NOT_RUN"
+  },
+  "sampler_sha256": "713a7cbfbc39538d90d77f30ba9feb869f854ab0c3b574d665c9309ef4947abd",
+  "schema_version": 1,
+  "six_logical_occurrence_repairs_preserved": true,
+  "source_baseline": "fa6ade3124f5387768025b0ea2de4f63daa78ccf",
+  "tests": [
+    {
+      "exit_code": 0,
+      "modules": [
+        "tests.test_compact_manifest",
+        "tests.test_g5_merge_fragments"
+      ],
+      "runtime": "Python 3.13.16",
+      "skipped": 2,
+      "stderr_sha256": "5d259c93389bbc9c9e844aa81fd526dca280027bbe4b6f13299b0309ff8d9fd1",
+      "tests": 128
+    },
+    {
+      "exit_code": 0,
+      "module": "tests.test_start_closure_sampler",
+      "runtime": "Python 3.14.4",
+      "stderr_sha256": "c219b351bf9ee1f85c4b8488a0e1bbb651b1b02875b534934d06007a54ab2c06",
+      "tests": 28
+    }
+  ],
+  "trial_source_assessments": {
+    "accepted_derived_only": true,
+    "count": 3,
+    "native_execution_or_install_claim": false,
+    "nautilus_risk_sources_added": true,
+    "receipt_sha256": "8d45c2907153c8c443dc5bc9e51aaed681bbebf983270a3c8a09911c36137292"
+  },
+  "trials_unchanged": 83,
+  "usage": {
+    "provider_tokens": null,
+    "step_tokens": null
+  }
+}
