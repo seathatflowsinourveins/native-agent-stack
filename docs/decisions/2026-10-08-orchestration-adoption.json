@@ -1,0 +1,920 @@
+{
+  "schema_version": 1,
+  "kind": "host_orchestration_adoption_record",
+  "record_date_utc": "2026-10-08",
+  "revision_date_utc": "2026-10-09",
+  "status": "draft_delta_reads_and_owner_gates_pending",
+  "lane": "foundation",
+  "base_commit": "aba02ec3456d383bcc2fc72883db098f9be7918a",
+  "reviewed_head": "021e1a875d13cdd713856784b4dbc3dec86acd88",
+  "delta_reviewed_head": "0ad947f6fd5023b2a21eadae2837349d4b313886",
+  "state_root": "~/.local/state/native-agent-stack",
+  "locator_scope": "research/ and coordination/ resolve under state_root; docs/ resolves in the repository checkout",
+  "new_acceptance_model_run": false,
+  "host_wiring_applied": false,
+  "decision_document": "docs/decisions/2026-10-08-orchestration-adoption.md",
+  "native_evidence": {
+    "file": "docs/decisions/2026-10-08-orchestration-native-evidence.json",
+    "sha256": "8a27c364b4a2a84e6fbfaa397461a3aab08c2a87bd08256947c740312ea835cb",
+    "scope": "Native fixed-window hcom metadata and installed vendor source; not organic/task/model acceptance"
+  },
+  "measurements": {
+    "historical": {
+      "source": "coordination/ns2604-coop/notes/adoption-evidence-20261008/adoption-now-5de97cf238b3d28a.json",
+      "sha256": "5de97cf238b3d28aa9f7d5110a05857204a847b0c75cda8971de8e142e362e36",
+      "generated_utc": "2026-10-08T23:42:51Z",
+      "window_hours": 24,
+      "claude_total_sessions": 63,
+      "codex_total_conversations": 841,
+      "producer_sha256": "10784aa8862eaed3a5e0520ecdb2eb58cdf0277f4bab62f8868a86b703954408",
+      "scope": "Historical MCP-only seven-layer snapshot; omission of native orchestration meant UNMEASURED then, not zero. Superseded for current native counts, retained unchanged."
+    },
+    "cc_read_snapshot": {
+      "source": "coordination/command-center/pages/adoption-cc-20261009T0008Z.json",
+      "sha256": "2ebc30ce3527d025dad39d65293d3020620192c4f0d2987cf3988461254836a0",
+      "retained_file": "docs/decisions/extra/adoption-cc-2ebc30ce3527d025.json",
+      "packet_extra": "extra/adoption-cc-2ebc30ce3527d025.json",
+      "bytes": 60603,
+      "retention_scope": "Exact frozen source bytes committed with this record and copied to the lane's new-head packet extra/; all prior denominators and comparison counts remain unchanged",
+      "generated_utc": "2026-10-09T00:08:43Z",
+      "window_hours": 24,
+      "claude_total_sessions": 69,
+      "codex_total_conversations": 844,
+      "per_role_counts": [
+        {
+          "role": "wsl-architecture-design",
+          "observed_sessions": 1,
+          "Agent": 57,
+          "SendMessage": 311,
+          "Monitor": 150,
+          "Workflow": 11
+        },
+        {
+          "role": "ns2604-coop",
+          "observed_sessions": 1,
+          "Agent": 8,
+          "SendMessage": 248,
+          "Monitor": 61,
+          "Workflow": 0,
+          "CronCreate": 24,
+          "CronDelete": 11,
+          "CronList": 6
+        },
+        {
+          "role": "api-actions",
+          "observed_sessions": 1,
+          "Agent": 4,
+          "SendMessage": 38,
+          "Monitor": 0,
+          "Workflow": 0
+        },
+        {
+          "role": "native-agent-stack-1a",
+          "observed_sessions": 1,
+          "Agent": 0,
+          "SendMessage": 11,
+          "Monitor": 1,
+          "Workflow": 1
+        },
+        {
+          "role": "other Claude sessions",
+          "observed_sessions": 65,
+          "Agent": 21,
+          "SendMessage": 0,
+          "Monitor": 0,
+          "Workflow": 0
+        }
+      ],
+      "codex_native_tool_result_totals": {
+        "spawn_agent": 589,
+        "send_message": 7247,
+        "followup_task": 1078
+      },
+      "original_producer_prefix_reported_by_cc": "85232bf9",
+      "scope": "Counts recomputed from frozen source file. Zero is no emitted matching aggregate for that measured role/tool, not proof of absence outside capture. No sum with later snapshots."
+    },
+    "hourly": {
+      "source": "coordination/ns2604-coop/notes/adoption-evidence-20261008/adoption-now-8682d1d326f29798.json",
+      "sha256": "8682d1d326f2979802efa32d156d9db14dba3ce04273328b6b48a0e227533ac7",
+      "generated_utc": "2026-10-09T00:31:25Z",
+      "window_hours": 24,
+      "claude_total_sessions": 70,
+      "codex_total_conversations": 850,
+      "per_role_counts": [
+        {
+          "role": "wsl-architecture-design",
+          "observed_sessions": 1,
+          "Agent": 59,
+          "SendMessage": 319,
+          "Monitor": 149,
+          "Workflow": 11
+        },
+        {
+          "role": "ns2604-coop",
+          "observed_sessions": 1,
+          "Agent": 8,
+          "SendMessage": 252,
+          "Monitor": 64,
+          "Workflow": 0,
+          "CronCreate": 24,
+          "CronDelete": 11,
+          "CronList": 6
+        },
+        {
+          "role": "api-actions",
+          "observed_sessions": 1,
+          "Agent": 4,
+          "SendMessage": 41,
+          "Monitor": 0,
+          "Workflow": 0
+        },
+        {
+          "role": "native-agent-stack-1a",
+          "observed_sessions": 1,
+          "Agent": 0,
+          "SendMessage": 12,
+          "Monitor": 2,
+          "Workflow": 1
+        },
+        {
+          "role": "other Claude sessions",
+          "observed_sessions": 66,
+          "Agent": 21,
+          "SendMessage": 0,
+          "Monitor": 0,
+          "Workflow": 0
+        }
+      ],
+      "codex_native_tool_result_totals": {
+        "spawn_agent": 587,
+        "send_message": 7219,
+        "followup_task": 1075
+      },
+      "own_codex_lane": {
+        "label": "kiri",
+        "observed_conversations": 2,
+        "spawn_agent": 1,
+        "send_message": 12,
+        "followup_task": 1
+      },
+      "scope": "Published native tool_result aggregate, separate from MCP groups; 24-hour windows shift, so counts need not increase."
+    },
+    "producer_review": {
+      "source": "coordination/command-center/cc-tools/adoption_invoke.py",
+      "sha256": "efff86d46ee7b76d1634d067a5c53126a0120294bbf38372f4318677d556a2a9",
+      "retained_source": "coordination/ns2604-coop/lanes/orch-records-work/adoption-fix-904-20261009/adoption_invoke-efff86d46ee7b76d.py",
+      "scope": "Reviewed current producer, postdating the two native snapshots; exact producer identity is not embedded by those files. This hash is not falsely assigned as their generating revision.",
+      "sdk_services": [
+        "codex_sdk_ts",
+        "codex-app-server"
+      ],
+      "sdk_role_label": "sdk:<service>:<lane>",
+      "matching_sdk_inclusive_snapshot": "measurements.latest_sdk_hourly",
+      "producer_modified_or_run_by_lane": false
+    },
+    "counter_caveats": [
+      "Agent includes ordinary subagents; not a named-peer/team-specific success count.",
+      "SendMessage includes cross-session communication; not exclusively peer collaboration.",
+      "Workflow tool_result is native invocation evidence, not successful stages or organic trigger proof.",
+      "Monitor is a native monitoring tool count, not orchestration completion.",
+      "Codex send_message/followup_task are collaboration; only spawn_agent is the spawn counter.",
+      "Session/conversation denominators are observed tool-result populations, not eligible fresh-task denominators.",
+      "Current role naming, retained telemetry and unlabelled buckets limit attribution; missing coverage stays unknown.",
+      "Do not sum the snapshots, cumulative usage or overlapping native/provider/cache counters."
+    ],
+    "latest_sdk_hourly": {
+      "source": "coordination/ns2604-coop/notes/adoption-evidence-20261008/adoption-now-e129759fe91ffbb1.json",
+      "sha256": "e129759fe91ffbb133de2719a7d5194fe96ac65c44b222adf7fdd4d65af0e872",
+      "generated_utc": "2026-10-09T01:39:38Z",
+      "window_hours": 24,
+      "claude_total_sessions": 79,
+      "codex_and_sdk_total_conversations": 931,
+      "current_reviewed_producer_sha256": "efff86d46ee7b76d1634d067a5c53126a0120294bbf38372f4318677d556a2a9",
+      "per_role_counts": [
+        {
+          "role": "wsl-architecture-design",
+          "observed_sessions": 1,
+          "Agent": 58,
+          "SendMessage": 356,
+          "Monitor": 147,
+          "Workflow": 11
+        },
+        {
+          "role": "ns2604-coop",
+          "observed_sessions": 1,
+          "Agent": 8,
+          "SendMessage": 281,
+          "Monitor": 76,
+          "Workflow": 0,
+          "CronCreate": 24,
+          "CronDelete": 11,
+          "CronList": 6
+        },
+        {
+          "role": "api-actions",
+          "observed_sessions": 1,
+          "Agent": 4,
+          "SendMessage": 54,
+          "Monitor": 0,
+          "Workflow": 0
+        },
+        {
+          "role": "native-agent-stack-1a",
+          "observed_sessions": 1,
+          "Agent": 0,
+          "SendMessage": 17,
+          "Monitor": 5,
+          "Workflow": 2
+        },
+        {
+          "role": "other Claude sessions",
+          "observed_sessions": 75,
+          "Agent": 30,
+          "SendMessage": 0,
+          "Monitor": 0,
+          "Workflow": 0
+        }
+      ],
+      "codex_native_non_sdk_totals": {
+        "spawn_agent": 574,
+        "send_message": 7060,
+        "followup_task": 1032
+      },
+      "own_codex_lane": {
+        "label": "kiri",
+        "observed_conversations": 3,
+        "spawn_agent": 2,
+        "send_message": 23,
+        "followup_task": 4
+      },
+      "sdk": {
+        "label": "sdk:codex_sdk_ts:unlabelled",
+        "observed_conversations": 80,
+        "native_orchestration_tool_results": 165,
+        "counts": {
+          "spawn_agent": 53,
+          "send_message": 54,
+          "followup_task": 9,
+          "list_agents": 11,
+          "wait_agent": 38
+        },
+        "owning_role": "unlabelled;unknown",
+        "scope": "Native SDK service counters separate from CLI/collaboration and from organic/model-success evidence"
+      },
+      "codex_app_server": "No matching labelled aggregate emitted in this file; not a universal zero-use claim.",
+      "scope": "Fresh published SDK-inclusive source, later window and denominator; preserve previous comparisons without summing. File does not embed producer revision; current reviewed source separately frozen."
+    }
+  },
+  "decisions": [
+    {
+      "layer": "hcom",
+      "outcome": "DEFER",
+      "outcome_reason": "Final-candidate G5 quality binding and fresh organic owning-role proof remain open; counts are not selection inputs",
+      "owner": "co-op lane launch/transport; client coordinators",
+      "stages": {
+        "final_candidate": {
+          "status": "PENDING_G5",
+          "catalog_row": {
+            "status": "pending",
+            "path": null,
+            "id": null,
+            "revision": null
+          },
+          "upstream_quality_sources": {
+            "repository": "aannoo/hcom",
+            "tag": "v0.7.28",
+            "commit": "b2a7c192003e7fd67ed93265289e4ac36276f965",
+            "sources": [
+              "README.md",
+              "src/db/events.rs",
+              "src/hooks/common.rs",
+              "src/commands/kill.rs",
+              "src/hooks/codex.rs"
+            ]
+          },
+          "available_evidence": "Pinned vendor source/release/interface review; no matched comparative quality claim",
+          "missing_quality_evidence": "Landed G5 row and its maintenance/release/benchmark/code-quality/head-to-head sources where present",
+          "invoke_used_for_selection": false,
+          "role_slot": "co-op cross-client lane lifecycle and transport",
+          "current_choice": null,
+          "current_choice_status": "PENDING_G5_single_default_adjudication",
+          "installed_candidate": "hcom",
+          "overlap_dispositions": [
+            {
+              "candidate": "Claude native cross-session messaging",
+              "disposition": "alternative",
+              "scope": "overlaps same-client messaging; not a parallel cross-client default"
+            },
+            {
+              "candidate": "AO owned-session lifecycle",
+              "disposition": "alternative",
+              "scope": "overlaps launch/control only within AO-managed workers"
+            }
+          ],
+          "alternative_ranking": "PENDING_G5;alternatives are not parallel defaults",
+          "checked_at_utc": "2026-10-09",
+          "evidence_class": "source_review_and_scoped_retained_evidence",
+          "overturn_when": "Landed quality evidence names the best same-role candidate/replacement or a release/capability correction reopens that choice; invoke counts do not alter source-quality rank",
+          "revisit_path": "PENDING #878 landing: catalog-owner daily catalog-freshness and saturation-ledger reopen triggers, docs/g5-refresh-procedure.md and index maintenance"
+        },
+        "wiring": {
+          "status": "install_recipe_and_source_recorded_application_acceptance_pending",
+          "clean_native_install": {
+            "command": "curl -fsSL https://github.com/aannoo/hcom/releases/download/v0.7.28/hcom-installer.sh | sh",
+            "source": "Vendor README installer method, fixed release asset at v0.7.28",
+            "installer_sha256": "75c1560785799881c265ae02ccb247bc6f0742835d716452f7d82071fe8bd638",
+            "evidence": "Installed0.7.28/status/hooks observed; no new installer run"
+          },
+          "vendor_route": "hcom0.7.28 per-run native client hooks; source b2a7c192003e7fd67ed93265289e4ac36276f965",
+          "per_client": {
+            "Claude": "Vendor per-run native hook/injected instructions; fresh owning-role route pending",
+            "Codex": "Vendor native Codex hook; launch/transport metadata narrower than organic acceptance"
+          },
+          "inverse": {
+            "command": "hcom kill <owned-lane>; independently observe process/tab/writer-lock exit; co-op owns worktree cleanup",
+            "fresh_receipt": "PENDING per-client task inverse; killed metadata is not successful exit proof",
+            "installation_withdrawal": "PENDING selected owner cleanup recipe; no global withdrawal from this record"
+          },
+          "owner_step": "Fresh supported owning-role route/inverse evidence",
+          "source_scope": "Vendor native per-run launch/hooks for the co-op transport role; fixed-window target tags/lifespans are measured separately from unknown initiating-role organic selection",
+          "task_dependencies": "No added shared-task requirement",
+          "memory_cost_gate": {
+            "tool_per_session_pss_kb": null,
+            "status": "PENDING_COMPONENT_COVERAGE;not_ADOPT_NOW",
+            "native_parent_pss_ref": null,
+            "scope": "Short-lived native CLI/hook/runner footprint not isolated in this receipt",
+            "shared_copy": "Native shared event store; per-run CLI/hooks; no proposed separate HTTP MCP daemon",
+            "role_scoped_loading": "Owning co-op/client coordinators and hcom-launched native lanes only",
+            "alwaysLoad": "Not applicable to these native interfaces;future MCP exposure, if selected, must use role sets/alwaysLoad:false where supported",
+            "whole_lane_reference": "native_evidence#/memory_observations/whole_lane_reference",
+            "unknown_is_zero": false
+          }
+        },
+        "fresh_session_evidence": {
+          "status": "PENDING",
+          "tests": {
+            "Claude": {
+              "name": "HCOM-CLAUDE-NATURAL-OWNER",
+              "task": "Ordinary bounded engineering outcome requiring a separate owned native lane; no tool names in task input",
+              "pass": "Fresh owning coordinator chooses vendor launch/transport; bind role/session/task selection, hook, readiness, delivery and causal reply",
+              "control": "Sender exit0 or system notice without actual recipient/reply cannot pass"
+            },
+            "Codex": {
+              "name": "HCOM-CODEX-NATURAL-OWNER",
+              "task": "Same natural coordination outcome in a fresh owning Codex role",
+              "pass": "Same native causal evidence bound to actual fresh role/client; explicitly forced transport is separate",
+              "control": "Stale readiness or missing hook/delivery rejects acceptance"
+            }
+          },
+          "organic_use_shown": false,
+          "missing_evidence": [
+            "Owning co-op role and client",
+            "fresh session boundary",
+            "natural task and how mechanism was selected",
+            "bound vendor hook and readiness",
+            "delivered request and causal reply"
+          ]
+        },
+        "invoke_measurement": {
+          "status": "MEASURED_NATIVE_OR_PROXY_COUNTERS",
+          "baseline_refs": [
+            "measurements.historical",
+            "native_evidence#/hcom/per_role_rows",
+            "native_evidence#/hcom/initiating_roles",
+            "measurements.latest_sdk_hourly"
+          ],
+          "baseline_scope": "2026-10-08 native omission was UNMEASURED, not zero; later coverage separately bound",
+          "role_scope": "Target tags/lifespans measured; CC/co-op initiating role and organic trigger unknown",
+          "eligible_fresh_task_denominator": null,
+          "organic_use_shown": false,
+          "rates_used_for_selection": false,
+          "sdk_scope": "SDK-native calls carry their service/unlabelled scope; not assigned to an owning role without evidence"
+        }
+      }
+    },
+    {
+      "layer": "Claude agent teams",
+      "outcome": "DEFER",
+      "outcome_reason": "Final-candidate G5 quality binding and fresh organic owning-role proof remain open; counts are not selection inputs",
+      "owner": "CC/co-op Claude coordinator",
+      "stages": {
+        "final_candidate": {
+          "status": "PENDING_G5",
+          "catalog_row": {
+            "status": "pending",
+            "path": null,
+            "id": null,
+            "revision": null
+          },
+          "upstream_quality_sources": {
+            "repository": "anthropics/claude-code",
+            "tag": "v2.1.295",
+            "public_commit": "602df92bf481ed904533e95c09f740f40aab5aed",
+            "build": "07e8f67ea328",
+            "installed_source_ref": "native_evidence#/claude_installed_source"
+          },
+          "available_evidence": "Pinned vendor source/release/interface review; no matched comparative quality claim",
+          "missing_quality_evidence": "Landed G5 row and its maintenance/release/benchmark/code-quality/head-to-head sources where present",
+          "invoke_used_for_selection": false,
+          "role_slot": "Claude coordinator parallel peer exploration/synthesis",
+          "current_choice": null,
+          "current_choice_status": "PENDING_G5_single_default_adjudication",
+          "installed_candidate": "Claude agent teams",
+          "overlap_dispositions": [
+            {
+              "candidate": "ordinary native subagents",
+              "disposition": "alternative",
+              "scope": "overlapping independent fan-out; native baseline already supplies this narrower mode"
+            },
+            {
+              "candidate": "native cross-session messaging or workflows",
+              "disposition": "alternative",
+              "scope": "overlapping peer/fan-out work; no parallel default asserted"
+            }
+          ],
+          "alternative_ranking": "PENDING_G5;alternatives are not parallel defaults",
+          "checked_at_utc": "2026-10-09",
+          "evidence_class": "source_review_and_scoped_retained_evidence",
+          "overturn_when": "Landed quality evidence names the best same-role candidate/replacement or a release/capability correction reopens that choice; invoke counts do not alter source-quality rank",
+          "revisit_path": "PENDING #878 landing: catalog-owner daily catalog-freshness and saturation-ledger reopen triggers, docs/g5-refresh-procedure.md and index maintenance"
+        },
+        "wiring": {
+          "status": "install_recipe_and_source_recorded_application_acceptance_pending",
+          "clean_native_install": {
+            "command": "claude install 2.1.295",
+            "source": "Native install --help confirms specific version; installed pinned source in native_evidence",
+            "evidence": "2.1.295 already installed; help/source only; no separate team/workflow package or reinstall"
+          },
+          "vendor_route": "Installed2.1.295 approved-plan named-teammate suggestion and Team Coordination reminder; original source spans in native_evidence",
+          "current_activation": "CC-verified user-scope CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 loads implicit teams in every Claude session; native_evidence#/claude_host_activation",
+          "role_scoping": {
+            "status": "PENDING_OWNER_GATE",
+            "owning_roles": ["CC", "co-op"],
+            "proposed_change": "Owner withdraws the experimental teams variable from user scope and enables it only in approved CC/co-op native launches; exact supported launch recipe and acceptance remain pending",
+            "inverse": "Owner removes the added role launch overrides and restores the recorded pre-change user-scope CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1; verify fresh-session scope after rollback",
+            "applied_by_record": false
+          },
+          "per_client": {
+            "Claude": "Pinned conditional approved-plan suggestion and Team Coordination reminder",
+            "Codex": "Claude-native feature not a Codex interface; hcom handoff separate, any Codex graph adapter independently qualified"
+          },
+          "inverse": {
+            "native_inverse": "Owner requests native peer stop; verify acknowledgement/exit and scoped cleanup",
+            "fresh_receipt": "PENDING selected session inverse; global installation not withdrawn"
+          },
+          "owner_step": "Owner decides/applies role scoping and its inverse; the shipped route is host-wide active today, while natural peer selection in a fresh CC/co-op task remains pending",
+          "source_scope": "Host-wide feature activation is CC-verified; intended CC/co-op role scoping is pending; approved-plan native guard still holds and does not prove natural selection",
+          "task_dependencies": "Not adopted under declined TODO-tools scope",
+          "memory_cost_gate": {
+            "tool_per_session_pss_kb": null,
+            "status": "PENDING_COMPONENT_COVERAGE;not_ADOPT_NOW",
+            "native_parent_pss_ref": "native_evidence#/memory_observations/role_rows",
+            "scope": "Measured native parent process only; named peers/MCP children and incremental feature PSS unknown; do not assign/sum the common client figure as tool-specific cost",
+            "shared_copy": "Native features inside owning Claude session; shared install/code pages, no separately proposed HTTP MCP server",
+            "role_scoped_loading": "PENDING_OWNER_GATE; current user-scope teams flag loads every Claude session; intended role scope is CC/co-op only; ordinary native Agent remains distinct",
+            "alwaysLoad": "Not applicable to these native interfaces;future MCP exposure, if selected, must use role sets/alwaysLoad:false where supported",
+            "whole_lane_reference": "native_evidence#/memory_observations/whole_lane_reference",
+            "unknown_is_zero": false
+          }
+        },
+        "fresh_session_evidence": {
+          "status": "PENDING",
+          "tests": {
+            "Claude": {
+              "name": "TEAMS-CLAUDE-NATURAL-PEERS",
+              "task": "Independent hypotheses/reviews with read-only bounded peer ownership and no orchestration names in task input",
+              "pass": "Owner-authorized native route naturally selects named peers; require actual peer-to-peer communication, accepted findings and fresh owner/session attribution",
+              "control": "Lead-only config or independent ordinary subagents without peer coordination cannot pass"
+            },
+            "Codex": {
+              "name": "TEAMS-CODEX-CLAUDE-HANDOFF",
+              "task": "Natural outcome handed to owning Claude coordinator when native peer modality is needed",
+              "pass": "Attribute actual team collaboration to Claude and hcom transport to Codex",
+              "control": "Codex collaboration calls cannot be relabelled native Claude teams"
+            }
+          },
+          "organic_use_shown": false,
+          "missing_evidence": "Natural selection, accepted output and fresh owning-role attribution"
+        },
+        "invoke_measurement": {
+          "status": "MEASURED_NATIVE_OR_PROXY_COUNTERS",
+          "baseline_refs": [
+            "measurements.historical",
+            "measurements.hourly#/per_role_counts",
+            "measurements.cc_read_snapshot#/per_role_counts",
+            "measurements.latest_sdk_hourly"
+          ],
+          "baseline_scope": "2026-10-08 native omission was UNMEASURED, not zero; later coverage separately bound",
+          "role_scope": "Native tool_result per observed role/session; Agent/SendMessage proxies",
+          "eligible_fresh_task_denominator": null,
+          "organic_use_shown": false,
+          "rates_used_for_selection": false,
+          "sdk_scope": "SDK-native calls carry their service/unlabelled scope; not assigned to an owning role without evidence"
+        }
+      }
+    },
+    {
+      "layer": "Claude workflows",
+      "outcome": "DEFER",
+      "outcome_reason": "Final-candidate G5 quality binding and fresh organic owning-role proof remain open; counts are not selection inputs",
+      "owner": "CC/co-op Claude coordinator; API-actions separately scoped",
+      "stages": {
+        "final_candidate": {
+          "status": "PENDING_G5",
+          "catalog_row": {
+            "status": "pending",
+            "path": null,
+            "id": null,
+            "revision": null
+          },
+          "upstream_quality_sources": {
+            "repository": "anthropics/claude-code",
+            "tag": "v2.1.295",
+            "public_commit": "602df92bf481ed904533e95c09f740f40aab5aed",
+            "build": "07e8f67ea328",
+            "installed_source_ref": "native_evidence#/claude_installed_source"
+          },
+          "available_evidence": "Pinned vendor source/release/interface review; no matched comparative quality claim",
+          "missing_quality_evidence": "Landed G5 row and its maintenance/release/benchmark/code-quality/head-to-head sources where present",
+          "invoke_used_for_selection": false,
+          "role_slot": "Claude coordinator dependency-graph execution/recovery",
+          "current_choice": null,
+          "current_choice_status": "PENDING_G5_single_default_adjudication",
+          "installed_candidate": "Claude workflows",
+          "overlap_dispositions": [
+            {
+              "candidate": "native subagents/agent teams",
+              "disposition": "alternative",
+              "scope": "overlapping fan-out; staged graph/replay qualification distinct"
+            },
+            {
+              "candidate": "Dagu operations DAG",
+              "disposition": "alternative",
+              "scope": "overlaps staged command execution; current final ranking pending G5"
+            }
+          ],
+          "alternative_ranking": "PENDING_G5;alternatives are not parallel defaults",
+          "checked_at_utc": "2026-10-09",
+          "evidence_class": "source_review_and_scoped_retained_evidence",
+          "overturn_when": "Landed quality evidence names the best same-role candidate/replacement or a release/capability correction reopens that choice; invoke counts do not alter source-quality rank",
+          "revisit_path": "PENDING #878 landing: catalog-owner daily catalog-freshness and saturation-ledger reopen triggers, docs/g5-refresh-procedure.md and index maintenance"
+        },
+        "wiring": {
+          "status": "install_recipe_and_source_recorded_application_acceptance_pending",
+          "clean_native_install": {
+            "command": "claude install 2.1.295",
+            "source": "Native install --help confirms specific version; installed pinned source in native_evidence",
+            "evidence": "2.1.295 already installed; help/source only; no separate team/workflow package or reinstall"
+          },
+          "vendor_route": "Installed2.1.295 session-scoped ultracode via supported --settings/apply_flag_settings; native schema and requested/available/active spans in native_evidence",
+          "current_activation": "CC-verified user-scope enableWorkflows=true loads workflows in every Claude session; Ultracode requested/available/active remains session-specific; native_evidence#/claude_host_activation",
+          "role_scoping": {
+            "status": "PENDING_OWNER_GATE",
+            "owning_roles": ["CC", "co-op", "separately approved API-actions workflow use"],
+            "proposed_change": "Owner withdraws host-wide enableWorkflows=true and supplies supported workflow enablement only for approved owning-role launches; actual model/session availability and exact launch recipe remain pending",
+            "inverse": "Owner removes the added role launch overrides and restores the recorded pre-change user-scope enableWorkflows=true; restore per-task Ultracode flags separately and verify fresh-session scope",
+            "applied_by_record": false
+          },
+          "per_client": {
+            "Claude": "Session --settings/apply_flag_settings; requested/available/active and model/workflow availability",
+            "Codex": "Claude-native feature not a Codex interface; hcom handoff separate, any Codex graph adapter independently qualified"
+          },
+          "inverse": {
+            "native_inverse": "Restore pre-task session flags through native control; cancel own nodes and verify completion/exit",
+            "fresh_receipt": "PENDING selected session inverse; global installation not withdrawn"
+          },
+          "owner_step": "Owner decides/applies workflow role scoping and its inverse; resolve Ultracode requested, available and active for the actual owning session and supported model",
+          "source_scope": "Workflow feature activation is host-wide today; role scoping is pending; Ultracode request/availability/activity is session-specific and static file values do not establish its active state",
+          "task_dependencies": "No added shared-task requirement",
+          "memory_cost_gate": {
+            "tool_per_session_pss_kb": null,
+            "status": "PENDING_COMPONENT_COVERAGE;not_ADOPT_NOW",
+            "native_parent_pss_ref": "native_evidence#/memory_observations/role_rows",
+            "scope": "Measured native parent process only; named peers/MCP children and incremental feature PSS unknown; do not assign/sum the common client figure as tool-specific cost",
+            "shared_copy": "Native features inside owning Claude session; shared install/code pages, no separately proposed HTTP MCP server",
+            "role_scoped_loading": "PENDING_OWNER_GATE; current user-scope enableWorkflows=true loads every Claude session; intended CC/co-op and separately approved API-actions workflow scope has not been applied",
+            "alwaysLoad": "Not applicable to these native interfaces;future MCP exposure, if selected, must use role sets/alwaysLoad:false where supported",
+            "whole_lane_reference": "native_evidence#/memory_observations/whole_lane_reference",
+            "unknown_is_zero": false
+          }
+        },
+        "fresh_session_evidence": {
+          "status": "PENDING",
+          "tests": {
+            "Claude": {
+              "name": "WORKFLOW-CLAUDE-SESSION-NATURAL",
+              "task": "Natural multi-stage outcome depending on prior evidence; no workflow keyword/tool names in task input",
+              "pass": "After owner-authorized session activation, record requested/available/active and actual fresh-owner graph stages, native results, accepted output and recovery",
+              "control": "Saved script, file flag, mtime or explicit forced invocation cannot establish fresh organic selection"
+            },
+            "Codex": {
+              "name": "WORKFLOW-CODEX-CLAUDE-HANDOFF",
+              "task": "A natural staged outcome requiring the owning Claude coordinator",
+              "pass": "Bind Codex/hcom handoff and attribute graph execution to Claude; a Codex graph node needs its own adapter qualification",
+              "control": "Codex subagents alone are not native Claude workflow execution"
+            }
+          },
+          "organic_use_shown": false,
+          "missing_evidence": "Natural selection, accepted output and fresh owning-role attribution"
+        },
+        "invoke_measurement": {
+          "status": "MEASURED_NATIVE_OR_PROXY_COUNTERS",
+          "baseline_refs": [
+            "measurements.historical",
+            "measurements.hourly#/per_role_counts",
+            "measurements.cc_read_snapshot#/per_role_counts",
+            "measurements.latest_sdk_hourly"
+          ],
+          "baseline_scope": "2026-10-08 native omission was UNMEASURED, not zero; later coverage separately bound",
+          "role_scope": "Native tool_result per observed role/session; Agent/SendMessage proxies",
+          "eligible_fresh_task_denominator": null,
+          "organic_use_shown": false,
+          "rates_used_for_selection": false,
+          "sdk_scope": "SDK-native calls carry their service/unlabelled scope; not assigned to an owning role without evidence"
+        }
+      }
+    },
+    {
+      "layer": "agent-orchestrator",
+      "outcome": "DEFER",
+      "outcome_reason": "Final-candidate G5 quality binding and fresh organic owning-role proof remain open; counts are not selection inputs",
+      "owner": "PR-feedback owner;5f retains landing",
+      "stages": {
+        "final_candidate": {
+          "status": "PENDING_G5",
+          "catalog_row": {
+            "status": "pending",
+            "path": null,
+            "id": null,
+            "revision": null
+          },
+          "upstream_quality_sources": {
+            "repository": "OrchestratorInc/agent-orchestrator",
+            "tag": "v0.13.5",
+            "commit": "c95ae361eee48d33c2f443c6d2fe69c445f548a8",
+            "sources": [
+              "docs/scm-observer.md",
+              "docs/cli/README.md",
+              "backend/internal/domain/projectconfig.go",
+              "backend/internal/integration/scm_observer_test.go"
+            ]
+          },
+          "available_evidence": "Source/release review and scoped retained native/synthetic comparison; no overall winner",
+          "missing_quality_evidence": "Landed G5 row and its maintenance/release/benchmark/code-quality/head-to-head sources where present",
+          "invoke_used_for_selection": false,
+          "role_slot": "PR-feedback owner native SCM-to-worker delivery",
+          "current_choice": null,
+          "current_choice_status": "PENDING_G5_single_default_adjudication",
+          "installed_candidate": "agent-orchestrator",
+          "overlap_dispositions": [
+            {
+              "candidate": "existing co-op/5f native GitHub feedback loop",
+              "disposition": "alternative",
+              "scope": "overlapping CI/review handoff;5f remains sole landing owner"
+            },
+            {
+              "candidate": "hcom/native workflows for manual feedback",
+              "disposition": "alternative",
+              "scope": "overlapping relay/stages; durable SCM feedback comparison remains unqualified"
+            }
+          ],
+          "alternative_ranking": "PENDING_G5;alternatives are not parallel defaults",
+          "checked_at_utc": "2026-10-09",
+          "evidence_class": "source_review_and_scoped_retained_evidence",
+          "overturn_when": "Landed quality evidence names the best same-role candidate/replacement or a release/capability correction reopens that choice; invoke counts do not alter source-quality rank",
+          "revisit_path": "PENDING #878 landing: catalog-owner daily catalog-freshness and saturation-ledger reopen triggers, docs/g5-refresh-procedure.md and index maintenance"
+        },
+        "wiring": {
+          "status": "install_recipe_and_source_recorded_application_acceptance_pending",
+          "clean_native_install": {
+            "command": "AO_HOST_INSTALL_DIR=\"$AO_PIN_PREFIX\" AO_DATA_DIR=\"$AO_PIN_DATA\" AO_RUN_FILE=\"$AO_PIN_RUN_FILE\" bash \"$AO_PIN_INSTALLER\" --bundle \"$AO_PIN_BUNDLE\" --install-only",
+            "source": "OrchestratorInc/agent-orchestrator@c95ae361eee48d33c2f443c6d2fe69c445f548a8:scripts/setup-self-hosted.sh",
+            "script_sha256": "463366604181029d8cdb16cbc1a5d8771eaf4bc498594b09759a5b42b79bee7d",
+            "release_asset_sha256": "5f4262c1b5fad5e63c0b1291d5a2e4c878c953496f5ca430edfe4c061987bf28",
+            "release_asset": "https://github.com/OrchestratorInc/agent-orchestrator/releases/download/v0.13.5/agent-orchestrator-linux-x64.AppImage",
+            "release_asset_id": 621487952,
+            "platform": "Linux x86_64; no arm64 or other-platform payload is qualified by this digest",
+            "payload_selection": "Verify the pinned installer and the exact v0.13.5 AppImage SHA256 before native extraction. Package its unchanged resources/ into an owned gzip tar, retain/check that archive's separate SHA256, then supply --bundle. Never invoke the floating stable or nightly download branch.",
+            "owner_parameters": "Owner supplies absolute AO_PIN_INSTALLER, AO_PIN_APPIMAGE, AO_PIN_STAGE, AO_PIN_BUNDLE, AO_PIN_PREFIX, AO_PIN_DATA and AO_PIN_RUN_FILE; AO_PIN_STAGE must be an empty owned directory",
+            "preflight_commands": [
+              "set -eu",
+              "printf '%s  %s\\n' 463366604181029d8cdb16cbc1a5d8771eaf4bc498594b09759a5b42b79bee7d \"$AO_PIN_INSTALLER\" | sha256sum -c -",
+              "printf '%s  %s\\n' 5f4262c1b5fad5e63c0b1291d5a2e4c878c953496f5ca430edfe4c061987bf28 \"$AO_PIN_APPIMAGE\" | sha256sum -c -",
+              "test -d \"$AO_PIN_STAGE\"; test -z \"$(ls -A \"$AO_PIN_STAGE\")\"",
+              "chmod +x \"$AO_PIN_APPIMAGE\"; (cd \"$AO_PIN_STAGE\"; \"$AO_PIN_APPIMAGE\" --appimage-extract >/dev/null)",
+              "AO_PIN_DAEMON=\"$(find \"$AO_PIN_STAGE\" -path '*/resources/daemon/ao' -type f -print -quit)\"; test -n \"$AO_PIN_DAEMON\"; AO_PIN_RESOURCES=\"$(dirname \"$(dirname \"$AO_PIN_DAEMON\")\")\"",
+              "tar -czf \"$AO_PIN_BUNDLE\" -C \"$(dirname \"$AO_PIN_RESOURCES\")\" resources",
+              "sha256sum \"$AO_PIN_BUNDLE\" > \"$AO_PIN_BUNDLE.sha256\"; sha256sum -c \"$AO_PIN_BUNDLE.sha256\""
+            ],
+            "derived_bundle_sha256": null,
+            "derived_bundle_digest_scope": "Owner records the separate archive digest after preparation and before installation; the AppImage digest pins the upstream payload and is never used as a tar digest. Neither extraction, archive creation nor installation was executed by this revision.",
+            "primary_sources": [
+              "OrchestratorInc/agent-orchestrator@c95ae361eee48d33c2f443c6d2fe69c445f548a8:scripts/setup-self-hosted.sh:15-26,76-107,141-170; supported local-bundle and native extraction/layout",
+              "https://api.github.com/repos/OrchestratorInc/agent-orchestrator/releases/tags/v0.13.5; checked 2026-10-09; target c95ae361eee48d33c2f443c6d2fe69c445f548a8, asset 621487952 digest matches; immutable=false so checksum enforcement is required"
+            ],
+            "evidence": "Documented pinned-payload recipe; owner execution/acceptance pending. Historical install0/native dev/stopped observations are retained and do not prove this recipe was executed."
+          },
+          "vendor_route": "OrchestratorInc/agent-orchestrator v0.13.5 c95ae361eee48d33c2f443c6d2fe69c445f548a8 typed project/role rules and native CI/review forwarding",
+          "per_client": {
+            "Codex": "Typed project/role config and native CI/review forwarding; isolated account/home and pre-task sandbox",
+            "Claude": "Vendor adapter only if selected; independent account/config/permissions/forwarding pending"
+          },
+          "inverse": {
+            "command": "Stop the owned user service, then ao stop --timeout 10s --json at owned state, then independent own-container exit/removal and import withdrawal",
+            "retained": "ao-stop137;Docker-stop0/rm0;independent exited/Pid0/ExitCode0",
+            "fresh_receipt": "PENDING; owner-held service/route and per-adapter scope"
+          },
+          "owner_step": "Usable approved native route, exact config ACK, effective sandbox and verified eligible PR head; quota pause remains",
+          "source_scope": "Earlier bounds carried by ao_record_relation",
+          "task_dependencies": "No added shared-task requirement",
+          "memory_cost_gate": {
+            "tool_per_session_pss_kb": null,
+            "status": "PENDING_COMPONENT_COVERAGE;not_ADOPT_NOW",
+            "native_parent_pss_ref": null,
+            "scope": "Owned AO daemon stopped; live daemon/worker per-session PSS not measured",
+            "shared_copy": "Vendor local HTTP daemon can serve owned sessions;daemon/worker split must be measured;not a claimed shared MCP server",
+            "role_scoped_loading": "PR-feedback owning role/selected workers only",
+            "alwaysLoad": "Not applicable to these native interfaces;future MCP exposure, if selected, must use role sets/alwaysLoad:false where supported",
+            "whole_lane_reference": "native_evidence#/memory_observations/whole_lane_reference",
+            "unknown_is_zero": false
+          }
+        },
+        "fresh_session_evidence": {
+          "status": "PENDING",
+          "tests": {
+            "Codex": {
+              "name": "AO-CODEX-NATIVE-PR-FEEDBACK",
+              "task": "One fresh isolated worker on one verified PR head with real authorized CI/review opportunity",
+              "pass": "Native observer forwards opportunity, native worker returns nonempty bounded proposal; pre-task sandbox, escalation/denial counts and complete inverse observed",
+              "control": "Disabled-forwarding policy suppresses same opportunity; stop/inverse on quota/core-budget failure"
+            },
+            "Claude": {
+              "name": "AO-CLAUDE-NATIVE-PR-FEEDBACK",
+              "task": "Same native outcome only if owner selects Claude adapter/route",
+              "pass": "Independently bind Claude account/config/permissions, real observer delivery, proposal and inverse",
+              "control": "Prior Codex or synthetic receipts do not qualify Claude"
+            }
+          },
+          "organic_use_shown": false,
+          "missing_evidence": "Successful natural task/selected adapter, sandbox, forwarding and inverse"
+        },
+        "invoke_measurement": {
+          "status": "UNMEASURED_AO_LIVE_RATE",
+          "baseline_refs": [
+            "measurements.historical",
+            "ao_retained_execution",
+            "native_measurement_proposal.agent_orchestrator",
+            "measurements.latest_sdk_hourly"
+          ],
+          "baseline_scope": "2026-10-08 native omission was UNMEASURED, not zero; later coverage separately bound",
+          "role_scope": "Retained receipts, no complete live owning-role invoke denominator",
+          "eligible_fresh_task_denominator": null,
+          "organic_use_shown": false,
+          "rates_used_for_selection": false,
+          "sdk_scope": "SDK-native calls carry their service/unlabelled scope; not assigned to an owning role without evidence"
+        }
+      }
+    }
+  ],
+  "ao_record_relation": {
+    "relationship": "extend",
+    "prior_file": "docs/decisions/2026-10-08-ao-adoption.md",
+    "prior_file_sha256": "7369ff144bff56f19cecfd16a60034d138ff55f1d86f287ae2f0c8f7327a5862",
+    "prior_tag": "v0.13.4",
+    "prior_commit": "e8a77577c14b015b947057d67c9171a78cdd5099",
+    "extension_tag": "v0.13.5",
+    "extension_commit": "c95ae361eee48d33c2f443c6d2fe69c445f548a8",
+    "effect": "Extends source/staged qualification; supersedes only old latest-release wording. Earlier accepted history/bounds remain;0134 outcomes do not qualify0135 coding/recovery.",
+    "carried_bounds": [
+    "Prior outer ceiling3 AO sessions through2026-10-14T03:28Z on small PRs only; current staged observe/propose case is narrower:one isolated worker.",
+      "Approved native sign-in and own container/writable home; shared Codex home prohibited as worker home.",
+      "One poller per AO-owned PR;30-second dated exception; next live run measures attributable REST/GraphQL use.",
+    "CC-supplied deployment guard reads gh api rate_limit and runs native ao stop at REST-core remaining<500; not tested daemon enforcement or a running guard in this record; separately observe GraphQL allowance/consumption; no invented GraphQL threshold.",
+      "R9/config/route/owner gates;5f landing on CC cue; no merge/close/auto-merge/branch deletion authority.",
+      "User service remains owner-installed; no daemon/session/container started by this record;quota pause retained."
+    ]
+  },
+  "ao_retained_execution": {
+    "receipt_sha256": "51ba6ac9088ad19d0dbf236257f5e9523341609987ff5a8257464a72400f9481",
+    "rc": 1,
+    "tag": "v0.13.5",
+    "native_version": "dev",
+    "model_proposal": "quota failed in3turns;0successful proposals/0native tools;usage/polls unknown",
+    "inverse": {
+      "native_ao_stop_rc": 137,
+      "docker_stop_rc": 0,
+      "docker_rm_rc": 0,
+      "independent_state": "exited;Running=false;Pid=0;ExitCode=0",
+      "own_container_removed": true,
+      "own_imported_state_removed": true,
+      "scope": "Completed container/import withdrawal; native stop137 is not called a successful standalone ao-stop command"
+    },
+    "fixture_ref": "evidence/receipts/ao-bounded-effect-20261008.json",
+    "fixture_scope": "Synthetic input with native AO engine, not organic/provider acceptance"
+  },
+  "native_measurement_proposal": {
+    "hcom": "Native fixed-window target-role metadata now measured in native_evidence; CC/co-op initiation and organic triggers remain unknown",
+    "agent_orchestrator": {
+      "source_commit": "c95ae361eee48d33c2f443c6d2fe69c445f548a8",
+      "files": [
+        "backend/internal/httpd/log.go",
+        "backend/internal/httpd/apispec/openapi.yaml",
+        "backend/internal/observe/scm/observer.go",
+        "backend/internal/lifecycle/reactions.go"
+      ],
+      "proposal": "Count native POST /api/v1/sessions access entries by response class and existing observer diagnostics separately; complete successful poll/delivery counts stay unknown",
+      "implemented": false
+    }
+  },
+  "corrections": [
+    "Historical MCP-only omission is not current native counter coverage; add separately bound snapshots without summing.",
+    "Ready/peer transport evidence does not prove owning-role fresh organic use: KEEP pending.",
+    "Vendor selection source is conditional approved-plan text, not an unconditional startup router or proposed custom block.",
+    "Shared-task dependency claim withdrawn under declined TODO scope.",
+    "Ultracode declared session-scoped; file values alone do not prove persistent or active-session suppression.",
+    "Journal131/.941942Z support withdrawn; authoritative frozen tool-result counts used.",
+    "Native AO stop137 preserved separately from successful Docker stop/removal/inverse.",
+    "Original14+10 module runs read neither changed document; no document-acceptance claim.",
+    "Four-stage owner refinement: counts move to stage4 baseline; final-candidate selection uses upstream quality/G5, with DEFER while those and organic gates remain open.",
+    "Role slots/overlap dispositions added; one current_choice remains PENDING_G5 per slot, alternatives not parallel defaults.",
+    "Native parent PSS and whole-lane trial figures have different scopes; missing per-tool PSS remains unknown and blocks ADOPT-NOW."
+  ],
+  "review_sources": {
+    "cc_delta": {
+      "file": "coordination/command-center/research-cc-role-20261008/pr904-claude-delta-read-0ad947f6.md",
+      "sha256": "69119fd821ddab7fda786a8b374ccfa89db43aa43cd81edb49b9fd5714860357",
+      "reviewed_head": "0ad947f6fd5023b2a21eadae2837349d4b313886",
+      "verdict": "CHANGES_REQUESTED; all 16 prior findings closed; 1 P2 and 6 optional P3s addressed by this record-only revision"
+    },
+    "gpt_delta": {
+      "file": "coordination/cc-reads-20261005/delta-pr904/GPT-VERDICT-0ad947f6f.full.md",
+      "sha256": "bb3bfe43911116f1dfb8721bc36c6cedc32c90d6f235287f511acbbc4ad14735",
+      "reviewed_head": "0ad947f6fd5023b2a21eadae2837349d4b313886",
+      "verdict": "CHANGES_REQUESTED; 2 P2s addressed by pinning the selected payload and retaining measurements.cc_read_snapshot in extra/"
+    },
+    "cc": {
+      "file": "coordination/command-center/research-cc-role-20261008/pr904-claude-read-021e1a87.md",
+      "sha256": "3f9e8aac3cde9231e4565b5627ef0c46a13e7a8f1527f123089767df0620957c",
+      "findings": "2P1,4P2,7P3"
+    },
+    "gpt": {
+      "file": "coordination/cc-reads-20261005/pr904/GPT-VERDICT-021e1a875.full.md",
+      "sha256": "48e1732a6405897bdf3aeb7e49e0d544ce8266c4fe885492a4499a83302ab62f",
+      "findings": "3P2;convergent items are not counted again"
+    },
+    "pre_cue_old_head": {
+      "rc": 0,
+      "modified_existing_tests": 0,
+      "scope": "Old reviewed head only; new head needs its own required pre-cue/delta checks"
+    },
+    "J8": "Skipped records-only per co-op packet, not a reviewer PASS"
+  },
+  "workflow_baseline": {
+    "owner": "codex-token-parity",
+    "file": "research/token-efficiency-20261008/WORKFLOW-BASELINE-20261008.json",
+    "new_baseline_or_improvement": false,
+    "measures": [
+      "uncached input/turn and cache share",
+      "rebuild events",
+      "first child-request uncached tokens",
+      "pre-cue/J8 defects",
+      "ready-to-landed PR time",
+      "daily minimum Windows memory",
+      "per-role native invocation counters"
+    ],
+    "scope": "After owner-approved wiring, same definitions and counter scopes; usage unknown stays unknown"
+  },
+  "completion_gates": {
+    "delta_read_gpt": "pending",
+    "delta_read_cc": "pending",
+    "new_head_pre_cue": "pending",
+    "new_head_ci": "pending",
+    "g5_bindings": "pending landed row/path/id/revision for each layer",
+    "owner_wiring_and_fresh_tests": "pending",
+    "cc_cue": "pending",
+    "lander": "5f",
+    "cue_ready": false,
+    "memory_cost_gate": "PENDING isolated component/peer/MCP coverage; parent-role sample does not allow ADOPT-NOW"
+  },
+  "completeness_critic": {
+    "scope": "Ordinary native subagents and cross-session messages remain candidates;distinct jobs are not proven exclusive",
+    "boundaries": [
+      "Proxy/native counters versus organic use",
+      "Both client scopes and native handoff attribution",
+      "Pinned compiled instructions versus execution",
+      "Session activation versus static settings",
+      "AO source extension versus old acceptance",
+      "Independent inverse versus failed native-stop command"
+    ],
+    "new_followup_started": false
+  },
+  "failed_optional_probe": {
+    "source": "https://code.claude.com/docs/en/agent-teams.md",
+    "result": "HTTP403",
+    "utc_minute": "2026-10-08T23:55Z",
+    "scope": "Public-doc optional digest probe; supported HTML had succeeded;no gateway/provider trial"
+  },
+  "coordinator_child_usage": "unmeasured;no zero-usage claim",
+  "structure": "four-stage-adoption/1",
+  "selection_rule": "Upstream quality and G5 sources decide final candidates. Invoke counts are stage4 baseline only. KEEP requires organic use; final candidate with low use is WIRE; otherwise DEFER."
+}
