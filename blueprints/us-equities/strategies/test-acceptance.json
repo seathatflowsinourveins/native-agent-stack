@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "kind": "t22_strategy_test_receipt",
+  "status": "passed",
+  "evidence_class": "synthetic",
+  "engine_version": "2.0.0rc5",
+  "command": "ENGINE_PYTHON -m unittest tests.test_us_equities_strategies -v",
+  "exit": 0,
+  "tests_run": 13,
+  "stdout_sha256": "5ef5f08d579c5cec7c94c3b2ffdf56dc66abd83a927439c1ef8d424ed18c4cb6",
+  "stderr_sha256": "42d84fd3a47a643af67bdf31eea91df984d685617005def821f53f574690776e",
+  "passed_tests": [
+    "test_availability_cannot_precede_event_or_outlive_validation_window",
+    "test_factors_require_exact_finite_decimals_and_unique_sorted_keys",
+    "test_historical_cutoff_is_explicit_and_development_requires_release",
+    "test_presets_are_versioned_and_narrative_squeeze_override_is_explicit",
+    "test_serialization_preserves_exact_values_and_provenance",
+    "test_all_families_and_presets_run_same_strategy_classes",
+    "test_extended_hours_stop_uses_limit_only",
+    "test_forward_or_wrong_cohort_snapshot_never_enters",
+    "test_native_target_profile_refuses_unqualified_T15_capability",
+    "test_noncohort_missing_inputs_and_halt_never_enter",
+    "test_replay_is_deterministic_and_no_trade_control_is_independent",
+    "test_same_family_classes_use_real_LiveNode_and_owned_partial_fills",
+    "test_stale_extended_quote_flags_held_position_and_sends_no_exit"
+  ],
+  "source_sha256": {
+    "blueprints/us-equities/strategies/presets.py": "0598c85296f9a0d3e3864dd02d7041ba5361004a50f0916f4f0ca2b905301425",
+    "blueprints/us-equities/strategies/__init__.py": "a6e37c81a6492dde3adf9d050ab4c7b99278f9821e224b5b9f8c3200496e91ff",
+    "blueprints/us-equities/strategies/simulation.py": "54425b2f776583f620ff416112308a152ae24c4e0fc4f4cbceda4a789d30725f",
+    "blueprints/us-equities/strategies/families.py": "e10282bbf854f4dcaa4df0ea88763a5d7994a2965f6316c0dd5e6278ed1f8ee4",
+    "blueprints/us-equities/strategies/contracts.py": "afa00ec87dbae4ac00ee65f945c3d722b38de261f25596c4ea1d65d7fbd3ba6a",
+    "tests/test_us_equities_strategies.py": "dd521b24a14b5e0a2d191431053272771ea016354759e50305a3970afa34e6bf",
+    "blueprints/us-equities/adaptive-paper/exits.py": "189133e6df99bda201d73d36a15f45ccbfb38979a3319ae6f75d077f5db5b3df",
+    "blueprints/us-equities/adaptive-paper/sessions.py": "ba6a78872d183563b1f47c216a7d8c162b2ab17ab6adc4a83b1536395c8bd743",
+    "blueprints/us-equities/adaptive-paper/native_adapter.py": "fbf530884c2ad3b9e0c2b1f989eda399531647cc1db3c56dc9bcac10174fea47",
+    "tests/test_adaptive_paper_native.py": "728458624788243abcaf653f6a20a5a6201cfa9ec3328e8d7eb3fd58fdfa94b0"
+  },
+  "scope": "all ten exact Strategy classes in real BacktestEngine and LiveNode; synthetic FakePort only; individual partial fills and duplicate deliveries",
+  "broker_e2e": "NOT_RUN",
+  "historical_layer15_e2e": "NOT_RUN",
+  "strategy_performance": "NOT_CITED"
+}

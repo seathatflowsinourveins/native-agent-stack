@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "kind": "t22_cts_candidate_receipt",
+  "checked_at": "2026-10-09T19:57:26Z",
+  "status": "passed",
+  "evidence_class": "local_integration",
+  "repository": "https://github.com/tradermonty/claude-trading-skills",
+  "sha": "eab8d5cb97b9982d915944cdaa2df972fa396b22",
+  "licence": "MIT",
+  "uv_lock_sha256": "bae61c1c95ae1247cfa92449558110196d77f76e41cb0f3e6e2c5bdac447cd63",
+  "installation": {
+    "environment": "isolated_candidate_checkout_not_study_runtime",
+    "command": "uv sync --locked --no-install-project --extra dev --extra ci --python 3.12.3",
+    "exit": 0,
+    "source": ".github/workflows/ci.yml",
+    "skill_method": "docs/en/getting-started.md supported copy into project .claude/skills; all source files verbatim; SOURCE.json retained beside installation",
+    "python": "3.12.3",
+    "uv": "0.12.22"
+  },
+  "vendor_commands": {
+    "dependency_check": "uv run --no-sync python scripts/ci_test_matrix.py install --check <skill>",
+    "own_check": "uv run --no-sync python scripts/ci_test_matrix.py run <skill>",
+    "inverse": "uv run --no-sync python -m pytest -q --import-mode=importlib -p no:cacheprovider skills/<skill>/scripts/tests -k 'invalid or reject or missing or negative or zero or empty or insufficient or wide_risk or unconfirmed'"
+  },
+  "skills": [
+    {"skill": "stockbee-episodic-pivot-analyzer", "dependency_exit": 0, "own_check_exit": 0, "tests_passed": 9, "own_output_sha256": "a14914756c778ccbc89808363fcd2d5ba8027db266eee366a311024d2abd9ab4", "inverse_exit": 0, "inverse_passed": 2, "inverse_output_sha256": "8f6195c9e2a1e4138fbc540bbaae94a2fbc71dcb117ed25908f799204ae9924c", "copied_files": 7, "verbatim": true, "copied_tree_sha256": "a17dedbb735e78d69441379820995a72a65b4611f80923b192c1b0eca07bcf50"},
+    {"skill": "breakout-trade-planner", "dependency_exit": 0, "own_check_exit": 0, "tests_passed": 84, "own_output_sha256": "d3e3f1f57feb9d40f6a03bedbcd3bdf7ad8376dcc2a1fd182174d4329730560c", "inverse_exit": 0, "inverse_passed": 21, "inverse_output_sha256": "1177af689bd020c24d101af36eb669f3076f7f955da6f0c8efa7a8fa8e488728", "copied_files": 12, "verbatim": true, "copied_tree_sha256": "d315e82c498bcfc5499cf620ef6603be8507c76cd6a1759577811c7a22947fe5"},
+    {"skill": "stockbee-momentum-burst-screener", "dependency_exit": 0, "own_check_exit": 0, "tests_passed": 7, "own_output_sha256": "18671fe2901da052a0234e02d371c831a75f36dcebf54028c7512d03c45926c4", "inverse_exit": 0, "inverse_passed": 3, "inverse_output_sha256": "6fa4129f63a52babb9ee660393ca8dd4e85a9a675a337d8e9d315d57dc0c7319", "copied_files": 7, "verbatim": true, "copied_tree_sha256": "6a54ac2c135c4ce759532fc06bf3ee630811f61706d2dad18e6aeede0ba5eccf"},
+    {"skill": "vcp-screener", "dependency_exit": 0, "own_check_exit": 0, "tests_passed": 262, "own_output_sha256": "c254476334cbe3c049971613e7c11dfa64a9f09194557c3bcf8bc9179174a36b", "inverse_exit": 0, "inverse_passed": 41, "inverse_output_sha256": "d941c0ee9080846ff52070c47958d403abb689da55a7bf454607e9844cde1e98", "copied_files": 26, "verbatim": true, "copied_tree_sha256": "593bc8000e28f1b42fc232f2265418819afa0f8eb398fa89e64416219a32b20f"},
+    {"skill": "position-sizer", "dependency_exit": 0, "own_check_exit": 0, "tests_passed": 42, "own_output_sha256": "edf88d3a3716b349351168e957e94d199ac2ebae0c310bafee19ce9135d23aa1", "inverse_exit": 0, "inverse_passed": 10, "inverse_output_sha256": "f91dfda0fe8dd3d43da96eaf8360a322e6215cee135fad8100491e1c665f377d", "copied_files": 6, "verbatim": true, "copied_tree_sha256": "881d8b2d8b292d48c03fa679194eefaaee46dc04731d189fc664d0a8a07fb858"},
+    {"skill": "pead-screener", "dependency_exit": 0, "own_check_exit": 0, "tests_passed": 114, "own_output_sha256": "f51b0dfe74ec416ebceaa2f0a88eeaef890e2dac7aabaeea482f371698613635", "inverse_exit": 0, "inverse_passed": 39, "inverse_output_sha256": "4764786dad87112679777c37092fc6114a6fb70116c1382331ae38d99099934c", "copied_files": 16, "verbatim": true, "copied_tree_sha256": "c9694648dc60b4a4208c5d5c20a9c8fee94349448a0d02fd09b527d4e93c2cf0"}
+  ],
+  "inverse_interpretation": "upstream tests reject malformed or insufficient inputs and abstain on unconfirmed or overly wide setups; inverse counts overlap own suites",
+  "adoption": "reference_screeners_only_not_order_path_not_signal_or_profitability_evidence",
+  "provider_or_broker_network": "NOT_RUN",
+  "strategy_numbers": "NOT_CITED"
+}

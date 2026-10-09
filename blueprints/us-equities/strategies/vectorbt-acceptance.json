@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "kind": "t22_vectorbt_rust_candidate_receipt",
+  "checked_at": "2026-10-09T20:17:23Z",
+  "status": "passed",
+  "evidence_class": "local_integration",
+  "repository": "https://github.com/polakowo/vectorbt",
+  "tag": "v1.1.2",
+  "sha": "f0d2afba7af8a6e6c1b02afde27c9a16413e86ff",
+  "packages": {
+    "vectorbt": "1.1.2",
+    "vectorbt-rust": "1.1.2"
+  },
+  "licence": "Apache-2.0 with Commons Clause 1.0",
+  "owner_override": {
+    "licence_at": "2026-10-09T19:46:28Z",
+    "dispatch_at": "2026-10-09T20:03:51Z",
+    "instruction": "T13 and T22: vectorbt 1.1.2 with its Rust engine for fast sweeps, through vendor install, check and inverse. Re-test anything that survives in Nautilus."
+  },
+  "coordination": "T13 agreed T22 owns one shared isolated acceptance run; T13 consumes this receipt rather than duplicate native jobs",
+  "source_discovery": {
+    "pypi_release_verified": true,
+    "git_tag_and_checkout_sha_verified": true,
+    "initial_MIRRORS_entry": "absent_pin_path_question_routed",
+    "vendor_source_unchanged": true
+  },
+  "install": {
+    "python": "3.12.3",
+    "uv": "0.12.22",
+    "command": "uv add --python 3.12.3 'vectorbt[rust,test]==1.1.2'",
+    "exit": 0,
+    "environment": "separate_candidate_uv_project",
+    "route": "README.md published precompiled wheel route; source checkout used only for unchanged vendor tests; no source build",
+    "lock_sha256": "76c11bd3640d2a139d2ca980f41a7becc248b73b871047bf37605ffa320a6703",
+    "vectorbt_wheel_sha256": "d63a1a8bde3fd4ae8ae364cb67fc174520260ba51edb8fa8a1ce867b4c63f9d6",
+    "vectorbt_rust_linux_py312_wheel_sha256": "1e3145c399a5ffcdcb4d413226aebad4cfa85ef842db13d74a655dc584e7d9a7"
+  },
+  "resource_limits": {
+    "memory": "2 GiB",
+    "cpu": "one CPU",
+    "jobs": "serial_systemd_scope"
+  },
+  "smoke": {
+    "engine": "rust",
+    "versions_verified": true,
+    "synthetic_order_records": 2,
+    "exit": 0
+  },
+  "vendor_check": {
+    "file": "tests/test_engine.py",
+    "classes": [
+      "TestEngineResolution",
+      "TestPortfolioRustParity"
+    ],
+    "passed": 41,
+    "exit": 0,
+    "output_sha256": "5e660ba3e4be2643864d7b6390f52031f6e77e15a7fc4c5db826938b4f16fb3d",
+    "invocation": "uv run --project VECTORBT_PROJECT --no-sync python -I; preload installed vectorbt; insert SOURCE for test helpers; pytest.main(['-q','--import-mode=importlib','-p','no:cacheprovider', SOURCE/tests/test_engine.py::TestEngineResolution, SOURCE/tests/test_engine.py::TestPortfolioRustParity])",
+    "scope": "bounded_unchanged_upstream_engine_and_portfolio_Rust_NumPy_NumBa_parity_not_full_vendor_suite"
+  },
+  "inverse": {
+    "selection": "error_parity or validate_flex_inputs or require_exact_call_seq or validate_group_lens or raise_reject_exception or max_orders_exception or callback_rejects or unsupported_rust or unavailable_rust",
+    "passed": 10,
+    "deselected": 31,
+    "exit": 0,
+    "output_sha256": "0e8bbb110f235b724571cc1d6bb3c575e4dcdb94a79da932be810dfc1c812353",
+    "cases": [
+      "nonfinite order fees",
+      "wrong broadcast shape",
+      "non-numeric size array",
+      "wrong signal shape",
+      "invalid call sequence",
+      "incorrect group lengths",
+      "cash-bound full-fill rejection",
+      "maximum order record cap",
+      "unsupported explicit Rust callback",
+      "unavailable or unsupported explicit Rust backend"
+    ],
+    "counts_overlap_vendor_check": true
+  },
+  "source_sha256": {
+    "pyproject.toml": "8d4867369d4e70444d4b1cdaf3f1bd69f492ca82d7ccbbb42ddaf1ce88a7b954",
+    "tests/test_engine.py": "55eba2ae74f6455c57f0a831dc8d3ad595c321c0ac831156d8b2fdbdc7e4a915",
+    "LICENSE.md": "a914859a115b70e80956a3cbd613139ad74c04e5d1bd38da8bcc16725822ec84"
+  },
+  "disposition": "native_candidate_checks_passed_for_future_released_development_sweeps",
+  "strategy_sweep": "NOT_RUN",
+  "survivor_selection": "NONE",
+  "nautilus_survivor_retest": "REQUIRED_BEFORE_ANY_CLAIM",
+  "broker_or_provider": "NOT_RUN",
+  "historical_layer15_e2e": "NOT_RUN",
+  "strategy_performance": "NOT_CITED"
+}

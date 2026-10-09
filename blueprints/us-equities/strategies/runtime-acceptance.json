@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "kind": "t22_rc5_runtime_acceptance",
+  "checked_at": "2026-10-09T20:03:45Z",
+  "status": "passed",
+  "evidence_class": "local_integration",
+  "engine": {"repository": "https://github.com/nautechsystems/nautilus_trader", "version": "2.0.0rc5", "sha": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e"},
+  "study_runtime": {"source_sha": "ee3883699870d972058516192b1ee1c6e3ffb762", "install": "uv sync --locked", "pyproject_and_lock_match_verified": true, "usage": "read_only_T13_authorized_no_sync_or_install_in_peer_runtime"},
+  "upstream_checks": {
+    "files": ["python/tests/unit/backtest/test_backtest_engine_default_ids.py", "python/tests/unit/backtest/test_backtest_engine_custom_data.py"],
+    "passed": 9,
+    "exit": 0,
+    "invocation": "installed ENGINE_PYTHON -I; preload nautilus_trader; insert upstream python path for test helpers; pytest.main(['-q','--import-mode=importlib','-p','no:cacheprovider','-o','addopts=', <two unchanged upstream test paths>])",
+    "wheel_location_verified": true,
+    "vendor_suite_scope": "bounded_native_tests_not_full_upstream_suite"
+  },
+  "development_corrections": [
+    {"finding": "mirror_local_python_package_shadowed_installed_wheel", "first_exit": 4, "resolution": "neutral_isolated_interpreter_preloads_native_installed_package_before_unchanged_test_helpers"},
+    {"finding": "pytest_cache_only_new_first_failed_first_options_require_disabled_cache_plugin", "first_exit": 4, "resolution": "override_addopts_empty_for_read_only_test_run"},
+    {"finding": "generated_rc5_stub_describes_cancel_order_order_object_but_actual_Rust_binding_requires_ClientOrderId", "first_synthetic_suite_exit": 1, "source": "crates/trading/src/python/strategy.rs:2001", "resolution": "use_pending_client_order_id_then_wait_for_native_terminal_confirmation"},
+    {"finding": "nonzero_native_latency_activates_at_next_quote_and_initial_synthetic_quote_moved_outside_entry_limit", "resolution": "register_stable_initial_quotes_and_explicit_unfilled_cancel_reprice_tail_no_performance_claim"}
+  ],
+  "broker_or_provider": "NOT_RUN",
+  "historical_layer15_e2e": "NOT_RUN",
+  "strategy_performance": "NOT_CITED"
+}

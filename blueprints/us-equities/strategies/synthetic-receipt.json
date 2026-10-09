@@ -1,0 +1,3608 @@
+{
+  "controls": [
+    {
+      "callback_faults": [],
+      "class": "NoTradeStrategy",
+      "evidence_class": "synthetic",
+      "execution_profile": "code-managed-limit-v1",
+      "family": "control_no_trade",
+      "fill_callbacks": 0,
+      "fixture_sha256": "5ffd787275494fbf540b4d52972f202785e736210a1953f79bb678adc0a85080",
+      "flags": [],
+      "iterations": 17,
+      "native_order_types": [],
+      "orders": 0,
+      "owned_quantity": "0",
+      "passed": true,
+      "pending": false,
+      "preset": "conservative-v1",
+      "trace": [
+        {
+          "event": "snapshot",
+          "now_ns": 1791465900000000000,
+          "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
+        }
+      ],
+      "trace_sha256": "a0b08d45544bf907734d31647993dcf965db61f7997aecb59ab6bf7b185854bc"
+    },
+    {
+      "callback_faults": [],
+      "class": "HashRandomControl",
+      "evidence_class": "synthetic",
+      "execution_profile": "code-managed-limit-v1",
+      "family": "control_hash_random",
+      "fill_callbacks": 2,
+      "fixture_sha256": "5ffd787275494fbf540b4d52972f202785e736210a1953f79bb678adc0a85080",
+      "flags": [],
+      "iterations": 17,
+      "native_order_types": [
+        "LIMIT"
+      ],
+      "orders": 4,
+      "owned_quantity": "0",
+      "passed": true,
+      "pending": false,
+      "preset": "conservative-v1",
+      "trace": [
+        {
+          "event": "snapshot",
+          "now_ns": 1791465900000000000,
+          "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
+        },
+        {
+          "event": "submit",
+          "limit_price": "10.03",
+          "now_ns": 1791466500000000000,
+          "quantity": "7",
+          "reason": "family_signal",
+          "side": "BUY"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466501000000000,
+          "price": "10.0102",
+          "quantity": "7",
+          "side": "BUY"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.79",
+          "now_ns": 1791466508000000000,
+          "quantity": "7",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466508000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466509000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.69",
+          "now_ns": 1791466509000000000,
+          "quantity": "7",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466510000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466511000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.59",
+          "now_ns": 1791466511000000000,
+          "quantity": "7",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466512000000000,
+          "role": "exit"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466512000000000,
+          "price": "9.5998",
+          "quantity": "7",
+          "side": "SELL"
+        }
+      ],
+      "trace_sha256": "028294d2cf79d00f944759f7e71a316b70e9354ae790462e4b9fba06bf1a750a"
+    },
+    {
+      "callback_faults": [],
+      "class": "MomentumControl",
+      "evidence_class": "synthetic",
+      "execution_profile": "code-managed-limit-v1",
+      "family": "control_momentum_20",
+      "fill_callbacks": 2,
+      "fixture_sha256": "5ffd787275494fbf540b4d52972f202785e736210a1953f79bb678adc0a85080",
+      "flags": [],
+      "iterations": 17,
+      "native_order_types": [
+        "LIMIT"
+      ],
+      "orders": 4,
+      "owned_quantity": "0",
+      "passed": true,
+      "pending": false,
+      "preset": "conservative-v1",
+      "trace": [
+        {
+          "event": "snapshot",
+          "now_ns": 1791465900000000000,
+          "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
+        },
+        {
+          "event": "submit",
+          "limit_price": "10.03",
+          "now_ns": 1791466500000000000,
+          "quantity": "7",
+          "reason": "family_signal",
+          "side": "BUY"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466501000000000,
+          "price": "10.0102",
+          "quantity": "7",
+          "side": "BUY"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.79",
+          "now_ns": 1791466508000000000,
+          "quantity": "7",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466508000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466509000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.69",
+          "now_ns": 1791466509000000000,
+          "quantity": "7",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466510000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466511000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.59",
+          "now_ns": 1791466511000000000,
+          "quantity": "7",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466512000000000,
+          "role": "exit"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466512000000000,
+          "price": "9.5998",
+          "quantity": "7",
+          "side": "SELL"
+        }
+      ],
+      "trace_sha256": "028294d2cf79d00f944759f7e71a316b70e9354ae790462e4b9fba06bf1a750a"
+    },
+    {
+      "callback_faults": [],
+      "class": "RelativeVolumeControl",
+      "evidence_class": "synthetic",
+      "execution_profile": "code-managed-limit-v1",
+      "family": "control_relative_volume",
+      "fill_callbacks": 2,
+      "fixture_sha256": "5ffd787275494fbf540b4d52972f202785e736210a1953f79bb678adc0a85080",
+      "flags": [],
+      "iterations": 17,
+      "native_order_types": [
+        "LIMIT"
+      ],
+      "orders": 4,
+      "owned_quantity": "0",
+      "passed": true,
+      "pending": false,
+      "preset": "conservative-v1",
+      "trace": [
+        {
+          "event": "snapshot",
+          "now_ns": 1791465900000000000,
+          "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
+        },
+        {
+          "event": "submit",
+          "limit_price": "10.03",
+          "now_ns": 1791466500000000000,
+          "quantity": "7",
+          "reason": "family_signal",
+          "side": "BUY"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466501000000000,
+          "price": "10.0102",
+          "quantity": "7",
+          "side": "BUY"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.79",
+          "now_ns": 1791466508000000000,
+          "quantity": "7",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466508000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466509000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.69",
+          "now_ns": 1791466509000000000,
+          "quantity": "7",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466510000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466511000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.59",
+          "now_ns": 1791466511000000000,
+          "quantity": "7",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466512000000000,
+          "role": "exit"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466512000000000,
+          "price": "9.5998",
+          "quantity": "7",
+          "side": "SELL"
+        }
+      ],
+      "trace_sha256": "028294d2cf79d00f944759f7e71a316b70e9354ae790462e4b9fba06bf1a750a"
+    }
+  ],
+  "engine": {
+    "base_latency_nanos": 1000000,
+    "fill_model": "OneTickSlippageFillModel",
+    "latency_model": "StaticLatencyModel",
+    "prob_fill_on_limit": "1.0",
+    "prob_slippage": "1.0",
+    "random_seed": 22,
+    "repository": "nautechsystems/nautilus_trader",
+    "sha": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+    "version": "2.0.0rc5"
+  },
+  "evidence_class": "synthetic",
+  "families": [
+    {
+      "callback_faults": [],
+      "class": "CatalystStrategy",
+      "evidence_class": "synthetic",
+      "execution_profile": "code-managed-limit-v1",
+      "family": "catalyst",
+      "fill_callbacks": 2,
+      "fixture_sha256": "5ffd787275494fbf540b4d52972f202785e736210a1953f79bb678adc0a85080",
+      "flags": [],
+      "iterations": 17,
+      "native_order_types": [
+        "LIMIT"
+      ],
+      "orders": 4,
+      "owned_quantity": "0",
+      "passed": true,
+      "pending": false,
+      "preset": "conservative-v1",
+      "trace": [
+        {
+          "event": "snapshot",
+          "now_ns": 1791465900000000000,
+          "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
+        },
+        {
+          "event": "submit",
+          "limit_price": "10.03",
+          "now_ns": 1791466500000000000,
+          "quantity": "7",
+          "reason": "family_signal",
+          "side": "BUY"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466501000000000,
+          "price": "10.0102",
+          "quantity": "7",
+          "side": "BUY"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.79",
+          "now_ns": 1791466508000000000,
+          "quantity": "7",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466508000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466509000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.69",
+          "now_ns": 1791466509000000000,
+          "quantity": "7",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466510000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466511000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.59",
+          "now_ns": 1791466511000000000,
+          "quantity": "7",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466512000000000,
+          "role": "exit"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466512000000000,
+          "price": "9.5998",
+          "quantity": "7",
+          "side": "SELL"
+        }
+      ],
+      "trace_sha256": "028294d2cf79d00f944759f7e71a316b70e9354ae790462e4b9fba06bf1a750a"
+    },
+    {
+      "callback_faults": [],
+      "class": "CatalystStrategy",
+      "evidence_class": "synthetic",
+      "execution_profile": "code-managed-limit-v1",
+      "family": "catalyst",
+      "fill_callbacks": 2,
+      "fixture_sha256": "d7626cec195e392de4594a0349bf557b6fd0eb411bef159a7868d08bab394c57",
+      "flags": [],
+      "iterations": 17,
+      "native_order_types": [
+        "LIMIT"
+      ],
+      "orders": 4,
+      "owned_quantity": "0",
+      "passed": true,
+      "pending": false,
+      "preset": "standard-v1",
+      "trace": [
+        {
+          "event": "snapshot",
+          "now_ns": 1791465900000000000,
+          "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
+        },
+        {
+          "event": "submit",
+          "limit_price": "10.03",
+          "now_ns": 1791466500000000000,
+          "quantity": "12",
+          "reason": "family_signal",
+          "side": "BUY"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466501000000000,
+          "price": "10.0102",
+          "quantity": "12",
+          "side": "BUY"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.79",
+          "now_ns": 1791466508000000000,
+          "quantity": "12",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466508000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466509000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.69",
+          "now_ns": 1791466509000000000,
+          "quantity": "12",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466510000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466511000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.59",
+          "now_ns": 1791466511000000000,
+          "quantity": "12",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466512000000000,
+          "role": "exit"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466512000000000,
+          "price": "9.5998",
+          "quantity": "12",
+          "side": "SELL"
+        }
+      ],
+      "trace_sha256": "e674041487f00fae112b5f820d2a9057826bc340ff361cd040262c3bd966d5b9"
+    },
+    {
+      "callback_faults": [],
+      "class": "CatalystStrategy",
+      "evidence_class": "synthetic",
+      "execution_profile": "code-managed-limit-v1",
+      "family": "catalyst",
+      "fill_callbacks": 2,
+      "fixture_sha256": "9bd01c7b65c5ca4a1cf3353907de7b120a3dce9482d3ca9c3e46d66027dddcc2",
+      "flags": [],
+      "iterations": 17,
+      "native_order_types": [
+        "LIMIT"
+      ],
+      "orders": 4,
+      "owned_quantity": "0",
+      "passed": true,
+      "pending": false,
+      "preset": "aggressive-v1",
+      "trace": [
+        {
+          "event": "snapshot",
+          "now_ns": 1791465900000000000,
+          "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
+        },
+        {
+          "event": "submit",
+          "limit_price": "10.03",
+          "now_ns": 1791466500000000000,
+          "quantity": "16",
+          "reason": "family_signal",
+          "side": "BUY"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466501000000000,
+          "price": "10.0102",
+          "quantity": "16",
+          "side": "BUY"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.79",
+          "now_ns": 1791466508000000000,
+          "quantity": "16",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466508000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466509000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.69",
+          "now_ns": 1791466509000000000,
+          "quantity": "16",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466510000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466511000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.59",
+          "now_ns": 1791466511000000000,
+          "quantity": "16",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466512000000000,
+          "role": "exit"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466512000000000,
+          "price": "9.5998",
+          "quantity": "16",
+          "side": "SELL"
+        }
+      ],
+      "trace_sha256": "5db3f2767611a39314c6cb321e47d78d3e8da8f27ad6b34e7e003f8b7bb6346b"
+    },
+    {
+      "callback_faults": [],
+      "class": "GapPremarketStrategy",
+      "evidence_class": "synthetic",
+      "execution_profile": "code-managed-limit-v1",
+      "family": "gap_premarket",
+      "fill_callbacks": 2,
+      "fixture_sha256": "5ffd787275494fbf540b4d52972f202785e736210a1953f79bb678adc0a85080",
+      "flags": [],
+      "iterations": 17,
+      "native_order_types": [
+        "LIMIT"
+      ],
+      "orders": 4,
+      "owned_quantity": "0",
+      "passed": true,
+      "pending": false,
+      "preset": "conservative-v1",
+      "trace": [
+        {
+          "event": "snapshot",
+          "now_ns": 1791465900000000000,
+          "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
+        },
+        {
+          "event": "submit",
+          "limit_price": "10.03",
+          "now_ns": 1791466500000000000,
+          "quantity": "7",
+          "reason": "family_signal",
+          "side": "BUY"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466501000000000,
+          "price": "10.0102",
+          "quantity": "7",
+          "side": "BUY"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.79",
+          "now_ns": 1791466508000000000,
+          "quantity": "7",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466508000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466509000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.69",
+          "now_ns": 1791466509000000000,
+          "quantity": "7",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466510000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466511000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.59",
+          "now_ns": 1791466511000000000,
+          "quantity": "7",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466512000000000,
+          "role": "exit"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466512000000000,
+          "price": "9.5998",
+          "quantity": "7",
+          "side": "SELL"
+        }
+      ],
+      "trace_sha256": "028294d2cf79d00f944759f7e71a316b70e9354ae790462e4b9fba06bf1a750a"
+    },
+    {
+      "callback_faults": [],
+      "class": "GapPremarketStrategy",
+      "evidence_class": "synthetic",
+      "execution_profile": "code-managed-limit-v1",
+      "family": "gap_premarket",
+      "fill_callbacks": 2,
+      "fixture_sha256": "d7626cec195e392de4594a0349bf557b6fd0eb411bef159a7868d08bab394c57",
+      "flags": [],
+      "iterations": 17,
+      "native_order_types": [
+        "LIMIT"
+      ],
+      "orders": 4,
+      "owned_quantity": "0",
+      "passed": true,
+      "pending": false,
+      "preset": "standard-v1",
+      "trace": [
+        {
+          "event": "snapshot",
+          "now_ns": 1791465900000000000,
+          "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
+        },
+        {
+          "event": "submit",
+          "limit_price": "10.03",
+          "now_ns": 1791466500000000000,
+          "quantity": "12",
+          "reason": "family_signal",
+          "side": "BUY"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466501000000000,
+          "price": "10.0102",
+          "quantity": "12",
+          "side": "BUY"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.79",
+          "now_ns": 1791466508000000000,
+          "quantity": "12",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466508000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466509000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.69",
+          "now_ns": 1791466509000000000,
+          "quantity": "12",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466510000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466511000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.59",
+          "now_ns": 1791466511000000000,
+          "quantity": "12",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466512000000000,
+          "role": "exit"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466512000000000,
+          "price": "9.5998",
+          "quantity": "12",
+          "side": "SELL"
+        }
+      ],
+      "trace_sha256": "e674041487f00fae112b5f820d2a9057826bc340ff361cd040262c3bd966d5b9"
+    },
+    {
+      "callback_faults": [],
+      "class": "GapPremarketStrategy",
+      "evidence_class": "synthetic",
+      "execution_profile": "code-managed-limit-v1",
+      "family": "gap_premarket",
+      "fill_callbacks": 2,
+      "fixture_sha256": "9bd01c7b65c5ca4a1cf3353907de7b120a3dce9482d3ca9c3e46d66027dddcc2",
+      "flags": [],
+      "iterations": 17,
+      "native_order_types": [
+        "LIMIT"
+      ],
+      "orders": 4,
+      "owned_quantity": "0",
+      "passed": true,
+      "pending": false,
+      "preset": "aggressive-v1",
+      "trace": [
+        {
+          "event": "snapshot",
+          "now_ns": 1791465900000000000,
+          "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
+        },
+        {
+          "event": "submit",
+          "limit_price": "10.03",
+          "now_ns": 1791466500000000000,
+          "quantity": "16",
+          "reason": "family_signal",
+          "side": "BUY"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466501000000000,
+          "price": "10.0102",
+          "quantity": "16",
+          "side": "BUY"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.79",
+          "now_ns": 1791466508000000000,
+          "quantity": "16",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466508000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466509000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.69",
+          "now_ns": 1791466509000000000,
+          "quantity": "16",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466510000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466511000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.59",
+          "now_ns": 1791466511000000000,
+          "quantity": "16",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466512000000000,
+          "role": "exit"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466512000000000,
+          "price": "9.5998",
+          "quantity": "16",
+          "side": "SELL"
+        }
+      ],
+      "trace_sha256": "5db3f2767611a39314c6cb321e47d78d3e8da8f27ad6b34e7e003f8b7bb6346b"
+    },
+    {
+      "callback_faults": [],
+      "class": "VolumeFloatStrategy",
+      "evidence_class": "synthetic",
+      "execution_profile": "code-managed-limit-v1",
+      "family": "volume_float",
+      "fill_callbacks": 2,
+      "fixture_sha256": "5ffd787275494fbf540b4d52972f202785e736210a1953f79bb678adc0a85080",
+      "flags": [],
+      "iterations": 17,
+      "native_order_types": [
+        "LIMIT"
+      ],
+      "orders": 4,
+      "owned_quantity": "0",
+      "passed": true,
+      "pending": false,
+      "preset": "conservative-v1",
+      "trace": [
+        {
+          "event": "snapshot",
+          "now_ns": 1791465900000000000,
+          "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
+        },
+        {
+          "event": "submit",
+          "limit_price": "10.03",
+          "now_ns": 1791466500000000000,
+          "quantity": "7",
+          "reason": "family_signal",
+          "side": "BUY"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466501000000000,
+          "price": "10.0102",
+          "quantity": "7",
+          "side": "BUY"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.79",
+          "now_ns": 1791466508000000000,
+          "quantity": "7",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466508000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466509000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.69",
+          "now_ns": 1791466509000000000,
+          "quantity": "7",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466510000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466511000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.59",
+          "now_ns": 1791466511000000000,
+          "quantity": "7",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466512000000000,
+          "role": "exit"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466512000000000,
+          "price": "9.5998",
+          "quantity": "7",
+          "side": "SELL"
+        }
+      ],
+      "trace_sha256": "028294d2cf79d00f944759f7e71a316b70e9354ae790462e4b9fba06bf1a750a"
+    },
+    {
+      "callback_faults": [],
+      "class": "VolumeFloatStrategy",
+      "evidence_class": "synthetic",
+      "execution_profile": "code-managed-limit-v1",
+      "family": "volume_float",
+      "fill_callbacks": 2,
+      "fixture_sha256": "d7626cec195e392de4594a0349bf557b6fd0eb411bef159a7868d08bab394c57",
+      "flags": [],
+      "iterations": 17,
+      "native_order_types": [
+        "LIMIT"
+      ],
+      "orders": 4,
+      "owned_quantity": "0",
+      "passed": true,
+      "pending": false,
+      "preset": "standard-v1",
+      "trace": [
+        {
+          "event": "snapshot",
+          "now_ns": 1791465900000000000,
+          "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
+        },
+        {
+          "event": "submit",
+          "limit_price": "10.03",
+          "now_ns": 1791466500000000000,
+          "quantity": "12",
+          "reason": "family_signal",
+          "side": "BUY"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466501000000000,
+          "price": "10.0102",
+          "quantity": "12",
+          "side": "BUY"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.79",
+          "now_ns": 1791466508000000000,
+          "quantity": "12",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466508000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466509000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.69",
+          "now_ns": 1791466509000000000,
+          "quantity": "12",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466510000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466511000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.59",
+          "now_ns": 1791466511000000000,
+          "quantity": "12",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466512000000000,
+          "role": "exit"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466512000000000,
+          "price": "9.5998",
+          "quantity": "12",
+          "side": "SELL"
+        }
+      ],
+      "trace_sha256": "e674041487f00fae112b5f820d2a9057826bc340ff361cd040262c3bd966d5b9"
+    },
+    {
+      "callback_faults": [],
+      "class": "VolumeFloatStrategy",
+      "evidence_class": "synthetic",
+      "execution_profile": "code-managed-limit-v1",
+      "family": "volume_float",
+      "fill_callbacks": 2,
+      "fixture_sha256": "9bd01c7b65c5ca4a1cf3353907de7b120a3dce9482d3ca9c3e46d66027dddcc2",
+      "flags": [],
+      "iterations": 17,
+      "native_order_types": [
+        "LIMIT"
+      ],
+      "orders": 4,
+      "owned_quantity": "0",
+      "passed": true,
+      "pending": false,
+      "preset": "aggressive-v1",
+      "trace": [
+        {
+          "event": "snapshot",
+          "now_ns": 1791465900000000000,
+          "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
+        },
+        {
+          "event": "submit",
+          "limit_price": "10.03",
+          "now_ns": 1791466500000000000,
+          "quantity": "16",
+          "reason": "family_signal",
+          "side": "BUY"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466501000000000,
+          "price": "10.0102",
+          "quantity": "16",
+          "side": "BUY"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.79",
+          "now_ns": 1791466508000000000,
+          "quantity": "16",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466508000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466509000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.69",
+          "now_ns": 1791466509000000000,
+          "quantity": "16",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466510000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466511000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.59",
+          "now_ns": 1791466511000000000,
+          "quantity": "16",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466512000000000,
+          "role": "exit"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466512000000000,
+          "price": "9.5998",
+          "quantity": "16",
+          "side": "SELL"
+        }
+      ],
+      "trace_sha256": "5db3f2767611a39314c6cb321e47d78d3e8da8f27ad6b34e7e003f8b7bb6346b"
+    },
+    {
+      "callback_faults": [],
+      "class": "SqueezeBorrowStrategy",
+      "evidence_class": "synthetic",
+      "execution_profile": "code-managed-limit-v1",
+      "family": "squeeze_borrow",
+      "fill_callbacks": 2,
+      "fixture_sha256": "5ffd787275494fbf540b4d52972f202785e736210a1953f79bb678adc0a85080",
+      "flags": [],
+      "iterations": 17,
+      "native_order_types": [
+        "LIMIT"
+      ],
+      "orders": 4,
+      "owned_quantity": "0",
+      "passed": true,
+      "pending": false,
+      "preset": "conservative-v1",
+      "trace": [
+        {
+          "event": "snapshot",
+          "now_ns": 1791465900000000000,
+          "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
+        },
+        {
+          "event": "submit",
+          "limit_price": "10.03",
+          "now_ns": 1791466500000000000,
+          "quantity": "7",
+          "reason": "family_signal",
+          "side": "BUY"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466501000000000,
+          "price": "10.0102",
+          "quantity": "7",
+          "side": "BUY"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.79",
+          "now_ns": 1791466508000000000,
+          "quantity": "7",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466508000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466509000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.69",
+          "now_ns": 1791466509000000000,
+          "quantity": "7",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466510000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466511000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.59",
+          "now_ns": 1791466511000000000,
+          "quantity": "7",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466512000000000,
+          "role": "exit"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466512000000000,
+          "price": "9.5998",
+          "quantity": "7",
+          "side": "SELL"
+        }
+      ],
+      "trace_sha256": "028294d2cf79d00f944759f7e71a316b70e9354ae790462e4b9fba06bf1a750a"
+    },
+    {
+      "callback_faults": [],
+      "class": "SqueezeBorrowStrategy",
+      "evidence_class": "synthetic",
+      "execution_profile": "code-managed-limit-v1",
+      "family": "squeeze_borrow",
+      "fill_callbacks": 2,
+      "fixture_sha256": "d7626cec195e392de4594a0349bf557b6fd0eb411bef159a7868d08bab394c57",
+      "flags": [],
+      "iterations": 17,
+      "native_order_types": [
+        "LIMIT"
+      ],
+      "orders": 4,
+      "owned_quantity": "0",
+      "passed": true,
+      "pending": false,
+      "preset": "standard-v1",
+      "trace": [
+        {
+          "event": "snapshot",
+          "now_ns": 1791465900000000000,
+          "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
+        },
+        {
+          "event": "submit",
+          "limit_price": "10.03",
+          "now_ns": 1791466500000000000,
+          "quantity": "12",
+          "reason": "family_signal",
+          "side": "BUY"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466501000000000,
+          "price": "10.0102",
+          "quantity": "12",
+          "side": "BUY"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.79",
+          "now_ns": 1791466508000000000,
+          "quantity": "12",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466508000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466509000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.69",
+          "now_ns": 1791466509000000000,
+          "quantity": "12",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466510000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466511000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.59",
+          "now_ns": 1791466511000000000,
+          "quantity": "12",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466512000000000,
+          "role": "exit"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466512000000000,
+          "price": "9.5998",
+          "quantity": "12",
+          "side": "SELL"
+        }
+      ],
+      "trace_sha256": "e674041487f00fae112b5f820d2a9057826bc340ff361cd040262c3bd966d5b9"
+    },
+    {
+      "callback_faults": [],
+      "class": "SqueezeBorrowStrategy",
+      "evidence_class": "synthetic",
+      "execution_profile": "code-managed-limit-v1",
+      "family": "squeeze_borrow",
+      "fill_callbacks": 2,
+      "fixture_sha256": "9bd01c7b65c5ca4a1cf3353907de7b120a3dce9482d3ca9c3e46d66027dddcc2",
+      "flags": [],
+      "iterations": 17,
+      "native_order_types": [
+        "LIMIT"
+      ],
+      "orders": 4,
+      "owned_quantity": "0",
+      "passed": true,
+      "pending": false,
+      "preset": "aggressive-v1",
+      "trace": [
+        {
+          "event": "snapshot",
+          "now_ns": 1791465900000000000,
+          "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
+        },
+        {
+          "event": "submit",
+          "limit_price": "10.03",
+          "now_ns": 1791466500000000000,
+          "quantity": "16",
+          "reason": "family_signal",
+          "side": "BUY"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466501000000000,
+          "price": "10.0102",
+          "quantity": "16",
+          "side": "BUY"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.79",
+          "now_ns": 1791466508000000000,
+          "quantity": "16",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466508000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466509000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.69",
+          "now_ns": 1791466509000000000,
+          "quantity": "16",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466510000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466511000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.59",
+          "now_ns": 1791466511000000000,
+          "quantity": "16",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466512000000000,
+          "role": "exit"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466512000000000,
+          "price": "9.5998",
+          "quantity": "16",
+          "side": "SELL"
+        }
+      ],
+      "trace_sha256": "5db3f2767611a39314c6cb321e47d78d3e8da8f27ad6b34e7e003f8b7bb6346b"
+    },
+    {
+      "callback_faults": [],
+      "class": "MomentumBreakoutStrategy",
+      "evidence_class": "synthetic",
+      "execution_profile": "code-managed-limit-v1",
+      "family": "momentum_breakout",
+      "fill_callbacks": 2,
+      "fixture_sha256": "5ffd787275494fbf540b4d52972f202785e736210a1953f79bb678adc0a85080",
+      "flags": [],
+      "iterations": 17,
+      "native_order_types": [
+        "LIMIT"
+      ],
+      "orders": 4,
+      "owned_quantity": "0",
+      "passed": true,
+      "pending": false,
+      "preset": "conservative-v1",
+      "trace": [
+        {
+          "event": "snapshot",
+          "now_ns": 1791465900000000000,
+          "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
+        },
+        {
+          "event": "submit",
+          "limit_price": "10.03",
+          "now_ns": 1791466500000000000,
+          "quantity": "7",
+          "reason": "family_signal",
+          "side": "BUY"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466501000000000,
+          "price": "10.0102",
+          "quantity": "7",
+          "side": "BUY"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.79",
+          "now_ns": 1791466508000000000,
+          "quantity": "7",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466508000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466509000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.69",
+          "now_ns": 1791466509000000000,
+          "quantity": "7",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466510000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466511000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.59",
+          "now_ns": 1791466511000000000,
+          "quantity": "7",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466512000000000,
+          "role": "exit"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466512000000000,
+          "price": "9.5998",
+          "quantity": "7",
+          "side": "SELL"
+        }
+      ],
+      "trace_sha256": "028294d2cf79d00f944759f7e71a316b70e9354ae790462e4b9fba06bf1a750a"
+    },
+    {
+      "callback_faults": [],
+      "class": "MomentumBreakoutStrategy",
+      "evidence_class": "synthetic",
+      "execution_profile": "code-managed-limit-v1",
+      "family": "momentum_breakout",
+      "fill_callbacks": 2,
+      "fixture_sha256": "d7626cec195e392de4594a0349bf557b6fd0eb411bef159a7868d08bab394c57",
+      "flags": [],
+      "iterations": 17,
+      "native_order_types": [
+        "LIMIT"
+      ],
+      "orders": 4,
+      "owned_quantity": "0",
+      "passed": true,
+      "pending": false,
+      "preset": "standard-v1",
+      "trace": [
+        {
+          "event": "snapshot",
+          "now_ns": 1791465900000000000,
+          "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
+        },
+        {
+          "event": "submit",
+          "limit_price": "10.03",
+          "now_ns": 1791466500000000000,
+          "quantity": "12",
+          "reason": "family_signal",
+          "side": "BUY"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466501000000000,
+          "price": "10.0102",
+          "quantity": "12",
+          "side": "BUY"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.79",
+          "now_ns": 1791466508000000000,
+          "quantity": "12",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466508000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466509000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.69",
+          "now_ns": 1791466509000000000,
+          "quantity": "12",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466510000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466511000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.59",
+          "now_ns": 1791466511000000000,
+          "quantity": "12",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466512000000000,
+          "role": "exit"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466512000000000,
+          "price": "9.5998",
+          "quantity": "12",
+          "side": "SELL"
+        }
+      ],
+      "trace_sha256": "e674041487f00fae112b5f820d2a9057826bc340ff361cd040262c3bd966d5b9"
+    },
+    {
+      "callback_faults": [],
+      "class": "MomentumBreakoutStrategy",
+      "evidence_class": "synthetic",
+      "execution_profile": "code-managed-limit-v1",
+      "family": "momentum_breakout",
+      "fill_callbacks": 2,
+      "fixture_sha256": "9bd01c7b65c5ca4a1cf3353907de7b120a3dce9482d3ca9c3e46d66027dddcc2",
+      "flags": [],
+      "iterations": 17,
+      "native_order_types": [
+        "LIMIT"
+      ],
+      "orders": 4,
+      "owned_quantity": "0",
+      "passed": true,
+      "pending": false,
+      "preset": "aggressive-v1",
+      "trace": [
+        {
+          "event": "snapshot",
+          "now_ns": 1791465900000000000,
+          "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
+        },
+        {
+          "event": "submit",
+          "limit_price": "10.03",
+          "now_ns": 1791466500000000000,
+          "quantity": "16",
+          "reason": "family_signal",
+          "side": "BUY"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466501000000000,
+          "price": "10.0102",
+          "quantity": "16",
+          "side": "BUY"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.79",
+          "now_ns": 1791466508000000000,
+          "quantity": "16",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466508000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466509000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.69",
+          "now_ns": 1791466509000000000,
+          "quantity": "16",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466510000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466511000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.59",
+          "now_ns": 1791466511000000000,
+          "quantity": "16",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466512000000000,
+          "role": "exit"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466512000000000,
+          "price": "9.5998",
+          "quantity": "16",
+          "side": "SELL"
+        }
+      ],
+      "trace_sha256": "5db3f2767611a39314c6cb321e47d78d3e8da8f27ad6b34e7e003f8b7bb6346b"
+    },
+    {
+      "callback_faults": [],
+      "class": "OptionsFlowStockStrategy",
+      "evidence_class": "synthetic",
+      "execution_profile": "code-managed-limit-v1",
+      "family": "options_flow_stock",
+      "fill_callbacks": 2,
+      "fixture_sha256": "5ffd787275494fbf540b4d52972f202785e736210a1953f79bb678adc0a85080",
+      "flags": [],
+      "iterations": 17,
+      "native_order_types": [
+        "LIMIT"
+      ],
+      "orders": 4,
+      "owned_quantity": "0",
+      "passed": true,
+      "pending": false,
+      "preset": "conservative-v1",
+      "trace": [
+        {
+          "event": "snapshot",
+          "now_ns": 1791465900000000000,
+          "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
+        },
+        {
+          "event": "submit",
+          "limit_price": "10.03",
+          "now_ns": 1791466500000000000,
+          "quantity": "7",
+          "reason": "family_signal",
+          "side": "BUY"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466501000000000,
+          "price": "10.0102",
+          "quantity": "7",
+          "side": "BUY"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.79",
+          "now_ns": 1791466508000000000,
+          "quantity": "7",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466508000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466509000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.69",
+          "now_ns": 1791466509000000000,
+          "quantity": "7",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466510000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466511000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.59",
+          "now_ns": 1791466511000000000,
+          "quantity": "7",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466512000000000,
+          "role": "exit"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466512000000000,
+          "price": "9.5998",
+          "quantity": "7",
+          "side": "SELL"
+        }
+      ],
+      "trace_sha256": "028294d2cf79d00f944759f7e71a316b70e9354ae790462e4b9fba06bf1a750a"
+    },
+    {
+      "callback_faults": [],
+      "class": "OptionsFlowStockStrategy",
+      "evidence_class": "synthetic",
+      "execution_profile": "code-managed-limit-v1",
+      "family": "options_flow_stock",
+      "fill_callbacks": 2,
+      "fixture_sha256": "d7626cec195e392de4594a0349bf557b6fd0eb411bef159a7868d08bab394c57",
+      "flags": [],
+      "iterations": 17,
+      "native_order_types": [
+        "LIMIT"
+      ],
+      "orders": 4,
+      "owned_quantity": "0",
+      "passed": true,
+      "pending": false,
+      "preset": "standard-v1",
+      "trace": [
+        {
+          "event": "snapshot",
+          "now_ns": 1791465900000000000,
+          "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
+        },
+        {
+          "event": "submit",
+          "limit_price": "10.03",
+          "now_ns": 1791466500000000000,
+          "quantity": "12",
+          "reason": "family_signal",
+          "side": "BUY"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466501000000000,
+          "price": "10.0102",
+          "quantity": "12",
+          "side": "BUY"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.79",
+          "now_ns": 1791466508000000000,
+          "quantity": "12",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466508000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466509000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.69",
+          "now_ns": 1791466509000000000,
+          "quantity": "12",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466510000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466511000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.59",
+          "now_ns": 1791466511000000000,
+          "quantity": "12",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466512000000000,
+          "role": "exit"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466512000000000,
+          "price": "9.5998",
+          "quantity": "12",
+          "side": "SELL"
+        }
+      ],
+      "trace_sha256": "e674041487f00fae112b5f820d2a9057826bc340ff361cd040262c3bd966d5b9"
+    },
+    {
+      "callback_faults": [],
+      "class": "OptionsFlowStockStrategy",
+      "evidence_class": "synthetic",
+      "execution_profile": "code-managed-limit-v1",
+      "family": "options_flow_stock",
+      "fill_callbacks": 2,
+      "fixture_sha256": "9bd01c7b65c5ca4a1cf3353907de7b120a3dce9482d3ca9c3e46d66027dddcc2",
+      "flags": [],
+      "iterations": 17,
+      "native_order_types": [
+        "LIMIT"
+      ],
+      "orders": 4,
+      "owned_quantity": "0",
+      "passed": true,
+      "pending": false,
+      "preset": "aggressive-v1",
+      "trace": [
+        {
+          "event": "snapshot",
+          "now_ns": 1791465900000000000,
+          "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
+        },
+        {
+          "event": "submit",
+          "limit_price": "10.03",
+          "now_ns": 1791466500000000000,
+          "quantity": "16",
+          "reason": "family_signal",
+          "side": "BUY"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466501000000000,
+          "price": "10.0102",
+          "quantity": "16",
+          "side": "BUY"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.79",
+          "now_ns": 1791466508000000000,
+          "quantity": "16",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466508000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466509000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.69",
+          "now_ns": 1791466509000000000,
+          "quantity": "16",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466510000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466511000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.59",
+          "now_ns": 1791466511000000000,
+          "quantity": "16",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466512000000000,
+          "role": "exit"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466512000000000,
+          "price": "9.5998",
+          "quantity": "16",
+          "side": "SELL"
+        }
+      ],
+      "trace_sha256": "5db3f2767611a39314c6cb321e47d78d3e8da8f27ad6b34e7e003f8b7bb6346b"
+    },
+    {
+      "callback_faults": [],
+      "class": "HaltReopenStrategy",
+      "evidence_class": "synthetic",
+      "execution_profile": "code-managed-limit-v1",
+      "family": "halt_reopen",
+      "fill_callbacks": 2,
+      "fixture_sha256": "5ffd787275494fbf540b4d52972f202785e736210a1953f79bb678adc0a85080",
+      "flags": [],
+      "iterations": 17,
+      "native_order_types": [
+        "LIMIT"
+      ],
+      "orders": 4,
+      "owned_quantity": "0",
+      "passed": true,
+      "pending": false,
+      "preset": "conservative-v1",
+      "trace": [
+        {
+          "event": "snapshot",
+          "now_ns": 1791465900000000000,
+          "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
+        },
+        {
+          "event": "submit",
+          "limit_price": "10.03",
+          "now_ns": 1791466500000000000,
+          "quantity": "7",
+          "reason": "family_signal",
+          "side": "BUY"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466501000000000,
+          "price": "10.0102",
+          "quantity": "7",
+          "side": "BUY"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.79",
+          "now_ns": 1791466508000000000,
+          "quantity": "7",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466508000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466509000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.69",
+          "now_ns": 1791466509000000000,
+          "quantity": "7",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466510000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466511000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.59",
+          "now_ns": 1791466511000000000,
+          "quantity": "7",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466512000000000,
+          "role": "exit"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466512000000000,
+          "price": "9.5998",
+          "quantity": "7",
+          "side": "SELL"
+        }
+      ],
+      "trace_sha256": "028294d2cf79d00f944759f7e71a316b70e9354ae790462e4b9fba06bf1a750a"
+    },
+    {
+      "callback_faults": [],
+      "class": "HaltReopenStrategy",
+      "evidence_class": "synthetic",
+      "execution_profile": "code-managed-limit-v1",
+      "family": "halt_reopen",
+      "fill_callbacks": 2,
+      "fixture_sha256": "d7626cec195e392de4594a0349bf557b6fd0eb411bef159a7868d08bab394c57",
+      "flags": [],
+      "iterations": 17,
+      "native_order_types": [
+        "LIMIT"
+      ],
+      "orders": 4,
+      "owned_quantity": "0",
+      "passed": true,
+      "pending": false,
+      "preset": "standard-v1",
+      "trace": [
+        {
+          "event": "snapshot",
+          "now_ns": 1791465900000000000,
+          "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
+        },
+        {
+          "event": "submit",
+          "limit_price": "10.03",
+          "now_ns": 1791466500000000000,
+          "quantity": "12",
+          "reason": "family_signal",
+          "side": "BUY"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466501000000000,
+          "price": "10.0102",
+          "quantity": "12",
+          "side": "BUY"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.79",
+          "now_ns": 1791466508000000000,
+          "quantity": "12",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466508000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466509000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.69",
+          "now_ns": 1791466509000000000,
+          "quantity": "12",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466510000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466511000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.59",
+          "now_ns": 1791466511000000000,
+          "quantity": "12",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466512000000000,
+          "role": "exit"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466512000000000,
+          "price": "9.5998",
+          "quantity": "12",
+          "side": "SELL"
+        }
+      ],
+      "trace_sha256": "e674041487f00fae112b5f820d2a9057826bc340ff361cd040262c3bd966d5b9"
+    },
+    {
+      "callback_faults": [],
+      "class": "HaltReopenStrategy",
+      "evidence_class": "synthetic",
+      "execution_profile": "code-managed-limit-v1",
+      "family": "halt_reopen",
+      "fill_callbacks": 2,
+      "fixture_sha256": "9bd01c7b65c5ca4a1cf3353907de7b120a3dce9482d3ca9c3e46d66027dddcc2",
+      "flags": [],
+      "iterations": 17,
+      "native_order_types": [
+        "LIMIT"
+      ],
+      "orders": 4,
+      "owned_quantity": "0",
+      "passed": true,
+      "pending": false,
+      "preset": "aggressive-v1",
+      "trace": [
+        {
+          "event": "snapshot",
+          "now_ns": 1791465900000000000,
+          "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
+        },
+        {
+          "event": "submit",
+          "limit_price": "10.03",
+          "now_ns": 1791466500000000000,
+          "quantity": "16",
+          "reason": "family_signal",
+          "side": "BUY"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466501000000000,
+          "price": "10.0102",
+          "quantity": "16",
+          "side": "BUY"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.79",
+          "now_ns": 1791466508000000000,
+          "quantity": "16",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466508000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466509000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.69",
+          "now_ns": 1791466509000000000,
+          "quantity": "16",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466510000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466511000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.59",
+          "now_ns": 1791466511000000000,
+          "quantity": "16",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466512000000000,
+          "role": "exit"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466512000000000,
+          "price": "9.5998",
+          "quantity": "16",
+          "side": "SELL"
+        }
+      ],
+      "trace_sha256": "5db3f2767611a39314c6cb321e47d78d3e8da8f27ad6b34e7e003f8b7bb6346b"
+    },
+    {
+      "callback_faults": [],
+      "class": "PostEarningsDriftStrategy",
+      "evidence_class": "synthetic",
+      "execution_profile": "code-managed-limit-v1",
+      "family": "post_earnings_drift",
+      "fill_callbacks": 2,
+      "fixture_sha256": "5ffd787275494fbf540b4d52972f202785e736210a1953f79bb678adc0a85080",
+      "flags": [],
+      "iterations": 17,
+      "native_order_types": [
+        "LIMIT"
+      ],
+      "orders": 4,
+      "owned_quantity": "0",
+      "passed": true,
+      "pending": false,
+      "preset": "conservative-v1",
+      "trace": [
+        {
+          "event": "snapshot",
+          "now_ns": 1791465900000000000,
+          "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
+        },
+        {
+          "event": "submit",
+          "limit_price": "10.03",
+          "now_ns": 1791466500000000000,
+          "quantity": "7",
+          "reason": "family_signal",
+          "side": "BUY"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466501000000000,
+          "price": "10.0102",
+          "quantity": "7",
+          "side": "BUY"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.79",
+          "now_ns": 1791466508000000000,
+          "quantity": "7",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466508000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466509000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.69",
+          "now_ns": 1791466509000000000,
+          "quantity": "7",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466510000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466511000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.59",
+          "now_ns": 1791466511000000000,
+          "quantity": "7",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466512000000000,
+          "role": "exit"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466512000000000,
+          "price": "9.5998",
+          "quantity": "7",
+          "side": "SELL"
+        }
+      ],
+      "trace_sha256": "028294d2cf79d00f944759f7e71a316b70e9354ae790462e4b9fba06bf1a750a"
+    },
+    {
+      "callback_faults": [],
+      "class": "PostEarningsDriftStrategy",
+      "evidence_class": "synthetic",
+      "execution_profile": "code-managed-limit-v1",
+      "family": "post_earnings_drift",
+      "fill_callbacks": 2,
+      "fixture_sha256": "d7626cec195e392de4594a0349bf557b6fd0eb411bef159a7868d08bab394c57",
+      "flags": [],
+      "iterations": 17,
+      "native_order_types": [
+        "LIMIT"
+      ],
+      "orders": 4,
+      "owned_quantity": "0",
+      "passed": true,
+      "pending": false,
+      "preset": "standard-v1",
+      "trace": [
+        {
+          "event": "snapshot",
+          "now_ns": 1791465900000000000,
+          "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
+        },
+        {
+          "event": "submit",
+          "limit_price": "10.03",
+          "now_ns": 1791466500000000000,
+          "quantity": "12",
+          "reason": "family_signal",
+          "side": "BUY"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466501000000000,
+          "price": "10.0102",
+          "quantity": "12",
+          "side": "BUY"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.79",
+          "now_ns": 1791466508000000000,
+          "quantity": "12",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466508000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466509000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.69",
+          "now_ns": 1791466509000000000,
+          "quantity": "12",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466510000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466511000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.59",
+          "now_ns": 1791466511000000000,
+          "quantity": "12",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466512000000000,
+          "role": "exit"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466512000000000,
+          "price": "9.5998",
+          "quantity": "12",
+          "side": "SELL"
+        }
+      ],
+      "trace_sha256": "e674041487f00fae112b5f820d2a9057826bc340ff361cd040262c3bd966d5b9"
+    },
+    {
+      "callback_faults": [],
+      "class": "PostEarningsDriftStrategy",
+      "evidence_class": "synthetic",
+      "execution_profile": "code-managed-limit-v1",
+      "family": "post_earnings_drift",
+      "fill_callbacks": 2,
+      "fixture_sha256": "9bd01c7b65c5ca4a1cf3353907de7b120a3dce9482d3ca9c3e46d66027dddcc2",
+      "flags": [],
+      "iterations": 17,
+      "native_order_types": [
+        "LIMIT"
+      ],
+      "orders": 4,
+      "owned_quantity": "0",
+      "passed": true,
+      "pending": false,
+      "preset": "aggressive-v1",
+      "trace": [
+        {
+          "event": "snapshot",
+          "now_ns": 1791465900000000000,
+          "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
+        },
+        {
+          "event": "submit",
+          "limit_price": "10.03",
+          "now_ns": 1791466500000000000,
+          "quantity": "16",
+          "reason": "family_signal",
+          "side": "BUY"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466501000000000,
+          "price": "10.0102",
+          "quantity": "16",
+          "side": "BUY"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.79",
+          "now_ns": 1791466508000000000,
+          "quantity": "16",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466508000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466509000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.69",
+          "now_ns": 1791466509000000000,
+          "quantity": "16",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466510000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466511000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.59",
+          "now_ns": 1791466511000000000,
+          "quantity": "16",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466512000000000,
+          "role": "exit"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466512000000000,
+          "price": "9.5998",
+          "quantity": "16",
+          "side": "SELL"
+        }
+      ],
+      "trace_sha256": "5db3f2767611a39314c6cb321e47d78d3e8da8f27ad6b34e7e003f8b7bb6346b"
+    },
+    {
+      "callback_faults": [],
+      "class": "TrendNewHighsStrategy",
+      "evidence_class": "synthetic",
+      "execution_profile": "code-managed-limit-v1",
+      "family": "trend_new_highs",
+      "fill_callbacks": 2,
+      "fixture_sha256": "5ffd787275494fbf540b4d52972f202785e736210a1953f79bb678adc0a85080",
+      "flags": [],
+      "iterations": 17,
+      "native_order_types": [
+        "LIMIT"
+      ],
+      "orders": 4,
+      "owned_quantity": "0",
+      "passed": true,
+      "pending": false,
+      "preset": "conservative-v1",
+      "trace": [
+        {
+          "event": "snapshot",
+          "now_ns": 1791465900000000000,
+          "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
+        },
+        {
+          "event": "submit",
+          "limit_price": "10.03",
+          "now_ns": 1791466500000000000,
+          "quantity": "7",
+          "reason": "family_signal",
+          "side": "BUY"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466501000000000,
+          "price": "10.0102",
+          "quantity": "7",
+          "side": "BUY"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.79",
+          "now_ns": 1791466508000000000,
+          "quantity": "7",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466508000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466509000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.69",
+          "now_ns": 1791466509000000000,
+          "quantity": "7",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466510000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466511000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.59",
+          "now_ns": 1791466511000000000,
+          "quantity": "7",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466512000000000,
+          "role": "exit"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466512000000000,
+          "price": "9.5998",
+          "quantity": "7",
+          "side": "SELL"
+        }
+      ],
+      "trace_sha256": "028294d2cf79d00f944759f7e71a316b70e9354ae790462e4b9fba06bf1a750a"
+    },
+    {
+      "callback_faults": [],
+      "class": "TrendNewHighsStrategy",
+      "evidence_class": "synthetic",
+      "execution_profile": "code-managed-limit-v1",
+      "family": "trend_new_highs",
+      "fill_callbacks": 2,
+      "fixture_sha256": "d7626cec195e392de4594a0349bf557b6fd0eb411bef159a7868d08bab394c57",
+      "flags": [],
+      "iterations": 17,
+      "native_order_types": [
+        "LIMIT"
+      ],
+      "orders": 4,
+      "owned_quantity": "0",
+      "passed": true,
+      "pending": false,
+      "preset": "standard-v1",
+      "trace": [
+        {
+          "event": "snapshot",
+          "now_ns": 1791465900000000000,
+          "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
+        },
+        {
+          "event": "submit",
+          "limit_price": "10.03",
+          "now_ns": 1791466500000000000,
+          "quantity": "12",
+          "reason": "family_signal",
+          "side": "BUY"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466501000000000,
+          "price": "10.0102",
+          "quantity": "12",
+          "side": "BUY"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.79",
+          "now_ns": 1791466508000000000,
+          "quantity": "12",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466508000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466509000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.69",
+          "now_ns": 1791466509000000000,
+          "quantity": "12",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466510000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466511000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.59",
+          "now_ns": 1791466511000000000,
+          "quantity": "12",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466512000000000,
+          "role": "exit"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466512000000000,
+          "price": "9.5998",
+          "quantity": "12",
+          "side": "SELL"
+        }
+      ],
+      "trace_sha256": "e674041487f00fae112b5f820d2a9057826bc340ff361cd040262c3bd966d5b9"
+    },
+    {
+      "callback_faults": [],
+      "class": "TrendNewHighsStrategy",
+      "evidence_class": "synthetic",
+      "execution_profile": "code-managed-limit-v1",
+      "family": "trend_new_highs",
+      "fill_callbacks": 2,
+      "fixture_sha256": "9bd01c7b65c5ca4a1cf3353907de7b120a3dce9482d3ca9c3e46d66027dddcc2",
+      "flags": [],
+      "iterations": 17,
+      "native_order_types": [
+        "LIMIT"
+      ],
+      "orders": 4,
+      "owned_quantity": "0",
+      "passed": true,
+      "pending": false,
+      "preset": "aggressive-v1",
+      "trace": [
+        {
+          "event": "snapshot",
+          "now_ns": 1791465900000000000,
+          "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
+        },
+        {
+          "event": "submit",
+          "limit_price": "10.03",
+          "now_ns": 1791466500000000000,
+          "quantity": "16",
+          "reason": "family_signal",
+          "side": "BUY"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466501000000000,
+          "price": "10.0102",
+          "quantity": "16",
+          "side": "BUY"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.79",
+          "now_ns": 1791466508000000000,
+          "quantity": "16",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466508000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466509000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.69",
+          "now_ns": 1791466509000000000,
+          "quantity": "16",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466510000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466511000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.59",
+          "now_ns": 1791466511000000000,
+          "quantity": "16",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466512000000000,
+          "role": "exit"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466512000000000,
+          "price": "9.5998",
+          "quantity": "16",
+          "side": "SELL"
+        }
+      ],
+      "trace_sha256": "5db3f2767611a39314c6cb321e47d78d3e8da8f27ad6b34e7e003f8b7bb6346b"
+    },
+    {
+      "callback_faults": [],
+      "class": "ShortTermReversalStrategy",
+      "evidence_class": "synthetic",
+      "execution_profile": "code-managed-limit-v1",
+      "family": "short_term_reversal",
+      "fill_callbacks": 2,
+      "fixture_sha256": "5ffd787275494fbf540b4d52972f202785e736210a1953f79bb678adc0a85080",
+      "flags": [],
+      "iterations": 17,
+      "native_order_types": [
+        "LIMIT"
+      ],
+      "orders": 4,
+      "owned_quantity": "0",
+      "passed": true,
+      "pending": false,
+      "preset": "conservative-v1",
+      "trace": [
+        {
+          "event": "snapshot",
+          "now_ns": 1791465900000000000,
+          "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
+        },
+        {
+          "event": "submit",
+          "limit_price": "10.03",
+          "now_ns": 1791466500000000000,
+          "quantity": "7",
+          "reason": "family_signal",
+          "side": "BUY"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466501000000000,
+          "price": "10.0102",
+          "quantity": "7",
+          "side": "BUY"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.79",
+          "now_ns": 1791466508000000000,
+          "quantity": "7",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466508000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466509000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.69",
+          "now_ns": 1791466509000000000,
+          "quantity": "7",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466510000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466511000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.59",
+          "now_ns": 1791466511000000000,
+          "quantity": "7",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466512000000000,
+          "role": "exit"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466512000000000,
+          "price": "9.5998",
+          "quantity": "7",
+          "side": "SELL"
+        }
+      ],
+      "trace_sha256": "028294d2cf79d00f944759f7e71a316b70e9354ae790462e4b9fba06bf1a750a"
+    },
+    {
+      "callback_faults": [],
+      "class": "ShortTermReversalStrategy",
+      "evidence_class": "synthetic",
+      "execution_profile": "code-managed-limit-v1",
+      "family": "short_term_reversal",
+      "fill_callbacks": 2,
+      "fixture_sha256": "d7626cec195e392de4594a0349bf557b6fd0eb411bef159a7868d08bab394c57",
+      "flags": [],
+      "iterations": 17,
+      "native_order_types": [
+        "LIMIT"
+      ],
+      "orders": 4,
+      "owned_quantity": "0",
+      "passed": true,
+      "pending": false,
+      "preset": "standard-v1",
+      "trace": [
+        {
+          "event": "snapshot",
+          "now_ns": 1791465900000000000,
+          "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
+        },
+        {
+          "event": "submit",
+          "limit_price": "10.03",
+          "now_ns": 1791466500000000000,
+          "quantity": "12",
+          "reason": "family_signal",
+          "side": "BUY"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466501000000000,
+          "price": "10.0102",
+          "quantity": "12",
+          "side": "BUY"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.79",
+          "now_ns": 1791466508000000000,
+          "quantity": "12",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466508000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466509000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.69",
+          "now_ns": 1791466509000000000,
+          "quantity": "12",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466510000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466511000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.59",
+          "now_ns": 1791466511000000000,
+          "quantity": "12",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466512000000000,
+          "role": "exit"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466512000000000,
+          "price": "9.5998",
+          "quantity": "12",
+          "side": "SELL"
+        }
+      ],
+      "trace_sha256": "e674041487f00fae112b5f820d2a9057826bc340ff361cd040262c3bd966d5b9"
+    },
+    {
+      "callback_faults": [],
+      "class": "ShortTermReversalStrategy",
+      "evidence_class": "synthetic",
+      "execution_profile": "code-managed-limit-v1",
+      "family": "short_term_reversal",
+      "fill_callbacks": 2,
+      "fixture_sha256": "9bd01c7b65c5ca4a1cf3353907de7b120a3dce9482d3ca9c3e46d66027dddcc2",
+      "flags": [],
+      "iterations": 17,
+      "native_order_types": [
+        "LIMIT"
+      ],
+      "orders": 4,
+      "owned_quantity": "0",
+      "passed": true,
+      "pending": false,
+      "preset": "aggressive-v1",
+      "trace": [
+        {
+          "event": "snapshot",
+          "now_ns": 1791465900000000000,
+          "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
+        },
+        {
+          "event": "submit",
+          "limit_price": "10.03",
+          "now_ns": 1791466500000000000,
+          "quantity": "16",
+          "reason": "family_signal",
+          "side": "BUY"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466501000000000,
+          "price": "10.0102",
+          "quantity": "16",
+          "side": "BUY"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.79",
+          "now_ns": 1791466508000000000,
+          "quantity": "16",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466508000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466509000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.69",
+          "now_ns": 1791466509000000000,
+          "quantity": "16",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466510000000000,
+          "role": "exit"
+        },
+        {
+          "event": "terminal",
+          "now_ns": 1791466511000000000,
+          "refused": false,
+          "role": "exit"
+        },
+        {
+          "event": "submit",
+          "limit_price": "9.59",
+          "now_ns": 1791466511000000000,
+          "quantity": "16",
+          "reason": "time_exit",
+          "side": "SELL"
+        },
+        {
+          "event": "cancel_requested",
+          "now_ns": 1791466512000000000,
+          "role": "exit"
+        },
+        {
+          "event": "fill",
+          "now_ns": 1791466512000000000,
+          "price": "9.5998",
+          "quantity": "16",
+          "side": "SELL"
+        }
+      ],
+      "trace_sha256": "5db3f2767611a39314c6cb321e47d78d3e8da8f27ad6b34e7e003f8b7bb6346b"
+    }
+  ],
+  "historical_layer15_e2e": "NOT_RUN",
+  "inverse_noncohort": [
+    {
+      "callback_faults": [],
+      "class": "CatalystStrategy",
+      "evidence_class": "synthetic",
+      "execution_profile": "code-managed-limit-v1",
+      "family": "catalyst",
+      "fill_callbacks": 0,
+      "fixture_sha256": "f0c2378c28d6138075966134a27cea27af07bf928171475804e98022b99c24d0",
+      "flags": [],
+      "iterations": 17,
+      "native_order_types": [],
+      "orders": 0,
+      "owned_quantity": "0",
+      "passed": true,
+      "pending": false,
+      "preset": "conservative-v1",
+      "trace": [
+        {
+          "event": "snapshot",
+          "now_ns": 1791465900000000000,
+          "source_sha256": "d71e07c674e8989901bf7263203b24711d93aee1e9fe97226b1fa1a1bb4de5c5"
+        }
+      ],
+      "trace_sha256": "685d05ff55d5c2f9d6f6446931f862b397d443b70351886cd5e70d32278e2aef"
+    },
+    {
+      "callback_faults": [],
+      "class": "GapPremarketStrategy",
+      "evidence_class": "synthetic",
+      "execution_profile": "code-managed-limit-v1",
+      "family": "gap_premarket",
+      "fill_callbacks": 0,
+      "fixture_sha256": "f0c2378c28d6138075966134a27cea27af07bf928171475804e98022b99c24d0",
+      "flags": [],
+      "iterations": 17,
+      "native_order_types": [],
+      "orders": 0,
+      "owned_quantity": "0",
+      "passed": true,
+      "pending": false,
+      "preset": "conservative-v1",
+      "trace": [
+        {
+          "event": "snapshot",
+          "now_ns": 1791465900000000000,
+          "source_sha256": "d71e07c674e8989901bf7263203b24711d93aee1e9fe97226b1fa1a1bb4de5c5"
+        }
+      ],
+      "trace_sha256": "685d05ff55d5c2f9d6f6446931f862b397d443b70351886cd5e70d32278e2aef"
+    },
+    {
+      "callback_faults": [],
+      "class": "VolumeFloatStrategy",
+      "evidence_class": "synthetic",
+      "execution_profile": "code-managed-limit-v1",
+      "family": "volume_float",
+      "fill_callbacks": 0,
+      "fixture_sha256": "f0c2378c28d6138075966134a27cea27af07bf928171475804e98022b99c24d0",
+      "flags": [],
+      "iterations": 17,
+      "native_order_types": [],
+      "orders": 0,
+      "owned_quantity": "0",
+      "passed": true,
+      "pending": false,
+      "preset": "conservative-v1",
+      "trace": [
+        {
+          "event": "snapshot",
+          "now_ns": 1791465900000000000,
+          "source_sha256": "d71e07c674e8989901bf7263203b24711d93aee1e9fe97226b1fa1a1bb4de5c5"
+        }
+      ],
+      "trace_sha256": "685d05ff55d5c2f9d6f6446931f862b397d443b70351886cd5e70d32278e2aef"
+    },
+    {
+      "callback_faults": [],
+      "class": "SqueezeBorrowStrategy",
+      "evidence_class": "synthetic",
+      "execution_profile": "code-managed-limit-v1",
+      "family": "squeeze_borrow",
+      "fill_callbacks": 0,
+      "fixture_sha256": "f0c2378c28d6138075966134a27cea27af07bf928171475804e98022b99c24d0",
+      "flags": [],
+      "iterations": 17,
+      "native_order_types": [],
+      "orders": 0,
+      "owned_quantity": "0",
+      "passed": true,
+      "pending": false,
+      "preset": "conservative-v1",
+      "trace": [
+        {
+          "event": "snapshot",
+          "now_ns": 1791465900000000000,
+          "source_sha256": "d71e07c674e8989901bf7263203b24711d93aee1e9fe97226b1fa1a1bb4de5c5"
+        }
+      ],
+      "trace_sha256": "685d05ff55d5c2f9d6f6446931f862b397d443b70351886cd5e70d32278e2aef"
+    },
+    {
+      "callback_faults": [],
+      "class": "MomentumBreakoutStrategy",
+      "evidence_class": "synthetic",
+      "execution_profile": "code-managed-limit-v1",
+      "family": "momentum_breakout",
+      "fill_callbacks": 0,
+      "fixture_sha256": "f0c2378c28d6138075966134a27cea27af07bf928171475804e98022b99c24d0",
+      "flags": [],
+      "iterations": 17,
+      "native_order_types": [],
+      "orders": 0,
+      "owned_quantity": "0",
+      "passed": true,
+      "pending": false,
+      "preset": "conservative-v1",
+      "trace": [
+        {
+          "event": "snapshot",
+          "now_ns": 1791465900000000000,
+          "source_sha256": "d71e07c674e8989901bf7263203b24711d93aee1e9fe97226b1fa1a1bb4de5c5"
+        }
+      ],
+      "trace_sha256": "685d05ff55d5c2f9d6f6446931f862b397d443b70351886cd5e70d32278e2aef"
+    },
+    {
+      "callback_faults": [],
+      "class": "OptionsFlowStockStrategy",
+      "evidence_class": "synthetic",
+      "execution_profile": "code-managed-limit-v1",
+      "family": "options_flow_stock",
+      "fill_callbacks": 0,
+      "fixture_sha256": "f0c2378c28d6138075966134a27cea27af07bf928171475804e98022b99c24d0",
+      "flags": [],
+      "iterations": 17,
+      "native_order_types": [],
+      "orders": 0,
+      "owned_quantity": "0",
+      "passed": true,
+      "pending": false,
+      "preset": "conservative-v1",
+      "trace": [
+        {
+          "event": "snapshot",
+          "now_ns": 1791465900000000000,
+          "source_sha256": "d71e07c674e8989901bf7263203b24711d93aee1e9fe97226b1fa1a1bb4de5c5"
+        }
+      ],
+      "trace_sha256": "685d05ff55d5c2f9d6f6446931f862b397d443b70351886cd5e70d32278e2aef"
+    },
+    {
+      "callback_faults": [],
+      "class": "HaltReopenStrategy",
+      "evidence_class": "synthetic",
+      "execution_profile": "code-managed-limit-v1",
+      "family": "halt_reopen",
+      "fill_callbacks": 0,
+      "fixture_sha256": "f0c2378c28d6138075966134a27cea27af07bf928171475804e98022b99c24d0",
+      "flags": [],
+      "iterations": 17,
+      "native_order_types": [],
+      "orders": 0,
+      "owned_quantity": "0",
+      "passed": true,
+      "pending": false,
+      "preset": "conservative-v1",
+      "trace": [
+        {
+          "event": "snapshot",
+          "now_ns": 1791465900000000000,
+          "source_sha256": "d71e07c674e8989901bf7263203b24711d93aee1e9fe97226b1fa1a1bb4de5c5"
+        }
+      ],
+      "trace_sha256": "685d05ff55d5c2f9d6f6446931f862b397d443b70351886cd5e70d32278e2aef"
+    },
+    {
+      "callback_faults": [],
+      "class": "PostEarningsDriftStrategy",
+      "evidence_class": "synthetic",
+      "execution_profile": "code-managed-limit-v1",
+      "family": "post_earnings_drift",
+      "fill_callbacks": 0,
+      "fixture_sha256": "f0c2378c28d6138075966134a27cea27af07bf928171475804e98022b99c24d0",
+      "flags": [],
+      "iterations": 17,
+      "native_order_types": [],
+      "orders": 0,
+      "owned_quantity": "0",
+      "passed": true,
+      "pending": false,
+      "preset": "conservative-v1",
+      "trace": [
+        {
+          "event": "snapshot",
+          "now_ns": 1791465900000000000,
+          "source_sha256": "d71e07c674e8989901bf7263203b24711d93aee1e9fe97226b1fa1a1bb4de5c5"
+        }
+      ],
+      "trace_sha256": "685d05ff55d5c2f9d6f6446931f862b397d443b70351886cd5e70d32278e2aef"
+    },
+    {
+      "callback_faults": [],
+      "class": "TrendNewHighsStrategy",
+      "evidence_class": "synthetic",
+      "execution_profile": "code-managed-limit-v1",
+      "family": "trend_new_highs",
+      "fill_callbacks": 0,
+      "fixture_sha256": "f0c2378c28d6138075966134a27cea27af07bf928171475804e98022b99c24d0",
+      "flags": [],
+      "iterations": 17,
+      "native_order_types": [],
+      "orders": 0,
+      "owned_quantity": "0",
+      "passed": true,
+      "pending": false,
+      "preset": "conservative-v1",
+      "trace": [
+        {
+          "event": "snapshot",
+          "now_ns": 1791465900000000000,
+          "source_sha256": "d71e07c674e8989901bf7263203b24711d93aee1e9fe97226b1fa1a1bb4de5c5"
+        }
+      ],
+      "trace_sha256": "685d05ff55d5c2f9d6f6446931f862b397d443b70351886cd5e70d32278e2aef"
+    },
+    {
+      "callback_faults": [],
+      "class": "ShortTermReversalStrategy",
+      "evidence_class": "synthetic",
+      "execution_profile": "code-managed-limit-v1",
+      "family": "short_term_reversal",
+      "fill_callbacks": 0,
+      "fixture_sha256": "f0c2378c28d6138075966134a27cea27af07bf928171475804e98022b99c24d0",
+      "flags": [],
+      "iterations": 17,
+      "native_order_types": [],
+      "orders": 0,
+      "owned_quantity": "0",
+      "passed": true,
+      "pending": false,
+      "preset": "conservative-v1",
+      "trace": [
+        {
+          "event": "snapshot",
+          "now_ns": 1791465900000000000,
+          "source_sha256": "d71e07c674e8989901bf7263203b24711d93aee1e9fe97226b1fa1a1bb4de5c5"
+        }
+      ],
+      "trace_sha256": "685d05ff55d5c2f9d6f6446931f862b397d443b70351886cd5e70d32278e2aef"
+    }
+  ],
+  "kind": "t22_strategy_synthetic_receipt",
+  "paper_adoption": "NOT_RUN",
+  "schema_version": 1,
+  "source_sha256": {
+    "__init__.py": "a6e37c81a6492dde3adf9d050ab4c7b99278f9821e224b5b9f8c3200496e91ff",
+    "contracts.py": "afa00ec87dbae4ac00ee65f945c3d722b38de261f25596c4ea1d65d7fbd3ba6a",
+    "families.py": "e10282bbf854f4dcaa4df0ea88763a5d7994a2965f6316c0dd5e6278ed1f8ee4",
+    "presets.py": "0598c85296f9a0d3e3864dd02d7041ba5361004a50f0916f4f0ca2b905301425",
+    "simulation.py": "54425b2f776583f620ff416112308a152ae24c4e0fc4f4cbceda4a789d30725f"
+  },
+  "status": "passed",
+  "strategy_performance": "NOT_CITED"
+}
