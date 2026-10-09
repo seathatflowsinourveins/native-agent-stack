@@ -5416,8 +5416,8 @@
     },
     {
       "path": "adoption/new-wsl/claude-user-instructions.md",
-      "sha256": "9b3ad2f70c4fa1baeadcf326d8c648420011bb1ee0c1f562610524a027aaa90e",
-      "bytes": 1811
+      "sha256": "d226f9024e3250750e6ef7c61fbd96e7cbb5af8239eb4471eb50935299fe8f63",
+      "bytes": 2036
     },
     {
       "path": "adoption/new-wsl/client-config-map.json",
@@ -5426,8 +5426,8 @@
     },
     {
       "path": "adoption/new-wsl/codex-user-instructions.md",
-      "sha256": "749619fa1b104ef2456f9d4e83664b6d5fff9a879382dd4acb931881c45c2620",
-      "bytes": 2498
+      "sha256": "7d31687962092365cbf13b56000ed660206f343bed59ed04b7698629cd52c3f9",
+      "bytes": 2723
     },
     {
       "path": "adoption/new-wsl/templates/claude-user.mcp.additions.json",
@@ -5521,8 +5521,8 @@
     },
     {
       "path": "adoption/scaffold/AGENTS.md",
-      "sha256": "897fb86cb1bc62f668b785558de3e988253c7464b1b934fedb54abd0feba5f21",
-      "bytes": 2465
+      "sha256": "7bc2fc6160bcc18079850402795324b64632f7cf68d296f5742fadf524181b02",
+      "bytes": 2690
     },
     {
       "path": "adoption/sdk/README.md",
@@ -5561,8 +5561,8 @@
     },
     {
       "path": "adoption/templates/codex.AGENTS.template.md",
-      "sha256": "749619fa1b104ef2456f9d4e83664b6d5fff9a879382dd4acb931881c45c2620",
-      "bytes": 2498
+      "sha256": "7d31687962092365cbf13b56000ed660206f343bed59ed04b7698629cd52c3f9",
+      "bytes": 2723
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
@@ -18342,8 +18342,8 @@
     },
     {
       "path": "docs/decisions/2026-10-09-corrections-rule.md",
-      "sha256": "be4446a7063417bb5f6adc01404139665015dfcd4e7a5ec881f45f57890e507b",
-      "bytes": 4952
+      "sha256": "76793e0c31d94a55c0e588195e7b630f2db172cb3fa40a8880aa74a917dac4df",
+      "bytes": 7784
     },
     {
       "path": "docs/decisions/2026-10-09-host-name-scan.md",
@@ -58227,8 +58227,8 @@
     },
     {
       "path": "examples/claude-native/CLAUDE.md",
-      "sha256": "9b3ad2f70c4fa1baeadcf326d8c648420011bb1ee0c1f562610524a027aaa90e",
-      "bytes": 1811
+      "sha256": "d226f9024e3250750e6ef7c61fbd96e7cbb5af8239eb4471eb50935299fe8f63",
+      "bytes": 2036
     },
     {
       "path": "examples/claude-native/agents/blind-adjudicator.md",
@@ -60027,8 +60027,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "822fab57b58b366d768d8c004e12bd5f9a28206d67b4f229823f5be229d191fe",
-      "bytes": 143345
+      "sha256": "268aee4e0eff1cf8404068ea3f67d622b962713bb1b0bd874d8ccb07f73f35ba",
+      "bytes": 144017
     },
     {
       "path": "tests/test_install_skills.py",
@@ -60454,6 +60454,11 @@
       "path": "tests/test_saturation_ledger.py",
       "sha256": "c0311178a40acd4f233bbce29540f6f591f3878e855242f85f71b8dc49a3cbb3",
       "bytes": 112415
+    },
+    {
+      "path": "tests/test_scaffold_repo.py",
+      "sha256": "823e778cc3716a4b76f3e26054c3c6ae37f40d77dc6948125afdb7a4cbbc2712",
+      "bytes": 21170
     },
     {
       "path": "tests/test_sdk_usage_scope.py",

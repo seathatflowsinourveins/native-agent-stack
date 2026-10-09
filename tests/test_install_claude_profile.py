@@ -1805,14 +1805,20 @@ class McpGetOutputTests(unittest.TestCase):
 
 
 class StandingRuleSurfacesTests(unittest.TestCase):
-    """Portable instruction layers retain the owner's philosophy core verbatim, and none of the earlier rule
+    """Every repository instruction layer retains the owner's philosophy core verbatim, and none of the earlier rule
     text. On 2026-10-08 the owner directed that the instruction files keep only the research-convergence philosophy:
     the standing clauses of docs/decisions/2026-09-30-rule-text-every-layer.md, the Codex routing, the local-time rule,
     the token-lane list and the other rule sentences left every layer. The portable Claude block is exactly the core;
-    the Codex template, both generated carriers and the scaffold's AGENTS.md each hold it once, byte for byte.
-    The repository root carries the separately authorized correction amendment; propagating it to the portable
-    layers remains a later publication step. All paths tested here belong to this repository."""
+    the Codex template, both generated carriers, root AGENTS.md and the scaffold's AGENTS.md each hold it once.
+    The 2026-10-09 correction amendment belongs to that same core on every layer and must survive the native
+    new-WSL and scaffold renderers. All paths tested here belong to this repository."""
 
+    LEGACY_CORRECTION = "When a claim proves wrong, record the correction."
+    CORRECTION = (
+        "When a claim or fix proves wrong, resolve it from the upstream primary source at the pinned version through "
+        "the vendor's supported path, record the correction with its citation, and add a regression test that fails "
+        "before the fix; where sources disagree, measure first-hand."
+    )
     CORE = (
         "# Native engineering defaults\n"
         "\n"
@@ -1833,15 +1839,9 @@ class StandingRuleSurfacesTests(unittest.TestCase):
         "workers without waiting for prompts to name it. Proceed where the evidence "
         "converges, and apply or propose the related improvements the work surfaces, at a moment that keeps the "
         "current focus and any protected window intact. Each choice adopts the current best converged practice and "
-        "is replaced when the live landscape converges on a better-evidenced one. When a claim proves wrong, record "
-        "the correction.\n"
+        "is replaced when the live landscape converges on a better-evidenced one. "
+        + CORRECTION + "\n"
     )
-    ROOT_CORRECTION = (
-        "When a claim or fix proves wrong, resolve it from the upstream primary source at the pinned version through "
-        "the vendor's supported path, record the correction with its citation, and add a regression test that fails "
-        "before the fix; where sources disagree, measure first-hand."
-    )
-    ROOT_CORE = CORE.replace("When a claim proves wrong, record the correction.\n", ROOT_CORRECTION + "\n")
     TRADING_CORRECTION = (
         "For a claim or fix that proves wrong, resolve it from the upstream primary source at the pinned version "
         "through the vendor's supported path. Record the correction with its citation and add a regression test "
@@ -1881,13 +1881,27 @@ class StandingRuleSurfacesTests(unittest.TestCase):
                 expected = 1 if relative in self.CLAUDE_USER_LAYERS else 0
                 self.assertEqual((ROOT / relative).read_text(encoding="utf-8").count(self.STRUCTURED_OUTPUT), expected)
 
-    def test_every_layer_carries_its_authorized_core_and_no_dropped_rule(self):
+    def test_every_layer_carries_the_same_core_and_no_dropped_rule(self):
         for relative in self.LAYERS:
             text = (ROOT / relative).read_text(encoding="utf-8")
             with self.subTest(layer=relative):
-                expected_core = self.ROOT_CORE if relative == "AGENTS.md" else self.CORE
-                self.assertEqual(text.count(expected_core), 1)
+                self.assertEqual(text.count(self.CORE), 1)
                 self.assertEqual([phrase for phrase in self.DROPPED if phrase in text], [])
+
+    def test_native_instruction_renderers_keep_the_amended_common_core(self):
+        import new_wsl_client_config as cfg
+        import scaffold_repo as scaffold
+
+        rendered = {
+            "claude": cfg.block_text(ROOT, cfg.CLAUDE_MD_PIECE),
+            "codex": cfg.block_text(ROOT, cfg.CODEX_MD_PIECE),
+            "scaffold/AGENTS.md": dict(scaffold.scaffold_files("0" * 40, ""))["AGENTS.md"].decode("utf-8"),
+        }
+        for renderer, text in rendered.items():
+            with self.subTest(renderer=renderer):
+                self.assertEqual(text.count(self.LEGACY_CORRECTION), 0)
+                self.assertEqual(text.count(self.CORRECTION), 1)
+                self.assertEqual(text.count(self.CORE), 1)
 
     def test_root_claude_md_loads_the_core_through_its_agents_md_import(self):
         # code.claude.com/docs/en/memory, "Share one file with other coding tools": the import keeps AGENTS.md the one
@@ -1913,7 +1927,7 @@ class StandingRuleSurfacesTests(unittest.TestCase):
 
     def test_the_repository_file_keeps_its_core_and_the_trading_prerequisite(self):
         text = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
-        self.assertTrue(text.startswith(self.ROOT_CORE))
+        self.assertTrue(text.startswith(self.CORE))
         for sentence in self.ROOT_KEPT:
             with self.subTest(sentence=sentence[:48]):
                 self.assertIn(sentence, text)
@@ -1985,11 +1999,12 @@ class PortableTopRuleTests(unittest.TestCase):
     # keeps the StructuredOutput line, the Codex block carries rtk's default awareness paragraph) measure 3942 (Claude)
     # and 4043 (Codex) bytes with startup_files below. The owner's proactive amendment on 2026-10-08 adds 224 bytes
     # to each core copy; two loaded copies per client measure 4390/4491 bytes. The same 5% formula gives 4610/4716.
-    # The dated 2026-10-09 comparison (docs/decisions/2026-10-09-corrections-rule.md) records the repository-only
-    # Corrections amendment: root AGENTS.md grows from 2331 to 3028 bytes, so startup_files measures
-    # 4728/4829 -> 5425/5526 bytes (Claude/Codex). The portable carriers stay at 2077/2498 bytes; REVIEW.md and the
-    # nested trading instructions are outside this helper's startup scope. These manual ceilings retain +5%, rounded up.
-    STARTUP_BUDGET_BYTES = {"claude": 5697, "codex": 5803}
+    # The dated 2026-10-09 comparison (docs/decisions/2026-10-09-corrections-rule.md) records root AGENTS.md growing
+    # from 2331 to 3028 bytes: startup_files first measured 4728/4829 -> 5425/5526 bytes (Claude/Codex). The #944 fix
+    # keeps the amended core on all six layers and in native renderer outputs; each rendered user block adds 225 bytes.
+    # With carriers of 2302/2723 bytes, the actual totals are 5650/5751. REVIEW.md and nested trading instructions remain
+    # outside this helper's startup scope. These manual ceilings retain the same +5%, rounded up.
+    STARTUP_BUDGET_BYTES = {"claude": 5933, "codex": 6039}
     # The four rules of the core (2026-10-08): research before acting with named sources, upstream as the truth with
     # the check order, decisions by evidence measured with upstream harnesses, and the compounding ecosystem with the
     # recorded correction.
