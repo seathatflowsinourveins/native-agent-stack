@@ -4946,8 +4946,8 @@
     },
     {
       "path": ".github/actions/setup-host-name-scanner/action.yml",
-      "sha256": "449a85bc904cc92b7eb825169b72eec4ebbf612d573c9599bca10c1ff17b889b",
-      "bytes": 1245
+      "sha256": "e23d8664782809e429669b36b9875db1aaff89b834d4f7f1e4b32d741ae10522",
+      "bytes": 3027
     },
     {
       "path": ".github/agent-branch-ruleset.json",
@@ -18317,8 +18317,8 @@
     },
     {
       "path": "docs/decisions/2026-10-09-host-name-scan.md",
-      "sha256": "ecb85946f5cbea82eb47700226d71d753b1fd2add3bc2ff5d9a3dc0442396780",
-      "bytes": 7758
+      "sha256": "6c6efc1f63f26556cbe0d9ef3cb81c44243a48f20369292361f06af5fe98da2f",
+      "bytes": 11509
     },
     {
       "path": "docs/decisions/2026-10-09-mcp-surfaces-trials.md",
@@ -57972,8 +57972,8 @@
     },
     {
       "path": "scripts/git-hooks/pre-push",
-      "sha256": "b69fa6e3fcb4e7bac4f999b40ead6a4c94b769d569b6253cd09d1f03cdf60824",
-      "bytes": 6455
+      "sha256": "3965482b7470b3a23df48ee8ba28a856948c90e50530164f2299b6fba9b19705",
+      "bytes": 7169
     },
     {
       "path": "scripts/hardware_profile.py",
@@ -57987,8 +57987,8 @@
     },
     {
       "path": "scripts/host_name_scan.py",
-      "sha256": "8786f897f1bf862d4d6c3020853f2588a5c305bcede6d9540ee86b3c2a5ce08e",
-      "bytes": 9902
+      "sha256": "944e2f0e85948104013d06480ee5285633cb19d5620bbc2117f915aacaf74c02",
+      "bytes": 17834
     },
     {
       "path": "scripts/host_receipts.py",
@@ -58062,8 +58062,8 @@
     },
     {
       "path": "scripts/validate.py",
-      "sha256": "c9216144708a42b980f1bdcb60386a4e18443cecc5fe536d08893b671328407f",
-      "bytes": 40188
+      "sha256": "abb6eb2f6a906bbbacace4d4a54a8b7d321229fa443c4fbe4fa4a13c4c1f7388",
+      "bytes": 41200
     },
     {
       "path": "scripts/validate_catalogs.py",
@@ -58832,8 +58832,8 @@
     },
     {
       "path": "tests/test_host_name_scan.py",
-      "sha256": "14e2fbe3ef8eb06e1098dc6c7b1a109915c3b599fe87ea877e536b6f3ffda655",
-      "bytes": 13575
+      "sha256": "140d82155532d2b8ae44c66cb36615a4d4da87f465aec0b21448abe1d9e8851c",
+      "bytes": 18368
     },
     {
       "path": "tests/test_host_receipts.py",
@@ -59197,8 +59197,8 @@
     },
     {
       "path": "tests/test_pre_push_gate.py",
-      "sha256": "a8d037db132374678fb0c5a1a3636aa74de158ac50b4db0a106baabb6601e5b4",
-      "bytes": 22791
+      "sha256": "906d85d4f0bbb15e98bbeceb5b8c4327049dd31c4a9e2d8a97612e84577a598d",
+      "bytes": 29181
     },
     {
       "path": "tests/test_promotion_gate.py",
@@ -59447,8 +59447,8 @@
     },
     {
       "path": "tests/test_validate.py",
-      "sha256": "0be52615600a1723f7ac4706d4faf209ed914287506b109653d6c58b8320355e",
-      "bytes": 46410
+      "sha256": "eb7f1c23959b77a68877b220dd232cc382b8a73cca888bf3cf7c8c26870b6558",
+      "bytes": 47273
     },
     {
       "path": "tests/test_validate_shards.py",

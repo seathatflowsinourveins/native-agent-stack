@@ -14,6 +14,7 @@ import os
 import re
 import struct
 import subprocess
+import sys
 import zlib
 from datetime import date, datetime, timezone
 from pathlib import Path, PurePosixPath
@@ -697,15 +698,23 @@ def main() -> int:
         "--scan-tracked", action="store_true",
         help="Scan tracked files for runtime host-local names with Betterleaks 1.9.0; "
              "report counts and file:line only. Hooks select an immutable checkout.")
+    parser.add_argument(
+        "--scan-history", action="append", nargs=2, default=[], metavar=("REMOTE_OID", "LOCAL_OID"),
+        help="Scan pushed diffs and author/committer names/emails with the same private list. "
+             "An all-zero remote OID selects new commits absent from remote refs.")
     args = parser.parse_args()
-    if args.scan_file or args.scan_tracked:
+    if args.scan_file or args.scan_tracked or args.scan_history:
+        source = "synthetic" if "NATIVE_AGENT_HOST_NAMES_JSON" in os.environ else "host"
+        if source == "synthetic":
+            print("Host-name scan uses synthetic sources; this is not real-host acceptance.", file=sys.stderr)
         try:
             try:
-                from .host_name_scan import HostNameScanError, host_names, safe_locator, scan_paths
+                from .host_name_scan import HostNameScanError, host_names, safe_locator, scan_paths, scan_history
             except ImportError:
-                from host_name_scan import HostNameScanError, host_names, safe_locator, scan_paths
+                from host_name_scan import HostNameScanError, host_names, safe_locator, scan_paths, scan_history
         except ImportError:
-            print(json.dumps({"status": "error", "scanned_files": len(args.scan_file)}, sort_keys=True))
+            print(json.dumps({"status": "error", "source": source,
+                              "scanned_files": len(args.scan_file)}, sort_keys=True))
             return 2
         paths = list(args.scan_file)
         try:
@@ -718,6 +727,9 @@ def main() -> int:
             names = host_names(args.root)
             locators = {safe_locator(path, line, root=args.root, names=names)
                         for path, line in scan_paths(paths, root=args.root, names=names)}
+            for remote_oid, local_oid in args.scan_history:
+                locators.update(safe_locator(path, line, root=args.root, names=names)
+                                for path, line in scan_history(remote_oid, local_oid, root=args.root, names=names))
             for path in dict.fromkeys(args.scan_file):
                 private_lines: list[int] = []
                 if scan_file_for_private_content(path, locations=private_lines) and not private_lines:
@@ -726,10 +738,12 @@ def main() -> int:
                                 for line in private_lines)
         except (HostNameScanError, OSError, subprocess.SubprocessError):
             # Native diagnostic/config text and exception values are private.
-            print(json.dumps({"status": "error", "scanned_files": len(paths)}, sort_keys=True))
+            print(json.dumps({"status": "error", "source": source,
+                              "scanned_files": len(paths)}, sort_keys=True))
             return 2
         print(json.dumps({"status": "failed" if locators else "passed",
-                          "scanned_files": len(paths), "findings": len(locators)}, sort_keys=True))
+                          "source": source, "scanned_files": len(paths),
+                          "matching_locations": len(locators)}, sort_keys=True))
         for locator in sorted(locators):
             print(locator)
         return 1 if locators else 0

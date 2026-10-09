@@ -824,7 +824,9 @@ class ScanFileForPrivateContentTests(unittest.TestCase):
         result = self.run_cli("--scan-file", str(path))
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         report = json.loads(result.stdout)
-        self.assertEqual(report, {"status": "passed", "scanned_files": 1, "findings": 0})
+        self.assertEqual(report, {"status": "passed", "source": "synthetic",
+                                  "scanned_files": 1, "matching_locations": 0})
+        self.assertIn("synthetic sources", result.stderr)
 
     def test_cli_scan_file_fails_on_an_encoded_home_path_without_echoing_it(self):
         content = "-".join(("C", "", "Users", "carol", "repo"))
@@ -833,7 +835,7 @@ class ScanFileForPrivateContentTests(unittest.TestCase):
         self.assertEqual(findings, [f"{path}: contains possible encoded home path"])
         result = self.run_cli("--scan-file", str(path))
         self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
-        self.assertEqual(json.loads(result.stdout.splitlines()[0])["findings"], 1)
+        self.assertEqual(json.loads(result.stdout.splitlines()[0])["matching_locations"], 1)
         self.assertIn("explorer.html:1", result.stdout)
         self.assertNotIn(content, result.stdout + result.stderr)
 
@@ -842,7 +844,7 @@ class ScanFileForPrivateContentTests(unittest.TestCase):
         path = self.write("explorer.html", f"<html>{secret}</html>")
         result = self.run_cli("--scan-file", str(path))
         self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
-        self.assertEqual(json.loads(result.stdout.splitlines()[0])["findings"], 1)
+        self.assertEqual(json.loads(result.stdout.splitlines()[0])["matching_locations"], 1)
         self.assertIn("explorer.html:1", result.stdout)
         self.assertNotIn(secret, result.stdout)
 
@@ -867,7 +869,7 @@ class ScanFileForPrivateContentTests(unittest.TestCase):
         result = self.run_cli("--scan-file", str(path), "--scan-file", str(path))
         self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
         self.assertEqual(result.stdout.splitlines(),
-                         ['{"findings": 1, "scanned_files": 1, "status": "failed"}',
+                         ['{"matching_locations": 1, "scanned_files": 1, "source": "synthetic", "status": "failed"}',
                           "explorer.html:2"])
         self.assertNotIn(name, result.stdout + result.stderr)
 
@@ -876,14 +878,14 @@ class ScanFileForPrivateContentTests(unittest.TestCase):
         with patch.dict(os.environ, {"PATH": ""}):
             result = self.run_cli("--scan-file", str(path))
         self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
-        self.assertEqual(json.loads(result.stdout), {"status": "error", "scanned_files": 1})
-        self.assertEqual(result.stderr, "")
+        self.assertEqual(json.loads(result.stdout), {"status": "error", "source": "synthetic", "scanned_files": 1})
+        self.assertIn("synthetic sources", result.stderr)
 
     def test_cli_scan_file_refuses_a_missing_input_without_its_absolute_path(self):
         path = self.root / "missing.html"
         result = self.run_cli("--scan-file", str(path))
         self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
-        self.assertEqual(json.loads(result.stdout), {"status": "error", "scanned_files": 1})
+        self.assertEqual(json.loads(result.stdout), {"status": "error", "source": "synthetic", "scanned_files": 1})
         self.assertNotIn(str(path), result.stdout + result.stderr)
 
     def test_cli_private_content_locator_uses_the_actual_original_line(self):
@@ -892,9 +894,20 @@ class ScanFileForPrivateContentTests(unittest.TestCase):
         result = self.run_cli("--scan-file", str(path))
         self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
         self.assertEqual(result.stdout.splitlines(),
-                         ['{"findings": 1, "scanned_files": 1, "status": "failed"}',
+                         ['{"matching_locations": 1, "scanned_files": 1, "source": "synthetic", "status": "failed"}',
                           "explorer.html:2"])
         self.assertNotIn(content, result.stdout + result.stderr)
+
+    def test_cli_labels_repeated_matches_as_one_distinct_location(self):
+        name = "fixture_" + "host_marker"
+        path = self.write("explorer.html", name + "|" + name)
+        result = self.run_cli("--scan-file", str(path))
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        report = json.loads(result.stdout.splitlines()[0])
+        self.assertEqual(report["matching_locations"], 1)
+        self.assertNotIn("findings", report)
+        self.assertEqual(report["source"], "synthetic")
+        self.assertNotIn(name, result.stdout + result.stderr)
 
 
 if __name__ == "__main__":

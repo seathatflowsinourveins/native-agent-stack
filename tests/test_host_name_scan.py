@@ -15,6 +15,16 @@ from scripts import host_name_scan
 
 
 class HostNameSourceTests(unittest.TestCase):
+    def setUp(self):
+        environment = {key: value for key, value in os.environ.items()
+                       if key not in (host_name_scan.OVERRIDE, "WSL_DISTRO_NAME")}
+        patch = mock.patch.dict(os.environ, environment, clear=True)
+        patch.start()
+        self.addCleanup(patch.stop)
+        patch = mock.patch.object(host_name_scan.shutil, "which", return_value=None)
+        patch.start()
+        self.addCleanup(patch.stop)
+
     def test_override_replaces_all_runtime_sources(self):
         with mock.patch.dict(os.environ, {host_name_scan.OVERRIDE: '["fixtureagent"]'}), \
                 mock.patch.object(host_name_scan, "_command", side_effect=AssertionError("source used")), \
@@ -22,7 +32,7 @@ class HostNameSourceTests(unittest.TestCase):
             self.assertEqual(host_name_scan.host_names(Path.cwd()), ("fixtureagent",))
             profiles.exists.assert_not_called()
 
-    def test_all_three_runtime_sources_are_combined_and_deduplicated(self):
+    def test_runtime_identity_hostname_profiles_and_private_email_are_combined(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             profiles = root / "profiles"
@@ -30,15 +40,17 @@ class HostNameSourceTests(unittest.TestCase):
             (profiles / "fixtureprofile").mkdir()
             (profiles / "not-a-profile").write_text("fixture")
             results = [subprocess.CompletedProcess([], 0, "fixtureagent\n", ""),
+                       subprocess.CompletedProcess([], 0, "fixturehostname\n", ""),
                        subprocess.CompletedProcess([], 0, "fixturemail@example.invalid\n", "")]
             environment = {key: value for key, value in os.environ.items() if key != host_name_scan.OVERRIDE}
             with mock.patch.dict(os.environ, environment, clear=True), \
                     mock.patch.object(host_name_scan, "PROFILE_ROOT", profiles), \
                     mock.patch.object(host_name_scan, "_command", side_effect=results) as command:
                 self.assertEqual(host_name_scan.host_names(root),
-                                 ("fixtureagent", "fixtureprofile", "fixturemail"))
+                                 ("fixtureagent", "fixturehostname", "fixtureprofile", "fixturemail"))
                 self.assertEqual([call.args[0] for call in command.call_args_list],
-                                 [["id", "-un"], ["git", "config", "--get", "user.email"]])
+                                 [["id", "-un"], ["uname", "-n"],
+                                  ["git", "config", "--get", "user.email"]])
 
     def test_invalid_overrides_fail_without_echoing_values(self):
         for value in ('not-json-fixtureagent', '["fixtureagent\\n"]', '[]', '"fixtureagent"', '[1]'):
@@ -94,6 +106,7 @@ class HostNameSourceTests(unittest.TestCase):
             for name in ("All Users", "Default", "Default User", "Public", "fixtureprofile"):
                 (profiles / name).mkdir()
             results = [subprocess.CompletedProcess([], 0, "Public\n", ""),
+                       subprocess.CompletedProcess([], 0, "fixturehostname\n", ""),
                        subprocess.CompletedProcess([], 0, "Default@example.invalid\n", "")]
             with mock.patch.dict(os.environ, {}, clear=True), \
                     mock.patch.object(host_name_scan, "PROFILE_ROOT", profiles), \
@@ -101,7 +114,41 @@ class HostNameSourceTests(unittest.TestCase):
                 # Id and email remain designated sources even if their actual
                 # values happen to coincide with a Windows system-folder name.
                 self.assertEqual(host_name_scan.host_names(profiles),
-                                 ("Public", "fixtureprofile", "Default"))
+                                 ("Public", "fixturehostname", "fixtureprofile", "Default"))
+
+    def test_github_noreply_local_part_is_public_but_coincident_id_stays(self):
+        for email in ("123+fixturepublic@users.noreply.github.com",
+                      "fixturepublic@USERS.NOREPLY.GITHUB.COM"):
+            results = [subprocess.CompletedProcess([], 0, "fixturepublic\n", ""),
+                       subprocess.CompletedProcess([], 0, "fixturehostname\n", ""),
+                       subprocess.CompletedProcess([], 0, email + "\n", "")]
+            with self.subTest(email=email), \
+                    mock.patch.object(host_name_scan, "PROFILE_ROOT") as profiles, \
+                    mock.patch.object(host_name_scan, "_command", side_effect=results):
+                profiles.iterdir.return_value = []
+                self.assertEqual(host_name_scan.host_names(Path.cwd()),
+                                 ("fixturepublic", "fixturehostname"))
+
+    def test_windows_native_sources_work_without_mnt_c_profile_mount(self):
+        results = [subprocess.CompletedProcess([], 0, "fixtureagent\n", ""),
+                   subprocess.CompletedProcess([], 0, "fixturehostname\n", ""),
+                   subprocess.CompletedProcess([], 0, json.dumps({
+                       "computer": "fixturecomputer", "profiles": ["fixtureprofile", "Public"]}), ""),
+                   subprocess.CompletedProcess([], 0, "fixturemail@example.invalid\n", "")]
+        with mock.patch.object(host_name_scan, "PROFILE_ROOT") as profiles, \
+                mock.patch.object(host_name_scan.shutil, "which", return_value="powershell.exe"), \
+                mock.patch.object(host_name_scan, "_command", side_effect=results):
+            profiles.iterdir.side_effect = FileNotFoundError()
+            self.assertEqual(host_name_scan.host_names(Path.cwd()),
+                             ("fixtureagent", "fixturehostname", "fixturecomputer", "fixtureprofile", "fixturemail"))
+
+    def test_wsl_without_windows_source_refuses_without_values(self):
+        with mock.patch.dict(os.environ, {"WSL_DISTRO_NAME": "fixture"}), \
+                mock.patch.object(host_name_scan, "_command", return_value=
+                                  subprocess.CompletedProcess([], 0, "fixtureagent\n", "")):
+            with self.assertRaises(host_name_scan.HostNameScanError) as caught:
+                host_name_scan.host_names(Path.cwd())
+            self.assertNotIn("fixtureagent", str(caught.exception))
 
 
 @unittest.skipUnless(shutil.which("betterleaks"), "native Betterleaks unavailable")
@@ -135,6 +182,32 @@ class NativeHostNameScanTests(unittest.TestCase):
                 lines = [left + name + right for left, right in
                          (("A", ""), ("", "7"), ("é", ""), ("", "中"), ("Ⅸ", ""))]
                 self.assertEqual(self.scan("\n".join(lines)), [])
+
+    def test_case_insensitive_literal_and_escaped_delimiter_boundaries(self):
+        lines = [prefix + "FIXTUREAGENT" for prefix in
+                 ("", "/", "%2F", "%5C", "%20", r"\n", r"\t", r"\r", r"\u000a", "%0A")]
+        self.assertEqual(self.scan("\n".join(lines)),
+                         [(self.target, line) for line in range(1, len(lines) + 1)])
+
+    def test_native_decoders_and_original_line_mapping(self):
+        import base64
+        name = "fixtureagentextendedmarker"
+        encoded = [base64.b64encode(name.encode()).decode(), name.encode().hex(),
+                   "".join("%" + format(byte, "02X") for byte in name.encode()),
+                   "".join(r"\u" + format(ord(char), "04x") for char in name)]
+        with mock.patch.dict(os.environ, {host_name_scan.OVERRIDE: json.dumps([name])}):
+            self.assertEqual(self.scan("\n".join("clean\n" + value for value in encoded)),
+                             [(self.target, line) for line in (2, 4, 6, 8)])
+            neighbors = [value.encode().hex() for value in ("A" + name, name + "A")]
+            self.assertEqual(self.scan("\n".join(neighbors)), [])
+
+    def test_decoded_names_at_artificial_cuts_retain_neighbor_guards(self):
+        name = "fixtureagentextendedmarker"
+        encoded = "".join("%" + format(byte, "02X") for byte in name.encode())
+        with mock.patch.dict(os.environ, {host_name_scan.OVERRIDE: json.dumps([name])}):
+            lines = ["_" * offset + encoded + "_" * 8000 for offset in (3980, 3990, 4050, 4060, 4090, 4110)]
+            self.assertEqual(self.scan("\n".join(lines)),
+                             [(self.target, line) for line in range(1, len(lines) + 1)])
 
     def test_adjacent_names_multifile_lines_and_binary_magic_are_retained(self):
         self.target.write_bytes(b"%PDF-1.4\nfixtureagent_fixtureagent\n")

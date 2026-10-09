@@ -1,13 +1,13 @@
-"""Tracked pre-push committed-name and registry gate (scripts/git-hooks/pre-push).
+"""Tracked pre-push tip/history name and registry gate (scripts/git-hooks/pre-push).
 
 Local integration class: a temporary clone that borrows this checkout's objects
 (`git clone --shared --no-checkout`, so nothing is copied), this checkout's HEAD
 commit overlaid with the current scanner sources, commits built on it with plumbing (a synthetic unlisted lockfile, or a
 registry test forced onto its skip or expected-failure path), and the zizmor
 binary already on PATH. Most tests run the hook directly with the stdin lines
-git would give it (githooks(5), pre-push). One pushes natively from a linked
-worktree, where git exports GIT_DIR to the hook, to a bare clone that shares
-this checkout's objects.
+git would give it (githooks(5), pre-push). Native pushes also cover removed
+historical bytes and author/committer metadata. A linked-worktree push, where
+git exports GIT_DIR to the hook, uses a bare clone sharing this checkout's objects.
 
 Every hook run sets GIT_CEILING_DIRECTORIES (git(1)) to the parent of its
 temporary root. Git's discovery, and the hook's inside-a-repository guard with
@@ -84,7 +84,7 @@ class PrePushGateTests(unittest.TestCase):
         return self.checked(["git", "-C", str(self.repo), "-c", "user.email=t@example.invalid", "-c", "user.name=t",
                              *args], env=env, input=input, strip=strip)
 
-    def commit_on_head(self, files):
+    def commit_on_head(self, files, **identity):
         """Commit {path: text} on the fixture tip; None deletes a file, using a scratch index."""
         index = {**os.environ, "GIT_INDEX_FILE": str(self.root / "index")}
         self.git("read-tree", self.head, env=index)
@@ -95,7 +95,9 @@ class PrePushGateTests(unittest.TestCase):
             blob = self.git("hash-object", "-w", "--stdin", input=text)
             self.git("update-index", "--add", "--cacheinfo", f"100644,{blob},{path}", env=index)
         tree = self.git("write-tree", env=index)
-        return self.git("commit-tree", tree, "-p", self.head, "-m", f"probe: {', '.join(files)}")
+        environment = {**os.environ, "GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@example.invalid",
+                       "GIT_COMMITTER_NAME": "t", "GIT_COMMITTER_EMAIL": "t@example.invalid", **identity}
+        return self.git("commit-tree", tree, "-p", self.head, "-m", f"probe: {', '.join(files)}", env=environment)
 
     def environment(self, tmpdir=None, path=None, **extra):
         """The hook's environment: its TMPDIR, with git's discovery stopping above the temporary root."""
@@ -119,10 +121,12 @@ class PrePushGateTests(unittest.TestCase):
             self.skipTest("zizmor shares a directory with git")
         return path
 
-    def native_push(self, commit, name, **environment):
+    def native_push(self, commit, name, remote_commit=None, **environment):
         """Push through Git's actual pre-push entry point to a local bare remote."""
         self.remote = self.root / "remote.git"
-        self.checked(["git", "clone", "-q", "--bare", "--shared", str(ROOT), str(self.remote)])
+        self.checked(["git", "clone", "-q", "--bare", "--shared", str(self.repo), str(self.remote)])
+        if remote_commit is not None:
+            self.checked(["git", "-C", str(self.remote), "update-ref", f"refs/heads/{name}", remote_commit])
         self.git("config", "core.hooksPath", str(HOOK.parent))
         return subprocess.run(["git", "push", str(self.remote), f"{commit}:refs/heads/{name}"], cwd=self.repo,
                               capture_output=True, text=True, env=self.environment(**environment), timeout=300)
@@ -131,6 +135,29 @@ class PrePushGateTests(unittest.TestCase):
         result = subprocess.run(["git", "-C", str(self.remote), "rev-parse", "--verify", "--quiet",
                                  f"refs/heads/{name}"], capture_output=True, text=True, timeout=120)
         self.assertNotEqual(result.returncode, 0)
+
+    def assert_remote_ref_equal(self, name, commit):
+        self.assertEqual(self.checked(["git", "-C", str(self.remote), "rev-parse", f"refs/heads/{name}"]), commit)
+
+    def assert_native_metadata_refused(self, field, value):
+        """Keep the tree clean and put the denied fixture only in a commit identity."""
+        base = self.head
+        commit = self.commit_on_head({}, **{field: value})
+        result = self.native_push(commit, "metadata-refused", remote_commit=base)
+        self.assertNotEqual(result.returncode, 0)
+        line = {"GIT_AUTHOR_NAME": 1, "GIT_AUTHOR_EMAIL": 2,
+                "GIT_COMMITTER_NAME": 3, "GIT_COMMITTER_EMAIL": 4}[field]
+        self.assertIn(f"git-metadata/{commit}:{line}", result.stdout + result.stderr)
+        reports = [json.loads(line) for line in result.stdout.splitlines() if line.startswith("{")]
+        self.assertEqual(len(reports), 1)
+        self.assertEqual(reports[0]["status"], "failed")
+        self.assertEqual(reports[0]["source"], "synthetic")
+        self.assertGreater(reports[0]["matching_locations"], 0)
+        self.assertIn("committed host-name scan failed", result.stderr)
+        self.assertIn("Ran 3 tests", result.stderr)
+        self.assertNotIn(FIXTURE_NAME, result.stdout + result.stderr)
+        self.assert_remote_ref_equal("metadata-refused", base)
+        self.assert_nothing_left()
 
     def assert_nothing_left(self, *tmpdirs, worktrees=1):
         """The hook removed its scratch directory and unregistered its worktree, whatever the outcome."""
@@ -177,6 +204,65 @@ class PrePushGateTests(unittest.TestCase):
         self.assert_nothing_left()
 
     @unittest.skipUnless(ZIZMOR, "zizmor not on PATH")
+    def test_a_native_push_refuses_a_name_added_then_removed_in_pushed_history(self):
+        base = self.head
+        self.head = self.commit_on_head({NAME_PROBE: f"{FIXTURE_NAME}\n"})
+        tip = self.commit_on_head({NAME_PROBE: None})
+        result = self.native_push(tip, "history-refused", remote_commit=base)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn(f"{NAME_PROBE}:1", result.stdout + result.stderr)
+        self.assertIn("committed host-name scan failed", result.stderr)
+        self.assertIn("Ran 3 tests", result.stderr)
+        self.assertNotIn(FIXTURE_NAME, result.stdout + result.stderr)
+        self.assert_remote_ref_equal("history-refused", base)
+        self.assert_nothing_left()
+
+    @unittest.skipUnless(ZIZMOR, "zizmor not on PATH")
+    def test_a_new_native_ref_refuses_a_name_removed_before_its_tip(self):
+        self.head = self.commit_on_head({NAME_PROBE: f"{FIXTURE_NAME}\n"})
+        tip = self.commit_on_head({NAME_PROBE: None})
+        result = self.native_push(tip, "new-history-refused")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn(f"{NAME_PROBE}:1", result.stdout + result.stderr)
+        self.assertIn("committed host-name scan failed", result.stderr)
+        self.assertIn("Ran 3 tests", result.stderr)
+        self.assertNotIn(FIXTURE_NAME, result.stdout + result.stderr)
+        self.assert_remote_ref_absent("new-history-refused")
+        self.assert_nothing_left()
+
+    @unittest.skipUnless(ZIZMOR, "zizmor not on PATH")
+    def test_shared_tips_scan_every_ref_range_and_run_registry_tests_once(self):
+        base = self.head
+        self.head = self.commit_on_head({NAME_PROBE: f"{FIXTURE_NAME}\n"})
+        self.head = self.commit_on_head({NAME_PROBE: None})
+        tip = self.commit_on_head({"pre-push-clean-probe.txt": "synthetic clean content\n"})
+        result = self.push(f"refs/heads/clean {tip} refs/heads/clean {self.head}",
+                           f"refs/heads/history {tip} refs/heads/history {base}")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn(f"{NAME_PROBE}:1", result.stdout + result.stderr)
+        self.assertIn("committed host-name scan failed", result.stderr)
+        self.assertEqual(result.stderr.count(f"pre-push: running the registry tests on {tip}"), 1)
+        self.assertEqual(result.stderr.count("Ran 3 tests"), 1)
+        self.assertNotIn(FIXTURE_NAME, result.stdout + result.stderr)
+        self.assert_nothing_left()
+
+    @unittest.skipUnless(ZIZMOR, "zizmor not on PATH")
+    def test_a_native_push_refuses_a_denied_author_name(self):
+        self.assert_native_metadata_refused("GIT_AUTHOR_NAME", f"Synthetic {FIXTURE_NAME}")
+
+    @unittest.skipUnless(ZIZMOR, "zizmor not on PATH")
+    def test_a_native_push_refuses_a_denied_author_email(self):
+        self.assert_native_metadata_refused("GIT_AUTHOR_EMAIL", f"{FIXTURE_NAME}@example.invalid")
+
+    @unittest.skipUnless(ZIZMOR, "zizmor not on PATH")
+    def test_a_native_push_refuses_a_denied_committer_name(self):
+        self.assert_native_metadata_refused("GIT_COMMITTER_NAME", f"Synthetic {FIXTURE_NAME}")
+
+    @unittest.skipUnless(ZIZMOR, "zizmor not on PATH")
+    def test_a_native_push_refuses_a_denied_committer_email(self):
+        self.assert_native_metadata_refused("GIT_COMMITTER_EMAIL", f"{FIXTURE_NAME}@example.invalid")
+
+    @unittest.skipUnless(ZIZMOR, "zizmor not on PATH")
     def test_a_native_push_scans_committed_bytes_despite_local_contamination(self):
         self.git("checkout", "-q", "--detach", self.head)
         (self.repo / "AGENTS.md").write_text(f"{FIXTURE_NAME}\n", encoding="utf-8")
@@ -189,6 +275,24 @@ class PrePushGateTests(unittest.TestCase):
         self.assertNotIn(FIXTURE_NAME, result.stdout + result.stderr)
         self.assertEqual(self.checked(["git", "-C", str(self.remote), "rev-parse",
                                        "refs/heads/clean-committed-tip"]), self.head)
+        self.assert_nothing_left()
+
+    @unittest.skipUnless(ZIZMOR, "zizmor not on PATH")
+    def test_a_native_push_scans_the_immutable_tip_when_pushing_from_a_clean_index(self):
+        # The name predates this push, so history alone cannot detect it. Git
+        # exports GIT_DIR to the hook; it must not redirect ls-files to this
+        # pushing checkout's clean index instead of the detached tip's index.
+        self.head = self.commit_on_head({NAME_PROBE: f"{FIXTURE_NAME}\n"})
+        base = self.head
+        tip = self.commit_on_head({"pre-push-clean-probe.txt": "synthetic clean content\n"})
+        self.git("checkout", "-q", "--detach", self.source_head)
+        result = self.native_push(tip, "immutable-tip-refused", remote_commit=base)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn(f"{NAME_PROBE}:1", result.stdout + result.stderr)
+        self.assertIn("committed host-name scan failed", result.stderr)
+        self.assertIn("Ran 3 tests", result.stderr)
+        self.assertNotIn(FIXTURE_NAME, result.stdout + result.stderr)
+        self.assert_remote_ref_equal("immutable-tip-refused", base)
         self.assert_nothing_left()
 
     @unittest.skipUnless(ZIZMOR, "zizmor not on PATH")
