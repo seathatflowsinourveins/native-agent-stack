@@ -18336,6 +18336,11 @@
       "bytes": 7510
     },
     {
+      "path": "docs/decisions/2026-10-09-trade-launch-profiles.md",
+      "sha256": "0ac527c06faad401f2e67e8e1a7273a655043f63f5a55ed28d7870695f586983",
+      "bytes": 5683
+    },
+    {
       "path": "docs/direct-results.md",
       "sha256": "12a511fee11f22c90b9b622701d5485be9c8247167102b5768d694244f939a5b",
       "bytes": 4022
@@ -58252,8 +58257,8 @@
     },
     {
       "path": "examples/claude-native/windows-terminal.fragment.example.json",
-      "sha256": "f68d0be2f73d58dc6839b9e4ff1ef3f14fb941a1b99ec1c80ba2de6a9098cd7e",
-      "bytes": 2230
+      "sha256": "955c3fbe94834e49cf8292525fb9287275363d4b9dccd3f9c766e010d41f1ccd",
+      "bytes": 3561
     },
     {
       "path": "examples/claude-native/workflows/README.md",
@@ -59007,8 +59012,8 @@
     },
     {
       "path": "recipes/claude-native-profile.md",
-      "sha256": "889aba2511afec00769d7e344812e0493be040e58e858e934dd66225894ab46a",
-      "bytes": 39973
+      "sha256": "dc4c93de7572446d9b4a6097cdab51ef9b0cf986668c287149e0b72ec4d06c29",
+      "bytes": 40449
     },
     {
       "path": "recipes/claude-native-ultracode.md",
@@ -60592,8 +60597,8 @@
     },
     {
       "path": "tests/test_windows_terminal_defaults.py",
-      "sha256": "f4b2c8ebe16f54782204f32fd674debc4b8f3a01f5ca1d0b00b788c175ed0502",
-      "bytes": 51736
+      "sha256": "478a41fa854039133c9e79e2d123064e20490d11d40037826e577d75af5afb4b",
+      "bytes": 63105
     },
     {
       "path": "tests/test_worker_recovery.py",
