@@ -35,6 +35,7 @@ class ArchitectureEvidenceBoundaryTests(unittest.TestCase):
             "architecture_receipt": [{"root": "repo", "path": path} for path in ("evidence/receipts/redirected/receipt.json", "evidence/receipts/approved-large.json")],
         }
         policy["architecture_families"] = {"architecture_adoption_snapshot": {"root": "state", "directory": SNAPSHOT_DIRECTORY, "filename": r"adoption-now-[a-f0-9]{16}\.json"}}
+        policy["architecture_inventory_aliases"] = []
         self.write(self.root.parent, self.policy_path.name, policy)
         approval = patch.object(evidence, "SOURCE_POLICY_PATH", self.policy_path)
         approval.start()

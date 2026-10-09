@@ -81,10 +81,14 @@ class ArchitectureCacheTests(unittest.TestCase):
                 previous_page = (output / "architecture.html").read_bytes()
                 previous_receipt = receipt.read_bytes()
                 (script.parent / "unreviewed.py").write_text("# unlisted fixture\n")
-                with self.assertRaisesRegex(ValueError, "approval"):
-                    MODULE.refresh_if_changed(root, state, output, receipt)
+                MODULE.refresh_if_changed(root, state, output, receipt)
                 self.assertEqual((output / "architecture.html").read_bytes(), previous_page)
                 self.assertEqual(receipt.read_bytes(), previous_receipt)
-                self.assertEqual(len(calls), 7)
+                self.assertEqual(len(calls), 8)
+                MODULE.refresh_if_changed(root, state, output, receipt)
+                self.assertEqual(len(calls), 8)
+                (script.parent / "unreviewed.py").unlink()
+                MODULE.refresh_if_changed(root, state, output, receipt)
+                self.assertEqual(len(calls), 9)
 if __name__ == "__main__":
     unittest.main()

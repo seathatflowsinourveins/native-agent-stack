@@ -16,6 +16,7 @@ import shutil
 import subprocess
 import tempfile
 import unittest
+from unittest import mock
 from unittest.mock import patch
 
 
@@ -294,6 +295,38 @@ class LocalPagesTests(unittest.TestCase):
                 self.assertIn('<section class="manifest-section"', text)
                 self.assertIn("</section>", text)
                 self.assertNotIn("<[personal identifier omitted]", text)
+
+    def test_architecture_failure_refreshes_other_pages_and_preserves_previous_page(self) -> None:
+        self.refresh()
+        architecture = self.output / "architecture.html"
+        architecture.write_bytes(b"previous Architecture publication")
+        (self.state / "coordination/ns2604-coop/notes/adoption-evidence-20261008").mkdir(parents=True)
+        original = BUILDER.load_local
+        for failure in (ValueError("synthetic protected input"), OSError("synthetic source unavailable")):
+            with self.subTest(failure=type(failure).__name__):
+                adapter = mock.Mock()
+                adapter.refresh_if_changed.side_effect = failure
+                with patch.object(BUILDER, "load_local", side_effect=lambda name: adapter if name == "architecture_builder" else original(name)):
+                    result = self.refresh()
+                self.assertEqual(result["architecture"]["status"], "UNREPORTED")
+                self.assertEqual(architecture.read_bytes(), b"previous Architecture publication")
+                for name in ("index", "readiness", "gaps", "roadmap", "fleet", "sources"):
+                    self.assertTrue((self.output / (name + ".html")).is_file())
+                self.assertIn(type(failure).__name__, result["architecture"]["reason"])
+                self.assertNotIn("synthetic protected input", json.dumps(result["architecture"]))
+
+    def test_first_architecture_failure_publishes_explicit_unreported_page(self) -> None:
+        (self.state / "coordination/ns2604-coop/notes/adoption-evidence-20261008").mkdir(parents=True)
+        original = BUILDER.load_local
+        adapter = mock.Mock()
+        adapter.refresh_if_changed.side_effect = ValueError("controlled input refusal")
+        with patch.object(BUILDER, "load_local", side_effect=lambda name: adapter if name == "architecture_builder" else original(name)):
+            result = self.refresh()
+        page = (self.output / "architecture.html").read_text()
+        self.assertIn("UNREPORTED", page)
+        self.assertNotIn("controlled input refusal", page)
+        self.assertEqual(result["architecture"]["status"], "UNREPORTED")
+        self.assertIn("architecture.html", result["outputs"])
 
     def real_fleet_adapter(self, state, cache, root):
         def native_transport(command, **kwargs):

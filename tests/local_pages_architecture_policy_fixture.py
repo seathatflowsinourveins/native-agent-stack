@@ -67,6 +67,7 @@ def policy_fixture(path):
             ".config/systemd/user/example.service",
         )
     ]
+    document["architecture_inventory_aliases"] = []
     document["architecture_families"] = {
         "architecture_adoption_snapshot": {
             "root": "state",

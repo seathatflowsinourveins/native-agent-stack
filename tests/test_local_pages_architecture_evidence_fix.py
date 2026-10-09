@@ -28,6 +28,7 @@ class ArchitectureEvidenceFixTests(unittest.TestCase):
             "architecture_receipt": [{"root": "repo", "path": path} for path in ("adoption/receipt.json", "evidence/receipts/older.json", "evidence/receipts/newer.json", "evidence/receipts/exact.json", "evidence/artifacts/exact/commands.json")],
         }
         policy["architecture_families"] = {"architecture_adoption_snapshot": {"root": "state", "directory": "coordination/ns2604-coop/notes/adoption-evidence-20261008", "filename": r"adoption-now-[a-f0-9]{16}\.json"}}
+        policy["architecture_inventory_aliases"] = []
         policy_path = Path(temporary.name) / "independent-policy.json"
         policy_path.write_text(json.dumps(policy), encoding="utf-8")
         approval = patch.object(evidence, "SOURCE_POLICY_PATH", policy_path)

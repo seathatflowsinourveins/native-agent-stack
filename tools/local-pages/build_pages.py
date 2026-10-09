@@ -145,7 +145,7 @@ def document(page: str, title: str, lede: str, scope: str, body: str,
     nav = "".join(f'<a href="{name}.html"' + (' aria-current="page"' if name == page else '') + f'>{text}</a>' for name, text in PAGES.items())
     heading = leading if leading is not None else f'<header class="page-header"><h1>{esc(title)}</h1><p class="lede">{esc(lede)}</p></header>'
     source_link = "#architecture-custody" if page == "architecture" else f"sources.html#{page}"
-    return sanitizer().sanitize(f'''<!doctype html>
+    return f'''<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -544,7 +544,22 @@ def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
     architecture_path = Path(__file__).resolve().parent / "architecture_builder.py"
     if architecture_path.exists() and (state_root / "coordination/ns2604-coop/notes/adoption-evidence-20261008").exists():
         architecture_receipt = receipt.parent / "architecture/architecture-receipt.json"
-        receipt_doc["architecture"] = load_local("architecture_builder").refresh_if_changed(root, state_root, output_dir, architecture_receipt)
+        try:
+            receipt_doc["architecture"] = load_local("architecture_builder").refresh_if_changed(root, state_root, output_dir, architecture_receipt)
+        except (OSError, ValueError, UnicodeError, KeyError, TypeError, AttributeError, OverflowError, RecursionError) as error:
+            # Architecture is an optional source view. Preserve its last page
+            # while the other documents publish current observations; never
+            # expose an exception's source path or treat refusal as acceptance.
+            receipt_doc["architecture"] = {"status": "UNREPORTED",
+                "reason": "Architecture source view unavailable (" + type(error).__name__ + ")",
+                "current_observation": False}
+            if not (output_dir / "architecture.html").exists():
+                body = '<section class="panel" id="architecture-custody"><h2>UNREPORTED</h2><p>The Architecture source view is unavailable. Other pages retain their own current observations.</p></section>'
+                outputs["architecture.html"] = document("architecture", "Architecture unavailable", "No current Architecture observation is reported.", "Source view unavailable; no gate or execution claim.", body, refreshed, manifest_sha, [])
+                receipt_doc["outputs"]["architecture.html"] = {"sha256": hashlib.sha256(outputs["architecture.html"]).hexdigest(), "bytes": len(outputs["architecture.html"])}
+                receipt_doc["architecture"]["page_status"] = "unreported placeholder"
+            else:
+                receipt_doc["architecture"]["page_status"] = "previous page retained without a new observation"
     publish(output_dir, receipt, outputs, receipt_doc)
     return receipt_doc
 

@@ -350,6 +350,35 @@ class ArchitectureReadBoundaryTests(unittest.TestCase):
         self.assertEqual(calls, [])
         self.assertEqual(self.published_bytes(), before)
 
+    def assert_name_only_unknown(self, target, *, cache=False):
+        original_stat, original_lstat, original_resolve = os.stat, os.lstat, Path.resolve
+        def stat(path, *args, **kwargs):
+            if not isinstance(path, int) and Path(path).absolute() == target:
+                raise AssertionError("unapproved discovery reached target stat")
+            return original_stat(path, *args, **kwargs)
+        def lstat(path, *args, **kwargs):
+            if not isinstance(path, int) and Path(path).absolute() == target:
+                raise AssertionError("unapproved discovery reached target lstat")
+            return original_lstat(path, *args, **kwargs)
+        def resolve(path, *args, **kwargs):
+            if path.absolute() == target:
+                raise AssertionError("unapproved discovery reached target resolve")
+            return original_resolve(path, *args, **kwargs)
+        calls = []
+        def observe(path):
+            if path.absolute() == target:
+                calls.append(path)
+                raise AssertionError("unapproved discovery reached target read")
+        with observed_file_reads(observe), patch.object(os, "stat", side_effect=stat), patch.object(os, "lstat", side_effect=lstat), patch.object(Path, "resolve", new=resolve):
+            result = builder.refresh_if_changed(self.root, self.state, self.output, self.receipt) if cache else builder.build(self.root, self.state, self.output, self.receipt)
+        self.assertEqual(calls, [])
+        record = next(row for row in result["inventory_sources"] if row["path"] == str(target))
+        self.assertEqual(record["status"], "UNAPPROVED")
+        self.assertIsNone(record["sha256"])
+        self.assertIsNone(record["bytes"])
+        self.assertIsNone(record["resolved_path"])
+        return result
+
     def test_real_builder_refuses_fixed_cc_projection_symlink_before_open(self):
         builder.build(self.root, self.state, self.output, self.receipt)
         forbidden = self.write(self.state, "coordination/e2e-truth-20261006/credentials.json", {"gates": []})
@@ -375,17 +404,17 @@ class ArchitectureReadBoundaryTests(unittest.TestCase):
         forbidden.write_text("Synthetic protected inventory role\n", encoding="utf-8")
         self.assert_production_refusal_preserves_publication(forbidden)
 
-    def test_real_builder_refuses_unreviewed_inventory_script_before_open(self):
+    def test_real_builder_lists_unreviewed_inventory_script_without_target_access(self):
         builder.build(self.root, self.state, self.output, self.receipt)
         forbidden = self.root / "scripts/unreviewed.py"
         forbidden.parent.mkdir(parents=True)
         forbidden.write_text("# Synthetic unreviewed inventory file\n", encoding="utf-8")
-        self.assert_production_refusal_preserves_publication(forbidden)
+        self.assert_name_only_unknown(forbidden)
 
-    def test_real_builder_refuses_unreviewed_inventory_metadata_before_open(self):
+    def test_real_builder_lists_unreviewed_inventory_metadata_without_target_access(self):
         builder.build(self.root, self.state, self.output, self.receipt)
         forbidden = self.write(self.root, "adoption/agents/unreviewed-manifest.json", {"agents": []})
-        self.assert_production_refusal_preserves_publication(forbidden)
+        self.assert_name_only_unknown(forbidden)
 
     def test_real_builder_refuses_protected_inventory_alias_target_before_open(self):
         builder.build(self.root, self.state, self.output, self.receipt)
@@ -405,12 +434,17 @@ class ArchitectureReadBoundaryTests(unittest.TestCase):
         alias.symlink_to(target)
         self.assert_production_refusal_preserves_publication(target)
 
-    def test_real_cache_refuses_unreviewed_inventory_script_before_open(self):
+    def test_real_cache_tracks_unknown_inventory_name_additions_and_removals(self):
         builder.refresh_if_changed(self.root, self.state, self.output, self.receipt)
         forbidden = self.root / "scripts/unreviewed.py"
         forbidden.parent.mkdir(parents=True)
         forbidden.write_text("# Synthetic cache discovery cannot add permission\n", encoding="utf-8")
-        self.assert_production_refusal_preserves_publication(forbidden, cache=True)
+        self.assert_name_only_unknown(forbidden, cache=True)
+        cached = self.assert_name_only_unknown(forbidden, cache=True)
+        self.assertTrue(any(row["path"] == str(forbidden) for row in cached["inventory_sources"]))
+        forbidden.unlink()
+        rebuilt = builder.refresh_if_changed(self.root, self.state, self.output, self.receipt)
+        self.assertFalse(any(row["path"] == str(forbidden) for row in rebuilt["inventory_sources"]))
 
     def test_inventory_boundary_watchers_need_no_proc_descriptor_lookup(self):
         original = os.readlink
@@ -442,25 +476,12 @@ class ArchitectureReadBoundaryTests(unittest.TestCase):
             self.assertIsNone(records[0]["sha256"])
             self.assertNotEqual(records[0].get("sha256_kind"), "computed")
 
-    def test_real_builder_refuses_unlisted_user_unit_before_metadata_or_content(self):
+    def test_real_builder_lists_unlisted_user_unit_without_metadata_or_content(self):
         builder.build(self.root, self.state, self.output, self.receipt)
-        before = self.published_bytes()
         forbidden = self.user / ".config/systemd/user/unreviewed.service"
         forbidden.parent.mkdir(parents=True)
         forbidden.write_text("Synthetic unreviewed unit; no metadata approval\n", encoding="utf-8")
-        calls = []
-        original_stat = os.stat
-        def stat(path, *args, **kwargs):
-            if not isinstance(path, int) and Path(path).absolute() == forbidden:
-                calls.append("stat")
-                raise AssertionError("unreviewed user unit reached metadata before authorization")
-            return original_stat(path, *args, **kwargs)
-        with self.forbidden_reads(forbidden) as reads, patch.object(os, "stat", side_effect=stat):
-            with self.assertRaises(ValueError):
-                builder.build(self.root, self.state, self.output, self.receipt)
-        self.assertEqual(reads, [])
-        self.assertEqual(calls, [])
-        self.assertEqual(self.published_bytes(), before)
+        self.assert_name_only_unknown(forbidden)
 
     def test_real_builder_refuses_registered_receipt_parent_symlink_before_open(self):
         builder.build(self.root, self.state, self.output, self.receipt)

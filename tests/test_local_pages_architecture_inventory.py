@@ -3,6 +3,7 @@
 import hashlib
 import importlib.util
 import json
+import os
 import tempfile
 import unittest
 from pathlib import Path
@@ -52,6 +53,12 @@ class InventoryTests(unittest.TestCase):
 
     def record(self, name, digest, **extra):
         return dict(name=name, source="upstream/skills", ref="a" * 40, tree_sha="b" * 40, skill_md_sha256=digest, status="trial", **extra)
+
+    def approve_alias(self, target):
+        policy = json.loads(self.policy_path.read_text())
+        policy["architecture_inventory_aliases"] = [{"root": "user", "path": ".agents/skills/alias/SKILL.md",
+                                                     "target_root": "user", "target_path": target}]
+        self.policy_path.write_text(json.dumps(policy))
 
     def test_exact_skill_hash_and_recorded_pin_without_guessed_layer(self):
         path = self.write(self.skills / "known/SKILL.md", "fixture skill\n")
@@ -142,7 +149,7 @@ class InventoryTests(unittest.TestCase):
         registry.unlink()
         registry.symlink_to(outside)
         self.write(self.root / "manifests/stack.json", json.dumps({"components": [{"id": "native-cli"}]}))
-        with self.assertRaisesRegex(ValueError, "approval"):
+        with self.assertRaisesRegex(ValueError, "approval|symlink"):
             self.build()
 
     def test_boundary_excludes_credentials_trash_deep_paths_and_external_targets(self):
@@ -160,14 +167,15 @@ class InventoryTests(unittest.TestCase):
         visited = []
         original = inventory._hash
         with patch.object(inventory, "_hash", side_effect=lambda path, **kwargs: (visited.append(path), original(path, **kwargs))[1]):
-            with self.assertRaisesRegex(ValueError, "approval|protected"):
-                self.build()
+            result = self.build()
         self.assertEqual(visited, [])
+        self.assertTrue(all(item["status"] == "UNAPPROVED" for item in result["items"]))
 
     def test_system_skills_and_approved_symlink_are_bounded(self):
         real = self.write(self.skills / ".system/native/SKILL.md", "native")
         alias = self.skills / "alias"
         alias.symlink_to(real.parent, target_is_directory=True)
+        self.approve_alias(".agents/skills/.system/native/SKILL.md")
         result = self.build()
         self.assertEqual(len(result["items"]), 2)
         self.assertTrue(all(item["sha256"] == hashlib.sha256(real.read_bytes()).hexdigest() for item in result["items"]))
@@ -180,6 +188,7 @@ class InventoryTests(unittest.TestCase):
         skill = self.write(self.skills / "known/SKILL.md", "fixture skill\n")
         alias = self.skills / "alias"
         alias.symlink_to(skill.parent, target_is_directory=True)
+        self.approve_alias(".agents/skills/known/SKILL.md")
         self.manifest([self.record("known", hashlib.sha256(skill.read_bytes()).hexdigest())])
         hashed = []
         original = inventory._hash
@@ -244,7 +253,7 @@ class InventoryTests(unittest.TestCase):
                 unit.symlink_to(outside)
             return approved
         with patch.object(reads, "authorize", side_effect=replace_after_grant):
-            with self.assertRaisesRegex(ValueError, "not a regular file"):
+            with self.assertRaisesRegex(ValueError, "not a regular file|protected|symlink"):
                 inventory.build(self.root, self.base / "state", [self.skills], reads=reads)
 
     def test_unread_user_role_checksum_is_unchecked_rather_than_mismatched(self):
@@ -255,6 +264,102 @@ class InventoryTests(unittest.TestCase):
         self.assertIsNone(item["sha256"])
         self.assertIsNone(item["hash_match"])
         self.assertIn("not checked", item["provenance"])
+
+    def test_unlisted_discoveries_are_names_only_before_any_target_metadata(self):
+        targets = [
+            self.write(self.root / "scripts/unreviewed.py", "unread fixture"),
+            self.write(self.root / ".github/workflows/unreviewed.yml", "unread fixture"),
+            self.write(self.root / "adoption/agents/unreviewed.md", "unread fixture"),
+            self.write(self.skills / "unreviewed/SKILL.md", "unread fixture"),
+            self.write(self.user / ".codex/agents/unreviewed.toml", "unread fixture"),
+            self.write(self.user / ".config/systemd/user/unreviewed.service", "unread fixture"),
+        ]
+        guarded = targets + [self.skills / "unreviewed"]
+        original_stat, original_lstat, original_resolve = os.stat, os.lstat, Path.resolve
+        def stat(path, *args, **kwargs):
+            if not isinstance(path, int) and Path(path).absolute() in guarded:
+                raise AssertionError("unknown inventory target reached stat")
+            return original_stat(path, *args, **kwargs)
+        def lstat(path, *args, **kwargs):
+            if not isinstance(path, int) and Path(path).absolute() in guarded:
+                raise AssertionError("unknown inventory target reached lstat")
+            return original_lstat(path, *args, **kwargs)
+        def resolve(path, *args, **kwargs):
+            if path.absolute() in guarded:
+                raise AssertionError("unknown inventory target reached resolve")
+            return original_resolve(path, *args, **kwargs)
+        with patch.object(os, "stat", side_effect=stat), patch.object(os, "lstat", side_effect=lstat), patch.object(Path, "resolve", new=resolve):
+            result = self.build()
+        records = {item["path"]: item for item in result["items"]}
+        for target in targets:
+            if target.name == "SKILL.md":
+                target = target.parent
+            record = records[str(target)]
+            self.assertEqual(record["status"], "UNAPPROVED")
+            self.assertIsNone(record["sha256"])
+            self.assertIsNone(record["bytes"])
+            self.assertIsNone(record["resolved_path"])
+            self.assertIn("name only", record["reason"])
+
+    def test_unknown_skill_and_agent_entries_are_not_entered_or_resolved(self):
+        skill = self.write(self.skills / "new-vendor/SKILL.md", "unread fixture")
+        agent = self.write(self.root / "adoption/agents/new-vendor/role.md", "unread fixture")
+        forbidden = {skill.parent, skill, agent.parent, agent}
+        original_open, original_stat, original_lstat = os.open, os.stat, os.lstat
+        def checked(operation):
+            def call(path, *args, **kwargs):
+                if not isinstance(path, int) and (Path(path).absolute() in forbidden or (str(path) == "new-vendor" and kwargs.get("dir_fd") is not None)):
+                    raise AssertionError("unknown entry reached a target operation")
+                return operation(path, *args, **kwargs)
+            return call
+        with patch.object(os, "open", side_effect=checked(original_open)), patch.object(os, "stat", side_effect=checked(original_stat)), patch.object(os, "lstat", side_effect=checked(original_lstat)):
+            result = self.build()
+        records = {item["path"]: item for item in result["items"]}
+        for path in (skill.parent, agent.parent):
+            self.assertEqual(records[str(path)]["status"], "UNAPPROVED")
+        self.assertNotIn(str(skill), records)
+        self.assertNotIn(str(agent), records)
+
+    def test_unknown_symlink_entry_never_inspects_its_target(self):
+        target = self.write(self.base / "outside/credentials.json", "unread fixture")
+        alias = self.user / ".codex/agents/unlisted.toml"
+        alias.parent.mkdir(parents=True)
+        alias.symlink_to(target)
+        real_readlink, real_resolve = os.readlink, Path.resolve
+        def readlink(path, *args, **kwargs):
+            if not isinstance(path, int) and Path(path).absolute() == alias:
+                raise AssertionError("unknown alias reached readlink")
+            return real_readlink(path, *args, **kwargs)
+        def resolve(path, *args, **kwargs):
+            if path.absolute() == alias:
+                raise AssertionError("unknown alias reached resolve")
+            return real_resolve(path, *args, **kwargs)
+        with patch.object(os, "readlink", side_effect=readlink), patch.object(Path, "resolve", new=resolve):
+            result = self.build()
+        record = next(item for item in result["items"] if item["path"] == str(alias))
+        self.assertEqual(record["status"], "UNAPPROVED")
+        self.assertIsNone(record["resolved_path"])
+
+    def test_reviewed_alias_cannot_retarget_to_a_different_approved_skill(self):
+        known = self.write(self.skills / "known/SKILL.md", "known fixture")
+        changed = self.write(self.skills / "changed/SKILL.md", "different fixture")
+        (self.skills / "alias").symlink_to(changed.parent, target_is_directory=True)
+        self.approve_alias(".agents/skills/known/SKILL.md")
+        with self.assertRaisesRegex(ValueError, "alias differs"):
+            self.build()
+
+    def test_mapping_provenance_names_the_root_whose_bytes_were_parsed(self):
+        self.catalog("foundation", [{"layer_id": "workers", "winners": []}])
+        self.write(self.user / ".codex/agents/reviewer.toml", "unread fixture")
+        mapping = self.write(self.root / "tools/local-pages/architecture_mapping.json", json.dumps({
+            "schema": "local-architecture-mapping/1", "mappings": [{"kinds": ["role"], "names": ["reviewer"], "layer_keys": ["foundation/workers"], "reason": "explicit fixture mapping"}]
+        }))
+        default = Path(inventory.__file__).with_name("architecture_mapping.json")
+        with patch.object(inventory, "MAPPING_PATH", default):
+            result = self.build()
+        item = next(item for item in result["items"] if item["name"] == "reviewer")
+        self.assertIn(str(mapping) + "#/mappings/0", item["mapping_source"])
+        self.assertNotIn(str(default), item["mapping_source"])
 
     def test_missing_sanitized_projection_never_reads_hook_sources(self):
         for root in (self.root / "hooks", self.root / "scripts/hooks", self.user / ".claude/hooks"):

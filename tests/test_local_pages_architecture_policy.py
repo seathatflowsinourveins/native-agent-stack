@@ -41,6 +41,7 @@ class ArchitecturePolicyTests(unittest.TestCase):
             "root": "state", "directory": "coordination/ns2604-coop/notes/adoption-evidence-20261008",
             "filename": "adoption-now-[a-f0-9]{16}\\.json",
         }}
+        self.document["architecture_inventory_aliases"] = []
         self.policy_path = self.base / "independent-architecture-policy.json"
         self.write(self.policy_path, self.document)
         self.target = self.state / "coordination/e2e-truth-20261006/credentials.json"

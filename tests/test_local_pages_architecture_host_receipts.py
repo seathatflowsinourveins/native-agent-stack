@@ -24,6 +24,7 @@ class HostReceiptsIndexTests(unittest.TestCase):
         self.index = self.state / "coordination/command-center/pages/host-receipts-index.json"
         policy = json.loads((ROOT / "tools/local-pages/source_policy.json").read_text())
         policy["architecture"] = {"architecture_projection": [{"root": "state", "path": "coordination/command-center/pages/host-receipts-index.json"}]}
+        policy["architecture_inventory_aliases"] = []
         policy_path = self.state.parent / (self.state.name + "-independent-policy.json")
         policy_path.write_text(json.dumps(policy), encoding="utf-8")
         self.addCleanup(lambda: policy_path.unlink(missing_ok=True))

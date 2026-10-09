@@ -50,9 +50,37 @@ def _inside(path, root):
     return path == root or root in path.parents
 
 
-def _safe_path(path, reads, role="architecture_inventory"):
+def _approved_target(path, reads, role="architecture_inventory"):
+    """Check a lexical grant or frozen alias before inspecting the target."""
     if _blocked(path):
         raise _policy().SourcePolicyError("protected inventory path rejected before access")
+    try:
+        reads.authorize(role, path)
+        return path
+    except ValueError:
+        pass
+    aliases = reads.policy.document.get("architecture_inventory_aliases", [])
+    for record in aliases:
+        if not isinstance(record, dict) or record.get("root") not in reads.roots or record.get("target_root") not in reads.roots:
+            raise _policy().SourcePolicyError("invalid inventory alias record")
+        relative = _policy()._relative(record.get("path"))
+        target_relative = _policy()._relative(record.get("target_path"))
+        if reads.roots[record["root"]] / relative == path:
+            target = reads.roots[record["target_root"]] / target_relative
+            reads.authorize(role, target)
+            return target
+    return None
+
+
+def _safe_path(path, reads, role="architecture_inventory"):
+    approved = _approved_target(path, reads, role)
+    if approved is None:
+        return None
+    if approved == path:
+        # Direct canonical grants do not authorize a new symlink target.
+        # Only the separately reviewed alias branch may resolve a lexical link.
+        _policy()._check_target(path, allow_missing=True)
+        return path
     try:
         resolved = path.resolve()
     except (OSError, RuntimeError):
@@ -62,50 +90,72 @@ def _safe_path(path, reads, role="architecture_inventory"):
     if path.name == "SKILL.md" and resolved.name != "SKILL.md":
         raise _policy().SourcePolicyError("skill alias does not name an approved instruction asset")
     reads.authorize(role, resolved)
+    if resolved != approved:
+        raise _policy().SourcePolicyError("inventory alias differs from its independently approved target")
     return resolved
 
 
-def _files(root, depth=0, metadata_suffixes=()):
-    if not root.is_dir() or root.is_symlink():
+def _entries(root):
+    """List names through native no-follow directory descriptors, without leaf stat."""
+    if _blocked(root):
         return []
-    entries = sorted(root.iterdir(), key=lambda path: path.name)
+    try:
+        with _policy()._directory(root) as directory:
+            entries = sorted(os.listdir(directory))
+    except OSError:
+        return []
     if len(entries) > MAX_ENTRIES:
         raise ValueError("inventory directory entry limit exceeded")
+    return [root / name for name in entries]
+
+
+def _known_container(path, reads):
+    return any(_inside(reads.roots[root_name] / relative, path)
+               for role in ("architecture_inventory", "architecture_inventory_metadata")
+               for root_name, relative in reads.allowed.get(role, set()))
+
+
+def _files(root, depth=0, metadata_suffixes=(), *, reads=None, unknown_entries=None):
     found = []
-    for path in entries:
+    for path in _entries(root):
         if _blocked(path):
             continue
-        if path.suffix in metadata_suffixes:
-            # Filename discovery does not stat or follow a user metadata leaf.
-            # Its canonical exact metadata grant precedes observations below.
+        if path.suffix in metadata_suffixes or path.name == "SHA256SUMS" or path.name.endswith("manifest.json"):
             found.append(path)
             continue
-        if path.is_dir() and not path.is_symlink() and depth:
-            found.extend(_files(path, depth - 1, metadata_suffixes))
-        elif path.is_file() or path.is_symlink():
+        if depth and not path.suffix:
+            if reads is not None and _known_container(path, reads):
+                found.extend(_files(path, depth - 1, metadata_suffixes, reads=reads, unknown_entries=unknown_entries))
+            elif unknown_entries is not None:
+                unknown_entries.add(path)
+        else:
             found.append(path)
     return found
 
 
-def _skills(root):
-    if not root.is_dir():
-        return []
-    entries = sorted(root.iterdir(), key=lambda path: path.name)
-    if len(entries) > MAX_ENTRIES:
-        raise ValueError("skill directory entry limit exceeded")
-    found = []
-    for path in entries:
+def _skills(root, reads):
+    found, unknown = [], []
+    for path in _entries(root):
         if _blocked(path):
             continue
         candidate = path / "SKILL.md"
-        if candidate.is_file():
+        if _approved_target(candidate, reads) is not None:
             found.append(candidate)
-        elif path.is_dir() and not path.is_symlink():
-            children = sorted(path.iterdir(), key=lambda child: child.name)
-            if len(children) > MAX_ENTRIES:
-                raise ValueError("nested skill directory entry limit exceeded")
-            found.extend(child / "SKILL.md" for child in children if not _blocked(child) and (child / "SKILL.md").is_file())
-    return found
+        else:
+            # A reviewed container such as .system can enumerate its names;
+            # an unknown entry grants no authority to enter or stat it.
+            if _known_container(path, reads):
+                for child in _entries(path):
+                    if _blocked(child):
+                        continue
+                    candidate = child / "SKILL.md"
+                    if _approved_target(candidate, reads) is not None:
+                        found.append(candidate)
+                    else:
+                        unknown.append(child)
+            else:
+                unknown.append(path)
+    return found, unknown
 
 
 def _hash(path, *, reads, max_bytes=MAX_HASH_BYTES):
@@ -269,7 +319,7 @@ def _projection_items(path, projection, digest):
     return items
 
 
-def _explicit_mapping(item, mapping, known_keys):
+def _explicit_mapping(item, mapping, known_keys, mapping_path):
     if mapping.get("schema") != "local-architecture-mapping/1":
         return
     for index, record in enumerate(mapping.get("mappings", [])):
@@ -289,7 +339,7 @@ def _explicit_mapping(item, mapping, known_keys):
             continue
         if targets and isinstance(record.get("reason"), str) and record["reason"].strip():
             item["layer_keys"] = sorted(set(item.get("layer_keys", [])) | set(targets))
-            source = str(MAPPING_PATH) + f"#/mappings/{index}"
+            source = str(mapping_path) + f"#/mappings/{index}"
             item["mapping_source"] = "; ".join(filter(None, (item.get("mapping_source"), source)))
             item["mapping_reason"] = "; ".join(filter(None, (item.get("mapping_reason"), record["reason"])))
             item.setdefault("mapping_evidence_refs", []).extend(record.get("source_refs", []))
@@ -302,9 +352,9 @@ def _capture(root, state_root, skill_roots, reads):
     snapshots, captured, resolutions = {}, {}, {}
     def snapshot(path, metadata=False):
         path = Path(path).absolute()
-        if not path.exists() and not path.is_symlink():
-            return None
         resolved = _safe_path(path, reads)
+        if resolved is None or (not resolved.exists() and not resolved.is_symlink()):
+            return None
         resolutions[str(path)] = resolved
         key = str(resolved)
         if key not in snapshots:
@@ -321,16 +371,22 @@ def _capture(root, state_root, skill_roots, reads):
         root / ".claude/skills", USER_ROOT / ".claude/skills",
         USER_ROOT / ".agents/skills", USER_ROOT / ".codex/skills",
     ]
-    groups = [("skill", path) for directory in skill_roots for path in _skills(directory)]
+    groups = []
+    unknown_entries = set()
+    for directory in skill_roots:
+        skills, unknown_skills = _skills(directory, reads)
+        groups.extend(("skill", path) for path in skills)
+        groups.extend(("skill-directory", path) for path in unknown_skills)
     for directory in (root / "adoption/agents", USER_ROOT / ".claude/agents", USER_ROOT / ".codex/agents"):
-        suffixes = {".md", ".toml"} if not _inside(directory, root.absolute()) else ()
-        groups.extend(("role" if path.suffix == ".toml" else "agent", path) for path in _files(directory, 2, suffixes) if path.suffix in {".md", ".toml"} and path.name != "AGENTS.md")
-    groups.extend(("workflow", path) for path in _files(root / ".github/workflows") if path.suffix in {".yml", ".yaml"})
-    groups.extend(("script", path) for path in _files(root / "scripts") if path.suffix in SCRIPT_SUFFIXES)
+        suffixes = {".md", ".toml"}
+        groups.extend(("role" if path.suffix == ".toml" else "agent", path) for path in _files(directory, 2, suffixes, reads=reads, unknown_entries=unknown_entries) if path.suffix in {".md", ".toml"} and path.name != "AGENTS.md")
+    groups.extend(("agent-entry", path) for path in sorted(unknown_entries))
+    groups.extend(("workflow", path) for path in _files(root / ".github/workflows", metadata_suffixes={".yml", ".yaml"}) if path.suffix in {".yml", ".yaml"})
+    groups.extend(("script", path) for path in _files(root / "scripts", metadata_suffixes=SCRIPT_SUFFIXES) if path.suffix in SCRIPT_SUFFIXES)
     unit_root = USER_ROOT / ".config/systemd/user"
     groups.extend(("timer" if path.suffix == ".timer" else "unit", path) for path in _files(unit_root, metadata_suffixes={".timer", ".service", ".path"}) if path.suffix in {".timer", ".service", ".path"})
     metadata_paths = [root / "adoption/skills/manifest.json", root / "adoption/manifest.json", root / "manifests/stack.json"]
-    metadata_paths += [path for path in _files(root / "adoption/agents", 2) if path.name.endswith("manifest.json") or path.name == "SHA256SUMS"]
+    metadata_paths += [path for path in _files(root / "adoption/agents", 2, reads=reads) if path.name.endswith("manifest.json") or path.name == "SHA256SUMS"]
     catalog_manifest, catalog_paths = _catalog_paths(root, snapshot)
     metadata_paths += [catalog_manifest] + [path for _, path in catalog_paths]
     projection_path = state_root / "coordination/command-center/pages/automation-projection.json"
@@ -338,13 +394,24 @@ def _capture(root, state_root, skill_roots, reads):
     metadata_paths += [projection_path, mapping_path]
     candidates = {}
     input_paths, input_types, symlink_paths = {}, {}, {}
-    metadata_only = {}
+    metadata_only, unknown = {}, {}
     for kind, path in groups + [("metadata", path) for path in metadata_paths]:
         path = path.absolute()
         user_metadata = kind in {"agent", "role", "timer", "unit"} and not _inside(path, root.absolute())
-        if not user_metadata and not path.exists() and not path.is_symlink():
+        role = "architecture_inventory_metadata" if user_metadata else "architecture_inventory"
+        if kind in {"skill-directory", "agent-entry"} or _approved_target(path, reads, role) is None:
+            unknown[str(path)] = {
+                "path": str(path), "resolved_path": None, "input_paths": [str(path)],
+                "sha256": None, "sha256_kind": "unreported", "bytes": None,
+                "mtime_ns": None, "type": kind, "types": [kind], "status": "UNAPPROVED",
+                "reason": "No independent exact inventory grant; name only; metadata and content unread",
+            }
+            if kind == "skill-directory":
+                unknown[str(path)]["reason"] = "Unapproved skill entry; name only; asset presence unmeasured"
             continue
-        resolved = _safe_path(path, reads, "architecture_inventory_metadata" if user_metadata else "architecture_inventory")
+        resolved = _safe_path(path, reads, role)
+        if not user_metadata and not resolved.exists() and not resolved.is_symlink():
+            continue
         resolutions[str(path)] = resolved
         info = None
         if user_metadata:
@@ -391,11 +458,12 @@ def _capture(root, state_root, skill_roots, reads):
                         "role": "architecture_inventory_metadata",
                         "symlink_paths": sorted(symlink_paths.get(key, set())),
                         "type": "/".join(sorted(input_types[key])), "types": sorted(input_types[key])})
-    return groups, metadata_paths, catalog_paths, snapshots, hashes, sources, total_bytes, resolutions
+    sources.extend(unknown[key] for key in sorted(unknown))
+    return groups, metadata_paths, catalog_paths, snapshots, hashes, sources, total_bytes, resolutions, unknown
 
 
 def input_signature(root, state_root, *, reads):
-    _, _, _, _, _, sources, _, _ = _capture(root, state_root, None, reads)
+    _, _, _, _, _, sources, _, _, _ = _capture(root, state_root, None, reads)
     return sources
 
 
@@ -403,7 +471,7 @@ def build(root, state_root, skill_roots=None, *, reads=None):
     """Use exact independent inventory grants before hashing or metadata parsing."""
     root, state_root = Path(root), Path(state_root)
     reads = reads or _policy().ArchitectureReads(root, state_root, user_root=USER_ROOT)
-    groups, metadata_paths, catalog_paths, snapshots, hashes, sources, total_bytes, resolutions = _capture(root, state_root, skill_roots, reads)
+    groups, metadata_paths, catalog_paths, snapshots, hashes, sources, total_bytes, resolutions, unknown = _capture(root, state_root, skill_roots, reads)
     projection_path = metadata_paths[-2]
     def data(path):
         return _json(snapshots.get(str(resolutions.get(str(path.absolute())))))
@@ -448,6 +516,12 @@ def build(root, state_root, skill_roots=None, *, reads=None):
                     role_records[record["name"]] = (record, str(path))
     items = []
     for kind, path in sorted(set(groups), key=lambda group: (group[0], str(group[1]))):
+        if str(path.absolute()) in unknown:
+            source = unknown[str(path.absolute())]
+            items.append({**source, "kind": kind, "name": path.parent.name if kind == "skill" else path.name if kind == "skill-directory" else path.stem,
+                          "repository": None, "pin": None, "source_refs": [],
+                          "unmapped_reason": source["reason"]})
+            continue
         resolved = resolutions.get(str(path.absolute()))
         digest = hashes.get(str(resolved)) if resolved else None
         item = {"kind": kind, "name": path.parent.name if kind == "skill" else path.stem, "path": str(path), "sha256": digest, "repository": None, "pin": None, "source_refs": [], "status": "UNREPORTED"}
@@ -490,13 +564,21 @@ def build(root, state_root, skill_roots=None, *, reads=None):
         item["provenance"] = "manifest reference; installed runtime and wiring unverified"
         items.append(item)
     items.extend(_projection_items(projection_path, projection, projection_digest))
+    grouped = {str(path.absolute()) for _, path in groups}
+    for key, source in unknown.items():
+        if key not in grouped:
+            items.append({**source, "kind": "metadata", "name": Path(key).name,
+                          "repository": None, "pin": None, "source_refs": [],
+                          "unmapped_reason": source["reason"]})
     if projection_present:
         source = next(source for source in sources if source["path"] == captured_key(projection_path))
         source.update({"status": "local sanitized automation projection", "local": True,
                        "generated_utc": projection.get("generated_utc"), "method": projection.get("method")})
     for item in items:
+        if item.get("status") == "UNAPPROVED":
+            continue
         _catalog_mapping(item, links)
-        _explicit_mapping(item, mapping, links[2])
+        _explicit_mapping(item, mapping, links[2], metadata_paths[-1])
         for action in item.get("action_refs", []):
             identity = _repo_key(action.get("repository"))
             if not identity:
@@ -504,7 +586,7 @@ def build(root, state_root, skill_roots=None, *, reads=None):
             projected = {"kind": "action", "name": identity.removeprefix("github.com/"),
                          "repository": action["repository"], "source_refs": item["source_refs"]}
             _catalog_mapping(projected, links)
-            _explicit_mapping(projected, mapping, links[2])
+            _explicit_mapping(projected, mapping, links[2], metadata_paths[-1])
             for key in ("layer_keys", "mapping_source", "mapping_reason"):
                 if projected.get(key):
                     action[key] = projected[key]

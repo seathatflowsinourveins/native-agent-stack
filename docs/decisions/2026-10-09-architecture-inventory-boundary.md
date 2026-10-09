@@ -13,19 +13,25 @@ Git tree and registration metadata and the pinned test's eligibility
 declaration, excluding frozen and shared protected paths. It prints proposals
 for review; it never writes runtime permissions from discovered input files,
 opens the referenced artifact bodies or pins executable grants as descriptions.
-The exact receipt union narrows4650to4648; no other receipt is added or removed.
+The exact receipt union narrows 4650 to 4648; no other receipt is added or removed.
 
 The complete builder's independent reader now reaches inventory content,
 metadata and cache signatures. Hashes and parsed metadata use one captured
 approved payload. Exact canonical approval precedes content/digest access,
-and shared checks reject protected lexical and canonical aliases. Unknown
-runtime inputs fail the complete build/cache reuse before publishing rather
-than adding themselves to permissions. Complete-builder synthetic regressions
-reproduced the two reported forbidden opens, then verified zero such opens
-and byte-exact preservation of prior published output and receipt.
+and shared checks reject protected lexical and canonical aliases. The later
+CC read at 64809272 identified an availability regression: ordinary unknown
+names had become fatal to all pages. Those names now produce UNAPPROVED
+name-only records, without target stat/resolve/open/hash or invented presence.
+They cannot add themselves to permissions. Protected inputs still refuse the
+Architecture observation; the optional composer adapter retains its last
+page or shows an UNREPORTED placeholder while other pages refresh. Cache
+signatures include unknown names, so installing an unapproved entry changes
+the inventory observation without accessing its content. Complete-builder
+synthetic regressions retain zero forbidden opens and verify this availability
+and privacy distinction.
 
-There are129independentexact inventory content paths: pinned repo selectors,
-the fixed sanitized automation projection and41reviewed installed skill
+There are 129 independent exact inventory content paths: pinned repo selectors,
+the fixed sanitized automation projection and 41 reviewed installed skill
 targets. User content is restricted to exact `SKILL.md` assets. A separate
 94-path metadata-only role covers user agent/service registrations; it cannot
 authorize file body access. Existing native descriptor-relative no-follow
@@ -34,6 +40,16 @@ client configuration or service Environment values. Newly installed assets
 require a new independent policy review before content capture, never a
 runtime-derived wildcard grant. File presence or hash equality still does not
 establish wiring, execution or acceptance.
+
+A checked-in names-only directory snapshot and independent bindings reproduce
+the 41 skill, 94 metadata and one design grant, including 33 exact aliases.
+Additional names remain unapproved rather than expanding permissions. A CI
+test compares repository grants with the current committed `git ls-files`
+selector; landing-head regeneration is required after the authorized rebase.
+Adoption role attribution separately reuses the same native no-follow reader
+for fixed co-op metadata paths and reviewed parking/capacity filenames;
+refusals leave measured call counts unattributed and report safe source errors.
+No raw co-op payload or user configuration body is read during derivation.
 
 The supported source primitives are reused from the native reader at
 ddb7a2a9419dac5047bb73df85b30c95bc0c98b8 and installed CPython3.13.16,

@@ -183,27 +183,47 @@ through its authorized descriptor, which avoids reopening its pathname.
 Inventory uses that same independently approved reader for every content
 hash and metadata parse, including its catalogs, manifests, checksum lists,
 mapping and sanitized automation projection. The committed
-`architecture_inventory` role contains129exact content paths; installed user
+`architecture_inventory` role contains 129 exact content paths; installed user
 content is restricted to exact `SKILL.md` assets. The separate
-`architecture_inventory_metadata` role contains94exact user agent/unit paths
+`architecture_inventory_metadata` role contains 94 exact user agent/unit paths
 and cannot authorize a content open. Native descriptor-relative no-follow
 stat supplies their file metadata. Shared protected checks apply to both
-lexical and canonical paths before reads. A newly discovered unlisted input
-or protected alias stops the complete build/cache reuse before publication;
-previous successful outputs and receipt remain intact. Hashes and parsed
-metadata derive from the same captured approved bytes.
+lexical and canonical paths before reads. Ordinary unapproved discoveries are
+listed by name only as UNAPPROVED, with no candidate stat, resolve, open or
+hash. Their asset presence and runtime use remain unmeasured. Protected input
+or a poisoned known alias still refuses the Architecture observation; the
+composer preserves its last page while refreshing the other documents, or
+publishes an explicit UNREPORTED placeholder on its first failure. Hashes and
+parsed metadata derive from the same captured approved bytes. Unknown names
+also enter cache signatures so additions/removals update the source view.
 
 `scripts/local_pages_policy_grants.py --pin <full-source-sha>` prints a static
 proposal from native Git tree/registered-path metadata for review. Runtime
 discovery never adds a grant. Receipt proposals also apply the pinned frozen
 eligibility declaration from the repository tripwire; the two unused frozen
-receipt permissions are removed, leaving4648eligibleexactJSONreceiptpaths.
+receipt permissions are removed, leaving 4648 eligible exact JSON receipt paths.
 Derivation does not open referenced receipt or frozen artifact bodies and
 does not add descriptive-pin exceptions. Separately reviewed user canonical
 filenames are metadata during permission generation. The shared reader uses
 64KiB chunks so a large logical bound does not allocate that bound for a small
 file. Inventory cache signatures bind approved bytes, metadata tuples and
 the policy digest before a prior render can be reused.
+
+`inventory_user_names.json` records names-only directory observations and
+separately reviewed bindings that reproduce the 41 skill, 94 metadata and
+one design grant. Extra names never create permissions. The 33 exact alias
+bindings name an already approved canonical target; the reader must verify
+that target before any content or metadata observation. The CI grant test
+compares committed repo grants with `inventory_paths(git ls-files)`; regenerate
+the reviewed proposal at the authorized landing head after a rebase, not from
+runtime discovery. No raw user file body is used for these derivations.
+
+Adoption role attribution uses the same native protected-name and no-follow
+parent/leaf descriptor reader for fixed registries and reviewed receipt
+families. Parking enumeration opens only its named directory with no-follow
+semantics. Refused/missing/malformed metadata contributes an UNREPORTED source
+error and no binding, source hash or invented attribution; published call
+counts remain measured even when a role cannot be assigned.
 
 Each component row reports observational use from the retained hash-verified
 snapshot. Client components use session counts; unmeasured rows explain the

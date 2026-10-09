@@ -1,0 +1,1226 @@
+{
+  "schema": "architecture-user-names/1",
+  "captured_utc": "2026-10-09T18:55:40Z",
+  "source_pin": "64809272031f61ed38f48518013495feb0887afd",
+  "policy_sha256": "253d87b31de4bd80175f75dbcde13044d670f6991d6e9e2432fb03b83ccc524f",
+  "directories": [
+    {
+      "path": ".agents/skills",
+      "names": [
+        "agentic-actions-auditor",
+        "codebase-design",
+        "codeql",
+        "diagnosing-bugs",
+        "find-skills",
+        "fp-check",
+        "frontend-design",
+        "gh-address-comments",
+        "gh-fix-ci",
+        "hcom-agent-messaging",
+        "hf-cli",
+        "iterative-retrieval",
+        "loki",
+        "mcp-builder",
+        "mineru",
+        "modern-python",
+        "native-stack-research",
+        "native-stack-worker",
+        "promptfoo-evals",
+        "property-based-testing",
+        "qmd",
+        "sarif-parsing",
+        "search-first",
+        "security-audit",
+        "security-best-practices",
+        "security-threat-model",
+        "supply-chain-risk-auditor",
+        "tdd",
+        "typesafe-ai",
+        "variant-analysis",
+        "writing-for-agents"
+      ]
+    },
+    {
+      "path": ".claude/agents",
+      "names": [
+        "blind-adjudicator.md",
+        "blind-judge.md",
+        "blind-lane-reviewer.md",
+        "codebase-memory-auditor.md",
+        "codebase-memory-scout.md",
+        "codebase-memory.md",
+        "evidence-reviewer.md",
+        "isolated-builder.md",
+        "landscape-sweep-worker.md",
+        "security-reviewer.md",
+        "semantic-evidence-reviewer.md",
+        "semantic-evidence-reviewer.md.bak.20261005T005836Z",
+        "semble-search.md",
+        "source-scout.md",
+        "stack-researcher.md",
+        "stack-verifier.md"
+      ]
+    },
+    {
+      "path": ".claude/skills",
+      "names": [
+        ".trash",
+        "agentic-actions-auditor",
+        "codebase-design",
+        "codebase-memory",
+        "codeql",
+        "diagnosing-bugs",
+        "find-skills",
+        "fp-check",
+        "frontend-design",
+        "gh-address-comments",
+        "gh-fix-ci",
+        "hcom-agent-messaging",
+        "hf-cli",
+        "iterative-retrieval",
+        "loki",
+        "mcp-builder",
+        "mineru",
+        "modern-python",
+        "native-stack-research",
+        "native-stack-worker",
+        "promptfoo-evals",
+        "property-based-testing",
+        "qmd",
+        "sarif-parsing",
+        "search-first",
+        "security-audit",
+        "security-best-practices",
+        "security-threat-model",
+        "skill-creator",
+        "supply-chain-risk-auditor",
+        "synced",
+        "tdd",
+        "typesafe-ai",
+        "variant-analysis",
+        "writing-for-agents"
+      ]
+    },
+    {
+      "path": ".codex/agents",
+      "names": [
+        "codebase-memory-auditor.toml",
+        "codebase-memory-scout.toml",
+        "codebase-memory.toml",
+        "semble-search.toml"
+      ]
+    },
+    {
+      "path": ".codex/skills",
+      "names": [
+        ".system",
+        "codebase-memory"
+      ]
+    },
+    {
+      "path": ".codex/skills/.system",
+      "names": [
+        ".codex-system-skills.marker",
+        "imagegen",
+        "openai-docs",
+        "review-agent",
+        "skill-creator",
+        "skill-installer"
+      ]
+    },
+    {
+      "path": ".config/systemd/user",
+      "names": [
+        "agentsview.service",
+        "ai-memory.service",
+        "ai-memory.service.d",
+        "cc-guest-memory-caps.service",
+        "cc-win-mem-reclaim.service",
+        "clock-change-check.service",
+        "clock-change-check.timer",
+        "clock-offset-check.service",
+        "clock-offset-check.timer",
+        "dagu.service",
+        "dagu.service.20261004142510.bak",
+        "dagu.service.20261005001839.bak",
+        "dagu.service.20261005122201.bak",
+        "dagu.service.d",
+        "default.target.wants",
+        "disk-headroom-guard.service",
+        "disk-headroom-guard.timer",
+        "docker.service",
+        "git-maintenance@.service",
+        "git-maintenance@.service.d",
+        "git-maintenance@daily.timer",
+        "git-maintenance@hourly.timer",
+        "git-maintenance@weekly.timer",
+        "headroom-ns2604-headroom.service",
+        "hindsight-research.service",
+        "hindsight-research.service.d",
+        "jcodemunch-mcp-http.service",
+        "mineru.service",
+        "native-agent-pages-refresh.path",
+        "native-agent-pages-refresh.service",
+        "native-agent-pages-refresh.timer",
+        "native-agent-pages.service",
+        "native-grafana-monitoring-validation.service",
+        "native-node-exporter.service",
+        "native-nvidia-gpu-exporter.service",
+        "native-process-exporter.service",
+        "native-stack-qmd-shared.service",
+        "native-wsl-distro-metrics.service",
+        "native-wsl-distro-metrics.timer",
+        "ns2604-alertmanager.service",
+        "ns2604-coop-checkpoint-backstop-20261009.service",
+        "ns2604-coop-checkpoint-backstop-20261009.timer",
+        "ns2604-grafana.service",
+        "ns2604-loki.service",
+        "ns2604-otelcol-contrib.service",
+        "ns2604-overnight-wsl-restart-20261009.service",
+        "ns2604-overnight-wsl-restart-20261009.timer",
+        "ns2604-prometheus.service",
+        "ns2604-research-progress.service",
+        "ns2604-research-progress.service.d",
+        "ns2604-research-progress.timer",
+        "ollama.service",
+        "ollama.service.before-guard-20261006",
+        "omniroute.service",
+        "omniroute.service.d",
+        "openhands-job@.service",
+        "paper-alert@.service",
+        "paper-alert@.service.d",
+        "paper-ext-20261006.service",
+        "paper-ext-20261006.service.d",
+        "paper-ext-20261006.timer",
+        "paper-n2-ctl-20261008.service",
+        "paper-n2-ctl-20261008.timer",
+        "paper-n2-gate-decision-20261009.service",
+        "paper-n2-gate-decision-20261009.timer",
+        "paper-n2-gate-go-20261009.service",
+        "paper-n2-gate-go-20261009.timer",
+        "paper-n2-open-20261008.service",
+        "paper-n2-open-20261008.timer",
+        "paper-n2-open-20261009.service",
+        "paper-n2-open-20261009.service.d",
+        "paper-n2-open-20261009.timer",
+        "paper-n2-wake-20261009.service",
+        "paper-n2-wake-20261009.timer",
+        "paper-pre-20261006.service",
+        "paper-pre-20261006.service.d",
+        "paper-pre-20261006.timer",
+        "paper-recover-a2-gate-20261006.service",
+        "paper-recover-a2-gate-20261006.timer",
+        "qmd-mcp-http.service",
+        "restic-backup-nativestack2604.service",
+        "restic-backup-nativestack2604.timer",
+        "restic-prune-nativestack2604.service",
+        "restic-prune-nativestack2604.timer",
+        "secret-guard-canary.service",
+        "secret-guard-canary.timer",
+        "stack-alert@.service",
+        "timers.target.wants",
+        "vllm-embed.service",
+        "vllm-embed.service.d",
+        "wu-watch-20261006.service",
+        "wu-watch-20261006.timer"
+      ]
+    }
+  ],
+  "reviewed_bindings": [
+    {
+      "role": "architecture_design",
+      "source": ".agents/skills/frontend-design/SKILL.md",
+      "target": ".agents/skills/frontend-design/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".claude/agents/blind-adjudicator.md",
+      "target": ".claude/agents/blind-adjudicator.md",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".claude/agents/blind-judge.md",
+      "target": ".claude/agents/blind-judge.md",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".claude/agents/blind-lane-reviewer.md",
+      "target": ".claude/agents/blind-lane-reviewer.md",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".claude/agents/codebase-memory-auditor.md",
+      "target": ".claude/agents/codebase-memory-auditor.md",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".claude/agents/codebase-memory-scout.md",
+      "target": ".claude/agents/codebase-memory-scout.md",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".claude/agents/codebase-memory.md",
+      "target": ".claude/agents/codebase-memory.md",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".claude/agents/evidence-reviewer.md",
+      "target": ".claude/agents/evidence-reviewer.md",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".claude/agents/isolated-builder.md",
+      "target": ".claude/agents/isolated-builder.md",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".claude/agents/landscape-sweep-worker.md",
+      "target": ".claude/agents/landscape-sweep-worker.md",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".claude/agents/security-reviewer.md",
+      "target": ".claude/agents/security-reviewer.md",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".claude/agents/semantic-evidence-reviewer.md",
+      "target": ".claude/agents/semantic-evidence-reviewer.md",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".claude/agents/semble-search.md",
+      "target": ".claude/agents/semble-search.md",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".claude/agents/source-scout.md",
+      "target": ".claude/agents/source-scout.md",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".claude/agents/stack-researcher.md",
+      "target": ".claude/agents/stack-researcher.md",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".claude/agents/stack-verifier.md",
+      "target": ".claude/agents/stack-verifier.md",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".codex/agents/codebase-memory-auditor.toml",
+      "target": ".codex/agents/codebase-memory-auditor.toml",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".codex/agents/codebase-memory-scout.toml",
+      "target": ".codex/agents/codebase-memory-scout.toml",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".codex/agents/codebase-memory.toml",
+      "target": ".codex/agents/codebase-memory.toml",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".codex/agents/semble-search.toml",
+      "target": ".codex/agents/semble-search.toml",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/agentsview.service",
+      "target": ".config/systemd/user/agentsview.service",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/ai-memory.service",
+      "target": ".config/systemd/user/ai-memory.service",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/cc-guest-memory-caps.service",
+      "target": ".config/systemd/user/cc-guest-memory-caps.service",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/cc-win-mem-reclaim.service",
+      "target": ".config/systemd/user/cc-win-mem-reclaim.service",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/clock-change-check.service",
+      "target": ".config/systemd/user/clock-change-check.service",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/clock-change-check.timer",
+      "target": ".config/systemd/user/clock-change-check.timer",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/clock-offset-check.service",
+      "target": ".config/systemd/user/clock-offset-check.service",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/clock-offset-check.timer",
+      "target": ".config/systemd/user/clock-offset-check.timer",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/dagu.service",
+      "target": ".config/systemd/user/dagu.service",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/disk-headroom-guard.service",
+      "target": ".config/systemd/user/disk-headroom-guard.service",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/disk-headroom-guard.timer",
+      "target": ".config/systemd/user/disk-headroom-guard.timer",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/docker.service",
+      "target": ".config/systemd/user/docker.service",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/git-maintenance@.service",
+      "target": ".config/systemd/user/git-maintenance@.service",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/git-maintenance@daily.timer",
+      "target": ".config/systemd/user/git-maintenance@daily.timer",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/git-maintenance@hourly.timer",
+      "target": ".config/systemd/user/git-maintenance@hourly.timer",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/git-maintenance@weekly.timer",
+      "target": ".config/systemd/user/git-maintenance@weekly.timer",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/headroom-ns2604-headroom.service",
+      "target": ".config/systemd/user/headroom-ns2604-headroom.service",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/hindsight-research.service",
+      "target": ".config/systemd/user/hindsight-research.service",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/jcodemunch-mcp-http.service",
+      "target": ".config/systemd/user/jcodemunch-mcp-http.service",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/mineru.service",
+      "target": ".config/systemd/user/mineru.service",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/native-agent-pages-refresh.path",
+      "target": ".local/state/native-agent-stack/research/fullspeed-20261008/g5-stars-gap/local-pages/native-agent-pages-refresh.path",
+      "scope": "Prior independently approved metadata-only canonical target associated by exact unique unit basename; reader verifies actual alias target before metadata access."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/native-agent-pages-refresh.service",
+      "target": ".local/state/native-agent-stack/research/fullspeed-20261008/g5-stars-gap/local-pages/native-agent-pages-refresh.service",
+      "scope": "Prior independently approved metadata-only canonical target associated by exact unique unit basename; reader verifies actual alias target before metadata access."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/native-agent-pages-refresh.timer",
+      "target": ".local/state/native-agent-stack/research/fullspeed-20261008/g5-stars-gap/local-pages/native-agent-pages-refresh.timer",
+      "scope": "Prior independently approved metadata-only canonical target associated by exact unique unit basename; reader verifies actual alias target before metadata access."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/native-agent-pages.service",
+      "target": ".local/state/native-agent-stack/research/fullspeed-20261008/g5-stars-gap/local-pages/native-agent-pages.service",
+      "scope": "Prior independently approved metadata-only canonical target associated by exact unique unit basename; reader verifies actual alias target before metadata access."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/native-grafana-monitoring-validation.service",
+      "target": ".config/systemd/user/native-grafana-monitoring-validation.service",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/native-node-exporter.service",
+      "target": ".config/systemd/user/native-node-exporter.service",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/native-nvidia-gpu-exporter.service",
+      "target": ".config/systemd/user/native-nvidia-gpu-exporter.service",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/native-process-exporter.service",
+      "target": ".config/systemd/user/native-process-exporter.service",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/native-stack-qmd-shared.service",
+      "target": ".config/systemd/user/native-stack-qmd-shared.service",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/native-wsl-distro-metrics.service",
+      "target": ".config/systemd/user/native-wsl-distro-metrics.service",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/native-wsl-distro-metrics.timer",
+      "target": ".config/systemd/user/native-wsl-distro-metrics.timer",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/ns2604-alertmanager.service",
+      "target": ".config/systemd/user/ns2604-alertmanager.service",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/ns2604-coop-checkpoint-backstop-20261009.service",
+      "target": ".config/systemd/user/ns2604-coop-checkpoint-backstop-20261009.service",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/ns2604-coop-checkpoint-backstop-20261009.timer",
+      "target": ".config/systemd/user/ns2604-coop-checkpoint-backstop-20261009.timer",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/ns2604-grafana.service",
+      "target": ".config/systemd/user/ns2604-grafana.service",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/ns2604-loki.service",
+      "target": ".config/systemd/user/ns2604-loki.service",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/ns2604-otelcol-contrib.service",
+      "target": ".config/systemd/user/ns2604-otelcol-contrib.service",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/ns2604-overnight-wsl-restart-20261009.service",
+      "target": ".config/systemd/user/ns2604-overnight-wsl-restart-20261009.service",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/ns2604-overnight-wsl-restart-20261009.timer",
+      "target": ".config/systemd/user/ns2604-overnight-wsl-restart-20261009.timer",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/ns2604-prometheus.service",
+      "target": ".config/systemd/user/ns2604-prometheus.service",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/ns2604-research-progress.service",
+      "target": ".config/systemd/user/ns2604-research-progress.service",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/ns2604-research-progress.timer",
+      "target": ".config/systemd/user/ns2604-research-progress.timer",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/ollama.service",
+      "target": ".config/systemd/user/ollama.service",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/omniroute.service",
+      "target": ".config/systemd/user/omniroute.service",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/openhands-job@.service",
+      "target": ".config/systemd/user/openhands-job@.service",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/paper-alert@.service",
+      "target": ".config/systemd/user/paper-alert@.service",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/paper-ext-20261006.service",
+      "target": ".config/systemd/user/paper-ext-20261006.service",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/paper-ext-20261006.timer",
+      "target": ".config/systemd/user/paper-ext-20261006.timer",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/paper-n2-ctl-20261008.service",
+      "target": ".config/systemd/user/paper-n2-ctl-20261008.service",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/paper-n2-ctl-20261008.timer",
+      "target": ".config/systemd/user/paper-n2-ctl-20261008.timer",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/paper-n2-gate-decision-20261009.service",
+      "target": ".config/systemd/user/paper-n2-gate-decision-20261009.service",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/paper-n2-gate-decision-20261009.timer",
+      "target": ".config/systemd/user/paper-n2-gate-decision-20261009.timer",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/paper-n2-gate-go-20261009.service",
+      "target": ".config/systemd/user/paper-n2-gate-go-20261009.service",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/paper-n2-gate-go-20261009.timer",
+      "target": ".config/systemd/user/paper-n2-gate-go-20261009.timer",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/paper-n2-open-20261008.service",
+      "target": ".config/systemd/user/paper-n2-open-20261008.service",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/paper-n2-open-20261008.timer",
+      "target": ".config/systemd/user/paper-n2-open-20261008.timer",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/paper-n2-open-20261009.service",
+      "target": ".config/systemd/user/paper-n2-open-20261009.service",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/paper-n2-open-20261009.timer",
+      "target": ".config/systemd/user/paper-n2-open-20261009.timer",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/paper-n2-wake-20261009.service",
+      "target": ".config/systemd/user/paper-n2-wake-20261009.service",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/paper-n2-wake-20261009.timer",
+      "target": ".config/systemd/user/paper-n2-wake-20261009.timer",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/paper-pre-20261006.service",
+      "target": ".config/systemd/user/paper-pre-20261006.service",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/paper-pre-20261006.timer",
+      "target": ".config/systemd/user/paper-pre-20261006.timer",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/paper-recover-a2-gate-20261006.service",
+      "target": ".config/systemd/user/paper-recover-a2-gate-20261006.service",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/paper-recover-a2-gate-20261006.timer",
+      "target": ".config/systemd/user/paper-recover-a2-gate-20261006.timer",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/qmd-mcp-http.service",
+      "target": ".config/systemd/user/qmd-mcp-http.service",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/restic-backup-nativestack2604.service",
+      "target": ".config/systemd/user/restic-backup-nativestack2604.service",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/restic-backup-nativestack2604.timer",
+      "target": ".config/systemd/user/restic-backup-nativestack2604.timer",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/restic-prune-nativestack2604.service",
+      "target": ".config/systemd/user/restic-prune-nativestack2604.service",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/restic-prune-nativestack2604.timer",
+      "target": ".config/systemd/user/restic-prune-nativestack2604.timer",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/secret-guard-canary.service",
+      "target": ".config/systemd/user/secret-guard-canary.service",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/secret-guard-canary.timer",
+      "target": ".config/systemd/user/secret-guard-canary.timer",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/stack-alert@.service",
+      "target": ".config/systemd/user/stack-alert@.service",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/vllm-embed.service",
+      "target": ".config/systemd/user/vllm-embed.service",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/wu-watch-20261006.service",
+      "target": ".config/systemd/user/wu-watch-20261006.service",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory_metadata",
+      "source": ".config/systemd/user/wu-watch-20261006.timer",
+      "target": ".config/systemd/user/wu-watch-20261006.timer",
+      "scope": "Prior independent metadata-only grant; snapshot does not stat or read any target."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/agentic-actions-auditor/SKILL.md",
+      "target": ".agents/skills/agentic-actions-auditor/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/codebase-design/SKILL.md",
+      "target": ".agents/skills/codebase-design/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/codeql/SKILL.md",
+      "target": ".agents/skills/codeql/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/diagnosing-bugs/SKILL.md",
+      "target": ".agents/skills/diagnosing-bugs/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/find-skills/SKILL.md",
+      "target": ".agents/skills/find-skills/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/fp-check/SKILL.md",
+      "target": ".agents/skills/fp-check/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/frontend-design/SKILL.md",
+      "target": ".agents/skills/frontend-design/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/gh-address-comments/SKILL.md",
+      "target": ".agents/skills/gh-address-comments/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/gh-fix-ci/SKILL.md",
+      "target": ".agents/skills/gh-fix-ci/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/hcom-agent-messaging/SKILL.md",
+      "target": ".agents/skills/hcom-agent-messaging/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/hf-cli/SKILL.md",
+      "target": ".agents/skills/hf-cli/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/iterative-retrieval/SKILL.md",
+      "target": ".agents/skills/iterative-retrieval/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/loki/SKILL.md",
+      "target": ".agents/skills/loki/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/mcp-builder/SKILL.md",
+      "target": ".agents/skills/mcp-builder/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/mineru/SKILL.md",
+      "target": ".agents/skills/mineru/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/modern-python/SKILL.md",
+      "target": ".agents/skills/modern-python/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/native-stack-research/SKILL.md",
+      "target": ".agents/skills/native-stack-research/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/native-stack-worker/SKILL.md",
+      "target": ".agents/skills/native-stack-worker/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/promptfoo-evals/SKILL.md",
+      "target": ".agents/skills/promptfoo-evals/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/property-based-testing/SKILL.md",
+      "target": ".agents/skills/property-based-testing/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/qmd/SKILL.md",
+      "target": ".agents/skills/qmd/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/sarif-parsing/SKILL.md",
+      "target": ".agents/skills/sarif-parsing/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/search-first/SKILL.md",
+      "target": ".agents/skills/search-first/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/security-audit/SKILL.md",
+      "target": ".agents/skills/security-audit/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/security-best-practices/SKILL.md",
+      "target": ".agents/skills/security-best-practices/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/security-threat-model/SKILL.md",
+      "target": ".agents/skills/security-threat-model/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/supply-chain-risk-auditor/SKILL.md",
+      "target": ".agents/skills/supply-chain-risk-auditor/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/tdd/SKILL.md",
+      "target": ".agents/skills/tdd/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/typesafe-ai/SKILL.md",
+      "target": ".agents/skills/typesafe-ai/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/variant-analysis/SKILL.md",
+      "target": ".agents/skills/variant-analysis/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".agents/skills/writing-for-agents/SKILL.md",
+      "target": ".agents/skills/writing-for-agents/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/agentic-actions-auditor/SKILL.md",
+      "target": ".agents/skills/agentic-actions-auditor/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/codebase-design/SKILL.md",
+      "target": ".agents/skills/codebase-design/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/codebase-memory/SKILL.md",
+      "target": ".claude/skills/codebase-memory/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/codeql/SKILL.md",
+      "target": ".agents/skills/codeql/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/diagnosing-bugs/SKILL.md",
+      "target": ".agents/skills/diagnosing-bugs/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/find-skills/SKILL.md",
+      "target": ".agents/skills/find-skills/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/fp-check/SKILL.md",
+      "target": ".agents/skills/fp-check/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/frontend-design/SKILL.md",
+      "target": ".agents/skills/frontend-design/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/gh-address-comments/SKILL.md",
+      "target": ".agents/skills/gh-address-comments/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/gh-fix-ci/SKILL.md",
+      "target": ".agents/skills/gh-fix-ci/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/hcom-agent-messaging/SKILL.md",
+      "target": ".agents/skills/hcom-agent-messaging/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/hf-cli/SKILL.md",
+      "target": ".agents/skills/hf-cli/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/iterative-retrieval/SKILL.md",
+      "target": ".agents/skills/iterative-retrieval/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/loki/SKILL.md",
+      "target": ".agents/skills/loki/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/mcp-builder/SKILL.md",
+      "target": ".agents/skills/mcp-builder/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/mineru/SKILL.md",
+      "target": ".agents/skills/mineru/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/modern-python/SKILL.md",
+      "target": ".agents/skills/modern-python/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/native-stack-research/SKILL.md",
+      "target": ".claude/skills/native-stack-research/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/native-stack-worker/SKILL.md",
+      "target": ".claude/skills/native-stack-worker/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/promptfoo-evals/SKILL.md",
+      "target": ".agents/skills/promptfoo-evals/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/property-based-testing/SKILL.md",
+      "target": ".agents/skills/property-based-testing/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/qmd/SKILL.md",
+      "target": ".agents/skills/qmd/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/sarif-parsing/SKILL.md",
+      "target": ".agents/skills/sarif-parsing/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/search-first/SKILL.md",
+      "target": ".agents/skills/search-first/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/security-audit/SKILL.md",
+      "target": ".agents/skills/security-audit/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/security-best-practices/SKILL.md",
+      "target": ".agents/skills/security-best-practices/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/security-threat-model/SKILL.md",
+      "target": ".agents/skills/security-threat-model/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/skill-creator/SKILL.md",
+      "target": ".claude/skills/skill-creator/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/supply-chain-risk-auditor/SKILL.md",
+      "target": ".agents/skills/supply-chain-risk-auditor/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/tdd/SKILL.md",
+      "target": ".agents/skills/tdd/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/typesafe-ai/SKILL.md",
+      "target": ".agents/skills/typesafe-ai/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/variant-analysis/SKILL.md",
+      "target": ".agents/skills/variant-analysis/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".claude/skills/writing-for-agents/SKILL.md",
+      "target": ".agents/skills/writing-for-agents/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".codex/skills/.system/imagegen/SKILL.md",
+      "target": ".codex/skills/.system/imagegen/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".codex/skills/.system/openai-docs/SKILL.md",
+      "target": ".codex/skills/.system/openai-docs/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".codex/skills/.system/review-agent/SKILL.md",
+      "target": ".codex/skills/.system/review-agent/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".codex/skills/.system/skill-creator/SKILL.md",
+      "target": ".codex/skills/.system/skill-creator/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".codex/skills/.system/skill-installer/SKILL.md",
+      "target": ".codex/skills/.system/skill-installer/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    },
+    {
+      "role": "architecture_inventory",
+      "source": ".codex/skills/codebase-memory/SKILL.md",
+      "target": ".codex/skills/codebase-memory/SKILL.md",
+      "scope": "Prior independent canonical grant associated by direct path or unique reviewed entry name; actual reader verifies canonical identity before content."
+    }
+  ],
+  "unapproved_names": [],
+  "limits": [
+    "Only names from explicitly named inventory parent directories are collected; no candidate stat, resolve, readlink, open, hash or config/body read.",
+    "Bindings reuse prior independently reviewed canonical grants; unknown names never generate permission. A reader must verify mapped canonical identity before content access."
+  ]
+}

@@ -1,13 +1,17 @@
 """Project published instance totals to recorded lanes without reading sessions.
 
 Only bounded co-op registry JSON and named parking/capacity receipts are read.
+The shared source_policy descriptor reader refuses protected components and
+symlinks before their bodies can contribute to source hashes or bindings.
 Window attribution remains uncertain when a recurrent alias has multiple lanes
 or no dated registry binding. No counters are inferred from missing telemetry.
 """
 
 import copy
 import hashlib
+import importlib.util
 import json
+import os
 import re
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -16,6 +20,9 @@ MAX_JSON_BYTES = 1_048_576
 MAX_RECEIPTS = 128
 OWNER = "native-agent-stack-1a"
 OWNER_DISPLAY = "owner session (reports to CC)"
+_POLICY_SPEC = importlib.util.spec_from_file_location("adoption_roles_source_policy", Path(__file__).with_name("source_policy.py"))
+_policy = importlib.util.module_from_spec(_POLICY_SPEC)
+_POLICY_SPEC.loader.exec_module(_policy)
 
 
 def _time(value):
@@ -24,7 +31,7 @@ def _time(value):
     try:
         parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
         return parsed.astimezone(timezone.utc) if parsed.tzinfo else None
-    except ValueError:
+    except (ValueError, OverflowError):
         return None
 
 
@@ -52,24 +59,58 @@ def _alias(name):
 
 
 def _read(path, sources, errors):
-    if not path.is_file() or path.is_symlink():
+    try:
+        # The shared native reader checks protected components and walks every
+        # ancestor with O_NOFOLLOW before opening the bounded regular leaf.
+        # Bytes, digest and file metadata all belong to that same descriptor.
+        with _policy._open_regular(path, limit=MAX_JSON_BYTES) as handle:
+            info = os.fstat(handle.fileno())
+            raw = handle.read(MAX_JSON_BYTES + 1)
+        if len(raw) > MAX_JSON_BYTES:
+            raise _policy.SourceReadLimitError("registry metadata exceeds its bound")
+    except FileNotFoundError:
         return {}
-    if path.stat().st_size > MAX_JSON_BYTES:
-        errors.append({"path": str(path), "status": "UNREPORTED: metadata exceeds bound"})
+    except (OSError, ValueError, OverflowError) as error:
+        errors.append({"path": str(path), "status": "UNREPORTED: registry input refused (" + type(error).__name__ + ")"})
         return {}
-    raw = path.read_bytes()
     source = {
         "path": str(path), "sha256": hashlib.sha256(raw).hexdigest(),
         "read_utc": _utc(datetime.now(timezone.utc)),
-        "mtime_utc": _utc(datetime.fromtimestamp(path.stat().st_mtime, timezone.utc)),
+        "mtime_utc": _utc(datetime.fromtimestamp(info.st_mtime, timezone.utc)),
     }
     sources.append(source)
     try:
         data = json.loads(raw)
-        return data if isinstance(data, dict) else {}
+        if not isinstance(data, dict):
+            raise ValueError("registry metadata must be an object")
+        return data
     except ValueError:
         errors.append({"path": str(path), "status": "UNREPORTED: malformed registry metadata"})
         return {}
+
+
+def _parking_paths(directory, errors):
+    """Enumerate the existing reviewed family without following its parent."""
+    if _policy.protected_path(directory.absolute().as_posix()):
+        errors.append({"path": str(directory), "status": "UNREPORTED: protected registry directory"})
+        return []
+    try:
+        with _policy._directory(directory) as descriptor:
+            names = os.listdir(descriptor)
+    except FileNotFoundError:
+        return []
+    except (OSError, ValueError) as error:
+        errors.append({"path": str(directory), "status": "UNREPORTED: registry directory refused (" + type(error).__name__ + ")"})
+        return []
+    names = sorted(name for name in names if name.startswith("park-") and name.endswith(".json"))
+    result = []
+    for name in names:
+        # The prefix does not make a credentials/protected basename eligible.
+        if _policy.protected_path(name) or _policy.protected_path(name.removeprefix("park-")):
+            errors.append({"path": str(directory / name), "status": "UNREPORTED: protected receipt name"})
+            continue
+        result.append(directory / name)
+    return result
 
 
 def _bindings(base):
@@ -106,7 +147,7 @@ def _bindings(base):
 
     parking = base / "notes/parking-20261008"
     capacity = base / "notes/capacity-ruling-20261008"
-    paths = sorted(parking.glob("park-*.json")) if parking.is_dir() else []
+    paths = _parking_paths(parking, errors)
     paths += [capacity / name for name in ("relay-receipt.json", "relay-receipt-dryrun.json", "relay-reserve-receipt.json")]
     if len(paths) > MAX_RECEIPTS:
         errors.append({"path": str(parking), "status": "UNREPORTED: receipt count exceeds bound"})

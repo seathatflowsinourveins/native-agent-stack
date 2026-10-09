@@ -1598,6 +1598,206 @@
     "SDK item versus raw identity is ambiguous in this metadata projection. Both categorical SDK roles permit this same exact reviewed file set; component identity, content, execution results and E2E acceptance remain separate native binding claims.",
     "Protected credential, environment, client-secret and mixed e2e-truth paths are denied before membership checks, including a hypothetical registration."
   ],
+  "architecture_inventory_aliases": [
+    {
+      "root": "user",
+      "path": ".claude/skills/agentic-actions-auditor/SKILL.md",
+      "target_root": "user",
+      "target_path": ".agents/skills/agentic-actions-auditor/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".claude/skills/codebase-design/SKILL.md",
+      "target_root": "user",
+      "target_path": ".agents/skills/codebase-design/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".claude/skills/codeql/SKILL.md",
+      "target_root": "user",
+      "target_path": ".agents/skills/codeql/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".claude/skills/diagnosing-bugs/SKILL.md",
+      "target_root": "user",
+      "target_path": ".agents/skills/diagnosing-bugs/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".claude/skills/find-skills/SKILL.md",
+      "target_root": "user",
+      "target_path": ".agents/skills/find-skills/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".claude/skills/fp-check/SKILL.md",
+      "target_root": "user",
+      "target_path": ".agents/skills/fp-check/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".claude/skills/frontend-design/SKILL.md",
+      "target_root": "user",
+      "target_path": ".agents/skills/frontend-design/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".claude/skills/gh-address-comments/SKILL.md",
+      "target_root": "user",
+      "target_path": ".agents/skills/gh-address-comments/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".claude/skills/gh-fix-ci/SKILL.md",
+      "target_root": "user",
+      "target_path": ".agents/skills/gh-fix-ci/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".claude/skills/hcom-agent-messaging/SKILL.md",
+      "target_root": "user",
+      "target_path": ".agents/skills/hcom-agent-messaging/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".claude/skills/hf-cli/SKILL.md",
+      "target_root": "user",
+      "target_path": ".agents/skills/hf-cli/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".claude/skills/iterative-retrieval/SKILL.md",
+      "target_root": "user",
+      "target_path": ".agents/skills/iterative-retrieval/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".claude/skills/loki/SKILL.md",
+      "target_root": "user",
+      "target_path": ".agents/skills/loki/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".claude/skills/mcp-builder/SKILL.md",
+      "target_root": "user",
+      "target_path": ".agents/skills/mcp-builder/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".claude/skills/mineru/SKILL.md",
+      "target_root": "user",
+      "target_path": ".agents/skills/mineru/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".claude/skills/modern-python/SKILL.md",
+      "target_root": "user",
+      "target_path": ".agents/skills/modern-python/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".claude/skills/promptfoo-evals/SKILL.md",
+      "target_root": "user",
+      "target_path": ".agents/skills/promptfoo-evals/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".claude/skills/property-based-testing/SKILL.md",
+      "target_root": "user",
+      "target_path": ".agents/skills/property-based-testing/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".claude/skills/qmd/SKILL.md",
+      "target_root": "user",
+      "target_path": ".agents/skills/qmd/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".claude/skills/sarif-parsing/SKILL.md",
+      "target_root": "user",
+      "target_path": ".agents/skills/sarif-parsing/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".claude/skills/search-first/SKILL.md",
+      "target_root": "user",
+      "target_path": ".agents/skills/search-first/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".claude/skills/security-audit/SKILL.md",
+      "target_root": "user",
+      "target_path": ".agents/skills/security-audit/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".claude/skills/security-best-practices/SKILL.md",
+      "target_root": "user",
+      "target_path": ".agents/skills/security-best-practices/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".claude/skills/security-threat-model/SKILL.md",
+      "target_root": "user",
+      "target_path": ".agents/skills/security-threat-model/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".claude/skills/supply-chain-risk-auditor/SKILL.md",
+      "target_root": "user",
+      "target_path": ".agents/skills/supply-chain-risk-auditor/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".claude/skills/tdd/SKILL.md",
+      "target_root": "user",
+      "target_path": ".agents/skills/tdd/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".claude/skills/typesafe-ai/SKILL.md",
+      "target_root": "user",
+      "target_path": ".agents/skills/typesafe-ai/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".claude/skills/variant-analysis/SKILL.md",
+      "target_root": "user",
+      "target_path": ".agents/skills/variant-analysis/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".claude/skills/writing-for-agents/SKILL.md",
+      "target_root": "user",
+      "target_path": ".agents/skills/writing-for-agents/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/native-agent-pages-refresh.path",
+      "target_root": "user",
+      "target_path": ".local/state/native-agent-stack/research/fullspeed-20261008/g5-stars-gap/local-pages/native-agent-pages-refresh.path"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/native-agent-pages-refresh.service",
+      "target_root": "user",
+      "target_path": ".local/state/native-agent-stack/research/fullspeed-20261008/g5-stars-gap/local-pages/native-agent-pages-refresh.service"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/native-agent-pages-refresh.timer",
+      "target_root": "user",
+      "target_path": ".local/state/native-agent-stack/research/fullspeed-20261008/g5-stars-gap/local-pages/native-agent-pages-refresh.timer"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/native-agent-pages.service",
+      "target_root": "user",
+      "target_path": ".local/state/native-agent-stack/research/fullspeed-20261008/g5-stars-gap/local-pages/native-agent-pages.service"
+    }
+  ],
   "architecture": {
   "architecture_inventory": [
     {

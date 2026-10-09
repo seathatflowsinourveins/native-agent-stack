@@ -256,6 +256,19 @@ class ArchitectureReads:
                 if record["root"] == "user" and role == "architecture_inventory" and PurePosixPath(relative).name != "SKILL.md":
                     raise SourcePolicyError("user inventory content is permitted only for exact SKILL.md assets")
                 self.allowed[role].add((record["root"], _relative(record.get("path"))))
+        self.inventory_aliases = {}
+        alias_rows = self.policy.document.get("architecture_inventory_aliases", [])
+        if not isinstance(alias_rows, list):
+            raise SourcePolicyError("inventory alias custody must be an exact reviewed list")
+        for row in alias_rows:
+            if not isinstance(row, dict) or row.get("root") not in self.roots or row.get("target_root") not in self.roots:
+                raise SourcePolicyError("inventory alias requires known roots")
+            source = (row["root"], _relative(row.get("path")))
+            target = (row["target_root"], _relative(row.get("target_path")))
+            role = "architecture_inventory" if source[1].endswith("/SKILL.md") else "architecture_inventory_metadata"
+            if target not in self.allowed.get(role, set()) or source in self.inventory_aliases:
+                raise SourcePolicyError("inventory alias target has no independent exact approval or is duplicated")
+            self.inventory_aliases[source] = (role, target)
         self.families = self.policy.document.get("architecture_families", {})
         reviewed = {"architecture_adoption_snapshot": {
             "root": "state", "directory": "coordination/ns2604-coop/notes/adoption-evidence-20261008",

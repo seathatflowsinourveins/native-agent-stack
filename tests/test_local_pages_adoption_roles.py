@@ -30,7 +30,7 @@ class AdoptionRolesTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
-        self.state = Path(self.temp.name)
+        self.state = Path(self.temp.name).resolve()
         self.base = self.state / "coordination/ns2604-coop"
 
     def write(self, relative, value):
@@ -149,6 +149,35 @@ class AdoptionRolesTests(unittest.TestCase):
         source["generated_utc"] = "invalid"
         with self.assertRaises(ValueError):
             roles.project(source, self.state)
+
+    def test_unrepresentable_registry_date_does_not_create_attribution(self):
+        self.write("lanes/hcom-lanes.json", {
+            "lane-a": {"name": "tag-mahe", "launched": "0001-01-01T00:00:00+01:00"},
+        })
+        result = roles.project(document({"mahe": row(2, 7)}), self.state)
+        self.assertIsNone(result["instances"]["role_map"]["mahe"])
+        self.assertEqual(result["document"]["codex_by_lane"]["unattributed instances"]["conversations"], 2)
+        self.assertEqual(result["document"]["codex_by_lane"]["unattributed instances"]["calls"], 7)
+
+    def test_nonobject_registry_remains_unreported(self):
+        path = self.base / "lanes/hcom-lanes.json"
+        path.parent.mkdir(parents=True)
+        path.write_text('[{"synthetic": "not a registry object"}]', encoding="utf-8")
+        result = roles.project(document({"mahe": row(2, 7)}), self.state)
+        self.assertIsNone(result["instances"]["role_map"]["mahe"])
+        self.assertEqual(result["document"]["codex_by_lane"]["unattributed instances"]["calls"], 7)
+        self.assertTrue(any("UNREPORTED" in error["status"] for error in result["source_errors"]))
+
+    def test_receipt_count_bound_applies_to_parking_and_capacity_together(self):
+        for index in range(129):
+            self.write(f"notes/parking-20261008/park-fixture-{index:03d}.json", {})
+        self.write("notes/capacity-ruling-20261008/relay-receipt.json", {
+            "at": "2026-10-08T12:00:00Z", "plan": [{"lane": "capacity-lane", "name": "tag-mahe"}],
+        })
+        result = roles.project(document({"mahe": row(2, 7)}), self.state)
+        self.assertIsNone(result["instances"]["role_map"]["mahe"])
+        self.assertEqual(result["sources"], [])
+        self.assertTrue(any("receipt count exceeds bound" in error["status"] for error in result["source_errors"]))
 
 
 if __name__ == "__main__":
