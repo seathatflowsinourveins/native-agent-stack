@@ -56,6 +56,8 @@ jobs:
           retention-days: 30
 
   macos-profile:
+    # Manual-only advisory smoke; see the 2026-10-09 addendum to the macOS CI decision.
+    if: github.event_name == 'workflow_dispatch'
     runs-on: macos-15
     timeout-minutes: 15
     permissions:

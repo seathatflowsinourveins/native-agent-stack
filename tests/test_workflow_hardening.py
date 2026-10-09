@@ -1745,14 +1745,24 @@ class AdoptionBootstrapMacosAdvisoryTests(unittest.TestCase):
                        "needs.changes.outputs.macos_tests": modules}
             # Raise directly so negative controls can exercise this helper with assertRaises.
             self.assertEqual(expression_truthy(evaluate_expression(condition, context)),
-                             event != "pull_request", f"{job_id}: macOS event policy failed for {context}")
+                             event in ("schedule", "workflow_dispatch"),
+                             f"{job_id}: macOS event policy failed for {context}")
 
-    def test_macos_jobs_skip_pull_requests_and_run_off_them(self):
+    def test_macos_jobs_run_only_on_schedule_and_workflow_dispatch(self):
         for job_id in ("validate-macos", "bootstrap-macos", "bootstrap-macos-brew"):
             with self.subTest(job=job_id):
                 header = self.job_map[job_id].split("\n    steps:\n", 1)[0]
                 self.assertRegex(header, r"(?m)^    needs: changes$", job_id)
                 self.assert_macos_event_policy(block_if(header), job_id)
+
+    def test_hardware_macos_profile_runs_only_on_workflow_dispatch(self):
+        text = (WORKFLOWS / "hardware-profile-smoke.yml").read_text(encoding="utf-8")
+        condition = block_if(jobs(text)["macos-profile"])
+        self.assertIsNotNone(condition, "macos-profile needs its job-level if:")
+        for event in ("pull_request", "push", "schedule", "workflow_dispatch"):
+            with self.subTest(event=event):
+                self.assertEqual(expression_truthy(evaluate_expression(condition, {"github.event_name": event})),
+                                 event == "workflow_dispatch")
 
     def test_nightly_schedule_is_daily_off_the_hour_and_half_hour(self):
         trigger = self.text.split("\non:\n", 1)[1].split("\njobs:\n", 1)[0]
@@ -1813,6 +1823,9 @@ class AdoptionBootstrapMacosAdvisoryTests(unittest.TestCase):
                     self.assert_macos_event_policy(without_status_function, job_id)
                 with self.assertRaises(AssertionError):
                     self.assert_macos_event_policy("${{ !cancelled() }}", job_id)
+                with self.assertRaises(AssertionError):
+                    self.assert_macos_event_policy("${{ !cancelled() && github.event_name != 'pull_request' }}",
+                                                   job_id)
 
     def test_changes_job_runs_only_on_pull_request_and_diffs_paths_matching_push(self):
         job = self.job_map["changes"]
@@ -2032,7 +2045,7 @@ class ValidateMacosGateEvaluationTests(unittest.TestCase):
         for event, result, macos, modules in self.cases():
             with self.subTest(event=event, result=result, macos=macos, modules=modules):
                 self.assertEqual(self.run_mode(self.gate, self.mode_text, event, result, macos, modules),
-                                 "skip" if event == "pull_request" else "full")
+                                 "full" if event in ("schedule", "workflow_dispatch") else "skip")
 
     def test_a_failed_changes_job_never_enables_macos_on_a_pull_request(self):
         for result in ("failure", "cancelled"):
@@ -2041,13 +2054,13 @@ class ValidateMacosGateEvaluationTests(unittest.TestCase):
                     self.assertEqual(self.run_mode(self.gate, self.mode_text, "pull_request", result, "false",
                                                    modules), "skip")
 
-    def test_control_the_previous_workflow_runs_prs_the_advisory_policy_skips(self):
+    def test_control_the_previous_workflow_runs_prs_and_pushes_the_daily_policy_skips(self):
         disagreements = {case for case in self.cases()
                          if self.run_mode(self.PRE_ADVISORY_GATE, self.PRE_ADVISORY_MODE, *case)
-                         != ("skip" if case[0] == "pull_request" else "full")}
+                         != ("full" if case[0] in ("schedule", "workflow_dispatch") else "skip")}
         previously_skipped = ("pull_request", "success", "false", "")
         self.assertEqual(disagreements, {case for case in self.cases()
-                                         if case[0] == "pull_request" and case != previously_skipped})
+                                         if case[0] in ("pull_request", "push") and case != previously_skipped})
         self.assertEqual(self.run_mode(self.PRE_ADVISORY_GATE, self.PRE_ADVISORY_MODE, "pull_request", "success",
                                        "true", ""), "full")
         self.assertEqual(self.run_mode(self.PRE_ADVISORY_GATE, self.PRE_ADVISORY_MODE, "pull_request", "success",
@@ -2222,10 +2235,9 @@ class MacosPatternsTests(unittest.TestCase):
 
 
 class PushNetTests(unittest.TestCase):
-    """The post-merge net (docs/decisions/2026-10-03-macos-ci-scope.md, D11): main's push run re-runs validate-macos
-    in full after a pull request whose run was skipped or scoped. It exists because nearly every merge touches
-    manifests/evidence.json, which the push `paths:` filter lists; the record's overturn 8 re-plans the net before
-    that entry leaves."""
+    """The evidence manifest retains the Linux post-merge net through the push paths filter and its explanatory
+    comment. The 2026-10-09 addendum to docs/decisions/2026-10-05-macos-ci-advisory.md moves macOS coverage to
+    daily schedules and manual dispatches; this path no longer enables a macOS push run."""
 
     def assert_push_net(self, text):
         trigger = "\n" + text.split("\non:\n", 1)[1].split("\n\njobs:", 1)[0]

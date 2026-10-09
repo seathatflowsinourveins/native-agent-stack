@@ -74,6 +74,11 @@ COMMENT_EVENTS = frozenset({"issue_comment", "pull_request_review", "pull_reques
 LOCAL_WORKFLOW_PREFIXES = ("./.github/workflows/", "$/.github/workflows/")
 # The one condition accepted as keeping a job or step off pull_request runs: a top-level `&&` conjunct of its `if:`.
 EXCLUDES_PULL_REQUEST = "github.event_name != 'pull_request'"
+EXCLUDES_PULL_REQUEST_CONJUNCTS = {
+    EXCLUDES_PULL_REQUEST,
+    "github.event_name == 'workflow_dispatch'",
+    "(github.event_name == 'schedule' || github.event_name == 'workflow_dispatch')",
+}
 # An exact allowlist, not a pattern: the standard GitHub-hosted runner labels in the ubuntu, windows and macos
 # families, as GitHub's "GitHub-hosted runners" reference lists them
 # (https://docs.github.com/en/actions/reference/runners/github-hosted-runners, "Standard GitHub-hosted runners for
@@ -513,7 +518,8 @@ def outside_literals(expression):
 def excludes_pull_request(condition):
     """True only when an `if:` provably keeps its job or step off pull_request runs: the decoded value is one bare
     expression, or one `${{ ... }}` expression from its first character to its last, and a top-level `&&` operand of
-    it is EXCLUDES_PULL_REQUEST. actions/runner splits any other value holding `${{` into literal and expression
+    it is one of EXCLUDES_PULL_REQUEST_CONJUNCTS (the explicit exclusion or an enumerated non-PR event allowlist).
+    actions/runner splits any other value holding `${{` into literal and expression
     segments and evaluates it as a `format()` string (TemplateReader.ParseScalar,
     src/Sdk/DTObjectTemplating/ObjectTemplating/TemplateReader.cs at d7bc179baf11), and a non-empty string is truthy:
     `${{ !cancelled() }} && github.event_name != 'pull_request'` excludes nothing, and neither does a whole expression
@@ -536,7 +542,7 @@ def excludes_pull_request(condition):
     if bare is None or "${{" in bare or "}}" in bare:
         return False  # not an expression GitHub can parse
     conjuncts = top_level_conjuncts(expression)
-    return conjuncts is not None and EXCLUDES_PULL_REQUEST in conjuncts
+    return conjuncts is not None and any(part in EXCLUDES_PULL_REQUEST_CONJUNCTS for part in conjuncts)
 
 
 def writes(permissions):
@@ -1288,6 +1294,10 @@ class PlantedViolationTests(unittest.TestCase):
         accepted = ("github.event_name != 'pull_request'",
                     "${{ github.event_name != 'pull_request' }}",
                     "${{ !cancelled() && github.event_name != 'pull_request' }}",
+                    "github.event_name == 'workflow_dispatch'",
+                    "${{ github.event_name == 'workflow_dispatch' }}",
+                    "${{ !cancelled() && (github.event_name == 'schedule' || "
+                    "github.event_name == 'workflow_dispatch') }}",
                     "github.event_name != 'pull_request' && steps.restore.outputs.cache-hit != 'true'",
                     # Repair round 2: whitespace around a bare expression is insignificant, and inside a string
                     # literal of an expression a `}}` ends nothing and a `${{` opens nothing
@@ -1297,6 +1307,15 @@ class PlantedViolationTests(unittest.TestCase):
                     "${{ github.event_name != 'pull_request' && contains('a}}b', 'a') }}",
                     "${{ github.event_name != 'pull_request' && !contains(github.head_ref, '${{') }}")
         refused = ("${{ !cancelled() }} && github.event_name != 'pull_request'",
+                   "${{ !cancelled() }} && github.event_name == 'workflow_dispatch'",
+                   " ${{ github.event_name == 'workflow_dispatch' }}",
+                   "${{ github.event_name == 'workflow_dispatch' }} ",
+                   "${{ github.event_name == 'workflow_dispatch' }}\n",
+                   "${{ always() || github.event_name == 'workflow_dispatch' }}",
+                   "${{ !cancelled() && (github.event_name == 'schedule' || "
+                   "github.event_name == 'pull_request') }}",
+                   "${{ !cancelled() && (github.event_name == 'schedule' || "
+                   "github.event_name == 'workflow_dispatch') || github.event_name == 'pull_request' }}",
                    "github.event_name != 'pull_request' && ${{ !cancelled() }}",
                    "${{ !cancelled() }} && ${{ github.event_name != 'pull_request' }}",
                    "${{ always() || github.event_name != 'pull_request' }}",

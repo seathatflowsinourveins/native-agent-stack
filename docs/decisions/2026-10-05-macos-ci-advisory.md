@@ -172,3 +172,49 @@ The existing expression oracle retains its citations to the GitHub runner
 operator sources. The search-first and tdd skills guided source selection
 and the red-then-green controls; they are process guidance, not hosted
 execution evidence.
+
+## Addendum: daily-only macOS CI (2026-10-09)
+
+The owner selected daily-only macOS CI on 2026-10-09, relayed by the command
+center at approximately 04:51 UTC. This supersedes the after-merge macOS
+execution described above. `validate-macos`, `bootstrap-macos` and
+`bootstrap-macos-brew` now run only on the existing daily **06:47 UTC**
+schedule or manual dispatch, using:
+
+```yaml
+if: ${{ !cancelled() && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') }}
+```
+
+`hardware-profile-smoke.yml:macos-profile` runs only on manual dispatch.
+Pull requests continue without macOS jobs; the Linux jobs and required-check
+policy retain their behavior. A daily macOS failure is still fixed forward
+under the existing seven-day overturn condition, then checked by the next
+scheduled or manually dispatched macOS run.
+
+The reason is the October 2026 metered-usage screenshot supplied by the owner
+and relayed with this decision (evidence class: `source_review`):
+
+| October day | Metered minutes |
+| --- | ---: |
+| 1 | 5,377 |
+| 2 | 3,599 |
+| 3 | 6,699 |
+| 4 | 4,712 |
+| 5 | 4,640 |
+| 6 | 684 |
+| 7 | 1,204 |
+| 8 | 2,182 |
+
+The screenshot reports **$0 billed**. Removing repeated merge and PR macOS
+runs is expected to reduce macOS minutes by about **80–90%**; this estimate
+has no measured post-change result yet. The reported daily totals motivate
+the cadence change and do not establish that estimate.
+
+The implementation follows the documented GitHub Actions job conditions,
+status functions and schedule at
+[`github/docs@9f651797567230e844373870fce8b14427ad47ad`](https://github.com/github/docs/tree/9f651797567230e844373870fce8b14427ad47ad),
+read on 2026-10-09: the job-condition reusable, `expressions.md` status-check
+functions, and the schedule-event references named in **SOTA sources** above.
+The existing expression oracle checks the four event types and cancellation
+locally; scheduled execution on the default branch remains hosted evidence
+to observe after landing.

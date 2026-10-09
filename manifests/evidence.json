@@ -5011,8 +5011,8 @@
     },
     {
       "path": ".github/workflows/adoption-bootstrap.yml",
-      "sha256": "96f4e9e7843827fa3e8689839fdb37d0adb98e37198c187f68f286a0880a301d",
-      "bytes": 56981
+      "sha256": "e978791dde69c79a4bd5d7e1dde1de8840c78d7dc0801b873786f15454ff65a4",
+      "bytes": 56917
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
@@ -5031,8 +5031,8 @@
     },
     {
       "path": ".github/workflows/hardware-profile-smoke.yml",
-      "sha256": "17264678834e8c4ef47f0bc0820a980310eb71676db5f07500358119b53b3753",
-      "bytes": 5951
+      "sha256": "7255aff34e5d6c6b1e3c8771a7653af9cb16aac9e9e5985750664e7fff6427f0",
+      "bytes": 6088
     },
     {
       "path": ".github/workflows/native-foundation-e2e.yml",
@@ -58822,13 +58822,13 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "02e5704fabec34058b2cd8645a086f6dbb2fbabe23ecc6bec755d15758106607",
-      "bytes": 165554
+      "sha256": "8ea69d5cbbbc53d0b27ca680157baace78829547a09f257361693cdec80d2b44",
+      "bytes": 166440
     },
     {
       "path": "tests/test_workflow_policy.py",
-      "sha256": "347ea2553d9e2f436965d1cbfbd3cfab6b507d9aa72787404c117cc7330e237e",
-      "bytes": 83757
+      "sha256": "1474beefebc5d5f83e43f25b0cba2264d5aa231cac59ec18214858c0eccdd4b0",
+      "bytes": 85061
     },
     {
       "path": "tests/test_workflow_security.py",
