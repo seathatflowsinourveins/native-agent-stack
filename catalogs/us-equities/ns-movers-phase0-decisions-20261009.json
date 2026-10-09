@@ -1,0 +1,198 @@
+{
+  "schema_version": 1,
+  "id": "ns-movers-phase0-decisions-20261009",
+  "recorded_on": "2026-10-09",
+  "scope": "Explicit source-reviewed repository-decision supplement from us-equities-trading Phase0 GRANDrev8 packet; no installed capability, original-history, strategy fit/E2E or scientific release inferred.",
+  "source_packet": {
+    "repository": "seathatflowsinourveins/us-equities-trading",
+    "pr": 16,
+    "commit": "00b935b4f4ebd76494cb995d4375638264b82bc9",
+    "path": "docs/research/ns-movers/decisions.json",
+    "sha256": "9662e3003d53a3f9a6951f46c606454d4b8145d92fdc5a9e04419bc2c0061d92",
+    "carrier_path": "docs/research/ns-movers/SHA256SUMS",
+    "protocol_sha256": "949691ee36063fccf771aa4acf0331955f1ad1bc9eab947ccdd18a696630cd1e",
+    "grand_review_path": "docs/research/ns-movers/grand-package-review.json"
+  },
+  "source_package": {
+    "sha256": "cdf568b8484fe252c2474d685cde7b8814100c780c6e24c1d8f2ae85a8bbda95",
+    "grand_revision": 8,
+    "desk_revision": 212,
+    "built": "2026-10-07 ~22:55 ET",
+    "access": "Read in place; no package bytes/owner text/code/datasets copied into this repository."
+  },
+  "registration_authority": "CCdecision around2026-10-09T08:40Z: one small draft registration PR in assigned native-agent-stack worktree, lane:shared, native registrar/validator;5f trading ack routed throughco-op/CC. No landing cue supplied.",
+  "decisions": [
+    {
+      "id": "NSM-NAUTILUS",
+      "repository": "nautechsystems/nautilus_trader",
+      "source_commit": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+      "version": "2.0.0rc5",
+      "decision": "selected engine; source API and release verified; new study execution NOT_RUN",
+      "review": "source_review_and_existing_receipt_leads_only",
+      "execution": "NOT_RUN_BY_NS_MOVERS",
+      "phase0_install": false,
+      "source_paths": [
+        "crates/backtest/src/engine.rs",
+        "crates/backtest/src/python/engine.rs",
+        "docs/api_reference/backtest.md"
+      ],
+      "review_level": "source_review; exact scope in source_packet, no E2E upgrade",
+      "evidence_level": "source_review_or_Phase0_synthetic_structural_only",
+      "source_packet_pointer": "docs/research/ns-movers/decisions.json#/decisions/0"
+    },
+    {
+      "id": "NSM-LEAN",
+      "repository": "QuantConnect/Lean",
+      "source_commit": "80e7843f645673bcbeaab963049f76f20f6785e1",
+      "version": "master snapshot 2026-10-09",
+      "decision": "source comparison snapshot; execute only the installed accepted LEAN engine after a reviewed pin/fixture check, not an automatic upgrade",
+      "review": "source_review_and_existing_receipt_leads_only",
+      "execution": "NOT_RUN_BY_NS_MOVERS",
+      "phase0_install": false,
+      "source_paths": [
+        "Common/Data/Auxiliary/MapFile.cs",
+        "Common/Data/Auxiliary/FactorFile.cs"
+      ],
+      "review_level": "source_review; exact scope in source_packet, no E2E upgrade",
+      "evidence_level": "source_review_or_Phase0_synthetic_structural_only",
+      "source_packet_pointer": "docs/research/ns-movers/decisions.json#/decisions/1"
+    },
+    {
+      "id": "NSM-SKFOLIO",
+      "repository": "skfolio/skfolio",
+      "source_commit": "8a399757200d46b1ac1bff1b3daa71d9f0fa4170",
+      "version": "1.7.0 installed route",
+      "decision": "reuse native WalkForward after exact study API/session/purge acceptance; v1.2.9 precedent c99fcf71349e2df4a7a1033ee85ca2e9ced9abee; new v1.7.1 watched, not installed",
+      "review": "source_review_and_existing_receipt_leads_only",
+      "execution": "NOT_RUN_BY_NS_MOVERS",
+      "phase0_install": false,
+      "source_paths": [
+        "src/skfolio/model_selection/_walk_forward.py",
+        "tests/test_model_selection/test_walk_forward.py"
+      ],
+      "review_level": "source_review; exact scope in source_packet, no E2E upgrade",
+      "evidence_level": "source_review_or_Phase0_synthetic_structural_only",
+      "source_packet_pointer": "docs/research/ns-movers/decisions.json#/decisions/2"
+    },
+    {
+      "id": "NSM-EDGARTOOLS",
+      "repository": "dgunning/edgartools",
+      "source_commit": "abe44344c56cf4bfb5443e0debca7e39342f6e7a",
+      "version": "5.58.0 retained reference",
+      "decision": "upstream CIK/ticker/filing features first; current 5.61.1 release verified, installed study pin must be read from locked runtime in Phase 1; no custom parser",
+      "review": "source_review_and_existing_receipt_leads_only",
+      "execution": "NOT_RUN_BY_NS_MOVERS",
+      "phase0_install": false,
+      "source_paths": [
+        "edgar"
+      ],
+      "review_level": "source_review; exact scope in source_packet, no E2E upgrade",
+      "evidence_level": "source_review_or_Phase0_synthetic_structural_only",
+      "source_packet_pointer": "docs/research/ns-movers/decisions.json#/decisions/3"
+    },
+    {
+      "id": "NSM-LIGHTGBM",
+      "repository": "microsoft/LightGBM",
+      "source_commit": "8f7036f03627054d5a54a6f965b13f4b9ff2cb63",
+      "version": "4.7.0 retained native example",
+      "decision": "existing native regression example is a lead, not binary-study acceptance; exact classifier parameters/determinism acceptance before fit",
+      "review": "source_review_and_existing_receipt_leads_only",
+      "execution": "NOT_RUN_BY_NS_MOVERS",
+      "phase0_install": false,
+      "source_paths": [
+        "examples/python-guide/simple_example.py"
+      ],
+      "review_level": "source_review; exact scope in source_packet, no E2E upgrade",
+      "evidence_level": "source_review_or_Phase0_synthetic_structural_only",
+      "source_packet_pointer": "docs/research/ns-movers/decisions.json#/decisions/4"
+    },
+    {
+      "id": "NSM-DUCKDB",
+      "repository": "duckdb/duckdb",
+      "decision": "Reuse installed native immutable Parquet/SQL as-of selection first; source/runtime version and actual study temporal tests required in Phase1, no custom engine.",
+      "review": "prior_upstream_adoption_lead_no_new_acceptance",
+      "execution": "NOT_RUN_BY_NS_MOVERS",
+      "phase0_install": false,
+      "review_level": "source_review; exact scope in source_packet, no E2E upgrade",
+      "evidence_level": "source_review_or_Phase0_synthetic_structural_only",
+      "source_packet_pointer": "docs/research/ns-movers/decisions.json#/decisions/5"
+    },
+    {
+      "id": "NSM-ARCH",
+      "repository": "bashtage/arch",
+      "decision": "Reuse installed arch 8.0.0 CircularBlockBootstrap for session-grouped inference after native exact block/determinism test; not reimplement bootstrap.",
+      "review": "R3 pinned native-assignment lead; study inference not accepted",
+      "execution": "NOT_RUN_BY_NS_MOVERS",
+      "phase0_install": false,
+      "review_level": "source_review; exact scope in source_packet, no E2E upgrade",
+      "evidence_level": "source_review_or_Phase0_synthetic_structural_only",
+      "source_packet_pointer": "docs/research/ns-movers/decisions.json#/decisions/6"
+    },
+    {
+      "id": "NSM-ALPACA",
+      "repository": "alpacahq/alpaca-py",
+      "decision": "Official SDK only if owner selects a licensed data leg. Current routing/asset status is not a historical universe; indicative options do not replace OPRA.",
+      "review": "official_data_docs_read_2026-10-09; historical universe/rights unaccepted",
+      "execution": "NOT_RUN_BY_NS_MOVERS",
+      "phase0_install": false,
+      "source_commit": "cc4cb3b7ba50ae250e621983c2779047fb16bb28",
+      "source_paths": [
+        "alpaca/trading/models.py:48",
+        "alpaca/data/models/snapshots.py:89"
+      ],
+      "review_level": "source_review; exact scope in source_packet, no E2E upgrade",
+      "evidence_level": "source_review_or_Phase0_synthetic_structural_only",
+      "source_packet_pointer": "docs/research/ns-movers/decisions.json#/decisions/7"
+    },
+    {
+      "id": "NSM-SKLEARN",
+      "repository": "scikit-learn/scikit-learn",
+      "decision": "Use installed upstream logistic/preprocessing/calibration APIs after exact locked source and parameter acceptance; no new model implementation.",
+      "review": "methodology proposal; installed pin/native parameter proof pending Phase1",
+      "execution": "NOT_RUN_BY_NS_MOVERS",
+      "phase0_install": false,
+      "review_level": "source_review; exact scope in source_packet, no E2E upgrade",
+      "evidence_level": "source_review_or_Phase0_synthetic_structural_only",
+      "source_packet_pointer": "docs/research/ns-movers/decisions.json#/decisions/8"
+    },
+    {
+      "id": "NSM-JSONSCHEMA",
+      "repository": "python-jsonschema/jsonschema",
+      "version": "4.26.0",
+      "decision": "Use upstream Draft202012Validator for Phase0 schema/meta-schema validation in an isolated uv environment; no dependency or runtime upgrade in this PR.",
+      "review": "PyPI release metadata verified 2026-10-09; actual validation receipt required",
+      "execution": "PHASE0_SCHEMA_STRUCTURAL_CHECKS_PASSED_NO_EMPIRICAL_ACCEPTANCE",
+      "phase0_install": "isolated_validation_tool_only",
+      "review_level": "source_review; exact scope in source_packet, no E2E upgrade",
+      "evidence_level": "source_review_or_Phase0_synthetic_structural_only",
+      "source_packet_pointer": "docs/research/ns-movers/decisions.json#/decisions/9"
+    },
+    {
+      "id": "NSM-DESK-S53",
+      "repository": "seathatflowsinourveins/extreme-gainer-desk",
+      "source_commit": "379d8d8093c3109173065d67818e996966433f10",
+      "source_paths": [
+        "desk/screen/FACTORS_MANIFEST.md",
+        "desk/screen/factors.py",
+        "desk/screen/history_legs.py"
+      ],
+      "decision": "Existing upstream31-factor interface first, after supported native tests and original-release/identity/actions/coverage acceptance. No package copy/scanner rebuild/inherited weights/performance; crosswalk in grand-package-review.json.",
+      "review": "source_review_only_2026-10-09_GRANDrev8_deskrev212",
+      "execution": "NOT_RUN_BY_NS_MOVERS",
+      "phase0_install": false,
+      "review_level": "source_review; exact scope in source_packet, no E2E upgrade",
+      "evidence_level": "source_review_or_Phase0_synthetic_structural_only",
+      "source_packet_pointer": "docs/research/ns-movers/decisions.json#/decisions/10"
+    }
+  ],
+  "boundaries": [
+    "Only repository-identity decision union registration; no financial purchase/access, runtime/code/strategy order change.",
+    "All paid/right/holdout/source-original-publication/terminal gates remain Phase0 pending as recorded in source packet.",
+    "Required read/CI/pre-cue/CC cue and5f trading ack mandatory; draft/registrar/validator success alone is not accepted scientific freeze."
+  ],
+  "references": [
+    "native-agent-stack@22e3ef6ffd53b09f3cb335c46f7c696093521274:scripts/catalog_decisions.py",
+    "native-agent-stack@22e3ef6ffd53b09f3cb335c46f7c696093521274:blueprints/us-equities/AGENTS.md",
+    "us-equities-trading@00b935b4f4ebd76494cb995d4375638264b82bc9:docs/research/ns-movers/sources.json"
+  ]
+}

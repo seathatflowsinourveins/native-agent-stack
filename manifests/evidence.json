@@ -17292,8 +17292,8 @@
     },
     {
       "path": "catalogs/us-equities/decision-index.json",
-      "sha256": "7140c17550cb18275f23c60392867cb55d2372ea9ece664e55bec98d110cb991",
-      "bytes": 765252
+      "sha256": "c34abe51f1afd85ccaf6ce042b9ad7c271f00dcda5184b805c811725a675ec53",
+      "bytes": 772315
     },
     {
       "path": "catalogs/us-equities/engines-strategies.json",
@@ -17347,7 +17347,7 @@
     },
     {
       "path": "catalogs/us-equities/manifest.json",
-      "sha256": "6c63c214d8784920231b55099cfaf50aa05e2cce4fd249c34f102ad1b7271fe2",
+      "sha256": "75bb7c9df961e59f920b63993bc964e6c09f46607fcf5f49dde6456d3598b9d5",
       "bytes": 3215
     },
     {
@@ -17379,6 +17379,11 @@
       "path": "catalogs/us-equities/native-workflows.md",
       "sha256": "efa0e68d34acfb790018eeb9a55c3d4e6c2eb9de4c7197cf3de3edcbbbd97768",
       "bytes": 12326
+    },
+    {
+      "path": "catalogs/us-equities/ns-movers-phase0-decisions-20261009.json",
+      "sha256": "ae197a4b944eac506df3db92ff67b173995517b1e802e6654e1713c9366734ab",
+      "bytes": 10956
     },
     {
       "path": "catalogs/us-equities/paper-practice-20260921.md",

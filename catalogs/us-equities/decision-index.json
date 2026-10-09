@@ -369,6 +369,12 @@
       "kind": "research_supplement"
     },
     {
+      "path": "catalogs/us-equities/ns-movers-phase0-decisions-20261009.json",
+      "collection": "/decisions",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
       "path": "catalogs/us-equities/security-identity-review.json",
       "collection": "/decisions",
       "repository_field": "repository",
@@ -413,16 +419,16 @@
     "zep-ai/graphiti": "getzep/graphiti"
   },
   "counts": {
-    "repositories": 875,
+    "repositories": 878,
     "public_star_repositories": 357,
-    "beyond_public_stars": 518,
-    "references": 2073,
+    "beyond_public_stars": 521,
+    "references": 2084,
     "repositories_by_record_type": {
       "catalog_card": 148,
       "component_record": 70,
       "legacy_candidate": 34,
       "public_star": 357,
-      "research_supplement": 584,
+      "research_supplement": 588,
       "star_review": 357
     }
   },
@@ -1622,6 +1628,15 @@
           "id": "mover-v3-alpaca-py-order-classes",
           "decision": "add_execution_method_candidate",
           "evidence_level": "official_docs_metadata"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/ns-movers-phase0-decisions-20261009.json",
+          "pointer": "/decisions/7",
+          "id": "NSM-ALPACA",
+          "decision": "Official SDK only if owner selects a licensed data leg. Current routing/asset status is not a historical universe; indicative options do not replace OPRA.",
+          "review_level": "source_review; exact scope in source_packet, no E2E upgrade",
+          "evidence_level": "source_review_or_Phase0_synthetic_structural_only"
         },
         {
           "kind": "research_supplement",
@@ -3621,6 +3636,15 @@
           "id": "arch",
           "decision": "conditional",
           "evidence_level": "source_review"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/ns-movers-phase0-decisions-20261009.json",
+          "pointer": "/decisions/6",
+          "id": "NSM-ARCH",
+          "decision": "Reuse installed arch 8.0.0 CircularBlockBootstrap for session-grouped inference after native exact block/determinism test; not reimplement bootstrap.",
+          "review_level": "source_review; exact scope in source_packet, no E2E upgrade",
+          "evidence_level": "source_review_or_Phase0_synthetic_structural_only"
         }
       ]
     },
@@ -6436,6 +6460,15 @@
         },
         {
           "kind": "research_supplement",
+          "path": "catalogs/us-equities/ns-movers-phase0-decisions-20261009.json",
+          "pointer": "/decisions/3",
+          "id": "NSM-EDGARTOOLS",
+          "decision": "upstream CIK/ticker/filing features first; current 5.61.1 release verified, installed study pin must be read from locked runtime in Phase 1; no custom parser",
+          "review_level": "source_review; exact scope in source_packet, no E2E upgrade",
+          "evidence_level": "source_review_or_Phase0_synthetic_structural_only"
+        },
+        {
+          "kind": "research_supplement",
           "path": "catalogs/us-equities/simulation-data-review.json",
           "pointer": "/decisions/0",
           "decision": "adopt_native_parser_bounded",
@@ -6895,6 +6928,15 @@
           "pointer": "/decisions/1",
           "decision": "retain_native_observation_ledger",
           "evidence_level": "native_offline_artifacts"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/ns-movers-phase0-decisions-20261009.json",
+          "pointer": "/decisions/5",
+          "id": "NSM-DUCKDB",
+          "decision": "Reuse installed native immutable Parquet/SQL as-of selection first; source/runtime version and actual study temporal tests required in Phase1, no custom engine.",
+          "review_level": "source_review; exact scope in source_packet, no E2E upgrade",
+          "evidence_level": "source_review_or_Phase0_synthetic_structural_only"
         },
         {
           "kind": "component_record",
@@ -12830,6 +12872,25 @@
       ]
     },
     {
+      "repository": "https://github.com/microsoft/lightgbm",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/ns-movers-phase0-decisions-20261009.json",
+          "pointer": "/decisions/4",
+          "id": "NSM-LIGHTGBM",
+          "decision": "existing native regression example is a lead, not binary-study acceptance; exact classifier parameters/determinism acceptance before fit",
+          "review_level": "source_review; exact scope in source_packet, no E2E upgrade",
+          "evidence_level": "source_review_or_Phase0_synthetic_structural_only"
+        }
+      ]
+    },
+    {
       "repository": "https://github.com/microsoft/llmlingua",
       "aliases": [],
       "public_star": false,
@@ -14000,6 +14061,15 @@
           "id": "nautilus-ibkr-adapter",
           "decision": "default",
           "evidence_level": "source_review"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/ns-movers-phase0-decisions-20261009.json",
+          "pointer": "/decisions/0",
+          "id": "NSM-NAUTILUS",
+          "decision": "selected engine; source API and release verified; new study execution NOT_RUN",
+          "review_level": "source_review; exact scope in source_packet, no E2E upgrade",
+          "evidence_level": "source_review_or_Phase0_synthetic_structural_only"
         },
         {
           "kind": "research_supplement",
@@ -17235,6 +17305,25 @@
       ]
     },
     {
+      "repository": "https://github.com/python-jsonschema/jsonschema",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/ns-movers-phase0-decisions-20261009.json",
+          "pointer": "/decisions/9",
+          "id": "NSM-JSONSCHEMA",
+          "decision": "Use upstream Draft202012Validator for Phase0 schema/meta-schema validation in an isolated uv environment; no dependency or runtime upgrade in this PR.",
+          "review_level": "source_review; exact scope in source_packet, no E2E upgrade",
+          "evidence_level": "source_review_or_Phase0_synthetic_structural_only"
+        }
+      ]
+    },
+    {
       "repository": "https://github.com/qdrant/fastembed",
       "aliases": [],
       "public_star": false,
@@ -17418,6 +17507,15 @@
           "id": "lean",
           "decision": "default",
           "evidence_level": "native_proven"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/ns-movers-phase0-decisions-20261009.json",
+          "pointer": "/decisions/1",
+          "id": "NSM-LEAN",
+          "decision": "source comparison snapshot; execute only the installed accepted LEAN engine after a reviewed pin/fixture check, not an automatic upgrade",
+          "review_level": "source_review; exact scope in source_packet, no E2E upgrade",
+          "evidence_level": "source_review_or_Phase0_synthetic_structural_only"
         },
         {
           "kind": "research_supplement",
@@ -18722,7 +18820,8 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "catalog_card"
+        "catalog_card",
+        "research_supplement"
       ],
       "references": [
         {
@@ -18732,6 +18831,15 @@
           "id": "scikit-learn",
           "decision": "conditional",
           "evidence_level": "source_review"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/ns-movers-phase0-decisions-20261009.json",
+          "pointer": "/decisions/8",
+          "id": "NSM-SKLEARN",
+          "decision": "Use installed upstream logistic/preprocessing/calibration APIs after exact locked source and parameter acceptance; no new model implementation.",
+          "review_level": "source_review; exact scope in source_packet, no E2E upgrade",
+          "evidence_level": "source_review_or_Phase0_synthetic_structural_only"
         }
       ]
     },
@@ -18858,6 +18966,25 @@
           "decision": "alternative",
           "review_level": "source_review",
           "review_depth": "readme_license_overview"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/seathatflowsinourveins/extreme-gainer-desk",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/ns-movers-phase0-decisions-20261009.json",
+          "pointer": "/decisions/10",
+          "id": "NSM-DESK-S53",
+          "decision": "Existing upstream31-factor interface first, after supported native tests and original-release/identity/actions/coverage acceptance. No package copy/scanner rebuild/inherited weights/performance; crosswalk in grand-package-review.json.",
+          "review_level": "source_review; exact scope in source_packet, no E2E upgrade",
+          "evidence_level": "source_review_or_Phase0_synthetic_structural_only"
         }
       ]
     },
@@ -19418,6 +19545,15 @@
           "id": "skfolio",
           "decision": "conditional",
           "evidence_level": "native_proven"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/ns-movers-phase0-decisions-20261009.json",
+          "pointer": "/decisions/2",
+          "id": "NSM-SKFOLIO",
+          "decision": "reuse native WalkForward after exact study API/session/purge acceptance; v1.2.9 precedent c99fcf71349e2df4a7a1033ee85ca2e9ced9abee; new v1.7.1 watched, not installed",
+          "review_level": "source_review; exact scope in source_packet, no E2E upgrade",
+          "evidence_level": "source_review_or_Phase0_synthetic_structural_only"
         },
         {
           "kind": "component_record",
