@@ -304,6 +304,13 @@ class PullRequestReviewShapeTests(unittest.TestCase):
         upload = step("Keep the numeric usage record")
         self.assertTrue(upload["with"]["path"].endswith("/pr-review-usage/usage.json"))
 
+    def test_the_usage_artifact_is_named_for_the_run_and_its_attempt(self):
+        # The decision record names the artifact claude-pr-review-usage-<run id>-<attempt>; the path check above
+        # does not read the name, so the exact name is pinned here.
+        upload = step("Keep the numeric usage record")
+        self.assertEqual(upload["with"]["name"],
+                         "claude-pr-review-usage-${{ github.run_id }}-${{ github.run_attempt }}")
+
 
 @unittest.skipUnless(shutil.which("jq") and shutil.which("git"),
                      "jq and git are needed to run the workflow's steps")

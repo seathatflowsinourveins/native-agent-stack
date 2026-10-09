@@ -92,11 +92,36 @@ both `.git/config` files were denied; no hook ran; neither instruction file chan
 (`evidence/artifacts/claude-actions-fence-smoke-20261008/receipt.json`). That is one small model and one prompt: it
 shows these controls held there, not that no input can defeat them. The action passes `claude_args` through its own
 parser (`shell-quote`, `base-action/src/parse-sdk-options.ts`); replaying that parser on this workflow's text yields
-the same flags and the same JSON. This workflow's own prompt and `claude_args`, read from this file, also ran on
-Opus 5.5 at `max` for one real pull request (#897): 12 of 12 assistant turns, a client cost estimate of about
-$1.87 of $3, tools Glob, Grep and Read, no MCP server, a report with two blocking findings
-(`evidence/artifacts/claude-actions-fence-smoke-20261008/local-parity-receipt.json`, which #892 adds; #892
-precedes this PR in the command center's landing order, so the file is on `main` before this PR lands).
+the same flags and the same JSON.
+
+This workflow's prompt and `claude_args` also ran once on the installed client (2.1.295), on Opus 5.5 at `max` and
+billed to a second API key, not through the action. The record is the `LR` entry of
+`evidence/artifacts/claude-actions-fence-smoke-20261008/local-parity-receipt.json`, a file #892 adds; #892 precedes
+this PR in the command center's landing order, so the file is on `main` before this PR lands. The run used this
+workflow at commit `a6d2379506b7526ca7f528319cc4b7c65c32f897` (`workflow_commit`; the file at that commit hashes to
+the entry's `workflow_sha256`) and reviewed pull request #897 (`target_pull_request`) at head
+`24821c572a83091341a4924d506655004811286b` (`target_head`). The entry records 12 assistant turns of 12
+(`assistant_turns_distinct_message_ids`, `max_turns`), a client cost estimate of $1.868667 of $3 (`client_cost_usd`),
+the session's tools Glob, Grep and Read (`session_tools`), no MCP server (`mcp_servers`) and a `success` result
+(`subtype`). Its `report_blocking_findings: 2` is the report's own first line, "Verdict: 2 blocking findings": the
+model's verdict, which this record does not check. The report stays outside the repository; the entry keeps its hash,
+`report_sha256` `c49bee04b8ce37feba8a812eacf2e883d8dc39b52617769ea9d73b237f857e43`. `target_pull_request`,
+`target_head`, `report_blocking_findings` and `report_sha256` were added to the entry on 2026-10-09
+(`amended_2026_10_09`), from the same run's harness receipt and that first line; neither is in the repository.
+
+From that commit to this head (`git diff a6d2379506b7526ca7f528319cc4b7c65c32f897 HEAD --
+.github/workflows/claude-pr-review.yml`), the prompt, `claude_args`, the action step's pin, environment and other
+inputs, the trigger, the job condition, its grants and timeout, and every step not named below are unchanged. What
+changed: the diff step expands an empty `paths` list safely on bash before 4.4; the numbers step
+bounds assistant turns instead of `num_turns`, checks tools against an allow-list, fails a start record without its
+lists or an empty result, names each unmet bound and adds an assistant-turns column to its summary; the publish step
+takes the last non-empty result and cuts it on a character boundary, with a notice when it cuts; a new step fails a
+success without an execution file. Comments changed with them, and the header now reads "no write scope beyond the
+OIDC token". The receipt covers the prompt and `claude_args` on the client, not the workflow's shell steps, so the run
+is evidence for this head's prompt, flags and client limits, not for the steps that changed after it; the tests below
+cover those. Its recorded numbers (12 assistant turns, about $1.87, Glob, Grep and Read, no MCP server, `success`, a
+`cache_read_share` of 0.8712) are consistent with this head's bounds; the receipt records no run of the numbers step
+on them.
 
 After the run, one step reads the action's execution file and keeps only numbers and fixed names: cost, turns, the
 success flag, the Claude Code version, the session's tool list, the number of MCP servers and per-model token
@@ -145,7 +170,7 @@ Runs spend from the Console organization that the four `ANTHROPIC_*` repository 
 Unchanged and still passing: `test_pull_requests_write_is_granted_only_to_the_propose_job` and
 `test_no_workflow_reviews_or_approves_a_pull_request`.
 
-New, in `tests/test_claude_pr_review_workflow.py` (28 tests): the trigger, condition, permissions, checkout layout,
+New, in `tests/test_claude_pr_review_workflow.py` (31 tests): the trigger, condition, permissions, checkout layout,
 step order, pin, inputs, flags and settings are asserted from the workflow file, and the guard, binding, diff,
 numbers and review steps are executed as written against a local stand-in for `gh` and a local git repository.
 Twenty weakened copies of the workflow each fail at least one test: a missing head or repository check, a missing
@@ -155,8 +180,12 @@ session-start check, metadata left in the model's directory, the head checked ou
 `.git` deny rule or `claudeMdExcludes` removed, and Bash added to `--tools` (measured on 2026-10-08 against that
 day's bounds). The 2026-10-09 bound changes have their own tests: an unknown tool, a session start record without its
 lists, an empty result, the named failure messages, the character-safe cap with its notice and the last non-empty
-result; the turn bound was checked with three mutants. The step tests no longer skip without PyYAML: they read the
-workflow with the policy test's own loader when PyYAML is absent.
+result; the turn bound was checked with three mutants. A test pins the usage artifact's name,
+`claude-pr-review-usage-${{ github.run_id }}-${{ github.run_attempt }}`, which the upload check had read only by its
+path (like the other workflow-shape tests, it needs PyYAML): three copies with the name weakened (a fixed
+`claude-pr-review-usage`, the attempt dropped, `run_number` for `run_id`) each passed the 30 earlier tests and fail
+this one. The step tests no longer skip without PyYAML: they read the workflow with the policy test's own loader when
+PyYAML is absent.
 
 ## Alternatives considered
 
@@ -182,8 +211,9 @@ workflow with the policy test's own loader when PyYAML is absent.
 
 `native_proven` for the flag set on the installed client (the receipt above; not through the action and not on a
 GitHub runner). `local_static_analysis`: actionlint 1.17.0 and zizmor 1.30.1 (offline, regular and pedantic), no
-findings. `local_integration`: the unit tests above with PyYAML 6.0.3 on Python 3.12. `source_review`: the action
-and client sources below. No hosted run of this workflow is part of this record.
+findings. `local_integration`: the unit tests above with PyYAML 6.0.3 on Python 3.12, and the local parity run above
+(the installed client in place of the action; the `LR` entry of #892's `local-parity-receipt.json`). `source_review`:
+the action and client sources below. No hosted run of this workflow is part of this record.
 
 ## SOTA sources
 

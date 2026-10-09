@@ -18157,8 +18157,8 @@
     },
     {
       "path": "docs/decisions/2026-10-08-claude-actions-pr-review.md",
-      "sha256": "7e2ccc3c178ab6d31d3f8f0cad161de749aec57dc66381b5e873d661fb1c31a6",
-      "bytes": 16912
+      "sha256": "366f99b5d1e16903680d88b59fd6e6788780cc983f1de0b6f00a2ba2e40ee6e7",
+      "bytes": 19824
     },
     {
       "path": "docs/decisions/2026-10-08-coordinator-research-routing.md",
@@ -57872,8 +57872,8 @@
     },
     {
       "path": "tests/test_claude_pr_review_workflow.py",
-      "sha256": "28480fcbdaacff650fa6983fc0d2bbb63c6e5525317eb64d690193bcaaf41a35",
-      "bytes": 26931
+      "sha256": "dfb23c59ed1db45c99593232c2c954302bd63dfd75092ff1a8555707d3200127",
+      "bytes": 27391
     },
     {
       "path": "tests/test_claude_recovery.py",
