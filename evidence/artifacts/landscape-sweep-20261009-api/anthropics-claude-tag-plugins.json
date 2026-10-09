@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-anthropics-claude-tag-plugins",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/anthropics/claude-tag-plugins",
+ "reviewed_commit": "b6ee25f8f00a291cbdf31eb75bd7cc1a987d6782",
+ "readme_path": "README.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "git-github-automation"
+ ],
+ "claim": "Source and documentation review of anthropics/claude-tag-plugins at commit b6ee25f8f00a291cbdf31eb75bd7cc1a987d6782 (license Apache-2.0), read from README.md at that commit. Survived the landscape-sweep-20261009-api facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 59,
+  "pushed_at": "2026-10-07T15:23:55Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@b6ee25f8f00a291cbdf31eb75bd7cc1a987d6782",
+   "text": "Plugins for [@claude](https://claude.ai) that connect the agent to common SaaS services. Each service is its own plugin, so a workspace can connect exactly the services it uses."
+  },
+  {
+   "source": "README.md@b6ee25f8f00a291cbdf31eb75bd7cc1a987d6782",
+   "text": "```bash # Add the marketplace first claude plugin marketplace add anthropics/claude-tag-plugins"
+  },
+  {
+   "source": "README.md@b6ee25f8f00a291cbdf31eb75bd7cc1a987d6782",
+   "text": "# Install the services you use claude plugin install jira@claude-tag-plugins claude plugin install datadog@claude-tag-plugins ```"
+  }
+ ]
+}

@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-betterleaks-betterleaks",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/betterleaks/betterleaks",
+ "reviewed_commit": "30c423ca44170ba08f72d13034e5970b6f3a7ca7",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "secrets-credentials"
+ ],
+ "claim": "Source and documentation review of betterleaks/betterleaks at commit 30c423ca44170ba08f72d13034e5970b6f3a7ca7 (license MIT), read from README.md at that commit. Repository description: \"Find leaked secrets everywhere.\". Survived the landscape-sweep-20261009-api facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 2167,
+  "pushed_at": "2026-10-08T17:28:20Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@30c423ca44170ba08f72d13034e5970b6f3a7ca7",
+   "text": "Betterleaks is a configurable, fast, and thorough secrets scanner. It is maintained by the folks who made Gitleaks, including the original author. Check out this series of blog posts to learn how the detection engine works: 1. [Regex is all you need](https://lookingatcomputer.substack.com/p/regex-is-almost-all-you-need), 2. [Rare Not Random](https://lookingatcomputer.substack.com/p/rare-not-random), 3. [Express YourCELf](https://lookingatcomputer.substack.com/p/express-yourcelf-filtering-and-val"
+  },
+  {
+   "source": "README.md@30c423ca44170ba08f72d13034e5970b6f3a7ca7",
+   "text": "Development is supported by <a href=\"https://www.aikido.dev\"><img src=\"docs/aikido_log.svg\" alt=\"Aikido Security\" width=\"80\" /></a>"
+  },
+  {
+   "source": "README.md@30c423ca44170ba08f72d13034e5970b6f3a7ca7",
+   "text": "The `main` branch is for v2 development. V1 maintenance and documentation live on the [`v1.x` branch](https://github.com/betterleaks/betterleaks/tree/v1.x)."
+  }
+ ]
+}

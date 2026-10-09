@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-prismml-eng-llama-cpp",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/PrismML-Eng/llama.cpp",
+ "reviewed_commit": "8b0c19c8c680e19e75a40cb52d1168fec01464ad",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "observation-inference"
+ ],
+ "claim": "Source and documentation review of PrismML-Eng/llama.cpp at commit 8b0c19c8c680e19e75a40cb52d1168fec01464ad (license MIT), read from README.md at that commit. Repository description: \"LLM inference in C/C++\". Survived the landscape-sweep-20261009-api facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 904,
+  "pushed_at": "2026-10-09T03:50:46Z",
+  "archived": false,
+  "default_branch": "prism"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@8b0c19c8c680e19e75a40cb52d1168fec01464ad",
+   "text": "> [!IMPORTANT] > **This is the PrismML fork of llama.cpp**, the main line behind the [Bonsai](https://huggingface.co/collections/prism-ml/bonsai) models (branch `prism`, developed as `prism-v7`). It tracks current mainline llama.cpp and adds the fork's low-bit formats and runtime features on top. > > **New here? Start with the [Bonsai-demo](https://github.com/PrismML-Eng/Bonsai-demo) repo.** It downloads the right models and the correct prebuilt binaries for your hardware/backend automatically. "
+  },
+  {
+   "source": "README.md@8b0c19c8c680e19e75a40cb52d1168fec01464ad",
+   "text": "[ggml](https://github.com/ggml-org/ggml) / [ops](https://github.com/ggml-org/llama.cpp/blob/master/docs/ops.md) / [maintainer PRs](https://github.com/ggml-org/llama.cpp/issues?q=is%3Apr%20is%3Aopen%20draft%3AFalse%20(author%3Argerganov%20OR%20author%3AKitaitiMakoto%20OR%20author%3Adanbev%20OR%20author%3Aaldehir%20OR%20author%3Amax-krasnyansky%20OR%20author%3ACISC%20OR%20author%3Aggerganov%20OR%20author%3Aam17an%20OR%20author%3Abartowski1182%20OR%20author%3Anikwen%20OR%20author%3Ahipudding%20OR%2"
+  },
+  {
+   "source": "README.md@8b0c19c8c680e19e75a40cb52d1168fec01464ad",
+   "text": "- Visit https://llama.app and follow the instructions - Run with Docker - see our [Docker documentation](docs/docker.md) - Download pre-built binaries from the [releases page](https://github.com/ggml-org/llama.cpp/releases) - Build from source by cloning this repository - check out [our build guide](docs/build.md)"
+  }
+ ]
+}

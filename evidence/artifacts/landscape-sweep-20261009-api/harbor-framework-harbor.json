@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-harbor-framework-harbor",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/harbor-framework/harbor",
+ "reviewed_commit": "07ad34000e4c481451b1a0ea30a4a09548d6de8b",
+ "readme_path": "README.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "quality-evaluation"
+ ],
+ "claim": "Source and documentation review of harbor-framework/harbor at commit 07ad34000e4c481451b1a0ea30a4a09548d6de8b (license Apache-2.0), read from README.md at that commit. Repository description: \"Framework for evaluating and improving agents\". Survived the landscape-sweep-20261009-api facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 5938,
+  "pushed_at": "2026-10-08T23:12:28Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@07ad34000e4c481451b1a0ea30a4a09548d6de8b",
+   "text": "Harbor is a framework from the creators of [Terminal-Bench](https://www.tbench.ai) for evaluating and optimizing agents and language models. You can use Harbor to:"
+  },
+  {
+   "source": "README.md@07ad34000e4c481451b1a0ea30a4a09548d6de8b",
+   "text": "- Evaluate arbitrary agents like Claude Code, OpenHands, Codex CLI, and more. - Build and share your own benchmarks and environments. - Conduct experiments in thousands of environments in parallel through providers like Daytona, Modal, LangSmith, Blaxel, Novita Sandbox, Tensorlake, Runta, and Sail. - Generate rollouts for RL optimization."
+  },
+  {
+   "source": "README.md@07ad34000e4c481451b1a0ea30a4a09548d6de8b",
+   "text": "Check out the [Harbor Cookbook](https://github.com/harbor-framework/harbor-cookbook) for end-to-end examples and guides."
+  }
+ ]
+}

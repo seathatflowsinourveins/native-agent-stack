@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-anthropics-claude-tag-wif-gateway-sample",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/anthropics/claude-tag-wif-gateway-sample",
+ "reviewed_commit": "89b1e49e31b12117fa3efcd3aede817599215ea9",
+ "readme_path": "README.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "secrets-credentials"
+ ],
+ "claim": "Source and documentation review of anthropics/claude-tag-wif-gateway-sample at commit 89b1e49e31b12117fa3efcd3aede817599215ea9 (license Apache-2.0), read from README.md at that commit. Repository description: \"Sample customer-side gateway for Claude Tag identity federation. Sample code; not maintained.\". Survived the landscape-sweep-20261009-api facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 0,
+  "pushed_at": "2026-10-02T06:26:30Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@89b1e49e31b12117fa3efcd3aede817599215ea9",
+   "text": "**Sample code. Not maintained and not accepting contributions.** This is a reference implementation of the gateway connection described in the Claude Tag documentation under Federated cloud access, \"Connect a gateway\". Federated cloud access is in public beta; an organization Owner, or an admin with full Claude Tag management permission, connects gateways in Claude Tag admin settings, with no Anthropic involvement. This code is meant to be read, adapted, and reviewed against your own security re"
+  },
+  {
+   "source": "README.md@89b1e49e31b12117fa3efcd3aede817599215ea9",
+   "text": "Anthropic calls your registered endpoint directly, attaching a Claude Tag identity token to each request in the `Authorization` header as a bearer token. This gateway:"
+  },
+  {
+   "source": "README.md@89b1e49e31b12117fa3efcd3aede817599215ea9",
+   "text": "1. **Validates** every incoming token — signature (ES256, against the published JWKS of the issuer the token names), exact match against the accepted issuers, your registered audience, and expiry. Anything that fails is rejected with a generic 401. 2. **Maps** the verified claims to a principal in your system, from a config file — exact-match on the token subject (preferred), an optional organization-wide mapping by subject prefix, and a `slack_channel_id`-based mapping shown as an alternative. "
+  }
+ ]
+}

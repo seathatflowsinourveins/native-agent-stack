@@ -10913,7 +10913,1864 @@
      ]
     }
    ]
+  },
+  {
+   "sweep_id": "landscape-sweep-20261009-api",
+   "date": "2026-10-09",
+   "workflow_run": "wf_b7a6dece-81b",
+   "status": "completed",
+   "manifest_ref": "catalogs/sota-convergence/manifest-20261009-api.json",
+   "manifest_sha256": "91d42fdf17882844760b384fad819b7f4a1944ab333c2e61a328636b03816063",
+   "lane": "landscape-sweep-20261009-api",
+   "prompts_sha256": "02cc3448da4fa8ecc6e953b3e4eb22265cec244c34f97bc4e761955af9ee9c7d",
+   "usage_ref": "evidence/artifacts/landscape-sweep-20261009-api-attempts/child-usage-wf_b7a6dece-81b.json",
+   "usage_sha256": "722ffd7cff49eb0e7b990e470857f1879e8d4c31d1c5763557caf7d8c698afd6",
+   "lower_bound_usage": false,
+   "returns_ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json",
+   "returns_sha256": "91a31f46e6583994954b01a23e7dd2178df7b8a9df92ae2c2f847063a5b13259",
+   "notes": [
+    "Publication follows the 2026-10-09 decision to retain one pending Codeberg source review and defer the Forgejo adapter. Native source_reviews.py exited 1 only for mergiraf and wrote 31 completed source reviews covering 32 of 33 surviving layer/repository pairs.",
+    "Native reviews.json is unchanged, sha256=f4050736f39f04b447b51d848600b24f9ea16c2f077e4c489bb6dbf12dd233ca. The separate review-bindings.json input adds one explicit pending_upstream_provenance artifact for mergiraf; its source_review field binds a local integration gap, not a completed vendor review. git-github-automation is reopened for missing_capability.",
+    "Original quality-evaluation and hosting-services retained failures remain; explicit reopen provenance cites FINAL.md lines 59, 105, 152 at sha256=77e17817d8ecc8e53329ac32303ece8dc4e86eaf67cba1e3ae36196aa328a109. Mergiraf pending provenance cites FINAL.md line 31 and source_reviews.py lines 1242-1252 at b7dfe638fc825a52ff4e7d1a9ccf2fde7de889fd.",
+    "The original usage capture rc 1 and documented post-processing remain retained. Initial manifest invocation rc 1 because work/github-freshness.json was absent; supported explicit --freshness retry rc 0. Publication establishes no adoption or default SDK.",
+    "Superseding publication decisions: nvidia_gpu_exporter is KEEP of the existing 1.15.1 workstation-gpu install and is excluded from new-adoption routing; anthropics/skills rerule and agnix/skillevaluator trials hide arm identities from the judge. See evidence/artifacts/landscape-sweep-20261009-api/publication.md#existing-gpu-exporter and #blinded-judge-requirement. Historical proposals and votes remain unchanged; decoded publication strings use state: source identifiers, repository-relative checkout paths and installed-client placeholders."
+   ],
+   "prev_sha256": "d6d5695f02c2404b38476be33f5be536e47bbe1c4793ab03ffd4bc0c43abb7b2",
+   "layers": [
+    {
+     "catalog": "foundation",
+     "layer_id": "agent-sdks",
+     "requirement_sha256": "b143dc0755fd362d06b3a3e0fe7032ecdc687fbadb621c0e7f4fc6b492cc94e0",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "retained",
+     "discovery_ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/discovery/agent-sdks",
+     "calls": {
+      "web_search": 3,
+      "web_fetch": 3,
+      "gh_api": 30,
+      "gpt6_web_search": 1,
+      "gpt6_web_fetch": 8,
+      "gpt6_gh_api": 40
+     },
+     "proposed": [
+      "https://github.com/anthropics/claude-agent-sdk-python",
+      "https://github.com/openai/openai-agents-python",
+      "https://github.com/github/copilot-sdk",
+      "https://github.com/agentproto/ts",
+      "https://github.com/google/adk-python",
+      "https://github.com/openhands/software-agent-sdk",
+      "https://github.com/openai/symphony",
+      "https://github.com/aaif-goose/goose"
+     ],
+     "known": [
+      "https://github.com/anthropics/claude-agent-sdk-python",
+      "https://github.com/openai/openai-agents-python",
+      "https://github.com/github/copilot-sdk",
+      "https://github.com/agentproto/ts",
+      "https://github.com/google/adk-python",
+      "https://github.com/openhands/software-agent-sdk"
+     ],
+     "new": [
+      "https://github.com/openai/symphony",
+      "https://github.com/aaif-goose/goose"
+     ],
+     "survived": [
+      {
+       "repo": "https://github.com/openai/symphony",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/agent-sdks/6/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/agent-sdks/6/fit"
+       },
+       "source_review": "evidence/artifacts/landscape-sweep-20261009-api/openai-symphony.json"
+      },
+      {
+       "repo": "https://github.com/aaif-goose/goose",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/agent-sdks/7/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/agent-sdks/7/fit"
+       },
+       "source_review": "evidence/artifacts/landscape-sweep-20261009-api/aaif-goose-goose.json"
+      }
+     ],
+     "refuted": [
+      {
+       "repo": "https://github.com/anthropics/claude-agent-sdk-python",
+       "facts": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/agent-sdks/0/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/agent-sdks/0/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/openai/openai-agents-python",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/agent-sdks/1/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/agent-sdks/1/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/github/copilot-sdk",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/agent-sdks/2/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/agent-sdks/2/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/agentproto/ts",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/agent-sdks/3/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/agent-sdks/3/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/google/adk-python",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/agent-sdks/4/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/agent-sdks/4/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/openhands/software-agent-sdk",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/agent-sdks/5/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/agent-sdks/5/fit"
+       }
+      }
+     ],
+     "reopen": []
+    },
+    {
+     "catalog": "foundation",
+     "layer_id": "native-clients",
+     "requirement_sha256": "05399edb0f84f790f19a312272324d5ee9682d751e92721e929ec7a706928e87",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "retained",
+     "discovery_ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/discovery/native-clients",
+     "calls": {
+      "web_search": 7,
+      "web_fetch": 12,
+      "gh_api": 75,
+      "gpt6_web_search": 8,
+      "gpt6_web_fetch": 16,
+      "gpt6_gh_api": 55
+     },
+     "proposed": [
+      "https://github.com/anthropics/anthropic-cli",
+      "https://github.com/anthropics/claude-agent-sdk-python",
+      "https://github.com/letta-ai/letta-code",
+      "https://github.com/openai/openai-agents-python",
+      "https://github.com/anthropics/claude-agent-sdk-typescript",
+      "https://github.com/google-gemini/gemini-cli",
+      "https://github.com/github/copilot-cli",
+      "https://github.com/cline/cline",
+      "https://github.com/ollama/ollama",
+      "https://github.com/lmstudio-ai/lms",
+      "https://github.com/ggml-org/llama.cpp",
+      "https://github.com/anthropics/claude-code",
+      "https://github.com/vllm-project/vllm",
+      "https://github.com/musistudio/claude-code-router"
+     ],
+     "known": [
+      "https://github.com/anthropics/claude-agent-sdk-python",
+      "https://github.com/letta-ai/letta-code",
+      "https://github.com/openai/openai-agents-python",
+      "https://github.com/google-gemini/gemini-cli",
+      "https://github.com/anthropics/claude-code"
+     ],
+     "new": [
+      "https://github.com/anthropics/anthropic-cli",
+      "https://github.com/anthropics/claude-agent-sdk-typescript",
+      "https://github.com/github/copilot-cli",
+      "https://github.com/cline/cline",
+      "https://github.com/ollama/ollama",
+      "https://github.com/lmstudio-ai/lms",
+      "https://github.com/ggml-org/llama.cpp",
+      "https://github.com/vllm-project/vllm",
+      "https://github.com/musistudio/claude-code-router"
+     ],
+     "survived": [],
+     "refuted": [
+      {
+       "repo": "https://github.com/anthropics/anthropic-cli",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/native-clients/0/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/native-clients/0/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/anthropics/claude-agent-sdk-python",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/native-clients/1/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/native-clients/1/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/letta-ai/letta-code",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/native-clients/2/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/native-clients/2/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/openai/openai-agents-python",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/native-clients/3/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/native-clients/3/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/anthropics/claude-agent-sdk-typescript",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/native-clients/4/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/native-clients/4/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/google-gemini/gemini-cli",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/native-clients/5/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/native-clients/5/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/github/copilot-cli",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/native-clients/6/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/native-clients/6/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/cline/cline",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/native-clients/7/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/native-clients/7/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/ollama/ollama",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/native-clients/8/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/native-clients/8/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/lmstudio-ai/lms",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/native-clients/9/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/native-clients/9/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/ggml-org/llama.cpp",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/native-clients/10/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/native-clients/10/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/anthropics/claude-code",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/native-clients/11/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/native-clients/11/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/vllm-project/vllm",
+       "facts": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/native-clients/12/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/native-clients/12/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/musistudio/claude-code-router",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/native-clients/13/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/native-clients/13/fit"
+       }
+      }
+     ],
+     "reopen": []
+    },
+    {
+     "catalog": "foundation",
+     "layer_id": "git-github-automation",
+     "requirement_sha256": "430b1de3110ad4f3f7dcc4b20426393d6c67c57427dcbc56472b8081e8f9cab1",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "retained",
+     "discovery_ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/discovery/git-github-automation",
+     "calls": {
+      "web_search": 7,
+      "web_fetch": 12,
+      "gh_api": 70,
+      "gpt6_web_search": 6,
+      "gpt6_web_fetch": 16,
+      "gpt6_gh_api": 61
+     },
+     "proposed": [
+      "https://github.com/anthropics/claude-code-action",
+      "https://github.com/ataraxy-labs/sem",
+      "https://github.com/openai/codex-action",
+      "https://github.com/openai/codex",
+      "https://github.com/alibaba/open-code-review",
+      "https://github.com/cli/cli",
+      "https://github.com/github/gh-aw",
+      "https://github.com/anthropics/claude-code-base-action",
+      "https://codeberg.org/mergiraf/mergiraf",
+      "https://github.com/gitbutlerapp/gitbutler",
+      "https://github.com/ataraxy-labs/weave",
+      "https://github.com/jj-vcs/jj",
+      "https://github.com/anthropics/claude-tag-plugins"
+     ],
+     "known": [
+      "https://github.com/anthropics/claude-code-action",
+      "https://github.com/ataraxy-labs/sem",
+      "https://github.com/openai/codex-action",
+      "https://github.com/openai/codex",
+      "https://github.com/alibaba/open-code-review",
+      "https://github.com/github/gh-aw",
+      "https://github.com/ataraxy-labs/weave",
+      "https://github.com/jj-vcs/jj"
+     ],
+     "new": [
+      "https://github.com/cli/cli",
+      "https://github.com/anthropics/claude-code-base-action",
+      "https://codeberg.org/mergiraf/mergiraf",
+      "https://github.com/gitbutlerapp/gitbutler",
+      "https://github.com/anthropics/claude-tag-plugins"
+     ],
+     "survived": [
+      {
+       "repo": "https://github.com/anthropics/claude-code-action",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/git-github-automation/0/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/git-github-automation/0/fit"
+       },
+       "source_review": "evidence/artifacts/landscape-sweep-20261009-api/anthropics-claude-code-action.json"
+      },
+      {
+       "repo": "https://github.com/ataraxy-labs/sem",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/git-github-automation/1/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/git-github-automation/1/fit"
+       },
+       "source_review": "evidence/artifacts/landscape-sweep-20261009-api/ataraxy-labs-sem.json"
+      },
+      {
+       "repo": "https://github.com/openai/codex",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/git-github-automation/3/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/git-github-automation/3/fit"
+       },
+       "source_review": "evidence/artifacts/landscape-sweep-20261009-api/openai-codex.json"
+      },
+      {
+       "repo": "https://github.com/anthropics/claude-code-base-action",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/git-github-automation/7/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/git-github-automation/7/fit"
+       },
+       "source_review": "evidence/artifacts/landscape-sweep-20261009-api/anthropics-claude-code-base-action.json"
+      },
+      {
+       "repo": "https://codeberg.org/mergiraf/mergiraf",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/git-github-automation/8/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/git-github-automation/8/fit"
+       },
+       "source_review": "evidence/artifacts/landscape-sweep-20261009-api/mergiraf-review-pending.json"
+      },
+      {
+       "repo": "https://github.com/ataraxy-labs/weave",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/git-github-automation/10/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/git-github-automation/10/fit"
+       },
+       "source_review": "evidence/artifacts/landscape-sweep-20261009-api/ataraxy-labs-weave.json"
+      },
+      {
+       "repo": "https://github.com/anthropics/claude-tag-plugins",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/git-github-automation/12/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/git-github-automation/12/fit"
+       },
+       "source_review": "evidence/artifacts/landscape-sweep-20261009-api/anthropics-claude-tag-plugins.json"
+      }
+     ],
+     "refuted": [
+      {
+       "repo": "https://github.com/openai/codex-action",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/git-github-automation/2/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/git-github-automation/2/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/alibaba/open-code-review",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/git-github-automation/4/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/git-github-automation/4/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/cli/cli",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/git-github-automation/5/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/git-github-automation/5/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/github/gh-aw",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/git-github-automation/6/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/git-github-automation/6/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/gitbutlerapp/gitbutler",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/git-github-automation/9/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/git-github-automation/9/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/jj-vcs/jj",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/git-github-automation/11/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/git-github-automation/11/fit"
+       }
+      }
+     ],
+     "reopen": [
+      {
+       "trigger": "missing_capability",
+       "ref": "evidence/artifacts/landscape-sweep-20261009-api/mergiraf-review-pending.json"
+      }
+     ]
+    },
+    {
+     "catalog": "foundation",
+     "layer_id": "ci-supply-chain",
+     "requirement_sha256": "7541357e60b31124c35f70256419b2c5f3868940ecc53412239d96d3603c7e34",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "retained",
+     "discovery_ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/discovery/ci-supply-chain",
+     "calls": {
+      "web_search": 6,
+      "web_fetch": 3,
+      "gh_api": 31,
+      "gpt6_web_search": 4,
+      "gpt6_web_fetch": 8,
+      "gpt6_gh_api": 35
+     },
+     "proposed": [
+      "https://github.com/openai/codex-security",
+      "https://github.com/sisaku-security/sisakulint",
+      "https://github.com/renovatebot/renovate",
+      "https://github.com/kjanat/actionlint",
+      "https://github.com/github/gh-actions-lock",
+      "https://github.com/boostsecurityio/poutine",
+      "https://github.com/aikidosec/safe-chain",
+      "https://github.com/datadog/supply-chain-firewall"
+     ],
+     "known": [
+      "https://github.com/renovatebot/renovate",
+      "https://github.com/kjanat/actionlint",
+      "https://github.com/github/gh-actions-lock",
+      "https://github.com/boostsecurityio/poutine"
+     ],
+     "new": [
+      "https://github.com/openai/codex-security",
+      "https://github.com/sisaku-security/sisakulint",
+      "https://github.com/aikidosec/safe-chain",
+      "https://github.com/datadog/supply-chain-firewall"
+     ],
+     "survived": [
+      {
+       "repo": "https://github.com/openai/codex-security",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/ci-supply-chain/0/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/ci-supply-chain/0/fit"
+       },
+       "source_review": "evidence/artifacts/landscape-sweep-20261009-api/openai-codex-security.json"
+      },
+      {
+       "repo": "https://github.com/sisaku-security/sisakulint",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/ci-supply-chain/1/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/ci-supply-chain/1/fit"
+       },
+       "source_review": "evidence/artifacts/landscape-sweep-20261009-api/sisaku-security-sisakulint.json"
+      }
+     ],
+     "refuted": [
+      {
+       "repo": "https://github.com/renovatebot/renovate",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/ci-supply-chain/2/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/ci-supply-chain/2/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/kjanat/actionlint",
+       "facts": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/ci-supply-chain/3/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/ci-supply-chain/3/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/github/gh-actions-lock",
+       "facts": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/ci-supply-chain/4/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/ci-supply-chain/4/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/boostsecurityio/poutine",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/ci-supply-chain/5/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/ci-supply-chain/5/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/aikidosec/safe-chain",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/ci-supply-chain/6/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/ci-supply-chain/6/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/datadog/supply-chain-firewall",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/ci-supply-chain/7/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/ci-supply-chain/7/fit"
+       }
+      }
+     ],
+     "reopen": []
+    },
+    {
+     "catalog": "foundation",
+     "layer_id": "mcp-surfaces",
+     "requirement_sha256": "772dbba88018c58887ad2e7b5335a4658cb4b3237653ea19cfaff774738c754f",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "retained",
+     "discovery_ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/discovery/mcp-surfaces",
+     "calls": {
+      "web_search": 6,
+      "web_fetch": 7,
+      "gh_api": 78,
+      "gpt6_web_search": 3,
+      "gpt6_web_fetch": 16,
+      "gpt6_gh_api": 80
+     },
+     "proposed": [
+      "https://github.com/smart-mcp-proxy/mcpproxy-go",
+      "https://github.com/stacklok/toolhive",
+      "https://github.com/btsouth/toolport",
+      "https://github.com/modelcontextprotocol/conformance",
+      "https://github.com/apify/mcpc",
+      "https://github.com/mcpjam/inspector",
+      "https://github.com/docker/mcp-gateway",
+      "https://github.com/snyk/agent-scan",
+      "https://github.com/openai/codex",
+      "https://github.com/anthropics/claude-code",
+      "https://github.com/microsoft/playwright-mcp",
+      "https://github.com/webmachinelearning/webmcp",
+      "https://github.com/modelcontextprotocol/inspector",
+      "https://github.com/1mcp-app/agent"
+     ],
+     "known": [
+      "https://github.com/smart-mcp-proxy/mcpproxy-go",
+      "https://github.com/stacklok/toolhive",
+      "https://github.com/modelcontextprotocol/conformance",
+      "https://github.com/apify/mcpc",
+      "https://github.com/mcpjam/inspector",
+      "https://github.com/modelcontextprotocol/inspector"
+     ],
+     "new": [
+      "https://github.com/btsouth/toolport",
+      "https://github.com/docker/mcp-gateway",
+      "https://github.com/snyk/agent-scan",
+      "https://github.com/openai/codex",
+      "https://github.com/anthropics/claude-code",
+      "https://github.com/microsoft/playwright-mcp",
+      "https://github.com/webmachinelearning/webmcp",
+      "https://github.com/1mcp-app/agent"
+     ],
+     "survived": [
+      {
+       "repo": "https://github.com/modelcontextprotocol/conformance",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/mcp-surfaces/3/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/mcp-surfaces/3/fit"
+       },
+       "source_review": "evidence/artifacts/landscape-sweep-20261009-api/modelcontextprotocol-conformance.json"
+      },
+      {
+       "repo": "https://github.com/modelcontextprotocol/inspector",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/mcp-surfaces/12/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/mcp-surfaces/12/fit"
+       },
+       "source_review": "evidence/artifacts/landscape-sweep-20261009-api/modelcontextprotocol-inspector.json"
+      }
+     ],
+     "refuted": [
+      {
+       "repo": "https://github.com/smart-mcp-proxy/mcpproxy-go",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/mcp-surfaces/0/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/mcp-surfaces/0/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/stacklok/toolhive",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/mcp-surfaces/1/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/mcp-surfaces/1/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/btsouth/toolport",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/mcp-surfaces/2/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/mcp-surfaces/2/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/apify/mcpc",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/mcp-surfaces/4/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/mcp-surfaces/4/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/mcpjam/inspector",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/mcp-surfaces/5/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/mcp-surfaces/5/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/docker/mcp-gateway",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/mcp-surfaces/6/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/mcp-surfaces/6/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/snyk/agent-scan",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/mcp-surfaces/7/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/mcp-surfaces/7/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/openai/codex",
+       "facts": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/mcp-surfaces/8/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/mcp-surfaces/8/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/anthropics/claude-code",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/mcp-surfaces/9/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/mcp-surfaces/9/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/microsoft/playwright-mcp",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/mcp-surfaces/10/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/mcp-surfaces/10/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/webmachinelearning/webmcp",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/mcp-surfaces/11/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/mcp-surfaces/11/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/1mcp-app/agent",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/mcp-surfaces/13/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/mcp-surfaces/13/fit"
+       }
+      }
+     ],
+     "reopen": []
+    },
+    {
+     "catalog": "foundation",
+     "layer_id": "instructions-skills",
+     "requirement_sha256": "1a095568d89a07d2d08bacd559f0cd5e5e2a13f39247e09977d5a30b0b294137",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "retained",
+     "discovery_ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/discovery/instructions-skills",
+     "calls": {
+      "web_search": 4,
+      "web_fetch": 8,
+      "gh_api": 40,
+      "gpt6_web_search": 4,
+      "gpt6_web_fetch": 8,
+      "gpt6_gh_api": 40
+     },
+     "proposed": [
+      "https://github.com/openai/plugins",
+      "https://github.com/anthropics/skills",
+      "https://github.com/openai/skills",
+      "https://github.com/agent-sh/agnix",
+      "https://github.com/nvidia/skillevaluator",
+      "https://github.com/mattpocock/skills",
+      "https://github.com/anthropics/claude-plugins-official",
+      "https://github.com/anthropics/knowledge-work-plugins"
+     ],
+     "known": [
+      "https://github.com/openai/plugins",
+      "https://github.com/anthropics/skills",
+      "https://github.com/agent-sh/agnix",
+      "https://github.com/mattpocock/skills",
+      "https://github.com/anthropics/claude-plugins-official"
+     ],
+     "new": [
+      "https://github.com/openai/skills",
+      "https://github.com/nvidia/skillevaluator",
+      "https://github.com/anthropics/knowledge-work-plugins"
+     ],
+     "survived": [
+      {
+       "repo": "https://github.com/openai/skills",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/instructions-skills/2/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/instructions-skills/2/fit"
+       },
+       "source_review": "evidence/artifacts/landscape-sweep-20261009-api/openai-skills.json"
+      },
+      {
+       "repo": "https://github.com/agent-sh/agnix",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/instructions-skills/3/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/instructions-skills/3/fit"
+       },
+       "source_review": "evidence/artifacts/landscape-sweep-20261009-api/agent-sh-agnix.json"
+      },
+      {
+       "repo": "https://github.com/nvidia/skillevaluator",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/instructions-skills/4/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/instructions-skills/4/fit"
+       },
+       "source_review": "evidence/artifacts/landscape-sweep-20261009-api/nvidia-skillevaluator.json"
+      }
+     ],
+     "refuted": [
+      {
+       "repo": "https://github.com/openai/plugins",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/instructions-skills/0/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/instructions-skills/0/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/anthropics/skills",
+       "facts": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/instructions-skills/1/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/instructions-skills/1/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/mattpocock/skills",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/instructions-skills/5/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/instructions-skills/5/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/anthropics/claude-plugins-official",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/instructions-skills/6/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/instructions-skills/6/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/anthropics/knowledge-work-plugins",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/instructions-skills/7/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/instructions-skills/7/fit"
+       }
+      }
+     ],
+     "reopen": []
+    },
+    {
+     "catalog": "foundation",
+     "layer_id": "quality-evaluation",
+     "requirement_sha256": "6b73a569e50fd0c2e3dcf534674115943253b4d66663e50a92d552708d138a97",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "retained",
+     "discovery_ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/discovery/quality-evaluation",
+     "calls": {
+      "web_search": 7,
+      "web_fetch": 12,
+      "gh_api": 54,
+      "gpt6_web_search": 5,
+      "gpt6_web_fetch": 16,
+      "gpt6_gh_api": 53
+     },
+     "proposed": [
+      "https://github.com/ukgovernmentbeis/inspect_ai",
+      "https://github.com/openai/monitorability-evals",
+      "https://github.com/anthropics/claude-cookbooks",
+      "https://github.com/harbor-framework/harbor",
+      "https://github.com/meridianlabs-ai/inspect_scout",
+      "https://github.com/promptfoo/promptfoo",
+      "https://github.com/benchflow-ai/benchflow",
+      "https://github.com/microsoft/skillopt",
+      "https://github.com/bachmann1234/diff_cover",
+      "https://github.com/schemathesis/schemathesis",
+      "https://github.com/microsoft/playwright",
+      "https://github.com/endava/cats",
+      "https://github.com/stryker-mutator/stryker-js"
+     ],
+     "known": [
+      "https://github.com/ukgovernmentbeis/inspect_ai",
+      "https://github.com/harbor-framework/harbor",
+      "https://github.com/meridianlabs-ai/inspect_scout",
+      "https://github.com/promptfoo/promptfoo",
+      "https://github.com/microsoft/playwright",
+      "https://github.com/stryker-mutator/stryker-js"
+     ],
+     "new": [
+      "https://github.com/openai/monitorability-evals",
+      "https://github.com/anthropics/claude-cookbooks",
+      "https://github.com/benchflow-ai/benchflow",
+      "https://github.com/microsoft/skillopt",
+      "https://github.com/bachmann1234/diff_cover",
+      "https://github.com/schemathesis/schemathesis",
+      "https://github.com/endava/cats"
+     ],
+     "survived": [
+      {
+       "repo": "https://github.com/ukgovernmentbeis/inspect_ai",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/quality-evaluation/0/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/quality-evaluation/0/fit"
+       },
+       "source_review": "evidence/artifacts/landscape-sweep-20261009-api/ukgovernmentbeis-inspect-ai.json"
+      },
+      {
+       "repo": "https://github.com/harbor-framework/harbor",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/quality-evaluation/3/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/quality-evaluation/3/fit"
+       },
+       "source_review": "evidence/artifacts/landscape-sweep-20261009-api/harbor-framework-harbor.json"
+      },
+      {
+       "repo": "https://github.com/bachmann1234/diff_cover",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/quality-evaluation/8/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/quality-evaluation/8/fit"
+       },
+       "source_review": "evidence/artifacts/landscape-sweep-20261009-api/bachmann1234-diff-cover.json"
+      },
+      {
+       "repo": "https://github.com/schemathesis/schemathesis",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/quality-evaluation/9/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/quality-evaluation/9/fit"
+       },
+       "source_review": "evidence/artifacts/landscape-sweep-20261009-api/schemathesis-schemathesis.json"
+      }
+     ],
+     "refuted": [
+      {
+       "repo": "https://github.com/openai/monitorability-evals",
+       "facts": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/quality-evaluation/1/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/quality-evaluation/1/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/anthropics/claude-cookbooks",
+       "facts": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/quality-evaluation/2/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/quality-evaluation/2/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/meridianlabs-ai/inspect_scout",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/quality-evaluation/4/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/quality-evaluation/4/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/promptfoo/promptfoo",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/quality-evaluation/5/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/quality-evaluation/5/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/benchflow-ai/benchflow",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/quality-evaluation/6/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/quality-evaluation/6/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/microsoft/skillopt",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/quality-evaluation/7/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/quality-evaluation/7/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/microsoft/playwright",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/quality-evaluation/10/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/quality-evaluation/10/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/endava/cats",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/quality-evaluation/11/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/quality-evaluation/11/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/stryker-mutator/stryker-js",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/quality-evaluation/12/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/quality-evaluation/12/fit"
+       }
+      }
+     ],
+     "reopen": [
+      {
+       "trigger": "retained_failure",
+       "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/failures/quality-evaluation"
+      },
+      {
+       "trigger": "retained_failure",
+       "ref": "evidence/artifacts/landscape-sweep-20261009-api/publication.md#reopened-layers"
+      }
+     ]
+    },
+    {
+     "catalog": "foundation",
+     "layer_id": "observation-inference",
+     "requirement_sha256": "3a68575079a1c43b718c4eb417317c5cb336dab6848e12b4f36df30fe10a154c",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "retained",
+     "discovery_ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/discovery/observation-inference",
+     "calls": {
+      "web_search": 3,
+      "web_fetch": 12,
+      "gh_api": 69,
+      "gpt6_web_search": 5,
+      "gpt6_web_fetch": 16,
+      "gpt6_gh_api": 65
+     },
+     "proposed": [
+      "https://github.com/open-telemetry/semantic-conventions-genai",
+      "https://github.com/ml-explore/mlx-lm",
+      "https://github.com/langfuse/langfuse",
+      "https://github.com/openlit/openlit",
+      "https://github.com/mostlygeek/llama-swap",
+      "https://github.com/jaegertracing/jaeger",
+      "https://github.com/ollama/ollama",
+      "https://github.com/utkuozdemir/nvidia_gpu_exporter",
+      "https://github.com/prismml-eng/llama.cpp",
+      "https://github.com/microsoft/frognano",
+      "https://github.com/jetbrains/mellum",
+      "https://github.com/lablup/all-smi"
+     ],
+     "known": [
+      "https://github.com/open-telemetry/semantic-conventions-genai",
+      "https://github.com/jaegertracing/jaeger",
+      "https://github.com/ollama/ollama",
+      "https://github.com/utkuozdemir/nvidia_gpu_exporter",
+      "https://github.com/lablup/all-smi"
+     ],
+     "new": [
+      "https://github.com/ml-explore/mlx-lm",
+      "https://github.com/langfuse/langfuse",
+      "https://github.com/openlit/openlit",
+      "https://github.com/mostlygeek/llama-swap",
+      "https://github.com/prismml-eng/llama.cpp",
+      "https://github.com/microsoft/frognano",
+      "https://github.com/jetbrains/mellum"
+     ],
+     "survived": [
+      {
+       "repo": "https://github.com/ml-explore/mlx-lm",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/observation-inference/1/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/observation-inference/1/fit"
+       },
+       "source_review": "evidence/artifacts/landscape-sweep-20261009-api/ml-explore-mlx-lm.json"
+      },
+      {
+       "repo": "https://github.com/mostlygeek/llama-swap",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/observation-inference/4/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/observation-inference/4/fit"
+       },
+       "source_review": "evidence/artifacts/landscape-sweep-20261009-api/mostlygeek-llama-swap.json"
+      },
+      {
+       "repo": "https://github.com/ollama/ollama",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/observation-inference/6/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/observation-inference/6/fit"
+       },
+       "source_review": "evidence/artifacts/landscape-sweep-20261009-api/ollama-ollama.json"
+      },
+      {
+       "repo": "https://github.com/utkuozdemir/nvidia_gpu_exporter",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/observation-inference/7/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/observation-inference/7/fit"
+       },
+       "source_review": "evidence/artifacts/landscape-sweep-20261009-api/utkuozdemir-nvidia-gpu-exporter.json"
+      },
+      {
+       "repo": "https://github.com/prismml-eng/llama.cpp",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/observation-inference/8/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/observation-inference/8/fit"
+       },
+       "source_review": "evidence/artifacts/landscape-sweep-20261009-api/prismml-eng-llama-cpp.json"
+      },
+      {
+       "repo": "https://github.com/microsoft/frognano",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/observation-inference/9/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/observation-inference/9/fit"
+       },
+       "source_review": "evidence/artifacts/landscape-sweep-20261009-api/microsoft-frognano.json"
+      },
+      {
+       "repo": "https://github.com/jetbrains/mellum",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/observation-inference/10/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/observation-inference/10/fit"
+       },
+       "source_review": "evidence/artifacts/landscape-sweep-20261009-api/jetbrains-mellum.json"
+      }
+     ],
+     "refuted": [
+      {
+       "repo": "https://github.com/open-telemetry/semantic-conventions-genai",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/observation-inference/0/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/observation-inference/0/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/langfuse/langfuse",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/observation-inference/2/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/observation-inference/2/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/openlit/openlit",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/observation-inference/3/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/observation-inference/3/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/jaegertracing/jaeger",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/observation-inference/5/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/observation-inference/5/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/lablup/all-smi",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/observation-inference/11/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/observation-inference/11/fit"
+       }
+      }
+     ],
+     "reopen": []
+    },
+    {
+     "catalog": "foundation",
+     "layer_id": "hosting-services",
+     "requirement_sha256": "48c6a135983cda6c8eefb9848955270b55aed9ef5d6073ff9edeb90c2ba2b624",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "retained",
+     "discovery_ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/discovery/hosting-services",
+     "calls": {
+      "web_search": 5,
+      "web_fetch": 8,
+      "gh_api": 72,
+      "gpt6_web_search": 5,
+      "gpt6_web_fetch": 16,
+      "gpt6_gh_api": 51
+     },
+     "proposed": [
+      "https://github.com/openai/tart",
+      "https://github.com/anthropics/sandbox-runtime",
+      "https://github.com/openai/codex-universal",
+      "https://github.com/apple/container",
+      "https://github.com/cachix/devenv",
+      "https://github.com/podman-container-tools/podman",
+      "https://github.com/openai/orchard",
+      "https://github.com/nvidia/nvidia-container-toolkit",
+      "https://github.com/postgresapp/postgresapp",
+      "https://github.com/containerd/nerdctl",
+      "https://github.com/apptainer/apptainer"
+     ],
+     "known": [
+      "https://github.com/apple/container",
+      "https://github.com/cachix/devenv",
+      "https://github.com/podman-container-tools/podman"
+     ],
+     "new": [
+      "https://github.com/openai/tart",
+      "https://github.com/anthropics/sandbox-runtime",
+      "https://github.com/openai/codex-universal",
+      "https://github.com/openai/orchard",
+      "https://github.com/nvidia/nvidia-container-toolkit",
+      "https://github.com/postgresapp/postgresapp",
+      "https://github.com/containerd/nerdctl",
+      "https://github.com/apptainer/apptainer"
+     ],
+     "survived": [],
+     "refuted": [
+      {
+       "repo": "https://github.com/openai/tart",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/hosting-services/0/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/hosting-services/0/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/anthropics/sandbox-runtime",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/hosting-services/1/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/hosting-services/1/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/openai/codex-universal",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/hosting-services/2/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/hosting-services/2/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/apple/container",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/hosting-services/3/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/hosting-services/3/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/cachix/devenv",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/hosting-services/4/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/hosting-services/4/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/podman-container-tools/podman",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/hosting-services/5/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/hosting-services/5/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/openai/orchard",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/hosting-services/6/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/hosting-services/6/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/nvidia/nvidia-container-toolkit",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/hosting-services/7/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/hosting-services/7/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/postgresapp/postgresapp",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/hosting-services/8/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/hosting-services/8/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/containerd/nerdctl",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/hosting-services/9/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/hosting-services/9/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/apptainer/apptainer",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/hosting-services/10/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/hosting-services/10/fit"
+       }
+      }
+     ],
+     "reopen": [
+      {
+       "trigger": "retained_failure",
+       "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/failures/hosting-services"
+      },
+      {
+       "trigger": "retained_failure",
+       "ref": "evidence/artifacts/landscape-sweep-20261009-api/publication.md#reopened-layers"
+      }
+     ]
+    },
+    {
+     "catalog": "foundation",
+     "layer_id": "secrets-credentials",
+     "requirement_sha256": "90fc33447f621715fdc6efcb806daa2a0e9ba88283d5370183925ec52525d57e",
+     "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+     "votes": "retained",
+     "discovery_ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/discovery/secrets-credentials",
+     "calls": {
+      "web_search": 8,
+      "web_fetch": 7,
+      "gh_api": 71,
+      "gpt6_web_search": 8,
+      "gpt6_web_fetch": 16,
+      "gpt6_gh_api": 61
+     },
+     "proposed": [
+      "https://github.com/betterleaks/betterleaks",
+      "https://github.com/openbao/openbao",
+      "https://github.com/mongodb/kingfisher",
+      "https://github.com/trufflesecurity/trufflehog",
+      "https://github.com/samsung/credsweeper",
+      "https://github.com/praetorian-inc/titus",
+      "https://github.com/anthropics/claude-tag-wif-gateway-sample",
+      "https://github.com/praetorian-inc/noseyparker",
+      "https://github.com/openai/codex",
+      "https://github.com/git-ecosystem/git-credential-manager",
+      "https://github.com/openai/tunnel-client",
+      "https://github.com/openai/sign-in-with-chatgpt-devkit",
+      "https://github.com/anthropics/claude-code",
+      "https://github.com/linux-credentials/oo7",
+      "https://github.com/cli/cli"
+     ],
+     "known": [
+      "https://github.com/betterleaks/betterleaks",
+      "https://github.com/openbao/openbao",
+      "https://github.com/mongodb/kingfisher",
+      "https://github.com/trufflesecurity/trufflehog",
+      "https://github.com/praetorian-inc/titus",
+      "https://github.com/praetorian-inc/noseyparker"
+     ],
+     "new": [
+      "https://github.com/samsung/credsweeper",
+      "https://github.com/anthropics/claude-tag-wif-gateway-sample",
+      "https://github.com/openai/codex",
+      "https://github.com/git-ecosystem/git-credential-manager",
+      "https://github.com/openai/tunnel-client",
+      "https://github.com/openai/sign-in-with-chatgpt-devkit",
+      "https://github.com/anthropics/claude-code",
+      "https://github.com/linux-credentials/oo7",
+      "https://github.com/cli/cli"
+     ],
+     "survived": [
+      {
+       "repo": "https://github.com/betterleaks/betterleaks",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/secrets-credentials/0/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/secrets-credentials/0/fit"
+       },
+       "source_review": "evidence/artifacts/landscape-sweep-20261009-api/betterleaks-betterleaks.json"
+      },
+      {
+       "repo": "https://github.com/anthropics/claude-tag-wif-gateway-sample",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/secrets-credentials/6/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/secrets-credentials/6/fit"
+       },
+       "source_review": "evidence/artifacts/landscape-sweep-20261009-api/anthropics-claude-tag-wif-gateway-sample.json"
+      },
+      {
+       "repo": "https://github.com/praetorian-inc/noseyparker",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/secrets-credentials/7/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/secrets-credentials/7/fit"
+       },
+       "source_review": "evidence/artifacts/landscape-sweep-20261009-api/praetorian-inc-noseyparker.json"
+      },
+      {
+       "repo": "https://github.com/openai/codex",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/secrets-credentials/8/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/secrets-credentials/8/fit"
+       },
+       "source_review": "evidence/artifacts/landscape-sweep-20261009-api/openai-codex.json"
+      },
+      {
+       "repo": "https://github.com/openai/tunnel-client",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/secrets-credentials/10/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/secrets-credentials/10/fit"
+       },
+       "source_review": "evidence/artifacts/landscape-sweep-20261009-api/openai-tunnel-client.json"
+      },
+      {
+       "repo": "https://github.com/openai/sign-in-with-chatgpt-devkit",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/secrets-credentials/11/facts"
+       },
+       "fit": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/secrets-credentials/11/fit"
+       },
+       "source_review": "evidence/artifacts/landscape-sweep-20261009-api/openai-sign-in-with-chatgpt-devkit.json"
+      }
+     ],
+     "refuted": [
+      {
+       "repo": "https://github.com/openbao/openbao",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/secrets-credentials/1/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/secrets-credentials/1/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/mongodb/kingfisher",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/secrets-credentials/2/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/secrets-credentials/2/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/trufflesecurity/trufflehog",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/secrets-credentials/3/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/secrets-credentials/3/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/samsung/credsweeper",
+       "facts": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/secrets-credentials/4/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/secrets-credentials/4/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/praetorian-inc/titus",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/secrets-credentials/5/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/secrets-credentials/5/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/git-ecosystem/git-credential-manager",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/secrets-credentials/9/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/secrets-credentials/9/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/anthropics/claude-code",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/secrets-credentials/12/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/secrets-credentials/12/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/linux-credentials/oo7",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/secrets-credentials/13/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/secrets-credentials/13/fit"
+       }
+      },
+      {
+       "repo": "https://github.com/cli/cli",
+       "facts": {
+        "vote": "not_refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/secrets-credentials/14/facts"
+       },
+       "fit": {
+        "vote": "refuted",
+        "ref": "evidence/artifacts/landscape-sweep-20261009-api/returns.json#/votes/secrets-credentials/14/fit"
+       }
+      }
+     ],
+     "reopen": []
+    }
+   ]
   }
  ],
- "head_sha256": "d6d5695f02c2404b38476be33f5be536e47bbe1c4793ab03ffd4bc0c43abb7b2"
+ "head_sha256": "3d3c10a0f70b5ae546349313d74b56c0909e654ae20e07ac18b3cb2540fcfecc"
 }

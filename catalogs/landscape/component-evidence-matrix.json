@@ -90,6 +90,10 @@
           {
             "date": "2026-09-29",
             "sweep_id": "landscape-sweep-20260929"
+          },
+          {
+            "date": "2026-10-09",
+            "sweep_id": "landscape-sweep-20261009-api"
           }
         ],
         "unresolved": [],
@@ -347,6 +351,10 @@
           {
             "date": "2026-09-29",
             "sweep_id": "landscape-sweep-20260929"
+          },
+          {
+            "date": "2026-10-09",
+            "sweep_id": "landscape-sweep-20261009-api"
           }
         ],
         "unresolved": [],
@@ -1527,6 +1535,10 @@
           {
             "date": "2026-09-29",
             "sweep_id": "landscape-sweep-20260929"
+          },
+          {
+            "date": "2026-10-09",
+            "sweep_id": "landscape-sweep-20261009-api"
           }
         ],
         "unresolved": [],
@@ -1912,6 +1924,10 @@
           {
             "date": "2026-09-29",
             "sweep_id": "landscape-sweep-20260929"
+          },
+          {
+            "date": "2026-10-09",
+            "sweep_id": "landscape-sweep-20261009-api"
           }
         ],
         "unresolved": [],
@@ -2386,6 +2402,10 @@
           {
             "date": "2026-09-29",
             "sweep_id": "landscape-sweep-20260929"
+          },
+          {
+            "date": "2026-10-09",
+            "sweep_id": "landscape-sweep-20261009-api"
           }
         ],
         "unresolved": [],
@@ -2874,6 +2894,10 @@
           {
             "date": "2026-09-29",
             "sweep_id": "landscape-sweep-20260929"
+          },
+          {
+            "date": "2026-10-09",
+            "sweep_id": "landscape-sweep-20261009-api"
           }
         ],
         "unresolved": [],
@@ -3166,6 +3190,10 @@
           {
             "date": "2026-09-29",
             "sweep_id": "landscape-sweep-20260929"
+          },
+          {
+            "date": "2026-10-09",
+            "sweep_id": "landscape-sweep-20261009-api"
           }
         ],
         "unresolved": [],
@@ -3628,6 +3656,10 @@
           {
             "date": "2026-09-29",
             "sweep_id": "landscape-sweep-20260929"
+          },
+          {
+            "date": "2026-10-09",
+            "sweep_id": "landscape-sweep-20261009-api"
           }
         ],
         "unresolved": [],
@@ -4072,6 +4104,10 @@
           {
             "date": "2026-09-29",
             "sweep_id": "landscape-sweep-20260929"
+          },
+          {
+            "date": "2026-10-09",
+            "sweep_id": "landscape-sweep-20261009-api"
           }
         ],
         "unresolved": [],
@@ -4902,6 +4938,10 @@
           {
             "date": "2026-09-29",
             "sweep_id": "landscape-sweep-20260929"
+          },
+          {
+            "date": "2026-10-09",
+            "sweep_id": "landscape-sweep-20261009-api"
           }
         ],
         "unresolved": [],
@@ -9386,6 +9426,12 @@
             "layers": 20,
             "manifest_ref": "catalogs/sota-convergence/manifest-20260929.json",
             "sweep_id": "landscape-sweep-20260929"
+          },
+          {
+            "date": "2026-10-09",
+            "layers": 10,
+            "manifest_ref": "catalogs/sota-convergence/manifest-20261009-api.json",
+            "sweep_id": "landscape-sweep-20261009-api"
           }
         ],
         "host_e2e_platform": "linux-wsl2-x86_64",

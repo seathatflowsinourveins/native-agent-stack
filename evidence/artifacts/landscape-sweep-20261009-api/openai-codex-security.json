@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-openai-codex-security",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/openai/codex-security",
+ "reviewed_commit": "d4a4eaf315371c85088e1c9b0b05e5d206ef518a",
+ "readme_path": "README.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "ci-supply-chain"
+ ],
+ "claim": "Source and documentation review of openai/codex-security at commit d4a4eaf315371c85088e1c9b0b05e5d206ef518a (license Apache-2.0), read from README.md at that commit. Repository description: \"OpenAI's Codex Security CLI and TypeScript SDK for finding, validating, and fixing security vulnerabilities. npm: https://www.npmjs.com/package/@openai/codex-security\". Survived the landscape-sweep-20261009-api facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 11041,
+  "pushed_at": "2026-10-09T05:35:31Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@d4a4eaf315371c85088e1c9b0b05e5d206ef518a",
+   "text": "`@openai/codex-security` is a CLI and TypeScript SDK for finding, validating, and fixing security vulnerabilities in your code."
+  },
+  {
+   "source": "README.md@d4a4eaf315371c85088e1c9b0b05e5d206ef518a",
+   "text": "- Scan repositories, selected paths, or Git changes. Deep scans run parallel discovery workers on repositories and selected paths. - Validate candidate findings, generate patches, and verify existing fixes. - Draft `SECURITY.md` policies and save threat models for later review. - Browse saved scans and findings, identify duplicates, assess severity against your own rubric, and suggest owners from source and Git history. - Import GitHub code scanning alerts, export SARIF, JSON, or CSV, and publis"
+  },
+  {
+   "source": "README.md@d4a4eaf315371c85088e1c9b0b05e5d206ef518a",
+   "text": "Requires Node.js 22.13.0+ within 22.x, or Node.js 24.x or 26.x, and Python 3.10+. Python 3.10 also requires `tomli`."
+  }
+ ]
+}

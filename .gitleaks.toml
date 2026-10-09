@@ -424,3 +424,31 @@ regexTarget = "line"
 regexes = [
   '''^\s*"(?:after_neutral_key_manifest_sha256|archive_sha256|arms_json_sha256|artifact_archive_sha256|artifact_sha256|base_commit|before_neutral_key_manifest_sha256|binary_sha256_before|binary_sha256|cases_sealed_sha256|checkpoint_sha256|claim_sha256|commit|completed_sha256|config_sha256|content_sha256|corporate_actions_ledger|corpus_sha256sums|coverage_manifest|coverage_probes|dagu_archive_sha256|dagu|daily_parquet|dataset_ledger|derived_sha256|disk-token|disk_token|downloaded_receipt_sha256|entitlement_probe|evaluate_sha256|evaluated_at_commit|evaluation_events|expected_symbol_sha256|frozen_commit|head_sha|image_sha256|input_sha256|installed_binary_sha256|interpreter_sha256|ledger_sha256|machine_id_sha256|manifest_sha256|openapi_sha256|payload_iso_sha256|plan_sha256|preparation_receipt_sha256|private_original_sha256|python_sha256|qemu_binary_sha256|raw_sha256|recovered_sha256|refetch_check|response_sha256|result_sha256|retained_sha256|rtk_archive_sha256|runner_sha256|scan_private|seal_sha256|seed_sha256|sha256|source_head_pin|source_revision|source_sha256|stderr_raw_sha256|stderr_sha256|stdout_raw_sha256|stdout_sha256|symbols_sha256|ubuntu_keyring_sha256|uv_executable_sha256|workflow_sha256)":\s*"(?:[0-9a-f]{40}|[0-9a-f]{64})",?\s*$''',
 ]
+
+# Public Git commit identifiers can match the inherited legacy Sourcegraph rule
+# after recursive decoding. Native reference: gitleaks/gitleaks@v8.30.1,
+# config/config.go and detect/codec/{encodings,decoder,unicode,percent,segment}.go.
+# Require BOTH an exact dated sweep path and the complete commit-context line.
+# These are line contexts, so bare identifiers and unrelated paths still scan.
+# GitHub owner/repo selectors omit underscores: a modern sgp_ prefix in a URL
+# name cannot enter either permitted context. Keep the inherited rule unchanged.
+[[rules.allowlists]]
+description = "Public commit provenance in dated sweep manifests and returns"
+condition = "AND"
+paths = [
+  '''^catalogs/sota-convergence/manifest-[0-9]{8}-[a-z-]+\.json$''',
+  '''^evidence/artifacts/landscape-sweep-[0-9]{8}-[a-z-]+/returns\.json$''',
+]
+regexTarget = "line"
+# Pattern 1 admits only the two complete default-branch provenance sentences.
+# Pattern 2 requires the GitHub API commit-check sentence inside a notes row.
+# Its surrounding-text grammar excludes sgp_ without unsupported RE2 lookahead:
+# runs of s retain state; g and then p advance it; a following underscore has
+# no accepting transition. Mismatches reset state, including overlapping runs.
+# Partial s/sg/sgp states are safe at the fixed '[' and '.' context boundaries.
+# The guard is case-insensitive and excludes line breaks inside the JSON value.
+# Leading whitespace accepts the decoder's preceding newline boundary.
+regexes = [
+  '''(?i)^\s*"https://github\.com/[a-z0-9.-]+/[a-z0-9.-]+/commit/[0-9a-f]{40} (?:—|\\u2014) the newest default-branch \((?:main|master)\) commit since [0-9]{4}-[0-9]{2}-[0-9]{2}, dated [0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z(?:\. It meets the 90-day rule; archived=false\.| \(gh api commits\?since=[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z&per_page=1\)\. It meets the 90-day maintenance rule; repository archived=false\.)",?\s*$''',
+  '''(?i)^\s*"notes":\s*"(?:[^s\r\n]|s+(?:gp?s+)*(?:[^sg\r\n]|g(?:[^sp\r\n]|p[^s_\r\n])))*(?:s+(?:gp?s+)*(?:gp?)?)?\[The required commit check\]\(https://api\.github\.com/repos/[a-z0-9.-]+/[a-z0-9.-]+/commits\?since=[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}(?::|%3a)[0-9]{2}(?::|%3a)[0-9]{2}Z&per_page=1\) returned [0-9a-f]{40} dated [0-9]{4}-[0-9]{2}-[0-9]{2}\.(?:[^s\r\n]|s+(?:gp?s+)*(?:[^sg\r\n]|g(?:[^sp\r\n]|p[^s_\r\n])))*(?:s+(?:gp?s+)*(?:gp?)?)?",?\s*$''',
+]

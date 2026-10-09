@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "id": "pending-source-review-mergiraf-mergiraf",
+  "kind": "pending_upstream_provenance",
+  "status": "pending",
+  "evidence_class": "local_integration",
+  "repository": "https://codeberg.org/mergiraf/mergiraf",
+  "reviewed_commit": null,
+  "readme_path": null,
+  "layers": [
+    "git-github-automation"
+  ],
+  "claim": "The shipped source-review harness rejected this surviving Codeberg repository. Its upstream provenance review is pending. This record binds the observed publication gap; it contains no reviewed vendor commit, README excerpts, installation or adoption evidence.",
+  "observed": {
+    "source_reviews_exit_code": 1,
+    "native_error": "https://codeberg.org/mergiraf/mergiraf is neither a GitHub repository nor a Hugging Face model repository URL",
+    "source_reviews_ref": "tools/sota-convergence/landscape-sweep/source_reviews.py",
+    "source_reviews_lines": "1242-1252",
+    "harness_commit": "b7dfe638fc825a52ff4e7d1a9ccf2fde7de889fd",
+    "stderr_ref": "evidence/artifacts/landscape-sweep-20261009-api/source-reviews.stderr.txt",
+    "supported_reviews_ref": "evidence/artifacts/landscape-sweep-20261009-api/reviews.json",
+    "supported_reviews_sha256": "f4050736f39f04b447b51d848600b24f9ea16c2f077e4c489bb6dbf12dd233ca",
+    "research_source": "state:FINAL.md:31",
+    "research_source_sha256": "77e17817d8ecc8e53329ac32303ece8dc4e86eaf67cba1e3ae36196aa328a109"
+  },
+  "follow_up": "A separate Forgejo adapter change, with tests, must enable the native source-review tool to review mergiraf. Until that review is retained, the git-github-automation layer remains reopened for missing_capability.",
+  "documentation_excerpts": []
+}

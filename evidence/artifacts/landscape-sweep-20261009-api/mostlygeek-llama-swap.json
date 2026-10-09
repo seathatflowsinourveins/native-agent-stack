@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-mostlygeek-llama-swap",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/mostlygeek/llama-swap",
+ "reviewed_commit": "d34ddb2b0e0bb8eff03d1d73097c38246fdf0c57",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "observation-inference"
+ ],
+ "claim": "Source and documentation review of mostlygeek/llama-swap at commit d34ddb2b0e0bb8eff03d1d73097c38246fdf0c57 (license MIT), read from README.md at that commit. Repository description: \"Reliable model swapping for any local OpenAI/Anthropic compatible server - llama.cpp, vllm, etc\". Survived the landscape-sweep-20261009-api facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 5905,
+  "pushed_at": "2026-10-08T14:47:14Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@d34ddb2b0e0bb8eff03d1d73097c38246fdf0c57",
+   "text": "Run multiple generative AI models on your machine and hot-swap between them on demand. llama-swap works with any OpenAI and Anthropic API compatible server and is used by thousands of people to power their local AI workflows."
+  },
+  {
+   "source": "README.md@d34ddb2b0e0bb8eff03d1d73097c38246fdf0c57",
+   "text": "Built in Go for performance and simplicity, llama-swap has zero dependencies and is incredibly easy to set up. Get started in minutes - just one binary and one configuration file."
+  },
+  {
+   "source": "README.md@d34ddb2b0e0bb8eff03d1d73097c38246fdf0c57",
+   "text": "- ✅ Easy to deploy and configure: one binary, one configuration file. no external dependencies - ✅ On-demand model switching for many local AI servers (llama.cpp + forks, vllm, stable-diffusion.cpp, audio.cpp, ComfyUI, etc.) - future proof, upgrade your inference servers at any time. - ✅ OpenAI API supported endpoints: - `v1/completions` - `v1/chat/completions` - `v1/responses` - `v1/embeddings` - `v1/models` - list available models - `v1/audio/speech` ([#36](https://github.com/mostlygeek/llama-"
+  }
+ ]
+}
