@@ -1,0 +1,842 @@
+{
+ "schema": "claude-native-practice-slots/1",
+ "client_version": "2.1.295",
+ "checked_at": "2026-10-09",
+ "record": "docs/decisions/2026-10-09-claude-code-native-practice.md",
+ "selection_rule": "One default per role slot; overlaps become ranked alternatives or rejections. A native Claude Code feature that covers the slot is the default unless a measured gap exists. Repository quality selects (maintenance, releases, tests, docs, upstream adoption); popularity and invoke counts never do. A token or cost saving becomes a default only with quality parity measured on paired same-task runs (promptfoo 0.124.0 or the skill-creator benchmark, blind judge plus exact checks); otherwise it stays an alternative marked pending.",
+ "status_values": {
+  "default": "current default, evidenced",
+  "default-scoped": "current default with a recorded scope limit or correction",
+  "recommendation": "owner-gated choice; the row is a recommendation with evidence",
+  "trial": "candidate under a named measurement; not adopted",
+  "pending": "decision waits on a named run"
+ },
+ "slots": [
+  {
+   "id": "client-core",
+   "layer_id": "native-clients",
+   "status": "default",
+   "default": "Native installer build on the latest auto-update channel (`autoUpdatesChannel` unset or `latest`)",
+   "route": "`claude install` or the documented install.sh; background sessions move to a new version through the daemon or `claude respawn`",
+   "alternatives": [
+    "`stable` channel plus `minimumVersion` after an observed regression",
+    "Exact-version install with `DISABLE_AUTOUPDATER` for a frozen host"
+   ],
+   "rejections": [
+    "npm global install (deprecated since 2.1.15)",
+    "`DISABLE_UPDATES` on this host"
+   ],
+   "evidence": [
+    "setup.md install and update sections",
+    "settings-reference.md `autoUpdatesChannel`",
+    "CHANGELOG@v2.1.295 L7262 (npm deprecation, 2.1.15)"
+   ],
+   "overturn_when": "An observed auto-update regression breaks a qualified workflow (then `stable` plus `minimumVersion`), or Anthropic changes the default channel.",
+   "supersedes": [
+    "M51 reconfirmed"
+   ]
+  },
+  {
+   "id": "instruction-files",
+   "layer_id": "native-clients",
+   "status": "default-scoped",
+   "default": "`CLAUDE.md` that imports `@AGENTS.md`, Claude-only lines below the import, and `paths:`-scoped `.claude/rules`",
+   "route": "The four-rule core stays the only always-loaded text (G6a); practice lives in skills, hooks and docs",
+   "alternatives": [
+    "Project-instructions setting `claude-md-and-agents-md`",
+    "AGENTS.md read directly (2.1.277+) without a CLAUDE.md"
+   ],
+   "rejections": [
+    "SessionStart hook that prints AGENTS.md",
+    "Prose telling Claude to read AGENTS.md",
+    "`<important if>` conditional tags",
+    "Telegraphic compression of the core (M20)"
+   ],
+   "evidence": [
+    "memory.md import and AGENTS.md sections",
+    "memory-O7 (2.1.293: path-scoped rules also load on Write, Edit and single-file Bash views)"
+   ],
+   "notes": "The core loads twice per session on this host (user CLAUDE.md and the AGENTS.md import) and a third time when files under examples/claude-native/ are touched; AN-12's `claudeMdExcludes` entry is still unapplied. The token cost is unmeasured.",
+   "overturn_when": "A paired same-task run shows the import pattern loses adherence against an alternative, or a release changes AGENTS.md handling.",
+   "supersedes": [
+    "M2 (wider rule triggers)",
+    "MI-7 sizes are dated history"
+   ]
+  },
+  {
+   "id": "auto-memory",
+   "layer_id": "native-clients",
+   "status": "default-scoped",
+   "default": "Native auto memory on, in the default directory, with `MEMORY.md` kept as a short index",
+   "route": "Reaches the interactive coordinator, `-p` workers and forks; Agent-tool subagents do not load it; the cross-client memory of record stays in durable-memory (ai-memory)",
+   "alternatives": [
+    "`autoMemoryEnabled: false` per project",
+    "`autoMemoryDirectory` from user, `--settings` or managed scope only"
+   ],
+   "rejections": [
+    "thedotmack/claude-mem over native memory (no measured gain)",
+    "Repository-tracked auto memory (a repository-supplied `autoMemoryDirectory` is inert)"
+   ],
+   "evidence": [
+    "memory.md auto-memory section",
+    "memory-O9 (2.1.284: markup neutralized in MEMORY.md)",
+    "settings-reference `autoMemoryDirectory` scope"
+   ],
+   "overturn_when": "Paired runs show auto memory lowers quality, or dropping the index keeps quality at lower cost; or a release changes its defaults.",
+   "supersedes": [
+    "The 'index about 22 KB' note of the 2026-10-04 dispatch record (now about 3 KB)"
+   ]
+  },
+  {
+   "id": "settings-permissions",
+   "layer_id": "native-clients",
+   "status": "default-scoped",
+   "default": "Native layered settings (managed > `--settings` > local > project > user) with deny-first rules",
+   "route": "Deny rules block in every mode, bypass included; the host's `bypassPermissions` default is the owner's standing choice and is not reopened here",
+   "alternatives": [
+    "`auto` mode (unconfigured interactive sessions start in it since 2.1.285)",
+    "`dontAsk` with `--permission-prompts none` for headless review",
+    "`permissions.blockReadsOutsideWorkingDirectories`"
+   ],
+   "rejections": [
+    "`bypassPermissions` or `auto` in project settings",
+    "Model-backed PermissionRequest auto-approve hooks",
+    "Managed settings on this single-owner host"
+   ],
+   "evidence": [
+    "settings.md precedence",
+    "permissions.md deny-first evaluation",
+    "permission-modes.md",
+    "settings-permissions-O7, O15, O16"
+   ],
+   "notes": "Under bypass, writes to `.claude` and `.git` are auto-approved and no deny rule covers the guard's own files; any non-interactive run skips the trust dialog. The docs limit bypass to isolated containers or VMs; the recipe records bypass as an open owner decision (recipes/claude-native-profile.md:367).",
+   "overturn_when": "The owner reopens the permission mode, a release changes precedence or rule evaluation, or an incident shows a deny or hook gap.",
+   "supersedes": [
+    "M46 evidence sentence (auto start mode, 2.1.285)",
+    "AN-20 list of what still blocks under bypass"
+   ]
+  },
+  {
+   "id": "config-managers",
+   "layer_id": "native-clients",
+   "status": "default",
+   "default": "Native settings layering as the profile and provider switch",
+   "route": "`--settings` and `--setting-sources` per session; `CLAUDE_CONFIG_DIR` from the shell for a separate profile (it starts without the host's deny rules and guard hooks); provider keys only in user settings or an out-of-repo `--settings` file",
+   "alternatives": [
+    "`claude import --dry-run` to preview another client's config",
+    "musistudio/claude-code-router, only if the owner adopts a non-Anthropic route"
+   ],
+   "rejections": [
+    "farion1231/cc-switch",
+    "UfoMiao/zcf",
+    "router-for-me/CLIProxyAPI",
+    "dyoshikawa/rulesync as a switcher"
+   ],
+   "evidence": [
+    "settings.md `--settings`",
+    "env-vars.md `CLAUDE_CONFIG_DIR` (shell, user or managed only)"
+   ],
+   "notes": "`forceLoginMethod: gateway` in user settings is unconfirmed: the v2.1.295 CHANGELOG and the current docs disagree on its scope. Adjudicated: the native default stands; the refuter's correction only adds that claude-code-router already has a recorded disposition.",
+   "overturn_when": "A measured native gap: a profile or provider switch native layering cannot express.",
+   "supersedes": []
+  },
+  {
+   "id": "hooks",
+   "layer_id": "native-clients",
+   "status": "default-scoped",
+   "default": "Settings command hooks, with `onFailure: \"block\"` on each guard hook entry",
+   "route": "Needs client 2.1.295 or later; the guard wrapper must also refuse when its script is missing (proposal with the command center)",
+   "alternatives": [
+    "hookify (anthropics/claude-plugins-official)",
+    "Skill-scoped frontmatter hooks"
+   ],
+   "rejections": [
+    "lasso-security/claude-hooks",
+    "Plugin mods as guards",
+    "Prompt or agent hooks as security guards",
+    "`onFailure` on the matcher group (no effect)"
+   ],
+   "evidence": [
+    "hooks-O9 (2.1.295 onFailure)",
+    "docs/decisions/2026-10-08-guard-hook-fails-closed.md probe cases"
+   ],
+   "notes": "The repository's pinned floor is 2.1.284 (adoption/pins-linux-x86_64.json), which ignores `onFailure`; the template wrapper exits 0 when the guard script is missing. Only managed-settings hooks resist `disableAllHooks`.",
+   "overturn_when": "A release changes `onFailure` semantics, or reruns of the record's cases B, D, H and N on a newer client let the call through.",
+   "supersedes": [
+    "M40 refined",
+    "M28 refined (onFailure does not make Stop gates fail closed)"
+   ]
+  },
+  {
+   "id": "statusline",
+   "layer_id": "native-clients",
+   "status": "default-scoped",
+   "default": "Native `statusLine` (command and `refreshInterval`), fed the session JSON",
+   "route": "One pinned renderer behind a fixed launcher path; the template's bash glob wrapper retires in favour of the host's node launcher",
+   "alternatives": [
+    "jarrodwatts/claude-hud (current renderer)",
+    "sirmalloc/ccstatusline",
+    "A script from `/statusline` or the docs examples"
+   ],
+   "rejections": [
+    "The pre-0.10.0 bash glob wrapper in the template",
+    "Status lines that parse the transcript"
+   ],
+   "evidence": [
+    "statusline.md",
+    "statusline-O7 (2.1.293 subagentStatusLine agentType)"
+   ],
+   "notes": "The renderer runs outside the sandbox with full user access and receives `transcript_path`; pin it and run it through a fixed launcher. Adjudicated: native default, claude-hud ranked first; the refuter upheld it. Owed: the M14 idle check on 2.1.295 at refreshInterval 5 for both renderers.",
+   "overturn_when": "claude-hud stops releasing or its CI stays red, or the M14 idle check shows index rewrites or lock contention that ccstatusline avoids.",
+   "supersedes": [
+    "M14 premise (claude-hud 0.8.0 git calls)"
+   ]
+  },
+  {
+   "id": "checkpoints-rewind",
+   "layer_id": "native-clients",
+   "status": "default-scoped",
+   "default": "Native checkpointing (`/rewind`, Esc Esc) with Git as the permanent history",
+   "route": "Covers the interactive coordinator's file-tool edits; `-p` workers get none unless `CLAUDE_CODE_ENABLE_SDK_FILE_CHECKPOINTING=true`; subagent and Workflow edits are not restored",
+   "alternatives": [
+    "`/branch` or `--fork-session`",
+    "SDK file checkpointing for `-p` workers that need rewind"
+   ],
+   "rejections": [
+    "Turning checkpointing off",
+    "Checkpoints as version control"
+   ],
+   "evidence": [
+    "checkpointing.md",
+    "claude-directory.md retention (cleanupPeriodDays default 30)",
+    "checkpoints-rewind-O6, O7, O8"
+   ],
+   "notes": "`cleanupPeriodDays: 3650` keeps plaintext transcripts and pre-edit snapshots for about ten years: an exposure window for any secret a tool read. Retention is the owner's choice; the record gives the trade-off and a recommended value.",
+   "overturn_when": "A measured footprint or an owner retention decision, or a release changes what checkpoints restore.",
+   "supersedes": []
+  },
+  {
+   "id": "sandbox",
+   "layer_id": "isolation",
+   "status": "trial",
+   "default": "Hardened native Bash sandbox, delivered through `claude --settings` or managed settings",
+   "route": "`enabled`, `allowUnsandboxedCommands: false`, `failIfUnavailable: true`, `autoAllowBashIfSandboxed: false`, `network.strictAllowlist` in user scope, credential deny entries; owner opt-in after M1's arms pass",
+   "alternatives": [
+    "anthropics/sandbox-runtime around the whole process",
+    "Dev container or VM for bypass sessions (the docs' guidance; candidate, not adopted without measurement)"
+   ],
+   "rejections": [
+    "dagger/container-use",
+    "Prompt-contract isolation",
+    "Sandbox without filesystem isolation"
+   ],
+   "evidence": [
+    "sandboxing.md",
+    "sandbox-environments.md (bypass sessions belong in a container, VM or the sandbox runtime)"
+   ],
+   "notes": "The native sandbox bounds shell commands only; file tools, MCP servers, hooks and the status line stay outside it. Bypass is not reopened.",
+   "overturn_when": "M1's arms pass on this host and the owner opts in, or a worker is seen taking a harmful action.",
+   "supersedes": [
+    "M1 refined"
+   ]
+  },
+  {
+   "id": "worktrees",
+   "layer_id": "isolation",
+   "status": "default-scoped",
+   "default": "Coordinator-created worktree at the exact base (`git worktree add --no-track <path> -b <branch> <base>`), with the session started in it",
+   "route": "The native isolation checks apply only to `--worktree` and EnterWorktree sessions; for a plain launch the main-checkout protection is the builder's prompt contract",
+   "alternatives": [
+    "A WorktreeCreate hook that creates each worktree at its exact base",
+    "Pre-create at the exact base under `.claude/worktrees/<name>`, then `claude --worktree <name>`",
+    "Native `--worktree` with `worktree.baseRef: head`",
+    "max-sixty/worktrunk"
+   ],
+   "rejections": [
+    "`isolation: worktree` in builder frontmatter (rewrote core.hooksPath on 2026-09-25)"
+   ],
+   "evidence": [
+    "worktrees.md (checks apply to --worktree and EnterWorktree sessions)",
+    "2026-09-27 settings record (hooksPath incident)"
+   ],
+   "overturn_when": "The M49 probe passes for a native path: concurrent builders from different exact bases, the four checks applied and core.hooksPath unchanged.",
+   "supersedes": [
+    "M49 refined"
+   ],
+   "notes": "Adjudicated: the current practice stands (refuter pending at writing). Owed: the M49 probe on 2.1.295 for the WorktreeCreate and pre-create paths."
+  },
+  {
+   "id": "model-effort-routing",
+   "layer_id": "native-clients",
+   "status": "recommendation",
+   "default": "Native per-role model and effort: subagent and skill frontmatter, the Agent tool's `model` and `effort` (2.1.292+), per-model `modelSettings`, and `--model`/`--effort` on headless jobs",
+   "route": "Opus 5.5 for judgment and build; Sonnet 5.5 or Haiku 5.5 only for a task class with a frozen paired A/B at parity; keep `CLAUDE_CODE_EFFORT_LEVEL` and `CLAUDE_CODE_SUBAGENT_MODEL_FORCE` unset, because they override frontmatter and per-call effort; Codex lanes through the gateway for fan-out research",
+   "alternatives": [
+    "Re-run failed attempts at a higher effort",
+    "Native advisor pairing"
+   ],
+   "rejections": [
+    "musistudio/claude-code-router",
+    "`opusplan` as a default",
+    "A global `CLAUDE_CODE_EFFORT_LEVEL` pin",
+    "A cheaper subagent default without an A/B",
+    "`MAX_THINKING_TOKENS` caps"
+   ],
+   "evidence": [
+    "sub-agents.md model resolution order",
+    "model-effort-O3, O5, O7",
+    "Measured here: promptfoo three-model extraction A/B, 60/60 each (one fixture class); #840 Haiku trial",
+    "Designed, not measured: J4 tiering (Opus census, Haiku sample, sealed 5% Opus re-read)"
+   ],
+   "notes": "Model choices are the owner's; this row is a recommendation. The M7 effort sweep (high, xhigh, max on our tasks) is owed.",
+   "overturn_when": "The M7 sweep shows a lower effort at quality parity for a task class, or max scoring below xhigh; or a newer model release.",
+   "supersedes": [
+    "R52 (Ultracode is a separate toggle since 2.1.284)",
+    "AN-05 (`sonnet` resolves to Sonnet 5.5)",
+    "M7 extended with Anthropic's published effort priors"
+   ]
+  },
+  {
+   "id": "context-compaction",
+   "layer_id": "token-efficiency",
+   "status": "default",
+   "default": "Native auto-compaction at the model's default window, with `/compact <focus>` at natural breaks, `/clear` between unrelated tasks and a Compact Instructions section in CLAUDE.md",
+   "route": "Manual levers apply to top-level interactive sessions; `-p` workers, Workflow children and subagents compact automatically; re-inject must-keep state with a SessionStart hook matching `compact`",
+   "alternatives": [
+    "SessionStart(compact) hook",
+    "Per-model `/autocompact` window behind a 200K gateway"
+   ],
+   "rejections": [
+    "A standing `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE` or lowered window",
+    "Disabling auto-compaction",
+    "Fixed-percentage 'rot boundary' rules"
+   ],
+   "evidence": [
+    "context-window.md what survives compaction",
+    "context-token-O3, O15, O16",
+    "Measured upstream: compaction pays only on long runs (Anthropic, optimizing-for-cost-and-intelligence)"
+   ],
+   "notes": "No quality loss measured or claimed: this is the native default; no override is set on the host or template.",
+   "overturn_when": "A paired same-task run shows an earlier window keeps quality at lower cost, or a release changes compaction.",
+   "supersedes": [
+    "topic: auto-compact threshold (window now saved per model)",
+    "M16 (compaction retraction defect fixed in 2.1.293)",
+    "M17 (SessionStart compact matcher is the documented route)"
+   ]
+  },
+  {
+   "id": "prompt-caching",
+   "layer_id": "token-efficiency",
+   "status": "default",
+   "default": "Native automatic prompt caching with the default TTL buckets and no TTL overrides",
+   "route": "The subscription main conversation, `-p` workers and Agent SDK turns get the 1-hour TTL within plan usage; subagents, Workflow children, API keys, usage credits and cloud providers get 5 minutes; model switches and plugin toggles invalidate the prefix, while CLAUDE.md edits and MCP connects under deferred tool search keep it",
+   "alternatives": [
+    "`promptCacheTtl: 1h` scoped to API-key runs with 5-60 minute idle gaps",
+    "`--exclude-dynamic-system-prompt-sections` for scripted fan-out",
+    "`experimental.cacheTtl` on one subagent that idles"
+   ],
+   "rejections": [
+    "A global 1-hour TTL environment override",
+    "Keep-alive requests"
+   ],
+   "evidence": [
+    "prompt-caching.md TTL buckets",
+    "context-token-O9, O11, O12, O18",
+    "Measured here: daily prompt-cache hit 94-97.5% (ccusage)"
+   ],
+   "notes": "No quality loss measured or claimed: caching does not change outputs.",
+   "overturn_when": "A release changes the TTL buckets, or a measured cache-hit drop on a run shape we use.",
+   "supersedes": [
+    "R53, R59 and the 1-hour TTL topic (buckets now native)",
+    "AN-23 (experimental.cacheTtl is fourth in precedence)"
+   ]
+  },
+  {
+   "id": "output-compression",
+   "layer_id": "token-efficiency",
+   "status": "default-scoped",
+   "default": "Native output bounds and delegation: `BASH_MAX_OUTPUT_LENGTH`/`bashOutputMaxChars` (30,000 characters by default), MCP results over 25,000 tokens saved to a file, filtering hooks, and subagents for large reads",
+   "route": "context-mode, rtk and headroom stay installed by owner direction; none becomes the default without a paired quality-parity run (a J7 class is requested)",
+   "alternatives": [
+    "headroomlabs-ai/headroom",
+    "rtk-ai/rtk",
+    "mksglu/context-mode"
+   ],
+   "rejections": [
+    "JuliusBrussee/caveman output styles",
+    "Raising `MAX_MCP_OUTPUT_TOKENS` globally"
+   ],
+   "evidence": [
+    "env-vars.md and settings-reference output limits",
+    "Measured usage: rtk 13.9% of 1,243.1M input tokens saved (rtk gain, all time); context-mode 32,484 Codex calls in 24 h and 743 MB kept out of context over 5 days; headroom 0 compressions (not in the request path)"
+   ],
+   "notes": "Token reductions are measured and quality parity is not, so no tool is the default. Usage observed on 2026-10-09 (information, not a selector): rtk 13.9% of 1,243.1M input tokens (rtk gain), context-mode 32,484 Codex calls in 24 h, headroom 0 compressions because it is not in the request path. Adjudicated: native default with headroom ranked first on its published fidelity evals; the refuter upheld it. Owed: a paired quality-parity run per mechanism (a J7 class).",
+   "overturn_when": "A paired same-task run shows a tool at quality parity with a measured saving; it then becomes the default for the mechanism it covers.",
+   "supersedes": [
+    "M35 (pin and proxy facts moved)"
+   ]
+  },
+  {
+   "id": "skills-library",
+   "layer_id": "instructions-skills",
+   "status": "default",
+   "default": "Native Agent Skills at personal scope, filled from the pinned vendor manifest (adoption/skills/manifest.json) and governed by `skillOverrides`, `skillListingBudgetFraction` and `/skill-doctor`",
+   "route": "Claude Code discovers nested `<subdir>/.claude/skills` (at start or lazily) and names clashes `<dir>:<name>`; Codex reads `<dir>/.agents/skills` only from the project root down to its working directory",
+   "alternatives": [
+    "anthropics/claude-plugins-official",
+    "anthropics/skills content (a blinded comparison is owed before any re-rule)",
+    "`claude plugin init` skills-dir plugins"
+   ],
+   "rejections": [
+    "`syncClaudeAiSkills: true` (synced skills bypass the pinned manifest)",
+    "Packaging our own skills and agents as marketplace plugins (R56)",
+    "github/awesome-copilot as a library",
+    "obra/superpowers process skills (excluded in the manifest)"
+   ],
+   "evidence": [
+    "skills.md 'Choose where skills load'",
+    "skills-I1, skills-I2 (inline-verified)",
+    "CHANGELOG L7339 (2.1.6), L4303 and L4313 (2.1.178)"
+   ],
+   "notes": "Adjudicated: the native mechanism with the pinned manifest stands; the refuter upheld it. Owed: paired with/without runs per manifest skill on our tasks.",
+   "overturn_when": "A paired with/without run shows a manifest skill lowering quality, or a blinded comparison shows another library ahead.",
+   "supersedes": [
+    "M9 (judge still defaults to haiku)",
+    "M23 (disable-model-invocation documented)"
+   ]
+  },
+  {
+   "id": "plugin-marketplaces",
+   "layer_id": "instructions-skills",
+   "status": "default-scoped",
+   "default": "Native marketplaces with commit-pinned plugin sources (plugin-level `sha`), the official marketplace first",
+   "route": "A catalog-owned marketplace.json with sha-pinned entries; a sha pin holds while the commit stays reachable; marketplace sources take a `ref`, never a `sha`",
+   "alternatives": [
+    "Publisher marketplaces pinned by tag (current state)"
+   ],
+   "rejections": [
+    "Packaging our own agents and skills as plugins",
+    "Managed marketplace allowlists on this host"
+   ],
+   "evidence": [
+    "plugin-marketplaces reference (sha on plugin sources)",
+    "plugins-marketplaces-O7, O8, O9"
+   ],
+   "notes": "Our marketplaces use tags or no ref (context-mode, worktrunk, codex). codex 0.162.0 now ships the review capability codex-plugin-cc bridged: trial owed (currency).",
+   "overturn_when": "A release adds sha pins to marketplace sources, or a pinned commit becomes unreachable.",
+   "supersedes": [
+    "M8 answered (no sha on marketplace sources)",
+    "R56 reaffirmed"
+   ]
+  },
+  {
+   "id": "output-styles",
+   "layer_id": "instructions-skills",
+   "status": "default-scoped",
+   "default": "Built-in Default output style in the repository templates",
+   "route": "The owner's primary checkout sets `Concise` in its untracked settings.local.json: an owner choice, not a repository default",
+   "alternatives": [
+    "Built-in Concise style (pending M19's paired run)"
+   ],
+   "rejections": [
+    "Explanatory and learning style plugins as defaults",
+    "Terse-output prompt packs"
+   ],
+   "evidence": [
+    "output-styles.md",
+    "output-styles-O8, O9"
+   ],
+   "notes": "The dispositions catalog marks Concise 'declined' without a measurement; it should read 'not measured, pending M19'.",
+   "overturn_when": "M19's paired run shows Concise at quality parity with a measured saving.",
+   "supersedes": [
+    "M19 (runs on 2.1.295)"
+   ]
+  },
+  {
+   "id": "commands",
+   "layer_id": "instructions-skills",
+   "status": "default",
+   "default": "Skills (`SKILL.md`) as the only surface for custom slash commands",
+   "route": "`.claude/commands` still works, but a skill wins a name clash; a model-invocable skill named `verify` is run before commits since 2.1.286 (#814)",
+   "alternatives": [
+    "`.claude/commands` files",
+    "Plugin commands"
+   ],
+   "rejections": [
+    "SuperClaude command packs",
+    "claude-code-templates command packs"
+   ],
+   "evidence": [
+    "skills.md 'Custom commands have been merged into skills'",
+    "skills-O9 (2.1.286 verify)"
+   ],
+   "overturn_when": "A release separates commands from skills again.",
+   "supersedes": []
+  },
+  {
+   "id": "practice-references",
+   "layer_id": "instructions-skills",
+   "status": "default",
+   "default": "Pinned, read-only practice-reference catalog with a weekly freshness check; primary sources first, community guides as leads",
+   "route": "catalogs/foundation/practice-references.json and practice-references-freshness.yml; this review's re-pins go to grand-catalog as a candidate file",
+   "alternatives": [
+    "FlorianBruniaux/claude-code-ultimate-guide",
+    "shanraisshan/claude-code-best-practice",
+    "hesreallyhim/awesome-claude-code"
+   ],
+   "rejections": [
+    "Installing a guide's .claude configuration wholesale"
+   ],
+   "evidence": [
+    "practice_references.py; the 2026-10-09 candidate file (37 references, 11 new)"
+   ],
+   "overturn_when": "A guide is archived or goes stale under the 90-day rule, or a vendor publishes a maintained practice catalog.",
+   "supersedes": []
+  },
+  {
+   "id": "subagent-definitions",
+   "layer_id": "workers",
+   "status": "default-scoped",
+   "default": "File-based subagent definitions at project scope (`.claude/agents`), installed to `~/.claude/agents` by the profile installer",
+   "route": "Each role carries its `tools` allowlist, model and effort; under `-p` or the Agent SDK a named spawn stays a subagent, while an interactive named spawn can become a teammate",
+   "alternatives": [
+    "`--agents` JSON per session",
+    "Ad-hoc stages with per-call model and effort"
+   ],
+   "rejections": [
+    "Plugin-packaged copies of our definitions",
+    "VoltAgent/awesome-claude-code-subagents as a source",
+    "`CLAUDE_CODE_SUBAGENT_MODEL_FORCE`"
+   ],
+   "evidence": [
+    "sub-agents.md frontmatter and priority",
+    "subagents-teams-O2, O3, O15"
+   ],
+   "notes": "Four host copies differ from adoption/agents/claude and four host-only definitions exist (G6b). Portability: the user-scope copies run in other projects, where 4 are stale and 4 of 11 bodies point at native-agent-stack-only paths; the north star needs repository-neutral bodies before relying on them.",
+   "overturn_when": "A release changes definition scope or priority, or a measured role-quality gap.",
+   "supersedes": []
+  },
+  {
+   "id": "agent-teams",
+   "layer_id": "workers",
+   "status": "default-scoped",
+   "default": "Native agent teams, used only where workers must message each other",
+   "route": "Teammates spawn only in interactive sessions; `-p` and SDK runs keep named subagents as subagents",
+   "alternatives": [
+    "Plain subagents",
+    "Cross-session messaging between sessions you run",
+    "Workflows"
+   ],
+   "rejections": [
+    "oh-my-claudecode's tmux team workers",
+    "Sonnet teammates without a paired run"
+   ],
+   "evidence": [
+    "agent-teams.md",
+    "subagents-teams-O15"
+   ],
+   "notes": "The host enables teams globally while the repository scopes them narrowly; whether that matches is the owner's call. No measurement of teams on our tasks exists. Verified: the switch sits in host user settings, so named subagents become teammates in every interactive session of every project, and teammates start in the lead's permission mode (bypass here).",
+   "overturn_when": "A paired run shows teams lose quality or cost more for the same work, or the feature leaves experimental status with changed semantics.",
+   "supersedes": [
+    "R50 effort clause"
+   ]
+  },
+  {
+   "id": "background-workflows",
+   "layer_id": "workers",
+   "status": "default-scoped",
+   "default": "Dynamic Workflows (Workflow tool; saved workflows in `.claude/workflows` or `~/.claude/workflows`)",
+   "route": "Runs resume from their journal after a pause or a usage limit (observed 2026-10-09); background sessions under the native supervisor for long single tasks",
+   "alternatives": [
+    "`claude --bg` sessions",
+    "Background subagents",
+    "`claude -p` from a script"
+   ],
+   "rejections": [
+    "A second background daemon"
+   ],
+   "evidence": [
+    "workflows.md resume and limits",
+    "background-workflows-O8, O9, O10"
+   ],
+   "notes": "Saved workflows are not yet at a native discovery location, and the adopt step names an agents/ directory that does not exist. Verified: a `-p` launch of a saved Workflow needs a launch-scoped `--allowedTools 'Workflow(<name>)'`; on WSL2 background carry-over relies on the on-demand supervisor.",
+   "overturn_when": "A release changes Workflow resume or limits, or a measured failure mode on our runs.",
+   "supersedes": [
+    "R52 Ultracode clause"
+   ]
+  },
+  {
+   "id": "orchestration-frameworks",
+   "layer_id": "workers",
+   "status": "default",
+   "default": "Native composition without a framework layer: subagent definitions, Workflows, agent teams, background sessions and cross-session messaging",
+   "route": "Choose by who coordinates, whether workers talk and whether files overlap (agents.md); recipes from a framework enter only as skill content through native extension points",
+   "alternatives": [
+    "`/batch` (bundled; one large change across worktree-isolated subagents)",
+    "OrchestratorInc/agent-orchestrator in its bounded role for sessions it launches (2026-10-08 decision)"
+   ],
+   "rejections": [
+    "EveryInc/compound-engineering-plugin as a layer",
+    "SuperClaude-Org/SuperClaude_Framework",
+    "Yeachan-Heo/oh-my-claudecode",
+    "Chachamaru127/claude-code-harness"
+   ],
+   "evidence": [
+    "agents.md how to choose",
+    "workflows.md",
+    "L2 framework ranking (compound-engineering first on its own quality, all seven overlap native)"
+   ],
+   "overturn_when": "A paired same-task run shows a framework ahead of native composition on quality at equal or lower cost.",
+   "supersedes": [],
+   "notes": "Adjudicated: native composition stands; the refuter upheld it. No framework shows a measured gain on our tasks. Scope: Claude-side composition; Codex lanes compose through hcom (2026-10-06 decision). G5 holds two rows for agent-orchestrator (OrchestratorInc and its former name, one repository id) to reconcile."
+  },
+  {
+   "id": "planning-persistence",
+   "layer_id": "workers",
+   "status": "default",
+   "default": "Repository-resident task state per Anthropic's multi-context-window guidance (a JSON status file, free-text progress notes and git commits, read at session start), with native plan mode for the plan",
+   "route": "One recipe paragraph names the files; set `plansDirectory` at project scope to a path inside the repository (unset, plans go to ~/.claude/plans and are not repository-resident), or copy the approved plan into the state files",
+   "alternatives": [
+    "Native Task tools with `CLAUDE_CODE_TASK_LIST_ID`",
+    "Native plan mode with `plansDirectory`",
+    "OthmanAdi/planning-with-files",
+    "gastownhall/beads"
+   ],
+   "rejections": [
+    "Storybloq/storybloq",
+    "claude-code-harness's full plan-work-review cycle",
+    "A standing `CLAUDE_CODE_ENABLE_TODO_TOOLS=1`",
+    "github/spec-kit for session state"
+   ],
+   "evidence": [
+    "platform prompting guide, 'Workflows across multiple context windows'",
+    "Anthropic engineering, 'Effective harnesses for long-running agents'"
+   ],
+   "overturn_when": "Paired same-task runs on long multi-session tasks, with forced restarts and compaction, show an alternative ahead on quality.",
+   "supersedes": [],
+   "notes": "Adjudicated: the Anthropic convention stands; the refuter upheld it."
+  },
+  {
+   "id": "loops-completion",
+   "layer_id": "workers",
+   "status": "default",
+   "default": "Native Stop hook as the completion gate, with `/goal` and the self-paced `/loop` for fitting conditions",
+   "route": "Command type for deterministic checks; prompt type with an explicit model for judged conditions; `stop_hook_active` and the continuation cap bound the loop",
+   "alternatives": [
+    "`/goal`",
+    "cobusgreyling/loop-engineering patterns as reference"
+   ],
+   "rejections": [
+    "Ralph-style bash loops",
+    "ralph-loop plugin as the default"
+   ],
+   "evidence": [
+    "hooks.md Stop event",
+    "goal.md"
+   ],
+   "notes": "No completion gate is configured today; the KC-19 trial was designed and never run. Verified: a command gate fails open by default (a gate that cannot start or times out lets Claude stop); `onFailure: \"block\"` (2.1.295) is not yet in hooks.md, so pick and test the failure mode; for agent-team members use TeammateIdle; for Workflow children put a Stop hook in the agent's frontmatter (runs as SubagentStop).",
+   "overturn_when": "A paired run shows a loop pattern catching more real defects at equal cost, or a release changes Stop semantics.",
+   "supersedes": [
+    "Completion-loops topic (native composition now converged)"
+   ]
+  },
+  {
+   "id": "scheduled-tasks",
+   "layer_id": "scheduling-supervision",
+   "status": "default",
+   "default": "systemd --user timers with oneshot services for durable host-local runs (a bounded headless command, `claude -p` with explicit settings when a model is needed)",
+   "route": "Session `/loop` and the Cron tools only for temporary in-session polling (7-day expiry, no catch-up); GitHub Actions schedules for repository jobs",
+   "alternatives": [
+    "Session `/loop` and Cron tools",
+    "Cloud routines",
+    "dagucloud/dagu for multi-step local workflows",
+    "GitHub Actions schedule"
+   ],
+   "rejections": [
+    "Session tasks as the durable scheduler",
+    "Saved scheduled tasks as reboot-durable state",
+    "'Recurring tasks last 3 days'"
+   ],
+   "evidence": [
+    "scheduled-tasks docs",
+    "scheduling-O7, O8, O10"
+   ],
+   "overturn_when": "A native scheduler survives a host restart with catch-up, or the systemd run fails where a native one passes.",
+   "supersedes": [],
+   "notes": "Adjudicated: systemd stands (refuter pending at writing). Owed: a `claude -p` run started by a systemd timer across a WSL restart. Verified: on WSL2 the timers outlast sessions and terminal closes but not the distro; after a shutdown nothing fires until the distro starts, and missed runs catch up only with `Persistent=true` (token-report-refresh lacks it)."
+  },
+  {
+   "id": "mcp-config-tool-search",
+   "layer_id": "mcp-surfaces",
+   "status": "default",
+   "default": "Native MCP configuration with tool search at its default (tools deferred), default output caps and `alwaysLoad` unset",
+   "route": "User-scope registrations; `alwaysLoad: true` only for a small server used on every turn; `ENABLE_TOOL_SEARCH=true` behind a non-first-party base URL",
+   "alternatives": [
+    "modelcontextprotocol/inspector 2.10.1 for inspection (overlap with mcporter to resolve)"
+   ],
+   "rejections": [
+    "`ENABLE_TOOL_SEARCH=auto:N`",
+    "Disabling tool search",
+    "Raising `MAX_MCP_OUTPUT_TOKENS` globally"
+   ],
+   "evidence": [
+    "mcp.md tool search and output limits",
+    "mcp-O2, O3, O4, O5, O6, O7"
+   ],
+   "notes": "Registrations drift between host and template (qmd stdio versus HTTP, ports, a server key): G6b. Verified: on user-scope registrations `alwaysLoad: true` loads every tool of that server upfront (the per-tool opt-out works only for --mcp-config, SDK and plugin servers); image results stay under MAX_MCP_OUTPUT_TOKENS; the upfront fallback behind a non-first-party base URL dates from 2.1.70.",
+   "overturn_when": "A measured context or quality gap from deferral, or a release changes tool-search defaults.",
+   "supersedes": [
+    "topic: MCP tool loading (native deferral converged)"
+   ]
+  },
+  {
+   "id": "mcp-shared-servers",
+   "layer_id": "mcp-surfaces",
+   "status": "trial",
+   "default": "One vendor-native Streamable HTTP service per heavy MCP server, admitted one server at a time after a PSS before/after and tool-surface parity check",
+   "route": "Registered with `claude mcp add --transport http --scope user`; stdio stays for servers without an HTTP mode",
+   "alternatives": [
+    "smart-mcp-proxy/mcpproxy-go (first trial alternative)",
+    "1mcp-app/agent"
+   ],
+   "rejections": [
+    "A proxy in front of a server that already speaks HTTP, without a measured advantage",
+    "`claude mcp serve` as a pooling mechanism"
+   ],
+   "evidence": [
+    "mcp.md HTTP transport",
+    "docs/decisions/2026-10-08-qmd-shared-mcp.md (QMD pilot)",
+    "Baseline RSS per group: serena plus pyright 5.7 GiB, chrome-devtools 2.6, context-mode 2.6, qmd 2.0"
+   ],
+   "notes": "Measurement owed: serena with pyright in three arms (per-session stdio, one native HTTP instance, behind mcpproxy-go): PSS, process-exporter RSS, latency and tool parity. Adjudicated mixed (native HTTP default, mcpproxy-go first alternative); the refuter upheld it. Admission gate per server, before PSS and tool parity: binds 127.0.0.1 only; rejects an invalid Origin with 403 (MCP 2026-07-28 Streamable HTTP); authenticates where the vendor supports it, through headersHelper, never literal values in a committed template; register through adoption/mcp/claude-user.json and re-render. Servers that scope by the client's project or working directory (serena) are excluded from sharing across projects.",
+   "overturn_when": "The three-arm run shows the proxy ahead on memory, latency or reliability on our servers.",
+   "supersedes": []
+  },
+  {
+   "id": "headless-sdk",
+   "layer_id": "agent-sdks",
+   "status": "default-scoped",
+   "default": "`claude -p` with every fence on the command line",
+   "route": "An explicit `--permission-mode dontAsk` with an explicit `--allowedTools` list for unattended workers (never inherit: an inheriting `-p` run on this host starts in bypassPermissions); `--strict-mcp-config` with `--mcp-config`; `--setting-sources` or `--restricted` (then carry the deny list and guard hooks through `--settings`, or keep code-running tools out of `--tools`); `--tools`, `--max-turns` (documented in cli-reference, absent from `--help`), `--max-budget-usd`, `--json-schema`; bound the post-final-turn wait with `CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS`; `CLAUDE_CODE_SUBPROCESS_ENV_SCRUB` for child processes; the Claude Agent SDK (Python) as the measured reader and extraction worker",
+   "alternatives": [
+    "claude-agent-sdk-python for hosted workers",
+    "claude-agent-sdk-typescript"
+   ],
+   "rejections": [
+    "`--bare` on OAuth subscription lanes (it never reads OAuth)",
+    "`--bare` for reader jobs (it drops Glob and Grep; measured on 2.1.295)",
+    "Relying on the built-in starting mode"
+   ],
+   "evidence": [
+    "headless.md",
+    "headless-sdk-O2, O3, O4, O5, O12",
+    "Measured: --bare leaves only Read of Read/Glob/Grep (client-behaviour-2.1.295 record)"
+   ],
+   "notes": "HOST-07 required `--bare` outside trusted checkouts; on this OAuth host the documented fence is `--restricted` with `--permission-prompts none` and `--strict-mcp-config`. Two call sites lack fences (skill_usage.py).",
+   "overturn_when": "A release changes `-p` defaults or `--bare` authentication, or a measured fence gap.",
+   "supersedes": [
+    "M6 (the fence for non-bare lanes)",
+    "HOST-07 on OAuth hosts",
+    "M46 (`-p` start mode can be auto)"
+   ]
+  },
+  {
+   "id": "github-action",
+   "layer_id": "git-github-automation",
+   "status": "default",
+   "default": "anthropics/claude-code-action at commit 2dca132ff0e0c4094ce6048b422c6915a071210b (v1.0.247)",
+   "route": "Workload identity federation only; dispatch-only or variable-gated jobs; explicit `--model` and `--effort`; read-only tools with `--restricted`; `ACTIONS_STEP_DEBUG` pinned false and debug settings refused before any token; `execution_file` never published; WIF inputs include the optional `anthropic_oidc_audience`; cost levers are `--max-turns`, job timeouts and concurrency controls (`--max-budget-usd` caps a client-side estimate)",
+   "alternatives": [
+    "Managed Claude Code Review (GitHub App)"
+   ],
+   "rejections": [
+    "anthropics/claude-code-security-review (no commit since 2026-02-11)",
+    "Mutable action refs",
+    "Run-time plugin installation in the action"
+   ],
+   "evidence": [
+    "github-actions-A1 to A10 (L3 requirement rows)",
+    "action.json R1-R8"
+   ],
+   "notes": "Converged in all three selections (both families and the owner's sweep). Main moves from v1.0.245 when #892 lands. Rejected route, recorded: the subscription OAuth token (cheaper, but a long-lived token tied to one person's subscription); WIF spend is API billing.",
+   "overturn_when": "A new action release changes authentication or output defaults, or a hosted run fails a requirement row.",
+   "supersedes": [
+    "M45 (adopted on main)",
+    "Action-pinning topic"
+   ]
+  },
+  {
+   "id": "pr-review-pre-cue",
+   "layer_id": "git-github-automation",
+   "status": "default",
+   "default": "pr-review-toolkit pre-cue (pr-test-analyzer and silent-failure-hunter): locally in J8 and in Actions through #909",
+   "route": "Runs before a landing cue; findings at confidence 80 or above go to the lane",
+   "alternatives": [
+    "Native `/code-review` at max effort (paired same-delta run owed, J7 class D)"
+   ],
+   "rejections": [
+    "Ultrareview as an automated default (user-triggered and billed; the owner's option for high-stakes PRs)"
+   ],
+   "evidence": [
+    "Measured: at or above 80, defects both designated reads missed on #892 (9), #894 (6), #895 (7), #896 (3) and trading #11 (2); $3.3-5.5 per run (J8 defects record)"
+   ],
+   "overturn_when": "The paired same-delta run shows `/code-review max` matching or beating the toolkit on confirmed findings at equal quality.",
+   "supersedes": [
+    "M42",
+    "M31"
+   ],
+   "notes": "Ultrareview from a script runs as `claude ultrareview <PR#> --json`; `claude -p '/code-review ultra'` exits without findings."
+  },
+  {
+   "id": "release-tracking",
+   "layer_id": "ci-supply-chain",
+   "status": "default",
+   "default": "Scheduled trackers: catalog-freshness.yml (daily read-only report plus a Monday proposal PR), practice-references-freshness.yml (weekly, report-only), the host's upstream surface watch (six sources: npm dist-tags, the Agent SDK settings types, the settings reference, env vars and mods, the Codex release, the CHANGELOG delta), plus Dependabot for action versions",
+   "route": "147 of 148 adopted repositories have a declared tracker (pandas has none); the weekly practice pass reads these reports",
+   "alternatives": [
+    "renovatebot/renovate, adopted only if the 2026-10-02 overturn test passes on current Renovate",
+    "`autoUpdatesChannel: stable` for the client"
+   ],
+   "rejections": [
+    "updatecli/updatecli (failed the 2026-10-02 trial)",
+    "lilydjwg/nvchecker",
+    "Dependabot for catalog and runtime pins",
+    "Hosted trackers"
+   ],
+   "evidence": [
+    "2026-10-02 local trial (Renovate 44.132.2, updatecli v0.122.0, nvchecker 2.22) kept the stdlib trackers",
+    "L3 R7 tracker map"
+   ],
+   "overturn_when": "Current Renovate passes the 2026-10-02 overturn test: seven daily runs on the same runtime rows plus deliberately outdated canaries, with fewer missed pins and no lost archived or renamed flags.",
+   "supersedes": [],
+   "notes": "Adjudicated: the incumbent stands; the refuter upheld it. Native client floor if the channel ever moves to stable: `minimumVersion` (any settings file); `requiredMinimumVersion` and `requiredMaximumVersion` are the managed startup gates. Dependabot is claude-code-action's only release tracker. Integrity: the opt-in Monday propose job is model-free but holds contents and pull-requests write; schedules on a public repository pause after 60 days without activity."
+  },
+  {
+   "id": "usage-cost-monitoring",
+   "layer_id": "observation-inference",
+   "status": "default",
+   "default": "Native OpenTelemetry export (claude_code.* metrics and events) into the local collector, Prometheus, Loki and Grafana",
+   "route": "Cost counters are estimates, never the bill; /usage, /cost and /stats for interactive checks",
+   "alternatives": [
+    "ccusage/ccusage (historical local counters)",
+    "kenn-io/agentsview (session archive)",
+    "Native /usage and the status line",
+    "openlit/openlit, only if it closes a measured gap"
+   ],
+   "rejections": [
+    "openlit/openlit as the default (it closes no measured gap)",
+    "agentops-ai/agentops",
+    "langfuse/mcp-server-langfuse",
+    "Treating estimated cost counters as the bill"
+   ],
+   "evidence": [
+    "monitoring-usage.md",
+    "cost-usage-O5, O7, O8",
+    "Observed: eight claude_code_* metric names in Prometheus with current samples"
+   ],
+   "overturn_when": "A measured gap the native path cannot close (for example per-lane cost attribution the counters lack).",
+   "supersedes": [],
+   "notes": "Adjudicated mixed: native default, with ccusage and agentsview ranked first among alternatives; the refuter upheld it. Owed: a fixed-window same-task reconciliation of native counters against ccusage. Scope verified: not covered are Actions under WIF (read the Console organisation's usage), ultrareview cloud runs (usage credits) and `--bare` workers; under the subscription `claude_code_cost_usage` is API-list-price value, not spend; the series carry effort, query_source, model, type and ecosystem_lane. Integrity preconditions: the prompt and response content gates stay off (OTEL_LOG_ASSISTANT_RESPONSES explicitly false); because the template sets OTEL_LOG_TOOL_DETAILS=1, the collector's tool-name and privacy allowlists are required; backends stay on loopback and no log or event export with values goes into the public repository."
+  }
+ ]
+}

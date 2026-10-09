@@ -1,0 +1,210 @@
+{
+ "schema": "claude-native-practice-fresh-session/1",
+ "where": "fresh claude -p sessions in a checkout of this branch (the project skill), 2026-10-09T06:5xZ-07:04Z",
+ "queries": {
+  "Q1": "Guard hook behaviour on failure or a missing script (slot hooks)",
+  "Q2": "Model, effort and permission flags for a headless claude -p reviewer (slots model-effort-routing, headless-sdk)",
+  "Q3": "Sharing one serena MCP server across sessions (slot mcp-shared-servers)"
+ },
+ "runs": [
+  {
+   "file": "proof1.jsonl",
+   "client": "2.1.295",
+   "model": "claude-sonnet-5-5",
+   "skill_invoked": false,
+   "reference_read": false,
+   "tools": [
+    "Read",
+    "Bash",
+    "Bash"
+   ],
+   "cost_usd": 0.2128,
+   "transcript_sha256": "bcc92ba206addea951c84923c41cd060fa1ed278561a495c44ce4ecb2439e914",
+   "variant": "description v1, default model",
+   "query": "Q1"
+  },
+  {
+   "file": "proof2.jsonl",
+   "client": "2.1.295",
+   "model": "claude-opus-5-5",
+   "skill_invoked": true,
+   "reference_read": true,
+   "tools": [
+    "Skill",
+    "Bash",
+    "Bash"
+   ],
+   "cost_usd": 0.5062,
+   "transcript_sha256": "5aa37504c8df2ebee8b5630ce277a635d40f1a8a99bbbb08de9815d0da9a9010",
+   "variant": "description v1",
+   "query": "Q1"
+  },
+  {
+   "file": "proof3-sonnet-1.jsonl",
+   "client": "2.1.295",
+   "model": "claude-sonnet-5-5",
+   "skill_invoked": true,
+   "reference_read": true,
+   "tools": [
+    "Skill",
+    "Read",
+    "Bash",
+    "Bash"
+   ],
+   "cost_usd": 0.2199,
+   "transcript_sha256": "be6d977ca97a9a1ab94722900c8c1c702dbbcbc4ad2e6607727329aa467f562b",
+   "variant": "description v2 (newer than notes or memory)",
+   "query": "Q1"
+  },
+  {
+   "file": "proof3-sonnet-2.jsonl",
+   "client": "2.1.295",
+   "model": "claude-sonnet-5-5",
+   "skill_invoked": true,
+   "reference_read": false,
+   "tools": [
+    "Skill",
+    "Read",
+    "Bash",
+    "Bash"
+   ],
+   "cost_usd": 0.2283,
+   "transcript_sha256": "c03f9a4ee09268b8c9b4f675af24f10b954f15ec29082af93cb49bc754c889ec",
+   "variant": "description v2 (newer than notes or memory)",
+   "query": "Q1"
+  },
+  {
+   "file": "proof3-sonnet-3.jsonl",
+   "client": "2.1.295",
+   "model": "claude-sonnet-5-5",
+   "skill_invoked": false,
+   "reference_read": false,
+   "tools": [
+    "Read",
+    "Bash",
+    "Bash"
+   ],
+   "cost_usd": 0.2097,
+   "transcript_sha256": "af4f19d7000e0ccdf42825faff4000ccba1c5db558f7d76e84f66a5a14817ead",
+   "variant": "description v2 (newer than notes or memory)",
+   "query": "Q1"
+  },
+  {
+   "file": "proof4-1.jsonl",
+   "client": "2.1.295",
+   "model": "claude-sonnet-5-5",
+   "skill_invoked": false,
+   "reference_read": false,
+   "tools": [
+    "Read",
+    "Bash",
+    "Bash",
+    "Bash",
+    "Bash"
+   ],
+   "cost_usd": 0.2418,
+   "transcript_sha256": "e382500a23adecac9d5377e8cc78bf4783622fe751c5373683caf45b0d9d2986",
+   "variant": "description v2 and body: start by reading reference/slots.md",
+   "query": "Q1"
+  },
+  {
+   "file": "proof4-2.jsonl",
+   "client": "2.1.295",
+   "model": "claude-sonnet-5-5",
+   "skill_invoked": true,
+   "reference_read": true,
+   "tools": [
+    "Skill",
+    "Read",
+    "Bash",
+    "Bash",
+    "Read",
+    "Read",
+    "Bash"
+   ],
+   "cost_usd": 0.2896,
+   "transcript_sha256": "26641c073923ee588b55300a22d5d414a3960feb2c60c1868994cd915d902ff1",
+   "variant": "description v2 and body: start by reading reference/slots.md",
+   "query": "Q2"
+  },
+  {
+   "file": "proof4-3.jsonl",
+   "client": "2.1.295",
+   "model": "claude-sonnet-5-5",
+   "skill_invoked": true,
+   "reference_read": true,
+   "tools": [
+    "Skill",
+    "Grep",
+    "Read",
+    "Bash"
+   ],
+   "cost_usd": 0.2309,
+   "transcript_sha256": "9dcbe69e57934bb2818ce13081be96341bf0d23b579cd89983fdeb3ec9604bff",
+   "variant": "description v2 and body: start by reading reference/slots.md",
+   "query": "Q3"
+  },
+  {
+   "file": "proof4-4.jsonl",
+   "client": "2.1.295",
+   "model": "claude-opus-5-5",
+   "skill_invoked": true,
+   "reference_read": false,
+   "tools": [
+    "Skill",
+    "Bash",
+    "Bash",
+    "Bash"
+   ],
+   "cost_usd": 0.4491,
+   "transcript_sha256": "8cc9c81efc71f556116b09b1ad5b05651e7ad552c80f2a3aaacb42411351fbd9",
+   "variant": "description v2 and body: start by reading reference/slots.md",
+   "query": "Q1"
+  },
+  {
+   "file": "proof4-5.jsonl",
+   "client": "2.1.295",
+   "model": "claude-opus-5-5",
+   "skill_invoked": true,
+   "reference_read": true,
+   "tools": [
+    "Skill",
+    "Bash",
+    "Bash",
+    "Bash",
+    "Bash",
+    "Bash",
+    "Bash"
+   ],
+   "cost_usd": 0.6153,
+   "transcript_sha256": "1d8c517d438a76e727ae8f62d1c6268baaeccd09c4a18b6091a41734b6129a00",
+   "variant": "description v2 and body: start by reading reference/slots.md",
+   "query": "Q2"
+  },
+  {
+   "file": "proof4-6.jsonl",
+   "client": "2.1.295",
+   "model": "claude-opus-5-5",
+   "skill_invoked": true,
+   "reference_read": true,
+   "tools": [
+    "Skill",
+    "Bash",
+    "Read"
+   ],
+   "cost_usd": 0.4051,
+   "transcript_sha256": "3f4d8c842e436c54e333e09a571e5a07d9268229f32b204e4a16cb80df5a41a9",
+   "variant": "description v2 and body: start by reading reference/slots.md",
+   "query": "Q3"
+  }
+ ],
+ "final_variant_rate": {
+  "skill_invoked": "5/6",
+  "reference_read": "4/6",
+  "by_model": {
+   "claude-sonnet-5-5": "skill 2/3, read 2/3",
+   "claude-opus-5-5": "skill 3/3, read 2/3"
+  }
+ },
+ "note": "Misses cluster on Q1, where this host's auto memory and the 2026-10-08 guard record already hold the answer. Transcripts are kept privately; only their sha256 is published."
+}
