@@ -8,7 +8,7 @@ ConditionPathExists=%h/.config/native-stack/memory-maintenance.approved
 [Service]
 Type=oneshot
 Environment=PATH=%h/.local/share/codex-ecosystem/bin:%h/.local/share/mise/shims:%h/.local/bin:/usr/bin:/bin
-ExecStart=/usr/bin/env ai-memory --data-dir %h/.local/share/ai-memory lint --workspace default --project seathatflowsinourveins-native-agent-stack --dry-run --no-llm
+ExecStart=/usr/bin/env ai-memory --data-dir %h/.local/share/ai-memory --config %h/.config/ai-memory/config.toml lint --workspace default --project seathatflowsinourveins-native-agent-stack --dry-run --no-llm
 TimeoutStartSec=600
 Nice=10
 IOSchedulingClass=best-effort

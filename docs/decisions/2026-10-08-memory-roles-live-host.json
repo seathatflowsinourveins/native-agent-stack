@@ -1,11 +1,7 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-10-08T23:35:45Z",
-  "observation_window_utc": {
-    "start": "2026-10-08T23:25:42Z",
-    "end": "2026-10-08T23:35:45Z"
-  },
-  "scope": "Read-only NativeStack2604 memory-role inventory for PR #835; sanitized metadata, not installation or quality acceptance.",
+  "recorded_at_utc": "2026-10-09T01:23:03Z",
+  "scope": "Private-host-state inventory and source-bound correction for PR #835; sanitized metadata by observation group, not portable-host, quality or new-install acceptance.",
   "evidence_classes": [
     "native_operation_metadata",
     "source_review"
@@ -17,9 +13,1309 @@
     "installs": 0,
     "service_changes": 0
   },
+  "adoption_evidence": {
+    "snapshots": {
+      "baseline": {
+        "source_file": "docs/decisions/memory-adoption-835/adoption-now-5de97cf238b3d28a.json",
+        "sha256": "5de97cf238b3d28aa9f7d5110a05857204a847b0c75cda8971de8e142e362e36",
+        "generated_utc": "2026-10-08T23:42:51Z",
+        "window_hours": 24,
+        "method": "docs/decisions/2026-09-26-tool-invoke-rates.md (Loki count of record)",
+        "codex_population": 841,
+        "claude_population": 63
+      },
+      "reconciled": {
+        "source_file": "docs/decisions/memory-adoption-835/adoption-now-8682d1d326f29798.json",
+        "sha256": "8682d1d326f2979802efa32d156d9db14dba3ce04273328b6b48a0e227533ac7",
+        "generated_utc": "2026-10-09T00:31:25Z",
+        "window_hours": 24,
+        "method": "docs/decisions/2026-09-26-tool-invoke-rates.md (Loki count of record)",
+        "codex_population": 850,
+        "claude_population": 70
+      }
+    },
+    "source_kind": "SHA256-pinned private-host-state producer snapshots; published sanitized counter bytes, not useful native outcomes",
+    "recounted_from_loki": false,
+    "limits": [
+      "Native MCP result events are not useful outcomes; these snapshots do not separate all probes from organic work.",
+      "Each snapshot is a separate rolling 24-hour window; changes are not accumulated new calls or a quality improvement.",
+      "Identity counts are conversations for Codex and sessions for Claude, including child threads; denominators are exact bucket populations.",
+      "No alias buckets, windows, clients, qmd/qmdshared namespaces or standalone/plugin context namespaces are merged.",
+      "A named Claude consumer is not proof of an owning lane. The other Claude sessions bucket is unattributed.",
+      "Absent server entries stay null/unmeasured, not measured zero. Built-in Claude memory is outside MCP."
+    ],
+    "per_decision_bindings": {
+      "claude_native_memory": {
+        "disposition": "KEEP",
+        "decision_status": "source-backed proposal; counters inform and do not gate readiness",
+        "job": "durable rules/preferences",
+        "owning_lane_or_role": "native Claude feature; no named native-memory counter",
+        "binding_basis": "Named launch/dispatch identities: memory-h2h rumi, historical memory-h2h voni, context codex-token-parity dove, code-intelligence overlap-token lise. Snapshot keys alone do not encode durable ownership. Claude named consumers stay consumers; unattributed buckets stay unattributed.",
+        "snapshot_sources": [
+          "baseline",
+          "reconciled"
+        ],
+        "role_evidence": [
+          {
+            "client": "claude",
+            "snapshot_bucket": "wsl-architecture-design",
+            "role_relation": "named native consumer; native-memory use not measured",
+            "scope_pointer": "/claude_by_role/wsl-architecture-design",
+            "server_namespace": null,
+            "identity_kind": "sessions",
+            "denominator_kind": "all sessions in this exact snapshot bucket",
+            "snapshots": {
+              "baseline": {
+                "calls": null,
+                "identities": null,
+                "denominator": 1,
+                "measurement": "UNMEASURED; no eligible native-memory MCP counter"
+              },
+              "reconciled": {
+                "calls": null,
+                "identities": null,
+                "denominator": 1,
+                "measurement": "UNMEASURED; no eligible native-memory MCP counter"
+              }
+            }
+          }
+        ],
+        "organic_use": "UNRESOLVED in these counters; no native task outcome classifier attached",
+        "evidence_limit": "Organic use unresolved: no native-session load/read/use observation is attached. Native file freshness is historical inventory, not substitute use evidence.",
+        "g5_binding": {
+          "component_identity": "https://github.com/anthropics/claude-code",
+          "repository": "seathatflowsinourveins/native-agent-stack",
+          "pr": 878,
+          "commit": "ae6cc2286643822d3a0218136722c69d0127fcd4",
+          "catalog_path": "catalogs/landscape/grand-catalog-20261008.json",
+          "source_file": "docs/decisions/memory-adoption-835/g5-grand-catalog-ae6cc228.json",
+          "source_sha256": "ff3b593c34b5f27caba29a915d3ed5443cb3a3d3ebb7e46937277529f0637dc9",
+          "row_pointer": null,
+          "status": "PENDING — row absent at this G5 pin",
+          "catalog_owner": "g5-stars-gap (G5 #878 catalog owner)",
+          "resolution_dependency": "Catalog owner must publish the matching component row; bind the published commit/pointer and identity before resolving.",
+          "evidence_limit": "No matching row in this exact 118-row draft; no global absence or measured-zero claim."
+        }
+      },
+      "ai_memory": {
+        "disposition": "WIRE",
+        "decision_status": "source-backed proposal; counters inform and do not gate readiness",
+        "job": "cross-session project memory",
+        "owning_lane_or_role": "memory-h2h",
+        "binding_basis": "Named launch/dispatch identities: memory-h2h rumi, historical memory-h2h voni, context codex-token-parity dove, code-intelligence overlap-token lise. Snapshot keys alone do not encode durable ownership. Claude named consumers stay consumers; unattributed buckets stay unattributed.",
+        "snapshot_sources": [
+          "baseline",
+          "reconciled"
+        ],
+        "role_evidence": [
+          {
+            "client": "codex",
+            "snapshot_bucket": "rumi",
+            "role_relation": "current owning-lane identity",
+            "scope_pointer": "/codex_by_lane/rumi",
+            "server_namespace": "ai-memory",
+            "identity_kind": "conversations",
+            "denominator_kind": "all conversations in this exact snapshot bucket",
+            "snapshots": {
+              "baseline": {
+                "calls": 5,
+                "identities": 1,
+                "denominator": 2,
+                "measurement": "reported MCP counter"
+              },
+              "reconciled": {
+                "calls": 5,
+                "identities": 1,
+                "denominator": 2,
+                "measurement": "reported MCP counter"
+              }
+            }
+          },
+          {
+            "client": "codex",
+            "snapshot_bucket": "voni",
+            "role_relation": "separate historical owning-lane identity",
+            "scope_pointer": "/codex_by_lane/voni",
+            "server_namespace": "ai-memory",
+            "identity_kind": "conversations",
+            "denominator_kind": "all conversations in this exact snapshot bucket",
+            "snapshots": {
+              "baseline": {
+                "calls": 8,
+                "identities": 1,
+                "denominator": 4,
+                "measurement": "reported MCP counter"
+              },
+              "reconciled": {
+                "calls": 8,
+                "identities": 1,
+                "denominator": 4,
+                "measurement": "reported MCP counter"
+              }
+            }
+          },
+          {
+            "client": "claude",
+            "snapshot_bucket": "wsl-architecture-design",
+            "role_relation": "named consumer; Claude memory-h2h owner attribution unresolved",
+            "scope_pointer": "/claude_by_role/wsl-architecture-design",
+            "server_namespace": "ai-memory",
+            "identity_kind": "sessions",
+            "denominator_kind": "all sessions in this exact snapshot bucket",
+            "snapshots": {
+              "baseline": {
+                "calls": 6,
+                "identities": 1,
+                "denominator": 1,
+                "measurement": "reported MCP counter"
+              },
+              "reconciled": {
+                "calls": 6,
+                "identities": 1,
+                "denominator": 1,
+                "measurement": "reported MCP counter"
+              }
+            }
+          }
+        ],
+        "organic_use": "UNRESOLVED in these counters; no native task outcome classifier attached",
+        "evidence_limit": "Native MCP result events are not useful outcomes; these snapshots do not separate all probes from organic work. A named Claude consumer is not proof of an owning lane. The other Claude sessions bucket is unattributed.",
+        "g5_binding": {
+          "component_identity": "https://github.com/akitaonrails/ai-memory",
+          "repository": "seathatflowsinourveins/native-agent-stack",
+          "pr": 878,
+          "commit": "ae6cc2286643822d3a0218136722c69d0127fcd4",
+          "catalog_path": "catalogs/landscape/grand-catalog-20261008.json",
+          "source_file": "docs/decisions/memory-adoption-835/g5-grand-catalog-ae6cc228.json",
+          "source_sha256": "ff3b593c34b5f27caba29a915d3ed5443cb3a3d3ebb7e46937277529f0637dc9",
+          "row_pointer": "/rows/7",
+          "status": "PENDING until G5 lands",
+          "catalog_owner": "g5-stars-gap (G5 #878 catalog owner)",
+          "resolution_dependency": "Catalog owner must publish the matching component row; bind the published commit/pointer and identity before resolving.",
+          "evidence_limit": "SOURCE-REVIEW/WATCH; draft pointer is not adoption or current-host acceptance."
+        },
+        "wiring": {
+          "vendor_command": "ai-memory --data-dir %h/.local/share/ai-memory --config %h/.config/ai-memory/config.toml install-skills --scope global --agent both",
+          "instruction_route": "ai-memory install-instructions, only the vendor managed block with reviewed client/project scope",
+          "version": "2.6.0",
+          "source_commit": "89bd8ded3c1ab8b769cf99417d038ed0364403c8",
+          "host_observation": "No ai-memory managed skill directories found in the named Claude and cross-agent roots; installation is not claimed.",
+          "applied": false
+        }
+      },
+      "hindsight": {
+        "disposition": "WIRE",
+        "decision_status": "source-backed proposal; counters inform and do not gate readiness",
+        "job": "Accepted research job: retain/recall hypotheses and experiment records in trading-research; coding memory stays ai-memory",
+        "owning_lane_or_role": "memory-h2h",
+        "binding_basis": "Named launch/dispatch identities: memory-h2h rumi, historical memory-h2h voni, context codex-token-parity dove, code-intelligence overlap-token lise. Snapshot keys alone do not encode durable ownership. Claude named consumers stay consumers; unattributed buckets stay unattributed.",
+        "snapshot_sources": [
+          "baseline",
+          "reconciled"
+        ],
+        "role_evidence": [
+          {
+            "client": "codex",
+            "snapshot_bucket": "rumi",
+            "role_relation": "current owning-lane identity",
+            "scope_pointer": "/codex_by_lane/rumi",
+            "server_namespace": "hindsight",
+            "identity_kind": "conversations",
+            "denominator_kind": "all conversations in this exact snapshot bucket",
+            "snapshots": {
+              "baseline": {
+                "calls": 4,
+                "identities": 1,
+                "denominator": 2,
+                "measurement": "reported MCP counter"
+              },
+              "reconciled": {
+                "calls": 4,
+                "identities": 1,
+                "denominator": 2,
+                "measurement": "reported MCP counter"
+              }
+            }
+          },
+          {
+            "client": "codex",
+            "snapshot_bucket": "voni",
+            "role_relation": "separate historical owning-lane identity",
+            "scope_pointer": "/codex_by_lane/voni",
+            "server_namespace": "hindsight",
+            "identity_kind": "conversations",
+            "denominator_kind": "all conversations in this exact snapshot bucket",
+            "snapshots": {
+              "baseline": {
+                "calls": 1,
+                "identities": 1,
+                "denominator": 4,
+                "measurement": "reported MCP counter"
+              },
+              "reconciled": {
+                "calls": 1,
+                "identities": 1,
+                "denominator": 4,
+                "measurement": "reported MCP counter"
+              }
+            }
+          },
+          {
+            "client": "claude",
+            "snapshot_bucket": "wsl-architecture-design",
+            "role_relation": "named consumer with no reported Hindsight entry",
+            "scope_pointer": "/claude_by_role/wsl-architecture-design",
+            "server_namespace": "hindsight",
+            "identity_kind": "sessions",
+            "denominator_kind": "all sessions in this exact snapshot bucket",
+            "snapshots": {
+              "baseline": {
+                "calls": null,
+                "identities": null,
+                "denominator": 1,
+                "measurement": "UNMEASURED; server absent in this exact bucket"
+              },
+              "reconciled": {
+                "calls": null,
+                "identities": null,
+                "denominator": 1,
+                "measurement": "UNMEASURED; server absent in this exact bucket"
+              }
+            }
+          },
+          {
+            "client": "claude",
+            "snapshot_bucket": "other Claude sessions",
+            "role_relation": "unattributed context only; not owning-role evidence",
+            "scope_pointer": "/claude_by_role/other Claude sessions",
+            "server_namespace": "hindsight",
+            "identity_kind": "sessions",
+            "denominator_kind": "all sessions in this exact snapshot bucket",
+            "snapshots": {
+              "baseline": {
+                "calls": 4,
+                "identities": 4,
+                "denominator": 55,
+                "measurement": "reported MCP counter"
+              },
+              "reconciled": {
+                "calls": 4,
+                "identities": 4,
+                "denominator": 66,
+                "measurement": "reported MCP counter"
+              }
+            }
+          }
+        ],
+        "organic_use": "UNRESOLVED in these counters; no native task outcome classifier attached",
+        "evidence_limit": "The canonical accepted job remains. Sparse MCP calls or zero mental models do not remove it; no same-job replacement evidence or host-install impossibility is shown. Native organic routing use is unresolved in these counter snapshots.",
+        "g5_binding": {
+          "component_identity": "https://github.com/vectorize-io/hindsight",
+          "repository": "seathatflowsinourveins/native-agent-stack",
+          "pr": 878,
+          "commit": "ae6cc2286643822d3a0218136722c69d0127fcd4",
+          "catalog_path": "catalogs/landscape/grand-catalog-20261008.json",
+          "source_file": "docs/decisions/memory-adoption-835/g5-grand-catalog-ae6cc228.json",
+          "source_sha256": "ff3b593c34b5f27caba29a915d3ed5443cb3a3d3ebb7e46937277529f0637dc9",
+          "row_pointer": null,
+          "status": "PENDING — row absent at this G5 pin",
+          "catalog_owner": "g5-stars-gap (G5 #878 catalog owner)",
+          "resolution_dependency": "Catalog owner must publish the matching component row; bind the published commit/pointer and identity before resolving.",
+          "evidence_limit": "No matching row in this exact 118-row draft; no global absence or measured-zero claim."
+        },
+        "accepted_job_reference": "manifests/landscape.json#/research_memory_jobs/0",
+        "wiring": {
+          "vendor_skill": "https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/hindsight-integrations/agent-plugin/skills/hindsight-memory/SKILL.md",
+          "vendor_manual_route": "Skills + MCP; unchanged skill only in the named research-consumer scope; reuse accepted bank-specific registrations",
+          "endpoint": "http://127.0.0.1:8888/mcp/trading-research/",
+          "bank": "trading-research",
+          "recall_types": [
+            "world",
+            "experience"
+          ],
+          "tags_match": "all_strict",
+          "mcp_allowlist_tools": 15,
+          "automatic_coding_capture": false,
+          "cloud_manifest_limit": "Shipped portable mcp.json hardcodes the Cloud URL; HINDSIGHT_MCP_URL alone does not redirect it. Use documented self-hosted replacement/existing native endpoint.",
+          "dependents": [
+            "manifests/landscape.json#/research_memory_jobs/0",
+            "adoption/manifest.json#/recipe_map/hindsight",
+            "recipes/hindsight-research-memory.md",
+            "adoption/templates/systemd/hindsight-research.service",
+            "adoption/templates/systemd/hindsight-research.service.d/10-mcp-tools.conf",
+            "adoption/templates/systemd/hindsight-research.mcp-tools.env.template",
+            "existing native client registrations and retained bank"
+          ],
+          "retirement_step": "No retirement is authorized or performed. A future rule-5-qualified removal would remove native registrations and disable the service under the recipe inverse; data deletion is separately destructive.",
+          "inverse": "Restore native bank-specific registrations, pinned service/drop-in/allowlist and enable the service; preserve existing bank. No removal/reinstallation is run here.",
+          "applied": false
+        }
+      },
+      "context_mode": {
+        "disposition": "KEEP",
+        "decision_status": "source-backed proposal; counters inform and do not gate readiness",
+        "job": "session continuity/captured-output retrieval",
+        "owning_lane_or_role": "codex-token-parity",
+        "binding_basis": "Named launch/dispatch identities: memory-h2h rumi, historical memory-h2h voni, context codex-token-parity dove, code-intelligence overlap-token lise. Snapshot keys alone do not encode durable ownership. Claude named consumers stay consumers; unattributed buckets stay unattributed.",
+        "snapshot_sources": [
+          "baseline",
+          "reconciled"
+        ],
+        "role_evidence": [
+          {
+            "client": "codex",
+            "snapshot_bucket": "dove",
+            "role_relation": "owning-lane identity",
+            "scope_pointer": "/codex_by_lane/dove",
+            "server_namespace": "context-mode",
+            "identity_kind": "conversations",
+            "denominator_kind": "all conversations in this exact snapshot bucket",
+            "snapshots": {
+              "baseline": {
+                "calls": 182,
+                "identities": 2,
+                "denominator": 2,
+                "measurement": "reported MCP counter"
+              },
+              "reconciled": {
+                "calls": 186,
+                "identities": 2,
+                "denominator": 2,
+                "measurement": "reported MCP counter"
+              }
+            }
+          },
+          {
+            "client": "codex",
+            "snapshot_bucket": "rumi",
+            "role_relation": "separate memory-h2h consumer identity",
+            "scope_pointer": "/codex_by_lane/rumi",
+            "server_namespace": "context-mode",
+            "identity_kind": "conversations",
+            "denominator_kind": "all conversations in this exact snapshot bucket",
+            "snapshots": {
+              "baseline": {
+                "calls": 68,
+                "identities": 2,
+                "denominator": 2,
+                "measurement": "reported MCP counter"
+              },
+              "reconciled": {
+                "calls": 100,
+                "identities": 2,
+                "denominator": 2,
+                "measurement": "reported MCP counter"
+              }
+            }
+          },
+          {
+            "client": "claude",
+            "snapshot_bucket": "wsl-architecture-design",
+            "role_relation": "named consumer; owning-lane attribution unresolved",
+            "scope_pointer": "/claude_by_role/wsl-architecture-design",
+            "server_namespace": "plugin_context-mode_context-mode",
+            "identity_kind": "sessions",
+            "denominator_kind": "all sessions in this exact snapshot bucket",
+            "snapshots": {
+              "baseline": {
+                "calls": 1975,
+                "identities": 1,
+                "denominator": 1,
+                "measurement": "reported MCP counter"
+              },
+              "reconciled": {
+                "calls": 1931,
+                "identities": 1,
+                "denominator": 1,
+                "measurement": "reported MCP counter"
+              }
+            }
+          }
+        ],
+        "organic_use": "UNRESOLVED in these counters; no native task outcome classifier attached",
+        "evidence_limit": "Native MCP result events are not useful outcomes; these snapshots do not separate all probes from organic work. A named Claude consumer is not proof of an owning lane. The other Claude sessions bucket is unattributed.",
+        "g5_binding": {
+          "component_identity": "https://github.com/mksglu/context-mode",
+          "repository": "seathatflowsinourveins/native-agent-stack",
+          "pr": 878,
+          "commit": "ae6cc2286643822d3a0218136722c69d0127fcd4",
+          "catalog_path": "catalogs/landscape/grand-catalog-20261008.json",
+          "source_file": "docs/decisions/memory-adoption-835/g5-grand-catalog-ae6cc228.json",
+          "source_sha256": "ff3b593c34b5f27caba29a915d3ed5443cb3a3d3ebb7e46937277529f0637dc9",
+          "row_pointer": null,
+          "status": "PENDING — row absent at this G5 pin",
+          "catalog_owner": "g5-stars-gap (G5 #878 catalog owner)",
+          "resolution_dependency": "Catalog owner must publish the matching component row; bind the published commit/pointer and identity before resolving.",
+          "evidence_limit": "No matching row in this exact 118-row draft; no global absence or measured-zero claim."
+        }
+      },
+      "codebase_memory": {
+        "disposition": "KEEP",
+        "decision_status": "source-backed proposal; counters inform and do not gate readiness",
+        "job": "structural code graph",
+        "owning_lane_or_role": "overlap-token",
+        "binding_basis": "Named launch/dispatch identities: memory-h2h rumi, historical memory-h2h voni, context codex-token-parity dove, code-intelligence overlap-token lise. Snapshot keys alone do not encode durable ownership. Claude named consumers stay consumers; unattributed buckets stay unattributed.",
+        "snapshot_sources": [
+          "baseline",
+          "reconciled"
+        ],
+        "role_evidence": [
+          {
+            "client": "codex",
+            "snapshot_bucket": "lise",
+            "role_relation": "owning-lane identity",
+            "scope_pointer": "/codex_by_lane/lise",
+            "server_namespace": "codebase-memory-mcp",
+            "identity_kind": "conversations",
+            "denominator_kind": "all conversations in this exact snapshot bucket",
+            "snapshots": {
+              "baseline": {
+                "calls": 5,
+                "identities": 1,
+                "denominator": 1,
+                "measurement": "reported MCP counter"
+              },
+              "reconciled": {
+                "calls": 5,
+                "identities": 1,
+                "denominator": 1,
+                "measurement": "reported MCP counter"
+              }
+            }
+          },
+          {
+            "client": "codex",
+            "snapshot_bucket": "rumi",
+            "role_relation": "separate memory-h2h inventory consumer",
+            "scope_pointer": "/codex_by_lane/rumi",
+            "server_namespace": "codebase-memory-mcp",
+            "identity_kind": "conversations",
+            "denominator_kind": "all conversations in this exact snapshot bucket",
+            "snapshots": {
+              "baseline": {
+                "calls": 1,
+                "identities": 1,
+                "denominator": 2,
+                "measurement": "reported MCP counter"
+              },
+              "reconciled": {
+                "calls": 1,
+                "identities": 1,
+                "denominator": 2,
+                "measurement": "reported MCP counter"
+              }
+            }
+          },
+          {
+            "client": "claude",
+            "snapshot_bucket": "other Claude sessions",
+            "role_relation": "unattributed context only; not owning-role evidence",
+            "scope_pointer": "/claude_by_role/other Claude sessions",
+            "server_namespace": "codebase-memory-mcp",
+            "identity_kind": "sessions",
+            "denominator_kind": "all sessions in this exact snapshot bucket",
+            "snapshots": {
+              "baseline": {
+                "calls": 4,
+                "identities": 4,
+                "denominator": 55,
+                "measurement": "reported MCP counter"
+              },
+              "reconciled": {
+                "calls": 4,
+                "identities": 4,
+                "denominator": 66,
+                "measurement": "reported MCP counter"
+              }
+            }
+          }
+        ],
+        "organic_use": "UNRESOLVED in these counters; no native task outcome classifier attached",
+        "evidence_limit": "Native MCP result events are not useful outcomes; these snapshots do not separate all probes from organic work. A named Claude consumer is not proof of an owning lane. The other Claude sessions bucket is unattributed.",
+        "g5_binding": {
+          "component_identity": "https://github.com/DeusData/codebase-memory-mcp",
+          "repository": "seathatflowsinourveins/native-agent-stack",
+          "pr": 878,
+          "commit": "ae6cc2286643822d3a0218136722c69d0127fcd4",
+          "catalog_path": "catalogs/landscape/grand-catalog-20261008.json",
+          "source_file": "docs/decisions/memory-adoption-835/g5-grand-catalog-ae6cc228.json",
+          "source_sha256": "ff3b593c34b5f27caba29a915d3ed5443cb3a3d3ebb7e46937277529f0637dc9",
+          "row_pointer": "/rows/32",
+          "status": "PENDING until G5 lands",
+          "catalog_owner": "g5-stars-gap (G5 #878 catalog owner)",
+          "resolution_dependency": "Catalog owner must publish the matching component row; bind the published commit/pointer and identity before resolving.",
+          "evidence_limit": "SOURCE-REVIEW/WATCH; draft pointer is not adoption or current-host acceptance."
+        }
+      },
+      "qmd": {
+        "disposition": "WIRE",
+        "decision_status": "source-backed proposal; counters inform and do not gate readiness",
+        "job": "markdown retrieval",
+        "owning_lane_or_role": "memory-h2h",
+        "binding_basis": "Named launch/dispatch identities: memory-h2h rumi, historical memory-h2h voni, context codex-token-parity dove, code-intelligence overlap-token lise. Snapshot keys alone do not encode durable ownership. Claude named consumers stay consumers; unattributed buckets stay unattributed.",
+        "snapshot_sources": [
+          "baseline",
+          "reconciled"
+        ],
+        "role_evidence": [
+          {
+            "client": "codex",
+            "snapshot_bucket": "rumi",
+            "role_relation": "current owning-lane identity",
+            "scope_pointer": "/codex_by_lane/rumi",
+            "server_namespace": "qmd",
+            "identity_kind": "conversations",
+            "denominator_kind": "all conversations in this exact snapshot bucket",
+            "snapshots": {
+              "baseline": {
+                "calls": 1,
+                "identities": 1,
+                "denominator": 2,
+                "measurement": "reported MCP counter"
+              },
+              "reconciled": {
+                "calls": 1,
+                "identities": 1,
+                "denominator": 2,
+                "measurement": "reported MCP counter"
+              }
+            }
+          },
+          {
+            "client": "codex",
+            "snapshot_bucket": "voni",
+            "role_relation": "separate historical identity; namespace absent",
+            "scope_pointer": "/codex_by_lane/voni",
+            "server_namespace": "qmd",
+            "identity_kind": "conversations",
+            "denominator_kind": "all conversations in this exact snapshot bucket",
+            "snapshots": {
+              "baseline": {
+                "calls": null,
+                "identities": null,
+                "denominator": 4,
+                "measurement": "UNMEASURED; server absent in this exact bucket"
+              },
+              "reconciled": {
+                "calls": null,
+                "identities": null,
+                "denominator": 4,
+                "measurement": "UNMEASURED; server absent in this exact bucket"
+              }
+            }
+          },
+          {
+            "client": "claude",
+            "snapshot_bucket": "wsl-architecture-design",
+            "role_relation": "named consumer; Claude memory-h2h owner attribution unresolved",
+            "scope_pointer": "/claude_by_role/wsl-architecture-design",
+            "server_namespace": "qmd",
+            "identity_kind": "sessions",
+            "denominator_kind": "all sessions in this exact snapshot bucket",
+            "snapshots": {
+              "baseline": {
+                "calls": 1,
+                "identities": 1,
+                "denominator": 1,
+                "measurement": "reported MCP counter"
+              },
+              "reconciled": {
+                "calls": 1,
+                "identities": 1,
+                "denominator": 1,
+                "measurement": "reported MCP counter"
+              }
+            }
+          }
+        ],
+        "organic_use": "UNRESOLVED in these counters; no native task outcome classifier attached",
+        "evidence_limit": "Native MCP result events are not useful outcomes; these snapshots do not separate all probes from organic work. A named Claude consumer is not proof of an owning lane. The other Claude sessions bucket is unattributed.",
+        "g5_binding": {
+          "component_identity": "https://github.com/tobi/qmd",
+          "repository": "seathatflowsinourveins/native-agent-stack",
+          "pr": 878,
+          "commit": "ae6cc2286643822d3a0218136722c69d0127fcd4",
+          "catalog_path": "catalogs/landscape/grand-catalog-20261008.json",
+          "source_file": "docs/decisions/memory-adoption-835/g5-grand-catalog-ae6cc228.json",
+          "source_sha256": "ff3b593c34b5f27caba29a915d3ed5443cb3a3d3ebb7e46937277529f0637dc9",
+          "row_pointer": null,
+          "status": "PENDING — row absent at this G5 pin",
+          "catalog_owner": "g5-stars-gap (G5 #878 catalog owner)",
+          "resolution_dependency": "Catalog owner must publish the matching component row; bind the published commit/pointer and identity before resolving.",
+          "evidence_limit": "No matching row in this exact 118-row draft; no global absence or measured-zero claim."
+        },
+        "separate_namespace": "qmdshared is preserved as a separate producer namespace; its identities are not merged with qmd."
+      },
+      "graphiti": {
+        "disposition": "DEFER",
+        "decision_status": "source-backed proposal; counters inform and do not gate readiness",
+        "job": "defer temporal-graph installation; keep outside defaults",
+        "owning_lane_or_role": "memory-h2h",
+        "binding_basis": "Named launch/dispatch identities: memory-h2h rumi, historical memory-h2h voni, context codex-token-parity dove, code-intelligence overlap-token lise. Snapshot keys alone do not encode durable ownership. Claude named consumers stay consumers; unattributed buckets stay unattributed.",
+        "snapshot_sources": [
+          "baseline",
+          "reconciled"
+        ],
+        "role_evidence": [
+          {
+            "client": "codex",
+            "snapshot_bucket": "rumi",
+            "role_relation": "owning-lane scope; no reported graphiti counter",
+            "scope_pointer": "/codex_by_lane/rumi",
+            "server_namespace": "graphiti",
+            "identity_kind": "conversations",
+            "denominator_kind": "all conversations in this exact snapshot bucket",
+            "snapshots": {
+              "baseline": {
+                "calls": null,
+                "identities": null,
+                "denominator": 2,
+                "measurement": "UNMEASURED; server absent in this exact bucket"
+              },
+              "reconciled": {
+                "calls": null,
+                "identities": null,
+                "denominator": 2,
+                "measurement": "UNMEASURED; server absent in this exact bucket"
+              }
+            }
+          },
+          {
+            "client": "claude",
+            "snapshot_bucket": "wsl-architecture-design",
+            "role_relation": "named consumer scope; no reported graphiti counter",
+            "scope_pointer": "/claude_by_role/wsl-architecture-design",
+            "server_namespace": "graphiti",
+            "identity_kind": "sessions",
+            "denominator_kind": "all sessions in this exact snapshot bucket",
+            "snapshots": {
+              "baseline": {
+                "calls": null,
+                "identities": null,
+                "denominator": 1,
+                "measurement": "UNMEASURED; server absent in this exact bucket"
+              },
+              "reconciled": {
+                "calls": null,
+                "identities": null,
+                "denominator": 1,
+                "measurement": "UNMEASURED; server absent in this exact bucket"
+              }
+            }
+          }
+        ],
+        "organic_use": "UNRESOLVED in these counters; no native task outcome classifier attached",
+        "evidence_limit": "UNMEASURED in both snapshots; absence is not zero. Installation remains defer; no adopted unique job is demonstrated.",
+        "g5_binding": {
+          "component_identity": "https://github.com/getzep/graphiti",
+          "repository": "seathatflowsinourveins/native-agent-stack",
+          "pr": 878,
+          "commit": "ae6cc2286643822d3a0218136722c69d0127fcd4",
+          "catalog_path": "catalogs/landscape/grand-catalog-20261008.json",
+          "source_file": "docs/decisions/memory-adoption-835/g5-grand-catalog-ae6cc228.json",
+          "source_sha256": "ff3b593c34b5f27caba29a915d3ed5443cb3a3d3ebb7e46937277529f0637dc9",
+          "row_pointer": null,
+          "status": "PENDING — row absent at this G5 pin",
+          "catalog_owner": "g5-stars-gap (G5 #878 catalog owner)",
+          "resolution_dependency": "Catalog owner must publish the matching component row; bind the published commit/pointer and identity before resolving.",
+          "evidence_limit": "No matching row in this exact 118-row draft; no global absence or measured-zero claim."
+        }
+      }
+    },
+    "reconciliation": {
+      "scope": "Every changed scalar of the seven owned memory/context/code namespaces across all snapshot buckets and producer layers; every role/client denominator. Other code tools and orchestration are outside these disposition counters.",
+      "comparison": "baseline to reconciled, separately bounded rolling windows; no cross-window sum or cumulative delta",
+      "changed_fields": [
+        {
+          "pointer": "/claude_by_role/native-agent-stack-1a/servers/plugin_context-mode_context-mode/calls",
+          "baseline_present": true,
+          "baseline": 35,
+          "reconciled_present": true,
+          "reconciled": 80
+        },
+        {
+          "pointer": "/claude_by_role/ns2604-coop/servers/plugin_context-mode_context-mode/calls",
+          "baseline_present": true,
+          "baseline": 214,
+          "reconciled_present": true,
+          "reconciled": 213
+        },
+        {
+          "pointer": "/claude_by_role/other Claude sessions/sessions",
+          "baseline_present": true,
+          "baseline": 55,
+          "reconciled_present": true,
+          "reconciled": 66
+        },
+        {
+          "pointer": "/claude_by_role/review-replay (transient)/sessions",
+          "baseline_present": true,
+          "baseline": 4,
+          "reconciled_present": false,
+          "reconciled": null
+        },
+        {
+          "pointer": "/claude_by_role/wsl-architecture-design/servers/plugin_context-mode_context-mode/calls",
+          "baseline_present": true,
+          "baseline": 1975,
+          "reconciled_present": true,
+          "reconciled": 1931
+        },
+        {
+          "pointer": "/claude_total_sessions",
+          "baseline_present": true,
+          "baseline": 63,
+          "reconciled_present": true,
+          "reconciled": 70
+        },
+        {
+          "pointer": "/codex_by_lane/dove/servers/context-mode/calls",
+          "baseline_present": true,
+          "baseline": 182,
+          "reconciled_present": true,
+          "reconciled": 186
+        },
+        {
+          "pointer": "/codex_by_lane/dune/servers/context-mode/calls",
+          "baseline_present": true,
+          "baseline": 439,
+          "reconciled_present": true,
+          "reconciled": 428
+        },
+        {
+          "pointer": "/codex_by_lane/exec readers/conversations",
+          "baseline_present": true,
+          "baseline": 286,
+          "reconciled_present": true,
+          "reconciled": 285
+        },
+        {
+          "pointer": "/codex_by_lane/exec readers/servers/context-mode/calls",
+          "baseline_present": true,
+          "baseline": 3029,
+          "reconciled_present": true,
+          "reconciled": 2910
+        },
+        {
+          "pointer": "/codex_by_lane/gore/servers/context-mode/calls",
+          "baseline_present": true,
+          "baseline": 100,
+          "reconciled_present": true,
+          "reconciled": 50
+        },
+        {
+          "pointer": "/codex_by_lane/guro/conversations",
+          "baseline_present": false,
+          "baseline": null,
+          "reconciled_present": true,
+          "reconciled": 3
+        },
+        {
+          "pointer": "/codex_by_lane/guro/servers/ai-memory/calls",
+          "baseline_present": false,
+          "baseline": null,
+          "reconciled_present": true,
+          "reconciled": 1
+        },
+        {
+          "pointer": "/codex_by_lane/guro/servers/ai-memory/conversations",
+          "baseline_present": false,
+          "baseline": null,
+          "reconciled_present": true,
+          "reconciled": 1
+        },
+        {
+          "pointer": "/codex_by_lane/guro/servers/codebase-memory-mcp/calls",
+          "baseline_present": false,
+          "baseline": null,
+          "reconciled_present": true,
+          "reconciled": 4
+        },
+        {
+          "pointer": "/codex_by_lane/guro/servers/codebase-memory-mcp/conversations",
+          "baseline_present": false,
+          "baseline": null,
+          "reconciled_present": true,
+          "reconciled": 1
+        },
+        {
+          "pointer": "/codex_by_lane/guro/servers/context-mode/calls",
+          "baseline_present": false,
+          "baseline": null,
+          "reconciled_present": true,
+          "reconciled": 65
+        },
+        {
+          "pointer": "/codex_by_lane/guro/servers/context-mode/conversations",
+          "baseline_present": false,
+          "baseline": null,
+          "reconciled_present": true,
+          "reconciled": 3
+        },
+        {
+          "pointer": "/codex_by_lane/hazu/servers/context-mode/calls",
+          "baseline_present": true,
+          "baseline": 167,
+          "reconciled_present": true,
+          "reconciled": 96
+        },
+        {
+          "pointer": "/codex_by_lane/kato/servers/ai-memory/calls",
+          "baseline_present": true,
+          "baseline": 13,
+          "reconciled_present": true,
+          "reconciled": 3
+        },
+        {
+          "pointer": "/codex_by_lane/kato/servers/ai-memory/conversations",
+          "baseline_present": true,
+          "baseline": 4,
+          "reconciled_present": true,
+          "reconciled": 2
+        },
+        {
+          "pointer": "/codex_by_lane/kato/servers/context-mode/calls",
+          "baseline_present": true,
+          "baseline": 484,
+          "reconciled_present": true,
+          "reconciled": 293
+        },
+        {
+          "pointer": "/codex_by_lane/kiri/conversations",
+          "baseline_present": false,
+          "baseline": null,
+          "reconciled_present": true,
+          "reconciled": 2
+        },
+        {
+          "pointer": "/codex_by_lane/kiri/servers/ai-memory/calls",
+          "baseline_present": false,
+          "baseline": null,
+          "reconciled_present": true,
+          "reconciled": 1
+        },
+        {
+          "pointer": "/codex_by_lane/kiri/servers/ai-memory/conversations",
+          "baseline_present": false,
+          "baseline": null,
+          "reconciled_present": true,
+          "reconciled": 1
+        },
+        {
+          "pointer": "/codex_by_lane/kiri/servers/context-mode/calls",
+          "baseline_present": false,
+          "baseline": null,
+          "reconciled_present": true,
+          "reconciled": 105
+        },
+        {
+          "pointer": "/codex_by_lane/kiri/servers/context-mode/conversations",
+          "baseline_present": false,
+          "baseline": null,
+          "reconciled_present": true,
+          "reconciled": 2
+        },
+        {
+          "pointer": "/codex_by_lane/lobo/servers/ai-memory/calls",
+          "baseline_present": true,
+          "baseline": 3,
+          "reconciled_present": false,
+          "reconciled": null
+        },
+        {
+          "pointer": "/codex_by_lane/lobo/servers/ai-memory/conversations",
+          "baseline_present": true,
+          "baseline": 1,
+          "reconciled_present": false,
+          "reconciled": null
+        },
+        {
+          "pointer": "/codex_by_lane/lobo/servers/context-mode/calls",
+          "baseline_present": true,
+          "baseline": 147,
+          "reconciled_present": true,
+          "reconciled": 82
+        },
+        {
+          "pointer": "/codex_by_lane/mahe/servers/codebase-memory-mcp/calls",
+          "baseline_present": true,
+          "baseline": 18,
+          "reconciled_present": true,
+          "reconciled": 23
+        },
+        {
+          "pointer": "/codex_by_lane/mahe/servers/context-mode/calls",
+          "baseline_present": true,
+          "baseline": 156,
+          "reconciled_present": true,
+          "reconciled": 188
+        },
+        {
+          "pointer": "/codex_by_lane/mika/conversations",
+          "baseline_present": true,
+          "baseline": 5,
+          "reconciled_present": true,
+          "reconciled": 4
+        },
+        {
+          "pointer": "/codex_by_lane/mika/servers/context-mode/calls",
+          "baseline_present": true,
+          "baseline": 346,
+          "reconciled_present": true,
+          "reconciled": 204
+        },
+        {
+          "pointer": "/codex_by_lane/mika/servers/context-mode/conversations",
+          "baseline_present": true,
+          "baseline": 4,
+          "reconciled_present": true,
+          "reconciled": 3
+        },
+        {
+          "pointer": "/codex_by_lane/miso/servers/context-mode/calls",
+          "baseline_present": true,
+          "baseline": 91,
+          "reconciled_present": true,
+          "reconciled": 86
+        },
+        {
+          "pointer": "/codex_by_lane/nafo/servers/context-mode/calls",
+          "baseline_present": true,
+          "baseline": 242,
+          "reconciled_present": true,
+          "reconciled": 247
+        },
+        {
+          "pointer": "/codex_by_lane/nara/servers/context-mode/calls",
+          "baseline_present": true,
+          "baseline": 133,
+          "reconciled_present": true,
+          "reconciled": 127
+        },
+        {
+          "pointer": "/codex_by_lane/peso/servers/ai-memory/calls",
+          "baseline_present": true,
+          "baseline": 6,
+          "reconciled_present": true,
+          "reconciled": 7
+        },
+        {
+          "pointer": "/codex_by_lane/peso/servers/codebase-memory-mcp/calls",
+          "baseline_present": false,
+          "baseline": null,
+          "reconciled_present": true,
+          "reconciled": 2
+        },
+        {
+          "pointer": "/codex_by_lane/peso/servers/codebase-memory-mcp/conversations",
+          "baseline_present": false,
+          "baseline": null,
+          "reconciled_present": true,
+          "reconciled": 1
+        },
+        {
+          "pointer": "/codex_by_lane/peso/servers/context-mode/calls",
+          "baseline_present": true,
+          "baseline": 102,
+          "reconciled_present": true,
+          "reconciled": 126
+        },
+        {
+          "pointer": "/codex_by_lane/ravi/servers/context-mode/calls",
+          "baseline_present": true,
+          "baseline": 98,
+          "reconciled_present": true,
+          "reconciled": 95
+        },
+        {
+          "pointer": "/codex_by_lane/rumi/servers/context-mode/calls",
+          "baseline_present": true,
+          "baseline": 68,
+          "reconciled_present": true,
+          "reconciled": 100
+        },
+        {
+          "pointer": "/codex_by_lane/sofa/conversations",
+          "baseline_present": false,
+          "baseline": null,
+          "reconciled_present": true,
+          "reconciled": 2
+        },
+        {
+          "pointer": "/codex_by_lane/sofa/servers/context-mode/calls",
+          "baseline_present": false,
+          "baseline": null,
+          "reconciled_present": true,
+          "reconciled": 31
+        },
+        {
+          "pointer": "/codex_by_lane/sofa/servers/context-mode/conversations",
+          "baseline_present": false,
+          "baseline": null,
+          "reconciled_present": true,
+          "reconciled": 2
+        },
+        {
+          "pointer": "/codex_by_lane/sumi/servers/context-mode/calls",
+          "baseline_present": true,
+          "baseline": 278,
+          "reconciled_present": true,
+          "reconciled": 274
+        },
+        {
+          "pointer": "/codex_by_lane/todo/conversations",
+          "baseline_present": false,
+          "baseline": null,
+          "reconciled_present": true,
+          "reconciled": 2
+        },
+        {
+          "pointer": "/codex_by_lane/todo/servers/codebase-memory-mcp/calls",
+          "baseline_present": false,
+          "baseline": null,
+          "reconciled_present": true,
+          "reconciled": 8
+        },
+        {
+          "pointer": "/codex_by_lane/todo/servers/codebase-memory-mcp/conversations",
+          "baseline_present": false,
+          "baseline": null,
+          "reconciled_present": true,
+          "reconciled": 2
+        },
+        {
+          "pointer": "/codex_by_lane/todo/servers/context-mode/calls",
+          "baseline_present": false,
+          "baseline": null,
+          "reconciled_present": true,
+          "reconciled": 56
+        },
+        {
+          "pointer": "/codex_by_lane/todo/servers/context-mode/conversations",
+          "baseline_present": false,
+          "baseline": null,
+          "reconciled_present": true,
+          "reconciled": 2
+        },
+        {
+          "pointer": "/codex_by_lane/vega/servers/context-mode/calls",
+          "baseline_present": true,
+          "baseline": 226,
+          "reconciled_present": true,
+          "reconciled": 242
+        },
+        {
+          "pointer": "/codex_by_lane/zeno/servers/context-mode/calls",
+          "baseline_present": true,
+          "baseline": 405,
+          "reconciled_present": true,
+          "reconciled": 331
+        },
+        {
+          "pointer": "/codex_by_lane/zonu/conversations",
+          "baseline_present": false,
+          "baseline": null,
+          "reconciled_present": true,
+          "reconciled": 2
+        },
+        {
+          "pointer": "/codex_by_lane/zonu/servers/context-mode/calls",
+          "baseline_present": false,
+          "baseline": null,
+          "reconciled_present": true,
+          "reconciled": 67
+        },
+        {
+          "pointer": "/codex_by_lane/zonu/servers/context-mode/conversations",
+          "baseline_present": false,
+          "baseline": null,
+          "reconciled_present": true,
+          "reconciled": 2
+        },
+        {
+          "pointer": "/codex_total_conversations",
+          "baseline_present": true,
+          "baseline": 841,
+          "reconciled_present": true,
+          "reconciled": 850
+        },
+        {
+          "pointer": "/layers/code intelligence/servers/codebase-memory-mcp/codex_calls",
+          "baseline_present": true,
+          "baseline": 1750,
+          "reconciled_present": true,
+          "reconciled": 1769
+        },
+        {
+          "pointer": "/layers/code intelligence/servers/codebase-memory-mcp/codex_conversations",
+          "baseline_present": true,
+          "baseline": 156,
+          "reconciled_present": true,
+          "reconciled": 160
+        },
+        {
+          "pointer": "/layers/memory and retrieval/servers/ai-memory/codex_calls",
+          "baseline_present": true,
+          "baseline": 303,
+          "reconciled_present": true,
+          "reconciled": 293
+        },
+        {
+          "pointer": "/layers/memory and retrieval/servers/ai-memory/codex_conversations",
+          "baseline_present": true,
+          "baseline": 81,
+          "reconciled_present": true,
+          "reconciled": 80
+        },
+        {
+          "pointer": "/layers/session context and token efficiency/servers/context-mode/codex_calls",
+          "baseline_present": true,
+          "baseline": 32093,
+          "reconciled_present": true,
+          "reconciled": 31789
+        },
+        {
+          "pointer": "/layers/session context and token efficiency/servers/context-mode/codex_conversations",
+          "baseline_present": true,
+          "baseline": 569,
+          "reconciled_present": true,
+          "reconciled": 579
+        }
+      ],
+      "producer_layer_rollups": {
+        "baseline": {
+          "codebase-memory-mcp": {
+            "claude_calls": 4,
+            "claude_sessions": 4,
+            "codex_calls": 1750,
+            "codex_conversations": 156
+          },
+          "ai-memory": {
+            "claude_calls": 13,
+            "claude_sessions": 6,
+            "codex_calls": 303,
+            "codex_conversations": 81
+          },
+          "hindsight": {
+            "claude_calls": 4,
+            "claude_sessions": 4,
+            "codex_calls": 25,
+            "codex_conversations": 16
+          },
+          "qmd": {
+            "claude_calls": 5,
+            "claude_sessions": 5,
+            "codex_calls": 41,
+            "codex_conversations": 28
+          },
+          "qmdshared": {
+            "claude_calls": 0,
+            "claude_sessions": 0,
+            "codex_calls": 4,
+            "codex_conversations": 2
+          },
+          "context-mode": {
+            "claude_calls": 0,
+            "claude_sessions": 0,
+            "codex_calls": 32093,
+            "codex_conversations": 569
+          },
+          "plugin_context-mode_context-mode": {
+            "claude_calls": 2453,
+            "claude_sessions": 9,
+            "codex_calls": 0,
+            "codex_conversations": 0
+          }
+        },
+        "reconciled": {
+          "codebase-memory-mcp": {
+            "claude_calls": 4,
+            "claude_sessions": 4,
+            "codex_calls": 1769,
+            "codex_conversations": 160
+          },
+          "ai-memory": {
+            "claude_calls": 13,
+            "claude_sessions": 6,
+            "codex_calls": 293,
+            "codex_conversations": 80
+          },
+          "hindsight": {
+            "claude_calls": 4,
+            "claude_sessions": 4,
+            "codex_calls": 25,
+            "codex_conversations": 16
+          },
+          "qmd": {
+            "claude_calls": 5,
+            "claude_sessions": 5,
+            "codex_calls": 41,
+            "codex_conversations": 28
+          },
+          "qmdshared": {
+            "claude_calls": 0,
+            "claude_sessions": 0,
+            "codex_calls": 4,
+            "codex_conversations": 2
+          },
+          "context-mode": {
+            "claude_calls": 0,
+            "claude_sessions": 0,
+            "codex_calls": 31789,
+            "codex_conversations": 579
+          },
+          "plugin_context-mode_context-mode": {
+            "claude_calls": 2453,
+            "claude_sessions": 9,
+            "codex_calls": 0,
+            "codex_conversations": 0
+          }
+        }
+      },
+      "role_counts": {
+        "baseline": {
+          "codex_buckets": 134,
+          "claude_buckets": 6
+        },
+        "reconciled": {
+          "codex_buckets": 139,
+          "claude_buckets": 5
+        }
+      },
+      "orchestration_section": {
+        "baseline_present": false,
+        "reconciled_present": true,
+        "used_in_memory_dispositions": false
+      }
+    },
+    "historical_markdown": {
+      "source_file": "docs/decisions/memory-adoption-835/INVOKE-RATES-24H-20261008T2330Z.md",
+      "sha256": "86e8a4e0db11846eed1c4e99d5e89321b576cab087aa07676188705de593e541",
+      "bytes": 2438,
+      "status": "DATED HISTORY ONLY; not disposition evidence; older query populations/windows remain separate",
+      "origin": "Private host state; exact sanitized counter capture published only for dated-history reproducibility."
+    },
+    "retention_policy": {
+      "source": "docs/decisions/2026-10-07-clean-upstream-install-finalizes-a-candidate.md",
+      "rules": [
+        3,
+        4,
+        5,
+        7
+      ],
+      "low_use": "installation/routing gap first, not removal evidence",
+      "removal_conditions": [
+        "better-evidenced upstream replacement for the same job",
+        "official installation cannot work on this host, proved from vendor sources"
+      ],
+      "counters_gate_readiness": false
+    }
+  },
   "routing_supplement": {
     "observed_at_utc": "2026-10-08T23:47:39Z",
-    "invoke_rates": {
+    "historical_invoke_rates": {
+      "evidence_status": "DATED HISTORY ONLY; not disposition evidence",
+      "source_file": "docs/decisions/memory-adoption-835/INVOKE-RATES-24H-20261008T2330Z.md",
       "artifact": "research/token-efficiency-20261008/INVOKE-RATES-24H-20261008T2330Z.md",
       "sha256": "86e8a4e0db11846eed1c4e99d5e89321b576cab087aa07676188705de593e541",
       "bytes": 2438,
@@ -94,7 +1390,8 @@
       "exclusions": {
         "claude_native_memory": "Native file workflow, outside MCP count.",
         "graphiti": "Not listed; not converted to a measured zero."
-      }
+      },
+      "origin": "Private host state; not repository-native or upstream measurement"
     },
     "qmd_routing": {
       "command": "claude plugin list --json; metadata-only native QMD skill inspection",
@@ -110,7 +1407,10 @@
       "vendor_marketplace_source": "https://github.com/tobi/qmd/blob/facd35e01359e59d938bc9418e93fb9318addee3/.claude-plugin/marketplace.json",
       "plugin_source": "./skills",
       "vendor_plugin_mcp_command": "qmd mcp",
-      "boundary": "WIRE is a proposal. Reconcile existing named index and pending shared transport; do not add a duplicate default-index server."
+      "boundary": "WIRE is a proposal. Reconcile existing named index and pending shared transport; do not add a duplicate default-index server.",
+      "bootstrap_vendor_source": "https://github.com/tobi/qmd/blob/facd35e01359e59d938bc9418e93fb9318addee3/src/cli/qmd.ts#L3339",
+      "bootstrap_sha256": "bb4664ad7d959f171c8aa5c9575394327d8fc1070b2529bcc5494a0843a7bc1b",
+      "bootstrap_source_boundary": "823-byte vendor-generated entrypoint; full skills/qmd/SKILL.md is a separate runtime payload"
     },
     "native_memory_freshness": {
       "observed_at_utc": "2026-10-08T23:44:33Z",
@@ -122,13 +1422,13 @@
       "boundary": "File freshness does not identify the writer or prove automatic loading/organic use in each session."
     },
     "dispositions": {
-      "claude_native_memory": "KEEP",
-      "ai_memory": "KEEP",
-      "hindsight": "RETIRE",
+      "claude_native_memory": "KEEP proposed; organic use unresolved",
+      "ai_memory": "WIRE",
+      "hindsight": "WIRE",
       "context_mode": "KEEP",
       "codebase_memory": "KEEP",
       "qmd": "WIRE",
-      "graphiti": "RETIRE"
+      "graphiti": "DEFER"
     },
     "proposed_fresh_session_checks": {
       "per_client": true,
@@ -136,8 +1436,9 @@
       "count_from_native_loki": true,
       "executed": false,
       "claude_native_memory_count_boundary": "Native file/session observation; MCP metric is not applicable.",
-      "hindsight_boundary": "Default retirement plus a separately scoped optional-bank test only after a unique research job is adopted.",
-      "graphiti_boundary": "Defer installation; no default graph dependency."
+      "hindsight_boundary": "After research-scoped vendor route repair, each native client recovers the original stored hypothesis/outcome for one real experiment with byte-equal world/experience source and all_strict tag isolation; count useful task events separately from probes. Not run here.",
+      "graphiti_boundary": "DEFER; no current retirement action or default dependency. Future native specialist job requires source-backed installation/operation checks.",
+      "claude_native_memory_observable": "Record native MEMORY/topic-file load/read evidence in the new session (native loaded-memory view or file-read event), plus use of a native-memory-only existing preference not supplied in the task. No observation is attached; organic use unresolved."
     },
     "maintenance_drafts": {
       "services": 7,
@@ -177,14 +1478,15 @@
     },
     {
       "layer": "context-mode",
-      "command": "installed package.json name/version; installed source git rev-parse HEAD and git status --short",
+      "command": "native Claude plugin-list/installed-plugin metadata; named Claude marketplace and Codex plugin-source git rev-parse HEAD",
       "returned": {
         "name": "context-mode",
         "version": "1.0.169",
-        "source_head": "6f0cc6841c687e754059f36714a11233fda1a02b",
-        "source_worktree_clean": true
+        "claude_plugin_record_commit": "9f3ecc8b0aafd25d3592ffc31e4b02b1767f6089",
+        "claude_marketplace_checkout": "a83c20165125850473e9344421cf7f374201f0fe",
+        "codex_source_checkout": "6f0cc6841c687e754059f36714a11233fda1a02b"
       },
-      "limit": "Does not verify a running bundle against the release source."
+      "limit": "These are separate native registration/checkout records; no running-bundle equivalence is claimed."
     },
     {
       "layer": "codebase-memory-mcp",
@@ -418,12 +1720,14 @@
     {
       "command": "ai-memory --data-dir <host-owned-data-dir> status --json",
       "result": "timeout after 15 seconds",
-      "retried": false
+      "retried": false,
+      "interpretation": "Historical probe omitted the live explicit --config. Timeout does not prove the configured service failed; no retry or model task is implied."
     },
     {
       "command": "ai-memory --data-dir <host-owned-data-dir> auto-improve-report --workspace default --project seathatflowsinourveins-native-agent-stack --json",
       "result": "timeout after 15 seconds",
-      "retried": false
+      "retried": false,
+      "interpretation": "Historical probe omitted the live explicit --config. Timeout does not prove the configured service failed; no retry or model task is implied."
     },
     {
       "command": "Pinned context-mode src/session/store.ts and hooks/claude-code/sessionstart.mjs source lookups",
@@ -472,7 +1776,10 @@
       "files": [
         "src/session/db.ts",
         "src/server.ts"
-      ]
+      ],
+      "observed_source_root": "Codex plugin source checkout, not Claude installed-plugin record",
+      "claude_plugin_record_commit": "9f3ecc8b0aafd25d3592ffc31e4b02b1767f6089",
+      "claude_marketplace_checkout": "a83c20165125850473e9344421cf7f374201f0fe"
     },
     {
       "repository": "DeusData/codebase-memory-mcp",
@@ -518,5 +1825,286 @@
     "No credentials, settings route, gateway route, raw conversation, fixture or historical benchmark opened by this task's host probes.",
     "No installed/enabled draft maintenance unit.",
     "No catalog/readiness upgrade; independent designated reads and explicit CC landing cue remain required."
-  ]
+  ],
+  "initial_recorded_at_utc": "2026-10-08T23:35:45Z",
+  "observation_windows_utc": {
+    "initial_inventory": {
+      "start": "2026-10-08T23:25:42Z",
+      "end": "2026-10-08T23:35:45Z"
+    },
+    "routing_supplement": {
+      "observed_at_utc": "2026-10-08T23:47:39Z"
+    },
+    "native_memory_freshness": {
+      "observed_at_utc": "2026-10-08T23:44:33Z"
+    },
+    "review_correction": {
+      "observed_at_utc": "2026-10-09T01:23:03Z",
+      "scope": "read-only native metadata/source correction, no installer or model task"
+    }
+  },
+  "review_correction": {
+    "observed_at_utc": "2026-10-09T01:23:03Z",
+    "ai_memory_managed_skills_present": false,
+    "ai_memory_live_config": "%h/.config/ai-memory/config.toml",
+    "native_unit_execstart_matches_drafts": true,
+    "codegraph_registered_project": "home-apoth-code-native-agent-stack",
+    "native_codegraph_list_projects_exit_code": 0,
+    "context_mode_metadata": {
+      "claude_plugin_record": "9f3ecc8b0aafd25d3592ffc31e4b02b1767f6089",
+      "claude_marketplace": "a83c20165125850473e9344421cf7f374201f0fe",
+      "codex_cache_checkout": "6f0cc6841c687e754059f36714a11233fda1a02b",
+      "source_root_labels": [
+        "Claude installed-plugin metadata",
+        "Claude marketplace checkout",
+        "Codex plugin source checkout"
+      ],
+      "bundle_equivalence_verified": false
+    },
+    "codebase_skill_location": {
+      "discovered_legacy_root": "%h/.codex/skills/codebase-memory/SKILL.md",
+      "preferred_root_counterpart_present": false,
+      "sha256": "8efe4aa10efa92b52148cce5840abac552b92e5dc3af567e5d167a5e33624db1",
+      "bytes": 5137,
+      "source": "https://developers.openai.com/codex/skills#where-codex-loads-local-skills",
+      "migration_performed": false
+    },
+    "draft_side_effects": [
+      "ai-memory workspace flags can create a workspace if the name drifts; verify exact existing scope before any preview",
+      "Hindsight refresh performs model calls and stores refreshed reflect_response; submission is not completion"
+    ],
+    "exec_counter_reconciliation": {
+      "historical_markdown": {
+        "calls": 3002,
+        "identities": 153,
+        "denominator": 285,
+        "use": "dated history only; method/window mismatch unresolved"
+      },
+      "baseline": {
+        "calls": 3029,
+        "identities": 24,
+        "denominator": 286
+      },
+      "reconciled": {
+        "calls": 2910,
+        "identities": 24,
+        "denominator": 285
+      },
+      "review_extra_figure": {
+        "calls": 2981,
+        "identities": 24,
+        "source": "CC read c5a288b0f351f7d67d6542140a968be7a30fdb1f7716e2ba417df8589517de32",
+        "producer_snapshot_sha256": null,
+        "use": "unbound review-window figure, not combined with either pinned snapshot"
+      },
+      "limit": "Identical codegraph counters do not establish identical windows/methods. The historical153-to-snapshot24 identity discrepancy is not explained away by window shift."
+    },
+    "claude_coordinator_role_scope": {
+      "note": "Pinned snapshots bind roles separately. Their coordinator plugin-context subtotal is2437 in each source; producer total2453 includes16 unattributed calls. A later review cites2466/2482 without a pinned producer snapshot; it is not merged into these sources.",
+      "memory_calls_by_named_role": {
+        "wsl-architecture-design": {
+          "ai-memory": 6,
+          "qmd": 1
+        },
+        "ns2604-coop": "no memory/retrieval server entry",
+        "api-actions": "no memory/retrieval server entry",
+        "native-agent-stack-1a": "no memory/retrieval server entry"
+      },
+      "limit": "Absence of a server entry is not a measured zero; no non-CC coordinator organic memory use is established by these snapshots."
+    },
+    "gpt_verdict_sha256": "455dd1af1c2130f280cca0ac05dac92aad2ee1e26aa315fab2e8a48bc91d29fd",
+    "claude_verdict_sha256": "c5a288b0f351f7d67d6542140a968be7a30fdb1f7716e2ba417df8589517de32",
+    "native_installs_or_model_tasks_performed": false
+  },
+  "adoption_stages": {
+    "stage1": {
+      "role_slots": {
+        "claude_native_memory": {
+          "role_slot": "native-claude-durable-preferences",
+          "current_choice": "Claude Code native auto-memory",
+          "version": "2.1.295",
+          "choice_status": "KEEP",
+          "primary_source_binding": "adoption_evidence.per_decision_bindings.claude_native_memory",
+          "evidence_class": "documented selection plus bounded native metadata; no new task-quality comparison",
+          "overlap_disposition": "ai-memory global-profile pages remain historical context, not a parallel native-preference authoring default",
+          "parallel_default": false,
+          "per_session_pss_kb": null,
+          "pss_status": "UNMEASURED for this component in a role-bound native session; no attribution from whole-arm totals",
+          "shared_copy_capability": "Native feature; no standalone shared MCP copy",
+          "load_scope": "only the owning/using roles; per-role MCP set proposal, no global activation change",
+          "alwaysLoad": {
+            "proposed": false,
+            "condition": "only if the installed client exposes this supported setting; no config field invented or applied",
+            "applied": false
+          },
+          "stage2_admission": "BLOCKED ADOPT-NOW until role/session/process-bound PSS evidence exists",
+          "revisit": "Pinned vendor release/source changes and G5 catalog-owner refresh/reopen triggers; no duplicate default selected"
+        },
+        "ai_memory": {
+          "role_slot": "cross-client-project-events-decisions",
+          "current_choice": "akitaonrails/ai-memory",
+          "version": "2.6.0",
+          "choice_status": "WIRE",
+          "primary_source_binding": "adoption_evidence.per_decision_bindings.ai_memory",
+          "evidence_class": "documented selection plus bounded native metadata; no new task-quality comparison",
+          "overlap_disposition": "Hindsight generic coding-capture route is not enabled; research memory has its own slot",
+          "parallel_default": false,
+          "per_session_pss_kb": null,
+          "pss_status": "UNMEASURED for this component in a role-bound native session; no attribution from whole-arm totals",
+          "shared_copy_capability": "Documented and observed shared HTTP native service",
+          "load_scope": "only the owning/using roles; per-role MCP set proposal, no global activation change",
+          "alwaysLoad": {
+            "proposed": false,
+            "condition": "only if the installed client exposes this supported setting; no config field invented or applied",
+            "applied": false
+          },
+          "stage2_admission": "BLOCKED ADOPT-NOW until role/session/process-bound PSS evidence exists",
+          "revisit": "Pinned vendor release/source changes and G5 catalog-owner refresh/reopen triggers; no duplicate default selected"
+        },
+        "hindsight": {
+          "role_slot": "research-hypotheses-experiment-records",
+          "current_choice": "vectorize-io/hindsight",
+          "version": "0.10.2",
+          "choice_status": "WIRE",
+          "primary_source_binding": "adoption_evidence.per_decision_bindings.hindsight",
+          "evidence_class": "documented selection plus bounded native metadata; no new task-quality comparison",
+          "overlap_disposition": "Generic project/coding capture belongs to ai-memory; vendor skill only in named research consumer scope",
+          "parallel_default": false,
+          "per_session_pss_kb": null,
+          "pss_status": "UNMEASURED for this component in a role-bound native session; no attribution from whole-arm totals",
+          "shared_copy_capability": "Documented and observed shared bank-specific HTTP service",
+          "load_scope": "only the owning/using roles; per-role MCP set proposal, no global activation change",
+          "alwaysLoad": {
+            "proposed": false,
+            "condition": "only if the installed client exposes this supported setting; no config field invented or applied",
+            "applied": false
+          },
+          "stage2_admission": "BLOCKED ADOPT-NOW until role/session/process-bound PSS evidence exists",
+          "revisit": "Pinned vendor release/source changes and G5 catalog-owner refresh/reopen triggers; no duplicate default selected"
+        },
+        "context_mode": {
+          "role_slot": "session-continuity-captured-output",
+          "current_choice": "mksglu/context-mode",
+          "version": "1.0.169",
+          "choice_status": "KEEP",
+          "primary_source_binding": "adoption_evidence.per_decision_bindings.context_mode",
+          "evidence_class": "documented selection plus bounded native metadata; no new task-quality comparison",
+          "overlap_disposition": "Persistent session capture is continuity/scratch evidence, not a parallel durable project decision store",
+          "parallel_default": false,
+          "per_session_pss_kb": null,
+          "pss_status": "UNMEASURED for this component in a role-bound native session; no attribution from whole-arm totals",
+          "shared_copy_capability": "Selected native session transport observed; shared MCP HTTP transport not verified here",
+          "load_scope": "only the owning/using roles; per-role MCP set proposal, no global activation change",
+          "alwaysLoad": {
+            "proposed": false,
+            "condition": "only if the installed client exposes this supported setting; no config field invented or applied",
+            "applied": false
+          },
+          "stage2_admission": "BLOCKED ADOPT-NOW until role/session/process-bound PSS evidence exists",
+          "revisit": "Pinned vendor release/source changes and G5 catalog-owner refresh/reopen triggers; no duplicate default selected"
+        },
+        "codebase_memory": {
+          "role_slot": "structural-code-graph",
+          "current_choice": "DeusData/codebase-memory-mcp",
+          "version": "0.11.0",
+          "choice_status": "KEEP",
+          "primary_source_binding": "adoption_evidence.per_decision_bindings.codebase_memory",
+          "evidence_class": "documented selection plus bounded native metadata; no new task-quality comparison",
+          "overlap_disposition": "SocratiCode/semble textual-semantic search remains a separate job; Graphiti application fact graph is not a parallel code-graph default",
+          "parallel_default": false,
+          "per_session_pss_kb": null,
+          "pss_status": "UNMEASURED for this component in a role-bound native session; no attribution from whole-arm totals",
+          "shared_copy_capability": "Native per-account shared daemon; per-session stdio frontends. Shared HTTP MCP front end not verified",
+          "load_scope": "only the owning/using roles; per-role MCP set proposal, no global activation change",
+          "alwaysLoad": {
+            "proposed": false,
+            "condition": "only if the installed client exposes this supported setting; no config field invented or applied",
+            "applied": false
+          },
+          "stage2_admission": "BLOCKED ADOPT-NOW until role/session/process-bound PSS evidence exists",
+          "revisit": "Pinned vendor release/source changes and G5 catalog-owner refresh/reopen triggers; no duplicate default selected"
+        },
+        "qmd": {
+          "role_slot": "checked-in-markdown-retrieval",
+          "current_choice": "tobi/qmd",
+          "version": "2.8.3",
+          "choice_status": "WIRE",
+          "primary_source_binding": "adoption_evidence.per_decision_bindings.qmd",
+          "evidence_class": "documented selection plus bounded native metadata; no new task-quality comparison",
+          "overlap_disposition": "Native memory/event stores do not become an additional default markdown-corpus search engine",
+          "parallel_default": false,
+          "per_session_pss_kb": null,
+          "pss_status": "UNMEASURED for this component in a role-bound native session; no attribution from whole-arm totals",
+          "shared_copy_capability": "Documented native shared HTTP; configured service pending activation",
+          "load_scope": "only the owning/using roles; per-role MCP set proposal, no global activation change",
+          "alwaysLoad": {
+            "proposed": false,
+            "condition": "only if the installed client exposes this supported setting; no config field invented or applied",
+            "applied": false
+          },
+          "stage2_admission": "BLOCKED ADOPT-NOW until role/session/process-bound PSS evidence exists",
+          "revisit": "Pinned vendor release/source changes and G5 catalog-owner refresh/reopen triggers; no duplicate default selected"
+        },
+        "graphiti": {
+          "role_slot": "application-temporal-fact-graph",
+          "current_choice": "getzep/graphiti",
+          "version": "0.30.2; MCP1.1.0 separately deferred",
+          "choice_status": "DEFER",
+          "primary_source_binding": "adoption_evidence.per_decision_bindings.graphiti",
+          "evidence_class": "documented selection plus bounded native metadata; no new task-quality comparison",
+          "overlap_disposition": "DEFER candidate only, no parallel default exposure and no current retirement action",
+          "parallel_default": false,
+          "per_session_pss_kb": null,
+          "pss_status": "UNMEASURED for this component in a role-bound native session; no attribution from whole-arm totals",
+          "shared_copy_capability": "No adopted host process; shared HTTP deployment capability not verified",
+          "load_scope": "only the owning/using roles; per-role MCP set proposal, no global activation change",
+          "alwaysLoad": {
+            "proposed": false,
+            "condition": "only if the installed client exposes this supported setting; no config field invented or applied",
+            "applied": false
+          },
+          "stage2_admission": "BLOCKED ADOPT-NOW until role/session/process-bound PSS evidence exists",
+          "revisit": "Pinned vendor release/source changes and G5 catalog-owner refresh/reopen triggers; no duplicate default selected"
+        }
+      },
+      "catalog_projection_owner": "grand-catalog in a separate PR after G5#878; this record names slots/overlaps, not a new parallel catalog",
+      "exactly_one_choice_per_slot": true
+    },
+    "stage2": {
+      "memory_cost_required_for_adopt_now": true,
+      "method": "Read native smaps_rollup for owned server/tool processes and retain role/session/process/time binding; shared-server PSS and per-session frontend PSS remain separate. No measurement or installer is run by this record.",
+      "prefer_shared_copy": true,
+      "per_role_load_only": true,
+      "component_measurements": "all seven component per-session figures unmeasured; existing accepted jobs/installed services are preserved, no removal on counters",
+      "trial_context": {
+        "source_file": "docs/decisions/memory-adoption-835/ROLE-MCP-TRIAL-REPORT-20261009.md",
+        "sha256": "f0afc2c734b3ad1b70e68cd38d3c844c7f4b1338cc030c8fc40fc88db1e53989",
+        "origin": "Private host-state trial report; exact sanitized metadata bytes retained",
+        "measurements": [
+          {
+            "arm": "A full-set control",
+            "owned_processes": 23,
+            "owned_pss_kb": 1431973
+          },
+          {
+            "arm": "B structural-scout",
+            "owned_processes": 12,
+            "owned_pss_kb": 674966
+          },
+          {
+            "arm": "B supplied-artifact",
+            "owned_processes": 16,
+            "owned_pss_kb": 837623
+          },
+          {
+            "arm": "C token-parity-parent",
+            "owned_processes": 14,
+            "owned_pss_kb": 947334
+          }
+        ],
+        "scope": "after-task whole-arm owned-process PSS, one run per arm with different real tasks; includes alive subagents/tools",
+        "limits": "Not per-component/session attribution, not paired measured savings; first-completion token figures are not provider-bound first-request proof. No division by tool count or reuse as a missing component memory figure."
+      }
+    }
+  }
 }

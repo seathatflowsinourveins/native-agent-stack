@@ -1,0 +1,2863 @@
+{
+ "claude_by_role": {
+  "api-actions": {
+   "servers": {
+    "plugin_context-mode_context-mode": {
+     "calls": 213,
+     "sessions": 1
+    },
+    "serena": {
+     "calls": 1,
+     "sessions": 1
+    }
+   },
+   "sessions": 1,
+   "tool_calls": 698
+  },
+  "native-agent-stack-1a": {
+   "servers": {
+    "plugin_context-mode_context-mode": {
+     "calls": 35,
+     "sessions": 1
+    }
+   },
+   "sessions": 1,
+   "tool_calls": 92
+  },
+  "ns2604-coop": {
+   "servers": {
+    "chrome-devtools": {
+     "calls": 133,
+     "sessions": 1
+    },
+    "grafana": {
+     "calls": 43,
+     "sessions": 1
+    },
+    "plugin_context-mode_context-mode": {
+     "calls": 214,
+     "sessions": 1
+    }
+   },
+   "sessions": 1,
+   "tool_calls": 5255
+  },
+  "other Claude sessions": {
+   "servers": {
+    "ai-memory": {
+     "calls": 7,
+     "sessions": 5
+    },
+    "chrome-devtools": {
+     "calls": 2,
+     "sessions": 2
+    },
+    "codebase-memory-mcp": {
+     "calls": 4,
+     "sessions": 4
+    },
+    "headroom": {
+     "calls": 3,
+     "sessions": 3
+    },
+    "hindsight": {
+     "calls": 4,
+     "sessions": 4
+    },
+    "jcodemunch": {
+     "calls": 8,
+     "sessions": 8
+    },
+    "plugin_context-mode_context-mode": {
+     "calls": 16,
+     "sessions": 5
+    },
+    "promptfoo": {
+     "calls": 4,
+     "sessions": 4
+    },
+    "qmd": {
+     "calls": 4,
+     "sessions": 4
+    },
+    "semble": {
+     "calls": 1,
+     "sessions": 1
+    },
+    "serena": {
+     "calls": 16,
+     "sessions": 7
+    },
+    "socraticode": {
+     "calls": 10,
+     "sessions": 10
+    }
+   },
+   "sessions": 55,
+   "tool_calls": 1156
+  },
+  "review-replay (transient)": {
+   "servers": {},
+   "sessions": 4,
+   "tool_calls": 111
+  },
+  "wsl-architecture-design": {
+   "servers": {
+    "agentsview": {
+     "calls": 6,
+     "sessions": 1
+    },
+    "ai-memory": {
+     "calls": 6,
+     "sessions": 1
+    },
+    "chrome-devtools": {
+     "calls": 35,
+     "sessions": 1
+    },
+    "grafana": {
+     "calls": 27,
+     "sessions": 1
+    },
+    "plugin_context-mode_context-mode": {
+     "calls": 1975,
+     "sessions": 1
+    },
+    "qmd": {
+     "calls": 1,
+     "sessions": 1
+    },
+    "serena": {
+     "calls": 14,
+     "sessions": 1
+    },
+    "socraticode": {
+     "calls": 2,
+     "sessions": 1
+    }
+   },
+   "sessions": 1,
+   "tool_calls": 9676
+  }
+ },
+ "claude_total_sessions": 63,
+ "codex_by_lane": {
+  "bali": {
+   "conversations": 5,
+   "servers": {
+    "ai-memory": {
+     "calls": 4,
+     "conversations": 1
+    },
+    "codebase-memory-mcp": {
+     "calls": 17,
+     "conversations": 2
+    },
+    "context-mode": {
+     "calls": 391,
+     "conversations": 5
+    },
+    "serena": {
+     "calls": 4,
+     "conversations": 2
+    }
+   }
+  },
+  "beni": {
+   "conversations": 2,
+   "servers": {
+    "ai-memory": {
+     "calls": 2,
+     "conversations": 1
+    },
+    "context-mode": {
+     "calls": 26,
+     "conversations": 2
+    },
+    "serena": {
+     "calls": 2,
+     "conversations": 2
+    }
+   }
+  },
+  "bilo": {
+   "conversations": 2,
+   "servers": {
+    "codebase-memory-mcp": {
+     "calls": 6,
+     "conversations": 2
+    },
+    "context-mode": {
+     "calls": 19,
+     "conversations": 2
+    },
+    "serena": {
+     "calls": 2,
+     "conversations": 2
+    }
+   }
+  },
+  "bobo": {
+   "conversations": 4,
+   "servers": {
+    "codebase-memory-mcp": {
+     "calls": 19,
+     "conversations": 1
+    },
+    "context-mode": {
+     "calls": 179,
+     "conversations": 4
+    },
+    "qmdshared": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "serena": {
+     "calls": 6,
+     "conversations": 4
+    }
+   }
+  },
+  "boho": {
+   "conversations": 1,
+   "servers": {
+    "ai-memory": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "context-mode": {
+     "calls": 23,
+     "conversations": 1
+    },
+    "serena": {
+     "calls": 3,
+     "conversations": 1
+    }
+   }
+  },
+  "bole": {
+   "conversations": 2,
+   "servers": {
+    "context-mode": {
+     "calls": 28,
+     "conversations": 2
+    },
+    "serena": {
+     "calls": 4,
+     "conversations": 2
+    }
+   }
+  },
+  "bono": {
+   "conversations": 1,
+   "servers": {
+    "ai-memory": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "codebase-memory-mcp": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "codex_worktrees": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "context-mode": {
+     "calls": 5,
+     "conversations": 1
+    },
+    "hindsight": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "jcodemunch": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "qmd": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "serena": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "socraticode": {
+     "calls": 1,
+     "conversations": 1
+    }
+   }
+  },
+  "bozo": {
+   "conversations": 5,
+   "servers": {
+    "context-mode": {
+     "calls": 372,
+     "conversations": 5
+    },
+    "serena": {
+     "calls": 10,
+     "conversations": 5
+    }
+   }
+  },
+  "bure": {
+   "conversations": 4,
+   "servers": {
+    "ai-memory": {
+     "calls": 7,
+     "conversations": 2
+    },
+    "codebase-memory-mcp": {
+     "calls": 9,
+     "conversations": 2
+    },
+    "context-mode": {
+     "calls": 254,
+     "conversations": 4
+    },
+    "serena": {
+     "calls": 11,
+     "conversations": 4
+    }
+   }
+  },
+  "dara": {
+   "conversations": 1,
+   "servers": {
+    "context-mode": {
+     "calls": 11,
+     "conversations": 1
+    },
+    "serena": {
+     "calls": 1,
+     "conversations": 1
+    }
+   }
+  },
+  "dela": {
+   "conversations": 3,
+   "servers": {
+    "ai-memory": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "codebase-memory-mcp": {
+     "calls": 3,
+     "conversations": 1
+    },
+    "context-mode": {
+     "calls": 49,
+     "conversations": 3
+    },
+    "serena": {
+     "calls": 20,
+     "conversations": 3
+    }
+   }
+  },
+  "dodo": {
+   "conversations": 1,
+   "servers": {
+    "context-mode": {
+     "calls": 6,
+     "conversations": 1
+    },
+    "serena": {
+     "calls": 2,
+     "conversations": 1
+    }
+   }
+  },
+  "dora": {
+   "conversations": 30,
+   "servers": {
+    "ai-memory": {
+     "calls": 7,
+     "conversations": 1
+    },
+    "codebase-memory-mcp": {
+     "calls": 121,
+     "conversations": 9
+    },
+    "context-mode": {
+     "calls": 803,
+     "conversations": 27
+    },
+    "jcodemunch": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "qmd": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "serena": {
+     "calls": 18,
+     "conversations": 7
+    },
+    "socraticode": {
+     "calls": 1,
+     "conversations": 1
+    }
+   }
+  },
+  "dove": {
+   "conversations": 2,
+   "servers": {
+    "ai-memory": {
+     "calls": 2,
+     "conversations": 1
+    },
+    "context-mode": {
+     "calls": 182,
+     "conversations": 2
+    },
+    "serena": {
+     "calls": 2,
+     "conversations": 1
+    }
+   }
+  },
+  "dune": {
+   "conversations": 4,
+   "servers": {
+    "ai-memory": {
+     "calls": 2,
+     "conversations": 1
+    },
+    "codebase-memory-mcp": {
+     "calls": 4,
+     "conversations": 1
+    },
+    "context-mode": {
+     "calls": 439,
+     "conversations": 4
+    },
+    "jcodemunch": {
+     "calls": 4,
+     "conversations": 1
+    },
+    "promptfoo": {
+     "calls": 3,
+     "conversations": 1
+    },
+    "qmd": {
+     "calls": 2,
+     "conversations": 1
+    },
+    "serena": {
+     "calls": 2,
+     "conversations": 1
+    },
+    "socraticode": {
+     "calls": 2,
+     "conversations": 1
+    }
+   }
+  },
+  "exec readers": {
+   "conversations": 286,
+   "servers": {
+    "ai-memory": {
+     "calls": 3,
+     "conversations": 1
+    },
+    "codebase-memory-mcp": {
+     "calls": 200,
+     "conversations": 29
+    },
+    "context-mode": {
+     "calls": 3029,
+     "conversations": 24
+    },
+    "headroom": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "hindsight": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "promptfoo": {
+     "calls": 2,
+     "conversations": 2
+    },
+    "semble": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "serena": {
+     "calls": 112,
+     "conversations": 6
+    },
+    "socraticode": {
+     "calls": 2,
+     "conversations": 2
+    }
+   }
+  },
+  "famo": {
+   "conversations": 4,
+   "servers": {
+    "ai-memory": {
+     "calls": 2,
+     "conversations": 1
+    },
+    "codebase-memory-mcp": {
+     "calls": 16,
+     "conversations": 3
+    },
+    "context-mode": {
+     "calls": 364,
+     "conversations": 4
+    },
+    "hindsight": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "jcodemunch": {
+     "calls": 2,
+     "conversations": 1
+    },
+    "qmd": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "serena": {
+     "calls": 9,
+     "conversations": 3
+    },
+    "socraticode": {
+     "calls": 1,
+     "conversations": 1
+    }
+   }
+  },
+  "fava": {
+   "conversations": 4,
+   "servers": {
+    "ai-memory": {
+     "calls": 8,
+     "conversations": 1
+    },
+    "codebase-memory-mcp": {
+     "calls": 4,
+     "conversations": 1
+    },
+    "context-mode": {
+     "calls": 318,
+     "conversations": 4
+    }
+   }
+  },
+  "fifi": {
+   "conversations": 2,
+   "servers": {
+    "context-mode": {
+     "calls": 27,
+     "conversations": 2
+    },
+    "serena": {
+     "calls": 3,
+     "conversations": 2
+    }
+   }
+  },
+  "fire": {
+   "conversations": 2,
+   "servers": {
+    "context-mode": {
+     "calls": 11,
+     "conversations": 1
+    },
+    "serena": {
+     "calls": 2,
+     "conversations": 2
+    }
+   }
+  },
+  "fure": {
+   "conversations": 2,
+   "servers": {
+    "context-mode": {
+     "calls": 23,
+     "conversations": 2
+    },
+    "serena": {
+     "calls": 4,
+     "conversations": 2
+    }
+   }
+  },
+  "gala": {
+   "conversations": 4,
+   "servers": {
+    "ai-memory": {
+     "calls": 15,
+     "conversations": 1
+    },
+    "codebase-memory-mcp": {
+     "calls": 44,
+     "conversations": 4
+    },
+    "context-mode": {
+     "calls": 741,
+     "conversations": 4
+    },
+    "hindsight": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "qmd": {
+     "calls": 2,
+     "conversations": 1
+    },
+    "serena": {
+     "calls": 27,
+     "conversations": 4
+    }
+   }
+  },
+  "gamo": {
+   "conversations": 3,
+   "servers": {
+    "ai-memory": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "codebase-memory-mcp": {
+     "calls": 8,
+     "conversations": 1
+    },
+    "context-mode": {
+     "calls": 132,
+     "conversations": 3
+    },
+    "headroom": {
+     "calls": 3,
+     "conversations": 1
+    },
+    "promptfoo": {
+     "calls": 2,
+     "conversations": 1
+    },
+    "serena": {
+     "calls": 5,
+     "conversations": 3
+    }
+   }
+  },
+  "gino": {
+   "conversations": 2,
+   "servers": {
+    "context-mode": {
+     "calls": 68,
+     "conversations": 2
+    },
+    "serena": {
+     "calls": 2,
+     "conversations": 2
+    }
+   }
+  },
+  "gobi": {
+   "conversations": 2,
+   "servers": {
+    "codebase-memory-mcp": {
+     "calls": 2,
+     "conversations": 1
+    },
+    "context-mode": {
+     "calls": 42,
+     "conversations": 2
+    },
+    "serena": {
+     "calls": 6,
+     "conversations": 2
+    }
+   }
+  },
+  "gome": {
+   "conversations": 3,
+   "servers": {
+    "context-mode": {
+     "calls": 19,
+     "conversations": 3
+    },
+    "qmd": {
+     "calls": 2,
+     "conversations": 1
+    },
+    "serena": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "socraticode": {
+     "calls": 2,
+     "conversations": 1
+    }
+   }
+  },
+  "gore": {
+   "conversations": 2,
+   "servers": {
+    "context-mode": {
+     "calls": 100,
+     "conversations": 2
+    },
+    "jcodemunch": {
+     "calls": 2,
+     "conversations": 1
+    }
+   }
+  },
+  "guru": {
+   "conversations": 6,
+   "servers": {
+    "context-mode": {
+     "calls": 229,
+     "conversations": 6
+    },
+    "serena": {
+     "calls": 14,
+     "conversations": 6
+    }
+   }
+  },
+  "halu": {
+   "conversations": 2,
+   "servers": {
+    "context-mode": {
+     "calls": 21,
+     "conversations": 2
+    }
+   }
+  },
+  "hanu": {
+   "conversations": 1,
+   "servers": {
+    "context-mode": {
+     "calls": 10,
+     "conversations": 1
+    }
+   }
+  },
+  "haru": {
+   "conversations": 2,
+   "servers": {
+    "ai-memory": {
+     "calls": 3,
+     "conversations": 1
+    },
+    "context-mode": {
+     "calls": 37,
+     "conversations": 2
+    },
+    "serena": {
+     "calls": 4,
+     "conversations": 2
+    }
+   }
+  },
+  "hazu": {
+   "conversations": 3,
+   "servers": {
+    "context-mode": {
+     "calls": 167,
+     "conversations": 3
+    },
+    "jcodemunch": {
+     "calls": 3,
+     "conversations": 1
+    },
+    "qmd": {
+     "calls": 2,
+     "conversations": 1
+    },
+    "serena": {
+     "calls": 9,
+     "conversations": 2
+    },
+    "socraticode": {
+     "calls": 2,
+     "conversations": 1
+    }
+   }
+  },
+  "helu": {
+   "conversations": 8,
+   "servers": {
+    "codebase-memory-mcp": {
+     "calls": 15,
+     "conversations": 2
+    },
+    "context-mode": {
+     "calls": 586,
+     "conversations": 8
+    },
+    "serena": {
+     "calls": 9,
+     "conversations": 7
+    }
+   }
+  },
+  "hemu": {
+   "conversations": 4,
+   "servers": {
+    "context-mode": {
+     "calls": 226,
+     "conversations": 4
+    },
+    "serena": {
+     "calls": 5,
+     "conversations": 4
+    }
+   }
+  },
+  "hena": {
+   "conversations": 2,
+   "servers": {
+    "ai-memory": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "context-mode": {
+     "calls": 16,
+     "conversations": 2
+    },
+    "serena": {
+     "calls": 4,
+     "conversations": 2
+    }
+   }
+  },
+  "hina": {
+   "conversations": 5,
+   "servers": {
+    "ai-memory": {
+     "calls": 6,
+     "conversations": 1
+    },
+    "codebase-memory-mcp": {
+     "calls": 19,
+     "conversations": 2
+    },
+    "context-mode": {
+     "calls": 379,
+     "conversations": 5
+    },
+    "serena": {
+     "calls": 11,
+     "conversations": 5
+    }
+   }
+  },
+  "kali": {
+   "conversations": 6,
+   "servers": {
+    "ai-memory": {
+     "calls": 3,
+     "conversations": 1
+    },
+    "codex_apps": {
+     "calls": 3,
+     "conversations": 2
+    },
+    "context-mode": {
+     "calls": 557,
+     "conversations": 6
+    },
+    "promptfoo": {
+     "calls": 3,
+     "conversations": 1
+    },
+    "serena": {
+     "calls": 6,
+     "conversations": 4
+    }
+   }
+  },
+  "kato": {
+   "conversations": 4,
+   "servers": {
+    "ai-memory": {
+     "calls": 13,
+     "conversations": 4
+    },
+    "context-mode": {
+     "calls": 484,
+     "conversations": 4
+    },
+    "jcodemunch": {
+     "calls": 3,
+     "conversations": 1
+    },
+    "qmd": {
+     "calls": 2,
+     "conversations": 1
+    },
+    "serena": {
+     "calls": 2,
+     "conversations": 1
+    },
+    "socraticode": {
+     "calls": 2,
+     "conversations": 1
+    }
+   }
+  },
+  "kazu": {
+   "conversations": 21,
+   "servers": {
+    "chrome-devtools": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "codebase-memory-mcp": {
+     "calls": 17,
+     "conversations": 7
+    },
+    "context-mode": {
+     "calls": 1187,
+     "conversations": 21
+    },
+    "promptfoo": {
+     "calls": 13,
+     "conversations": 1
+    },
+    "serena": {
+     "calls": 25,
+     "conversations": 18
+    }
+   }
+  },
+  "kilo": {
+   "conversations": 7,
+   "servers": {
+    "ai-memory": {
+     "calls": 7,
+     "conversations": 1
+    },
+    "chrome-devtools": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "codebase-memory-mcp": {
+     "calls": 30,
+     "conversations": 5
+    },
+    "context-mode": {
+     "calls": 540,
+     "conversations": 7
+    },
+    "headroom": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "hindsight": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "jcodemunch": {
+     "calls": 2,
+     "conversations": 1
+    },
+    "promptfoo": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "qmd": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "serena": {
+     "calls": 4,
+     "conversations": 4
+    },
+    "socraticode": {
+     "calls": 1,
+     "conversations": 1
+    }
+   }
+  },
+  "kola": {
+   "conversations": 1,
+   "servers": {
+    "context-mode": {
+     "calls": 3,
+     "conversations": 1
+    },
+    "serena": {
+     "calls": 1,
+     "conversations": 1
+    }
+   }
+  },
+  "kona": {
+   "conversations": 2,
+   "servers": {
+    "codebase-memory-mcp": {
+     "calls": 5,
+     "conversations": 1
+    },
+    "context-mode": {
+     "calls": 44,
+     "conversations": 2
+    },
+    "serena": {
+     "calls": 2,
+     "conversations": 2
+    }
+   }
+  },
+  "kuma": {
+   "conversations": 4,
+   "servers": {
+    "codebase-memory-mcp": {
+     "calls": 14,
+     "conversations": 1
+    },
+    "context-mode": {
+     "calls": 578,
+     "conversations": 4
+    },
+    "qmdshared": {
+     "calls": 3,
+     "conversations": 1
+    },
+    "serena": {
+     "calls": 11,
+     "conversations": 4
+    }
+   }
+  },
+  "kune": {
+   "conversations": 7,
+   "servers": {
+    "ai-memory": {
+     "calls": 4,
+     "conversations": 1
+    },
+    "context-mode": {
+     "calls": 184,
+     "conversations": 6
+    },
+    "serena": {
+     "calls": 11,
+     "conversations": 7
+    }
+   }
+  },
+  "ledu": {
+   "conversations": 3,
+   "servers": {
+    "context-mode": {
+     "calls": 39,
+     "conversations": 2
+    },
+    "serena": {
+     "calls": 5,
+     "conversations": 3
+    }
+   }
+  },
+  "levi": {
+   "conversations": 7,
+   "servers": {
+    "ai-memory": {
+     "calls": 15,
+     "conversations": 1
+    },
+    "codebase-memory-mcp": {
+     "calls": 87,
+     "conversations": 2
+    },
+    "context-mode": {
+     "calls": 572,
+     "conversations": 7
+    },
+    "hindsight": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "qmd": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "serena": {
+     "calls": 14,
+     "conversations": 7
+    }
+   }
+  },
+  "lezi": {
+   "conversations": 4,
+   "servers": {
+    "context-mode": {
+     "calls": 41,
+     "conversations": 2
+    },
+    "serena": {
+     "calls": 5,
+     "conversations": 4
+    }
+   }
+  },
+  "libu": {
+   "conversations": 7,
+   "servers": {
+    "codebase-memory-mcp": {
+     "calls": 7,
+     "conversations": 2
+    },
+    "context-mode": {
+     "calls": 167,
+     "conversations": 7
+    },
+    "serena": {
+     "calls": 10,
+     "conversations": 7
+    }
+   }
+  },
+  "lilo": {
+   "conversations": 2,
+   "servers": {
+    "ai-memory": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "codebase-memory-mcp": {
+     "calls": 15,
+     "conversations": 1
+    },
+    "context-mode": {
+     "calls": 35,
+     "conversations": 2
+    }
+   }
+  },
+  "lime": {
+   "conversations": 5,
+   "servers": {
+    "ai-memory": {
+     "calls": 4,
+     "conversations": 1
+    },
+    "context-mode": {
+     "calls": 107,
+     "conversations": 5
+    },
+    "serena": {
+     "calls": 1,
+     "conversations": 1
+    }
+   }
+  },
+  "lise": {
+   "conversations": 1,
+   "servers": {
+    "codebase-memory-mcp": {
+     "calls": 5,
+     "conversations": 1
+    },
+    "context-mode": {
+     "calls": 9,
+     "conversations": 1
+    },
+    "serena": {
+     "calls": 1,
+     "conversations": 1
+    }
+   }
+  },
+  "live": {
+   "conversations": 2,
+   "servers": {
+    "context-mode": {
+     "calls": 20,
+     "conversations": 2
+    },
+    "serena": {
+     "calls": 2,
+     "conversations": 2
+    }
+   }
+  },
+  "lobo": {
+   "conversations": 3,
+   "servers": {
+    "ai-memory": {
+     "calls": 3,
+     "conversations": 1
+    },
+    "context-mode": {
+     "calls": 147,
+     "conversations": 3
+    },
+    "jcodemunch": {
+     "calls": 4,
+     "conversations": 1
+    },
+    "qmd": {
+     "calls": 2,
+     "conversations": 1
+    },
+    "socraticode": {
+     "calls": 4,
+     "conversations": 1
+    }
+   }
+  },
+  "luba": {
+   "conversations": 2,
+   "servers": {
+    "context-mode": {
+     "calls": 13,
+     "conversations": 2
+    },
+    "serena": {
+     "calls": 2,
+     "conversations": 2
+    }
+   }
+  },
+  "lulu": {
+   "conversations": 1,
+   "servers": {
+    "context-mode": {
+     "calls": 10,
+     "conversations": 1
+    },
+    "serena": {
+     "calls": 3,
+     "conversations": 1
+    }
+   }
+  },
+  "luno": {
+   "conversations": 5,
+   "servers": {
+    "context-mode": {
+     "calls": 408,
+     "conversations": 5
+    },
+    "serena": {
+     "calls": 9,
+     "conversations": 5
+    }
+   }
+  },
+  "luso": {
+   "conversations": 11,
+   "servers": {
+    "ai-memory": {
+     "calls": 4,
+     "conversations": 2
+    },
+    "codebase-memory-mcp": {
+     "calls": 240,
+     "conversations": 7
+    },
+    "context-mode": {
+     "calls": 320,
+     "conversations": 11
+    },
+    "jcodemunch": {
+     "calls": 4,
+     "conversations": 2
+    },
+    "qmd": {
+     "calls": 2,
+     "conversations": 2
+    },
+    "serena": {
+     "calls": 14,
+     "conversations": 11
+    },
+    "socraticode": {
+     "calls": 3,
+     "conversations": 2
+    }
+   }
+  },
+  "luto": {
+   "conversations": 4,
+   "servers": {
+    "context-mode": {
+     "calls": 68,
+     "conversations": 4
+    },
+    "serena": {
+     "calls": 6,
+     "conversations": 4
+    }
+   }
+  },
+  "luva": {
+   "conversations": 2,
+   "servers": {
+    "ai-memory": {
+     "calls": 4,
+     "conversations": 1
+    },
+    "codebase-memory-mcp": {
+     "calls": 3,
+     "conversations": 1
+    },
+    "context-mode": {
+     "calls": 142,
+     "conversations": 2
+    },
+    "jcodemunch": {
+     "calls": 2,
+     "conversations": 1
+    },
+    "serena": {
+     "calls": 2,
+     "conversations": 2
+    }
+   }
+  },
+  "mahe": {
+   "conversations": 6,
+   "servers": {
+    "codebase-memory-mcp": {
+     "calls": 18,
+     "conversations": 4
+    },
+    "context-mode": {
+     "calls": 156,
+     "conversations": 6
+    },
+    "serena": {
+     "calls": 10,
+     "conversations": 6
+    }
+   }
+  },
+  "mako": {
+   "conversations": 2,
+   "servers": {
+    "context-mode": {
+     "calls": 15,
+     "conversations": 2
+    },
+    "serena": {
+     "calls": 1,
+     "conversations": 1
+    }
+   }
+  },
+  "maze": {
+   "conversations": 7,
+   "servers": {
+    "context-mode": {
+     "calls": 402,
+     "conversations": 7
+    },
+    "serena": {
+     "calls": 17,
+     "conversations": 7
+    }
+   }
+  },
+  "mero": {
+   "conversations": 11,
+   "servers": {
+    "ai-memory": {
+     "calls": 7,
+     "conversations": 2
+    },
+    "codebase-memory-mcp": {
+     "calls": 27,
+     "conversations": 3
+    },
+    "context-mode": {
+     "calls": 516,
+     "conversations": 11
+    },
+    "hindsight": {
+     "calls": 2,
+     "conversations": 1
+    },
+    "qmd": {
+     "calls": 2,
+     "conversations": 1
+    },
+    "serena": {
+     "calls": 32,
+     "conversations": 9
+    }
+   }
+  },
+  "meze": {
+   "conversations": 2,
+   "servers": {
+    "context-mode": {
+     "calls": 36,
+     "conversations": 2
+    },
+    "serena": {
+     "calls": 5,
+     "conversations": 2
+    }
+   }
+  },
+  "midi": {
+   "conversations": 4,
+   "servers": {
+    "ai-memory": {
+     "calls": 8,
+     "conversations": 1
+    },
+    "context-mode": {
+     "calls": 272,
+     "conversations": 4
+    },
+    "serena": {
+     "calls": 4,
+     "conversations": 3
+    }
+   }
+  },
+  "mika": {
+   "conversations": 5,
+   "servers": {
+    "ai-memory": {
+     "calls": 2,
+     "conversations": 1
+    },
+    "context-mode": {
+     "calls": 346,
+     "conversations": 4
+    },
+    "jcodemunch": {
+     "calls": 3,
+     "conversations": 1
+    },
+    "qmd": {
+     "calls": 2,
+     "conversations": 1
+    },
+    "semble": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "serena": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "socraticode": {
+     "calls": 2,
+     "conversations": 1
+    }
+   }
+  },
+  "miso": {
+   "conversations": 2,
+   "servers": {
+    "ai-memory": {
+     "calls": 2,
+     "conversations": 1
+    },
+    "context-mode": {
+     "calls": 91,
+     "conversations": 2
+    },
+    "serena": {
+     "calls": 1,
+     "conversations": 1
+    }
+   }
+  },
+  "mita": {
+   "conversations": 2,
+   "servers": {
+    "context-mode": {
+     "calls": 24,
+     "conversations": 2
+    },
+    "serena": {
+     "calls": 4,
+     "conversations": 2
+    }
+   }
+  },
+  "momo": {
+   "conversations": 2,
+   "servers": {
+    "context-mode": {
+     "calls": 29,
+     "conversations": 2
+    },
+    "serena": {
+     "calls": 2,
+     "conversations": 2
+    }
+   }
+  },
+  "movu": {
+   "conversations": 5,
+   "servers": {
+    "context-mode": {
+     "calls": 134,
+     "conversations": 5
+    }
+   }
+  },
+  "muhe": {
+   "conversations": 5,
+   "servers": {
+    "codebase-memory-mcp": {
+     "calls": 5,
+     "conversations": 1
+    },
+    "context-mode": {
+     "calls": 62,
+     "conversations": 5
+    },
+    "serena": {
+     "calls": 8,
+     "conversations": 5
+    }
+   }
+  },
+  "muvi": {
+   "conversations": 2,
+   "servers": {
+    "ai-memory": {
+     "calls": 2,
+     "conversations": 1
+    },
+    "context-mode": {
+     "calls": 20,
+     "conversations": 2
+    },
+    "serena": {
+     "calls": 2,
+     "conversations": 2
+    }
+   }
+  },
+  "muvu": {
+   "conversations": 4,
+   "servers": {
+    "context-mode": {
+     "calls": 204,
+     "conversations": 4
+    },
+    "serena": {
+     "calls": 4,
+     "conversations": 4
+    }
+   }
+  },
+  "nafo": {
+   "conversations": 4,
+   "servers": {
+    "ai-memory": {
+     "calls": 5,
+     "conversations": 1
+    },
+    "context-mode": {
+     "calls": 242,
+     "conversations": 4
+    },
+    "serena": {
+     "calls": 5,
+     "conversations": 1
+    }
+   }
+  },
+  "nara": {
+   "conversations": 3,
+   "servers": {
+    "context-mode": {
+     "calls": 133,
+     "conversations": 3
+    },
+    "jcodemunch": {
+     "calls": 2,
+     "conversations": 1
+    },
+    "qmd": {
+     "calls": 2,
+     "conversations": 1
+    },
+    "socraticode": {
+     "calls": 2,
+     "conversations": 1
+    }
+   }
+  },
+  "nase": {
+   "conversations": 5,
+   "servers": {
+    "ai-memory": {
+     "calls": 22,
+     "conversations": 2
+    },
+    "codebase-memory-mcp": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "context-mode": {
+     "calls": 324,
+     "conversations": 5
+    },
+    "hindsight": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "qmd": {
+     "calls": 1,
+     "conversations": 1
+    }
+   }
+  },
+  "neda": {
+   "conversations": 11,
+   "servers": {
+    "ai-memory": {
+     "calls": 6,
+     "conversations": 1
+    },
+    "codebase-memory-mcp": {
+     "calls": 33,
+     "conversations": 3
+    },
+    "context-mode": {
+     "calls": 499,
+     "conversations": 11
+    },
+    "hindsight": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "qmd": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "serena": {
+     "calls": 29,
+     "conversations": 11
+    }
+   }
+  },
+  "neko": {
+   "conversations": 3,
+   "servers": {
+    "context-mode": {
+     "calls": 38,
+     "conversations": 3
+    },
+    "serena": {
+     "calls": 3,
+     "conversations": 3
+    }
+   }
+  },
+  "nepa": {
+   "conversations": 4,
+   "servers": {
+    "context-mode": {
+     "calls": 86,
+     "conversations": 4
+    },
+    "serena": {
+     "calls": 6,
+     "conversations": 4
+    }
+   }
+  },
+  "neta": {
+   "conversations": 2,
+   "servers": {
+    "ai-memory": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "context-mode": {
+     "calls": 21,
+     "conversations": 2
+    },
+    "serena": {
+     "calls": 1,
+     "conversations": 1
+    }
+   }
+  },
+  "nova": {
+   "conversations": 4,
+   "servers": {
+    "context-mode": {
+     "calls": 168,
+     "conversations": 4
+    },
+    "serena": {
+     "calls": 29,
+     "conversations": 4
+    }
+   }
+  },
+  "novu": {
+   "conversations": 2,
+   "servers": {
+    "ai-memory": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "context-mode": {
+     "calls": 23,
+     "conversations": 2
+    },
+    "serena": {
+     "calls": 4,
+     "conversations": 2
+    }
+   }
+  },
+  "noze": {
+   "conversations": 6,
+   "servers": {
+    "codebase-memory-mcp": {
+     "calls": 31,
+     "conversations": 2
+    },
+    "context-mode": {
+     "calls": 209,
+     "conversations": 6
+    },
+    "promptfoo": {
+     "calls": 10,
+     "conversations": 1
+    },
+    "serena": {
+     "calls": 8,
+     "conversations": 6
+    }
+   }
+  },
+  "nuzo": {
+   "conversations": 5,
+   "servers": {
+    "context-mode": {
+     "calls": 344,
+     "conversations": 5
+    },
+    "serena": {
+     "calls": 6,
+     "conversations": 4
+    }
+   }
+  },
+  "peso": {
+   "conversations": 2,
+   "servers": {
+    "ai-memory": {
+     "calls": 6,
+     "conversations": 1
+    },
+    "context-mode": {
+     "calls": 102,
+     "conversations": 2
+    }
+   }
+  },
+  "pogo": {
+   "conversations": 2,
+   "servers": {
+    "context-mode": {
+     "calls": 34,
+     "conversations": 2
+    },
+    "serena": {
+     "calls": 4,
+     "conversations": 2
+    }
+   }
+  },
+  "poke": {
+   "conversations": 4,
+   "servers": {
+    "ai-memory": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "codebase-memory-mcp": {
+     "calls": 72,
+     "conversations": 4
+    },
+    "context-mode": {
+     "calls": 520,
+     "conversations": 4
+    },
+    "hindsight": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "jcodemunch": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "qmd": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "serena": {
+     "calls": 10,
+     "conversations": 4
+    },
+    "socraticode": {
+     "calls": 1,
+     "conversations": 1
+    }
+   }
+  },
+  "polo": {
+   "conversations": 4,
+   "servers": {
+    "codebase-memory-mcp": {
+     "calls": 180,
+     "conversations": 4
+    },
+    "context-mode": {
+     "calls": 536,
+     "conversations": 4
+    },
+    "serena": {
+     "calls": 23,
+     "conversations": 4
+    }
+   }
+  },
+  "puma": {
+   "conversations": 1,
+   "servers": {
+    "ai-memory": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "context-mode": {
+     "calls": 11,
+     "conversations": 1
+    },
+    "serena": {
+     "calls": 1,
+     "conversations": 1
+    }
+   }
+  },
+  "rani": {
+   "conversations": 2,
+   "servers": {
+    "context-mode": {
+     "calls": 49,
+     "conversations": 2
+    },
+    "serena": {
+     "calls": 2,
+     "conversations": 2
+    }
+   }
+  },
+  "rava": {
+   "conversations": 2,
+   "servers": {
+    "ai-memory": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "context-mode": {
+     "calls": 49,
+     "conversations": 2
+    },
+    "serena": {
+     "calls": 2,
+     "conversations": 2
+    }
+   }
+  },
+  "ravi": {
+   "conversations": 3,
+   "servers": {
+    "context-mode": {
+     "calls": 98,
+     "conversations": 3
+    },
+    "jcodemunch": {
+     "calls": 5,
+     "conversations": 1
+    },
+    "qmd": {
+     "calls": 2,
+     "conversations": 1
+    },
+    "serena": {
+     "calls": 5,
+     "conversations": 3
+    },
+    "socraticode": {
+     "calls": 3,
+     "conversations": 1
+    }
+   }
+  },
+  "riko": {
+   "conversations": 6,
+   "servers": {
+    "ai-memory": {
+     "calls": 3,
+     "conversations": 1
+    },
+    "codebase-memory-mcp": {
+     "calls": 35,
+     "conversations": 2
+    },
+    "context-mode": {
+     "calls": 276,
+     "conversations": 6
+    },
+    "serena": {
+     "calls": 12,
+     "conversations": 4
+    }
+   }
+  },
+  "rive": {
+   "conversations": 4,
+   "servers": {
+    "ai-memory": {
+     "calls": 17,
+     "conversations": 3
+    },
+    "codebase-memory-mcp": {
+     "calls": 60,
+     "conversations": 3
+    },
+    "context-mode": {
+     "calls": 1013,
+     "conversations": 4
+    },
+    "hindsight": {
+     "calls": 5,
+     "conversations": 1
+    },
+    "jcodemunch": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "qmd": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "serena": {
+     "calls": 33,
+     "conversations": 4
+    }
+   }
+  },
+  "romi": {
+   "conversations": 1,
+   "servers": {
+    "context-mode": {
+     "calls": 5,
+     "conversations": 1
+    },
+    "serena": {
+     "calls": 3,
+     "conversations": 1
+    }
+   }
+  },
+  "rori": {
+   "conversations": 3,
+   "servers": {
+    "context-mode": {
+     "calls": 38,
+     "conversations": 3
+    },
+    "serena": {
+     "calls": 6,
+     "conversations": 3
+    }
+   }
+  },
+  "rose": {
+   "conversations": 2,
+   "servers": {
+    "ai-memory": {
+     "calls": 2,
+     "conversations": 1
+    },
+    "context-mode": {
+     "calls": 26,
+     "conversations": 2
+    },
+    "serena": {
+     "calls": 4,
+     "conversations": 2
+    }
+   }
+  },
+  "rumi": {
+   "conversations": 2,
+   "servers": {
+    "ai-memory": {
+     "calls": 5,
+     "conversations": 1
+    },
+    "codebase-memory-mcp": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "context-mode": {
+     "calls": 68,
+     "conversations": 2
+    },
+    "hindsight": {
+     "calls": 4,
+     "conversations": 1
+    },
+    "qmd": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "serena": {
+     "calls": 3,
+     "conversations": 2
+    }
+   }
+  },
+  "rune": {
+   "conversations": 4,
+   "servers": {
+    "codebase-memory-mcp": {
+     "calls": 11,
+     "conversations": 3
+    },
+    "context-mode": {
+     "calls": 64,
+     "conversations": 4
+    },
+    "serena": {
+     "calls": 8,
+     "conversations": 4
+    }
+   }
+  },
+  "ruzi": {
+   "conversations": 7,
+   "servers": {
+    "context-mode": {
+     "calls": 368,
+     "conversations": 7
+    },
+    "serena": {
+     "calls": 16,
+     "conversations": 7
+    }
+   }
+  },
+  "sage": {
+   "conversations": 3,
+   "servers": {
+    "ai-memory": {
+     "calls": 4,
+     "conversations": 1
+    },
+    "context-mode": {
+     "calls": 102,
+     "conversations": 3
+    },
+    "serena": {
+     "calls": 4,
+     "conversations": 2
+    }
+   }
+  },
+  "sake": {
+   "conversations": 2,
+   "servers": {
+    "ai-memory": {
+     "calls": 2,
+     "conversations": 1
+    },
+    "context-mode": {
+     "calls": 28,
+     "conversations": 2
+    },
+    "serena": {
+     "calls": 2,
+     "conversations": 2
+    }
+   }
+  },
+  "saki": {
+   "conversations": 3,
+   "servers": {
+    "ai-memory": {
+     "calls": 2,
+     "conversations": 1
+    },
+    "codebase-memory-mcp": {
+     "calls": 10,
+     "conversations": 2
+    },
+    "context-mode": {
+     "calls": 279,
+     "conversations": 3
+    },
+    "serena": {
+     "calls": 31,
+     "conversations": 3
+    }
+   }
+  },
+  "sari": {
+   "conversations": 3,
+   "servers": {
+    "context-mode": {
+     "calls": 33,
+     "conversations": 3
+    },
+    "serena": {
+     "calls": 3,
+     "conversations": 3
+    }
+   }
+  },
+  "silo": {
+   "conversations": 3,
+   "servers": {
+    "ai-memory": {
+     "calls": 2,
+     "conversations": 1
+    },
+    "context-mode": {
+     "calls": 147,
+     "conversations": 3
+    },
+    "serena": {
+     "calls": 3,
+     "conversations": 3
+    }
+   }
+  },
+  "soba": {
+   "conversations": 3,
+   "servers": {
+    "ai-memory": {
+     "calls": 4,
+     "conversations": 1
+    },
+    "context-mode": {
+     "calls": 80,
+     "conversations": 3
+    },
+    "serena": {
+     "calls": 5,
+     "conversations": 3
+    }
+   }
+  },
+  "soho": {
+   "conversations": 8,
+   "servers": {
+    "ai-memory": {
+     "calls": 3,
+     "conversations": 1
+    },
+    "codebase-memory-mcp": {
+     "calls": 14,
+     "conversations": 2
+    },
+    "context-mode": {
+     "calls": 324,
+     "conversations": 8
+    },
+    "hindsight": {
+     "calls": 2,
+     "conversations": 1
+    },
+    "qmd": {
+     "calls": 2,
+     "conversations": 1
+    },
+    "serena": {
+     "calls": 3,
+     "conversations": 1
+    }
+   }
+  },
+  "suki": {
+   "conversations": 3,
+   "servers": {
+    "ai-memory": {
+     "calls": 6,
+     "conversations": 1
+    },
+    "context-mode": {
+     "calls": 108,
+     "conversations": 3
+    },
+    "serena": {
+     "calls": 3,
+     "conversations": 3
+    }
+   }
+  },
+  "sumi": {
+   "conversations": 5,
+   "servers": {
+    "context-mode": {
+     "calls": 278,
+     "conversations": 5
+    },
+    "jcodemunch": {
+     "calls": 2,
+     "conversations": 1
+    },
+    "qmd": {
+     "calls": 2,
+     "conversations": 1
+    },
+    "serena": {
+     "calls": 4,
+     "conversations": 4
+    },
+    "socraticode": {
+     "calls": 2,
+     "conversations": 1
+    }
+   }
+  },
+  "sumo": {
+   "conversations": 2,
+   "servers": {
+    "context-mode": {
+     "calls": 32,
+     "conversations": 2
+    },
+    "serena": {
+     "calls": 2,
+     "conversations": 2
+    }
+   }
+  },
+  "tina": {
+   "conversations": 7,
+   "servers": {
+    "ai-memory": {
+     "calls": 10,
+     "conversations": 4
+    },
+    "codebase-memory-mcp": {
+     "calls": 33,
+     "conversations": 3
+    },
+    "context-mode": {
+     "calls": 940,
+     "conversations": 7
+    },
+    "hindsight": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "jcodemunch": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "qmd": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "serena": {
+     "calls": 12,
+     "conversations": 7
+    },
+    "socraticode": {
+     "calls": 1,
+     "conversations": 1
+    }
+   }
+  },
+  "tipi": {
+   "conversations": 2,
+   "servers": {
+    "context-mode": {
+     "calls": 18,
+     "conversations": 2
+    },
+    "serena": {
+     "calls": 1,
+     "conversations": 1
+    }
+   }
+  },
+  "tofu": {
+   "conversations": 6,
+   "servers": {
+    "codebase-memory-mcp": {
+     "calls": 2,
+     "conversations": 1
+    },
+    "context-mode": {
+     "calls": 944,
+     "conversations": 6
+    },
+    "serena": {
+     "calls": 8,
+     "conversations": 5
+    }
+   }
+  },
+  "toku": {
+   "conversations": 4,
+   "servers": {
+    "ai-memory": {
+     "calls": 4,
+     "conversations": 1
+    },
+    "codex_apps": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "context-mode": {
+     "calls": 202,
+     "conversations": 4
+    },
+    "serena": {
+     "calls": 8,
+     "conversations": 4
+    }
+   }
+  },
+  "tori": {
+   "conversations": 1,
+   "servers": {
+    "ai-memory": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "context-mode": {
+     "calls": 9,
+     "conversations": 1
+    },
+    "serena": {
+     "calls": 3,
+     "conversations": 1
+    }
+   }
+  },
+  "tutu": {
+   "conversations": 18,
+   "servers": {
+    "ai-memory": {
+     "calls": 4,
+     "conversations": 2
+    },
+    "codebase-memory-mcp": {
+     "calls": 118,
+     "conversations": 7
+    },
+    "context-mode": {
+     "calls": 588,
+     "conversations": 18
+    },
+    "serena": {
+     "calls": 21,
+     "conversations": 14
+    }
+   }
+  },
+  "vame": {
+   "conversations": 4,
+   "servers": {
+    "codebase-memory-mcp": {
+     "calls": 5,
+     "conversations": 2
+    },
+    "context-mode": {
+     "calls": 62,
+     "conversations": 4
+    },
+    "serena": {
+     "calls": 8,
+     "conversations": 4
+    }
+   }
+  },
+  "vega": {
+   "conversations": 6,
+   "servers": {
+    "ai-memory": {
+     "calls": 2,
+     "conversations": 1
+    },
+    "codebase-memory-mcp": {
+     "calls": 9,
+     "conversations": 3
+    },
+    "context-mode": {
+     "calls": 226,
+     "conversations": 6
+    },
+    "serena": {
+     "calls": 13,
+     "conversations": 2
+    }
+   }
+  },
+  "vele": {
+   "conversations": 11,
+   "servers": {
+    "ai-memory": {
+     "calls": 7,
+     "conversations": 1
+    },
+    "codebase-memory-mcp": {
+     "calls": 40,
+     "conversations": 2
+    },
+    "context-mode": {
+     "calls": 254,
+     "conversations": 11
+    },
+    "serena": {
+     "calls": 16,
+     "conversations": 11
+    }
+   }
+  },
+  "vimu": {
+   "conversations": 4,
+   "servers": {
+    "codebase-memory-mcp": {
+     "calls": 10,
+     "conversations": 1
+    },
+    "context-mode": {
+     "calls": 273,
+     "conversations": 4
+    }
+   }
+  },
+  "vino": {
+   "conversations": 4,
+   "servers": {
+    "codebase-memory-mcp": {
+     "calls": 4,
+     "conversations": 1
+    },
+    "context-mode": {
+     "calls": 70,
+     "conversations": 4
+    },
+    "serena": {
+     "calls": 4,
+     "conversations": 4
+    }
+   }
+  },
+  "vona": {
+   "conversations": 1,
+   "servers": {
+    "ai-memory": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "codebase-memory-mcp": {
+     "calls": 20,
+     "conversations": 1
+    },
+    "context-mode": {
+     "calls": 47,
+     "conversations": 1
+    },
+    "serena": {
+     "calls": 1,
+     "conversations": 1
+    }
+   }
+  },
+  "voni": {
+   "conversations": 4,
+   "servers": {
+    "ai-memory": {
+     "calls": 8,
+     "conversations": 1
+    },
+    "context-mode": {
+     "calls": 863,
+     "conversations": 4
+    },
+    "hindsight": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "serena": {
+     "calls": 7,
+     "conversations": 4
+    }
+   }
+  },
+  "vure": {
+   "conversations": 4,
+   "servers": {
+    "context-mode": {
+     "calls": 199,
+     "conversations": 4
+    },
+    "serena": {
+     "calls": 9,
+     "conversations": 3
+    }
+   }
+  },
+  "vuru": {
+   "conversations": 2,
+   "servers": {
+    "ai-memory": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "context-mode": {
+     "calls": 17,
+     "conversations": 2
+    },
+    "serena": {
+     "calls": 4,
+     "conversations": 2
+    }
+   }
+  },
+  "zama": {
+   "conversations": 6,
+   "servers": {
+    "ai-memory": {
+     "calls": 3,
+     "conversations": 1
+    },
+    "codebase-memory-mcp": {
+     "calls": 46,
+     "conversations": 4
+    },
+    "codex_worktrees": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "context-mode": {
+     "calls": 170,
+     "conversations": 6
+    },
+    "hindsight": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "qmd": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "serena": {
+     "calls": 2,
+     "conversations": 1
+    }
+   }
+  },
+  "zene": {
+   "conversations": 6,
+   "servers": {
+    "codebase-memory-mcp": {
+     "calls": 18,
+     "conversations": 2
+    },
+    "context-mode": {
+     "calls": 1490,
+     "conversations": 6
+    },
+    "serena": {
+     "calls": 5,
+     "conversations": 5
+    }
+   }
+  },
+  "zeno": {
+   "conversations": 5,
+   "servers": {
+    "ai-memory": {
+     "calls": 13,
+     "conversations": 3
+    },
+    "context-mode": {
+     "calls": 405,
+     "conversations": 5
+    },
+    "jcodemunch": {
+     "calls": 4,
+     "conversations": 1
+    },
+    "qmd": {
+     "calls": 2,
+     "conversations": 1
+    },
+    "serena": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "socraticode": {
+     "calls": 3,
+     "conversations": 1
+    }
+   }
+  },
+  "zero": {
+   "conversations": 3,
+   "servers": {
+    "ai-memory": {
+     "calls": 3,
+     "conversations": 1
+    },
+    "codebase-memory-mcp": {
+     "calls": 30,
+     "conversations": 2
+    },
+    "context-mode": {
+     "calls": 84,
+     "conversations": 3
+    },
+    "serena": {
+     "calls": 7,
+     "conversations": 3
+    }
+   }
+  },
+  "zimu": {
+   "conversations": 2,
+   "servers": {
+    "context-mode": {
+     "calls": 16,
+     "conversations": 2
+    },
+    "serena": {
+     "calls": 1,
+     "conversations": 1
+    }
+   }
+  },
+  "ziri": {
+   "conversations": 4,
+   "servers": {
+    "ai-memory": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "codebase-memory-mcp": {
+     "calls": 5,
+     "conversations": 1
+    },
+    "context-mode": {
+     "calls": 828,
+     "conversations": 4
+    },
+    "serena": {
+     "calls": 53,
+     "conversations": 4
+    }
+   }
+  },
+  "zola": {
+   "conversations": 2,
+   "servers": {
+    "context-mode": {
+     "calls": 28,
+     "conversations": 2
+    },
+    "serena": {
+     "calls": 2,
+     "conversations": 2
+    }
+   }
+  },
+  "zori": {
+   "conversations": 2,
+   "servers": {
+    "context-mode": {
+     "calls": 24,
+     "conversations": 2
+    }
+   }
+  },
+  "zuma": {
+   "conversations": 14,
+   "servers": {
+    "ai-memory": {
+     "calls": 6,
+     "conversations": 1
+    },
+    "codebase-memory-mcp": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "context-mode": {
+     "calls": 267,
+     "conversations": 13
+    },
+    "qmd": {
+     "calls": 1,
+     "conversations": 1
+    },
+    "serena": {
+     "calls": 12,
+     "conversations": 6
+    }
+   }
+  }
+ },
+ "codex_total_conversations": 841,
+ "generated_utc": "2026-10-08T23:42:51Z",
+ "layers": {
+  "browser": {
+   "servers": {
+    "chrome-devtools": {
+     "claude_calls": 170,
+     "claude_sessions": 4,
+     "codex_calls": 2,
+     "codex_conversations": 2
+    }
+   }
+  },
+  "client-native": {
+   "servers": {
+    "codex_apps": {
+     "claude_calls": 0,
+     "claude_sessions": 0,
+     "codex_calls": 4,
+     "codex_conversations": 3
+    },
+    "codex_worktrees": {
+     "claude_calls": 0,
+     "claude_sessions": 0,
+     "codex_calls": 2,
+     "codex_conversations": 2
+    }
+   }
+  },
+  "code intelligence": {
+   "servers": {
+    "codebase-memory-mcp": {
+     "claude_calls": 4,
+     "claude_sessions": 4,
+     "codex_calls": 1750,
+     "codex_conversations": 156
+    },
+    "jcodemunch": {
+     "claude_calls": 8,
+     "claude_sessions": 8,
+     "codex_calls": 47,
+     "codex_conversations": 20
+    },
+    "semble": {
+     "claude_calls": 1,
+     "claude_sessions": 1,
+     "codex_calls": 2,
+     "codex_conversations": 2
+    },
+    "serena": {
+     "claude_calls": 31,
+     "claude_sessions": 9,
+     "codex_calls": 1023,
+     "codex_conversations": 421
+    },
+    "socraticode": {
+     "claude_calls": 12,
+     "claude_sessions": 11,
+     "codex_calls": 35,
+     "codex_conversations": 20
+    }
+   }
+  },
+  "evaluation": {
+   "servers": {
+    "promptfoo": {
+     "claude_calls": 4,
+     "claude_sessions": 4,
+     "codex_calls": 34,
+     "codex_conversations": 8
+    }
+   }
+  },
+  "memory and retrieval": {
+   "servers": {
+    "ai-memory": {
+     "claude_calls": 13,
+     "claude_sessions": 6,
+     "codex_calls": 303,
+     "codex_conversations": 81
+    },
+    "hindsight": {
+     "claude_calls": 4,
+     "claude_sessions": 4,
+     "codex_calls": 25,
+     "codex_conversations": 16
+    },
+    "qmd": {
+     "claude_calls": 5,
+     "claude_sessions": 5,
+     "codex_calls": 41,
+     "codex_conversations": 28
+    },
+    "qmdshared": {
+     "claude_calls": 0,
+     "claude_sessions": 0,
+     "codex_calls": 4,
+     "codex_conversations": 2
+    }
+   }
+  },
+  "observability": {
+   "servers": {
+    "agentsview": {
+     "claude_calls": 6,
+     "claude_sessions": 1,
+     "codex_calls": 0,
+     "codex_conversations": 0
+    },
+    "grafana": {
+     "claude_calls": 70,
+     "claude_sessions": 2,
+     "codex_calls": 0,
+     "codex_conversations": 0
+    }
+   }
+  },
+  "session context and token efficiency": {
+   "servers": {
+    "context-mode": {
+     "claude_calls": 0,
+     "claude_sessions": 0,
+     "codex_calls": 32093,
+     "codex_conversations": 569
+    },
+    "headroom": {
+     "claude_calls": 3,
+     "claude_sessions": 3,
+     "codex_calls": 5,
+     "codex_conversations": 3
+    },
+    "plugin_context-mode_context-mode": {
+     "claude_calls": 2453,
+     "claude_sessions": 9,
+     "codex_calls": 0,
+     "codex_conversations": 0
+    }
+   }
+  }
+ },
+ "method": "docs/decisions/2026-09-26-tool-invoke-rates.md (Loki count of record)",
+ "schema": "adoption-now/1",
+ "window_hours": 24
+}

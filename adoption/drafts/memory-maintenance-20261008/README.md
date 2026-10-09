@@ -13,9 +13,9 @@ jitter. Services have a 600-second bound and reduced CPU/I/O priority.
 | --- | --- | --- | --- |
 | `ai-lint` | Daily 03:15 UTC | `ai-memory lint --dry-run --no-llm` | Resolve exact native project scope and effective server maintenance scheduling; avoid a duplicate built-in lint job |
 | `ai-retention-review` | Saturday 03:30 UTC | `ai-memory forget-sweep --dry-run` | Same scope/scheduler review; a preview does not authorize deletion |
-| `hindsight-reflect` | Sunday 03:45 UTC | `hindsight memory reflect trading-research ... --budget low --max-tokens 512` | Optional bank only: adopt a named curated research job, install the pinned vendor CLI through its supported recipe and approve this query's model use |
-| `hindsight-model-refresh` | Daily 04:00 UTC | `hindsight mental-model refresh trading-research MODEL_ID` | Optional bank only: select an existing mental model, install the CLI, and use either this timer or native `refresh_cron`/post-consolidation refresh |
-| `codegraph-coverage` | Monday 04:15 UTC | Native `check_index_coverage` for project `native-agent-stack`, scope `docs`, bounded pages | Verify the registered project identity and choose relevant paths; this does not rebuild or establish complete coverage |
+| `hindsight-reflect` | Sunday 03:45 UTC | `hindsight memory reflect trading-research ... --budget low --max-tokens 512` | Accepted research bank: separately review this administrative reflection query, install the pinned vendor CLI and approve its model use |
+| `hindsight-model-refresh` | Daily 04:00 UTC | `hindsight mental-model refresh trading-research MODEL_ID` | Accepted research bank: select an existing mental model, install the CLI, and use either this administrative timer or native `refresh_cron`/post-consolidation refresh |
+| `codegraph-coverage` | Monday 04:15 UTC | Native `check_index_coverage` for registered project `home-apoth-code-native-agent-stack`, scope `docs`, bounded pages | Native project registry confirms the identity; choose relevant paths before activation. This does not rebuild or establish complete coverage |
 | `qmd-update` | Daily 02:45 UTC | `qmd --index native-agent-stack-catalog-lex update` | Confirm the named index and collection roots/update hooks, coordinate its one writer, and finish the separate shared-service decision |
 | `qmd-cleanup-review` | Saturday 04:30 UTC | `qmd --index native-agent-stack-catalog-lex cleanup --dry-run` | Same index/writer review; preview only |
 
@@ -34,10 +34,21 @@ operator must observe native operation completion before claiming a successful
 refresh. Server-owned provider credentials remain in their native service.
 The research client's 15-tool allowlist is unchanged.
 
-The decision proposes retiring Hindsight from the default coding-client toolset
-while retaining its existing service/bank as optional. These two administrative
-drafts do not establish a unique adopted research workflow or reverse that
-default-exposure proposal. No client routing changes accompany these files.
+The canonical landscape already accepts Hindsight's research-hypothesis and
+experiment-record job. The decision proposes WIRE to complete its vendor-native
+research-consumer routing; its registrations, service/bank and allowlist remain.
+These administrative drafts neither requalify that job nor change client routing.
+
+The ai-memory drafts pass the same explicit native `--config` as the live user
+service. The earlier timed-out inventory probes omitted that argument and do not
+establish a failure of the configured service. Exact workspace/project identity
+must be verified before activation: a misspelled `--workspace` can auto-create a
+workspace even when the maintenance action is a preview.
+
+Hindsight model refresh makes model calls and stores a new `reflect_response`.
+It is not read-only maintenance. Its draft needs the selected model ID, reviewed
+model-use authorization and native operation completion observation. The reflect
+draft performs synthesis/model calls without storing a refreshed mental model.
 
 Claude native auto-memory and context-mode use their native session lifecycle;
 their weekly operator review proposals are recorded in the decision. Neither

@@ -1,6 +1,6 @@
 # Foundation finalization: memory and RAG owners, retrieval models, runtime pins, Mac host changes and readiness dispositions (2026-10-07)
 
-Date: 2026-10-07. Lane: foundation. Base: `475127d43c1cce70dba5cd31238af4e078fa17eb`.
+Date: 2026-10-07; corrected 2026-10-09. Lane: foundation. PR base after the single rebase: `aba02ec3456d383bcc2fc72883db098f9be7918a`. Original October 7 selection-input base: `475127d43c1cce70dba5cd31238af4e078fa17eb`.
 North-star action: finish the native foundation for US-equities research and
 historical simulation, so the broker-specific paper lanes can follow under
 `docs/paper-lane-policy.md`.
@@ -29,7 +29,7 @@ page `decisions/correction-license-not-a-gate-20261007.md`.
 | Role | Owner (pin) | Runner-up | Evidence | Overturn condition |
 | --- | --- | --- | --- | --- |
 | Cross-session project memory | [ai-memory](https://github.com/akitaonrails/ai-memory) v2.6.0, installed on NativeStack2604; the separate rules, session, code-graph and markdown jobs are assigned below | rohitg00/agentmemory v0.9.30 | Native version and scoped MCP status/query answered on October 8; v2.6.0 source includes the GHSA-7qj3-7wqw-m5w6 global-scope write authorization fix and wiki path confinement (CHANGELOG Security and Fixed sections) | a cited upstream regression or later clean-release review reopens the recommendation; this record does not authorize an upgrade |
-| Optional curated research-bank synthesis | [Hindsight](https://github.com/vectorize-io/hindsight) v0.10.2; **RETIRE proposed for the default coding-client toolset**, retaining the existing service/bank as optional | [Cognee](https://github.com/topoteretes/cognee) v1.6.3 | retain/recall/reflect and maintained mental models fit a dedicated curated research bank. Sparse invocation and zero mental models do not demonstrate that distinct workflow here; earlier release/test results remain historical | a named research execution scope needing curated-bank synthesis, supported scoped routing and fresh organic-use evidence reopen default inclusion |
+| Research hypotheses and experiment memory | [Hindsight](https://github.com/vectorize-io/hindsight) v0.10.2, **WIRE** the research-consumer skill route; preserve accepted bank/service | [Cognee](https://github.com/topoteretes/cognee) v1.6.3 | [Canonical accepted job](../../manifests/landscape.json), `/research_memory_jobs/0`, and [research recipe](../../recipes/hindsight-research-memory.md): verbatim world/experience recall and strict experiment-tag isolation | a better-evidenced same-job replacement or documented host-install impossibility under the [landed retention rule](2026-10-07-clean-upstream-install-finalizes-a-candidate.md); call counts alone never remove it |
 | Graph and temporal knowledge specialist | **Defer** [Graphiti](https://github.com/getzep/graphiti) v0.30.2 and MCP mcp-v1.1.0 for this host; no active job is assigned | Cognee v1.6.3 | The pinned library offers bi-temporal edges. [Recipe #839](https://github.com/seathatflowsinourveins/native-agent-stack/pull/839) at `4d8ecef02eb43e1be1266712fe76737b258006f0` records a Mac offline-import integration check and explicitly defers managed-stack installation. No Graphiti tool or named user unit was observed here | a concrete temporal-graph job, supported dependency set and native database/model acceptance reopen adoption; library and MCP versions require separate review |
 | Document parsing (PDF exhibits, research PDFs) | [Docling](https://github.com/docling-project/docling) v2.135.0; [EdgarTools](https://github.com/dgunning/edgartools) stays the SEC HTML/iXBRL/XBRL owner | [MinerU](https://github.com/opendatalab/MinerU) mineru-4.0.10-released | Docling parent commit `0d604da` 50 pass / 0 fail; Mac OCR/MLX paths; docling-mcp v3.3.0 | the preregistered Docling-versus-MinerU table comparison (new-WSL architecture row `document-retrieval`, closure c3) favors MinerU |
 | Retrieval orchestration | plain [qdrant-client](https://github.com/qdrant/qdrant-client) v1.19.1 | [Haystack](https://github.com/deepset-ai/haystack) v3.3.0 with qdrant-haystack 11.1.0 and docling-haystack 2.0.0 | only the plain client exposes as-of corpus statistics (`IdfCorpusParams`, models.py L1297) with filing-date filters, so BM25 statistics exclude future filings in historical research | a qdrant-haystack release exposing the corpus filter |
@@ -67,63 +67,184 @@ retrieval quality, complete capture or restart acceptance.
 | --- | --- | --- | --- |
 | Durable rules and preferences for Claude Code | Claude Code native auto-memory, client 2.1.295 | Native repository memory directory contains `MEMORY.md` and 46 files; file metadata only was inspected. Claude maintains the index and topic files during native sessions | [Anthropic memory documentation](https://code.claude.com/docs/en/memory), read October 8; [client changelog at the observed source](https://github.com/anthropics/claude-code/blob/602df92bf481ed904533e95c09f740f40aab5aed/CHANGELOG.md), `2.1.295` |
 | Cross-session, cross-client project memory | ai-memory 2.6.0 | `ai-memory.service` is active/enabled. Scoped MCP status/query answered; the native lifecycle hooks carry session capture and consolidation. Native consolidation log categories were observed, but this inventory does not certify completed jobs or effective scheduler settings | [v2.6.0 configuration and lifecycle source](https://github.com/akitaonrails/ai-memory/blob/89bd8ded3c1ab8b769cf99417d038ed0364403c8/crates/ai-memory-cli/src/config.rs); [native maintenance skill](https://github.com/akitaonrails/ai-memory/blob/89bd8ded3c1ab8b769cf99417d038ed0364403c8/crates/ai-memory-core/src/routing_skills/ai-memory-learning-maintenance/SKILL.md) |
-| Optional research memory unit; proposed retirement from default exposure | Hindsight API/client 0.10.2 | `hindsight-research.service` is active/enabled. `get_bank` answered for the research bank. This client's 15 exposed tools match the research allowlist. Native operation metadata records three consolidation operations; the newest completed October 8 at 09:26:34Z. Runtime remains unchanged pending the separate exposure decision | [Hindsight v0.10.2](https://github.com/vectorize-io/hindsight/tree/5fc4ce20917b916240cef27c212c387a177f115b); [research recipe](../../recipes/hindsight-research-memory.md) |
-| Session continuity through compaction/resume and retrieval of captured tool output | context-mode 1.0.169 | This session's context-mode tools answered. The installed package reports 1.0.169; its clean source checkout is `6f0cc6841c687e754059f36714a11233fda1a02b`, distinct from the release-tag source pin. No package-version check proves bundle equivalence | [v1.0.169 session database](https://github.com/mksglu/context-mode/blob/589d8214d56740a28b5f7bf63167743d586b0b40/src/session/db.ts); [observed source revision](https://github.com/mksglu/context-mode/tree/6f0cc6841c687e754059f36714a11233fda1a02b) |
+| Research hypotheses and experiment records | Hindsight API/client 0.10.2; WIRE scoped vendor research routing | `hindsight-research.service` is active/enabled; the accepted `trading-research` bank retains the 15-tool allowlist. Three consolidation operations were recorded, newest completed October 8 at 09:26:34Z. Zero mental models do not negate the accepted research job | [Canonical job](../../manifests/landscape.json), `/research_memory_jobs/0`; [research recipe](../../recipes/hindsight-research-memory.md); [vendor skill](https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/hindsight-integrations/agent-plugin/skills/hindsight-memory/SKILL.md) |
+| Session continuity through compaction/resume and captured-output retrieval | context-mode 1.0.169 | Answering tools observed. Claude installed-plugin metadata pins `9f3ecc8b0aafd25d3592ffc31e4b02b1767f6089`; its marketplace checkout is `a83c20165125850473e9344421cf7f374201f0fe`. The separately observed Codex plugin source checkout is `6f0cc6841c687e754059f36714a11233fda1a02b`. No checkout/registration check establishes running-bundle equivalence | [Release source](https://github.com/mksglu/context-mode/blob/589d8214d56740a28b5f7bf63167743d586b0b40/src/session/db.ts), with per-client metadata separated in the JSON |
 | Structural code graph | codebase-memory-mcp 0.11.0 | Native `--version` and paged `list_projects` answered. The vendor's per-account daemon owns shared watchers and indexing while clients are connected; a listed project alone does not establish exact-path coverage | [v0.11.0 README, Auto-sync and Session Coordination Daemon](https://github.com/DeusData/codebase-memory-mcp/blob/8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798/README.md) |
 | Markdown search | QMD 2.8.3 (`facd35e`) | MCP status answered: 425 documents, four collections, no vector index. `native-stack-qmd-shared.service` exists but is inactive/disabled. The shared HTTP service remains pending; this metadata call does not prove its transport has been adopted | [v2.8.3 README, MCP Server and Index Maintenance](https://github.com/tobi/qmd/blob/facd35e01359e59d938bc9418e93fb9318addee3/README.md) |
 | Optional application entity/fact graph with temporal invalidation | Graphiti v0.30.2; MCP mcp-v1.1.0 | **Defer.** No Graphiti namespace in this client's exposed tools and no Graphiti entry in the named user-unit root. A host-wide package absence is not claimed | [library source](https://github.com/getzep/graphiti/blob/eaa4128681bc53487138a4bbc22d58336ebe70d2/graphiti_core/graphiti.py); [MCP dependencies](https://github.com/getzep/graphiti/blob/11538f6d45561bcce9a4400b374fb2dc533dccb6/mcp_server/pyproject.toml) |
 
-Current instruction files remain authoritative. New durable preference/rule
-corrections use Claude's native memory and the applicable instruction file;
-existing ai-memory profile pages remain historical retrieval evidence. Project
-events, decisions and project research provenance use ai-memory; session captures
-use context-mode, code structure uses the code graph, and checked-in markdown
-uses QMD. A separately curated research bank could use Hindsight on demand;
-that distinct workflow is not established by today's inventory. This assigns
-default write and maintenance jobs without migrating or deleting existing
-stores. SocratiCode and semble retain their separate code search jobs; they are
-not additional durable-memory owners.
+Current instruction files remain authoritative. Durable preference/rule
+corrections use native Claude memory and the applicable instruction file;
+existing ai-memory profile pages remain historical retrieval evidence. ai-memory
+owns project/coding events and decisions. Hindsight owns the already accepted
+research-hypothesis and experiment-record bank, with world/experience verbatim
+recall and strict experiment-tag isolation. context-mode owns session captures,
+codebase-memory the structural graph, and QMD markdown retrieval. These jobs
+remain distinct; no existing store is migrated or deleted by this record.
+
+Selection/retention follows the [landed October 7 rule](2026-10-07-clean-upstream-install-finalizes-a-candidate.md):
+low use first prompts a vendor installation/routing check. Component removal
+requires a better-evidenced same-job upstream replacement or evidence that its
+official installation cannot work on this host. Invocation counters inform and
+do not gate readiness. No such removal evidence is supplied for Hindsight or
+Graphiti; Hindsight is WIRE and Graphiti DEFER.
 
 ### Invoke-rate evidence and default-routing dispositions
 
-The retained 24-hour counter artifact is
-`research/token-efficiency-20261008/INVOKE-RATES-24H-20261008T2330Z.md`,
-SHA256 `86e8a4e0db11846eed1c4e99d5e89321b576cab087aa07676188705de593e541`.
-Its bytes/hash and every number used below were checked; the Loki count was not
-rerun. It counts native MCP tool-result events and distinct conversations or
-sessions, including subagents. Events are not outcomes; the artifact does not
-separate every probe from organic work. Codex interactive conversations (555),
-Codex exec readers (285) and Claude sessions with any event (105, including
-headless runs without MCP) remain separate populations.
+The disposition evidence is now bound to two [retained private-host-state producer snapshots](memory-adoption-835/README.md):
+`5de97cf238b3d28aa9f7d5110a05857204a847b0c75cda8971de8e142e362e36`
+(generated 2026-10-08T23:42:51Z) and
+`8682d1d326f2979802efa32d156d9db14dba3ce04273328b6b48a0e227533ac7`
+(generated 2026-10-09T00:31:25Z). Each is its own rolling 24-hour window.
+The [JSON record](2026-10-08-memory-roles-live-host.json) binds every decision to
+the exact source hash, snapshot bucket, calls, distinct identities and that
+bucket's denominator. Its `adoption_evidence.reconciliation.changed_fields`
+lists every changed counter for these seven namespaces across all source
+buckets/producer layers and every changed role/client population.
 
-Each reviewed memory layer gets one default disposition. KEEP preserves the
-native role with use evidence; WIRE proposes missing vendor-native routing;
-RETIRE proposes removing default exposure while retaining optional stores and
-historical evidence. These proposals do not change host configuration.
+The owning Codex identities are memory-h2h `rumi`, the separate historical
+memory-h2h identity `voni`, context owner codex-token-parity `dove`, and
+code-intelligence owner overlap-token `lise`, as supplied by the lane launches
+and role dispatch. The snapshots themselves index these identities, not durable
+lane ownership. `wsl-architecture-design` is a named Claude consumer; it does
+not prove an owning lane. `other Claude sessions` is unattributed. Claude
+owning-role adoption therefore remains unresolved where that is the only
+reported bucket. Those consumer/context rows are labelled separately from
+owning-lane evidence.
 
-| Layer | Disposition | Evidence and native routing decision |
+Cells below are **calls / distinct identities / exact role denominator**,
+shown **5de97cf2 → 8682d1d3**. Identities are Codex conversations or Claude
+sessions. No aliases, client populations, namespaces or windows are merged.
+Counters show invocation, not useful outcomes or organic acceptance. Missing
+entries remain unmeasured. KEEP/WIRE/DEFER remain source-backed proposals. A successful ordinary fresh task
+is an organic-use observation; under the landed rule it does not gate readiness.
+
+| Layer | Disposition | Owning-role/lane binding and evidence limits |
 | --- | --- | --- |
-| Claude native auto-memory | **KEEP** | Retention proposal pending the named native-session observation. The memory directory is present and updated within the observed day, but this built-in file workflow is outside the MCP metric. Freshness does not attribute the writer or prove loading and does not satisfy the organic-use criterion |
-| ai-memory | **KEEP** | Codex: 303 calls in 84/555 conversations (15%); Claude: 13 calls in six sessions. Preserve vendor lifecycle capture and [managed recall/maintenance skills](https://github.com/akitaonrails/ai-memory/tree/89bd8ded3c1ab8b769cf99417d038ed0364403c8/crates/ai-memory-core/src/routing_skills); rare Claude use remains a test boundary |
-| Hindsight | **RETIRE** | Codex: 20 calls in 14/555 conversations (2.5%); Claude: four calls in four sessions. No established unique default job is demonstrated. Retain the research service/bank as optional; do not install another generic coding-memory capture route |
-| context-mode | **KEEP** | Codex: 29,102 calls in 545/555 conversations (98%); Claude: 2,433 calls in nine sessions. The retained artifact identifies organic use on both clients. Preserve vendor session hooks and runtime skill |
-| codebase-memory | **KEEP** | Codex: 1,551 calls in 127/555 conversations (23%); Claude: four single calls in four sessions. Preserve the native daemon/watcher and vendor graph routing. Claude organic adoption is not established by single-call sessions |
-| QMD | **WIRE** | Codex: 43 calls in 28/555 conversations (5%); Claude: five calls in five sessions. Both clients have the 823-byte bootstrap skill; native `claude plugin list --json` reports no QMD plugin entry. The unregistered first-party Claude plugin route is [qmd@qmd](https://github.com/tobi/qmd/blob/facd35e01359e59d938bc9418e93fb9318addee3/.claude-plugin/marketplace.json), whose [runtime skill](https://github.com/tobi/qmd/blob/facd35e01359e59d938bc9418e93fb9318addee3/skills/qmd/SKILL.md) triggers markdown retrieval. Effective bootstrap use is unverified. Propose that native plugin route for Claude and verify the existing runtime bootstrap in Codex; reconcile the named index/transport so activation adds no competing server |
-| Graphiti | **RETIRE** | Keep it outside defaults while its installation disposition is **defer**. It is absent from the supplied invocation table; that is not a measured zero. No unique adopted job justifies default exposure |
+| Claude native auto-memory | **KEEP proposed** | **Organic use unresolved.** Named Claude consumer population is 1 → 1, but native memory has no eligible MCP counter: calls/identities remain null. No native-session load/read/use observation is attached; file freshness is not a substitute |
+| ai-memory | **WIRE** | Current memory-h2h `rumi`: 5/1/2 → 5/1/2; historical `voni`: 8/1/4 → 8/1/4, kept separate. Named Claude consumer: 6/1/1 → 6/1/1; owning Claude lane is unresolved. Managed recall/maintenance skills are missing in the inspected native roots; use [vendor managed skill sources](https://github.com/akitaonrails/ai-memory/tree/89bd8ded3c1ab8b769cf99417d038ed0364403c8/crates/ai-memory-core/src/routing_skills) and native `ai-memory install-skills --scope global --agent both` / reviewed `install-instructions`; no installation is claimed. Invocation does not certify task use |
+| Hindsight | **WIRE** | Current memory-h2h `rumi`: 4/1/2 → 4/1/2; historical `voni`: 1/1/4 → 1/1/4. Named Claude consumer has no Hindsight entry; the unattributed bucket is 4/4/55 → 4/4/66 and cannot prove an owner. The canonical research job is accepted; complete the vendor research skill route and preserve its native registrations/service/bank. Counts are not removal evidence |
+| context-mode | **KEEP** | Owning context lane `dove`: 182/2/2 → 186/2/2. Separate memory-h2h consumer `rumi`: 68/2/2 → 100/2/2. Named Claude consumer uses `plugin_context-mode_context-mode`: 1975/1/1 → 1931/1/1; it is not a Codex `context-mode` counter or owning-lane proof. Preserve native session routing; useful outcomes remain unmeasured by these counters |
+| codebase-memory | **KEEP** | Owning code-intelligence lane `lise`: 5/1/1 → 5/1/1. Separate memory inventory consumer `rumi`: 1/1/2 → 1/1/2. Claude's 4/4/55 → 4/4/66 is wholly unattributed; owning-role use is unresolved. Preserve native graph routing; inventory calls alone do not prove traversal usefulness |
+| QMD | **WIRE** | Current memory-h2h `rumi`: 1/1/2 → 1/1/2; historical `voni` has no entry. Named Claude consumer: 1/1/1 → 1/1/1; owning Claude lane unresolved. Both bootstrap skills exist. The unregistered [first-party Claude plugin route](https://github.com/tobi/qmd/blob/facd35e01359e59d938bc9418e93fb9318addee3/.claude-plugin/marketplace.json) and [runtime skill](https://github.com/tobi/qmd/blob/facd35e01359e59d938bc9418e93fb9318addee3/skills/qmd/SKILL.md) remain the wiring proposal; effective bootstrap use is unverified. Reconcile the named index/transport before adding a competing server |
+| Graphiti | **DEFER** | **Unmeasured in both snapshots.** No Graphiti entry in the owning-lane or named-consumer scopes; null calls/identities are not zero. Installation remains **defer**, with no current adopted specialist job; no retirement action is proposed |
 
-Hindsight's potential unique job is source-grounded synthesis and maintained
-mental models over a deliberately curated research bank. ai-memory owns project
-session/decision memory, and context-mode owns session continuity. Zero mental
-models and sparse invocation do not establish the separate curated research
-workflow here. The vendor [portable memory skill](https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/hindsight-integrations/agent-plugin/skills/hindsight-memory/SKILL.md)
-routes generic prior context, preferences and continuity, overlapping those
-default jobs. The unified [coding-agent integration](https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/hindsight-docs/docs-integrations/coding-agents.md#L495)
-supports `optInOnly`/`optInPaths`, path-to-bank mapping, and suppression of
-session retention, auto-seeding, bank management and injection. Those controls
-can isolate a future dedicated research directory; they do not select a research
-question within a mixed coding session. Reopen WIRE only with that named scope
-and unique job. Keep the server's research 15-tool allowlist authoritative;
-plugin configuration review is not client allowlist acceptance.
+Reconciliation keeps the producer populations separate: Codex 841 → 850 and
+Claude 63 → 70. The exec-reader denominator changes 286 → 285; it is not mixed
+with interactive lane buckets. Producer roll-ups reconcile ai-memory Codex
+303/81 → 293/80, context-mode 32093/569 → 31789/579, and codebase-memory
+1750/156 → 1769/160. Hindsight 25/16, QMD 41/28, and shared QMD 4/2 stay
+unchanged for Codex. Claude's ai-memory 13/6, Hindsight 4/4, QMD 5/5, and
+codebase-memory 4/4 stay unchanged; plugin context stays 2453/9. Those roll-ups
+check producer consistency; they are not owning-role evidence. The older Markdown
+exec context pair 3002/153 differs from the two pinned snapshot pairs 3029/24
+and 2910/24. The later read also cites 2981/24 without an attached producer pin.
+These figures are not blended, and the 153-to-24 identity discrepancy is not
+explained away as a window shift merely because code-graph counts match.
+
+Every changed scalar and its before/after presence is retained in the JSON.
+Absent buckets/servers are not assigned measured zeros. In particular, Claude
+`other Claude sessions` changes 55 → 66 and `review-replay (transient)` leaves
+the snapshot; no causal reclassification is inferred. The fresh snapshot's
+new orchestration section does not enter these memory decisions. A difference
+between rolling snapshots is not a count of new activity, a performance result
+or an organic-use improvement.
+
+The older private-host-state [Markdown capture](memory-adoption-835/INVOKE-RATES-24H-20261008T2330Z.md)
+retains its exact 2,438 bytes and SHA256
+`86e8a4e0db11846eed1c4e99d5e89321b576cab087aa07676188705de593e541`
+as **dated history only**, with its private host-state origin labelled. Its interactive/exec/Claude populations and earlier
+query time do not support the disposition table above. No Loki query,
+fresh-session model task or product comparison was rerun.
+
+Hindsight's distinct job is already accepted in
+`manifests/landscape.json#/research_memory_jobs/0`: retain and recall research
+hypotheses and experiment records. The [research recipe](../../recipes/hindsight-research-memory.md)
+requires recall types `world` and `experience` for verbatim text and
+`tags_match: "all_strict"` for experiment isolation. Synthesized observations
+are paraphrases. Recall has no hard time filter and supplies no backtest
+point-in-time exclusion. No evidence shows ai-memory replacing that same job.
+
+WIRE reuses the existing bank-specific native registrations at
+`http://127.0.0.1:8888/mcp/trading-research/` and loads the unchanged
+[first-party memory skill](https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/hindsight-integrations/agent-plugin/skills/hindsight-memory/SKILL.md)
+only in the named research-consumer scope. The vendor
+[Skills + MCP manual route](https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/hindsight-integrations/agent-plugin/README.md)
+adds no automatic coding-capture hooks. The shipped portable `mcp.json` points
+to Cloud; setting `HINDSIGHT_MCP_URL` alone does not redirect it. Preserve the
+accepted self-hosted endpoint and server-side 15-tool allowlist, and verify
+native client exposure before claiming the scoped skill is active.
+
+The accepted job, `adoption/manifest.json#/recipe_map/hindsight`, research
+recipe, native registrations, service/drop-in/allowlist templates and retained
+bank remain dependents. No retirement step is authorized or performed. A later
+rule-5-qualified retirement would follow the recipe inverse: remove the two
+client registrations and disable the service, with any data/database removal
+separately destructive. Its inverse restores the bank-specific registrations,
+pinned service/drop-in/allowlist and service activation while retaining the
+bank. These are documented contingencies, not commands run by this PR.
+
+ai-memory's managed recall/maintenance skills are not installed in the inspected
+Claude/cross-agent roots. WIRE names native `install-skills --scope global
+--agent both` and, if required, the selective managed `install-instructions`
+block at v2.6.0. Use the same native `--data-dir` and `--config` as the live
+service; review the vendor-generated targets and managed-marker behavior before
+application. No installation, global-rule rewrite or new model route is applied.
+
+QMD's 823-byte entrypoint is generated by
+[`installedSkillStubContent`](https://github.com/tobi/qmd/blob/facd35e01359e59d938bc9418e93fb9318addee3/src/cli/qmd.ts#L3339),
+not the full runtime skill. SHA256
+`bb4664ad7d959f171c8aa5c9575394327d8fc1070b2529bcc5494a0843a7bc1b`
+matches both installed entrypoints; native `showSkill` loads the separate runtime
+payload. The unregistered first-party plugin route and native bootstrap use
+remain installation/routing questions, not inferred absence of the skill.
+
+### Role slots, overlaps and stage-2 memory cost
+
+Stage 1 names one current source choice per distinct role slot. The JSON's
+`adoption_stages.stage1.role_slots` binds the choice to its source/evidence,
+explicit overlap disposition and using roles. It does not create parallel
+defaults or publish the grand-catalog owner's later projection after G5 lands.
+
+| Role slot | Current choice | Overlap disposition |
+| --- | --- | --- |
+| Native Claude durable preferences | Claude native auto-memory | ai-memory profile pages remain historical context; no competing preference authoring default |
+| Cross-client project events/decisions | ai-memory | Hindsight generic coding capture is not enabled alongside it |
+| Research hypotheses/experiment records | Hindsight | Research-scoped bank/skill, preserving the accepted job; project coding memory stays ai-memory |
+| Session continuity/captured output | context-mode | Continuity/scratch retrieval is not another durable project decision store |
+| Structural code graph | codebase-memory | Textual/semantic code search is a separate code-intelligence slot; Graphiti's application graph is distinct |
+| Checked-in markdown retrieval | QMD | Native event/memory stores are not another default markdown-corpus search engine |
+| Application temporal fact graph | Graphiti, DEFER | Candidate source choice only; no active parallel default or retirement action |
+
+Stage 2 requires **role/session-bound per-server or tool PSS from native
+`smaps_rollup`** before ADOPT-NOW. These seven component figures are currently
+**unmeasured**, so this record makes no ADOPT-NOW declaration. Existing accepted
+jobs/installed services are preserved. Prefer a supported shared HTTP or
+streamable-HTTP copy and load only in using roles; apply `alwaysLoad: false`
+only where the installed client supports it. No new client setting is assumed
+or written here. Shared backend PSS and per-session frontend PSS need separate
+attribution rather than dividing whole-arm memory by a tool count.
+
+The [retained role-MCP trial report](memory-adoption-835/ROLE-MCP-TRIAL-REPORT-20261009.md),
+SHA256 `f0afc2c734b3ad1b70e68cd38d3c844c7f4b1338cc030c8fc40fc88db1e53989`,
+is private host-state metadata. Its after-task owned-process PSS is A full-set
+1,431,973 kB (23 processes), B scout 674,966 kB (12), B supplied-artifact
+837,623 kB (16), and C token-parity 947,334 kB (14). Each arm ran once on a
+different real task and includes alive subagents/tools. These are whole-arm
+observations, not per-component figures or paired measured savings. They do
+not fill the missing component PSS values. The report also marks its first
+completion token data as lacking independent provider-first-response binding.
+
+ai-memory and Hindsight already expose shared native HTTP services. QMD's
+documented shared HTTP service remains pending activation. codebase-memory
+shares its daemon/backend but retains per-session stdio frontends. A shared
+MCP HTTP transport for context-mode or that code-graph frontend has not been
+verified in this record. Native Claude memory has no independent MCP process;
+Graphiti has no adopted host process. Those limits stay explicit in the JSON.
+
+The catalog owner retains release/freshness tracking and reopen triggers for
+each role slot; G5 publication/identity binding is still pending. No per-role
+trial is rerun and no PSS number is inferred from invocation counts.
 
 ### Proposed fresh-session checks per client
 
@@ -138,13 +259,13 @@ unknown outcomes stay explicit.
 
 | Layer | Fresh Claude task | Fresh Codex task | Required observation |
 | --- | --- | --- | --- |
-| Claude native memory | Apply a previously recorded citation preference to a bounded source review | Apply the same published repository rule to a bounded source review | Claude native memory load/read is a file/session observation, not an MCP count. Codex uses its instruction/memory owner; no Claude-only feature is claimed for Codex |
+| Claude native memory | Apply an existing native-memory-only preference to a bounded review, without supplying its value | Apply the published repository rule through the Codex instruction owner | For Claude, record native loaded-memory/file-read metadata and actual application of the preference; a timestamp or the task text is not proof. No observation is attached: organic use unresolved. No Claude-only feature is claimed for Codex |
 | ai-memory | Continue a real unresolved project decision from a prior completed session, citing its record | Same task in a new Codex conversation | Useful scoped retrieval and native MCP events; lifecycle capture remains a separate observation |
 | context-mode | Research the two pinned source references and retain unresolved points through native compaction/resume | Same task with native Codex compaction/resume | Useful capture/retrieval and restoration; count each session's events once |
 | codebase-memory | Trace callers of `scripts/catalog_decisions.py:identity` and explain affected source paths | Same scoped code question | Useful graph traversal, source citations and native events; a project list alone fails |
 | QMD | Find the checked-in decision defining foundation evidence and cite exact text/lines | Same markdown question with native runtime skill activation | Actual search and source retrieval from the named collection, counted from Loki; no tool is named in the task |
-| Hindsight | After proposed default retirement, continue the ordinary project decision above | Same task after proposed default retirement | No default Hindsight exposure/calls and successful use of the assigned project-memory owner. A later dedicated curated research scope needs ordinary bank-synthesis tasks and useful research-bank events in both clients; that optional test remains pending |
-| Graphiti | Continue a code/project-memory task with the assigned owners | Same task | No Graphiti dependency in defaults. A future temporal-graph job needs its own fresh task, useful native events and database/provider results before adoption; none is run here |
+| Hindsight | Recover the original stored hypothesis/outcome for one real experiment and exclude other experiments | Same research task in a new Codex session after scoped route repair | Useful bank-specific events and byte-equal `world`/`experience` source with `all_strict` tags. Preserve 15 tools; recall supplies no hard time filter. Proposed, not run |
+| Graphiti | Continue a code/project-memory task with the assigned owners | Same task | DEFER with no current default exposure or retirement action. A future temporal-graph job needs its own fresh task, useful native events and database/provider results before adoption; none is run here |
 
 ### Native maintenance, current execution and proposed cadence
 
@@ -158,8 +279,8 @@ runtime/bus address made the read-only commands succeed. No service changed.
 | Layer | Vendor-native upkeep | Evidence of execution today | Draft cadence and runner |
 | --- | --- | --- | --- |
 | Claude native auto-memory | Native session writes, concise `MEMORY.md`, topic-file maintenance and `/memory` review. The client prompts for index shortening near its 200-line/25KB load limit | Memory file presence and installed client observed; no contents or settings read, and no cleanup execution claimed | Event driven by Claude. Weekly operator `/memory` review is proposed. No unattended CLI timer is invented for this interactive operation |
-| ai-memory | `memory_lint` / CLI `lint`, `memory_consolidate`, `memory_forget_sweep` / CLI `forget-sweep`, curated feedback and auto-improvement. Its server has persisted maintenance cadence; v2.6.0 defaults enable daily lint/forget sweeps and hourly auto-improvement, while SessionEnd consolidation is opt-in | Active server and answering scoped MCP observed. Bounded journal metadata includes consolidation categories. Direct CLI `status --json` and `auto-improve-report --json` each timed out after 15 seconds; effective lint/sweep/learning intervals remain unknown. Defaults and old receipts are not current settings | Preserve SessionEnd/native scheduling as the primary runner where confirmed. Draft daily rule-only lint and weekly retention review run native CLI with `--dry-run`; lint also uses `--no-llm`. Before activation, reconcile them with the server scheduler to prevent duplicate work. No consolidation timer replays completed sessions |
-| Hindsight | On-demand `reflect`; observation consolidation; saved mental-model source-query refresh. Mental models support native `refresh_cron` or `refresh_after_consolidation`, with dirty-scope gating and bounded retries | Native consolidation operation completion observed. `list_mental_models`: total 0; refresh operations: total 0. This bank has no mental models to schedule. Reflect/model-refresh execution was not invoked by this task | Optional-bank drafts only: weekly `memory reflect` uses `--budget low --max-tokens 512`; daily refresh requires an adopted curated research job, selected model ID and installed native CLI. Prefer either native model cron or the timer, never both. Exit zero submits an operation; completion must be observed separately |
+| ai-memory | `memory_lint` / CLI `lint`, `memory_consolidate`, `memory_forget_sweep` / CLI `forget-sweep`, curated feedback and auto-improvement. Its server has persisted maintenance cadence; v2.6.0 defaults enable daily lint/forget sweeps and hourly auto-improvement, while SessionEnd consolidation is opt-in | Active server and answering scoped MCP observed. Bounded journal metadata includes consolidation categories. Historical CLI probes omitted the live explicit `--config` and each timed out after 15 seconds; they do not diagnose the configured service. effective lint/sweep/learning intervals remain unknown. Defaults and old receipts are not current settings | Preserve SessionEnd/native scheduling as the primary runner where confirmed. Draft daily rule-only lint and weekly retention review run native CLI with the live `--config` and `--dry-run`; lint also uses `--no-llm`. Before activation, reconcile them with the server scheduler to prevent duplicate work. No consolidation timer replays completed sessions |
+| Hindsight | On-demand `reflect`; observation consolidation; saved mental-model source-query refresh. Mental models support native `refresh_cron` or `refresh_after_consolidation`, with dirty-scope gating and bounded retries | Native consolidation operation completion observed. `list_mental_models`: total 0; refresh operations: total 0. This bank has no mental models to schedule. Reflect/model-refresh execution was not invoked by this task | Accepted research bank, optional maintenance drafts: weekly `memory reflect` uses `--budget low --max-tokens 512`; daily refresh requires a selected model ID and installed native CLI. Prefer either native model cron or the timer, never both. Refresh makes model calls and stores refreshed `reflect_response`; exit zero submits an operation and completion must be observed separately |
 | context-mode | Session hooks capture/restore continuity; vendor `cleanupOldSessions` supports age-based session cleanup. `ctx_stats` and `ctx_doctor` inspect health; scoped `ctx_purge` is explicit deletion | Session tools answered; release source and installed source were inspected. No independent retention execution or effective retention age was measured | Session hooks remain the runner. Weekly operator health/continuity review; no automatic purge or invented timer. Destructive purge stays an explicit scoped request |
 | codebase-memory | Native daemon watcher incrementally refreshes graphs. `detect_changes`, `index_status`, `check_index_coverage` and scoped `index_repository` support diagnosis/recovery | `list_projects` answered with 50 registered projects. Current watcher activity and exact-path freshness were not independently inspected | Preserve event-driven watcher updates. Draft weekly native `check_index_coverage` for the named project; repair only an observed stale/gapped index. No periodic whole-repository rebuild |
 | QMD | `qmd update` refreshes collections; `qmd embed` is optional for a semantic index; `qmd cleanup --dry-run` previews orphan/cache cleanup | Lexical index status answered; no maintenance timer found. Current update history was not inspected. Shared HTTP unit remains inactive/disabled | Draft daily `update` and weekly `cleanup --dry-run` on the explicit lexical index. Review collection update hooks before activation because `update` may execute them. Embeddings remain a separately justified workload |
@@ -170,7 +291,10 @@ contain seven services and seven timers. They call supported native commands;
 no scheduler or maintenance implementation is rebuilt. All are guarded by an
 absent operator marker, use bounded time/resource settings, and remain files in
 this PR. None was installed, enabled or run. Cadences are proposals, not vendor
-defaults, measured optima or a new model-use authorization.
+defaults, measured optima or a new model-use authorization. ai-memory workspace
+flags may create a workspace if the name drifts; confirm the exact existing
+scope before any preview. Hindsight refresh makes model calls and stores a
+new `reflect_response`; it is not read-only upkeep.
 
 Hindsight's native mental-model triggers default to `false` / `null` and are
 mutually exclusive. A failed refresh exhausts native retries and pauses further
@@ -218,23 +342,41 @@ designated reads remain part of the landing process.
 
 ### G5 catalog cross-reference boundary
 
-[G5 #878](https://github.com/seathatflowsinourveins/native-agent-stack/pull/878)
-is still open at `ae6cc2286643822d3a0218136722c69d0127fcd4`. Its pinned
-[compact catalog](https://github.com/seathatflowsinourveins/native-agent-stack/blob/ae6cc2286643822d3a0218136722c69d0127fcd4/catalogs/landscape/grand-catalog-20261008.json)
-maps ai-memory to JSON pointer `/rows/7` and codebase-memory to `/rows/32`.
-Both are source-review/WATCH rows, not adoption or current-host acceptance.
-The selected row lookup did not find the other five reviewed layers in that
-draft manifest; it is not a global catalog-coverage claim. Their pinned vendor
-and native evidence above remains the decision source. Map all seven decisions
-to the published G5 rows once that publication lands; do not invent an absent
-row or treat an open draft as main. This is a publication dependency for the
-readers, separate from this branch's single rebase and structural validation.
+Each disposition has its own `g5_binding` under
+`adoption_evidence.per_decision_bindings` in the [JSON record](2026-10-08-memory-roles-live-host.json).
+All bind [G5 #878](https://github.com/seathatflowsinourveins/native-agent-stack/pull/878)
+at `ae6cc2286643822d3a0218136722c69d0127fcd4`, catalog
+`catalogs/landscape/grand-catalog-20261008.json`. The exact
+[118-row source bytes](memory-adoption-835/g5-grand-catalog-ae6cc228.json) are retained
+at SHA256 `ff3b593c34b5f27caba29a915d3ed5443cb3a3d3ebb7e46937277529f0637dc9`.
+The catalog owner is **g5-stars-gap (G5 #878)**. A binding resolves only after
+that owner publishes the matching row and the published commit/pointer/identity
+are bound; this draft is not main or current-host adoption acceptance.
+
+| Decision identity | G5 pointer at ae6cc228 | Binding status and catalog-owner dependency |
+| --- | --- | --- |
+| Claude native memory — `anthropics/claude-code` | none | **PENDING — row absent at this G5 pin**; g5-stars-gap must publish the native-memory component row and confirm its identity |
+| ai-memory — `akitaonrails/ai-memory` | `/rows/7` | **PENDING until G5 lands**; preserve the verified SOURCE-REVIEW/WATCH row, then bind the published commit/pointer |
+| Hindsight — `vectorize-io/hindsight` | none | **PENDING — row absent at this G5 pin**; g5-stars-gap must publish the Hindsight row and confirm its identity |
+| context-mode — `mksglu/context-mode` | none | **PENDING — row absent at this G5 pin**; g5-stars-gap must publish the session-context row and confirm its identity |
+| codebase-memory — `DeusData/codebase-memory-mcp` | `/rows/32` | **PENDING until G5 lands**; preserve the verified SOURCE-REVIEW/WATCH row, then bind the published commit/pointer |
+| QMD — `tobi/qmd` | none | **PENDING — row absent at this G5 pin**; g5-stars-gap must publish the markdown-search row and confirm its identity |
+| Graphiti — `getzep/graphiti` | none | **PENDING — row absent at this G5 pin**; g5-stars-gap must publish the specialist-candidate row and confirm its identity |
+
+The five null pointers are deliberate pending bindings, not invented row numbers
+or global catalog-absence claims. The two present pointers establish source
+traceability only. Publication and final identity binding remain independent of
+this record's validation and the designated reads.
 
 ### Corrections retained in this record
 
+The earlier default-retirement proposal for Hindsight was wrong: it omitted the
+canonical accepted research job and did not meet the landed removal rule. The
+current head corrects that record to WIRE, retaining all dependents.
+
 | Anti-pattern | Correction and verification | Preventing check |
 | --- | --- | --- |
-| Treating a library import on another host as current deployment | The earlier Graphiti row used an installation verb; pinned #839 explicitly defers managed installation. The current role is defer, with retirement from defaults proposed | Read the exact recipe head and current native tool/unit state before assigning an active owner; this record |
+| Treating a library import on another host as current deployment | The earlier Graphiti row used an installation verb; pinned #839 explicitly defers managed installation. The current role is DEFER; no default exposure or retirement action exists | Read the exact recipe head and current native tool/unit state before assigning an active owner; this record |
 | Inferring no native maintenance from no systemd timer | ai-memory has native persisted cadence; Hindsight supports model triggers and has completed consolidation operations | Check pinned native schedulers and operation metadata separately from the timer inventory; this record |
 | Handwriting observation times | Two future coordination headings were corrected with an append-only notice using the host UTC clock | Obtain heading/receipt times from the native clock or artifact timestamp; coordination correction retained, no timer acceptance inferred |
 
@@ -277,11 +419,11 @@ CI at the tag; coupled pins move as one unit.
 
 ## Instruction practice adopted from current client sources
 
-- Claude Code reads `AGENTS.md` natively (CHANGELOG 2.1.277); instruction files no longer prescribe an `@AGENTS.md` import.
+- Claude Code 2.1.277 adds `AGENTS.md` fallback only for a project without `CLAUDE.md` ([changelog](https://github.com/anthropics/claude-code/blob/602df92bf481ed904533e95c09f740f40aab5aed/CHANGELOG.md)). This repository has `CLAUDE.md` importing `@AGENTS.md`; preserve that import or the fallback does not apply.
 - The Agent tool takes a per-call `effort` (2.1.292); frontmatter effort remains valid (2.1.267, 2.1.288).
 - Claude runs a skill named exactly `verify` before commits (2.1.286); projects provide a `verify` skill that wraps their acceptance commands.
 - `omitClaudeMd` (2.1.271) suits blind judges and reviewers.
-- Codex user skills live under `$HOME/.agents/skills`; `$CODEX_HOME/skills` is the deprecated location (codex-rs `host_roots.rs` at rust-v0.160.0, L96-107).
+- [Current official Codex skill documentation](https://developers.openai.com/codex/skills#where-codex-loads-local-skills) specifies `.agents/skills` for user/project skills. This session also discovers codebase-memory from the legacy `%h/.codex/skills/codebase-memory/SKILL.md`; the `.agents` counterpart is absent. Record this observed compatibility and unresolved vendor-led migration, not a claim that the legacy skill is no longer loaded.
 - Always-loaded instructions stay a short map (Claude memory guidance: files over 200 lines reduce adherence); procedures go to skills, enforcement to hooks and settings.
 
 ## Mac coordinator host changes (2026-10-07; the evidence class is per row)
