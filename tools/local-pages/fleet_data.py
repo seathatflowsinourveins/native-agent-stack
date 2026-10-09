@@ -6,13 +6,18 @@ sanitized run fields only and must be placed outside the HTTP serving root.
 
 from __future__ import annotations
 
+from contextlib import contextmanager
 from datetime import datetime, timezone
 import fcntl
+import hashlib
 import json
 import math
+import os
 from pathlib import Path
 import re
+import stat
 import subprocess
+import tempfile
 import time
 from typing import Any, Callable
 
@@ -21,6 +26,13 @@ ACTIONS_TTL_SECONDS = 600
 REPO = "seathatflowsinourveins/native-agent-stack"
 MAX_SOURCE_BYTES = 2_000_000
 RUN_FIELDS = "workflowName,status,conclusion,databaseId,startedAt,updatedAt,url"
+# Linux UAPI include/uapi/linux/fcntl.h F_ADD_SEALS/F_GET_SEALS and seal bits:
+# https://github.com/torvalds/linux/blob/v6.18/include/uapi/linux/fcntl.h
+# Some CPython builds expose memfd_create but omit these fcntl constants.
+_ADD_SEALS = getattr(fcntl, "F_ADD_SEALS", 1033)
+_GET_SEALS = getattr(fcntl, "F_GET_SEALS", 1034)
+_REQUIRED_SEALS = (getattr(fcntl, "F_SEAL_SEAL", 0x0001) | getattr(fcntl, "F_SEAL_SHRINK", 0x0002)
+                   | getattr(fcntl, "F_SEAL_GROW", 0x0004) | getattr(fcntl, "F_SEAL_WRITE", 0x0008))
 _IDENTIFIER = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.:/+-]{0,99}\Z")
 _OPAQUE = re.compile(r"[A-Za-z0-9_-]{32,}|(?:sk-|gh[pousr]_|github_pat_|Bearer\s)", re.I)
 _POOL_LABEL = re.compile(
@@ -43,6 +55,22 @@ _CONCLUSIONS = {
     "success", "failure", "neutral", "cancelled", "skipped", "timed_out",
     "action_required", "startup_failure", "stale",
 }
+_PRODUCER_BOOTSTRAP = """import hashlib, importlib.machinery, io, linecache, os, sys, tokenize, types
+descriptor, source, expected = int(sys.argv[1]), sys.argv[2], sys.argv[3]
+with os.fdopen(descriptor, 'rb') as snapshot:
+    raw = snapshot.read(2000001)
+if len(raw) > 2000000 or hashlib.sha256(raw).hexdigest() != expected:
+    raise SystemExit('verified producer snapshot differs from its binding')
+encoding, _ = tokenize.detect_encoding(io.BytesIO(raw).readline)
+linecache.cache[source] = (len(raw), None, raw.decode(encoding).splitlines(True), source)
+sys.argv = [source] + sys.argv[4:]
+sys.path[0] = os.path.dirname(source)
+entry = types.ModuleType('__main__')
+entry.__file__, entry.__package__, entry.__spec__, entry.__cached__ = source, None, None, None
+entry.__loader__ = importlib.machinery.SourceFileLoader('__main__', source)
+sys.modules['__main__'] = entry
+exec(compile(raw, source, 'exec'), entry.__dict__)
+"""
 
 
 def _utc(epoch: float | None = None) -> str:
@@ -84,21 +112,136 @@ def _status(value: Any) -> str | None:
     return value if isinstance(value, str) and value in _STATUSES else None
 
 
-def _read_json(path: Path) -> dict[str, Any]:
+@contextmanager
+def _directory(path: Path, create: bool = False):
+    """Open the named directory through non-symlink ancestor descriptors.
+
+    Native Python3.13 os.open(dir_fd, O_NOFOLLOW), fstat and replace contracts:
+    https://docs.python.org/3.13/library/os.html#files-and-directories
+    """
+    path = path.absolute()
+    if ".." in path.parts:
+        raise OSError("directory traversal rejected")
+    descriptor = os.open(path.anchor, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
     try:
-        if path.stat().st_size > MAX_SOURCE_BYTES:
-            return {}
-        value = json.loads(path.read_text(encoding="utf-8"))
-        return value if isinstance(value, dict) else {}
-    except (OSError, ValueError):
+        for part in path.parts[1:]:
+            if create:
+                try:
+                    os.mkdir(part, mode=0o700, dir_fd=descriptor)
+                except FileExistsError:
+                    pass
+            child = os.open(part, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=descriptor)
+            os.close(descriptor)
+            descriptor = child
+        yield descriptor
+    finally:
+        os.close(descriptor)
+
+
+def _read_source(path: Path, root: Path, sources: dict | None = None, *, kind: str = "source", limit: int = MAX_SOURCE_BYTES):
+    """Read a bounded regular file without following any source symlink."""
+    path, root = path.absolute(), root.absolute()
+    receipt = {"path": str(path), "type": kind, "status": "unavailable", "sha256": None, "bytes": None, "read_utc": None, "file_utc": None}
+    raw = None
+    try:
+        relative = path.relative_to(root)
+        if ".." in relative.parts:
+            raise ValueError("source outside approved root")
+        with _directory(path.parent) as directory:
+            descriptor = os.open(path.name, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK, dir_fd=directory)
+            try:
+                info = os.fstat(descriptor)
+                if not stat.S_ISREG(info.st_mode):
+                    raise ValueError("nonregular source rejected")
+                if info.st_size > limit:
+                    raise ValueError("source exceeds read limit")
+                with os.fdopen(descriptor, "rb", closefd=False) as stream:
+                    raw = stream.read(limit + 1)
+                if len(raw) > limit:
+                    raise ValueError("source exceeds read limit")
+                receipt.update(status="reported", sha256=hashlib.sha256(raw).hexdigest(), bytes=len(raw), read_utc=_utc(), file_utc=_utc(info.st_mtime))
+            finally:
+                os.close(descriptor)
+    except (OSError, ValueError) as error:
+        raw = None
+        receipt["reason"] = "source missing" if isinstance(error, FileNotFoundError) else "source rejected or unavailable"
+    if sources is not None:
+        sources[str(path)] = receipt
+    return raw, receipt
+
+
+def _read_json(path: Path, root: Path | None = None, sources: dict | None = None, *, kind: str = "source") -> dict[str, Any]:
+    raw, receipt = _read_source(path, root or path.parent, sources, kind=kind)
+    if raw is None:
         return {}
-
-
-def _mtime(path: Path) -> str | None:
     try:
-        return _utc(path.stat().st_mtime)
-    except OSError:
-        return None
+        value = json.loads(raw)
+        if isinstance(value, dict):
+            return value
+    except (ValueError, UnicodeError):
+        pass
+    receipt.update(status="unavailable", reason="invalid JSON object")
+    return {}
+
+
+def _execute_producer(path: Path, raw: bytes, receipt: dict, run: Callable[..., Any]):
+    """Execute the checked bytes through an immutable native Linux descriptor.
+
+    Python os.memfd_create(MFD_ALLOW_SEALING), fcntl F_ADD_SEALS/F_SEAL_WRITE
+    and subprocess.run(pass_fds): https://docs.python.org/3.13/library/os.html#os.memfd_create
+    https://docs.python.org/3.13/library/fcntl.html
+    https://docs.python.org/3.13/library/subprocess.html#subprocess.Popen
+    The child compiles these bytes with the producer's original filename,
+    argv and sibling-import path; it never opens that producer pathname.
+    """
+    execution = {"kind": "sealed memfd producer snapshot", "sha256": hashlib.sha256(raw).hexdigest(),
+                 "bytes": len(raw), "status": "unavailable", "attempt_utc": _utc()}
+    receipt["execution"] = execution
+    descriptor = os.memfd_create("native-fleet-producer", os.MFD_CLOEXEC | os.MFD_ALLOW_SEALING)
+    try:
+        with os.fdopen(descriptor, "wb", closefd=False) as snapshot:
+            snapshot.write(raw)
+            snapshot.flush()
+        fcntl.fcntl(descriptor, _ADD_SEALS, _REQUIRED_SEALS)
+        if fcntl.fcntl(descriptor, _GET_SEALS) & _REQUIRED_SEALS != _REQUIRED_SEALS:
+            raise ValueError("producer snapshot immutability was not established")
+        os.lseek(descriptor, 0, os.SEEK_SET)
+        result = run(["python3", "-c", _PRODUCER_BOOTSTRAP, str(descriptor), str(path),
+                      execution["sha256"], "--json", "--no-gh"],
+                     pass_fds=(descriptor,), capture_output=True, text=True, timeout=25)
+        execution.update(status="completed" if result.returncode == 0 else "failed", returncode=result.returncode)
+        return result
+    finally:
+        os.close(descriptor)
+
+
+def _destination(directory: int, name: str) -> None:
+    try:
+        info = os.stat(name, dir_fd=directory, follow_symlinks=False)
+    except FileNotFoundError:
+        return
+    if not stat.S_ISREG(info.st_mode):
+        raise OSError("nonregular cache destination rejected")
+
+
+def _write_cache(path: Path, value: dict) -> None:
+    """Use native secure temporary creation and one checked atomic replacement."""
+    with _directory(path.parent, create=True) as directory:
+        _destination(directory, path.name)
+        descriptor, temporary = tempfile.mkstemp(prefix=".fleet-actions-", suffix=".tmp", dir=f"/proc/self/fd/{directory}")
+        name = Path(temporary).name
+        try:
+            with os.fdopen(descriptor, "w", encoding="utf-8") as stream:
+                json.dump(value, stream, allow_nan=False)
+                stream.flush()
+                os.fsync(stream.fileno())
+            _destination(directory, path.name)
+            os.replace(name, path.name, src_dir_fd=directory, dst_dir_fd=directory)
+        finally:
+            try:
+                os.unlink(name, dir_fd=directory)
+            except FileNotFoundError:
+                pass
 
 
 def _names(value: Any) -> list[str] | None:
@@ -118,10 +261,16 @@ def _tiers(raw: dict[str, Any]) -> dict[str, Any]:
     version = raw.get("codex_version") if isinstance(raw.get("codex_version"), dict) else {}
     holds = version.get("hold") if isinstance(version.get("hold"), dict) else {}
     until = version.get("hold_until") if isinstance(version.get("hold_until"), dict) else {}
+    fast = _names(raw.get("fast"))
+    if isinstance(raw.get("fast"), list) and len(fast or []) != len(raw["fast"]):
+        fast = None
+    policy_known = raw.get("schema") == "lane-tiers/1" and fast is not None and _identifier(raw.get("default")) is not None
     return {
+        "availability": "reported" if policy_known else "not reported",
+        "reason": None if policy_known else "policy absent or required default/fast list unavailable",
         "read_utc": _stamp(raw.get("updated_utc")),
         "default": _identifier(raw.get("default")),
-        "fast": _names(raw.get("fast")),
+        "fast": fast,
         "parking": {
             **{key: _number(parking.get(key)) for key in (
                 "idle_minutes_default", "idle_minutes_when_memory_tight",
@@ -157,14 +306,26 @@ def _lane(row: Any) -> dict[str, Any] | None:
     }
 
 
-def _workflow_names(root: Path) -> list[str]:
+def _workflow_names(root: Path, sources: dict | None = None) -> list[str]:
     names = []
-    for path in sorted((root / ".github/workflows").glob("*.y*ml")):
+    directory = root / ".github/workflows"
+    try:
+        with _directory(directory) as descriptor:
+            entries = sorted(os.listdir(descriptor))
+            if len(entries) > 200:
+                return []
+    except OSError:
+        return []
+    for name in entries:
+        path = directory / name
+        if path.suffix not in {".yml", ".yaml"}:
+            continue
+        raw, _ = _read_source(path, root, sources, kind="workflow", limit=256_000)
+        if raw is None:
+            continue
         try:
-            if path.stat().st_size > 256_000:
-                continue
-            source = path.read_text(encoding="utf-8")
-        except OSError:
+            source = raw.decode("utf-8")
+        except UnicodeError:
             continue
         source = "\n".join(line for line in source.splitlines() if not line.lstrip().startswith("#"))
         if not _AI_INVOCATION.search(source):
@@ -190,10 +351,10 @@ def _run_row(row: Any, workflow_names: list[str]) -> dict[str, Any] | None:
     }
 
 
-def _actions_locked(cache_dir: Path, root: Path, run: Callable[..., Any], now: float) -> dict[str, Any]:
-    names = _workflow_names(root)
+def _actions_locked(cache_dir: Path, root: Path, run: Callable[..., Any], now: float, sources: dict | None = None) -> dict[str, Any]:
+    names = _workflow_names(root, sources)
     path = cache_dir / "fleet-actions.json"
-    cached = _read_json(path)
+    cached = _read_json(path, cache_dir, sources, kind="Actions cache")
     cached_runs = cached.get("runs") if isinstance(cached.get("runs"), list) else []
     rows = [safe for row in cached_runs[:100] if (safe := _run_row(row, names))]
     read_utc = _stamp(cached.get("read_utc"))
@@ -216,10 +377,7 @@ def _actions_locked(cache_dir: Path, root: Path, run: Callable[..., Any], now: f
             api_errors.append({"what": "gh run list failed", "when": _utc(now)})
         safe_cache = {"schema": "local-fleet-actions/1", "attempt_epoch": now, "read_utc": read_utc, "failed": error is not None, "runs": rows}
         try:
-            cache_dir.mkdir(parents=True, exist_ok=True)
-            temporary = path.with_suffix(".json.tmp")
-            temporary.write_text(json.dumps(safe_cache, allow_nan=False), encoding="utf-8")
-            temporary.replace(path)
+            _write_cache(path, safe_cache)
         except OSError:
             pass
     age = max(0, now - datetime.fromisoformat(read_utc.replace("Z", "+00:00")).timestamp()) if read_utc else None
@@ -232,20 +390,24 @@ def _actions_locked(cache_dir: Path, root: Path, run: Callable[..., Any], now: f
     }
 
 
-def _actions(cache_dir: Path, root: Path, run: Callable[..., Any], now: float) -> dict[str, Any]:
+def _actions(cache_dir: Path, root: Path, run: Callable[..., Any], now: float, sources: dict | None = None) -> dict[str, Any]:
     # The service timer, path watch and reviewer may collect concurrently.
     # A separate, stable inode coordinates the native CLI call across processes.
     try:
-        cache_dir.mkdir(parents=True, exist_ok=True)
-        with (cache_dir / "fleet-actions.lock").open("a", encoding="utf-8") as lock:
-            fcntl.flock(lock.fileno(), fcntl.LOCK_EX)
+        with _directory(cache_dir, create=True) as directory:
+            _destination(directory, "fleet-actions.json")
+            _destination(directory, "fleet-actions.lock")
+            lock = os.open("fleet-actions.lock", os.O_RDWR | os.O_CREAT | os.O_NOFOLLOW | os.O_NONBLOCK, mode=0o600, dir_fd=directory)
             try:
-                return _actions_locked(cache_dir, root, run, now)
+                if not stat.S_ISREG(os.fstat(lock).st_mode):
+                    raise OSError("nonregular cache lock rejected")
+                fcntl.flock(lock, fcntl.LOCK_EX)
+                return _actions_locked(cache_dir, root, run, now, sources)
             finally:
-                fcntl.flock(lock.fileno(), fcntl.LOCK_UN)
+                os.close(lock)
     except OSError:
         return {
-            "runs": [], "workflow_names": _workflow_names(root),
+            "runs": [], "workflow_names": _workflow_names(root, sources),
             "scope": "Newest 100 repository runs, filtered to workflows that invoke models",
             "read_utc": None, "cache_age_seconds": None,
             "cache_ttl_seconds": ACTIONS_TTL_SECONDS, "stale": True,
@@ -253,17 +415,16 @@ def _actions(cache_dir: Path, root: Path, run: Callable[..., Any], now: float) -
         }
 
 
-def _ledger(path: Path, now: str, jobs: Any) -> dict[str, Any]:
+def _ledger(path: Path, now: str, jobs: Any, root: Path, sources: dict) -> dict[str, Any]:
     jobs_running = _count(jobs) if not isinstance(jobs, list) else len(jobs)
-    result = {"read_utc": now, "file_utc": _mtime(path), "jobs_running": jobs_running, "spend_usd": None, "ceiling_usd": None}
-    if not path.exists():
-        return {**result, "status": "no spend yet", "spend_usd": 0.0}
+    raw, receipt = _read_source(path, root, sources, kind="API ledger")
+    result = {"read_utc": receipt.get("read_utc"), "file_utc": receipt.get("file_utc"), "jobs_running": jobs_running, "spend_usd": None, "ceiling_usd": None, "source": receipt}
+    if raw is None:
+        return {**result, "status": "ledger unavailable"}
     # Ledger event formats are not inferred from arbitrary fields or prose.
     # A cumulative spend_usd and explicit ceiling_usd are accepted if present.
     try:
-        if path.stat().st_size > MAX_SOURCE_BYTES:
-            return {**result, "status": "ledger exceeds read limit"}
-        nonblank = [line for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+        nonblank = [line for line in raw.decode("utf-8").splitlines() if line.strip()]
         for line in nonblank:
             row = json.loads(line)
             if not isinstance(row, dict):
@@ -274,8 +435,40 @@ def _ledger(path: Path, now: str, jobs: Any) -> dict[str, Any]:
             if ceiling is not None:
                 result["ceiling_usd"] = ceiling
         return {**result, "status": "observed" if result["spend_usd"] is not None else "ledger spend not observed"}
-    except (OSError, ValueError):
+    except (ValueError, UnicodeError):
         return {**result, "status": "ledger unavailable"}
+
+
+def _exec_reads(value: Any) -> list[dict] | None:
+    if not isinstance(value, list):
+        return None
+    rows = []
+    for entry in value[:200]:
+        if isinstance(entry, str):
+            match = re.fullmatch(r"(.+)\[(fast|standard)\]", entry)
+            name, tier = (match[1], match[2]) if match else (entry, None)
+        elif isinstance(entry, dict):
+            name, tier = entry.get("name"), entry.get("tier")
+            if tier not in (None, "fast", "standard"):
+                return None
+        else:
+            return None
+        if not _identifier(name):
+            return None
+        rows.append({"name": name, "tier": tier})
+    return rows
+
+
+def _roster(value: Any, kind: str) -> bool:
+    if not isinstance(value, list):
+        return False
+    if kind == "lanes_live":
+        return all(_lane(row) is not None for row in value[:200])
+    if kind == "lanes_parked":
+        return all(_identifier(row.get("name") if isinstance(row, dict) else row) for row in value[:200])
+    if kind == "claude_sessions":
+        return all(isinstance(row, dict) and _identifier(row.get("name")) for row in value[:100])
+    return True
 
 
 def collect(state_root: Path, cache_dir: Path, root: Path, run: Callable[..., Any] | None = None) -> dict[str, Any]:
@@ -288,12 +481,17 @@ def collect(state_root: Path, cache_dir: Path, root: Path, run: Callable[..., An
     run = run or subprocess.run
     now = time.time()
     observed = _utc(now)
+    inputs = {}
     snapshot_path = state_root / "coordination/ns2604-coop/watchers/fleet-now.json"
-    snapshot = _read_json(snapshot_path)
+    snapshot = _read_json(snapshot_path, state_root, inputs, kind="Fleet snapshot")
     snapshot = snapshot if snapshot.get("schema") == "coop-fleet/1" else {}
     fleet, source = snapshot, "snapshot" if snapshot else "unavailable"
+    producer_path = state_root / "coordination/ns2604-coop/tools/fleet_block.py"
     try:
-        result = run(["python3", str(state_root / "coordination/ns2604-coop/tools/fleet_block.py"), "--json", "--no-gh"], capture_output=True, text=True, timeout=25)
+        producer, producer_receipt = _read_source(producer_path, state_root, inputs, kind="native Fleet producer")
+        if producer is None:
+            raise ValueError("native producer unavailable")
+        result = _execute_producer(producer_path, producer, producer_receipt, run)
         if result.returncode or len(result.stdout) > MAX_SOURCE_BYTES:
             raise ValueError("native collection failed")
         direct = json.loads(result.stdout)
@@ -306,39 +504,76 @@ def collect(state_root: Path, cache_dir: Path, root: Path, run: Callable[..., An
     snapshot_time = _stamp(snapshot.get("at"))
     cc_path = state_root / "coordination/command-center/pages/cc-now.json"
     tier_path = state_root / "coordination/command-center/lane-tiers.json"
-    cc = _read_json(cc_path)
-    tiers = _tiers(_read_json(tier_path))
+    cc = _read_json(cc_path, state_root, inputs, kind="CC current view")
+    cc = cc if cc.get("schema") == "cc-now/1" else {}
+    tiers = _tiers(_read_json(tier_path, state_root, inputs, kind="lane tier policy"))
+    tiers["source"] = inputs.get(str(tier_path.absolute()))
     cc_agents = cc.get("cc_agents") if isinstance(cc.get("cc_agents"), dict) else {}
     cc_running = cc_agents.get("running") if isinstance(cc_agents.get("running"), list) else None
-    live = fleet.get("lanes_live") if isinstance(fleet.get("lanes_live"), list) else []
-    parked = _names(fleet.get("lanes_parked"))
+    if cc_running is not None and not all(isinstance(row, dict) and _identifier(row.get("name")) for row in cc_running[:100]):
+        cc_running = None
+    availability = {}
+    def section(key, valid):
+        for document, label, stamp in ((fleet, source, native_time), (snapshot, "snapshot", snapshot_time)):
+            value = document.get(key)
+            if label != "unavailable" and valid(value):
+                availability[key] = {"status": "snapshot fallback" if label == "snapshot" else "reported", "source": label, "read_utc": stamp, "reason": None}
+                return value
+        availability[key] = {"status": "not reported", "source": "unavailable", "read_utc": None, "reason": "source section absent, null or malformed"}
+        return None
+    live = section("lanes_live", lambda value: _roster(value, "lanes_live"))
+    parked_value = section("lanes_parked", lambda value: _roster(value, "lanes_parked"))
+    parked = _names(parked_value)
     subgroup = fleet.get("claude_subagents_running") if isinstance(fleet.get("claude_subagents_running"), dict) else {}
     snap_subgroup = snapshot.get("claude_subagents_running") if isinstance(snapshot.get("claude_subagents_running"), dict) else {}
     subagents = {}
-    for group in ("coop", "cc", "api_actions"):
-        value = snap_subgroup.get(group) if group == "coop" else subgroup.get(group)
+    for group in ("coop", "native_cc", "api_actions"):
+        key = "cc" if group == "native_cc" else group
+        value = snap_subgroup.get(key) if group == "coop" else subgroup.get(key)
+        group_source, group_time = ("snapshot", snapshot_time) if group == "coop" else (source, native_time)
+        if group != "coop" and not isinstance(value, list) and isinstance(snap_subgroup.get(key), list):
+            value, group_source, group_time = snap_subgroup[key], "snapshot", snapshot_time
         names = _names(value)
-        subagents[group] = {"names": names, "count": len(value) if isinstance(value, list) else None, "read_utc": snapshot_time if group == "coop" else native_time, "source": "snapshot" if group == "coop" else source}
-    sessions = fleet.get("claude_sessions") if isinstance(fleet.get("claude_sessions"), list) else []
-    accounts = fleet.get("pool_accounts") if isinstance(fleet.get("pool_accounts"), list) else []
-    actions = _actions(cache_dir, root, run, now)
-    sdk = _ledger(state_root / "coordination/api-actions-20261008/api-actions-ledger.jsonl", observed, fleet.get("sdk_jobs_running"))
+        subagents[group] = {"names": names, "count": len(value) if isinstance(value, list) else None, "read_utc": group_time if names is not None else None, "source": group_source if names is not None else "unavailable"}
+    cc_time = _stamp(cc.get("updated_utc"))
+    cc_names = _names(cc_running)
+    subagents["cc"] = {"names": cc_names, "count": len(cc_running) if cc_running is not None else None, "read_utc": cc_time if cc_running is not None else None, "source": "cc-now" if cc_running is not None else "unavailable"}
+    availability["cc_agents"] = {"status": "reported" if cc_running is not None else "not reported", "source": "cc-now" if cc_running is not None else "unavailable", "read_utc": cc_time if cc_running is not None else None, "reason": None if cc_running is not None else "CC running-agent section absent, null or malformed"}
+    sessions = section("claude_sessions", lambda value: _roster(value, "claude_sessions"))
+    accounts = section("pool_accounts", lambda value: isinstance(value, list))
+    reads = section("exec_reads_in_flight", lambda value: _exec_reads(value) is not None)
+    jobs = section("sdk_jobs_running", lambda value: isinstance(value, list) or _count(value) is not None)
+    actions = _actions(cache_dir, root, run, now, inputs)
+    ledger_path = state_root / "coordination/api-actions-20261008/api-actions-ledger.jsonl"
+    native_ledger = fleet.get("api_spend_ledger")
+    if isinstance(native_ledger, dict) and isinstance(native_ledger.get("sums"), dict):
+        sdk = {"read_utc": native_time, "file_utc": None, "jobs_running": len(jobs) if isinstance(jobs, list) else _count(jobs), "spend_usd": _number(native_ledger["sums"].get("actual_usd")), "ceiling_usd": None, "status": "native ledger observation" if source == "direct" else "snapshot ledger observation", "ledger_source": "coop-fleet api_spend_ledger", "ledger_rows": _count(native_ledger.get("rows")), "ledger_last_utc": _stamp(native_ledger.get("last"))}
+    else:
+        sdk = _ledger(ledger_path, observed, jobs, state_root, inputs)
+    credit = cc.get("api_credit") if isinstance(cc.get("api_credit"), dict) else {}
+    ceiling = _number(credit.get("ceiling_usd"))
+    if ceiling is not None:
+        sdk.update(ceiling_usd=ceiling, ceiling_source="cc-now api_credit", ceiling_read_utc=_stamp(cc.get("updated_utc")))
+    for field in ("stop_and_report_at_usd", "table_at_caps_usd", "table_expected_usd"):
+        sdk[field] = _number(credit.get(field))
     source_label = {"direct": "direct native", "snapshot": "snapshot fallback", "unavailable": "not reported"}[source]
     return {
         "schema": "local-fleet/1", "observed_utc": observed, "at": native_time,
         "fleet_source": source_label,
-        "lanes_live": [safe for row in live[:200] if (safe := _lane(row))],
-        "lanes_parked": [{"lane": lane, "tier": "fast" if lane in (tiers["fast"] or []) else tiers["default"], "cli_version": None, "expected_cli_version": tiers["versions"]["hold"].get(lane, tiers["versions"]["default"])} for lane in (parked or [])],
-        "claude_sessions": [{"name": name, "status": _status(row.get("status"))} for row in sessions[:100] if isinstance(row, dict) and (name := _identifier(row.get("name")))],
+        "lanes_live": [safe for row in live[:200] if (safe := _lane(row))] if live is not None else None,
+        "lanes_parked": [{"lane": lane, "tier": ("fast" if lane in tiers["fast"] else tiers["default"]) if tiers["fast"] is not None else None, "cli_version": None, "expected_cli_version": tiers["versions"]["hold"].get(lane, tiers["versions"]["default"])} for lane in parked] if parked is not None else None,
+        "claude_sessions": [{"name": name, "status": _status(row.get("status"))} for row in sessions[:100] if isinstance(row, dict) and (name := _identifier(row.get("name")))] if sessions is not None else None,
         "claude_subagents_running": subagents,
-        "cc_agents": {"running": [{"name": _identifier(row.get("name")), "type": _identifier(row.get("type"))} for row in (cc_running or [])[:100] if isinstance(row, dict)], "running_count": len(cc_running) if cc_running is not None else None, "read_utc": _stamp(cc.get("updated_utc"))},
-        "exec_reads_in_flight": _names(fleet.get("exec_reads_in_flight")),
+        "cc_agents": {"running": [{"name": _identifier(row.get("name")), "type": _identifier(row.get("type"))} for row in cc_running[:100] if isinstance(row, dict)] if cc_running is not None else None, "running_count": len(cc_running) if cc_running is not None else None, "read_utc": cc_time},
+        "exec_reads_in_flight": _exec_reads(reads),
         "sdk": sdk, "actions": {key: value for key, value in actions.items() if key != "API_errors"},
-        "pool_accounts": [{"account": row["account"], "used_pct": _number(row.get("used_pct"), 100)} for row in accounts[:100] if isinstance(row, dict) and isinstance(row.get("account"), str) and _POOL_LABEL.fullmatch(row["account"])],
+        "pool_accounts": [{"account": row["account"], "used_pct": _number(row.get("used_pct"), 100)} for row in accounts[:100] if isinstance(row, dict) and isinstance(row.get("account"), str) and _POOL_LABEL.fullmatch(row["account"])] if accounts is not None else None,
         "fresh_total_pct": _number(fleet.get("fresh_total_pct")), "tiers": tiers,
         "totals": {key: _count(fleet.get("totals", {}).get(key)) for key in ("lanes_live", "lanes_parked", "codex_subagents_running", "claude_subagents_running", "claude_subagents_not_reported", "exec_reads_in_flight", "sdk_jobs_running")} if isinstance(fleet.get("totals"), dict) else {},
-        "source_times": {"fleet_direct": native_time if source == "direct" else None, "fleet_snapshot": snapshot_time, "cc_now": _stamp(cc.get("updated_utc")), "lane_tiers": tiers["read_utc"], "api_ledger": sdk["file_utc"], "actions": actions["read_utc"]},
-        "source_notes": ["Co-op subagents use the separately dated fleet snapshot.", "A missing ledger records no spend yet; a missing ceiling remains unknown."] + (["Direct fleet collection unavailable; dated snapshot used."] if source == "snapshot" else []),
+        "availability": availability, "source_inputs": list(inputs.values()),
+        "section_counts": {key: len(value) if isinstance(value, list) else None for key, value in (("lanes_live", live), ("lanes_parked", parked_value), ("claude_sessions", sessions), ("exec_reads_in_flight", reads))},
+        "source_times": {"fleet_direct": native_time if source == "direct" else None, "fleet_snapshot": snapshot_time, "cc_now": cc_time, "lane_tiers": tiers["read_utc"], "api_ledger": sdk["read_utc"], "actions": actions["read_utc"]},
+        "source_notes": ["Co-op subagents use the separately dated fleet snapshot; CC agents use the CC current view.", "Missing source sections and ledger amounts remain unknown."] + (["Direct fleet collection unavailable; dated snapshot used."] if source == "snapshot" else []),
         "errors": (["Fleet collection not reported."] if source == "unavailable" else []),
         "API_errors": actions["API_errors"],
     }

@@ -100,6 +100,36 @@ class CurrentViewTests(unittest.TestCase):
         self.assertIn("not reported", first)
         self.assertNotIn('datetime="None"', first)
         self.assertNotIn(self.view["updated_utc"], first)
+    def test_optional_memory_totals_require_finite_positive_numeric_bounds(self):
+        for invalid in [None, False, "32", -1, 0, 9, float("nan"), float("inf")]:
+            with self.subTest(invalid=invalid):
+                self.view["workstation"]["windows_total_gib"] = invalid
+                current.validate(self.view)
+                self.workstation["windows_total_gib"] = {"value_gib": invalid, "source": "fixture total", "read_utc": "2026-10-09T05:00:00Z"}
+                text = current.render(self.view, self.workstation)
+                self.assertIn("total unknown", text)
+                self.assertNotIn('class="memory-total"', text)
+                self.assertIn("Windows available", text)
+        self.view["workstation"]["windows_total_gib"] = 32
+        current.validate(self.view)
+
+    def test_metric_render_rejects_wrong_total_type_and_timezone_naive_metadata(self):
+        self.workstation["windows_total_gib"] = {"value_gib": "32", "source": "fixture total", "read_utc": "2026-10-09T05:00:00Z"}
+        self.assertIn("total unknown", current.render(self.view, self.workstation))
+        self.workstation["windows_total_gib"]["value_gib"] = 32
+        self.workstation["windows_total_gib"]["read_utc"] = "2026-10-09T05:00:00"
+        self.assertIn("total unknown", current.render(self.view, self.workstation))
+        self.workstation["windows_total_gib"]["read_utc"] = "2026-10-09T04:00:00Z"
+        rendered = current.render(self.view, self.workstation)
+        self.assertIn("32.0 GiB total", rendered)
+        self.assertIn('datetime="2026-10-09T04:00:00Z"', rendered)
+        self.assertNotIn("total unknown", rendered)
+
+    def test_tiny_positive_swap_never_rounds_to_zero(self):
+        self.workstation["swap_used_gib"]["value_gib"] = 1 / 1024 ** 3
+        html = current.render(self.view, self.workstation)
+        self.assertIn("<strong>1</strong> byte", html)
+        self.assertNotIn("<strong>0.0</strong> MiB", html)
 
 
 if __name__ == "__main__":

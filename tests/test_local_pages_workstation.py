@@ -167,6 +167,9 @@ class WorkstationTests(unittest.TestCase):
                         self.assertTrue(requests[0].startswith("/api/v1/query?"))
                         self.assertEqual(actual["API_errors"][0]["type"], "HTTPError")
                         for field in workstation.FIELDS:
+                            if field not in FALLBACK:
+                                self.assertNotIn(field, actual)
+                                continue
                             self.assert_fallback(actual, field)
                             self.assertEqual(actual[field]["fallback_reason"], "API read failed")
         finally:
@@ -231,6 +234,29 @@ class WorkstationTests(unittest.TestCase):
         self.assertEqual(actual["wsl_total_gib"]["read_utc"], "2026-10-08T21:02:00Z")
         fallback = dict(FALLBACK, read_utc={"swap_used_gib": "2026-10-08T21:03:00Z"})
         self.assertEqual(self.collect([], fallback)["swap_used_gib"]["read_utc"], "2026-10-08T21:03:00Z")
+
+    def test_invalid_optional_total_is_unknown_without_changing_mandatory_readings(self):
+        for value in [None, False, "32", -1, 0, 1, float("nan"), float("inf"),
+                      {"value_gib": 32, "read_utc": "2026-10-08T21:03:00"},
+                      {"value_gib": 32, "read_utc": "bad-date"}]:
+            with self.subTest(value=value):
+                actual = self.collect([], dict(FALLBACK, windows_total_gib=value))
+                self.assertNotIn("windows_total_gib", actual)
+                self.assertEqual(actual["optional_total_status"]["windows_total_gib"]["status"], "UNKNOWN")
+                self.assertTrue(actual["optional_total_status"]["windows_total_gib"]["reason"])
+                for field in FALLBACK.keys() - {"read_utc"}:
+                    self.assert_fallback(actual, field)
+
+    def test_api_failure_preserves_unknown_optional_total_and_valid_dictionary_date(self):
+        fallback = dict(FALLBACK, windows_total_gib=None,
+                        wsl_total_gib={"value_gib": 128, "read_utc": "2026-10-08T21:03:00Z"})
+        def failed(*args, **kwargs):
+            raise TimeoutError("fixture timeout")
+        actual = workstation.collect(fallback, failed)
+        self.assertNotIn("windows_total_gib", actual)
+        self.assertEqual(actual["optional_total_status"]["windows_total_gib"]["status"], "UNKNOWN")
+        self.assertEqual(actual["wsl_total_gib"]["value_gib"], 128)
+        self.assertEqual(actual["wsl_total_gib"]["read_utc"], "2026-10-08T21:03:00Z")
 
 
 if __name__ == "__main__":

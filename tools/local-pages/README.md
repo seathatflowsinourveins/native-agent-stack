@@ -39,8 +39,9 @@ The Fleet page uses the supported read-only
 each refresh. Direct values fall back to the dated
 `coordination/ns2604-coop/watchers/fleet-now.json` snapshot if collection
 fails. The co-op's named subagents always use that snapshot and its own time,
-because a direct invocation cannot observe them. CC named agents come from
-`cc-now.json`; tier, version holds and parking policy come from
+because a direct invocation cannot observe them. CC named agents come only from
+`cc-now.json#/cc_agents/running` and its own published timestamp; the producer's
+different CC list is a separate observation. Tier, version holds and parking policy come from
 `command-center/lane-tiers.json`. Parked CLI versions remain unreported when
 the source supplies no observation; policy versions are separate.
 
@@ -48,8 +49,9 @@ the source supplies no observation; policy versions are separate.
 omitting prompts, task text, emails and credential fields. Pool labels accept
 the producer's anonymous `position N`, `fresh(HH:MM:SS)` and reset-time forms;
 arbitrary account identities are rejected. A missing
-`coordination/api-actions-20261008/api-actions-ledger.jsonl` displays “no spend
-yet”; an unknown ceiling or job count remains unreported. Existing ledger
+`coordination/api-actions-20261008/api-actions-ledger.jsonl` displays UNKNOWN;
+only a valid empty ledger establishes no recorded spend. Unknown roster sections,
+tiers, ceilings and job counts remain UNKNOWN rather than zero. Existing ledger
 rows contribute only explicit cumulative `spend_usd` and `ceiling_usd` fields.
 
 Actions use one native `gh run list` invocation for the newest100 repository
@@ -60,11 +62,49 @@ for this command, so a600-second nonserved JSON cache with a native file lock
 coordinates refreshes. Fresh cache hits make no additional CLI request;
 failure preserves earlier observations with their original time, never an
 invented zero. The Fleet section identifies its bounded Actions scope.
+Each source, producer, workflow, ledger, cache and lock path rejects symlinks
+and nonregular inputs. Cache writes use securely created temporary files in
+the cache directory and an atomic replace of a checked destination.
+The producer executes only its verified bytes from a sealed Linux memory
+descriptor, with its original file location, arguments and sibling-import
+path. Execution digest and byte count are retained; collection never reopens
+the original producer pathname after validation.
+
+Optional memory totals accept a finite positive scalar or a
+`{value_gib, read_utc}` record. An invalid total becomes UNKNOWN with a reason;
+valid mandatory readings still publish. A valid per-figure total keeps its
+own recorded time rather than inheriting another measurement's date.
+
+Missing or partially written Adoption snapshots degrade only that section to
+UNKNOWN. Producer-provided `codex_by_role` is preferred; an absent role projection
+is labelled as a dated instance-label fallback. Raw keys still determine
+memberships and counts before the shared display sanitizer masks personal paths,
+host labels and positively classified encoded identifiers. Reads in flight use
+the producer's name-and-tier format; actual zero subagents remains zero. Summed
+per-account pool percentages are labelled with their reference rather than as
+a unique aggregate pool, and ledger observations keep their actual source time.
 
 The native refresh runtime needs the installed hcom, Claude and gh directories
 on PATH for the upstream producer and Actions command. This is runtime setup
 in the owned systemd unit, separate from client configuration or exporter
 installation. The Fleet view uses local assets and the existing refresh timer.
+
+Mapped tier/CLI values from `lane-tiers.json` appear beside running observations
+when they differ. Columns identify the order as running / map; the renderer
+shows the mismatch without changing a lane's tier or version. CC `api_credit`
+supplies the ceiling and stop/report threshold; planned table amounts are
+labelled estimates. Recorded actual spend uses the native producer's
+`api_spend_ledger.sums.actual_usd`, not the sum of reserved caps.
+
+`adoption_view.py` reads the CC-owned
+`coordination/command-center/pages/adoption-now.json` (`adoption-now/1`).
+Readiness shows layer/server activity and Fleet exposes all published role
+labels in collapsible tables. The co-op alone runs its hourly collector;
+page refreshes make no Loki query or collector invocation. Exact server
+aliases follow the producer's memberships and each raw server row counts
+once. Sparse maps show zero recorded calls, while unknown values stay
+unreported. Counts describe the stated retrospective window and do not prove
+adoption acceptance, fresh-session use or workflow improvement.
 
 `--current-source` selects the exact approved read-only `cc-now/1` JSON path,
 currently only `state-root/coordination/command-center/pages/cc-now.json`.
@@ -87,12 +127,19 @@ and read time. Each displayed figure identifies its provenance and timestamp;
 no free-memory metric is relabelled as available. Requests have finite server
 and client bounds. Query identity, sample metadata and any API error are
 retained in the nonserved refresh receipt. There is no new exporter or dependency.
+Windows metrics use job `workstation-windows`; the page composer selects node
+metrics from `workstation-node`. Small nonzero swap values display in MiB so
+they do not round to zero. Port19090 belongs to another mirrored WSL distro
+and is never queried; earlier absence observations at that port do not describe
+this host. The corrected source identity is backed by native process readback
+on21090 and its installed Prometheus API, not merely a responding socket.
 
 All input reads and rendering complete before publication. Generated HTML and
 assets are prepared in nonserved staging, then each destination is atomically
 replaced with `os.replace`; the receipt is replaced last. This is atomic per
-file, not a transaction across all page files. Source or rendering failure
-keeps the prior generated bytes and prior receipt. An I/O failure during the
+file, not a transaction across all page files. Required source or rendering failure
+keeps the prior generated bytes and prior receipt; optional Fleet or Adoption
+observations instead degrade their own fields to UNKNOWN. An I/O failure during the
 replacement sequence can leave files from two refreshes; compare their visible
 refresh time and manifest hash with the last receipt and run a successful
 refresh again. Unrelated files in the served root are preserved. Symlink
@@ -151,6 +198,9 @@ nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p t
 nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_source_policy.py
 nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_north_star_readiness.py
 nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_fleet_data.py
+nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_fleet_execution.py
+nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_fleet_view.py
+nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_adoption.py
 ```
 
 The fixtures use the repository's real native builder and local temporary

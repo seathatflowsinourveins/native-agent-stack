@@ -2,7 +2,9 @@
 
 import importlib.util
 from concurrent.futures import ThreadPoolExecutor
+import hashlib
 import json
+import os
 from pathlib import Path
 import subprocess
 import tempfile
@@ -50,6 +52,9 @@ class FleetDataTests(unittest.TestCase):
             "pool_accounts": [{"account": "10-09T00:00:00Z", "used_pct": 30.0}],
         }
         self.snapshot = {**self.direct, "at": "2026-10-08T22:00:00Z", "claude_subagents_running": {"coop": ["coop-read-a", "coop-read-b"], "cc": ["old-review"], "api_actions": None}}
+        producer = self.state / "coordination/ns2604-coop/tools/fleet_block.py"
+        producer.parent.mkdir(parents=True)
+        producer.write_text("# isolated fixture producer; transport is mocked\n", encoding="utf-8")
         self.write_json("coordination/ns2604-coop/watchers/fleet-now.json", self.snapshot)
         self.write_json("coordination/command-center/pages/cc-now.json", {"schema": "cc-now/1", "updated_utc": "2026-10-08T22:02:00Z", "cc_agents": {"running": [{"name": "review-a", "type": "Explore", "task": "PRIVATE-TASK"}]}})
         self.write_json("coordination/command-center/lane-tiers.json", {"schema": "lane-tiers/1", "updated_utc": "2026-10-08T22:03:00Z", "default": "default", "fast": [], "parking": {"idle_minutes_default": 45, "idle_minutes_when_memory_tight": 15, "keep_alive": ["g5-stars-gap"]}, "codex_version": {"default": "0.162.0", "hold": {"grand-catalog": "0.161.0"}, "hold_until": {"grand-catalog": "gate opens"}}})
@@ -68,6 +73,24 @@ class FleetDataTests(unittest.TestCase):
         with patch.object(fleet_data.time, "time", return_value=self.now + offset):
             return fleet_data.collect(self.state, self.cache, self.root, self.runner)
 
+    def test_cc_credit_policy_supplies_ceiling_without_changing_actual_spend(self):
+        self.write_json("coordination/command-center/pages/cc-now.json", {"schema": "cc-now/1", "updated_utc": "2026-10-08T22:02:00Z", "api_credit": {"ceiling_usd": 200, "stop_and_report_at_usd": 150, "table_at_caps_usd": 194.41, "table_expected_usd": 117, "key": "PRIVATE-FORBIDDEN"}})
+        sdk = self.collect()["sdk"]
+        self.assertEqual(sdk["ceiling_usd"], 200)
+        self.assertEqual(sdk["stop_and_report_at_usd"], 150)
+        self.assertIsNone(sdk["spend_usd"])
+        self.assertEqual(sdk["status"], "ledger unavailable")
+        self.assertNotIn("PRIVATE-FORBIDDEN", json.dumps(sdk))
+        self.assertEqual(sdk["ceiling_read_utc"], "2026-10-08T22:02:00Z")
+
+    def test_native_ledger_actual_sum_is_used_without_counting_reserved_caps(self):
+        self.direct["api_spend_ledger"] = {"rows": 368, "last": "2026-10-08T22:09:00Z", "sums": {"actual_usd": 17.4321, "max_usd": 800}}
+        sdk = self.collect()["sdk"]
+        self.assertEqual(sdk["spend_usd"], 17.4321)
+        self.assertEqual(sdk["ledger_rows"], 368)
+        self.assertEqual(sdk["ledger_source"], "coop-fleet api_spend_ledger")
+        self.assertIsNone(sdk["jobs_running"])
+
     def test_direct_sections_and_separately_dated_coop_subagents(self):
         view = self.collect()
         self.assertEqual(view["fleet_source"], "direct native")
@@ -84,7 +107,9 @@ class FleetDataTests(unittest.TestCase):
         self.assertEqual(view["fleet_source"], "snapshot fallback")
         self.assertEqual(view["at"], self.snapshot["at"])
         self.assertIsNone(view["source_times"]["fleet_direct"])
-        self.assertEqual(view["claude_subagents_running"]["cc"]["names"], ["old-review"])
+        self.assertEqual(view["claude_subagents_running"]["cc"]["names"], ["review-a"])
+        self.assertEqual(view["claude_subagents_running"]["cc"]["source"], "cc-now")
+        self.assertEqual(view["claude_subagents_running"]["native_cc"]["names"], ["old-review"])
 
     def test_missing_tokens_and_missing_subagent_counts_are_unknown(self):
         self.direct["lanes_live"][0].pop("subagents_running")
@@ -92,10 +117,11 @@ class FleetDataTests(unittest.TestCase):
         for key in ["subagents_running", "subagents_spawned", "subagent_uncached_share_pct", "subagent_uncached_tokens", "lane_uncached_tokens"]:
             self.assertIsNone(lane[key])
 
-    def test_no_ledger_is_zero_spend_and_unknown_ceiling_and_job_count(self):
+    def test_missing_ledger_keeps_spend_ceiling_and_job_count_unknown(self):
         sdk = self.collect()["sdk"]
-        self.assertEqual(sdk["status"], "no spend yet")
-        self.assertEqual(sdk["spend_usd"], 0)
+        self.assertEqual(sdk["status"], "ledger unavailable")
+        self.assertIsNone(sdk["spend_usd"])
+        self.assertIsNone(sdk["read_utc"])
         self.assertIsNone(sdk["ceiling_usd"])
         self.assertIsNone(sdk["jobs_running"])
 
@@ -179,6 +205,198 @@ class FleetDataTests(unittest.TestCase):
         self.assertIsNone(parked[0]["cli_version"])
         self.assertEqual(parked[0]["expected_cli_version"], "0.161.0")
         self.assertEqual(parked[1]["expected_cli_version"], "0.162.0")
+
+    def test_real_exec_read_labels_keep_name_and_tier(self):
+        self.direct["exec_reads_in_flight"] = ["read-a[fast]", "read-b[standard]"]
+        view = self.collect()
+        self.assertEqual(view["exec_reads_in_flight"], [{"name": "read-a", "tier": "fast"}, {"name": "read-b", "tier": "standard"}])
+
+    def test_cc_current_roster_uses_cc_time_when_native_source_disagrees(self):
+        self.write_json("coordination/command-center/pages/cc-now.json", {"schema": "cc-now/1", "updated_utc": "2026-10-08T22:02:00Z", "cc_agents": {"running": [{"name": "cc-current", "type": "Explore"}]}})
+        view = self.collect()
+        group = view["claude_subagents_running"]["cc"]
+        self.assertEqual(group["names"], ["cc-current"])
+        self.assertEqual(group["read_utc"], "2026-10-08T22:02:00Z")
+        self.assertEqual(group["source"], "cc-now")
+        self.assertEqual(view["claude_subagents_running"]["native_cc"]["names"], ["review-a"])
+
+    def test_absent_null_and_malformed_rosters_remain_unknown_without_fallback(self):
+        (self.state / "coordination/ns2604-coop/watchers/fleet-now.json").unlink()
+        for field in ("lanes_live", "lanes_parked", "claude_sessions"):
+            original = self.direct.pop(field)
+            try:
+                for value in (None, {}, "invalid"):
+                    with self.subTest(field=field, value=value):
+                        self.direct[field] = value
+                        view = self.collect()
+                        self.assertIsNone(view[field])
+                        self.assertEqual(view["availability"][field]["status"], "not reported")
+            finally:
+                self.direct[field] = original
+
+    def test_explicit_empty_rosters_are_reported_zero_and_zero_subagents_survive(self):
+        self.direct.update(lanes_live=[], lanes_parked=[], claude_sessions=[])
+        view = self.collect()
+        for field in ("lanes_live", "lanes_parked", "claude_sessions"):
+            self.assertEqual(view[field], [])
+            self.assertEqual(view["availability"][field]["status"], "reported")
+        self.direct["lanes_live"] = [{"lane": "active", "subagents_running": 0}]
+        self.assertEqual(self.collect()["lanes_live"][0]["subagents_running"], 0)
+
+    def test_snapshot_ledger_keeps_snapshot_date_and_missing_tiers_are_unknown(self):
+        self.snapshot["api_spend_ledger"] = {"rows": 1, "last": "2026-10-08T21:59:00Z", "sums": {"actual_usd": 2.5}}
+        self.write_json("coordination/ns2604-coop/watchers/fleet-now.json", self.snapshot)
+        (self.state / "coordination/command-center/lane-tiers.json").unlink()
+        self.runner.fleet_fail = True
+        view = self.collect()
+        self.assertEqual(view["sdk"]["read_utc"], self.snapshot["at"])
+        self.assertEqual(view["source_times"]["api_ledger"], self.snapshot["at"])
+        self.assertEqual(view["tiers"]["availability"], "not reported")
+        self.assertIsNone(view["tiers"]["fast"])
+
+    def test_snapshot_symlink_cannot_read_outside_synthetic_credentials(self):
+        outside = self.state.parent / "outside/credentials.json"
+        outside.parent.mkdir()
+        outside.write_text(json.dumps({**self.direct, "lanes_live": [{"lane": "outside-read-sentinel"}]}), encoding="utf-8")
+        snapshot = self.state / "coordination/ns2604-coop/watchers/fleet-now.json"
+        snapshot.unlink()
+        snapshot.symlink_to(outside)
+        self.runner.fleet_fail = True
+        view = self.collect()
+        self.assertNotIn("outside-read-sentinel", json.dumps(view))
+        self.assertIsNone(view["lanes_live"])
+
+    def test_predictable_cache_temporary_symlink_does_not_overwrite_outside_file(self):
+        self.cache.mkdir()
+        outside = self.state.parent / "outside-cache-sentinel"
+        outside.write_text("untouched outside fixture", encoding="utf-8")
+        (self.cache / "fleet-actions.json.tmp").symlink_to(outside)
+        self.collect()
+        self.assertEqual(outside.read_text(), "untouched outside fixture")
+        self.assertTrue((self.cache / "fleet-actions.json").is_file())
+
+    def test_symlink_lock_and_cache_destinations_skip_native_actions(self):
+        self.cache.mkdir()
+        outside = self.state.parent / "outside-lock-fixture"
+        outside.write_text("untouched", encoding="utf-8")
+        for name in ("fleet-actions.lock", "fleet-actions.json"):
+            with self.subTest(name=name):
+                path = self.cache / name
+                if path.exists():
+                    path.unlink()
+                path.symlink_to(outside)
+                self.runner.commands.clear()
+                view = self.collect()
+                self.assertFalse(any(command[0] == "gh" for command in self.runner.commands))
+                self.assertTrue(view["actions"]["stale"])
+                self.assertEqual(outside.read_text(), "untouched")
+                path.unlink()
+
+    def test_symlink_producer_and_workflow_are_not_opened_or_executed(self):
+        outside = self.state.parent / "outside-producer.py"
+        outside.write_text("# controlled external fixture\n", encoding="utf-8")
+        producer = self.state / "coordination/ns2604-coop/tools/fleet_block.py"
+        producer.unlink()
+        producer.symlink_to(outside)
+        workflows = self.root / ".github/workflows"
+        (workflows / "audit.yml").unlink()
+        workflow = self.state.parent / "outside-workflow.yml"
+        workflow.write_text("name: outside-model-workflow\nsteps:\n - uses: anthropics/claude-code-action@pin\n", encoding="utf-8")
+        (workflows / "audit.yml").symlink_to(workflow)
+        view = self.collect()
+        self.assertFalse(any(command[0] == "python3" for command in self.runner.commands))
+        self.assertEqual(view["actions"]["workflow_names"], [])
+        self.assertEqual(view["fleet_source"], "snapshot fallback")
+
+    def test_every_snapshot_child_is_bounded_regular_and_receipted(self):
+        paths = [
+            "coordination/ns2604-coop/watchers/fleet-now.json",
+            "coordination/command-center/pages/cc-now.json",
+            "coordination/command-center/lane-tiers.json",
+            "coordination/api-actions-20261008/api-actions-ledger.jsonl",
+        ]
+        outside = self.state.parent / "outside/credentials.json"
+        outside.parent.mkdir()
+        outside.write_text(json.dumps({"spend_usd": 999, "default": "outside-policy", "schema": "cc-now/1", "cc_agents": {"running": [{"name": "outside-agent"}]}}), encoding="utf-8")
+        for relative in paths:
+            with self.subTest(relative=relative):
+                path = self.state / relative
+                path.parent.mkdir(parents=True, exist_ok=True)
+                original = path.read_bytes() if path.is_file() else None
+                if path.exists():
+                    path.unlink()
+                path.symlink_to(outside)
+                try:
+                    view = self.collect()
+                    source = next(row for row in view["source_inputs"] if row["path"] == str(path))
+                    self.assertEqual(source["status"], "unavailable")
+                    self.assertIsNone(source["sha256"])
+                    self.assertNotIn("outside-agent", json.dumps(view))
+                    self.assertNotEqual(view["sdk"]["spend_usd"], 999)
+                finally:
+                    path.unlink()
+                    if original is not None:
+                        path.write_bytes(original)
+        view = self.collect()
+        cc = self.state / paths[1]
+        source = next(row for row in view["source_inputs"] if row["path"] == str(cc))
+        self.assertEqual(source["sha256"], hashlib.sha256(cc.read_bytes()).hexdigest())
+        self.assertEqual(source["bytes"], cc.stat().st_size)
+        self.assertEqual(source["status"], "reported")
+
+    def test_symlink_ancestor_cannot_supply_a_snapshot_or_actions_cache(self):
+        watchers = self.state / "coordination/ns2604-coop/watchers"
+        outside = self.state.parent / "outside-watchers"
+        watchers.rename(outside)
+        watchers.symlink_to(outside, target_is_directory=True)
+        self.runner.fleet_fail = True
+        outside_cache = self.state.parent / "outside-cache"
+        outside_cache.mkdir()
+        self.cache.symlink_to(outside_cache, target_is_directory=True)
+        view = self.collect()
+        self.assertIsNone(view["lanes_live"])
+        self.assertTrue(view["actions"]["stale"])
+        self.assertEqual(list(outside_cache.iterdir()), [])
+        self.assertFalse(any(command[0] == "gh" for command in self.runner.commands))
+
+    def test_fifo_and_oversized_json_do_not_block_or_read_as_rosters(self):
+        snapshot = self.state / "coordination/ns2604-coop/watchers/fleet-now.json"
+        snapshot.unlink()
+        os.mkfifo(snapshot)
+        self.runner.fleet_fail = True
+        view = self.collect()
+        self.assertIsNone(view["lanes_live"])
+        snapshot.unlink()
+        snapshot.write_text("x" * (fleet_data.MAX_SOURCE_BYTES + 1), encoding="utf-8")
+        view = self.collect()
+        self.assertIsNone(view["lanes_live"])
+        self.assertTrue(all(row["status"] == "unavailable" for row in view["source_inputs"] if row["path"] == str(snapshot)))
+
+    def test_null_fast_list_preserves_unknown_policy_and_observed_running_tier(self):
+        self.write_json("coordination/command-center/lane-tiers.json", {"schema": "lane-tiers/1", "default": "standard", "fast": None})
+        view = self.collect()
+        self.assertIsNone(view["tiers"]["fast"])
+        self.assertEqual(view["tiers"]["availability"], "not reported")
+        self.assertEqual(view["lanes_live"][0]["tier"], "standard")
+
+    def test_malformed_named_groups_are_unknown_and_have_source_reasons(self):
+        self.write_json("coordination/command-center/pages/cc-now.json", {"schema": "cc-now/1", "updated_utc": "2026-10-08T22:02:00Z", "cc_agents": {"running": [{"bad": "fixture"}]}})
+        view = self.collect()
+        self.assertIsNone(view["cc_agents"]["running_count"])
+        self.assertIsNone(view["claude_subagents_running"]["cc"]["names"])
+        self.assertEqual(view["availability"]["cc_agents"]["status"], "not reported")
+
+    def test_producer_execution_receipt_matches_sealed_bytes_and_public_arguments(self):
+        view = self.collect()
+        producer = self.state / "coordination/ns2604-coop/tools/fleet_block.py"
+        source = next(row for row in view["source_inputs"] if row["path"] == str(producer))
+        self.assertEqual(source["execution"]["sha256"], hashlib.sha256(producer.read_bytes()).hexdigest())
+        self.assertEqual(source["execution"]["bytes"], producer.stat().st_size)
+        self.assertEqual(source["execution"]["status"], "completed")
+        command = next(command for command in self.runner.commands if command[0] == "python3")
+        self.assertEqual(command[1], "-c")
+        self.assertEqual(command[-2:], ["--json", "--no-gh"])
+        self.assertNotEqual(command[1], str(producer))
 
 
 if __name__ == "__main__":

@@ -130,6 +130,49 @@ def _fallback(fallback, field):
     }
 
 
+def normalize_optional_totals(readings):
+    """Keep valid total observations; record unknown optional values separately."""
+    result = dict(readings)
+    existing_statuses = result.get("optional_total_status", {})
+    statuses = dict(existing_statuses) if isinstance(existing_statuses, dict) else {}
+    for field, available in (("windows_total_gib", "windows_available_gib"),
+                             ("wsl_total_gib", "wsl_available_gib")):
+        if field not in result:
+            continue
+        reading = result[field]
+        reason = None
+        value = reading.get("value_gib") if isinstance(reading, dict) else None
+        if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or value <= 0:
+            reason = "optional total requires a finite positive numeric value"
+        elif not isinstance(reading.get("source"), str):
+            reason = "optional total source is not reported"
+        else:
+            available_reading = result.get(available)
+            amount = available_reading.get("value_gib") if isinstance(available_reading, dict) else None
+            if isinstance(amount, (int, float)) and not isinstance(amount, bool) and math.isfinite(amount) and value < amount:
+                reason = "optional total is below available memory"
+            recorded = reading.get("read_utc")
+            if recorded is not None:
+                try:
+                    if not isinstance(recorded, str) or not recorded or len(recorded) > 50:
+                        raise ValueError("unbounded date")
+                    parsed = datetime.fromisoformat(recorded.replace("Z", "+00:00"))
+                    if parsed.tzinfo is None:
+                        raise ValueError("timezone absent")
+                except (ValueError, TypeError, AttributeError):
+                    reason = "optional total date requires timezone-aware text"
+        if reason:
+            result.pop(field)
+            statuses[field] = {"status": "UNKNOWN", "reason": reason}
+        else:
+            statuses.pop(field, None)
+    if statuses:
+        result["optional_total_status"] = statuses
+    else:
+        result.pop("optional_total_status", None)
+    return result
+
+
 def collect(fallback, fetch=None, *, wsl_job=None):
     """Return per-value provenance using fetch(query, timeout=2.0) if supplied.
 
@@ -166,7 +209,7 @@ def collect(fallback, fetch=None, *, wsl_job=None):
         for field in FIELDS:
             if field in result:
                 result[field]["fallback_reason"] = "API read failed"
-        return result
+        return normalize_optional_totals(result)
     now = time.time()
     result["fetched_utc"] = _utc(now)
     for field, metrics in FIELDS.items():
@@ -194,4 +237,4 @@ def collect(fallback, fetch=None, *, wsl_job=None):
         except (ValueError, TypeError, KeyError, IndexError, AttributeError, OverflowError) as error:
             if field in result:
                 result[field]["fallback_reason"] = str(error) if isinstance(error, ValueError) else "invalid sample"
-    return result
+    return normalize_optional_totals(result)

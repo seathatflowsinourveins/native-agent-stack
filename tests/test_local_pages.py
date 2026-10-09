@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from contextlib import redirect_stderr, redirect_stdout
+import base64
 import builtins
 import hashlib
 from html.parser import HTMLParser
@@ -12,6 +13,7 @@ import json
 import os
 from pathlib import Path
 import shutil
+import subprocess
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -98,6 +100,9 @@ class LocalPagesTests(unittest.TestCase):
         self.fleet_patch = patch.object(BUILDER, "collect_fleet", return_value=self.fleet_result)
         self.fleet_patch.start()
         self.addCleanup(self.fleet_patch.stop)
+        self.adoption_path = self.state / "coordination/command-center/pages/adoption-now.json"
+        self.adoption = {"schema": "adoption-now/1", "generated_utc": "2024-07-08T09:00:00Z", "window_hours": 24, "method": "fixture count of record", "claude_total_sessions": 0, "codex_total_conversations": 0, "layers": {}, "claude_by_role": {}, "codex_by_lane": {}}
+        self.write_json(self.adoption_path, self.adoption)
 
     @staticmethod
     def write_json(path: Path, value: object) -> None:
@@ -241,6 +246,109 @@ class LocalPagesTests(unittest.TestCase):
         self.assertNotIn("superseded in the current view", html)
         self.assertIn("differs from the current view", html)
 
+    def test_missing_or_partial_adoption_degrades_without_aborting_pages(self) -> None:
+        self.refresh()
+        adoption_path = self.state / "coordination/command-center/pages/adoption-now.json"
+        for content in (None, '{"schema":'):
+            with self.subTest(content=content):
+                if content is None:
+                    adoption_path.unlink(missing_ok=True)
+                else:
+                    adoption_path.write_text(content)
+                result = self.refresh()
+                self.assertEqual(result["adoption"]["status"], "UNREPORTED")
+                html = (self.output / "readiness.html").read_text()
+                self.assertIn("Adoption", html)
+                self.assertIn("UNKNOWN", html)
+                self.assertNotIn("0 Claude sessions", html)
+                self.assertTrue((self.output / "fleet.html").is_file())
+
+    def real_fleet_adapter(self, state, cache, root):
+        def native_transport(command, **kwargs):
+            return subprocess.CompletedProcess(command, 0, stdout="[]" if command[0] == "gh" else "", stderr="")
+        return BUILDER.load_local("fleet_data").collect(state, cache, root, run=native_transport)
+
+    def test_real_fleet_adapter_rejects_snapshot_symlink_before_publication(self) -> None:
+        producer = self.state / "coordination/ns2604-coop/tools/fleet_block.py"
+        producer.parent.mkdir(parents=True, exist_ok=True)
+        producer.write_text("# synthetic producer transport fixture\n")
+        outside = self.base / "outside/credentials.json"
+        self.write_json(outside, {"schema": "coop-fleet/1", "at": "2024-07-08T00:00:00Z", "lanes_live": [{"lane": "outside-read-sentinel", "tier": "standard"}], "lanes_parked": [], "claude_sessions": []})
+        source = self.state / "coordination/ns2604-coop/watchers/fleet-now.json"
+        source.parent.mkdir(parents=True, exist_ok=True)
+        source.symlink_to(outside)
+        with patch.object(BUILDER, "collect_fleet", side_effect=self.real_fleet_adapter):
+            result = self.refresh()
+        html = (self.output / "fleet.html").read_text()
+        self.assertNotIn("outside-read-sentinel", html)
+        self.assertIn("UNKNOWN", html)
+        observed = next(row for row in result["fleet"]["source_inputs"] if row["path"] == str(source))
+        self.assertEqual(observed["status"], "unavailable")
+        self.assertIsNone(observed.get("sha256"))
+
+    def test_real_fleet_adapter_does_not_overwrite_cache_temp_symlink(self) -> None:
+        producer = self.state / "coordination/ns2604-coop/tools/fleet_block.py"
+        producer.parent.mkdir(parents=True, exist_ok=True)
+        producer.write_text("# synthetic producer transport fixture\n")
+        cache = self.receipt.parent / "fleet/cache"
+        cache.mkdir(parents=True, exist_ok=True)
+        outside = self.base / "outside/private-cache-target.json"
+        outside.parent.mkdir(parents=True, exist_ok=True)
+        outside.write_text("synthetic cache target must remain unchanged")
+        (cache / "fleet-actions.json.tmp").symlink_to(outside)
+        with patch.object(BUILDER, "collect_fleet", side_effect=self.real_fleet_adapter):
+            self.refresh()
+        self.assertEqual(outside.read_text(), "synthetic cache target must remain unchanged")
+        self.assertTrue((self.output / "fleet.html").is_file())
+
+    def test_full_generated_fleet_masks_private_labels_after_counting(self) -> None:
+        home = self.base / "synthetic-host-user"
+        labels = ["file:" + "/".join(("", "home", home.name, "private")), "worker-" + home.name]
+        for label in labels:
+            with self.subTest(label=label):
+                self.fleet_result.update(fleet_source="direct native", lanes_live=[{"lane": label, "tier": "standard", "status": "active", "subagents_spawned": 0, "subagents_running": 0}], lanes_parked=[], claude_sessions=[])
+                with patch.object(Path, "home", return_value=home):
+                    result = self.refresh()
+                html = (self.output / "fleet.html").read_text()
+                self.assertNotIn(label, html)
+                self.assertNotIn(home.name, html)
+                self.assertIn('<strong>1</strong> live Codex lanes', html)
+                self.assertEqual(result["fleet"]["lanes_live"][0]["lane"], label)
+
+    def test_real_composer_masks_underscore_identity_in_fleet_and_adoption_after_grouping(self) -> None:
+        home = self.base / "synthetic-host-user"
+        label = "worker_" + home.name + "_read"
+        self.write_json(self.state / "coordination/ns2604-coop/watchers/fleet-now.json", {"schema": "coop-fleet/1", "at": "2024-07-08T09:00:00Z", "lanes_live": [{"lane": label, "tier": "standard", "status": "active", "subagents_running": 0}], "lanes_parked": [], "claude_sessions": []})
+        self.adoption["layers"] = {label: {"servers": {"context-mode": {"claude_calls": 3, "claude_sessions": 1, "codex_calls": 17, "codex_conversations": 3}}}}
+        self.adoption["codex_by_role"] = {label: {"conversations": 3, "servers": {"context-mode": {"calls": 17, "conversations": 3}}}}
+        self.write_json(self.adoption_path, self.adoption)
+        with patch.object(Path, "home", return_value=home), patch.object(BUILDER, "collect_fleet", side_effect=self.real_fleet_adapter):
+            result = self.refresh()
+        for name in ("index", "readiness", "gaps", "roadmap", "fleet", "sources"):
+            html = (self.output / (name + ".html")).read_text()
+            self.assertNotIn(home.name.casefold(), html.casefold())
+        fleet_html = (self.output / "fleet.html").read_text()
+        self.assertIn('<strong>1</strong> live Codex lanes', fleet_html)
+        self.assertIn("<td>17</td>", fleet_html)
+        self.assertEqual(result["fleet"]["lanes_live"][0]["lane"], label)
+        self.assertEqual(json.loads(self.adoption_path.read_text())["codex_by_role"][label]["servers"]["context-mode"]["calls"], 17)
+
+    def test_real_composer_applies_identity_policy_to_classified_decoded_tokens(self) -> None:
+        home = self.base / "synthetic-host-user"
+        raw = "worker_" + home.name + "_read"
+        encoded = ["".join("%" + format(ord(char), "02x") for char in raw), "".join("&#" + str(ord(char)) + ";" for char in raw), "".join("\\u" + format(ord(char), "04x") for char in raw), raw.encode().hex(), base64.b64encode(raw.encode()).decode()]
+        for label in encoded:
+            with self.subTest(label=label):
+                self.current["headline"] = label
+                self.write_json(self.current_path, self.current)
+                with patch.object(Path, "home", return_value=home):
+                    self.refresh()
+                for name in ("index", "readiness", "gaps", "roadmap", "fleet", "sources"):
+                    html = (self.output / (name + ".html")).read_text()
+                    self.assertNotIn(label, html)
+                    self.assertNotIn(home.name.casefold(), html.casefold())
+                self.assertIn("[personal identifier omitted]", (self.output / "index.html").read_text())
+
     def test_full_documents_native_digest_and_local_resources(self) -> None:
         source_bytes = {path: path.read_bytes() for path in (self.source_index, self.gate, self.gaps_path, self.road_path, self.current_path)}
         receipt = self.refresh()
@@ -314,6 +422,60 @@ class LocalPagesTests(unittest.TestCase):
         self.assertIn("2024-07-08T08:00:00Z", text)
         self.assertIn("cc-now fallback", text)
 
+    def test_small_live_swap_is_visible_instead_of_rounded_to_zero(self) -> None:
+        self.workstation_result["swap_used_gib"].update(value_gib=.003265380859, source="prometheus", read_utc="2024-07-08T09:00:00Z")
+        self.refresh()
+        text = (self.output / "readiness.html").read_text()
+        self.assertIn("<strong>3.3</strong> MiB", text)
+        self.assertIn("prometheus · metric read", text)
+        self.assertIn('datetime="2024-07-08T09:00:00Z"', text)
+
+    def test_full_refresh_invalid_optional_total_is_unknown_and_still_publishes(self) -> None:
+        collector = BUILDER.load_local("workstation")
+        for field in ("windows_total_gib", "wsl_total_gib"):
+            for value in [None, -1, 0, "32", False,
+                          {"value_gib": 128, "read_utc": "2024-07-08T08:00:00"}]:
+                with self.subTest(field=field, value=value):
+                    self.current["workstation"][field] = value
+                    self.write_json(self.current_path, self.current)
+                    def observed(fallback):
+                        return collector.collect(fallback, lambda *args, **kwargs: {"status": "success", "data": {"resultType": "matrix", "result": []}})
+                    with patch.object(BUILDER, "collect_workstation", side_effect=observed):
+                        result = self.refresh()
+                    self.assertEqual(len(result["outputs"]), 8)
+                    self.assertNotIn(field, result["workstation"])
+                    self.assertEqual(result["workstation"]["optional_total_status"][field]["status"], "UNKNOWN")
+                    text = (self.output / "readiness.html").read_text()
+                    self.assertIn("total unknown", text)
+                    self.assertIn("<strong>17.4</strong> GiB", text)
+                    self.assertNotIn('class="memory-total"', text)
+            self.current["workstation"].pop(field)
+
+    def test_full_refresh_optional_total_dictionary_preserves_its_own_date(self) -> None:
+        collector = BUILDER.load_local("workstation")
+        recorded = "2024-07-08T07:30:00Z"
+        self.current["workstation"]["windows_total_gib"] = {"value_gib": 32, "read_utc": recorded}
+        self.write_json(self.current_path, self.current)
+        with patch.object(BUILDER, "collect_workstation", side_effect=lambda fallback: collector.collect(fallback, lambda *args, **kwargs: {"status": "success", "data": {"resultType": "matrix", "result": []}})):
+            result = self.refresh()
+        reading = result["workstation"]["windows_total_gib"]
+        self.assertEqual(reading["value_gib"], 32)
+        self.assertEqual(reading["read_utc"], recorded)
+        text = (self.output / "readiness.html").read_text()
+        self.assertIn("32.0 GiB total", text)
+        self.assertIn('datetime="' + recorded + '"', text)
+        self.assertNotIn("total unknown", text)
+
+    def test_adoption_snapshot_is_read_only_and_follows_operator_summary(self) -> None:
+        source_bytes = self.adoption_path.read_bytes()
+        receipt = self.refresh()
+        ready = (self.output / "readiness.html").read_text()
+        fleet = (self.output / "fleet.html").read_text()
+        self.assertLess(ready.index('id="now-view"'), ready.index('id="adoption"'))
+        self.assertLess(fleet.index('id="fleet-view"'), fleet.index('id="adoption-by-role"'))
+        self.assertEqual(self.adoption_path.read_bytes(), source_bytes)
+        self.assertEqual(receipt["adoption"]["sha256"], hashlib.sha256(source_bytes).hexdigest())
+
     def test_cc_current_schema_failure_preserves_last_successful_render(self) -> None:
         self.refresh()
         old = self.generated_bytes()
@@ -355,7 +517,7 @@ class LocalPagesTests(unittest.TestCase):
                 text = (self.output / "fleet.html").read_text()
                 self.assertNotIn('<strong>0</strong> live Codex lanes', text)
                 self.assertNotIn('<strong>0</strong> Claude worker sessions', text)
-                self.assertIn('<strong>not reported</strong> live Codex lanes', text)
+                self.assertIn('<strong>UNKNOWN</strong> live Codex lanes', text)
                 self.assertNotIn('datetime=""', text)
 
     def test_owner_claude_session_is_named_by_role_and_excluded_from_workers(self) -> None:
@@ -366,6 +528,14 @@ class LocalPagesTests(unittest.TestCase):
         self.assertIn('<strong>1</strong> Claude worker sessions + 1 owner session', text)
         self.assertNotIn("native-agent-stack-1a", text)
         self.assertIn('data-session-role="owner"', text)
+
+    def test_fleet_shows_mapped_values_beside_running_tier_and_version_gaps(self) -> None:
+        self.fleet_result["tiers"] = {"default": "default", "fast": ["fixture-lane"], "versions": {"default": "0.162.0", "hold": {}, "hold_until": {}}}
+        self.refresh()
+        text = (self.output / "fleet.html").read_text()
+        self.assertIn("standard / fast", text)
+        self.assertIn("0.161.0 / 0.162.0", text)
+        self.assertIn("Tier: running / map", text)
 
     def test_untrusted_text_does_not_create_markup_or_account_links(self) -> None:
         attack = '<img src="https://attacker.invalid/x" onerror="alert(1)">'
