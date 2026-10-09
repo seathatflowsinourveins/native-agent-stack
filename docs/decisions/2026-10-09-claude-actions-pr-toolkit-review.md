@@ -73,7 +73,10 @@ The workflow is new, so this is all of its behaviour.
   $7, the $5 budget plus a $2 allowance, because the client checks its budget after a turn and the background agents'
   last requests can land after that check; a cache read; result text; and both agents' report sections. The step
   names every bound it finds unmet. With background agents the client emits several result records, and the last can
-  be an empty idle tick, so the reports are the last result with text.
+  be an empty idle tick, so the coordinator's relay is the last result with text. When that relay lacks an agent's
+  section, the reports are assembled from each agent's own `SubagentHandback` message in the execution file: in J8
+  #894 the coordinator hit `--max-budget-usd 5` (`error_max_budget_usd`) after both agents had handed back their full
+  reports, and never relayed them. All three J8 streams so far (#892, #900, #894) carry `SubagentHandback` calls.
 - The reports go to the job summary only when the bounds passed, capped at 60,000 bytes on a character boundary,
   with a line saying so when they were longer.
 
@@ -111,13 +114,14 @@ then the same agents run locally on the second key, which already meets the need
 - `tests.test_workflow_security_coverage.NewWorkflowSecurityCoverageTests`: the coverage set gains the workflow, with
   its own offline zizmor test.
 
-New, in `tests/test_claude_pr_toolkit_review_workflow.py` (34 tests): the trigger, condition, permissions, checkout
+New, in `tests/test_claude_pr_toolkit_review_workflow.py` (37 tests): the trigger, condition, permissions, checkout
 layout, toolkit checkout, step order, pin, inputs, time limits, flags, prompt and settings are asserted from the
 workflow file; the guard, binding, diff, toolkit check, numbers and report steps are executed as written against
 local stand-ins for `gh` and `git` and a local git repository. They run without PyYAML, through the policy test's own
 loader. Eight weakened copies of the workflow each fail at least one test: the report-sections bound removed, the turn
 count including the agents' turns, Bash allowed, no time scaling, no hash check, the toolkit ref moved to `main`, the
-runtime `plugins` input added, and a $70 cost bound.
+runtime `plugins` input added, and a $70 cost bound. Three more each fail them for the handback fallback: the
+handbacks ignored, the wrong handback tool name, and the handbacks preferred over a complete relay.
 
 ## Alternatives considered
 

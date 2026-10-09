@@ -89,7 +89,7 @@ def model_usage(read=4000000, cost=4.3):
 
 
 def execution(result=None, tools=("Task", "Glob", "Grep", "Read"), mcp_servers=(), init=True, turns=None, lists=True,
-              subagent_turns=0, **changes):
+              subagent_turns=0, handbacks=None, **changes):
     final = {"type": "result", "subtype": "success", "is_error": False, "num_turns": 3,
              "total_cost_usd": 4.3, "modelUsage": model_usage(), "result": REPORT_TEXT}
     final.update(changes)
@@ -107,6 +107,16 @@ def execution(result=None, tools=("Task", "Glob", "Grep", "Read"), mcp_servers=(
             "id": f"msg_{turn:02d}", "content": [{"type": "thinking", "thinking": ""}]}})
         messages.append({"type": "assistant", "parent_tool_use_id": None, "message": {
             "id": f"msg_{turn:02d}", "content": [{"type": "text", "text": TRANSCRIPT_MARKER}]}})
+    for index, (agent, text) in enumerate((handbacks or {}).items()):
+        # The coordinator's Agent call, then the agent's own SubagentHandback carrying its full report.
+        call = f"toolu_agent_{index}"
+        messages.append({"type": "assistant", "parent_tool_use_id": None, "message": {
+            "id": f"msg_call_{index}", "content": [{"type": "tool_use", "id": call, "name": "Agent",
+                                                    "input": {"subagent_type": agent, "prompt": "task"}}]}})
+        if text is not None:
+            messages.append({"type": "assistant", "parent_tool_use_id": call, "message": {
+                "id": f"msg_handback_{index}", "content": [{"type": "tool_use", "id": f"toolu_hb_{index}",
+                                                            "name": "SubagentHandback", "input": {"message": text}}]}})
     for turn in range(subagent_turns):
         # A subagent's turns carry the coordinator's Agent call as their parent; they are the subagent's, not the
         # coordinator's.
@@ -482,7 +492,7 @@ class PullRequestToolkitStepTests(unittest.TestCase):
         self.assertEqual(code, 0, console)
         record = json.loads(usage)
         self.assertEqual(sorted(record), ["assistant_turns", "claude_code_version", "forbidden_tools", "mcp_servers",
-                                          "models", "num_turns", "report_sections", "result_chars",
+                                          "models", "num_turns", "report_sections", "report_source", "result_chars",
                                           "session_started", "successful_result", "tools", "tools_listed",
                                           "total_cost_usd"])
         self.assertEqual(record["tools"], ["Task", "Glob", "Grep", "Read"])
@@ -577,6 +587,35 @@ class PullRequestToolkitStepTests(unittest.TestCase):
         self.assertNotIn("�", summary)
         code, console, summary, *_ = run_step(REPORT, execution_file=execution(result="short report"))
         self.assertNotIn("are shown.", summary)
+
+    def test_a_coordinator_that_stopped_before_relaying_still_yields_both_agents_reports(self):
+        # J8 #894 (2026-10-09): the coordinator hit its budget after both agents had handed back, so the only result
+        # text was its first "running in the background" note.
+        log = execution(result="Both review agents are running in the background.", turns=2,
+                        handbacks={AGENTS[0]: "TEST-ANALYZER-REPORT", AGENTS[1]: "SILENT-FAILURE-REPORT"})
+        code, console, _, usage, _ = run_step(NUMBERS, execution_file=log)
+        self.assertEqual(code, 0, console)
+        record = json.loads(usage)
+        self.assertEqual(record["report_sections"], list(AGENTS))
+        self.assertEqual(record["report_source"], "handbacks")
+        code, console, summary, *_ = run_step(REPORT, execution_file=log)
+        self.assertEqual(code, 0, console)
+        self.assertIn("TEST-ANALYZER-REPORT", summary)
+        self.assertIn("SILENT-FAILURE-REPORT", summary)
+        self.assertNotIn("running in the background", summary)
+
+    def test_one_missing_handback_still_fails_the_report_bound(self):
+        log = execution(result="Both review agents are running in the background.", turns=2,
+                        handbacks={AGENTS[0]: "TEST-ANALYZER-REPORT", AGENTS[1]: None})
+        code, console, *_ = run_step(NUMBERS, execution_file=log)
+        self.assertNotEqual(code, 0)
+        self.assertIn("1 of 2 agent reports", console)
+
+    def test_a_relay_with_both_sections_is_preferred_to_the_handbacks(self):
+        log = execution(handbacks={AGENTS[0]: "HANDBACK-A", AGENTS[1]: "HANDBACK-B"})
+        code, console, _, usage, _ = run_step(NUMBERS, execution_file=log)
+        self.assertEqual(code, 0, console)
+        self.assertEqual(json.loads(usage)["report_source"], "relay")
 
     def test_the_reports_are_the_last_result_with_text(self):
         # With background agents the client emits several result records; the last one can be an empty idle tick.

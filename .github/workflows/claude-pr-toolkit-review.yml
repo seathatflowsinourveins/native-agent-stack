@@ -260,7 +260,8 @@ jobs:
       # follows. It reads the session's own tool list: a missing list, any tool outside the allow-list (the session
       # reports the Agent tool as Task) or an MCP server fails the run, and the step names every bound it finds unmet.
       # The turn bound counts the coordinator's own assistant turns (distinct message ids without a parent tool use);
-      # the subagents' turns are theirs. The cost bound is the $5 budget plus a $2 allowance, because the client
+      # the subagents' turns are theirs. The reports come from the relay or, when it lacks a section, from the agents'
+      # handbacks, as in the report step. The cost bound is the $5 budget plus a $2 allowance, because the client
       # checks its budget after a turn and the background agents' last requests can land after that check.
       - name: Keep the run's numbers and check the bounds
         if: ${{ always() && steps.claude_toolkit.outputs.execution_file != '' }}
@@ -272,6 +273,7 @@ jobs:
           out="$RUNNER_TEMP/pr-toolkit-usage"
           mkdir -p "$out"
           jq -e '
+            . as $all |
             def count: type == "number" and . >= 0 and . == floor;
             def name: if type == "string" and test("^[A-Za-z0-9_.:@/-]{1,80}$") then . else "other" end;
             if type != "array" then error("unsupported execution shape") else . end |
@@ -283,11 +285,23 @@ jobs:
             then . else error("usage unavailable") end |
             (($init.tools // []) | map(select(type == "string"))) as $tools |
             ([.[] | select(.type == "result") | .result // "" | select(type == "string" and . != "")] | last // "")
-              as $text |
+              as $relay |
+            ([.[] | select(.type == "assistant" and (.parent_tool_use_id == null)) | .message.content[]?
+              | select(.type == "tool_use" and (.name == "Agent" or .name == "Task"))
+              | {id: .id, agent: ((.input.subagent_type // "") | tostring)}]) as $calls |
+            ([$calls[] | . as $c
+              | ([$all[] | select(.type == "assistant" and .parent_tool_use_id == $c.id) | .message.content[]?
+                  | select(.type == "tool_use" and .name == "SubagentHandback") | .input.message
+                  | select(type == "string" and . != "")] | last) as $m
+              | select($m != null) | "## \($c.agent)\n\n\($m)\n"] | join("\n")) as $handbacks |
+            (if ($relay | contains("## pr-review-toolkit:pr-test-analyzer") and
+                 contains("## pr-review-toolkit:silent-failure-hunter")) then $relay
+             elif $handbacks != "" then $handbacks else $relay end) as $text |
             ([.[] | select(.type == "assistant" and (.parent_tool_use_id == null)) | .message.id?
               | select(type == "string")] | unique | length) as $turns |
             {total_cost_usd: $result.total_cost_usd, num_turns: $result.num_turns, assistant_turns: $turns,
              result_chars: ($text | length),
+             report_source: (if $text == $relay then "relay" else "handbacks" end),
              report_sections: ([("pr-review-toolkit:pr-test-analyzer", "pr-review-toolkit:silent-failure-hunter")
                | select(. as $agent | $text | contains("## " + $agent))]),
              tools_listed: (($init.tools | type) == "array" and ($init.mcp_servers | type) == "array"),
@@ -336,7 +350,9 @@ jobs:
             exit 1
           fi
 
-      # The reports are the final result text only, capped and shown as preformatted text so nothing in them renders
+      # The reports are the coordinator's relay when it carries both sections, and otherwise each agent's own handback
+      # (its SubagentHandback message): a coordinator that hits its budget after both agents finished never relays
+      # (api-actions J8 #894, 2026-10-09). They are capped and shown as preformatted text so nothing in them renders
       # as Markdown or HTML on the run page.
       - name: Publish the reports to the job summary
         if: ${{ success() && steps.claude_toolkit.outputs.execution_file != '' }}
@@ -348,8 +364,22 @@ jobs:
         run: |
           set -euo pipefail
           report="$(mktemp)"
-          jq -r '[.[] | select(.type == "result") | .result // "" | select(type == "string" and . != "")] | last // ""' \
-            "$EXECUTION_FILE" > "$report"
+          jq -r '
+            . as $all |
+            ([.[] | select(.type == "result") | .result // "" | select(type == "string" and . != "")] | last // "")
+              as $relay |
+            ([.[] | select(.type == "assistant" and (.parent_tool_use_id == null)) | .message.content[]?
+              | select(.type == "tool_use" and (.name == "Agent" or .name == "Task"))
+              | {id: .id, agent: ((.input.subagent_type // "") | tostring)}]) as $calls |
+            ([$calls[] | . as $c
+              | ([$all[] | select(.type == "assistant" and .parent_tool_use_id == $c.id) | .message.content[]?
+                  | select(.type == "tool_use" and .name == "SubagentHandback") | .input.message
+                  | select(type == "string" and . != "")] | last) as $m
+              | select($m != null) | "## \($c.agent)\n\n\($m)\n"] | join("\n")) as $handbacks |
+            if ($relay | contains("## pr-review-toolkit:pr-test-analyzer") and
+                contains("## pr-review-toolkit:silent-failure-hunter")) then $relay
+            elif $handbacks != "" then $handbacks else $relay end
+          ' "$EXECUTION_FILE" > "$report"
           size="$(wc -c < "$report")"
           {
             echo "### Pull request toolkit read: #$PR_NUMBER at $HEAD_SHA"
