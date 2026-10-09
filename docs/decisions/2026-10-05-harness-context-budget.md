@@ -612,7 +612,7 @@ no full-repository Python acceptance is claimed. The unchanged workflow config a
 checksum lock were read back through git diff. Full returned outputs, including
 the failed reproductions, remain in the authorized repair TMPDIR. The coordinator
 commits and refreshes the registry last; both protected manifests remain unchanged.
-
+<a id="2026-10-05-repair-round-3-user-directed-listing-and-verbatim-rtk"></a>
 ## 2026-10-05 repair round 3: native skill listing and verbatim RTK
 
 CI run 37283231657, job 111676262001 at `ee37894af`, reported three failures

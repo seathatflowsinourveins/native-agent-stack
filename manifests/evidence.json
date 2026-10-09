@@ -17927,8 +17927,8 @@
     },
     {
       "path": "docs/decisions/2026-10-03-retire-gateway-ab-r02.md",
-      "sha256": "4f12a9239751a58982ae6e6bff62c80a465252dedaebae629fb73b4a5fe2a740",
-      "bytes": 28135
+      "sha256": "825178b861508b96ae3cd5252fd8b381f00824259641704356e3eaf9fe896536",
+      "bytes": 28149
     },
     {
       "path": "docs/decisions/2026-10-03-retire-gpt6-lane-compression-ab.md",
@@ -18087,8 +18087,8 @@
     },
     {
       "path": "docs/decisions/2026-10-05-harness-context-budget.md",
-      "sha256": "6a37ab27818720b19bed03e9266c5866d5e93f18254fc5220a8ae360d7465191",
-      "bytes": 60605
+      "sha256": "f793eece3b344fbe3baff6f52f402083a1a639838377324941989929363716c9",
+      "bytes": 60682
     },
     {
       "path": "docs/decisions/2026-10-05-main-checkout-backup-disposition.md",

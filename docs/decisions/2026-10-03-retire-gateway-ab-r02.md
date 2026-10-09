@@ -129,7 +129,7 @@ the current gateway build. The current build is the gateway owner's to state.[^b
 
 - The 2026-09-28T01:29:29Z freeze, `r02-freeze-20128`: "No routing change is applied to 20128 in that period."
   (`main:evidence/artifacts/omniroute-routing-20260928/decisions.json:29-33`).
-- The occupancy patch's apply-after-R02 order, including the user quote "Full patch after R02"
+- The 2026-09-28 apply-after-R02 condition: apply the complete occupancy patch only after the R02 scored run
   (`main:evidence/artifacts/omniroute-routing-20260928/decisions.json:36-41`).
 
 The freeze ended **in fact** no later than 2026-09-29 00:42Z. From then 20128 ran `5fc47d970` instead of the
