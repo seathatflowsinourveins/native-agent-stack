@@ -84,7 +84,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"${CLAUDE_PROJECT_DIR}\"/scripts/hooks/secret_path_guard.py",
+            "command": "f=\"${CLAUDE_PROJECT_DIR}/scripts/hooks/secret_path_guard.py\"; [ -f \"$f\" ] && exec /usr/bin/python3 \"$f\"; exec jq -n --arg f \"$f\" '\"Refused: the secret-path guard is not installed at \\($f)\\n\" | halt_error(2)'",
             "timeout": 10,
             "onFailure": "block"
           }

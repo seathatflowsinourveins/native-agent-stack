@@ -4921,8 +4921,8 @@
     },
     {
       "path": ".claude/settings.json",
-      "sha256": "2e67fcd45c61944ec7171438e3283542ddbab4bfcdf39ccc3b18a8f3612fcca2",
-      "bytes": 2918
+      "sha256": "8f65ca76f754b9c829de60685443fe1a16044cf2522a429076e0196683806117",
+      "bytes": 3069
     },
     {
       "path": ".claude/skills/omniroute-runtime-worker/SKILL.md",
@@ -18262,8 +18262,8 @@
     },
     {
       "path": "docs/decisions/2026-10-08-guard-hook-fails-closed.md",
-      "sha256": "315bc21041ad3a0a5543b419f31a4cfb0e7961ef99136ed29bd0773422f2dac3",
-      "bytes": 19863
+      "sha256": "9a1097a58c45a2e84d177e839a9ef0e4c7a40f4d68a913ba3527aba24438dac3",
+      "bytes": 20420
     },
     {
       "path": "docs/decisions/2026-10-08-harness-rules-consolidation.md",
@@ -58302,8 +58302,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "546c693013daec00927f238a0a50e5a5d289748f57d51b257fb5cef13bbc2a8f",
-      "bytes": 137778
+      "sha256": "83cb5381b09ef0044f312bd689380b2f61b4f23c09dd85df5e3d5cbe12617600",
+      "bytes": 139314
     },
     {
       "path": "tests/test_install_skills.py",

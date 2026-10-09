@@ -657,18 +657,23 @@ class SecretGuardProfileTests(unittest.TestCase):
             allowed = self.run_rendered(command, "git status")
             self.assertEqual((allowed.returncode, allowed.stderr), (0, ""))
 
+    @staticmethod
+    def broken_python3_path(base: Path) -> str:
+        """A PATH holding jq and a python3 that fails the way an inactive mise shim does, and no mise shim directory."""
+        bin_dir = base / "bin"
+        bin_dir.mkdir()
+        (bin_dir / "jq").symlink_to(shutil.which("jq"))
+        shim = bin_dir / "python3"
+        shim.write_text("#!/bin/sh\necho 'python3: no version is set for this shim' >&2\nexit 1\n")
+        shim.chmod(0o755)
+        return str(bin_dir)
+
     @unittest.skipUnless(Path("/usr/bin/python3").is_file() and shutil.which("jq"), "needs /usr/bin/python3 and jq")
     def test_rendered_hook_runs_the_system_interpreter_without_a_working_python3_on_path(self):
-        # PATH holds jq and a python3 that fails the way an inactive mise shim does, and no mise shim directory.
         with tempfile.TemporaryDirectory() as tmp:
-            home, bin_dir = Path(tmp) / "home", Path(tmp) / "bin"
+            home = Path(tmp) / "home"
             home.mkdir()
-            bin_dir.mkdir()
-            (bin_dir / "jq").symlink_to(shutil.which("jq"))
-            shim = bin_dir / "python3"
-            shim.write_text("#!/bin/sh\necho 'python3: no version is set for this shim' >&2\nexit 1\n")
-            shim.chmod(0o755)
-            env = {"PATH": str(bin_dir), "HOME": str(home)}
+            env = {"PATH": self.broken_python3_path(Path(tmp)), "HOME": str(home)}
             command = self.rendered_hook(home)
             self.assertIn('exec /usr/bin/python3 "$f"', command)
             missing = self.run_rendered(command, "git status", env)
@@ -679,6 +684,25 @@ class SecretGuardProfileTests(unittest.TestCase):
             self.assertEqual(blocked.returncode, 2)
             self.assertIn("credential_file_read", blocked.stderr)
             allowed = self.run_rendered(command, "git status", env)
+            self.assertEqual((allowed.returncode, allowed.stderr), (0, ""))
+
+    @unittest.skipUnless(Path("/usr/bin/python3").is_file() and shutil.which("jq"), "needs /usr/bin/python3 and jq")
+    def test_project_hook_runs_the_system_interpreter_and_refuses_a_missing_script(self):
+        command = next(hook["command"] for group in json.loads((ROOT / ".claude/settings.json").read_text())["hooks"]
+                       ["PreToolUse"] for hook in group["hooks"] if "secret_path_guard.py" in hook["command"])
+        self.assertIn('exec /usr/bin/python3 "$f"', command)
+        with tempfile.TemporaryDirectory() as tmp:
+            empty = Path(tmp) / "checkout-without-the-guard"
+            empty.mkdir()
+            env = {"PATH": self.broken_python3_path(Path(tmp)), "HOME": tmp}
+            missing = self.run_rendered(command, "git status", {**env, "CLAUDE_PROJECT_DIR": str(empty)})
+            self.assertEqual(missing.returncode, 2, "a checkout without the guard must block every Bash call")
+            self.assertIn("secret-path guard is not installed", missing.stderr)
+            checkout = {**env, "CLAUDE_PROJECT_DIR": str(ROOT)}
+            blocked = self.run_rendered(command, "cat \"$PAPER_ENV_FILE\"", checkout)
+            self.assertEqual(blocked.returncode, 2)
+            self.assertIn("credential_file_read", blocked.stderr)
+            allowed = self.run_rendered(command, "git status", checkout)
             self.assertEqual((allowed.returncode, allowed.stderr), (0, ""))
 
     def test_apply_merge_keeps_host_rules_and_adds_the_guard(self):
