@@ -260,7 +260,17 @@ metadata scope; none is a final-lock rerun.
 | CPython / uv | 3.12.3 / 0.12.17 | [Adapter's tested Python line](https://github.com/seathatflowsinourveins/native-agent-stack/blob/dca821cca85dce3647fa7b488d5a23fbe5b85d4a/blueprints/us-equities/adaptive-paper/requirements.txt), [retained rc5 runtime](../../../evidence/receipts/native-nautilus-v2-20260920.json), [uv Python installation](https://github.com/astral-sh/uv/blob/0.12.17/docs/guides/install-python.md) and [locked sync](https://github.com/astral-sh/uv/blob/0.12.17/docs/concepts/projects/sync.md) |
 | NautilusTrader / IBKR adapter | 2.0.0rc5; source `1b0a49d2792a9432a3aca3fcb617ce7a630d905e`; in-tree Rust ibapi 3.3.0 | [Installation](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/docs/getting_started/installation.md), [IBKR integration](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/docs/integrations/interactive_brokers.md) |
 | alpaca-py | 0.44.0 | [README at cc4cb3b7](https://github.com/alpacahq/alpaca-py/blob/cc4cb3b7ba50ae250e621983c2779047fb16bb28/README.md) |
-| Separate Alpaca adapter | `dca821cca85dce3647fa7b488d5a23fbe5b85d4a` | [Native adapter source](https://github.com/seathatflowsinourveins/native-agent-stack/blob/dca821cca85dce3647fa7b488d5a23fbe5b85d4a/blueprints/us-equities/adaptive-paper/native_adapter.py) |
+| Separate Alpaca adapter | `dfeea13377cfb15936f856d9ed8df3c6575a7895` | [Landed dry-run-only native adapter source](https://github.com/seathatflowsinourveins/native-agent-stack/blob/dfeea13377cfb15936f856d9ed8df3c6575a7895/blueprints/us-equities/adaptive-paper/native_adapter.py) |
+
+The installer and acceptance bind this landed source commit and adapter SHA256
+`50c9cff32944b45abb4c4aff20d2235688f5240c52e892a623aa6e19ecd9b037`.
+The landed adapter, source-map and seam-test bytes match the reviewed #939 head.
+This recipe source-pin update does not assert that an existing host checkout has
+moved. Native compatibility is checked offline with the installed rc5 runtime;
+broker order acceptance remains NOT_RUN, and builtin strategies are restricted
+to upstream `dry_run=True` configs. Protected N2 source/bundle pins and historical
+runtime receipts are unchanged. A runtime owner must preserve that closure and
+own the maintenance slot before applying the full installer to a shared checkout.
 | EdgarTools | 5.61.1 | [Version-specific PyPI metadata](https://pypi.org/pypi/edgartools/5.61.1/json); [imported native installation/verification scopes](../../../evidence/receipts/runtime-final-lock-binding-20261008.json). The older SEC index receipt remains at 5.60.0. |
 | exchange_calendars | 4.13.2 | [README at dbe38b1f](https://github.com/gerrymanoim/exchange_calendars/blob/dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a/README.md) |
 | DuckDB | 1.5.5 | [Python README at b236c819](https://github.com/duckdb/duckdb-python/blob/b236c8194ed14c7a7c685e0534dde501cc855b3a/README.md) |

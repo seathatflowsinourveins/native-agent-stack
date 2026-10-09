@@ -101,7 +101,7 @@ readonly previous_lock_hash=4c98672d14147a1be712bf788b495cf318705631cbf5e04ebe23
 readonly recorded_project_hash=581bbb38a265068791c1a8c92435f9859876fd613d3c2c87d618a223376b01e0
 readonly recorded_lock_hash=c6b5f25cd3198c1b847c1cb602fe5441dce7e038aa16976c46ecf5f0beb7b086
 readonly engine_commit=1b0a49d2792a9432a3aca3fcb617ce7a630d905e
-readonly adapter_commit=dca821cca85dce3647fa7b488d5a23fbe5b85d4a
+readonly adapter_commit=dfeea13377cfb15936f856d9ed8df3c6575a7895
 readonly quickstart_hash=487e6807dedd1a38062638eb671f6110799451611819542bf0f0c10646cb2c53
 # Version 10.45.1j is in the pinned gnzsnz README. Its image label identifies
 # build c147d206b8d5d8cd329feced09f02a9df61e84cc; e19aa0 is the documentation pin.
@@ -264,7 +264,7 @@ fi
 
 # adaptive-paper has no distributable project: preserve its selected source as
 # a separate sparse checkout. Do not execute runner.py, recovery.py or LiveNode.
-# https://github.com/seathatflowsinourveins/native-agent-stack/blob/dca821cca85dce3647fa7b488d5a23fbe5b85d4a/blueprints/us-equities/adaptive-paper/README.md
+# https://github.com/seathatflowsinourveins/native-agent-stack/blob/dfeea13377cfb15936f856d9ed8df3c6575a7895/blueprints/us-equities/adaptive-paper/README.md
 # https://github.com/git/git/blob/v2.43.0/Documentation/git-sparse-checkout.txt
 # https://github.com/git/git/blob/v2.43.0/Documentation/git-fetch.txt
 # https://github.com/git/git/blob/v2.43.0/Documentation/git-clone.txt
@@ -306,7 +306,7 @@ fi
 adapter_status=$("${safe[@]}" git -C "$adapter" status --porcelain)
 [[ -z $adapter_status ]] || die 'Adapter checkout has local changes.' 73
 "${safe[@]}" git -C "$adapter" diff --exit-code HEAD -- blueprints/us-equities/adaptive-paper
-printf '%s  %s\n' fbf530884c2ad3b9e0c2b1f989eda399531647cc1db3c56dc9bcac10174fea47 \
+printf '%s  %s\n' 50c9cff32944b45abb4c4aff20d2235688f5240c52e892a623aa6e19ecd9b037 \
     "$adapter/blueprints/us-equities/adaptive-paper/native_adapter.py" | sha256sum --check --status
 
 # Images are staged only. No run/create/compose-up or gateway sign-in occurs.

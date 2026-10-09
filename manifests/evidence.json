@@ -16502,17 +16502,17 @@
     },
     {
       "path": "blueprints/us-equities/runtime-2604/README.md",
-      "sha256": "0428df473d1245ce9222692bf78dd2fa8d6957271cc02bead76a1aebc7e34c60",
-      "bytes": 35736
+      "sha256": "6051dd6b29e24f62d34e0375b7ae8d7fd103216bea3b9cb295cadaf72f940400",
+      "bytes": 36468
     },
     {
       "path": "blueprints/us-equities/runtime-2604/accept-trading-2604.sh",
-      "sha256": "c0b2dc45cbe77949969eeb94f65e5b98750a720333b9fd337ca5903337baac44",
+      "sha256": "352e0f221d313ca18ea62805935439787228db0af96d7d690a742dfb8389d86e",
       "bytes": 13990
     },
     {
       "path": "blueprints/us-equities/runtime-2604/install-trading-2604.sh",
-      "sha256": "dbe61ddab078356a24430cf7b5ef91643a88506fbb6748c888bb3665f2900ee9",
+      "sha256": "89c81b283d0272fb46e52bbbb9263bd4e9b83cfa0cdec3bf72d3bc53af6e49c6",
       "bytes": 20381
     },
     {
