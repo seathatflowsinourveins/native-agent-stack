@@ -18467,8 +18467,8 @@
     },
     {
       "path": "docs/decisions/2026-10-08-g5-compact-evidence.md",
-      "sha256": "6f7604dd336b1e1cf8650cbf408a76f8e3b99af24322aed1d32ce8419be1505f",
-      "bytes": 14888
+      "sha256": "61a2fa273ea239ca48c6d6b4b78340fe37aaed2ed2a1d26bc9fd71af64ebc569",
+      "bytes": 14792
     },
     {
       "path": "docs/decisions/2026-10-08-guard-hook-fails-closed.md",
@@ -18657,8 +18657,8 @@
     },
     {
       "path": "docs/g5-refresh-procedure.md",
-      "sha256": "e71dee5e70505601cb42491b4eab673325cb6e25b64eee2ae675b01529df23bc",
-      "bytes": 13806
+      "sha256": "d708cfcdeb1b3eb880ae268dba3c1f7f48b9b9b915f7d52d3e57f690fe4fddce",
+      "bytes": 14411
     },
     {
       "path": "docs/gap-crosswalk-92bb279.md",
@@ -61429,6 +61429,11 @@
       "path": "tools/sota-convergence/reconciliations-20260922.json",
       "sha256": "a512097b7dc9b912e2e9efec0027f9d28cb9e836ee0c2d9ed93c97a81b9a1b5a",
       "bytes": 7097
+    },
+    {
+      "path": "tools/sota-convergence/sealed_r3_generator.py",
+      "sha256": "80e69ff94f97fffdf906583fa280f2a60a7487a54f0b58b05342264a5adf9627",
+      "bytes": 42631
     },
     {
       "path": "tools/token-e2e/README.md",

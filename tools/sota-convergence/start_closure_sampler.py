@@ -102,6 +102,61 @@ def declared_capture_index(rows, origin_map, native):
     return index
 
 
+def derive_origin_map(manifest, manifest_sha, provenance, provenance_sha, declarations, native, r3):
+    """Join native retained provenance with explicit root-owned family declarations."""
+    require(manifest.get("validation", {}).get("status") == "PASS" and manifest["validation"].get("profile") == PROFILE,
+            "Origin derivation requires the passing START manifest")
+    require(provenance.get("schema_version") == 1 and isinstance(provenance.get("origins"), list), "Unsupported retained origin provenance")
+    require(declarations.get("source_provenance_sha256") == provenance_sha, "Family declarations do not bind retained provenance")
+    families = {}
+    for declaration in declarations.get("declarations", []):
+        fragment_key = (declaration["fragment"], declaration["artifact_sha256"])
+        require(fragment_key not in families and declaration["parent_family"] in r3.PARENT_FAMILIES, "Duplicate or unknown declared parent family")
+        families[fragment_key] = declaration
+    retained = {}
+    for origin in provenance["origins"]:
+        key = native.decision_key(origin)
+        require(key not in retained, "Duplicate retained origin key")
+        retained[key] = origin
+    output = {"schema_version": 1, "manifest_sha256": manifest_sha, "stratum_contract_sha256": CONTRACT_SHA256,
+              "source_provenance_sha256": provenance_sha, "origins": [], "pending_origins": [],
+              "family_declarations": copy.deepcopy(declarations), "unreachable_sampled_rows": []}
+    keys = set()
+    for row in manifest["rows"]:
+        key = native.decision_key(row)
+        require(key not in keys, "Duplicate native origin derivation key")
+        keys.add(key)
+        key_record = {name: copy.deepcopy(row[name]) for name in ("repository_or_entry", "slot", "qualification") if name in row}
+        if key not in retained:
+            pending = {"key": key_record, "status": "PENDING", "reason_code": "retained-provenance-missing",
+                       "measurement": "Recover an explicit original fragment, artifact hash and owner from custody; do not infer an origin."}
+            output["pending_origins"].append(pending)
+            if row["disposition"] not in ACTION and CONFLICT_FLAG not in row.get("closure", {}):
+                output["unreachable_sampled_rows"].append({"key": key_record, "disposition": row["disposition"]})
+            continue
+        original = retained[key]
+        row_refs = row.get("source_refs", []) + [ref for choice in row.get("choices", []) for ref in choice["source_refs"]]
+        groups = {}
+        for ref in original["source_refs"]:
+            require(any(r3.source_ref_matches(ref, old) for old in row_refs), "Retained origin reference differs from the exact final reference")
+            fragment_key = (ref["source_id"], ref["sha256"])
+            require(ref["source_id"] in original["fragments"] and fragment_key in families, "Origin lacks its explicit fragment/family declaration")
+            declaration = families[fragment_key]
+            require(declaration["owner_lane"] == ref["owner_lane"], "Declared family owner differs from retained source owner")
+            group = groups.setdefault(fragment_key, {"fragment": ref["source_id"], "artifact_sha256": ref["sha256"],
+                "owner_lane": ref["owner_lane"], "parent_family": declaration["parent_family"], "source_refs": []})
+            require(group["owner_lane"] == ref["owner_lane"], "Retained fragment has inconsistent owners")
+            if ref not in group["source_refs"]:
+                group["source_refs"].append(copy.deepcopy(ref))
+        require(bool(groups), "Retained origin has no literal source reference")
+        output["origins"].append({"key": key_record, "fragments": [groups[k] for k in sorted(groups)]})
+    require(set(retained) <= keys, "Retained provenance contains orphan native keys")
+    output["counts"] = {"rows": len(keys), "origins_retained": len(output["origins"]), "origins_pending": len(output["pending_origins"]),
+                        "pending_census_origins": len(output["pending_origins"]) - len(output["unreachable_sampled_rows"]),
+                        "unreachable_sampled_rows": len(output["unreachable_sampled_rows"]), "declared_fragments": len(families)}
+    return output
+
+
 def rows_and_origins(manifest, origin_map, manifest_sha, native, validator, r3):
     require(manifest.get("kind") == "g5-compact-landscape" and manifest.get("schema_version") == 1,
             "Input is not a native compact manifest")
@@ -161,13 +216,23 @@ def rows_and_origins(manifest, origin_map, manifest_sha, native, validator, r3):
                 require("owner_lane" not in ref or ref["owner_lane"] == owner, "Source proof owner differs")
                 require(any(r3.source_ref_matches(ref, old) for old in original_refs),
                         "Fragment source proof is not an original row reference")
+    for pending in origin_map.get("pending_origins", []):
+        key = native.key(pending["key"])
+        require(key in rows and key not in origins, "Duplicate or orphan PENDING origin key")
+        require(pending.get("status") == "PENDING" and pending.get("reason_code") == "retained-provenance-missing"
+                and isinstance(pending.get("measurement"), str) and bool(pending["measurement"].strip()), "PENDING origin requires an explicit reason and measurement")
+        row = rows[key]["row"]
+        require(row["disposition"] in ACTION or CONFLICT_FLAG in row.get("closure", {}),
+                "A sampled row cannot have PENDING origin; report its unreachable stratum before drawing")
+        origins[key] = []  # Explicit census-only absence; no fragment/owner is invented.
+        rows[key]["origin_pending"] = copy.deepcopy(pending)
     require(set(origins) == set(rows), "Origin map does not cover every final row")
     return rows, origins, fragments
 
 
 def select(rows, origins, fragments, classes, r3):
     """Call the sealed draw helper and restore original, unprojected evidence."""
-    eligible = {key: item for key, item in rows.items() if CONFLICT_FLAG not in item["row"].get("closure", {})}
+    eligible = {key: item for key, item in rows.items() if CONFLICT_FLAG not in item["row"].get("closure", {}) and origins[key]}
     draw_origins = copy.deepcopy(origins)
     for bindings in draw_origins.values():
         for fragment in bindings:
@@ -207,7 +272,9 @@ def packet_counts(packets, rows):
             "unique_census_rows": len(actions | conflicts), "pending_conflict_census_memberships": len(conflicts),
             "final_action_census_memberships": sum(p["selected_count"] for p in packets if p["selection_mode"] == "FULL-CENSUS"),
             "sample_memberships": memberships, "unique_sampled_rows": len(sampled_keys),
-            "sample_overlap_memberships": memberships - len(sampled_keys), "unique_selected_rows": len(selected_keys | conflicts),
+            "sample_overlap_memberships": memberships - len(sampled_keys), "unique_selected_rows": len(selected_keys | conflicts | actions),
+            "pending_origin_census_rows": sum("origin_pending" in item for item in rows.values()),
+            "pending_origins_excluded_from_samples": sum("origin_pending" in item for item in rows.values()),
             "rows_with_both_closure_flags": sum(all(f in i["row"].get("closure", {}) or any(residue["bucket"] == label for residue in i["row"].get("closure", {}).get("residue", [])) for label, f in FLAGS.items()) for i in rows.values()),
             "pending_conflict_excluded_from_samples": len(conflicts),
             "conflict_sample_flag_exclusions": {label: sum(flag in rows[key]["row"].get("closure", {}) or any(residue["bucket"] == label for residue in rows[key]["row"].get("closure", {}).get("residue", [])) for key in conflicts)
@@ -265,6 +332,8 @@ def census_read_set(actions, conflicts, rows, action_sha, conflict_sha):
                 selected["action_side_row_ids"] = copy.deepcopy(entry["action_side_row_ids"])
             if "origin_pointer" in item["row"]:
                 selected["origin_pointer"] = copy.deepcopy(item["row"]["origin_pointer"])
+            if "origin_pending" in item:
+                selected["origin_pending"] = copy.deepcopy(item["origin_pending"])
             combined["rows"].append(selected)
     combined["count"] = len(combined["rows"])
     return combined
@@ -360,13 +429,74 @@ def build_packet(*, profile, manifest_path, manifest_sha256, origin_map_path, or
             "packet_manifest_sha256": r3.digest(files["manifest.json"]), "counts": counts, "reads": "NOT_RUN"}
 
 
+def draw_proof(*, manifest_path, manifest_sha256, origin_map_path, origin_map_sha256,
+               protocol_sha256, r3_generator, r3_sha256, head, output):
+    """Run the native selector under an explicit comparison pin without a model read."""
+    require(isinstance(head, str) and re.fullmatch(r"[0-9a-f]{40}", head), "Comparison head must be a full commit id")
+    r3 = import_verified(Path(r3_generator), r3_sha256, "g5_r3_comparison")
+    require(sys.version_info[:3] == (3, 14, 4), "The sealed R3 stream requires native Python 3.14.4")
+    pinned_bytes(Path(r3.random.__file__), r3.PINS["random"])
+    require(r3.SEED == SEED and r3.QUOTA == QUOTA, "Comparison seed or quota differs")
+    native, repo = load_native(PROTOCOL, protocol_sha256, r3)
+    manifest = native.load(pinned_bytes(manifest_path, manifest_sha256))
+    origin_map = native.load(pinned_bytes(origin_map_path, origin_map_sha256))
+    from jsonschema import Draft202012Validator
+    schema = native.load(pinned_bytes(repo / ROW_SCHEMA, manifest["row_schema"]["sha256"]))
+    rows, origins, fragments = rows_and_origins(manifest, origin_map, manifest_sha256, native, Draft202012Validator(schema), r3)
+    packets = select(rows, origins, fragments, schema["properties"]["disposition"]["enum"], r3)
+    proof = {"schema_version": 1, "kind": "g5-paired-native-draw", "profile": PROFILE,
+             "manifest_sha256": manifest_sha256, "origin_map_sha256": origin_map_sha256,
+             "head": head, "seed": SEED, "quota": QUOTA, "packets": packets}
+    raw = (r3.canonical(proof) + "\n").encode()
+    destination = Path(output)
+    require(not destination.exists(), "Draw-proof output already exists")
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    destination.write_bytes(raw)
+    return {"packet_sha256": r3.digest(raw), "packet_bytes": len(raw), "strata": len(packets),
+            "manifest_sha256": manifest_sha256, "origin_map_sha256": origin_map_sha256, "head": head,
+            "r3_sha256": r3_sha256, "counts": packet_counts(packets, rows), "family_review": "NOT_RUN"}
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--profile", choices=[PROFILE], required=True)
+    parser.add_argument("--derive-origin-map", action="store_true")
+    parser.add_argument("--draw-proof", action="store_true")
+    parser.add_argument("--proof-r3-sha256")
     for name in ("manifest", "manifest-sha256", "origin-map", "origin-map-sha256", "protocol-sha256", "r3-generator", "head", "output-root", "output"):
-        parser.add_argument("--" + name, required=True)
+        parser.add_argument("--" + name)
+    for name in ("origin-provenance", "origin-provenance-sha256", "family-declarations", "family-declarations-sha256", "origin-map-output"):
+        parser.add_argument("--" + name)
     args = parser.parse_args(argv)
     try:
+        require(not (args.derive_origin_map and args.draw_proof), "Choose one native preparation mode")
+        if args.derive_origin_map:
+            for name in ("manifest", "manifest_sha256", "protocol_sha256", "r3_generator", "origin_provenance", "origin_provenance_sha256", "family_declarations", "family_declarations_sha256", "origin_map_output"):
+                require(getattr(args, name) is not None, "Missing --" + name.replace("_", "-"))
+            r3 = load_r3(args.r3_generator)
+            native, _ = load_native(PROTOCOL, args.protocol_sha256, r3)
+            manifest = native.load(pinned_bytes(args.manifest, args.manifest_sha256))
+            provenance = native.load(pinned_bytes(args.origin_provenance, args.origin_provenance_sha256))
+            declarations = native.load(pinned_bytes(args.family_declarations, args.family_declarations_sha256))
+            derived = derive_origin_map(manifest, args.manifest_sha256, provenance, args.origin_provenance_sha256, declarations, native, r3)
+            destination = Path(args.origin_map_output)
+            require(not destination.exists(), "Origin-map output already exists")
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            raw = (r3.canonical(derived) + "\n").encode()
+            destination.write_bytes(raw)
+            print(json.dumps({"origin_map_sha256": r3.digest(raw), "counts": derived["counts"], "unreachable_sampled_rows": derived["unreachable_sampled_rows"]}, sort_keys=True))
+            return 1 if derived["unreachable_sampled_rows"] else 0
+        if args.draw_proof:
+            for name in ("manifest", "manifest_sha256", "origin_map", "origin_map_sha256", "protocol_sha256", "r3_generator", "proof_r3_sha256", "head", "output"):
+                require(getattr(args, name) is not None, "Missing --" + name.replace("_", "-"))
+            result = draw_proof(manifest_path=args.manifest, manifest_sha256=args.manifest_sha256,
+                origin_map_path=args.origin_map, origin_map_sha256=args.origin_map_sha256,
+                protocol_sha256=args.protocol_sha256, r3_generator=args.r3_generator,
+                r3_sha256=args.proof_r3_sha256, head=args.head, output=args.output)
+            print(json.dumps(result, sort_keys=True))
+            return 0
+        for name in ("manifest", "manifest_sha256", "origin_map", "origin_map_sha256", "protocol_sha256", "r3_generator", "head", "output_root", "output"):
+            require(getattr(args, name) is not None, "Missing --" + name.replace("_", "-"))
         result = build_packet(profile=args.profile, manifest_path=args.manifest, manifest_sha256=args.manifest_sha256,
                               origin_map_path=args.origin_map, origin_map_sha256=args.origin_map_sha256,
                               protocol_sha256=args.protocol_sha256, r3_generator=args.r3_generator, head=args.head,

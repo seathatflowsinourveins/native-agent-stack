@@ -45,7 +45,9 @@ Run native catalog and manifest checks. Register owned evidence with `host_recei
 
 Both designated families review every ADOPT-NOW and TRIAL row against primary sources. Other rows follow the [stratified plan](decisions/2026-10-08-g5-compact-evidence.md): 59 random rows per fragment and disposition, or census for smaller strata, with a frozen seed, population and sampler version. Retain defects, root-cause corrections, failed attempts and revised seeds. State only the verification claim supported by actual results.
 
-The profile sampler is the tracked `tools/sota-convergence/start_closure_sampler.py` (SHA256 `2cee742863f7f69acad0ad9847750b4f5cb620ee7d5ed0155854c459037b1fb5`), using native [CPython 3.14.4 random.sample](https://github.com/python/cpython/blob/v3.14.4/Lib/random.py) and pinned `random.py` SHA256 `62dca8cdae7482513b99bb093ff038afd5131954e7eb78166d673a772cee871c`. Its companion contract SHA256 is `744e1729ddd16a7d91378aebd35feea0acfba9932e49b831675fb1246a32ffde`. Resolve the retained-evidence locator `coverage-gap-20261008/landscape-stars/revisions/g5-sampler-r3-20261008T1934Z/generator.py` against the private research root, verify SHA256 `80e69ff94f97fffdf906583fa280f2a60a7487a54f0b58b05342264a5adf9627`, and supply it through `--r3-generator`. The record chooses this unchanged retained source instead of committing its historical host paths. The co-op runs one draw after the landing-prep head is posted; retain its seed, population hash per stratum, sampler path@commit/hash and selected row IDs. Both families use that single packet and the same defect classes: the profile's reason codes plus pin, locator, capture-hash, disposition and other. Packet creation runs no model read and establishes no zero-defect acceptance.
+The profile sampler is the tracked `tools/sota-convergence/start_closure_sampler.py` (SHA256 `9b6ecd5317949b8a217668648d0649cdfa8101f80ab333c7776e7de5f00c7102`), using native [CPython 3.14.4 random.sample](https://github.com/python/cpython/blob/v3.14.4/Lib/random.py) and pinned `random.py` SHA256 `62dca8cdae7482513b99bb093ff038afd5131954e7eb78166d673a772cee871c`. Its START contract SHA256 is `744e1729ddd16a7d91378aebd35feea0acfba9932e49b831675fb1246a32ffde`. The privacy-safe R3 reseal is `tools/sota-convergence/sealed_r3_generator.py`, SHA256 `759facff52170f452290077b71d328f299b2c763df0358d126973c60886515c7`; historical source SHA256 `80e69ff94f97fffdf906583fa280f2a60a7487a54f0b58b05342264a5adf9627` remains in private custody. Only the two historical path defaults change, to repository siblings; seed, QUOTA and selection source remain byte-identical. The historical R2 contract `tools/sota-convergence/sealed_r3_stratum_contract.json` retains SHA256 `c12428493bd8aa76785a6b08f15b1e0e20b5cc169f2bcd6831c7d75ea84573fd`; the companion explicitly supplies the current protocol and START contract.
+
+Before accepting the new R3 pin, run the original and reseal through the native selection helpers on identical passing-manifest, origin-map and head inputs. Record both commands, both packet hashes and per-stratum selected-row-ID/population-hash equality. A missing origin map keeps this comparison pending; do not substitute fixture results. After the comparison passes, pin the reseal in the companion and use the repository path through `--r3-generator`. The privacy gate remains unchanged. The co-op runs one shared draw after the passing landing-prep head is posted; retain its seed, population hash per stratum, sampler path@commit/hash and selected row IDs. Both families use that single packet and the same defect classes: profile reasons plus pin, locator, capture-hash, disposition and other. Packet creation runs no model read and establishes no zero-defect acceptance.
 
 Keep the PR a draft while inputs or required checks are open. The explicit catalog and release cue controls landing and publication. After landing, attach the final asset and `SHA256SUMS` to its pinned release, verify remote bytes and the tag binding on main, and retain the receipt. A prospective tag or local archive does not substitute for that verification.
 
@@ -74,6 +76,18 @@ python3 tools/sota-convergence/compact_manifest.py \
 python3 tools/sota-convergence/compact_manifest.py \
   --asset g5-landscape-evidence-2026-10-08.tar.zst \
   --manifest full-qualification.manifest.json --check
+```
+
+The co-op's shared packet command uses the committed sampler source and exact frozen inputs. Replace the task variables with their actual paths, hashes and landing-prep head; use native Python 3.14.4:
+
+```sh
+python3 tools/sota-convergence/start_closure_sampler.py \
+  --profile start-closure/1 \
+  --manifest "$G5_MANIFEST" --manifest-sha256 "$G5_MANIFEST_SHA256" \
+  --origin-map "$G5_ORIGIN_MAP" --origin-map-sha256 "$G5_ORIGIN_MAP_SHA256" \
+  --protocol-sha256 "$G5_PROTOCOL_SHA256" \
+  --r3-generator tools/sota-convergence/sealed_r3_generator.py \
+  --head "$G5_HEAD" --output-root "$G5_PACKET_ROOT" --output "$G5_PACKET_NAME"
 ```
 
 The face must identify `validation.profile` and every class/bucket count, including PENDING-PIN, PENDING-LOCATOR, counted-inventory, origin-unresolved and G5-F1/F2/F3. Test each row-level class against default blocking, action blocking, non-action counting and equality of face counts to per-row residue sums. Record separate unique-row, append-event, physical inventory, claim-ID and global mapping units; overlapping buckets are not added. Run module tests with a 600-second timeout. Register the two owned docs with the repository's `host_receipts.register_file` before `python3 scripts/validate.py`, and commit the shared registry last.

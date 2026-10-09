@@ -340,6 +340,56 @@ class NativeSamplerTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "every final row"):
             self.validated(manifest, origins, manifest_sha)
 
+    def test_declared_pending_action_origin_remains_full_census_without_sample_inference(self):
+        self.add_row("TRIAL", origin_pointer="unresolved")
+        self.add_row("WATCH")
+        manifest, origins, manifest_sha = self.inputs()
+        missing = origins["origins"].pop(0)
+        origins["pending_origins"] = [{"key": missing["key"], "status": "PENDING", "reason_code": "retained-provenance-missing", "measurement": "Recover original fragment provenance"}]
+        rows, provenance, fragments = self.validated(manifest, origins, manifest_sha)
+        packets = sampler.select(rows, provenance, fragments, list(self.native.CLASSES), self.r3)
+        actions = sampler.action_read_set(rows, manifest, manifest_sha, "a" * 40)
+        self.assertEqual(len(actions["rows"]), 1)
+        self.assertFalse(any(item["row"]["disposition"] == "TRIAL" for packet in packets for item in packet["selected"]))
+        counts = sampler.packet_counts(packets, rows)
+        self.assertEqual(counts["unique_final_action_rows"], 1)
+        self.assertEqual(counts["pending_origin_census_rows"], 1)
+        self.assertEqual(counts["unique_selected_rows"], 2)
+
+    def test_pending_origin_cannot_exempt_sampled_rows_or_omit_reason_and_measurement(self):
+        self.add_row("WATCH")
+        manifest, origins, manifest_sha = self.inputs()
+        missing = origins["origins"].pop()
+        declaration = {"key": missing["key"], "status": "PENDING", "reason_code": "retained-provenance-missing", "measurement": "Recover original provenance"}
+        origins["pending_origins"] = [declaration]
+        with self.assertRaisesRegex(ValueError, "sampled row"):
+            self.validated(manifest, origins, manifest_sha)
+        self.add_row("TRIAL")
+        manifest, origins, manifest_sha = self.inputs()
+        missing = origins["origins"].pop()
+        origins["pending_origins"] = [{"key": missing["key"], "status": "PENDING", "reason_code": "retained-provenance-missing", "measurement": ""}]
+        with self.assertRaisesRegex(ValueError, "reason and measurement"):
+            self.validated(manifest, origins, manifest_sha)
+
+    def test_native_origin_derivation_preserves_exact_refs_and_explicit_rollups(self):
+        self.add_row("WATCH")
+        self.add_row("TRIAL")
+        manifest, origins, manifest_sha = self.inputs()
+        binding = origins["origins"][0]
+        fragment = binding["fragments"][0]
+        provenance = {"schema_version": 1, "origins": [{**binding["key"], "fragments": [fragment["fragment"]], "source_refs": fragment["source_refs"]}]}
+        provenance_sha = digest(raw(provenance))
+        declarations = {"source_provenance_sha256": provenance_sha, "declarations": [{name: fragment[name] for name in ("fragment", "artifact_sha256", "owner_lane", "parent_family")}]}
+        derived = sampler.derive_origin_map(manifest, manifest_sha, provenance, provenance_sha, declarations, self.native, self.r3)
+        self.assertEqual(derived["counts"]["origins_retained"], 1)
+        self.assertEqual(derived["counts"]["origins_pending"], 1)
+        self.assertEqual(derived["counts"]["unreachable_sampled_rows"], 0)
+        self.assertEqual(derived["origins"][0]["fragments"][0]["source_refs"], fragment["source_refs"])
+        self.validated(manifest, derived, manifest_sha)
+        declarations["declarations"][0]["owner_lane"] = "invented-owner"
+        with self.assertRaisesRegex(ValueError, "owner differs"):
+            sampler.derive_origin_map(manifest, manifest_sha, provenance, provenance_sha, declarations, self.native, self.r3)
+
     def test_action_row_and_every_primary_source_remain_pinned(self):
         self.add_row("TRIAL")
         for target in ("row", "source"):
