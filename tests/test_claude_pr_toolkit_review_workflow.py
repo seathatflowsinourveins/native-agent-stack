@@ -400,9 +400,20 @@ class PullRequestToolkitStepTests(unittest.TestCase):
                 code, console, *_ = run_step(GUARD, {"DIFF_PATHS": paths})
                 self.assertEqual(code, 0, console)
 
+    def test_the_guard_binds_debug_logging_set_as_a_repository_secret_or_variable(self):
+        # GitHub's "Enabling debug logging": step debug logging and runner diagnostic logging are each enabled by a
+        # secret or a variable of that name, the secret taking precedence; neither reaches a step's shell unbound.
+        env = step(GUARD)["env"]
+        self.assertEqual(env["STEP_DEBUG_SETTING"],
+                         "${{ (secrets.ACTIONS_STEP_DEBUG || vars.ACTIONS_STEP_DEBUG) == 'true' }}")
+        self.assertEqual(env["RUNNER_DIAGNOSTICS_SETTING"],
+                         "${{ (secrets.ACTIONS_RUNNER_DEBUG || vars.ACTIONS_RUNNER_DEBUG) == 'true' }}")
+        self.assertEqual(env["RUNNER_DEBUG_SIGNAL"], "${{ runner.debug }}")
+
     def test_each_debug_signal_and_a_pre_existing_settings_file_stop_the_job(self):
         for name, value in (("ACTIONS_STEP_DEBUG", "true"), ("ACTIONS_RUNNER_DEBUG", "true"),
-                            ("RUNNER_DEBUG", "1"), ("RUNNER_DEBUG_SIGNAL", "1")):
+                            ("RUNNER_DEBUG", "1"), ("RUNNER_DEBUG_SIGNAL", "1"), ("STEP_DEBUG_SETTING", "true"),
+                            ("RUNNER_DIAGNOSTICS_SETTING", "true")):
             with self.subTest(signal=name):
                 self.assertEqual(run_step(GUARD, {name: value})[0], 2)
         for kind in ("file", "dangling-symlink"):
@@ -593,6 +604,16 @@ class PullRequestToolkitStepTests(unittest.TestCase):
         self.assertLess(len(summary.encode("utf-8")), 61000)
         self.assertNotIn(TRANSCRIPT_MARKER, summary)
         self.assertIn("bytes; the first 60,000 are shown.", summary)
+
+    def test_a_report_of_exactly_the_cap_has_no_notice_and_one_byte_more_has_one(self):
+        # J8 micro read of #892 (2026-10-09): `jq -r` added a newline, so a 60,000-byte report was announced as cut.
+        code, console, summary, *_ = run_step(REPORT, execution_file=execution(result="a" * 60000))
+        self.assertEqual(code, 0, console)
+        self.assertIn("a" * 60000, summary)
+        self.assertNotIn("are shown.", summary)
+        code, console, summary, *_ = run_step(REPORT, execution_file=execution(result="a" * 60001))
+        self.assertEqual(code, 0, console)
+        self.assertIn("The report is 60001 bytes; the first 60,000 are shown.", summary)
 
     def test_the_cap_never_splits_a_character_and_a_short_report_has_no_notice(self):
         code, console, summary, *_ = run_step(REPORT, execution_file=execution(result="a" + "é" * 40000))

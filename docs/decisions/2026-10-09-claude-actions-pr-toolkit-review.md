@@ -127,7 +127,7 @@ then the same agents run locally on the second key, which already meets the need
 - `tests.test_workflow_security_coverage.NewWorkflowSecurityCoverageTests`: the coverage set gains the workflow, with
   its own offline zizmor test.
 
-New, in `tests/test_claude_pr_toolkit_review_workflow.py` (39 tests): the trigger, condition, permissions, checkout
+New, in `tests/test_claude_pr_toolkit_review_workflow.py` (41 tests): the trigger, condition, permissions, checkout
 layout, toolkit checkout, step order, pin, inputs, time limits, flags, prompt and settings are asserted from the
 workflow file; the guard, binding, diff, toolkit check, numbers and report steps are executed as written against
 local stand-ins for `gh` and `git` and a local git repository. They run without PyYAML, through the policy test's own
@@ -135,6 +135,31 @@ loader. Eight weakened copies of the workflow each fail at least one test: the r
 count including the agents' turns, Bash allowed, no time scaling, no hash check, the toolkit ref moved to `main`, the
 runtime `plugins` input added, and a $70 cost bound. Three more each fail them for the handback fallback: the
 handbacks ignored, the wrong handback tool name, and the handbacks preferred over a complete relay.
+
+## Debug logging set as a repository secret or variable (2026-10-09)
+
+A read of this workflow against official practice for `anthropics/claude-code-action` v1.0.247 (the cc-native-practice
+lane's L3 delta, requirement R4) found that the guard step could not see debug logging enabled through a repository
+secret or variable. Step debug logging and runner diagnostic logging are each enabled by a secret or a variable named
+`ACTIONS_STEP_DEBUG` or `ACTIONS_RUNNER_DEBUG`, the secret taking precedence (GitHub, "Enabling debug logging"), and
+neither reaches a step's shell unless it is bound; `runner.debug` reflects step debug logging, a debug re-run
+included, but not runner diagnostic logging. The guard now binds
+`(secrets.ACTIONS_STEP_DEBUG || vars.ACTIONS_STEP_DEBUG) == 'true'` as `STEP_DEBUG_SETTING` and
+`(secrets.ACTIONS_RUNNER_DEBUG || vars.ACTIONS_RUNNER_DEBUG) == 'true'` as `RUNNER_DIAGNOSTICS_SETTING`, so only
+`true` or `false` reaches the shell, and refuses either before any token is requested. This is hardening, not a closed
+leak: the action step already pins `ACTIONS_STEP_DEBUG: 'false'` in its own environment, which is what the action's
+full-output switch reads (`base-action/src/parse-sdk-options.ts`). zizmor's auditor persona reports
+`secrets-outside-env` (medium) on the two secret reads; the repository's CI runs the regular persona, pedantic
+suppresses it, and each read yields a boolean only. A test pins both bindings and the guard test refuses each
+setting; weakened copies are listed with the checks of this change.
+
+## The report notice at the cap (2026-10-09)
+
+The J8 micro read of #892 found an off-by-one in the publish step: `jq -r` adds a newline, so the file it wrote was
+one byte longer than the report text, and a report of exactly 60,000 bytes was announced as cut although nothing
+was. The step now writes the text with `jq -j`, which adds none, and a test publishes reports of exactly 60,000 and
+60,001 bytes (no notice, then the notice); a copy that writes with `jq -r` again fails it. The step's comment now
+says it publishes the last non-empty result text, which it does.
 
 ## Alternatives considered
 
