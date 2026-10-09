@@ -95,17 +95,26 @@ def _safe_path(path, reads, role="architecture_inventory"):
     return resolved
 
 
-def _entries(root):
+def _entries(root, listings=None):
     """List names through native no-follow directory descriptors, without leaf stat."""
     if _blocked(root):
         return []
     try:
         with _policy()._directory(root) as directory:
             entries = sorted(os.listdir(directory))
-    except OSError:
+    except OSError as error:
+        if listings is not None:
+            listings[str(root)] = {"path": str(root), "type": "directory-listing", "status": "UNREPORTED",
+                                   "entry_count": None, "error_type": type(error).__name__,
+                                   "reason": "Inventory directory names unavailable; empty inventory is not inferred",
+                                   "sha256": None, "bytes": None}
         return []
     if len(entries) > MAX_ENTRIES:
         raise ValueError("inventory directory entry limit exceeded")
+    if listings is not None:
+        listings[str(root)] = {"path": str(root), "type": "directory-listing", "status": "REPORTED",
+                               "entry_count": len(entries), "error_type": None, "reason": None,
+                               "sha256": None, "bytes": None}
     return [root / name for name in entries]
 
 
@@ -115,9 +124,9 @@ def _known_container(path, reads):
                for root_name, relative in reads.allowed.get(role, set()))
 
 
-def _files(root, depth=0, metadata_suffixes=(), *, reads=None, unknown_entries=None):
+def _files(root, depth=0, metadata_suffixes=(), *, reads=None, unknown_entries=None, listings=None):
     found = []
-    for path in _entries(root):
+    for path in _entries(root, listings):
         if _blocked(path):
             continue
         if path.suffix in metadata_suffixes or path.name == "SHA256SUMS" or path.name.endswith("manifest.json"):
@@ -125,7 +134,7 @@ def _files(root, depth=0, metadata_suffixes=(), *, reads=None, unknown_entries=N
             continue
         if depth and not path.suffix:
             if reads is not None and _known_container(path, reads):
-                found.extend(_files(path, depth - 1, metadata_suffixes, reads=reads, unknown_entries=unknown_entries))
+                found.extend(_files(path, depth - 1, metadata_suffixes, reads=reads, unknown_entries=unknown_entries, listings=listings))
             elif unknown_entries is not None:
                 unknown_entries.add(path)
         else:
@@ -133,9 +142,9 @@ def _files(root, depth=0, metadata_suffixes=(), *, reads=None, unknown_entries=N
     return found
 
 
-def _skills(root, reads):
+def _skills(root, reads, listings=None):
     found, unknown = [], []
-    for path in _entries(root):
+    for path in _entries(root, listings):
         if _blocked(path):
             continue
         candidate = path / "SKILL.md"
@@ -145,7 +154,7 @@ def _skills(root, reads):
             # A reviewed container such as .system can enumerate its names;
             # an unknown entry grants no authority to enter or stat it.
             if _known_container(path, reads):
-                for child in _entries(path):
+                for child in _entries(path, listings):
                     if _blocked(child):
                         continue
                     candidate = child / "SKILL.md"
@@ -160,6 +169,18 @@ def _skills(root, reads):
 
 def _hash(path, *, reads, max_bytes=MAX_HASH_BYTES):
     return reads.read("architecture_inventory", path, max_bytes=max_bytes)
+
+
+def _file_info(path):
+    """Observe an authorized canonical leaf through native no-follow traversal."""
+    try:
+        with _policy()._directory(path.parent) as directory:
+            info = os.stat(path.name, dir_fd=directory, follow_symlinks=False)
+    except FileNotFoundError:
+        return None
+    if not stat.S_ISREG(info.st_mode):
+        raise _policy().SourcePolicyError("inventory target is not a regular non-symlink file")
+    return info
 
 
 def _json(raw):
@@ -349,17 +370,18 @@ def _capture(root, state_root, skill_roots, reads):
     """Capture exact approved bytes once; aliases supply no content authority."""
     root = Path(root)
     state_root = Path(state_root)
-    snapshots, captured, resolutions = {}, {}, {}
+    snapshots, captured, resolutions, listings = {}, {}, {}, {}
     def snapshot(path, metadata=False):
         path = Path(path).absolute()
         resolved = _safe_path(path, reads)
-        if resolved is None or (not resolved.exists() and not resolved.is_symlink()):
+        info = _file_info(resolved) if resolved is not None else None
+        if info is None:
             return None
         resolutions[str(path)] = resolved
         key = str(resolved)
         if key not in snapshots:
             remaining = MAX_HASH_BYTES - sum(source["bytes"] for source in captured.values())
-            size = resolved.stat().st_size
+            size = info.st_size
             if size > remaining:
                 raise ValueError("LARGE-READ actual inventory payload exceeds aggregate budget")
             bound = MAX_METADATA_BYTES if metadata else MAX_HASH_BYTES
@@ -374,19 +396,19 @@ def _capture(root, state_root, skill_roots, reads):
     groups = []
     unknown_entries = set()
     for directory in skill_roots:
-        skills, unknown_skills = _skills(directory, reads)
+        skills, unknown_skills = _skills(directory, reads, listings)
         groups.extend(("skill", path) for path in skills)
         groups.extend(("skill-directory", path) for path in unknown_skills)
     for directory in (root / "adoption/agents", USER_ROOT / ".claude/agents", USER_ROOT / ".codex/agents"):
         suffixes = {".md", ".toml"}
-        groups.extend(("role" if path.suffix == ".toml" else "agent", path) for path in _files(directory, 2, suffixes, reads=reads, unknown_entries=unknown_entries) if path.suffix in {".md", ".toml"} and path.name != "AGENTS.md")
+        groups.extend(("role" if path.suffix == ".toml" else "agent", path) for path in _files(directory, 2, suffixes, reads=reads, unknown_entries=unknown_entries, listings=listings) if path.suffix in {".md", ".toml"} and path.name != "AGENTS.md")
     groups.extend(("agent-entry", path) for path in sorted(unknown_entries))
-    groups.extend(("workflow", path) for path in _files(root / ".github/workflows", metadata_suffixes={".yml", ".yaml"}) if path.suffix in {".yml", ".yaml"})
-    groups.extend(("script", path) for path in _files(root / "scripts", metadata_suffixes=SCRIPT_SUFFIXES) if path.suffix in SCRIPT_SUFFIXES)
+    groups.extend(("workflow", path) for path in _files(root / ".github/workflows", metadata_suffixes={".yml", ".yaml"}, listings=listings) if path.suffix in {".yml", ".yaml"})
+    groups.extend(("script", path) for path in _files(root / "scripts", metadata_suffixes=SCRIPT_SUFFIXES, listings=listings) if path.suffix in SCRIPT_SUFFIXES)
     unit_root = USER_ROOT / ".config/systemd/user"
-    groups.extend(("timer" if path.suffix == ".timer" else "unit", path) for path in _files(unit_root, metadata_suffixes={".timer", ".service", ".path"}) if path.suffix in {".timer", ".service", ".path"})
+    groups.extend(("timer" if path.suffix == ".timer" else "unit", path) for path in _files(unit_root, metadata_suffixes={".timer", ".service", ".path"}, listings=listings) if path.suffix in {".timer", ".service", ".path"})
     metadata_paths = [root / "adoption/skills/manifest.json", root / "adoption/manifest.json", root / "manifests/stack.json"]
-    metadata_paths += [path for path in _files(root / "adoption/agents", 2, reads=reads) if path.name.endswith("manifest.json") or path.name == "SHA256SUMS"]
+    metadata_paths += [path for path in _files(root / "adoption/agents", 2, reads=reads, listings=listings) if path.name.endswith("manifest.json") or path.name == "SHA256SUMS"]
     catalog_manifest, catalog_paths = _catalog_paths(root, snapshot)
     metadata_paths += [catalog_manifest] + [path for _, path in catalog_paths]
     projection_path = state_root / "coordination/command-center/pages/automation-projection.json"
@@ -410,18 +432,9 @@ def _capture(root, state_root, skill_roots, reads):
                 unknown[str(path)]["reason"] = "Unapproved skill entry; name only; asset presence unmeasured"
             continue
         resolved = _safe_path(path, reads, role)
-        if not user_metadata and not resolved.exists() and not resolved.is_symlink():
-            continue
         resolutions[str(path)] = resolved
-        info = None
-        if user_metadata:
-            # Reuse native no-follow traversal for metadata too. An approved
-            # canonical path cannot stat a replacement symlink's target.
-            with _policy()._directory(resolved.parent) as directory:
-                info = os.stat(resolved.name, dir_fd=directory, follow_symlinks=False)
-            if not stat.S_ISREG(info.st_mode):
-                raise _policy().SourcePolicyError("inventory metadata target is not a regular file")
-        if user_metadata or resolved.is_file():
+        info = _file_info(resolved)
+        if info is not None:
             key = str(resolved)
             if user_metadata:
                 metadata_only[key] = {"path": key, "bytes": info.st_size, "mtime_ns": info.st_mtime_ns,
@@ -433,7 +446,7 @@ def _capture(root, state_root, skill_roots, reads):
             input_types.setdefault(key, set()).add(kind)
             if resolved != path.absolute():
                 symlink_paths.setdefault(key, set()).add(str(path))
-    input_bytes = {key: path.stat().st_size for key, path in candidates.items()}
+    input_bytes = {key: info.st_size for key, path in candidates.items() if (info := _file_info(path)) is not None}
     total_bytes = sum(input_bytes.values())
     if total_bytes > MAX_HASH_BYTES:
         raise ValueError("LARGE-READ bytes=" + str(total_bytes) + "; notify coordinator before hashing")
@@ -459,11 +472,12 @@ def _capture(root, state_root, skill_roots, reads):
                         "symlink_paths": sorted(symlink_paths.get(key, set())),
                         "type": "/".join(sorted(input_types[key])), "types": sorted(input_types[key])})
     sources.extend(unknown[key] for key in sorted(unknown))
-    return groups, metadata_paths, catalog_paths, snapshots, hashes, sources, total_bytes, resolutions, unknown
+    sources.extend(listings[key] for key in sorted(listings))
+    return groups, metadata_paths, catalog_paths, snapshots, hashes, sources, total_bytes, resolutions, unknown, listings
 
 
 def input_signature(root, state_root, *, reads):
-    _, _, _, _, _, sources, _, _, _ = _capture(root, state_root, None, reads)
+    _, _, _, _, _, sources, _, _, _, _ = _capture(root, state_root, None, reads)
     return sources
 
 
@@ -471,7 +485,7 @@ def build(root, state_root, skill_roots=None, *, reads=None):
     """Use exact independent inventory grants before hashing or metadata parsing."""
     root, state_root = Path(root), Path(state_root)
     reads = reads or _policy().ArchitectureReads(root, state_root, user_root=USER_ROOT)
-    groups, metadata_paths, catalog_paths, snapshots, hashes, sources, total_bytes, resolutions, unknown = _capture(root, state_root, skill_roots, reads)
+    groups, metadata_paths, catalog_paths, snapshots, hashes, sources, total_bytes, resolutions, unknown, listings = _capture(root, state_root, skill_roots, reads)
     projection_path = metadata_paths[-2]
     def data(path):
         return _json(snapshots.get(str(resolutions.get(str(path.absolute())))))
@@ -594,6 +608,7 @@ def build(root, state_root, skill_roots=None, *, reads=None):
             item.setdefault("unmapped_reason", "no canonical component ID or repository join, and no committed mapping for " + item["kind"] + ":" + item["name"])
     timer_rows, timer_status = _timers()
     coverage = {
+        "directory_roots": [listings[key] for key in sorted(listings)],
         "hash_bytes": total_bytes,
         "canonical_skill_records": len(skills),
         "unmapped": [{"kind": item["kind"], "name": item["name"], "path": item["path"], "reason": item["unmapped_reason"]} for item in items if not item.get("layer_keys") and not item.get("layer_id")],

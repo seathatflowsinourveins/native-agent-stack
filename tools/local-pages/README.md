@@ -183,7 +183,7 @@ through its authorized descriptor, which avoids reopening its pathname.
 Inventory uses that same independently approved reader for every content
 hash and metadata parse, including its catalogs, manifests, checksum lists,
 mapping and sanitized automation projection. The committed
-`architecture_inventory` role contains 129 exact content paths; installed user
+`architecture_inventory` role contains 131 exact content paths; installed user
 content is restricted to exact `SKILL.md` assets. The separate
 `architecture_inventory_metadata` role contains 94 exact user agent/unit paths
 and cannot authorize a content open. Native descriptor-relative no-follow
@@ -205,18 +205,26 @@ receipt permissions are removed, leaving 4648 eligible exact JSON receipt paths.
 Derivation does not open referenced receipt or frozen artifact bodies and
 does not add descriptive-pin exceptions. Separately reviewed user canonical
 filenames are metadata during permission generation. The shared reader uses
-64KiB chunks so a large logical bound does not allocate that bound for a small
+64 KiB chunks so a large logical bound does not allocate that bound for a small
 file. Inventory cache signatures bind approved bytes, metadata tuples and
 the policy digest before a prior render can be reused.
 
-`inventory_user_names.json` records names-only directory observations and
-separately reviewed bindings that reproduce the 41 skill, 94 metadata and
-one design grant. Extra names never create permissions. The 33 exact alias
+`inventory_user_names.json` contains only independently reviewed bindings
+and safe provenance that reproduce the 41 skill, 94 metadata and one design
+grant. User directory listings and unapproved names are not committed.
+Runtime discoveries never create permissions. The 33 exact alias
 bindings name an already approved canonical target; the reader must verify
 that target before any content or metadata observation. The CI grant test
-compares committed repo grants with `inventory_paths(git ls-files)`; regenerate
-the reviewed proposal at the authorized landing head after a rebase, not from
-runtime discovery. No raw user file body is used for these derivations.
+compares committed repo grants with `inventory_paths(git ls-files)`. The
+authorized rebase onto main's final Fleet and sanitization changes adds the
+two reviewed workflow paths, yielding 89 repository grants. Regenerate the
+proposal after an authorized rebase, using committed paths rather than runtime
+discovery. No raw user file body is used for these derivations.
+
+Directory-listing failures remain UNREPORTED rather than implying an empty
+inventory, and unapproved rows receive no name-based evidence joins. Optional
+Architecture archive/time-limit failures and Adoption attribution failures
+leave the other pages available; receipts expose exception categories only.
 
 Adoption role attribution uses the same native protected-name and no-follow
 parent/leaf descriptor reader for fixed registries and reviewed receipt

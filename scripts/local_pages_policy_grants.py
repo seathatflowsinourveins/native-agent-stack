@@ -4,7 +4,7 @@ Reference: native source_policy.ArchitectureReads at
 ddb7a2a9419dac5047bb73df85b30c95bc0c98b8; installed Git ls-tree/show and
 CPython3.13.16 cbc944f4bc59639a444dd971c737788ba2283a91 ast/json/pathlib.
 This prints a proposal for review. It does not modify policy or discover a
-runtime file into permission. User grants require a separate reviewed snapshot.
+runtime file into permission. User grants come only from reviewed bindings.
 """
 
 from __future__ import annotations
@@ -66,46 +66,44 @@ def inventory_paths(tracked: list[str], catalogs: dict) -> list[str]:
 
 
 def user_inventory_grants(snapshot: dict) -> dict:
-    """Reproduce reviewed user grants from names-only observations and bindings.
+    """Reproduce grants directly from independently reviewed relative bindings.
 
-    An extra discovered name is not a new binding or content permission.
     Binding targets are independently reviewed in the retained data file; no
-    resolver, stat or content open is used by this derivation.
+    directory observation, resolver, stat or input body is used by derivation.
     """
-    if snapshot.get("schema") != "architecture-user-names/1":
-        raise ValueError("reviewed user inventory requires a names-only snapshot")
-    observed = set()
-    for row in snapshot.get("directories", []):
-        directory = row.get("path") if isinstance(row, dict) else None
-        if not isinstance(directory, str) or PurePosixPath(directory).is_absolute() or ".." in PurePosixPath(directory).parts:
-            raise ValueError("user observation directory is not relative")
-        for name in row.get("names", []):
-            if not isinstance(name, str) or name in {".", ".."} or "/" in name or "\\" in name:
-                raise ValueError("user observation name is not a leaf")
-            observed.add(str(PurePosixPath(directory) / name))
+    if not isinstance(snapshot, dict) or snapshot.get("schema") != "architecture-user-bindings/1":
+        raise ValueError("user grant derivation requires reviewed bindings")
+    if any(key in snapshot for key in ("directories", "names", "unapproved_names")):
+        raise ValueError("user grant source must exclude directory observations and unapproved names")
+    rows = snapshot.get("reviewed_bindings")
+    if not isinstance(rows, list):
+        raise ValueError("reviewed bindings must be an explicit list")
+    policy_spec = importlib.util.spec_from_file_location("user_grant_policy_reference", ROOT / "tools/local-pages/source_policy.py")
+    policy = importlib.util.module_from_spec(policy_spec)
+    policy_spec.loader.exec_module(policy)
     roles = {"architecture_inventory": set(), "architecture_inventory_metadata": set(), "architecture_design": set()}
-    aliases = []
-    for row in snapshot.get("reviewed_bindings", []):
+    aliases, seen, targets = {}, set(), {}
+    for row in rows:
         if not isinstance(row, dict) or row.get("role") not in roles:
             raise ValueError("user binding requires a reviewed role")
         source, target = row.get("source"), row.get("target")
-        if not isinstance(source, str) or not isinstance(target, str):
-            raise ValueError("user binding requires exact relative paths")
         for relative in (source, target):
-            p = PurePosixPath(relative)
-            if p.is_absolute() or ".." in p.parts or "\\" in relative:
-                raise ValueError("user binding escapes its root")
+            policy._relative(relative)
         role = row["role"]
-        source_key = str(PurePosixPath(source).parent) if role != "architecture_inventory_metadata" else source
-        if source_key not in observed:
-            continue
-        if role != "architecture_inventory_metadata" and PurePosixPath(target).name != "SKILL.md":
+        binding = (role, source, target)
+        if binding in seen:
+            raise ValueError("duplicate reviewed user binding")
+        seen.add(binding)
+        if source in targets and targets[source] != target:
+            raise ValueError("reviewed user binding has conflicting targets")
+        targets[source] = target
+        if role != "architecture_inventory_metadata" and any(PurePosixPath(path).name != "SKILL.md" for path in (source, target)):
             raise ValueError("user content binding must name an exact skill asset")
         roles[role].add(target)
         if source != target:
-            aliases.append({"root": "user", "path": source, "target_root": "user", "target_path": target})
+            aliases[source] = {"root": "user", "path": source, "target_root": "user", "target_path": target}
     return {**{role: [{"root": "user", "path": path} for path in sorted(paths)] for role, paths in roles.items()},
-            "architecture_inventory_aliases": sorted(aliases, key=lambda row: (row["path"], row["target_path"]))}
+            "architecture_inventory_aliases": sorted(aliases.values(), key=lambda row: (row["path"], row["target_path"]))}
 
 
 def proposal(root: Path, pin: str) -> dict:

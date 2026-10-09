@@ -18,6 +18,8 @@ import json
 import os
 from pathlib import Path
 import re
+import subprocess
+import tarfile
 import tempfile
 from typing import Any
 
@@ -423,8 +425,12 @@ def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
         inputs["adoption"] = adoption_input
         adoption = {"schema": "adoption-now/1", "status": "UNREPORTED", "reason": adoption_input["reason"], "generated_utc": None, "window_hours": None, "layers": None, "claude_by_role": None, "codex_by_lane": None, "claude_total_sessions": None, "codex_total_conversations": None}
     role_projection = None
+    role_projection_error = None
     if adoption.get("status") != "UNREPORTED" and (Path(__file__).resolve().parent / "adoption_roles.py").exists() and (state_root / "coordination/ns2604-coop/lanes/hcom-lanes.json").exists():
-        role_projection = load_local("adoption_roles").project(adoption, state_root)
+        try:
+            role_projection = load_local("adoption_roles").project(adoption, state_root)
+        except (OSError, ValueError, UnicodeError, KeyError, TypeError, AttributeError, OverflowError, RecursionError) as error:
+            role_projection_error = "Adoption role attribution unavailable (" + type(error).__name__ + ")"
     gaps, roadmap, road_links = (strict_json(item["raw"]) for item in (gap_input, road_input, road_index))
     if any(not isinstance(item, dict) for item in (gaps, roadmap, road_links)):
         raise ValueError("CC page source must be a JSON object")
@@ -493,6 +499,8 @@ def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
     index_leading = f'<header class="page-header"><h1>North-star readiness and next steps</h1><p class="current-stamp">Current view snapshot: {view.observation_time(current["updated_utc"])}</p><p>{esc(current["headline"])}</p><p class="now-score"><strong>{current["readiness"]["start_gates_met"]} of {current["readiness"]["start_gates_total"]} START gates met</strong></p></header>' + view.gate_strip(current)
     native_dates = {(sanitizer().sanitize(raw_manifest["receipts"][name.removeprefix("readiness:")]["root"]), sanitizer().sanitize(raw_manifest["receipts"][name.removeprefix("readiness:")]["path"])): item.get("source_dates", {}) for name, item in inputs.items() if name.startswith("readiness:")}
     role_body = adoption_view.roles(role_projection["document"] if role_projection else adoption)
+    if role_projection_error:
+        role_body += '<p class="muted">UNREPORTED · ' + esc(role_projection_error) + '</p>'
     if role_projection:
         role_body = role_body.replace('published labels', 'role rows').replace('by published label', 'by attributed role')
         extras = []
@@ -535,7 +543,7 @@ def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
                     "workstation": workstation,
                     "fleet": fleet,
                      "adoption": {"schema": adoption["schema"], "generated_utc": adoption["generated_utc"], "window_hours": adoption["window_hours"], "sha256": adoption_input["sha256"], "status": adoption.get("status", "RECORDED"), "reason": adoption.get("reason")},
-                    "adoption_role_attribution": {"window": role_projection.get("window"), "sources": role_projection.get("sources"), "source_errors": role_projection.get("source_errors"), "instances": role_projection.get("instances"), "sdk": role_projection.get("sdk")} if role_projection else {"status": "registry unavailable; attribution unreported"},
+                    "adoption_role_attribution": {"window": role_projection.get("window"), "sources": role_projection.get("sources"), "source_errors": role_projection.get("source_errors"), "instances": role_projection.get("instances"), "sdk": role_projection.get("sdk")} if role_projection else ({"status": "UNREPORTED", "reason": role_projection_error} if role_projection_error else {"status": "registry unavailable; attribution unreported"}),
                    "source_scope": {"readiness": "Per-source retained dates; no combined snapshot timestamp", "gaps": gap_scope, "roadmap": road_scope},
                    "inputs": {key: {field: value for field, value in item.items() if field != "raw"} for key, item in inputs.items()},
                    "outputs": {key: {"sha256": hashlib.sha256(value).hexdigest(), "bytes": len(value)} for key, value in outputs.items()},
@@ -546,7 +554,7 @@ def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
         architecture_receipt = receipt.parent / "architecture/architecture-receipt.json"
         try:
             receipt_doc["architecture"] = load_local("architecture_builder").refresh_if_changed(root, state_root, output_dir, architecture_receipt)
-        except (OSError, ValueError, UnicodeError, KeyError, TypeError, AttributeError, OverflowError, RecursionError) as error:
+        except (OSError, ValueError, UnicodeError, KeyError, TypeError, AttributeError, OverflowError, RecursionError, tarfile.TarError, subprocess.TimeoutExpired) as error:
             # Architecture is an optional source view. Preserve its last page
             # while the other documents publish current observations; never
             # expose an exception's source path or treat refusal as acceptance.

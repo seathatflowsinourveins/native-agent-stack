@@ -7,21 +7,47 @@ from __future__ import annotations
 
 from html import escape
 import hashlib
+import importlib.util
 import json
 import math
 import re
+from pathlib import Path
 from typing import Any
 from urllib.parse import urlsplit
 
 
+_SANITIZER = None
+
+
+def _sanitizer():
+    """Reuse the maintained local-pages projection on values, never markup."""
+    global _SANITIZER
+    if _SANITIZER is None:
+        spec = importlib.util.spec_from_file_location("architecture_text_projection", Path(__file__).with_name("sanitization.py"))
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        _SANITIZER = module
+    return _SANITIZER
+
+
+def _portable(item: Any) -> Any:
+    # JSON object keys can contain source paths too. Project them before JSON
+    # string escaping makes encoded source identities part of the payload.
+    if isinstance(item, dict):
+        return {_sanitizer().text(key): _portable(child) for key, child in item.items()}
+    if isinstance(item, (list, tuple)):
+        return [_portable(child) for child in item]
+    return _sanitizer().sanitize(item)
+
+
 def esc(value: Any) -> str:
-    return escape(str(value), quote=True)
+    return escape(_sanitizer().text(value), quote=True)
 
 
 def value(item: Any) -> str:
     if item is None or item == "" or item == [] or item == {}:
         return "UNREPORTED"
-    return json.dumps(item, ensure_ascii=False, sort_keys=True) if isinstance(item, (dict, list)) else str(item)
+    return json.dumps(_portable(item), ensure_ascii=False, sort_keys=True) if isinstance(item, (dict, list)) else _sanitizer().text(item)
 
 
 def repo_key(raw: Any) -> str | None:
@@ -231,7 +257,7 @@ def _deferred(key: str, label: str, content: str, outputs: dict[str, bytes] | No
     if outputs is None:
         return content
     raw = content.encode("utf-8")
-    slug = re.sub(r"[^a-zA-Z0-9_-]+", "-", key).strip("-") or "detail"
+    slug = re.sub(r"[^a-zA-Z0-9_-]+", "-", _sanitizer().text(key)).strip("-") or "detail"
     path = f'architecture/layers/{slug}-{hashlib.sha256(raw).hexdigest()[:16]}.html'
     outputs[path] = raw
     return f'<details class="architecture-detail" data-layer-src="{esc(path)}"><summary>{esc(label)}</summary><div class="architecture-detail-content" aria-live="polite"><p>Expand to load these component tables. <a href="{esc(path)}">Open the detail page</a>.</p></div></details>'

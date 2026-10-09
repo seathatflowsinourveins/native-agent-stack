@@ -166,6 +166,23 @@ class ArchitectureEvidenceFixTests(unittest.TestCase):
         self.assertEqual(items[0]["e2e"]["result"], "failure")
         self.assertFalse(items[0]["evidence_complete"])
 
+    def test_unapproved_inventory_never_inherits_catalog_or_mcp_evidence_by_name(self):
+        observation = {"status": "recorded", "window_hours": 24, "roles": [{"name": "lane", "client": "Codex", "conversations": 3, "servers": {"context-mode": {"calls": 7, "conversations": 2}}}]}
+        proven = {"e2e": {"path": "approved-receipt.json", "verified": True, "pin_matches": True}, "invoke": {"calls": 7, "roles": []}, "fresh_invocation": [{"verified": True}]}
+        for name in ("context-mode", "codex"):
+            with self.subTest(name=name):
+                item = {"name": name, "status": "UNAPPROVED", "sha256": None, "reason": "name only; independent grant absent"}
+                result = evidence.attach_inventory([item], {name: [proven]}, observation=observation)
+                self.assertEqual(result[0]["status"], "UNAPPROVED")
+                self.assertFalse(result[0]["e2e"]["verified"])
+                self.assertIsNone(result[0]["invoke"]["calls"])
+                self.assertEqual(result[0]["invoke"]["roles"], [])
+                self.assertEqual(result[0]["fresh_invocation"], [])
+                self.assertFalse(result[0]["evidence_complete"])
+        sources = object()
+        with patch.object(evidence, "_e2e", side_effect=AssertionError("unknown identity reached a receipt lookup")), patch.object(evidence, "_invoke", side_effect=AssertionError("unknown identity reached MCP attribution")):
+            evidence.attach_inventory([{"name": "context-mode", "status": "UNAPPROVED"}], {}, root=self.root, sources=sources, observation=observation)
+
     def test_missing_component_pin_does_not_fall_back_to_harness_pin(self):
         self.register([("evidence/receipts/exact.json", {"kind": "native_cli_e2e", "component_ids": ["context-mode", "codex"], "recorded_at_utc": "2026-10-08T22:00:00Z", "pin": "harness-v55", "command": "context-mode --version", "result": "pass", "execution": {"harness": {"repository": "harbor-framework/harbor", "version": "v55"}}})])
         result = self.result()

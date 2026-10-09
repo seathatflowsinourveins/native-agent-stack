@@ -30,7 +30,7 @@ the inventory observation without accessing its content. Complete-builder
 synthetic regressions retain zero forbidden opens and verify this availability
 and privacy distinction.
 
-There are 129 independent exact inventory content paths: pinned repo selectors,
+There are 131 independent exact inventory content paths: 89 pinned repo selectors,
 the fixed sanitized automation projection and 41 reviewed installed skill
 targets. User content is restricted to exact `SKILL.md` assets. A separate
 94-path metadata-only role covers user agent/service registrations; it cannot
@@ -41,24 +41,36 @@ require a new independent policy review before content capture, never a
 runtime-derived wildcard grant. File presence or hash equality still does not
 establish wiring, execution or acceptance.
 
-A checked-in names-only directory snapshot and independent bindings reproduce
+A checked-in collection of independently reviewed bindings reproduces
 the 41 skill, 94 metadata and one design grant, including 33 exact aliases.
-Additional names remain unapproved rather than expanding permissions. A CI
-test compares repository grants with the current committed `git ls-files`
-selector; landing-head regeneration is required after the authorized rebase.
+Public data contains no user directory listings or unapproved names. Additional
+runtime names remain unapproved rather than expanding permissions. A CI test
+compares repository grants with the current committed `git ls-files` selector.
+The authorized rebase onto main 3a4cc28840ba7e8a1a9474a989102a669955f243 preserves
+the final Fleet implementation and sanitization and adds the two reviewed
+workflow grants. Repository grant regeneration uses the rebased Git tree.
 Adoption role attribution separately reuses the same native no-follow reader
 for fixed co-op metadata paths and reviewed parking/capacity filenames;
 refusals leave measured call counts unattributed and report safe source errors.
 No raw co-op payload or user configuration body is read during derivation.
+Directory-listing errors report UNREPORTED coverage; unapproved rows never
+inherit catalog, MCP or receipt evidence by matching an approved component's
+name. Optional archive errors, subprocess time limits and deeply nested role
+registries cannot halt the other page refreshes. These failures retain only
+exception categories, preserving the published Adoption snapshot's counts.
 
 The supported source primitives are reused from the native reader at
-ddb7a2a9419dac5047bb73df85b30c95bc0c98b8 and installed CPython3.13.16,
+ddb7a2a9419dac5047bb73df85b30c95bc0c98b8 and installed CPython 3.13.16,
 full source pin cbc944f4bc59639a444dd971c737788ba2283a91:
 [os descriptor interfaces](https://github.com/python/cpython/blob/cbc944f4bc59639a444dd971c737788ba2283a91/Doc/library/os.rst),
 [pathlib](https://github.com/python/cpython/blob/cbc944f4bc59639a444dd971c737788ba2283a91/Lib/pathlib/_local.py),
 and [buffered I/O](https://github.com/python/cpython/blob/cbc944f4bc59639a444dd971c737788ba2283a91/Modules/_io/bufferedio.c).
+The same installed version defines the optional adapter's
+[archive exceptions](https://github.com/python/cpython/blob/cbc944f4bc59639a444dd971c737788ba2283a91/Lib/tarfile.py),
+[subprocess time limits](https://github.com/python/cpython/blob/cbc944f4bc59639a444dd971c737788ba2283a91/Lib/subprocess.py)
+and [JSON parser](https://github.com/python/cpython/blob/cbc944f4bc59639a444dd971c737788ba2283a91/Lib/json/decoder.py).
 Native installed Git supplies immutable `ls-tree`/`show` metadata, rather than
-another repository walker or archive parser. The reader captures64KiB chunks
+another repository walker or archive parser. The reader captures 64 KiB chunks
 within its original bound; a small approved payload cannot trigger a caller's
 large-bound buffer allocation. Scope-limit errors remain failures, with no
 read-limit widening.

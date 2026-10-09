@@ -472,6 +472,13 @@ def attach_inventory(items, index, *, root=None, state_root=None, sources=None, 
     if state_root is not None and observation is None:
         observation = invocation_source(state_root, reads=reads)
     for item in items:
+        if item.get("status") == "UNAPPROVED":
+            reason = "Inventory identity has no independent approval; names-only discovery does not establish a source or MCP association"
+            item["e2e"] = {"status": "UNREPORTED", "verified": False, "reason": reason}
+            item["invoke"] = {"status": "unmeasured", "calls": None, "roles": [], "reason": reason, "count_class": "observational"}
+            item["fresh_invocation"] = []
+            item["evidence_complete"] = False
+            continue
         matches = []
         for identity in sorted(_identity(item)):
             matches.extend(index.get(identity, []))

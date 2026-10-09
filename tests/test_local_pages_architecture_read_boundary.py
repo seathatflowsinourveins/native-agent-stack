@@ -28,21 +28,24 @@ RAW_SDK = "research/fullspeed-20261008/sdk-harness-ready/handoff.receipt.json"
 
 
 @contextmanager
-def observed_file_reads(observe):
+def observed_file_reads(observe, *, observe_metadata=None):
     """Observe real reads using descriptor ancestry on every supported OS."""
-    originals = {"builtins": builtins.open, "io": io.open, "os": os.open, "close": os.close}
+    originals = {"builtins": builtins.open, "io": io.open, "os": os.open, "close": os.close,
+                 "stat": os.stat, "lstat": os.lstat}
     descriptors = {}
+    def observed_path(value, options):
+        if isinstance(value, int):
+            return descriptors.get(value)
+        path = Path(os.fsdecode(value))
+        if not path.is_absolute() and options.get("dir_fd") is not None:
+            parent = descriptors.get(options["dir_fd"])
+            if parent is None:
+                raise AssertionError("read watcher received an untracked directory descriptor")
+            path = parent / path
+        return path.absolute()
     def wrapper(kind):
         def invoke(value, *args, **options):
-            path = None
-            if not isinstance(value, int):
-                path = Path(os.fsdecode(value))
-                if not path.is_absolute() and options.get("dir_fd") is not None:
-                    parent = descriptors.get(options["dir_fd"])
-                    if parent is None:
-                        raise AssertionError("read watcher received an untracked directory descriptor")
-                    path = parent / path
-                path = path.absolute()
+            path = None if isinstance(value, int) else observed_path(value, options)
             flags = args[0] if kind == "os" and args else options.get("flags", 0)
             directory = kind == "os" and flags & os.O_DIRECTORY
             mode = args[0] if kind != "os" and args else options.get("mode", "r")
@@ -57,10 +60,20 @@ def observed_file_reads(observe):
     def close(descriptor):
         originals["close"](descriptor)
         descriptors.pop(descriptor, None)
+    def metadata(kind):
+        def invoke(value, *args, **options):
+            path = observed_path(value, options)
+            if path is not None:
+                observe_metadata(path)
+            return originals[kind](value, *args, **options)
+        return invoke
     with ExitStack() as stack:
         for kind, owner in (("builtins", builtins), ("io", io), ("os", os)):
             stack.enter_context(patch.object(owner, "open", wrapper(kind)))
         stack.enter_context(patch.object(os, "close", close))
+        if observe_metadata is not None:
+            stack.enter_context(patch.object(os, "stat", metadata("stat")))
+            stack.enter_context(patch.object(os, "lstat", metadata("lstat")))
         yield
 
 
@@ -351,15 +364,10 @@ class ArchitectureReadBoundaryTests(unittest.TestCase):
         self.assertEqual(self.published_bytes(), before)
 
     def assert_name_only_unknown(self, target, *, cache=False):
-        original_stat, original_lstat, original_resolve = os.stat, os.lstat, Path.resolve
-        def stat(path, *args, **kwargs):
-            if not isinstance(path, int) and Path(path).absolute() == target:
-                raise AssertionError("unapproved discovery reached target stat")
-            return original_stat(path, *args, **kwargs)
-        def lstat(path, *args, **kwargs):
-            if not isinstance(path, int) and Path(path).absolute() == target:
-                raise AssertionError("unapproved discovery reached target lstat")
-            return original_lstat(path, *args, **kwargs)
+        original_resolve = Path.resolve
+        def metadata(path):
+            if path == target:
+                raise AssertionError("unapproved discovery reached target stat or lstat")
         def resolve(path, *args, **kwargs):
             if path.absolute() == target:
                 raise AssertionError("unapproved discovery reached target resolve")
@@ -369,7 +377,7 @@ class ArchitectureReadBoundaryTests(unittest.TestCase):
             if path.absolute() == target:
                 calls.append(path)
                 raise AssertionError("unapproved discovery reached target read")
-        with observed_file_reads(observe), patch.object(os, "stat", side_effect=stat), patch.object(os, "lstat", side_effect=lstat), patch.object(Path, "resolve", new=resolve):
+        with observed_file_reads(observe, observe_metadata=metadata), patch.object(Path, "resolve", new=resolve):
             result = builder.refresh_if_changed(self.root, self.state, self.output, self.receipt) if cache else builder.build(self.root, self.state, self.output, self.receipt)
         self.assertEqual(calls, [])
         record = next(row for row in result["inventory_sources"] if row["path"] == str(target))
@@ -378,6 +386,26 @@ class ArchitectureReadBoundaryTests(unittest.TestCase):
         self.assertIsNone(record["bytes"])
         self.assertIsNone(record["resolved_path"])
         return result
+
+    def test_metadata_watcher_detects_descriptor_relative_stat_and_lstat(self):
+        target = self.root / "scripts/unapproved-stat-fixture.py"
+        target.parent.mkdir(parents=True)
+        target.write_text("unread fixture")
+        observed = []
+        def metadata(path):
+            if path == target:
+                observed.append(path)
+                raise AssertionError("descriptor-relative forbidden metadata caught")
+        with observed_file_reads(lambda unused: None, observe_metadata=metadata):
+            descriptor = os.open(target.parent, os.O_RDONLY | os.O_DIRECTORY)
+            try:
+                with self.assertRaisesRegex(AssertionError, "forbidden metadata"):
+                    os.stat(target.name, dir_fd=descriptor, follow_symlinks=False)
+                with self.assertRaisesRegex(AssertionError, "forbidden metadata"):
+                    os.lstat(target.name, dir_fd=descriptor)
+            finally:
+                os.close(descriptor)
+        self.assertEqual(observed, [target, target])
 
     def test_real_builder_refuses_fixed_cc_projection_symlink_before_open(self):
         builder.build(self.root, self.state, self.output, self.receipt)

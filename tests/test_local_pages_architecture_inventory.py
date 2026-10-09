@@ -9,6 +9,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 from tests.local_pages_architecture_policy_fixture import policy_fixture
+from tests.test_local_pages_architecture_read_boundary import observed_file_reads
 
 SPEC = importlib.util.spec_from_file_location(
     "architecture_inventory", Path(__file__).resolve().parents[1] / "tools/local-pages/architecture_inventory.py"
@@ -194,9 +195,9 @@ class InventoryTests(unittest.TestCase):
         original = inventory._hash
         with patch.object(inventory, "_hash", side_effect=lambda path, **kwargs: (hashed.append(path), original(path, **kwargs))[1]):
             result = self.build()
-        sources = {source["path"]: source for source in result["sources"]}
+        sources = {source["path"]: source for source in result["sources"] if source.get("sha256_kind") == "computed"}
         self.assertEqual(set(sources), {str(path) for path in hashed})
-        self.assertEqual(len(result["sources"]), len(hashed))
+        self.assertEqual(len(sources), len(hashed))
         for path, kind in [(workflow, "workflow"), (agent, "agent"), (script, "script"), (skill, "skill")]:
             source = sources[str(path.resolve())]
             self.assertEqual(source["sha256"], hashlib.sha256(path.read_bytes()).hexdigest())
@@ -275,20 +276,15 @@ class InventoryTests(unittest.TestCase):
             self.write(self.user / ".config/systemd/user/unreviewed.service", "unread fixture"),
         ]
         guarded = targets + [self.skills / "unreviewed"]
-        original_stat, original_lstat, original_resolve = os.stat, os.lstat, Path.resolve
-        def stat(path, *args, **kwargs):
-            if not isinstance(path, int) and Path(path).absolute() in guarded:
-                raise AssertionError("unknown inventory target reached stat")
-            return original_stat(path, *args, **kwargs)
-        def lstat(path, *args, **kwargs):
-            if not isinstance(path, int) and Path(path).absolute() in guarded:
-                raise AssertionError("unknown inventory target reached lstat")
-            return original_lstat(path, *args, **kwargs)
+        original_resolve = Path.resolve
+        def metadata(path):
+            if path in guarded:
+                raise AssertionError("unknown inventory target reached stat or lstat")
         def resolve(path, *args, **kwargs):
             if path.absolute() in guarded:
                 raise AssertionError("unknown inventory target reached resolve")
             return original_resolve(path, *args, **kwargs)
-        with patch.object(os, "stat", side_effect=stat), patch.object(os, "lstat", side_effect=lstat), patch.object(Path, "resolve", new=resolve):
+        with observed_file_reads(lambda path: self.assertNotIn(path, guarded), observe_metadata=metadata), patch.object(Path, "resolve", new=resolve):
             result = self.build()
         records = {item["path"]: item for item in result["items"]}
         for target in targets:
@@ -413,6 +409,52 @@ class InventoryTests(unittest.TestCase):
             return result
         with patch.object(inventory, "MAX_HASH_BYTES", 4), patch.object(inventory, "_hash", side_effect=grow_after_first):
             with self.assertRaisesRegex(ValueError, "LARGE-READ"):
+                self.build()
+
+    def test_directory_listing_failure_is_unreported_rather_than_an_empty_inventory(self):
+        directory = self.root / "scripts"
+        directory.mkdir()
+        info = directory.stat()
+        original = os.listdir
+        def inaccessible(value):
+            if isinstance(value, int):
+                actual = os.fstat(value)
+                if (actual.st_dev, actual.st_ino) == (info.st_dev, info.st_ino):
+                    raise PermissionError("synthetic private listing error")
+            return original(value)
+        with patch.object(os, "listdir", side_effect=inaccessible):
+            result = self.build()
+        roots = result["coverage"]["directory_roots"]
+        record = next(row for row in roots if row["path"] == str(directory))
+        self.assertEqual(record["status"], "UNREPORTED")
+        self.assertIsNone(record["entry_count"])
+        self.assertEqual(record["error_type"], "PermissionError")
+        self.assertNotIn("synthetic private listing error", json.dumps(result))
+        known_empty = self.build()["coverage"]["directory_roots"]
+        record = next(row for row in known_empty if row["path"] == str(directory))
+        self.assertEqual(record["status"], "REPORTED")
+        self.assertEqual(record["entry_count"], 0)
+        self.assertIsNone(record["error_type"])
+
+    def test_content_leaf_swap_after_no_follow_check_never_follows_metadata(self):
+        script = self.write(self.root / "scripts/approved.py", "# approved fixture\n")
+        outside = self.write(self.base / "outside/credentials.json", "unread fixture")
+        policy = inventory._policy()
+        original_check, original_stat = policy._check_target, os.stat
+        swapped = []
+        def swap_after_check(path, **kwargs):
+            result = original_check(path, **kwargs)
+            if Path(path) == script and not swapped:
+                script.unlink()
+                script.symlink_to(outside)
+                swapped.append(True)
+            return result
+        def reject_following_stat(path, *args, **kwargs):
+            if not isinstance(path, int) and Path(path).absolute() == script and kwargs.get("follow_symlinks", True):
+                raise AssertionError("approved content leaf reached a following stat after replacement")
+            return original_stat(path, *args, **kwargs)
+        with patch.object(policy, "_check_target", side_effect=swap_after_check), patch.object(os, "stat", side_effect=reject_following_stat):
+            with self.assertRaises(ValueError):
                 self.build()
 
 

@@ -37,15 +37,21 @@ class ArchitectureCacheTests(unittest.TestCase):
                        "architecture_sources": SimpleNamespace(_FINAL_ASSET=G5)}
             policy_path = policy_fixture(base / "independent-policy.json")
             calls = []
+            captured_inventory = []
+            signature = modules["architecture_inventory"].input_signature
+            def observe_signature(*args, **kwargs):
+                sources = signature(*args, **kwargs)
+                captured_inventory.append(sources)
+                return sources
             def generate(*unused):
                 calls.append(observation["sha256"])
                 output.mkdir(exist_ok=True)
-                (output / "architecture.html").write_text("generated")
+                (output / "architecture.html").write_text(json.dumps({"generation": len(calls), "inventory_sources": captured_inventory[-1]}))
                 receipt.parent.mkdir(parents=True, exist_ok=True)
-                result = {"generated_utc": "2026-01-01T00:00:00Z", "sources": []}
+                result = {"generated_utc": "2026-01-01T00:00:00Z", "generation": len(calls), "inventory_sources": captured_inventory[-1]}
                 receipt.write_text(json.dumps(result))
                 return result
-            with patch.object(modules["architecture_inventory"], "USER_ROOT", base / "user"), patch.object(MODULE, "SOURCE_POLICY_PATH", policy_path), patch.object(MODULE, "load", side_effect=lambda name: modules[name]), patch.object(MODULE, "build", side_effect=generate):
+            with patch.object(modules["architecture_inventory"], "USER_ROOT", base / "user"), patch.object(modules["architecture_inventory"], "input_signature", side_effect=observe_signature), patch.object(MODULE, "SOURCE_POLICY_PATH", policy_path), patch.object(MODULE, "load", side_effect=lambda name: modules[name]), patch.object(MODULE, "build", side_effect=generate):
                 MODULE.refresh_if_changed(root, state, output, receipt)
                 MODULE.refresh_if_changed(root, state, output, receipt)
                 self.assertEqual(len(calls), 1)
@@ -82,13 +88,17 @@ class ArchitectureCacheTests(unittest.TestCase):
                 previous_receipt = receipt.read_bytes()
                 (script.parent / "unreviewed.py").write_text("# unlisted fixture\n")
                 MODULE.refresh_if_changed(root, state, output, receipt)
-                self.assertEqual((output / "architecture.html").read_bytes(), previous_page)
-                self.assertEqual(receipt.read_bytes(), previous_receipt)
+                self.assertNotEqual((output / "architecture.html").read_bytes(), previous_page)
+                self.assertNotEqual(receipt.read_bytes(), previous_receipt)
+                published = json.loads(receipt.read_text())
+                self.assertEqual(published["generation"], 8)
+                self.assertTrue(any(row["path"] == str(script.parent / "unreviewed.py") and row["status"] == "UNAPPROVED" for row in published["inventory_sources"]))
                 self.assertEqual(len(calls), 8)
                 MODULE.refresh_if_changed(root, state, output, receipt)
                 self.assertEqual(len(calls), 8)
                 (script.parent / "unreviewed.py").unlink()
                 MODULE.refresh_if_changed(root, state, output, receipt)
                 self.assertEqual(len(calls), 9)
+                self.assertFalse(any(row["path"] == str(script.parent / "unreviewed.py") for row in json.loads(receipt.read_text())["inventory_sources"]))
 if __name__ == "__main__":
     unittest.main()

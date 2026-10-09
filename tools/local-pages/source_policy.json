@@ -1816,6 +1816,14 @@
       "root": "repo",
       "path": ".github/workflows/catalog-freshness.yml"
     },
+      {
+        "root": "repo",
+        "path": ".github/workflows/claude-pr-review.yml"
+      },
+      {
+        "root": "repo",
+        "path": ".github/workflows/claude-pr-toolkit-review.yml"
+      },
     {
       "root": "repo",
       "path": ".github/workflows/dependency-review.yml"

@@ -14,6 +14,7 @@ import os
 from pathlib import Path
 import shutil
 import subprocess
+import tarfile
 import tempfile
 import unittest
 from unittest import mock
@@ -302,7 +303,9 @@ class LocalPagesTests(unittest.TestCase):
         architecture.write_bytes(b"previous Architecture publication")
         (self.state / "coordination/ns2604-coop/notes/adoption-evidence-20261008").mkdir(parents=True)
         original = BUILDER.load_local
-        for failure in (ValueError("synthetic protected input"), OSError("synthetic source unavailable")):
+        for failure in (ValueError("synthetic protected input"), OSError("synthetic source unavailable"),
+                        tarfile.ReadError("synthetic private archive"),
+                        subprocess.TimeoutExpired("synthetic private command", 1)):
             with self.subTest(failure=type(failure).__name__):
                 adapter = mock.Mock()
                 adapter.refresh_if_changed.side_effect = failure
@@ -314,6 +317,7 @@ class LocalPagesTests(unittest.TestCase):
                     self.assertTrue((self.output / (name + ".html")).is_file())
                 self.assertIn(type(failure).__name__, result["architecture"]["reason"])
                 self.assertNotIn("synthetic protected input", json.dumps(result["architecture"]))
+                self.assertNotIn("synthetic private", json.dumps(result["architecture"]))
 
     def test_first_architecture_failure_publishes_explicit_unreported_page(self) -> None:
         (self.state / "coordination/ns2604-coop/notes/adoption-evidence-20261008").mkdir(parents=True)
@@ -327,6 +331,22 @@ class LocalPagesTests(unittest.TestCase):
         self.assertNotIn("controlled input refusal", page)
         self.assertEqual(result["architecture"]["status"], "UNREPORTED")
         self.assertIn("architecture.html", result["outputs"])
+
+    def test_deep_role_registry_preserves_snapshot_and_all_pages(self) -> None:
+        registry = self.state / "coordination/ns2604-coop/lanes/hcom-lanes.json"
+        registry.parent.mkdir(parents=True)
+        registry.write_text('{"nested":' + '[' * 25000 + '0' + ']' * 25000 + '}')
+        source_bytes = self.adoption_path.read_bytes()
+        receipt = self.refresh()
+        attribution = receipt["adoption_role_attribution"]
+        self.assertEqual(attribution["status"], "UNREPORTED")
+        self.assertIn("RecursionError", attribution["reason"])
+        self.assertNotIn("nested", json.dumps(attribution))
+        self.assertEqual(receipt["adoption"]["sha256"], hashlib.sha256(source_bytes).hexdigest())
+        self.assertEqual(self.adoption_path.read_bytes(), source_bytes)
+        for name in ("index", "readiness", "gaps", "roadmap", "fleet", "sources"):
+            self.assertTrue((self.output / (name + ".html")).is_file())
+        self.assertIn("attribution unavailable (RecursionError)", (self.output / "fleet.html").read_text())
 
     def real_fleet_adapter(self, state, cache, root):
         def native_transport(command, **kwargs):
