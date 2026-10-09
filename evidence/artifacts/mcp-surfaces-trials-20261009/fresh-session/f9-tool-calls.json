@@ -1,0 +1,103 @@
+{
+  "schema": "mcp-fresh-session-completed-tool-calls/1",
+  "raw_rollout_sha256": "855a8986a8288fafd8f3f06e429b6b671bfcad08bb5230ff76dcc3c2c5c90fcc",
+  "completed_native_commands": [
+    {
+      "rollout_line": 4,
+      "command": "/bin/bash -lc 'for trial_bin in mcp-inspector mcp mcp-cli npx node uvx python3; do command -v \"$trial_bin\" || true; done'",
+      "status": "completed",
+      "exit_code": 0,
+      "output": "/home/example/.local/share/mise/shims/npx\n/home/example/.local/share/codex-ecosystem/bin/node\n/home/example/.local/share/mise/shims/uvx\n/home/example/.local/share/mise/shims/python3\n"
+    },
+    {
+      "rollout_line": 6,
+      "command": "/bin/bash -lc 'for trial_bin in fastmcp mcptools mcp-tools mcp-client mcp-inspector-cli inspector bun deno; do command -v \"$trial_bin\" || true; done'",
+      "status": "completed",
+      "exit_code": 0,
+      "output": ""
+    },
+    {
+      "rollout_line": 8,
+      "command": "/bin/bash -lc \"printf '%s\\\\n' \\\"\"'$PATH\"'",
+      "status": "completed",
+      "exit_code": 0,
+      "output": "/home/example/.local/share/codex-ecosystem/bin:/home/example/.local/bin:/home/example/.codex/packages/standalone/releases/0.161.0-x86_64-unknown-linux-musl/codex-path:/home/example/.local/share/codex-ecosystem/bin:/home/example/.local/bin:/home/example/.local/share/mise/shims:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin\n"
+    },
+    {
+      "rollout_line": 11,
+      "command": "/bin/bash -c \"compgen -c | LC_ALL=C sort -u | rtk rg -i 'mcp|inspect|probe|diagnos|conform|native|(\"'^|-)cli$'\"'\"",
+      "status": "completed",
+      "exit_code": 0
+    },
+    {
+      "rollout_line": 13,
+      "command": "/bin/bash -c 'command -v mcporter inspect'",
+      "status": "completed",
+      "exit_code": 0,
+      "output": "/home/example/.local/share/mise/shims/mcporter\n/home/example/.local/bin/inspect\n"
+    },
+    {
+      "rollout_line": 15,
+      "command": "/bin/bash -c 'mcporter --help'",
+      "status": "completed",
+      "exit_code": 0
+    },
+    {
+      "rollout_line": 17,
+      "command": "/bin/bash -c \"sed -n '1,70p' /home/example/.local/bin/inspect\"",
+      "status": "completed",
+      "exit_code": 0
+    },
+    {
+      "rollout_line": 20,
+      "command": "/bin/bash -c 'mcporter --version'",
+      "status": "completed",
+      "exit_code": 0,
+      "output": "0.14.2\n"
+    },
+    {
+      "rollout_line": 21,
+      "command": "/bin/bash -c 'mcporter list --help'",
+      "status": "completed",
+      "exit_code": 0
+    },
+    {
+      "rollout_line": 23,
+      "command": "/bin/bash -c 'mise which mcporter'",
+      "status": "completed",
+      "exit_code": 0
+    },
+    {
+      "rollout_line": 25,
+      "command": "/bin/bash -c 'readlink -f /home/example/.local/share/mise/installs/node/24.21.0/bin/mcporter'",
+      "status": "completed",
+      "exit_code": 0
+    },
+    {
+      "rollout_line": 27,
+      "command": "/bin/bash -c \"rtk rg -n '\\\"(name|version|repository)\\\"|github.com' /home/example/.local/share/mise/installs/node/24.21.0/lib/node_modules/mcporter/package.json\"",
+      "status": "completed",
+      "exit_code": 0
+    },
+    {
+      "rollout_line": 29,
+      "command": "/bin/bash -c \"rg --files /home/example/.local/share/mise/installs/node/24.21.0/lib/node_modules/mcporter/dist | rg '/(config|runtime|client|.*auth.*|.*list.*|.*adhoc.*|.*ad-hoc.*|.*oauth.*|.*http.*).*\\\\.(js|mjs)\"'$'\"' | head -n 65\"",
+      "status": "completed",
+      "exit_code": 0
+    },
+    {
+      "rollout_line": 32,
+      "command": "/bin/bash -c \"sed -n '1,155p' /home/example/.local/share/mise/installs/node/24.21.0/lib/node_modules/mcporter/dist/config/path-discovery.js\"",
+      "status": "completed",
+      "exit_code": 0
+    },
+    {
+      "rollout_line": 33,
+      "command": "/bin/bash -c \"sed -n '1,175p' /home/example/.local/share/mise/installs/node/24.21.0/lib/node_modules/mcporter/dist/config.js\"",
+      "status": "completed",
+      "exit_code": 0
+    }
+  ],
+  "output_selection": "Only binary discovery, PATH and version outputs are retained. Other command outputs, all model prose and all reasoning are omitted.",
+  "redaction": "Personal home paths become /home/example; bare host usernames become <user>. Transient task identifiers are not included."
+}

@@ -137,5 +137,25 @@
     "upstream_release_and_ci_inspection": "source_review",
     "source_unit_tests": "local_integration"
   },
-  "publication_boundary": "Public captures are sanitized. Separate redaction maps and per-log raw/public digests preserve custody without publishing personal paths or session identifiers."
+  "publication_boundary": "Public captures are sanitized. Separate redaction maps and per-log raw/public digests preserve custody without publishing personal paths or session identifiers.",
+  "fresh_session_f9": {
+    "receipt": "fresh-session/f9-receipt.json",
+    "controls": "fresh-session/f9-controls.json",
+    "tool_calls": "fresh-session/f9-tool-calls.json",
+    "fetch_failed_classification": "environmental",
+    "environmental_boundary": "Read-only sandbox denies socket creation; matched host replay succeeds and sandbox replay reproduces fetch failed. Historical r3 errno was not retained, so attribution is inference.",
+    "gateway_env_boundary": "The historical missing-key setup failure preceded inference. The later fetch-failed observation already used the fixed placeholder. F9 supplies the kit variables only to the child, without claiming they fix the MCP fetch.",
+    "prompt_identical_to_original": true,
+    "retry_return_code": -15,
+    "retry_timed_out": true,
+    "retry_completed_commands": 15,
+    "retry_endpoint_attempt_completed": false,
+    "retry_successful_task_completion": false,
+    "candidate_fresh_proof": "NOT_PROVEN",
+    "original_observations_unchanged": true,
+    "host_control_rc": 0,
+    "host_control_tools": 23,
+    "sandbox_control_rc": 1,
+    "sandbox_socket_errno": 1
+  }
 }

@@ -18297,8 +18297,8 @@
     },
     {
       "path": "docs/decisions/2026-10-09-mcp-surfaces-trials.md",
-      "sha256": "b4db5597ed5a1792f40e4dffcaed462659a8d5b8146fd7da83d64c9d653e058d",
-      "bytes": 12188
+      "sha256": "bec9cc9a99ce31227c41952e7787e979b9ffe01b4d3a6dd221c193776bfcb04d",
+      "bytes": 16364
     },
     {
       "path": "docs/direct-results.md",
@@ -37857,13 +37857,13 @@
     },
     {
       "path": "evidence/artifacts/mcp-surfaces-trials-20261009/README.md",
-      "sha256": "57eae1532d687587f11a03f6a0e5eb9f8e72052c9155afcb1a1553f5e7365673",
-      "bytes": 2009
+      "sha256": "8fed5eec0043423fb86b1da77b97c01255954b57bf6bc5f79382e4c40e19d27d",
+      "bytes": 2774
     },
     {
       "path": "evidence/artifacts/mcp-surfaces-trials-20261009/RESULT.json",
-      "sha256": "86e7d65eed85206e2146c377329b3ffc8fa1ecff3a72220982c87abe648b4bea",
-      "bytes": 7332
+      "sha256": "ad0a4f7662ef5af4b0da9cb6e6d00a1b1e105b94b0e07816b7451239f279a034",
+      "bytes": 8467
     },
     {
       "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/client-checks/client-inspector-initialize-r2.json",
@@ -38254,6 +38254,26 @@
       "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/redaction.json",
       "sha256": "4fb9f81d80f8ae56bcf1d406013690fb953c08015a437d21503eb5a2c4bfa110",
       "bytes": 9137
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/fresh-session/f9-codex-read-only-source.txt",
+      "sha256": "95638671594caa4221545e7e03b92c9eb1f7a592b9c255d1afda5e9a0b8cdd8a",
+      "bytes": 1678
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/fresh-session/f9-controls.json",
+      "sha256": "7cbcc792b79d5b0320736371ea58b6c83ca5156609154c2ecb68fe910727897a",
+      "bytes": 5313
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/fresh-session/f9-receipt.json",
+      "sha256": "2dfc5c26d880d902a49f4180a0fa1266bdc1a010081ad1e4a24d3e7adf4e5963",
+      "bytes": 7586
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/fresh-session/f9-tool-calls.json",
+      "sha256": "dfc12c2c696f100acd50dc80a0fd3316869966d042ebc770030847654f92c516",
+      "bytes": 4299
     },
     {
       "path": "evidence/artifacts/mcp-surfaces-trials-20261009/fresh-session/prompt.md",

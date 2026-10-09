@@ -1,0 +1,185 @@
+{
+  "schema": "mcp-fresh-session-f9-diagnosis/1",
+  "date_utc": "2026-10-09",
+  "classification": "environmental",
+  "classification_boundary": "The exact original mcporter command succeeds on the host and reproduces fetch failed under the same read-only sandbox. Socket creation there returns EPERM. Attribution of the historical failure to that sandbox is an inference; its original errno was not captured. This establishes no MCP tool defect or protocol verdict.",
+  "original_observations": {
+    "receipt": "receipt.json",
+    "tool_calls": "tool-calls.json",
+    "immutable": true,
+    "missing_gateway_env": "Historical setup r2 stopped before inference because OMNIROUTE_API_KEY was absent.",
+    "fetch_failed": "Historical r3 already used the fixed placeholder and completed native commands before its MCP fetch failed. The missing-key setup failure is separate."
+  },
+  "retry": {
+    "label": "fresh-unnamed-f9-r1",
+    "started_utc": "2026-10-09T09:56:35.409146+00:00",
+    "installed_client": "codex-cli 0.161.0",
+    "prompt_file": "prompt.md",
+    "prompt_sha256": "c2699f04c4a1f908777dc575dd0d257e57a4c6088bf79d3478f05f1b98e59287",
+    "prompt_identical_to_original": true,
+    "prompt_names_candidate": false,
+    "launch_argv": [
+      "codex",
+      "exec",
+      "-p",
+      "omniroute",
+      "-m",
+      "cx/gpt-6.1-sol",
+      "--ephemeral",
+      "--skip-git-repo-check",
+      "--json",
+      "--color",
+      "never",
+      "--sandbox",
+      "read-only",
+      "-c",
+      "service_tier=\"default\"",
+      "-c",
+      "model_providers.omniroute.env_http_headers={\"x-omniroute-session-id\"=\"OMNIROUTE_SESSION_ID\"}",
+      "-c",
+      "mcp_servers.serena.enabled=false",
+      "-c",
+      "mcp_servers.ai-memory.enabled=false",
+      "-c",
+      "mcp_servers.context-mode.enabled=false",
+      "-c",
+      "mcp_servers.headroom.enabled=false",
+      "-c",
+      "mcp_servers.jcodemunch.enabled=false",
+      "-c",
+      "mcp_servers.semble.enabled=false",
+      "-c",
+      "mcp_servers.promptfoo.enabled=false",
+      "-c",
+      "mcp_servers.chrome-devtools.enabled=false",
+      "-c",
+      "mcp_servers.socraticode.enabled=false",
+      "-c",
+      "mcp_servers.codebase-memory-mcp.enabled=false",
+      "-c",
+      "mcp_servers.qmd.enabled=false",
+      "-c",
+      "mcp_servers.hindsight.enabled=false",
+      "-"
+    ],
+    "command_shape": "OMNIROUTE_API_KEY=local OMNIROUTE_SESSION_ID=<task> PATH=<conformance-bin>:<inspector-bin>:<inherited-PATH> codex exec -p omniroute -m cx/gpt-6.1-sol --ephemeral --skip-git-repo-check --json --color never --sandbox read-only -c 'service_tier=\"default\"' -c 'model_providers.omniroute.env_http_headers={\"x-omniroute-session-id\"=\"OMNIROUTE_SESSION_ID\"}' -c mcp_servers.serena.enabled=false -c mcp_servers.ai-memory.enabled=false -c mcp_servers.context-mode.enabled=false -c mcp_servers.headroom.enabled=false -c mcp_servers.jcodemunch.enabled=false -c mcp_servers.semble.enabled=false -c mcp_servers.promptfoo.enabled=false -c mcp_servers.chrome-devtools.enabled=false -c mcp_servers.socraticode.enabled=false -c mcp_servers.codebase-memory-mcp.enabled=false -c mcp_servers.qmd.enabled=false -c mcp_servers.hindsight.enabled=false - < prompt.md",
+    "environment_boundary": "The launcher added only the two named gateway variables to the child process environment, using local as the fixed non-secret loopback placeholder. Neither variable was exported in the parent shell. No credential value or environment dump was read or printed. Trial-bin prefixes were supplied on the child PATH.",
+    "gateway": "http://127.0.0.1:21128/v1",
+    "session_id_publication": "<task>; exact transient task label remains private",
+    "gateway_header_name": "x-omniroute-session-id",
+    "service_tier": "default",
+    "MCP_servers_enabled": [],
+    "MCP_boundary": "The isolated unnamed CLI proof retains the original child-only MCP-disable overrides. Host and lane configuration are unchanged.",
+    "native_recorder": "../run_native.py",
+    "native_recorder_rc": 0,
+    "return_code": -15,
+    "timed_out": true,
+    "observation_bound_seconds": 180,
+    "elapsed_seconds": 180.060016,
+    "completed_command_count": 15,
+    "api_error_events": 0,
+    "tool_calls_file": "f9-tool-calls.json",
+    "organically_reached": "mcporter 0.14.2",
+    "candidate_reach": {
+      "conformance": false,
+      "inspector": false
+    },
+    "endpoint_attempt_completed": false,
+    "successful_task_completion": false,
+    "adoption_fresh_gate": "NOT_PROVEN",
+    "path_boundary": "Completed login and non-login discovery calls found the global mcporter shim; the reported shell PATH omitted both supplied trial prefixes. No launch-PATH change is claimed to survive child shell initialization.",
+    "pss": {
+      "peak_process_tree_kib": 248658,
+      "max_observed_processes": 1,
+      "samples": 3105,
+      "interval_seconds": 0.05,
+      "source": "/proc/<owned-pid>/smaps_rollup:Pss",
+      "scope": "owned command process tree; shared host servers excluded"
+    },
+    "private_raw_captures": {
+      "fresh-unnamed-f9-r1.stdout": {
+        "bytes": 28560,
+        "sha256": "855a8986a8288fafd8f3f06e429b6b671bfcad08bb5230ff76dcc3c2c5c90fcc"
+      },
+      "fresh-unnamed-f9-r1.stderr": {
+        "bytes": 506,
+        "sha256": "038bf7f0237b96140792388e4cbaf877f8c08af38725b36cc7e2b83dd380f557"
+      },
+      "fresh-unnamed-f9-r1.json": {
+        "bytes": 1933,
+        "sha256": "fbfe3521aee6b07fc7f7d768de8eb4cc443008c08ab5db5a027e6c6df7c1c222"
+      }
+    },
+    "model_prose_or_reasoning_published": false
+  },
+  "diagnosis_controls": {
+    "record": "f9-controls.json",
+    "same_original_mcporter_argv": true,
+    "host": {
+      "return_code": 0,
+      "status": "ok",
+      "tools": 23
+    },
+    "read_only_sandbox": {
+      "return_code": 1,
+      "status": "offline",
+      "error": "Version negotiation probe failed: fetch failed"
+    },
+    "socket_creation_read_only": {
+      "return_code": 1,
+      "errno": 1,
+      "error": "Operation not permitted"
+    },
+    "scope": "Controlled native replays are separate from the unnamed model retry. No tool call or successful endpoint request is attributed to the model retry."
+  },
+  "primary_sources": {
+    "launch_pattern": {
+      "logical_path": "coordination/ns2604-coop/tools/gpt_read_repo_exec_omni.sh",
+      "sha256": "f19cc2d15444a50ee575da3ca901d4505b4b449a0e10b2432a74ea89b2f232d2",
+      "lines": [
+        102,
+        103,
+        104,
+        105
+      ]
+    },
+    "codex_source": {
+      "repository": "https://github.com/openai/codex",
+      "tag": "rust-v0.161.0",
+      "commit": "979011409de0a60b52f179721948e65531d26144",
+      "path": "codex-rs/protocol/src/protocol.rs",
+      "blob_sha": "abc4e90847636bfe51e6275ede528a13616c8573",
+      "sha256": "d3d3d384da91b2824c10091de4331a2bc26ec5474887ed0aef1e3f3c4ae110f4",
+      "lines": [
+        1079,
+        1080,
+        1081,
+        1082,
+        1083,
+        1203,
+        1204,
+        1205,
+        1206,
+        1207,
+        1235,
+        1236,
+        1237,
+        1238,
+        1239,
+        1240,
+        1241
+      ],
+      "excerpt": "f9-codex-read-only-source.txt"
+    },
+    "official_docs": [
+      "https://developers.openai.com/codex/sandboxing.md",
+      "https://developers.openai.com/codex/config-reference.md"
+    ]
+  },
+  "adoption": {
+    "candidate_fresh_proof": "NOT_PROVEN",
+    "adopt_now": [],
+    "catalog_disposition_owner": "grand-catalog",
+    "landing": "Designated reads, required CI, pre-cue, CC cue and owner decisions remain required."
+  }
+}

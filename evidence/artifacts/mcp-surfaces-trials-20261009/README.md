@@ -28,3 +28,14 @@ Source package archives, exact pinned source blobs and original captures remain
 in the lane-owned research prefixes. Public logs are sanitized observations;
 their original-byte hashes are not claims about the sanitized copy. No catalog,
 user-level client configuration or platform status changes are part of this PR.
+
+The [F9 receipt](fresh-session/f9-receipt.json) adds the kit-pattern retry and
+classifies the earlier fetch failure as an environmental read-only sandbox
+network restriction, with the historical attribution explicitly qualified.
+[Controlled native replays](fresh-session/f9-controls.json) distinguish the
+successful host discovery from the matching sandbox failure and socket EPERM.
+The [retry tool calls](fresh-session/f9-tool-calls.json) show fifteen completed
+commands but no endpoint attempt before the 180-second bound. The original
+fresh-session files are unchanged; successful candidate fresh proof remains
+NOT_PROVEN. The [pinned Codex source excerpt](fresh-session/f9-codex-read-only-source.txt)
+corroborates the network default at the installed version.

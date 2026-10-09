@@ -169,3 +169,63 @@ The proposal would be overturned by a pinned Inspector release that passes
 those gates and demonstrates a better memory/latency tradeoff on the same tasks
 and a representative multi-server workload. A supported frozen conformance
 revision and native stdio transport route would also expand this trial's scope.
+
+## F9: fresh-session retry and fetch diagnosis
+
+The original [receipt](../../evidence/artifacts/mcp-surfaces-trials-20261009/fresh-session/receipt.json)
+and [completed commands](../../evidence/artifacts/mcp-surfaces-trials-20261009/fresh-session/tool-calls.json)
+remain unchanged. The missing `OMNIROUTE_API_KEY` in setup r2 stopped that
+launcher before inference. The later r3 observation already used the fixed
+non-secret placeholder and completed eighteen native commands before its MCP
+request returned `Version negotiation probe failed: fetch failed`. These are
+separate failure stages; the missing gateway variable does not explain that
+later MCP fetch.
+
+The [F9 receipt](../../evidence/artifacts/mcp-surfaces-trials-20261009/fresh-session/f9-receipt.json)
+records a fresh retry with the identical unnamed prompt (SHA256
+`c2699f04c4a1f908777dc575dd0d257e57a4c6088bf79d3478f05f1b98e59287`).
+Its exact argument vector and equivalent command shape retain `-p omniroute`,
+`--ephemeral`, `--skip-git-repo-check`, `service_tier=default`, the original
+read-only sandbox and child-only MCP-disable overrides. The launcher supplied
+`OMNIROUTE_API_KEY=local` and `OMNIROUTE_SESSION_ID=<task>` only in the child
+environment, with the kit's session-header mapping and trial binary prefixes
+on PATH. The host gateway is `127.0.0.1:21128`; neither variable was exported in
+the parent shell and no credential value was read or published.
+
+The retry completed fifteen native commands, reached mcporter 0.14.2
+organically and emitted no API error event. Its reported shell PATH omitted
+the supplied trial prefixes. The 180-second bound terminated the child with
+rc -15 before an endpoint attempt or successful task completion. This is a
+recorded retry, not successful candidate fresh proof. Only the
+[completed tool calls](../../evidence/artifacts/mcp-surfaces-trials-20261009/fresh-session/f9-tool-calls.json)
+are published; model prose and reasoning remain excluded.
+
+The [native diagnosis controls](../../evidence/artifacts/mcp-surfaces-trials-20261009/fresh-session/f9-controls.json)
+replay the exact original mcporter argument vector with empty imports, an
+empty Authorization header and no OAuth. On the host it returns rc 0, status
+`ok` and 23 tool definitions. The same command under
+`codex sandbox -c 'sandbox_mode="read-only"'` returns rc 1, status `offline`
+and the exact original fetch-failed message. A socket-creation control under
+that sandbox returns `PermissionError`, errno 1 (`EPERM`), before connecting.
+These controlled replays are separate from the unnamed model retry.
+
+The resulting classification is **environmental: read-only sandbox network
+restriction**. The host-versus-sandbox replay and socket errno reproduce that
+boundary; the original r3 did not capture its errno, so assigning its
+historical failure to the same boundary is an inference. Adding the gateway
+placeholder is not claimed to fix that fetch. No tool defect, protocol failure
+or new successful candidate proof is inferred. Both candidates remain TRIAL,
+`candidate_fresh_proof=NOT_PROVEN`, with the empty ADOPT-NOW list and catalog,
+read, CI, pre-cue, cue and owner gates retained.
+
+Primary sources for this correction are the installed `codex-cli 0.161.0`,
+the read kit `coordination/ns2604-coop/tools/gpt_read_repo_exec_omni.sh:102-105`
+(SHA256 `f19cc2d15444a50ee575da3ca901d4505b4b449a0e10b2432a74ea89b2f232d2`),
+and [openai/codex rust-v0.161.0 at 979011409de0a60b52f179721948e65531d26144](https://github.com/openai/codex/blob/979011409de0a60b52f179721948e65531d26144/codex-rs/protocol/src/protocol.rs#L1079).
+That source defaults read-only networking off at lines 1079-1083 and
+1203-1207; its [retained excerpt](../../evidence/artifacts/mcp-surfaces-trials-20261009/fresh-session/f9-codex-read-only-source.txt)
+separates the upstream full-file digest from excerpt bytes. Official
+[sandbox documentation](https://developers.openai.com/codex/sandboxing.md)
+and [configuration reference](https://developers.openai.com/codex/config-reference.md)
+were checked as supporting sources. The native controls establish behavior on
+this host; documentation alone does not supply the measured result.
