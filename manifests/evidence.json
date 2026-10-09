@@ -5151,8 +5151,8 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "490e1d7fcc56f2211c845b01a61aae2e0b6ecacc34132fab4909eb0933dd40af",
-      "bytes": 2331
+      "sha256": "e60cc9b27a4badd27215c471d32d8faada3a1deb02b1613e11ecf2c002e83d74",
+      "bytes": 3028
     },
     {
       "path": "CLAUDE.md",
@@ -5168,6 +5168,11 @@
       "path": "README.md",
       "sha256": "81459545301d187ab97ee106f60ec9805cca26cbd884a05a3f056833af5e2def",
       "bytes": 23613
+    },
+    {
+      "path": "REVIEW.md",
+      "sha256": "d8d4ac30f5f9a508bc70c1519ac6f63de0bb80ea38263de56a89d31be6659d31",
+      "bytes": 611
     },
     {
       "path": "SECURITY.md",
@@ -12712,8 +12717,8 @@
     },
     {
       "path": "blueprints/us-equities/AGENTS.md",
-      "sha256": "98bb1ab00ed7d7902ba75bb28a3df811be128eeae5002c327b6fdde2973853f5",
-      "bytes": 5499
+      "sha256": "3ef75b070a712f194a9d92ad67092132fac10dc58343789995fcb8f88e36ae34",
+      "bytes": 5778
     },
     {
       "path": "blueprints/us-equities/CLAUDE.md",
@@ -18334,6 +18339,11 @@
       "path": "docs/decisions/2026-10-09-codex-native-review-trial.md",
       "sha256": "337ec932d1e70994adc7b6e90458114e604d70ec065c49fc7d7ff8c2191e11fc",
       "bytes": 9003
+    },
+    {
+      "path": "docs/decisions/2026-10-09-corrections-rule.md",
+      "sha256": "be4446a7063417bb5f6adc01404139665015dfcd4e7a5ec881f45f57890e507b",
+      "bytes": 4952
     },
     {
       "path": "docs/decisions/2026-10-09-host-name-scan.md",
@@ -60017,8 +60027,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "83cb5381b09ef0044f312bd689380b2f61b4f23c09dd85df5e3d5cbe12617600",
-      "bytes": 139314
+      "sha256": "822fab57b58b366d768d8c004e12bd5f9a28206d67b4f229823f5be229d191fe",
+      "bytes": 143345
     },
     {
       "path": "tests/test_install_skills.py",

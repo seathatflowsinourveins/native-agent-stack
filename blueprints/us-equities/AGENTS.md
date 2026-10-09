@@ -2,6 +2,10 @@
 
 Rules for trading research waves, data readiness and experiments. The north star and the paper-lane authorization are recorded below.
 
+For a claim or fix that proves wrong, resolve it from the upstream primary source at the
+pinned version through the vendor's supported path. Record the correction with its citation
+and add a regression test that fails before the fix. Where sources disagree, measure first-hand.
+
 For brokers, engines and data, use the vendor's own maintained repositories at their clean releases: [alpacahq/alpaca-py](https://github.com/alpacahq/alpaca-py), [the official Alpaca MCP server](https://github.com/alpacahq/alpaca-mcp-server) where an MCP is needed, [nautechsystems/nautilus_trader](https://github.com/nautechsystems/nautilus_trader), and [the official IBKR TWS API distribution](https://interactivebrokers.github.io/). For adapters, never rebuild or fork what an upstream already ships; glue only fills a demonstrated gap, cited at a pin. [Current release verification](../../docs/decisions/2026-10-05-official-upstream-never-rebuild.md) records the sources; runtime selections stay with the trading lane.
 
 For architecture or research waves, read `blueprints/us-equities/architecture/README.md`
