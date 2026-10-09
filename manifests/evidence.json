@@ -18486,6 +18486,11 @@
       "bytes": 8327
     },
     {
+      "path": "docs/decisions/2026-10-09-claude-code-native-practice.md",
+      "sha256": "d1bb3266804fa09629bc33f0a8cf7bdb69dfd28601e777ee6c2757e2437735b0",
+      "bytes": 36772
+    },
+    {
       "path": "docs/decisions/2026-10-09-codex-native-review-trial.md",
       "sha256": "337ec932d1e70994adc7b6e90458114e604d70ec065c49fc7d7ff8c2191e11fc",
       "bytes": 9003
