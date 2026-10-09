@@ -1425,6 +1425,27 @@ remain unaffected. This predicate comes from the frozen canary contract,
 SHA256 `9d4c8e555966d4cf50518be28b6ec55500f1987883e936319e5551401a82c0af`,
 not a canary execution in K4.
 
+**Hooks.** `guard_file_write` (tier k, 2026-10-09) refuses a Bash write, move,
+delete or in-place edit of a `.claude/hooks` directory, which holds this guard:
+an output redirection to one; `rm`, `unlink`, `shred`, `truncate` and the other
+deleters, and `mv` and the other movers, on any operand there (also a delete or
+move of a `.claude` directory or of a home that holds one); `cp`, `install`,
+`ln`, `rsync`, `ditto` and `scp` to a destination there; `tee`, `sponge`,
+editors, the chmod family, `touch`, `unzip`, `cpio` and `patch` on a path
+there; `dd of=`; `sed -i`, `perl -i` and `ruby -i`; `tar` extracting; `find`
+with `-delete` or an action that runs one of these; `cd` or `pushd` into a
+hooks directory followed by a write; `xargs` or `parallel` running a writer in a
+command that names a hooks path; and inline interpreter code that writes, moves
+or deletes a file in a command that names one. Reading, hashing, diffing,
+listing and copying a hook elsewhere pass. The settings template and the
+project settings also deny `Edit(~/.claude/hooks/**)` to Claude's file tools
+(Claude Code consults only `Edit` and `Read` path rules; a `Write(...)` path
+rule is never used). Change a hook by pull request and install it with
+`tools/adoption/install_claude_profile.py`. A path built at run time or an
+unlisted program passes; the template's guard command blocks when the guard
+cannot run, so deleting or moving it blocks every Bash call instead of letting
+one through.
+
 **Names and trees.** `CLAUDE_CODE_OAUTH_TOKEN` and `CLAUDE_CODE_MESSAGING_TOKEN`
 join the secret-name expansion, lookup, search, runner and manager checks. The
 inventory's optional `claude-oauth-token` entry is distinct from native sign-in;
@@ -1833,6 +1854,7 @@ For a host that does not use the template, merge the same rules by hand under
 "Read(~/.config/nativestack/*.key)", "Read(**/.config/nativestack/*.key)",
 "Read(~/.claude/.credentials.json)", "Read(**/.claude/.credentials.json)",
 "Read(~/.codex/auth.json)", "Read(**/.codex/auth.json)",
+"Edit(~/.claude/hooks/**)",
 "Read(~/.config/gh/hosts.yml)", "Read(**/.config/gh/hosts.yml)",
 "Read(//proc/*/environ)", "Read(**/proc/*/environ)",
 "Read(~/.cache/huggingface/token)", "Read(**/.cache/huggingface/token)",

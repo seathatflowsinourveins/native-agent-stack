@@ -4921,8 +4921,8 @@
     },
     {
       "path": ".claude/settings.json",
-      "sha256": "8f65ca76f754b9c829de60685443fe1a16044cf2522a429076e0196683806117",
-      "bytes": 3069
+      "sha256": "4ae3cefcd4efe136957fa015a0c69afaf36cab64607b350696fb9afbe784fdac",
+      "bytes": 3103
     },
     {
       "path": ".claude/skills/omniroute-runtime-worker/SKILL.md",
@@ -5276,7 +5276,7 @@
     },
     {
       "path": "adoption/hooks/claude/SHA256SUMS",
-      "sha256": "9db7433fa8c7d1c37a55b027e8eb3b66ed400ad375403abfa9808aa86fb82c66",
+      "sha256": "dae4464f0171dd95e288526f5b2800667ea8f9bf44a3d89d4dfb49d90442ebeb",
       "bytes": 1229
     },
     {
@@ -5536,8 +5536,8 @@
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "e10fc53e6fb57e6b342246fcbc9d516f376cef7c1d50a24fcabc54ff849787bd",
-      "bytes": 13821
+      "sha256": "47383dbd903c621a235f51a5e7cc06f166f01f26fe7693942bdbc3064d459f28",
+      "bytes": 13855
     },
     {
       "path": "adoption/templates/codex.AGENTS.template.md",
@@ -16972,7 +16972,7 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "ed742ae36312bd76ba04425885fed029a0d1de51b6d396da7d9c94e43dd39549",
+      "sha256": "30e2cd76f505418aaecb95ba01c1e001f153d09d9b177067671a330e165efd4f",
       "bytes": 160022
     },
     {
@@ -17842,8 +17842,8 @@
     },
     {
       "path": "docs/decisions/2026-10-02-new-wsl-client-configuration.md",
-      "sha256": "77b0610b2ce98361906d3c4fc202b3b4f65e14203b54a4f05a441e6457e1e26e",
-      "bytes": 148760
+      "sha256": "6e0f75f1af60e9934a54f0e752ae0312f40a269dd8da60c75375a474d1297cd2",
+      "bytes": 149635
     },
     {
       "path": "docs/decisions/2026-10-02-omniroute-mac-rebuild.md",
@@ -18262,8 +18262,8 @@
     },
     {
       "path": "docs/decisions/2026-10-08-guard-hook-fails-closed.md",
-      "sha256": "9a1097a58c45a2e84d177e839a9ef0e4c7a40f4d68a913ba3527aba24438dac3",
-      "bytes": 20420
+      "sha256": "5c9acafe9c644c9acabcceb7e6956618c963920dccfc1ee2db151e9bf1bcab74",
+      "bytes": 22665
     },
     {
       "path": "docs/decisions/2026-10-08-harness-rules-consolidation.md",
@@ -18612,8 +18612,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "917f8d1d0db59af5454d9530beb5696dcb2208a7191f3e82790848aaab5083f0",
-      "bytes": 193318
+      "sha256": "5ad643bbb8dcb06876f938754c3e973d366b71262f0cdad7705891659d0e2ce8",
+      "bytes": 194819
     },
     {
       "path": "docs/stack.md",
@@ -57437,8 +57437,8 @@
     },
     {
       "path": "scripts/hooks/secret_path_guard.py",
-      "sha256": "fd516d8b78de7e3a9da4917c8d126fc71d7ab216a014bb28fb8bd189d6b0fb7b",
-      "bytes": 296975
+      "sha256": "39816ac297627b158027f7b43bca1aaab77a7e5e65520de20e08addb51affd36",
+      "bytes": 306245
     },
     {
       "path": "scripts/host_receipts.py",
@@ -58302,8 +58302,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "83cb5381b09ef0044f312bd689380b2f61b4f23c09dd85df5e3d5cbe12617600",
-      "bytes": 139314
+      "sha256": "f1018a5397a0a3360898d507d673fc696466013853b70009fa441c43b5a30035",
+      "bytes": 140187
     },
     {
       "path": "tests/test_install_skills.py",
@@ -58732,8 +58732,8 @@
     },
     {
       "path": "tests/test_secret_path_guard.py",
-      "sha256": "36edfe372be11f424e36576c1533111514662958063f429aec7a7284cc81b958",
-      "bytes": 391697
+      "sha256": "17c7beb7adc2f03a580eb65eeaeee745cd2813176cbe7e1e21abdafa088562c6",
+      "bytes": 398129
     },
     {
       "path": "tests/test_security_identity.py",

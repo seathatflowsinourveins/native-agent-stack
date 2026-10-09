@@ -705,6 +705,16 @@ class SecretGuardProfileTests(unittest.TestCase):
             allowed = self.run_rendered(command, "git status", checkout)
             self.assertEqual((allowed.returncode, allowed.stderr), (0, ""))
 
+    def test_the_hooks_directory_is_denied_to_the_file_tools_in_both_settings(self):
+        # Claude Code checks file permissions against Edit(path) and Read(path) rules only, and an Edit rule covers every built-in tool
+        # that edits files; a Write(...) path rule is accepted but never consulted (https://code.claude.com/docs/en/permissions, read
+        # 2026-10-09). The guard's own HOOKS tier covers Bash writes to the same directory.
+        for relative in (".claude/settings.json", "adoption/templates/claude.settings.template.json"):
+            with self.subTest(file=relative):
+                deny = json.loads((ROOT / relative).read_text())["permissions"]["deny"]
+                self.assertIn("Edit(~/.claude/hooks/**)", deny)
+                self.assertEqual([rule for rule in deny if rule.startswith(("Write(", "NotebookEdit(", "MultiEdit("))], [])
+
     def test_apply_merge_keeps_host_rules_and_adds_the_guard(self):
         import apply_claude_settings as acs
         with tempfile.TemporaryDirectory() as tmp:

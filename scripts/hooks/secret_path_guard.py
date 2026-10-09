@@ -75,7 +75,9 @@ port 21129 none. Actual
 omniroute api/sync commands refuse. Other tightenings cover manager environment
 writes, literal keyring feeds with quote provenance, explicit ps personalities,
 canary comparison/user-run invocations, both Claude OAuth/messaging token names,
-and both complete OmniRoute data trees. This does not inspect external scripts,
+and both complete OmniRoute data trees. A write, move, delete or in-place edit of a
+.claude/hooks directory, which holds this guard, refuses (guard_file_write, tier k of 2026-10-09);
+reading a hook passes. This does not inspect external scripts,
 computed requests, inherited ps settings, renamed helpers or other tool types.
 
 After form recognition, a backslash-newline is joined and every raw-text rule also reads the
@@ -609,6 +611,7 @@ HINTS = {
     "keyring_store_literal": "typed literals persist in transcripts/history; use the hidden prompt or documented dynamic input",
     "ps_personality_selector": "a ps personality can change environment-display flags; agent commands cannot select it",
     "canary_user_terminal_required": "canary_proof.py comparison/user-run belong in the user terminal; a pty is not authorization",
+    "guard_file_write": "this guard and its sibling hooks live in a .claude/hooks directory; change them by pull request and install them with tools/adoption/install_claude_profile.py; reading, hashing and diffing them stay allowed",
     "interpreter_environment_unclassified": "environment access could not be classified; use an explicit single non-secret key or a separately reviewed script",
     "env_split_unclassified": "env's split string is invalid or depends on inherited variable values; use a literal command and arguments",
     "environment_dump_in_credential_run": "credential_run.py gives the started command keys; masking is a second layer; use a client that consumes its environment without printing it",
@@ -2620,7 +2623,7 @@ def k4_tightenings(r: K4Reading) -> str | None:
     command, a shell string read before a keyring or runner unwrap, a segment B dropped as a string duplicate of one with other descriptors:
     D-ID, at the environment-dump position of this reading); (c) runner usage and secret-name mentions; (d) gateway requests; (e) manager
     environment writes; (f) literal keyring stores; (g) ps personality selectors; (h) the canary gate; (i) interpreter code, SHELL-LITERAL,
-    SHELL-OUT, then WHOLE-ENV; (j) post-terminator tails. Every rule only refuses. Runs with _baseline False (read_command restores it)."""
+    SHELL-OUT, then WHOLE-ENV; (j) post-terminator tails; (k) writes, moves, deletes and in-place edits of a hooks directory (HOOKS, 2026-10-09). Every rule only refuses. Runs with _baseline False (read_command restores it)."""
     global _baseline
     _baseline = False
     anchors = r.anchors = k4_anchors(r.texts[1])
@@ -2640,7 +2643,8 @@ def k4_tightenings(r: K4Reading) -> str | None:
             or (k4_ps_reason(r.word_text) if anchors & K4_SELECTORS else None)
             or (k4_canary_reason(segments) if "canary_proof.py" in anchors else None)
             or k4_interpreter_reason(r, segments)
-            or (k4_tail_reason(r.command) if "<<" in anchors else None))
+            or (k4_tail_reason(r.command) if "<<" in anchors else None)
+            or k4_hook_write_reason(segments, r.joined))
 
 
 def k4_needs_walk(r: K4Reading, anchors: frozenset[str]) -> bool:
@@ -3434,6 +3438,126 @@ class K4Region:
         self.languages, self.operator, self.line_end = languages, operator, line_end
         self.body_start, self.body_end, self.cut, self.exact = body_start, body_end, cut, exact
 
+
+
+
+# HOOKS (tier k, 2026-10-09): the hooks directories that hold this guard and its siblings. HOOKS_PATH finds a .claude/hooks directory
+# or a path inside one, wherever it sits: the user one (~/.claude/hooks, where install_claude_profile.py installs the guard, also
+# through $HOME, a home under /home or /Users, or $CLAUDE_CONFIG_DIR) and a project's (.claude/hooks, ./.claude/hooks, $CLAUDE_PROJECT_DIR/...).
+# HOOKS_HOLDER matches a word that names a .claude directory or a home itself, whose delete or move takes the hooks with it. Both read
+# literal text, and every quantifier is bounded or anchored, so a scan stays linear in the text.
+HOOKS_PATH = re.compile(r"(?:\A|[\s=:'\"/])\.claude/{1,8}hooks(?:/|\Z|[\s'\"])|\$\{?CLAUDE_CONFIG_DIR\}?/{1,8}hooks(?:/|\Z|[\s'\"])")
+HOOKS_HOLDER = re.compile(r"\A(?:(?:\S*/)?\.claude|~[A-Za-z0-9_.-]*|\$\{?HOME\}?|/home/[^/\s]+|/Users/[^/\s]+|/root"
+                          r"|\$\{?CLAUDE_CONFIG_DIR\}?)/*\Z")
+HOOKS_CLAUDE_DIR = re.compile(r"\A(?:\S*/)?\.claude/*\Z|\A\$\{?CLAUDE_CONFIG_DIR\}?/*\Z")
+HOOKS_RELATIVE = re.compile(r"\A(?:\./)?hooks(?:/|\Z)")
+HOOK_DELETERS = {"rm", "unlink", "shred", "truncate", "rmdir", "srm", "wipe", "trash", "trash-put", "gio"}
+HOOK_MOVERS = {"mv", "rename", "prename", "file-rename", "perl-rename"}
+HOOK_COPIERS = {"cp", "install", "ln", "rsync", "ditto", "scp"}
+HOOK_WRITERS = {"tee", "sponge", "ed", "red", "ex", "vi", "vim", "nvim", "nano", "emacs", "chmod", "chown", "chgrp", "chattr",
+                "setfacl", "touch", "unzip", "cpio", "patch"}
+HOOK_WRITE_PROGRAMS = HOOK_DELETERS | HOOK_MOVERS | HOOK_COPIERS | HOOK_WRITERS | {"dd", "sed", "gsed", "perl", "ruby", "tar",
+                                                                                 "bsdtar"}
+SED_IN_PLACE = re.compile(r"\A-[nErsuz]*i|\A--in-place")
+PERL_IN_PLACE = re.compile(r"\A-[acnpslwtTU0]*i")
+# Inline interpreter code that writes, moves or deletes a file: Python (open with a write mode, pathlib, os, shutil), Node (fs), Perl and
+# Ruby. Read with a hooks path anywhere in the command, it refuses; reading a hook from code passes.
+HOOK_CODE_WRITE = re.compile(
+    r"open\s{0,8}\([^)]{0,200},\s{0,8}(?:mode\s{0,8}=\s{0,8})?[rbt]{0,2}['\"][^'\"]{0,8}[wax+]"
+    r"|\.(?:write_text|write_bytes|unlink|rename|replace|rmdir|touch|chmod|symlink_to|hardlink_to)\s{0,8}\("
+    r"|\bos\.(?:remove|unlink|rename|replace|rmdir|removedirs|chmod|truncate|symlink|link)\s{0,8}\("
+    r"|\bshutil\.(?:rmtree|move|copy\w{0,16})\s{0,8}\("
+    r"|\b(?:writeFile|appendFile|unlink|rmdir|rm|rename|copyFile|cp|symlink|truncate|chmod)(?:Sync)?\s{0,8}\("
+    r"|\b(?:unlink|rename)\b|\bopen\s{0,8}\(?\s{0,8}[\w$]{1,64}\s{0,8},\s{0,8}['\"]?\s{0,8}\+?>"
+    r"|\bFile\.(?:write|delete|rename|unlink|chmod|symlink)\b|\bFileUtils\.")
+
+
+def k4_hook_command(words: list[str]) -> tuple[str, list[str]]:
+    """The program a segment runs, past assignments and launchers (prefix_end), and its arguments without redirections."""
+    start = prefix_end(words, 0)
+    if start >= len(words):
+        return "", []
+    return program_of(words[start:start + 1]), command_arguments(words[start:])
+
+
+def k4_hook_write_segment(words: list[str]) -> bool:
+    """Whether one segment writes, moves, deletes or edits in place a hooks path (HOOKS_PATH), or deletes or moves a word HOOKS_HOLDER
+    matches: an output redirection to one; rm and the other deleters, and mv and the other movers, on any operand; cp, install, ln, rsync,
+    ditto and scp to a destination (the value of -t or --target-directory, else the last operand); tee, sponge, editors, the chmod family,
+    touch, unzip, cpio and patch on any operand; dd of=; sed or gsed with -i or --in-place, and perl or ruby with -i; tar extracting;
+    find with -delete or with an -exec, -execdir, -ok or -okdir action that runs one of these. A read of a hook, a copy out of a hooks
+    directory and a listing pass."""
+    for position, word in enumerate(words[:-1]):
+        if REDIRECT_OUT.match(word) and HOOKS_PATH.search(words[position + 1]):
+            return True
+    program, args = k4_hook_command(words)
+    named = [arg for arg in args if HOOKS_PATH.search(arg)]
+    if program in HOOK_DELETERS or program in HOOK_MOVERS:
+        return bool(named) or any(HOOKS_HOLDER.match(arg) for arg in args)
+    if program in HOOK_COPIERS:
+        target = next((args[i + 1] for i, arg in enumerate(args[:-1]) if arg in {"-t", "--target-directory"}), None)
+        target = target or next((arg.partition("=")[2] for arg in args if arg.startswith("--target-directory=")), None)
+        if target is None:
+            positional = [arg for arg in args if not arg.startswith("-")]
+            target = positional[-1] if positional else ""
+        return bool(HOOKS_PATH.search(target))
+    if program in HOOK_WRITERS:
+        return bool(named)
+    if program == "dd":
+        return any(arg.startswith("of=") and HOOKS_PATH.search(arg[3:]) for arg in args)
+    if program in {"sed", "gsed"}:
+        return bool(named) and any(SED_IN_PLACE.match(arg) for arg in args)
+    if program in {"perl", "ruby"}:
+        return bool(named) and any(PERL_IN_PLACE.match(arg) for arg in args)
+    if program in {"tar", "bsdtar"}:
+        first = next((arg for arg in args if arg != "--"), "")
+        extracting = any(arg in {"-x", "--extract", "--get"} or re.fullmatch(r"-[A-Za-z]{0,8}x[A-Za-z]{0,8}", arg) for arg in args) \
+            or bool(re.fullmatch(r"[A-Za-z]{0,8}x[A-Za-z]{0,8}", first))
+        return extracting and bool(named)
+    if program == "find":
+        holds = bool(named) or any(HOOKS_HOLDER.match(arg) for arg in args)
+        acts = "-delete" in args or any(arg in FIND_EXEC and position + 1 < len(args)
+                                        and program_of(args[position + 1:position + 2]) in HOOK_WRITE_PROGRAMS
+                                        for position, arg in enumerate(args))
+        return holds and acts
+    return False
+
+
+def k4_hook_write_reason(words_list: list[list[str]], text: str) -> str | None:
+    """HOOKS (tier k; command center ruling of 2026-10-09, gap d of the Claude Code native practice record of that date; recorded in
+    docs/decisions/2026-10-08-guard-hook-fails-closed.md): a Bash write, move, delete or in-place edit of the files in a hooks directory,
+    which hold this guard, refuses as guard_file_write. Each segment is read by k4_hook_write_segment. A command that changes directory
+    into a hooks directory (cd, pushd) and then runs one of those programs or an output redirection refuses, and so does one that changes
+    into a .claude directory and then names `hooks` relatively; xargs or parallel running one of those programs in a command that names a
+    hooks path refuses; an interpreter or shell (INTERPRETER, SHELLS) in a command that names a hooks path and holds a file write, move or
+    delete in code (HOOK_CODE_WRITE) refuses. Reading, hashing, diffing, listing and copying a hook elsewhere pass. A program not listed
+    here or a path built at run time passes: like every rule here this is a text heuristic, not a security boundary; the Edit deny rule on
+    ~/.claude/hooks/** in the settings covers Claude's file tools, and a hook that cannot run blocks (the template's guard command)."""
+    if ".claude" not in text and "CLAUDE_CONFIG_DIR" not in text:
+        return None
+    k4_charge(text)
+    named_anywhere = bool(HOOKS_PATH.search(text))
+    code_writes: bool | None = None  # HOOK_CODE_WRITE over the text, read once: per interpreter segment it would be quadratic
+    in_hooks = in_claude = False
+    for words in words_list:
+        k4_word_charge(words)
+        if k4_hook_write_segment(words):
+            return "guard_file_write"
+        program, args = k4_hook_command(words)
+        writes = program in HOOK_WRITE_PROGRAMS or any(REDIRECT_OUT.match(word) for word in words)
+        if writes and (in_hooks or in_claude and any(HOOKS_RELATIVE.match(arg) for arg in args)):
+            return "guard_file_write"
+        if program in {"cd", "pushd"}:
+            in_hooks = in_hooks or any(HOOKS_PATH.search(arg) for arg in args)
+            in_claude = in_claude or any(HOOKS_CLAUDE_DIR.match(arg) for arg in args)
+        if named_anywhere and program in HOOK_WRITE_PROGRAMS and any(program_of([word]) in {"xargs", "parallel"} for word in words):
+            return "guard_file_write"  # prefix_end walks past xargs and parallel as launchers; their operands come from stdin
+        if named_anywhere and (INTERPRETER.fullmatch(program) or program in SHELLS):
+            if code_writes is None:
+                code_writes = bool(HOOK_CODE_WRITE.search(text))
+            if code_writes:
+                return "guard_file_write"
+    return None
 
 def k4_delimiter_word(text: str, at: int) -> tuple[str, bool] | None:
     """(delimiter, exact) of the here-document word that starts at text[at]: the shell word up to a blank, a line end or a metacharacter

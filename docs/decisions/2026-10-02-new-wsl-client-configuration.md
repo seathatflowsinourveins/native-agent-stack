@@ -1334,3 +1334,18 @@ configuration application or token or cache savings. All earlier projections
 remain historical observations.
 
 Today: 402 pieces, 362 wired (211 practice, 151 through a slot), 24 not wired (0 through a slot that does not install, 24 by their own entry) and 16 authorization pieces
+
+## Addendum 2026-10-09: hooks directory edit deny
+
+The settings template adds the practice piece
+`claude/settings/permission/deny/Edit(~/.claude/hooks/**)`, which the existing
+permission-deny practice entry of the map wires. It keeps Claude's file tools off
+the installed hooks, among them the secret-path guard; the guard's own tier k
+covers Bash writes to the same directory
+([guard record, addendum of this date](2026-10-08-guard-hook-fails-closed.md)).
+Claude Code consults only `Edit` and `Read` path rules, so no `Write(...)` rule
+is added. This projection records repository source wiring; it establishes no
+live configuration application. All earlier projections remain historical
+observations.
+
+Today: 403 pieces, 363 wired (212 practice, 151 through a slot), 24 not wired (0 through a slot that does not install, 24 by their own entry) and 16 authorization pieces

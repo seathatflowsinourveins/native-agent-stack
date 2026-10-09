@@ -296,3 +296,31 @@ Limits: a host without `/usr/bin/python3` now fails the guard with exit 127, whi
 block from Claude Code 2.1.295 (the floor raise is the currency lane's change); the same holds for a missing script
 when `jq` is not on `PATH`. The command center aligns this host's user settings to the rendered form after this
 lands; until then the host keeps its own pinned form.
+
+## Addendum (2026-10-09): the guard protects its own files
+
+The command center ruled on 2026-10-09 to close the gap the Claude Code native practice review recorded for the
+`settings-permissions` slot: under bypass no rule covered the guard's own files. Two layers now do.
+
+- **File tools.** The settings template and the project settings deny `Edit(~/.claude/hooks/**)`. An `Edit` rule
+  covers every built-in tool that edits files, and Claude Code consults only `Edit` and `Read` path rules: a
+  `Write(...)` path rule is accepted but never used (https://code.claude.com/docs/en/permissions, read 2026-10-09),
+  so none is added. A test pins the rule in both files and keeps `Write(`, `NotebookEdit(` and `MultiEdit(` path
+  rules out.
+- **Bash.** The guard's new tier k (`guard_file_write`, `k4_hook_write_reason`) refuses a write, move, delete or
+  in-place edit of a `.claude/hooks` directory, user or project, and a delete or move of a `.claude` directory or a
+  home that holds one. The rule list is in `docs/secret-storage.md` ("Hooks"). Reading, hashing, diffing, listing
+  and copying a hook elsewhere pass.
+
+Tests (`tests/test_secret_path_guard.py`, `GuardFileWriteTests`): 52 commands refuse, including through `sudo`, a
+launcher with an assignment, `timeout`, `rtk proxy`, `bash -c`, `xargs`, a `cd` first and inline Python and Node; 30
+controls pass, among them `cat`, `sha256sum`, `diff`, `grep`, `cp` out, `sed -n`, a hash redirected elsewhere and
+deletes of sibling `~/.claude` directories; the hook process exits 2 with one line; crafted 199,000-character texts
+stay under the timing bound. `adoption/hooks/claude/SHA256SUMS` carries the guard's new hash.
+
+Limits: like every rule in the guard this is a text heuristic, not a security boundary; a path built at run time or
+an unlisted program passes. The break-glass paths stay as drilled: `claude --safe-mode` and
+`claude --settings '{"disableAllHooks": true}'` act at session launch, outside any guarded Bash call. The supported
+install, `tools/adoption/install_claude_profile.py`, names no hooks path on its command line and is unaffected.
+After this lands, the command center applies the new deny rule to the host's user settings and installs the new
+guard with that tool.

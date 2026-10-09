@@ -42,6 +42,7 @@
       "Read(**/.config/nativestack/*.key)",
       "Read(~/.claude/.credentials.json)",
       "Read(**/.claude/.credentials.json)",
+      "Edit(~/.claude/hooks/**)",
       "Read(~/.codex/auth.json)",
       "Read(**/.codex/auth.json)",
       "Read(~/.config/gh/hosts.yml)",

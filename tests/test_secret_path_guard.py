@@ -4385,6 +4385,9 @@ K4_HELPER_FIXTURES = {
     "k4_literal_input": "printf '%s' \"$K\" | python3 scripts/kernel_keyring.py store sample_key",
     "k4_ps_reason": "echo PS_PERSONALITY; ps -e",
     "k4_canary_reason": "python3 /p/canary_proof.py --phase baseline",
+    "k4_hook_write_reason": "ls ~/.claude/hooks",
+    "k4_hook_write_segment": "ls ~/.claude/hooks",
+    "k4_hook_command": "ls ~/.claude/hooks",
     "k4_delimiter_word": "cat <<'EOF' > note.md\ntext\nEOF\ngit status",
     "k4_regions": "cat <<'EOF' > note.md\ntext\nEOF\ngit status",
     "k4_resume_contexts": "cat <<'EOF' > note.md\ntext\nEOF\ngit status",
@@ -4857,6 +4860,10 @@ K4_SCALING.update({
     'k4_names_stores_segment': K4_SCALING['k4_names_and_stores'],
     'systemd_run_variables': lambda n: 'systemd-run --user ' + '-E X=CLAUDE_CODE_x ' * (n // 19) + 'true',
     'k4_derived': lambda n: k4_code_f("import os\nos.system('true " + 'a ' * (n // 2) + "')"),
+    # HOOKS (tier k): many arguments, a copy out of a hooks directory, and interpreter code naming one with read-only opens.
+    'k4_hook_write_reason': lambda n: "python3 -c '" + "open(x);" * (n // 8) + "' ~/.claude/hooks/x",
+    'k4_hook_write_segment': lambda n: 'cp ' + '~/.claude/hooks/x ' * (n // 18) + '/tmp/out',
+    'k4_hook_command': lambda n: 'ls ' + '-l ' * (n // 3) + '~/.claude/hooks',
 })
 
 
@@ -5591,6 +5598,86 @@ class K4GuardTests(unittest.TestCase):
                     self.assertIn(word, hint)
                 self.assertNotIn("/api/settings/", hint)
                 self.assertNotIn("$", hint)
+
+
+class GuardFileWriteTests(unittest.TestCase):
+    """HOOKS (tier k, 2026-10-09; docs/decisions/2026-10-08-guard-hook-fails-closed.md): a Bash write, move, delete or in-place edit of a
+    .claude/hooks directory, which holds this guard, refuses as guard_file_write; reading, hashing, diffing, listing and copying a hook out
+    pass (the command center's false-positive controls)."""
+
+    GUARD = "~/.claude/hooks/secret_path_guard.py"
+    REFUSED = (
+        f"rm {GUARD}", "rm -rf ~/.claude/hooks", "rm -rf ~/.claude", 'rm -rf "$HOME/.claude/hooks"', "rm -f ${HOME}/.claude/hooks/x.py",
+        "unlink /home/example/.claude/hooks/secret_path_guard.py", f"shred -u {GUARD}", f"truncate -s 0 {GUARD}",
+        f"mv {GUARD} /tmp/x.py", f"mv /tmp/x.py {GUARD}", "mv ~/.claude ~/.claude.bak",
+        f"cp /tmp/benign.py {GUARD}", "cp -t ~/.claude/hooks /tmp/benign.py", f"install -m 0644 /tmp/benign.py {GUARD}",
+        f"ln -sf /tmp/benign.py {GUARD}", "rsync -a /tmp/hooks/ ~/.claude/hooks/",
+        f"echo 'import sys' > {GUARD}", "printf x >> $HOME/.claude/hooks/secret_path_guard.py", f"cat /tmp/x 1> {GUARD}",
+        f"tee {GUARD} < /tmp/x", f"echo x | tee -a {GUARD}", f"sed -i 's/return 2/return 0/' {GUARD}", f"sed -ni 's/a/b/' {GUARD}",
+        f"sed --in-place=.bak 's/a/b/' {GUARD}", f"perl -pi -e 's/2/0/' {GUARD}", f"perl -i.bak -pe 's/2/0/' {GUARD}",
+        f"dd if=/dev/null of={GUARD}", f"chmod 000 {GUARD}", "touch ~/.claude/hooks/new.py", f"vim -c wq {GUARD}",
+        "cd ~/.claude/hooks && rm secret_path_guard.py", "cd ~/.claude && rm -rf hooks", "pushd ~/.claude/hooks; echo x > g.py",
+        "find ~/.claude/hooks -name '*.py' -delete", "find ~/.claude -name '*.py' -exec rm {} +",
+        f"python3 -c \"open('{GUARD}', 'w').write('')\"", "python3 -c \"import os; os.remove('/home/example/.claude/hooks/g.py')\"",
+        "python3 - <<'PY'\nfrom pathlib import Path\nPath('/home/example/.claude/hooks/g.py').write_text('')\nPY",
+        "node -e \"require('fs').writeFileSync('/home/example/.claude/hooks/g.py', '')\"",
+        f"bash -c 'rm {GUARD}'", f"sudo rm {GUARD}", f"env FOO=1 rm {GUARD}", f"timeout 5 rm {GUARD}", f"rtk proxy rm {GUARD}",
+        "tar -xf /tmp/x.tar -C ~/.claude/hooks", "tar xf /tmp/x.tar ~/.claude/hooks/g.py", "unzip -o /tmp/x.zip -d ~/.claude/hooks",
+        "ls ~/.claude/hooks/*.py | xargs rm", "rm .claude/hooks/x.py", "cp /tmp/x ./.claude/hooks/x.py",
+        "rm -rf $CLAUDE_CONFIG_DIR/hooks", "echo x > ${CLAUDE_PROJECT_DIR}/.claude/hooks/x.sh",
+    )
+    ALLOWED = (
+        f"cat {GUARD}", f"head -n 5 {GUARD}", f"sha256sum {GUARD}", "sha256sum ~/.claude/hooks/*.py", "ls -la ~/.claude/hooks",
+        f"diff {GUARD} scripts/hooks/secret_path_guard.py", f"grep -n onFailure {GUARD}", f"wc -l {GUARD}", f"stat {GUARD}",
+        f"cp {GUARD} /tmp/guard-copy.py", "cp -r ~/.claude/hooks /tmp/hooks-backup", f"sed -n 1,20p {GUARD}",
+        f"sha256sum {GUARD} > /tmp/sums.txt", "rm -rf ~/.claude/projects/old-session", "rm -rf ~/.claude/worktrees/x",
+        "mv ~/.claude/todos/a.json /tmp/", "cd ~ && rm -rf tmp/x", "cd ~/.claude && ls hooks", "cd ~/.claude && rm -rf todos",
+        "python3 tools/adoption/install_claude_profile.py --apply", f"python3 -c \"print(open('{GUARD}').read()[:10])\"",
+        "python3 -c \"import os; print(os.path.exists('/home/example/.claude/hooks/g.py'))\"",
+        "find ~/.claude/hooks -name '*.py' -exec sha256sum {} +", "tar -czf /tmp/hooks.tgz ~/.claude/hooks",
+        "git diff -- .claude/settings.json", "echo hooks > /tmp/x", "rm /tmp/x.py", "ls .claude/hooks",
+        "perl -Mstrict -e 'print 1' ~/.claude/hooks/x.py", "vim --version",
+    )
+
+    def test_writes_moves_deletes_and_edits_of_a_hooks_directory_refuse(self):
+        for command in self.REFUSED:
+            with self.subTest(command=command):
+                self.assertEqual(guard.check(command), "guard_file_write")
+
+    def test_reads_listings_and_copies_out_pass(self):
+        for command in self.ALLOWED:
+            with self.subTest(command=command):
+                self.assertIsNone(guard.check(command))
+
+    def test_the_hook_process_refuses_with_its_reason_on_one_line(self):
+        sentinel = "SENTINEL-HOOKS-7c1e"
+        for command in (f"rm {self.GUARD}", f"sed -i 's/2/0/' {self.GUARD}", f"cp /tmp/benign.py {self.GUARD}"):
+            with self.subTest(command=command):
+                done = run_hook({"tool_name": "Bash", "tool_input": {"command": f"{command} # {sentinel}"}})
+                self.assertEqual((done.returncode, done.stdout), (2, ""))
+                self.assertIn("blocked (guard_file_write)", done.stderr)
+                self.assertEqual(done.stderr.count("\n"), 1)
+                self.assertNotIn(sentinel, done.stderr)
+        done = run_hook({"tool_name": "Bash", "tool_input": {"command": f"sha256sum {self.GUARD}"}})
+        self.assertEqual((done.returncode, done.stdout, done.stderr), (0, "", ""))
+
+    def test_hint_names_the_supported_route_and_no_value(self):
+        hint = guard.HINTS["guard_file_write"]
+        for word in (".claude/hooks", "pull request", "install_claude_profile.py", "reading"):
+            self.assertIn(word, hint)
+        self.assertNotIn("$", hint)
+
+    def test_crafted_texts_stay_within_the_hook_timeout(self):
+        # Every HOOKS quantifier is bounded or anchored: a long interpreter text that names a hooks path is read in linear time.
+        for unit in ("open(", "openx", "aaaaaaa ", "os.x" * 4, "/.claude/" * 2):
+            command = "python3 -c '" + unit * (199_000 // len(unit)) + "' ~/.claude/hooks/x.py"
+            with self.subTest(unit=unit):
+                started = time.perf_counter()
+                try:
+                    guard.check(command)
+                except guard.WorkBudgetExceeded:
+                    pass
+                self.assertLess(time.perf_counter() - started, PATHOLOGICAL_SECONDS)
 
 
 if __name__ == "__main__":
