@@ -5266,8 +5266,8 @@
     },
     {
       "path": "adoption/credential-inventory.json",
-      "sha256": "e689a8d584a62f9551be7a0befa93eebf193d59d2dd1b5b8e62afe2ba300fb06",
-      "bytes": 27732
+      "sha256": "65ba72f1a088fb953f66aa4a0abfa39b1703a9d2f215c0cd55f43a76eca9cdbd",
+      "bytes": 31151
     },
     {
       "path": "adoption/hardware-profiles.json",
@@ -16977,7 +16977,7 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "ed742ae36312bd76ba04425885fed029a0d1de51b6d396da7d9c94e43dd39549",
+      "sha256": "7b7ee4cf2f492917f3f9616cc6cd6a7c4908c29e6b38a66c14d4da96123090fa",
       "bytes": 160022
     },
     {
@@ -18301,6 +18301,11 @@
       "bytes": 16124
     },
     {
+      "path": "docs/decisions/2026-10-09-anthropic-api-additional-keys.md",
+      "sha256": "60e4c7cc58ec4aa4b7fb2a803afb49b10739cf94167ba7519f715704a1e7210e",
+      "bytes": 6502
+    },
+    {
       "path": "docs/decisions/2026-10-09-claude-code-floor.md",
       "sha256": "3c3c8d1a9abbd526ee9c284b77a1199cffe18435be738539e0a7c3662b6a5838",
       "bytes": 8327
@@ -18452,8 +18457,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "d25b8168702228217100f8249b89353881533d9061c3abf7d6fabda6a481b089",
-      "bytes": 252667
+      "sha256": "9557391861663af05fd2b39f85d2246d2d586208cfc7491ce4c98b08554aff72",
+      "bytes": 252754
     },
     {
       "path": "docs/harness-rule-enforcement.md",
@@ -18632,8 +18637,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "917f8d1d0db59af5454d9530beb5696dcb2208a7191f3e82790848aaab5083f0",
-      "bytes": 193318
+      "sha256": "bbe03ecc59bfcff562c62492de8f1615b6ec5a3ebea8dc9bae74c07672c314f1",
+      "bytes": 194203
     },
     {
       "path": "docs/stack.md",
@@ -58652,8 +58657,8 @@
     },
     {
       "path": "tests/test_credential_run.py",
-      "sha256": "8896ee149fcd42440408f98d4b6c86cef50fc9f181dec44a22771580101f3a42",
-      "bytes": 132878
+      "sha256": "815c19451749117963299a4adda8a87e3998d6397bf882d05f6f74297eee2027",
+      "bytes": 132965
     },
     {
       "path": "tests/test_credential_status.py",

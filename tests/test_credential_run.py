@@ -37,7 +37,8 @@ import credential_run as run_mod  # noqa: E402
 import set_credential as writer  # noqa: E402
 
 INJECTABLE_IDS = {"alpaca-paper", "alpaca-paper-2", "sec-contact", "databento", "typesafe", "omniroute", "tavily",
-                  "claude-oauth-token", "canary-e2e", "anthropic-api", "anthropic-api-2"}
+                  "claude-oauth-token", "canary-e2e", "anthropic-api", "anthropic-api-2",
+                  "anthropic-api-3", "anthropic-api-4"}
 NOT_INJECTABLE_IDS = ("grafana-admin", "nativestack-generation-key", "openhands-session", "claude-native",
                       "codex-native", "gh-native", "huggingface-native", "huggingface-native-stored", "ibkr-gateway",
                       "github-actions")
@@ -380,12 +381,12 @@ class RunnerCase(unittest.TestCase):
 
 
 class InjectionTests(RunnerCase):
-    def test_second_anthropic_key_uses_the_same_setter_and_runner_grammar(self):
+    def test_anthropic_keys_use_the_same_setter_and_runner_grammar(self):
         name = "ANTHROPIC_API_KEY"
         first_path = self.store / "anthropic-api.env"
         for tail in ("", " space;tilde~"):
             values = {entry_id: fake("sk-test-", tail)
-                      for entry_id in ("anthropic-api", "anthropic-api-2")}
+                      for entry_id in ("anthropic-api", "anthropic-api-2", "anthropic-api-3", "anthropic-api-4")}
             first_before = None
             for entry_id, value in values.items():
                 with self.subTest(id=entry_id, quoted=bool(tail)):
