@@ -74,6 +74,14 @@ The Actions allow-list and harness description below were checked against live s
   The owner checks the native [Claude Console federation history](https://platform.claude.com/settings/workload-identity-federation?tab=history)
   for the reason and corrects the relevant rule or claim; the Console denial reason is not established by the retained
   workflow evidence.
+- **Pull request review on demand.** [`claude-pr-review.yml`](../.github/workflows/claude-pr-review.yml) is
+  dispatched by hand from `main` with a pull request number and the exact head commit, and only while the repository
+  variable `CLAUDE_PR_REVIEW_ENABLED` is `true`. It uses the action pin v1.0.247 (`2dca132f`) and the federation
+  variables `ANTHROPIC_FEDERATION_RULE_ID`, `ANTHROPIC_ORGANIZATION_ID`, `ANTHROPIC_SERVICE_ACCOUNT_ID` and
+  `ANTHROPIC_WORKSPACE_ID`. `main` is at the workspace root and the pull request head is data under `pr-head/`; Claude has Read, Glob
+  and Grep only, a $5 client budget and at most 30 assistant turns; the job grants `contents: read`, `pull-requests: read` and
+  `id-token: write`. A model-free step copies the review to the job summary; nothing is posted to the pull request
+  ([decision](decisions/2026-10-08-claude-actions-pr-review.md)). No hosted run has been made.
 - **Against the final catalog of 2026-10-01** (`docs/final-catalog-20261001.md`, #595): the picks each blind model
   family made for these layers. The clean-room definitive round announced there decides one pick per slot.
   - git-github-automation: both families picked git, gh, Worktrunk and sem (the Claude pick keeps sem only if a
