@@ -642,12 +642,13 @@ class SecretGuardProfileTests(unittest.TestCase):
         payload = json.dumps({"tool_name": "Bash", "tool_input": {"command": bash_command}})
         return subprocess.run(["sh", "-c", command], input=payload, capture_output=True, text=True, timeout=30)
 
-    def test_rendered_hook_blocks_after_install_and_is_inert_before(self):
+    def test_rendered_hook_blocks_before_and_after_install(self):
         with tempfile.TemporaryDirectory() as tmp:
             home = Path(tmp)
             command = self.rendered_hook(home)
-            missing = self.run_rendered(command, "cat \"$PAPER_ENV_FILE\"")
-            self.assertEqual(missing.returncode, 0, "no installed guard must not block every Bash call")
+            missing = self.run_rendered(command, "git status")
+            self.assertEqual(missing.returncode, 2, "a missing guard must block, not pass, every Bash call")
+            self.assertIn("secret-path guard is not installed", missing.stderr)
             icp.install_guards(home, dry_run=False)
             blocked = self.run_rendered(command, "cat \"$PAPER_ENV_FILE\"")
             self.assertEqual(blocked.returncode, 2)
