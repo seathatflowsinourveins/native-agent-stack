@@ -2,8 +2,8 @@
   "schema_version": 1,
   "id": "n1-extreme-mover-ranking-20261008",
   "status": "draft",
-  "revision": "R3 census-2018 successor under CC task-ns2604-coop-20261008T223631Z; portable draft for both designated R3 reads before any census count",
-  "parent_candidate_sha256": "bc8ec9b89b73612b69e6c50f8ecdfe45c26a87c0d24e252f94572fc90f802b55",
+  "revision": "R3 census-2018 identity-plan successor: P2 binds the exact PLAN and requires qualified joins, accounting and upstream-engine historical acceptance before census or fit; both designated delta reads remain required",
+  "parent_candidate_sha256": "8e203bcea1f3df307db3ccabb0294d5bad07cc24125eab77b6d1e320e3e9e704",
   "required_changes": [
     1,
     2
@@ -314,6 +314,17 @@
     "reconciliation": "NativeNautilus accounts/fills/positions plus independent Decimal cash/fees/actions/NAV reconciliation must implement the frozen portfolio contract; all economic integration remains unaccepted pending the upstream historical E2E."
   },
   "eligibility_for_strategy_evidence": {
+    "identity_join_acceptance": {
+      "required_for": ["descriptive_census", "fit"],
+      "plan_pointer": "/descriptive_census/gates/identity_join_plan",
+      "gate_3_status": "OPEN",
+      "acceptance_state": "INCOMPLETE",
+      "qualified_joins": "Before census or fit, require the bound plan's nonempty covered dated LEAN map/resolver path and historical native SID, original filing CIK, qualified immutable provider security ID/source namespace, and dated ordinary-share issuer/class/listing evidence containing the cutoff; reject empty/default/fallback mappings, inferred aliases, conflicting lifetimes and backdated availability.",
+      "inventory_and_exclusions": "Before census or fit, freeze and hash the supplied ticker/session inventory, actual map inputs and expected joins; reconcile every supplied row as uniquely admitted or explicitly unknown/excluded with original-source identity/reason/hash accounting under the accepted Layer1.5 receipt. Partial inventory and original source counts are not market-wide acceptance.",
+      "historical_upstream_engine_acceptance": "Before census or fit, require the bound plan's new historical diagnostic through NautilusTrader2.0.0rc5 ParquetDataCatalog write/query and BacktestEngine.run, using qualified inputs and real historical rename/reuse/share-class/end-point cases, refusal controls and independent per-security fill/cash reconciliation; retain commands, rc and source/input/output hashes and matched/unknown/excluded totals. Synthetic controls, engine/source pins and the earlier AAPL diagnostic alone cannot close gate3.",
+      "separate_gate_2": "Accepted dated options listing-state evidence remains a separate conditional requirement; PLAN, qualified identity or a later archive floor does not close gate2 or turn absent chains into negative membership.",
+      "failure": "Until these preconditions are accepted, keep gate3 OPEN and record NOT_RUN; inadequate qualified data remains INSUFFICIENT_EVIDENCE. No census/fit, replacement cohort or deleted mandatory KZ arm is permitted by the plan."
+    },
     "layer15": "INCOMPLETE: Only an accepted Layer1.5 native acceptance receipt, binding its exact manifest/exclusions hashes, can supply PIT-04 counted identities/reasons into survivorship reporting. All native included/excluded counts remain unknown until then; code tests/partial corpus do not grant acceptance. G4 is three checks: retained Alpaca ratio, pinnedLEANfactor/effective event985ef30a, and independently acquired AlpacaSPLITversusRAWwith declared tolerance. The paid three-provider version is an owner-gated upgrade. ExactcontractR2-SURVIVORSHIP.json.",
     "N1_engine_exam": "retained-evidence:research/n1-entrance-exam-20261008T0715Z/receipt.json sha256df92a20de4678b271b1aa2af0e2599e815998ce49b26db7625cd2020c643fa5c; engineevidenceonly/Alpaca-onlysplitglue. Itdoesnotmeet theseparatelyboundLayer1.5triple-check. Frozen-input/strategy-datasetboundary source=native-agent-stack@ee01dd1274b3e6339ac388b53e2fea3d3b1ec52b:blueprints/us-equities/AGENTS.md:38-44, verifiednativegitshow; synthetictiming/LEANscheduleisnotacceptedhistoricalstrategydata. No strategy number citable. Historical-data replay/acceptance remains a separate layer15 task on its accepted source/head/currentlock.",
     "promotion": "R2-COMPARISON.json exactstates: DATA_INVALID,INSUFFICIENT_EVIDENCE,NOT_BEATEN,HISTORICAL_DIAGNOSTIC,FORWARD_HOLDOUT_PASS. Onlyfixedfuture126sessionholdoutcanpromote; all36primarybounds atBonferroni126level>0,250fills,100issuers,40sessions,90percentmatched,nettotal>0/drawdown<=20percentbothcosts, includingwinsor/top5removed. No historicalfreshPASSororders.",
@@ -471,8 +482,19 @@
       "evidence_scope": "Retained public documentation/sample metadata and native calendar observations, not paid delivery or accepted historical strategy data; licensed bytes are not published here."
     },
     "gates": {
-      "daily_listing_state": "unresolved; absence of chain rows cannot establish negative membership",
-      "historical_identity_and_survivorship": "unresolved; Layer1.5 owner must qualify dated CIK-anchored issuer/immutable security/share-class joins using upstream maps first and accepted included/excluded source hashes",
+      "daily_listing_state": "unresolved; gate2 OPEN and separately conditional on accepted dated listing-state evidence. PLAN, identity mapping, engine/source pins or a later archive floor do not pass gate2; absent chain rows cannot establish negative membership.",
+      "historical_identity_and_survivorship": "unresolved; gate3 OPEN. Before census or fit, accept the adjacent hash-bound PLAN's qualified dated CIK/immutable security/share-class joins, original-source inventory/exclusion accounting and new historical upstream-engine acceptance; plan/source pins alone supply no gate3 PASS.",
+      "identity_join_plan": {
+        "path": "retained-evidence:research/layer15-build-r3-identity-20261008/R3-IDENTITY-JOIN-PLAN.md",
+        "sha256": "b25064aabc4ba363f1bbda05729874d44d39606bf1d2470c8978def21b59b56c",
+        "classification": "PLAN",
+        "gate_3_status": "OPEN",
+        "custodian_path": "research/layer15-build-r3-identity-20261008/R3-IDENTITY-JOIN-PLAN.md",
+        "path_resolution": "Resolve the retained-evidence identifier at the custodian's native-agent-stack state root; it names the exact retained file, not a reconstructed or sanitised plan. Both designated review packets must carry that same file/hash as source context.",
+        "execution_precondition_pointer": "/eligibility_for_strategy_evidence/identity_join_acceptance",
+        "required_before": ["descriptive_census", "fit"],
+        "scope": "Dated original CIK/issuer/class/provider-security joins, bound inventory/exclusion accounting and historical Nautilus upstream-engine acceptance are mandatory before execution. The exact source plan remains off-repository; its private host locator is not republished. No implementation, acquisition, gate PASS or strategy evidence is asserted."
+      },
       "published_count_rights": "unresolved for actual selected delivery; purchase remains owner-controlled",
       "mandatory_KZ_inputs": "unresolved separately in execution_gaps.KZ.source_inputs"
     },
