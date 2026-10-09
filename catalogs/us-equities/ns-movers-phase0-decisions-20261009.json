@@ -62,7 +62,7 @@
       "repository": "skfolio/skfolio",
       "source_commit": "8a399757200d46b1ac1bff1b3daa71d9f0fa4170",
       "version": "1.7.0 installed route",
-      "decision": "reuse native WalkForward after exact study API/session/purge acceptance; v1.2.9 precedent c99fcf71349e2df4a7a1033ee85ca2e9ced9abee; new v1.7.1 watched, not installed",
+      "decision": "reuse native WalkForward after exact study API/session/purge acceptance; v1.2.9 predecessor reference pinned in source_packet/sources.json; new v1.7.1 watched, not installed",
       "review": "source_review_and_existing_receipt_leads_only",
       "execution": "NOT_RUN_BY_NS_MOVERS",
       "phase0_install": false,

@@ -19551,7 +19551,7 @@
           "path": "catalogs/us-equities/ns-movers-phase0-decisions-20261009.json",
           "pointer": "/decisions/2",
           "id": "NSM-SKFOLIO",
-          "decision": "reuse native WalkForward after exact study API/session/purge acceptance; v1.2.9 precedent c99fcf71349e2df4a7a1033ee85ca2e9ced9abee; new v1.7.1 watched, not installed",
+          "decision": "reuse native WalkForward after exact study API/session/purge acceptance; v1.2.9 predecessor reference pinned in source_packet/sources.json; new v1.7.1 watched, not installed",
           "review_level": "source_review; exact scope in source_packet, no E2E upgrade",
           "evidence_level": "source_review_or_Phase0_synthetic_structural_only"
         },
