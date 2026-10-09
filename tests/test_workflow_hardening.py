@@ -1088,7 +1088,7 @@ class WholeSuiteHeadroomAndDiagnostics(unittest.TestCase):
         job = self.jobs[self.VALIDATE]
         summary = step_block(job, "Report unittest counts")
         self.assertEqual(block_if(summary), "always()")
-        self.assertIn("continue-on-error: true", summary)
+        self.assertNotIn("continue-on-error", summary)
         self.assertLess(job.index(self.SUITE_STEPS[self.VALIDATE]), job.index("Report unittest counts"))
         self.assertLess(job.index("Report unittest counts"), job.index(self.UPLOAD_STEP))
         cases = [
@@ -1172,9 +1172,7 @@ class ValidateShardWorkflowContract(unittest.TestCase):
         self.assertEqual(json.loads(matrix.group(1)), list(range(8)))
         step = step_block(self.shards, "Test validation failure modes")
         self.assertIsNone(block_if(step), "every matrix cell must execute its assigned modules")
-        # Count reporting may be nonfatal; the shard job and suite execution must still fail closed.
-        self.assertNotRegex(uncommented(self.shards), r"(?m)^    continue-on-error\s*:")
-        self.assertNotIn("continue-on-error", uncommented(step))
+        self.assertNotIn("continue-on-error", uncommented(self.shards))
         self.assertEqual(unittest_invocations(step), [])
         (args,) = validate_shard_invocations(step)
         self.assertEqual(args[args.index("--shards") + 1], "8")
@@ -1188,6 +1186,32 @@ class ValidateShardWorkflowContract(unittest.TestCase):
         self.assertNotIn("continue-on-error", uncommented(self.final))
         self.assertEqual(sum(bool(re.search(r"(?m)^    name: validate$", job))
                              for job in self.jobs.values()), 1)
+
+    def test_validate_guard_rejects_failure_suppression_in_every_step(self):
+        from tests.test_workflow_policy import load_workflow
+
+        def guarded_result(candidate):
+            case = type(self)("test_eight_distinct_native_shards_keep_every_cell_running")
+            case.shards = candidate
+            result = unittest.TestResult()
+            case.run(result)
+            return result
+
+        original = guarded_result(self.shards)
+        self.assertTrue(original.wasSuccessful(), original.failures + original.errors)
+        steps = load_workflow(self.workflow)["jobs"]["validate"]["steps"]
+        for index, step in enumerate(steps):
+            with self.subTest(step=step["name"]):
+                block = step_block(self.shards, step["name"])
+                lines = [line for line in block.splitlines()
+                         if not re.match(r"^        continue-on-error:", line)]
+                lines.insert(1, "        continue-on-error: true")
+                candidate = self.shards.replace(block, "\n".join(lines), 1)
+                mutated = load_workflow("on: push\njobs:\n  validate:" + candidate)
+                self.assertEqual(mutated["jobs"]["validate"]["steps"][index]["continue-on-error"], "true")
+                result = guarded_result(candidate)
+                self.assertEqual(result.errors, [], result.errors)
+                self.assertTrue(result.failures, f"the real shard guard accepted suppression in {step['name']}")
 
     def test_final_step_passes_the_real_needs_result_and_attempt_scoped_reports(self):
         step = step_block(self.final, "Require complete discovery coverage and success from every shard")

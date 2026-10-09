@@ -1911,7 +1911,7 @@ class StandingRuleSurfacesTests(unittest.TestCase):
         self.assertEqual([phrase for phrase in self.DROPPED if phrase in text], [])
 
     # Root AGENTS.md keeps, beside the core, only lines whose removal would cause a shown mistake: the required
-    # sota-sources check (.github/workflows/validate.yml, job sota-sources; .github/main-ruleset.json), the required
+    # sota-sources check (.github/workflows/pr-metadata.yml, job sota-sources; .github/main-ruleset.json), the required
     # validate check over the registered evidence digests (validate.yml runs scripts/validate.py), and the trading
     # prerequisite that the amendment of docs/decisions/2026-10-07-instruction-core.md keeps for paper operation outside
     # the repository's paths, with the subtree rule that Codex's root-to-cwd AGENTS.md walk needs.

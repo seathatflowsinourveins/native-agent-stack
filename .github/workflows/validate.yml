@@ -269,7 +269,6 @@ jobs:
               2>&1 | tee "$RUNNER_TEMP/suite/unittest-verbose.log"
       - name: Report unittest counts
         if: always()
-        continue-on-error: true
         run: |
           # Parse unittest's native summary as adoption-bootstrap.yml's changed-tests step does.
           # An interrupted or missing log has unknown counts; reporting never changes the suite result.
