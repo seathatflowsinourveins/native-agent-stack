@@ -1,6 +1,6 @@
 """Versioned §6 hypotheses, never tuned or changed by a model.
 
-Source: us-equities-trading #25@7dfa652ac36195ea1e0b3df77f915e35fd3d4c81 §6;
+Source: us-equities-trading #25@b0994749ca6c52ad07cb3bb70e8b5b6cd4fac910 §6;
 CTS@eab8d5cb position-sizer and breakout-trade-planner references. The explicit
 code-managed-limit execution variant is separate from the target native plans.
 """

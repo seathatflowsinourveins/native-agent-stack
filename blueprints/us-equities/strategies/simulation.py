@@ -39,7 +39,7 @@ from .families import CONTROLS, FAMILIES, snapshot_data_type
 from .presets import PRESETS
 
 BASE_NS = int(datetime(2026, 10, 8, 13, 35, tzinfo=timezone.utc).timestamp() * 1e9)
-INSTRUMENT_ID = "T22.ALPACA"
+INSTRUMENT_ID = "TST.ALPACA"
 COHORT_SHA256 = digest({"protocol": "t22-synthetic-v1", "members": [INSTRUMENT_ID]})
 D = Decimal
 
@@ -146,23 +146,12 @@ def fixture_quotes(
     return result
 
 
-def run_case(
-    family,
-    preset="conservative-v1",
-    *,
-    snapshot=None,
-    start_ns=BASE_NS,
-    bids=None,
-    spec_overrides=None,
-    advance_to_ns=None,
-):
-    """Small native backtest, returning engineering fields without P&L statistics."""
-    if importlib.metadata.version("nautilus-trader") != "2.0.0rc5":
-        raise ValueError("unqualified_native_version")
+def fixture_engine():
+    """Shared native synthetic venue/instrument for acceptance regressions."""
     currency = Currency.from_str("USD")
     instrument = Equity(
         InstrumentId.from_str(INSTRUMENT_ID),
-        Symbol("T22"),
+        Symbol("TST"),
         currency,
         price_precision=4,
         price_increment=Price.from_str("0.0001"),
@@ -185,6 +174,24 @@ def run_case(
         latency_model=StaticLatencyModel(base_latency_nanos=1_000_000),
     )
     engine.add_instrument(instrument)
+    return engine, instrument
+
+
+def run_case(
+    family,
+    preset="conservative-v1",
+    *,
+    snapshot=None,
+    start_ns=BASE_NS,
+    bids=None,
+    spec_overrides=None,
+    advance_to_ns=None,
+    ledger=None,
+):
+    """Small native backtest, returning engineering fields without P&L statistics."""
+    if importlib.metadata.version("nautilus-trader") != "2.0.0rc5":
+        raise ValueError("unqualified_native_version")
+    engine, instrument = fixture_engine()
     overrides = {
         "entry_deadline_ns": start_ns + 5_000_000_000,
         "exit_deadline_ns": start_ns + 8_000_000_000,
@@ -196,7 +203,7 @@ def run_case(
         StrategySpec(INSTRUMENT_ID, COHORT_SHA256, preset=preset), **overrides
     )
     cls = (FAMILIES | CONTROLS)[family]
-    strategy = cls(spec)
+    strategy = cls(spec, ledger=ledger)
     snapshot = fixture_snapshot() if snapshot is None else snapshot
     quotes = fixture_quotes(
         instrument, start_ns=start_ns, **({"bids": bids} if bids is not None else {})
@@ -244,6 +251,9 @@ def run_case(
             "fill_callbacks": sum(row["event"] == "fill" for row in strategy.trace),
             "owned_quantity": str(strategy.quantity),
             "pending": strategy.pending is not None,
+            "sequence": strategy.sequence,
+            "strategy_id": str(strategy.strategy_id),
+            "order_id_tag": strategy.config.order_id_tag,
             "callback_faults": strategy.callback_faults,
             "flags": sorted(strategy.flags),
             "trace": strategy.trace,

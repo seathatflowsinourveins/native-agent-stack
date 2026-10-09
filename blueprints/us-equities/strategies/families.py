@@ -14,6 +14,7 @@ from decimal import ROUND_CEILING, ROUND_FLOOR, Decimal
 from types import MappingProxyType, SimpleNamespace
 
 from nautilus_trader.model import (
+    ClientOrderId,
     DataType,
     InstrumentId,
     OrderSide,
@@ -52,13 +53,35 @@ class FamilyStrategy(Strategy):
 
     FAMILY = "abstract"
 
+    def __new__(cls, spec, *, ledger=None, fault_sink=None):
+        # The rc5 PyO3 allocator accepts only its native config argument;
+        # Python-only injected dependencies belong to this subclass's __init__.
+        return super().__new__(cls)
+
     def __init__(self, spec: StrategySpec, *, ledger=None, fault_sink=None):
         self.spec = spec
         self.preset = preset_for(spec.preset, self.FAMILY, spec.catalyst_kind)
+        # rc5 checks the last StrategyId segment for uniqueness, not just
+        # config.order_id_tag (crates/system/src/trader.rs:566-578 at 1b0a49d2).
+        # A stable explicit instance name distinguishes otherwise identical
+        # deployments; one identity must never run twice in the same trader.
+        self.instance_tag = digest(
+            [
+                "t22-instance-v1",
+                self.FAMILY,
+                spec.preset,
+                spec.instance_id,
+                spec.instrument_id,
+                spec.execution_profile,
+                spec.cohort_sha256,
+            ]
+        )[:24]
+        self.client_id_prefix = "t22-" + self.instance_tag + "-"
+        self.sequence = 0
         super().__init__(
             StrategyConfig(
-                strategy_id=StrategyId("T22-" + self.FAMILY),
-                order_id_tag="T22",
+                strategy_id=StrategyId("T22-" + self.instance_tag),
+                order_id_tag=self.instance_tag,
                 log_events=False,
                 log_commands=False,
             )
@@ -72,8 +95,16 @@ class FamilyStrategy(Strategy):
         self.faulted = False
         self.enabled = True
         self.fault_sink = fault_sink
+        self._durable_ledger_supplied = ledger is not None
         self.ledger = (
-            ledger if ledger is not None else SimpleNamespace(freeze=self._freeze)
+            ledger
+            if ledger is not None
+            else SimpleNamespace(
+                freeze=self._freeze,
+                intents=lambda: (),
+                unresolved=lambda: (),
+                positions=dict,
+            )
         )
         self.entry_attempted = False
         self.pending = None
@@ -117,11 +148,81 @@ class FamilyStrategy(Strategy):
             return
         if self.cache.instrument(self.instrument_id) is None:
             raise ValueError("instrument_not_registered")
+        if (
+            self.spec.evidence_class != "synthetic"
+            and not self._durable_ledger_supplied
+        ):
+            self._freeze("startup_durable_ledger_required")
+            return
+        try:
+            if not self._restore_ledger():
+                return
+        except Exception as error:
+            # Never guess flatness or reset a sequence when journal reads fail.
+            self._freeze("startup_ledger_read_failed_requires_reconciliation")
+            self._record(
+                "startup_refused",
+                reason="ledger_read_failed",
+                error_type=type(error).__name__,
+            )
+            self._fault("on_start", error)
+            raise
         self.subscribe_quotes(self.instrument_id)
         self.subscribe_data(snapshot_data_type(self.spec.instrument_id))
         self.clock.set_timer(
             "t22-watchdog", timedelta(seconds=1), callback=self._on_watchdog
         )
+
+    def _restore_ledger(self):
+        """Restore identifiers; dirty startup requires the existing recovery path.
+
+        Reuse adaptive-paper/native_strategy.py's ledger-intents max-sequence
+        contract. No ambiguous order is retried here and no existing position is
+        adopted as flat. The wire governor still journals each explicit ID
+        before any broker request.
+        """
+        symbol = str(self.instrument_id.symbol)
+        own = [
+            i
+            for i in self.ledger.intents()
+            if i.client_id.startswith(self.client_id_prefix)
+        ]
+        sequences = [i.client_id[len(self.client_id_prefix) :] for i in own]
+        if any(
+            len(value) != 7
+            or not value.isascii()
+            or not value.isdigit()
+            or int(value) < 1
+            for value in sequences
+        ):
+            raise ValueError("malformed_owned_client_id")
+        self.sequence = max((int(value) for value in sequences), default=0)
+        if any(i.side == "buy" for i in own):
+            # Each registered instance makes one entry attempt across restart,
+            # including a terminal pre-wire refusal; a new trial needs its own
+            # explicit instance identity, not an implicit reset.
+            self.entry_attempted = True
+            self.flags.add("prior_entry_attempt_restored")
+        unresolved = self.ledger.unresolved()
+        position = self.ledger.positions().get(symbol)
+        reasons = []
+        if any(
+            i.symbol == symbol or i.client_id.startswith(self.client_id_prefix)
+            for i in unresolved
+        ):
+            reasons.append("startup_unresolved_intent_requires_reconciliation")
+        if position is not None and decimal(str(position.qty)) != 0:
+            reasons.append("startup_position_requires_reconciliation")
+        if self.cache.orders_open(instrument_id=self.instrument_id):
+            reasons.append("startup_cached_order_requires_reconciliation")
+        if self.cache.positions_open(instrument_id=self.instrument_id):
+            reasons.append("startup_cached_position_requires_reconciliation")
+        self._record(
+            "ledger_restored", sequence=self.sequence, prior_entry=self.entry_attempted
+        )
+        for reason in reasons:
+            self._freeze(reason)
+        return not reasons
 
     def on_stop(self):
         if "t22-watchdog" in self.clock.timer_names():
@@ -335,7 +436,7 @@ class FamilyStrategy(Strategy):
         instrument = self.cache.instrument(self.instrument_id)
         collar = decimal(self.spec.limit_collar_bps) / BPS
         raw = reference * (1 + collar if side == OrderSide.BUY else 1 - collar)
-        # Alpaca's price grid changes below $1; respect the tighter instrument
+        # The market-wide sub-penny grid changes below $1; respect the tighter instrument
         # grid as well. A buy rounds down into its collar; a sell rounds up.
         tick = max(
             decimal(str(instrument.price_increment)),
@@ -436,6 +537,13 @@ class FamilyStrategy(Strategy):
         )
 
     def _submit(self, side, quantity, price, role, reason):
+        if self.faulted or not self.enabled:
+            return
+        if self.sequence >= 9_999_999:
+            self._freeze("client_order_sequence_exhausted_requires_handoff")
+            return
+        self.sequence += 1
+        client_id = self.client_id_prefix + f"{self.sequence:07d}"
         instrument = self.cache.instrument(self.instrument_id)
         order = self.order_factory.limit(
             self.instrument_id,
@@ -444,6 +552,7 @@ class FamilyStrategy(Strategy):
             Price.from_decimal_dp(price, instrument.price_precision),
             time_in_force=TimeInForce.DAY,
             reduce_only=side == OrderSide.SELL,
+            client_order_id=ClientOrderId(client_id),
             tags=[
                 "family=" + self.FAMILY,
                 "preset=" + self.spec.preset,
@@ -461,6 +570,7 @@ class FamilyStrategy(Strategy):
             quantity=str(quantity),
             limit_price=str(price),
             reason=reason,
+            client_order_id=client_id,
         )
         self.submit_order(order)
 

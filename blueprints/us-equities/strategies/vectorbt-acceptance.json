@@ -59,7 +59,7 @@
     "scope": "bounded_unchanged_upstream_engine_and_portfolio_Rust_NumPy_NumBa_parity_not_full_vendor_suite"
   },
   "inverse": {
-    "selection": "error_parity or validate_flex_inputs or require_exact_call_seq or validate_group_lens or raise_reject_exception or max_orders_exception or callback_rejects or unsupported_rust or unavailable_rust",
+    "pytest_k_expression": "error_parity or validate_flex_inputs or require_exact_call_seq or validate_group_lens or raise_reject_exception or max_orders_exception or callback_rejects or unsupported_rust or unavailable_rust",
     "passed": 10,
     "deselected": 31,
     "exit": 0,

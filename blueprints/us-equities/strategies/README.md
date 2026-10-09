@@ -36,6 +36,7 @@ spec = contracts.StrategySpec(
     instrument_id="SPY.ALPACA",
     cohort_sha256=cohort_hash,
     preset="conservative-v1",
+    instance_id="cohort_trial_1",
     position_cap_usd="1000",
     loss_cap_usd="10",
     cash_cap_usd="1000",
@@ -127,3 +128,35 @@ survivor must return to Nautilus/T13 before any strategy claim.
 [vectorbt-acceptance.json](vectorbt-acceptance.json) records the precompiled
 install, 41 unchanged vendor engine/parity checks and ten overlapping inverse
 checks, with licence/owner override and resource limits.
+
+## Restart and multiple instances
+
+Each frozen `instance_id` is part of a hash over family, preset, instrument,
+execution profile and cohort. The hash supplies both the configured StrategyId's
+unique final tag and the order-ID tag. Different presets and named instances can
+share a trader; deploying the same identity twice is refused by rc5. Instance
+identity is stable across process restarts, and its sequence is restored at
+`on_start` from the durable ledger's maximum matching intent suffix. Orders pass
+an explicit `ClientOrderId` to upstream `OrderFactory.limit`; the existing paper
+governor journals that ID before any broker request.
+
+An unresolved intent or held position for the instrument refuses startup with a
+named reconciliation flag. Terminal prior entry attempts also remain consumed
+for that instance, preventing a restart from silently creating another entry.
+Recovery stays with the existing paper lane. Development specifications require
+a durable ledger; synthetic fixtures may use the explicit empty local boundary.
+
+Standard/aggressive presets remain unqualified for paper overnight operation
+until hana or T15 qualifies that session. The current helper treats 20:00–04:00
+ET as closed and flags the position; it does not provide overnight exits. PRE
+and POST retain the existing code-managed limit protections.
+
+Regenerate the behaviour receipt with the repository generator in the unchanged
+T13 runtime, then regenerate the companion matrix:
+
+```sh
+"$ENGINE_PYTHON" -m blueprints.us-equities.strategies.acceptance \
+  --output blueprints/us-equities/strategies/test-acceptance.json
+"$ENGINE_PYTHON" -m blueprints.us-equities.strategies.simulation \
+  --output blueprints/us-equities/strategies/synthetic-receipt.json
+```

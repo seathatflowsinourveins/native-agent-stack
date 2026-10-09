@@ -158,8 +158,13 @@ class StrategySpec:
     exit_deadline_ns: int | None = None
     catalyst_kind: str = "concrete"
     qualified_data: tuple[str, ...] = ()
+    instance_id: str = "default"
 
     def __post_init__(self):
+        if not isinstance(self.instance_id, str) or not re.fullmatch(
+            r"[A-Za-z0-9_]{1,64}", self.instance_id
+        ):
+            raise ValueError("stable_instance_id_required")
         if not SHA256.fullmatch(self.cohort_sha256):
             raise ValueError("cohort_hash_required")
         if self.evidence_class not in {"synthetic", "development"}:

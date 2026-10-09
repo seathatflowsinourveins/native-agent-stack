@@ -7,23 +7,32 @@
       "execution_profile": "code-managed-limit-v1",
       "family": "control_no_trade",
       "fill_callbacks": 0,
-      "fixture_sha256": "5ffd787275494fbf540b4d52972f202785e736210a1953f79bb678adc0a85080",
+      "fixture_sha256": "52b3439fcee8998e5d7632c5ee8327d30c3b83c72258e18fec0894e67ee138c4",
       "flags": [],
       "iterations": 17,
       "native_order_types": [],
+      "order_id_tag": "7b6e388ea7b1d9742e668b74",
       "orders": 0,
       "owned_quantity": "0",
       "passed": true,
       "pending": false,
       "preset": "conservative-v1",
+      "sequence": 0,
+      "strategy_id": "T22-7b6e388ea7b1d9742e668b74",
       "trace": [
+        {
+          "event": "ledger_restored",
+          "now_ns": 1791465900000000000,
+          "prior_entry": false,
+          "sequence": 0
+        },
         {
           "event": "snapshot",
           "now_ns": 1791465900000000000,
           "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
         }
       ],
-      "trace_sha256": "a0b08d45544bf907734d31647993dcf965db61f7997aecb59ab6bf7b185854bc"
+      "trace_sha256": "190af1bf8c2a73c521e207aa0bf33c3f0958bf37c73f000a728971e0cf697e46"
     },
     {
       "callback_faults": [],
@@ -31,99 +40,33 @@
       "evidence_class": "synthetic",
       "execution_profile": "code-managed-limit-v1",
       "family": "control_hash_random",
-      "fill_callbacks": 2,
-      "fixture_sha256": "5ffd787275494fbf540b4d52972f202785e736210a1953f79bb678adc0a85080",
+      "fill_callbacks": 0,
+      "fixture_sha256": "52b3439fcee8998e5d7632c5ee8327d30c3b83c72258e18fec0894e67ee138c4",
       "flags": [],
       "iterations": 17,
-      "native_order_types": [
-        "LIMIT"
-      ],
-      "orders": 4,
+      "native_order_types": [],
+      "order_id_tag": "c6fa97fd7c3bdcd1b5187c9f",
+      "orders": 0,
       "owned_quantity": "0",
       "passed": true,
       "pending": false,
       "preset": "conservative-v1",
+      "sequence": 0,
+      "strategy_id": "T22-c6fa97fd7c3bdcd1b5187c9f",
       "trace": [
+        {
+          "event": "ledger_restored",
+          "now_ns": 1791465900000000000,
+          "prior_entry": false,
+          "sequence": 0
+        },
         {
           "event": "snapshot",
           "now_ns": 1791465900000000000,
           "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
-        },
-        {
-          "event": "submit",
-          "limit_price": "10.03",
-          "now_ns": 1791466500000000000,
-          "quantity": "7",
-          "reason": "family_signal",
-          "side": "BUY"
-        },
-        {
-          "event": "fill",
-          "now_ns": 1791466501000000000,
-          "price": "10.0102",
-          "quantity": "7",
-          "side": "BUY"
-        },
-        {
-          "event": "submit",
-          "limit_price": "9.79",
-          "now_ns": 1791466508000000000,
-          "quantity": "7",
-          "reason": "time_exit",
-          "side": "SELL"
-        },
-        {
-          "event": "cancel_requested",
-          "now_ns": 1791466508000000000,
-          "role": "exit"
-        },
-        {
-          "event": "terminal",
-          "now_ns": 1791466509000000000,
-          "refused": false,
-          "role": "exit"
-        },
-        {
-          "event": "submit",
-          "limit_price": "9.69",
-          "now_ns": 1791466509000000000,
-          "quantity": "7",
-          "reason": "time_exit",
-          "side": "SELL"
-        },
-        {
-          "event": "cancel_requested",
-          "now_ns": 1791466510000000000,
-          "role": "exit"
-        },
-        {
-          "event": "terminal",
-          "now_ns": 1791466511000000000,
-          "refused": false,
-          "role": "exit"
-        },
-        {
-          "event": "submit",
-          "limit_price": "9.59",
-          "now_ns": 1791466511000000000,
-          "quantity": "7",
-          "reason": "time_exit",
-          "side": "SELL"
-        },
-        {
-          "event": "cancel_requested",
-          "now_ns": 1791466512000000000,
-          "role": "exit"
-        },
-        {
-          "event": "fill",
-          "now_ns": 1791466512000000000,
-          "price": "9.5998",
-          "quantity": "7",
-          "side": "SELL"
         }
       ],
-      "trace_sha256": "028294d2cf79d00f944759f7e71a316b70e9354ae790462e4b9fba06bf1a750a"
+      "trace_sha256": "190af1bf8c2a73c521e207aa0bf33c3f0958bf37c73f000a728971e0cf697e46"
     },
     {
       "callback_faults": [],
@@ -132,24 +75,34 @@
       "execution_profile": "code-managed-limit-v1",
       "family": "control_momentum_20",
       "fill_callbacks": 2,
-      "fixture_sha256": "5ffd787275494fbf540b4d52972f202785e736210a1953f79bb678adc0a85080",
+      "fixture_sha256": "52b3439fcee8998e5d7632c5ee8327d30c3b83c72258e18fec0894e67ee138c4",
       "flags": [],
       "iterations": 17,
       "native_order_types": [
         "LIMIT"
       ],
+      "order_id_tag": "a7b92f1acef359d2b3a37529",
       "orders": 4,
       "owned_quantity": "0",
       "passed": true,
       "pending": false,
       "preset": "conservative-v1",
+      "sequence": 4,
+      "strategy_id": "T22-a7b92f1acef359d2b3a37529",
       "trace": [
+        {
+          "event": "ledger_restored",
+          "now_ns": 1791465900000000000,
+          "prior_entry": false,
+          "sequence": 0
+        },
         {
           "event": "snapshot",
           "now_ns": 1791465900000000000,
           "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
         },
         {
+          "client_order_id": "t22-a7b92f1acef359d2b3a37529-0000001",
           "event": "submit",
           "limit_price": "10.03",
           "now_ns": 1791466500000000000,
@@ -165,6 +118,7 @@
           "side": "BUY"
         },
         {
+          "client_order_id": "t22-a7b92f1acef359d2b3a37529-0000002",
           "event": "submit",
           "limit_price": "9.79",
           "now_ns": 1791466508000000000,
@@ -184,6 +138,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-a7b92f1acef359d2b3a37529-0000003",
           "event": "submit",
           "limit_price": "9.69",
           "now_ns": 1791466509000000000,
@@ -203,6 +158,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-a7b92f1acef359d2b3a37529-0000004",
           "event": "submit",
           "limit_price": "9.59",
           "now_ns": 1791466511000000000,
@@ -223,7 +179,7 @@
           "side": "SELL"
         }
       ],
-      "trace_sha256": "028294d2cf79d00f944759f7e71a316b70e9354ae790462e4b9fba06bf1a750a"
+      "trace_sha256": "d42579136bbd2136b5e2fc52ad33253b34eb4919177969a2857a761dfb8e933f"
     },
     {
       "callback_faults": [],
@@ -232,24 +188,34 @@
       "execution_profile": "code-managed-limit-v1",
       "family": "control_relative_volume",
       "fill_callbacks": 2,
-      "fixture_sha256": "5ffd787275494fbf540b4d52972f202785e736210a1953f79bb678adc0a85080",
+      "fixture_sha256": "52b3439fcee8998e5d7632c5ee8327d30c3b83c72258e18fec0894e67ee138c4",
       "flags": [],
       "iterations": 17,
       "native_order_types": [
         "LIMIT"
       ],
+      "order_id_tag": "df63c2a12ac813167db0b56f",
       "orders": 4,
       "owned_quantity": "0",
       "passed": true,
       "pending": false,
       "preset": "conservative-v1",
+      "sequence": 4,
+      "strategy_id": "T22-df63c2a12ac813167db0b56f",
       "trace": [
+        {
+          "event": "ledger_restored",
+          "now_ns": 1791465900000000000,
+          "prior_entry": false,
+          "sequence": 0
+        },
         {
           "event": "snapshot",
           "now_ns": 1791465900000000000,
           "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
         },
         {
+          "client_order_id": "t22-df63c2a12ac813167db0b56f-0000001",
           "event": "submit",
           "limit_price": "10.03",
           "now_ns": 1791466500000000000,
@@ -265,6 +231,7 @@
           "side": "BUY"
         },
         {
+          "client_order_id": "t22-df63c2a12ac813167db0b56f-0000002",
           "event": "submit",
           "limit_price": "9.79",
           "now_ns": 1791466508000000000,
@@ -284,6 +251,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-df63c2a12ac813167db0b56f-0000003",
           "event": "submit",
           "limit_price": "9.69",
           "now_ns": 1791466509000000000,
@@ -303,6 +271,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-df63c2a12ac813167db0b56f-0000004",
           "event": "submit",
           "limit_price": "9.59",
           "now_ns": 1791466511000000000,
@@ -323,7 +292,7 @@
           "side": "SELL"
         }
       ],
-      "trace_sha256": "028294d2cf79d00f944759f7e71a316b70e9354ae790462e4b9fba06bf1a750a"
+      "trace_sha256": "1a8d50e3e190a7701c2d1d259794f0a40b774397168ee885e2d9510b94175102"
     }
   ],
   "engine": {
@@ -346,24 +315,34 @@
       "execution_profile": "code-managed-limit-v1",
       "family": "catalyst",
       "fill_callbacks": 2,
-      "fixture_sha256": "5ffd787275494fbf540b4d52972f202785e736210a1953f79bb678adc0a85080",
+      "fixture_sha256": "52b3439fcee8998e5d7632c5ee8327d30c3b83c72258e18fec0894e67ee138c4",
       "flags": [],
       "iterations": 17,
       "native_order_types": [
         "LIMIT"
       ],
+      "order_id_tag": "9835da042aa2cdd054f7f6a0",
       "orders": 4,
       "owned_quantity": "0",
       "passed": true,
       "pending": false,
       "preset": "conservative-v1",
+      "sequence": 4,
+      "strategy_id": "T22-9835da042aa2cdd054f7f6a0",
       "trace": [
+        {
+          "event": "ledger_restored",
+          "now_ns": 1791465900000000000,
+          "prior_entry": false,
+          "sequence": 0
+        },
         {
           "event": "snapshot",
           "now_ns": 1791465900000000000,
           "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
         },
         {
+          "client_order_id": "t22-9835da042aa2cdd054f7f6a0-0000001",
           "event": "submit",
           "limit_price": "10.03",
           "now_ns": 1791466500000000000,
@@ -379,6 +358,7 @@
           "side": "BUY"
         },
         {
+          "client_order_id": "t22-9835da042aa2cdd054f7f6a0-0000002",
           "event": "submit",
           "limit_price": "9.79",
           "now_ns": 1791466508000000000,
@@ -398,6 +378,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-9835da042aa2cdd054f7f6a0-0000003",
           "event": "submit",
           "limit_price": "9.69",
           "now_ns": 1791466509000000000,
@@ -417,6 +398,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-9835da042aa2cdd054f7f6a0-0000004",
           "event": "submit",
           "limit_price": "9.59",
           "now_ns": 1791466511000000000,
@@ -437,7 +419,7 @@
           "side": "SELL"
         }
       ],
-      "trace_sha256": "028294d2cf79d00f944759f7e71a316b70e9354ae790462e4b9fba06bf1a750a"
+      "trace_sha256": "4d08c6699f0cb13af6989f01d7fead1375c02afd39fb24e9952c2133598716af"
     },
     {
       "callback_faults": [],
@@ -446,24 +428,34 @@
       "execution_profile": "code-managed-limit-v1",
       "family": "catalyst",
       "fill_callbacks": 2,
-      "fixture_sha256": "d7626cec195e392de4594a0349bf557b6fd0eb411bef159a7868d08bab394c57",
+      "fixture_sha256": "fb88e354a16919d4f5241e400e86b0dd25ea870a639fea0fcb45b45fb652e3b4",
       "flags": [],
       "iterations": 17,
       "native_order_types": [
         "LIMIT"
       ],
+      "order_id_tag": "1a1b26f89962432b05a5f12e",
       "orders": 4,
       "owned_quantity": "0",
       "passed": true,
       "pending": false,
       "preset": "standard-v1",
+      "sequence": 4,
+      "strategy_id": "T22-1a1b26f89962432b05a5f12e",
       "trace": [
+        {
+          "event": "ledger_restored",
+          "now_ns": 1791465900000000000,
+          "prior_entry": false,
+          "sequence": 0
+        },
         {
           "event": "snapshot",
           "now_ns": 1791465900000000000,
           "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
         },
         {
+          "client_order_id": "t22-1a1b26f89962432b05a5f12e-0000001",
           "event": "submit",
           "limit_price": "10.03",
           "now_ns": 1791466500000000000,
@@ -479,6 +471,7 @@
           "side": "BUY"
         },
         {
+          "client_order_id": "t22-1a1b26f89962432b05a5f12e-0000002",
           "event": "submit",
           "limit_price": "9.79",
           "now_ns": 1791466508000000000,
@@ -498,6 +491,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-1a1b26f89962432b05a5f12e-0000003",
           "event": "submit",
           "limit_price": "9.69",
           "now_ns": 1791466509000000000,
@@ -517,6 +511,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-1a1b26f89962432b05a5f12e-0000004",
           "event": "submit",
           "limit_price": "9.59",
           "now_ns": 1791466511000000000,
@@ -537,7 +532,7 @@
           "side": "SELL"
         }
       ],
-      "trace_sha256": "e674041487f00fae112b5f820d2a9057826bc340ff361cd040262c3bd966d5b9"
+      "trace_sha256": "aef1f61cb2f530ae1dbc6f163c2c1bf835463c2fd68e80748e818201ec47e7eb"
     },
     {
       "callback_faults": [],
@@ -546,24 +541,34 @@
       "execution_profile": "code-managed-limit-v1",
       "family": "catalyst",
       "fill_callbacks": 2,
-      "fixture_sha256": "9bd01c7b65c5ca4a1cf3353907de7b120a3dce9482d3ca9c3e46d66027dddcc2",
+      "fixture_sha256": "6b17464f8c8ffea07ed5e5303f03e1c5bdb593e88b2e05f14f20bb5666e73327",
       "flags": [],
       "iterations": 17,
       "native_order_types": [
         "LIMIT"
       ],
+      "order_id_tag": "e37ff7c238b83d3eb623b713",
       "orders": 4,
       "owned_quantity": "0",
       "passed": true,
       "pending": false,
       "preset": "aggressive-v1",
+      "sequence": 4,
+      "strategy_id": "T22-e37ff7c238b83d3eb623b713",
       "trace": [
+        {
+          "event": "ledger_restored",
+          "now_ns": 1791465900000000000,
+          "prior_entry": false,
+          "sequence": 0
+        },
         {
           "event": "snapshot",
           "now_ns": 1791465900000000000,
           "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
         },
         {
+          "client_order_id": "t22-e37ff7c238b83d3eb623b713-0000001",
           "event": "submit",
           "limit_price": "10.03",
           "now_ns": 1791466500000000000,
@@ -579,6 +584,7 @@
           "side": "BUY"
         },
         {
+          "client_order_id": "t22-e37ff7c238b83d3eb623b713-0000002",
           "event": "submit",
           "limit_price": "9.79",
           "now_ns": 1791466508000000000,
@@ -598,6 +604,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-e37ff7c238b83d3eb623b713-0000003",
           "event": "submit",
           "limit_price": "9.69",
           "now_ns": 1791466509000000000,
@@ -617,6 +624,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-e37ff7c238b83d3eb623b713-0000004",
           "event": "submit",
           "limit_price": "9.59",
           "now_ns": 1791466511000000000,
@@ -637,7 +645,7 @@
           "side": "SELL"
         }
       ],
-      "trace_sha256": "5db3f2767611a39314c6cb321e47d78d3e8da8f27ad6b34e7e003f8b7bb6346b"
+      "trace_sha256": "b0c93099ac17ea7f656403e58e306f1b7b2ab446290edcbe01ac19cba434a47e"
     },
     {
       "callback_faults": [],
@@ -646,24 +654,34 @@
       "execution_profile": "code-managed-limit-v1",
       "family": "gap_premarket",
       "fill_callbacks": 2,
-      "fixture_sha256": "5ffd787275494fbf540b4d52972f202785e736210a1953f79bb678adc0a85080",
+      "fixture_sha256": "52b3439fcee8998e5d7632c5ee8327d30c3b83c72258e18fec0894e67ee138c4",
       "flags": [],
       "iterations": 17,
       "native_order_types": [
         "LIMIT"
       ],
+      "order_id_tag": "0851b91e360edce391dd3426",
       "orders": 4,
       "owned_quantity": "0",
       "passed": true,
       "pending": false,
       "preset": "conservative-v1",
+      "sequence": 4,
+      "strategy_id": "T22-0851b91e360edce391dd3426",
       "trace": [
+        {
+          "event": "ledger_restored",
+          "now_ns": 1791465900000000000,
+          "prior_entry": false,
+          "sequence": 0
+        },
         {
           "event": "snapshot",
           "now_ns": 1791465900000000000,
           "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
         },
         {
+          "client_order_id": "t22-0851b91e360edce391dd3426-0000001",
           "event": "submit",
           "limit_price": "10.03",
           "now_ns": 1791466500000000000,
@@ -679,6 +697,7 @@
           "side": "BUY"
         },
         {
+          "client_order_id": "t22-0851b91e360edce391dd3426-0000002",
           "event": "submit",
           "limit_price": "9.79",
           "now_ns": 1791466508000000000,
@@ -698,6 +717,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-0851b91e360edce391dd3426-0000003",
           "event": "submit",
           "limit_price": "9.69",
           "now_ns": 1791466509000000000,
@@ -717,6 +737,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-0851b91e360edce391dd3426-0000004",
           "event": "submit",
           "limit_price": "9.59",
           "now_ns": 1791466511000000000,
@@ -737,7 +758,7 @@
           "side": "SELL"
         }
       ],
-      "trace_sha256": "028294d2cf79d00f944759f7e71a316b70e9354ae790462e4b9fba06bf1a750a"
+      "trace_sha256": "7199747d940be59e1eec4d0b87aaa2857077d98ae0c766bcae74403e7e43d867"
     },
     {
       "callback_faults": [],
@@ -746,24 +767,34 @@
       "execution_profile": "code-managed-limit-v1",
       "family": "gap_premarket",
       "fill_callbacks": 2,
-      "fixture_sha256": "d7626cec195e392de4594a0349bf557b6fd0eb411bef159a7868d08bab394c57",
+      "fixture_sha256": "fb88e354a16919d4f5241e400e86b0dd25ea870a639fea0fcb45b45fb652e3b4",
       "flags": [],
       "iterations": 17,
       "native_order_types": [
         "LIMIT"
       ],
+      "order_id_tag": "df67a39a7006b580c6b6e7b1",
       "orders": 4,
       "owned_quantity": "0",
       "passed": true,
       "pending": false,
       "preset": "standard-v1",
+      "sequence": 4,
+      "strategy_id": "T22-df67a39a7006b580c6b6e7b1",
       "trace": [
+        {
+          "event": "ledger_restored",
+          "now_ns": 1791465900000000000,
+          "prior_entry": false,
+          "sequence": 0
+        },
         {
           "event": "snapshot",
           "now_ns": 1791465900000000000,
           "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
         },
         {
+          "client_order_id": "t22-df67a39a7006b580c6b6e7b1-0000001",
           "event": "submit",
           "limit_price": "10.03",
           "now_ns": 1791466500000000000,
@@ -779,6 +810,7 @@
           "side": "BUY"
         },
         {
+          "client_order_id": "t22-df67a39a7006b580c6b6e7b1-0000002",
           "event": "submit",
           "limit_price": "9.79",
           "now_ns": 1791466508000000000,
@@ -798,6 +830,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-df67a39a7006b580c6b6e7b1-0000003",
           "event": "submit",
           "limit_price": "9.69",
           "now_ns": 1791466509000000000,
@@ -817,6 +850,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-df67a39a7006b580c6b6e7b1-0000004",
           "event": "submit",
           "limit_price": "9.59",
           "now_ns": 1791466511000000000,
@@ -837,7 +871,7 @@
           "side": "SELL"
         }
       ],
-      "trace_sha256": "e674041487f00fae112b5f820d2a9057826bc340ff361cd040262c3bd966d5b9"
+      "trace_sha256": "ed0312dd4d12cb012cfcca9666b93cff55a226849cfe22b0551a099e60f36d2c"
     },
     {
       "callback_faults": [],
@@ -846,24 +880,34 @@
       "execution_profile": "code-managed-limit-v1",
       "family": "gap_premarket",
       "fill_callbacks": 2,
-      "fixture_sha256": "9bd01c7b65c5ca4a1cf3353907de7b120a3dce9482d3ca9c3e46d66027dddcc2",
+      "fixture_sha256": "6b17464f8c8ffea07ed5e5303f03e1c5bdb593e88b2e05f14f20bb5666e73327",
       "flags": [],
       "iterations": 17,
       "native_order_types": [
         "LIMIT"
       ],
+      "order_id_tag": "8d26485f55d81c6bb6a79c72",
       "orders": 4,
       "owned_quantity": "0",
       "passed": true,
       "pending": false,
       "preset": "aggressive-v1",
+      "sequence": 4,
+      "strategy_id": "T22-8d26485f55d81c6bb6a79c72",
       "trace": [
+        {
+          "event": "ledger_restored",
+          "now_ns": 1791465900000000000,
+          "prior_entry": false,
+          "sequence": 0
+        },
         {
           "event": "snapshot",
           "now_ns": 1791465900000000000,
           "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
         },
         {
+          "client_order_id": "t22-8d26485f55d81c6bb6a79c72-0000001",
           "event": "submit",
           "limit_price": "10.03",
           "now_ns": 1791466500000000000,
@@ -879,6 +923,7 @@
           "side": "BUY"
         },
         {
+          "client_order_id": "t22-8d26485f55d81c6bb6a79c72-0000002",
           "event": "submit",
           "limit_price": "9.79",
           "now_ns": 1791466508000000000,
@@ -898,6 +943,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-8d26485f55d81c6bb6a79c72-0000003",
           "event": "submit",
           "limit_price": "9.69",
           "now_ns": 1791466509000000000,
@@ -917,6 +963,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-8d26485f55d81c6bb6a79c72-0000004",
           "event": "submit",
           "limit_price": "9.59",
           "now_ns": 1791466511000000000,
@@ -937,7 +984,7 @@
           "side": "SELL"
         }
       ],
-      "trace_sha256": "5db3f2767611a39314c6cb321e47d78d3e8da8f27ad6b34e7e003f8b7bb6346b"
+      "trace_sha256": "dfd03095543c31c324a0ca08f020ba3102982797f71c3f3c6c95bb965c4a9457"
     },
     {
       "callback_faults": [],
@@ -946,24 +993,34 @@
       "execution_profile": "code-managed-limit-v1",
       "family": "volume_float",
       "fill_callbacks": 2,
-      "fixture_sha256": "5ffd787275494fbf540b4d52972f202785e736210a1953f79bb678adc0a85080",
+      "fixture_sha256": "52b3439fcee8998e5d7632c5ee8327d30c3b83c72258e18fec0894e67ee138c4",
       "flags": [],
       "iterations": 17,
       "native_order_types": [
         "LIMIT"
       ],
+      "order_id_tag": "62efca4022b2f53beee37dc4",
       "orders": 4,
       "owned_quantity": "0",
       "passed": true,
       "pending": false,
       "preset": "conservative-v1",
+      "sequence": 4,
+      "strategy_id": "T22-62efca4022b2f53beee37dc4",
       "trace": [
+        {
+          "event": "ledger_restored",
+          "now_ns": 1791465900000000000,
+          "prior_entry": false,
+          "sequence": 0
+        },
         {
           "event": "snapshot",
           "now_ns": 1791465900000000000,
           "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
         },
         {
+          "client_order_id": "t22-62efca4022b2f53beee37dc4-0000001",
           "event": "submit",
           "limit_price": "10.03",
           "now_ns": 1791466500000000000,
@@ -979,6 +1036,7 @@
           "side": "BUY"
         },
         {
+          "client_order_id": "t22-62efca4022b2f53beee37dc4-0000002",
           "event": "submit",
           "limit_price": "9.79",
           "now_ns": 1791466508000000000,
@@ -998,6 +1056,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-62efca4022b2f53beee37dc4-0000003",
           "event": "submit",
           "limit_price": "9.69",
           "now_ns": 1791466509000000000,
@@ -1017,6 +1076,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-62efca4022b2f53beee37dc4-0000004",
           "event": "submit",
           "limit_price": "9.59",
           "now_ns": 1791466511000000000,
@@ -1037,7 +1097,7 @@
           "side": "SELL"
         }
       ],
-      "trace_sha256": "028294d2cf79d00f944759f7e71a316b70e9354ae790462e4b9fba06bf1a750a"
+      "trace_sha256": "a18ea6b277ae6cde6a7826aed5fba2b507125af655ace18132c0b3f4b5b3f528"
     },
     {
       "callback_faults": [],
@@ -1046,24 +1106,34 @@
       "execution_profile": "code-managed-limit-v1",
       "family": "volume_float",
       "fill_callbacks": 2,
-      "fixture_sha256": "d7626cec195e392de4594a0349bf557b6fd0eb411bef159a7868d08bab394c57",
+      "fixture_sha256": "fb88e354a16919d4f5241e400e86b0dd25ea870a639fea0fcb45b45fb652e3b4",
       "flags": [],
       "iterations": 17,
       "native_order_types": [
         "LIMIT"
       ],
+      "order_id_tag": "3d5c95c405c0ed09b031c2c6",
       "orders": 4,
       "owned_quantity": "0",
       "passed": true,
       "pending": false,
       "preset": "standard-v1",
+      "sequence": 4,
+      "strategy_id": "T22-3d5c95c405c0ed09b031c2c6",
       "trace": [
+        {
+          "event": "ledger_restored",
+          "now_ns": 1791465900000000000,
+          "prior_entry": false,
+          "sequence": 0
+        },
         {
           "event": "snapshot",
           "now_ns": 1791465900000000000,
           "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
         },
         {
+          "client_order_id": "t22-3d5c95c405c0ed09b031c2c6-0000001",
           "event": "submit",
           "limit_price": "10.03",
           "now_ns": 1791466500000000000,
@@ -1079,6 +1149,7 @@
           "side": "BUY"
         },
         {
+          "client_order_id": "t22-3d5c95c405c0ed09b031c2c6-0000002",
           "event": "submit",
           "limit_price": "9.79",
           "now_ns": 1791466508000000000,
@@ -1098,6 +1169,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-3d5c95c405c0ed09b031c2c6-0000003",
           "event": "submit",
           "limit_price": "9.69",
           "now_ns": 1791466509000000000,
@@ -1117,6 +1189,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-3d5c95c405c0ed09b031c2c6-0000004",
           "event": "submit",
           "limit_price": "9.59",
           "now_ns": 1791466511000000000,
@@ -1137,7 +1210,7 @@
           "side": "SELL"
         }
       ],
-      "trace_sha256": "e674041487f00fae112b5f820d2a9057826bc340ff361cd040262c3bd966d5b9"
+      "trace_sha256": "efe7b6db0eec427c70c19fd5aa3f104cad2ff7bbd1f8598dd77ec05fbb18199f"
     },
     {
       "callback_faults": [],
@@ -1146,24 +1219,34 @@
       "execution_profile": "code-managed-limit-v1",
       "family": "volume_float",
       "fill_callbacks": 2,
-      "fixture_sha256": "9bd01c7b65c5ca4a1cf3353907de7b120a3dce9482d3ca9c3e46d66027dddcc2",
+      "fixture_sha256": "6b17464f8c8ffea07ed5e5303f03e1c5bdb593e88b2e05f14f20bb5666e73327",
       "flags": [],
       "iterations": 17,
       "native_order_types": [
         "LIMIT"
       ],
+      "order_id_tag": "0e1ea15f0d4fd8dc993a5b16",
       "orders": 4,
       "owned_quantity": "0",
       "passed": true,
       "pending": false,
       "preset": "aggressive-v1",
+      "sequence": 4,
+      "strategy_id": "T22-0e1ea15f0d4fd8dc993a5b16",
       "trace": [
+        {
+          "event": "ledger_restored",
+          "now_ns": 1791465900000000000,
+          "prior_entry": false,
+          "sequence": 0
+        },
         {
           "event": "snapshot",
           "now_ns": 1791465900000000000,
           "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
         },
         {
+          "client_order_id": "t22-0e1ea15f0d4fd8dc993a5b16-0000001",
           "event": "submit",
           "limit_price": "10.03",
           "now_ns": 1791466500000000000,
@@ -1179,6 +1262,7 @@
           "side": "BUY"
         },
         {
+          "client_order_id": "t22-0e1ea15f0d4fd8dc993a5b16-0000002",
           "event": "submit",
           "limit_price": "9.79",
           "now_ns": 1791466508000000000,
@@ -1198,6 +1282,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-0e1ea15f0d4fd8dc993a5b16-0000003",
           "event": "submit",
           "limit_price": "9.69",
           "now_ns": 1791466509000000000,
@@ -1217,6 +1302,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-0e1ea15f0d4fd8dc993a5b16-0000004",
           "event": "submit",
           "limit_price": "9.59",
           "now_ns": 1791466511000000000,
@@ -1237,7 +1323,7 @@
           "side": "SELL"
         }
       ],
-      "trace_sha256": "5db3f2767611a39314c6cb321e47d78d3e8da8f27ad6b34e7e003f8b7bb6346b"
+      "trace_sha256": "b0e1301ce42bcb536f015f7a18af697a5c5df1ae947a88c29998e74f1209f359"
     },
     {
       "callback_faults": [],
@@ -1246,24 +1332,34 @@
       "execution_profile": "code-managed-limit-v1",
       "family": "squeeze_borrow",
       "fill_callbacks": 2,
-      "fixture_sha256": "5ffd787275494fbf540b4d52972f202785e736210a1953f79bb678adc0a85080",
+      "fixture_sha256": "52b3439fcee8998e5d7632c5ee8327d30c3b83c72258e18fec0894e67ee138c4",
       "flags": [],
       "iterations": 17,
       "native_order_types": [
         "LIMIT"
       ],
+      "order_id_tag": "0f50be19540371a89432e212",
       "orders": 4,
       "owned_quantity": "0",
       "passed": true,
       "pending": false,
       "preset": "conservative-v1",
+      "sequence": 4,
+      "strategy_id": "T22-0f50be19540371a89432e212",
       "trace": [
+        {
+          "event": "ledger_restored",
+          "now_ns": 1791465900000000000,
+          "prior_entry": false,
+          "sequence": 0
+        },
         {
           "event": "snapshot",
           "now_ns": 1791465900000000000,
           "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
         },
         {
+          "client_order_id": "t22-0f50be19540371a89432e212-0000001",
           "event": "submit",
           "limit_price": "10.03",
           "now_ns": 1791466500000000000,
@@ -1279,6 +1375,7 @@
           "side": "BUY"
         },
         {
+          "client_order_id": "t22-0f50be19540371a89432e212-0000002",
           "event": "submit",
           "limit_price": "9.79",
           "now_ns": 1791466508000000000,
@@ -1298,6 +1395,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-0f50be19540371a89432e212-0000003",
           "event": "submit",
           "limit_price": "9.69",
           "now_ns": 1791466509000000000,
@@ -1317,6 +1415,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-0f50be19540371a89432e212-0000004",
           "event": "submit",
           "limit_price": "9.59",
           "now_ns": 1791466511000000000,
@@ -1337,7 +1436,7 @@
           "side": "SELL"
         }
       ],
-      "trace_sha256": "028294d2cf79d00f944759f7e71a316b70e9354ae790462e4b9fba06bf1a750a"
+      "trace_sha256": "492cbfe41bd91296a4325823b40c159a6401d5c1885630729ded47c425ab9884"
     },
     {
       "callback_faults": [],
@@ -1346,24 +1445,34 @@
       "execution_profile": "code-managed-limit-v1",
       "family": "squeeze_borrow",
       "fill_callbacks": 2,
-      "fixture_sha256": "d7626cec195e392de4594a0349bf557b6fd0eb411bef159a7868d08bab394c57",
+      "fixture_sha256": "fb88e354a16919d4f5241e400e86b0dd25ea870a639fea0fcb45b45fb652e3b4",
       "flags": [],
       "iterations": 17,
       "native_order_types": [
         "LIMIT"
       ],
+      "order_id_tag": "aaa2d4a06ea1ec6cdcdf8f1b",
       "orders": 4,
       "owned_quantity": "0",
       "passed": true,
       "pending": false,
       "preset": "standard-v1",
+      "sequence": 4,
+      "strategy_id": "T22-aaa2d4a06ea1ec6cdcdf8f1b",
       "trace": [
+        {
+          "event": "ledger_restored",
+          "now_ns": 1791465900000000000,
+          "prior_entry": false,
+          "sequence": 0
+        },
         {
           "event": "snapshot",
           "now_ns": 1791465900000000000,
           "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
         },
         {
+          "client_order_id": "t22-aaa2d4a06ea1ec6cdcdf8f1b-0000001",
           "event": "submit",
           "limit_price": "10.03",
           "now_ns": 1791466500000000000,
@@ -1379,6 +1488,7 @@
           "side": "BUY"
         },
         {
+          "client_order_id": "t22-aaa2d4a06ea1ec6cdcdf8f1b-0000002",
           "event": "submit",
           "limit_price": "9.79",
           "now_ns": 1791466508000000000,
@@ -1398,6 +1508,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-aaa2d4a06ea1ec6cdcdf8f1b-0000003",
           "event": "submit",
           "limit_price": "9.69",
           "now_ns": 1791466509000000000,
@@ -1417,6 +1528,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-aaa2d4a06ea1ec6cdcdf8f1b-0000004",
           "event": "submit",
           "limit_price": "9.59",
           "now_ns": 1791466511000000000,
@@ -1437,7 +1549,7 @@
           "side": "SELL"
         }
       ],
-      "trace_sha256": "e674041487f00fae112b5f820d2a9057826bc340ff361cd040262c3bd966d5b9"
+      "trace_sha256": "d57e1d6caee51702b80b85938c18cebb9a14a38d0fc215a0cb3b079194d57453"
     },
     {
       "callback_faults": [],
@@ -1446,24 +1558,34 @@
       "execution_profile": "code-managed-limit-v1",
       "family": "squeeze_borrow",
       "fill_callbacks": 2,
-      "fixture_sha256": "9bd01c7b65c5ca4a1cf3353907de7b120a3dce9482d3ca9c3e46d66027dddcc2",
+      "fixture_sha256": "6b17464f8c8ffea07ed5e5303f03e1c5bdb593e88b2e05f14f20bb5666e73327",
       "flags": [],
       "iterations": 17,
       "native_order_types": [
         "LIMIT"
       ],
+      "order_id_tag": "6c5c3654924331bd172b1a37",
       "orders": 4,
       "owned_quantity": "0",
       "passed": true,
       "pending": false,
       "preset": "aggressive-v1",
+      "sequence": 4,
+      "strategy_id": "T22-6c5c3654924331bd172b1a37",
       "trace": [
+        {
+          "event": "ledger_restored",
+          "now_ns": 1791465900000000000,
+          "prior_entry": false,
+          "sequence": 0
+        },
         {
           "event": "snapshot",
           "now_ns": 1791465900000000000,
           "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
         },
         {
+          "client_order_id": "t22-6c5c3654924331bd172b1a37-0000001",
           "event": "submit",
           "limit_price": "10.03",
           "now_ns": 1791466500000000000,
@@ -1479,6 +1601,7 @@
           "side": "BUY"
         },
         {
+          "client_order_id": "t22-6c5c3654924331bd172b1a37-0000002",
           "event": "submit",
           "limit_price": "9.79",
           "now_ns": 1791466508000000000,
@@ -1498,6 +1621,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-6c5c3654924331bd172b1a37-0000003",
           "event": "submit",
           "limit_price": "9.69",
           "now_ns": 1791466509000000000,
@@ -1517,6 +1641,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-6c5c3654924331bd172b1a37-0000004",
           "event": "submit",
           "limit_price": "9.59",
           "now_ns": 1791466511000000000,
@@ -1537,7 +1662,7 @@
           "side": "SELL"
         }
       ],
-      "trace_sha256": "5db3f2767611a39314c6cb321e47d78d3e8da8f27ad6b34e7e003f8b7bb6346b"
+      "trace_sha256": "b6867cc79e5337370cf582e30b909216394081ad2b97b3cd88579370101da08e"
     },
     {
       "callback_faults": [],
@@ -1546,24 +1671,34 @@
       "execution_profile": "code-managed-limit-v1",
       "family": "momentum_breakout",
       "fill_callbacks": 2,
-      "fixture_sha256": "5ffd787275494fbf540b4d52972f202785e736210a1953f79bb678adc0a85080",
+      "fixture_sha256": "52b3439fcee8998e5d7632c5ee8327d30c3b83c72258e18fec0894e67ee138c4",
       "flags": [],
       "iterations": 17,
       "native_order_types": [
         "LIMIT"
       ],
+      "order_id_tag": "fbe13292c768dd0e2ab07a97",
       "orders": 4,
       "owned_quantity": "0",
       "passed": true,
       "pending": false,
       "preset": "conservative-v1",
+      "sequence": 4,
+      "strategy_id": "T22-fbe13292c768dd0e2ab07a97",
       "trace": [
+        {
+          "event": "ledger_restored",
+          "now_ns": 1791465900000000000,
+          "prior_entry": false,
+          "sequence": 0
+        },
         {
           "event": "snapshot",
           "now_ns": 1791465900000000000,
           "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
         },
         {
+          "client_order_id": "t22-fbe13292c768dd0e2ab07a97-0000001",
           "event": "submit",
           "limit_price": "10.03",
           "now_ns": 1791466500000000000,
@@ -1579,6 +1714,7 @@
           "side": "BUY"
         },
         {
+          "client_order_id": "t22-fbe13292c768dd0e2ab07a97-0000002",
           "event": "submit",
           "limit_price": "9.79",
           "now_ns": 1791466508000000000,
@@ -1598,6 +1734,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-fbe13292c768dd0e2ab07a97-0000003",
           "event": "submit",
           "limit_price": "9.69",
           "now_ns": 1791466509000000000,
@@ -1617,6 +1754,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-fbe13292c768dd0e2ab07a97-0000004",
           "event": "submit",
           "limit_price": "9.59",
           "now_ns": 1791466511000000000,
@@ -1637,7 +1775,7 @@
           "side": "SELL"
         }
       ],
-      "trace_sha256": "028294d2cf79d00f944759f7e71a316b70e9354ae790462e4b9fba06bf1a750a"
+      "trace_sha256": "49b20143360ea6201ef5bec6b8b5cc507031687c919aaa54f0bd7d390c14c36f"
     },
     {
       "callback_faults": [],
@@ -1646,24 +1784,34 @@
       "execution_profile": "code-managed-limit-v1",
       "family": "momentum_breakout",
       "fill_callbacks": 2,
-      "fixture_sha256": "d7626cec195e392de4594a0349bf557b6fd0eb411bef159a7868d08bab394c57",
+      "fixture_sha256": "fb88e354a16919d4f5241e400e86b0dd25ea870a639fea0fcb45b45fb652e3b4",
       "flags": [],
       "iterations": 17,
       "native_order_types": [
         "LIMIT"
       ],
+      "order_id_tag": "9ee7ae95b9d9ef84aedfc857",
       "orders": 4,
       "owned_quantity": "0",
       "passed": true,
       "pending": false,
       "preset": "standard-v1",
+      "sequence": 4,
+      "strategy_id": "T22-9ee7ae95b9d9ef84aedfc857",
       "trace": [
+        {
+          "event": "ledger_restored",
+          "now_ns": 1791465900000000000,
+          "prior_entry": false,
+          "sequence": 0
+        },
         {
           "event": "snapshot",
           "now_ns": 1791465900000000000,
           "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
         },
         {
+          "client_order_id": "t22-9ee7ae95b9d9ef84aedfc857-0000001",
           "event": "submit",
           "limit_price": "10.03",
           "now_ns": 1791466500000000000,
@@ -1679,6 +1827,7 @@
           "side": "BUY"
         },
         {
+          "client_order_id": "t22-9ee7ae95b9d9ef84aedfc857-0000002",
           "event": "submit",
           "limit_price": "9.79",
           "now_ns": 1791466508000000000,
@@ -1698,6 +1847,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-9ee7ae95b9d9ef84aedfc857-0000003",
           "event": "submit",
           "limit_price": "9.69",
           "now_ns": 1791466509000000000,
@@ -1717,6 +1867,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-9ee7ae95b9d9ef84aedfc857-0000004",
           "event": "submit",
           "limit_price": "9.59",
           "now_ns": 1791466511000000000,
@@ -1737,7 +1888,7 @@
           "side": "SELL"
         }
       ],
-      "trace_sha256": "e674041487f00fae112b5f820d2a9057826bc340ff361cd040262c3bd966d5b9"
+      "trace_sha256": "9d2954a6eaae28e091a59e07909b0c7154f6e6b54973623e23d150d800858ec3"
     },
     {
       "callback_faults": [],
@@ -1746,24 +1897,34 @@
       "execution_profile": "code-managed-limit-v1",
       "family": "momentum_breakout",
       "fill_callbacks": 2,
-      "fixture_sha256": "9bd01c7b65c5ca4a1cf3353907de7b120a3dce9482d3ca9c3e46d66027dddcc2",
+      "fixture_sha256": "6b17464f8c8ffea07ed5e5303f03e1c5bdb593e88b2e05f14f20bb5666e73327",
       "flags": [],
       "iterations": 17,
       "native_order_types": [
         "LIMIT"
       ],
+      "order_id_tag": "e69aaa7ddf329da340df8a63",
       "orders": 4,
       "owned_quantity": "0",
       "passed": true,
       "pending": false,
       "preset": "aggressive-v1",
+      "sequence": 4,
+      "strategy_id": "T22-e69aaa7ddf329da340df8a63",
       "trace": [
+        {
+          "event": "ledger_restored",
+          "now_ns": 1791465900000000000,
+          "prior_entry": false,
+          "sequence": 0
+        },
         {
           "event": "snapshot",
           "now_ns": 1791465900000000000,
           "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
         },
         {
+          "client_order_id": "t22-e69aaa7ddf329da340df8a63-0000001",
           "event": "submit",
           "limit_price": "10.03",
           "now_ns": 1791466500000000000,
@@ -1779,6 +1940,7 @@
           "side": "BUY"
         },
         {
+          "client_order_id": "t22-e69aaa7ddf329da340df8a63-0000002",
           "event": "submit",
           "limit_price": "9.79",
           "now_ns": 1791466508000000000,
@@ -1798,6 +1960,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-e69aaa7ddf329da340df8a63-0000003",
           "event": "submit",
           "limit_price": "9.69",
           "now_ns": 1791466509000000000,
@@ -1817,6 +1980,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-e69aaa7ddf329da340df8a63-0000004",
           "event": "submit",
           "limit_price": "9.59",
           "now_ns": 1791466511000000000,
@@ -1837,7 +2001,7 @@
           "side": "SELL"
         }
       ],
-      "trace_sha256": "5db3f2767611a39314c6cb321e47d78d3e8da8f27ad6b34e7e003f8b7bb6346b"
+      "trace_sha256": "3ce05bae619bb17049773719f6a58c596028000bfd2cd3e0adeaeebdaa6f5b20"
     },
     {
       "callback_faults": [],
@@ -1846,24 +2010,34 @@
       "execution_profile": "code-managed-limit-v1",
       "family": "options_flow_stock",
       "fill_callbacks": 2,
-      "fixture_sha256": "5ffd787275494fbf540b4d52972f202785e736210a1953f79bb678adc0a85080",
+      "fixture_sha256": "52b3439fcee8998e5d7632c5ee8327d30c3b83c72258e18fec0894e67ee138c4",
       "flags": [],
       "iterations": 17,
       "native_order_types": [
         "LIMIT"
       ],
+      "order_id_tag": "e071a4d34b4a3e60a99b936f",
       "orders": 4,
       "owned_quantity": "0",
       "passed": true,
       "pending": false,
       "preset": "conservative-v1",
+      "sequence": 4,
+      "strategy_id": "T22-e071a4d34b4a3e60a99b936f",
       "trace": [
+        {
+          "event": "ledger_restored",
+          "now_ns": 1791465900000000000,
+          "prior_entry": false,
+          "sequence": 0
+        },
         {
           "event": "snapshot",
           "now_ns": 1791465900000000000,
           "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
         },
         {
+          "client_order_id": "t22-e071a4d34b4a3e60a99b936f-0000001",
           "event": "submit",
           "limit_price": "10.03",
           "now_ns": 1791466500000000000,
@@ -1879,6 +2053,7 @@
           "side": "BUY"
         },
         {
+          "client_order_id": "t22-e071a4d34b4a3e60a99b936f-0000002",
           "event": "submit",
           "limit_price": "9.79",
           "now_ns": 1791466508000000000,
@@ -1898,6 +2073,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-e071a4d34b4a3e60a99b936f-0000003",
           "event": "submit",
           "limit_price": "9.69",
           "now_ns": 1791466509000000000,
@@ -1917,6 +2093,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-e071a4d34b4a3e60a99b936f-0000004",
           "event": "submit",
           "limit_price": "9.59",
           "now_ns": 1791466511000000000,
@@ -1937,7 +2114,7 @@
           "side": "SELL"
         }
       ],
-      "trace_sha256": "028294d2cf79d00f944759f7e71a316b70e9354ae790462e4b9fba06bf1a750a"
+      "trace_sha256": "21422b7b4cc040dcefad0b70c683f2741c51b9043f4cd1f7a3e98707244d04b5"
     },
     {
       "callback_faults": [],
@@ -1946,24 +2123,34 @@
       "execution_profile": "code-managed-limit-v1",
       "family": "options_flow_stock",
       "fill_callbacks": 2,
-      "fixture_sha256": "d7626cec195e392de4594a0349bf557b6fd0eb411bef159a7868d08bab394c57",
+      "fixture_sha256": "fb88e354a16919d4f5241e400e86b0dd25ea870a639fea0fcb45b45fb652e3b4",
       "flags": [],
       "iterations": 17,
       "native_order_types": [
         "LIMIT"
       ],
+      "order_id_tag": "279a88f043f81cc4c7d62170",
       "orders": 4,
       "owned_quantity": "0",
       "passed": true,
       "pending": false,
       "preset": "standard-v1",
+      "sequence": 4,
+      "strategy_id": "T22-279a88f043f81cc4c7d62170",
       "trace": [
+        {
+          "event": "ledger_restored",
+          "now_ns": 1791465900000000000,
+          "prior_entry": false,
+          "sequence": 0
+        },
         {
           "event": "snapshot",
           "now_ns": 1791465900000000000,
           "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
         },
         {
+          "client_order_id": "t22-279a88f043f81cc4c7d62170-0000001",
           "event": "submit",
           "limit_price": "10.03",
           "now_ns": 1791466500000000000,
@@ -1979,6 +2166,7 @@
           "side": "BUY"
         },
         {
+          "client_order_id": "t22-279a88f043f81cc4c7d62170-0000002",
           "event": "submit",
           "limit_price": "9.79",
           "now_ns": 1791466508000000000,
@@ -1998,6 +2186,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-279a88f043f81cc4c7d62170-0000003",
           "event": "submit",
           "limit_price": "9.69",
           "now_ns": 1791466509000000000,
@@ -2017,6 +2206,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-279a88f043f81cc4c7d62170-0000004",
           "event": "submit",
           "limit_price": "9.59",
           "now_ns": 1791466511000000000,
@@ -2037,7 +2227,7 @@
           "side": "SELL"
         }
       ],
-      "trace_sha256": "e674041487f00fae112b5f820d2a9057826bc340ff361cd040262c3bd966d5b9"
+      "trace_sha256": "555ce7ef35c2ad4442a90762a347bce40086c42d88cc1bc3465c34d39f95cc30"
     },
     {
       "callback_faults": [],
@@ -2046,24 +2236,34 @@
       "execution_profile": "code-managed-limit-v1",
       "family": "options_flow_stock",
       "fill_callbacks": 2,
-      "fixture_sha256": "9bd01c7b65c5ca4a1cf3353907de7b120a3dce9482d3ca9c3e46d66027dddcc2",
+      "fixture_sha256": "6b17464f8c8ffea07ed5e5303f03e1c5bdb593e88b2e05f14f20bb5666e73327",
       "flags": [],
       "iterations": 17,
       "native_order_types": [
         "LIMIT"
       ],
+      "order_id_tag": "7c0b943d5ef638ff8f448099",
       "orders": 4,
       "owned_quantity": "0",
       "passed": true,
       "pending": false,
       "preset": "aggressive-v1",
+      "sequence": 4,
+      "strategy_id": "T22-7c0b943d5ef638ff8f448099",
       "trace": [
+        {
+          "event": "ledger_restored",
+          "now_ns": 1791465900000000000,
+          "prior_entry": false,
+          "sequence": 0
+        },
         {
           "event": "snapshot",
           "now_ns": 1791465900000000000,
           "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
         },
         {
+          "client_order_id": "t22-7c0b943d5ef638ff8f448099-0000001",
           "event": "submit",
           "limit_price": "10.03",
           "now_ns": 1791466500000000000,
@@ -2079,6 +2279,7 @@
           "side": "BUY"
         },
         {
+          "client_order_id": "t22-7c0b943d5ef638ff8f448099-0000002",
           "event": "submit",
           "limit_price": "9.79",
           "now_ns": 1791466508000000000,
@@ -2098,6 +2299,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-7c0b943d5ef638ff8f448099-0000003",
           "event": "submit",
           "limit_price": "9.69",
           "now_ns": 1791466509000000000,
@@ -2117,6 +2319,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-7c0b943d5ef638ff8f448099-0000004",
           "event": "submit",
           "limit_price": "9.59",
           "now_ns": 1791466511000000000,
@@ -2137,7 +2340,7 @@
           "side": "SELL"
         }
       ],
-      "trace_sha256": "5db3f2767611a39314c6cb321e47d78d3e8da8f27ad6b34e7e003f8b7bb6346b"
+      "trace_sha256": "81236684e30384df14878837121bca362a22b1859e889489866c249563dc0e5d"
     },
     {
       "callback_faults": [],
@@ -2146,24 +2349,34 @@
       "execution_profile": "code-managed-limit-v1",
       "family": "halt_reopen",
       "fill_callbacks": 2,
-      "fixture_sha256": "5ffd787275494fbf540b4d52972f202785e736210a1953f79bb678adc0a85080",
+      "fixture_sha256": "52b3439fcee8998e5d7632c5ee8327d30c3b83c72258e18fec0894e67ee138c4",
       "flags": [],
       "iterations": 17,
       "native_order_types": [
         "LIMIT"
       ],
+      "order_id_tag": "7f6d75fd81053420dad98b9d",
       "orders": 4,
       "owned_quantity": "0",
       "passed": true,
       "pending": false,
       "preset": "conservative-v1",
+      "sequence": 4,
+      "strategy_id": "T22-7f6d75fd81053420dad98b9d",
       "trace": [
+        {
+          "event": "ledger_restored",
+          "now_ns": 1791465900000000000,
+          "prior_entry": false,
+          "sequence": 0
+        },
         {
           "event": "snapshot",
           "now_ns": 1791465900000000000,
           "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
         },
         {
+          "client_order_id": "t22-7f6d75fd81053420dad98b9d-0000001",
           "event": "submit",
           "limit_price": "10.03",
           "now_ns": 1791466500000000000,
@@ -2179,6 +2392,7 @@
           "side": "BUY"
         },
         {
+          "client_order_id": "t22-7f6d75fd81053420dad98b9d-0000002",
           "event": "submit",
           "limit_price": "9.79",
           "now_ns": 1791466508000000000,
@@ -2198,6 +2412,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-7f6d75fd81053420dad98b9d-0000003",
           "event": "submit",
           "limit_price": "9.69",
           "now_ns": 1791466509000000000,
@@ -2217,6 +2432,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-7f6d75fd81053420dad98b9d-0000004",
           "event": "submit",
           "limit_price": "9.59",
           "now_ns": 1791466511000000000,
@@ -2237,7 +2453,7 @@
           "side": "SELL"
         }
       ],
-      "trace_sha256": "028294d2cf79d00f944759f7e71a316b70e9354ae790462e4b9fba06bf1a750a"
+      "trace_sha256": "0ad3ac4f3759d6f24aa556ee3f13e31c774360d80d58ff64f716bb943ccd9693"
     },
     {
       "callback_faults": [],
@@ -2246,24 +2462,34 @@
       "execution_profile": "code-managed-limit-v1",
       "family": "halt_reopen",
       "fill_callbacks": 2,
-      "fixture_sha256": "d7626cec195e392de4594a0349bf557b6fd0eb411bef159a7868d08bab394c57",
+      "fixture_sha256": "fb88e354a16919d4f5241e400e86b0dd25ea870a639fea0fcb45b45fb652e3b4",
       "flags": [],
       "iterations": 17,
       "native_order_types": [
         "LIMIT"
       ],
+      "order_id_tag": "cd4907ef9d2cd43d29221c4a",
       "orders": 4,
       "owned_quantity": "0",
       "passed": true,
       "pending": false,
       "preset": "standard-v1",
+      "sequence": 4,
+      "strategy_id": "T22-cd4907ef9d2cd43d29221c4a",
       "trace": [
+        {
+          "event": "ledger_restored",
+          "now_ns": 1791465900000000000,
+          "prior_entry": false,
+          "sequence": 0
+        },
         {
           "event": "snapshot",
           "now_ns": 1791465900000000000,
           "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
         },
         {
+          "client_order_id": "t22-cd4907ef9d2cd43d29221c4a-0000001",
           "event": "submit",
           "limit_price": "10.03",
           "now_ns": 1791466500000000000,
@@ -2279,6 +2505,7 @@
           "side": "BUY"
         },
         {
+          "client_order_id": "t22-cd4907ef9d2cd43d29221c4a-0000002",
           "event": "submit",
           "limit_price": "9.79",
           "now_ns": 1791466508000000000,
@@ -2298,6 +2525,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-cd4907ef9d2cd43d29221c4a-0000003",
           "event": "submit",
           "limit_price": "9.69",
           "now_ns": 1791466509000000000,
@@ -2317,6 +2545,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-cd4907ef9d2cd43d29221c4a-0000004",
           "event": "submit",
           "limit_price": "9.59",
           "now_ns": 1791466511000000000,
@@ -2337,7 +2566,7 @@
           "side": "SELL"
         }
       ],
-      "trace_sha256": "e674041487f00fae112b5f820d2a9057826bc340ff361cd040262c3bd966d5b9"
+      "trace_sha256": "231a8355a3216dd07feb902d85a4de8ce0f8541b27226bdfb33538f266e2d35c"
     },
     {
       "callback_faults": [],
@@ -2346,24 +2575,34 @@
       "execution_profile": "code-managed-limit-v1",
       "family": "halt_reopen",
       "fill_callbacks": 2,
-      "fixture_sha256": "9bd01c7b65c5ca4a1cf3353907de7b120a3dce9482d3ca9c3e46d66027dddcc2",
+      "fixture_sha256": "6b17464f8c8ffea07ed5e5303f03e1c5bdb593e88b2e05f14f20bb5666e73327",
       "flags": [],
       "iterations": 17,
       "native_order_types": [
         "LIMIT"
       ],
+      "order_id_tag": "044c88005a2948b251b6849c",
       "orders": 4,
       "owned_quantity": "0",
       "passed": true,
       "pending": false,
       "preset": "aggressive-v1",
+      "sequence": 4,
+      "strategy_id": "T22-044c88005a2948b251b6849c",
       "trace": [
+        {
+          "event": "ledger_restored",
+          "now_ns": 1791465900000000000,
+          "prior_entry": false,
+          "sequence": 0
+        },
         {
           "event": "snapshot",
           "now_ns": 1791465900000000000,
           "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
         },
         {
+          "client_order_id": "t22-044c88005a2948b251b6849c-0000001",
           "event": "submit",
           "limit_price": "10.03",
           "now_ns": 1791466500000000000,
@@ -2379,6 +2618,7 @@
           "side": "BUY"
         },
         {
+          "client_order_id": "t22-044c88005a2948b251b6849c-0000002",
           "event": "submit",
           "limit_price": "9.79",
           "now_ns": 1791466508000000000,
@@ -2398,6 +2638,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-044c88005a2948b251b6849c-0000003",
           "event": "submit",
           "limit_price": "9.69",
           "now_ns": 1791466509000000000,
@@ -2417,6 +2658,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-044c88005a2948b251b6849c-0000004",
           "event": "submit",
           "limit_price": "9.59",
           "now_ns": 1791466511000000000,
@@ -2437,7 +2679,7 @@
           "side": "SELL"
         }
       ],
-      "trace_sha256": "5db3f2767611a39314c6cb321e47d78d3e8da8f27ad6b34e7e003f8b7bb6346b"
+      "trace_sha256": "6eac662c7bdf3b27b6b619a584ba2f0301fa9e2837a82117876bca67aaf85019"
     },
     {
       "callback_faults": [],
@@ -2446,24 +2688,34 @@
       "execution_profile": "code-managed-limit-v1",
       "family": "post_earnings_drift",
       "fill_callbacks": 2,
-      "fixture_sha256": "5ffd787275494fbf540b4d52972f202785e736210a1953f79bb678adc0a85080",
+      "fixture_sha256": "52b3439fcee8998e5d7632c5ee8327d30c3b83c72258e18fec0894e67ee138c4",
       "flags": [],
       "iterations": 17,
       "native_order_types": [
         "LIMIT"
       ],
+      "order_id_tag": "f94deb14caddbd80f7ae176a",
       "orders": 4,
       "owned_quantity": "0",
       "passed": true,
       "pending": false,
       "preset": "conservative-v1",
+      "sequence": 4,
+      "strategy_id": "T22-f94deb14caddbd80f7ae176a",
       "trace": [
+        {
+          "event": "ledger_restored",
+          "now_ns": 1791465900000000000,
+          "prior_entry": false,
+          "sequence": 0
+        },
         {
           "event": "snapshot",
           "now_ns": 1791465900000000000,
           "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
         },
         {
+          "client_order_id": "t22-f94deb14caddbd80f7ae176a-0000001",
           "event": "submit",
           "limit_price": "10.03",
           "now_ns": 1791466500000000000,
@@ -2479,6 +2731,7 @@
           "side": "BUY"
         },
         {
+          "client_order_id": "t22-f94deb14caddbd80f7ae176a-0000002",
           "event": "submit",
           "limit_price": "9.79",
           "now_ns": 1791466508000000000,
@@ -2498,6 +2751,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-f94deb14caddbd80f7ae176a-0000003",
           "event": "submit",
           "limit_price": "9.69",
           "now_ns": 1791466509000000000,
@@ -2517,6 +2771,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-f94deb14caddbd80f7ae176a-0000004",
           "event": "submit",
           "limit_price": "9.59",
           "now_ns": 1791466511000000000,
@@ -2537,7 +2792,7 @@
           "side": "SELL"
         }
       ],
-      "trace_sha256": "028294d2cf79d00f944759f7e71a316b70e9354ae790462e4b9fba06bf1a750a"
+      "trace_sha256": "629197dbfbad3689bb57d5b471a5e5ca9e0f5899dd7cff9b39eb58e3e644ed2f"
     },
     {
       "callback_faults": [],
@@ -2546,24 +2801,34 @@
       "execution_profile": "code-managed-limit-v1",
       "family": "post_earnings_drift",
       "fill_callbacks": 2,
-      "fixture_sha256": "d7626cec195e392de4594a0349bf557b6fd0eb411bef159a7868d08bab394c57",
+      "fixture_sha256": "fb88e354a16919d4f5241e400e86b0dd25ea870a639fea0fcb45b45fb652e3b4",
       "flags": [],
       "iterations": 17,
       "native_order_types": [
         "LIMIT"
       ],
+      "order_id_tag": "fefe3c8d6fbf24d6950fb4bf",
       "orders": 4,
       "owned_quantity": "0",
       "passed": true,
       "pending": false,
       "preset": "standard-v1",
+      "sequence": 4,
+      "strategy_id": "T22-fefe3c8d6fbf24d6950fb4bf",
       "trace": [
+        {
+          "event": "ledger_restored",
+          "now_ns": 1791465900000000000,
+          "prior_entry": false,
+          "sequence": 0
+        },
         {
           "event": "snapshot",
           "now_ns": 1791465900000000000,
           "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
         },
         {
+          "client_order_id": "t22-fefe3c8d6fbf24d6950fb4bf-0000001",
           "event": "submit",
           "limit_price": "10.03",
           "now_ns": 1791466500000000000,
@@ -2579,6 +2844,7 @@
           "side": "BUY"
         },
         {
+          "client_order_id": "t22-fefe3c8d6fbf24d6950fb4bf-0000002",
           "event": "submit",
           "limit_price": "9.79",
           "now_ns": 1791466508000000000,
@@ -2598,6 +2864,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-fefe3c8d6fbf24d6950fb4bf-0000003",
           "event": "submit",
           "limit_price": "9.69",
           "now_ns": 1791466509000000000,
@@ -2617,6 +2884,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-fefe3c8d6fbf24d6950fb4bf-0000004",
           "event": "submit",
           "limit_price": "9.59",
           "now_ns": 1791466511000000000,
@@ -2637,7 +2905,7 @@
           "side": "SELL"
         }
       ],
-      "trace_sha256": "e674041487f00fae112b5f820d2a9057826bc340ff361cd040262c3bd966d5b9"
+      "trace_sha256": "bca84593fe104211adc7b1eb48d37580491d588ddccd0de6e87abdb4f4d83e1f"
     },
     {
       "callback_faults": [],
@@ -2646,24 +2914,34 @@
       "execution_profile": "code-managed-limit-v1",
       "family": "post_earnings_drift",
       "fill_callbacks": 2,
-      "fixture_sha256": "9bd01c7b65c5ca4a1cf3353907de7b120a3dce9482d3ca9c3e46d66027dddcc2",
+      "fixture_sha256": "6b17464f8c8ffea07ed5e5303f03e1c5bdb593e88b2e05f14f20bb5666e73327",
       "flags": [],
       "iterations": 17,
       "native_order_types": [
         "LIMIT"
       ],
+      "order_id_tag": "df3da1572d16f0a16fa98d66",
       "orders": 4,
       "owned_quantity": "0",
       "passed": true,
       "pending": false,
       "preset": "aggressive-v1",
+      "sequence": 4,
+      "strategy_id": "T22-df3da1572d16f0a16fa98d66",
       "trace": [
+        {
+          "event": "ledger_restored",
+          "now_ns": 1791465900000000000,
+          "prior_entry": false,
+          "sequence": 0
+        },
         {
           "event": "snapshot",
           "now_ns": 1791465900000000000,
           "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
         },
         {
+          "client_order_id": "t22-df3da1572d16f0a16fa98d66-0000001",
           "event": "submit",
           "limit_price": "10.03",
           "now_ns": 1791466500000000000,
@@ -2679,6 +2957,7 @@
           "side": "BUY"
         },
         {
+          "client_order_id": "t22-df3da1572d16f0a16fa98d66-0000002",
           "event": "submit",
           "limit_price": "9.79",
           "now_ns": 1791466508000000000,
@@ -2698,6 +2977,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-df3da1572d16f0a16fa98d66-0000003",
           "event": "submit",
           "limit_price": "9.69",
           "now_ns": 1791466509000000000,
@@ -2717,6 +2997,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-df3da1572d16f0a16fa98d66-0000004",
           "event": "submit",
           "limit_price": "9.59",
           "now_ns": 1791466511000000000,
@@ -2737,7 +3018,7 @@
           "side": "SELL"
         }
       ],
-      "trace_sha256": "5db3f2767611a39314c6cb321e47d78d3e8da8f27ad6b34e7e003f8b7bb6346b"
+      "trace_sha256": "4c3bd123b2264812f8acaa6b571e1db75ff4c3008c9b12132a9b313746499acb"
     },
     {
       "callback_faults": [],
@@ -2746,24 +3027,34 @@
       "execution_profile": "code-managed-limit-v1",
       "family": "trend_new_highs",
       "fill_callbacks": 2,
-      "fixture_sha256": "5ffd787275494fbf540b4d52972f202785e736210a1953f79bb678adc0a85080",
+      "fixture_sha256": "52b3439fcee8998e5d7632c5ee8327d30c3b83c72258e18fec0894e67ee138c4",
       "flags": [],
       "iterations": 17,
       "native_order_types": [
         "LIMIT"
       ],
+      "order_id_tag": "8629c26db50eae7e35ded561",
       "orders": 4,
       "owned_quantity": "0",
       "passed": true,
       "pending": false,
       "preset": "conservative-v1",
+      "sequence": 4,
+      "strategy_id": "T22-8629c26db50eae7e35ded561",
       "trace": [
+        {
+          "event": "ledger_restored",
+          "now_ns": 1791465900000000000,
+          "prior_entry": false,
+          "sequence": 0
+        },
         {
           "event": "snapshot",
           "now_ns": 1791465900000000000,
           "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
         },
         {
+          "client_order_id": "t22-8629c26db50eae7e35ded561-0000001",
           "event": "submit",
           "limit_price": "10.03",
           "now_ns": 1791466500000000000,
@@ -2779,6 +3070,7 @@
           "side": "BUY"
         },
         {
+          "client_order_id": "t22-8629c26db50eae7e35ded561-0000002",
           "event": "submit",
           "limit_price": "9.79",
           "now_ns": 1791466508000000000,
@@ -2798,6 +3090,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-8629c26db50eae7e35ded561-0000003",
           "event": "submit",
           "limit_price": "9.69",
           "now_ns": 1791466509000000000,
@@ -2817,6 +3110,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-8629c26db50eae7e35ded561-0000004",
           "event": "submit",
           "limit_price": "9.59",
           "now_ns": 1791466511000000000,
@@ -2837,7 +3131,7 @@
           "side": "SELL"
         }
       ],
-      "trace_sha256": "028294d2cf79d00f944759f7e71a316b70e9354ae790462e4b9fba06bf1a750a"
+      "trace_sha256": "d66ee5895a38baa9f23a99f17598077e106bf0d670e4a1cb60c82861e14b2953"
     },
     {
       "callback_faults": [],
@@ -2846,24 +3140,34 @@
       "execution_profile": "code-managed-limit-v1",
       "family": "trend_new_highs",
       "fill_callbacks": 2,
-      "fixture_sha256": "d7626cec195e392de4594a0349bf557b6fd0eb411bef159a7868d08bab394c57",
+      "fixture_sha256": "fb88e354a16919d4f5241e400e86b0dd25ea870a639fea0fcb45b45fb652e3b4",
       "flags": [],
       "iterations": 17,
       "native_order_types": [
         "LIMIT"
       ],
+      "order_id_tag": "b422aeb968ce654189da412c",
       "orders": 4,
       "owned_quantity": "0",
       "passed": true,
       "pending": false,
       "preset": "standard-v1",
+      "sequence": 4,
+      "strategy_id": "T22-b422aeb968ce654189da412c",
       "trace": [
+        {
+          "event": "ledger_restored",
+          "now_ns": 1791465900000000000,
+          "prior_entry": false,
+          "sequence": 0
+        },
         {
           "event": "snapshot",
           "now_ns": 1791465900000000000,
           "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
         },
         {
+          "client_order_id": "t22-b422aeb968ce654189da412c-0000001",
           "event": "submit",
           "limit_price": "10.03",
           "now_ns": 1791466500000000000,
@@ -2879,6 +3183,7 @@
           "side": "BUY"
         },
         {
+          "client_order_id": "t22-b422aeb968ce654189da412c-0000002",
           "event": "submit",
           "limit_price": "9.79",
           "now_ns": 1791466508000000000,
@@ -2898,6 +3203,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-b422aeb968ce654189da412c-0000003",
           "event": "submit",
           "limit_price": "9.69",
           "now_ns": 1791466509000000000,
@@ -2917,6 +3223,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-b422aeb968ce654189da412c-0000004",
           "event": "submit",
           "limit_price": "9.59",
           "now_ns": 1791466511000000000,
@@ -2937,7 +3244,7 @@
           "side": "SELL"
         }
       ],
-      "trace_sha256": "e674041487f00fae112b5f820d2a9057826bc340ff361cd040262c3bd966d5b9"
+      "trace_sha256": "4b6fc3eb484e4e842c70cf518c2c2cbadb51ce53a80bc11dc4345dd913f10aed"
     },
     {
       "callback_faults": [],
@@ -2946,24 +3253,34 @@
       "execution_profile": "code-managed-limit-v1",
       "family": "trend_new_highs",
       "fill_callbacks": 2,
-      "fixture_sha256": "9bd01c7b65c5ca4a1cf3353907de7b120a3dce9482d3ca9c3e46d66027dddcc2",
+      "fixture_sha256": "6b17464f8c8ffea07ed5e5303f03e1c5bdb593e88b2e05f14f20bb5666e73327",
       "flags": [],
       "iterations": 17,
       "native_order_types": [
         "LIMIT"
       ],
+      "order_id_tag": "bdd4dc9bec612d184cad42cf",
       "orders": 4,
       "owned_quantity": "0",
       "passed": true,
       "pending": false,
       "preset": "aggressive-v1",
+      "sequence": 4,
+      "strategy_id": "T22-bdd4dc9bec612d184cad42cf",
       "trace": [
+        {
+          "event": "ledger_restored",
+          "now_ns": 1791465900000000000,
+          "prior_entry": false,
+          "sequence": 0
+        },
         {
           "event": "snapshot",
           "now_ns": 1791465900000000000,
           "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
         },
         {
+          "client_order_id": "t22-bdd4dc9bec612d184cad42cf-0000001",
           "event": "submit",
           "limit_price": "10.03",
           "now_ns": 1791466500000000000,
@@ -2979,6 +3296,7 @@
           "side": "BUY"
         },
         {
+          "client_order_id": "t22-bdd4dc9bec612d184cad42cf-0000002",
           "event": "submit",
           "limit_price": "9.79",
           "now_ns": 1791466508000000000,
@@ -2998,6 +3316,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-bdd4dc9bec612d184cad42cf-0000003",
           "event": "submit",
           "limit_price": "9.69",
           "now_ns": 1791466509000000000,
@@ -3017,6 +3336,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-bdd4dc9bec612d184cad42cf-0000004",
           "event": "submit",
           "limit_price": "9.59",
           "now_ns": 1791466511000000000,
@@ -3037,7 +3357,7 @@
           "side": "SELL"
         }
       ],
-      "trace_sha256": "5db3f2767611a39314c6cb321e47d78d3e8da8f27ad6b34e7e003f8b7bb6346b"
+      "trace_sha256": "1113a145287a03e263f5a0502e422986d063fc402f88ff527c4efe296d6538fb"
     },
     {
       "callback_faults": [],
@@ -3046,24 +3366,34 @@
       "execution_profile": "code-managed-limit-v1",
       "family": "short_term_reversal",
       "fill_callbacks": 2,
-      "fixture_sha256": "5ffd787275494fbf540b4d52972f202785e736210a1953f79bb678adc0a85080",
+      "fixture_sha256": "52b3439fcee8998e5d7632c5ee8327d30c3b83c72258e18fec0894e67ee138c4",
       "flags": [],
       "iterations": 17,
       "native_order_types": [
         "LIMIT"
       ],
+      "order_id_tag": "2aa0fadd6a510caa7d519d00",
       "orders": 4,
       "owned_quantity": "0",
       "passed": true,
       "pending": false,
       "preset": "conservative-v1",
+      "sequence": 4,
+      "strategy_id": "T22-2aa0fadd6a510caa7d519d00",
       "trace": [
+        {
+          "event": "ledger_restored",
+          "now_ns": 1791465900000000000,
+          "prior_entry": false,
+          "sequence": 0
+        },
         {
           "event": "snapshot",
           "now_ns": 1791465900000000000,
           "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
         },
         {
+          "client_order_id": "t22-2aa0fadd6a510caa7d519d00-0000001",
           "event": "submit",
           "limit_price": "10.03",
           "now_ns": 1791466500000000000,
@@ -3079,6 +3409,7 @@
           "side": "BUY"
         },
         {
+          "client_order_id": "t22-2aa0fadd6a510caa7d519d00-0000002",
           "event": "submit",
           "limit_price": "9.79",
           "now_ns": 1791466508000000000,
@@ -3098,6 +3429,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-2aa0fadd6a510caa7d519d00-0000003",
           "event": "submit",
           "limit_price": "9.69",
           "now_ns": 1791466509000000000,
@@ -3117,6 +3449,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-2aa0fadd6a510caa7d519d00-0000004",
           "event": "submit",
           "limit_price": "9.59",
           "now_ns": 1791466511000000000,
@@ -3137,7 +3470,7 @@
           "side": "SELL"
         }
       ],
-      "trace_sha256": "028294d2cf79d00f944759f7e71a316b70e9354ae790462e4b9fba06bf1a750a"
+      "trace_sha256": "ff468f6a74ff825588d83cfe2d160337d37cd97bcabc93710f0e4d500e5b08ba"
     },
     {
       "callback_faults": [],
@@ -3146,24 +3479,34 @@
       "execution_profile": "code-managed-limit-v1",
       "family": "short_term_reversal",
       "fill_callbacks": 2,
-      "fixture_sha256": "d7626cec195e392de4594a0349bf557b6fd0eb411bef159a7868d08bab394c57",
+      "fixture_sha256": "fb88e354a16919d4f5241e400e86b0dd25ea870a639fea0fcb45b45fb652e3b4",
       "flags": [],
       "iterations": 17,
       "native_order_types": [
         "LIMIT"
       ],
+      "order_id_tag": "62690b4fdaa941601bfe07c0",
       "orders": 4,
       "owned_quantity": "0",
       "passed": true,
       "pending": false,
       "preset": "standard-v1",
+      "sequence": 4,
+      "strategy_id": "T22-62690b4fdaa941601bfe07c0",
       "trace": [
+        {
+          "event": "ledger_restored",
+          "now_ns": 1791465900000000000,
+          "prior_entry": false,
+          "sequence": 0
+        },
         {
           "event": "snapshot",
           "now_ns": 1791465900000000000,
           "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
         },
         {
+          "client_order_id": "t22-62690b4fdaa941601bfe07c0-0000001",
           "event": "submit",
           "limit_price": "10.03",
           "now_ns": 1791466500000000000,
@@ -3179,6 +3522,7 @@
           "side": "BUY"
         },
         {
+          "client_order_id": "t22-62690b4fdaa941601bfe07c0-0000002",
           "event": "submit",
           "limit_price": "9.79",
           "now_ns": 1791466508000000000,
@@ -3198,6 +3542,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-62690b4fdaa941601bfe07c0-0000003",
           "event": "submit",
           "limit_price": "9.69",
           "now_ns": 1791466509000000000,
@@ -3217,6 +3562,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-62690b4fdaa941601bfe07c0-0000004",
           "event": "submit",
           "limit_price": "9.59",
           "now_ns": 1791466511000000000,
@@ -3237,7 +3583,7 @@
           "side": "SELL"
         }
       ],
-      "trace_sha256": "e674041487f00fae112b5f820d2a9057826bc340ff361cd040262c3bd966d5b9"
+      "trace_sha256": "a1690b45370e34e6b0444698c2d28fe4f78b7f159cbbc5c6e3a38b133a1d8409"
     },
     {
       "callback_faults": [],
@@ -3246,24 +3592,34 @@
       "execution_profile": "code-managed-limit-v1",
       "family": "short_term_reversal",
       "fill_callbacks": 2,
-      "fixture_sha256": "9bd01c7b65c5ca4a1cf3353907de7b120a3dce9482d3ca9c3e46d66027dddcc2",
+      "fixture_sha256": "6b17464f8c8ffea07ed5e5303f03e1c5bdb593e88b2e05f14f20bb5666e73327",
       "flags": [],
       "iterations": 17,
       "native_order_types": [
         "LIMIT"
       ],
+      "order_id_tag": "55c73878ffa3a7140e2d5ce5",
       "orders": 4,
       "owned_quantity": "0",
       "passed": true,
       "pending": false,
       "preset": "aggressive-v1",
+      "sequence": 4,
+      "strategy_id": "T22-55c73878ffa3a7140e2d5ce5",
       "trace": [
+        {
+          "event": "ledger_restored",
+          "now_ns": 1791465900000000000,
+          "prior_entry": false,
+          "sequence": 0
+        },
         {
           "event": "snapshot",
           "now_ns": 1791465900000000000,
           "source_sha256": "b0e774bfda9fe624680bd455f9a91864c8fee44eba6a3c3d380f6f63761ccbd2"
         },
         {
+          "client_order_id": "t22-55c73878ffa3a7140e2d5ce5-0000001",
           "event": "submit",
           "limit_price": "10.03",
           "now_ns": 1791466500000000000,
@@ -3279,6 +3635,7 @@
           "side": "BUY"
         },
         {
+          "client_order_id": "t22-55c73878ffa3a7140e2d5ce5-0000002",
           "event": "submit",
           "limit_price": "9.79",
           "now_ns": 1791466508000000000,
@@ -3298,6 +3655,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-55c73878ffa3a7140e2d5ce5-0000003",
           "event": "submit",
           "limit_price": "9.69",
           "now_ns": 1791466509000000000,
@@ -3317,6 +3675,7 @@
           "role": "exit"
         },
         {
+          "client_order_id": "t22-55c73878ffa3a7140e2d5ce5-0000004",
           "event": "submit",
           "limit_price": "9.59",
           "now_ns": 1791466511000000000,
@@ -3337,7 +3696,7 @@
           "side": "SELL"
         }
       ],
-      "trace_sha256": "5db3f2767611a39314c6cb321e47d78d3e8da8f27ad6b34e7e003f8b7bb6346b"
+      "trace_sha256": "a7e9369b82c947f4f8762cddc23adcfd385042aa5f4995b09bf238c60b02de1e"
     }
   ],
   "historical_layer15_e2e": "NOT_RUN",
@@ -3349,23 +3708,32 @@
       "execution_profile": "code-managed-limit-v1",
       "family": "catalyst",
       "fill_callbacks": 0,
-      "fixture_sha256": "f0c2378c28d6138075966134a27cea27af07bf928171475804e98022b99c24d0",
+      "fixture_sha256": "9a39912dfa0a2baab963a61e4ce044870f6c9a5c1a15919a397e8091172b48a1",
       "flags": [],
       "iterations": 17,
       "native_order_types": [],
+      "order_id_tag": "9835da042aa2cdd054f7f6a0",
       "orders": 0,
       "owned_quantity": "0",
       "passed": true,
       "pending": false,
       "preset": "conservative-v1",
+      "sequence": 0,
+      "strategy_id": "T22-9835da042aa2cdd054f7f6a0",
       "trace": [
+        {
+          "event": "ledger_restored",
+          "now_ns": 1791465900000000000,
+          "prior_entry": false,
+          "sequence": 0
+        },
         {
           "event": "snapshot",
           "now_ns": 1791465900000000000,
           "source_sha256": "d71e07c674e8989901bf7263203b24711d93aee1e9fe97226b1fa1a1bb4de5c5"
         }
       ],
-      "trace_sha256": "685d05ff55d5c2f9d6f6446931f862b397d443b70351886cd5e70d32278e2aef"
+      "trace_sha256": "974a4d1ce19b8c19bfac66dd8d8a0c7995f6381e19c31190e2354e702bd53036"
     },
     {
       "callback_faults": [],
@@ -3374,23 +3742,32 @@
       "execution_profile": "code-managed-limit-v1",
       "family": "gap_premarket",
       "fill_callbacks": 0,
-      "fixture_sha256": "f0c2378c28d6138075966134a27cea27af07bf928171475804e98022b99c24d0",
+      "fixture_sha256": "9a39912dfa0a2baab963a61e4ce044870f6c9a5c1a15919a397e8091172b48a1",
       "flags": [],
       "iterations": 17,
       "native_order_types": [],
+      "order_id_tag": "0851b91e360edce391dd3426",
       "orders": 0,
       "owned_quantity": "0",
       "passed": true,
       "pending": false,
       "preset": "conservative-v1",
+      "sequence": 0,
+      "strategy_id": "T22-0851b91e360edce391dd3426",
       "trace": [
+        {
+          "event": "ledger_restored",
+          "now_ns": 1791465900000000000,
+          "prior_entry": false,
+          "sequence": 0
+        },
         {
           "event": "snapshot",
           "now_ns": 1791465900000000000,
           "source_sha256": "d71e07c674e8989901bf7263203b24711d93aee1e9fe97226b1fa1a1bb4de5c5"
         }
       ],
-      "trace_sha256": "685d05ff55d5c2f9d6f6446931f862b397d443b70351886cd5e70d32278e2aef"
+      "trace_sha256": "974a4d1ce19b8c19bfac66dd8d8a0c7995f6381e19c31190e2354e702bd53036"
     },
     {
       "callback_faults": [],
@@ -3399,23 +3776,32 @@
       "execution_profile": "code-managed-limit-v1",
       "family": "volume_float",
       "fill_callbacks": 0,
-      "fixture_sha256": "f0c2378c28d6138075966134a27cea27af07bf928171475804e98022b99c24d0",
+      "fixture_sha256": "9a39912dfa0a2baab963a61e4ce044870f6c9a5c1a15919a397e8091172b48a1",
       "flags": [],
       "iterations": 17,
       "native_order_types": [],
+      "order_id_tag": "62efca4022b2f53beee37dc4",
       "orders": 0,
       "owned_quantity": "0",
       "passed": true,
       "pending": false,
       "preset": "conservative-v1",
+      "sequence": 0,
+      "strategy_id": "T22-62efca4022b2f53beee37dc4",
       "trace": [
+        {
+          "event": "ledger_restored",
+          "now_ns": 1791465900000000000,
+          "prior_entry": false,
+          "sequence": 0
+        },
         {
           "event": "snapshot",
           "now_ns": 1791465900000000000,
           "source_sha256": "d71e07c674e8989901bf7263203b24711d93aee1e9fe97226b1fa1a1bb4de5c5"
         }
       ],
-      "trace_sha256": "685d05ff55d5c2f9d6f6446931f862b397d443b70351886cd5e70d32278e2aef"
+      "trace_sha256": "974a4d1ce19b8c19bfac66dd8d8a0c7995f6381e19c31190e2354e702bd53036"
     },
     {
       "callback_faults": [],
@@ -3424,23 +3810,32 @@
       "execution_profile": "code-managed-limit-v1",
       "family": "squeeze_borrow",
       "fill_callbacks": 0,
-      "fixture_sha256": "f0c2378c28d6138075966134a27cea27af07bf928171475804e98022b99c24d0",
+      "fixture_sha256": "9a39912dfa0a2baab963a61e4ce044870f6c9a5c1a15919a397e8091172b48a1",
       "flags": [],
       "iterations": 17,
       "native_order_types": [],
+      "order_id_tag": "0f50be19540371a89432e212",
       "orders": 0,
       "owned_quantity": "0",
       "passed": true,
       "pending": false,
       "preset": "conservative-v1",
+      "sequence": 0,
+      "strategy_id": "T22-0f50be19540371a89432e212",
       "trace": [
+        {
+          "event": "ledger_restored",
+          "now_ns": 1791465900000000000,
+          "prior_entry": false,
+          "sequence": 0
+        },
         {
           "event": "snapshot",
           "now_ns": 1791465900000000000,
           "source_sha256": "d71e07c674e8989901bf7263203b24711d93aee1e9fe97226b1fa1a1bb4de5c5"
         }
       ],
-      "trace_sha256": "685d05ff55d5c2f9d6f6446931f862b397d443b70351886cd5e70d32278e2aef"
+      "trace_sha256": "974a4d1ce19b8c19bfac66dd8d8a0c7995f6381e19c31190e2354e702bd53036"
     },
     {
       "callback_faults": [],
@@ -3449,23 +3844,32 @@
       "execution_profile": "code-managed-limit-v1",
       "family": "momentum_breakout",
       "fill_callbacks": 0,
-      "fixture_sha256": "f0c2378c28d6138075966134a27cea27af07bf928171475804e98022b99c24d0",
+      "fixture_sha256": "9a39912dfa0a2baab963a61e4ce044870f6c9a5c1a15919a397e8091172b48a1",
       "flags": [],
       "iterations": 17,
       "native_order_types": [],
+      "order_id_tag": "fbe13292c768dd0e2ab07a97",
       "orders": 0,
       "owned_quantity": "0",
       "passed": true,
       "pending": false,
       "preset": "conservative-v1",
+      "sequence": 0,
+      "strategy_id": "T22-fbe13292c768dd0e2ab07a97",
       "trace": [
+        {
+          "event": "ledger_restored",
+          "now_ns": 1791465900000000000,
+          "prior_entry": false,
+          "sequence": 0
+        },
         {
           "event": "snapshot",
           "now_ns": 1791465900000000000,
           "source_sha256": "d71e07c674e8989901bf7263203b24711d93aee1e9fe97226b1fa1a1bb4de5c5"
         }
       ],
-      "trace_sha256": "685d05ff55d5c2f9d6f6446931f862b397d443b70351886cd5e70d32278e2aef"
+      "trace_sha256": "974a4d1ce19b8c19bfac66dd8d8a0c7995f6381e19c31190e2354e702bd53036"
     },
     {
       "callback_faults": [],
@@ -3474,23 +3878,32 @@
       "execution_profile": "code-managed-limit-v1",
       "family": "options_flow_stock",
       "fill_callbacks": 0,
-      "fixture_sha256": "f0c2378c28d6138075966134a27cea27af07bf928171475804e98022b99c24d0",
+      "fixture_sha256": "9a39912dfa0a2baab963a61e4ce044870f6c9a5c1a15919a397e8091172b48a1",
       "flags": [],
       "iterations": 17,
       "native_order_types": [],
+      "order_id_tag": "e071a4d34b4a3e60a99b936f",
       "orders": 0,
       "owned_quantity": "0",
       "passed": true,
       "pending": false,
       "preset": "conservative-v1",
+      "sequence": 0,
+      "strategy_id": "T22-e071a4d34b4a3e60a99b936f",
       "trace": [
+        {
+          "event": "ledger_restored",
+          "now_ns": 1791465900000000000,
+          "prior_entry": false,
+          "sequence": 0
+        },
         {
           "event": "snapshot",
           "now_ns": 1791465900000000000,
           "source_sha256": "d71e07c674e8989901bf7263203b24711d93aee1e9fe97226b1fa1a1bb4de5c5"
         }
       ],
-      "trace_sha256": "685d05ff55d5c2f9d6f6446931f862b397d443b70351886cd5e70d32278e2aef"
+      "trace_sha256": "974a4d1ce19b8c19bfac66dd8d8a0c7995f6381e19c31190e2354e702bd53036"
     },
     {
       "callback_faults": [],
@@ -3499,23 +3912,32 @@
       "execution_profile": "code-managed-limit-v1",
       "family": "halt_reopen",
       "fill_callbacks": 0,
-      "fixture_sha256": "f0c2378c28d6138075966134a27cea27af07bf928171475804e98022b99c24d0",
+      "fixture_sha256": "9a39912dfa0a2baab963a61e4ce044870f6c9a5c1a15919a397e8091172b48a1",
       "flags": [],
       "iterations": 17,
       "native_order_types": [],
+      "order_id_tag": "7f6d75fd81053420dad98b9d",
       "orders": 0,
       "owned_quantity": "0",
       "passed": true,
       "pending": false,
       "preset": "conservative-v1",
+      "sequence": 0,
+      "strategy_id": "T22-7f6d75fd81053420dad98b9d",
       "trace": [
+        {
+          "event": "ledger_restored",
+          "now_ns": 1791465900000000000,
+          "prior_entry": false,
+          "sequence": 0
+        },
         {
           "event": "snapshot",
           "now_ns": 1791465900000000000,
           "source_sha256": "d71e07c674e8989901bf7263203b24711d93aee1e9fe97226b1fa1a1bb4de5c5"
         }
       ],
-      "trace_sha256": "685d05ff55d5c2f9d6f6446931f862b397d443b70351886cd5e70d32278e2aef"
+      "trace_sha256": "974a4d1ce19b8c19bfac66dd8d8a0c7995f6381e19c31190e2354e702bd53036"
     },
     {
       "callback_faults": [],
@@ -3524,23 +3946,32 @@
       "execution_profile": "code-managed-limit-v1",
       "family": "post_earnings_drift",
       "fill_callbacks": 0,
-      "fixture_sha256": "f0c2378c28d6138075966134a27cea27af07bf928171475804e98022b99c24d0",
+      "fixture_sha256": "9a39912dfa0a2baab963a61e4ce044870f6c9a5c1a15919a397e8091172b48a1",
       "flags": [],
       "iterations": 17,
       "native_order_types": [],
+      "order_id_tag": "f94deb14caddbd80f7ae176a",
       "orders": 0,
       "owned_quantity": "0",
       "passed": true,
       "pending": false,
       "preset": "conservative-v1",
+      "sequence": 0,
+      "strategy_id": "T22-f94deb14caddbd80f7ae176a",
       "trace": [
+        {
+          "event": "ledger_restored",
+          "now_ns": 1791465900000000000,
+          "prior_entry": false,
+          "sequence": 0
+        },
         {
           "event": "snapshot",
           "now_ns": 1791465900000000000,
           "source_sha256": "d71e07c674e8989901bf7263203b24711d93aee1e9fe97226b1fa1a1bb4de5c5"
         }
       ],
-      "trace_sha256": "685d05ff55d5c2f9d6f6446931f862b397d443b70351886cd5e70d32278e2aef"
+      "trace_sha256": "974a4d1ce19b8c19bfac66dd8d8a0c7995f6381e19c31190e2354e702bd53036"
     },
     {
       "callback_faults": [],
@@ -3549,23 +3980,32 @@
       "execution_profile": "code-managed-limit-v1",
       "family": "trend_new_highs",
       "fill_callbacks": 0,
-      "fixture_sha256": "f0c2378c28d6138075966134a27cea27af07bf928171475804e98022b99c24d0",
+      "fixture_sha256": "9a39912dfa0a2baab963a61e4ce044870f6c9a5c1a15919a397e8091172b48a1",
       "flags": [],
       "iterations": 17,
       "native_order_types": [],
+      "order_id_tag": "8629c26db50eae7e35ded561",
       "orders": 0,
       "owned_quantity": "0",
       "passed": true,
       "pending": false,
       "preset": "conservative-v1",
+      "sequence": 0,
+      "strategy_id": "T22-8629c26db50eae7e35ded561",
       "trace": [
+        {
+          "event": "ledger_restored",
+          "now_ns": 1791465900000000000,
+          "prior_entry": false,
+          "sequence": 0
+        },
         {
           "event": "snapshot",
           "now_ns": 1791465900000000000,
           "source_sha256": "d71e07c674e8989901bf7263203b24711d93aee1e9fe97226b1fa1a1bb4de5c5"
         }
       ],
-      "trace_sha256": "685d05ff55d5c2f9d6f6446931f862b397d443b70351886cd5e70d32278e2aef"
+      "trace_sha256": "974a4d1ce19b8c19bfac66dd8d8a0c7995f6381e19c31190e2354e702bd53036"
     },
     {
       "callback_faults": [],
@@ -3574,23 +4014,32 @@
       "execution_profile": "code-managed-limit-v1",
       "family": "short_term_reversal",
       "fill_callbacks": 0,
-      "fixture_sha256": "f0c2378c28d6138075966134a27cea27af07bf928171475804e98022b99c24d0",
+      "fixture_sha256": "9a39912dfa0a2baab963a61e4ce044870f6c9a5c1a15919a397e8091172b48a1",
       "flags": [],
       "iterations": 17,
       "native_order_types": [],
+      "order_id_tag": "2aa0fadd6a510caa7d519d00",
       "orders": 0,
       "owned_quantity": "0",
       "passed": true,
       "pending": false,
       "preset": "conservative-v1",
+      "sequence": 0,
+      "strategy_id": "T22-2aa0fadd6a510caa7d519d00",
       "trace": [
+        {
+          "event": "ledger_restored",
+          "now_ns": 1791465900000000000,
+          "prior_entry": false,
+          "sequence": 0
+        },
         {
           "event": "snapshot",
           "now_ns": 1791465900000000000,
           "source_sha256": "d71e07c674e8989901bf7263203b24711d93aee1e9fe97226b1fa1a1bb4de5c5"
         }
       ],
-      "trace_sha256": "685d05ff55d5c2f9d6f6446931f862b397d443b70351886cd5e70d32278e2aef"
+      "trace_sha256": "974a4d1ce19b8c19bfac66dd8d8a0c7995f6381e19c31190e2354e702bd53036"
     }
   ],
   "kind": "t22_strategy_synthetic_receipt",
@@ -3598,10 +4047,11 @@
   "schema_version": 1,
   "source_sha256": {
     "__init__.py": "a6e37c81a6492dde3adf9d050ab4c7b99278f9821e224b5b9f8c3200496e91ff",
-    "contracts.py": "afa00ec87dbae4ac00ee65f945c3d722b38de261f25596c4ea1d65d7fbd3ba6a",
-    "families.py": "e10282bbf854f4dcaa4df0ea88763a5d7994a2965f6316c0dd5e6278ed1f8ee4",
-    "presets.py": "0598c85296f9a0d3e3864dd02d7041ba5361004a50f0916f4f0ca2b905301425",
-    "simulation.py": "54425b2f776583f620ff416112308a152ae24c4e0fc4f4cbceda4a789d30725f"
+    "acceptance.py": "a91de81e09a21d1535dc6607ccd61410cd450b122913082d6ee0c88ab229638e",
+    "contracts.py": "b39b86cd8c6fa0b313c93522dd3ebe4f81cf71ca43060c3d7c2f74a608c8d116",
+    "families.py": "3c4c514c51dd0499f1e40d368b77cf421213fdce42ad0fc36e1a88c155ec3cee",
+    "presets.py": "9590d1dd6f43e33a754b5373e27b84b84c79e0a51b4a9b52193739df96aef070",
+    "simulation.py": "3a45c415325a6626e5a5fcc7a60c69e838dac036b32e8b19cdf8183cc847ebc1"
   },
   "status": "passed",
   "strategy_performance": "NOT_CITED"

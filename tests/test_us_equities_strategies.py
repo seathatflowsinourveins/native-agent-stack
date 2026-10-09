@@ -5,10 +5,12 @@ from __future__ import annotations
 import asyncio
 import importlib
 import importlib.util
+import tempfile
 import time
 import unittest
 from dataclasses import replace
 from datetime import datetime, timezone
+from pathlib import Path
 
 contracts = importlib.import_module("blueprints.us-equities.strategies.contracts")
 presets = importlib.import_module("blueprints.us-equities.strategies.presets")
@@ -19,6 +21,14 @@ if NATIVE:
 
 
 class ContractTests(unittest.TestCase):
+    def test_instance_identity_is_explicit_stable_and_bounded(self):
+        for value in ("", "a-b", "x" * 65, None, True):
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                contracts.StrategySpec("SPY.ALPACA", "1" * 64, instance_id=value)
+        self.assertEqual(
+            contracts.StrategySpec("SPY.ALPACA", "1" * 64).instance_id, "default"
+        )
+
     def snapshot(self, **kwargs):
         base = {
             "instrument_id": "T22.ALPACA",
@@ -95,6 +105,279 @@ class ContractTests(unittest.TestCase):
 
 @unittest.skipUnless(NATIVE, "requires the exact locked Nautilus rc5 runtime")
 class NativeStrategyTests(unittest.TestCase):
+    def test_same_family_presets_register_together_in_BacktestEngine_and_LiveNode(self):
+        adapter = importlib.import_module(
+            "blueprints.us-equities.adaptive-paper.native_adapter"
+        )
+        fixture = importlib.import_module("tests.test_adaptive_paper_native")
+        spec = contracts.StrategySpec(
+            simulation.INSTRUMENT_ID, simulation.COHORT_SHA256
+        )
+
+        def instances(spec):
+            return [
+                families.GapPremarketStrategy(spec),
+                families.GapPremarketStrategy(replace(spec, preset="aggressive-v1")),
+                families.MomentumBreakoutStrategy(spec),
+                families.GapPremarketStrategy(replace(spec, instance_id="second")),
+            ]
+
+        engine, instrument = simulation.fixture_engine()
+        strategies = instances(spec)
+        try:
+            for strategy in strategies:
+                engine.add_strategy(strategy)
+            self.assertEqual(len({str(s.strategy_id) for s in strategies}), 4)
+            self.assertEqual(len({s.config.order_id_tag for s in strategies}), 4)
+            self.assertEqual(
+                [str(s.strategy_id) for s in strategies],
+                [str(s.config.strategy_id) for s in instances(spec)],
+            )
+            engine.add_data(simulation.fixture_quotes(instrument, bids=("10", "10")))
+            engine.run()
+            self.assertTrue(all(not s.callback_faults for s in strategies))
+        finally:
+            engine.dispose()
+
+        # A single real LiveNode must accept these exact classes/presets too.
+        async def exercise():
+            strategies = instances(replace(spec, instrument_id="SPY.ALPACA"))
+            session = adapter.build_node(
+                fixture.FakePort(), [{"symbol": "SPY", "currency": "USD"}], strategies
+            )
+
+            async def stop_when_started():
+                deadline = time.monotonic() + 5
+                while time.monotonic() < deadline:
+                    if all(s.is_running() for s in strategies):
+                        session.stop()
+                        return True
+                    await asyncio.sleep(0.05)
+                session.stop()
+                return False
+
+            started = asyncio.create_task(stop_when_started())
+            await asyncio.wait_for(session.run_async(), timeout=8)
+            return await started, strategies, session
+
+        started, strategies, session = asyncio.run(exercise())
+        self.assertTrue(started)
+        self.assertEqual(session.errors, [])
+        self.assertTrue(all(not s.callback_faults for s in strategies))
+
+    def test_restart_ambiguous_submit_refuses_new_id_from_durable_ledger(self):
+        safety = importlib.import_module("blueprints.us-equities.adaptive-paper.safety")
+        spec = contracts.StrategySpec(
+            simulation.INSTRUMENT_ID, simulation.COHORT_SHA256
+        )
+        seed = families.GapPremarketStrategy(spec)
+        now = simulation.BASE_NS / 1e9
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "ledger.sqlite3"
+            ledger = safety.Ledger(path)
+            try:
+                ledger.start_trial(now)
+                first = seed.client_id_prefix + "0000007"
+                ledger.reserve_intent(
+                    first,
+                    "TST",
+                    "buy",
+                    "1",
+                    "10.03",
+                    quote=safety.Quote("TST", "10", "10.01", now),
+                    now=now,
+                    market_open=True,
+                    session_close=now + 3600,
+                    stop_file=Path(directory) / "unused-stop-fixture",
+                )
+                self.assertEqual(ledger.request_budget(now, "submit", first), 0)
+            finally:
+                ledger.close()
+            ledger = safety.Ledger(path)
+            try:
+                self.assertTrue(ledger.intents()[0].submit_attempted)
+                result = simulation.run_case("gap_premarket", ledger=ledger)
+                self.assertEqual(result["orders"], 0, result)
+                self.assertIn(
+                    "startup_unresolved_intent_requires_reconciliation", result["flags"]
+                )
+                self.assertEqual([i.client_id for i in ledger.intents()], [first])
+            finally:
+                ledger.close()
+
+    def test_ambiguous_LiveNode_submit_journals_id_then_restart_sends_nothing(self):
+        adapter = importlib.import_module(
+            "blueprints.us-equities.adaptive-paper.native_adapter"
+        )
+        safety = importlib.import_module("blueprints.us-equities.adaptive-paper.safety")
+        fixture = importlib.import_module("tests.test_adaptive_paper_native")
+        cohort = contracts.digest(
+            {"fixture": "t22-ambiguous-restart", "members": ["SPY.ALPACA"]}
+        )
+        spec = contracts.StrategySpec(
+            "SPY.ALPACA", cohort, preset="aggressive-v1", max_quantity=1
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "ledger.sqlite3"
+            ledger = safety.Ledger(path)
+            ledger.start_trial(time.time())
+
+            async def attempt(ambiguous):
+                port = fixture.FakePort("unknown" if ambiguous else "fills")
+                strategy = families.GapPremarketStrategy(spec, ledger=ledger)
+                now = time.time_ns()
+                values = dict(
+                    simulation.POSITIVE_FACTORS,
+                    atr_price="2",
+                    entry_trigger="100",
+                    structure_low="99.7",
+                )
+                snapshot = contracts.FactorSnapshot(
+                    "SPY.ALPACA",
+                    cohort,
+                    contracts.digest(values),
+                    now,
+                    now,
+                    now + 10_000_000_000,
+                    tuple(sorted(values.items())),
+                )
+                original_start, original_submit = port.start, port.submit
+
+                async def start(on_quote, on_order):
+                    strategy.on_data(snapshot)
+                    await original_start(on_quote, on_order)
+
+                async def submit(payload):
+                    # Synthetic wire seam uses the unchanged durable governor:
+                    # reserve and journal the explicit native ID before send.
+                    observed = time.time()
+                    ledger.reserve_intent(
+                        payload["client_order_id"],
+                        "SPY",
+                        payload["side"],
+                        payload["qty"],
+                        payload["limit_price"],
+                        quote=safety.Quote("SPY", "100", "100.01", observed),
+                        now=observed,
+                        market_open=True,
+                        session_close=observed + 3600,
+                        stop_file=Path(directory) / "unused-stop-fixture",
+                    )
+                    self.assertEqual(
+                        ledger.request_budget(
+                            observed, "submit", payload["client_order_id"]
+                        ),
+                        0,
+                    )
+                    return await original_submit(payload)
+
+                port.start, port.submit = start, submit
+                session = adapter.build_node(
+                    port, [{"symbol": "SPY", "currency": "USD"}], [strategy]
+                )
+                strategy.fault_sink = session.fail
+
+                async def stop_when_resolved():
+                    for _ in range(100):
+                        if session.errors or strategy.flags:
+                            session.stop()
+                            return
+                        await asyncio.sleep(0.05)
+                    session.stop()
+
+                waiter = asyncio.create_task(stop_when_resolved())
+                await asyncio.wait_for(session.run_async(), timeout=8)
+                await waiter
+                return strategy, port, session
+
+            try:
+                first, port, session = asyncio.run(attempt(True))
+                self.assertEqual(len(port.submissions), 1, first.trace)
+                self.assertTrue(session.errors)
+                original_id = port.submissions[0]["client_order_id"]
+                self.assertEqual(original_id, first.client_id_prefix + "0000001")
+                self.assertTrue(ledger.intents()[0].submit_attempted)
+                ledger.close()
+                ledger = safety.Ledger(path)
+                restarted, port, session = asyncio.run(attempt(False))
+                self.assertEqual(port.submissions, [])
+                self.assertIn(
+                    "startup_unresolved_intent_requires_reconciliation", restarted.flags
+                )
+                self.assertEqual(restarted.sequence, 1)
+                self.assertEqual([i.client_id for i in ledger.intents()], [original_id])
+            finally:
+                ledger.close()
+
+    def test_restored_sequence_and_existing_position_prevent_restart_entry(self):
+        safety = importlib.import_module("blueprints.us-equities.adaptive-paper.safety")
+        spec = contracts.StrategySpec(
+            simulation.INSTRUMENT_ID, simulation.COHORT_SHA256
+        )
+        seed = families.GapPremarketStrategy(spec)
+        now = simulation.BASE_NS / 1e9
+        with tempfile.TemporaryDirectory() as directory:
+            ledger = safety.Ledger(Path(directory) / "ledger.sqlite3")
+            try:
+                ledger.start_trial(now)
+                for seq in (2, 7):
+                    cid = seed.client_id_prefix + f"{seq:07d}"
+                    ledger.reserve_intent(
+                        cid,
+                        "TST",
+                        "buy",
+                        "1",
+                        "10.03",
+                        quote=safety.Quote("TST", "10", "10.01", now),
+                        now=now,
+                        market_open=True,
+                        session_close=now + 3600,
+                        stop_file=Path(directory) / "unused-stop-fixture",
+                    )
+                    ledger.mark_not_sent(cid, "synthetic_pre_wire_refusal")
+                # An older/other lineage's real position for this symbol also
+                # blocks startup, even though its client prefix differs.
+                ledger.reserve_intent(
+                    "other-lineage-1",
+                    "TST",
+                    "buy",
+                    "1",
+                    "10.03",
+                    quote=safety.Quote("TST", "10", "10.01", now),
+                    now=now,
+                    market_open=True,
+                    session_close=now + 3600,
+                    stop_file=Path(directory) / "unused-stop-fixture",
+                )
+                ledger.record_order(
+                    "other-lineage-1",
+                    "synthetic-venue-1",
+                    "filled",
+                    "1",
+                    "10.01",
+                    timestamp=now,
+                )
+                result = simulation.run_case("gap_premarket", ledger=ledger)
+                self.assertEqual(result["orders"], 0, result)
+                self.assertIn(
+                    "startup_position_requires_reconciliation", result["flags"]
+                )
+                self.assertEqual(result["sequence"], 7)
+            finally:
+                ledger.close()
+
+    def test_client_ids_are_stable_across_engine_clock_changes(self):
+        first = simulation.run_case("gap_premarket")
+        later = simulation.run_case(
+            "gap_premarket", start_ns=simulation.BASE_NS + 60_000_000_000
+        )
+        ids = lambda result: [
+            r["client_order_id"] for r in result["trace"] if r["event"] == "submit"
+        ]
+        self.assertTrue(first["passed"] and later["passed"])
+        self.assertGreaterEqual(len(ids(first)), 2)
+        self.assertEqual(ids(first), ids(later))
+
     def test_same_family_classes_use_real_LiveNode_and_owned_partial_fills(self):
         fixture = importlib.import_module("tests.test_adaptive_paper_native")
         adapter = importlib.import_module(

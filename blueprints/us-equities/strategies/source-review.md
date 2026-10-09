@@ -2,7 +2,7 @@
 
 The ten §6 families and three preset columns are untested hypotheses beside the
 frozen #16 study. The scope record is us-equities-trading #25 at
-`7dfa652ac36195ea1e0b3df77f915e35fd3d4c81`, read through `git show` after fetching
+`b0994749ca6c52ad07cb3bb70e8b5b6cd4fac910`, read through `git show` after fetching
 the PR head. No rank rows, labels or study arms are inputs to these classes.
 
 The requested upstream mirrors were inspected read-only and their native Git
@@ -92,3 +92,30 @@ the native adapter. Portability of the Strategy class does not itself qualify
 paper adoption, broker order types or overnight sessions. Historical Layer 1.5
 E2E, LEAN strategy-matrix reconciliation, cost/delay sensitivity and T16 Pine
 parity remain distinct gates. No strategy performance number is cited here.
+
+## Review correction at 216bed68
+
+The TCC's three P2 findings were reproduced against the reviewed head. The
+unclassified vectorbt pytest expression is now under `pytest_k_expression`, and
+its actual adoption disposition is classified as a withheld label in the
+existing blind-export vocabulary. No test or export policy was relaxed.
+
+The same-family registration reproduction raised rc5's native already-registered
+error; identical specs at two engine times also generated different default
+client IDs. At `nautilus_trader@1b0a49d2`,
+`crates/system/src/trader.rs:566-578` checks the configured StrategyId's final tag,
+and `OrderFactory.limit` accepts an explicit `ClientOrderId`. T22 now derives the
+ID/tag from family, preset, explicit stable instance, instrument, profile and
+cohort, and restores its seven-digit client sequence from the existing durable
+ledger's maximum matching intent, following `native_strategy.py:102-104` and
+`:1018-1026`. Dirty ledger/cache startup refuses entry; a prior terminal entry
+attempt remains consumed. The wire governor retains reserve-before-send.
+
+The new native regressions exercise four instances in one engine and one real
+LiveNode, fixed IDs under a shifted engine clock, maximum-sequence restoration,
+unresolved/position refusal and a real synthetic ambiguous LiveNode submit,
+followed by closing/reopening the SQLite ledger and proving no new submission.
+Supplying the ledger also exposed rc5's PyO3 allocator keyword boundary; a thin
+subclass `__new__` now leaves Python-only dependencies for `__init__`. Both
+repository generators rerun in the unchanged T13 rc5 environment, with no native
+test skips. Overnight paper/session qualification remains a disclosed boundary.

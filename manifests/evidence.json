@@ -61562,8 +61562,8 @@
     },
     {
       "path": "tools/sota-convergence/blind_checkout.py",
-      "sha256": "780a2b931ecbff453ce4caeeb153614d1dcef98d77b4318687aa592e066f88ce",
-      "bytes": 56215
+      "sha256": "3fcb2d2226ad02c1b41f1d8bc9d3108dc6b003a6c8b78bf0cabea23928217175",
+      "bytes": 56376
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",
