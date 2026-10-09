@@ -1,0 +1,16 @@
+# DRAFT ONLY. Not installed, enabled or executed.
+# tobi/qmd facd35e01359e59d938bc9418e93fb9318addee3; README.md Index Maintenance; review collection update hooks before activation
+# systemd 259.5 systemd.service(5), systemd.unit(5), systemd.exec(5).
+[Unit]
+Description=Daily native QMD lexical index refresh (draft)
+ConditionPathExists=%h/.config/native-stack/memory-maintenance.approved
+
+[Service]
+Type=oneshot
+Environment=PATH=%h/.local/share/codex-ecosystem/bin:%h/.local/share/mise/shims:%h/.local/bin:/usr/bin:/bin
+ExecStart=/usr/bin/env qmd --index native-agent-stack-catalog-lex update
+TimeoutStartSec=600
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+NoNewPrivileges=true

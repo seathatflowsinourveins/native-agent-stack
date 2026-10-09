@@ -1,0 +1,16 @@
+# DRAFT ONLY. Not installed, enabled or executed.
+# DeusData/codebase-memory-mcp 8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798; README.md CLI mode and exact-path coverage
+# systemd 259.5 systemd.service(5), systemd.unit(5), systemd.exec(5).
+[Unit]
+Description=Weekly bounded codebase-memory coverage inspection (draft)
+ConditionPathExists=%h/.config/native-stack/memory-maintenance.approved
+
+[Service]
+Type=oneshot
+Environment=PATH=%h/.local/share/codex-ecosystem/bin:%h/.local/share/mise/shims:%h/.local/bin:/usr/bin:/bin
+ExecStart=/usr/bin/env codebase-memory-mcp cli check_index_coverage '{"project":"native-agent-stack","scopes":["docs"],"path_limit":5,"scope_limit":5,"diagnostics":"none","format":"json"}'
+TimeoutStartSec=600
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+NoNewPrivileges=true

@@ -1,0 +1,15 @@
+# DRAFT ONLY. Not installed or enabled.
+# Proposed cadence, not a vendor default or measured optimum.
+# systemd 259.5 systemd.timer(5): UTC calendars and bounded jitter.
+[Unit]
+Description=Daily ai-memory rule-only lint preview schedule (draft)
+
+[Timer]
+OnCalendar=*-*-* 03:15:00 UTC
+RandomizedDelaySec=15min
+AccuracySec=1min
+Persistent=false
+Unit=native-memory-ai-lint.service
+
+[Install]
+WantedBy=timers.target

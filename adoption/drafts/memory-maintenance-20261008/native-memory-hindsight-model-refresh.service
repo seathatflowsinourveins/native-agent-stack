@@ -1,0 +1,19 @@
+# DRAFT ONLY. Not installed, enabled or executed.
+# vectorize-io/hindsight 5fc4ce20917b916240cef27c212c387a177f115b; hindsight-cli/src/main.rs:1170; returns async submission
+# systemd 259.5 systemd.service(5), systemd.unit(5), systemd.exec(5).
+[Unit]
+Description=Daily selected Hindsight mental-model refresh submission (draft)
+ConditionPathExists=%h/.config/native-stack/memory-maintenance.approved
+ConditionPathExists=%h/.config/native-stack/hindsight-maintenance.env
+
+[Service]
+Type=oneshot
+Environment=PATH=%h/.local/share/codex-ecosystem/bin:%h/.local/share/mise/shims:%h/.local/bin:/usr/bin:/bin
+Environment=HINDSIGHT_API_URL=http://127.0.0.1:8888
+EnvironmentFile=%h/.config/native-stack/hindsight-maintenance.env
+ExecStart=/usr/bin/env hindsight mental-model refresh trading-research ${HINDSIGHT_MENTAL_MODEL_ID}
+TimeoutStartSec=600
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+NoNewPrivileges=true

@@ -1,0 +1,522 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-08T23:35:45Z",
+  "observation_window_utc": {
+    "start": "2026-10-08T23:25:42Z",
+    "end": "2026-10-08T23:35:45Z"
+  },
+  "scope": "Read-only NativeStack2604 memory-role inventory for PR #835; sanitized metadata, not installation or quality acceptance.",
+  "evidence_classes": [
+    "native_operation_metadata",
+    "source_review"
+  ],
+  "operations_started_by_this_task": {
+    "maintenance": 0,
+    "maintenance_or_qualification_provider_calls": 0,
+    "whole_task_provider_usage": "unknown; native coordinator/worker usage not measured by this inventory",
+    "installs": 0,
+    "service_changes": 0
+  },
+  "routing_supplement": {
+    "observed_at_utc": "2026-10-08T23:47:39Z",
+    "invoke_rates": {
+      "artifact": "research/token-efficiency-20261008/INVOKE-RATES-24H-20261008T2330Z.md",
+      "sha256": "86e8a4e0db11846eed1c4e99d5e89321b576cab087aa07676188705de593e541",
+      "bytes": 2438,
+      "recounted": false,
+      "method": "Retained Loki count of native MCP tool-result events and distinct conversation_id/session_id; events are not outcomes and all probes are not separated.",
+      "window": "24 hours ending at the retained query time; exact instant not supplied by the artifact.",
+      "populations": {
+        "codex_interactive_conversations": 555,
+        "codex_exec_conversations": 285,
+        "claude_sessions_with_any_event": 105
+      },
+      "codex_interactive": {
+        "context_mode": {
+          "calls": 29102,
+          "conversations": 545,
+          "reported_share": "98%"
+        },
+        "codebase_memory": {
+          "calls": 1551,
+          "conversations": 127,
+          "reported_share": "23%"
+        },
+        "ai_memory": {
+          "calls": 303,
+          "conversations": 84,
+          "reported_share": "15%"
+        },
+        "qmd": {
+          "calls": 43,
+          "conversations": 28,
+          "reported_share": "5%"
+        },
+        "hindsight": {
+          "calls": 20,
+          "conversations": 14,
+          "reported_share": "2.5%"
+        }
+      },
+      "codex_exec": {
+        "context_mode": {
+          "calls": 3002,
+          "conversations": 153
+        },
+        "codebase_memory": {
+          "calls": 200,
+          "conversations": 29
+        },
+        "other_owned_layers": "Only 1-3 calls reported; no total inferred."
+      },
+      "claude": {
+        "context_mode": {
+          "calls": 2433,
+          "sessions": 9
+        },
+        "ai_memory": {
+          "calls": 13,
+          "sessions": 6
+        },
+        "codebase_memory": {
+          "calls": 4,
+          "sessions": 4
+        },
+        "qmd": {
+          "calls": 5,
+          "sessions": 5
+        },
+        "hindsight": {
+          "calls": 4,
+          "sessions": 4
+        }
+      },
+      "exclusions": {
+        "claude_native_memory": "Native file workflow, outside MCP count.",
+        "graphiti": "Not listed; not converted to a measured zero."
+      }
+    },
+    "qmd_routing": {
+      "command": "claude plugin list --json; metadata-only native QMD skill inspection",
+      "exit_code": 0,
+      "matching_plugin_entries": [],
+      "bootstrap_files": {
+        "codex_present": true,
+        "claude_present": true,
+        "bytes_each": 823
+      },
+      "version_matched_runtime_skill_command": "qmd skills get qmd --full",
+      "runtime_skill_command_exit_code": 0,
+      "vendor_marketplace_source": "https://github.com/tobi/qmd/blob/facd35e01359e59d938bc9418e93fb9318addee3/.claude-plugin/marketplace.json",
+      "plugin_source": "./skills",
+      "vendor_plugin_mcp_command": "qmd mcp",
+      "boundary": "WIRE is a proposal. Reconcile existing named index and pending shared transport; do not add a duplicate default-index server."
+    },
+    "native_memory_freshness": {
+      "observed_at_utc": "2026-10-08T23:44:33Z",
+      "files": 46,
+      "files_modified_since": "2026-10-07T23:30:00Z",
+      "modified_files": 46,
+      "latest_file_mtime_utc": "2026-10-08T23:42:45.676149+00:00",
+      "content_read": false,
+      "boundary": "File freshness does not identify the writer or prove automatic loading/organic use in each session."
+    },
+    "dispositions": {
+      "claude_native_memory": "KEEP",
+      "ai_memory": "KEEP",
+      "hindsight": "RETIRE",
+      "context_mode": "KEEP",
+      "codebase_memory": "KEEP",
+      "qmd": "WIRE",
+      "graphiti": "RETIRE"
+    },
+    "proposed_fresh_session_checks": {
+      "per_client": true,
+      "ordinary_tasks_without_tool_names": true,
+      "count_from_native_loki": true,
+      "executed": false,
+      "claude_native_memory_count_boundary": "Native file/session observation; MCP metric is not applicable.",
+      "hindsight_boundary": "Default retirement plus a separately scoped optional-bank test only after a unique research job is adopted.",
+      "graphiti_boundary": "Defer installation; no default graph dependency."
+    },
+    "maintenance_drafts": {
+      "services": 7,
+      "timers": 7,
+      "native_systemd_verify_exit_code": 0,
+      "native_calendar_checks": 7,
+      "native_calendar_failures": 0,
+      "installed": 0,
+      "enabled": 0,
+      "executed": 0,
+      "operator_marker_present": false,
+      "hindsight_model_selection_file_present": false
+    }
+  },
+  "versions": [
+    {
+      "layer": "claude-native-auto-memory",
+      "command": "claude --version",
+      "exit_code": 0,
+      "returned": "2.1.295 (Claude Code)"
+    },
+    {
+      "layer": "ai-memory",
+      "command": "ai-memory --version",
+      "exit_code": 0,
+      "returned": "ai-memory 2.6.0"
+    },
+    {
+      "layer": "hindsight",
+      "command": "<service-venv-python> importlib.metadata.version",
+      "exit_code": 0,
+      "returned": {
+        "hindsight-api": "0.10.2",
+        "hindsight-client": "0.10.2"
+      },
+      "cli_on_path": false
+    },
+    {
+      "layer": "context-mode",
+      "command": "installed package.json name/version; installed source git rev-parse HEAD and git status --short",
+      "returned": {
+        "name": "context-mode",
+        "version": "1.0.169",
+        "source_head": "6f0cc6841c687e754059f36714a11233fda1a02b",
+        "source_worktree_clean": true
+      },
+      "limit": "Does not verify a running bundle against the release source."
+    },
+    {
+      "layer": "codebase-memory-mcp",
+      "command": "codebase-memory-mcp --version",
+      "exit_code": 0,
+      "returned": "codebase-memory-mcp 0.11.0"
+    },
+    {
+      "layer": "qmd",
+      "command": "qmd --version",
+      "exit_code": 0,
+      "returned": "qmd 2.8.3 (facd35e)"
+    }
+  ],
+  "native_memory": {
+    "command": "stat immediate files in the canonical repository Claude memory directory",
+    "files": 46,
+    "memory_md_present": true,
+    "file_content_read": false,
+    "settings_read": false,
+    "limit": "Presence and client version; no new session write or cleanup acceptance."
+  },
+  "user_units": {
+    "command": "systemctl --user show ai-memory.service hindsight-research.service native-stack-qmd-shared.service --property=Id,ActiveState,SubState,UnitFileState,MainPID,Result; systemctl --user cat the same named units",
+    "exit_code": 0,
+    "services": [
+      {
+        "id": "ai-memory.service",
+        "active_state": "active",
+        "sub_state": "running",
+        "unit_file_state": "enabled",
+        "result": "success",
+        "command_summary": "ai-memory serve --transport http --enable-web; native data/config references and additive environment files; environment values not read"
+      },
+      {
+        "id": "hindsight-research.service",
+        "active_state": "active",
+        "sub_state": "running",
+        "unit_file_state": "enabled",
+        "result": "success",
+        "command_summary": "service-owned hindsight-api --host 127.0.0.1 --port 8888; research MCP allowlist drop-in"
+      },
+      {
+        "id": "native-stack-qmd-shared.service",
+        "active_state": "inactive",
+        "sub_state": "dead",
+        "unit_file_state": "disabled",
+        "result": "success",
+        "command_summary": "qmd --index native-agent-stack-catalog-lex mcp --http --host 127.0.0.1 --port 21851",
+        "adoption": "pending"
+      }
+    ],
+    "timers": {
+      "command": "systemctl --user list-timers --all --no-pager --plain; immediate .timer names in the named user-unit root",
+      "exit_code": 0,
+      "loaded": 23,
+      "named_root_timer_files": 23,
+      "memory_name_matches": [],
+      "limit": "Name-scoped timer inventory does not exclude jobs hidden under unrelated names, native process schedulers or cron."
+    },
+    "environment_recovery": "Initial systemctl calls lacked user-bus environment. Read-only retry supplied the existing user runtime/bus addresses. No settings or credential file was opened."
+  },
+  "mcp_observations": {
+    "ai_memory": {
+      "command": "memory_status; memory_query with exact returned workspace/project, pin_first=true, limit=2",
+      "scope": {
+        "workspace": "default",
+        "project": "seathatflowsinourveins-native-agent-stack",
+        "resolved_by": "shared_slot"
+      },
+      "counts": {
+        "pages_latest": 207,
+        "pages_all": 623,
+        "sessions": 334,
+        "observations": 613087,
+        "evidence_rows": 198
+      },
+      "query_answered": true,
+      "limit": "Single counter snapshot; neither complete capture nor maintenance cadence."
+    },
+    "hindsight": {
+      "commands": [
+        "get_bank",
+        "list_mental_models(limit=10)",
+        "list_operations(limit=1,type=consolidation)",
+        "list_operations(limit=1,type=refresh_mental_model)"
+      ],
+      "bank_id": "trading-research",
+      "mental_models": {
+        "items": [],
+        "total": 0
+      },
+      "consolidation_operations": {
+        "total": 3,
+        "newest": {
+          "operation_locator": "private native metadata; completion timestamp retained",
+          "status": "completed",
+          "created_at": "2026-10-08T09:26:28.369608+00:00",
+          "updated_at": "2026-10-08T09:26:34.756112+00:00",
+          "retry_count": 0
+        }
+      },
+      "refresh_operations": {
+        "operations": [],
+        "total": 0
+      },
+      "exposed_tools": [
+        "get_bank",
+        "get_document",
+        "get_knowledge_base_tree",
+        "get_memory",
+        "get_mental_model",
+        "get_operation",
+        "list_documents",
+        "list_memories",
+        "list_mental_models",
+        "list_operations",
+        "list_tags",
+        "recall",
+        "reflect",
+        "retain",
+        "sync_retain"
+      ],
+      "allowlist_tools": 15,
+      "limit": "Operation history read; no retain, reflect, refresh or model creation invoked."
+    },
+    "context_mode": {
+      "commands": [
+        "ctx_execute",
+        "ctx_batch_execute",
+        "ctx_search",
+        "ctx_fetch_and_index"
+      ],
+      "answered": true,
+      "limit": "This session's tool execution; not a new client installation or retention acceptance."
+    },
+    "codebase_memory": {
+      "command": "list_projects(detail=identity,format=json,limit=4)",
+      "total": 50,
+      "returned": 4,
+      "has_more": true,
+      "limit": "First metadata page only; no index rebuild or exact-path coverage claim."
+    },
+    "qmd": {
+      "command": "MCP status",
+      "total_documents": 425,
+      "needs_embedding": 425,
+      "vector_index": false,
+      "collections": [
+        {
+          "name": "foundation-docs",
+          "documents": 244
+        },
+        {
+          "name": "us-equities-catalog",
+          "documents": 24
+        },
+        {
+          "name": "us-equities-foundation",
+          "documents": 117
+        },
+        {
+          "name": "foundation-adoption",
+          "documents": 40
+        }
+      ],
+      "index_name": "not returned by MCP status",
+      "limit": "Does not establish shared HTTP adoption or current update history."
+    },
+    "graphiti": {
+      "exposed_namespace": false,
+      "named_user_unit": false,
+      "disposition": "defer",
+      "limit": "No host-wide package absence or container inventory claim."
+    }
+  },
+  "journal_observation": {
+    "command": "journalctl --user -u <named-memory-service> --since 2026-10-08 --grep <maintenance-categories> -n 200 -o json; derive timestamps/category names only",
+    "exit_code": 0,
+    "services": [
+      {
+        "id": "ai-memory.service",
+        "selected_records": 200,
+        "observed_categories": [
+          "consolidation"
+        ]
+      },
+      {
+        "id": "hindsight-research.service",
+        "selected_records": 200,
+        "observed_categories": [
+          "consolidation",
+          "maintenance"
+        ]
+      }
+    ],
+    "raw_messages_retained": false,
+    "limit": "Bounded category observation; polling/category mentions do not establish successful jobs or effective scheduler settings."
+  },
+  "graphiti_recipe": {
+    "pr": 839,
+    "state": "OPEN",
+    "head": "4d8ecef02eb43e1be1266712fe76737b258006f0",
+    "path": "tools/graphiti-smoke/README.md",
+    "evidence": "Historical macOS arm64 offline import/local integration; explicitly deferred managed installation.",
+    "rerun": false
+  },
+  "currency": {
+    "repository": "akitaonrails/ai-memory",
+    "command": "gh api repos/akitaonrails/ai-memory/releases/latest",
+    "exit_code": 0,
+    "returned": {
+      "tag": "v2.6.2",
+      "published": "2026-10-08T20:42:35Z"
+    },
+    "installed": "2.6.0",
+    "upgrade_performed": false
+  },
+  "failed_attempts": [
+    {
+      "command": "memory_query with incorrect workspace selector",
+      "returned": "-32602 workspace not found",
+      "recovery": "Native memory_status supplied exact scope; subsequent scoped query answered.",
+      "provider_usage": "not applicable"
+    },
+    {
+      "command": "systemctl --user without user-bus environment",
+      "exit_code": 1,
+      "recovery": "Existing user runtime/bus address environment; same named read-only commands returned zero."
+    },
+    {
+      "command": "ai-memory --data-dir <host-owned-data-dir> status --json",
+      "result": "timeout after 15 seconds",
+      "retried": false
+    },
+    {
+      "command": "ai-memory --data-dir <host-owned-data-dir> auto-improve-report --workspace default --project seathatflowsinourveins-native-agent-stack --json",
+      "result": "timeout after 15 seconds",
+      "retried": false
+    },
+    {
+      "command": "Pinned context-mode src/session/store.ts and hooks/claude-code/sessionstart.mjs source lookups",
+      "result": "missing paths",
+      "recovery": "Verified src/session/db.ts and current installed source instead."
+    },
+    {
+      "command": "Journal metadata derivation",
+      "result": "Initial parser rejected binary/list MESSAGE shape.",
+      "recovery": "Normalized shape and emitted only category/timestamp metadata."
+    }
+  ],
+  "sources": [
+    {
+      "repository": "anthropics/claude-code",
+      "version": "2.1.295",
+      "commit": "602df92bf481ed904533e95c09f740f40aab5aed",
+      "source": "CHANGELOG.md section 2.1.295; https://code.claude.com/docs/en/memory read 2026-10-08",
+      "limit": "Native client version and dated official docs; no public binary source pin."
+    },
+    {
+      "repository": "akitaonrails/ai-memory",
+      "version": "v2.6.0",
+      "commit": "89bd8ded3c1ab8b769cf99417d038ed0364403c8",
+      "files": [
+        "crates/ai-memory-cli/src/config.rs",
+        "crates/ai-memory-core/src/routing_skills/ai-memory-learning-maintenance/SKILL.md",
+        "crates/ai-memory-store/src/maintenance.rs"
+      ]
+    },
+    {
+      "repository": "vectorize-io/hindsight",
+      "version": "v0.10.2",
+      "commit": "5fc4ce20917b916240cef27c212c387a177f115b",
+      "files": [
+        "hindsight-cli/src/main.rs",
+        "hindsight-cli/src/api.rs",
+        "hindsight-docs/docs/developer/api/mental-models.mdx"
+      ]
+    },
+    {
+      "repository": "mksglu/context-mode",
+      "version": "v1.0.169",
+      "commit": "589d8214d56740a28b5f7bf63167743d586b0b40",
+      "observed_source_commit": "6f0cc6841c687e754059f36714a11233fda1a02b",
+      "files": [
+        "src/session/db.ts",
+        "src/server.ts"
+      ]
+    },
+    {
+      "repository": "DeusData/codebase-memory-mcp",
+      "version": "v0.11.0",
+      "commit": "8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798",
+      "files": [
+        "README.md"
+      ]
+    },
+    {
+      "repository": "tobi/qmd",
+      "version": "v2.8.3",
+      "commit": "facd35e01359e59d938bc9418e93fb9318addee3",
+      "files": [
+        "README.md"
+      ]
+    },
+    {
+      "repository": "getzep/graphiti",
+      "version": "v0.30.2",
+      "commit": "eaa4128681bc53487138a4bbc22d58336ebe70d2",
+      "files": [
+        "graphiti_core/graphiti.py"
+      ]
+    },
+    {
+      "repository": "getzep/graphiti",
+      "version": "mcp-v1.1.0",
+      "commit": "11538f6d45561bcce9a4400b374fb2dc533dccb6",
+      "files": [
+        "pyproject.toml",
+        "mcp_server/pyproject.toml",
+        "mcp_server/docker/Dockerfile"
+      ]
+    },
+    {
+      "repository": "systemd/systemd",
+      "version": "259.5",
+      "source": "systemd.service(5), systemd.timer(5), systemd.exec(5), systemd.unit(5); installed systemctl --version"
+    }
+  ],
+  "boundaries": [
+    "No credentials, settings route, gateway route, raw conversation, fixture or historical benchmark opened by this task's host probes.",
+    "No installed/enabled draft maintenance unit.",
+    "No catalog/readiness upgrade; independent designated reads and explicit CC landing cue remain required."
+  ]
+}

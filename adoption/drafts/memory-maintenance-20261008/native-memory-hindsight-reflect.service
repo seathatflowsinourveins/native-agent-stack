@@ -1,0 +1,17 @@
+# DRAFT ONLY. Not installed, enabled or executed.
+# vectorize-io/hindsight 5fc4ce20917b916240cef27c212c387a177f115b; hindsight-cli/src/main.rs:593
+# systemd 259.5 systemd.service(5), systemd.unit(5), systemd.exec(5).
+[Unit]
+Description=Weekly bounded Hindsight research reflection (draft)
+ConditionPathExists=%h/.config/native-stack/memory-maintenance.approved
+
+[Service]
+Type=oneshot
+Environment=PATH=%h/.local/share/codex-ecosystem/bin:%h/.local/share/mise/shims:%h/.local/bin:/usr/bin:/bin
+Environment=HINDSIGHT_API_URL=http://127.0.0.1:8888
+ExecStart=/usr/bin/env hindsight memory reflect trading-research "Summarize research-memory conventions, source corrections, and unresolved evidence." --budget low --max-tokens 512
+TimeoutStartSec=600
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+NoNewPrivileges=true
