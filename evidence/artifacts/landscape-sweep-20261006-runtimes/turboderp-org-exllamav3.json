@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-turboderp-org-exllamav3",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/turboderp-org/exllamav3",
+ "reviewed_commit": "16a49792a3c93d8432d72e6c4bce800841566577",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "observation-inference"
+ ],
+ "claim": "Source and documentation review of turboderp-org/exllamav3 at commit 16a49792a3c93d8432d72e6c4bce800841566577 (license MIT), read from README.md at that commit. Repository description: \"An optimized quantization and inference library for running LLMs locally on modern consumer-class GPUs\". Survived the landscape-sweep-20261006-runtimes facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 1598,
+  "pushed_at": "2026-10-06T14:57:15Z",
+  "archived": false,
+  "default_branch": "master"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@16a49792a3c93d8432d72e6c4bce800841566577",
+   "text": "[Installation](#installation) · [Supported models](#architecture-support) · [Examples](#examples) · [Quantization](#exl3-quantization) · [Community](#community)"
+  },
+  {
+   "source": "README.md@16a49792a3c93d8432d72e6c4bce800841566577",
+   "text": "ExLlamaV3 is an inference library for running local LLMs on modern consumer GPUs, with flexible quantization and parallel inference."
+  },
+  {
+   "source": "README.md@16a49792a3c93d8432d72e6c4bce800841566577",
+   "text": "- **Quantization** - [EXL3](#exl3-quantization), based on QTIP, plus 2–8 bit cache quantization. - **Parallel inference** - Flexible tensor-parallel and expert-parallel inference for consumer hardware setups. - **CPU offloading** - Allows large MoE models to run with limited GPU resources. AVX2 and AVX512 support. - **Generation** - Continuous, dynamic batching, speculative decoding, multimodal support. - **Integrations** - Broad [HF model support](#architecture-support), a [Transformers plugin]"
+  }
+ ]
+}

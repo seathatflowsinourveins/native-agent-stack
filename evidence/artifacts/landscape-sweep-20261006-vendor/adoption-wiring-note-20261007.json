@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "kind": "source_review",
+  "date": "2026-10-07",
+  "scope": "Forward adoption interpretation of converted catalog evidence; no observed results changed",
+  "extends": [
+    "evidence/artifacts/landscape-sweep-20261006-vendor/conversion-provenance.json",
+    "evidence/artifacts/landscape-sweep-20261006-vendor/returns.json"
+  ],
+  "catalog_is_not_adoption": true,
+  "installed_and_smoked_requires": [
+    "Vendor-documented native integration for each client, cited at its installed pin and source file/line.",
+    "Installed configuration/integration readback through supported scripts, names only and never credential values.",
+    "The documented integration gap repaired through its owner; client changes are applied by the command center.",
+    "One fresh-session smoke per client using an organic-shaped task whose prompt does not name the tool."
+  ],
+  "organic_use_requires": "One working day of invocation measurement on the integration's native channel; a hook uses hook execution events rather than MCP call counts.",
+  "under_invocation": "An unwired or uninvoked required tool is an adoption defect to resolve; zero usage does not establish not-needed status.",
+  "promotion_limit": "Without the cited integration/readback/two-client smoke and subsequent daily report, no slot is adopted. These sweeps and source reviews establish none of those missing steps by themselves.",
+  "owner_join": "The finalized catalog field contract and adoption synthesis consume this note; each tool's assigned owner supplies its native evidence.",
+  "source": "The owner's 2026-10-07 adoption rule, applied to the repository's source-vs-native evidence classes in docs/acceptance-evidence-policy.md; component-specific vendor citations remain required from their integration owners.",
+  "native_execution_claim": false
+}

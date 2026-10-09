@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-microsoft-nvx",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/microsoft/nvx",
+ "reviewed_commit": "03103c13cf8ed843f1a30f86d2ae29df6afb621b",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "isolation"
+ ],
+ "claim": "Source and documentation review of microsoft/nvx at commit 03103c13cf8ed843f1a30f86d2ae29df6afb621b (license MIT), read from README.md at that commit. Repository description: \"Cross-Platform Micro-VM Sandbox for Agentic Workloads\". Survived the landscape-sweep-20261006-vendor facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 331,
+  "pushed_at": "2026-10-06T23:17:30Z",
+  "archived": false,
+  "default_branch": "dev"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@03103c13cf8ed843f1a30f86d2ae29df6afb621b",
+   "text": "NVX is an ultra-light micro-VM sandbox for running untrusted workloads with hardware-enforced isolation. It is built on top of OpenVMM and runs Linux as a guest."
+  },
+  {
+   "source": "README.md@03103c13cf8ed843f1a30f86d2ae29df6afb621b",
+   "text": "NVX was jointly developed by the [MSR Systems Research Group][msr-systems] and [Azure Research - Systems][azure-systems], building on research results from the [Nanvix](https://github.com/nanvix) system."
+  },
+  {
+   "source": "README.md@03103c13cf8ed843f1a30f86d2ae29df6afb621b",
+   "text": "[msr-systems]: https://www.microsoft.com/en-us/research/group/systems-research-group-redmond/ [azure-systems]: https://www.microsoft.com/en-us/research/group/azure-research-systems/"
+  }
+ ]
+}

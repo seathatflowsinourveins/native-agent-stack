@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-lightgbm-org-lightgbm",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/lightgbm-org/LightGBM",
+ "reviewed_commit": "d8e422f8719b88f937acc9480654a7cee03ee43f",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "research-factors-ml"
+ ],
+ "claim": "Source and documentation review of lightgbm-org/LightGBM at commit d8e422f8719b88f937acc9480654a7cee03ee43f (license MIT), read from README.md at that commit. Repository description: \"A fast, distributed, high performance gradient boosting (GBT, GBDT, GBRT, GBM or MART) framework based on decision tree algorithms, used for ranking, classification and many other machine learning tasks.\". Survived the landscape-sweep-20261006-vendor facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 18832,
+  "pushed_at": "2026-10-06T02:01:53Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@d8e422f8719b88f937acc9480654a7cee03ee43f",
+   "text": "> [!NOTE] > This project moved from `Microsoft/LightGBM` to `lightgbm-org/LightGBM` in March 2026. > This repository is still the official LightGBM source code, managed by the same maintainers (including the creator of LightGBM). > For details, see https://github.com/lightgbm-org/LightGBM/issues/7187"
+  },
+  {
+   "source": "README.md@d8e422f8719b88f937acc9480654a7cee03ee43f",
+   "text": "Light Gradient Boosting Machine ==============================="
+  },
+  {
+   "source": "README.md@d8e422f8719b88f937acc9480654a7cee03ee43f",
+   "text": "LightGBM is a gradient boosting framework that uses tree based learning algorithms. It is designed to be distributed and efficient with the following advantages:"
+  }
+ ]
+}

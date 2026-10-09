@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-jasongwartz-inspect-vagrant-sandbox",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/jasongwartz/inspect_vagrant_sandbox",
+ "reviewed_commit": "a1ebe6c676063fdec392c184e273e3a27148ef5e",
+ "readme_path": "README.md",
+ "license": "NOASSERTION",
+ "layers": [
+  "isolation"
+ ],
+ "claim": "Source and documentation review of jasongwartz/inspect_vagrant_sandbox at commit a1ebe6c676063fdec392c184e273e3a27148ef5e (license NOASSERTION), read from README.md at that commit. Survived the landscape-sweep-20261006-vendor facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 6,
+  "pushed_at": "2026-10-04T09:53:31Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@a1ebe6c676063fdec392c184e273e3a27148ef5e",
+   "text": "This plugin for [Inspect](https://inspect.aisi.org.uk/) allows you to use virtual machines, running with [Hashicorp Vagrant](https://developer.hashicorp.com/vagrant), as [sandboxes](https://inspect.aisi.org.uk/sandboxing.html). Vagrant can use multiple VM hypervisors as a \"backend\", making it especially portable across host operating systems and architectures. Before using `inspect_vagrant_sandbox`, you should familiarise yourself with [the official Vagrant docs from Hashicorp](https://developer"
+  },
+  {
+   "source": "README.md@a1ebe6c676063fdec392c184e273e3a27148ef5e",
+   "text": "> [!CAUTION] > This release should be considered **alpha** and unstable! There are likely many bugs to fix and breaking API changes to make before a production release."
+  },
+  {
+   "source": "README.md@a1ebe6c676063fdec392c184e273e3a27148ef5e",
+   "text": "``` poetry add git+ssh://git@github.com/jasongwartz/inspect_vagrant_sandbox.git ```"
+  }
+ ]
+}

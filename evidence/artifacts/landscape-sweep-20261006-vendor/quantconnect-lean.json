@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-quantconnect-lean",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/QuantConnect/Lean",
+ "reviewed_commit": "80e7843f645673bcbeaab963049f76f20f6785e1",
+ "readme_path": "readme.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "instructions-skills"
+ ],
+ "claim": "Source and documentation review of QuantConnect/Lean at commit 80e7843f645673bcbeaab963049f76f20f6785e1 (license Apache-2.0), read from readme.md at that commit. Repository description: \"Lean Algorithmic Trading Engine by QuantConnect (Python, C#)\". Survived the landscape-sweep-20261006-vendor facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 21884,
+  "pushed_at": "2026-10-06T21:54:02Z",
+  "archived": false,
+  "default_branch": "master"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "readme.md@80e7843f645673bcbeaab963049f76f20f6785e1",
+   "text": "[Lean Home][1] | [Documentation][2] | [Download Zip][3] | [Docker Hub][8] | [Nuget][9]"
+  },
+  {
+   "source": "readme.md@80e7843f645673bcbeaab963049f76f20f6785e1",
+   "text": "LEAN is an event-driven, professional-caliber algorithmic trading platform built with a passion for elegant engineering and deep quant concept modeling. Out-of-the-box alternative data and live-trading support. <br/> <br/>"
+  },
+  {
+   "source": "readme.md@80e7843f645673bcbeaab963049f76f20f6785e1",
+   "text": "QuantConnect Lean CLI is a command-line interface tool for interacting with the Lean algorithmic trading engine, which is an open-source platform for backtesting and live trading algorithms in multiple financial markets. It allows developers to manage projects, run backtests, deploy live algorithms, and perform various other tasks related to algorithmic trading directly from the terminal. The CLI simplifies the workflow by automating tasks, enabling seamless integration with cloud services, and "
+  }
+ ]
+}

@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-smtg-ai-claude-squad",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/smtg-ai/claude-squad",
+ "reviewed_commit": "ce1ffb4392b01f38e2c4599c7c84d2a93973b138",
+ "readme_path": "README.md",
+ "license": "AGPL-3.0",
+ "layers": [
+  "workers"
+ ],
+ "claim": "Source and documentation review of smtg-ai/claude-squad at commit ce1ffb4392b01f38e2c4599c7c84d2a93973b138 (license AGPL-3.0), read from README.md at that commit. Repository description: \"Manage multiple AI terminal agents like Claude Code, Codex, OpenCode, and Amp.\". Survived the landscape-sweep-20261006-vendor facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 8573,
+  "pushed_at": "2026-08-20T05:09:53Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@ce1ffb4392b01f38e2c4599c7c84d2a93973b138",
+   "text": "# Claude Squad [![CI](https://github.com/smtg-ai/claude-squad/actions/workflows/build.yml/badge.svg)](https://github.com/smtg-ai/claude-squad/actions/workflows/build.yml) [![GitHub Release](https://img.shields.io/github/v/release/smtg-ai/claude-squad)](https://github.com/smtg-ai/claude-squad/releases/latest)"
+  },
+  {
+   "source": "README.md@ce1ffb4392b01f38e2c4599c7c84d2a93973b138",
+   "text": "[Claude Squad](https://smtg-ai.github.io/claude-squad/) is a terminal app that manages multiple [Claude Code](https://github.com/anthropics/claude-code), [Codex](https://github.com/openai/codex), [Gemini](https://github.com/google-gemini/gemini-cli) (and other local agents including [Aider](https://github.com/Aider-AI/aider)) in separate workspaces, allowing you to work on multiple tasks simultaneously."
+  },
+  {
+   "source": "README.md@ce1ffb4392b01f38e2c4599c7c84d2a93973b138",
+   "text": "### Highlights - Complete tasks in the background (including yolo / auto-accept mode!) - Manage instances and tasks in one terminal window - Review changes before applying them, checkout changes before pushing them - Each task gets its own isolated git workspace, so no conflicts"
+  }
+ ]
+}

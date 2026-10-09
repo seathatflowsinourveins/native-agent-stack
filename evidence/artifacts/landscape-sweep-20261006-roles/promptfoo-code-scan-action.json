@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-promptfoo-code-scan-action",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/promptfoo/code-scan-action",
+ "reviewed_commit": "c3f94a79e20359e4d85f2ea4b7ee7be6ddd99d72",
+ "readme_path": "README.md",
+ "license": "NOASSERTION",
+ "layers": [
+  "quality-evaluation"
+ ],
+ "claim": "Source and documentation review of promptfoo/code-scan-action at commit c3f94a79e20359e4d85f2ea4b7ee7be6ddd99d72 (license NOASSERTION), read from README.md at that commit. Repository description: \"Github Action for Promptfoo Code Scanner - security scanning for LLM apps\". Survived the landscape-sweep-20261006-roles facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 3,
+  "pushed_at": "2026-10-06T02:02:27Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@c3f94a79e20359e4d85f2ea4b7ee7be6ddd99d72",
+   "text": "Automatically scan pull requests for LLM security vulnerabilities using AI-powered analysis."
+  },
+  {
+   "source": "README.md@c3f94a79e20359e4d85f2ea4b7ee7be6ddd99d72",
+   "text": "Promptfoo Code Scanning uses AI agents to find LLM-related vulnerabilities in your codebase and helps you fix them before you merge. By focusing specifically on LLM-related vulnerabilities, it finds issues that more general security scanners might miss."
+  },
+  {
+   "source": "README.md@c3f94a79e20359e4d85f2ea4b7ee7be6ddd99d72",
+   "text": "The scanner examines code changes for common LLM security risks including prompt injection, PII exposure, and excessive agency. Rather than just analyzing the surface-level diff, it traces data flows deep into your codebase to understand how user inputs reach LLM prompts, how outputs are used, and what capabilities your LLM has access to."
+  }
+ ]
+}

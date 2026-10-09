@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-bashtage-arch",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/bashtage/arch",
+ "reviewed_commit": "9d4d6ea8483d86ba70d9e11feae21a645fdf01b7",
+ "readme_path": "README.md",
+ "license": "NOASSERTION",
+ "layers": [
+  "research-factors-ml"
+ ],
+ "claim": "Source and documentation review of bashtage/arch at commit 9d4d6ea8483d86ba70d9e11feae21a645fdf01b7 (license NOASSERTION), read from README.md at that commit. Repository description: \"ARCH models in Python\". Survived the landscape-sweep-20261006-vendor facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 1587,
+  "pushed_at": "2026-10-06T21:59:39Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@9d4d6ea8483d86ba70d9e11feae21a645fdf01b7",
+   "text": "Autoregressive Conditional Heteroskedasticity (ARCH) and other tools for financial econometrics, written in Python (with Cython and/or Numba used to improve performance)"
+  },
+  {
+   "source": "README.md@9d4d6ea8483d86ba70d9e11feae21a645fdf01b7",
+   "text": "- [Univariate ARCH Models](#volatility) - [Unit Root Tests](#unit-root) - [Cointegration Testing and Analysis](#cointegration) - [Bootstrapping](#bootstrap) - [Multiple Comparison Tests](#multiple-comparison) - [Long-run Covariance Estimation](#long-run-covariance)"
+  },
+  {
+   "source": "README.md@9d4d6ea8483d86ba70d9e11feae21a645fdf01b7",
+   "text": "`arch` is Python 3 only. Version 4.8 is the final version that supported Python 2.7."
+  }
+ ]
+}

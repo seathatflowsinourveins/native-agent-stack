@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-dmlc-xgboost",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/dmlc/xgboost",
+ "reviewed_commit": "0e3f3fda75d842feb04f990537317f5e087609fd",
+ "readme_path": "README.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "research-factors-ml"
+ ],
+ "claim": "Source and documentation review of dmlc/xgboost at commit 0e3f3fda75d842feb04f990537317f5e087609fd (license Apache-2.0), read from README.md at that commit. Repository description: \"Scalable, Portable and Distributed Gradient Boosting (GBDT, GBRT or GBM) Library,  for Python, R, Java, Scala, C and more. Runs on single machine, Hadoop, Spark, Dask, Flink and DataFlow\". Survived the landscape-sweep-20261006-vendor facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 28834,
+  "pushed_at": "2026-10-06T23:52:38Z",
+  "archived": false,
+  "default_branch": "master"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@0e3f3fda75d842feb04f990537317f5e087609fd",
+   "text": "[Blog](https://xgboost.ai/blog) | [Documentation](https://xgboost.readthedocs.io) | [Resources](demo/README.md) | [Contributors](CONTRIBUTORS.md) | [Release Notes](https://xgboost.readthedocs.io/en/latest/changes/index.html)"
+  },
+  {
+   "source": "README.md@0e3f3fda75d842feb04f990537317f5e087609fd",
+   "text": "XGBoost is an optimized distributed gradient boosting library designed to be highly ***efficient***, ***flexible*** and ***portable***. It implements machine learning algorithms under the [Gradient Boosting](https://en.wikipedia.org/wiki/Gradient_boosting) framework. XGBoost provides a parallel tree boosting (also known as GBDT, GBM) that solve many data science problems in a fast and accurate way. The same code runs on major distributed environment (Kubernetes, Hadoop, SGE, Dask, Spark, PySpark"
+  },
+  {
+   "source": "README.md@0e3f3fda75d842feb04f990537317f5e087609fd",
+   "text": "License ------- © Contributors, 2021. Licensed under an [Apache-2](https://github.com/dmlc/xgboost/blob/master/LICENSE) license."
+  }
+ ]
+}

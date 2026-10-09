@@ -5141,8 +5141,8 @@
     },
     {
       "path": ".gitleaksignore",
-      "sha256": "b17156d26a9041d78135927b08fc45bd892d0c603e9484966f8c47c3d8d41721",
-      "bytes": 7333
+      "sha256": "66dc22ef2f4f937f69d9c67cca7b14fd9d19aa911a33cf5173aa4f44e04d122f",
+      "bytes": 8385
     },
     {
       "path": ".jcodemunch.jsonc",
@@ -17012,8 +17012,8 @@
     },
     {
       "path": "catalogs/landscape/component-evidence-matrix.json",
-      "sha256": "c761d3e6ec61a3c2d822d36f0afc7d49c6cb0da0269245e1c06516818b23aa00",
-      "bytes": 314853
+      "sha256": "a19ecb074190b96921cb6eb4dcebe8b697a2e198b0dbec5534fd76f38ca08380",
+      "bytes": 318361
     },
     {
       "path": "catalogs/landscape/foundation.json",
@@ -17097,8 +17097,8 @@
     },
     {
       "path": "catalogs/saturation/ledger.json",
-      "sha256": "4a37a821f5608da528a8fa1f1774a7ba7ad82b6af17d11815c2d3ac6283b3375",
-      "bytes": 403074
+      "sha256": "b90b356d0c0eb430b9c1a7d35130610991c4b8e50de9a91e60f3c036050ae795",
+      "bytes": 584903
     },
     {
       "path": "catalogs/sota-convergence/README.md",
@@ -17129,6 +17129,36 @@
       "path": "catalogs/sota-convergence/manifest-20260929.json",
       "sha256": "af4e0314b28acafe2b5e8a0bce71d1ced2efe911a3c3757557b23bd71c63c9ee",
       "bytes": 1149103
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20261005-webresearch-ns2604.json",
+      "sha256": "e2d3944c73766d49758c0917eb22b7bd2c9e871475bcc07efa1424ab627f6751",
+      "bytes": 261445
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20261006-roles.json",
+      "sha256": "45524fa8f2513a947ac3b0d7edd228c951ffee989d3bfdba7e548a49bf5b49a5",
+      "bytes": 500693
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20261006-runtimes.json",
+      "sha256": "7d3a6efb033c3d6e5913923175fbc2a39657bc32791d23904ae97e6413dfd965",
+      "bytes": 760079
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20261006-vendor.json",
+      "sha256": "e4534197a73f2e55f66de99520908342acffd10c92137ae9ee020f7d8756e04e",
+      "bytes": 978241
+    },
+    {
+      "path": "catalogs/sota-convergence/reconciliations-20261006-first-pass.json",
+      "sha256": "64117127b73f02fcdfe0b3a66088ea27d19c07c44643f912a5b424c683f04bf4",
+      "bytes": 13890
+    },
+    {
+      "path": "catalogs/sota-convergence/reconciliations-20261006-vendor.json",
+      "sha256": "c6b237c19810820534d7fa02f316dcf8c85225d8019715e611e73ea151db2561",
+      "bytes": 44742
     },
     {
       "path": "catalogs/sota-convergence/sdk-runtime-coverage-20260922.json",
@@ -17572,8 +17602,8 @@
     },
     {
       "path": "docs/component-evidence-matrix.md",
-      "sha256": "a1af27458583cabaebfe3d0299b239fdf23f42740165f02f9323d33f0647d26f",
-      "bytes": 32903
+      "sha256": "3a75142c2cbbb96d3820b3f5a81d2f64e2f75c10e4201dde8afd4844959c50ec",
+      "bytes": 33898
     },
     {
       "path": "docs/contributing-evidence.md",
@@ -18121,6 +18151,11 @@
       "bytes": 23344
     },
     {
+      "path": "docs/decisions/2026-10-05-seeded-web-research-landscape.md",
+      "sha256": "e9cb39a27d5cd92f6dbcf4c82697d1e5c725e3a6e72231b99c57a640f7cad028",
+      "bytes": 9644
+    },
+    {
       "path": "docs/decisions/2026-10-05-trading-unattended-hosting-recovery.md",
       "sha256": "604998e8ff2290f91273ebe55c52165f7101cb956a00c56620c85e44fdf03a1d",
       "bytes": 29820
@@ -18349,6 +18384,11 @@
       "path": "docs/decisions/2026-10-09-skills-blinded-trials.md",
       "sha256": "65d2fb708f07afb6c46b8bfeb57950374f52d529cb8b785083cc50efdb02b4d0",
       "bytes": 7510
+    },
+    {
+      "path": "docs/decisions/2026-10-06-landscape-sweep-catalog-publication.md",
+      "sha256": "436c26a8aea8b2c909d5a18965ca4bdc500d186327c65000ce7a9fc1c5e5bda0",
+      "bytes": 12534
     },
     {
       "path": "docs/direct-results.md",
@@ -36019,6 +36059,516 @@
       "path": "evidence/artifacts/landscape-sweep-20260929/vshulcz-deja-vu.json",
       "sha256": "1ecffbbd16d616fe5a3728d23cf16824fd84579c55544c4fc131086486b628d1",
       "bytes": 2160
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-roles-attempts/child-usage-wf_dd41894e-66a.json",
+      "sha256": "75ba3f06a9f329bff1e7b7ad5f9f5cf8a733e1f2480cfc63303831b827da2253",
+      "bytes": 1371828
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-roles/RESULT.json",
+      "sha256": "5da49d9bc5709c09737a2b0a5f7a7f2ac8b705da2ce152855d87b40c6d8857b2",
+      "bytes": 31291
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-roles/anthropics-claude-code-action.json",
+      "sha256": "9febeaa4bba110b25f5dd506d20e6bf202b6b9d188889f01227d672751a715ef",
+      "bytes": 2386
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-roles/approvals-approvaltests-python.json",
+      "sha256": "1817c89c8a001c5c1845c3031d62c62494c8636c3d5ad405deeaebe8c4fd2d40",
+      "bytes": 1948
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-roles/astral-sh-ty.json",
+      "sha256": "1caa7af6c4436faf083ea19e293b82f03e93dcabbb5b0f28debc803f2d551145",
+      "bytes": 1913
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-roles/ataraxy-labs-sem.json",
+      "sha256": "9a833d56a50d8f8f469595bf2720ef5a199ad801dc087546c896787fecca7de9",
+      "bytes": 2324
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-roles/ataraxy-labs-weave.json",
+      "sha256": "66e349c842a3b423c74d008f6e42491bcbb365f278aebc8705a7b10825997947",
+      "bytes": 2417
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-roles/batrachianai-toad.json",
+      "sha256": "174ec666be1ea9caf789a8590dc0cc423cba8004288e8689ea64a610e7db97a4",
+      "bytes": 1456
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-roles/esss-pytest-regressions.json",
+      "sha256": "29dc12964334514a93864f834cfc22fb889cd982ab6d9552f5b479b45a166000",
+      "bytes": 1655
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-roles/facebook-pyrefly.json",
+      "sha256": "0abe77d749e24fbaf7f3bb6fa33acb01d0ef46b2959791a589803512d6d13b02",
+      "bytes": 1885
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-roles/google-gemini-gemini-cli.json",
+      "sha256": "b33e0f5ab8ea5f69100bc3ff0702e1f9b02adb27bf32964f5a8a3a0bf43a493c",
+      "bytes": 2029
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-roles/harbor-framework-harbor.json",
+      "sha256": "8397ad1a7a6f204312de9f27dd2dee8aea7dea7e0b5fbed3a9af9f3f7c44fe69",
+      "bytes": 1832
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-roles/meridianlabs-ai-inspect-swe.json",
+      "sha256": "b2d1c38d094bf443f2efab515f383f75a1f9fdf6e364620ef3df170dde13be52",
+      "bytes": 1482
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-roles/nvidia-skillevaluator.json",
+      "sha256": "4e47dcae14dae52ab1fcf6d7680eb76a66a67607a8d792f855308c734eac619d",
+      "bytes": 2080
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-roles/openai-codex.json",
+      "sha256": "0bed75aab93f31d5aefa650920dd9ef8096d8f12cbff892695b268ccbeaa54e2",
+      "bytes": 1638
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-roles/promptfoo-code-scan-action.json",
+      "sha256": "77491a22145157604839311a8f708ae747f9f460d7e46759618e885c9b72ffe6",
+      "bytes": 1930
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-roles/returns.json",
+      "sha256": "24ff248323382f72c65c8061f04fd790206a991ead95ba87dc74cbb1f2340f47",
+      "bytes": 814354
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-roles/semgrep-skills.json",
+      "sha256": "d1599a0977b4e92d085314631c4fdfbb7f57946ba467eca380e7f25e2e127b7e",
+      "bytes": 1680
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-roles/slopus-happy.json",
+      "sha256": "21fed109e025b1a5420d8fc3c445c0221fc6b41849ad2093b41259509a81109f",
+      "bytes": 1905
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-roles/toad-maintenance-commits.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "bytes": 2
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-roles/toad-maintenance-metadata.json",
+      "sha256": "f88fcf8f3f2dc0ed27ed64dea1e1bafdbb57c3751849d67b8d32b40773f6fb07",
+      "bytes": 111
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-runtimes-attempts/child-usage-wf_0fed86b5-3e8.json",
+      "sha256": "439be81e1d15c00b3bee04823302f464024bfe3c923ed1c2bb98b5fecbef9794",
+      "bytes": 139218
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-runtimes-attempts/child-usage-wf_eed0e74b-ba4.json",
+      "sha256": "e6441556a44689a252adaba3e3aaaf95ad82abae82f3a09ee2751c450c8ef050",
+      "bytes": 2302894
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-runtimes/RESULT.json",
+      "sha256": "3e419c872458ae677653aaffbd0de9a1afe08bc6b643ec7847ad2c11cb3bb6c5",
+      "bytes": 51931
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-runtimes/anthropics-claude-code.json",
+      "sha256": "5626a553ed5e661f838de6d2ac40f607fba6d27a78a31f29e70697375a732bfd",
+      "bytes": 1881
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-runtimes/apify-mcpc.json",
+      "sha256": "4391ca3002d828e6e695a6e89a41e7c9719d0265a2e7d91402613cd9e9c4b1ba",
+      "bytes": 2306
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-runtimes/boxlite-ai-boxlite.json",
+      "sha256": "0df6ffc0e85dcf1a1d882079b75fb9086bd14e2cf64d1c331dca5d6f6a098b8f",
+      "bytes": 2022
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-runtimes/containers-bubblewrap.json",
+      "sha256": "189fefe5f504af7189e02ca5410c94669c9b9fb6a9973f84865a955606d14e34",
+      "bytes": 1844
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-runtimes/dagucloud-dagu.json",
+      "sha256": "b612da56fdadf65c01073d868509f80e7c4bd03cdf237e65f4f7b04895b25275",
+      "bytes": 2652
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-runtimes/earendil-works-gondolin.json",
+      "sha256": "7ed4d166903b07bf5d689727b0043d8af11884a2e4b51cfca04780d06bb2e028",
+      "bytes": 1714
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-runtimes/gethamster-horde.json",
+      "sha256": "979f7cad0504b78521de2ed4af14ba808bb8b65e6f50f245b6a123de3cf2828e",
+      "bytes": 1830
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-runtimes/ggml-org-llama-cpp.json",
+      "sha256": "5cbb0f2df53962b87bc1b7d15bbe388ec55bcdea7a6363fc31417dd83e5785ba",
+      "bytes": 2082
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-runtimes/healthchecks-healthchecks.json",
+      "sha256": "4cf5bb36bedb9c7b3a9188aaf55f9502b187ecd2e805861900eda76b7666e267",
+      "bytes": 1806
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-runtimes/horde-age-metadata.json",
+      "sha256": "38890ba8992f6d4fdb31acd449a564579d6172e3385c9fdf8e97cf601648ae88",
+      "bytes": 110
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-runtimes/inngest-inngest.json",
+      "sha256": "23e98e245d7fe63b385e5ec8196275381ac17f2d90334bde54f7c3c242de5d7b",
+      "bytes": 2131
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-runtimes/louislam-uptime-kuma.json",
+      "sha256": "ef72a4c95980e8ae7350dda00947751ad5f2287f897e90ad404831be8e38a083",
+      "bytes": 1933
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-runtimes/mcp-use-mcp-use.json",
+      "sha256": "b22be71db9647372d1fbfdca01b8e2afe0b029410d0137f61dc2b6516efe7c08",
+      "bytes": 1682
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-runtimes/microsoft-mcp-gateway.json",
+      "sha256": "63ad66e0bf616ff3e3a8cb2ae3edd9b32d1228f695e71311f93ce2f8f7639cfa",
+      "bytes": 2184
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-runtimes/obeli-sk-obelisk.json",
+      "sha256": "0a37e57e91b4ac18e7cc328c1ce1b24a6a22136d017ab8f3a2c7953b77298282",
+      "bytes": 1471
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-runtimes/openai-codex.json",
+      "sha256": "09d2030ea98ab1041c4639b67a23cdfa04e1047fd3270c23d5e2ce16022e6e5b",
+      "bytes": 1642
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-runtimes/restatedev-restate.json",
+      "sha256": "825cce0190de388d6687757133bc4dd97cb44cf3753d93f0f3179f12ac15bd56",
+      "bytes": 1952
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-runtimes/returns.json",
+      "sha256": "fe91400ca9cd2be4306e758424248c313e94a192eaae9b59de1df156e652762b",
+      "bytes": 1443602
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-runtimes/snyk-agent-scan.json",
+      "sha256": "6c030e665157ecca3d51ea2bc4c4e79dbb1559069690986a104a175feba45a77",
+      "bytes": 2073
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-runtimes/superradcompany-microsandbox.json",
+      "sha256": "c6e58a6f1e0e5f0a944aae3cf69d1f91e5878f750aab5e0bcc7c84bf24caf160",
+      "bytes": 2241
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-runtimes/traceloop-openllmetry.json",
+      "sha256": "42d8a96ed2b1cf02f7b4e88a197481036ba0386613314a7d2a1421829e6cefb9",
+      "bytes": 1978
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-runtimes/turboderp-org-exllamav3.json",
+      "sha256": "cdb78642d58a3135779d102fa628e3871ee2fc2e7944c8b63d1a0f6334786cef",
+      "bytes": 2058
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-runtimes/twin-gatus.json",
+      "sha256": "3b0eb4e9fb7983725ed940ea2de04668bcdab2c75d597d2b20397e5f1a60ca2c",
+      "bytes": 1874
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-vendor-attempts/child-usage-wf_62ccd24a-231.json",
+      "sha256": "41ba2603f81c066bec201b8828709af8a9ed3edf97215f020aa88e6d57335524",
+      "bytes": 2613741
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-vendor/RESULT.json",
+      "sha256": "9cd743f8339eb33e46524e774711bdd336acab97b037fedf5b11ca89a5704538",
+      "bytes": 68781
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-vendor/adoption-wiring-note-20261007.json",
+      "sha256": "f205883b726121e84a9f65d63b31a5cfcf993fb5dcd6ce7b860da7fa051456e1",
+      "bytes": 1844
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-vendor/anthropics-claude-agent-sdk-python.json",
+      "sha256": "98d32f0f83fda2465176be18572c8802a07c0c5ee70029340223f8438737fc14",
+      "bytes": 1686
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-vendor/anthropics-claude-code.json",
+      "sha256": "763424b309f8828d0e8adafdedbfbc057d2c189eb8b3a613e2188c63efff7015",
+      "bytes": 1904
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-vendor/awslabs-cli-agent-orchestrator.json",
+      "sha256": "4f921fc94e3e4b714403ebd75cfc06acdbbfbc255c821cf41a940180e648498a",
+      "bytes": 2308
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-vendor/bachmann1234-diff-cover.json",
+      "sha256": "269a8fe72a5d8e30592fcfc2f0f9efd8ac4f83a41a5d597511cf3bfd61e4ab4a",
+      "bytes": 1852
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-vendor/bashtage-arch.json",
+      "sha256": "6530088f39ae76b3be5e2a5121910a30b607cc1ac4ddef8c51ab70ad08df7c48",
+      "bytes": 1677
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-vendor/catboost-catboost.json",
+      "sha256": "7f27ee05491cfa4a785e364cda59cc4ad320226c19ec28fa58726ae5ea2e714f",
+      "bytes": 2280
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-vendor/chunkhound-chunkhound.json",
+      "sha256": "7c33807399299215157f6d55a8dd2b1e9d746ebf4b06f017d4dc19630b4f4d0d",
+      "bytes": 2054
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-vendor/cli-cli.json",
+      "sha256": "566fa04746bbd6f5f21ab2779751554008611e5894f2cfff6f81a94439472c80",
+      "bytes": 1840
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-vendor/conversion-provenance.json",
+      "sha256": "93f85d553bde9fb1f9157408598e40a87e2272224dbf3fd27c2c90482cecf3ec",
+      "bytes": 2328
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-vendor/creation-age-review.json",
+      "sha256": "4604b31abf0f74a53af4492e3c208e8d17a0e09354d582e9aca46edfeee85485",
+      "bytes": 1999
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-vendor/critic-followup.json",
+      "sha256": "e1d3d5935a593d7529d3a18298d5d80bfd4bc6fcea3de671d0e2224935a9ec6b",
+      "bytes": 4728
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-vendor/dmlc-xgboost.json",
+      "sha256": "5688cb69df8ab1b4c8cc450dc1a1726508a73afd92ed6af7351c6c381320236e",
+      "bytes": 2175
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-vendor/hashicorp-nomad.json",
+      "sha256": "7c9a98d890905e4b805b38abd99a6fd20443f019ed01198b89c7d34482d8735e",
+      "bytes": 2284
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-vendor/jasongwartz-inspect-vagrant-sandbox.json",
+      "sha256": "3226ebcd06dcead44b80cbd874c9620bcf51839f784fbb7a3fd4fa0b530ff383",
+      "bytes": 1914
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-vendor/lightgbm-org-lightgbm.json",
+      "sha256": "61462b0c9481aa0b3346cf027e580b861b90121e0102821d4b42595f46b9363a",
+      "bytes": 1875
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-vendor/lmstudio-ai-lms.json",
+      "sha256": "bcb3c15e3b7ce77a675008b129268ce90162e8f6cf21b9067afc532ea40aa210",
+      "bytes": 1412
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-vendor/max-sixty-worktrunk.json",
+      "sha256": "fb9570913fc8583d69ab6dcc4819e86615ac7b730d8654800acb560d3d725fc8",
+      "bytes": 1980
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-vendor/microsoft-apm.json",
+      "sha256": "3930217138eb00145f6cb1e50191bbb3f167ff257fbe270baa30301cca51e783",
+      "bytes": 1402
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-vendor/microsoft-nvx.json",
+      "sha256": "e54392eb28f7190d1ae234a792d8c15a9ae1ebea9965bdf9ef116c268383e8ef",
+      "bytes": 1708
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-vendor/microsoft-quicksand.json",
+      "sha256": "ee2cbc8e10a9be6d232ad4a97257505c990c3cf3fc9e2ac7bae40850481c78cd",
+      "bytes": 1796
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-vendor/microsoft-wsl.json",
+      "sha256": "d283e1b09addaa77316eb5417ca9e93815d7d92767ac6cbc9f7c19d12ebadc37",
+      "bytes": 1625
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-vendor/minishlab-semble.json",
+      "sha256": "aad8f491b197e8377b8b8f17932f38079a3c49d63e0cff7f0b717b9fd5d9f8d4",
+      "bytes": 2020
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-vendor/ml4t-diagnostic.json",
+      "sha256": "771a080d5c8a4cd800fac09dc9fc4846d67388f708c2c37839adb1e1618b1436",
+      "bytes": 1691
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-vendor/modelcontextprotocol-mcpb.json",
+      "sha256": "e7215ad3efe11c65b7136cae3bee282ed1a5a6f4d47fe2a6938620734171e272",
+      "bytes": 2183
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-vendor/nautechsystems-nautilus-agents.json",
+      "sha256": "97a875df8e854b01c1c1a82b523e729893a719ce9372301ca6a8d6082d0bb829",
+      "bytes": 2144
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-vendor/nautechsystems-nautilus-engineering.json",
+      "sha256": "94f5c468b33755cef32a915f9b1bfd81180ce1c4e0e2657cfb50b8a97a7cb135",
+      "bytes": 2155
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-vendor/openai-codex-security.json",
+      "sha256": "3ce290704f445582138288559fe49b59e7cf311a456b8abfe957c4df76f9f778",
+      "bytes": 2072
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-vendor/openai-codex.json",
+      "sha256": "8ef0b126867fa06cde74d1eb31cec7c049144bde6921a36d9fa5243f7f67834d",
+      "bytes": 1632
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-vendor/openai-symphony.json",
+      "sha256": "cc235a96cd6bbcc64498cf5dbae2922fbf307c6d13e9920ecd98b5de950b5253",
+      "bytes": 1948
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-vendor/openai-tunnel-client.json",
+      "sha256": "b1c6c68a3475780d6d36463c24f9d2f64988ef0abe9ffad66ace61972249b410",
+      "bytes": 2254
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-vendor/qdrant-fastembed.json",
+      "sha256": "f03dc40e9aac7fca95629d23d061e8f44a2de02176727fef1c8382ff2c816aa2",
+      "bytes": 2206
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-vendor/quantconnect-lean.json",
+      "sha256": "4367c64cf5afd945e3f021bf5ec0058e339edee20c917764bfbdc796390a482c",
+      "bytes": 2019
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-vendor/returns.json",
+      "sha256": "3c934132e5317f864797a5fe63c3dc3af7f0f0d86eea74773b80c8e7aa766aaf",
+      "bytes": 1923858
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-vendor/smtg-ai-claude-squad.json",
+      "sha256": "5fc306820e0d05ffcbcb3330c2eb01cb5b2cb62aa5e151d610bf49ac3db9b1b7",
+      "bytes": 2213
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-vendor/stefan-jansen-alphalens-reloaded.json",
+      "sha256": "808d78b053fa102ad61ea2f814a6da491d823aacb55e2f121849162ef4026649",
+      "bytes": 1781
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-vendor/tailscale-tailscale.json",
+      "sha256": "7867d7fdfd6eb6251a7d625b651f3ea33bc36c33dba6400a72da4e3fbcdb1bf2",
+      "bytes": 1993
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20261006-vendor/uipath-coder-eval.json",
+      "sha256": "7f7e8c999fe75972cc24d38ef342adeb7177ca687518bc01a4ce84b8b09f5f49",
+      "bytes": 2398
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604-attempts/child-usage-wf_5d8a2a30-9b5.json",
+      "sha256": "40fc65d95aedd966af6c702263178c7de48ded4cb1867a9ed1c51100f5797eb2",
+      "bytes": 305901
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/adbar-trafilatura.json",
+      "sha256": "148aa30e069e5994ef3cf9d78c90be7a8ac975424b95f1748d1c95debd077286",
+      "bytes": 2252
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/commoncrawl-cdx-toolkit.json",
+      "sha256": "d1245fd461f8574d16a236d0e9cfffd9b2f2f6dc2a4b8e0f27855cb77612529f",
+      "bytes": 1940
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/convert-summary.json",
+      "sha256": "2ae39c777713248e9bac7b8f706cf981999fa3fb49cb60357f38420247946903",
+      "bytes": 1476
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/exa-labs-exa-mcp-server.json",
+      "sha256": "38be68e2d5bb424401981a886bd04dd09e840213188aa63b1d31607cbd09e2c2",
+      "bytes": 1494
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/fold-publication-20261007.md",
+      "sha256": "9feeb3bcb1248c6948314dd114cc38bc48596852abb33c33a7f612b92483d6df",
+      "bytes": 2805
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/krlabsorg-lettucedetect.json",
+      "sha256": "dd703130a13ddff64a1d9ac1d5f61fead6a3e897da75efcecf5534542e963b78",
+      "bytes": 1872
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/lanes.json",
+      "sha256": "8f898fd8546bc458d396bf916097b360dbb47a7320229e63b98bd62dfd727f56",
+      "bytes": 133988
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/layers.json",
+      "sha256": "863ac3ce317c6c38d418840aa980db558eef2c6f4e4b1f68555540d3e9e088ef",
+      "bytes": 5364
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/original-ledger-event.json",
+      "sha256": "0ffff23c84c9bdea2a5296a21c0e1eb9779081877e37f3250232b5e343854f88",
+      "bytes": 12353
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/returns.json",
+      "sha256": "0a1d06245c958b8de7495793df9e5ee4e15aebe69fbeaa7bb55c2ada322ed646",
+      "bytes": 229049
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/scope.json",
+      "sha256": "45157b7c2090dd28447cec9f3fe793600154fb330490ca3c7a0f2dc87f2e13e9",
+      "bytes": 3403
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/seeds.json",
+      "sha256": "f704f5ff1d058a8173df676af3bbd04ce578fedba9165d4659dc94e0687b83fe",
+      "bytes": 1520
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/survivors.json",
+      "sha256": "bf621a9e856b218500a398925b025341c407bba84ba7f8048fb1a83cf1d23a8b",
+      "bytes": 483
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-webresearch-20261005-ns2604/vulcanlab-ipi-proxy.json",
+      "sha256": "d14e27823893554dd1a7eaeed829e3676437b40698d224b2b3ea46a067bafc51",
+      "bytes": 1686
     },
     {
       "path": "evidence/artifacts/layer-closure-assessment-20261001/README.md",
@@ -59932,8 +60482,8 @@
     },
     {
       "path": "tests/test_gitleaks_config.py",
-      "sha256": "af4fcd8fc06c207a0fed3ceafdfafff46092278e733c0ad29309c59da538ec2d",
-      "bytes": 61987
+      "sha256": "64e2977ef6ca456e7578e11953b582635bc86fb2815b70f699341ec7c46ed170",
+      "bytes": 62556
     },
     {
       "path": "tests/test_gitleaks_guarded_macos.py",

@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-microsoft-quicksand",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/microsoft/quicksand",
+ "reviewed_commit": "298ba69fad80137ef1036eb1b8c7960e90b8c35a",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "isolation"
+ ],
+ "claim": "Source and documentation review of microsoft/quicksand at commit 298ba69fad80137ef1036eb1b8c7960e90b8c35a (license MIT), read from README.md at that commit. Repository description: \"Quickly sandbox your AI agent.\". Survived the landscape-sweep-20261006-vendor facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 55,
+  "pushed_at": "2026-10-02T05:32:00Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@298ba69fad80137ef1036eb1b8c7960e90b8c35a",
+   "text": "Quicksand is an async Python API to launch, control, and snapshot [QEMU](https://www.qemu.org) virtual machines with a particular focus on sandboxing AI agents. Quicksand provides pre-built Linux VMs for Ubuntu and Alpine distros and supports x86_64 and ARM64 across macOS, Linux, and Windows. Running sandboxes needs no root privileges or Docker; install the QEMU and image extras for a bundled runtime on supported platforms."
+  },
+  {
+   "source": "README.md@298ba69fad80137ef1036eb1b8c7960e90b8c35a",
+   "text": "```bash pip install quick-sandbox quicksand install qemu alpine ```"
+  },
+  {
+   "source": "README.md@298ba69fad80137ef1036eb1b8c7960e90b8c35a",
+   "text": "async def main(): async with Sandbox(image=\"ubuntu\") as sb: result = await sb.execute(\"echo 'Hello from the sandbox!'\") print(result.stdout)"
+  }
+ ]
+}

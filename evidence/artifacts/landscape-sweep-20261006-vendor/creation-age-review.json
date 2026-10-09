@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "kind": "source_review",
+  "observed_at": "2026-10-07T00:37:12Z",
+  "sweep_date": "2026-10-06",
+  "scope": "repository creation metadata; no maintenance/engineering/adoption verdict",
+  "checks": [
+    {
+      "repository": "https://github.com/microsoft/nvx",
+      "api": "https://api.github.com/repos/microsoft/nvx",
+      "command": "gh api --cache 120s repos/microsoft/nvx",
+      "exit_code": 0,
+      "response": {
+        "full_name": "microsoft/nvx",
+        "created_at": "2026-08-27T16:46:54Z",
+        "default_branch": "dev",
+        "html_url": "https://github.com/microsoft/nvx",
+        "archived": false
+      },
+      "warning_at_sweep_date": "TOO NEW TO ASSESS (<90 days)"
+    },
+    {
+      "repository": "https://github.com/openai/codex-security",
+      "api": "https://api.github.com/repos/openai/codex-security",
+      "command": "gh api --cache 120s repos/openai/codex-security",
+      "exit_code": 0,
+      "response": {
+        "full_name": "openai/codex-security",
+        "created_at": "2026-07-13T22:00:13Z",
+        "default_branch": "main",
+        "html_url": "https://github.com/openai/codex-security",
+        "archived": false
+      },
+      "warning_at_sweep_date": "TOO NEW TO ASSESS (<90 days)"
+    },
+    {
+      "repository": "https://github.com/UiPath/coder_eval",
+      "api": "https://api.github.com/repos/UiPath/coder_eval",
+      "command": "gh api --cache 120s repos/UiPath/coder_eval",
+      "exit_code": 0,
+      "response": {
+        "full_name": "UiPath/coder_eval",
+        "created_at": "2026-07-09T06:46:59Z",
+        "default_branch": "main",
+        "html_url": "https://github.com/UiPath/coder_eval",
+        "archived": false
+      },
+      "warning_at_sweep_date": "TOO NEW TO ASSESS (<90 days)"
+    }
+  ],
+  "limits": [
+    "Warning is dated to the frozen sweep, not a permanent or current future eligibility label.",
+    "Age alone never refutes; current release and maintenance observations are separate."
+  ]
+}

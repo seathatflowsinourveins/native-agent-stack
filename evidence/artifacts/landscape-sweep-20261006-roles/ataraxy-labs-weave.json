@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-ataraxy-labs-weave",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/Ataraxy-Labs/weave",
+ "reviewed_commit": "d73c4ae83d0bf5ecb7fbeb29715a70f0255c9a37",
+ "readme_path": "README.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "git-github-automation"
+ ],
+ "claim": "Source and documentation review of Ataraxy-Labs/weave at commit d73c4ae83d0bf5ecb7fbeb29715a70f0255c9a37 (license Apache-2.0), read from README.md at that commit. Repository description: \"Entity-level git merge driver. Resolves false conflicts git invents when independent agents edit the same file. ~95% reduction vs. line-based merge.\". Survived the landscape-sweep-20261006-roles facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 1315,
+  "pushed_at": "2026-10-04T13:21:09Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@d73c4ae83d0bf5ecb7fbeb29715a70f0255c9a37",
+   "text": "> **Part of the [Ataraxy Labs](https://ataraxy-labs.com) stack**, agent-native infrastructure for software development. See also: [sem](https://ataraxy-labs.com/sem) (semantic version control) · [inspect](https://github.com/Ataraxy-Labs/inspect) (semantic code review) · [opensessions](https://github.com/Ataraxy-Labs/opensessions) (tmux sidebar for coding agents). > > Read the manifesto: https://ataraxy-labs.com/#thesis · Essays: https://ataraxy-labs.com/blogs · LLMs: https://ataraxy-labs.com/llm"
+  },
+  {
+   "source": "README.md@d73c4ae83d0bf5ecb7fbeb29715a70f0255c9a37",
+   "text": "`weave land` takes a merge from \"git stopped\" (or \"an agent wants this on main\") to published, in four steps:"
+  },
+  {
+   "source": "README.md@d73c4ae83d0bf5ecb7fbeb29715a70f0255c9a37",
+   "text": "1. **Merge.** weave merges by function and by entry, not by line. Two agents who add different entries to the same list, table, map or `switch` both keep their entry. 2. **Gate.** Every file of the merge must pass fixed, built-in rules: nothing either side wrote is dropped, nothing either side changed is undone, no key or `case` label is stated twice, and the file still parses. The gate is deterministic code, the same on every run, with no AI in it. 3. **Verify.** Your command runs on the merged"
+  }
+ ]
+}

@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-twin-gatus",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/TwiN/gatus",
+ "reviewed_commit": "1cf79275cd7bd761f19ca731bd5cd24cdec37797",
+ "readme_path": "README.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "scheduling-supervision"
+ ],
+ "claim": "Source and documentation review of TwiN/gatus at commit 1cf79275cd7bd761f19ca731bd5cd24cdec37797 (license Apache-2.0), read from README.md at that commit. Repository description: \"Automated developer-oriented status page with alerting and incident support\". Survived the landscape-sweep-20261006-runtimes facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 12253,
+  "pushed_at": "2026-10-05T06:33:42Z",
+  "archived": false,
+  "default_branch": "master"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@1cf79275cd7bd761f19ca731bd5cd24cdec37797",
+   "text": "Gatus is a developer-oriented health dashboard that gives you the ability to monitor your services using HTTP, ICMP, TCP, and even DNS queries as well as evaluate the result of said queries by using a list of conditions on values like the status code, the response time, the certificate expiration, the body and many others. The icing on top is that each of these health checks can be paired with alerting via Slack, Teams, PagerDuty, Discord, Twilio and many more."
+  },
+  {
+   "source": "README.md@1cf79275cd7bd761f19ca731bd5cd24cdec37797",
+   "text": "I personally deploy it in my Kubernetes cluster and let it monitor the status of my core applications: https://status.twin.sh/"
+  },
+  {
+   "source": "README.md@1cf79275cd7bd761f19ca731bd5cd24cdec37797",
+   "text": "_Looking for a managed solution? Check out [Gatus.io](https://gatus.io)._"
+  }
+ ]
+}

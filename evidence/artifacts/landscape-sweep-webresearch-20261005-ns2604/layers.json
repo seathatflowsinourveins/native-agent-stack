@@ -1,0 +1,215 @@
+[
+ {
+  "catalog": "foundation",
+  "layer_id": "web-research",
+  "votes": "retained",
+  "discovery_ref": "@RETURNS@#/discovery/web-research",
+  "calls": {
+   "web_search": 10,
+   "web_fetch": 11,
+   "gh_api": 50,
+   "gpt6_web_search": 24,
+   "gpt6_web_fetch": 16,
+   "gpt6_gh_api": 80
+  },
+  "proposed": [
+   "https://github.com/chromedevtools/chrome-devtools-mcp",
+   "https://github.com/unclecode/crawl4ai",
+   "https://github.com/exa-labs/exa-mcp-server",
+   "https://github.com/adbar/trafilatura",
+   "https://github.com/1broseidon/ketch",
+   "https://github.com/knockoutez/wigolo",
+   "https://github.com/browserbase/stagehand",
+   "https://github.com/d4vinci/scrapling",
+   "https://github.com/krlabsorg/lettucedetect",
+   "https://github.com/commoncrawl/cdx_toolkit",
+   "https://github.com/meridianlabs-ai/inspect_swe",
+   "https://github.com/promptfoo/promptfoo",
+   "https://github.com/ukgovernmentbeis/inspect_evals",
+   "https://github.com/answerdotai/llms-txt",
+   "https://github.com/anthropics/claude-code",
+   "https://github.com/vulcanlab/ipi-proxy"
+  ],
+  "survived": [
+   {
+    "repo": "https://github.com/exa-labs/exa-mcp-server",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/web-research/2/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/web-research/2/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/adbar/trafilatura",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/web-research/3/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/web-research/3/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/krlabsorg/lettucedetect",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/web-research/8/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/web-research/8/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/commoncrawl/cdx_toolkit",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/web-research/9/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/web-research/9/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/vulcanlab/ipi-proxy",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/web-research/15/facts"
+    },
+    "fit": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/web-research/15/fit"
+    }
+   }
+  ],
+  "refuted": [
+   {
+    "repo": "https://github.com/chromedevtools/chrome-devtools-mcp",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/web-research/0/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/web-research/0/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/unclecode/crawl4ai",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/web-research/1/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/web-research/1/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/1broseidon/ketch",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/web-research/4/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/web-research/4/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/knockoutez/wigolo",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/web-research/5/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/web-research/5/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/browserbase/stagehand",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/web-research/6/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/web-research/6/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/d4vinci/scrapling",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/web-research/7/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/web-research/7/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/meridianlabs-ai/inspect_swe",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/web-research/10/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/web-research/10/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/promptfoo/promptfoo",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/web-research/11/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/web-research/11/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/ukgovernmentbeis/inspect_evals",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/web-research/12/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/web-research/12/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/answerdotai/llms-txt",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/web-research/13/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/web-research/13/fit"
+    }
+   },
+   {
+    "repo": "https://github.com/anthropics/claude-code",
+    "facts": {
+     "vote": "not_refuted",
+     "ref": "@RETURNS@#/votes/web-research/14/facts"
+    },
+    "fit": {
+     "vote": "refuted",
+     "ref": "@RETURNS@#/votes/web-research/14/fit"
+    }
+   }
+  ],
+  "reopen": []
+ }
+]

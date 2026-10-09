@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-microsoft-mcp-gateway",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/microsoft/mcp-gateway",
+ "reviewed_commit": "ce37788ae0719fd73a1707c9a7bc379a68dd775e",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "mcp-surfaces"
+ ],
+ "claim": "Source and documentation review of microsoft/mcp-gateway at commit ce37788ae0719fd73a1707c9a7bc379a68dd775e (license MIT), read from README.md at that commit. Repository description: \"MCP Gateway is a reverse proxy and management layer for MCP servers, enabling scalable, session-aware stateful routing and lifecycle management of MCP servers in Kubernetes environments.\". Survived the landscape-sweep-20261006-runtimes facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 862,
+  "pushed_at": "2026-10-02T01:31:55Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@ce37788ae0719fd73a1707c9a7bc379a68dd775e",
+   "text": "**MCP Gateway** is a reverse proxy and management layer for [Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction) servers, enabling scalable, stateless request routing, authorization and lifecycle management of MCP servers in Kubernetes environments."
+  },
+  {
+   "source": "README.md@ce37788ae0719fd73a1707c9a7bc379a68dd775e",
+   "text": "> **Breaking change:** this version requires MCP `2026-07-28` clients and adapters. It does not provide legacy initialization, transport sessions, or protocol downgrade. See [the migration guide](docs/mcp-2026-07-28.md) for client requirements, request examples, deployment settings, and rollback considerations."
+  },
+  {
+   "source": "README.md@ce37788ae0719fd73a1707c9a7bc379a68dd775e",
+   "text": "- [Overview](#overview) - [Key Concepts](#key-concepts) - [Architecture](#architecture) - [Features](#features) - [Getting Started – Local Deployment](#getting-started---local-deployment) - [Getting Started – 1-Click Deploy to Azure](#getting-started---deploy-to-azure)"
+  }
+ ]
+}

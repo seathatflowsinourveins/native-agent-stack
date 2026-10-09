@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-commoncrawl-cdx-toolkit",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/commoncrawl/cdx_toolkit",
+ "reviewed_commit": "e87b1204993b77a4c41c03239baefa1c8462a6e1",
+ "readme_path": "README.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "web-research"
+ ],
+ "claim": "Source and documentation review of commoncrawl/cdx_toolkit at commit e87b1204993b77a4c41c03239baefa1c8462a6e1 (license Apache-2.0), read from README.md at that commit. Repository description: \"A toolkit for CDX indices such as Common Crawl and the Internet Archive's Wayback Machine\". Survived the landscape-sweep-webresearch-20261005-ns2604 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 216,
+  "pushed_at": "2026-09-07T04:38:17Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@e87b1204993b77a4c41c03239baefa1c8462a6e1",
+   "text": "cdx_toolkit is a set of tools for working with CDX indices of web crawls and archives, including those at the Common Crawl Foundation (CCF) and those at the Internet Archive's Wayback Machine."
+  },
+  {
+   "source": "README.md@e87b1204993b77a4c41c03239baefa1c8462a6e1",
+   "text": "Common Crawl uses Ilya Kreymer's pywb to serve the CDX API, which is somewhat different from the Internet Archive's CDX API server. cdx_toolkit hides these differences as best it can. cdx_toolkit also knits together the monthly Common Crawl CDX indices into a single, virtual index."
+  },
+  {
+   "source": "README.md@e87b1204993b77a4c41c03239baefa1c8462a6e1",
+   "text": "Finally, cdx_toolkit allows extracting archived pages from CC and IA into WARC files. If you're looking to create subsets of CC or IA data and then further process them, this is a feature you'll find useful."
+  }
+ ]
+}
