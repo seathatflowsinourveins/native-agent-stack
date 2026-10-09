@@ -17692,8 +17692,8 @@
     },
     {
       "path": "docs/decisions/2026-09-27-model-currency.md",
-      "sha256": "c3e2d0a439a8c0a0e74d9f607e69ddde65ffbbc1cdcf4da6b0048f6af5076564",
-      "bytes": 57789
+      "sha256": "387f9250e7c5f4848644b36d708c94740df7867105bdb062e3baab1d3502b38f",
+      "bytes": 59664
     },
     {
       "path": "docs/decisions/2026-09-27-omniroute-account-pool.md",
@@ -17784,6 +17784,16 @@
       "path": "docs/decisions/2026-09-30-omniroute-runtime-workers.md",
       "sha256": "22c52104ccec6af101427f16fa9ac85aa3b1b812d0b7e7d2a122cda43c3dd0e7",
       "bytes": 11606
+    },
+    {
+      "path": "docs/decisions/2026-09-30-sol-primary-quality-defaults.md",
+      "sha256": "a70bc9cbeb2cf016f8e13edd406ebd5c255fcf909a7059afe41c3519734f4b55",
+      "bytes": 11003
+    },
+    {
+      "path": "docs/decisions/2026-09-30-task-model-routing.md",
+      "sha256": "32e2a30e9c73cc1093993d72dd4d2de2d0e661c0fbe8ba2969b043aa77d43aa9",
+      "bytes": 44899
     },
     {
       "path": "docs/decisions/2026-10-01-mac-runtime-memory-candidates.md",
@@ -18662,8 +18672,8 @@
     },
     {
       "path": "docs/token-practice.md",
-      "sha256": "0472591d527cfc3989c2be2fbcbe49cd9c623cbe4a3749e431928450d2bc1f03",
-      "bytes": 57165
+      "sha256": "cefdb897b4f18b934141ab97129ab0fe37df6751b0e8d7209b866d80e5332d20",
+      "bytes": 61772
     },
     {
       "path": "docs/token-session-handbook.md",

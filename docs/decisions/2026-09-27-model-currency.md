@@ -528,3 +528,31 @@ they describe the September 27 state. The
 also points forward and retains its old quote through this record's unchanged line 132. Keeping Fable was the previous
 selection; Opus replaces it at the user's request, with post-change savings and quality still unmeasured. Revisit the
 selection through the October 4 record's observation contract or a subsequent user decision.
+
+## Addendum (2026-10-09): generic-child template quote is historical
+
+The September 30 addendum's `default_subagent_model = "${CODEX_MODEL}"`
+quotation at lines 418–419, its template lines 30–31 citation, and its combined
+primary-worker/generic-child row at line 450 describe the recorded September
+30 revision. They remain as historical provenance for that change, alongside
+the dated installed-client and gateway observations; they do not assert the
+current template or this host's live settings.
+
+The current repository template omits `agents.default_subagent_model`, while
+keeping the root `CODEX_MODEL` placeholder, Max child effort and explicit
+worker and role selections. An unspecified generic child now retains its
+active parent model. The updated
+[Sol-primary decision](2026-09-30-sol-primary-quality-defaults.md#addendum-2026-10-09-generic-children-inherit-their-parent-model)
+and [task-routing table](2026-09-30-task-model-routing.md#decision) supersede
+that generic-child enforcement statement. The table now has two globally
+Sol-bound routes, coordinator and explicit primary workers; generic children
+have their own inherited-model row. The old installed-model counts and
+gateway measurements remain historical and were not rerun or reinterpreted.
+
+Primary source: [openai/codex rust-v0.162.0, child_config.rs:115,137,204,243-249](https://github.com/openai/codex/blob/rust-v0.162.0/codex-rs/core/src/agent/child_config.rs#L115).
+The rust-v0.161.0 file is byte-identical, SHA-256
+`33d4dd6f70e6640af1059398272c48b88e16e0005105fbd1ef13e30456d39a39`.
+The [behavior record](../token-practice.md#generic-child-model-default-omission)
+names lane and role effects and the changed expectation declarations. This is
+a repository proposal with no measured savings or live application; F9 applies
+only after landing from a reviewed diff and the required owner gates.

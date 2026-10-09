@@ -21,9 +21,9 @@ or a failure unresolved after one bounded Sol repair. Explicit task
 model choices take precedence over this default. Preserve Astra judgment roles
 and verify the resolved role, model and effort before accepting their output.
 
-The native user configuration sets `model = "gpt-6.1-sol"`,
-`model_reasoning_effort = "ultra"`, `agents.default_subagent_model =
-"gpt-6.1-sol"` and `agents.default_subagent_reasoning_effort = "max"`.
+The repository template renders `model = "${CODEX_MODEL}"` from the platform pin,
+and sets `model_reasoning_effort = "ultra"`. It leaves `agents.default_subagent_model`
+unset; generic children retain the parent model with `agents.default_subagent_reasoning_effort = "max"`.
 Keep three concurrent children. The bounded worker profile selects Sol/Max;
 worker commands also pass their model, effort and live-search choice explicitly
 because project settings outrank a profile. Astra workers substitute the model
@@ -133,3 +133,29 @@ claiming task-level quality. Count every attempt once, keep cache/provider
 subsets distinct, and retain failures and unknown usage. Reopen routing when a
 comparable workload demonstrates better accepted resolution or lower complete
 task cost at the same acceptance bar.
+
+## Addendum (2026-10-09): generic children inherit their parent model
+
+The template now omits the generic model default. This supersedes the September
+30 choice to force every unspecified generic child to the template's rendered
+Sol model. The root placeholder and explicit stack-worker Sol binding stay;
+an unspecified generic child of another parent model now follows that parent.
+The Max default remains, and explicit spawn and role model selections retain
+their native precedence.
+
+Source: [openai/codex rust-v0.162.0, child_config.rs:115](https://github.com/openai/codex/blob/rust-v0.162.0/codex-rs/core/src/agent/child_config.rs#L115)
+and [line 137](https://github.com/openai/codex/blob/rust-v0.162.0/codex-rs/core/src/agent/child_config.rs#L137)
+copy the parent slug; [line 204](https://github.com/openai/codex/blob/rust-v0.162.0/codex-rs/core/src/agent/child_config.rs#L204)
+selects an optional generic override, and lines 243–249 apply effort without
+replacing the model. The rust-v0.161.0 file is byte-identical, SHA-256
+`33d4dd6f70e6640af1059398272c48b88e16e0005105fbd1ef13e30456d39a39`.
+
+The [task-routing table](2026-09-30-task-model-routing.md#decision) now records
+generic children as inherited, rather than as a third globally Sol-bound
+route. [The behavior record](../token-practice.md#generic-child-model-default-omission)
+names the affected lanes, conditional nested-role effects and changed test
+expectations. The earlier selected model and effort choices for explicit
+workers and roles remain distinct from this inherited generic path. No token
+or cache saving was measured. This edits the repository proposal only; F9
+applies the landed template from a reviewed diff after the required reads,
+pre-cue tool, CI and explicit command-center cue.

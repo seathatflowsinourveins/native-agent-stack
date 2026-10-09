@@ -6,11 +6,11 @@ upstream acceptance and not a model run. Every value the record's table quotes f
 must still be in that file as a whole value, not as the tail or head of a longer name, at least once for each distinct
 line the table quotes it from, and every `path:line` the table cites must exist. The record reads its line numbers at
 the revisions it names, so an edit that only moves a quoted value passes here, while a change to an agent's
-frontmatter, a settings template key, a Codex profile or a lane constant fails until the record is restated. The dated
-generic-child model override is the one historical quote: the current template omits that key so children inherit
-the active parent's model. Its Max effort and the coordinator's platform model remain checked against live files.
+frontmatter, a settings template key, a Codex profile or a lane constant fails until the record is restated. Generic
+children inherit the active parent's model, so the user template must omit a generic child model override while
+retaining Max effort. The coordinator's platform model remains checked against the rendered template.
 GPT-6.1 Sol is routed where the Sol-primary routing record of unit D4 (#542) routes it and nowhere else: the table's
-Sol rows are the Codex coordinator, the primary workers and the generic children, the Codex user template renders on
+Sol rows are the Codex coordinator and the primary workers, the Codex user template renders on
 each pinned platform the model the coordinator row names for it, and each GPT-6.1 binding in a routing file, one by
 one (a TOML key by its table, a constant, or a command's `-m` with the profile it selects), is one a Sol row cites by
 file and name and one that D4 routes. A mention in prose is not a binding.
@@ -53,14 +53,12 @@ EXTENSIONS = r"(?:md|json|toml|py|js|mjs|sh|yml)"
 CITE = re.compile(rf"`([\w./-]+\.{EXTENSIONS}):(\d+(?:-\d+)?(?:,\d+(?:-\d+)?)*)`")
 # A quoted value runs from "says" to the next ";" or the end of the cell, one or more backticked strings.
 SAYS = re.compile(rf"`([\w./-]+\.{EXTENSIONS}):(\d+)(?:-(\d+))?` says ([^;]+)")
-# GPT-6.1 Sol's routes as docs/decisions/2026-09-30-sol-primary-quality-defaults.md sets them: Sol/Ultra coordinates
-# Codex, and Sol/Max runs the primary workers and the generic children. Each key is part of one row's task class, and
-# the value is the effort that row names.
-SOL_ROUTES = {"interactive codex": "ultra", "primary codex workers": "max", "generic codex children": "max"}
+# GPT-6.1 Sol's configured routes: Sol/Ultra coordinates Codex and Sol/Max runs the primary workers. Generic children
+# inherit their active parent's model, with Max effort, so they do not form a globally Sol-pinned route.
+SOL_ROUTES = {"interactive codex": "ultra", "primary codex workers": "max"}
 USER_TEMPLATE = "adoption/templates/codex.config.template.toml"
 STACK_WORKER = "adoption/templates/codex.stack-worker.config.toml"
 PLACEHOLDER = "${CODEX_MODEL}"
-HISTORICAL_CHILD_MODEL_QUOTE = f'default_subagent_model = "{PLACEHOLDER}"'
 RENDER_CONFIG = ROOT / "tools" / "adoption" / "render_config.py"
 # The coordinator row's statement of what the user template renders on one platform: "`<platform>` renders `<model>`".
 RENDERS = re.compile(r"`([a-z0-9]+-[a-z0-9_]+)` renders `([\w.-]+)`")
@@ -82,11 +80,10 @@ SOL_VALUE = re.compile(rf"(?:[\w.-]+/)?gpt-6\.1|{re.escape(PLACEHOLDER)}$", re.I
 COMMAND_PROFILE = re.compile(r"""(?:(?<![\w-])-p|--profile)(?:\s+|=)["'`]?([\w.-]+)""")
 # A quoted TOML table header, such as `[profiles.name]`, scopes the key quotes after it in the same "says" clause.
 TABLE_HEADER = re.compile(r"\[[^\[\]]+\]")
-# The GPT-6.1 bindings D4 makes (docs/decisions/2026-09-27-model-currency.md:414-422 and :484-487 at 1f2cdce5): the user
-# template's coordinator `model` and `[agents] default_subagent_model`, the constant that renders their placeholder, the
-# stack-worker profile's `model`, and the stack-worker command's `-m` wherever that command is written.
-# The generic-child model override is historical; the current template leaves that binding absent.
-D4_BINDINGS = {(USER_TEMPLATE, "model"), (USER_TEMPLATE, "agents.default_subagent_model"),
+# D4's current GPT-6.1 bindings: the user template's coordinator `model`, the constant that renders its placeholder,
+# the stack-worker profile's `model`, and the stack-worker command's `-m` wherever that command is written. The user
+# template leaves the generic-child model unbound so a child inherits its active parent's model.
+D4_BINDINGS = {(USER_TEMPLATE, "model"),
                ("tools/adoption/render_config.py", "CODEX_MODEL_CURRENT"), (STACK_WORKER, "model")}
 D4_COMMAND = "-p stack-worker -m"
 
@@ -231,22 +228,15 @@ class TaskModelRoutingRecordTests(unittest.TestCase):
         # A value counts only as a whole: `model = "${CODEX_MODEL}"` inside `default_subagent_model = "${CODEX_MODEL}"`
         # is not the template's model line.
         cited: dict[tuple[str, str], set[str]] = {}
-        cited_rows: dict[tuple[str, str], set[str]] = {}
         for row in self.rows:
             for path, first, last, said in SAYS.findall(row[4]):
                 quotes = re.findall(r"`([^`]+)`", said)
                 self.assertTrue(quotes, f"{row[0]}: {path}:{first} quotes nothing")
                 for quote in quotes:
                     cited.setdefault((path, quote), set()).add(f"{first}-{last or first}")
-                    cited_rows.setdefault((path, quote), set()).add(row[0])
         self.assertGreaterEqual(sum(map(len, cited.values())), 30, "the table quotes its enforcement points")
         for (path, quote), spans in sorted(cited.items()):
             with self.subTest(cited=path, quote=quote):
-                if (path, quote) == (USER_TEMPLATE, HISTORICAL_CHILD_MODEL_QUOTE):
-                    self.assertTrue(all("generic codex children" in row.lower()
-                                        for row in cited_rows[(path, quote)]))
-                    self.assertNotIn("default_subagent_model", tomllib.loads((ROOT / path).read_text())["agents"])
-                    continue
                 whole = re.compile(rf"(?<![\w.-]){re.escape(quote)}(?![\w.-])")
                 found = len(whole.findall((ROOT / path).read_text(encoding="utf-8")))
                 self.assertGreaterEqual(found, len(spans), sorted(spans))
@@ -273,7 +263,7 @@ class TaskModelRoutingRecordTests(unittest.TestCase):
                 self.assertEqual(row[3], "max")
 
     def test_gpt_6_1_sol_is_routed_where_the_sol_primary_record_routes_it_and_nowhere_else(self):
-        # The table's Sol rows are the record's three routes, each a Codex row at the record's effort.
+        # The table's Sol rows are the two configured routes, each a Codex row at the record's effort.
         sol = [row for row in self.rows if "`gpt-6.1-sol`" in row[2]]
         self.assertEqual(len(sol), len(SOL_ROUTES), [row[0] for row in sol])
         for route, wanted in SOL_ROUTES.items():
@@ -282,23 +272,19 @@ class TaskModelRoutingRecordTests(unittest.TestCase):
                 self.assertEqual((row[1], effort(row)), ("Codex CLI", wanted))
         # Nowhere else, binding by binding: each GPT-6.1 binding in a routing file is one a Sol row cites by file and
         # name, and one D4 makes. The scan must find the user template's coordinator key by table and the stack-worker
-        # profile's `model`, while its historical generic-child override is absent.
+        # profile's `model`, while the generic-child model stays unbound.
         texts = routing_texts()
         template = sol_bindings(USER_TEMPLATE, texts[USER_TEMPLATE])
         self.assertEqual(template["model"], 1)
         self.assertNotIn("agents.default_subagent_model", template)
         self.assertEqual(sol_bindings(STACK_WORKER, texts[STACK_WORKER])["model"], 1)
         self.assertEqual(routing_problems(self.rows, texts), [])
-        # The generic-child row records its former override; the other Sol rows still cite live bindings.
+        # Each configured Sol row cites at least one live binding.
         for row in sol:
             with self.subTest(row=row[0]):
                 names = [name for path, _first, _last, said in SAYS.findall(row[4])
                          for name in cited_sol_bindings(path, re.findall(r"`([^`]+)`", said), texts[path])[0]]
-                if "generic codex children" in row[0].lower():
-                    self.assertIn(f"`{HISTORICAL_CHILD_MODEL_QUOTE}`", row[4])
-                    self.assertEqual(names, [])
-                else:
-                    self.assertTrue(names, row[4])
+                self.assertTrue(names, row[4])
 
     def test_a_gpt_6_1_binding_planted_in_a_cited_file_is_caught(self):
         # The cross-family review of round 2: a profile added to the user template, a file the coordinator row already
@@ -325,11 +311,12 @@ class TaskModelRoutingRecordTests(unittest.TestCase):
             "binding"])
 
     def test_the_user_template_renders_on_each_platform_the_model_its_rows_name(self):
-        # The coordinator row still names the rendered platform model. The generic-child row's model override is
-        # historical, while its Max effort remains current. Render each pinned platform and require that the child
-        # model stays unbound, as tests/test_render_config.py's CodexModelTests do.
+        # The coordinator row names the rendered platform model. Generic children inherit the active parent's
+        # model at Max effort. Render each pinned platform and require that the child model stays unbound, as
+        # tests/test_render_config.py's CodexModelTests do.
         [coordinator] = [row for row in self.rows if "interactive codex" in row[0].lower()]
         [children] = [row for row in self.rows if "generic codex children" in row[0].lower()]
+        self.assertEqual((children[1], effort(children)), ("Codex CLI", "max"))
         stated = dict(RENDERS.findall(coordinator[2]))
         platforms = sorted(path.name[len("pins-"):-len(".json")] for path in (ROOT / "adoption").glob("pins-*.json"))
         self.assertEqual(sorted(stated), platforms)

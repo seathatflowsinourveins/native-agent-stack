@@ -791,23 +791,50 @@ does not turn that retained fixture into a new native run.
 
 The existing template-read tests now require the generic model key to be
 absent while preserving the root model, Max effort and explicit role checks.
-The intentionally failing original-head checks below declare the expected
-method set for the lander's comparison against main. The lander must still
-run main's versions on a fresh merge and compare the actual failing set.
+The pre-cue tool ran the base versions of the three changed modules against
+head `8e1d60e231e1e290b50ca934efd17a6f0fb6a0cf` and returned rc 1. Its retained
+report is
+`coordination/ns2604-coop/gpt-reads/extra-902-8e1d60e2/BASE-TESTS-AT-HEAD-8e1d60e2.txt`,
+2,914 bytes, SHA-256
+`856315647e5f9b6f3344e7c4387efe57acf39196bc011e3af9688579b93a1493`.
+It printed nine distinct methods and eleven failing entries: render_config
+had five errors and one failure, task_model_routing had two errors and two
+failures, and codex_roles had one error. The duplicated errors are the two
+platform subcases of each rendering method. Each changed expectation is
+declared below by the method name printed in that report.
 
-| Module | Intentionally changed unittest methods |
-| --- | --- |
-| tests.test_render_config | RenderConfigTests.test_codex_user_template_sets_the_verified_base_keys |
-| tests.test_render_config | CodexModelTests.test_the_template_names_its_models_only_through_the_placeholder |
-| tests.test_render_config | CodexModelTests.test_each_platform_renders_the_model_its_pinned_codex_lists |
-| tests.test_render_config | CodexModelTests.test_a_host_supplied_model_wins_over_the_pin |
-| tests.test_render_config | CodexModelTests.test_a_platform_without_a_pins_file_fails_closed_unless_the_model_is_given |
-| tests.test_codex_roles | WorkerRoleSourceTests.test_the_builder_takes_the_lanes_model_at_max |
-| tests.test_task_model_routing | TaskModelRoutingRecordTests.test_every_quoted_value_is_in_its_cited_file |
-| tests.test_task_model_routing | TaskModelRoutingRecordTests.test_gpt_6_1_sol_is_routed_where_the_sol_primary_record_routes_it_and_nowhere_else |
-| tests.test_task_model_routing | TaskModelRoutingRecordTests.test_the_user_template_renders_on_each_platform_the_model_its_rows_name |
+| Exact unittest method | Pre-cue entry at 8e1d60e2 | Old expectation, new expectation and reason |
+| --- | --- | --- |
+| tests.test_render_config.RenderConfigTests.test_codex_user_template_sets_the_verified_base_keys | ERROR | Read `agents["default_subagent_model"]` and require the fixture's rendered model. The key is now absent, so the old access raises KeyError; the updated check requires absence while retaining the root fixture model and Max effort. |
+| tests.test_render_config.CodexModelTests.test_the_template_names_its_models_only_through_the_placeholder | FAIL | Require both `model` and `default_subagent_model` to bind `${CODEX_MODEL}`. Only root `model` remains; the updated check requires that single placeholder binding so generic children can inherit their active parent. |
+| tests.test_render_config.CodexModelTests.test_each_platform_renders_the_model_its_pinned_codex_lists | ERROR twice: `(platform='linux-x86_64')` and `(platform='macos-arm64')` | The old helper reads both rendered root and child keys and raises KeyError in each platform subcase. The updated helper requires child-key absence and still checks each platform's root model against its pin. These two entries count as one method. |
+| tests.test_render_config.CodexModelTests.test_a_host_supplied_model_wins_over_the_pin | ERROR | The old helper requires the host-supplied model in both root and generic-child bindings. The updated check keeps the root override (`gpt-6-sol` in the fixture) and requires an absent child key; no template child model is forced. |
+| tests.test_render_config.CodexModelTests.test_a_platform_without_a_pins_file_fails_closed_unless_the_model_is_given | ERROR | After the explicit `CODEX_MODEL=gpt-6-astra` override, the old helper reads both root and child keys. The updated check retains the missing-pin refusal and explicit root selection, while requiring an absent child key. |
+| tests.test_codex_roles.WorkerRoleSourceTests.test_the_builder_takes_the_lanes_model_at_max | ERROR | Require the template pair `("${CODEX_MODEL}", "max")`. The updated check requires no generic model key and Max effort; isolated-builder still names no model and explicit Astra carriers retain their pins. |
+| tests.test_task_model_routing.TaskModelRoutingRecordTests.test_every_quoted_value_is_in_its_cited_file | FAIL | The old record quotes `default_subagent_model = "${CODEX_MODEL}"` at template lines 30–31, so the missing quote fails the required match count. The record now quotes only the live Max-effort key at line 30 and states model inheritance; unconditional quoted-value verification is restored. This old method passes after the stale record is corrected. |
+| tests.test_task_model_routing.TaskModelRoutingRecordTests.test_gpt_6_1_sol_is_routed_where_the_sol_primary_record_routes_it_and_nowhere_else | FAIL: `(1, 0)` against `(1, 1)` | Require one root and one generic-child model binding, plus three globally Sol-routed rows. The template now has one root binding and no child binding; the table has two rows with explicit Sol model bindings and one inherited-model child row. The updated check requires those two routes and rejects a generic model binding; the old version now fails earlier on two rows against three. |
+| tests.test_task_model_routing.TaskModelRoutingRecordTests.test_the_user_template_renders_on_each_platform_the_model_its_rows_name | ERROR twice; both printed entries have the same method name, with the report clipping the long parenthesized selector | Require the rendered generic-child model to equal the root model on each platform. The updated check keeps the root model/effort check, requires the child model key absent and retains generic-child Max effort. The two entries count as one method. |
 
-All 11 test modules mentioning this template ran separately under
+For the revised records, eight distinct base-version methods remain intentional
+failures: all five render_config methods, the builder method, and the Sol-routing
+and per-platform rendering methods. The quoted-value method now passes because
+its stale enforcement quote is corrected. This declares the observed nine-method
+pre-cue result and the revised eight-method failing set separately. The lander
+must run current main's versions on a fresh merge and compare the actual set;
+a new method, missing expected method or unrelated failure still requires a hold.
+
+Three decision records are reconciled in the same head. The current generic-child
+row in [task-model-routing](decisions/2026-09-30-task-model-routing.md#decision)
+now names the parent slug and the remaining Max key, and the
+[Sol-primary record](decisions/2026-09-30-sol-primary-quality-defaults.md#addendum-2026-10-09-generic-children-inherit-their-parent-model)
+states the omission and preserves explicit worker and role selections. The
+[model-currency addendum](decisions/2026-09-27-model-currency.md#addendum-2026-10-09-generic-child-template-quote-is-historical)
+explains why its September 30 lines 418–419 and 450 stay: they document that
+revision and its historical observations, which were not rerun or reinterpreted.
+They no longer claim current generic-child enforcement. This removes the routing
+test's historical-quote exception; every live enforcement quote is checked again.
+
+At the first fold head, all 11 test modules mentioning this template ran separately under
 `timeout 600`. Ten passed. The unchanged `tests.test_windows_terminal_defaults`
 module failed only
 `OverlayTests.test_the_installed_client_knows_no_notification_type_without_a_decision`:
