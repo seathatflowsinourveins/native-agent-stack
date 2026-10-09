@@ -191,6 +191,8 @@ class Checkout:
         self.set(STALENESS, staleness_report())
         self.set(PINNED, pinned_report())
         self.set(SATURATION, saturation_report([("foundation/workers", False, "sweep-a")]))
+        self.set(cd.ACTIVE_MODELS[0], {"schema_version": 1, "status": "current", "stale_count": 0,
+                                      "findings": [], "errors": []})
         self.write_ledger(ledger(("sweep-a", "2026-09-29", "completed")))
         # The user manager's answer that run() hands the script instead of this host's: {unit: properties}, or a string
         # saying why it could not be asked. No unit by default.
@@ -1583,9 +1585,12 @@ class ThisCheckoutTests(unittest.TestCase):
         # catches a pathological slowdown on slower runners.
         with tempfile.TemporaryDirectory(dir=short_temp_base()) as temporary:
             state = Path(temporary) / "state"
+            catalog_time = datetime.fromisoformat(
+                json.loads((ROOT / "catalogs/foundation/latest-models.json").read_text())["generated_at"].replace("Z", "+00:00"))
             started = time.monotonic()
             result = subprocess.run([sys.executable, str(ROOT / "scripts/currency_due.py"), "--dry-run", "--json",
-                                     "--state-dir", str(state)], capture_output=True, text=True, timeout=600,
+                                      "--state-dir", str(state), "--now",
+                                      catalog_time.strftime("%Y-%m-%dT%H:%M:%SZ")], capture_output=True, text=True, timeout=600,
                                     cwd=ROOT, stdin=subprocess.DEVNULL, check=False)
             elapsed = time.monotonic() - started
             self.assertEqual(result.returncode, 0, result.stderr[-2000:])

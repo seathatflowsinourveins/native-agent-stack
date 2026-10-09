@@ -105,7 +105,9 @@ LABELS = {"pins_behind": ("pin behind", "pins behind"),
 # The upstream-surface watch's report (scripts/upstream_surface_watch.py, its default state directory under this one).
 # Its count joins the due counts only while the report is fresh, so DUE_KEYS keeps the five counts every run has.
 SURFACE_KEY = "surface_unreviewed"
-COUNT_KEYS = (*DUE_KEYS, SURFACE_KEY)
+MODEL_KEY = "stale_models"
+LABELS[MODEL_KEY] = ("stale model selector", "stale model selectors")
+COUNT_KEYS = (*DUE_KEYS, SURFACE_KEY, MODEL_KEY)
 SURFACE_DIR = "surface-watch"
 SURFACE_FILE = "latest.json"
 SURFACE_MAX_AGE_DAYS = 3
@@ -175,6 +177,7 @@ RECEIPTS = ("scripts/receipt_staleness.py", frozenset({0}), 120)
 LAYERS = ("scripts/saturation_ledger.py", frozenset({0}), 120)
 PINS = ("scripts/adoption_status.py", frozenset({0, 2}), 600)
 SKILLS = ("tools/adoption/runtime_skill_freshness.py", frozenset({0, 1}), 900)
+ACTIVE_MODELS = ("scripts/active_model_currency.py", frozenset({0, 1, 2}), 30)
 
 
 class CheckError(Exception):
@@ -326,8 +329,10 @@ def collect(root: Path, now_text: str, network: bool, state: Path | None = None)
         except OSError:
             observed_before = True  # an inaccessible state directory cannot prove that the watch never ran
         surface = {"record": read_record(surface_dir / SURFACE_FILE), "observed_before": observed_before}
+    models = parse_report("active_model_currency.py", run_check(
+        root, ACTIVE_MODELS, ["check", "--root", str(root), "--host", "--json", "--now", now_text]))
     return {"receipts": receipts, "layers": layers, "pins": pins, "skills": skills, "sweep_dates": sweep_dates(root),
-            "host": host, "surface": surface}
+            "host": host, "surface": surface, "active_models": models}
 
 
 def report_options(network: bool, cadence_days: int) -> list[str]:
@@ -668,14 +673,30 @@ def aggregate(reports: dict, now: datetime, now_text: str, cadence_days: int, ro
     surface_count, surface_details, surface_coverage = surface_findings(reports.get("surface"), now)
     details += surface_details
 
+    models = reports.get("active_models")
+    model_count = 0
+    model_coverage = {}
+    if models is not None:
+        if not isinstance(models, dict) or models.get("status") not in {"current", "stale"}:
+            raise CheckError("active-model catalog or selector check is incomplete")
+        model_count = models.get("stale_count")
+        if (type(model_count) is not int or model_count < 0 or not isinstance(models.get("findings"), list)
+                or len(models["findings"]) != model_count or models.get("errors")
+                or (models["status"] == "current") != (model_count == 0)):
+            raise CheckError("active-model check returned an invalid report")
+        model_coverage = {"active_models": models["status"]}
+        details += [{"kind": "stale_model", **item} for item in models["findings"] if isinstance(item, dict)]
+
     details.append({"kind": "coverage", "pins_unchecked": len(unchecked), "due_layers_total": due_total,
                     "sweep_cadence_days": cadence_days, "network": skills is not None,
                     "skills_complete": skills_complete, "skills_fetch_errors": skills_errors,
-                    "skills_unresolved": skills_unresolved, **host_coverage, **surface_coverage})
+                    "skills_unresolved": skills_unresolved, **host_coverage, **surface_coverage, **model_coverage})
     due = {"pins_behind": pins_behind, "stale_receipts": stale_receipts, "due_layers": due_layers,
            "reopen_triggers": reopen_triggers, "host_alerts": len(alerts)}
     if surface_count is not None:
         due[SURFACE_KEY] = surface_count
+    if model_count:
+        due[MODEL_KEY] = model_count
     command = details_command(root, skills is not None, cadence_days)
     if due_file is None:  # a direct caller: the default state directory, as main() would resolve it
         due_file, from_xdg = default_state_dir() / DUE_FILE, os.path.isabs(os.environ.get("XDG_STATE_HOME") or "")
@@ -731,7 +752,9 @@ def render_text(document: dict) -> str:
     lines = [document["summary_line"]]
     for item in document["details"]:
         kind = item["kind"]
-        if kind == "pin_mismatch":
+        if kind == "stale_model":
+            lines.append(f"  model: {item.get('path')}:{item.get('line')} {item.get('model')} -> {item.get('expected')}")
+        elif kind == "pin_mismatch":
             lines.append(f"  pin: {item['component_id']} did not report its pin {item['pinned_version']} "
                          f"({', '.join(str(profile) for profile in item['profiles'])})")
         elif kind in ("skill_drift", "skill_pin_invalid"):
@@ -870,7 +893,7 @@ def main(argv: list[str] | None = None) -> int:
         print(render_text(document))
     else:
         print(f"{document['summary_line']} ({action})")
-    return 0
+    return 1 if document["due"].get(MODEL_KEY) else 0
 
 
 if __name__ == "__main__":

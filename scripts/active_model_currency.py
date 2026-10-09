@@ -1,0 +1,423 @@
+#!/usr/bin/env python3
+"""Generate the hosted-family catalog and check active model selectors.
+
+Only catalog metadata is consumed; this module never starts a model or a
+Claude process. Check/notice are offline and never change configuration.
+Findings contain a locator and model IDs, never source lines or other values.
+"""
+from __future__ import annotations
+
+import argparse
+import ast
+import fnmatch
+import hashlib
+import json
+import os
+from pathlib import Path
+import re
+import subprocess
+import sys
+from datetime import datetime, timedelta, timezone
+
+ROOT = Path(__file__).resolve().parents[1]
+MANIFEST = "catalogs/foundation/latest-models.json"
+FAMILIES = ("gpt-sol", "gpt-astra", "gpt-luna", "claude-opus", "claude-sonnet", "claude-haiku", "claude-fable")
+GPT = re.compile(r"gpt-(\d+(?:\.\d+)*)-(sol|astra|luna)\Z")
+CLAUDE = re.compile(r"claude-(opus|sonnet|haiku|fable)-(\d+(?:-\d+)?)(?:-(\d{8}))?\Z")
+MODEL = re.compile(r"(?<![\w.-])(?:gpt-[0-9][\w.-]*|gpt-reserve|codex-auto-review|o[134](?:-mini)?|claude-(?:opus|sonnet|haiku|fable)-[\w.-]+|claude-[0-9][\w.-]+)(?:\[1m\])?(?![\w.-])")
+EFFORT = re.compile(r"-(?:low|medium|high|xhigh|max|ultra)(?:-fast)?\Z")
+CLI_ALIASES = {"opus": "claude-opus", "sonnet": "claude-sonnet", "haiku": "claude-haiku", "fable": "claude-fable", "best": "claude-fable"}
+NATIVE_ROUTING_ALIASES = {"gpt-reserve", "codex-auto-review"}
+SELECTOR = re.compile(r"(?:^|_)(?:model|model_id|model_name|default_model|fallback_model|review_model|agent_model)$", re.I)
+KEY_EXCLUSIONS = {"supported_models", "available_models", "model_catalog_json", "model_pattern", "model_regex"}
+RECORD_KEYS = {"previous", "history", "historical", "examples", "landscape_check", "newer_candidates", "release_line"}
+RECORD_STATUSES = {"retired", "rejected", "superseded", "historical", "not_selected", "not-selected"}
+FROZEN_EXPERIMENTS = ("blueprints/convergence-practice/gpt6-family-tiering-20260926/", "blueprints/convergence-practice/native-recovery/", "blueprints/convergence-practice/native-worker/", "blueprints/convergence-practice/worker-recovery/")
+RECORD_PARTS = {"tests", "fixtures", "node_modules", "vendor", ".git", ".venv", "__pycache__", "receipts", "logs", "history", "archive", "backups", "captures", "raw"}
+TEXT_SUFFIXES = {"", ".py", ".js", ".cjs", ".mjs", ".ts", ".sh", ".bash", ".ps1", ".json", ".toml", ".yaml", ".yml", ".ini", ".cfg", ".env", ".md", ".service"}
+MAX_BYTES = 2_000_000
+MAX_AGE = timedelta(hours=24)
+
+
+class CurrencyError(ValueError):
+    pass
+
+
+def utc(value: str) -> datetime:
+    if not isinstance(value, str):
+        raise CurrencyError("catalog time must be an ISO timestamp")
+    result = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    if result.tzinfo is None:
+        raise CurrencyError("catalog time must include a timezone")
+    return result.astimezone(timezone.utc)
+
+
+def model_identity(identifier: str):
+    """Stable generation identity; availability or gateway created time is not rank."""
+    gpt = GPT.fullmatch(identifier)
+    if gpt:
+        return "gpt-" + gpt[2], tuple(int(x) for x in gpt[1].split("."))
+    claude = CLAUDE.fullmatch(identifier)
+    if claude and not claude[3]:
+        return "claude-" + claude[1], tuple(int(x) for x in claude[2].split("-"))
+    return None
+
+
+def generate(codex: Path, omniroute: Path, claude: Path, observed_at: str) -> dict:
+    utc(observed_at)
+    inputs = {"codex": codex, "omniroute": omniroute, "claude": claude}
+    documents = {name: json.loads(path.read_text()) for name, path in inputs.items()}
+    native = documents["codex"].get("models")
+    gateway = documents["omniroute"].get("data")
+    anthropic = documents["claude"].get("data")
+    if not all(isinstance(rows, list) and rows for rows in (native, gateway, anthropic)):
+        raise CurrencyError("all three nonempty native model catalogs are required")
+    if documents["claude"].get("has_more"):
+        raise CurrencyError("Claude catalog pagination is incomplete")
+    candidates = {}
+    for row in native:
+        identifier = row.get("slug", "")
+        identity = model_identity(identifier)
+        if identity and identity[0].startswith("gpt-"):
+            candidates.setdefault(identity[0], []).append((identity[1], identifier))
+    for row in anthropic:
+        identifier = row.get("id", "")
+        identity = model_identity(identifier)
+        if identity and identity[0].startswith("claude-") and row.get("lifecycle") == "active":
+            candidates.setdefault(identity[0], []).append((identity[1], identifier))
+    if set(candidates) != set(FAMILIES):
+        raise CurrencyError("the native catalogs do not cover all seven hosted families")
+    latest = {family: max(candidates[family])[1] for family in FAMILIES}
+    aliases = {identifier: identifier for identifier in latest.values()}
+    gateway_ids = {row.get("id") for row in gateway if isinstance(row, dict)}
+    for identifier in gateway_ids:
+        if not isinstance(identifier, str):
+            continue
+        bare = identifier.rsplit("/", 1)[-1]
+        base = EFFORT.sub("", bare)
+        if base in latest.values():
+            aliases[identifier] = base
+            # Prefixes are transport routing; a tier is accepted only when observed.
+            aliases[bare] = base
+    for identifier in latest.values():
+        if identifier.startswith("claude-"):
+            aliases[identifier + "[1m]"] = identifier
+    sources = []
+    for name, path in inputs.items():
+        rows = native if name == "codex" else gateway if name == "omniroute" else anthropic
+        sources.append({"name": name, "observed_at": observed_at, "sha256": hashlib.sha256(path.read_bytes()).hexdigest(), "rows": len(rows)})
+    routing_aliases = sorted({row["slug"] for row in native if row.get("slug") in NATIVE_ROUTING_ALIASES})
+    return {"schema_version": 1, "generated_at": datetime.now(timezone.utc).isoformat(), "observed_at": observed_at,
+            "latest": latest, "aliases": dict(sorted(aliases.items())), "native_routing_aliases": routing_aliases,
+            "sources": sources, "selection": "maximum stable generation per declared hosted family; native Codex for GPT, Anthropic active lines for Claude; gateway only supplies observed routing/effort aliases",
+            "limits": {"codex_network_refresh_certified": False, "gateway_created_is_release_date": False, "inference_or_route_resolution_qualified": False},
+            "exempt_rule": "dated evidence/decisions/research/receipts and test/reference material are records; active agents, lanes, templates, launchers and defaults are not exempt by extension or a date in their path"}
+
+
+def load_manifest(path: Path, now: datetime) -> dict:
+    try:
+        data = json.loads(path.read_text())
+        if (not isinstance(data, dict) or data.get("schema_version") != 1
+                or not isinstance(data.get("latest"), dict) or set(data["latest"]) != set(FAMILIES)):
+            raise CurrencyError("latest-models manifest has an unsupported shape")
+        if any(not isinstance(identifier, str) or not model_identity(identifier)
+               or model_identity(identifier)[0] != family for family, identifier in data["latest"].items()):
+            raise CurrencyError("latest-models manifest has an invalid family identity")
+        age = now - utc(data["generated_at"])
+        if age > MAX_AGE or age < -timedelta(minutes=5):
+            raise CurrencyError("latest-models manifest needs a fresh native catalog observation")
+        if (not isinstance(data.get("sources"), list) or len(data["sources"]) != 3
+                or not all(isinstance(row, dict) for row in data["sources"])
+                or {row["name"] for row in data["sources"]} != {"codex", "omniroute", "claude"}):
+            raise CurrencyError("latest-models manifest has incomplete catalog sources")
+        for row in data["sources"]:
+            if (type(row.get("rows")) is not int or row["rows"] <= 0
+                    or not re.fullmatch(r"[a-f0-9]{64}", row.get("sha256", ""))):
+                raise CurrencyError("latest-models source observation is invalid")
+            source_age = now - utc(row["observed_at"])
+            if source_age > MAX_AGE or source_age < -timedelta(minutes=5):
+                raise CurrencyError("latest-models source observation needs refreshing")
+        if not isinstance(data["aliases"], dict) or any(v not in data["latest"].values() for v in data["aliases"].values()):
+            raise CurrencyError("latest-model alias target is not a current family")
+        if (any(data["aliases"].get(identifier) != identifier for identifier in data["latest"].values())
+                or any(EFFORT.sub("", alias.rsplit("/", 1)[-1].removesuffix("[1m]")) != target
+                       for alias, target in data["aliases"].items())):
+            raise CurrencyError("latest-model aliases must retain the current generation identity")
+        routing = data.get("native_routing_aliases", [])
+        if (not isinstance(routing, list) or any(not isinstance(alias, str) or alias not in NATIVE_ROUTING_ALIASES for alias in routing)
+                or len(routing) != len(set(routing))):
+            raise CurrencyError("native routing aliases must be unique observed routing identities")
+        return data
+    except (OSError, ValueError, KeyError, TypeError) as error:
+        raise CurrencyError(str(error) if isinstance(error, CurrencyError) else "latest-models manifest is unavailable or invalid") from None
+
+
+def exempt(path: str) -> str | None:
+    parts = Path(path).parts
+    if {part.lower() for part in parts} & {"n2", "paper-open-e2e"} or Path(path).name == "STOP":
+        return "peer-owned protected lane outside the currency scope"
+    if set(parts) & RECORD_PARTS:
+        return "record, fixture or dependency"
+    if path.startswith("docs/decisions/"):
+        return "dated decision record"
+    if path in {"manifests/evidence.json", "catalogs/foundation/model-currency.json"}:
+        return "file registration or dated age-review inventory; not a runtime selector"
+    if path.startswith(FROZEN_EXPERIMENTS):
+        return "frozen completed experiment and exact replay source"
+    if path in {"blueprints/us-equities/convergence-review/README.md", "blueprints/us-equities/research-efficiency/README.md"}:
+        return "dated review invocation or frozen comparison documentation"
+    if re.match(r"test[-_].*\.(?:py|js|mjs|cjs|ts)$", Path(path).name):
+        return "test source"
+    if path.startswith("evidence/"):
+        # The maintained install kit carries active instructions despite its date.
+        active_kit = "evidence/artifacts/new-wsl-install-plan-20261002/"
+        if not path.startswith(active_kit) or Path(path).name == "SOURCES.md":
+            return "dated evidence record"
+    if path.startswith("docs/research/") or (path.startswith("blueprints/") and Path(path).name in {"protocol.json", "receipt.json"}):
+        return "frozen study record"
+    if any(re.fullmatch(r"(?:trials|gap-wave\d*|gap-resolution|host-changes|research-cc-role)-\d{8}", part) for part in parts):
+        return "dated trial/source record"
+    if Path(path).suffix in {".jsonl", ".log", ".lock"}:
+        return "append-only record or dependency lock"
+    return None
+
+
+def measurement(value: dict) -> bool:
+    """A dated native observation is immutable evidence, even inside a live carrier."""
+    dated = any(isinstance(item, str) and re.match(r"20\d\d-\d\d-\d\d", item)
+                and re.search(r"(?:_at|date|time)(?:_utc)?$", key)
+                for key, item in value.items())
+    kind = value.get("kind", "")
+    native = isinstance(kind, str) and kind in {"native_model_e2e", "native_cli_e2e", "execution_receipt", "observation"}
+    fields = {"native_usage", "native_results", "combined_native_reported_token_counts", "exit_code"}
+    return dated and (native or bool(fields & value.keys()))
+
+
+def selector_key(value: str) -> bool:
+    key = re.sub(r"(?<=[a-z])(?=[A-Z])", "_", value).lower().replace("-", "_")
+    if key in KEY_EXCLUSIONS or any(word in key for word in ("secret", "password", "token", "api_key")):
+        return False
+    return bool(SELECTOR.search(key) or key in {"model", "modelid", "modelname", "fallback_models"})
+
+
+def identifiers(value: str, allow_cli_alias: bool = False):
+    found = [match.group(0) for match in MODEL.finditer(value)]
+    if not found and allow_cli_alias and value in CLI_ALIASES:
+        found = [value]
+    return found
+
+
+def selectors(text: str, path: Path):
+    """Extract selection values, not historical prose or all supported catalog IDs."""
+    cli = "/claude/" in path.as_posix() or path.name == "settings.json"
+    results = []
+    if path.suffix == ".json":
+        try:
+            document = json.loads(text)
+        except ValueError:
+            raise CurrencyError("active JSON configuration is invalid") from None
+        dated_record_name = bool(re.search(r"(?:receipt|observation)\.json$|scheduled-\d{8}\.json$", path.name))
+        if dated_record_name and isinstance(document, dict) and any(
+                isinstance(value, str) and re.match(r"20\d\d-\d\d-\d\d", value)
+                and re.search(r"(?:_at|date|time)(?:_utc)?$", key)
+                for key, value in document.items()):
+            return []
+        def walk(value):
+            if isinstance(value, dict):
+                if measurement(value):
+                    return
+                if isinstance(value.get("status"), str) and value["status"] in RECORD_STATUSES:
+                    return
+                for key, child in value.items():
+                    if key in RECORD_KEYS:
+                        continue
+                    if selector_key(key) and isinstance(child, (str, list)):
+                        for item in child if isinstance(child, list) else [child]:
+                            if isinstance(item, str):
+                                for identifier in identifiers(item, cli):
+                                    position = text.find(json.dumps(item))
+                                    results.append((text.count("\n", 0, max(0, position)) + 1, identifier))
+                    elif isinstance(child, (dict, list)):
+                        walk(child)
+            elif isinstance(value, list):
+                for child in value:
+                    walk(child)
+        walk(document)
+        return sorted(set(results))
+    if path.suffix == ".py":
+        try:
+            tree = ast.parse(text)
+        except SyntaxError:
+            raise CurrencyError("active Python default source is invalid") from None
+        def strings(node):
+            return [n for n in ast.walk(node) if isinstance(n, ast.Constant) and isinstance(n.value, str)]
+        for node in ast.walk(tree):
+            values = []
+            if isinstance(node, (ast.Assign, ast.AnnAssign)):
+                targets = node.targets if isinstance(node, ast.Assign) else [node.target]
+                regex_value = isinstance(node.value, ast.Call) and isinstance(node.value.func, ast.Attribute) and node.value.func.attr == "compile"
+                if any(selector_key(ast.unparse(target)) for target in targets) and node.value and not regex_value:
+                    values = strings(node.value)
+            elif isinstance(node, ast.keyword) and node.arg and selector_key(node.arg):
+                values = strings(node.value)
+            elif isinstance(node, ast.Dict):
+                for key, child in zip(node.keys, node.values):
+                    if isinstance(key, ast.Constant) and isinstance(key.value, str) and selector_key(key.value):
+                        values.extend(strings(child))
+            elif isinstance(node, ast.Call):
+                arguments = [n.value for n in node.args if isinstance(n, ast.Constant) and isinstance(n.value, str)]
+                if any(arg in {"--model", "--model-id", "-m"} or selector_key(arg) for arg in arguments):
+                    for keyword in node.keywords:
+                        if keyword.arg == "default":
+                            values.extend(strings(keyword.value))
+                    if len(node.args) > 1 and any(selector_key(arg) for arg in arguments[:1]):
+                        values.extend(strings(node.args[1]))
+            for value in values:
+                for identifier in identifiers(value.value, cli):
+                    results.append((value.lineno, identifier))
+        return sorted(set(results))
+    prose = path.suffix == ".md" and any(part in {"docs", "blueprints"} for part in path.parts)
+    historical_setup = prose and bool(re.search(r"setup below records.*?earlier.*?historical", text[:1500], re.S | re.I))
+    record_section = False
+    for number, line in enumerate(text.splitlines(), 1):
+        stripped = line.strip()
+        if not stripped or stripped.startswith(("#", "//", "<!--", ";")):
+            if prose and stripped.startswith("#"):
+                record_section = bool(re.search(r"historical|dated (?:observation|measurement|receipt)|recorded (?:probe|result)", stripped, re.I))
+            continue
+        if historical_setup or record_section or (prose and re.search(r"source/parser checked|failed attempt|recorded provider probe", line, re.I)):
+            continue
+        # Model fields/frontmatter, environment defaults and native CLI arguments.
+        field = re.search(r"(?:^|[\s{,])([\w.-]*model(?:_id|_name)?)[\s\"']*[:=]", line, re.I)
+        argument = re.search(r"(?:--model(?:-id)?(?:[=\s])|\b(?:codex|claude)\b.*\s-m\s)", line)
+        if field and selector_key(field[1]) or argument:
+            for identifier in identifiers(line, cli):
+                results.append((number, identifier))
+    return sorted(set(results))
+
+
+def repo_files(root: Path):
+    result = subprocess.run(["git", "-C", str(root), "ls-files", "--cached", "--others", "--exclude-standard", "-z"], capture_output=True, timeout=30)
+    if result.returncode:
+        raise CurrencyError("active repository inventory could not be read")
+    return sorted(set(result.stdout.decode().rstrip("\0").split("\0")))
+
+
+def host_files(home: Path):
+    singles = [home / ".codex/config.toml", home / ".claude/settings.json"]
+    folders = [home / ".claude/agents", home / ".codex/agents", home / ".local/bin", home / ".local/share/codex-ecosystem/bin",
+               home / ".local/state/native-agent-stack/coordination/command-center/cc-tools",
+               home / ".local/state/native-agent-stack/coordination/ns2604-coop/tools",
+               home / ".local/state/native-agent-stack/coordination/api-actions-20261008"]
+    return singles + [p for folder in folders if folder.is_dir() for p in folder.iterdir() if p.is_file()]
+
+
+def check(manifest: dict, roots: list[Path], host: bool = False) -> dict:
+    files, excluded, errors, findings = [], 0, [], []
+    home = Path.home()
+    for root in roots:
+        try:
+            names = repo_files(root)
+        except CurrencyError as error:
+            errors.append(str(error)); continue
+        for name in names:
+            if not name:
+                continue
+            if exempt(name):
+                excluded += 1; continue
+            files.append(root / name)
+    if host:
+        files.extend(host_files(home))
+    for path in sorted(set(files)):
+        if path.suffix not in TEXT_SUFFIXES or not path.is_file():
+            continue
+        display = str(path).replace(str(home), "~")
+        try:
+            with path.open("rb") as stream:
+                prefix = stream.read(512)
+            if b"\0" in prefix:
+                continue
+            if path.stat().st_size > MAX_BYTES:
+                errors.append(display + ": active text exceeds the check bound"); continue
+            raw = path.read_bytes()
+            text = raw.decode("utf-8")
+            if not MODEL.search(text) and not ("model" in text.lower() and any(re.search(r"\b" + alias + r"\b", text) for alias in CLI_ALIASES)):
+                continue
+            selected = selectors(text, path)
+        except (OSError, UnicodeError, CurrencyError):
+            errors.append(display + ": active selector source could not be checked"); continue
+        for number, identifier in selected:
+            if identifier in manifest.get("native_routing_aliases", []):
+                continue
+            target = manifest["aliases"].get(identifier)
+            if identifier in CLI_ALIASES:
+                target = manifest["latest"][CLI_ALIASES[identifier]]
+            if target is None:
+                family = model_identity(EFFORT.sub("", identifier.removesuffix("[1m]")))
+                expected = manifest["latest"].get(family[0]) if family else None
+                findings.append({"path": display, "line": number, "model": identifier, "expected": expected})
+    return {"schema_version": 1, "status": "unknown" if errors else "stale" if findings else "current", "stale_count": len(findings),
+            "findings": findings, "errors": errors, "coverage": {"candidate_files": len(set(files)), "record_exemptions": excluded, "host": host}}
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    sub = parser.add_subparsers(dest="command", required=True)
+    build = sub.add_parser("generate")
+    for source in ("codex", "omniroute", "claude"):
+        build.add_argument("--" + source, required=True, type=Path)
+    build.add_argument("--observed-at", required=True)
+    build.add_argument("--output", required=True, type=Path)
+    for command in ("check", "notice"):
+        run = sub.add_parser(command)
+        run.add_argument("--root", type=Path, default=ROOT)
+        run.add_argument("--extra-root", type=Path, action="append", default=[])
+        run.add_argument("--host", action="store_true")
+        run.add_argument("--manifest", type=Path)
+        run.add_argument("--now")
+        run.add_argument("--json", action="store_true")
+    args = parser.parse_args(argv)
+    if args.command == "notice":
+        try:
+            event = json.load(sys.stdin)
+        except (ValueError, RecursionError):
+            return 0
+        if not isinstance(event, dict) or event.get("hook_event_name") != "SessionStart":
+            return 0
+    try:
+        if args.command == "generate":
+            document = generate(args.codex, args.omniroute, args.claude, args.observed_at)
+            args.output.parent.mkdir(parents=True, exist_ok=True)
+            args.output.write_text(json.dumps(document, indent=2) + "\n")
+            print(json.dumps({"manifest": str(args.output), "sha256": hashlib.sha256(args.output.read_bytes()).hexdigest(), "latest": document["latest"]}))
+            return 0
+        now = utc(args.now) if args.now else datetime.now(timezone.utc)
+        manifest = load_manifest(args.manifest or args.root / MANIFEST, now)
+        roots = [args.root, *args.extra_root]
+        trading = Path.home() / "code/us-equities-trading"
+        if args.host and trading.is_dir() and trading.resolve() not in {root.resolve() for root in roots}:
+            roots.append(trading)
+        report = check(manifest, roots, args.host)
+    except (CurrencyError, OSError, ValueError, KeyError, TypeError) as error:
+        report = {"schema_version": 1, "status": "unknown", "stale_count": 0, "findings": [], "errors": [str(error) if isinstance(error, CurrencyError) else "model currency could not complete"]}
+    if args.command == "generate":
+        print(json.dumps(report), file=sys.stderr)
+        return 2
+    if args.command == "notice":
+        if report["status"] != "current":
+            line = f"Model currency: {report['stale_count']} stale active selectors" if report["status"] == "stale" else "Model currency: latest-model check incomplete; refresh the native catalog and run the check."
+            print(json.dumps({"hookSpecificOutput": {"hookEventName": "SessionStart", "additionalContext": line}}))
+        return 0
+    if args.json:
+        print(json.dumps(report))
+    else:
+        print(f"model currency: {report['status']}; {report['stale_count']} stale active selectors")
+        for item in report["findings"]:
+            print(f"{item['path']}:{item['line']} {item['model']} -> {item['expected'] or 'latest declared hosted family'}")
+        for error in report["errors"]:
+            print(error)
+    return 2 if report["status"] == "unknown" else 1 if report["status"] == "stale" else 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
