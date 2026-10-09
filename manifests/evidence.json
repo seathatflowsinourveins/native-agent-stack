@@ -5161,8 +5161,8 @@
     },
     {
       "path": "adoption/README.md",
-      "sha256": "f35e4f688275badf7536be8ecb1f1c6d8462061073c4c447e60ffa46d0f2f588",
-      "bytes": 19053
+      "sha256": "ccc3f258e285004ff9da0e456e268cbdcc1628076648d99f5aefb29a3892adbf",
+      "bytes": 19454
     },
     {
       "path": "adoption/agents/claude/blind-adjudicator.md",
@@ -17557,8 +17557,8 @@
     },
     {
       "path": "docs/convergence-architecture.md",
-      "sha256": "4bd71670734119bae382402efe7ca1180b0812e5c3c32f766e5d2c19fed5d57a",
-      "bytes": 15969
+      "sha256": "66a4203fa42ed7b7c481642aac01edbcb76f426cebb7b5c39b0822aac80fc114",
+      "bytes": 16330
     },
     {
       "path": "docs/convergence-audit.md",

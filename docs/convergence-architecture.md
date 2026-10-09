@@ -267,3 +267,9 @@ building complex systems while keeping evidence, ownership and recovery small
 enough to inspect.
 
 The companion [Claude session qualification](../blueprints/convergence-practice/native-recovery/claude/README.md) now exercises native interruption during an owned Bash wait on WSL and resumes the same session to finalize its checkpoint. The action journal rejects repeated checkpoint work. Its two native terminal usage views reconcile without adding the resumed cumulative view again. Later no-model guard tests harden private-log placement and failure cleanup; the original execution source remains frozen separately.
+
+For foundation role expectations and MCP memory gates, use the dated
+[roles and tool sets record](role-tool-sets.md) and its
+[machine-readable stages](role-tool-sets.json). It separates candidate quality,
+native wiring, fresh-role use and rolling invoke evidence; the unpaired role
+trial does not select new defaults or attribute lane PSS to individual tools.
