@@ -10,7 +10,7 @@ The [research-runtime receipt](../../blueprints/us-equities/research-runtime/rec
 
 ## A coherent local-first data plane
 
-Start with **Alpaca's official SDK**, **EdgarTools** where filing research is needed, **immutable raw objects and Parquet**, **DuckDB**, **exchange_calendars**, **Pandera** contracts and **DVC** snapshot metadata. Separate credentials and permitted raw data from this public repository. The existing [native data receipt](../../blueprints/us-equities/data/receipt.json) gives DuckDB/calendar adoption a concrete starting point; it does not prove any of the proposed ingestion or quality gates.
+Start with **Alpaca's official SDK**, **EdgarTools** where filing research is needed, **immutable raw objects and Parquet**, **DuckDB** and **exchange_calendars**. **Pandera** contracts remain a source-reviewed candidate; **DVC** installation is held after its removal from the selected runtime. Separate credentials and permitted raw data from this public repository. The existing [native data receipt](../../blueprints/us-equities/data/receipt.json) gives DuckDB/calendar adoption a concrete starting point; it does not prove any of the proposed ingestion or quality gates.
 
 ```mermaid
 flowchart LR
@@ -22,7 +22,7 @@ flowchart LR
   E --> F[Chronological research evaluation]
   F --> G[Versioned research artifact]
   G --> H[Separate deterministic paper decision and risk service]
-  V[DVC snapshot identity and optional MLflow runs] --- D
+  V[Retained snapshot manifests; DVC held; MLflow optional] --- D
   V --- F
 ```
 
@@ -84,7 +84,7 @@ Add tools when an observed need justifies them:
 | [Kafka](https://github.com/apache/kafka) | 4.3.1 | Conditional | Durable partitioned log. |
 | [Redpanda](https://github.com/redpanda-data/redpanda) | 26.2.2 | Alternative | Kafka-compatible log; BSL/RCL terms. |
 | [dlt](https://github.com/dlt-hub/dlt) | 1.30.0 | Conditional | Incremental ingestion/loading. |
-| [DVC](https://github.com/treeverse/dvc) | 3.67.1 | Default; advisory follow-up open | Private artifacts linked to Git metadata; prospective install on hold. |
+| [DVC](https://github.com/treeverse/dvc) | 3.67.1 | Conditional; installation held | Historical provisional recommendation; removed from selected runtime; re-judgement open. |
 | [lakeFS](https://github.com/treeverse/lakeFS) | Server 1.86.0; Python 0.16.0 | Alternative | Object-storage branches/snapshots. |
 | [MLflow](https://github.com/mlflow/mlflow) | 3.16.1 | Conditional | Experiment metadata/artifacts. |
 | [OpenLineage](https://github.com/OpenLineage/OpenLineage) | 1.53.0 | Conditional | Job/run/dataset lineage events. |
@@ -172,14 +172,21 @@ records historical installation PASS and 25/25 offline acceptance at 5.60.0 on
 lock `4c98672d14147a1b` (before the 2026-10-05 DVC removal), at `d02c0827` on
 2026-10-05, 01:00:17Z–01:01:07Z. Independent review remains pending;
 point-in-time data and strategy gates remain unchanged. The current lock
-`1fb9f8ca6fef9c47` is not yet qualified on NativeStack2604. The 2604 co-op will
-re-run installation and `accept-trading-2604.sh` for the current 24 checks and
-write a separate receipt.
+is now `f451ef979cdb1ae3686a30df1c883c257402b32753478c1f9c686c057e9c3989`,
+with EdgarTools **5.61.1** and skfolio **1.7.0**. The
+[separate final-lock receipt](../../evidence/receipts/runtime-final-native-24-acceptance-20261008.json)
+records **24/24 PASS, rc 0**, at **2026-10-08 17:48:39Z–17:49:09Z**, with
+the actual lock hash printed before and after in the same stdout stream. Its
+class is `local_integration`. The accepted isolated SEC recipe remains **5.60.0**;
+the runtime smoke does not repeat SEC acquisition or establish point-in-time data.
+The earlier `1fb9f8ca…` run stays historical. The
+[October 9 reconciliation](catalog-refresh-20261009.md) records these distinct scopes.
 
 ## DVC advisory disposition — 2026-10-05
 
-The `data-dvc` source-reviewed default remains recorded at 3.67.1, with its
-prospective install workflow on hold and a data-versioning re-judgement open.
+The `data-dvc` historical source-reviewed default remains recorded at 3.67.1;
+its current decision is **conditional, installation held**, with a
+data-versioning re-judgement open.
 It pulls `dvc-data -> diskcache 5.6.3`, affected by
 [PYSEC-2026-2447](https://osv.dev/vulnerability/PYSEC-2026-2447)
 ([GHSA-w8v5-vhqr-4h9v](https://github.com/advisories/GHSA-w8v5-vhqr-4h9v)):
@@ -189,3 +196,8 @@ release was listed in the
 That evidence records removal of unused DVC and its dependency closure from the
 NativeStack2604 runtime bundle, without an OSV ignore. It does not select a
 replacement or establish safe use of the catalog's prospective DVC workflow.
+
+The retained [September 23 four-store fixture](../../evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/4-four-store-comparison.json)
+did execute `dvc checkout` and correction retention. Its five-observation,
+two-universe-row `local_integration` result remains historical; it did not execute
+the full layer overturn comparison or qualify the equity dataset contract.

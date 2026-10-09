@@ -233,7 +233,7 @@
     "recipe": "blueprints/us-equities/runtime-2604/README.md",
     "receipt": "evidence/receipts/native-trading-runtime-2604-20261004.json",
     "host_receipt": "evidence/hosts/native-stack-2604-20261004/native-stack-2604-20261004--nautilustrader--use--20261004.json",
-    "current_acceptance_20261008": {
+    "historical_acceptance_20261008_0620": {
       "status": "passed",
       "host": "NativeStack2604",
       "run_started_utc": "2026-10-08T06:20:48Z",
@@ -245,6 +245,35 @@
       "evidence_class": "native_proven",
       "scope": "The co-op ran the unchanged acceptance script from its native WSL shell on the already installed runtime. Installation was not repeated; this is not an upstream test-suite pass and changes no engine, strategy or broker gate.",
       "host_guard": "Attempt 1 is retained: readiness-runner's shell lacked WSL_DISTRO_NAME, so accept-trading-2604.sh:49 blocked all 24 checks with rc 1. WSL supplied the NativeStack2604 value in the co-op's shell; the guard was unchanged and no value was set by hand. Later guarded scripts run through the co-op's native shell."
+    },
+    "current_acceptance_20261008": {
+      "status": "passed_within_scope",
+      "host": "NativeStack2604",
+      "run_started_utc": "2026-10-08T17:48:39Z",
+      "run_finished_utc": "2026-10-08T17:49:09Z",
+      "exit_code": 0,
+      "checks": {
+        "pass": 24,
+        "fail": 0,
+        "blocked": 0
+      },
+      "lock_sha256": "f451ef979cdb1ae3686a30df1c883c257402b32753478c1f9c686c057e9c3989",
+      "receipt": "evidence/receipts/runtime-final-native-24-acceptance-20261008.json",
+      "evidence_class": "local_integration",
+      "lock_hash_source": "Full actual lock SHA256 printed immediately before and after the 24-case run in the same returned stdout stream.",
+      "scope": "Retained October 8 offline integration acceptance only. This catalog refresh does not repeat execution, qualify the 28 prospective checks/dev probes, or close historical-data, strategy, broker or paper gates."
+    },
+    "current_runtime": {
+      "recorded_at_utc": "2026-10-09T19:44:46Z",
+      "lock_sha256": "f451ef979cdb1ae3686a30df1c883c257402b32753478c1f9c686c057e9c3989",
+      "manifest_sha256": "aa370e42e29dc2419e586358254ff2e821df48a693aa9a3ee16b65d30036ee0b",
+      "edgartools": "5.61.1",
+      "edgartools_source_commit": "7338aa335f6442c52dfa0695422cf1cd27e946e0",
+      "skfolio": "1.7.0",
+      "skfolio_source_commit": "8a399757200d46b1ac1bff1b3daa71d9f0fa4170",
+      "recipe": "blueprints/us-equities/runtime-2604/README.md",
+      "reconciliation": "catalogs/us-equities/catalog-refresh-20261009.json",
+      "scope": "Published runtime metadata verified against retained lock bytes and maintainer release identities; no new installed-host observation or acceptance run. The isolated SEC recipe remains EdgarTools 5.60.0; the frozen chronological study remains skfolio 1.2.9."
     },
     "pipeline_e2e_20261008": {
       "status": "completed_repeated_identically",
@@ -262,19 +291,20 @@
     },
     "open": [
       "Ratify CPython 3.12.3 against 3.13 and the complete canonical runtime matrix.",
-      "Independent post-run review of the historical host receipts and all existing data, strategy, oracle and broker gates remain separate. The current lock's 24/24 offline integration acceptance is recorded in current_acceptance_20261008; installation was not repeated."
+      "The current f451 lock's retained 24/24 offline integration acceptance and independent run-binding critic are linked from current_acceptance_20261008. Independent review of older host receipts, prospective 28-case/dev-probe acceptance, exact legacy migration, and data, strategy, oracle and broker gates remain separate. This refresh repeats no installation or acceptance."
     ],
     "edgartools_pin_move_20261004": {
       "runtime_pin": "5.60.0",
+      "runtime_pin_scope": "Historical October 4 pin move; current_runtime separately records the published 5.61.1 bundle.",
       "catalog_entry": "data-edgartools",
       "catalog_pin": "5.60.0",
       "source_pin": "1e7a61b3a142dbf5d19bc82444f85239c1786348",
       "resolved_item": "EdgarTools 5.59.1 filing-fix overturn comparison before moving catalog 5.58.0",
-      "resolution": "Superseded by directed 5.60.0 pin move and native SEC acceptance native-sec-edgartools-5600-20261004; the repository runtime bundle and current catalog now select the same release.",
+      "resolution": "The October 4 directed 5.60.0 move and native-sec-edgartools-5600-20261004 qualify the isolated SEC recipe/catalog scope. The current published runtime separately selects 5.61.1; its offline smoke acceptance does not repeat SEC acquisition at that version.",
       "receipt_id": "native-sec-edgartools-5600-20261004",
       "evidence_ref": "blueprints/us-equities/catalyst-provenance/native-network-edgartools-5600-20261004.json",
       "historical_2604_run_edgartools": "5.58.0",
-      "native_stack_2604_rerun": "recorded historical qualification: native-trading-runtime-2604-rerun-d02c0827-20261005 (evidence/receipts/native-trading-runtime-2604-rerun-20261005.json); install PASS and 25/25 offline acceptance at d02c0827 on lock 4c98672d14147a1b (before the 2026-10-05 DVC removal), 2026-10-05T01:00:17Z-01:01:07Z, through mise exec uv@0.12.17; independent review pending. Superseding current-lock acceptance is recorded in current_acceptance_20261008: NativeStack2604, 24/24 PASS, rc 0, 2026-10-08T06:20:48Z-06:21:25Z, lock 1fb9f8ca6fef9c47. Installation was not repeated.",
+      "native_stack_2604_rerun": "Historical 5.60.0 installation/25-case acceptance: evidence/receipts/native-trading-runtime-2604-rerun-20261005.json, d02c0827, pre-DVC-removal lock 4c98672d14147a1b, 2026-10-05T01:00:17Z-01:01:07Z. The separate October 8 06:20 run remains historical_acceptance_20261008_0620 with its receipt-reported 1fb lock. Current f451 acceptance is the separate 17:48:39Z-17:49:09Z run in current_acceptance_20261008, with actual same-stream lock capture. None of these runs is repeated by this refresh.",
       "scope": "Bounded SEC index acceptance on NativeStack; no strategy, point-in-time data, paper or broker gate changes."
     }
   }

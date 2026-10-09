@@ -2,6 +2,7 @@
   "schema_version": 1,
   "checked_at": "2026-09-19",
   "layer": "engines-strategies",
+  "current_refresh_record": "catalogs/us-equities/catalog-refresh-20261009.json",
   "snapshot_scope": "September 19 decisions are historical; later native evidence is individually linked. Use the current selection record for installation and the engine destination rather than historical default/alternative labels.",
   "current_selection_record": "catalogs/us-equities/runtime-target.json",
   "reconciliation_record": "docs/foundation-rd-readiness.md",
@@ -9,6 +10,8 @@
   "entries": [
     {
       "id": "lean",
+      "version_scope": "Historical September source-build/sample acceptance at 985ef30. The protocol 18176/source 80e7843f record and local 18149/source 33e3945f image record are separate; none relabels this execution.",
+      "source_identity_record": "catalogs/us-equities/catalog-refresh-20261009.json#/entries/6",
       "repository": "https://github.com/QuantConnect/Lean",
       "layers": [
         "backtesting",
@@ -254,8 +257,15 @@
         "backtesting"
       ],
       "role": "Fast signal/parameter sweeps and portfolio simulation",
-      "decision": "alternative",
-      "rationale": "Use for broad research only if its array semantics and license fit; recheck selected strategies in the chosen event-driven engine.",
+      "decision": "excluded",
+      "decision_scope": "Current north-star trading adoption under the owner-routed licence disposition; no universal legal prohibition on internal research is inferred.",
+      "historical_decision": {
+        "decision": "alternative",
+        "scope": "Historical optional, unexecuted array-research recipe at 1.1.0; no engine adoption or licence acceptance.",
+        "source": "catalogs/us-equities/architecture/trading.json#/entries/3"
+      },
+      "current_decision_record": "catalogs/us-equities/catalog-refresh-20261009.json#/entries/3",
+      "rationale": "Excluded from current north-star adoption by the owner-routed licence rejection. The public source is Apache-2.0 with Commons Clause; the historical destination-engine rejection is separately scoped. Fresh 1.1.2 source supports multi-asset analysis and the public Rust extra, so those capabilities are not grounds for rejection.",
       "version_or_commit": "1.1.0",
       "release_date": "2026-07-05T17:21:08.372312Z",
       "license": "Apache-2.0 with Commons Clause License Condition v1.0",
@@ -266,7 +276,7 @@
         "https://github.com/polakowo/vectorbt/blob/v1.1.0/README.md"
       ],
       "native_workflow": [
-        "# Prospective and unexecuted. local-file holding baseline; sample fee assumption is not broker calibration.",
+        "# Historical unexecuted recipe only; excluded from current north-star adoption. Local-file holding baseline; sample fee assumption is not broker calibration.",
         "python -m pip install vectorbt==1.1.0",
         "python - <<'PY'\nimport pandas as pd, vectorbt as vbt\np=pd.read_csv('prices.csv',index_col=0,parse_dates=True)\nprint(vbt.Portfolio.from_holding(p,fees=0.001,freq='1D').stats())\nPY"
       ],
@@ -724,6 +734,8 @@
     },
     {
       "id": "skfolio",
+      "version_scope": "Frozen chronological splitter/control study at 1.2.9; current published NativeStack2604 runtime separately selects 1.7.0. The latter's offline smoke does not establish portfolio/risk acceptance.",
+      "current_runtime_record": "catalogs/us-equities/catalog-refresh-20261009.json#/entries/1",
       "repository": "https://github.com/skfolio/skfolio",
       "layers": [
         "portfolio-optimization",

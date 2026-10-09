@@ -64,7 +64,7 @@ current runtime target above for the selected engine.
 | `nautilus-ibkr-adapter` | same pin as `nautilustrader` | Default | Native IBKR socket adapter; `local_broker_acceptance` `not_established` (runtime-target.json). |
 | `adaptive-paper-alpaca-adapter` | `7e7eefe28315f3de3aa4dc75cc8b6524f70829cb` (`blueprints/us-equities/adaptive-paper`) | Default | Custom deterministic Alpaca adapter for the adaptive-paper lane; source_review with the synthetic capacity fixture cited (180 fills / 90 round trips in 60.4282s, zero broker connections); no live broker fills claimed. |
 | `lumibot` | 4.5.91 | Alternative | Direct Python strategy lifecycle and Alpaca broker; unresolved GPL/MIT license metadata conflict. |
-| `vectorbt` | 1.1.0 | Alternative | Array-based research sweeps; recheck selected hypotheses in the event engine. |
+| `vectorbt` | 1.1.0 historical card; 1.1.2 source review | Excluded from current north-star adoption | Owner-routed licence disposition; historical research alternative is retained as history. |
 | `backtrader` | 1.9.78.123 | Alternative | Useful for existing research; package and broker integration age require care. |
 | `backtesting-py` | 0.6.6 | Alternative | Small single-instrument prototypes; not the multi-asset broker-state authority. |
 | `zipline-reloaded` | 3.1.1 | Alternative | Maintained Zipline/Pipeline research, with explicit data-bundle ingestion. |
@@ -76,7 +76,16 @@ The paragraph below is the historical `1.231.0` source review, retained for cont
 
 Lumibot is the most direct reviewed Python-first alternative for reusing a strategy class between historical simulation and Alpaca paper trading. However, its release [LICENSE](https://github.com/Lumiwealth/lumibot/blob/v4.5.91/LICENSE) and [setup metadata](https://github.com/Lumiwealth/lumibot/blob/v4.5.91/setup.py) disagree. Resolve that before adoption. Some current agent examples also invoke model services and enable trading; the catalog deliberately supplies only a deterministic backtest example.
 
-Vectorbt's public edition is Apache-2.0 **with Commons Clause**, not unrestricted Apache-only software. VectorBT PRO is a separate private commercial product, not another audited open repository; the site advertised 2026.9.5 when checked, but its private implementation was not reviewed. [Public license](https://github.com/polakowo/vectorbt/blob/v1.1.0/LICENSE.md), [PRO terms](https://vectorbt.pro/terms/software-license/).
+Vectorbt's public edition is Apache-2.0 **with Commons Clause**. The current
+north-star adoption disposition follows the owner-routed licence rejection;
+it is not a legal conclusion about every internal research use. The historical
+optional-sweep review remains dated. Fresh v1.1.2 source supports multi-asset
+analysis and the public `vectorbt[rust]` extra, so single-asset/PRO-only Rust
+arguments must not justify its rejection. VectorBT PRO is a separate private
+commercial product whose implementation was not reviewed. See the
+[current scope and primary sources](catalog-refresh-20261009.md),
+[public licence at v1.1.2](https://github.com/polakowo/vectorbt/blob/f0d2afba7af8a6e6c1b02afde27c9a16413e86ff/LICENSE.md)
+and [PRO terms](https://vectorbt.pro/terms/software-license/).
 
 ## Portfolio construction and statistical evaluation
 
@@ -87,7 +96,7 @@ Start with a transparent benchmark and unambiguous accounting. Add an optimizer 
 | `quantstats` | 0.0.81 | Default | Return-series report with explicit frequency, benchmark and net-cost accounting. |
 | `pyportfolioopt` | 1.6.0 | Alternative | Covariance/shrinkage and conventional constrained portfolio weights. |
 | `riskfolio-lib` | 7.3.0 | Alternative | Broader risk measures and allocation formulations when required. |
-| `skfolio` | 1.2.9 accepted splitter; 1.2.8 earlier review | Conditional beyond accepted scope | Native chronological splitter/control study is accepted; portfolio optimization and broader validation remain separate. |
+| `skfolio` | 1.2.9 frozen splitter; 1.7.0 selected runtime | Conditional beyond accepted scope | Historical chronological study and current offline runtime smoke are separate; portfolio/risk acceptance remains open. |
 | `cvxportfolio` | 1.5.1 | Conditional | Cost-aware, multi-period allocation research. |
 | `empyrical-reloaded` | 0.5.12 | Conditional | Reusable metrics where a report is insufficient. |
 | `ffn` | 1.2.2 | Alternative | Lightweight price/return analytics, especially alongside `bt`. |

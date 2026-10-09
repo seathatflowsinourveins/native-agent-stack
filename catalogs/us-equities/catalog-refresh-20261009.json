@@ -1,0 +1,258 @@
+{
+  "schema_version": 1,
+  "id": "t19-catalog-refresh-20261009",
+  "checked_at": "2026-10-09",
+  "base_commit": "3a4cc28840ba7e8a1a9474a989102a669955f243",
+  "evidence_class": "source_review",
+  "scope": "Scoped reconciliation of current trading catalog projections, release identities and owner-routed adoption dispositions. Historical receipts retain their versions, dates and execution scopes. No installation, fresh host acceptance, data acquisition, model request, strategy or broker gate change.",
+  "decision_authority": "CC T19 catalog-refresh dispatch relayed 2026-10-09T18:49:01Z; vectorbt licence rejection and TradingView ToS rejection apply to current north-star adoption, not an inferred universal legal ban.",
+  "source_record": "catalogs/us-equities/catalog-refresh-20261009.md",
+  "review_receipt": "evidence/artifacts/t19-catalog-refresh-20261009/review-receipt.json",
+  "entries": [
+    {
+      "id": "t19-edgartools-scopes",
+      "repository": "https://github.com/dgunning/edgartools",
+      "decision": "retain_separate_runtime_recipe_and_history",
+      "review_level": "source_review",
+      "selected_runtime": {
+        "version": "5.61.1",
+        "source_commit": "7338aa335f6442c52dfa0695422cf1cd27e946e0",
+        "source": "https://github.com/dgunning/edgartools/blob/7338aa335f6442c52dfa0695422cf1cd27e946e0/edgar/__about__.py",
+        "tag_fetched_utc": "2026-10-09T19:31:01.086Z"
+      },
+      "isolated_sec_recipe": {
+        "version": "5.60.0",
+        "source_commit": "1e7a61b3a142dbf5d19bc82444f85239c1786348",
+        "lock": "blueprints/us-equities/catalyst-provenance/requirements.lock",
+        "lock_sha256": "8249d798431f0499970b68a34690060f48c50a2fef98322b4fb1706f30eb5a8c",
+        "tag_fetched_utc": "2026-10-09T19:31:00.777Z",
+        "receipt": "blueprints/us-equities/catalyst-provenance/native-network-edgartools-5600-20261004.json"
+      },
+      "historical_initial_wave": {
+        "version": "5.58.0",
+        "source_commit": "abe44344c56cf4bfb5443e0debca7e39342f6e7a",
+        "tag_fetched_utc": "2026-10-09T19:31:00.442Z"
+      },
+      "evidence_refs": [
+        "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock",
+        "evidence/receipts/runtime-final-native-24-acceptance-20261008.json",
+        "blueprints/us-equities/catalyst-provenance/README.md"
+      ],
+      "limitations": [
+        "Published lock/metadata and retained October 8 installed observation are distinct from a fresh installed-host observation.",
+        "Runtime offline smoke at 5.61.1 does not repeat the accepted SEC request at 5.60.0 or establish historical information availability."
+      ]
+    },
+    {
+      "id": "t19-skfolio-scopes",
+      "repository": "https://github.com/skfolio/skfolio",
+      "decision": "retain_runtime_170_and_frozen_study_129",
+      "review_level": "source_review",
+      "selected_runtime": {
+        "version": "1.7.0",
+        "source_commit": "8a399757200d46b1ac1bff1b3daa71d9f0fa4170",
+        "tag_fetched_utc": "2026-10-09T19:31:01.742Z",
+        "tag_dereferenced_utc": "2026-10-09T19:31:33.303Z"
+      },
+      "frozen_chronological_study": {
+        "version": "1.2.9",
+        "source_commit": "c99fcf71349e2df4a7a1033ee85ca2e9ced9abee",
+        "lock": "blueprints/us-equities/research-evaluation/requirements.lock",
+        "lock_sha256": "bb82ec0446011a74f5d1ee47ef3b02b62e56151d8a2937f6b7554d30fd7bcc27",
+        "tag_fetched_utc": "2026-10-09T19:31:01.430Z",
+        "tag_dereferenced_utc": "2026-10-09T19:31:32.969Z"
+      },
+      "currency_only": [
+        {
+          "version": "1.7.1",
+          "source_commit": "6aa7cf38cf99799d383e3544f839c3ca4cf14a15",
+          "tag_dereferenced_utc": "2026-10-09T19:35:08.174Z",
+          "source": "https://github.com/skfolio/skfolio/releases/tag/v1.7.1",
+          "finding": "Release fixes weighted downside risk, VaR rare-loss omission, weighted rolling measures and NaN handling; selected-runtime risk/portfolio acceptance remains open."
+        },
+        {
+          "version": "1.8.0",
+          "source_commit": "33923e050083eb82c5996a16e3293343baa16689",
+          "released_utc": "2026-10-09T16:20:36Z",
+          "tag_dereferenced_utc": "2026-10-09T19:35:07.129Z",
+          "source": "https://github.com/skfolio/skfolio/releases/tag/v1.8.0",
+          "finding": "Latest upstream release discovered during this review, extending sample-weight support; no upgrade or native acceptance performed."
+        }
+      ],
+      "evidence_refs": [
+        "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock",
+        "blueprints/us-equities/research-evaluation/requirements.lock",
+        "evidence/receipts/runtime-final-native-24-acceptance-20261008.json"
+      ],
+      "limitations": [
+        "1.2.9 WalkForward/control evidence is historical and is not relabeled as 1.7.0 execution.",
+        "Offline runtime smoke does not accept portfolio optimization, risk measures or strategy performance. Newer releases are next-sweep inputs only."
+      ]
+    },
+    {
+      "id": "t19-dvc-held",
+      "repository": "https://github.com/treeverse/dvc",
+      "source_commit": "356dfa03278058b02df42124f243c2c345329dae",
+      "version": "3.67.1",
+      "decision": "held_not_in_selected_runtime",
+      "review_level": "source_review",
+      "license": "Apache-2.0",
+      "rationale": "Historical provisional winner for dataset hashes/dependencies; current installation remains held after October 5 diskcache closure removal. Retained manifests remain the selected portable path; no replacement or safe-use qualification is established.",
+      "evidence_refs": [
+        "https://github.com/treeverse/dvc/blob/356dfa03278058b02df42124f243c2c345329dae/README.rst",
+        "evidence/artifacts/trading-runtime-2604-20261004/diskcache-removal-20261005.json",
+        "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/4-four-store-comparison.json",
+        "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock"
+      ],
+      "limitations": [
+        "The September 23 dvc checkout/correction-retention fixture is real historical local integration, with five observations/two universe rows; it is not the full specified overturn comparison or equity dataset acceptance.",
+        "Neither DVC nor diskcache is present in the current selected runtime lock. The current hold is not a licence rejection or a new vulnerability audit."
+      ]
+    },
+    {
+      "id": "t19-vectorbt-owner-adoption",
+      "repository": "https://github.com/polakowo/vectorbt",
+      "source_commit": "f0d2afba7af8a6e6c1b02afde27c9a16413e86ff",
+      "version": "1.1.2",
+      "decision": "excluded_current_north_star_adoption",
+      "review_level": "source_review",
+      "license": "Apache-2.0 with Commons Clause License Condition v1.0",
+      "rationale": "Owner-routed GRAND licence rejection governs current trading adoption. Historical optional-research and broker-integrated destination-engine decisions retain their own scopes. No universal legal prohibition on internal research is inferred.",
+      "evidence_refs": [
+        "https://github.com/polakowo/vectorbt/blob/f0d2afba7af8a6e6c1b02afde27c9a16413e86ff/LICENSE.md",
+        "https://github.com/polakowo/vectorbt/blob/f0d2afba7af8a6e6c1b02afde27c9a16413e86ff/README.md#L68",
+        "https://github.com/polakowo/vectorbt/blob/f0d2afba7af8a6e6c1b02afde27c9a16413e86ff/pyproject.toml#L51",
+        "catalogs/us-equities/architecture/trading.json#/entries/3",
+        "catalogs/us-equities/convergence-20260926.json#/trading/1/candidates/1"
+      ],
+      "limitations": [
+        "Multi-asset analysis and the public vectorbt[rust] extra are supported by this source; single-asset/PRO-only Rust rejection arguments are false.",
+        "Private PRO source and licence acceptance were not examined; no implementation was installed or executed."
+      ]
+    },
+    {
+      "id": "t19-atila-tradingview-terms",
+      "repository": "https://github.com/atilaahmettaner/tradingview-mcp",
+      "source_commit": "b04513ece51dd21a60b0a1e05964aee5957b7a69",
+      "decision": "reject_terms_non_display",
+      "review_level": "source_review",
+      "license": "MIT code; provider data rights are separate",
+      "rationale": "TradingView Terms section 3 display-only/non-display restriction and owner-routed ToS rejection exclude automated/algorithmic north-star data use. Current source still depends on tradingview-screener and tradingview-ta; the README's no-session-automation claim does not establish provider-data permission.",
+      "historical_decisions": [
+        "September 22 landscape: unqualified",
+        "September 23 proposal: keep_but_compare_unverified",
+        "September 24 source audit at a1e54b07e5c21b375363607920f297c5adfbeed4: obsolete_or_ineligible/do_not_wire"
+      ],
+      "evidence_refs": [
+        "https://www.tradingview.com/policies/#terms-of-use",
+        "https://github.com/atilaahmettaner/tradingview-mcp/blob/b04513ece51dd21a60b0a1e05964aee5957b7a69/pyproject.toml",
+        "https://github.com/atilaahmettaner/tradingview-mcp/blob/b04513ece51dd21a60b0a1e05964aee5957b7a69/src/tradingview_mcp/core/services/screener_service.py#L50"
+      ],
+      "limitations": [
+        "This repository is distinct from tradesdontlie/tradingview-mcp.",
+        "The scoped rejection is not a finding that every ordinary human-readable chart interaction is forbidden; no installation or provider request was performed."
+      ]
+    },
+    {
+      "id": "t19-tradesdontlie-tradingview-terms",
+      "repository": "https://github.com/tradesdontlie/tradingview-mcp",
+      "source_commit": "c05b8f5755ed8e64ea242de88ddbf46aa24d56a4",
+      "decision": "reject_terms_non_display",
+      "review_level": "source_review",
+      "license": "MIT code with explicit TradingView software/data/IP rights exclusion",
+      "rationale": "Distinct Desktop CDP implementation; the same owner-routed Terms section 3 rejection governs automated/non-display north-star use. The pinned LICENSE exists; the earlier null/NOASSERTION result was a failed-response inference, not absent permission text.",
+      "evidence_refs": [
+        "https://www.tradingview.com/policies/#terms-of-use",
+        "https://github.com/tradesdontlie/tradingview-mcp/blob/c05b8f5755ed8e64ea242de88ddbf46aa24d56a4/LICENSE",
+        "https://github.com/tradesdontlie/tradingview-mcp/blob/c05b8f5755ed8e64ea242de88ddbf46aa24d56a4/README.md"
+      ],
+      "limitations": [
+        "The historical alternative review remains dated. MIT permission for server source does not grant provider-data rights.",
+        "No installation, Desktop session or provider request was performed."
+      ]
+    },
+    {
+      "id": "t19-lean-three-identities",
+      "repository": "https://github.com/QuantConnect/Lean",
+      "decision": "retain_distinct_protocol_local_and_historical_identities",
+      "review_level": "source_review",
+      "identities": [
+        {
+          "scope": "CC-declared protocol engine record",
+          "build": "18176",
+          "source_commit": "80e7843f645673bcbeaab963049f76f20f6785e1",
+          "association_source": "CC T19 dispatch; protocol build/source association is declared, not newly reproduced by this catalog review."
+        },
+        {
+          "scope": "Current local runtime recipe/image record",
+          "build": "18149",
+          "source_commit": "33e3945f2faa95308d972dfd3d7b762f7743d1d5",
+          "image_digest": "sha256:70071d1bbb90385deb60c7d20bc3830c7f4c79f6c09c5d1ade9196c009f68861",
+          "association_source": "blueprints/us-equities/runtime-2604/install-trading-2604.sh; existing local image inspect found the digest but no revision/version labels."
+        },
+        {
+          "scope": "Historical September source-build/sample acceptance",
+          "source_commit": "985ef30ad3ac774218c5ac516b4cb0aa2655730f",
+          "association_source": "blueprints/us-equities/engine/README.md and historical native receipt"
+        }
+      ],
+      "evidence_refs": [
+        "https://github.com/QuantConnect/Lean/commit/80e7843f645673bcbeaab963049f76f20f6785e1",
+        "https://github.com/QuantConnect/Lean/blob/33e3945f2faa95308d972dfd3d7b762f7743d1d5/Dockerfile",
+        "https://github.com/QuantConnect/Lean/commit/985ef30ad3ac774218c5ac516b4cb0aa2655730f",
+        "blueprints/us-equities/runtime-2604/README.md",
+        "blueprints/us-equities/engine/README.md"
+      ],
+      "limitations": [
+        "All three full maintainer commit identities resolve; GitHub status responses for the two newer commits contained no build statuses. Neither those responses nor absent image labels reproduce source-to-image equivalence.",
+        "No protocol-engine run, image rebuild, source-to-image reproduction or retained-oracle parity was performed. Those acceptance gaps remain open."
+      ]
+    }
+  ],
+  "runtime_binding": {
+    "lock_sha256": "f451ef979cdb1ae3686a30df1c883c257402b32753478c1f9c686c057e9c3989",
+    "manifest_sha256": "aa370e42e29dc2419e586358254ff2e821df48a693aa9a3ee16b65d30036ee0b",
+    "acceptance_receipt": "evidence/receipts/runtime-final-native-24-acceptance-20261008.json",
+    "acceptance_receipt_sha256": "cc32a1462171763446809fb675bd946f3b45875c797bea5049d1a925d4809086",
+    "acceptance_run_utc": ["2026-10-08T17:48:39Z", "2026-10-08T17:49:09Z"],
+    "acceptance_result": "24/24 PASS, rc 0; actual full lock SHA printed before and after in the same stdout stream",
+    "acceptance_evidence_class": "local_integration",
+    "earlier_run": "catalogs/us-equities/runtime-target.json#/offline_runtime_followup_20261004/historical_acceptance_20261008_0620"
+  },
+  "grand_views": {
+    "current_selection_authority": "catalogs/us-equities/runtime-target.json and registered current decision supplements",
+    "dated_handbook": "docs/grand-catalog-handbook.md; catalogs/sota-convergence/layer-verdicts-20260922.json",
+    "current_layer_ledger": "catalogs/landscape/us-equities.json; original layer dates remain dated",
+    "derived_host_setup": "docs/new-host-grand-list.md; catalogs/landscape/new-host-grand-list.json; regenerate through scripts/new_host_grand_list.py, never hand-edit",
+    "derived_snapshot_limits": [
+      "The generated EdgarTools winner rows retain the dated ledger pin/upstream_latest v5.58.0 and pin_behind_upstream=false. These are historical generator inputs, not October 9 currency, the accepted 5.60.0 SEC recipe or the selected 5.61.1 runtime.",
+      "The generated skfolio upstream_latest v1.3.0 is also a dated snapshot, not the current 1.8.0 release. A host_verified projection retains its source receipt scope and does not establish a new host run at the current runtime pin.",
+      "Canonical pin/latest projection reconciliation is a next-sweep input. T19 changes no generator code or frozen September verdict bytes; current scope and source identities are explicit in this supplement."
+    ],
+    "derived_offline_view": "docs/ecosystem/index.html#landscape; generated and uncommitted through scripts/build_ecosystem.py",
+    "scope": "These are historical or derived views, not two independent GRAND selections. This refresh does not claim an October 9 re-review of every September 22 layer."
+  },
+  "primary_fetches": {
+    "package_identity_window_utc": ["2026-10-09T19:30:59.926Z", "2026-10-09T19:35:08.174Z"],
+    "pinned_edgartools_source_window_utc": ["2026-10-09T19:33:36.068Z", "2026-10-09T19:33:37.672Z"],
+    "licence_readme_fetched_utc": "2026-10-09T19:36:26Z",
+    "tradingview_terms": {
+      "url": "https://www.tradingview.com/policies/#terms-of-use",
+      "fetched_utc": "2026-10-09T19:36:28.520518Z",
+      "status": 200,
+      "bytes": 237593,
+      "sha256": "b554d8912a29e92b0f1f3108d1637a4ef873e6a0422d728bb338dbd14e645093",
+      "section": "3: Ownership of information; license to use TradingView; redistribution of data; non-display usage"
+    },
+    "selected_source_hashes": {
+      "vectorbt_LICENSE_at_f0d2afba": "a914859a115b70e80956a3cbd613139ad74c04e5d1bd38da8bcc16725822ec84",
+      "vectorbt_README_at_f0d2afba": "171a1854805ff901f00017d1a918484f4b00413757b2c6e2fe61ea752c06a141",
+      "atila_LICENSE_at_b04513ec": "d1496da72184ceb868048480b9e972fa34dab844b156c21e5f1aa9483d834351",
+      "atila_README_at_b04513ec": "aed63e6ff386145570f8e272930aa59e66288eca9c51a1021f1f5a4496ab7231",
+      "tradesdontlie_LICENSE_at_c05b8f57": "1f368594b544a3b7d96cd78e059861d089e7302a364cab766f86939b79f18ae6",
+      "tradesdontlie_README_at_c05b8f57": "c52470ccb9d7c55c57a2e9b41127ad5f9297eea3171282640b290a43e073f30e"
+    },
+    "lean_commit_fetch_window_utc": ["2026-10-09T19:38:56Z", "2026-10-09T19:38:57Z"],
+    "lean_status_fetch_window_utc": ["2026-10-09T19:47:26.127846Z", "2026-10-09T19:47:26.435170Z"]
+  }
+}

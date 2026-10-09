@@ -76,8 +76,11 @@ DeerFlow already uses LangGraph; another orchestration framework is not needed
 for this proof. Temporal is a possible later durable workflow layer, not an
 installed dependency. The earlier Nautilus comparison decision is superseded by
 the selected 2.0.0rc5 target above; the absence of an official Nautilus Alpaca
-adapter remains a separate integration constraint. vectorbt is optional analysis
-software with a Commons Clause license addition; it is not adopted as the engine.
+adapter remains a separate integration constraint. The historical optional
+vectorbt analysis review is superseded for current north-star adoption by the
+owner-routed licence rejection. Its Commons Clause addition is a source fact;
+the adoption decision does not infer a universal legal ban on internal research.
+See the [October 9 catalog reconciliation](../../catalogs/us-equities/catalog-refresh-20261009.md).
 See [the dated manifest](manifest.json) and [coverage limits](../../docs/convergence-audit.md).
 
 ## September 19 results and remaining scope

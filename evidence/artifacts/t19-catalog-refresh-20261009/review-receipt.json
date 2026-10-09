@@ -1,0 +1,122 @@
+{
+  "schema_version": 1,
+  "id": "t19-catalog-refresh-source-review-20261009",
+  "recorded_at_utc": "2026-10-09T19:58:34Z",
+  "base_commit": "3a4cc28840ba7e8a1a9474a989102a669955f243",
+  "evidence_class": "source_review",
+  "scope": "Catalog projection, source identity and owner-routed adoption reconciliation. Native catalog checks establish consistency; retained runtime/fixture evidence keeps its original execution date and class. No new installation, installed-host acceptance, market/SEC acquisition, model request, strategy, broker or paper gate change.",
+  "artifacts": [
+    {
+      "path": "catalogs/us-equities/catalog-refresh-20261009.json",
+      "bytes": 16785,
+      "sha256": "c4ce41dc66d16b8db0b46606fded1659c4fce1d346f1b71bc700df624aefea1d"
+    },
+    {
+      "path": "catalogs/us-equities/catalog-refresh-20261009.md",
+      "bytes": 14833,
+      "sha256": "8f6ed33d7445e8c675f6c8f64906b789e71b71b43a47d38d4321b1e599dfd72b"
+    }
+  ],
+  "native_commands": [
+    {
+      "command": "/usr/bin/python3 scripts/catalog_decisions.py --write --supplement catalogs/us-equities/catalog-refresh-20261009.json#/entries",
+      "exit_code": 0,
+      "returned_counts": {"repositories": 875, "public_star_repositories": 357, "beyond_public_stars": 518, "references": 2080},
+      "stdout_sha256": "bb9679cdbdf04696e6d318f41020032321a3824b6c9c0570d18c82070a6ff054",
+      "scope": "Supported offline registration; exact output retained. No upstream source or native runtime execution was rerun."
+    },
+    {
+      "command": "/usr/bin/python3 scripts/component_matrix.py --write",
+      "exit_code": 0,
+      "returned_stdout": "{\"flip_rule_violations\": 0, \"rows\": 32, \"status\": \"written\"}\n",
+      "stdout_sha256": "4cd2e50526b588cf998c7136436856094ee43628f56bf7db7f397105a40df225"
+    },
+    {
+      "command": "/usr/bin/python3 scripts/new_host_grand_list.py --write",
+      "exit_code": 0,
+      "returned_stdout": "{\"status\": \"written\", \"layers\": 32, \"winners\": 65}\n",
+      "stdout_sha256": "41e2c1752d77b2596cf8f27ca11349437ec5ffcfeefd315d41e62d6f60c2aaa7",
+      "scope": "Held DVC is no longer a current winner. Historical winner row remains in the maintained ledger; frozen September verdict bytes were not edited."
+    },
+    {
+      "commands": [
+        "/usr/bin/python3 scripts/catalog_decisions.py --check",
+        "/usr/bin/python3 scripts/component_matrix.py --check",
+        "/usr/bin/python3 scripts/new_host_grand_list.py --check",
+        "git diff --check"
+      ],
+      "observed_at_utc": "2026-10-09T19:57:20Z",
+      "exit_codes": [0, 0, 0, 0],
+      "catalog_result": "875 identities / 2080 typed pointers",
+      "matrix_returned_stdout": "{\"rows\": 32, \"status\": \"checked\"}\n",
+      "grand_returned_stdout": "{\"status\": \"passed\", \"layers\": 32, \"winners\": 65}\n",
+      "stderr_bytes": 0
+    }
+  ],
+  "prepublication_full_validation": {
+    "command": "timeout 600 nice -n 10 ionice -c2 -n7 /usr/bin/python3 scripts/validate.py",
+    "mode": "FULL; never --failed",
+    "started_at_utc": "2026-10-09T19:53:03Z",
+    "completion_observed_at_utc": "2026-10-09T19:54:21Z",
+    "exit_code": 0,
+    "returned_stdout": "{\"components\": 70, \"hashed_files\": 11279, \"profiles\": 4, \"receipts\": 239, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution.\n",
+    "stdout_bytes": 162,
+    "stdout_sha256": "05179c49963ac0f8870cce074bd0390ec9b7b0deb12a73c58c860ede0fd3a8a2",
+    "stderr_bytes": 0,
+    "scope": "Actual check of then-current registered content, before subsequent locator/snapshot notes and this receipt. Final FULL validation after receipt registration is required before commit and retained in the PR/lane handoff."
+  },
+  "independent_completeness_critic": {
+    "role": "Separate read-only critic",
+    "verdict": "No unresolved material blockers or additional missed candidate class/modality within the bounded T19 scope",
+    "findings": [
+      {
+        "finding": "Shortened atila screener source URL returned HTTP 404",
+        "disposition": "Corrected to src/tradingview_mcp/core/services/screener_service.py at the same full b04513ec pin; independently re-fetched and parent gh contents returned rc0, 53664 bytes, Git blob db669c913343f3ad392a6007ce96d66829359b0f",
+        "verified_claim": "The pinned source imports tradingview_screener.Query"
+      },
+      {
+        "finding": "Generated new-host Edgar pin/latest5.58 and skfolio latest1.3 are inherited dated inputs",
+        "disposition": "Explicit dated-field/host-receipt caveat added in supplement grand_views.derived_snapshot_limits and Markdown GRAND views; current runtime/recipe/latest source scopes stay separate",
+        "next_sweep": "Canonical pin/latest projection reconciliation through the maintained native producer; no frozen-verdict rewrite or new host acceptance inferred"
+      }
+    ],
+    "artifact_observation": "Actual full runtime/recipe lock, manifest and final acceptance receipt hashes match the supplement. Current lock has Edgar5.61.1/skfolio1.7 and no DVC/diskcache. Retained sanitized final24 stdout contains 24 unique PASS|0 results and matching actual f451 hashes before/after, exit0 and original October8 times; no new native acceptance was performed.",
+    "timed_primary_reads": {
+      "tool": "ctx_fetch_and_index",
+      "date_utc": "2026-10-09",
+      "request_window_started_utc": "2026-10-09T19:56:29.629Z",
+      "all_eight_tool_results": "success; isError=false",
+      "completion_times_utc": {
+        "vectorbt_LICENSE_f0d2afba": "19:56:31.393Z",
+        "vectorbt_pyproject_f0d2afba": "19:56:31.795Z",
+        "atila_pyproject_b04513ec": "19:56:32.237Z",
+        "atila_corrected_src_screener_b04513ec": "19:56:32.655Z",
+        "tradesdontlie_LICENSE_c05b8f57": "19:56:33.083Z",
+        "TradingView_official_Terms": "19:56:33.657Z",
+        "skfolio_v171_release": "19:56:34.707Z",
+        "skfolio_v180_release": "19:56:35.539Z"
+      },
+      "limit": "These bracket tool calls, not HTTP-header dates. The tool did not expose raw response hashes or HTTP success codes; none is inferred from tool success. Original first-reader response hashes are separately attributed in the source supplement."
+    },
+    "provenance_limits": "CC adoption authority and LEAN build/source mappings remain attributed declarations. The critic did not reproduce owner dispatch, source-to-image equivalence or engine parity."
+  },
+  "retained_runtime_acceptance": {
+    "receipt": "evidence/receipts/runtime-final-native-24-acceptance-20261008.json",
+    "receipt_sha256": "cc32a1462171763446809fb675bd946f3b45875c797bea5049d1a925d4809086",
+    "evidence_class": "local_integration",
+    "run": "2026-10-08T17:48:39Z-17:49:09Z; 24/24 PASS rc0 with actual same-stream lock before/after",
+    "scope": "Reuse of existing evidence, not a new T19 model/provider/runtime execution"
+  },
+  "next_sweep": [
+    "DVC safe dependency closure and full historical equity snapshot contract",
+    "Upstream skfolio risk/portfolio acceptance for the intended use, including newly published fixes",
+    "Canonical generated pin/latest projection scopes",
+    "LEAN source/image provenance and retained-oracle parity"
+  ],
+  "limitations": [
+    "No fresh installed-host acceptance, new upstream-suite pass, broker/paper execution or strategy qualification.",
+    "Prospective 28-case/dev runtime checks and exact migration remain separate.",
+    "Historical receipts, failed conditions and frozen September verdict bytes remain preserved.",
+    "CC reads and lands the draft after #926; this unit does not rebase or merge it."
+  ]
+}

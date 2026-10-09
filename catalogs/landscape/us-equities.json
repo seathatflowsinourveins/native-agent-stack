@@ -1,6 +1,8 @@
 {
   "schema_version": 2,
   "checked_at": "2026-09-21",
+  "current_refresh_record": "catalogs/us-equities/catalog-refresh-20261009.json",
+  "date_scope": "Layer checked_at values retain the September 22 verdict dates. October 9 corrections cover only the named runtime/adoption/identity records; they do not redate the whole landscape.",
   "scope": "Dated requirement-fit decisions for all four US-equities domain research layers, reconciled against existing September 21 runtime and execution records. The candidate slates are representative comparisons; all 152 historical cards remain in the original catalogs. Source review, native execution and measured tradeoffs remain distinct. No fresh installations, provider/model calls or broker actions were performed for this synthesis. A bounded primary-source quality refresh on September 21 America/New_York (September 22 UTC) corrects runtime/memory capability exclusions without changing broker, data or runtime qualification.",
   "layers": [
     {
@@ -365,8 +367,10 @@
         {
           "name": "atilaahmettaner/tradingview-mcp",
           "repository": "https://github.com/atilaahmettaner/tradingview-mcp",
-          "disposition": "unqualified",
-          "why_not_default": "Not adopted and has no retained evidence. The packet note says it would need documented data rights plus a demonstrated as-of query reconciled against retained Alpaca news timestamps; neither exists.",
+          "disposition": "excluded",
+          "historical_disposition": "unqualified at the September 22 verdict; the September 23 keep_but_compare_unverified proposal and September 24 do_not_wire audit remain dated.",
+          "current_decision_record": "catalogs/us-equities/catalog-refresh-20261009.json#/entries/4",
+          "why_not_default": "Owner-routed rejection for automated/non-display north-star data use under TradingView Terms of Use section 3. MIT code permission does not establish provider-data permission. The distinct tradesdontlie Desktop bridge receives the same scoped rejection in the current supplement.",
           "evidence_class": "source_review",
           "evidence_refs": [],
           "source": "lane:claude"
@@ -623,7 +627,10 @@
         }
       ],
       "verdict_status": "recorded",
-      "winners": [
+      "winners": [],
+      "current_adoption_status": "held_no_installable_winner",
+      "current_decision_record": "catalogs/us-equities/catalog-refresh-20261009.json#/entries/2",
+      "historical_winners": [
         {
           "component_id": "data-dvc",
           "repository": "https://github.com/treeverse/dvc",
@@ -752,11 +759,11 @@
         "agreement": "disagree"
       },
       "open_gaps": [
-        "DVC has source-review support only: no retained native add, restore and reproduction run demonstrates this repository's equity snapshot contract.",
+        "DVC installation is held after the October 5 dependency-security removal. The retained September 23 dvc checkout/correction fixture is local integration, not qualification of this repository's historical equity snapshot contract.",
         "No candidate evidence establishes the complete requirement: licensed acquisition, permanent security identity, historical universe eligibility, corporate-action completeness and original publication/revision availability remain separate obligations.",
         "The identity-readiness receipt demonstrates bounded observation-time selection and quarantine through project-local adapters. It does not qualify DVC or another candidate as the executing implementation.",
         "Content identity, signer identity, storage commit time and code-index freshness cannot substitute for original historical information availability.",
-        "No executed comparison measures snapshot restoration fidelity, correction retention, lineage completeness, recovery, concurrency, storage cost or latency across the candidate stores.",
+        "The September 23 four-store fixture measures bounded restoration/correction behavior only. No executed full overturn comparison qualifies the equity snapshot contract, lineage, recovery, concurrency, storage cost or latency across the candidate stores.",
         "OpenLineage event persistence and consistent version/cutoff facets, and MLflow run-to-dataset bindings, remain unqualified.",
         "lanes disagreed: claude=data-dvc,data-openlineage; codex=data-dvc; adjudicated by evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-identity-provenance-20260922.json"
       ],
@@ -1612,8 +1619,9 @@
         {
           "name": "vectorbt",
           "repository": "https://github.com/polakowo/vectorbt",
-          "disposition": "conditional",
-          "rationale": "Array-based sweeps can accelerate a defined research task, subject to semantics and license fit. Selected signals would still require event-driven accounting and execution checks; no matched speed/quality result is recorded here.",
+          "disposition": "excluded",
+          "current_decision_record": "catalogs/us-equities/catalog-refresh-20261009.json#/entries/3",
+          "rationale": "Current north-star adoption is excluded by the owner-routed licence disposition. The historical optional-sweep review remains dated; multi-asset and public Rust support are source facts, not grounds for rejection. No matched speed/quality acceptance is recorded.",
           "evidence_kind": "source_review",
           "evidence_refs": [
             "catalogs/us-equities/engines-strategies.json"
@@ -2139,8 +2147,9 @@
         {
           "name": "vectorbt",
           "repository": "https://github.com/polakowo/vectorbt",
-          "disposition": "conditional",
-          "rationale": "Array-based sweeps can accelerate a defined research task, subject to semantics and license fit. Selected signals would still require event-driven accounting and execution checks; no matched speed/quality result is recorded here.",
+          "disposition": "excluded",
+          "current_decision_record": "catalogs/us-equities/catalog-refresh-20261009.json#/entries/3",
+          "rationale": "Current north-star adoption is excluded by the owner-routed licence disposition. The historical optional-sweep review remains dated; multi-asset and public Rust support are source facts, not grounds for rejection. No matched speed/quality acceptance is recorded.",
           "evidence_kind": "source_review",
           "evidence_refs": [
             "catalogs/us-equities/engines-strategies.json"
@@ -2478,8 +2487,9 @@
         {
           "name": "vectorbt",
           "repository": "https://github.com/polakowo/vectorbt",
-          "disposition": "conditional",
-          "rationale": "Array-based sweeps can accelerate a defined research task, subject to semantics and license fit. Selected signals would still require event-driven accounting and execution checks; no matched speed/quality result is recorded here.",
+          "disposition": "excluded",
+          "current_decision_record": "catalogs/us-equities/catalog-refresh-20261009.json#/entries/3",
+          "rationale": "Current north-star adoption is excluded by the owner-routed licence disposition. The historical optional-sweep review remains dated; multi-asset and public Rust support are source facts, not grounds for rejection. No matched speed/quality acceptance is recorded.",
           "evidence_kind": "source_review",
           "evidence_refs": [
             "catalogs/us-equities/engines-strategies.json"
@@ -2719,8 +2729,9 @@
         {
           "name": "vectorbt",
           "repository": "https://github.com/polakowo/vectorbt",
-          "disposition": "conditional",
-          "rationale": "Array-based sweeps can accelerate a defined research task, subject to semantics and license fit. Selected signals would still require event-driven accounting and execution checks; no matched speed/quality result is recorded here.",
+          "disposition": "excluded",
+          "current_decision_record": "catalogs/us-equities/catalog-refresh-20261009.json#/entries/3",
+          "rationale": "Current north-star adoption is excluded by the owner-routed licence disposition. The historical optional-sweep review remains dated; multi-asset and public Rust support are source facts, not grounds for rejection. No matched speed/quality acceptance is recorded.",
           "evidence_kind": "source_review",
           "evidence_refs": [
             "catalogs/us-equities/engines-strategies.json"
@@ -5535,8 +5546,9 @@
         {
           "name": "vectorbt",
           "repository": "https://github.com/polakowo/vectorbt",
-          "disposition": "conditional",
-          "rationale": "Array-based sweeps can accelerate a defined research task, subject to semantics and license fit. Selected signals would still require event-driven accounting and execution checks; no matched speed/quality result is recorded here.",
+          "disposition": "excluded",
+          "current_decision_record": "catalogs/us-equities/catalog-refresh-20261009.json#/entries/3",
+          "rationale": "Current north-star adoption is excluded by the owner-routed licence disposition. The historical optional-sweep review remains dated; multi-asset and public Rust support are source facts, not grounds for rejection. No matched speed/quality acceptance is recorded.",
           "evidence_kind": "source_review",
           "evidence_refs": [
             "catalogs/us-equities/engines-strategies.json"

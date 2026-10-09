@@ -3618,6 +3618,10 @@
     },
     {
       "repository": "https://github.com/atilaahmettaner/tradingview-mcp",
+      "current_decision": "reject_terms_non_display",
+      "current_decision_record": "catalogs/us-equities/catalog-refresh-20261009.json#/entries/4",
+      "current_source_commit": "b04513ece51dd21a60b0a1e05964aee5957b7a69",
+      "historical_scope": "The source_commit and unchanged-source statements below belong to the September 24 audit, not current upstream currency.",
       "source_commit": "a1e54b07e5c21b375363607920f297c5adfbeed4",
       "source_date": "2026-09-01T15:15:48Z",
       "review_level": "source_review",
@@ -3779,18 +3783,21 @@
     },
     {
       "repository": "https://github.com/tradesdontlie/tradingview-mcp",
+      "current_decision": "reject_terms_non_display",
+      "current_decision_record": "catalogs/us-equities/catalog-refresh-20261009.json#/entries/5",
+      "historical_decision": "alternative in the September audit; superseded for automated/non-display north-star use by the owner-routed October 9 ToS rejection.",
       "source_commit": "c05b8f5755ed8e64ea242de88ddbf46aa24d56a4",
       "source_date": "2026-07-28T17:28:37Z",
       "review_level": "source_review",
       "review_depth": "selected_primary_files",
-      "decision": "alternative",
+      "decision": "obsolete_or_ineligible",
       "role": "CDP bridge to an operator's TradingView Desktop charts",
       "layers": [
         "financial-ui-automation"
       ],
       "rationale": "A personal chart workflow requiring a valid subscription; it is explicitly unofficial and does not become an authoritative data API or broker integration.",
-      "license": null,
-      "license_classifier": "NOASSERTION",
+      "license": "MIT source code; additional notice excludes TradingView software/data/IP rights",
+      "license_classifier": "MIT",
       "sources": [
         "https://github.com/tradesdontlie/tradingview-mcp/blob/c05b8f5755ed8e64ea242de88ddbf46aa24d56a4/README.md",
         "https://github.com/tradesdontlie/tradingview-mcp/blob/c05b8f5755ed8e64ea242de88ddbf46aa24d56a4/LICENSE",
@@ -3798,7 +3805,7 @@
       ],
       "limitations": [
         "No installation, model inference, broker call or native acceptance was performed by this audit.",
-        "No unambiguous license classification established; a missing root license response is not permission to reuse.",
+        "October 9 primary-source correction: the pinned root LICENSE exists and is MIT with an explicit TradingView rights exclusion. The earlier missing-response/NOASSERTION classification was incorrect. Source-code permission is separate from provider-data permission.",
         "The stdio server registers chart, UI, alert and replay tool families against TradingView Desktop through CDP. README requires the user desktop/subscription and warns about automated-data restrictions."
       ],
       "evidence_refs": [],
