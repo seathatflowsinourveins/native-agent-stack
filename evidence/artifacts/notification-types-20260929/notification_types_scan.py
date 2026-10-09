@@ -29,6 +29,9 @@ DECISIONS = {
     "quota_auto_resume_disabled": ("ring", True, "the client ended its usage-limit wait without continuing the task"),
     "worker_permission_prompt": ("ring", False, "an agent-team teammate needs permission or network access (team inbox poller)"),
     "push_notification": ("ring", False, "the model's own PushNotification, which a local session sends only while the client judges the person away (the terminal's focus report, else 60 s without input; a remote workspace skips the check)"),
+    # 2026-10-09 F10: pinned 2.1.295 $.ui.notify emitter and hooks-reference check;
+    # source and before/after installed-client proof share the floor decision record.
+    "plugin_notification": ("quiet", False, "Claude Code 2.1.295 plugin $.ui.notify forwards arbitrary plugin text/title without an intrinsic approval or input wait; quiet under the escalation-only bell rule (docs/decisions/2026-10-09-claude-code-floor.md)"),
     "idle_prompt": ("quiet", True, "a finished-and-waiting ping about 60 s after a turn: the noise the record removed"),
     "auth_success": ("quiet", True, "authentication completed; the person just did it"),
     "elicitation_complete": ("quiet", True, "an MCP elicitation finished; nothing waits for the person"),

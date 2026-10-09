@@ -163,7 +163,7 @@ class OverlayTests(unittest.TestCase):
     def test_every_type_carries_a_decision_with_a_reason_and_the_matcher_rings_for_exactly_the_ring_ones(self):
         (group,) = self.overlay["hooks"]["Notification"]
         self.assertEqual(sorted(group["matcher"].split("|")), sorted(NEEDED_TYPES))
-        self.assertEqual(len(DECISIONS), 18, "a notification type added to or removed from the table changes this count on purpose")
+        self.assertEqual(len(DECISIONS), 19, "a notification type added to or removed from the table changes this count on purpose")
         self.assertEqual(sum(1 for _d, documented, _w in DECISIONS.values() if documented), 12, "the hooks reference documents 12 types")
         for kind, (decision, documented, reason) in DECISIONS.items():
             self.assertIn(decision, ("ring", "quiet"), kind)

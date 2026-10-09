@@ -17067,8 +17067,8 @@
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
-      "sha256": "e9274e0cb5f5aae9eeb3056eb9ccfee9076306762381986aff724fdc94af33e8",
-      "bytes": 299238
+      "sha256": "244d2659a3ee3c6c8efc05c87a5b9a1ac4c5eeb159430b92987c7e2434868182",
+      "bytes": 299857
     },
     {
       "path": "catalogs/landscape/us-equities.json",
@@ -18292,8 +18292,8 @@
     },
     {
       "path": "docs/decisions/2026-10-09-claude-code-floor.md",
-      "sha256": "00832e279f39b292f098962e58964f366f0e019efd229c6a3ee1ef1cc5071e40",
-      "bytes": 4968
+      "sha256": "3c3c8d1a9abbd526ee9c284b77a1199cffe18435be738539e0a7c3662b6a5838",
+      "bytes": 8327
     },
     {
       "path": "docs/decisions/2026-10-09-codex-native-review-trial.md",
@@ -42062,8 +42062,8 @@
     },
     {
       "path": "evidence/artifacts/notification-types-20260929/notification_types_scan.py",
-      "sha256": "b12ea18b67f64a13688d1468249c395058a528b8ba44239b472edba897bdf385",
-      "bytes": 12075
+      "sha256": "9520252cedcf8143a515b530b33f18152f160f980413587b811c63f268051a3f",
+      "bytes": 12505
     },
     {
       "path": "evidence/artifacts/notification-types-20260929/push_notification_probe.py",
@@ -42074,6 +42074,21 @@
       "path": "evidence/artifacts/notification-types-20260929/recorded/exit_codes.txt",
       "sha256": "a83298a69680f8ecb6fbd814c8ff0466306ccaee241a807f1b1002fb8cc4dd37",
       "bytes": 834
+    },
+    {
+      "path": "evidence/artifacts/notification-types-20260929/recorded/f10-2.1.295-after.txt",
+      "sha256": "a3d182d10f67e91ae3e08f228a0423415abe1c35f243062244360877c8c8a2ab",
+      "bytes": 144
+    },
+    {
+      "path": "evidence/artifacts/notification-types-20260929/recorded/f10-2.1.295-before.txt",
+      "sha256": "44018e069225c05ab3f9d2485f436bf4f950e01f5093068345bf573d0bd17d9c",
+      "bytes": 1217
+    },
+    {
+      "path": "evidence/artifacts/notification-types-20260929/recorded/f10-2.1.295-source.json",
+      "sha256": "91a6792347668febedb477646f748a173cb216f3153a370ebae1530dab745d2c",
+      "bytes": 2543
     },
     {
       "path": "evidence/artifacts/notification-types-20260929/recorded/notification_types_scan_2.1.283.json",
@@ -58907,7 +58922,7 @@
     },
     {
       "path": "tests/test_windows_terminal_defaults.py",
-      "sha256": "fb944eaf37f25c0222c10440690972f4948b03adf5fd9829d120ac61eff626b7",
+      "sha256": "f4b2c8ebe16f54782204f32fd674debc4b8f3a01f5ca1d0b00b788c175ed0502",
       "bytes": 51736
     },
     {

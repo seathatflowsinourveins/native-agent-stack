@@ -1,0 +1,22 @@
+..............................F..............
+======================================================================
+FAIL: test_the_installed_client_knows_no_notification_type_without_a_decision (tests.test_windows_terminal_defaults.OverlayTests.test_the_installed_client_knows_no_notification_type_without_a_decision)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repo>/tests/test_windows_terminal_defaults.py", line 185, in test_the_installed_client_knows_no_notification_type_without_a_decision
+    self.assertEqual(sorted(kind for kind in found["types"] if kind not in DECISIONS), [], "a type this client knows has no decision in DECISIONS")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: ['plugin_notification'] != []
+
+First list contains 1 additional elements.
+First extra element 0:
+'plugin_notification'
+
+- ['plugin_notification']
++ [] : a type this client knows has no decision in DECISIONS
+
+----------------------------------------------------------------------
+Ran 45 tests in 4.642s
+
+FAILED (failures=1)
+
