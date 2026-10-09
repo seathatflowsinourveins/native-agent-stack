@@ -72,7 +72,7 @@ COMMENT_EVENTS = frozenset({"issue_comment", "pull_request_review", "pull_reques
 # commit as the caller workflow" (Workflow syntax, `jobs.<job_id>.uses`, where `$/` is the recommended form). Any other
 # value names a workflow at another commit or in another repository, which this module does not read.
 LOCAL_WORKFLOW_PREFIXES = ("./.github/workflows/", "$/.github/workflows/")
-# The one condition accepted as keeping a job or step off pull_request runs: a top-level `&&` conjunct of its `if:`.
+# Enumerated conditions accepted as keeping a job or step off pull_request runs: top-level `&&` conjuncts of its `if:`.
 EXCLUDES_PULL_REQUEST = "github.event_name != 'pull_request'"
 EXCLUDES_PULL_REQUEST_CONJUNCTS = {
     EXCLUDES_PULL_REQUEST,

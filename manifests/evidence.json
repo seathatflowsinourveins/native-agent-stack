@@ -5031,8 +5031,8 @@
     },
     {
       "path": ".github/workflows/hardware-profile-smoke.yml",
-      "sha256": "7255aff34e5d6c6b1e3c8771a7653af9cb16aac9e9e5985750664e7fff6427f0",
-      "bytes": 6088
+      "sha256": "07d44f503623635518ff6b70c015b7ffe1ac1788ff583a7790d8f43a424c9595",
+      "bytes": 7911
     },
     {
       "path": ".github/workflows/native-foundation-e2e.yml",
@@ -5476,8 +5476,8 @@
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "b2286b97f8b2df2ba9297367bd78bc97b3238ad113edec97cf0c359d613c4582",
-      "bytes": 66805
+      "sha256": "07fb501200565c1d13c51a246b9cd06588f3d857e567f4ace74b3d8be6c963c3",
+      "bytes": 67033
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -18407,8 +18407,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "f489ff42d80b1c2e1ece353250c477605730ee41d47dcd54245d06e11c8d13f2",
-      "bytes": 101058
+      "sha256": "5eb511b28e86690d74cc70caf4ce4fc3f22eb6f5d5230435cd46e0f2684620c4",
+      "bytes": 101594
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -58822,13 +58822,13 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "8ea69d5cbbbc53d0b27ca680157baace78829547a09f257361693cdec80d2b44",
-      "bytes": 166440
+      "sha256": "c7a2a886f4a621b9a6c98fce5e063cdaa53741052d689aff0b6985a5b8a53170",
+      "bytes": 169838
     },
     {
       "path": "tests/test_workflow_policy.py",
-      "sha256": "1474beefebc5d5f83e43f25b0cba2264d5aa231cac59ec18214858c0eccdd4b0",
-      "bytes": 85061
+      "sha256": "26110c5c528a7ce0b97269c53b36d954270c4e60506e1b5f6122eccfea754b82",
+      "bytes": 85064
     },
     {
       "path": "tests/test_workflow_security.py",

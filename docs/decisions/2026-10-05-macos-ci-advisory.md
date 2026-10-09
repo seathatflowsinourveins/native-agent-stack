@@ -218,3 +218,40 @@ functions, and the schedule-event references named in **SOTA sources** above.
 The existing expression oracle checks the four event types and cancellation
 locally; scheduled execution on the default branch remains hosted evidence
 to observe after landing.
+
+### MLX lock coverage retained on Linux PRs (2026-10-09 fix)
+
+At the implementation base
+[`b7dfe638`](https://github.com/seathatflowsinourveins/native-agent-stack/blob/b7dfe638fc825a52ff4e7d1a9ccf2fde7de889fd/.github/workflows/hardware-profile-smoke.yml#L94-L102),
+the macOS job checked lock consistency by compiling `tools/mlx-smoke/requirements.in`
+with **uv 0.12.17**, targeting `aarch64-apple-darwin` and Python 3.12 with
+hashes, a 2026-09-23 cutoff and `MACOSX_DEPLOYMENT_TARGET=14.0`, then comparing
+the result with the committed `requirements.lock.txt`. The separate
+[lines 103–118](https://github.com/seathatflowsinourveins/native-agent-stack/blob/b7dfe638fc825a52ff4e7d1a9ccf2fde7de889fd/.github/workflows/hardware-profile-smoke.yml#L103-L118)
+create a venv, install the wheels and run MLX generation.
+
+The resolve-and-diff check is retained in `linux-profile` on pull requests and
+manual dispatch, using the vendor's same cross-platform command and pinned
+Linux distribution. The existing Linux profile and script tests remain; the
+job also runs `MlxLockLinuxTests` against its native uv executable. That test
+executes the workflow's actual resolve-and-diff script against both the
+committed lock and a deliberately stale dependency pin. Other unit-test jobs
+without the supplied uv binary skip this integration case; the Linux MLX job
+supplies it explicitly and runs the regression. Native MLX wheel installation
+and inference remain manual macOS checks, so PRs lose that runtime coverage.
+
+The primary reference is [uv's `--python-platform` CLI
+documentation](https://docs.astral.sh/uv/reference/cli/#uv-pip-compile--python-platform)
+and [`--python-version`](https://docs.astral.sh/uv/reference/cli/#uv-pip-compile--python-version),
+verified against **astral-sh/uv 0.12.17 at
+[`635500036e1705961315e86447f0fab0a8ddb309`](https://github.com/astral-sh/uv/tree/635500036e1705961315e86447f0fab0a8ddb309)**,
+`crates/uv-cli/src/lib.rs` and `crates/uv/src/commands/pip/compile.rs`.
+On Linux, that vendor binary reproduced the committed lock exactly
+(SHA-256 `71b920ceab903cf59e6387651f79dd9c9ac70880065508689eac664a8d27e6a4`;
+resolve 0, diff 0). Replacing a dependency pin in a scratch lock left the
+generated lock unchanged and made the same diff return 1. An explicit Linux
+Python 3.13 interpreter with Python 3.12 resolution also returned resolve 0,
+diff 0 without Python downloads. These are `local_integration` results for
+this requirements set. Hosted Linux PR execution at the fix head remains to
+be observed; the daily **06:47 UTC** adoption jobs retain general macOS
+portability coverage and manual hardware dispatch retains the MLX runtime check.

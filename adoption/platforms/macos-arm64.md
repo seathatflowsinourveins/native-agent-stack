@@ -512,9 +512,11 @@ to its historical `denylist` default
 Since the [2026-10-05 advisory decision](../../docs/decisions/2026-10-05-macos-ci-advisory.md),
 the Mac is portable or remote-control only. `validate-macos`, `bootstrap-macos`
 and `bootstrap-macos-brew` skip every pull request and are not required checks.
-They run nightly at 06:47 UTC, on main pushes selected by the workflow's paths
-filter, and on manual dispatch. A failing nightly or main-push run is fixed in
-a follow-up PR.
+The [2026-10-09 addendum](../../docs/decisions/2026-10-05-macos-ci-advisory.md#addendum-daily-only-macos-ci-2026-10-09)
+sets their cadence to the daily 06:47 UTC schedule and manual dispatch only;
+they skip pushes as well. `hardware-profile-smoke.yml`'s `macos-profile` runs
+only on manual dispatch. A failing scheduled or manually dispatched run is
+fixed in a follow-up PR.
 
 The `platform_profiles` row for `macos-arm64` names a hosted smoke job
 (`.github/workflows/adoption-bootstrap.yml`, jobs `bootstrap-macos`,
@@ -893,15 +895,15 @@ there; what a Mac's crash reporter keeps of a crashed command's environment
 has not been checked. Key acceptance on a Mac is
 the runner, guard and status test suites on the macOS CI job, then a new Mac
 host receipt that separates the steps run from those not run. WSL receipts
-do not certify the Mac. Since 2026-10-05, that macOS CI job
-(`adoption-bootstrap.yml`'s `validate-macos`) skips every pull request and runs
-the full suite on matching main pushes, nightly schedules and manual dispatch
-([advisory decision](../../docs/decisions/2026-10-05-macos-ci-advisory.md)).
+do not certify the Mac. Under the [2026-10-09 addendum](../../docs/decisions/2026-10-05-macos-ci-advisory.md#addendum-daily-only-macos-ci-2026-10-09),
+that macOS CI job (`adoption-bootstrap.yml`'s `validate-macos`) skips pull requests
+and pushes and runs the full suite on the daily 06:47 UTC schedule and manual
+dispatch.
 The runner, guard and status suites (`tests/test_credential_run.py`,
 `tests/test_secret_path_guard.py`, `tests/test_effort_default_guard.py`,
 `tests/test_adoption_status.py` and `tests/test_credential_status.py`) are on
 the retained Mac-relevant input list, as is the code they test. Portability
-checks happen after merge or on the nightly schedule; a failure gets a follow-up PR.
+checks run on the daily schedule or manual dispatch; a failure gets a follow-up PR.
 
 ## Qdrant collections
 

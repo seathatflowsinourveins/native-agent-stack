@@ -1715,8 +1715,8 @@ def validate_macos_mode(outputs, result="success", event="pull_request"):
 
 
 class AdoptionBootstrapMacosAdvisoryTests(unittest.TestCase):
-    """No macOS job runs on pull_request. Main pushes, nightly schedules and dispatches still run them,
-    while `changes` keeps bootstrap-linux path-gated (docs/decisions/2026-10-05-macos-ci-advisory.md)."""
+    """Adoption macOS jobs run only on daily schedules and manual dispatches, skipping pull requests and pushes.
+    `changes` keeps bootstrap-linux path-gated (2026-10-09 addendum to the macOS advisory decision)."""
 
     text = ADOPTION_BOOTSTRAP.read_text(encoding="utf-8")
     job_map = jobs(text)
@@ -1999,8 +1999,8 @@ def evaluate_expression(expression, context):
 
 
 class ValidateMacosGateEvaluationTests(unittest.TestCase):
-    """The advisory job gate skips every PR regardless of `changes` result or outputs, and the retained mode
-    selector gives full on all other events. The previous workflow's gate is a discriminating control."""
+    """The daily job gate skips PRs and pushes regardless of `changes` result or outputs; schedule and dispatch
+    select full mode. The previous workflow's gate is a discriminating control."""
 
     # The workflow before the advisory change, as shipped by #677 (2026-10-03-macos-ci-scope.md).
     PRE_ADVISORY_GATE = ("${{ !cancelled() && (github.event_name != 'pull_request' || "
@@ -2073,6 +2073,56 @@ class ValidateMacosGateEvaluationTests(unittest.TestCase):
                 with self.subTest(job=job_id, event=event):
                     self.assertFalse(expression_truthy(evaluate_expression(
                         gate, {"github.event_name": event, "cancelled()": True})))
+
+
+class MlxLockLinuxTests(unittest.TestCase):
+    """Linux PR CI retains the native uv Apple-target lock check and rejects a stale committed lock."""
+
+    def test_linux_keeps_the_lock_check_and_regression_on_pull_requests(self):
+        text = (WORKFLOWS / "hardware-profile-smoke.yml").read_text(encoding="utf-8")
+        linux = jobs(text)["linux-profile"]
+        self.assertIsNone(block_if(linux.split("\n    steps:\n", 1)[0]))
+        check = step_block(linux, "Verify the hash-locked MLX requirements")
+        self.assertIsNone(block_if(check))
+        script = run_block(check)
+        for option in ("--python-platform aarch64-apple-darwin", "--python-version 3.12",
+                       "--generate-hashes", "--no-header --exclude-newer 2026-09-23T00:00:00Z",
+                       'diff -u tools/mlx-smoke/requirements.lock.txt'):
+            self.assertIn(option, script)
+        self.assertIn("MACOSX_DEPLOYMENT_TARGET: '14.0'", check)
+        install = step_block(linux, "Install uv")
+        self.assertIn("uv-x86_64-unknown-linux-gnu.tar.gz", run_block(install))
+        self.assertIn("sha256sum --check", run_block(install))
+        regression = step_block(linux, "Run the MLX lock consistency regression")
+        self.assertIsNone(block_if(regression))
+        self.assertIn("tests.test_workflow_hardening.MlxLockLinuxTests", regression)
+        self.assertIn("      - tests/test_workflow_hardening.py", text.split("\njobs:", 1)[0])
+
+    @unittest.skipUnless(os.environ.get("UV"), "the Linux MLX job supplies its pinned native uv binary")
+    def test_native_apple_target_check_accepts_current_lock_and_rejects_stale_lock(self):
+        linux = jobs((WORKFLOWS / "hardware-profile-smoke.yml").read_text(encoding="utf-8"))["linux-profile"]
+        script = run_block(step_block(linux, "Verify the hash-locked MLX requirements"))
+        lock = (ROOT / "tools/mlx-smoke/requirements.lock.txt").read_text(encoding="utf-8")
+        stale = re.sub(r"(?m)^(\S+)==\S+", r"\1==0.0.0", lock, count=1)
+        self.assertNotEqual(stale, lock, "the stale dependency mutation applies")
+        with tempfile.TemporaryDirectory(prefix="mlx-lock-check-") as temporary:
+            checkout = Path(temporary)
+            inputs = checkout / "tools/mlx-smoke"
+            inputs.mkdir(parents=True)
+            shutil.copyfile(ROOT / "tools/mlx-smoke/requirements.in", inputs / "requirements.in")
+            runner = checkout / "runner"
+            (runner / "hw-profile").mkdir(parents=True)
+            environment = dict(os.environ, RUNNER_TEMP=str(runner), MACOSX_DEPLOYMENT_TARGET="14.0",
+                               UV_PYTHON_DOWNLOADS="never")
+            for label, content, expected in (("current", lock, 0), ("stale", stale, 1)):
+                with self.subTest(lock=label):
+                    (inputs / "requirements.lock.txt").write_text(content, encoding="utf-8")
+                    result = subprocess.run(["bash", "--noprofile", "--norc", "-eo", "pipefail", "-c", script],
+                                            cwd=checkout, env=environment, text=True, capture_output=True, timeout=300)
+                    self.assertEqual(result.returncode, expected, (result.stdout + result.stderr)[-2000:])
+                    if label == "stale":
+                        self.assertIn("requirements.lock.txt", result.stdout)
+                        self.assertIn("0.0.0", result.stdout)
 
 
 def macos_job_inputs():

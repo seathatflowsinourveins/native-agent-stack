@@ -17,7 +17,7 @@ The [PR #26 qualification record](https://github.com/seathatflowsinourveins/nati
 links the final hosted revision, integration and publication outcomes; local
 implementation records below remain dated observations.
 
-## Current practice (2026-10-05)
+## Current practice (2026-10-09)
 
 This section is the current practice. The dated sections below are history; where they differ, this section and the
 live settings win. The user chose the advisory option at 2026-10-05T01:41:33Z;
@@ -31,9 +31,10 @@ The Actions allow-list and harness description below were checked against live s
 - **Required checks** (job IDs from GitHub Actions, app ID 15368; strict up-to-date checks off): `validate`,
   `token-report`, `secret-scan`, `dependency-review`, `osv-scanner`, `verdict-review-gate` and
   `sota-sources`. Renaming one of these jobs, or giving it a job-level `name:`, orphans its required check.
-- **macOS is advisory.** `validate-macos`, `bootstrap-macos` and `bootstrap-macos-brew` skip every pull request.
-  Nightly runs at 06:47 UTC and main pushes selected by the workflow's paths filter retain portability coverage;
-  a failure is fixed in a follow-up PR ([decision](decisions/2026-10-05-macos-ci-advisory.md)).
+- **macOS is advisory.** `validate-macos`, `bootstrap-macos` and `bootstrap-macos-brew` run only on the daily
+  06:47 UTC schedule and manual dispatch. They skip pull requests and pushes. `hardware-profile-smoke.yml`'s
+  `macos-profile` runs only on manual dispatch. A failure is fixed in a follow-up PR
+  ([2026-10-09 addendum](decisions/2026-10-05-macos-ci-advisory.md#addendum-daily-only-macos-ci-2026-10-09)).
 - **Merging.** Squash merges only; merge commits and rebase merges are off. The ruleset adds linear history, deletion
   and non-fast-forward rules, resolved review threads, no human approval count and a CodeQL code-scanning rule.
   Auto-merge is allowed by the repository settings but is not used for bot PRs: Dependabot PRs and the
@@ -96,8 +97,8 @@ not automatically run them; opening the PR supplies the review check.
 
 | Event | Ordinary validation and token-report checks | Native tool/engine checks | Recovery trials |
 | --- | --- | --- | --- |
-| Open or update a PR | Run; cancel an older run of the same workflow for that PR | Run only for existing matching paths; macOS adoption jobs skip PRs | No automatic run |
-| Push to `main` | Run on the integrated revision | Run only for existing matching paths | No automatic run |
+| Open or update a PR | Run; cancel an older run of the same workflow for that PR | Run only for existing matching paths; macOS jobs skip PRs | No automatic run |
+| Push to `main` | Run on the integrated revision | Run only for existing matching paths; macOS jobs skip pushes | No automatic run |
 | Manual dispatch | Run independently | Run independently | Run only the selected trial |
 
 Concurrency groups include the workflow and event. PR runs share their PR number;
@@ -362,6 +363,12 @@ informational naming notes. Static checks execute no job; a pull request's own r
 remain the execution evidence.
 
 ## Scheduled portability and report-only lanes, 2026-10-05
+
+**Update 2026-10-09:** the [daily-only addendum](decisions/2026-10-05-macos-ci-advisory.md#addendum-daily-only-macos-ci-2026-10-09)
+supersedes this section's main-push macOS cadence. The three macOS adoption jobs
+now run only on the daily 06:47 UTC schedule and manual dispatch;
+`hardware-profile-smoke.yml`'s `macos-profile` runs only on manual dispatch.
+The following paragraphs retain the 2026-10-05 policy as dated history.
 
 Three lanes run on a schedule and are not required checks: `catalog-freshness.yml`
 (Mondays 06:17 UTC, plus manual dispatch with a `max_repos` bound), the

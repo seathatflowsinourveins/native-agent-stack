@@ -5,6 +5,7 @@ on:
     paths:
       - scripts/hardware_profile.py
       - tests/test_hardware_profile.py
+      - tests/test_workflow_hardening.py
       - adoption/hardware-profiles.json
       - tools/mlx-smoke/requirements.in
       - tools/mlx-smoke/requirements.lock.txt
@@ -47,6 +48,34 @@ jobs:
           cat "$RUNNER_TEMP/hw-profile/ubuntu-24.04.json"
       - name: Run the unit tests for the script
         run: python3 -m unittest tests.test_hardware_profile -v
+      - name: Install uv (verified download, isolated prefix, no PATH replacement)
+        env:
+          UV_VERSION: '0.12.17'
+          # https://github.com/astral-sh/uv/releases/download/0.12.17/uv-x86_64-unknown-linux-gnu.tar.gz.sha256
+          UV_SHA256: fa82fd8dde8e8eefdecada6aa0889666556cfceb690d06e0c3bca49eb3070a63
+        run: |
+          mkdir -p "$RUNNER_TEMP/uv"
+          curl --fail --silent --show-error --location --retry 3 \
+            "https://github.com/astral-sh/uv/releases/download/${UV_VERSION}/uv-x86_64-unknown-linux-gnu.tar.gz" \
+            --output "$RUNNER_TEMP/uv/archive.tar.gz"
+          printf '%s  %s\n' "$UV_SHA256" "$RUNNER_TEMP/uv/archive.tar.gz" | sha256sum --check
+          tar -xzf "$RUNNER_TEMP/uv/archive.tar.gz" -C "$RUNNER_TEMP/uv" --strip-components=1
+          "$RUNNER_TEMP/uv/uv" --version
+          echo "UV=$RUNNER_TEMP/uv/uv" >> "$GITHUB_ENV"
+      - name: Verify the hash-locked MLX requirements for macOS on Linux
+        # uv 0.12.17 resolves the Apple target without importing or installing MLX.
+        # https://docs.astral.sh/uv/reference/cli/#uv-pip-compile--python-platform
+        env:
+          MACOSX_DEPLOYMENT_TARGET: '14.0'
+          UV_PYTHON_DOWNLOADS: never
+        run: |
+          "$UV" pip compile tools/mlx-smoke/requirements.in \
+            --python-platform aarch64-apple-darwin --python-version 3.12 --generate-hashes \
+            --no-header --exclude-newer 2026-09-23T00:00:00Z \
+            -o "$RUNNER_TEMP/hw-profile/requirements.lock.check.txt"
+          diff -u tools/mlx-smoke/requirements.lock.txt "$RUNNER_TEMP/hw-profile/requirements.lock.check.txt"
+      - name: Run the MLX lock consistency regression
+        run: python3 -m unittest tests.test_workflow_hardening.MlxLockLinuxTests -v
       - name: Upload the measured Linux profile
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
