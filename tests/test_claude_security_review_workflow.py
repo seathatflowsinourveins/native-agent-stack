@@ -76,7 +76,7 @@ def model_usage(read=160000, cost=0.7):
                                 "cacheCreationInputTokens": 30000, "costUSD": cost}}
 
 
-def execution(result=None, tools=("Read", "Glob", "Grep"), mcp_servers=(), init=True, **changes):
+def execution(result=None, tools=("Read", "Glob", "Grep"), mcp_servers=(), init=True, turns=None, **changes):
     final = {"type": "result", "subtype": "success", "is_error": False, "num_turns": 7,
              "total_cost_usd": 0.7, "modelUsage": model_usage(), "result": "Verdict NONE\nFinding 1"}
     final.update(changes)
@@ -86,7 +86,12 @@ def execution(result=None, tools=("Read", "Glob", "Grep"), mcp_servers=(), init=
     if init:
         messages.append({"type": "system", "subtype": "init", "tools": list(tools),
                          "mcp_servers": list(mcp_servers), "claude_code_version": "2.1.295"})
-    messages.append({"type": "assistant", "message": {"content": [{"type": "text", "text": TRANSCRIPT_MARKER}]}})
+    for turn in range(final["num_turns"] if turns is None else turns):
+        # The client streams one message per content block, so one API turn spans several messages with one id.
+        messages.append({"type": "assistant", "message": {"id": f"msg_{turn:02d}", "content": [
+            {"type": "thinking", "thinking": ""}]}})
+        messages.append({"type": "assistant", "message": {"id": f"msg_{turn:02d}", "content": [
+            {"type": "text", "text": TRANSCRIPT_MARKER}]}})
     messages.append(final)
     return messages
 
@@ -371,7 +376,7 @@ class SecurityReviewStepTests(unittest.TestCase):
         code, console, summary, usage, _ = run_step(NUMBERS, execution_file=execution())
         self.assertEqual(code, 0, console)
         record = json.loads(usage)
-        self.assertEqual(sorted(record), ["claude_code_version", "forbidden_tools", "mcp_servers", "models",
+        self.assertEqual(sorted(record), ["assistant_turns", "claude_code_version", "forbidden_tools", "mcp_servers", "models",
                                           "num_turns", "session_started", "successful_result", "tools",
                                           "total_cost_usd"])
         self.assertEqual(record["tools"], ["Read", "Glob", "Grep"])
@@ -379,13 +384,13 @@ class SecurityReviewStepTests(unittest.TestCase):
         for text in (usage, summary, console):
             self.assertNotIn(TRANSCRIPT_MARKER, text)
             self.assertNotIn("Verdict", text)
-        self.assertIn("| 7 | 0.7 | true | 2.1.295 | Read Glob Grep | 0 |", summary)
+        self.assertIn("| 7 | 7 | 0.7 | true | 2.1.295 | Read Glob Grep | 0 |", summary)
 
     def test_an_unmet_bound_fails_after_the_numbers_were_kept(self):
         cases = {
             "no cache read": {"modelUsage": model_usage(read=0)},
             "over the client budget": {"total_cost_usd": 3.01},
-            "over the turn limit": {"num_turns": 13},
+            "over the turn limit": {"turns": 13},
             "an error result": {"is_error": True},
             "a turn-limit stop": {"subtype": "error_max_turns"},
             "a shell tool in the session": {"tools": ("Read", "Glob", "Grep", "Bash")},
@@ -399,6 +404,14 @@ class SecurityReviewStepTests(unittest.TestCase):
                 code, _, _, usage, _ = run_step(NUMBERS, execution_file=execution(**changes))
                 self.assertNotEqual(code, 0)
                 self.assertIsInstance(json.loads(usage)["total_cost_usd"], (int, float))
+
+    def test_the_turn_bound_counts_assistant_turns_not_transcript_messages(self):
+        # On Claude Code 2.1.295 a 12-request run with parallel reads reported num_turns 57 (api-actions LR
+        # receipt, 2026-10-08): num_turns counts transcript messages, tool results included.
+        code, console, *_ = run_step(NUMBERS, execution_file=execution(turns=12, num_turns=57))
+        self.assertEqual(code, 0, console)
+        code, *_ = run_step(NUMBERS, execution_file=execution(turns=13, num_turns=13))
+        self.assertNotEqual(code, 0)
 
     def test_names_that_are_not_plain_identifiers_are_replaced(self):
         hostile = "<img src=x onerror=alert(1)> | injected"

@@ -61,7 +61,7 @@ listed separately; a value that looks like a credential is never printed, only i
 ## Cost of one run
 
 As for the pull request review: dry estimate $0.70 to $1.30 for a diff up to about 1,000 lines at Claude Opus 5.5's
-standard prices, a $3 client budget checked again from the run's own numbers, 12 turns. The flag costs nothing.
+standard prices, a $3 client budget checked again from the run's own numbers, 12 turns (checked after the run as distinct assistant message ids, because the result's `num_turns` counts transcript messages, tool results included: a 12-request run on 2.1.295 reported 57). The flag costs nothing.
 
 ## Changed existing test contracts
 
