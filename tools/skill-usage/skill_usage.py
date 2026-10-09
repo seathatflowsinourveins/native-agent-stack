@@ -5,7 +5,8 @@ Claude side reads native `/skill-doctor` (its table is the only per-skill invoke
 Claude Code exposes; see the README for why OTel, a custom hook, agentsview and ccusage cannot
 answer this):
 
-    claude -p "/skill-doctor" --output-format json > /path/outside/checkout/skill-doctor.json
+    claude -p "/skill-doctor" --output-format json --permission-mode dontAsk --tools "" --strict-mcp-config \\
+        --max-turns 1 --max-budget-usd 0.05 > /path/outside/checkout/skill-doctor.json
     python3 tools/skill-usage/skill_usage.py --claude-skill-doctor /path/outside/checkout/skill-doctor.json \\
         --codex-root ~/.codex/sessions --out /path/outside/checkout/report.json
 
@@ -195,10 +196,18 @@ def parse_claude_output(raw: str) -> dict:
             "total_cost_usd": total_cost_usd, "num_turns": num_turns}
 
 
+# /skill-doctor is a local command (0 turns, $0), so these fences change nothing while the client recognises it. They
+# keep a prompt the client does not recognise from reaching a model with tools under the host's inherited
+# bypassPermissions or from spending: no tools, no MCP servers, deny anything not pre-approved, one turn, a budget cap
+# (the headless default of the Claude Code native practice record of 2026-10-09, slot headless-sdk).
+SKILL_DOCTOR_ARGV = ["claude", "-p", "/skill-doctor", "--output-format", "json", "--permission-mode", "dontAsk",
+                     "--tools", "", "--strict-mcp-config", "--max-turns", "1", "--max-budget-usd", "0.05"]
+
+
 def run_skill_doctor(*, timeout: int = 30, runner=subprocess.run) -> dict:
-    """Run exactly `claude -p "/skill-doctor" --output-format json`, stdin from /dev/null."""
+    """Run exactly SKILL_DOCTOR_ARGV, stdin from /dev/null."""
     try:
-        completed = runner(["claude", "-p", "/skill-doctor", "--output-format", "json"],
+        completed = runner(SKILL_DOCTOR_ARGV,
                             stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=timeout)
     except (OSError, subprocess.TimeoutExpired) as error:
         return {"format": None, "rows": {}, "total_cost_usd": None, "num_turns": None,
@@ -2223,7 +2232,7 @@ def main(argv=None) -> int:
                                      "'result' text), or a plain-text /skill-doctor table, from "
                                      "this file")
     claude_source.add_argument("--run-skill-doctor", action="store_true",
-                                help="Run 'claude -p \"/skill-doctor\" --output-format json' now "
+                                help="Run SKILL_DOCTOR_ARGV, 'claude -p \"/skill-doctor\" --output-format json' with the headless fences, now "
                                      "(stdin from /dev/null); refused unless total_cost_usd == 0 "
                                      "and num_turns == 0")
     parser.add_argument("--claude-timeout", type=int, default=30, metavar="SECONDS",
