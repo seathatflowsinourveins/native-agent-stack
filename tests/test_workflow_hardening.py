@@ -1172,7 +1172,9 @@ class ValidateShardWorkflowContract(unittest.TestCase):
         self.assertEqual(json.loads(matrix.group(1)), list(range(8)))
         step = step_block(self.shards, "Test validation failure modes")
         self.assertIsNone(block_if(step), "every matrix cell must execute its assigned modules")
-        self.assertNotIn("continue-on-error", uncommented(self.shards))
+        # Count reporting may be nonfatal; the shard job and suite execution must still fail closed.
+        self.assertNotRegex(uncommented(self.shards), r"(?m)^    continue-on-error\s*:")
+        self.assertNotIn("continue-on-error", uncommented(step))
         self.assertEqual(unittest_invocations(step), [])
         (args,) = validate_shard_invocations(step)
         self.assertEqual(args[args.index("--shards") + 1], "8")
