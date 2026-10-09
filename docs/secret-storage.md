@@ -22,6 +22,8 @@ against it.
 | `tavily` | Tavily API key. Until 2026-09-29 it lived only in the kernel keyring; its first file write comes from that copy through the create-only chain in [Kernel keyring](#kernel-keyring-transport-and-per-boot-spare-2026-09-29) | optional | `<store>/tavily.env` | `TAVILY_API_KEY` |
 | `anthropic-api` | Anthropic Claude Console API key for local tools without an identity provider | optional | `<store>/anthropic-api.env` | `ANTHROPIC_API_KEY` |
 | `anthropic-api-2` | Anthropic Claude API key, second key (additional credit; fast-mode trial) | optional | `<store>/anthropic-api-2.env` | `ANTHROPIC_API_KEY` |
+| `anthropic-api-3` | Anthropic Claude API key, third key (additional credit; direct use only) | optional | `<store>/anthropic-api-3.env` | `ANTHROPIC_API_KEY` |
+| `anthropic-api-4` | Anthropic Claude API key, fourth key (additional credit; direct use only) | optional | `<store>/anthropic-api-4.env` | `ANTHROPIC_API_KEY` |
 | `grafana-admin` | Local Grafana admin account and secret key | generated locally | `~/.config/ecosystem-observability/ecosystem-grafana.env` | `GF_SECURITY_*` |
 | `nativestack-generation-key` | Host service key | generated locally | `~/.config/nativestack/generation.key` | none |
 | `openhands-session` | OpenHands agent-server session key for one runtime-worker attempt ([decision](decisions/2026-09-28-openhands-resolver-isolation.md)) | generated locally, per attempt; deleted after the attempt's containers are confirmed removed | `~/.local/state/native-agent-stack/runtime-workers/openhands/secrets/<run-id>-<arm>.server.env`, plus the `.headers` file beside it | none on the host; `OH_SESSION_API_KEYS_0` exists only inside the agent-server container (Docker `--env-file`) |
@@ -32,8 +34,8 @@ against it.
 
 `<store>` means `${XDG_CONFIG_HOME:-$HOME/.config}/native-agent-stack`.
 
-The two Anthropic entries are separate stores for additional Console keys;
-adding `anthropic-api-2` replaces nothing. Select the key for one command with
+`anthropic-api` and `anthropic-api-2` are separate Console-key stores;
+adding another entry replaces nothing. Select the key for one command with
 `python3 tools/credentials/credential_run.py anthropic-api-2 -- <command>`
 (or `anthropic-api` for the first key). Both inject only `ANTHROPIC_API_KEY`,
 which stays in `must_not_be_set` and is never exported into the host shell.
@@ -47,6 +49,15 @@ distinguishes headless API-key use from interactive approval before overriding
 subscription sign-in. Store creation and rotation use the existing hidden
 prompt and the selected id; the other store remains separate. See the
 [second-key decision](decisions/2026-10-08-anthropic-api-second-key.md).
+
+`anthropic-api-3` and `anthropic-api-4` add two more optional stores for
+additional Console credit, using the same per-command variable and handling
+rules. Select either id with `credential_run.py`; storage uses the owner's
+hidden prompt. These keys are for direct Anthropic consumers. The gateway
+feature-parity failure is a reported dispatch condition, not a result of
+this inventory change. Batches and other provider features require their
+own direct-client verification. See the
+[additional-keys decision](decisions/2026-10-09-anthropic-api-additional-keys.md).
 
 `sec-contact` may also declare the public `EDGAR_RATE_LIMIT_PER_SEC` setting as
 a positive integer, for example `5`, before launching an EdgarTools command.
