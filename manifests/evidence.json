@@ -18267,8 +18267,8 @@
     },
     {
       "path": "docs/decisions/2026-10-08-sdk-runtime-worker-adoption.md",
-      "sha256": "aba6c2c758520f4cea2e8383bfae08618a7efda23831e6766763feab257981a2",
-      "bytes": 31517
+      "sha256": "6a8b6e8ee76eb04d7ab6036d0435805f6063b45ee6c48bf2f3b1fe9d65da8f57",
+      "bytes": 31210
     },
     {
       "path": "docs/decisions/2026-10-08-skills-cc-lanes-picks.md",
@@ -49057,8 +49057,8 @@
     },
     {
       "path": "evidence/artifacts/sdk-runtime-adoption-20261008/decisions.json",
-      "sha256": "c678227d3a289670f42ad103749d37dfc3fb194cb7bed2af2a38cfa5ca67ceb3",
-      "bytes": 121608
+      "sha256": "108903768a1239ec7d078121d47e3b154efe8934b97876ac1084e03e4f9d1c42",
+      "bytes": 121681
     },
     {
       "path": "evidence/artifacts/sdk-runtime-adoption-20261008/loki/app_server_events_by_client.f5a6eac9d40b5d5233694fc8f8e773a632f6f0dc7a426a262453ed5e03894b66.loki.json",
@@ -49107,18 +49107,13 @@
     },
     {
       "path": "evidence/artifacts/sdk-runtime-adoption-20261008/observations.json",
-      "sha256": "4c6a955616cf0741b13dadfe35424f1fd6bb86fe4d9956d0f1c732e9e5bd6eef",
-      "bytes": 90337
+      "sha256": "212af1da8d35c262ebe172956aceaaafe5345bb3a5157f9f485f9bc0caae8b42",
+      "bytes": 89936
     },
     {
       "path": "evidence/artifacts/sdk-runtime-adoption-20261008/offline-parser-check.json",
       "sha256": "ca7ec711b3ebcfe63d443f49f52a3ea96b545749874df5077be33d4d545d1bc4",
       "bytes": 1259
-    },
-    {
-      "path": "evidence/artifacts/sdk-runtime-adoption-20261008/openhands-1.53.0-constraints.public.d1d7d7a010130646e5e06c1b182a226ab0ee39590b7eb429e64249562b3fc235.txt",
-      "sha256": "d1d7d7a010130646e5e06c1b182a226ab0ee39590b7eb429e64249562b3fc235",
-      "bytes": 58786
     },
     {
       "path": "evidence/artifacts/sdk-runtime-adoption-20261008/openhands-job-starts.aef22b0794253231a919111201c2ad3854339480edf7da10d566aa8b572bae62.json",

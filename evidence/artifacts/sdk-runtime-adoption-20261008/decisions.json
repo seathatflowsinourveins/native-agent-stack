@@ -1,9 +1,9 @@
 {
   "schema": "sdk-runtime-adoption-decisions/2",
-  "status": "MICRO_RECORD_FIXES_PREPARED_ONE_REBASE_HEAD_PENDING_GATES",
+  "status": "FIX3_HOST_WITNESS_ONLY_REQUIRED_GATES_PENDING",
   "observations": {
     "path": "evidence/artifacts/sdk-runtime-adoption-20261008/observations.json",
-    "sha256": "4c6a955616cf0741b13dadfe35424f1fd6bb86fe4d9956d0f1c732e9e5bd6eef"
+    "sha256": "212af1da8d35c262ebe172956aceaaafe5345bb3a5157f9f485f9bc0caae8b42"
   },
   "decision_record": "docs/decisions/2026-10-08-sdk-runtime-worker-adoption.md",
   "organic_use_definition": "An ordinary real job causes the owning role in a fresh native session to select its configured route without SDK, skill or tool names in the task prompt; native invocation and the task oracle are retained with role attribution.",
@@ -837,7 +837,7 @@
               "source": {
                 "path": "evidence/artifacts/sdk-runtime-adoption-20261008/observations.json",
                 "locator": "/adoption_observation",
-                "sha256": "4c6a955616cf0741b13dadfe35424f1fd6bb86fe4d9956d0f1c732e9e5bd6eef"
+                "sha256": "212af1da8d35c262ebe172956aceaaafe5345bb3a5157f9f485f9bc0caae8b42"
               },
               "role_attribution_gap": "No dedicated native measurement/role adapter.",
               "availability": "UNAVAILABLE_NATIVE_ROLE_SERIES",
@@ -917,7 +917,7 @@
         },
         "2_wiring": {
           "status": "RETAINED_CANDIDATE_OR_ACTIVATION_PENDING",
-          "install": "At OpenHands/software-agent-sdk 54daf056bd863bb46f922a2fe9324dd736b37ff6, vendor source environment: make build (Makefile:34-37 runs uv sync --dev). Existing 1.53.0 constraints export is retained with its recorded uv export command; selected package-environment procedure: uv pip install --python <selected-env>/bin/python -c <retained-constraints> openhands-sdk==1.53.0 openhands-tools==1.53.0. Existing install-plan.json:4307-4310 exports and installs 1.50.1. Neither procedure was executed in this revision.",
+          "install": "At OpenHands/software-agent-sdk 54daf056bd863bb46f922a2fe9324dd736b37ff6, vendor source environment: make build (Makefile:34-37 runs uv sync --dev). Existing 1.53.0 export is a local host witness only, bound by path, prior digest, size and stat mtime. That dependency set is not run here and stays outside the scanned tree. Existing install-plan.json:4307-4310 exports and installs 1.50.1. No export, installation or restore was executed for FIX3.",
           "pin": "54daf056bd863bb46f922a2fe9324dd736b37ff6",
           "inverse": "For a newly added package env, vendor package-manager uninstall; restore previous exact user-unit and skill entry if changed, by owner-reviewed diff. Existing two environments stay. Stale metadata 1.50.1/source 1.53.0 is not a supported restore target.",
           "route": "Existing native-stack-worker skill -> openhands-job@ native unit -> selected agent-runtime-worker interpreter; retained source/qualification env separate",
@@ -942,23 +942,29 @@
             "pin": "54daf056bd863bb46f922a2fe9324dd736b37ff6",
             "locator": "Makefile:34-37; openhands-sdk/pyproject.toml:3; openhands-tools/pyproject.toml:3",
             "observations_locator": "/vendor_openhands_install_source",
-            "constraints_header_source": {
-              "path": "evidence/artifacts/sdk-runtime-adoption-20261008/openhands-1.53.0-constraints.public.d1d7d7a010130646e5e06c1b182a226ab0ee39590b7eb429e64249562b3fc235.txt",
-              "sha256": "d1d7d7a010130646e5e06c1b182a226ab0ee39590b7eb429e64249562b3fc235",
-              "bytes": 58786,
-              "locator": "lines 1-2: normalized export header; byte-identical dependency body"
+            "constraints_host_witness": {
+              "path": "${USER_HOME}/.local/share/new-wsl-native-stack/tools/openhands-source/openhands-1.53.0-constraints.txt",
+              "sha256": "77f59a5d9403594b8c78be40a0bf5d20a95353ab68a4dcfde518933d6260f17e",
+              "bytes": 58784,
+              "mtime_utc": "2026-10-08T02:38:32.782614Z",
+              "mtime_ns": 1791427112782613566,
+              "locator": "Local host witness metadata; dependency contents not reopened for FIX3",
+              "availability": "LOCAL_HOST_WITNESS_ONLY"
             }
           },
-          "selected_binary_constraints_restore": "EXISTING_EXPORT_RETAINED; installation and restore execution remain unverified",
+          "selected_binary_constraints_restore": "LOCAL_HOST_WITNESS_ONLY; installation and restore execution remain unverified",
           "unit_header_limit": "Retained selected unit header cites 1.50.1 while its ExecStart interpreter metadata is 1.53.0; header is stale and no unit changed.",
           "constraints_witness": {
-            "path": "evidence/artifacts/sdk-runtime-adoption-20261008/openhands-1.53.0-constraints.public.d1d7d7a010130646e5e06c1b182a226ab0ee39590b7eb429e64249562b3fc235.txt",
-            "sha256": "d1d7d7a010130646e5e06c1b182a226ab0ee39590b7eb429e64249562b3fc235",
-            "bytes": 58786,
-            "locator": "lines 1-2: normalized export header; byte-identical dependency body"
+            "path": "${USER_HOME}/.local/share/new-wsl-native-stack/tools/openhands-source/openhands-1.53.0-constraints.txt",
+            "sha256": "77f59a5d9403594b8c78be40a0bf5d20a95353ab68a4dcfde518933d6260f17e",
+            "bytes": 58784,
+            "mtime_utc": "2026-10-08T02:38:32.782614Z",
+            "mtime_ns": 1791427112782613566,
+            "locator": "Local host witness metadata; dependency contents not reopened for FIX3",
+            "availability": "LOCAL_HOST_WITNESS_ONLY"
           },
           "constraints_raw_digest": "77f59a5d9403594b8c78be40a0bf5d20a95353ab68a4dcfde518933d6260f17e",
-          "constraints_projection_limit": "Raw export retained privately; published witness changes only two header-comment home prefixes. Dependency body is identical. No constrained install or restore ran."
+          "constraints_witness_scope": "Local host witness only; the dependency set is not run here and remains outside the scanned repository tree."
         },
         "3_fresh_session": {
           "status": "PENDING_ORGANIC_OWNING_ROLE_ACCEPTANCE",
@@ -1129,7 +1135,7 @@
               "source": {
                 "path": "evidence/artifacts/sdk-runtime-adoption-20261008/observations.json",
                 "locator": "/adoption_observation",
-                "sha256": "4c6a955616cf0741b13dadfe35424f1fd6bb86fe4d9956d0f1c732e9e5bd6eef"
+                "sha256": "212af1da8d35c262ebe172956aceaaafe5345bb3a5157f9f485f9bc0caae8b42"
               },
               "role_attribution_gap": "No current role-attributed 24h invoke series.",
               "availability": "UNAVAILABLE_NATIVE_ROLE_SERIES",
@@ -1380,7 +1386,7 @@
               "source": {
                 "path": "evidence/artifacts/sdk-runtime-adoption-20261008/observations.json",
                 "locator": "/adoption_observation",
-                "sha256": "4c6a955616cf0741b13dadfe35424f1fd6bb86fe4d9956d0f1c732e9e5bd6eef"
+                "sha256": "212af1da8d35c262ebe172956aceaaafe5345bb3a5157f9f485f9bc0caae8b42"
               },
               "role_attribution_gap": "gptr-mcp not exposed/qualified in this profile; current CLI reports lack per-role 24h join.",
               "availability": "UNAVAILABLE_NATIVE_ROLE_SERIES",
@@ -1489,7 +1495,7 @@
               "source": {
                 "path": "evidence/artifacts/sdk-runtime-adoption-20261008/observations.json",
                 "locator": "/adoption_observation",
-                "sha256": "4c6a955616cf0741b13dadfe35424f1fd6bb86fe4d9956d0f1c732e9e5bd6eef"
+                "sha256": "212af1da8d35c262ebe172956aceaaafe5345bb3a5157f9f485f9bc0caae8b42"
               },
               "role_attribution_gap": "Retained research run metrics lack owning-role/client attribution; embedded use does not qualify HTTP.",
               "availability": "UNAVAILABLE_NATIVE_ROLE_SERIES",
@@ -1504,14 +1510,14 @@
   "acceptance": {
     "designated_claude": "PASS_WITH_P3_AT_62426CF9",
     "designated_gpt_exec": "CHANGES_REQUESTED_P3_AT_62426CF9",
-    "ci": "PENDING_REBASED_HEAD",
+    "ci": "PENDING_FIX3_HEAD",
     "ci_head": null,
-    "pre_cue": "PENDING_REBASED_HEAD",
+    "pre_cue": "PENDING_FIX3_HEAD",
     "cc_cue": "PENDING",
     "owner_decisions": "PENDING",
     "g5_release_binding": "PENDING",
     "wiring_or_retirement_deployed": false,
-    "delta_reads": "PENDING_REBASE_DELTA_MICRO_READS",
+    "delta_reads": "PENDING_FIX3_DELTA_MICROS",
     "schema_label_note": "Gate status uses PENDING; missing canonical entry point is a separate gap field.",
     "pre_cue_entrypoint": "${STATE_ROOT}/coordination/command-center/cc-tools/base_tests_at_head.sh",
     "memory_cost_gate": "PENDING_COMPONENT_SPECIFIC_PSS"

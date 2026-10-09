@@ -299,21 +299,18 @@ installation was performed by that check.
   each declare 1.53.0 at line 3; this supported source sync restores coherent
   metadata. The existing [installer plan](../../evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json):4307–4310
   instead exports and installs 1.50.1 constraints.
-  The existing raw 1.53.0 constraints export is retained privately, unchanged:
-  58,784 bytes, SHA-256
-  77f59a5d9403594b8c78be40a0bf5d20a95353ab68a4dcfde518933d6260f17e.
-  Its literal home paths fail the publication rule in scripts/validate.py:31.
-  The [published projection](../../evidence/artifacts/sdk-runtime-adoption-20261008/openhands-1.53.0-constraints.public.d1d7d7a010130646e5e06c1b182a226ab0ee39590b7eb429e64249562b3fc235.txt)
-  is 58,786 bytes, SHA-256
-  d1d7d7a010130646e5e06c1b182a226ab0ee39590b7eb429e64249562b3fc235.
-  Only the two home prefixes in the export-header comment become `${USER_HOME}`;
-  the dependency body is byte-identical. Lines 1–2 retain `uv export` with `--frozen`, `--no-dev`,
-  `--no-hashes`, `--no-emit-project`, `--no-emit-workspace`, `--no-emit-local`,
-  requirements-txt format and the openhands-tools package. This corrects the
-  previous unavailable-export claim; retaining the raw file and projection does not
-  execute export, installation or restore. Both installed environments remain
-  preserved pending scoped restore acceptance. The stale 1.50.1/source 1.53.0
-  mix is not a supported restore target.
+  The historical 1.53.0 export has a local host witness at
+  `${USER_HOME}/.local/share/new-wsl-native-stack/tools/openhands-source/openhands-1.53.0-constraints.txt`.
+  The recorded witness metadata is 58,784 bytes, SHA-256
+  77f59a5d9403594b8c78be40a0bf5d20a95353ab68a4dcfde518933d6260f17e,
+  mtime 2026-10-08T02:38:32Z. Observations records this source under
+  `openhands_constraints_witness` with availability `LOCAL_HOST_WITNESS_ONLY`.
+  The witness remains outside the repository's scanned tree. Its dependency set
+  was not run here; the historical source export does not establish current
+  deployment or acceptance. No export, installation or restore was performed
+  in this revision. Both installed environments remain preserved pending scoped
+  restore acceptance. The stale 1.50.1/source 1.53.0 mix is not a supported
+  restore target.
 - Deep 0.7.23: retained receipt's uv venv --python 3.13 <runtime> and
   uv pip install --python <runtime>/bin/python deepagents==0.7.23, followed by
   its exact filesystem oracle. The separate 0.7.21 trial restores through its
