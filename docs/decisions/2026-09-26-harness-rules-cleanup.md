@@ -1,7 +1,7 @@
 # Decision: harness rules cleanup, each rule once, token practice as the base layer (2026-09-26)
 
-**Decided by:** the user's request of 2026-09-26 ("clean harness rules with research driven evidance driven";
-"the token save practice always be the essential layer for our ecosyustem"), carried out by a workflow unit on
+**Decided by:** the owner's request of 2026-09-26 for research- and evidence-driven harness cleanup,
+with token-saving practice as the ecosystem's essential base layer, carried out by a workflow unit following [Claude's memory guidance](https://code.claude.com/docs/en/memory) and [native workflow contract](https://code.claude.com/docs/en/workflows) on
 branch `claude/harness-rules-cleanup-20260926`, based on `origin/main@d78d2de9`.
 
 **Scope:** [`examples/claude-native/CLAUDE.md`](../../examples/claude-native/CLAUDE.md) (portable user rules),

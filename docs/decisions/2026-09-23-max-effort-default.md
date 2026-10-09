@@ -2,11 +2,11 @@
 
 **Decided by:** unit `max-effort-default`, its own dedicated worktree, branch
 `claude/max-effort-default-20260923` (first based on `origin/main@40828dfe`, later
-rebased onto the current `main`), from the user's requirement of 2026-09-23: "effort max
-and ultracode default for all future workflow and github, max quality". The user
-expected one session to run `max` and Ultracode at the same time; the probes below
-show that the native client does not allow that, so the requirement is met per layer
-instead.
+rebased onto the current `main`), acting on the owner's 2026-09-23 request for maximum-quality `max` effort
+and Ultracode across future workflow and GitHub work. They expected both in one session; the retained
+2.1.281 probes below show that combination unavailable then, so their requirement is met per layer.
+The [native model-configuration contract](https://code.claude.com/docs/en/model-config) defines effort and orchestration separately;
+those historical probes establish neither a current-client restriction nor a new quality measurement.
 
 **Scope:**
 
@@ -199,10 +199,10 @@ does not reduce usage. Record each run's per-child model, effort and usage with
 - **`CLAUDE_CODE_EFFORT_LEVEL=max` everywhere.** Rejected: it disables Ultracode
   orchestration for the main loop (P1) and forces every child to `max` regardless of
   its definition (P5, P6, P9), so no stage could ever be set lower on evidence.
-- **Keep the task-matched efforts (Sonnet/medium, Opus/high).** Rejected: contrary
-  to the user's requirement of `max` for all workflows.
-- **`max` for reviewers and judges only.** Rejected: the user asked for all
-  workflows, scouts and builders included.
+- **Keep the task-matched efforts (Sonnet/medium, Opus/high).** Rejected because the owner's 2026-09-23 request
+  requires `max` for all workflows; the [frontmatter effort contract](https://code.claude.com/docs/en/model-config) supplies the setting.
+- **`max` for reviewers and judges only.** Rejected because the owner's request covers all
+  workflows, scouts and builders included; the per-role setting keeps their requested level visible.
 - **Persist `max` through `effortLevel` or `modelSettings`.** Not available: the
   client drops the value without a warning (Q1, with Q2 as its control; the schema and
   docs for the per-model key).
@@ -286,7 +286,7 @@ Sonnet 5.5. The 2.1.281 findings above stay as history for that release. On 2.1.
 - **A max session kept the Ultracode reminder.** `--effort max` and `CLAUDE_CODE_EFFORT_LEVEL=max` sessions carried the reminder text
   (P1 and P2 above did not). The reminder is only the indicator this record used; the probes did not exercise workflow
   orchestration at max. The overturn condition "a Claude Code release accepts `max` together with Ultracode orchestration" is met by
-  that indicator and was acted on later that day: the user asked for `max` as the default, and the
+  that indicator and was acted on later that day: the owner requested `max` as the default on 2026-09-29, and the
   [2026-09-29 max-default record](2026-09-29-max-default-effort.md) starts interactive terminal launches at `max` through the launcher,
   with the saved xhigh as the fallback where the launcher is not used.
 - **The stage rule stands and is load-bearing.** In the headless probes a stage or child that names no effort ran at its own model's

@@ -1,8 +1,8 @@
 # Decision: an OmniRoute account pool for GPT-6 lanes: a source build of release/v3.8.51 with an upstream fix and an upstream feature, a keyless loopback service and Codex wiring (2026-09-27)
 
-**Status: decided by the user and installed on the NativeStack WSL2 workstation on 2026-09-27; this change records
+**Status: decided by the owner and installed on the NativeStack WSL2 workstation on 2026-09-27; this change records
 it.** The coordinator session built, installed and verified the gateway before this record was written. This change
-touches no host. The gateway is adopted for pooled GPT-6 access. Native Codex stays the max-quality default, and the
+touches no host. Pooled GPT-6 access uses [OmniRoute's account-pool implementation at `a58000c7`](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/README.md). Native Codex stays the max-quality default, and the
 agent-sdks layer default is unchanged (decision 6).
 
 **Scope:**
@@ -39,14 +39,14 @@ section lists the observations whose outputs are not retained, and other reporte
 
 ## Context
 
-The user's direction on 2026-09-27 (UTC, intent quoted from the session):
-- about 05:05Z, the account pool and its purpose: "with omniroute organize all the accs and its native built token
-  efficiency practice, we can powering the sota repos, runtimes, even trading runtimes etc in north star, and we will
-  not need to spend the context for tracking noise of gpt6 usage". Earlier: "consider the full codex lane move to
-  omniroute".
-- about 05:40Z, the build: "go ahead install the v3.8.51 branch and wire codex".
-- about 06:05Z, the posture: "we need passwardless workflow as previous stated and open the dashboard, we are llm
-  native frictionless".
+The owner's 2026-09-27 directions (UTC), paraphrased; pinned OR/native Codex sources establish implementation, not authority:
+- about 05:05Z, they requested pooled accounts and [OmniRoute's native efficiency/usage mechanisms](https://github.com/diegosouzapw/OmniRoute/blob/a58000c7685f4091c7a6fd8ddf3ebce7d2ec67c3/README.md)
+  with the aim of powering SOTA repositories and runtime workers, potentially including north-star trading runtimes, while keeping usage-tracking noise
+  outside prompt context. They had asked to consider moving the complete Codex lane; that proposal retains the native parity and
+  worker-comparison gates below, and native Codex stays the maximum-quality default.
+- about 05:40Z, they authorized installing upstream `release/v3.8.51` and wiring Codex (OR `a58000c7`; decisions 1 and 4).
+- about 06:05Z, they chose the previously requested frictionless, passwordless dashboard posture, implemented through OR `src/lib/db/settings.ts`
+  and `src/server/authz/policies/management.ts`; its keyless settings, local-management risk and exposure overturn condition remain recorded below.
 - about 06:30Z, the accounts: four Codex accounts were added through OmniRoute's own OAuth flow. Codex's own
   `~/.codex/auth.json` was never imported.
 - about 06:55Z, the workload: multi-hour GPT-6-heavy convergence through SOTA harness frameworks, with GPT-6 powering
@@ -282,7 +282,7 @@ Upstream's own CI is red on `a58000c7`. Issue #14866 "Release branch not green: 
    - **Not decided here.** The settings synthesis recommends moving the provider block out of the host base config
      into the profile (its K2), so base config matches `adoption/templates/codex.config.template.toml`. That is the
      Codex-templates unit's scope, not this record's.
-5. **Passwordless and keyless, by the user's decision.**
+5. **Passwordless and keyless by the owner's 2026-09-27 decision (implemented through OR's settings/authentication contract).**
    - **The settings.** `requireLogin=false`, `REQUIRE_API_KEY=false` and `INITIAL_PASSWORD` removed. While first-time
      setup is incomplete, a set `INITIAL_PASSWORD` makes upstream mark setup complete and force `requireLogin=true`
      as a headless deploy (OR `src/lib/db/settings.ts` L301-311: `!settings.setupComplete &&
@@ -298,10 +298,10 @@ Upstream's own CI is red on `a58000c7`. Issue #14866 "Release branch not green: 
    - **Mitigation.** The bind is loopback only, on a single-user workstation: all three listeners were on 127.0.0.1
      at 10:40Z (decision 2, "Addresses").
    - **Overturn.** Any multi-user or non-loopback exposure, or any untrusted local process.
-   - **What the user overrode.** The settings synthesis recommended requiring the key and the login (its K7 and U2).
-     The user's 06:05Z direction overrides that.
+   - **Owner override.** The settings synthesis recommended requiring the key and the login (its K7 and U2).
+      The owner overrode both in their 2026-09-27 06:05Z direction.
 6. **What "adopted" covers, and the gate that stays.**
-   - **The gateway lane's uses.** The landscape sweep, on the user's direction, through #387's lane
+   - **The gateway lane's uses.** The landscape sweep, on the owner's September 27 direction, through #387's lane
      (`build_args.py --gpt6-provider omniroute`). The peer's 8-check mechanical parity probe on build `dd6e9607e` is
      recorded in the message of merged commit `b9abcc5f` (#387): stage rc 0 and codex rc 0; the shell tool; MCP
      `ctx_execute`; `--output-schema`; usage; effort `max` in the rollout and `max`/`max` in the gateway's
@@ -449,8 +449,8 @@ rests on source (OR50 `open-sse/executors/codex.ts` L346-347).
 
 - **Native Codex only.** One account per session. It stays the max-quality default until a preregistered comparison.
 - **OmniRoute 3.8.50 from npm.** Rejected: the `xhigh` clamp and the hook sandbox escape.
-- **Waiting for npm 3.8.51** (the settings synthesis's U1). Superseded by the user's 05:40Z direction to install the
-  branch. The re-pin trigger below keeps that path open.
+- **Waiting for npm 3.8.51** (the settings synthesis's U1). Superseded by the owner's 2026-09-27 05:40Z direction to install upstream `release/v3.8.51`
+  at OR `a58000c7` with the documented upstream patches; the re-pin trigger below keeps the published-package path open.
 - **The other open fixes for defect 1:**
   - **#14872** (head `396e1ad2`) and **#14886** (head `86b75f7d`) were not chosen; #14904 has the widest test coverage
     (decision 1).
@@ -458,7 +458,7 @@ rests on source (OR50 `open-sse/executors/codex.ts` L346-347).
     source build anyway. A code fix also covers upstream's Node 24 and 26 targets.
 - **CLIProxyAPI v7.3.19 and thezillo/codex-proxy v0.3.7.** These are from the 2026-09-26 runtime-worker discovery,
   which reported that CLIProxyAPI stores tokens unencrypted; this record did not re-check that.
-- **Requiring the key and the login** (the settings synthesis's K7 and U2). Overridden by the user (decision 5).
+- **Requiring the key and the login** (the settings synthesis's K7 and U2). Overridden by the owner on 2026-09-27, with the risk and mitigation recorded in decision 5.
 - **The subshell loader in `ExecStart=` instead of `EnvironmentFile=`.** Not needed: the file has no `export` lines,
   which systemd v255 would drop, and the process-environment exposure is the same (decision 2).
 - **`--no-recovery`.** Rejected; upstream labels it a debugging mode.

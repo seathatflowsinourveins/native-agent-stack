@@ -37,18 +37,18 @@ Verified on 2026-09-29 from source and tests. No value was read.
 
 Dated reading (2026-09-29, designer 1, for the coordinator):
 
-- On 2026-09-29 the user said "the key can be store with env so no key is
-  loss" and "handle the key with seamless sota env practice always" (the
-  coordinator's design brief). These state a rule for every key.
-- They post-date the 2026-09-26 memory-only placement of Tavily. They also
-  post-date the 2026-09-28 "don't store in files" for the keys pasted in chat
-  (the Alpaca pairs), which the user already reversed by moving both pairs
-  into 0600 files.
-- **Reading:** Tavily moves to the 0600 file store, and the keyring keeps at
-  most a per-boot spare. The design's root research unit called the two
-  instructions conflicting and left the move to the user; this reading
-  resolves the conflict by recency and by the user's stated goal that no key
-  is lost.
+- As recorded in the coordinator's design brief, on 2026-09-29 the owner requested durable environment storage and seamless key handling so no key is lost;
+  those owner statements state a rule for every key.
+  [Linux keyrings(7)](https://man7.org/linux/man-pages/man7/keyrings.7.html) establishes retention lifetimes, not the authority to change placement.
+- These directions post-date the 2026-09-26 memory-only placement of Tavily and the owner's 2026-09-28
+  instruction against file storage for keys supplied in chat. They had already reversed the latter for the
+  Alpaca pairs by moving both into 0600 files; that recorded move remains separate from this reading.
+  The restart plan and source/test findings establish why kernel retention is not the durable store of record.
+- **Reading:** designer 1 interprets the later directions as moving Tavily to the existing 0600 file store,
+  with the keyring retaining at most a per-boot spare. The root research unit had called the directions
+  conflicting and left the move to the owner; this designer's reading resolves that conflict by recency
+  and their stated no-key-loss goal, rather than presenting an upstream lifetime contract as the owner's decision.
+  No key value was read; the move's execution evidence remains separate from this dated interpretation.
 - **Overturn:** if the user restates memory-only for Tavily, the row reverts
   to `kernel_keyring`, now carrying the `memory_only_lost_on_restart`
   warning, and the file is removed by the user or by a tracked removal tool
@@ -832,7 +832,7 @@ With `requireLogin=false`, the management policy admits an anonymous `auth-disab
 - **(a) Upstream's control, `requireLogin=true`.**
   - It is the only control that closes the whole management surface for every caller.
   - It needs a stored password, `INITIAL_PASSWORD` or OIDC. Without one, a loopback caller can still write `requireLogin: false` (`src/shared/utils/apiAuth.ts:474-478,511-515`; `src/app/api/settings/require-login/route.ts:90-122`), and the dashboard login needs a stored hash.
-  - The user ruled out a login or password on 2026-09-28 ("passwordless ... use the env key if needed"). The same instruction said to close container exposure without one.
+  - On 2026-09-28 the owner ruled out a login/password, allowed an environment key if needed and required closing container exposure without a password. That direction is a deployment constraint; the [WSL networking contract](https://learn.microsoft.com/en-us/windows/wsl/networking) does not authenticate shared loopback, and this record claims no verified isolation merely from the instruction. No login or password setup is applied here.
 - **(b) A local redaction carry.**
   - It removes direct reads on the patched routes only, and cannot close the writes above for a loopback caller.
   - The surface spans about fifteen routes, in files upstream edits weekly: `routeGuard.ts` three times and `settings/route.ts` once in the week to 2026-09-29.
@@ -872,7 +872,7 @@ With `requireLogin=false`, the management policy admits an anonymous `auth-disab
 - Until the container rule is verified for a workload, that workload must not run model-written or third-party code.
 
 **Overturn:**
-- A workload that runs model-written or third-party code found without verified isolation: it is stopped at once. If it cannot be isolated, `requireLogin=true` with a password is the only close; that reverses the user's 2026-09-28 direction, so it is the user's decision.
+- A workload that runs model-written or third-party code found without verified isolation: it is stopped at once. If it cannot be isolated, the source-reviewed `requireLogin=true` control with a password is required to close the management surface; changing the dated passwordless deployment constraint remains a separate user-owned decision.
 - Upstream ships a non-interactive management credential that an anonymous loopback caller cannot disable, for example key-only management with the bootstrap write closed: adopt it.
 - An agent-browser, Playwright or Chromium change, a launch that disables `LocalNetworkAccessChecks` or grants the loopback permission, or a measured request from an untrusted page (including a navigation or a private-address-space page) reaching a loopback listener: re-measure, and if a request reaches the listener, apply the origin-validator carry, which closes rebinding reads and cross-site writes for every browser.
 - A gateway port bound beyond loopback, a second OS user on the host, or a gateway reachable from the LAN: the posture no longer holds.

@@ -1,7 +1,7 @@
 # Decision: model currency across the routed lanes, and the routes to an older model (2026-09-27)
 
-**Decided by:** a workflow unit on host `nativestack-5975wx-20260925`, for the user's request of 2026-09-27 to use
-only the latest state-of-the-art models, including those released in the past weeks. Branch
+**Decided by:** a workflow unit on host `nativestack-5975wx-20260925`, acting on the owner's 2026-09-27 request to use
+only the latest SOTA models, including recent releases; vendor notes, model catalogs and [native configuration](https://developers.openai.com/codex/config-reference/) supply availability/interface evidence. Branch
 `claude/w5-model-currency-20260927`, based on `origin/main@ec8a4892`, checked against Claude Code 2.1.283 and
 codex-cli 0.157.1.
 
@@ -59,10 +59,10 @@ Two rows keep a model that a single source could rank lower:
   every row of its table, while adding that "the gap between Opus 5.5 and Claude Fable 5.1 is narrower than these
   scores suggest". Anthropic's routing text keeps Fable 5.1 as the escalation tier: the models overview uses it "when
   your evals on Claude Opus 5.5 at higher effort still fall short", and the advisor pairing table accepts a Fable
-  advisor for an Opus 5.5 main model but rejects an Opus advisor for a Fable 5.1 main model. The user's rule assigns
-  Fable 5.1 and allows `opus` when that fits, so no switch is needed.
+  advisor for an Opus 5.5 main model but rejects an Opus advisor for a Fable 5.1 main model. The owner's September 27 rule assigns
+  Fable 5.1 and allows `opus` where it fits; the [native advisor pairing table](https://code.claude.com/docs/en/advisor) supports compatibility, so no switch is needed in that dated scope.
 - **Extraction.** GPT-6 Luna shares Sol's release date. The frozen #359 metric (billed tokens) picked Sol; a rerun that
-  scores credits or included usage could favour Luna, and changing that metric is the user's call.
+  scores credits or included usage could favour Luna; changing that frozen metric is the owner's decision, requiring their explicit amendment.
 
 ## Holds and their gates
 
@@ -130,7 +130,7 @@ who wants the automatic switch sets `"switchModelsOnFlag": true` and the variabl
 ## The advisor in the template
 
 **Decision.** `adoption/templates/claude.settings.template.json` sets `"advisorModel": "fable"`, so a new host that
-applies it gets the advisor the user's rule assigns (Opus 5.5 main, Fable 5.1 advisor for truly complex calls).
+applies it gets the advisor assigned by the owner's September 27 rule (Opus 5.5 main, Fable 5.1 advisor for truly complex calls), supported by the [native pairing contract](https://code.claude.com/docs/en/advisor).
 
 **Evidence.**
 - [Settings reference](https://code.claude.com/docs/en/settings-reference#advisormodel) (fetched 2026-09-27): "Scope:
@@ -247,8 +247,8 @@ classifier is not an acceptable test), and no session was started with the chang
    effort guard only reads one.
 5. **A workflow-contract check in `test-envelope.mjs`.** Deferred: it would change the portable contract, its
    `SHA256SUMS` and every adopter's vendored copy. The Python tests cover this repository's files.
-6. **Advisor `opus`, or no template default.** `opus` is allowed by the user's rule and by the pairing table, but the
-   user chose Fable 5.1, which Anthropic's overview keeps as the escalation tier. No default leaves new hosts without
+6. **Advisor `opus`, or no template default.** The owner's rule and the [native advisor pairing table](https://code.claude.com/docs/en/advisor) allow `opus`, but they
+   selected Fable 5.1, which Anthropic's overview keeps as the escalation tier. No default leaves new hosts without
    the assigned advisor.
 7. **`advisorModel` in the project settings.** Rejected: it would turn the advisor, and its Fable billing, on for
    every session in this repository whatever the contributor's plan; `/advisor` itself saves to user settings.
@@ -310,8 +310,8 @@ classifier is not an acceptable test), and no session was started with the chang
 ## Addendum 2026-09-28: Claude Sonnet 5.5 launched, and what the fallback map now means
 
 **Decided by:** the coordinator session that superseded PR #434 (branch `claude/model-currency-20260928`, based on
-`origin/main@83229e24`, checked against Claude Code 2.1.284), for the user's requests of 2026-09-28 to retire stale
-models, keep the latest highest-quality ones and apply the updated configuration. The record above is unchanged and
+`origin/main@83229e24`, checked against Claude Code 2.1.284), acting on the owner's 2026-09-28 requests to retire stale
+models, retain the latest highest-quality ones and apply the update; [Anthropic's release notes](https://platform.claude.com/docs/en/release-notes/overview) and catalog supply model facts. The record above is unchanged and
 stays the 2026-09-27 state; this section records what changed the next day and what it does to the table above.
 
 **What changed.**
@@ -374,14 +374,14 @@ for Sonnet 5.5; an observation on 2.1.284 would settle whether it belongs there.
 
 ## Addendum 2026-09-30: GPT-6.1 Sol released, Codex CLI 0.159.2 pinned, GPT-6.1 Sol at ultra the interactive default
 
-**Decided by:** the user, on 2026-09-30 at about 04:33Z, for the Codex default and the complex-workflow model, as the
-coordinator relayed it verbatim: "at max quality set which is ultra? for gpt6.1 sol as main workers and use astra
-ultra when tasks needed suitable for complex workflow". Recorded by unit D4 of coordinator session
+**Decided by:** the owner on 2026-09-30 at about 04:33Z, as relayed by the coordinator: GPT-6.1 Sol at the highest quality setting for the Codex default and primary workers, with Astra for suitable complex workflows.
+[Native model/effort configuration](https://developers.openai.com/codex/config-reference/) and [openai/codex `rust-v0.159.2` child configuration](https://github.com/openai/codex/blob/rust-v0.159.2/codex-rs/core/src/agent/child_config.rs)
+support those explicit role bindings; the source contract is not the selection authority. Recorded by unit D4 of coordinator session
 native-agent-stack-c5 (branch `claude/sota-defaults-d4-codex-0159-20260930`, based on `origin/main@f77612b6`), which
 also moves the Linux Codex pin to 0.159.2 with
 [`codex-01592-qualification-20260930.json`](../../evidence/receipts/codex-01592-qualification-20260930.json); the
-Gate A owner (session native-agent-stack-2d) chose 0.159.2 as the candidate frozen Codex version, as the coordinator
-relayed. The record above and the 2026-09-28 addendum are unchanged; this section records what changed on 2026-09-29
+Gate A owner (session native-agent-stack-2d) selected 0.159.2 as the candidate frozen Codex version, as the coordinator relayed;
+the qualification receipt supplies its observed client gate, not proof of the relayed selection. The record above and the 2026-09-28 addendum stay historical; this section records the 2026-09-29
 and 2026-09-30 and what it does to the three Codex rows of the table above. The routing contract itself (coordinator,
 worker and child defaults, Astra escalation triggers, routing records) is
 [`2026-09-30-sol-primary-quality-defaults.md`](2026-09-30-sol-primary-quality-defaults.md), pre-existing uncommitted changes
@@ -446,23 +446,23 @@ evidence.
 
 | Lane and role | Current | Latest available (release date) | Action | Sources |
 | --- | --- | --- | --- | --- |
-| Codex CLI 0.159.2 (the Linux pin from this addendum): interactive default and coordinator | `gpt-6.1-sol` at `ultra` (the template rendered for the Linux pin, lines 7-8) | GPT-6.1 Sol (`gpt-6.1-sol`, 2026-09-29) | switched from `gpt-6-astra` at `ultra` by the user's decision | the user's decision above; the routing record; changelog and models page (read 2026-09-30); `rust-v0.159.1` release notes; the 0.159.2 bundled catalog |
+| Codex CLI 0.159.2 (the Linux pin from this addendum): interactive default and coordinator | `gpt-6.1-sol` at `ultra` (the template rendered for the Linux pin, lines 7-8) | GPT-6.1 Sol (`gpt-6.1-sol`, 2026-09-29) | switched from `gpt-6-astra` at `ultra` by the owner's September 30 decision; relative task quality remains unmeasured | the owner's decision above; the routing record; [native configuration](https://developers.openai.com/codex/config-reference/); changelog and models page (read 2026-09-30); `rust-v0.159.1` release notes; the 0.159.2 bundled catalog |
 | Codex CLI 0.159.2: primary workers and generic children | `gpt-6.1-sol` at `max`: the stack-worker profile and the worker command (`-m gpt-6.1-sol`), and `agents.default_subagent_model` with `default_subagent_reasoning_effort` in the template | as above | switched from `gpt-6-astra` at `max` by the routing record | the routing record; `rust-v0.159.2` `core/src/agent/child_config.rs` (cited there) |
-| Codex CLI 0.159.2: complex-workflow tasks and escalation | `gpt-6-astra`, chosen per task: `ultra` to coordinate a complex workflow (the user's decision; Ultra sends `xhigh` and delegates proactively), `max` for an Astra worker or an escalation on the routing record's triggers | GPT-6 Astra (2026-09-03), "Our most capable model for complex work across code, apps, and research" (models page) | the user's decision above and the routing record | the user's decision above; the routing record; models page |
+| Codex CLI 0.159.2: complex-workflow tasks and escalation | `gpt-6-astra`, chosen per task: `ultra` to coordinate a complex workflow (the owner's September 30 decision; Ultra sends `xhigh` and delegates proactively), `max` for an Astra worker or an escalation on the routing record's triggers | GPT-6 Astra (2026-09-03), "Our most capable model for complex work across code, apps, and research" (models page) | the owner's decision above and the routing record; retain the dated binding pending its comparison | the owner's decision above; the routing record; [native model/effort configuration](https://developers.openai.com/codex/config-reference/); openai/codex `rust-v0.159.2` `core/src/agent/child_config.rs`; models page |
 | Codex CLI 0.159.2: judgment lanes that name Astra (the landscape sweep's votes, cross-family reviews, the Codex role carriers, the Gate A runbook and preregistration arms) | `gpt-6-astra` at their recorded efforts: `max` in the landscape-sweep lane and the OmniRoute profile (`cx/gpt-6-astra`), the role carriers' own pins | as above | keep | the Codex judgment row above |
 | Codex CLI 0.159.2: mechanical, deterministically scored extraction | `gpt-6-sol` at `medium`, the #359 binding | GPT-6.1 Sol (2026-09-29), unmeasured on this task | keep until the comparison below | the #359 decision |
 
 **Decision.** The interactive default and coordinator is `gpt-6.1-sol` at `ultra` and primary workers and generic
 children run `gpt-6.1-sol` at `max`; a task that needs a complex workflow runs `gpt-6-astra` at `ultra`, and Astra
-workers and escalations run at `max` on the routing record's triggers. These follow the user's decision and the
-routing record. The judgment lanes that name Astra keep their recorded bindings and the mechanical tier keeps
+workers and escalations run at `max` on the routing record's triggers. These follow the owner's September 30 decision and the routing record; [native configuration](https://developers.openai.com/codex/config-reference/) and the `rust-v0.159.2`
+child configuration support the explicit bindings rather than choosing them. Judgment lanes that name Astra keep their recorded bindings and the mechanical tier keeps
 `gpt-6-sol` at `medium`: no same-task measurement on this stack compares 6.1 Sol with them, and Gate A's model set is
 frozen by its owner. Through the gateway's `cx/` route an `ultra` or `max` request for 6.1 Sol was sent at `xhigh` until
 20128's restart at 06:32:50Z and at `max` after it (the gateway item above), so what a gateway session sends depends on
 the build it reaches and on an upstream PR that is still open.
 
-**Overturn.** The interactive default, the worker default and the complex-workflow choice follow the user's decisions
-and the routing record, and change with the next one or with the routing record's own reopening condition (a
+**Overturn.** The interactive, worker and complex-workflow choices follow the owner's decisions and the routing record, and change with their next decision
+or with the routing record's own reopening condition (a
 comparable workload showing better accepted resolution or lower complete task cost at the same acceptance bar). For
 the lane tiers that keep Astra or GPT-6 Sol the overturn path is a preregistered comparison, described next.
 
@@ -493,7 +493,7 @@ Linux pin; the opt-in `CodexIntegrationTests` passed 10 of 10 against the 0.159.
 owner's rehearsal receipts (peer rehearsal, session native-agent-stack-2d, not re-run here). `rust-v0.159.2` was
 published 2026-09-29T23:57:16Z, so the pin moves inside the 7-day cooldown that the
 [workstation refresh](2026-09-25-workstation-sota-refresh.md#socraticode-1150) applied to a release that is not a
-security fix; it moves because the Gate A owner chose 0.159.2 and the host launcher already runs it.
+security fix; it moves because the Gate A owner selected 0.159.2 and the host launcher already runs it, without claiming a new model comparison.
 
 **Follow-up: macOS needs its own 0.159.x qualification before the template default applies there.**
 `adoption/pins-macos-arm64.json` keeps Codex 0.155.1, while `adoption/templates/codex.config.template.toml` is shared
@@ -556,3 +556,10 @@ The [behavior record](../token-practice.md#generic-child-model-default-omission)
 names lane and role effects and the changed expectation declarations. This is
 a repository proposal with no measured savings or live application; F9 applies
 only after landing from a reviewed diff and the required owner gates.
+
+## Addendum (2026-10-09): G6c-A advisor source clarification
+
+[The September 30 routing record's October 4 addendum](2026-09-30-task-model-routing.md#addendum-2026-10-04-advisor-selection-supersedes-the-fable-row)
+also points forward and preserves the historical Fable configuration at this record's unchanged line 132. Fable was the previous
+selection; the [native advisor alias](https://code.claude.com/docs/en/advisor#set-advisormodel-in-settings) supports Opus, with post-change savings and quality still unmeasured. Revisit the
+selection through the October 4 record's observation contract or a subsequent dated configuration decision.
