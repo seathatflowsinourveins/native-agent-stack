@@ -11,19 +11,31 @@ This foundation record supports recoverable coordination of engineering and
 research workers used for US-equities research and historical simulation. It
 qualifies no strategy or broker operation. The base is
 `aba02ec3456d383bcc2fc72883db098f9be7918a`; both designated reads examined
-`021e1a875d13cdd713856784b4dbc3dec86acd88`. This revision changes records
-only. The CC cues landing through 5f after the required checks and delta reads.
+`021e1a875d13cdd713856784b4dbc3dec86acd88`. The subsequent CC and GPT delta
+reads examined `0ad947f6fd5023b2a21eadae2837349d4b313886`; their full artifact
+hashes are bound in `review_sources.cc_delta` and `review_sources.gpt_delta`.
+This revision carries both reads and changes records only. The CC cues landing
+through 5f after the required checks and both new-head micro reads.
 
 The [decision JSON](2026-10-08-orchestration-adoption.json) binds the measurements
 to each decision. The [native evidence receipt](2026-10-08-orchestration-native-evidence.json),
-SHA256 `96c6fa65d0a0b64850820d18acd62170760e8260af6babfd37a836097dde3441`,
+SHA256 `8a27c364b4a2a84e6fbfaa397461a3aab08c2a87bd08256947c740312ea835cb`,
 retains fixed-window hcom results, selection SQL, attribution rules, source pins
 and installed Claude source selectors.
 
 ## Measurement sources and denominators
 
-Every count below refers to the indicated frozen file and its SHA256. These
-files remain in private coordination state at the named portable locators.
+Every count below refers to the indicated frozen file and its SHA256.
+`coordination/` and `research/` locators resolve under the state root
+`~/.local/state/native-agent-stack`; `docs/` locators resolve in this
+repository checkout. The JSON and native receipt also declare that root.
+
+The exact [CC frozen snapshot](extra/adoption-cc-2ebc30ce3527d025.json) is
+retained in this PR: 60,603 bytes, SHA256
+`2ebc30ce3527d025dad39d65293d3020620192c4f0d2987cf3988461254836a0`.
+It maps to `measurements.cc_read_snapshot` and the new-head review packet's
+`extra/adoption-cc-2ebc30ce3527d025.json`. Its denominators and comparison counts
+are unchanged. The other frozen files remain at the named state locators.
 
 | Source | Capture and population | SHA256 |
 | --- | --- | --- |
@@ -134,12 +146,20 @@ stopped/killed aggregate. Later delivery metadata/current rows can change a
 live projection digest. No archive recovery, model success or organic trigger
 is inferred from this read.
 
+The `delivered_metadata` predicate counts a present/non-null stored
+`msg_delivered_to` field, including serialized empty lists `[]`. Its 2,096
+message rows are stored metadata; the CC delta read reports 1,612 rows with a
+recipient. Neither value proves delivery timing or recipient-role acceptance.
+The 2,139 stored recipient members are a sum of list members, not distinct
+delivered messages. These definitions are also recorded in the native receipt;
+the frozen aggregates remain unchanged.
+
 ## Four stages per tool
 
 | Layer | Outcome and owning job | Stage-4 baseline | Remaining stage-1/3 evidence |
 | --- | --- | --- | --- |
 | hcom | **DEFER** — co-op lane launch and cross-session transport | Native fixed-window role table and narrower hook/transport point evidence | G5 quality row; natural fresh owning-role task, actual client/hook/readiness, delivered request and causal reply |
-| Claude agent teams | **DEFER** — CC/co-op named peers, separate contexts, native peer communication and lead synthesis | Agent/SendMessage proxies in both frozen native snapshots | G5 quality row; owner-scoped native application and fresh named-peer communication/accepted findings |
+| Claude agent teams | **DEFER** — CC/co-op named peers, separate contexts, native peer communication and lead synthesis | Agent/SendMessage proxies in both frozen native snapshots | G5 quality row; owner-gated role scoping and fresh named-peer communication/accepted findings |
 | Claude workflows | **DEFER** — CC/co-op staged native dependency graph and same-session recovery; API-actions separately scoped | CC Workflow 11 in all three native snapshots; native-agent-stack-1a 1 in 2ebc/8682, 2 in e129 | G5 quality row; requested/available/active session state and fresh natural graph selection/completion/recovery |
 | agent-orchestrator | **DEFER** — PR-feedback owner's durable SCM-to-worker route; 5f owns landing | Pinned synthetic/native-observation/quota/inverse receipts; full live invocation rate UNMEASURED | G5 quality row; approved route/config/head, native feedback/proposal, sandbox/denial and inverse proof |
 
@@ -166,9 +186,10 @@ clean final default list yet. The catalog owner supplies the final ranking.
 These entries are source review and scoped retained evidence, checked
 2026-10-09; they do not establish matched comparative winners. A landed
 quality adjudication or material release/capability correction can overturn
-them. Daily catalog-freshness and saturation-ledger reopen triggers provide
-the catalog owner's revisit path, including its index and
-`docs/g5-refresh-procedure.md`. Invoke volume cannot change the quality rank.
+them. The catalog owner's proposed revisit path is daily catalog-freshness and
+saturation-ledger reopen triggers, including its index and
+`docs/g5-refresh-procedure.md`; this procedure is **pending #878 landing**.
+Invoke volume cannot change the quality rank.
 
 ### Stage 2 — clean native install, per-client integration and inverse
 
@@ -179,9 +200,55 @@ version/status observations do not replace a clean installation receipt.
 | Tool | Clean native command/pin | Integration by client | Inverse and current evidence |
 | --- | --- | --- | --- |
 | hcom | Vendor release installer: `curl -fsSL https://github.com/aannoo/hcom/releases/download/v0.7.28/hcom-installer.sh \| sh`; installer SHA256 `75c1560785799881c265ae02ccb247bc6f0742835d716452f7d82071fe8bd638` | Claude/Codex vendor per-run hooks and injected instructions; no substitute task-prompt routing | `hcom kill <owned-lane>` plus independent process/tab/writer-lock exit; co-op owns worktree cleanup. Fresh inverse and selected installation-withdrawal recipe remain pending; killed metadata alone does not pass |
-| Claude agent teams | `claude install 2.1.295`; installed build/content pins below, native install help confirms version target | Claude native conditional approved-plan selection and teammate coordination; Codex uses a separately attributed hcom handoff | Owner requests native peer stop and verifies acknowledgement/exit/cleanup. Fresh selected session inverse remains pending |
-| Claude workflows | Same unchanged native Claude install; no separate workflow package | Claude session `--settings`/`apply_flag_settings`, with requested/available/active and model availability; Codex handoff is not a native graph | Restore pre-task session flags through native control, cancel own nodes and verify completion/exit. Fresh inverse pending |
-| agent-orchestrator | At c95ae361, `AO_HOST_INSTALL_DIR=<owned-prefix> AO_DATA_DIR=<owned-state> AO_RUN_FILE=<owned-run-file> bash scripts/setup-self-hosted.sh --install-only`; script SHA256 `463366604181029d8cdb16cbc1a5d8771eaf4bc498594b09759a5b42b79bee7d` | Codex native config/feedback with isolated account, home and sandbox; Claude adapter separately owner-selected and qualified | Owned `ao stop --timeout 10s --json`, independent own-container exit/removal/import withdrawal; old native-stop137 and Docker0 outcomes remain distinct. No fresh deployment |
+| Claude agent teams | `claude install 2.1.295`; installed build/content pins below, native install help confirms version target | User-scope `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` currently loads implicit teams in every Claude session. Approved-plan peer selection/coordination is shipped; CC/co-op role scoping is pending and owner-gated. Codex uses a separately attributed hcom handoff | Owner requests native peer stop and verifies acknowledgement/exit/cleanup. For the proposed role-scoping change, remove added role overrides and restore the original user-scope teams variable to `1`. Fresh task and role-scope inverses remain pending |
+| Claude workflows | Same unchanged native Claude install; no separate workflow package | User-scope `enableWorkflows=true` currently loads workflows in every Claude session. Role scoping is pending and owner-gated; Ultracode session `--settings`/`apply_flag_settings`, requested/available/active and model availability are separate | For proposed role scoping, remove added role overrides and restore the original user-scope `enableWorkflows=true`. Restore per-task Ultracode flags separately, cancel own nodes and verify completion/exit. Fresh inverse pending |
+| agent-orchestrator | Pinned v0.13.5 Linux x64 AppImage, verified native extraction and local `--bundle` recipe below; pinned c95ae361 installer SHA256 `463366604181029d8cdb16cbc1a5d8771eaf4bc498594b09759a5b42b79bee7d` | Codex native config/feedback with isolated account, home and sandbox; Claude adapter separately owner-selected and qualified | Stop the owned user service, then owned `ao stop --timeout 10s --json`, independent own-container exit/removal/import withdrawal; old native-stop137 and Docker0 outcomes remain distinct. No fresh deployment |
+
+The AO payload is the upstream [v0.13.5 Linux x64 AppImage](https://github.com/OrchestratorInc/agent-orchestrator/releases/download/v0.13.5/agent-orchestrator-linux-x64.AppImage),
+asset ID `621487952`, SHA256
+`5f4262c1b5fad5e63c0b1291d5a2e4c878c953496f5ca430edfe4c061987bf28`.
+The [release metadata](https://api.github.com/repos/OrchestratorInc/agent-orchestrator/releases/tags/v0.13.5)
+was checked 2026-10-09: target c95ae361 and the asset digest match; the release
+reports `immutable=false`, so the checksum must be enforced. This digest
+belongs to the AppImage, not to a `resources/` tar archive.
+
+The pinned [vendor installer](https://github.com/OrchestratorInc/agent-orchestrator/blob/c95ae361eee48d33c2f443c6d2fe69c445f548a8/scripts/setup-self-hosted.sh#L90-L107)
+supports `--bundle` and validates a gzip tar rooted at `resources/`; its local
+bundle branch does not verify a checksum. Its default stable branch selects
+`/releases/latest` and cannot pin this payload. The recipe below uses the
+vendor's [native extraction and resource discovery](https://github.com/OrchestratorInc/agent-orchestrator/blob/c95ae361eee48d33c2f443c6d2fe69c445f548a8/scripts/setup-self-hosted.sh#L141-L170)
+to prepare unchanged resources for that supported interface. It applies to
+Linux x86_64 and has not been executed by this revision.
+
+The owner supplies absolute paths for the pinned installer, exact AppImage,
+empty owned extraction directory, output bundle, install prefix, data root and
+run file through the seven `AO_PIN_*` variables below. A failed checksum stops
+the recipe. The derived archive's separate checksum is retained before the
+owner installation; its digest is pending because no archive is created here.
+The AppImage checksum pins the upstream payload before archive preparation.
+
+```bash
+set -eu
+printf '%s  %s\n' \
+  463366604181029d8cdb16cbc1a5d8771eaf4bc498594b09759a5b42b79bee7d \
+  "$AO_PIN_INSTALLER" | sha256sum -c -
+printf '%s  %s\n' \
+  5f4262c1b5fad5e63c0b1291d5a2e4c878c953496f5ca430edfe4c061987bf28 \
+  "$AO_PIN_APPIMAGE" | sha256sum -c -
+test -d "$AO_PIN_STAGE"
+test -z "$(ls -A "$AO_PIN_STAGE")"
+chmod +x "$AO_PIN_APPIMAGE"
+(cd "$AO_PIN_STAGE"; "$AO_PIN_APPIMAGE" --appimage-extract >/dev/null)
+AO_PIN_DAEMON="$(find "$AO_PIN_STAGE" -path '*/resources/daemon/ao' -type f -print -quit)"
+test -n "$AO_PIN_DAEMON"
+AO_PIN_RESOURCES="$(dirname "$(dirname "$AO_PIN_DAEMON")")"
+tar -czf "$AO_PIN_BUNDLE" -C "$(dirname "$AO_PIN_RESOURCES")" resources
+sha256sum "$AO_PIN_BUNDLE" > "$AO_PIN_BUNDLE.sha256"
+sha256sum -c "$AO_PIN_BUNDLE.sha256"
+AO_HOST_INSTALL_DIR="$AO_PIN_PREFIX" AO_DATA_DIR="$AO_PIN_DATA" \
+  AO_RUN_FILE="$AO_PIN_RUN_FILE" \
+  bash "$AO_PIN_INSTALLER" --bundle "$AO_PIN_BUNDLE" --install-only
+```
 
 The memory gate uses `smaps_rollup` PSS, not binary size or RSS. At
 2026-10-09T01:48:37.106663Z, native session metadata identified these live
@@ -213,10 +280,24 @@ HTTP MCP server is proposed. Teams/workflows use owning Claude sessions and
 shared installed code pages, not a separately qualified shared MCP daemon.
 AO documents a local HTTP daemon serving owned sessions; its daemon/worker
 cost split still needs measurement and is not a claimed MCP transport.
-Role loading is limited to the named owning slots. Native interfaces have no
-MCP `alwaysLoad` setting; any later selected MCP exposure must use per-role
-sets and `alwaysLoad: false` where supported. No such configuration change is
-performed here.
+**Teams and workflows are currently active host-wide.** The CC verified
+user-scope `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` at
+`~/.claude/settings.json:35` and `enableWorkflows=true` at `:535`, as recorded
+in its delta read (SHA256
+`69119fd821ddab7fda786a8b374ccfa89db43aa43cd81edb49b9fd5714860357`).
+The pinned CHANGELOG section 2.1.178 describes one implicit team per enabled
+session; dispositions rows[17] and rows[123] agree, as checked by the CC.
+This lane neither reads nor edits client configuration.
+
+Role-scoped loading is **pending and owner-gated**. The proposed change moves
+the teams flag from user scope to approved CC/co-op launches only; API-actions
+is outside Teams' owning scope. Workflow enablement would likewise move from
+user scope to approved CC/co-op launches and separately approved API-actions
+workflow use. The exact supported launch recipes and fresh scope checks remain
+pending. Each JSON wiring stage records the inverse: remove added role launch
+overrides and restore the original user-scope activation. Native interfaces
+have no MCP `alwaysLoad` setting; any later selected MCP exposure must use
+per-role sets and `alwaysLoad: false` where supported.
 
 ### Stage 3 — natural fresh owning-role evidence
 
@@ -252,8 +333,11 @@ omits it.
 ## Pinned vendor instructions and session scope
 
 hcom source is [aannoo/hcom v0.7.28](https://github.com/aannoo/hcom/tree/b2a7c192003e7fd67ed93265289e4ac36276f965),
-`b2a7c192003e7fd67ed93265289e4ac36276f965`: `src/db/events.rs`,
+`b2a7c192003e7fd67ed93265289e4ac36276f965`: `README.md`, `src/db/events.rs`,
 `src/hooks/common.rs`, `src/commands/kill.rs` and `src/hooks/codex.rs`.
+This canonical list matches the decision JSON and native receipt. The receipt's
+hashed `sources` subset is the three measurement-semantic files: events,
+common hooks and kill; interface sources are not claimed as extra measured files.
 Its per-run native hooks remain the supported launch/transport route.
 
 The installed Claude executable `versions/2.1.295`, build `07e8f67ea328`,
@@ -277,7 +361,8 @@ The vendor selection text, resolving its pinned Agent-name interpolation, is:
 It is appended to an approved-plan result only when its native flag and
 `lF()==="default"` guard hold. This is a shipped conditional routing instruction
 for the intended CC/co-op scope, not an unconditional startup router or an
-invented packaged skill. Its application and natural selection remain pending.
+invented packaged skill. Host-wide feature activation is recorded above;
+natural selection by a fresh owning-role task remains pending.
 The coordinator verified the selection and coordination source bytes. The
 teammate reminder supplies native lead/peer communication instructions.
 
@@ -321,12 +406,16 @@ It supersedes that record's old latest-release wording, not its historical
 v0.13.4 `e8a77577c14b015b947057d67c9171a78cdd5099` evidence or owner bounds.
 0134 outcomes do not qualify 0135 coding, restart or changed-head behavior.
 
-The earlier outer ceiling is three sessions through 2026-10-14T03:28Z.
+The earlier outer ceiling is three sessions through 2026-10-14T03:28Z,
+on small PRs only.
 This staged case is narrower: one isolated observe/propose worker. Approved
 native sign-in, an owned container/writable home, prohibition on shared worker
 home, one poller per AO-owned PR and the dated 30-second exception remain.
-The native REST-core stop control below 500 and separate GraphQL observation
-remain; no new GraphQL threshold is invented. R9/config/route/owner gates and
+The CC-supplied deployment guard reads `gh api rate_limit` and runs native
+`ao stop` when REST-core remaining falls below 500. This is a deployment
+control, not tested daemon enforcement or a running guard in this record.
+Separate GraphQL allowance/consumption observation remains; no new GraphQL
+threshold is invented. R9/config/route/owner gates and
 5f landing on the CC cue remain. Deployment stays owner-controlled and the
 quota pause is retained.
 

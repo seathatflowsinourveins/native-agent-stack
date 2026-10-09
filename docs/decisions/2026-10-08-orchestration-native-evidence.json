@@ -2,10 +2,40 @@
   "schema_version": 1,
   "kind": "sanitized_native_orchestration_observation",
   "observed_utc": "2026-10-09T01:02:40.973754Z",
+  "state_root": "~/.local/state/native-agent-stack",
+  "locator_scope": "research/ and coordination/ resolve under state_root; docs/ resolves in the repository checkout",
+  "claude_host_activation": {
+    "observation_owner": "CC",
+    "reviewed_head": "0ad947f6fd5023b2a21eadae2837349d4b313886",
+    "source": "coordination/command-center/research-cc-role-20261008/pr904-claude-delta-read-0ad947f6.md",
+    "source_sha256": "69119fd821ddab7fda786a8b374ccfa89db43aa43cd81edb49b9fd5714860357",
+    "settings_locators": {
+      "teams": "~/.claude/settings.json:35; user-scope CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1",
+      "workflows": "~/.claude/settings.json:535; user-scope enableWorkflows=true"
+    },
+    "current_scope": "Both features load in every Claude session; feature loading does not establish natural task selection",
+    "primary_contract": "anthropics/claude-code@602df92bf481ed904533e95c09f740f40aab5aed:CHANGELOG.md section 2.1.178; enabled sessions have an implicit team",
+    "catalog_cross_check": "catalogs/foundation/upstream-surface-dispositions.json rows[17] and rows[123], as verified by the CC",
+    "role_scoped_loading": "PENDING_OWNER_GATE; proposed role scoping and its inverse are recorded in the decision wiring stages",
+    "lane_access": "This revision neither reads nor edits client configuration; settings facts are the CC's verified observation"
+  },
   "hcom": {
     "version": "0.7.28",
     "repository": "https://github.com/aannoo/hcom",
     "commit": "b2a7c192003e7fd67ed93265289e4ac36276f965",
+    "source_files": [
+      "README.md",
+      "src/db/events.rs",
+      "src/hooks/common.rs",
+      "src/commands/kill.rs",
+      "src/hooks/codex.rs"
+    ],
+    "source_scope": "Canonical vendor interface/source list matches the Markdown and decision JSON; hashed sources below cover the three files used for fixed-window measurement semantics",
+    "column_predicates": {
+      "delivered_metadata": "Message rows with a present/non-null stored msg_delivered_to value, including serialized empty lists []; 2096 is stored-field metadata, not messages with a recipient or proof of delivery",
+      "stored_recipient_members": "Sum of recipient-list members in the stored delivery metadata; not distinct delivered messages or recipient-role acceptance",
+      "cc_recipient_cross_check": "The CC delta read reports 1612 messages with a recipient, versus 2096 with stored delivery metadata; no frozen count is changed"
+    },
     "source_locator": "~/.hcom/hcom.db:events_v",
     "window": {
       "start": "2026-10-08T00:31:25Z",
