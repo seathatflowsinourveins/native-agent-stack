@@ -18467,8 +18467,8 @@
     },
     {
       "path": "docs/decisions/2026-10-08-g5-compact-evidence.md",
-      "sha256": "36ea7d5479367a1e1131501bb4a9b8d938acf9d5453ef2e52b84b60891a7cccb",
-      "bytes": 13632
+      "sha256": "6f7604dd336b1e1cf8650cbf408a76f8e3b99af24322aed1d32ce8419be1505f",
+      "bytes": 14888
     },
     {
       "path": "docs/decisions/2026-10-08-guard-hook-fails-closed.md",
@@ -18657,8 +18657,8 @@
     },
     {
       "path": "docs/g5-refresh-procedure.md",
-      "sha256": "25e4f126a1d9e362792c8a9e233928d893c4173f94ef7770c8544ad9e4a5ee42",
-      "bytes": 12569
+      "sha256": "e71dee5e70505601cb42491b4eab673325cb6e25b64eee2ae675b01529df23bc",
+      "bytes": 13806
     },
     {
       "path": "docs/gap-crosswalk-92bb279.md",
