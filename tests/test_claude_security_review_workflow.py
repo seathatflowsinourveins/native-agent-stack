@@ -47,10 +47,15 @@ SETTINGS = {"disableAllHooks": True, "claudeMdExcludes": ["**/pr-head/**"],
             "permissions": {"blockReadsOutsideWorkingDirectories": True,
                             "deny": ["Read(./.git/**)", "Read(./**/.git/**)", "Read(./pr-head/.git/**)",
                                      "Read(./**/.env)", "Read(./**/.env.*)", "Read(./**/*.pem)", "Read(./**/*.key)"]}}
-CLAUDE_ARGS = [["--model", "claude-opus-5-5"], ["--effort", "max"], ["--max-turns", "30"], ["--max-budget-usd", "5"],
+CLAUDE_ARGS = [["--model", "claude-opus-5-5"], ["--effort", "max"], ["--max-budget-usd", "5"],
                ["--tools", "Read,Glob,Grep"], ["--allowedTools", "Read,Glob,Grep"], ["--restricted"],
                ["--permission-prompts", "none"], ["--setting-sources", "user"], ["--strict-mcp-config"],
                ["--settings", SETTINGS], ["--add-dir", RUNNER_TEMP_STAND_IN + "/security-review"]]
+
+
+def canonical(value):
+    """Canonical JSON text: unlike ==, it tells true from 1 and false from 0 (in Python 1 == True)."""
+    return json.dumps(value, sort_keys=True, separators=(",", ":"))
 
 
 def workflow():
@@ -121,6 +126,15 @@ def execution(result=None, tools=("Read", "Glob", "Grep"), mcp_servers=(), init=
             {"type": "text", "text": TRANSCRIPT_MARKER}]}})
     messages.append(final)
     return messages
+
+
+def budget_stop(cost):
+    """A budget stop as the installed Claude Code 2.1.295 builds it: subtype error_max_budget_usd, is_error true, an
+    errors list and no result text (its result schema has no result field for an error subtype)."""
+    log = execution(subtype="error_max_budget_usd", is_error=True, total_cost_usd=cost,
+                    errors=["Exceeded USD budget (5)"])
+    del log[-1]["result"]
+    return log
 
 
 def run_step(name, env_changes=None, execution_file=None, settings=None, pull_request=None, cwd=None):
@@ -300,7 +314,7 @@ class SecurityReviewShapeTests(unittest.TestCase):
 
     def test_claude_has_three_read_tools_and_fixed_bounds(self):
         arguments = [line.strip() for line in step(REVIEW)["with"]["claude_args"].split("\n") if line.strip()]
-        for expected in ("--model claude-opus-5-5", "--effort max", "--max-turns 30", "--max-budget-usd 5",
+        for expected in ("--model claude-opus-5-5", "--effort max", "--max-budget-usd 5",
                          "--tools Read,Glob,Grep", "--allowedTools Read,Glob,Grep",
                          "--restricted", "--permission-prompts none",
                          "--setting-sources user", "--strict-mcp-config",
@@ -310,8 +324,10 @@ class SecurityReviewShapeTests(unittest.TestCase):
         joined = " ".join(line for line in arguments if not line.startswith("--settings "))
         for tool in ("Bash", "Write", "Edit", "WebFetch", "WebSearch", "Task", "Agent", "mcp__"):
             self.assertNotIn(tool, joined)
+        # No --max-turns: the action fails a success whose num_turns exceeds it, and num_turns counts transcript
+        # messages, not turns. The numbers step bounds the assistant turns instead.
         for flag in ("--debug", "--dangerously-skip-permissions", "--permission-mode", "--mcp-config",
-                     "--add-dir pr-head"):
+                     "--add-dir pr-head", "--max-turns"):
             self.assertNotIn(flag, joined)
 
     def test_settings_turn_hooks_off_exclude_the_heads_instruction_files_and_confine_reads(self):
@@ -328,11 +344,13 @@ class SecurityReviewShapeTests(unittest.TestCase):
     def test_claude_args_are_exactly_the_reviewed_list(self):
         # The whole list (CC security read of f5f1fd22, 2026-10-09): a widened or repeated --add-dir and a repeated
         # budget or turn flag fail here; a check for each expected line alone lets an extra line pass.
-        self.assertEqual(claude_args(), CLAUDE_ARGS)
+        # Compared as canonical JSON, because the list holds the decoded --settings, where 1 == True.
+        self.assertEqual(canonical(claude_args()), canonical(CLAUDE_ARGS))
 
     def test_settings_are_exactly_the_reviewed_json(self):
-        # The whole JSON: permissions.additionalDirectories, an allow rule or a dropped deny rule fails here.
-        self.assertEqual(cli_settings(), SETTINGS)
+        # The whole JSON: permissions.additionalDirectories, an allow rule or a dropped deny rule fails here, and so
+        # does a boolean written as 1 or 0 (canonical JSON, not dict equality).
+        self.assertEqual(canonical(cli_settings()), canonical(SETTINGS))
 
     def test_a_green_run_always_has_an_execution_file(self):
         check = step("Require the run's execution file")
@@ -340,7 +358,13 @@ class SecurityReviewShapeTests(unittest.TestCase):
         self.assertIn("exit 1", check["run"])
 
     def test_the_review_is_published_only_after_the_bounds_check_passed_and_only_numbers_are_uploaded(self):
-        self.assertIn("success()", step(REPORT)["if"])
+        # Keyed to the numbers step, not success(): the action fails its own step on a budget stop that the numbers
+        # step accepts (claude-code-action base-action/src/run-claude-sdk.ts, the result check), as on any non-success,
+        # and keeps its execution_file output. The numbers step runs only with that file; a cancelled run publishes
+        # nothing.
+        self.assertEqual(step(NUMBERS)["id"], "numbers")
+        self.assertEqual(step(NUMBERS)["if"], "${{ always() && steps.claude_review.outputs.execution_file != '' }}")
+        self.assertEqual(step(REPORT)["if"], "${{ !cancelled() && steps.numbers.outcome == 'success' }}")
         self.assertIn("always()", step(NUMBERS)["if"])
         upload = step("Keep the numeric usage record")
         self.assertTrue(upload["with"]["path"].endswith("/security-review-usage/usage.json"))
@@ -474,7 +498,8 @@ class SecurityReviewStepTests(unittest.TestCase):
         code, console, summary, usage, _ = run_step(NUMBERS, execution_file=execution())
         self.assertEqual(code, 0, console)
         record = json.loads(usage)
-        self.assertEqual(sorted(record), ["assistant_turns", "claude_code_version", "forbidden_tools", "mcp_servers", "models", "num_turns", "result_chars", "session_started", "successful_result", "tools", "tools_listed", "total_cost_usd"])
+        self.assertEqual(sorted(record), ["assistant_turns", "budget_stop", "claude_code_version", "forbidden_tools", "mcp_servers", "models", "num_turns", "result_chars", "session_started", "successful_result", "tools", "tools_listed", "total_cost_usd"])
+        self.assertIs(record["budget_stop"], False)
         self.assertEqual(record["tools"], ["Read", "Glob", "Grep"])
         self.assertEqual(record["forbidden_tools"], [])
         for text in (usage, summary, console):
@@ -485,7 +510,7 @@ class SecurityReviewStepTests(unittest.TestCase):
     def test_an_unmet_bound_fails_after_the_numbers_were_kept(self):
         cases = {
             "no cache read": {"modelUsage": model_usage(read=0)},
-            "over the client budget": {"total_cost_usd": 5.01},
+            "over the cost bound": {"total_cost_usd": 5.51},
             "over the turn limit": {"turns": 31},
             "an error result": {"is_error": True},
             "a turn-limit stop": {"subtype": "error_max_turns"},
@@ -505,24 +530,57 @@ class SecurityReviewStepTests(unittest.TestCase):
                 self.assertIsInstance(json.loads(usage)["total_cost_usd"], (int, float))
 
     def test_the_step_names_every_unmet_bound(self):
-        code, console, *_ = run_step(NUMBERS, execution_file=execution(turns=31, total_cost_usd=5.5,
+        code, console, *_ = run_step(NUMBERS, execution_file=execution(turns=31, total_cost_usd=6,
                                                          tools=("Read", "Skill"), result=""))
         self.assertNotEqual(code, 0)
-        for words in ("31 assistant turns, outside 1 to 30", "above 5", "Skill", "no result text"):
+        for words in ("31 assistant turns, outside 1 to 30", "above the 5.5 USD bound", "Skill", "no result text"):
             self.assertIn(words, console)
 
     def test_the_caps_hold_at_the_bound_and_fail_just_above_it(self):
-        # Caps from measurement (command center, 2026-10-09): 30 assistant turns and a $5 client budget.
-        for changes in ({"turns": 30}, {"total_cost_usd": 5}):
+        # Caps from measurement (command center, 2026-10-09): 30 assistant turns and a $5 client budget. The cost
+        # bound is that budget times the measured overrun factor 1.10 (R6): the client stops only after it crosses it.
+        for changes in ({"turns": 30}, {"total_cost_usd": 5.5}):
             with self.subTest(at_the_bound=changes):
                 code, console, *_ = run_step(NUMBERS, execution_file=execution(**changes))
                 self.assertEqual(code, 0, console)
+        overrun = ("client cost estimate 5.51 USD, above the 5.5 USD bound (the 5 USD budget times its measured "
+                   "overrun factor 1.10)")
         for changes, words in (({"turns": 31}, "Bounds not met: 31 assistant turns, outside 1 to 30"),
-                               ({"total_cost_usd": 5.01}, "Bounds not met: client cost estimate 5.01 USD, above 5")):
+                               ({"total_cost_usd": 5.51}, "Bounds not met: " + overrun)):
             with self.subTest(just_above=changes):
-                code, console, *_ = run_step(NUMBERS, execution_file=execution(**changes))
+                code, console, summary, *_ = run_step(NUMBERS, execution_file=execution(**changes))
                 self.assertEqual(code, 1, console)
                 self.assertIn(words, console)
+        self.assertIn("Over the cost bound: the client cost estimate is 5.51 USD, above 5.5 USD (the 5 USD budget "
+                      "times its measured overrun factor 1.10).", summary)
+
+    def test_a_budget_stop_at_or_under_the_bound_is_accepted_and_named(self):
+        # The client stops only after it crosses its budget; its budget stop carries no result text (2.1.295).
+        for cost in (5.2, 5.5):
+            with self.subTest(cost=cost):
+                code, console, summary, usage, _ = run_step(NUMBERS, execution_file=budget_stop(cost))
+                self.assertEqual(code, 0, console)
+                self.assertIs(json.loads(usage)["budget_stop"], True)
+                self.assertIn("Budget stop: the client stopped the run at its 5 USD budget (error_max_budget_usd).",
+                              summary)
+                self.assertNotIn("Over the cost bound", summary)
+        code, console, summary, *_ = run_step(NUMBERS, execution_file=budget_stop(5.51))
+        self.assertEqual(code, 1, console)
+        self.assertIn("client cost estimate 5.51 USD, above the 5.5 USD bound", console)
+        self.assertNotIn("did not end in success", console)
+        self.assertIn("Budget stop:", summary)
+        self.assertIn("Over the cost bound:", summary)
+
+    def test_a_budget_stop_is_published_and_named(self):
+        code, console, summary, *_ = run_step(REPORT, execution_file=budget_stop(5.2))
+        self.assertEqual(code, 0, console)
+        self.assertIn(f"### Security review: #12 at {HEAD}", summary)
+        self.assertIn("Budget stop: the client stopped the run at its budget (error_max_budget_usd) before it "
+                      "finished; the text above, if any, is what it wrote before the stop.", summary)
+        self.assertNotIn(TRANSCRIPT_MARKER, summary)
+        code, console, summary, *_ = run_step(REPORT, execution_file=execution())
+        self.assertEqual(code, 0, console)
+        self.assertNotIn("Budget stop", summary)
 
     def test_a_tool_entry_that_is_not_a_string_is_a_forbidden_tool(self):
         # GPT designated read of #895 at f5f1fd22 (2026-10-09), P2: the step dropped such entries from the tool list,

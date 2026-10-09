@@ -38,8 +38,9 @@ harness-audit PR (#892, 2026-10-09), which found changes its record had not name
 - The action step runs `anthropics/claude-code-action@2dca132ff0e0c4094ce6048b422c6915a071210b` (v1.0.247), federated
   through the repository variables `ANTHROPIC_FEDERATION_RULE_ID`, `ANTHROPIC_ORGANIZATION_ID`,
   `ANTHROPIC_SERVICE_ACCOUNT_ID` and `ANTHROPIC_WORKSPACE_ID` (no stored key), with `claude_args`
-  `--model claude-opus-5-5 --effort max --max-turns 30 --max-budget-usd 5 --tools Read,Glob,Grep --allowedTools
-  Read,Glob,Grep --restricted --permission-prompts none --setting-sources user --strict-mcp-config`, a `--settings`
+  `--model claude-opus-5-5 --effort max --max-budget-usd 5 --tools Read,Glob,Grep --allowedTools
+  Read,Glob,Grep --restricted --permission-prompts none --setting-sources user --strict-mcp-config` (no `--max-turns`
+  since R6; the numbers step bounds the assistant turns), a `--settings`
   that turns hooks off, sets `claudeMdExcludes` over `pr-head/` and `blockReadsOutsideWorkingDirectories`, and denies
   seven read patterns (the `.git` directories, `.env` files, `*.pem` and `*.key`), and `--add-dir` for the prompt
   directory.
@@ -47,10 +48,12 @@ harness-audit PR (#892, 2026-10-09), which found changes its record had not name
   `track_progress` as `'false'`; the last two are their defaults, declared in the pinned `action.yml` (lines
   136-139 and 152-155 at `2dca132f`).
 - A numbers step checks the bounds (an allow-list of Read, Glob and Grep, where a tool-list entry that is not a
-  string is a forbidden tool named `non-string tool entry`; tool and MCP lists present, 1 to 30 assistant turns, at
-  most $5, a cache read, result text; every unmet bound is named), and an artifact keeps
-  `usage.json` (numbers only) for 14 days. The review, the last non-empty result, goes to the job summary only when
-  the bounds passed, capped at 60,000 bytes on a character boundary with a line saying so when it was longer.
+  string is a forbidden tool named `non-string tool entry`; tool and MCP lists present, 1 to 30 assistant turns, a
+  client cost estimate of at most $5.50, the $5 budget times the measured overrun factor 1.10, a cache read, result
+  text; a budget stop at or under that bound is accepted without result text and named; every unmet bound is named),
+  and an artifact keeps `usage.json` (numbers only) for 14 days. The review, the last non-empty result, goes to the
+  job summary only when the numbers step accepted the run, whatever the review step's own status, with a line naming
+  a budget stop, capped at 60,000 bytes on a character boundary with a line saying so when it was longer.
   Nothing is posted to the pull request. A final step, "Require the run's execution file", fails the job when the
   review step reports success without an execution file, so a green run always means the bounds were checked.
 - The job summary, and with it the published review, is public, as the repository is; a finding that should not be
@@ -144,7 +147,8 @@ $1.75, $1.35, $1.54 and $0.73. Those runs used the installed Claude Code 2.1.295
 a second Anthropic key; a hosted run bills the federated organization instead, so the caps are the owner's per-run
 spend limit once the enabling variable is set. Expected cost per run: about $2, by that shape, not yet measured. The
 earlier dry estimate here, $0.70 to $1.30 for a diff of up to about 1,000 lines, was below the measured cost of that
-shape and is withdrawn. The numbers step checks both caps again from the run's own numbers. Turns are counted after
+shape and is withdrawn. The numbers step checks the turn cap again from the run's own numbers, and the cost against
+$5.50, the budget times the measured overrun factor 1.10 (R6 below). Turns are counted after
 the run as distinct assistant message ids, because the result's `num_turns` counts transcript messages, tool results
 included: a 12-request run on 2.1.295 reported 57. The flag costs nothing.
 
@@ -157,7 +161,7 @@ included: a 12-request run on 2.1.295 reported 57. The flag costs nothing.
 - `tests.test_workflow_security_coverage.NewWorkflowSecurityCoverageTests`: the coverage set gains both workflows,
   each with its own offline zizmor test.
 
-New, in `tests/test_claude_security_review_workflow.py` (42 tests): the review workflow's shape, and its steps' shell
+New, in `tests/test_claude_security_review_workflow.py` (44 tests): the review workflow's shape, and its steps' shell
 taken from the workflow file and run against a local stand-in for `gh` and a local git repository, and the flag's trigger paths, empty permissions, absence of any secret,
 variable, OIDC token, checkout or model, and its notice. Eleven weakened copies of the two workflows each fail at
 least one test (measured on 2026-10-08 against that day's bounds). The 2026-10-09 bound changes have their own tests
@@ -271,6 +275,116 @@ step above removes links instead of relying on the client.
 
 Security hardening from the 2026-10-09 read (flag-path additions, a fork notice, debug-value widening, tool-list shape, extra deny rules, token-source and guard-step assertions) is filed as follow-ups before any enabling variable is set.
 
+## The cost bound: the budget times the measured overrun factor (2026-10-09, R6)
+
+The client stops a run only after its cost has crossed `--max-budget-usd`, so a cost bound equal to the budget fails a normal budget stop. Four measured J8 runs on a $5 budget ended above it: $5.46 (9.2% over, the largest overrun), $5.33, $5.16 and $5.0007, on #895, trading #11, #902 and #894. The cost bound is therefore the budget times 1.10, a factor that rounds up the largest measured overrun; the factor is derived again after this workflow's first three hosted runs. A run at or under the bound passes the cost check. A budget stop (result subtype `error_max_budget_usd`) at or under the bound publishes what the run produced, and the summary names the stop. A run above the bound fails closed and names the overrun. This workflow's budget is $5, so its bound is $5.50.
+
+The command center's read of this PR at R5 (5903ceed) asked for this as a P2. The exception for a workflow that must
+fail at its budget does not apply: nothing acts on the review, so a budget stop costs only its unfinished text, and
+the summary names it. Per the command center, the J8 micro read of R5 found its five findings fixed and none new at
+confidence 80 or above, so this round changes nothing else. The changes, by name:
+
+- **The numbers step**, "Keep the run's numbers and check the bounds":
+  - It has the id `numbers` and holds the budget and the bound as `budget=5 cost_bound=5.5`; its comment states the
+    factor.
+  - `usage.json` gains `budget_stop`, true when the result's subtype is `error_max_budget_usd`. The success check
+    accepts a budget stop, and its failure now reads "the run did not end in success or in a budget stop".
+  - "no result text" no longer applies to a budget stop. The installed Claude Code 2.1.295 writes that result record
+    with `is_error` true, an `errors` list and no result text: its result schema has no result field for an error
+    subtype. This comes from a reading of the client's code, not a measured budget stop (SOTA sources below).
+  - The cost failure reads "client cost estimate <x> USD, above the 5.5 USD bound (the 5 USD budget times its
+    measured overrun factor 1.10)". The run-numbers summary gains "Budget stop: the client stopped the run at its 5
+    USD budget (error_max_budget_usd)." and "Over the cost bound: the client cost estimate is <x> USD, above 5.5 USD
+    (the 5 USD budget times its measured overrun factor 1.10).", in the toolkit read's (#909) wording.
+- **The publish step**, "Publish the security review to the job summary":
+  - Its condition is now `!cancelled() && steps.numbers.outcome == 'success'`, in place of `success() &&
+    steps.claude_review.outputs.execution_file != ''`, the form #892 uses. The pinned action fails its own step on
+    any result that is not a plain success, a budget stop among them (`base-action/src/run-claude-sdk.ts`, its result
+    check), and keeps its `execution_file` output, so under `success()` an accepted budget stop was never published.
+    The numbers step runs only with an execution file, so its outcome implies one, and a cancelled run publishes
+    nothing. The job stays failed, with the review published.
+  - The same condition publishes a success whose `num_turns` exceeds `--max-turns`, which the action also fails:
+    `--max-turns` reaches the SDK as `maxTurns` (`base-action/src/parse-sdk-options.ts`), and `num_turns` counts
+    transcript messages (57 for a 12-request run). The assistant-turn bound in the numbers step is the one this
+    workflow applies. ("`--max-turns` dropped from `claude_args`" below removes the flag, so this case no longer
+    arises.)
+  - A budget stop adds the line "Budget stop: the client stopped the run at its budget (error_max_budget_usd) before
+    it finished; the text above, if any, is what it wrote before the stop." The step's comment says when it
+    publishes.
+- **Tests (44; 42 at R5):**
+  - New: `test_a_budget_stop_at_or_under_the_bound_is_accepted_and_named`, where budget stops at $5.20 and $5.50
+    pass and are named and one at $5.51 fails with the overrun named; `test_a_budget_stop_is_published_and_named`;
+    and the helper `budget_stop()`, which builds the record as 2.1.295 writes it.
+  - Changed: `test_the_caps_hold_at_the_bound_and_fail_just_above_it` ($5.50 passes; $5.51 fails, named in the
+    failure and in the summary), `test_an_unmet_bound_fails_after_the_numbers_were_kept` ($5.51),
+    `test_the_step_names_every_unmet_bound` ($6 and the new message),
+    `test_a_bounded_cached_read_only_run_is_accepted_and_only_numbers_and_fixed_names_are_kept` (`budget_stop` among
+    the record's keys, false), and
+    `test_the_review_is_published_only_after_the_bounds_check_passed_and_only_numbers_are_uploaded` (the numbers
+    step's id and both steps' conditions, exactly).
+- **Weakened copies, 2026-10-09:** fourteen new ones weaken this round's changes. They drop the factor (the bound
+  back at the $5 budget), widen it to 1.2, make the cost check refuse the bound itself, stop accepting a budget stop,
+  require a budget stop to carry result text, waive the result-text check for every run, read `budget_stop` from
+  another subtype, drop the stop or the overrun line from the run-numbers summary, put the publish condition back on
+  `success()`, gate it on `always()` instead of `!cancelled()`, leave out `!cancelled()` (so `success()` applies
+  again), remove the numbers step's id, or drop the stop line from the publish step. With the nineteen of R5's that
+  still apply (its three cost-bound copies targeted the bare check this round replaced), all 33 fail a test with
+  PyYAML 6.0.3 present. Without PyYAML, 17 do; four of the sixteen that pass are new, the three publish conditions
+  and the numbers step's id, which only a shape test reads. (After the two subsections below: 35 copies, all failing
+  a test with PyYAML present; without it 17 fail and 18 pass, the three new copies among those that pass, as the
+  other argument copies do.)
+- The by-name list above and "Cost of one run" state the bound.
+- **The SOTA sources** below gain the action files behind R5 and R6, with their lines and the version they were read
+  at, and the installed client's result-record code.
+
+### `--max-turns` dropped from `claude_args` (command center decision, 2026-10-09)
+
+At the pin, anthropics/claude-code-action `2dca132f` (v1.0.247), `base-action/src/run-claude-sdk.ts` lines 241-250
+throw "Claude reported a successful result after N turns, exceeding the configured maximum" when a successful result
+has `num_turns` above `maxTurns`, the value `--max-turns` sets. The check came in with commit `6ef6450f`, "fix:
+enforce max turns from claude args (#1607)", on 2026-08-07. On Claude Code 2.1.295 the result's `num_turns` counts
+transcript messages, tool results included: a local run of 12 API requests (distinct assistant message ids) under
+`--max-turns 12` reported `num_turns` 57 (the LR entry of `local-parity-receipt.json`, recorded with #892, not carried
+in this PR). With `--max-turns 30`, a normal successful review would therefore fail the action step. This is a code
+reading of the pinned source plus a local measurement, not a hosted run. Upstream has no fix as of 2026-10-09:
+upstream `main` is identical to `2dca132f` on that date.
+
+- `--max-turns 30` is removed from `claude_args`. The runaway bounds that stay are the client budget, checked against
+  $5.50 (the budget times 1.10), and the numbers step's own turn bound, 1 to 30 distinct assistant message ids, which
+  fails closed. The prompt's sentence "You have at most 30 turns" is unchanged.
+- The publish step's comment no longer names a success over `--max-turns` among the results the action fails; it says
+  why `claude_args` passes no `--max-turns`.
+- `CLAUDE_ARGS` in the test module no longer holds `--max-turns 30`, and
+  `test_claude_has_three_read_tools_and_fixed_bounds` no longer expects it and asserts that `--max-turns` is absent.
+  The turn-bound and caps tests are unchanged. The module still has 44 tests.
+- Record sentences changed with this subsection: the `claude_args` of the by-name list, the publish-step bullet of the
+  R6 changes and "Evidence class"; the `docs/github-automation.md` bullet now says 30 assistant turns, checked after
+  the run.
+- The weakened copy "`--max-turns 30` put back" fails `test_claude_args_are_exactly_the_reviewed_list` and
+  `test_claude_has_three_read_tools_and_fixed_bounds` with PyYAML 6.0.3; without PyYAML both skip, as the other
+  argument copies do. It replaces the R5 copy "`--max-turns` left at 12", whose anchor text no longer exists; with
+  the two copies below, all 35 copies fail a test with PyYAML present, and 17 do without it.
+
+#### Upstream issue (draft, not filed; the owner decides)
+
+> Title: success with num_turns > maxTurns fails the step, but num_turns counts messages, not turns.
+> base-action/src/run-claude-sdk.ts:241-250 (v1.0.247, 2dca132f) compares `resultMessage.num_turns` with
+> `sdkOptions.maxTurns`. On Claude Code 2.1.295 the result's num_turns counts transcript messages (tool results
+> included): a headless run of 12 requests under `--max-turns 12` reported num_turns 57. A normal successful run
+> under `--max-turns N` therefore throws "exceeding the configured maximum". Repro: any `claude_args: --max-turns 5`
+> run that makes a few tool calls and succeeds.
+
+### The exact pins tell `true` from `1` (2026-10-09)
+
+`test_claude_args_are_exactly_the_reviewed_list` and `test_settings_are_exactly_the_reviewed_json` compared the
+decoded `--settings` JSON with the expected dict by `==`; in Python `1 == True`, so `"disableAllHooks": 1` passed both.
+Both now compare canonical JSON (the helper `canonical()`: `json.dumps` with `sort_keys=True` and
+`separators=(",", ":")`), which tells them apart. The weakened copies `"disableAllHooks":1` and
+`"blockReadsOutsideWorkingDirectories":1` (this workflow has no `autoMemoryEnabled` key, so the second copy writes its
+other boolean as `1`) each fail both exact pins and
+`test_settings_turn_hooks_off_exclude_the_heads_instruction_files_and_confine_reads` with PyYAML 6.0.3; without
+PyYAML those shape tests skip.
+
 ## Alternatives considered
 
 - **`anthropics/claude-code-security-review`.** Rejected above.
@@ -301,8 +415,8 @@ the citation does not depend on which PR lands first). Two of that receipt's thr
 `--setting-sources user` has run there. The smoke ran the client directly on the workstation, not through the
 action, whose parser path the receipt records as replayed offline, not run. This workflow adds `--add-dir`,
 `--effort max`, `blockReadsOutsideWorkingDirectories` and four more deny rules (`Read(./pr-head/.git/**)`,
-`Read(./**/.env.*)`, `Read(./**/*.pem)`, `Read(./**/*.key)`) and runs Opus 5.5 with 30 turns and $5 through the
-action; no run of that configuration, local or hosted, is part of this record. What has run is model-free and
+`Read(./**/.env.*)`, `Read(./**/*.pem)`, `Read(./**/*.key)`) and runs Opus 5.5 with at most 30 assistant turns
+(checked after the run; no `--max-turns`) and $5 through the action; no run of that configuration, local or hosted, is part of this record. What has run is model-free and
 local: the shells of the review's guard, binding, symbolic-link, diff, numbers and publish steps and of the flag's
 notice step, on synthetic inputs under the unit tests above.
 `local_static_analysis`: actionlint 1.17.0 and zizmor 1.30.1 (offline, regular and pedantic), no findings on either
@@ -314,6 +428,18 @@ below. No hosted run of either workflow is part of this record.
 - anthropics/claude-code-action at `2dca132ff0e0c4094ce6048b422c6915a071210b` (v1.0.247): `docs/solutions.md`
   ("Security Review" example), `docs/security.md`, `docs/setup.md`, `action.yml`;
   <https://github.com/anthropics/claude-code-action/tree/2dca132ff0e0c4094ce6048b422c6915a071210b>.
+  Read on 2026-10-09 at v1.0.246 (`38c80c1`) for R5 and R6:
+  - `base-action/src/run-claude-sdk.ts`: line 222 writes the execution file before the result check; lines 241-256
+    and 280-298 fail the step on a success whose `num_turns` exceeds `maxTurns` and on any result other than an
+    error-free success.
+  - `base-action/src/parse-sdk-options.ts`, lines 207-208 and 318-321: `--max-turns` becomes `maxTurns`.
+  - `src/github/operations/git-config.ts`, lines 129-134, and `src/modes/agent/index.ts`, lines 52-61: the R5 shared
+    sentence.
+  - `src/entrypoints/run.ts`, lines 316-324: a failed run still sets the `execution_file` output.
+
+  Per the command center's compare, v1.0.247 changes only the bundled Claude Code version
+  (`base-action/action.yml`, `src/entrypoints/run.ts`, and package and lock files), so the first four files do not
+  differ at the pin. The `run.ts` lines were read at `38c80c1` only.
 - anthropics/claude-code-security-review at `0c6a49f1fa56a1d472575da86a94dbc1edb78eda`: `action.yml`, `README.md`,
   `claudecode/constants.py`, `scripts/comment-pr-findings.js`;
   <https://github.com/anthropics/claude-code-security-review/tree/0c6a49f1fa56a1d472575da86a94dbc1edb78eda>.
@@ -321,3 +447,6 @@ below. No hosted run of either workflow is part of this record.
 - GitHub, OpenID Connect reference: <https://docs.github.com/en/actions/reference/security/oidc>; workflow syntax,
   `on.pull_request.paths`: <https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax>.
 - Claude Code 2.1.295 `--help` for `--restricted` and `--permission-prompts`; all read 2026-10-08.
+- Claude Code 2.1.295, the installed binary, read on 2026-10-09: its budget-exhausted branch builds the
+  `error_max_budget_usd` result with `is_error` true and an `errors` list, and its schema for error results has no
+  result field. This is a reading of the client's code, not a measured budget stop.

@@ -224,7 +224,6 @@ jobs:
           claude_args: |
             --model claude-opus-5-5
             --effort max
-            --max-turns 30
             --max-budget-usd 5
             --tools Read,Glob,Grep
             --allowedTools Read,Glob,Grep
@@ -242,14 +241,20 @@ jobs:
       # every bound it finds unmet.
       # The turn bound counts distinct assistant message ids. The result's num_turns counts transcript
       # messages, tool results included (a 12-request run on Claude Code 2.1.295 reported 57), so it is
-      # kept in the record only.
+      # kept in the record only. The client checks its budget after a turn, so a run can end a little above it: the
+      # cost bound is the $5 budget times 1.10, the largest overrun measured on J8's $5-budget runs (9.2%) rounded up.
+      # A run above it fails, budget stop or not. A budget stop (error_max_budget_usd) at or under it passes, although
+      # its result record carries no result text; the job summary names an overrun and a budget stop.
       - name: Keep the run's numbers and check the bounds
+        id: numbers
         if: ${{ always() && steps.claude_review.outputs.execution_file != '' }}
         shell: bash
         env:
           EXECUTION_FILE: ${{ steps.claude_review.outputs.execution_file }}
         run: |
           set -euo pipefail
+          # --max-budget-usd above, and the cost bound: that budget times the measured overrun factor 1.10.
+          budget=5 cost_bound=5.5
           out="$RUNNER_TEMP/security-review-usage"
           mkdir -p "$out"
           jq -e '
@@ -271,6 +276,7 @@ jobs:
              result_chars: ($text | length),
              tools_listed: (($init.tools | type) == "array" and ($init.mcp_servers | type) == "array"),
              successful_result: ($result.subtype == "success" and $result.is_error == false),
+             budget_stop: ($result.subtype == "error_max_budget_usd"),
              session_started: ($init != null),
              claude_code_version: (($init.claude_code_version // "unknown") | name),
              tools: ($tools | map(tool_name)),
@@ -289,15 +295,23 @@ jobs:
           {
             echo '### Security review: run numbers'
             echo
-            jq -r '"| assistant turns | messages | client cost estimate (USD) | completed | Claude Code | tools | MCP servers |",
+            jq -r --argjson budget "$budget" --argjson bound "$cost_bound" '
+                   "| assistant turns | messages | client cost estimate (USD) | completed | Claude Code | tools | MCP servers |",
                    "| ---: | ---: | ---: | --- | --- | --- | ---: |",
                    "| \(.assistant_turns) | \(.num_turns) | \(.total_cost_usd) | \(.successful_result) | \(.claude_code_version) | \(.tools | join(" ")) | \(.mcp_servers) |",
+                   (if .budget_stop
+                    then "", "Budget stop: the client stopped the run at its \($budget) USD budget (error_max_budget_usd)."
+                    else empty end),
+                   (if .total_cost_usd > $bound
+                    then "", "Over the cost bound: the client cost estimate is \(.total_cost_usd) USD, above \($bound) USD (the \($budget) USD budget times its measured overrun factor 1.10)."
+                    else empty end),
                    "", "| model | input | cache write | cache read | output |", "| --- | ---: | ---: | ---: | ---: |",
                    (.models[] | "| \(.model) | \(.input_tokens) | \(.cache_creation_input_tokens) | \(.cache_read_input_tokens) | \(.output_tokens) |")' \
               "$out/usage.json"
           } >> "$GITHUB_STEP_SUMMARY"
-          failed="$(jq -r '[
-            (if .successful_result != true then "the run did not end in success" else empty end),
+          failed="$(jq -r --argjson budget "$budget" --argjson bound "$cost_bound" '[
+            (if .successful_result != true and .budget_stop != true then "the run did not end in success or in a budget stop"
+             else empty end),
             (if .session_started != true then "no session start record" else empty end),
             (if .tools_listed != true then "the session start record lists no tools or MCP servers" else empty end),
             (if (.forbidden_tools | length) > 0 then "tools outside Read, Glob and Grep: \(.forbidden_tools | join(" "))"
@@ -305,9 +319,11 @@ jobs:
             (if .mcp_servers != 0 then "\(.mcp_servers) MCP servers in the session" else empty end),
             (if .assistant_turns < 1 or .assistant_turns > 30 then "\(.assistant_turns) assistant turns, outside 1 to 30"
              else empty end),
-            (if .total_cost_usd > 5 then "client cost estimate \(.total_cost_usd) USD, above 5" else empty end),
+            (if .total_cost_usd > $bound
+             then "client cost estimate \(.total_cost_usd) USD, above the \($bound) USD bound (the \($budget) USD budget times its measured overrun factor 1.10)"
+             else empty end),
             (if ((.models | map(.cache_read_input_tokens) | add) // 0) <= 0 then "no cache read" else empty end),
-            (if .result_chars < 1 then "no result text" else empty end)
+            (if .result_chars < 1 and .budget_stop != true then "no result text" else empty end)
           ] | join("; ")' "$out/usage.json")"
           if [ -n "$failed" ]; then
             echo "Bounds not met: $failed" >&2
@@ -315,9 +331,14 @@ jobs:
           fi
 
       # The review is the last non-empty result text, capped and shown as preformatted text so nothing in it renders
-      # as Markdown or HTML on the run page.
+      # as Markdown or HTML on the run page. It is published when the numbers step accepted the run, whatever the
+      # review step's own status: the action fails its own step on a result that is not a plain success, a budget stop
+      # the numbers step accepts among them; the job then stays failed with the review published. (claude_args passes
+      # no --max-turns: the action also fails a success whose num_turns exceeds it, and num_turns counts transcript
+      # messages, not the assistant turns the numbers step bounds.) The numbers step runs only with an
+      # execution file, so its outcome implies one; a cancelled run publishes nothing. A budget stop is named here too.
       - name: Publish the security review to the job summary
-        if: ${{ success() && steps.claude_review.outputs.execution_file != '' }}
+        if: ${{ !cancelled() && steps.numbers.outcome == 'success' }}
         shell: bash
         env:
           EXECUTION_FILE: ${{ steps.claude_review.outputs.execution_file }}
@@ -340,6 +361,9 @@ jobs:
             echo '</pre>'
             if [ "$size" -gt 60000 ]; then
               echo "The report is $size bytes; the first 60,000 are shown."
+            fi
+            if jq -e 'any(.[]; .type == "result" and .subtype == "error_max_budget_usd")' "$EXECUTION_FILE" > /dev/null; then
+              echo 'Budget stop: the client stopped the run at its budget (error_max_budget_usd) before it finished; the text above, if any, is what it wrote before the stop.'
             fi
           } >> "$GITHUB_STEP_SUMMARY"
           rm -f "$report"
