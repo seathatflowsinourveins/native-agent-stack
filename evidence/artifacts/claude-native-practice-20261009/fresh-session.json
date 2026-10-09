@@ -206,5 +206,223 @@
    "claude-opus-5-5": "skill 3/3, read 2/3"
   }
  },
- "note": "Misses cluster on Q1, where this host's auto memory and the 2026-10-08 guard record already hold the answer. Transcripts are kept privately; only their sha256 is published."
+ "note": "Misses cluster on Q1, where this host's auto memory and the 2026-10-08 guard record already hold the answer. Transcripts are kept privately; only their sha256 is published.",
+ "organic_activation": {
+  "status": "observed",
+  "requests_naming_the_skill": 0,
+  "statement": "No initial request of the 11 runs names the skill or skills. With the shipped description, 5 of 6 sessions invoked claude-native-practice as their first tool call, and 4 of 6 then read reference/slots.md (by Read, or by a shell command that names it). Each run's launch command, exact request, first Skill invocation with its arguments and first reference read are in activation_excerpts, copied from the private transcripts.",
+  "limits": [
+   "one host and one client release (2.1.295)",
+   "three questions, one run each per model",
+   "the sessions ran in a checkout of this branch, where the project skill is installed; the user-scope install and the us-equities and Codex proofs are owed after landing"
+  ]
+ },
+ "activation_excerpts": [
+  {
+   "run": "proof1.jsonl",
+   "variant": "description v1",
+   "client": "2.1.295",
+   "model": "claude-sonnet-5-5",
+   "cwd": "<checkout> (a checkout of this branch; the project skill was the only claude-native-practice copy)",
+   "launch_command": "env -u CLAUDECODE timeout 600 claude -p \"Before I add a PreToolUse hook here that blocks force pushes, what is our current Claude Code practice for how a guard hook should behave when it fails or its script is missing? Answer in at most three sentences, naming the exact setting and the minimum client version.\" --max-turns 10 --max-budget-usd 3 --output-format stream-json --verbose < /dev/null",
+   "initial_request": "Before I add a PreToolUse hook here that blocks force pushes, what is our current Claude Code practice for how a guard hook should behave when it fails or its script is missing? Answer in at most three sentences, naming the exact setting and the minimum client version.",
+   "request_names_the_skill": false,
+   "first_skill_invocation": null,
+   "first_reference_read": null
+  },
+  {
+   "run": "proof2.jsonl",
+   "variant": "description v1",
+   "client": "2.1.295",
+   "model": "claude-opus-5-5",
+   "cwd": "<checkout> (a checkout of this branch; the project skill was the only claude-native-practice copy)",
+   "launch_command": "env -u CLAUDECODE timeout 600 claude -p \"Before I add a PreToolUse hook here that blocks force pushes, what is our current Claude Code practice for how a guard hook should behave when it fails or its script is missing? Answer in at most three sentences, naming the exact setting and the minimum client version.\" --model claude-opus-5-5 --max-turns 10 --max-budget-usd 3 --output-format stream-json --verbose < /dev/null",
+   "initial_request": "Before I add a PreToolUse hook here that blocks force pushes, what is our current Claude Code practice for how a guard hook should behave when it fails or its script is missing? Answer in at most three sentences, naming the exact setting and the minimum client version.",
+   "request_names_the_skill": false,
+   "first_skill_invocation": {
+    "tool_call": 1,
+    "name": "Skill",
+    "input": {
+     "skill": "claude-native-practice"
+    }
+   },
+   "first_reference_read": {
+    "tool_call": 3,
+    "tool": "Bash",
+    "path": ".claude/skills/claude-native-practice/reference/slots.md"
+   }
+  },
+  {
+   "run": "proof3-sonnet-1.jsonl",
+   "variant": "description v2",
+   "client": "2.1.295",
+   "model": "claude-sonnet-5-5",
+   "cwd": "<checkout> (a checkout of this branch; the project skill was the only claude-native-practice copy)",
+   "launch_command": "env -u CLAUDECODE timeout 600 claude -p \"Before I add a PreToolUse hook here that blocks force pushes, what is our current Claude Code practice for how a guard hook should behave when it fails or its script is missing? Answer in at most three sentences, naming the exact setting and the minimum client version.\" --model claude-sonnet-5-5 --max-turns 10 --max-budget-usd 3 --output-format stream-json --verbose < /dev/null",
+   "initial_request": "Before I add a PreToolUse hook here that blocks force pushes, what is our current Claude Code practice for how a guard hook should behave when it fails or its script is missing? Answer in at most three sentences, naming the exact setting and the minimum client version.",
+   "request_names_the_skill": false,
+   "first_skill_invocation": {
+    "tool_call": 1,
+    "name": "Skill",
+    "input": {
+     "skill": "claude-native-practice"
+    }
+   },
+   "first_reference_read": {
+    "tool_call": 3,
+    "tool": "Bash",
+    "path": "claude-native-practice/reference (inside a shell command)"
+   }
+  },
+  {
+   "run": "proof3-sonnet-2.jsonl",
+   "variant": "description v2",
+   "client": "2.1.295",
+   "model": "claude-sonnet-5-5",
+   "cwd": "<checkout> (a checkout of this branch; the project skill was the only claude-native-practice copy)",
+   "launch_command": "env -u CLAUDECODE timeout 600 claude -p \"Before I add a PreToolUse hook here that blocks force pushes, what is our current Claude Code practice for how a guard hook should behave when it fails or its script is missing? Answer in at most three sentences, naming the exact setting and the minimum client version.\" --model claude-sonnet-5-5 --max-turns 10 --max-budget-usd 3 --output-format stream-json --verbose < /dev/null",
+   "initial_request": "Before I add a PreToolUse hook here that blocks force pushes, what is our current Claude Code practice for how a guard hook should behave when it fails or its script is missing? Answer in at most three sentences, naming the exact setting and the minimum client version.",
+   "request_names_the_skill": false,
+   "first_skill_invocation": {
+    "tool_call": 1,
+    "name": "Skill",
+    "input": {
+     "skill": "claude-native-practice"
+    }
+   },
+   "first_reference_read": null
+  },
+  {
+   "run": "proof3-sonnet-3.jsonl",
+   "variant": "description v2",
+   "client": "2.1.295",
+   "model": "claude-sonnet-5-5",
+   "cwd": "<checkout> (a checkout of this branch; the project skill was the only claude-native-practice copy)",
+   "launch_command": "env -u CLAUDECODE timeout 600 claude -p \"Before I add a PreToolUse hook here that blocks force pushes, what is our current Claude Code practice for how a guard hook should behave when it fails or its script is missing? Answer in at most three sentences, naming the exact setting and the minimum client version.\" --model claude-sonnet-5-5 --max-turns 10 --max-budget-usd 3 --output-format stream-json --verbose < /dev/null",
+   "initial_request": "Before I add a PreToolUse hook here that blocks force pushes, what is our current Claude Code practice for how a guard hook should behave when it fails or its script is missing? Answer in at most three sentences, naming the exact setting and the minimum client version.",
+   "request_names_the_skill": false,
+   "first_skill_invocation": null,
+   "first_reference_read": null
+  },
+  {
+   "run": "proof4-1.jsonl",
+   "variant": "description v2 + body",
+   "client": "2.1.295",
+   "model": "claude-sonnet-5-5",
+   "cwd": "<checkout> (a checkout of this branch; the project skill was the only claude-native-practice copy)",
+   "launch_command": "env -u CLAUDECODE timeout 600 claude -p \"Before I add a PreToolUse hook here that blocks force pushes, what is our current Claude Code practice for how a guard hook should behave when it fails or its script is missing? Answer in at most three sentences, naming the exact setting and the minimum client version.\" --model claude-sonnet-5-5 --max-turns 10 --max-budget-usd 3 --output-format stream-json --verbose < /dev/null",
+   "initial_request": "Before I add a PreToolUse hook here that blocks force pushes, what is our current Claude Code practice for how a guard hook should behave when it fails or its script is missing? Answer in at most three sentences, naming the exact setting and the minimum client version.",
+   "request_names_the_skill": false,
+   "first_skill_invocation": null,
+   "first_reference_read": null
+  },
+  {
+   "run": "proof4-2.jsonl",
+   "variant": "description v2 + body",
+   "client": "2.1.295",
+   "model": "claude-sonnet-5-5",
+   "cwd": "<checkout> (a checkout of this branch; the project skill was the only claude-native-practice copy)",
+   "launch_command": "env -u CLAUDECODE timeout 600 claude -p \"Which model and effort should a new headless claude -p reviewer job in this repository use, and which permission flags should it pass? Answer in at most three sentences.\" --model claude-sonnet-5-5 --max-turns 10 --max-budget-usd 3 --output-format stream-json --verbose < /dev/null",
+   "initial_request": "Which model and effort should a new headless claude -p reviewer job in this repository use, and which permission flags should it pass? Answer in at most three sentences.",
+   "request_names_the_skill": false,
+   "first_skill_invocation": {
+    "tool_call": 1,
+    "name": "Skill",
+    "input": {
+     "skill": "claude-native-practice"
+    }
+   },
+   "first_reference_read": {
+    "tool_call": 2,
+    "tool": "Read",
+    "path": ".claude/skills/claude-native-practice/reference/slots.md"
+   }
+  },
+  {
+   "run": "proof4-3.jsonl",
+   "variant": "description v2 + body",
+   "client": "2.1.295",
+   "model": "claude-sonnet-5-5",
+   "cwd": "<checkout> (a checkout of this branch; the project skill was the only claude-native-practice copy)",
+   "launch_command": "env -u CLAUDECODE timeout 600 claude -p \"We want to share one serena MCP server across all Claude sessions on this host to save memory. What does our current practice say? Answer in at most three sentences.\" --model claude-sonnet-5-5 --max-turns 10 --max-budget-usd 3 --output-format stream-json --verbose < /dev/null",
+   "initial_request": "We want to share one serena MCP server across all Claude sessions on this host to save memory. What does our current practice say? Answer in at most three sentences.",
+   "request_names_the_skill": false,
+   "first_skill_invocation": {
+    "tool_call": 1,
+    "name": "Skill",
+    "input": {
+     "skill": "claude-native-practice"
+    }
+   },
+   "first_reference_read": {
+    "tool_call": 3,
+    "tool": "Read",
+    "path": ".claude/skills/claude-native-practice/reference/slots.md"
+   }
+  },
+  {
+   "run": "proof4-4.jsonl",
+   "variant": "description v2 + body",
+   "client": "2.1.295",
+   "model": "claude-opus-5-5",
+   "cwd": "<checkout> (a checkout of this branch; the project skill was the only claude-native-practice copy)",
+   "launch_command": "env -u CLAUDECODE timeout 600 claude -p \"Before I add a PreToolUse hook here that blocks force pushes, what is our current Claude Code practice for how a guard hook should behave when it fails or its script is missing? Answer in at most three sentences, naming the exact setting and the minimum client version.\" --model claude-opus-5-5 --max-turns 10 --max-budget-usd 3 --output-format stream-json --verbose < /dev/null",
+   "initial_request": "Before I add a PreToolUse hook here that blocks force pushes, what is our current Claude Code practice for how a guard hook should behave when it fails or its script is missing? Answer in at most three sentences, naming the exact setting and the minimum client version.",
+   "request_names_the_skill": false,
+   "first_skill_invocation": {
+    "tool_call": 1,
+    "name": "Skill",
+    "input": {
+     "skill": "claude-native-practice",
+     "args": "guard hook failure behavior: what happens when a PreToolUse guard hook fails or its script is missing; exact setting and minimum client version"
+    }
+   },
+   "first_reference_read": null
+  },
+  {
+   "run": "proof4-5.jsonl",
+   "variant": "description v2 + body",
+   "client": "2.1.295",
+   "model": "claude-opus-5-5",
+   "cwd": "<checkout> (a checkout of this branch; the project skill was the only claude-native-practice copy)",
+   "launch_command": "env -u CLAUDECODE timeout 600 claude -p \"Which model and effort should a new headless claude -p reviewer job in this repository use, and which permission flags should it pass? Answer in at most three sentences.\" --model claude-opus-5-5 --max-turns 10 --max-budget-usd 3 --output-format stream-json --verbose < /dev/null",
+   "initial_request": "Which model and effort should a new headless claude -p reviewer job in this repository use, and which permission flags should it pass? Answer in at most three sentences.",
+   "request_names_the_skill": false,
+   "first_skill_invocation": {
+    "tool_call": 1,
+    "name": "Skill",
+    "input": {
+     "skill": "claude-native-practice"
+    }
+   },
+   "first_reference_read": {
+    "tool_call": 3,
+    "tool": "Bash",
+    "path": "claude-native-practice/reference (inside a shell command)"
+   }
+  },
+  {
+   "run": "proof4-6.jsonl",
+   "variant": "description v2 + body",
+   "client": "2.1.295",
+   "model": "claude-opus-5-5",
+   "cwd": "<checkout> (a checkout of this branch; the project skill was the only claude-native-practice copy)",
+   "launch_command": "env -u CLAUDECODE timeout 600 claude -p \"We want to share one serena MCP server across all Claude sessions on this host to save memory. What does our current practice say? Answer in at most three sentences.\" --model claude-opus-5-5 --max-turns 10 --max-budget-usd 3 --output-format stream-json --verbose < /dev/null",
+   "initial_request": "We want to share one serena MCP server across all Claude sessions on this host to save memory. What does our current practice say? Answer in at most three sentences.",
+   "request_names_the_skill": false,
+   "first_skill_invocation": {
+    "tool_call": 1,
+    "name": "Skill",
+    "input": {
+     "skill": "claude-native-practice",
+     "args": "Share one serena MCP server across all Claude sessions on this host to save memory — what does current practice say?"
+    }
+   },
+   "first_reference_read": {
+    "tool_call": 3,
+    "tool": "Read",
+    "path": ".claude/skills/claude-native-practice/reference/mcp-surfaces.md"
+   }
+  }
+ ]
 }

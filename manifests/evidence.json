@@ -19922,8 +19922,8 @@
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/fresh-session.json",
-      "sha256": "1999e315638d8e729eae94f7a4ddaf671f4ec5489189747beb1b99b884035306",
-      "bytes": 5468
+      "sha256": "8ae2332534c590bdb35688ee6ac74cbd1d869f461c9de5dedfbf032626a6bebc",
+      "bytes": 19255
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/g5-candidate-rows.json",
