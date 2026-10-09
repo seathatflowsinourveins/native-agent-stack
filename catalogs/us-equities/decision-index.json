@@ -412,6 +412,7 @@
     "huangruiteng/loopx": "loopx-project/loopx",
     "iterative/dvc": "treeverse/dvc",
     "linkedin/datahub": "datahub-project/datahub",
+    "microsoft/lightgbm": "lightgbm-org/lightgbm",
     "polygon-io/client-python": "massive-com/client-python",
     "tobikodata/sqlmesh": "sqlmesh/sqlmesh",
     "ukplab/sentence-transformers": "huggingface/sentence-transformers",
@@ -422,7 +423,7 @@
     "repositories": 878,
     "public_star_repositories": 357,
     "beyond_public_stars": 521,
-    "references": 2084,
+    "references": 2085,
     "repositories_by_record_type": {
       "catalog_card": 148,
       "component_record": 70,
@@ -1634,9 +1635,9 @@
           "path": "catalogs/us-equities/ns-movers-phase0-decisions-20261009.json",
           "pointer": "/decisions/7",
           "id": "NSM-ALPACA",
-          "decision": "Official SDK only if owner selects a licensed data leg. Current routing/asset status is not a historical universe; indicative options do not replace OPRA.",
-          "review_level": "source_review; exact scope in source_packet, no E2E upgrade",
-          "evidence_level": "source_review_or_Phase0_synthetic_structural_only"
+          "decision": "Official SDK only. OD2 owner approves held Algo Trader Plus SIP/OPRA; source acquisition still waits for landed freeze. Current Asset/OptionsSnapshot fields do not supply original universe/fee/quantity/OI history.",
+          "review_level": "source_review; exact scope in source_packet, no study E2E upgrade",
+          "evidence_level": "source_review_no_empirical_acceptance"
         },
         {
           "kind": "research_supplement",
@@ -3643,8 +3644,8 @@
           "pointer": "/decisions/6",
           "id": "NSM-ARCH",
           "decision": "Reuse installed arch 8.0.0 CircularBlockBootstrap for session-grouped inference after native exact block/determinism test; not reimplement bootstrap.",
-          "review_level": "source_review; exact scope in source_packet, no E2E upgrade",
-          "evidence_level": "source_review_or_Phase0_synthetic_structural_only"
+          "review_level": "source_review; exact scope in source_packet, no study E2E upgrade",
+          "evidence_level": "source_review_no_empirical_acceptance"
         }
       ]
     },
@@ -6463,9 +6464,9 @@
           "path": "catalogs/us-equities/ns-movers-phase0-decisions-20261009.json",
           "pointer": "/decisions/3",
           "id": "NSM-EDGARTOOLS",
-          "decision": "upstream CIK/ticker/filing features first; current 5.61.1 release verified, installed study pin must be read from locked runtime in Phase 1; no custom parser",
-          "review_level": "source_review; exact scope in source_packet, no E2E upgrade",
-          "evidence_level": "source_review_or_Phase0_synthetic_structural_only"
+          "decision": "Adopt existing locked5.61.1 from upstreamv5.61.1; qualify CIK/ticker/filing original-vintage behavior through upstream tests before study use; no parser rebuild.",
+          "review_level": "source_review; exact scope in source_packet, no study E2E upgrade",
+          "evidence_level": "source_review_no_empirical_acceptance"
         },
         {
           "kind": "research_supplement",
@@ -6934,9 +6935,9 @@
           "path": "catalogs/us-equities/ns-movers-phase0-decisions-20261009.json",
           "pointer": "/decisions/5",
           "id": "NSM-DUCKDB",
-          "decision": "Reuse installed native immutable Parquet/SQL as-of selection first; source/runtime version and actual study temporal tests required in Phase1, no custom engine.",
-          "review_level": "source_review; exact scope in source_packet, no E2E upgrade",
-          "evidence_level": "source_review_or_Phase0_synthetic_structural_only"
+          "decision": "Use existing locked DuckDB1.5.5 native as-of/Parquet path; exact temporal/session/decimal checks before study; no SQL engine rebuild.",
+          "review_level": "source_review; exact scope in source_packet, no study E2E upgrade",
+          "evidence_level": "source_review_no_empirical_acceptance"
         },
         {
           "kind": "component_record",
@@ -8238,6 +8239,15 @@
           "id": "data-exchange-calendars",
           "decision": "default",
           "evidence_level": "native_proven"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/ns-movers-phase0-decisions-20261009.json",
+          "pointer": "/decisions/11",
+          "id": "NSM-EXCHANGE-CALENDARS",
+          "decision": "Reuse locked4.13.2native XNYS schedule; session boundaries/early closes/completion window tested before study. No calendar rebuild.",
+          "review_level": "source_review; exact scope in source_packet, no study E2E upgrade",
+          "evidence_level": "source_review_no_empirical_acceptance"
         },
         {
           "kind": "component_record",
@@ -11781,6 +11791,27 @@
       ]
     },
     {
+      "repository": "https://github.com/lightgbm-org/lightgbm",
+      "aliases": [
+        "microsoft/lightgbm"
+      ],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/ns-movers-phase0-decisions-20261009.json",
+          "pointer": "/decisions/4",
+          "id": "NSM-LIGHTGBM",
+          "decision": "Canonical upstream redirect verified2026-10-09. Reuse4.7.0native example; exact binary/deterministic study acceptance remains NOT_RUN.",
+          "review_level": "source_review; exact scope in source_packet, no study E2E upgrade",
+          "evidence_level": "source_review_no_empirical_acceptance"
+        }
+      ]
+    },
+    {
       "repository": "https://github.com/lightonai/pylate",
       "aliases": [],
       "public_star": false,
@@ -12868,25 +12899,6 @@
           "pointer": "/candidates/243",
           "decision": "discovery_only",
           "evidence_depth": "Attributed documentary discovery; no runtime execution or controlled comparative acceptance"
-        }
-      ]
-    },
-    {
-      "repository": "https://github.com/microsoft/lightgbm",
-      "aliases": [],
-      "public_star": false,
-      "record_types": [
-        "research_supplement"
-      ],
-      "references": [
-        {
-          "kind": "research_supplement",
-          "path": "catalogs/us-equities/ns-movers-phase0-decisions-20261009.json",
-          "pointer": "/decisions/4",
-          "id": "NSM-LIGHTGBM",
-          "decision": "existing native regression example is a lead, not binary-study acceptance; exact classifier parameters/determinism acceptance before fit",
-          "review_level": "source_review; exact scope in source_packet, no E2E upgrade",
-          "evidence_level": "source_review_or_Phase0_synthetic_structural_only"
         }
       ]
     },
@@ -14068,8 +14080,8 @@
           "pointer": "/decisions/0",
           "id": "NSM-NAUTILUS",
           "decision": "selected engine; source API and release verified; new study execution NOT_RUN",
-          "review_level": "source_review; exact scope in source_packet, no E2E upgrade",
-          "evidence_level": "source_review_or_Phase0_synthetic_structural_only"
+          "review_level": "source_review; exact scope in source_packet, no study E2E upgrade",
+          "evidence_level": "source_review_no_empirical_acceptance"
         },
         {
           "kind": "research_supplement",
@@ -17318,8 +17330,8 @@
           "pointer": "/decisions/9",
           "id": "NSM-JSONSCHEMA",
           "decision": "Use upstream Draft202012Validator for Phase0 schema/meta-schema validation in an isolated uv environment; no dependency or runtime upgrade in this PR.",
-          "review_level": "source_review; exact scope in source_packet, no E2E upgrade",
-          "evidence_level": "source_review_or_Phase0_synthetic_structural_only"
+          "review_level": "source_review; exact scope in source_packet, no study E2E upgrade",
+          "evidence_level": "Phase0_synthetic_structural_validation_only"
         }
       ]
     },
@@ -17514,8 +17526,8 @@
           "pointer": "/decisions/1",
           "id": "NSM-LEAN",
           "decision": "source comparison snapshot; execute only the installed accepted LEAN engine after a reviewed pin/fixture check, not an automatic upgrade",
-          "review_level": "source_review; exact scope in source_packet, no E2E upgrade",
-          "evidence_level": "source_review_or_Phase0_synthetic_structural_only"
+          "review_level": "source_review; exact scope in source_packet, no study E2E upgrade",
+          "evidence_level": "source_review_no_empirical_acceptance"
         },
         {
           "kind": "research_supplement",
@@ -18837,9 +18849,9 @@
           "path": "catalogs/us-equities/ns-movers-phase0-decisions-20261009.json",
           "pointer": "/decisions/8",
           "id": "NSM-SKLEARN",
-          "decision": "Use installed upstream logistic/preprocessing/calibration APIs after exact locked source and parameter acceptance; no new model implementation.",
-          "review_level": "source_review; exact scope in source_packet, no E2E upgrade",
-          "evidence_level": "source_review_or_Phase0_synthetic_structural_only"
+          "decision": "Use existing locked1.9.1 official logistic/preprocessing/calibration APIs; exact frozen parameter checks before fit.",
+          "review_level": "source_review; exact scope in source_packet, no study E2E upgrade",
+          "evidence_level": "source_review_no_empirical_acceptance"
         }
       ]
     },
@@ -18983,8 +18995,8 @@
           "pointer": "/decisions/10",
           "id": "NSM-DESK-S53",
           "decision": "Existing upstream31-factor interface first, after supported native tests and original-release/identity/actions/coverage acceptance. No package copy/scanner rebuild/inherited weights/performance; crosswalk in grand-package-review.json.",
-          "review_level": "source_review; exact scope in source_packet, no E2E upgrade",
-          "evidence_level": "source_review_or_Phase0_synthetic_structural_only"
+          "review_level": "source_review; exact scope in source_packet, no study E2E upgrade",
+          "evidence_level": "source_review_no_empirical_acceptance"
         }
       ]
     },
@@ -19551,9 +19563,9 @@
           "path": "catalogs/us-equities/ns-movers-phase0-decisions-20261009.json",
           "pointer": "/decisions/2",
           "id": "NSM-SKFOLIO",
-          "decision": "reuse native WalkForward after exact study API/session/purge acceptance; v1.2.9 predecessor reference pinned in source_packet/sources.json; new v1.7.1 watched, not installed",
-          "review_level": "source_review; exact scope in source_packet, no E2E upgrade",
-          "evidence_level": "source_review_or_Phase0_synthetic_structural_only"
+          "decision": "Reuse native WalkForward after exact study API/session/purge acceptance; retained v1.2.9 precedent is a separate typed source reference; v1.7.1 watched, not installed.",
+          "review_level": "source_review; exact scope in source_packet, no study E2E upgrade",
+          "evidence_level": "source_review_no_empirical_acceptance"
         },
         {
           "kind": "component_record",
