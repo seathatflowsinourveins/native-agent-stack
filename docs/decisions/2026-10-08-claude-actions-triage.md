@@ -101,7 +101,7 @@ Runs spend from the Console organization that the four `ANTHROPIC_*` repository 
 - `tests.test_workflow_security_coverage.NewWorkflowSecurityCoverageTests`: the coverage set gains
   `claude-triage.yml`, with its own offline zizmor test.
 
-New, in `tests/test_claude_triage_workflow.py` (26 tests): triggers, conditions, permissions per job, the pin, the
+New, in `tests/test_claude_triage_workflow.py` (27 tests): triggers, conditions, permissions per job, the pin, the
 flags, the schema's enums and the settings are asserted from the workflow file; the collect, numbers, validation and
 apply steps are executed as written against a local stand-in for `gh`. Thirteen weakened copies of the workflow each
 fail at least one test (no check that a number was collected, labels for pull requests or low confidence passed on,
@@ -129,6 +129,23 @@ are still tried. `apply` now reads `jq`'s exit status and treats only 1 as a ski
 failures (three bodies, then an issue that is still labelled) and a label failure followed by an issue that is still
 labelled. Five more weakened copies each fail at least one test: a `jq` error reported as a skip, a `jq` error that
 does not fail the step, every `jq` failure read as false, and a read or label failure that stops the loop.
+
+## Debug logging set as a repository secret or variable (2026-10-09)
+
+A read of this workflow against official practice for `anthropics/claude-code-action` v1.0.247 (the cc-native-practice
+lane's L3 delta, requirement R4) found that the guard step could not see debug logging enabled through a repository
+secret or variable. Step debug logging and runner diagnostic logging are each enabled by a secret or a variable named
+`ACTIONS_STEP_DEBUG` or `ACTIONS_RUNNER_DEBUG`, the secret taking precedence (GitHub, "Enabling debug logging"), and
+neither reaches a step's shell unless it is bound; `runner.debug` reflects step debug logging, a debug re-run
+included, but not runner diagnostic logging. The guard now binds
+`(secrets.ACTIONS_STEP_DEBUG || vars.ACTIONS_STEP_DEBUG) == 'true'` as `STEP_DEBUG_SETTING` and
+`(secrets.ACTIONS_RUNNER_DEBUG || vars.ACTIONS_RUNNER_DEBUG) == 'true'` as `RUNNER_DIAGNOSTICS_SETTING`, so only
+`true` or `false` reaches the shell, and refuses either before any token is requested. This is hardening, not a closed
+leak: the action step already pins `ACTIONS_STEP_DEBUG: 'false'` in its own environment, which is what the action's
+full-output switch reads (`base-action/src/parse-sdk-options.ts`). zizmor's auditor persona reports
+`secrets-outside-env` (medium) on the two secret reads; the repository's CI runs the regular persona, pedantic
+suppresses it, and each read yields a boolean only. A test pins both bindings and the guard test refuses each
+setting; weakened copies are listed with the checks of this change.
 
 ## Alternatives considered
 

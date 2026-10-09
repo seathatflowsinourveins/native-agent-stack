@@ -219,6 +219,16 @@ class TriageShapeTests(unittest.TestCase):
                                       "steps.claude_triage.outputs.execution_file == '' }}")
         self.assertIn("exit 1", check["run"])
 
+    def test_the_guard_binds_debug_logging_set_as_a_repository_secret_or_variable(self):
+        # GitHub's "Enabling debug logging": step debug logging and runner diagnostic logging are each enabled by a
+        # secret or a variable of that name, the secret taking precedence; neither reaches a step's shell unbound.
+        env = step(GUARD)["env"]
+        self.assertEqual(env["STEP_DEBUG_SETTING"],
+                         "${{ (secrets.ACTIONS_STEP_DEBUG || vars.ACTIONS_STEP_DEBUG) == 'true' }}")
+        self.assertEqual(env["RUNNER_DIAGNOSTICS_SETTING"],
+                         "${{ (secrets.ACTIONS_RUNNER_DEBUG || vars.ACTIONS_RUNNER_DEBUG) == 'true' }}")
+        self.assertEqual(env["RUNNER_DEBUG_SIGNAL"], "${{ runner.debug }}")
+
     def test_the_numbers_run_after_any_outcome_and_the_proposal_only_after_success(self):
         self.assertEqual(step(NUMBERS)["if"], "${{ always() && steps.claude_triage.outputs.execution_file != '' }}")
         self.assertEqual(step(VALIDATE)["if"], "${{ success() && steps.claude_triage.outputs.execution_file != '' }}")
@@ -254,10 +264,13 @@ class TriageStepTests(unittest.TestCase):
             code, console = run.run(GUARD)
             self.assertEqual(code, 0, console)
             for env in ({"ACTIONS_STEP_DEBUG": "true"}, {"ACTIONS_RUNNER_DEBUG": "true"}, {"RUNNER_DEBUG": "1"},
-                        {"RUNNER_DEBUG_SIGNAL": "1"}):
+                        {"RUNNER_DEBUG_SIGNAL": "1"}, {"STEP_DEBUG_SETTING": "true"},
+                        {"RUNNER_DIAGNOSTICS_SETTING": "true"}):
                 code, console = run.run(GUARD, **env)
                 self.assertEqual(code, 2, env)
                 self.assertIn("Refused: debug logging is enabled for this run.", console)
+            for env in ({"STEP_DEBUG_SETTING": "false"}, {"RUNNER_DIAGNOSTICS_SETTING": "false"}):
+                self.assertEqual(run.run(GUARD, **env)[0], 0, env)
             settings = run.dir / "home/.claude/settings.json"
             settings.parent.mkdir()
             settings.symlink_to(run.dir / "absent.json")  # a dangling link counts as present

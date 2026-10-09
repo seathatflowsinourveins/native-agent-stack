@@ -54,10 +54,15 @@ jobs:
         shell: bash
         env:
           RUNNER_DEBUG_SIGNAL: ${{ runner.debug }}
+          # Debug logging set as a repository secret or variable reaches no step's shell. GitHub's "Enabling debug
+          # logging" lets either one enable it, the secret taking precedence; each is bound here as true or false only.
+          STEP_DEBUG_SETTING: ${{ (secrets.ACTIONS_STEP_DEBUG || vars.ACTIONS_STEP_DEBUG) == 'true' }}
+          RUNNER_DIAGNOSTICS_SETTING: ${{ (secrets.ACTIONS_RUNNER_DEBUG || vars.ACTIONS_RUNNER_DEBUG) == 'true' }}
         run: |
           set -euo pipefail
           if [ "${ACTIONS_STEP_DEBUG:-false}" = "true" ] || [ "${ACTIONS_RUNNER_DEBUG:-false}" = "true" ] ||
-             [ "${RUNNER_DEBUG:-0}" = "1" ] || [ "${RUNNER_DEBUG_SIGNAL:-0}" = "1" ]; then
+             [ "${RUNNER_DEBUG:-0}" = "1" ] || [ "${RUNNER_DEBUG_SIGNAL:-0}" = "1" ] ||
+             [ "${STEP_DEBUG_SETTING:-false}" = "true" ] || [ "${RUNNER_DIAGNOSTICS_SETTING:-false}" = "true" ]; then
             echo 'Refused: debug logging is enabled for this run.' >&2
             exit 2
           fi
