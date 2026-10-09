@@ -20,6 +20,8 @@ against it.
 | `typesafe` | Typesafe key, for the live-judge mode of `gap_crosswalk.py` and the native-skill-practice Jev provider in `blueprints/native-skill-practice/promptfooconfig.yaml`; start each through `tools/credentials/credential_run.py typesafe -- <command>`. A trading-lane use needs its own, separately authorized key | only when you pay for it | `<store>/typesafe.env` | `TYPESAFE_API_KEY` |
 | `omniroute` | OmniRoute local gateway key, one per lane. The workstation gateway runs keyless on loopback, so callers pass the placeholder `local-loopback` ([decision](decisions/2026-09-27-omniroute-account-pool.md)) | optional | `<store>/omniroute.env` | `OMNIROUTE_API_KEY` |
 | `tavily` | Tavily API key. Until 2026-09-29 it lived only in the kernel keyring; its first file write comes from that copy through the create-only chain in [Kernel keyring](#kernel-keyring-transport-and-per-boot-spare-2026-09-29) | optional | `<store>/tavily.env` | `TAVILY_API_KEY` |
+| `anthropic-api` | Anthropic Claude Console API key for local tools without an identity provider | optional | `<store>/anthropic-api.env` | `ANTHROPIC_API_KEY` |
+| `anthropic-api-2` | Anthropic Claude API key, second key (additional credit; fast-mode trial) | optional | `<store>/anthropic-api-2.env` | `ANTHROPIC_API_KEY` |
 | `grafana-admin` | Local Grafana admin account and secret key | generated locally | `~/.config/ecosystem-observability/ecosystem-grafana.env` | `GF_SECURITY_*` |
 | `nativestack-generation-key` | Host service key | generated locally | `~/.config/nativestack/generation.key` | none |
 | `openhands-session` | OpenHands agent-server session key for one runtime-worker attempt ([decision](decisions/2026-09-28-openhands-resolver-isolation.md)) | generated locally, per attempt; deleted after the attempt's containers are confirmed removed | `~/.local/state/native-agent-stack/runtime-workers/openhands/secrets/<run-id>-<arm>.server.env`, plus the `.headers` file beside it | none on the host; `OH_SESSION_API_KEYS_0` exists only inside the agent-server container (Docker `--env-file`) |
@@ -29,6 +31,22 @@ against it.
 | `github-actions` | `FOUNDATION_RESTORE_FIXTURE_20260920` and the per-job `github.token` | CI only | GitHub's encrypted secret store | none locally |
 
 `<store>` means `${XDG_CONFIG_HOME:-$HOME/.config}/native-agent-stack`.
+
+The two Anthropic entries are separate stores for additional Console keys;
+adding `anthropic-api-2` replaces nothing. Select the key for one command with
+`python3 tools/credentials/credential_run.py anthropic-api-2 -- <command>`
+(or `anthropic-api` for the first key). Both inject only `ANTHROPIC_API_KEY`,
+which stays in `must_not_be_set` and is never exported into the host shell.
+Use a key scoped to one dedicated workspace with a spend limit: Anthropic's
+[authentication guidance](https://platform.claude.com/docs/en/manage-claude/authentication#create-and-use-a-key)
+documents that SDKs read this variable and that a workspace-scoped key needs
+no workspace header. A multi-workspace key needs `anthropic-workspace-id`
+and is outside this one-variable inventory contract. Claude Code's
+[environment guidance](https://code.claude.com/docs/en/env-vars#variables)
+distinguishes headless API-key use from interactive approval before overriding
+subscription sign-in. Store creation and rotation use the existing hidden
+prompt and the selected id; the other store remains separate. See the
+[second-key decision](decisions/2026-10-08-anthropic-api-second-key.md).
 
 `sec-contact` may also declare the public `EDGAR_RATE_LIMIT_PER_SEC` setting as
 a positive integer, for example `5`, before launching an EdgarTools command.
