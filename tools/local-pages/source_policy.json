@@ -1,0 +1,1589 @@
+{
+  "schema": "local-pages-source-policy/1",
+  "source_pin": "0d86b53d1b8647cbf61085124403defe5b0fbc25",
+  "source_index": [
+    {
+      "root": "repo",
+      "path": "tools/north-star/sources.json"
+    }
+  ],
+  "native_reader": {
+    "root": "repo",
+    "path": "tools/north-star/build_readiness.py",
+    "sha256": "59428d63e09bab10e216e86af377891f8546aca6b3f9cc08c59d0803573b57b0"
+  },
+  "overrides": {
+    "gaps_source": [
+      {"root": "state", "path": "coordination/command-center/cc-tools/gaps/gaps.json"}
+    ],
+    "roadmap_source": [
+      {"root": "state", "path": "coordination/command-center/cc-tools/roadmap/roadmap-status.json"}
+    ],
+    "roadmap_inputs": [
+      {"root": "state", "path": "coordination/command-center/cc-tools/roadmap/roadmap-inputs.json"}
+    ],
+    "current_source": [
+      {"root": "state", "path": "coordination/command-center/pages/cc-now.json"}
+    ]
+  },
+  "sources": {
+    "foundation": [
+      {
+        "root": "repo",
+        "path": "catalogs/landscape/foundation.json"
+      }
+    ],
+    "stack": [
+      {
+        "root": "repo",
+        "path": "manifests/stack.json"
+      }
+    ],
+    "evidence": [
+      {
+        "root": "repo",
+        "path": "manifests/evidence.json"
+      }
+    ],
+    "profile": [
+      {
+        "root": "repo",
+        "path": "adoption/new-wsl-profile.json"
+      }
+    ],
+    "sdk_rows": [
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/rows.json"
+      }
+    ],
+    "sdk_handoff": [
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/handoff.receipt.json"
+      }
+    ],
+    "sdk_contract": [
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/receipt-contract.json"
+      }
+    ],
+    "sdk_route_correction": [
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/route-correction.receipt.json"
+      }
+    ],
+    "sdk_route_reconciliation": [
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/route-reconciliation-final.receipt.json"
+      }
+    ],
+    "cc_g1": [
+      {
+        "root": "state",
+        "path": "coordination/command-center/ROW-ns2604-coop-20261008T1725Z-g1met.md"
+      }
+    ],
+    "cc_g2": [
+      {
+        "root": "state",
+        "path": "coordination/command-center/ITEM-ns2604-coop-20261008T160905Z.md"
+      }
+    ],
+    "cc_g2_started": [
+      {
+        "root": "state",
+        "path": "coordination/ns2604-coop/notes/rnd-start-20261008/ledger-r3-start.md"
+      }
+    ],
+    "cc_g2_started_correction": [
+      {
+        "root": "state",
+        "path": "coordination/ns2604-coop/notes/rnd-start-20261008/ledger-r3-start-correction.md"
+      }
+    ],
+    "cc_g3": [
+      {
+        "root": "state",
+        "path": "coordination/command-center/ITEM-ns2604-coop-20261008T164839Z.md"
+      }
+    ],
+    "cc_batch": [
+      {
+        "root": "state",
+        "path": "coordination/command-center/ITEM-ns2604-coop-20261008T175944Z.md"
+      }
+    ],
+    "cc_g5": [
+      {
+        "root": "state",
+        "path": "coordination/command-center/ROW-ns2604-coop-20261008T1822Z-g5shape.md"
+      }
+    ],
+    "cc_g5_closure": [
+      {
+        "root": "state",
+        "path": "coordination/command-center/ITEM-ns2604-coop-20261008T210228Z.md"
+      }
+    ],
+    "cc_g6_f9": [
+      {
+        "root": "state",
+        "path": "coordination/command-center/windows/f9-g6a-881-20261008/RECEIPT.md"
+      }
+    ],
+    "paper_hold": [
+      {
+        "root": "state",
+        "path": "coordination/command-center/ROW-ns2604-coop-20261008T1805Z-n2hold.md"
+      }
+    ],
+    "fullspeed": [
+      {
+        "root": "state",
+        "path": "coordination/command-center/ITEM-ns2604-coop-20261008T181214Z.md"
+      }
+    ],
+    "rnd_launch": [
+      {
+        "root": "state",
+        "path": "coordination/command-center/north-star-rnd-launch-spec-20261008.md"
+      }
+    ],
+    "g1_actual": [
+      {
+        "root": "state",
+        "path": "coordination/ns2604-coop/lanes/layer15-acceptance-f8334c2/20261008T163552Z-l41z4e3s/receipt.json"
+      }
+    ],
+    "g1_event_binding": [
+      {
+        "root": "state",
+        "path": "coordination/ns2604-coop/lanes/layer15-acceptance-f8334c2/20261008T163552Z-l41z4e3s/execution-provenance-addendum-original-event-binding.json"
+      }
+    ],
+    "native24": [
+      {
+        "root": "repo",
+        "path": "evidence/receipts/runtime-final-native-24-acceptance-20261008.json"
+      }
+    ],
+    "native24_run": [
+      {
+        "root": "repo",
+        "path": "evidence/artifacts/runtime-final-lock-binding-20261008/final-native-24-acceptance.json"
+      }
+    ],
+    "roadmap_inputs": [
+      {
+        "root": "state",
+        "path": "coordination/command-center/cc-tools/roadmap/roadmap-inputs.json"
+      }
+    ],
+    "runner_inputs": [
+      {
+        "root": "state",
+        "path": "coordination/ns2604-coop/lanes/readiness-runner.inputs-20261008T1830Z.json"
+      }
+    ],
+    "monitoring_status": [
+      {
+        "root": "state",
+        "path": "coordination/ns2604-coop/lanes/runtime-workers.status.md"
+      }
+    ]
+  },
+  "linked_receipts": {
+    "supporting": [
+      {
+        "root": "repo",
+        "path": "adoption/paired/receipt.json"
+      },
+      {
+        "root": "repo",
+        "path": "adoption/receipt.json"
+      },
+      {
+        "root": "repo",
+        "path": "blueprints/convergence-practice/application-delivery/migration-rollback.json"
+      },
+      {
+        "root": "repo",
+        "path": "blueprints/convergence-practice/application-delivery/receipt.json"
+      },
+      {
+        "root": "repo",
+        "path": "blueprints/convergence-practice/ci-security/receipt.json"
+      },
+      {
+        "root": "repo",
+        "path": "blueprints/convergence-practice/container-storage/receipt.json"
+      },
+      {
+        "root": "repo",
+        "path": "blueprints/convergence-practice/document-ingestion/receipt.json"
+      },
+      {
+        "root": "repo",
+        "path": "blueprints/convergence-practice/native-worker/receipt.json"
+      },
+      {
+        "root": "repo",
+        "path": "blueprints/convergence-practice/wsl-native-tools/receipt.json"
+      },
+      {
+        "root": "repo",
+        "path": "blueprints/convergence-practice/wsl-restore/receipt.json"
+      },
+      {
+        "root": "repo",
+        "path": "blueprints/us-equities/architecture/receipt.json"
+      },
+      {
+        "root": "repo",
+        "path": "blueprints/us-equities/authenticated-data/native-receipt.json"
+      },
+      {
+        "root": "repo",
+        "path": "blueprints/us-equities/catalyst-dataset/native-receipt.json"
+      },
+      {
+        "root": "repo",
+        "path": "blueprints/us-equities/catalyst-experiment/receipt.json"
+      },
+      {
+        "root": "repo",
+        "path": "blueprints/us-equities/catalyst-provenance/access-resolution.json"
+      },
+      {
+        "root": "repo",
+        "path": "blueprints/us-equities/catalyst-provenance/native-network-edgartools-5600-20261004.json"
+      },
+      {
+        "root": "repo",
+        "path": "blueprints/us-equities/catalyst-provenance/new-host-native-network-20260924.json"
+      },
+      {
+        "root": "repo",
+        "path": "blueprints/us-equities/catalyst-provenance/receipt.json"
+      },
+      {
+        "root": "repo",
+        "path": "blueprints/us-equities/convergence-program/review-receipt.json"
+      },
+      {
+        "root": "repo",
+        "path": "blueprints/us-equities/convergence-review/receipt.json"
+      },
+      {
+        "root": "repo",
+        "path": "blueprints/us-equities/corporate-action-readiness/receipt.json"
+      },
+      {
+        "root": "repo",
+        "path": "blueprints/us-equities/execution-realism/receipt.json"
+      },
+      {
+        "root": "repo",
+        "path": "blueprints/us-equities/financial-data/receipt.json"
+      },
+      {
+        "root": "repo",
+        "path": "blueprints/us-equities/historical-simulation/receipt.json"
+      },
+      {
+        "root": "repo",
+        "path": "blueprints/us-equities/hosting/backup/receipt.json"
+      },
+      {
+        "root": "repo",
+        "path": "blueprints/us-equities/identity-readiness/native-receipt.json"
+      },
+      {
+        "root": "repo",
+        "path": "blueprints/us-equities/lifecycle-sample/native-receipt.json"
+      },
+      {
+        "root": "repo",
+        "path": "blueprints/us-equities/memory-lifecycle/receipt.json"
+      },
+      {
+        "root": "repo",
+        "path": "blueprints/us-equities/nanosecond-replay/receipt.json"
+      },
+      {
+        "root": "repo",
+        "path": "blueprints/us-equities/order-contract/receipt.json"
+      },
+      {
+        "root": "repo",
+        "path": "blueprints/us-equities/point-in-time/receipt.json"
+      },
+      {
+        "root": "repo",
+        "path": "blueprints/us-equities/research-efficiency/native-receipt.json"
+      },
+      {
+        "root": "repo",
+        "path": "blueprints/us-equities/research-evaluation/receipt.json"
+      },
+      {
+        "root": "repo",
+        "path": "blueprints/us-equities/research-runtime/receipt.json"
+      },
+      {
+        "root": "repo",
+        "path": "blueprints/us-equities/retrieval-evaluation/receipt.json"
+      },
+      {
+        "root": "repo",
+        "path": "blueprints/us-equities/simulation-research/receipt.json"
+      },
+      {
+        "root": "repo",
+        "path": "blueprints/us-equities/state-recovery/memory/receipt.json"
+      },
+      {
+        "root": "repo",
+        "path": "blueprints/us-equities/state-recovery/qdrant/receipt.json"
+      },
+      {
+        "root": "repo",
+        "path": "blueprints/us-equities/supply-chain/receipt.json"
+      },
+      {
+        "root": "repo",
+        "path": "blueprints/us-equities/worker-supervision/receipt.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/artifacts/new-wsl-install-plan-20261002/fixwave-20261006-verdict-rebase-receipt.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/artifacts/new-wsl-local-models-20261002/part-a-receipt.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/artifacts/new-wsl-local-models-20261002/part-b-receipt.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/2604-drift-version-readback-20261008.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/adaptive-paper-practice-20260921.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/adoption-macos-hosted-smoke-20260922.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/adoption-macos-hosted-smoke-20260923.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/agent-browser-0382-qualification-20261003.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/agent-browser-lna-20260930.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/ai-memory-240-qualification-20260925.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/ai-memory-241-qualification-20260925.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/alpaca-paper-e2e-20260921.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/ao-bounded-effect-20261008.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/ao-bounded-feedback-20261008-registration.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/ao-orchestration-landscape-20261008-registration.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/artifact-reductions.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/broad-universe-research-20260921.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/canary-proof-verification-20261001.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/catalog-clean-install-20260921.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/catalog-freshness-20260923.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/catalog-runtime-review-20260921.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/ccusage-20026-qualification-20260927.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/claude-advisor-usage-scan-20260928.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/claude-foundation-finalization-20260921.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/claude-host-practice-readback-20260928.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/claude-hud-0100-qualification-20261003.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/claude-hud-0100-qualification-20261004.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/claude-max-default-effort-20260929.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/claude-model-effort-probes-20260929.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/claude-project-effort-flag-20260929.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/claude-repository-evidence-20260921.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/claude-selective-context-pilot-20260921.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/claude-spend-attribution-20260929.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/claude-spend-window-20261004.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/claude-upstream-checks-20260921.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/codex-01571-qualification-20260926.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/codex-01592-host-finalization-20260930.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/codex-01592-qualification-20260930.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/codex-01593-hindsight-native-memory-20261001.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/codex-01593-native-queue-20261001.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/codex-desktop-live-20260920.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/codex-session-environment-20260920.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/codex-shell-snapshot-cleanup-20260930.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/component-history.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/cross-family-review-terminal-lane-20260930.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/current-session-observation-20260920.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/dagu-mise-pin-qualification-20261005.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/dashboard-gap-resolution-20260921.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/dashboard-render-e2e-20260921.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/decision-record-index-20261008.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/desktop-cli-workflows.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/desktop-direct-rag.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/edgartools-5600-pin-move-20261004.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/env-freshness-wsl-ubuntu-main-20260924.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/exchange-calendars-native-check-20260922.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/foundation-catalog-ui-20260920.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/foundation-closure-20260921.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/foundation-convergence-20260921.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/foundation-native-20260920.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/foundation-rd-20260921.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/full-stack-convergence-20260921.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/github-automation-newpc-20260922.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/gitleaks-macos-memory-bound-20260924.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/grafana-1323-qualification-20261003.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/guard-k3-verification-20260930.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/guard-k4-verification-20261001.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/harbor-e2e-token-tools-20260930.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/headroom-039-qualification-20260925.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/hf-memory-models-20260921.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/hindsight-research-memory-20261008.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/jcodemunch-1108327-qualification-20261003.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/local-inference-c2-serving-switch-20260926.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/login-shell-contract-20260929.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/mac-memory-patch-20260920.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/markitdown-018-qualification-20260925.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/mcp-inspector-280-qualification-20260926.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/mcp-inspector-290-qualification-20261003.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/mcporter-0141-qualification-20260925.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/mcporter-0142-qualification-20261003.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/mcporter-0142-qualification-20261004.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/memory-landscape-20260921.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/memory-landscape-lifecycle-20260921.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/memory-lifecycle-probe-20260921.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/native-ai-memory-maintenance-20260920.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/native-catalog-retrieval-20260920.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/native-claude-hud-interactive-20260920.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/native-claude-profile-20260920.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/native-claude-session-recovery-20260920.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/native-cli-gaps.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/native-codex-session-recovery-20260920.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/native-context-memory.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/native-dagu-job-recovery-20260920.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/native-dagu-retry-tests-20260920.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/native-dashboard-access-20260921.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/native-dashboard-data-20260921.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/native-gpu-patch-20260920.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/native-harness-defaults-20260920.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/native-headroom-mcp-20260920.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/native-jcodemunch-20260920.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/native-linux-zizmor-20260920.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/native-memory-rag-alignment-20260921.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/native-memory.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/native-nautilus-ci-20260920.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/native-nautilus-v2-20260920.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/native-offhost-app-state-20260920.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/native-offhost-restic-20260920.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/native-quality-defaults-20260920.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/native-rag.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/native-returned-results-20260921.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/native-runtime-role-resolution-20260930.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/native-sandbox-codex-binding-20261008.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/native-sandbox-network-20260920.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/native-sandbox-smoke-20261008.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/native-sdk-acceptance-20261002.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/native-sdk-role-mcp-followup-20261002.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/native-service-reboot-20260920.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/native-session-defaults-20260920.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/native-tavily-cli-20260920.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/native-tavily-session-20260920.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/native-terminal-profiles-20260920.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/native-token-ci-github-20260920.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/native-token-ci-local-20260920.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/native-token-clean-prefix-20260920.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/native-token-focus-clients-20260920.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/native-token-stack-final-20260920.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/native-trading-runtime-2604-20261004.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/native-trading-runtime-2604-rerun-20261005.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/native-ultracode-20260921.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/native-worker-cgroup-20260920.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/native-worker-containment-20260920.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/native-worker-recovery-20260920.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/native-workflow-graceful-recovery-20260921.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/native-workflow-writing-comparison-20260921.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/nautilus-equity-replay-20260921.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/nextjs-1638-qualification-20261001.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/notification-types-20260929.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/ns2604-e2e-20261004.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/ns2604-requalification-20261005.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/ns2604-roadmap-evidence-20261005.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/omniroute-3851-npm-qualification-20260930.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/omniroute-claude-callsite-20260930.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/omniroute-runtime-enhancements-20260930.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/omniroute-runtime-workers-20260930.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/omniroute-sdk-worker-0160-20261003.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/openresearch-0215-qualification-20261003.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/otelcol-contrib-0162-qualification-20261003.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/playwright-cli-0122-qualification-20261003.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/portable-claude-native-qualification-20260921.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/portable-cli-artifacts.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/portable-userspace-install-20260921.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/prometheus-3150-qualification-20260926.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/row70-defect-a-install-plan-20261008.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/row70-records-b-e-20261008.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/rtk-050-qualification-20260925.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/rtk-051-qualification-20261004.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/rtk-fold-harbor-20261004.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/runtime-final-lock-binding-20261008.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/runtime-final-native-24-acceptance-20261008.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/runtime-sdk-20261003.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/runtime-tools.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/skills-listing-restore-20260928.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/skills-m4-host-removal-20260928.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/socraticode-1150-qualification-20260927.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/socraticode-1160-qualification-20260929.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/sota-convergence-20260922.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/srt-source-citations-20261008.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/syft-1540-qualification-20261003.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/tavily-research-qualification-20260926.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/terminal-experience-20260928.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/token-native-retained-functional-20260920.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/token-practice-artifacts-20260920.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/token-practice-catalog-toon-20260920.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/token-practice-confirmation-20260920.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/token-practice-coverage-20260920.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/token-practice-gap-followup-20260920.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/token-practice-native-counters-20260920.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/token-practice-native-pairs-20260920.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/trading-unattended-hosting-recovery-20261005.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/trading-unattended-hosting-recovery-r2-20261005.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/trading-unattended-hosting-recovery-r3-20261005.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/ultracode-token-routing-20260921.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/upstream-native-tools-20260920.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/vllm-030-switch-20260925.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/vllm-030-switch-laptop-20260926.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/vllm-compatibility.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/worktrunk-0800-qualification-20261003.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/worktrunk-list.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/wsl-application-20260920.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/wsl-document-ingestion-20260920.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/wsl-memory-maintenance-20260920.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/wsl-retrieval-20260920.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/wsl-retrieval-retirement-20261003.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/wsl-terminal-defaults-20260929.json"
+      },
+      {
+        "root": "repo",
+        "path": "evidence/receipts/wsl-transport-recovery-20260920.json"
+      },
+      {
+        "root": "repo",
+        "path": "observability/followup-receipt.json"
+      },
+      {
+        "root": "repo",
+        "path": "observability/grand-dashboard/capacity-recovery-20260921.json"
+      },
+      {
+        "root": "repo",
+        "path": "observability/grand-dashboard/receipt.json"
+      },
+      {
+        "root": "repo",
+        "path": "observability/receipt.json"
+      },
+      {
+        "root": "repo",
+        "path": "observability/restart-receipt.json"
+      }
+    ],
+    "sdk_item": [
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/bfb-supported-install-supplement/receipt.final.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/g5-rd-tools/OpenHands__extensions/receipt.final.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/g5-rd-tools/apify__mcpc/receipt.final.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/g5-rd-tools/dshakes__distil/receipt.final.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/g5-rd-tools/langchain-ai__deepagents/receipt.final.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/g5-trading-tools/final-receipts/benchbox.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/g5-trading-tools/final-receipts/databento.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/g5-trading-tools/final-receipts/massive.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/g5-trading-tools/final-receipts/nautilus-rc6.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/g5-trading-tools/final-receipts/pandera.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/g5-trading-tools/final-receipts/pointblank.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/g5-trading-tools/final-receipts/trackio.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/g5-worker-clients/crush.receipt.final.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/g5-worker-clients/goose.receipt.final.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/g5-worker-clients/hermes-agent.receipt.final.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/g5-worker-clients/mini-swe-agent.receipt.final.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/g5-worker-clients/opencode.receipt.final.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/g5-worker-clients/pi-earendil.receipt.final.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/g5-worker-clients/pi-mono.receipt.final.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/harnesses/dspy.final.receipt.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/harnesses/harbor.final.receipt.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/harnesses/inspect-ai.final.receipt.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/harnesses/inspect-scout.final.receipt.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/harnesses/promptfoo.final.receipt.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/normalized-final/alpaca-py.401f8804f616064c.readiness.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/normalized-final/claude-agent-sdk.a2e11e2403b3de11.readiness.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/normalized-final/codex-sdk.f5045c17241df3c4.readiness.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/normalized-final/deerflow.b82eb067086d77b7.readiness.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/normalized-final/dspy.29cb908086e9cb00.readiness.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/normalized-final/edgartools.4b4f7306ff5843a8.readiness.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/normalized-final/exact-query-route-875.b46253bd27ccd141.readiness.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/normalized-final/gpt-researcher.b19e8ce5e5459f30.readiness.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/normalized-final/harbor.a34e0bc9fbbd9869.readiness.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/normalized-final/inspect-ai.00ea22f2b26ac7bd.readiness.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/normalized-final/inspect-scout.9e99c69d05946cc6.readiness.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/normalized-final/lean.c15f86d30379a473.readiness.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/normalized-final/nautilus-trader-ibkr.9c981b33a59c6dd0.readiness.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/normalized-final/openhands-sdk.a8635af845e98a43.readiness.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/normalized-final/promptfoo.251db48913edbb34.readiness.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/normalized-final/skfolio.fe35fc920da29f47.readiness.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/orchestrator-supported-install-supplement/receipt.final.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/research-sdks/deerflow/receipt.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/research-sdks/exact875/receipt.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/research-sdks/gptr/receipt.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/research-sdks/openhands/receipt.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/sdk-clients/claude-agent-sdk.receipt.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/sdk-clients/codex-sdk.receipt.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/trading-sdks/readiness.json"
+      }
+    ],
+    "sdk_raw": [
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/bfb-supported-install-supplement/receipt.final.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/g5-rd-tools/OpenHands__extensions/receipt.final.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/g5-rd-tools/apify__mcpc/receipt.final.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/g5-rd-tools/dshakes__distil/receipt.final.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/g5-rd-tools/langchain-ai__deepagents/receipt.final.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/g5-trading-tools/final-receipts/benchbox.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/g5-trading-tools/final-receipts/databento.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/g5-trading-tools/final-receipts/massive.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/g5-trading-tools/final-receipts/nautilus-rc6.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/g5-trading-tools/final-receipts/pandera.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/g5-trading-tools/final-receipts/pointblank.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/g5-trading-tools/final-receipts/trackio.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/g5-worker-clients/crush.receipt.final.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/g5-worker-clients/goose.receipt.final.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/g5-worker-clients/hermes-agent.receipt.final.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/g5-worker-clients/mini-swe-agent.receipt.final.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/g5-worker-clients/opencode.receipt.final.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/g5-worker-clients/pi-earendil.receipt.final.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/g5-worker-clients/pi-mono.receipt.final.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/harnesses/dspy.final.receipt.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/harnesses/harbor.final.receipt.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/harnesses/inspect-ai.final.receipt.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/harnesses/inspect-scout.final.receipt.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/harnesses/promptfoo.final.receipt.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/normalized-final/alpaca-py.401f8804f616064c.readiness.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/normalized-final/claude-agent-sdk.a2e11e2403b3de11.readiness.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/normalized-final/codex-sdk.f5045c17241df3c4.readiness.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/normalized-final/deerflow.b82eb067086d77b7.readiness.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/normalized-final/dspy.29cb908086e9cb00.readiness.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/normalized-final/edgartools.4b4f7306ff5843a8.readiness.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/normalized-final/exact-query-route-875.b46253bd27ccd141.readiness.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/normalized-final/gpt-researcher.b19e8ce5e5459f30.readiness.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/normalized-final/harbor.a34e0bc9fbbd9869.readiness.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/normalized-final/inspect-ai.00ea22f2b26ac7bd.readiness.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/normalized-final/inspect-scout.9e99c69d05946cc6.readiness.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/normalized-final/lean.c15f86d30379a473.readiness.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/normalized-final/nautilus-trader-ibkr.9c981b33a59c6dd0.readiness.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/normalized-final/openhands-sdk.a8635af845e98a43.readiness.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/normalized-final/promptfoo.251db48913edbb34.readiness.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/normalized-final/skfolio.fe35fc920da29f47.readiness.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/orchestrator-supported-install-supplement/receipt.final.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/research-sdks/deerflow/receipt.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/research-sdks/exact875/receipt.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/research-sdks/gptr/receipt.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/research-sdks/openhands/receipt.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/sdk-clients/claude-agent-sdk.receipt.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/sdk-clients/codex-sdk.receipt.json"
+      },
+      {
+        "root": "state",
+        "path": "research/fullspeed-20261008/sdk-harness-ready/trading-sdks/readiness.json"
+      }
+    ]
+  },
+  "derivation_sources": [
+    {
+      "root": "repo",
+      "path": "tools/local-pages/build_pages.py",
+      "sha256": "2b5d0df4a8bac568f9990a495cce8e973207dd060f5dc179eae73df2cfd6344a",
+      "pin": "0d86b53d1b8647cbf61085124403defe5b0fbc25",
+      "scope": "Independent default paths for gaps_source, roadmap_source, roadmap_inputs and current_source before capture."
+    },
+    {
+      "root": "repo",
+      "path": "tools/north-star/sources.json",
+      "sha256": "80b379f2c8c2f9f7904d6b5834c1534168555f919561170f13b3fa4887341fd5",
+      "pin": "0d86b53d1b8647cbf61085124403defe5b0fbc25"
+    },
+    {
+      "root": "repo",
+      "path": "tools/north-star/sources.json",
+      "sha256": "4cdfe0a722a8e2a620551f5b092e2db762555deb06eef085686623561996dcd2",
+      "pin": "958a6d1ab770c807c5ee59748475a5c14df7ba52",
+      "scope": "Exact root/path grants for cc_g2_started, cc_g2_started_correction, cc_g5_closure and cc_g6_f9 from the committed main index; linked state bodies unread."
+    },
+    {
+      "root": "repo",
+      "path": "manifests/evidence.json",
+      "sha256": "55c2977680bd041bf2b62a9e33d227469760341427e6aa7dd3f000db50bc9063",
+      "pin": "0d86b53d1b8647cbf61085124403defe5b0fbc25",
+      "registered_receipts": 239
+    },
+    {
+      "root": "state",
+      "path": "research/fullspeed-20261008/g5-stars-gap/local-pages/refresh-receipt.json",
+      "sha256": "c01f7704827d3523efcbe6aa8d5f8ad98a4069cefa6471fd0841e9c925ef26d9",
+      "generated_utc": "2026-10-09T07:40:00Z",
+      "bytes": 868449
+    }
+  ],
+  "scope_notes": [
+    "All entries are static exact root/path permissions; selecting JSON cannot extend these sets.",
+    "The retained projection supplied linked SDK filenames, hashes and sizes only. Referenced normalized or raw SDK bodies were not opened during derivation.",
+    "SDK item versus raw identity is ambiguous in this metadata projection. Both categorical SDK roles permit this same exact reviewed file set; component identity, content, execution results and E2E acceptance remain separate native binding claims.",
+    "Protected credential, environment, client-secret and mixed e2e-truth paths are denied before membership checks, including a hypothetical registration."
+  ]
+}
