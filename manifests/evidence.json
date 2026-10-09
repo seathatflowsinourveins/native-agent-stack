@@ -18317,8 +18317,8 @@
     },
     {
       "path": "docs/decisions/2026-10-08-claude-actions-harness-audit-bounds.md",
-      "sha256": "6821df665b3bd59edfb2c56513c27a483bea3f3485e3e92a6d63c3fe8b94fa60",
-      "bytes": 57553
+      "sha256": "8957aed9a156450b444e57fc53e0ea51b735215e7cf723ea9d2b89ed116fc2e4",
+      "bytes": 59386
     },
     {
       "path": "docs/decisions/2026-10-08-claude-actions-pr-review.md",

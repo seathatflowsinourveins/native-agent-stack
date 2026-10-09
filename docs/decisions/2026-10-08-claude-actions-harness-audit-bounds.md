@@ -572,6 +572,27 @@ handbacks as the complete report. The command center ruled that N1 to N3 are fix
     the action step, so an added input (for example `claude_code_version`) fails.
   - N9: `test_a_budget_stop_has_no_lower_cost_limit` runs budget stops at $0.01, $1 and $4.99, which must pass, so a
     floor such as `.total_cost_usd >= 5` fails.
+- **R8 sources (resolved 2026-10-09, after the GPT read of 645975ac).** The two tests change no workflow behaviour.
+  The workflow is unchanged since R7.
+  - **The 10-input set and the absent cost floor are this repository's acceptance policy** over that workflow. They
+    are not an upstream requirement: upstream allows more inputs and does not say where a budget stop may start.
+  - **The inputs it pins** are declared by the action at the pin:
+    - source: anthropics/claude-code-action `action.yml` at `2dca132ff0e0c4094ce6048b422c6915a071210b` (v1.0.247);
+    - `prompt` (line 57), `anthropic_federation_rule_id` (73), `anthropic_organization_id` (76),
+      `anthropic_service_account_id` (79), `anthropic_workspace_id` (82), `github_token` (88), `claude_args` (104),
+      `track_progress` (136), `display_report` (152) and `show_full_output` (156).
+  - **The result fields the budget-stop test feeds the bounds step** (`subtype`, `is_error`, `total_cost_usd`) are those
+    of the Agent SDK result message the action installs:
+    - `@anthropic-ai/claude-agent-sdk` 0.3.295 (the version its install step resolved in run 37988961127);
+      tarball sha256 704b1228…c7b;
+    - in `sdk.d.ts`, `SDKResultError.subtype` includes `'error_max_budget_usd'` (line 5707), and `total_cost_usd` is
+      declared at line 5716.
+  - **The test mechanics** are Python 3.13's `unittest`, the version these tests ran on (3.13.16):
+    - `TestCase.assertEqual` for the input-set comparison;
+    - `TestCase.subTest` for the three costs, so each failing cost is reported on its own
+      (<https://docs.python.org/3.13/library/unittest.html#unittest.TestCase.subTest>).
+  - **The mutation results are `synthetic`:** the two variants were applied to a copy of the workflow and the test
+    module run against it; no hosted run is involved.
 
 The module runs 33 tests, up from 30 (32 at R7).
 
