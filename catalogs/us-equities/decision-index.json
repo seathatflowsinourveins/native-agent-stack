@@ -1635,7 +1635,7 @@
           "path": "catalogs/us-equities/ns-movers-phase0-decisions-20261009.json",
           "pointer": "/decisions/7",
           "id": "NSM-ALPACA",
-          "decision": "Use the official alpaca-py 0.44.0 SDK. OD 2 authorizes held Algo Trader Plus SIP and OPRA; source access still waits for landed freeze. Current Asset and OptionsSnapshot fields do not supply complete original universe, fee, quantity or OI history.",
+          "decision": "Use the official alpaca-py 0.44.0 SDK. OD2 authorizes the held Algo Trader Plus subscription for SIP and OPRA; source access still waits for the landed freeze receipt and explicit co-op release. Current Asset and OptionsSnapshot fields do not supply complete original universe, fee, quantity or OI history.",
           "review_level": "source review; exact scope in the landed source packet, no study E2E upgrade",
           "evidence_level": "source review without empirical acceptance"
         },
@@ -17329,7 +17329,7 @@
           "path": "catalogs/us-equities/ns-movers-phase0-decisions-20261009.json",
           "pointer": "/decisions/9",
           "id": "NSM-JSONSCHEMA",
-          "decision": "Use upstream jsonschema 4.26.0 Draft 202012Validator for the Phase 0 schema and meta-schema checks in an isolated uv environment. This is validation-tool installation only, with no trading runtime upgrade.",
+          "decision": "Use upstream jsonschema 4.26.0 Draft202012Validator for the Phase 0 schema and meta-schema checks in an isolated uv environment. This is validation-tool installation only, with no trading runtime upgrade.",
           "review_level": "source review; exact scope in the landed source packet, no study E2E upgrade",
           "evidence_level": "Phase0 synthetic structural validation only"
         }
@@ -17525,7 +17525,7 @@
           "path": "catalogs/us-equities/ns-movers-phase0-decisions-20261009.json",
           "pointer": "/decisions/1",
           "id": "NSM-LEAN",
-          "decision": "Use open-source LEAN at source 80e 7843f locally through its supported .NET 10 build and launcher CLI. No QuantConnect billing, cloud or sign-in. Authenticated leanCLI is excluded; Docker 18176 remains a candidate with unproven application-source mapping. Study execution is NOT_RUN.",
+          "decision": "Use open-source LEAN from QuantConnect/Lean@80e7843f locally through its supported .NET 10 build and launcher CLI. No QuantConnect billing, cloud or sign-in. Authenticated LEAN CLI is excluded; Docker 18176 remains a candidate with unproven application-source mapping. Study execution is NOT_RUN.",
           "review_level": "source review; exact scope in the landed source packet, no study E2E upgrade",
           "evidence_level": "source review without empirical acceptance"
         },
@@ -19563,7 +19563,7 @@
           "path": "catalogs/us-equities/ns-movers-phase0-decisions-20261009.json",
           "pointer": "/decisions/2",
           "id": "NSM-SKFOLIO",
-          "decision": "Reuse native WalkForward after exact study API, session and purge acceptance. Retained v 1.2.9 is a separate historical reference; v 1.7.1 is watched and is not installed.",
+          "decision": "Reuse native WalkForward from skfolio/skfolio@8a399757 after exact study API, session and purge acceptance. Retained skfolio 1.2.9 is a separate historical reference; skfolio 1.7.1 is watched and is not installed.",
           "review_level": "source review; exact scope in the landed source packet, no study E2E upgrade",
           "evidence_level": "source review without empirical acceptance"
         },

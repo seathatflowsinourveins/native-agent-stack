@@ -17292,8 +17292,8 @@
     },
     {
       "path": "catalogs/us-equities/decision-index.json",
-      "sha256": "73cccc63841b31ad499ef49e638db9705fc23fc985b3afd6add3d3742e34f58a",
-      "bytes": 773583
+      "sha256": "2063cdc6fc8d1911c329794224946b998d2d109387bba7be596d72a16d40c688",
+      "bytes": 773696
     },
     {
       "path": "catalogs/us-equities/engines-strategies.json",
@@ -17382,8 +17382,8 @@
     },
     {
       "path": "catalogs/us-equities/ns-movers-phase0-decisions-20261009.json",
-      "sha256": "c7297b51d89ed1b5719a16ef77d0ae1bcfbf93e8d6d5136acf2d4b7ddcae523b",
-      "bytes": 21582
+      "sha256": "7ca6a1f39e10a29df030202ec1698577f37d3a16f81c32f6957b6de56cd20a45",
+      "bytes": 21726
     },
     {
       "path": "catalogs/us-equities/paper-practice-20260921.md",
@@ -60219,6 +60219,11 @@
       "path": "tests/test_ns2604_dashboards.py",
       "sha256": "cdfe83175f42ec55d1ce30fce84e85a1f9f9198d960f4314d1822f3034f8006b",
       "bytes": 18114
+    },
+    {
+      "path": "tests/test_ns_movers_decision_display.py",
+      "sha256": "10fb486c324c7d40aacf3215e0168449104c08965141bec04d0af6fca7bad113",
+      "bytes": 1420
     },
     {
       "path": "tests/test_observability.py",
