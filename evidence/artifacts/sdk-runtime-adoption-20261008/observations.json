@@ -1,0 +1,444 @@
+{
+  "acceptance": {
+    "cc_cue": "PENDING",
+    "designated_claude": "PENDING",
+    "designated_gpt_exec": "PENDING",
+    "owner_decisions": "PENDING",
+    "pre_cue": "PENDING_CANONICAL_ENTRYPOINT",
+    "wiring_or_retirement_deployed": false
+  },
+  "adoption_observation": {
+    "claude_total_sessions": 63,
+    "codex_total_conversations": 841,
+    "counted_layers": [
+      "browser",
+      "client-native",
+      "code intelligence",
+      "evaluation",
+      "memory and retrieval",
+      "observability",
+      "session context and token efficiency"
+    ],
+    "generated_utc": "2026-10-08T23:42:51Z",
+    "reason": "Counter enumerates MCP servers; SDK/runtime workers have no native per-role organic invocation series in this file. Missing is not zero.",
+    "schema": "adoption-now/1",
+    "sdk_runtime_worker_calls": null,
+    "window_hours": 24
+  },
+  "base_commit": "aba02ec3456d383bcc2fc72883db098f9be7918a",
+  "captured_utc": "2026-10-08T23:57:41.565449+00:00",
+  "current_inventory": {
+    "claude_gateway_trial_dependency": "claude-agent-sdk==0.2.162",
+    "codex_python_locked_dependency": "openai-codex==0.160.0",
+    "codex_typescript_version": "0.160.0",
+    "gpt_researcher_pyproject_version": "0.16.0",
+    "native_clients": [
+      {
+        "argv": [
+          "${USER_HOME}/.local/share/codex-ecosystem/bin/codex",
+          "--version"
+        ],
+        "rc": 0,
+        "version_output": "codex-cli 0.161.0"
+      },
+      {
+        "argv": [
+          "${USER_HOME}/.local/share/codex-ecosystem/bin/claude",
+          "--version"
+        ],
+        "rc": 0,
+        "version_output": "2.1.295 (Claude Code)"
+      }
+    ],
+    "openai_agents": {
+      "installed_version": null,
+      "scope": "sealed readiness rows, named tools root and sampled distribution locations; no whole-home census",
+      "status": "NO_INSTALL_FOUND_IN_BOUNDED_INVENTORY"
+    },
+    "package_status": [
+      {
+        "argv": [
+          "${USER_HOME}/.local/share/new-wsl-native-stack/tools/claude-agent-sdk/bin/python",
+          "-I",
+          "-c",
+          "import importlib.metadata; print(importlib.metadata.version('claude-agent-sdk'))"
+        ],
+        "layer": "claude_sdk",
+        "rc": 0,
+        "version": "0.2.163"
+      },
+      {
+        "argv": [
+          "${USER_HOME}/.local/share/new-wsl-native-stack/tools/deer-flow/backend/.venv/bin/python",
+          "-I",
+          "-c",
+          "import importlib.metadata; print(importlib.metadata.version('deerflow-harness'))"
+        ],
+        "layer": "deerflow",
+        "rc": 0,
+        "version": "2.1.0"
+      }
+    ],
+    "public_registry_observations": [
+      {
+        "executed": false,
+        "latest_observed_version": "0.2.165",
+        "package": "claude-agent-sdk",
+        "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/claude-agent-sdk.registry.726e79018a3f16556c24b8bf7b1c85a1a49a2154df30a2573b450fd93eaa5331.json",
+        "sha256": "726e79018a3f16556c24b8bf7b1c85a1a49a2154df30a2573b450fd93eaa5331",
+        "url": "https://pypi.org/pypi/claude-agent-sdk/json"
+      },
+      {
+        "executed": false,
+        "latest_observed_version": "0.162.0",
+        "package": "codex-python",
+        "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/codex-python.registry.54ff993c37fd9877eae283b98ebdadc548d374d773cccacf60b58f8dfb2f065b.json",
+        "sha256": "54ff993c37fd9877eae283b98ebdadc548d374d773cccacf60b58f8dfb2f065b",
+        "url": "https://pypi.org/pypi/openai-codex/json"
+      },
+      {
+        "executed": false,
+        "latest_observed_version": "0.162.0",
+        "package": "codex-typescript",
+        "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/codex-typescript.registry.76b008dccc7f4cf07bbd750f45cf068bab7a02f8655228e652289e58c3f8aebc.json",
+        "sha256": "76b008dccc7f4cf07bbd750f45cf068bab7a02f8655228e652289e58c3f8aebc",
+        "url": "https://registry.npmjs.org/@openai/codex-sdk/latest"
+      },
+      {
+        "executed": false,
+        "latest_observed_version": "0.23.1",
+        "package": "openai-agents",
+        "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/openai-agents.registry.1ed88a3db89ba2da3a7444ebbfb07141abe58775aa40af9723abd6ab8965bfc8.json",
+        "sha256": "1ed88a3db89ba2da3a7444ebbfb07141abe58775aa40af9723abd6ab8965bfc8",
+        "url": "https://pypi.org/pypi/openai-agents/json"
+      },
+      {
+        "executed": false,
+        "latest_observed_version": "1.53.0",
+        "package": "openhands-sdk",
+        "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/openhands-sdk.registry.635288fe8405e79e57e6dc3136335a305148d0ce265a4cea07cacfcac1e15d70.json",
+        "sha256": "635288fe8405e79e57e6dc3136335a305148d0ce265a4cea07cacfcac1e15d70",
+        "url": "https://pypi.org/pypi/openhands-sdk/json"
+      },
+      {
+        "executed": false,
+        "latest_observed_version": "0.7.23",
+        "package": "deepagents",
+        "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/deepagents.registry.b7fe924af084964f207b827c1bbf589efae0e55d7fa1249d045ae441e17f5630.json",
+        "sha256": "b7fe924af084964f207b827c1bbf589efae0e55d7fa1249d045ae441e17f5630",
+        "url": "https://pypi.org/pypi/deepagents/json"
+      },
+      {
+        "executed": false,
+        "latest_observed_version": "0.16.1",
+        "package": "gpt-researcher",
+        "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/gpt-researcher.registry.86399c6a5876f24a68ebadf1e9ab7d5a3d1b844dc378821685ea2decba49909c.json",
+        "sha256": "86399c6a5876f24a68ebadf1e9ab7d5a3d1b844dc378821685ea2decba49909c",
+        "url": "https://pypi.org/pypi/gpt-researcher/json"
+      }
+    ],
+    "research_vendor_skill_paths": [
+      {
+        "exists": false,
+        "path": "${USER_HOME}/.claude/skills/gpt-researcher/SKILL.md"
+      },
+      {
+        "exists": false,
+        "path": "${USER_HOME}/.claude/skills/claude-to-deerflow/SKILL.md"
+      },
+      {
+        "exists": false,
+        "path": "${USER_HOME}/.codex/skills/gpt-researcher/SKILL.md"
+      },
+      {
+        "exists": false,
+        "path": "${USER_HOME}/.codex/skills/claude-to-deerflow/SKILL.md"
+      },
+      {
+        "exists": false,
+        "path": "${USER_HOME}/.agents/skills/gpt-researcher/SKILL.md"
+      },
+      {
+        "exists": false,
+        "path": "${USER_HOME}/.agents/skills/claude-to-deerflow/SKILL.md"
+      }
+    ]
+  },
+  "g5_binding": {
+    "candidate_action_rows": [
+      {
+        "disposition": "TRIAL",
+        "pointer": "/rows/48",
+        "repository": "bytedance/deer-flow",
+        "row_id": "86c6347b193efc3a8df5",
+        "verdict": "NEEDS-FIX"
+      },
+      {
+        "disposition": "TRIAL",
+        "pointer": "/rows/59",
+        "repository": "langchain-ai/deepagents",
+        "row_id": "ad984275af111838f0fc",
+        "verdict": "NEEDS-FIX"
+      }
+    ],
+    "candidate_fields": [
+      {
+        "current_choice_source": "native-agent-stack@7742970d31e384b478a0a23af79940c6e12d9b2c:catalogs/landscape/foundation.json:604",
+        "layer_id": "workers",
+        "pointer": "/2"
+      },
+      {
+        "current_choice_source": "native-agent-stack@7742970d31e384b478a0a23af79940c6e12d9b2c:catalogs/landscape/foundation.json:2267",
+        "layer_id": "web-research",
+        "pointer": "/8"
+      },
+      {
+        "current_choice_source": "native-agent-stack@7742970d31e384b478a0a23af79940c6e12d9b2c:catalogs/landscape/foundation.json:4566",
+        "layer_id": "agent-sdks",
+        "pointer": "/16"
+      }
+    ],
+    "observed_published_head": "ae6cc2286643822d3a0218136722c69d0127fcd4",
+    "pr": 878,
+    "status": "PENDING_LANDED_CATALOG"
+  },
+  "schema": "sdk-runtime-adoption-evidence/1",
+  "sealed_native_evidence": [
+    {
+      "fresh_client": "claude",
+      "id": "claude-agent-sdk",
+      "installed_version_at_seal": "0.2.163",
+      "limitations": [
+        "Evidence establishes the installed version's bounded vendor API turn and fresh-client SDK access.",
+        "The fresh session executed a local SDK API probe and validated the preceding live query result; it did not repeat live SDK inference.",
+        "Latest PyPI version 0.2.165 was observed in primary live registry metadata but was not installed or executed.",
+        "Default provider routing and explicit OmniRoute SDK inference remain UNVERIFIED.",
+        "Configuration and credential values were not inspected or changed.",
+        "Full suites and designated-reader acceptance were not performed."
+      ],
+      "native_rc": 0,
+      "organic_use": null,
+      "pin": {
+        "source_commit": "1ef6d8c71bb0e44a6b33fe61497864f21e17fdb7",
+        "version": "0.2.163"
+      },
+      "receipt": {
+        "path": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/normalized-final/claude-agent-sdk.a2e11e2403b3de11.readiness.json",
+        "sha256": "a2e11e2403b3de11aaccbea647b74c64015bc3941efc3bd7b230e0e263523a10"
+      },
+      "repository": "https://github.com/anthropics/claude-agent-sdk-python",
+      "scope": "Use the vendor query() API with the installed client, a bounded one-turn no-tools request, and a fresh Claude print session that executes a vendor API probe and validates the native result.",
+      "sealed_index_pointer": "/items/1"
+    },
+    {
+      "fresh_client": "codex exec",
+      "id": "codex-sdk",
+      "installed_version_at_seal": "0.160.0",
+      "limitations": [
+        "SDK package 0.160.0 drove installed client 0.161.0 through the vendor-supported codexPathOverride API.",
+        "Evidence establishes one live bounded vendor SDK turn and fresh-client SDK access.",
+        "The fresh session executed a local SDK thread-construction probe and validated the preceding live turn result; it did not repeat live SDK inference.",
+        "Latest npm version 0.161.0 was observed in primary live registry metadata but was not installed or executed as an SDK.",
+        "Default provider routing and explicit OmniRoute SDK inference remain UNVERIFIED.",
+        "Raw stderr diagnostics were counted without retention; structured outcomes establish success.",
+        "Configuration and credential values were not inspected or changed.",
+        "Full suites and designated-reader acceptance were not performed."
+      ],
+      "native_rc": 0,
+      "organic_use": null,
+      "pin": {
+        "source_commit": "a956835d020762cb2b570053af06f643a11c0ecc",
+        "version": "0.160.0"
+      },
+      "receipt": {
+        "path": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/normalized-final/codex-sdk.f5045c17241df3c4.readiness.json",
+        "sha256": "f5045c17241df3c42ff269f6e209e06802b5efde241022fdd61270685342d66e"
+      },
+      "repository": "https://github.com/openai/codex",
+      "scope": "Use the vendor Codex.startThread().run() API with its supported installed-client path override, a bounded no-tools request, and a fresh Codex exec session that executes a vendor API probe and validates the native result.",
+      "sealed_index_pointer": "/items/2"
+    },
+    {
+      "fresh_client": "codex",
+      "id": "deepagents",
+      "installed_version_at_seal": "0.7.23",
+      "limitations": [
+        "Final catalog/readiness binding remains UNVERIFIED; catalog candidate dispositions are source-review leads, not adoption or comparative acceptance.",
+        "FilesystemBackend interface fixture only; agent/model/provider/CLI acceptance UNVERIFIED",
+        "No full suite, same-task superiority measurement or cross-client comparison was run."
+      ],
+      "native_rc": 0,
+      "organic_use": null,
+      "pin": "9f4bdf7c8b8bfc86877729d80ed286bd71d78706",
+      "receipt": {
+        "path": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/g5-rd-tools/langchain-ai__deepagents/receipt.final.json",
+        "sha256": "e0117aa7e5bbab0759c73b214054a778ea801fad7253aca787133db7b8aae7a7"
+      },
+      "repository": "langchain-ai/deepagents",
+      "scope": "FilesystemBackend interface fixture only; agent/model/provider/CLI acceptance UNVERIFIED",
+      "sealed_index_pointer": "/items/3"
+    },
+    {
+      "fresh_client": "codex",
+      "id": "deerflow",
+      "installed_version_at_seal": "2.1.0",
+      "limitations": [
+        "One bounded public research question proves the current installed native route and artifact/citation predicates. General research quality and broader task performance remain UNVERIFIED."
+      ],
+      "native_rc": 0,
+      "organic_use": null,
+      "pin": {
+        "source_commit": "345f08be00c8a9495079b732a39b46aa9af1584e",
+        "version": "2.1.0"
+      },
+      "receipt": {
+        "path": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/normalized-final/deerflow.b82eb067086d77b7.readiness.json",
+        "sha256": "b82eb067086d77b7f104f3b1c6d1ff81b47c4473a2ba76d3145802adb23dd078"
+      },
+      "repository": "https://github.com/bytedance/deer-flow",
+      "scope": "Installed native interface check and separately retained native invocation",
+      "sealed_index_pointer": "/items/4"
+    },
+    {
+      "fresh_client": "codex",
+      "id": "gpt-researcher",
+      "installed_version_at_seal": "3.7.0",
+      "limitations": [
+        "One bounded public research question proves the current installed native route and artifact/citation predicates. General research quality and broader task performance remain UNVERIFIED."
+      ],
+      "native_rc": 0,
+      "organic_use": null,
+      "pin": {
+        "source_commit": "0957c301ed06c2a5857b834358c7227c739041d4",
+        "version": "3.7.0"
+      },
+      "receipt": {
+        "path": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/normalized-final/gpt-researcher.b19e8ce5e5459f30.readiness.json",
+        "sha256": "b19e8ce5e5459f305e1680923f6a831cdac8e641604d2d31cc208efe7c33e87d"
+      },
+      "repository": "https://github.com/assafelovic/gpt-researcher",
+      "scope": "Installed native interface check and separately retained native invocation",
+      "sealed_index_pointer": "/items/25"
+    },
+    {
+      "fresh_client": "codex",
+      "id": "openhands-sdk",
+      "installed_version_at_seal": "1.53.0 source / 1.50.1 metadata",
+      "limitations": [
+        "Editable source checkout is v1.53.0 but package metadata still says 1.50.1. Python source hashes were compared against both release pins. This run verifies the current installed route operationally; package metadata synchronization, non-Python source files and full upstream suite remain UNVERIFIED.",
+        "Bounded owned systemd job finished with3modelrequests and exact sdk-readiness.txt oracle. No full upstream suite was run."
+      ],
+      "native_rc": 0,
+      "organic_use": null,
+      "pin": {
+        "source_commit": "54daf056bd863bb46f922a2fe9324dd736b37ff6",
+        "version": "1.53.0 source / 1.50.1 metadata"
+      },
+      "receipt": {
+        "path": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/normalized-final/openhands-sdk.a8635af845e98a43.readiness.json",
+        "sha256": "a8635af845e98a434d22d1f43ba6530ad4855e02267d108db4590c62ff515368"
+      },
+      "repository": "https://github.com/OpenHands/software-agent-sdk",
+      "scope": "Installed native interface check and separately retained native invocation",
+      "sealed_index_pointer": "/items/32"
+    }
+  ],
+  "source_refs": {
+    "adoption": {
+      "bytes": 46103,
+      "path": "${STATE_ROOT}/coordination/command-center/pages/adoption-now.json",
+      "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/adoption.5de97cf238b3d28aa9f7d5110a05857204a847b0c75cda8971de8e142e362e36.json",
+      "sha256": "5de97cf238b3d28aa9f7d5110a05857204a847b0c75cda8971de8e142e362e36"
+    },
+    "claude_gateway_trial": {
+      "bytes": 19873,
+      "path": "${REPO_ROOT}/examples/claude-runtime-sdk/worker.py",
+      "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/claude_gateway_trial.5e66c0bed0aea3d6aee3d927d141beb50ebc809866087f2a878a749ed009c234.py",
+      "sha256": "5e66c0bed0aea3d6aee3d927d141beb50ebc809866087f2a878a749ed009c234"
+    },
+    "claude_sdk_types": {
+      "bytes": 93134,
+      "path": "${USER_HOME}/.local/share/new-wsl-native-stack/tools/claude-agent-sdk/lib/python3.13/site-packages/claude_agent_sdk/types.py",
+      "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/claude_sdk_types.b1054473280782ab57b2b0690a49a820a2f97dbd2eb6b2ff1bbd3e6205b71bdb.py",
+      "sha256": "b1054473280782ab57b2b0690a49a820a2f97dbd2eb6b2ff1bbd3e6205b71bdb"
+    },
+    "codex_python_worker": {
+      "bytes": 26572,
+      "path": "${REPO_ROOT}/examples/omniroute-codex-sdk/worker.py",
+      "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/codex_python_worker.f1a2489fc059b5ab055392e26a1f13d1748623baed130d8808ddc99fc1c08610.py",
+      "sha256": "f1a2489fc059b5ab055392e26a1f13d1748623baed130d8808ddc99fc1c08610"
+    },
+    "codex_python_worker_lock": {
+      "bytes": 12840,
+      "path": "${REPO_ROOT}/examples/omniroute-codex-sdk/worker.py.lock",
+      "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/codex_python_worker_lock.df99054948f217c499ebd9ed19744f7e7d4f6c92fabec6820caf2ecd3e2660b3.lock",
+      "sha256": "df99054948f217c499ebd9ed19744f7e7d4f6c92fabec6820caf2ecd3e2660b3"
+    },
+    "codex_ts_package": {
+      "bytes": 1955,
+      "path": "${USER_HOME}/.local/share/new-wsl-native-stack/tools/codex-sdk/node_modules/@openai/codex-sdk/package.json",
+      "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/codex_ts_package.e8c2fd59b5499439b33c8fa6f1b6e5d3a51d9a38ca6cca8d8d95f5aa69576338.json",
+      "sha256": "e8c2fd59b5499439b33c8fa6f1b6e5d3a51d9a38ca6cca8d8d95f5aa69576338"
+    },
+    "counter": {
+      "bytes": 6657,
+      "path": "${STATE_ROOT}/coordination/command-center/cc-tools/adoption_invoke.py",
+      "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/counter.10784aa8862eaed3a5e0520ecdb2eb58cdf0277f4bab62f8868a86b703954408.py",
+      "sha256": "10784aa8862eaed3a5e0520ecdb2eb58cdf0277f4bab62f8868a86b703954408"
+    },
+    "deer_vendor_http_skill": {
+      "bytes": 6864,
+      "path": "${USER_HOME}/.local/share/new-wsl-native-stack/tools/deer-flow/skills/public/claude-to-deerflow/SKILL.md",
+      "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/deer_vendor_http_skill.b05a6fa8c64ba4137b09a5f61278b6caa0384b2b4e4330ee9676e2485a53269e.md",
+      "sha256": "b05a6fa8c64ba4137b09a5f61278b6caa0384b2b4e4330ee9676e2485a53269e"
+    },
+    "g5_actions": {
+      "bytes": 1225883,
+      "path": "${STATE_ROOT}/research/coverage-gap-20261008/assembly/qa/adopt-trial-verification.json",
+      "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/g5_actions.d78bae7f30c83395c475ca5359022ec7e3db7cbb6a8e288ad1674a2d1ff73020.json",
+      "sha256": "d78bae7f30c83395c475ca5359022ec7e3db7cbb6a8e288ad1674a2d1ff73020"
+    },
+    "g5_fields": {
+      "bytes": 14569539,
+      "path": "${STATE_ROOT}/research/coverage-gap-20261008/assembly/foundation.rows.json",
+      "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/g5_fields.a948fa5a64c42622f03881d00c61997e5aa372dd15ad03489d13e478453f8fab.json",
+      "sha256": "a948fa5a64c42622f03881d00c61997e5aa372dd15ad03489d13e478453f8fab"
+    },
+    "g5_worker_sidecar": {
+      "bytes": 612661,
+      "path": "${STATE_ROOT}/research/coverage-gap-20261008/runtime-workers/sidecars.json",
+      "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/g5_worker_sidecar.2068f2e3f07ae298d08baf382f0c753c616b60e684b89dd7df4ccead5aff8b8f.json",
+      "sha256": "2068f2e3f07ae298d08baf382f0c753c616b60e684b89dd7df4ccead5aff8b8f"
+    },
+    "gpt_project": {
+      "bytes": 5639,
+      "path": "${USER_HOME}/.local/share/new-wsl-native-stack/tools/gpt-researcher/pyproject.toml",
+      "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/gpt_project.53b8d59bb05e5e1ec854703b6e487ababaeab53d49f0a25a3e549947312dfcd6.toml",
+      "sha256": "53b8d59bb05e5e1ec854703b6e487ababaeab53d49f0a25a3e549947312dfcd6"
+    },
+    "gpt_vendor_codex_skill": {
+      "bytes": 317,
+      "path": "${USER_HOME}/.local/share/new-wsl-native-stack/tools/gpt-researcher/skills/gpt-researcher/SKILL.md",
+      "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/gpt_vendor_codex_skill.d6f8d0c19f5c898f4e80a8865da0b0c0f23950394a71f1aa52388ee1e4340d67.md",
+      "sha256": "d6f8d0c19f5c898f4e80a8865da0b0c0f23950394a71f1aa52388ee1e4340d67"
+    },
+    "sealed_sdk_index": {
+      "bytes": 340174,
+      "path": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/rows.json",
+      "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/sealed_sdk_index.affc6ee209a92cad2a18e1cddea78ffcf19560268f527a1afc2865ad877fdf3d.json",
+      "sha256": "affc6ee209a92cad2a18e1cddea78ffcf19560268f527a1afc2865ad877fdf3d"
+    },
+    "workflow_baseline": {
+      "bytes": 11280,
+      "path": "${STATE_ROOT}/research/token-efficiency-20261008/WORKFLOW-BASELINE-20261008.json",
+      "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/workflow_baseline.c6e9f24e207520b1dfa1d83f094b9d7c8996dbd6cd1d9019a0c4f115e7407ad8.json",
+      "sha256": "c6e9f24e207520b1dfa1d83f094b9d7c8996dbd6cd1d9019a0c4f115e7407ad8"
+    }
+  },
+  "workflow_measurement": {
+    "after": null,
+    "baseline_ref": "workflow_baseline",
+    "definitions": "Reuse the referenced baseline definitions and scope; no new measurement run.",
+    "saving_claim": null
+  }
+}
