@@ -199,16 +199,11 @@ class RunSkillDoctor(unittest.TestCase):
             return subprocess.CompletedProcess(argv, 0, "[]", "")
 
         S.run_skill_doctor(timeout=17, runner=fake_runner)
-        argv = captured["argv"]
-        self.assertEqual(argv, S.SKILL_DOCTOR_ARGV)
-        self.assertEqual(argv[:5], ["claude", "-p", "/skill-doctor", "--output-format", "json"])
-        # The headless fences: deny what is not pre-approved, no tools, no MCP servers, one turn, a budget cap.
-        self.assertEqual(argv[argv.index("--permission-mode") + 1], "dontAsk")
-        self.assertEqual(argv[argv.index("--tools") + 1], "")
-        self.assertIn("--strict-mcp-config", argv)
-        self.assertEqual(argv[argv.index("--max-turns") + 1], "1")
-        self.assertEqual(argv[argv.index("--max-budget-usd") + 1], "0.05")
-        self.assertNotIn("bypassPermissions", argv)
+        # An independent literal: the headless fences deny what is not pre-approved, offer no tools and no MCP
+        # servers, allow one turn and cap the spend.
+        self.assertEqual(captured["argv"], ["claude", "-p", "/skill-doctor", "--output-format", "json",
+                                            "--permission-mode", "dontAsk", "--tools", "", "--strict-mcp-config",
+                                            "--max-turns", "1", "--max-budget-usd", "0.05"])
         self.assertIs(captured["kwargs"]["stdin"], subprocess.DEVNULL)
         self.assertEqual(captured["kwargs"]["timeout"], 17)
         self.assertTrue(captured["kwargs"]["text"])

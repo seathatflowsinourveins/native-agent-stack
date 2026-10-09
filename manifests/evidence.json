@@ -18197,7 +18197,7 @@
     },
     {
       "path": "docs/decisions/2026-10-04-pwsh7-windows-guidance.md",
-      "sha256": "635fb536fb82377c4f1dd8d1acefe73d4fa6cc9298ce578164c372142ac36a8a",
+      "sha256": "56bef0619442b84992e68d624275c2d5cdf04496475849fb3cd02a7bd158d6dc",
       "bytes": 16799
     },
     {
@@ -60752,8 +60752,8 @@
     },
     {
       "path": "tests/test_skill_usage.py",
-      "sha256": "c7e57e5fc2b9257f6c52bced7e174b9458a3d3d3595cbcb23fc7c7dd3fdbac8f",
-      "bytes": 250131
+      "sha256": "f378ce83d70ccb1827ad58e5642c15a363a4430eaddaf48f343a85472fa82855",
+      "bytes": 249927
     },
     {
       "path": "tests/test_skills_manifest.py",
