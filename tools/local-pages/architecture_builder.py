@@ -139,7 +139,7 @@ def build(root: Path, state_root: Path, output_dir: Path, receipt: Path,
     policy_module = load("source_policy")
     retained = _retained_projection(state_root, pages, reads)
     model = load("architecture_sources").build(root, state_root, asset, reads=reads)
-    inventory = load("architecture_inventory").build(root, state_root)
+    inventory = load("architecture_inventory").build(root, state_root, reads=reads)
     evidence = load("architecture_evidence")
     model["host_receipts"] = evidence.host_receipts_index(state_root, reads=reads)
     model["sources"] = list(model.get("sources") or []) + model["host_receipts"].get("sources", []) + [retained["source"]]
@@ -209,6 +209,7 @@ def refresh_if_changed(root: Path, state_root: Path, output_dir: Path, receipt: 
     evidence = load("architecture_evidence")
     observation = evidence.invocation_source(state_root, reads=reads)
     signature = {"adoption_sha256": observation.get("sha256"), "source_policy_sha256": reads.policy.receipt["sha256"], "files": []}
+    signature["inventory_sources"] = load("architecture_inventory").input_signature(root, state_root, reads=reads)
     manifest = root / "catalogs/landscape/manifest.json"
     manifest_raw, _ = reads.read("architecture_manifest", manifest, max_bytes=16 * 1024 * 1024)
     declaration = json.loads(manifest_raw)
@@ -242,7 +243,7 @@ def refresh_if_changed(root: Path, state_root: Path, output_dir: Path, receipt: 
             stat = os.fstat(handle.fileno())
             signature["files"].append([str(archive), stat.st_size, stat.st_mtime_ns])
     helper_paths = [HERE / (name + ".py") for name in ("architecture_builder", "architecture_sources", "architecture_inventory", "architecture_evidence", "architecture_view", "build_pages", "evidence_sources", "sanitization", "source_policy")]
-    helper_paths += [HERE / "assets/site.css", HERE / "assets/site.js", HERE / "architecture_mapping.json"]
+    helper_paths += [HERE / "assets/site.css", HERE / "assets/site.js"]
     for path in helper_paths:
         if path.exists():
             raw = policy._read_regular(path, 8 * 1024 * 1024)

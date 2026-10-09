@@ -7,6 +7,7 @@ import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
+from tests.local_pages_architecture_policy_fixture import policy_fixture
 
 SPEC = importlib.util.spec_from_file_location(
     "architecture_inventory", Path(__file__).resolve().parents[1] / "tools/local-pages/architecture_inventory.py"
@@ -29,6 +30,7 @@ class InventoryTests(unittest.TestCase):
         patch.object(inventory, "USER_ROOT", self.user).start()
         patch.object(inventory, "MAPPING_PATH", self.root / "tools/local-pages/architecture_mapping.json", create=True).start()
         self.timer = patch.object(inventory, "_timers", return_value=([], "UNREPORTED: fixture query unavailable")).start()
+        self.policy_path = policy_fixture(self.base / "independent-policy.json")
 
     def write(self, path, text):
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -39,7 +41,8 @@ class InventoryTests(unittest.TestCase):
         self.write(self.root / "adoption/skills/manifest.json", json.dumps({"skills": records, "excluded": excluded or []}))
 
     def build(self):
-        return inventory.build(self.root, self.base / "state", [self.skills])
+        reads = inventory._policy().ArchitectureReads(self.root, self.base / "state", policy_path=self.policy_path, user_root=self.user)
+        return inventory.build(self.root, self.base / "state", [self.skills], reads=reads)
 
     def catalog(self, catalog, layers):
         self.write(self.root / "catalogs/landscape/manifest.json", json.dumps({
@@ -139,9 +142,8 @@ class InventoryTests(unittest.TestCase):
         registry.unlink()
         registry.symlink_to(outside)
         self.write(self.root / "manifests/stack.json", json.dumps({"components": [{"id": "native-cli"}]}))
-        result = self.build()
-        self.assertNotIn("layer_keys", result["items"][0])
-        self.assertFalse(any(source["path"] == str(registry) for source in result["sources"]))
+        with self.assertRaisesRegex(ValueError, "approval"):
+            self.build()
 
     def test_boundary_excludes_credentials_trash_deep_paths_and_external_targets(self):
         external = self.write(self.base / "outside/SKILL.md", "external")
@@ -157,11 +159,10 @@ class InventoryTests(unittest.TestCase):
         (auth.parent / "SKILL.md").symlink_to(auth)
         visited = []
         original = inventory._hash
-        with patch.object(inventory, "_hash", side_effect=lambda path: (visited.append(path), original(path))[1]):
-            result = self.build()
+        with patch.object(inventory, "_hash", side_effect=lambda path, **kwargs: (visited.append(path), original(path, **kwargs))[1]):
+            with self.assertRaisesRegex(ValueError, "approval|protected"):
+                self.build()
         self.assertEqual(visited, [])
-        self.assertTrue(all(item["sha256"] is None for item in result["items"]))
-        self.assertEqual({item["name"] for item in result["items"]}, {"escape", "alias"})
 
     def test_system_skills_and_approved_symlink_are_bounded(self):
         real = self.write(self.skills / ".system/native/SKILL.md", "native")
@@ -182,7 +183,7 @@ class InventoryTests(unittest.TestCase):
         self.manifest([self.record("known", hashlib.sha256(skill.read_bytes()).hexdigest())])
         hashed = []
         original = inventory._hash
-        with patch.object(inventory, "_hash", side_effect=lambda path: (hashed.append(path), original(path))[1]):
+        with patch.object(inventory, "_hash", side_effect=lambda path, **kwargs: (hashed.append(path), original(path, **kwargs))[1]):
             result = self.build()
         sources = {source["path"]: source for source in result["sources"]}
         self.assertEqual(set(sources), {str(path) for path in hashed})
@@ -227,13 +228,40 @@ class InventoryTests(unittest.TestCase):
         self.assertNotIn("IGNORED_VALUE", json.dumps(result))
         self.assertNotIn("ExecStart", json.dumps(result))
         self.assertTrue(result["coverage"]["cron_status"].startswith("UNREPORTED"))
+        units = [source for source in result["sources"] if source["path"].endswith(("example.timer", "example.service"))]
+        self.assertEqual(len(units), 2)
+        self.assertTrue(all(source["sha256"] is None and "body unread" in source["status"] for source in units))
+
+    def test_metadata_leaf_swap_after_approval_is_not_followed(self):
+        unit = self.write(self.user / ".config/systemd/user/example.timer", "[Timer]\n")
+        outside = self.write(self.base / "outside/credentials.json", "unread fixture")
+        reads = inventory._policy().ArchitectureReads(self.root, self.base / "state", policy_path=self.policy_path, user_root=self.user)
+        authorize = reads.authorize
+        def replace_after_grant(role, path):
+            approved = authorize(role, path)
+            if role == "architecture_inventory_metadata" and Path(path) == unit:
+                unit.unlink()
+                unit.symlink_to(outside)
+            return approved
+        with patch.object(reads, "authorize", side_effect=replace_after_grant):
+            with self.assertRaisesRegex(ValueError, "not a regular file"):
+                inventory.build(self.root, self.base / "state", [self.skills], reads=reads)
+
+    def test_unread_user_role_checksum_is_unchecked_rather_than_mismatched(self):
+        self.write(self.user / ".codex/agents/reviewer.toml", "unread user role fixture")
+        self.write(self.root / "adoption/agents/codex/SHA256SUMS", "a" * 64 + "  reviewer.toml\n")
+        result = self.build()
+        item = next(item for item in result["items"] if item["name"] == "reviewer")
+        self.assertIsNone(item["sha256"])
+        self.assertIsNone(item["hash_match"])
+        self.assertIn("not checked", item["provenance"])
 
     def test_missing_sanitized_projection_never_reads_hook_sources(self):
         for root in (self.root / "hooks", self.root / "scripts/hooks", self.user / ".claude/hooks"):
             self.write(root / "registered.py", "hook source fixture")
         visited = []
         original = inventory._hash
-        with patch.object(inventory, "_hash", side_effect=lambda path: (visited.append(path), original(path))[1]):
+        with patch.object(inventory, "_hash", side_effect=lambda path, **kwargs: (visited.append(path), original(path, **kwargs))[1]):
             result = self.build()
         self.assertEqual(visited, [])
         self.assertFalse(any(item["kind"] == "hook" for item in result["items"]))
@@ -268,6 +296,19 @@ class InventoryTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "LARGE-READ"):
                 self.build()
             hash_file.assert_not_called()
+
+    def test_growth_after_preflight_cannot_exceed_the_aggregate_read_budget(self):
+        first = self.write(self.skills / "changed/SKILL.md", "a")
+        second = self.write(self.skills / "known/SKILL.md", "b")
+        original = inventory._hash
+        def grow_after_first(path, **kwargs):
+            result = original(path, **kwargs)
+            if path == first:
+                second.write_text("1234")
+            return result
+        with patch.object(inventory, "MAX_HASH_BYTES", 4), patch.object(inventory, "_hash", side_effect=grow_after_first):
+            with self.assertRaisesRegex(ValueError, "LARGE-READ"):
+                self.build()
 
 
 if __name__ == "__main__":

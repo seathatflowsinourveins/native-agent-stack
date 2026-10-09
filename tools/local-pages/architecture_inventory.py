@@ -5,8 +5,11 @@ matching hash does not establish client wiring or a fresh-session acceptance.
 """
 
 import hashlib
+import importlib.util
 import json
+import os
 import re
+import stat
 import subprocess
 from pathlib import Path
 
@@ -21,38 +24,48 @@ BLOCKED_NAMES = {
 SKIP_DIRS = {".trash", ".git", "__pycache__", "node_modules"}
 SCRIPT_SUFFIXES = {".py", ".sh", ".js", ".mjs", ".cjs", ".ts"}
 MAPPING_PATH = Path(__file__).with_name("architecture_mapping.json")
+_POLICY = None
+
+
+def _policy():
+    global _POLICY
+    if _POLICY is None:
+        spec = importlib.util.spec_from_file_location("inventory_source_policy", Path(__file__).with_name("source_policy.py"))
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        _POLICY = module
+    return _POLICY
 
 
 def _blocked(path):
+    if any(part.lower().startswith("e2e-truth-") for part in path.parts):
+        raise _policy().SourcePolicyError("protected inventory component rejected before access")
     return any(part in SKIP_DIRS for part in path.parts) or (
         path.name.lower() in BLOCKED_NAMES or path.name.startswith(".env.")
         or (path.suffix.lower() in {".json", ".toml", ".yaml", ".yml"} and any(word in path.name.lower() for word in ("credential", "secret", "auth")))
-    )
+    ) or _policy().protected_path(path.as_posix())
 
 
 def _inside(path, root):
     return path == root or root in path.parents
 
 
-def _safe_path(path, approved):
+def _safe_path(path, reads, role="architecture_inventory"):
+    if _blocked(path):
+        raise _policy().SourcePolicyError("protected inventory path rejected before access")
     try:
         resolved = path.resolve()
     except (OSError, RuntimeError):
-        return None
-    if _blocked(path) or _blocked(resolved):
-        return None
+        raise _policy().SourcePolicyError("inventory canonical target unavailable")
+    if _blocked(resolved):
+        raise _policy().SourcePolicyError("protected inventory canonical target rejected before access")
     if path.name == "SKILL.md" and resolved.name != "SKILL.md":
-        return None
-    if any(_inside(resolved, root.absolute()) for root in approved):
-        return resolved
-    # Follow only an explicitly named SKILL target in an installed bundle.
-    bundle = USER_ROOT / ".codex/plugins/cache"
-    if resolved.name == "SKILL.md" and _inside(resolved, bundle) and "skills" in resolved.relative_to(bundle).parts:
-        return resolved
-    return None
+        raise _policy().SourcePolicyError("skill alias does not name an approved instruction asset")
+    reads.authorize(role, resolved)
+    return resolved
 
 
-def _files(root, depth=0):
+def _files(root, depth=0, metadata_suffixes=()):
     if not root.is_dir() or root.is_symlink():
         return []
     entries = sorted(root.iterdir(), key=lambda path: path.name)
@@ -62,8 +75,13 @@ def _files(root, depth=0):
     for path in entries:
         if _blocked(path):
             continue
+        if path.suffix in metadata_suffixes:
+            # Filename discovery does not stat or follow a user metadata leaf.
+            # Its canonical exact metadata grant precedes observations below.
+            found.append(path)
+            continue
         if path.is_dir() and not path.is_symlink() and depth:
-            found.extend(_files(path, depth - 1))
+            found.extend(_files(path, depth - 1, metadata_suffixes))
         elif path.is_file() or path.is_symlink():
             found.append(path)
     return found
@@ -90,23 +108,15 @@ def _skills(root):
     return found
 
 
-def _hash(path):
-    digest = hashlib.sha256()
-    with path.open("rb") as stream:
-        for chunk in iter(lambda: stream.read(65536), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
+def _hash(path, *, reads, max_bytes=MAX_HASH_BYTES):
+    return reads.read("architecture_inventory", path, max_bytes=max_bytes)
 
 
-def _json(path):
-    if not path.is_file() or _blocked(path):
-        return {}
-    if path.stat().st_size > MAX_METADATA_BYTES:
-        raise ValueError("metadata size limit exceeded")
+def _json(raw):
     try:
-        value = json.loads(path.read_text())
+        value = json.loads(raw)
         return value if isinstance(value, dict) else {}
-    except (OSError, ValueError):
+    except (ValueError, UnicodeError, TypeError):
         return {}
 
 
@@ -133,11 +143,14 @@ def _record(item, record, source_ref, expected_hash=None):
     if record.get("status") is not None:
         item["recorded_status"] = record["status"]
     immutable = bool(re.fullmatch(r"[0-9a-f]{40}", str(item["pin"] or record.get("tree_sha", ""))))
-    if expected_hash:
+    if expected_hash and item["sha256"] is not None:
         item["hash_match"] = item["sha256"] == expected_hash
         item["provenance"] = "recorded hash matches" if item["hash_match"] else "recorded hash mismatch"
         if item["hash_match"] and item["repository"] and immutable:
             item["status"] = "SOURCE_MATCHED"
+    elif expected_hash:
+        item["hash_match"] = None
+        item["provenance"] = "independently approved metadata only; expected content hash not checked"
 
 
 def _timers():
@@ -176,12 +189,10 @@ def _repo_key(value):
     return value.lower().rstrip("/") if value.startswith("https://") else None
 
 
-def _catalog_paths(root):
+def _catalog_paths(root, snapshot):
     manifest = root / "catalogs/landscape/manifest.json"
     paths = []
-    if _safe_path(manifest, [root / "catalogs/landscape"]) is None:
-        return manifest, paths
-    for catalog, relative in _json(manifest).get("catalogs", {}).items():
+    for catalog, relative in _json(snapshot(manifest, metadata=True)).get("catalogs", {}).items():
         if (isinstance(catalog, str) and re.fullmatch(r"[\w.-]+", catalog) and isinstance(relative, str)
                 and relative.startswith("catalogs/landscape/") and ".." not in Path(relative).parts):
             paths.append((catalog, root / relative))
@@ -284,35 +295,73 @@ def _explicit_mapping(item, mapping, known_keys):
             item.setdefault("mapping_evidence_refs", []).extend(record.get("source_refs", []))
 
 
-def build(root, state_root, skill_roots=None):
-    """Inventory approved paths and canonical metadata without guessing layers."""
+def _capture(root, state_root, skill_roots, reads):
+    """Capture exact approved bytes once; aliases supply no content authority."""
     root = Path(root)
     state_root = Path(state_root)
+    snapshots, captured, resolutions = {}, {}, {}
+    def snapshot(path, metadata=False):
+        path = Path(path).absolute()
+        if not path.exists() and not path.is_symlink():
+            return None
+        resolved = _safe_path(path, reads)
+        resolutions[str(path)] = resolved
+        key = str(resolved)
+        if key not in snapshots:
+            remaining = MAX_HASH_BYTES - sum(source["bytes"] for source in captured.values())
+            size = resolved.stat().st_size
+            if size > remaining:
+                raise ValueError("LARGE-READ actual inventory payload exceeds aggregate budget")
+            bound = MAX_METADATA_BYTES if metadata else MAX_HASH_BYTES
+            bound = min(bound, max(1, size), max(1, remaining))
+            raw, receipt = _hash(resolved, reads=reads, max_bytes=bound)
+            snapshots[key], captured[key] = raw, receipt
+        return snapshots[key]
     skill_roots = [Path(path) for path in skill_roots] if skill_roots is not None else [
         root / ".claude/skills", USER_ROOT / ".claude/skills",
         USER_ROOT / ".agents/skills", USER_ROOT / ".codex/skills",
     ]
     groups = [("skill", path) for directory in skill_roots for path in _skills(directory)]
     for directory in (root / "adoption/agents", USER_ROOT / ".claude/agents", USER_ROOT / ".codex/agents"):
-        groups.extend(("role" if path.suffix == ".toml" else "agent", path) for path in _files(directory, 2) if path.suffix in {".md", ".toml"} and path.name != "AGENTS.md")
+        suffixes = {".md", ".toml"} if not _inside(directory, root.absolute()) else ()
+        groups.extend(("role" if path.suffix == ".toml" else "agent", path) for path in _files(directory, 2, suffixes) if path.suffix in {".md", ".toml"} and path.name != "AGENTS.md")
     groups.extend(("workflow", path) for path in _files(root / ".github/workflows") if path.suffix in {".yml", ".yaml"})
     groups.extend(("script", path) for path in _files(root / "scripts") if path.suffix in SCRIPT_SUFFIXES)
     unit_root = USER_ROOT / ".config/systemd/user"
-    groups.extend(("timer" if path.suffix == ".timer" else "unit", path) for path in _files(unit_root) if path.suffix in {".timer", ".service", ".path"})
+    groups.extend(("timer" if path.suffix == ".timer" else "unit", path) for path in _files(unit_root, metadata_suffixes={".timer", ".service", ".path"}) if path.suffix in {".timer", ".service", ".path"})
     metadata_paths = [root / "adoption/skills/manifest.json", root / "adoption/manifest.json", root / "manifests/stack.json"]
     metadata_paths += [path for path in _files(root / "adoption/agents", 2) if path.name.endswith("manifest.json") or path.name == "SHA256SUMS"]
-    catalog_manifest, catalog_paths = _catalog_paths(root)
+    catalog_manifest, catalog_paths = _catalog_paths(root, snapshot)
     metadata_paths += [catalog_manifest] + [path for _, path in catalog_paths]
     projection_path = state_root / "coordination/command-center/pages/automation-projection.json"
-    metadata_paths += [projection_path, MAPPING_PATH]
-    approved = [root / ".claude/skills", root / "adoption/agents", root / ".github/workflows", root / "scripts", root / "adoption/skills", root / "manifests", root / "adoption/manifest.json", root / "catalogs/landscape", unit_root, USER_ROOT / ".claude/agents", USER_ROOT / ".codex/agents", projection_path, MAPPING_PATH] + skill_roots
+    mapping_path = root / "tools/local-pages/architecture_mapping.json" if MAPPING_PATH == Path(__file__).with_name("architecture_mapping.json") else MAPPING_PATH
+    metadata_paths += [projection_path, mapping_path]
     candidates = {}
     input_paths, input_types, symlink_paths = {}, {}, {}
+    metadata_only = {}
     for kind, path in groups + [("metadata", path) for path in metadata_paths]:
-        resolved = _safe_path(path, approved)
-        if resolved is not None and resolved.is_file():
+        path = path.absolute()
+        user_metadata = kind in {"agent", "role", "timer", "unit"} and not _inside(path, root.absolute())
+        if not user_metadata and not path.exists() and not path.is_symlink():
+            continue
+        resolved = _safe_path(path, reads, "architecture_inventory_metadata" if user_metadata else "architecture_inventory")
+        resolutions[str(path)] = resolved
+        info = None
+        if user_metadata:
+            # Reuse native no-follow traversal for metadata too. An approved
+            # canonical path cannot stat a replacement symlink's target.
+            with _policy()._directory(resolved.parent) as directory:
+                info = os.stat(resolved.name, dir_fd=directory, follow_symlinks=False)
+            if not stat.S_ISREG(info.st_mode):
+                raise _policy().SourcePolicyError("inventory metadata target is not a regular file")
+        if user_metadata or resolved.is_file():
             key = str(resolved)
-            candidates[key] = resolved
+            if user_metadata:
+                metadata_only[key] = {"path": key, "bytes": info.st_size, "mtime_ns": info.st_mtime_ns,
+                                      "sha256": None, "sha256_kind": "unreported",
+                                      "status": "independently approved metadata only; body unread"}
+            else:
+                candidates[key] = resolved
             input_paths.setdefault(key, set()).add(str(path))
             input_types.setdefault(key, set()).add(kind)
             if resolved != path.absolute():
@@ -321,26 +370,58 @@ def build(root, state_root, skill_roots=None):
     total_bytes = sum(input_bytes.values())
     if total_bytes > MAX_HASH_BYTES:
         raise ValueError("LARGE-READ bytes=" + str(total_bytes) + "; notify coordinator before hashing")
-    hashes = {key: _hash(path) for key, path in candidates.items()}
+    for key, path in candidates.items():
+        snapshot(path, metadata="metadata" in input_types[key] or "workflow" in input_types[key])
+    hashes = {key: receipt["sha256"] for key, receipt in captured.items()}
+    input_bytes = {key: receipt["bytes"] for key, receipt in captured.items()}
+    total_bytes = sum(input_bytes.values())
+    if total_bytes > MAX_HASH_BYTES:
+        raise ValueError("LARGE-READ captured inventory payload exceeds aggregate budget")
     sources = [{
         "path": key, "resolved_path": key, "input_paths": sorted(input_paths[key]),
         "symlink_paths": sorted(symlink_paths.get(key, set())),
         "sha256": hashes[key], "sha256_kind": "computed", "bytes": input_bytes[key],
+        "role": "architecture_inventory",
         "type": "metadata" if "metadata" in input_types[key] else "/".join(sorted(input_types[key])),
         "types": sorted(input_types[key]),
         "status": "recorded metadata" if "metadata" in input_types[key] else "hashed inventory input; runtime and wiring unverified",
     } for key in sorted(candidates)]
+    for key, record in sorted(metadata_only.items()):
+        sources.append({**record, "resolved_path": key, "input_paths": sorted(input_paths[key]),
+                        "role": "architecture_inventory_metadata",
+                        "symlink_paths": sorted(symlink_paths.get(key, set())),
+                        "type": "/".join(sorted(input_types[key])), "types": sorted(input_types[key])})
+    return groups, metadata_paths, catalog_paths, snapshots, hashes, sources, total_bytes, resolutions
+
+
+def input_signature(root, state_root, *, reads):
+    _, _, _, _, _, sources, _, _ = _capture(root, state_root, None, reads)
+    return sources
+
+
+def build(root, state_root, skill_roots=None, *, reads=None):
+    """Use exact independent inventory grants before hashing or metadata parsing."""
+    root, state_root = Path(root), Path(state_root)
+    reads = reads or _policy().ArchitectureReads(root, state_root, user_root=USER_ROOT)
+    groups, metadata_paths, catalog_paths, snapshots, hashes, sources, total_bytes, resolutions = _capture(root, state_root, skill_roots, reads)
+    projection_path = metadata_paths[-2]
+    def data(path):
+        return _json(snapshots.get(str(resolutions.get(str(path.absolute())))))
+    def captured_key(path):
+        return str(resolutions.get(str(path.absolute())))
+    def content(path):
+        return snapshots.get(str(resolutions.get(str(path.absolute()))), b"").decode("utf-8")
     skill_manifest, adoption, stack = [
-        _json(path) if str(path.resolve()) in hashes else {}
+        data(path)
         for path in metadata_paths[:3]
     ]
-    links = _layer_links([(catalog, path, _json(path)) for catalog, path in catalog_paths if str(path.resolve()) in hashes])
-    projection_digest = hashes.get(str(projection_path.resolve()))
-    projection = _json(projection_path) if projection_digest else {}
+    links = _layer_links([(catalog, path, data(path)) for catalog, path in catalog_paths])
+    projection_digest = hashes.get(captured_key(projection_path))
+    projection = data(projection_path) if projection_digest else {}
     projection_present = projection.get("schema") == "automation-projection/1"
-    mapping = _json(MAPPING_PATH) if str(MAPPING_PATH.resolve()) in hashes else {}
+    mapping = data(metadata_paths[-1])
     for source in sources:
-        if source["path"] == str(metadata_paths[1].resolve()):
+        if source["path"] == captured_key(metadata_paths[1]):
             source["reference_paths"] = [
                 {"key": key, "path": value}
                 for key, value in adoption.get("sources", {}).items()
@@ -355,27 +436,27 @@ def build(root, state_root, skill_roots=None):
     role_records = {}
     checksums = {}
     for path in metadata_paths[3:]:
-        if path.name == "SHA256SUMS" and str(path.resolve()) in hashes:
-            if path.stat().st_size > MAX_METADATA_BYTES:
-                continue
-            for line in path.read_text().splitlines():
+        if path.name == "SHA256SUMS" and captured_key(path) in hashes:
+            for line in content(path).splitlines():
                 match = re.fullmatch(r"([0-9a-f]{64})\s+\*?([^/\\]+)", line)
                 if match:
                     checksums.setdefault(match[2], []).append((match[1], str(path)))
-        elif path.suffix == ".json" and str(path.resolve()) in hashes:
-            data = _json(path)
-            for record in data.get("agents", []) + data.get("roles", []):
+        elif path.suffix == ".json" and captured_key(path) in hashes:
+            document = data(path)
+            for record in document.get("agents", []) + document.get("roles", []):
                 if isinstance(record, dict) and record.get("name"):
                     role_records[record["name"]] = (record, str(path))
     items = []
     for kind, path in sorted(set(groups), key=lambda group: (group[0], str(group[1]))):
-        resolved = _safe_path(path, approved)
+        resolved = resolutions.get(str(path.absolute()))
         digest = hashes.get(str(resolved)) if resolved else None
         item = {"kind": kind, "name": path.parent.name if kind == "skill" else path.stem, "path": str(path), "sha256": digest, "repository": None, "pin": None, "source_refs": [], "status": "UNREPORTED"}
         if resolved and resolved != path.absolute():
             item["resolved_path"] = str(resolved)
         if not resolved:
             item["provenance"] = "target outside approved roots or excluded"
+        elif digest is None:
+            item["provenance"] = "independently approved metadata only; body unread and content hash UNREPORTED"
         if kind == "skill" and item["name"] in skills:
             record = skills[item["name"]]
             _record(item, record, str(metadata_paths[0]) + "#skills/" + item["name"], record.get("skill_md_sha256"))
@@ -386,12 +467,12 @@ def build(root, state_root, skill_roots=None):
             elif path.name in checksums:
                 records = checksums[path.name]
                 item["source_refs"] = [source_ref for _, source_ref in records]
-                item["hash_match"] = any(expected == digest for expected, _ in records)
-                item["provenance"] = "recorded hash matches; source pin unreported" if item["hash_match"] else "recorded hash mismatch"
+                item["hash_match"] = any(expected == digest for expected, _ in records) if digest is not None else None
+                item["provenance"] = ("recorded hash matches; source pin unreported" if item["hash_match"] else "recorded hash mismatch") if digest is not None else "independently approved metadata only; expected content hash not checked"
         elif kind == "workflow" and resolved:
             item["action_refs"] = []
-            if path.stat().st_size <= MAX_METADATA_BYTES:
-                for line in path.read_text().splitlines():
+            if len(snapshots[str(resolved)]) <= MAX_METADATA_BYTES:
+                for line in content(path).splitlines():
                     match = re.search(r"\buses:\s*['\"]?([\w.-]+/[\w./-]+)@([0-9a-f]{40})(?:['\"]|\s|$)", line)
                     if match:
                         item["action_refs"].append({"repository": "https://github.com/" + "/".join(match[1].split("/")[:2]), "pin": match[2]})
@@ -400,7 +481,7 @@ def build(root, state_root, skill_roots=None):
     for component in stack.get("components", []):
         if not isinstance(component, dict) or not component.get("id"):
             continue
-        item = {"kind": "component", "name": component["id"], "component_id": component["id"], "path": str(metadata_paths[2]), "sha256": hashes.get(str(metadata_paths[2].resolve())), "repository": None, "pin": None, "source_refs": [], "status": "UNREPORTED"}
+        item = {"kind": "component", "name": component["id"], "component_id": component["id"], "path": str(metadata_paths[2]), "sha256": hashes.get(captured_key(metadata_paths[2])), "repository": None, "pin": None, "source_refs": [], "status": "UNREPORTED"}
         _record(item, component, str(metadata_paths[2]) + "#components/" + str(component["id"]))
         recipe = adoption.get("recipe_map", {}).get(component["id"])
         if isinstance(recipe, str):
@@ -410,7 +491,7 @@ def build(root, state_root, skill_roots=None):
         items.append(item)
     items.extend(_projection_items(projection_path, projection, projection_digest))
     if projection_present:
-        source = next(source for source in sources if source["path"] == str(projection_path.resolve()))
+        source = next(source for source in sources if source["path"] == captured_key(projection_path))
         source.update({"status": "local sanitized automation projection", "local": True,
                        "generated_utc": projection.get("generated_utc"), "method": projection.get("method")})
     for item in items:

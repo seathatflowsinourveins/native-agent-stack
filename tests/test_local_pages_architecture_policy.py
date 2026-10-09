@@ -178,6 +178,58 @@ class ArchitecturePolicyTests(unittest.TestCase):
                 self.assertEqual(handle.read(), expected)
             self.assertEqual(calls, [])
 
+    def test_user_inventory_content_is_exact_skill_assets_only(self):
+        user = self.base / "user"
+        target = user / ".codex/agents/fixture.toml"
+        target.parent.mkdir(parents=True)
+        target.write_text("content must not be authorized\n")
+        self.document["architecture"]["architecture_inventory"] = [{"root": "user", "path": ".codex/agents/fixture.toml"}]
+        self.write(self.policy_path, self.document)
+        with self.watch(target) as calls, self.assertRaises(policy.SourcePolicyError):
+            policy.ArchitectureReads(self.root, self.state, policy_path=self.policy_path, user_root=user)
+        self.assertEqual(calls, [])
+
+    def test_metadata_only_grant_never_confers_content_read_permission(self):
+        user = self.base / "user"
+        target = user / ".config/systemd/user/fixture.service"
+        target.parent.mkdir(parents=True)
+        target.write_text("fixture body must stay unread\n")
+        self.document["architecture"]["architecture_inventory_metadata"] = [{"root": "user", "path": ".config/systemd/user/fixture.service"}]
+        self.write(self.policy_path, self.document)
+        reads = policy.ArchitectureReads(self.root, self.state, policy_path=self.policy_path, user_root=user)
+        self.assertEqual(reads.authorize("architecture_inventory_metadata", target), target)
+        with self.watch(target) as calls, self.assertRaisesRegex(policy.SourcePolicyError, "metadata-only"):
+            reads.read("architecture_inventory_metadata", target)
+        self.assertEqual(calls, [])
+
+    def test_large_logical_bound_reads_small_sources_in_bounded_native_chunks(self):
+        path = self.root / "manifests/evidence.json"
+        self.write(path, {"fixture": "small approved data"})
+        expected = path.read_bytes()
+        original = policy._open_regular
+        requests = []
+        class BoundedStream:
+            def __init__(self, stream):
+                self.stream = stream
+            def __enter__(self):
+                return self
+            def __exit__(self, *args):
+                return self.stream.__exit__(*args)
+            def fileno(self):
+                return self.stream.fileno()
+            def read(self, size):
+                requests.append(size)
+                if size > 65536:
+                    raise AssertionError("logical size bound became an eager allocation")
+                return self.stream.read(size)
+        reads = self.reads()
+        with patch.object(policy, "_open_regular", side_effect=lambda *a, **k: BoundedStream(original(*a, **k))):
+            raw, receipt = reads.read("architecture_registry", path, max_bytes=512 * 1024 * 1024)
+        self.assertEqual(raw, expected)
+        self.assertEqual(receipt["sha256"], hashlib.sha256(expected).hexdigest())
+        self.assertTrue(requests)
+        self.assertLessEqual(max(requests), 65536)
+
 
 if __name__ == "__main__":
     unittest.main()

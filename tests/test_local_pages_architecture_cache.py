@@ -33,6 +33,7 @@ class ArchitectureCacheTests(unittest.TestCase):
             original_load = MODULE.load
             modules = {"build_pages": page_module, "architecture_evidence": evidence_module,
                        "source_policy": original_load("source_policy"),
+                       "architecture_inventory": original_load("architecture_inventory"),
                        "architecture_sources": SimpleNamespace(_FINAL_ASSET=G5)}
             policy_path = policy_fixture(base / "independent-policy.json")
             calls = []
@@ -44,7 +45,7 @@ class ArchitectureCacheTests(unittest.TestCase):
                 result = {"generated_utc": "2026-01-01T00:00:00Z", "sources": []}
                 receipt.write_text(json.dumps(result))
                 return result
-            with patch.object(MODULE, "SOURCE_POLICY_PATH", policy_path), patch.object(MODULE, "load", side_effect=lambda name: modules[name]), patch.object(MODULE, "build", side_effect=generate):
+            with patch.object(modules["architecture_inventory"], "USER_ROOT", base / "user"), patch.object(MODULE, "SOURCE_POLICY_PATH", policy_path), patch.object(MODULE, "load", side_effect=lambda name: modules[name]), patch.object(MODULE, "build", side_effect=generate):
                 MODULE.refresh_if_changed(root, state, output, receipt)
                 MODULE.refresh_if_changed(root, state, output, receipt)
                 self.assertEqual(len(calls), 1)
@@ -67,9 +68,23 @@ class ArchitectureCacheTests(unittest.TestCase):
                 retained.write_text('{"schema_version":1,"kind":"local_page_refresh"}')
                 MODULE.refresh_if_changed(root, state, output, receipt)
                 self.assertEqual(len(calls), 5)
+                script = root / "scripts/evidence_manifest.py"
+                script.parent.mkdir(exist_ok=True)
+                script.write_text("# approved fixture one\n")
                 MODULE.refresh_if_changed(root, state, output, receipt)
-                self.assertEqual(len(calls), 5)
-
-
+                self.assertEqual(len(calls), 6)
+                script.write_text("# approved fixture two\n")
+                MODULE.refresh_if_changed(root, state, output, receipt)
+                self.assertEqual(len(calls), 7)
+                MODULE.refresh_if_changed(root, state, output, receipt)
+                self.assertEqual(len(calls), 7)
+                previous_page = (output / "architecture.html").read_bytes()
+                previous_receipt = receipt.read_bytes()
+                (script.parent / "unreviewed.py").write_text("# unlisted fixture\n")
+                with self.assertRaisesRegex(ValueError, "approval"):
+                    MODULE.refresh_if_changed(root, state, output, receipt)
+                self.assertEqual((output / "architecture.html").read_bytes(), previous_page)
+                self.assertEqual(receipt.read_bytes(), previous_receipt)
+                self.assertEqual(len(calls), 7)
 if __name__ == "__main__":
     unittest.main()

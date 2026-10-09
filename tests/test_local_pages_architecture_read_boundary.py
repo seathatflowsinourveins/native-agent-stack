@@ -1,4 +1,4 @@
-"""The real Architecture build may open only declared state projections."""
+"""The real Architecture build may open only independently declared inputs."""
 
 from contextlib import contextmanager, ExitStack
 import builtins
@@ -27,11 +27,48 @@ G5 = "research/coverage-gap-20261008/grand-catalog/start-closure-1-20261008T2140
 RAW_SDK = "research/fullspeed-20261008/sdk-harness-ready/handoff.receipt.json"
 
 
+@contextmanager
+def observed_file_reads(observe):
+    """Observe real reads using descriptor ancestry on every supported OS."""
+    originals = {"builtins": builtins.open, "io": io.open, "os": os.open, "close": os.close}
+    descriptors = {}
+    def wrapper(kind):
+        def invoke(value, *args, **options):
+            path = None
+            if not isinstance(value, int):
+                path = Path(os.fsdecode(value))
+                if not path.is_absolute() and options.get("dir_fd") is not None:
+                    parent = descriptors.get(options["dir_fd"])
+                    if parent is None:
+                        raise AssertionError("read watcher received an untracked directory descriptor")
+                    path = parent / path
+                path = path.absolute()
+            flags = args[0] if kind == "os" and args else options.get("flags", 0)
+            directory = kind == "os" and flags & os.O_DIRECTORY
+            mode = args[0] if kind != "os" and args else options.get("mode", "r")
+            reading = not flags & (os.O_WRONLY | os.O_RDWR) if kind == "os" else isinstance(mode, str) and "r" in mode
+            if path is not None and reading and not directory:
+                observe(path)
+            result = originals[kind](value, *args, **options)
+            if kind == "os":
+                descriptors[result] = path
+            return result
+        return invoke
+    def close(descriptor):
+        originals["close"](descriptor)
+        descriptors.pop(descriptor, None)
+    with ExitStack() as stack:
+        for kind, owner in (("builtins", builtins), ("io", io), ("os", os)):
+            stack.enter_context(patch.object(owner, "open", wrapper(kind)))
+        stack.enter_context(patch.object(os, "close", close))
+        yield
+
+
 class ArchitectureReadBoundaryTests(unittest.TestCase):
     def setUp(self):
         temporary = tempfile.TemporaryDirectory()
         self.addCleanup(temporary.cleanup)
-        self.base = Path(temporary.name)
+        self.base = Path(temporary.name).resolve()
         self.root, self.state, self.user = (self.base / name for name in ("repo", "state", "user"))
         self.output, self.receipt = self.base / "served", self.base / "custody/architecture.json"
         self.home = patch.object(Path, "home", return_value=self.user)
@@ -104,30 +141,28 @@ class ArchitectureReadBoundaryTests(unittest.TestCase):
     @contextmanager
     def read_guard(self):
         fixed = {self.state / name for name in ("coordination/command-center/pages/cc-now.json", "coordination/command-center/pages/adoption-now.json", "coordination/command-center/pages/automation-projection.json", "coordination/command-center/pages/host-receipts-index.json", REFRESH, G5)}
+        approved_repo = {self.root / name for name in (
+            "catalogs/landscape/manifest.json", "catalogs/landscape/foundation.json",
+            "catalogs/north-star/readiness.json", "adoption/skills/manifest.json",
+            "adoption/manifest.json", "manifests/stack.json", "manifests/evidence.json",
+            "tools/local-pages/architecture_mapping.json", "scripts/approved.py",
+        )}
+        approved_fixture = {self.policy_path, self.user / ".agents/skills/frontend-design/SKILL.md"}
         opened, commands = [], []
-        originals = {"builtins": builtins.open, "io": io.open, "os": os.open, "popen": subprocess.Popen}
+        original_popen = subprocess.Popen
 
         def permit(path):
-            if isinstance(path, int):
-                return
-            path = Path(os.fsdecode(path)).resolve()
+            path = path.resolve()
             if path.is_relative_to(self.state):
                 relative = path.relative_to(self.state).as_posix()
                 immutable = re.fullmatch(r"coordination/ns2604-coop/notes/adoption-evidence-20261008/adoption-now-[a-f0-9]{16}\.json", relative)
                 if path not in fixed and not immutable:
                     raise AssertionError("unauthorized state read: " + relative)
+            elif path.is_relative_to(self.root) and path not in approved_repo:
+                raise AssertionError("unauthorized repository data read: " + path.relative_to(self.root).as_posix())
+            elif path.is_relative_to(self.user) and path not in approved_fixture:
+                raise AssertionError("unauthorized fixture-user read")
             opened.append(path)
-
-        def guarded_open(kind):
-            def invoke(path, *args, **kwargs):
-                if kind == "os" and args and args[0] & os.O_DIRECTORY:
-                    return originals[kind](path, *args, **kwargs)
-                observed = path
-                if kind == "os" and not isinstance(path, int) and not Path(os.fsdecode(path)).is_absolute() and kwargs.get("dir_fd") is not None:
-                    observed = Path(os.readlink(f'/proc/self/fd/{kwargs["dir_fd"]}')) / os.fsdecode(path)
-                permit(observed)
-                return originals[kind](path, *args, **kwargs)
-            return invoke
 
         def guarded_popen(args, *other, **kwargs):
             expected = ["/usr/bin/zstd", "-dc"]
@@ -137,7 +172,7 @@ class ArchitectureReadBoundaryTests(unittest.TestCase):
             if handle is None or os.fstat(handle.fileno()).st_ino != self.asset.stat().st_ino:
                 raise AssertionError("archive subprocess did not use the approved descriptor")
             commands.append(args)
-            return originals["popen"](args, *other, **kwargs)
+            return original_popen(args, *other, **kwargs)
 
         def guarded_run(args, *other, **kwargs):
             if args != ["systemctl", "--help"]:
@@ -146,9 +181,7 @@ class ArchitectureReadBoundaryTests(unittest.TestCase):
             return subprocess.CompletedProcess(args, 0, "fixture help without JSON output support", "")
 
         with ExitStack() as stack:
-            stack.enter_context(patch.object(builtins, "open", side_effect=guarded_open("builtins")))
-            stack.enter_context(patch.object(io, "open", side_effect=guarded_open("io")))
-            stack.enter_context(patch.object(os, "open", side_effect=guarded_open("os")))
+            stack.enter_context(observed_file_reads(permit))
             stack.enter_context(patch.object(subprocess, "Popen", side_effect=guarded_popen))
             stack.enter_context(patch.object(subprocess, "run", side_effect=guarded_run))
             yield opened, commands
@@ -200,6 +233,24 @@ class ArchitectureReadBoundaryTests(unittest.TestCase):
             return module
 
         with self.read_guard(), patch.object(builder, "load", side_effect=injected_load), self.assertRaisesRegex(AssertionError, "unauthorized state read: coordination/command-center/windows"):
+            builder.build(self.root, self.state, self.output, self.receipt)
+
+    def test_guard_catches_hidden_repository_inventory_reads_late_in_rendering(self):
+        forbidden = self.root / "scripts/unreviewed.py"
+        forbidden.parent.mkdir(parents=True)
+        original_load = builder.load
+        def injected_load(name):
+            module = original_load(name)
+            if name == "architecture_view":
+                original_render = module.render
+                def late_read(*args, **kwargs):
+                    result = original_render(*args, **kwargs)
+                    forbidden.write_text("# Synthetic named late-read target\n", encoding="utf-8")
+                    forbidden.read_bytes()
+                    return result
+                module.render = late_read
+            return module
+        with self.read_guard(), patch.object(builder, "load", side_effect=injected_load), self.assertRaisesRegex(AssertionError, "unauthorized repository data read: scripts/unreviewed.py"):
             builder.build(self.root, self.state, self.output, self.receipt)
 
     def test_missing_retained_projection_fails_before_publication(self):
@@ -277,19 +328,11 @@ class ArchitectureReadBoundaryTests(unittest.TestCase):
         """Count real open boundaries without allowing a forbidden fixture read."""
         forbidden = Path(forbidden).resolve()
         calls = []
-        original_open, original_io, original_os = builtins.open, io.open, os.open
-        def wrapper(function, os_call=False):
-            def watched(value, *args, **kwargs):
-                if not isinstance(value, int):
-                    path = Path(os.fsdecode(value))
-                    if os_call and kwargs.get("dir_fd") is not None and not path.is_absolute():
-                        path = Path(os.readlink(f'/proc/self/fd/{kwargs["dir_fd"]}')) / path
-                    if not (os_call and args and args[0] & os.O_DIRECTORY) and path.resolve() == forbidden:
-                        calls.append(str(path))
-                        raise AssertionError("forbidden Architecture source reached a real open")
-                return function(value, *args, **kwargs)
-            return watched
-        with patch.object(builtins, "open", wrapper(original_open)), patch.object(io, "open", wrapper(original_io)), patch.object(os, "open", wrapper(original_os, True)):
+        def observe(path):
+            if path.resolve() == forbidden:
+                calls.append(str(path))
+                raise AssertionError("forbidden Architecture source reached a real open")
+        with observed_file_reads(observe):
             yield calls
 
     def published_bytes(self):
@@ -324,6 +367,100 @@ class ArchitectureReadBoundaryTests(unittest.TestCase):
         builder.build(self.root, self.state, self.output, self.receipt)
         forbidden = self.write(self.root, "catalogs/landscape/ordinary-unreviewed.json", {"layers": []})
         self.assert_production_refusal_preserves_publication(forbidden)
+
+    def test_real_builder_refuses_protected_inventory_agent_before_open(self):
+        builder.build(self.root, self.state, self.output, self.receipt)
+        forbidden = self.root / "adoption/agents/e2e-truth-20261006/role.md"
+        forbidden.parent.mkdir(parents=True)
+        forbidden.write_text("Synthetic protected inventory role\n", encoding="utf-8")
+        self.assert_production_refusal_preserves_publication(forbidden)
+
+    def test_real_builder_refuses_unreviewed_inventory_script_before_open(self):
+        builder.build(self.root, self.state, self.output, self.receipt)
+        forbidden = self.root / "scripts/unreviewed.py"
+        forbidden.parent.mkdir(parents=True)
+        forbidden.write_text("# Synthetic unreviewed inventory file\n", encoding="utf-8")
+        self.assert_production_refusal_preserves_publication(forbidden)
+
+    def test_real_builder_refuses_unreviewed_inventory_metadata_before_open(self):
+        builder.build(self.root, self.state, self.output, self.receipt)
+        forbidden = self.write(self.root, "adoption/agents/unreviewed-manifest.json", {"agents": []})
+        self.assert_production_refusal_preserves_publication(forbidden)
+
+    def test_real_builder_refuses_protected_inventory_alias_target_before_open(self):
+        builder.build(self.root, self.state, self.output, self.receipt)
+        forbidden = self.write(self.root, "catalogs/e2e-truth-20261006/role.json", {"source": "synthetic protected alias target"})
+        alias = self.root / "scripts/approved.py"
+        alias.parent.mkdir(parents=True)
+        alias.symlink_to(forbidden)
+        self.assert_production_refusal_preserves_publication(forbidden)
+
+    def test_real_builder_refuses_protected_lexical_inventory_alias_before_open(self):
+        target = self.root / "scripts/approved.py"
+        target.parent.mkdir(parents=True)
+        target.write_text("# Synthetic independently approved inventory script\n", encoding="utf-8")
+        builder.build(self.root, self.state, self.output, self.receipt)
+        alias = self.root / "adoption/agents/e2e-truth-20261006/role.md"
+        alias.parent.mkdir(parents=True)
+        alias.symlink_to(target)
+        self.assert_production_refusal_preserves_publication(target)
+
+    def test_real_cache_refuses_unreviewed_inventory_script_before_open(self):
+        builder.refresh_if_changed(self.root, self.state, self.output, self.receipt)
+        forbidden = self.root / "scripts/unreviewed.py"
+        forbidden.parent.mkdir(parents=True)
+        forbidden.write_text("# Synthetic cache discovery cannot add permission\n", encoding="utf-8")
+        self.assert_production_refusal_preserves_publication(forbidden, cache=True)
+
+    def test_inventory_boundary_watchers_need_no_proc_descriptor_lookup(self):
+        original = os.readlink
+        def no_proc(path, *args, **kwargs):
+            if str(path).startswith("/proc/self/fd/"):
+                raise FileNotFoundError("synthetic platform has no proc descriptor links")
+            return original(path, *args, **kwargs)
+        with patch.object(os, "readlink", side_effect=no_proc), self.read_guard():
+            builder.build(self.root, self.state, self.output, self.receipt)
+
+    def test_real_builder_user_configuration_inventory_is_metadata_only(self):
+        paths = []
+        for relative in (".codex/agents/reviewer.toml", ".config/systemd/user/example.timer", ".config/systemd/user/example.service"):
+            path = self.user / relative
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text("Synthetic user configuration; its body must never be opened\n", encoding="utf-8")
+            paths.append(path)
+        calls = []
+        def observe(path):
+            if path in paths:
+                calls.append(path)
+                raise AssertionError("metadata-only user configuration reached a content open")
+        with observed_file_reads(observe):
+            result = builder.build(self.root, self.state, self.output, self.receipt)
+        self.assertEqual(calls, [])
+        for path in paths:
+            records = [row for row in result["inventory_sources"] if row["path"] == str(path)]
+            self.assertEqual(len(records), 1)
+            self.assertIsNone(records[0]["sha256"])
+            self.assertNotEqual(records[0].get("sha256_kind"), "computed")
+
+    def test_real_builder_refuses_unlisted_user_unit_before_metadata_or_content(self):
+        builder.build(self.root, self.state, self.output, self.receipt)
+        before = self.published_bytes()
+        forbidden = self.user / ".config/systemd/user/unreviewed.service"
+        forbidden.parent.mkdir(parents=True)
+        forbidden.write_text("Synthetic unreviewed unit; no metadata approval\n", encoding="utf-8")
+        calls = []
+        original_stat = os.stat
+        def stat(path, *args, **kwargs):
+            if not isinstance(path, int) and Path(path).absolute() == forbidden:
+                calls.append("stat")
+                raise AssertionError("unreviewed user unit reached metadata before authorization")
+            return original_stat(path, *args, **kwargs)
+        with self.forbidden_reads(forbidden) as reads, patch.object(os, "stat", side_effect=stat):
+            with self.assertRaises(ValueError):
+                builder.build(self.root, self.state, self.output, self.receipt)
+        self.assertEqual(reads, [])
+        self.assertEqual(calls, [])
+        self.assertEqual(self.published_bytes(), before)
 
     def test_real_builder_refuses_registered_receipt_parent_symlink_before_open(self):
         builder.build(self.root, self.state, self.output, self.receipt)

@@ -162,8 +162,12 @@ from the reported native manifest hash. Architecture does not call the native
 readiness builder against the state root or follow that projection's input
 paths. Retained role attribution keeps its observation window; a different
 invocation window retains published counts with attribution marked unassigned.
-The complete hashed inventory input set is declared in `inventory_sources`,
-including computed hashes, byte counts, input types and symlink aliases.
+The complete inventory input set is declared in `inventory_sources`, with
+computed hashes/bytes for approved content, and separate metadata-only
+observations for user agent and service configurations. No user configuration
+body is opened or hashed. Metadata-only entries have no computed content hash
+and an explicit scope reason. Aliases are labels only after their canonical
+target has independent approval.
 
 Architecture source, projection and registered receipt selections also bind
 independent exact roles in `source_policy.json` before parsing or hashing.
@@ -175,6 +179,31 @@ any byte read; invalid names are ignored, and symlink candidates are refused.
 An approved receipt above its existing read limit remains explicitly unmeasured
 without widening that limit. The G5 archive is hashed and streamed to zstd
 through its authorized descriptor, which avoids reopening its pathname.
+
+Inventory uses that same independently approved reader for every content
+hash and metadata parse, including its catalogs, manifests, checksum lists,
+mapping and sanitized automation projection. The committed
+`architecture_inventory` role contains129exact content paths; installed user
+content is restricted to exact `SKILL.md` assets. The separate
+`architecture_inventory_metadata` role contains94exact user agent/unit paths
+and cannot authorize a content open. Native descriptor-relative no-follow
+stat supplies their file metadata. Shared protected checks apply to both
+lexical and canonical paths before reads. A newly discovered unlisted input
+or protected alias stops the complete build/cache reuse before publication;
+previous successful outputs and receipt remain intact. Hashes and parsed
+metadata derive from the same captured approved bytes.
+
+`scripts/local_pages_policy_grants.py --pin <full-source-sha>` prints a static
+proposal from native Git tree/registered-path metadata for review. Runtime
+discovery never adds a grant. Receipt proposals also apply the pinned frozen
+eligibility declaration from the repository tripwire; the two unused frozen
+receipt permissions are removed, leaving4648eligibleexactJSONreceiptpaths.
+Derivation does not open referenced receipt or frozen artifact bodies and
+does not add descriptive-pin exceptions. Separately reviewed user canonical
+filenames are metadata during permission generation. The shared reader uses
+64KiB chunks so a large logical bound does not allocate that bound for a small
+file. Inventory cache signatures bind approved bytes, metadata tuples and
+the policy digest before a prior render can be reused.
 
 Each component row reports observational use from the retained hash-verified
 snapshot. Client components use session counts; unmeasured rows explain the
@@ -299,6 +328,7 @@ nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p t
 nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_current_view.py
 nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_sanitization.py
 nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_source_policy.py
+nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_policy_grants.py
 nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_north_star_readiness.py
 nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_fleet_data.py
 nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_fleet_execution.py

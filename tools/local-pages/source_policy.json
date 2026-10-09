@@ -1599,6 +1599,902 @@
     "Protected credential, environment, client-secret and mixed e2e-truth paths are denied before membership checks, including a hypothetical registration."
   ],
   "architecture": {
+  "architecture_inventory": [
+    {
+      "root": "repo",
+      "path": ".claude/skills/omniroute-runtime-worker/SKILL.md"
+    },
+    {
+      "root": "repo",
+      "path": ".github/workflows/action-compatibility.yml"
+    },
+    {
+      "root": "repo",
+      "path": ".github/workflows/adoption-bootstrap.yml"
+    },
+    {
+      "root": "repo",
+      "path": ".github/workflows/catalog-freshness.yml"
+    },
+    {
+      "root": "repo",
+      "path": ".github/workflows/dependency-review.yml"
+    },
+    {
+      "root": "repo",
+      "path": ".github/workflows/frozen-evidence-risk.yml"
+    },
+    {
+      "root": "repo",
+      "path": ".github/workflows/hardware-profile-smoke.yml"
+    },
+    {
+      "root": "repo",
+      "path": ".github/workflows/harness-audit.yml"
+    },
+    {
+      "root": "repo",
+      "path": ".github/workflows/native-foundation-e2e.yml"
+    },
+    {
+      "root": "repo",
+      "path": ".github/workflows/native-offhost-app-state.yml"
+    },
+    {
+      "root": "repo",
+      "path": ".github/workflows/native-offhost-restore.yml"
+    },
+    {
+      "root": "repo",
+      "path": ".github/workflows/native-service-reboot.yml"
+    },
+    {
+      "root": "repo",
+      "path": ".github/workflows/native-token-e2e.yml"
+    },
+    {
+      "root": "repo",
+      "path": ".github/workflows/practice-references-freshness.yml"
+    },
+    {
+      "root": "repo",
+      "path": ".github/workflows/publish-catalog.yml"
+    },
+    {
+      "root": "repo",
+      "path": ".github/workflows/receipt-staleness.yml"
+    },
+    {
+      "root": "repo",
+      "path": ".github/workflows/runtime-worker-skills-freshness.yml"
+    },
+    {
+      "root": "repo",
+      "path": ".github/workflows/saturation-tracking.yml"
+    },
+    {
+      "root": "repo",
+      "path": ".github/workflows/scorecard.yml"
+    },
+    {
+      "root": "repo",
+      "path": ".github/workflows/security-scan.yml"
+    },
+    {
+      "root": "repo",
+      "path": ".github/workflows/sota-sources-gate.yml"
+    },
+    {
+      "root": "repo",
+      "path": ".github/workflows/supply-chain.yml"
+    },
+    {
+      "root": "repo",
+      "path": ".github/workflows/token-report.yml"
+    },
+    {
+      "root": "repo",
+      "path": ".github/workflows/validate.yml"
+    },
+    {
+      "root": "repo",
+      "path": "adoption/agents/claude/blind-adjudicator.md"
+    },
+    {
+      "root": "repo",
+      "path": "adoption/agents/claude/blind-judge.md"
+    },
+    {
+      "root": "repo",
+      "path": "adoption/agents/claude/blind-lane-reviewer.md"
+    },
+    {
+      "root": "repo",
+      "path": "adoption/agents/claude/evidence-reviewer.md"
+    },
+    {
+      "root": "repo",
+      "path": "adoption/agents/claude/isolated-builder.md"
+    },
+    {
+      "root": "repo",
+      "path": "adoption/agents/claude/landscape-sweep-worker.md"
+    },
+    {
+      "root": "repo",
+      "path": "adoption/agents/claude/security-reviewer.md"
+    },
+    {
+      "root": "repo",
+      "path": "adoption/agents/claude/semantic-evidence-reviewer.md"
+    },
+    {
+      "root": "repo",
+      "path": "adoption/agents/claude/source-scout.md"
+    },
+    {
+      "root": "repo",
+      "path": "adoption/agents/claude/stack-researcher.md"
+    },
+    {
+      "root": "repo",
+      "path": "adoption/agents/claude/stack-verifier.md"
+    },
+    {
+      "root": "repo",
+      "path": "adoption/agents/codex/SHA256SUMS"
+    },
+    {
+      "root": "repo",
+      "path": "adoption/agents/codex/stack-researcher.toml"
+    },
+    {
+      "root": "repo",
+      "path": "adoption/agents/codex/stack-verifier.toml"
+    },
+    {
+      "root": "repo",
+      "path": "adoption/agents/codex/workers/evidence-reviewer.toml"
+    },
+    {
+      "root": "repo",
+      "path": "adoption/agents/codex/workers/isolated-builder.toml"
+    },
+    {
+      "root": "repo",
+      "path": "adoption/agents/codex/workers/semantic-evidence-reviewer.toml"
+    },
+    {
+      "root": "repo",
+      "path": "adoption/agents/codex/workers/SHA256SUMS"
+    },
+    {
+      "root": "repo",
+      "path": "adoption/manifest.json"
+    },
+    {
+      "root": "repo",
+      "path": "adoption/skills/manifest.json"
+    },
+    {
+      "root": "repo",
+      "path": "catalogs/landscape/foundation.json"
+    },
+    {
+      "root": "repo",
+      "path": "catalogs/landscape/manifest.json"
+    },
+    {
+      "root": "repo",
+      "path": "catalogs/landscape/us-equities.json"
+    },
+    {
+      "root": "repo",
+      "path": "manifests/stack.json"
+    },
+    {
+      "root": "repo",
+      "path": "scripts/adoption_status.py"
+    },
+    {
+      "root": "repo",
+      "path": "scripts/build_ecosystem.py"
+    },
+    {
+      "root": "repo",
+      "path": "scripts/build_new_wsl_handbook.py"
+    },
+    {
+      "root": "repo",
+      "path": "scripts/catalog_decisions.py"
+    },
+    {
+      "root": "repo",
+      "path": "scripts/codex_quota.py"
+    },
+    {
+      "root": "repo",
+      "path": "scripts/component_matrix.py"
+    },
+    {
+      "root": "repo",
+      "path": "scripts/credential_boot_receipt.py"
+    },
+    {
+      "root": "repo",
+      "path": "scripts/credential_status.py"
+    },
+    {
+      "root": "repo",
+      "path": "scripts/currency_due.py"
+    },
+    {
+      "root": "repo",
+      "path": "scripts/env_freshness.py"
+    },
+    {
+      "root": "repo",
+      "path": "scripts/evidence_manifest.py"
+    },
+    {
+      "root": "repo",
+      "path": "scripts/freshness_propose.py"
+    },
+    {
+      "root": "repo",
+      "path": "scripts/hardware_profile.py"
+    },
+    {
+      "root": "repo",
+      "path": "scripts/host_receipts.py"
+    },
+    {
+      "root": "repo",
+      "path": "scripts/host_requests.py"
+    },
+    {
+      "root": "repo",
+      "path": "scripts/kernel_keyring.py"
+    },
+    {
+      "root": "repo",
+      "path": "scripts/landscape.py"
+    },
+    {
+      "root": "repo",
+      "path": "scripts/local_pages_policy_grants.py"
+    },
+    {
+      "root": "repo",
+      "path": "scripts/native_token_ci.py"
+    },
+    {
+      "root": "repo",
+      "path": "scripts/new_host_grand_list.py"
+    },
+    {
+      "root": "repo",
+      "path": "scripts/new_wsl_profile.py"
+    },
+    {
+      "root": "repo",
+      "path": "scripts/path_safety.py"
+    },
+    {
+      "root": "repo",
+      "path": "scripts/platform_status.py"
+    },
+    {
+      "root": "repo",
+      "path": "scripts/receipt_staleness.py"
+    },
+    {
+      "root": "repo",
+      "path": "scripts/recount-tokens.cjs"
+    },
+    {
+      "root": "repo",
+      "path": "scripts/release_due.py"
+    },
+    {
+      "root": "repo",
+      "path": "scripts/saturation_ledger.py"
+    },
+    {
+      "root": "repo",
+      "path": "scripts/skills_status.py"
+    },
+    {
+      "root": "repo",
+      "path": "scripts/trading_gates.py"
+    },
+    {
+      "root": "repo",
+      "path": "scripts/upstream_surface_watch.py"
+    },
+    {
+      "root": "repo",
+      "path": "scripts/validate_catalogs.py"
+    },
+    {
+      "root": "repo",
+      "path": "scripts/validate_convergence.py"
+    },
+    {
+      "root": "repo",
+      "path": "scripts/validate_foundation.py"
+    },
+    {
+      "root": "repo",
+      "path": "scripts/validate_shards.py"
+    },
+    {
+      "root": "repo",
+      "path": "scripts/validate.py"
+    },
+    {
+      "root": "repo",
+      "path": "scripts/verdict_flip_candidates.py"
+    },
+    {
+      "root": "repo",
+      "path": "scripts/verdict_review_gate.py"
+    },
+    {
+      "root": "repo",
+      "path": "scripts/verify_nautilus_ci.py"
+    },
+    {
+      "root": "repo",
+      "path": "tools/local-pages/architecture_mapping.json"
+    },
+    {
+      "root": "state",
+      "path": "coordination/command-center/pages/automation-projection.json"
+    },
+    {
+      "root": "user",
+      "path": ".agents/skills/agentic-actions-auditor/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".agents/skills/codebase-design/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".agents/skills/codeql/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".agents/skills/diagnosing-bugs/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".agents/skills/find-skills/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".agents/skills/fp-check/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".agents/skills/frontend-design/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".agents/skills/gh-address-comments/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".agents/skills/gh-fix-ci/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".agents/skills/hcom-agent-messaging/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".agents/skills/hf-cli/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".agents/skills/iterative-retrieval/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".agents/skills/loki/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".agents/skills/mcp-builder/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".agents/skills/mineru/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".agents/skills/modern-python/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".agents/skills/native-stack-research/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".agents/skills/native-stack-worker/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".agents/skills/promptfoo-evals/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".agents/skills/property-based-testing/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".agents/skills/qmd/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".agents/skills/sarif-parsing/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".agents/skills/search-first/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".agents/skills/security-audit/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".agents/skills/security-best-practices/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".agents/skills/security-threat-model/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".agents/skills/supply-chain-risk-auditor/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".agents/skills/tdd/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".agents/skills/typesafe-ai/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".agents/skills/variant-analysis/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".agents/skills/writing-for-agents/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".claude/skills/codebase-memory/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".claude/skills/native-stack-research/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".claude/skills/native-stack-worker/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".claude/skills/skill-creator/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".codex/skills/.system/imagegen/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".codex/skills/.system/openai-docs/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".codex/skills/.system/review-agent/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".codex/skills/.system/skill-creator/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".codex/skills/.system/skill-installer/SKILL.md"
+    },
+    {
+      "root": "user",
+      "path": ".codex/skills/codebase-memory/SKILL.md"
+    }
+  ],
+  "architecture_inventory_metadata": [
+    {
+      "root": "user",
+      "path": ".claude/agents/blind-adjudicator.md"
+    },
+    {
+      "root": "user",
+      "path": ".claude/agents/blind-judge.md"
+    },
+    {
+      "root": "user",
+      "path": ".claude/agents/blind-lane-reviewer.md"
+    },
+    {
+      "root": "user",
+      "path": ".claude/agents/codebase-memory-auditor.md"
+    },
+    {
+      "root": "user",
+      "path": ".claude/agents/codebase-memory-scout.md"
+    },
+    {
+      "root": "user",
+      "path": ".claude/agents/codebase-memory.md"
+    },
+    {
+      "root": "user",
+      "path": ".claude/agents/evidence-reviewer.md"
+    },
+    {
+      "root": "user",
+      "path": ".claude/agents/isolated-builder.md"
+    },
+    {
+      "root": "user",
+      "path": ".claude/agents/landscape-sweep-worker.md"
+    },
+    {
+      "root": "user",
+      "path": ".claude/agents/security-reviewer.md"
+    },
+    {
+      "root": "user",
+      "path": ".claude/agents/semantic-evidence-reviewer.md"
+    },
+    {
+      "root": "user",
+      "path": ".claude/agents/semble-search.md"
+    },
+    {
+      "root": "user",
+      "path": ".claude/agents/source-scout.md"
+    },
+    {
+      "root": "user",
+      "path": ".claude/agents/stack-researcher.md"
+    },
+    {
+      "root": "user",
+      "path": ".claude/agents/stack-verifier.md"
+    },
+    {
+      "root": "user",
+      "path": ".codex/agents/codebase-memory-auditor.toml"
+    },
+    {
+      "root": "user",
+      "path": ".codex/agents/codebase-memory-scout.toml"
+    },
+    {
+      "root": "user",
+      "path": ".codex/agents/codebase-memory.toml"
+    },
+    {
+      "root": "user",
+      "path": ".codex/agents/semble-search.toml"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/agentsview.service"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/ai-memory.service"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/cc-guest-memory-caps.service"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/cc-win-mem-reclaim.service"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/clock-change-check.service"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/clock-change-check.timer"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/clock-offset-check.service"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/clock-offset-check.timer"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/dagu.service"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/disk-headroom-guard.service"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/disk-headroom-guard.timer"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/docker.service"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/git-maintenance@.service"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/git-maintenance@daily.timer"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/git-maintenance@hourly.timer"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/git-maintenance@weekly.timer"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/headroom-ns2604-headroom.service"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/hindsight-research.service"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/jcodemunch-mcp-http.service"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/mineru.service"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/native-grafana-monitoring-validation.service"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/native-node-exporter.service"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/native-nvidia-gpu-exporter.service"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/native-process-exporter.service"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/native-stack-qmd-shared.service"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/native-wsl-distro-metrics.service"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/native-wsl-distro-metrics.timer"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/ns2604-alertmanager.service"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/ns2604-coop-checkpoint-backstop-20261009.service"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/ns2604-coop-checkpoint-backstop-20261009.timer"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/ns2604-grafana.service"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/ns2604-loki.service"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/ns2604-otelcol-contrib.service"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/ns2604-overnight-wsl-restart-20261009.service"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/ns2604-overnight-wsl-restart-20261009.timer"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/ns2604-prometheus.service"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/ns2604-research-progress.service"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/ns2604-research-progress.timer"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/ollama.service"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/omniroute.service"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/openhands-job@.service"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/paper-alert@.service"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/paper-ext-20261006.service"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/paper-ext-20261006.timer"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/paper-n2-ctl-20261008.service"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/paper-n2-ctl-20261008.timer"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/paper-n2-gate-decision-20261009.service"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/paper-n2-gate-decision-20261009.timer"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/paper-n2-gate-go-20261009.service"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/paper-n2-gate-go-20261009.timer"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/paper-n2-open-20261008.service"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/paper-n2-open-20261008.timer"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/paper-n2-open-20261009.service"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/paper-n2-open-20261009.timer"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/paper-n2-wake-20261009.service"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/paper-n2-wake-20261009.timer"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/paper-pre-20261006.service"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/paper-pre-20261006.timer"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/paper-recover-a2-gate-20261006.service"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/paper-recover-a2-gate-20261006.timer"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/qmd-mcp-http.service"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/restic-backup-nativestack2604.service"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/restic-backup-nativestack2604.timer"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/restic-prune-nativestack2604.service"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/restic-prune-nativestack2604.timer"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/secret-guard-canary.service"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/secret-guard-canary.timer"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/stack-alert@.service"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/vllm-embed.service"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/wu-watch-20261006.service"
+    },
+    {
+      "root": "user",
+      "path": ".config/systemd/user/wu-watch-20261006.timer"
+    },
+    {
+      "root": "user",
+      "path": ".local/state/native-agent-stack/research/fullspeed-20261008/g5-stars-gap/local-pages/native-agent-pages-refresh.path"
+    },
+    {
+      "root": "user",
+      "path": ".local/state/native-agent-stack/research/fullspeed-20261008/g5-stars-gap/local-pages/native-agent-pages-refresh.service"
+    },
+    {
+      "root": "user",
+      "path": ".local/state/native-agent-stack/research/fullspeed-20261008/g5-stars-gap/local-pages/native-agent-pages-refresh.timer"
+    },
+    {
+      "root": "user",
+      "path": ".local/state/native-agent-stack/research/fullspeed-20261008/g5-stars-gap/local-pages/native-agent-pages.service"
+    }
+  ],
     "architecture_manifest": [
       {
         "root": "repo",
@@ -12842,14 +13738,6 @@
       },
       {
         "root": "repo",
-        "path": "evidence/artifacts/macos-application-20260924/run-summary.json"
-      },
-      {
-        "root": "repo",
-        "path": "evidence/artifacts/macos-application-20260924/variant/package.json"
-      },
-      {
-        "root": "repo",
         "path": "evidence/artifacts/macos-ci-scope-20261003/closure.json"
       },
       {
@@ -20363,7 +21251,7 @@
       "path": "manifests/evidence.json",
       "sha256": "f0143f44252045086894bdc8be22dd42ffee31283bc3a3a8868ada65e13ea477",
       "pin": "c945ea1f011e4c7e69a0b5f19052717b2af9d46e",
-      "scope": "Committed main metadata parity: 10939 files, 239 registered receipts, 4650 nonprotected JSON paths, all already present in the exact Architecture receipt grants. No referenced bodies were opened."
+      "scope": "Pinned main metadata contains 10939 files and 239 registered receipts; 4648 nonprotected, nonfrozen JSON paths are approved. The two unused frozen-eligibility paths are excluded by the pinned tripwire declaration in tests/test_frozen_macos_variant_no_use.py, via scripts/local_pages_policy_grants.py. No referenced bodies were opened and no descriptive exception pin was added."
     },
     {
       "root": "repo",
@@ -20377,14 +21265,14 @@
       "path": "manifests/evidence.json",
       "sha256": "55c2977680bd041bf2b62a9e33d227469760341427e6aa7dd3f000db50bc9063",
       "pin": "85a067ba6b960f490f7277b451e8a8f9a74b52a4",
-      "scope": "Static exact JSON paths from receipts[] and files[] metadata only; referenced bodies were not opened."
+      "scope": "Static exact JSON paths from receipts[] and files[] metadata only, subject to shared protected-name and pinned frozen-eligibility exclusion; referenced bodies were not opened."
     },
     {
       "root": "repo",
       "path": "manifests/evidence.json",
       "sha256": "f0143f44252045086894bdc8be22dd42ffee31283bc3a3a8868ada65e13ea477",
       "pin": "2ecce6ec2221704db642ddec8f70f7152ed2afb6",
-      "scope": "Same independently fixed metadata union from the approved source checkout; referenced bodies were not opened."
+      "scope": "Same independently fixed metadata union from the approved source checkout, narrowed by shared protected-name and pinned frozen-eligibility exclusion; referenced bodies were not opened."
     },
     {
       "root": "repo",

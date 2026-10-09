@@ -229,7 +229,8 @@ class ArchitectureReads:
     Exact grants come from the committed policy, never a catalog or receipt
     selecting another file. The one dynamic family has a fixed reviewed
     directory and a strict immutable-projection filename. Native permissions
-    remain separately limited to repo/state; only design custody may use user.
+    remain separately limited to repo/state. Exact installed skill custody and
+    file-metadata observations have distinct reviewed user-root roles.
     """
 
     limit_error = SourceReadLimitError
@@ -249,8 +250,11 @@ class ArchitectureReads:
             for record in paths:
                 if not isinstance(record, dict) or record.get("root") not in self.roots:
                     raise SourcePolicyError("Architecture permission requires a known root")
-                if record["root"] == "user" and role != "architecture_design":
-                    raise SourcePolicyError("user root is permitted only for exact design custody")
+                if record["root"] == "user" and role not in {"architecture_design", "architecture_inventory", "architecture_inventory_metadata"}:
+                    raise SourcePolicyError("user root requires exact design, skill-inventory or metadata custody")
+                relative = _relative(record.get("path"))
+                if record["root"] == "user" and role == "architecture_inventory" and PurePosixPath(relative).name != "SKILL.md":
+                    raise SourcePolicyError("user inventory content is permitted only for exact SKILL.md assets")
                 self.allowed[role].add((record["root"], _relative(record.get("path"))))
         self.families = self.policy.document.get("architecture_families", {})
         reviewed = {"architecture_adoption_snapshot": {
@@ -277,6 +281,8 @@ class ArchitectureReads:
 
     @contextmanager
     def open(self, role, path, max_bytes=MAX_SOURCE_BYTES):
+        if role == "architecture_inventory_metadata":
+            raise SourcePolicyError("metadata-only inventory approval cannot authorize content reads")
         path = self.authorize(role, path)
         if isinstance(max_bytes, bool) or not isinstance(max_bytes, int) or max_bytes <= 0:
             raise SourcePolicyError("Architecture read bound must be a positive integer")
@@ -294,7 +300,15 @@ class ArchitectureReads:
         path = self.authorize(role, path)
         with self.open(role, path, max_bytes=max_bytes) as handle:
             info = os.fstat(handle.fileno())
-            raw = handle.read(max_bytes + 1)
+            chunks = []
+            remaining = max_bytes + 1
+            while remaining:
+                block = handle.read(min(65536, remaining))
+                if not block:
+                    break
+                chunks.append(block)
+                remaining -= len(block)
+            raw = b"".join(chunks)
         if len(raw) > max_bytes:
             raise SourceReadLimitError("approved Architecture input exceeds its bounded read")
         return raw, {"path": str(path), "role": role, "sha256": hashlib.sha256(raw).hexdigest(),

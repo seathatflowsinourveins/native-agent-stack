@@ -9,6 +9,29 @@ REPO = Path(__file__).resolve().parents[1]
 G5 = "research/coverage-gap-20261008/grand-catalog/start-closure-1-20261008T2140Z/class-ruling-20261009T0031Z/g5-landscape-evidence-2026-10-08.tar.zst"
 REFRESH = "research/fullspeed-20261008/g5-stars-gap/local-pages/refresh-receipt.json"
 
+# Reviewed fixture inputs are explicit constants. Runtime discoveries and a
+# selecting catalog/manifest never add permissions to this inventory role.
+INVENTORY_EXACT = {
+    "repo": [
+        "adoption/skills/manifest.json", "adoption/manifest.json", "manifests/stack.json",
+        "catalogs/landscape/manifest.json", "catalogs/landscape/foundation.json",
+        "catalogs/landscape/us-equities.json", "tools/local-pages/architecture_mapping.json",
+        ".claude/skills/known/SKILL.md", ".claude/skills/changed/SKILL.md",
+        ".claude/skills/unknown/SKILL.md", ".claude/skills/.system/native/SKILL.md",
+        ".claude/skills/large/SKILL.md", "adoption/agents/blind-judge.md",
+        "adoption/agents/codex/reviewer.toml", "adoption/agents/codex/SHA256SUMS",
+        ".github/workflows/harness-audit.yml", ".github/workflows/check.yml",
+        "scripts/evidence_manifest.py", "scripts/approved.py",
+        "adoption/agents/manifest.json",
+    ],
+    "state": ["coordination/command-center/pages/automation-projection.json"],
+    "user": [
+        ".agents/skills/known/SKILL.md", ".agents/skills/changed/SKILL.md",
+        ".agents/skills/unknown/SKILL.md", ".agents/skills/.system/native/SKILL.md",
+        ".agents/skills/large/SKILL.md", ".agents/skills/frontend-design/SKILL.md",
+    ],
+}
+
 def policy_fixture(path):
     document = json.loads((REPO / "tools/local-pages/source_policy.json").read_text())
     exact = {
@@ -34,6 +57,16 @@ def policy_fixture(path):
         role: [{"root": root, "path": relative} for relative in paths]
         for role, (root, paths) in exact.items()
     }
+    document["architecture"]["architecture_inventory"] = [
+        {"root": root, "path": relative}
+        for root, paths in INVENTORY_EXACT.items() for relative in paths
+    ]
+    document["architecture"]["architecture_inventory_metadata"] = [
+        {"root": "user", "path": relative} for relative in (
+            ".codex/agents/reviewer.toml", ".config/systemd/user/example.timer",
+            ".config/systemd/user/example.service",
+        )
+    ]
     document["architecture_families"] = {
         "architecture_adoption_snapshot": {
             "root": "state",
