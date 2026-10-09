@@ -1,9 +1,9 @@
 {
   "schema": "sdk-runtime-adoption-decisions/2",
-  "status": "REVIEW_REVISION_PREPARED_NOT_YET_PUBLISHED",
+  "status": "MICRO_RECORD_FIXES_PREPARED_ONE_REBASE_HEAD_PENDING_GATES",
   "observations": {
     "path": "evidence/artifacts/sdk-runtime-adoption-20261008/observations.json",
-    "sha256": "7a7ed73a67b60748f16aa78f60f23450ebeea2fda797fa07bbae6561b00b0b75"
+    "sha256": "4c6a955616cf0741b13dadfe35424f1fd6bb86fe4d9956d0f1c732e9e5bd6eef"
   },
   "decision_record": "docs/decisions/2026-10-08-sdk-runtime-worker-adoption.md",
   "organic_use_definition": "An ordinary real job causes the owning role in a fresh native session to select its configured route without SDK, skill or tool names in the task prompt; native invocation and the task oracle are retained with role attribution.",
@@ -46,8 +46,24 @@
           "invoke_rates_are_selection_input": false,
           "final_owner_decision": "PENDING",
           "role_slot": "programmatic Claude session control",
-          "current_incumbent": "Native Claude session for current non-programmatic job; application requirement pending",
-          "overlap_disposition": "Alternative only when programmatic-control gap is declared; no competing coordinator default."
+          "current_incumbent": "Landed definitive Claude Agent SDK on the programmatic Claude route; native Claude retained for interactive work",
+          "overlap_disposition": "Alternative only when programmatic-control gap is declared; no competing coordinator default.",
+          "landed_decision_sources": [
+            {
+              "path": "docs/decisions/2026-10-01-new-wsl-definitive-defaults.md",
+              "sha256": "1b59e7b2100199d2b3a2125a811c7959c11dc55be9d029d4c0f676bbd9059ff5",
+              "bytes": 80195,
+              "locator": "lines 56"
+            },
+            {
+              "path": "docs/decisions/2026-10-02-new-wsl-layer-consensus.md",
+              "sha256": "a3a0e724c2997ce1323b87b07f80e72e57d50d9bb1ce75f4a4a356409225be39",
+              "bytes": 50007,
+              "locator": "lines 162-164"
+            }
+          ],
+          "governing_selection": "Landed selection preserved unless a cited superseding decision is supplied; this DEFER applies to new or changed deployment acceptance.",
+          "rule_b_overlap": "Overlapping role/engine surface; retained as selected baseline or scoped candidate, with no new competing default. Final ranking belongs to post-G5 catalog write."
         },
         "2_wiring": {
           "status": "RETAINED_CANDIDATE_OR_ACTIVATION_PENDING",
@@ -83,7 +99,7 @@
           "evidence": "sealed_native_evidence/claude-agent-sdk"
         },
         "4_invoke_measurement": {
-          "status": "BASELINE_ROLE_JOIN_LIMITED",
+          "status": "BASELINE_NATIVE_ROLE_LABELS_RETAINED_PACKAGE_PATH_UNAVAILABLE",
           "source": "observations/adoption_observation",
           "hourly_sdk_snapshot": {
             "path": "${STATE_ROOT}/coordination/ns2604-coop/notes/adoption-evidence-20261008/adoption-now-e129759fe91ffbb1.json",
@@ -96,21 +112,48 @@
               "client_or_service": "claude-code",
               "definition": "sum by (query_source) (count_over_time({service_name=\"claude-code\"} | query_source=~\"sdk.*\" [24h]))",
               "window_hours": 24,
-              "window_end_utc": "2026-10-09T01:06:56.047839+00:00",
+              "window_end_utc": "2026-10-09T01:06:56Z",
               "count": 540,
               "counting_unit": "events with query_source=sdk",
               "owning_role_count": null,
               "denominator": null,
               "denominator_unit": "unknown native owning-role population",
               "source": {
-                "path": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/claude_sdk_query_sources.1dcaf1644038547fca635340996755bae05edba9bdf0ef27143851f31d31df77.loki.json",
+                "path": "evidence/artifacts/sdk-runtime-adoption-20261008/loki/claude_sdk_query_sources.1dcaf1644038547fca635340996755bae05edba9bdf0ef27143851f31d31df77.loki.json",
                 "sha256": "1dcaf1644038547fca635340996755bae05edba9bdf0ef27143851f31d31df77",
-                "locator": "/data/result"
+                "locator": "/data/result",
+                "bytes": 3846
               },
-              "role_attribution_gap": "Returned aggregate has no owning-role identifier; defer organic adoption until native role join exists.",
-              "count_scope": "Native service/query projection; not automatically this package's organic owning-role use."
+              "role_attribution_gap": "Native lane event counts are retained; selected package path, organic completion and owning-role task denominator are unavailable.",
+              "count_scope": "Native service/query projection; not automatically this package's organic owning-role use.",
+              "evaluation_time_ns": "1791508016000000000",
+              "availability": "RETAINED_IN_PR_TREE",
+              "native_role_counts": {
+                "api-actions": 80,
+                "skills-lifecycle": 115,
+                "unlabelled": 345
+              },
+              "native_role_counts_source": {
+                "path": "evidence/artifacts/sdk-runtime-adoption-20261008/loki/claude_sdk_events_by_role.af7cc227152d2d87e50cae7f89994011224195379726fd0a050f27d284771b58.loki.json",
+                "sha256": "af7cc227152d2d87e50cae7f89994011224195379726fd0a050f27d284771b58",
+                "bytes": 4008,
+                "locator": "/data/result"
+              }
             }
-          ]
+          ],
+          "native_role_counts": {
+            "api-actions": 80,
+            "skills-lifecycle": 115,
+            "unlabelled": 345
+          },
+          "native_role_counts_source": {
+            "path": "evidence/artifacts/sdk-runtime-adoption-20261008/loki/claude_sdk_events_by_role.af7cc227152d2d87e50cae7f89994011224195379726fd0a050f27d284771b58.loki.json",
+            "sha256": "af7cc227152d2d87e50cae7f89994011224195379726fd0a050f27d284771b58",
+            "bytes": 4008,
+            "locator": "/data/result"
+          },
+          "native_role_count_unit": "SDK-source log events grouped by native ecosystem_lane, not completed tasks",
+          "owning_package_organic_jobs": null
         }
       }
     },
@@ -122,7 +165,7 @@
       "version": "openai-codex==0.160.0 (script lock)",
       "source": "openai/codex@a956835d020762cb2b570053af06f643a11c0ecc:sdk/python/src/openai_codex/api.py",
       "evidence_ref": "source_refs/codex_python_worker and evidence/receipts/omniroute-sdk-worker-0160-20261003.json",
-      "boundary": "October3 receipt queried20128 and proves historical route only; no live21128 SDK task receipt is retained for this row. Writing and native role attribution remain unqualified.",
+      "boundary": "October 3 receipt queried 20128 and proves historical route only; no live 21128 SDK task receipt is retained for this row. Writing and native role attribution remain unqualified.",
       "landed_catalog_pointers": [
         "/layers/2",
         "/layers/16"
@@ -145,15 +188,31 @@
           "invoke_rates_are_selection_input": false,
           "final_owner_decision": "PENDING",
           "role_slot": "programmatic local Codex session control",
-          "current_incumbent": "Landed Codex SDK/CLI incumbent and existing bounded Python route",
-          "overlap_disposition": "Same engine as native Codex; a deployment route, not a second autonomous default."
+          "current_incumbent": "Landed definitive Codex SDK and exec/app-server; bounded Python deployment acceptance remains pending",
+          "overlap_disposition": "Same engine as native Codex; a deployment route, not a second autonomous default.",
+          "landed_decision_sources": [
+            {
+              "path": "docs/decisions/2026-10-01-new-wsl-definitive-defaults.md",
+              "sha256": "1b59e7b2100199d2b3a2125a811c7959c11dc55be9d029d4c0f676bbd9059ff5",
+              "bytes": 80195,
+              "locator": "lines 57"
+            },
+            {
+              "path": "docs/decisions/2026-10-02-new-wsl-layer-consensus.md",
+              "sha256": "a3a0e724c2997ce1323b87b07f80e72e57d50d9bb1ce75f4a4a356409225be39",
+              "bytes": 50007,
+              "locator": "lines 165-167"
+            }
+          ],
+          "governing_selection": "Landed selection preserved unless a cited superseding decision is supplied; this DEFER applies to new or changed deployment acceptance.",
+          "rule_b_overlap": "Overlapping role/engine surface; retained as selected baseline or scoped candidate, with no new competing default. Final ranking belongs to post-G5 catalog write."
         },
         "2_wiring": {
           "status": "EXISTING_CODE_HOST_ROUTE_ACCEPTANCE_PENDING",
           "install": "uv run --locked --script examples/omniroute-codex-sdk/worker.py --preflight --workspace <owned-project> --codex-home <private-native-home>",
-          "pin": "openai-codex0.160.0 / a956835d020762cb2b570053af06f643a11c0ecc and committed script lock",
+          "pin": "openai-codex 0.160.0 / a956835d020762cb2b570053af06f643a11c0ecc and committed script lock",
           "inverse": "Restore prior child-only launch arguments/native project skill bytes from its bound repository revision; preserve SDK cache and receipts. No persistent install/config change is proposed here.",
-          "route": "Claude native project Skill to existing worker at21128; Codex uses native worker role. Historical20128 acceptance is not21128 acceptance.",
+          "route": "Claude native project Skill to existing worker at 21128; Codex uses native worker role. Historical 20128 acceptance is not 21128 acceptance.",
           "changes_deployed": false,
           "vendor_routing_source": {
             "source_url": "https://code.claude.com/docs/en/skills.md",
@@ -216,37 +275,43 @@
               "client_or_service": "codex-sdk-receipt",
               "definition": "sum (count_over_time({service_name=\"codex-sdk-receipt\"}[24h]))",
               "window_hours": 24,
-              "window_end_utc": "2026-10-09T01:06:56.047839+00:00",
+              "window_end_utc": "2026-10-09T01:06:56Z",
               "count": 0,
               "counting_unit": "SDK receipt-spool events",
               "owning_role_count": null,
               "denominator": null,
               "denominator_unit": "unknown native owning-role population",
               "source": {
-                "path": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/python_sdk_receipt_events.145e231eda2d3d1d9210bc829f05580c149d5047eaffe3c39294967ec43fe11e.loki.json",
+                "path": "evidence/artifacts/sdk-runtime-adoption-20261008/loki/python_sdk_receipt_events.145e231eda2d3d1d9210bc829f05580c149d5047eaffe3c39294967ec43fe11e.loki.json",
                 "sha256": "145e231eda2d3d1d9210bc829f05580c149d5047eaffe3c39294967ec43fe11e",
-                "locator": "/data/result"
+                "locator": "/data/result",
+                "bytes": 3639
               },
               "role_attribution_gap": "Returned aggregate has no owning-role identifier; defer organic adoption until native role join exists.",
-              "count_scope": "Native service/query projection; not automatically this package's organic owning-role use."
+              "count_scope": "Native service/query projection; not automatically this package's organic owning-role use.",
+              "evaluation_time_ns": "1791508016000000000",
+              "availability": "RETAINED_IN_PR_TREE"
             },
             {
               "client_or_service": "codex-app-server",
               "definition": "sum by (ecosystem_lane, client) (count_over_time({service_name=\"codex-app-server\"}[24h]))",
               "window_hours": 24,
-              "window_end_utc": "2026-10-09T01:06:56.047839+00:00",
+              "window_end_utc": "2026-10-09T01:06:56Z",
               "count": 30,
               "counting_unit": "all app-server events",
               "owning_role_count": null,
               "denominator": null,
               "denominator_unit": "unknown native owning-role population",
               "source": {
-                "path": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/app_server_events_by_client.f5a6eac9d40b5d5233694fc8f8e773a632f6f0dc7a426a262453ed5e03894b66.loki.json",
+                "path": "evidence/artifacts/sdk-runtime-adoption-20261008/loki/app_server_events_by_client.f5a6eac9d40b5d5233694fc8f8e773a632f6f0dc7a426a262453ed5e03894b66.loki.json",
                 "sha256": "f5a6eac9d40b5d5233694fc8f8e773a632f6f0dc7a426a262453ed5e03894b66",
-                "locator": "/data/result"
+                "locator": "/data/result",
+                "bytes": 3721
               },
               "role_attribution_gap": "Returned aggregate has no owning-role identifier; defer organic adoption until native role join exists.",
-              "count_scope": "Native service/query projection; not automatically this package's organic owning-role use."
+              "count_scope": "Native service/query projection; not automatically this package's organic owning-role use.",
+              "evaluation_time_ns": "1791508016000000000",
+              "availability": "RETAINED_IN_PR_TREE"
             }
           ]
         }
@@ -275,7 +340,7 @@
         "source_refs/capability_gate_contract",
         "current_inventory/promptfoo_callers"
       ],
-      "reason": "A native provider caller exists and is required for the current capability-gate job. KEEP this dependency and qualify fresh role attribution; no SDK/framework superiority is claimed.",
+      "reason": "Retain the provider dependency while the capability-gate executable/version mismatch and fresh role attribution remain unqualified; current new acceptance is DEFER.",
       "installed_paths": [
         "${USER_HOME}/.local/share/codex-ecosystem/tools/promptfoo-0.123.1/lib/node_modules/promptfoo/node_modules/@openai/codex-sdk/package.json",
         "${USER_HOME}/.local/share/codex-ecosystem/tools/promptfoo-0.124.0/lib/node_modules/promptfoo/node_modules/@openai/codex-sdk/package.json"
@@ -283,7 +348,7 @@
       "landed_catalog_pointers": [
         "/layers/16"
       ],
-      "boundary": "promptfoo0.123.1 bundles SDK0.153.4; current CLI0.124.0 bundles0.156.1. Shared service counts do not prove which package version executed.",
+      "boundary": "promptfoo 0.123.1 bundles SDK 0.153.4; current CLI 0.124.0 bundles 0.156.1. Shared service counts do not prove which package version executed.",
       "stages": {
         "1_final_candidate": {
           "status": "PENDING_G5_RELEASE",
@@ -299,13 +364,29 @@
           "invoke_rates_are_selection_input": false,
           "final_owner_decision": "PENDING",
           "role_slot": "capability-gate evaluator",
-          "current_incumbent": "Existing configured promptfoo Codex provider",
-          "overlap_disposition": "No competing SDK default introduced; this is a distinct evaluator job."
+          "current_incumbent": "Landed Codex SDK surface; preserved configured promptfoo provider, installed evaluator unqualified",
+          "overlap_disposition": "No competing SDK default introduced; this is a distinct evaluator job.",
+          "landed_decision_sources": [
+            {
+              "path": "docs/decisions/2026-10-01-new-wsl-definitive-defaults.md",
+              "sha256": "1b59e7b2100199d2b3a2125a811c7959c11dc55be9d029d4c0f676bbd9059ff5",
+              "bytes": 80195,
+              "locator": "lines 57"
+            },
+            {
+              "path": "docs/decisions/2026-10-02-new-wsl-layer-consensus.md",
+              "sha256": "a3a0e724c2997ce1323b87b07f80e72e57d50d9bb1ce75f4a4a356409225be39",
+              "bytes": 50007,
+              "locator": "lines 165-167"
+            }
+          ],
+          "governing_selection": "Landed selection preserved unless a cited superseding decision is supplied; this DEFER applies to new or changed deployment acceptance.",
+          "rule_b_overlap": "Overlapping role/engine surface; retained as selected baseline or scoped candidate, with no new competing default. Final ranking belongs to post-G5 catalog write."
         },
         "2_wiring": {
           "status": "EXISTING_PROVIDER_CALLER",
           "install": "npm install --global --prefix <owned-promptfoo-prefix> promptfoo@0.123.1",
-          "pin": "promptfoo0.123.1 bundled @openai/codex-sdk0.153.4",
+          "pin": "promptfoo 0.123.1 bundled @openai/codex-sdk 0.153.4",
           "inverse": "npm uninstall --global --prefix <owned-promptfoo-prefix> promptfoo (only if that exact owned install was newly added)",
           "route": "Vendor openai:codex-sdk provider configured by tools/capability-gate; Claude/Codex evaluator invokes existing driver; no SDK tool name added to task.",
           "changes_deployed": false,
@@ -323,6 +404,12 @@
               "changes_deployed": false
             },
             "reference_profile_costs": "observations/memory_cost_evidence/reference_role_trial; whole-profile values do not measure this component"
+          },
+          "installed_gate_status": {
+            "observations_locator": "/current_inventory/capability_gate_executable_state",
+            "driver_pin": "0.123.1",
+            "path_version": "0.124.0",
+            "status": "UNQUALIFIED_VERSION_MISMATCH; CLI_VERSION_PROBE_TIMEOUT; GATE_NOT_RUN"
           }
         },
         "3_fresh_session": {
@@ -350,77 +437,140 @@
           "evidence_entries": [
             {
               "client_or_service": "sdk:codex_sdk_ts:unlabelled",
-              "definition": "Distinct native conversations with codex.tool_result in the producer's24h window",
+              "definition": "Distinct native conversations with codex.tool_result in the producer's 24h window",
               "window_hours": 24,
               "window_end_utc": "2026-10-09T01:39:38Z",
               "count": 80,
               "counting_unit": "tool-using SDK conversations; shared service",
               "owning_role_count": null,
               "denominator": 931,
-              "denominator_unit": "all native Codex conversations in immutable snapshot,931",
+              "denominator_unit": "all native Codex conversations in immutable snapshot, 931",
               "source": {
                 "path": "${STATE_ROOT}/coordination/ns2604-coop/notes/adoption-evidence-20261008/adoption-now-e129759fe91ffbb1.json",
                 "sha256": "e129759fe91ffbb133de2719a7d5194fe96ac65c44b222adf7fdd4d65af0e872",
                 "locator": "/codex_by_lane/sdk:codex_sdk_ts:unlabelled/conversations"
               },
               "role_attribution_gap": "SDK lane label is unlabelled; package path and natural evaluator role are not joined.",
-              "count_scope": "Native service/query projection; not automatically this package's organic owning-role use."
+              "count_scope": "Native service/query projection; not automatically this package's organic owning-role use.",
+              "denominator_source": {
+                "path": "${STATE_ROOT}/coordination/ns2604-coop/notes/adoption-evidence-20261008/adoption-now-e129759fe91ffbb1.json",
+                "sha256": "e129759fe91ffbb133de2719a7d5194fe96ac65c44b222adf7fdd4d65af0e872",
+                "locator": "/codex_total_conversations"
+              }
             },
             {
               "client_or_service": "codex_sdk_ts",
               "definition": "sum by (ecosystem_lane) (count_over_time({service_name=\"codex_sdk_ts\"}[24h]))",
               "window_hours": 24,
-              "window_end_utc": "2026-10-09T01:06:56.047839+00:00",
+              "window_end_utc": "2026-10-09T01:06:56Z",
               "count": 138109,
               "counting_unit": "all log events",
               "owning_role_count": null,
               "denominator": 80,
               "denominator_unit": "distinct native SDK conversations with a tool_result; service aggregate, not role population",
               "source": {
-                "path": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/typescript_sdk_events.cdaa239e16af4499f87dd4b41886eca64f87af4d3e51fed940b4da280dd8a76d.loki.json",
+                "path": "evidence/artifacts/sdk-runtime-adoption-20261008/loki/typescript_sdk_events.cdaa239e16af4499f87dd4b41886eca64f87af4d3e51fed940b4da280dd8a76d.loki.json",
                 "sha256": "cdaa239e16af4499f87dd4b41886eca64f87af4d3e51fed940b4da280dd8a76d",
-                "locator": "/data/result"
+                "locator": "/data/result",
+                "bytes": 3767
               },
               "role_attribution_gap": "Returned aggregate has no owning-role identifier; defer organic adoption until native role join exists.",
-              "count_scope": "Native service/query projection; not automatically this package's organic owning-role use."
+              "count_scope": "Native service/query projection; not automatically this package's organic owning-role use.",
+              "evaluation_time_ns": "1791508016000000000",
+              "availability": "RETAINED_IN_PR_TREE",
+              "denominator_source": {
+                "path": "evidence/artifacts/sdk-runtime-adoption-20261008/loki/typescript_sdk_conversations.5155c4089174502e28aa676fab0bdc793108d25ddb4e8c7440ad8f73893ca542.loki.json",
+                "sha256": "5155c4089174502e28aa676fab0bdc793108d25ddb4e8c7440ad8f73893ca542",
+                "bytes": 3766,
+                "locator": "/data/result/0/value/1"
+              }
             },
             {
               "client_or_service": "codex_sdk_ts",
               "definition": "sum by (ecosystem_lane) (count_over_time({service_name=\"codex_sdk_ts\"} | event_name=\"codex.tool_result\" [24h]))",
               "window_hours": 24,
-              "window_end_utc": "2026-10-09T01:06:56.047839+00:00",
+              "window_end_utc": "2026-10-09T01:06:56Z",
               "count": 708,
               "counting_unit": "native codex.tool_result events",
               "owning_role_count": null,
               "denominator": 80,
               "denominator_unit": "distinct native SDK conversations with a tool_result; service aggregate, not role population",
               "source": {
-                "path": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/typescript_sdk_tool_results.ad183319137c43fad6a30453c71ecdab7499e19007cbc23c533ee1f609d9fbbe.loki.json",
+                "path": "evidence/artifacts/sdk-runtime-adoption-20261008/loki/typescript_sdk_tool_results.ad183319137c43fad6a30453c71ecdab7499e19007cbc23c533ee1f609d9fbbe.loki.json",
                 "sha256": "ad183319137c43fad6a30453c71ecdab7499e19007cbc23c533ee1f609d9fbbe",
-                "locator": "/data/result"
+                "locator": "/data/result",
+                "bytes": 3763
               },
               "role_attribution_gap": "Returned aggregate has no owning-role identifier; defer organic adoption until native role join exists.",
-              "count_scope": "Native service/query projection; not automatically this package's organic owning-role use."
+              "count_scope": "Native service/query projection; not automatically this package's organic owning-role use.",
+              "evaluation_time_ns": "1791508016000000000",
+              "availability": "RETAINED_IN_PR_TREE",
+              "denominator_source": {
+                "path": "evidence/artifacts/sdk-runtime-adoption-20261008/loki/typescript_sdk_conversations.5155c4089174502e28aa676fab0bdc793108d25ddb4e8c7440ad8f73893ca542.loki.json",
+                "sha256": "5155c4089174502e28aa676fab0bdc793108d25ddb4e8c7440ad8f73893ca542",
+                "bytes": 3766,
+                "locator": "/data/result/0/value/1"
+              }
             },
             {
               "client_or_service": "codex_sdk_ts",
               "definition": "count by (ecosystem_lane) (sum by (ecosystem_lane, conversation_id) (count_over_time({service_name=\"codex_sdk_ts\"} | event_name=\"codex.tool_result\" [24h])))",
               "window_hours": 24,
-              "window_end_utc": "2026-10-09T01:06:56.047839+00:00",
+              "window_end_utc": "2026-10-09T01:06:56Z",
               "count": 80,
               "counting_unit": "distinct conversations containing native tool results",
               "owning_role_count": null,
               "denominator": 80,
               "denominator_unit": "distinct native SDK conversations with a tool_result; service aggregate, not role population",
               "source": {
-                "path": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/typescript_sdk_conversations.5155c4089174502e28aa676fab0bdc793108d25ddb4e8c7440ad8f73893ca542.loki.json",
+                "path": "evidence/artifacts/sdk-runtime-adoption-20261008/loki/typescript_sdk_conversations.5155c4089174502e28aa676fab0bdc793108d25ddb4e8c7440ad8f73893ca542.loki.json",
                 "sha256": "5155c4089174502e28aa676fab0bdc793108d25ddb4e8c7440ad8f73893ca542",
-                "locator": "/data/result"
+                "locator": "/data/result",
+                "bytes": 3766
               },
               "role_attribution_gap": "Returned aggregate has no owning-role identifier; defer organic adoption until native role join exists.",
-              "count_scope": "Native service/query projection; not automatically this package's organic owning-role use."
+              "count_scope": "Native service/query projection; not automatically this package's organic owning-role use.",
+              "evaluation_time_ns": "1791508016000000000",
+              "availability": "RETAINED_IN_PR_TREE",
+              "denominator_source": {
+                "path": "evidence/artifacts/sdk-runtime-adoption-20261008/loki/typescript_sdk_conversations.5155c4089174502e28aa676fab0bdc793108d25ddb4e8c7440ad8f73893ca542.loki.json",
+                "sha256": "5155c4089174502e28aa676fab0bdc793108d25ddb4e8c7440ad8f73893ca542",
+                "bytes": 3766,
+                "locator": "/data/result/0/value/1"
+              }
             }
-          ]
+          ],
+          "hourly_presence_series": {
+            "source": {
+              "path": "evidence/artifacts/sdk-runtime-adoption-20261008/loki/typescript_sdk_identified_conversations_hourly.287ac95d39a71118e42fec6ec616a0d70f1554661990fe983f886f1836e54c77.loki.json",
+              "sha256": "287ac95d39a71118e42fec6ec616a0d70f1554661990fe983f886f1836e54c77",
+              "bytes": 3806,
+              "locator": "/data/result/0/values"
+            },
+            "observations_locator": "/adoption_observation/typescript_sdk_hourly_series",
+            "counting_unit": "Distinct identified conversations observed in each preceding hour; conversations may appear in multiple hours",
+            "distinct_24h_source": {
+              "path": "evidence/artifacts/sdk-runtime-adoption-20261008/loki/typescript_sdk_identified_conversations_all.80e8b32fd74f310b697bb38fafbc39d06e4169c44ee93023d2d4aa79ceccb860.loki.json",
+              "sha256": "80e8b32fd74f310b697bb38fafbc39d06e4169c44ee93023d2d4aa79ceccb860",
+              "bytes": 3756,
+              "locator": "/data/result/0/value/1"
+            },
+            "expiry_limit": "Dated burst baseline; any changed 24h window requires a new retained measurement. No future zero-use claim."
+          }
+        }
+      },
+      "g5_action_row": {
+        "pointer": "/rows/88",
+        "row_id": "57a68c9f0ebe83010d8f",
+        "repository": "promptfoo/promptfoo",
+        "disposition": "TRIAL",
+        "verdict": "NEEDS-FIX",
+        "pin": "421e7959642c5d4cc1c983259a268de1c6f847b9",
+        "version": "0.124.1",
+        "source": {
+          "path": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/g5_actions.d78bae7f30c83395c475ca5359022ec7e3db7cbb6a8e288ad1674a2d1ff73020.json",
+          "sha256": "d78bae7f30c83395c475ca5359022ec7e3db7cbb6a8e288ad1674a2d1ff73020",
+          "locator": "/rows/88"
         }
       }
     },
@@ -437,7 +587,7 @@
         "/layers/16"
       ],
       "installed_path": "${USER_HOME}/.local/share/new-wsl-native-stack/tools/codex-sdk",
-      "reason": "Standalone0.160.0 is distinct from promptfoo-bundled SDKs. Generic codex_sdk_ts telemetry cannot assign package path; no evidence licenses removal.",
+      "reason": "Standalone 0.160.0 is distinct from promptfoo-bundled SDKs. Generic codex_sdk_ts telemetry cannot assign package path; no evidence licenses removal.",
       "stages": {
         "1_final_candidate": {
           "status": "PENDING_G5_RELEASE",
@@ -454,8 +604,24 @@
           "invoke_rates_are_selection_input": false,
           "final_owner_decision": "PENDING",
           "role_slot": "programmatic local Codex session control",
-          "current_incumbent": "Landed Codex SDK/CLI incumbent; existing Python integration",
-          "overlap_disposition": "Standalone TS is an alternative for a demonstrated Node application, not a parallel default."
+          "current_incumbent": "Landed definitive Codex SDK/exec/app-server; standalone deployment acceptance remains pending",
+          "overlap_disposition": "Standalone TS is an alternative for a demonstrated Node application, not a parallel default.",
+          "landed_decision_sources": [
+            {
+              "path": "docs/decisions/2026-10-01-new-wsl-definitive-defaults.md",
+              "sha256": "1b59e7b2100199d2b3a2125a811c7959c11dc55be9d029d4c0f676bbd9059ff5",
+              "bytes": 80195,
+              "locator": "lines 57"
+            },
+            {
+              "path": "docs/decisions/2026-10-02-new-wsl-layer-consensus.md",
+              "sha256": "a3a0e724c2997ce1323b87b07f80e72e57d50d9bb1ce75f4a4a356409225be39",
+              "bytes": 50007,
+              "locator": "lines 165-167"
+            }
+          ],
+          "governing_selection": "Landed selection preserved unless a cited superseding decision is supplied; this DEFER applies to new or changed deployment acceptance.",
+          "rule_b_overlap": "Overlapping role/engine surface; retained as selected baseline or scoped candidate, with no new competing default. Final ranking belongs to post-G5 catalog write."
         },
         "2_wiring": {
           "status": "RETAINED_CANDIDATE_OR_ACTIVATION_PENDING",
@@ -501,41 +667,72 @@
           "evidence_entries": [
             {
               "client_or_service": "sdk:codex_sdk_ts:unlabelled",
-              "definition": "Distinct native conversations with codex.tool_result in the producer's24h window",
+              "definition": "Distinct native conversations with codex.tool_result in the producer's 24h window",
               "window_hours": 24,
               "window_end_utc": "2026-10-09T01:39:38Z",
               "count": 80,
               "counting_unit": "tool-using SDK conversations; shared service",
               "owning_role_count": null,
               "denominator": 931,
-              "denominator_unit": "all native Codex conversations in immutable snapshot,931",
+              "denominator_unit": "all native Codex conversations in immutable snapshot, 931",
               "source": {
                 "path": "${STATE_ROOT}/coordination/ns2604-coop/notes/adoption-evidence-20261008/adoption-now-e129759fe91ffbb1.json",
                 "sha256": "e129759fe91ffbb133de2719a7d5194fe96ac65c44b222adf7fdd4d65af0e872",
                 "locator": "/codex_by_lane/sdk:codex_sdk_ts:unlabelled/conversations"
               },
               "role_attribution_gap": "SDK lane label is unlabelled; package path and natural evaluator role are not joined.",
-              "count_scope": "Native service/query projection; not automatically this package's organic owning-role use."
+              "count_scope": "Native service/query projection; not automatically this package's organic owning-role use.",
+              "denominator_source": {
+                "path": "${STATE_ROOT}/coordination/ns2604-coop/notes/adoption-evidence-20261008/adoption-now-e129759fe91ffbb1.json",
+                "sha256": "e129759fe91ffbb133de2719a7d5194fe96ac65c44b222adf7fdd4d65af0e872",
+                "locator": "/codex_total_conversations"
+              }
             },
             {
               "client_or_service": "codex_sdk_ts",
               "definition": "sum by (ecosystem_lane) (count_over_time({service_name=\"codex_sdk_ts\"}[24h]))",
               "window_hours": 24,
-              "window_end_utc": "2026-10-09T01:06:56.047839+00:00",
+              "window_end_utc": "2026-10-09T01:06:56Z",
               "count": 138109,
               "counting_unit": "all log events",
               "owning_role_count": null,
               "denominator": 80,
               "denominator_unit": "distinct native SDK conversations with a tool_result; service aggregate, not role population",
               "source": {
-                "path": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/typescript_sdk_events.cdaa239e16af4499f87dd4b41886eca64f87af4d3e51fed940b4da280dd8a76d.loki.json",
+                "path": "evidence/artifacts/sdk-runtime-adoption-20261008/loki/typescript_sdk_events.cdaa239e16af4499f87dd4b41886eca64f87af4d3e51fed940b4da280dd8a76d.loki.json",
                 "sha256": "cdaa239e16af4499f87dd4b41886eca64f87af4d3e51fed940b4da280dd8a76d",
-                "locator": "/data/result"
+                "locator": "/data/result",
+                "bytes": 3767
               },
               "role_attribution_gap": "Returned aggregate has no owning-role identifier; defer organic adoption until native role join exists.",
-              "count_scope": "Native service/query projection; not automatically this package's organic owning-role use."
+              "count_scope": "Native service/query projection; not automatically this package's organic owning-role use.",
+              "evaluation_time_ns": "1791508016000000000",
+              "availability": "RETAINED_IN_PR_TREE",
+              "denominator_source": {
+                "path": "evidence/artifacts/sdk-runtime-adoption-20261008/loki/typescript_sdk_conversations.5155c4089174502e28aa676fab0bdc793108d25ddb4e8c7440ad8f73893ca542.loki.json",
+                "sha256": "5155c4089174502e28aa676fab0bdc793108d25ddb4e8c7440ad8f73893ca542",
+                "bytes": 3766,
+                "locator": "/data/result/0/value/1"
+              }
             }
-          ]
+          ],
+          "hourly_presence_series": {
+            "source": {
+              "path": "evidence/artifacts/sdk-runtime-adoption-20261008/loki/typescript_sdk_identified_conversations_hourly.287ac95d39a71118e42fec6ec616a0d70f1554661990fe983f886f1836e54c77.loki.json",
+              "sha256": "287ac95d39a71118e42fec6ec616a0d70f1554661990fe983f886f1836e54c77",
+              "bytes": 3806,
+              "locator": "/data/result/0/values"
+            },
+            "observations_locator": "/adoption_observation/typescript_sdk_hourly_series",
+            "counting_unit": "Distinct identified conversations observed in each preceding hour; conversations may appear in multiple hours",
+            "distinct_24h_source": {
+              "path": "evidence/artifacts/sdk-runtime-adoption-20261008/loki/typescript_sdk_identified_conversations_all.80e8b32fd74f310b697bb38fafbc39d06e4169c44ee93023d2d4aa79ceccb860.loki.json",
+              "sha256": "80e8b32fd74f310b697bb38fafbc39d06e4169c44ee93023d2d4aa79ceccb860",
+              "bytes": 3756,
+              "locator": "/data/result/0/value/1"
+            },
+            "expiry_limit": "Dated burst baseline; any changed 24h window requires a new retained measurement. No future zero-use claim."
+          }
         }
       }
     },
@@ -568,8 +765,24 @@
           "invoke_rates_are_selection_input": false,
           "final_owner_decision": "PENDING",
           "role_slot": "caller-owned application orchestration",
-          "current_incumbent": "Native worker/orchestration path for existing host jobs",
-          "overlap_disposition": "Application handoff/guardrail alternative pending a distinct requirement; not a second host default."
+          "current_incumbent": "Landed Claude/Codex SDKs and existing native worker path; no selected OpenAI Agents application adapter",
+          "overlap_disposition": "Application handoff/guardrail alternative pending a distinct requirement; not a second host default.",
+          "landed_decision_sources": [
+            {
+              "path": "docs/decisions/2026-10-01-new-wsl-definitive-defaults.md",
+              "sha256": "1b59e7b2100199d2b3a2125a811c7959c11dc55be9d029d4c0f676bbd9059ff5",
+              "bytes": 80195,
+              "locator": "lines 56-57"
+            },
+            {
+              "path": "docs/decisions/2026-10-02-new-wsl-layer-consensus.md",
+              "sha256": "a3a0e724c2997ce1323b87b07f80e72e57d50d9bb1ce75f4a4a356409225be39",
+              "bytes": 50007,
+              "locator": "lines 162-167"
+            }
+          ],
+          "governing_selection": "Landed selection preserved unless a cited superseding decision is supplied; this DEFER applies to new or changed deployment acceptance.",
+          "rule_b_overlap": "Overlapping role/engine surface; retained as selected baseline or scoped candidate, with no new competing default. Final ranking belongs to post-G5 catalog write."
         },
         "2_wiring": {
           "status": "RETAINED_CANDIDATE_OR_ACTIVATION_PENDING",
@@ -618,15 +831,17 @@
               "client_or_service": "No installed host adapter identified in bounded inventory",
               "definition": "No dedicated native measurement/role adapter.",
               "window_hours": 24,
-              "window_end_utc": "2026-10-09T01:06:56.047839+00:00",
+              "window_end_utc": "2026-10-09T01:06:56.047839Z",
               "count": null,
               "denominator": null,
               "source": {
                 "path": "evidence/artifacts/sdk-runtime-adoption-20261008/observations.json",
                 "locator": "/adoption_observation",
-                "sha256": "7a7ed73a67b60748f16aa78f60f23450ebeea2fda797fa07bbae6561b00b0b75"
+                "sha256": "4c6a955616cf0741b13dadfe35424f1fd6bb86fe4d9956d0f1c732e9e5bd6eef"
               },
-              "role_attribution_gap": "No dedicated native measurement/role adapter."
+              "role_attribution_gap": "No dedicated native measurement/role adapter.",
+              "availability": "UNAVAILABLE_NATIVE_ROLE_SERIES",
+              "unavailable_reason": "No dedicated native measurement/role adapter."
             }
           ]
         }
@@ -637,7 +852,7 @@
       "decision": "DEFER",
       "owner_role": "foundation coding worker",
       "job": "Additional owned coding conversation/runtime",
-      "version": "Selected unit SDK/tools1.53.0; separate editable qualification env metadata1.50.1/source1.53.0",
+      "version": "Selected unit SDK/tools 1.53.0; separate editable qualification env metadata 1.50.1/source 1.53.0",
       "source": "OpenHands/software-agent-sdk@54daf056bd863bb46f922a2fe9324dd736b37ff6:examples/01_standalone_sdk/01_hello_world.py",
       "evidence_ref": "sealed_native_evidence/openhands-sdk",
       "landed_catalog_pointers": [
@@ -661,7 +876,7 @@
           "source_version": "1.53.0",
           "source_pin": "54daf056bd863bb46f922a2fe9324dd736b37ff6",
           "dispatcher_selected": false,
-          "restore_boundary": "Vendor source resync produces metadata1.53.0; no supported restore preserves the stale1.50.1/source1.53 mix."
+          "restore_boundary": "Vendor source resync produces metadata 1.53.0; no supported restore preserves the stale 1.50.1/source 1.53 mix."
         }
       ],
       "reason": "Retain both environments and the accepted owned coding-job evidence. No better-evidenced same-job upstream replacement or failed official install is established.",
@@ -681,14 +896,30 @@
           "invoke_rates_are_selection_input": false,
           "final_owner_decision": "PENDING",
           "role_slot": "isolated or remote coding worker",
-          "current_incumbent": "Landed native Claude/Codex owned worker incumbent",
-          "overlap_disposition": "Unselected SDK alternative pending remote/container requirement and upstream-quality evidence; both existing envs retained."
+          "current_incumbent": "Landed OpenHands 1.50.1 worker baseline; separately observed 1.53.0 selected runtime and source env retained",
+          "overlap_disposition": "OpenHands is the landed worker selection. Native Codex and other workers are comparison alternatives; new version/activation acceptance is pending.",
+          "landed_decision_sources": [
+            {
+              "path": "docs/decisions/2026-10-01-new-wsl-definitive-defaults.md",
+              "sha256": "1b59e7b2100199d2b3a2125a811c7959c11dc55be9d029d4c0f676bbd9059ff5",
+              "bytes": 80195,
+              "locator": "lines 134"
+            },
+            {
+              "path": "docs/decisions/2026-10-02-new-wsl-layer-consensus.md",
+              "sha256": "a3a0e724c2997ce1323b87b07f80e72e57d50d9bb1ce75f4a4a356409225be39",
+              "bytes": 50007,
+              "locator": "lines 168-175"
+            }
+          ],
+          "governing_selection": "Landed selection preserved unless a cited superseding decision is supplied; this DEFER applies to new or changed deployment acceptance.",
+          "rule_b_overlap": "Overlapping role/engine surface; retained as selected baseline or scoped candidate, with no new competing default. Final ranking belongs to post-G5 catalog write."
         },
         "2_wiring": {
           "status": "RETAINED_CANDIDATE_OR_ACTIVATION_PENDING",
-          "install": "Selected env: uv pip install --python <owned-env>/bin/python -c <pinned-constraints> openhands-sdk==1.53.0 openhands-tools==1.53.0. Source env: vendor make build / uv sync --dev at54daf056.",
+          "install": "At OpenHands/software-agent-sdk 54daf056bd863bb46f922a2fe9324dd736b37ff6, vendor source environment: make build (Makefile:34-37 runs uv sync --dev). Existing 1.53.0 constraints export is retained with its recorded uv export command; selected package-environment procedure: uv pip install --python <selected-env>/bin/python -c <retained-constraints> openhands-sdk==1.53.0 openhands-tools==1.53.0. Existing install-plan.json:4307-4310 exports and installs 1.50.1. Neither procedure was executed in this revision.",
           "pin": "54daf056bd863bb46f922a2fe9324dd736b37ff6",
-          "inverse": "For a newly added package env, vendor package-manager uninstall; restore previous exact user-unit and skill entry if changed, by owner-reviewed diff. Existing two environments stay. Stale metadata1.50.1/source1.53.0 is not a supported restore target.",
+          "inverse": "For a newly added package env, vendor package-manager uninstall; restore previous exact user-unit and skill entry if changed, by owner-reviewed diff. Existing two environments stay. Stale metadata 1.50.1/source 1.53.0 is not a supported restore target.",
           "route": "Existing native-stack-worker skill -> openhands-job@ native unit -> selected agent-runtime-worker interpreter; retained source/qualification env separate",
           "changes_deployed": false,
           "memory_cost_gate": {
@@ -705,7 +936,29 @@
               "changes_deployed": false
             },
             "reference_profile_costs": "observations/memory_cost_evidence/reference_role_trial; whole-profile values do not measure this component"
-          }
+          },
+          "install_source": {
+            "repository": "OpenHands/software-agent-sdk",
+            "pin": "54daf056bd863bb46f922a2fe9324dd736b37ff6",
+            "locator": "Makefile:34-37; openhands-sdk/pyproject.toml:3; openhands-tools/pyproject.toml:3",
+            "observations_locator": "/vendor_openhands_install_source",
+            "constraints_header_source": {
+              "path": "evidence/artifacts/sdk-runtime-adoption-20261008/openhands-1.53.0-constraints.public.d1d7d7a010130646e5e06c1b182a226ab0ee39590b7eb429e64249562b3fc235.txt",
+              "sha256": "d1d7d7a010130646e5e06c1b182a226ab0ee39590b7eb429e64249562b3fc235",
+              "bytes": 58786,
+              "locator": "lines 1-2: normalized export header; byte-identical dependency body"
+            }
+          },
+          "selected_binary_constraints_restore": "EXISTING_EXPORT_RETAINED; installation and restore execution remain unverified",
+          "unit_header_limit": "Retained selected unit header cites 1.50.1 while its ExecStart interpreter metadata is 1.53.0; header is stale and no unit changed.",
+          "constraints_witness": {
+            "path": "evidence/artifacts/sdk-runtime-adoption-20261008/openhands-1.53.0-constraints.public.d1d7d7a010130646e5e06c1b182a226ab0ee39590b7eb429e64249562b3fc235.txt",
+            "sha256": "d1d7d7a010130646e5e06c1b182a226ab0ee39590b7eb429e64249562b3fc235",
+            "bytes": 58786,
+            "locator": "lines 1-2: normalized export header; byte-identical dependency body"
+          },
+          "constraints_raw_digest": "77f59a5d9403594b8c78be40a0bf5d20a95353ab68a4dcfde518933d6260f17e",
+          "constraints_projection_limit": "Raw export retained privately; published witness changes only two header-comment home prefixes. Dependency body is identical. No constrained install or restore ran."
         },
         "3_fresh_session": {
           "status": "PENDING_ORGANIC_OWNING_ROLE_ACCEPTANCE",
@@ -718,7 +971,7 @@
           "evidence": "sealed_native_evidence/openhands-sdk"
         },
         "4_invoke_measurement": {
-          "status": "BASELINE_ROLE_JOIN_LIMITED",
+          "status": "BASELINE_NATIVE_JOB_START_RETAINED_ROLE_UNAVAILABLE",
           "source": "observations/adoption_observation",
           "hourly_sdk_snapshot": {
             "path": "${STATE_ROOT}/coordination/ns2604-coop/notes/adoption-evidence-20261008/adoption-now-e129759fe91ffbb1.json",
@@ -729,17 +982,24 @@
           "evidence_entries": [
             {
               "client_or_service": "Native openhands-job@ user-unit and per-job run-report.json model metrics",
-              "definition": "Job reports are retained; no 24h joined client/role invocation series.",
+              "definition": "Native systemd unit-start message metadata selected by MESSAGE_ID in the fixed 24h window; no log messages retained.",
               "window_hours": 24,
-              "window_end_utc": "2026-10-09T01:06:56.047839+00:00",
-              "count": null,
+              "window_end_utc": "2026-10-09T01:06:56Z",
+              "count": 1,
               "denominator": null,
               "source": {
-                "path": "evidence/artifacts/sdk-runtime-adoption-20261008/observations.json",
-                "locator": "/adoption_observation",
-                "sha256": "7a7ed73a67b60748f16aa78f60f23450ebeea2fda797fa07bbae6561b00b0b75"
+                "path": "evidence/artifacts/sdk-runtime-adoption-20261008/openhands-job-starts.aef22b0794253231a919111201c2ad3854339480edf7da10d566aa8b572bae62.json",
+                "sha256": "aef22b0794253231a919111201c2ad3854339480edf7da10d566aa8b572bae62",
+                "bytes": 1240,
+                "locator": "/rows"
               },
-              "role_attribution_gap": "Job reports are retained; no 24h joined client/role invocation series."
+              "role_attribution_gap": "One selected unit-start message reproduced in the fixed window. No ecosystem_lane or completion label in this metadata. The CC-reported three starts are unavailable to this revision; no extra starts inferred.",
+              "availability": "RETAINED_NATIVE_START_METADATA",
+              "counting_unit": "systemd unit-start messages, not completed jobs",
+              "owning_role_count": null,
+              "native_role_counts": {
+                "unlabelled": 1
+              }
             }
           ]
         }
@@ -748,17 +1008,17 @@
     {
       "id": "deepagents-sdk",
       "decision": "DEFER",
-      "owner_role": "foundation coding worker; isolated readiness environment only",
+      "owner_role": "Application research/trial owner; isolated historical and readiness scopes",
       "job": "Additional planning/subagent/filesystem agent harness",
       "version": "0.7.23",
       "source": "langchain-ai/deepagents@9f4bdf7c8b8bfc86877729d80ed286bd71d78706:libs/deepagents/deepagents/backends/filesystem.py",
       "evidence_ref": "sealed_native_evidence/deepagents",
-      "boundary": "0.7.23 evidence is only filesystem fixture;0.7.21 live trial and dcode0.1.83 are separately retained.",
+      "boundary": "0.7.23 evidence is only filesystem fixture; 0.7.21 live trial and dcode 0.1.83 are separately retained.",
       "landed_catalog_pointers": [
         "/layers/2",
         "/layers/16"
       ],
-      "reason": "Retain isolated0.7.23 and separate0.7.21 live trial. Rule5 replacement/install-failure evidence is absent; the newer filesystem fixture does not erase older persisted-state capability evidence.",
+      "reason": "Retain isolated 0.7.23 and separate 0.7.21 live trial. Rule 5 replacement/install-failure evidence is absent; the newer filesystem fixture does not erase older persisted-state capability evidence.",
       "installed_path": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/g5-rd-tools/langchain-ai__deepagents/runtime",
       "historical_trial": {
         "version": "0.7.21",
@@ -783,14 +1043,30 @@
           "invoke_rates_are_selection_input": false,
           "final_owner_decision": "PENDING",
           "role_slot": "application-owned graph/checkpoint worker",
-          "current_incumbent": "Landed native worker path for current local tasks",
-          "overlap_disposition": "Graph/checkpoint alternative; no parallel host worker default and separate pins preserved."
+          "current_incumbent": "Landed OpenHands worker and GPT Researcher/DeerFlow gatherers; Deep Agents remains a scoped application research/trial candidate",
+          "overlap_disposition": "Graph/checkpoint alternative; no parallel host worker default and separate pins preserved.",
+          "landed_decision_sources": [
+            {
+              "path": "docs/decisions/2026-10-01-new-wsl-definitive-defaults.md",
+              "sha256": "1b59e7b2100199d2b3a2125a811c7959c11dc55be9d029d4c0f676bbd9059ff5",
+              "bytes": 80195,
+              "locator": "lines 134-135"
+            },
+            {
+              "path": "docs/decisions/2026-10-02-new-wsl-layer-consensus.md",
+              "sha256": "a3a0e724c2997ce1323b87b07f80e72e57d50d9bb1ce75f4a4a356409225be39",
+              "bytes": 50007,
+              "locator": "lines 168-179"
+            }
+          ],
+          "governing_selection": "Landed selection preserved unless a cited superseding decision is supplied; this DEFER applies to new or changed deployment acceptance.",
+          "rule_b_overlap": "Overlapping role/engine surface; retained as selected baseline or scoped candidate, with no new competing default. Final ranking belongs to post-G5 catalog write."
         },
         "2_wiring": {
           "status": "RETAINED_CANDIDATE_OR_ACTIVATION_PENDING",
-          "install": "Isolated0.7.23: uv venv --python3.13 <owned-runtime>; uv pip install --python <owned-runtime>/bin/python deepagents==0.7.23. Historical0.7.21 trial: uv pip sync --require-hashes --python <owned-env>/bin/python examples/deepagents-omniroute/requirements.lock.",
-          "pin": "SDK9f4bdf7c8b8bfc86877729d80ed286bd71d78706; trial4394bcd00b8eb46e7c423939643a0dfcfb5d8773",
-          "inverse": "Only remove a newly installed isolated env or uninstall its package; retain0.7.21 trial lock/checkpoints/receipts and dcode candidate. No current env is removed.",
+          "install": "Isolated 0.7.23: uv venv --python 3.13 <owned-runtime>; uv pip install --python <owned-runtime>/bin/python deepagents==0.7.23. Historical 0.7.21 trial: uv pip sync --require-hashes --python <owned-env>/bin/python examples/deepagents-omniroute/requirements.lock.",
+          "pin": "SDK 9f4bdf7c8b8bfc86877729d80ed286bd71d78706; trial 4394bcd00b8eb46e7c423939643a0dfcfb5d8773",
+          "inverse": "Only remove a newly installed isolated env or uninstall its package; retain 0.7.21 trial lock/checkpoints/receipts and dcode candidate. No current env is removed.",
           "route": "Vendor create_deep_agent in application; existing historical trial wrapper separately qualified; native coordinator role pending",
           "changes_deployed": false,
           "memory_cost_gate": {
@@ -807,6 +1083,20 @@
               "changes_deployed": false
             },
             "reference_profile_costs": "observations/memory_cost_evidence/reference_role_trial; whole-profile values do not measure this component"
+          },
+          "offline_parser_check": {
+            "source": {
+              "path": "evidence/artifacts/sdk-runtime-adoption-20261008/offline-parser-check.json",
+              "sha256": "ca7ec711b3ebcfe63d443f49f52a3ea96b545749874df5077be33d4d545d1bc4",
+              "bytes": 1259,
+              "locator": "/checks"
+            },
+            "uv_version": "0.12.22",
+            "bad_option_rc": 2,
+            "corrected_option_rc": 0,
+            "scope": "Offline help/argument parsing only; no environment, package or runtime installed",
+            "corrected_command": "uv venv --python 3.13 <owned-runtime>",
+            "installation_acceptance": "UNEXECUTED"
           }
         },
         "3_fresh_session": {
@@ -816,7 +1106,7 @@
             "Claude",
             "Codex"
           ],
-          "role": "foundation coding worker; isolated readiness environment only",
+          "role": "Application research/trial owner; isolated historical and readiness scopes",
           "evidence": "sealed_native_evidence/deepagents"
         },
         "4_invoke_measurement": {
@@ -833,15 +1123,17 @@
               "client_or_service": "Isolated receipt and historical trial artifacts; native LangGraph/SQLite checkpoint",
               "definition": "No current role-attributed 24h invoke series.",
               "window_hours": 24,
-              "window_end_utc": "2026-10-09T01:06:56.047839+00:00",
+              "window_end_utc": "2026-10-09T01:06:56.047839Z",
               "count": null,
               "denominator": null,
               "source": {
                 "path": "evidence/artifacts/sdk-runtime-adoption-20261008/observations.json",
                 "locator": "/adoption_observation",
-                "sha256": "7a7ed73a67b60748f16aa78f60f23450ebeea2fda797fa07bbae6561b00b0b75"
+                "sha256": "4c6a955616cf0741b13dadfe35424f1fd6bb86fe4d9956d0f1c732e9e5bd6eef"
               },
-              "role_attribution_gap": "No current role-attributed 24h invoke series."
+              "role_attribution_gap": "No current role-attributed 24h invoke series.",
+              "availability": "UNAVAILABLE_NATIVE_ROLE_SERIES",
+              "unavailable_reason": "No current role-attributed 24h invoke series."
             }
           ]
         }
@@ -850,7 +1142,7 @@
     {
       "id": "claude-gateway-runtime-trial",
       "decision": "DEFER",
-      "owner_role": "Claude coordinator",
+      "owner_role": "Application agent builder; no coordinator dispatch qualified",
       "job": "Additional gateway-translated Claude worker experiment",
       "version": "claude-agent-sdk==0.2.162 (separate script lock)",
       "source": "anthropics/claude-agent-sdk-python@f2204bb956bab02907aaf3cb88eb9dead28eaa35:README.md",
@@ -878,13 +1170,29 @@
           "invoke_rates_are_selection_input": false,
           "final_owner_decision": "PENDING",
           "role_slot": "Claude runtime-worker transport trial",
-          "current_incumbent": "Native Claude current coordinator route",
-          "overlap_disposition": "Unselected transport alternative; does not become a parallel default."
+          "current_incumbent": "Landed definitive Claude Agent SDK and native Claude route; gateway transport acceptance remains pending",
+          "overlap_disposition": "Unselected transport alternative; does not become a parallel default.",
+          "landed_decision_sources": [
+            {
+              "path": "docs/decisions/2026-10-01-new-wsl-definitive-defaults.md",
+              "sha256": "1b59e7b2100199d2b3a2125a811c7959c11dc55be9d029d4c0f676bbd9059ff5",
+              "bytes": 80195,
+              "locator": "lines 56"
+            },
+            {
+              "path": "docs/decisions/2026-10-02-new-wsl-layer-consensus.md",
+              "sha256": "a3a0e724c2997ce1323b87b07f80e72e57d50d9bb1ce75f4a4a356409225be39",
+              "bytes": 50007,
+              "locator": "lines 162-164"
+            }
+          ],
+          "governing_selection": "Landed selection preserved unless a cited superseding decision is supplied; this DEFER applies to new or changed deployment acceptance.",
+          "rule_b_overlap": "Overlapping role/engine surface; retained as selected baseline or scoped candidate, with no new competing default. Final ranking belongs to post-G5 catalog write."
         },
         "2_wiring": {
           "status": "RETAINED_CANDIDATE_OR_ACTIVATION_PENDING",
           "install": "uv run --frozen --script examples/claude-runtime-sdk/worker.py --preflight --gateway http://127.0.0.1:21128 --model <explicit-reviewed-Claude-family-route>",
-          "pin": "f2204bb956bab02907aaf3cb88eb9dead28eaa35 / committed0.2.162 script lock",
+          "pin": "f2204bb956bab02907aaf3cb88eb9dead28eaa35 / committed 0.2.162 script lock",
           "inverse": "Child-only launcher exits and closes SDK; preserve trial/lock/receipts. Restore prior child argument/owned-config bytes if changed; no current mutation.",
           "route": "Existing standalone trial only; no proven coordinator automatic selection or live gateway acceptance",
           "changes_deployed": false,
@@ -911,11 +1219,11 @@
             "Claude",
             "Codex"
           ],
-          "role": "Claude coordinator",
+          "role": "Application agent builder; no coordinator dispatch qualified",
           "evidence": "source_refs/claude_gateway_trial and examples/claude-runtime-sdk/verification.md"
         },
         "4_invoke_measurement": {
-          "status": "BASELINE_ROLE_JOIN_LIMITED",
+          "status": "BASELINE_NATIVE_ROLE_LABELS_RETAINED_PACKAGE_PATH_UNAVAILABLE",
           "source": "observations/adoption_observation",
           "hourly_sdk_snapshot": {
             "path": "${STATE_ROOT}/coordination/ns2604-coop/notes/adoption-evidence-20261008/adoption-now-e129759fe91ffbb1.json",
@@ -928,21 +1236,48 @@
               "client_or_service": "claude-code",
               "definition": "sum by (query_source) (count_over_time({service_name=\"claude-code\"} | query_source=~\"sdk.*\" [24h]))",
               "window_hours": 24,
-              "window_end_utc": "2026-10-09T01:06:56.047839+00:00",
+              "window_end_utc": "2026-10-09T01:06:56Z",
               "count": 540,
               "counting_unit": "events with query_source=sdk",
               "owning_role_count": null,
               "denominator": null,
               "denominator_unit": "unknown native owning-role population",
               "source": {
-                "path": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/claude_sdk_query_sources.1dcaf1644038547fca635340996755bae05edba9bdf0ef27143851f31d31df77.loki.json",
+                "path": "evidence/artifacts/sdk-runtime-adoption-20261008/loki/claude_sdk_query_sources.1dcaf1644038547fca635340996755bae05edba9bdf0ef27143851f31d31df77.loki.json",
                 "sha256": "1dcaf1644038547fca635340996755bae05edba9bdf0ef27143851f31d31df77",
-                "locator": "/data/result"
+                "locator": "/data/result",
+                "bytes": 3846
               },
-              "role_attribution_gap": "Returned aggregate has no owning-role identifier; defer organic adoption until native role join exists.",
-              "count_scope": "Native service/query projection; not automatically this package's organic owning-role use."
+              "role_attribution_gap": "Native lane event counts are retained; selected package path, organic completion and owning-role task denominator are unavailable.",
+              "count_scope": "Native service/query projection; not automatically this package's organic owning-role use.",
+              "evaluation_time_ns": "1791508016000000000",
+              "availability": "RETAINED_IN_PR_TREE",
+              "native_role_counts": {
+                "api-actions": 80,
+                "skills-lifecycle": 115,
+                "unlabelled": 345
+              },
+              "native_role_counts_source": {
+                "path": "evidence/artifacts/sdk-runtime-adoption-20261008/loki/claude_sdk_events_by_role.af7cc227152d2d87e50cae7f89994011224195379726fd0a050f27d284771b58.loki.json",
+                "sha256": "af7cc227152d2d87e50cae7f89994011224195379726fd0a050f27d284771b58",
+                "bytes": 4008,
+                "locator": "/data/result"
+              }
             }
-          ]
+          ],
+          "native_role_counts": {
+            "api-actions": 80,
+            "skills-lifecycle": 115,
+            "unlabelled": 345
+          },
+          "native_role_counts_source": {
+            "path": "evidence/artifacts/sdk-runtime-adoption-20261008/loki/claude_sdk_events_by_role.af7cc227152d2d87e50cae7f89994011224195379726fd0a050f27d284771b58.loki.json",
+            "sha256": "af7cc227152d2d87e50cae7f89994011224195379726fd0a050f27d284771b58",
+            "bytes": 4008,
+            "locator": "/data/result"
+          },
+          "native_role_count_unit": "SDK-source log events grouped by native ecosystem_lane, not completed tasks",
+          "owning_package_organic_jobs": null
         }
       }
     },
@@ -973,14 +1308,30 @@
           },
           "invoke_rates_are_selection_input": false,
           "final_owner_decision": "PENDING",
-          "role_slot": "public-source research gatherer",
-          "current_incumbent": "Landed browser/retrieval default; final research-owner list pending",
-          "overlap_disposition": "Alternative autonomous research loop; no parallel default until owner names its slot/gap."
+          "role_slot": "baseline public-source research gatherer",
+          "current_incumbent": "Landed GPT Researcher 3.7.0 baseline gatherer",
+          "overlap_disposition": "GPT Researcher remains the baseline gatherer; its revised activation is DEFER.",
+          "landed_decision_sources": [
+            {
+              "path": "docs/decisions/2026-10-01-new-wsl-definitive-defaults.md",
+              "sha256": "1b59e7b2100199d2b3a2125a811c7959c11dc55be9d029d4c0f676bbd9059ff5",
+              "bytes": 80195,
+              "locator": "lines 135"
+            },
+            {
+              "path": "docs/decisions/2026-10-02-new-wsl-layer-consensus.md",
+              "sha256": "a3a0e724c2997ce1323b87b07f80e72e57d50d9bb1ce75f4a4a356409225be39",
+              "bytes": 50007,
+              "locator": "lines 176-179"
+            }
+          ],
+          "governing_selection": "Landed selection preserved unless a cited superseding decision is supplied; this DEFER applies to new or changed deployment acceptance.",
+          "rule_b_overlap": "Overlapping role/engine surface; retained as selected baseline or scoped candidate, with no new competing default. Final ranking belongs to post-G5 catalog write."
         },
         "2_wiring": {
           "status": "RETAINED_CANDIDATE_OR_ACTIVATION_PENDING",
-          "install": "Existing selected gptr-mcp63884773685b1f12c7f0d9e283b3d71a5b9b5fda checkout: pip install -r requirements.txt; python server.py. Resolve/pin environment and pass existing consensus gate before native client registration.",
-          "pin": "gpt-researcher0957c301ed06c2a5857b834358c7227c739041d4 / gptr-mcp63884773685b1f12c7f0d9e283b3d71a5b9b5fda",
+          "install": "Existing selected gptr-mcp at 63884773685b1f12c7f0d9e283b3d71a5b9b5fda checkout: pip install -r requirements.txt; python server.py. Resolve/pin environment and pass existing consensus gate before native client registration.",
+          "pin": "gpt-researcher at 0957c301ed06c2a5857b834358c7227c739041d4 / gptr-mcp at 63884773685b1f12c7f0d9e283b3d71a5b9b5fda",
           "inverse": "Existing gate requires bounded start/stop/removal; pinned vendor uninstall/client-registration inverse not yet accepted. Restore only reviewed native MCP/Skill registration diff if later deployed.",
           "route": "Vendor skill -> selected vendor gptr-mcp STDIO; useful result in Claude and Codex before activation; profile currently unexposed/unaccepted",
           "changes_deployed": false,
@@ -991,7 +1342,7 @@
             "adopt_now_allowed": false,
             "shared_copy": {
               "status": "SUPPORTED_VENDOR_NETWORK_ROUTE_ACCEPTANCE_PENDING",
-              "evidence": "Vendor README63884773 documents STDIO, SSE and streamable-HTTP deployment. Shared service is source-supported in principle; client/lifecycle/auth/state acceptance pending."
+              "evidence": "Vendor README at 63884773 documents STDIO, SSE and streamable-HTTP deployment. Shared service is source-supported in principle; client/lifecycle/auth/state acceptance pending."
             },
             "role_loading": {
               "policy": "Only owning role/client; alwaysLoad:false where supported; user-level changes require CC-reviewed diff",
@@ -1021,17 +1372,19 @@
           "evidence_entries": [
             {
               "client_or_service": "Native CLI report; future gptr-mcp native MCP tool_result route",
-              "definition": "gptr-mcp not exposed/qualified in this profile; current CLI reports lack per-role24h join.",
+              "definition": "gptr-mcp not exposed/qualified in this profile; current CLI reports lack per-role 24h join.",
               "window_hours": 24,
-              "window_end_utc": "2026-10-09T01:06:56.047839+00:00",
+              "window_end_utc": "2026-10-09T01:06:56.047839Z",
               "count": null,
               "denominator": null,
               "source": {
                 "path": "evidence/artifacts/sdk-runtime-adoption-20261008/observations.json",
                 "locator": "/adoption_observation",
-                "sha256": "7a7ed73a67b60748f16aa78f60f23450ebeea2fda797fa07bbae6561b00b0b75"
+                "sha256": "4c6a955616cf0741b13dadfe35424f1fd6bb86fe4d9956d0f1c732e9e5bd6eef"
               },
-              "role_attribution_gap": "gptr-mcp not exposed/qualified in this profile; current CLI reports lack per-role24h join."
+              "role_attribution_gap": "gptr-mcp not exposed/qualified in this profile; current CLI reports lack per-role 24h join.",
+              "availability": "UNAVAILABLE_NATIVE_ROLE_SERIES",
+              "unavailable_reason": "gptr-mcp not exposed/qualified in this profile; current CLI reports lack per-role 24h join."
             }
           ]
         }
@@ -1064,13 +1417,29 @@
           },
           "invoke_rates_are_selection_input": false,
           "final_owner_decision": "PENDING",
-          "role_slot": "public-source research gatherer",
-          "current_incumbent": "Landed browser/retrieval default; final research-owner list pending",
-          "overlap_disposition": "Overlaps GPT Researcher for gatherer slot; owner ranks alternatives, not parallel defaults."
+          "role_slot": "second independent public-source research gatherer",
+          "current_incumbent": "Landed DeerFlow selected second independent gatherer",
+          "overlap_disposition": "DeerFlow remains the selected independent second gatherer; its revised activation is DEFER. Compare alternatives at post-G5 catalog write.",
+          "landed_decision_sources": [
+            {
+              "path": "docs/decisions/2026-10-01-new-wsl-definitive-defaults.md",
+              "sha256": "1b59e7b2100199d2b3a2125a811c7959c11dc55be9d029d4c0f676bbd9059ff5",
+              "bytes": 80195,
+              "locator": "lines 135"
+            },
+            {
+              "path": "docs/decisions/2026-10-02-new-wsl-layer-consensus.md",
+              "sha256": "a3a0e724c2997ce1323b87b07f80e72e57d50d9bb1ce75f4a4a356409225be39",
+              "bytes": 50007,
+              "locator": "lines 176-179"
+            }
+          ],
+          "governing_selection": "Landed selection preserved unless a cited superseding decision is supplied; this DEFER applies to new or changed deployment acceptance.",
+          "rule_b_overlap": "Overlapping role/engine surface; retained as selected baseline or scoped candidate, with no new competing default. Final ranking belongs to post-G5 catalog write."
         },
         "2_wiring": {
           "status": "RETAINED_CANDIDATE_OR_ACTIVATION_PENDING",
-          "install": "cd <source345f08be00c8a9495079b732a39b46aa9af1584e>/backend; uv sync --locked; make -C <source>/backend test",
+          "install": "cd <pinned-source>/backend; uv sync --locked; make -C <source>/backend test",
           "pin": "345f08be00c8a9495079b732a39b46aa9af1584e",
           "inverse": "NEEDS-FIX: no verified vendor uninstall; reset_session_pool returns rather than closes old pool. Owner-reviewed service/skill diff and explicit lifecycle inverse required before new HTTP activation.",
           "route": "Claude vendor claude-to-deerflow skill -> DEERFLOW_URL HTTP service; embedded current route separate. Codex dispatcher unsupported until separately qualified",
@@ -1114,15 +1483,17 @@
               "client_or_service": "Embedded DeerFlowClient reports; vendor HTTP threads/runs on DEERFLOW_URL if qualified",
               "definition": "Retained research run metrics lack owning-role/client attribution; embedded use does not qualify HTTP.",
               "window_hours": 24,
-              "window_end_utc": "2026-10-09T01:06:56.047839+00:00",
+              "window_end_utc": "2026-10-09T01:06:56.047839Z",
               "count": null,
               "denominator": null,
               "source": {
                 "path": "evidence/artifacts/sdk-runtime-adoption-20261008/observations.json",
                 "locator": "/adoption_observation",
-                "sha256": "7a7ed73a67b60748f16aa78f60f23450ebeea2fda797fa07bbae6561b00b0b75"
+                "sha256": "4c6a955616cf0741b13dadfe35424f1fd6bb86fe4d9956d0f1c732e9e5bd6eef"
               },
-              "role_attribution_gap": "Retained research run metrics lack owning-role/client attribution; embedded use does not qualify HTTP."
+              "role_attribution_gap": "Retained research run metrics lack owning-role/client attribution; embedded use does not qualify HTTP.",
+              "availability": "UNAVAILABLE_NATIVE_ROLE_SERIES",
+              "unavailable_reason": "Retained research run metrics lack owning-role/client attribution; embedded use does not qualify HTTP."
             }
           ]
         }
@@ -1131,44 +1502,230 @@
   ],
   "deployment": "NONE",
   "acceptance": {
-    "designated_claude": "CHANGES_REQUESTED",
-    "designated_gpt_exec": "CHANGES_REQUESTED",
-    "ci": "PREVIOUS_HEAD_PASSED_REVISION_PENDING",
-    "ci_head": "45cbdbad4439dba6422fc6617eceee58502a8aaf",
-    "pre_cue": "PENDING",
+    "designated_claude": "PASS_WITH_P3_AT_62426CF9",
+    "designated_gpt_exec": "CHANGES_REQUESTED_P3_AT_62426CF9",
+    "ci": "PENDING_REBASED_HEAD",
+    "ci_head": null,
+    "pre_cue": "PENDING_REBASED_HEAD",
     "cc_cue": "PENDING",
     "owner_decisions": "PENDING",
     "g5_release_binding": "PENDING",
     "wiring_or_retirement_deployed": false,
-    "delta_reads": "PENDING_REVISION_HEAD",
+    "delta_reads": "PENDING_REBASE_DELTA_MICRO_READS",
     "schema_label_note": "Gate status uses PENDING; missing canonical entry point is a separate gap field.",
-    "pre_cue_entrypoint": null,
+    "pre_cue_entrypoint": "${STATE_ROOT}/coordination/command-center/cc-tools/base_tests_at_head.sh",
     "memory_cost_gate": "PENDING_COMPONENT_SPECIFIC_PSS"
   },
   "landed_catalog_reconciliation": {
     "path": "catalogs/landscape/foundation.json",
     "sha256": "868d193a31080ab913400725140bd0d01e0afe97e28564fd12777f737d22951a",
-    "base": "aba02ec3456d383bcc2fc72883db098f9be7918a",
+    "base": "58080c6b435d14c57f5b9e0bbbc0658add41c8d9",
     "changed_catalog_rows": [],
-    "workers": "Existing native worker selection retained; local host-route wire pending.",
-    "web_research": "Existing browser/retrieval selection retained; research rows deferred to owner's final list.",
-    "agent_sdks": "Existing Codex selection retained; Claude/OpenHands/Agents alternatives are not promoted by this record."
+    "workers": "Native Claude/Codex workers with owned Worktrunk worktrees; optional Beads when dependency tracking is needed, optional qualified cross-client review and an opt-in semantic-evidence-reviewer with explicit TypeSafe context.",
+    "web_research": "agent-browser, selected Playwright CLI operations, OpenResearch literature retrieval and Tavily CLI search/extract skills.",
+    "agent_sdks": "Codex SDK/CLI (component codex) for supported start/run/resume; Claude Agent SDK, OpenHands SDK, Temporal and LangGraph remain source-reviewed, unselected alternatives.",
+    "landed_decision_sources": {
+      "landed_definitive_defaults": {
+        "path": "docs/decisions/2026-10-01-new-wsl-definitive-defaults.md",
+        "sha256": "1b59e7b2100199d2b3a2125a811c7959c11dc55be9d029d4c0f676bbd9059ff5",
+        "bytes": 80195,
+        "locator": "lines 56-57, 134-135"
+      },
+      "landed_layer_consensus": {
+        "path": "docs/decisions/2026-10-02-new-wsl-layer-consensus.md",
+        "sha256": "a3a0e724c2997ce1323b87b07f80e72e57d50d9bb1ce75f4a4a356409225be39",
+        "bytes": 50007,
+        "locator": "lines 162-179"
+      }
+    },
+    "governing_policy": "D01/C02 govern host-layer selections. The frozen catalog rows are recorded as written, including unselected alternatives; they are not treated as host adoption truth. Flag this drift for post-G5 catalog re-record under the cited D03 record. No superseding host decision is claimed.",
+    "captured_base": "aba02ec3456d383bcc2fc72883db098f9be7918a",
+    "frozen_rows": [
+      {
+        "pointer": "/layers/2",
+        "layer_id": "workers",
+        "current_choice": "Native Claude/Codex workers with owned Worktrunk worktrees; optional Beads when dependency tracking is needed, optional qualified cross-client review and an opt-in semantic-evidence-reviewer with explicit TypeSafe context.",
+        "decision": "keep_but_compare",
+        "winners": [
+          {
+            "component_id": "claude-code",
+            "repository": "https://github.com/anthropics/claude-code",
+            "pin": "2.1.278",
+            "evidence_class": "local_integration",
+            "why_selected": "This verdict comes from my own source review of retained receipts. No head-to-head comparison was run. The requirement has three parts: delegate bounded work, keep owned edits and failed results, and integrate only after review.\n\nc12 (Claude native workers) is the only adopted candidate with retained executed evidence of an owned writing child that also keeps its failed results. c7 (Worktrunk) was qualified separately as the owned-worktree lifecycle tool. It did not provide the isolation used by the delegated child.\n\n(1) Bounded delegation, native execution (c12). On Claude Code 2.1.278, one foreground native Opus child ran with the role's native `isolation: worktree`, not a Worktrunk worktree. It changed only planner.py in that worktree. The seed failed 8 of 12 visible tests. Afterwards all 12 unchanged tests passed. An independent oracle checked all 65,536 four-node graphs, and the primary checkout stayed clean (blueprints/convergence-practice/native-worker/README.md lines 3-26 and 42-44; catalogs/foundation/decisions.json owned-native-child, lines 338-376). The oracle was author-written and visible to the worker (README lines 35-37).\n\n(2) Failed results kept, local integration fixture (c12). native-workflow-graceful-recovery (decisions.json lines 2600-2650) records a selected reviewer stop that kept a failed child and a null result. Replay reused the completed implementation. A same-session resume integrated the repair and kept later user edits. 29 visible and seven hidden checks passed. The record calls this \"a local integration fixture, not an unchanged upstream product test\".\n\n(3) Interruption recovery, native execution on one synthetic same-host task (c12). The sequence was cancellation, continuation of the same child, parent SIGKILL, systemd cgroup cleanup and finalization of the same child. It produced one effect (decisions.json lines 2324-2383; blueprints/convergence-practice/worker-recovery/README.md lines 1-17).\n\n(4) Owned edits, native execution (c7), on a synthetic repository with no model child.\n- Worktrunk 0.78.0 created and listed owned worktrees, then removed them.\n- It refused a dirty removal without loss (blueprints/convergence-practice/wsl-native-tools/receipt.json line 10 and lines 27-30).\n- decisions.json owned-worktrees (lines 478-521) marks it selection \"default\", accepted_within_scope.\n- Only a native old/new comparison of the corrected child working directory covers the packet pin 0.79.0. Its Rust suite was not run (docs/full-stack-convergence.md lines 124-130).\n- docs/token-native-saturation.md line 121 rates worktrunk only \"optional | use, cleanup | supporting workflow / 0\".\n\n(5) Review before integration: decisions.json lines 2672 and 2676 record eight native review-changes runs. The gate was fix-and-commit after independent review; the strict accepted status was never returned. c8/c11 also have executed review evidence: a native Claude-to-Codex foreground review returned (recipes/claude-codex-foreground-review.md lines 20-29). That covers only the review part, not delegation of owned edits.\n\ndocs/foundation-convergence-20260921.md line 20 records the project's decision to retain this setup. That is a claim, not extra evidence. The weakest winner evidence class is local_integration, because (2) is only a local fixture.",
+            "evidence_refs": [
+              "catalogs/foundation/decisions.json",
+              "blueprints/convergence-practice/native-worker/README.md",
+              "blueprints/convergence-practice/worker-recovery/README.md",
+              "blueprints/convergence-practice/wsl-native-tools/receipt.json",
+              "docs/foundation-convergence-20260921.md",
+              "docs/full-stack-convergence.md",
+              "docs/token-native-saturation.md"
+            ],
+            "recipe_ref": "recipes/claude-native-profile.md",
+            "platform_status": {
+              "linux-wsl2-x86_64": "conditional",
+              "macos-arm64": "untested"
+            }
+          },
+          {
+            "component_id": "worktrunk",
+            "repository": "https://github.com/max-sixty/worktrunk",
+            "pin": "0.79.0",
+            "evidence_class": "local_integration",
+            "why_selected": "This verdict comes from my own source review of retained receipts. No head-to-head comparison was run. The requirement has three parts: delegate bounded work, keep owned edits and failed results, and integrate only after review.\n\nc12 (Claude native workers) is the only adopted candidate with retained executed evidence of an owned writing child that also keeps its failed results. c7 (Worktrunk) was qualified separately as the owned-worktree lifecycle tool. It did not provide the isolation used by the delegated child.\n\n(1) Bounded delegation, native execution (c12). On Claude Code 2.1.278, one foreground native Opus child ran with the role's native `isolation: worktree`, not a Worktrunk worktree. It changed only planner.py in that worktree. The seed failed 8 of 12 visible tests. Afterwards all 12 unchanged tests passed. An independent oracle checked all 65,536 four-node graphs, and the primary checkout stayed clean (blueprints/convergence-practice/native-worker/README.md lines 3-26 and 42-44; catalogs/foundation/decisions.json owned-native-child, lines 338-376). The oracle was author-written and visible to the worker (README lines 35-37).\n\n(2) Failed results kept, local integration fixture (c12). native-workflow-graceful-recovery (decisions.json lines 2600-2650) records a selected reviewer stop that kept a failed child and a null result. Replay reused the completed implementation. A same-session resume integrated the repair and kept later user edits. 29 visible and seven hidden checks passed. The record calls this \"a local integration fixture, not an unchanged upstream product test\".\n\n(3) Interruption recovery, native execution on one synthetic same-host task (c12). The sequence was cancellation, continuation of the same child, parent SIGKILL, systemd cgroup cleanup and finalization of the same child. It produced one effect (decisions.json lines 2324-2383; blueprints/convergence-practice/worker-recovery/README.md lines 1-17).\n\n(4) Owned edits, native execution (c7), on a synthetic repository with no model child.\n- Worktrunk 0.78.0 created and listed owned worktrees, then removed them.\n- It refused a dirty removal without loss (blueprints/convergence-practice/wsl-native-tools/receipt.json line 10 and lines 27-30).\n- decisions.json owned-worktrees (lines 478-521) marks it selection \"default\", accepted_within_scope.\n- Only a native old/new comparison of the corrected child working directory covers the packet pin 0.79.0. Its Rust suite was not run (docs/full-stack-convergence.md lines 124-130).\n- docs/token-native-saturation.md line 121 rates worktrunk only \"optional | use, cleanup | supporting workflow / 0\".\n\n(5) Review before integration: decisions.json lines 2672 and 2676 record eight native review-changes runs. The gate was fix-and-commit after independent review; the strict accepted status was never returned. c8/c11 also have executed review evidence: a native Claude-to-Codex foreground review returned (recipes/claude-codex-foreground-review.md lines 20-29). That covers only the review part, not delegation of owned edits.\n\ndocs/foundation-convergence-20260921.md line 20 records the project's decision to retain this setup. That is a claim, not extra evidence. The weakest winner evidence class is local_integration, because (2) is only a local fixture.",
+            "evidence_refs": [
+              "catalogs/foundation/decisions.json",
+              "blueprints/convergence-practice/native-worker/README.md",
+              "blueprints/convergence-practice/worker-recovery/README.md",
+              "blueprints/convergence-practice/wsl-native-tools/receipt.json",
+              "docs/foundation-convergence-20260921.md",
+              "docs/full-stack-convergence.md",
+              "docs/token-native-saturation.md"
+            ],
+            "recipe_ref": "recipes/native-upgrades-20260921.md",
+            "platform_status": {
+              "linux-wsl2-x86_64": "conditional",
+              "macos-arm64": "untested"
+            }
+          }
+        ]
+      },
+      {
+        "pointer": "/layers/8",
+        "layer_id": "web-research",
+        "current_choice": "agent-browser, selected Playwright CLI operations, OpenResearch literature retrieval and Tavily CLI search/extract skills.",
+        "decision": "retain",
+        "winners": [
+          {
+            "component_id": "tavily-cli",
+            "repository": "https://github.com/tavily-ai/tavily-cli",
+            "pin": "0.1.8",
+            "evidence_class": "local_integration",
+            "why_selected": "This is my own review of the original receipts, revised after the refuter findings. It does not restate the packet's withheld dispositions. The requirement has three parts: attributable primary-source retrieval, interaction with selected pages, and bounded native commands without a standing research-agent stack. Each winner covers a different part, and each has retained native execution, including one retained Tavily search miss.\n\n(1) Tavily CLI (c8) covers primary-source search and extraction. Three separate retained runs exist:\n- docs/ecosystem/tavily-receipt.json (2026-09-20T02:48Z), lines 84-92 and 144: native authentication, plus one search capped at 3 results that returned three code.claude.com sources. Extraction was not exercised in that run.\n- evidence/receipts/native-tavily-cli-20260920.json: `uv tool install tavily-cli` exited 0 (tavily-cli==0.1.8). A domain-limited `tvly search --max-results 4` exited 0 with result_count 4, and `tvly extract https://code.claude.com/docs/en/sub-agents` exited 0 with result_count 1 and failed_count 0.\n- evidence/receipts/native-tavily-session-20260920.json (native_cli_e2e, Codex Desktop task, upstream_cli_version 0.1.8). An IBKR/Nautilus search exited 0 and returned three official ibkrcampus.com sources, but it missed the intended Nautilus adapter guide (line 11, and \"intended_adapter_guide_found\": false at line 83). This is a retained search miss. A direct known-URL `tvly extract` of the nautilustrader.io IBKR page then exited 0 with results 1 and failed_results [] (lines 86-90).\nThe decision's evidence_scope names both runs (catalogs/foundation/decisions.json lines 2294-2298). Across these runs, Search found relevant official sources but did not reliably surface a specific target page. Extraction of a known URL worked twice.\n\n(2) agent-browser (c1) covers page interaction. evidence/receipts/desktop-cli-workflows.json (kind native_model_e2e) lines 42-61 record an active Codex Desktop task running open, snapshot -i, fill, click, get text #status, screenshot and close against fixtures/greeting.html. all_exit_codes is 0, observed_status is \"Hello, Publication Codex Desktop!\", the screenshot was visually inspected and the owned session was closed. That receipt records no agent-browser version. A separate 2026-09-21 `agent-browser --version` returned \"agent-browser 0.38.1\" (evidence/artifacts/claude-repository-evidence-20260921/results.json line 5788), and nothing ties that check to the fixture run. docs/dashboard-rendered-acceptance.md line 28 records a separate observed use on a real Dagu browser stream.\n\n(3) OpenResearch (c7) covers primary literature. Two runs are retained:\n- On 2026-09-20 (no version recorded; this predates the 0.2.4 to 0.2.7 upgrade), `orx --no-telemetry paper 2608.02583 --full` returned the full public paper, 63560 bytes, with no model or agent job (evidence/receipts/token-practice-gap-followup-20260920.json lines 66-71 and 195-200).\n- For the current 0.2.7 pin, evidence/artifacts/full-stack-convergence-20260921/orx-worktrunk-upgrades.json lines 9-58 record `orx --no-telemetry discover keyword 'retrieval augmented generation memory' --limit 3` (exit 0, result_count 3), `orx --no-telemetry paper 2609.05760 --full` (exit 0, 69752 UTF-8 bytes) and 7 of 7 unchanged upstream Markdown tests passed. recipes/native-upgrades-20260921.md line 13 and docs/full-stack-convergence.md lines 124-128 point to this receipt.\n\nAll three winners are CLI commands run on demand. The set's class is local_integration, the weakest among the winners, because the browser interaction was shown only on a local fixture and a dashboard. The Tavily and OpenResearch runs are single bounded queries, not benchmarks.",
+            "evidence_refs": [
+              "evidence/receipts/native-tavily-cli-20260920.json",
+              "evidence/receipts/native-tavily-session-20260920.json",
+              "docs/ecosystem/tavily-receipt.json",
+              "evidence/receipts/desktop-cli-workflows.json",
+              "docs/dashboard-rendered-acceptance.md",
+              "evidence/artifacts/claude-repository-evidence-20260921/results.json",
+              "evidence/receipts/token-practice-gap-followup-20260920.json",
+              "evidence/artifacts/full-stack-convergence-20260921/orx-worktrunk-upgrades.json",
+              "recipes/native-upgrades-20260921.md",
+              "catalogs/foundation/decisions.json",
+              "docs/full-stack-convergence.md"
+            ],
+            "recipe_ref": "recipes/tavily.md",
+            "platform_status": {
+              "linux-wsl2-x86_64": "conditional",
+              "macos-arm64": "untested"
+            }
+          },
+          {
+            "component_id": "agent-browser",
+            "repository": "https://github.com/vercel-labs/agent-browser",
+            "pin": "0.38.1",
+            "evidence_class": "local_integration",
+            "why_selected": "This is my own review of the original receipts, revised after the refuter findings. It does not restate the packet's withheld dispositions. The requirement has three parts: attributable primary-source retrieval, interaction with selected pages, and bounded native commands without a standing research-agent stack. Each winner covers a different part, and each has retained native execution, including one retained Tavily search miss.\n\n(1) Tavily CLI (c8) covers primary-source search and extraction. Three separate retained runs exist:\n- docs/ecosystem/tavily-receipt.json (2026-09-20T02:48Z), lines 84-92 and 144: native authentication, plus one search capped at 3 results that returned three code.claude.com sources. Extraction was not exercised in that run.\n- evidence/receipts/native-tavily-cli-20260920.json: `uv tool install tavily-cli` exited 0 (tavily-cli==0.1.8). A domain-limited `tvly search --max-results 4` exited 0 with result_count 4, and `tvly extract https://code.claude.com/docs/en/sub-agents` exited 0 with result_count 1 and failed_count 0.\n- evidence/receipts/native-tavily-session-20260920.json (native_cli_e2e, Codex Desktop task, upstream_cli_version 0.1.8). An IBKR/Nautilus search exited 0 and returned three official ibkrcampus.com sources, but it missed the intended Nautilus adapter guide (line 11, and \"intended_adapter_guide_found\": false at line 83). This is a retained search miss. A direct known-URL `tvly extract` of the nautilustrader.io IBKR page then exited 0 with results 1 and failed_results [] (lines 86-90).\nThe decision's evidence_scope names both runs (catalogs/foundation/decisions.json lines 2294-2298). Across these runs, Search found relevant official sources but did not reliably surface a specific target page. Extraction of a known URL worked twice.\n\n(2) agent-browser (c1) covers page interaction. evidence/receipts/desktop-cli-workflows.json (kind native_model_e2e) lines 42-61 record an active Codex Desktop task running open, snapshot -i, fill, click, get text #status, screenshot and close against fixtures/greeting.html. all_exit_codes is 0, observed_status is \"Hello, Publication Codex Desktop!\", the screenshot was visually inspected and the owned session was closed. That receipt records no agent-browser version. A separate 2026-09-21 `agent-browser --version` returned \"agent-browser 0.38.1\" (evidence/artifacts/claude-repository-evidence-20260921/results.json line 5788), and nothing ties that check to the fixture run. docs/dashboard-rendered-acceptance.md line 28 records a separate observed use on a real Dagu browser stream.\n\n(3) OpenResearch (c7) covers primary literature. Two runs are retained:\n- On 2026-09-20 (no version recorded; this predates the 0.2.4 to 0.2.7 upgrade), `orx --no-telemetry paper 2608.02583 --full` returned the full public paper, 63560 bytes, with no model or agent job (evidence/receipts/token-practice-gap-followup-20260920.json lines 66-71 and 195-200).\n- For the current 0.2.7 pin, evidence/artifacts/full-stack-convergence-20260921/orx-worktrunk-upgrades.json lines 9-58 record `orx --no-telemetry discover keyword 'retrieval augmented generation memory' --limit 3` (exit 0, result_count 3), `orx --no-telemetry paper 2609.05760 --full` (exit 0, 69752 UTF-8 bytes) and 7 of 7 unchanged upstream Markdown tests passed. recipes/native-upgrades-20260921.md line 13 and docs/full-stack-convergence.md lines 124-128 point to this receipt.\n\nAll three winners are CLI commands run on demand. The set's class is local_integration, the weakest among the winners, because the browser interaction was shown only on a local fixture and a dashboard. The Tavily and OpenResearch runs are single bounded queries, not benchmarks.",
+            "evidence_refs": [
+              "evidence/receipts/native-tavily-cli-20260920.json",
+              "evidence/receipts/native-tavily-session-20260920.json",
+              "docs/ecosystem/tavily-receipt.json",
+              "evidence/receipts/desktop-cli-workflows.json",
+              "docs/dashboard-rendered-acceptance.md",
+              "evidence/artifacts/claude-repository-evidence-20260921/results.json",
+              "evidence/receipts/token-practice-gap-followup-20260920.json",
+              "evidence/artifacts/full-stack-convergence-20260921/orx-worktrunk-upgrades.json",
+              "recipes/native-upgrades-20260921.md",
+              "catalogs/foundation/decisions.json",
+              "docs/full-stack-convergence.md"
+            ],
+            "recipe_ref": "recipes/README.md",
+            "platform_status": {
+              "linux-wsl2-x86_64": "conditional",
+              "macos-arm64": "untested"
+            }
+          },
+          {
+            "component_id": "openresearch",
+            "repository": "https://github.com/alphaXiv/OpenResearch",
+            "pin": "0.2.7",
+            "evidence_class": "local_integration",
+            "why_selected": "This is my own review of the original receipts, revised after the refuter findings. It does not restate the packet's withheld dispositions. The requirement has three parts: attributable primary-source retrieval, interaction with selected pages, and bounded native commands without a standing research-agent stack. Each winner covers a different part, and each has retained native execution, including one retained Tavily search miss.\n\n(1) Tavily CLI (c8) covers primary-source search and extraction. Three separate retained runs exist:\n- docs/ecosystem/tavily-receipt.json (2026-09-20T02:48Z), lines 84-92 and 144: native authentication, plus one search capped at 3 results that returned three code.claude.com sources. Extraction was not exercised in that run.\n- evidence/receipts/native-tavily-cli-20260920.json: `uv tool install tavily-cli` exited 0 (tavily-cli==0.1.8). A domain-limited `tvly search --max-results 4` exited 0 with result_count 4, and `tvly extract https://code.claude.com/docs/en/sub-agents` exited 0 with result_count 1 and failed_count 0.\n- evidence/receipts/native-tavily-session-20260920.json (native_cli_e2e, Codex Desktop task, upstream_cli_version 0.1.8). An IBKR/Nautilus search exited 0 and returned three official ibkrcampus.com sources, but it missed the intended Nautilus adapter guide (line 11, and \"intended_adapter_guide_found\": false at line 83). This is a retained search miss. A direct known-URL `tvly extract` of the nautilustrader.io IBKR page then exited 0 with results 1 and failed_results [] (lines 86-90).\nThe decision's evidence_scope names both runs (catalogs/foundation/decisions.json lines 2294-2298). Across these runs, Search found relevant official sources but did not reliably surface a specific target page. Extraction of a known URL worked twice.\n\n(2) agent-browser (c1) covers page interaction. evidence/receipts/desktop-cli-workflows.json (kind native_model_e2e) lines 42-61 record an active Codex Desktop task running open, snapshot -i, fill, click, get text #status, screenshot and close against fixtures/greeting.html. all_exit_codes is 0, observed_status is \"Hello, Publication Codex Desktop!\", the screenshot was visually inspected and the owned session was closed. That receipt records no agent-browser version. A separate 2026-09-21 `agent-browser --version` returned \"agent-browser 0.38.1\" (evidence/artifacts/claude-repository-evidence-20260921/results.json line 5788), and nothing ties that check to the fixture run. docs/dashboard-rendered-acceptance.md line 28 records a separate observed use on a real Dagu browser stream.\n\n(3) OpenResearch (c7) covers primary literature. Two runs are retained:\n- On 2026-09-20 (no version recorded; this predates the 0.2.4 to 0.2.7 upgrade), `orx --no-telemetry paper 2608.02583 --full` returned the full public paper, 63560 bytes, with no model or agent job (evidence/receipts/token-practice-gap-followup-20260920.json lines 66-71 and 195-200).\n- For the current 0.2.7 pin, evidence/artifacts/full-stack-convergence-20260921/orx-worktrunk-upgrades.json lines 9-58 record `orx --no-telemetry discover keyword 'retrieval augmented generation memory' --limit 3` (exit 0, result_count 3), `orx --no-telemetry paper 2609.05760 --full` (exit 0, 69752 UTF-8 bytes) and 7 of 7 unchanged upstream Markdown tests passed. recipes/native-upgrades-20260921.md line 13 and docs/full-stack-convergence.md lines 124-128 point to this receipt.\n\nAll three winners are CLI commands run on demand. The set's class is local_integration, the weakest among the winners, because the browser interaction was shown only on a local fixture and a dashboard. The Tavily and OpenResearch runs are single bounded queries, not benchmarks.",
+            "evidence_refs": [
+              "evidence/receipts/native-tavily-cli-20260920.json",
+              "evidence/receipts/native-tavily-session-20260920.json",
+              "docs/ecosystem/tavily-receipt.json",
+              "evidence/receipts/desktop-cli-workflows.json",
+              "docs/dashboard-rendered-acceptance.md",
+              "evidence/artifacts/claude-repository-evidence-20260921/results.json",
+              "evidence/receipts/token-practice-gap-followup-20260920.json",
+              "evidence/artifacts/full-stack-convergence-20260921/orx-worktrunk-upgrades.json",
+              "recipes/native-upgrades-20260921.md",
+              "catalogs/foundation/decisions.json",
+              "docs/full-stack-convergence.md"
+            ],
+            "recipe_ref": "recipes/native-upgrades-20260921.md",
+            "platform_status": {
+              "linux-wsl2-x86_64": "conditional",
+              "macos-arm64": "untested"
+            }
+          }
+        ]
+      },
+      {
+        "pointer": "/layers/16",
+        "layer_id": "agent-sdks",
+        "current_choice": "Codex SDK/CLI (component codex) for supported start/run/resume; Claude Agent SDK, OpenHands SDK, Temporal and LangGraph remain source-reviewed, unselected alternatives.",
+        "decision": "retain",
+        "winners": [
+          {
+            "component_id": "codex",
+            "repository": "https://github.com/openai/codex",
+            "pin": "0.155.1",
+            "evidence_class": "native_proven",
+            "why_selected": "c4 (Codex SDK/CLI) stays the default because it is the incumbent, with a native integration on record. It did not win a comparison. My own source review found these observations.\n(1) Native end-to-end run. blueprints/us-equities/workers/receipt.json (kind native_model_e2e, 2026-09-19) records the Python openai-codex 0.154.0 SDK driving native Codex 0.155.1. One research task finished with run.status \"completed\", duration_ms 58410 and configured_model \"gpt-6-astra\". The run returned per-turn usage (totalTokens 135311, lines 40-47) and the exact result fields (lines 51-58). It also returned structured tool events (lines 59-85): four Context Mode calls completed and one ctx_execute_file call failed. The same receipt records two more native turns (lines 132-220). Both had extraction_task_succeeded false, one blocked by the project root and one by approval policy. Across all three turns the total is 204091 tokens, with successful_research_tasks 1 and blocked_file_extraction_tasks 2. blueprints/us-equities/workers/README.md lines 39-45 name the upstream SDK calls used.\n(2) Executed three-arm workers comparison. evidence/artifacts/comparison-progress-20260922/summary.json lines 132-157 record 9 submissions across three arms: native Claude CLI, the Codex SDK via native_worker.py, and the Claude Agent SDK. The result is \"unresolved\" and publication_eligible is false, with the note \"no arm accepted as a winner and no SDK adoption follows\". worker-receipts-followup.json lines 112-238 add detail. Codex arm B completed both replays with reported_completeness 1. Its cancel submission ended no_receipt/SIGINT with usage not_requested. Claude Agent SDK arm C also succeeded on both replays with completeness 1, and its cancel was interrupted with usage unavailable. Recovery was not run and no artifact judge was pinned. So the comparison neither overturns nor confirms c4.\n(3) Activation record. catalogs/foundation/decisions.json lines 2831-2841 set selection \"conditional\" and review_status \"source_review\", with the activation text \"Use the Codex CLI/SDK for existing supported start/run/resume workflows\". The decision's evidence_ids point only to token-practice-coverage-20260920; the link to the us-equities receipt is mine, not the decision's.\nTwo limits apply. First, native_worker.py line 77 sets ephemeral=True, so this integration does not show resume. Second, README lines 53-57 say inherited MCP servers and hooks are not made read-only, so c4 isolation is unverified.",
+            "evidence_refs": [
+              "blueprints/us-equities/workers/receipt.json",
+              "blueprints/us-equities/workers/README.md",
+              "blueprints/us-equities/workers/native_worker.py",
+              "evidence/artifacts/comparison-progress-20260922/summary.json",
+              "evidence/artifacts/comparison-progress-20260922/worker-receipts-followup.json",
+              "catalogs/foundation/decisions.json"
+            ],
+            "recipe_ref": "recipes/README.md",
+            "platform_status": {
+              "linux-wsl2-x86_64": "accepted",
+              "macos-arm64": "untested"
+            }
+          }
+        ]
+      }
+    ],
+    "catalog_drift": "Frozen catalog rows differ from governing D01/C02 host selections; flag for post-G5 catalog re-record. No catalog row changes in this PR.",
+    "drift_record_source": {
+      "path": "docs/decisions/2026-10-03-foundation-catalog-drift.md",
+      "sha256": "a4c5ddf98c9fa778d07b60507a183818b1d243dda789bc06ee8bcd612fcbcedb",
+      "bytes": 16588,
+      "locator": "lines 22-40"
+    }
   },
   "retirement_rule": {
-    "source": "docs/decisions/2026-10-07-clean-upstream-install-finalizes-a-candidate.md:67-78",
+    "source": "docs/decisions/2026-10-07-clean-upstream-install-finalizes-a-candidate.md:67-73",
     "retirements": [],
     "withdrawn_previous_proposals": 5,
     "steps_executed": 0,
     "inverse": "No installation/configuration changes; no rollback required."
   },
-  "four_stage_contract": "Candidate selection uses upstream-quality/G5 evidence; wiring uses vendor install/routing/inverse; fresh natural task shows owning-role organic use; hourly counts are baseline/monitoring. KEEP only after stage3 or4 organic evidence; otherwise DEFER.",
+  "four_stage_contract": "Candidate selection uses upstream-quality/G5 evidence; wiring uses vendor install/routing/inverse; fresh natural task shows owning-role organic use; hourly counts are baseline/monitoring. KEEP only after stage 3 or 4 organic evidence; otherwise DEFER.",
   "reviewed_heads": {
-    "claude": "45cbdbad4439dba6422fc6617eceee58502a8aaf",
-    "gpt_exec": "45cbdbad4439dba6422fc6617eceee58502a8aaf",
-    "delta_reads": "PENDING"
+    "claude": "62426cf9fe81ebf7766fad9a7a139dd5bc575088",
+    "gpt_exec": "62426cf9fe81ebf7766fad9a7a139dd5bc575088",
+    "delta_reads": "PENDING_REBASE_DELTA_MICRO_READS"
   },
   "quality_evidence_limits": "Candidate stage uses landed/G5 and named pinned upstream sources/releases/retained vendor checks. No new maintenance ranking, benchmark or head-to-head winner is claimed. Missing final G5 binding is explicit.",
   "fresh_task_definition": "Ordinary real task without SDK/tool names; owning client/role, native route/result oracle and organic counters retained. Qualification and unlabelled service totals do not satisfy the role gate.",
-  "baseline_comparison": "Same supported native definitions,24h windows and role/client scope against2026-10-08 evidence; no post-change saving claimed.",
-  "role_slot_policy": "Exactly one upstream-quality-backed default per role slot in the catalog's subsequent reconciliation; duplicates remain ranked alternatives, not parallel defaults. This record does not select a new winner."
+  "baseline_comparison": "Same supported native definitions, 24h windows and role/client scope against 2026-10-08 evidence; no post-change saving claimed.",
+  "role_slot_policy": "Preserve each landed role slot and flag overlaps. GPT Researcher is the baseline gatherer and DeerFlow the selected second independent gatherer; new activation is DEFER. A post-G5 catalog write decides changes with a cited superseder."
 }

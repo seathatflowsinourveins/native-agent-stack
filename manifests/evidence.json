@@ -18267,8 +18267,8 @@
     },
     {
       "path": "docs/decisions/2026-10-08-sdk-runtime-worker-adoption.md",
-      "sha256": "ba36d65f9ad51be9193e36d136a3bcbd62b3bc438fa92079a2e10c2d49ee27ec",
-      "bytes": 20708
+      "sha256": "aba6c2c758520f4cea2e8383bfae08618a7efda23831e6766763feab257981a2",
+      "bytes": 31517
     },
     {
       "path": "docs/decisions/2026-10-08-skills-cc-lanes-picks.md",
@@ -49057,13 +49057,73 @@
     },
     {
       "path": "evidence/artifacts/sdk-runtime-adoption-20261008/decisions.json",
-      "sha256": "2de55eb908d4728e48055fa248ccc093e1cdac745f80339f159061ff6c2917a5",
-      "bytes": 68619
+      "sha256": "c678227d3a289670f42ad103749d37dfc3fb194cb7bed2af2a38cfa5ca67ceb3",
+      "bytes": 121608
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-adoption-20261008/loki/app_server_events_by_client.f5a6eac9d40b5d5233694fc8f8e773a632f6f0dc7a426a262453ed5e03894b66.loki.json",
+      "sha256": "f5a6eac9d40b5d5233694fc8f8e773a632f6f0dc7a426a262453ed5e03894b66",
+      "bytes": 3721
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-adoption-20261008/loki/claude_sdk_events_by_role.af7cc227152d2d87e50cae7f89994011224195379726fd0a050f27d284771b58.loki.json",
+      "sha256": "af7cc227152d2d87e50cae7f89994011224195379726fd0a050f27d284771b58",
+      "bytes": 4008
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-adoption-20261008/loki/claude_sdk_query_sources.1dcaf1644038547fca635340996755bae05edba9bdf0ef27143851f31d31df77.loki.json",
+      "sha256": "1dcaf1644038547fca635340996755bae05edba9bdf0ef27143851f31d31df77",
+      "bytes": 3846
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-adoption-20261008/loki/python_sdk_receipt_events.145e231eda2d3d1d9210bc829f05580c149d5047eaffe3c39294967ec43fe11e.loki.json",
+      "sha256": "145e231eda2d3d1d9210bc829f05580c149d5047eaffe3c39294967ec43fe11e",
+      "bytes": 3639
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-adoption-20261008/loki/typescript_sdk_conversations.5155c4089174502e28aa676fab0bdc793108d25ddb4e8c7440ad8f73893ca542.loki.json",
+      "sha256": "5155c4089174502e28aa676fab0bdc793108d25ddb4e8c7440ad8f73893ca542",
+      "bytes": 3766
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-adoption-20261008/loki/typescript_sdk_events.cdaa239e16af4499f87dd4b41886eca64f87af4d3e51fed940b4da280dd8a76d.loki.json",
+      "sha256": "cdaa239e16af4499f87dd4b41886eca64f87af4d3e51fed940b4da280dd8a76d",
+      "bytes": 3767
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-adoption-20261008/loki/typescript_sdk_identified_conversations_all.80e8b32fd74f310b697bb38fafbc39d06e4169c44ee93023d2d4aa79ceccb860.loki.json",
+      "sha256": "80e8b32fd74f310b697bb38fafbc39d06e4169c44ee93023d2d4aa79ceccb860",
+      "bytes": 3756
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-adoption-20261008/loki/typescript_sdk_identified_conversations_hourly.287ac95d39a71118e42fec6ec616a0d70f1554661990fe983f886f1836e54c77.loki.json",
+      "sha256": "287ac95d39a71118e42fec6ec616a0d70f1554661990fe983f886f1836e54c77",
+      "bytes": 3806
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-adoption-20261008/loki/typescript_sdk_tool_results.ad183319137c43fad6a30453c71ecdab7499e19007cbc23c533ee1f609d9fbbe.loki.json",
+      "sha256": "ad183319137c43fad6a30453c71ecdab7499e19007cbc23c533ee1f609d9fbbe",
+      "bytes": 3763
     },
     {
       "path": "evidence/artifacts/sdk-runtime-adoption-20261008/observations.json",
-      "sha256": "7a7ed73a67b60748f16aa78f60f23450ebeea2fda797fa07bbae6561b00b0b75",
-      "bytes": 45369
+      "sha256": "4c6a955616cf0741b13dadfe35424f1fd6bb86fe4d9956d0f1c732e9e5bd6eef",
+      "bytes": 90337
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-adoption-20261008/offline-parser-check.json",
+      "sha256": "ca7ec711b3ebcfe63d443f49f52a3ea96b545749874df5077be33d4d545d1bc4",
+      "bytes": 1259
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-adoption-20261008/openhands-1.53.0-constraints.public.d1d7d7a010130646e5e06c1b182a226ab0ee39590b7eb429e64249562b3fc235.txt",
+      "sha256": "d1d7d7a010130646e5e06c1b182a226ab0ee39590b7eb429e64249562b3fc235",
+      "bytes": 58786
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-adoption-20261008/openhands-job-starts.aef22b0794253231a919111201c2ad3854339480edf7da10d566aa8b572bae62.json",
+      "sha256": "aef22b0794253231a919111201c2ad3854339480edf7da10d566aa8b572bae62",
+      "bytes": 1240
     },
     {
       "path": "evidence/artifacts/sdk-runtime-coverage-20260922/agent-sdks.json",

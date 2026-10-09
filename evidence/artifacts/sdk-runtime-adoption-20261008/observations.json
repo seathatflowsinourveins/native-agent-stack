@@ -1,17 +1,17 @@
 {
   "acceptance": {
-    "designated_claude": "CHANGES_REQUESTED",
-    "designated_gpt_exec": "CHANGES_REQUESTED",
-    "ci": "PREVIOUS_HEAD_PASSED_REVISION_PENDING",
-    "ci_head": "45cbdbad4439dba6422fc6617eceee58502a8aaf",
-    "pre_cue": "PENDING",
+    "designated_claude": "PASS_WITH_P3_AT_62426CF9",
+    "designated_gpt_exec": "CHANGES_REQUESTED_P3_AT_62426CF9",
+    "ci": "PENDING_REBASED_HEAD",
+    "ci_head": null,
+    "pre_cue": "PENDING_REBASED_HEAD",
     "cc_cue": "PENDING",
     "owner_decisions": "PENDING",
     "g5_release_binding": "PENDING",
     "wiring_or_retirement_deployed": false,
-    "delta_reads": "PENDING_REVISION_HEAD",
+    "delta_reads": "PENDING_REBASE_DELTA_MICRO_READS",
     "schema_label_note": "Gate status uses PENDING; missing canonical entry point is a separate gap field.",
-    "pre_cue_entrypoint": null,
+    "pre_cue_entrypoint": "${STATE_ROOT}/coordination/command-center/cc-tools/base_tests_at_head.sh",
     "memory_cost_gate": "PENDING_COMPONENT_SPECIFIC_PSS"
   },
   "adoption_observation": {
@@ -26,10 +26,10 @@
     "sdk_snapshot_binding": "BOUND_IMMUTABLE_COOP_SNAPSHOT",
     "native_loki_aggregates": [
       {
-        "end_utc": "2026-10-09T01:06:56.047839+00:00",
+        "end_utc": "2026-10-09T01:06:56Z",
         "id": "typescript_sdk_events",
         "query": "sum by (ecosystem_lane) (count_over_time({service_name=\"codex_sdk_ts\"}[24h]))",
-        "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/typescript_sdk_events.cdaa239e16af4499f87dd4b41886eca64f87af4d3e51fed940b4da280dd8a76d.loki.json",
+        "retained_snapshot": "evidence/artifacts/sdk-runtime-adoption-20261008/loki/typescript_sdk_events.cdaa239e16af4499f87dd4b41886eca64f87af4d3e51fed940b4da280dd8a76d.loki.json",
         "rows": [
           {
             "count": 138109,
@@ -38,13 +38,19 @@
         ],
         "sha256": "cdaa239e16af4499f87dd4b41886eca64f87af4d3e51fed940b4da280dd8a76d",
         "total": 138109,
-        "window_hours": 24
+        "window_hours": 24,
+        "original_host_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/typescript_sdk_events.cdaa239e16af4499f87dd4b41886eca64f87af4d3e51fed940b4da280dd8a76d.loki.json",
+        "evaluation_time_ns": "1791508016000000000",
+        "capture_utc": "2026-10-09T01:06:56.047839+00:00",
+        "bytes": 3767,
+        "locator": "/data/result",
+        "availability": "RETAINED_IN_PR_TREE"
       },
       {
-        "end_utc": "2026-10-09T01:06:56.047839+00:00",
+        "end_utc": "2026-10-09T01:06:56Z",
         "id": "typescript_sdk_tool_results",
         "query": "sum by (ecosystem_lane) (count_over_time({service_name=\"codex_sdk_ts\"} | event_name=\"codex.tool_result\" [24h]))",
-        "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/typescript_sdk_tool_results.ad183319137c43fad6a30453c71ecdab7499e19007cbc23c533ee1f609d9fbbe.loki.json",
+        "retained_snapshot": "evidence/artifacts/sdk-runtime-adoption-20261008/loki/typescript_sdk_tool_results.ad183319137c43fad6a30453c71ecdab7499e19007cbc23c533ee1f609d9fbbe.loki.json",
         "rows": [
           {
             "count": 708,
@@ -53,13 +59,19 @@
         ],
         "sha256": "ad183319137c43fad6a30453c71ecdab7499e19007cbc23c533ee1f609d9fbbe",
         "total": 708,
-        "window_hours": 24
+        "window_hours": 24,
+        "original_host_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/typescript_sdk_tool_results.ad183319137c43fad6a30453c71ecdab7499e19007cbc23c533ee1f609d9fbbe.loki.json",
+        "evaluation_time_ns": "1791508016000000000",
+        "capture_utc": "2026-10-09T01:06:56.047839+00:00",
+        "bytes": 3763,
+        "locator": "/data/result",
+        "availability": "RETAINED_IN_PR_TREE"
       },
       {
-        "end_utc": "2026-10-09T01:06:56.047839+00:00",
+        "end_utc": "2026-10-09T01:06:56Z",
         "id": "typescript_sdk_conversations",
         "query": "count by (ecosystem_lane) (sum by (ecosystem_lane, conversation_id) (count_over_time({service_name=\"codex_sdk_ts\"} | event_name=\"codex.tool_result\" [24h])))",
-        "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/typescript_sdk_conversations.5155c4089174502e28aa676fab0bdc793108d25ddb4e8c7440ad8f73893ca542.loki.json",
+        "retained_snapshot": "evidence/artifacts/sdk-runtime-adoption-20261008/loki/typescript_sdk_conversations.5155c4089174502e28aa676fab0bdc793108d25ddb4e8c7440ad8f73893ca542.loki.json",
         "rows": [
           {
             "count": 80,
@@ -68,23 +80,35 @@
         ],
         "sha256": "5155c4089174502e28aa676fab0bdc793108d25ddb4e8c7440ad8f73893ca542",
         "total": 80,
-        "window_hours": 24
+        "window_hours": 24,
+        "original_host_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/typescript_sdk_conversations.5155c4089174502e28aa676fab0bdc793108d25ddb4e8c7440ad8f73893ca542.loki.json",
+        "evaluation_time_ns": "1791508016000000000",
+        "capture_utc": "2026-10-09T01:06:56.047839+00:00",
+        "bytes": 3766,
+        "locator": "/data/result",
+        "availability": "RETAINED_IN_PR_TREE"
       },
       {
-        "end_utc": "2026-10-09T01:06:56.047839+00:00",
+        "end_utc": "2026-10-09T01:06:56Z",
         "id": "python_sdk_receipt_events",
         "query": "sum (count_over_time({service_name=\"codex-sdk-receipt\"}[24h]))",
-        "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/python_sdk_receipt_events.145e231eda2d3d1d9210bc829f05580c149d5047eaffe3c39294967ec43fe11e.loki.json",
+        "retained_snapshot": "evidence/artifacts/sdk-runtime-adoption-20261008/loki/python_sdk_receipt_events.145e231eda2d3d1d9210bc829f05580c149d5047eaffe3c39294967ec43fe11e.loki.json",
         "rows": [],
         "sha256": "145e231eda2d3d1d9210bc829f05580c149d5047eaffe3c39294967ec43fe11e",
         "total": 0,
-        "window_hours": 24
+        "window_hours": 24,
+        "original_host_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/python_sdk_receipt_events.145e231eda2d3d1d9210bc829f05580c149d5047eaffe3c39294967ec43fe11e.loki.json",
+        "evaluation_time_ns": "1791508016000000000",
+        "capture_utc": "2026-10-09T01:06:56.047839+00:00",
+        "bytes": 3639,
+        "locator": "/data/result",
+        "availability": "RETAINED_IN_PR_TREE"
       },
       {
-        "end_utc": "2026-10-09T01:06:56.047839+00:00",
+        "end_utc": "2026-10-09T01:06:56Z",
         "id": "app_server_events_by_client",
         "query": "sum by (ecosystem_lane, client) (count_over_time({service_name=\"codex-app-server\"}[24h]))",
-        "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/app_server_events_by_client.f5a6eac9d40b5d5233694fc8f8e773a632f6f0dc7a426a262453ed5e03894b66.loki.json",
+        "retained_snapshot": "evidence/artifacts/sdk-runtime-adoption-20261008/loki/app_server_events_by_client.f5a6eac9d40b5d5233694fc8f8e773a632f6f0dc7a426a262453ed5e03894b66.loki.json",
         "rows": [
           {
             "count": 30,
@@ -93,13 +117,19 @@
         ],
         "sha256": "f5a6eac9d40b5d5233694fc8f8e773a632f6f0dc7a426a262453ed5e03894b66",
         "total": 30,
-        "window_hours": 24
+        "window_hours": 24,
+        "original_host_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/app_server_events_by_client.f5a6eac9d40b5d5233694fc8f8e773a632f6f0dc7a426a262453ed5e03894b66.loki.json",
+        "evaluation_time_ns": "1791508016000000000",
+        "capture_utc": "2026-10-09T01:06:56.047839+00:00",
+        "bytes": 3721,
+        "locator": "/data/result",
+        "availability": "RETAINED_IN_PR_TREE"
       },
       {
-        "end_utc": "2026-10-09T01:06:56.047839+00:00",
+        "end_utc": "2026-10-09T01:06:56Z",
         "id": "claude_sdk_query_sources",
         "query": "sum by (query_source) (count_over_time({service_name=\"claude-code\"} | query_source=~\"sdk.*\" [24h]))",
-        "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/claude_sdk_query_sources.1dcaf1644038547fca635340996755bae05edba9bdf0ef27143851f31d31df77.loki.json",
+        "retained_snapshot": "evidence/artifacts/sdk-runtime-adoption-20261008/loki/claude_sdk_query_sources.1dcaf1644038547fca635340996755bae05edba9bdf0ef27143851f31d31df77.loki.json",
         "rows": [
           {
             "count": 540,
@@ -110,7 +140,13 @@
         ],
         "sha256": "1dcaf1644038547fca635340996755bae05edba9bdf0ef27143851f31d31df77",
         "total": 540,
-        "window_hours": 24
+        "window_hours": 24,
+        "original_host_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/claude_sdk_query_sources.1dcaf1644038547fca635340996755bae05edba9bdf0ef27143851f31d31df77.loki.json",
+        "evaluation_time_ns": "1791508016000000000",
+        "capture_utc": "2026-10-09T01:06:56.047839+00:00",
+        "bytes": 3846,
+        "locator": "/data/result",
+        "availability": "RETAINED_IN_PR_TREE"
       }
     ],
     "counting_units": {
@@ -124,8 +160,8 @@
     "limits": [
       "All events are not invocations or tasks.",
       "codex_sdk_ts does not identify a standalone versus bundled package path.",
-      "Claude sdk query_source observations are not joined to coordinator role identities.",
-      "An empty receipt spool series is a count for that series, not absence of SDK usage."
+      "An empty receipt spool series is a count for that series, not absence of SDK usage.",
+      "Claude native lane labels are retained; package path, role denominator and organic completion remain unavailable."
     ],
     "hourly_sdk_snapshot": {
       "path": "${STATE_ROOT}/coordination/ns2604-coop/notes/adoption-evidence-20261008/adoption-now-e129759fe91ffbb1.json",
@@ -150,6 +186,91 @@
         }
       },
       "attribution_limit": "SDK native service row remains unlabelled; no natural owning-role attribution inferred."
+    },
+    "claude_sdk_role_measurement": {
+      "query": "sum by (ecosystem_lane, query_source) (count_over_time({service_name=\"claude-code\"} | query_source=~\"sdk.*\" [24h]))",
+      "evaluation_time_ns": "1791508016000000000",
+      "window_hours": 24,
+      "window_end_utc": "2026-10-09T01:06:56Z",
+      "counting_unit": "SDK-source log events grouped by native ecosystem_lane, not completed tasks",
+      "counts_by_role": {
+        "api-actions": 80,
+        "skills-lifecycle": 115,
+        "unlabelled": 345
+      },
+      "total": 540,
+      "source": {
+        "path": "evidence/artifacts/sdk-runtime-adoption-20261008/loki/claude_sdk_events_by_role.af7cc227152d2d87e50cae7f89994011224195379726fd0a050f27d284771b58.loki.json",
+        "sha256": "af7cc227152d2d87e50cae7f89994011224195379726fd0a050f27d284771b58",
+        "bytes": 4008,
+        "locator": "/data/result"
+      },
+      "denominator": null,
+      "package_path_attribution": null,
+      "organic_completed_jobs": null,
+      "limit": "Native labels identify 195 role-labelled events; package version and organic completion are unavailable. 345 events have no native lane label."
+    },
+    "typescript_sdk_hourly_series": {
+      "query": "count by (ecosystem_lane) (sum by (ecosystem_lane, conversation_id) (count_over_time({service_name=\"codex_sdk_ts\"} | conversation_id!=\"\" [1h])))",
+      "request": {
+        "route": "/loki/api/v1/query_range",
+        "start_ns": "1791428400000000000",
+        "end_ns": "1791507600000000000",
+        "step_seconds": 3600
+      },
+      "counting_unit": "Distinct identified conversations observed in each preceding hour; conversations may appear in multiple hours",
+      "returned_samples": [
+        {
+          "end_utc": "2026-10-08T04:00:00Z",
+          "conversations": 9
+        },
+        {
+          "end_utc": "2026-10-08T05:00:00Z",
+          "conversations": 100
+        },
+        {
+          "end_utc": "2026-10-08T19:00:00Z",
+          "conversations": 1
+        }
+      ],
+      "source": {
+        "path": "evidence/artifacts/sdk-runtime-adoption-20261008/loki/typescript_sdk_identified_conversations_hourly.287ac95d39a71118e42fec6ec616a0d70f1554661990fe983f886f1836e54c77.loki.json",
+        "sha256": "287ac95d39a71118e42fec6ec616a0d70f1554661990fe983f886f1836e54c77",
+        "bytes": 3806,
+        "locator": "/data/result/0/values"
+      },
+      "missing_sample_interpretation": "No series at other requested endpoints; future windows are unmeasured.",
+      "distinct_24h": {
+        "count": 108,
+        "query": "count by (ecosystem_lane) (sum by (ecosystem_lane, conversation_id) (count_over_time({service_name=\"codex_sdk_ts\"} | conversation_id!=\"\" [24h])))",
+        "evaluation_time_ns": "1791508016000000000",
+        "window_end_utc": "2026-10-09T01:06:56Z",
+        "window_hours": 24,
+        "source": {
+          "path": "evidence/artifacts/sdk-runtime-adoption-20261008/loki/typescript_sdk_identified_conversations_all.80e8b32fd74f310b697bb38fafbc39d06e4169c44ee93023d2d4aa79ceccb860.loki.json",
+          "sha256": "80e8b32fd74f310b697bb38fafbc39d06e4169c44ee93023d2d4aa79ceccb860",
+          "bytes": 3756,
+          "locator": "/data/result/0/value/1"
+        }
+      },
+      "attribution_limit": "Native lane labels are empty; package path and owning role unavailable. 108 identified all-event conversations differ from 80 tool-using conversations. Hourly counts are not additive.",
+      "expiry_limit": "Dated burst baseline; any changed 24h window requires a new retained measurement. No future zero-use claim."
+    },
+    "openhands_job_starts": {
+      "count": 1,
+      "counting_unit": "systemd unit-start messages, not completed jobs",
+      "window_hours": 24,
+      "window_start_utc": "2026-10-08T01:06:56Z",
+      "window_end_utc": "2026-10-09T01:06:56Z",
+      "native_role": null,
+      "denominator": null,
+      "source": {
+        "path": "evidence/artifacts/sdk-runtime-adoption-20261008/openhands-job-starts.aef22b0794253231a919111201c2ad3854339480edf7da10d566aa8b572bae62.json",
+        "sha256": "aef22b0794253231a919111201c2ad3854339480edf7da10d566aa8b572bae62",
+        "bytes": 1240,
+        "locator": "/rows"
+      },
+      "attribution_limit": "One selected unit-start message reproduced in the fixed window. No ecosystem_lane or completion label in this metadata. The CC-reported three starts are unavailable to this revision; no extra starts inferred."
     }
   },
   "base_commit": "aba02ec3456d383bcc2fc72883db098f9be7918a",
@@ -319,9 +440,42 @@
         "source_version": "1.53.0",
         "source_pin": "54daf056bd863bb46f922a2fe9324dd736b37ff6",
         "dispatcher_selected": false,
-        "restore_boundary": "Vendor source resync produces metadata1.53.0; no supported restore preserves the stale1.50.1/source1.53 mix."
+        "restore_boundary": "Vendor source resync produces metadata 1.53.0; no supported restore preserves the stale 1.50.1/source 1.53 mix."
       }
-    ]
+    ],
+    "capability_gate_executable_state": {
+      "captured_utc": "2026-10-09T03:47:45.822281Z",
+      "driver_pin": "0.123.1",
+      "driver_source": "tools/capability-gate/run_gate.py:49",
+      "path_package_version": "0.124.0",
+      "path_package_ref": {
+        "path": "${USER_HOME}/.local/share/codex-ecosystem/tools/promptfoo-0.124.0/lib/node_modules/promptfoo/package.json",
+        "sha256": "deb8f6569cd90b7ceb17dd57bc051bcd17401bf489ab2dd4019448ffaf37e101",
+        "locator": "/version"
+      },
+      "pinned_prefix_executables": {
+        "promptfoo": {
+          "target_exists": true,
+          "symlink_target": "../lib/node_modules/promptfoo/dist/src/entrypoint.js"
+        },
+        "pf": {
+          "target_exists": true,
+          "symlink_target": "../lib/node_modules/promptfoo/dist/src/entrypoint.js"
+        }
+      },
+      "version_probe": {
+        "argv": [
+          "promptfoo",
+          "--version"
+        ],
+        "status": "TIMEOUT",
+        "timeout_seconds": 20,
+        "rc": null
+      },
+      "capability_gate_executed": false,
+      "status": "UNQUALIFIED: PATH 0.124.0 differs from driver 0.123.1; prefix execution not accepted",
+      "correction": "CC delta saw only pf earlier; current prefix has both valid symlinks. This revision changed no executable or configuration."
+    }
   },
   "g5_binding": {
     "candidate_action_rows": [
@@ -338,6 +492,20 @@
         "repository": "langchain-ai/deepagents",
         "row_id": "ad984275af111838f0fc",
         "verdict": "NEEDS-FIX"
+      },
+      {
+        "pointer": "/rows/88",
+        "row_id": "57a68c9f0ebe83010d8f",
+        "repository": "promptfoo/promptfoo",
+        "disposition": "TRIAL",
+        "verdict": "NEEDS-FIX",
+        "pin": "421e7959642c5d4cc1c983259a268de1c6f847b9",
+        "version": "0.124.1",
+        "source": {
+          "path": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/g5_actions.d78bae7f30c83395c475ca5359022ec7e3db7cbb6a8e288ad1674a2d1ff73020.json",
+          "sha256": "d78bae7f30c83395c475ca5359022ec7e3db7cbb6a8e288ad1674a2d1ff73020",
+          "locator": "/rows/88"
+        }
       }
     ],
     "candidate_fields": [
@@ -369,7 +537,8 @@
         "/layers/8",
         "/layers/16"
       ],
-      "mutations": []
+      "mutations": [],
+      "rebase_base_commit": "58080c6b435d14c57f5b9e0bbbc0658add41c8d9"
     }
   },
   "schema": "sdk-runtime-adoption-evidence/2",
@@ -496,7 +665,7 @@
       "installed_version_at_seal": "1.53.0 source / 1.50.1 metadata",
       "limitations": [
         "Editable source checkout is v1.53.0 but package metadata still says 1.50.1. Python source hashes were compared against both release pins. This run verifies the current installed route operationally; package metadata synchronization, non-Python source files and full upstream suite remain UNVERIFIED.",
-        "Bounded owned systemd job finished with3modelrequests and exact sdk-readiness.txt oracle. No full upstream suite was run."
+        "Bounded owned systemd job finished with 3 model requests and exact sdk-readiness.txt oracle. No full upstream suite was run."
       ],
       "native_rc": 0,
       "organic_use": null,
@@ -699,6 +868,30 @@
       "sha256": "e129759fe91ffbb133de2719a7d5194fe96ac65c44b222adf7fdd4d65af0e872",
       "bytes": 60932,
       "mutable": false
+    },
+    "landed_definitive_defaults": {
+      "path": "docs/decisions/2026-10-01-new-wsl-definitive-defaults.md",
+      "sha256": "1b59e7b2100199d2b3a2125a811c7959c11dc55be9d029d4c0f676bbd9059ff5",
+      "bytes": 80195,
+      "locator": "lines 56-57, 134-135"
+    },
+    "landed_layer_consensus": {
+      "path": "docs/decisions/2026-10-02-new-wsl-layer-consensus.md",
+      "sha256": "a3a0e724c2997ce1323b87b07f80e72e57d50d9bb1ce75f4a4a356409225be39",
+      "bytes": 50007,
+      "locator": "lines 162-179"
+    },
+    "openhands_installer": {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+      "sha256": "7cec8b6cd896836f85ef57dc9cee33b0acbe44a7d9fc5ac2cf53a13450dd51eb",
+      "bytes": 487716,
+      "locator": "lines 4307-4310"
+    },
+    "foundation_catalog_drift": {
+      "path": "docs/decisions/2026-10-03-foundation-catalog-drift.md",
+      "sha256": "a4c5ddf98c9fa778d07b60507a183818b1d243dda789bc06ee8bcd612fcbcedb",
+      "bytes": 16588,
+      "locator": "lines 22-40"
     }
   },
   "workflow_measurement": {
@@ -707,7 +900,7 @@
     "definitions": "Reuse the referenced baseline definitions and scope; no new measurement run.",
     "saving_claim": null
   },
-  "revision_utc": "2026-10-09T01:06:56.047839+00:00",
+  "revision_utc": "2026-10-09T04:37:44.349553Z",
   "review_correction": {
     "reviewed_head": "45cbdbad4439dba6422fc6617eceee58502a8aaf",
     "correction": "The MCP-only historical snapshot was wrongly generalized to absence of SDK use. Native SDK services are measured; per-role/path attribution is a distinct gap.",
@@ -717,20 +910,21 @@
       "retained_snapshot": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/claude_designated_read.90bf98f56ab0f5b67028fd358399aaa30a370fd6c67c6f767d6960c40acc7cd5.md",
       "sha256": "90bf98f56ab0f5b67028fd358399aaa30a370fd6c67c6f767d6960c40acc7cd5"
     },
-    "retention_rule": "docs/decisions/2026-10-07-clean-upstream-install-finalizes-a-candidate.md:67-78 (#833): low use is an installation gap; retirement needs a better-evidenced upstream replacement for the same job or an official install shown unable to work."
+    "retention_rule": "docs/decisions/2026-10-07-clean-upstream-install-finalizes-a-candidate.md:67-73 (#833): low use is an installation gap; retirement needs a better-evidenced upstream replacement for the same job or an official install shown unable to work."
   },
   "retained_additional_evidence": [
     {
       "path": "examples/deepagents-omniroute/README.md",
       "sha256": "db694d5948539b98a36b62c08b7a641a2b6cc14ad7a9d2ac1829b15e8c29064b",
       "pin": "4394bcd00b8eb46e7c423939643a0dfcfb5d8773",
-      "version": "deepagents0.7.21",
-      "scope": "Historical failed initial live research, successful saved-context repair and fresh-process SQLite continuation; separate from SDK0.7.23 and dcode0.1.83."
+      "version": "deepagents 0.7.21",
+      "scope": "Historical failed initial live research, successful saved-context repair and fresh-process SQLite continuation; separate from SDK 0.7.23 and dcode 0.1.83."
     },
     {
       "path": "${STATE_ROOT}/research/deer-flow/run.IHU83nIK/native-retrieval-metadata.json",
       "sha256": "bc49079455731ec759af7148d42e67599626986b855449de0e1e614d5867d419",
-      "scope": "3 search witnesses,13 fetch witnesses,11 matching citations,197818 native tokens; role/client not attributed."
+      "scope": "Historical DeerFlow metadata totals unavailable to packet; no accepted numeric claim until exact value-free response is retained.",
+      "measurement_available_to_packet": false
     }
   ],
   "vendor_claude_skill_routing": {
@@ -830,5 +1024,297 @@
       "sha256": "f0afc2c734b3ad1b70e68cd38d3c844c7f4b1338cc030c8fc40fc88db1e53989",
       "scope": "Whole role-MCP profile measurements; not SDK/library component PSS. Do not substitute for missing component figure."
     }
+  },
+  "offline_parser_check": {
+    "source": {
+      "path": "evidence/artifacts/sdk-runtime-adoption-20261008/offline-parser-check.json",
+      "sha256": "ca7ec711b3ebcfe63d443f49f52a3ea96b545749874df5077be33d4d545d1bc4",
+      "bytes": 1259,
+      "locator": "/checks"
+    },
+    "uv_version": "0.12.22",
+    "bad_option_rc": 2,
+    "corrected_option_rc": 0,
+    "scope": "Offline help/argument parsing only; no environment, package or runtime installed",
+    "corrected_command": "uv venv --python 3.13 <owned-runtime>",
+    "installation_acceptance": "UNEXECUTED"
+  },
+  "vendor_openhands_install_source": {
+    "repository": "OpenHands/software-agent-sdk",
+    "pin": "54daf056bd863bb46f922a2fe9324dd736b37ff6",
+    "source_environment_install": "make build (Makefile:34-37 runs uv sync --dev)",
+    "sdk_version_source": "openhands-sdk/pyproject.toml:3",
+    "tools_version_source": "openhands-tools/pyproject.toml:3",
+    "source_files": [
+      {
+        "file": "Makefile",
+        "sha256": "f9a6fcc8a1699118a8ba648a81445d6512b7a67736fc2252b6a6fb5e324275aa"
+      },
+      {
+        "file": "openhands-sdk/pyproject.toml",
+        "sha256": "a0124442e9c8841a432cd62d282972d3e6580d28becfc1d9f2633220ea5f55f6"
+      },
+      {
+        "file": "openhands-tools/pyproject.toml",
+        "sha256": "d917f14b90b715c508e3abf3b95e4ecc14ef80f26eaf3295784bc0c7240f1c11"
+      }
+    ],
+    "selected_binary_constraints_restore": "RETAINED_EXISTING_UV_EXPORT; installation/restore execution remains unverified",
+    "commands_executed": false,
+    "constraints_witness": {
+      "path": "evidence/artifacts/sdk-runtime-adoption-20261008/openhands-1.53.0-constraints.public.d1d7d7a010130646e5e06c1b182a226ab0ee39590b7eb429e64249562b3fc235.txt",
+      "sha256": "d1d7d7a010130646e5e06c1b182a226ab0ee39590b7eb429e64249562b3fc235",
+      "bytes": 58786,
+      "locator": "lines 1-2: normalized export header; byte-identical dependency body"
+    },
+    "retained_export_command_authority": "Raw witness header lines 1-2 retained privately; public projection substitutes home prefixes in its header comment only. Dependency body is unchanged."
+  },
+  "designated_delta_read_records": {
+    "claude": {
+      "head": "7511ffa9039de552eae6ffc7fce67af4b59586f9",
+      "path": "${STATE_ROOT}/coordination/command-center/research-cc-role-20261008/pr903-claude-delta-read-7511ffa9.md",
+      "sha256": "e0bc7f5807f97512b9ff2203ac8421e3d853c5b85d3c9689c3e100f6cafc0650",
+      "bytes": 3750,
+      "verdict": "CHANGES_REQUESTED"
+    },
+    "gpt_exec": {
+      "head": "7511ffa9039de552eae6ffc7fce67af4b59586f9",
+      "path": "${STATE_ROOT}/coordination/cc-reads-20261005/delta-pr903/GPT-VERDICT-7511ffa90.full.md",
+      "sha256": "8ff7f2e3cdad3cf9595a5b175f189a2d846d8f9d5da20285b6ff9a31c733fdad",
+      "bytes": 18741,
+      "verdict": "CHANGES_REQUESTED"
+    }
+  },
+  "openhands_constraints_witness": {
+    "source": {
+      "path": "evidence/artifacts/sdk-runtime-adoption-20261008/openhands-1.53.0-constraints.public.d1d7d7a010130646e5e06c1b182a226ab0ee39590b7eb429e64249562b3fc235.txt",
+      "sha256": "d1d7d7a010130646e5e06c1b182a226ab0ee39590b7eb429e64249562b3fc235",
+      "bytes": 58786,
+      "locator": "lines 1-2: normalized export header; byte-identical dependency body"
+    },
+    "original_path": "${USER_HOME}/.local/share/new-wsl-native-stack/tools/openhands-source/openhands-1.53.0-constraints.txt",
+    "git_tracking": "untracked",
+    "original_mtime_utc": "2026-10-08T02:38:32.782614Z",
+    "evidence_class": "source_review",
+    "qualification": "Raw existing export retained byte-for-byte privately and source file unchanged. Published projection normalizes only export-header home paths; dependency body unchanged. No export, installation or restore executed.",
+    "raw_source_sha256": "77f59a5d9403594b8c78be40a0bf5d20a95353ab68a4dcfde518933d6260f17e",
+    "raw_source_bytes": 58784,
+    "raw_retained_path": "${STATE_ROOT}/research/fullspeed-20261008/sdk-harness-ready/adoption-record-20261008/openhands-1.53.0-constraints.77f59a5d9403594b8c78be40a0bf5d20a95353ab68a4dcfde518933d6260f17e.txt",
+    "published_header": [
+      "# This file was autogenerated by uv via the following command:",
+      "#    uv export --project ${USER_HOME}/.local/share/new-wsl-native-stack/tools/openhands-source --frozen --no-dev --no-hashes --no-emit-project --no-emit-workspace --no-emit-local --format requirements-txt --package openhands-tools -o ${USER_HOME}/.local/share/new-wsl-native-stack/tools/openhands-source/openhands-1.53.0-constraints.txt"
+    ],
+    "publication_normalization": {
+      "rule": "scripts/validate.py:31 rejects literal personal home paths",
+      "changes": "Only two home prefixes in the header comment replaced by ${USER_HOME}; dependency body byte-identical",
+      "raw_publication": "NOT_PUBLISHED; exact raw bytes retained privately",
+      "dependency_body_verified_equal": true
+    }
+  },
+  "pre_cue_tool_binding": {
+    "path": "${STATE_ROOT}/coordination/command-center/cc-tools/base_tests_at_head.sh",
+    "sha256": "82a2f507b773258f6beb1e727b12cfa5101e8ffb2d5dc520c5ccabde228fedf5",
+    "bytes": 2870,
+    "source_locator": "lines 2-9 usage; 14-20 exact base/head and zero-test fast path",
+    "invocation": "bash <tool> <assigned-worktree> 58080c6b435d14c57f5b9e0bbbc0658add41c8d9 <rebased-head> unittest",
+    "scope": "CC pre-cue check of base versions of modified existing test files; does not replace targeted module checks or designated reads",
+    "status": "PENDING_REBASED_HEAD"
+  },
+  "rebase_base_commit": "58080c6b435d14c57f5b9e0bbbc0658add41c8d9",
+  "designated_micro_read_records": {
+    "claude": {
+      "head": "62426cf9fe81ebf7766fad9a7a139dd5bc575088",
+      "path": "${STATE_ROOT}/coordination/command-center/research-cc-role-20261008/pr903-claude-micro-read-62426cf9.md",
+      "sha256": "341ce969e1b40c2cac025ca1c150a3c6042ba3814e5ba995be4dc19c1ed21a4d",
+      "bytes": 2353,
+      "verdict": "PASS_WITH_P3"
+    },
+    "gpt_exec": {
+      "head": "62426cf9fe81ebf7766fad9a7a139dd5bc575088",
+      "path": "${STATE_ROOT}/coordination/cc-reads-20261005/micro-pr903/GPT-VERDICT-62426cf9f.full.md",
+      "sha256": "879c03a9e631a5e0932521c801afe41ad7c6f931aa4fa1649b637328a9d21123",
+      "bytes": 18193,
+      "verdict": "CHANGES_REQUESTED_P3"
+    }
+  },
+  "frozen_catalog_drift": {
+    "path": "catalogs/landscape/foundation.json",
+    "sha256": "868d193a31080ab913400725140bd0d01e0afe97e28564fd12777f737d22951a",
+    "captured_base_commit": "aba02ec3456d383bcc2fc72883db098f9be7918a",
+    "rebase_base_commit": "58080c6b435d14c57f5b9e0bbbc0658add41c8d9",
+    "rows": [
+      {
+        "pointer": "/layers/2",
+        "layer_id": "workers",
+        "current_choice": "Native Claude/Codex workers with owned Worktrunk worktrees; optional Beads when dependency tracking is needed, optional qualified cross-client review and an opt-in semantic-evidence-reviewer with explicit TypeSafe context.",
+        "decision": "keep_but_compare",
+        "winners": [
+          {
+            "component_id": "claude-code",
+            "repository": "https://github.com/anthropics/claude-code",
+            "pin": "2.1.278",
+            "evidence_class": "local_integration",
+            "why_selected": "This verdict comes from my own source review of retained receipts. No head-to-head comparison was run. The requirement has three parts: delegate bounded work, keep owned edits and failed results, and integrate only after review.\n\nc12 (Claude native workers) is the only adopted candidate with retained executed evidence of an owned writing child that also keeps its failed results. c7 (Worktrunk) was qualified separately as the owned-worktree lifecycle tool. It did not provide the isolation used by the delegated child.\n\n(1) Bounded delegation, native execution (c12). On Claude Code 2.1.278, one foreground native Opus child ran with the role's native `isolation: worktree`, not a Worktrunk worktree. It changed only planner.py in that worktree. The seed failed 8 of 12 visible tests. Afterwards all 12 unchanged tests passed. An independent oracle checked all 65,536 four-node graphs, and the primary checkout stayed clean (blueprints/convergence-practice/native-worker/README.md lines 3-26 and 42-44; catalogs/foundation/decisions.json owned-native-child, lines 338-376). The oracle was author-written and visible to the worker (README lines 35-37).\n\n(2) Failed results kept, local integration fixture (c12). native-workflow-graceful-recovery (decisions.json lines 2600-2650) records a selected reviewer stop that kept a failed child and a null result. Replay reused the completed implementation. A same-session resume integrated the repair and kept later user edits. 29 visible and seven hidden checks passed. The record calls this \"a local integration fixture, not an unchanged upstream product test\".\n\n(3) Interruption recovery, native execution on one synthetic same-host task (c12). The sequence was cancellation, continuation of the same child, parent SIGKILL, systemd cgroup cleanup and finalization of the same child. It produced one effect (decisions.json lines 2324-2383; blueprints/convergence-practice/worker-recovery/README.md lines 1-17).\n\n(4) Owned edits, native execution (c7), on a synthetic repository with no model child.\n- Worktrunk 0.78.0 created and listed owned worktrees, then removed them.\n- It refused a dirty removal without loss (blueprints/convergence-practice/wsl-native-tools/receipt.json line 10 and lines 27-30).\n- decisions.json owned-worktrees (lines 478-521) marks it selection \"default\", accepted_within_scope.\n- Only a native old/new comparison of the corrected child working directory covers the packet pin 0.79.0. Its Rust suite was not run (docs/full-stack-convergence.md lines 124-130).\n- docs/token-native-saturation.md line 121 rates worktrunk only \"optional | use, cleanup | supporting workflow / 0\".\n\n(5) Review before integration: decisions.json lines 2672 and 2676 record eight native review-changes runs. The gate was fix-and-commit after independent review; the strict accepted status was never returned. c8/c11 also have executed review evidence: a native Claude-to-Codex foreground review returned (recipes/claude-codex-foreground-review.md lines 20-29). That covers only the review part, not delegation of owned edits.\n\ndocs/foundation-convergence-20260921.md line 20 records the project's decision to retain this setup. That is a claim, not extra evidence. The weakest winner evidence class is local_integration, because (2) is only a local fixture.",
+            "evidence_refs": [
+              "catalogs/foundation/decisions.json",
+              "blueprints/convergence-practice/native-worker/README.md",
+              "blueprints/convergence-practice/worker-recovery/README.md",
+              "blueprints/convergence-practice/wsl-native-tools/receipt.json",
+              "docs/foundation-convergence-20260921.md",
+              "docs/full-stack-convergence.md",
+              "docs/token-native-saturation.md"
+            ],
+            "recipe_ref": "recipes/claude-native-profile.md",
+            "platform_status": {
+              "linux-wsl2-x86_64": "conditional",
+              "macos-arm64": "untested"
+            }
+          },
+          {
+            "component_id": "worktrunk",
+            "repository": "https://github.com/max-sixty/worktrunk",
+            "pin": "0.79.0",
+            "evidence_class": "local_integration",
+            "why_selected": "This verdict comes from my own source review of retained receipts. No head-to-head comparison was run. The requirement has three parts: delegate bounded work, keep owned edits and failed results, and integrate only after review.\n\nc12 (Claude native workers) is the only adopted candidate with retained executed evidence of an owned writing child that also keeps its failed results. c7 (Worktrunk) was qualified separately as the owned-worktree lifecycle tool. It did not provide the isolation used by the delegated child.\n\n(1) Bounded delegation, native execution (c12). On Claude Code 2.1.278, one foreground native Opus child ran with the role's native `isolation: worktree`, not a Worktrunk worktree. It changed only planner.py in that worktree. The seed failed 8 of 12 visible tests. Afterwards all 12 unchanged tests passed. An independent oracle checked all 65,536 four-node graphs, and the primary checkout stayed clean (blueprints/convergence-practice/native-worker/README.md lines 3-26 and 42-44; catalogs/foundation/decisions.json owned-native-child, lines 338-376). The oracle was author-written and visible to the worker (README lines 35-37).\n\n(2) Failed results kept, local integration fixture (c12). native-workflow-graceful-recovery (decisions.json lines 2600-2650) records a selected reviewer stop that kept a failed child and a null result. Replay reused the completed implementation. A same-session resume integrated the repair and kept later user edits. 29 visible and seven hidden checks passed. The record calls this \"a local integration fixture, not an unchanged upstream product test\".\n\n(3) Interruption recovery, native execution on one synthetic same-host task (c12). The sequence was cancellation, continuation of the same child, parent SIGKILL, systemd cgroup cleanup and finalization of the same child. It produced one effect (decisions.json lines 2324-2383; blueprints/convergence-practice/worker-recovery/README.md lines 1-17).\n\n(4) Owned edits, native execution (c7), on a synthetic repository with no model child.\n- Worktrunk 0.78.0 created and listed owned worktrees, then removed them.\n- It refused a dirty removal without loss (blueprints/convergence-practice/wsl-native-tools/receipt.json line 10 and lines 27-30).\n- decisions.json owned-worktrees (lines 478-521) marks it selection \"default\", accepted_within_scope.\n- Only a native old/new comparison of the corrected child working directory covers the packet pin 0.79.0. Its Rust suite was not run (docs/full-stack-convergence.md lines 124-130).\n- docs/token-native-saturation.md line 121 rates worktrunk only \"optional | use, cleanup | supporting workflow / 0\".\n\n(5) Review before integration: decisions.json lines 2672 and 2676 record eight native review-changes runs. The gate was fix-and-commit after independent review; the strict accepted status was never returned. c8/c11 also have executed review evidence: a native Claude-to-Codex foreground review returned (recipes/claude-codex-foreground-review.md lines 20-29). That covers only the review part, not delegation of owned edits.\n\ndocs/foundation-convergence-20260921.md line 20 records the project's decision to retain this setup. That is a claim, not extra evidence. The weakest winner evidence class is local_integration, because (2) is only a local fixture.",
+            "evidence_refs": [
+              "catalogs/foundation/decisions.json",
+              "blueprints/convergence-practice/native-worker/README.md",
+              "blueprints/convergence-practice/worker-recovery/README.md",
+              "blueprints/convergence-practice/wsl-native-tools/receipt.json",
+              "docs/foundation-convergence-20260921.md",
+              "docs/full-stack-convergence.md",
+              "docs/token-native-saturation.md"
+            ],
+            "recipe_ref": "recipes/native-upgrades-20260921.md",
+            "platform_status": {
+              "linux-wsl2-x86_64": "conditional",
+              "macos-arm64": "untested"
+            }
+          }
+        ]
+      },
+      {
+        "pointer": "/layers/8",
+        "layer_id": "web-research",
+        "current_choice": "agent-browser, selected Playwright CLI operations, OpenResearch literature retrieval and Tavily CLI search/extract skills.",
+        "decision": "retain",
+        "winners": [
+          {
+            "component_id": "tavily-cli",
+            "repository": "https://github.com/tavily-ai/tavily-cli",
+            "pin": "0.1.8",
+            "evidence_class": "local_integration",
+            "why_selected": "This is my own review of the original receipts, revised after the refuter findings. It does not restate the packet's withheld dispositions. The requirement has three parts: attributable primary-source retrieval, interaction with selected pages, and bounded native commands without a standing research-agent stack. Each winner covers a different part, and each has retained native execution, including one retained Tavily search miss.\n\n(1) Tavily CLI (c8) covers primary-source search and extraction. Three separate retained runs exist:\n- docs/ecosystem/tavily-receipt.json (2026-09-20T02:48Z), lines 84-92 and 144: native authentication, plus one search capped at 3 results that returned three code.claude.com sources. Extraction was not exercised in that run.\n- evidence/receipts/native-tavily-cli-20260920.json: `uv tool install tavily-cli` exited 0 (tavily-cli==0.1.8). A domain-limited `tvly search --max-results 4` exited 0 with result_count 4, and `tvly extract https://code.claude.com/docs/en/sub-agents` exited 0 with result_count 1 and failed_count 0.\n- evidence/receipts/native-tavily-session-20260920.json (native_cli_e2e, Codex Desktop task, upstream_cli_version 0.1.8). An IBKR/Nautilus search exited 0 and returned three official ibkrcampus.com sources, but it missed the intended Nautilus adapter guide (line 11, and \"intended_adapter_guide_found\": false at line 83). This is a retained search miss. A direct known-URL `tvly extract` of the nautilustrader.io IBKR page then exited 0 with results 1 and failed_results [] (lines 86-90).\nThe decision's evidence_scope names both runs (catalogs/foundation/decisions.json lines 2294-2298). Across these runs, Search found relevant official sources but did not reliably surface a specific target page. Extraction of a known URL worked twice.\n\n(2) agent-browser (c1) covers page interaction. evidence/receipts/desktop-cli-workflows.json (kind native_model_e2e) lines 42-61 record an active Codex Desktop task running open, snapshot -i, fill, click, get text #status, screenshot and close against fixtures/greeting.html. all_exit_codes is 0, observed_status is \"Hello, Publication Codex Desktop!\", the screenshot was visually inspected and the owned session was closed. That receipt records no agent-browser version. A separate 2026-09-21 `agent-browser --version` returned \"agent-browser 0.38.1\" (evidence/artifacts/claude-repository-evidence-20260921/results.json line 5788), and nothing ties that check to the fixture run. docs/dashboard-rendered-acceptance.md line 28 records a separate observed use on a real Dagu browser stream.\n\n(3) OpenResearch (c7) covers primary literature. Two runs are retained:\n- On 2026-09-20 (no version recorded; this predates the 0.2.4 to 0.2.7 upgrade), `orx --no-telemetry paper 2608.02583 --full` returned the full public paper, 63560 bytes, with no model or agent job (evidence/receipts/token-practice-gap-followup-20260920.json lines 66-71 and 195-200).\n- For the current 0.2.7 pin, evidence/artifacts/full-stack-convergence-20260921/orx-worktrunk-upgrades.json lines 9-58 record `orx --no-telemetry discover keyword 'retrieval augmented generation memory' --limit 3` (exit 0, result_count 3), `orx --no-telemetry paper 2609.05760 --full` (exit 0, 69752 UTF-8 bytes) and 7 of 7 unchanged upstream Markdown tests passed. recipes/native-upgrades-20260921.md line 13 and docs/full-stack-convergence.md lines 124-128 point to this receipt.\n\nAll three winners are CLI commands run on demand. The set's class is local_integration, the weakest among the winners, because the browser interaction was shown only on a local fixture and a dashboard. The Tavily and OpenResearch runs are single bounded queries, not benchmarks.",
+            "evidence_refs": [
+              "evidence/receipts/native-tavily-cli-20260920.json",
+              "evidence/receipts/native-tavily-session-20260920.json",
+              "docs/ecosystem/tavily-receipt.json",
+              "evidence/receipts/desktop-cli-workflows.json",
+              "docs/dashboard-rendered-acceptance.md",
+              "evidence/artifacts/claude-repository-evidence-20260921/results.json",
+              "evidence/receipts/token-practice-gap-followup-20260920.json",
+              "evidence/artifacts/full-stack-convergence-20260921/orx-worktrunk-upgrades.json",
+              "recipes/native-upgrades-20260921.md",
+              "catalogs/foundation/decisions.json",
+              "docs/full-stack-convergence.md"
+            ],
+            "recipe_ref": "recipes/tavily.md",
+            "platform_status": {
+              "linux-wsl2-x86_64": "conditional",
+              "macos-arm64": "untested"
+            }
+          },
+          {
+            "component_id": "agent-browser",
+            "repository": "https://github.com/vercel-labs/agent-browser",
+            "pin": "0.38.1",
+            "evidence_class": "local_integration",
+            "why_selected": "This is my own review of the original receipts, revised after the refuter findings. It does not restate the packet's withheld dispositions. The requirement has three parts: attributable primary-source retrieval, interaction with selected pages, and bounded native commands without a standing research-agent stack. Each winner covers a different part, and each has retained native execution, including one retained Tavily search miss.\n\n(1) Tavily CLI (c8) covers primary-source search and extraction. Three separate retained runs exist:\n- docs/ecosystem/tavily-receipt.json (2026-09-20T02:48Z), lines 84-92 and 144: native authentication, plus one search capped at 3 results that returned three code.claude.com sources. Extraction was not exercised in that run.\n- evidence/receipts/native-tavily-cli-20260920.json: `uv tool install tavily-cli` exited 0 (tavily-cli==0.1.8). A domain-limited `tvly search --max-results 4` exited 0 with result_count 4, and `tvly extract https://code.claude.com/docs/en/sub-agents` exited 0 with result_count 1 and failed_count 0.\n- evidence/receipts/native-tavily-session-20260920.json (native_cli_e2e, Codex Desktop task, upstream_cli_version 0.1.8). An IBKR/Nautilus search exited 0 and returned three official ibkrcampus.com sources, but it missed the intended Nautilus adapter guide (line 11, and \"intended_adapter_guide_found\": false at line 83). This is a retained search miss. A direct known-URL `tvly extract` of the nautilustrader.io IBKR page then exited 0 with results 1 and failed_results [] (lines 86-90).\nThe decision's evidence_scope names both runs (catalogs/foundation/decisions.json lines 2294-2298). Across these runs, Search found relevant official sources but did not reliably surface a specific target page. Extraction of a known URL worked twice.\n\n(2) agent-browser (c1) covers page interaction. evidence/receipts/desktop-cli-workflows.json (kind native_model_e2e) lines 42-61 record an active Codex Desktop task running open, snapshot -i, fill, click, get text #status, screenshot and close against fixtures/greeting.html. all_exit_codes is 0, observed_status is \"Hello, Publication Codex Desktop!\", the screenshot was visually inspected and the owned session was closed. That receipt records no agent-browser version. A separate 2026-09-21 `agent-browser --version` returned \"agent-browser 0.38.1\" (evidence/artifacts/claude-repository-evidence-20260921/results.json line 5788), and nothing ties that check to the fixture run. docs/dashboard-rendered-acceptance.md line 28 records a separate observed use on a real Dagu browser stream.\n\n(3) OpenResearch (c7) covers primary literature. Two runs are retained:\n- On 2026-09-20 (no version recorded; this predates the 0.2.4 to 0.2.7 upgrade), `orx --no-telemetry paper 2608.02583 --full` returned the full public paper, 63560 bytes, with no model or agent job (evidence/receipts/token-practice-gap-followup-20260920.json lines 66-71 and 195-200).\n- For the current 0.2.7 pin, evidence/artifacts/full-stack-convergence-20260921/orx-worktrunk-upgrades.json lines 9-58 record `orx --no-telemetry discover keyword 'retrieval augmented generation memory' --limit 3` (exit 0, result_count 3), `orx --no-telemetry paper 2609.05760 --full` (exit 0, 69752 UTF-8 bytes) and 7 of 7 unchanged upstream Markdown tests passed. recipes/native-upgrades-20260921.md line 13 and docs/full-stack-convergence.md lines 124-128 point to this receipt.\n\nAll three winners are CLI commands run on demand. The set's class is local_integration, the weakest among the winners, because the browser interaction was shown only on a local fixture and a dashboard. The Tavily and OpenResearch runs are single bounded queries, not benchmarks.",
+            "evidence_refs": [
+              "evidence/receipts/native-tavily-cli-20260920.json",
+              "evidence/receipts/native-tavily-session-20260920.json",
+              "docs/ecosystem/tavily-receipt.json",
+              "evidence/receipts/desktop-cli-workflows.json",
+              "docs/dashboard-rendered-acceptance.md",
+              "evidence/artifacts/claude-repository-evidence-20260921/results.json",
+              "evidence/receipts/token-practice-gap-followup-20260920.json",
+              "evidence/artifacts/full-stack-convergence-20260921/orx-worktrunk-upgrades.json",
+              "recipes/native-upgrades-20260921.md",
+              "catalogs/foundation/decisions.json",
+              "docs/full-stack-convergence.md"
+            ],
+            "recipe_ref": "recipes/README.md",
+            "platform_status": {
+              "linux-wsl2-x86_64": "conditional",
+              "macos-arm64": "untested"
+            }
+          },
+          {
+            "component_id": "openresearch",
+            "repository": "https://github.com/alphaXiv/OpenResearch",
+            "pin": "0.2.7",
+            "evidence_class": "local_integration",
+            "why_selected": "This is my own review of the original receipts, revised after the refuter findings. It does not restate the packet's withheld dispositions. The requirement has three parts: attributable primary-source retrieval, interaction with selected pages, and bounded native commands without a standing research-agent stack. Each winner covers a different part, and each has retained native execution, including one retained Tavily search miss.\n\n(1) Tavily CLI (c8) covers primary-source search and extraction. Three separate retained runs exist:\n- docs/ecosystem/tavily-receipt.json (2026-09-20T02:48Z), lines 84-92 and 144: native authentication, plus one search capped at 3 results that returned three code.claude.com sources. Extraction was not exercised in that run.\n- evidence/receipts/native-tavily-cli-20260920.json: `uv tool install tavily-cli` exited 0 (tavily-cli==0.1.8). A domain-limited `tvly search --max-results 4` exited 0 with result_count 4, and `tvly extract https://code.claude.com/docs/en/sub-agents` exited 0 with result_count 1 and failed_count 0.\n- evidence/receipts/native-tavily-session-20260920.json (native_cli_e2e, Codex Desktop task, upstream_cli_version 0.1.8). An IBKR/Nautilus search exited 0 and returned three official ibkrcampus.com sources, but it missed the intended Nautilus adapter guide (line 11, and \"intended_adapter_guide_found\": false at line 83). This is a retained search miss. A direct known-URL `tvly extract` of the nautilustrader.io IBKR page then exited 0 with results 1 and failed_results [] (lines 86-90).\nThe decision's evidence_scope names both runs (catalogs/foundation/decisions.json lines 2294-2298). Across these runs, Search found relevant official sources but did not reliably surface a specific target page. Extraction of a known URL worked twice.\n\n(2) agent-browser (c1) covers page interaction. evidence/receipts/desktop-cli-workflows.json (kind native_model_e2e) lines 42-61 record an active Codex Desktop task running open, snapshot -i, fill, click, get text #status, screenshot and close against fixtures/greeting.html. all_exit_codes is 0, observed_status is \"Hello, Publication Codex Desktop!\", the screenshot was visually inspected and the owned session was closed. That receipt records no agent-browser version. A separate 2026-09-21 `agent-browser --version` returned \"agent-browser 0.38.1\" (evidence/artifacts/claude-repository-evidence-20260921/results.json line 5788), and nothing ties that check to the fixture run. docs/dashboard-rendered-acceptance.md line 28 records a separate observed use on a real Dagu browser stream.\n\n(3) OpenResearch (c7) covers primary literature. Two runs are retained:\n- On 2026-09-20 (no version recorded; this predates the 0.2.4 to 0.2.7 upgrade), `orx --no-telemetry paper 2608.02583 --full` returned the full public paper, 63560 bytes, with no model or agent job (evidence/receipts/token-practice-gap-followup-20260920.json lines 66-71 and 195-200).\n- For the current 0.2.7 pin, evidence/artifacts/full-stack-convergence-20260921/orx-worktrunk-upgrades.json lines 9-58 record `orx --no-telemetry discover keyword 'retrieval augmented generation memory' --limit 3` (exit 0, result_count 3), `orx --no-telemetry paper 2609.05760 --full` (exit 0, 69752 UTF-8 bytes) and 7 of 7 unchanged upstream Markdown tests passed. recipes/native-upgrades-20260921.md line 13 and docs/full-stack-convergence.md lines 124-128 point to this receipt.\n\nAll three winners are CLI commands run on demand. The set's class is local_integration, the weakest among the winners, because the browser interaction was shown only on a local fixture and a dashboard. The Tavily and OpenResearch runs are single bounded queries, not benchmarks.",
+            "evidence_refs": [
+              "evidence/receipts/native-tavily-cli-20260920.json",
+              "evidence/receipts/native-tavily-session-20260920.json",
+              "docs/ecosystem/tavily-receipt.json",
+              "evidence/receipts/desktop-cli-workflows.json",
+              "docs/dashboard-rendered-acceptance.md",
+              "evidence/artifacts/claude-repository-evidence-20260921/results.json",
+              "evidence/receipts/token-practice-gap-followup-20260920.json",
+              "evidence/artifacts/full-stack-convergence-20260921/orx-worktrunk-upgrades.json",
+              "recipes/native-upgrades-20260921.md",
+              "catalogs/foundation/decisions.json",
+              "docs/full-stack-convergence.md"
+            ],
+            "recipe_ref": "recipes/native-upgrades-20260921.md",
+            "platform_status": {
+              "linux-wsl2-x86_64": "conditional",
+              "macos-arm64": "untested"
+            }
+          }
+        ]
+      },
+      {
+        "pointer": "/layers/16",
+        "layer_id": "agent-sdks",
+        "current_choice": "Codex SDK/CLI (component codex) for supported start/run/resume; Claude Agent SDK, OpenHands SDK, Temporal and LangGraph remain source-reviewed, unselected alternatives.",
+        "decision": "retain",
+        "winners": [
+          {
+            "component_id": "codex",
+            "repository": "https://github.com/openai/codex",
+            "pin": "0.155.1",
+            "evidence_class": "native_proven",
+            "why_selected": "c4 (Codex SDK/CLI) stays the default because it is the incumbent, with a native integration on record. It did not win a comparison. My own source review found these observations.\n(1) Native end-to-end run. blueprints/us-equities/workers/receipt.json (kind native_model_e2e, 2026-09-19) records the Python openai-codex 0.154.0 SDK driving native Codex 0.155.1. One research task finished with run.status \"completed\", duration_ms 58410 and configured_model \"gpt-6-astra\". The run returned per-turn usage (totalTokens 135311, lines 40-47) and the exact result fields (lines 51-58). It also returned structured tool events (lines 59-85): four Context Mode calls completed and one ctx_execute_file call failed. The same receipt records two more native turns (lines 132-220). Both had extraction_task_succeeded false, one blocked by the project root and one by approval policy. Across all three turns the total is 204091 tokens, with successful_research_tasks 1 and blocked_file_extraction_tasks 2. blueprints/us-equities/workers/README.md lines 39-45 name the upstream SDK calls used.\n(2) Executed three-arm workers comparison. evidence/artifacts/comparison-progress-20260922/summary.json lines 132-157 record 9 submissions across three arms: native Claude CLI, the Codex SDK via native_worker.py, and the Claude Agent SDK. The result is \"unresolved\" and publication_eligible is false, with the note \"no arm accepted as a winner and no SDK adoption follows\". worker-receipts-followup.json lines 112-238 add detail. Codex arm B completed both replays with reported_completeness 1. Its cancel submission ended no_receipt/SIGINT with usage not_requested. Claude Agent SDK arm C also succeeded on both replays with completeness 1, and its cancel was interrupted with usage unavailable. Recovery was not run and no artifact judge was pinned. So the comparison neither overturns nor confirms c4.\n(3) Activation record. catalogs/foundation/decisions.json lines 2831-2841 set selection \"conditional\" and review_status \"source_review\", with the activation text \"Use the Codex CLI/SDK for existing supported start/run/resume workflows\". The decision's evidence_ids point only to token-practice-coverage-20260920; the link to the us-equities receipt is mine, not the decision's.\nTwo limits apply. First, native_worker.py line 77 sets ephemeral=True, so this integration does not show resume. Second, README lines 53-57 say inherited MCP servers and hooks are not made read-only, so c4 isolation is unverified.",
+            "evidence_refs": [
+              "blueprints/us-equities/workers/receipt.json",
+              "blueprints/us-equities/workers/README.md",
+              "blueprints/us-equities/workers/native_worker.py",
+              "evidence/artifacts/comparison-progress-20260922/summary.json",
+              "evidence/artifacts/comparison-progress-20260922/worker-receipts-followup.json",
+              "catalogs/foundation/decisions.json"
+            ],
+            "recipe_ref": "recipes/README.md",
+            "platform_status": {
+              "linux-wsl2-x86_64": "accepted",
+              "macos-arm64": "untested"
+            }
+          }
+        ]
+      }
+    ],
+    "governing_host_sources": [
+      "source_refs/landed_definitive_defaults",
+      "source_refs/landed_layer_consensus"
+    ],
+    "drift_record_source": {
+      "path": "docs/decisions/2026-10-03-foundation-catalog-drift.md",
+      "sha256": "a4c5ddf98c9fa778d07b60507a183818b1d243dda789bc06ee8bcd612fcbcedb",
+      "bytes": 16588,
+      "locator": "lines 22-40"
+    },
+    "re_record": "Frozen catalog rows differ from governing D01/C02 host selections; flag for post-G5 catalog re-record. No catalog row changes in this PR."
   }
 }
