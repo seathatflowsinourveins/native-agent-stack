@@ -83,17 +83,24 @@ The workflow is new, so this is all of its behaviour.
   distinct assistant message ids without a parent
   tool use, because the agents' own turns are theirs; a client cost estimate, the highest any result record reports,
   of at most $24.20, the $22 budget times the measured overrun factor 1.10 (Cost of one run), whether or not the run
-  ended in a budget stop; a cache read; result text; and both agents' report sections. The step holds the budget and
+  ended in a budget stop; a cache read, checked only when the usage is complete; result text; and both agents'
+  handbacks. A handback counts only as a `SubagentHandback` message whose parent is the coordinator's Agent call for
+  that agent, once per agent however many calls it had, and it is required whatever the result records say; headings
+  in the coordinator's relay never count (R6). The step holds the budget and
   the bound as `budget=22 cost_bound=24.2` and passes both to jq. The step names every bound it finds unmet. The
   costliest result record also supplies `models`. With background agents the client emits several result records, and
   the last can be an empty
-  idle tick, so the coordinator's relay is the last result with text. When that relay lacks an agent's section, the
-  reports are assembled from each agent's own `SubagentHandback` message in the execution file: in J8 #894 the
+  idle tick, so the coordinator's relay is the last result with text. The report step never publishes that relay
+  (R6): it publishes each agent's own `SubagentHandback` message from the execution file, pr-test-analyzer's then
+  silent-failure-hunter's, each under its own heading, and for an agent called more than once its last handback; it
+  runs only after both agents handed back. In J8 #894 the
   coordinator hit `--max-budget-usd 5` (`error_max_budget_usd`) after both agents had handed back their full reports,
   and never relayed them. All three J8 streams so far (#892, #900, #894) carry `SubagentHandback` calls.
 - `usage.json` holds `complete`, `total_cost_usd` (the highest over the result records), `num_turns` (the highest
   over the result records, not their sum: J8 #894's five records hold 3, 1, 0, 1 and 0), `assistant_turns`,
-  `result_chars`, `report_source`, `report_sections`, `agents_called` (the coordinator's Agent calls, sorted, each
+  `result_chars`, `report_source` (`handbacks` when any agent handed back, and otherwise `relay`, the relay then
+  measured for the record only), `report_sections` (the agents' sections in that text; no longer a bound since R6),
+  `agents_called` (the coordinator's Agent calls, sorted, each
   either one of the two toolkit agents or `other`, a retried agent listed once per call), `handbacks` (how many of
   the two agents handed back),
   `result_subtypes`, `tools_listed`, `successful_result` (every result record accepted, as above, whether or not its
@@ -116,13 +123,15 @@ The workflow is new, so this is all of its behaviour.
   records: <subtypes>; handbacks: <n> of 2)`, which replaces `the run did not end in success`;
   `the coordinator did not call both toolkit agents and no other agent (agents called: <agents>)`; and
   `client cost estimate <x> USD, above the 24.2 USD bound (the 22 USD budget times its measured overrun factor 1.10)`,
-  which replaces `..., above 7`.
+  which replaces `..., above 7`. R6 replaces `<n> of 2 agent reports`, which counted headings, with
+  `<n> of 2 agent reports handed back`, which counts handbacks.
 - The reports go to the job summary only when the numbers step succeeded: the publish step's condition is
-  `always() && steps.numbers.outcome == 'success' && steps.claude_toolkit.outputs.execution_file != ''`, not
-  `success()`. The action fails its own step on a first result that is not a plain success, which includes a budget stop
-  the numbers step accepts, and on a success whose `num_turns` exceeds `--max-turns`, a count the numbers step does not
-  use. The job then stays failed with the reports published. They are capped at 60,000 bytes on a character boundary,
-  with a line saying so when they were longer.
+  `!cancelled() && steps.numbers.outcome == 'success'`, not `success()`. The action fails its own step on a first
+  result that is not a plain success, which includes a budget stop the numbers step accepts, and on a success whose
+  `num_turns` exceeds `--max-turns`, a count the numbers step does not use. The job then stays failed with the reports
+  published. A cancelled run publishes nothing (R6). The numbers step runs only when the action set an execution file,
+  so its success implies one. The reports are capped at 60,000 bytes on a character boundary, with a line saying so
+  when they were longer.
 
 ## Why the pinned checkout and not the action's `plugins` input
 
@@ -170,13 +179,7 @@ Opus, and twice the top of that is about $22. The coordinator's 12 turns stay, t
 cost of a run is about $6.6 to $10.9. A hosted run bills the federated organization, not the second key, so $22 is
 the owner's spend limit for one run of this workflow once its variable is enabled.
 
-The client checks its budget after a turn, so a run can end a little above it. The numbers step's cost bound is
-therefore the budget times a measured overrun factor, 1.10: $22 × 1.10 = $24.20 (the command center's decision of
-2026-10-09). The factor comes from the largest settled overrun among J8's $5-budget runs on 2026-10-09: #895's run
-cost $5.46 on $5, 9.2% over. The others ended at $5.0007, $5.16 and $5.33, so 1.10 rounds the largest up. A run
-above $24.20 fails, whether or not it ended in a budget stop; a budget stop at or under it, after both agents
-handed back, passes and publishes both reports. The factor is re-derived after #909's first three runs: an overrun
-is about one turn's cost, so the ratio should shrink at $22. The turn bound stays 1 to 12.
+The client stops a run only after its cost has crossed `--max-budget-usd`, so a cost bound equal to the budget fails a normal budget stop. Four measured J8 runs on a $5 budget ended above it: $5.46 (9.2% over, the largest overrun), $5.33, $5.16 and $5.0007, on #895, trading #11, #902 and #894. The cost bound is therefore the budget times 1.10, a factor that rounds up the largest measured overrun; the factor is derived again after this workflow's first three hosted runs. A run at or under the bound passes the cost check. A budget stop (result subtype `error_max_budget_usd`) at or under the bound publishes what the run produced, and the summary names the stop. A run above the bound fails closed and names the overrun. This workflow's budget is $22, so its bound is $24.20.
 
 Runs spend from the Console organization that the repository variables `ANTHROPIC_ORGANIZATION_ID`,
 `ANTHROPIC_FEDERATION_RULE_ID`, `ANTHROPIC_SERVICE_ACCOUNT_ID` and `ANTHROPIC_WORKSPACE_ID` name. Activation is the
@@ -192,14 +195,15 @@ then the same agents run locally on the second key, which already meets the need
 - `tests.test_workflow_security_coverage.NewWorkflowSecurityCoverageTests`: the coverage set gains the workflow, with
   its own offline zizmor test.
 
-New, in `tests/test_claude_pr_toolkit_review_workflow.py` (56 tests): the trigger, condition, permissions, checkout
+New, in `tests/test_claude_pr_toolkit_review_workflow.py` (57 tests): the trigger, condition, permissions, checkout
 layout, toolkit checkout, step order, pin, inputs, time limits, flags (exactly, line by line), prompt and settings
 (exactly) are asserted from the workflow file; the guard, binding, link removal, diff, toolkit check, numbers and
 report steps are executed as written against local stand-ins for `gh` and `git` and a local git repository. They run without PyYAML, through the policy test's own
 loader. Eight weakened copies of the workflow each fail at least one test: the report-sections bound removed, the turn
 count including the agents' turns, Bash allowed, no time scaling, no hash check, the toolkit ref moved to `main`, the
 runtime `plugins` input added, and a $70 cost bound. Three more each fail them for the handback fallback: the
-handbacks ignored, the wrong handback tool name, and the handbacks preferred over a complete relay.
+handbacks ignored, the wrong handback tool name, and the handbacks preferred over a complete relay. R6 reverses
+that last preference: the handbacks are now always published, and a copy that prefers the relay fails.
 
 ## Debug logging set as a repository secret or variable (2026-10-09)
 
@@ -226,7 +230,7 @@ was. The step now writes the text with `jq -j`, which adds none, and a test publ
 60,001 bytes (no notice, then the notice); a copy that writes with `jq -r` again fails it. The step's comment says
 what it publishes: the coordinator's relay, which is the last non-empty result text, when that relay carries both
 agents' sections, and otherwise each agent's own handback; with no handback at all it publishes the relay as it is.
-That is what the step does.
+That is what the step did then; R6 replaces it with the two handbacks only (below).
 
 ## Round 5: result records, caps, link removal and exact pins (2026-10-09)
 
@@ -252,7 +256,8 @@ changes below. Each new or changed step, condition, field and message is also in
     record still holds both handbacks, and the numbers step passes on both cut streams.
   - Whether the client, run through the action's SDK path, also waits for the background agents before its first
     result record is not measured. If it does not, the file ends after the coordinator's first turn, before any
-    handback: the report bound fails with `0 of 2 agent reports`, the numbers step fails, and nothing is published.
+    handback: the report bound fails with `0 of 2 agent reports` (since R6, the handback bound with
+    `0 of 2 agent reports handed back`), the numbers step fails, and nothing is published.
     The run fails closed. The first hosted runs measure which happens.
   - A budget stop costs at least the budget (J8 #894: $5.0007 on $5). The cost bound is therefore the budget times
     the measured overrun factor 1.10, $24.20 (the caps below and "Cost of one run"). A budget stop at or under it,
@@ -327,7 +332,8 @@ Tests:
     once a budget-stop record is among those read;
   - `test_a_file_that_ends_before_the_handbacks_fails_closed`, the order not measured: the first result record comes
     after the coordinator's first turn and before the handbacks. Cut there, the step fails with exactly
-    `Bounds not met: 0 of 2 agent reports` and keeps no report text; with the rest of its records, it passes;
+    `Bounds not met: 0 of 2 agent reports` (since R6, `... handed back`) and keeps no report text; with the rest of
+    its records, it passes;
   - `test_the_model_usage_is_the_costliest_result_records`: three records at $4, $23 and $9 with different usage;
     `models` is the $23 record's;
   - `test_a_budget_stop_without_both_handbacks_and_any_other_error_record_fail`;
@@ -378,6 +384,132 @@ Tests:
 - iconv converting to ASCII;
 - the agent bound removed, a third agent allowed, or each agent required exactly once again, so a retry fails;
 - the non-string filter restored.
+
+## Round 6: both handbacks required, the shared cost wording and the undeclared changes (2026-10-09)
+
+The command center's R6 round, with the GPT designated read of `7aa2c128` and the J8 R5 micro read of the same head,
+asked for the changes below. Each behaviour change below is also in the by-name list above.
+
+- **Both agents must hand back (GPT designated read, P2, reproduced by the reader).**
+  - The defect: a plain success was accepted whatever `handbacks` was; only a budget stop needed both. The report
+    bound counted two headings in the text the report step would publish, which is the coordinator's relay whenever
+    the relay carries both headings. So a run that ended at a success whose relay held both headings passed and
+    published with no handback or one. On five synthetic prefixes, each ending at one ordinary success, the reader
+    found four incomplete ones that passed and published, headings alone with no handback among them.
+  - The fix: the numbers step now fails unless both called agents handed back, whatever the result records say. A
+    handback counts only as a `SubagentHandback` message whose parent is the coordinator's Agent call for that agent,
+    once per agent however many calls it had. The new message `<n> of 2 agent reports handed back` replaces
+    `<n> of 2 agent reports`, which counted headings. Headings in the relay no longer count anywhere. `report_sections`
+    stays in `usage.json` but is no longer a bound, and `successful_result` keeps its R5 meaning.
+- **The handbacks are published, never the relay (command center decision).** The report step published the
+  coordinator's relay whenever it carried both report headings, even with both handbacks present, a preference R3
+  chose and its tests enforced. A relay is model text and can be a template or a paraphrase; the handbacks are the
+  agents' own reports, and the GPT designated read of `7aa2c128` ruled that relay headings never count as completion.
+  The report step now publishes the two agents' handbacks, pr-test-analyzer's then silent-failure-hunter's, each under
+  its own heading, whatever order the agents were called in, and for an agent called more than once its last handback.
+  It never publishes the relay; the numbers step, whose success it needs, requires both handbacks. In `usage.json`,
+  `report_source` is `handbacks` whenever any agent handed back. For an agent called more than once, the published
+  handback is the one from its last call in the order the coordinator made the calls, not the one that came last in
+  the stream; a background retry can finish before the first attempt, and the command center kept this rule.
+- **The coordinator no longer relays (command center decision).** Publishing now uses the handbacks only, so the
+  prompt's instruction to output both agents' reports verbatim under their headings was removed: nothing read that
+  output, and it spent Opus output tokens on every run. The coordinator is now told not to repeat or summarize the
+  reports and, after both agents have handed back, to end with the single line `Both reports handed back.` This saves
+  the relay's output tokens on every run; the $24.20 cost bound stays as it is, as an upper bound.
+- **A cancelled run publishes nothing (aligned with the other W4 workflows).** The publish step's condition is now
+  `!cancelled() && steps.numbers.outcome == 'success'`, where it started with `always()`. The clause on the execution
+  file is dropped because the numbers step runs only with one.
+- **The exact `--settings` pin tells `true` from `1` (J8 R5 micro read of #894, N1).** The exact-pin test compared
+  parsed dicts with `==`, and `1 == True` in Python, so a setting of `1` or `0` where `true` or `false` is pinned
+  passed it. It now compares canonical JSON (sorted keys), for the whole argument list and for the settings.
+- **The cost factor's shared wording.** The paragraph under "Cost of one run" is now the shared R6 paragraph, verbatim,
+  with this workflow's $22 budget and $24.20 bound in its last sentence. It replaces this record's own wording of the
+  factor, its four runs and its re-derivation trigger. The rule itself is R5's ($22 × 1.10 = $24.20).
+- **Changes the J8 R5 micro read found undeclared.** Section 3 of each agent's report named these behaviour and test
+  changes of R5 that the pull request description did not declare. They are declared here, and the by-name list above
+  now covers the two it lacked: the cache-read bound checked only on complete usage, and what a cancellation does to
+  publication (R6 ends it, below).
+  1. `usage.json` values change meaning: `num_turns` is the highest over all result records, not the last record's,
+     and `successful_result` is true for an accepted budget stop.
+  2. One result record without a whole cost, turn count and model usage puts the whole run on the lower-bound path,
+     even when other records are usable: `total_cost_usd` and `num_turns` become null and `models` empty.
+  3. The job summary gains, besides the budget-stop and overrun lines, a `Result records … Agents called … Handbacks
+     <n> of 2.` line on every run, `none` for a missing cost or turn count, and lower-bound model rows; its `completed`
+     column shows `true` for an accepted budget stop.
+  4. Failure messages: `the run did not end in success` and `…, above 7` are replaced by longer messages, and two
+     messages are new.
+  5. The `no cache read` bound is checked only when the usage is complete; before R5 it was always checked.
+  6. Publication is broader. Reports publish whenever the numbers step passes, whatever the action step's outcome,
+     including a success whose `num_turns` exceeds `--max-turns` and any other failure of the action step after
+     `execution_file` was set. The job stays failed. R5's condition started with `always()`, so reports also
+     published after a cancellation; R6's `!cancelled()` ends that, and a cancelled run publishes nothing.
+  7. `test_no_step_executes_anything_from_the_pull_request_head` skips the link-removal step entirely.
+  8. The shared test fixture changed. `execution()` emits both coordinator Agent calls in its first turn under one
+     message id, with the handbacks after the coordinator's turns, so unchanged tests run on different input (two
+     coordinator turns where there were four). `results=`, `budget_stop_records()`, `with_message_usage()`,
+     `run_step(replacements=, after=)` and `toolkit_tree(extra=)` are new. The accepted-run test pinned
+     `handbacks == 0` on a passing run, which R6 changes to 2.
+
+Tests:
+
+- New: `test_a_success_before_both_agents_handed_back_fails_and_publishes_nothing`. Each case ends at one ordinary
+  success at $0.40 with both agents called, and each fails with exactly `Bounds not met: <n> of 2 agent reports handed
+  back`, so the publish step, which needs the numbers step's success, publishes nothing. The cases:
+  - both headings alone, no handback;
+  - both headings with pending text, no handback;
+  - two calls, no handback;
+  - one handback, with a relay carrying both headings;
+  - one handback carrying the other agent's heading;
+  - one agent's two handbacks after a retry, none from the other.
+- New: `test_the_handbacks_are_published_never_a_relay_with_both_headings` replaces R3's
+  `test_a_relay_with_both_sections_is_preferred_to_the_handbacks`. A relay carrying both headings and template text,
+  with both real handbacks: the numbers record says `handbacks`, the published text is exactly the two handbacks in
+  order, and the template text never appears. It runs with the agents called in order, called in reverse order, and
+  with pr-test-analyzer retried (its first attempt's handback is not published, and each heading appears once).
+- Changed:
+  - `execution()` gives both agents a handback by default (`BOTH_HANDBACKS`); a test that needs none passes
+    `handbacks={}`;
+  - `test_a_bounded_cached_run_with_both_reports_is_accepted_and_only_numbers_and_fixed_names_are_kept` expects 2
+    handbacks and the handbacks as the report source, and checks that no handback text is kept;
+  - in `test_an_unmet_bound_fails_after_the_numbers_were_kept`, "no result text" also has no handback, and "one agent's
+    report missing" is now "one agent's handback missing";
+  - `test_the_step_names_every_unmet_bound` passes no handback and names the new message;
+  - `test_a_file_that_ends_before_the_handbacks_fails_closed` expects the new message;
+  - the case "a budget stop after a full relay but no handback" passes no handback;
+  - `test_the_coordinator_must_call_both_toolkit_agents_and_no_other` also expects the handback failure where an agent
+    is missing;
+  - the report-step tests that check escaping, the cap and the character-boundary prefix carry their text in the first
+    agent's handback, sized so the published text, headings included, is exactly 60,000 or 60,001 bytes, or cuts an
+    `é` in half at the 60,000th byte;
+  - R3's `test_the_reports_are_the_last_result_with_text` is now
+    `test_an_empty_idle_result_at_the_end_changes_nothing_published`: the handbacks are published and the relay's text
+    is not;
+  - the publish condition test expects `!cancelled() && steps.numbers.outcome == 'success'`;
+  - `test_the_prompt_runs_the_two_toolkit_agents_and_asks_for_undeclared_changes` pins the coordinator's part of the
+    prompt exactly, with runs of whitespace folded, and checks that no report heading is left in the prompt;
+  - `test_claude_args_and_settings_are_pinned_exactly` compares canonical JSON.
+- The module runs 57 tests, where it ran 56 after R5.
+
+49 weakened copies of the workflow each fail at least one test. The R5 copy that turns the publish condition back to
+`success()` now starts from the new condition. Seven copies are new for the published text, the relay instruction,
+the cancellation and the settings pin:
+- the coordinator's relay instruction restored in the prompt: the prompt test;
+- the relay preferred again in the publish step when it carries both headings: the new test, the empty-idle-result
+  test and the three escaping and cap tests;
+- the handbacks published in call order, one per call: the new test;
+- the relay preferred again in the numbers record: the accepted-run test and the new test;
+- `always()` restored in the publish condition: the publish condition test;
+- `"disableAllHooks": 1` and `"autoMemoryEnabled": 0` in `--settings`: each fails the exact-pin test (and the
+  settings test's `assertIs` checks).
+
+The six copies new earlier in R6, and the cases of the new handback-bound test each fails:
+- the handback bound switched off: all six;
+- relay headings counting again: the two headings-only cases and both one-handback cases;
+- handbacks required only when the text carries a report heading: two calls, no handback;
+- one handback enough: both one-handback cases and the retry case;
+- handbacks counted per call, not per agent: the retry case;
+- any handback counting for every call, the association to the coordinator's call dropped: both one-handback cases
+  and the retry case.
 
 ## Alternatives considered
 

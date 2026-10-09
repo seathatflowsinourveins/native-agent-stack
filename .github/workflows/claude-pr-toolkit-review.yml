@@ -227,16 +227,14 @@ jobs:
           display_report: 'false'
           track_progress: 'false'
           prompt: |
-            You are the coordinator of one pull request review. Your only job is to run two review agents and relay
-            their reports.
+            You are the coordinator of one pull request review. Your only job is to run two review agents.
 
             In one turn, call the Agent tool twice, in parallel: once with subagent_type
             "pr-review-toolkit:pr-test-analyzer" and once with subagent_type "pr-review-toolkit:silent-failure-hunter".
             Give each the task between the marker lines below, verbatim, as its prompt. Do not review the code
-            yourself, do not call any other agent, and do not add findings or commentary of your own. When both
-            agents have returned, output the first agent's complete final report under the heading
-            "## pr-review-toolkit:pr-test-analyzer" and the second agent's under
-            "## pr-review-toolkit:silent-failure-hunter", verbatim, and nothing else.
+            yourself, do not call any other agent, and do not add findings or commentary of your own. Do not repeat
+            or summarize the agents' reports. After both agents have handed back, end with exactly this one line and
+            nothing else: Both reports handed back.
 
             ----- task for the agent -----
             Review the changes of pull request #${{ inputs.pr_number }} of this repository at commit ${{ inputs.head_sha }}.
@@ -281,16 +279,19 @@ jobs:
       # reports the Agent tool as Task), an entry in it that is not a string, or an MCP server fails the run, and the
       # step names every bound it finds unmet. The turn bound counts the coordinator's own assistant turns (distinct
       # message ids without a parent tool use); the subagents' turns are theirs. The coordinator must have called both
-      # toolkit agents, each at least once (a retry is allowed), and no other agent. Every result record in the file is
-      # read, not only the last, so an idle success at the end cannot hide an earlier error: each must be a success, or
-      # a budget stop (error_max_budget_usd) after both agents handed back their reports, and the cost is the highest
-      # any record reports, with the model usage of that record. The file holds only what the action read before it
-      # stopped, which at the pinned action is up to the first result record, so a file that ends before the agents
-      # handed back fails the report bound. When there is no result record (a run cut off before its result), or one
+      # toolkit agents, each at least once (a retry is allowed), and no other agent. Both agents must have handed back
+      # their reports, whatever the result records say: a report counts only as a SubagentHandback message whose parent
+      # is the coordinator's Agent call for that agent, one per agent however many calls it had, and headings in the
+      # coordinator's own text never count. Every result record in the file is read, not only the last, so an idle
+      # success at the end cannot hide an earlier error: each must be a success, or a budget stop (error_max_budget_usd)
+      # after both agents handed back their reports, and the cost is the highest any record reports, with the model
+      # usage of that record. The file holds only what the action read before it stopped, which at the pinned action is
+      # up to the first result record, so a file that ends before both agents handed back fails the handback bound.
+      # When there is no result record (a run cut off before its result), or one
       # without a whole cost, turn count and model usage, the record keeps the assistant messages' token counts, once
       # per message id, as a lower bound without a cost, and the step fails. An execution file with neither leaves no
-      # record. The reports come from the relay or, when it lacks a
-      # section, from the agents' handbacks, as in the report step. The client checks its budget after a turn, so a
+      # record. The report text is the agents' handbacks, as in the report step; with no handback, the relay is
+      # measured for the record only and never published. The client checks its budget after a turn, so a
       # run can end a little above it: the cost bound is the $22 budget times 1.10, the largest overrun measured on
       # J8's $5-budget runs (9.2%) rounded up. A run above it fails, budget stop or not; a budget stop at or under it,
       # after both agents handed back, passes. The job summary names an overrun and a budget stop.
@@ -334,11 +335,11 @@ jobs:
               | ([$all[] | select(.type == "assistant" and .parent_tool_use_id == $c.id) | .message.content[]?
                   | select(.type == "tool_use" and .name == "SubagentHandback") | .input.message
                   | select(type == "string" and . != "")] | last) as $m
-              | select($m != null) | {agent: $c.agent, text: "## \($c.agent)\n\n\($m)\n"}]) as $returned |
-            ($returned | map(.text) | join("\n")) as $handbacks |
-            (if ($relay | contains("## pr-review-toolkit:pr-test-analyzer") and
-                 contains("## pr-review-toolkit:silent-failure-hunter")) then $relay
-             elif $handbacks != "" then $handbacks else $relay end) as $text |
+              | select($m != null) | {agent: $c.agent, text: $m}]) as $returned |
+            ([("pr-review-toolkit:pr-test-analyzer", "pr-review-toolkit:silent-failure-hunter") as $agent
+              | [$returned[] | select(.agent == $agent)] | last | select(. != null)
+              | "## \(.agent)\n\n\(.text)\n"] | join("\n")) as $handbacks |
+            (if $handbacks != "" then $handbacks else $relay end) as $text |
             ([("pr-review-toolkit:pr-test-analyzer", "pr-review-toolkit:silent-failure-hunter")
               | select(. as $agent | any($returned[]; .agent == $agent))] | length) as $handed_back |
             ([.[] | select(.type == "assistant" and (.parent_tool_use_id == null)) | .message.id?
@@ -422,22 +423,25 @@ jobs:
             (if .complete == true and ((.models | map(.cache_read_input_tokens) | add) // 0) <= 0 then "no cache read"
              else empty end),
             (if .result_chars < 1 then "no result text" else empty end),
-            (if (.report_sections | length) < 2 then "\(.report_sections | length) of 2 agent reports" else empty end)
+            (if .handbacks != 2 then "\(.handbacks) of 2 agent reports handed back" else empty end)
           ] | join("; ")' "$out/usage.json")"
           if [ -n "$failed" ]; then
             echo "Bounds not met: $failed" >&2
             exit 1
           fi
 
-      # The reports are the coordinator's relay when it carries both sections, and otherwise each agent's own handback
-      # (its SubagentHandback message): a coordinator that hits its budget after both agents finished never relays
-      # (api-actions J8 #894, 2026-10-09). They are published when the numbers step accepted the run, whatever the
-      # read step's own status: the action fails its own step on a first result that is not a plain success, a budget
-      # stop the numbers step accepts among them, and on a success whose num_turns exceeds --max-turns, a count the
-      # numbers step does not use; the job then stays failed with the reports published. They are capped and shown as
-      # preformatted text so nothing in them renders as Markdown or HTML on the run page.
+      # The reports are the two agents' own handbacks (their SubagentHandback messages), pr-test-analyzer's then
+      # silent-failure-hunter's, each under its own heading; for an agent called more than once, its last handback.
+      # The coordinator's relay is never published: it is model text and can be a template or a paraphrase, and a
+      # coordinator that hits its budget after both agents finished never relays (api-actions J8 #894, 2026-10-09).
+      # The numbers step requires both handbacks, and they are published when it accepted the run, whatever the read
+      # step's own status: the action fails its own step on a first result that is not a plain success, a budget stop
+      # the numbers step accepts among them, and on a success whose num_turns exceeds --max-turns, a count the numbers
+      # step does not use; the job then stays failed with the reports published. A cancelled run publishes nothing.
+      # The numbers step runs only with an execution file, so its success implies one. The reports are capped and
+      # shown as preformatted text so nothing in them renders as Markdown or HTML on the run page.
       - name: Publish the reports to the job summary
-        if: ${{ always() && steps.numbers.outcome == 'success' && steps.claude_toolkit.outputs.execution_file != '' }}
+        if: ${{ !cancelled() && steps.numbers.outcome == 'success' }}
         shell: bash
         env:
           EXECUTION_FILE: ${{ steps.claude_toolkit.outputs.execution_file }}
@@ -448,8 +452,6 @@ jobs:
           report="$(mktemp)"
           jq -j '
             . as $all |
-            ([.[] | select(.type == "result") | .result // "" | select(type == "string" and . != "")] | last // "")
-              as $relay |
             ([.[] | select(.type == "assistant" and (.parent_tool_use_id == null)) | .message.content[]?
               | select(.type == "tool_use" and (.name == "Agent" or .name == "Task"))
               | {id: .id, agent: ((.input.subagent_type // "") | tostring)}]) as $calls |
@@ -457,10 +459,10 @@ jobs:
               | ([$all[] | select(.type == "assistant" and .parent_tool_use_id == $c.id) | .message.content[]?
                   | select(.type == "tool_use" and .name == "SubagentHandback") | .input.message
                   | select(type == "string" and . != "")] | last) as $m
-              | select($m != null) | "## \($c.agent)\n\n\($m)\n"] | join("\n")) as $handbacks |
-            if ($relay | contains("## pr-review-toolkit:pr-test-analyzer") and
-                contains("## pr-review-toolkit:silent-failure-hunter")) then $relay
-            elif $handbacks != "" then $handbacks else $relay end
+              | select($m != null) | {agent: $c.agent, text: $m}]) as $returned |
+            [("pr-review-toolkit:pr-test-analyzer", "pr-review-toolkit:silent-failure-hunter") as $agent
+              | [$returned[] | select(.agent == $agent)] | last | select(. != null)
+              | "## \(.agent)\n\n\(.text)\n"] | join("\n")
           ' "$EXECUTION_FILE" > "$report"
           size="$(wc -c < "$report")"
           {

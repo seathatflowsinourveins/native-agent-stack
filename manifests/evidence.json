@@ -5026,8 +5026,8 @@
     },
     {
       "path": ".github/workflows/claude-pr-toolkit-review.yml",
-      "sha256": "3873e2680e5db90b19f126171f045a17c9a74fd30f938fd68f89138131e65be9",
-      "bytes": 32939
+      "sha256": "6f4cd72c95d6970b773bfd1d1f0a3c2c61ee43cb4ad23c840820e6d4566c64ba",
+      "bytes": 33316
     },
     {
       "path": ".github/workflows/dependency-review.yml",
@@ -18312,8 +18312,8 @@
     },
     {
       "path": "docs/decisions/2026-10-09-claude-actions-pr-toolkit-review.md",
-      "sha256": "2154ab6a25fe84f22c720c778375fd0cd30fa0cbcacdca5b60d7e3cdc493bfaa",
-      "bytes": 37422
+      "sha256": "5ba1c9290ba3d0e00d9f94a40b544f47aa383f08c5e1883bf337bf55f79fe49a",
+      "bytes": 49682
     },
     {
       "path": "docs/decisions/2026-10-09-claude-code-floor.md",
@@ -58592,8 +58592,8 @@
     },
     {
       "path": "tests/test_claude_pr_toolkit_review_workflow.py",
-      "sha256": "391b4e4965dae47aa6fd078e9d5c3983036048c4603fbbca8ed4a4631672481b",
-      "bytes": 67120
+      "sha256": "f69c19cbc1eb3d3e306fb35c5e308b85cf905c218fb210b66a5f5b62124c3c61",
+      "bytes": 75282
     },
     {
       "path": "tests/test_claude_recovery.py",
