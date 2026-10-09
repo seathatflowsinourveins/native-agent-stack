@@ -21,6 +21,8 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
+# Compatibility symbol for existing callers; never a config or publish fallback.
+LOKI = "http://127.0.0.1:13100/loki/api/v1/push"
 LOKI_PUSH = re.compile(r"http://([0-9.]+|\[[0-9A-Fa-f:]+\]):([0-9]{1,5})/loki/api/v1/push")
 LIMIT = 1024 * 1024
 # An explicit consumer ceiling, not a producer maximum: the token report bounds its

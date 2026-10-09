@@ -57197,8 +57197,8 @@
     },
     {
       "path": "observability/native-data/snapshot.py",
-      "sha256": "f5f1db4fc571425b91d8d3cb165285fd368831bef5c574bef3feac9c1c27e1e6",
-      "bytes": 29731
+      "sha256": "2d0a0a899767b10d7c8c978dd4f0674d57af73335362825d2e670482cd9019be",
+      "bytes": 29861
     },
     {
       "path": "observability/ns2604_dashboards.py",
