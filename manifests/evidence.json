@@ -18157,8 +18157,8 @@
     },
     {
       "path": "docs/decisions/2026-10-08-claude-actions-triage.md",
-      "sha256": "686318d334f7315f94b421f228d1c2d7c167a2e7bd213159716b3b22fbff0564",
-      "bytes": 37976
+      "sha256": "a52127ed20c791d15a64a16b766845faad1dce69b32213829ac41f85c5454938",
+      "bytes": 37978
     },
     {
       "path": "docs/decisions/2026-10-08-coordinator-research-routing.md",

@@ -353,8 +353,8 @@ that date.
 > base-action/src/run-claude-sdk.ts:241-250 (v1.0.247, 2dca132f) compares `resultMessage.num_turns` with
 > `sdkOptions.maxTurns`. On Claude Code 2.1.295 the result's num_turns counts transcript messages (tool results
 > included): a headless run of 12 requests under `--max-turns 12` reported num_turns 57. A normal successful run
-> under `--max-turns N` therefore throws "exceeding the configured maximum". Repro: any `claude_args: --max-turns 5`
-> run that makes a few tool calls and succeeds.
+> under `--max-turns N` therefore throws "exceeding the configured maximum". Repro: a successful run whose reported
+> num_turns (a message count) exceeds --max-turns.
 
 ### The exact pins tell `true` from `1` (2026-10-09)
 
