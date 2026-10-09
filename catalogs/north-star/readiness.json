@@ -318,6 +318,66 @@
     },
     {
       "fields": {
+        "closure_criterion_1_population_witnesses": {
+          "receipt": {
+            "locator": "line:16;regex:^1\\. \\*\\*Population, each with a hash-pinned witness:\\*\\* (?P<value>[^\\n]+)$",
+            "path": "coordination/command-center/ITEM-ns2604-coop-20261008T210228Z.md",
+            "root": "state",
+            "sha256": "d3868b6a0a81826407ade426c6f8a2c6511401177d3801eb24b3ae0e9023aa43"
+          },
+          "status": "RECORDED",
+          "value": "the original star inventory (368), the field inventory (45), the documents (2) and the frozen union of mined lists (each list at a snapshot pin)."
+        },
+        "closure_criterion_2_row_evidence": {
+          "receipt": {
+            "locator": "line:17;regex:^2\\. \\*\\*Rows:\\*\\* (?P<value>[^\\n]+)$",
+            "path": "coordination/command-center/ITEM-ns2604-coop-20261008T210228Z.md",
+            "root": "state",
+            "sha256": "d3868b6a0a81826407ade426c6f8a2c6511401177d3801eb24b3ae0e9023aa43"
+          },
+          "status": "RECORDED",
+          "value": "every star row and every field row carries a disposition, a pin, a primary-source locator in the generator's accepted form (an upstream HTTPS source or `repo@pin:file`) and a capture sha256. A row whose claim lacks primary evidence is PENDING with the conservative provisional and a named settling measurement. PENDING rows do not block closure."
+        },
+        "closure_criterion_3_mined_list_population_census": {
+          "receipt": {
+            "locator": "line:18;regex:^3\\. \\*\\*Mined lists are a counted population, not a row set\\.\\*\\* (?P<value>[^\\n]+)$",
+            "path": "coordination/command-center/ITEM-ns2604-coop-20261008T210228Z.md",
+            "root": "state",
+            "sha256": "d3868b6a0a81826407ade426c6f8a2c6511401177d3801eb24b3ae0e9023aa43"
+          },
+          "status": "RECORDED",
+          "value": "The census states, per list: snapshot pin, entry count, typed source ids, duplicates removed, overlap with stars and fields, and how many entries were promoted to rows by which rule. Entries that were not promoted are counted and declared; they are not dispositioned one by one."
+        },
+        "closure_criterion_4_full_asset_validation": {
+          "receipt": {
+            "locator": "line:19;regex:^4\\. \\*\\*Mechanical check:\\*\\* (?P<value>[^\\n]+)$",
+            "path": "coordination/command-center/ITEM-ns2604-coop-20261008T210228Z.md",
+            "root": "state",
+            "sha256": "d3868b6a0a81826407ade426c6f8a2c6511401177d3801eb24b3ae0e9023aa43"
+          },
+          "status": "RECORDED",
+          "value": "`compact_manifest.py --check` exits 0 on the full asset (all 368 stars, 45 fields, 2 documents), not on a subset."
+        },
+        "closure_criterion_5_reader_coverage": {
+          "receipt": {
+            "locator": "line:20;regex:^5\\. \\*\\*Reads:\\*\\* (?P<value>[^\\n]+)$",
+            "path": "coordination/command-center/ITEM-ns2604-coop-20261008T210228Z.md",
+            "root": "state",
+            "sha256": "d3868b6a0a81826407ade426c6f8a2c6511401177d3801eb24b3ae0e9023aa43"
+          },
+          "status": "RECORDED",
+          "value": "both families read every ADOPT-NOW and TRIAL row (113) and the seeded stratified samples (n=59 per stratum, zero defects). Nothing else needs a 100 % read."
+        },
+        "closure_criterion_6_cued_release": {
+          "receipt": {
+            "locator": "line:21;regex:^6\\. \\*\\*Landing:\\*\\* (?P<value>[^\\n]+)$",
+            "path": "coordination/command-center/ITEM-ns2604-coop-20261008T210228Z.md",
+            "root": "state",
+            "sha256": "d3868b6a0a81826407ade426c6f8a2c6511401177d3801eb24b3ae0e9023aa43"
+          },
+          "status": "RECORDED",
+          "value": "explicit cue, then the release with the hash-pinned asset."
+        },
         "owner": {
           "receipt": {
             "locator": "line:51;regex:^- \\*\\*(?P<value>grand-catalog):\\*\\* #878\\.$",
@@ -350,13 +410,13 @@
         },
         "state": {
           "receipt": {
-            "locator": "line:119;regex:^\\*\\*Gates:\\*\\* G1, G3 and G4 are MET\\. (?P<value>G5 and G6 remain)\\.$",
-            "path": "coordination/command-center/ITEM-ns2604-coop-20261008T175944Z.md",
+            "locator": "line:12;regex:^\\*\\*Why this row\\.\\*\\* G5 is the (?P<value>only START gate left)\\.[^\\n]+$",
+            "path": "coordination/command-center/ITEM-ns2604-coop-20261008T210228Z.md",
             "root": "state",
-            "sha256": "001341383c83daf6cebc25e620eb9551c7231ff280efe8d05c812c7893a2a78a"
+            "sha256": "d3868b6a0a81826407ade426c6f8a2c6511401177d3801eb24b3ae0e9023aa43"
           },
           "status": "RECORDED",
-          "value": "G5 and G6 remain"
+          "value": "only START gate left"
         }
       },
       "id": "G5",
@@ -364,25 +424,65 @@
     },
     {
       "fields": {
-        "blocking_part": {
+        "claude_fresh_session_exit_code": {
           "receipt": {
-            "locator": "line:19;regex:^- \\*\\*(?P<value>G6a) is START-blocking:\\*\\*[^\\n]+$",
-            "path": "coordination/command-center/ITEM-ns2604-coop-20261008T175944Z.md",
+            "locator": "line:14;regex:^[ ]+- Claude Code 2\\.1\\.295,[^\\n]+rc (?P<value>0)\\.$",
+            "path": "coordination/command-center/windows/f9-g6a-881-20261008/RECEIPT.md",
             "root": "state",
-            "sha256": "001341383c83daf6cebc25e620eb9551c7231ff280efe8d05c812c7893a2a78a"
+            "sha256": "24906eaf9cc3f041ed6bd500dd41095e4282a551ad1403d80a76a709ce7cf6a1"
           },
           "status": "RECORDED",
-          "value": "G6a"
+          "value": "0"
         },
-        "held_head": {
+        "codex_fresh_session_exit_code": {
           "receipt": {
-            "locator": "line:12;regex:^## 1\\. G6: HOLD at (?P<value>bace9b29), split into G6a, G6b and G6c[^\\n]+$",
-            "path": "coordination/command-center/ITEM-ns2604-coop-20261008T175944Z.md",
+            "locator": "line:15;regex:^[ ]+- Codex CLI 0\\.161\\.0,[^\\n]+rc (?P<value>0)\\.$",
+            "path": "coordination/command-center/windows/f9-g6a-881-20261008/RECEIPT.md",
             "root": "state",
-            "sha256": "001341383c83daf6cebc25e620eb9551c7231ff280efe8d05c812c7893a2a78a"
+            "sha256": "24906eaf9cc3f041ed6bd500dd41095e4282a551ad1403d80a76a709ce7cf6a1"
           },
           "status": "RECORDED",
-          "value": "bace9b29"
+          "value": "0"
+        },
+        "f9_applied_at": {
+          "receipt": {
+            "locator": "line:5;regex:^- \\*\\*Tool:\\*\\*[^\\n]+Dry run rc 0, then the run at (?P<value>2026-10-08T20:44:38Z), rc 0\\.$",
+            "path": "coordination/command-center/windows/f9-g6a-881-20261008/RECEIPT.md",
+            "root": "state",
+            "sha256": "24906eaf9cc3f041ed6bd500dd41095e4282a551ad1403d80a76a709ce7cf6a1"
+          },
+          "status": "RECORDED",
+          "value": "2026-10-08T20:44:38Z"
+        },
+        "f9_exit_code": {
+          "receipt": {
+            "locator": "line:5;regex:^- \\*\\*Tool:\\*\\*[^\\n]+Dry run rc 0, then the run at 2026-10-08T20:44:38Z, rc (?P<value>0)\\.$",
+            "path": "coordination/command-center/windows/f9-g6a-881-20261008/RECEIPT.md",
+            "root": "state",
+            "sha256": "24906eaf9cc3f041ed6bd500dd41095e4282a551ad1403d80a76a709ce7cf6a1"
+          },
+          "status": "RECORDED",
+          "value": "0"
+        },
+        "merge_commit": {
+          "receipt": {
+            "locator": "line:3;regex:^- \\*\\*Landing:\\*\\* #881 merged 2026-10-08T20:41:37Z as (?P<value>[0-9a-f]{40})[^\\n]+$",
+            "path": "coordination/command-center/windows/f9-g6a-881-20261008/RECEIPT.md",
+            "root": "state",
+            "sha256": "24906eaf9cc3f041ed6bd500dd41095e4282a551ad1403d80a76a709ce7cf6a1"
+          },
+          "status": "RECORDED",
+          "value": "e48de2e6fa1dd3b740af4793ea5824ea35476dba"
+        },
+        "merged_at": {
+          "receipt": {
+            "locator": "line:3;regex:^- \\*\\*Landing:\\*\\* #881 merged (?P<value>2026-10-08T20:41:37Z) as [0-9a-f]{40}[^\\n]+$",
+            "path": "coordination/command-center/windows/f9-g6a-881-20261008/RECEIPT.md",
+            "root": "state",
+            "sha256": "24906eaf9cc3f041ed6bd500dd41095e4282a551ad1403d80a76a709ce7cf6a1"
+          },
+          "status": "RECORDED",
+          "value": "2026-10-08T20:41:37Z"
         },
         "owner": {
           "receipt": {
@@ -394,19 +494,101 @@
           "status": "RECORDED",
           "value": "harness-rules"
         },
-        "state": {
+        "pull_request": {
           "receipt": {
-            "locator": "line:12;regex:^## 1\\. G6: (?P<value>HOLD) at bace9b29, split into G6a, G6b and G6c \\(harness-rules; top priority after the N2 r2 fixes\\)$",
-            "path": "coordination/command-center/ITEM-ns2604-coop-20261008T175944Z.md",
+            "locator": "line:3;regex:^- \\*\\*Landing:\\*\\* (?P<value>#881) merged 2026-10-08T20:41:37Z as [0-9a-f]{40}[^\\n]+$",
+            "path": "coordination/command-center/windows/f9-g6a-881-20261008/RECEIPT.md",
             "root": "state",
-            "sha256": "001341383c83daf6cebc25e620eb9551c7231ff280efe8d05c812c7893a2a78a"
+            "sha256": "24906eaf9cc3f041ed6bd500dd41095e4282a551ad1403d80a76a709ce7cf6a1"
           },
           "status": "RECORDED",
-          "value": "HOLD"
+          "value": "#881"
+        },
+        "state": {
+          "receipt": {
+            "locator": "line:17;regex:^- \\*\\*Result:\\*\\* G6a is (?P<value>MET)\\. G6b \\(settings ownership\\) and G6c \\(#885, #886\\) continue and do not block START\\.$",
+            "path": "coordination/command-center/windows/f9-g6a-881-20261008/RECEIPT.md",
+            "root": "state",
+            "sha256": "24906eaf9cc3f041ed6bd500dd41095e4282a551ad1403d80a76a709ce7cf6a1"
+          },
+          "status": "RECORDED",
+          "value": "MET"
         }
       },
-      "id": "G6",
-      "title": "Harness consolidation"
+      "id": "G6a",
+      "title": "Harness consolidation and fresh-session loading"
+    },
+    {
+      "fields": {
+        "scope": {
+          "receipt": {
+            "locator": "line:17;regex:^- \\*\\*Result:\\*\\* G6a is MET\\. G6b \\((?P<value>settings ownership)\\) and G6c \\(#885, #886\\) continue and do not block START\\.$",
+            "path": "coordination/command-center/windows/f9-g6a-881-20261008/RECEIPT.md",
+            "root": "state",
+            "sha256": "24906eaf9cc3f041ed6bd500dd41095e4282a551ad1403d80a76a709ce7cf6a1"
+          },
+          "status": "RECORDED",
+          "value": "settings ownership"
+        },
+        "start_policy": {
+          "receipt": {
+            "locator": "line:17;regex:^- \\*\\*Result:\\*\\* G6a is MET\\. G6b \\(settings ownership\\) and G6c \\(#885, #886\\) continue and (?P<value>do not block START)\\.$",
+            "path": "coordination/command-center/windows/f9-g6a-881-20261008/RECEIPT.md",
+            "root": "state",
+            "sha256": "24906eaf9cc3f041ed6bd500dd41095e4282a551ad1403d80a76a709ce7cf6a1"
+          },
+          "status": "RECORDED",
+          "value": "do not block START"
+        },
+        "state": {
+          "receipt": {
+            "locator": "line:17;regex:^- \\*\\*Result:\\*\\* G6a is MET\\. G6b \\(settings ownership\\) and G6c \\(#885, #886\\) (?P<value>continue) and do not block START\\.$",
+            "path": "coordination/command-center/windows/f9-g6a-881-20261008/RECEIPT.md",
+            "root": "state",
+            "sha256": "24906eaf9cc3f041ed6bd500dd41095e4282a551ad1403d80a76a709ce7cf6a1"
+          },
+          "status": "RECORDED",
+          "value": "continue"
+        }
+      },
+      "id": "G6b",
+      "title": "Harness settings ownership"
+    },
+    {
+      "fields": {
+        "pull_requests": {
+          "receipt": {
+            "locator": "line:17;regex:^- \\*\\*Result:\\*\\* G6a is MET\\. G6b \\(settings ownership\\) and G6c \\((?P<value>#885, #886)\\) continue and do not block START\\.$",
+            "path": "coordination/command-center/windows/f9-g6a-881-20261008/RECEIPT.md",
+            "root": "state",
+            "sha256": "24906eaf9cc3f041ed6bd500dd41095e4282a551ad1403d80a76a709ce7cf6a1"
+          },
+          "status": "RECORDED",
+          "value": "#885, #886"
+        },
+        "start_policy": {
+          "receipt": {
+            "locator": "line:17;regex:^- \\*\\*Result:\\*\\* G6a is MET\\. G6b \\(settings ownership\\) and G6c \\(#885, #886\\) continue and (?P<value>do not block START)\\.$",
+            "path": "coordination/command-center/windows/f9-g6a-881-20261008/RECEIPT.md",
+            "root": "state",
+            "sha256": "24906eaf9cc3f041ed6bd500dd41095e4282a551ad1403d80a76a709ce7cf6a1"
+          },
+          "status": "RECORDED",
+          "value": "do not block START"
+        },
+        "state": {
+          "receipt": {
+            "locator": "line:17;regex:^- \\*\\*Result:\\*\\* G6a is MET\\. G6b \\(settings ownership\\) and G6c \\(#885, #886\\) (?P<value>continue) and do not block START\\.$",
+            "path": "coordination/command-center/windows/f9-g6a-881-20261008/RECEIPT.md",
+            "root": "state",
+            "sha256": "24906eaf9cc3f041ed6bd500dd41095e4282a551ad1403d80a76a709ce7cf6a1"
+          },
+          "status": "RECORDED",
+          "value": "continue"
+        }
+      },
+      "id": "G6c",
+      "title": "Harness records grounded in upstream sources"
     }
   ],
   "kind": "north_star_retained_receipt_readiness",
@@ -432,7 +614,7 @@
                   "locator": "/entries/8/acceptance",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -452,7 +634,7 @@
                   "locator": "/entries/8/install",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -468,7 +650,7 @@
                   "locator": "/entries/8/pin",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "0.160.0"
@@ -478,7 +660,7 @@
                   "locator": "/entries/8/provisioning_status",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "unprovisioned_source_review"
@@ -501,7 +683,7 @@
                 "locator": "/components/9/commands",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": [
@@ -536,7 +718,7 @@
                 "locator": "/components/9/evidence_ids",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -564,14 +746,14 @@
                   "locator": "/components/9/version",
                   "path": "manifests/stack.json",
                   "root": "repo",
-                  "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                  "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
                 }
               ],
               "receipt": {
                 "locator": "/components/9/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": false
@@ -591,7 +773,7 @@
                 "locator": "/components/9/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": "0.160.0"
@@ -1384,7 +1566,7 @@
                   "locator": "/entries/69/acceptance",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -1398,7 +1580,7 @@
                   "locator": "/entries/69/install",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -1411,7 +1593,7 @@
                   "locator": "/entries/69/pin",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "1.30.1"
@@ -1421,7 +1603,7 @@
                   "locator": "/entries/69/provisioning_status",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "unprovisioned_user_decision"
@@ -1444,7 +1626,7 @@
                 "locator": "/components/53/commands",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": [
@@ -1479,7 +1661,7 @@
                 "locator": "/components/53/evidence_ids",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -1507,14 +1689,14 @@
                   "locator": "/components/53/version",
                   "path": "manifests/stack.json",
                   "root": "repo",
-                  "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                  "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
                 }
               ],
               "receipt": {
                 "locator": "/components/53/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": true
@@ -1534,7 +1716,7 @@
                 "locator": "/components/53/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": "1.30.1"
@@ -1642,7 +1824,7 @@
                   "locator": "/entries/71/acceptance",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -1659,7 +1841,7 @@
                   "locator": "/entries/71/install",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -1675,7 +1857,7 @@
                   "locator": "/entries/71/pin",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "1.54.0"
@@ -1685,7 +1867,7 @@
                   "locator": "/entries/71/provisioning_status",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "unprovisioned_source_review"
@@ -1708,7 +1890,7 @@
                 "locator": "/components/46/commands",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": [
@@ -1743,7 +1925,7 @@
                 "locator": "/components/46/evidence_ids",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -1771,14 +1953,14 @@
                   "locator": "/components/46/version",
                   "path": "manifests/stack.json",
                   "root": "repo",
-                  "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                  "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
                 }
               ],
               "receipt": {
                 "locator": "/components/46/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": false
@@ -1798,7 +1980,7 @@
                 "locator": "/components/46/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": "1.54.0"
@@ -1937,7 +2119,7 @@
                 "locator": "/components/None/commands",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -1969,7 +2151,7 @@
                 "locator": "/components/None/evidence_ids",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -1997,7 +2179,7 @@
                   "locator": "/components/None/version",
                   "path": "manifests/stack.json",
                   "root": "repo",
-                  "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                  "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
                 }
               ],
               "reason": "selected component is absent from the stack ledger",
@@ -2005,7 +2187,7 @@
                 "locator": "/components",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -2026,7 +2208,7 @@
                 "locator": "/components/None/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -2078,7 +2260,7 @@
                   "locator": "/entries/14/acceptance",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -2099,7 +2281,7 @@
                   "locator": "/entries/14/install",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -2118,7 +2300,7 @@
                   "locator": "/entries/14/pin",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143"
@@ -2128,7 +2310,7 @@
                   "locator": "/entries/14/provisioning_status",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "unprovisioned_source_review"
@@ -2151,7 +2333,7 @@
                 "locator": "/components/29/commands",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": [
@@ -2192,7 +2374,7 @@
                 "locator": "/components/29/evidence_ids",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -2220,14 +2402,14 @@
                   "locator": "/components/29/version",
                   "path": "manifests/stack.json",
                   "root": "repo",
-                  "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                  "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
                 }
               ],
               "receipt": {
                 "locator": "/components/29/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": true
@@ -2247,7 +2429,7 @@
                 "locator": "/components/29/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": "2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143"
@@ -2500,7 +2682,7 @@
                   "locator": "/entries/35/acceptance",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -2520,7 +2702,7 @@
                   "locator": "/entries/35/install",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -2536,7 +2718,7 @@
                   "locator": "/entries/35/pin",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "2.8.3"
@@ -2546,7 +2728,7 @@
                   "locator": "/entries/35/provisioning_status",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "unprovisioned_source_review"
@@ -2569,7 +2751,7 @@
                 "locator": "/components/25/commands",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": [
@@ -2603,7 +2785,7 @@
                 "locator": "/components/25/evidence_ids",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -2631,14 +2813,14 @@
                   "locator": "/components/25/version",
                   "path": "manifests/stack.json",
                   "root": "repo",
-                  "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                  "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
                 }
               ],
               "receipt": {
                 "locator": "/components/25/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": true
@@ -2658,7 +2840,7 @@
                 "locator": "/components/25/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": "2.8.3"
@@ -3026,7 +3208,7 @@
                   "locator": "/entries/23/acceptance",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -3045,7 +3227,7 @@
                   "locator": "/entries/23/install",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -3063,7 +3245,7 @@
                   "locator": "/entries/23/pin",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "0.1.8"
@@ -3073,7 +3255,7 @@
                   "locator": "/entries/23/provisioning_status",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "unprovisioned_source_review"
@@ -3096,7 +3278,7 @@
                 "locator": "/components/18/commands",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": [
@@ -3130,7 +3312,7 @@
                 "locator": "/components/18/evidence_ids",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -3158,14 +3340,14 @@
                   "locator": "/components/18/version",
                   "path": "manifests/stack.json",
                   "root": "repo",
-                  "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                  "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
                 }
               ],
               "receipt": {
                 "locator": "/components/18/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": false
@@ -3185,7 +3367,7 @@
                 "locator": "/components/18/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": "0.1.8"
@@ -3363,7 +3545,7 @@
                 "locator": "/components/63/commands",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": [
@@ -3397,7 +3579,7 @@
                 "locator": "/components/63/evidence_ids",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -3425,14 +3607,14 @@
                   "locator": "/components/63/version",
                   "path": "manifests/stack.json",
                   "root": "repo",
-                  "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                  "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
                 }
               ],
               "receipt": {
                 "locator": "/components/63/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": true
@@ -3452,7 +3634,7 @@
                 "locator": "/components/63/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": "26.09.0"
@@ -3545,7 +3727,7 @@
                   "locator": "/entries/49/acceptance",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -3565,7 +3747,7 @@
                   "locator": "/entries/49/install",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -3584,7 +3766,7 @@
                   "locator": "/entries/49/pin",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "2.5.2"
@@ -3594,7 +3776,7 @@
                   "locator": "/entries/49/provisioning_status",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "unprovisioned_comparison_arm"
@@ -3617,7 +3799,7 @@
                 "locator": "/components/3/commands",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": [
@@ -3653,7 +3835,7 @@
                 "locator": "/components/3/evidence_ids",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -3681,14 +3863,14 @@
                   "locator": "/components/3/version",
                   "path": "manifests/stack.json",
                   "root": "repo",
-                  "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                  "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
                 }
               ],
               "receipt": {
                 "locator": "/components/3/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": false
@@ -3708,7 +3890,7 @@
                 "locator": "/components/3/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": "2.4.1"
@@ -4221,7 +4403,7 @@
                   "locator": "/entries/13/acceptance",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -4240,7 +4422,7 @@
                   "locator": "/entries/13/install",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -4255,7 +4437,7 @@
                   "locator": "/entries/13/pin",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "0.80.0"
@@ -4265,7 +4447,7 @@
                   "locator": "/entries/13/provisioning_status",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "unprovisioned_source_review"
@@ -4288,7 +4470,7 @@
                 "locator": "/components/35/commands",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": [
@@ -4322,7 +4504,7 @@
                 "locator": "/components/35/evidence_ids",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -4350,14 +4532,14 @@
                   "locator": "/components/35/version",
                   "path": "manifests/stack.json",
                   "root": "repo",
-                  "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                  "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
                 }
               ],
               "receipt": {
                 "locator": "/components/35/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": false
@@ -4377,7 +4559,7 @@
                 "locator": "/components/35/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": "0.80.0"
@@ -4596,7 +4778,7 @@
                 "locator": "/components/None/commands",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -4628,7 +4810,7 @@
                 "locator": "/components/None/evidence_ids",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -4656,7 +4838,7 @@
                   "locator": "/components/None/version",
                   "path": "manifests/stack.json",
                   "root": "repo",
-                  "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                  "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
                 }
               ],
               "reason": "selected component is absent from the stack ledger",
@@ -4664,7 +4846,7 @@
                 "locator": "/components",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -4685,7 +4867,7 @@
                 "locator": "/components/None/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -4712,7 +4894,7 @@
                   "locator": "/entries/30/acceptance",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -4726,7 +4908,7 @@
                   "locator": "/entries/30/install",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -4739,7 +4921,7 @@
                   "locator": "/entries/30/pin",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "0.71.0"
@@ -4749,7 +4931,7 @@
                   "locator": "/entries/30/provisioning_status",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "unprovisioned_source_review"
@@ -4772,7 +4954,7 @@
                 "locator": "/components/14/commands",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": [
@@ -4806,7 +4988,7 @@
                 "locator": "/components/14/evidence_ids",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -4834,14 +5016,14 @@
                   "locator": "/components/14/version",
                   "path": "manifests/stack.json",
                   "root": "repo",
-                  "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                  "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
                 }
               ],
               "receipt": {
                 "locator": "/components/14/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": true
@@ -4861,7 +5043,7 @@
                 "locator": "/components/14/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": "0.71.0"
@@ -5024,7 +5206,7 @@
                 "locator": "/components/61/commands",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": [
@@ -5059,7 +5241,7 @@
                 "locator": "/components/61/evidence_ids",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -5087,14 +5269,14 @@
                   "locator": "/components/61/version",
                   "path": "manifests/stack.json",
                   "root": "repo",
-                  "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                  "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
                 }
               ],
               "receipt": {
                 "locator": "/components/61/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": true
@@ -5114,7 +5296,7 @@
                 "locator": "/components/61/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": "0.141.1"
@@ -5212,7 +5394,7 @@
                 "locator": "/components/59/commands",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": [
@@ -5248,7 +5430,7 @@
                 "locator": "/components/59/evidence_ids",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -5276,14 +5458,14 @@
                   "locator": "/components/59/version",
                   "path": "manifests/stack.json",
                   "root": "repo",
-                  "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                  "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
                 }
               ],
               "receipt": {
                 "locator": "/components/59/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": false
@@ -5303,7 +5485,7 @@
                 "locator": "/components/59/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": "16.3.8"
@@ -5401,7 +5583,7 @@
                 "locator": "/components/62/commands",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": [
@@ -5438,7 +5620,7 @@
                 "locator": "/components/62/evidence_ids",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -5466,14 +5648,14 @@
                   "locator": "/components/62/version",
                   "path": "manifests/stack.json",
                   "root": "repo",
-                  "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                  "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
                 }
               ],
               "receipt": {
                 "locator": "/components/62/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": true
@@ -5493,7 +5675,7 @@
                 "locator": "/components/62/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": "18.6"
@@ -5636,7 +5818,7 @@
                 "locator": "/components/0/commands",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": [
@@ -5675,7 +5857,7 @@
                 "locator": "/components/0/evidence_ids",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -5703,14 +5885,14 @@
                   "locator": "/components/0/version",
                   "path": "manifests/stack.json",
                   "root": "repo",
-                  "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                  "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
                 }
               ],
               "receipt": {
                 "locator": "/components/0/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": true
@@ -5730,7 +5912,7 @@
                 "locator": "/components/0/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": "dd6ee538aee0f548d4a6b520118f875431fd749e"
@@ -5849,7 +6031,7 @@
                 "locator": "/components/None/commands",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -5881,7 +6063,7 @@
                 "locator": "/components/None/evidence_ids",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -5909,7 +6091,7 @@
                   "locator": "/components/None/version",
                   "path": "manifests/stack.json",
                   "root": "repo",
-                  "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                  "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
                 }
               ],
               "reason": "selected component is absent from the stack ledger",
@@ -5917,7 +6099,7 @@
                 "locator": "/components",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -5938,7 +6120,7 @@
                 "locator": "/components/None/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -5976,7 +6158,7 @@
                 "locator": "/components/None/commands",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -6008,7 +6190,7 @@
                 "locator": "/components/None/evidence_ids",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -6036,7 +6218,7 @@
                   "locator": "/components/None/version",
                   "path": "manifests/stack.json",
                   "root": "repo",
-                  "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                  "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
                 }
               ],
               "reason": "selected component is absent from the stack ledger",
@@ -6044,7 +6226,7 @@
                 "locator": "/components",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -6065,7 +6247,7 @@
                 "locator": "/components/None/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -6117,7 +6299,7 @@
                   "locator": "/entries/13/acceptance",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -6136,7 +6318,7 @@
                   "locator": "/entries/13/install",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -6151,7 +6333,7 @@
                   "locator": "/entries/13/pin",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "0.80.0"
@@ -6161,7 +6343,7 @@
                   "locator": "/entries/13/provisioning_status",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "unprovisioned_source_review"
@@ -6184,7 +6366,7 @@
                 "locator": "/components/35/commands",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": [
@@ -6218,7 +6400,7 @@
                 "locator": "/components/35/evidence_ids",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -6246,14 +6428,14 @@
                   "locator": "/components/35/version",
                   "path": "manifests/stack.json",
                   "root": "repo",
-                  "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                  "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
                 }
               ],
               "receipt": {
                 "locator": "/components/35/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": false
@@ -6273,7 +6455,7 @@
                 "locator": "/components/35/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": "0.80.0"
@@ -6481,7 +6663,7 @@
                   "locator": "/entries/12/acceptance",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -6495,7 +6677,7 @@
                   "locator": "/entries/12/install",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -6510,7 +6692,7 @@
                   "locator": "/entries/12/pin",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "0.0.79"
@@ -6520,7 +6702,7 @@
                   "locator": "/entries/12/provisioning_status",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "unprovisioned_source_review"
@@ -6543,7 +6725,7 @@
                 "locator": "/components/28/commands",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": [
@@ -6577,7 +6759,7 @@
                 "locator": "/components/28/evidence_ids",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -6605,14 +6787,14 @@
                   "locator": "/components/28/version",
                   "path": "manifests/stack.json",
                   "root": "repo",
-                  "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                  "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
                 }
               ],
               "receipt": {
                 "locator": "/components/28/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": false
@@ -6632,7 +6814,7 @@
                 "locator": "/components/28/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": "0.0.79"
@@ -6778,7 +6960,7 @@
                   "locator": "/kind",
                   "path": "evidence/receipts/native-sandbox-codex-binding-20261008.json",
                   "root": "repo",
-                  "sha256": "01c147e16d146bebd8db2cf11fc267f4b2d7d32a98dcddf1ed2fe8c5a5a1860e"
+                  "sha256": "06b6e15783396c437e5470db1fec73e101b778712cc9ff90041daf901532c34d"
                 },
                 "status": "RECORDED",
                 "value": "native_cli_e2e"
@@ -6787,7 +6969,7 @@
                 "locator": "",
                 "path": "evidence/receipts/native-sandbox-codex-binding-20261008.json",
                 "root": "repo",
-                "sha256": "01c147e16d146bebd8db2cf11fc267f4b2d7d32a98dcddf1ed2fe8c5a5a1860e"
+                "sha256": "06b6e15783396c437e5470db1fec73e101b778712cc9ff90041daf901532c34d"
               }
             }
           ]
@@ -6825,7 +7007,7 @@
                   "locator": "/entries/10/acceptance",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -6839,7 +7021,7 @@
                   "locator": "/entries/10/install",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -6857,7 +7039,7 @@
                   "locator": "/entries/10/pin",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "0.14.2"
@@ -6867,7 +7049,7 @@
                   "locator": "/entries/10/provisioning_status",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "unprovisioned_source_review"
@@ -6890,7 +7072,7 @@
                 "locator": "/components/20/commands",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": [
@@ -6924,7 +7106,7 @@
                 "locator": "/components/20/evidence_ids",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -6952,14 +7134,14 @@
                   "locator": "/components/20/version",
                   "path": "manifests/stack.json",
                   "root": "repo",
-                  "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                  "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
                 }
               ],
               "receipt": {
                 "locator": "/components/20/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": false
@@ -6979,7 +7161,7 @@
                 "locator": "/components/20/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": "0.14.2"
@@ -7167,7 +7349,7 @@
                   "locator": "/entries/11/acceptance",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -7181,7 +7363,7 @@
                   "locator": "/entries/11/install",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -7196,7 +7378,7 @@
                   "locator": "/entries/11/pin",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "2.9.0"
@@ -7206,7 +7388,7 @@
                   "locator": "/entries/11/provisioning_status",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "unprovisioned_source_review"
@@ -7229,7 +7411,7 @@
                 "locator": "/components/19/commands",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": [
@@ -7263,7 +7445,7 @@
                 "locator": "/components/19/evidence_ids",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -7291,14 +7473,14 @@
                   "locator": "/components/19/version",
                   "path": "manifests/stack.json",
                   "root": "repo",
-                  "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                  "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
                 }
               ],
               "receipt": {
                 "locator": "/components/19/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": false
@@ -7318,7 +7500,7 @@
                 "locator": "/components/19/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": "2.9.0"
@@ -7491,7 +7673,7 @@
                   "locator": "/entries/9/acceptance",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -7511,7 +7693,7 @@
                   "locator": "/entries/9/install",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -7526,7 +7708,7 @@
                   "locator": "/entries/9/pin",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "2.1.284"
@@ -7536,7 +7718,7 @@
                   "locator": "/entries/9/provisioning_status",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "unprovisioned_source_review"
@@ -7559,7 +7741,7 @@
                 "locator": "/components/6/commands",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": [
@@ -7594,7 +7776,7 @@
                 "locator": "/components/6/evidence_ids",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -7622,14 +7804,14 @@
                   "locator": "/components/6/version",
                   "path": "manifests/stack.json",
                   "root": "repo",
-                  "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                  "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
                 }
               ],
               "receipt": {
                 "locator": "/components/6/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": false
@@ -7649,7 +7831,7 @@
                 "locator": "/components/6/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": "2.1.284"
@@ -8377,7 +8559,7 @@
                   "locator": "/entries/8/acceptance",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -8397,7 +8579,7 @@
                   "locator": "/entries/8/install",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -8413,7 +8595,7 @@
                   "locator": "/entries/8/pin",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "0.160.0"
@@ -8423,7 +8605,7 @@
                   "locator": "/entries/8/provisioning_status",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "unprovisioned_source_review"
@@ -8446,7 +8628,7 @@
                 "locator": "/components/9/commands",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": [
@@ -8481,7 +8663,7 @@
                 "locator": "/components/9/evidence_ids",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -8509,14 +8691,14 @@
                   "locator": "/components/9/version",
                   "path": "manifests/stack.json",
                   "root": "repo",
-                  "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                  "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
                 }
               ],
               "receipt": {
                 "locator": "/components/9/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": false
@@ -8536,7 +8718,7 @@
                 "locator": "/components/9/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": "0.160.0"
@@ -9329,7 +9511,7 @@
                   "locator": "/entries/57/acceptance",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -9344,7 +9526,7 @@
                   "locator": "/entries/57/install",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -9357,7 +9539,7 @@
                   "locator": "/entries/57/pin",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "0.162.0"
@@ -9367,7 +9549,7 @@
                   "locator": "/entries/57/provisioning_status",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "unprovisioned_optional_service"
@@ -9390,7 +9572,7 @@
                 "locator": "/components/36/commands",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": [
@@ -9424,7 +9606,7 @@
                 "locator": "/components/36/evidence_ids",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -9452,14 +9634,14 @@
                   "locator": "/components/36/version",
                   "path": "manifests/stack.json",
                   "root": "repo",
-                  "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                  "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
                 }
               ],
               "receipt": {
                 "locator": "/components/36/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": false
@@ -9479,7 +9661,7 @@
                 "locator": "/components/36/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": "0.162.0"
@@ -9787,7 +9969,7 @@
                   "locator": "/entries/58/acceptance",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -9801,7 +9983,7 @@
                   "locator": "/entries/58/install",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -9814,7 +9996,7 @@
                   "locator": "/entries/58/pin",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "3.15.0"
@@ -9824,7 +10006,7 @@
                   "locator": "/entries/58/provisioning_status",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "unprovisioned_optional_service"
@@ -9847,7 +10029,7 @@
                 "locator": "/components/37/commands",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": [
@@ -9882,7 +10064,7 @@
                 "locator": "/components/37/evidence_ids",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -9910,14 +10092,14 @@
                   "locator": "/components/37/version",
                   "path": "manifests/stack.json",
                   "root": "repo",
-                  "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                  "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
                 }
               ],
               "receipt": {
                 "locator": "/components/37/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": false
@@ -9937,7 +10119,7 @@
                 "locator": "/components/37/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": "3.15.0"
@@ -10325,7 +10507,7 @@
                   "locator": "/entries/59/acceptance",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -10339,7 +10521,7 @@
                   "locator": "/entries/59/install",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -10352,7 +10534,7 @@
                   "locator": "/entries/59/pin",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "3.7.8"
@@ -10362,7 +10544,7 @@
                   "locator": "/entries/59/provisioning_status",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "unprovisioned_optional_service"
@@ -10385,7 +10567,7 @@
                 "locator": "/components/38/commands",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": [
@@ -10419,7 +10601,7 @@
                 "locator": "/components/38/evidence_ids",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -10447,14 +10629,14 @@
                   "locator": "/components/38/version",
                   "path": "manifests/stack.json",
                   "root": "repo",
-                  "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                  "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
                 }
               ],
               "receipt": {
                 "locator": "/components/38/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": true
@@ -10474,7 +10656,7 @@
                 "locator": "/components/38/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": "3.7.8"
@@ -10907,7 +11089,7 @@
                   "locator": "/entries/29/acceptance",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -10928,7 +11110,7 @@
                   "locator": "/entries/29/install",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -10948,7 +11130,7 @@
                   "locator": "/entries/29/pin",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "0.123.1"
@@ -10958,7 +11140,7 @@
                   "locator": "/entries/29/provisioning_status",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "unprovisioned_source_review"
@@ -10981,7 +11163,7 @@
                 "locator": "/components/23/commands",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": [
@@ -11015,7 +11197,7 @@
                 "locator": "/components/23/evidence_ids",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -11043,14 +11225,14 @@
                   "locator": "/components/23/version",
                   "path": "manifests/stack.json",
                   "root": "repo",
-                  "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                  "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
                 }
               ],
               "receipt": {
                 "locator": "/components/23/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": true
@@ -11070,7 +11252,7 @@
                 "locator": "/components/23/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": "0.123.1"
@@ -11248,7 +11430,7 @@
                 "locator": "/components/65/commands",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": [
@@ -11282,7 +11464,7 @@
                 "locator": "/components/65/evidence_ids",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -11310,14 +11492,14 @@
                   "locator": "/components/65/version",
                   "path": "manifests/stack.json",
                   "root": "repo",
-                  "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                  "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
                 }
               ],
               "receipt": {
                 "locator": "/components/65/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": true
@@ -11337,7 +11519,7 @@
                 "locator": "/components/65/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": "1.63.0"
@@ -11410,7 +11592,7 @@
                   "locator": "/entries/65/acceptance",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -11424,7 +11606,7 @@
                   "locator": "/entries/65/install",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -11437,7 +11619,7 @@
                   "locator": "/entries/65/pin",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "0.19.1"
@@ -11447,7 +11629,7 @@
                   "locator": "/entries/65/provisioning_status",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "unprovisioned_source_review"
@@ -11470,7 +11652,7 @@
                 "locator": "/components/43/commands",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": [
@@ -11506,7 +11688,7 @@
                 "locator": "/components/43/evidence_ids",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -11534,14 +11716,14 @@
                   "locator": "/components/43/version",
                   "path": "manifests/stack.json",
                   "root": "repo",
-                  "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                  "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
                 }
               ],
               "receipt": {
                 "locator": "/components/43/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": true
@@ -11561,7 +11743,7 @@
                 "locator": "/components/43/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": "0.19.1"
@@ -11760,7 +11942,7 @@
                 "locator": "/components/None/commands",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -11792,7 +11974,7 @@
                 "locator": "/components/None/evidence_ids",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -11820,7 +12002,7 @@
                   "locator": "/components/None/version",
                   "path": "manifests/stack.json",
                   "root": "repo",
-                  "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                  "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
                 }
               ],
               "reason": "selected component is absent from the stack ledger",
@@ -11828,7 +12010,7 @@
                 "locator": "/components",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -11849,7 +12031,7 @@
                 "locator": "/components/None/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -11901,7 +12083,7 @@
                   "locator": "/entries/62/acceptance",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -11915,7 +12097,7 @@
                   "locator": "/entries/62/install",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -11930,7 +12112,7 @@
                   "locator": "/entries/62/pin",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "2.18.2"
@@ -11940,7 +12122,7 @@
                   "locator": "/entries/62/provisioning_status",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "unprovisioned_optional_service"
@@ -11963,7 +12145,7 @@
                 "locator": "/components/44/commands",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": [
@@ -11999,7 +12181,7 @@
                 "locator": "/components/44/evidence_ids",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -12027,14 +12209,14 @@
                   "locator": "/components/44/version",
                   "path": "manifests/stack.json",
                   "root": "repo",
-                  "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                  "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
                 }
               ],
               "receipt": {
                 "locator": "/components/44/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": true
@@ -12054,7 +12236,7 @@
                 "locator": "/components/44/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": "2.16.6"
@@ -12342,7 +12524,7 @@
                   "locator": "/entries/2/acceptance",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -12356,7 +12538,7 @@
                   "locator": "/entries/2/install",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -12370,7 +12552,7 @@
                   "locator": "/entries/2/pin",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "UNVERIFIED",
                 "value": null
@@ -12380,7 +12562,7 @@
                   "locator": "/entries/2/provisioning_status",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "unprovisioned_source_review"
@@ -12403,7 +12585,7 @@
                 "locator": "/components/48/commands",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": [
@@ -12438,7 +12620,7 @@
                 "locator": "/components/48/evidence_ids",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -12466,14 +12648,14 @@
                   "locator": "/components/48/version",
                   "path": "manifests/stack.json",
                   "root": "repo",
-                  "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                  "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
                 }
               ],
               "receipt": {
                 "locator": "/components/48/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": true
@@ -12493,7 +12675,7 @@
                 "locator": "/components/48/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": "255.4-1ubuntu8.17"
@@ -12676,7 +12858,7 @@
                 "locator": "/components/15/commands",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": [
@@ -12710,7 +12892,7 @@
                 "locator": "/components/15/evidence_ids",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -12738,14 +12920,14 @@
                   "locator": "/components/15/version",
                   "path": "manifests/stack.json",
                   "root": "repo",
-                  "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                  "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
                 }
               ],
               "receipt": {
                 "locator": "/components/15/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": true
@@ -12765,7 +12947,7 @@
                 "locator": "/components/15/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": "8.30.1"
@@ -12938,7 +13120,7 @@
                   "locator": "/entries/37/acceptance",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -12952,7 +13134,7 @@
                   "locator": "/entries/37/install",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -12965,7 +13147,7 @@
                   "locator": "/entries/37/pin",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "1.15.0"
@@ -12975,7 +13157,7 @@
                   "locator": "/entries/37/provisioning_status",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "unprovisioned_comparison_arm"
@@ -12998,7 +13180,7 @@
                 "locator": "/components/32/commands",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": [
@@ -13033,7 +13215,7 @@
                 "locator": "/components/32/evidence_ids",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -13061,14 +13243,14 @@
                   "locator": "/components/32/version",
                   "path": "manifests/stack.json",
                   "root": "repo",
-                  "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                  "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
                 }
               ],
               "receipt": {
                 "locator": "/components/32/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": false
@@ -13088,7 +13270,7 @@
                 "locator": "/components/32/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": "1.15.0"
@@ -13486,7 +13668,7 @@
                 "locator": "/components/24/commands",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": [
@@ -13520,7 +13702,7 @@
                 "locator": "/components/24/evidence_ids",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -13548,14 +13730,14 @@
                   "locator": "/components/24/version",
                   "path": "manifests/stack.json",
                   "root": "repo",
-                  "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                  "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
                 }
               ],
               "receipt": {
                 "locator": "/components/24/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": true
@@ -13575,7 +13757,7 @@
                 "locator": "/components/24/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": "1.19.1"
@@ -13873,7 +14055,7 @@
                 "locator": "/components/34/commands",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": [
@@ -13907,7 +14089,7 @@
                 "locator": "/components/34/evidence_ids",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -13935,14 +14117,14 @@
                   "locator": "/components/34/version",
                   "path": "manifests/stack.json",
                   "root": "repo",
-                  "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                  "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
                 }
               ],
               "receipt": {
                 "locator": "/components/34/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": false
@@ -13962,7 +14144,7 @@
                 "locator": "/components/34/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": "0.30.0"
@@ -14255,7 +14437,7 @@
                   "locator": "/entries/53/acceptance",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -14274,7 +14456,7 @@
                   "locator": "/entries/53/install",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -14293,7 +14475,7 @@
                   "locator": "/entries/53/pin",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "0.51.0"
@@ -14303,7 +14485,7 @@
                   "locator": "/entries/53/provisioning_status",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "unprovisioned_source_review"
@@ -14326,7 +14508,7 @@
                 "locator": "/components/27/commands",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": [
@@ -14360,7 +14542,7 @@
                 "locator": "/components/27/evidence_ids",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -14388,14 +14570,14 @@
                   "locator": "/components/27/version",
                   "path": "manifests/stack.json",
                   "root": "repo",
-                  "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                  "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
                 }
               ],
               "receipt": {
                 "locator": "/components/27/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": false
@@ -14415,7 +14597,7 @@
                 "locator": "/components/27/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": "0.51.0"
@@ -14803,7 +14985,7 @@
                   "locator": "/entries/55/acceptance",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -14817,7 +14999,7 @@
                   "locator": "/entries/55/install",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -14835,7 +15017,7 @@
                   "locator": "/entries/55/pin",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "0.37.0"
@@ -14845,7 +15027,7 @@
                   "locator": "/entries/55/provisioning_status",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "unprovisioned_source_review"
@@ -14868,7 +15050,7 @@
                 "locator": "/components/16/commands",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": [
@@ -14903,7 +15085,7 @@
                 "locator": "/components/16/evidence_ids",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -14931,14 +15113,14 @@
                   "locator": "/components/16/version",
                   "path": "manifests/stack.json",
                   "root": "repo",
-                  "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                  "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
                 }
               ],
               "receipt": {
                 "locator": "/components/16/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": false
@@ -14958,7 +15140,7 @@
                 "locator": "/components/16/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": "0.40.0"
@@ -15306,7 +15488,7 @@
                   "locator": "/entries/17/acceptance",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -15325,7 +15507,7 @@
                   "locator": "/entries/17/install",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -15343,7 +15525,7 @@
                   "locator": "/entries/17/pin",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "20.0.26"
@@ -15353,7 +15535,7 @@
                   "locator": "/entries/17/provisioning_status",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "unprovisioned_source_review"
@@ -15376,7 +15558,7 @@
                 "locator": "/components/5/commands",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": [
@@ -15410,7 +15592,7 @@
                 "locator": "/components/5/evidence_ids",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -15438,14 +15620,14 @@
                   "locator": "/components/5/version",
                   "path": "manifests/stack.json",
                   "root": "repo",
-                  "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                  "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
                 }
               ],
               "receipt": {
                 "locator": "/components/5/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": false
@@ -15465,7 +15647,7 @@
                 "locator": "/components/5/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": "20.0.26"
@@ -15688,7 +15870,7 @@
                 "locator": "/components/67/commands",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": [
@@ -15724,7 +15906,7 @@
                 "locator": "/components/67/evidence_ids",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -15752,14 +15934,14 @@
                   "locator": "/components/67/version",
                   "path": "manifests/stack.json",
                   "root": "repo",
-                  "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                  "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
                 }
               ],
               "receipt": {
                 "locator": "/components/67/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": true
@@ -15779,7 +15961,7 @@
                 "locator": "/components/67/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": "0.1.8"
@@ -15917,7 +16099,7 @@
                 "locator": "/components/1/commands",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": [
@@ -15951,7 +16133,7 @@
                 "locator": "/components/1/evidence_ids",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -15979,14 +16161,14 @@
                   "locator": "/components/1/version",
                   "path": "manifests/stack.json",
                   "root": "repo",
-                  "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                  "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
                 }
               ],
               "receipt": {
                 "locator": "/components/1/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": false
@@ -16006,7 +16188,7 @@
                 "locator": "/components/1/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": "0.38.2"
@@ -16304,7 +16486,7 @@
                 "locator": "/components/21/commands",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": [
@@ -16339,7 +16521,7 @@
                 "locator": "/components/21/evidence_ids",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -16367,14 +16549,14 @@
                   "locator": "/components/21/version",
                   "path": "manifests/stack.json",
                   "root": "repo",
-                  "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                  "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
                 }
               ],
               "receipt": {
                 "locator": "/components/21/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": false
@@ -16394,7 +16576,7 @@
                 "locator": "/components/21/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": "0.2.15"
@@ -16607,7 +16789,7 @@
                   "locator": "/entries/9/acceptance",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -16627,7 +16809,7 @@
                   "locator": "/entries/9/install",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -16642,7 +16824,7 @@
                   "locator": "/entries/9/pin",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "2.1.284"
@@ -16652,7 +16834,7 @@
                   "locator": "/entries/9/provisioning_status",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "unprovisioned_source_review"
@@ -16675,7 +16857,7 @@
                 "locator": "/components/6/commands",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": [
@@ -16710,7 +16892,7 @@
                 "locator": "/components/6/evidence_ids",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -16738,14 +16920,14 @@
                   "locator": "/components/6/version",
                   "path": "manifests/stack.json",
                   "root": "repo",
-                  "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                  "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
                 }
               ],
               "receipt": {
                 "locator": "/components/6/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": false
@@ -16765,7 +16947,7 @@
                 "locator": "/components/6/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": "2.1.284"
@@ -17493,7 +17675,7 @@
                   "locator": "/entries/13/acceptance",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -17512,7 +17694,7 @@
                   "locator": "/entries/13/install",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": {
@@ -17527,7 +17709,7 @@
                   "locator": "/entries/13/pin",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "0.80.0"
@@ -17537,7 +17719,7 @@
                   "locator": "/entries/13/provisioning_status",
                   "path": "adoption/new-wsl-profile.json",
                   "root": "repo",
-                  "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389"
+                  "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
                 },
                 "status": "RECORDED",
                 "value": "unprovisioned_source_review"
@@ -17560,7 +17742,7 @@
                 "locator": "/components/35/commands",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": [
@@ -17594,7 +17776,7 @@
                 "locator": "/components/35/evidence_ids",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "UNVERIFIED",
               "value": null
@@ -17622,14 +17804,14 @@
                   "locator": "/components/35/version",
                   "path": "manifests/stack.json",
                   "root": "repo",
-                  "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                  "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
                 }
               ],
               "receipt": {
                 "locator": "/components/35/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": false
@@ -17649,7 +17831,7 @@
                 "locator": "/components/35/version",
                 "path": "manifests/stack.json",
                 "root": "repo",
-                "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c"
+                "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d"
               },
               "status": "RECORDED",
               "value": "0.80.0"
@@ -17873,14 +18055,15 @@
     {
       "fields": {
         "owner": {
+          "reason": "selector matched 2 times; exactly one required",
           "receipt": {
-            "locator": "line:127;regex:^## LANE-READY tier=fast role=(?P<value>runtime-workers)$",
+            "locator": "regex:^## LANE-READY tier=fast role=(?P<value>runtime-workers)$",
             "path": "coordination/ns2604-coop/lanes/runtime-workers.status.md",
             "root": "state",
-            "sha256": "4b9e5a7a8437ffd3f3c313163adf9611f8528a32999d358eac486108c6747479"
+            "sha256": "e977a0cd30fd967da6b7f3b65b74260ed7e83727c5a2c3734dc2d2c8da445187"
           },
-          "status": "RECORDED",
-          "value": "runtime-workers"
+          "status": "UNVERIFIED",
+          "value": null
         },
         "state": {
           "reason": "selector matched 0 times; exactly one required",
@@ -17888,7 +18071,7 @@
             "locator": "regex:^## (?P<value>MONITORINGREADY)(?: [^\\n]*)?$",
             "path": "coordination/ns2604-coop/lanes/runtime-workers.status.md",
             "root": "state",
-            "sha256": "4b9e5a7a8437ffd3f3c313163adf9611f8528a32999d358eac486108c6747479"
+            "sha256": "e977a0cd30fd967da6b7f3b65b74260ed7e83727c5a2c3734dc2d2c8da445187"
           },
           "status": "UNVERIFIED",
           "value": null
@@ -18299,13 +18482,13 @@
         },
         "state": {
           "receipt": {
-            "locator": "line:12;regex:^## 1\\. G6: (?P<value>HOLD) at bace9b29,[^\\n]+$",
-            "path": "coordination/command-center/ITEM-ns2604-coop-20261008T175944Z.md",
+            "locator": "line:17;regex:^- \\*\\*Result:\\*\\* G6a is (?P<value>MET)\\. G6b \\(settings ownership\\) and G6c \\(#885, #886\\) continue and do not block START\\.$",
+            "path": "coordination/command-center/windows/f9-g6a-881-20261008/RECEIPT.md",
             "root": "state",
-            "sha256": "001341383c83daf6cebc25e620eb9551c7231ff280efe8d05c812c7893a2a78a"
+            "sha256": "24906eaf9cc3f041ed6bd500dd41095e4282a551ad1403d80a76a709ce7cf6a1"
           },
           "status": "RECORDED",
-          "value": "HOLD"
+          "value": "MET"
         }
       },
       "id": "G6a",
@@ -18351,13 +18534,13 @@
         },
         "state": {
           "receipt": {
-            "locator": "line:119;regex:^\\*\\*Gates:\\*\\* G1, G3 and G4 are MET\\. (?P<value>G5 and G6 remain)\\.$",
-            "path": "coordination/command-center/ITEM-ns2604-coop-20261008T175944Z.md",
+            "locator": "line:12;regex:^\\*\\*Why this row\\.\\*\\* G5 is the (?P<value>only START gate left)\\.[^\\n]+$",
+            "path": "coordination/command-center/ITEM-ns2604-coop-20261008T210228Z.md",
             "root": "state",
-            "sha256": "001341383c83daf6cebc25e620eb9551c7231ff280efe8d05c812c7893a2a78a"
+            "sha256": "d3868b6a0a81826407ade426c6f8a2c6511401177d3801eb24b3ae0e9023aa43"
           },
           "status": "RECORDED",
-          "value": "G5 and G6 remain"
+          "value": "only START gate left"
         }
       },
       "id": "G5-878",
@@ -19005,11 +19188,27 @@
       "sha256": "9ec37ed6667227745db87827577a33c32ca2a8e3fedd777693097e39b8702d36",
       "status": "RECORDED"
     },
+    "cc_g5_closure": {
+      "bytes": 4988,
+      "expected_sha256": "d3868b6a0a81826407ade426c6f8a2c6511401177d3801eb24b3ae0e9023aa43",
+      "path": "coordination/command-center/ITEM-ns2604-coop-20261008T210228Z.md",
+      "root": "state",
+      "sha256": "d3868b6a0a81826407ade426c6f8a2c6511401177d3801eb24b3ae0e9023aa43",
+      "status": "RECORDED"
+    },
+    "cc_g6_f9": {
+      "bytes": 1829,
+      "expected_sha256": "24906eaf9cc3f041ed6bd500dd41095e4282a551ad1403d80a76a709ce7cf6a1",
+      "path": "coordination/command-center/windows/f9-g6a-881-20261008/RECEIPT.md",
+      "root": "state",
+      "sha256": "24906eaf9cc3f041ed6bd500dd41095e4282a551ad1403d80a76a709ce7cf6a1",
+      "status": "RECORDED"
+    },
     "evidence": {
-      "bytes": 2922788,
+      "bytes": 2928311,
       "path": "manifests/evidence.json",
       "root": "repo",
-      "sha256": "4b9d08705a08ea122e4ab3370e74e6518b4ce2b28c134092cf150983e7ccd8c1",
+      "sha256": "d07bbce85f1f4f3eee404771a80e3b79e2333ea50de49c90e56f855babb43b98",
       "status": "RECORDED"
     },
     "foundation": {
@@ -19044,10 +19243,10 @@
       "status": "RECORDED"
     },
     "monitoring_status": {
-      "bytes": 36200,
+      "bytes": 48154,
       "path": "coordination/ns2604-coop/lanes/runtime-workers.status.md",
       "root": "state",
-      "sha256": "4b9e5a7a8437ffd3f3c313163adf9611f8528a32999d358eac486108c6747479",
+      "sha256": "e977a0cd30fd967da6b7f3b65b74260ed7e83727c5a2c3734dc2d2c8da445187",
       "status": "RECORDED"
     },
     "native24": {
@@ -19075,10 +19274,10 @@
       "status": "RECORDED"
     },
     "profile": {
-      "bytes": 261338,
+      "bytes": 261291,
       "path": "adoption/new-wsl-profile.json",
       "root": "repo",
-      "sha256": "38fe65468a5e7312c8a456c4d7729fe861c5f6ec9c1fec33ed08130e74f05389",
+      "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5",
       "status": "RECORDED"
     },
     "repo:adoption/paired/receipt.json@9b00455d09dba24ed47cd5be8cc09b573573f122c9ca10e931f68146e7e57730": {
@@ -19665,12 +19864,12 @@
       "sha256": "2fda903207f5668362cf93da9f9dc7e83c27e2ec03e087752b7a88805ab1acee",
       "status": "RECORDED"
     },
-    "repo:evidence/receipts/native-sandbox-codex-binding-20261008.json@01c147e16d146bebd8db2cf11fc267f4b2d7d32a98dcddf1ed2fe8c5a5a1860e": {
-      "bytes": 5335,
-      "expected_sha256": "01c147e16d146bebd8db2cf11fc267f4b2d7d32a98dcddf1ed2fe8c5a5a1860e",
+    "repo:evidence/receipts/native-sandbox-codex-binding-20261008.json@06b6e15783396c437e5470db1fec73e101b778712cc9ff90041daf901532c34d": {
+      "bytes": 6166,
+      "expected_sha256": "06b6e15783396c437e5470db1fec73e101b778712cc9ff90041daf901532c34d",
       "path": "evidence/receipts/native-sandbox-codex-binding-20261008.json",
       "root": "repo",
-      "sha256": "01c147e16d146bebd8db2cf11fc267f4b2d7d32a98dcddf1ed2fe8c5a5a1860e",
+      "sha256": "06b6e15783396c437e5470db1fec73e101b778712cc9ff90041daf901532c34d",
       "status": "RECORDED"
     },
     "repo:evidence/receipts/native-sandbox-network-20260920.json@e934457a442f01bcf564fa1e37777f35e6a64eff0455c572efb382a6c652dd4b": {
@@ -20097,10 +20296,10 @@
       "status": "RECORDED"
     },
     "stack": {
-      "bytes": 130270,
+      "bytes": 130275,
       "path": "manifests/stack.json",
       "root": "repo",
-      "sha256": "1399613890844a85f1cb2b0fece5afe7a060a85957d0af8d674253fee269d32c",
+      "sha256": "70faae7516706653f308afb9c2b359712155bd61765061c95827e1b347b2508d",
       "status": "RECORDED"
     },
     "state:research/fullspeed-20261008/sdk-harness-ready/bfb-supported-install-supplement/receipt.final.json@22e19524e81ca7ebbc16210dee4b4997afa29ce90568f55c915dae1ae5e4982c": {
@@ -20513,17 +20712,17 @@
         },
         "state": {
           "receipt": {
-            "locator": "line:12;regex:^## 1\\. G6: (?P<value>HOLD) at bace9b29,[^\\n]+$",
-            "path": "coordination/command-center/ITEM-ns2604-coop-20261008T175944Z.md",
+            "locator": "line:17;regex:^- \\*\\*Result:\\*\\* G6a is (?P<value>MET)\\. G6b \\(settings ownership\\) and G6c \\(#885, #886\\) continue and do not block START\\.$",
+            "path": "coordination/command-center/windows/f9-g6a-881-20261008/RECEIPT.md",
             "root": "state",
-            "sha256": "001341383c83daf6cebc25e620eb9551c7231ff280efe8d05c812c7893a2a78a"
+            "sha256": "24906eaf9cc3f041ed6bd500dd41095e4282a551ad1403d80a76a709ce7cf6a1"
           },
           "status": "RECORDED",
-          "value": "HOLD"
+          "value": "MET"
         }
       },
-      "id": "g6_rules",
-      "title": "G6 consolidated rules"
+      "id": "g6a_rules",
+      "title": "G6a consolidated rules"
     },
     {
       "fields": {
@@ -20549,13 +20748,13 @@
         },
         "state": {
           "receipt": {
-            "locator": "line:119;regex:^\\*\\*Gates:\\*\\* G1, G3 and G4 are MET\\. (?P<value>G5 and G6 remain)\\.$",
-            "path": "coordination/command-center/ITEM-ns2604-coop-20261008T175944Z.md",
+            "locator": "line:12;regex:^\\*\\*Why this row\\.\\*\\* G5 is the (?P<value>only START gate left)\\.[^\\n]+$",
+            "path": "coordination/command-center/ITEM-ns2604-coop-20261008T210228Z.md",
             "root": "state",
-            "sha256": "001341383c83daf6cebc25e620eb9551c7231ff280efe8d05c812c7893a2a78a"
+            "sha256": "d3868b6a0a81826407ade426c6f8a2c6511401177d3801eb24b3ae0e9023aa43"
           },
           "status": "RECORDED",
-          "value": "G5 and G6 remain"
+          "value": "only START gate left"
         }
       },
       "id": "g5_catalog",
@@ -33825,14 +34024,14 @@
   "source_index": {
     "path": "tools/north-star/sources.json",
     "root": "repo",
-    "sha256": "80b379f2c8c2f9f7904d6b5834c1534168555f919561170f13b3fa4887341fd5"
+    "sha256": "37144d0045b3d6dad597dc5f22fd20c1ba36cbed93e6ea00dc9eb92f16590538"
   },
   "summary": {
-    "gates": 6,
+    "gates": 8,
     "layers": 20,
-    "recorded_claims": 1508,
+    "recorded_claims": 1524,
     "sdk_items": 36,
-    "unverified_claims": 193,
+    "unverified_claims": 194,
     "unverified_sources": 0
   }
 }
