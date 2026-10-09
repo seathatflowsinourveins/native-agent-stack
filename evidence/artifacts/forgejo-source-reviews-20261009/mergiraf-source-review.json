@@ -1,0 +1,1195 @@
+{
+  "schema_version": 1,
+  "id": "source-review-codeberg-mergiraf-mergiraf",
+  "kind": "upstream_provenance",
+  "evidence_class": "source_review",
+  "repository": "https://codeberg.org/mergiraf/mergiraf",
+  "reviewed_commit": "633fc1bf2e8d4941619fc1c49137b0f1ec9b56aa",
+  "readme_path": "README.md",
+  "license": "GPL-3.0-only",
+  "layers": [
+    "git-github-automation"
+  ],
+  "claim": "Source and documentation review of mergiraf/mergiraf at commit 633fc1bf2e8d4941619fc1c49137b0f1ec9b56aa (license GPL-3.0-only), read from README.md at that commit. Repository description: \"A syntax-aware git merge driver for a growing collection of programming languages and file formats.\". Survived the landscape-sweep-20261009-api facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+  "observed": {
+    "stars": 457,
+    "pushed_at": null,
+    "updated_at": "2026-10-09T10:22:06+02:00",
+    "head_committed_at": "2026-10-09T10:22:01+02:00",
+    "archived": false,
+    "default_branch": "main",
+    "license_source": {
+      "path": "Cargo.toml",
+      "sha256": "12e2e8e7cec4a1b1bbe3f1a7ef94168d46297d6bc2ab10b6e4ba81e283e868a0",
+      "commit": "633fc1bf2e8d4941619fc1c49137b0f1ec9b56aa"
+    },
+    "latest_release": {
+      "tag_name": "v0.20.0",
+      "name": "v0.20.0",
+      "target_commitish": "",
+      "created_at": "2026-09-26T13:41:29+02:00",
+      "published_at": "2026-09-26T13:41:29+02:00",
+      "assets": [
+        {
+          "name": "mergiraf_aarch64-apple-darwin.tar.gz",
+          "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.20.0/mergiraf_aarch64-apple-darwin.tar.gz",
+          "size": 7954953
+        },
+        {
+          "name": "mergiraf_aarch64-unknown-linux-gnu.tar.gz",
+          "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.20.0/mergiraf_aarch64-unknown-linux-gnu.tar.gz",
+          "size": 7260243
+        },
+        {
+          "name": "mergiraf_aarch64-unknown-linux-musl.tar.gz",
+          "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.20.0/mergiraf_aarch64-unknown-linux-musl.tar.gz",
+          "size": 7252772
+        },
+        {
+          "name": "mergiraf_x86_64-apple-darwin.tar.gz",
+          "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.20.0/mergiraf_x86_64-apple-darwin.tar.gz",
+          "size": 7549084
+        },
+        {
+          "name": "mergiraf_x86_64-pc-windows-gnu.zip",
+          "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.20.0/mergiraf_x86_64-pc-windows-gnu.zip",
+          "size": 7191953
+        },
+        {
+          "name": "mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+          "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.20.0/mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+          "size": 7472707
+        },
+        {
+          "name": "mergiraf_x86_64-unknown-linux-musl.tar.gz",
+          "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.20.0/mergiraf_x86_64-unknown-linux-musl.tar.gz",
+          "size": 7526597
+        }
+      ]
+    },
+    "releases": [
+      {
+        "tag_name": "v0.20.0",
+        "name": "v0.20.0",
+        "target_commitish": "",
+        "created_at": "2026-09-26T13:41:29+02:00",
+        "published_at": "2026-09-26T13:41:29+02:00",
+        "assets": [
+          {
+            "name": "mergiraf_aarch64-apple-darwin.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.20.0/mergiraf_aarch64-apple-darwin.tar.gz",
+            "size": 7954953
+          },
+          {
+            "name": "mergiraf_aarch64-unknown-linux-gnu.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.20.0/mergiraf_aarch64-unknown-linux-gnu.tar.gz",
+            "size": 7260243
+          },
+          {
+            "name": "mergiraf_aarch64-unknown-linux-musl.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.20.0/mergiraf_aarch64-unknown-linux-musl.tar.gz",
+            "size": 7252772
+          },
+          {
+            "name": "mergiraf_x86_64-apple-darwin.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.20.0/mergiraf_x86_64-apple-darwin.tar.gz",
+            "size": 7549084
+          },
+          {
+            "name": "mergiraf_x86_64-pc-windows-gnu.zip",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.20.0/mergiraf_x86_64-pc-windows-gnu.zip",
+            "size": 7191953
+          },
+          {
+            "name": "mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.20.0/mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+            "size": 7472707
+          },
+          {
+            "name": "mergiraf_x86_64-unknown-linux-musl.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.20.0/mergiraf_x86_64-unknown-linux-musl.tar.gz",
+            "size": 7526597
+          }
+        ]
+      },
+      {
+        "tag_name": "v0.19.1",
+        "name": "v0.19.1",
+        "target_commitish": "",
+        "created_at": "2026-09-01T11:41:22+02:00",
+        "published_at": "2026-09-01T11:41:22+02:00",
+        "assets": [
+          {
+            "name": "mergiraf_aarch64-apple-darwin.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.19.1/mergiraf_aarch64-apple-darwin.tar.gz",
+            "size": 7395226
+          },
+          {
+            "name": "mergiraf_aarch64-unknown-linux-gnu.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.19.1/mergiraf_aarch64-unknown-linux-gnu.tar.gz",
+            "size": 6757523
+          },
+          {
+            "name": "mergiraf_aarch64-unknown-linux-musl.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.19.1/mergiraf_aarch64-unknown-linux-musl.tar.gz",
+            "size": 6756457
+          },
+          {
+            "name": "mergiraf_x86_64-apple-darwin.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.19.1/mergiraf_x86_64-apple-darwin.tar.gz",
+            "size": 7047766
+          },
+          {
+            "name": "mergiraf_x86_64-pc-windows-gnu.zip",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.19.1/mergiraf_x86_64-pc-windows-gnu.zip",
+            "size": 6696607
+          },
+          {
+            "name": "mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.19.1/mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+            "size": 6970642
+          },
+          {
+            "name": "mergiraf_x86_64-unknown-linux-musl.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.19.1/mergiraf_x86_64-unknown-linux-musl.tar.gz",
+            "size": 7023360
+          }
+        ]
+      },
+      {
+        "tag_name": "v0.19.0",
+        "name": "v0.19.0",
+        "target_commitish": "",
+        "created_at": "2026-08-16T19:02:51+02:00",
+        "published_at": "2026-08-16T19:02:51+02:00",
+        "assets": [
+          {
+            "name": "mergiraf_aarch64-apple-darwin.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.19.0/mergiraf_aarch64-apple-darwin.tar.gz",
+            "size": 7563668
+          },
+          {
+            "name": "mergiraf_aarch64-unknown-linux-gnu.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.19.0/mergiraf_aarch64-unknown-linux-gnu.tar.gz",
+            "size": 6915426
+          },
+          {
+            "name": "mergiraf_aarch64-unknown-linux-musl.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.19.0/mergiraf_aarch64-unknown-linux-musl.tar.gz",
+            "size": 6920974
+          },
+          {
+            "name": "mergiraf_x86_64-apple-darwin.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.19.0/mergiraf_x86_64-apple-darwin.tar.gz",
+            "size": 7220289
+          },
+          {
+            "name": "mergiraf_x86_64-pc-windows-gnu.zip",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.19.0/mergiraf_x86_64-pc-windows-gnu.zip",
+            "size": 6854511
+          },
+          {
+            "name": "mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.19.0/mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+            "size": 7134312
+          },
+          {
+            "name": "mergiraf_x86_64-unknown-linux-musl.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.19.0/mergiraf_x86_64-unknown-linux-musl.tar.gz",
+            "size": 7183085
+          }
+        ]
+      },
+      {
+        "tag_name": "v0.18.0",
+        "name": "v0.18.0",
+        "target_commitish": "",
+        "created_at": "2026-07-14T20:28:31+02:00",
+        "published_at": "2026-07-14T20:28:31+02:00",
+        "assets": [
+          {
+            "name": "mergiraf_aarch64-apple-darwin.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.18.0/mergiraf_aarch64-apple-darwin.tar.gz",
+            "size": 7428600
+          },
+          {
+            "name": "mergiraf_aarch64-unknown-linux-gnu.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.18.0/mergiraf_aarch64-unknown-linux-gnu.tar.gz",
+            "size": 6784472
+          },
+          {
+            "name": "mergiraf_aarch64-unknown-linux-musl.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.18.0/mergiraf_aarch64-unknown-linux-musl.tar.gz",
+            "size": 6787876
+          },
+          {
+            "name": "mergiraf_x86_64-apple-darwin.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.18.0/mergiraf_x86_64-apple-darwin.tar.gz",
+            "size": 7080691
+          },
+          {
+            "name": "mergiraf_x86_64-pc-windows-gnu.zip",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.18.0/mergiraf_x86_64-pc-windows-gnu.zip",
+            "size": 6729822
+          },
+          {
+            "name": "mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.18.0/mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+            "size": 6996332
+          },
+          {
+            "name": "mergiraf_x86_64-unknown-linux-musl.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.18.0/mergiraf_x86_64-unknown-linux-musl.tar.gz",
+            "size": 7049184
+          }
+        ]
+      },
+      {
+        "tag_name": "v0.17.0",
+        "name": "v0.17.0",
+        "target_commitish": "",
+        "created_at": "2026-05-07T19:28:50+02:00",
+        "published_at": "2026-05-07T19:28:50+02:00",
+        "assets": [
+          {
+            "name": "mergiraf_aarch64-apple-darwin.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.17.0/mergiraf_aarch64-apple-darwin.tar.gz",
+            "size": 7571726
+          },
+          {
+            "name": "mergiraf_aarch64-unknown-linux-gnu.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.17.0/mergiraf_aarch64-unknown-linux-gnu.tar.gz",
+            "size": 6906075
+          },
+          {
+            "name": "mergiraf_aarch64-unknown-linux-musl.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.17.0/mergiraf_aarch64-unknown-linux-musl.tar.gz",
+            "size": 6916752
+          },
+          {
+            "name": "mergiraf_x86_64-apple-darwin.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.17.0/mergiraf_x86_64-apple-darwin.tar.gz",
+            "size": 7212933
+          },
+          {
+            "name": "mergiraf_x86_64-pc-windows-gnu.zip",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.17.0/mergiraf_x86_64-pc-windows-gnu.zip",
+            "size": 6887192
+          },
+          {
+            "name": "mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.17.0/mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+            "size": 7125246
+          },
+          {
+            "name": "mergiraf_x86_64-unknown-linux-musl.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.17.0/mergiraf_x86_64-unknown-linux-musl.tar.gz",
+            "size": 7184172
+          }
+        ]
+      },
+      {
+        "tag_name": "v0.16.3",
+        "name": "Mergiraf 0.16.3",
+        "target_commitish": "",
+        "created_at": "2026-01-26T11:20:01+01:00",
+        "published_at": "2026-01-26T11:20:01+01:00",
+        "assets": [
+          {
+            "name": "mergiraf_aarch64-apple-darwin.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.16.3/mergiraf_aarch64-apple-darwin.tar.gz",
+            "size": 7063761
+          },
+          {
+            "name": "mergiraf_aarch64-unknown-linux-gnu.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.16.3/mergiraf_aarch64-unknown-linux-gnu.tar.gz",
+            "size": 6447239
+          },
+          {
+            "name": "mergiraf_aarch64-unknown-linux-musl.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.16.3/mergiraf_aarch64-unknown-linux-musl.tar.gz",
+            "size": 6458168
+          },
+          {
+            "name": "mergiraf_x86_64-apple-darwin.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.16.3/mergiraf_x86_64-apple-darwin.tar.gz",
+            "size": 6759582
+          },
+          {
+            "name": "mergiraf_x86_64-pc-windows-gnu.zip",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.16.3/mergiraf_x86_64-pc-windows-gnu.zip",
+            "size": 6447667
+          },
+          {
+            "name": "mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.16.3/mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+            "size": 6671492
+          },
+          {
+            "name": "mergiraf_x86_64-unknown-linux-musl.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.16.3/mergiraf_x86_64-unknown-linux-musl.tar.gz",
+            "size": 6725601
+          }
+        ]
+      },
+      {
+        "tag_name": "v0.16.1",
+        "name": "Mergiraf 0.16.1",
+        "target_commitish": "",
+        "created_at": "2025-11-06T13:37:12+01:00",
+        "published_at": "2025-11-06T13:37:12+01:00",
+        "assets": [
+          {
+            "name": "mergiraf_aarch64-apple-darwin.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.16.1/mergiraf_aarch64-apple-darwin.tar.gz",
+            "size": 7146074
+          },
+          {
+            "name": "mergiraf_aarch64-unknown-linux-gnu.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.16.1/mergiraf_aarch64-unknown-linux-gnu.tar.gz",
+            "size": 6506702
+          },
+          {
+            "name": "mergiraf_aarch64-unknown-linux-musl.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.16.1/mergiraf_aarch64-unknown-linux-musl.tar.gz",
+            "size": 6524297
+          },
+          {
+            "name": "mergiraf_x86_64-apple-darwin.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.16.1/mergiraf_x86_64-apple-darwin.tar.gz",
+            "size": 6830434
+          },
+          {
+            "name": "mergiraf_x86_64-pc-windows-gnu.zip",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.16.1/mergiraf_x86_64-pc-windows-gnu.zip",
+            "size": 6513579
+          },
+          {
+            "name": "mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.16.1/mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+            "size": 6734875
+          },
+          {
+            "name": "mergiraf_x86_64-unknown-linux-musl.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.16.1/mergiraf_x86_64-unknown-linux-musl.tar.gz",
+            "size": 6788975
+          }
+        ]
+      },
+      {
+        "tag_name": "v0.15.0",
+        "name": "Mergiraf 0.15.0",
+        "target_commitish": "",
+        "created_at": "2025-09-17T20:30:41+02:00",
+        "published_at": "2025-09-17T20:30:41+02:00",
+        "assets": [
+          {
+            "name": "mergiraf_aarch64-apple-darwin.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.15.0/mergiraf_aarch64-apple-darwin.tar.gz",
+            "size": 6785499
+          },
+          {
+            "name": "mergiraf_aarch64-unknown-linux-gnu.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.15.0/mergiraf_aarch64-unknown-linux-gnu.tar.gz",
+            "size": 6362467
+          },
+          {
+            "name": "mergiraf_aarch64-unknown-linux-musl.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.15.0/mergiraf_aarch64-unknown-linux-musl.tar.gz",
+            "size": 6376785
+          },
+          {
+            "name": "mergiraf_x86_64-apple-darwin.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.15.0/mergiraf_x86_64-apple-darwin.tar.gz",
+            "size": 6490843
+          },
+          {
+            "name": "mergiraf_x86_64-pc-windows-gnu.zip",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.15.0/mergiraf_x86_64-pc-windows-gnu.zip",
+            "size": 6372400
+          },
+          {
+            "name": "mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.15.0/mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+            "size": 6601976
+          },
+          {
+            "name": "mergiraf_x86_64-unknown-linux-musl.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.15.0/mergiraf_x86_64-unknown-linux-musl.tar.gz",
+            "size": 6643934
+          }
+        ]
+      },
+      {
+        "tag_name": "v0.14.0",
+        "name": "Mergiraf 0.14.0",
+        "target_commitish": "",
+        "created_at": "2025-09-02T08:34:52+02:00",
+        "published_at": "2025-09-02T08:34:52+02:00",
+        "assets": [
+          {
+            "name": "mergiraf_aarch64-apple-darwin.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.14.0/mergiraf_aarch64-apple-darwin.tar.gz",
+            "size": 6751508
+          },
+          {
+            "name": "mergiraf_aarch64-unknown-linux-gnu.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.14.0/mergiraf_aarch64-unknown-linux-gnu.tar.gz",
+            "size": 6320458
+          },
+          {
+            "name": "mergiraf_aarch64-unknown-linux-musl.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.14.0/mergiraf_aarch64-unknown-linux-musl.tar.gz",
+            "size": 6339051
+          },
+          {
+            "name": "mergiraf_x86_64-apple-darwin.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.14.0/mergiraf_x86_64-apple-darwin.tar.gz",
+            "size": 6455237
+          },
+          {
+            "name": "mergiraf_x86_64-pc-windows-gnu.zip",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.14.0/mergiraf_x86_64-pc-windows-gnu.zip",
+            "size": 6342775
+          },
+          {
+            "name": "mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.14.0/mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+            "size": 6566884
+          },
+          {
+            "name": "mergiraf_x86_64-unknown-linux-musl.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.14.0/mergiraf_x86_64-unknown-linux-musl.tar.gz",
+            "size": 6608327
+          }
+        ]
+      },
+      {
+        "tag_name": "v0.13.0",
+        "name": "Mergiraf 0.13.0",
+        "target_commitish": "",
+        "created_at": "2025-07-23T20:03:49+02:00",
+        "published_at": "2025-07-23T20:03:49+02:00",
+        "assets": [
+          {
+            "name": "mergiraf_aarch64-unknown-linux-gnu.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.13.0/mergiraf_aarch64-unknown-linux-gnu.tar.gz",
+            "size": 6217030
+          },
+          {
+            "name": "mergiraf_aarch64-unknown-linux-musl.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.13.0/mergiraf_aarch64-unknown-linux-musl.tar.gz",
+            "size": 6238681
+          },
+          {
+            "name": "mergiraf_x86_64-pc-windows-gnu.zip",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.13.0/mergiraf_x86_64-pc-windows-gnu.zip",
+            "size": 6254918
+          },
+          {
+            "name": "mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.13.0/mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+            "size": 6464222
+          },
+          {
+            "name": "mergiraf_x86_64-unknown-linux-musl.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.13.0/mergiraf_x86_64-unknown-linux-musl.tar.gz",
+            "size": 6508640
+          }
+        ]
+      },
+      {
+        "tag_name": "v0.12.1",
+        "name": "Mergiraf 0.12.1",
+        "target_commitish": "",
+        "created_at": "2025-07-10T18:33:46+02:00",
+        "published_at": "2025-07-10T18:33:46+02:00",
+        "assets": [
+          {
+            "name": "mergiraf_aarch64-unknown-linux-gnu.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.12.1/mergiraf_aarch64-unknown-linux-gnu.tar.gz",
+            "size": 6194519
+          },
+          {
+            "name": "mergiraf_aarch64-unknown-linux-musl.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.12.1/mergiraf_aarch64-unknown-linux-musl.tar.gz",
+            "size": 6210369
+          },
+          {
+            "name": "mergiraf_x86_64-pc-windows-gnu.zip",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.12.1/mergiraf_x86_64-pc-windows-gnu.zip",
+            "size": 6228730
+          },
+          {
+            "name": "mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.12.1/mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+            "size": 6429236
+          },
+          {
+            "name": "mergiraf_x86_64-unknown-linux-musl.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.12.1/mergiraf_x86_64-unknown-linux-musl.tar.gz",
+            "size": 6473050
+          }
+        ]
+      },
+      {
+        "tag_name": "v0.12.0",
+        "name": "Mergiraf 0.12.0",
+        "target_commitish": "",
+        "created_at": "2025-07-09T07:27:21+02:00",
+        "published_at": "2025-07-09T07:27:21+02:00",
+        "assets": [
+          {
+            "name": "mergiraf_aarch64-unknown-linux-gnu.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.12.0/mergiraf_aarch64-unknown-linux-gnu.tar.gz",
+            "size": 6167470
+          },
+          {
+            "name": "mergiraf_aarch64-unknown-linux-musl.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.12.0/mergiraf_aarch64-unknown-linux-musl.tar.gz",
+            "size": 6187657
+          },
+          {
+            "name": "mergiraf_x86_64-pc-windows-gnu.zip",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.12.0/mergiraf_x86_64-pc-windows-gnu.zip",
+            "size": 6209639
+          },
+          {
+            "name": "mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.12.0/mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+            "size": 6400312
+          },
+          {
+            "name": "mergiraf_x86_64-unknown-linux-musl.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.12.0/mergiraf_x86_64-unknown-linux-musl.tar.gz",
+            "size": 6451559
+          }
+        ]
+      },
+      {
+        "tag_name": "v0.11.0",
+        "name": "Mergiraf 0.11.0",
+        "target_commitish": "",
+        "created_at": "2025-06-29T15:41:58+02:00",
+        "published_at": "2025-06-29T15:41:58+02:00",
+        "assets": [
+          {
+            "name": "mergiraf_aarch64-unknown-linux-gnu.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.11.0/mergiraf_aarch64-unknown-linux-gnu.tar.gz",
+            "size": 6158116
+          },
+          {
+            "name": "mergiraf_aarch64-unknown-linux-musl.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.11.0/mergiraf_aarch64-unknown-linux-musl.tar.gz",
+            "size": 6181674
+          },
+          {
+            "name": "mergiraf_x86_64-pc-windows-gnu.zip",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.11.0/mergiraf_x86_64-pc-windows-gnu.zip",
+            "size": 6187746
+          },
+          {
+            "name": "mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.11.0/mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+            "size": 6375901
+          },
+          {
+            "name": "mergiraf_x86_64-unknown-linux-musl.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.11.0/mergiraf_x86_64-unknown-linux-musl.tar.gz",
+            "size": 6431995
+          }
+        ]
+      },
+      {
+        "tag_name": "v0.10.0",
+        "name": "Mergiraf 0.10.0",
+        "target_commitish": "main",
+        "created_at": "2025-06-02T10:28:39+02:00",
+        "published_at": "2025-06-02T10:28:39+02:00",
+        "assets": [
+          {
+            "name": "mergiraf_aarch64-unknown-linux-gnu.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.10.0/mergiraf_aarch64-unknown-linux-gnu.tar.gz",
+            "size": 4671607
+          },
+          {
+            "name": "mergiraf_aarch64-unknown-linux-musl.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.10.0/mergiraf_aarch64-unknown-linux-musl.tar.gz",
+            "size": 4697901
+          },
+          {
+            "name": "mergiraf_x86_64-pc-windows-gnu.zip",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.10.0/mergiraf_x86_64-pc-windows-gnu.zip",
+            "size": 4713674
+          },
+          {
+            "name": "mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.10.0/mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+            "size": 4875742
+          },
+          {
+            "name": "mergiraf_x86_64-unknown-linux-musl.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.10.0/mergiraf_x86_64-unknown-linux-musl.tar.gz",
+            "size": 4925625
+          }
+        ]
+      },
+      {
+        "tag_name": "v0.9.0",
+        "name": "Mergiraf 0.9.0",
+        "target_commitish": "main",
+        "created_at": "2025-05-27T09:57:51+02:00",
+        "published_at": "2025-05-27T09:57:51+02:00",
+        "assets": [
+          {
+            "name": "mergiraf_aarch64-unknown-linux-gnu.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.9.0/mergiraf_aarch64-unknown-linux-gnu.tar.gz",
+            "size": 4654710
+          },
+          {
+            "name": "mergiraf_aarch64-unknown-linux-musl.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.9.0/mergiraf_aarch64-unknown-linux-musl.tar.gz",
+            "size": 4675285
+          },
+          {
+            "name": "mergiraf_x86_64-pc-windows-gnu.zip",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.9.0/mergiraf_x86_64-pc-windows-gnu.zip",
+            "size": 4696637
+          },
+          {
+            "name": "mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.9.0/mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+            "size": 4857727
+          },
+          {
+            "name": "mergiraf_x86_64-unknown-linux-musl.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.9.0/mergiraf_x86_64-unknown-linux-musl.tar.gz",
+            "size": 4902257
+          }
+        ]
+      },
+      {
+        "tag_name": "v0.8.1",
+        "name": "Mergiraf 0.8.1",
+        "target_commitish": "main",
+        "created_at": "2025-05-16T07:16:35+02:00",
+        "published_at": "2025-05-16T07:16:35+02:00",
+        "assets": [
+          {
+            "name": "mergiraf_aarch64-unknown-linux-gnu.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.8.1/mergiraf_aarch64-unknown-linux-gnu.tar.gz",
+            "size": 4558326
+          },
+          {
+            "name": "mergiraf_aarch64-unknown-linux-musl.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.8.1/mergiraf_aarch64-unknown-linux-musl.tar.gz",
+            "size": 4570711
+          },
+          {
+            "name": "mergiraf_x86_64-pc-windows-gnu.zip",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.8.1/mergiraf_x86_64-pc-windows-gnu.zip",
+            "size": 4623219
+          },
+          {
+            "name": "mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.8.1/mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+            "size": 4725101
+          },
+          {
+            "name": "mergiraf_x86_64-unknown-linux-musl.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.8.1/mergiraf_x86_64-unknown-linux-musl.tar.gz",
+            "size": 4799264
+          }
+        ]
+      },
+      {
+        "tag_name": "v0.8.0",
+        "name": "Mergiraf 0.8.0",
+        "target_commitish": "main",
+        "created_at": "2025-05-13T17:06:48+02:00",
+        "published_at": "2025-05-13T17:06:48+02:00",
+        "assets": [
+          {
+            "name": "mergiraf_aarch64-unknown-linux-gnu.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.8.0/mergiraf_aarch64-unknown-linux-gnu.tar.gz",
+            "size": 4512837
+          },
+          {
+            "name": "mergiraf_aarch64-unknown-linux-musl.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.8.0/mergiraf_aarch64-unknown-linux-musl.tar.gz",
+            "size": 4537572
+          },
+          {
+            "name": "mergiraf_x86_64-pc-windows-gnu.zip",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.8.0/mergiraf_x86_64-pc-windows-gnu.zip",
+            "size": 4585302
+          },
+          {
+            "name": "mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.8.0/mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+            "size": 4687456
+          },
+          {
+            "name": "mergiraf_x86_64-unknown-linux-musl.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.8.0/mergiraf_x86_64-unknown-linux-musl.tar.gz",
+            "size": 4762762
+          }
+        ]
+      },
+      {
+        "tag_name": "v0.7.0",
+        "name": "Mergiraf 0.7.0",
+        "target_commitish": "main",
+        "created_at": "2025-04-30T19:04:20+02:00",
+        "published_at": "2025-04-30T19:04:20+02:00",
+        "assets": [
+          {
+            "name": "mergiraf_aarch64-unknown-linux-gnu.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.7.0/mergiraf_aarch64-unknown-linux-gnu.tar.gz",
+            "size": 4498620
+          },
+          {
+            "name": "mergiraf_aarch64-unknown-linux-musl.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.7.0/mergiraf_aarch64-unknown-linux-musl.tar.gz",
+            "size": 4518528
+          },
+          {
+            "name": "mergiraf_x86_64-pc-windows-gnu.zip",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.7.0/mergiraf_x86_64-pc-windows-gnu.zip",
+            "size": 4573111
+          },
+          {
+            "name": "mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.7.0/mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+            "size": 4677269
+          },
+          {
+            "name": "mergiraf_x86_64-unknown-linux-musl.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.7.0/mergiraf_x86_64-unknown-linux-musl.tar.gz",
+            "size": 4752690
+          }
+        ]
+      },
+      {
+        "tag_name": "v0.6.0",
+        "name": "Mergiraf 0.6.0",
+        "target_commitish": "main",
+        "created_at": "2025-03-02T19:10:07+01:00",
+        "published_at": "2025-03-02T19:10:07+01:00",
+        "assets": [
+          {
+            "name": "mergiraf_aarch64-apple-darwin.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.6.0/mergiraf_aarch64-apple-darwin.tar.gz",
+            "size": 4919648
+          },
+          {
+            "name": "mergiraf_aarch64-unknown-linux-gnu.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.6.0/mergiraf_aarch64-unknown-linux-gnu.tar.gz",
+            "size": 4477210
+          },
+          {
+            "name": "mergiraf_aarch64-unknown-linux-musl.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.6.0/mergiraf_aarch64-unknown-linux-musl.tar.gz",
+            "size": 4495420
+          },
+          {
+            "name": "mergiraf_x86_64-apple-darwin.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.6.0/mergiraf_x86_64-apple-darwin.tar.gz",
+            "size": 4763473
+          },
+          {
+            "name": "mergiraf_x86_64-pc-windows-gnu.zip",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.6.0/mergiraf_x86_64-pc-windows-gnu.zip",
+            "size": 4548613
+          },
+          {
+            "name": "mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.6.0/mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+            "size": 4656725
+          },
+          {
+            "name": "mergiraf_x86_64-unknown-linux-musl.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.6.0/mergiraf_x86_64-unknown-linux-musl.tar.gz",
+            "size": 4711472
+          }
+        ]
+      },
+      {
+        "tag_name": "v0.5.1",
+        "name": "Mergiraf 0.5.1",
+        "target_commitish": "main",
+        "created_at": "2025-02-08T11:39:19+01:00",
+        "published_at": "2025-02-08T11:39:19+01:00",
+        "assets": [
+          {
+            "name": "mergiraf_aarch64-apple-darwin.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.5.1/mergiraf_aarch64-apple-darwin.tar.gz",
+            "size": 4025138
+          },
+          {
+            "name": "mergiraf_aarch64-unknown-linux-gnu.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.5.1/mergiraf_aarch64-unknown-linux-gnu.tar.gz",
+            "size": 3711008
+          },
+          {
+            "name": "mergiraf_aarch64-unknown-linux-musl.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.5.1/mergiraf_aarch64-unknown-linux-musl.tar.gz",
+            "size": 3734337
+          },
+          {
+            "name": "mergiraf_x86_64-apple-darwin.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.5.1/mergiraf_x86_64-apple-darwin.tar.gz",
+            "size": 4001043
+          },
+          {
+            "name": "mergiraf_x86_64-pc-windows-gnu.zip",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.5.1/mergiraf_x86_64-pc-windows-gnu.zip",
+            "size": 3795128
+          },
+          {
+            "name": "mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.5.1/mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+            "size": 3895681
+          },
+          {
+            "name": "mergiraf_x86_64-unknown-linux-musl.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.5.1/mergiraf_x86_64-unknown-linux-musl.tar.gz",
+            "size": 3948529
+          }
+        ]
+      },
+      {
+        "tag_name": "v0.5.0",
+        "name": "Mergiraf 0.5.0",
+        "target_commitish": "main",
+        "created_at": "2025-02-06T17:16:57+01:00",
+        "published_at": "2025-02-06T17:16:57+01:00",
+        "assets": [
+          {
+            "name": "mergiraf_aarch64-apple-darwin.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.5.0/mergiraf_aarch64-apple-darwin.tar.gz",
+            "size": 4020744
+          },
+          {
+            "name": "mergiraf_aarch64-unknown-linux-gnu.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.5.0/mergiraf_aarch64-unknown-linux-gnu.tar.gz",
+            "size": 3710814
+          },
+          {
+            "name": "mergiraf_aarch64-unknown-linux-musl.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.5.0/mergiraf_aarch64-unknown-linux-musl.tar.gz",
+            "size": 3733600
+          },
+          {
+            "name": "mergiraf_x86_64-apple-darwin.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.5.0/mergiraf_x86_64-apple-darwin.tar.gz",
+            "size": 3997404
+          },
+          {
+            "name": "mergiraf_x86_64-pc-windows-gnu.zip",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.5.0/mergiraf_x86_64-pc-windows-gnu.zip",
+            "size": 3789961
+          },
+          {
+            "name": "mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.5.0/mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+            "size": 3890444
+          },
+          {
+            "name": "mergiraf_x86_64-unknown-linux-musl.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.5.0/mergiraf_x86_64-unknown-linux-musl.tar.gz",
+            "size": 3943389
+          }
+        ]
+      },
+      {
+        "tag_name": "v0.4.0",
+        "name": "Mergiraf 0.4.0",
+        "target_commitish": "main",
+        "created_at": "2024-12-08T09:19:38+01:00",
+        "published_at": "2024-12-08T09:19:38+01:00",
+        "assets": [
+          {
+            "name": "mergiraf_aarch64-apple-darwin.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.4.0/mergiraf_aarch64-apple-darwin.tar.gz",
+            "size": 3127435
+          },
+          {
+            "name": "mergiraf_aarch64-unknown-linux-gnu.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.4.0/mergiraf_aarch64-unknown-linux-gnu.tar.gz",
+            "size": 2889305
+          },
+          {
+            "name": "mergiraf_x86_64-apple-darwin.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.4.0/mergiraf_x86_64-apple-darwin.tar.gz",
+            "size": 3158655
+          },
+          {
+            "name": "mergiraf_x86_64-pc-windows-gnu.zip",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.4.0/mergiraf_x86_64-pc-windows-gnu.zip",
+            "size": 2989082
+          },
+          {
+            "name": "mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.4.0/mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+            "size": 3054564
+          }
+        ]
+      },
+      {
+        "tag_name": "v0.3.1",
+        "name": "Mergiraf 0.3.1",
+        "target_commitish": "main",
+        "created_at": "2024-11-13T18:55:15+01:00",
+        "published_at": "2024-11-13T18:55:15+01:00",
+        "assets": [
+          {
+            "name": "mergiraf_aarch64-apple-darwin.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.3.1/mergiraf_aarch64-apple-darwin.tar.gz",
+            "size": 2439911
+          },
+          {
+            "name": "mergiraf_aarch64-unknown-linux-gnu.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.3.1/mergiraf_aarch64-unknown-linux-gnu.tar.gz",
+            "size": 2263313
+          },
+          {
+            "name": "mergiraf_x86_64-apple-darwin.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.3.1/mergiraf_x86_64-apple-darwin.tar.gz",
+            "size": 2494854
+          },
+          {
+            "name": "mergiraf_x86_64-pc-windows-gnu.zip",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.3.1/mergiraf_x86_64-pc-windows-gnu.zip",
+            "size": 2360749
+          },
+          {
+            "name": "mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.3.1/mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+            "size": 2403049
+          }
+        ]
+      },
+      {
+        "tag_name": "v0.3.0",
+        "name": "Mergiraf 0.3.0",
+        "target_commitish": "main",
+        "created_at": "2024-11-12T17:00:17+01:00",
+        "published_at": "2024-11-12T17:00:17+01:00",
+        "assets": [
+          {
+            "name": "mergiraf_aarch64-apple-darwin.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.3.0/mergiraf_aarch64-apple-darwin.tar.gz",
+            "size": 2439754
+          },
+          {
+            "name": "mergiraf_aarch64-unknown-linux-gnu.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.3.0/mergiraf_aarch64-unknown-linux-gnu.tar.gz",
+            "size": 2256579
+          },
+          {
+            "name": "mergiraf_x86_64-apple-darwin.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.3.0/mergiraf_x86_64-apple-darwin.tar.gz",
+            "size": 2496612
+          },
+          {
+            "name": "mergiraf_x86_64-pc-windows-gnu.zip",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.3.0/mergiraf_x86_64-pc-windows-gnu.zip",
+            "size": 2360995
+          },
+          {
+            "name": "mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.3.0/mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+            "size": 2404117
+          }
+        ]
+      },
+      {
+        "tag_name": "v0.2.0",
+        "name": "Mergiraf 0.2.0",
+        "target_commitish": "main",
+        "created_at": "2024-11-08T11:00:02+01:00",
+        "published_at": "2024-11-08T11:00:02+01:00",
+        "assets": [
+          {
+            "name": "mergiraf_aarch64-apple-darwin.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.2.0/mergiraf_aarch64-apple-darwin.tar.gz",
+            "size": 2349269
+          },
+          {
+            "name": "mergiraf_aarch64-unknown-linux-gnu.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.2.0/mergiraf_aarch64-unknown-linux-gnu.tar.gz",
+            "size": 2170794
+          },
+          {
+            "name": "mergiraf_x86_64-apple-darwin.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.2.0/mergiraf_x86_64-apple-darwin.tar.gz",
+            "size": 2408532
+          },
+          {
+            "name": "mergiraf_x86_64-pc-windows-gnu.zip",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.2.0/mergiraf_x86_64-pc-windows-gnu.zip",
+            "size": 2277975
+          },
+          {
+            "name": "mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.2.0/mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+            "size": 2312769
+          }
+        ]
+      },
+      {
+        "tag_name": "v0.1.0",
+        "name": "Mergiraf 0.1.0",
+        "target_commitish": "main",
+        "created_at": "2024-11-01T15:06:20+01:00",
+        "published_at": "2024-11-01T15:06:20+01:00",
+        "assets": [
+          {
+            "name": "mergiraf_x86_64-pc-windows-gnu.zip",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.1.0/mergiraf_x86_64-pc-windows-gnu.zip",
+            "size": 2273300
+          },
+          {
+            "name": "mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+            "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.1.0/mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+            "size": 2311109
+          }
+        ]
+      }
+    ],
+    "tags": [
+      {
+        "name": "v0.20.0",
+        "commit": "182d26ea63aa62f7f5dc213cf8ceb70d83e7750e"
+      },
+      {
+        "name": "v0.19.1",
+        "commit": "e1c6514fb364faca51132be2b336aa739cdfadb9"
+      },
+      {
+        "name": "v0.19.0",
+        "commit": "7246b03c08c02248035bc20668fde1edf94a09e0"
+      },
+      {
+        "name": "v0.18.0",
+        "commit": "e8e13887b85b8cb56b1dc1624c5f94e3d39182b6"
+      },
+      {
+        "name": "v0.17.0",
+        "commit": "11b88160fb47376d5b27d524cbed5daebfa0c997"
+      },
+      {
+        "name": "v0.16.3",
+        "commit": "3f27f0a065b8d74c572218814dce89a91bc9ee9b"
+      },
+      {
+        "name": "v0.16.2",
+        "commit": "d5f02ef76676cf728e0eb4c59839d894999bcd82"
+      },
+      {
+        "name": "v0.16.1",
+        "commit": "0522ff6dc5d74fbf9302bb48e617948cda9d899a"
+      },
+      {
+        "name": "v0.16.0",
+        "commit": "7c806a299a3678bdc916f51f14cb89ecd2748025"
+      },
+      {
+        "name": "v0.15.0",
+        "commit": "6e69355155f34a1afda505e6f237be45c784f245"
+      },
+      {
+        "name": "v0.14.0",
+        "commit": "270d3cdfdb4e98f0e1e50fb6f03a408da3bb55e6"
+      },
+      {
+        "name": "v0.13.0",
+        "commit": "bd0745b78874e43d4907ff93b87389ffebe1f1cb"
+      },
+      {
+        "name": "v0.12.1",
+        "commit": "79b5378df59c9094570b359295584d69964f2b3d"
+      },
+      {
+        "name": "v0.12.0",
+        "commit": "814de756cca214536eb1a73653e69ae710373b00"
+      },
+      {
+        "name": "v0.11.0",
+        "commit": "104384241d78ee86956f9960216e115e36b64569"
+      },
+      {
+        "name": "v0.10.0",
+        "commit": "c8eb41c9faca63a89f941b68810ed79a80e6bbdb"
+      },
+      {
+        "name": "v0.9.0",
+        "commit": "57b5dc33fcee7376c9bedbf4272ef485e8d4452c"
+      },
+      {
+        "name": "v0.8.1",
+        "commit": "b8764ff33e06af8de272ee0b9f2d69be1de3fbb5"
+      },
+      {
+        "name": "v0.8.0",
+        "commit": "42b4ed80c2ce5292a020b7f5e02ff909beb9b5e0"
+      },
+      {
+        "name": "v0.7.0",
+        "commit": "2ec77bc3b18ea314ced2023c516645f5fcced2ba"
+      },
+      {
+        "name": "v0.6.0",
+        "commit": "8ede8053b12a259ff3e90e9df998552b26f5a87b"
+      },
+      {
+        "name": "v0.5.1",
+        "commit": "720c974f29e704118f4799cf190b2ec936bf0e5a"
+      },
+      {
+        "name": "v0.5.0",
+        "commit": "f81b67a50e72610ac41933383f60d745c0bbf50c"
+      },
+      {
+        "name": "v0.4.0",
+        "commit": "08cefbaa8bda56aa901d939f80a517d03e0fbb7f"
+      },
+      {
+        "name": "preview-v0.4.0-alpha1",
+        "commit": "808f10dec49aaf889985e8a56b695d1431b56476"
+      },
+      {
+        "name": "v0.3.1",
+        "commit": "6e40800d33640217d83177e7dfaf4a90a739d81e"
+      },
+      {
+        "name": "v0.3.0",
+        "commit": "cadbb646a331077ec4f3e100d55f54282f3c281c"
+      },
+      {
+        "name": "v0.2.0",
+        "commit": "5e0e340b1f666c36720531e0a7ac7b5417c96031"
+      },
+      {
+        "name": "v0.1.0",
+        "commit": "892e1f5a9e0dc00fa9e8759fd998f880d65aa983"
+      }
+    ],
+    "api_spec": "https://code.forgejo.org/forgejo/forgejo/raw/tag/v16.0.5/templates/swagger/v1_json.tmpl"
+  },
+  "documentation_excerpts": [
+    {
+      "source": "README.md@633fc1bf2e8d4941619fc1c49137b0f1ec9b56aa",
+      "text": "A syntax-aware git merge driver for a growing collection of programming languages and file formats."
+    },
+    {
+      "source": "README.md@633fc1bf2e8d4941619fc1c49137b0f1ec9b56aa",
+      "text": "* [Documentation](https://mergiraf.org/) * [Zulip chat](https://mergiraf.zulipchat.com/) (public accessibility sponsored by [Zulip](https://zulip.com))"
+    },
+    {
+      "source": "README.md@633fc1bf2e8d4941619fc1c49137b0f1ec9b56aa",
+      "text": "We welcome contributions and new team members, see [CONTRIBUTING.md](./CONTRIBUTING.md)."
+    }
+  ]
+}

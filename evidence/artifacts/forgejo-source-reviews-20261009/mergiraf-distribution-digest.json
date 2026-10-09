@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "kind": "official_distribution_digest",
+  "evidence_class": "local_integration",
+  "repository": "https://codeberg.org/mergiraf/mergiraf",
+  "version": "v0.20.0",
+  "release_commit": "182d26ea63aa62f7f5dc213cf8ceb70d83e7750e",
+  "asset": "mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+  "url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.20.0/mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+  "final_url": "https://codeberg.org/mergiraf/mergiraf/releases/download/v0.20.0/mergiraf_x86_64-unknown-linux-gnu.tar.gz",
+  "http_status": 200,
+  "sha256": "4341127da8d1da29eced669fbacc1e5d6e530115098de0b82cc9dc551a1acf37",
+  "bytes": 7472707,
+  "observed_at": "2026-10-09T11:12:33.726932+00:00",
+  "measurement": "anonymous read-only streaming download of official Codeberg release asset; no archive extraction, install, execution or adoption"
+}

@@ -18297,8 +18297,8 @@
     },
     {
       "path": "docs/decisions/2026-10-09-forgejo-source-reviews.md",
-      "sha256": "ce5f586f6090b13f3d7e0b8b5f6bbefb88d170dda3ce15e068e659283cee2e32",
-      "bytes": 6546
+      "sha256": "4b64a97e43d98f207001b2c0973b14eec16b927abededde373ed401730550547",
+      "bytes": 7669
     },
     {
       "path": "docs/direct-results.md",
@@ -20684,6 +20684,16 @@
       "path": "evidence/artifacts/final-architecture-round2-20261004/verdicts.json",
       "sha256": "45cd2b5c580d6f65aaf8eafd80d9412295e40de275dc8a5356d08f8deadb05a7",
       "bytes": 319713
+    },
+    {
+      "path": "evidence/artifacts/forgejo-source-reviews-20261009/mergiraf-distribution-digest.json",
+      "sha256": "c0696f03ce1df01209edbc16994322f399aeba8c0b2f818257d1a7c4cced621b",
+      "bytes": 876
+    },
+    {
+      "path": "evidence/artifacts/forgejo-source-reviews-20261009/mergiraf-source-review.json",
+      "sha256": "34c8c8666526a35c53727f92cf09b6c052047d0329b03e60e8f30c23b53515c8",
+      "bytes": 49943
     },
     {
       "path": "evidence/artifacts/foundation-closure-20260921/claude-review.md",
