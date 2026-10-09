@@ -4236,6 +4236,8 @@ class ConvertTests(unittest.TestCase):
         self.assertNotIn("smith", stdout.getvalue() + (work / "out/returns.json").read_text())
 
     def test_redactor_output_passes_actual_encoded_home_publication_rule(self):
+        from string import punctuation
+
         patterns = [(kind, pattern) for kind, pattern in sweep_common.private_content(ROOT)
                     if kind == "encoded home path"]
         self.assertEqual(len(patterns), 1,
@@ -4259,6 +4261,15 @@ class ConvertTests(unittest.TestCase):
                     "word{}", "-{}", "{}. Next.")
         strings = [context.format(root + "-" + name + tail) for root in roots for name in names
                    for tail in tails for context in contexts]
+        direct_names = ("fixtureagent", "fixture.agent", "fixture_agent", "fixture-agent",
+                        "fixture--agent", "fixtureagent-", "fixtureÅagent", "fixtureéagent",
+                        "fixtureǅagent", "fixtureʰagent", "fixture中agent", "example.person",
+                        "example_person", "examples")
+        direct_ids = ["-".join(("home", name, "code", "native", "agent", "stack"))
+                      for name in direct_names]
+        strings.extend(direct_ids)
+        strings.extend(left + identifier + right for identifier in direct_ids
+                       for left in punctuation for right in ("", '"', "`"))
         self.assertGreater(sum(bool(patterns[0][1].search(text)) for text in strings), 0)
         document = [{"value": text, text: "retained note"} for text in strings]
         home = Path("/") / "home" / "fixturelocal"
@@ -4639,15 +4650,16 @@ class ConvertTests(unittest.TestCase):
         self.assertEqual(json.loads(done.stdout)["run"]["runId"], "<project-dir>")
 
     def test_cli_preserves_home_substrings_inside_ordinary_words(self):
-        encoded = "-".join(("", "home", "fixtureuser", "code", "project"))
-        notes = "word" + encoded + " and component-home-widget; unchanged"
+        encoded = "-".join(("home", "fixtureuser", "code", "native", "agent", "stack"))
+        notes = "word-" + encoded + " and component-home-widget; unchanged"
         work = temp_dir(self)
         res = healthy_result()
         res["first"][0]["claude_discover"]["notes"] = notes
         done = self.cli(work, res)
         self.assertEqual(done.returncode, 0, done.stderr)
         returns = json.loads((work / "out/returns.json").read_text())
-        self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"], notes)
+        self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                         "word-<project-dir> and component-home-widget; unchanged")
 
     def test_cli_compares_each_gpt6_output_with_the_file_codex_wrote(self):
         work = temp_dir(self)

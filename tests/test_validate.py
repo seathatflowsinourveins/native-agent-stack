@@ -629,6 +629,8 @@ class DirectCodegraphHomePrivacyProperties(unittest.TestCase):
         ("dot", "fixture.agent"),
         ("underscore", "fixture_agent"),
         ("hyphen", "fixture-agent"),
+        ("consecutive-hyphens", "fixture--agent"),
+        ("trailing-hyphen", "fixtureagent-"),
         ("Lu", "fixtureÅagent"),
         ("Ll", "fixtureéagent"),
         ("Lt", "fixtureǅagent"),
@@ -640,6 +642,7 @@ class DirectCodegraphHomePrivacyProperties(unittest.TestCase):
     )
     PLACEHOLDERS = ("<user>", "%u", "example")
     NON_PUNCTUATION_BOUNDARIES = ("", " ", "\t", "\n")
+    FILE_SCAN_WRAPPERS = ("", '"', "`")
     property_cases_executed = 0
 
     @classmethod
@@ -679,7 +682,7 @@ class DirectCodegraphHomePrivacyProperties(unittest.TestCase):
             "unicode_letter_names": count,
             "unicode_letter_left_neighbors": count,
             "ascii_alphanumeric_left_neighbors": 62,
-            "scan_file_wrappers": 2,
+            "scan_file_wrappers": len(cls.NAME_CLASSES) * len(cls.FILE_SCAN_WRAPPERS),
             "unicode_categories": categories,
             "unicode_version": unicodedata.unidata_version,
         }
@@ -739,17 +742,18 @@ class DirectCodegraphHomePrivacyProperties(unittest.TestCase):
         identifier = self.graph_id("fixtureagent")
         self.assert_semantic_domain((letter + identifier for letter in ascii_letters + digits), False)
 
-    def test_direct_file_scan_flags_quotes_and_backticks_without_echoing_identifier(self):
-        identifier = self.graph_id("fixtureagent")
+    def test_direct_file_scan_flags_bare_quotes_and_backticks_without_echoing_identifier(self):
         mismatches = 0
         with tempfile.TemporaryDirectory(prefix="codegraph-privacy-") as directory:
             target = Path(directory) / "synthetic.txt"
-            for wrapper in ('"', "`"):
-                target.write_text(wrapper + identifier + wrapper, encoding="utf-8")
-                findings = scan_file_for_private_content(target)
-                type(self).property_cases_executed += 1
-                mismatches += not any("encoded home path" in finding for finding in findings)
-                mismatches += any(identifier in finding for finding in findings)
+            for _, name in self.NAME_CLASSES:
+                identifier = self.graph_id(name)
+                for wrapper in self.FILE_SCAN_WRAPPERS:
+                    target.write_text(wrapper + identifier + wrapper, encoding="utf-8")
+                    findings = scan_file_for_private_content(target)
+                    type(self).property_cases_executed += 1
+                    mismatches += not any("encoded home path" in finding for finding in findings)
+                    mismatches += any(identifier in finding for finding in findings)
         self.assertEqual(mismatches, 0, f"{mismatches} scan classification/redaction mismatches")
 
 

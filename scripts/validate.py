@@ -40,7 +40,7 @@ PRIVATE_CONTENT = (
         # Graph project IDs omit the leading dash. Every punctuation wrapper,
         # including '_' and '-', is a boundary; Unicode alphanumerics are not.
         # '<user>', '%u' and the complete 'example' placeholder remain exempt.
-        r"|(?<![^\W_])home-(?!example-code-)[\w.]+(?:-[\w.]+)*-code-")),
+        r"|(?<![^\W_])home-(?!example-code-)[\w.]+(?:-+[\w.]+)*-*-code-")),
     ("Hugging Face token", re.compile(r"\bhf_[A-Za-z0-9]{20,}\b")),
     ("GitHub token", re.compile(r"\b(?:gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{30,})\b")),
     ("Tavily token", re.compile(r"\btvly-(?:(?:prod|dev)-)?[A-Za-z0-9_-]{24,}\b")),
