@@ -156,8 +156,8 @@
     },
     "verifier": {
       "path": "R3-VERIFY.py",
-      "sha256": "8d86e1d3cc517c549ad4f7b9dff660a50bc95cc3804822989b1d72086b9f5018",
-      "source": "CPython3.12.3json.load/hashlib.file_digest; nativeuutils0.10.0sha256sumtextcarrier; smallstructuraljoinglueforCC-R3-1,notupstreamtest/A-B/E2Erunner"
+      "sha256": "dd89dd9af5d7b8a2faad05715fda3787741b82c8dcb6e00a139b5c4d7e4adc63",
+      "source": "CPython3.12.3json.load/hashlib.file_digest; R3-F2 adds CPython3.13.16json.JSONDecodeError/pathlib/OSError/re.fullmatch and this packet's mandatory join schema at36e36ea498e23ffd5bfc103035a2da883a6a08e4. Nativeuutils0.10.0sha256sumtextcarrier; local structural checks and synthetic unittest mutations, not upstream/scientific acceptance."
     },
     "withdrawn_early_attempt_used": false
   }
