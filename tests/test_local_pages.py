@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 from contextlib import redirect_stderr, redirect_stdout
+import builtins
 import hashlib
 from html.parser import HTMLParser
 import importlib.util
 import io
 import json
+import os
 from pathlib import Path
 import shutil
 import tempfile
@@ -84,6 +86,14 @@ class LocalPagesTests(unittest.TestCase):
         self.workstation_patch = patch.object(BUILDER, "collect_workstation", return_value=self.workstation_result)
         self.workstation_patch.start()
         self.addCleanup(self.workstation_patch.stop)
+        policy = json.loads((ROOT / "tools/local-pages/source_policy.json").read_text())
+        policy["sources"] = {name: [dict(record)] for name, record in sources.items()}
+        policy["source_index"] = [{"root": "repo", "path": "tools/north-star/sources.json"}, {"root": "repo", "path": "tools/north-star/source-override.json"}]
+        self.policy_path = self.base / "approved-source-policy.json"
+        self.write_json(self.policy_path, policy)
+        self.policy_patch = patch.object(BUILDER, "SOURCE_POLICY_PATH", self.policy_path)
+        self.policy_patch.start()
+        self.addCleanup(self.policy_patch.stop)
 
     @staticmethod
     def write_json(path: Path, value: object) -> None:
@@ -158,6 +168,65 @@ class LocalPagesTests(unittest.TestCase):
         self.assertIn("checked_at = 2024-03-04T05:06:07Z", sources)
         for name in ("index", "readiness", "gaps", "roadmap"):
             self.assertNotIn("checked_at = 2024-03-04T05:06:07Z", (self.output / (name + ".html")).read_text())
+
+    def test_approved_roadmap_reference_dates_render_on_sources(self) -> None:
+        target = self.state / "coordination/ns2604-coop/readiness-20261005/jobs/BOARD-CLOSE-20261007T190934Z/board-close-20261007T193821Z.json"
+        self.write_json(target, {"updated_utc": "2024-08-09T10:11:12Z"})
+        self.refresh()
+        html = (self.output / "sources.html").read_text()
+        self.assertIn("updated_utc = 2024-08-09T10:11:12Z", html)
+
+    def test_raw_receipt_paths_are_not_replaced_by_portable_placeholders(self) -> None:
+        segment = "-".join(("11111111", "2222", "3333", "4444", "555555555555"))
+        path = self.state / segment / "gate.json"
+        self.write_json(path, json.loads(self.gate.read_text()))
+        self.source_spec["sources"]["gate"]["path"] = path.relative_to(self.state).as_posix()
+        self.write_json(self.source_index, self.source_spec)
+        policy = json.loads(self.policy_path.read_text())
+        policy["sources"]["gate"] = [dict(self.source_spec["sources"]["gate"])]
+        self.write_json(self.policy_path, policy)
+        result = self.refresh()
+        self.assertEqual(result["inputs"]["readiness:gate"]["path"], str(path))
+        self.assertIn("${LOCAL_SESSION_ID}", (self.output / "sources.html").read_text())
+        self.assertNotIn(segment, (self.output / "sources.html").read_text())
+
+    def test_override_flags_refuse_files_outside_source_roots_before_read(self) -> None:
+        outside = self.base / "outside/unrelated.json"
+        self.write_json(outside, {"value": "synthetic outside source"})
+        for keyword in ("gaps_source", "roadmap_source", "roadmap_inputs", "current_source"):
+            with self.subTest(keyword=keyword):
+                original = BUILDER.snapshot
+                attempts = []
+                def guarded(path):
+                    if Path(path) == outside:
+                        attempts.append(path)
+                        raise AssertionError("outside override opened")
+                    return original(path)
+                with patch.object(BUILDER, "snapshot", side_effect=guarded), self.assertRaises(ValueError):
+                    self.refresh(**{keyword: outside})
+                self.assertEqual(attempts, [])
+
+    def test_all_override_roles_refuse_protected_and_unapproved_files_on_actual_opens(self) -> None:
+        relative_paths = ("coordination/e2e-truth-20261006/synthetic-capture.json", "credentials/client-secret.env", ".env", "environment.json", "client-secret.json", "unrelated/public.json")
+        for keyword in ("gaps_source", "roadmap_source", "roadmap_inputs", "current_source"):
+            for source_root in (self.root, self.state):
+                for relative in relative_paths:
+                    with self.subTest(keyword=keyword, root=source_root.name, relative=relative):
+                        target = source_root / relative
+                        self.write_json(target, {"value": "synthetic unapproved projection"})
+                        attempts = []
+                        original_builtin, original_io, original_os = builtins.open, io.open, os.open
+                        def guard(original):
+                            def checked(path, *args, **kwargs):
+                                if not isinstance(path, int) and Path(path) == target:
+                                    attempts.append(path)
+                                    raise AssertionError("protected override reached a real file-open boundary")
+                                return original(path, *args, **kwargs)
+                            return checked
+                        with patch.object(builtins, "open", side_effect=guard(original_builtin)), patch.object(io, "open", side_effect=guard(original_io)), patch.object(os, "open", side_effect=guard(original_os)), self.assertRaises(ValueError):
+                            self.refresh(**{keyword: target})
+                        self.assertEqual(attempts, [])
+                        self.assertFalse(self.receipt.exists())
 
     def test_newer_native_observation_only_differs_from_current_view(self) -> None:
         gate = json.loads(self.gate.read_text())

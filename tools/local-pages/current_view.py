@@ -71,11 +71,21 @@ def validate(view: dict) -> None:
     parse_time(view["workstation"]["read_utc"])
 
 
-def time_label(value: str) -> str:
+def time_label(value: str, *, plain: bool = False) -> str:
     utc = parse_time(value)
     local = utc.astimezone(ZoneInfo("America/New_York"))
+    if plain:
+        return local.strftime("%b %d, %H:%M:%S %Z") + "; " + utc.strftime("%b %d, %H:%M:%S UTC")
     return (f'<time datetime="{esc(value)}">{local.strftime("%b %d, %H:%M:%S %Z")}</time>'
             f'<small>{utc.strftime("%b %d, %H:%M:%S UTC")}</small>')
+
+
+def observation_time(value: str | None, *, plain: bool = False) -> str:
+    """Display only a recorded observation time; never substitute another date."""
+    try:
+        return time_label(value, plain=plain)
+    except (ValueError, TypeError, AttributeError):
+        return "not reported"
 
 
 def gate_strip(view: dict) -> str:
@@ -96,7 +106,7 @@ def owner_link(item: dict) -> str:
         parsed = urlsplit(link)
     except ValueError:
         return esc(item["what"])
-    if not _sanitization.is_account_url(original) and not _sanitization.is_account_url(link) and parsed.scheme == "https" and parsed.netloc and not parsed.username and not parsed.password:
+    if link == original and not _sanitization.is_account_url(original) and not _sanitization.is_account_url(link) and parsed.scheme == "https" and parsed.netloc and not parsed.username and not parsed.password:
         return f'<a href="{esc(link)}">{esc(item["what"])}</a>'
     return esc(item["what"])
 
@@ -111,11 +121,11 @@ def render(view: dict, workstation: dict) -> str:
     readings = []
     for key, label in (("windows_available_gib", "Windows available"), ("wsl_available_gib", "WSL available"), ("swap_used_gib", "Swap used")):
         reading = workstation[key]
-        readings.append(f'<div class="workstation-metric"><dt>{label}</dt><dd><strong>{reading["value_gib"]:.1f}</strong> GiB <small class="reading-meta">{esc(reading["source"])} · read <time datetime="{esc(reading["read_utc"])}">{esc(reading["read_utc"])}</time></small></dd></div>')
+        readings.append(f'<div class="workstation-metric"><dt>{label}</dt><dd><strong>{reading["value_gib"]:.1f}</strong> GiB <small class="reading-meta">{esc(reading["source"])} · metric read {observation_time(reading.get("read_utc"))}</small></dd></div>')
     pool = view["workstation"].get("codex_pool")
     pool_note = f'<p class="pool-note"><strong>Pool note:</strong> {esc(pool)}</p>' if pool else ''
     return f'''<section id="now-view" class="now-view" aria-labelledby="now-title">
-<header class="now-heading"><h1 id="now-title">North-star readiness</h1><p class="current-stamp">Now · command-center current view · <time datetime="{esc(view["updated_utc"])}">{esc(view["updated_utc"])}</time></p><p class="now-headline">{esc(view["headline"])}</p></header>
+<header class="now-heading"><h1 id="now-title">North-star readiness</h1><p class="current-stamp">Now · command-center current view snapshot · {observation_time(view.get("updated_utc"))}</p><p class="now-headline">{esc(view["headline"])}</p></header>
 <p class="now-score"><strong>{readiness["start_gates_met"]} of {readiness["start_gates_total"]} START gates met</strong><span class="now-estimate">CC estimate {readiness["estimate_percent"]}% · {esc(readiness["basis"])}</span></p>
 {gate_strip(view)}
 <div class="now-grid"><section class="now-events"><h2>Next events</h2><table><thead><tr><th>New York, then UTC</th><th>Event</th></tr></thead><tbody>{events}</tbody></table></section>
@@ -124,18 +134,25 @@ def render(view: dict, workstation: dict) -> str:
 </section>'''
 
 
+def differs(gate_id: str, state: str, view: dict) -> bool:
+    """Compare exact gates, or their single-letter split ids, consistently."""
+    absent = ("unverified", "unreported", "not reported", "unspecified", "unknown")
+    if not isinstance(gate_id, str) or not gate_id or not isinstance(state, str) or not state.strip() or state.strip().casefold().startswith(absent):
+        return False
+    gates = [row for row in view.get("gates", []) if isinstance(row, dict) and isinstance(row.get("id"), str) and isinstance(row.get("state"), str) and row["state"].strip() and not row["state"].strip().casefold().startswith(absent)]
+    candidates = [row for row in gates if row["id"] == gate_id]
+    if not candidates:
+        candidates = [row for row in gates if row["id"].startswith(gate_id) and len(row["id"]) == len(gate_id) + 1 and row["id"][-1] in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"]
+    return bool(candidates) and any(row["state"].strip().casefold() != state.strip().casefold() for row in candidates)
+
+
 def superseded(gate_id: str, state: str, view: dict, *, source_utc: str | None = None, source_status: str = "RECORDED") -> bool:
     """A newer current-view observation can supersede a recorded gate state."""
-    absent = ("unverified", "unreported", "not reported", "unspecified")
-    if not isinstance(state, str) or not state.strip() or state.strip().casefold().startswith(absent) or not isinstance(source_status, str) or source_status.strip().upper() != "RECORDED":
+    if not isinstance(source_status, str) or source_status.strip().upper() != "RECORDED":
         return False
     try:
         if parse_time(source_utc) >= parse_time(view["updated_utc"]):
             return False
     except (ValueError, TypeError, AttributeError, KeyError):
         return False
-    gates = [row for row in view.get("gates", []) if isinstance(row, dict) and isinstance(row.get("id"), str) and isinstance(row.get("state"), str) and row["state"].strip() and not row["state"].strip().casefold().startswith(absent)]
-    candidates = [row for row in gates if row["id"] == gate_id]
-    if not candidates:
-        candidates = [row for row in gates if row["id"].startswith(gate_id) and row["id"][len(gate_id):].isalpha()]
-    return bool(candidates) and any(row["state"].strip().casefold() != state.strip().casefold() for row in candidates)
+    return differs(gate_id, state, view)

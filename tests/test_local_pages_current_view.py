@@ -62,6 +62,45 @@ class CurrentViewTests(unittest.TestCase):
         self.assertFalse(current.superseded("G5", "READY", self.view, source_utc="2026-10-08T06:00:00Z", source_status="RECORDED"))
         self.assertFalse(current.superseded("G4", "READY", self.view))
 
+    def test_owner_link_changed_by_portable_projection_is_plain_text(self):
+        for fragment in [SYNTHETIC_HOME + "/receipt", SYNTHETIC_SESSION, SYNTHETIC_TASK]:
+            with self.subTest(fragment=fragment):
+                link = "https://example.org/source/" + fragment
+                html = current.owner_link({"link": link, "what": "Read " + link})
+                self.assertNotIn('<a href=', html)
+                self.assertNotIn(fragment, html)
+        self.assertIn('<a href="https://example.org/source">', current.owner_link({"link": "https://example.org/source", "what": "Read source"}))
+
+    def test_differs_and_superseded_share_one_bounded_split_gate_matcher(self):
+        self.assertTrue(current.differs("G4", "READY", self.view))
+        self.assertFalse(current.differs("G4a", "MET", self.view))
+        self.assertFalse(current.differs("G4", "UNVERIFIED", self.view))
+        self.assertFalse(current.differs("G4", "UNKNOWN", self.view))
+        self.assertFalse(current.differs("G4", None, self.view))
+        for extra in ["G4other", "G40", "G4abc", "G4a-extra"]:
+            with self.subTest(extra=extra):
+                view = {**self.view, "gates": [{"id": extra, "state": "MET"}]}
+                self.assertFalse(current.differs("G4", "READY", view))
+                self.assertFalse(current.superseded("G4", "READY", view, source_utc="2026-10-08T06:00:00Z"))
+
+    def test_now_stamp_and_metric_reads_show_new_york_before_utc(self):
+        html = current.render(self.view, self.workstation)
+        stamp = html.split('class="current-stamp"', 1)[1].split('</p>', 1)[0]
+        self.assertIn("02:00:00 EDT", stamp)
+        self.assertLess(stamp.index("02:00:00 EDT"), stamp.index("06:00:00 UTC"))
+        readings = html.split('class="reading-meta"', 1)[1]
+        self.assertIn("01:00:00 EDT", readings)
+        self.assertLess(readings.index("01:00:00 EDT"), readings.index("05:00:00 UTC"))
+        self.assertIn('datetime="2026-10-09T05:00:00Z"', readings)
+
+    def test_unknown_metric_read_time_stays_explicitly_unreported(self):
+        self.workstation["windows_available_gib"]["read_utc"] = None
+        html = current.render(self.view, self.workstation)
+        first = html.split('class="reading-meta"', 1)[1].split('</small>', 1)[0]
+        self.assertIn("not reported", first)
+        self.assertNotIn('datetime="None"', first)
+        self.assertNotIn(self.view["updated_utc"], first)
+
 
 if __name__ == "__main__":
     unittest.main()

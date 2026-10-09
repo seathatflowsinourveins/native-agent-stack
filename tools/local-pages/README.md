@@ -91,18 +91,33 @@ allowed file, including references into mixed capture directories, are omitted
 and recorded. A shared sanitizer applies the native portable home/session/task
 projection and account URL policy to every served page string, including native
 manifest gate cards and fragments. Custody receipts keep their original paths.
+The independently committed `source_policy.json` binds every native source-index
+key, the source-index file itself, and linked supporting/SDK/raw receipt roles
+to exact permitted paths. Selecting JSON cannot extend it. The guard checks
+each path before the original native reader opens it and uses bounded regular
+file reads that reject symlinks. Policy provenance and hashes are retained.
+Source custody uses raw receipt paths; portable copies are used only for rendering.
+All four source overrides bind independent exact approved paths within the
+selected repository or state root before native reads or source capture.
+Credential, environment, client-secret and mixed capture paths are refused.
+An owner URL changed by sanitization renders as plain text.
 Operational owner fields remain source records. The original CC fragment's
 external fonts and attributed direction are not used.
 
-Run only the focused builder module:
+Run the focused local-page modules and native readiness checks:
 
 ```sh
 nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages.py
 nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_workstation.py
+nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_current_view.py
+nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_sanitization.py
+nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_source_policy.py
+nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_north_star_readiness.py
 ```
 
 The fixtures use the repository's real native builder and local temporary
-receipts. They need no network, service, credentials or third-party packages.
+receipts. They need no external network, shared service, credentials or
+third-party packages; the redirect tests bind an isolated loopback socket.
 Browser interaction and actual host reachability are separate co-op checks.
 
 Primary references: the native readiness API at the commit above; the retained

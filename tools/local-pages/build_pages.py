@@ -24,6 +24,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[2]
 ASSETS = Path(__file__).resolve().parent / "assets"
+SOURCE_POLICY_PATH = Path(__file__).resolve().parent / "source_policy.json"
 MAX_BYTES = 8 * 1024 * 1024
 DATE_KEYS = ("as_of_utc", "updated_utc", "generated_utc", "generated_at",
              "checked_at", "recorded_utc", "captured_at", "captured_utc")
@@ -233,10 +234,8 @@ def readiness_body(native: Any, manifest: dict[str, Any], current: dict[str, Any
         known_dates = (source_dates or {}).get((receipt.get("root"), receipt.get("path")), {})
         timestamp = next((known_dates[key] for key in DATE_KEYS if key in known_dates), None)
         superseded = '<p class="superseded-note">superseded in the current view</p>' if view.superseded(row["id"], state, current, source_utc=timestamp, source_status=field.get("status", "UNVERIFIED")) else ''
-        if not superseded and field.get("status") == "RECORDED":
-            candidates = [gate for gate in current["gates"] if gate["id"] == row["id"] or gate["id"].startswith(row["id"]) and gate["id"][len(row["id"]):].isalpha()]
-            if any(gate["state"].casefold() != state.casefold() for gate in candidates):
-                superseded = '<p class="superseded-note">differs from the current view</p>'
+        if not superseded and field.get("status") == "RECORDED" and view.differs(row["id"], state, current):
+            superseded = '<p class="superseded-note">differs from the current view</p>'
         cards.append(f'<article class="gate-card" data-manifest-gate="{esc(row["id"])}"><h3>{esc(row["id"])}</h3><p class="gate-state">{esc(state)}</p>{superseded}<p>Operational owner: {esc(fact(row["fields"].get("owner")))}</p></article>')
     gates = "".join(cards)
     fragment = display(native.render_fragment(manifest))
@@ -292,10 +291,32 @@ def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
         item = snapshot(path)
         inputs[name] = item
         return item
+    def override_path(value: Path | None, default: Path, role: str | None = None) -> Path:
+        path = no_symlinks(value if value is not None else default)
+        if not any(path.is_relative_to(base) for base in (root, state_root)):
+            raise ValueError("source override escapes the selected source roots")
+        if path.is_relative_to(output_dir):
+            raise ValueError("source override is inside the served root")
+        if role is not None:
+            policy.validate_override(role, path, root, state_root)
+        return path
+    sources = override_path(sources, root / "tools/north-star/sources.json")
+    policy_module = load_local("source_policy")
+    policy = policy_module.load_policy(SOURCE_POLICY_PATH)
+    policy.validate_index_path(root, state_root, sources)
+    override_inputs = {
+        "gaps": override_path(gaps_source, cc_tools / "gaps/gaps.json", "gaps_source"),
+        "roadmap": override_path(roadmap_source, cc_tools / "roadmap/roadmap-status.json", "roadmap_source"),
+        "roadmap_inputs": override_path(roadmap_inputs, cc_tools / "roadmap/roadmap-inputs.json", "roadmap_inputs"),
+        "cc_now": override_path(current_source, state_root / "coordination/command-center/pages/cc-now.json", "current_source"),
+    }
+    inputs["source_policy"] = dict(policy.receipt)
+    capture("module:source_policy", Path(__file__).resolve().parent / "source_policy.py")
     index = capture("native_source_index", sources)
     source_spec = strict_json(index["raw"])
     if not isinstance(source_spec, dict) or not isinstance(source_spec.get("sources"), dict):
         raise ValueError("native source index must contain a sources object")
+    policy.validate_sources(source_spec)
     for entry in source_spec.get("sources", {}).values():
         base = {"repo": root, "state": state_root}[entry["root"]]
         relative = Path(entry["path"])
@@ -308,14 +329,15 @@ def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
     if Path(native_input["path"]).is_relative_to(output_dir):
         raise ValueError("native builder is inside the served root")
     inputs["native_builder"] = native_input
-    manifest = native.build(root, state_root, sources)
-    manifest_bytes = native.render(manifest)
+    with policy_module.guard_native(native, root, state_root, sources, policy_path=SOURCE_POLICY_PATH):
+        raw_manifest = native.build(root, state_root, sources)
+    manifest_bytes = native.render(raw_manifest)
     manifest_sha = hashlib.sha256(manifest_bytes).hexdigest()
     manifest = sanitizer().sanitize(strict_json(manifest_bytes))
     if manifest["source_index"]["sha256"] != index["sha256"]:
         raise ValueError("native source index changed during refresh")
     readiness_notes = []
-    for name, record in manifest["receipts"].items():
+    for name, record in raw_manifest["receipts"].items():
         path = {"repo": root, "state": state_root}[record["root"]] / record["path"]
         no_symlinks(path)
         fields = {}
@@ -332,10 +354,10 @@ def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
             inputs["readiness:" + name] = {"path": str(path), "sha256": None, "status": "UNVERIFIED"}
         timestamp = "; ".join(f"{key} = {value}" for key, value in fields.items()) or "Source-owned snapshot date unspecified"
         readiness_notes.append(f'<code>{esc(record["root"] + ":" + record["path"])}</code> — {esc(record["status"])}; {esc(timestamp)}')
-    gap_input = capture("gaps", gaps_source or cc_tools / "gaps/gaps.json")
-    road_input = capture("roadmap", roadmap_source or cc_tools / "roadmap/roadmap-status.json")
-    road_index = capture("roadmap_inputs", roadmap_inputs or cc_tools / "roadmap/roadmap-inputs.json")
-    current_input = capture("cc_now", current_source or state_root / "coordination/command-center/pages/cc-now.json")
+    gap_input = capture("gaps", override_inputs["gaps"])
+    road_input = capture("roadmap", override_inputs["roadmap"])
+    road_index = capture("roadmap_inputs", override_inputs["roadmap_inputs"])
+    current_input = capture("cc_now", override_inputs["cc_now"])
     current = strict_json(current_input["raw"])
     view = load_local("current_view")
     view.validate(current)
@@ -375,15 +397,19 @@ def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
     road_scope = source_scope(road_input, roadmap)
     gap_notes = [f'<code>{esc(label_path(gap_input["path"], root, state_root))}</code> — {esc(source_scope(gap_input, gaps, detail=True))}', "Counts describe rows and severity labels in this gap snapshot. Due dates are source-listed deadlines."]
     road_notes = [f'<code>{esc(label_path(road_input["path"], root, state_root))}</code> — {esc(source_scope(road_input, roadmap, detail=True))}', f'<code>{esc(label_path(road_index["path"], root, state_root))}</code> — retained input bindings; hashes remain in the nonserved receipt.', "Milestone dates are event dates. No single roadmap snapshot date was inferred from them."]
+    for name, item in inputs.items():
+        if name.startswith("roadmap:"):
+            description = "; ".join(f"{key} = {value}" for key, value in item.get("source_dates", {}).items()) or item.get("status") or "source date unspecified"
+            road_notes.append('<code>' + esc(label_path(item["path"], root, state_root)) + '</code> — ' + esc(description))
     overview = '<section class="panel"><h2>Choose a page</h2><ul class="page-index"><li><a href="readiness.html">North-star readiness</a><p>What is done, what is left and what needs a decision.</p></li><li><a href="gaps.html">Grand Gap Board</a><p>Find open gaps and their next actions.</p></li><li><a href="roadmap.html">Roadmap</a><p>Read the dated milestones and server records.</p></li><li><a href="sources.html">Sources</a><p>Check input dates, hashes and evidence scope.</p></li></ul></section>'
-    current_scope = 'command-center current view; updated_utc = ' + current["updated_utc"]
+    current_scope = 'command-center current view snapshot; ' + view.observation_time(current["updated_utc"], plain=True)
     current_notes = [f'<code>{esc(label_path(current_input["path"], root, state_root))}</code> — {esc(current_scope)}; SHA-256 <code>{current_input["sha256"]}</code>', 'Workstation readings use an exact Prometheus metric when present, otherwise the CC-owned value and its recorded read time.']
     source_groups = {"index": current_notes, "readiness": current_notes + readiness_notes, "gaps": gap_notes, "roadmap": road_notes}
     source_body = "".join(f'<section id="{key}" class="panel"><h2>{esc(PAGES[key])}</h2><ul class="source-list">' + "".join(f'<li>{note}</li>' for note in notes) + '</ul></section>' for key, notes in source_groups.items())
     custody_rows = "".join(f'<tr><td><code>{esc(label_path(item["path"], root, state_root))}</code></td><td><code>{esc(item.get("sha256") or item.get("status", "UNVERIFIED"))}</code></td></tr>' for item in inputs.values())
     source_body += f'<section id="sources" class="panel"><h2>Input identity</h2><div class="table-wrap"><table><thead><tr><th>Source</th><th>SHA-256 or status</th></tr></thead><tbody>{custody_rows}</tbody></table></div></section>'
-    index_leading = f'<header class="page-header"><h1>North-star readiness and next steps</h1><p class="current-stamp">{esc(current_scope)}</p><p>{esc(current["headline"])}</p><p class="now-score"><strong>{current["readiness"]["start_gates_met"]} of {current["readiness"]["start_gates_total"]} START gates met</strong></p></header>' + view.gate_strip(current)
-    native_dates = {(manifest["receipts"][name.removeprefix("readiness:")]["root"], manifest["receipts"][name.removeprefix("readiness:")]["path"]): item.get("source_dates", {}) for name, item in inputs.items() if name.startswith("readiness:")}
+    index_leading = f'<header class="page-header"><h1>North-star readiness and next steps</h1><p class="current-stamp">Current view snapshot: {view.observation_time(current["updated_utc"])}</p><p>{esc(current["headline"])}</p><p class="now-score"><strong>{current["readiness"]["start_gates_met"]} of {current["readiness"]["start_gates_total"]} START gates met</strong></p></header>' + view.gate_strip(current)
+    native_dates = {(sanitizer().sanitize(raw_manifest["receipts"][name.removeprefix("readiness:")]["root"]), sanitizer().sanitize(raw_manifest["receipts"][name.removeprefix("readiness:")]["path"])): item.get("source_dates", {}) for name, item in inputs.items() if name.startswith("readiness:")}
     manifest_body = f'<section class="manifest-section" aria-labelledby="manifest-title"><h2 id="manifest-title" class="manifest-title">repository manifest at <code>{manifest_sha}</code>, dated receipts</h2><p><a href="sources.html#readiness">Source dates and retained receipt identities</a></p>' + readiness_body(native, manifest, current, view, source_dates=native_dates) + '</section>'
     common = (refreshed, manifest_sha)
     outputs = {
