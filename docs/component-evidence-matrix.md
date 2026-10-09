@@ -7,7 +7,7 @@ Scope and schema checked 2026-09-27; newest verdict, sweep-manifest or completed
 | Metric | Count |
 | --- | --- |
 | layers | 32 |
-| winners | 65 |
+| winners | 66 |
 | alternatives | 183 |
 | dual_lane_same_winner | 20 |
 | dual_lane_adjudicated | 10 |
@@ -45,7 +45,7 @@ Each winner shows, for linux-wsl2-x86_64 / macos-arm64, its `e2e_state` and host
 | `us-equities/data-quality-orchestration` | dual_lane_adjudicated (adjudication: `evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-data-quality-orchestration-20260922.json`) | dagu (host_verified [2/0/2/0] / untested [0/0/0/0]); data-pandera (host_verified [3/0/1/0] dissented 2 / untested [0/0/0/0]) |
 | `us-equities/evaluation-experiments` | dual_lane_adjudicated (adjudication: `evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-evaluation-experiments-20260922.json`) | foundation-agent-retrieval-bench (not_established [0/0/0/0] / untested [0/0/0/0]); inspect-ai (host_verified [6/0/2/0] dissented 4 / untested [0/0/0/0]); data-mlflow (not_established [0/0/0/0] / untested [0/0/0/0]) |
 | `us-equities/execution-broker` | pending_lanes (adjudication: `evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-execution-broker-20260922.json`) | - |
-| `us-equities/identity-provenance` | dual_lane_adjudicated (adjudication: `evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-identity-provenance-20260922.json`) | - |
+| `us-equities/identity-provenance` | dual_lane_adjudicated (adjudication: `evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-identity-provenance-20260922.json`) | data-dvc (not_established [0/0/0/0] / untested [0/0/0/0]) |
 | `us-equities/market-data-reference` | dual_lane_same_winner | data-alpaca-py (accepted [1/0/1/0] / untested [0/0/0/0] +1 alias receipt(s), not counted); data-edgartools (host_verified [1/0/1/0] / untested [0/0/0/0]); data-exchange-calendars (host_verified [1/0/1/0] / untested [0/0/0/0]) |
 | `us-equities/observability-hosting` | pending_lanes (adjudication: `evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-observability-hosting-20260922.json`) | - |
 | `us-equities/portfolio-risk` | dual_lane_same_winner | skfolio (host_verified [1/0/1/0] / untested [0/0/0/0]) |
@@ -79,6 +79,7 @@ Winners whose per-platform `e2e_state` is neither `accepted` nor `host_verified`
 - `foundation/workers`: `claude-code` (catalog/e2e state: conditional)
 - `us-equities/evaluation-experiments`: `data-mlflow` (catalog/e2e state: not_established)
 - `us-equities/evaluation-experiments`: `foundation-agent-retrieval-bench` (catalog/e2e state: not_established)
+- `us-equities/identity-provenance`: `data-dvc` (catalog/e2e state: not_established)
 
 ### macos-arm64
 
@@ -132,6 +133,7 @@ Winners whose per-platform `e2e_state` is neither `accepted` nor `host_verified`
 - `us-equities/evaluation-experiments`: `data-mlflow` (catalog/e2e state: untested)
 - `us-equities/evaluation-experiments`: `foundation-agent-retrieval-bench` (catalog/e2e state: untested)
 - `us-equities/evaluation-experiments`: `inspect-ai` (catalog/e2e state: untested)
+- `us-equities/identity-provenance`: `data-dvc` (catalog/e2e state: untested)
 - `us-equities/market-data-reference`: `data-alpaca-py` (catalog/e2e state: untested)
 - `us-equities/market-data-reference`: `data-edgartools` (catalog/e2e state: untested)
 - `us-equities/market-data-reference`: `data-exchange-calendars` (catalog/e2e state: untested)
@@ -169,7 +171,7 @@ Definitions frozen 2026-09-27, before any count was computed. Every count is an 
 
 Sources: verdict ledgers `catalogs/landscape/foundation.json` (newest verdict checked_at 2026-09-22) and `catalogs/landscape/us-equities.json` (newest verdict checked_at 2026-09-22); newest sweep manifest `catalogs/sota-convergence/manifest-20260929.json` (`sota-convergence-20260929`, checked_at 2026-09-29); completed sweeps in `catalogs/saturation/ledger.json`: `landscape-sweep-20260923` (2026-09-23), `landscape-sweep-20260926` (2026-09-26), `landscape-sweep-20260929` (2026-09-29); adopted components from `manifests/stack.json` and `tools/sota-convergence/receipt-component-aliases.json`; host_e2e reads `linux-wsl2-x86_64`.
 
-Layer states: confirmed_current 0, no_selection 1, pending_lanes 2, recorded_reopened 29.
+Layer states: confirmed_current 0, no_selection 0, pending_lanes 2, recorded_reopened 30.
 
 in_use and converged count layer-component rows: a component in several layers counts once per layer, and two rows of one layer that resolve to the same stack component both count, so the catalog and overall sums below are not numbers of distinct components.
 
@@ -206,7 +208,7 @@ in_use and converged count layer-component rows: a component in several layers c
 | `us-equities/data-quality-orchestration` | recorded_reopened | 2026-09-22 | `landscape-sweep-20260923`, `landscape-sweep-20260926` | 1 | 0 | 1/0/0 | 1/0/0 | 1/0/0 | 4 | 2 | - | null |
 | `us-equities/evaluation-experiments` | recorded_reopened | 2026-09-22 | `landscape-sweep-20260923`, `landscape-sweep-20260926` | 1 | 0 | 1/0/0 | 0/0/1 | 1/0/0 | 7 | 4 | - | null |
 | `us-equities/execution-broker` | pending_lanes | 2026-09-22 | - | 5 | 0 | 0/5/0 | 3/0/2 | 0/0/5 | 5 | 0 | - | null |
-| `us-equities/identity-provenance` | no_selection | 2026-09-22 | - | 2 | 0 | 0/2/0 | 1/1/0 | 0/0/2 | 8 | 0 | - | null |
+| `us-equities/identity-provenance` | recorded_reopened | 2026-09-22 | `landscape-sweep-20260923`, `landscape-sweep-20260926` | 2 | 0 | 1/1/0 | 1/1/0 | 0/1/1 | 8 | 1 | - | null |
 | `us-equities/market-data-reference` | recorded_reopened | 2026-09-22 | `landscape-sweep-20260923`, `landscape-sweep-20260926` | 3 | 0 | 3/0/0 | 2/1/0 | 3/0/0 | 11 | 3 | - | null |
 | `us-equities/observability-hosting` | pending_lanes | 2026-09-22 | - | 9 | 0 | 0/9/0 | 7/2/0 | 0/0/9 | 14 | 0 | - | null |
 | `us-equities/portfolio-risk` | recorded_reopened | 2026-09-22 | `landscape-sweep-20260923`, `landscape-sweep-20260926` | 1 | 0 | 0/1/0 | 0/1/0 | 0/0/1 | 4 | 1 | - | null |

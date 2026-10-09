@@ -71,9 +71,12 @@ audit or lift the hold. The [September 23 four-store comparison](../../evidence/
 did execute `dvc checkout` restoration and correction retention. That real
 `local_integration` fixture used five observations/two universe rows and did not
 execute the full specified layer overturn comparison. “DVC never executed”
-would erase valid, limited historical evidence. The current ledger removes its
-installable winner projection and preserves the original row under
-`historical_winners`; the frozen September 22 snapshot stays dated.
+would erase valid, limited historical evidence. The sealed September layer
+winner and its source fields remain intact, with their actual review date.
+The current `data-dvc` card and registered supplement explicitly hold adoption;
+they take precedence over the dated winner label for setup. The layer ledger's
+`current_adoption_status` and `verdict_scope` make that distinction explicit.
+This source refresh does not claim a new paired layer verdict.
 
 vectorbt's [public licence at 1.1.2](https://github.com/polakowo/vectorbt/blob/f0d2afba7af8a6e6c1b02afde27c9a16413e86ff/LICENSE.md)
 is Apache-2.0 with Commons Clause. Its bytes match the historical architecture
@@ -140,6 +143,9 @@ fields. The new-host EdgarTools winner cards still carry **v5.58.0** as both
 October 9 currency and do not describe the **5.60.0** SEC recipe or
 **5.61.1 / 1.7.0** runtime. Their `host_verified` labels retain the original
 receipt scope; they do not establish a new host run at a replacement pin.
+The generated DVC winner also belongs to that sealed September verdict and
+does not lift the current dependency hold. Consult the current catalog card
+and registered supplement before any prospective installation.
 The current identities and latest discovered releases are explicit above and
 in the supplement. Reconciliation of canonical pin/latest projections feeds
 the next sweep; this unit changes no generator code or frozen verdict bytes.
@@ -150,13 +156,15 @@ the next sweep; this unit changes no generator code or frozen verdict bytes.
 | --- | --- | --- |
 | Calling the earlier `1fb…` acceptance current, or updating only its hash | Link the separate same-stream `f451…` run; keep all original receipts/timestamps | Exact lock/manifest bytes and final receipt reproduce the full recorded hashes |
 | Treating recipe pins as deployed-runtime disagreement | Name isolated SEC, frozen splitter and published-runtime scopes separately | Native lock bytes plus maintainer tags, package metadata and retained run records |
-| Presenting held DVC as an installable winner, or claiming it never ran | Remove current winner projection; preserve provisional winner and actual bounded `dvc checkout` fixture | Current lock has no DVC/diskcache; retained September fixture remains linked |
+| Presenting held DVC as an installable winner, or claiming it never ran | Make the current hold explicit and preserve the dated paired winner and bounded `dvc checkout` fixture | Current lock has no DVC/diskcache; current supplement takes precedence over the dated label |
 | Single-asset/PRO-only Rust claims used against vectorbt | Use current maintainer capabilities; attribute the current rejection to the owner adoption disposition | v1.1.2 README and `pyproject.toml`; historical correction remains dated |
 | Inferring no licence from a missing response | Correct the Desktop bridge's pinned LICENSE classification without inferring data rights | Actual MIT text plus explicit TradingView rights exclusion at full c05b8f57 pin |
 | Dropping the source-root prefix from a pinned locator | Correct the atila screener URL to `src/tradingview_mcp/core/services/screener_service.py` | The independent critic measured HTTP 404 for the shortened path and found the file in the maintainer tree at the same full pin |
 | Collapsing TradingView names or treating MIT as data permission | Register both repositories; apply one scoped current ToS rejection | Separate full pins/README/LICENSE and official Terms §3 |
 | Inferring LEAN source/image equivalence from version labels | Record declared associations and missing proof separately | Distinct maintainer commits, empty status responses and absent local revision labels |
 | Treating a generated GRAND view or scoped refresh as a new selection/all-layer review | Keep canonical sources and original dates explicit | Native generator inputs and registered supplement source pointers |
+| Editing frozen v2 verdict fields while retaining the September 22 lane binding | Withdraw direct v2 edits; record current source/adoption conditions separately. A paired-verdict change needs fresh sealed returns and a new native wave | `build_verdicts.py --check` verifies the intact frozen wave; the verdict gate rechecks the final change |
+| Using the catalog's `excluded` value in the landscape's narrower enum | Use native `out_of_scope` for current candidate source/adoption scope while preserving frozen alternative fields | The supported packet schema enumerates accepted dispositions; native landscape validation passes |
 
 The completeness check surfaced both TradingView identities and same-day releases
 of vectorbt 1.1.2 and skfolio 1.8.0. Their source review resolves currency and
@@ -170,3 +178,12 @@ sweep without being relabeled as current. The
 records native catalog checks, prepublication FULL validation and the independent
 completeness review. A final FULL check follows registration of the receipt before
 commit; its returned result is retained in the PR and lane handoff.
+
+The separate native verdict gate checks the frozen wave as well as landscape
+schema validity. CI exposed invalid direct edits to the two September v2 rows;
+those edits were withdrawn. Current adoption conditions are registered source
+decisions, while the paired winner/alternative fields keep their original family
+provenance. A future paired-verdict re-record uses fresh sealed family returns
+and a new native wave; no such run is claimed here. The CC reads this source
+refresh and lands the draft after #926. FULL artifact validation and the native
+verdict gate are recorded separately.

@@ -3790,7 +3790,8 @@
       "source_date": "2026-07-28T17:28:37Z",
       "review_level": "source_review",
       "review_depth": "selected_primary_files",
-      "decision": "obsolete_or_ineligible",
+      "decision": "alternative",
+      "decision_scope": "Historical September audit field retained for its count/source binding; current_decision and the registered October9 supplement govern current automated/non-display north-star use.",
       "role": "CDP bridge to an operator's TradingView Desktop charts",
       "layers": [
         "financial-ui-automation"

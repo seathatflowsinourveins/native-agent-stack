@@ -2573,7 +2573,36 @@
       "independent_review": "dual_lane_adjudicated",
       "open_executable_now_gaps": 2,
       "open_gaps": 5,
-      "winners": []
+      "winners": [
+        {
+          "component_id": "data-dvc",
+          "repository": "https://github.com/treeverse/dvc",
+          "pin": "3.67.1; source 356dfa03278058b02df42124f243c2c345329dae",
+          "evidence_class": "source_review",
+          "upstream_latest": "3.67.1",
+          "pin_behind_upstream": false,
+          "manifest_joined": true,
+          "install_profiles": [],
+          "recipe": null,
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "e2e_state": "not_established",
+              "bootstrap_pinned": false,
+              "bootstrap_version": null
+            },
+            "macos-arm64": {
+              "e2e_state": "untested",
+              "bootstrap_pinned": false,
+              "bootstrap_version": null
+            }
+          },
+          "why_selected": "Select c2 provisionally for this layer's reproducibility and data-versioning scope. Source review of the exact pinned [DVC README](https://raw.githubusercontent.com/treeverse/dvc/356dfa03278058b02df42124f243c2c345329dae/README.rst) observed concrete add, dependency-stage, experiment and remote-storage workflows connecting versioned data with code. This is documentation inspection, not native execution. catalogs/us-equities/data-research.json explicitly marks the local workflow unexecuted. Among the adopted candidates, that bounded file-and-dependency contract is the closest supported fit to exact analytical snapshots without an unmeasured broker or lake requirement. The historical native results in blueprints/us-equities/identity-readiness/native-receipt.json separately demonstrate project-local observation cutoffs and quarantine; they are not DVC acceptance. No winner is established for the full acquisition and historical-eligibility requirement.",
+          "evidence_refs": [
+            "https://raw.githubusercontent.com/treeverse/dvc/356dfa03278058b02df42124f243c2c345329dae/README.rst",
+            "catalogs/us-equities/data-research.json"
+          ]
+        }
+      ]
     },
     {
       "catalog": "us-equities",
@@ -3055,9 +3084,9 @@
       "foundation": 20,
       "us-equities": 12
     },
-    "winners": 65,
+    "winners": 66,
     "winner_count_unit": "layer-winner pairs (a component that wins several layers counts once per layer)",
-    "distinct_components": 54,
+    "distinct_components": 55,
     "pins_behind_upstream": [
       "ai-memory",
       "claude-code",
@@ -3128,8 +3157,8 @@
       ]
     },
     "needs_host": {
-      "linux-wsl2-x86_64": 12,
-      "macos-arm64": 59
+      "linux-wsl2-x86_64": 13,
+      "macos-arm64": 60
     }
   }
 }

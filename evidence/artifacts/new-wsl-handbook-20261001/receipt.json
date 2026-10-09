@@ -6,8 +6,8 @@
   "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
   "profile_sha256": "309fa245e3aaa07ed8045ee8969727280c890679e71256424b7c873f491cdec4",
   "outputs": {
-    "docs/new-wsl-handbook.md": "39acb57d7bc9cae04739ec7c4f540881a32c1ae80f767582f1dff88507ea9abb",
-    "docs/new-wsl-handbook.json": "08586eeb653b3a0f24d70907b3e29636d798b3e7d14c4c2ddf4c9ce9db405baa"
+    "docs/new-wsl-handbook.md": "bd35fd2834f83e8151f2775b0b034ad47729315fb368bc737cfafb13f7276015",
+    "docs/new-wsl-handbook.json": "78f5c26c47fb622c0923e1643df0212db8a77d46b64a2cb296e2e44068710f62"
   },
   "inventory": {
     "layers": 37,
@@ -866,6 +866,19 @@
       "check_exit_code": 0,
       "evidence_class": "local_integration",
       "scope": "Current generated-byte binding; all earlier native/evidence observations remain unchanged."
+    },
+    {
+      "recorded_at_utc": "2026-10-09T21:51:53Z",
+      "source_base": "3a4cc28840ba7e8a1a9474a989102a669955f243",
+      "command": "/usr/bin/python3 scripts/build_new_wsl_handbook.py --write",
+      "native_exit_code": 0,
+      "cause": "T19 current source/adoption and catalog pointer changes require the supported deterministic producer refresh. Current mirror updated; all previous observations/history retained.",
+      "current_outputs": {
+        "docs/new-wsl-handbook.md": "bd35fd2834f83e8151f2775b0b034ad47729315fb368bc737cfafb13f7276015",
+        "docs/new-wsl-handbook.json": "78f5c26c47fb622c0923e1643df0212db8a77d46b64a2cb296e2e44068710f62"
+      },
+      "evidence_class": "local_integration",
+      "scope": "Generated artifact identity only; no target-host/native client/model/provider acceptance."
     }
   ],
   "previous_outputs": [
@@ -962,6 +975,23 @@
         "projected_tools": 82,
         "canonical_package_ids": 25
       }
+    },
+    {
+      "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
+      "profile_sha256": "309fa245e3aaa07ed8045ee8969727280c890679e71256424b7c873f491cdec4",
+      "outputs": {
+        "docs/new-wsl-handbook.md": "39acb57d7bc9cae04739ec7c4f540881a32c1ae80f767582f1dff88507ea9abb",
+        "docs/new-wsl-handbook.json": "08586eeb653b3a0f24d70907b3e29636d798b3e7d14c4c2ddf4c9ce9db405baa"
+      },
+      "inventory": {
+        "layers": 37,
+        "profile_entries": 78,
+        "projected_tools": 82,
+        "canonical_package_ids": 25
+      },
+      "superseded_at_utc": "2026-10-09T21:51:53Z",
+      "source_base": "3a4cc28840ba7e8a1a9474a989102a669955f243",
+      "reason": "T19 catalogue/source projection refresh; retain prior current mirror as history, no host acceptance repeated."
     }
   ]
 }

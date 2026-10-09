@@ -291,6 +291,12 @@
       "kind": "research_supplement"
     },
     {
+      "path": "catalogs/us-equities/catalog-engine-refresh-20261009.json",
+      "collection": "/entries",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
       "path": "catalogs/us-equities/catalog-refresh-20261009.json",
       "collection": "/entries",
       "repository_field": "repository",
@@ -429,7 +435,7 @@
     "repositories": 878,
     "public_star_repositories": 357,
     "beyond_public_stars": 521,
-    "references": 2092,
+    "references": 2099,
     "repositories_by_record_type": {
       "catalog_card": 148,
       "component_record": 70,
@@ -1431,6 +1437,14 @@
           "pointer": "/candidates/12",
           "decision": "discovery_only",
           "evidence_depth": "Attributed documentary discovery; no runtime execution or controlled comparative acceptance"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/catalog-engine-refresh-20261009.json",
+          "pointer": "/entries/5",
+          "id": "t19-alpaca-backtrader-stale",
+          "decision": "excluded_owner_stale_demotion",
+          "review_level": "source_review"
         },
         {
           "kind": "catalog_card",
@@ -12168,6 +12182,14 @@
           "review_depth": "Selected implementation/documentation/test/license sections; source and metadata review only, no native tests or model runs."
         },
         {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/catalog-engine-refresh-20261009.json",
+          "pointer": "/entries/2",
+          "id": "t19-lumibot-second-engine",
+          "decision": "conditional_second_engine_candidate",
+          "review_level": "source_review"
+        },
+        {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
           "pointer": "/stars/175",
@@ -12178,7 +12200,7 @@
           "path": "catalogs/us-equities/engines-strategies.json",
           "pointer": "/entries/4",
           "id": "lumibot",
-          "decision": "alternative",
+          "decision": "conditional",
           "evidence_level": "source_review"
         },
         {
@@ -12724,32 +12746,40 @@
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
           "pointer": "/layers/4/candidates/6",
-          "disposition": "overlap"
+          "disposition": "out_of_scope"
         },
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
           "pointer": "/layers/5/candidates/6",
-          "disposition": "overlap"
+          "disposition": "out_of_scope"
         },
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
           "pointer": "/layers/6/candidates/6",
-          "disposition": "overlap"
+          "disposition": "out_of_scope"
         },
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
           "pointer": "/layers/7/candidates/6",
-          "disposition": "overlap"
+          "disposition": "out_of_scope"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/catalog-engine-refresh-20261009.json",
+          "pointer": "/entries/3",
+          "id": "t19-backtrader-stale",
+          "decision": "watch_owner_stale_demotion",
+          "review_level": "source_review"
         },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/engines-strategies.json",
           "pointer": "/entries/6",
           "id": "backtrader",
-          "decision": "alternative",
+          "decision": "watch",
           "evidence_level": "source_review"
         },
         {
@@ -14439,6 +14469,14 @@
           "pointer": "/entries/6",
           "decision": "microstructure_reference_if_horizon_justifies_tick_data",
           "review_depth": "Selected implementation/documentation/test/license sections; source and metadata review only, no native tests or model runs."
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/catalog-engine-refresh-20261009.json",
+          "pointer": "/entries/6",
+          "id": "t19-hftbacktest-stale",
+          "decision": "watch_owner_stale_demotion",
+          "review_level": "source_review"
         },
         {
           "kind": "research_supplement",
@@ -16607,25 +16645,25 @@
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
           "pointer": "/layers/4/candidates/5",
-          "disposition": "excluded"
+          "disposition": "out_of_scope"
         },
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
           "pointer": "/layers/5/candidates/5",
-          "disposition": "excluded"
+          "disposition": "out_of_scope"
         },
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
           "pointer": "/layers/6/candidates/5",
-          "disposition": "excluded"
+          "disposition": "out_of_scope"
         },
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
           "pointer": "/layers/7/candidates/5",
-          "disposition": "excluded"
+          "disposition": "out_of_scope"
         },
         {
           "kind": "research_supplement",
@@ -17657,6 +17695,14 @@
         },
         {
           "kind": "research_supplement",
+          "path": "catalogs/us-equities/catalog-engine-refresh-20261009.json",
+          "pointer": "/entries/0",
+          "id": "t19-lean-alpaca-entitlement",
+          "decision": "backtest_reference_only_no_local_paper",
+          "review_level": "source_review"
+        },
+        {
+          "kind": "research_supplement",
           "path": "catalogs/us-equities/convergence-program/trading.json",
           "pointer": "/entries/1",
           "decision": "retain_adapter_pending_current_account_acceptance",
@@ -17667,7 +17713,7 @@
           "path": "catalogs/us-equities/engines-strategies.json",
           "pointer": "/entries/1",
           "id": "lean-alpaca",
-          "decision": "default",
+          "decision": "conditional",
           "evidence_level": "native_proven"
         }
       ]
@@ -17686,6 +17732,14 @@
           "pointer": "/candidates/61",
           "decision": "discovery_only",
           "evidence_depth": "Primary-source review; no local runtime or comparative measurement"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/catalog-engine-refresh-20261009.json",
+          "pointer": "/entries/1",
+          "id": "t19-lean-ibkr-entitlement",
+          "decision": "backtest_reference_only_no_local_paper",
+          "review_level": "source_review"
         }
       ]
     },
@@ -20067,25 +20121,25 @@
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
           "pointer": "/layers/4/candidates/8",
-          "disposition": "conditional"
+          "disposition": "out_of_scope"
         },
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
           "pointer": "/layers/5/candidates/8",
-          "disposition": "conditional"
+          "disposition": "out_of_scope"
         },
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
           "pointer": "/layers/6/candidates/8",
-          "disposition": "conditional"
+          "disposition": "out_of_scope"
         },
         {
           "kind": "research_supplement",
           "path": "catalogs/landscape/us-equities.json",
           "pointer": "/layers/7/candidates/8",
-          "disposition": "conditional"
+          "disposition": "out_of_scope"
         },
         {
           "kind": "research_supplement",
@@ -20093,6 +20147,14 @@
           "pointer": "/entries/5",
           "decision": "alternate_equity_data_semantics_reference",
           "review_depth": "Selected implementation/documentation/test/license sections; source and metadata review only, no native tests or model runs."
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/catalog-engine-refresh-20261009.json",
+          "pointer": "/entries/4",
+          "id": "t19-zipline-stale",
+          "decision": "watch_owner_stale_demotion",
+          "review_level": "source_review"
         },
         {
           "kind": "research_supplement",
@@ -20106,7 +20168,7 @@
           "path": "catalogs/us-equities/engines-strategies.json",
           "pointer": "/entries/8",
           "id": "zipline-reloaded",
-          "decision": "alternative",
+          "decision": "watch",
           "evidence_level": "source_review"
         },
         {
@@ -21643,7 +21705,7 @@
           "kind": "star_review",
           "path": "catalogs/us-equities/star-audit.json",
           "pointer": "/entries/101",
-          "decision": "obsolete_or_ineligible",
+          "decision": "alternative",
           "review_level": "source_review",
           "review_depth": "selected_primary_files"
         }

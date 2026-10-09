@@ -7714,13 +7714,15 @@
             "adopted_as": null,
             "adopted_as_candidates": [],
             "converged": false,
-            "host_e2e": "unknown",
+            "host_e2e": "false",
             "id": "data-dvc",
             "pin_current": "true",
             "resolved_by": "decision",
-            "verdict_winner": "false",
-            "winner_ids": [],
-            "winner_match": null
+            "verdict_winner": "true",
+            "winner_ids": [
+              "data-dvc"
+            ],
+            "winner_match": "id"
           },
           {
             "adopted_as": null,
@@ -7738,9 +7740,9 @@
         "converged": 0,
         "factors": {
           "host_e2e": {
-            "false": 0,
+            "false": 1,
             "true": 0,
-            "unknown": 2
+            "unknown": 1
           },
           "pin_current": {
             "false": 1,
@@ -7748,21 +7750,38 @@
             "unknown": 0
           },
           "verdict_winner": {
-            "false": 2,
-            "true": 0,
+            "false": 1,
+            "true": 1,
             "unknown": 0
           }
         },
         "in_use": 2,
         "invoke": null,
         "invoke_reason": "no post-fix invoke receipt yet",
-        "layer_state": "no_selection",
+        "layer_state": "recorded_reopened",
         "manifest_layer_found": true,
-        "recorded_winner_rows": 0,
-        "reopened_by": [],
+        "recorded_winner_rows": 1,
+        "reopened_by": [
+          {
+            "date": "2026-09-23",
+            "sweep_id": "landscape-sweep-20260923"
+          },
+          {
+            "date": "2026-09-26",
+            "sweep_id": "landscape-sweep-20260926"
+          }
+        ],
         "unresolved": [],
         "verdict_checked_at": "2026-09-22",
-        "winner_rows": [],
+        "winner_rows": [
+          {
+            "id": "data-dvc",
+            "matched_by": "id",
+            "winner_ids": [
+              "data-dvc"
+            ]
+          }
+        ],
         "winners_without_manifest_row": []
       },
       "independent_review": "dual_lane_adjudicated",
@@ -7771,7 +7790,49 @@
       "open_gaps": 5,
       "title": "Identity, provenance and lineage",
       "verdict_status": "recorded",
-      "winners": []
+      "winners": [
+        {
+          "component_id": "data-dvc",
+          "evidence_class": "source_review",
+          "lifecycle_stages": [],
+          "pin": "3.67.1; source 356dfa03278058b02df42124f243c2c345329dae",
+          "platforms": {
+            "linux-wsl2-x86_64": {
+              "alias_receipts": [],
+              "catalog_status": "not_established",
+              "derived_reason": "source_review winner with no passing host receipt",
+              "derived_status": "not_established",
+              "e2e_state": "not_established",
+              "host_receipts": {
+                "dissented": 0,
+                "fail": 0,
+                "independently_reviewed_fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              },
+              "qualified_models": []
+            },
+            "macos-arm64": {
+              "alias_receipts": [],
+              "catalog_status": "untested",
+              "derived_reason": "no schema-valid host receipt bound to pin '3.67.1; source 356dfa03278058b02df42124f243c2c345329dae'",
+              "derived_status": "untested",
+              "e2e_state": "untested",
+              "host_receipts": {
+                "dissented": 0,
+                "fail": 0,
+                "independently_reviewed_fail": 0,
+                "independently_reviewed_pass": 0,
+                "latest": null,
+                "pass": 0
+              },
+              "qualified_models": []
+            }
+          },
+          "repository": "https://github.com/treeverse/dvc"
+        }
+      ]
     },
     {
       "adjudication_ref": null,
@@ -7833,7 +7894,7 @@
           "repository": "https://github.com/questdb/questdb"
         },
         {
-          "disposition": "excluded",
+          "disposition": "unqualified",
           "e2e_state": "not_run",
           "evidence_class": "source_review",
           "name": "atilaahmettaner/tradingview-mcp",
@@ -9284,9 +9345,9 @@
       "frozen_at": "2026-09-27",
       "layer_states": {
         "confirmed_current": 0,
-        "no_selection": 1,
+        "no_selection": 0,
         "pending_lanes": 2,
-        "recorded_reopened": 29
+        "recorded_reopened": 30
       },
       "manifest_layers_without_matrix_row": [],
       "newest_manifest": {
@@ -9409,6 +9470,12 @@
           "component_id": "foundation-agent-retrieval-bench",
           "e2e_state": "not_established",
           "layer_id": "evaluation-experiments"
+        },
+        {
+          "catalog": "us-equities",
+          "component_id": "data-dvc",
+          "e2e_state": "not_established",
+          "layer_id": "identity-provenance"
         }
       ],
       "macos-arm64": [
@@ -9714,6 +9781,12 @@
         },
         {
           "catalog": "us-equities",
+          "component_id": "data-dvc",
+          "e2e_state": "untested",
+          "layer_id": "identity-provenance"
+        },
+        {
+          "catalog": "us-equities",
           "component_id": "data-alpaca-py",
           "e2e_state": "untested",
           "layer_id": "market-data-reference"
@@ -9787,7 +9860,7 @@
       "layers": 32,
       "pending_lanes": 2,
       "single_lane": 0,
-      "winners": 65
+      "winners": 66
     }
   }
 }

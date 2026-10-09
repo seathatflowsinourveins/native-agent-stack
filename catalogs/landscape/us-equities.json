@@ -367,10 +367,8 @@
         {
           "name": "atilaahmettaner/tradingview-mcp",
           "repository": "https://github.com/atilaahmettaner/tradingview-mcp",
-          "disposition": "excluded",
-          "historical_disposition": "unqualified at the September 22 verdict; the September 23 keep_but_compare_unverified proposal and September 24 do_not_wire audit remain dated.",
-          "current_decision_record": "catalogs/us-equities/catalog-refresh-20261009.json#/entries/4",
-          "why_not_default": "Owner-routed rejection for automated/non-display north-star data use under TradingView Terms of Use section 3. MIT code permission does not establish provider-data permission. The distinct tradesdontlie Desktop bridge receives the same scoped rejection in the current supplement.",
+          "disposition": "unqualified",
+          "why_not_default": "Not adopted and has no retained evidence. The packet note says it would need documented data rights plus a demonstrated as-of query reconciled against retained Alpaca news timestamps; neither exists.",
           "evidence_class": "source_review",
           "evidence_refs": [],
           "source": "lane:claude"
@@ -627,10 +625,10 @@
         }
       ],
       "verdict_status": "recorded",
-      "winners": [],
-      "current_adoption_status": "held_no_installable_winner",
+      "current_adoption_status": "held_not_in_selected_runtime",
       "current_decision_record": "catalogs/us-equities/catalog-refresh-20261009.json#/entries/2",
-      "historical_winners": [
+      "verdict_scope": "The winners/alternatives/lanes below preserve the sealed September 22 verdict. Current DVC installation is held and the current source/adoption supplement takes precedence; no new paired winner verdict is claimed.",
+      "winners": [
         {
           "component_id": "data-dvc",
           "repository": "https://github.com/treeverse/dvc",
@@ -759,11 +757,11 @@
         "agreement": "disagree"
       },
       "open_gaps": [
-        "DVC installation is held after the October 5 dependency-security removal. The retained September 23 dvc checkout/correction fixture is local integration, not qualification of this repository's historical equity snapshot contract.",
+        "DVC has source-review support only: no retained native add, restore and reproduction run demonstrates this repository's equity snapshot contract.",
         "No candidate evidence establishes the complete requirement: licensed acquisition, permanent security identity, historical universe eligibility, corporate-action completeness and original publication/revision availability remain separate obligations.",
         "The identity-readiness receipt demonstrates bounded observation-time selection and quarantine through project-local adapters. It does not qualify DVC or another candidate as the executing implementation.",
         "Content identity, signer identity, storage commit time and code-index freshness cannot substitute for original historical information availability.",
-        "The September 23 four-store fixture measures bounded restoration/correction behavior only. No executed full overturn comparison qualifies the equity snapshot contract, lineage, recovery, concurrency, storage cost or latency across the candidate stores.",
+        "No executed comparison measures snapshot restoration fidelity, correction retention, lineage completeness, recovery, concurrency, storage cost or latency across the candidate stores.",
         "OpenLineage event persistence and consistent version/cutoff facets, and MLflow run-to-dataset bindings, remain unqualified.",
         "lanes disagreed: claude=data-dvc,data-openlineage; codex=data-dvc; adjudicated by evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-identity-provenance-20260922.json"
       ],
@@ -1610,16 +1608,17 @@
           "name": "Lumibot",
           "repository": "https://github.com/lumiwealth/lumibot",
           "disposition": "conditional",
-          "rationale": "A direct Python strategy lifecycle with Alpaca support is a substantial alternative. It needs the same data, risk, order/recovery and accounting comparison before replacing the selected destination.",
+          "rationale": "Owner-directed second-engine candidate at reviewed4.6.11; GPLv3 source/package metadata agree. Historical4.5.91 conflict remains dated; native qualification is not established.",
           "evidence_kind": "source_review",
           "evidence_refs": [
             "catalogs/us-equities/engines-strategies.json"
-          ]
+          ],
+          "current_decision_record": "catalogs/us-equities/catalog-engine-refresh-20261009.json#/entries/2"
         },
         {
           "name": "vectorbt",
           "repository": "https://github.com/polakowo/vectorbt",
-          "disposition": "excluded",
+          "disposition": "out_of_scope",
           "current_decision_record": "catalogs/us-equities/catalog-refresh-20261009.json#/entries/3",
           "rationale": "Current north-star adoption is excluded by the owner-routed licence disposition. The historical optional-sweep review remains dated; multi-asset and public Rust support are source facts, not grounds for rejection. No matched speed/quality acceptance is recorded.",
           "evidence_kind": "source_review",
@@ -1630,12 +1629,13 @@
         {
           "name": "Backtrader",
           "repository": "https://github.com/mementum/backtrader",
-          "disposition": "overlap",
-          "rationale": "Useful for an existing strategy or bounded offline comparison; its reviewed integration age weakens the case for a new second Alpaca host. No general engine failure was measured.",
+          "disposition": "out_of_scope",
+          "rationale": "Owner-directed stale demotion for current north-star adoption. Historical evidence retained; unarchived metadata and dated code do not establish abandonment or native acceptance.",
           "evidence_kind": "source_review",
           "evidence_refs": [
             "catalogs/us-equities/engines-strategies.json"
-          ]
+          ],
+          "current_decision_record": "catalogs/us-equities/catalog-engine-refresh-20261009.json"
         },
         {
           "name": "backtesting.py",
@@ -1650,12 +1650,13 @@
         {
           "name": "Zipline Reloaded",
           "repository": "https://github.com/stefan-jansen/zipline-reloaded",
-          "disposition": "conditional",
-          "rationale": "Maintained continuation is relevant for existing Zipline/Pipeline research. It has no recorded same-input advantage that warrants a second active event engine in this stack.",
+          "disposition": "out_of_scope",
+          "rationale": "Owner-directed stale demotion for current north-star adoption. Historical evidence retained; unarchived metadata and dated code do not establish abandonment or native acceptance.",
           "evidence_kind": "source_review",
           "evidence_refs": [
             "catalogs/us-equities/engines-strategies.json"
-          ]
+          ],
+          "current_decision_record": "catalogs/us-equities/catalog-engine-refresh-20261009.json"
         },
         {
           "name": "ib_async",
@@ -2138,16 +2139,17 @@
           "name": "Lumibot",
           "repository": "https://github.com/lumiwealth/lumibot",
           "disposition": "conditional",
-          "rationale": "A direct Python strategy lifecycle with Alpaca support is a substantial alternative. It needs the same data, risk, order/recovery and accounting comparison before replacing the selected destination.",
+          "rationale": "Owner-directed second-engine candidate at reviewed4.6.11; GPLv3 source/package metadata agree. Historical4.5.91 conflict remains dated; native qualification is not established.",
           "evidence_kind": "source_review",
           "evidence_refs": [
             "catalogs/us-equities/engines-strategies.json"
-          ]
+          ],
+          "current_decision_record": "catalogs/us-equities/catalog-engine-refresh-20261009.json#/entries/2"
         },
         {
           "name": "vectorbt",
           "repository": "https://github.com/polakowo/vectorbt",
-          "disposition": "excluded",
+          "disposition": "out_of_scope",
           "current_decision_record": "catalogs/us-equities/catalog-refresh-20261009.json#/entries/3",
           "rationale": "Current north-star adoption is excluded by the owner-routed licence disposition. The historical optional-sweep review remains dated; multi-asset and public Rust support are source facts, not grounds for rejection. No matched speed/quality acceptance is recorded.",
           "evidence_kind": "source_review",
@@ -2158,12 +2160,13 @@
         {
           "name": "Backtrader",
           "repository": "https://github.com/mementum/backtrader",
-          "disposition": "overlap",
-          "rationale": "Useful for an existing strategy or bounded offline comparison; its reviewed integration age weakens the case for a new second Alpaca host. No general engine failure was measured.",
+          "disposition": "out_of_scope",
+          "rationale": "Owner-directed stale demotion for current north-star adoption. Historical evidence retained; unarchived metadata and dated code do not establish abandonment or native acceptance.",
           "evidence_kind": "source_review",
           "evidence_refs": [
             "catalogs/us-equities/engines-strategies.json"
-          ]
+          ],
+          "current_decision_record": "catalogs/us-equities/catalog-engine-refresh-20261009.json"
         },
         {
           "name": "backtesting.py",
@@ -2178,12 +2181,13 @@
         {
           "name": "Zipline Reloaded",
           "repository": "https://github.com/stefan-jansen/zipline-reloaded",
-          "disposition": "conditional",
-          "rationale": "Maintained continuation is relevant for existing Zipline/Pipeline research. It has no recorded same-input advantage that warrants a second active event engine in this stack.",
+          "disposition": "out_of_scope",
+          "rationale": "Owner-directed stale demotion for current north-star adoption. Historical evidence retained; unarchived metadata and dated code do not establish abandonment or native acceptance.",
           "evidence_kind": "source_review",
           "evidence_refs": [
             "catalogs/us-equities/engines-strategies.json"
-          ]
+          ],
+          "current_decision_record": "catalogs/us-equities/catalog-engine-refresh-20261009.json"
         },
         {
           "name": "ib_async",
@@ -2478,16 +2482,17 @@
           "name": "Lumibot",
           "repository": "https://github.com/lumiwealth/lumibot",
           "disposition": "conditional",
-          "rationale": "A direct Python strategy lifecycle with Alpaca support is a substantial alternative. It needs the same data, risk, order/recovery and accounting comparison before replacing the selected destination.",
+          "rationale": "Owner-directed second-engine candidate at reviewed4.6.11; GPLv3 source/package metadata agree. Historical4.5.91 conflict remains dated; native qualification is not established.",
           "evidence_kind": "source_review",
           "evidence_refs": [
             "catalogs/us-equities/engines-strategies.json"
-          ]
+          ],
+          "current_decision_record": "catalogs/us-equities/catalog-engine-refresh-20261009.json#/entries/2"
         },
         {
           "name": "vectorbt",
           "repository": "https://github.com/polakowo/vectorbt",
-          "disposition": "excluded",
+          "disposition": "out_of_scope",
           "current_decision_record": "catalogs/us-equities/catalog-refresh-20261009.json#/entries/3",
           "rationale": "Current north-star adoption is excluded by the owner-routed licence disposition. The historical optional-sweep review remains dated; multi-asset and public Rust support are source facts, not grounds for rejection. No matched speed/quality acceptance is recorded.",
           "evidence_kind": "source_review",
@@ -2498,12 +2503,13 @@
         {
           "name": "Backtrader",
           "repository": "https://github.com/mementum/backtrader",
-          "disposition": "overlap",
-          "rationale": "Useful for an existing strategy or bounded offline comparison; its reviewed integration age weakens the case for a new second Alpaca host. No general engine failure was measured.",
+          "disposition": "out_of_scope",
+          "rationale": "Owner-directed stale demotion for current north-star adoption. Historical evidence retained; unarchived metadata and dated code do not establish abandonment or native acceptance.",
           "evidence_kind": "source_review",
           "evidence_refs": [
             "catalogs/us-equities/engines-strategies.json"
-          ]
+          ],
+          "current_decision_record": "catalogs/us-equities/catalog-engine-refresh-20261009.json"
         },
         {
           "name": "backtesting.py",
@@ -2518,12 +2524,13 @@
         {
           "name": "Zipline Reloaded",
           "repository": "https://github.com/stefan-jansen/zipline-reloaded",
-          "disposition": "conditional",
-          "rationale": "Maintained continuation is relevant for existing Zipline/Pipeline research. It has no recorded same-input advantage that warrants a second active event engine in this stack.",
+          "disposition": "out_of_scope",
+          "rationale": "Owner-directed stale demotion for current north-star adoption. Historical evidence retained; unarchived metadata and dated code do not establish abandonment or native acceptance.",
           "evidence_kind": "source_review",
           "evidence_refs": [
             "catalogs/us-equities/engines-strategies.json"
-          ]
+          ],
+          "current_decision_record": "catalogs/us-equities/catalog-engine-refresh-20261009.json"
         },
         {
           "name": "ib_async",
@@ -2720,16 +2727,17 @@
           "name": "Lumibot",
           "repository": "https://github.com/lumiwealth/lumibot",
           "disposition": "conditional",
-          "rationale": "A direct Python strategy lifecycle with Alpaca support is a substantial alternative. It needs the same data, risk, order/recovery and accounting comparison before replacing the selected destination.",
+          "rationale": "Owner-directed second-engine candidate at reviewed4.6.11; GPLv3 source/package metadata agree. Historical4.5.91 conflict remains dated; native qualification is not established.",
           "evidence_kind": "source_review",
           "evidence_refs": [
             "catalogs/us-equities/engines-strategies.json"
-          ]
+          ],
+          "current_decision_record": "catalogs/us-equities/catalog-engine-refresh-20261009.json#/entries/2"
         },
         {
           "name": "vectorbt",
           "repository": "https://github.com/polakowo/vectorbt",
-          "disposition": "excluded",
+          "disposition": "out_of_scope",
           "current_decision_record": "catalogs/us-equities/catalog-refresh-20261009.json#/entries/3",
           "rationale": "Current north-star adoption is excluded by the owner-routed licence disposition. The historical optional-sweep review remains dated; multi-asset and public Rust support are source facts, not grounds for rejection. No matched speed/quality acceptance is recorded.",
           "evidence_kind": "source_review",
@@ -2740,12 +2748,13 @@
         {
           "name": "Backtrader",
           "repository": "https://github.com/mementum/backtrader",
-          "disposition": "overlap",
-          "rationale": "Useful for an existing strategy or bounded offline comparison; its reviewed integration age weakens the case for a new second Alpaca host. No general engine failure was measured.",
+          "disposition": "out_of_scope",
+          "rationale": "Owner-directed stale demotion for current north-star adoption. Historical evidence retained; unarchived metadata and dated code do not establish abandonment or native acceptance.",
           "evidence_kind": "source_review",
           "evidence_refs": [
             "catalogs/us-equities/engines-strategies.json"
-          ]
+          ],
+          "current_decision_record": "catalogs/us-equities/catalog-engine-refresh-20261009.json"
         },
         {
           "name": "backtesting.py",
@@ -2760,12 +2769,13 @@
         {
           "name": "Zipline Reloaded",
           "repository": "https://github.com/stefan-jansen/zipline-reloaded",
-          "disposition": "conditional",
-          "rationale": "Maintained continuation is relevant for existing Zipline/Pipeline research. It has no recorded same-input advantage that warrants a second active event engine in this stack.",
+          "disposition": "out_of_scope",
+          "rationale": "Owner-directed stale demotion for current north-star adoption. Historical evidence retained; unarchived metadata and dated code do not establish abandonment or native acceptance.",
           "evidence_kind": "source_review",
           "evidence_refs": [
             "catalogs/us-equities/engines-strategies.json"
-          ]
+          ],
+          "current_decision_record": "catalogs/us-equities/catalog-engine-refresh-20261009.json"
         },
         {
           "name": "ib_async",
@@ -5537,16 +5547,17 @@
           "name": "Lumibot",
           "repository": "https://github.com/lumiwealth/lumibot",
           "disposition": "conditional",
-          "rationale": "A direct Python strategy lifecycle with Alpaca support is a substantial alternative. It needs the same data, risk, order/recovery and accounting comparison before replacing the selected destination.",
+          "rationale": "Owner-directed second-engine candidate at reviewed4.6.11; GPLv3 source/package metadata agree. Historical4.5.91 conflict remains dated; native qualification is not established.",
           "evidence_kind": "source_review",
           "evidence_refs": [
             "catalogs/us-equities/engines-strategies.json"
-          ]
+          ],
+          "current_decision_record": "catalogs/us-equities/catalog-engine-refresh-20261009.json#/entries/2"
         },
         {
           "name": "vectorbt",
           "repository": "https://github.com/polakowo/vectorbt",
-          "disposition": "excluded",
+          "disposition": "out_of_scope",
           "current_decision_record": "catalogs/us-equities/catalog-refresh-20261009.json#/entries/3",
           "rationale": "Current north-star adoption is excluded by the owner-routed licence disposition. The historical optional-sweep review remains dated; multi-asset and public Rust support are source facts, not grounds for rejection. No matched speed/quality acceptance is recorded.",
           "evidence_kind": "source_review",
@@ -5557,12 +5568,13 @@
         {
           "name": "Backtrader",
           "repository": "https://github.com/mementum/backtrader",
-          "disposition": "overlap",
-          "rationale": "Useful for an existing strategy or bounded offline comparison; its reviewed integration age weakens the case for a new second Alpaca host. No general engine failure was measured.",
+          "disposition": "out_of_scope",
+          "rationale": "Owner-directed stale demotion for current north-star adoption. Historical evidence retained; unarchived metadata and dated code do not establish abandonment or native acceptance.",
           "evidence_kind": "source_review",
           "evidence_refs": [
             "catalogs/us-equities/engines-strategies.json"
-          ]
+          ],
+          "current_decision_record": "catalogs/us-equities/catalog-engine-refresh-20261009.json"
         },
         {
           "name": "backtesting.py",
@@ -5577,12 +5589,13 @@
         {
           "name": "Zipline Reloaded",
           "repository": "https://github.com/stefan-jansen/zipline-reloaded",
-          "disposition": "conditional",
-          "rationale": "Maintained continuation is relevant for existing Zipline/Pipeline research. It has no recorded same-input advantage that warrants a second active event engine in this stack.",
+          "disposition": "out_of_scope",
+          "rationale": "Owner-directed stale demotion for current north-star adoption. Historical evidence retained; unarchived metadata and dated code do not establish abandonment or native acceptance.",
           "evidence_kind": "source_review",
           "evidence_refs": [
             "catalogs/us-equities/engines-strategies.json"
-          ]
+          ],
+          "current_decision_record": "catalogs/us-equities/catalog-engine-refresh-20261009.json"
         },
         {
           "name": "ib_async",

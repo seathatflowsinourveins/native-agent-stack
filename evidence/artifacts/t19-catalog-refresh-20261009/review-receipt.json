@@ -2,22 +2,63 @@
   "schema_version": 1,
   "id": "t19-catalog-refresh-source-review-20261009",
   "recorded_at_utc": "2026-10-09T19:58:34Z",
+  "updated_at_utc": "2026-10-09T20:16:03Z",
+  "engine_followup_observed_at_utc": "2026-10-09T21:58:05Z",
+  "ci_repair_local_modules": {
+    "observed_at_utc": "2026-10-09T21:59:03Z",
+    "evidence_class": "local_integration",
+    "command_pattern": "timeout600 nice10 ionice2,7 /usr/bin/python3 -m unittest discover -s tests -p <whole-module.py> -v",
+    "modules": [
+      {"module": "test_ecosystem_manifest.py", "tests": 82, "exit_code": 0, "returned_summary": "Ran82tests in38.322s; OK", "stderr_sha256": "76c336390d309b3d0daffd695bb5c9acf3beb3cc8a996e4e20d296154f542361"},
+      {"module": "test_new_wsl_handbook.py", "tests": 87, "exit_code": 0, "returned_summary": "Ran87tests in44.451s; OK", "stderr_sha256": "83321d6171890b885d58e5058ab5863e21eaab97df88a0b140ca2dd84e888084"},
+      {"module": "test_new_wsl_profile.py", "tests": 18, "exit_code": 0, "returned_summary": "Ran18tests in6.677s; OK", "stderr_sha256": "b4d48ff5773e439f4bba7ec9418980e3f3976d7699adb9a6d24faf87ca6a0c77"},
+      {"module": "test_verdict_review_gate.py", "tests": 167, "exit_code": 0, "returned_summary": "Ran167tests in19.075s; OK", "stderr_sha256": "f7fa259db31465a9114934d84a367726b6414010c3969c823e3e136eab3737a5"},
+      {"module": "test_catalog_freshness_propose.py", "tests": 86, "exit_code": 0, "returned_summary": "Ran86tests in81.193s; OK", "stderr_sha256": "d6661d3a8ce81d334f8150aa043a640cc7d78d4f30d42348ad4acf8b917f340a"}
+    ],
+    "total_tests": 440,
+    "scope": "Whole repository integration-test modules for actual937CI failure paths. No new upstream suite, provider/model or host acceptance. Exact stdout/stderr retained; FULL validation and final-head CI remain separate.",
+    "failed_registration_attempt_retained": {"module": "test_catalog_freshness_propose.py", "tests": 86, "exit_code": 1, "failures": 1, "stderr_sha256": "fbe856eedf4a40ceb8803d638d28d92c674e7441a087a928382de8ec76c1db59", "condition": "Changed registered source/generated files had stale evidence hashes", "correction": "Register every owned changed/new source path, then rerun the entire module; final86-test run passed"}
+  },
+  "engine_source_supplement": {
+    "path": "catalogs/us-equities/catalog-engine-refresh-20261009.json",
+    "bytes": 9516,
+    "sha256": "66354261042b50afbe3751a2362eae85b79a39103264245fd6c3f98ede9457f9",
+    "registered_entries": 7,
+    "decision_union": {"repositories": 875, "references": 2087},
+    "evidence_class": "source_review",
+    "scope": "LEAN brokerage entitlement, Lumibot4.6.11 candidate/current GPLv3 metadata, public vectorbt1.1.2/private PRO scope, and owner stale demotions. No installation, provider/broker/model request or strategy acceptance."
+  },
+  "ci_repair_analysis": {
+    "run": "37984266312",
+    "failed_head": "7524a3b438633617358eba471794428ff3cb44c7",
+    "merge_base": "3a4cc28840ba7e8a1a9474a989102a669955f243",
+    "complete_failed_job_logs_read": [114002183614, 114002183631, 114002183648, 114002183728, 114002183745],
+    "introduced_conditions": ["unsupported landscape disposition caused Explorer/downstream generator and validator failures", "direct frozen-paired-field edits failed the verdict integrity gate", "historical star-audit decision change invalidated retained aggregate counts", "generated WSL handbook bytes were stale after source pointers changed"],
+    "corrections": ["preserve frozen paired fields and register current adoption records separately", "use native out_of_scope for current generic candidate scope", "retain historical star-audit decision/count binding with explicit current Terms decision", "native handbook --write and current receipt mirror refresh, preserving every historical observation"],
+    "reported_extra_failures_refuted": {"test_new_wsl_client_config": "230 passed in the recorded run", "test_research_dispatch_exact_queries": "25 passed; 2 explicit DDGS availability/runtime skips; no failed test"},
+    "scope": "Native GitHub Actions logs and exact source/validator evidence; current local checks are separate from that earlier run and final-head CI."
+  },
+  "bounded_engine_completeness": {
+    "result": "No remaining material source/pin/licence/currency inconsistency in the bounded local review",
+    "corrections": ["date PRO2026.9.5 advertisement to history and point to current2026.10.5 conditional product/access/licence card", "date Lumibot4.5.91 licence conflict to history; metadata agreement at4.6.11 is current"],
+    "limits": "Read-only local source check against prior measured primary observations; no new runtime, tests or network reads in this critic pass."
+  },
   "base_commit": "3a4cc28840ba7e8a1a9474a989102a669955f243",
   "evidence_class": "source_review",
   "scope": "Catalog projection, source identity and owner-routed adoption reconciliation. Native catalog checks establish consistency; retained runtime/fixture evidence keeps its original execution date and class. No new installation, installed-host acceptance, market/SEC acquisition, model request, strategy, broker or paper gate change.",
   "artifacts": [
     {
       "path": "catalogs/us-equities/catalog-refresh-20261009.json",
-      "bytes": 16785,
-      "sha256": "c4ce41dc66d16b8db0b46606fded1659c4fce1d346f1b71bc700df624aefea1d"
+      "bytes": 17073,
+      "sha256": "9e767ee5ad75beb138abff839f91e3a55b40fdf2b103abaaac80c5257d75fcfd"
     },
     {
       "path": "catalogs/us-equities/catalog-refresh-20261009.md",
-      "bytes": 14833,
-      "sha256": "8f6ed33d7445e8c675f6c8f64906b789e71b71b43a47d38d4321b1e599dfd72b"
+      "bytes": 16519,
+      "sha256": "bfb1f91bb6185121287ab1c819a9c9be5196b6d4151d6a526c5930ba1a5c15cd"
     }
   ],
-  "native_commands": [
+  "historical_prepublication_commands": [
     {
       "command": "/usr/bin/python3 scripts/catalog_decisions.py --write --supplement catalogs/us-equities/catalog-refresh-20261009.json#/entries",
       "exit_code": 0,
@@ -36,7 +77,7 @@
       "exit_code": 0,
       "returned_stdout": "{\"status\": \"written\", \"layers\": 32, \"winners\": 65}\n",
       "stdout_sha256": "41e2c1752d77b2596cf8f27ca11349437ec5ffcfeefd315d41e62d6f60c2aaa7",
-      "scope": "Held DVC is no longer a current winner. Historical winner row remains in the maintained ledger; frozen September verdict bytes were not edited."
+      "scope": "Initial local derived run before the direct frozen-layer edits were withdrawn. This 65-pair output is historical preparation, not the final ledger projection or a new paired verdict."
     },
     {
       "commands": [
@@ -53,6 +94,38 @@
       "stderr_bytes": 0
     }
   ],
+  "final_contract_checks": {
+    "observed_at_utc": "2026-10-09T20:16:03Z",
+    "landscape_command": "/usr/bin/python3 scripts/landscape.py",
+    "landscape_exit_code": 0,
+    "landscape_scope": "32 layers, native disposition schema and reference integrity; no runtime/ranking acceptance",
+    "frozen_wave_command": "/usr/bin/python3 tools/sota-convergence/build_verdicts.py --check",
+    "frozen_wave_exit_code": 0,
+    "frozen_wave": "20260922; original paired verdict fields and wave bytes retained",
+    "gate_command": "timeout 600 nice -n 10 ionice -c2 -n7 /usr/bin/python3 scripts/verdict_review_gate.py --base 3a4cc28840ba7e8a1a9474a989102a669955f243",
+    "gate_exit_code": 0,
+    "gate_returned_stdout": "1 verdict path(s) changed; the repository validators ran\nverdict-review-gate: passed (0 changed row(s), 0 violation(s))\n",
+    "gate_stdout_sha256": "ff3e42acebf0c0ccccb63cb16a5a9b3f3e6d7e79fe82a68f14cfe2998e1c0c10",
+    "gate_stderr_bytes": 0,
+    "grand_write_exit_code": 0,
+    "grand_returned_stdout": "{\"status\": \"written\", \"layers\": 32, \"winners\": 66}\n",
+    "grand_stdout_sha256": "f161f06c41a6dffe6e66c88c61f6e8de9ac981c52fc179231fb0df66ccb30b5a",
+    "scope": "Current adoption conditions are held/excluded in the registered source supplement and catalog cards. The 66-pair projection retains the dated paired layer verdicts and does not lift DVC's hold. No new native wave or family return is claimed."
+  },
+  "failed_conditions_retained": [
+    {
+      "condition": "Initial draft changed two frozen September v2 rows and used an unsupported landscape disposition",
+      "native_gate_exit_code": 1,
+      "native_gate_stdout_sha256": "244e24adf974d99985bb22d80f0661b6917a8b8dfefaf1fe56f387168a09adbf",
+      "observed_errors": ["alternative.disposition is unknown", "rows name wave 20260922 but differ from its frozen entries", "a recorded verdict needs at least one winner"],
+      "correction": "Direct frozen-field edits withdrawn; current source/adoption decisions remain registered separately. Current vectorbt candidate scope uses native out_of_scope; landscape/build/gate now pass. A future paired-verdict change requires genuine sealed returns and a new wave.",
+      "usage": "Local catalog checks only; no model/provider usage. Failed commands and their returned logs remain retained privately; the initial draft commit preserves the attempted source state."
+    },
+    {
+      "condition": "A guessed scripts/landscape.py --check invocation returned argparse exit2",
+      "correction": "Use the supported no-flag scripts/landscape.py entrypoint; actual corrected invocation returned0"
+    }
+  ],
   "prepublication_full_validation": {
     "command": "timeout 600 nice -n 10 ionice -c2 -n7 /usr/bin/python3 scripts/validate.py",
     "mode": "FULL; never --failed",
@@ -67,6 +140,7 @@
   },
   "independent_completeness_critic": {
     "role": "Separate read-only critic",
+    "method_limit": "The critic reviewed source/identity/semantic scope and did not run the native verdict/schema validators. Subsequent coordinator checks found and corrected the formal recording defects recorded above; source facts remain unchanged.",
     "verdict": "No unresolved material blockers or additional missed candidate class/modality within the bounded T19 scope",
     "findings": [
       {

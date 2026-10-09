@@ -225,6 +225,7 @@
     "current_layer_ledger": "catalogs/landscape/us-equities.json; original layer dates remain dated",
     "derived_host_setup": "docs/new-host-grand-list.md; catalogs/landscape/new-host-grand-list.json; regenerate through scripts/new_host_grand_list.py, never hand-edit",
     "derived_snapshot_limits": [
+      "The DVC winner card retains the sealed September provisional verdict. Current data-dvc adoption_status is held_not_in_selected_runtime; the registered current supplement/catalog card takes precedence for setup and does not lift that hold. No new paired layer verdict is claimed.",
       "The generated EdgarTools winner rows retain the dated ledger pin/upstream_latest v5.58.0 and pin_behind_upstream=false. These are historical generator inputs, not October 9 currency, the accepted 5.60.0 SEC recipe or the selected 5.61.1 runtime.",
       "The generated skfolio upstream_latest v1.3.0 is also a dated snapshot, not the current 1.8.0 release. A host_verified projection retains its source receipt scope and does not establish a new host run at the current runtime pin.",
       "Canonical pin/latest projection reconciliation is a next-sweep input. T19 changes no generator code or frozen September verdict bytes; current scope and source identities are explicit in this supplement."
