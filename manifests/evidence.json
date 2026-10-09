@@ -18276,6 +18276,11 @@
       "bytes": 12311
     },
     {
+      "path": "docs/decisions/2026-10-08-sdk-runtime-worker-adoption.md",
+      "sha256": "6a8b6e8ee76eb04d7ab6036d0435805f6063b45ee6c48bf2f3b1fe9d65da8f57",
+      "bytes": 31210
+    },
+    {
       "path": "docs/decisions/2026-10-08-skills-cc-lanes-picks.md",
       "sha256": "e115a46c4509631399147f1d34a70c25cc6cc3d088c9a522059238a91cda5c02",
       "bytes": 16124
@@ -49059,6 +49064,71 @@
       "path": "evidence/artifacts/s4-record-corrections-20261008/record.json",
       "sha256": "9314564911e6f49b2b6c94afcb95175a85d941427ad7980fa55476312ecc9090",
       "bytes": 11884
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-adoption-20261008/decisions.json",
+      "sha256": "108903768a1239ec7d078121d47e3b154efe8934b97876ac1084e03e4f9d1c42",
+      "bytes": 121681
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-adoption-20261008/loki/app_server_events_by_client.f5a6eac9d40b5d5233694fc8f8e773a632f6f0dc7a426a262453ed5e03894b66.loki.json",
+      "sha256": "f5a6eac9d40b5d5233694fc8f8e773a632f6f0dc7a426a262453ed5e03894b66",
+      "bytes": 3721
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-adoption-20261008/loki/claude_sdk_events_by_role.af7cc227152d2d87e50cae7f89994011224195379726fd0a050f27d284771b58.loki.json",
+      "sha256": "af7cc227152d2d87e50cae7f89994011224195379726fd0a050f27d284771b58",
+      "bytes": 4008
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-adoption-20261008/loki/claude_sdk_query_sources.1dcaf1644038547fca635340996755bae05edba9bdf0ef27143851f31d31df77.loki.json",
+      "sha256": "1dcaf1644038547fca635340996755bae05edba9bdf0ef27143851f31d31df77",
+      "bytes": 3846
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-adoption-20261008/loki/python_sdk_receipt_events.145e231eda2d3d1d9210bc829f05580c149d5047eaffe3c39294967ec43fe11e.loki.json",
+      "sha256": "145e231eda2d3d1d9210bc829f05580c149d5047eaffe3c39294967ec43fe11e",
+      "bytes": 3639
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-adoption-20261008/loki/typescript_sdk_conversations.5155c4089174502e28aa676fab0bdc793108d25ddb4e8c7440ad8f73893ca542.loki.json",
+      "sha256": "5155c4089174502e28aa676fab0bdc793108d25ddb4e8c7440ad8f73893ca542",
+      "bytes": 3766
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-adoption-20261008/loki/typescript_sdk_events.cdaa239e16af4499f87dd4b41886eca64f87af4d3e51fed940b4da280dd8a76d.loki.json",
+      "sha256": "cdaa239e16af4499f87dd4b41886eca64f87af4d3e51fed940b4da280dd8a76d",
+      "bytes": 3767
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-adoption-20261008/loki/typescript_sdk_identified_conversations_all.80e8b32fd74f310b697bb38fafbc39d06e4169c44ee93023d2d4aa79ceccb860.loki.json",
+      "sha256": "80e8b32fd74f310b697bb38fafbc39d06e4169c44ee93023d2d4aa79ceccb860",
+      "bytes": 3756
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-adoption-20261008/loki/typescript_sdk_identified_conversations_hourly.287ac95d39a71118e42fec6ec616a0d70f1554661990fe983f886f1836e54c77.loki.json",
+      "sha256": "287ac95d39a71118e42fec6ec616a0d70f1554661990fe983f886f1836e54c77",
+      "bytes": 3806
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-adoption-20261008/loki/typescript_sdk_tool_results.ad183319137c43fad6a30453c71ecdab7499e19007cbc23c533ee1f609d9fbbe.loki.json",
+      "sha256": "ad183319137c43fad6a30453c71ecdab7499e19007cbc23c533ee1f609d9fbbe",
+      "bytes": 3763
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-adoption-20261008/observations.json",
+      "sha256": "212af1da8d35c262ebe172956aceaaafe5345bb3a5157f9f485f9bc0caae8b42",
+      "bytes": 89936
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-adoption-20261008/offline-parser-check.json",
+      "sha256": "ca7ec711b3ebcfe63d443f49f52a3ea96b545749874df5077be33d4d545d1bc4",
+      "bytes": 1259
+    },
+    {
+      "path": "evidence/artifacts/sdk-runtime-adoption-20261008/openhands-job-starts.aef22b0794253231a919111201c2ad3854339480edf7da10d566aa8b572bae62.json",
+      "sha256": "aef22b0794253231a919111201c2ad3854339480edf7da10d566aa8b572bae62",
+      "bytes": 1240
     },
     {
       "path": "evidence/artifacts/sdk-runtime-coverage-20260922/agent-sdks.json",

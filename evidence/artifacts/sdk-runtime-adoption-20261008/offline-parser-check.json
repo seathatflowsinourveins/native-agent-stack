@@ -1,0 +1,42 @@
+{
+  "schema": "sdk903-offline-parser-check.v1",
+  "captured_utc": "2026-10-09T03:44:09.674486+00:00",
+  "authority": "Installed upstream astral-sh/uv 0.12.22 CLI help/parser",
+  "checks": [
+    {
+      "argv": [
+        "uv",
+        "--version"
+      ],
+      "rc": 0,
+      "stdout_excerpt": "uv 0.12.22 (x86_64-unknown-linux-gnu)",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "uv",
+        "venv",
+        "--python3.13",
+        "--help"
+      ],
+      "rc": 2,
+      "stdout_excerpt": "",
+      "stderr": "error: unexpected argument '--python3.13' found\n\n  tip: a similar argument exists: '--python'\n\nUsage: uv venv --python <PYTHON> [PATH]\n\nFor more information, try '--help'.\n"
+    },
+    {
+      "argv": [
+        "uv",
+        "venv",
+        "--python",
+        "3.13",
+        "--help"
+      ],
+      "rc": 0,
+      "stdout_excerpt": "Create a virtual environment\n\nUsage: uv venv [OPTIONS] [PATH]\n  -p, --python <PYTHON>      The Python interpreter to use for the virtual environment. [env:",
+      "stderr": ""
+    }
+  ],
+  "scope": "Offline help/argument parsing only; no environment, package or runtime installed",
+  "corrected_command": "uv venv --python 3.13 <owned-runtime>",
+  "installation_acceptance": "UNEXECUTED"
+}
