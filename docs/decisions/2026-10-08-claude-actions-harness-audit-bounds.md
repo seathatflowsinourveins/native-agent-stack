@@ -237,9 +237,10 @@ A run can end a little above the budget, because the client stops only after cro
 up to $5.50 (R6, below).
 
 The pinned audit prompt has four phases and eight dimensions and was written for a session with a shell; `main`
-gave it 60 turns. Twenty turns without a shell may not finish it. The prompt tells the model its limit, and a run
-that stops at the limit fails the bounds check with its numbers kept; that outcome is the measurement that would
-raise the limit.
+gave it 60 turns. Twenty turns without a shell may not finish it. The prompt tells the model its limit, but since R6
+nothing stops a run at 20 turns: a longer run goes on until it finishes or crosses its $5 budget, is paid for, and then
+fails the bounds check after it has ended, with its numbers kept and its report withheld. That outcome is the
+measurement that would raise the limit.
 
 Runs spend from the Console organization that the repository variables `ANTHROPIC_ORGANIZATION_ID`,
 `ANTHROPIC_FEDERATION_RULE_ID`, `ANTHROPIC_SERVICE_ACCOUNT_ID` and `ANTHROPIC_WORKSPACE_ID` name (read by name on
@@ -522,13 +523,60 @@ the second copy writes its other boolean as `1`) each fail the pin test and
 test's token-list comparison, which runs first, already catches both; the same script checked the settings comparison
 on its own: dict equality calls each copy equal, canonical JSON calls it different.
 
+## R7: the J8 micro read of R5 and R6 (2026-10-09)
+
+The J8 micro read of the combined delta `0be47ac7..bf34373d` (Anthropic's pr-review-toolkit agents
+`pr-test-analyzer` and `silent-failure-hunter` on Claude Opus 5.5 at `max`) found all eight listed findings fixed.
+A memory guard stopped the run's wrapper after both agents had handed back, and the command center accepted the
+handbacks as the complete report. The command center ruled that N1 to N3 are fixed and the rest dispositioned.
+
+- **N1 (confidence 85): the budget-stop exemption's scope was untested.** The exemption waives the success and
+  result-text checks only. New test: `test_a_budget_stop_within_the_bound_is_exempt_only_from_the_success_and_text_checks`.
+  It runs a $5.20 budget stop that breaks one other bound at a time, and each fails, named:
+  - a Bash tool;
+  - an MCP server;
+  - 21 assistant turns;
+  - no session start record;
+  - no cache read.
+
+  Three weakened copies each fail it: the read's own mutant (a budget stop skips every check), and the tools and
+  turn checks each waived on a budget stop.
+- **N2 (confidence 70) and N4 (confidence 55): text left stale by dropping `--max-turns`.**
+  - The paragraph after the bounds table now says a run of more than 20 turns goes on until it finishes or crosses
+    its budget, then fails the check after it ends.
+  - "Alternatives considered" no longer calls the turn limit the second line of spend.
+  - "What would overturn it" no longer lists `error_max_turns`.
+  - The workflow's header comment and its numbers-step comment no longer name a client turn limit or a turn-limit
+    stop.
+  - R6's list of changed sentences also missed the `docs/github-automation.md` wording, "at most 20 assistant turns
+    (checked after the run)", which R6 already made.
+- **N3 (confidence 65): the budget-stop note could promise a report that never appeared.** The numbers step wrote
+  the note before checking the other bounds, so a failed check left the note with no report under it. The note now
+  comes from the publish step, under the report, which runs only after every bound has passed.
+  - The budget-stop test now expects the note there.
+  - `test_the_report_step_names_no_stop_after_a_success` checks the other side.
+  - A weakened copy that writes the note for any subtype fails.
+- **N5 (confidence 40), disposition: follow-up, no change here.** After a real budget stop, the client's result
+  record may carry no `result` text, so the published report could be empty.
+  - The sibling `claude-pr-review.yml` on main publishes the text the model wrote before the stop in that case.
+  - Bringing that here changes what a budget stop publishes, and needs its own read, so it is proposed as a
+    follow-up rather than folded into this round.
+- **N6 (confidence 40), correction:** R6's count of R5 copies run again was wrong. Of the 17 R5 copies, the five whose
+  workflow text R6 changed (the two `--max-turns` copies and the three `> 5` cost-check copies) were replaced or
+  re-run; the other 12 still fail a test.
+- **N7 to N9 (confidence 30 and under), disposition: no change.** Each is a narrower pin of behaviour that existing
+  tests already hold: one non-string tool entry at a time, the action's input list, and no lower cost limit on the
+  exemption.
+
+The module runs 32 tests, up from 30.
+
 ## Alternatives considered
 
 - **Keep `gh issue create`.** Rejected: it is the one write path the model had, and `--body-file` makes it a read
   path too.
 - **Eight turns** (the first draft of this bound). Rejected for this prompt: the audit reads many files, and a run
-  that stops one turn short is paid for and returns nothing. The budget is the cost bound; the turn limit is the
-  second line.
+  that stops one turn short is paid for and returns nothing. The budget is the cost bound; since R6 the 20-turn
+  bound is checked after the run and limits no spend.
 - **Keep the fence in the action's `settings` input.** Rejected once `--restricted` was chosen: that input writes
   a settings file, which `--restricted` ignores.
 - **A stored API key as an Actions secret.** Not proposed. Federation is the stated route; if the credit sits in
@@ -536,9 +584,9 @@ on its own: dict equality calls each copy equal, canonical JSON calls it differe
 
 ## What would overturn it
 
-- A first activated run stops at `error_max_turns` or `error_max_budget_usd` with a useful audit unfinished (the
-  record's `result_subtype` and the failure message say which): raise the one bound that stopped it, with that run's
-  numbers.
+- A first activated run stops at `error_max_budget_usd` with a useful audit unfinished, or fails the 20-assistant-turn
+  check after it ends (the record's `result_subtype`, its `assistant_turns` and the failure message say which): raise
+  the one bound that stopped it, with that run's numbers.
 - The numbers step reports a forbidden tool or an MCP server: stop the job and read the action's change.
 - The action changes the execution file's shape (the numbers step fails on "unsupported execution shape"): read the
   new shape at the new pin and change the extractor in the same pull request as the pin.

@@ -9,7 +9,8 @@ name: harness-audit
 # "Federation exemption (2026-10-08)").
 #
 # Bounded since 2026-10-08 (docs/decisions/2026-10-08-claude-actions-harness-audit-bounds.md): Claude has Read, Glob and
-# Grep only, at most 20 turns and a $5 client budget; the job holds no write scope beyond the OIDC token;
+# Grep only and a $5 client budget, and a run of more than 20 assistant turns fails the bounds check after it ends (there
+# is no client turn limit); the job holds no write scope beyond the OIDC token;
 # a model-free step copies the report
 # to the job summary and keeps the run's token and cost numbers. The job runs only while the repository variable
 # CLAUDE_HARNESS_AUDIT_ENABLED is 'true', and only on the first attempt of a run: a re-run would spend again without a
@@ -129,12 +130,13 @@ jobs:
       # follows. It also reads the session's own tool list: a missing list, any tool outside the allow-list or
       # an MCP server fails the run, and the step names every bound it finds unmet. A run that did not succeed is
       # named by its result subtype, through the same name filter, in the record, the summary and the message, so
-      # a turn-limit stop (error_max_turns) and a budget stop (error_max_budget_usd) read apart.
+      # a budget stop (error_max_budget_usd) reads apart from any other ending.
       # The turn bound counts distinct assistant message ids. The result's num_turns counts transcript
       # messages, tool results included (a 12-request run on Claude Code 2.1.295 reported 57), so it is
       # kept in the record only.
       # The cost bound is the 5 USD budget times 1.10, because the client stops only after crossing its budget. A
-      # budget stop at or under the bound passes the check and is named in the summary, and the report is published.
+      # budget stop at or under the bound is exempt from the success and result-text checks only; every other bound
+      # still applies to it. When it passes, the publish step names the stop under the report.
       - name: Keep the run's numbers and check the bounds
         id: bounds
         if: ${{ always() && steps.claude_audit.outputs.execution_file != '' }}
@@ -191,9 +193,6 @@ jobs:
                    "", "| model | input | cache write | cache read | output |", "| --- | ---: | ---: | ---: | ---: |",
                    (.models[] | "| \(.model) | \(.input_tokens) | \(.cache_creation_input_tokens) | \(.cache_read_input_tokens) | \(.output_tokens) |")' \
               "$out/usage.json"
-            jq -r --argjson bound "$bound" 'if .result_subtype == "error_max_budget_usd" and .total_cost_usd <= $bound
-              then "", "The run stopped at its client budget (error_max_budget_usd), at a client cost estimate of \(.total_cost_usd) USD, within the \($bound) bound (the budget times 1.10). The report below is the result text it returned, if any."
-              else empty end' "$out/usage.json"
           } >> "$GITHUB_STEP_SUMMARY"
           failed="$(jq -r --argjson bound "$bound" '
             (.result_subtype == "error_max_budget_usd" and .total_cost_usd <= $bound) as $budget_stop | [
@@ -218,7 +217,8 @@ jobs:
       # The report is the last non-empty result text, capped and shown as preformatted text so nothing in it renders
       # as Markdown or HTML on the run page. It is published whenever the bounds check passed: the action fails its
       # own step on any result but a success, so after a budget stop within the bound only the check's outcome, not
-      # success(), says that the bounds were met.
+      # success(), says that the bounds were met. A budget stop is named under the report here, where every bound is
+      # known to have passed, so the note never stands without a report.
       - name: Publish the report to the job summary
         if: ${{ !cancelled() && steps.bounds.outcome == 'success' }}
         shell: bash
@@ -242,6 +242,10 @@ jobs:
             if [ "$size" -gt 60000 ]; then
               echo "The report is $size bytes; the first 60,000 are shown."
             fi
+            jq -r 'map(select(.type == "result")) | last |
+              if .subtype == "error_max_budget_usd"
+              then "", "The run stopped at its client budget (error_max_budget_usd), at a client cost estimate of \(.total_cost_usd) USD, within the 5.5 bound (the budget times 1.10). The report above is the result text it returned, if any."
+              else empty end' "$EXECUTION_FILE"
           } >> "$GITHUB_STEP_SUMMARY"
           rm -f "$report"
 

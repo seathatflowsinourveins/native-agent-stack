@@ -360,8 +360,9 @@ class HarnessAuditStepTests(unittest.TestCase):
         self.assertIn("Bounds not met: client cost estimate 5.51 USD, above 5.5\n", console)
 
     def test_a_budget_stop_within_the_bound_is_published_and_named(self):
-        # A budget stop at or under the bound passes the check, even without result text; the summary names the stop
-        # and the report step publishes what the run returned. Above the bound it fails, naming the stop and overrun.
+        # A budget stop at or under the bound passes the check, even without result text; the report step publishes
+        # what the run returned and names the stop under it (R7: the note moved there from the numbers step, so it is
+        # written only once every bound has passed). Above the bound it fails, naming the stop and overrun.
         for cost, result in ((5.5, None), (5.2, "partial report")):
             with self.subTest(cost=cost, result=result):
                 log = execution(subtype="error_max_budget_usd", is_error=True, total_cost_usd=cost)
@@ -372,17 +373,42 @@ class HarnessAuditStepTests(unittest.TestCase):
                 code, console, summary, usage = run_step(NUMBERS, log)
                 self.assertEqual(code, 0, console)
                 self.assertEqual(json.loads(usage)["result_subtype"], "error_max_budget_usd")
-                self.assertIn(f"The run stopped at its client budget (error_max_budget_usd), at a client cost estimate "
-                              f"of {cost} USD, within the 5.5 bound (the budget times 1.10).", summary)
+                self.assertNotIn("The run stopped at its client budget", summary)
                 code, console, summary, _ = run_step(REPORT, log)
                 self.assertEqual(code, 0, console)
-                self.assertIn(f"<pre>\n{result or ''}\n</pre>", summary)
+                self.assertIn(f"<pre>\n{result or ''}\n</pre>\n\nThe run stopped at its client budget "
+                              f"(error_max_budget_usd), at a client cost estimate of {cost} USD, within the 5.5 bound "
+                              f"(the budget times 1.10). The report above is the result text it returned, if any.\n",
+                              summary)
         code, console, summary, _ = run_step(NUMBERS, execution(subtype="error_max_budget_usd", is_error=True,
                                                                 total_cost_usd=5.51))
         self.assertNotEqual(code, 0)
         self.assertIn("Bounds not met: the run did not end in success (subtype error_max_budget_usd); client cost "
                       "estimate 5.51 USD, above 5.5\n", console)
         self.assertNotIn("The run stopped at its client budget", summary)
+
+    def test_a_budget_stop_within_the_bound_is_exempt_only_from_the_success_and_text_checks(self):
+        # R7 (J8 micro read, N1): the exemption waives the success and result-text checks only. A budget stop within
+        # the bound that breaks any other bound fails, named, and writes no budget-stop note (N3).
+        cases = {
+            "a forbidden tool": ({"tools": ("Read", "Glob", "Grep", "Bash")},
+                                 "Bounds not met: tools outside Read, Glob and Grep: Bash\n"),
+            "an MCP server": ({"mcp_servers": ("github",)}, "Bounds not met: 1 MCP servers in the session\n"),
+            "21 assistant turns": ({"turns": 21}, "Bounds not met: 21 assistant turns, outside 1 to 20\n"),
+            "no session start record": ({"init": False}, "no session start record"),
+            "no cache read": ({"modelUsage": model_usage(read=0, cost=5.2)}, "Bounds not met: no cache read\n"),
+        }
+        for label, (changes, message) in cases.items():
+            with self.subTest(case=label):
+                log = execution(subtype="error_max_budget_usd", is_error=True, total_cost_usd=5.2, **changes)
+                code, console, summary, _ = run_step(NUMBERS, log)
+                self.assertNotEqual(code, 0, console)
+                self.assertIn(message, console)
+                self.assertNotIn("The run stopped at its client budget", summary)
+
+    def test_the_report_step_names_no_stop_after_a_success(self):
+        _, console, summary, _ = run_step(REPORT, execution())
+        self.assertNotIn("The run stopped at its client budget", summary, console)
 
     def test_names_that_are_not_plain_identifiers_are_replaced(self):
         hostile = "<img src=x onerror=alert(1)> | injected"
