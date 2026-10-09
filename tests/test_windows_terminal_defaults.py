@@ -1,6 +1,7 @@
 """The repository-carried Windows Terminal, notification and login-shell defaults.
 
-These are local consistency checks over the checked-in files, not a run of Windows Terminal, Claude Code or Codex. The
+These are local consistency checks over the checked-in files, not a run of Windows Terminal, Claude Code or Codex. Trade
+launches also exercise real Git and Worktrunk in isolated local repositories with inert runtime/client executables. The
 policy is docs/decisions/2026-09-28-terminal-experience.md: each AI tab shows the title its client sends, the bell rings
 only for a real needed action and quietly, and a profile that starts a client through a login shell reaches its PATH. A resume profile
 (the update of 2026-10-02 in that record) opens its client's own session picker and nothing else, sits right after the client's default
@@ -49,10 +50,16 @@ CODEX_KINDS = {"agent-turn-complete", "approval-requested", "plan-mode-prompt", 
 PLACEHOLDERS = ("<DISTRO>", "<WSL_USER>", "<PROJECT>")
 # The example's profiles in order. A resume profile opens its client's own session picker (scoped to the directory the profile starts in) and nothing more, and
 # sits right after the client's default profile, which keeps starting a new session; nothing resumes by itself.
-FRAGMENT_ORDER = ["WSL - Shell", "WSL - Codex", "WSL - Codex - resume", "WSL - Claude", "WSL - Claude - resume"]
+LEGACY_FRAGMENT_ORDER = ["WSL - Shell", "WSL - Codex", "WSL - Codex - resume", "WSL - Claude", "WSL - Claude - resume"]
 AI_COMMANDS = {"WSL - Codex": "codex", "WSL - Codex - resume": "codex resume", "WSL - Claude": "claude", "WSL - Claude - resume": "claude --resume"}
+TRADE_COMMANDS = {
+    "Trade - Claude": "env -u ANTHROPIC_API_KEY -u ANTHROPIC_AUTH_TOKEN claude",
+    "Trade - Codex": "codex -c model_reasoning_effort=max -c service_tier=priority",
+}
+FRAGMENT_ORDER = LEGACY_FRAGMENT_ORDER + list(TRADE_COMMANDS)
+TRADE_LAUNCH = re.compile(r'^wsl\.exe -d <DISTRO> -u <WSL_USER> --cd <TRADE_PROJECT> --exec /bin/bash -lc "([^\"]+)"$')
 RESUME_OF = {"WSL - Codex - resume": "WSL - Codex", "WSL - Claude - resume": "WSL - Claude"}
-CLAUDE_PROFILES = ("WSL - Claude", "WSL - Claude - resume")
+CLAUDE_PROFILES = ("WSL - Claude", "WSL - Claude - resume", "Trade - Claude")
 # One profile opens many tabs and several tabs share one directory, so a profile must not decide one session, name or setting for all of them: `--continue` and `--last`
 # reopen the newest session of the directory in every tab, a fixed `--name` collides (the second live session is renamed), `--fork-session` starts a new session at every
 # launch, and `--effort`, `--settings` and `--permission-mode` would override what a picked session or the client's own settings say.
@@ -141,7 +148,7 @@ def session_flag_problems(profile: dict) -> list:
 
 
 def environment_problems(name: str, profile: dict) -> list:
-    """COLORTERM reaches Claude Code through the `environment` key of both Claude profiles; no other profile sets an environment, and no command line carries the variable."""
+    """COLORTERM reaches Claude Code through each Claude profile's `environment` key; no other profile sets an environment, and no command line carries the variable."""
     problems = []
     expected = {"COLORTERM": "truecolor"} if name in CLAUDE_PROFILES else None
     if profile.get("environment") != expected:
@@ -340,16 +347,31 @@ class ProfilePolicyMixin:
         self.assertEqual(profile.get("closeOnExit"), "graceful", "closeOnExit graceful, so a tab whose client ends abnormally stays open")
         self.assertIn("tabTitle", profile)
 
-    def check_ai(self, profile: dict, command: str):
-        """`command` is what follows `exec` in the profile's login-shell command: the client alone for a default profile, the client's picker for a resume profile."""
+    def check_ai_presentation(self, profile: dict):
         self.check_common(profile)
         self.assertNotIn("suppressApplicationTitle", profile, "it would discard the title each client sends")
         self.assertEqual(profile["bellStyle"], ["audible", "taskbar"], "the reviewed bellStyle")
         self.assertIn("bellSound", profile, "the quiet sound")
         self.assertRegex(profile["bellSound"], r"\\Windows Ding\.wav$", "the quiet sound")
         self.assertEqual(session_flag_problems(profile), [], "a profile must not pin a session, name or setting flag: several tabs share one directory")
+
+    def check_ai(self, profile: dict, command: str):
+        """The generic default and resume profiles still launch exactly their own client or picker."""
+        self.check_ai_presentation(profile)
         self.assertRegex(profile["commandline"], rf'^wsl\.exe -d \S+ -u \S+ --cd \S+ --exec /bin/bash -lc "exec {re.escape(command)}"$',
                          "a login shell that runs exactly the command the policy names")
+
+    def check_trade(self, profile: dict):
+        self.check_ai_presentation(profile)
+        match = TRADE_LAUNCH.fullmatch(profile["commandline"])
+        self.assertIsNotNone(match, "a Trade profile uses its own project and a login shell")
+        body = match.group(1)
+        self.assertIn("git fetch origin main && exec wt switch --create ", body)
+        self.assertIn("--base origin/main --no-cd -x sh -- -c ", body)
+        self.assertTrue(body.endswith(f"'uv sync --locked && exec {TRADE_COMMANDS[profile['name']]}'"),
+                        "locked runtime sync must succeed before the Trade client starts")
+        self.assertNotRegex(body, r"(?i)\bhcom\b|\bHCOM_[A-Z_]+\b|--(?:session-id|resume|continue|last)\b",
+                            "Trade tabs start without a fixed lane tag or a selected session")
 
     def check_shell(self, profile: dict):
         self.check_common(profile)
@@ -370,6 +392,8 @@ class ProfilePolicyMixin:
         self.check_shell(profiles["WSL - Shell"])
         for name, command in AI_COMMANDS.items():
             self.check_ai(profiles[name], command)
+        for name in TRADE_COMMANDS:
+            self.check_trade(profiles[name])
         for resume, default in RESUME_OF.items():
             self.assertEqual(resume_copy_problems(profiles[default], profiles[resume]), [], f"{resume} is its default profile with another name, command and tab title")
 
@@ -379,7 +403,7 @@ class FragmentExampleTests(ProfilePolicyMixin, unittest.TestCase):
         self.fragment = json.loads(FRAGMENT.read_text(encoding="utf-8"))
         self.profiles = {profile["name"]: profile for profile in self.fragment["profiles"]}
 
-    def test_a_fragment_of_five_profiles_that_declare_no_guid(self):
+    def test_a_fragment_preserves_five_generic_profiles_then_adds_two_trade_profiles_without_guids(self):
         # The GUID is optional in a fragment: Windows Terminal derives a stable one from the fragment folder's name and the profile
         # name (Profile::_GenerateGuidForProfile at v1.24.11911.0), and the derived value never travels in this repository.
         self.assertEqual(set(self.fragment), {"profiles"})
@@ -392,6 +416,8 @@ class FragmentExampleTests(ProfilePolicyMixin, unittest.TestCase):
         # exactly one command each (the client alone for a default profile, so that it still starts a new session; its own picker for a resume profile).
         for name, command in AI_COMMANDS.items():
             self.check_ai(self.profiles[name], command)
+        for name in TRADE_COMMANDS:
+            self.check_trade(self.profiles[name])
 
     def test_each_resume_profile_sits_right_after_its_default_profile_and_copies_it(self):
         names = [profile["name"] for profile in self.fragment["profiles"]]
@@ -413,18 +439,18 @@ class FragmentExampleTests(ProfilePolicyMixin, unittest.TestCase):
                          r'^wsl\.exe -d \S+ -u \S+ --cd \S+ --exec /bin/bash -lc "exec /bin/bash -l"$')
 
     def test_only_claude_sets_truecolor_and_only_through_the_environment_key(self):
-        # both Claude profiles (the default and the resume one) and no other profile
+        # Generic default/resume Claude profiles and Trade Claude, through the same environment key.
         for name, profile in self.profiles.items():
             self.assertEqual(environment_problems(name, profile), [], name)
 
-    def test_only_the_three_placeholders_stand_for_host_values(self):
+    def test_host_placeholders_keep_the_trade_project_separate_from_the_generic_project(self):
         text = FRAGMENT.read_text(encoding="utf-8")
         found = set(re.findall(r"<[A-Z_]+>", text))
-        self.assertEqual(found, set(PLACEHOLDERS))
+        self.assertEqual(found, {*PLACEHOLDERS, "<TRADE_PROJECT>"})
         self.assertNotRegex(text, r"(?i)/(?:home|users)/|[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}")
-        for profile in self.profiles.values():
-            for placeholder in PLACEHOLDERS:
-                self.assertIn(placeholder, profile["commandline"])
+        for name, profile in self.profiles.items():
+            expected = {"<DISTRO>", "<WSL_USER>", "<TRADE_PROJECT>"} if name in TRADE_COMMANDS else set(PLACEHOLDERS)
+            self.assertEqual(set(re.findall(r"<[A-Z_]+>", profile["commandline"])), expected, name)
 
     def test_the_recipe_profile_follows_the_same_policy(self):
         profile = recipe_profile()
@@ -447,15 +473,15 @@ class FragmentExampleTests(ProfilePolicyMixin, unittest.TestCase):
                 self.check_ai({**copy.deepcopy(good), **change}, "claude")
 
     def test_a_defect_in_the_profile_set_is_detected(self):
-        # Negative controls for the five-profile example: every rule of check_fragment must fail, with that rule's own message, on an in-memory copy of the example
+        # Negative controls for the example: every rule of check_fragment must fail, with that rule's own message, on an in-memory copy of the example
         # that has the one defect (the example itself is not touched). The unchanged example passes first, so a failure below comes from the defect and from nothing else.
         self.check_fragment(self.fragment)
-        shell, codex, codex_resume, claude, claude_resume = FRAGMENT_ORDER
+        shell, codex, codex_resume, claude, claude_resume = LEGACY_FRAGMENT_ORDER
         launch = 'wsl.exe -d <DISTRO> -u <WSL_USER> --cd <PROJECT> --exec /bin/bash -lc'
 
         def reordered(*names):
             def change(by_name, profiles):
-                profiles[:] = [by_name[name] for name in names]
+                profiles[:] = [by_name[name] for name in (*names, *TRADE_COMMANDS)]
             return change
 
         def add_profile(change_to):
@@ -485,7 +511,7 @@ class FragmentExampleTests(ProfilePolicyMixin, unittest.TestCase):
             ("the Claude resume profile right after the Codex profile", reordered(shell, codex, claude_resume, codex_resume, claude), placement),
             ("both resume profiles first", reordered(codex_resume, claude_resume, shell, codex, claude), placement),
             ("the Claude resume profile missing", reordered(shell, codex, codex_resume, claude), "is missing"),
-            ("an unlisted sixth profile", add_profile({"name": "WSL - Operations"}), "the example's profiles and their order"),
+            ("an unlisted eighth profile", add_profile({"name": "WSL - Operations"}), "the example's profiles and their order"),
             ("a resume profile that declares a guid", edited(codex_resume, guid="not-a-guid"), "declares a guid"),
             ("the Codex resume profile with another tab colour", edited(codex_resume, tabColor="#000000"), "differs from WSL - Codex in tabColor"),
             ("the Claude resume profile hidden", edited(claude_resume, hidden=True), "must stay visible"),
@@ -530,6 +556,172 @@ class FragmentExampleTests(ProfilePolicyMixin, unittest.TestCase):
         for text in ("exec claude", "exec claude --resume", "exec codex", "exec codex resume", "exec /bin/bash -l", "exec claude --lastly", "exec claude --names"):
             with self.subTest(text):
                 self.assertEqual(session_flag_problems({"commandline": f'{launch} "{text}"'}), [])
+
+
+@unittest.skipUnless(Path("/bin/bash").is_file() and shutil.which("git") and shutil.which("wt"),
+                     "needs Bash, Git and native Worktrunk for isolated Trade launch checks")
+class TradeLaunchTests(unittest.TestCase):
+    """Run the shipped shell bodies; only uv and the clients are inert fixture executables.
+
+    Worktrunk's supported WORKTRUNK_*_CONFIG_PATH overrides isolate every config layer.
+    The scratch project has no hooks to approve; no trust gate is suppressed. Login-shell
+    startup files are disabled for these checks, so they cannot read a live host config.
+    """
+
+    def setUp(self):
+        scratch = tempfile.TemporaryDirectory(prefix="native-stack-trade-launch-")
+        self.addCleanup(scratch.cleanup)
+        self.scratch = Path(scratch.name).resolve()
+        self.source = self.scratch / "Trade project"
+        self.seed = self.scratch / "publisher"
+        self.remote = self.scratch / "origin.git"
+        self.log = self.scratch / "launch.jsonl"
+        fixture_bin = self.scratch / "bin"
+        fixture_bin.mkdir()
+        config = self.scratch / "worktrunk.toml"
+        config.write_text("worktree-path = " + json.dumps(str(self.scratch / "worktrees") + "/{{ branch | sanitize }}") + "\n", encoding="utf-8")
+        empty_config = self.scratch / "empty-config"
+        empty_config.write_text("", encoding="utf-8")
+        hooks = self.scratch / "empty-hooks"
+        hooks.mkdir()
+        self.env = {
+            "PATH": str(fixture_bin),
+            "LC_ALL": "C",
+            "TERM": "dumb",
+            "NO_COLOR": "1",
+            "GIT_CONFIG_NOSYSTEM": "1",
+            "GIT_CONFIG_GLOBAL": str(empty_config),
+            "GIT_TERMINAL_PROMPT": "0",
+            "XDG_CONFIG_HOME": str(self.scratch / "xdg-user"),
+            "XDG_CONFIG_DIRS": str(self.scratch / "xdg-system"),
+            "WORKTRUNK_CONFIG_PATH": str(config),
+            "WORKTRUNK_SYSTEM_CONFIG_PATH": str(empty_config),
+            "WORKTRUNK_PROJECT_CONFIG_PATH": str(empty_config),
+            "WORKTRUNK_MAX_CONCURRENT_COMMANDS": "2",
+            "TRADE_TEST_LOG": str(self.log),
+        }
+        for command in ("git", "wt", "date", "env", "sh", "bash"):
+            (fixture_bin / command).symlink_to(Path(shutil.which(command)).resolve())
+        # Only presence is recorded for the two synthetic auth markers used below;
+        # neither fixture code nor the subprocess environment reads a live credential.
+        probe = f"#!{sys.executable}\n" + '''import json
+import os
+import sys
+from pathlib import Path
+
+command = Path(sys.argv[0]).name
+cwd = Path.cwd()
+ready = cwd / ".trade-runtime-ready"
+event = {
+    "command": command,
+    "argv": sys.argv[1:],
+    "cwd": str(cwd),
+    "runtime_root": (cwd / "pyproject.toml").is_file() and (cwd / "uv.lock").is_file(),
+    "runtime_ready": ready.is_file(),
+    "auth_markers_present": any(key in os.environ for key in ("ANTHROPIC_API_KEY", "ANTHROPIC_AUTH_TOKEN")),
+    "hcom_environment_present": any(key.startswith("HCOM_") for key in os.environ),
+}
+with Path(os.environ["TRADE_TEST_LOG"]).open("a", encoding="utf-8") as stream:
+    stream.write(json.dumps(event) + "\\n")
+if command == "uv":
+    result = int(os.environ.get("TRADE_TEST_SYNC_RC", "0"))
+    if result:
+        sys.exit(result)
+    ready.write_text("fixture runtime synced\\n", encoding="utf-8")
+'''
+        for command in ("uv", "claude", "codex"):
+            executable = fixture_bin / command
+            executable.write_text(probe, encoding="utf-8")
+            executable.chmod(0o755)
+
+        self.git("init", "--bare", "--initial-branch=main", str(self.remote), cwd=self.scratch)
+        self.git("init", "--initial-branch=main", str(self.seed), cwd=self.scratch)
+        (self.seed / "pyproject.toml").write_text('[project]\nname = "trade-launch-fixture"\nversion = "0.0.0"\n', encoding="utf-8")
+        (self.seed / "uv.lock").write_text("fixture-only locked runtime\n", encoding="utf-8")
+        self.git("add", "pyproject.toml", "uv.lock", cwd=self.seed)
+        self.git("-c", "user.name=Trade fixture", "-c", "user.email=fixture@example.invalid", "commit", "-m", "initial runtime", cwd=self.seed)
+        self.git("remote", "add", "origin", str(self.remote), cwd=self.seed)
+        self.git("push", "origin", "main", cwd=self.seed)
+        self.git("clone", str(self.remote), str(self.source), cwd=self.scratch)
+        self.git("config", "core.hooksPath", str(hooks))
+        old_head = self.git("rev-parse", "origin/main").stdout.strip()
+        (self.seed / "current-main").write_text("published after the Trade launcher checkout\n", encoding="utf-8")
+        self.git("add", "current-main", cwd=self.seed)
+        self.git("-c", "user.name=Trade fixture", "-c", "user.email=fixture@example.invalid", "commit", "-m", "new main", cwd=self.seed)
+        self.git("push", "origin", "main", cwd=self.seed)
+        self.main_head = self.git("rev-parse", "HEAD", cwd=self.seed).stdout.strip()
+        self.assertNotEqual(old_head, self.main_head, "the profile must fetch a genuinely newer main")
+        self.assertEqual(self.git("rev-parse", "origin/main").stdout.strip(), old_head)
+        self.profiles = {profile["name"]: profile for profile in json.loads(FRAGMENT.read_text(encoding="utf-8"))["profiles"]}
+
+    def git(self, *arguments, cwd=None):
+        run = subprocess.run(["git", *arguments], cwd=cwd or self.source, env=self.env,
+                             capture_output=True, text=True, timeout=30)
+        self.assertEqual(run.returncode, 0, run.stderr)
+        return run
+
+    def launch(self, name, **environment):
+        match = TRADE_LAUNCH.fullmatch(self.profiles[name]["commandline"])
+        self.assertIsNotNone(match, name)
+        self.log.write_text("", encoding="utf-8")
+        run = subprocess.run(["/bin/bash", "--noprofile", "--norc", "-lc", match.group(1)],
+                             cwd=self.source, env={**self.env, **environment},
+                             capture_output=True, text=True, timeout=45)
+        events = [json.loads(line) for line in self.log.read_text(encoding="utf-8").splitlines()]
+        return run, events
+
+    def test_repeated_trade_tabs_get_distinct_fetched_main_worktrees_and_sync_before_the_client(self):
+        paths, branches = set(), set()
+        for name, client in (("Trade - Claude", "claude"), ("Trade - Codex", "codex")):
+            for tab in range(2):
+                with self.subTest(profile=name, tab=tab):
+                    # Explicitly inert markers exercise env -u without inheriting any host environment.
+                    run, events = self.launch(name, ANTHROPIC_API_KEY="inert-test-marker", ANTHROPIC_AUTH_TOKEN="inert-test-marker")
+                    self.assertEqual(run.returncode, 0, run.stderr)
+                    self.assertEqual([event["command"] for event in events], ["uv", client])
+                    sync, started = events
+                    self.assertEqual(sync["argv"], ["sync", "--locked"])
+                    self.assertTrue(sync["runtime_root"])
+                    self.assertFalse(sync["runtime_ready"])
+                    self.assertTrue(started["runtime_ready"], "the client can start only after runtime sync")
+                    self.assertEqual(sync["cwd"], started["cwd"])
+                    tree = Path(started["cwd"])
+                    self.assertNotEqual(tree, self.source)
+                    self.assertTrue(tree.is_relative_to(self.scratch / "worktrees"))
+                    self.assertNotIn(tree, paths, "each tab needs a fresh worktree")
+                    self.assertEqual(self.git("rev-parse", "HEAD", cwd=tree).stdout.strip(), self.main_head)
+                    branch = self.git("branch", "--show-current", cwd=tree).stdout.strip()
+                    self.assertRegex(branch, rf"^foundation/trade-{client}-\d{{8}}T\d{{6}}-\d+$")
+                    self.assertNotIn(branch, branches, "no two tabs may share a fixed branch")
+                    self.assertFalse(started["hcom_environment_present"])
+                    if client == "claude":
+                        self.assertEqual(started["argv"], [])
+                        self.assertFalse(started["auth_markers_present"])
+                    else:
+                        self.assertEqual(started["argv"], ["-c", "model_reasoning_effort=max", "-c", "service_tier=priority"])
+                    paths.add(tree)
+                    branches.add(branch)
+        self.assertEqual(len(paths), 4)
+
+    def test_failed_runtime_sync_stops_before_either_client_starts(self):
+        for name in TRADE_COMMANDS:
+            with self.subTest(profile=name):
+                run, events = self.launch(name, TRADE_TEST_SYNC_RC="23")
+                self.assertNotEqual(run.returncode, 0)
+                self.assertEqual([event["command"] for event in events], ["uv"])
+                self.assertEqual(events[0]["argv"], ["sync", "--locked"])
+                self.assertTrue(events[0]["runtime_root"])
+                self.assertFalse((Path(events[0]["cwd"]) / ".trade-runtime-ready").exists())
+
+    def test_failed_fetch_stops_before_creating_a_worktree_or_syncing(self):
+        self.git("remote", "set-url", "origin", str(self.scratch / "missing-origin.git"))
+        before = self.git("worktree", "list", "--porcelain").stdout
+        for name in TRADE_COMMANDS:
+            with self.subTest(profile=name):
+                run, events = self.launch(name)
+                self.assertNotEqual(run.returncode, 0)
+                self.assertEqual(events, [])
+                self.assertEqual(self.git("worktree", "list", "--porcelain").stdout, before)
 
 
 class ScanReaderTests(unittest.TestCase):

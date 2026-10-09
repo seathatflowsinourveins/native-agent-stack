@@ -56,6 +56,29 @@
       "bellStyle": ["audible", "taskbar"],
       "bellSound": "C:\\Windows\\Media\\Windows Ding.wav",
       "closeOnExit": "graceful"
+    },
+    {
+      "name": "Trade - Claude",
+      "commandline": "wsl.exe -d <DISTRO> -u <WSL_USER> --cd <TRADE_PROJECT> --exec /bin/bash -lc \"git fetch origin main && exec wt switch --create foundation/trade-claude-$(date -u +%Y%m%dT%H%M%S)-$$ --base origin/main --no-cd -x sh -- -c 'uv sync --locked && exec env -u ANTHROPIC_API_KEY -u ANTHROPIC_AUTH_TOKEN claude'\"",
+      "startingDirectory": "%USERPROFILE%",
+      "hidden": false,
+      "environment": { "COLORTERM": "truecolor" },
+      "tabTitle": "Trade - Claude",
+      "tabColor": "#B87645",
+      "bellStyle": ["audible", "taskbar"],
+      "bellSound": "C:\\Windows\\Media\\Windows Ding.wav",
+      "closeOnExit": "graceful"
+    },
+    {
+      "name": "Trade - Codex",
+      "commandline": "wsl.exe -d <DISTRO> -u <WSL_USER> --cd <TRADE_PROJECT> --exec /bin/bash -lc \"git fetch origin main && exec wt switch --create foundation/trade-codex-$(date -u +%Y%m%dT%H%M%S)-$$ --base origin/main --no-cd -x sh -- -c 'uv sync --locked && exec codex -c model_reasoning_effort=max -c service_tier=priority'\"",
+      "startingDirectory": "%USERPROFILE%",
+      "hidden": false,
+      "tabTitle": "Trade - Codex",
+      "tabColor": "#4C78A8",
+      "bellStyle": ["audible", "taskbar"],
+      "bellSound": "C:\\Windows\\Media\\Windows Ding.wav",
+      "closeOnExit": "graceful"
     }
   ]
 }
