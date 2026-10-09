@@ -18,12 +18,18 @@ _SANITIZER_SPEC = importlib.util.spec_from_file_location("local_current_view_san
 _sanitization = importlib.util.module_from_spec(_SANITIZER_SPEC)
 _SANITIZER_SPEC.loader.exec_module(_sanitization)
 
+_WORKSTATION_SPEC = importlib.util.spec_from_file_location("local_current_view_workstation", Path(__file__).with_name("workstation.py"))
+_workstation = importlib.util.module_from_spec(_WORKSTATION_SPEC)
+_WORKSTATION_SPEC.loader.exec_module(_workstation)
+
 
 def esc(value: object) -> str:
     return escape(_sanitization.text(value), quote=True)
 
 
 def parse_time(value: str) -> datetime:
+    if not isinstance(value, str) or not value or len(value) > 50:
+        raise ValueError("current-view dates require bounded timezone-aware text")
     parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
     if parsed.tzinfo is None:
         raise ValueError("current-view dates require a timezone")
@@ -64,11 +70,9 @@ def validate(view: dict) -> None:
             raise ValueError("current-view owner action must be text")
         if item.get("by_utc"):
             parse_time(item["by_utc"])
-    for field in ("windows_available_gib", "wsl_available_gib", "swap_used_gib"):
-        value = view["workstation"][field]
-        if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or value < 0:
-            raise ValueError("invalid current-view workstation fallback")
-    parse_time(view["workstation"]["read_utc"])
+    _workstation.validate_fallback(view["workstation"])
+    # Optional scalar/per-figure totals are normalized by the collector. Invalid
+    # optional observations become UNKNOWN without aborting valid mandatory data.
 
 
 def time_label(value: str, *, plain: bool = False) -> str:
@@ -84,7 +88,7 @@ def observation_time(value: str | None, *, plain: bool = False) -> str:
     """Display only a recorded observation time; never substitute another date."""
     try:
         return time_label(value, plain=plain)
-    except (ValueError, TypeError, AttributeError):
+    except (ValueError, TypeError, AttributeError, OverflowError):
         return "not reported"
 
 
@@ -111,7 +115,18 @@ def owner_link(item: dict) -> str:
     return esc(item["what"])
 
 
-def render(view: dict, workstation: dict) -> str:
+def render(view: dict, workstation: dict, *, validated: bool = False, readings_normalized: bool = False) -> str:
+    if not validated:
+        validate(view)
+    if not readings_normalized:
+        workstation = _workstation.normalize_optional_totals(workstation)
+    for key in ("windows_available_gib", "wsl_available_gib", "swap_used_gib"):
+        reading = workstation.get(key)
+        value = reading.get("value_gib") if isinstance(reading, dict) else None
+        if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or value < 0 or not isinstance(reading.get("source"), str):
+            raise ValueError("invalid current-view workstation metric")
+        if reading.get("read_utc") is not None:
+            parse_time(reading["read_utc"])
     readiness = view["readiness"]
     events = "".join(f'<tr><td class="event-time">{time_label(row["utc"])}</td><td>{esc(row["what"])}</td></tr>' for row in view["next_events"])
     actions = []
@@ -121,7 +136,23 @@ def render(view: dict, workstation: dict) -> str:
     readings = []
     for key, label in (("windows_available_gib", "Windows available"), ("wsl_available_gib", "WSL available"), ("swap_used_gib", "Swap used")):
         reading = workstation[key]
-        readings.append(f'<div class="workstation-metric"><dt>{label}</dt><dd><strong>{reading["value_gib"]:.1f}</strong> GiB <small class="reading-meta">{esc(reading["source"])} · metric read {observation_time(reading.get("read_utc"))}</small></dd></div>')
+        amount = reading["value_gib"]
+        if key == "swap_used_gib" and 0 < amount < .1:
+            if amount * 1024 >= .1:
+                value_label = f'<strong>{amount * 1024:.1f}</strong> MiB'
+            elif amount * 1024 ** 2 >= .1:
+                value_label = f'<strong>{amount * 1024 ** 2:.1f}</strong> KiB'
+            else:
+                value_label = f'<strong>{amount * 1024 ** 3:g}</strong> byte' + ('s' if amount * 1024 ** 3 != 1 else '')
+        else:
+            value_label = f'<strong>{amount:.1f}</strong> GiB'
+        total_key = {"windows_available_gib": "windows_total_gib", "wsl_available_gib": "wsl_total_gib"}.get(key)
+        total = workstation.get(total_key) if total_key else None
+        unknown = workstation.get("optional_total_status", {}).get(total_key)
+        total_label = (f'<span class="memory-total"> / {total["value_gib"]:.1f} GiB total</span>' if total
+                       else f'<small class="reading-meta">total unknown: {esc(unknown["reason"])}</small>' if unknown else '')
+        total_time = f'<small class="reading-meta">Total: {esc(total["source"])} · metric read {observation_time(total.get("read_utc"))}</small>' if total and (total["source"], total.get("read_utc")) != (reading["source"], reading.get("read_utc")) else ''
+        readings.append(f'<div class="workstation-metric"><dt>{label}</dt><dd>{value_label}{total_label} <small class="reading-meta">{esc(reading["source"])} · metric read {observation_time(reading.get("read_utc"))}</small>{total_time}</dd></div>')
     pool = view["workstation"].get("codex_pool")
     pool_note = f'<p class="pool-note"><strong>Pool note:</strong> {esc(pool)}</p>' if pool else ''
     return f'''<section id="now-view" class="now-view" aria-labelledby="now-title">

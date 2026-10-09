@@ -37,7 +37,7 @@ ROAD_REFERENCE_FILES = {
     "css_from": ("coordination/command-center/cc-tools/invoke-evidence/build_page.py",),
 }
 _SANITIZER = None
-PAGES = {"index": "Home", "readiness": "Readiness", "gaps": "Gap board", "roadmap": "Roadmap", "sources": "Sources"}
+PAGES = {"index": "Home", "readiness": "Readiness", "gaps": "Gap board", "roadmap": "Roadmap", "fleet": "Fleet", "sources": "Sources"}
 
 
 def utc_now() -> str:
@@ -88,6 +88,17 @@ def display(value: Any) -> str:
     return TEMPLATE.sub(lambda match: match.group() if match.group() in PORTABLE_PLACEHOLDERS else "[source template omitted]", text)
 
 
+def source_templates(value: Any) -> Any:
+    """Omit unapproved source placeholders before native HTML rendering."""
+    if isinstance(value, str):
+        return TEMPLATE.sub(lambda match: match.group() if match.group() in PORTABLE_PLACEHOLDERS else "[source template omitted]", value)
+    if isinstance(value, dict):
+        return {key: source_templates(child) for key, child in value.items()}
+    if isinstance(value, list):
+        return [source_templates(child) for child in value]
+    return value
+
+
 def sanitizer() -> Any:
     global _SANITIZER
     if _SANITIZER is None:
@@ -133,7 +144,7 @@ def document(page: str, title: str, lede: str, scope: str, body: str,
              refreshed: str, manifest_sha: str, source_notes: list[str], leading: str | None = None) -> bytes:
     nav = "".join(f'<a href="{name}.html"' + (' aria-current="page"' if name == page else '') + f'>{text}</a>' for name, text in PAGES.items())
     heading = leading if leading is not None else f'<header class="page-header"><h1>{esc(title)}</h1><p class="lede">{esc(lede)}</p></header>'
-    return sanitizer().sanitize(f'''<!doctype html>
+    return f'''<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -168,7 +179,7 @@ def document(page: str, title: str, lede: str, scope: str, body: str,
 </div>
 </body>
 </html>
-''').encode("utf-8")
+'''.encode("utf-8")
 
 
 def rows(document: dict[str, Any], key: str, required: tuple[str, ...] = ()) -> list[Any]:
@@ -238,7 +249,7 @@ def readiness_body(native: Any, manifest: dict[str, Any], current: dict[str, Any
             superseded = '<p class="superseded-note">differs from the current view</p>'
         cards.append(f'<article class="gate-card" data-manifest-gate="{esc(row["id"])}"><h3>{esc(row["id"])}</h3><p class="gate-state">{esc(state)}</p>{superseded}<p>Operational owner: {esc(fact(row["fields"].get("owner")))}</p></article>')
     gates = "".join(cards)
-    fragment = display(native.render_fragment(manifest))
+    fragment = native.render_fragment(source_templates(manifest))
     fragment = fragment.replace('<table>', '<div class="table-wrap"><table>').replace('</table>', '</table></div>')
     summary = manifest["summary"]
     counts = "".join(f'<p><strong>{int(summary[key])}</strong> {title}</p>' for key, title in (("recorded_claims", "recorded claims"), ("unverified_claims", "unverified claims"), ("unverified_sources", "unverified sources")))
@@ -267,7 +278,11 @@ def load_local(name: str) -> Any:
 
 
 def collect_workstation(fallback: dict[str, Any]) -> dict[str, Any]:
-    return load_local("workstation").collect(fallback)
+    return load_local("workstation").collect(fallback, wsl_job="workstation-node")
+
+
+def collect_fleet(state_root: Path, cache_dir: Path, root: Path) -> dict[str, Any]:
+    return load_local("fleet_data").collect(state_root, cache_dir, root)
 
 
 def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
@@ -361,9 +376,38 @@ def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
     current = strict_json(current_input["raw"])
     view = load_local("current_view")
     view.validate(current)
-    for name in ("current_view", "workstation", "sanitization"):
+    for name in ("current_view", "workstation", "sanitization", "fleet_data", "fleet_view", "adoption_view"):
         capture("module:" + name, Path(__file__).resolve().parent / (name + ".py"))
     workstation = collect_workstation(current["workstation"])
+    fleet_cache = no_symlinks(receipt.parent / "fleet/cache")
+    if fleet_cache.is_relative_to(output_dir):
+        raise ValueError("fleet cache must remain outside the served root")
+    try:
+        fleet = collect_fleet(state_root, fleet_cache, root)
+    except (OSError, ValueError, UnicodeError, KeyError, TypeError, AttributeError, OverflowError, RecursionError) as error:
+        # An unavailable optional adapter must not prevent the other documents
+        # from publishing. Error categories are public; exception text is not.
+        fleet = {"fleet_source": "not reported", "at": None,
+                 "lanes_live": None, "lanes_parked": None, "claude_sessions": None,
+                 "pool_accounts": None, "claude_subagents_running": {},
+                 "exec_reads_in_flight": None, "sdk": {}, "actions": {},
+                 "availability": {name: {"status": "UNKNOWN", "source": "Fleet adapter",
+                                           "reason": "adapter failed (" + type(error).__name__ + ")"}
+                                  for name in ("lanes_live", "lanes_parked", "claude_sessions", "pool_accounts")},
+                 "source_inputs": [], "errors": [{"type": type(error).__name__}]}
+    fleet_view = load_local("fleet_view")
+    adoption_view = load_local("adoption_view")
+    adoption_path = state_root / "coordination/command-center/pages/adoption-now.json"
+    try:
+        adoption_input = capture("adoption", adoption_path)
+        adoption = strict_json(adoption_input["raw"])
+        adoption_view.validate(adoption)
+    except (OSError, ValueError, UnicodeError, KeyError, TypeError, AttributeError) as error:
+        adoption_input = inputs.get("adoption") or {"path": str(adoption_path), "sha256": None, "status": "UNREPORTED"}
+        adoption_input["status"] = "UNREPORTED"
+        adoption_input["reason"] = "published Adoption snapshot is unavailable or malformed (" + type(error).__name__ + ")"
+        inputs["adoption"] = adoption_input
+        adoption = {"schema": "adoption-now/1", "status": "UNREPORTED", "reason": adoption_input["reason"], "generated_utc": None, "window_hours": None, "layers": None, "claude_by_role": None, "codex_by_lane": None, "claude_total_sessions": None, "codex_total_conversations": None}
     gaps, roadmap, road_links = (strict_json(item["raw"]) for item in (gap_input, road_input, road_index))
     if any(not isinstance(item, dict) for item in (gaps, roadmap, road_links)):
         raise ValueError("CC page source must be a JSON object")
@@ -401,22 +445,42 @@ def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
         if name.startswith("roadmap:"):
             description = "; ".join(f"{key} = {value}" for key, value in item.get("source_dates", {}).items()) or item.get("status") or "source date unspecified"
             road_notes.append('<code>' + esc(label_path(item["path"], root, state_root)) + '</code> — ' + esc(description))
-    overview = '<section class="panel"><h2>Choose a page</h2><ul class="page-index"><li><a href="readiness.html">North-star readiness</a><p>What is done, what is left and what needs a decision.</p></li><li><a href="gaps.html">Grand Gap Board</a><p>Find open gaps and their next actions.</p></li><li><a href="roadmap.html">Roadmap</a><p>Read the dated milestones and server records.</p></li><li><a href="sources.html">Sources</a><p>Check input dates, hashes and evidence scope.</p></li></ul></section>'
+    overview = '<section class="panel"><h2>Choose a page</h2><ul class="page-index"><li><a href="readiness.html">North-star readiness</a><p>What is done, what is left and what needs a decision.</p></li><li><a href="gaps.html">Grand Gap Board</a><p>Find open gaps and their next actions.</p></li><li><a href="roadmap.html">Roadmap</a><p>Read the dated milestones and server records.</p></li><li><a href="fleet.html">Worker fleet</a><p>See the lanes, sessions, jobs and spend.</p></li><li><a href="sources.html">Sources</a><p>Check input dates, hashes and evidence scope.</p></li></ul></section>'
     current_scope = 'command-center current view snapshot; ' + view.observation_time(current["updated_utc"], plain=True)
     current_notes = [f'<code>{esc(label_path(current_input["path"], root, state_root))}</code> — {esc(current_scope)}; SHA-256 <code>{current_input["sha256"]}</code>', 'Workstation readings use an exact Prometheus metric when present, otherwise the CC-owned value and its recorded read time.']
-    source_groups = {"index": current_notes, "readiness": current_notes + readiness_notes, "gaps": gap_notes, "roadmap": road_notes}
+    fleet_notes = [f'<code>{esc(key)}</code> — {esc(value or "not reported")}' for key, value in fleet.get("source_times", {}).items()]
+    actions = fleet.get("actions") if isinstance(fleet.get("actions"), dict) else {}
+    actions_ttl = actions.get("cache_ttl_seconds")
+    actions_ttl = actions_ttl if isinstance(actions_ttl, int) and not isinstance(actions_ttl, bool) and actions_ttl > 0 else "UNKNOWN"
+    fleet_notes += ['Native source: <code>coordination/ns2604-coop/tools/fleet_block.py --json --no-gh</code>; direct fleet values use the snapshot only as fallback. Co-op subagents always retain their separate snapshot time.', 'Read-only inputs: <code>coordination/ns2604-coop/watchers/fleet-now.json</code>, <code>command-center/pages/cc-now.json</code>, <code>command-center/lane-tiers.json</code>, <code>coordination/api-actions-20261008/api-actions-ledger.jsonl</code>.', f'Actions use one bounded native <code>gh run list</code> invocation through a nonserved cache with a reported TTL of {esc(actions_ttl)} seconds; the retained newest-run scope is shown on the Fleet page. Unknown jobs, CLI observations and ceiling are not converted to zero.']
+    fleet_policy = fleet.get("tiers", {})
+    fast_exceptions = fleet_policy.get("fast")
+    fast_policy_text = ', '.join(fast_exceptions) or "0 declared exceptions" if isinstance(fast_exceptions, list) else "UNKNOWN"
+    fleet_notes.append('Tier policy: default ' + esc(fleet_policy.get("default") or "UNKNOWN") + '; fast exceptions ' + esc(fast_policy_text) + '. Live lane tiers remain the observed values from the direct fleet source.')
+    fleet_notes.append('Parking keep-alive exceptions: ' + esc(', '.join(fleet_policy.get("parking", {}).get("keep_alive") or []) or "not reported") + '. Thresholds and policy time remain source-bound.')
+    sdk_policy = fleet.get("sdk", {})
+    fleet_notes.append('Spend ceiling source: ' + esc(sdk_policy.get("ceiling_source") or "not reported") + '; read ' + esc(sdk_policy.get("ceiling_read_utc") or "not reported") + '. Planned table amounts: expected USD ' + esc(sdk_policy.get("table_expected_usd") if sdk_policy.get("table_expected_usd") is not None else "not reported") + '; at caps USD ' + esc(sdk_policy.get("table_at_caps_usd") if sdk_policy.get("table_at_caps_usd") is not None else "not reported") + '. These are estimates, separate from the native ledger actual-cost sum.')
+    for lane, deadline in fleet_policy.get("versions", {}).get("hold_until", {}).items():
+        fleet_notes.append('Version hold for ' + esc(lane) + ': ' + esc(deadline))
+    adoption_note = f'<code>{esc(label_path(adoption_input["path"], root, state_root))}</code> — adoption-now/1; generated {esc(adoption["generated_utc"])}; window {esc(adoption["window_hours"])} hours; SHA-256 <code>{esc(adoption_input["sha256"])}</code>. The co-op owns the hourly collector; pages read its published snapshot.'
+    if adoption.get("status") == "UNREPORTED":
+        adoption_note = '<code>' + esc(label_path(adoption_input["path"], root, state_root)) + '</code> — UNKNOWN: ' + esc(adoption["reason"])
+    current_notes.append(adoption_note)
+    fleet_notes.append(adoption_note)
+    source_groups = {"index": current_notes, "readiness": current_notes + readiness_notes, "gaps": gap_notes, "roadmap": road_notes, "fleet": fleet_notes}
     source_body = "".join(f'<section id="{key}" class="panel"><h2>{esc(PAGES[key])}</h2><ul class="source-list">' + "".join(f'<li>{note}</li>' for note in notes) + '</ul></section>' for key, notes in source_groups.items())
     custody_rows = "".join(f'<tr><td><code>{esc(label_path(item["path"], root, state_root))}</code></td><td><code>{esc(item.get("sha256") or item.get("status", "UNVERIFIED"))}</code></td></tr>' for item in inputs.values())
     source_body += f'<section id="sources" class="panel"><h2>Input identity</h2><div class="table-wrap"><table><thead><tr><th>Source</th><th>SHA-256 or status</th></tr></thead><tbody>{custody_rows}</tbody></table></div></section>'
     index_leading = f'<header class="page-header"><h1>North-star readiness and next steps</h1><p class="current-stamp">Current view snapshot: {view.observation_time(current["updated_utc"])}</p><p>{esc(current["headline"])}</p><p class="now-score"><strong>{current["readiness"]["start_gates_met"]} of {current["readiness"]["start_gates_total"]} START gates met</strong></p></header>' + view.gate_strip(current)
     native_dates = {(sanitizer().sanitize(raw_manifest["receipts"][name.removeprefix("readiness:")]["root"]), sanitizer().sanitize(raw_manifest["receipts"][name.removeprefix("readiness:")]["path"])): item.get("source_dates", {}) for name, item in inputs.items() if name.startswith("readiness:")}
-    manifest_body = f'<section class="manifest-section" aria-labelledby="manifest-title"><h2 id="manifest-title" class="manifest-title">repository manifest at <code>{manifest_sha}</code>, dated receipts</h2><p><a href="sources.html#readiness">Source dates and retained receipt identities</a></p>' + readiness_body(native, manifest, current, view, source_dates=native_dates) + '</section>'
+    manifest_body = adoption_view.summary(adoption) + f'<section class="manifest-section" aria-labelledby="manifest-title"><h2 id="manifest-title" class="manifest-title">repository manifest at <code>{manifest_sha}</code>, dated receipts</h2><p><a href="sources.html#readiness">Source dates and retained receipt identities</a></p>' + readiness_body(native, manifest, current, view, source_dates=native_dates) + '</section>'
     common = (refreshed, manifest_sha)
     outputs = {
         "index.html": document("index", "North-star readiness and next steps", "", current_scope, overview, *common, [], leading=index_leading),
-        "readiness.html": document("readiness", "North-star readiness: what is done, what is left, what needs a decision", "", current_scope, manifest_body, *common, [], leading=view.render(current, workstation)),
+        "readiness.html": document("readiness", "North-star readiness: what is done, what is left, what needs a decision", "", current_scope, manifest_body, *common, [], leading=view.render(current, workstation, validated=True, readings_normalized=True)),
         "gaps.html": document("gaps", "Grand Gap Board", "Find the open gaps, who owns them and what happens next.", gap_scope, gap_body(rows(gaps, "gaps", ("id", "group", "sev", "title"))), *common, []),
         "roadmap.html": document("roadmap", "Roadmap", "Read the dated milestones and server records.", road_scope, roadmap_body(roadmap), *common, []),
+        "fleet.html": document("fleet", "Worker fleet", "", 'Native fleet as of ' + str(fleet.get("at") or "not reported"), adoption_view.roles(adoption), *common, [], leading=fleet_view.render(fleet)),
         "sources.html": document("sources", "Sources and dates", "Check the dates and identities behind each page.", 'Current view and dated repository receipts remain distinct.', source_body, *common, []),
     }
     for name in ("site.css", "site.js"):
@@ -435,6 +499,8 @@ def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
                     "native_readiness_summary": manifest["summary"],
                     "command_center_current_view": {"updated_utc": current["updated_utc"], "sha256": current_input["sha256"], "schema": current["schema"]},
                     "workstation": workstation,
+                    "fleet": fleet,
+                     "adoption": {"schema": adoption["schema"], "generated_utc": adoption["generated_utc"], "window_hours": adoption["window_hours"], "sha256": adoption_input["sha256"], "status": adoption.get("status", "RECORDED"), "reason": adoption.get("reason")},
                    "source_scope": {"readiness": "Per-source retained dates; no combined snapshot timestamp", "gaps": gap_scope, "roadmap": road_scope},
                    "inputs": {key: {field: value for field, value in item.items() if field != "raw"} for key, item in inputs.items()},
                    "outputs": {key: {"sha256": hashlib.sha256(value).hexdigest(), "bytes": len(value)} for key, value in outputs.items()},
@@ -493,7 +559,7 @@ def main(argv: list[str] | None = None) -> int:
         result = refresh(args.root, args.state_root, output, receipt, args.sources, args.gaps_source, args.roadmap_source, args.roadmap_inputs, current_source=args.current_source)
     except (OSError, ValueError, KeyError, TypeError, AttributeError, ImportError) as error:
         parser.exit(1, f"local-pages: refresh failed ({type(error).__name__}): {error}\n")
-    print(json.dumps({"output_dir": str(output), "receipt": str(receipt), "generated_utc": result["generated_utc"], "native_readiness_manifest_sha256": result["native_readiness_manifest_sha256"], "pages": 5, "API_errors": result["workstation"].get("API_errors", [])}, sort_keys=True))
+    print(json.dumps({"output_dir": str(output), "receipt": str(receipt), "generated_utc": result["generated_utc"], "native_readiness_manifest_sha256": result["native_readiness_manifest_sha256"], "pages": 6, "API_errors": result["workstation"].get("API_errors", []) + result["fleet"].get("API_errors", [])}, sort_keys=True))
     return 0
 
 

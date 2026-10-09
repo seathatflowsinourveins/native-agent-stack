@@ -22,9 +22,11 @@ FALLBACK = {
 }
 
 
-def series(metric, value, timestamp=NOW - 5, instance="127.0.0.1:9100"):
+def series(metric, value, timestamp=NOW - 5, instance="127.0.0.1:9100", job=None):
+    if job is None:
+        job = workstation.WINDOWS_JOB if metric.startswith("windows_") else "fixture-wsl"
     return {
-        "metric": {"__name__": metric, "job": "fixture-local", "instance": instance},
+        "metric": {"__name__": metric, "job": job, "instance": instance},
         "values": [[timestamp, str(value)]],
     }
 
@@ -34,9 +36,9 @@ def payload(rows):
 
 
 class WorkstationTests(unittest.TestCase):
-    def collect(self, rows):
+    def collect(self, rows, fallback=FALLBACK, **kwargs):
         with patch.object(workstation.time, "time", return_value=NOW):
-            return workstation.collect(FALLBACK, lambda query, timeout: payload(rows))
+            return workstation.collect(fallback, lambda query, timeout: payload(rows), **kwargs)
 
     def assert_fallback(self, actual, field):
         self.assertEqual(actual[field]["value_gib"], FALLBACK[field])
@@ -50,7 +52,7 @@ class WorkstationTests(unittest.TestCase):
             series(workstation.METRICS[2], 4 * 1024 ** 3, NOW - 9),
             series(workstation.METRICS[3], 4 * 1024 ** 3, NOW - 9),
         ])
-        for field in workstation.FIELDS:
+        for field in FALLBACK.keys() - {"read_utc"}:
             self.assertEqual(actual[field]["source"], "prometheus")
         self.assertEqual(actual["windows_available_gib"]["value_gib"], 0)
         self.assertEqual(actual["wsl_available_gib"]["value_gib"], 3)
@@ -61,7 +63,7 @@ class WorkstationTests(unittest.TestCase):
 
     def test_missing_series_uses_exact_cc_values_and_read_time(self):
         actual = self.collect([])
-        for field in workstation.FIELDS:
+        for field in FALLBACK.keys() - {"read_utc"}:
             self.assert_fallback(actual, field)
 
     def test_invalid_stale_future_and_ambiguous_samples_keep_fallback(self):
@@ -71,7 +73,7 @@ class WorkstationTests(unittest.TestCase):
             [series(metric, -1)], [series(metric, 1, NOW - 121)],
             [series(metric, 1, NOW + 1)],
             [series(metric, 1), series(metric, 2, instance="localhost:9182")],
-            [series(metric, 1, instance="other-host:9182")],
+            [series(metric, 1, instance="other-host:9182", job="unrelated-windows")],
         ]
         for rows in cases:
             with self.subTest(rows=rows):
@@ -83,7 +85,7 @@ class WorkstationTests(unittest.TestCase):
         self.assert_fallback(self.collect([row]), "windows_available_gib")
 
     def test_swap_requires_same_target_recent_times_and_valid_difference(self):
-        total, free = workstation.METRICS[2:]
+        total, free = workstation.METRICS[2:4]
         cases = [
             [series(total, 4)],
             [series(total, 4), series(free, 3, instance="localhost:9101")],
@@ -106,7 +108,7 @@ class WorkstationTests(unittest.TestCase):
             actual = workstation.collect(FALLBACK, failing)
         self.assertEqual(calls, [(workstation.QUERY, 2.0)])
         self.assertEqual(actual["API_errors"][0]["type"], "TimeoutError")
-        for field in workstation.FIELDS:
+        for field in FALLBACK.keys() - {"read_utc"}:
             self.assert_fallback(actual, field)
         for body in [
             {"status": "error", "errorType": "timeout"},
@@ -165,12 +167,103 @@ class WorkstationTests(unittest.TestCase):
                         self.assertTrue(requests[0].startswith("/api/v1/query?"))
                         self.assertEqual(actual["API_errors"][0]["type"], "HTTPError")
                         for field in workstation.FIELDS:
+                            if field not in FALLBACK:
+                                self.assertNotIn(field, actual)
+                                continue
                             self.assert_fallback(actual, field)
                             self.assertEqual(actual[field]["fallback_reason"], "API read failed")
         finally:
             server.shutdown()
             server.server_close()
             thread.join(timeout=2)
+    def test_windows_uses_supplied_job_not_loopback_instance(self):
+        metric = workstation.METRICS[0]
+        actual = self.collect([
+            series(metric, 7 * 1024 ** 3, instance="172.26.16.1:9182"),
+            series(metric, 2 * 1024 ** 3, job="unrelated-windows"),
+        ])
+        self.assertEqual(actual["windows_available_gib"]["value_gib"], 7)
+        self.assertEqual(actual["windows_available_gib"]["source"], "prometheus")
+
+    def test_node_identity_is_unique_labelled_and_can_be_narrowed(self):
+        metric = workstation.METRICS[1]
+        total = workstation.METRICS[2]
+        actual = self.collect([
+            series(metric, 1, instance="wsl:9100"),
+            series(total, 4, instance="other-linux:9100"),
+        ])
+        self.assert_fallback(actual, "wsl_available_gib")
+        self.assert_fallback(actual, "swap_used_gib")
+        row = series(metric, 1)
+        del row["metric"]["job"]
+        self.assert_fallback(self.collect([row]), "wsl_available_gib")
+        self.assert_fallback(self.collect([series(metric, 1, job=workstation.WINDOWS_JOB)]), "wsl_available_gib")
+        actual = self.collect([
+            series(metric, 3 * 1024 ** 3, job="known-wsl"),
+            series(metric, 8 * 1024 ** 3, job="another-linux"),
+        ], wsl_job="known-wsl")
+        self.assertEqual(actual["wsl_available_gib"]["value_gib"], 3)
+
+    def test_totals_are_optional_and_have_individual_sample_times(self):
+        actual = self.collect([])
+        for field in workstation.OPTIONAL_TOTALS:
+            self.assertNotIn(field, actual)
+        fallback = dict(FALLBACK, windows_total_gib=127.8, wsl_total_gib=102.2)
+        actual = self.collect([], fallback)
+        self.assertEqual(actual["windows_total_gib"]["value_gib"], 127.8)
+        self.assertEqual(actual["wsl_total_gib"]["value_gib"], 102.2)
+        actual = self.collect([
+            series(workstation.METRICS[4], 128 * 1024 ** 3, NOW - 4, "172.26.16.1:9182"),
+            series(workstation.METRICS[5], 100 * 1024 ** 3, NOW - 8),
+        ])
+        self.assertEqual(actual["windows_total_gib"]["value_gib"], 128)
+        self.assertEqual(actual["wsl_total_gib"]["value_gib"], 100)
+        self.assertEqual(actual["windows_total_gib"]["read_utc"], workstation._utc(NOW - 4))
+        self.assertEqual(actual["wsl_total_gib"]["read_utc"], workstation._utc(NOW - 8))
+
+    def test_authored_per_figure_fallback_times_are_preserved(self):
+        fallback = dict(
+            FALLBACK,
+            windows_total_gib={"value_gib": 127.8, "read_utc": "2026-10-08T21:01:00Z"},
+            wsl_total_gib=102.2,
+            wsl_total_gib_read_utc="2026-10-08T21:02:00Z",
+        )
+        actual = self.collect([], fallback)
+        self.assertEqual(actual["windows_total_gib"]["value_gib"], 127.8)
+        self.assertEqual(actual["windows_total_gib"]["read_utc"], "2026-10-08T21:01:00Z")
+        self.assertEqual(actual["wsl_total_gib"]["read_utc"], "2026-10-08T21:02:00Z")
+        fallback = dict(FALLBACK, read_utc={"swap_used_gib": "2026-10-08T21:03:00Z"})
+        self.assertEqual(self.collect([], fallback)["swap_used_gib"]["read_utc"], "2026-10-08T21:03:00Z")
+
+    def test_invalid_optional_total_is_unknown_without_changing_mandatory_readings(self):
+        for value in [None, False, "32", -1, 0, 1, float("nan"), float("inf"),
+                      {"value_gib": 32, "read_utc": "2026-10-08T21:03:00"},
+                      {"value_gib": 32, "read_utc": "bad-date"}]:
+            with self.subTest(value=value):
+                actual = self.collect([], dict(FALLBACK, windows_total_gib=value))
+                self.assertNotIn("windows_total_gib", actual)
+                self.assertEqual(actual["optional_total_status"]["windows_total_gib"]["status"], "UNKNOWN")
+                self.assertTrue(actual["optional_total_status"]["windows_total_gib"]["reason"])
+                for field in FALLBACK.keys() - {"read_utc"}:
+                    self.assert_fallback(actual, field)
+
+    def test_api_failure_preserves_unknown_optional_total_and_valid_dictionary_date(self):
+        fallback = dict(FALLBACK, windows_total_gib=None,
+                        wsl_total_gib={"value_gib": 128, "read_utc": "2026-10-08T21:03:00Z"})
+        def failed(*args, **kwargs):
+            raise TimeoutError("fixture timeout")
+        actual = workstation.collect(fallback, failed)
+        self.assertNotIn("windows_total_gib", actual)
+        self.assertEqual(actual["optional_total_status"]["windows_total_gib"]["status"], "UNKNOWN")
+        self.assertEqual(actual["wsl_total_gib"]["value_gib"], 128)
+        self.assertEqual(actual["wsl_total_gib"]["read_utc"], "2026-10-08T21:03:00Z")
+
+    def test_live_total_replaces_invalid_fallback_date_and_its_reason(self):
+        fallback = dict(FALLBACK, windows_total_gib={"value_gib": 32, "read_utc": "bad-date"})
+        actual = self.collect([series("windows_memory_physical_total_bytes", 128 * 1024 ** 3, job=workstation.WINDOWS_JOB)], fallback)
+        self.assertEqual(actual["windows_total_gib"]["value_gib"], 128)
+        self.assertNotIn("date_reason", actual["windows_total_gib"])
+        self.assertNotIn("windows_total_gib", actual.get("optional_total_status", {}))
 
 
 if __name__ == "__main__":

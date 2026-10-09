@@ -1,11 +1,14 @@
 """One sanitizer preserves the native portable recipe and omits account URLs."""
 
 import ast
+import base64
 import importlib.util
 from pathlib import Path
 import re
 from typing import Any
 import unittest
+from unittest.mock import patch
+from urllib.parse import quote
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -41,6 +44,13 @@ class SanitizationTests(unittest.TestCase):
         self.assertTrue(all(value.endswith("[account artifact omitted]") for value in result["links"]))
         self.assertEqual(result["keep"], values["keep"])
 
+    def test_encoded_account_artifacts_follow_the_same_plain_policy(self):
+        helper = load_helper()
+        raw = "https://chatgpt.com/c/private-fixture"
+        for encoded in (quote(raw, safe=""), raw.encode().hex(), base64.b64encode(raw.encode()).decode()):
+            with self.subTest(encoded=encoded):
+                self.assertEqual(helper.text(encoded), helper.text(raw))
+
     def test_url_classification_uses_supported_url_parser(self):
         helper = load_helper()
         for value in ["https://claude.ai/artifact/id", "HTTPS://CHATGPT.COM/c/id", "https://chat.openai.com/c/id", "https://chatgpt.com", "https://%63hatgpt.com/c/id"]:
@@ -69,6 +79,84 @@ class SanitizationTests(unittest.TestCase):
         self.assertNotIn(SYNTHETIC_HOME, rendered)
         self.assertNotIn(SYNTHETIC_MAC_HOME, rendered)
         self.assertNotIn(SYNTHETIC_TASK, rendered)
+
+    def test_short_home_names_and_public_substrings_do_not_damage_html(self):
+        helper = load_helper()
+        spec = importlib.util.spec_from_file_location("short_home_composer", ROOT / "tools/local-pages/build_pages.py")
+        composer = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(composer)
+        for name in ("li", "link", "section"):
+            with self.subTest(name=name), patch.object(helper.Path, "home", return_value=Path("/synthetic") / name):
+                public = "<link href='assets/site.css'><section><li>public list</li></section>"
+                rendered = composer.document("index", "Public", "Public page", "fixture", public, "2026-10-09T05:00:00Z", "a" * 64, []).decode()
+                self.assertIn(public, rendered)
+                self.assertEqual(helper.text("linked public selection"), "linked public selection")
+
+    def test_classified_encodings_preserve_portable_native_context(self):
+        helper = load_helper()
+        raw = SYNTHETIC_HOME + "/fixture"
+        expected = helper.sanitize(raw)
+        for encoded in (quote(raw, safe=""), raw.replace("/", "&#47;"), "".join("\\u" + format(ord(char), "04x") for char in raw), raw.encode().hex(), base64.b64encode(raw.encode()).decode()):
+            with self.subTest(encoded=encoded):
+                self.assertEqual(helper.text("prefix " + encoded + " suffix"), "prefix " + expected + " suffix")
+
+    def test_actual_home_name_is_masked_as_a_public_label_after_aggregation(self):
+        helper = load_helper()
+        identity = "-".join(["dummy", "synthetic", "user"])
+        raw = {identity: {"calls": 7}}
+        with patch.object(helper.Path, "home", return_value=Path("/synthetic") / identity):
+            self.assertNotIn(identity, helper.text(identity))
+            self.assertNotIn(identity, helper.text("host-" + identity + "-session"))
+            self.assertEqual(raw[identity]["calls"], 7)
+
+    def test_encoded_identifiers_are_masked_only_after_positive_classification(self):
+        helper = load_helper()
+        identity = "-".join(["dummy", "synthetic", "user"])
+        path = "/".join(["", "home", identity, "fixture"])
+        encoded = [quote(path, safe=""), path.replace("/", "&#47;"), "".join("\\u" + format(ord(char), "04x") for char in path), path.encode().hex(), base64.b64encode(path.encode()).decode()]
+        with patch.object(helper.Path, "home", return_value=Path("/synthetic") / identity):
+            for value in encoded:
+                with self.subTest(value=value):
+                    projected = helper.text(value)
+                    self.assertNotIn(value, projected)
+                    self.assertNotIn(identity, projected)
+            public = base64.b64encode(b"public fixture label").decode()
+            self.assertEqual(helper.text(public), public)
+            self.assertEqual(helper.text("&lt;script&gt;public&lt;/script&gt;"), "&lt;script&gt;public&lt;/script&gt;")
+
+    def test_home_name_label_filter_preserves_native_placeholders(self):
+        helper = load_helper()
+        with patch.object(helper.Path, "home", return_value=Path("/synthetic") / "user"):
+            for value in ["${USER_HOME}", "${LOCAL_SESSION_ID}", "${LOCAL_TASK_HANDLE}"]:
+                self.assertEqual(helper.text(value), value)
+
+    def test_identity_is_masked_at_underscore_boundaries_without_public_substrings(self):
+        helper = load_helper()
+        identity = "-".join(["dummy", "synthetic", "user"])
+        labels = ["worker_" + identity + "_read", "_" + identity.upper() + "_"]
+        with patch.object(helper.Path, "home", return_value=Path("/synthetic") / identity):
+            for label in labels:
+                with self.subTest(label=label):
+                    self.assertNotIn(identity.casefold(), helper.text(label).casefold())
+            self.assertEqual(helper.text("pre" + identity + "post"), "pre" + identity + "post")
+
+    def test_decoded_tokens_use_the_same_underscore_identity_classification(self):
+        helper = load_helper()
+        identity = "-".join(["dummy", "synthetic", "user"])
+        raw = "worker_" + identity + "_read"
+        encoded = ["".join("%" + format(ord(char), "02x") for char in raw), "".join("&#" + str(ord(char)) + ";" for char in raw), "".join("\\u" + format(ord(char), "04x") for char in raw), raw.encode().hex(), base64.b64encode(raw.encode()).decode()]
+        with patch.object(helper.Path, "home", return_value=Path("/synthetic") / identity):
+            for label in encoded:
+                with self.subTest(label=label):
+                    self.assertEqual(helper.text(label), helper.text(raw))
+
+    def test_known_placeholders_and_owner_identifier_survive_identity_projection(self):
+        helper = load_helper()
+        for identity in ["user", "session", "native"]:
+            with patch.object(helper.Path, "home", return_value=Path("/synthetic") / identity):
+                for label in ["${USER_HOME}", "${LOCAL_SESSION_ID}", "${LOCAL_TASK_HANDLE}", "native-agent-stack-1a", "[personal identifier omitted]", "[account artifact omitted]"]:
+                    with self.subTest(identity=identity, label=label):
+                        self.assertEqual(helper.text(label), label)
 
 
 if __name__ == "__main__":
