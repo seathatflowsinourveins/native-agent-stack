@@ -147,7 +147,8 @@ jobs:
 
       # Numbers and fixed names only: the execution file holds the whole transcript and is never printed or uploaded.
       # The record is written first, so a failed or over-budget run still leaves its cost; the acceptance check
-      # follows. It also reads the session's own tool list: a shell, write, web, subagent or MCP tool fails the run.
+      # follows. It also reads the session's own tool list: a missing list, any tool outside the allow-list or
+      # an MCP server fails the run, and the step names every bound it finds unmet.
       # The turn bound counts distinct assistant message ids. The result's num_turns counts transcript
       # messages, tool results included (a 12-request run on Claude Code 2.1.295 reported 57), so it is
       # kept in the record only.
@@ -171,15 +172,16 @@ jobs:
                ($result.modelUsage | type == "object" and length > 0)
             then . else error("usage unavailable") end |
             (($init.tools // []) | map(select(type == "string"))) as $tools |
+            ([.[] | select(.type == "result") | .structured_output | select(. != null)] | last) as $answer |
             ([.[] | select(.type == "assistant") | .message.id? | select(type == "string")] | unique | length) as $turns |
             {total_cost_usd: $result.total_cost_usd, num_turns: $result.num_turns, assistant_turns: $turns,
+             structured_output_present: ($answer != null),
+             tools_listed: (($init.tools | type) == "array" and ($init.mcp_servers | type) == "array"),
              successful_result: ($result.subtype == "success" and $result.is_error == false),
              session_started: ($init != null),
              claude_code_version: (($init.claude_code_version // "unknown") | name),
              tools: ($tools | map(name)),
-             forbidden_tools: ($tools | map(select(
-               test("^(Bash|Write|Edit|MultiEdit|NotebookEdit|WebFetch|WebSearch|Task|Agent)$") or
-               startswith("mcp__"))) | map(name)),
+             forbidden_tools: ($tools | map(select(IN("Glob", "Grep", "Read", "StructuredOutput") | not)) | map(name)),
              mcp_servers: (($init.mcp_servers // []) | length),
              models: ($result.modelUsage | to_entries | map(
                if (.value.inputTokens | count) and (.value.outputTokens | count) and
@@ -201,9 +203,23 @@ jobs:
                    (.models[] | "| \(.model) | \(.input_tokens) | \(.cache_creation_input_tokens) | \(.cache_read_input_tokens) | \(.output_tokens) |")' \
               "$out/usage.json"
           } >> "$GITHUB_STEP_SUMMARY"
-          jq -e '.successful_result == true and .session_started == true and (.forbidden_tools | length) == 0 and
-                 .mcp_servers == 0 and .assistant_turns >= 1 and .assistant_turns <= 6 and .total_cost_usd <= 1 and
-                 (.models | map(.cache_read_input_tokens) | add) > 0' "$out/usage.json" > /dev/null
+          failed="$(jq -r '[
+            (if .successful_result != true then "the run did not end in success" else empty end),
+            (if .session_started != true then "no session start record" else empty end),
+            (if .tools_listed != true then "the session start record lists no tools or MCP servers" else empty end),
+            (if (.forbidden_tools | length) > 0 then "tools outside Glob, Grep, Read and StructuredOutput: \(.forbidden_tools | join(" "))"
+             else empty end),
+            (if .mcp_servers != 0 then "\(.mcp_servers) MCP servers in the session" else empty end),
+            (if .assistant_turns < 1 or .assistant_turns > 6 then "\(.assistant_turns) assistant turns, outside 1 to 6"
+             else empty end),
+            (if .total_cost_usd > 1 then "client cost estimate \(.total_cost_usd) USD, above 1" else empty end),
+            (if ((.models | map(.cache_read_input_tokens) | add) // 0) <= 0 then "no cache read" else empty end),
+            (if .structured_output_present != true then "no structured output" else empty end)
+          ] | join("; ")' "$out/usage.json")"
+          if [ -n "$failed" ]; then
+            echo "Bounds not met: $failed" >&2
+            exit 1
+          fi
 
       # Every entry must name an item this run collected, an allow-listed label and confidence, and appear once. Only
       # high-confidence labels for issues go on to the apply job; everything else is a suggestion in the summary,

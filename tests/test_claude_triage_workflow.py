@@ -16,6 +16,8 @@ import textwrap
 import unittest
 from pathlib import Path
 
+from tests.test_workflow_policy import load_workflow
+
 try:
     import yaml
 except ImportError:  # the macOS job installs no package; the hosted validate job has PyYAML
@@ -59,7 +61,8 @@ GH_STAND_IN = textwrap.dedent("""\
 
 
 def workflow():
-    return yaml.safe_load(WORKFLOW.read_text(encoding="utf-8"))
+    text = WORKFLOW.read_text(encoding="utf-8")
+    return yaml.safe_load(text) if yaml else load_workflow(text)
 
 
 def job(name):
@@ -93,15 +96,17 @@ def model_usage(read=9000, cost=0.25):
                                 "cacheCreationInputTokens": 9000, "costUSD": cost}}
 
 
-def execution(tools=("Glob", "Grep", "Read", "StructuredOutput"), turns=None, **changes):
+def execution(tools=("Glob", "Grep", "Read", "StructuredOutput"), turns=None, lists=True, **changes):
     final = {"type": "result", "subtype": "success", "is_error": False, "num_turns": 3,
-             "total_cost_usd": 0.25, "modelUsage": model_usage()}
+             "total_cost_usd": 0.25, "modelUsage": model_usage(), "structured_output": {"items": []}}
     final.update(changes)
     # The client streams one message per content block, so one API turn spans several messages with one id.
     assistants = [{"type": "assistant", "message": {"id": f"msg_{turn:02d}", "content": []}}
                   for turn in range(final["num_turns"] if turns is None else turns) for _ in range(2)]
-    return [{"type": "system", "subtype": "init", "tools": list(tools), "mcp_servers": [],
-             "claude_code_version": "2.1.295"}, *assistants, final]
+    start = {"type": "system", "subtype": "init", "claude_code_version": "2.1.295"}
+    if lists:
+        start.update(tools=list(tools), mcp_servers=[])
+    return [start, *assistants, final]
 
 
 class Run:
@@ -216,7 +221,7 @@ class TriageShapeTests(unittest.TestCase):
             self.assertIn(rule, settings["permissions"]["deny"])
 
 
-@unittest.skipUnless(yaml and shutil.which("jq"), "PyYAML and jq are needed to run the workflow's steps")
+@unittest.skipUnless(shutil.which("jq"), "jq is needed to run the workflow's steps")
 class TriageStepTests(unittest.TestCase):
     def fixtures(self):
         issues = [issue(5, title="paper engine halts", body="x" * 5000), issue(6, labels=["lane:trading"]),
@@ -346,12 +351,27 @@ class TriageStepTests(unittest.TestCase):
             self.assertEqual(json.loads(run.read("triage-usage/usage.json"))["tools"],
                              ["Glob", "Grep", "Read", "StructuredOutput"])
             for changes in ({"tools": ("Read", "Bash")}, {"total_cost_usd": 1.01}, {"turns": 7},
-                            {"modelUsage": model_usage(read=0)}):
+                            {"modelUsage": model_usage(read=0)},
+                            {"tools": ("Glob", "Grep", "Read", "StructuredOutput", "Skill")},
+                            {"lists": False}, {"structured_output": None}):
                 path.write_text(json.dumps(execution(**changes)), encoding="utf-8")
                 self.assertNotEqual(run.run(NUMBERS, EXECUTION_FILE=str(path))[0], 0, changes)
         finally:
             run.close()
 
+
+    def test_the_step_names_every_unmet_bound(self):
+        run = Run()
+        try:
+            path = run.dir / "execution.json"
+            path.write_text(json.dumps(execution(turns=7, total_cost_usd=1.5, structured_output=None,
+                                                 tools=("Read", "Skill"))), encoding="utf-8")
+            code, console = run.run(NUMBERS, EXECUTION_FILE=str(path))
+            self.assertNotEqual(code, 0)
+            for words in ("7 assistant turns, outside 1 to 6", "above 1", "Skill", "no structured output"):
+                self.assertIn(words, console)
+        finally:
+            run.close()
 
     def test_the_turn_bound_counts_assistant_turns_not_transcript_messages(self):
         # On Claude Code 2.1.295 a 12-request run with parallel reads reported num_turns 57 (api-actions LR

@@ -5,6 +5,30 @@ variable `CLAUDE_TRIAGE_ENABLED` is `true` and only on the first attempt of a ru
 (`lane:foundation`, `lane:trading`, `lane:shared`) for each open issue and pull request that has none. Nothing in this
 change starts a run or sets a variable.
 
+## What the workflow does, by name
+
+The workflow is new, so this is all of its behaviour. The list follows the pre-cue read of the sibling harness-audit
+PR (#892, 2026-10-09), which found changes its record had not named; the same review was applied here.
+
+- Triggers: `schedule` (`41 9 * * 2`, Tuesday 09:41 UTC) and `workflow_dispatch`; one concurrency group.
+- `classify` job condition: this repository (slug guard), the `main` ref, the first attempt of a run,
+  `CLAUDE_TRIAGE_ENABLED == 'true'`, and for a dispatch, `github.actor` and `github.triggering_actor` both the
+  repository owner. `timeout-minutes: 15`. Grants: `contents: read`, `issues: read`, `pull-requests: read` and
+  `id-token: write`.
+- `classify` steps: a guard step that stops the job with exit 2 on debug signals or a pre-existing
+  `~/.claude/settings.json` (a dangling symlink included); a model-free collect step (at most 30 items without a lane
+  label, text cut to 2,000 characters); the action step, which pins `ACTIONS_STEP_DEBUG: 'false'` and passes
+  `show_full_output`, `display_report` and `track_progress` as `'false'` (the last two are their defaults, declared in
+  the pinned `action.yml`, lines 136-139 and 152-155 at `2dca132f`) and answers only through `--json-schema`; a
+  numbers step that checks the bounds (an allow-list of Glob, Grep, Read and StructuredOutput, tool and MCP lists
+  present, 1 to 6 assistant turns, at most $1, a cache read, a structured output; every unmet bound is named); a
+  validation step that keeps only allowed labels for collected issues; and an artifact that keeps `usage.json`
+  (numbers only) for 14 days.
+- `apply` job: no model; `timeout-minutes: 5`; `issues: write` only; it re-reads every proposed issue and adds one
+  allow-listed lane label to an open issue that still has none. Pull requests get suggestions in the summary only.
+- The pin, v1.0.247, is hours old: the user ended the seven-day cooldown for clean releases on 2026-10-03
+  (`docs/decisions/2026-10-03-currency-wave-w1.md`, "Holds and cooldown waiver"), which keeps qualification.
+
 ## Two jobs, so the model never holds a write scope
 
 - **`classify`** collects the unlabelled open items with a model-free step (`gh issue list`, `gh pr list`), cuts each
@@ -65,13 +89,16 @@ Runs spend from the Console organization that the four `ANTHROPIC_*` repository 
 - `tests.test_workflow_security_coverage.NewWorkflowSecurityCoverageTests`: the coverage set gains
   `claude-triage.yml`, with its own offline zizmor test.
 
-New, in `tests/test_claude_triage_workflow.py` (16 tests): triggers, conditions, permissions per job, the pin, the
+New, in `tests/test_claude_triage_workflow.py` (18 tests): triggers, conditions, permissions per job, the pin, the
 flags, the schema's enums and the settings are asserted from the workflow file; the collect, numbers, validation and
 apply steps are executed as written against a local stand-in for `gh`. Thirteen weakened copies of the workflow each
 fail at least one test (no check that a number was collected, labels for pull requests or low confidence passed on,
 no pull request or existing-label re-check before writing, no allow-list in the apply job, no cap of 30 items or
 2,000 characters, a `pull-requests: write` grant, a $10 budget check, an extra enum value, `apply` not depending on
-`classify` succeeding, extra keys accepted, reasons not escaped).
+`classify` succeeding, extra keys accepted, reasons not escaped), measured on 2026-10-08 against that day's bounds.
+The 2026-10-09 bound changes have their own tests (an unknown tool, a start record without lists, a missing
+structured output, the named failures), the turn bound was checked with three mutants, and the step tests no longer
+skip without PyYAML.
 
 ## Alternatives considered
 
@@ -95,7 +122,8 @@ no pull request or existing-label re-check before writing, no allow-list in the 
 `local_integration`: the unit tests above with PyYAML 6.0.3 on Python 3.12; actionlint 1.17.0 and zizmor 1.30.1
 (offline, regular and pedantic), no findings; the action's argument parser replayed on the workflow text, including
 the JSON schema. `native_proven`, local and limited: one structured-output run of the flag set on the installed
-client. No hosted run of this workflow is part of this record.
+client, with Read, Glob and Grep and a JSON schema; this workflow's exact `claude_args` have not run, locally or
+hosted. No hosted run of this workflow is part of this record.
 
 ## SOTA sources
 
