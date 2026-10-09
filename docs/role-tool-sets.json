@@ -124,10 +124,13 @@
     },
     {
       "source_id": "claude-native-fields",
-      "locator": "installed Claude Code 2.1.295 --help and embedded stdio schema at byte offset 207499116",
+      "locator": "installed Claude Code 2.1.295 --help and embedded stdio schema: term byte offset 207499116; 1000-byte span starting at 207499016",
       "schema_span_sha256": "98c935556619bbd70ec55ddd7b923bb1b8ff797de883af82e9af1401f47e1cc9",
       "evidence_class": "source_review",
-      "scope": "alwaysLoad controls prompt deferral; true waits up to 5s for connection; no memory acceptance"
+      "scope": "alwaysLoad controls prompt deferral; true waits up to 5s for connection; no memory acceptance",
+      "schema_span_start_offset": 207499016,
+      "schema_span_length_bytes": 1000,
+      "schema_term_offset": 207499116
     },
     {
       "source_id": "codex-profile",
@@ -135,7 +138,38 @@
       "native_readback": "codex-cli 0.161.0; -p, --profile <CONFIG_PROFILE_V2>",
       "checked_at": "2026-10-09",
       "evidence_class": "source_review",
-      "scope": "independent process configuration profile; no host configuration read or change"
+      "scope": "0.161.0 native profile readback; trial launch metadata separately names map-default 0.162.0 and identity launcher 0.161.0; no host configuration read or change",
+      "readback_binary": "identity-launcher codex executable reporting codex-cli 0.161.0",
+      "version_command": "codex --version",
+      "profile_help_command": "codex --help"
+    },
+    {
+      "source_id": "trial-release-A-control",
+      "locator": "research/coverage-gap-20261008/O3/ROLE-MCP-TRIAL-PLAN-20261008/runs/A-control-harness-rules/release.out:2",
+      "sha256": "8d9433577599b11f39c530ee5793b51d713af613173127a88d0a155e8f41826f",
+      "evidence_class": "native_proven",
+      "scope": "retained launch output records role_mcp_off=skip; no new run or process acceptance"
+    },
+    {
+      "source_id": "trial-release-B-scout",
+      "locator": "research/coverage-gap-20261008/O3/ROLE-MCP-TRIAL-PLAN-20261008/runs/B-scout-overlap-token/release.out:2",
+      "sha256": "6ba8650043f44dd2555a81b245879efe8ff698bf17573eb8d798e25e95354a32",
+      "evidence_class": "native_proven",
+      "scope": "retained launch output records role_mcp_off=skip; no new run or process acceptance"
+    },
+    {
+      "source_id": "trial-release-B-artifact",
+      "locator": "research/coverage-gap-20261008/O3/ROLE-MCP-TRIAL-PLAN-20261008/runs/B-artifact-ns-readiness-manifest/release.out:2",
+      "sha256": "912f49bb65b076bce26ebc5bf0a363cb3ca7620a9a719e5e6061713db9b625c8",
+      "evidence_class": "native_proven",
+      "scope": "retained launch output records role_mcp_off=skip; no new run or process acceptance"
+    },
+    {
+      "source_id": "trial-release-C-token-parity",
+      "locator": "research/coverage-gap-20261008/O3/ROLE-MCP-TRIAL-PLAN-20261008/runs/C-token-parity-codex-token-parity/release.out:2",
+      "sha256": "7143037ad55d217ef65eae651d18a72bfaebb3a9b4dc1ae4bd3147334ba3aac5",
+      "evidence_class": "native_proven",
+      "scope": "retained launch output records role_mcp_off=skip; no new run or process acceptance"
     }
   ],
   "slots": [
@@ -182,8 +216,9 @@
       "alternatives": [
         {
           "tool_id": "jcodemunch",
-          "ranking": "pending G5",
-          "disposition": "alternative_pending_G5_not_parallel_default"
+          "ranking": "catalog measured_tradeoff; final G5 pending",
+          "disposition": "measured_tradeoff; scoped discovery, not a parallel source-navigation default",
+          "catalog_locator": "catalogs/landscape/foundation.json#/layers/4/alternatives/2"
         },
         {
           "tool_id": "codebase-memory-mcp",
@@ -310,18 +345,24 @@
       "prior_documented_choice": "git-gh",
       "alternatives": [],
       "checked_at": "2026-10-09",
-      "overturn_when": "G5 upstream evidence or a vendor release changes the job/quality/transport contract; retain dated primary sources and re-open only the affected slot"
+      "overturn_when": "G5 upstream evidence or a vendor release changes the job/quality/transport contract; retain dated primary sources and re-open only the affected slot",
+      "prior_disposition": "catalog_winner",
+      "catalog_locator": "catalogs/landscape/foundation.json#/layers/19/winners/1",
+      "catalog_component_id": "candidate:cli-cli",
+      "scope": "GitHub CLI source-reviewed operations; generic git and PR lifecycle acceptance remain separate"
     },
     {
       "slot_id": "session-archive-observation",
       "current_choice": null,
       "status": "PENDING_G5_FINAL_CHOICE",
       "prior_documented_choice": "agentsview",
-      "prior_disposition": "existing task contract",
+      "prior_disposition": "conditional",
       "deciding_source": "docs/command-center.md:55",
       "alternatives": [],
       "checked_at": "2026-10-09",
-      "overturn_when": "A named better-evidenced archive route meets role coverage and native qualification."
+      "overturn_when": "A named better-evidenced archive route meets role coverage and native qualification.",
+      "catalog_locator": "catalogs/landscape/foundation.json#/layers/15/alternatives/4",
+      "scope": "conditional session archive inspection; existing CC/co-op task contract does not promote it to a catalog winner"
     }
   ],
   "mcp_sets": [
@@ -760,7 +801,7 @@
           "serena"
         ],
         "status": "covered_by_role_specific_selection_contract; effective registrations unmeasured",
-        "acceptance": "Retain all observed necessary servers and archive route. The prior 12-component contract alone cannot pass. Resolve exact existing aliases before strict materialization."
+        "acceptance": "Retain the observed hook-review servers plugin_context-mode_context-mode and serena, plus the native GitHub/source-review operations named by this role. Resolve their existing Claude registrations before strict MCP selection. Complete carrier and fresh hook-review acceptance remain unmeasured; no archive requirement is inferred for api-actions."
       }
     },
     {
@@ -952,13 +993,20 @@
       "definition": "private-role-exec",
       "expected_tool_ids": [
         "context-mode",
-        "git-gh"
+        "git-gh",
+        "ai-memory",
+        "codebase-memory-mcp",
+        "headroom",
+        "hindsight",
+        "promptfoo",
+        "semble",
+        "serena",
+        "socraticode"
       ],
       "conditional_alternatives": [],
       "expectation_evidence_class": "source_review",
       "process_set_contract": [
-        "ARTIFACT",
-        "REVIEW"
+        "EVALUATION"
       ],
       "deployment_status": "unchanged; role-table does not apply a launch delta",
       "exact_effective_host_mcp_set": "unmeasured",
@@ -974,14 +1022,14 @@
       "remaining_gaps": [],
       "client": "Codex",
       "client_basis": "native Codex carrier/reader contract",
-      "process_set_scope": "trial analogue/candidate; native selection follows client_selection_contracts",
+      "process_set_scope": "narrowest reviewed coverage contract containing all nine observed native servers; current deployed set and lane binding unmeasured",
       "current_set_source_id": "current-role-mcp-off",
       "current_lane_binding": null,
-      "current_set_status": "hash-bound named-lane exclusions; generic role binding unmeasured",
+      "current_set_status": "reviewed EVALUATION coverage requirement conflicts with live exclusions; conflict routed to the CC; current deployment remains unmeasured",
       "observed_call_coverage_gate": {
         "source_id": "invoke-snapshot",
         "sha256": "e129759fe91ffbb133de2719a7d5194fe96ac65c44b222adf7fdd4d65af0e872",
-        "source_pointer": "#/codex_by_lane/exec readers",
+        "source_pointer": "#/codex_by_lane/exec%20readers",
         "observed_calls_by_native_server": {
           "ai-memory": 3,
           "codebase-memory-mcp": 200,
@@ -1004,8 +1052,26 @@
           "serena",
           "socraticode"
         ],
-        "status": "phase_binding_unmeasured; preserve necessary capabilities",
-        "acceptance": "ARTIFACT/REVIEW alone misses observed servers. Bind actual phase and lane; aggregate use does not override live exclusions or imply universal defaults."
+        "status": "EVALUATION reviewed contract covers all observed servers; live exclusion conflict routed to the CC",
+        "acceptance": "Retain every observed required server, including the graph, semantic retrieval and evaluation servers. EVALUATION is the narrowest existing covering contract. Any conflict with live lane exclusions is routed to the CC; an intentional exclusion needs its deciding file and decision before acceptance.",
+        "intentional_exclusion_decision_sources": [],
+        "conflict_resolution": {
+          "owner": "CC",
+          "state": "routed",
+          "live_source_id": "current-role-mcp-off",
+          "scope": "Bind the actual reader lane and resolve its live exclusions against the covering contract before any narrowing or shared-MCP adoption. No live source is edited."
+        },
+        "observed_conversations_by_native_server": {
+          "ai-memory": 1,
+          "codebase-memory-mcp": 29,
+          "context-mode": 24,
+          "headroom": 1,
+          "hindsight": 1,
+          "promptfoo": 2,
+          "semble": 1,
+          "serena": 5,
+          "socraticode": 2
+        }
       }
     }
   ],
@@ -1069,7 +1135,7 @@
       "supplemental_source_review": {
         "version": "2.5.2",
         "source_pin": "7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83",
-        "runtime_acceptance": "separate new-WSL selection, not base2.4.1 acceptance"
+        "runtime_acceptance": "separate new-WSL selection, not base 2.4.1 acceptance"
       }
     },
     {
@@ -1297,7 +1363,7 @@
       "supplemental_source_review": {
         "version": "1.16.0",
         "source_pin": "3d3a4a4d427cb0f29de4f5dd1360da52896f62df",
-        "runtime_acceptance": "not transferred from base1.15.0"
+        "runtime_acceptance": "not transferred from base 1.15.0"
       }
     },
     {
@@ -1310,11 +1376,15 @@
         "final_candidate": {
           "status": "PENDING_G5",
           "slot_id": "exact-source-navigation",
-          "prior_disposition": "source-reviewed role contract; G5 pending",
-          "catalog_locator": "catalogs/landscape/foundation.json#/layers/4",
-          "overlap_disposition": "layer does not imply a catalog verdict; existing phase contract only",
-          "catalog_locator_scope": "layer context only",
-          "deciding_source_id": "role-review"
+          "prior_disposition": "measured_tradeoff",
+          "catalog_locator": "catalogs/landscape/foundation.json#/layers/4/alternatives/2",
+          "overlap_disposition": "measured retrieval trade-off for scoped discovery; retained evidence does not establish better reference retrieval than Serena",
+          "catalog_locator_scope": "historical catalog verdict for the named component and job; new G5 acceptance pending",
+          "deciding_sources": [
+            "docs/token-native-saturation.md",
+            "docs/full-stack-convergence.md",
+            "evidence/receipts/native-jcodemunch-20260920.json"
+          ]
         },
         "wiring": {
           "status": "record_existing_contract_only",
@@ -1358,7 +1428,7 @@
       "supplemental_source_review": {
         "version": "1.108.333",
         "source_pin": "bbe30fa299c4f82251233f25b8a0c5c56e2d407a",
-        "runtime_acceptance": "not transferred from base1.108.327"
+        "runtime_acceptance": "not transferred from base 1.108.327"
       }
     },
     {
@@ -1886,9 +1956,14 @@
         "final_candidate": {
           "status": "PENDING_G5",
           "slot_id": "git-github-operations",
-          "prior_disposition": "existing task contract",
-          "catalog_locator": "G5 final row pending",
-          "overlap_disposition": "final slot disposition pending"
+          "prior_disposition": "catalog_winner",
+          "catalog_locator": "catalogs/landscape/foundation.json#/layers/19/winners/1",
+          "overlap_disposition": "maps the GitHub CLI portion to candidate:cli-cli; source-review selection for GitHub operations, not generic git or proven PR lifecycle",
+          "catalog_locator_scope": "historical catalog verdict for the named component and job; new G5 acceptance pending",
+          "deciding_sources": [
+            "docs/github-automation.md"
+          ],
+          "catalog_component_id": "candidate:cli-cli"
         },
         "wiring": {
           "status": "record_existing_task_contract_only",
@@ -1937,13 +2012,15 @@
         "final_candidate": {
           "status": "PENDING_G5",
           "slot_id": "session-archive-observation",
-          "prior_disposition": "existing archive task contract; G5 pending",
-          "catalog_locator": "G5 final row pending",
-          "overlap_disposition": "final slot disposition pending",
+          "prior_disposition": "conditional",
+          "catalog_locator": "catalogs/landscape/foundation.json#/layers/15/alternatives/4",
+          "overlap_disposition": "conditional session archive observation; continuous ingestion and usage-pipeline substitution are unestablished",
           "deciding_sources": [
-            "docs/command-center.md:55",
-            "manifests/stack.json:68-92"
-          ]
+            "docs/dashboard-gap-resolution.md",
+            "docs/dashboard-rendered-acceptance.md",
+            "docs/token-native-saturation.md"
+          ],
+          "catalog_locator_scope": "historical catalog verdict for the named component and job; new G5 acceptance pending"
         },
         "wiring": {
           "status": "record_existing_task_contract_only",
@@ -1996,7 +2073,8 @@
       "per_tool_attribution": "unmeasured",
       "paired_task_acceptance": "not run",
       "role_mcp_off": "skip",
-      "source_id": "role-trial"
+      "source_id": "role-trial",
+      "role_mcp_off_source_id": "trial-release-A-control"
     },
     {
       "arm": "B-scout",
@@ -2012,7 +2090,8 @@
       "per_tool_attribution": "unmeasured",
       "paired_task_acceptance": "not run",
       "role_mcp_off": "skip",
-      "source_id": "role-trial"
+      "source_id": "role-trial",
+      "role_mcp_off_source_id": "trial-release-B-scout"
     },
     {
       "arm": "B-artifact",
@@ -2028,7 +2107,8 @@
       "per_tool_attribution": "unmeasured",
       "paired_task_acceptance": "not run",
       "role_mcp_off": "skip",
-      "source_id": "role-trial"
+      "source_id": "role-trial",
+      "role_mcp_off_source_id": "trial-release-B-artifact"
     },
     {
       "arm": "C-token-parity",
@@ -2044,7 +2124,8 @@
       "per_tool_attribution": "unmeasured",
       "paired_task_acceptance": "not run",
       "role_mcp_off": "skip",
-      "source_id": "role-trial"
+      "source_id": "role-trial",
+      "role_mcp_off_source_id": "trial-release-C-token-parity"
     }
   ],
   "qmd_pilot": {
@@ -2115,7 +2196,7 @@
   "corrections": [
     {
       "claim": "A stdio registration proves no native shared HTTP capability",
-      "correction": "Headroom0.40.0 exposes native HTTP; verify pinned CLI and session manager, then qualify isolation/accounting before adoption.",
+      "correction": "Headroom 0.40.0 exposes native HTTP; verify pinned CLI and session manager, then qualify isolation/accounting before adoption.",
       "source": "https://github.com/headroomlabs-ai/headroom/blob/855390d6110e0bbb199d9b97025baac16c2f5cf3/headroom/cli/mcp.py#L349"
     },
     {
@@ -2130,7 +2211,7 @@
     },
     {
       "claim": "Layer context determines a winning disposition",
-      "correction": "Use indexed verdict pointers: Context Mode measured_tradeoff, Headroom winner, CBM conditional, Hindsight unqualified. Semble/browser links are layer context only.",
+      "correction": "Use indexed verdict pointers: Context Mode and jCodeMunch measured_tradeoff, Headroom winner, CBM and agentsview conditional, Hindsight unqualified, GitHub CLI candidate:cli-cli winner. Semble/browser links are layer context only.",
       "source": "catalogs/landscape/foundation.json#/layers"
     },
     {
@@ -2142,6 +2223,11 @@
       "claim": "Secondary QMD table supplies numerical provenance here",
       "correction": "Optional figures omitted; native numerical evidence remains unmeasured until original hash-bound rows supplied.",
       "source": "docs/decisions/2026-10-08-qmd-shared-mcp.md:35-39,70-93"
+    },
+    {
+      "claim": "An ARTIFACT/REVIEW reader analogue covers all observed reader needs",
+      "correction": "EVALUATION is the narrowest existing set covering all nine observed reader servers. Conflicting live exclusions are routed to the CC; an intentional server exclusion needs its deciding file and decision.",
+      "source_id": "invoke-snapshot"
     }
   ],
   "completeness_critic": {
@@ -2157,7 +2243,8 @@
       "client field and per-role coverage gates retaining grafana/agentsview",
       "native plugin alias preserved; catalog verdict pointers and composed coordination",
       "tree/installed hcom pins and grafana connector pin",
-      "architecture locator restored; unbound QMD figures omitted"
+      "architecture locator restored; unbound QMD figures omitted",
+      "exec-reader covering contract and explicit CC conflict routing; all three previously missed catalog verdicts; hashed trial skip launch sources"
     ],
     "remaining": [
       "G5 final candidate/slot rows",
