@@ -47,6 +47,7 @@ class FleetReviewRegressionTests(unittest.TestCase):
     setUp = fixtures.FleetDataTests.setUp
     write_json = fixtures.FleetDataTests.write_json
     collect = fixtures.FleetDataTests.collect
+    producer_transport = staticmethod(fixtures.FleetDataTests.producer_transport)
     def test_regular_long_lane_names_survive_an_individually_invalid_row(self):
         names = ['risk-limits', 'desk-review', 'disk-pressure', 'us-equities-strategy-gate-review']
         self.direct['lanes_live'] = [{'lane': name, 'status': 'active'} for name in names]
@@ -294,7 +295,9 @@ class FleetReviewRegressionTests(unittest.TestCase):
         self.assertEqual(view['fleet_source'], 'direct native')
         self.assertEqual(sum(command[0] == 'gh' for command in self.runner.commands), 1)
 
+    @unittest.skipUnless(fixtures.SEALED_MEMFD_AVAILABLE, fixtures.SEALED_MEMFD_REASON)
     def test_actions_observation_completes_before_a_timed_out_producer(self):
+        self.producer_patch.stop()
         def transport(command, **kwargs):
             if command[0] == sys.executable:
                 self.assertTrue((self.cache / 'fleet-actions.json').exists(), 'Actions observation was deferred behind the producer.')
@@ -309,11 +312,12 @@ class FleetReviewRegressionTests(unittest.TestCase):
         self.assertEqual(producer['execution']['status'], 'timed out')
 
 
+@unittest.skipUnless(fixtures.SEALED_MEMFD_AVAILABLE, fixtures.SEALED_MEMFD_REASON)
 class FleetProducerReviewRegressionTests(unittest.TestCase):
     def test_actual_cwd_tokenize_shadow_does_not_execute_in_verified_child(self):
         import tempfile
         with tempfile.TemporaryDirectory() as temporary:
-            base = Path(temporary)
+            base = Path(temporary).resolve()
             source = base / 'approved' / 'fleet_block.py'
             source.parent.mkdir()
             (source.parent / 'sibling.py').write_text('VALUE = 17\n')
@@ -334,7 +338,7 @@ class FleetProducerReviewRegressionTests(unittest.TestCase):
     def test_producer_timeout_cleans_up_a_real_descendant_process_group(self):
         import tempfile
         with tempfile.TemporaryDirectory() as temporary:
-            base = Path(temporary)
+            base = Path(temporary).resolve()
             sentinel = base / 'descendant-pid'
             raw = (
                 'import subprocess, sys, time\n'

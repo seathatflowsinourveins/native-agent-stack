@@ -2632,6 +2632,11 @@ class FixwaveAcceptanceRepairs(unittest.TestCase):
     def test_hcom_start_capture_selects_one_native_base_name(self):
         # hcom@2c5f343: start.rs:843-848 deliberately repeats the marker;
         # tests/support/mod.rs:949-959 selects its first occurrence.
+        probe = subprocess.run(
+            ["bash", "-e", "-c", "[[ '' =~ ^[a-z0-9_]+$ && luna =~ ^[a-z0-9_]+$ ]]\nexit 0"],
+            capture_output=True, timeout=10)
+        if probe.returncode == 0:
+            self.skipTest("WSL Bash acceptance requires errexit on failed compound [[ ... ]] tests; macOS Bash 3.2 lacks it")
         command = self.row("agent-messaging")["acceptance"]["post_install"]["command"]
         begin = command.index('sender="$(')
         end = command.index('\n"${isolated[@]}" "$hcom_binary" send "@$recipient"')
@@ -2747,6 +2752,8 @@ class FixwaveAcceptanceRepairs(unittest.TestCase):
                     if report_case == "complete":
                         self.assertEqual(observed, [], "Invalid topology reached a provider scan")
 
+    @unittest.skipUnless(sys.platform.startswith("linux") and shutil.which("unshare"),
+                         "WSL conformance acceptance probes Linux user/PID namespaces through util-linux unshare")
     def test_conformance_release_cli_is_not_resolved_from_the_same_named_source_package(self):
         # npm@bfacd33 libnpmexec:49-60 can select an unbuilt same-name checkout.
         # Exercise the real row's working-directory transition with fixture CLIs.
@@ -2818,7 +2825,7 @@ failed=0
         cases = ("absent", "previous owner", "current owner", "foreign file", "foreign link", "dangling")
         for case in cases:
             with self.subTest(case=case), tempfile.TemporaryDirectory() as directory:
-                root = Path(directory)
+                root = Path(directory).resolve()
                 binary = root / "bin"
                 binary.mkdir()
                 tools = root / "uv-tools"
@@ -2922,6 +2929,8 @@ exec(sys.stdin.read())
             stderr = next((root / "state").rglob("claude.stderr")).read_text()
             return json.loads(stderr)
 
+    @unittest.skipIf(sys.platform == "darwin",
+                     "Frozen WSL DeerFlow launcher executes GNU timeout before its synthetic stream oracle")
     def test_deer_flow_synthetic_stream_oracle_and_cold_native_argv(self):
         import copy
         # Synthetic records of bytedance/deer-flow@345f08be00c8a9495079b732a39b46aa9af1584e:
@@ -3440,6 +3449,8 @@ exec(sys.stdin.read())
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertIn("Completed worker job: 55; positive model responses: 2", result.stdout)
 
+    @unittest.skipIf(sys.platform == "darwin",
+                     "Frozen WSL Claude command requires util-linux flock")
     def test_variadic_tool_values_do_not_consume_the_prompt(self):
         for slot in ("difftastic", "worktrunk"):
             with self.subTest(slot=slot):
@@ -3470,6 +3481,8 @@ exec(sys.stdin.read())
                         with self.assertRaises((AssertionError, subprocess.CalledProcessError)):
                             exec(compile(check, "<actual-alert-closed-port-predicate>", "exec"), {})
 
+    @unittest.skipIf(sys.platform == "darwin",
+                     "Frozen WSL Claude command requires util-linux flock")
     def test_fresh_sessions_use_bounded_native_cli_and_keep_context(self):
         for slot in ("difftastic", "worktrunk"):
             with self.subTest(slot=slot):
@@ -3901,7 +3914,7 @@ import json, os, stat, sys
 assert sys.argv[1:] == ['--yes', 'skills@1.7.0', 'list', '-g', '-a', 'claude-code', 'codex', '--json']
 assert stat.S_ISREG(os.fstat(1).st_mode), 'listing stdout must be a regular file'
 with open(os.environ['FIXTURE_TRACE'], 'a') as stream:
-    stream.write(json.dumps(['producer', os.readlink('/proc/self/fd/1')]) + '\\n')
+    stream.write(json.dumps(['producer', os.fstat(1).st_dev, os.fstat(1).st_ino]) + '\\n')
 case = os.environ['FIXTURE_CASE']
 agents = ['Claude Code', 'Codex']
 if case == 'missing_claude': agents.remove('Claude Code')
@@ -3917,7 +3930,7 @@ import json, os, stat, sys
 path = sys.argv[-1]
 assert stat.S_ISREG(os.stat(path).st_mode)
 with open(os.environ['FIXTURE_TRACE'], 'a') as stream:
-    stream.write(json.dumps(['reader', path]) + '\\n')
+    stream.write(json.dumps(['reader', path, os.stat(path).st_dev, os.stat(path).st_ino]) + '\\n')
 os.execv(os.environ['FIXTURE_JQ'], [os.environ['FIXTURE_JQ'], *sys.argv[1:]])
 """)
                 jq.chmod(0o755)
@@ -3928,11 +3941,12 @@ os.execv(os.environ['FIXTURE_JQ'], [os.environ['FIXTURE_JQ'], *sys.argv[1:]])
                     capture_output=True, text=True, timeout=20)
                 self.assertEqual(result.returncode == 0, case == "valid", result.stderr)
                 observations = [json.loads(s) for s in trace.read_text().splitlines()]
-                capture = observations[0][1]
-                readers = [item[1] for item in observations if item[0] == "reader" and item[1] != str(lock)]
-                self.assertTrue(all(path == capture for path in readers))
+                capture_identity = observations[0][1:]
+                readers = [item for item in observations if item[0] == "reader" and item[1] != str(lock)]
+                self.assertTrue(all(item[2:] == capture_identity for item in readers))
                 if case == "valid":
-                    self.assertEqual(readers, [capture, capture])
+                    self.assertEqual(len(readers), 2)
+                    self.assertEqual(readers[0][1], readers[1][1])
                 self.assertEqual(list(scratch.iterdir()), [])
 
     def test_agentsview_sync_wakes_idle_backend_and_health_remains_discriminating(self):
@@ -4197,6 +4211,8 @@ sys.exit(42 if fail else 0)
                                     capture_output=True, text=True, timeout=20)
             self.assertEqual(result.returncode, 42, result.stderr)
 
+    @unittest.skipIf(sys.platform == "darwin",
+                     "Frozen WSL srt client acceptance requires GNU realpath -e and util-linux flock")
     def test_srt_fixture_bindings_survive_an_empty_child_environment(self):
         import shlex
         with tempfile.TemporaryDirectory() as directory:
@@ -4234,6 +4250,8 @@ sys.exit(42 if fail else 0)
             self.assertEqual(child.returncode, 0, child.stderr)
             self.assertEqual(child.stdout.strip(), str(allowed))
 
+    @unittest.skipIf(sys.platform == "darwin",
+                     "Frozen WSL Linux AMD64 package migration requires GNU readlink -m ownership guards")
     def test_owned_old_agentsview_links_migrate_but_foreign_aliases_are_retained(self):
         # 2026-10-06 known-alias migration fixtures retain the superseded launcher versions.
         cases = (
@@ -4294,6 +4312,8 @@ sys.exit(42 if fail else 0)
                         self.assertEqual(target.read_text(), "retained fixture")
 
 
+    @unittest.skipUnless(sys.platform.startswith("linux"),
+                         "WSL Inspector probe needs Linux /proc/sys/net/ipv4/ip_local_port_range and util-linux setsid")
     def test_inspector_probe_rejects_env_drift_and_port_collision_and_cleans_up(self):
         for inherited, occupied in (("false", "none"), ("true", "none"), (None, "none"),
                                     ("false", "LISTEN"), ("false", "ESTAB"), ("false", "BOUND-INACTIVE")):

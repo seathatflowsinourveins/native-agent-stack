@@ -282,6 +282,8 @@ class Round2RepairIntegrationTests(unittest.TestCase):
                                       env={"PATH": os.environ["PATH"], "native_probe": scratch}, capture_output=True)
                 self.assertEqual(done.returncode, expected)
 
+    @unittest.skipIf(sys.platform == "darwin",
+                     "Frozen WSL review command requires GNU timeout --kill-after and util-linux flock")
     def test_cross_family_review_receives_the_bounded_diff_on_stdin(self):
         plan = json.loads((PLAN / "install-plan.json").read_text())
         row = next(r for r in plan["owners"] if r["slot"] == "cross-family-review")

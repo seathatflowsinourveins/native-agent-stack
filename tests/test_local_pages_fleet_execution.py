@@ -10,8 +10,10 @@ import unittest
 from unittest.mock import patch
 
 from tests import test_local_pages as composer_fixtures
+from tests.test_local_pages_fleet_data import SEALED_MEMFD_AVAILABLE, SEALED_MEMFD_REASON
 
 
+@unittest.skipUnless(SEALED_MEMFD_AVAILABLE, SEALED_MEMFD_REASON)
 class FleetExecutionTests(unittest.TestCase):
     def setUp(self):
         self.fixture = composer_fixtures.LocalPagesTests("test_full_documents_native_digest_and_local_resources")

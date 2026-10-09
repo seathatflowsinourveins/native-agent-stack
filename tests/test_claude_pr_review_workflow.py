@@ -733,6 +733,19 @@ class PullRequestReviewStepTests(unittest.TestCase):
         self.assertEqual(code, 0, console)
         self.assertIn("The report is 60001 bytes; the first 60,000 are shown.", summary)
 
+    def test_report_notice_normalizes_padded_wc_byte_count(self):
+        # BSD wc pads redirected byte counts; the notice must still contain an ordinary decimal number.
+        with tempfile.TemporaryDirectory() as temporary:
+            binary = Path(temporary) / "wc"
+            binary.write_text("#!/bin/sh\nprintf '    %s\\n' \"$(" +
+                              shlex.quote(shutil.which("wc")) + " \"$@\")\"\n", encoding="utf-8")
+            binary.chmod(0o755)
+            code, console, summary, *_ = run_step(
+                REPORT, env_changes={"PATH": temporary + os.pathsep + os.environ["PATH"]},
+                execution_file=execution(result="a" * 60001))
+        self.assertEqual(code, 0, console)
+        self.assertIn("The report is 60001 bytes; the first 60,000 are shown.", summary)
+
     def test_a_report_one_byte_under_the_cap_is_published_whole_without_a_notice(self):
         report = "a" * 59998 + "Z"
         code, console, summary, *_ = run_step(REPORT, execution_file=execution(result=report))
@@ -856,6 +869,10 @@ class Api:
 
 def run_api_step(script, api, values):
     """Run a step's shell against the stand-in gh. Returns (exit code, console, outputs, summary)."""
+    if subprocess.run(["bash", "-c", "shopt -s inherit_errexit"],
+                      stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=False).returncode:
+        raise unittest.SkipTest(
+            "Ubuntu resolve/recheck integration requires Bash inherit_errexit (4.4+); macOS system Bash 3.2 lacks it")
     with tempfile.TemporaryDirectory() as temporary:
         directory = Path(temporary)
         (directory / "fixtures.json").write_text(json.dumps(api.data), encoding="utf-8")

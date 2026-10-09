@@ -464,7 +464,7 @@ jobs:
               | [$returned[] | select(.agent == $agent)] | last | select(. != null)
               | "## \(.agent)\n\n\(.text)\n"] | join("\n")
           ' "$EXECUTION_FILE" > "$report"
-          size="$(wc -c < "$report")"
+          size="$(wc -c < "$report" | tr -d '[:space:]')"
           {
             echo "### Pull request toolkit read: #$PR_NUMBER at $HEAD_SHA"
             echo

@@ -874,6 +874,20 @@ class PullRequestToolkitStepTests(unittest.TestCase):
         self.assertEqual(code, 0, console)
         self.assertIn("The report is 60001 bytes; the first 60,000 are shown.", summary)
 
+    def test_report_notice_normalizes_padded_wc_byte_count(self):
+        # BSD wc pads redirected byte counts; the notice must still contain an ordinary decimal number.
+        overhead = len(published({AGENTS[0]: "", AGENTS[1]: "b"}).encode("utf-8"))
+        with tempfile.TemporaryDirectory() as temporary:
+            binary = Path(temporary) / "wc"
+            binary.write_text("#!/bin/sh\nprintf '    %s\\n' \"$(" +
+                              shlex.quote(shutil.which("wc")) + " \"$@\")\"\n", encoding="utf-8")
+            binary.chmod(0o755)
+            code, console, summary, *_ = run_step(
+                REPORT, env_changes={"PATH": temporary + os.pathsep + os.environ["PATH"]},
+                execution_file=execution(handbacks={AGENTS[0]: "a" * (60001 - overhead), AGENTS[1]: "b"}))
+        self.assertEqual(code, 0, console)
+        self.assertIn("The report is 60001 bytes; the first 60,000 are shown.", summary)
+
     def test_the_cap_never_splits_a_character_and_a_short_report_has_no_notice(self):
         handbacks = {AGENTS[0]: "ab" + "é" * 40000, AGENTS[1]: "b"}
         head = f"## {AGENTS[0]}\n\nab"

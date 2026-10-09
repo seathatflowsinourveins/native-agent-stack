@@ -23,8 +23,8 @@ class ReceiptTests(unittest.TestCase):
     def setUp(self):
         temporary = tempfile.TemporaryDirectory(prefix="north-star-receipts-")
         self.addCleanup(temporary.cleanup)
-        self.root = Path(temporary.name) / "repo"
-        self.state = Path(temporary.name) / "state"
+        self.root = Path(temporary.name).resolve() / "repo"
+        self.state = Path(temporary.name).resolve() / "state"
         self.root.mkdir()
         self.state.mkdir()
 
@@ -155,8 +155,8 @@ class ReadinessBuilderTests(unittest.TestCase):
     def setUp(self):
         temporary = tempfile.TemporaryDirectory(prefix="north-star-builder-")
         self.addCleanup(temporary.cleanup)
-        self.root = Path(temporary.name) / "repo"
-        self.state = Path(temporary.name) / "state"
+        self.root = Path(temporary.name).resolve() / "repo"
+        self.state = Path(temporary.name).resolve() / "state"
         self.root.mkdir()
         self.state.mkdir()
         self.spec_path = self.root / "tools/north-star/sources.json"
@@ -387,6 +387,51 @@ class ReadinessBuilderTests(unittest.TestCase):
         self.assertEqual("MATCH", item["receipt_binding"])
         self.assertEqual("native_proven", item["fields"]["evidence_class"]["value"])
         self.assertEqual({"state": "pending"}, item["fields"]["designated_reader"]["value"])
+
+    def test_sdk_receipt_through_state_symlink_preserves_its_binding(self):
+        alias = self.state.with_name("state-link")
+        alias.symlink_to(self.state, target_is_directory=True)
+        item = self.sdk_item()
+        item["receipt_path"] = str(alias / "sdk/item.json")
+        self.write_json("sdk/index.json", {"items": [item]}, state=True)
+
+        bound = self.build()["sdk_frameworks"]["items"][0]
+
+        self.assertEqual("MATCH", bound["receipt_binding"])
+        self.assertEqual("sdk/item.json", bound["item_receipt"]["path"])
+        self.assertEqual("native_proven", bound["fields"]["evidence_class"]["value"])
+
+    def test_raw_sdk_receipt_through_state_symlink_preserves_its_binding(self):
+        alias = self.state.with_name("state-link")
+        alias.symlink_to(self.state, target_is_directory=True)
+        raw = self.write_json("sdk/raw.json", {"id": "fixture-sdk"}, state=True)
+        self.sdk_item(receipt_changes={"raw_receipt": {
+            "path": str(alias / "sdk/raw.json"), "sha256": hashlib.sha256(raw).hexdigest(),
+        }})
+
+        bound = self.build()["sdk_frameworks"]["items"][0]
+
+        self.assertEqual("MATCH", bound["receipt_binding"])
+        self.assertEqual("MATCH", bound["raw_receipt_binding"])
+        self.assertEqual("sdk/raw.json", bound["raw_receipt"]["path"])
+
+    def test_sdk_symlinks_cannot_escape_the_state_root(self):
+        outside = self.root / "outside.json"
+        outside.write_text('{"id": "fixture-sdk"}\n', encoding="utf-8")
+        escaped = self.state / "escaped.json"
+        escaped.symlink_to(outside)
+        for raw_receipt in (False, True):
+            with self.subTest(raw_receipt=raw_receipt):
+                if raw_receipt:
+                    self.sdk_item(receipt_changes={"raw_receipt": {
+                        "path": str(escaped), "sha256": hashlib.sha256(outside.read_bytes()).hexdigest(),
+                    }})
+                else:
+                    item = self.sdk_item()
+                    item["receipt_path"] = str(escaped)
+                    self.write_json("sdk/index.json", {"items": [item]}, state=True)
+                with self.assertRaisesRegex(ValueError, "SDK receipt escapes state root"):
+                    self.build()
 
     def test_sdk_without_contract_does_not_carry_execution_claims(self):
         self.sdk_item()

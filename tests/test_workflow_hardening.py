@@ -2505,6 +2505,8 @@ class ChangedTestsStepRunTests(unittest.TestCase):
                                  "        self.assertTrue(True)\n",
         "tests/test_zz_fail.py": "import unittest\n\n\nclass T(unittest.TestCase):\n    def test_no(self):\n"
                                  "        self.assertTrue(False)\n",
+        "tests/test_zz_error.py": "import unittest\n\n\nclass T(unittest.TestCase):\n    def test_broken(self):\n"
+                                  "        raise RuntimeError('synthetic workflow error')\n",
         "tests/test_zz_skip.py": "import unittest\n\n\nclass T(unittest.TestCase):\n    @unittest.skip('probe')\n"
                                  "    def test_skipped(self):\n        pass\n",
         "tests/test_zz_empty.py": "import unittest\n",
@@ -2553,6 +2555,16 @@ class ChangedTestsStepRunTests(unittest.TestCase):
         code, output, summary, _ = self.run_step("tests.test_zz_pass tests.test_zz_fail")
         self.assertNotEqual(code, 0, output)
         self.assertIn("ran 2 tests from: tests.test_zz_pass tests.test_zz_fail", summary)
+
+    def test_both_macos_modes_report_failure_headers_and_preserve_exit_status(self):
+        job = jobs(ADOPTION_BOOTSTRAP.read_text(encoding="utf-8"))["validate-macos"]
+        for name in ("Run the full test suite (gating on macOS)", CHANGED_TESTS_STEP):
+            with self.subTest(step=name):
+                script = run_block(step_block(job, name))
+                code, output, _, _ = self.run_step("tests.test_zz_fail tests.test_zz_error", script=script)
+                self.assertEqual(code, 1, output)
+                self.assertIn("FAIL: test_no", output)
+                self.assertIn("ERROR: test_broken", output)
 
     def test_skipped_tests_are_counted_in_the_summary(self):
         code, output, summary, _ = self.run_step("tests.test_zz_pass tests.test_zz_skip")

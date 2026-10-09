@@ -543,7 +543,7 @@ jobs:
           ' "$EXECUTION_FILE" > "$report"
           stop="$(jq -r 'map(select(.type == "result")) | last | .subtype // "" | select(. == "error_max_budget_usd")' \
             "$EXECUTION_FILE")"
-          size="$(wc -c < "$report")"
+          size="$(wc -c < "$report" | tr -d '[:space:]')"
           {
             echo "### Pull request review: #$PR_NUMBER at $HEAD_SHA"
             echo

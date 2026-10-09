@@ -176,6 +176,7 @@ jobs:
             'blueprints/convergence-practice/document-ingestion/bootstrap.py'
             'blueprints/us-equities/data-lake/backfill.py'
             'tools/token-e2e/freeze_snapshot.py'
+            'tools/local-pages/fleet_data.py'
             'blueprints/us-equities/adaptive-paper/credential_guard.py'
             'scripts/kernel_keyring.py'
             'tools/sota-convergence/adjudicate.py'
@@ -1000,6 +1001,7 @@ jobs:
           code=$?
           set -e
           echo "Full python3 -m unittest exit code on macOS: $code"
+          grep -E '^(FAIL|ERROR):' full-suite-macos.log || true
           sed -n '/^Slowest test durations$/,/^Ran [0-9]/p' full-suite-macos.log
           tail -n 5 full-suite-macos.log
           exit "$code"
@@ -1042,6 +1044,7 @@ jobs:
           ran="$(sed -n 's/^Ran \([0-9][0-9]*\) tests\{0,1\} in .*/\1/p' full-suite-macos.log | tail -n 1)"
           skipped="$(sed -n -E 's/^(OK|FAILED) \(.*skipped=([0-9]+).*$/\2/p' full-suite-macos.log | tail -n 1)"
           echo "validate-macos changed-tests mode: ran ${ran:-0} tests from: $MODULES. Skipped: ${skipped:-0}. The full suite did not run; this is a scoped result, not a macOS full-suite pass." >> "$GITHUB_STEP_SUMMARY"
+          grep -E '^(FAIL|ERROR):' full-suite-macos.log || true
           tail -n 5 full-suite-macos.log
           # Aggregate zero-test guard: a selection that runs no test is untested, not passed. It also covers modules
           # that load test cases but run none, as when every class skips in setUpClass.
