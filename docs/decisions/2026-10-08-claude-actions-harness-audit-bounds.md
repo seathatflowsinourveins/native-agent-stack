@@ -99,7 +99,7 @@ keeps qualification. This pin's qualification is the fence receipt and the local
 | no code-running tool, no WebFetch, no settings file, file tools inside the working directories | `--restricted` | same `--help`: "removes the built-in tools that run commands or code ... and WebFetch unless --tools names them, and ignores user, project and local settings files (managed settings and --settings still apply; add --strict-mcp-config to skip MCP servers too). Also confines the file tools to the working directories (--add-dir included), refuses bypassPermissions" |
 | nothing waits for an answer | `--permission-prompts none` | same `--help`: "nobody: anything that would prompt is denied automatically"; changelog 2.1.259: "for unattended headless hosts" |
 | no MCP server | `--strict-mcp-config` | same `--help` |
-| hooks off; no read of any `.git` directory, `.env` or key file (Read and Grep into `.git`, and Read of `.env`, measured as refused; Glob's attribution pending, below) | `--settings` JSON (`disableAllHooks`, `permissions.deny`) | `--settings` still applies under `--restricted`; the action sets git authentication in the root checkout (`src/github/operations/git-config.ts`) |
+| hooks off; no read of any `.git` directory, `.env` or key file (Glob, Grep and Read measured as bound by the deny rules against a control run, below) | `--settings` JSON (`disableAllHooks`, `permissions.deny`) | `--settings` still applies under `--restricted`; the action sets git authentication in the root checkout (`src/github/operations/git-config.ts`) |
 | 20 turns | `--max-turns 20` | accepted by the 2.1.295 argument parser (`option '--max-turns <turns>'`); checked again after the run as distinct assistant message ids, because the result's `num_turns` counts transcript messages |
 | $3 per run | `--max-budget-usd 3` | same `--help`: "Maximum dollar amount to spend on API calls"; a client estimate, checked again from the run's own numbers |
 | no full model output in a public log | `show_full_output: 'false'`, `ACTIONS_STEP_DEBUG: 'false'` in the action step's environment, and a first guard step that refuses a run with runner debugging on | `showFullOutput = options.showFullOutput === "true" \|\| isDebugMode`, where `isDebugMode` is `ACTIONS_STEP_DEBUG === "true"` (`base-action/src/parse-sdk-options.ts` at the pin) |
@@ -147,16 +147,22 @@ root `CLAUDE.md`, outside that pattern and planted in two of the three runs, the
 instruction did not take effect, not whether the file was loaded; and the 2.1.295 `--help` text for `--restricted`
 names settings files, not instruction files.
 
-Whether the `.git` deny rules also bind Glob and Grep has a measured partial answer. A local subscription probe ran
-on 2026-10-09 with Claude Code 2.1.295 and Haiku 5.5, using this workflow's fence flags and its `--settings` JSON
-verbatim, in a scratch git repository. In it:
+The `.git` and `.env` deny rules bind Glob and Grep as well as Read, measured on 2026-10-09 by two local
+subscription runs of Claude Code 2.1.295 on Haiku 5.5 with this workflow's fence flags, in a scratch git repository
+holding marker strings in `.git`, a nested repository's `.git` and `.env`. The probe run used this workflow's
+`--settings` JSON verbatim; the control run used the same flags with the deny rules removed (hooks off and
+`blockReadsOutsideWorkingDirectories` kept). Step by step, probe against control:
 
-- Grep with a path inside `.git` (or a nested `.git`) was refused as a permission denial.
-- Read of a file inside `.git`, and of `.env`, was refused.
-- Glob of `.git/**`, Glob of `**/PROBE_MARKER`, and Grep over `.` returned nothing.
+| Call | With the deny rules | Without them |
+| --- | --- | --- |
+| Glob `.git/**` | no files found | lists the files under `.git` |
+| Glob `**/PROBE_MARKER` | no files found | finds `.git/PROBE_MARKER` and `sub/.git/PROBE_MARKER` |
+| Grep over `.` | no matches | returns the `.env` marker (it skips `.git` either way) |
+| Grep in `.git`, and in `sub/.git` | refused: permission denied | returns each marker |
+| Read `.git/PROBE_MARKER`, and `.env` | refused: denied by the permission settings | returns each marker |
 
-Whether the deny rules or the tools' default skipping of hidden paths caused those empty results is pending a control
-run without the deny rules. Its probe and stream stay outside the repository.
+So the empty Glob and Grep results come from the deny rules, not from the tools skipping hidden paths. That is one
+model and one prompt per arm; the runs' streams stay outside the repository.
 
 Whether `blockReadsOutsideWorkingDirectories` also binds Glob and Grep is not established: no runtime test exists,
 and the receipt's runs did not set it. For both questions the documentation says more than the runs show: the
@@ -280,8 +286,8 @@ longer skip without PyYAML: they read the workflow with the policy test's own lo
 checked at runtime lists every way it differs from this workflow's `claude_args`), not for this workflow's flags, and
 not through the action or on a GitHub runner. `local_static_analysis`: actionlint 1.17.0 and zizmor 1.30.1
 (offline, regular and pedantic), no findings. `local_integration`: the unit tests named above, PyYAML 6.0.3 on Python 3.12, and the
-2026-10-09 local probe of the `.git` deny rules (one subscription run on the installed client with this workflow's
-fence flags and `--settings`; its stream stays outside the repository). `documented_api_check`: the `gh api` reads
+2026-10-09 local probe of the `.git` and `.env` deny rules and its control without them (two subscription runs on
+the installed client with this workflow's fence flags; their streams stay outside the repository). `documented_api_check`: the `gh api` reads
 named above. No hosted run of this workflow is part of this record.
 
 ## SOTA sources
