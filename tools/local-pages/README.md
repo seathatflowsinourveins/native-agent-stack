@@ -1,7 +1,7 @@
 # Local engineering pages
 
 `build_pages.py` presents the CC current view, native readiness receipts,
-gap board, roadmap, fleet and sources as six complete local HTML documents. It uses the existing
+gap board, roadmap, fleet, architecture and sources as seven complete local HTML documents. It uses the existing
 `tools/north-star/build_readiness.py` functions `build`, `render` and
 `render_fragment`; it adds presentation and refresh custody without deciding
 gate acceptance. The initial reference is repository commit
@@ -115,13 +115,55 @@ labelled estimates. Recorded actual spend uses the native producer's
 
 `adoption_view.py` reads the CC-owned
 `coordination/command-center/pages/adoption-now.json` (`adoption-now/1`).
-Readiness shows layer/server activity and Fleet exposes all published role
-labels in collapsible tables. The co-op alone runs its hourly collector;
+Readiness shows layer/server activity. Fleet groups Codex instances into lane
+roles using dated launch windows from the co-op registry, with the instance
+mapping collapsed by default. Ambiguous labels remain unattributed and the
+published call/population totals are conserved. Claude and Codex orchestration
+and measured `sdk:` rows retain their source values; absent SDK measurements
+remain unreported. The co-op alone runs its hourly collector;
 page refreshes make no Loki query or collector invocation. Exact server
 aliases follow the producer's memberships and each raw server row counts
 once. Sparse maps show zero recorded calls, while unknown values stay
 unreported. Counts describe the stated retrospective window and do not prove
 adoption acceptance, fresh-session use or workflow improvement.
+
+`architecture_builder.py` generates `architecture.html` from the canonical
+catalogs named by `catalogs/landscape/manifest.json`, the current retained G5
+asset, exact source metadata inventories and the hashed hourly Adoption
+snapshot. Full mode requires one section per canonical layer; `--first-layer`
+supports an early source-complete preview without changing the canonical
+count. Selected choices, winners, alternatives, rejection reasons and pins
+remain dated source records. Grand candidates stay pending G5 while the CC
+gate is not MET. The four program stages come from `cc-now.json`; missing
+per-tool stage data is unreported. Readiness labels dated selections as catalog
+pins and shows observed host-version differences with their source time.
+
+Inventory rows come from the named skills/agents/runtime/workflow/unit roots
+and recorded upstream manifests. File/hash equality is metadata provenance,
+not client wiring or fresh-session acceptance. Only explicit layer IDs and
+exact repository identity map records; the remaining items are listed as
+unmapped. Credential stores, env files, client-secret configurations and
+actual cron contents are excluded from the inventory reader.
+
+Each component row includes recorded role calls/populations from the newest
+hash-verified snapshot and source-bound upstream E2E receipt metadata. Unknown
+measurements say `unmeasured`; missing full proof says `no upstream E2E evidence`.
+The header's joint count requires positive observed use and verified E2E for
+the same component. Install metadata, source review and documented harness
+instructions alone cannot produce a completed E2E claim.
+
+The existing refresh service rebuilds Architecture on a changed hourly
+snapshot or relevant source/code metadata, and otherwise uses its nonserved
+receipt/cache. Source hashes, installed frontend-design path/pin/hash, builder
+and helper hashes, canonical/rendered counts and mapping coverage remain in
+the Architecture receipt outside the serving root. The G5 archive is read
+through the installed zstd stream without extraction; unrelated raw members
+are not consumed as content.
+
+```sh
+nice -n 10 ionice -c2 -n7 timeout 600 python3 tools/local-pages/architecture_builder.py \
+  --root /path/to/native-source-checkout --state-root /path/to/native-state
+```
 
 `--current-source` selects the exact approved read-only `cc-now/1` JSON path,
 currently only `state-root/coordination/command-center/pages/cc-now.json`.

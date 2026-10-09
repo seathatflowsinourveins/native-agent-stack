@@ -64,6 +64,30 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 html { scroll-padding-top: 1.5rem; }
+/* Architecture is a source ledger: layers stay in source order and details
+   preserve the full alternatives/inventory without duplicating status facts. */
+.architecture-summary { padding-block: .8rem; border-block: 1px solid var(--rule); margin-block: 1rem; }
+.architecture-index ul { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); gap: .45rem 1rem; list-style: none; padding: 0; }
+.architecture-index li { margin: 0; }
+.architecture-layer { margin-top: 2rem; padding-top: 1.25rem; border-top: 3px solid var(--rule); min-width: 0; scroll-margin-top: 1.5rem; }
+.architecture-layer-id { color: var(--muted); font-size: .875rem; }
+.architecture-observation, .architecture-layer .source-note, #architecture-custody { overflow-wrap: anywhere; }
+.architecture-choice { margin-block: 1rem; }
+.architecture-choice > div { display: grid; grid-template-columns: minmax(8rem, .2fr) minmax(0, 1fr); gap: .4rem 1rem; border-top: 1px solid var(--rule); padding-block: .55rem; }
+.architecture-choice dt { color: var(--muted); }
+.architecture-choice dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.architecture-layer details, #architecture-custody { margin-block: 1rem; }
+.architecture-layer summary, #architecture-custody summary { cursor: pointer; padding-block: .4rem; }
+.architecture-layer summary:hover, #architecture-custody summary:hover { color: var(--link); }
+.architecture-layer summary:focus-visible, #architecture-custody summary:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+.architecture-table { margin-block: .75rem; }
+.architecture-table table { font-size: .875rem; }
+.architecture-table th, .architecture-table td { overflow-wrap: anywhere; max-width: 48ch; }
+.architecture-quality { max-height: 24rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+.architecture-stages { max-width: 80ch; }
+.g5-boundary { border-left: 3px solid var(--warn); padding-left: .8rem; }
+#architecture-unmapped { margin-top: 2rem; min-width: 0; }
+@media (max-width: 40rem) { .architecture-choice > div { grid-template-columns: 1fr; } }
 body {
   margin: 0;
   background: var(--canvas);

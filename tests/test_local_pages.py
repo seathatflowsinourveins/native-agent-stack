@@ -508,6 +508,23 @@ class LocalPagesTests(unittest.TestCase):
         self.assertEqual(self.adoption_path.read_bytes(), source_bytes)
         self.assertEqual(receipt["adoption"]["sha256"], hashlib.sha256(source_bytes).hexdigest())
 
+    def test_native_orchestration_keeps_owner_role_and_unattributed_counts(self) -> None:
+        projection = {"document": self.adoption, "window": {}, "sources": [], "source_errors": [], "instances": {"role_map": {"fixture-instance": None}}, "orchestration": {"claude_by_role": {"native-agent-stack-1a": {"Agent": 1}}, "codex_by_role": {}, "codex_unattributed": {"spawn_agent": 2}}, "sdk": {"status": "UNREPORTED"}}
+        role_module = type("RoleProjection", (), {"project": staticmethod(lambda *unused: projection)})
+        original = BUILDER.load_local
+        def local(name):
+            return role_module if name == "adoption_roles" else original(name)
+        registry = self.state / "coordination/ns2604-coop/lanes/hcom-lanes.json"
+        self.write_json(registry, {})
+        with patch.object(BUILDER, "load_local", side_effect=local):
+            self.refresh()
+        text = (self.output / "fleet.html").read_text()
+        self.assertIn("owner session (reports to CC)", text)
+        self.assertNotIn("native-agent-stack-1a", text)
+        self.assertIn("unattributed instances", text)
+        self.assertIn("spawn_agent", text)
+        self.assertIn("SDK client observations", text)
+
     def test_cc_current_schema_failure_preserves_last_successful_render(self) -> None:
         self.refresh()
         old = self.generated_bytes()

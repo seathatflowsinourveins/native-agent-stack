@@ -37,7 +37,7 @@ ROAD_REFERENCE_FILES = {
     "css_from": ("coordination/command-center/cc-tools/invoke-evidence/build_page.py",),
 }
 _SANITIZER = None
-PAGES = {"index": "Home", "readiness": "Readiness", "gaps": "Gap board", "roadmap": "Roadmap", "fleet": "Fleet", "sources": "Sources"}
+PAGES = {"index": "Home", "readiness": "Readiness", "gaps": "Gap board", "roadmap": "Roadmap", "fleet": "Fleet", "architecture": "Architecture", "sources": "Sources"}
 
 
 def utc_now() -> str:
@@ -144,7 +144,8 @@ def document(page: str, title: str, lede: str, scope: str, body: str,
              refreshed: str, manifest_sha: str, source_notes: list[str], leading: str | None = None) -> bytes:
     nav = "".join(f'<a href="{name}.html"' + (' aria-current="page"' if name == page else '') + f'>{text}</a>' for name, text in PAGES.items())
     heading = leading if leading is not None else f'<header class="page-header"><h1>{esc(title)}</h1><p class="lede">{esc(lede)}</p></header>'
-    return f'''<!doctype html>
+    source_link = "#architecture-custody" if page == "architecture" else f"sources.html#{page}"
+    return sanitizer().sanitize(f'''<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -169,7 +170,7 @@ def document(page: str, title: str, lede: str, scope: str, body: str,
   {heading}
   {body}
 </main>
-<footer class="site-footer"><p><a href="sources.html#{page}">Sources and dates for this page</a></p>
+<footer class="site-footer"><p><a href="{source_link}">Sources and dates for this page</a></p>
   <div class="snapshot-note"><p><strong>Source as of:</strong> {esc(scope)}</p>
     <p><strong>Page refreshed:</strong> <time datetime="{esc(refreshed)}">{esc(refreshed)}</time></p>
     <p><strong>Native readiness manifest SHA-256:</strong> <code>{manifest_sha}</code></p>
@@ -236,7 +237,7 @@ def roadmap_body(status: dict[str, Any]) -> str:
 <section class="panel"><div class="section-header"><h2>Recorded finalization sequence</h2></div><ol class="source-sequence">{sequence}</ol></section>'''
 
 
-def readiness_body(native: Any, manifest: dict[str, Any], current: dict[str, Any], view: Any, *, source_dates: dict | None = None) -> str:
+def readiness_body(native: Any, manifest: dict[str, Any], current: dict[str, Any], view: Any, fleet: dict[str, Any] | None = None, *, source_dates: dict | None = None) -> str:
     cards = []
     for row in manifest["gates"]:
         state = fact(row["fields"].get("state"))
@@ -250,10 +251,23 @@ def readiness_body(native: Any, manifest: dict[str, Any], current: dict[str, Any
         cards.append(f'<article class="gate-card" data-manifest-gate="{esc(row["id"])}"><h3>{esc(row["id"])}</h3><p class="gate-state">{esc(state)}</p>{superseded}<p>Operational owner: {esc(fact(row["fields"].get("owner")))}</p></article>')
     gates = "".join(cards)
     fragment = native.render_fragment(source_templates(manifest))
+    fragment = fragment.replace("Selected tool / pin", "Selected tool / catalog pin")
     fragment = fragment.replace('<table>', '<div class="table-wrap"><table>').replace('</table>', '</table></div>')
     summary = manifest["summary"]
     counts = "".join(f'<p><strong>{int(summary[key])}</strong> {title}</p>' for key, title in (("recorded_claims", "recorded claims"), ("unverified_claims", "unverified claims"), ("unverified_sources", "unverified sources")))
-    return f'<div class="metric-grid" aria-label="Native manifest counts">{counts}</div><div class="readiness-content"><div class="wrap"><aside class="gates"><div class="section-header"><h2>Gate receipts</h2></div><div class="gate-grid">{gates}</div></aside><div class="panel">{fragment}</div></div></div>'
+    running = sorted({row.get("cli_version") for row in (fleet or {}).get("lanes_live", []) if row.get("cli_version")})
+    currency = []
+    for row in manifest.get("layers", []):
+        for tool in row.get("selected_tools", []):
+            if isinstance(tool, dict) and "codex" in str(tool.get("id", "")).casefold():
+                pin_value = fact(tool.get("fields", {}).get("pin"))
+                versions = set(re.findall(r"(?<![\w.])\d+\.\d+\.\d+(?![\w.])", pin_value))
+                if running and versions and versions != set(running):
+                    currency.append('<li>' + esc(row["id"] + ' / ' + str(tool["id"])) + ': catalog pin ' + esc(pin_value) + '; running CLI ' + esc(', '.join(running)) + ' — currency item</li>')
+    drift = '<p class="currency-item">Catalog pins are dated records. Observed running Codex CLI versions: ' + esc(', '.join(running) or "UNREPORTED") + '.</p>'
+    if currency:
+        drift += '<ul class="currency-items">' + ''.join(currency) + '</ul>'
+    return drift + f'<div class="metric-grid" aria-label="Native manifest counts">{counts}</div><div class="readiness-content"><div class="wrap"><aside class="gates"><div class="section-header"><h2>Gate receipts</h2></div><div class="gate-grid">{gates}</div></aside><div class="panel">{fragment}</div></div></div>'
 
 
 def load_native(root: Path) -> tuple[Any, dict[str, Any]]:
@@ -408,6 +422,9 @@ def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
         adoption_input["reason"] = "published Adoption snapshot is unavailable or malformed (" + type(error).__name__ + ")"
         inputs["adoption"] = adoption_input
         adoption = {"schema": "adoption-now/1", "status": "UNREPORTED", "reason": adoption_input["reason"], "generated_utc": None, "window_hours": None, "layers": None, "claude_by_role": None, "codex_by_lane": None, "claude_total_sessions": None, "codex_total_conversations": None}
+    role_projection = None
+    if adoption.get("status") != "UNREPORTED" and (Path(__file__).resolve().parent / "adoption_roles.py").exists() and (state_root / "coordination/ns2604-coop/lanes/hcom-lanes.json").exists():
+        role_projection = load_local("adoption_roles").project(adoption, state_root)
     gaps, roadmap, road_links = (strict_json(item["raw"]) for item in (gap_input, road_input, road_index))
     if any(not isinstance(item, dict) for item in (gaps, roadmap, road_links)):
         raise ValueError("CC page source must be a JSON object")
@@ -467,20 +484,37 @@ def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
         adoption_note = '<code>' + esc(label_path(adoption_input["path"], root, state_root)) + '</code> — UNKNOWN: ' + esc(adoption["reason"])
     current_notes.append(adoption_note)
     fleet_notes.append(adoption_note)
+    if role_projection:
+        fleet_notes.extend('<code>' + esc(item.get("path", "UNREPORTED")) + '</code> — registry metadata SHA-256 <code>' + esc(item.get("sha256", "UNREPORTED")) + '</code>' for item in role_projection.get("sources", []) if isinstance(item, dict))
     source_groups = {"index": current_notes, "readiness": current_notes + readiness_notes, "gaps": gap_notes, "roadmap": road_notes, "fleet": fleet_notes}
     source_body = "".join(f'<section id="{key}" class="panel"><h2>{esc(PAGES[key])}</h2><ul class="source-list">' + "".join(f'<li>{note}</li>' for note in notes) + '</ul></section>' for key, notes in source_groups.items())
     custody_rows = "".join(f'<tr><td><code>{esc(label_path(item["path"], root, state_root))}</code></td><td><code>{esc(item.get("sha256") or item.get("status", "UNVERIFIED"))}</code></td></tr>' for item in inputs.values())
     source_body += f'<section id="sources" class="panel"><h2>Input identity</h2><div class="table-wrap"><table><thead><tr><th>Source</th><th>SHA-256 or status</th></tr></thead><tbody>{custody_rows}</tbody></table></div></section>'
     index_leading = f'<header class="page-header"><h1>North-star readiness and next steps</h1><p class="current-stamp">Current view snapshot: {view.observation_time(current["updated_utc"])}</p><p>{esc(current["headline"])}</p><p class="now-score"><strong>{current["readiness"]["start_gates_met"]} of {current["readiness"]["start_gates_total"]} START gates met</strong></p></header>' + view.gate_strip(current)
     native_dates = {(sanitizer().sanitize(raw_manifest["receipts"][name.removeprefix("readiness:")]["root"]), sanitizer().sanitize(raw_manifest["receipts"][name.removeprefix("readiness:")]["path"])): item.get("source_dates", {}) for name, item in inputs.items() if name.startswith("readiness:")}
-    manifest_body = adoption_view.summary(adoption) + f'<section class="manifest-section" aria-labelledby="manifest-title"><h2 id="manifest-title" class="manifest-title">repository manifest at <code>{manifest_sha}</code>, dated receipts</h2><p><a href="sources.html#readiness">Source dates and retained receipt identities</a></p>' + readiness_body(native, manifest, current, view, source_dates=native_dates) + '</section>'
+    role_body = adoption_view.roles(role_projection["document"] if role_projection else adoption)
+    if role_projection:
+        role_body = role_body.replace('published labels', 'role rows').replace('by published label', 'by attributed role')
+        extras = []
+        for client, field in (("Claude", "claude_by_role"), ("Codex", "codex_by_role")):
+            observations = dict(role_projection.get("orchestration", {}).get(field) or {})
+            if client == "Codex" and role_projection.get("orchestration", {}).get("codex_unattributed"):
+                observations["unattributed instances"] = role_projection["orchestration"]["codex_unattributed"]
+            table_rows = "".join('<tr><th scope="row">' + esc("owner session (reports to CC)" if role == "native-agent-stack-1a" else role) + '</th><td>' + esc(display(counts)) + '</td></tr>' for role, counts in observations.items())
+            extras.append(f'<div class="table-wrap" tabindex="0" role="region" aria-label="{client} orchestration by role"><table><caption>{client} orchestration by role</caption><thead><tr><th>Role</th><th>Recorded native tool calls</th></tr></thead><tbody>{table_rows}</tbody></table></div>')
+        instance_rows = "".join('<tr><th scope="row">' + esc(name) + '</th><td>' + esc(role or "unattributed") + '</td></tr>' for name, role in (role_projection.get("instances", {}).get("role_map") or {}).items())
+        extras.append('<details><summary>Instance names and source attribution</summary><div class="table-wrap" tabindex="0" role="region" aria-label="Instance attribution"><table><thead><tr><th>Instance</th><th>Launch-window role</th></tr></thead><tbody>' + instance_rows + '</tbody></table></div></details>')
+        sdk_projection = role_projection.get("sdk") or {}
+        extras.append('<h3>SDK client observations</h3><p>' + esc(display(sdk_projection)) + '</p>')
+        role_body += '<section id="adoption-native-tools"><h2>Native orchestration and SDK use</h2>' + ''.join(extras) + '<p>Unattributed instances remain unassigned; an absent producer measurement is unmeasured.</p></section>'
+    manifest_body = adoption_view.summary(adoption) + f'<section class="manifest-section" aria-labelledby="manifest-title"><h2 id="manifest-title" class="manifest-title">repository manifest at <code>{manifest_sha}</code>, dated receipts</h2><p><a href="sources.html#readiness">Source dates and retained receipt identities</a></p>' + readiness_body(native, manifest, current, view, fleet, source_dates=native_dates) + '</section>'
     common = (refreshed, manifest_sha)
     outputs = {
         "index.html": document("index", "North-star readiness and next steps", "", current_scope, overview, *common, [], leading=index_leading),
         "readiness.html": document("readiness", "North-star readiness: what is done, what is left, what needs a decision", "", current_scope, manifest_body, *common, [], leading=view.render(current, workstation, validated=True, readings_normalized=True)),
         "gaps.html": document("gaps", "Grand Gap Board", "Find the open gaps, who owns them and what happens next.", gap_scope, gap_body(rows(gaps, "gaps", ("id", "group", "sev", "title"))), *common, []),
         "roadmap.html": document("roadmap", "Roadmap", "Read the dated milestones and server records.", road_scope, roadmap_body(roadmap), *common, []),
-        "fleet.html": document("fleet", "Worker fleet", "", 'Native fleet as of ' + str(fleet.get("at") or "not reported"), adoption_view.roles(adoption), *common, [], leading=fleet_view.render(fleet)),
+        "fleet.html": document("fleet", "Worker fleet", "", 'Native fleet as of ' + str(fleet.get("at") or "not reported"), role_body, *common, [], leading=fleet_view.render(fleet)),
         "sources.html": document("sources", "Sources and dates", "Check the dates and identities behind each page.", 'Current view and dated repository receipts remain distinct.', source_body, *common, []),
     }
     for name in ("site.css", "site.js"):
@@ -501,11 +535,16 @@ def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
                     "workstation": workstation,
                     "fleet": fleet,
                      "adoption": {"schema": adoption["schema"], "generated_utc": adoption["generated_utc"], "window_hours": adoption["window_hours"], "sha256": adoption_input["sha256"], "status": adoption.get("status", "RECORDED"), "reason": adoption.get("reason")},
+                    "adoption_role_attribution": {"window": role_projection.get("window"), "sources": role_projection.get("sources"), "source_errors": role_projection.get("source_errors"), "instances": role_projection.get("instances"), "sdk": role_projection.get("sdk")} if role_projection else {"status": "registry unavailable; attribution unreported"},
                    "source_scope": {"readiness": "Per-source retained dates; no combined snapshot timestamp", "gaps": gap_scope, "roadmap": road_scope},
                    "inputs": {key: {field: value for field, value in item.items() if field != "raw"} for key, item in inputs.items()},
                    "outputs": {key: {"sha256": hashlib.sha256(value).hexdigest(), "bytes": len(value)} for key, value in outputs.items()},
                    "content_omissions": [{"source": "roadmap-status.json#/owner", "reason": "attributed_direction"}, {"source": "roadmap-status.json#/rules", "reason": "attributed_direction"}, {"source": "roadmap-status.json narrative/glance fields", "reason": "unexpanded_snapshot_templates"}, {"source": "CC original HTML fragments", "reason": "native_source_view_used_without_external_assets_or_attributed_direction"}],
                    "limitations": ["Per-file atomic replacement after all source reads and rendering succeed.", "Receipt identity and page refresh confer no new acceptance, execution, closure or landing.", "Readiness facts and manifest digest come from the native builder; this composer does not adjudicate gates."]}
+    architecture_path = Path(__file__).resolve().parent / "architecture_builder.py"
+    if architecture_path.exists() and (state_root / "coordination/ns2604-coop/notes/adoption-evidence-20261008").exists():
+        architecture_receipt = receipt.parent / "architecture/architecture-receipt.json"
+        receipt_doc["architecture"] = load_local("architecture_builder").refresh_if_changed(root, state_root, output_dir, architecture_receipt)
     publish(output_dir, receipt, outputs, receipt_doc)
     return receipt_doc
 
