@@ -1,0 +1,17 @@
+# DRAFT ONLY. Not installed, enabled or executed.
+# akitaonrails/ai-memory 89bd8ded3c1ab8b769cf99417d038ed0364403c8; native CLI forget-sweep --help
+# systemd 259.5 systemd.service(5), systemd.unit(5), systemd.exec(5).
+[Unit]
+Description=Weekly ai-memory retention preview (draft)
+ConditionPathExists=%h/.config/native-stack/memory-maintenance.approved
+
+[Service]
+Type=oneshot
+EnvironmentFile=-%h/.config/ai-memory/env
+Environment=PATH=%h/.local/share/codex-ecosystem/bin:%h/.local/share/mise/shims:%h/.local/bin:/usr/bin:/bin
+ExecStart=/usr/bin/env ai-memory --data-dir %h/.local/share/ai-memory --config %h/.config/ai-memory/config.toml forget-sweep --workspace default --project seathatflowsinourveins-native-agent-stack --dry-run
+TimeoutStartSec=600
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+NoNewPrivileges=true
