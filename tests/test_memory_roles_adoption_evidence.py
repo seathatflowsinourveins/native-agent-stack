@@ -8,9 +8,13 @@ establish record consistency, never truth or upstream memory acceptance.
 import copy
 import hashlib
 import json
+import os
 from pathlib import Path
 import re
 import shlex
+import subprocess
+import tempfile
+import textwrap
 import unittest
 
 
@@ -33,7 +37,7 @@ HASHES = {
     "ROLE-MCP-TRIAL-REPORT-20261009.md":
         "f0afc2c734b3ad1b70e68cd38d3c844c7f4b1338cc030c8fc40fc88db1e53989",
     "registry-role-identities.json":
-        "03abf51ca7477c6b40c03e5f60a64177730fc838495b9bc174062555fc7f8cf6",
+        "fc6f5dd30aa8dfa78932f1cb81b11abea311beca3d306927e21cb75f54ec765e",
 }
 NAMESPACES = {
     "ai-memory", "hindsight", "context-mode", "plugin_context-mode_context-mode",
@@ -41,6 +45,11 @@ NAMESPACES = {
 }
 WINDOWS = {"baseline", "reconciled"}
 REGISTRY = SOURCE / "registry-role-identities.json"
+HINDSIGHT_PIN = "5fc4ce20917b916240cef27c212c387a177f115b"
+HINDSIGHT_SKILL_SHA256 = "736dec06d414798f6b17dc078c5ef6204e8802f53cb3a5fb3c306ce08872f08e"
+HINDSIGHT_BINARY_SHA256 = "be87c63714ff046ac8ed668465ca0c875f94e6ff0a89ed83da7eb387313197af"
+TRADING_REPOSITORY = "seathatflowsinourveins/us-equities-trading"
+NATIVE_REPOSITORY = "seathatflowsinourveins/native-agent-stack"
 LANE_DOCUMENTS = (
     ROOT / "docs/decisions/2026-10-07-foundation-finalization.md",
     SOURCE / "README.md",
@@ -84,6 +93,67 @@ def pointer_value(document, pointer):
         key = part.replace("~1", "/").replace("~0", "~")
         value = value[int(key)] if isinstance(value, list) else value[key]
     return value
+
+
+def bash_blocks(text):
+    """Read actual Markdown Bash fences, including indented tilde fences."""
+    pattern = r"^[ \t]*(?P<fence>```|~~~)bash[ \t]*\n(?P<body>.*?)^[ \t]*(?P=fence)[ \t]*$"
+    return [textwrap.dedent(match["body"]).strip() for match in
+            re.finditer(pattern, text, re.MULTILINE | re.DOTALL)]
+
+
+def run_cli_guard_fixture(packet, case):
+    """Adapt the reader's pinned reproducer to current fenced commands.
+
+    Source: reproduce_wire_guards.py, SHA256 43e9adfe8f7477af078543bbef62aa9f170594897a07fd9ade9eba8cbdae1da8.
+    Only destination prefixes and curl are substituted. The published guard,
+    checksum, interpreter and binary command ordering remains intact. No
+    network or vendor code is executed; HOME itself is never overridden.
+    """
+    block = next(block for block in bash_blocks(packet)
+                 if "HINDSIGHT_CLI_VERSION=0.10.2" in block)
+    with tempfile.TemporaryDirectory(prefix="memory835-wire-guard-") as directory:
+        fixture = Path(directory)
+        stage = fixture / "stage"
+        cli_root = fixture / "cli"
+        binary = cli_root / "bin/hindsight"
+        marker = fixture / "curl-called"
+        downloaded = fixture / "fixture-installer"
+        downloaded.write_text(
+            "printf 'UNVERIFIED_INSTALLER_EXECUTED\\n'\n"
+            'mkdir -p "$HINDSIGHT_INSTALL_DIR"\n'
+            "printf '#!/bin/sh\\necho FIXTURE_BINARY_EXECUTED\\n' "
+            '> "$HINDSIGHT_INSTALL_DIR/hindsight"\n'
+            'chmod +x "$HINDSIGHT_INSTALL_DIR/hindsight"\n'
+        )
+        block = block.replace(
+            "$HOME/.local/state/native-agent-stack/coordination/ns2604-coop/"
+            "memory-roles-835-fix2-20261009/cli-review", str(stage))
+        block = block.replace("$HOME/.local/opt/hindsight-cli/0.10.2", str(cli_root))
+        # CI runs the portable committed packet; private host files are not inputs.
+        if "$HOME/.local/" in block:
+            raise ValueError("unmapped host destination in offline fixture")
+        prefix = ("curl() { printf 'called\\n' > " + shlex.quote(str(marker)) + "; "
+                  "cp -- " + shlex.quote(str(downloaded)) + ' "${@: -1}"; }\n')
+        original = b"PREEXISTING_CLI\x00preserved\n"
+        if case == "failed-download":
+            prefix = "curl() { return 22; }\n"
+        elif case == "preexisting-binary":
+            binary.parent.mkdir(parents=True)
+            binary.write_bytes(original)
+        elif case != "incorrect-installer-hash":
+            raise ValueError(case)
+        result = subprocess.run(["bash", "--noprofile", "--norc", "-c", prefix + block],
+                                capture_output=True, text=True, timeout=20,
+                                cwd=fixture, env=os.environ.copy())
+        return {
+            "rc": result.returncode,
+            "stdout": result.stdout,
+            "stderr": result.stderr,
+            "binary_bytes": binary.read_bytes() if binary.exists() else None,
+            "original_bytes": original,
+            "curl_called": marker.exists(),
+        }
 
 
 def projection(snapshot):
@@ -288,6 +358,118 @@ class MemoryRoleEvidenceTests(unittest.TestCase):
             elif choice["desired_disposition"] == "KEEP":
                 self.assertEqual(decision["disposition"], "KEEP proposed")
                 self.assertFalse(choice["accepted_keep"])
+
+    def assert_hindsight_project_wiring(self, wiring):
+        """Check the CC-approved scope and recorded plan, not host deployment."""
+        scope = wiring["scope_decision"]
+        self.assertTrue(scope["user_roots"].startswith("REJECTED"))
+        self.assertEqual(scope["approved_cli_prefix"], "$HOME/.local/opt/hindsight-cli/0.10.2/bin")
+        self.assertIs(scope["path_or_profile_change"], False)
+        trading = scope["trading_project"]
+        native = scope["native_blueprint_project"]
+        self.assertEqual(trading["repository"], TRADING_REPOSITORY)
+        self.assertEqual(trading["pull_request"], 15)
+        self.assertEqual(trading["url"], f"https://github.com/{TRADING_REPOSITORY}/pull/15")
+        self.assertRegex(trading["head"], r"^[0-9a-f]{40}$")
+        self.assertEqual(native["repository"], NATIVE_REPOSITORY)
+        self.assertEqual(native["pull_request"], 835)
+        self.assertEqual(native["relative_project_root"], "blueprints/us-equities")
+        self.assertFalse(trading["merged"])
+        self.assertFalse(native["merged"])
+
+        source = wiring["skill_source"]
+        self.assertEqual(source["repository"], "vectorize-io/hindsight")
+        self.assertEqual(source["commit"], HINDSIGHT_PIN)
+        self.assertEqual(source["version"], "v0.10.2")
+        self.assertEqual(source["file"],
+                         "hindsight-integrations/agent-plugin/skills/hindsight-memory/SKILL.md")
+        self.assertEqual(source["sha256"], HINDSIGHT_SKILL_SHA256)
+        self.assertEqual(source["bytes"], 2758)
+        self.assertIs(source["unchanged"], True)
+
+        self.assertEqual(set(wiring["client_routes"]), {"claude", "codex"})
+        local_skill_bytes = []
+        for client, skill_root in (("claude", ".claude/skills/hindsight-memory"),
+                                   ("codex", ".agents/skills/hindsight-memory")):
+            route = wiring["client_routes"][client]
+            self.assertEqual(route["skill_root"], skill_root)
+            self.assertIsNone(route["install_command"])
+            self.assertIs(route["user_root_rejected"], True)
+            self.assertIs(route["native_repo_root_rejected"], True)
+            self.assertIs(route["staged"], True)
+            self.assertIs(route["applied"], False)
+            self.assertEqual(route["status"], "OUTSTANDING")
+            self.assertEqual(route["vendor_sha256"], source["sha256"])
+            expected = {
+                (TRADING_REPOSITORY, f"{skill_root}/SKILL.md", 15),
+                (NATIVE_REPOSITORY, f"blueprints/us-equities/{skill_root}/SKILL.md", 835),
+            }
+            self.assertEqual(len(route["targets"]), 2)
+            self.assertEqual({(row["repository"], row["path"], row["pull_request"])
+                              for row in route["targets"]}, expected)
+            for row in route["targets"]:
+                if row["repository"] == TRADING_REPOSITORY:
+                    self.assertEqual(row["head"], trading["head"])
+                    self.assertIn(row["path"], trading["changed_files"])
+                else:
+                    self.assertIn(row["path"], native["changed_files"])
+                    data = (ROOT / row["path"]).read_bytes()
+                    self.assertEqual(len(data), source["bytes"])
+                    self.assertEqual(hashlib.sha256(data).hexdigest(), source["sha256"])
+                    local_skill_bytes.append(data)
+        self.assertEqual(len(local_skill_bytes), 2)
+        self.assertEqual(local_skill_bytes[0], local_skill_bytes[1])
+
+        cli = wiring["cli"]
+        self.assertEqual(cli["version"], "0.10.2")
+        self.assertEqual(cli["source_commit"], HINDSIGHT_PIN)
+        self.assertIn("HINDSIGHT_CLI_VERSION=0.10.2", cli["install_command"])
+        self.assertIn(scope["approved_cli_prefix"], cli["install_command"])
+        digest = cli["binary_digest_check"]
+        self.assertEqual(digest["sha256"], HINDSIGHT_BINARY_SHA256)
+        self.assertEqual(digest["asset"], "hindsight-linux-amd64")
+        self.assertEqual(digest["release_tag"], "v0.10.2")
+        self.assertEqual(digest["source"],
+                         "https://api.github.com/repos/vectorize-io/hindsight/releases/tags/v0.10.2")
+        self.assertEqual(digest["release_metadata_sha256"],
+                         "8ce08cd4cc97254733c4c0a61631b2bb6332594eb01f3ba12f3947c7e52bf5b7")
+        self.assertIs(digest["before_first_binary_execution"], True)
+        self.assertIs(digest["executed"], False)
+        self.assertEqual(digest["status"], "OUTSTANDING")
+        self.assertEqual(digest["operator"], "CC")
+        args = shlex.split(digest["command"])
+        self.assertEqual(args[0], "printf")
+        self.assertIn(HINDSIGHT_BINARY_SHA256, args)
+        self.assertIn("$memory835_cli_root/bin/hindsight", args)
+        self.assertEqual(args[-4:], ["|", "sha256sum", "--check", "--status"])
+        packet = (ROOT / wiring["packet"]["source_file"]).read_text()
+        self.assertLess(packet.index(HINDSIGHT_BINARY_SHA256),
+                        packet.index('"$memory835_cli_root/bin/hindsight" --version'))
+
+        for client in ("claude", "codex"):
+            smoke = wiring["smokes"][client]
+            self.assertEqual(smoke["operator"], "CC")
+            self.assertEqual(smoke["session_start_cwd"], "$HOME/code/us-equities-trading")
+            self.assertEqual(smoke["additional_admitted_cwd"],
+                             "$HOME/code/native-agent-stack/blueprints/us-equities")
+            self.assertIs(smoke["resume_or_fork"], False)
+            self.assertIs(smoke["executed"], False)
+            self.assertEqual(smoke["status"], "OUTSTANDING")
+            self.assertIsNone(smoke["result"])
+            args = shlex.split(smoke["command"])
+            self.assertEqual(args[:3], ["cd", smoke["session_start_cwd"], "&&"])
+            self.assertEqual(args[3], client)
+            self.assertIn("get_bank", args[-1])
+            if client == "claude":
+                self.assertIn("--allowedTools", args)
+                self.assertEqual(args[args.index("--allowedTools") + 1], "mcp__hindsight__get_bank")
+        harness = wiring["smokes"]["upstream_harness"]
+        self.assertEqual(harness["status"], "DEFERRED")
+        self.assertIsNone(harness["command"])
+        self.assertIs(harness["executed"], False)
+        self.assertIsNone(harness["result"])
+        self.assertIn("scratch", harness["reason"])
+        self.assertIn("provider", harness["reason"])
 
     def assert_g5_bindings(self, evidence):
         self.assertEqual(set(evidence["per_decision_bindings"]), DECISIONS)
@@ -579,19 +761,163 @@ class MemoryRoleEvidenceTests(unittest.TestCase):
             self.assertIsNone(row["result"])
         for component in DECISIONS:
             self.assertTrue({f"MV-{stage}-{component}" for stage in ("PSS", "S3", "S4", "G5")}.issubset(ids))
-        self.assertEqual(hindsight["cli"]["version"], "0.10.2")
-        self.assertIn("HINDSIGHT_CLI_VERSION=0.10.2", hindsight["cli"]["install_command"])
-        for client, suffix in (("claude", ".claude/skills/hindsight-memory"),
-                               ("codex", ".agents/skills/hindsight-memory")):
-            route = hindsight["client_routes"][client]
-            self.assertEqual(route["skill_root"], f"$HOME/{suffix}")
-            self.assertFalse(route["applied"])
-            self.assertEqual(route["status"], "OUTSTANDING")
-            smoke = hindsight["smokes"][client]
-            self.assertEqual(smoke["status"], "OUTSTANDING")
-            self.assertFalse(smoke["executed"])
-            self.assertIsNone(smoke["result"])
-        self.assertFalse(hindsight["smokes"]["upstream_harness"]["executed"])
+        self.assert_hindsight_project_wiring(hindsight)
+
+    def test_stage_two_hindsight_route_matches_decision_binding(self):
+        wiring = self.evidence["per_decision_bindings"]["hindsight"]["wiring"]
+        stage2 = self.record["adoption_stages"]["stage2"]["tools"]["hindsight"]["install_routing"]
+        for field in ("packet", "cli", "client_routes", "inverse", "smokes"):
+            with self.subTest(field=field):
+                self.assertEqual(stage2[field], wiring[field])
+
+    def test_hindsight_user_wide_skill_route_is_rejected(self):
+        for client, root in (("claude", ".claude"), ("codex", ".agents")):
+            with self.subTest(client=client):
+                wiring = copy.deepcopy(self.evidence["per_decision_bindings"]["hindsight"]["wiring"])
+                wiring["client_routes"][client]["skill_root"] = f"$HOME/{root}/skills/hindsight-memory"
+                with self.assertRaises(AssertionError):
+                    self.assert_hindsight_project_wiring(wiring)
+
+    def test_hindsight_native_repository_root_target_is_rejected(self):
+        for client in ("claude", "codex"):
+            with self.subTest(client=client):
+                wiring = copy.deepcopy(self.evidence["per_decision_bindings"]["hindsight"]["wiring"])
+                target = next(row for row in wiring["client_routes"][client]["targets"]
+                              if row["repository"] == NATIVE_REPOSITORY)
+                target["path"] = target["path"].removeprefix("blueprints/us-equities/")
+                with self.assertRaises(AssertionError):
+                    self.assert_hindsight_project_wiring(wiring)
+
+    def test_hindsight_binary_digest_and_first_execution_gate_cannot_drift(self):
+        mutations = {
+            "wrong_digest": ("sha256", "0" * 64),
+            "unverified_source": ("source", "https://example.invalid/unverified-release"),
+            "unverified_capture": ("release_metadata_sha256", "0" * 64),
+            "check_after_first_run": ("before_first_binary_execution", False),
+            "not_a_hash_check": ("command", '"$memory835_cli_root/bin/hindsight" --version'),
+        }
+        for mutation, (field, value) in mutations.items():
+            with self.subTest(mutation=mutation):
+                wiring = copy.deepcopy(self.evidence["per_decision_bindings"]["hindsight"]["wiring"])
+                wiring["cli"]["binary_digest_check"][field] = value
+                with self.assertRaises(AssertionError):
+                    self.assert_hindsight_project_wiring(wiring)
+
+    def test_hindsight_smokes_require_cc_fresh_research_cwd(self):
+        for client in ("claude", "codex"):
+            mutations = {
+                "unscoped_cwd": ("session_start_cwd", "$HOME"),
+                "native_root_cwd": ("additional_admitted_cwd", "$HOME/code/native-agent-stack"),
+                "wrong_operator": ("operator", "lane"),
+                "resumed_session": ("resume_or_fork", True),
+            }
+            for mutation, (field, value) in mutations.items():
+                with self.subTest(client=client, mutation=mutation):
+                    wiring = copy.deepcopy(self.evidence["per_decision_bindings"]["hindsight"]["wiring"])
+                    wiring["smokes"][client][field] = value
+                    with self.assertRaises(AssertionError):
+                        self.assert_hindsight_project_wiring(wiring)
+            with self.subTest(client=client, mutation="command_omits_cwd"):
+                wiring = copy.deepcopy(self.evidence["per_decision_bindings"]["hindsight"]["wiring"])
+                wiring["smokes"][client]["command"] = wiring["smokes"][client]["command"].split(" && ", 1)[1]
+                with self.assertRaises(AssertionError):
+                    self.assert_hindsight_project_wiring(wiring)
+
+    def test_hindsight_deferred_scratch_harness_cannot_be_required_or_executed(self):
+        for mutation, field, value in (
+                ("executed", "executed", True),
+                ("required", "status", "OUTSTANDING"),
+                ("executable", "command", 'bash "$memory835_stage/hindsight-cli-smoke-test.sh"')):
+            with self.subTest(mutation=mutation):
+                wiring = copy.deepcopy(self.evidence["per_decision_bindings"]["hindsight"]["wiring"])
+                wiring["smokes"]["upstream_harness"][field] = value
+                with self.assertRaises(AssertionError):
+                    self.assert_hindsight_project_wiring(wiring)
+
+    def test_every_wire_bash_block_defines_its_own_strict_guards_and_variables(self):
+        for name in ("hindsight-wire.diff.md", "wire-inverses-smokes.md"):
+            blocks = bash_blocks((SOURCE / name).read_text())
+            self.assertTrue(blocks, name)
+            for index, block in enumerate(blocks):
+                with self.subTest(packet=name, block=index):
+                    lines = block.splitlines()
+                    self.assertEqual(lines[0], "set -euo pipefail")
+                    defined = set()
+                    for line in lines:
+                        referenced = set(re.findall(r"\$(?:\{)?(memory835_[a-z0-9_]+)", line))
+                        self.assertTrue(referenced.issubset(defined),
+                                        f"task variables used before block-local definition: {line}")
+                        defined.update(re.findall(r"^\s*(memory835_[a-z0-9_]+)=", line))
+
+    def test_actual_wire_bad_installer_checksum_stops_before_fixture_execution(self):
+        packet = (SOURCE / "hindsight-wire.diff.md").read_text()
+        result = run_cli_guard_fixture(packet, "incorrect-installer-hash")
+        self.assertNotEqual(result["rc"], 0)
+        self.assertTrue(result["curl_called"])
+        self.assertIsNone(result["binary_bytes"])
+        self.assertNotIn("UNVERIFIED_INSTALLER_EXECUTED", result["stdout"])
+        self.assertNotIn("FIXTURE_BINARY_EXECUTED", result["stdout"])
+
+    def test_actual_wire_failed_download_stops_before_fixture_execution(self):
+        packet = (SOURCE / "hindsight-wire.diff.md").read_text()
+        result = run_cli_guard_fixture(packet, "failed-download")
+        self.assertNotEqual(result["rc"], 0)
+        self.assertIsNone(result["binary_bytes"])
+        self.assertNotIn("UNVERIFIED_INSTALLER_EXECUTED", result["stdout"])
+        self.assertNotIn("FIXTURE_BINARY_EXECUTED", result["stdout"])
+
+    def test_actual_wire_preexisting_cli_is_preserved_byte_for_byte(self):
+        packet = (SOURCE / "hindsight-wire.diff.md").read_text()
+        result = run_cli_guard_fixture(packet, "preexisting-binary")
+        self.assertNotEqual(result["rc"], 0)
+        self.assertFalse(result["curl_called"])
+        self.assertEqual(result["binary_bytes"], result["original_bytes"])
+        self.assertNotIn("UNVERIFIED_INSTALLER_EXECUTED", result["stdout"])
+        self.assertNotIn("FIXTURE_BINARY_EXECUTED", result["stdout"])
+
+    def test_hindsight_skill_route_has_no_host_install_or_overwrite_command(self):
+        packet = (SOURCE / "hindsight-wire.diff.md").read_text()
+        for block in bash_blocks(packet):
+            self.assertNotRegex(block, r"(?m)^\s*(?:install|mkdir)\b.*skills/hindsight-memory")
+        self.assertNotIn("bash \"$memory835_stage/hindsight-cli-smoke-test.sh\"", packet)
+
+    def test_ai_memory_primary_route_and_smoke_match_the_wire_packet(self):
+        packet = (SOURCE / "wire-inverses-smokes.md").read_text()
+        commands = [line for block in bash_blocks(packet) for line in block.splitlines()
+                    if line.startswith("ai-memory ")]
+        route = self.record["adoption_stages"]["stage2"]["tools"]["ai_memory"]["install_routing"]
+        for client in ("claude_preview", "codex_preview"):
+            self.assertIn(route["client_supported_commands"][client], commands)
+        self.assertIn(route["vendor_command"], commands)
+        self.assertIn("install-instructions", route["vendor_command"])
+        for command in commands:
+            args = shlex.split(command)
+            self.assertEqual(args[args.index("--data-dir") + 1], "$HOME/.local/share/ai-memory")
+            self.assertEqual(args[args.index("--config") + 1], "$HOME/.config/ai-memory/config.toml")
+        self.assertIn("memory_query", route["smoke"])
+        self.assertNotIn("ai-memory --version", route["smoke"])
+        self.assertIn("AM-02", route["inverse"])
+        qmd = self.record["adoption_stages"]["stage2"]["tools"]["qmd"]["install_routing"]
+        self.assertIn("QMD-02", qmd["inverse"])
+        self.assertIn("unselected reviewed alternative", packet)
+
+    def test_claude_smoke_without_get_bank_allowlist_is_rejected(self):
+        wiring = copy.deepcopy(self.evidence["per_decision_bindings"]["hindsight"]["wiring"])
+        wiring["smokes"]["claude"]["command"] = wiring["smokes"]["claude"]["command"].replace(
+            "--allowedTools mcp__hindsight__get_bank ", "")
+        with self.assertRaises(AssertionError):
+            self.assert_hindsight_project_wiring(wiring)
+
+    def test_hindsight_drafts_resolve_the_approved_cli_without_path(self):
+        drafts = ROOT / "adoption/drafts/memory-maintenance-20261008"
+        for name in ("native-memory-hindsight-model-refresh.service",
+                     "native-memory-hindsight-reflect.service"):
+            with self.subTest(unit=name):
+                commands = [line.removeprefix("ExecStart=") for line in (drafts / name).read_text().splitlines()
+                            if line.startswith("ExecStart=")]
+                self.assertEqual(len(commands), 1)
+                self.assertEqual(shlex.split(commands[0])[0],
+                                 "%h/.local/opt/hindsight-cli/0.10.2/bin/hindsight")
 
     def test_every_role_has_organic_tasks_and_unstarted_24h_followup(self):
         for component in DECISIONS:

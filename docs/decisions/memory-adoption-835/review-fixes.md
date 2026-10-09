@@ -62,3 +62,28 @@ organic task/hourly/G5 work, Claude-owner mapping, both micro reads, hosted CI,
 the pre-cue tool and explicit CC cue/owner decisions. Source snapshots/trial/G5
 bytes remain unchanged. One fix head on the current base, no rebase/host apply;
 landing remains CC through 5f after required reads, CI and the cue.
+
+## Both micro reads at 04c4bc27 and project scope — FIX2
+
+The exact-head micro sources are GPT
+`da4e41a4857c4a51d80293bcf4e6a0c9827e22ff29f2cb2d90cfd227b50985b4`
+(CHANGES_REQUESTED, one P2) and CC
+`3c886d2f427c58fe4445c8671408a72943bc03b65030724a05cac7f4a604fa61`
+(PASS-WITH-P3). Both are carried with the CC's HW-01 scope decisions in one next head.
+
+| Finding / decision | Correction and execution boundary |
+| --- | --- |
+| GPT P2 / CC a — non-terminating checksum/preservation checks | Every executable Bash fence starts `set -euo pipefail` with local variables initialized in that fence. Failed download/checksum/occupied destination blocks dependent writes/installer/smoke. The saved reader repro is run offline at its original baseline; new failure-path tests execute the revised packet blocks through harmless fixtures. No vendor code or host installation |
+| CC b — ai-memory params/routes and inverse/smoke references | Primary project `install-instructions` routes now share quoted `$HOME` data/config parameters across J/R/W and write matching skills; global `install-skills` is an unselected alternative. AM-02/QMD-02 are inverses, AM-03/QMD-03 smokes. Public/private W hashes rebound |
+| CC c — stage1 overlap row | Stage1 R row names SocratiCode impact/flow/dependencies and Serena references as structural overlaps; proposed scope split stays unexecuted |
+| CC d — dedicated CLI outside PATH | Both Hindsight draft ExecStarts use `%h/.local/opt/hindsight-cli/0.10.2/bin/hindsight`. No PATH/profile/config change |
+| CC e — mutable registry citation | Three live-source references replaced with `hcom-lanes.json.pre-ram-20261009`, verified byte-identical to source7094935b...; excerpt/J/S/R/test pins rebound |
+| CC HW06 allowlist | Headless Claude smoke allows only `mcp__hindsight__get_bank` and starts in the research project. CC executes; no result claimed |
+| CC HW01 project scope | Draft tradingPR15 at650df14547daf7ac4e86d1f85f167787d94b4f24 carries two unchanged skills plus committed SOURCE.json for both copies. #835 adds the two unchanged blueprint-scoped copies. User roots/native repository root rejected; both repositories land through review |
+| CC pre-run digest / smoke deferral | Dedicated CLI binary must match official v0.10.2 asset SHA256be87c63714ff046ac8ed668465ca0c875f94e6ff0a89ed83da7eb387313197af before first execution. The vendor smoke-test.sh is recorded once and DEFERRED for scratch-bank/provider model work; two get_bank smokes satisfy rule A |
+
+The earlier counters, whole-arm PSS and G5 sources remain unchanged. Four stages,
+KEEP-proposed eligibility and all original acceptance gates remain intact.
+Host CLI installation, actual discovery/smokes, organic retain/recall, component
+PSS and hourly/+24h execution remain OUTSTANDING. Current-head reads/CI,
+the pre-cue tool and explicit CC/owner landing decisions remain required.

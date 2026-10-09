@@ -20,9 +20,12 @@ supports `install-instructions`, `install-skills` and concern-limited
    CC-selected project with the exact installed 2.6.0 CLI before application:
 
    ```bash
-   ai-memory install-instructions --target CLAUDE.md --compact --skills-agent claude-code --print
-   ai-memory install-instructions --target AGENTS.md --compact --skills-agent agents --print
-   ai-memory install-skills --scope project --agent both --print
+   set -euo pipefail
+   memory835_project='<CC-reviewed-project>'
+   test "$memory835_project" != '<CC-reviewed-project>'
+   cd "$memory835_project"
+   ai-memory --data-dir "$HOME/.local/share/ai-memory" --config "$HOME/.config/ai-memory/config.toml" install-instructions --target CLAUDE.md --compact --skills-agent claude-code --print
+   ai-memory --data-dir "$HOME/.local/share/ai-memory" --config "$HOME/.config/ai-memory/config.toml" install-instructions --target AGENTS.md --compact --skills-agent agents --print
    ```
 
    These are proposed preview commands; none was executed here. Preserve
@@ -30,8 +33,12 @@ supports `install-instructions`, `install-skills` and concern-limited
    CC can run the matching application commands:
 
    ```bash
-   ai-memory install-instructions --target CLAUDE.md --compact --skills-agent claude-code
-   ai-memory install-instructions --target AGENTS.md --compact --skills-agent agents
+   set -euo pipefail
+   memory835_project='<CC-reviewed-project>'
+   test "$memory835_project" != '<CC-reviewed-project>'
+   cd "$memory835_project"
+   ai-memory --data-dir "$HOME/.local/share/ai-memory" --config "$HOME/.config/ai-memory/config.toml" install-instructions --target CLAUDE.md --compact --skills-agent claude-code
+   ai-memory --data-dir "$HOME/.local/share/ai-memory" --config "$HOME/.config/ai-memory/config.toml" install-instructions --target AGENTS.md --compact --skills-agent agents
    ```
 
    Installation writes both the compact markered instruction snippet and
@@ -39,15 +46,36 @@ supports `install-instructions`, `install-skills` and concern-limited
    skill install. The selected project/root is OUTSTANDING. Project Claude
    roots are `.claude/skills`; project Codex/cross-agent roots are
    `.agents/skills` [A1,A2]. Existing native MCP and capture hooks are reused.
+   The primary route is these scoped `install-instructions` commands, with
+   matched vendor-managed skills. The standalone
+   `ai-memory --data-dir "$HOME/.local/share/ai-memory" --config "$HOME/.config/ai-memory/config.toml" install-skills --scope global --agent both`
+   is an **unselected reviewed alternative**, not an additional primary step
+   or proof of project isolation. CC resolves the project placeholder before
+   running a block; its guard otherwise stops before client changes. Each
+   block is independently executable under its own strict shell options.
 
 2. **AM-02 — transaction-specific inverse: OUTSTANDING.** The supported
    upstream removal commands, first dry-run and then application by CC, are:
 
    ```bash
-   ai-memory uninstall --only skills
-   ai-memory uninstall --only instructions
-   ai-memory uninstall --only skills --apply
-   ai-memory uninstall --only instructions --apply
+   set -euo pipefail
+   memory835_project='<CC-reviewed-project>'
+   test "$memory835_project" != '<CC-reviewed-project>'
+   cd "$memory835_project"
+   ai-memory --data-dir "$HOME/.local/share/ai-memory" --config "$HOME/.config/ai-memory/config.toml" uninstall --only skills
+   ai-memory --data-dir "$HOME/.local/share/ai-memory" --config "$HOME/.config/ai-memory/config.toml" uninstall --only instructions
+   ```
+
+   After CC reviews that plan against the transaction's touched-file ledger,
+   the supported concern-level application forms are:
+
+   ```bash
+   set -euo pipefail
+   memory835_project='<CC-reviewed-project>'
+   test "$memory835_project" != '<CC-reviewed-project>'
+   cd "$memory835_project"
+   ai-memory --data-dir "$HOME/.local/share/ai-memory" --config "$HOME/.config/ai-memory/config.toml" uninstall --only skills --apply
+   ai-memory --data-dir "$HOME/.local/share/ai-memory" --config "$HOME/.config/ai-memory/config.toml" uninstall --only instructions --apply
    ```
 
    These concern-level inverses are broader than one added file: skills removal
@@ -72,6 +100,14 @@ supports `install-instructions`, `install-skills` and concern-limited
    a +24 h useful-outcome follow-up for `memory-h2h` and every admitted named
    consumer. Bind complete registry-history role rows and snapshot hashes.
    No provider test (`llm-test`), page write, capture backfill or smoke was run.
+   The native smoke operation is `memory_query` through the loaded retrieval
+   skill in each fresh eligible client. It uses the real lifecycle session's
+   project scope; static clients instead supply the exact workspace/project
+   pair selected from their native marker/remote metadata. Project identity
+   must not fall back to the server's last active project. This read-only
+   retrieval operation, expected existing-source hash and returned native
+   result are the AM-03 record; `--version` or `install-skills --print` is not
+   substituted for that client smoke. AM-02 is the inverse step.
 
 ## QMD v2.8.3 vendor bootstrap route
 
@@ -91,6 +127,10 @@ runtime skill are separate assets, so they do not share a byte hash [Q1,Q2].
    missing the vendor skill, the supported manual route is:
 
    ```bash
+   set -euo pipefail
+   memory835_project='<CC-reviewed-project>'
+   test "$memory835_project" != '<CC-reviewed-project>'
+   cd "$memory835_project"
    qmd skill install --yes
    ```
 
@@ -98,8 +138,8 @@ runtime skill are separate assets, so they do not share a byte hash [Q1,Q2].
    `./.claude/skills/qmd`. The supported user-root alternative is
    `qmd skill install --global --yes`, targeting `$HOME/.agents/skills/qmd`
    and the Claude visibility link [Q1]. Existing same-name installs are
-   preserved; `--force` is not proposed. Both alternative selections remain
-   OUTSTANDING, and exactly one scope is chosen through CC review. The vendor
+   preserved; `--force` is not proposed. Global installation is an unselected
+   reviewed alternative. Exactly one project/scope is chosen through CC review. The vendor
    Claude plugin alternative is `claude plugin marketplace add tobi/qmd`
    followed by `claude plugin install qmd@qmd`; its marketplace supplies
    `./skills` and `qmd mcp` [Q3]. The selected manual route reuses existing
@@ -125,8 +165,14 @@ runtime skill are separate assets, so they do not share a byte hash [Q1,Q2].
    and lexical search against a CC-selected existing document:
 
    ```bash
+   set -euo pipefail
+   memory835_project='<CC-reviewed-project>'
+   memory835_query='<CC-existing-document-query>'
+   test "$memory835_project" != '<CC-reviewed-project>'
+   test "$memory835_query" != '<CC-existing-document-query>'
+   cd "$memory835_project"
    qmd --index native-agent-stack-catalog-lex status
-   qmd --index native-agent-stack-catalog-lex search '<CC-existing-document-query>' --json -n 1
+   qmd --index native-agent-stack-catalog-lex search "$memory835_query" --json -n 1
    ```
 
    CC replaces the query placeholder with a known existing document query and
@@ -138,6 +184,7 @@ runtime skill are separate assets, so they do not share a byte hash [Q1,Q2].
    +24 h useful-outcome evidence separately for every owning-lane and admitted
    named-consumer role row. No index update, embed, trust change, daemon launch,
    provider smoke or organic verification was executed here.
+   QMD-02 is the wiring inverse; QMD-03 records the smoke and follow-up only.
 
 ## Primary sources
 

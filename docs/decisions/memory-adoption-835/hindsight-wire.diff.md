@@ -1,226 +1,243 @@
-# Hindsight WIRE: CC application packet
+# Hindsight WIRE: research-project CC application packet
 
-Recorded 2026-10-09. `applied=false`; `status=OUTSTANDING`. This packet records
-an unapplied client-wiring addition for the accepted `trading-research` job.
-The existing API service, bank, data, native MCP registrations and 15-tool
-allowlist are dependencies preserved by this addition. The CLI and skill
-installs, client smokes, fresh-session organic checks and follow-ups below
-have **not been executed**. This is a proposed selection, with no KEEP claim.
+Recorded 2026-10-09. applied=false; deployment_status=OUTSTANDING.
+CC selected the unchanged vendor skill in two admitted research scopes:
+us-equities-trading's project roots, and native-agent-stack's nested
+blueprints/us-equities roots. CLI installation, skill landing/deployment,
+client smokes, organic fresh-session checks and +24 h follow-ups remain
+unexecuted. Existing API service, trading-research bank/data, native
+bank-specific MCP registrations and the 15-tool allowlist are preserved.
+This remains a proposed WIRE with no accepted KEEP claim.
 
-The source pin is `vectorize-io/hindsight@5fc4ce20917b916240cef27c212c387a177f115b`
-(v0.10.2), including its portable vendor skill at
-`hindsight-integrations/agent-plugin/skills/hindsight-memory/SKILL.md`.
-The CLI release pin is v0.10.2. The unchanged skill uses explicit recall,
-retain and reflect; it does not install session-lifecycle hooks [H1,H2].
-The native Claude Code plugin has automatic recall/retention hooks [H6].
-The selected route is the vendor's manual Skills + existing bank MCP route,
-scoped to CC-admitted research consumers. Coding event capture remains in
-the ai-memory slot [L1].
+The skill source is vectorize-io/hindsight@5fc4ce20917b916240cef27c212c387a177f115b
+(v0.10.2), hindsight-integrations/agent-plugin/skills/hindsight-memory/SKILL.md,
+SHA-256 736dec06d414798f6b17dc078c5ef6204e8802f53cb3a5fb3c306ce08872f08e.
+The selected manual Skills + existing MCP route adds no automatic lifecycle
+hooks [H1,H2,H6]. Coding event capture retains the ai-memory slot [L1].
 
-## Proposed client delta and its own inverse
+## Selected project delta and its own inverse
 
-| Target | Proposed delta | Wiring inverse |
+| Target | Reviewed addition | Wiring-specific inverse |
 | --- | --- | --- |
-| `$HOME/.local/opt/hindsight-cli/0.10.2/bin/hindsight` | Install v0.10.2 through the pinned vendor installer using its supported version/install-directory variables [H3,H4]. No existing binary is overwritten. | Remove this binary only if the application ledger proves it was newly created by this transaction; remove the now-empty `bin`/version directories. |
-| `$HOME/.claude/skills/hindsight-memory/SKILL.md` | Place the unchanged pinned vendor skill in Claude Code's manual user skill root, after CC restricts eligibility to the named research roles [H1,H2,H8]. | Remove only the added byte-matching skill file and its now-empty directory. If a preexisting path exists, restore its exact preimage instead of deleting it. |
-| `$HOME/.agents/skills/hindsight-memory/SKILL.md` | Place the same unchanged skill in Codex's documented user skill root [C1]. | Apply the same transaction-specific preimage restoration. |
-| Existing `hindsight` MCP entries in both clients | Reuse `http://127.0.0.1:8888/mcp/trading-research/`, which selects the bank through the URL [H5,L1]. | No registration mutation is part of this delta. Retain the existing entries. |
+| $HOME/.local/opt/hindsight-cli/0.10.2/bin/hindsight | CC installs the pinned release; verify its official asset digest before first execution [H3,H4,H9]. No PATH/profile change. | Remove only the unchanged transaction-created binary and empty created prefix directories recorded in the CC ledger. |
+| us-equities-trading:.claude/skills/hindsight-memory/SKILL.md | Unchanged vendor skill in the research repository's Claude project root, through draft PR #15 [H2,H8]. | Revert the reviewed two-file addition through a repository PR. |
+| us-equities-trading:.agents/skills/hindsight-memory/SKILL.md | Identical vendor skill in the research repository's Codex project root, through the same draft PR [H2,C1]. | The same repository revert PR reverses this addition. |
+| native-agent-stack:blueprints/us-equities/.claude/skills/hindsight-memory/SKILL.md | Same unchanged skill in the CC-selected nested Claude research root, through #835's next head [H2,H8,L2]. | A reviewed native repository revert PR reverses only the two nested skill additions. |
+| native-agent-stack:blueprints/us-equities/.agents/skills/hindsight-memory/SKILL.md | Same unchanged skill in the CC-selected nested Codex research root, through #835's next head [H2,C1,L2]. | The same native repository revert PR reverses this addition. |
+| Existing hindsight MCP entries in both clients | Reuse http://127.0.0.1:8888/mcp/trading-research/; bank selection is implicit in the URL [H5,L1]. | Preserve those entries, the API service, bank/data and allowlist. |
 
-The user roots above are exact, reviewable targets. Their installation would
-make the skill discoverable beyond a single project; root discovery alone
-does not establish role isolation. **CC mapping of those roots to admitted
-research-role launches is OUTSTANDING and blocks applying the addition.**
-If the host's supported launch policy cannot isolate those user roots, CC
-selects the supported project alternative:
-`<CC-research-project>/.claude/skills/hindsight-memory/SKILL.md` and
-`<CC-research-project>/.agents/skills/hindsight-memory/SKILL.md` [C1,H8].
-The research-project root is unverified and its selection is OUTSTANDING.
-No particular blueprint directory is inferred.
+User-wide and native repository-root skill targets are not selected. No skill
+installation command targets them. Native sessions for the nested route start
+at $HOME/code/native-agent-stack/blueprints/us-equities or below it. Trading
+sessions start at $HOME/code/us-equities-trading.
+
+Research skill draft PR: <https://github.com/seathatflowsinourveins/us-equities-trading/pull/15>
+at head 650df14547daf7ac4e86d1f85f167787d94b4f24,
+base a8a4e880ad5a4a69bb3ede3b856d0677055b08b8,
+branch foundation/ns2604-hindsight-skill-20261009.
+It carries exactly the two unchanged project SKILL.md files. Publication is
+recorded separately from review/merge/runtime loading. Its reviewed landing
+commit remains OUTSTANDING. The native nested additions' #835 fix head and
+reviewed landing likewise remain OUTSTANDING in this packet.
 
 ## Numbered application and evidence steps
 
-Every row has `applied=false`, `executed=false`, `status=OUTSTANDING`.
-The stable step ids, rather than the number of shell lines, define the ten
-outstanding steps in this packet.
+HW-01 through HW-10 remain stable record ids. Every deployment/execution below
+has applied=false and execution_status=OUTSTANDING. Completed scope/source
+reviews and published PR evidence are distinguished from execution.
+Every Bash block begins with its own strict error/undefined-variable/pipeline
+guards and defines its task variables locally. Checksum, download and absent-
+destination failure terminates before dependent installer or binary execution.
 
-1. **HW-01 — CC scope and transaction review: OUTSTANDING.** Bind the owner
-   lane `memory-h2h` and each admitted named research consumer to its complete
-   registry-history role row. `wsl-architecture-design` is a named Claude
-   consumer in the pinned record, with research-route eligibility still
-   OUTSTANDING. CC chooses isolated user roots or an explicit research project,
-   reviews this diff, and records application targets/preimages. A native
-   launch requires measured Windows available memory of at least 12 GiB.
-   Existing matching skill/binary paths are preserved; the additions below
-   require absent destinations. Preimage backups cover touched skill files,
-   not credential-bearing client configuration or environment files.
+1. **HW-01 — selected research scope and deployment review: OUTSTANDING.**
+   scope_decision=COMPLETED: CC selected the research project's two roots and
+   the two native nested blueprint roots after primary-source discovery review
+   [C1,H8,L2]. trading_draft_publication=COMPLETED at PR #15/head above.
+   deployment_review=OUTSTANDING: bind reviewed landings and complete
+   registry-history role rows for memory-h2h and every admitted named research
+   consumer. The pinned named Claude consumer is wsl-architecture-design;
+   admission/session binding remains OUTSTANDING. CC starts fresh sessions in
+   the admitted research cwd after skill landing and a fresh measured Windows
+   available-memory gate of at least 12 GiB.
 
-2. **HW-02 — pinned CLI install and version: OUTSTANDING.** The following is
-   ready for CC application after HW-01. `get-cli` supports
-   `HINDSIGHT_CLI_VERSION` and `HINDSIGHT_INSTALL_DIR` [H3]. The version variable
-   belongs on the installer process, so it reaches `bash` rather than only a
-   downloader in a pipeline. Its release download resolves to
-   `releases/download/v0.10.2/hindsight-<vendor-detected-platform>`.
+2. **HW-02 — pinned CLI install and verification before first run: OUTSTANDING.**
+   installer_source_review=COMPLETED; release_digest_review=COMPLETED.
+   The pinned installer supports HINDSIGHT_CLI_VERSION and HINDSIGHT_INSTALL_DIR
+   [H3]. The official release metadata matches the Linux amd64 asset digest
+   below [H9]. CC runs this fail-fast sequence, using the approved dedicated
+   prefix without changing PATH or a shell profile:
 
-   ```bash
-   memory835_stage=$HOME/.local/state/native-agent-stack/coordination/ns2604-coop/hindsight-wire-835-review
-   memory835_cli_root=$HOME/.local/opt/hindsight-cli/0.10.2
+   ~~~bash
+   set -euo pipefail
+   memory835_stage="$HOME/.local/state/native-agent-stack/coordination/ns2604-coop/memory-roles-835-fix2-20261009/cli-review"
+   memory835_cli_root="$HOME/.local/opt/hindsight-cli/0.10.2"
    test ! -e "$memory835_cli_root/bin/hindsight"
    mkdir -p "$memory835_stage"
    curl -fsSL https://raw.githubusercontent.com/vectorize-io/hindsight/5fc4ce20917b916240cef27c212c387a177f115b/hindsight-docs/static/get-cli -o "$memory835_stage/get-cli"
    printf '%s  %s\n' ed7489a0287d51e1a3bb045b506c806118131b401c8e229e4ae2e714efa9ee4a "$memory835_stage/get-cli" | sha256sum --check --status
    HINDSIGHT_CLI_VERSION=0.10.2 HINDSIGHT_INSTALL_DIR="$memory835_cli_root/bin" bash "$memory835_stage/get-cli"
+   printf '%s  %s\n' be87c63714ff046ac8ed668465ca0c875f94e6ff0a89ed83da7eb387313197af "$memory835_cli_root/bin/hindsight" | sha256sum --check --status
    "$memory835_cli_root/bin/hindsight" --version
-   ```
+   ~~~
 
-   Expected version is 0.10.2. This research verified installer source bytes
-   and version selection, not a downloaded release binary or host installation.
-   The dedicated path avoids changing a shell profile or replacing an existing
-   CLI. CC records the created binary's hash in the application ledger.
+   **The installed binary hash check precedes its first execution.** The pinned
+   installer tail installs and prints instructions without running the binary
+   [H3]. A mismatch stops before --version and is reported to CC. Expected
+   version is 0.10.2. This lane read release metadata only, downloaded no binary
+   and ran no installer. CC records its installed digest and created paths.
 
-3. **HW-03 — Claude manual skill route: OUTSTANDING.** Reuse the existing
-   bank-specific HTTP registration [L1]. Fetch the vendor skill unchanged,
-   verify its byte hash, then install only the CC-reviewed destination. This
-   exact user-root form remains gated by HW-01:
+3. **HW-03 — Claude project-skill review and landing: OUTSTANDING.**
+   vendor_skill_source_review=COMPLETED. Both the research PR and #835 nested
+   additions use the unchanged H2 bytes. CC verifies the appropriate reviewed
+   checkout's file before its Claude smoke:
 
-   ```bash
-   curl -fsSL https://raw.githubusercontent.com/vectorize-io/hindsight/5fc4ce20917b916240cef27c212c387a177f115b/hindsight-integrations/agent-plugin/skills/hindsight-memory/SKILL.md -o "$memory835_stage/hindsight-memory.SKILL.md"
-   printf '%s  %s\n' 736dec06d414798f6b17dc078c5ef6204e8802f53cb3a5fb3c306ce08872f08e "$memory835_stage/hindsight-memory.SKILL.md" | sha256sum --check --status
-   test ! -e $HOME/.claude/skills/hindsight-memory
-   mkdir -p $HOME/.claude/skills/hindsight-memory
-   install -m 0644 "$memory835_stage/hindsight-memory.SKILL.md" $HOME/.claude/skills/hindsight-memory/SKILL.md
-   ```
+   ~~~bash
+   set -euo pipefail
+   memory835_research_root="$HOME/code/us-equities-trading"
+   cd "$memory835_research_root"
+   printf '%s  %s\n' 736dec06d414798f6b17dc078c5ef6204e8802f53cb3a5fb3c306ce08872f08e .claude/skills/hindsight-memory/SKILL.md | sha256sum --check --status
+   ~~~
 
-4. **HW-04 — Codex manual skill route: OUTSTANDING.** Codex's exact user
-   root is `$HOME/.agents/skills`; the supported project root is
-   `<CC-research-project>/.agents/skills` [C1]. Reuse the accepted bank-specific
-   native registration [L1]. For CC-admitted isolated user-root launches:
+   The admitted native nested route uses the same verification from
+   $HOME/code/native-agent-stack/blueprints/us-equities. Project byte presence
+   does not establish discovery; the native smoke records the loaded skill.
 
-   ```bash
-   test ! -e $HOME/.agents/skills/hindsight-memory
-   mkdir -p $HOME/.agents/skills/hindsight-memory
-   install -m 0644 "$memory835_stage/hindsight-memory.SKILL.md" $HOME/.agents/skills/hindsight-memory/SKILL.md
-   ```
+4. **HW-04 — Codex project-skill review and landing: OUTSTANDING.**
+   project_discovery_review=COMPLETED at the source boundaries below [C1,L2].
+   CC verifies the appropriate reviewed checkout before its Codex smoke:
 
-   The portable plugin's `mcp.json` hardcodes the Cloud URL. Merely setting
-   `HINDSIGHT_MCP_URL` cannot redirect that manifest. The documented self-hosted
-   replacement and bank URL semantics support the accepted local registration
-   [H1,H5]. Neither portable Cloud auth nor an invented configuration field is
-   required by this selected manual route.
+   ~~~bash
+   set -euo pipefail
+   memory835_research_root="$HOME/code/us-equities-trading"
+   cd "$memory835_research_root"
+   printf '%s  %s\n' 736dec06d414798f6b17dc078c5ef6204e8802f53cb3a5fb3c306ce08872f08e .agents/skills/hindsight-memory/SKILL.md | sha256sum --check --status
+   ~~~
 
-5. **HW-05 — client-wiring inverse review: OUTSTANDING.** Before application,
-   attach the concrete preimage/created-path ledger. On rollback, compare each
-   created file to its recorded application hash. Remove only unchanged new
-   files; restore exact preimages for replacements, and escalate intervening
-   modifications to CC. For the absent-path application above, the skill inverse
-   is `rm -- <recorded-added-SKILL.md>` followed by `rmdir -- <recorded-added-skill-directory>`;
-   the CLI inverse is `rm -- <recorded-added-binary>` followed by `rmdir` for
-   recorded-created empty directories. Paths come from the ledger, including a
-   project alternative if selected. This unwires the addition while preserving
-   existing service/bank/data/registrations/allowlist. The service-retirement
-   inverse in the recipe is a different operation and is not applied here [L1].
+   The native nested verification starts from
+   $HOME/code/native-agent-stack/blueprints/us-equities. The portable plugin
+   manifest hardcodes Cloud, so HINDSIGHT_MCP_URL alone cannot redirect it.
+   Selected project skills reuse the existing bank-specific local MCP entry;
+   no Cloud manifest, invented field or automatic capture is added [H1,H5,L1].
 
-6. **HW-06 — Claude vendor-tool smoke: OUTSTANDING.** In one new eligible
-   Claude Code research session, invoke the vendor single-bank `get_bank`
-   through the configured `hindsight` connection, and verify the selected bank
-   is `trading-research` [H5,L1]. Record native MCP success, client/session,
-   complete owning-lane role binding and timestamp. A ready launch form, run
-   from the CC-selected research scope, is:
+5. **HW-05 — repository/CLI wiring inverse: OUTSTANDING.**
+   inverse_definition=COMPLETED; rollback execution requires separate CC
+   direction. The skill inverse is a reviewed revert PR for the exact added
+   files: two project files in us-equities-trading, and two nested files in
+   native-agent-stack. Bind each reviewed landing commit and restrict the
+   resulting revert diff to those additions. Host skill-directory deletion
+   is not an inverse for repository deployment. The CLI inverse compares its
+   binary with the applied digest, removes only that unchanged transaction-
+   created binary, then removes ledger-recorded empty bin/version directories.
+   Preexisting files and intervening changes are preserved/referred to CC.
+   The active API service, bank/data, native registrations and allowlist remain
+   unchanged. The recipe's service-retirement inverse is a separate action [L1].
 
-   ```bash
-   claude --print --output-format json 'Perform a connection smoke with the configured hindsight get_bank tool. Report whether it selects trading-research. Do not retain, change, or delete anything.'
-   ```
+6. **HW-06 — Claude vendor get_bank smoke from research cwd: OUTSTANDING.**
+   After reviewed skill landing and the launch gate, CC starts one fresh
+   native Claude research session. For the research repository:
 
-   Installed `claude --help` confirms `--print` and `--output-format`.
-   This provider-backed session was not launched. Its result is a smoke, not
-   organic adoption evidence.
+   ~~~bash
+   set -euo pipefail
+   memory835_research_root="$HOME/code/us-equities-trading"
+   cd "$memory835_research_root"
+   claude --print --allowedTools mcp__hindsight__get_bank --output-format json 'Perform a connection smoke with the configured hindsight get_bank tool. Report whether it selects trading-research. Do not retain, change, or delete anything.'
+   ~~~
 
-7. **HW-07 — Codex vendor-tool smoke: OUTSTANDING.** Run the same single-bank
-   vendor `get_bank` smoke in one new eligible native Codex session:
+   For the CC-admitted native nested research scope, the same fresh-session
+   command starts with cd "$HOME/code/native-agent-stack/blueprints/us-equities".
+   Record loaded project-skill evidence, vendor get_bank success, selected bank,
+   client/session, admitted role row and timestamp [H5]. Installed help supports
+   the command. No session was launched; explicit smoke is not organic evidence.
 
-   ```bash
+7. **HW-07 — Codex vendor get_bank smoke from research cwd: OUTSTANDING.**
+   CC starts a separate fresh Codex session after the same landing/gate:
+
+   ~~~bash
+   set -euo pipefail
+   memory835_research_root="$HOME/code/us-equities-trading"
+   cd "$memory835_research_root"
    codex exec --json 'Perform a connection smoke with the configured hindsight get_bank tool. Report whether it selects trading-research. Do not retain, change, or delete anything.'
-   ```
+   ~~~
 
-   Installed `codex exec --help` confirms this launch form. Record the same
-   evidence fields as HW-06. Neither launch uses a resumed/forked session or
-   changes the bank. Hindsight's upstream full `hindsight-cli/smoke-test.sh`
-   creates/writes/deletes a separate temporary bank and performs model work;
-   it has not been executed [H7]. The per-client smoke above exercises the
-   vendor MCP `get_bank` surface without adding test memories.
+   The admitted native nested scope uses the same command after
+   cd "$HOME/code/native-agent-stack/blueprints/us-equities".
+   Record the HW-06 evidence fields, including native skill discovery.
+   Neither smoke is executed. These read-only vendor get_bank checks are the
+   CC-selected rule-A client smokes; the scratch-bank harness is deferred.
 
 8. **HW-08 — Claude organic fresh-session retain AND recall: OUTSTANDING.**
-   After application, an ordinary admitted research task must produce a real
-   hypothesis/experiment record and retain it through the loaded vendor route.
-   Record the original source hash, experiment tags, stored world/experience
-   record and native retain completion. A different fresh Claude session must
-   recover that experiment to complete a real follow-up task, without naming
-   memory tools or supplying the record in the prompt. Native evidence must
-   establish a useful result, original source byte equality, the same complete
-   role-row binding, `types=[world,experience]` and `tags_match=all_strict` [L1,H5].
-   Use vendor `sync_retain` when an organic workflow needs immediate visibility;
-   it waits for storage before the receiver recalls [H5]. Any explicitly
-   requested probe remains a probe. Zero execution is recorded here.
+   An ordinary admitted research task produces and retains a real hypothesis/
+   experiment record through the vendor skill. Record original source hash,
+   experiment tags, world/experience record and retain completion. A different
+   fresh Claude research session recovers it for real follow-up work, without
+   tool names or the stored answer in its prompt. Evidence establishes useful
+   outcome, original-source byte equality, complete role/session/time binding,
+   types=[world,experience] and tags_match=all_strict [H5,L1]. Vendor sync_retain
+   waits for visibility when an organic workflow needs immediate read-after-
+   write. Explicit probes remain probes; zero execution is recorded here.
 
 9. **HW-09 — Codex organic fresh-session retain AND recall: OUTSTANDING.**
-   Apply HW-08 independently to an ordinary admitted Codex research task and
-   a different fresh Codex receiver session. Also bind the cross-client
-   Claude-to-Codex and Codex-to-Claude handoffs when those are real follow-up
-   work. Preserve each source/receiver hash, tags, role row, useful task outcome
-   and latency. Prior accepted native round-trip receipts remain historical
-   exercised integration; they do not establish these new organic sessions [L1].
+   Apply HW-08 independently to an ordinary admitted Codex task and different
+   fresh receiver in the selected research scope. Bind real cross-client
+   handoffs when they occur. Preserve source/receiver hashes, tags, full role
+   row, outcome and latency. Prior accepted round trips remain historical
+   integration evidence; they do not establish these new organic sessions [L1].
 
-10. **HW-10 — +24 h per-role follow-up: OUTSTANDING.** Start the window from
-    the recorded application/fresh-session evidence time, not this proposal's
-    timestamp. Re-read organic useful outcomes separately from setup/smoke
-    calls for every owning-lane and named-consumer row in the adoption record.
-    Hindsight's owner is `memory-h2h`; the currently named Claude consumer is
-    `wsl-architecture-design`, whose admitted research scope must first be
-    resolved by CC. Cover both eligible native clients and every additional
-    CC-admitted research consumer with its complete registry-history row.
-    The other tool owners (`codex-token-parity` and `overlap-token`) and each
-    named consumer require their own stage-4 follow-ups in the live-host
-    record; Hindsight exposure to them is not inferred. Pin/hash the follow-up
-    producer snapshot and registry mapping, report every unobserved role
-    explicitly, and promote KEEP only where stage 3 or 4 has organic evidence.
+10. **HW-10 — +24 h per-role follow-up: OUTSTANDING.** Anchor T0 to actual
+    reviewed deployment/fresh-session evidence, not this proposal's timestamp.
+    Follow every admitted research owning/consumer row through T0+24 h:
+    memory-h2h, wsl-architecture-design once admitted, both eligible clients
+    and any additional admitted consumers in either selected research scope.
+    Pin/hash producer snapshots and full registry mappings. Separate setup/
+    smoke calls from organic useful outcomes and report each unobserved role.
+    Other tools' owners/consumers retain their own stage-4 follow-ups;
+    Hindsight admission is not inferred. KEEP requires returned organic-result
+    provenance from stage 3 or 4.
 
-## Shipped vendor smoke harness for HW-06 and HW-07
+## Deferred vendor scratch-bank harness
 
-The pinned vendor harness is also recorded as **OUTSTANDING** for one invocation
-from each eligible client session, in addition to the bank-specific native MCP
-connection check. This supplies the shipped upstream smoke command without
-claiming it has run:
+hindsight-cli/smoke-test.sh at H7 is **DEFERRED**, executed=false.
+It creates/writes/reflects on/deletes a separate temporary bank and performs
+provider/model work. CC selected read-only get_bank as the sufficient
+per-client rule-A smoke. The scratch-bank harness is neither a required
+application command nor a hook here. It remains unexecuted and must never be
+retargeted to retained trading-research data [H7,L1].
 
-```bash
-curl -fsSL https://raw.githubusercontent.com/vectorize-io/hindsight/5fc4ce20917b916240cef27c212c387a177f115b/hindsight-cli/smoke-test.sh -o "$memory835_stage/hindsight-cli-smoke-test.sh"
-printf '%s  %s\n' c57a3506017164997bd45b88bf9d87cfeec69b511fcf90bd50c8f20278593848 "$memory835_stage/hindsight-cli-smoke-test.sh" | sha256sum --check --status
-HINDSIGHT_API_URL=http://127.0.0.1:8888 HINDSIGHT_CLI="$memory835_cli_root/bin/hindsight" bash "$memory835_stage/hindsight-cli-smoke-test.sh"
-```
-
-H7 owns its separately named `cli-smoke-test-<timestamp>` bank, performs
-retain/recall/reflect and management operations, and cleans up that scratch
-bank. CC reviews that mutation/provider-work scope before invoking it. It
-must not be retargeted to the retained `trading-research` bank. Record separate
-Claude/Codex invocation results; both are vendor smokes, never organic evidence.
-
-## Primary-source bindings and verification limits
+## Primary-source bindings and limits
 
 | Id | Source | Retrieved byte SHA-256 |
 | --- | --- | --- |
-| H1 | `vectorize-io/hindsight@5fc4ce20917b916240cef27c212c387a177f115b:hindsight-integrations/agent-plugin/README.md`, especially Skills + MCP, self-hosting and lifecycle boundaries | `9be844948ece7b09fa192e5e6e770b73d94fe10142f10bc85759a4e6af84211b` |
-| H2 | Same pin, `hindsight-integrations/agent-plugin/skills/hindsight-memory/SKILL.md` | `736dec06d414798f6b17dc078c5ef6204e8802f53cb3a5fb3c306ce08872f08e` |
-| H3 | Same pin, `hindsight-docs/static/get-cli`, supported install directory at line 9 and version selection at lines 174-179 | `ed7489a0287d51e1a3bb045b506c806118131b401c8e229e4ae2e714efa9ee4a` |
-| H4 | Same pin, `hindsight-docs/docs/sdks/cli.mdx`, vendor installer command at lines 12-16 | `8cabf147cf2027f80197df1de1ab81863518d8bec855395d20c610e4f3a7a888` |
-| H5 | Same pin, `hindsight-docs/docs/developer/mcp-server.md`, per-bank URL, get_bank, sync_retain and recall parameters | `73d9513ad29acbd40fc02f95fe1a84cadb4b9958b6e82a4b8fb77df515716f11` |
-| H6 | Same pin, `hindsight-integrations/claude-code/README.md`, native plugin install, roots and automatic hooks | `c56dfca50d045cf513faffcaeae6858ced8cf6dc78ed68140cf9c1171bc2e0d7` |
-| H7 | Same pin, `hindsight-cli/smoke-test.sh` | `c57a3506017164997bd45b88bf9d87cfeec69b511fcf90bd50c8f20278593848` |
-| H8 | Official Claude Code skill-root documentation, fetched 2026-10-09: <https://code.claude.com/docs/en/skills>, manual personal/project skill locations | Live documentation, not a version-pinned artifact |
-| C1 | Official OpenAI Codex skill-root documentation, fetched 2026-10-09: <https://developers.openai.com/codex/skills> | Live documentation, not a version-pinned artifact |
-| L1 | `recipes/hindsight-research-memory.md` and its linked accepted sanitized receipts; `manifests/landscape.json#/research_memory_jobs/0` | Existing pinned repository evidence, reused rather than rerun |
+| H1 | vectorize-io/hindsight@5fc4ce20917b916240cef27c212c387a177f115b:hindsight-integrations/agent-plugin/README.md | 9be844948ece7b09fa192e5e6e770b73d94fe10142f10bc85759a4e6af84211b |
+| H2 | Same pin, hindsight-integrations/agent-plugin/skills/hindsight-memory/SKILL.md | 736dec06d414798f6b17dc078c5ef6204e8802f53cb3a5fb3c306ce08872f08e |
+| H3 | Same pin, hindsight-docs/static/get-cli, version/install variables and nonexecuting installer tail | ed7489a0287d51e1a3bb045b506c806118131b401c8e229e4ae2e714efa9ee4a |
+| H4 | Same pin, hindsight-docs/docs/sdks/cli.mdx | 8cabf147cf2027f80197df1de1ab81863518d8bec855395d20c610e4f3a7a888 |
+| H5 | Same pin, hindsight-docs/docs/developer/mcp-server.md | 73d9513ad29acbd40fc02f95fe1a84cadb4b9958b6e82a4b8fb77df515716f11 |
+| H6 | Same pin, hindsight-integrations/claude-code/README.md, unselected automatic hooks | c56dfca50d045cf513faffcaeae6858ced8cf6dc78ed68140cf9c1171bc2e0d7 |
+| H7 | Same pin, hindsight-cli/smoke-test.sh, deferred scratch-bank/provider harness | c57a3506017164997bd45b88bf9d87cfeec69b511fcf90bd50c8f20278593848 |
+| H8 | Official Claude Code project/nested skill discovery, fetched 2026-10-09: https://code.claude.com/docs/en/skills | Live official docs |
+| C1 | Official OpenAI Codex project-skill discovery, fetched 2026-10-09: https://developers.openai.com/codex/skills | Live official docs |
+| H9 | Official https://api.github.com/repos/vectorize-io/hindsight/releases/tags/v0.10.2 retrieved 2026-10-09T04:01:10Z; hindsight-linux-amd64 asset id 597888410, size 4170928, digest sha256:be87c63714ff046ac8ed668465ca0c875f94e6ff0a89ed83da7eb387313197af | 8ce08cd4cc97254733c4c0a61631b2bb6332594eb01f3ba12f3947c7e52bf5b7 |
+| L1 | recipes/hindsight-research-memory.md, linked sanitized accepted receipts and manifests/landscape.json#/research_memory_jobs/0 | Existing pinned evidence reused |
+| L2 | CC's 2026-10-09T04:00:02Z nested-scope decision cites anthropics/claude-code@v2.1.295:CHANGELOG.md lines 7339/4303 and skills docs; openai/codex@rust-v0.161.0:host_roots.rs lines 138-185 | Primary-source handoff reviewed by CC/L1; not independently reread by this worker |
 
-Installed client help establishes supported launch/registration options.
-The official documentation search tool was unavailable; C1 was fetched
-directly through the installed context-mode fetch tool. C1 documents current
-skill discovery; a version-pinned Codex loader-source verification remains
-unexecuted. No credentials or environment-file values were read. Source
-verification does not establish host application, useful recall quality,
-role-bound PSS, strategy results, stage-3 organic use or stage-4 follow-up.
+The source handoff establishes the intended discovery boundary: Claude loads
+nested skills for sessions started at/below the directory and can discover
+them lazily while working on its files; the cited Codex version loads from
+repository root down to the session cwd [L2]. The actual native fresh-session
+loading checks remain OUTSTANDING. H9's target_commitish=main does not alone
+bind a binary build to the source commit: source pin and release-asset digest
+are separate evidence. No credential/config/environment values were read.
+This lane downloaded no binary and ran no installer, provider or native client.
+Source/PR evidence does not establish landing, runtime use, recall quality,
+role-bound PSS, strategy results, organic stage 3 or follow-up stage 4.
+
+The GPT micro read at 04c4bc278 reproduced shell fall-through using harmless
+fixtures. Its saved reproduce_wire_guards.py has SHA-256
+43e9adfe8f7477af078543bbef62aa9f170594897a07fd9ade9eba8cbdae1da8.
+That unchanged baseline reproduced ordinary-shell overwrite/execution and
+strict-shell termination. The evidence module reads the actual published
+Bash blocks and tests bad download/checksum and preexisting CLI destination
+failure paths in temporary fixtures, using the same downloader-substitution
+method. It executes no vendor installer, real binary, provider or client.
+Repository skill placement has no host install command; reviewed PR deployment
+and its revert remain the selected addition/inverse.

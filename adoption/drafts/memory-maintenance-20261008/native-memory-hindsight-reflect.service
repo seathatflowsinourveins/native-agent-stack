@@ -9,7 +9,7 @@ ConditionPathExists=%h/.config/native-stack/memory-maintenance.approved
 Type=oneshot
 Environment=PATH=%h/.local/share/codex-ecosystem/bin:%h/.local/share/mise/shims:%h/.local/bin:/usr/bin:/bin
 Environment=HINDSIGHT_API_URL=http://127.0.0.1:8888
-ExecStart=/usr/bin/env hindsight memory reflect trading-research "Summarize research-memory conventions, source corrections, and unresolved evidence." --budget low --max-tokens 512
+ExecStart=%h/.local/opt/hindsight-cli/0.10.2/bin/hindsight memory reflect trading-research "Summarize research-memory conventions, source corrections, and unresolved evidence." --budget low --max-tokens 512
 TimeoutStartSec=600
 Nice=10
 IOSchedulingClass=best-effort

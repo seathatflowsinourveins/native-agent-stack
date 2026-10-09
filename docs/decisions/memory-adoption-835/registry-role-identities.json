@@ -2,7 +2,7 @@
   "schema_version": 1,
   "captured_utc": "2026-10-09T03:27:22Z",
   "registry_root": "$HOME/.local/state/native-agent-stack/coordination/ns2604-coop/lanes",
-  "registry_scope": "hcom-lanes.json and all 90 named timestamped backups; threads.json and named backups for historical join",
+  "registry_scope": "immutable hcom-lanes.json.pre-ram-20261009 and the 90 timestamped registry backups inspected at capture; threads.json and named backups for historical join",
   "extraction": "Only name/previous_name/parked_name/last_parked_name, launch timestamp and source hashes retained. Voni joins a thread-registry entry to supported hcom stopped metadata; thread identifier is hashed. Every observed alias for these three lanes is retained, including post-window revi.",
   "limit": "Launch UTC is registry-reported, not event-level attribution. Bucket sums cannot deduplicate identities across aliases because source captures omit session IDs. Names absent in a snapshot stay unmeasured.",
   "hcom_join_command": "hcom list --stopped memory-h2h-voni --json --name revi",
@@ -13,7 +13,7 @@
         "name": "memory-h2h-revi",
         "launch_utc": "2026-10-09T03:14:10Z",
         "field": "name",
-        "source": "hcom-lanes.json",
+        "source": "hcom-lanes.json.pre-ram-20261009",
         "source_sha256": "7094935b8fe668a3004c774941679b1867c3ecc3f8f362f3099221f84f6e45bf"
       },
       {
@@ -66,7 +66,7 @@
         "name": "codex-token-parity-zonu",
         "launch_utc": "2026-10-09T00:14:43Z",
         "field": "name",
-        "source": "hcom-lanes.json",
+        "source": "hcom-lanes.json.pre-ram-20261009",
         "source_sha256": "7094935b8fe668a3004c774941679b1867c3ecc3f8f362f3099221f84f6e45bf"
       }
     ],
@@ -76,7 +76,7 @@
         "name": "overlap-token-lise",
         "launch_utc": "2026-10-08T23:02:27Z",
         "field": "name",
-        "source": "hcom-lanes.json",
+        "source": "hcom-lanes.json.pre-ram-20261009",
         "source_sha256": "7094935b8fe668a3004c774941679b1867c3ecc3f8f362f3099221f84f6e45bf"
       },
       {

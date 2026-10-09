@@ -16,7 +16,7 @@
   "adoption_evidence": {
     "identity_registry": {
       "source_file": "docs/decisions/memory-adoption-835/registry-role-identities.json",
-      "sha256": "03abf51ca7477c6b40c03e5f60a64177730fc838495b9bc174062555fc7f8cf6",
+      "sha256": "fc6f5dd30aa8dfa78932f1cb81b11abea311beca3d306927e21cb75f54ec765e",
       "scope": "all observed aliases from canonical hcom registry and timestamped backups for the three owning lanes; older voni thread-registry join is source-pinned",
       "all_observed_aliases_bound": true,
       "aggregation_policy": "Every alias remains separately bound to exact source buckets. Sum of identities across aliases is not a deduplicated distinct-lane/session count."
@@ -128,7 +128,7 @@
         },
         "registry_reference": {
           "source_file": "docs/decisions/memory-adoption-835/registry-role-identities.json",
-          "sha256": "03abf51ca7477c6b40c03e5f60a64177730fc838495b9bc174062555fc7f8cf6",
+          "sha256": "fc6f5dd30aa8dfa78932f1cb81b11abea311beca3d306927e21cb75f54ec765e",
           "role_pointer": null
         },
         "lane_aggregates": {},
@@ -310,7 +310,9 @@
         },
         "wiring": {
           "client_supported_commands": {"claude_preview":"ai-memory --data-dir \"$HOME/.local/share/ai-memory\" --config \"$HOME/.config/ai-memory/config.toml\" install-instructions --target CLAUDE.md --compact --skills-agent claude-code --print","codex_preview":"ai-memory --data-dir \"$HOME/.local/share/ai-memory\" --config \"$HOME/.config/ai-memory/config.toml\" install-instructions --target AGENTS.md --compact --skills-agent agents --print","application":"Remove --print only from the CC-reviewed target/scope commands. Vendor install-instructions writes matched skills; do not add duplicate managed skills. Existing global install-skills command remains a separate reviewed option, no scope silently selected.","status":"OUTSTANDING","applied":false},
-          "vendor_command": "ai-memory --data-dir \"$HOME/.local/share/ai-memory\" --config \"$HOME/.config/ai-memory/config.toml\" install-skills --scope global --agent both",
+          "vendor_command": "ai-memory --data-dir \"$HOME/.local/share/ai-memory\" --config \"$HOME/.config/ai-memory/config.toml\" install-instructions --target AGENTS.md --compact --skills-agent agents",
+          "unselected_alternative_command": "ai-memory --data-dir \"$HOME/.local/share/ai-memory\" --config \"$HOME/.config/ai-memory/config.toml\" install-skills --scope global --agent both",
+          "route_choice": "CC-reviewed project install-instructions writes matching skills; standalone global install-skills is an unselected alternative, not a second default.",
           "instruction_route": "ai-memory install-instructions, only the vendor managed block with reviewed client/project scope",
           "version": "2.6.0",
           "source_commit": "89bd8ded3c1ab8b769cf99417d038ed0364403c8",
@@ -318,15 +320,15 @@
           "applied": false,
           "packet": {
             "source_file": "docs/decisions/memory-adoption-835/wire-inverses-smokes.md",
-            "sha256": "31ab5d5c5d8986df30bd367c5428423f2b18c1cad98fc39d5de78e33bb30e5bd"
+            "sha256": "509d4b65980a5012e4e3b80cab86ffcb8769e06ba3fc3107516e2b774ef6fbc8"
           },
           "inverse": "Preview ai-memory uninstall --only skills and --only instructions; apply only the reviewed transaction inverse with --apply, preserving pre-existing managed routes via captured preimages. Packet AM-02 records the transaction scope.",
-          "smoke": "AM-03: ai-memory --version / install-skills --print and fresh client supported recall route verification; OUTSTANDING, no returned result.",
+          "smoke": "AM-03: from a new eligible client session in the CC-selected project, load the managed recall skill and call the existing memory_query or memory_context route with a benign known project decision. Bind client, project, role, session, query and source-backed returned result. OUTSTANDING; no returned result.",
           "status": "OUTSTANDING"
         },
         "registry_reference": {
           "source_file": "docs/decisions/memory-adoption-835/registry-role-identities.json",
-          "sha256": "03abf51ca7477c6b40c03e5f60a64177730fc838495b9bc174062555fc7f8cf6",
+          "sha256": "fc6f5dd30aa8dfa78932f1cb81b11abea311beca3d306927e21cb75f54ec765e",
           "role_pointer": "/roles/memory-h2h"
         },
         "lane_aggregates": {
@@ -540,7 +542,7 @@
         "accepted_job_reference": "manifests/landscape.json#/research_memory_jobs/0",
         "wiring": {
           "vendor_skill": "https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/hindsight-integrations/agent-plugin/skills/hindsight-memory/SKILL.md",
-          "vendor_manual_route": "Skills + MCP; unchanged skill only in the named research-consumer scope; reuse accepted bank-specific registrations",
+          "vendor_manual_route": "Vendor unchanged Skills + existing bank-specific MCP in CC-selected research projects, by repository PR; no user roots or native repository-root skill additions. Trading PR15 plus blueprint-scoped files in #835.",
           "endpoint": "http://127.0.0.1:8888/mcp/trading-research/",
           "bank": "trading-research",
           "recall_types": [
@@ -560,12 +562,12 @@
             "adoption/templates/systemd/hindsight-research.mcp-tools.env.template",
             "existing native client registrations and retained bank"
           ],
-          "inverse": "Reverse only the CC-approved additions: restore exact reviewed preimages or remove only transaction-created hindsight-memory directories and dedicated $HOME/.local/opt/hindsight-cli/0.10.2 prefix after verifying ownership. Restore any client config/PATH preimage touched by the CC. Preserve all pre-existing registrations, active service, 15-tool allowlist and research bank/data. Packet HW-05 defines the transaction inverse; no service-retirement inverse is used.",
+          "inverse": "Revert only the two project skill additions in each repository through its reviewed PR route (trading PR15 and native blueprint files in #835). No user skill directory or client configuration removal. Reverse only the transaction-created dedicated CLI binary/prefix after ownership/hash review. Preserve all existing research bank/data/service, MCP registrations and server allowlist; no PATH/profile delta.",
           "applied": false,
           "retirement_context": "No retirement authorized. The retained service/bank/registrations/allowlist are outside this wiring transaction.",
           "packet": {
             "source_file": "docs/decisions/memory-adoption-835/hindsight-wire.diff.md",
-            "sha256": "d55fcbd57147fe76e124cbc942591cb3d850eb7b11c084fcbcd26702f81208fb"
+            "sha256": "ea5d287f65127b368e73d477697a8f2c0ade20e237d0325eb914b15608596098"
           },
           "cli": {
             "version": "0.10.2",
@@ -575,66 +577,204 @@
             "install_command": "HINDSIGHT_CLI_VERSION=0.10.2 HINDSIGHT_INSTALL_DIR=\"$HOME/.local/opt/hindsight-cli/0.10.2/bin\" bash \"$memory835_stage/get-cli\"",
             "version_smoke": "\"$HOME/.local/opt/hindsight-cli/0.10.2/bin/hindsight\" --version",
             "status": "OUTSTANDING",
-            "applied": false
+            "applied": false,
+            "binary_digest_check": {
+              "asset": "hindsight-linux-amd64",
+              "release_tag": "v0.10.2",
+              "asset_id": 597888410,
+              "asset_size_bytes": 4170928,
+              "sha256": "be87c63714ff046ac8ed668465ca0c875f94e6ff0a89ed83da7eb387313197af",
+              "source": "https://api.github.com/repos/vectorize-io/hindsight/releases/tags/v0.10.2",
+              "release_metadata_sha256": "8ce08cd4cc97254733c4c0a61631b2bb6332594eb01f3ba12f3947c7e52bf5b7",
+              "reviewed_at_utc": "2026-10-09T04:01:10Z",
+              "before_first_binary_execution": true,
+              "command": "printf '%s  %s\\n' be87c63714ff046ac8ed668465ca0c875f94e6ff0a89ed83da7eb387313197af \"$memory835_cli_root/bin/hindsight\" | sha256sum --check --status",
+              "executed": false,
+              "status": "OUTSTANDING",
+              "operator": "CC"
+            }
           },
           "client_routes": {
             "claude": {
-              "route": "vendor Skills + existing bank-specific MCP, manual; automatic plugin hooks unselected",
-              "skill_root": "$HOME/.claude/skills/hindsight-memory",
-              "install_command": "install -m 0644 \"$memory835_stage/hindsight-memory.SKILL.md\" $HOME/.claude/skills/hindsight-memory/SKILL.md",
-              "status": "OUTSTANDING",
-              "applied": false
+              "route": "unchanged vendor project skill + existing bank-specific MCP, landed through repository PR review",
+              "skill_root": ".claude/skills/hindsight-memory",
+              "targets": [
+                {
+                  "repository": "seathatflowsinourveins/us-equities-trading",
+                  "path": ".claude/skills/hindsight-memory/SKILL.md",
+                  "pull_request": 15,
+                  "head": "650df14547daf7ac4e86d1f85f167787d94b4f24"
+                },
+                {
+                  "repository": "seathatflowsinourveins/native-agent-stack",
+                  "path": "blueprints/us-equities/.claude/skills/hindsight-memory/SKILL.md",
+                  "pull_request": 835,
+                  "next_head": "this fix2 head"
+                }
+              ],
+              "vendor_sha256": "736dec06d414798f6b17dc078c5ef6204e8802f53cb3a5fb3c306ce08872f08e",
+              "installation_route": "repository PR review/merge; skill discovery in a fresh admitted research session",
+              "install_command": null,
+              "user_root_rejected": true,
+              "native_repo_root_rejected": true,
+              "staged": true,
+              "applied": false,
+              "status": "OUTSTANDING"
             },
             "codex": {
-              "route": "vendor skill + existing bank-specific MCP, manual",
-              "skill_root": "$HOME/.agents/skills/hindsight-memory",
-              "install_command": "install -m 0644 \"$memory835_stage/hindsight-memory.SKILL.md\" $HOME/.agents/skills/hindsight-memory/SKILL.md",
-              "status": "OUTSTANDING",
-              "applied": false
+              "route": "unchanged vendor project skill + existing bank-specific MCP, landed through repository PR review",
+              "skill_root": ".agents/skills/hindsight-memory",
+              "targets": [
+                {
+                  "repository": "seathatflowsinourveins/us-equities-trading",
+                  "path": ".agents/skills/hindsight-memory/SKILL.md",
+                  "pull_request": 15,
+                  "head": "650df14547daf7ac4e86d1f85f167787d94b4f24"
+                },
+                {
+                  "repository": "seathatflowsinourveins/native-agent-stack",
+                  "path": "blueprints/us-equities/.agents/skills/hindsight-memory/SKILL.md",
+                  "pull_request": 835,
+                  "next_head": "this fix2 head"
+                }
+              ],
+              "vendor_sha256": "736dec06d414798f6b17dc078c5ef6204e8802f53cb3a5fb3c306ce08872f08e",
+              "installation_route": "repository PR review/merge; skill discovery in a fresh admitted research session",
+              "install_command": null,
+              "user_root_rejected": true,
+              "native_repo_root_rejected": true,
+              "staged": true,
+              "applied": false,
+              "status": "OUTSTANDING"
             }
           },
           "smokes": {
             "claude": {
               "vendor_operation": "get_bank via existing bank-specific MCP",
-              "command": "claude --print --output-format json 'Perform a connection smoke with the configured hindsight get_bank tool. Report whether it selects trading-research. Do not retain, change, or delete anything.'",
+              "command": "cd \"$HOME/code/us-equities-trading\" && claude --print --allowedTools mcp__hindsight__get_bank --output-format json 'Perform a connection smoke with the configured hindsight get_bank tool. Report whether it selects trading-research. Do not retain, change, or delete anything.'",
               "status": "OUTSTANDING",
               "executed": false,
-              "result": null
+              "result": null,
+              "operator": "CC",
+              "session_start_cwd": "$HOME/code/us-equities-trading",
+              "additional_admitted_cwd": "$HOME/code/native-agent-stack/blueprints/us-equities",
+              "prerequisite": "review/landing of project-scoped unchanged vendor skill, CLI binary digest before first run and preserved bank-specific MCP",
+              "resume_or_fork": false
             },
             "codex": {
               "vendor_operation": "get_bank via existing bank-specific MCP",
-              "command": "codex exec --json 'Perform a connection smoke with the configured hindsight get_bank tool. Report whether it selects trading-research. Do not retain, change, or delete anything.'",
+              "command": "cd \"$HOME/code/us-equities-trading\" && codex exec --json 'Perform a connection smoke with the configured hindsight get_bank tool. Report whether it selects trading-research. Do not retain, change, or delete anything.'",
               "status": "OUTSTANDING",
               "executed": false,
-              "result": null
+              "result": null,
+              "operator": "CC",
+              "session_start_cwd": "$HOME/code/us-equities-trading",
+              "additional_admitted_cwd": "$HOME/code/native-agent-stack/blueprints/us-equities",
+              "prerequisite": "review/landing of project-scoped unchanged vendor skill, CLI binary digest before first run and preserved bank-specific MCP",
+              "resume_or_fork": false
             },
             "upstream_harness": {
               "source": "vectorize-io/hindsight@5fc4ce20917b916240cef27c212c387a177f115b:hindsight-cli/smoke-test.sh",
               "sha256": "c57a3506017164997bd45b88bf9d87cfeec69b511fcf90bd50c8f20278593848",
-              "command": "HINDSIGHT_API_URL=http://127.0.0.1:8888 HINDSIGHT_CLI=\"$memory835_cli_root/bin/hindsight\" bash \"$memory835_stage/hindsight-cli-smoke-test.sh\"",
-              "status": "OUTSTANDING",
+              "status": "DEFERRED",
               "executed": false,
               "result": null,
-              "scope": "CC authorizes scratch-bank write/delete/provider smoke; never substitute the accepted bank as scratch"
+              "command": null,
+              "reason": "CC deferred scratch-bank harness because it performs provider/model work and writes/deletes a scratch bank. Two research-project get_bank smokes satisfy rule A; no harness execution is required or authorized by this scope.",
+              "decision_source": "CC HW-01 ruling relayed2026-10-09T03:58:29Z"
             }
           },
           "organic_fresh_session_checks": {
             "retain_and_recall_per_client": "Packet HW-08 Claude and HW-09 Codex; natural research tasks without tool names; retain and subsequent fresh-session recall, world/experience verbatim text and strict experiment isolation",
             "executed": false,
             "status": "OUTSTANDING",
-            "results": []
+            "results": [],
+            "scope": "only admitted research projects (us-equities-trading and native blueprint subtree), after corresponding repository review/landing"
           },
           "follow_up": {
             "wiring_timestamp_utc": null,
-            "due": "each owning lane and named consumer role at wiring +24h; hourly rolling capture plan in stage 4",
+            "due": "for each admitted research owning lane/named consumer from actual CC wiring/fresh-project verification T0 through hourly rolling captures to T0+24h; retain role/client/project/cwd/session/source bindings",
             "status": "OUTSTANDING",
             "scheduled": false,
             "results": []
+          },
+          "scope_decision": {
+            "status": "COMPLETED — selected by CC; actual landing/execution OUTSTANDING",
+            "user_roots": "REJECTED: vendor broad continuity trigger overlaps coding memory and exposes research bank",
+            "trading_project": {
+              "repository": "seathatflowsinourveins/us-equities-trading",
+              "pull_request": 15,
+              "url": "https://github.com/seathatflowsinourveins/us-equities-trading/pull/15",
+              "head": "650df14547daf7ac4e86d1f85f167787d94b4f24",
+              "base": "a8a4e880ad5a4a69bb3ede3b856d0677055b08b8",
+              "committed_provenance": {"source_file":".claude/skills/hindsight-memory/SOURCE.json","sha256":"ada3ac1eb18414a22ce05f44ba778c7eda4e2ccc9f9ab924d8c07fce67a478d3","covers_both_copies":true,"skill_bytes_unchanged":true,"cc_read":{"head":"d794e28f860866c807717dfde069c55b06948b34","verdict":"PASS-WITH-P3","sha256":"2ff57f6a7a7788265d3d7f0663f3509de50b49efda26a2c59c0b7ba7edcb2caa","finding":"committed provenance for both copies","follow_up_head":"650df14547daf7ac4e86d1f85f167787d94b4f24"},"final_head_ci":"9 reported checks SUCCESS at650df14547daf7ac4e86d1f85f167787d94b4f24 observed04:21:43Z; GPT micro and CC landing cue remain OUTSTANDING","verification_exit_code":0,"tests":{"passed":62,"total":63,"skipped":1}},
+              "branch": "foundation/ns2604-hindsight-skill-20261009",
+              "is_draft": true,
+              "merged": false,
+              "changed_files": [
+                ".claude/skills/hindsight-memory/SKILL.md",
+                ".agents/skills/hindsight-memory/SKILL.md",
+                ".claude/skills/hindsight-memory/SOURCE.json"
+              ],
+              "vendor_sha256": "736dec06d414798f6b17dc078c5ef6204e8802f53cb3a5fb3c306ce08872f08e",
+              "vendor_bytes": 2758,
+              "verification_exit_code": 0,
+              "tests": {
+                "passed": 62,
+                "total": 63,
+                "skipped": 1
+              },
+              "lane_paths_exit_code": 0,
+              "hosted_ci": {"head":"650df14547daf7ac4e86d1f85f167787d94b4f24","observed_at_utc":"2026-10-09T04:21:43Z","checks":9,"conclusion":"SUCCESS","review_and_cue":"OUTSTANDING"},
+              "status": "OUTSTANDING — review/landing and fresh client qualification"
+            },
+            "native_blueprint_project": {
+              "repository": "seathatflowsinourveins/native-agent-stack",
+              "pull_request": 835,
+              "relative_project_root": "blueprints/us-equities",
+              "changed_files": [
+                "blueprints/us-equities/.claude/skills/hindsight-memory/SKILL.md",
+                "blueprints/us-equities/.agents/skills/hindsight-memory/SKILL.md"
+              ],
+              "vendor_sha256": "736dec06d414798f6b17dc078c5ef6204e8802f53cb3a5fb3c306ce08872f08e",
+              "vendor_bytes": 2758,
+              "staged_in_fix2": true,
+              "merged": false,
+              "scope_decision": "CC selected nested roots at2026-10-09T04:00:02Z after L1",
+              "status": "OUTSTANDING — next-head review/landing and fresh client qualification"
+            },
+            "approved_cli_prefix": "$HOME/.local/opt/hindsight-cli/0.10.2/bin",
+            "path_or_profile_change": false
+          },
+          "skill_source": {
+            "repository": "vectorize-io/hindsight",
+            "commit": "5fc4ce20917b916240cef27c212c387a177f115b",
+            "version": "v0.10.2",
+            "file": "hindsight-integrations/agent-plugin/skills/hindsight-memory/SKILL.md",
+            "sha256": "736dec06d414798f6b17dc078c5ef6204e8802f53cb3a5fb3c306ce08872f08e",
+            "bytes": 2758,
+            "unchanged": true
+          },
+          "nested_discovery": {
+            "decision": "SELECTED by CC at2026-10-09T04:00:02Z; add only blueprint-scoped files, never native repository root",
+            "claude": {
+              "version": "2.1.295",
+              "source": "anthropics/claude-code@602df92bf481ed904533e95c09f740f40aab5aed:CHANGELOG.md, lines7339/4303; official skills docs",
+              "behavior": "nested .claude/skills discovered for sessions started at/below directory and lazily when working on files there",
+              "verification": "official pinned changelog/doc fetch plus CC/L1 handoff; fresh client discovery remains OUTSTANDING"
+            },
+            "codex": {
+              "version": "0.161.0",
+              "source": "openai/codex@rust-v0.161.0:host_roots.rs:138-185 per CC/L1",
+              "behavior": "repository .agents/skills from project root down to launch cwd; root-started session does not acquire child-only skill",
+              "verification": "official live Codex skills page independently fetched; direct version-pinned source-path API probe403rate-limit, no retry or pinned-source execution claim"
+            },
+            "native_execution": false
           }
         },
         "registry_reference": {
           "source_file": "docs/decisions/memory-adoption-835/registry-role-identities.json",
-          "sha256": "03abf51ca7477c6b40c03e5f60a64177730fc838495b9bc174062555fc7f8cf6",
+          "sha256": "fc6f5dd30aa8dfa78932f1cb81b11abea311beca3d306927e21cb75f54ec765e",
           "role_pointer": "/roles/memory-h2h"
         },
         "lane_aggregates": {
@@ -922,7 +1062,7 @@
         },
         "registry_reference": {
           "source_file": "docs/decisions/memory-adoption-835/registry-role-identities.json",
-          "sha256": "03abf51ca7477c6b40c03e5f60a64177730fc838495b9bc174062555fc7f8cf6",
+          "sha256": "fc6f5dd30aa8dfa78932f1cb81b11abea311beca3d306927e21cb75f54ec765e",
           "role_pointer": "/roles/codex-token-parity"
         },
         "lane_aggregates": {
@@ -1237,7 +1377,7 @@
         },
         "registry_reference": {
           "source_file": "docs/decisions/memory-adoption-835/registry-role-identities.json",
-          "sha256": "03abf51ca7477c6b40c03e5f60a64177730fc838495b9bc174062555fc7f8cf6",
+          "sha256": "fc6f5dd30aa8dfa78932f1cb81b11abea311beca3d306927e21cb75f54ec765e",
           "role_pointer": "/roles/overlap-token"
         },
         "lane_aggregates": {
@@ -1477,7 +1617,7 @@
         "separate_namespace": "qmdshared is preserved as a separate producer namespace; its identities are not merged with qmd.",
         "registry_reference": {
           "source_file": "docs/decisions/memory-adoption-835/registry-role-identities.json",
-          "sha256": "03abf51ca7477c6b40c03e5f60a64177730fc838495b9bc174062555fc7f8cf6",
+          "sha256": "fc6f5dd30aa8dfa78932f1cb81b11abea311beca3d306927e21cb75f54ec765e",
           "role_pointer": "/roles/memory-h2h"
         },
         "lane_aggregates": {
@@ -1516,12 +1656,12 @@
         "wiring": {
           "packet": {
             "source_file": "docs/decisions/memory-adoption-835/wire-inverses-smokes.md",
-            "sha256": "31ab5d5c5d8986df30bd367c5428423f2b18c1cad98fc39d5de78e33bb30e5bd"
+            "sha256": "509d4b65980a5012e4e3b80cab86ffcb8769e06ba3fc3107516e2b774ef6fbc8"
           },
           "source_commit": "facd35e01359e59d938bc9418e93fb9318addee3",
           "version": "2.8.3",
           "vendor_command": "qmd skill install --yes (only after QMD-01 scope review)",
-          "inverse": "Restore only touched skill/bootstrap/symlink and registration preimages; remove only transaction-created paths; preserve named index, models and other collections. QMD-03.",
+          "inverse": "Restore only touched skill/bootstrap/symlink and registration preimages; remove only transaction-created paths; preserve named index, models and other collections. QMD-02.",
           "smoke": "qmd --index native-agent-stack-catalog-lex status; per-client fresh-session retrieval observation with cited checked-in text. QMD-03 is OUTSTANDING.",
           "applied": false,
           "status": "OUTSTANDING"
@@ -1703,7 +1843,7 @@
         },
         "registry_reference": {
           "source_file": "docs/decisions/memory-adoption-835/registry-role-identities.json",
-          "sha256": "03abf51ca7477c6b40c03e5f60a64177730fc838495b9bc174062555fc7f8cf6",
+          "sha256": "fc6f5dd30aa8dfa78932f1cb81b11abea311beca3d306927e21cb75f54ec765e",
           "role_pointer": "/roles/memory-h2h"
         },
         "lane_aggregates": {
@@ -2935,8 +3075,117 @@
     "claude_verdict_sha256": "c5a288b0f351f7d67d6542140a968be7a30fdb1f7716e2ba417df8589517de32",
     "native_installs_or_model_tasks_performed": false
   },
+  "fix2_correction": {
+    "private_ai_qmd_diff": {
+      "source_file": "$HOME/.local/state/native-agent-stack/coordination/ns2604-coop/memory-roles-835-fix2-20261009/wire-inverses-smokes.md",
+      "sha256": "be0c4a51e50901c5f95e4d47211a9ebcdf2193cb5d01ce75352ff975a588ffd0",
+      "status": "OUTSTANDING",
+      "applied": false
+    },
+    "guard_reproduction": {
+      "reader_reproducer_sha256": "43e9adfe8f7477af078543bbef62aa9f170594897a07fd9ade9eba8cbdae1da8",
+      "source": "designated GPT micro-pr835-04c4bc278/reproduce_wire_guards.py; method retained in updated offline regression tests",
+      "baseline": {
+        "exit_code": 0,
+        "log_sha256": "ce47588486d9b87b459c0e77122ef2c0b1cb4205dc8b368796349758814ad92b",
+        "result": "previous packet reproduced fail-open installer/checksum/destination control flow; strict comparison stopped it"
+      },
+      "updated_packet": {
+        "bad_installer_checksum_exit_code": 1,
+        "failed_download_exit_code": 22,
+        "existing_cli_destination_exit_code": 1,
+        "bad_checksum_installer_executed": false,
+        "failed_download_installer_executed": false,
+        "preexisting_cli_bytes_preserved": true
+      },
+      "evidence_class": "synthetic shell control-flow fixtures; no vendor code, network or host apply"
+    },
+    "draft_unit_verification": {
+      "command": "systemd-analyze --user verify <two changed Hindsight draft units>",
+      "exit_code": 1,
+      "reason": "dedicated approved CLI binary not installed at %h/.local/opt/hindsight-cli/0.10.2/bin/hindsight",
+      "syntax_or_scope_error": false,
+      "absolute_execstart_required": true,
+      "execution_availability": "OUTSTANDING until CC installs/verifies pinned binary; repeat native unit verify then",
+      "installed_or_activated": false
+    },
+    "scope_decision": "CC HW01 projectscope and nestedruling",
+    "trading_skill_pr": {
+      "repository": "seathatflowsinourveins/us-equities-trading",
+      "pull_request": 15,
+      "url": "https://github.com/seathatflowsinourveins/us-equities-trading/pull/15",
+      "head": "650df14547daf7ac4e86d1f85f167787d94b4f24",
+      "base": "a8a4e880ad5a4a69bb3ede3b856d0677055b08b8",
+      "committed_provenance": {"source_file":".claude/skills/hindsight-memory/SOURCE.json","sha256":"ada3ac1eb18414a22ce05f44ba778c7eda4e2ccc9f9ab924d8c07fce67a478d3","covers_both_copies":true,"skill_bytes_unchanged":true,"cc_read":{"head":"d794e28f860866c807717dfde069c55b06948b34","verdict":"PASS-WITH-P3","sha256":"2ff57f6a7a7788265d3d7f0663f3509de50b49efda26a2c59c0b7ba7edcb2caa","finding":"committed provenance for both copies","follow_up_head":"650df14547daf7ac4e86d1f85f167787d94b4f24"},"final_head_ci":"9 reported checks SUCCESS at650df14547daf7ac4e86d1f85f167787d94b4f24 observed04:21:43Z; GPT micro and CC landing cue remain OUTSTANDING","verification_exit_code":0,"tests":{"passed":62,"total":63,"skipped":1}},
+      "branch": "foundation/ns2604-hindsight-skill-20261009",
+      "is_draft": true,
+      "merged": false,
+      "changed_files": [
+        ".claude/skills/hindsight-memory/SKILL.md",
+        ".agents/skills/hindsight-memory/SKILL.md",
+        ".claude/skills/hindsight-memory/SOURCE.json"
+      ],
+      "vendor_sha256": "736dec06d414798f6b17dc078c5ef6204e8802f53cb3a5fb3c306ce08872f08e",
+      "vendor_bytes": 2758,
+      "verification_exit_code": 0,
+      "tests": {
+        "passed": 62,
+        "total": 63,
+        "skipped": 1
+      },
+      "lane_paths_exit_code": 0,
+      "hosted_ci": {"head":"650df14547daf7ac4e86d1f85f167787d94b4f24","observed_at_utc":"2026-10-09T04:21:43Z","checks":9,"conclusion":"SUCCESS","review_and_cue":"OUTSTANDING"},
+      "status": "OUTSTANDING — review/landing and fresh client qualification"
+    },
+    "native_skill_scope": {
+      "repository": "seathatflowsinourveins/native-agent-stack",
+      "pull_request": 835,
+      "relative_project_root": "blueprints/us-equities",
+      "changed_files": [
+        "blueprints/us-equities/.claude/skills/hindsight-memory/SKILL.md",
+        "blueprints/us-equities/.agents/skills/hindsight-memory/SKILL.md"
+      ],
+      "vendor_sha256": "736dec06d414798f6b17dc078c5ef6204e8802f53cb3a5fb3c306ce08872f08e",
+      "vendor_bytes": 2758,
+      "staged_in_fix2": true,
+      "merged": false,
+      "scope_decision": "CC selected nested roots at2026-10-09T04:00:02Z after L1",
+      "status": "OUTSTANDING — next-head review/landing and fresh client qualification"
+    },
+    "cli_digest_check_before_first_run": {
+      "asset": "hindsight-linux-amd64",
+      "release_tag": "v0.10.2",
+      "asset_id": 597888410,
+      "asset_size_bytes": 4170928,
+      "sha256": "be87c63714ff046ac8ed668465ca0c875f94e6ff0a89ed83da7eb387313197af",
+      "source": "https://api.github.com/repos/vectorize-io/hindsight/releases/tags/v0.10.2",
+      "release_metadata_sha256": "8ce08cd4cc97254733c4c0a61631b2bb6332594eb01f3ba12f3947c7e52bf5b7",
+      "reviewed_at_utc": "2026-10-09T04:01:10Z",
+      "before_first_binary_execution": true,
+      "command": "printf '%s  %s\\n' be87c63714ff046ac8ed668465ca0c875f94e6ff0a89ed83da7eb387313197af \"$memory835_cli_root/bin/hindsight\" | sha256sum --check --status",
+      "executed": false,
+      "status": "OUTSTANDING",
+      "operator": "CC"
+    },
+    "user_roots_rejected": true,
+    "provider_harness": "DEFERRED by CC; get_bank suffices rule A",
+    "micro_read": {"head":"04c4bc278c25913cf7f3dff859dae7e91d8aab4e","status":"READ — findings incorporated in this same fix2 head","gpt_verdict":"CHANGES_REQUESTED (1P2)","gpt_sha256":"da4e41a4857c4a51d80293bcf4e6a0c9827e22ff29f2cb2d90cfd227b50985b4","cc_verdict":"PASS-WITH-P3 (5P3+smoke allowlist)","cc_sha256":"3c886d2f427c58fe4445c8671408a72943bc03b65030724a05cac7f4a604fa61","guard_checks":"reader offline reproduction plus actual revised packet guard regression; fixtures only, no vendor installer/model/download","completed_record_fixes":["project scopes and repository PRroute","CLI binarydigest beforefirstrun","fail-fast self-contained shellblocks","aligned ai-memory/QMDparams/inverse/smoke","stage1 SocratiCode/Serena overlap","Hindsightdrafts absolute dedicatedCLIpath","immutable registry backup","Claude get_bank --allowedTools"],"host_execution":"OUTSTANDING"},
+    "source_limits": {
+      "codex_source_api": "403rate-limit; official skills page and CC/L1 source handoff retained",
+      "native_discovery": "fresh-session execution still OUTSTANDING"
+    },
+    "outstanding_count": 50,
+    "host_installs": 0,
+    "client_configuration_changes": 0
+  },
   "delta_review_correction": {
-    "private_host_wiring_diff": {"source_file":"$HOME/.local/state/native-agent-stack/coordination/ns2604-coop/memory-roles-835-delta-20261009/hindsight-wire.diff.md","sha256":"2feb35c0551cef34d13953c10a024947a9097b1cfb4c14d4410928d64040b700","status":"OUTSTANDING","applied":false,"scope":"Concrete host paths retained privately before publication sanitation. Public packet uses portable $HOME references and has its own SHA256. Both describe the same pending transaction; CC applies only a reviewed private diff."},
+    "private_host_wiring_diff": {
+      "source_file": "$HOME/.local/state/native-agent-stack/coordination/ns2604-coop/memory-roles-835-fix2-20261009/hindsight-wire.diff.md",
+      "sha256": "d0692177528717f74c24f27a8b3691e959424cda5c59620c98e239614e2b6b45",
+      "status": "OUTSTANDING",
+      "applied": false,
+      "scope": "CC-selected project PRs; concrete approved CLI prefix and two get_bank smokes only. Public packet portable path form; no user-root skill target."
+    },
     "native_environment_property_observation": {
       "observed_utc": "2026-10-09T03:26:00Z",
       "command": "systemctl --user show ai-memory.service --property=EnvironmentFiles --no-pager",
@@ -2993,7 +3242,7 @@
     {
       "id": "HW-01",
       "component": "hindsight",
-      "operation": "CC-approved wiring/check step",
+      "operation": "CC scope decided; reviewed project PR deployment and fresh-route confirmation remain OUTSTANDING",
       "source_file": "docs/decisions/memory-adoption-835/hindsight-wire.diff.md",
       "status": "OUTSTANDING",
       "executed": false,
@@ -3002,7 +3251,7 @@
     {
       "id": "HW-02",
       "component": "hindsight",
-      "operation": "CC-approved wiring/check step",
+      "operation": "CC dedicated CLI install, binary release-asset digest before first execution and version check",
       "source_file": "docs/decisions/memory-adoption-835/hindsight-wire.diff.md",
       "status": "OUTSTANDING",
       "executed": false,
@@ -3011,7 +3260,7 @@
     {
       "id": "HW-03",
       "component": "hindsight",
-      "operation": "CC-approved wiring/check step",
+      "operation": "land unchanged vendor project skill via tradingPR15 and blueprint-scoped nativePR835 (Claude route)",
       "source_file": "docs/decisions/memory-adoption-835/hindsight-wire.diff.md",
       "status": "OUTSTANDING",
       "executed": false,
@@ -3020,7 +3269,7 @@
     {
       "id": "HW-04",
       "component": "hindsight",
-      "operation": "CC-approved wiring/check step",
+      "operation": "land unchanged vendor project skill via tradingPR15 and blueprint-scoped nativePR835 (Codex route)",
       "source_file": "docs/decisions/memory-adoption-835/hindsight-wire.diff.md",
       "status": "OUTSTANDING",
       "executed": false,
@@ -3029,7 +3278,7 @@
     {
       "id": "HW-05",
       "component": "hindsight",
-      "operation": "CC-approved wiring/check step",
+      "operation": "reviewed repository revert PR plus dedicated CLI addition inverse",
       "source_file": "docs/decisions/memory-adoption-835/hindsight-wire.diff.md",
       "status": "OUTSTANDING",
       "executed": false,
@@ -3692,7 +3941,9 @@
           },
           "install_routing": {
             "client_supported_commands": {"claude_preview":"ai-memory --data-dir \"$HOME/.local/share/ai-memory\" --config \"$HOME/.config/ai-memory/config.toml\" install-instructions --target CLAUDE.md --compact --skills-agent claude-code --print","codex_preview":"ai-memory --data-dir \"$HOME/.local/share/ai-memory\" --config \"$HOME/.config/ai-memory/config.toml\" install-instructions --target AGENTS.md --compact --skills-agent agents --print","application":"Remove --print only from the CC-reviewed target/scope commands. Vendor install-instructions writes matched skills; do not add duplicate managed skills. Existing global install-skills command remains a separate reviewed option, no scope silently selected.","status":"OUTSTANDING","applied":false},
-            "vendor_command": "ai-memory --data-dir \"$HOME/.local/share/ai-memory\" --config \"$HOME/.config/ai-memory/config.toml\" install-skills --scope global --agent both",
+            "vendor_command": "ai-memory --data-dir \"$HOME/.local/share/ai-memory\" --config \"$HOME/.config/ai-memory/config.toml\" install-instructions --target AGENTS.md --compact --skills-agent agents",
+            "unselected_alternative_command": "ai-memory --data-dir \"$HOME/.local/share/ai-memory\" --config \"$HOME/.config/ai-memory/config.toml\" install-skills --scope global --agent both",
+            "route_choice": "CC-reviewed project install-instructions writes matching skills; standalone global install-skills is an unselected alternative, not a second default.",
             "instruction_route": "ai-memory install-instructions, only the vendor managed block with reviewed client/project scope",
             "version": "2.6.0",
             "source_commit": "89bd8ded3c1ab8b769cf99417d038ed0364403c8",
@@ -3700,10 +3951,10 @@
             "applied": false,
             "packet": {
               "source_file": "docs/decisions/memory-adoption-835/wire-inverses-smokes.md",
-              "sha256": "31ab5d5c5d8986df30bd367c5428423f2b18c1cad98fc39d5de78e33bb30e5bd"
+              "sha256": "509d4b65980a5012e4e3b80cab86ffcb8769e06ba3fc3107516e2b774ef6fbc8"
             },
             "inverse": "Preview ai-memory uninstall --only skills and --only instructions; apply only the reviewed transaction inverse with --apply, preserving pre-existing managed routes via captured preimages. Packet AM-02 records the transaction scope.",
-            "smoke": "AM-03: ai-memory --version / install-skills --print and fresh client supported recall route verification; OUTSTANDING, no returned result.",
+            "smoke": "AM-03: from a new eligible client session in the CC-selected project, load the managed recall skill and call the existing memory_query or memory_context route with a benign known project decision. Bind client, project, role, session, query and source-backed returned result. OUTSTANDING; no returned result.",
             "status": "OUTSTANDING"
           },
           "component_per_session_pss_kb": null,
@@ -3724,7 +3975,7 @@
           "install_routing": {
             "packet": {
               "source_file": "docs/decisions/memory-adoption-835/hindsight-wire.diff.md",
-              "sha256": "d55fcbd57147fe76e124cbc942591cb3d850eb7b11c084fcbcd26702f81208fb"
+              "sha256": "ea5d287f65127b368e73d477697a8f2c0ade20e237d0325eb914b15608596098"
             },
             "cli": {
               "version": "0.10.2",
@@ -3734,56 +3985,166 @@
               "install_command": "HINDSIGHT_CLI_VERSION=0.10.2 HINDSIGHT_INSTALL_DIR=\"$HOME/.local/opt/hindsight-cli/0.10.2/bin\" bash \"$memory835_stage/get-cli\"",
               "version_smoke": "\"$HOME/.local/opt/hindsight-cli/0.10.2/bin/hindsight\" --version",
               "status": "OUTSTANDING",
-              "applied": false
+              "applied": false,
+              "binary_digest_check": {
+                "asset": "hindsight-linux-amd64",
+                "release_tag": "v0.10.2",
+                "asset_id": 597888410,
+                "asset_size_bytes": 4170928,
+                "sha256": "be87c63714ff046ac8ed668465ca0c875f94e6ff0a89ed83da7eb387313197af",
+                "source": "https://api.github.com/repos/vectorize-io/hindsight/releases/tags/v0.10.2",
+                "release_metadata_sha256": "8ce08cd4cc97254733c4c0a61631b2bb6332594eb01f3ba12f3947c7e52bf5b7",
+                "reviewed_at_utc": "2026-10-09T04:01:10Z",
+                "before_first_binary_execution": true,
+                "command": "printf '%s  %s\\n' be87c63714ff046ac8ed668465ca0c875f94e6ff0a89ed83da7eb387313197af \"$memory835_cli_root/bin/hindsight\" | sha256sum --check --status",
+                "executed": false,
+                "status": "OUTSTANDING",
+                "operator": "CC"
+              }
             },
             "client_routes": {
               "claude": {
-                "route": "vendor Skills + existing bank-specific MCP, manual; automatic plugin hooks unselected",
-                "skill_root": "$HOME/.claude/skills/hindsight-memory",
-                "install_command": "install -m 0644 \"$memory835_stage/hindsight-memory.SKILL.md\" $HOME/.claude/skills/hindsight-memory/SKILL.md",
-                "status": "OUTSTANDING",
-                "applied": false
+                "route": "unchanged vendor project skill + existing bank-specific MCP, landed through repository PR review",
+                "skill_root": ".claude/skills/hindsight-memory",
+                "targets": [
+                  {
+                    "repository": "seathatflowsinourveins/us-equities-trading",
+                    "path": ".claude/skills/hindsight-memory/SKILL.md",
+                    "pull_request": 15,
+                    "head": "650df14547daf7ac4e86d1f85f167787d94b4f24"
+                  },
+                  {
+                    "repository": "seathatflowsinourveins/native-agent-stack",
+                    "path": "blueprints/us-equities/.claude/skills/hindsight-memory/SKILL.md",
+                    "pull_request": 835,
+                    "next_head": "this fix2 head"
+                  }
+                ],
+                "vendor_sha256": "736dec06d414798f6b17dc078c5ef6204e8802f53cb3a5fb3c306ce08872f08e",
+                "installation_route": "repository PR review/merge; skill discovery in a fresh admitted research session",
+                "install_command": null,
+                "user_root_rejected": true,
+                "native_repo_root_rejected": true,
+                "staged": true,
+                "applied": false,
+                "status": "OUTSTANDING"
               },
               "codex": {
-                "route": "vendor skill + existing bank-specific MCP, manual",
-                "skill_root": "$HOME/.agents/skills/hindsight-memory",
-                "install_command": "install -m 0644 \"$memory835_stage/hindsight-memory.SKILL.md\" $HOME/.agents/skills/hindsight-memory/SKILL.md",
-                "status": "OUTSTANDING",
-                "applied": false
+                "route": "unchanged vendor project skill + existing bank-specific MCP, landed through repository PR review",
+                "skill_root": ".agents/skills/hindsight-memory",
+                "targets": [
+                  {
+                    "repository": "seathatflowsinourveins/us-equities-trading",
+                    "path": ".agents/skills/hindsight-memory/SKILL.md",
+                    "pull_request": 15,
+                    "head": "650df14547daf7ac4e86d1f85f167787d94b4f24"
+                  },
+                  {
+                    "repository": "seathatflowsinourveins/native-agent-stack",
+                    "path": "blueprints/us-equities/.agents/skills/hindsight-memory/SKILL.md",
+                    "pull_request": 835,
+                    "next_head": "this fix2 head"
+                  }
+                ],
+                "vendor_sha256": "736dec06d414798f6b17dc078c5ef6204e8802f53cb3a5fb3c306ce08872f08e",
+                "installation_route": "repository PR review/merge; skill discovery in a fresh admitted research session",
+                "install_command": null,
+                "user_root_rejected": true,
+                "native_repo_root_rejected": true,
+                "staged": true,
+                "applied": false,
+                "status": "OUTSTANDING"
               }
             },
-            "inverse": "Reverse only the CC-approved additions: restore exact reviewed preimages or remove only transaction-created hindsight-memory directories and dedicated $HOME/.local/opt/hindsight-cli/0.10.2 prefix after verifying ownership. Restore any client config/PATH preimage touched by the CC. Preserve all pre-existing registrations, active service, 15-tool allowlist and research bank/data. Packet HW-05 defines the transaction inverse; no service-retirement inverse is used.",
+            "inverse": "Revert only the two project skill additions in each repository through its reviewed PR route (trading PR15 and native blueprint files in #835). No user skill directory or client configuration removal. Reverse only the transaction-created dedicated CLI binary/prefix after ownership/hash review. Preserve all existing research bank/data/service, MCP registrations and server allowlist; no PATH/profile delta.",
             "smokes": {
               "claude": {
                 "vendor_operation": "get_bank via existing bank-specific MCP",
-                "command": "claude --print --output-format json 'Perform a connection smoke with the configured hindsight get_bank tool. Report whether it selects trading-research. Do not retain, change, or delete anything.'",
+                "command": "cd \"$HOME/code/us-equities-trading\" && claude --print --allowedTools mcp__hindsight__get_bank --output-format json 'Perform a connection smoke with the configured hindsight get_bank tool. Report whether it selects trading-research. Do not retain, change, or delete anything.'",
                 "status": "OUTSTANDING",
                 "executed": false,
-                "result": null
+                "result": null,
+                "operator": "CC",
+                "session_start_cwd": "$HOME/code/us-equities-trading",
+                "additional_admitted_cwd": "$HOME/code/native-agent-stack/blueprints/us-equities",
+                "prerequisite": "review/landing of project-scoped unchanged vendor skill, CLI binary digest before first run and preserved bank-specific MCP",
+                "resume_or_fork": false
               },
               "codex": {
                 "vendor_operation": "get_bank via existing bank-specific MCP",
-                "command": "codex exec --json 'Perform a connection smoke with the configured hindsight get_bank tool. Report whether it selects trading-research. Do not retain, change, or delete anything.'",
+                "command": "cd \"$HOME/code/us-equities-trading\" && codex exec --json 'Perform a connection smoke with the configured hindsight get_bank tool. Report whether it selects trading-research. Do not retain, change, or delete anything.'",
                 "status": "OUTSTANDING",
                 "executed": false,
-                "result": null
+                "result": null,
+                "operator": "CC",
+                "session_start_cwd": "$HOME/code/us-equities-trading",
+                "additional_admitted_cwd": "$HOME/code/native-agent-stack/blueprints/us-equities",
+                "prerequisite": "review/landing of project-scoped unchanged vendor skill, CLI binary digest before first run and preserved bank-specific MCP",
+                "resume_or_fork": false
               },
               "upstream_harness": {
                 "source": "vectorize-io/hindsight@5fc4ce20917b916240cef27c212c387a177f115b:hindsight-cli/smoke-test.sh",
                 "sha256": "c57a3506017164997bd45b88bf9d87cfeec69b511fcf90bd50c8f20278593848",
-                "command": "HINDSIGHT_API_URL=http://127.0.0.1:8888 HINDSIGHT_CLI=\"$memory835_cli_root/bin/hindsight\" bash \"$memory835_stage/hindsight-cli-smoke-test.sh\"",
-                "status": "OUTSTANDING",
+                "status": "DEFERRED",
                 "executed": false,
                 "result": null,
-                "scope": "CC authorizes scratch-bank write/delete/provider smoke; never substitute the accepted bank as scratch"
+                "command": null,
+                "reason": "CC deferred scratch-bank harness because it performs provider/model work and writes/deletes a scratch bank. Two research-project get_bank smokes satisfy rule A; no harness execution is required or authorized by this scope.",
+                "decision_source": "CC HW-01 ruling relayed2026-10-09T03:58:29Z"
               }
-            }
+            },
+            "repository_changes": [
+              {
+                "repository": "seathatflowsinourveins/us-equities-trading",
+                "pull_request": 15,
+                "url": "https://github.com/seathatflowsinourveins/us-equities-trading/pull/15",
+                "head": "650df14547daf7ac4e86d1f85f167787d94b4f24",
+                "base": "a8a4e880ad5a4a69bb3ede3b856d0677055b08b8",
+                "committed_provenance": {"source_file":".claude/skills/hindsight-memory/SOURCE.json","sha256":"ada3ac1eb18414a22ce05f44ba778c7eda4e2ccc9f9ab924d8c07fce67a478d3","covers_both_copies":true,"skill_bytes_unchanged":true,"cc_read":{"head":"d794e28f860866c807717dfde069c55b06948b34","verdict":"PASS-WITH-P3","sha256":"2ff57f6a7a7788265d3d7f0663f3509de50b49efda26a2c59c0b7ba7edcb2caa","finding":"committed provenance for both copies","follow_up_head":"650df14547daf7ac4e86d1f85f167787d94b4f24"},"final_head_ci":"9 reported checks SUCCESS at650df14547daf7ac4e86d1f85f167787d94b4f24 observed04:21:43Z; GPT micro and CC landing cue remain OUTSTANDING","verification_exit_code":0,"tests":{"passed":62,"total":63,"skipped":1}},
+                "branch": "foundation/ns2604-hindsight-skill-20261009",
+                "is_draft": true,
+                "merged": false,
+                "changed_files": [
+                  ".claude/skills/hindsight-memory/SKILL.md",
+                  ".agents/skills/hindsight-memory/SKILL.md",
+                  ".claude/skills/hindsight-memory/SOURCE.json"
+                ],
+                "vendor_sha256": "736dec06d414798f6b17dc078c5ef6204e8802f53cb3a5fb3c306ce08872f08e",
+                "vendor_bytes": 2758,
+                "verification_exit_code": 0,
+                "tests": {
+                  "passed": 62,
+                  "total": 63,
+                  "skipped": 1
+                },
+                "lane_paths_exit_code": 0,
+                "hosted_ci": {"head":"650df14547daf7ac4e86d1f85f167787d94b4f24","observed_at_utc":"2026-10-09T04:21:43Z","checks":9,"conclusion":"SUCCESS","review_and_cue":"OUTSTANDING"},
+                "status": "OUTSTANDING — review/landing and fresh client qualification"
+              },
+              {
+                "repository": "seathatflowsinourveins/native-agent-stack",
+                "pull_request": 835,
+                "relative_project_root": "blueprints/us-equities",
+                "changed_files": [
+                  "blueprints/us-equities/.claude/skills/hindsight-memory/SKILL.md",
+                  "blueprints/us-equities/.agents/skills/hindsight-memory/SKILL.md"
+                ],
+                "vendor_sha256": "736dec06d414798f6b17dc078c5ef6204e8802f53cb3a5fb3c306ce08872f08e",
+                "vendor_bytes": 2758,
+                "staged_in_fix2": true,
+                "merged": false,
+                "scope_decision": "CC selected nested roots at2026-10-09T04:00:02Z after L1",
+                "status": "OUTSTANDING — next-head review/landing and fresh client qualification"
+              }
+            ],
+            "host_executor": "CC",
+            "no_user_roots": true
           },
           "component_per_session_pss_kb": null,
           "pss_status": "UNMEASURED; MV-PSS-hindsight OUTSTANDING",
           "cost_gate": "BLOCKED ADOPT-NOW until per-role/session/process PSS and sharing/load evidence",
           "shared_copy_capability": "Documented and observed shared bank-specific HTTP service",
-          "load_scope": "only the owning/using roles; per-role MCP set proposal, no global activation change",
+          "load_scope": "Only research sessions launched in us-equities-trading or native-agent-stack/blueprints/us-equities; Claude lazy nested discovery when working on blueprint files is source-documented. Per-project MCP bank route remains existing; no user-wide skill or configuration delta.",
           "executed_host_steps": [],
           "unexecuted_steps_status": "OUTSTANDING"
         },
@@ -3873,12 +4234,12 @@
           "install_routing": {
             "packet": {
               "source_file": "docs/decisions/memory-adoption-835/wire-inverses-smokes.md",
-              "sha256": "31ab5d5c5d8986df30bd367c5428423f2b18c1cad98fc39d5de78e33bb30e5bd"
+              "sha256": "509d4b65980a5012e4e3b80cab86ffcb8769e06ba3fc3107516e2b774ef6fbc8"
             },
             "source_commit": "facd35e01359e59d938bc9418e93fb9318addee3",
             "version": "2.8.3",
             "vendor_command": "qmd skill install --yes (only after QMD-01 scope review)",
-            "inverse": "Restore only touched skill/bootstrap/symlink and registration preimages; remove only transaction-created paths; preserve named index, models and other collections. QMD-03.",
+            "inverse": "Restore only touched skill/bootstrap/symlink and registration preimages; remove only transaction-created paths; preserve named index, models and other collections. QMD-02.",
             "smoke": "qmd --index native-agent-stack-catalog-lex status; per-client fresh-session retrieval observation with cited checked-in text. QMD-03 is OUTSTANDING.",
             "applied": false,
             "status": "OUTSTANDING"
@@ -4024,7 +4385,16 @@
               ],
               "executed": false,
               "session_reference": null,
-              "result": null
+              "result": null,
+              "admitted_projects": [
+                "us-equities-trading",
+                "native-agent-stack/blueprints/us-equities"
+              ],
+              "session_start_cwds": [
+                "$HOME/code/us-equities-trading",
+                "$HOME/code/native-agent-stack/blueprints/us-equities"
+              ],
+              "prerequisite": "review/landing plus native project skill discovery; operator validates client/cwd/session before organic evidence"
             },
             {
               "role": "wsl-architecture-design",
@@ -4045,7 +4415,16 @@
               ],
               "executed": false,
               "session_reference": null,
-              "result": null
+              "result": null,
+              "admitted_projects": [
+                "us-equities-trading",
+                "native-agent-stack/blueprints/us-equities"
+              ],
+              "session_start_cwds": [
+                "$HOME/code/us-equities-trading",
+                "$HOME/code/native-agent-stack/blueprints/us-equities"
+              ],
+              "prerequisite": "review/landing plus native project skill discovery; operator validates client/cwd/session before organic evidence"
             }
           ],
           "eligibility": "OUTSTANDING; no scripted smoke promoted to organic use"
@@ -4296,7 +4675,7 @@
           },
           "registry_reference": {
             "source_file": "docs/decisions/memory-adoption-835/registry-role-identities.json",
-            "sha256": "03abf51ca7477c6b40c03e5f60a64177730fc838495b9bc174062555fc7f8cf6"
+            "sha256": "fc6f5dd30aa8dfa78932f1cb81b11abea311beca3d306927e21cb75f54ec765e"
           },
           "hourly_plan": {
             "anchor": "CC-applied wiring or reviewed unchanged-route verification timestamp",
@@ -4346,7 +4725,7 @@
           },
           "registry_reference": {
             "source_file": "docs/decisions/memory-adoption-835/registry-role-identities.json",
-            "sha256": "03abf51ca7477c6b40c03e5f60a64177730fc838495b9bc174062555fc7f8cf6"
+            "sha256": "fc6f5dd30aa8dfa78932f1cb81b11abea311beca3d306927e21cb75f54ec765e"
           },
           "hourly_plan": {
             "anchor": "CC-applied wiring or reviewed unchanged-route verification timestamp",
@@ -4404,10 +4783,10 @@
           },
           "registry_reference": {
             "source_file": "docs/decisions/memory-adoption-835/registry-role-identities.json",
-            "sha256": "03abf51ca7477c6b40c03e5f60a64177730fc838495b9bc174062555fc7f8cf6"
+            "sha256": "fc6f5dd30aa8dfa78932f1cb81b11abea311beca3d306927e21cb75f54ec765e"
           },
           "hourly_plan": {
-            "anchor": "CC-applied wiring or reviewed unchanged-route verification timestamp",
+            "anchor": "actual CC-applied CLI/binary-digest/get_bank/project-route verification timestamp after repository landing; not PR creation time",
             "anchor_utc": null,
             "interval_hours": 1,
             "first_sample": "T0 (post-wiring)",
@@ -4432,7 +4811,11 @@
             ],
             "source": "CC hourly adoption-now.json role rows, or newly pinned registry excerpt joined to source buckets",
             "scheduled": false,
-            "compared": false
+            "compared": false,
+            "project_scope": [
+              "us-equities-trading",
+              "native-agent-stack/blueprints/us-equities"
+            ]
           },
           "comparison": "Report calls/identities/denominator per role and exact rolling window, with role-row/launch-window provenance. Counters alone do not establish organic use; attach the natural-task outcome provenance before accepted KEEP.",
           "limitations": "Rolling-window count differences are descriptive; not paired causal savings or product acceptance."
@@ -4462,7 +4845,7 @@
           },
           "registry_reference": {
             "source_file": "docs/decisions/memory-adoption-835/registry-role-identities.json",
-            "sha256": "03abf51ca7477c6b40c03e5f60a64177730fc838495b9bc174062555fc7f8cf6"
+            "sha256": "fc6f5dd30aa8dfa78932f1cb81b11abea311beca3d306927e21cb75f54ec765e"
           },
           "hourly_plan": {
             "anchor": "CC-applied wiring or reviewed unchanged-route verification timestamp",
@@ -4528,7 +4911,7 @@
           },
           "registry_reference": {
             "source_file": "docs/decisions/memory-adoption-835/registry-role-identities.json",
-            "sha256": "03abf51ca7477c6b40c03e5f60a64177730fc838495b9bc174062555fc7f8cf6"
+            "sha256": "fc6f5dd30aa8dfa78932f1cb81b11abea311beca3d306927e21cb75f54ec765e"
           },
           "hourly_plan": {
             "anchor": "CC-applied wiring or reviewed unchanged-route verification timestamp",
@@ -4594,7 +4977,7 @@
           },
           "registry_reference": {
             "source_file": "docs/decisions/memory-adoption-835/registry-role-identities.json",
-            "sha256": "03abf51ca7477c6b40c03e5f60a64177730fc838495b9bc174062555fc7f8cf6"
+            "sha256": "fc6f5dd30aa8dfa78932f1cb81b11abea311beca3d306927e21cb75f54ec765e"
           },
           "hourly_plan": {
             "anchor": "CC-applied wiring or reviewed unchanged-route verification timestamp",
@@ -4652,7 +5035,7 @@
           },
           "registry_reference": {
             "source_file": "docs/decisions/memory-adoption-835/registry-role-identities.json",
-            "sha256": "03abf51ca7477c6b40c03e5f60a64177730fc838495b9bc174062555fc7f8cf6"
+            "sha256": "fc6f5dd30aa8dfa78932f1cb81b11abea311beca3d306927e21cb75f54ec765e"
           },
           "hourly_plan": {
             "anchor": "CC-applied wiring or reviewed unchanged-route verification timestamp",
