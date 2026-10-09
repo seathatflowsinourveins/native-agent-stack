@@ -84,6 +84,14 @@ the OWASP Top 10 classes, hardcoded secrets, weak cryptography, unsafe deseriali
 and time-of-check to time-of-use races. Findings must be checked against the files; unconfirmed suspicions are
 listed separately; a value that looks like a credential is never printed, only its file and line.
 
+## Visibility
+
+The repository is public, so the job summary of every run, and with it the published review, is readable by anyone.
+A security finding that should not be public before a fix (an undisclosed vulnerability) does not belong in this
+workflow: the local route on the second key (`api-actions` reader jobs) keeps its report off GitHub, and the model-free
+flag workflow says only that a review is due. A review step that reports success without an execution file fails the
+job in a final step, so a green run always means the bounds were checked.
+
 ## Effort
 
 `--effort max` in `claude_args`, set under the command center's effort mapping of 2026-10-08, which runs judgment work (designated reads, adjudication, pull request and security reviews, audits) at `max`. Every job records its level and the reason, because an unset level is a defect. The level has to be in `claude_args`: `--restricted` ignores the settings files that would otherwise carry a session's level, and on the Claude API Opus 5.5 runs at `medium` when a request leaves effort unset (bundled `claude-api` skill 2.1.295, `shared/model-migration.md`). `claude --help` (2.1.295) lists `low, medium, high, xhigh, max`. At `max`, thinking takes a larger share of the output than at the default level, so the estimate below is a floor; the client budget still bounds each run.

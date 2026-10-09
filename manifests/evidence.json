@@ -5021,8 +5021,8 @@
     },
     {
       "path": ".github/workflows/claude-security-review.yml",
-      "sha256": "38e47ea1e2cd1e90d4c2b3201f6d66f9c46e51432d9e6c910667f6610cd13aaf",
-      "bytes": 20309
+      "sha256": "6cedf5ac74e5e8a2f0e70854be38a2be5e10a0e0e949672efe97c04e1af52046",
+      "bytes": 20953
     },
     {
       "path": ".github/workflows/dependency-review.yml",
@@ -17877,8 +17877,8 @@
     },
     {
       "path": "docs/decisions/2026-10-04-ci-least-privilege.md",
-      "sha256": "cc9c4aa92ac4ac3e3a0ef286a82f5e1d27c0fc4dc8aeda27ad62251140f0cd89",
-      "bytes": 41413
+      "sha256": "a07805a50bd5f6f3468ad4f4dc6892c793044368b22c5505db0f5ac67c9c00b2",
+      "bytes": 41937
     },
     {
       "path": "docs/decisions/2026-10-04-claude-template-holds-out-token-lane-carriers.md",
@@ -18162,8 +18162,8 @@
     },
     {
       "path": "docs/decisions/2026-10-08-claude-actions-security-review.md",
-      "sha256": "e9d1124ff3fa1ba6b7a55ae6c8771c300e2f72c69027545e864bdb05031e761b",
-      "bytes": 12146
+      "sha256": "86f1ac150b971e51c967f257c5fa5cd7b7bd578075fe54a0d5a05ebd13dde7c9",
+      "bytes": 12702
     },
     {
       "path": "docs/decisions/2026-10-08-coordinator-research-routing.md",
@@ -57882,8 +57882,8 @@
     },
     {
       "path": "tests/test_claude_security_review_workflow.py",
-      "sha256": "15ae4373fc660f1ceefcaf6a52db4cb746c924b878694359579856a66e424790",
-      "bytes": 29502
+      "sha256": "a7c0cdc347b93c7908f24aa3e922d5325c04e3f84de145137dcbc83ff5e7c51d",
+      "bytes": 30125
     },
     {
       "path": "tests/test_claude_spend_scan.py",

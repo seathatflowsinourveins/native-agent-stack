@@ -261,6 +261,8 @@ class SecurityReviewShapeTests(unittest.TestCase):
                      "anthropic_service_account_id", "anthropic_workspace_id"):
             self.assertRegex(inputs[name], r"^\$\{\{ vars\.[A-Z_]+ \}\}$")
         self.assertEqual(inputs["show_full_output"], "false")
+        self.assertEqual(inputs["display_report"], "false")
+        self.assertEqual(inputs["track_progress"], "false")
         text = WORKFLOW.read_text(encoding="utf-8")
         for static_credential in ("ANTHROPIC_API_KEY", "ANTHROPIC_AUTH_TOKEN", "CLAUDE_CODE_OAUTH_TOKEN"):
             self.assertNotIn(static_credential, text)
@@ -290,6 +292,11 @@ class SecurityReviewShapeTests(unittest.TestCase):
         for rule in ("Read(./.git/**)", "Read(./**/.git/**)"):
             self.assertIn(rule, settings["permissions"]["deny"])
         self.assertNotIn("allow", settings["permissions"])
+
+    def test_a_green_run_always_has_an_execution_file(self):
+        check = step("Require the run's execution file")
+        self.assertEqual(check["if"], "${{ success() && steps.claude_review.outputs.execution_file == '' }}")
+        self.assertIn("exit 1", check["run"])
 
     def test_the_review_is_published_only_after_the_bounds_check_passed_and_only_numbers_are_uploaded(self):
         self.assertIn("success()", step(REPORT)["if"])
@@ -357,6 +364,11 @@ class SecurityReviewStepTests(unittest.TestCase):
             self.assertIn("DOCS-CHANGE", left["pr.diff"])
             self.assertNotIn("later.txt", left["pr.diff"], "main's later commits are not part of the change")
             self.assertIn("kept.txt", left["pr.stat"])
+
+    def test_no_paths_expands_safely_under_set_u_on_old_bash(self):
+        script = step(DIFF)["run"]
+        self.assertNotIn('-- "${scope[@]}"', script)
+        self.assertEqual(script.count('${scope[@]+"${scope[@]}"}'), 2)
 
     def test_paths_limit_the_diff(self):
         with tempfile.TemporaryDirectory() as temporary:
