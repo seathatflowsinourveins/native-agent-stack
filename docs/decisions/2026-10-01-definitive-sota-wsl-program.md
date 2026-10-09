@@ -7,8 +7,8 @@ install); the us-equities table follows when its assessment completes.
 
 The definitive runtime is a new WSL 2 distro, imported from an official upstream image and bootstrapped from this
 repository at a recorded revision (decision 4), in which each layer's selected repositories are installed cleanly with
-their upstream-supported commands by an LLM-native session. Gate A's token-adoption E2E re-aims at the new distro (the
-2026-10-01 03:33Z measurement-host selection): the new distro collects its own evidence through the upstream harness; the
+their upstream-supported commands by an LLM-native session. Gate A's token-adoption E2E is to re-aim at the new distro (the
+owner's 2026-10-01 03:33Z decision): that distro must collect its own evidence; the harness choice remains open below, and the
 current workstation distro's Gate A freeze is lifted and keeps whatever the production program runs there. The
 production program's composition (Codex 0.159.3, AgentRelay 13.0.0, Relaycast 8.14.0, Hindsight 0.10.2 with the 0.8.0
 coding integration, NautilusTrader 2.0.0rc5) is a candidate composition for the new distro, not a selection. A
@@ -22,10 +22,10 @@ under decision 3. Every install leaves a per-layer receipt registered through th
 
 ## Upstream basis and decision context
 
-On 2026-10-01 ~03:20Z, the program organized a complete per-layer architecture and evidence for a new WSL runtime;
-[Microsoft's import/export commands](https://learn.microsoft.com/en-us/windows/wsl/basic-commands#import-a-distribution) supply its distro lifecycle, while
-[Inspect's dataset/solver/scorer contract](https://inspect.aisi.org.uk/tasks.html) grounds reproducible layer qualification for complex systems and the north star.
-The ~03:30Z install contract uses each repository's own supported commands in that new WSL, driven through the native clients.
+On 2026-10-01 ~03:20Z, the owner requested that every layer be finalized and a clean new WSL runtime be built with complete repository architecture
+and evidence per layer, opening the route to complex projects, system building and the north star. [Microsoft's import/export commands](https://learn.microsoft.com/en-us/windows/wsl/basic-commands#import-a-distribution) supply the distro lifecycle;
+[Inspect's dataset/solver/scorer contract](https://inspect.aisi.org.uk/tasks.html) supplies an evaluation reference without deciding the open Gate A harness choice.
+At ~03:30Z the owner required each repository's clean installation through its own upstream commands in that new WSL, driven by an LLM-native session.
 The Gate A owner's earlier ruling A (03:17Z: measure on the current distro, revert its drift, build the new distro
 after the last window) is superseded by that decision; see "Gate A re-aim". WSL 2 distros still share one virtual
 machine (CPU, memory, disk and network namespace), so a window needs a load check on the shared machine.
@@ -65,7 +65,7 @@ coordinator's. One is the user's and carries a default until it is answered.
    "under the preregistered protocol and 150 s bound Dagu sigkill is false"). The Temporal arm ran the native
    development server, which `catalogs/us-equities/hosting-source-review.json:60` calls developer evidence only, so
    the exception reopens the comparison and selects nothing.
-2. **What "frozen" means in item 2 (a pending policy choice; the default applies until answered).** Default: a candidate
+2. **What "frozen" means in item 2 (the owner's open policy choice; the default applies until answered).** Default: a candidate
    and source set recorded at a named revision, with a disposition or an omission reason for every proposal of the
    2026-09-23, 09-26 and 09-29 sweeps and the failed access listed. The default rests on item 2's own wording, which
    asks for a recorded frozen set and not for a number of sweeps. Neither repository source settles whether a
@@ -93,7 +93,7 @@ coordinator's. One is the user's and carries a default until it is answered.
    `--configure-full-profile` unless the checkout's HEAD equals `origin/main`. A new release tag is cut after the
    merge train lands, and each receipt names the commit it installed from. Overturn: a release tag at the pins of
    record exists and the bootstrap accepts it.
-5. **Selection by repository quality (2026-10-01).** Use upstream evidence and a matched frozen task/scorer comparison, following [Inspect's task contract](https://inspect.aisi.org.uk/tasks.html); installation history does not establish comparative merit.
+5. **Selection by repository quality (the owner's instruction, 2026-10-01).** The owner required judging the repositories' own quality without inherited host biases; upstream evidence and a matched frozen task/scorer comparison implement that instruction, with [Inspect's task contract](https://inspect.aisi.org.uk/tasks.html) as a method source.
    A layer's winner on the new distro is what the repositories' own quality supports: upstream evidence and a
    head-to-head on the same frozen tasks, each arm installed fresh by its upstream command. The source host's pins,
    installed state and bookkeeping, and holds that came from its own integration, are not evidence for or against
@@ -116,8 +116,8 @@ coordinator's. One is the user's and carries a default until it is answered.
    by hand: a dated `limitations` entry on the row carries what changed since, as on the durable-memory row, and
    a sweep input dates those fields and joins the gap-wave ledgers onto them
    (`tools/sota-convergence/landscape-sweep/build_inputs.py`).
-6. **One default per slot (2026-10-01 about 20:35Z).** Select one named default for every architecture slot, while retaining
-   each comparison's [dataset, scorer and result](https://inspect.aisi.org.uk/tasks.html) as its overturn evidence. This amends decision 5 for
+6. **One default per slot (the owner's request, 2026-10-01 about 20:35Z).** The owner requested a definitive architecture with one named default per slot and no missing layers,
+   recorded in [the definitive-defaults decision](2026-10-01-new-wsl-definitive-defaults.md); each comparison's [dataset, scorer and result](https://inspect.aisi.org.uk/tasks.html) remain its overturn evidence. This amends decision 5 for
    layers that need a comparison: a blind decision round in both model families names one default per slot; the
    clean install installs the defaults only; the comparison arms run beforehand, on the current workstation or on a
    rehearsal distribution; and the comparison is the default's overturn check, no longer a gate on the install. The
@@ -125,9 +125,9 @@ coordinator's. One is the user's and carries a default until it is answered.
    selection. A definitive default is an install decision, not merit acceptance: the full-field re-vote, the measured
    comparison and new-host acceptance stay open. Gate A's re-aimed end-to-end run is, under this decision, the overturn
    check of the context-supply default (the lean base): it runs on a rehearsal distribution that collects its own
-   evidence, not on the clean install. This program's amended placement separates the comparison environment from the
-   default-install environment; the 2026-10-01 03:33Z baseline originally placed the run on the new distribution,
-   and that baseline placement remains an explicit overturn option. The earlier sentences (the Decision, phase 3b and the
+   evidence, not on the clean install. That placement is the coordinator's and the Gate A owner's interpretation of the
+   owner's directive; the owner's 2026-10-01 03:33Z decision placed the run on the new distribution,
+   and the owner can restore that placement. The earlier sentences (the Decision, phase 3b and the
    Gate A re-aim section) are read with this amendment; the choice of its harness is still the user's. The decision
    round covered the slots the blind selection had marked "compare"; the other layers decision 1 lists as needing a
    comparison keep the first round's pick as default with that comparison as the overturn check. Overturn: the user
@@ -147,7 +147,7 @@ coordinator's. One is the user's and carries a default until it is answered.
 
 ## The grand HTML: the final architecture per layer, with reasons and verdicts
 
-The 2026-10-01 ~03:43Z deliverable records each layer's final architecture in the generated ecosystem
+The owner requested on 2026-10-01 ~03:43Z that each layer's final architecture be manifested in the generated ecosystem
 guide with reasons and verdicts, for the new distro's Claude and Codex clients, the SOTA GPT-6 runtime workers and
 SDKs, repository hosting, the rootless Docker CLI driven through the OmniRoute gateway on GPT-6.1 Sol, the token-save
 practice, the foundation, memory and RAG, and beyond. The deliverable is a dated architecture topic edition of
@@ -349,11 +349,11 @@ day the owner recorded a selection for each, which closes nothing, and corrected
 the architecture edition in PR #574. The sanitized trading assessment and the owner's records are PR #578
 (lane:trading); the decisions, the verdict wording and the closure records stay with that lane.
 
-## Gate A measurement-host selection (2026-10-01 03:33Z)
+## Gate A re-aim (decided by the user, 2026-10-01 03:33Z)
 
-The baseline program places Gate A on the new WSL, with the runtime workers and GPT-6 framework harnesses below;
-the install manifest binds the final repositories, upstream pins and commands to the native workflow and foundation
-catalog, using [WSL's native distro lifecycle](https://learn.microsoft.com/en-us/windows/wsl/basic-commands) and [Inspect's retained evaluation contract](https://inspect.aisi.org.uk/tasks.html). The Gate A
+The owner decided to re-aim Gate A at the new WSL with the SOTA runtime workers and GPT-6 framework harnesses;
+the owner requested a manifest of the final winner repositories, upstream pins and commands for the clean install, native workflow and foundation
+catalog, including passwordless LLM-native workflow and harness convergence. [WSL's native distro lifecycle](https://learn.microsoft.com/en-us/windows/wsl/basic-commands) and [Inspect's evaluation contract](https://inspect.aisi.org.uk/tasks.html) supply method references. The Gate A
 owner's ruling A of ~03:17Z is superseded: the token-adoption E2E runs on the new distro after its clean install, the
 current distro's drift revert is withdrawn for Gate A's sake, and the new distro's build waits only for the WSL
 recipe and the winner manifest. The program gains one deliverable, the new-WSL install manifest: per layer the

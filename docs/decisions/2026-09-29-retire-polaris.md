@@ -1,8 +1,8 @@
 # Decision: retire the Polaris WSL distro on the workstation (2026-09-29)
 
-**Decision practice (2026-09-29):** retire the unused Polaris distribution on the Windows PC hosting
-`nativestack-5975wx-20260925`, preserve the still-used workspace and archive NAS work for later resumption.
-The [official WSL export/unregister contract](https://learn.microsoft.com/en-us/windows/wsl/basic-commands) defines distribution lifecycle and irreversible unregister semantics.
+**Decided by:** the owner on 2026-09-29, on the Windows PC hosting `nativestack-5975wx-20260925`; they authorized
+retiring the unneeded Polaris distribution while preserving the still-used workspace and deferring NAS work for later resumption.
+The [official WSL export/unregister contract](https://learn.microsoft.com/en-us/windows/wsl/basic-commands) defines the irreversible unregister operation they authorized.
 A Claude Code session in NativeStack carried out the retirement that day, following the procedure of the
 [Vela and VelaNext retirement](2026-09-25-retire-vela-velanext.md).
 

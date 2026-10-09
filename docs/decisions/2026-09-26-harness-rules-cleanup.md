@@ -1,7 +1,7 @@
 # Decision: harness rules cleanup, each rule once, token practice as the base layer (2026-09-26)
 
-**Record 2026-09-26:** deduplicate harness constraints and keep measured token practice as the base layer,
-following [Claude's concise, structured memory guidance](https://code.claude.com/docs/en/memory) and its [native workflow contract](https://code.claude.com/docs/en/workflows), in a workflow unit on
+**Decided by:** the owner's request of 2026-09-26 for research- and evidence-driven harness cleanup,
+with token-saving practice as the ecosystem's essential base layer, carried out by a workflow unit following [Claude's memory guidance](https://code.claude.com/docs/en/memory) and [native workflow contract](https://code.claude.com/docs/en/workflows) on
 branch `claude/harness-rules-cleanup-20260926`, based on `origin/main@d78d2de9`.
 
 **Scope:** [`examples/claude-native/CLAUDE.md`](../../examples/claude-native/CLAUDE.md) (portable user rules),

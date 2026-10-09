@@ -1,6 +1,6 @@
 # Decision: rebuild both OmniRoute gateways on release/v3.8.51 2f42a9ac1, announce Codex 0.159.1, and enable ten of the twelve shipped compression engines on 20129 at upstream's per-engine settings (2026-09-30)
 
-**Status: gateway build and settings selected from upstream source on 2026-09-29 and 2026-09-30, and switched on the
+**Status: decided by the gateway owner under the owner's 2026-09-29 and 2026-09-30 directions, with upstream source supporting the implementation, and switched on the
 NativeStack WSL2 workstation on 2026-09-30 between 00:02:41Z and 00:03:00Z. The settings were applied at 00:06Z (nine
 steps) and 00:43Z (one step). This change records it and touches no host.** It supersedes
 [the 2026-09-27 record](2026-09-27-omniroute-account-pool.md) only where that record names the build, the pinned Codex
@@ -30,10 +30,10 @@ Every claim carries the evidence class used in the receipt (`receipt.json`, `evi
 - **What ran before.** Two builds of `release/v3.8.51` at `81c9b6da` (20128: `5fc47d970`; 20129: `c3fa5a15e`) since
   2026-09-29 00:42Z, and before them `a58000c7` builds. A receipt package for the `81c9b6da` build was written but never
   published; this record replaces it as the published account.
-- **Selection chronology.** (2026-09-29 20:00Z) reconcile the build and token-save features against
-  [OmniRoute at 2f42a9ac19d1a247ec9ce5473b790843724b3061](https://github.com/diegosouzapw/OmniRoute/commit/2f42a9ac19d1a247ec9ce5473b790843724b3061); about 22:55Z, the pi-practice session relayed the GPT-6.1 Sol route selection.
-  About 00:15Z, the configuration review selected shipped compression implementations and their per-engine values;
-  the applied switches below remain local choices, distinct from upstream's disabled-by-default state.
+- **Owner directions, paraphrased.** (2026-09-29 20:00Z) resolve the full state using upstream, latest features and token-save practice; implementation uses
+  [OmniRoute at 2f42a9ac19d1a247ec9ce5473b790843724b3061](https://github.com/diegosouzapw/OmniRoute/commit/2f42a9ac19d1a247ec9ce5473b790843724b3061). About 22:55Z, the pi-practice session relayed their request to run the latest models, GPT-6.1 Sol first.
+  About 00:15Z, a relayed direction required upstream as the source of truth and shipped features to be adopted rather than merely suggested, without local bias;
+  the applied switches remain owner-directed local choices, distinct from upstream's disabled-by-default state.
 - **GPT-6.1 Sol.** Released 2026-09-29. It was absent from the gateway's live codex catalog while the gateway announced
   `CODEX_CLIENT_VERSION=0.157.1`; after 0.159.1 was announced it appeared (`cx/gpt-6.1-sol`, `codex/gpt-6.1-sol`,
   context_length 872000) and answered 200. The static registry of upstream `release/v3.8.51` (2f42a9ac1) and
@@ -64,8 +64,8 @@ Every claim carries the evidence class used in the receipt (`receipt.json`, `evi
 4. **Settings.** A nine-step plan (context-length override for `sharedgw/gpt-6-astra-max`, three stored context combos,
    one confinement write on 20128 (the Codex app-server flag off, T05), an interception rule, the prompt-cache
    declaration and 1200 s hop timeout on the `sharedgw` connection, fixed hop headers, and the 20129 compression
-   settings) was applied first. Then one delta (T10), grounded in pinned upstream compression types and request policy,
-   moved the 20129 compression settings to upstream's per-engine settings with ten of
+   settings) was applied first. Then, on the owner's direction to enable shipped token-save features with upstream as the source of truth, one delta (T10)
+   used the pinned compression types/request policy and moved 20129 to upstream's per-engine settings with ten of
    the twelve catalog engines enabled (headroom stays off as a defect mitigation, scoped below; omniglyph is off because it
    cannot act on GPT-6 routes). **That is not upstream's shipped state.** Upstream ships the master switch off,
    `defaultMode` off and every engine disabled (`open-sse/services/compression/types.ts:421-443` at 2f42a9ac1), and its
@@ -104,15 +104,15 @@ Every claim carries the evidence class used in the receipt (`receipt.json`, `evi
 
 | Setting | Class | Basis |
 | --- | --- | --- |
-| 20129 master switch ON (upstream ships off) | locally selected switch using the shipped implementation, not an upstream default | `types.ts:421-443`: `enabled: false`, `defaultMode: "off"`; a request with no header is compressed only while the master is on (`COMPRESSION_GUIDE.md:226`) |
-| Ten of twelve engines enabled (upstream ships every engine disabled), each at upstream's per-engine values except the two mitigations below | locally selected engine set using pinned vendor values, not an upstream default | `types.ts:436`; the per-engine values (rtk minimal, caveman lite, headroom minRows 8, cacheMinutes 5, liveZone off, fuzzy false) were compared with `types.ts` by two independent reviews of this branch |
+| 20129 master switch ON (upstream ships off) | owner's September 30 direction, implemented using shipped code, not an upstream default | `types.ts:421-443`: `enabled: false`, `defaultMode: "off"`; a request with no header is compressed only while the master is on (`COMPRESSION_GUIDE.md:226`) |
+| Ten of twelve engines enabled (upstream ships every engine disabled), each at upstream's per-engine values except the two mitigations below | owner's September 30 direction, implemented using pinned vendor values, not an upstream default | `types.ts:436`; the per-engine values (rtk minimal, caveman lite, headroom minRows 8, cacheMinutes 5, liveZone off, fuzzy false) were compared with `types.ts` by two independent reviews of this branch |
 | ccr in the headerless lane (upstream's default pipeline is `[session-dedup, lite]`) | derived from our engines map | the derived plan adds every enabled engine the catalog counts as safe; ccr is lossless (`engineCatalog.ts`, `lossy: false`) |
 | Codex app-server flag off on 20128 (T05) | local confinement write, plan item GC8 | upstream's default is `"true"` (`src/shared/constants/featureFlagDefinitions.ts:564-570`); no Codex connection uses the transport |
 | Lossy engines only on a header or combo opt-in | upstream-native control, kept | `lossyRequestPolicy.ts` strips them from headerless requests whatever the engines map holds |
 | `sessionDedup.minBlockChars` 512 (upstream 80) | mitigation of a verified upstream defect | composite-key collision overwrote an unrelated text part (chat body whose first non-system message has two or more `text` parts); reproduced offline; Responses input and string-content chat are immune |
 | `lite.compressToolResults` false (upstream true) | mitigation of a verified upstream defect | head-only truncation of tool results drops error and exit tails; the current-turn guard misses Responses tool loops |
 | headroom OFF in the engines map | mitigation of a verified upstream defect, scoped: it still runs where a stored combo names it | re-encodes JSON integers above 2^53 and fixed-scale decimals; a stored combo runs its pipeline as given (`strategySelector.ts:812-816`), so `gpt6-safe-lossy` (step `minRows` 16) and the peer combos `allow-lossy` and `fw-headroom` (global `minRows`, 8 since T10) still run headroom for a caller that names them |
-| omniglyph OFF | selected from the pi-practice session's upstream image-transport comparison | inert on GPT-6: skipped for every GPT-6 route (`imageTransportPolicy.ts:17-33`; PLAN.md) |
+| omniglyph OFF | owner's direction following the pi-practice session's upstream image-transport comparison | inert on GPT-6: skipped for every GPT-6 route (`imageTransportPolicy.ts:17-33`; PLAN.md) |
 | contextBudget off | upstream default | escalation overrides an explicit `off` (reproduced) |
 | headerless plan `[ccr]` only, output style `terse-prose:lite`, liveZone on | local scoping without an upstream basis, removed on 2026-09-30 | measured on our own fixtures, not an upstream-documented defect; the screen's finding that lite folds whitespace in code-bearing text was confirmed again on 2026-09-30 and is a residual below, not a removed-with-the-scoping claim |
 | 20128: master off, `codex/*` excluded | local setting from 2026-09-27, upstream default is also `enabled: false` | open user decision below |
@@ -194,8 +194,8 @@ Classes are kept apart.
   hashes, drop-ins, `MainPID`, `NRestarts`, `BUILD_SHA`, three route digests and the sorted override rows as JSON,
   read-only. The Gate A owner runs it at each window start and end; a window is void when a unit hash, a drop-in, the
   process identity, the build, or the compression, combos or resilience digest changes, or an override row present at
-  the start changes or disappears (a new automatic row is informational: the gateway's own reconciler writes them). The reported Gate A
-  freeze of the record taken at 00:48:58Z has no retained artifact proof here and is not independently established by this record. A
+  the start changes or disappears (a new automatic row is informational: the gateway's own reconciler writes them). The Gate A
+  owner's freeze of the record taken at 00:48:58Z is their statement to the coordinator, with no freeze artifact retained here; it is not independently established by this record. A
   fresh record taken while this record was reviewed equals the published copy on every path that both carry but `taken_utc`,
   with the digests compared in full and `exec_main_start` compared after converting the host's local-time string to UTC (the
   published copy shows UTC):
@@ -227,15 +227,15 @@ Classes are kept apart.
   2026-09-30T01:41Z with the same tree as the tip, so waiting would have cost a day for the same code).
 - **Keep `CODEX_CLIENT_VERSION` as the installed Codex version.** Rejected for now: it hides a model released after the
   installed client; the literal is one line in the unit and reverts with one edit.
-- **Headerless `[ccr]` only** (the first plan, from our fixtures). Superseded by the pinned upstream request policy.
+- **Headerless `[ccr]` only** (the first plan, from our fixtures). Superseded by the owner's September 30 direction to follow upstream; pinned request policy supplies the implementation.
 - **Compression on 20128.** Not applied; see below.
 
 ## Update 2026-09-30, 06:32Z: 20128 carries upstream PR 15167 (gpt-6.1-sol at max)
 
 **Why.** The rebuild's residual said `max` clamps to `xhigh` for `gpt-6.1-sol`. The live cost was measured before the restart: 1154 of 1495 `gpt-6.1-sol`
 rows since 00:00Z had `max` requested and `xhigh` sent ([`checks/calllog-effort-counts-before-switch.json`](../../evidence/artifacts/omniroute-sol-max-20260930/checks/calllog-effort-counts-before-switch.json)),
-native Codex callers included, and the `-max` suffix of the new base was an unknown model id (HTTP 400 with the prefix, 401 without it). Preserve requested max effort for GPT-6.1 Sol
-through the vendor effort normalization change below; this selection is separate from a task-quality comparison.
+native Codex callers included, and the `-max` suffix of the new base was an unknown model id (HTTP 400 with the prefix, 401 without it). The owner requested the highest quality on GPT-6.1 Sol,
+as relayed by the pi-practice session and not seen first-hand here; the vendor effort-normalization change below preserves requested max, without a task-quality comparison.
 
 **Source.** Upstream PR [#15167](https://github.com/diegosouzapw/OmniRoute/pull/15167), head `f5d8e150b79e0901fa18241c7f29bff889b87c14`, one commit, 5 files +23/-0 on release/v3.8.52 (same practice as
 the #13788 carry: a cited upstream change, no self-written patch). It applies cleanly, its stable patch-id equals the cherry-pick's, and its registry entries use the capabilities
@@ -281,9 +281,9 @@ rows on 2604; their cause is in `2026-10-05-omniroute-gateway-composition.md` (u
 
 ## Limitations and residuals
 
-- **Open qualification gate.** (a) Compression on 20128 (the Codex lane itself; it would rewrite real Codex CLI traffic).
-  The 2026-09-30 review at about 02:25Z retained a conditional selection: use the shipped request policy only after
-  a matched run shows a reproduced saving on real traffic and no output regression, including exact tool-text checks.
+- **Open owner decision.** (a) Compression on 20128 (the Codex lane itself; it would rewrite real Codex CLI traffic). The owner's
+  conditional answer on 2026-09-30 at about 02:25Z was relayed by another session and not seen first-hand here: adopt only after SOTA convergence
+  while maintaining suitably high output quality, requiring a reproduced saving on real traffic and no output regression, including exact tool-text checks.
   It is **not applied**. The pi-practice session's 3-arm measurement the same morning
   (reported, not reproduced here: four identical Codex 0.159.2 jobs per arm on gpt-6.1-sol with web search and MCP; direct
   20128, via 20129 with the header off, via 20129 on the headerless lane) found 0 compressed tokens in all 115 joined rows,
@@ -327,7 +327,7 @@ rows on 2604; their cause is in `2026-10-05-omniroute-gateway-composition.md` (u
   lite is part of upstream's own default lane, and its measured saving here is small (192 of 413,153 input tokens
   across 28 real pi tasks on 20129, reported by the pi-practice session), but a hunk whose context spans two blank lines
   written from a folded view may not apply. The earlier plan screen (`PLAN.md`) recorded the same risk and moved lite to
-  opt-in; the pinned upstream-policy delta put it back. Untested: an actual `apply_patch` round trip through the lane.
+  opt-in; the owner's upstream-direction delta put it back through the pinned policy. Untested: an actual `apply_patch` round trip through the lane.
 - **headroom and the stored combos.** headroom is off in the engines map, yet `gpt6-safe-lossy` (ours, step `minRows` 16; its
   description says it can round large-JSON numbers) and the peer combos `allow-lossy` and `fw-headroom` (global `minRows`, 8 since
   T10) run it for a caller that names them, with the integer and decimal re-encoding the mitigation is about. Restoring `minRows`

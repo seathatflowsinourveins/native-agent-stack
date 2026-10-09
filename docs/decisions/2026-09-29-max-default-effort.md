@@ -1,15 +1,15 @@
 # Decision: effort max for interactive terminal launches, through the launcher (2026-09-29)
 
-**Record provenance:** session `native-agent-stack-03` on host `nativestack-5975wx-20260925`, extending the dated 2026-09-23
-effort decision on 2026-09-29. Interactive terminal launches select `max` through the launcher, using the
-[Claude Code model-configuration contract](https://code.claude.com/docs/en/model-config) for explicit session effort;
-saved settings, Ultracode behavior and launcher precedence are qualified separately by the historical receipt. Checked
+**Decided by:** session `native-agent-stack-03` on host `nativestack-5975wx-20260925`, acting on the owner's 2026-09-23
+request for maximum-quality `max` effort and Ultracode across workflow/GitHub work, and their 2026-09-29 requests to
+finalize maximum-quality defaults and E2E qualification using current upstream SOTA. The [Claude Code model-configuration contract](https://code.claude.com/docs/en/model-config)
+supplies explicit session effort; saved settings, Ultracode behavior and launcher precedence retain their historical qualification. Checked
 against Claude Code 2.1.284, the latest release when this was written (binary sha256 in the receipt); branch
 `claude/max-default-effort-20260929`, rebased onto `origin/main@ba31dcd0`. It acts on the third overturn condition of the
 [2026-09-23 max-effort record](2026-09-23-max-effort-default.md), which 2.1.284 meets, and leaves that record as history
 for 2.1.281. That record's 2026-09-29 addendum (#479, the Sonnet 5.5 dispatch change) found the same condition met by the
 Ultracode-reminder indicator but "not adopted: the coordinator stays at xhigh, and moving it to `max` is left to the user"; this
-record makes that dated 2026-09-29 move, limited to interactive launches through the launcher; it claims no universal quality advantage for `max`.
+record makes that move on the owner's 2026-09-29 request, limited to interactive launches through the launcher; it claims no universal quality advantage for `max`.
 
 **Scope:**
 

@@ -1,11 +1,11 @@
 # Decision: Windows Terminal tab titles, needed-only alerts and colour depth for the native clients (2026-09-28)
 
-**Decision practice (2026-09-28):** give each native-client tab a distinct title and reserve a quiet alert for an escalation
-or a decision requiring the user. [Windows Terminal profile settings](https://learn.microsoft.com/en-us/windows/terminal/customize-settings/profile-general) define tab titles;
-[advanced profile settings](https://learn.microsoft.com/en-us/windows/terminal/customize-settings/profile-advanced) define bell styles and sounds. Claude's
-[Notification hook](https://code.claude.com/docs/en/hooks#notification) and [Codex notification configuration](https://developers.openai.com/codex/config-reference/)
-are the client mechanisms; routine completion stays quiet and phone push remains deferred. Host-specific observations,
-source review and unobserved bell/focus behavior remain separate in the tables below.
+**Decided by:** the owner on 2026-09-28; they requested distinct native-client tab titles, quiet bells only for escalation
+or a needed decision, source-converged persistence/dashboard practice and needed-action notifications rather than routine noise. They approved the preceding plan,
+authorized choosing the best-evidenced practice instead of continuing manual tests, and deferred phone push. [Windows Terminal profile settings](https://learn.microsoft.com/en-us/windows/terminal/customize-settings/profile-general) define titles;
+[advanced settings](https://learn.microsoft.com/en-us/windows/terminal/customize-settings/profile-advanced) define bells, while Claude's [Notification hook](https://code.claude.com/docs/en/hooks#notification)
+and [Codex notification configuration](https://developers.openai.com/codex/config-reference/) supply client mechanisms. Host-specific observations,
+source review and unobserved bell/focus behavior remain separate from that dated authority in the tables below.
 
 **Scope:** one workstation (WSL2 distro `NativeStack`, Windows Terminal 1.24.11911.0, Claude Code 2.1.284, Codex 0.157.1).
 Runtime settings changed on the host only; the settings template and `AGENTS.md` are unchanged. The change also registers
@@ -187,7 +187,7 @@ and outside every repository.
 
 ## Update 2026-09-29: login shell contract, launch practice and landscape refresh
 
-The 2026-09-29 update resolves the open items through the source comparisons and retained measurements below. It also adds the two anti-pattern rows
+On 2026-09-29 the owner asked to decide the open items through research convergence and carry them through; the source comparisons and retained measurements below record this update. It also adds the two anti-pattern rows
 of the earlier update, which that change left out so that its pull request could merge cleanly, and one for this incident. The evidence is in the
 [receipt](../../evidence/receipts/login-shell-contract-20260929.json) and its
 [scripts](../../evidence/artifacts/login-shell-contract-20260929/README.md). The Windows Terminal profiles of the second distro (Polaris; two per-project Claude profiles) were outside this update and were not measured; the same-day section "Repository-carried defaults" below brings them to this policy.
@@ -267,8 +267,8 @@ and did not name where the variable and its sandbox came from (2.1.83 and 2.1.98
 
 ## Repository-carried defaults and the second distro's profiles (2026-09-29)
 
-Repository-carried terminal profiles provide the recorded launch and notification defaults to later sessions and hosts; the declared review scope is preserved when a usage limit
-interrupts execution. Previously these settings lived in host files: the deployed fragment and the hand-edited live settings. This change moves them into the
+On 2026-09-29 the owner requested clean, current-best-practice terminal defaults for every later session/host and required that a usage limit not shorten a planned review.
+Previously these settings lived in host files: the deployed fragment and the hand-edited live settings. This change carries that direction into the
 repository and brings the second distro's per-project Claude profiles to the same policy. The evidence is in the
 [receipt](../../evidence/receipts/wsl-terminal-defaults-20260929.json) and its [scripts](../../evidence/artifacts/wsl-terminal-defaults-20260929/README.md).
 
@@ -308,7 +308,7 @@ and the manifest is re-pinned.
 
 ## Update 2026-09-29 (late): the model's own push signal, every notification type and agent teams in Windows Terminal
 
-The late 2026-09-29 update qualifies needed-action notifications for complex workflows and the subsequent project/north-star work. A long workflow ends, or blocks, while the user is
+The owner asked late on 2026-09-29 to finalize readiness for complex workflows and subsequent project/north-star work; this update qualifies needed-action notifications. A long workflow ends, or blocks, while the user is
 away, and the model's own way to say so is the PushNotification tool. The [receipt](../../evidence/receipts/notification-types-20260929.json) and its
 [scripts](../../evidence/artifacts/notification-types-20260929/README.md) hold the evidence.
 
@@ -349,8 +349,8 @@ Limits: one workstation and one probe model (Haiku); the probe's "away" is a syn
 
 ## Update 2026-09-30: the cross-family review of the terminal lane
 
-The Codex cross-family round of #484, #498, #510 and #519 could not run on 2026-09-29 (every GPT-6 account was at its weekly limit). The dated 2026-09-30 dispatch options were GPT-6.1 Sol
-or GPT-6 ultra through the SOTA harness and OmniRoute, with the token-save practice. The actual round ran nine read-only jobs of the packaged Codex lane, `cx/gpt-6.1-sol` at effort `max`, Codex CLI 0.159.2
+The Codex cross-family round of #484, #498, #510 and #519 could not run on 2026-09-29 (every GPT-6 account was at its weekly limit). On 2026-09-30 the owner requested finalization with GPT-6.1 Sol
+or GPT-6 ultra through the SOTA harness and OmniRoute, with token-save practice. The actual round ran nine read-only jobs of the packaged Codex lane, `cx/gpt-6.1-sol` at effort `max`, Codex CLI 0.159.2
 through the local gateway. The [receipt](../../evidence/receipts/cross-family-review-terminal-lane-20260930.json) and its [artifacts](../../evidence/artifacts/terminal-lane-cross-family-review-20260930/README.md)
 hold the evidence, and `findings.json` there has a row for each of the 46 findings. Two further reads followed the repairs (the re-check, then a final read of the re-check's repairs); each has its own subsection below and its own records in the same directory.
 
@@ -399,7 +399,7 @@ probe was slow (that case was replaced in the final read).
 
 ### The final read of the repairs
 
-The re-check's repairs received a final read by both GPT-6 models: six read-only jobs of the same lane, one per lens (the tool and the probes; the scan, the
+The re-check's repairs received a final read on the owner's request for the highest-quality finish with both GPT-6 models: six read-only jobs of the same lane, one per lens (the tool and the probes; the scan, the
 tests and the scripts; the claims and the evidence) on each of `cx/gpt-6.1-sol` and `cx/gpt-6-astra-ultra` at effort `max`, Codex 0.159.2, every job exit 0. They returned 37 findings (1 high, 30 medium, 6 low, every one
 with a command the reviewer ran): 16 duplicates of another finding and 21 graded by Claude verifiers (Opus, effort max; 17 confirmed, 4 partly, none refuted). All 37 were repaired in one round;
 `final-findings.json`, `final-verification.json` and `final-results.json` in the artifact directory hold them. The re-check's repairs were again incomplete or wrong in places:
@@ -455,7 +455,7 @@ Residuals of this round: the repairs were checked by the sweep, 22 mutant runs a
 
 ### The post-merge GPT read
 
-On 2026-10-01, after the pool's one usable account reset, the packaged GPT lane read the merged repairs of #563: six read-only jobs on `origin/main`, three lenses (P1 the two pty probes and the mutant runner,
+On 2026-10-01 the owner requested continuation with the highest-quality GPT lane after the pool's one usable account reset, so the packaged lane read the merged repairs of #563: six read-only jobs on `origin/main`, three lenses (P1 the two pty probes and the mutant runner,
 P2 the tmux probes, the new scripts and the recorded outputs, P3 claims, evidence and hygiene), each on `cx/gpt-6.1-sol` and on `cx/gpt-6-astra-ultra` at effort `max`, Codex 0.159.3, all exit 0 (27 to 47 minutes; 27.69M input tokens, 96.1% cache reads; 0.36M
 output tokens). They returned 38 findings (5 high, 31 medium, 2 low, each with a command the reviewer ran): 16 distinct issues and 22 duplicates. The shared Claude five-hour meter read 89% when the findings arrived, so no verifier agent was started: the
 coordinator reproduced each distinct issue (`verify_post_gpt_findings.py`, whose output on the merged code is `recorded/post_gpt_verification.txt`; three were checked by reading) and confirmed all 16, with lower severities than the reviewers' for the tmux
@@ -554,7 +554,7 @@ unobserved); the remote-workspace branch of the push tool, Windows Terminal's pa
 
 ## Update 2026-10-02: landscape refresh after the WSL 3.0.1 update, and two resume profiles
 
-This 2026-10-02 update checks the four profile upstreams (Windows Terminal, Claude Code, Codex and WSL) at the recorded releases, retains the launch line, bell, titles, colour and both clients' notification settings, and adds two resume profiles using the [Windows Terminal profile contract](https://learn.microsoft.com/en-us/windows/terminal/customize-settings/profile-general). It covers the catalog only (the example, its tests, the Windows Terminal section of [the Linux/WSL2 page](../../adoption/platforms/linux-wsl2.md#windows-terminal-profiles-and-the-login-shell) and this record); a host's own fragment, settings and checks are separate. The catalog change touched no host; the workstation's fragment gained the same two profiles that day, and the reload observation is under "Host observation" below. This is a dated scope extension that reverses the `Resume` row in "Update 2026-09-29" ("No resume profile"), preserved above as history. Its earlier measured-cost overturn was not measured or satisfied; the supported resume recipes below justify the implementation, while no usability comparison is claimed.
+On 2026-10-02 the owner requested that all terminal profiles, including Codex, be updated to SOTA-aligned practice. This update checks the four profile upstreams (Windows Terminal, Claude Code, Codex and WSL) at the recorded releases, retains the launch line, bell, titles, colour and both clients' notification settings, and adds two resume profiles using the [Windows Terminal profile contract](https://learn.microsoft.com/en-us/windows/terminal/customize-settings/profile-general). It covers the catalog only (the example, its tests, the Windows Terminal section of [the Linux/WSL2 page](../../adoption/platforms/linux-wsl2.md#windows-terminal-profiles-and-the-login-shell) and this record); a host's own fragment, settings and checks are separate. The catalog change touched no host; the workstation's fragment gained the same two profiles that day, and the reload observation is under "Host observation" below. The reversal of the `Resume` row in "Update 2026-09-29" ("No resume profile"), preserved above as history, rests on the owner's direction. That row's measured-cost overturn was not measured or satisfied; upstream recipes support the implementation, not that decision's authority or a usability comparison.
 
 ### Versions checked (2026-10-02)
 

@@ -1,11 +1,11 @@
 # Decision: tool, MCP server, skill and subagent invoke rates from Collector-extracted names in Loki (2026-09-26)
 
-**Status: historical host configuration; `OTEL_LOG_TOOL_DETAILS` was enabled on 2026-09-26 with the
-name-extraction/filtering pipeline below, using [Claude telemetry](https://code.claude.com/docs/en/monitoring-usage) and otelcol-contrib 0.161.0 OTTL. It passed host
+**Status: decided; the owner chose on 2026-09-26 to enable `OTEL_LOG_TOOL_DETAILS` with the
+name-extraction/filtering pipeline below and proceed with full SOTA convergence. The [Claude telemetry](https://code.claude.com/docs/en/monitoring-usage) and otelcol-contrib 0.161.0 OTTL configuration was applied on the host and passed host
 acceptance with the pre-fix checker** (`prove.sh`, 2026-09-26T23:47:42Z-23:49:21Z,
 33 passed, 0 failed; see "Evidence and its class" for the corrected offline result and remaining limits).
 [docs/secret-storage.md](../secret-storage.md#telemetry-and-pasted-values) recommends, as a user
-configuration posture, keeping tool details off while broker keys exist on the host, and records this change as its
+decision, keeping tool details off while broker keys exist on the host, and records this change as its
 one dated exception. The Collector part works without the flag. This change is stacked
 on [telemetry writer identity](2026-09-26-telemetry-writer-identity.md), which left workflow and agent
 attribution on the Loki allowlist as a separate gap of its own.
@@ -94,7 +94,7 @@ READMEs, the template sentence in `docs/secret-storage.md`, and
 
 | Alternative | Why not now |
 |---|---|
-| Keep `OTEL_LOG_TOOL_DETAILS` off | Under the [native telemetry contract](https://code.claude.com/docs/en/monitoring-usage), Claude MCP servers stay `custom` and skills stay `custom_skill`, with no `subagent_type` and no Claude rtk ratio. The Collector pipeline still works; this is the fallback if the dated opt-in is withdrawn. |
+| Keep `OTEL_LOG_TOOL_DETAILS` off | Under the [native telemetry contract](https://code.claude.com/docs/en/monitoring-usage), Claude MCP servers stay `custom` and skills stay `custom_skill`, with no `subagent_type` and no Claude rtk ratio. The Collector pipeline still works; this is the fallback if the owner declines the opt-in. |
 | Keep `tool_parameters` in Loki and parse it at query time | Stores whole Bash commands and prompts in Loki. |
 | Loki labels for `tool_family` or MCP server | More streams for no query gain at about 50 calls per minute. |
 | Traces (`agent_id`) for per-call subagent attribution | Needs a trace exporter and a tracing store, and the profile keeps traces off. Revisit if calls from the main thread and from Agent subagents must be split per call. |
