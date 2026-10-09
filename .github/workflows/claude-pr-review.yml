@@ -4,7 +4,7 @@ name: claude-pr-review
 # (docs/decisions/2026-10-08-claude-actions-pr-review.md). A maintainer dispatches it from main with the PR number and
 # the exact head commit to review. The workflow code is main's; the PR head is checked out as data into the `pr-head`
 # subdirectory with the base ref at the workspace root, the pattern the action's docs/security.md prescribes. Claude
-# has Read, Glob and Grep only, at most 12 turns and a $3 client budget. The job holds no write scope beyond the
+# has Read, Glob and Grep only, at most 30 turns and a $5 client budget. The job holds no write scope beyond the
 # OIDC token: a model-free step copies the review to the job summary, and nothing is posted to the pull request.
 #
 # Authentication is Anthropic workload identity federation (no Anthropic key in this repository). A dispatch on main
@@ -129,6 +129,15 @@ jobs:
           path: pr-head
           persist-credentials: false
 
+      # A pull request can commit symbolic links, for example to /proc/self/environ or to ../.git/config, and the
+      # client's documentation does not say whether its file tools follow a link out of the working directories. Every
+      # link under pr-head is removed before the model runs; pr-head/.git, which the checkout wrote, is left as it is.
+      - name: Remove symbolic links from the pull request head
+        shell: bash
+        run: |
+          set -euo pipefail
+          find pr-head -path pr-head/.git -prune -o -type l -exec rm -f {} +
+
       # git runs in the trusted root checkout only; external diff drivers and text conversion are off. The paths are
       # expanded as ${scope[@]+"${scope[@]}"} because bash before 4.4 (macOS /bin/bash 3.2) treats an empty array as
       # unset under set -u.
@@ -190,12 +199,12 @@ jobs:
 
             Finish with one report: a one-line verdict (no blocking finding, or the number of blocking findings),
             then the findings ranked by severity, each with file and line, what is wrong, the evidence you read and
-            the smallest fix, then the files you did not read. You have at most 12 turns, so read in parallel.
+            the smallest fix, then the files you did not read. You have at most 30 turns, so read in parallel.
           claude_args: |
             --model claude-opus-5-5
             --effort max
-            --max-turns 12
-            --max-budget-usd 3
+            --max-turns 30
+            --max-budget-usd 5
             --tools Read,Glob,Grep
             --allowedTools Read,Glob,Grep
             --restricted
@@ -207,8 +216,9 @@ jobs:
 
       # Numbers and fixed names only: the execution file holds the whole transcript and is never printed or uploaded.
       # The record is written first, so a failed or over-budget run still leaves its cost; the acceptance check
-      # follows. It also reads the session's own tool list: a missing list, any tool outside the allow-list or
-      # an MCP server fails the run, and the step names every bound it finds unmet.
+      # follows. It also reads the session's own tool list: a missing list, any tool outside the allow-list (a
+      # non-string entry is one, named "non-string tool entry") or an MCP server fails the run, and the step names
+      # every bound it finds unmet.
       # The turn bound counts distinct assistant message ids. The result's num_turns counts transcript
       # messages, tool results included (a 12-request run on Claude Code 2.1.295 reported 57), so it is
       # kept in the record only.
@@ -231,7 +241,8 @@ jobs:
             if ($result.total_cost_usd | type == "number" and . >= 0) and ($result.num_turns | count) and
                ($result.modelUsage | type == "object" and length > 0)
             then . else error("usage unavailable") end |
-            (($init.tools // []) | map(select(type == "string"))) as $tools |
+            ($init.tools // []) as $listed |
+            ($listed | map(select(type == "string"))) as $tools |
             ([.[] | select(.type == "result") | .result // "" | select(type == "string" and . != "")] | last // "")
               as $text |
             ([.[] | select(.type == "assistant") | .message.id? | select(type == "string")] | unique | length) as $turns |
@@ -242,7 +253,8 @@ jobs:
              session_started: ($init != null),
              claude_code_version: (($init.claude_code_version // "unknown") | name),
              tools: ($tools | map(name)),
-             forbidden_tools: ($tools | map(select(IN("Read", "Glob", "Grep") | not)) | map(name)),
+             forbidden_tools: (($tools | map(select(IN("Read", "Glob", "Grep") | not)) | map(name)) +
+                               ($listed | map(select(type != "string") | "non-string tool entry"))),
              mcp_servers: (($init.mcp_servers // []) | length),
              models: ($result.modelUsage | to_entries | map(
                if (.value.inputTokens | count) and (.value.outputTokens | count) and
@@ -271,9 +283,9 @@ jobs:
             (if (.forbidden_tools | length) > 0 then "tools outside Read, Glob and Grep: \(.forbidden_tools | join(" "))"
              else empty end),
             (if .mcp_servers != 0 then "\(.mcp_servers) MCP servers in the session" else empty end),
-            (if .assistant_turns < 1 or .assistant_turns > 12 then "\(.assistant_turns) assistant turns, outside 1 to 12"
+            (if .assistant_turns < 1 or .assistant_turns > 30 then "\(.assistant_turns) assistant turns, outside 1 to 30"
              else empty end),
-            (if .total_cost_usd > 3 then "client cost estimate \(.total_cost_usd) USD, above 3" else empty end),
+            (if .total_cost_usd > 5 then "client cost estimate \(.total_cost_usd) USD, above 5" else empty end),
             (if ((.models | map(.cache_read_input_tokens) | add) // 0) <= 0 then "no cache read" else empty end),
             (if .result_chars < 1 then "no result text" else empty end)
           ] | join("; ")' "$out/usage.json")"

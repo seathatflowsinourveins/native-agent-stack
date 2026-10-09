@@ -34,10 +34,25 @@ TITLE_MARKER = "SYNTHETIC-PULL-REQUEST-TITLE-MUST-NOT-REACH-THE-MODEL"
 
 GUARD = "Refuse debug logging, pre-existing Claude settings and malformed inputs"
 BIND = "Bind the request to an open same-repository pull request"
+HEAD_CHECKOUT = "Check out the pull request head as data"
+STRIP = "Remove symbolic links from the pull request head"
 DIFF = "Write the diff from the merge base"
 REVIEW = "Review the diff"
 NUMBERS = "Keep the run's numbers and check the bounds"
 REPORT = "Publish the review to the job summary"
+
+# What the guard step's env holds when no debug logging is on: each repository setting binds false, and
+# ${{ runner.debug }} renders empty because GitHub sets runner.debug only while debug logging is on.
+DEBUG_OFF = {"STEP_DEBUG_SETTING": "false", "RUNNER_DIAGNOSTICS_SETTING": "false", "RUNNER_DEBUG_SIGNAL": ""}
+
+# A stand-in for the path GitHub renders ${{ runner.temp }} as before the action reads claude_args.
+RUNNER_TEMP_STAND_IN = "/runner-temp"
+
+# The whole --settings JSON the review step passes.
+SETTINGS = {"disableAllHooks": True, "claudeMdExcludes": ["**/pr-head/**"],
+            "permissions": {"blockReadsOutsideWorkingDirectories": True,
+                            "deny": ["Read(./.git/**)", "Read(./**/.git/**)", "Read(./pr-head/.git/**)",
+                                     "Read(./**/.env)", "Read(./**/.env.*)", "Read(./**/*.pem)", "Read(./**/*.key)"]}}
 
 
 def workflow():
@@ -59,6 +74,13 @@ def cli_settings():
     (line,) = [line for line in lines if line.startswith("--settings ")]
     (value,) = shlex.split(line)[1:]
     return json.loads(value)
+
+
+def claude_args():
+    """Every argument the action's parser receives, in order: ${{ runner.temp }} rendered, each line split as a shell
+    would split it."""
+    text = step(REVIEW)["with"]["claude_args"].replace("${{ runner.temp }}", RUNNER_TEMP_STAND_IN)
+    return [token for line in text.split("\n") for token in shlex.split(line)]
 
 
 def pull(**changes):
@@ -228,17 +250,26 @@ class PullRequestReviewShapeTests(unittest.TestCase):
 
     def test_steps_run_in_the_order_the_binding_depends_on(self):
         names = [item.get("name") for item in job()["steps"]]
-        order = [GUARD, "Check out main at the workspace root", BIND, "Check out the pull request head as data",
-                 DIFF, REVIEW, NUMBERS, REPORT]
+        order = [GUARD, "Check out main at the workspace root", BIND, HEAD_CHECKOUT, STRIP, DIFF, REVIEW, NUMBERS,
+                 REPORT]
         self.assertEqual([n for n in names if n in order], order)
         self.assertEqual(names[0], "Harden the runner (audit-only network egress)")
 
+    def test_symbolic_links_are_removed_right_after_the_head_checkout(self):
+        names = [item.get("name") for item in job()["steps"]]
+        self.assertEqual(names[names.index(HEAD_CHECKOUT) + 1], STRIP)
+        self.assertEqual(step(STRIP), {
+            "name": STRIP, "shell": "bash",
+            "run": "set -euo pipefail\nfind pr-head -path pr-head/.git -prune -o -type l -exec rm -f {} +\n"})
+
     def test_no_step_executes_anything_from_the_pull_request_head(self):
         for item in job()["steps"]:
+            self.assertNotIn("working-directory", item)
+            if item.get("name") == STRIP:
+                continue  # it names pr-head/.git to leave it alone; the test above pins its whole text
             script = item.get("run", "")
             for token in ("pr-head/", "./pr-head", "cd pr-head", "bash pr-head", "source "):
                 self.assertNotIn(token, script, item.get("name"))
-            self.assertNotIn("working-directory", item)
 
     def test_git_diffs_in_the_trusted_checkout_without_external_drivers(self):
         script = step(DIFF)["run"]
@@ -268,30 +299,27 @@ class PullRequestReviewShapeTests(unittest.TestCase):
             self.assertNotIn(static_credential, text)
 
     def test_claude_has_three_read_tools_and_fixed_bounds(self):
-        arguments = [line.strip() for line in step(REVIEW)["with"]["claude_args"].split("\n") if line.strip()]
-        for expected in ("--model claude-opus-5-5", "--effort max", "--max-turns 12", "--max-budget-usd 3",
-                         "--tools Read,Glob,Grep", "--allowedTools Read,Glob,Grep",
-                         "--restricted", "--permission-prompts none",
-                         "--setting-sources user", "--strict-mcp-config",
-                         "--add-dir ${{ runner.temp }}/pr-review"):
-            self.assertIn(expected, arguments)
-        joined = " ".join(line for line in arguments if not line.startswith("--settings "))
-        for tool in ("Bash", "Write", "Edit", "WebFetch", "WebSearch", "Task", "Agent", "mcp__"):
-            self.assertNotIn(tool, joined)
-        for flag in ("--debug", "--dangerously-skip-permissions", "--permission-mode", "--mcp-config",
-                     "--add-dir pr-head"):
-            self.assertNotIn(flag, joined)
+        # The whole list, closed: a widened or second --add-dir, a repeated turn or budget flag, or any added flag
+        # changes it. The --settings value is compared as the JSON it parses to.
+        arguments = claude_args()
+        settings = arguments.index("--settings") + 1
+        arguments[settings] = json.loads(arguments[settings])
+        self.assertEqual(arguments, [
+            "--model", "claude-opus-5-5", "--effort", "max", "--max-turns", "30", "--max-budget-usd", "5",
+            "--tools", "Read,Glob,Grep", "--allowedTools", "Read,Glob,Grep", "--restricted",
+            "--permission-prompts", "none", "--setting-sources", "user", "--strict-mcp-config",
+            "--settings", SETTINGS, "--add-dir", RUNNER_TEMP_STAND_IN + "/pr-review"])
+
+    def test_the_prompt_states_the_turn_cap_the_flags_set(self):
+        arguments = claude_args()
+        turns = arguments[arguments.index("--max-turns") + 1]
+        self.assertIn(f"You have at most {turns} turns, so read in parallel.", step(REVIEW)["with"]["prompt"])
 
     def test_settings_turn_hooks_off_exclude_the_heads_instruction_files_and_confine_reads(self):
         # --restricted ignores every settings file, so the rules travel in --settings, not in the action's input.
         self.assertNotIn("settings", step(REVIEW)["with"])
-        settings = cli_settings()
-        self.assertIs(settings["disableAllHooks"], True)
-        self.assertEqual(settings["claudeMdExcludes"], ["**/pr-head/**"])
-        self.assertIs(settings["permissions"]["blockReadsOutsideWorkingDirectories"], True)
-        for rule in ("Read(./.git/**)", "Read(./**/.git/**)"):
-            self.assertIn(rule, settings["permissions"]["deny"])
-        self.assertNotIn("allow", settings["permissions"])
+        # The whole JSON, closed: a dropped deny rule, an allow list or permissions.additionalDirectories changes it.
+        self.assertEqual(cli_settings(), SETTINGS)
 
     def test_a_green_run_always_has_an_execution_file(self):
         check = step("Require the run's execution file")
@@ -299,8 +327,8 @@ class PullRequestReviewShapeTests(unittest.TestCase):
         self.assertIn("exit 1", check["run"])
 
     def test_the_review_is_published_only_after_the_bounds_check_passed_and_only_numbers_are_uploaded(self):
-        self.assertIn("success()", step(REPORT)["if"])
-        self.assertIn("always()", step(NUMBERS)["if"])
+        self.assertEqual(step(REPORT)["if"], "${{ success() && steps.claude_review.outputs.execution_file != '' }}")
+        self.assertEqual(step(NUMBERS)["if"], "${{ always() && steps.claude_review.outputs.execution_file != '' }}")
         upload = step("Keep the numeric usage record")
         self.assertTrue(upload["with"]["path"].endswith("/pr-review-usage/usage.json"))
 
@@ -316,9 +344,10 @@ class PullRequestReviewShapeTests(unittest.TestCase):
                      "jq and git are needed to run the workflow's steps")
 class PullRequestReviewStepTests(unittest.TestCase):
     def test_well_formed_inputs_pass_the_guard(self):
+        # With the values a run without debug logging binds, so a guard that refuses those fails here.
         for paths in ("", "docs", "docs tests/test_a.py scripts/x-y_z.py"):
             with self.subTest(paths=paths):
-                code, console, *_ = run_step(GUARD, {"DIFF_PATHS": paths})
+                code, console, *_ = run_step(GUARD, {**DEBUG_OFF, "DIFF_PATHS": paths})
                 self.assertEqual(code, 0, console)
 
     def test_the_guard_binds_debug_logging_set_as_a_repository_secret_or_variable(self):
@@ -336,10 +365,10 @@ class PullRequestReviewStepTests(unittest.TestCase):
                             ("RUNNER_DEBUG", "1"), ("RUNNER_DEBUG_SIGNAL", "1"), ("STEP_DEBUG_SETTING", "true"),
                             ("RUNNER_DIAGNOSTICS_SETTING", "true")):
             with self.subTest(signal=name):
-                self.assertEqual(run_step(GUARD, {name: value})[0], 2)
+                self.assertEqual(run_step(GUARD, {**DEBUG_OFF, name: value})[0], 2)
         for kind in ("file", "dangling-symlink"):
             with self.subTest(kind=kind):
-                code, console, *_ = run_step(GUARD, settings=kind)
+                code, console, *_ = run_step(GUARD, DEBUG_OFF, settings=kind)
                 self.assertEqual(code, 2)
                 self.assertNotIn(SETTINGS_MARKER, console)
 
@@ -372,6 +401,35 @@ class PullRequestReviewStepTests(unittest.TestCase):
                 code, console, _, _, _ = run_step(BIND, pull_request=pull(**changes))
                 self.assertEqual(code, 2, console)
                 self.assertNotIn(TITLE_MARKER, console)
+
+    def test_symbolic_links_in_the_head_are_removed_and_nothing_else(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            workspace = Path(temporary)
+            (workspace / ".git").mkdir()
+            (workspace / ".git/config").write_text("ROOT-CONFIG\n", encoding="utf-8")
+            head = workspace / "pr-head"
+            (head / ".git").mkdir(parents=True)
+            (head / ".git/config").write_text("HEAD-CONFIG\n", encoding="utf-8")
+            (head / ".git/link").symlink_to("config")  # the checkout's own directory is pruned, not cleaned
+            (head / "kept.txt").write_text("kept\n", encoding="utf-8")
+            (head / "docs").mkdir()
+            (head / "docs/note.md").write_text("note\n", encoding="utf-8")
+            links = {"environ": "/proc/self/environ", "config": "../.git/config", "docs/workspace": "../.."}
+            for name, target in links.items():
+                (head / name).symlink_to(target)
+            code, console, *_ = run_step(STRIP, cwd=workspace)
+            self.assertEqual(code, 0, console)
+            for name in links:
+                self.assertFalse(os.path.lexists(head / name), name)  # lexists: a dangling link counts as present
+            self.assertEqual((head / "kept.txt").read_text(encoding="utf-8"), "kept\n")
+            self.assertEqual((head / "docs/note.md").read_text(encoding="utf-8"), "note\n")
+            self.assertEqual((head / ".git/config").read_text(encoding="utf-8"), "HEAD-CONFIG\n")
+            self.assertTrue((head / ".git/link").is_symlink())
+            self.assertEqual((workspace / ".git/config").read_text(encoding="utf-8"), "ROOT-CONFIG\n")
+            # A head with no link, the usual case, passes too: find then starts no rm.
+            code, console, *_ = run_step(STRIP, cwd=workspace)
+            self.assertEqual(code, 0, console)
+            self.assertEqual((head / "kept.txt").read_text(encoding="utf-8"), "kept\n")
 
     def test_the_diff_is_taken_from_the_merge_base_in_the_trusted_checkout(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -424,8 +482,8 @@ class PullRequestReviewStepTests(unittest.TestCase):
     def test_an_unmet_bound_fails_after_the_numbers_were_kept(self):
         cases = {
             "no cache read": {"modelUsage": model_usage(read=0)},
-            "over the client budget": {"total_cost_usd": 3.01},
-            "over the turn limit": {"turns": 13},
+            "over the client budget": {"total_cost_usd": 5.01},
+            "over the turn limit": {"turns": 31},
             "an error result": {"is_error": True},
             "a turn-limit stop": {"subtype": "error_max_turns"},
             "a shell tool in the session": {"tools": ("Read", "Glob", "Grep", "Bash")},
@@ -444,18 +502,46 @@ class PullRequestReviewStepTests(unittest.TestCase):
                 self.assertIsInstance(json.loads(usage)["total_cost_usd"], (int, float))
 
     def test_the_step_names_every_unmet_bound(self):
-        code, console, *_ = run_step(NUMBERS, execution_file=execution(turns=13, total_cost_usd=3.5,
+        code, console, *_ = run_step(NUMBERS, execution_file=execution(turns=31, total_cost_usd=5.5,
                                                          tools=("Read", "Skill"), result=""))
         self.assertNotEqual(code, 0)
-        for words in ("13 assistant turns, outside 1 to 12", "above 3", "Skill", "no result text"):
+        for words in ("31 assistant turns, outside 1 to 30", "above 5", "Skill", "no result text"):
             self.assertIn(words, console)
+
+    def test_the_caps_hold_at_30_turns_and_5_usd_and_fail_just_above_or_with_no_turn(self):
+        code, console, *_ = run_step(NUMBERS, execution_file=execution(turns=30, total_cost_usd=5))
+        self.assertEqual(code, 0, console)
+        for changes, words in (({"turns": 31}, "Bounds not met: 31 assistant turns, outside 1 to 30"),
+                               ({"total_cost_usd": 5.01}, "Bounds not met: client cost estimate 5.01 USD, above 5"),
+                               ({"turns": 0}, "Bounds not met: 0 assistant turns, outside 1 to 30")):
+            with self.subTest(**changes):
+                code, console, *_ = run_step(NUMBERS, execution_file=execution(**changes))
+                self.assertNotEqual(code, 0)
+                self.assertIn(words, console)
+
+    def assert_refused_as_a_non_string_tool_entry(self, entry):
+        # A non-string entry in the session's tool list is a tool outside the allow-list, not one dropped unchecked.
+        code, console, _, usage, _ = run_step(NUMBERS, execution_file=execution(tools=("Read", "Glob", "Grep", entry)))
+        self.assertNotEqual(code, 0)
+        self.assertIn("Bounds not met: tools outside Read, Glob and Grep: non-string tool entry", console)
+        self.assertEqual(json.loads(usage)["forbidden_tools"], ["non-string tool entry"])
+
+    def test_an_object_in_the_tool_list_is_refused_and_named(self):
+        self.assert_refused_as_a_non_string_tool_entry({"name": "Bash"})
+
+    def test_a_null_in_the_tool_list_is_refused_and_named(self):
+        self.assert_refused_as_a_non_string_tool_entry(None)
+
+    def test_a_number_in_the_tool_list_is_refused_and_named(self):
+        self.assert_refused_as_a_non_string_tool_entry(17)
 
     def test_the_turn_bound_counts_assistant_turns_not_transcript_messages(self):
         # On Claude Code 2.1.295 a 12-request run with parallel reads reported num_turns 57 (api-actions LR
         # receipt, 2026-10-08): num_turns counts transcript messages, tool results included.
         code, console, *_ = run_step(NUMBERS, execution_file=execution(turns=12, num_turns=57))
         self.assertEqual(code, 0, console)
-        code, *_ = run_step(NUMBERS, execution_file=execution(turns=13, num_turns=13))
+        # 31 assistant turns fail although num_turns, 30, is within the cap.
+        code, *_ = run_step(NUMBERS, execution_file=execution(turns=31, num_turns=30))
         self.assertNotEqual(code, 0)
 
     def test_names_that_are_not_plain_identifiers_are_replaced(self):
@@ -507,12 +593,25 @@ class PullRequestReviewStepTests(unittest.TestCase):
         self.assertEqual(code, 0, console)
         self.assertIn("The report is 60001 bytes; the first 60,000 are shown.", summary)
 
+    def test_a_report_one_byte_under_the_cap_is_published_whole_without_a_notice(self):
+        report = "a" * 59998 + "Z"
+        code, console, summary, *_ = run_step(REPORT, execution_file=execution(result=report))
+        self.assertEqual(code, 0, console)
+        self.assertIn("<pre>\n" + report + "\n</pre>\n", summary)
+        self.assertNotIn("are shown.", summary)
+
     def test_the_cap_never_splits_a_character_and_a_short_report_has_no_notice(self):
+        # 80,001 bytes: the 60,000-byte cap falls inside a two-byte character, so the 59,999 bytes before it are
+        # published whole and the cut character is dropped.
         code, console, summary, *_ = run_step(REPORT, execution_file=execution(result="a" + "é" * 40000))
         self.assertEqual(code, 0, console)
         summary.encode("utf-8")  # the summary file decoded as UTF-8 when it was read
         self.assertNotIn("\ufffd", summary)
+        self.assertIn("<pre>\n" + "a" + "é" * 29999 + "\n</pre>\n", summary)
+        self.assertIn("The report is 80001 bytes;", summary)
         code, console, summary, *_ = run_step(REPORT, execution_file=execution(result="short report"))
+        self.assertEqual(code, 0, console)
+        self.assertIn("<pre>\nshort report\n</pre>\n", summary)
         self.assertNotIn("are shown.", summary)
 
     def test_the_report_is_the_last_result_with_text(self):
