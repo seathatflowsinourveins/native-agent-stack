@@ -5536,8 +5536,8 @@
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "633dfc7a3665dc12557c14eb008727e62885d7584303052978471abf8467b73c",
-      "bytes": 13702
+      "sha256": "fc7417ea1e7137f689cdd06dafdb32e71f36c78bee6e41505290e0637893f95f",
+      "bytes": 13812
     },
     {
       "path": "adoption/templates/codex.AGENTS.template.md",
@@ -18262,8 +18262,8 @@
     },
     {
       "path": "docs/decisions/2026-10-08-guard-hook-fails-closed.md",
-      "sha256": "efc6e5ad518643e7ebf4d432d1af91f5719d4506ce38781dbec62dab978e75ec",
-      "bytes": 16203
+      "sha256": "ddb28f698b419552dba6892822ae2a8fdb26ad0f849a6110fb5592ffe18c1508",
+      "bytes": 18131
     },
     {
       "path": "docs/decisions/2026-10-08-harness-rules-consolidation.md",
@@ -58302,8 +58302,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "7cda2a2626e5cbd855c73d96933b0ade4e48f954e8806087e2440af810d402e6",
-      "bytes": 136091
+      "sha256": "fba5766547bce320f34f28a60140465a914ae3f41fbe6d30db3f73ed9d0b16a4",
+      "bytes": 136153
     },
     {
       "path": "tests/test_install_skills.py",

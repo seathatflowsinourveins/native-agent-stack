@@ -245,3 +245,26 @@ No existing test expectation changes.
 | The key exists for command and HTTP hooks; it is skipped for async hooks and four events | `source_review` | Changelog 2.1.295; installed 2.1.295 binary |
 | Only the guard hooks carry the key | `local_integration` | New test method and its four mutations |
 | The merge path does not carry the key to an existing host | `local_integration` | `merge_settings` run against both base files |
+
+## Addendum (2026-10-09): a missing guard script now blocks
+
+This record kept one fail-open path on purpose: the template's guard command exited 0 when no guard file was installed,
+so a host without the guard was not blocked, and `onFailure` never fires on exit 0. The Claude Code native practice
+review of 2026-10-09 (`docs/decisions/2026-10-09-claude-code-native-practice.md`, slot `hooks`, in its own pull request) found that every supported
+install route places the guard before the settings that call it (`adoption/bootstrap.md` runs the `claude-profile`
+step before `claude-settings`, and the new-WSL render copies the checksum-verified hook files with the settings). A
+missing script after install is therefore removal or damage.
+
+The template command now refuses when the script is missing:
+`f="${HOME}/.claude/hooks/secret_path_guard.py"; [ -f "$$f" ] && exec python3 "$$f"; exec jq -n --arg f "$$f" '"Refused: …\($$f)\n" | halt_error(2)'`.
+It runs only `[`, `python3` and `jq`, command words the new-WSL renderer admits for a practice hook
+(`tools/adoption/new_wsl_client_config.py` `BASE_COMMAND_WORDS`), and the refusal itself needs no Python. Exit 2
+blocks a PreToolUse call on every client version, so this part does not depend on `onFailure`. One test
+contract changes, declared: `test_rendered_hook_blocks_after_install_and_is_inert_before` becomes
+`test_rendered_hook_blocks_before_and_after_install`; before install it now expects exit 2 and the refusal text, and
+the after-install assertions are unchanged.
+
+The command center applied the same command to this host's user settings at 2026-10-09T06:20:30Z, after testing it
+in isolated temporary home directories (missing script: exit 2 with the refusal; passing stub: 0; blocking stub: 2).
+Raising the pinned client floor from 2.1.284 to 2.1.295, so that `onFailure` is honoured on every host at the floor,
+is a separate change owned by the currency lane.
