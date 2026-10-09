@@ -2871,7 +2871,8 @@
     "polygon-io/client-python": "massive-com/client-python",
     "huangruiteng/loopx": "loopx-project/loopx",
     "tobikodata/sqlmesh": "sqlmesh/sqlmesh",
-    "linkedin/datahub": "datahub-project/datahub"
+    "linkedin/datahub": "datahub-project/datahub",
+    "microsoft/lightgbm": "lightgbm-org/lightgbm"
   },
   "latest_public_refresh": {
     "checked_at_utc": "2026-09-24T17:33:14Z",
