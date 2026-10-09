@@ -96,8 +96,9 @@ the same flags and the same JSON.
 
 This workflow's prompt and `claude_args` also ran once on the installed client (2.1.295), on Opus 5.5 at `max` and
 billed to a second API key, not through the action. The record is the `LR` entry of
-`evidence/artifacts/claude-actions-fence-smoke-20261008/local-parity-receipt.json`, a file #892 adds; #892 precedes
-this PR in the command center's landing order, so the file is on `main` before this PR lands. The run used this
+`evidence/artifacts/claude-actions-fence-smoke-20261008/local-parity-receipt.json`, which this PR carries as a
+byte-identical copy of the file #892 adds (sha256 `ba498b82b6b4d2410879f23112da5d1aeaf5dabe008e7207a56e867dc48b1477`), so
+the citation does not depend on which PR lands first. The run used this
 workflow at commit `a6d2379506b7526ca7f528319cc4b7c65c32f897` (`workflow_commit`; the file at that commit hashes to
 the entry's `workflow_sha256`) and reviewed pull request #897 (`target_pull_request`) at head
 `24821c572a83091341a4924d506655004811286b` (`target_head`). The entry records 12 assistant turns of 12
@@ -170,7 +171,7 @@ Runs spend from the Console organization that the four `ANTHROPIC_*` repository 
 Unchanged and still passing: `test_pull_requests_write_is_granted_only_to_the_propose_job` and
 `test_no_workflow_reviews_or_approves_a_pull_request`.
 
-New, in `tests/test_claude_pr_review_workflow.py` (31 tests): the trigger, condition, permissions, checkout layout,
+New, in `tests/test_claude_pr_review_workflow.py` (33 tests): the trigger, condition, permissions, checkout layout,
 step order, pin, inputs, flags and settings are asserted from the workflow file, and the guard, binding, diff,
 numbers and review steps are executed as written against a local stand-in for `gh` and a local git repository.
 Twenty weakened copies of the workflow each fail at least one test: a missing head or repository check, a missing
@@ -186,6 +187,31 @@ path (like the other workflow-shape tests, it needs PyYAML): three copies with t
 `claude-pr-review-usage`, the attempt dropped, `run_number` for `run_id`) each passed the 30 earlier tests and fail
 this one. The step tests no longer skip without PyYAML: they read the workflow with the policy test's own loader when
 PyYAML is absent.
+
+## Debug logging set as a repository secret or variable (2026-10-09)
+
+A read of this workflow against official practice for `anthropics/claude-code-action` v1.0.247 (the cc-native-practice
+lane's L3 delta, requirement R4) found that the guard step could not see debug logging enabled through a repository
+secret or variable. Step debug logging and runner diagnostic logging are each enabled by a secret or a variable named
+`ACTIONS_STEP_DEBUG` or `ACTIONS_RUNNER_DEBUG`, the secret taking precedence (GitHub, "Enabling debug logging"), and
+neither reaches a step's shell unless it is bound; `runner.debug` reflects step debug logging, a debug re-run
+included, but not runner diagnostic logging. The guard now binds
+`(secrets.ACTIONS_STEP_DEBUG || vars.ACTIONS_STEP_DEBUG) == 'true'` as `STEP_DEBUG_SETTING` and
+`(secrets.ACTIONS_RUNNER_DEBUG || vars.ACTIONS_RUNNER_DEBUG) == 'true'` as `RUNNER_DIAGNOSTICS_SETTING`, so only
+`true` or `false` reaches the shell, and refuses either before any token is requested. This is hardening, not a closed
+leak: the action step already pins `ACTIONS_STEP_DEBUG: 'false'` in its own environment, which is what the action's
+full-output switch reads (`base-action/src/parse-sdk-options.ts`). zizmor's auditor persona reports
+`secrets-outside-env` (medium) on the two secret reads; the repository's CI runs the regular persona, pedantic
+suppresses it, and each read yields a boolean only. A test pins both bindings and the guard test refuses each
+setting; weakened copies are listed with the checks of this change.
+
+## The report notice at the cap (2026-10-09)
+
+The J8 micro read of #892 found an off-by-one in the publish step: `jq -r` adds a newline, so the file it wrote was
+one byte longer than the report text, and a report of exactly 60,000 bytes was announced as cut although nothing
+was. The step now writes the text with `jq -j`, which adds none, and a test publishes reports of exactly 60,000 and
+60,001 bytes (no notice, then the notice); a copy that writes with `jq -r` again fails it. The step's comment now
+says it publishes the last non-empty result text, which it does.
 
 ## Alternatives considered
 
@@ -212,7 +238,7 @@ PyYAML is absent.
 `native_proven` for the flag set on the installed client (the receipt above; not through the action and not on a
 GitHub runner). `local_static_analysis`: actionlint 1.17.0 and zizmor 1.30.1 (offline, regular and pedantic), no
 findings. `local_integration`: the unit tests above with PyYAML 6.0.3 on Python 3.12, and the local parity run above
-(the installed client in place of the action; the `LR` entry of #892's `local-parity-receipt.json`). `source_review`:
+(the installed client in place of the action; the `LR` entry of `local-parity-receipt.json`, carried in this PR). `source_review`:
 the action and client sources below. No hosted run of this workflow is part of this record.
 
 ## SOTA sources

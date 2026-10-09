@@ -5021,8 +5021,8 @@
     },
     {
       "path": ".github/workflows/claude-pr-review.yml",
-      "sha256": "a3d2a347b843817f9ff86bac15c05d3c1c54f0d8217bd36907877a59f5ff34e0",
-      "bytes": 19067
+      "sha256": "fe16e509ddef8d4ea6a3d03dc2298e8fddf810f9e4a4bd8ace796e54f90a2734",
+      "bytes": 19639
     },
     {
       "path": ".github/workflows/dependency-review.yml",
@@ -18157,8 +18157,8 @@
     },
     {
       "path": "docs/decisions/2026-10-08-claude-actions-pr-review.md",
-      "sha256": "366f99b5d1e16903680d88b59fd6e6788780cc983f1de0b6f00a2ba2e40ee6e7",
-      "bytes": 19824
+      "sha256": "9627040251f298eac46c9589e663459257dae9bf1f3955ad545fe108da54c529",
+      "bytes": 22034
     },
     {
       "path": "docs/decisions/2026-10-08-coordinator-research-routing.md",
@@ -18327,8 +18327,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "e30178c77f20588bf7a0296288721694a500c2289824c3bc90822ef0049718cd",
-      "bytes": 101901
+      "sha256": "b033e2e58ddaeb8a2d69c1c6d0b1c191f81ed5ed4e1a642fc14990fd510a9d1b",
+      "bytes": 101957
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -19569,6 +19569,11 @@
       "path": "evidence/artifacts/child-lane-baseline-20260926/skill-invoke-rate.json",
       "sha256": "5c1e13b427dd9c8818721a1788eab19d55ef0ceef269d5eb644c25557760238b",
       "bytes": 39479
+    },
+    {
+      "path": "evidence/artifacts/claude-actions-fence-smoke-20261008/local-parity-receipt.json",
+      "sha256": "ba498b82b6b4d2410879f23112da5d1aeaf5dabe008e7207a56e867dc48b1477",
+      "bytes": 3592
     },
     {
       "path": "evidence/artifacts/claude-actions-fence-smoke-20261008/receipt.json",
@@ -57872,8 +57877,8 @@
     },
     {
       "path": "tests/test_claude_pr_review_workflow.py",
-      "sha256": "dfb23c59ed1db45c99593232c2c954302bd63dfd75092ff1a8555707d3200127",
-      "bytes": 27391
+      "sha256": "503bae9794a292f4fb51d668ddc8c49074fea955d941e74afc89d24cdda4de09",
+      "bytes": 28912
     },
     {
       "path": "tests/test_claude_recovery.py",

@@ -1,0 +1,83 @@
+{
+ "schema_version": 1,
+ "what": "Local parity runs of the W4 workflows' prompt and claude_args on the installed Claude Code 2.1.295, billed to a second Anthropic API key through the repository's credential runner, plus the num_turns measurement. Numbers and fixed names only: the transcripts stay outside the repository.",
+ "recorded_utc": "2026-10-09T01:05:00Z",
+ "runs": [
+  {
+   "job": "LA",
+   "workflow": ".github/workflows/harness-audit.yml",
+   "workflow_commit": "a2f2570f1b5228be0a151a4c82e7aec46632286a",
+   "workflow_sha256": "66abc9b9c33c70f47afab3068b51d56b0437e50b724e1f811410525aa20167f4",
+   "claude_args_sha256": "51c45911904433b850e16912a8192eb3427f7b30873eb9a5c4f827576fe3214a",
+   "effort_flag": "max",
+   "model": "claude-opus-5-5",
+   "cli_version": "2.1.295",
+   "auth_source": "ANTHROPIC_API_KEY",
+   "session_tools": [
+    "Glob",
+    "Grep",
+    "Read"
+   ],
+   "mcp_servers": 0,
+   "max_turns": 20,
+   "assistant_turns_distinct_message_ids": 10,
+   "tool_result_messages": 45,
+   "result_num_turns": 46,
+   "client_cost_usd": 2.0263004,
+   "cache_read_share": 0.8206,
+   "subtype": "success",
+   "is_error": false,
+   "duration_ms": 627219,
+   "stream_sha256": "754e56a08e9142d3830f1542ff66cc138bf6055b854df1f398c4904ced07ffa4"
+  },
+  {
+   "job": "LR",
+   "workflow": ".github/workflows/claude-pr-review.yml",
+   "workflow_commit": "a6d2379506b7526ca7f528319cc4b7c65c32f897",
+   "workflow_sha256": "3b762bfb1df7a33bf2e25924ba095dffa103c136cab0223d6ebf890ee2f0f9b7",
+   "claude_args_sha256": "0b5647bcbeb8e0e2ad56764c7f30d06e131f14a2c8a7790d856e60cb983349c3",
+   "effort_flag": "max",
+   "model": "claude-opus-5-5",
+   "cli_version": "2.1.295",
+   "auth_source": "ANTHROPIC_API_KEY",
+   "session_tools": [
+    "Glob",
+    "Grep",
+    "Read"
+   ],
+   "mcp_servers": 0,
+   "max_turns": 12,
+   "assistant_turns_distinct_message_ids": 12,
+   "tool_result_messages": 56,
+   "result_num_turns": 57,
+   "client_cost_usd": 1.868667,
+   "cache_read_share": 0.8712,
+   "subtype": "success",
+   "is_error": false,
+   "duration_ms": 512670,
+   "stream_sha256": "88e601938ca0f5ed5e7200068aefb6d51227921c6da34d977e73e3dd49610bd8",
+   "target_pull_request": 897,
+   "target_head": "24821c572a83091341a4924d506655004811286b",
+   "report_blocking_findings": 2,
+   "report_sha256": "c49bee04b8ce37feba8a812eacf2e883d8dc39b52617769ea9d73b237f857e43",
+   "amended_2026_10_09": {
+    "fields": [
+     "target_pull_request",
+     "target_head",
+     "report_blocking_findings",
+     "report_sha256"
+    ],
+    "source": "the same run's harness receipt (pr 897, head 24821c57, stream_sha256 matching this entry) and its report's first line, 'Verdict: 2 blocking findings'; both stay outside the repository",
+    "why": "the pre-cue read of #894 found that its record cites this run's target pull request and finding count, which this entry did not carry"
+   }
+  }
+ ],
+ "findings": [
+  "The result's num_turns counts transcript messages, tool results included: LR made 12 API requests (distinct assistant message ids) under --max-turns 12 and reported num_turns 57; the client enforced --max-turns on assistant turns.",
+  "At --effort max the harness-audit prompt finished within its bounds: 10 assistant turns of 20 and a client cost estimate of about $2.03 of $3."
+ ],
+ "limits": [
+  "one run each; the hosted Actions run is not established (the federation organization differs from the key's)",
+  "LA's prompt fell back because the audit skills it hands off to are not installed (command center: fallback-mode, not comparable as an audit score); its bounds and cost figures stand"
+ ]
+}
