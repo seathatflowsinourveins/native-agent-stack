@@ -356,10 +356,28 @@ def output_directory(root, name):
     return output
 
 
+def verify_asset_rows(manifest, asset_path, native, r3):
+    """Compare every ordered row field using the native bounded archive reader."""
+    asset_sha, _, captured = native.read_archive(Path(asset_path), wanted={native.ROWS_MEMBER})
+    require(native.ROWS_MEMBER in captured, "Asset is missing compact/rows.json")
+    asset_rows = native.row_list(captured[native.ROWS_MEMBER])
+    manifest_rows = manifest.get("rows")
+    require(isinstance(manifest_rows, list), "Manifest rows must be a list")
+    asset_canonical = r3.canonical(asset_rows)
+    require(asset_canonical == r3.canonical(manifest_rows),
+            "Asset compact/rows.json differs from manifest rows; rebuild the asset before drawing")
+    return {"asset_sha256": asset_sha, "member": native.ROWS_MEMBER,
+            "rows": len(asset_rows), "rows_diff": 0,
+            "ordered_rows_sha256": r3.digest(asset_canonical.encode()),
+            "comparison": "Complete ordered rows, including every closure, origin and disposition field"}
+
+
 def build_packet(*, profile, manifest_path, manifest_sha256, origin_map_path, origin_map_sha256,
-                 protocol_sha256, r3_generator, head, output_root, output_name, protocol=PROTOCOL, redraw_seed=None):
+                 protocol_sha256, r3_generator, head, output_root, output_name, protocol=PROTOCOL,
+                 redraw_seed=None, asset_path=None, asset_sha256=None):
     require(profile == PROFILE, "Select --profile start-closure/1 explicitly")
     require(isinstance(head, str) and re.fullmatch(r"[0-9a-f]{40}", head), "Head must be a full lowercase commit ID")
+    require(asset_path is not None, "Packet build requires --asset to check asset/manifest row equality")
     output = output_directory(output_root, output_name)
     r3 = load_r3(r3_generator)
     native, repo = load_native(protocol, protocol_sha256, r3)
@@ -367,6 +385,13 @@ def build_packet(*, profile, manifest_path, manifest_sha256, origin_map_path, or
     origin_raw = pinned_bytes(origin_map_path, origin_map_sha256)
     contract_raw = pinned_bytes(CONTRACT, CONTRACT_SHA256)
     manifest, origin_map = native.load(manifest_raw), native.load(origin_raw)
+    manifest_asset_sha = manifest.get("asset", {}).get("sha256")
+    expected_asset_sha = manifest_asset_sha if asset_sha256 is None else asset_sha256
+    require(isinstance(expected_asset_sha, str) and re.fullmatch(r"[0-9a-f]{64}", expected_asset_sha),
+            "Asset pin must be a full lowercase SHA256")
+    asset_verification = verify_asset_rows(manifest, asset_path, native, r3)
+    require(asset_verification["asset_sha256"] == expected_asset_sha,
+            "Asset SHA256 differs from the explicit pin or hash-checked manifest binding")
     require(manifest.get("row_schema", {}).get("path") == ROW_SCHEMA, "Manifest does not bind the profile row schema")
     schema_raw = pinned_bytes(repo / ROW_SCHEMA, manifest["row_schema"]["sha256"])
     from jsonschema import Draft202012Validator
@@ -381,12 +406,17 @@ def build_packet(*, profile, manifest_path, manifest_sha256, origin_map_path, or
     actions = action_read_set(rows, manifest, manifest_sha256, head)
     actions["count"] = len(actions["rows"])
     conflicts = pending_conflict_census(rows, origins, manifest, manifest_sha256, head)
+    for read_set in (actions, conflicts):
+        read_set.update({"asset_sha256": asset_verification["asset_sha256"],
+                         "manifest_asset_sha256": manifest_asset_sha,
+                         "row_binding": "manifest_sha256"})
     files = {"inputs/manifest.json": manifest_raw, "inputs/origin-map.json": origin_raw,
              "inputs/row-schema.json": schema_raw, "stratum-contract.json": contract_raw,
              "action-read-set.json": (r3.canonical(actions) + "\n").encode(),
              "pending-conflict-census.json": (r3.canonical(conflicts) + "\n").encode()}
     combined = census_read_set(actions, conflicts, rows, r3.digest(files["action-read-set.json"]),
                                r3.digest(files["pending-conflict-census.json"]))
+    combined.update({"manifest_asset_sha256": manifest_asset_sha, "row_binding": "manifest_sha256"})
     files["census-read-set.json"] = (r3.canonical(combined) + "\n").encode()
     review_sources = {
         "compact_manifest.py": Path(protocol),
@@ -404,7 +434,10 @@ def build_packet(*, profile, manifest_path, manifest_sha256, origin_map_path, or
     counts = packet_counts(packets, rows)
     summary = {"schema_version": 1, "kind": "g5-start-closure-sample-packet", "profile": PROFILE,
                "seed": seed, "head": head, "manifest_sha256": manifest_sha256,
-                "asset_sha256": manifest["asset"]["sha256"], "origin_map_sha256": origin_map_sha256,
+                "asset_sha256": asset_verification["asset_sha256"], "origin_map_sha256": origin_map_sha256,
+                "manifest_asset_sha256": manifest_asset_sha, "row_binding": "manifest_sha256",
+                "asset_rebinding": {"explicit_pin": asset_sha256 is not None,
+                                    "changed": asset_verification["asset_sha256"] != manifest_asset_sha},
                 "redraw": {"enabled": redraw_seed is not None, "historical_sealed_seed": SEED,
                            "population_scope": "every sampled stratum", "seed": seed},
                "stratum_contract_sha256": CONTRACT_SHA256,
@@ -421,7 +454,8 @@ def build_packet(*, profile, manifest_path, manifest_sha256, origin_map_path, or
                                                      "profile_code_and_tests": "NOT_RUN", "zero_defects_established": False},
                "profile_review_sources": [{"path": "profile-code/" + name, "sha256": r3.digest(files["profile-code/" + name])}
                                           for name in sorted(review_sources)],
-               "capture_verification": "The exact PASS manifest binds prior full-asset validation; this draw verifies declarations and input file hashes and does not claim a new full-asset byte check.",
+               "asset_rows_verification": asset_verification,
+               "capture_verification": "The native bounded reader hashes the supplied asset and checks complete ordered rows against the exact PASS manifest before selection. Prior full-profile qualification remains separate.",
                "strata": [{"stratum": p["stratum"], "path": "strata/" + p["stratum_id"] + ".json",
                            "sha256": r3.digest(files["strata/" + p["stratum_id"] + ".json"])} for p in packets]}
     files["manifest.json"] = (r3.canonical(summary) + "\n").encode()
@@ -478,7 +512,7 @@ def main(argv=None):
     parser.add_argument("--draw-proof", action="store_true")
     parser.add_argument("--proof-r3-sha256")
     parser.add_argument("--redraw-seed", type=int)
-    for name in ("manifest", "manifest-sha256", "origin-map", "origin-map-sha256", "protocol-sha256", "r3-generator", "head", "output-root", "output"):
+    for name in ("asset", "asset-sha256", "manifest", "manifest-sha256", "origin-map", "origin-map-sha256", "protocol-sha256", "r3-generator", "head", "output-root", "output"):
         parser.add_argument("--" + name)
     for name in ("origin-provenance", "origin-provenance-sha256", "family-declarations", "family-declarations-sha256", "origin-map-output"):
         parser.add_argument("--" + name)
@@ -516,12 +550,13 @@ def main(argv=None):
                 r3_sha256=args.proof_r3_sha256, head=args.head, output=args.output)
             print(json.dumps(result, sort_keys=True))
             return 0
-        for name in ("manifest", "manifest_sha256", "origin_map", "origin_map_sha256", "protocol_sha256", "r3_generator", "head", "output_root", "output"):
+        for name in ("asset", "manifest", "manifest_sha256", "origin_map", "origin_map_sha256", "protocol_sha256", "r3_generator", "head", "output_root", "output"):
             require(getattr(args, name) is not None, "Missing --" + name.replace("_", "-"))
         result = build_packet(profile=args.profile, manifest_path=args.manifest, manifest_sha256=args.manifest_sha256,
                               origin_map_path=args.origin_map, origin_map_sha256=args.origin_map_sha256,
                               protocol_sha256=args.protocol_sha256, r3_generator=args.r3_generator, head=args.head,
-                               output_root=args.output_root, output_name=args.output, redraw_seed=args.redraw_seed)
+                               output_root=args.output_root, output_name=args.output, redraw_seed=args.redraw_seed,
+                               asset_path=args.asset, asset_sha256=args.asset_sha256)
     except (ValueError, OSError, KeyError, TypeError, ValidationError) as error:
         parser.exit(2, "start_closure_sampler: " + str(error) + "\n")
     print(json.dumps(result, sort_keys=True))

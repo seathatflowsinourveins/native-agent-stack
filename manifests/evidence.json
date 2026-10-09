@@ -18467,8 +18467,8 @@
     },
     {
       "path": "docs/decisions/2026-10-08-g5-compact-evidence.md",
-      "sha256": "c03536dfd79e241126d735424e8e7ff74ed0409f870e4f5f4caf99e5060c9160",
-      "bytes": 25302
+      "sha256": "1e222499a9db043ad9ad4807bdfb66b5ec487ea58560e737860f34ec2176ff88",
+      "bytes": 26167
     },
     {
       "path": "docs/decisions/2026-10-08-guard-hook-fails-closed.md",
@@ -18657,8 +18657,8 @@
     },
     {
       "path": "docs/g5-refresh-procedure.md",
-      "sha256": "58be107f2c202d65b71d9b1fdcbdd0ad8450dd6ec0dd661692a5a5d196e81b90",
-      "bytes": 19076
+      "sha256": "4706d4c4a5f50cafe1f2f01b53c4ebab3ebbf1880133345b094aa39f4bbc9b7b",
+      "bytes": 19736
     },
     {
       "path": "docs/gap-crosswalk-92bb279.md",
@@ -21591,9 +21591,19 @@
       "bytes": 17118
     },
     {
+      "path": "evidence/artifacts/g5-start-closure-1-20261009/asset-row-sync.json",
+      "sha256": "109e2cd35a3141e6d40ef79c717ed8cf87f45d3a557b301703475de65f2fe1e9",
+      "bytes": 3822
+    },
+    {
       "path": "evidence/artifacts/g5-start-closure-1-20261009/class-gates.json",
       "sha256": "7e9c66a44605f5d02e137dd4358987151433e3d972ae59f8c81532a7fd49c396",
       "bytes": 3990
+    },
+    {
+      "path": "evidence/artifacts/g5-start-closure-1-20261009/compact/rows.json",
+      "sha256": "fb8f6d40bc00a9ec5fc6cc6aadc8921c5baf0d020f1827177925b29bbfb4a398",
+      "bytes": 25019837
     },
     {
       "path": "evidence/artifacts/g5-start-closure-1-20261009/full-suite-comparison.json",
@@ -60877,8 +60887,8 @@
     },
     {
       "path": "tests/test_start_closure_sampler.py",
-      "sha256": "e20d05c25ef4fe5d255e335d06ab9e469de4ded241fd0514bfc9853fcece2281",
-      "bytes": 34815
+      "sha256": "a26c3ec66f8aa87180671776a1ce85955840ba1a1d10e9bc3e1c5b14b07539cf",
+      "bytes": 41851
     },
     {
       "path": "tests/test_supply_chain_scan.py",
@@ -61512,8 +61522,8 @@
     },
     {
       "path": "tools/sota-convergence/start_closure_sampler.py",
-      "sha256": "713a7cbfbc39538d90d77f30ba9feb869f854ab0c3b574d665c9309ef4947abd",
-      "bytes": 36014
+      "sha256": "8f42c4332388dc0e3b45c2677bc54b3620f61cebdd8175ff089e16aea60a4fda",
+      "bytes": 38573
     },
     {
       "path": "tools/token-e2e/README.md",
