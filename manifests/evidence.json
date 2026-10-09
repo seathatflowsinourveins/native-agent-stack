@@ -11267,8 +11267,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/resolver/patch_policy.py",
-      "sha256": "fba292f3204475e0cc192bb0e30663675ffebcff309b035395fcee53468122ad",
-      "bytes": 43493
+      "sha256": "246b2c65fb296747e676182591b87d1fbbc622a2f9be83d023e8106d6853d557",
+      "bytes": 43497
     },
     {
       "path": "blueprints/runtime-workers/openhands/resolver/push_gate.py",
@@ -15507,22 +15507,22 @@
     },
     {
       "path": "blueprints/us-equities/event-anchored-ranking/ROW14-SUBMISSION-R3.json",
-      "sha256": "d7cab10869ac5628c9537ab60df46652ea85d854891c068ec77cf1a0dca4d4b8",
-      "bytes": 13346
+      "sha256": "5252d7243f0ad5606a80c56f9dec364f03bd7ecfd84a1d45c5f290eabfcf22aa",
+      "bytes": 13494
     },
     {
       "path": "blueprints/us-equities/event-anchored-ranking/SHA256SUMS",
-      "sha256": "26f5db9c430b015d4fb0d7ba4b2f125492d4d43f6f57275e8fbcd716beeba5f0",
+      "sha256": "a920411fe56e9bb86b41d0d9d785625fefd66ca66833fa4fdb1200e267b3b775",
       "bytes": 1056
     },
     {
       "path": "blueprints/us-equities/event-anchored-ranking/SHA256SUMS.R3",
-      "sha256": "26f5db9c430b015d4fb0d7ba4b2f125492d4d43f6f57275e8fbcd716beeba5f0",
+      "sha256": "a920411fe56e9bb86b41d0d9d785625fefd66ca66833fa4fdb1200e267b3b775",
       "bytes": 1056
     },
     {
       "path": "blueprints/us-equities/event-anchored-ranking/SHA256SUMS.R3B",
-      "sha256": "26f5db9c430b015d4fb0d7ba4b2f125492d4d43f6f57275e8fbcd716beeba5f0",
+      "sha256": "a920411fe56e9bb86b41d0d9d785625fefd66ca66833fa4fdb1200e267b3b775",
       "bytes": 1056
     },
     {
@@ -58597,7 +58597,7 @@
     },
     {
       "path": "tests/test_runtime_worker_openhands_resolver.py",
-      "sha256": "bcb1218394b20467dcd5d76242bbe2023038807248f3eedbc2decb290233f052",
+      "sha256": "2b2414c3fd322e496126cdbc2f2af9a0bef62a4d54e59b0466f2ec282123a658",
       "bytes": 271414
     },
     {
