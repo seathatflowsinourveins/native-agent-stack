@@ -1,6 +1,6 @@
 # Review verdicts carry a GitHub App identity
 
-Date: 2026-10-09. Status: accepted by the foundation CC on 2026-10-09. The App waits on the owner's registration (steps below); until its first check run, the interim rule below is in force.
+Date: 2026-10-09. Status: accepted by the foundation CC on 2026-10-09. The App waits on the owner's registration (steps below). Until the CC has verified enforcement (see Transition), the interim rule below stays in force.
 
 ## Owner direction
 
@@ -25,23 +25,48 @@ On 2026-10-09 a side agent told the owner that every agent session, Claude and C
    - Check-run writes are "only available to GitHub Apps" [checks]. The current page also lists fine-grained tokens with Checks write. Either way, the owner's shared token can't post a check run in the App's name.
 3. **Tokens.** Each post mints an installation access token through the credential runner: a JWT signed with the App's key, then `POST /app/installations/{installation_id}/access_tokens` [install-token]. api-actions builds the minting into the local review worker.
 4. **Key custody.** The private key is a 0600 file outside every worktree, reached by pointer through the credential runner's inventory. The owner moves the downloaded file into custody. No agent reads, prints or copies it.
-5. **Landing.** For essential PRs, the CC's landing scripts require a check run on the exact head with the right name and an `app.id` equal to the App's ID.
-   - Pinning the App as the ruleset's expected source of the status check [rulesets] is optional, because a ruleset can't express the essential-path condition.
-   - `claude-pr-review` statuses (us-equities-trading #42) come from github-actions[bot]. For those, the scripts also verify that the status's run is a trusted `schedule` or `workflow_dispatch` run on main.
+5. **Landing predicate.** For an essential PR, the CC's landing script resolves the PR's current head SHA at landing time. It then lists that head's check runs by name, with `filter=all` [checks-list], and keeps only runs whose `app.id` equals the App's ID.
+   - **Which run counts:** among those runs, the one with the latest `completed_at` is authoritative (ties go to the higher run id). It counts only with `status` `completed` and `conclusion` `success`.
+   - **What blocks:** a queued or in-progress App run, an authoritative `failure`, or no App run at all. A failure posted after a success supersedes it.
+   - **Rulesets:** pinning the App as the ruleset's expected source of the status check [rulesets] is optional, because a ruleset can't express the essential-path condition.
+   - **#42's statuses:** `claude-pr-review` statuses (us-equities-trading #42) come from github-actions[bot]. For those, the script also verifies that the status's run is a trusted `schedule` or `workflow_dispatch` run on main.
+   - **Nothing is waived:** an App verdict adds a gate. The co-op GPT read, the non-author trading acknowledgement, CI and the landing script's own readiness decision all still apply. The CC's independent review is preserved.
 
 ## Limit, stated plainly
 
-Every agent session runs as the same Unix user, so any session that goes looking can read the key file. Version 1 therefore gives an **auditable identity, not isolation**:
-- A session can no longer post a verdict with the ambient owner token.
-- A forgery now takes a deliberate, logged call to the credential runner.
+Every agent session runs as the same Unix user, so any session that goes looking can read the key file. That session can then sign a JWT and post a check run as the App directly, without the credential runner.
+- **The App ID identifies the credential, not the reviewer.**
+- **What version 1 stops:** accidental or confused posting with the ambient owner token, which no longer carries the reviewer's identity.
+- **What it doesn't stop:** a session that deliberately reads the key. Such a forgery may leave no runner log, so this record claims no runner audit trail.
+- **The interim pair has the same limit.** A status plus a PASS record proves nothing more, since every local session can write the records directory.
 
-GitHub's own guidance is stronger: keep the key in a sign-only vault, from which it "can never be read" [keys]. Moving the runner to its own Unix user, or to a sign-only store, is optional later hardening. The owner has asked for no new security layers for now.
+App verdicts therefore stay advisory evidence beside the CC's independent review until signing is restricted. GitHub's own guidance is stronger: keep the key in a sign-only vault, from which it "can never be read" [keys]. A runner audit can be claimed only once key access and signing are confined to the runner, under its own Unix user or a sign-only store. That is optional later hardening; the owner has asked for no new security layers for now.
 
-## Interim, in force until the App's first check run
+## Interim, in force until the Transition is verified
 
 The CC implemented this on 2026-10-09:
 - `trading-cc-read` and `claude-review/local` statuses are advisory, except that a failure blocks landing.
 - A success counts only when its named record exists under the coordination root's `trading-cc/reads/` directory and names that head SHA with PASS or ACK.
+
+## Transition
+
+The landing script moves from the interim rule to the App predicate only after the CC has verified enforcement on a non-production PR and recorded a dated receipt. The receipt must show five things:
+1. A `success` App check on the current head admits landing.
+2. A later App `failure` on the same head blocks it.
+3. A queued App run blocks it.
+4. A `success` check or status from any other source, including the owner token, is ignored.
+5. A success on a superseded head doesn't count.
+
+## Compromise and rotation
+
+Credentials are referred to by inventory id and pointer only, never by value.
+1. **On suspected compromise, the CC stops trusting App verdicts at once.** The landing script falls back to the interim rule, and the CC records the time.
+2. **The owner suspends the installation.** While it is suspended, "the GitHub App cannot access resources owned by that installation account", and GitHub gives leaked credentials as a reason to do this [suspend]. Suspension also covers any outstanding installation tokens. A token still held by a trusted process can be revoked with `DELETE /installation/token` [installations].
+3. **The owner generates a new key, then deletes the old one** under Credentials → Key pairs. GitHub requires a new key before an existing one can be deleted, and "Private keys do not expire and instead need to be manually revoked" [keys]. Deleting the local PEM file revokes nothing; only deletion on GitHub does.
+4. **The owner places the new key in custody** through the credential tooling, under the same pointer, as in Owner steps 3. The CC verifies the key's fingerprint against the one GitHub shows, using the documented `openssl` command [keys], without printing the key.
+5. **Re-enable after independent verification.** The owner unsuspends the installation. The CC re-runs the Transition checks and records a dated receipt before App verdicts count again.
+
+Routine rotation follows steps 3–5 without suspension. GitHub allows up to 25 keys per App so keys can rotate without downtime [keys].
 
 ## Alternatives considered
 
@@ -68,19 +93,22 @@ These need the owner's login [register] [install-own] [keys]:
 3. **Create the key.** On the App's page, choose Credentials → Key pairs → New key; the browser downloads a PEM file.
    - Move it yourself into the credential runner's custody directory as a 0600 file, then delete the download.
    - Don't paste it into any session.
-4. **Tell the CC.** Send the CC the App ID and the installation ID; neither is secret. The CC registers the key's pointer, and the App's first check run moves the landing scripts off the interim rule.
+4. **Tell the CC.** Send the CC the App ID and the installation ID; neither is secret. The CC registers the key's pointer and then runs the Transition checks.
 
 ## Sources
 
-Fetched 2026-10-09 between 22:58Z and 23:01Z.
+Fetched 2026-10-09 between 22:58Z and 23:37Z.
 
 | Key | Source |
 | --- | --- |
 | statuses | <https://docs.github.com/en/rest/commits/statuses#create-a-commit-status> |
 | checks | <https://docs.github.com/en/rest/checks/runs> |
+| checks-list | <https://docs.github.com/en/rest/checks/runs#list-check-runs-for-a-git-reference> (`check_name`, `status`, `filter=latest\|all`) |
 | rulesets | <https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets#require-status-checks-to-pass-before-merging> |
 | register | <https://docs.github.com/en/apps/creating-github-apps/registering-a-github-app/registering-a-github-app> |
 | install-own | <https://docs.github.com/en/apps/using-github-apps/installing-your-own-github-app> |
-| keys | <https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/managing-private-keys-for-github-apps> |
+| keys | <https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/managing-private-keys-for-github-apps> (storing, deleting and verifying private keys) |
 | install-token | <https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/generating-an-installation-access-token-for-a-github-app> |
+| suspend | <https://docs.github.com/en/apps/maintaining-github-apps/suspending-a-github-app-installation> |
+| installations | <https://docs.github.com/en/rest/apps/installations#revoke-an-installation-access-token> |
 | #42 N3 | us-equities-trading #42, security micro at `57f68472` |
