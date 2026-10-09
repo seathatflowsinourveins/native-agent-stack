@@ -16,7 +16,7 @@ names their concrete corrections without carrying the owner's wording.
 | Claude P2-3 — missing ai-memory managed skills | Change to WIRE; name native `install-skills --scope global --agent both` and selective managed `install-instructions`. No installation is claimed |
 | Claude P2-4 — exec context discrepancy | Keep 3002/153 only as historical capture; pinned snapshots are 3029/24 and 2910/24 with their separate denominators. The unbound 2981/24 review figure is not merged or explained away by matching graph counts |
 | Claude P2-5 — omitted native config | Both ai-memory drafts now pass the live `%h/.config/ai-memory/config.toml`. Historical timed-out no-config probes are retained with their diagnostic limit |
-| Claude P2-6 — graph project identifier | Draft uses native registered `home-apoth-code-native-agent-stack`, verified by metadata-only registry read |
+| Claude P2-6 — graph project identifier | Draft uses native registered `home-<user>-code-native-agent-stack`, verified by metadata-only registry read |
 | Claude P2-7 — private capture origin | Old Markdown and producer snapshots are labelled private host-state origin; exact sanitized source bytes are retained for reproducibility, not upstream or portable-host acceptance |
 | Claude P2-8 — context source identity | Separate Claude installed-plugin pin, Claude marketplace checkout and Codex source checkout; no running-bundle equivalence claimed |
 | Claude P2-9 — instruction fallback | Keep this repository's `CLAUDE.md` import. The changelog's AGENTS fallback applies only without CLAUDE.md |

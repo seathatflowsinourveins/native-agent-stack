@@ -3007,7 +3007,7 @@
     "ai_memory_managed_skills_present": false,
     "ai_memory_live_config": "%h/.config/ai-memory/config.toml",
     "native_unit_execstart_matches_drafts": true,
-    "codegraph_registered_project": "home-apoth-code-native-agent-stack",
+    "codegraph_registered_project": "home-<user>-code-native-agent-stack",
     "native_codegraph_list_projects_exit_code": 0,
     "context_mode_metadata": {
       "claude_plugin_record": "9f3ecc8b0aafd25d3592ffc31e4b02b1767f6089",

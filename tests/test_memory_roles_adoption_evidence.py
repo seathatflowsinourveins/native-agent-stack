@@ -958,7 +958,8 @@ class MemoryRoleEvidenceTests(unittest.TestCase):
                        (drafts / "native-memory-codegraph-coverage.service").read_text().splitlines()
                        if line.startswith("ExecStart="))
         parameters = json.loads(shlex.split(command)[-1])
-        self.assertEqual(parameters["project"],
+        self.assertEqual(parameters["project"], "home-%u-code-native-agent-stack")
+        self.assertEqual(parameters["project"].replace("%u", "<user>"),
                          self.record["review_correction"]["codegraph_registered_project"])
 
     def test_observation_groups_and_context_sources_are_separate(self):

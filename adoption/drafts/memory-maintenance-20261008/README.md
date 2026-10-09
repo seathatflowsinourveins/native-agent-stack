@@ -24,7 +24,7 @@ jitter. Services have a 600-second bound and reduced CPU/I/O priority.
 | `ai-retention-review` | Saturday 03:30 UTC | `ai-memory forget-sweep --dry-run` | Same scope/scheduler review; a preview does not authorize deletion |
 | `hindsight-reflect` | Sunday 03:45 UTC | `hindsight memory reflect trading-research ... --budget low --max-tokens 512` | Accepted research bank: separately review this administrative reflection query, install the pinned vendor CLI and approve its model use |
 | `hindsight-model-refresh` | Daily 04:00 UTC | `hindsight mental-model refresh trading-research MODEL_ID` | Accepted research bank: select an existing mental model, install the CLI, and use either this administrative timer or native `refresh_cron`/post-consolidation refresh |
-| `codegraph-coverage` | Monday 04:15 UTC | Native `check_index_coverage` for registered project `home-apoth-code-native-agent-stack`, scope `docs`, bounded pages | Native project registry confirms the identity; choose relevant paths before activation. This does not rebuild or establish complete coverage |
+| `codegraph-coverage` | Monday 04:15 UTC | Native `check_index_coverage` for registered project `home-<user>-code-native-agent-stack`, scope `docs`, bounded pages | Native project registry confirms the identity; choose relevant paths before activation. This does not rebuild or establish complete coverage |
 | `qmd-update` | Daily 02:45 UTC | `qmd --index native-agent-stack-catalog-lex update` | Confirm the named index and collection roots/update hooks, coordinate its one writer, and finish the separate shared-service decision |
 | `qmd-cleanup-review` | Saturday 04:30 UTC | `qmd --index native-agent-stack-catalog-lex cleanup --dry-run` | Same index/writer review; preview only |
 
