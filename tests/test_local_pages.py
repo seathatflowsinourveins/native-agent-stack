@@ -6,6 +6,7 @@ from contextlib import redirect_stderr, redirect_stdout
 import base64
 import builtins
 import hashlib
+from http.client import HTTPException
 from html.parser import HTMLParser
 import importlib.util
 import io
@@ -264,7 +265,7 @@ class LocalPagesTests(unittest.TestCase):
                 self.assertTrue((self.output / "fleet.html").is_file())
 
     def test_failed_fleet_adapter_preserves_all_pages_with_unknown_observations(self) -> None:
-        for failure in (OverflowError("fixture timestamp"), AttributeError("fixture memfd"), RecursionError("fixture structure")):
+        for failure in (OverflowError("fixture timestamp"), AttributeError("fixture memfd"), RecursionError("fixture structure"), HTTPException("PRIVATE-TRANSPORT-DETAIL")):
             with self.subTest(failure=type(failure).__name__), patch.object(BUILDER, "collect_fleet", side_effect=failure):
                 result = self.refresh()
                 self.assertEqual(result["fleet"]["fleet_source"], "not reported")
@@ -273,6 +274,27 @@ class LocalPagesTests(unittest.TestCase):
                 html = (self.output / "fleet.html").read_text()
                 self.assertIn("UNKNOWN</strong> live Codex lanes", html)
                 self.assertIn(type(failure).__name__, html)
+
+    def test_http_fleet_failure_keeps_tracking_availability_visible(self) -> None:
+        with patch.object(BUILDER, "collect_fleet", side_effect=HTTPException("PRIVATE-TRANSPORT-DETAIL")):
+            result = self.refresh()
+        tracking = result["fleet"]["tracking"]
+        self.assertEqual(tracking["status"], "UNREPORTED")
+        self.assertIn("HTTPException", tracking["reason"])
+        html = (self.output / "fleet.html").read_text()
+        self.assertTrue("Telemetry and invocation coverage" in html)
+        self.assertTrue("unreported" in html.lower())
+        self.assertNotIn("PRIVATE-TRANSPORT-DETAIL", html)
+        self.assertNotIn("PRIVATE-TRANSPORT-DETAIL", self.receipt.read_text())
+
+    def test_main_handles_http_transport_failure_without_exception_payload(self) -> None:
+        output = io.StringIO()
+        with patch.object(BUILDER, "refresh", side_effect=HTTPException("PRIVATE-TRANSPORT-DETAIL")), redirect_stderr(output):
+            with self.assertRaises(SystemExit) as raised:
+                BUILDER.main([])
+        self.assertEqual(raised.exception.code, 1)
+        self.assertIn("HTTPException", output.getvalue())
+        self.assertNotIn("PRIVATE-TRANSPORT-DETAIL", output.getvalue())
 
     def test_fleet_source_notes_render_reported_actions_cache_ttl(self) -> None:
         for seconds in (540, 731):

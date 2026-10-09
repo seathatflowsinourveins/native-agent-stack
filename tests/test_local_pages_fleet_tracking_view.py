@@ -3,9 +3,11 @@ import base64
 import copy
 from html.parser import HTMLParser
 import importlib.util
+import json
 from pathlib import Path
 import unittest
 from unittest.mock import patch
+from urllib.parse import urlencode
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -17,7 +19,7 @@ SPEC.loader.exec_module(VIEW)
 class FleetDOM(HTMLParser):
     def __init__(self, markup):
         super().__init__(convert_charrefs=True)
-        self.rows, self.links, self.tags, self.attrs, self.tokens = [], [], [], [], []
+        self.rows, self.links, self.tags, self.attrs, self.tokens, self.rates = [], [], [], [], [], []
         self._row = None
         self.feed(markup)
     def handle_starttag(self, tag, attrs):
@@ -28,6 +30,8 @@ class FleetDOM(HTMLParser):
             self.links.append(attrs.get('href'))
         if attrs.get('data-tracking-metric') == 'token':
             self.tokens.append(attrs.get('data-token-type'))
+        if 'data-invocation-family' in attrs:
+            self.rates.append(attrs['data-invocation-family'])
         if tag == 'tr' and any(key in attrs for key in ('data-hcom-name', 'data-tracking-lane', 'data-tracking-service', 'data-tracking-query')):
             self._row = {'attrs': attrs, 'text': ''}
     def handle_data(self, value):
@@ -60,8 +64,8 @@ def fixture():
             'tracking': {'schema': 'fleet-tracking/1', 'observed_utc': '2026-10-09T20:01:00Z',
                          'hcom': {'status': 'reported', 'agents': agents, 'count': 19, 'read_utc': '2026-10-09T20:00:30Z'},
                          'lanes': [{'lane': 'historic-source-lane', 'clients': [
-                             {'client': 'codex', 'tokens': [measurement(0, token_type='input'), measurement(0.00000004, token_type='cached_input'), measurement(0.2, token_type='cache_write_input'), measurement(0.3, token_type='output'), measurement(0.1, token_type='reasoning_output'), measurement(0.6, token_type='total')],
-                              'invocations': {**measurement(0.00000004, unit='calls/s'), 'scope': 'native MCP calls'}},
+                             {'client': 'codex', 'tokens': [measurement(value, status='lower bound', token_type=kind) for value, kind in [(0, 'input'), (0.00000004, 'cached_input'), (0.2, 'cache_write_input'), (0.3, 'output'), (0.1, 'reasoning_output'), (0.6, 'total')]],
+                              'invocations': {**measurement(0.00000004, status='lower bound', unit='calls/s'), 'scope': 'native MCP calls'}},
                              {'client': 'claude', 'tokens': [measurement(None, status='UNKNOWN', token_type='input', reason='Client series is absent.')],
                               'invocations': measurement(None, status='UNKNOWN', unit='calls/s', reason='Native invocation metric unavailable.')}],
                                     'source_refs': []},
@@ -95,9 +99,11 @@ class FleetTrackingViewTests(unittest.TestCase):
     def test_zero_unknown_tiny_rates_and_measurement_dates_remain_distinct(self):
         dom = FleetDOM(VIEW.render(fixture()))
         codex = next(row for row in dom.group('data-tracking-lane') if row['attrs']['data-tracking-client'] == 'codex')
-        self.assertIn('0 tokens/s', codex['text'])
+        self.assertIn('UNKNOWN tokens/s', codex['text'])
+        self.assertNotIn('0 tokens/s', codex['text'])
         self.assertIn('4e-08 tokens/s', codex['text'])
         self.assertIn('4e-08 calls/s', codex['text'])
+        self.assertIn('lower bound', codex['text'])
         self.assertIn('2026-10-09T20:00:00Z', codex['text'])
         self.assertIn('2026-10-09T20:01:00Z', codex['text'])
         self.assertIn('Window: 300 seconds', codex['text'])
@@ -106,6 +112,47 @@ class FleetTrackingViewTests(unittest.TestCase):
         self.assertIn('Native invocation metric unavailable.', unknown['text'])
         self.assertNotIn('0 calls/s', unknown['text'])
         self.assertIn('0', dom.group('data-hcom-name')[0]['text'])
+
+    def test_invocation_families_keep_qualification_scope_and_unknowns_separate(self):
+        data = fixture()
+        client = data['tracking']['lanes'][0]['clients'][0]
+        families = [('api_requests', 'API requests', 0.2, 'API attempts include retries'),
+                    ('tool_calls', 'Tool calls', 0.3, 'Native tool-call counter, not result records'),
+                    ('mcp_calls', 'MCP calls', 0.00000004, 'Native MCP calls'),
+                    ('skill_invocations', 'Skill invocations', None, 'Numeric source is unqualified'),
+                    ('agent_invocations', 'Agent invocations', None, 'Numeric source is unqualified')]
+        client['rates'] = [{**measurement(value, status='lower bound' if value is not None else 'UNKNOWN', unit='calls/s'),
+                            'family': family, 'label': label, 'scope': scope} for family, label, value, scope in families]
+        dom = FleetDOM(VIEW.render(data))
+        codex = next(row for row in dom.group('data-tracking-lane') if row['attrs']['data-tracking-client'] == 'codex')
+        self.assertEqual(dom.rates[:5], [item[0] for item in families])
+        for _, label, _, scope in families:
+            self.assertIn(label, codex['text'])
+            self.assertIn(scope, codex['text'])
+        self.assertEqual(codex['text'].count('4e-08 calls/s'), 1)
+        self.assertIn('UNKNOWN calls/s', codex['text'])
+        self.assertIn('unreported', codex['text'])
+        self.assertIn('lower bound', codex['text'])
+        self.assertIn('Source sample:', codex['text'])
+        client['rates'][0].update(value=0.4, status='reported')
+        dom = FleetDOM(VIEW.render(data))
+        codex = next(row for row in dom.group('data-tracking-lane') if row['attrs']['data-tracking-client'] == 'codex')
+        self.assertIn('0.4 calls/s', codex['text'])
+        self.assertIn('(reported)', codex['text'])
+
+    def test_hcom_creation_epochs_display_utc_and_invalid_times_stay_unknown(self):
+        data = fixture()
+        agents = data['tracking']['hcom']['agents']
+        agents[0]['created_at'] = 1791572400
+        for agent, value in zip(agents[1:], [True, -1, float('inf'), 'invalid timestamp']):
+            agent['created_at'] = value
+        markup = VIEW.render(data)
+        rows = FleetDOM(markup).group('data-hcom-name')
+        self.assertIn('2026-10-09T19:00:00Z', rows[0]['text'])
+        self.assertNotIn('1791572400', rows[0]['text'])
+        self.assertIn('<time datetime="2026-10-09T19:00:00Z">', markup)
+        for row in rows[1:5]:
+            self.assertIn('UNKNOWN', row['text'])
 
     def test_scrape_readings_keep_their_scope_and_stale_measurements_are_unknown(self):
         data = fixture()
@@ -167,6 +214,19 @@ class FleetTrackingViewTests(unittest.TestCase):
         self.assertEqual(dom.links, [fixture()['tracking']['grafana']['links'][0]['url']])
         self.assertFalse(any('fake-password' in value or 'fake-secret' in value for value in dom.attrs))
 
+    def test_per_lane_explore_links_preserve_the_supported_panes_query(self):
+        data = fixture()
+        lane = data['tracking']['lanes'][0]['lane']
+        pane = {'datasource': 'ns2604-prometheus', 'queries': [
+            {'refId': 'A', 'datasource': {'uid': 'ns2604-prometheus', 'type': 'prometheus'},
+             'expr': 'sum(rate(codex_api_request_total{ecosystem_lane=' + json.dumps(lane) + '}[5m]))'}],
+            'range': {'from': '1791574200000', 'to': '1791576000000'}}
+        url = 'http://127.0.0.1:21301/explore?' + urlencode({'panes': json.dumps({'lane': pane}), 'schemaVersion': '1'})
+        data['tracking']['grafana']['links'].append({'title': lane + ' · API requests', 'url': url})
+        dom = FleetDOM(VIEW.render(data))
+        self.assertIn(url, dom.links)
+        self.assertTrue(all('/api/' not in link for link in dom.links))
+
     def test_dynamic_tracking_values_are_sanitized_before_escaping_without_changing_markup(self):
         data = fixture()
         home = Path('/home') / 'synthetic-person'
@@ -200,7 +260,12 @@ class FleetTrackingViewTests(unittest.TestCase):
         self.assertIn('Published count: 0', empty)
         self.assertIn('0 published agents', empty)
         del data['tracking']
-        self.assertNotIn('id="fleet-tracking"', VIEW.render(data))
+        unavailable = VIEW.render(data)
+        self.assertIn('id="fleet-tracking"', unavailable)
+        self.assertIn('unreported', unavailable)
+        data['tracking'] = {'schema': 'fleet-tracking/1', 'reason': 'Native tracking adapter failed.'}
+        unavailable = VIEW.render(data)
+        self.assertIn('Native tracking adapter failed.', unavailable)
 
     def test_tracking_publication_preserves_full_markup_for_a_short_home_name(self):
         specification = importlib.util.spec_from_file_location('fleet_tracking_document', ROOT / 'tools/local-pages/build_pages.py')

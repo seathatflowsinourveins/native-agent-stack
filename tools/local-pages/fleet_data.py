@@ -10,6 +10,7 @@ from contextlib import contextmanager
 from datetime import datetime, timezone
 import fcntl
 import hashlib
+from http.client import HTTPException
 import importlib.util
 import json
 import math
@@ -23,6 +24,7 @@ import sys
 import tempfile
 import time
 from typing import Any, Callable
+from urllib.parse import urlencode
 
 
 ACTIONS_TTL_SECONDS = 540
@@ -535,7 +537,9 @@ def _roster(value: Any, kind: str) -> bool:
     return False
 
 
-HCOM_TRACKING_COMMAND = ["hcom", "list", "--format", "{name}|{base_name}|{tool}|{tag}|{status}|{status_age_seconds}|{created_at}", "--name", "navi"]
+# hcom 0.7.28 list.rs b2a7c192: explicit identities are fatal when stopped;
+# the standalone roster command tolerates the absence of a sender identity.
+HCOM_TRACKING_COMMAND = ["hcom", "list", "--format", "{name}|{base_name}|{tool}|{tag}|{status}|{status_age_seconds}|{created_at}"]
 VLLM_STATE_PROPERTIES = ("LoadState", "ActiveState", "SubState", "UnitFileState")
 VLLM_STATE_COMMAND = ["systemctl", "--user", "show", "vllm-embed.service"] + ["--property=" + name for name in VLLM_STATE_PROPERTIES] + ["--no-pager"]
 TRACKING_WINDOW_SECONDS = 300
@@ -543,7 +547,15 @@ TRACKING_MAX_AGE_SECONDS = 120
 TRACKING_TIMEOUT_SECONDS = 2.0
 _TRACKING_ENDPOINT = "http://127.0.0.1:21090"
 _GRAFANA_ENDPOINT = "http://127.0.0.1:21301"
-_HEALTH_ROUTES = {"http://127.0.0.1:8231/health", "http://127.0.0.1:8888/health", "http://127.0.0.1:29374/healthz"}
+_HEALTH_ROUTES = {"http://127.0.0.1:28231/health", "http://127.0.0.1:8888/health", "http://127.0.0.1:29374/healthz"}
+_CODEX_RATE_QUALIFICATION = "Lower bound until deployed start-timestamp ingestion and a newly born single-turn reconciliation pass."
+_TRACKING_RATE_FAMILIES = (
+    ("api_requests", "API requests", "codex_api_request_total", "Native API attempts, including retries; these are not completed user turns."),
+    ("tool_calls", "Tool calls", "codex_tool_call_total", "Native tool-call counter; separate from API attempts and tool-result records."),
+    ("mcp_calls", "MCP calls", "codex_mcp_call_total", "Native MCP calls; separate from outer tool results and general tool calls."),
+    ("skill_invocations", "Skill invocations", None, "Skill activation coverage requires a qualified native producer; skill reads are not substituted."),
+    ("agent_invocations", "Agent invocations", None, "Agent invocation coverage requires a qualified native producer; delegation and completion records are not substituted."),
+)
 
 
 def _workstation_module():
@@ -596,7 +608,7 @@ def _tracking_stamp(value):
 def _tracking_hcom(run, now):
     clock = now if callable(now) else lambda: now
     observed = clock()
-    result = {"status": "UNKNOWN", "agents": None, "count": None, "read_utc": _utc(observed),
+    result = {"status": "UNKNOWN", "agents": None, "count": None, "rejected_rows": None, "read_utc": _utc(observed),
               "source": {"command": HCOM_TRACKING_COMMAND.copy()}, "reason": None}
     try:
         native = run(HCOM_TRACKING_COMMAND.copy(), capture_output=True, text=True, timeout=TRACKING_TIMEOUT_SECONDS)
@@ -604,23 +616,30 @@ def _tracking_hcom(run, now):
         result["read_utc"] = _utc(observed)
         if native.returncode or not isinstance(native.stdout, str) or len(native.stdout.encode("utf-8")) > MAX_SOURCE_BYTES:
             raise ValueError("native roster unavailable or oversized")
-        agents = []
+        agents, rejected = [], 0
         for line in native.stdout.splitlines():
             if not line:
                 continue
             fields = line.split("|")
             if len(fields) != 7:
-                raise ValueError("native roster projection has an unexpected delimiter count")
+                rejected += 1
+                continue
             name, base, tool, tag, status, age, created = fields
             if (not all(_identifier(value) for value in (name, base, tool)) or tag and not _identifier(tag)
-                    or status not in {"active", "listening", "blocked", "inactive", "unknown"}):
-                raise ValueError("native roster projection contains invalid fields")
+                    or status not in {"active", "listening", "blocked", "inactive", "unknown", "launching", "error"}):
+                rejected += 1
+                continue
             age, created = _tracking_numeric(age), _tracking_numeric(created)
             if age is None or created is None or created > observed or _tracking_stamp(created) is None:
-                raise ValueError("native roster projection contains invalid times")
+                rejected += 1
+                continue
             agents.append({"name": name, "base_name": base, "tool": tool, "tag": tag or None,
                            "status": status, "status_age_seconds": age, "created_at": created})
-        result.update(status="reported", agents=agents, count=len(agents))
+        result["rejected_rows"] = rejected
+        if rejected and not agents:
+            raise ValueError("all native roster rows were rejected")
+        result.update(status="reported", agents=agents, count=len(agents),
+                      reason=f"Rejected {rejected} invalid native roster rows; the published count covers accepted rows only." if rejected else None)
     except (OSError, subprocess.SubprocessError, ValueError, TypeError, AttributeError, OverflowError) as error:
         result["reason"] = "Native hcom roster is UNKNOWN (" + type(error).__name__ + ")."
     return result
@@ -630,21 +649,25 @@ def _tracking_manager(run, now):
     values, reason = {}, None
     try:
         native = run(VLLM_STATE_COMMAND.copy(), capture_output=True, text=True, timeout=TRACKING_TIMEOUT_SECONDS)
-        if native.returncode or not isinstance(native.stdout, str) or len(native.stdout.encode("utf-8")) > 4096:
+        if not isinstance(native.stdout, str) or len(native.stdout.encode("utf-8")) > 4096:
             raise ValueError("user-manager properties are unavailable")
         for line in native.stdout.splitlines():
             key, separator, value = line.partition("=")
             if (not separator or key not in VLLM_STATE_PROPERTIES or key in values
-                    or not re.fullmatch(r"[a-z][a-z0-9-]{0,47}", value)):
+                    or not (re.fullmatch(r"[a-z][a-z0-9-]{0,47}", value) or key == "UnitFileState" and value == "")):
                 raise ValueError("user-manager property projection is malformed")
             values[key] = value
         if set(values) != set(VLLM_STATE_PROPERTIES):
             raise ValueError("user-manager property projection is incomplete")
+        missing = values["LoadState"] == "not-found"
+        if (native.returncode and not (native.returncode == 1 and missing)) or (not values["UnitFileState"] and not missing):
+            raise ValueError("user-manager property projection is unavailable")
     except (OSError, subprocess.SubprocessError, ValueError, TypeError, AttributeError) as error:
         values, reason = {}, "User-manager state is UNKNOWN (" + type(error).__name__ + ")."
     observed = now() if callable(now) else now
-    return [{"metric": name, "value": values.get(name), "unit": "state", "status": "UNKNOWN" if reason else "reported", "reason": reason,
-             "source_sample_utc": None if reason else _utc(observed), "evaluated_utc": _utc(observed), "query": " ".join(VLLM_STATE_COMMAND),
+    return [{"metric": name, "value": values.get(name) or None, "unit": "state", "status": "UNKNOWN" if reason or not values.get(name) else "reported",
+             "reason": reason or ("No installation state is reported for a not-found unit." if not values.get(name) else None),
+             "source_sample_utc": None if reason or not values.get(name) else _utc(observed), "evaluated_utc": _utc(observed), "query": " ".join(VLLM_STATE_COMMAND),
              "source": "native systemctl --user show", "scope": "User-manager property of vllm-embed.service only; no model readiness or port binding is inferred."}
             for name in VLLM_STATE_PROPERTIES]
 
@@ -671,11 +694,11 @@ def _tracking_series(fetch, query, keys):
                 value, reason = None, "Prometheus grouped observation is duplicated"
             result[identity] = {"value": value, "evaluated": evaluated, "reason": reason}
         return result, None
-    except (OSError, ValueError, TypeError, KeyError, AttributeError, OverflowError, RecursionError) as error:
+    except (OSError, HTTPException, ValueError, TypeError, KeyError, AttributeError, OverflowError, RecursionError) as error:
         return {}, "Prometheus observation is UNKNOWN (" + type(error).__name__ + ")."
 
 
-def _tracking_measurement(row, source, *, query, fresh_query, unit, now, scope, window=None, error=None, fresh_error=None):
+def _tracking_measurement(row, source, *, query, fresh_query, unit, now, scope, window=None, error=None, fresh_error=None, lower_bound=False):
     row, source = row or {}, source or {}
     epoch = source.get("value")
     stamp = _tracking_stamp(epoch)
@@ -689,10 +712,28 @@ def _tracking_measurement(row, source, *, query, fresh_query, unit, now, scope, 
             reason = "Underlying source sample timestamp is in the future."
         elif now - epoch > TRACKING_MAX_AGE_SECONDS:
             reason = "Underlying source sample is stale."
-    return {"value": None if reason else row["value"], "unit": unit, "status": "UNKNOWN" if reason else "reported", "reason": reason,
+        elif window is not None and row["value"] == 0:
+            reason = "A zero rate has no qualified full-window writer coverage; no measured zero is published."
+    status = "UNKNOWN" if reason else "lower bound" if lower_bound else "reported"
+    return {"value": None if reason else row["value"], "unit": unit, "status": status,
+            "reason": reason or (_CODEX_RATE_QUALIFICATION if lower_bound else None),
             "source_sample_utc": stamp, "evaluated_utc": _tracking_stamp(row.get("evaluated")), "query": query,
             "freshness_query": fresh_query, "window_seconds": window, "scope": scope,
             "source": _TRACKING_ENDPOINT, "max_source_age_seconds": TRACKING_MAX_AGE_SECONDS}
+
+
+def _tracking_explore(lane, by_client, now):
+    # Grafana v13.2.3 Explore's documented panes schema; no dashboard variable
+    # or organization ID is inferred. Datasource UID: ns2604_dashboards.py:7-8.
+    expressions = dict.fromkeys(row["query"] for client in by_client.values()
+                                for row in client["tokens"] + client["rates"] if row.get("query"))
+    queries = [{"refId": chr(65 + index), "datasource": {"uid": "ns2604-prometheus", "type": "prometheus"},
+                "expr": expression.replace('ecosystem_lane!=""', "ecosystem_lane=" + json.dumps(lane)), "range": True}
+               for index, expression in enumerate(expressions)]
+    pane = {"datasource": "ns2604-prometheus", "queries": queries,
+            "range": {"from": str(int((now - TRACKING_WINDOW_SECONDS) * 1000)), "to": str(int(now * 1000))}}
+    return {"title": lane + " · Explore rates", "lane": lane, "uid": "ns2604-prometheus",
+            "url": _GRAFANA_ENDPOINT + "/explore?" + urlencode({"panes": json.dumps({"fleet": pane}, separators=(",", ":")), "schemaVersion": "1"})}
 
 
 def collect_tracking(*, run=None, fetch=None, probe=None, now=None):
@@ -701,6 +742,7 @@ def collect_tracking(*, run=None, fetch=None, probe=None, now=None):
     Primary contracts: hcom 0.7.28 list.rs b2a7c192003e7fd67ed93265289e4ac36276f965;
     observability/lanes_dashboard.py and native-lane-invocation ADR; Prometheus
     rate/timestamp APIs. Token categories are separate; rate runs before sum.
+    The ADR's start-timestamp/reconciliation gate remains unqualified here.
     """
     live_clock = now is None
     now = time.time() if live_clock else now
@@ -717,7 +759,7 @@ def collect_tracking(*, run=None, fetch=None, probe=None, now=None):
         return rows, reason
     for client, counter, label in (("codex", "codex_turn_token_usage_sum", "token_type"),
                                    ("claude", "claude_code_token_usage_tokens_total", "type")):
-        selector = counter + '{ecosystem_lane!=""}'
+        selector = counter + '{ecosystem_lane!="",instance!="unscoped"}'
         grouping = "ecosystem_lane," + label
         query = f"sum by ({grouping}) (rate({selector}[5m]))"
         fresh_query = f"max by ({grouping}) (timestamp({selector}))"
@@ -726,25 +768,44 @@ def collect_tracking(*, run=None, fetch=None, probe=None, now=None):
         for lane, kind in sorted(set(values) | set(freshness)):
             row = _tracking_measurement(values.get((lane, kind)), freshness.get((lane, kind)), query=query, fresh_query=fresh_query,
                                         unit="tokens/s", now=read_time(), window=TRACKING_WINDOW_SECONDS, error=error, fresh_error=fresh_error,
-                                        scope="Native token category; categories are not added together.")
+                                        scope="Native token category; categories are not added together." + (" " + _CODEX_RATE_QUALIFICATION if client == "codex" else ""),
+                                        lower_bound=client == "codex")
             row["token_type"] = kind
             clients.setdefault(lane, {}).setdefault(client, {"client": client, "tokens": [], "source_refs": ["observability/lanes_dashboard.py"]})["tokens"].append(row)
-    query = 'sum by (ecosystem_lane) (rate(codex_mcp_call_total{ecosystem_lane!=""}[5m]))'
-    fresh_query = 'max by (ecosystem_lane) (timestamp(codex_mcp_call_total{ecosystem_lane!=""}))'
-    values, error = observed_query(query, ("ecosystem_lane",), "codex", "MCP call rates")
-    freshness, fresh_error = observed_query(fresh_query, ("ecosystem_lane",), "codex", "MCP source samples")
-    for lane, in sorted(set(values) | set(freshness)):
-        clients.setdefault(lane, {}).setdefault("codex", {"client": "codex", "tokens": [], "source_refs": []})
+    codex_rates = {}
+    # API/tool/MCP counters are independently qualified in the retained native
+    # Fleet source packet; they must never be collapsed to one invoke count.
+    for family, label, counter, scope in _TRACKING_RATE_FAMILIES:
+        if counter is None:
+            continue
+        selector = counter + '{ecosystem_lane!="",instance!="unscoped"}'
+        query = f"sum by (ecosystem_lane) (rate({selector}[5m]))"
+        fresh_query = f"max by (ecosystem_lane) (timestamp({selector}))"
+        values, error = observed_query(query, ("ecosystem_lane",), "codex", label + " rates")
+        freshness, fresh_error = observed_query(fresh_query, ("ecosystem_lane",), "codex", label + " source samples")
+        codex_rates[family] = (values, freshness, query, fresh_query, error, fresh_error)
+        for lane, in sorted(set(values) | set(freshness)):
+            clients.setdefault(lane, {}).setdefault("codex", {"client": "codex", "tokens": [], "source_refs": ["observability/lanes_dashboard.py"]})
     for lane, by_client in clients.items():
         for client, row in by_client.items():
-            if client == "codex":
-                row["invocations"] = _tracking_measurement(values.get((lane,)), freshness.get((lane,)), query=query, fresh_query=fresh_query,
-                                                         unit="calls/s", now=read_time(), window=TRACKING_WINDOW_SECONDS, error=error, fresh_error=fresh_error,
-                                                         scope="Native MCP calls; not API attempts, completed turns, or outer tool results.")
-            else:
-                row["invocations"] = {"value": None, "unit": "calls/s", "status": "UNKNOWN", "reason": "A dedicated Claude MCP-call counter is not evidenced.",
-                                      "source_sample_utc": None, "evaluated_utc": None, "window_seconds": TRACKING_WINDOW_SECONDS, "query": None,
-                                      "scope": "No API attempts or outer tool results are substituted for native MCP calls."}
+            row["rates"] = []
+            for family, label, counter, scope in _TRACKING_RATE_FAMILIES:
+                if client == "codex" and counter:
+                    values, freshness, query, fresh_query, error, fresh_error = codex_rates[family]
+                    rate = _tracking_measurement(values.get((lane,)), freshness.get((lane,)), query=query, fresh_query=fresh_query,
+                                                 unit="calls/s", now=read_time(), window=TRACKING_WINDOW_SECONDS, error=error, fresh_error=fresh_error,
+                                                 scope=scope + " " + _CODEX_RATE_QUALIFICATION, lower_bound=True)
+                else:
+                    reason = f"A native {client.title()} {label.lower()} rate producer and full-window coverage are not qualified."
+                    if client == "claude":
+                        reason += " Native Loki event contracts exist; a numeric rate transport and source-freshness contract are not qualified for this collector."
+                    rate = _tracking_measurement(None, None, query=None, fresh_query=None, unit="calls/s", now=read_time(),
+                                                 window=TRACKING_WINDOW_SECONDS, scope=scope, error=reason)
+                    rate["source"] = None
+                rate.update(family=family, label=label)
+                row["rates"].append(rate)
+            row["invocations"] = next(rate for rate in row["rates"] if rate["family"] == "mcp_calls")
+            row["source_refs"].append("docs/decisions/2026-10-06-native-lane-invocation-observability.md")
     query, fresh_query = 'up{job="workstation-vllm"}', 'timestamp(up{job="workstation-vllm"})'
     values, error = observed_query(query, ("job",), "vllm-embed", "scrape availability")
     freshness, fresh_error = observed_query(fresh_query, ("job",), "vllm-embed", "scrape source sample")
@@ -757,7 +818,8 @@ def collect_tracking(*, run=None, fetch=None, probe=None, now=None):
     services = [{"id": "vllm-embed", "title": "vLLM embedding service", "observations": [vllm], "source_refs": ["observability/lanes_dashboard.py"]}]
     services[0]["observations"].extend(_tracking_manager(run, read_time))
     for identity, title, url, scope, source in (
-        ("vllm-embed", "vLLM embedding service", "http://127.0.0.1:8231/health", "Documented health route on port 8231; its identity is not inferred from the separate Prometheus scrape job.", "docs/hf-memory-model-qualification.md"),
+        # CC's 2026-10-09 host measurement corrects the old distro's 8231 route.
+        ("vllm-embed", "vLLM embedding service", "http://127.0.0.1:28231/health", "Host port 28231 measured by the command center; HTTP health remains independent of the separate Prometheus scrape job.", "docs/hf-memory-model-qualification.md"),
         ("hindsight", "Hindsight", "http://127.0.0.1:8888/health", "Database reachability only; no LLM or model readiness is established.", "recipes/hindsight-research-memory.md"),
         ("ai-memory", "ai-memory", "http://127.0.0.1:29374/healthz", "Unauthenticated process liveness only; no store, provider, or auth state is read.", "observability/ns2604_dashboards.py"),
     ):
@@ -766,7 +828,7 @@ def collect_tracking(*, run=None, fetch=None, probe=None, now=None):
             value = probe(url, timeout=TRACKING_TIMEOUT_SECONDS)
             if isinstance(value, bool) or not isinstance(value, int) or not 100 <= value <= 599:
                 raise ValueError("health HTTP status is unavailable")
-        except (OSError, ValueError, TypeError, AttributeError) as exc:
+        except (OSError, HTTPException, ValueError, TypeError, AttributeError) as exc:
             reason = "Health-route observation is UNKNOWN (" + type(exc).__name__ + ")."
         reading = _utc(read_time())
         observation = {"metric": "HTTP status", "value": None if reason else value, "unit": "HTTP status",
@@ -785,12 +847,16 @@ def collect_tracking(*, run=None, fetch=None, probe=None, now=None):
                     ("Lane monitoring", "cc-lanes", "/d/cc-lanes/lanes"),
                     ("Native agent ecosystem", "ecosystem-native", "/d/ecosystem-native/native-agent-ecosystem"),
                     ("Foundation services", "native-foundation-data", "/d/native-foundation-data/253abf9"),
-                )], "source_refs": ["observability/ns2604_dashboards.py", "observability/lanes_dashboard.py"]},
+                )] + [_tracking_explore(lane, by_client, now) for lane, by_client in sorted(clients.items())],
+                "source_refs": ["observability/ns2604_dashboards.py", "observability/lanes_dashboard.py"]},
             "limitations": ["Live hcom rows and historical telemetry labels are separate observations; no name join is inferred.",
                             "Token categories retain native inclusion semantics and must not be added together.",
                             "Prometheus rate handles counter resets before writer aggregation over five minutes.",
                             "Source freshness is the latest underlying scrape among grouped writers; it is not last invocation time or coverage of every writer.",
-                            "Missing or stale measurements remain UNKNOWN; a measured zero remains zero."]}
+                            _CODEX_RATE_QUALIFICATION,
+                            "Unscoped writers are excluded; remaining writer coverage is not qualified for measured rate zeros.",
+                            "Claude API requests, tool, MCP, skill and agent rates remain UNKNOWN until numeric event-rate transport and source freshness are qualified.",
+                            "Missing, stale or unqualified zero rates remain UNKNOWN; reported service zeros remain zero."]}
 
 
 def collect(state_root: Path, cache_dir: Path, root: Path, run: Callable[..., Any] | None = None,
@@ -895,6 +961,13 @@ def collect(state_root: Path, cache_dir: Path, root: Path, run: Callable[..., An
     for field in ("stop_and_report_at_usd", "table_at_caps_usd", "table_expected_usd"):
         sdk[field] = _number(credit.get(field))
     source_label = {"direct": "direct native", "snapshot": "snapshot fallback", "unavailable": "not reported"}[source]
+    try:
+        tracking = collect_tracking(run=tracking_run or run, fetch=tracking_fetch, probe=tracking_probe)
+    except Exception as error:
+        # Optional adapters must not take the independently collected Fleet,
+        # ledger or Actions observations down. Never retain exception payloads.
+        tracking = {"schema": "fleet-tracking/1", "status": "UNKNOWN", "observed_utc": _utc(time.time()),
+                    "reason": "Optional tracking collection is UNKNOWN (" + type(error).__name__ + ")."}
     return {
         "schema": "local-fleet/1", "observed_utc": observed, "at": native_time,
         "fleet_source": source_label,
@@ -914,5 +987,5 @@ def collect(state_root: Path, cache_dir: Path, root: Path, run: Callable[..., An
         "source_notes": ["Co-op subagents use the separately dated fleet snapshot; CC agents use the CC current view.", "Missing source sections and ledger amounts remain unknown."] + (["Direct fleet collection unavailable; dated snapshot used."] if source == "snapshot" else []),
         "errors": (["Fleet collection not reported."] if source == "unavailable" else []),
         "API_errors": actions["API_errors"],
-        "tracking": collect_tracking(run=tracking_run or run, fetch=tracking_fetch, probe=tracking_probe),
+        "tracking": tracking,
     }

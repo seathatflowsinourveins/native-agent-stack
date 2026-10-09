@@ -13,6 +13,7 @@ from collections import Counter
 from datetime import datetime, timezone
 import hashlib
 import html
+from http.client import HTTPException
 import importlib.util
 import json
 import os
@@ -384,7 +385,7 @@ def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
         raise ValueError("fleet cache must remain outside the served root")
     try:
         fleet = collect_fleet(state_root, fleet_cache, root)
-    except (OSError, ValueError, UnicodeError, KeyError, TypeError, AttributeError, OverflowError, RecursionError) as error:
+    except (OSError, ValueError, UnicodeError, KeyError, TypeError, AttributeError, OverflowError, RecursionError, HTTPException) as error:
         # An unavailable optional adapter must not prevent the other documents
         # from publishing. Error categories are public; exception text is not.
         fleet = {"fleet_source": "not reported", "at": None,
@@ -394,7 +395,11 @@ def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
                  "availability": {name: {"status": "UNKNOWN", "source": "Fleet adapter",
                                            "reason": "adapter failed (" + type(error).__name__ + ")"}
                                   for name in ("lanes_live", "lanes_parked", "claude_sessions", "pool_accounts")},
-                 "source_inputs": [], "errors": [{"type": type(error).__name__}]}
+                 "source_inputs": [], "errors": [{"type": type(error).__name__}],
+                 "tracking": {"schema": "fleet-tracking/1", "status": "UNREPORTED", "observed_utc": None,
+                              "reason": "Fleet adapter failed (" + type(error).__name__ + ")",
+                              "hcom": {"agents": [], "count": None, "status": "UNKNOWN", "reason": "Fleet adapter unavailable"},
+                              "lanes": [], "services": [], "query_observations": []}}
     fleet_view = load_local("fleet_view")
     adoption_view = load_local("adoption_view")
     adoption_path = state_root / "coordination/command-center/pages/adoption-now.json"
@@ -557,6 +562,8 @@ def main(argv: list[str] | None = None) -> int:
     receipt = args.receipt or args.state_root / "research/fullspeed-20261008/g5-stars-gap/local-pages/refresh-receipt.json"
     try:
         result = refresh(args.root, args.state_root, output, receipt, args.sources, args.gaps_source, args.roadmap_source, args.roadmap_inputs, current_source=args.current_source)
+    except HTTPException as error:
+        parser.exit(1, f"local-pages: refresh failed ({type(error).__name__})\n")
     except (OSError, ValueError, KeyError, TypeError, AttributeError, ImportError) as error:
         parser.exit(1, f"local-pages: refresh failed ({type(error).__name__}): {error}\n")
     print(json.dumps({"output_dir": str(output), "receipt": str(receipt), "generated_utc": result["generated_utc"], "native_readiness_manifest_sha256": result["native_readiness_manifest_sha256"], "pages": 6, "API_errors": result["workstation"].get("API_errors", []) + result["fleet"].get("API_errors", [])}, sort_keys=True))

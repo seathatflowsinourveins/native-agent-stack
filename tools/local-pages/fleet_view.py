@@ -5,6 +5,7 @@ Anthropic frontend-design683bc88e; Vercel web-design-guidelines063bee94.
 """
 from __future__ import annotations
 
+from datetime import datetime, timezone
 from html import escape
 import importlib.util
 import ipaddress
@@ -54,19 +55,45 @@ def _metric_number(value: Any) -> str:
 
 def _reading(item: Any) -> str:
     metric = item if isinstance(item, dict) else {}
-    measured = metric.get('status') == 'reported' and metric.get('stale') is not True
+    status = metric.get('status')
+    measured = status in {'reported', 'lower bound'} and metric.get('stale') is not True
     unit = metric.get('unit')
     raw = metric.get('value')
+    zero_unqualified = status == 'lower bound' and raw == 0 and unit != 'state'
     if unit == 'state':
         accepted = isinstance(raw, str) and raw in _STATE_VALUES.get(metric.get('metric'), set())
         value = esc(raw) if measured and accepted else 'UNKNOWN'
     else:
-        value = _metric_number(raw) if measured else 'UNKNOWN'
+        value = _metric_number(raw) if measured and not zero_unqualified else 'UNKNOWN'
     reading = value + (' ' + esc(unit) if unit else '')
+    qualification = status if measured and value != 'UNKNOWN' else 'unreported'
+    reading += ' <span class="fleet-metric-status">(' + esc(qualification) + ')</span>'
     reason = metric.get('reason')
     if reason:
         reading += '<small>' + esc(reason) + '</small>'
+    elif zero_unqualified:
+        reading += '<small>Zero does not establish measured activity until counter coverage is qualified.</small>'
     return reading
+
+
+def _created_time(value: Any) -> str:
+    try:
+        if isinstance(value, bool):
+            return 'UNKNOWN'
+        if isinstance(value, (int, float)):
+            if value < 0 or not math.isfinite(value):
+                return 'UNKNOWN'
+            created = datetime.fromtimestamp(value, timezone.utc)
+        elif isinstance(value, str):
+            created = datetime.fromisoformat(value.replace('Z', '+00:00'))
+            if created.tzinfo is None:
+                return 'UNKNOWN'
+        else:
+            return 'UNKNOWN'
+        stamp = created.astimezone(timezone.utc).isoformat(timespec='seconds').replace('+00:00', 'Z')
+        return '<time datetime="' + esc(stamp) + '">' + esc(stamp) + '</time>'
+    except (ValueError, OverflowError, OSError):
+        return 'UNKNOWN'
 
 
 def _measurement_time(item: dict) -> str:
@@ -135,21 +162,19 @@ def _grafana_links(grafana: Any) -> str:
 
 def _tracking(data: dict) -> str:
     tracking = data.get('tracking')
-    if not isinstance(tracking, dict):
-        return ''
-    if tracking.get('schema') != 'fleet-tracking/1':
-        return '<section id="fleet-tracking"><h2>Fleet tracking</h2><p>UNKNOWN: tracking source is unavailable.</p></section>'
+    if not isinstance(tracking, dict) or tracking.get('schema') != 'fleet-tracking/1':
+        return '<section id="fleet-tracking"><h2>Telemetry and invocation coverage</h2><p>Tracking unreported: native source is unavailable.</p></section>'
     hcom = tracking.get('hcom') if isinstance(tracking.get('hcom'), dict) else {}
     agents = hcom.get('agents')
     agent_rows = []
     for item in agents if isinstance(agents, list) else []:
         if not isinstance(item, dict):
             continue
-        agent_rows.append(f'<tr data-hcom-name="{esc(item.get("name"))}"><th scope="row">{text(item.get("name"))}<small>{text(item.get("base_name"))}</small></th><td>{text(item.get("tool"))}</td><td>{text(item.get("tag"))}</td><td>{text(item.get("status"))}</td><td>{_metric_number(item.get("status_age_seconds"))}</td><td>{text(item.get("created_at"))}</td></tr>')
+        agent_rows.append(f'<tr data-hcom-name="{esc(item.get("name"))}"><th scope="row">{text(item.get("name"))}<small>{text(item.get("base_name"))}</small></th><td>{text(item.get("tool"))}</td><td>{text(item.get("tag"))}</td><td>{text(item.get("status"))}</td><td>{_metric_number(item.get("status_age_seconds"))}</td><td>{_created_time(item.get("created_at"))}</td></tr>')
     hcom_known = hcom.get('status') == 'reported' and isinstance(agents, list)
     roster_count = _metric_number(hcom.get('count')) if hcom_known else 'UNKNOWN'
     roster = '<section class="fleet-codex" id="fleet-hcom"><h2>Live hcom roster</h2><p class="fleet-source-note">Published count: ' + roster_count + '. Read ' + text(hcom.get('read_utc')) + ('. ' + esc(hcom['reason']) if hcom.get('reason') else '') + '</p>'
-    roster += _tracking_table('Every published hcom agent', ['Agent / base name', 'Client', 'Lane tag', 'Published state', 'State age (seconds)', 'Created at'], agent_rows) if agent_rows else '<p>' + ('0 published agents' if hcom_known else 'UNKNOWN') + '</p>'
+    roster += _tracking_table('Every published hcom agent', ['Agent / base name', 'Client', 'Lane tag', 'Published state', 'State age (seconds)', 'Created at (UTC)'], agent_rows) if agent_rows else '<p>' + ('0 published agents' if hcom_known else 'UNKNOWN') + '</p>'
     roster += '</section>'
     telemetry_rows = []
     for lane in tracking.get('lanes') or []:
@@ -166,13 +191,22 @@ def _tracking(data: dict) -> str:
                     continue
                 token_readings.append('<li data-tracking-metric="token" data-token-type="' + esc(item.get('token_type')) + '"><strong>' + text(item.get('token_type')) + ':</strong> ' + _reading(item) + _measurement_time(item) + '</li>')
             token_cell = '<ul>' + ''.join(token_readings) + '</ul>' if token_readings else 'UNKNOWN'
-            invocation = client.get('invocations') if isinstance(client.get('invocations'), dict) else {}
-            calls = _reading(invocation) + _measurement_time(invocation)
-            if invocation.get('scope'):
-                calls += '<small>' + esc(invocation['scope']) + '</small>'
+            rates = client.get('rates')
+            if not isinstance(rates, list):
+                invocation = client.get('invocations') if isinstance(client.get('invocations'), dict) else {}
+                rates = [{**invocation, 'family': 'mcp_calls', 'label': 'MCP calls'}]
+            call_readings = []
+            for item in rates:
+                if not isinstance(item, dict):
+                    continue
+                reading = _reading(item) + _measurement_time(item)
+                if item.get('scope'):
+                    reading += '<small>' + esc(item['scope']) + '</small>'
+                call_readings.append('<li data-invocation-family="' + esc(item.get('family')) + '"><strong>' + text(item.get('label') or item.get('family')) + ':</strong> ' + reading + '</li>')
+            calls = '<ul>' + ''.join(call_readings) + '</ul>' if call_readings else 'UNKNOWN · unreported'
             telemetry_rows.append('<tr data-tracking-lane="' + esc(lane.get('lane')) + '" data-tracking-client="' + esc(client.get('client')) + '"><th scope="row">' + text(lane.get('lane')) + '</th><td>' + text(client.get('client')) + '</td><td>' + token_cell + '</td><td data-tracking-metric="invocations">' + calls + '</td></tr>')
-    telemetry = '<section class="fleet-codex" id="fleet-lane-metrics"><h2>Lane token and MCP rates</h2><p class="fleet-source-note">Telemetry retains its published lane labels and measurement windows. Token types remain separate; source sample time describes the metric observation.</p>'
-    telemetry += _tracking_table('All published lane and client measurements', ['Published lane', 'Client', 'Token types and rates', 'Native MCP calls'], telemetry_rows) if telemetry_rows else '<p>UNKNOWN: lane measurements are not reported.</p>'
+    telemetry = '<section class="fleet-codex" id="fleet-lane-metrics"><h2>Telemetry and invocation coverage</h2><p class="fleet-source-note">Telemetry retains its published lane labels and measurement windows. Token categories and API, tool, MCP, skill and agent invocations remain separate. Numeric readings are labelled reported or lower bound; unqualified rates are unreported. Source sample time describes the metric observation.</p>'
+    telemetry += _tracking_table('All published lane and client measurements', ['Published lane', 'Client', 'Token types and rates', 'Invocation rates and coverage'], telemetry_rows) if telemetry_rows else '<p>UNKNOWN: lane measurements are unreported.</p>'
     query_rows = []
     for item in tracking.get('query_observations') or []:
         if not isinstance(item, dict):
@@ -195,7 +229,8 @@ def _tracking(data: dict) -> str:
     services += '</section>'
     limits = tracking.get('limitations')
     notes = '<ul class="fleet-source-note">' + ''.join('<li>' + esc(item) + '</li>' for item in limits) + '</ul>' if isinstance(limits, list) and limits else ''
-    return '<div id="fleet-tracking"><p class="fleet-stamp">Tracking evaluated ' + text(tracking.get('observed_utc')) + '</p>' + roster + telemetry + services + _grafana_links(tracking.get('grafana')) + notes + '</div>'
+    source_reason = '<p class="fleet-source-note">Tracking unreported: ' + esc(tracking['reason']) + '</p>' if tracking.get('reason') else ''
+    return '<div id="fleet-tracking"><p class="fleet-stamp">Tracking evaluated ' + text(tracking.get('observed_utc')) + '</p>' + source_reason + roster + telemetry + services + _grafana_links(tracking.get('grafana')) + notes + '</div>'
 
 
 def render(data: dict[str, Any]) -> str:
