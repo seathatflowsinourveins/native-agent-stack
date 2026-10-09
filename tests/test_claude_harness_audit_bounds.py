@@ -215,14 +215,15 @@ class HarnessAuditStepTests(unittest.TestCase):
         code, console, summary, usage = run_step(NUMBERS, execution())
         self.assertEqual(code, 0, console)
         record = json.loads(usage)
-        self.assertEqual(sorted(record), ["assistant_turns", "claude_code_version", "forbidden_tools", "mcp_servers", "models", "num_turns", "result_chars", "session_started", "successful_result", "tools", "tools_listed", "total_cost_usd"])
+        self.assertEqual(sorted(record), ["assistant_turns", "claude_code_version", "forbidden_tools", "mcp_servers", "models", "num_turns", "result_chars", "result_subtype", "session_started", "successful_result", "tools", "tools_listed", "total_cost_usd"])
+        self.assertEqual(record["result_subtype"], "success")
         self.assertEqual(record["tools"], ["Read", "Glob", "Grep"])
         self.assertEqual(sorted(record["models"][0]), ["cache_creation_input_tokens", "cache_read_input_tokens",
                                                        "cost_usd", "input_tokens", "model", "output_tokens"])
         for text in (usage, summary, console):
             self.assertNotIn(TRANSCRIPT_MARKER, text)
             self.assertNotIn("Scorecard", text)
-        self.assertIn("| 9 | 9 | 0.7 | true | 2.1.295 | Read Glob Grep | 0 |", summary)
+        self.assertIn("| 9 | 9 | 0.7 | true | success | 2.1.295 | Read Glob Grep | 0 |", summary)
 
     def test_an_unmet_bound_fails_after_the_numbers_were_kept(self):
         cases = {
@@ -254,6 +255,39 @@ class HarnessAuditStepTests(unittest.TestCase):
         for words in ("21 assistant turns, outside 1 to 20", "above 3", "Skill", "no result text"):
             self.assertIn(words, console)
 
+    def test_a_run_that_did_not_succeed_is_named_by_its_result_subtype(self):
+        # A turn-limit stop and a budget stop call for different changes, so the record, the summary row and the
+        # failure message each carry the result's subtype; a success result flagged as an error keeps its own.
+        cases = {
+            "error_max_turns": {"subtype": "error_max_turns", "is_error": True},
+            "error_max_budget_usd": {"subtype": "error_max_budget_usd", "is_error": True},
+            "success": {"is_error": True},
+        }
+        for subtype, changes in cases.items():
+            with self.subTest(subtype=subtype):
+                code, console, summary, usage = run_step(NUMBERS, execution(**changes))
+                self.assertNotEqual(code, 0)
+                self.assertEqual(json.loads(usage)["result_subtype"], subtype)
+                self.assertIn(f"| false | {subtype} | 2.1.295 |", summary)
+                self.assertIn(f"the run did not end in success (subtype {subtype})", console)
+        log = execution()
+        del log[-1]["subtype"]
+        code, console, _, usage = run_step(NUMBERS, log)
+        self.assertNotEqual(code, 0)
+        self.assertEqual(json.loads(usage)["result_subtype"], "unknown")
+        self.assertIn("the run did not end in success (subtype unknown)", console)
+
+    def test_the_summary_tables_are_well_formed(self):
+        # Every row of each table has as many cells as its header, the result subtype column included.
+        for subtype in ("success", "error_max_turns"):
+            with self.subTest(subtype=subtype):
+                _, _, summary, _ = run_step(NUMBERS, execution(subtype=subtype))
+                tables = [block.splitlines() for block in summary.split("\n\n") if block.startswith("|")]
+                self.assertEqual(len(tables), 2, summary)
+                for table in tables:
+                    self.assertGreaterEqual(len(table), 3, table)
+                    self.assertEqual({row.count("|") for row in table}, {table[0].count("|")}, table)
+
     def test_the_turn_bound_counts_assistant_turns_not_transcript_messages(self):
         # On Claude Code 2.1.295 a 12-request run with parallel reads reported num_turns 57 (api-actions LR
         # receipt, 2026-10-08): num_turns counts transcript messages, tool results included.
@@ -266,6 +300,7 @@ class HarnessAuditStepTests(unittest.TestCase):
         hostile = "<img src=x onerror=alert(1)> | injected"
         log = execution(tools=("Read", hostile), modelUsage={hostile: model_usage()["claude-opus-5-5"]})
         log[0]["claude_code_version"] = hostile
+        log[-1]["subtype"] = hostile
         _, console, summary, usage = run_step(NUMBERS, log)
         for text in (usage, summary, console):
             self.assertNotIn("onerror", text)
@@ -273,6 +308,8 @@ class HarnessAuditStepTests(unittest.TestCase):
         self.assertEqual(record["tools"], ["Read", "other"])
         self.assertEqual(record["models"][0]["model"], "other")
         self.assertEqual(record["claude_code_version"], "other")
+        self.assertEqual(record["result_subtype"], "other")
+        self.assertIn("the run did not end in success (subtype other)", console)
 
     def test_an_unreadable_execution_file_fails_and_leaves_no_record(self):
         broken = {

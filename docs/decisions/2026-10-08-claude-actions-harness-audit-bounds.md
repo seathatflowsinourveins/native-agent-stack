@@ -10,7 +10,8 @@ run, sets a variable or touches the federation rule.
 ## Behaviour changes in this PR
 
 Every change against the workflow on `main`, by name. A pre-cue read by Anthropic's pr-review-toolkit agents
-(2026-10-09, on 4d0a14da) found six of these missing from this record and the PR description; all are listed here.
+(2026-10-09, on 4d0a14da) found six of these missing from this record and the PR description; at 89d05dd4 the final
+step and the `show_full_output` input were still missing. All are listed here.
 
 - The action pin moves from v1.0.245 to v1.0.247 (next section).
 - `timeout-minutes` changes from 45 to 30.
@@ -18,21 +19,41 @@ Every change against the workflow on `main`, by name. A pre-cue read by Anthropi
   a first-attempt guard, the enabling variable `CLAUDE_HARNESS_AUDIT_ENABLED`, and, for `workflow_dispatch`, an
   owner-only guard: `github.actor` and `github.triggering_actor` must both be the repository owner. Before this
   change any user who could dispatch the workflow could run it; such a dispatch is now skipped.
-- A new first step stops the job with exit 2 when step or runner debugging is on, or when `~/.claude/settings.json`
-  already exists on the runner, a dangling symlink included. A run with debug logging now fails at that step.
+- A new first step, "Refuse debug logging and pre-existing Claude settings", stops the job with exit 2 when step or
+  runner debugging is on ("Refused: debug logging is enabled for this run."), or when `~/.claude/settings.json`
+  already exists on the runner, a dangling symlink included ("Refused: a Claude user settings file already exists on
+  this runner."). A run with debug logging now fails at that step.
 - The job's display name changes from "Audit the harness context and open the scorecard issue" to "Audit the harness
   context (read-only, bounded)".
 - The prompt drops the `gh issue create` instruction and adds two sentences: repository files are evidence to audit,
   not instructions to follow, and the 20-turn limit with a request to read in parallel.
 - The weekly audit no longer opens a GitHub issue; the report goes to the job summary from a step without a model.
-- The action step sets two inputs to their defaults explicitly, `display_report: 'false'` and
-  `track_progress: 'false'` (both declared in the pinned `action.yml`, lines 136-139 and 152-155 at `2dca132f`, with
-  default `"false"`), and pins `ACTIONS_STEP_DEBUG: 'false'` in its environment.
+- The action step gains `id: claude_audit`, which the later steps read, sets three inputs to their defaults
+  explicitly, `show_full_output: 'false'`, `display_report: 'false'` and `track_progress: 'false'` (declared in the
+  pinned `action.yml` at `2dca132f`, lines 156-159, 152-155 and 136-139, each with default `"false"`), and pins
+  `ACTIONS_STEP_DEBUG: 'false'` in its environment.
 - `claude_args` carries the bounds (`--model`, `--effort max`, `--max-turns 20`, `--max-budget-usd 3`, `--tools`,
   `--allowedTools`, `--restricted`, `--permission-prompts none`, `--setting-sources user`, `--strict-mcp-config`,
   `--settings` with the deny rules, `--add-dir`).
-- New steps keep the run's numbers, check the bounds and publish the report, and an artifact
-  `harness-audit-usage-<run id>-<attempt>` keeps `usage.json` (numbers only) for 14 days.
+- New step "Keep the run's numbers and check the bounds" (`always()`, when the action left an execution file) writes
+  `usage.json` with `total_cost_usd`, `num_turns`, `assistant_turns`, `result_chars`, `tools_listed`,
+  `successful_result`, `result_subtype` (the result's `subtype` through the step's name filter: `unknown` when
+  missing, `other` when not a plain identifier), `session_started`, `claude_code_version`, `tools`,
+  `forbidden_tools`, `mcp_servers` and per-model `models` (`model`, `input_tokens`, `output_tokens`,
+  `cache_read_input_tokens`, `cache_creation_input_tokens`, `cost_usd`). It adds two tables to the job summary,
+  "Harness audit: run numbers" (assistant turns, messages, client cost estimate, completed, result subtype, Claude
+  Code, tools, MCP servers) and the per-model tokens (model, input, cache write, cache read, output). It then exits 1
+  with "Bounds not met:" and the message of every unmet bound:
+  "the run did not end in success (subtype <subtype>)", "no session start record", "the session start record lists
+  no tools or MCP servers", "tools outside Read, Glob and Grep: <names>", "<n> MCP servers in the session", "<n>
+  assistant turns, outside 1 to 20", "client cost estimate <x> USD, above 3", "no cache read" and "no result text".
+- New step "Publish the report to the job summary" (`success()`, with an execution file) copies the report (After
+  the run, below).
+- New step "Require the run's execution file" (`success()`, without an execution file) fails the job with "The audit
+  step finished without an execution file: no bounds were checked and no report was published.", so a green run
+  always had its bounds checked.
+- New step "Keep the numeric usage record" (`always()`, with an execution file) uploads `usage.json` (numbers and
+  fixed names only) as the artifact `harness-audit-usage-<run id>-<attempt>` for 14 days.
 - The grant `issues: write` is removed; the job holds `contents: read` and `id-token: write`.
 
 ## What was wrong with the job as landed
@@ -78,12 +99,12 @@ keeps qualification. This pin's qualification is the fence receipt and the local
 | no code-running tool, no WebFetch, no settings file, file tools inside the working directories | `--restricted` | same `--help`: "removes the built-in tools that run commands or code ... and WebFetch unless --tools names them, and ignores user, project and local settings files (managed settings and --settings still apply; add --strict-mcp-config to skip MCP servers too). Also confines the file tools to the working directories (--add-dir included), refuses bypassPermissions" |
 | nothing waits for an answer | `--permission-prompts none` | same `--help`: "nobody: anything that would prompt is denied automatically"; changelog 2.1.259: "for unattended headless hosts" |
 | no MCP server | `--strict-mcp-config` | same `--help` |
-| hooks off; no read of any `.git` directory, `.env` or key file | `--settings` JSON (`disableAllHooks`, `permissions.deny`) | `--settings` still applies under `--restricted`; the action sets git authentication in the root checkout (`src/github/operations/git-config.ts`) |
+| hooks off; no read of any `.git` directory, `.env` or key file (Read and Grep into `.git`, and Read of `.env`, measured as refused; Glob's attribution pending, below) | `--settings` JSON (`disableAllHooks`, `permissions.deny`) | `--settings` still applies under `--restricted`; the action sets git authentication in the root checkout (`src/github/operations/git-config.ts`) |
 | 20 turns | `--max-turns 20` | accepted by the 2.1.295 argument parser (`option '--max-turns <turns>'`); checked again after the run as distinct assistant message ids, because the result's `num_turns` counts transcript messages |
 | $3 per run | `--max-budget-usd 3` | same `--help`: "Maximum dollar amount to spend on API calls"; a client estimate, checked again from the run's own numbers |
 | no full model output in a public log | `show_full_output: 'false'`, `ACTIONS_STEP_DEBUG: 'false'` in the action step's environment, and a first guard step that refuses a run with runner debugging on | `showFullOutput = options.showFullOutput === "true" \|\| isDebugMode`, where `isDebugMode` is `ACTIONS_STEP_DEBUG === "true"` (`base-action/src/parse-sdk-options.ts` at the pin) |
 | no key in GitHub | federation inputs only; the workflow passes no static credential | "a static credential takes precedence and federation will not be used" (`docs/setup.md` at the pin) |
-| one spend per request | `github.run_attempt == 1`, and for a dispatch the owner as both actor and triggering actor | GitHub contexts reference: a re-run keeps `github.actor`; `github.triggering_actor` is who re-ran it |
+| one spend per request | `github.run_attempt == 1`, and for a dispatch the owner as both actor and triggering actor | GitHub contexts reference: a re-run keeps `github.actor`; `github.triggering_actor` is who re-ran it. A re-run, the case the triggering-actor clause exists for, is already skipped by the first-attempt clause; the triggering-actor clause stays as an independent second guard, so a dispatch stays owner-only if the first-attempt clause is ever relaxed (for example to let the owner re-run a failed attempt), and removing either clause fails a test |
 
 The action's `settings` input is not used: it writes the user settings file, which `--restricted` ignores, so the
 same JSON goes to `--settings`. `--setting-sources user` stays, because without it the action asks for user, project
@@ -95,29 +116,71 @@ pin). The guard tests presence only.
 
 ### What was checked at runtime
 
-The fence flags were run on the installed client (Claude Code 2.1.295, the version the pin installs): `--restricted`,
-`--tools` and `--allowedTools` Read,Glob,Grep, `--strict-mcp-config`, `--permission-prompts none` and `--settings` with
-hooks off and three deny rules, on Claude Haiku 5.5 with `--max-turns 10` and a $0.50 budget. This workflow adds
-`--setting-sources user`, `--add-dir`, `--effort max`, three more deny rules and `blockReadsOutsideWorkingDirectories`,
-and runs Opus 5.5 with 20 turns and $3; the receipt lists its own flags. The runs used a throwaway tree: files at the root, an untrusted subdirectory with its own `CLAUDE.md`, a skill and a hook, a root
-settings file with a hook, a root `CLAUDE.md`, `.git/config` files and a file outside the tree. In three runs the
-session's tools were exactly Glob, Grep and Read; files inside the tree were read; the file outside the tree and
-both `.git/config` files were denied; no hook ran; no instruction file changed the answer; there was no shell
-(`evidence/artifacts/claude-actions-fence-smoke-20261008/receipt.json`). That is one small model and one prompt: it
-shows these controls held there, not that no input can defeat them. The action passes `claude_args` through its own
-parser (`shell-quote`); replaying that parser on this workflow's text yields the same flags and the same JSON.
-This workflow's own prompt and `claude_args`, read from this file, also ran on Opus 5.5 at `max` (next sections).
+The fence was run on the installed client (Claude Code 2.1.295, the version the pin installs) with the flag set that
+`evidence/artifacts/claude-actions-fence-smoke-20261008/receipt.json` lists, which is not this workflow's
+`claude_args`. Both pass `--restricted`, `--tools Read,Glob,Grep`, `--allowedTools Read,Glob,Grep`,
+`--strict-mcp-config`, `--permission-prompts none` and `--settings` with `"disableAllHooks": true` and the deny rules
+`Read(./.git/**)`, `Read(./**/.git/**)` and `Read(./**/.env)`. Every difference:
+
+| Flag | The receipt's runs | This workflow |
+| --- | --- | --- |
+| `--model` | `claude-haiku-5-5` | `claude-opus-5-5` |
+| `--effort` | not passed | `max` |
+| `--max-turns` | `10` | `20` |
+| `--max-budget-usd` | `0.5` | `3` |
+| `--setting-sources` | not passed (run1), `user` (run2-user), `user,project,local` (run2-user-project-local) | `user` |
+| `--add-dir` | not passed | `${{ runner.temp }}/harness-audit` |
+| `--settings`, `claudeMdExcludes` | `["**/pr-head/**"]` | not set |
+| `--settings`, `permissions.blockReadsOutsideWorkingDirectories` | not set | `true` |
+| `--settings`, further `permissions.deny` rules | none | `Read(./**/.env.*)`, `Read(./**/*.pem)`, `Read(./**/*.key)` |
+
+The runs used a throwaway tree: files at the root, an untrusted `pr-head` subdirectory with its own `CLAUDE.md`, a
+skill, a settings file with a hook and a `.git/config`, a root `.git/config`, a file outside the tree and, from the
+second run on, a root settings file with a hook and a root `CLAUDE.md`. In three runs the session's tools were exactly
+Glob, Grep and Read; files inside the tree were read; the file outside the tree and both `.git/config` files were
+denied; no planted hook or skill ran; there was no shell. That is one small model and one prompt: it shows these
+controls held there, not that no input can defeat them.
+
+Neither planted `CLAUDE.md` changed the answer. That does not show that `--restricted` alone keeps instruction files
+out: the runs also set `claudeMdExcludes` over the `pr-head` subdirectory, which this workflow does not set; for the
+root `CLAUDE.md`, outside that pattern and planted in two of the three runs, the receipt records only that its
+instruction did not take effect, not whether the file was loaded; and the 2.1.295 `--help` text for `--restricted`
+names settings files, not instruction files.
+
+Whether the `.git` deny rules also bind Glob and Grep has a measured partial answer. A local subscription probe ran
+on 2026-10-09 with Claude Code 2.1.295 and Haiku 5.5, using this workflow's fence flags and its `--settings` JSON
+verbatim, in a scratch git repository. In it:
+
+- Grep with a path inside `.git` (or a nested `.git`) was refused as a permission denial.
+- Read of a file inside `.git`, and of `.env`, was refused.
+- Glob of `.git/**`, Glob of `**/PROBE_MARKER`, and Grep over `.` returned nothing.
+
+Whether the deny rules or the tools' default skipping of hidden paths caused those empty results is pending a control
+run without the deny rules. Its probe and stream stay outside the repository.
+
+Whether `blockReadsOutsideWorkingDirectories` also binds Glob and Grep is not established: no runtime test exists,
+and the receipt's runs did not set it. For both questions the documentation says more than the runs show: the
+settings reference says that setting denies `Read`, `Grep`, `Glob` and `LSP` calls outside the working directories,
+and the permissions page says Claude Code makes "a best-effort attempt" to apply `Read` rules to Grep and Glob.
+
+The action passes `claude_args` through its own parser (`shell-quote`); replaying that parser on this workflow's text
+yields the same flags and the same JSON. This workflow's own prompt and `claude_args`, read from this file, also ran
+on Opus 5.5 at `max` (next sections); that run recorded the session's tools, turns and cost and probed no fence.
 
 ### After the run
 
 One step reads the action's execution file and keeps only numbers and fixed names: cost, turns, the success flag,
-the Claude Code version, the session's tool list, the number of MCP servers and per-model token counts. The record
-is written before the check, so a failed or over-budget run still leaves its cost. The step then fails the job
+the result's subtype, the Claude Code version, the session's tool list, the number of MCP servers and per-model token
+counts. The record is written before the check, so a failed or over-budget run still leaves its cost. The step then
+fails the job
 unless the run succeeded, used 1 to 20 assistant turns (distinct assistant message ids; the client's `num_turns` counts transcript messages, tool results included: a 12-request run on 2.1.295 reported 57, `local-parity-receipt.json`; it is only recorded), cost at most $3 by the client's estimate, read the prompt cache, had
 no MCP server, listed its tools and MCP servers in the session start record (a missing list fails instead of passing
 as empty), used no tool outside Read, Glob and Grep (an allow-list, so a tool name it does not know also fails) and
-returned result text. The step names every bound it finds unmet. The execution file itself holds the whole
-transcript and is never printed or uploaded. A second step, which runs only when the check passed, copies the last
+returned result text. The step names every bound it finds unmet. A run that did not succeed is named by its result
+subtype, in the message ("the run did not end in success (subtype error_max_turns)") and in the summary's result
+subtype column, so a turn-limit stop and a budget stop (`error_max_budget_usd`) read apart; a `success` result
+flagged `is_error` reads `(subtype success)`, and a missing subtype reads `unknown`. The execution file itself holds
+the whole transcript and is never printed or uploaded. A second step, which runs only when the check passed, copies the last
 non-empty result text to the job summary, escaped, inside `<pre>`, capped at 60,000 bytes on a character boundary,
 with a line saying so when the report was longer.
 
@@ -134,7 +197,7 @@ success without an execution file fails the job in a final step, so a green run 
 
 ## Effort
 
-`--effort max` in `claude_args`, set under the command center's effort mapping of 2026-10-08, which runs judgment work (designated reads, adjudication, pull request and security reviews, audits) at `max`. Every job records its level and the reason, because an unset level is a defect. The level has to be in `claude_args`: `--restricted` ignores the settings files that would otherwise carry a session's level, and on the Claude API Opus 5.5 runs at `medium` when a request leaves effort unset (bundled `claude-api` skill 2.1.295, `shared/model-migration.md`). `claude --help` (2.1.295) lists `low, medium, high, xhigh, max`. A loopback dry run of the installed 2.1.295 client with this workflow's `claude_args` sent `output_config.effort: "max"`, adaptive thinking and no `speed` field on every request. At `max`, thinking takes a larger share of the output than at the default level, so the estimate below is a floor; the client budget still bounds each run. A local run of this workflow's prompt and `claude_args` at `max` (Opus 5.5, Claude Code 2.1.295, billed to a second Anthropic key through the credential runner) used 10 of 20 assistant turns and a client cost estimate of about $2.03 of the $3 budget, and its result's `num_turns` was 46 (`evidence/artifacts/claude-actions-fence-smoke-20261008/local-parity-receipt.json`).
+`--effort max` in `claude_args`, set under the command center's effort mapping of 2026-10-08, which runs judgment work (designated reads, adjudication, pull request and security reviews, audits) at `max`. Every job records its level and the reason, because an unset level is a defect. The level has to be in `claude_args`: `--restricted` ignores the settings files that would otherwise carry a session's level, and on the Claude API Opus 5.5 runs at `medium` when a request leaves effort unset (bundled `claude-api` skill 2.1.295, `shared/model-migration.md`). `claude --help` (2.1.295) lists `low, medium, high, xhigh, max`. A loopback dry run of the installed 2.1.295 client with this workflow's `claude_args` sent `output_config.effort: "max"`, adaptive thinking and no `speed` field on every request. At `max`, thinking takes a larger share of the output than at the default level, so the estimate below is a floor; the client budget still bounds each run. A local run of this workflow's prompt and `claude_args` at `max` (Opus 5.5, Claude Code 2.1.295, billed to a second Anthropic key through the credential runner) used 10 of 20 assistant turns and a client cost estimate of about $2.03 of the $3 budget, and its result's `num_turns` was 46 (`evidence/artifacts/claude-actions-fence-smoke-20261008/local-parity-receipt.json`). The same file's LR entry, the 12-request run cited under After the run, also records its target pull request (#897 at `24821c57`), its report's two blocking findings and the report's sha256, amended on 2026-10-09 from that run's harness receipt.
 
 ## Cost of one run
 
@@ -167,7 +230,7 @@ Runs spend from the Console organization that the repository variables `ANTHROPI
   entry for `harness-audit.yml:audit` changes from `["id-token: write", "issues: write"]` to `["id-token: write"]`.
   No other entry and no exemption changes.
 
-New, in `tests/test_claude_harness_audit_bounds.py` (21 tests): the job's condition, permissions, pin, inputs, flags
+New, in `tests/test_claude_harness_audit_bounds.py` (24 tests): the job's condition, permissions, pin, inputs, flags
 and settings are asserted from the workflow file, and the guard, numbers and report steps are executed as written on
 synthetic inputs. Sixteen weakened copies of the workflow each fail at least one test: a $30 budget check, a
 600,000-byte cap, 60 or 200 turns, a settings check that passes a symlink, a cache check that accepts zero, an added
@@ -176,8 +239,18 @@ Bash tool, a missing first-attempt or triggering-actor condition, a missing tool
 (measured on 2026-10-08 against that day's bounds). The 2026-10-09 bound changes have their own tests: an unknown
 tool, a session start record without its lists, an empty result, the named failure messages, the character-safe cap
 with its notice and the last non-empty result; the turn bound was checked with three mutants (a bound on
-`num_turns`, a count forced to 0, a count that does not de-duplicate message ids). The step tests no longer skip
-without PyYAML: they read the workflow with the policy test's own loader when PyYAML is absent.
+`num_turns`, a count forced to 0, a count that does not de-duplicate message ids).
+`test_a_green_run_always_has_an_execution_file` asserts the final step's condition and exit. The result subtype has
+its own tests: `test_a_run_that_did_not_succeed_is_named_by_its_result_subtype` (`error_max_turns`,
+`error_max_budget_usd`, a `success` result flagged `is_error` and a missing subtype, each in the record and the
+failure message, the first three in the summary row as well), `test_the_summary_tables_are_well_formed` (every row
+of each table has its header's cell count) and a hostile subtype in
+`test_names_that_are_not_plain_identifiers_are_replaced`; the record and summary row of
+`test_a_bounded_cached_read_only_run_is_accepted_and_only_numbers_and_fixed_names_are_kept` now include it. Seven
+weakened copies each fail at least one of these, and an unmodified copy fails none (measured 2026-10-09): the
+subtype dropped from the record, dropped from the message, taken without the name filter, a missing subtype read as
+`success`, and the summary column dropped from the header only, the row only, or the whole table. The step tests no
+longer skip without PyYAML: they read the workflow with the policy test's own loader when PyYAML is absent.
 
 ## Alternatives considered
 
@@ -193,8 +266,9 @@ without PyYAML: they read the workflow with the policy test's own loader when Py
 
 ## What would overturn it
 
-- A first activated run stops at `error_max_turns` or `error_max_budget_usd` with a useful audit unfinished: raise
-  the one bound that stopped it, with that run's numbers.
+- A first activated run stops at `error_max_turns` or `error_max_budget_usd` with a useful audit unfinished (the
+  record's `result_subtype` and the failure message say which): raise the one bound that stopped it, with that run's
+  numbers.
 - The numbers step reports a forbidden tool or an MCP server: stop the job and read the action's change.
 - The action changes the execution file's shape (the numbers step fails on "unsupported execution shape"): read the
   new shape at the new pin and change the extractor in the same pull request as the pin.
@@ -202,17 +276,21 @@ without PyYAML: they read the workflow with the policy test's own loader when Py
 
 ## Evidence class
 
-`native_proven` for the flag set on the installed client (the receipt above; not through the action and not on a
-GitHub runner). `local_static_analysis`: actionlint 1.17.0 and zizmor 1.30.1 (offline, regular and pedantic), no
-findings. `local_integration`: the unit tests named above, PyYAML 6.0.3 on Python 3.12. `documented_api_check`: the
-`gh api` reads named above. No hosted run of this workflow is part of this record.
+`native_proven` for the receipt's own flag set on the installed client (`receipt.json`; the table under What was
+checked at runtime lists every way it differs from this workflow's `claude_args`), not for this workflow's flags, and
+not through the action or on a GitHub runner. `local_static_analysis`: actionlint 1.17.0 and zizmor 1.30.1
+(offline, regular and pedantic), no findings. `local_integration`: the unit tests named above, PyYAML 6.0.3 on Python 3.12, and the
+2026-10-09 local probe of the `.git` deny rules (one subscription run on the installed client with this workflow's
+fence flags and `--settings`; its stream stays outside the repository). `documented_api_check`: the `gh api` reads
+named above. No hosted run of this workflow is part of this record.
 
 ## SOTA sources
 
 - anthropics/claude-code-action at `2dca132ff0e0c4094ce6048b422c6915a071210b` (v1.0.247): `action.yml` (inputs
   `anthropic_federation_rule_id`, `anthropic_organization_id`, `anthropic_service_account_id`,
-  `anthropic_workspace_id`, `claude_args`, `show_full_output`; output `execution_file`), `docs/setup.md`
-  (authentication precedence), `docs/security.md`, `base-action/src/parse-sdk-options.ts`,
+  `anthropic_workspace_id`, `claude_args`, `show_full_output` (lines 156-159), `track_progress` (lines 136-139) and
+  `display_report` (lines 152-155), the last three each with default `"false"`; output `execution_file`),
+  `docs/setup.md` (authentication precedence), `docs/security.md`, `base-action/src/parse-sdk-options.ts`,
   `base-action/src/setup-claude-code-settings.ts`, `base-action/src/run-claude-sdk.ts`,
   `base-action/src/execution-file.ts`, `src/github/operations/git-config.ts`;
   <https://github.com/anthropics/claude-code-action/tree/2dca132ff0e0c4094ce6048b422c6915a071210b>.
@@ -224,6 +302,10 @@ findings. `local_integration`: the unit tests named above, PyYAML 6.0.3 on Pytho
   <https://code.claude.com/docs/en/prompt-caching>; Pricing:
   <https://platform.claude.com/docs/en/about-claude/pricing>; Claude Code fast mode:
   <https://code.claude.com/docs/en/fast-mode>; all read 2026-10-08.
+- Anthropic, Claude Code docs: All settings, `permissions.blockReadsOutsideWorkingDirectories` and
+  `claudeMdExcludes` (<https://code.claude.com/docs/en/settings-reference>); Configure permissions, the scope of
+  `Read` rules (<https://code.claude.com/docs/en/permissions>); Agent SDK reference - Python, `ResultMessage`
+  `subtype` values (<https://code.claude.com/docs/en/agent-sdk/python>); read from copies saved on 2026-10-08.
 - GitHub, OpenID Connect reference (subject of a run on a branch):
   <https://docs.github.com/en/actions/reference/security/oidc>; contexts reference (`github.triggering_actor`,
   `github.run_attempt`): <https://docs.github.com/en/actions/reference/workflows-and-actions/contexts>.

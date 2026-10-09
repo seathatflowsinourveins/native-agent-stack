@@ -64,9 +64,11 @@ The Actions allow-list and harness description below were checked against live s
   request (`test_pull_requests_write_is_granted_only_to_the_propose_job`,
   `test_no_workflow_reviews_or_approves_a_pull_request`).
 - **Harness audit.** The weekly and manually dispatched [`harness-audit.yml`](../.github/workflows/harness-audit.yml)
-  runs only on `main`, using `anthropics/claude-code-action` v1.0.247 at
+  runs only in `seathatflowsinourveins/native-agent-stack` and only on `main`, using `anthropics/claude-code-action`
+  v1.0.247 at
   [`2dca132ff0e0c4094ce6048b422c6915a071210b`](https://github.com/anthropics/claude-code-action/blob/2dca132ff0e0c4094ce6048b422c6915a071210b/action.yml),
-  and only while the repository variable `CLAUDE_HARNESS_AUDIT_ENABLED` is `true`.
+  only while the repository variable `CLAUDE_HARNESS_AUDIT_ENABLED` is `true`, only on a run's first attempt, and,
+  when dispatched by hand, only when the repository owner is both `github.actor` and `github.triggering_actor`.
   Its job grants `contents: read` and `id-token: write` over an empty workflow permission default.
   Anthropic workload identity federation exchanges GitHub's OIDC token using the four configured repository variables;
   the workflow fetches a pinned, SHA-256-verified audit prompt and asks for a project-scoped read-only audit. Claude

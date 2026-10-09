@@ -123,7 +123,9 @@ jobs:
       # Numbers and fixed names only: the execution file holds the whole transcript and is never printed or uploaded.
       # The record is written first, so a failed or over-budget run still leaves its cost; the acceptance check
       # follows. It also reads the session's own tool list: a missing list, any tool outside the allow-list or
-      # an MCP server fails the run, and the step names every bound it finds unmet.
+      # an MCP server fails the run, and the step names every bound it finds unmet. A run that did not succeed is
+      # named by its result subtype, through the same name filter, in the record, the summary and the message, so
+      # a turn-limit stop (error_max_turns) and a budget stop (error_max_budget_usd) read apart.
       # The turn bound counts distinct assistant message ids. The result's num_turns counts transcript
       # messages, tool results included (a 12-request run on Claude Code 2.1.295 reported 57), so it is
       # kept in the record only.
@@ -154,6 +156,7 @@ jobs:
              result_chars: ($text | length),
              tools_listed: (($init.tools | type) == "array" and ($init.mcp_servers | type) == "array"),
              successful_result: ($result.subtype == "success" and $result.is_error == false),
+             result_subtype: (($result.subtype // "unknown") | name),
              session_started: ($init != null),
              claude_code_version: (($init.claude_code_version // "unknown") | name),
              tools: ($tools | map(name)),
@@ -172,15 +175,16 @@ jobs:
           {
             echo '### Harness audit: run numbers'
             echo
-            jq -r '"| assistant turns | messages | client cost estimate (USD) | completed | Claude Code | tools | MCP servers |",
-                   "| ---: | ---: | ---: | --- | --- | --- | ---: |",
-                   "| \(.assistant_turns) | \(.num_turns) | \(.total_cost_usd) | \(.successful_result) | \(.claude_code_version) | \(.tools | join(" ")) | \(.mcp_servers) |",
+            jq -r '"| assistant turns | messages | client cost estimate (USD) | completed | result subtype | Claude Code | tools | MCP servers |",
+                   "| ---: | ---: | ---: | --- | --- | --- | --- | ---: |",
+                   "| \(.assistant_turns) | \(.num_turns) | \(.total_cost_usd) | \(.successful_result) | \(.result_subtype) | \(.claude_code_version) | \(.tools | join(" ")) | \(.mcp_servers) |",
                    "", "| model | input | cache write | cache read | output |", "| --- | ---: | ---: | ---: | ---: |",
                    (.models[] | "| \(.model) | \(.input_tokens) | \(.cache_creation_input_tokens) | \(.cache_read_input_tokens) | \(.output_tokens) |")' \
               "$out/usage.json"
           } >> "$GITHUB_STEP_SUMMARY"
           failed="$(jq -r '[
-            (if .successful_result != true then "the run did not end in success" else empty end),
+            (if .successful_result != true then "the run did not end in success (subtype \(.result_subtype))"
+             else empty end),
             (if .session_started != true then "no session start record" else empty end),
             (if .tools_listed != true then "the session start record lists no tools or MCP servers" else empty end),
             (if (.forbidden_tools | length) > 0 then "tools outside Read, Glob and Grep: \(.forbidden_tools | join(" "))"
