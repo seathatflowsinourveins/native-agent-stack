@@ -472,6 +472,7 @@ jobs:
         run: |
           export PATH="$RUNNER_TEMP/gitleaks:$PATH"
           python3 -m unittest tests.test_gitleaks_config -v
+          python3 -m unittest tests.test_gitleaks_record_commit_context -v
       - name: Scan git history for secrets
         if: always()
         run: |
