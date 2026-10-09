@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "subject": "Codex native review versus its Claude companion on PR882; OS credential-store source research",
+  "bridge_replacement": "retain-bridge",
+  "store_mode": "research-only",
+  "sweep_final_sha256": "77e17817d8ecc8e53329ac32303ece8dc4e86eaf67cba1e3ae36196aa328a109",
+  "upstreams": {
+    "codex": {
+      "repository": "https://github.com/openai/codex",
+      "tag": "rust-v0.162.0",
+      "commit": "c1382380de69521303b416720a52f42d51af6248",
+      "release_run": "https://github.com/openai/codex/actions/runs/37812662295",
+      "observed_release_checks": {"total": 55, "success": 53, "skipped": 2},
+      "local_rust_unit_tests_run": false,
+      "official_package_sha256": "4f573944c1d2059109d75a2f4d0cc9c03697288224a5e407717a9de98fc010c5",
+      "extracted_binary_sha256": "50ed828f357c655a3c82054d346cab8434f24901f14ec19b8267571bdd008b38",
+      "native_version": "codex-cli 0.162.0",
+      "ordinary_path_wrapper_version": "codex-cli 0.161.0"
+    },
+    "bridge": {
+      "repository": "https://github.com/openai/codex-plugin-cc",
+      "tag": "v1.0.6",
+      "commit": "db52e28f4d9ded852ab3942cea316258ae4ef346",
+      "observed_default_branch_commit_date": "2026-07-08T00:17:00Z",
+      "four_inspected_installed_files_match_pin": true,
+      "vendor_version_consistency_exit_code": 0,
+      "plugin_manifest_validation_exit_code": 0,
+      "initial_vendor_suite": {"exit_code": 1, "tests": 91, "passed": 90, "failed": 1},
+      "initial_failure": "state.test.mjs:14 assumes CLAUDE_PLUGIN_DATA is unset; trial override violated that fixture precondition",
+      "clean_vendor_suite": {
+        "evidence_class": "synthetic",
+        "command": "env -u CLAUDE_PLUGIN_DATA nice -n 10 ionice -c2 -n7 timeout 600 npm test",
+        "exit_code": 0, "tests": 91, "passed": 91, "failed": 0, "skipped": 0,
+        "vendor_source_or_expectations_modified": false
+      },
+      "retrieved_tag_ci_runs_prove_unit_suite": false
+    }
+  },
+  "corpus": {
+    "pull_request": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/882",
+    "base": "a484989a43f70ff2575b6fb054cf00c9834e7679",
+    "head": "f4965224b569325a8ab41c2a97b8d71157d630c6",
+    "changed_files": 5,
+    "behavior_module": "tests.test_research_dispatch_exact_queries",
+    "behavior_result": {"evidence_class": "local_integration", "exit_code": 0, "tests": 32, "passed": 30, "skipped": 2},
+    "source_pull_request_modified": false,
+    "assigned_branch_restored_after_trial": true,
+    "reviewed_checkout_clean_after_all_runs": true
+  },
+  "model_dispatch": {
+    "configured_model": "cx/gpt-6.1-sol",
+    "configured_provider": "omniroute",
+    "configured_effort": "max",
+    "configured_service_tier": "default",
+    "keyless_lane_owned_process_configuration": true,
+    "owner_configuration_or_credentials_used": false,
+    "scope_instructions_equal_between_all_runs": false,
+    "scope_difference": "Initial native run included ambient ancestor and installed-dependency reads; bridge and fresh runs used explicit checkout-only developer instructions",
+    "comparison_is_performance_benchmark": false
+  },
+  "native_review": {
+    "evidence_class": "native_proven",
+    "command": "codex exec -s read-only --ephemeral --json -o <retained native-last.md> review --base a484989a43f70ff2575b6fb054cf00c9834e7679",
+    "exit_code": 0,
+    "duration_seconds": 146.443,
+    "peak_sampled_tree_pss_kib": 198901,
+    "samples": 141,
+    "stdout_sha256": "8ed42160a5b003a93480ee5dbb40ea2527ddf84fc8cac61a5ddd34c22bee5098",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "result": "No actionable regressions were found; returned response says tests and validator were not rerun",
+    "token_usage_report_informative": false
+  },
+  "bridge_review": {
+    "evidence_class": "native_proven",
+    "command": "node <pinned plugin>/scripts/codex-companion.mjs review --wait --scope branch --base a484989a43f70ff2575b6fb054cf00c9834e7679 --model cx/gpt-6.1-sol --json",
+    "exit_code": 0,
+    "nested_codex_status": 0,
+    "duration_seconds": 116.082,
+    "peak_sampled_tree_pss_kib": 223104,
+    "samples": 111,
+    "stdout_sha256": "853c8ab224f36beb5079403f31d7f9a358fbeda7a09bea37c4a1de8eed0e7356",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "result": "No actionable regression; returned response reports five in-memory regression checks, not the full filesystem-writing suite",
+    "claude_frontend_invoked": false
+  },
+  "fresh_unnamed_intent": {
+    "evidence_class": "native_proven",
+    "prompt_names_a_command_plugin_or_tool": false,
+    "exit_code": 0,
+    "duration_seconds": 190.783,
+    "peak_sampled_tree_pss_kib": 123396,
+    "samples": 183,
+    "stdout_sha256": "b439f867686c29250be5abfce084d60cf80be1823891b0789fba948903586af3",
+    "stderr_sha256": "1aa26269eb1cc57f86b235a03cda53c004edb5b1e9fc99d4da4f00843293d721",
+    "result": "No actionable regressions; local in-memory before/after checks reported",
+    "dedicated_native_review_reached": false,
+    "automatic_routing_adoption_stage": "unproven"
+  },
+  "measurement": {
+    "method": "1-second samples of root and descendant /proc/<pid>/smaps_rollup Pss, summed at each observation",
+    "continuous_peak": false,
+    "private_root": "$HOME/.local/state/native-agent-stack/research/api-surfaces-trials/codex-review/20261009",
+    "measurement_script_sha256": "99089652067b7e95411c2467eb99440ed02c4d2eda78d65048943acd4d73ff60",
+    "native_pss_sha256": "7f4af72e5d26737689ae5e7792ec1f3a799ce84dc34b55928a26e73b9b40cb96",
+    "bridge_pss_sha256": "5d2b280f859f5e59b85bf43b0d00bf55160c70611d8f7dad7000e11e4dc018d7",
+    "fresh_pss_sha256": "4e71b6fcbd808356e8caa43719255ada7880813be81ff1b75423ca18baf392cb",
+    "retained_trial_results_sha256": "4557c86dadaef330228a54ca59edaf34b1ee8aebf4e8d0a2bd554a6bc683586d"
+  },
+  "inverse": {
+    "trial_extraction_and_process_configuration_removed": true,
+    "trial_prefix_absence_verified": true,
+    "dedicated_bridge_broker_shutdown": "upstream SIGTERM handler; process and socket absent",
+    "previous_versioned_install_preserved": true,
+    "installed_user_plugin_preserved": true
+  },
+  "credential_store": {
+    "evidence_class": "source_review",
+    "mode": "research-only",
+    "upstream_mode_default": "file",
+    "strict_secure_mode": "keyring",
+    "auto_can_fall_back_to_file": true,
+    "setting_change_migrates_existing_file": false,
+    "secure_save_guarantees_fallback_file_cleanup": false,
+    "host_backend_qualified": false,
+    "credential_file_or_values_inspected": false,
+    "owner_store_changed": false
+  },
+  "unexecuted_boundaries": [
+    "Claude frontend dispatch and lifecycle parity",
+    "Stop gate, rescue/task, session transfer and concurrent-session parity",
+    "Independent correctness oracle and equivalent-scope performance comparison",
+    "Automatic unnamed routing to the dedicated native reviewer",
+    "Native extraction transport, OS credential-store availability and authentication",
+    "Client configuration adoption or removal"
+  ],
+  "publication_gates": {
+    "both_designated_reads": "required after draft head publication",
+    "ci": "required at published head",
+    "pre_cue_tool": "required; co-op supplies the designated tool",
+    "command_center_cue": "required before landing"
+  }
+}
