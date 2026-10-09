@@ -282,8 +282,8 @@ rows on 2604; their cause is in `2026-10-05-omniroute-gateway-composition.md` (u
 ## Limitations and residuals
 
 - **Open owner decision.** (a) Compression on 20128 (the Codex lane itself; it would rewrite real Codex CLI traffic). The owner's
-  conditional answer on 2026-09-30 at about 02:25Z was relayed by another session and not seen first-hand here: adopt only after SOTA convergence
-  while maintaining suitably high output quality, requiring a reproduced saving on real traffic and no output regression, including exact tool-text checks.
+  conditional answer on 2026-09-30 at about 02:25Z was relayed by another session and not seen first-hand here: adoption depends on SOTA convergence while maintaining suitably high output quality.
+  This record separately requires a reproduced saving on real traffic and no output regression, including exact tool-text checks.
   It is **not applied**. The pi-practice session's 3-arm measurement the same morning
   (reported, not reproduced here: four identical Codex 0.159.2 jobs per arm on gpt-6.1-sol with web search and MCP; direct
   20128, via 20129 with the header off, via 20129 on the headerless lane) found 0 compressed tokens in all 115 joined rows,

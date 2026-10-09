@@ -17657,13 +17657,13 @@
     },
     {
       "path": "docs/decisions/2026-09-25-skills-trial-and-usage.md",
-      "sha256": "1a8ebecf7159f74867fee2fd0126dc4e7d3e9f22aab059a9e9441cf1f4515dc6",
-      "bytes": 147808
+      "sha256": "9ee38b2a470b227961dd091dfa307a4ecb222bafe378d1a9104576819058efb8",
+      "bytes": 147866
     },
     {
       "path": "docs/decisions/2026-09-25-top-rule-sota-sources.md",
-      "sha256": "9c4b7520b3a65d70d2710690a8257184c28387b140bbd49743e74557dd957c25",
-      "bytes": 5245
+      "sha256": "d4fe325bbb759d4ee950d47d6b75ca2215d7784d0f032dfac490cc88a86cdec9",
+      "bytes": 5187
     },
     {
       "path": "docs/decisions/2026-09-25-workstation-sota-refresh.md",
@@ -17737,8 +17737,8 @@
     },
     {
       "path": "docs/decisions/2026-09-27-omniroute-account-pool.md",
-      "sha256": "befa5ddf498569f8a14b68162a38c56c22ed96ddcd5e8f10e69573b5afd6f538",
-      "bytes": 43045
+      "sha256": "54b624ebca57fe29497e4a0599ba78005878aaf85c5becefee1bb5e47d905dc2",
+      "bytes": 42932
     },
     {
       "path": "docs/decisions/2026-09-27-prompt-audit-resolution.md",
@@ -17767,8 +17767,8 @@
     },
     {
       "path": "docs/decisions/2026-09-28-ecosystem-roadmap.md",
-      "sha256": "783df7cf9ef1199228e091346653778c37943d34201937b1ec5d9adf3f96cbf2",
-      "bytes": 36987
+      "sha256": "516266d538bd673891b705436623b7d5ab3713f0e388d1b6487f7245a498f866",
+      "bytes": 36973
     },
     {
       "path": "docs/decisions/2026-09-28-openhands-resolver-isolation.md",
@@ -17782,8 +17782,8 @@
     },
     {
       "path": "docs/decisions/2026-09-28-top-rule-templates.md",
-      "sha256": "fdd7e6b5d2f1b341c7b8a7db1bbefa9f5b649a18825608174fad3852168b5f39",
-      "bytes": 32160
+      "sha256": "a6d491e2941c2a91de6362e9b9cbed64fe39bdb4896c8ad460cdb583d53cd292",
+      "bytes": 32172
     },
     {
       "path": "docs/decisions/2026-09-29-codex-lane-default-effort.md",
@@ -17797,8 +17797,8 @@
     },
     {
       "path": "docs/decisions/2026-09-29-key-management.md",
-      "sha256": "a2beea4fcfdd7d73aa8bbf03cd0a03300ccbace3a882f5996a7f4392fc6a29b2",
-      "bytes": 94488
+      "sha256": "d4572e45af7b2d90af601f7296dc9d0b57336e97a9d965195c1550131f50efaa",
+      "bytes": 94496
     },
     {
       "path": "docs/decisions/2026-09-29-max-default-effort.md",
@@ -17832,8 +17832,8 @@
     },
     {
       "path": "docs/decisions/2026-09-30-omniroute-rebuild.md",
-      "sha256": "1a600eb5b802b24316be6c964a3c0ffeac18e64ee56361e966aee154c40d79e9",
-      "bytes": 39820
+      "sha256": "2c11528a4e1c8efa9343ac1db12a57e35cde7603808395770456f34c036ae5e6",
+      "bytes": 39845
     },
     {
       "path": "docs/decisions/2026-09-30-omniroute-runtime-workers.md",

@@ -38,7 +38,7 @@ Verified on 2026-09-29 from source and tests. No value was read.
 Dated reading (2026-09-29, designer 1, for the coordinator):
 
 - On 2026-09-29 the owner requested durable environment storage and seamless key handling so no key is lost;
-  the coordinator's design brief reads that requirement as applying to every key of record.
+  those owner statements state a rule for every key, as recorded in the coordinator's design brief.
   [Linux keyrings(7)](https://man7.org/linux/man-pages/man7/keyrings.7.html) establishes retention lifetimes, not the authority to change placement.
 - These directions post-date the 2026-09-26 memory-only placement of Tavily and the owner's 2026-09-28
   instruction against file storage for keys supplied in chat. They had already reversed the latter for the

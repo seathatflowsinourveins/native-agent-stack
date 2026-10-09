@@ -299,9 +299,9 @@ Upstream's own CI is red on `a58000c7`. Issue #14866 "Release branch not green: 
      at 10:40Z (decision 2, "Addresses").
    - **Overturn.** Any multi-user or non-loopback exposure, or any untrusted local process.
    - **Owner override.** The settings synthesis recommended requiring the key and the login (its K7 and U2).
-     The owner overrode both in their 2026-09-27 06:05Z direction and accepted the documented local-management risk of the selected posture.
+      The owner overrode both in their 2026-09-27 06:05Z direction.
 6. **What "adopted" covers, and the gate that stays.**
-   - **The gateway lane's uses.** The landscape sweep, on the owner's September 27 direction, uses the native Codex provider contract through #387's lane
+   - **The gateway lane's uses.** The landscape sweep, on the owner's September 27 direction, through #387's lane
      (`build_args.py --gpt6-provider omniroute`). The peer's 8-check mechanical parity probe on build `dd6e9607e` is
      recorded in the message of merged commit `b9abcc5f` (#387): stage rc 0 and codex rc 0; the shell tool; MCP
      `ctx_execute`; `--output-schema`; usage; effort `max` in the rollout and `max`/`max` in the gateway's
