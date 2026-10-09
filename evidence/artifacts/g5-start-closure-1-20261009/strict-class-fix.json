@@ -74,12 +74,21 @@
   },
   "full_suite_comparison": {
     "baseline_commit": "2ecce6ec2221704db642ddec8f70f7152ed2afb6",
-    "status": "PENDING",
+    "baseline_exit_code": 1,
+    "head_commit": "a7d501c73827a7d859a655eea71d80353a73e5a4",
+    "head_exit_code": 1,
+    "head_introduced_failures": 0,
+    "pre_existing_head_failures": 22,
+    "private_comparison_sha256": "56cb70c0b7517b50309557ed598ef5340f13ac985bbadf89cdd6e1d2a75b362d",
+    "receipt": "evidence/artifacts/g5-start-closure-1-20261009/full-suite-comparison.json",
+    "receipt_sha256": "623784ea49a51d2f3f57692539f2a516636a4ae6d7c77b6ffd50fb06962464af",
+    "status": "COMPLETE_NO_INTRODUCED_FAILURES",
     "unprepared_errors": 23,
     "unprepared_failures": 11,
     "unprepared_run_exit_code": 1,
     "unprepared_skips": 914,
-    "unprepared_tests": 10814
+    "unprepared_tests": 10814,
+    "unresolved_head_failures": 0
   },
   "historical_pin_flags_on_f4_rows": 476,
   "hot_file_citations": {
