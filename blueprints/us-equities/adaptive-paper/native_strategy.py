@@ -9,7 +9,7 @@ from nautilus_trader.trading import Strategy
 from nautilus_trader.config import StrategyConfig
 from nautilus_trader.model import (ClientOrderId, InstrumentId, OrderSide, Price,
                                   Quantity, StrategyId, TimeInForce)
-from exits import DEFAULT_PLAN, ExitContext, REASON_PRICE_RULE
+from exits import DEFAULT_PLAN, ExitContext, ExitDecision, REASON_PRICE_RULE
 from leverage import LeverageInputs
 from native_adapter import guarded_callback
 from safety import DEFAULT_STOP, SafetyError, evaluate_gap_risk
@@ -37,6 +37,7 @@ class AdaptiveStrategy(Strategy):
         if exit_session_at is None and getattr(transport, "extended_hours_allowed", False):
             exit_session_at = lambda now: session_at(datetime.fromtimestamp(now, timezone.utc)).kind
         self._exit_session_at = exit_session_at
+        self._exit_pending_attention = {}
         # E4: a symbol halted, paused or quotation-only per the status stream or an
         # unexpired startup seed (runner.Controller.is_halted) gets no new order, entry or
         # exit, and its resting exit is not re-priced until it resumes. The quote's own
@@ -845,7 +846,7 @@ class AdaptiveStrategy(Strategy):
         except ValueError:
             # A missing/invalid calendar classification is a held position,
             # never permission to fall back to an RTH replacement.
-            return "unknown"
+            return "CLASSIFICATION_FAILED"
         kind = getattr(result, "kind", result)
         return getattr(kind, "value", kind)
 
@@ -865,6 +866,7 @@ class AdaptiveStrategy(Strategy):
         ), self.policy.config)
 
     def _flag_exit_position(self, symbol, decision):
+        self._exit_pending_attention[symbol] = decision.reason
         self.event_sink({"type": "exit_attention", "symbol": symbol,
                          "reason": decision.reason})
 
@@ -895,6 +897,11 @@ class AdaptiveStrategy(Strategy):
         flagged_exits = {symbol: value for symbol, value in
                          getattr(self.policy, "last_exit_decisions", {}).items()
                          if value.flag_position}
+        # A fresh policy decision can resolve earlier attention; throttled
+        # ticks returned above, so cached metadata never clears a live flag.
+        for symbol in tuple(self._exit_pending_attention):
+            if symbol not in self.policy.holdings or symbol not in flagged_exits:
+                self._exit_pending_attention.pop(symbol)
         # If this tick's selector decision liquidates (FLATTEN_BEFORE_SWITCH),
         # policy.decide() already force-exited every holding above; propagate
         # that into this method's own force_exit so (a) no fresh entry is
@@ -1032,6 +1039,9 @@ class AdaptiveStrategy(Strategy):
                 continue
             if not quote or now - quote.timestamp > self.policy.config.quote_age_seconds \
                     or now < quote.timestamp - QUOTE_FUTURE_TOLERANCE_SECONDS:
+                if side == "sell":
+                    self._flag_exit_position(symbol, ExitDecision(
+                        "quote_stale", 0.0, "hold", submit=False, flag_position=True))
                 # D2 (round 3): a gap_risk_stop action that fails this same
                 # freshness check must NOT be marked fire-once applied --
                 # the stop stays armed and is re-evaluated (against a
@@ -1298,6 +1308,10 @@ class AdaptiveStrategy(Strategy):
         if (self.faulted or self._halted(symbol) or not quote
                 or now - quote.timestamp > self.policy.config.quote_age_seconds
                 or now < quote.timestamp - QUOTE_FUTURE_TOLERANCE_SECONDS):
+            if (not quote or now - quote.timestamp > self.policy.config.quote_age_seconds
+                    or now < quote.timestamp - QUOTE_FUTURE_TOLERANCE_SECONDS):
+                self._flag_exit_position(symbol, ExitDecision(
+                    "quote_stale", 0.0, "hold", submit=False, flag_position=True))
             # E3/E4: a faulted strategy submits nothing; a symbol that halted while its
             # cancel was in flight is not re-priced (the ordinary path acts after it
             # resumes), exactly as for a stale quote below.

@@ -2833,6 +2833,38 @@ class AchievedLeverageReceiptIntegrationTests(unittest.TestCase):
             self.assertLessEqual(ceiling_at_peak, Decimal("1"))
             ledger.close()
 
+    def test_ceiling_change_regime_comes_from_the_same_tick_decision(self):
+        import native_strategy
+
+        decisions = {}
+        original = native_strategy.AdaptiveStrategy.rebalance
+
+        def rebalance_with_later_event(strategy, *args, **kwargs):
+            decision = original(strategy, *args, **kwargs)
+            if decision is not None:
+                decisions[decision.timestamp] = decision.regime
+                strategy.event_sink({"type": "synthetic_event_after_decision"})
+            return decision
+
+        with self._pinned_rth_session(), tempfile.TemporaryDirectory() as root:
+            config, limits, policy = self._fast_leveraged_policy("config-leverage-1x.json", root)
+            ledger = Ledger(Path(root) / "journal.db", limits)
+            self.addCleanup(ledger.close)
+            ledger.start_trial(time.time())
+            controller = Controller(ledger, time.time() + 3600, market_open=True)
+            port = SimulatedPort(controller, policy.symbols)
+            controller.port = port
+            with patch.object(native_strategy.AdaptiveStrategy, "rebalance", rebalance_with_later_event):
+                result = asyncio.run(run_native(controller, policy,
+                                                [{"symbol": s} for s in policy.symbols],
+                                                "fixture", config, "100000"))
+            changes = result["leverage"]["ceiling_changes"]
+            self.assertTrue(changes, result)
+            for change in changes:
+                self.assertIn(change["t"], decisions)
+                self.assertEqual(change["regime"], decisions[change["t"]])
+                self.assertIsNotNone(change["regime"])
+
     def test_2x_rung_next_lower_ceiling_is_the_1x_rung(self):
         with self._pinned_rth_session(), tempfile.TemporaryDirectory() as root:
             config, limits, policy = self._fast_leveraged_policy("config-leverage-2x.json", root)

@@ -60,7 +60,7 @@ class ExtendedExitDecisionTests(unittest.TestCase):
         self.assert_flagged_hold(decision, "quote_stale")
 
     def test_fresh_extended_long_exit_is_an_explicit_marketable_limit(self):
-        for session in ("PRE", "POST", "OVERNIGHT"):
+        for session in ("PRE", "POST"):
             with self.subTest(session=session):
                 ctx = self.context(session=session, pnl_bps=-30.0)
                 decision = X.DEFAULT_PLAN.evaluate(ctx, self.config())
@@ -71,6 +71,27 @@ class ExtendedExitDecisionTests(unittest.TestCase):
                 self.assertFalse(decision.flag_position)
                 self.assertEqual(decision.fraction, 1.0)
                 self.assertEqual(ctx.bid, "100.00")
+
+    def test_unqualified_overnight_holds_fresh_quotes_for_every_exit_trigger(self):
+        cases = (
+            {}, {"force_exit": True}, {"risk_off": True},
+            {"pnl_bps": -30.0}, {"pnl_bps": 50.0},
+            {"trail_bps": -20.0}, {"now": 1100.0},
+        )
+        for fields in cases:
+            with self.subTest(fields=fields):
+                decision = X.DEFAULT_PLAN.evaluate(
+                    self.context(session="OVERNIGHT", **fields), self.config())
+                self.assert_flagged_hold(decision, "overnight_unqualified")
+
+    def test_failed_classification_has_a_distinct_attention_reason(self):
+        for quote_fresh in (False, True):
+            with self.subTest(quote_fresh=quote_fresh):
+                decision = X.DEFAULT_PLAN.evaluate(self.context(
+                    session="CLASSIFICATION_FAILED", quote_fresh=quote_fresh,
+                    force_exit=True, risk_off=True,
+                ), self.config())
+                self.assert_flagged_hold(decision, "session_classification_failed")
 
     def test_fresh_extended_short_cover_uses_ask_side_limit(self):
         decision = X.DEFAULT_PLAN.evaluate(
@@ -172,6 +193,19 @@ class ExtendedPolicyCallerTests(unittest.TestCase):
         self.assertFalse(policy.last_exit_decisions["AAPL"].submit)
         self.assertNotIn("last_exit_decisions", decision.__dataclass_fields__)
 
+    def test_fresh_overnight_keeps_the_holding_even_during_forced_cleanup(self):
+        policy = self.policy()
+        policy.exit_session = "OVERNIGHT"
+        policy.observe("AAPL", 100.0, 100.02, 1000.0)
+        decision = policy.decide(1000.0, allow_entries=True, force_exit=True)
+        self.assertEqual(decision.targets["AAPL"], Decimal("2"))
+        self.assertNotIn("AAPL", decision.exits)
+        self.assertNotIn("AAPL", policy.last_exit_fractions)
+        flagged = policy.last_exit_decisions["AAPL"]
+        self.assertEqual(flagged.reason, "overnight_unqualified")
+        self.assertFalse(flagged.submit)
+        self.assertTrue(flagged.flag_position)
+
     def test_future_quote_flags_without_advancing_the_holding_watermark(self):
         policy = self.policy()
         policy.observe("AAPL", 101.0, 101.02, 1001.0)
@@ -251,6 +285,44 @@ class NativeExtendedExitCallerTests(unittest.TestCase):
         self.assertTrue(any(e["type"] == "exit_attention" and e["reason"] == "quote_stale"
                             for e in events))
 
+    def test_forced_stale_exit_cannot_be_a_successful_overnight_hold(self):
+        from datetime import datetime, timezone
+        from zoneinfo import ZoneInfo
+        import runner
+
+        strategy, helper, now, events = self.strategy(session="POST")
+        strategy.policy.observe("AAPL", 100.0, 100.02, 900.0)
+        strategy.rebalance(now=now[0], force_exit=True)
+        self.assertEqual(strategy.submitted, [])
+        self.assertTrue(any(e["type"] == "exit_attention" and e["reason"] == "quote_stale"
+                            for e in events))
+        boundary = datetime(2026, 3, 10, 18, tzinfo=ZoneInfo("America/New_York")) \
+            .astimezone(timezone.utc).timestamp()
+        reconciliation = {"positions": 1, "open_orders": 0}
+        outcome = {"reconciliation": reconciliation, "adapter_errors": [],
+                   "accounting": {"halted_reason": None}, "flat": False,
+                   "events": events,
+                   "corporate_action_guard": runner._final_corporate_action_guard_summary(
+                       strategy, {"AAPL"}, boundary)}
+        outcome["status"] = runner._run_native_status(
+            reconciliation, [], 0, outcome,
+            {"overnight_holds": True, "extended_hours": True}, boundary)
+        self.assertEqual(outcome["status"], "needs_attention")
+        self.assertEqual(runner.trial_phase_and_exit_code(outcome), ("needs_attention", 3))
+
+    def test_a_fresh_disposition_clears_only_that_holdings_exit_attention(self):
+        import runner
+
+        strategy, helper, now, events = self.strategy(session="POST")
+        strategy.policy.observe("AAPL", 100.0, 100.02, 900.0)
+        strategy.rebalance(now=now[0], force_exit=True)
+        held = runner._final_corporate_action_guard_summary(strategy, {"AAPL"}, now[0])
+        self.assertIn("AAPL", held["pending_needs_attention_held"])
+        strategy.policy.observe("AAPL", 100.0, 100.02, now[0])
+        strategy.rebalance(now=now[0], force_exit=True)
+        cleared = runner._final_corporate_action_guard_summary(strategy, {"AAPL"}, now[0])
+        self.assertNotIn("AAPL", cleared["pending_needs_attention_held"])
+
     def test_fresh_extended_rebalance_reuses_native_limit_order_factory(self):
         strategy, helper, now, events = self.strategy()
         strategy.policy.observe("AAPL", 100.0, 100.02, now[0])
@@ -262,11 +334,24 @@ class NativeExtendedExitCallerTests(unittest.TestCase):
         self.assertFalse(any(e["type"] == "exit_attention" for e in events))
 
     def test_closed_session_rebalance_flags_even_with_a_fresh_quote(self):
-        strategy, helper, now, events = self.strategy(session="CLOSED")
+        for session in ("CLOSED", "unknown"):
+            with self.subTest(session=session):
+                strategy, helper, now, events = self.strategy(session=session)
+                strategy.policy.observe("AAPL", 100.0, 100.02, now[0])
+                strategy.rebalance(now=now[0], force_exit=True)
+                self.assertEqual(strategy.submitted, [])
+                self.assertTrue(any(e["type"] == "exit_attention" and e["reason"] == "session_unavailable"
+                                    for e in events))
+
+    def test_fresh_overnight_rebalance_flags_without_submit_or_replacement(self):
+        strategy, helper, now, events = self.strategy(session="OVERNIGHT")
         strategy.policy.observe("AAPL", 100.0, 100.02, now[0])
-        strategy.rebalance(now=now[0], force_exit=True)
+        helper.seed_resting_sell(strategy)
+        decision = strategy.rebalance(now=now[0], force_exit=True)
+        self.assertEqual(decision.targets["AAPL"], Decimal("2"))
         self.assertEqual(strategy.submitted, [])
-        self.assertTrue(any(e["type"] == "exit_attention" and e["reason"] == "session_unavailable"
+        self.assertEqual(strategy.cancelled, [])
+        self.assertTrue(any(e["type"] == "exit_attention" and e["reason"] == "overnight_unqualified"
                             for e in events))
 
     def test_failed_session_classification_flags_rebalance(self):
@@ -277,7 +362,7 @@ class NativeExtendedExitCallerTests(unittest.TestCase):
         strategy.policy.observe("AAPL", 100.0, 100.02, now[0])
         strategy.rebalance(now=now[0], force_exit=True)
         self.assertEqual(strategy.submitted, [])
-        self.assertTrue(any(e["type"] == "exit_attention" and e["reason"] == "session_unavailable"
+        self.assertTrue(any(e["type"] == "exit_attention" and e["reason"] == "session_classification_failed"
                             for e in events))
 
     def test_cancel_ack_crossing_into_closed_session_submits_no_replacement(self):
@@ -321,7 +406,23 @@ class NativeExtendedExitCallerTests(unittest.TestCase):
         strategy.on_order_canceled(SimpleNamespace(client_order_id="adp-fixture-0000001"))
         self.assertEqual(strategy.submitted, [])
         self.assertFalse(strategy.faulted)
-        self.assertTrue(any(e["type"] == "exit_attention" and e["reason"] == "session_unavailable"
+        self.assertTrue(any(e["type"] == "exit_attention" and e["reason"] == "session_classification_failed"
+                            for e in events))
+
+    def test_stale_rth_ack_cannot_be_an_honest_hold_without_another_tick(self):
+        import runner
+
+        strategy, helper, now, events = self.strategy(session="RTH")
+        strategy.policy.observe("AAPL", 100.0, 100.02, now[0])
+        helper.seed_resting_sell(strategy)
+        self.assertEqual(strategy.replace_exit("AAPL", now[0], Decimal("2"), "stop_loss"),
+                         "cancel_requested")
+        now[0] += strategy.policy.config.quote_age_seconds + 1
+        strategy.on_order_canceled(SimpleNamespace(client_order_id="adp-fixture-0000001"))
+        self.assertEqual(strategy.submitted, [])
+        summary = runner._final_corporate_action_guard_summary(strategy, {"AAPL"}, now[0])
+        self.assertIn("AAPL", summary["pending_needs_attention_held"])
+        self.assertTrue(any(e["type"] == "exit_attention" and e["reason"] == "quote_stale"
                             for e in events))
 
     def test_pre_to_rth_ack_uses_rth_rule_without_an_unchanged_price_cancel(self):

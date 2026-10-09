@@ -191,10 +191,18 @@ class ExitPlan:
         """
         extended_price = None
         if ctx.session != "RTH":
+            if ctx.session == "CLASSIFICATION_FAILED":
+                return ExitDecision("session_classification_failed", 0.0, "hold",
+                                    submit=False, flag_position=True)
             if not ctx.quote_fresh:
                 return ExitDecision("quote_stale", 0.0, "hold",
                                     submit=False, flag_position=True)
-            if ctx.session not in ("PRE", "POST", "OVERNIGHT"):
+            # OVERNIGHT remains a measured candidate. Its native classifier,
+            # adapter and owned paper acceptance have not been established.
+            if ctx.session == "OVERNIGHT":
+                return ExitDecision("overnight_unqualified", 0.0, "hold",
+                                    submit=False, flag_position=True)
+            if ctx.session not in ("PRE", "POST"):
                 return ExitDecision("session_unavailable", 0.0, "hold",
                                     submit=False, flag_position=True)
             # Local import reuses the native numeric/side-price primitive after
