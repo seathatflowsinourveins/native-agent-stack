@@ -4945,6 +4945,11 @@
       "bytes": 808
     },
     {
+      "path": ".github/actions/setup-host-name-scanner/action.yml",
+      "sha256": "ed068e2a316a5f020b3ba57d25ba26739e683ac2444016e01a5d3d933079402c",
+      "bytes": 3067
+    },
+    {
       "path": ".github/agent-branch-ruleset.json",
       "sha256": "bc4df163c810f26dacdfaaae90667fc0cdd4edd3beea35b86ed4efc00c3d5f24",
       "bytes": 315
@@ -5076,8 +5081,8 @@
     },
     {
       "path": ".github/workflows/publish-catalog.yml",
-      "sha256": "6f48ef65db2a270121e607aea1f08f2cad7c9f883009babd40af42b21c8f3167",
-      "bytes": 20399
+      "sha256": "edfec4da5226ef7d7dd614542c551a9060df55308c2a171dfc294fd16d388493",
+      "bytes": 20825
     },
     {
       "path": ".github/workflows/receipt-staleness.yml",
@@ -5121,8 +5126,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "4a26082ea361b31cc164ffe20dc1a288a9933dec770d60b64f41c8f3741a7392",
-      "bytes": 42878
+      "sha256": "339626f86df3cf5954f23e1365e87eaf3635ff55488b65f0715ed7dbdbd3cacb",
+      "bytes": 43019
     },
     {
       "path": ".gitignore",
@@ -11277,13 +11282,13 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/resolver/patch_policy.py",
-      "sha256": "246b2c65fb296747e676182591b87d1fbbc622a2f9be83d023e8106d6853d557",
-      "bytes": 43497
+      "sha256": "35b995962f9c803114beb507116963403cc391dbcc9bd9ab74547d19eaa34eeb",
+      "bytes": 46776
     },
     {
       "path": "blueprints/runtime-workers/openhands/resolver/push_gate.py",
-      "sha256": "e68cfc8053e44eeafca3625ffbbb12fc2bbbd47599f3ffaf2b2b9b626f838c53",
-      "bytes": 75141
+      "sha256": "5a53cc382b88ec64f41aaf29808603436e9eba80630afaa95f46f5bba3a9b694",
+      "bytes": 75186
     },
     {
       "path": "blueprints/runtime-workers/openhands/run-e2e.sh",
@@ -17777,8 +17782,8 @@
     },
     {
       "path": "docs/decisions/2026-09-29-retire-polaris.md",
-      "sha256": "77a716f97b8bc5a2ed0ed372a9ffbbf179a56407d32eb557b49706d06130187c",
-      "bytes": 5291
+      "sha256": "1b5b1b866e70ca58aed0ca8391de2355dd1a7a5497134e4d64d65bbfd35b39b6",
+      "bytes": 5307
     },
     {
       "path": "docs/decisions/2026-09-29-shell-command-parser.md",
@@ -18329,6 +18334,11 @@
       "path": "docs/decisions/2026-10-09-codex-native-review-trial.md",
       "sha256": "337ec932d1e70994adc7b6e90458114e604d70ec065c49fc7d7ff8c2191e11fc",
       "bytes": 9003
+    },
+    {
+      "path": "docs/decisions/2026-10-09-host-name-scan.md",
+      "sha256": "35da3d0ed9e661ac1834589d5438ab6a8e29ffdf4f5ac29da8a22393b7cfa751",
+      "bytes": 15360
     },
     {
       "path": "docs/decisions/2026-10-09-mcp-surfaces-trials.md",
@@ -49322,8 +49332,8 @@
     },
     {
       "path": "evidence/artifacts/rtk-native-git256-20261002/receipt.json",
-      "sha256": "3746287baeda32c343247eb8f87ecc3b79b6605dfe564f31c2a85ca1f714368a",
-      "bytes": 29878
+      "sha256": "5072a228e15c58da0c4268d9efe7afde491a7fe560407cd0ac829e1ccadcee1d",
+      "bytes": 29902
     },
     {
       "path": "evidence/artifacts/runtime-final-lock-binding-20261008/final-native-24-acceptance.json",
@@ -59112,8 +59122,8 @@
     },
     {
       "path": "scripts/git-hooks/pre-push",
-      "sha256": "398be3114466272628f9615d847a7355989837b5b482a6d504137bdbb8b62924",
-      "bytes": 5576
+      "sha256": "a45b2074ecdd5b5ae858ae54a240fa1e8811544b479c3c64bfbfc6b9e739837e",
+      "bytes": 7548
     },
     {
       "path": "scripts/hardware_profile.py",
@@ -59124,6 +59134,11 @@
       "path": "scripts/hooks/secret_path_guard.py",
       "sha256": "fd516d8b78de7e3a9da4917c8d126fc71d7ab216a014bb28fb8bd189d6b0fb7b",
       "bytes": 296975
+    },
+    {
+      "path": "scripts/host_name_scan.py",
+      "sha256": "01ac281b13c17f292e66ee73bd04cd189edcfb608ac3f37d265adeb1a66d226d",
+      "bytes": 18544
     },
     {
       "path": "scripts/host_receipts.py",
@@ -59197,8 +59212,8 @@
     },
     {
       "path": "scripts/validate.py",
-      "sha256": "96ffe49eafbc676f4cdd80d61f049ec4081a82ad332dfa5ad5d2689d4db8e531",
-      "bytes": 37976
+      "sha256": "abb6eb2f6a906bbbacace4d4a54a8b7d321229fa443c4fbe4fa4a13c4c1f7388",
+      "bytes": 41200
     },
     {
       "path": "scripts/validate_catalogs.py",
@@ -59971,6 +59986,11 @@
       "bytes": 36179
     },
     {
+      "path": "tests/test_host_name_scan.py",
+      "sha256": "91c3ede06e49f4d89acf1147fa7bc22802699b7d9f8775479ce9d0f1a70a7fcb",
+      "bytes": 22509
+    },
+    {
       "path": "tests/test_host_receipts.py",
       "sha256": "04f54683ee97d99f3383ac1f9989c0aad843562bdc31f890dece4177f114448f",
       "bytes": 144843
@@ -60337,8 +60357,8 @@
     },
     {
       "path": "tests/test_pre_push_gate.py",
-      "sha256": "0e86e30013f7daf0a3a2875bb5a4f4255c74782478baac8428898b7e63b08b31",
-      "bytes": 18294
+      "sha256": "b4cd12d2659c733b494a5dbe2adb57596dc3c836c64ff4bebab176df29bb030c",
+      "bytes": 29598
     },
     {
       "path": "tests/test_promotion_gate.py",
@@ -60407,13 +60427,13 @@
     },
     {
       "path": "tests/test_runtime_worker_openhands_push_gate.py",
-      "sha256": "aef98d31834907cb8489e0e36415e54653919626ae5649d4602ee0c5449e0868",
-      "bytes": 157423
+      "sha256": "1c2c46523eacb9245afa5dfdcf1c79a00a6304203fe1a08c12fd94a68965979f",
+      "bytes": 158428
     },
     {
       "path": "tests/test_runtime_worker_openhands_resolver.py",
-      "sha256": "2b2414c3fd322e496126cdbc2f2af9a0bef62a4d54e59b0466f2ec282123a658",
-      "bytes": 271414
+      "sha256": "b6ce5cf835a00e68494513a79df41238d059abf794e8d8062c2286812cee66b6",
+      "bytes": 276707
     },
     {
       "path": "tests/test_runtime_worker_skills.py",
@@ -60587,8 +60607,8 @@
     },
     {
       "path": "tests/test_validate.py",
-      "sha256": "808407035264cde55ee7d2e47a1da6baf8d85f578d877adde60c2e5a4437cdbc",
-      "bytes": 43953
+      "sha256": "ddd4daa3e39a80964b5530dbdb65f3650c5fb26ed980403fb0e728146399a781",
+      "bytes": 47358
     },
     {
       "path": "tests/test_validate_shards.py",
@@ -60612,8 +60632,8 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "02e5704fabec34058b2cd8645a086f6dbb2fbabe23ecc6bec755d15758106607",
-      "bytes": 165554
+      "sha256": "02f1e54a06aabfe5976d454e99486984925608f0b598d7358be6166b3ee2e10a",
+      "bytes": 165701
     },
     {
       "path": "tests/test_workflow_policy.py",

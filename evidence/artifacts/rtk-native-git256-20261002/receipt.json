@@ -54,7 +54,7 @@
     ]
   },
   "runtime_condition": {
-    "platform": "Local x86_64 Linux toolchain condition; no new Windows, WSL, Noesis, provider or GPU qualification",
+    "platform": "Local x86_64 Linux toolchain condition; no new Windows, WSL, <windows-computer>, provider or GPU qualification",
     "git_version": {"argv": ["git", "--version"], "exit_code": 0, "stdout": "git version 2.56.0\n", "stderr": ""},
     "rustc_version": {"argv": ["rustc", "--version"], "exit_code": 0, "stdout": "rustc 1.99.0 (b940084d7 2026-09-28)\n", "stderr": ""},
     "cargo_version": {"argv": ["cargo", "--version"], "exit_code": 0, "stdout": "cargo 1.99.0 (5f94df478 2026-08-27)\n", "stderr": ""},
@@ -339,7 +339,7 @@
   },
   "limitations": [
     "Upstream-test qualification applies to the recorded private dependency/runtime condition only; it does not install or promote an active default",
-    "No complete Git-suite, HTTP(S) Git transport, production Git, Windows, new WSL/Noesis, GPU, provider, account, sign-in, broker, trading, service or whole-ecosystem acceptance",
+    "No complete Git-suite, HTTP(S) Git transport, production Git, Windows, new WSL/<windows-computer>, GPU, provider, account, sign-in, broker, trading, service or whole-ecosystem acceptance",
     "Windows zero-case target and Git PCRE/TTY skips remain outside executed coverage",
     "Default, focused, historical and ignored-only scopes are retained separately; no cumulative passing total is claimed",
     "RTK raw stderr gains one extra LF under both recorded Git versions; that byte-preservation defect remains unresolved",

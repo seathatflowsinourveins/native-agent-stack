@@ -1,0 +1,51 @@
+name: Set up the host-name scanner
+description: Verify the upstream Betterleaks 1.9.0 Linux release with Sigstore and pinned checksums
+runs:
+  using: composite
+  steps:
+    - name: Install the native scanner after Sigstore and checksum verification
+      shell: bash
+      env:
+        BETTERLEAKS_VERSION: '1.9.0'
+        BETTERLEAKS_SHA256: f8b185a39ffcece2a1ca82bf3a4e7435cd81963ffd16b7a9128daf75f35f6de7
+        # Reuse validate.yml's cosign bootstrap, pinned by cosign-installer v4.1.2
+        # (6f9f17788090df1f26f669e9d70d6ae9567deba6/action.yml).
+        COSIGN_VERSION: 'v3.0.6'
+        COSIGN_SHA256: c956e5dfcac53d52bcf058360d579472f0c1d2d9b69f55209e256fe7783f4c74
+        # Betterleaks 81aff7a638638aae3a659845d089043e1d8fe9ac/.goreleaser.yml
+        # signs checksums.txt; require its release workflow at this exact tag and commit.
+        SIGNER_IDENTITY_REGEXP: '^https://github\.com/betterleaks/betterleaks/\.github/workflows/release\.yml@refs/tags/v1\.9\.0$'
+        SIGNER_COMMIT: 81aff7a638638aae3a659845d089043e1d8fe9ac
+      run: |
+        set -euo pipefail
+        case "${RUNNER_OS}:${RUNNER_ARCH}" in
+          Linux:X64) ;;
+          *) echo 'This CI setup requires Linux X64.' >&2; exit 2 ;;
+        esac
+        scanner_dir='${{ runner.temp }}/host-name-scanner'
+        mkdir -p "$scanner_dir"
+        curl --disable --fail --silent --show-error --location --retry 3 \
+          "https://github.com/sigstore/cosign/releases/download/${COSIGN_VERSION}/cosign-linux-amd64" \
+          --output "$scanner_dir/cosign"
+        printf '%s  %s\n' "$COSIGN_SHA256" "$scanner_dir/cosign" | sha256sum --check
+        chmod +x "$scanner_dir/cosign"
+        "$scanner_dir/cosign" version
+        archive="betterleaks_${BETTERLEAKS_VERSION}_linux_x64.tar.gz"
+        for asset in "$archive" checksums.txt checksums.txt.sigstore.json; do
+          curl --disable --fail --silent --show-error --location --retry 3 \
+            "https://github.com/betterleaks/betterleaks/releases/download/v${BETTERLEAKS_VERSION}/${asset}" \
+            --output "$scanner_dir/$asset"
+        done
+        "$scanner_dir/cosign" verify-blob --bundle "$scanner_dir/checksums.txt.sigstore.json" \
+          --certificate-identity-regexp "$SIGNER_IDENTITY_REGEXP" \
+          --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+          --certificate-github-workflow-repository betterleaks/betterleaks \
+          --certificate-github-workflow-ref "refs/tags/v${BETTERLEAKS_VERSION}" \
+          --certificate-github-workflow-sha "$SIGNER_COMMIT" \
+          --certificate-github-workflow-trigger push \
+          "$scanner_dir/checksums.txt"
+        (cd "$scanner_dir" && sha256sum --check --ignore-missing --strict checksums.txt)
+        printf '%s  %s\n' "$BETTERLEAKS_SHA256" "$scanner_dir/$archive" | sha256sum --check
+        tar -xzf "$scanner_dir/$archive" -C "$scanner_dir" betterleaks
+        test "$("$scanner_dir/betterleaks" version)" = "$BETTERLEAKS_VERSION"
+        printf '%s\n' '${{ runner.temp }}/host-name-scanner' >> "$GITHUB_PATH"

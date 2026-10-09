@@ -14,6 +14,7 @@ import json
 import os
 import posixpath
 import re
+import shlex
 import subprocess
 import unicodedata
 
@@ -294,6 +295,70 @@ def resolve_module(parts, roots, blobs, dirs, names=None):
     return found
 
 
+def _isolated_python_sources(text):
+    """Separate literal isolated Python commands from shell path arguments.
+
+    Python -I -c does not add a script's directory to sys.path. Trace its source
+    with the same AST classifier as Python files, including the documented
+    importlib direct-file recipe, rather than interpreting Python literals as
+    shell script invocations (Python 3.12 cmdline -I and importlib docs).
+    """
+    lexer = shlex.shlex(text, posix=True, punctuation_chars=True)
+    lexer.whitespace_split = True
+    lexer.commenters = ""  # Preserve the existing shell-literal miss-oracle.
+    try:
+        words = list(lexer)
+    except ValueError:
+        return text, []
+    assignments, assignment_positions, bound_sources = {}, {}, {}
+    consumed, sources = set(), []
+    for index, word in enumerate(words):
+        assignment = re.fullmatch(r"([A-Za-z_]\w*)=(.*)", word, re.DOTALL)
+        if assignment:
+            assignments[assignment[1]] = (index, assignment[2])
+            assignment_positions.setdefault(assignment[1], set()).add(index)
+        if not re.fullmatch(r"python(?:\d+(?:\.\d+)*)?", posixpath.basename(word)):
+            continue
+        argument, flags = index + 1, []
+        while argument < len(words) and words[argument].startswith("-"):
+            flag = words[argument]
+            argument += 1
+            if flag == "-c":
+                break
+            flags.append(flag)
+        else:
+            continue
+        if ("-I" not in flags or argument >= len(words)
+                or any(flag not in {"-I", "-B", "-E", "-s", "-S", "-P", "-u", "-q", "-O", "-OO"}
+                       for flag in flags)):
+            continue
+        source, binding = words[argument], None
+        variable = re.fullmatch(r"\$(?:([A-Za-z_]\w*)|\{([A-Za-z_]\w*)\})", source)
+        if variable:
+            binding = assignments.get(variable[1] or variable[2])
+            if binding is None:
+                continue
+            source = binding[1]
+        try:
+            ast.parse(source)
+        except (SyntaxError, ValueError):
+            continue
+        sources.append(source)
+        consumed.add(argument)
+        if binding is not None:
+            bound_sources.setdefault(variable[1] or variable[2], set()).add(argument)
+    if not sources:
+        return text, []
+    for name, source_arguments in bound_sources.items():
+        reference = re.compile(r"\$(?:" + re.escape(name) + r"(?!\w)|\{" + re.escape(name) + r"(?!\w))")
+        references = {index for index, word in enumerate(words) if reference.search(word)}
+        # A reassigned or otherwise used variable may execute the same paths
+        # outside the isolated command. Preserve its shell-literal coverage.
+        if len(assignment_positions[name]) == 1 and references <= source_arguments:
+            consumed.update(assignment_positions[name])
+    return " ".join(word for index, word in enumerate(words) if index not in consumed), sources
+
+
 def names_in_text(text, blobs, dirs, names=None):
     """(kind, path) for each tracked path a hook text names.
 
@@ -303,7 +368,12 @@ def names_in_text(text, blobs, dirs, names=None):
     a dotted module name (`python3 -m a.b`, `unittest` ids). The miss-oracle in the
     tests is independent of this tokenizer.
     """
+    text, inline_sources = _isolated_python_sources(text)
     found = set()
+    for source in inline_sources:
+        files, directories = python_references(".inline.py", source, blobs, dirs, names)
+        found.update(("module", path) for path in files)
+        found.update(("dir", path) for path in directories)
     for raw in _TOKEN_SPLIT.split(text.replace('"', "").replace("'", "")):
         token = _VARIABLE_PREFIX.sub("", raw, count=1)
         while token.startswith("./"):

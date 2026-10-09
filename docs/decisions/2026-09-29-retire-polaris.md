@@ -24,7 +24,7 @@ Before the retirement, Polaris ran the services listed below. Each was classifie
 | `lane-proxy` container (gVisor) and its bridge networks; `lane-egress`, `polaris-gate`, `polaris-drift` and `memguard` units | Plumbing from the pre-convergence agent estate. `polaris-drift` had already been failing (exit 203). | Removed through Polaris's own dockerd, then retired |
 | `wslinterop-guard.timer` | Kept the VM-wide WSLInterop entry alive against a peer distro's shutdown. With one distro left, WSL's generated `systemd-binfmt` override (`/run/systemd/generator/systemd-binfmt.service.d/override.conf`: no unregister on stop, re-registration on start) covers NativeStack. `cmd.exe` ran from NativeStack after the terminate and again after the unregister. | Retired |
 | A private project workspace and its Windows Terminal profile | Still in use. | Migrated to NativeStack at the same absolute path |
-| Windows scheduled task `\NoesisBackup` | Ran a meridian backup script that no longer existed (last result 127). | Definition exported, task deleted |
+| Windows scheduled task `\<win-host>Backup` | Ran a meridian backup script that no longer existed (last result 127). | Definition exported, task deleted |
 
 ## What was kept
 
@@ -32,7 +32,7 @@ The salvage was written to a private archive outside every repository, with a SH
 was verified against that manifest before the distro was unregistered. The archive holds:
 
 - git bundles of every repository with history that exists only locally: the photo-archive pipeline's `local-full-history` branch
-  (343 commits not on GitHub), noesis with its stash, and the `cc-safety-net` fork. It also holds patches of their
+  (343 commits not on GitHub), <windows-computer> with its stash, and the `cc-safety-net` fork. It also holds patches of their
   uncommitted work and a bundle of the migrated workspace;
 - the home directory as a tar, with its repositories and their `.git` directories. It keeps the data needed to
   resume the photo-archive pipeline: the evidence database, the inventories and reports, and the operations scripts and units;

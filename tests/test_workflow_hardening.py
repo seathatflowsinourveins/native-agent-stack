@@ -802,7 +802,9 @@ class PinningTests(unittest.TestCase):
         for path in sorted(WORKFLOWS.glob("*.yml")):
             for line_number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
                 match = re.search(r"uses:\s*([^\s#]+)", line)
-                if not match or match.group(1).startswith("./"):
+                # GitHub's $/ syntax resolves this action at the workflow's
+                # exact running commit (2026-07-30 native rollout).
+                if not match or match.group(1).startswith(("./", "$/")):
                     continue
                 if not re.fullmatch(r"[\w.-]+/[\w./-]+@[0-9a-f]{40}", match.group(1)):
                     unpinned.append(f"{path.name}:{line_number}: {match.group(1)}")
@@ -2673,7 +2675,7 @@ class ActionsAllowListTests(unittest.TestCase):
 
     def test_every_uses_is_github_owned_or_in_the_pattern_allow_list(self):
         # Reuses PinningTests' own `uses:` extraction (the same regex, the same
-        # per-line walk over every workflow file), skipping a local `./` action and
+        # per-line walk over every workflow file), skipping a local `./` or `$/` action and
         # a `docker://` one exactly as that scan does, then checks ownership instead
         # of the pin format.
         patterns = self.permissions["patterns_allowed"]
@@ -2684,7 +2686,7 @@ class ActionsAllowListTests(unittest.TestCase):
                 if not match:
                     continue
                 target = match.group(1)
-                if target.startswith("./") or target.startswith("docker://"):
+                if target.startswith(("./", "$/", "docker://")):
                     continue
                 owner = target.split("/", 1)[0]
                 if owner in {"actions", "github"}:

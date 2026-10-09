@@ -248,6 +248,8 @@ jobs:
           with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as env_file:
               env_file.write("LANDSCAPE_SWEEP_SKILLS_YAML=" + directory + "\n")
           PYEOF
+      - name: Install the native runtime-name scanner for synthetic validation tests
+        uses: $/.github/actions/setup-host-name-scanner
       - name: Test validation failure modes
         # --durations 50 lists the 50 slowest tests at the end of the run (Python 3.12+; this job runs the image's
         # CPython 3.12.3). GNU timeout sends SIGABRT at 55 minutes, five under the job's limit, and SIGKILL 60 s later;
