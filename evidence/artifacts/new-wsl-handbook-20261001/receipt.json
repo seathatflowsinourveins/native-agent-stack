@@ -6,8 +6,8 @@
   "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
   "profile_sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
   "outputs": {
-    "docs/new-wsl-handbook.md": "508701b5827a0348a5119df44cca138ddfe12fe1d66d6eed552fa11ae6df3786",
-    "docs/new-wsl-handbook.json": "51ecdbbdc0238f001097717659ebb136179dcec55c7e5f50b5481acfd7657ead"
+    "docs/new-wsl-handbook.md": "0b696d6e7aa8e068be0ea7e5aadb1fcf2f6c255ef8fb3836ac99565440dee500",
+    "docs/new-wsl-handbook.json": "b8244970897da8383c13ab47af62a4e8b88a700fdadd81854a55c13dfc600ee5"
   },
   "inventory": {
     "layers": 37,
@@ -909,6 +909,23 @@
       "check_exit_code": 0,
       "evidence_class": "local_integration",
       "scope": "Current generated-byte binding only. All previous validation rows and regeneration history remain preserved."
+    },
+    {
+      "recorded_at_utc": "2026-10-09T11:31:05Z",
+      "source_head": "24070e07da9eaa163c2a71bee3edac675d2814a0",
+      "cause": "Authorized PR927 P2 current-owner companion0.24 amendment from operative consensus source, regenerated definitive manifest/current tables and aligned trajectory install-plan mirrors; preserve dated0.23receipts and separate pinned reproductions.",
+      "command": "nice -n 10 ionice -c2 -n7 timeout 600 python3 scripts/build_new_wsl_handbook.py --write",
+      "native_exit_code": 0,
+      "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
+      "profile_sha256": "a97f7fc6a5eba2bf8938ac42db231d8cf8ad30d894e0369525490d1f8b861ec5",
+      "current_outputs": {
+        "docs/new-wsl-handbook.md": "f4ddfb9b3d3b9bb107b18899c435da4f1c328ce70f07401ee2891221e38829da",
+        "docs/new-wsl-handbook.json": "fa2b34a38d9016a75293f350b3c3fc078bf2a21f20d3673448b69ef47730aa7e"
+      },
+      "check": "nice -n 10 ionice -c2 -n7 timeout 600 python3 scripts/build_new_wsl_handbook.py --check",
+      "check_exit_code": 0,
+      "evidence_class": "local_integration",
+      "scope": "Current operative-owner/generated-byte consistency; no native install or acceptance run."
     }
   ],
   "previous_outputs": [
@@ -1043,6 +1060,23 @@
       "outputs": {
         "docs/new-wsl-handbook.md": "981e9634500ce4ab0d3083990236ada854d845f24e3dbdcd32d37b262f91dfb7",
         "docs/new-wsl-handbook.json": "f14476918ca459c3cefc5336dd3ac76b9d187f14aeae482935bfbf51300b55d1"
+      }
+    },
+    {
+      "superseded_at_utc": "2026-10-09T11:17:22Z",
+      "reason": "Preserve the pre-review Harbor0.24 direct-row binding before the authorized current-owner companion pin correction.",
+      "source_main": "958a6d1ab770c807c5ee59748475a5c14df7ba52",
+      "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
+      "profile_sha256": "a97f7fc6a5eba2bf8938ac42db231d8cf8ad30d894e0369525490d1f8b861ec5",
+      "outputs": {
+        "docs/new-wsl-handbook.md": "4856a52ab9de12efe0c1b58685a9ee53ffb59aacb82b5bc50394c42897d32702",
+        "docs/new-wsl-handbook.json": "f92ea8aaaaedd6eaf85a9bdfeb3533ad9023753edc87661e9ad9517a920288af"
+      },
+      "inventory": {
+        "layers": 37,
+        "profile_entries": 78,
+        "projected_tools": 82,
+        "canonical_package_ids": 26
       }
     }
   ]

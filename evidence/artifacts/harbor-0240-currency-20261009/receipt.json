@@ -18,10 +18,24 @@
   },
   "tag": {
     "source": "https://api.github.com/repos/harbor-framework/harbor/commits/v0.24.0",
+    "reference_source": "https://api.github.com/repos/harbor-framework/harbor/git/ref/tags/v0.24.0",
+    "reference": "refs/tags/v0.24.0",
+    "reference_object_type": "tag",
+    "reference_object_sha": "bf8996ef6d97d014924dc1a5e4acc7e9b19b27a1",
+    "kind": "annotated",
+    "tag_object_source": "https://api.github.com/repos/harbor-framework/harbor/git/tags/bf8996ef6d97d014924dc1a5e4acc7e9b19b27a1",
+    "tag_object_sha": "bf8996ef6d97d014924dc1a5e4acc7e9b19b27a1",
+    "tag_object_target_type": "commit",
+    "peeled_commit": "b53b8134e1241686dca7759af188f987ecc48e8b",
+    "tag_signature_verified": false,
+    "signature_reason": "unsigned",
+    "reference_capture": "evidence/artifacts/harbor-0240-currency-20261009/upstream/ref-v0.24.0.json",
+    "tag_object_capture": "evidence/artifacts/harbor-0240-currency-20261009/upstream/tag-object.json",
+    "commit_capture": "evidence/artifacts/harbor-0240-currency-20261009/upstream/commit.json",
     "commit": "b53b8134e1241686dca7759af188f987ecc48e8b",
     "committed_at": "2026-10-05T05:04:47Z",
     "github_commit_signature_verified": false,
-    "claim": "Immutable source identity, without a signed-commit claim."
+    "claim": "Captured tag reference, annotated-tag object and peeled commit identity, without a signed-tag or signed-commit claim."
   },
   "wheel": {
     "metadata_source": "https://pypi.org/pypi/harbor/0.24.0/json",
@@ -57,6 +71,80 @@
   "provider_calls_performed": false,
   "new_host_acceptance_verified": false,
   "historical_receipt": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json",
+  "current_owner_amendment": {
+    "recorded_at_utc": "2026-10-09T11:31:05Z",
+    "operative_source": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+    "source": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+    "slot": "foundation/quality-evaluation/trajectory-analysis",
+    "fields": ["default", "resolution.pin", "resolution.install"],
+    "harbor_companion": "0.24.0",
+    "current_plan_mirrors": [
+      "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+      "evidence/artifacts/new-wsl-install-plan-20261002/owners.json",
+      "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
+      "evidence/artifacts/new-wsl-install-plan-20261002/accept.sh"
+    ],
+    "plan_scope": "Only the current trajectory-analysis companion metadata, verified wheel URL/digest, pinned install dependency and version assertion; no execution or changes to other plan rows/pinned reproductions.",
+    "authorization": "PR927 coordinated review repair: amend the operative owner selection and regenerate the handbook.",
+    "dated_measured_receipts_and_frozen_reproductions_changed": false
+  },
+  "primary_capture_provenance": "evidence/artifacts/harbor-0240-currency-20261009/upstream/capture-provenance.json",
+  "primary_captures": [
+    {
+      "path": "evidence/artifacts/harbor-0240-currency-20261009/upstream/README.md",
+      "sha256": "471eeac02b89640051dd25c0a4bb5a29a76d55862a6ae30da1dbb532f13bd633",
+      "bytes": 2984
+    },
+    {
+      "path": "evidence/artifacts/harbor-0240-currency-20261009/upstream/capture-provenance.json",
+      "sha256": "edba04645cd5e39b0bb5e5be2ebe62dac50cd273a6ab6e16ea29602e603e36f5",
+      "bytes": 7972
+    },
+    {
+      "path": "evidence/artifacts/harbor-0240-currency-20261009/upstream/commit.json",
+      "sha256": "20a6f31f5a0d590ce8865a9f9a0a89a0e6454812fb1ce4c54ff972b494f13432",
+      "bytes": 9914
+    },
+    {
+      "path": "evidence/artifacts/harbor-0240-currency-20261009/upstream/pypi-0.24.0.json",
+      "sha256": "c56c5c7cab5961a324019395eef3ad01dbd82015dede7490f59998ebb8a2cb6f",
+      "bytes": 9594
+    },
+    {
+      "path": "evidence/artifacts/harbor-0240-currency-20261009/upstream/pyproject.toml",
+      "sha256": "d7d5398dfeff698ec1c008a9a122326be6e3e6b69af9dcf7caec8e79efabb43e",
+      "bytes": 6283
+    },
+    {
+      "path": "evidence/artifacts/harbor-0240-currency-20261009/upstream/pytest.yml",
+      "sha256": "a58bcad1137f9f0a862eb9308c1392fc29780794bc6b2ebfe850307f1336ecce",
+      "bytes": 3377
+    },
+    {
+      "path": "evidence/artifacts/harbor-0240-currency-20261009/upstream/ref-v0.24.0.json",
+      "sha256": "baead2c103189c9248dd88ea788079f167c3c303d22e28c81abdae3bfb5323cb",
+      "bytes": 346
+    },
+    {
+      "path": "evidence/artifacts/harbor-0240-currency-20261009/upstream/release.json",
+      "sha256": "17dd20187eef049e6d9aa943780e3863736e449257a068bdb299e92379d5421d",
+      "bytes": 20714
+    },
+    {
+      "path": "evidence/artifacts/harbor-0240-currency-20261009/upstream/tag-object.json",
+      "sha256": "babb2265240ca677a2c74a4844553762966112a7737560c2faceae4082836165",
+      "bytes": 670
+    }
+  ],
+  "wheel_pinned_byte_custody": {
+    "state_relative_path": "research/harbor-0240-currency-20261009/harbor-0.24.0-py3-none-any.whl",
+    "state_root": "native-agent-stack private state root",
+    "bytes": 2331740,
+    "sha256": "23b7ba616a3aae4eff561ced5e2c51c7186f2981e53a770dea9c689d3969877c",
+    "public_url": "https://files.pythonhosted.org/packages/9e/63/0e3d788e8d1ed116125507c6a01e3fb95cf82be71f2ea7040a1458709d21/harbor-0.24.0-py3-none-any.whl",
+    "independent_rehash_matched_captured_pypi": true,
+    "wheel_bytes_committed": false
+  },
   "decision": "docs/decisions/2026-10-09-harbor-0240-profile.md",
   "limitations": [
     "Downloaded wheel integrity is not a locked installation or runtime qualification.",

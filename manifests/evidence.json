@@ -18012,7 +18012,7 @@
     },
     {
       "path": "docs/decisions/2026-10-01-new-wsl-definitive-defaults.md",
-      "sha256": "1b696a28d3582819ab59a7feb0208f80042529d65a9cda5a3fcfd53e614a5e3b",
+      "sha256": "b156c72425b244e08e2f97c246975f920a0bf72c8bad67c75ecb120332e310ad",
       "bytes": 80611
     },
     {
@@ -18532,8 +18532,8 @@
     },
     {
       "path": "docs/decisions/2026-10-09-harbor-0240-profile.md",
-      "sha256": "e94c44fa033ed655ca043db15cfe9f359e00025b7f2b4760f54bb181249e409b",
-      "bytes": 4237
+      "sha256": "e500fb4b8424e54c0cf218fd5ba187cd8dd21952b0b2cb7aeb9f8155a6723d46",
+      "bytes": 7359
     },
     {
       "path": "docs/decisions/2026-10-09-host-name-scan.md",
@@ -18847,12 +18847,12 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "51ecdbbdc0238f001097717659ebb136179dcec55c7e5f50b5481acfd7657ead",
+      "sha256": "b8244970897da8383c13ab47af62a4e8b88a700fdadd81854a55c13dfc600ee5",
       "bytes": 693715
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "508701b5827a0348a5119df44cca138ddfe12fe1d66d6eed552fa11ae6df3786",
+      "sha256": "0b696d6e7aa8e068be0ea7e5aadb1fcf2f6c255ef8fb3836ac99565440dee500",
       "bytes": 369530
     },
     {
@@ -35332,8 +35332,53 @@
     },
     {
       "path": "evidence/artifacts/harbor-0240-currency-20261009/receipt.json",
-      "sha256": "d07c5ccb2e876337725c6e0de1a189ad43939b0b9af07cd7b3486dbc6a022f34",
-      "bytes": 4019
+      "sha256": "7454e5f3f70992563ad9ef6c49292da728e7609dcc67624f5776f36ddb5a4ceb",
+      "bytes": 8754
+    },
+    {
+      "path": "evidence/artifacts/harbor-0240-currency-20261009/upstream/README.md",
+      "sha256": "471eeac02b89640051dd25c0a4bb5a29a76d55862a6ae30da1dbb532f13bd633",
+      "bytes": 2984
+    },
+    {
+      "path": "evidence/artifacts/harbor-0240-currency-20261009/upstream/capture-provenance.json",
+      "sha256": "edba04645cd5e39b0bb5e5be2ebe62dac50cd273a6ab6e16ea29602e603e36f5",
+      "bytes": 7972
+    },
+    {
+      "path": "evidence/artifacts/harbor-0240-currency-20261009/upstream/commit.json",
+      "sha256": "20a6f31f5a0d590ce8865a9f9a0a89a0e6454812fb1ce4c54ff972b494f13432",
+      "bytes": 9914
+    },
+    {
+      "path": "evidence/artifacts/harbor-0240-currency-20261009/upstream/pypi-0.24.0.json",
+      "sha256": "c56c5c7cab5961a324019395eef3ad01dbd82015dede7490f59998ebb8a2cb6f",
+      "bytes": 9594
+    },
+    {
+      "path": "evidence/artifacts/harbor-0240-currency-20261009/upstream/pyproject.toml",
+      "sha256": "d7d5398dfeff698ec1c008a9a122326be6e3e6b69af9dcf7caec8e79efabb43e",
+      "bytes": 6283
+    },
+    {
+      "path": "evidence/artifacts/harbor-0240-currency-20261009/upstream/pytest.yml",
+      "sha256": "a58bcad1137f9f0a862eb9308c1392fc29780794bc6b2ebfe850307f1336ecce",
+      "bytes": 3377
+    },
+    {
+      "path": "evidence/artifacts/harbor-0240-currency-20261009/upstream/ref-v0.24.0.json",
+      "sha256": "baead2c103189c9248dd88ea788079f167c3c303d22e28c81abdae3bfb5323cb",
+      "bytes": 346
+    },
+    {
+      "path": "evidence/artifacts/harbor-0240-currency-20261009/upstream/release.json",
+      "sha256": "17dd20187eef049e6d9aa943780e3863736e449257a068bdb299e92379d5421d",
+      "bytes": 20714
+    },
+    {
+      "path": "evidence/artifacts/harbor-0240-currency-20261009/upstream/tag-object.json",
+      "sha256": "babb2265240ca677a2c74a4844553762966112a7737560c2faceae4082836165",
+      "bytes": 670
     },
     {
       "path": "evidence/artifacts/harness-rules-20261008/B-run-receipts.json",
@@ -41177,7 +41222,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
-      "sha256": "901916dbfe24a40e377ba238c41648150b70eed4696421fa61da07d08f1ee150",
+      "sha256": "f67e9d44eb90a183c5e93a89e8c9018c2298c4d177d3fa7dd23d9038fc927d7f",
       "bytes": 229957
     },
     {
@@ -41932,8 +41977,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "0471c6e52b8f1fee33dad515a376849f0d0e9ee10f2c28ae59ccd5d2f2a7a62e",
-      "bytes": 64894
+      "sha256": "b365aa1e9e8dea87cf005628ee9cc75d18cbfaaccc412a2dc5dae5646c8355ff",
+      "bytes": 66973
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/slot-state-and-core-recipes.json",
@@ -41957,7 +42002,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
-      "sha256": "01ed1c58366004111f68923550d6ef7240fbfd25feb7176f01a94359d638412d",
+      "sha256": "9f61e3d885b107b75020ccab1a935418d5d90633539cfff366d07cd57e8e7e47",
       "bytes": 199902
     },
     {
@@ -42392,12 +42437,12 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
-      "sha256": "7cec8b6cd896836f85ef57dc9cee33b0acbe44a7d9fc5ac2cf53a13450dd51eb",
+      "sha256": "4967930d69e16ea9e7a6d86d2b03f515a2fc7c971277a3df1c47cc5f2fd22ac7",
       "bytes": 487716
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
-      "sha256": "4b29a0a0ef8675c1a472f08cf829a7bc071c5146ea25d55eee634aa58bab96b6",
+      "sha256": "4fbc7389c4a494acec09043654952ecebb3bf3dab6487cc27d5ef64a957f6821",
       "bytes": 134397
     },
     {
@@ -42422,7 +42467,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/owners.json",
-      "sha256": "a75511675f56df573e2700b04c40db69f35f2c44225f5eff304d1521d15369ab",
+      "sha256": "b3453c5e51587a0811d8fd9bf12345c03857390d22a9483685b68f0577390a83",
       "bytes": 35189
     },
     {
@@ -42462,7 +42507,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-      "sha256": "d5441b11b0641c3a1666851443db76e1703697962badb28f0fe48eac40f8171e",
+      "sha256": "6e9eb9b8bd69141482be14976bc79247a756ca876e534a27269bbe139f9d2666",
       "bytes": 142808
     },
     {
@@ -60647,8 +60692,8 @@
     },
     {
       "path": "tests/test_new_wsl_handbook.py",
-      "sha256": "7a151c05cccf4a0b0f96ae27302497be6035850fbe0272c35a3438a58d5ab0b9",
-      "bytes": 104637
+      "sha256": "0c1d05dbe70d1334a956d86abe8ad85563661dffa7d7b323fb24fa45a92b4205",
+      "bytes": 106029
     },
     {
       "path": "tests/test_new_wsl_profile.py",

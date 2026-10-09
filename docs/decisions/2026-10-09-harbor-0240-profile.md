@@ -13,6 +13,22 @@ redirected to this canonical repository. The
 [v0.24.0 release](https://github.com/harbor-framework/harbor/releases/tag/v0.24.0)
 is non-draft and non-prerelease, published 2026-10-05T05:04:52Z. Its tag
 resolves to [b53b8134e1241686dca7759af188f987ecc48e8b](https://github.com/harbor-framework/harbor/commit/b53b8134e1241686dca7759af188f987ecc48e8b).
+The captured `refs/tags/v0.24.0` reference points to an **annotated tag**
+object, `bf8996ef6d97d014924dc1a5e4acc7e9b19b27a1`, whose object type is
+`tag`. Its captured tag object peels directly to the commit above. This is
+reference/object/commit identity proof; no signed-tag verification is claimed.
+The reference, tag-object and commit responses are retained in the new
+receipt's `upstream/` directory, alongside release and PyPI metadata and the
+three pinned source copies: [reference](../../evidence/artifacts/harbor-0240-currency-20261009/upstream/ref-v0.24.0.json),
+[tag object](../../evidence/artifacts/harbor-0240-currency-20261009/upstream/tag-object.json),
+[commit](../../evidence/artifacts/harbor-0240-currency-20261009/upstream/commit.json),
+[release](../../evidence/artifacts/harbor-0240-currency-20261009/upstream/release.json),
+[PyPI metadata](../../evidence/artifacts/harbor-0240-currency-20261009/upstream/pypi-0.24.0.json),
+[README](../../evidence/artifacts/harbor-0240-currency-20261009/upstream/README.md),
+[project metadata](../../evidence/artifacts/harbor-0240-currency-20261009/upstream/pyproject.toml)
+and [pytest workflow](../../evidence/artifacts/harbor-0240-currency-20261009/upstream/pytest.yml).
+Their [capture/provenance record](../../evidence/artifacts/harbor-0240-currency-20261009/upstream/capture-provenance.json) distinguishes
+native capture formatting from the original response bytes.
 The pinned [project metadata](https://github.com/harbor-framework/harbor/blob/b53b8134e1241686dca7759af188f987ecc48e8b/pyproject.toml#L3)
 also declares version 0.24.0 and Python >=3.12.
 
@@ -34,6 +50,14 @@ distribution metadata confirmed name `harbor`, version `0.24.0` and Python
 `>=3.12`. The wheel was neither installed nor imported. This verifies that
 artifact's identity, not the installation's transitive dependency lock or
 runtime correctness.
+
+The independently rehashed wheel remains in the lane's private state under
+`research/harbor-0240-currency-20261009/harbor-0.24.0-py3-none-any.whl`.
+The receipt binds this custody locator, the immutable PyPI file URL, bytes
+and digest so a review packet can supply the same pinned artifact. The wheel
+is not part of the Git commit. The new public captures permit independent
+release/tag/source comparison without treating repeated digest strings as
+artifact verification.
 
 The pinned [README:22](https://github.com/harbor-framework/harbor/blob/b53b8134e1241686dca7759af188f987ecc48e8b/README.md#L22)
 documents `uv tool install harbor`; the profile applies its selected version
@@ -58,6 +82,25 @@ older core-native-recipe receipt retains its 0.23.0 observation as history.
 The current entry points to the new receipt, replaces its source-only
 checksum with the verified wheel checksum and keeps the unprovisioned
 acceptance gap explicit.
+
+The operative Inspect Scout owner selection also requires Harbor for ATIF
+import in its shared Inspect AI environment. The authorized review repair
+updates that current companion summary, pin and install requirement to
+0.24.0 in the operative consensus source, then rebuilds the definitive
+manifest and its current tables with their existing generators. The current
+trajectory-analysis install-plan row and mirrored scripts use the verified
+0.24.0 wheel and version assertion in the same Scout-owned environment;
+they remain unexecuted. The plan's other rows and separate pinned Harbor
+reproduction are preserved. The generated handbook now carries
+the same Harbor version in both installation recommendations. Dated measured
+0.23.0 receipts and frozen benchmark reproductions retain their original
+versions; the current owner recommendation is distinct from those records.
+
+A regression check compares the current profile pin with imperative Harbor
+companion pins in operative owner selections and their generated projection.
+It failed before this repair and passes after the owner-input amendment and
+native regeneration. This checks the cross-owner installation contract that
+ordinary generated-byte equality did not cover.
 
 The handbook is regenerated through `scripts/build_new_wsl_handbook.py`.
 Its rolling integration receipt preserves previous bindings and validation

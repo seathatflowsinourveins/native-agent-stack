@@ -1669,6 +1669,28 @@ class NewWslHandbookTests(unittest.TestCase):
                             ("bootstrap page", self.committed("adoption/bootstrap.md"))):
             self.assertNotIn("current at install time", " ".join(text.split()), label)
 
+    def test_current_harbor_companion_installations_match_the_profile_pin(self):
+        profile = json.loads(self.committed(handbook.PROFILE))
+        harbor, = [entry for entry in profile["entries"] if entry["name"] == "Harbor"]
+        manifest = json.loads(self.committed(DEFAULTS_SOURCE))
+        projected = json.loads(self.committed(handbook.OUTPUTS[1]))
+        owner_records = [slot for slot in manifest["slots"]
+                         if slot.get("row_kind") == "owner_decision"]
+        owner_records += [slot["record"] for layer in projected["layers"]
+                          for slot in layer["default_slots"]
+                          if slot["record"].get("row_kind") == "owner_decision"]
+        companions = []
+        for record in owner_records:
+            resolution = record.get("resolution", {})
+            for field in ("pin", "install"):
+                for pin in re.findall(r"(?<![\w-])harbor==([\w.+-]+)", resolution.get(field, "")):
+                    companions.append((record["slot_id"], field, pin))
+        self.assertTrue(companions, "the operative Harbor companion install must be checked")
+        for slot_id, field, pin in companions:
+            with self.subTest(slot=slot_id, field=field):
+                self.assertEqual(pin, harbor["pin"],
+                                 "operative owner installs must use the current Harbor profile pin")
+
     def test_the_committed_outputs_are_current_and_the_handbook_receipt_names_them(self):
         result = subprocess.run([sys.executable, str(ROOT / "scripts/build_new_wsl_handbook.py"), "--check"],
                                 capture_output=True, text=True)

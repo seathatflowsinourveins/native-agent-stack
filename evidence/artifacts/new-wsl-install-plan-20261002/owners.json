@@ -823,7 +823,7 @@
   {
    "layer": "quality-evaluation",
    "slot": "trajectory-analysis",
-   "owner": "Inspect Scout 0.5.3 (in the Inspect AI owner's environment, with harbor 0.23.0 for ATIF import)",
+   "owner": "Inspect Scout 0.5.3 (in the Inspect AI owner's environment, with harbor 0.24.0 for ATIF import)",
    "repository": "https://github.com/meridianlabs-ai/inspect_scout",
    "installed": true,
    "note": "wave-5 round-2 owner decision; pin and sources are in install-plan.json; no new repository metadata or destination acceptance"

@@ -2723,7 +2723,7 @@ assert version("inspect-ai") == "0.3.273"
 assert Version("2.20.0") <= Version(version("openai")) < Version("3.0.0")
 assert version("litellm") == "1.92.0"
 assert version("inspect-scout") == "0.5.3"
-assert version("harbor") == "0.23.0"
+assert version("harbor") == "0.24.0"
 from harbor.models.trajectories import Trajectory  # Require ATIF coverage before importorskip tests.
 PY
 uv pip check --python "$tool_python"
