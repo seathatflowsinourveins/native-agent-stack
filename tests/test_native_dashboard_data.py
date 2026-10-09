@@ -1,7 +1,10 @@
 """Offline guards for the local metadata adapter, not native E2E acceptance."""
 import copy
+from contextlib import redirect_stdout
 import errno
+from http.server import BaseHTTPRequestHandler, HTTPServer
 import importlib.util
+import io
 import json
 import os
 from pathlib import Path
@@ -10,6 +13,7 @@ import stat
 import subprocess
 import sys
 import tempfile
+import threading
 import time
 import unittest
 from unittest.mock import patch
@@ -369,6 +373,73 @@ class NativeDataTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             M.validate_config(c)
 
+    def test_loki_config_accepts_loopback_literals_and_explicit_ports(self):
+        for host, port in (("127.0.0.1", 13100), ("127.0.0.1", 21300),
+                           ("127.42.0.9", 1), ("127.255.255.255", 65535),
+                           ("[::1]", 21300), ("[0:0:0:0:0:0:0:1]", 21300)):
+            url = f"http://{host}:{port}/loki/api/v1/push"
+            c = self.config(); c["loki_url"] = url
+            with self.subTest(url=url):
+                self.assertEqual(M.validate_config(c)["loki_url"], url)
+
+    def test_loki_config_rejects_nonliteral_nonloopback_and_ambiguous_urls(self):
+        suffix = ":21300/loki/api/v1/push"
+        urls = ["http://" + host + suffix for host in (
+            "localhost", "example.com", "127.1", "2130706433", "127.000.0.1",
+            "127.256.0.1", "128.0.0.1", "0.0.0.0", "[::]", "[::2]",
+            "[::ffff:7f00:1]", "[::ffff:127.0.0.1]", "[::1%lo]", "[::1%25lo]",
+            "user@127.0.0.1", "127.0.0.1@example.com", "127%2e0.0.1")]
+        urls.extend("http://127.0.0.1:" + port + "/loki/api/v1/push"
+                    for port in ("", "0", "65536", "99999", "-1", "+1", "1.5", "abc", "２１３００"))
+        good = "http://127.0.0.1:21300/loki/api/v1/push"
+        urls.extend((good.replace(":21300", ""), good.replace("http:", "https:"),
+                     good + "/", good + "?x=1", good + "?", good + "#x", good + "#",
+                     good.replace("/push", "/%70ush"), " " + good, "\x00" + good,
+                     good + "\n", good.replace("127.0.0.1", "127.0.\n0.1"),
+                     good.replace("127.0.0.1", "127.0.\t0.1"), good + "\r\nX-Test: value",
+                     None, 21300, [good], {"url": good}))
+        for url in urls:
+            c = self.config(); c["loki_url"] = url
+            with self.subTest(url=url), self.assertRaises(ValueError):
+                M.validate_config(c)
+
+    def test_publish_posts_to_the_configured_loopback_endpoint(self):
+        received = []
+
+        class Handler(BaseHTTPRequestHandler):
+            def do_POST(self):
+                received.append((self.path, self.headers["Content-Type"],
+                                 json.loads(self.rfile.read(int(self.headers["Content-Length"])))))
+                self.send_response(204)
+                self.end_headers()
+
+            def log_message(self, *args):
+                pass
+
+        with HTTPServer(("127.0.0.1", 0), Handler) as server, tempfile.TemporaryDirectory() as directory:
+            thread = threading.Thread(target=server.serve_forever, daemon=True)
+            thread.start()
+            try:
+                c = self.config(); c["state_dir"] = str(Path(directory) / "state")
+                c["loki_url"] = f"http://127.0.0.1:{server.server_port}/loki/api/v1/push"
+                config_path = Path(directory) / "config.json"
+                config_path.write_text(json.dumps(c))
+                marker = {"record_kind": "snapshot", "observed_unix": 10000,
+                          "row_count": 1, "unknown_count": 0, "stale_count": 0}
+                output = io.StringIO()
+                with patch.object(sys, "argv", ["snapshot.py", "--config", str(config_path), "--publish"]), \
+                        patch.object(M, "collect", return_value={"rows": [marker]}), redirect_stdout(output):
+                    self.assertEqual(M.main(), 0)
+                self.assertEqual(received[0][:2], ("/loki/api/v1/push", "application/json"))
+                self.assertEqual(len(received), 1)
+                stream = received[0][2]["streams"][0]
+                self.assertEqual(stream["stream"]["service_name"], "agent-stack-native-data")
+                self.assertEqual(json.loads(stream["values"][0][1]), marker)
+                self.assertEqual(json.loads(output.getvalue())["loki_http_status"], 204)
+            finally:
+                server.shutdown()
+                thread.join(timeout=5)
+
     def test_configured_report_scopes_select_their_labels_without_publishing_them(self):
         # Token-report labels observed on the WSL workstation: Context Mode scopes are the
         # report's context_roots names and Headroom uses the reporter's default label.
@@ -508,7 +579,7 @@ class NativeDataTests(unittest.TestCase):
         with patch.object(M.urllib.request, "build_opener") as mocked:
             response = mocked.return_value.open.return_value
             response.read.return_value = b""; response.status = 204
-            self.assertEqual(M.request(M.LOKI, b"{}"), (204, b""))
+            self.assertEqual(M.request(self.config()["loki_url"], b"{}"), (204, b""))
             self.assertEqual(mocked.call_args.args[0].proxies, {})
 
     def test_command_launch_failure_retains_attempt_and_empty_streams(self):

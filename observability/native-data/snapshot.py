@@ -6,6 +6,7 @@ import argparse
 import datetime as dt
 import fcntl
 import hashlib
+import ipaddress
 import json
 import math
 import os
@@ -20,7 +21,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
-LOKI = "http://127.0.0.1:13100/loki/api/v1/push"
+LOKI_PUSH = re.compile(r"http://([0-9.]+|\[[0-9A-Fa-f:]+\]):([0-9]{1,5})/loki/api/v1/push")
 LIMIT = 1024 * 1024
 # An explicit consumer ceiling, not a producer maximum: the token report bounds its
 # returned-results attachments (16 MiB in total, tools/token-report/README.md) but not its
@@ -129,8 +130,14 @@ def validate_config(config):
     if "server_url" in config["ai_memory"]:
         # ai-memory 2.4 `status` asks the running server's /admin/status at this URL.
         loopback_origin(config["ai_memory"]["server_url"], "ai-memory server")
-    if config["loki_url"] != LOKI:
-        raise ValueError("Loki must use the fixed loopback push endpoint")
+    # Validate untouched input: URL parsers can discard controls and accept DNS names.
+    endpoint = LOKI_PUSH.fullmatch(config["loki_url"]) if isinstance(config["loki_url"], str) else None
+    if not endpoint or not 1 <= int(endpoint[2]) <= 65535:
+        raise ValueError("Loki requires an HTTP loopback literal, port and exact push path")
+    address = ipaddress.ip_address(endpoint[1].strip("[]"))
+    # IPv4-mapped IPv6 can report is_loopback=True; allow IPv6 ::1 explicitly.
+    if not address.is_loopback or (address.version == 6 and int(address) != 1):
+        raise ValueError("Loki requires an IPv4 loopback or IPv6 ::1 literal")
     q = config.get("qdrant")
     if q is not None:
         if not isinstance(q, dict) or set(q) != {"url", "collection"}:
