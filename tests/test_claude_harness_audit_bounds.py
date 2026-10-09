@@ -146,6 +146,12 @@ class HarnessAuditShapeTests(unittest.TestCase):
         self.assertEqual(run["uses"], ACTION)
         self.assertEqual(run["env"], {"ACTIONS_STEP_DEBUG": "false"})
         inputs = run["with"]
+        # The complete reviewed input set (J8 micro N8; GPT read of 0cf13fc2): an input added to the action step, such
+        # as claude_code_version or settings, fails here even when no test names it.
+        self.assertEqual(sorted(inputs), ["anthropic_federation_rule_id", "anthropic_organization_id",
+                                          "anthropic_service_account_id", "anthropic_workspace_id", "claude_args",
+                                          "display_report", "github_token", "prompt", "show_full_output",
+                                          "track_progress"])
         for forbidden in ("anthropic_api_key", "claude_code_oauth_token", "allowed_non_write_users", "allowed_bots",
                           "plugins", "plugin_marketplaces"):
             self.assertNotIn(forbidden, inputs)
@@ -386,6 +392,16 @@ class HarnessAuditStepTests(unittest.TestCase):
         self.assertIn("Bounds not met: the run did not end in success (subtype error_max_budget_usd); client cost "
                       "estimate 5.51 USD, above 5.5\n", console)
         self.assertNotIn("The run stopped at its client budget", summary)
+
+    def test_a_budget_stop_has_no_lower_cost_limit(self):
+        # J8 micro N9 (GPT read of 0cf13fc2): the exemption takes any budget stop at or under the bound, however low
+        # its cost; a floor such as `.total_cost_usd >= 5` would fail these.
+        for cost in (0.01, 1.0, 4.99):
+            with self.subTest(cost=cost):
+                log = execution(subtype="error_max_budget_usd", is_error=True, total_cost_usd=cost,
+                                modelUsage=model_usage(cost=cost))
+                code, console, _, _ = run_step(NUMBERS, log)
+                self.assertEqual(code, 0, console)
 
     def test_a_budget_stop_within_the_bound_is_exempt_only_from_the_success_and_text_checks(self):
         # R7 (J8 micro read, N1): the exemption waives the success and result-text checks only. A budget stop within

@@ -564,11 +564,16 @@ handbacks as the complete report. The command center ruled that N1 to N3 are fix
 - **N6 (confidence 40), correction:** R6's count of R5 copies run again was wrong. Of the 17 R5 copies, the five whose
   workflow text R6 changed (the two `--max-turns` copies and the three `> 5` cost-check copies) were replaced or
   re-run; the other 12 still fail a test.
-- **N7 to N9 (confidence 30 and under), disposition: no change.** Each is a narrower pin of behaviour that existing
-  tests already hold: one non-string tool entry at a time, the action's input list, and no lower cost limit on the
-  exemption.
+- **N7 (confidence 30), disposition: no change.** Existing tests reject an entry that is not a string one entry at a
+  time; a list with several such entries is rejected too, but how many markers it records is not pinned.
+- **N8 and N9, fixed in R8 after the GPT read of 0cf13fc2.** R7 first said existing tests already held these; they did
+  not.
+  - N8: `test_the_action_is_pinned_and_takes_federation_inputs_only` now compares the complete reviewed input set of
+    the action step, so an added input (for example `claude_code_version`) fails.
+  - N9: `test_a_budget_stop_has_no_lower_cost_limit` runs budget stops at $0.01, $1 and $4.99, which must pass, so a
+    floor such as `.total_cost_usd >= 5` fails.
 
-The module runs 32 tests, up from 30.
+The module runs 33 tests, up from 30 (32 at R7).
 
 ## Alternatives considered
 
