@@ -76,6 +76,12 @@ Record license, platform and dependency compatibility, overlap with the current
 stack, installation scope, rollback and the result that would justify a switch.
 A newer release can reopen a decision without changing the accepted pin.
 
+For foundation role expectations and MCP memory gates, use the dated
+[roles and tool sets record](role-tool-sets.md) and its
+[machine-readable stages](role-tool-sets.json). It separates candidate quality,
+native wiring, fresh-role use and rolling invoke evidence; the unpaired role
+trial does not select new defaults or attribute lane PSS to individual tools.
+
 Compare the working baseline with the smallest useful alternative. The existing
 [external retrieval experiment](../blueprints/convergence-practice/arb-trace2code/README.md)
 and [local documentation experiment](../blueprints/convergence-practice/local-fixture/evaluation.md)

@@ -1,0 +1,1753 @@
+{
+  "schema_version": 1,
+  "kind": "adoption-program-B-role-tool-sets",
+  "recorded_at": "2026-10-09T01:47:16Z",
+  "base_commit": "72e1f943d951e6aff4200729db88121a8d38d7da",
+  "north_star_action": "Make role-specific tool expectations and native memory gates reviewable before foundation architecture adoption and subsequent R&D.",
+  "scope": "One record PR; current client/MCP sets remain unchanged; code-intelligence adoption program C is not executed.",
+  "policy": {
+    "selection_basis": "maintained upstream quality and final G5 slot evidence, never invoke rates",
+    "g5_status": "PENDING",
+    "g5_pr": 878,
+    "g5_observed_head": "083800f288ee7a0a4e836ff06279538d0332b8e2",
+    "g5_checked_at": "2026-10-09T01:39Z",
+    "low_use_disposition": "WIRE if final candidate, otherwise DEFER; no RETIRE for low use",
+    "adopt_now_requires": [
+      "final candidate and one choice per slot",
+      "native install/integration and inverse",
+      "attributed per-session tool PSS and sharing boundary",
+      "fresh task organic use bound to role/client",
+      "stage-4 baseline/counters retained separately"
+    ],
+    "settings_changed": false,
+    "model_route_changed": false,
+    "paired_runs_pending": true
+  },
+  "sources": [
+    {
+      "source_id": "role-trial",
+      "locator": "research/coverage-gap-20261008/O3/ROLE-MCP-TRIAL-PLAN-20261008/ROLE-MCP-TRIAL-REPORT-20261009.md",
+      "sha256": "f0afc2c734b3ad1b70e68cd38d3c844c7f4b1338cc030c8fc40fc88db1e53989",
+      "evidence_class": "native_proven",
+      "scope": "retained observational report; no new run"
+    },
+    {
+      "source_id": "trial-plan",
+      "locator": "research/coverage-gap-20261008/O3/ROLE-MCP-TRIAL-PLAN-20261008/PLAN.md",
+      "sha256": "dd7f58a176b409e09c2d8841c0746e4fe8e149b0a5335e59699232ee7661352d",
+      "evidence_class": "source_review"
+    },
+    {
+      "source_id": "role-review",
+      "locator": "research/coverage-gap-20261008/O3/per-role-review-20261008/draft/docs/decisions/2026-10-08-role-mcp-review.md",
+      "sha256": "d4f1e247bad23715cd986ab95224b800141f41687bd8601c6762ef9fbbadd689",
+      "evidence_class": "source_review",
+      "patch_sha256": "256666bce58e04edbad409ae0f3782ba50b9b779645a9f69bb3ee66f0d430e0a"
+    },
+    {
+      "source_id": "invoke-snapshot",
+      "locator": "coordination/command-center/pages/adoption-now.json",
+      "generated_utc": "2026-10-09T01:39:38Z",
+      "sha256": "e129759fe91ffbb133de2719a7d5194fe96ac65c44b222adf7fdd4d65af0e872",
+      "window_hours": 24,
+      "method": "docs/decisions/2026-09-26-tool-invoke-rates.md (Loki count of record)",
+      "evidence_class": "native_proven",
+      "scope": "retained rolling record; original 2026-10-08 baseline not bound"
+    },
+    {
+      "source_id": "private-role-coop",
+      "locator": "coordination/command-center/ROW-ns2604-coop-20261008T2252Z-read-889-delta.md",
+      "sha256": "326844e722015eedd3ac27cf37db82a61267a3e5e297420a4cc8efb8b6b0eb68",
+      "evidence_class": "source_review"
+    },
+    {
+      "source_id": "private-role-lander",
+      "locator": "coordination/command-center/cc-tools/brief-5f-897-cue.md",
+      "sha256": "e2000d9e1b243a813315819ae2ad49a662c56890357d04a8891ba2e423f94ff1",
+      "evidence_class": "source_review"
+    },
+    {
+      "source_id": "private-role-99",
+      "locator": "coordination/command-center/cc-tools/ITEM-native-agent-stack-99-20261008T021058Z.md",
+      "sha256": "0a17230d27c875c5abdee9ef31aa212dd82051c1ba4e28beee4db7a09e8606cc",
+      "evidence_class": "source_review"
+    },
+    {
+      "source_id": "private-role-exec",
+      "locator": "coordination/ns2604-coop/gpt-reads/brief-landing.tmpl.md",
+      "sha256": "5b0dc536818dda7ce6d1808633ce848a0b5c2ffd759445b3fcee206726ed4135",
+      "evidence_class": "source_review"
+    },
+    {
+      "source_id": "scout-result",
+      "locator": "research/coverage-gap-20261008/O3/ROLE-MCP-TRIAL-PLAN-20261008/ARM-B-SCOUT-RESULT-20261008.md",
+      "sha256": "5e40175caaff999b18d863417fa032c114979d949805e8ce5e1f7e04c9160309",
+      "evidence_class": "source_review",
+      "scope": "S1-S3 done; four heuristic destination disagreements retained"
+    },
+    {
+      "source_id": "codex-client",
+      "url": "https://developers.openai.com/codex/mcp",
+      "evidence_class": "source_review",
+      "checked_at": "2026-10-09"
+    },
+    {
+      "source_id": "claude-client",
+      "url": "https://code.claude.com/docs/en/sub-agents#scope-mcp-servers-to-a-subagent",
+      "evidence_class": "source_review",
+      "scope": "prior reviewed client contract; no new runtime acceptance"
+    }
+  ],
+  "slots": [
+    {
+      "slot_id": "coding-decisions",
+      "current_choice": null,
+      "status": "PENDING_G5_FINAL_CHOICE",
+      "prior_documented_choice": "ai-memory",
+      "alternatives": [],
+      "checked_at": "2026-10-09",
+      "overturn_when": "G5 upstream evidence or a vendor release changes the job/quality/transport contract; retain dated primary sources and re-open only the affected slot"
+    },
+    {
+      "slot_id": "research-episodes",
+      "current_choice": null,
+      "status": "PENDING_G5_FINAL_CHOICE",
+      "prior_documented_choice": "hindsight",
+      "alternatives": [],
+      "checked_at": "2026-10-09",
+      "overturn_when": "G5 upstream evidence or a vendor release changes the job/quality/transport contract; retain dated primary sources and re-open only the affected slot"
+    },
+    {
+      "slot_id": "scoped-documents",
+      "current_choice": null,
+      "status": "PENDING_G5_FINAL_CHOICE",
+      "prior_documented_choice": "qmd",
+      "alternatives": [],
+      "checked_at": "2026-10-09",
+      "overturn_when": "G5 upstream evidence or a vendor release changes the job/quality/transport contract; retain dated primary sources and re-open only the affected slot"
+    },
+    {
+      "slot_id": "exact-source-navigation",
+      "current_choice": null,
+      "status": "PENDING_G5_FINAL_CHOICE",
+      "prior_documented_choice": "serena",
+      "alternatives": [
+        {
+          "tool_id": "jcodemunch",
+          "ranking": "pending G5",
+          "disposition": "alternative_pending_G5_not_parallel_default"
+        }
+      ],
+      "checked_at": "2026-10-09",
+      "overturn_when": "G5 upstream evidence or a vendor release changes the job/quality/transport contract; retain dated primary sources and re-open only the affected slot"
+    },
+    {
+      "slot_id": "static-relationships",
+      "current_choice": null,
+      "status": "PENDING_G5_FINAL_CHOICE",
+      "prior_documented_choice": "codebase-memory-mcp",
+      "alternatives": [],
+      "checked_at": "2026-10-09",
+      "overturn_when": "G5 upstream evidence or a vendor release changes the job/quality/transport contract; retain dated primary sources and re-open only the affected slot"
+    },
+    {
+      "slot_id": "conceptual-code-retrieval",
+      "current_choice": null,
+      "status": "PENDING_G5_FINAL_CHOICE",
+      "prior_documented_choice": "socraticode",
+      "alternatives": [
+        {
+          "tool_id": "semble",
+          "ranking": "pending G5",
+          "disposition": "alternative_pending_G5_not_parallel_default"
+        }
+      ],
+      "checked_at": "2026-10-09",
+      "overturn_when": "G5 upstream evidence or a vendor release changes the job/quality/transport contract; retain dated primary sources and re-open only the affected slot"
+    },
+    {
+      "slot_id": "bounded-output-processing",
+      "current_choice": null,
+      "status": "PENDING_G5_FINAL_CHOICE",
+      "prior_documented_choice": "context-mode",
+      "alternatives": [
+        {
+          "tool_id": "headroom",
+          "ranking": "pending G5",
+          "disposition": "alternative_pending_G5_not_parallel_default"
+        }
+      ],
+      "checked_at": "2026-10-09",
+      "overturn_when": "G5 upstream evidence or a vendor release changes the job/quality/transport contract; retain dated primary sources and re-open only the affected slot"
+    },
+    {
+      "slot_id": "command-output-formatting",
+      "current_choice": null,
+      "status": "PENDING_G5_FINAL_CHOICE",
+      "prior_documented_choice": "rtk",
+      "alternatives": [],
+      "checked_at": "2026-10-09",
+      "overturn_when": "G5 upstream evidence or a vendor release changes the job/quality/transport contract; retain dated primary sources and re-open only the affected slot"
+    },
+    {
+      "slot_id": "browser-inspection",
+      "current_choice": null,
+      "status": "PENDING_G5_FINAL_CHOICE",
+      "prior_documented_choice": "chrome-devtools",
+      "alternatives": [],
+      "checked_at": "2026-10-09",
+      "overturn_when": "G5 upstream evidence or a vendor release changes the job/quality/transport contract; retain dated primary sources and re-open only the affected slot"
+    },
+    {
+      "slot_id": "llm-evaluation",
+      "current_choice": null,
+      "status": "PENDING_G5_FINAL_CHOICE",
+      "prior_documented_choice": "promptfoo",
+      "alternatives": [],
+      "checked_at": "2026-10-09",
+      "overturn_when": "G5 upstream evidence or a vendor release changes the job/quality/transport contract; retain dated primary sources and re-open only the affected slot"
+    },
+    {
+      "slot_id": "operational-observation",
+      "current_choice": null,
+      "status": "PENDING_G5_FINAL_CHOICE",
+      "prior_documented_choice": "grafana-observation",
+      "alternatives": [],
+      "checked_at": "2026-10-09",
+      "overturn_when": "G5 upstream evidence or a vendor release changes the job/quality/transport contract; retain dated primary sources and re-open only the affected slot"
+    },
+    {
+      "slot_id": "agent-coordination",
+      "current_choice": null,
+      "status": "PENDING_G5_FINAL_CHOICE",
+      "prior_documented_choice": "hcom",
+      "alternatives": [],
+      "checked_at": "2026-10-09",
+      "overturn_when": "G5 upstream evidence or a vendor release changes the job/quality/transport contract; retain dated primary sources and re-open only the affected slot"
+    },
+    {
+      "slot_id": "git-github-operations",
+      "current_choice": null,
+      "status": "PENDING_G5_FINAL_CHOICE",
+      "prior_documented_choice": "git-gh",
+      "alternatives": [],
+      "checked_at": "2026-10-09",
+      "overturn_when": "G5 upstream evidence or a vendor release changes the job/quality/transport contract; retain dated primary sources and re-open only the affected slot"
+    }
+  ],
+  "mcp_sets": [
+    {
+      "set_id": "FULL",
+      "components_review_contract": [
+        "ai-memory",
+        "context-mode",
+        "headroom",
+        "hindsight",
+        "qmd",
+        "semble",
+        "serena",
+        "codebase-memory-mcp",
+        "jcodemunch",
+        "socraticode",
+        "chrome-devtools",
+        "promptfoo"
+      ],
+      "disabled_native_aliases": [],
+      "cbm_profile": "all",
+      "evidence": "A-control",
+      "status": "one observed full-base run; entire runtime base not enumerated by this record"
+    },
+    {
+      "set_id": "ENGINEERING",
+      "components_review_contract": [
+        "ai-memory",
+        "context-mode",
+        "headroom",
+        "hindsight",
+        "qmd",
+        "semble",
+        "serena",
+        "codebase-memory-mcp",
+        "jcodemunch",
+        "socraticode"
+      ],
+      "disabled_native_aliases": [
+        "chrome-devtools",
+        "promptfoo"
+      ],
+      "cbm_profile": "all",
+      "evidence": "role-review",
+      "status": "source-reviewed contract; not trialed"
+    },
+    {
+      "set_id": "REVIEW",
+      "components_review_contract": [
+        "ai-memory",
+        "context-mode",
+        "headroom",
+        "hindsight",
+        "qmd",
+        "semble",
+        "serena",
+        "codebase-memory-mcp",
+        "jcodemunch",
+        "socraticode"
+      ],
+      "disabled_native_aliases": [
+        "chrome-devtools",
+        "promptfoo"
+      ],
+      "cbm_profile": "analysis",
+      "evidence": "role-review",
+      "status": "source-reviewed contract; not trialed"
+    },
+    {
+      "set_id": "SCOUT",
+      "components_review_contract": [
+        "ai-memory",
+        "context-mode",
+        "headroom",
+        "hindsight",
+        "qmd",
+        "semble",
+        "serena",
+        "codebase-memory-mcp"
+      ],
+      "disabled_native_aliases": [
+        "chrome-devtools",
+        "promptfoo",
+        "jcodemunch",
+        "socraticode"
+      ],
+      "cbm_profile": "scout",
+      "evidence": "B-scout",
+      "status": "one observed run; paired acceptance pending"
+    },
+    {
+      "set_id": "ARTIFACT",
+      "components_review_contract": [
+        "ai-memory",
+        "context-mode",
+        "headroom",
+        "hindsight",
+        "qmd",
+        "semble",
+        "serena"
+      ],
+      "disabled_native_aliases": [
+        "chrome-devtools",
+        "promptfoo",
+        "jcodemunch",
+        "socraticode",
+        "codebase-memory-mcp"
+      ],
+      "cbm_profile": "off",
+      "evidence": "B-artifact",
+      "status": "one observed run; paired acceptance pending"
+    },
+    {
+      "set_id": "EVALUATION",
+      "components_review_contract": [
+        "ai-memory",
+        "context-mode",
+        "headroom",
+        "hindsight",
+        "qmd",
+        "semble",
+        "serena",
+        "codebase-memory-mcp",
+        "jcodemunch",
+        "socraticode",
+        "promptfoo"
+      ],
+      "disabled_native_aliases": [
+        "chrome-devtools"
+      ],
+      "cbm_profile": "analysis",
+      "evidence": "role-review",
+      "status": "source-reviewed contract; not trialed"
+    },
+    {
+      "set_id": "TOKEN-PARITY-PARENT",
+      "components_review_contract": [
+        "ai-memory",
+        "context-mode",
+        "headroom",
+        "hindsight",
+        "semble",
+        "serena",
+        "chrome-devtools",
+        "promptfoo"
+      ],
+      "disabled_native_aliases": [
+        "socraticode",
+        "jcodemunch",
+        "qmd",
+        "codebase-memory-mcp"
+      ],
+      "cbm_profile": "off",
+      "evidence": "C-token-parity",
+      "status": "explicit phase-specific trial exception; no fleet default change"
+    }
+  ],
+  "roles": [
+    {
+      "role_id": "CC",
+      "expectation_basis": "Documented job/authority; tool mapping is a derived candidate where the role source does not prescribe a tool. No runtime grant or mandatory call is inferred.",
+      "role_slot": "coordinator",
+      "definition": "docs/command-center.md:9-30,45-61,137-155",
+      "expected_tool_ids": [
+        "ai-memory",
+        "qmd",
+        "context-mode",
+        "hcom",
+        "git-gh",
+        "grafana-observation"
+      ],
+      "conditional_alternatives": [],
+      "expectation_evidence_class": "source_review",
+      "process_set_contract": [
+        "FULL"
+      ],
+      "deployment_status": "unchanged; role-table does not apply a launch delta",
+      "exact_effective_host_mcp_set": "unmeasured",
+      "native_child_scope": "tool/instruction carrier is separate from independent-process MCP startup selection",
+      "snapshot_binding": "unknown; wsl-architecture-design bucket alias unverified",
+      "per_tool_memory_reference": "tools[].stages.wiring.memory",
+      "shared_copy_reference": "tools[].stages.wiring.shared_copy",
+      "fresh_session_task": {
+        "natural_task": "Decide the next foundation action from the dated lane records and explain the evidence and remaining gate.",
+        "status": "not run by this record",
+        "prompt_contains_tool_names": false
+      },
+      "remaining_gaps": []
+    },
+    {
+      "role_id": "co-op",
+      "expectation_basis": "Documented job/authority; tool mapping is a derived candidate where the role source does not prescribe a tool. No runtime grant or mandatory call is inferred.",
+      "role_slot": "coordination-and-observation",
+      "definition": "private-role-coop",
+      "expected_tool_ids": [
+        "context-mode",
+        "hcom",
+        "git-gh",
+        "grafana-observation",
+        "chrome-devtools"
+      ],
+      "conditional_alternatives": [],
+      "expectation_evidence_class": "source_review",
+      "process_set_contract": [
+        "FULL"
+      ],
+      "deployment_status": "unchanged; role-table does not apply a launch delta",
+      "exact_effective_host_mcp_set": "unmeasured",
+      "native_child_scope": "tool/instruction carrier is separate from independent-process MCP startup selection",
+      "snapshot_binding": "ns2604-coop",
+      "per_tool_memory_reference": "tools[].stages.wiring.memory",
+      "shared_copy_reference": "tools[].stages.wiring.shared_copy",
+      "fresh_session_task": {
+        "natural_task": "Compare the lane checkpoint with its accepted source and report discrepancies and current readiness.",
+        "status": "not run by this record",
+        "prompt_contains_tool_names": false
+      },
+      "remaining_gaps": []
+    },
+    {
+      "role_id": "lander-5f",
+      "expectation_basis": "Documented job/authority; tool mapping is a derived candidate where the role source does not prescribe a tool. No runtime grant or mandatory call is inferred.",
+      "role_slot": "exact-head-landing",
+      "definition": "private-role-lander",
+      "expected_tool_ids": [
+        "git-gh",
+        "context-mode",
+        "hcom"
+      ],
+      "conditional_alternatives": [],
+      "expectation_evidence_class": "source_review",
+      "process_set_contract": [
+        "ARTIFACT"
+      ],
+      "deployment_status": "unchanged; role-table does not apply a launch delta",
+      "exact_effective_host_mcp_set": "unmeasured",
+      "native_child_scope": "tool/instruction carrier is separate from independent-process MCP startup selection",
+      "snapshot_binding": "unknown; no dedicated snapshot bucket",
+      "per_tool_memory_reference": "tools[].stages.wiring.memory",
+      "shared_copy_reference": "tools[].stages.wiring.shared_copy",
+      "fresh_session_task": {
+        "natural_task": "Assess the cued head against required checks and unresolved threads; report the landing gate.",
+        "status": "not run by this record",
+        "prompt_contains_tool_names": false
+      },
+      "remaining_gaps": []
+    },
+    {
+      "role_id": "99",
+      "expectation_basis": "Documented job/authority; tool mapping is a derived candidate where the role source does not prescribe a tool. No runtime grant or mandatory call is inferred.",
+      "role_slot": "bounded-engineering-investigation",
+      "definition": "private-role-99",
+      "expected_tool_ids": [
+        "context-mode",
+        "serena",
+        "codebase-memory-mcp",
+        "socraticode",
+        "ai-memory",
+        "git-gh"
+      ],
+      "conditional_alternatives": [],
+      "expectation_evidence_class": "source_review",
+      "process_set_contract": [
+        "ENGINEERING",
+        "REVIEW"
+      ],
+      "deployment_status": "unchanged; role-table does not apply a launch delta",
+      "exact_effective_host_mcp_set": "unmeasured",
+      "native_child_scope": "tool/instruction carrier is separate from independent-process MCP startup selection",
+      "snapshot_binding": "unknown; no dedicated snapshot bucket",
+      "per_tool_memory_reference": "tools[].stages.wiring.memory",
+      "shared_copy_reference": "tools[].stages.wiring.shared_copy",
+      "fresh_session_task": {
+        "natural_task": "Trace the reported streaming discrepancy through the pinned source and prepare a cited correction.",
+        "status": "not run by this record",
+        "prompt_contains_tool_names": false
+      },
+      "remaining_gaps": []
+    },
+    {
+      "role_id": "api-actions",
+      "expectation_basis": "Documented job/authority; tool mapping is a derived candidate where the role source does not prescribe a tool. No runtime grant or mandatory call is inferred.",
+      "role_slot": "independent-hook-review",
+      "definition": "private-role-lander",
+      "expected_tool_ids": [
+        "context-mode",
+        "serena",
+        "git-gh"
+      ],
+      "conditional_alternatives": [],
+      "expectation_evidence_class": "source_review",
+      "process_set_contract": [
+        "REVIEW"
+      ],
+      "deployment_status": "unchanged; role-table does not apply a launch delta",
+      "exact_effective_host_mcp_set": "unmeasured",
+      "native_child_scope": "tool/instruction carrier is separate from independent-process MCP startup selection",
+      "snapshot_binding": "api-actions",
+      "per_tool_memory_reference": "tools[].stages.wiring.memory",
+      "shared_copy_reference": "tools[].stages.wiring.shared_copy",
+      "fresh_session_task": {
+        "natural_task": "Review the supplied hook change against original source and identify defects or missing evidence.",
+        "status": "not run by this record",
+        "prompt_contains_tool_names": false
+      },
+      "remaining_gaps": [
+        "independent reviewer task evidenced; full carrier definition not established"
+      ]
+    },
+    {
+      "role_id": "codex-builder",
+      "expectation_basis": "Documented job/authority; tool mapping is a derived candidate where the role source does not prescribe a tool. No runtime grant or mandatory call is inferred.",
+      "role_slot": "bounded-implementation",
+      "definition": "adoption/agents/codex/workers/isolated-builder.toml:16-26",
+      "expected_tool_ids": [
+        "context-mode",
+        "serena",
+        "ai-memory",
+        "git-gh",
+        "rtk"
+      ],
+      "conditional_alternatives": [],
+      "expectation_evidence_class": "source_review",
+      "process_set_contract": [
+        "ENGINEERING"
+      ],
+      "deployment_status": "unchanged; role-table does not apply a launch delta",
+      "exact_effective_host_mcp_set": "unmeasured",
+      "native_child_scope": "tool/instruction carrier is separate from independent-process MCP startup selection",
+      "snapshot_binding": "unknown; no role-to-lane registry binding",
+      "per_tool_memory_reference": "tools[].stages.wiring.memory",
+      "shared_copy_reference": "tools[].stages.wiring.shared_copy",
+      "fresh_session_task": {
+        "natural_task": "Implement the bounded source change in the assigned checkout and return the relevant check results.",
+        "status": "not run by this record",
+        "prompt_contains_tool_names": false
+      },
+      "remaining_gaps": []
+    },
+    {
+      "role_id": "codex-reader",
+      "expectation_basis": "Documented job/authority; tool mapping is a derived candidate where the role source does not prescribe a tool. No runtime grant or mandatory call is inferred.",
+      "role_slot": "original-source-review",
+      "definition": "adoption/agents/codex/workers/evidence-reviewer.toml:13-26; adoption/agents/codex/stack-verifier.toml:10-25",
+      "expected_tool_ids": [
+        "context-mode",
+        "serena",
+        "ai-memory",
+        "git-gh",
+        "rtk"
+      ],
+      "conditional_alternatives": [],
+      "expectation_evidence_class": "source_review",
+      "process_set_contract": [
+        "ARTIFACT",
+        "REVIEW"
+      ],
+      "deployment_status": "unchanged; role-table does not apply a launch delta",
+      "exact_effective_host_mcp_set": "unmeasured",
+      "native_child_scope": "tool/instruction carrier is separate from independent-process MCP startup selection",
+      "snapshot_binding": "unknown; evidence-reviewer versus stack-verifier alias unresolved",
+      "per_tool_memory_reference": "tools[].stages.wiring.memory",
+      "shared_copy_reference": "tools[].stages.wiring.shared_copy",
+      "fresh_session_task": {
+        "natural_task": "Review the supplied patch and returned check evidence against the cited original source.",
+        "status": "not run by this record",
+        "prompt_contains_tool_names": false
+      },
+      "remaining_gaps": [
+        "resolve reviewer/verifier alias"
+      ]
+    },
+    {
+      "role_id": "codex-researcher",
+      "expectation_basis": "Documented job/authority; tool mapping is a derived candidate where the role source does not prescribe a tool. No runtime grant or mandatory call is inferred.",
+      "conditional_native_modality": "Native web discovery when the brief needs external sources, followed by context-mode ctx_fetch_and_index/ctx_search; stack-researcher.toml:20. No new web MCP candidate.",
+      "role_slot": "bounded-primary-source-research",
+      "definition": "adoption/agents/codex/stack-researcher.toml:10-26",
+      "expected_tool_ids": [
+        "context-mode",
+        "qmd",
+        "ai-memory",
+        "serena",
+        "socraticode"
+      ],
+      "conditional_alternatives": [
+        "jcodemunch"
+      ],
+      "expectation_evidence_class": "source_review",
+      "process_set_contract": [
+        "ENGINEERING"
+      ],
+      "deployment_status": "unchanged; role-table does not apply a launch delta",
+      "exact_effective_host_mcp_set": "unmeasured",
+      "native_child_scope": "tool/instruction carrier is separate from independent-process MCP startup selection",
+      "snapshot_binding": "unknown; no role-to-lane registry binding",
+      "per_tool_memory_reference": "tools[].stages.wiring.memory",
+      "shared_copy_reference": "tools[].stages.wiring.shared_copy",
+      "fresh_session_task": {
+        "natural_task": "Resolve one bounded architecture question from the named upstream sources and cite the decisive facts.",
+        "status": "not run by this record",
+        "prompt_contains_tool_names": false
+      },
+      "remaining_gaps": []
+    },
+    {
+      "role_id": "codex-scout",
+      "expectation_basis": "Documented job/authority; tool mapping is a derived candidate where the role source does not prescribe a tool. No runtime grant or mandatory call is inferred.",
+      "role_slot": "positive-structural-discovery",
+      "definition": "role-trial; scout-result",
+      "expected_tool_ids": [
+        "codebase-memory-mcp",
+        "context-mode",
+        "git-gh"
+      ],
+      "conditional_alternatives": [],
+      "expectation_evidence_class": "source_review",
+      "process_set_contract": [
+        "SCOUT"
+      ],
+      "deployment_status": "unchanged; role-table does not apply a launch delta",
+      "exact_effective_host_mcp_set": "unmeasured",
+      "native_child_scope": "tool/instruction carrier is separate from independent-process MCP startup selection",
+      "snapshot_binding": "unknown; lane participant observed, native Codex source-scout carrier not established",
+      "per_tool_memory_reference": "tools[].stages.wiring.memory",
+      "shared_copy_reference": "tools[].stages.wiring.shared_copy",
+      "fresh_session_task": {
+        "natural_task": "Locate the dispatch entry in the named hook and compare its observed relationships with original source.",
+        "status": "not run by this record",
+        "prompt_contains_tool_names": false
+      },
+      "remaining_gaps": [
+        "native Codex scout carrier not established; trial proves independent-process role only"
+      ]
+    },
+    {
+      "role_id": "exec-readers",
+      "expectation_basis": "Documented job/authority; tool mapping is a derived candidate where the role source does not prescribe a tool. No runtime grant or mandatory call is inferred.",
+      "role_slot": "bounded-delta-and-contract-review",
+      "definition": "private-role-exec",
+      "expected_tool_ids": [
+        "context-mode",
+        "git-gh"
+      ],
+      "conditional_alternatives": [],
+      "expectation_evidence_class": "source_review",
+      "process_set_contract": [
+        "ARTIFACT",
+        "REVIEW"
+      ],
+      "deployment_status": "unchanged; role-table does not apply a launch delta",
+      "exact_effective_host_mcp_set": "unmeasured",
+      "native_child_scope": "tool/instruction carrier is separate from independent-process MCP startup selection",
+      "snapshot_binding": "exec readers aggregate; no common native carrier proven",
+      "per_tool_memory_reference": "tools[].stages.wiring.memory",
+      "shared_copy_reference": "tools[].stages.wiring.shared_copy",
+      "fresh_session_task": {
+        "natural_task": "Compare the supplied base, changed source and verification records, and report concrete defects and gaps.",
+        "status": "not run by this record",
+        "prompt_contains_tool_names": false
+      },
+      "remaining_gaps": []
+    }
+  ],
+  "tools": [
+    {
+      "tool_id": "ai-memory",
+      "repository": "https://github.com/akitaonrails/ai-memory",
+      "version": "2.4.1",
+      "source_pin": "433a19f3d54dea287571b1423591db2a89965fa9",
+      "evidence_class": "source_review",
+      "stages": {
+        "final_candidate": {
+          "status": "PENDING_G5",
+          "slot_id": "coding-decisions",
+          "prior_disposition": "current-documented-choice",
+          "catalog_locator": "catalogs/landscape/foundation.json#/layers/durable-memory",
+          "overlap_disposition": "one prior documented choice; final slot adjudication pending G5"
+        },
+        "wiring": {
+          "status": "record_existing_contract_only",
+          "install_source": "https://github.com/akitaonrails/ai-memory/blob/433a19f3d54dea287571b1423591db2a89965fa9/README.md#L197",
+          "install_commands": [
+            "gh release download v2.4.1 --repo akitaonrails/ai-memory --pattern ai-memory-linux-x86_64.tar.gz --dir \"$OWNED_DOWNLOAD_DIR\"",
+            "tar -xf \"$OWNED_DOWNLOAD_DIR/ai-memory-linux-x86_64.tar.gz\" -C \"$OWNED_PREFIX\""
+          ],
+          "integration": "ai-memory serve; native install-mcp --client codex / claude-code",
+          "recipe": "recipes/README.md#project-memory",
+          "inverse_source": "adoption/lifecycle.md#native-client-integration-and-process-lifecycle",
+          "inverse_policy_ref": "stage_policy.inverse_scope",
+          "memory": {
+            "per_session_pss_kb": null,
+            "status": "unmeasured",
+            "source_id": "role-trial",
+            "attribution": "lane totals have no tool binding"
+          },
+          "shared_copy": {
+            "capability": "native_shared_http",
+            "source": "https://github.com/akitaonrails/ai-memory/blob/433a19f3d54dea287571b1423591db2a89965fa9/docs/install.md#L83",
+            "evidence_class": "source_review",
+            "fresh_concurrent_client_acceptance": "unmeasured"
+          },
+          "role_loading": "unchanged until paired runs; stage_policy.alwaysLoad_false",
+          "portable_or_inspected_transport": "http"
+        },
+        "fresh_session": {
+          "status": "unmeasured",
+          "natural_tasks_ref": "roles[].fresh_session_task"
+        },
+        "invoke_measurement": {
+          "source_id": "invoke-snapshot",
+          "baseline_date": "2026-10-08",
+          "baseline_status": "unmeasured_missing_named_baseline",
+          "delta": null
+        }
+      },
+      "outcome": "DEFER_new_adoption_claims",
+      "adopt_now": false,
+      "supplemental_source_review": {
+        "version": "2.5.2",
+        "source_pin": "7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83",
+        "runtime_acceptance": "separate new-WSL selection, not base2.4.1 acceptance"
+      }
+    },
+    {
+      "tool_id": "qmd",
+      "repository": "https://github.com/tobi/qmd",
+      "version": "2.8.3",
+      "source_pin": "facd35e01359e59d938bc9418e93fb9318addee3",
+      "evidence_class": "source_review",
+      "stages": {
+        "final_candidate": {
+          "status": "PENDING_G5",
+          "slot_id": "scoped-documents",
+          "prior_disposition": "current-documented-choice",
+          "catalog_locator": "catalogs/landscape/foundation.json#/layers/document-retrieval",
+          "overlap_disposition": "one prior documented choice; final slot adjudication pending G5"
+        },
+        "wiring": {
+          "status": "record_existing_contract_only",
+          "install_source": "https://github.com/tobi/qmd/blob/facd35e01359e59d938bc9418e93fb9318addee3/README.md#L32",
+          "install_commands": [
+            "npm install --global --prefix \"$OWNED_PREFIX\" @tobilu/qmd@2.8.3"
+          ],
+          "integration": "qmd --index <selected-index> mcp --http --host 127.0.0.1 --port 21851",
+          "recipe": "docs/decisions/2026-10-08-qmd-shared-mcp.md",
+          "inverse_source": "adoption/lifecycle.md#native-client-integration-and-process-lifecycle",
+          "inverse_policy_ref": "stage_policy.inverse_scope",
+          "memory": {
+            "per_session_pss_kb": null,
+            "status": "unmeasured",
+            "source_id": "role-trial",
+            "attribution": "lane totals have no tool binding"
+          },
+          "shared_copy": {
+            "capability": "native_shared_http",
+            "source": "https://github.com/tobi/qmd/blob/facd35e01359e59d938bc9418e93fb9318addee3/README.md#L132",
+            "evidence_class": "source_review",
+            "fresh_concurrent_client_acceptance": "unmeasured"
+          },
+          "role_loading": "unchanged until paired runs; stage_policy.alwaysLoad_false",
+          "portable_or_inspected_transport": "http"
+        },
+        "fresh_session": {
+          "status": "unmeasured",
+          "natural_tasks_ref": "roles[].fresh_session_task"
+        },
+        "invoke_measurement": {
+          "source_id": "invoke-snapshot",
+          "baseline_date": "2026-10-08",
+          "baseline_status": "unmeasured_missing_named_baseline",
+          "delta": null
+        }
+      },
+      "outcome": "DEFER_new_adoption_claims",
+      "adopt_now": false
+    },
+    {
+      "tool_id": "serena",
+      "repository": "https://github.com/oraios/serena",
+      "version": "2.0.0.dev0",
+      "source_pin": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+      "evidence_class": "source_review",
+      "stages": {
+        "final_candidate": {
+          "status": "PENDING_G5",
+          "slot_id": "exact-source-navigation",
+          "prior_disposition": "current-documented-choice",
+          "catalog_locator": "catalogs/landscape/foundation.json#/layers/code-navigation",
+          "overlap_disposition": "one prior documented choice; final slot adjudication pending G5"
+        },
+        "wiring": {
+          "status": "record_existing_contract_only",
+          "install_source": "https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/README.md#L220",
+          "install_commands": [
+            "UV_TOOL_DIR=\"$OWNED_PREFIX/uv-tools\" UV_TOOL_BIN_DIR=\"$OWNED_PREFIX/bin\" uv tool install --python 3.13 git+https://github.com/oraios/serena@c6fbd1c5932df2494ffa0020af5a9fbe80b82143"
+          ],
+          "integration": "serena start-mcp-server --transport stdio --project-from-cwd --context <client>",
+          "recipe": "docs/decisions/2026-10-07-serena-jcodemunch-native-navigation-wiring.md",
+          "inverse_source": "adoption/lifecycle.md#native-client-integration-and-process-lifecycle",
+          "inverse_policy_ref": "stage_policy.inverse_scope",
+          "memory": {
+            "per_session_pss_kb": null,
+            "status": "unmeasured",
+            "source_id": "role-trial",
+            "attribution": "lane totals have no tool binding"
+          },
+          "shared_copy": {
+            "capability": "native_http_same_worktree_conditional",
+            "source": "https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/src/serena/mcp.py#L380",
+            "evidence_class": "source_review",
+            "fresh_concurrent_client_acceptance": "unmeasured"
+          },
+          "role_loading": "unchanged until paired runs; stage_policy.alwaysLoad_false",
+          "portable_or_inspected_transport": "stdio"
+        },
+        "fresh_session": {
+          "status": "unmeasured",
+          "natural_tasks_ref": "roles[].fresh_session_task"
+        },
+        "invoke_measurement": {
+          "source_id": "invoke-snapshot",
+          "baseline_date": "2026-10-08",
+          "baseline_status": "unmeasured_missing_named_baseline",
+          "delta": null
+        }
+      },
+      "outcome": "DEFER_new_adoption_claims",
+      "adopt_now": false
+    },
+    {
+      "tool_id": "codebase-memory-mcp",
+      "repository": "https://github.com/DeusData/codebase-memory-mcp",
+      "version": "0.11.0",
+      "source_pin": "8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798",
+      "evidence_class": "source_review",
+      "stages": {
+        "final_candidate": {
+          "status": "PENDING_G5",
+          "slot_id": "static-relationships",
+          "prior_disposition": "current-documented-choice",
+          "catalog_locator": "catalogs/landscape/foundation.json#/layers/code-navigation",
+          "overlap_disposition": "one prior documented choice; final slot adjudication pending G5"
+        },
+        "wiring": {
+          "status": "record_existing_contract_only",
+          "install_source": "https://github.com/DeusData/codebase-memory-mcp/blob/8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798/README.md#L44",
+          "install_commands": [
+            "gh release download v0.11.0 --repo DeusData/codebase-memory-mcp --pattern codebase-memory-mcp-linux-amd64.tar.gz --dir \"$OWNED_DOWNLOAD_DIR\"",
+            "tar -xf \"$OWNED_DOWNLOAD_DIR/codebase-memory-mcp-linux-amd64.tar.gz\" -C \"$OWNED_PREFIX\""
+          ],
+          "integration": "codebase-memory-mcp [--tool-profile=scout|analysis]",
+          "recipe": "recipes/README.md#static-code-graph",
+          "inverse_source": "adoption/lifecycle.md#native-client-integration-and-process-lifecycle",
+          "inverse_policy_ref": "stage_policy.inverse_scope",
+          "memory": {
+            "per_session_pss_kb": null,
+            "status": "unmeasured",
+            "source_id": "role-trial",
+            "attribution": "lane totals have no tool binding"
+          },
+          "shared_copy": {
+            "capability": "shared_daemon_per_session_stdio",
+            "source": "https://github.com/DeusData/codebase-memory-mcp/blob/8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798/README.md#L114",
+            "evidence_class": "source_review",
+            "fresh_concurrent_client_acceptance": "unmeasured"
+          },
+          "role_loading": "unchanged until paired runs; stage_policy.alwaysLoad_false",
+          "portable_or_inspected_transport": "stdio"
+        },
+        "fresh_session": {
+          "status": "unmeasured",
+          "natural_tasks_ref": "roles[].fresh_session_task"
+        },
+        "invoke_measurement": {
+          "source_id": "invoke-snapshot",
+          "baseline_date": "2026-10-08",
+          "baseline_status": "unmeasured_missing_named_baseline",
+          "delta": null
+        }
+      },
+      "outcome": "DEFER_new_adoption_claims",
+      "adopt_now": false
+    },
+    {
+      "tool_id": "socraticode",
+      "repository": "https://github.com/giancarloerra/SocratiCode",
+      "version": "1.15.0",
+      "source_pin": "f6191f076a42405f0d5508139f3a8b505cfef93a",
+      "evidence_class": "source_review",
+      "stages": {
+        "final_candidate": {
+          "status": "PENDING_G5",
+          "slot_id": "conceptual-code-retrieval",
+          "prior_disposition": "current-documented-choice",
+          "catalog_locator": "catalogs/landscape/foundation.json#/layers/semantic-rag",
+          "overlap_disposition": "one prior documented choice; final slot adjudication pending G5"
+        },
+        "wiring": {
+          "status": "record_existing_contract_only",
+          "install_source": "https://github.com/giancarloerra/SocratiCode/blob/f6191f076a42405f0d5508139f3a8b505cfef93a/README.md#L89",
+          "install_commands": [
+            "npm install --global --prefix \"$OWNED_PREFIX\" --ignore-scripts --before=2026-09-24T12:00:00Z socraticode@1.15.0"
+          ],
+          "integration": "documented local stdio launch with the selected embedding/Qdrant configuration",
+          "recipe": "recipes/README.md#local-semantic-code-search",
+          "inverse_source": "adoption/lifecycle.md#native-client-integration-and-process-lifecycle",
+          "inverse_policy_ref": "stage_policy.inverse_scope",
+          "memory": {
+            "per_session_pss_kb": null,
+            "status": "unmeasured",
+            "source_id": "role-trial",
+            "attribution": "lane totals have no tool binding"
+          },
+          "shared_copy": {
+            "capability": "stdio_frontend_shared_backends_only",
+            "source": "https://github.com/giancarloerra/SocratiCode/blob/f6191f076a42405f0d5508139f3a8b505cfef93a/src/index.ts#L467",
+            "evidence_class": "source_review",
+            "fresh_concurrent_client_acceptance": "unmeasured"
+          },
+          "role_loading": "unchanged until paired runs; stage_policy.alwaysLoad_false",
+          "portable_or_inspected_transport": "stdio"
+        },
+        "fresh_session": {
+          "status": "unmeasured",
+          "natural_tasks_ref": "roles[].fresh_session_task"
+        },
+        "invoke_measurement": {
+          "source_id": "invoke-snapshot",
+          "baseline_date": "2026-10-08",
+          "baseline_status": "unmeasured_missing_named_baseline",
+          "delta": null
+        }
+      },
+      "outcome": "DEFER_new_adoption_claims",
+      "adopt_now": false,
+      "supplemental_source_review": {
+        "version": "1.16.0",
+        "source_pin": "3d3a4a4d427cb0f29de4f5dd1360da52896f62df",
+        "runtime_acceptance": "not transferred from base1.15.0"
+      }
+    },
+    {
+      "tool_id": "jcodemunch",
+      "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+      "version": "1.108.327",
+      "source_pin": "6d5ae86c130f96624e2ca2d797fa3b853c210b9d",
+      "evidence_class": "source_review",
+      "stages": {
+        "final_candidate": {
+          "status": "PENDING_G5",
+          "slot_id": "exact-source-navigation",
+          "prior_disposition": "alternative_pending_G5",
+          "catalog_locator": "catalogs/landscape/foundation.json#/layers/code-navigation",
+          "overlap_disposition": "alternative; no parallel default"
+        },
+        "wiring": {
+          "status": "record_existing_contract_only",
+          "install_source": "https://github.com/jgravelle/jcodemunch-mcp/blob/6d5ae86c130f96624e2ca2d797fa3b853c210b9d/README.md#L80",
+          "install_commands": [
+            "UV_TOOL_DIR=\"$OWNED_PREFIX/uv-tools\" UV_TOOL_BIN_DIR=\"$OWNED_PREFIX/bin\" uv tool install --python 3.13 jcodemunch-mcp==1.108.327"
+          ],
+          "integration": "jcodemunch-mcp; native optional streamable-http as documented in CLIENTS.md",
+          "recipe": "recipes/README.md#focused-jcodemunch-retrieval",
+          "inverse_source": "adoption/lifecycle.md#native-client-integration-and-process-lifecycle",
+          "inverse_policy_ref": "stage_policy.inverse_scope",
+          "memory": {
+            "per_session_pss_kb": null,
+            "status": "unmeasured",
+            "source_id": "role-trial",
+            "attribution": "lane totals have no tool binding"
+          },
+          "shared_copy": {
+            "capability": "native_streamable_http_conditional",
+            "source": "https://github.com/jgravelle/jcodemunch-mcp/blob/6d5ae86c130f96624e2ca2d797fa3b853c210b9d/CLIENTS.md#L27",
+            "evidence_class": "source_review",
+            "fresh_concurrent_client_acceptance": "unmeasured"
+          },
+          "role_loading": "unchanged until paired runs; stage_policy.alwaysLoad_false",
+          "portable_or_inspected_transport": "stdio",
+          "http_extra_reference": "jcodemunch-mcp[http]==1.108.327, native pyproject.toml:84; dependencies and concurrent acceptance remain unmeasured"
+        },
+        "fresh_session": {
+          "status": "unmeasured",
+          "natural_tasks_ref": "roles[].fresh_session_task"
+        },
+        "invoke_measurement": {
+          "source_id": "invoke-snapshot",
+          "baseline_date": "2026-10-08",
+          "baseline_status": "unmeasured_missing_named_baseline",
+          "delta": null
+        }
+      },
+      "outcome": "DEFER_new_adoption_claims",
+      "adopt_now": false,
+      "supplemental_source_review": {
+        "version": "1.108.333",
+        "source_pin": "bbe30fa299c4f82251233f25b8a0c5c56e2d407a",
+        "runtime_acceptance": "not transferred from base1.108.327"
+      }
+    },
+    {
+      "tool_id": "semble",
+      "repository": "https://github.com/MinishLab/semble",
+      "version": "0.6.1",
+      "source_pin": "24497845460960db1839c8485319df189a889225",
+      "evidence_class": "source_review",
+      "stages": {
+        "final_candidate": {
+          "status": "PENDING_G5",
+          "slot_id": "conceptual-code-retrieval",
+          "prior_disposition": "alternative_pending_G5",
+          "catalog_locator": "catalogs/landscape/foundation.json#/layers/semantic-rag",
+          "overlap_disposition": "alternative; no parallel default"
+        },
+        "wiring": {
+          "status": "record_existing_contract_only",
+          "install_source": "https://github.com/MinishLab/semble/blob/24497845460960db1839c8485319df189a889225/docs/installation.md#L14",
+          "install_commands": [
+            "UV_TOOL_DIR=\"$OWNED_PREFIX/uv-tools\" UV_TOOL_BIN_DIR=\"$OWNED_PREFIX/bin\" uv tool install semble==0.6.1"
+          ],
+          "integration": "semble; native tool integration from docs/installation.md",
+          "recipe": "adoption/new-wsl/templates/codex.config.additions.toml",
+          "inverse_source": "adoption/lifecycle.md#native-client-integration-and-process-lifecycle",
+          "inverse_policy_ref": "stage_policy.inverse_scope",
+          "memory": {
+            "per_session_pss_kb": null,
+            "status": "unmeasured",
+            "source_id": "role-trial",
+            "attribution": "lane totals have no tool binding"
+          },
+          "shared_copy": {
+            "capability": "stdio_entrypoint_no_shared_http_established",
+            "source": "https://github.com/MinishLab/semble/blob/24497845460960db1839c8485319df189a889225/src/semble/mcp.py#L174",
+            "evidence_class": "source_review",
+            "fresh_concurrent_client_acceptance": "unmeasured"
+          },
+          "role_loading": "unchanged until paired runs; stage_policy.alwaysLoad_false",
+          "portable_or_inspected_transport": "stdio"
+        },
+        "fresh_session": {
+          "status": "unmeasured",
+          "natural_tasks_ref": "roles[].fresh_session_task"
+        },
+        "invoke_measurement": {
+          "source_id": "invoke-snapshot",
+          "baseline_date": "2026-10-08",
+          "baseline_status": "unmeasured_missing_named_baseline",
+          "delta": null
+        }
+      },
+      "outcome": "DEFER_new_adoption_claims",
+      "adopt_now": false
+    },
+    {
+      "tool_id": "context-mode",
+      "repository": "https://github.com/mksglu/context-mode",
+      "version": "1.0.169",
+      "source_pin": "6f0cc6841c687e754059f36714a11233fda1a02b",
+      "evidence_class": "source_review",
+      "stages": {
+        "final_candidate": {
+          "status": "PENDING_G5",
+          "slot_id": "bounded-output-processing",
+          "prior_disposition": "current-documented-choice",
+          "catalog_locator": "catalogs/landscape/foundation.json#/layers/token-efficiency",
+          "overlap_disposition": "one prior documented choice; final slot adjudication pending G5"
+        },
+        "wiring": {
+          "status": "record_existing_contract_only",
+          "install_source": "https://github.com/mksglu/context-mode/blob/6f0cc6841c687e754059f36714a11233fda1a02b/README.md#L60",
+          "install_commands": [
+            "npm install --global --prefix \"$OWNED_PREFIX\" context-mode@1.0.169"
+          ],
+          "integration": "node <pinned-package>/start.mjs for Codex; native plugin MCP for Claude",
+          "recipe": "recipes/README.md#retained-context-mode",
+          "inverse_source": "adoption/lifecycle.md#native-client-integration-and-process-lifecycle",
+          "inverse_policy_ref": "stage_policy.inverse_scope",
+          "memory": {
+            "per_session_pss_kb": null,
+            "status": "unmeasured",
+            "source_id": "role-trial",
+            "attribution": "lane totals have no tool binding"
+          },
+          "shared_copy": {
+            "capability": "per_session_stdio_no_shared_http_established",
+            "source": "https://github.com/mksglu/context-mode/blob/6f0cc6841c687e754059f36714a11233fda1a02b/src/server.ts#L4895",
+            "evidence_class": "source_review",
+            "fresh_concurrent_client_acceptance": "unmeasured"
+          },
+          "role_loading": "unchanged until paired runs; stage_policy.alwaysLoad_false",
+          "portable_or_inspected_transport": "stdio",
+          "plugin_install_references": [
+            "codex plugin marketplace add mksglu/context-mode --ref 6f0cc6841c687e754059f36714a11233fda1a02b --json",
+            "codex plugin add context-mode@context-mode --json",
+            "claude plugin marketplace add mksglu/context-mode --scope user",
+            "claude plugin install context-mode@context-mode --scope user --json"
+          ],
+          "plugin_pin_guard": "Native Claude marketplace command tracks its default branch; independently compare returned gitCommitSha to reviewed pin. Package identity, plugin identity and version label differ."
+        },
+        "fresh_session": {
+          "status": "unmeasured",
+          "natural_tasks_ref": "roles[].fresh_session_task"
+        },
+        "invoke_measurement": {
+          "source_id": "invoke-snapshot",
+          "baseline_date": "2026-10-08",
+          "baseline_status": "unmeasured_missing_named_baseline",
+          "delta": null
+        }
+      },
+      "outcome": "DEFER_new_adoption_claims",
+      "adopt_now": false
+    },
+    {
+      "tool_id": "headroom",
+      "repository": "https://github.com/headroomlabs-ai/headroom",
+      "version": "0.40.0",
+      "source_pin": "855390d6110e0bbb199d9b97025baac16c2f5cf3",
+      "evidence_class": "source_review",
+      "stages": {
+        "final_candidate": {
+          "status": "PENDING_G5",
+          "slot_id": "bounded-output-processing",
+          "prior_disposition": "alternative_pending_G5",
+          "catalog_locator": "catalogs/landscape/foundation.json#/layers/token-efficiency",
+          "overlap_disposition": "alternative; no parallel default"
+        },
+        "wiring": {
+          "status": "record_existing_contract_only",
+          "install_source": "https://github.com/headroomlabs-ai/headroom/blob/855390d6110e0bbb199d9b97025baac16c2f5cf3/README.md#L91",
+          "install_commands": [
+            "UV_TOOL_DIR=\"$OWNED_PREFIX/uv-tools\" UV_TOOL_BIN_DIR=\"$OWNED_PREFIX/bin\" uv tool install --python 3.13 'headroom-ai[mcp]==0.40.0'"
+          ],
+          "integration": "headroom mcp serve --proxy-url <selected-proxy>; native HTTP uses --transport http",
+          "recipe": "recipes/README.md#headroom-native-compression-and-recovery",
+          "inverse_source": "adoption/lifecycle.md#native-client-integration-and-process-lifecycle",
+          "inverse_policy_ref": "stage_policy.inverse_scope",
+          "memory": {
+            "per_session_pss_kb": null,
+            "status": "unmeasured",
+            "source_id": "role-trial",
+            "attribution": "lane totals have no tool binding"
+          },
+          "shared_copy": {
+            "capability": "native_streamable_http_conditional",
+            "source": "https://github.com/headroomlabs-ai/headroom/blob/855390d6110e0bbb199d9b97025baac16c2f5cf3/headroom/cli/mcp.py#L349",
+            "evidence_class": "source_review",
+            "fresh_concurrent_client_acceptance": "unmeasured"
+          },
+          "role_loading": "unchanged until paired runs; stage_policy.alwaysLoad_false",
+          "portable_or_inspected_transport": "stdio"
+        },
+        "fresh_session": {
+          "status": "unmeasured",
+          "natural_tasks_ref": "roles[].fresh_session_task"
+        },
+        "invoke_measurement": {
+          "source_id": "invoke-snapshot",
+          "baseline_date": "2026-10-08",
+          "baseline_status": "unmeasured_missing_named_baseline",
+          "delta": null
+        }
+      },
+      "outcome": "DEFER_new_adoption_claims",
+      "adopt_now": false
+    },
+    {
+      "tool_id": "hindsight",
+      "repository": "https://github.com/vectorize-io/hindsight",
+      "version": "0.10.2",
+      "source_pin": "5fc4ce20917b916240cef27c212c387a177f115b",
+      "evidence_class": "source_review",
+      "stages": {
+        "final_candidate": {
+          "status": "PENDING_G5",
+          "slot_id": "research-episodes",
+          "prior_disposition": "current-documented-distinct-scope",
+          "catalog_locator": "catalogs/landscape/foundation.json#/layers/durable-memory",
+          "overlap_disposition": "one prior documented choice; final slot adjudication pending G5"
+        },
+        "wiring": {
+          "status": "record_existing_contract_only",
+          "install_source": "https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/hindsight-docs/docs/developer/installation.md#L229",
+          "install_commands": [
+            "python3.13 -m venv \"$OWNED_PREFIX/venv\"",
+            "\"$OWNED_PREFIX/venv/bin/pip\" install hindsight-api==0.10.2 hindsight-client==0.10.2"
+          ],
+          "integration": "hindsight-api --host 127.0.0.1 --port <selected-port>; /mcp/<bank_id>/",
+          "recipe": "recipes/hindsight-research-memory.md",
+          "inverse_source": "adoption/lifecycle.md#native-client-integration-and-process-lifecycle",
+          "inverse_policy_ref": "stage_policy.inverse_scope",
+          "memory": {
+            "per_session_pss_kb": null,
+            "status": "unmeasured",
+            "source_id": "role-trial",
+            "attribution": "lane totals have no tool binding"
+          },
+          "shared_copy": {
+            "capability": "native_shared_bank_http",
+            "source": "https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/hindsight-docs/docs/developer/mcp-server.md#L11",
+            "evidence_class": "source_review",
+            "fresh_concurrent_client_acceptance": "unmeasured"
+          },
+          "role_loading": "unchanged until paired runs; stage_policy.alwaysLoad_false",
+          "portable_or_inspected_transport": "http"
+        },
+        "fresh_session": {
+          "status": "unmeasured",
+          "natural_tasks_ref": "roles[].fresh_session_task"
+        },
+        "invoke_measurement": {
+          "source_id": "invoke-snapshot",
+          "baseline_date": "2026-10-08",
+          "baseline_status": "unmeasured_missing_named_baseline",
+          "delta": null
+        }
+      },
+      "outcome": "DEFER_new_adoption_claims",
+      "adopt_now": false
+    },
+    {
+      "tool_id": "chrome-devtools",
+      "repository": "https://github.com/ChromeDevTools/chrome-devtools-mcp",
+      "version": "1.10.1",
+      "source_pin": "e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df",
+      "evidence_class": "source_review",
+      "stages": {
+        "final_candidate": {
+          "status": "PENDING_G5",
+          "slot_id": "browser-inspection",
+          "prior_disposition": "current-source-contract_pending_G5",
+          "catalog_locator": "catalogs/landscape/foundation.json#/layers/mcp-surfaces",
+          "overlap_disposition": "one prior documented choice; final slot adjudication pending G5"
+        },
+        "wiring": {
+          "status": "record_existing_contract_only",
+          "install_source": "https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/README.md#L74",
+          "install_commands": [
+            "npm install --prefix \"$OWNED_PREFIX\" chrome-devtools-mcp@1.10.1"
+          ],
+          "integration": "npx -y chrome-devtools-mcp@1.10.1 --headless --isolated --no-usage-statistics --no-performance-crux",
+          "recipe": "adoption/new-wsl/templates/claude-user.mcp.additions.json",
+          "inverse_source": "adoption/lifecycle.md#native-client-integration-and-process-lifecycle",
+          "inverse_policy_ref": "stage_policy.inverse_scope",
+          "memory": {
+            "per_session_pss_kb": null,
+            "status": "unmeasured",
+            "source_id": "role-trial",
+            "attribution": "lane totals have no tool binding"
+          },
+          "shared_copy": {
+            "capability": "stdio_frontend_browser_backend_distinct",
+            "source": "https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/src/bin/chrome-devtools-mcp-main.ts#L84",
+            "evidence_class": "source_review",
+            "fresh_concurrent_client_acceptance": "unmeasured"
+          },
+          "role_loading": "unchanged until paired runs; stage_policy.alwaysLoad_false",
+          "portable_or_inspected_transport": "stdio"
+        },
+        "fresh_session": {
+          "status": "unmeasured",
+          "natural_tasks_ref": "roles[].fresh_session_task"
+        },
+        "invoke_measurement": {
+          "source_id": "invoke-snapshot",
+          "baseline_date": "2026-10-08",
+          "baseline_status": "unmeasured_missing_named_baseline",
+          "delta": null
+        }
+      },
+      "outcome": "DEFER_new_adoption_claims",
+      "adopt_now": false
+    },
+    {
+      "tool_id": "promptfoo",
+      "repository": "https://github.com/promptfoo/promptfoo",
+      "version": "0.123.1",
+      "source_pin": "34f74d34e140b5e17d23770dfb2340057b1936b8",
+      "evidence_class": "source_review",
+      "stages": {
+        "final_candidate": {
+          "status": "PENDING_G5",
+          "slot_id": "llm-evaluation",
+          "prior_disposition": "current-source-contract_pending_G5",
+          "catalog_locator": "catalogs/landscape/foundation.json#/layers/quality-evaluation",
+          "overlap_disposition": "one prior documented choice; final slot adjudication pending G5"
+        },
+        "wiring": {
+          "status": "record_existing_contract_only",
+          "install_source": "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/README.md#L31",
+          "install_commands": [
+            "npm install --global --prefix \"$OWNED_PREFIX\" promptfoo@0.123.1"
+          ],
+          "integration": "promptfoo mcp --transport stdio; HTTP choice documented in src/commands/mcp/index.ts",
+          "recipe": "recipes/README.md",
+          "inverse_source": "adoption/lifecycle.md#native-client-integration-and-process-lifecycle",
+          "inverse_policy_ref": "stage_policy.inverse_scope",
+          "memory": {
+            "per_session_pss_kb": null,
+            "status": "unmeasured",
+            "source_id": "role-trial",
+            "attribution": "lane totals have no tool binding"
+          },
+          "shared_copy": {
+            "capability": "native_http_conditional_stateful_transport",
+            "source": "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/src/commands/mcp/server.ts#L135",
+            "evidence_class": "source_review",
+            "fresh_concurrent_client_acceptance": "unmeasured"
+          },
+          "role_loading": "unchanged until paired runs; stage_policy.alwaysLoad_false",
+          "portable_or_inspected_transport": "stdio"
+        },
+        "fresh_session": {
+          "status": "unmeasured",
+          "natural_tasks_ref": "roles[].fresh_session_task"
+        },
+        "invoke_measurement": {
+          "source_id": "invoke-snapshot",
+          "baseline_date": "2026-10-08",
+          "baseline_status": "unmeasured_missing_named_baseline",
+          "delta": null
+        }
+      },
+      "outcome": "DEFER_new_adoption_claims",
+      "adopt_now": false
+    },
+    {
+      "tool_id": "rtk",
+      "repository": "https://github.com/rtk-ai/rtk",
+      "version": "0.51.0",
+      "source_pin": "e001f773f80b22b7dc4c7a79521b30e35aaef026",
+      "evidence_class": "source_review",
+      "stages": {
+        "final_candidate": {
+          "status": "PENDING_G5",
+          "slot_id": "command-output-formatting",
+          "prior_disposition": "current-documented-choice",
+          "catalog_locator": "catalogs/landscape/foundation.json#/layers/token-efficiency",
+          "overlap_disposition": "one prior documented choice; final slot adjudication pending G5"
+        },
+        "wiring": {
+          "status": "record_existing_contract_only",
+          "install_source": "https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/README.md#L1",
+          "install_commands": null,
+          "integration": "rtk hook <selected-client>; existing hook configuration is preserved",
+          "recipe": "docs/token-practice.md",
+          "inverse_source": "adoption/lifecycle.md#native-client-integration-and-process-lifecycle",
+          "inverse_policy_ref": "stage_policy.inverse_scope",
+          "memory": {
+            "per_session_pss_kb": null,
+            "status": "unmeasured",
+            "source_id": "role-trial",
+            "attribution": "lane totals have no tool binding"
+          },
+          "shared_copy": {
+            "capability": "not_applicable_cli_hook",
+            "source": "https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/AWARENESS_CONFIG.md#L12",
+            "evidence_class": "source_review",
+            "fresh_concurrent_client_acceptance": "unmeasured"
+          },
+          "role_loading": "unchanged until paired runs; stage_policy.alwaysLoad_false",
+          "portable_or_inspected_transport": "not-MCP"
+        },
+        "fresh_session": {
+          "status": "unmeasured",
+          "natural_tasks_ref": "roles[].fresh_session_task"
+        },
+        "invoke_measurement": {
+          "source_id": "invoke-snapshot",
+          "baseline_date": "2026-10-08",
+          "baseline_status": "unmeasured_missing_named_baseline",
+          "delta": null
+        }
+      },
+      "outcome": "DEFER_new_adoption_claims",
+      "adopt_now": false
+    },
+    {
+      "tool_id": "grafana-observation",
+      "repository": "https://github.com/grafana/grafana",
+      "version": "13.2.3",
+      "source_pin": "6193dc03311b631b9727b560d24369e683dc396e",
+      "slot_id": "operational-observation",
+      "source": "docs/command-center.md#evidence-the-command-center-publishes",
+      "note": "Native Grafana HTTP service is distinct from an MCP connector; no exact MCP connector pin or registration was established.",
+      "evidence_class": "source_review",
+      "stages": {
+        "final_candidate": {
+          "status": "PENDING_G5",
+          "slot_id": "operational-observation",
+          "prior_disposition": "existing task contract",
+          "catalog_locator": "G5 final row pending",
+          "overlap_disposition": "final slot disposition pending"
+        },
+        "wiring": {
+          "status": "record_existing_task_contract_only",
+          "install_source": "docs/command-center.md#evidence-the-command-center-publishes",
+          "install_commands": null,
+          "integration": "docs/command-center.md#evidence-the-command-center-publishes",
+          "recipe": "docs/command-center.md#evidence-the-command-center-publishes",
+          "inverse_source": "adoption/lifecycle.md",
+          "inverse_policy_ref": "stage_policy.inverse_scope",
+          "memory": {
+            "per_session_pss_kb": null,
+            "status": "unmeasured",
+            "source_id": "role-trial",
+            "attribution": "lane totals have no tool binding"
+          },
+          "shared_copy": {
+            "capability": "native_HTTP_service; MCP connector sharing unmeasured",
+            "evidence_class": "source_review"
+          },
+          "role_loading": "unchanged until paired runs; stage_policy.alwaysLoad_false"
+        },
+        "fresh_session": {
+          "status": "unmeasured",
+          "natural_tasks_ref": "roles[].fresh_session_task"
+        },
+        "invoke_measurement": {
+          "source_id": "invoke-snapshot",
+          "baseline_date": "2026-10-08",
+          "baseline_status": "unmeasured_missing_named_baseline",
+          "delta": null
+        }
+      },
+      "outcome": "DEFER_new_adoption_claims",
+      "adopt_now": false
+    },
+    {
+      "tool_id": "hcom",
+      "repository": "https://github.com/aannoo/hcom",
+      "version": "0.7.27",
+      "source_pin": null,
+      "slot_id": "agent-coordination",
+      "source": "docs/decisions/2026-10-06-hcom-relaxation.md",
+      "note": "Existing native CLI contract; no new install/invoke trial; resolve full release pin in G5 before new adoption.",
+      "evidence_class": "source_review",
+      "stages": {
+        "final_candidate": {
+          "status": "PENDING_G5",
+          "slot_id": "agent-coordination",
+          "prior_disposition": "existing task contract",
+          "catalog_locator": "G5 final row pending",
+          "overlap_disposition": "final slot disposition pending"
+        },
+        "wiring": {
+          "status": "record_existing_task_contract_only",
+          "install_source": "docs/decisions/2026-10-06-hcom-relaxation.md",
+          "install_commands": null,
+          "integration": "docs/decisions/2026-10-06-hcom-relaxation.md",
+          "recipe": "docs/decisions/2026-10-06-hcom-relaxation.md",
+          "inverse_source": "adoption/lifecycle.md",
+          "inverse_policy_ref": "stage_policy.inverse_scope",
+          "memory": {
+            "per_session_pss_kb": null,
+            "status": "unmeasured",
+            "source_id": "role-trial",
+            "attribution": "lane totals have no tool binding"
+          },
+          "shared_copy": {
+            "capability": "not_applicable_native_CLI",
+            "evidence_class": "source_review"
+          },
+          "role_loading": "unchanged until paired runs; stage_policy.alwaysLoad_false"
+        },
+        "fresh_session": {
+          "status": "unmeasured",
+          "natural_tasks_ref": "roles[].fresh_session_task"
+        },
+        "invoke_measurement": {
+          "source_id": "invoke-snapshot",
+          "baseline_date": "2026-10-08",
+          "baseline_status": "unmeasured_missing_named_baseline",
+          "delta": null
+        }
+      },
+      "outcome": "DEFER_new_adoption_claims",
+      "adopt_now": false
+    },
+    {
+      "tool_id": "git-gh",
+      "repository": "https://github.com/cli/cli",
+      "version": null,
+      "source_pin": null,
+      "slot_id": "git-github-operations",
+      "source": "docs/command-center.md#landing",
+      "note": "Native Git/gh command slot; installed version/full source pin unmeasured in this record.",
+      "evidence_class": "source_review",
+      "stages": {
+        "final_candidate": {
+          "status": "PENDING_G5",
+          "slot_id": "git-github-operations",
+          "prior_disposition": "existing task contract",
+          "catalog_locator": "G5 final row pending",
+          "overlap_disposition": "final slot disposition pending"
+        },
+        "wiring": {
+          "status": "record_existing_task_contract_only",
+          "install_source": "docs/command-center.md#landing",
+          "install_commands": null,
+          "integration": "docs/command-center.md#landing",
+          "recipe": "docs/command-center.md#landing",
+          "inverse_source": "adoption/lifecycle.md",
+          "inverse_policy_ref": "stage_policy.inverse_scope",
+          "memory": {
+            "per_session_pss_kb": null,
+            "status": "unmeasured",
+            "source_id": "role-trial",
+            "attribution": "lane totals have no tool binding"
+          },
+          "shared_copy": {
+            "capability": "not_applicable_native_CLI",
+            "evidence_class": "source_review"
+          },
+          "role_loading": "unchanged until paired runs; stage_policy.alwaysLoad_false"
+        },
+        "fresh_session": {
+          "status": "unmeasured",
+          "natural_tasks_ref": "roles[].fresh_session_task"
+        },
+        "invoke_measurement": {
+          "source_id": "invoke-snapshot",
+          "baseline_date": "2026-10-08",
+          "baseline_status": "unmeasured_missing_named_baseline",
+          "delta": null
+        }
+      },
+      "outcome": "DEFER_new_adoption_claims",
+      "adopt_now": false
+    }
+  ],
+  "trial_observations": [
+    {
+      "arm": "A-control",
+      "set_id": "FULL",
+      "lane": "harness-rules",
+      "owned_process_count": 23,
+      "owned_pss_kb": 1431973,
+      "unit": "Linux kB = 1024 bytes",
+      "observed_at": "2026-10-09T01:33:20.060669+00:00",
+      "after_task_sha256": "2b53bc6a7c73307ff510211c161718291ea94f886e2c70af54f4914cb7a4a28f",
+      "evidence_class": "native_proven",
+      "scope": "native root descendants plus explicit owned PIDs, excludes declared shared PIDs; after-task snapshot",
+      "per_tool_attribution": "unmeasured",
+      "paired_task_acceptance": "not run"
+    },
+    {
+      "arm": "B-scout",
+      "set_id": "SCOUT",
+      "lane": "overlap-token",
+      "owned_process_count": 12,
+      "owned_pss_kb": 674966,
+      "unit": "Linux kB = 1024 bytes",
+      "observed_at": "2026-10-08T23:10:40.830127+00:00",
+      "after_task_sha256": "e091bb161bca6a5b7f41bd0d45811d8135cdb698fbf294af4f4490641fe332e9",
+      "evidence_class": "native_proven",
+      "scope": "native root descendants plus explicit owned PIDs, excludes declared shared PIDs; after-task snapshot",
+      "per_tool_attribution": "unmeasured",
+      "paired_task_acceptance": "not run"
+    },
+    {
+      "arm": "B-artifact",
+      "set_id": "ARTIFACT",
+      "lane": "ns-readiness-manifest",
+      "owned_process_count": 16,
+      "owned_pss_kb": 837623,
+      "unit": "Linux kB = 1024 bytes",
+      "observed_at": "2026-10-09T00:14:14.440095+00:00",
+      "after_task_sha256": "995111bca57200c2fc17ab7021d870909300ac1ac6beae59850850271105e3db",
+      "evidence_class": "native_proven",
+      "scope": "native root descendants plus explicit owned PIDs, excludes declared shared PIDs; after-task snapshot",
+      "per_tool_attribution": "unmeasured",
+      "paired_task_acceptance": "not run"
+    },
+    {
+      "arm": "C-token-parity",
+      "set_id": "TOKEN-PARITY-PARENT",
+      "lane": "codex-token-parity",
+      "owned_process_count": 14,
+      "owned_pss_kb": 947334,
+      "unit": "Linux kB = 1024 bytes",
+      "observed_at": "2026-10-09T00:40:44.378225+00:00",
+      "after_task_sha256": "c65ca9b983be71cc661ae650cffa78412cb8485254a914c65de2de03c4b474c0",
+      "evidence_class": "native_proven",
+      "scope": "native root descendants plus explicit owned PIDs, excludes declared shared PIDs; after-task snapshot",
+      "per_tool_attribution": "unmeasured",
+      "paired_task_acceptance": "not run"
+    }
+  ],
+  "qmd_pilot": {
+    "source": "docs/decisions/2026-10-08-qmd-shared-mcp.md:70-93",
+    "two_lane_owned_before_kb": 29801,
+    "two_lane_owned_after_kb": 0,
+    "shared_before_kb": 48077,
+    "shared_after_kb": 55768,
+    "individual_per_session_pss": "unmeasured",
+    "scope": "historical attributed two-lane cohort plus shared lexical service; not a split of the role-trial totals"
+  },
+  "invoke_projection": {
+    "claude_roles": {
+      "ns2604-coop": {
+        "sessions": 1,
+        "tool_calls": 5219,
+        "servers": {
+          "context-mode": 209,
+          "chrome-devtools": 133,
+          "grafana": 43
+        }
+      },
+      "api-actions": {
+        "sessions": 1,
+        "tool_calls": 1051,
+        "servers": {
+          "context-mode": 213,
+          "serena": 1
+        }
+      },
+      "wsl-architecture-design": {
+        "alias_status": "not verified as CC",
+        "sessions": 1,
+        "tool_calls": 9937,
+        "servers": {
+          "context-mode": 2012,
+          "chrome-devtools": 39,
+          "grafana": 27,
+          "serena": 14,
+          "agentsview": 6,
+          "ai-memory": 6,
+          "socraticode": 2,
+          "qmd": 1
+        }
+      }
+    },
+    "codex_roles": {
+      "exec readers": {
+        "conversations": 281,
+        "servers": {
+          "context-mode": 2992,
+          "codebase-memory-mcp": 200,
+          "serena": 136,
+          "ai-memory": 3,
+          "promptfoo": 2,
+          "socraticode": 2,
+          "headroom": 1,
+          "hindsight": 1,
+          "semble": 1
+        }
+      }
+    },
+    "generic_codex_role_attribution": "unmeasured; lane names not mapped to native role definitions",
+    "baseline_delta": "unmeasured",
+    "zero_or_low_use_selection_input": false
+  },
+  "corrections": [
+    {
+      "claim": "A stdio registration proves no native shared HTTP capability",
+      "correction": "Headroom0.40.0 exposes native HTTP; verify pinned CLI and session manager, then qualify isolation/accounting before adoption.",
+      "source": "https://github.com/headroomlabs-ai/headroom/blob/855390d6110e0bbb199d9b97025baac16c2f5cf3/headroom/cli/mcp.py#L349"
+    },
+    {
+      "claim": "Clean graph coverage makes heuristic destinations authoritative",
+      "correction": "The scout source trace disagrees with four low-confidence destinations despite metadata_match; retain source-first caveat.",
+      "source_id": "scout-result"
+    }
+  ],
+  "completeness_critic": {
+    "covered": [
+      "requested ten role rows",
+      "four trial arms with original hashes and units",
+      "six reviewed process contracts plus token-parity exception",
+      "per-tool four stages and memory/sharing fields",
+      "source identity/version mismatches",
+      "separate native child/instruction mechanism",
+      "overlap alternatives without parallel defaults"
+    ],
+    "remaining": [
+      "G5 final candidate/slot rows",
+      "reader and scout native-role aliases",
+      "api-actions complete carrier",
+      "per-tool memory attribution",
+      "paired role/client tasks",
+      "2026-10-08 baseline",
+      "independent shared-client lifecycle/attribution"
+    ]
+  },
+  "upstream_api_limits": {
+    "reporting_at": "2026-10-09T01:47Z",
+    "request_timestamps": null,
+    "response_bodies_or_headers_retained": false,
+    "failed_tree_requests": [
+      "https://api.github.com/repos/promptfoo/promptfoo/git/trees/34f74d34e140b5e17d23770dfb2340057b1936b8?recursive=1",
+      "https://api.github.com/repos/vectorize-io/hindsight/git/trees/5fc4ce20917b916240cef27c212c387a177f115b?recursive=1",
+      "https://api.github.com/repos/MinishLab/semble/git/trees/24497845460960db1839c8485319df189a889225?recursive=1"
+    ],
+    "tree_status": 403,
+    "guessed_raw_path_status": 404,
+    "scope": "Path discovery failed; positive claims use successfully read exact-pin raw source; no currency or negative capability claim from failures."
+  },
+  "usage": {
+    "new_provider_experiments": 0,
+    "provider_usage": null,
+    "shared_pool_usage": null
+  },
+  "stage_policy": {
+    "stage1": "G5 upstream quality and one best choice per role slot; no invoke-rate selection; current_choice remains null while PENDING.",
+    "stage2": "Vendor clean install/native integration at named pin and exact originating inverse; per-tool attributed PSS required, shared frontend/backend boundary preserved. References are unrun; no live settings changes.",
+    "stage3": "Tool-name-free natural task per role/client with organically used native counters; paired acceptance remains pending.",
+    "stage4": "Hourly source snapshot against the named 2026-10-08 baseline; absence/low use never implies retirement.",
+    "inverse_registration_commands": [
+      "codex mcp remove \"$SERVER_NAME\"",
+      "claude mcp remove --scope \"$ORIGINAL_SCOPE\" \"$SERVER_NAME\""
+    ],
+    "inverse_scope": "only the originating native registration/plugin/owned installation; restore retained before-image and preserve data/index/sign-ins/hooks/unrelated settings",
+    "alwaysLoad_false": "required where natively supported; actual literal-field support unqualified here and no setting written",
+    "outcome": "DEFER new final-candidate/adoption claims; existing installations unchanged. If a candidate is final and low-use: WIRE vendor route, fresh-session check, then remeasure."
+  }
+}

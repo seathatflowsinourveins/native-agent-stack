@@ -107,6 +107,12 @@ These are interactive account operations, separate from setup checks. Complete t
 
 ## Native verification tiers
 
+The [roles and tool sets record](../docs/role-tool-sets.md) connects owning roles
+to the [four stages and per-tool memory gates](../docs/role-tool-sets.json).
+Its dated trial observations preserve current launch sets. Final G5 selection,
+attributed per-session PSS and fresh-role evidence are separate adoption gates;
+an unmeasured tool does not reach ADOPT-NOW through a lane's total memory figure.
+
 | Tier | Evidence required | Boundary |
 | --- | --- | --- |
 | Repository integrity | Both validators pass against the checked-out bytes | No installed-runtime claim |
