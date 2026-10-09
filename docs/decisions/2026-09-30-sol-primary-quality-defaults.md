@@ -133,3 +133,35 @@ claiming task-level quality. Count every attempt once, keep cache/provider
 subsets distinct, and retain failures and unknown usage. Reopen routing when a
 comparable workload demonstrates better accepted resolution or lower complete
 task cost at the same acceptance bar.
+
+## Addendum (2026-10-09): generic children inherit their parent model
+
+The template now omits the generic model default. This supersedes the September
+30 choice to force every unspecified generic child to the template's rendered
+Sol model. The root placeholder and explicit stack-worker Sol binding stay;
+an unspecified generic child of another parent model now follows that parent.
+The Max default remains, and explicit spawn and role model selections retain
+their native precedence.
+
+The original September 30 paragraph above is retained verbatim as that dated
+configuration snapshot. This addendum supplies the current repository proposal:
+root `model = "${CODEX_MODEL}"` rendering remains, the generic model key is
+omitted, and Max child effort stays. Existing live host configuration requires
+the explicit F9 deletion recorded in the linked behavior record after landing.
+
+Source: [openai/codex rust-v0.162.0, child_config.rs:115](https://github.com/openai/codex/blob/rust-v0.162.0/codex-rs/core/src/agent/child_config.rs#L115)
+and [line 137](https://github.com/openai/codex/blob/rust-v0.162.0/codex-rs/core/src/agent/child_config.rs#L137)
+copy the parent slug; [line 204](https://github.com/openai/codex/blob/rust-v0.162.0/codex-rs/core/src/agent/child_config.rs#L204)
+selects an optional generic override, and lines 243–249 apply effort without
+replacing the model. The rust-v0.161.0 file is byte-identical, SHA-256
+`33d4dd6f70e6640af1059398272c48b88e16e0005105fbd1ef13e30456d39a39`.
+
+The [task-routing table](2026-09-30-task-model-routing.md#decision) now records
+generic children as inherited, rather than as a third globally Sol-bound
+route. [The behavior record](../token-practice.md#generic-child-model-default-omission)
+names the affected lanes, conditional nested-role effects and changed test
+expectations. The earlier selected model and effort choices for explicit
+workers and roles remain distinct from this inherited generic path. No token
+or cache saving was measured. This edits the repository proposal only; F9
+applies the landed template from a reviewed diff after the required reads,
+pre-cue tool, CI and explicit command-center cue.

@@ -179,10 +179,10 @@ class RenderConfigTests(unittest.TestCase):
         # rust-v0.157.1: live search in every sandbox (core/src/config/mod.rs), no startup update check on a pinned
         # client (config/src/config_toml.rs L520-523), no shell snapshot of exported variables
         # (shell-command/src/shell_snapshot_exports.rs), and no trust for dated directories that no longer exist.
-        # The user's 2026-09-30 defaults are Sol/Ultra coordination and Sol/Max generic children, supported by
-        # rust-v0.159.2 models-manager/models.json and core/src/agent/child_config.rs L204-249. Selected role
-        # configs still apply afterwards (L62-73). The gateway route lives only in the omniroute profile. Both
-        # models are the one CODEX_MODEL placeholder, which CodexModelTests renders from each platform's Codex pin.
+        # The coordinator's model uses CODEX_MODEL, rendered from each platform's Codex pin. Generic children
+        # inherit the active parent's model, with Max effort and no template model override (openai/codex
+        # rust-v0.162.0 core/src/agent/child_config.rs L115,137,204,243-249; identical at 0.161.0). Selected role
+        # configs still apply afterwards. The gateway route lives only in the omniroute profile.
         import tomllib  # Python 3.11+, as above
 
         text = (TEMPLATES / "codex.config.template.toml").read_text(encoding="utf-8")
@@ -193,7 +193,7 @@ class RenderConfigTests(unittest.TestCase):
         self.assertIs(user["agents"]["enabled"], True)
         self.assertEqual(user["agents"]["max_concurrent_threads_per_session"], 3)
         self.assertEqual(user["agents"]["default_subagent_reasoning_effort"], "max")
-        self.assertEqual(user["agents"]["default_subagent_model"], FIXTURE_VALUES["CODEX_MODEL"])
+        self.assertNotIn("default_subagent_model", user["agents"])
         self.assertEqual(user["model"], FIXTURE_VALUES["CODEX_MODEL"])
         self.assertEqual(user["model_reasoning_effort"], "ultra")
         self.assertEqual(sorted(user["projects"]), [FIXTURE_VALUES["PROJECT_ROOT"],
@@ -651,16 +651,17 @@ class CodexModelTests(unittest.TestCase):
         spec.loader.exec_module(module)
         return module
 
-    def models(self, out_dir: Path) -> tuple[str, str]:
+    def model(self, out_dir: Path) -> str:
         import tomllib  # Python 3.11+, as the Codex wiring check already requires
 
         config = tomllib.loads((out_dir / "codex.config.toml").read_text(encoding="utf-8"))
-        return config["model"], config["agents"]["default_subagent_model"]
+        self.assertNotIn("default_subagent_model", config["agents"])
+        return config["model"]
 
     def test_the_template_names_its_models_only_through_the_placeholder(self):
         text = self.CODEX.read_text(encoding="utf-8")
         self.assertEqual(re.findall(r'^(model|default_subagent_model) = "([^"]*)"$', text, flags=re.M),
-                         [("model", "${CODEX_MODEL}"), ("default_subagent_model", "${CODEX_MODEL}")])
+                         [("model", "${CODEX_MODEL}")])
 
     def test_each_platform_renders_the_model_its_pinned_codex_lists(self):
         self.assertEqual((self.pinned("linux-x86_64"), self.pinned("macos-arm64")), ("0.160.0", "0.155.1"))
@@ -669,7 +670,7 @@ class CodexModelTests(unittest.TestCase):
                 out_dir = Path(self.tmp.name) / platform_id
                 result = run("--host", self.host, "--platform", platform_id, "--out", str(out_dir))
                 self.assertEqual(result.returncode, 0, result.stderr)
-                self.assertEqual(self.models(out_dir), (model, model))
+                self.assertEqual(self.model(out_dir), model)
 
     def test_gpt_6_1_sol_starts_at_codex_0_159_1(self):
         # openai/codex codex-rs/models-manager/models.json has no "gpt-6.1-sol" slug at rust-v0.159.0 (687a119f) and
@@ -692,7 +693,7 @@ class CodexModelTests(unittest.TestCase):
         result = run("--host", self.host, "--platform", "macos-arm64", "--set", "CODEX_MODEL=gpt-6-sol",
                      "--out", str(out_dir))
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertEqual(self.models(out_dir), ("gpt-6-sol", "gpt-6-sol"))
+        self.assertEqual(self.model(out_dir), "gpt-6-sol")
         self.assertNotIn("CODEX_MODEL", result.stdout)  # nothing was derived, so nothing is explained
 
     def test_a_platform_without_a_pins_file_fails_closed_unless_the_model_is_given(self):
@@ -706,7 +707,7 @@ class CodexModelTests(unittest.TestCase):
         given = run("--host", self.host, "--platform", "linux-aarch64", *others, "--set", "CODEX_MODEL=gpt-6-astra",
                     "--out", str(out_dir))
         self.assertEqual(given.returncode, 0, given.stderr)
-        self.assertEqual(self.models(out_dir), ("gpt-6-astra", "gpt-6-astra"))
+        self.assertEqual(self.model(out_dir), "gpt-6-astra")
 
     def test_out_and_check_name_the_derived_model_its_pin_and_the_rules_sources(self):
         for platform_id, model in self.EXPECTED.items():

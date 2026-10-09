@@ -25,7 +25,7 @@ same way: the Codex user template's SocratiCode server runs
 ``adoption/bootstrap-<os>.sh`` installs from the selected platform's pin
 (1.15.0 on linux-x86_64 and 1.14.0 on macos-arm64 since 2026-09-27); ``--set
 SOCRATICODE_VERSION=...`` names another installed version. ``CODEX_MODEL`` is the
-Codex user template's ``model`` and ``[agents] default_subagent_model``, chosen
+Codex user template's root ``model``, chosen
 from the selected platform's Codex pin: ``gpt-6.1-sol`` from Codex 0.159.1, the
 release that added it to the bundled catalog, and ``gpt-6-astra`` for an older
 pin (macos-arm64 pins 0.155.1 on 2026-09-30), so a render never names a model
@@ -33,6 +33,11 @@ its pinned client's catalog lacks (the rule and its sources are at
 ``CODEX_MODEL_SINCE`` below); ``--set CODEX_MODEL=...`` names another model.
 ``--out`` and ``--check`` print a derived ``CODEX_MODEL`` with its pin and
 sources.
+
+The template omits ``[agents] default_subagent_model``. Generic children without
+an explicit spawn model retain the active parent step's ``model_info.slug``,
+including its routed alias, with ``[agents] default_subagent_reasoning_effort = "max"``.
+Explicit spawn model selections and role configuration retain their native precedence.
 
 One placeholder is an explicit opt-in instead of a host value:
 ``AI_MEMORY_CAPTURE_ASSISTANT`` renders nothing unless the host value file or

@@ -5256,8 +5256,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "c33b28072ffee4b92e2ea61100acd75b2289f35e9e878ffa21ac855fa010e963",
-      "bytes": 73702
+      "sha256": "e35da598832557acec11104c16ea91be7c2e71caf45e67d6ddc940d8311639fd",
+      "bytes": 74033
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -5546,8 +5546,8 @@
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
-      "sha256": "ad55a812006e6d25038a75c3f213460fccd40f7dd79faa21ab521eec1e88701e",
-      "bytes": 19167
+      "sha256": "2642da698bc15584c5001c03c10aad33714e00c6635035ca2cdf6ea1b9a20da2",
+      "bytes": 19097
     },
     {
       "path": "adoption/templates/codex.omniroute.config.toml",
@@ -16972,8 +16972,8 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "2c9847e1460661e953d59add75e82808c9e2ea33e46fc0fc67c4c375f38187f3",
-      "bytes": 159863
+      "sha256": "ed742ae36312bd76ba04425885fed029a0d1de51b6d396da7d9c94e43dd39549",
+      "bytes": 160022
     },
     {
       "path": "catalogs/landscape/README.md",
@@ -17647,8 +17647,8 @@
     },
     {
       "path": "docs/decisions/2026-09-26-stack-agents-role-dispatch.md",
-      "sha256": "98ab05b6283e6baad7ce711a2101af6ed7b690c801c9711ebbc6df8a4a7762e9",
-      "bytes": 50598
+      "sha256": "a3457e1fbc5baddb0c6d13f5ba8abb48d82bf476e2340a3a5326ea614be6ea68",
+      "bytes": 51983
     },
     {
       "path": "docs/decisions/2026-09-26-telemetry-writer-identity.md",
@@ -17692,8 +17692,8 @@
     },
     {
       "path": "docs/decisions/2026-09-27-model-currency.md",
-      "sha256": "c3e2d0a439a8c0a0e74d9f607e69ddde65ffbbc1cdcf4da6b0048f6af5076564",
-      "bytes": 57789
+      "sha256": "387f9250e7c5f4848644b36d708c94740df7867105bdb062e3baab1d3502b38f",
+      "bytes": 59664
     },
     {
       "path": "docs/decisions/2026-09-27-omniroute-account-pool.md",
@@ -17786,6 +17786,16 @@
       "bytes": 11606
     },
     {
+      "path": "docs/decisions/2026-09-30-sol-primary-quality-defaults.md",
+      "sha256": "0df000b556a5cad6a7ba0caf1a9eb24a44e0b74ceff7b30b7c51b761650012bb",
+      "bytes": 11321
+    },
+    {
+      "path": "docs/decisions/2026-09-30-task-model-routing.md",
+      "sha256": "0fcd4c4d3ddf7f23121ff85f58dc23a2d4c5ac543044949f9342a129e11085d4",
+      "bytes": 44901
+    },
+    {
       "path": "docs/decisions/2026-10-01-mac-runtime-memory-candidates.md",
       "sha256": "ea1a9bf3e788caed923977d98050e735836b555a1fe9c8ef7e06e1a926391926",
       "bytes": 12358
@@ -17827,8 +17837,8 @@
     },
     {
       "path": "docs/decisions/2026-10-02-new-wsl-client-configuration.md",
-      "sha256": "498634a2a6b27e9d70143b6b8e43ce00c0914c914dec1d346dca38807c4941f5",
-      "bytes": 147135
+      "sha256": "77b0610b2ce98361906d3c4fc202b3b4f65e14203b54a4f05a441e6457e1e26e",
+      "bytes": 148760
     },
     {
       "path": "docs/decisions/2026-10-02-omniroute-mac-rebuild.md",
@@ -18662,8 +18672,8 @@
     },
     {
       "path": "docs/token-practice.md",
-      "sha256": "a44d6dd1fd255517d66e46b356b5377d25dd8551c11b0897fe1dee9a9e02e34c",
-      "bytes": 42223
+      "sha256": "1d10996d3dd7f2d2d5ccabf98b125232e582cca628180bdd0a2a7eb2f67e3f44",
+      "bytes": 65882
     },
     {
       "path": "docs/token-session-handbook.md",
@@ -57972,8 +57982,8 @@
     },
     {
       "path": "tests/test_codex_roles.py",
-      "sha256": "1c1a5900db768ea81b5aa609c3458f798dd5a37c7c5ab76b03c6e6a500d8cf60",
-      "bytes": 33470
+      "sha256": "cc127f85af185d05ab8331989f3fa578f7f193e2c7490e73eb4d3653700057d3",
+      "bytes": 33416
     },
     {
       "path": "tests/test_codex_worker_lane.py",
@@ -58567,8 +58577,8 @@
     },
     {
       "path": "tests/test_render_config.py",
-      "sha256": "9eae1b97d637079056994268e754f878bbafd4702fe8182cfef21f2f7b9bfcec",
-      "bytes": 47956
+      "sha256": "03d31001eef58ba1d6cf1498d9a7e9c6d6fe391d5ff9a4d02a9174bdc89dc136",
+      "bytes": 47826
     },
     {
       "path": "tests/test_research_dispatch.py",
@@ -58714,6 +58724,11 @@
       "path": "tests/test_supply_chain_scan.py",
       "sha256": "a4e3e5a6f40a7f3b4e679b21dc56f443a27ccdd9f097423bdf64d9e41eef19f8",
       "bytes": 6838
+    },
+    {
+      "path": "tests/test_task_model_routing.py",
+      "sha256": "0b9ebfe62b7a214663138d1f3b19ff4d518ff0d3f7750343c425c26c3d5c68c2",
+      "bytes": 23455
     },
     {
       "path": "tests/test_token_e2e_grader.py",
@@ -58922,8 +58937,8 @@
     },
     {
       "path": "tools/adoption/render_config.py",
-      "sha256": "0a2e7e0fff08963a0c9f43a0dfe60a86e348de9f04ed8f29dfda8effcc1ced27",
-      "bytes": 19670
+      "sha256": "40156162b38c04fd55e16e297d47327fc8dc452f43f57e634d5dac07b739a1ef",
+      "bytes": 19970
     },
     {
       "path": "tools/adoption/render_launchd.py",

@@ -2805,15 +2805,15 @@
   },
   {
    "key": "codex:config:agents.default_subagent_model",
-   "disposition": "enabled",
-   "reason": "set in the configuration of both hosts (read 2026-10-04); the cited record names it",
-   "source": "docs/decisions/2026-09-26-stack-agents-role-dispatch.md:375",
-   "carrier": "host configuration",
+   "disposition": "declined",
+   "reason": "Generic model default is declined; omit it from the template. F9 must delete the existing host key after landing; live removal is still pending.",
+   "source": "docs/token-practice.md:733",
+   "carrier": "F9: reviewed deletion from existing host configuration after landing",
    "value": null,
-   "scope": "both",
-   "overturn": "upstream removes or changes the switch, or a measured regression",
-   "reviewed_utc": "2026-10-04T16:23:19Z",
-   "version": "rust-v0.160.0"
+   "scope": "repository template; reviewed host deletion pending",
+   "overturn": "A reviewed task requires an explicit generic model, or upstream parent-model inheritance changes.",
+   "reviewed_utc": "2026-10-09T02:20:37Z",
+   "version": "rust-v0.162.0"
   },
   {
    "key": "codex:config:agents.default_subagent_reasoning_effort",
@@ -3335,7 +3335,7 @@
    "key": "codex:config_group:otel.metrics_exporter",
    "disposition": "enabled",
    "reason": "set in the configuration of both hosts (read 2026-10-04); the cited record names it",
-   "source": "adoption/templates/codex.config.template.toml:291",
+   "source": "adoption/templates/codex.config.template.toml:290",
    "carrier": "host configuration",
    "value": null,
    "scope": "both",

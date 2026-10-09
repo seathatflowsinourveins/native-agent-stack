@@ -150,6 +150,98 @@ Project registration metadata to safe names/status before returning it; client
 configuration can contain environment/header credentials. Configuration listings
 establish registration, not a connected tool's schema or successful use.
 
+### Shared files and native discovery
+
+For files outside the selected worktree, process the known path inside
+`ctx_execute` or `ctx_batch_execute`. Keep `ctx_execute_file` for worktree
+paths. context-mode 1.0.169 documents its file boundary at
+[mksglu/context-mode@6f0cc684:README.md:1561](https://github.com/mksglu/context-mode/blob/6f0cc6841c687e754059f36714a11233fda1a02b/README.md#L1561)
+and execution-tool access at
+[README.md:1575](https://github.com/mksglu/context-mode/blob/6f0cc6841c687e754059f36714a11233fda1a02b/README.md#L1575).
+For a batch command whose first word is `for`, wrap the loop in
+`bash -c '...'`: the installed batch builder prefixes POSIX commands with
+an environment assignment
+([src/server.ts:1456](https://github.com/mksglu/context-mode/blob/6f0cc6841c687e754059f36714a11233fda1a02b/src/server.ts#L1456)).
+Use the execution tool to return the derived answer instead of a whole file.
+
+In Codex code mode, filter `ALL_TOOLS` before returning its metadata and retain
+only the selected complete schemas. Deferred nested tools can be omitted from
+the exec description
+([openai/codex@979011409:codex-rs/code-mode-protocol/src/description.rs:16](https://github.com/openai/codex/blob/979011409de0a60b52f179721948e65531d26144/codex-rs/code-mode-protocol/src/description.rs#L16)).
+An inventory count alone does not measure request-schema tokens, and code mode
+still renders descriptions for enabled tools. Keep measured input and returned
+artifact characters separate. Reuse each selected skill body within a thread.
+
+Select a parent's MCP set through its native launch configuration.
+`mcp_servers.<id>.enabled=false` is the documented setting
+([OpenAI configuration reference](https://developers.openai.com/codex/config-reference/)).
+The selected `<name>.config.toml` layer loads after the user layer
+([codex-rs/config/src/loader/mod.rs:130](https://github.com/openai/codex/blob/979011409de0a60b52f179721948e65531d26144/codex-rs/config/src/loader/mod.rs#L130)).
+Agent-role files project a narrower set of overrides; the role model fields are
+listed at
+[codex-rs/core/src/agent/role.rs:36](https://github.com/openai/codex/blob/979011409de0a60b52f179721948e65531d26144/codex-rs/core/src/agent/role.rs#L36).
+Measure token effects and server-start resource costs independently.
+
+For a selected skill, finish its first required body read, then reuse that body
+within the thread while its source still matches. Count raw read calls, partial
+windows and repeated complete bodies separately.
+
+RTK 0.51.0 documents shell `cat`, `head` and `tail` rewrite coverage
+([rtk-ai/rtk@e001f773:README.md:153](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/README.md#L153)).
+A `sed -n` range can pass through without an RTK equivalent; that is distinct
+from a broken hook. Use a supported exact window for a prefix/tail read, or an
+execution tool for range analysis. `rtk read` defaults to level `none`; supported
+head/tail windows preserve the selected bytes and do not imply additional token
+savings. When `rtk rewrite` returns command text with exit 3, that status means
+its ask/default permission classification, not missing command coverage
+([src/hooks/rewrite_cmd.rs:71](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/hooks/rewrite_cmd.rs#L71)).
+This workflow does not modify the hook or its permission policy.
+
+Serena activation requires both `project` and the session identifier returned
+by `initial_instructions`
+([oraios/serena@c6fbd1c5:src/serena/tools/config_tools.py:44](https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/src/serena/tools/config_tools.py#L44)).
+Retain that identifier, and pass `session_id` if activation is required.
+If the manual already reports the required project active, reuse that state.
+A prior validation failure does not justify omitting a required field again.
+
+### Cache and terminal attribution
+
+Group gateway observations by the returned session and connection fields,
+then describe request position only within the available collection page.
+A clipped page can begin mid-session. Unknown cache counts remain unknown.
+A rate-limit reset identifier is an account-meter observation; it does not
+identify the account that served a particular response.
+
+When a spawn call selects no model, `agents.default_subagent_model` can replace
+the constructor's parent-derived `model_info.slug`. Leaving the effective key
+unset retains that constructor value
+([codex-rs/core/src/agent/child_config.rs:109](https://github.com/openai/codex/blob/979011409de0a60b52f179721948e65531d26144/codex-rs/core/src/agent/child_config.rs#L109),
+[override at :204](https://github.com/openai/codex/blob/979011409de0a60b52f179721948e65531d26144/codex-rs/core/src/agent/child_config.rs#L204)).
+Explicit roles and per-spawn selections retain their native precedence. The key
+must be unset across contributing layers; omitting a higher profile entry cannot
+mask a lower value. Verify root/child request models before claiming raw alias
+parity, then qualify provider routing and cache effects independently.
+
+For direct-provider cache continuity, OmniRoute ships session affinity:
+`sessionAffinityTtlMs` selects its lifetime, and the documented default is zero
+([diegosouzapw/OmniRoute@c1e30b76:docs/guides/CODEX-CLI-CONFIGURATION.md:470](https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/docs/guides/CODEX-CLI-CONFIGURATION.md#L470)).
+An available affinity connection is selected before round-robin routing
+([src/sse/services/auth.ts:1985](https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/src/sse/services/auth.ts#L1985)).
+Recorded historical settings do not establish the running settings or a
+measured repair. Preserve a bounded before/after native observation before
+claiming reduced cache rebuilds.
+
+Treat hcom `pty:approval` as an inferred action-required terminal state.
+hcom 0.7.28 detects a title containing `Action Required` or visible prompt
+patterns
+([aannoo/hcom@b2a7c192:src/pty/screen.rs:309](https://github.com/aannoo/hcom/blob/b2a7c192003e7fd67ed93265289e4ac36276f965/src/pty/screen.rs#L309),
+[screen.rs:439](https://github.com/aannoo/hcom/blob/b2a7c192003e7fd67ed93265289e4ac36276f965/src/pty/screen.rs#L439)).
+Its emitted event retains prior status-detail text
+([src/pty/shared.rs:394](https://github.com/aannoo/hcom/blob/b2a7c192003e7fd67ed93265289e4ac36276f965/src/pty/shared.rs#L394)).
+A retained command preview therefore does not identify the detector input.
+Native approval, interactive hooks and classifier false positives require
+their own evidence.
+
 The [reported Mac rollout](decisions/2026-09-30-bounded-native-decision-routing.md)
 retained an oversized initial discovery and a missed current decision. These
 rules address those observed failure modes; semantic answer quality and complete
@@ -598,3 +690,224 @@ computation and made no Context Mode calls. Their aggregate reported tokens were
 The rejected setup attempt remains separate and included in campaign totals.
 Keep the existing smallest-sufficient-context policy rather than forcing a tool
 call or promoting this single-fixture observation into a universal default.
+
+## Generic child model default omission
+
+The October 9, 2026 template change removes
+`agents.default_subagent_model = "${CODEX_MODEL}"` and keeps
+`agents.default_subagent_reasoning_effort = "max"`. A generic child whose
+spawn supplies no model now retains its parent step's `model_info.slug`.
+Previously the template's model default could replace that value with the
+rendered `CODEX_MODEL`. On the qualified 0.161.0/0.162.0 Codex host, a parent
+on another model therefore stops receiving a forced Sol child default. This
+changes model selection; no token or cache savings were measured. The older
+0.155.1 macOS pin has only rendering coverage here, not a native inheritance
+qualification. No claim that its forced model default ends is made.
+
+The launcher's default client is 0.162.0
+(`coordination/command-center/lane-tiers.json:39`; its two held lanes are
+listed at lines 41–42). The source is
+[openai/codex rust-v0.162.0, child_config.rs](https://github.com/openai/codex/blob/rust-v0.162.0/codex-rs/core/src/agent/child_config.rs#L109):
+the spawn constructor copies the parent step's slug at line 115, and the
+full-history constructor copies the parent turn's slug at line 137. The
+generic model override is selected at line 204 and applied at lines 211–240;
+the effort-only path at lines 243–249 leaves the inherited model in place.
+The same file at
+[rust-v0.161.0](https://github.com/openai/codex/blob/rust-v0.161.0/codex-rs/core/src/agent/child_config.rs)
+is byte-identical: both are 13,496 bytes with SHA-256
+`33d4dd6f70e6640af1059398272c48b88e16e0005105fbd1ef13e30456d39a39`.
+Explicit spawn selections and role configuration retain their native
+precedence. The effective key must be absent across contributing layers;
+removing this template entry does not mask an existing lower-layer value.
+
+The effort-only path also validates Max against the parent's supported
+reasoning levels at child_config.rs:243–248. A parent model whose metadata
+does not support `max` can reject the spawn instead of receiving a forced
+Sol/Max child. All registered Codex lanes in the cited launch inventory use
+the qualified Sol parent setting, so none is identified with this unsupported
+effort case. An explicit spawn effort can select a supported level; this record
+does not qualify other parent models by analogy.
+
+### Existing host application requires deletion
+
+F9's reviewed live-apply diff must delete `agents.default_subagent_model` from
+the existing host's `~/.codex/config.toml` after landing. The CC's October 9
+Claude read verified that file's line 45 still sets
+`default_subagent_model = "gpt-6.1-sol"`; this lane did not read the live file.
+Omitting the template entry in a merge-style apply cannot remove that existing
+key. The reviewed apply therefore includes its explicit deletion, with the
+effective key absent across all contributing layers and the root model, Max
+effort and explicit role choices preserved. The CC performs F9 from that
+reviewed diff after landing; this PR neither edits the live file nor claims
+the deletion has occurred.
+
+The corresponding surface-catalog decision is `declined`: it rejects a forced
+generic model default and records the pending F9 deletion. The earlier
+`enabled` host observation remains dated evidence, not the selected practice.
+
+The lane inventory below is a source review of the co-op registries at
+2026-10-09 00:20 UTC. `H` means a source line in
+`coordination/ns2604-coop/lanes/hcom-lanes.json`; `T` means a source line in
+`coordination/ns2604-coop/lanes/threads.json`. Those snapshots have SHA-256
+`fe550f1eec77ace1537e3a9546b703118cd4aafba4cbdf0d55345d78d133a830`
+and `965d884240b0d6e8bceddcd4517ca16c6940bf3e488edf1f4254947b99814d63`,
+respectively. They identify lanes, rather than recording each request's model.
+State locators in this section are relative to the native-agent-stack state
+root, normally `~/.local/state/native-agent-stack/`. The H snapshot locator is
+`coordination/ns2604-coop/lanes/hcom-lanes.json`, read at the stated time with
+the digest above; this registry is mutable, so its current bytes need not match
+that historical read. The T locator has the same historical-read boundary.
+The shared launch command supplies `-m cx/gpt-6.1-sol` at
+`coordination/ns2604-coop/omniroute-canary-20261008/launch_lane_omni.sh:80`
+(SHA-256 `5100497bdd1235ea9d5cc7e69e075b8f59269430b459301281695b96bc45d7bc`).
+Under that launch setting, none of the 28 non-closed registered Codex root lanes changes
+model family when it spawns a generic child. Inheriting the routed slug can
+still differ from forcing the plain rendered model ID; this inventory does
+not claim byte-identical requests or a measured routing or cache improvement.
+
+| Codex lane on the shared Sol launch setting | Registry source lines |
+| --- | --- |
+| orch-records | H:2 |
+| rnd-r1 | H:36 |
+| layer15-build | H:65 |
+| paper-open-e2e | H:89 |
+| api-credit-sota | H:104 |
+| github-consolidation | H:123 |
+| landscape-gap | H:176 |
+| landscape-mcp | H:195 |
+| landscape-stars | H:212 |
+| runtime-workers | H:232 |
+| landscape-live-foundation | H:251 |
+| landscape-live-trading | H:268 |
+| harness-rules | H:293 |
+| g5-fields-a | H:317 |
+| g5-fields-b | H:337 |
+| g5-stars-gap | H:358 |
+| sdk-harness-ready | H:374 |
+| ns-readiness-manifest | H:395 |
+| currency | H:415, T:3 |
+| codex-token-parity | H:426, T:7 |
+| convergence-practice | H:441, T:8 |
+| fixwave-defects | H:454, T:2 |
+| github-ci-finalize | H:467, T:4 |
+| grand-catalog | H:480, T:5 |
+| readiness-runner | H:491, T:30 |
+| skills-lifecycle | H:504, T:23 |
+| memory-h2h | H:523, T:6 |
+| overlap-token | H:541, T:38 |
+
+`fixwave-mcp` (H:149) and `github-ci-finalize-read` (H:161) are registered
+Claude sessions, so this Codex template does not select their child models;
+the latter is marked closed. `rnd-r3` (H:22), `lm-qmd` (H:52, T:39),
+`supersession-ledger` (T:24) and `overlap-codenav` (T:31) are also marked
+closed; `overlap-codenav` was absorbed by `readiness-runner`.
+
+The repository's builtin role names are `default`, `explorer` and `worker`
+([codex_roles.py:67](../tools/adoption/codex_roles.py#L67)); each generic spawn
+without a role model override follows the behavior above. The configured
+roles have these effects:
+
+| Role | Source | Effect of omitting the generic model default |
+| --- | --- | --- |
+| isolated-builder | [workers/isolated-builder.toml:18](../adoption/agents/codex/workers/isolated-builder.toml#L18), [inherited model role at codex_roles.py:74](../tools/adoption/codex_roles.py#L74) | Names no model and keeps Max. With no explicit spawn model, it now inherits its parent; a non-Sol parent can therefore change this child's model family. |
+| stack-researcher | [stack-researcher.toml:12](../adoption/agents/codex/stack-researcher.toml#L12) | Its explicit Astra/Max selection remains. A generic child spawned from this Astra parent now inherits Astra rather than the template's Sol default. |
+| stack-verifier | [stack-verifier.toml:12](../adoption/agents/codex/stack-verifier.toml#L12) | Its explicit Astra/Max selection remains; generic children of this Astra parent can change from forced Sol to inherited Astra. |
+| evidence-reviewer | [workers/evidence-reviewer.toml:15](../adoption/agents/codex/workers/evidence-reviewer.toml#L15) | Its explicit Astra/Max selection remains; generic children of this Astra parent can change from forced Sol to inherited Astra. |
+| semantic-evidence-reviewer | [workers/semantic-evidence-reviewer.toml:16](../adoption/agents/codex/workers/semantic-evidence-reviewer.toml#L16) | Its explicit Astra/Max selection remains; generic children of this Astra parent can change from forced Sol to inherited Astra. |
+
+These nested-role effects are source-derived conditions, not observed new
+spawns. The retained 0.161.0 synthetic recorder checked an unset-default root
+and full-history fork using `cx/gpt-6.1-sol/max`; it did not execute a paired
+default-present arm or measure provider usage. Byte-identical 0.162.0 source
+does not turn that retained fixture into a new native run.
+
+The retained fixture report is
+`research/token-efficiency-20261008/model-recorder/REPORT.md`, SHA-256
+`ec82a85ff4c98b5ff161c46235d607caa6a1dbf42cfb727213d94b9b0ff559c1`.
+Its root and full-history child request models are both `cx/gpt-6.1-sol`, with
+the unchanged 11-entry bundled catalog containing no added `cx/` alias. Native
+constructors copy the active parent's `model_info.slug` at lines 115/137;
+omitting the generic override leaves that slug rather than selecting a catalog
+model at lines 211–240. The fixture demonstrates alias retention for its
+recorded root/child path; it does not establish normalization or cache behavior
+for other model aliases or providers.
+
+The later co-op pre-cue report is
+`coordination/ns2604-coop/gpt-reads/extra-902-8b151f01/BASE-TESTS-AT-HEAD-8b151f01.txt`,
+SHA-256 `630c9e3244dbc138f3ceb2b3df9f2113773e37dad11333e431839d308e69d4f9`.
+It is distinct from the starting-head report used for the declarations below.
+
+The RTK statements retained at lines 191–195 follow
+[rtk-ai/rtk@e001f773](https://github.com/rtk-ai/rtk/tree/e001f773f80b22b7dc4c7a79521b30e35aaef026),
+version 0.51.0: native `rtk read --help` documents default level `none` and
+byte-exact `--head-lines` at that level with line numbering off, and supplies
+the `--tail-lines` window. Native `rtk rewrite --help` describes rewrite
+coverage, while [rewrite_cmd.rs:71](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/hooks/rewrite_cmd.rs#L71)
+explains exit-3 classification. These provenance pointers are added here so
+the earlier 92 reviewed lines stay byte-identical.
+
+The dated explicit `-c 'agents.default_subagent_model="gpt-6.1-sol"'` command in
+[the October 2 north-star recipe](decisions/2026-10-02-two-host-north-star-architecture.md)
+at line 79 is an explicit-override exception. Running that recipe keeps its
+selected generic model and does not exercise the omitted-default path. Its
+dated command remains historical; F9's reviewed apply uses the effective-key
+absence requirement above.
+
+The existing template-read tests now require the generic model key to be
+absent while preserving the root model, Max effort and explicit role checks.
+The pre-cue tool ran the base versions of the three changed modules against
+head `8e1d60e231e1e290b50ca934efd17a6f0fb6a0cf` and returned rc 1. Its retained
+report is
+`coordination/ns2604-coop/gpt-reads/extra-902-8e1d60e2/BASE-TESTS-AT-HEAD-8e1d60e2.txt`,
+2,914 bytes, SHA-256
+`856315647e5f9b6f3344e7c4387efe57acf39196bc011e3af9688579b93a1493`.
+It printed nine distinct methods and eleven failing entries: render_config
+had five errors and one failure, task_model_routing had two errors and two
+failures, and codex_roles had one error. The duplicated errors are the two
+platform subcases of each rendering method. Each changed expectation is
+declared below by the method name printed in that report.
+
+| Exact unittest method | Pre-cue entry at 8e1d60e2 | Old expectation, new expectation and reason |
+| --- | --- | --- |
+| tests.test_render_config.RenderConfigTests.test_codex_user_template_sets_the_verified_base_keys | ERROR | Read `agents["default_subagent_model"]` and require the fixture's rendered model. The key is now absent, so the old access raises KeyError; the updated check requires absence while retaining the root fixture model and Max effort. |
+| tests.test_render_config.CodexModelTests.test_the_template_names_its_models_only_through_the_placeholder | FAIL | Require both `model` and `default_subagent_model` to bind `${CODEX_MODEL}`. Only root `model` remains; the updated check requires that single placeholder binding so generic children can inherit their active parent. |
+| tests.test_render_config.CodexModelTests.test_each_platform_renders_the_model_its_pinned_codex_lists | ERROR twice: `(platform='linux-x86_64')` and `(platform='macos-arm64')` | The old helper reads both rendered root and child keys and raises KeyError in each platform subcase. The updated helper requires child-key absence and still checks each platform's root model against its pin. These two entries count as one method. |
+| tests.test_render_config.CodexModelTests.test_a_host_supplied_model_wins_over_the_pin | ERROR | The old helper requires the host-supplied model in both root and generic-child bindings. The updated check keeps the root override (`gpt-6-sol` in the fixture) and requires an absent child key; no template child model is forced. |
+| tests.test_render_config.CodexModelTests.test_a_platform_without_a_pins_file_fails_closed_unless_the_model_is_given | ERROR | After the explicit `CODEX_MODEL=gpt-6-astra` override, the old helper reads both root and child keys. The updated check retains the missing-pin refusal and explicit root selection, while requiring an absent child key. |
+| tests.test_codex_roles.WorkerRoleSourceTests.test_the_builder_takes_the_lanes_model_at_max | ERROR | Require the template pair `("${CODEX_MODEL}", "max")`. The updated check requires no generic model key and Max effort; isolated-builder still names no model and explicit Astra carriers retain their pins. |
+| tests.test_task_model_routing.TaskModelRoutingRecordTests.test_every_quoted_value_is_in_its_cited_file | FAIL | The old record quotes `default_subagent_model = "${CODEX_MODEL}"` at template lines 30–31, so the missing quote fails the required match count. The record now quotes only the live Max-effort key at line 30 and states model inheritance; unconditional quoted-value verification is restored. This old method passes after the stale record is corrected. |
+| tests.test_task_model_routing.TaskModelRoutingRecordTests.test_gpt_6_1_sol_is_routed_where_the_sol_primary_record_routes_it_and_nowhere_else | FAIL: `(1, 0)` against `(1, 1)` | Require one root and one generic-child model binding, plus three globally Sol-routed rows. The template now has one root binding and no child binding; the table has two rows with explicit Sol model bindings and one inherited-model child row. The updated check requires those two routes and rejects a generic model binding; the old version now fails earlier on two rows against three. |
+| tests.test_task_model_routing.TaskModelRoutingRecordTests.test_the_user_template_renders_on_each_platform_the_model_its_rows_name | ERROR twice; both printed entries have the same method name, with the report clipping the long parenthesized selector | Require the rendered generic-child model to equal the root model on each platform. The updated check keeps the root model/effort check, requires the child model key absent and retains generic-child Max effort. The two entries count as one method. |
+
+For the revised records, eight distinct base-version methods remain intentional
+failures: all five render_config methods, the builder method, and the Sol-routing
+and per-platform rendering methods. The quoted-value method now passes because
+its stale enforcement quote is corrected. This declares the observed nine-method
+pre-cue result and the revised eight-method failing set separately. The lander
+must run current main's versions on a fresh merge and compare the actual set;
+a new method, missing expected method or unrelated failure still requires a hold.
+
+Three decision records are reconciled in the same head. The current generic-child
+row in [task-model-routing](decisions/2026-09-30-task-model-routing.md#decision)
+now names the parent slug and the remaining Max key, and the
+[Sol-primary record](decisions/2026-09-30-sol-primary-quality-defaults.md#addendum-2026-10-09-generic-children-inherit-their-parent-model)
+states the omission and preserves explicit worker and role selections. The
+[model-currency addendum](decisions/2026-09-27-model-currency.md#addendum-2026-10-09-generic-child-template-quote-is-historical)
+explains why its September 30 lines 418–419 and 450 stay: they document that
+revision and its historical observations, which were not rerun or reinterpreted.
+They no longer claim current generic-child enforcement. This removes the routing
+test's historical-quote exception; every live enforcement quote is checked again.
+
+At the first fold head, all 11 test modules mentioning this template ran separately under
+`timeout 600`. Ten passed. The unchanged `tests.test_windows_terminal_defaults`
+module failed only
+`OverlayTests.test_the_installed_client_knows_no_notification_type_without_a_decision`:
+the installed Claude Code 2.1.295 binary exposes `plugin_notification`, which
+the existing notification decision table does not list. The same assertion
+failed when executed from the original draft head's byte-identical source.
+That host-dependent policy gap is retained separately from the nine deliberate
+Codex checks; this change does not resolve it or claim all 11 modules passed.
+
+This is a proposed template change. Both designated reads, the pre-cue tool,
+CI and an explicit command-center cue gate landing. F9 alone applies the
+landed template from a reviewed diff; this PR performs no live application.
