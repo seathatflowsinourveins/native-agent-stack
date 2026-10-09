@@ -1,0 +1,1 @@
+Name 'Bad_Name' should be hyphen-case (lowercase letters, digits, and hyphens only)

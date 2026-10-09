@@ -1,0 +1,6 @@
+{
+  "Arm-1": "openai",
+  "Arm-2": "skillevaluator",
+  "Arm-3": "agnix",
+  "Arm-4": "anthropic"
+}

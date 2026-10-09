@@ -1,0 +1,17 @@
+Installed 19 packages in 43ms
+
+==================================== ERRORS ====================================
+_______________ ERROR collecting tests/validators/test_schema.py _______________
+ImportError while importing test module '<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/skillevaluator/source/tests/validators/test_schema.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+../../../../../../share/mise/installs/python/3.13.16/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/validators/test_schema.py:13: in <module>
+    from skillevaluator.validators.schema import SchemaValidator
+E   ModuleNotFoundError: No module named 'skillevaluator'
+=========================== short test summary info ============================
+ERROR tests/validators/test_schema.py
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+1 error in 0.15s

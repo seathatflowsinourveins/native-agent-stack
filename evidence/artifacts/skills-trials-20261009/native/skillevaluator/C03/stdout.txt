@@ -1,0 +1,29 @@
+╭──────────────────────────────────────────────────────────────────────────────╮
+│  skillevaluator validate                        skill: case-no-description   │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+╭─ Tier 1 · Static & Security ─────────────────────────────────────────────────╮
+│    checks      ✗ schema · ✓ quality                                          │
+│    summary     1/2 passed  ·  1 failed                                       │
+│  ✗ failed      Schema & Repository Governance — Field 'description': Field   │
+│  required                                                                    │
+│    advisories  10  quality 10                                                │
+│    quality     B  80.2 / 100                                                 │
+╰────────────────────────────────────────────────────────────── ✗ fail · 0.0s ─╯
+╭──────────────────────────────────────────────────────────────────────────────╮
+│   ✗ FAIL   Schema & Repository Governance failed in Tier 1  ·  exit 1        │
+│                                                                              │
+│  fix     Fix the 'description' field in frontmatter according to schema      │
+│  requirements                                                                │
+│          skillevaluator validate                                             │
+│  <host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifact  │
+│  s/skills-trials-20261009/corpus/C03/case-no-description --tiers 1 --checks  │
+│  schema,quality --no-llm --min-score 70 -r json -o                           │
+│  <host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifact  │
+│  s/skills-trials-20261009/native/skillevaluator/C03/reports                  │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+      json
+<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skil
+ls-trials-20261009/native/skillevaluator/C03/reports/skillevaluator-output-20261
+009054056.json

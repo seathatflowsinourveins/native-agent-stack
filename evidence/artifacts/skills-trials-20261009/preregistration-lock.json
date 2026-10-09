@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "locked_at": "2026-10-09T05:36:11Z",
+  "execution_started": false,
+  "preregistration_sha256": "6fc7045aed40d6a0d82ebc1234d2566f6ac51d0c3da7a946676eb92c0286836b",
+  "corpus_sha256": "c31ca2e699473cd39754dc22d5cb784fa010c1709358f2e0530cc8b0402fef63",
+  "corpus_hash_method": "Sorted file relative path UTF-8, NUL, then raw file bytes concatenated into SHA256; includes cases.json",
+  "private_arm_mapping_sha256": "fae1643bc5aff64fb654b2eac45e5a15aae6236fdaa20c539cfca5277516bb3e",
+  "judge_mapping_access": false,
+  "prior_unblinded_scores_reused": false
+}

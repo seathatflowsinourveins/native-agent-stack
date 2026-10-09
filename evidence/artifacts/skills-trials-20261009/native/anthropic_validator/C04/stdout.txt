@@ -1,0 +1,8 @@
+Invalid YAML in frontmatter: while parsing a flow sequence
+  in "<unicode string>", line 2, column 14:
+    description: [Unclosed flow sequence
+                 ^
+expected ',' or ']', but got '<stream end>'
+  in "<unicode string>", line 2, column 37:
+    description: [Unclosed flow sequence
+                                        ^

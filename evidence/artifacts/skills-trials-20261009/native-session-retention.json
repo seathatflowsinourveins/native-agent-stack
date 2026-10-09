@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "redaction": "Replace thread.started.thread_id with [session-id-redacted] and replace personal home prefix with <host-home>; all other native event text preserved",
+  "events": [
+    {
+      "path": "fresh-events.jsonl",
+      "private_original_sha256": "77012d6261377dcaa70bdd2b64056258b1d8b2bc6182cbd29105eb730fef58f7",
+      "published_redacted_sha256": "b8e49ab89268901008cc41b2c68045173897954236d4d4780981889a167a67ab",
+      "raw_complete_retained_privately": true,
+      "thread_id_redactions": 1,
+      "home_prefix_redactions": 13
+    },
+    {
+      "path": "judge-events.jsonl",
+      "private_original_sha256": "3cc704f8350af69ca6583a04002cd48e6fde95a8d05e87c4949ef20301bb5903",
+      "published_redacted_sha256": "7a8ffaec7d04019b3969b7d0281df8489d9c7ba92362e4b51b59487fafbc2cd7",
+      "raw_complete_retained_privately": true,
+      "thread_id_redactions": 1,
+      "home_prefix_redactions": 0
+    }
+  ],
+  "fresh_native_usage": {
+    "input_tokens": 127582,
+    "cached_input_tokens": 96256,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 2840,
+    "reasoning_output_tokens": 1642
+  },
+  "judge_native_usage": {
+    "input_tokens": 32720,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 12932,
+    "reasoning_output_tokens": 8070
+  }
+}

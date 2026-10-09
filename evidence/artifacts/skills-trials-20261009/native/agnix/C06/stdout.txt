@@ -1,0 +1,33 @@
+{
+  "version": "0.57.0",
+  "files_checked": 1,
+  "diagnostics": [
+    {
+      "level": "error",
+      "rule": "AS-004",
+      "file": "evidence/artifacts/skills-trials-20261009/corpus/C06/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/SKILL.md",
+      "line": 2,
+      "column": 1,
+      "message": "Name 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' must be 1-64 characters per segment using lowercase letters, digits, and hyphens, as a bare skill name or plugin:skill-name",
+      "suggestion": "Lowercase and trim each name segment, replace spaces and '_' with '-', collapse multiple '-' into one, remove invalid characters, and truncate each segment to 64 characters",
+      "category": "agent-skills",
+      "rule_severity": "HIGH"
+    },
+    {
+      "level": "info",
+      "rule": "VER-001",
+      "file": "",
+      "line": 1,
+      "column": 1,
+      "message": "No tool or spec versions pinned. Version-dependent rules will use default assumptions.",
+      "suggestion": "Pin versions in .agnix.toml [tool_versions] or [spec_revisions] for deterministic validation.",
+      "category": "version-awareness",
+      "rule_severity": "LOW"
+    }
+  ],
+  "summary": {
+    "errors": 1,
+    "warnings": 0,
+    "info": 1
+  }
+}

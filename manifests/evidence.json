@@ -17072,8 +17072,8 @@
     },
     {
       "path": "catalogs/landscape/skills-lifecycle.json",
-      "sha256": "affdb8d3969dd13ae5d4edbf63448fd4a461f574434f2890c050ff39a74a62f6",
-      "bytes": 26356
+      "sha256": "02ecc110296491c06c00d7f024717009a0c902b13a98837050a8b6353f7738d3",
+      "bytes": 26580
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
@@ -18329,6 +18329,11 @@
       "path": "docs/decisions/2026-10-09-mcp-surfaces-trials.md",
       "sha256": "bec9cc9a99ce31227c41952e7787e979b9ffe01b4d3a6dd221c193776bfcb04d",
       "bytes": 16364
+    },
+    {
+      "path": "docs/decisions/2026-10-09-skills-blinded-trials.md",
+      "sha256": "e3031ef371ebbae6094aaf56d2f0d21365a2a84157cd2bfcff200ae1c533aa12",
+      "bytes": 6059
     },
     {
       "path": "docs/direct-results.md",
@@ -49921,6 +49926,1126 @@
       "bytes": 11280
     },
     {
+      "path": "evidence/artifacts/skills-trials-20261009/PREREGISTRATION.md",
+      "sha256": "6fc7045aed40d6a0d82ebc1234d2566f6ac51d0c3da7a946676eb92c0286836b",
+      "bytes": 7191
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/RESULT.json",
+      "sha256": "8346e0a2d4c96bfc0a214c795c55ec9f3f0be81049e333833ec35354ad89afe2",
+      "bytes": 6621
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/agnix-source-review.md",
+      "sha256": "967c695dbd4aa503410af67f467f0f844d3270c4c58e58c486293530588249a8",
+      "bytes": 5428
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/arm-map-reveal.json",
+      "sha256": "fae1643bc5aff64fb654b2eac45e5a15aae6236fdaa20c539cfca5277516bb3e",
+      "bytes": 97
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/blinding-audit.md",
+      "sha256": "6444c430ae92f082af1e4abfd3bc19e321d5e1b919eb55118b9757282b99c67b",
+      "bytes": 2496
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/checks/agnix-vendor-eval.log",
+      "sha256": "61febabc3170a7731c518a3cc7e2f6092748cf6cba680f743266cf1727a27cfd",
+      "bytes": 3131
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/checks/controller-preexecution-failure.log",
+      "sha256": "44c4a2b10e628d51fd4b3d335beda9736deddc6605a0f53073dfdb8646d501ab",
+      "bytes": 356
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/checks/judge-preexecution-failure.log",
+      "sha256": "bc90d92ba5df93e01f3ac7924fa0d37001462e0be2770f2b424c8ebfccac2ecc",
+      "bytes": 107
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/checks/landscape-skills-tests-initial-failure.log",
+      "sha256": "55cd2d0621f886c7c66bfb9e212d8fb84ddf2b2913a983e3fa354ad5a5dd68a0",
+      "bytes": 1195
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/checks/landscape-skills-tests.log",
+      "sha256": "160d0c41d9cd3ba1e51a94f853a71e61a22a7003852ab6c0c2cabbe9613f382a",
+      "bytes": 224
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/checks/skillevaluator-cli-tests.log",
+      "sha256": "88fd3e5b3c12249ef39bf6185289131037937a06830f8e0d1db8533e9d98c11f",
+      "bytes": 99
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/checks/skillevaluator-quality-tests.log",
+      "sha256": "aeb3e52813fed489135edb8bc18eabc5feb6562b67128a38ac5f80a965b57076",
+      "bytes": 180
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/checks/skillevaluator-schema-initial-failure.log",
+      "sha256": "52dd9b8b5fe73240ca6c10140de369f2afc37c128ac0ba270c104b482f0bd186",
+      "bytes": 1069
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/checks/skillevaluator-schema-tests.log",
+      "sha256": "f3669b325d08ed25d20cfe72b01678a9151d81792845639443056aab438727b5",
+      "bytes": 99
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/checks/skills-manifest-tests.log",
+      "sha256": "aa53a6c0350b483f6b19c722e4f8d997e8b81f8aae70786020cf18aa6a6b4dab",
+      "bytes": 132
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/checks/validate-ignored-events-failure.log",
+      "sha256": "7a7a297f4736218b5dd01072c1b4e4334ea8eb2e55f97ed28246e71cac0c4f03",
+      "bytes": 439
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/checks/validate-initial-failure.log",
+      "sha256": "6163fad8a3e558ad9d4e58ba8d8641ced1978d1e719fc722b339764b9dfd0ecd",
+      "bytes": 25820
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/corpus/C01/case-minimal/SKILL.md",
+      "sha256": "20c3c65a1507aa68fafafd6584d28dc31e11b012d605aab3ca61c4e23c75287e",
+      "bytes": 240
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/corpus/C02/case-no-name/SKILL.md",
+      "sha256": "133b4aebbeb35f374389a53e7968c1c47a66fdf75b43f465af08c4cb8b0ef01c",
+      "bytes": 147
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/corpus/C03/case-no-description/SKILL.md",
+      "sha256": "3a8b87f2104978451129f90d88dd86b88bbc8de57179acd6db00d6d772e4ca69",
+      "bytes": 111
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/corpus/C04/case-broken-yaml/SKILL.md",
+      "sha256": "d81d4619d27001baf9c6cb7d20ab62b4807cc1bf421f166cfb5722e0eef16ad3",
+      "bytes": 145
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/corpus/C05/Bad_Name/SKILL.md",
+      "sha256": "1db3924eaf8d6aefc5803a2e799f87f35e808a81d48d7f71074bfd8b828cbbb8",
+      "bytes": 162
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/corpus/C06/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/SKILL.md",
+      "sha256": "cc20ce9b36dfed0329edd4d8696f09e3ca990cf5b39188dbfcf89f794f24a72b",
+      "bytes": 219
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/corpus/C07/case-long-description/SKILL.md",
+      "sha256": "806664654e5d8a46736514cdaa4a30742db3d884d6362db7b6c2ee99772542e8",
+      "bytes": 1152
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/corpus/C08/case-missing-reference/SKILL.md",
+      "sha256": "bd3a6d21518f12712a01165926f41cd5a9e6100f4293ce015c5bef6ba75dabb7",
+      "bytes": 194
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/corpus/C09/case-existing-reference/SKILL.md",
+      "sha256": "6b7d7881bf76311d03b642a50f8d93f1b07974aa18d80818e6b72a3e11abb636",
+      "bytes": 195
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/corpus/C09/case-existing-reference/references/csv-guide.md",
+      "sha256": "390ddbf475e8945c7e19fb596821a51510c1fd416d9dfdbd07490bedc468222e",
+      "bytes": 132
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/corpus/C10/case-optional-fields/SKILL.md",
+      "sha256": "6b3cf48274b53e8a1c15f68f4a0710fc82dde7d3c0d644dce274d06ab120897c",
+      "bytes": 353
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/corpus/C11/case-empty-description/SKILL.md",
+      "sha256": "e3c61ffa4c7b8c488268d5f2c79bc0f26ea5711e98350dc777e228464ec25c5a",
+      "bytes": 130
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/corpus/C12/case-no-frontmatter/SKILL.md",
+      "sha256": "aef85c6645b7674a435887823434e8ffbc2032e2170818f1478de79b58cc73a2",
+      "bytes": 94
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/corpus/I01/AGENTS.md",
+      "sha256": "7c111a0b34c627fa8c8d18ab925e95c9ae2a17cbad3c7be7cb264340cf5dc3ab",
+      "bytes": 154
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/corpus/I01/guide.md",
+      "sha256": "76df49037bddec9112c3355d7a6f07a58c9e9611a61640137f55a2d3dcaf0c58",
+      "bytes": 134
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/corpus/I02/AGENTS.md",
+      "sha256": "276649c157187af8d39fef361f250104aad566e98c2863c3b8ef52c78220adac",
+      "bytes": 162
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/corpus/cases.json",
+      "sha256": "0e2dc9534fe26f8bdc49a49e7ee3588804f9f59be6d4dc556e456549f366c7f1",
+      "bytes": 2192
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/fresh-events.jsonl",
+      "sha256": "b8e49ab89268901008cc41b2c68045173897954236d4d4780981889a167a67ab",
+      "bytes": 38208
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/fresh-session.json",
+      "sha256": "4729c64a4becd0347f6913c00d04a125ba778786ed0d57c26eee7ad6c999187b",
+      "bytes": 2205
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/install-and-inverse.json",
+      "sha256": "555b800e92a074ba6cc3d9aaf1d8941ba2fe1a9ce365f29876d92351b57a57d5",
+      "bytes": 5598
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/judge-events.jsonl",
+      "sha256": "7a8ffaec7d04019b3969b7d0281df8489d9c7ba92362e4b51b59487fafbc2cd7",
+      "bytes": 25474
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/judge-execution.json",
+      "sha256": "e82e68781117c5efaae6c11642232a16b5e85aa4d547a81892a52da5c1ef523f",
+      "bytes": 2053
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/judge-instructions.md",
+      "sha256": "ce37a5af2d32b5727dfd55827dec1b9cf94898f274305405c4372ea7bc7b5210",
+      "bytes": 2165
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/judge-packet.json",
+      "sha256": "7145370d6584747569e585be9d345b1f51fdb542b0a0ee08315d63539f49f440",
+      "bytes": 76084
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/judge-return.json",
+      "sha256": "26e68e1b8950e0f289f3e994b1a90a6b84f75859bba8ec10418003e052b6f386",
+      "bytes": 18792
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native-session-retention.json",
+      "sha256": "e474c9cca1b69cb409aa2d6e5ba65a6bbb7b72c48009e15c4cc3e18a094f6997",
+      "bytes": 1324
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/agnix/C01/smaps_rollup.txt",
+      "sha256": "72998e93ed2c469431641ad46bd7a43e26fb2e1f8cb38726a323ec8311f76b9c",
+      "bytes": 698
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/agnix/C01/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/agnix/C01/stdout.txt",
+      "sha256": "3feceea1d891d581800be5c11483ab7f038cf5ba8a9596758dac0fa08a87293b",
+      "bytes": 548
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/agnix/C02/smaps_rollup.txt",
+      "sha256": "e151d688b8d14b903d85f9138eafb3f74229f2c121953466c03630d9338fcb6a",
+      "bytes": 698
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/agnix/C02/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/agnix/C02/stdout.txt",
+      "sha256": "8809d9d3db34b1c496a38f3f96e7bc45e3926ba9535eb221bae3583b5c0dbcbf",
+      "bytes": 938
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/agnix/C03/smaps_rollup.txt",
+      "sha256": "23202cbe4f1616edccdfb652de66083465de4527bf6e2c999381655139459b84",
+      "bytes": 698
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/agnix/C03/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/agnix/C03/stdout.txt",
+      "sha256": "7ae2a4d65a8a9899c40c42ebcacf186b3a76b32ed447c4a8de61a99da28c8662",
+      "bytes": 955
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/agnix/C04/smaps_rollup.txt",
+      "sha256": "20b82d3ddf8023975a53464b133d89c1263102135a4b23d57c9ef98e8a9372e5",
+      "bytes": 698
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/agnix/C04/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/agnix/C04/stdout.txt",
+      "sha256": "e16ee3582836bf545c2398279a31a1640bb090813833dc0ebce77f8410474fdd",
+      "bytes": 1044
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/agnix/C05/smaps_rollup.txt",
+      "sha256": "0dd4c4ac1463a440694f93f54284f193c7ac162de6d67562a68302b2d62b5762",
+      "bytes": 698
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/agnix/C05/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/agnix/C05/stdout.txt",
+      "sha256": "ea918f05e20a79fbc1cb2b92f005c2fff6e29c910e482026b115d8cf5037d008",
+      "bytes": 1153
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/agnix/C06/smaps_rollup.txt",
+      "sha256": "96e6b69c6751c5fa001ac2290a3abc562b334d99bd3d1f76dfc1149dbb3dc98c",
+      "bytes": 698
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/agnix/C06/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/agnix/C06/stdout.txt",
+      "sha256": "c982bd64894d8f16a6c4229b285d480585a125c6d869c18db05b8c070f384871",
+      "bytes": 1267
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/agnix/C07/smaps_rollup.txt",
+      "sha256": "73d74efdd8de3e4e2174725a99dccba186efb6b7076f9f12044e28a60c5002b0",
+      "bytes": 698
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/agnix/C07/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/agnix/C07/stdout.txt",
+      "sha256": "9cfeb16fb3860b8852a540f9400003123aad688d4185dbe9bb2c8a6c0c5f82cc",
+      "bytes": 950
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/agnix/C08/smaps_rollup.txt",
+      "sha256": "88ae990e459ea9f9b696e40c83c33d98a0ea307313846796d41a2f4a6acac253",
+      "bytes": 698
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/agnix/C08/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/agnix/C08/stdout.txt",
+      "sha256": "7275a9bca580d5c3b851059d3d5a2fc538ee15315e156744f3e9a1538aa31d00",
+      "bytes": 1122
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/agnix/C09/smaps_rollup.txt",
+      "sha256": "c13f5f43b827c76719d954e992c5f06f6601f747737ed13037e01776493d5a07",
+      "bytes": 698
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/agnix/C09/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/agnix/C09/stdout.txt",
+      "sha256": "f2139137eed6f7e1d9b57190cc283d8698bfe94db59a3d19870ea6d37163550b",
+      "bytes": 548
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/agnix/C10/smaps_rollup.txt",
+      "sha256": "85e97e7d2738f225008db3507dde5f239064eb1571f145d60e55a677cf7f6308",
+      "bytes": 698
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/agnix/C10/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/agnix/C10/stdout.txt",
+      "sha256": "3feceea1d891d581800be5c11483ab7f038cf5ba8a9596758dac0fa08a87293b",
+      "bytes": 548
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/agnix/C11/smaps_rollup.txt",
+      "sha256": "46ad492e990a7a881b1954173bbfc787c9a9bb15bd81798dd90ee48f0c22b040",
+      "bytes": 698
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/agnix/C11/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/agnix/C11/stdout.txt",
+      "sha256": "dc18f398550c57bc3e454d8ce6669697a94a5c7d18e8f70a3f87e8e647194831",
+      "bytes": 948
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/agnix/C12/smaps_rollup.txt",
+      "sha256": "386943a6bc9fcf1759f11542d3a968a45e059002874e0936432f88d2ad718ca7",
+      "bytes": 698
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/agnix/C12/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/agnix/C12/stdout.txt",
+      "sha256": "58ab1f2819eb275ef98f8828beadc20c43bdb163e69181ab468480fc5d861f79",
+      "bytes": 943
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/agnix/I01/smaps_rollup.txt",
+      "sha256": "39faa86684e054a824d1274234d11b086df0fe8f044c90db61d12faedf8de8fc",
+      "bytes": 698
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/agnix/I01/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/agnix/I01/stdout.txt",
+      "sha256": "ae3dcdcfbd8a05ca2b6e9b261f1c211ff2d9e139cd9f55c1728ba01676d030df",
+      "bytes": 982
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/agnix/I02/smaps_rollup.txt",
+      "sha256": "c7939c6598888042e57ad6b1869f8d32fc9cf60474e2c455d651f17fdfe461d4",
+      "bytes": 698
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/agnix/I02/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/agnix/I02/stdout.txt",
+      "sha256": "cb2f76d93924f513d1b3fef31b2dc245c249d60aaeb36adbb8c5268394abad5e",
+      "bytes": 1497
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/anthropic_validator/C01/smaps_rollup.txt",
+      "sha256": "742c0db74030df584883e6cdac2a0b7202dc044e2dba96b207d464ed0b51e9f8",
+      "bytes": 698
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/anthropic_validator/C01/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/anthropic_validator/C01/stdout.txt",
+      "sha256": "db349825903d66adffea3ecf1bd8e1803043e8a71cf1a051235dabc5371f5bb0",
+      "bytes": 16
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/anthropic_validator/C02/smaps_rollup.txt",
+      "sha256": "6a16406f94929c80c08d6c4ceb35344c1eb72facab9914afe00a19b553830dd2",
+      "bytes": 698
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/anthropic_validator/C02/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/anthropic_validator/C02/stdout.txt",
+      "sha256": "e0cab01a68d3ec208b8003bde34ebb63e1f279098d3d2c3c86b403e8f2715794",
+      "bytes": 30
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/anthropic_validator/C03/smaps_rollup.txt",
+      "sha256": "e0538aa2e68240b9a77d0893374cbdb56636e9bbec22c3d8f88e870a6c1dd2b4",
+      "bytes": 698
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/anthropic_validator/C03/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/anthropic_validator/C03/stdout.txt",
+      "sha256": "613e1b8f99a4e5eca744ba22e65a6d15fd2811ebf7ea76f0587727a0aaad3fdf",
+      "bytes": 37
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/anthropic_validator/C04/smaps_rollup.txt",
+      "sha256": "3e5bb806e9445df0d501efaab8e18e9159810d56c116bbd773167fcc3a7a5804",
+      "bytes": 698
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/anthropic_validator/C04/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/anthropic_validator/C04/stdout.txt",
+      "sha256": "761356466ad421ec080a238b36f10f6fd01487519ba326ddec0033c3b98c8035",
+      "bytes": 334
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/anthropic_validator/C05/smaps_rollup.txt",
+      "sha256": "c8f15c9644fab2c8232684fd500db2f8e74d5b5760b030dafe5291a6ed7e4d8c",
+      "bytes": 698
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/anthropic_validator/C05/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/anthropic_validator/C05/stdout.txt",
+      "sha256": "0ef95f23db2456e4702ef9666d76e10b182f7c9fb1e9b34d7bb7508307f043c5",
+      "bytes": 83
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/anthropic_validator/C06/smaps_rollup.txt",
+      "sha256": "39bd47bcc748894f21bb9aaacce43380151f5f380f33649310a54ecb376dec39",
+      "bytes": 698
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/anthropic_validator/C06/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/anthropic_validator/C06/stdout.txt",
+      "sha256": "a73028856d902b8ea0afedcc0e439a662d08e06037d56651c63f8b49d761fd9d",
+      "bytes": 60
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/anthropic_validator/C07/smaps_rollup.txt",
+      "sha256": "0b72388830a892ed557a3401b0ec36031b0032c4108f793046cca77657ac75c9",
+      "bytes": 698
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/anthropic_validator/C07/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/anthropic_validator/C07/stdout.txt",
+      "sha256": "fb6c4763dca6810f162ac79707a2ccc35c948e7b39e8f4bc2fadc4525a825bdc",
+      "bytes": 71
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/anthropic_validator/C08/smaps_rollup.txt",
+      "sha256": "7191681a768a96035c18604b00c6169de7959a667b0416f7ba16d561863b45cb",
+      "bytes": 698
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/anthropic_validator/C08/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/anthropic_validator/C08/stdout.txt",
+      "sha256": "db349825903d66adffea3ecf1bd8e1803043e8a71cf1a051235dabc5371f5bb0",
+      "bytes": 16
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/anthropic_validator/C09/smaps_rollup.txt",
+      "sha256": "1466d552ddf964c35454f03d3c5385fc34381eee216367e349fe3cffd6b16aa4",
+      "bytes": 698
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/anthropic_validator/C09/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/anthropic_validator/C09/stdout.txt",
+      "sha256": "db349825903d66adffea3ecf1bd8e1803043e8a71cf1a051235dabc5371f5bb0",
+      "bytes": 16
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/anthropic_validator/C10/smaps_rollup.txt",
+      "sha256": "b326847a1cd97acc0b63c863348a07f3097ab8dfa77abb90eb18cc3b8d4504f9",
+      "bytes": 698
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/anthropic_validator/C10/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/anthropic_validator/C10/stdout.txt",
+      "sha256": "db349825903d66adffea3ecf1bd8e1803043e8a71cf1a051235dabc5371f5bb0",
+      "bytes": 16
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/anthropic_validator/C11/smaps_rollup.txt",
+      "sha256": "9241efac90344417b79ed42727644df4d463030ec066690114b1b4af74fa8fd4",
+      "bytes": 698
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/anthropic_validator/C11/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/anthropic_validator/C11/stdout.txt",
+      "sha256": "db349825903d66adffea3ecf1bd8e1803043e8a71cf1a051235dabc5371f5bb0",
+      "bytes": 16
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/anthropic_validator/C12/smaps_rollup.txt",
+      "sha256": "c9ffdef89b64212daa5a4c05473d3671585dc17f107c79b68daef7c077d132e4",
+      "bytes": 698
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/anthropic_validator/C12/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/anthropic_validator/C12/stdout.txt",
+      "sha256": "9af0794619d2b78c81a58020e378bfbfd4969f3b012f12e41792c15367e2121c",
+      "bytes": 26
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/finding-views.json",
+      "sha256": "499047ef601d409ec5a305b8cfb217caa881024ac929fd10e20a0598d10d4b6c",
+      "bytes": 71798
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/native-results.json",
+      "sha256": "5762d0c7294f96c5a7419dcf575e03a38282b254f3a78b2095c4147020360a29",
+      "bytes": 76814
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/openai_validator/C01/smaps_rollup.txt",
+      "sha256": "02106fca84e738196d666d4a6fed4cc751e0c9e24f8c9211924eb9998ac18e42",
+      "bytes": 698
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/openai_validator/C01/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/openai_validator/C01/stdout.txt",
+      "sha256": "db349825903d66adffea3ecf1bd8e1803043e8a71cf1a051235dabc5371f5bb0",
+      "bytes": 16
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/openai_validator/C02/smaps_rollup.txt",
+      "sha256": "08fcfd282c6eb3a3121914e9999ed0fd56d105416bdbf184ecee02cbf69962d7",
+      "bytes": 698
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/openai_validator/C02/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/openai_validator/C02/stdout.txt",
+      "sha256": "e0cab01a68d3ec208b8003bde34ebb63e1f279098d3d2c3c86b403e8f2715794",
+      "bytes": 30
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/openai_validator/C03/smaps_rollup.txt",
+      "sha256": "6e8d3258aae48685cd86a06b9e8fe4641d2f1d543430af7bf2812a939fcdb89f",
+      "bytes": 698
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/openai_validator/C03/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/openai_validator/C03/stdout.txt",
+      "sha256": "613e1b8f99a4e5eca744ba22e65a6d15fd2811ebf7ea76f0587727a0aaad3fdf",
+      "bytes": 37
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/openai_validator/C04/smaps_rollup.txt",
+      "sha256": "9533d85cccf9b1e868ffbc55146f5c7272f8f8e3a8d3affa0043d7be1136e17c",
+      "bytes": 698
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/openai_validator/C04/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/openai_validator/C04/stdout.txt",
+      "sha256": "761356466ad421ec080a238b36f10f6fd01487519ba326ddec0033c3b98c8035",
+      "bytes": 334
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/openai_validator/C05/smaps_rollup.txt",
+      "sha256": "00e3ccf1ed2aa66c50a66baebf97d478d40a89dd83f6da5ffe0fd8804a4d4e34",
+      "bytes": 698
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/openai_validator/C05/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/openai_validator/C05/stdout.txt",
+      "sha256": "ed6db84fba500178e4ae32410c0fc5a2450c5b456b315f5ec9f6c984a53e6469",
+      "bytes": 84
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/openai_validator/C06/smaps_rollup.txt",
+      "sha256": "4c3f0e94523092927514278d1bd830d6760ba9171d46cc6a1c2440a2c8e9eeed",
+      "bytes": 698
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/openai_validator/C06/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/openai_validator/C06/stdout.txt",
+      "sha256": "a73028856d902b8ea0afedcc0e439a662d08e06037d56651c63f8b49d761fd9d",
+      "bytes": 60
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/openai_validator/C07/smaps_rollup.txt",
+      "sha256": "76573120458ee096ad62a8a3fc5809ac6bd3a64adf9eae55ea4ca2f5772f7022",
+      "bytes": 698
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/openai_validator/C07/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/openai_validator/C07/stdout.txt",
+      "sha256": "fb6c4763dca6810f162ac79707a2ccc35c948e7b39e8f4bc2fadc4525a825bdc",
+      "bytes": 71
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/openai_validator/C08/smaps_rollup.txt",
+      "sha256": "b936cfb61f0d8928904ebd103118c2027a13ff5e4a91c8343d7cca4ee0a00839",
+      "bytes": 698
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/openai_validator/C08/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/openai_validator/C08/stdout.txt",
+      "sha256": "db349825903d66adffea3ecf1bd8e1803043e8a71cf1a051235dabc5371f5bb0",
+      "bytes": 16
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/openai_validator/C09/smaps_rollup.txt",
+      "sha256": "bb19126077c0f6a28693f3ba2c9a6cfd45774abb2394b362d976dd544683e4d9",
+      "bytes": 698
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/openai_validator/C09/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/openai_validator/C09/stdout.txt",
+      "sha256": "db349825903d66adffea3ecf1bd8e1803043e8a71cf1a051235dabc5371f5bb0",
+      "bytes": 16
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/openai_validator/C10/smaps_rollup.txt",
+      "sha256": "55e9077459d03e74388a87e88e9bf10d945a1f75fea63b94a0039b1aebaf0af6",
+      "bytes": 698
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/openai_validator/C10/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/openai_validator/C10/stdout.txt",
+      "sha256": "827ba0e94d91270c68f97ad2f56d578024f95b5e0da53761525c48f67e6e45b4",
+      "bytes": 134
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/openai_validator/C11/smaps_rollup.txt",
+      "sha256": "ae04cc92031e96464d4c94d1fe51ac79b1df2ddcb8b544867843a29537be4049",
+      "bytes": 698
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/openai_validator/C11/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/openai_validator/C11/stdout.txt",
+      "sha256": "db349825903d66adffea3ecf1bd8e1803043e8a71cf1a051235dabc5371f5bb0",
+      "bytes": 16
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/openai_validator/C12/smaps_rollup.txt",
+      "sha256": "14a236a0c1c24bd087c542d8b01faad0b0b4ab1285f8a2196d44bb8d4d43bd54",
+      "bytes": 698
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/openai_validator/C12/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/openai_validator/C12/stdout.txt",
+      "sha256": "9af0794619d2b78c81a58020e378bfbfd4969f3b012f12e41792c15367e2121c",
+      "bytes": 26
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C01/reports/BENCHMARK.md",
+      "sha256": "498508533ef50bb2a684edcb83b0587dc9478010738b9369de1df29874812038",
+      "bytes": 4130
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C01/reports/skillevaluator-output-20261009054055.json",
+      "sha256": "430f97900d14ddd530bf27a0da57486331272952582ee3f071d03fb2839725f8",
+      "bytes": 24268
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C01/smaps_rollup.txt",
+      "sha256": "0850f4d31b938e0d507c3ceda96208293b6ed08f92e0b44ab7cd676aeeeaf6c8",
+      "bytes": 698
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C01/stderr.txt",
+      "sha256": "fd45d200adde9a4a3d9ef87e26ce7582d4f570826ad5c7b124e04449eb283906",
+      "bytes": 25
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C01/stdout.txt",
+      "sha256": "83190599f6a076c5da89286cb3c97bc90a985123361cf70adff8e460bc3ca721",
+      "bytes": 2928
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C02/reports/BENCHMARK.md",
+      "sha256": "8fce0449e4770c8eef7a5d41ece892386a5352cbac436756a5148f7e46914692",
+      "bytes": 3803
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C02/reports/skillevaluator-output-20261009054056.json",
+      "sha256": "0cc313f84598a540f7e5fb3512daa8d03b982dcc40dbf51708fad791bacbfd26",
+      "bytes": 20151
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C02/smaps_rollup.txt",
+      "sha256": "6dffaf7f49f2be1d4e289d001e6be9c2a97692d6aef60c201b0c26e5ad2afad6",
+      "bytes": 698
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C02/stderr.txt",
+      "sha256": "fd45d200adde9a4a3d9ef87e26ce7582d4f570826ad5c7b124e04449eb283906",
+      "bytes": 25
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C02/stdout.txt",
+      "sha256": "ab32e967dbebc337872e43053ee279e94000aa5942ba624413fd3d52de0564c7",
+      "bytes": 3012
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C03/reports/BENCHMARK.md",
+      "sha256": "1224d0374ee3c57c766028ce7295d28723b1590eb13f5521c80a848f8ed51130",
+      "bytes": 3831
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C03/reports/skillevaluator-output-20261009054056.json",
+      "sha256": "05476421b77618925c9806159e1ab1ae14279212993fd78abdc6a3f89ff32d9b",
+      "bytes": 20366
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C03/smaps_rollup.txt",
+      "sha256": "0c79ec14b738b9ac94fc0f08c6f3f8ef45e83978490c1591ea5c4569dde36953",
+      "bytes": 698
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C03/stderr.txt",
+      "sha256": "fd45d200adde9a4a3d9ef87e26ce7582d4f570826ad5c7b124e04449eb283906",
+      "bytes": 25
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C03/stdout.txt",
+      "sha256": "cb7f02d7e30f59021e47adc600abd5fd6521a28dc696b96982554cba9b7a0d72",
+      "bytes": 3012
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C04/reports/BENCHMARK.md",
+      "sha256": "594e0a62530a9067dc92666b85d947a005358cd8e911d10b65261eb12a309845",
+      "bytes": 4252
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C04/reports/skillevaluator-output-20261009054056.json",
+      "sha256": "7a225e9998f2b59c93adfaf7af310e0423bbefcec6518f917db3f968da5a7b8c",
+      "bytes": 16468
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C04/smaps_rollup.txt",
+      "sha256": "f1672026dffc736bd1818c65fc01ba5052e6a6d0d3d73aaa8b32bf429f7e09b7",
+      "bytes": 698
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C04/stderr.txt",
+      "sha256": "fd45d200adde9a4a3d9ef87e26ce7582d4f570826ad5c7b124e04449eb283906",
+      "bytes": 25
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C04/stdout.txt",
+      "sha256": "dfc418e9fc1863510bfcc0f2212f66c577077f2d45faa26ee3647e307f761ecd",
+      "bytes": 3522
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C05/reports/BENCHMARK.md",
+      "sha256": "e2d4f09476092cbbe7f6568896d41b347ef0272ae51e4f97b19b382cf22394e5",
+      "bytes": 4485
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C05/reports/skillevaluator-output-20261009054057.json",
+      "sha256": "99476a9507f76433cb639575dd367f953afa5a9e68f97d9f821b2394a8b9de08",
+      "bytes": 22997
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C05/smaps_rollup.txt",
+      "sha256": "4c7075e2d1dc031fe2640889931e0570e0f41a03c839ff7fd411399c352af439",
+      "bytes": 698
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C05/stderr.txt",
+      "sha256": "fd45d200adde9a4a3d9ef87e26ce7582d4f570826ad5c7b124e04449eb283906",
+      "bytes": 25
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C05/stdout.txt",
+      "sha256": "3e88462e887539d82232225c8ca17bdc6342e3c96b345d8f7bb457c30e53fb2b",
+      "bytes": 3272
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C06/reports/BENCHMARK.md",
+      "sha256": "b81a42a51fe41b261ee7847032f667838c822f93d98a06af44b8cdfd2e90ca9b",
+      "bytes": 3961
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C06/reports/skillevaluator-output-20261009054057.json",
+      "sha256": "0cc1c7ebe94a95f5e792d84b3f6b5336dba662fddb924ee867f037837e85cd30",
+      "bytes": 21642
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C06/smaps_rollup.txt",
+      "sha256": "0de2eaeb445d60a243b33cd86f59b22b0e993f719383d37f44e84c96f5180978",
+      "bytes": 698
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C06/stderr.txt",
+      "sha256": "fd45d200adde9a4a3d9ef87e26ce7582d4f570826ad5c7b124e04449eb283906",
+      "bytes": 25
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C06/stdout.txt",
+      "sha256": "1068904975bd67d27911793a241b7ec0631cfbbc9ee0f1f2afac41539dd242f4",
+      "bytes": 3182
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C07/reports/BENCHMARK.md",
+      "sha256": "8915217e3076e02b402b4cb7b741689747016d99dcedcaf85758c6a20f86103f",
+      "bytes": 3891
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C07/reports/skillevaluator-output-20261009054058.json",
+      "sha256": "ba7c06990662edbbc951b15862e9cde9fa547694601269955340540df84a8298",
+      "bytes": 23253
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C07/smaps_rollup.txt",
+      "sha256": "5a5202f7e1ab4aaa5719afb6a492712f9118792d0cecf9fbc7bbffafd91146e5",
+      "bytes": 698
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C07/stderr.txt",
+      "sha256": "fd45d200adde9a4a3d9ef87e26ce7582d4f570826ad5c7b124e04449eb283906",
+      "bytes": 25
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C07/stdout.txt",
+      "sha256": "f1314a862a5b0e6ab7e4cc39a3b0a93636f5c0f887acf6a81374a91633e8df57",
+      "bytes": 3012
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C08/reports/BENCHMARK.md",
+      "sha256": "77d815a1054a8419390cc43f5f2bb773a0b7cd2ce7d3efa92686dd2ab306ab0d",
+      "bytes": 4248
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C08/reports/skillevaluator-output-20261009054058.json",
+      "sha256": "fe85f2925c088e0802068e4ccac59b42b349be6ae3232b494437f4634ca8f8d3",
+      "bytes": 25226
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C08/smaps_rollup.txt",
+      "sha256": "f23908390c7deb3cc63c67bc438c6df47be8632c3bd1a5bc34388296180101f9",
+      "bytes": 698
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C08/stderr.txt",
+      "sha256": "fd45d200adde9a4a3d9ef87e26ce7582d4f570826ad5c7b124e04449eb283906",
+      "bytes": 25
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C08/stdout.txt",
+      "sha256": "be97ce3936afafaeca6ce30ed9689be088e5070f88e1b2fe30fe284368496ef3",
+      "bytes": 2928
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C09/reports/BENCHMARK.md",
+      "sha256": "9edb6550fc6370b25495ba51381d144c793ed608aedb45092dda3f014043c669",
+      "bytes": 4251
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C09/reports/skillevaluator-output-20261009054059.json",
+      "sha256": "18b23a8be5c40524aa0531d4c923d223be749ebaa355b3034e1a028b9a724d82",
+      "bytes": 25344
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C09/smaps_rollup.txt",
+      "sha256": "9fbd2050043415b0e1bd3e3bc26c585b2a23d2c3edcf094ce1801dba6f63c5ae",
+      "bytes": 698
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C09/stderr.txt",
+      "sha256": "fd45d200adde9a4a3d9ef87e26ce7582d4f570826ad5c7b124e04449eb283906",
+      "bytes": 25
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C09/stdout.txt",
+      "sha256": "bbc8468e854e2277e7167a12acb1b398d17d3ca37f7b1f31036fe3f319c4d8c3",
+      "bytes": 2928
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C10/reports/BENCHMARK.md",
+      "sha256": "4d4b40f1d1f80b97b0871d4cfcf8556ba7d28d2083b417db4c4f6e6d1b7b1d8e",
+      "bytes": 4286
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C10/reports/skillevaluator-output-20261009054059.json",
+      "sha256": "45de9e081e3c9901f73dc0aaba04a9f66faf9b314064ab25e2cfc8ed918afb80",
+      "bytes": 23827
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C10/smaps_rollup.txt",
+      "sha256": "66c53c42eddd5132fecabec323a81ad73c0096c1cf67119025498e8a4c7c9e84",
+      "bytes": 698
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C10/stderr.txt",
+      "sha256": "fd45d200adde9a4a3d9ef87e26ce7582d4f570826ad5c7b124e04449eb283906",
+      "bytes": 25
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C10/stdout.txt",
+      "sha256": "53435ab2adaadd3e2a563e7f12dbf096ddb6193b689e0b318d1b13ac27d7354a",
+      "bytes": 2928
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C11/reports/BENCHMARK.md",
+      "sha256": "eaceb764e99b8bb9f8aec501ec235077a21a8a654d5d7702ff6bd232b598abf1",
+      "bytes": 3887
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C11/reports/skillevaluator-output-20261009054059.json",
+      "sha256": "11c625892be0bce1c079499bf485f2dc5c10d83ba0f6ce06628c0fa4656f6579",
+      "bytes": 20508
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C11/smaps_rollup.txt",
+      "sha256": "ebf716001bb8583044556d4a68658b798907b51bafbe50d63093ebe6b12d8057",
+      "bytes": 698
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C11/stderr.txt",
+      "sha256": "fd45d200adde9a4a3d9ef87e26ce7582d4f570826ad5c7b124e04449eb283906",
+      "bytes": 25
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C11/stdout.txt",
+      "sha256": "2bc954e506af1608919099b7ebb440a102645b5e93230492a11ca098a0bf9d44",
+      "bytes": 3012
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C12/reports/BENCHMARK.md",
+      "sha256": "5a70f5aa3ad37bdc274d8e660c6fa23e22f00d06f3f793ca663afc0c9b99839b",
+      "bytes": 3798
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C12/reports/skillevaluator-output-20261009054100.json",
+      "sha256": "c0edfbef2047a3296d2ca3f8079916e3b4b7015f4d51dc891a1313087fc9dd90",
+      "bytes": 15957
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C12/smaps_rollup.txt",
+      "sha256": "658ee9a8469d287cc7a895a833481bf3280129892ffc69c5ca48f7fa5439bf0a",
+      "bytes": 698
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C12/stderr.txt",
+      "sha256": "fd45d200adde9a4a3d9ef87e26ce7582d4f570826ad5c7b124e04449eb283906",
+      "bytes": 25
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/native/skillevaluator/C12/stdout.txt",
+      "sha256": "51f7c7bb39fc5601c36f8b45c42a9df160e85a9545ddba34d1a506ad490bdd3b",
+      "bytes": 3012
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/openai-maintenance.json",
+      "sha256": "f527abbc7411e044eb1ed2399e38ef51e4c0515b147728e11c7081735c533d04",
+      "bytes": 1057
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/preregistration-lock.json",
+      "sha256": "16e00c9dc22df56bfafce3c5ba2a8b0e2b19ca60a16fdb1ac3fafcdf33e6afdc",
+      "bytes": 584
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/publication-redaction.json",
+      "sha256": "fa13c3d34faf4c83630a453a5a4ba709544fae8f2283cfdbab70e9089fe592b5",
+      "bytes": 15134
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/run_static_trial.py",
+      "sha256": "4983124eaa566f6b6ad5c00da0522766688f58e94cd88c49be57a5c950ec0612",
+      "bytes": 11682
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/skillevaluator-source-review.md",
+      "sha256": "6aac9f54babfb5c20008856daba903095da329a0d7497b60ac9e739f420e1eae",
+      "bytes": 13338
+    },
+    {
       "path": "evidence/artifacts/sota-convergence-review-20260922/manifest-citation-review.json",
       "sha256": "97ffac75c1208a58d9700ad5e30d1c0aa0f3decfc3199f10ce4d88135b7d10e4",
       "bytes": 90508
@@ -58912,8 +60037,8 @@
     },
     {
       "path": "tests/test_landscape_sweep_skills.py",
-      "sha256": "4f789458553548cae2b40545c83dcd52cc810faa73b28a724cdfc3cd5aa89a9b",
-      "bytes": 184120
+      "sha256": "f2095097742a5084c5ffdbab1e11e627c6776c01de5f4c3c8b74406f9f91c5c9",
+      "bytes": 184138
     },
     {
       "path": "tests/test_lane_packets.py",
