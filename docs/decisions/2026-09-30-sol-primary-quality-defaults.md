@@ -21,9 +21,9 @@ or a failure unresolved after one bounded Sol repair. Explicit task
 model choices take precedence over this default. Preserve Astra judgment roles
 and verify the resolved role, model and effort before accepting their output.
 
-The repository template renders `model = "${CODEX_MODEL}"` from the platform pin,
-and sets `model_reasoning_effort = "ultra"`. It leaves `agents.default_subagent_model`
-unset; generic children retain the parent model with `agents.default_subagent_reasoning_effort = "max"`.
+The native user configuration sets `model = "gpt-6.1-sol"`,
+`model_reasoning_effort = "ultra"`, `agents.default_subagent_model =
+"gpt-6.1-sol"` and `agents.default_subagent_reasoning_effort = "max"`.
 Keep three concurrent children. The bounded worker profile selects Sol/Max;
 worker commands also pass their model, effort and live-search choice explicitly
 because project settings outrank a profile. Astra workers substitute the model
@@ -142,6 +142,12 @@ Sol model. The root placeholder and explicit stack-worker Sol binding stay;
 an unspecified generic child of another parent model now follows that parent.
 The Max default remains, and explicit spawn and role model selections retain
 their native precedence.
+
+The original September 30 paragraph above is retained verbatim as that dated
+configuration snapshot. This addendum supplies the current repository proposal:
+root `model = "${CODEX_MODEL}"` rendering remains, the generic model key is
+omitted, and Max child effort stays. Existing live host configuration requires
+the explicit F9 deletion recorded in the linked behavior record after landing.
 
 Source: [openai/codex rust-v0.162.0, child_config.rs:115](https://github.com/openai/codex/blob/rust-v0.162.0/codex-rs/core/src/agent/child_config.rs#L115)
 and [line 137](https://github.com/openai/codex/blob/rust-v0.162.0/codex-rs/core/src/agent/child_config.rs#L137)

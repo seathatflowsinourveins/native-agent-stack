@@ -698,9 +698,11 @@ The October 9, 2026 template change removes
 `agents.default_subagent_reasoning_effort = "max"`. A generic child whose
 spawn supplies no model now retains its parent step's `model_info.slug`.
 Previously the template's model default could replace that value with the
-rendered `CODEX_MODEL`. For a parent on another model, the forced Sol default
-therefore ends. This changes model selection; no token or cache savings were
-measured.
+rendered `CODEX_MODEL`. On the qualified 0.161.0/0.162.0 Codex host, a parent
+on another model therefore stops receiving a forced Sol child default. This
+changes model selection; no token or cache savings were measured. The older
+0.155.1 macOS pin has only rendering coverage here, not a native inheritance
+qualification. No claim that its forced model default ends is made.
 
 The launcher's default client is 0.162.0
 (`coordination/command-center/lane-tiers.json:39`; its two held lanes are
@@ -718,6 +720,31 @@ Explicit spawn selections and role configuration retain their native
 precedence. The effective key must be absent across contributing layers;
 removing this template entry does not mask an existing lower-layer value.
 
+The effort-only path also validates Max against the parent's supported
+reasoning levels at child_config.rs:243–248. A parent model whose metadata
+does not support `max` can reject the spawn instead of receiving a forced
+Sol/Max child. All registered Codex lanes in the cited launch inventory use
+the qualified Sol parent setting, so none is identified with this unsupported
+effort case. An explicit spawn effort can select a supported level; this record
+does not qualify other parent models by analogy.
+
+### Existing host application requires deletion
+
+F9's reviewed live-apply diff must delete `agents.default_subagent_model` from
+the existing host's `~/.codex/config.toml` after landing. The CC's October 9
+Claude read verified that file's line 45 still sets
+`default_subagent_model = "gpt-6.1-sol"`; this lane did not read the live file.
+Omitting the template entry in a merge-style apply cannot remove that existing
+key. The reviewed apply therefore includes its explicit deletion, with the
+effective key absent across all contributing layers and the root model, Max
+effort and explicit role choices preserved. The CC performs F9 from that
+reviewed diff after landing; this PR neither edits the live file nor claims
+the deletion has occurred.
+
+The corresponding surface-catalog decision is `declined`: it rejects a forced
+generic model default and records the pending F9 deletion. The earlier
+`enabled` host observation remains dated evidence, not the selected practice.
+
 The lane inventory below is a source review of the co-op registries at
 2026-10-09 00:20 UTC. `H` means a source line in
 `coordination/ns2604-coop/lanes/hcom-lanes.json`; `T` means a source line in
@@ -725,6 +752,11 @@ The lane inventory below is a source review of the co-op registries at
 `fe550f1eec77ace1537e3a9546b703118cd4aafba4cbdf0d55345d78d133a830`
 and `965d884240b0d6e8bceddcd4517ca16c6940bf3e488edf1f4254947b99814d63`,
 respectively. They identify lanes, rather than recording each request's model.
+State locators in this section are relative to the native-agent-stack state
+root, normally `~/.local/state/native-agent-stack/`. The H snapshot locator is
+`coordination/ns2604-coop/lanes/hcom-lanes.json`, read at the stated time with
+the digest above; this registry is mutable, so its current bytes need not match
+that historical read. The T locator has the same historical-read boundary.
 The shared launch command supplies `-m cx/gpt-6.1-sol` at
 `coordination/ns2604-coop/omniroute-canary-20261008/launch_lane_omni.sh:80`
 (SHA-256 `5100497bdd1235ea9d5cc7e69e075b8f59269430b459301281695b96bc45d7bc`).
@@ -788,6 +820,38 @@ spawns. The retained 0.161.0 synthetic recorder checked an unset-default root
 and full-history fork using `cx/gpt-6.1-sol/max`; it did not execute a paired
 default-present arm or measure provider usage. Byte-identical 0.162.0 source
 does not turn that retained fixture into a new native run.
+
+The retained fixture report is
+`research/token-efficiency-20261008/model-recorder/REPORT.md`, SHA-256
+`ec82a85ff4c98b5ff161c46235d607caa6a1dbf42cfb727213d94b9b0ff559c1`.
+Its root and full-history child request models are both `cx/gpt-6.1-sol`, with
+the unchanged 11-entry bundled catalog containing no added `cx/` alias. Native
+constructors copy the active parent's `model_info.slug` at lines 115/137;
+omitting the generic override leaves that slug rather than selecting a catalog
+model at lines 211–240. The fixture demonstrates alias retention for its
+recorded root/child path; it does not establish normalization or cache behavior
+for other model aliases or providers.
+
+The later co-op pre-cue report is
+`coordination/ns2604-coop/gpt-reads/extra-902-8b151f01/BASE-TESTS-AT-HEAD-8b151f01.txt`,
+SHA-256 `630c9e3244dbc138f3ceb2b3df9f2113773e37dad11333e431839d308e69d4f9`.
+It is distinct from the starting-head report used for the declarations below.
+
+The RTK statements retained at lines 191–195 follow
+[rtk-ai/rtk@e001f773](https://github.com/rtk-ai/rtk/tree/e001f773f80b22b7dc4c7a79521b30e35aaef026),
+version 0.51.0: native `rtk read --help` documents default level `none` and
+byte-exact `--head-lines` at that level with line numbering off, and supplies
+the `--tail-lines` window. Native `rtk rewrite --help` describes rewrite
+coverage, while [rewrite_cmd.rs:71](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/hooks/rewrite_cmd.rs#L71)
+explains exit-3 classification. These provenance pointers are added here so
+the earlier 92 reviewed lines stay byte-identical.
+
+The dated explicit `-c 'agents.default_subagent_model="gpt-6.1-sol"'` command in
+[the October 2 north-star recipe](decisions/2026-10-02-two-host-north-star-architecture.md)
+at line 79 is an explicit-override exception. Running that recipe keeps its
+selected generic model and does not exercise the omitted-default path. Its
+dated command remains historical; F9's reviewed apply uses the effective-key
+absence requirement above.
 
 The existing template-read tests now require the generic model key to be
 absent while preserving the root model, Max effort and explicit role checks.

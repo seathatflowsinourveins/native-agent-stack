@@ -532,3 +532,24 @@ Installing the worker roles by default needs changes outside this unit's paths: 
   a CommonJS main module through a symlink.
 - `adoption/agents/claude/evidence-reviewer.md`, `isolated-builder.md` and `semantic-evidence-reviewer.md` for the
   adapted texts; `recipes/README.md` "Headroom native compression and recovery" for the headroom registration.
+
+## Addendum 2026-10-09: inherited builder model after generic-default omission
+
+The F4 fallback statement at lines 374–375 and its source discussion at line
+525 describe the earlier generic model default. The current template omits
+that key: isolated-builder still names no model, so it takes an explicit spawn
+model when supplied and otherwise retains its active parent's model at its
+role's Max effort. Explicit role models retain native precedence. This follows
+[openai/codex rust-v0.162.0, child_config.rs:115,137,204,243-249](https://github.com/openai/codex/blob/rust-v0.162.0/codex-rs/core/src/agent/child_config.rs#L115),
+byte-identical at rust-v0.161.0, SHA-256
+`33d4dd6f70e6640af1059398272c48b88e16e0005105fbd1ef13e30456d39a39`.
+
+The SHA256SUMS-pinned isolated-builder carrier is preserved byte-for-byte; its
+lines 9–12 are a comment citing the dated 0.159.2 rule, not an additional
+configuration layer. The absent `model` key and Max effort remain covered by
+the role checks. This addendum and the updated adopter guide state the current
+fallback; no frozen role receipt or qualification is rewritten. The
+[omission record](../token-practice.md#generic-child-model-default-omission)
+records the required reviewed deletion from the live host after landing,
+the unsupported-parent-Max boundary and the qualified-client scope. No live
+application or savings claim is made.

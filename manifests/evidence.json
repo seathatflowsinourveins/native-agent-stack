@@ -5256,8 +5256,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "c33b28072ffee4b92e2ea61100acd75b2289f35e9e878ffa21ac855fa010e963",
-      "bytes": 73702
+      "sha256": "e35da598832557acec11104c16ea91be7c2e71caf45e67d6ddc940d8311639fd",
+      "bytes": 74033
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -16972,8 +16972,8 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "528d8bd07ada4e44a4d1865f5bc005e9a9c0a9810e8ab018d1c6c8ae8d3811f0",
-      "bytes": 159863
+      "sha256": "ed742ae36312bd76ba04425885fed029a0d1de51b6d396da7d9c94e43dd39549",
+      "bytes": 160022
     },
     {
       "path": "catalogs/landscape/README.md",
@@ -17647,8 +17647,8 @@
     },
     {
       "path": "docs/decisions/2026-09-26-stack-agents-role-dispatch.md",
-      "sha256": "98ab05b6283e6baad7ce711a2101af6ed7b690c801c9711ebbc6df8a4a7762e9",
-      "bytes": 50598
+      "sha256": "a3457e1fbc5baddb0c6d13f5ba8abb48d82bf476e2340a3a5326ea614be6ea68",
+      "bytes": 51983
     },
     {
       "path": "docs/decisions/2026-09-26-telemetry-writer-identity.md",
@@ -17787,13 +17787,13 @@
     },
     {
       "path": "docs/decisions/2026-09-30-sol-primary-quality-defaults.md",
-      "sha256": "a70bc9cbeb2cf016f8e13edd406ebd5c255fcf909a7059afe41c3519734f4b55",
-      "bytes": 11003
+      "sha256": "0df000b556a5cad6a7ba0caf1a9eb24a44e0b74ceff7b30b7c51b761650012bb",
+      "bytes": 11321
     },
     {
       "path": "docs/decisions/2026-09-30-task-model-routing.md",
-      "sha256": "32e2a30e9c73cc1093993d72dd4d2de2d0e661c0fbe8ba2969b043aa77d43aa9",
-      "bytes": 44899
+      "sha256": "0fcd4c4d3ddf7f23121ff85f58dc23a2d4c5ac543044949f9342a129e11085d4",
+      "bytes": 44901
     },
     {
       "path": "docs/decisions/2026-10-01-mac-runtime-memory-candidates.md",
@@ -18672,8 +18672,8 @@
     },
     {
       "path": "docs/token-practice.md",
-      "sha256": "cefdb897b4f18b934141ab97129ab0fe37df6751b0e8d7209b866d80e5332d20",
-      "bytes": 61772
+      "sha256": "1d10996d3dd7f2d2d5ccabf98b125232e582cca628180bdd0a2a7eb2f67e3f44",
+      "bytes": 65882
     },
     {
       "path": "docs/token-session-handbook.md",
@@ -58721,6 +58721,11 @@
       "bytes": 6838
     },
     {
+      "path": "tests/test_task_model_routing.py",
+      "sha256": "0b9ebfe62b7a214663138d1f3b19ff4d518ff0d3f7750343c425c26c3d5c68c2",
+      "bytes": 23455
+    },
+    {
       "path": "tests/test_token_e2e_grader.py",
       "sha256": "42708be8476b880f4288f8cfc44622123ea18e8ae8198ca0c98a379460932cd3",
       "bytes": 524375
@@ -58927,8 +58932,8 @@
     },
     {
       "path": "tools/adoption/render_config.py",
-      "sha256": "0a2e7e0fff08963a0c9f43a0dfe60a86e348de9f04ed8f29dfda8effcc1ced27",
-      "bytes": 19670
+      "sha256": "40156162b38c04fd55e16e297d47327fc8dc452f43f57e634d5dac07b739a1ef",
+      "bytes": 19970
     },
     {
       "path": "tools/adoption/render_launchd.py",
