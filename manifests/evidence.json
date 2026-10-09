@@ -17526,6 +17526,11 @@
       "bytes": 4075
     },
     {
+      "path": "docs/codex-credential-store-research-20261009.md",
+      "sha256": "449f22a5273d027a834e063ecf5e2cfa71176935c08d4817c83685e69a21e291",
+      "bytes": 4665
+    },
+    {
       "path": "docs/codex-currency-upgrade-checklist.md",
       "sha256": "4a7bff666f04d2c791f38a2249f56671a162215696ed2ab0160b6ead1bdeb8dc",
       "bytes": 5494
@@ -18279,6 +18284,11 @@
       "path": "docs/decisions/2026-10-08-skills-cc-lanes-picks.md",
       "sha256": "e115a46c4509631399147f1d34a70c25cc6cc3d088c9a522059238a91cda5c02",
       "bytes": 16124
+    },
+    {
+      "path": "docs/decisions/2026-10-09-codex-native-review-trial.md",
+      "sha256": "337ec932d1e70994adc7b6e90458114e604d70ec065c49fc7d7ff8c2191e11fc",
+      "bytes": 9003
     },
     {
       "path": "docs/direct-results.md",
@@ -19859,6 +19869,16 @@
       "path": "evidence/artifacts/codex-01592-qualification-20260930/qualification.json",
       "sha256": "7d634ff5a9195a589923f9be2bf64070fe507bf50b2efc82629150e967ec896e",
       "bytes": 14536
+    },
+    {
+      "path": "evidence/artifacts/codex-review-trial-20261009/owner-proposals.md",
+      "sha256": "2dc3904fa162f33463adbfa836afb7330bf221c250b9b9db5c46ac778219ce00",
+      "bytes": 2044
+    },
+    {
+      "path": "evidence/artifacts/codex-review-trial-20261009/receipt.json",
+      "sha256": "50ac06a04baa0a560e8510cd13768e4f29695884dce13ce7384c631818484470",
+      "bytes": 7356
     },
     {
       "path": "evidence/artifacts/codex-service-tier-migration-20261005/ci-validate-repair-20261006.json",
