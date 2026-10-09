@@ -142,7 +142,7 @@
   {
    "claim": "The requested neighboring PRs have identifiable merge overlaps.",
    "result": "confirmed",
-   "source": "Git-fetched #535 at ff79d96ad3458aa12c52327a129f28a555bb1113 conflicts with this PR's tests.py:64–70 grant/comment, pins.json:44 and requirements.lock:308 block; its digest is 38c20c899b8d7b08e03a04624daa17ba1fc353533fbff450bb0ac2bddd0832eb. #551 at 0e86cb7e7798b497a43672dc67328a12d2793964 and #555 at 8c263acebe7396c09d66d9d4f70bf144e1c4cdd3 merge the test code cleanly but conflict at manifests/evidence.json:45983, the hash for tests/test_osv_lockfile_coverage.py: this PR 31780dc60ea10f55597dbc984628fa22019a0a0c3cc63727f2a684fff2ea383e; #551 7dc3770432668f732cbffb7fbe189b6e7b63d6ac7ef91fda8c3146bf0d7a77df; #555 6ab01255f9d5395c52c6e8f5c3fa14ba3f5262a6750d9ff868bc06ab83827a5e."
+   "source": "Git-fetched #535 at ff79d96ad3458aa12c52327a129f28a555bb1113 conflicts with this PR's tests.py:64–70 grant/comment, pins.json:44 and requirements.lock:308 block; its digest is 38c20c899b8d7b08e03a04624daa17ba1fc353533fbff450bb0ac2bddd0832eb. #551 at 0e86cb7e7798b497a43672dc67328a12d2793964 and #555 at 8c263acebe7396c09d66d9d4f70bf144e1c4cdd3 merge the test code cleanly but conflict at seathatflowsinourveins/native-agent-stack@6741c554219eb7c1669b37d1c08881bc81083e62:manifests/evidence.json:45983, the hash for tests/test_osv_lockfile_coverage.py: this PR 31780dc60ea10f55597dbc984628fa22019a0a0c3cc63727f2a684fff2ea383e; #551 7dc3770432668f732cbffb7fbe189b6e7b63d6ac7ef91fda8c3146bf0d7a77df; #555 6ab01255f9d5395c52c6e8f5c3fa14ba3f5262a6750d9ff868bc06ab83827a5e."
   },
   {
    "claim": "The additional scan inputs in #535 and #551 introduce no LiteLLM pin below 1.93.2.",
