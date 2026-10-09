@@ -75,7 +75,7 @@ class LocalPagesTests(unittest.TestCase):
         self.roadmap = {"milestones": [{"at": "2024-06-07T08:09:00Z", "what": "Retained milestone event", "state": "pending", "kind": "warn"}], "servers": [{"key": "test", "label": "Test server", "job": "Test role", "paired": "No new invocation", "verdict": "pending", "next": "Read the receipt"}], "ladder": ["**Selected:** recorded upstream source"], "owner": ["OWNER-DIRECTION-SENTINEL"], "rules": ["RULES-DIRECTION-SENTINEL"], "lead": "Unsupported {g_total} narrative", "glance": [{"value": "{g_closed}"}]}
         self.write_json(self.road_path, self.roadmap)
         self.road_inputs = self.cc / "roadmap/roadmap-inputs.json"
-        self.write_json(self.road_inputs, {"board_base": str(self.state / "unavailable-board.json"), "handbook_commit": "fixture-only"})
+        self.write_json(self.road_inputs, {"board_base": str(self.state / "coordination/ns2604-coop/readiness-20261005/jobs/BOARD-CLOSE-20261007T190934Z/board-close-20261007T193821Z.json"), "handbook_commit": "fixture-only"})
         self.current_path = self.state / "coordination/command-center/pages/cc-now.json"
         self.current = {"schema": "cc-now/1", "updated_utc": "2024-07-08T09:10:00Z", "timezone_for_display": "America/New_York", "headline": "Fixture current headline", "readiness": {"start_gates_met": 4, "start_gates_total": 5, "estimate_percent": 75, "basis": "Authored fixture estimate"}, "gates": [{"id": "G-test", "state": "MET", "what": "Current test receipt", "blocks_start": True}, {"id": "G-other", "state": "OPEN", "what": "Optional fixture task", "blocks_start": False}], "next_events": [{"utc": "2024-07-09T13:15:00Z", "what": "Summer fixture event"}, {"utc": "2024-12-09T13:15:00Z", "what": "Winter fixture event"}], "waiting_on_owner": [{"what": "Review a source", "by_utc": "2024-07-09T18:00:00Z"}], "workstation": {"windows_available_gib": 17.4, "wsl_available_gib": 70.7, "swap_used_gib": 0, "read_utc": "2024-07-08T08:00:00Z"}}
         self.write_json(self.current_path, self.current)
@@ -95,6 +95,78 @@ class LocalPagesTests(unittest.TestCase):
 
     def generated_bytes(self) -> dict[str, bytes]:
         return {path.relative_to(self.output).as_posix(): path.read_bytes() for path in self.output.rglob("*") if path.is_file()}
+
+    def test_reference_keys_cannot_select_unapproved_files(self) -> None:
+        for relative in ("credentials.json", "client-secret.json", ".env.json", "coordination/e2e-truth-20261006/capture.json", "unrelated/public.json"):
+            with self.subTest(relative=relative):
+                forbidden = self.state / relative
+                self.write_json(forbidden, {"updated_utc": "2024-08-01T00:00:00Z", "value": "SYNTHETIC-NOT-FOR-PUBLICATION"})
+                self.write_json(self.road_inputs, {"board_base": str(forbidden)})
+                original = BUILDER.snapshot
+                attempts = []
+                def guarded(path):
+                    if Path(path) == forbidden:
+                        attempts.append(path)
+                        raise AssertionError("unapproved roadmap source opened")
+                    return original(path)
+                with patch.object(BUILDER, "snapshot", side_effect=guarded):
+                    receipt = self.refresh()
+                self.assertEqual(attempts, [])
+                self.assertEqual(receipt["inputs"]["roadmap:board_base"]["status"], "OMITTED")
+
+    def test_native_html_and_every_page_string_are_portable(self) -> None:
+        private = "/".join(("", "home", "synthetic-private-user", "private-data"))
+        account = "https://chatgpt.com/c/synthetic-account"
+        gate = json.loads(self.gate.read_text())
+        gate["owner"] = private
+        gate["state"] = "source with " + account
+        self.write_json(self.gate, gate)
+        self.current["headline"] = private
+        self.gaps["gaps"][0]["title"] = private
+        self.roadmap["servers"][0]["job"] = private
+        self.write_json(self.current_path, self.current)
+        self.write_json(self.gaps_path, self.gaps)
+        self.write_json(self.road_path, self.roadmap)
+        self.refresh()
+        for name in ("index", "readiness", "gaps", "roadmap", "sources"):
+            html = (self.output / (name + ".html")).read_text()
+            self.assertNotIn(private, html)
+            self.assertNotIn(account, html)
+        self.assertIn("${USER_HOME}", (self.output / "readiness.html").read_text())
+
+    def test_milestone_times_and_reset_match_documented_controls(self) -> None:
+        self.refresh()
+        road = (self.output / "roadmap.html").read_text()
+        self.assertIn("04:09:00 EDT", road)
+        self.assertLess(road.index("04:09:00 EDT"), road.index("08:09:00 UTC"))
+        gaps = (self.output / "gaps.html").read_text()
+        self.assertIn('id="gap-reset"', gaps)
+        self.assertIn("Reset filters", gaps)
+
+    def test_cli_attribute_error_is_finite(self) -> None:
+        stdout, stderr = io.StringIO(), io.StringIO()
+        with patch.object(BUILDER, "refresh", side_effect=AttributeError("synthetic malformed field")), redirect_stdout(stdout), redirect_stderr(stderr):
+            with self.assertRaises(SystemExit) as caught:
+                BUILDER.main([])
+        self.assertEqual(caught.exception.code, 1)
+        self.assertIn("AttributeError", stderr.getvalue())
+        self.assertNotIn("Traceback", stderr.getvalue())
+
+    def test_source_date_lists_are_kept_on_sources_page(self) -> None:
+        self.refresh()
+        sources = (self.output / "sources.html").read_text()
+        self.assertIn("checked_at = 2024-03-04T05:06:07Z", sources)
+        for name in ("index", "readiness", "gaps", "roadmap"):
+            self.assertNotIn("checked_at = 2024-03-04T05:06:07Z", (self.output / (name + ".html")).read_text())
+
+    def test_newer_native_observation_only_differs_from_current_view(self) -> None:
+        gate = json.loads(self.gate.read_text())
+        gate["updated_utc"] = "2024-12-01T00:00:00Z"
+        self.write_json(self.gate, gate)
+        self.refresh()
+        html = (self.output / "readiness.html").read_text()
+        self.assertNotIn("superseded in the current view", html)
+        self.assertIn("differs from the current view", html)
 
     def test_full_documents_native_digest_and_local_resources(self) -> None:
         source_bytes = {path: path.read_bytes() for path in (self.source_index, self.gate, self.gaps_path, self.road_path, self.current_path)}
@@ -132,12 +204,13 @@ class LocalPagesTests(unittest.TestCase):
         readiness = (self.output / "readiness.html").read_text()
         sources = (self.output / "sources.html").read_text()
         roadmap = (self.output / "roadmap.html").read_text()
-        self.assertIn("updated_utc = 2024-05-06T07:08Z", gap)
+        self.assertIn("snapshot as of 2024-05-06T07:08Z", gap)
+        self.assertIn("updated_utc = 2024-05-06T07:08Z", sources)
         self.assertIn("updated_utc = 2024-04-05T06:07:08Z", sources)
         self.assertIn("checked_at = 2024-03-04T05:06:07Z", sources)
         self.assertNotIn('<ul class="source-list">', readiness)
         self.assertIn("Source-owned snapshot date unspecified", roadmap)
-        self.assertIn("file metadata, not event or acceptance time", roadmap)
+        self.assertIn("file metadata, not event or acceptance time", sources)
         self.assertIn("2024-06-07T08:09:00Z", roadmap)
         self.assertEqual(roadmap.count('class="evidence-footnote"'), 1)
         self.assertNotIn("Passing a date does not record completion", roadmap)
@@ -259,7 +332,8 @@ class LocalPagesTests(unittest.TestCase):
         second = self.refresh()
         self.assertNotEqual(first["inputs"]["gaps"]["sha256"], second["inputs"]["gaps"]["sha256"])
         self.assertIn("Changed retained source", (self.output / "gaps.html").read_text())
-        self.assertIn("updated_utc = 2025-07-08T09:10Z", (self.output / "gaps.html").read_text())
+        self.assertIn("snapshot as of 2025-07-08T09:10Z", (self.output / "gaps.html").read_text())
+        self.assertIn("updated_utc = 2025-07-08T09:10Z", (self.output / "sources.html").read_text())
         self.assertEqual((self.output / "custodian-note.txt").read_text(), "preserve this")
         self.assertFalse(list(self.output.rglob(".local-pages-*")))
 

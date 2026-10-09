@@ -1,7 +1,9 @@
 """Collector failure/provenance tests using Prometheus API-shaped fixtures."""
 
 import importlib.util
+import threading
 import unittest
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 from unittest.mock import patch
@@ -121,11 +123,54 @@ class WorkstationTests(unittest.TestCase):
             response.read.return_value = b'{"status":"success","data":{"resultType":"matrix","result":[]}}'
             workstation.collect(FALLBACK)
         args, kwargs = opener.return_value.open.call_args
-        self.assertTrue(args[0].startswith(workstation.ENDPOINT + "/api/v1/query?"))
+        self.assertTrue(args[0].startswith("http://127.0.0.1:21090/api/v1/query?"))
         self.assertEqual(parse_qs(urlparse(args[0]).query)["timeout"], ["1s"])
         self.assertEqual(kwargs["timeout"], 2.0)
         response.read.assert_called_once_with(workstation.MAX_RESPONSE_BYTES + 1)
         self.assertEqual(opener.call_args.args[0].proxies, {})
+
+    def test_redirects_are_refused_without_a_second_request(self):
+        requests = []
+        redirect = {"code": 302}
+
+        class Handler(BaseHTTPRequestHandler):
+            def do_GET(self):
+                requests.append(self.path)
+                if self.path.startswith("/api/v1/query?"):
+                    self.send_response(redirect["code"])
+                    self.send_header("Location", f"http://127.0.0.1:{self.server.server_port}/redirect-target")
+                    self.send_header("Content-Length", "0")
+                    self.end_headers()
+                else:
+                    body = b'{"status":"success","data":{"resultType":"matrix","result":[]}}'
+                    self.send_response(200)
+                    self.send_header("Content-Length", str(len(body)))
+                    self.end_headers()
+                    self.wfile.write(body)
+
+            def log_message(self, *args):
+                pass
+
+        server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+        thread = threading.Thread(target=server.serve_forever, kwargs={"poll_interval": 0.01}, daemon=True)
+        thread.start()
+        try:
+            with patch.object(workstation, "ENDPOINT", f"http://127.0.0.1:{server.server_port}"):
+                for code in (301, 302, 303, 307, 308):
+                    with self.subTest(code=code):
+                        redirect["code"] = code
+                        requests.clear()
+                        actual = workstation.collect(FALLBACK)
+                        self.assertEqual(len(requests), 1)
+                        self.assertTrue(requests[0].startswith("/api/v1/query?"))
+                        self.assertEqual(actual["API_errors"][0]["type"], "HTTPError")
+                        for field in workstation.FIELDS:
+                            self.assert_fallback(actual, field)
+                            self.assertEqual(actual[field]["fallback_reason"], "API read failed")
+        finally:
+            server.shutdown()
+            server.server_close()
+            thread.join(timeout=2)
 
 
 if __name__ == "__main__":

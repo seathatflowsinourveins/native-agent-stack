@@ -36,12 +36,15 @@ readiness page's compact current view and the index's shared gate strip.
 The CC-owned headline, gate count, estimate and basis are presented as recorded.
 Events and owner deadlines show America/New_York first and UTC second, using
 Python's `zoneinfo` with the date's actual daylight-saving offset. Manifest
-cards keep their original dated states; disagreement with the current gate
-or its split successors adds “superseded in the current view.” Sources and
+cards keep their original dated states; a recorded, older observation that
+differs from the current gate or its split successors adds “superseded in the
+current view.” Unverified, undated, equal-time and newer observations are not
+marked superseded; a recorded state disagreement without an older source date
+says “differs from the current view.” Sources and
 long per-input date lists are on `sources.html`, linked from each page.
 
 `workstation.py` uses the installed Prometheus HTTP API at
-`http://127.0.0.1:19090` to read exact available-memory and swap metrics when
+`http://127.0.0.1:21090` to read exact available-memory and swap metrics when
 present. Ambiguous, missing, stale or invalid series retain the CC's value
 and read time. Each displayed figure identifies its provenance and timestamp;
 no free-memory metric is relabelled as available. Requests have finite server
@@ -83,6 +86,11 @@ Typing replaces the current entry to keep history from growing per keystroke.
 Roadmap `owner`/`rules` direction arrays, unsupported
 narrative placeholders and account artifact URLs are omitted from the view;
 omission reasons and source pointers are recorded in the nonserved receipt.
+Reference keys bind exact approved files before any read; keys with no safe
+allowed file, including references into mixed capture directories, are omitted
+and recorded. A shared sanitizer applies the native portable home/session/task
+projection and account URL policy to every served page string, including native
+manifest gate cards and fragments. Custody receipts keep their original paths.
 Operational owner fields remain source records. The original CC fragment's
 external fonts and attributed direction are not used.
 

@@ -7,13 +7,20 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 from html import escape
+import importlib.util
 import math
+from pathlib import Path
 from urllib.parse import urlsplit
 from zoneinfo import ZoneInfo
 
 
+_SANITIZER_SPEC = importlib.util.spec_from_file_location("local_current_view_sanitization", Path(__file__).with_name("sanitization.py"))
+_sanitization = importlib.util.module_from_spec(_SANITIZER_SPEC)
+_SANITIZER_SPEC.loader.exec_module(_sanitization)
+
+
 def esc(value: object) -> str:
-    return escape(str(value), quote=True)
+    return escape(_sanitization.text(value), quote=True)
 
 
 def parse_time(value: str) -> datetime:
@@ -83,9 +90,13 @@ def gate_strip(view: dict) -> str:
 
 
 def owner_link(item: dict) -> str:
-    link = item.get("link", "")
-    parsed = urlsplit(link)
-    if parsed.scheme == "https" and parsed.netloc and not parsed.username and not parsed.password:
+    original = item.get("link", "")
+    link = _sanitization.text(original)
+    try:
+        parsed = urlsplit(link)
+    except ValueError:
+        return esc(item["what"])
+    if not _sanitization.is_account_url(original) and not _sanitization.is_account_url(link) and parsed.scheme == "https" and parsed.netloc and not parsed.username and not parsed.password:
         return f'<a href="{esc(link)}">{esc(item["what"])}</a>'
     return esc(item["what"])
 
@@ -113,8 +124,18 @@ def render(view: dict, workstation: dict) -> str:
 </section>'''
 
 
-def superseded(gate_id: str, state: str, view: dict) -> bool:
-    candidates = [row for row in view["gates"] if row["id"] == gate_id]
+def superseded(gate_id: str, state: str, view: dict, *, source_utc: str | None = None, source_status: str = "RECORDED") -> bool:
+    """A newer current-view observation can supersede a recorded gate state."""
+    absent = ("unverified", "unreported", "not reported", "unspecified")
+    if not isinstance(state, str) or not state.strip() or state.strip().casefold().startswith(absent) or not isinstance(source_status, str) or source_status.strip().upper() != "RECORDED":
+        return False
+    try:
+        if parse_time(source_utc) >= parse_time(view["updated_utc"]):
+            return False
+    except (ValueError, TypeError, AttributeError, KeyError):
+        return False
+    gates = [row for row in view.get("gates", []) if isinstance(row, dict) and isinstance(row.get("id"), str) and isinstance(row.get("state"), str) and row["state"].strip() and not row["state"].strip().casefold().startswith(absent)]
+    candidates = [row for row in gates if row["id"] == gate_id]
     if not candidates:
-        candidates = [row for row in view["gates"] if row["id"].startswith(gate_id) and row["id"][len(gate_id):].isalpha()]
-    return bool(candidates) and any(row["state"].casefold() != state.casefold() for row in candidates)
+        candidates = [row for row in gates if row["id"].startswith(gate_id) and row["id"][len(gate_id):].isalpha()]
+    return bool(candidates) and any(row["state"].strip().casefold() != state.strip().casefold() for row in candidates)

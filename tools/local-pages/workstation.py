@@ -13,10 +13,11 @@ import math
 import re
 import time
 from datetime import datetime, timezone
+from urllib.error import HTTPError
 from urllib.parse import urlencode
-from urllib.request import ProxyHandler, build_opener
+from urllib.request import HTTPRedirectHandler, ProxyHandler, build_opener
 
-ENDPOINT = "http://127.0.0.1:19090"
+ENDPOINT = "http://127.0.0.1:21090"
 TIMEOUT = 2.0
 MAX_AGE_SECONDS = 120
 MAX_RESPONSE_BYTES = 262144
@@ -45,12 +46,22 @@ def _utc(timestamp):
     ).replace("+00:00", "Z")
 
 
+class _NoRedirect(HTTPRedirectHandler):
+    """Refuse redirects through urllib's supported redirect_request seam.
+
+    https://docs.python.org/3.13/library/urllib.request.html#urllib.request.HTTPRedirectHandler.redirect_request
+    """
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        raise HTTPError(req.full_url, code, msg, headers, fp)
+
+
 def _fetch(query, *, timeout):
     url = ENDPOINT + "/api/v1/query?" + urlencode(
         {"query": query, "timeout": "1s"}
     )
     # The native API must stay loopback even when a process has a proxy set.
-    with build_opener(ProxyHandler({})).open(url, timeout=timeout) as response:
+    with build_opener(ProxyHandler({}), _NoRedirect()).open(url, timeout=timeout) as response:
         raw = response.read(MAX_RESPONSE_BYTES + 1)
     if len(raw) > MAX_RESPONSE_BYTES:
         raise ValueError("response exceeds limit")
