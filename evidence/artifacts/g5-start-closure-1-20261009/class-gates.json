@@ -20,7 +20,7 @@
   "trial_scope": {"repository": "massive-com/client-python", "slot": "market-data-reference", "source": "wilsonfreitas/awesome-quant", "commit": "48e48a76b2054b5fe6eede6852ffef7783b992ce", "blob": "5fd2caf71fcdacc47d1e64ff37e8d9abc34b7303", "source_sha256": "fa346fdbc05f651f500795e7ea95e90b6d8c0cb394daee1f7b612470650caa86", "line": 683, "section_start": 675, "section_end": 760, "scope_witness_sha256": "932d268b8fe7ca7aa03af3b9a1e0e0fdc438180e30f25bed21b87505b9789f2f", "result": "VERIFIED", "native_execution": false},
   "tests": [
     {"module": "tests.test_compact_manifest", "runtime": "Python 3.14.4", "tests": 85, "pre_existing_external_original_skips": 2, "exit_code": 0, "stderr_sha256": "b144160c321761c1ce2aa42135508ad4f57e4a458a9946a56e2fef4c6f1b0173"},
-    {"module": "tests.test_start_closure_sampler", "runtime": "Python 3.14.4", "tests": 20, "exit_code": 0, "stderr_sha256": "edce880cde5b76fa1182d76d3db84ca1f46009761de21a00bfc1e95d1e65d93c", "sealed_r3_generator_sha256": "80e69ff94f97fffdf906583fa280f2a60a7487a54f0b58b05342264a5adf9627"}
+    {"module": "tests.test_start_closure_sampler", "runtime": "Python 3.14.4", "tests": 20, "exit_code": 0, "stderr_sha256": "9b98de98d6ffbcb40424214f216542266513746fd9975e6160dc53d63b52bf11", "sealed_r3_generator_sha256": "80e69ff94f97fffdf906583fa280f2a60a7487a54f0b58b05342264a5adf9627"}
   ],
   "default_schemas_changed": false,
   "original_rows_sha256": "e7abe385adc1e1456ee3658299bf67705f2079c773b45653358d70a87ca54a10",
