@@ -1,11 +1,26 @@
 {
   "schema_version": 1,
-  "protocol": "t22-strategies-v1-20261009",
+  "protocol": "t22-strategies-v2-20261009",
   "status": "untested_hypotheses",
   "scope": "synthetic_engineering_and_released_development_only",
   "study_relation": "separate_from_number16_no_rank_rows_no_labels_no_arms",
   "record": {"repository": "us-equities-trading", "pull_request": 25, "sha": "b0994749ca6c52ad07cb3bb70e8b5b6cd4fac910", "sections": ["6", "R9"]},
+  "scope_record": {"repository": "us-equities-trading", "pull_request": 47, "sha": "2e0860ccd1d485593d1bd31b8a97c12198ca6b3d", "path": "docs/decisions/2026-10-09-equities-intraday-scope.md", "sections": ["D1", "D2", "Slice re-plan"]},
+  "asset_class": "equity",
+  "instrument_gate": "native_Equity_type_required_before_subscriptions_or_orders",
+  "paused_option_order_families": [
+    {"id": "options_wheel", "status": "deferred_under_D1", "repository": "alpacahq/options-wheel", "sha": "3698429289065ceb0c13ffcdc31a966c576779ad", "e2e": "NOT_RUN"},
+    {"id": "gamma_scalping", "status": "deferred_under_D1", "repository": "alpacahq/gamma-scalping", "sha": "c80b5e36f4b375b2c096d1370f6d5962f5abb630", "e2e": "NOT_RUN"}
+  ],
+  "exit_policies": {
+    "regular-close-v1": {"boundary": "RTH_CLOSE", "next_trading_day": false, "margin_seconds": 120},
+    "after-hours-v1": {"boundary": "POST_CLOSE", "next_trading_day": false, "margin_seconds": 120},
+    "overnight-v1": {"boundary": "PRE_OPEN", "next_trading_day": true, "margin_seconds": 120},
+    "next-premarket-v1": {"boundary": "RTH_OPEN", "next_trading_day": true, "margin_seconds": 120}
+  },
+  "measured_exit_model": {"status": "untested_research_candidates", "development_gate": "explicit_registered_exit_policy_and_external_historical_exit_evidence_sha256_plus_release_and_horizon", "legacy_v1_horizon": "retained_synthetic_controls_only_when_exit_policy_is_null", "explicit_policy_overrides_max_sessions": true, "overnight_execution": "hold_and_flag_until_T15_classifier_adapter_and_paper_acceptance", "historical_timing_acceptance": "NOT_RUN", "intraday_entry_priority_et": ["09:35", "10:00"]},
   "instance_identity": {"version": "t22-instance-v1", "inputs": ["family", "preset", "instance_id", "instrument_id", "execution_profile", "cohort_sha256"], "tag": "first24_hex_sha256", "strategy_id": "T22-<tag>", "order_id_tag": "<tag>", "client_order_id": "t22-<tag>-<seven_digit_sequence>", "sequence_restore": "maximum_owned_ledger_intent_suffix_at_on_start", "dirty_startup": "refuse_unresolved_intent_or_held_position_for_instrument", "overnight_paper": "unqualified_until_hana_or_T15_accepts_session"},
+  "measured_instance_identity": {"version": "t22-instance-v2", "extends": "t22-instance-v1_inputs", "additional_inputs": ["exit_policy", "exit_evidence_sha256"], "legacy_identity_preserved": "exit_policy_null"},
   "engine": {"repository": "nautechsystems/nautilus_trader", "version": "2.0.0rc5", "sha": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e"},
   "execution_profiles": {
     "code-managed-limit-v1": {"status": "synthetic_mechanics_passed", "entry": "marketable_limit_on_observed_cross", "exit": "existing_exit_chain_code_managed_limit_day", "native_advanced_orders": false, "R9": "fresh_quotes_only_same_stop_trail_levels_stale_held_flag", "paper_adoption": "T15_and_hana_review_required"},

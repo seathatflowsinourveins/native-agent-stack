@@ -1,6 +1,7 @@
 """Versioned §6 hypotheses, never tuned or changed by a model.
 
 Source: us-equities-trading #25@b0994749ca6c52ad07cb3bb70e8b5b6cd4fac910 §6;
+measured-exit scope: #47@2e0860ccd1d485593d1bd31b8a97c12198ca6b3d D1/D2.
 CTS@eab8d5cb position-sizer and breakout-trade-planner references. The explicit
 code-managed-limit execution variant is separate from the target native plans.
 """
@@ -8,6 +9,27 @@ code-managed-limit execution variant is separate from the target native plans.
 from dataclasses import dataclass, replace
 from decimal import Decimal
 from types import MappingProxyType
+
+
+@dataclass(frozen=True)
+class ExitPolicy:
+    version: str
+    boundary: str
+    next_trading_day: bool
+    margin_seconds: int = 120
+
+
+# These are candidate timing parameters, not historically selected policies or
+# broker permissions. OVERNIGHT remains admitted to research while unsupported
+# execution sessions hold and flag through the shared T15 boundary.
+EXIT_POLICIES = MappingProxyType(
+    {
+        "regular-close-v1": ExitPolicy("regular-close-v1", "RTH_CLOSE", False),
+        "after-hours-v1": ExitPolicy("after-hours-v1", "POST_CLOSE", False),
+        "overnight-v1": ExitPolicy("overnight-v1", "PRE_OPEN", True),
+        "next-premarket-v1": ExitPolicy("next-premarket-v1", "RTH_OPEN", True),
+    }
+)
 
 
 @dataclass(frozen=True)
@@ -26,6 +48,7 @@ class Preset:
     native_entry: str
     stop_limit_offset_atr: Decimal
     max_hold_seconds: int | None = None
+    exit_policy: ExitPolicy | None = None
 
 
 D = Decimal
@@ -80,7 +103,13 @@ PRESETS = MappingProxyType(
 )
 
 
-def preset_for(version: str, family: str, catalyst_kind: str = "concrete") -> Preset:
+def preset_for(
+    version: str,
+    family: str,
+    catalyst_kind: str = "concrete",
+    *,
+    exit_policy: str | None = None,
+) -> Preset:
     try:
         preset = PRESETS[version]
     except KeyError as error:
@@ -98,6 +127,19 @@ def preset_for(version: str, family: str, catalyst_kind: str = "concrete") -> Pr
         preset = replace(preset, max_sessions=20 if preset.overnight else 1)
     if family == "trend_new_highs":
         preset = replace(preset, take_profit_r=None)
+    if exit_policy is not None:
+        try:
+            policy = EXIT_POLICIES[exit_policy]
+        except (KeyError, TypeError) as error:
+            raise ValueError("unregistered_exit_policy") from error
+        # Override the old multi-session horizon only for an explicit measured
+        # candidate. None preserves the retained v1 synthetic control behaviour.
+        preset = replace(
+            preset,
+            exit_policy=policy,
+            overnight=policy.next_trading_day,
+            max_sessions=2 if policy.next_trading_day else 1,
+        )
     return preset
 
 

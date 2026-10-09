@@ -11,6 +11,7 @@ import unittest
 from dataclasses import replace
 from datetime import datetime, timezone
 from pathlib import Path
+from unittest.mock import patch
 
 contracts = importlib.import_module("blueprints.us-equities.strategies.contracts")
 presets = importlib.import_module("blueprints.us-equities.strategies.presets")
@@ -79,8 +80,43 @@ class ContractTests(unittest.TestCase):
             evidence_class="development",
             qualified_data=("released_development", "horizon_qualified"),
             exit_deadline_ns=cutoff - 1,
+            exit_policy="regular-close-v1",
+            exit_evidence_sha256="3" * 64,
         )
         self.assertEqual(accepted.evidence_class, "development")
+
+    def test_measured_exit_candidates_are_registered_and_development_binds_evidence(
+        self,
+    ):
+        spec = contracts.StrategySpec("T22.ALPACA", "1" * 64)
+        for policy in presets.EXIT_POLICIES:
+            with self.subTest(policy=policy):
+                candidate = replace(spec, exit_policy=policy)
+                resolved = presets.preset_for(
+                    candidate.preset, "trend_new_highs", exit_policy=policy
+                )
+                self.assertEqual(resolved.exit_policy.version, policy)
+                self.assertEqual(resolved.max_sessions, 2 if resolved.overnight else 1)
+        with self.assertRaisesRegex(ValueError, "unregistered_exit_policy"):
+            replace(spec, exit_policy="model-selected")
+        with self.assertRaises(TypeError):
+            presets.EXIT_POLICIES["overnight-v1"] = None
+        for policy, evidence in ((None, "3" * 64), ("overnight-v1", None)):
+            with self.assertRaisesRegex(
+                ValueError, "measured_exit_policy_and_evidence"
+            ):
+                replace(
+                    spec,
+                    evidence_class="development",
+                    qualified_data=("released_development", "horizon_qualified"),
+                    exit_deadline_ns=contracts.DEVELOPMENT_CUTOFF_NS - 1,
+                    exit_policy=policy,
+                    exit_evidence_sha256=evidence,
+                )
+        with self.assertRaisesRegex(ValueError, "exit_evidence_hash_required"):
+            replace(
+                spec, exit_policy="overnight-v1", exit_evidence_sha256="not-evidence"
+            )
 
     def test_serialization_preserves_exact_values_and_provenance(self):
         value = self.snapshot(values=(("momentum_20", "0.10000000001"),))
@@ -105,6 +141,161 @@ class ContractTests(unittest.TestCase):
 
 @unittest.skipUnless(NATIVE, "requires the exact locked Nautilus rc5 runtime")
 class NativeStrategyTests(unittest.TestCase):
+    def test_option_and_currency_instruments_cannot_start_equity_family(self):
+        from nautilus_trader.model import (
+            AssetClass,
+            Currency,
+            CurrencyPair,
+            InstrumentId,
+            OptionContract,
+            OptionKind,
+            Price,
+            Quantity,
+            Symbol,
+        )
+
+        common = {
+            "instrument_id": InstrumentId.from_str(simulation.INSTRUMENT_ID),
+            "raw_symbol": Symbol("TST"),
+            "price_precision": 4,
+            "price_increment": Price.from_str("0.0001"),
+            "lot_size": Quantity.from_int(1),
+            "ts_event": 0,
+            "ts_init": 0,
+        }
+        # Both share the declared symbol/venue with the valid equity fixture:
+        # symbol naming and option-underlying asset_class cannot bypass the gate.
+        option = OptionContract(
+            **common,
+            currency=Currency.from_str("USD"),
+            asset_class=AssetClass.EQUITY,
+            underlying="TST",
+            option_kind=OptionKind.CALL,
+            multiplier=Quantity.from_int(100),
+            strike_price=Price.from_str("10.0000"),
+            activation_ns=0,
+            expiration_ns=simulation.BASE_NS + 86400_000_000_000,
+        )
+        currency = CurrencyPair(
+            **common,
+            base_currency=Currency.from_str("EUR"),
+            quote_currency=Currency.from_str("USD"),
+            size_precision=0,
+            size_increment=Quantity.from_int(1),
+        )
+        factory = simulation.fixture_engine
+        for instrument in (option, currency):
+            with self.subTest(instrument=type(instrument).__name__):
+                with patch.object(
+                    simulation, "fixture_engine", return_value=factory(instrument)
+                ):
+                    result = simulation.run_case("gap_premarket")
+                self.assertEqual(result["orders"], 0)
+                self.assertEqual(result["callback_faults"], [])
+                self.assertIn("equity_instrument_required", result["flags"])
+
+    def test_measured_deadlines_use_shared_calendar_early_close_holiday_and_dst(self):
+        def stamp(value):
+            return int(datetime.fromisoformat(value).timestamp() * 1_000_000_000)
+
+        cases = (
+            # Thanksgiving Friday: native early RTH close; weekend and DST
+            # conversion are inherited from the existing XNYS session helper.
+            (
+                "2026-11-27T15:00:00+00:00",
+                (
+                    "2026-11-27T17:58:00+00:00",
+                    "2026-11-28T00:58:00+00:00",
+                    "2026-11-30T08:58:00+00:00",
+                    "2026-11-30T14:28:00+00:00",
+                ),
+            ),
+            # Friday before US DST ends: the following PRE uses UTC-5.
+            (
+                "2026-10-30T14:00:00+00:00",
+                (
+                    "2026-10-30T19:58:00+00:00",
+                    "2026-10-30T23:58:00+00:00",
+                    "2026-11-02T08:58:00+00:00",
+                    "2026-11-02T14:28:00+00:00",
+                ),
+            ),
+            # Independence Day observed Friday: Thursday's next session Monday.
+            (
+                "2026-07-02T14:00:00+00:00",
+                (
+                    "2026-07-02T19:58:00+00:00",
+                    "2026-07-02T23:58:00+00:00",
+                    "2026-07-06T07:58:00+00:00",
+                    "2026-07-06T13:28:00+00:00",
+                ),
+            ),
+        )
+        tags = set()
+        for entered, boundaries in cases:
+            for policy, expected in zip(presets.EXIT_POLICIES, boundaries, strict=True):
+                with self.subTest(entered=entered, policy=policy):
+                    spec = contracts.StrategySpec(
+                        simulation.INSTRUMENT_ID,
+                        simulation.COHORT_SHA256,
+                        exit_policy=policy,
+                    )
+                    strategy = families.TrendNewHighsStrategy(spec)
+                    self.assertEqual(
+                        strategy._holding_deadline(stamp(entered)), stamp(expected)
+                    )
+                    tags.add(strategy.instance_tag)
+        self.assertEqual(len(tags), 4)
+        base = contracts.StrategySpec(
+            simulation.INSTRUMENT_ID, simulation.COHORT_SHA256
+        )
+        self.assertNotIn(families.TrendNewHighsStrategy(base).instance_tag, tags)
+        first = families.TrendNewHighsStrategy(
+            replace(base, exit_policy="overnight-v1")
+        )
+        second = families.TrendNewHighsStrategy(
+            replace(base, exit_policy="overnight-v1")
+        )
+        self.assertEqual(first.instance_tag, second.instance_tag)
+
+    def test_all_measured_exit_candidates_run_in_native_engine(self):
+        for policy in presets.EXIT_POLICIES:
+            for family in families.FAMILIES:
+                with self.subTest(policy=policy, family=family):
+                    result = simulation.run_case(
+                        family, spec_overrides={"exit_policy": policy}
+                    )
+                    self.assertTrue(result["passed"], result)
+                    self.assertGreaterEqual(result["fill_callbacks"], 2)
+                    self.assertEqual(result["exit_policy"], policy)
+
+    def test_overnight_candidate_holds_and_flags_unsupported_execution_session(self):
+        # A real native entry just before POST closes crosses 20:00 ET into the
+        # current classifier's unsupported window with fresh execution quotes.
+        start = int(
+            datetime(2026, 10, 8, 23, 59, 58, tzinfo=timezone.utc).timestamp() * 1e9
+        )
+        snapshot = replace(
+            simulation.fixture_snapshot(),
+            ts_event=start - 600_000_000_000,
+            ts_init=start - 600_000_000_000,
+            valid_until_ns=start + 7200_000_000_000,
+        )
+        result = simulation.run_case(
+            "gap_premarket",
+            "aggressive-v1",
+            start_ns=start,
+            snapshot=snapshot,
+            bids=("10",) * 12,
+            spec_overrides={"exit_policy": "overnight-v1"},
+        )
+        self.assertEqual(result["callback_faults"], [])
+        self.assertGreater(float(result["owned_quantity"]), 0)
+        self.assertIn("closed_session_requires_handoff", result["flags"])
+        self.assertFalse(
+            any(r["event"] == "submit" and r["side"] == "SELL" for r in result["trace"])
+        )
+
     def test_same_family_presets_register_together_in_BacktestEngine_and_LiveNode(self):
         adapter = importlib.import_module(
             "blueprints.us-equities.adaptive-paper.native_adapter"

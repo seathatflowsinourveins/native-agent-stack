@@ -36,7 +36,7 @@ from nautilus_trader.model import (
 
 from .contracts import FactorSnapshot, StrategySpec, digest
 from .families import CONTROLS, FAMILIES, snapshot_data_type
-from .presets import PRESETS
+from .presets import EXIT_POLICIES, PRESETS
 
 BASE_NS = int(datetime(2026, 10, 8, 13, 35, tzinfo=timezone.utc).timestamp() * 1e9)
 INSTRUMENT_ID = "TST.ALPACA"
@@ -146,19 +146,20 @@ def fixture_quotes(
     return result
 
 
-def fixture_engine():
+def fixture_engine(instrument=None):
     """Shared native synthetic venue/instrument for acceptance regressions."""
     currency = Currency.from_str("USD")
-    instrument = Equity(
-        InstrumentId.from_str(INSTRUMENT_ID),
-        Symbol("TST"),
-        currency,
-        price_precision=4,
-        price_increment=Price.from_str("0.0001"),
-        lot_size=Quantity.from_int(1),
-        ts_event=0,
-        ts_init=0,
-    )
+    if instrument is None:
+        instrument = Equity(
+            InstrumentId.from_str(INSTRUMENT_ID),
+            Symbol("TST"),
+            currency,
+            price_precision=4,
+            price_increment=Price.from_str("0.0001"),
+            lot_size=Quantity.from_int(1),
+            ts_event=0,
+            ts_init=0,
+        )
     engine = BacktestEngine(
         BacktestEngineConfig(bypass_logging=True, run_analysis=False)
     )
@@ -167,7 +168,7 @@ def fixture_engine():
         OmsType.NETTING,
         AccountType.CASH,
         starting_balances=[Money.from_str("10000 USD")],
-        base_currency=currency,
+        base_currency=currency if isinstance(instrument, Equity) else None,
         fill_model=OneTickSlippageFillModel(
             prob_fill_on_limit=1.0, prob_slippage=1.0, random_seed=22
         ),
@@ -242,6 +243,7 @@ def run_case(
             "family": family,
             "class": cls.__name__,
             "preset": preset,
+            "exit_policy": spec.exit_policy,
             "execution_profile": spec.execution_profile,
             "evidence_class": "synthetic",
             "fixture_sha256": fixture_hash,
@@ -274,11 +276,19 @@ def run_case(
 
 def run_matrix():
     records = [run_case(family, preset) for family in FAMILIES for preset in PRESETS]
+    # Accelerated deadlines exercise native mechanics only; real multi-session
+    # timing and qualification are covered separately by regression/evidence.
+    measured = [
+        run_case(family, preset, spec_overrides={"exit_policy": policy})
+        for family in FAMILIES
+        for preset in PRESETS
+        for policy in EXIT_POLICIES
+    ]
     controls = [run_case(control) for control in CONTROLS]
     inverse = [
         run_case(family, snapshot=fixture_snapshot(member=False)) for family in FAMILIES
     ]
-    for row in records:
+    for row in records + measured:
         row["passed"] = row["passed"] and row["fill_callbacks"] >= 2
     for row in inverse:
         row["passed"] = row["passed"] and row["orders"] == 0
@@ -289,10 +299,11 @@ def run_matrix():
         "schema_version": 1,
         "kind": "t22_strategy_synthetic_receipt",
         "status": "passed"
-        if all(r["passed"] for r in records + controls + inverse)
+        if all(r["passed"] for r in records + measured + controls + inverse)
         else "failed",
         "evidence_class": "synthetic",
         "historical_layer15_e2e": "NOT_RUN",
+        "historical_exit_timing": "NOT_RUN",
         "strategy_performance": "NOT_CITED",
         "paper_adoption": "NOT_RUN",
         "engine": {
@@ -307,11 +318,17 @@ def run_matrix():
             "base_latency_nanos": 1_000_000,
         },
         "families": records,
+        "measured_exit_candidates": measured,
         "controls": controls,
         "inverse_noncohort": inverse,
         "source_sha256": {
             f.name: hashlib.sha256(f.read_bytes()).hexdigest()
-            for f in sorted(Path(__file__).parent.glob("*.py"))
+            for f in sorted(
+                [
+                    *Path(__file__).parent.glob("*.py"),
+                    Path(__file__).parent / "registry.json",
+                ]
+            )
         },
     }
 

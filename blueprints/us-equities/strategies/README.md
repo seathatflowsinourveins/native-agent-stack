@@ -1,8 +1,10 @@
 # T22 deterministic strategy hypotheses
 
-Ten NautilusTrader `2.0.0rc5` Strategy subclasses and three versioned presets
-implement the family predicates in the draft trading-ecosystem §6. Every rule
-and parameter remains an untested hypothesis. The same classes have synthetic
+Ten **equity-only** NautilusTrader `2.0.0rc5` Strategy subclasses, three risk
+presets and four versioned exit-timing candidates follow the landed
+[equities scope decision](https://github.com/seathatflowsinourveins/us-equities-trading/blob/2e0860ccd1d485593d1bd31b8a97c12198ca6b3d/docs/decisions/2026-10-09-equities-intraday-scope.md)
+and trading-ecosystem §6. Every rule and parameter remains an untested hypothesis.
+The same classes have synthetic
 BacktestEngine and adaptive-paper LiveNode checks; neither check uses a broker.
 [registry.json](registry.json) freezes the grid, factor coordinates, overrides,
 controls and target order plans. [source-review.md](source-review.md) records
@@ -36,6 +38,7 @@ spec = contracts.StrategySpec(
     instrument_id="SPY.ALPACA",
     cohort_sha256=cohort_hash,
     preset="conservative-v1",
+    exit_policy="after-hours-v1",
     instance_id="cohort_trial_1",
     position_cap_usd="1000",
     loss_cap_usd="10",
@@ -54,6 +57,47 @@ the native risk engine and its independent final-wire governor. This lane provid
 no paper command and has placed no broker order. Passing the fake-port LiveNode
 check does not qualify the bridge or a paper session.
 
+Native startup requires an `Equity` instrument before subscriptions or orders;
+an option whose underlying asset class is equity is still excluded. The option
+wheel and gamma-scalping order families stay catalogued as paused under D1 in
+the registry, with their references retained and E2E NOT_RUN.
+`OptionsFlowStockStrategy` remains an equity family: its orders are stock, and
+its option-history inputs retain the separate OD3 development gate.
+
+## Measured exit-timing candidates
+
+`StrategySpec.exit_policy` resolves an immutable parameter in the preset. It
+supports four research candidates, each with an explicit two-minute boundary
+margin; the margin itself remains an untested hypothesis:
+
+| Version | Target boundary |
+| --- | --- |
+| `regular-close-v1` | Entry day's regular close, including early closes |
+| `after-hours-v1` | Entry day's POST close |
+| `overnight-v1` | Next trading day's PRE open, from within the overnight window |
+| `next-premarket-v1` | Next trading day's regular open, from within PRE |
+
+The existing session helper and its pinned XNYS calendar supply the boundaries,
+holidays, weekend navigation and DST. Exit timing is chosen from qualified
+historical evidence; these candidates do not declare a winner. Development
+specifications require the explicit policy and `exit_evidence_sha256` from the
+external qualified timing study, alongside the existing release/horizon gates.
+A hash binds that evidence and does not qualify its contents by itself. No
+historical timing study has run here. Intraday entries prioritize the protocol's
+09:35 and 10:00 ET snapshots; no frozen protocol, data fence or ranking arm changes.
+
+An explicit policy overrides the old five/twenty-session horizon for every risk
+preset, including conservative. The one-hour halt-family risk bound and
+options-flow expiry bound still apply. `exit_policy=None` retains the original
+v1 synthetic controls and their IDs; it is unavailable for development use.
+Instances with an explicit policy use a new identity version bound to both the
+policy and evidence digest, preserving restart determinism without collisions.
+
+OVERNIGHT is an admitted, evidence-gated research candidate. Until T15's shared
+classifier, adapter and paper acceptance qualify that session, execution holds
+and flags the position. Fresh quotes do not authorize an unsupported session;
+stale quotes suppress new exits. No candidate metadata authorizes paper orders.
+
 ## Execution profiles and R9
 
 `code-managed-limit-v1` is a separately registered simple-order hypothesis. It
@@ -61,7 +105,7 @@ uses LIMIT/DAY entries on an observed crossing and reuses adaptive-paper's
 existing `exits.py` rule chain for stops, profit, trail and time exits. Position
 size is capped by the preset's fractions of frozen notional/loss budgets, whole
 shares and available cash. Trail activation, partial profit and per-family hold
-overrides are explicit; conservative stays flat at the session close.
+overrides are explicit. A measured exit policy supplies the timing boundary.
 
 Every extended-hours exit is a code-managed limit at the same preset's stop
 or trail level. A stale execution quote sends no new order and flags the held
@@ -84,7 +128,9 @@ existing XNYS/session helper; closed sessions are flagged for handoff.
 
 Use T13's unchanged runtime installed with `uv sync --locked` from
 `ee3883699870d972058516192b1ee1c6e3ffb762`. Candidate screeners have their own
-separate locked environment. Run only one heavy job at a time.
+separate locked environment. Run suites normally; no small memory/CPU caps or
+Windows-gate waits apply. Heavy builds use the standard 10G scope and the
+vendor's worker controls.
 
 ```sh
 "$ENGINE_PYTHON" -m unittest tests.test_us_equities_strategies -v
@@ -95,7 +141,8 @@ python3 scripts/validate.py
 
 The matrix uses synthetic FactorSnapshot/QuoteTick data, the upstream
 `OneTickSlippageFillModel` with a fixed seed and `StaticLatencyModel`.
-Each family/preset has a receipt, along with non-cohort inverses and independently
+Each family/risk-preset/exit-policy has a receipt, with the retained v1 synthetic
+controls, non-cohort inverses and independently
 registered hash-random, `momentum_20`, relative-volume and no-trade controls.
 The short fixture has an explicit accelerated cleanup deadline; it tests engine
 mechanics, not the multi-session strategy horizon. The LiveNode check reuses the
@@ -146,8 +193,8 @@ for that instance, preventing a restart from silently creating another entry.
 Recovery stays with the existing paper lane. Development specifications require
 a durable ledger; synthetic fixtures may use the explicit empty local boundary.
 
-Standard/aggressive presets remain unqualified for paper overnight operation
-until hana or T15 qualifies that session. The current helper treats 20:00–04:00
+Overnight candidates remain unqualified for paper operation until T15 qualifies
+that session. The current helper treats 20:00–04:00
 ET as closed and flags the position; it does not provide overnight exits. PRE
 and POST retain the existing code-managed limit protections.
 

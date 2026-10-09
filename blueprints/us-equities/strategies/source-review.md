@@ -5,6 +5,29 @@ frozen #16 study. The scope record is us-equities-trading #25 at
 `b0994749ca6c52ad07cb3bb70e8b5b6cd4fac910`, read through `git show` after fetching
 the PR head. No rank rows, labels or study arms are inputs to these classes.
 
+The landed amendment, us-equities-trading #47 at
+`2e0860ccd1d485593d1bd31b8a97c12198ca6b3d`, supersedes exit/scope assumptions:
+`docs/decisions/2026-10-09-equities-intraday-scope.md` D1/D2 and the T22 re-plan.
+It keeps equity families, pauses option-order families without deleting their
+references, and treats exit timing as a versioned parameter measured in research.
+All four timing candidates remain untested; none is selected by these fixtures.
+The options-flow-to-stock family remains equity-only and OD3-gated.
+
+The timing implementation reuses adaptive-paper's existing session helpers and
+`gerrymanoim/exchange_calendars@dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a`
+(4.13.2): native XNYS `session_open`, `session_close` and `date_to_session`.
+The mirror HEAD was re-verified for this change; no calendar, classifier, engine
+or adapter is rebuilt or forked. Nautilus's pinned native `Equity` instrument
+type supplies the order-asset gate, rather than inferring it from a symbol or
+an option underlying's EQUITY asset class.
+
+T15 owns the shared rich exit disposition and session/adapter capability seam.
+Its current #940 interface has ExitContext session/bid/ask and ExitDecision
+submit/flag_position/price_rule/limit_price. T22 will bind that accepted interface
+at its CC-cued final rebase after #940. Until session support and acceptance,
+an overnight research candidate holds and flags at execution. It is not a
+blanket-refused candidate or an implicit permission to submit overnight orders.
+
 The requested upstream mirrors were inspected read-only and their native Git
 HEADs and clean trees verified. None of the inspected sources ships the complete
 Nautilus family/preset interface. This is the demonstrated gap: original family

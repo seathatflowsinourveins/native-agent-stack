@@ -16,6 +16,7 @@ from types import MappingProxyType, SimpleNamespace
 from nautilus_trader.model import (
     ClientOrderId,
     DataType,
+    Equity,
     InstrumentId,
     OrderSide,
     Price,
@@ -60,22 +61,26 @@ class FamilyStrategy(Strategy):
 
     def __init__(self, spec: StrategySpec, *, ledger=None, fault_sink=None):
         self.spec = spec
-        self.preset = preset_for(spec.preset, self.FAMILY, spec.catalyst_kind)
+        self.preset = preset_for(
+            spec.preset, self.FAMILY, spec.catalyst_kind, exit_policy=spec.exit_policy
+        )
         # rc5 checks the last StrategyId segment for uniqueness, not just
         # config.order_id_tag (crates/system/src/trader.rs:566-578 at 1b0a49d2).
         # A stable explicit instance name distinguishes otherwise identical
         # deployments; one identity must never run twice in the same trader.
-        self.instance_tag = digest(
-            [
-                "t22-instance-v1",
-                self.FAMILY,
-                spec.preset,
-                spec.instance_id,
-                spec.instrument_id,
-                spec.execution_profile,
-                spec.cohort_sha256,
-            ]
-        )[:24]
+        identity = [
+            "t22-instance-v1",
+            self.FAMILY,
+            spec.preset,
+            spec.instance_id,
+            spec.instrument_id,
+            spec.execution_profile,
+            spec.cohort_sha256,
+        ]
+        if spec.exit_policy is not None:
+            identity[0] = "t22-instance-v2"
+            identity.extend([spec.exit_policy, spec.exit_evidence_sha256])
+        self.instance_tag = digest(identity)[:24]
         self.client_id_prefix = "t22-" + self.instance_tag + "-"
         self.sequence = 0
         super().__init__(
@@ -146,8 +151,13 @@ class FamilyStrategy(Strategy):
             self._freeze("T15_native_order_capability_unqualified")
             self._record("capability_refused", profile=self.spec.execution_profile)
             return
-        if self.cache.instrument(self.instrument_id) is None:
+        instrument = self.cache.instrument(self.instrument_id)
+        if instrument is None:
             raise ValueError("instrument_not_registered")
+        if not isinstance(instrument, Equity):
+            self._freeze("equity_instrument_required")
+            self._record("capability_refused", reason="non_equity_instrument")
+            return
         if (
             self.spec.evidence_class != "synthetic"
             and not self._durable_ledger_supplied
@@ -447,6 +457,28 @@ class FamilyStrategy(Strategy):
 
     def _holding_deadline(self, now):
         dt = datetime.fromtimestamp(now / 1e9, timezone.utc)
+        policy = self.preset.exit_policy
+        if policy is not None:
+            info = _sessions.session_at(dt)
+            day = info.session_date
+            if policy.next_trading_day:
+                day = _sessions.next_trading_day(day)
+            # Reuse the shared calendar's PRE/RTH/POST boundaries, including
+            # holidays, early closes and DST; do not rebuild session logic.
+            pre = _sessions.session_at(
+                datetime.combine(day, _sessions.PRE_OPEN, _sessions.NY)
+            )
+            if policy.boundary == "PRE_OPEN":
+                boundary = pre.open
+            elif policy.boundary == "RTH_OPEN":
+                boundary = pre.close
+            elif policy.boundary == "POST_CLOSE":
+                boundary = _sessions.extended_session_close(pre.open)
+            else:
+                boundary = _sessions.session_at(pre.close).close
+            return (
+                int(boundary.timestamp() * 1e9) - policy.margin_seconds * 1_000_000_000
+            )
         day = dt.astimezone(_sessions.NY).date()
         for _ in range(self.preset.max_sessions - 1):
             day = _sessions.next_trading_day(day)

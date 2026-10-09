@@ -13,6 +13,8 @@ import re
 from dataclasses import dataclass
 from decimal import Decimal, InvalidOperation
 
+from .presets import EXIT_POLICIES
+
 SHA256 = re.compile(r"[0-9a-f]{64}\Z")
 DEVELOPMENT_CUTOFF_NS = 1791936000000000000  # 2026-10-14T00:00:00Z, exclusive
 
@@ -159,6 +161,8 @@ class StrategySpec:
     catalyst_kind: str = "concrete"
     qualified_data: tuple[str, ...] = ()
     instance_id: str = "default"
+    exit_policy: str | None = None
+    exit_evidence_sha256: str | None = None
 
     def __post_init__(self):
         if not isinstance(self.instance_id, str) or not re.fullmatch(
@@ -173,6 +177,16 @@ class StrategySpec:
             raise ValueError("unregistered_execution_profile")
         if self.catalyst_kind not in {"concrete", "narrative"}:
             raise ValueError("catalyst_kind_invalid")
+        if self.exit_policy is not None and (
+            not isinstance(self.exit_policy, str)
+            or self.exit_policy not in EXIT_POLICIES
+        ):
+            raise ValueError("unregistered_exit_policy")
+        if self.exit_evidence_sha256 is not None and (
+            not isinstance(self.exit_evidence_sha256, str)
+            or not SHA256.fullmatch(self.exit_evidence_sha256)
+        ):
+            raise ValueError("exit_evidence_hash_required")
         for field in (self.position_cap_usd, self.loss_cap_usd, self.cash_cap_usd):
             if decimal(field) <= 0:
                 raise ValueError("positive_frozen_cap_required")
@@ -206,6 +220,8 @@ class StrategySpec:
             if value is not None:
                 nanos(value)
         if self.evidence_class == "development":
+            if self.exit_policy is None or self.exit_evidence_sha256 is None:
+                raise ValueError("measured_exit_policy_and_evidence_required")
             if (
                 "released_development" not in self.qualified_data
                 or "horizon_qualified" not in self.qualified_data

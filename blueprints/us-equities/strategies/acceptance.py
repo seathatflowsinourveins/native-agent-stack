@@ -51,6 +51,7 @@ def main():
         root / "blueprints/us-equities/adaptive-paper/native_adapter.py",
         root / "blueprints/us-equities/adaptive-paper/safety.py",
         root / "tests/test_adaptive_paper_native.py",
+        root / "blueprints/us-equities/strategies/registry.json",
     ]
     skipped = "skipped" in completed.stderr
     receipt = {
@@ -78,9 +79,10 @@ def main():
             str(p.relative_to(root)): hashlib.sha256(p.read_bytes()).hexdigest()
             for p in source
         },
-        "scope": "ten exact classes plus restart and multi-instance regressions in BacktestEngine/LiveNode; synthetic ports and real local ledger only",
+        "scope": "ten equity classes, versioned exit-timing candidates, instrument/session gates plus restart and multi-instance regressions in BacktestEngine/LiveNode; synthetic ports and real local ledger only",
         "broker_e2e": "NOT_RUN",
         "historical_layer15_e2e": "NOT_RUN",
+        "historical_exit_timing": "NOT_RUN",
         "strategy_performance": "NOT_CITED",
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
