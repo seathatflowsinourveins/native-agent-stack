@@ -119,6 +119,18 @@ def _fallback(fallback, field):
     if isinstance(value, dict):
         read_utc = value.get("read_utc", read_utc)
         value = value.get("value_gib")
+    date_reason = None
+    if read_utc is not None:
+        try:
+            if not isinstance(read_utc, str) or not read_utc or len(read_utc) > 50:
+                raise ValueError("unbounded fallback date")
+            parsed = datetime.fromisoformat(read_utc.replace("Z", "+00:00"))
+            if parsed.tzinfo is None:
+                raise ValueError("timezone absent")
+            parsed.astimezone(timezone.utc)
+        except (ValueError, TypeError, AttributeError, OverflowError):
+            read_utc = None
+            date_reason = "fallback date requires bounded timezone-aware text"
     return {
         "value_gib": value,
         "source": "cc-now fallback",
@@ -127,7 +139,18 @@ def _fallback(fallback, field):
         "sample_utc": None,
         "sample_labels": [],
         "fallback_reason": "missing series",
+        **({"date_reason": date_reason} if date_reason else {}),
     }
+
+
+def validate_fallback(fallback):
+    """Validate scalar and per-figure values; invalid dates remain unreported."""
+    if not isinstance(fallback, dict):
+        raise ValueError("workstation fallback requires an object")
+    for field in ("windows_available_gib", "wsl_available_gib", "swap_used_gib"):
+        value = _fallback(fallback, field)["value_gib"]
+        if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or value < 0:
+            raise ValueError("invalid current-view workstation fallback")
 
 
 def normalize_optional_totals(readings):
@@ -147,6 +170,8 @@ def normalize_optional_totals(readings):
         elif not isinstance(reading.get("source"), str):
             reason = "optional total source is not reported"
         else:
+            if reading.get("date_reason"):
+                reason = reading["date_reason"]
             available_reading = result.get(available)
             amount = available_reading.get("value_gib") if isinstance(available_reading, dict) else None
             if isinstance(amount, (int, float)) and not isinstance(amount, bool) and math.isfinite(amount) and value < amount:
@@ -159,7 +184,8 @@ def normalize_optional_totals(readings):
                     parsed = datetime.fromisoformat(recorded.replace("Z", "+00:00"))
                     if parsed.tzinfo is None:
                         raise ValueError("timezone absent")
-                except (ValueError, TypeError, AttributeError):
+                    parsed.astimezone(timezone.utc)
+                except (ValueError, TypeError, AttributeError, OverflowError):
                     reason = "optional total date requires timezone-aware text"
         if reason:
             result.pop(field)
@@ -234,6 +260,9 @@ def collect(fallback, fetch=None, *, wsl_job=None):
                 sample_labels=[sample[2] for sample in samples],
                 fallback_reason=None,
             )
+            # A valid live observation replaces all fallback provenance,
+            # including an earlier malformed fallback date classification.
+            result[field].pop("date_reason", None)
         except (ValueError, TypeError, KeyError, IndexError, AttributeError, OverflowError) as error:
             if field in result:
                 result[field]["fallback_reason"] = str(error) if isinstance(error, ValueError) else "invalid sample"

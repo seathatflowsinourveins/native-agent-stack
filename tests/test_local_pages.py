@@ -263,6 +263,26 @@ class LocalPagesTests(unittest.TestCase):
                 self.assertNotIn("0 Claude sessions", html)
                 self.assertTrue((self.output / "fleet.html").is_file())
 
+    def test_failed_fleet_adapter_preserves_all_pages_with_unknown_observations(self) -> None:
+        for failure in (OverflowError("fixture timestamp"), AttributeError("fixture memfd"), RecursionError("fixture structure")):
+            with self.subTest(failure=type(failure).__name__), patch.object(BUILDER, "collect_fleet", side_effect=failure):
+                result = self.refresh()
+                self.assertEqual(result["fleet"]["fleet_source"], "not reported")
+                for name in ("index", "readiness", "gaps", "roadmap", "fleet", "sources"):
+                    self.assertTrue((self.output / (name + ".html")).is_file())
+                html = (self.output / "fleet.html").read_text()
+                self.assertIn("UNKNOWN</strong> live Codex lanes", html)
+                self.assertIn(type(failure).__name__, html)
+
+    def test_short_home_names_preserve_native_readiness_fragment_html(self) -> None:
+        for name in ("li", "link", "section"):
+            with self.subTest(name=name), patch.object(Path, "home", return_value=self.base / name):
+                self.refresh()
+                text = (self.output / "readiness.html").read_text()
+                self.assertIn('<section class="manifest-section"', text)
+                self.assertIn("</section>", text)
+                self.assertNotIn("<[personal identifier omitted]", text)
+
     def real_fleet_adapter(self, state, cache, root):
         def native_transport(command, **kwargs):
             return subprocess.CompletedProcess(command, 0, stdout="[]" if command[0] == "gh" else "", stderr="")

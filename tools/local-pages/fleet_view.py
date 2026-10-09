@@ -61,9 +61,9 @@ def render(data: dict[str, Any]) -> str:
     subgroups = data.get("claude_subagents_running") if isinstance(data.get("claude_subagents_running"), dict) else {}
     # CC source role: this named session belongs to the owner, not our workers.
     session_rows = session_source if isinstance(session_source, list) else []
-    owner_count = sum(row.get("name") == "native-agent-stack-1a" for row in session_rows)
+    owner_count = sum(row.get("name") == "native-agent-stack-1a" for row in session_rows) if known("claude_sessions", session_source) else 0
     worker_count = len(session_rows) - owner_count
-    sessions = "".join(f'<li data-session-role="{"owner" if row.get("name") == "native-agent-stack-1a" else "worker"}"><strong>{"owner session (reports to CC)" if row.get("name") == "native-agent-stack-1a" else text(row.get("name"))}</strong> <span>{text(row.get("status"))}</span></li>' for row in session_rows) or '<li>none reported</li>' if isinstance(session_source, list) else '<li>UNKNOWN</li>'
+    sessions = "".join(f'<li data-session-role="{"owner" if row.get("name") == "native-agent-stack-1a" else "worker"}"><strong>{"owner session (reports to CC)" if row.get("name") == "native-agent-stack-1a" else text(row.get("name"))}</strong> <span>{text(row.get("status"))}</span></li>' for row in session_rows) or '<li>none reported</li>' if known("claude_sessions", session_source) else '<li>UNKNOWN</li>'
     named_groups = []
     for key, label in (("coop", "Co-op"), ("cc", "Command center"), ("api_actions", "API actions")):
         group = subgroups.get(key) if isinstance(subgroups.get(key), dict) else {}
@@ -83,7 +83,8 @@ def render(data: dict[str, Any]) -> str:
     visible_runs = recent[:6]
     action_rows = ''.join(f'<li><span>{text(row.get("workflowName"))}</span><strong>{text(row.get("conclusion") or row.get("status"))}</strong></li>' for row in visible_runs) or '<li>No matching runs in the retained result</li>' if actions.get("read_utc") else '<li>Actions observation not reported</li>'
     action_counts = f'{len(active)} active / {len(runs)} matching. Showing {len(visible_runs)}; ' if actions.get("read_utc") else ''
-    pool = ''.join(f'<div class="pool-account"><strong>{text(row.get("account"))}</strong><span>{number(row.get("used_pct"), "% used")}</span></div>' for row in data.get("pool_accounts", []) or [])
+    pool_source = data.get("pool_accounts")
+    pool = (''.join(f'<div class="pool-account"><strong>{text(row.get("account"))}</strong><span>{number(row.get("used_pct"), "% used")}</span></div>' for row in pool_source) or '<p>No recorded pool accounts</p>') if known("pool_accounts", pool_source) else '<p>UNKNOWN</p>'
     policy = tiers.get("parking") if isinstance(tiers.get("parking"), dict) else {}
     held_names = ', '.join(f'{esc(name)} {esc(version)}' for name, version in holds.items()) or 'none listed'
     section_notes = ''.join('<li>' + esc(name) + ': ' + text(row.get("status")) + ' · ' + text(row.get("source")) + ' · read ' + text(row.get("read_utc")) + (' · ' + text(row.get("reason")) if row.get("reason") else '') + '</li>' for name, row in availability.items() if isinstance(row, dict))

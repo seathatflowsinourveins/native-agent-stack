@@ -100,6 +100,25 @@ class CurrentViewTests(unittest.TestCase):
         self.assertIn("not reported", first)
         self.assertNotIn('datetime="None"', first)
         self.assertNotIn(self.view["updated_utc"], first)
+
+    def test_scalar_dictionary_fallbacks_and_invalid_figure_dates_do_not_abort(self):
+        self.view["workstation"]["read_utc"] = {"windows_available_gib": "2026-10-09T05:00:00Z", "wsl_available_gib": "2026-10-09T04:00:00Z", "swap_used_gib": "bad date"}
+        self.view["workstation"]["windows_available_gib"] = {"value_gib": 16, "read_utc": "2026-10-09T05:00:00Z"}
+        self.view["workstation"]["wsl_available_gib_read_utc"] = "2026-10-09T04:00:00"
+        current.validate(self.view)
+        readings = current._workstation.collect(self.view["workstation"], lambda *a, **k: {"status": "error"})
+        html = current.render(self.view, readings)
+        self.assertIn("16.0</strong> GiB", html)
+        self.assertIsNone(readings["wsl_available_gib"]["read_utc"])
+        self.assertIsNone(readings["swap_used_gib"]["read_utc"])
+        self.assertIn("not reported", html)
+
+    def test_timezone_conversion_overflow_is_an_unreported_figure_date(self):
+        self.view["workstation"]["windows_available_gib_read_utc"] = "0001-01-01T00:00:00+01:00"
+        readings = current._workstation.collect(self.view["workstation"], lambda *a, **k: {"status": "error"})
+        self.assertIsNone(readings["windows_available_gib"]["read_utc"])
+        self.assertIn("not reported", current.render(self.view, readings))
+        self.assertEqual(current.observation_time("0001-01-01T00:00:00Z"), "not reported")
     def test_optional_memory_totals_require_finite_positive_numeric_bounds(self):
         for invalid in [None, False, "32", -1, 0, 9, float("nan"), float("inf")]:
             with self.subTest(invalid=invalid):

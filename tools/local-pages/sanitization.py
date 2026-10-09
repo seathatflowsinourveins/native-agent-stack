@@ -33,7 +33,9 @@ def _home_name() -> str | None:
 
 
 def _identity_pattern(name: str | None):
-    return re.compile(re.escape(name), re.I) if name else None
+    # Separators in host/role labels include underscores. Ordinary longer words
+    # and very short home names do not establish a personal-identity match.
+    return re.compile(r"(?<![A-Za-z0-9])" + re.escape(name) + r"(?![A-Za-z0-9])", re.I) if name and len(name) >= 3 else None
 
 
 def _without_preserved(value: str) -> str:
@@ -41,7 +43,7 @@ def _without_preserved(value: str) -> str:
 
 
 def _private(value: str, identity) -> bool:
-    return bool(_HOME.search(value) or _SESSION.search(value) or _TASK.search(value) or identity and identity.search(_without_preserved(value)))
+    return bool(_HOME.search(value) or _SESSION.search(value) or _TASK.search(value) or is_account_url(value) or identity and identity.search(_without_preserved(value)))
 
 
 def _project_identity(value: str, identity) -> str:
@@ -64,7 +66,7 @@ def _encoded_token(token: str, identity) -> str:
         decoded = unescape(unquote(decoded))
         decoded = re.sub(r"\\u([a-fA-F0-9]{4})|\\x([a-fA-F0-9]{2})", lambda match: chr(int(match.group(1) or match.group(2), 16)), decoded)
     if decoded != token and _private(decoded, identity):
-        return "[personal identifier omitted]"
+        return _portable_text(decoded, identity)
     candidate = None
     try:
         if len(token) >= 12 and len(token) % 2 == 0 and re.fullmatch(r"[a-fA-F0-9]+", token):
@@ -73,7 +75,18 @@ def _encoded_token(token: str, identity) -> str:
             candidate = base64.b64decode(token + "=" * (-len(token) % 4), altchars=b"-_", validate=True).decode("utf-8")
     except (ValueError, UnicodeError, binascii.Error):
         pass
-    return "[personal identifier omitted]" if candidate is not None and _private(candidate, identity) else token
+    return _portable_text(candidate, identity) if candidate is not None and _private(candidate, identity) else token
+
+
+def _portable_text(value: str, identity) -> str:
+    """Retain the native portable substitutions and surrounding source text."""
+    value = _HOME.sub("${USER_HOME}", value)
+    value = _SESSION.sub("${LOCAL_SESSION_ID}", value)
+    value = _TASK.sub("${LOCAL_TASK_HANDLE}", value)
+    if identity:
+        value = _project_identity(value, identity)
+    value = ACCOUNT_URL.sub("[account artifact omitted]", value)
+    return _URL.sub(lambda match: "[account artifact omitted]" if is_account_url(match.group()) else match.group(), value)
 
 
 def is_account_url(value: Any) -> bool:
@@ -96,13 +109,7 @@ def sanitize(value: Any) -> Any:
     if isinstance(value, str):
         identity = _identity_pattern(_home_name())
         value = _TOKEN.sub(lambda match: _encoded_token(match.group(), identity), value)
-        value = _HOME.sub("${USER_HOME}", value)
-        value = _SESSION.sub("${LOCAL_SESSION_ID}", value)
-        value = _TASK.sub("${LOCAL_TASK_HANDLE}", value)
-        if identity:
-            value = _project_identity(value, identity)
-        value = ACCOUNT_URL.sub("[account artifact omitted]", value)
-        return _URL.sub(lambda match: "[account artifact omitted]" if is_account_url(match.group()) else match.group(), value)
+        return _portable_text(value, identity)
     if isinstance(value, dict):
         return {key: sanitize(child) for key, child in value.items()}
     if isinstance(value, list):

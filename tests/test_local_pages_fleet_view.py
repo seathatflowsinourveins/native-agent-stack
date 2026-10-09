@@ -78,6 +78,22 @@ class FleetViewTests(unittest.TestCase):
         data["lanes_live"][0]["subagents_running"] = 0
         self.assertIn("<td>0</td>", view.render(data))
 
+    def test_unknown_pool_and_sessions_differ_from_recorded_empty_lists(self):
+        data = fixture()
+        data.update(pool_accounts=None, claude_sessions=[])
+        data["availability"] = {"claude_sessions": {"status": "UNKNOWN", "reason": "not measured"}}
+        unknown = view.render(data)
+        self.assertIn("UNKNOWN</strong> Claude worker sessions", unknown)
+        self.assertIn('<ul class="claude-sessions"><li>UNKNOWN</li>', unknown)
+        self.assertIn('<section class="fleet-pool"><h2>Pool accounts</h2><p>UNKNOWN</p>', unknown)
+        data["claude_sessions"] = [{"name": "native-agent-stack-1a", "status": "active"}]
+        self.assertNotIn("+ 1 owner session", view.render(data))
+        data["claude_sessions"] = []
+        data.update(pool_accounts=[], availability={})
+        empty = view.render(data)
+        self.assertIn("0</strong> Claude worker sessions", empty)
+        self.assertIn("No recorded pool accounts", empty)
+
     def test_legacy_empty_rosters_need_a_known_source_before_showing_zero(self):
         for source in [None, "", "not reported"]:
             with self.subTest(source=source):

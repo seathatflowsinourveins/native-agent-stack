@@ -258,6 +258,13 @@ class WorkstationTests(unittest.TestCase):
         self.assertEqual(actual["wsl_total_gib"]["value_gib"], 128)
         self.assertEqual(actual["wsl_total_gib"]["read_utc"], "2026-10-08T21:03:00Z")
 
+    def test_live_total_replaces_invalid_fallback_date_and_its_reason(self):
+        fallback = dict(FALLBACK, windows_total_gib={"value_gib": 32, "read_utc": "bad-date"})
+        actual = self.collect([series("windows_memory_physical_total_bytes", 128 * 1024 ** 3, job=workstation.WINDOWS_JOB)], fallback)
+        self.assertEqual(actual["windows_total_gib"]["value_gib"], 128)
+        self.assertNotIn("date_reason", actual["windows_total_gib"])
+        self.assertNotIn("windows_total_gib", actual.get("optional_total_status", {}))
+
 
 if __name__ == "__main__":
     unittest.main()

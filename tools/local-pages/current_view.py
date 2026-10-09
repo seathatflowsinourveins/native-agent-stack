@@ -70,13 +70,9 @@ def validate(view: dict) -> None:
             raise ValueError("current-view owner action must be text")
         if item.get("by_utc"):
             parse_time(item["by_utc"])
-    for field in ("windows_available_gib", "wsl_available_gib", "swap_used_gib"):
-        value = view["workstation"][field]
-        if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or value < 0:
-            raise ValueError("invalid current-view workstation fallback")
+    _workstation.validate_fallback(view["workstation"])
     # Optional scalar/per-figure totals are normalized by the collector. Invalid
     # optional observations become UNKNOWN without aborting valid mandatory data.
-    parse_time(view["workstation"]["read_utc"])
 
 
 def time_label(value: str, *, plain: bool = False) -> str:
@@ -92,7 +88,7 @@ def observation_time(value: str | None, *, plain: bool = False) -> str:
     """Display only a recorded observation time; never substitute another date."""
     try:
         return time_label(value, plain=plain)
-    except (ValueError, TypeError, AttributeError):
+    except (ValueError, TypeError, AttributeError, OverflowError):
         return "not reported"
 
 
@@ -119,15 +115,15 @@ def owner_link(item: dict) -> str:
     return esc(item["what"])
 
 
-def render(view: dict, workstation: dict) -> str:
-    validate(view)
-    workstation = _workstation.normalize_optional_totals(workstation)
+def render(view: dict, workstation: dict, *, validated: bool = False, readings_normalized: bool = False) -> str:
+    if not validated:
+        validate(view)
+    if not readings_normalized:
+        workstation = _workstation.normalize_optional_totals(workstation)
     for key in ("windows_available_gib", "wsl_available_gib", "swap_used_gib"):
-        if key not in workstation:
-            continue
-        reading = workstation[key]
+        reading = workstation.get(key)
         value = reading.get("value_gib") if isinstance(reading, dict) else None
-        if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or value < 0 or key.endswith("total_gib") and value <= 0 or not isinstance(reading.get("source"), str):
+        if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or value < 0 or not isinstance(reading.get("source"), str):
             raise ValueError("invalid current-view workstation metric")
         if reading.get("read_utc") is not None:
             parse_time(reading["read_utc"])

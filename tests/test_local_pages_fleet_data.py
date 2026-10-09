@@ -7,6 +7,7 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import sys
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -28,7 +29,7 @@ class NativeRunner:
 
     def __call__(self, command, **kwargs):
         self.commands.append(command)
-        if command[0] == "python3":
+        if command[0] == sys.executable:
             return subprocess.CompletedProcess(command, 1 if self.fleet_fail else 0, json.dumps(self.direct), "")
         if self.gh_fail:
             return subprocess.CompletedProcess(command, 1, "", "private error text must not be retained")
@@ -99,7 +100,7 @@ class FleetDataTests(unittest.TestCase):
         self.assertEqual(view["claude_subagents_running"]["cc"]["names"], ["review-a"])
         self.assertEqual(view["source_times"]["fleet_direct"], self.direct["at"])
         self.assertEqual(view["source_times"]["fleet_snapshot"], self.snapshot["at"])
-        self.assertTrue(all(command[-2:] == ["--json", "--no-gh"] for command in self.runner.commands if command[0] == "python3"))
+        self.assertTrue(all(command[-2:] == ["--json", "--no-gh"] for command in self.runner.commands if command[0] == sys.executable))
 
     def test_failed_direct_read_falls_back_without_retiming_snapshot(self):
         self.runner.fleet_fail = True
@@ -132,25 +133,26 @@ class FleetDataTests(unittest.TestCase):
         self.assertIsNone(sdk["spend_usd"])
         self.assertIsNone(sdk["ceiling_usd"])
 
-    def test_explicit_cumulative_ledger_amount_and_ceiling(self):
+    def test_explicit_native_ledger_actual_events_and_reserved_caps(self):
         path = self.state / "coordination/api-actions-20261008/api-actions-ledger.jsonl"
         path.parent.mkdir(parents=True)
-        path.write_text('\n'.join(json.dumps(row) for row in [{"spend_usd": 1.25, "ceiling_usd": 10}, {"spend_usd": 2.5}]), encoding="utf-8")
+        path.write_text('\n'.join(json.dumps(row) for row in [{"actual_usd": 1.25, "max_usd": 10}, {"actual_usd": 2.5}]), encoding="utf-8")
         sdk = self.collect()["sdk"]
-        self.assertEqual(sdk["spend_usd"], 2.5)
-        self.assertEqual(sdk["ceiling_usd"], 10)
+        self.assertEqual(sdk["spend_usd"], 3.75)
+        self.assertEqual(sdk["reserved_max_usd"], 10)
+        self.assertIsNone(sdk["ceiling_usd"])
 
     def test_single_native_actions_call_and_cache_ttl(self):
         self.collect()
         self.collect(30)
-        self.collect(599)
+        self.collect(539)
         self.assertEqual(sum(command[0] == "gh" for command in self.runner.commands), 1)
-        self.collect(600)
+        self.collect(540)
         gh_commands = [command for command in self.runner.commands if command[0] == "gh"]
         self.assertEqual(len(gh_commands), 2)
         self.assertEqual(gh_commands[0][-1], fleet_data.RUN_FIELDS)
         self.assertNotIn("displayTitle", gh_commands[0][-1])
-        self.assertEqual(sum(command[0] == "python3" for command in self.runner.commands), 4)
+        self.assertEqual(sum(command[0] == sys.executable for command in self.runner.commands), 4)
 
     def test_concurrent_refreshes_share_one_actions_call(self):
         with patch.object(fleet_data.time, "time", return_value=self.now):
@@ -162,23 +164,23 @@ class FleetDataTests(unittest.TestCase):
     def test_failure_retains_old_run_time_and_suppresses_retry_until_ttl(self):
         original = self.collect()["actions"]["read_utc"]
         self.runner.gh_fail = True
-        failed = self.collect(600)
+        failed = self.collect(540)
         self.assertEqual(failed["actions"]["read_utc"], original)
         self.assertTrue(failed["actions"]["stale"])
         self.assertEqual(len(failed["API_errors"]), 1)
-        next_view = self.collect(601)
+        next_view = self.collect(541)
         self.assertEqual(next_view["API_errors"], [])
         self.assertEqual(sum(command[0] == "gh" for command in self.runner.commands), 2)
         self.assertNotIn("private error text", json.dumps(next_view))
 
     def test_whitelist_excludes_tasks_prompts_emails_and_opaque_tokens(self):
         self.direct.update({"text": "PRIVATE-PROMPT", "prompt": "PRIVATE-PROMPT", "task": "PRIVATE-TASK"})
-        self.direct["lanes_live"][0].update({"task": "PRIVATE-TASK", "account": "operator@example.test", "flags": ["operator@example.test", "PRIVATE PROMPT"], "subagent_models": {"abcdefghijklmnopqrstuvwx1234567890": 1}})
+        self.direct["lanes_live"][0].update({"task": "PRIVATE-TASK", "account": "operator@example.test", "flags": ["operator@example.test", "PRIVATE PROMPT"], "subagent_models": {"ghp_" + "X" * 40: 1}})
         self.direct["pool_accounts"].append({"account": "operator@example.test", "used_pct": 10})
         self.runner.runs = [{"workflowName": "harness-audit", "status": "completed", "conclusion": "success", "databaseId": 123, "startedAt": "2026-10-08T21:00:00Z", "updatedAt": "2026-10-08T21:02:00Z", "url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/123", "displayTitle": "PRIVATE-PROMPT", "headBranch": "operator@example.test"}]
         view = self.collect()
         serialized = json.dumps(view) + (self.cache / "fleet-actions.json").read_text()
-        for text in ["PRIVATE-PROMPT", "PRIVATE-TASK", "operator@example.test", "abcdefghijklmnopqrstuvwx1234567890", "displayTitle", "headBranch"]:
+        for text in ["PRIVATE-PROMPT", "PRIVATE-TASK", "operator@example.test", "ghp_" + "X" * 40, "displayTitle", "headBranch"]:
             self.assertNotIn(text, serialized)
         self.assertEqual(len(view["actions"]["runs"]), 1)
         self.assertEqual(view["cc_agents"]["running"], [{"name": "review-a", "type": "Explore"}])
@@ -304,7 +306,7 @@ class FleetDataTests(unittest.TestCase):
         workflow.write_text("name: outside-model-workflow\nsteps:\n - uses: anthropics/claude-code-action@pin\n", encoding="utf-8")
         (workflows / "audit.yml").symlink_to(workflow)
         view = self.collect()
-        self.assertFalse(any(command[0] == "python3" for command in self.runner.commands))
+        self.assertFalse(any(command[0] == sys.executable for command in self.runner.commands))
         self.assertEqual(view["actions"]["workflow_names"], [])
         self.assertEqual(view["fleet_source"], "snapshot fallback")
 
@@ -393,8 +395,8 @@ class FleetDataTests(unittest.TestCase):
         self.assertEqual(source["execution"]["sha256"], hashlib.sha256(producer.read_bytes()).hexdigest())
         self.assertEqual(source["execution"]["bytes"], producer.stat().st_size)
         self.assertEqual(source["execution"]["status"], "completed")
-        command = next(command for command in self.runner.commands if command[0] == "python3")
-        self.assertEqual(command[1], "-c")
+        command = next(command for command in self.runner.commands if command[0] == sys.executable)
+        self.assertEqual(command[1:3], ["-I", "-c"])
         self.assertEqual(command[-2:], ["--json", "--no-gh"])
         self.assertNotEqual(command[1], str(producer))
 

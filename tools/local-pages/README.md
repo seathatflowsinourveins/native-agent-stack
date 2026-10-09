@@ -52,13 +52,16 @@ arbitrary account identities are rejected. A missing
 `coordination/api-actions-20261008/api-actions-ledger.jsonl` displays UNKNOWN;
 only a valid empty ledger establishes no recorded spend. Unknown roster sections,
 tiers, ceilings and job counts remain UNKNOWN rather than zero. Existing ledger
-rows contribute only explicit cumulative `spend_usd` and `ceiling_usd` fields.
+rows contribute explicit per-event `actual_usd` and `max_usd` fields, matching
+the native producer. Actual amounts are summed as spend; summed `max_usd`
+reservations remain separate from the CC-owned credit ceiling. Unrecognized
+ledger formats remain UNKNOWN.
 
 Actions use one native `gh run list` invocation for the newest100 repository
 runs, then filter against checked-out workflow files that actually invoke a
 model. Only workflow/status/time/run-ID fields are requested; prompt-like
 display titles and branch names are omitted. The native CLI has no cache flag
-for this command, so a600-second nonserved JSON cache with a native file lock
+for this command, so a540-second nonserved JSON cache with a native file lock
 coordinates refreshes. Fresh cache hits make no additional CLI request;
 failure preserves earlier observations with their original time, never an
 invented zero. The Fleet section identifies its bounded Actions scope.
@@ -67,13 +70,27 @@ and nonregular inputs. Cache writes use securely created temporary files in
 the cache directory and an atomic replace of a checked destination.
 The producer executes only its verified bytes from a sealed Linux memory
 descriptor, with its original file location, arguments and sibling-import
-path. Execution digest and byte count are retained; collection never reopens
+path. The child starts with Python isolated mode (`-I`), then adds the approved
+producer sibling directory after verification. Bootstrap stdlib imports cannot
+be shadowed by the page process's working directory or ambient Python path.
+A dedicated process session has a90-second limit; timeout cleanup kills its
+descendant process group. Execution digest and byte count are retained;
+collection never reopens
 the original producer pathname after validation.
 
 Optional memory totals accept a finite positive scalar or a
 `{value_gib, read_utc}` record. An invalid total becomes UNKNOWN with a reason;
 valid mandatory readings still publish. A valid per-figure total keeps its
 own recorded time rather than inheriting another measurement's date.
+
+Mandatory fallback readings accept scalar or per-figure values. Invalid
+figure dates become unreported with a reason rather than aborting publication.
+An optional Fleet adapter failure also leaves all pages available with explicit
+UNKNOWN observations. Known empty pool/session lists remain separate from
+missing observations. Personal labels are masked as source text at identifier
+boundaries (minimum length three), after counting; finished HTML tags are never
+rewritten as personal identifiers. Classified decoded values retain the native
+portable path/session/task substitutions and their surrounding source text.
 
 Missing or partially written Adoption snapshots degrade only that section to
 UNKNOWN. Producer-provided `codex_by_role` is preferred; an absent role projection

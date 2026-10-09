@@ -88,6 +88,17 @@ def display(value: Any) -> str:
     return TEMPLATE.sub(lambda match: match.group() if match.group() in PORTABLE_PLACEHOLDERS else "[source template omitted]", text)
 
 
+def source_templates(value: Any) -> Any:
+    """Omit unapproved source placeholders before native HTML rendering."""
+    if isinstance(value, str):
+        return TEMPLATE.sub(lambda match: match.group() if match.group() in PORTABLE_PLACEHOLDERS else "[source template omitted]", value)
+    if isinstance(value, dict):
+        return {key: source_templates(child) for key, child in value.items()}
+    if isinstance(value, list):
+        return [source_templates(child) for child in value]
+    return value
+
+
 def sanitizer() -> Any:
     global _SANITIZER
     if _SANITIZER is None:
@@ -133,7 +144,7 @@ def document(page: str, title: str, lede: str, scope: str, body: str,
              refreshed: str, manifest_sha: str, source_notes: list[str], leading: str | None = None) -> bytes:
     nav = "".join(f'<a href="{name}.html"' + (' aria-current="page"' if name == page else '') + f'>{text}</a>' for name, text in PAGES.items())
     heading = leading if leading is not None else f'<header class="page-header"><h1>{esc(title)}</h1><p class="lede">{esc(lede)}</p></header>'
-    return sanitizer().sanitize(f'''<!doctype html>
+    return f'''<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -168,7 +179,7 @@ def document(page: str, title: str, lede: str, scope: str, body: str,
 </div>
 </body>
 </html>
-''').encode("utf-8")
+'''.encode("utf-8")
 
 
 def rows(document: dict[str, Any], key: str, required: tuple[str, ...] = ()) -> list[Any]:
@@ -238,7 +249,7 @@ def readiness_body(native: Any, manifest: dict[str, Any], current: dict[str, Any
             superseded = '<p class="superseded-note">differs from the current view</p>'
         cards.append(f'<article class="gate-card" data-manifest-gate="{esc(row["id"])}"><h3>{esc(row["id"])}</h3><p class="gate-state">{esc(state)}</p>{superseded}<p>Operational owner: {esc(fact(row["fields"].get("owner")))}</p></article>')
     gates = "".join(cards)
-    fragment = display(native.render_fragment(manifest))
+    fragment = native.render_fragment(source_templates(manifest))
     fragment = fragment.replace('<table>', '<div class="table-wrap"><table>').replace('</table>', '</table></div>')
     summary = manifest["summary"]
     counts = "".join(f'<p><strong>{int(summary[key])}</strong> {title}</p>' for key, title in (("recorded_claims", "recorded claims"), ("unverified_claims", "unverified claims"), ("unverified_sources", "unverified sources")))
@@ -367,11 +378,23 @@ def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
     view.validate(current)
     for name in ("current_view", "workstation", "sanitization", "fleet_data", "fleet_view", "adoption_view"):
         capture("module:" + name, Path(__file__).resolve().parent / (name + ".py"))
-    workstation = load_local("workstation").normalize_optional_totals(collect_workstation(current["workstation"]))
+    workstation = collect_workstation(current["workstation"])
     fleet_cache = no_symlinks(receipt.parent / "fleet/cache")
     if fleet_cache.is_relative_to(output_dir):
         raise ValueError("fleet cache must remain outside the served root")
-    fleet = collect_fleet(state_root, fleet_cache, root)
+    try:
+        fleet = collect_fleet(state_root, fleet_cache, root)
+    except (OSError, ValueError, UnicodeError, KeyError, TypeError, AttributeError, OverflowError, RecursionError) as error:
+        # An unavailable optional adapter must not prevent the other documents
+        # from publishing. Error categories are public; exception text is not.
+        fleet = {"fleet_source": "not reported", "at": None,
+                 "lanes_live": None, "lanes_parked": None, "claude_sessions": None,
+                 "pool_accounts": None, "claude_subagents_running": {},
+                 "exec_reads_in_flight": None, "sdk": {}, "actions": {},
+                 "availability": {name: {"status": "UNKNOWN", "source": "Fleet adapter",
+                                           "reason": "adapter failed (" + type(error).__name__ + ")"}
+                                  for name in ("lanes_live", "lanes_parked", "claude_sessions", "pool_accounts")},
+                 "source_inputs": [], "errors": [{"type": type(error).__name__}]}
     fleet_view = load_local("fleet_view")
     adoption_view = load_local("adoption_view")
     adoption_path = state_root / "coordination/command-center/pages/adoption-now.json"
@@ -451,7 +474,7 @@ def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
     common = (refreshed, manifest_sha)
     outputs = {
         "index.html": document("index", "North-star readiness and next steps", "", current_scope, overview, *common, [], leading=index_leading),
-        "readiness.html": document("readiness", "North-star readiness: what is done, what is left, what needs a decision", "", current_scope, manifest_body, *common, [], leading=view.render(current, workstation)),
+        "readiness.html": document("readiness", "North-star readiness: what is done, what is left, what needs a decision", "", current_scope, manifest_body, *common, [], leading=view.render(current, workstation, validated=True, readings_normalized=True)),
         "gaps.html": document("gaps", "Grand Gap Board", "Find the open gaps, who owns them and what happens next.", gap_scope, gap_body(rows(gaps, "gaps", ("id", "group", "sev", "title"))), *common, []),
         "roadmap.html": document("roadmap", "Roadmap", "Read the dated milestones and server records.", road_scope, roadmap_body(roadmap), *common, []),
         "fleet.html": document("fleet", "Worker fleet", "", 'Native fleet as of ' + str(fleet.get("at") or "not reported"), adoption_view.roles(adoption), *common, [], leading=fleet_view.render(fleet)),

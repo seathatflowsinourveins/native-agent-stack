@@ -10,19 +10,23 @@ from contextlib import contextmanager
 from datetime import datetime, timezone
 import fcntl
 import hashlib
+import importlib.util
 import json
 import math
 import os
 from pathlib import Path
 import re
+import signal
 import stat
 import subprocess
+import sys
 import tempfile
 import time
 from typing import Any, Callable
 
 
-ACTIONS_TTL_SECONDS = 600
+ACTIONS_TTL_SECONDS = 540
+PRODUCER_TIMEOUT_SECONDS = 90
 REPO = "seathatflowsinourveins/native-agent-stack"
 MAX_SOURCE_BYTES = 2_000_000
 RUN_FIELDS = "workflowName,status,conclusion,databaseId,startedAt,updatedAt,url"
@@ -34,7 +38,9 @@ _GET_SEALS = getattr(fcntl, "F_GET_SEALS", 1034)
 _REQUIRED_SEALS = (getattr(fcntl, "F_SEAL_SEAL", 0x0001) | getattr(fcntl, "F_SEAL_SHRINK", 0x0002)
                    | getattr(fcntl, "F_SEAL_GROW", 0x0004) | getattr(fcntl, "F_SEAL_WRITE", 0x0008))
 _IDENTIFIER = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.:/+-]{0,99}\Z")
-_OPAQUE = re.compile(r"[A-Za-z0-9_-]{32,}|(?:sk-|gh[pousr]_|github_pat_|Bearer\s)", re.I)
+_OPAQUE = re.compile(r"(?<![\w-])(?:sk-|gh[pousr]_|github_pat_|Bearer\s)", re.I)
+_PRIVATE_LABEL = re.compile(r"(?:https?://|/home/|/Users/|[A-Za-z]:[\\/]|\b[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}\b)", re.I)
+_SOURCE_POLICY = None
 _POOL_LABEL = re.compile(
     r"(?:position [1-9][0-9]{0,2}|fresh\((?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d\)"
     r"|(?:\d{4}-)?\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z)\Z"
@@ -64,7 +70,7 @@ if len(raw) > 2000000 or hashlib.sha256(raw).hexdigest() != expected:
 encoding, _ = tokenize.detect_encoding(io.BytesIO(raw).readline)
 linecache.cache[source] = (len(raw), None, raw.decode(encoding).splitlines(True), source)
 sys.argv = [source] + sys.argv[4:]
-sys.path[0] = os.path.dirname(source)
+sys.path.insert(0, os.path.dirname(source))
 entry = types.ModuleType('__main__')
 entry.__file__, entry.__package__, entry.__spec__, entry.__cached__ = source, None, None, None
 entry.__loader__ = importlib.machinery.SourceFileLoader('__main__', source)
@@ -95,6 +101,14 @@ def _text(value: Any, limit: int = 160) -> str | None:
     if not isinstance(value, str) or not value or len(value) > limit or "@" in value or _OPAQUE.search(value):
         return None
     return value if re.fullmatch(r"[A-Za-z0-9 .,;:()_/'+-]+", value) else None
+
+
+def _workflow_label(value: Any) -> str | None:
+    # Workflow names are public labels, including Unicode and punctuation.
+    # Preserve the source's exact identity while excluding private/token text.
+    if not isinstance(value, str) or not value or len(value) > 100 or not value.isprintable():
+        return None
+    return value if '@' not in value and not _OPAQUE.search(value) and not _PRIVATE_LABEL.search(value) else None
 
 
 def _number(value: Any, maximum: float | None = None) -> int | float | None:
@@ -138,6 +152,18 @@ def _directory(path: Path, create: bool = False):
         os.close(descriptor)
 
 
+def _source_policy():
+    global _SOURCE_POLICY
+    if _SOURCE_POLICY is None:
+        spec = importlib.util.spec_from_file_location("fleet_source_policy", Path(__file__).with_name("source_policy.py"))
+        if spec is None or spec.loader is None:
+            raise ValueError("native source read helper unavailable")
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        _SOURCE_POLICY = module
+    return _SOURCE_POLICY
+
+
 def _read_source(path: Path, root: Path, sources: dict | None = None, *, kind: str = "source", limit: int = MAX_SOURCE_BYTES):
     """Read a bounded regular file without following any source symlink."""
     path, root = path.absolute(), root.absolute()
@@ -147,21 +173,14 @@ def _read_source(path: Path, root: Path, sources: dict | None = None, *, kind: s
         relative = path.relative_to(root)
         if ".." in relative.parts:
             raise ValueError("source outside approved root")
-        with _directory(path.parent) as directory:
-            descriptor = os.open(path.name, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK, dir_fd=directory)
-            try:
-                info = os.fstat(descriptor)
-                if not stat.S_ISREG(info.st_mode):
-                    raise ValueError("nonregular source rejected")
-                if info.st_size > limit:
-                    raise ValueError("source exceeds read limit")
-                with os.fdopen(descriptor, "rb", closefd=False) as stream:
-                    raw = stream.read(limit + 1)
-                if len(raw) > limit:
-                    raise ValueError("source exceeds read limit")
-                receipt.update(status="reported", sha256=hashlib.sha256(raw).hexdigest(), bytes=len(raw), read_utc=_utc(), file_utc=_utc(info.st_mtime))
-            finally:
-                os.close(descriptor)
+        # The native helper enforces protected names, regular-file bounds and
+        # no-follow ancestors. Metadata and digest bind the same open handle.
+        with _source_policy()._open_regular(path, limit=limit) as stream:
+            info = os.fstat(stream.fileno())
+            raw = stream.read(limit + 1)
+            if len(raw) > limit:
+                raise ValueError("source exceeds read limit")
+            receipt.update(status="reported", sha256=hashlib.sha256(raw).hexdigest(), bytes=len(raw), read_utc=_utc(), file_utc=_utc(info.st_mtime))
     except (OSError, ValueError) as error:
         raw = None
         receipt["reason"] = "source missing" if isinstance(error, FileNotFoundError) else "source rejected or unavailable"
@@ -182,6 +201,30 @@ def _read_json(path: Path, root: Path | None = None, sources: dict | None = None
         pass
     receipt.update(status="unavailable", reason="invalid JSON object")
     return {}
+
+
+def _run_producer(command, *, capture_output=True, text=True, timeout=PRODUCER_TIMEOUT_SECONDS, **kwargs):
+    """Use the native Popen session/communicate API to kill a timed-out group.
+
+    CPython3.13.16 subprocess.run kills its direct child only. Official Popen
+    start_new_session and communicate(timeout) contracts supply this small seam:
+    https://docs.python.org/3.13/library/subprocess.html#subprocess.Popen
+    https://docs.python.org/3.13/library/os.html#os.killpg
+    """
+    kwargs.setdefault("start_new_session", True)
+    if capture_output:
+        kwargs.update(stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    with subprocess.Popen(command, text=text, **kwargs) as child:
+        try:
+            stdout, stderr = child.communicate(timeout=timeout)
+        except BaseException:
+            try:
+                os.killpg(child.pid, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+            child.communicate()
+            raise
+        return subprocess.CompletedProcess(command, child.returncode, stdout, stderr)
 
 
 def _execute_producer(path: Path, raw: bytes, receipt: dict, run: Callable[..., Any]):
@@ -206,11 +249,18 @@ def _execute_producer(path: Path, raw: bytes, receipt: dict, run: Callable[..., 
         if fcntl.fcntl(descriptor, _GET_SEALS) & _REQUIRED_SEALS != _REQUIRED_SEALS:
             raise ValueError("producer snapshot immutability was not established")
         os.lseek(descriptor, 0, os.SEEK_SET)
-        result = run(["python3", "-c", _PRODUCER_BOOTSTRAP, str(descriptor), str(path),
+        # -I keeps CWD/PYTHONPATH/user-site code out of the bootstrap's imports.
+        # The sibling path is added explicitly only after snapshot verification.
+        runner = _run_producer if run is subprocess.run else run
+        result = runner([sys.executable, "-I", "-c", _PRODUCER_BOOTSTRAP, str(descriptor), str(path),
                       execution["sha256"], "--json", "--no-gh"],
-                     pass_fds=(descriptor,), capture_output=True, text=True, timeout=25)
+                     pass_fds=(descriptor,), capture_output=True, text=True,
+                     timeout=PRODUCER_TIMEOUT_SECONDS, start_new_session=True)
         execution.update(status="completed" if result.returncode == 0 else "failed", returncode=result.returncode)
         return result
+    except subprocess.TimeoutExpired:
+        execution.update(status="timed out", timeout_seconds=PRODUCER_TIMEOUT_SECONDS)
+        raise
     finally:
         os.close(descriptor)
 
@@ -269,8 +319,8 @@ def _tiers(raw: dict[str, Any]) -> dict[str, Any]:
         "availability": "reported" if policy_known else "not reported",
         "reason": None if policy_known else "policy absent or required default/fast list unavailable",
         "read_utc": _stamp(raw.get("updated_utc")),
-        "default": _identifier(raw.get("default")),
-        "fast": fast,
+        "default": _identifier(raw.get("default")) if policy_known else None,
+        "fast": fast if policy_known else None,
         "parking": {
             **{key: _number(parking.get(key)) for key in (
                 "idle_minutes_default", "idle_minutes_when_memory_tight",
@@ -331,7 +381,7 @@ def _workflow_names(root: Path, sources: dict | None = None) -> list[str]:
         if not _AI_INVOCATION.search(source):
             continue
         match = re.search(r"(?m)^name:\s*([^\n]+)$", source)
-        name = _text(match[1].strip().strip("\"'"), 100) if match else None
+        name = _workflow_label(match[1].strip().strip("\"'")) if match else None
         if name:
             names.append(name)
     return sorted(set(names))
@@ -402,7 +452,7 @@ def _actions(cache_dir: Path, root: Path, run: Callable[..., Any], now: float, s
                 if not stat.S_ISREG(os.fstat(lock).st_mode):
                     raise OSError("nonregular cache lock rejected")
                 fcntl.flock(lock, fcntl.LOCK_EX)
-                return _actions_locked(cache_dir, root, run, now, sources)
+                return _actions_locked(cache_dir, root, run, time.time(), sources)
             finally:
                 os.close(lock)
     except OSError:
@@ -421,19 +471,23 @@ def _ledger(path: Path, now: str, jobs: Any, root: Path, sources: dict) -> dict[
     result = {"read_utc": receipt.get("read_utc"), "file_utc": receipt.get("file_utc"), "jobs_running": jobs_running, "spend_usd": None, "ceiling_usd": None, "source": receipt}
     if raw is None:
         return {**result, "status": "ledger unavailable"}
-    # Ledger event formats are not inferred from arbitrary fields or prose.
-    # A cumulative spend_usd and explicit ceiling_usd are accepted if present.
+    # Match native fleet_block.py's per-key event sums (325-343, SHA-256
+    # b7b6936e421682da7d699e3f22e8fdf04a2e838c8dff4b8bace60e88edd77cf3).
+    # Reserved max_usd amounts are distinct from a CC global credit ceiling.
     try:
         nonblank = [line for line in raw.decode("utf-8").splitlines() if line.strip()]
+        sums = {"actual_usd": None, "max_usd": None}
         for line in nonblank:
             row = json.loads(line)
             if not isinstance(row, dict):
                 continue
-            spend, ceiling = _number(row.get("spend_usd")), _number(row.get("ceiling_usd"))
-            if spend is not None:
-                result["spend_usd"] = spend
-            if ceiling is not None:
-                result["ceiling_usd"] = ceiling
+            for key in sums:
+                value = _number(row.get(key))
+                if value is not None:
+                    sums[key] = round((sums[key] or 0) + value, 4)
+        if not nonblank:
+            return {**result, "status": "no spend yet", "spend_usd": 0, "reserved_max_usd": 0}
+        result.update(spend_usd=sums["actual_usd"], reserved_max_usd=sums["max_usd"])
         return {**result, "status": "observed" if result["spend_usd"] is not None else "ledger spend not observed"}
     except (ValueError, UnicodeError):
         return {**result, "status": "ledger unavailable"}
@@ -460,15 +514,10 @@ def _exec_reads(value: Any) -> list[dict] | None:
 
 
 def _roster(value: Any, kind: str) -> bool:
-    if not isinstance(value, list):
-        return False
-    if kind == "lanes_live":
-        return all(_lane(row) is not None for row in value[:200])
-    if kind == "lanes_parked":
-        return all(_identifier(row.get("name") if isinstance(row, dict) else row) for row in value[:200])
-    if kind == "claude_sessions":
-        return all(isinstance(row, dict) and _identifier(row.get("name")) for row in value[:100])
-    return True
+    # Shape selects the dated observation; each public row is filtered below.
+    # One rejected identity cannot replace an entire current roster with a
+    # stale snapshot or UNKNOWN when valid rows are available.
+    return isinstance(value, list)
 
 
 def collect(state_root: Path, cache_dir: Path, root: Path, run: Callable[..., Any] | None = None) -> dict[str, Any]:
@@ -547,7 +596,18 @@ def collect(state_root: Path, cache_dir: Path, root: Path, run: Callable[..., An
     ledger_path = state_root / "coordination/api-actions-20261008/api-actions-ledger.jsonl"
     native_ledger = fleet.get("api_spend_ledger")
     if isinstance(native_ledger, dict) and isinstance(native_ledger.get("sums"), dict):
-        sdk = {"read_utc": native_time, "file_utc": None, "jobs_running": len(jobs) if isinstance(jobs, list) else _count(jobs), "spend_usd": _number(native_ledger["sums"].get("actual_usd")), "ceiling_usd": None, "status": "native ledger observation" if source == "direct" else "snapshot ledger observation", "ledger_source": "coop-fleet api_spend_ledger", "ledger_rows": _count(native_ledger.get("rows")), "ledger_last_utc": _stamp(native_ledger.get("last"))}
+        ledger_rows = _count(native_ledger.get("rows"))
+        empty_ledger = ledger_rows == 0 and not native_ledger["sums"]
+        sdk = {
+            "read_utc": native_time, "file_utc": None,
+            "jobs_running": len(jobs) if isinstance(jobs, list) else _count(jobs),
+            "spend_usd": 0 if empty_ledger else _number(native_ledger["sums"].get("actual_usd")),
+            "reserved_max_usd": 0 if empty_ledger else _number(native_ledger["sums"].get("max_usd")),
+            "ceiling_usd": None,
+            "status": "no spend yet" if empty_ledger else "native ledger observation" if source == "direct" else "snapshot ledger observation",
+            "ledger_source": "coop-fleet api_spend_ledger", "ledger_rows": ledger_rows,
+            "ledger_last_utc": _stamp(native_ledger.get("last")),
+        }
     else:
         sdk = _ledger(ledger_path, observed, jobs, state_root, inputs)
     credit = cc.get("api_credit") if isinstance(cc.get("api_credit"), dict) else {}
