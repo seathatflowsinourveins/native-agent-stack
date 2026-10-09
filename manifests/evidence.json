@@ -18467,8 +18467,8 @@
     },
     {
       "path": "docs/decisions/2026-10-08-g5-compact-evidence.md",
-      "sha256": "61a2fa273ea239ca48c6d6b4b78340fe37aaed2ed2a1d26bc9fd71af64ebc569",
-      "bytes": 14792
+      "sha256": "f55872f1906c1a86ccd89bb198cfee5c6ac7c37103529ed1bcda76b5f2156030",
+      "bytes": 19057
     },
     {
       "path": "docs/decisions/2026-10-08-guard-hook-fails-closed.md",
@@ -18657,8 +18657,8 @@
     },
     {
       "path": "docs/g5-refresh-procedure.md",
-      "sha256": "d708cfcdeb1b3eb880ae268dba3c1f7f48b9b9b915f7d52d3e57f690fe4fddce",
-      "bytes": 14411
+      "sha256": "1d9e250982ff2902373e1a260a3027e8871893d8739cac021e8111ee54d530da",
+      "bytes": 16028
     },
     {
       "path": "docs/gap-crosswalk-92bb279.md",
@@ -21594,6 +21594,21 @@
       "path": "evidence/artifacts/g5-start-closure-1-20261009/class-gates.json",
       "sha256": "7e9c66a44605f5d02e137dd4358987151433e3d972ae59f8c81532a7fd49c396",
       "bytes": 3990
+    },
+    {
+      "path": "evidence/artifacts/g5-start-closure-1-20261009/origin-family-declarations.json",
+      "sha256": "6350a713b79c12677d8c5de62539ea6dad40c6a758864b3b071e4e56167d850d",
+      "bytes": 10012
+    },
+    {
+      "path": "evidence/artifacts/g5-start-closure-1-20261009/origin-map.json",
+      "sha256": "0155eb321619338889195dd6427a2a0413b290eb8afd045eb29d3e807277befa",
+      "bytes": 3064954
+    },
+    {
+      "path": "evidence/artifacts/g5-start-closure-1-20261009/r3-reseal-proof.json",
+      "sha256": "50626ce0d975fbced41ec46561c40d86c2913fdf9a45fc8f7f4db9307d71f1fa",
+      "bytes": 4765
     },
     {
       "path": "evidence/artifacts/gap-crosswalk-92bb279/PREREGISTRATION.md",
@@ -61432,8 +61447,13 @@
     },
     {
       "path": "tools/sota-convergence/sealed_r3_generator.py",
-      "sha256": "80e69ff94f97fffdf906583fa280f2a60a7487a54f0b58b05342264a5adf9627",
-      "bytes": 42631
+      "sha256": "759facff52170f452290077b71d328f299b2c763df0358d126973c60886515c7",
+      "bytes": 42382
+    },
+    {
+      "path": "tools/sota-convergence/sealed_r3_stratum_contract.json",
+      "sha256": "c12428493bd8aa76785a6b08f15b1e0e20b5cc169f2bcd6831c7d75ea84573fd",
+      "bytes": 3382
     },
     {
       "path": "tools/token-e2e/README.md",
