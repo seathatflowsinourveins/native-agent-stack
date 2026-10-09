@@ -58402,8 +58402,8 @@
     },
     {
       "path": "tests/test_new_wsl_client_config.py",
-      "sha256": "cb9ef8fc8934713a5d341dbbb96d82026d15ec44816a36e2d3909c08b96bc5d0",
-      "bytes": 343281
+      "sha256": "eef09d97ee48c2c6f1c8040f1d8cb400baad2f082bc052740de7bd3d69fe430a",
+      "bytes": 344217
     },
     {
       "path": "tests/test_new_wsl_definitive_defaults.py",

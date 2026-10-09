@@ -1538,6 +1538,23 @@ class RenderTests(unittest.TestCase):
             self.assertNotIn("${", self.files[name])
             self.assertNotIn("$$", self.files[name])
 
+    def test_rendered_settings_block_on_guard_failure_only(self):
+        settings = json.loads(self.files["settings.json"])
+        guard_count = 0
+        for event, groups in settings["hooks"].items():
+            for group in groups:
+                for hook in group["hooks"]:
+                    with self.subTest(event=event, matcher=group.get("matcher"), command=hook.get("command")):
+                        if "secret_path_guard.py" in hook.get("command", ""):
+                            guard_count += 1
+                            self.assertEqual(event, "PreToolUse")
+                            self.assertEqual(group.get("matcher"), "Bash")
+                            self.assertEqual(hook["type"], "command")
+                            self.assertEqual(hook["onFailure"], "block")
+                        else:
+                            self.assertNotIn("onFailure", hook)
+        self.assertEqual(guard_count, 1)
+
     def test_settings_keep_the_practice_pieces_and_drop_the_old_profile_pieces(self):
         settings = json.loads(self.files["settings.json"])
         # The user's choice of 2026-10-04, Opus 5.5, pinned by its full model name (the map's model entry overrides the
