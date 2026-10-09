@@ -46,6 +46,7 @@ The existing write grants stay on their own jobs, and none runs on `pull_request
 | Job | Grant | Why it is not reachable from a pull request |
 | --- | --- | --- |
 | `catalog-freshness.yml:propose` | `contents: write`, `pull-requests: write` | schedule and dispatch only |
+| `claude-pr-review.yml:review` (2026-10-08) | `id-token: write` | dispatch only, on `main`, by the owner; federation, not attestation (addendum below) |
 | `harness-audit.yml:audit` (2026-10-08) | `id-token: write`, `issues: write` | schedule and dispatch only, on `main`; federation, not attestation ("Federation exemption (2026-10-08)") |
 | `publish-catalog.yml:publish` | `id-token: write`, `attestations: write` | tag push and dispatch only; attests provenance |
 | `publish-catalog.yml:release` | `contents: write` | tag push only |
@@ -167,6 +168,7 @@ inventories.
 | `action-compatibility.yml` | `{}` | none (no checkout) | `none` | kept | |
 | `adoption-bootstrap.yml` | `{}` | `contents: read` on all 5 jobs | `none` on 4 jobs | kept | restore/save cache split |
 | `catalog-freshness.yml` | `{}` | `freshness: contents: read` | | job-scoped (kept) | |
+| `claude-pr-review.yml` (added 2026-10-08) | `{}` | `review`: `contents: read`, `pull-requests: read`, `id-token: write` | | added | `id-token-write` exemption |
 | `dependency-review.yml` | `{}` | `contents: read` | `none` | kept | |
 | `hardware-profile-smoke.yml` | `{}` | `contents: read` on both jobs | `none` | kept | |
 | `harness-audit.yml` (added 2026-10-08) | `{}` | `audit`: `contents: read`, `id-token: write`, `issues: write` | | added | `id-token-write` exemption |
@@ -399,8 +401,9 @@ The federation rule accepts workflows on this repository's `main` and never pull
 of a run on `main`, and a pull request run's subject ends in `:pull_request` instead (GitHub's OpenID Connect reference,
 "Filtering for pull_request events" and "Filtering for a specific branch"). It has no `workflow_ref` condition, by
 design, so other workflows on `main` may use it later. Which workflows may request an OIDC token is therefore governed
-by the reviewed write-grant inventory (`id-token: write`) that `tests/test_workflow_policy.py` enforces, and this
-exemption names the one job that may request a token without an attestation.
+by the reviewed write-grant inventory (`id-token: write`) that `tests/test_workflow_policy.py` enforces, and the
+`id-token-write` exemptions name each job that may request a token without an attestation (`harness-audit.yml:audit`,
+and `claude-pr-review.yml:review` by the addendum below).
 
 This repository was created on 2026-09-19, after GitHub's 2026-07-15 move to immutable subject claims, and
 `GET repos/seathatflowsinourveins/native-agent-stack/actions/oidc/customization/sub` returned

@@ -76,8 +76,8 @@ The Actions allow-list and harness description below were checked against live s
   workflow evidence.
 - **Pull request review on demand.** [`claude-pr-review.yml`](../.github/workflows/claude-pr-review.yml) is
   dispatched by hand from `main` with a pull request number and the exact head commit, and only while the repository
-  variable `CLAUDE_PR_REVIEW_ENABLED` is `true`. It uses the same action pin and federation variables as the harness
-  audit. `main` is at the workspace root and the pull request head is data under `pr-head/`; Claude has Read, Glob
+  variable `CLAUDE_PR_REVIEW_ENABLED` is `true`. It uses the harness audit's federation variables and the action pin
+  v1.0.247; the harness audit on `main` stays on v1.0.245 until #892 lands. `main` is at the workspace root and the pull request head is data under `pr-head/`; Claude has Read, Glob
   and Grep only, 12 turns and a $3 client budget; the job grants `contents: read`, `pull-requests: read` and
   `id-token: write`. A model-free step copies the review to the job summary; nothing is posted to the pull request
   ([decision](decisions/2026-10-08-claude-actions-pr-review.md)). No hosted run has been made.

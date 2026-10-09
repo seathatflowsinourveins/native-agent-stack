@@ -26,7 +26,7 @@ PR (#892, 2026-10-09), which found changes its record had not named; the same re
 - The action step pins `ACTIONS_STEP_DEBUG: 'false'` and passes `show_full_output`, `display_report` and
   `track_progress` as `'false'`; the last two are their defaults, declared in the pinned `action.yml` (lines
   136-139 and 152-155 at `2dca132f`).
-- A numbers step checks the bounds (below) and an artifact `pr-review-usage-<run id>-<attempt>` keeps `usage.json`
+- A numbers step checks the bounds (below) and an artifact `claude-pr-review-usage-<run id>-<attempt>` keeps `usage.json`
   (numbers only) for 14 days; the review goes to the job summary only when the bounds passed. Nothing is posted to
   the pull request.
 - The pin, v1.0.247, is hours old: the user ended the seven-day cooldown for clean releases on 2026-10-03
@@ -83,7 +83,8 @@ The fence flags were run on the installed client (Claude Code 2.1.295, the versi
 `--tools` and `--allowedTools` Read,Glob,Grep, `--strict-mcp-config`, `--permission-prompts none` and `--settings` with
 hooks off, `claudeMdExcludes` for `pr-head` and three deny rules, on Claude Haiku 5.5 with `--max-turns 10` and a
 $0.50 budget; the receipt lists them. This workflow adds `--setting-sources user`, `--add-dir`, `--effort max`, four
-more deny rules and `blockReadsOutsideWorkingDirectories`, and runs Opus 5.5 with 12 turns and $3. The runs used a
+more deny rules and `blockReadsOutsideWorkingDirectories` (a settings key present in the 2.1.295 build; the fence
+receipt does not exercise it), and runs Opus 5.5 with 12 turns and $3. The runs used a
 throwaway tree with an untrusted `pr-head` carrying its own `CLAUDE.md`, a skill and a hook, a root settings file
 with a hook, a root `CLAUDE.md`, `.git/config` files and a file outside the tree. In three runs the session's tools
 were exactly Glob, Grep and Read; the files at the root and under `pr-head` were read; the file outside the tree and
@@ -94,7 +95,8 @@ parser (`shell-quote`, `base-action/src/parse-sdk-options.ts`); replaying that p
 the same flags and the same JSON. This workflow's own prompt and `claude_args`, read from this file, also ran on
 Opus 5.5 at `max` for one real pull request (#897): 12 of 12 assistant turns, a client cost estimate of about
 $1.87 of $3, tools Glob, Grep and Read, no MCP server, a report with two blocking findings
-(`evidence/artifacts/claude-actions-fence-smoke-20261008/local-parity-receipt.json`, added by #892).
+(`evidence/artifacts/claude-actions-fence-smoke-20261008/local-parity-receipt.json`, which #892 adds; #892
+precedes this PR in the command center's landing order, so the file is on `main` before this PR lands).
 
 After the run, one step reads the action's execution file and keeps only numbers and fixed names: cost, turns, the
 success flag, the Claude Code version, the session's tool list, the number of MCP servers and per-model token
@@ -104,6 +106,16 @@ missing list fails instead of passing as empty), used no tool outside Read, Glob
 result text; the step names every bound it finds unmet. The review text, the last non-empty result, is published
 only when that check passed, escaped, inside `<pre>`, capped at 60,000 bytes on a character boundary, with a line
 saying so when the review was longer.
+
+## Visibility
+
+The repository is public, so the job summary of every run, and with it the published review, is readable by anyone.
+That is by design: the review names defects in a pull request that is itself public. A review of a change whose
+findings should not be public before a fix (an undisclosed vulnerability, for example) does not belong in this
+workflow; the local route on the second key (`api-actions` reader jobs) keeps its report off GitHub.
+
+A review step that reports success without an execution file fails the job in a final step, so a green run always
+means the bounds were checked.
 
 ## Effort
 

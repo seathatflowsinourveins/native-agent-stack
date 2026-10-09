@@ -5021,8 +5021,8 @@
     },
     {
       "path": ".github/workflows/claude-pr-review.yml",
-      "sha256": "911fcf59571d58b68578642aeee0d152839d0249cb605e80d37bec82523beb6d",
-      "bytes": 18423
+      "sha256": "a3d2a347b843817f9ff86bac15c05d3c1c54f0d8217bd36907877a59f5ff34e0",
+      "bytes": 19067
     },
     {
       "path": ".github/workflows/dependency-review.yml",
@@ -17872,8 +17872,8 @@
     },
     {
       "path": "docs/decisions/2026-10-04-ci-least-privilege.md",
-      "sha256": "daea2edd0754b49294e7b0421b78c4c1a6e3ac529bb3471b232d343100fd1db5",
-      "bytes": 41292
+      "sha256": "2e421d4d0a99e5abd7c0120dbb61d70796e0c654039fa5ea8da8c23c726562bb",
+      "bytes": 41707
     },
     {
       "path": "docs/decisions/2026-10-04-claude-template-holds-out-token-lane-carriers.md",
@@ -18157,8 +18157,8 @@
     },
     {
       "path": "docs/decisions/2026-10-08-claude-actions-pr-review.md",
-      "sha256": "fff34a616630880e7a6094d49c5226e60aac8aad96973f843161a3d0779207a3",
-      "bytes": 16107
+      "sha256": "7e2ccc3c178ab6d31d3f8f0cad161de749aec57dc66381b5e873d661fb1c31a6",
+      "bytes": 16912
     },
     {
       "path": "docs/decisions/2026-10-08-coordinator-research-routing.md",
@@ -18327,8 +18327,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "4f024c45cbd61640899c73747e722d9c033a0099571c723df1d3f421192fb559",
-      "bytes": 101834
+      "sha256": "e30178c77f20588bf7a0296288721694a500c2289824c3bc90822ef0049718cd",
+      "bytes": 101901
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -57872,8 +57872,8 @@
     },
     {
       "path": "tests/test_claude_pr_review_workflow.py",
-      "sha256": "e6f2410899e25b0b56e4c323c416bc91898ac592eb41d9ec2eead997fe591513",
-      "bytes": 26203
+      "sha256": "28480fcbdaacff650fa6983fc0d2bbb63c6e5525317eb64d690193bcaaf41a35",
+      "bytes": 26931
     },
     {
       "path": "tests/test_claude_recovery.py",

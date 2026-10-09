@@ -124,7 +124,9 @@ jobs:
           path: pr-head
           persist-credentials: false
 
-      # git runs in the trusted root checkout only; external diff drivers and text conversion are off.
+      # git runs in the trusted root checkout only; external diff drivers and text conversion are off. The paths are
+      # expanded as ${scope[@]+"${scope[@]}"} because bash before 4.4 (macOS /bin/bash 3.2) treats an empty array as
+      # unset under set -u.
       - name: Write the diff from the merge base
         shell: bash
         env:
@@ -135,9 +137,9 @@ jobs:
           git fetch --quiet --no-tags origin "$HEAD_SHA"
           base="$(git merge-base HEAD "$HEAD_SHA")"
           read -r -a scope <<< "$DIFF_PATHS"
-          git diff --no-ext-diff --no-textconv --no-color "$base" "$HEAD_SHA" -- "${scope[@]}" \
+          git diff --no-ext-diff --no-textconv --no-color "$base" "$HEAD_SHA" -- ${scope[@]+"${scope[@]}"} \
             > "$RUNNER_TEMP/pr-review/pr.diff"
-          git diff --no-ext-diff --no-textconv --stat=200 "$base" "$HEAD_SHA" -- "${scope[@]}" \
+          git diff --no-ext-diff --no-textconv --stat=200 "$base" "$HEAD_SHA" -- ${scope[@]+"${scope[@]}"} \
             > "$RUNNER_TEMP/pr-review/pr.stat"
           [ -s "$RUNNER_TEMP/pr-review/pr.diff" ] || { echo 'Refused: the diff is empty.' >&2; exit 2; }
           size="$(wc -c < "$RUNNER_TEMP/pr-review/pr.diff")"
@@ -304,6 +306,15 @@ jobs:
             fi
           } >> "$GITHUB_STEP_SUMMARY"
           rm -f "$report"
+
+      # A review step that reports success without an execution file would leave the job green with nothing
+      # checked or published; that fails here.
+      - name: Require the run's execution file
+        if: ${{ success() && steps.claude_review.outputs.execution_file == '' }}
+        shell: bash
+        run: |
+          echo 'The review step finished without an execution file: no bounds were checked and no review was published.' >&2
+          exit 1
 
       - name: Keep the numeric usage record
         if: ${{ always() && steps.claude_review.outputs.execution_file != '' }}
