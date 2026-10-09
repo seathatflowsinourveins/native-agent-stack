@@ -91,7 +91,7 @@ def claude_args():
 
 
 def pull(**changes):
-    data = {"state": "open", "title": TITLE_MARKER,
+    data = {"state": "open", "draft": False, "title": TITLE_MARKER,
             "head": {"repo": {"full_name": REPOSITORY}, "sha": HEAD},
             "base": {"repo": {"full_name": REPOSITORY}, "ref": "main"}}
     for key, value in changes.items():
@@ -174,7 +174,7 @@ def run_step(name, env_changes=None, execution_file=None, settings=None, pull_re
         env = {"PATH": str(bin_dir) + os.pathsep + os.environ.get("PATH", os.defpath), "LANG": "C.UTF-8",
                "HOME": str(home), "RUNNER_TEMP": str(directory), "GITHUB_STEP_SUMMARY": str(summary),
                "TMPDIR": str(directory), "GH_REPO": REPOSITORY, "GH_TOKEN": "synthetic-not-a-token",
-               "PR_NUMBER": "12", "HEAD_SHA": HEAD, "DIFF_PATHS": "",
+               "PR_NUMBER": "12", "HEAD_SHA": HEAD, "DIFF_PATHS": "", "EVENT_NAME": "workflow_dispatch",
                "GIT_CONFIG_GLOBAL": os.devnull, "GIT_CONFIG_SYSTEM": os.devnull}
         if execution_file is not None:
             path = directory / "claude-execution-output.json"
@@ -233,9 +233,12 @@ def repository_pair(directory, big=False):
 
 @unittest.skipUnless(yaml, "PyYAML is needed to read the workflow's steps")
 class PullRequestReviewShapeTests(unittest.TestCase):
-    def test_the_only_trigger_is_a_manual_dispatch_with_a_number_and_a_commit(self):
+    def test_the_triggers_are_a_manual_dispatch_and_a_15_minute_schedule(self):
+        # No pull_request, pull_request_target or workflow_run: the review runs only from main's copy of this file
+        # (docs/decisions/2026-10-08-claude-actions-pr-review.md, "Every pull request (2026-10-09)").
         triggers = workflow()[True] if True in workflow() else workflow()["on"]
-        self.assertEqual(list(triggers), ["workflow_dispatch"])
+        self.assertEqual(list(triggers), ["workflow_dispatch", "schedule"])
+        self.assertEqual(triggers["schedule"], [{"cron": "*/15 * * * *"}])
         inputs = triggers["workflow_dispatch"]["inputs"]
         self.assertTrue(inputs["pr_number"]["required"])
         self.assertTrue(inputs["head_sha"]["required"])
@@ -250,8 +253,31 @@ class PullRequestReviewShapeTests(unittest.TestCase):
                        "github.run_attempt == 1",
                        "vars.CLAUDE_PR_REVIEW_ENABLED == 'true'"):
             self.assertIn(clause, condition)
-        self.assertEqual(condition.count("&&"), 5)
+        self.assertIn("needs.resolve.outputs.go == 'true'", condition)
+        self.assertEqual(condition.count("&&"), 6)
         self.assertNotIn("||", condition)
+        self.assertEqual(job()["needs"], "resolve")
+
+    def test_the_resolve_job_holds_no_token_and_reads_only(self):
+        resolve = workflow()["jobs"]["resolve"]
+        self.assertEqual(resolve["permissions"], {"pull-requests": "read", "actions": "read"})
+        condition = " ".join(resolve["if"].split())
+        for clause in ("github.ref == 'refs/heads/main'", "github.actor == github.repository_owner",
+                       "github.triggering_actor == github.repository_owner", "github.run_attempt == 1",
+                       "vars.CLAUDE_PR_REVIEW_ENABLED == 'true'",
+                       "(github.event_name == 'workflow_dispatch' || vars.CLAUDE_PR_REVIEW_EVERY_PR == 'true')"):
+            self.assertIn(clause, condition)
+        self.assertNotIn("uses: actions/checkout", json.dumps(resolve))
+        self.assertNotIn("secrets.", json.dumps(resolve))
+
+    def test_each_review_is_one_matrix_head_with_its_own_group_at_most_two_at_once(self):
+        strategy = job()["strategy"]
+        self.assertEqual(strategy["max-parallel"], 2)
+        self.assertIs(strategy["fail-fast"], False)
+        self.assertEqual(strategy["matrix"], {"include": "${{ fromJSON(needs.resolve.outputs.heads) }}"})
+        self.assertEqual(job()["concurrency"], {
+            "group": "claude-pr-review-pr${{ matrix.pr_number }}-${{ matrix.head_sha }}", "cancel-in-progress": False})
+        self.assertTrue(job()["name"].startswith("Review "))  # the resolve step counts today's reviews by this prefix
 
     def test_the_job_holds_the_oidc_token_and_no_write_scope(self):
         self.assertEqual(job()["permissions"],
@@ -270,7 +296,7 @@ class PullRequestReviewShapeTests(unittest.TestCase):
         self.assertNotIn("path", root)
         self.assertIs(root["persist-credentials"], False)
         head = step("Check out the pull request head as data")["with"]
-        self.assertEqual(head["ref"], "${{ inputs.head_sha }}")
+        self.assertEqual(head["ref"], "${{ matrix.head_sha }}")
         self.assertEqual(head["path"], "pr-head")
         self.assertIs(head["persist-credentials"], False)
 
@@ -364,12 +390,11 @@ class PullRequestReviewShapeTests(unittest.TestCase):
         upload = step("Keep the numeric usage record")
         self.assertTrue(upload["with"]["path"].endswith("/pr-review-usage/usage.json"))
 
-    def test_the_usage_artifact_is_named_for_the_run_and_its_attempt(self):
-        # The decision record names the artifact claude-pr-review-usage-<run id>-<attempt>; the path check above
-        # does not read the name, so the exact name is pinned here.
+    def test_the_usage_artifact_is_named_for_the_pull_request_and_its_head(self):
+        # The resolve step skips a head whose artifact claude-pr-review-usage-pr<N>-<sha> exists, so the exact name is
+        # pinned here.
         upload = step("Keep the numeric usage record")
-        self.assertEqual(upload["with"]["name"],
-                         "claude-pr-review-usage-${{ github.run_id }}-${{ github.run_attempt }}")
+        self.assertEqual(upload["with"]["name"], "claude-pr-review-usage-pr${{ matrix.pr_number }}-${{ matrix.head_sha }}")
 
 
 @unittest.skipUnless(shutil.which("jq") and shutil.which("git"),
@@ -433,6 +458,14 @@ class PullRequestReviewStepTests(unittest.TestCase):
                 code, console, _, _, _ = run_step(BIND, pull_request=pull(**changes))
                 self.assertEqual(code, 2, console)
                 self.assertNotIn(TITLE_MARKER, console)
+
+    def test_a_draft_is_bound_on_a_dispatch_and_refused_on_a_scheduled_review(self):
+        code, console, _, _, _ = run_step(BIND, pull_request=pull(draft=True))
+        self.assertEqual(code, 0, console)
+        code, console, _, _, _ = run_step(BIND, {"EVENT_NAME": "schedule"}, pull_request=pull(draft=True))
+        self.assertEqual(code, 2, console)
+        code, console, _, _, _ = run_step(BIND, {"EVENT_NAME": "schedule"}, pull_request=pull())
+        self.assertEqual(code, 0, console)
 
     def test_symbolic_links_in_the_head_are_removed_and_nothing_else(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -700,3 +733,176 @@ class PullRequestReviewStepTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+CHOOSE = "Choose the heads"
+
+
+def choose_step():
+    return next(item for item in workflow()["jobs"]["resolve"]["steps"] if item.get("name") == CHOOSE)
+
+
+def open_pull(number, sha, **changes):
+    data = pull(**changes)
+    data["number"] = number
+    data["head"]["sha"] = sha
+    return data
+
+
+def run_choose(event="schedule", pulls=(), reviewed_names=(), jobs_today=0, fail=None, env_changes=None,
+               spoofed_names=()):
+    """Run the resolve job's choosing step against a stand-in gh that serves fixtures and applies --jq with jq.
+    `fail` names an endpoint ("runs", "jobs", "pulls" or "artifacts") whose call exits 1, as an API error does.
+    Returns (exit code, console, outputs as a dict, summary)."""
+    with tempfile.TemporaryDirectory() as temporary:
+        directory = Path(temporary)
+        fixtures = {"runs": {"workflow_runs": ([{"id": 101, "head_branch": "main", "event": "schedule"}] if jobs_today else [])
+                             + [{"id": 102, "head_branch": "feature", "event": "pull_request"}]},
+                    "jobs": {"jobs": [{"name": "Review pull request 1 (read-only, bounded)", "conclusion": "success"}
+                                      for _ in range(jobs_today)] +
+                                     [{"name": "Choose the pull request heads to review (no token)",
+                                       "conclusion": "success"}]},
+                    "pulls": list(pulls), "reviewed": list(reviewed_names), "spoofed": list(spoofed_names),
+                    "fail": fail}
+        (directory / "fixtures.json").write_text(json.dumps(fixtures), encoding="utf-8")
+        bin_dir = directory / "bin"
+        bin_dir.mkdir()
+        tool = bin_dir / "gh"
+        tool.write_text(textwrap.dedent("""\
+            #!/usr/bin/env python3
+            import json, os, re, subprocess, sys
+            fx = json.load(open(os.path.join(os.environ["RUNNER_TEMP"], "fixtures.json")))
+            args = sys.argv[1:]
+            if not args or args[0] != "api":
+                sys.exit(99)
+            path, jq = args[1], None
+            if "--jq" in args:
+                jq = args[args.index("--jq") + 1]
+            if "/actions/workflows/claude-pr-review.yml/runs?" in path:
+                kind, body = "runs", fx["runs"]
+            elif re.search(r"/actions/runs/101/jobs", path):
+                kind, body = "jobs", fx["jobs"]
+            elif re.search(r"/actions/runs/[0-9]+/jobs", path):
+                kind, body = "jobs", {"jobs": [{"name": "Review pull request 9 (planted)", "conclusion": "success"}] * 50}
+            elif "/pulls?" in path:
+                kind, body = "pulls", fx["pulls"]
+            elif "/actions/artifacts?name=" in path:
+                name = path.split("name=", 1)[1].split("&", 1)[0]
+                arts = ([{"name": name, "expired": False, "workflow_run": {"head_branch": "main"}}]
+                        if name in fx["reviewed"] else [])
+                arts += ([{"name": name, "expired": False, "workflow_run": {"head_branch": "feature"}}]
+                         if name in fx["spoofed"] else [])
+                kind, body = "artifacts", {"total_count": len(arts), "artifacts": arts}
+            else:
+                sys.exit(98)
+            if fx["fail"] == kind:
+                sys.stderr.write("gh: HTTP 502\\n")
+                sys.exit(1)
+            text = json.dumps(body)
+            if jq is None:
+                sys.stdout.write(text)
+            else:
+                sys.stdout.write(subprocess.run(["jq", "-r", jq], input=text, capture_output=True, text=True,
+                                                check=True).stdout)
+            """), encoding="utf-8")
+        tool.chmod(0o755)
+        output, summary = directory / "output", directory / "summary.md"
+        env = {"PATH": str(bin_dir) + os.pathsep + os.environ.get("PATH", os.defpath), "LANG": "C.UTF-8",
+               "HOME": str(directory), "RUNNER_TEMP": str(directory), "GITHUB_OUTPUT": str(output),
+               "GITHUB_STEP_SUMMARY": str(summary), "GH_REPO": REPOSITORY, "GH_TOKEN": "synthetic-not-a-token",
+               "EVENT_NAME": event, "PR_NUMBER": "", "HEAD_SHA": "", "DAILY_USD": "55"}
+        env.update(env_changes or {})
+        done = subprocess.run(["bash", "-c", choose_step()["run"]], env=env, capture_output=True, text=True,
+                              check=False, cwd=directory)
+        outputs = dict(line.split("=", 1) for line in output.read_text().splitlines()) if output.exists() else {}
+        return (done.returncode, done.stdout + done.stderr, outputs,
+                summary.read_text(encoding="utf-8") if summary.exists() else "")
+
+
+def heads_of(outputs):
+    return [(h["pr_number"], h["head_sha"]) for h in json.loads(outputs.get("heads", "[]"))]
+
+
+@unittest.skipUnless(shutil.which("jq"), "jq is needed to run the resolve step")
+class ResolveStepTests(unittest.TestCase):
+    """The tokenless resolve job: which heads a tick reviews. A skipped tick exits 0 with go=false and no heads."""
+
+    def test_a_dispatch_passes_its_checked_inputs_through(self):
+        code, console, outputs, _ = run_choose("workflow_dispatch", env_changes={"PR_NUMBER": "12", "HEAD_SHA": HEAD})
+        self.assertEqual(code, 0, console)
+        self.assertEqual(outputs["go"], "true")
+        self.assertEqual(heads_of(outputs), [(12, HEAD)])
+
+    def test_a_malformed_dispatch_is_refused(self):
+        for changes in ({"PR_NUMBER": "12; x", "HEAD_SHA": HEAD}, {"PR_NUMBER": "12", "HEAD_SHA": "main"}):
+            with self.subTest(changes=changes):
+                code, console, outputs, _ = run_choose("workflow_dispatch", env_changes=changes)
+                self.assertEqual(code, 2, console)
+                self.assertNotIn("go", outputs)
+
+    def test_an_open_same_repository_non_draft_head_not_yet_reviewed_is_chosen(self):
+        code, console, outputs, summary = run_choose(pulls=[open_pull(7, HEAD)])
+        self.assertEqual(code, 0, console)
+        self.assertEqual(outputs["go"], "true")
+        self.assertEqual(heads_of(outputs), [(7, HEAD)])
+        self.assertIn(f"Review: pull request #7 at {HEAD}", summary)
+        self.assertNotIn(TITLE_MARKER, console + summary)
+
+    def test_a_fork_head_a_draft_another_base_and_a_closed_pull_request_are_never_chosen(self):
+        pulls = [open_pull(1, "1" * 40, **{"head.repo.full_name": "someone/fork"}),
+                 open_pull(2, "2" * 40, draft=True),
+                 open_pull(3, "3" * 40, **{"base.ref": "release"}),
+                 open_pull(4, "4" * 40, state="closed"),
+                 open_pull(5, "5" * 40, **{"base.repo.full_name": "someone/else"})]
+        code, console, outputs, summary = run_choose(pulls=pulls)
+        self.assertEqual(code, 0, console)
+        self.assertEqual(outputs, {"go": "false", "heads": "[]"})
+        self.assertIn("No review this run", summary)
+
+    def test_a_head_already_reviewed_is_skipped_and_a_new_head_of_the_same_pull_request_is_chosen(self):
+        reviewed = [f"claude-pr-review-usage-pr7-{HEAD}"]
+        code, console, outputs, _ = run_choose(pulls=[open_pull(7, HEAD)], reviewed_names=reviewed)
+        self.assertEqual(code, 0, console)
+        self.assertEqual(outputs["go"], "false")
+        code, console, outputs, _ = run_choose(pulls=[open_pull(7, "c" * 40)], reviewed_names=reviewed)
+        self.assertEqual(code, 0, console)
+        self.assertEqual(heads_of(outputs), [(7, "c" * 40)])
+
+    def test_at_most_two_heads_per_tick_oldest_first(self):
+        pulls = [open_pull(n, f"{n:x}" * 40) for n in (3, 4, 5)]
+        code, console, outputs, _ = run_choose(pulls=pulls)
+        self.assertEqual(code, 0, console)
+        self.assertEqual([n for n, _ in heads_of(outputs)], [3, 4])
+
+    def test_the_daily_ceiling_stops_new_reviews_and_reports_it(self):
+        code, console, outputs, summary = run_choose(pulls=[open_pull(7, HEAD)], jobs_today=10)
+        self.assertEqual(code, 0, console)
+        self.assertEqual(outputs, {"go": "false", "heads": "[]"})
+        self.assertIn("daily ceiling of 55 USD", summary)
+        code, console, outputs, _ = run_choose(pulls=[open_pull(7, HEAD), open_pull(8, "d" * 40)], jobs_today=9)
+        self.assertEqual(heads_of(outputs), [(7, HEAD)])  # room for one more review at 5.50 USD
+
+    def test_a_malformed_ceiling_skips(self):
+        code, console, outputs, _ = run_choose(pulls=[open_pull(7, HEAD)], env_changes={"DAILY_USD": "1e9"})
+        self.assertEqual(code, 0, console)
+        self.assertEqual(outputs["go"], "false")
+
+    def test_an_api_failure_fails_the_job_and_chooses_nothing(self):
+        for endpoint in ("runs", "pulls", "artifacts"):
+            with self.subTest(endpoint=endpoint):
+                code, console, outputs, _ = run_choose(pulls=[open_pull(7, HEAD)], jobs_today=1, fail=endpoint)
+                self.assertNotEqual(code, 0, console)
+                self.assertNotEqual(outputs.get("go"), "true")
+
+    def test_another_event_skips(self):
+        code, console, outputs, _ = run_choose("push", pulls=[open_pull(7, HEAD)])
+        self.assertEqual(code, 0, console)
+        self.assertEqual(outputs["go"], "false")
+
+    def test_an_artifact_or_a_run_from_a_pull_request_branch_cannot_suppress_or_ration_reviews(self):
+        # A branch's own workflows can upload an artifact with the review's name, and a branch's copy of this file can
+        # add runs with review jobs; neither counts, because only runs on main do.
+        name = f"claude-pr-review-usage-pr7-{HEAD}"
+        code, console, outputs, _ = run_choose(pulls=[open_pull(7, HEAD)], spoofed_names=[name])
+        self.assertEqual(code, 0, console)
+        self.assertEqual(heads_of(outputs), [(7, HEAD)])

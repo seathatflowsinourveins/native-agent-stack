@@ -5021,8 +5021,8 @@
     },
     {
       "path": ".github/workflows/claude-pr-review.yml",
-      "sha256": "ca2232599db31a67323d14256a26810443e686565942234d5ee0efc7d1e44af0",
-      "bytes": 23823
+      "sha256": "3d6a8724e44713d8416f06381a763f88cf1ec74a96290bbaf90f1ee1765996aa",
+      "bytes": 31860
     },
     {
       "path": ".github/workflows/claude-pr-toolkit-review.yml",
@@ -18252,8 +18252,8 @@
     },
     {
       "path": "docs/decisions/2026-10-08-claude-actions-pr-review.md",
-      "sha256": "5e8061b9010ab69b0aa71e2e5f39901da7a029a8a448d48fe74f9bf4d32eae9a",
-      "bytes": 49696
+      "sha256": "4a0f3c861ea9f1f51e903fb464d58c61935aa00bb56e76351cb5d1808dbc15ab",
+      "bytes": 57420
     },
     {
       "path": "docs/decisions/2026-10-08-coordinator-research-routing.md",
@@ -18457,8 +18457,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "19ed98531ef163007d9e6b514fbc0d704d473766fb76dc9063c4dee199af6c15",
-      "bytes": 102982
+      "sha256": "512722e154fa3377c2d958d671449b63a8a2bd21e3f3da4d6fc3abf0a2003d9a",
+      "bytes": 103362
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -58587,8 +58587,8 @@
     },
     {
       "path": "tests/test_claude_pr_review_workflow.py",
-      "sha256": "e768ed2096ae2f0a65062ec835b0796d4f19e77baa62affb9abda06923fa9c0f",
-      "bytes": 40292
+      "sha256": "cdc82d6590722915d3f58a6b3e92ab09cca63901cb5e49c5e42f47aa689158ef",
+      "bytes": 52360
     },
     {
       "path": "tests/test_claude_pr_toolkit_review_workflow.py",
@@ -59477,8 +59477,8 @@
     },
     {
       "path": "tests/test_workflow_policy.py",
-      "sha256": "8bc89f25c4d4cc008ff79afb07fd8bbe2429b2be1a89dbba83ce1d1ab7cd8a44",
-      "bytes": 84953
+      "sha256": "598f6d8ea8d5b7224581396b35b998a9cec7440f2e7b849acf97bde4a9c5c36f",
+      "bytes": 84974
     },
     {
       "path": "tests/test_workflow_security.py",
