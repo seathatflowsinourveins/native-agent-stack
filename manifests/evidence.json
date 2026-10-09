@@ -19952,8 +19952,8 @@
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/verification.json",
-      "sha256": "24be9acfde85dd1a4105e07ec85e4c9742fabdd645b71399473bbbe692ee5a07",
-      "bytes": 721034
+      "sha256": "8a1b218833c8fe423e2aec93b274b09519b2a044d5884d9b950b5a78c89a5a6e",
+      "bytes": 721036
     },
     {
       "path": "evidence/artifacts/claude-repository-evidence-20260921/provenance.json",

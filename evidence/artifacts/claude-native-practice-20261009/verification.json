@@ -3979,7 +3979,7 @@
         "family": "claude",
         "l1_claim_ids": null,
         "refuted": false,
-        "basis": "main-read@2ecce6ec2221704db642ddec8f70f7152ed2afb6:docs/decisions/2026-09-25-host-request-lane.md:155-175. adoption/templates/systemd: codex-broker-reaper.timer (OnCalendar=hourly, Persistent=true), stack-currency.timer (Persistent=true), token-report-refresh.timer (Persistent=false), host-requests-workstation.timer lines 1-2 ('Drafted, not installed') and 13-14. /etc/wsl.conf lines 1-2 ([boot], systemd=true). 'loginctl show-user "$USER" -p Linger' gives Linger=yes (rc 0). 'systemctl --user list-timers --all --no-pager --no-legend' rc 0 lists 23 timers, 0 containing 'claude'.",
+        "basis": "main-read@2ecce6ec2221704db642ddec8f70f7152ed2afb6:docs/decisions/2026-09-25-host-request-lane.md:155-175. adoption/templates/systemd: codex-broker-reaper.timer (OnCalendar=hourly, Persistent=true), stack-currency.timer (Persistent=true), token-report-refresh.timer (Persistent=false), host-requests-workstation.timer lines 1-2 ('Drafted, not installed') and 13-14. /etc/wsl.conf lines 1-2 ([boot], systemd=true). 'loginctl show-user \"$USER\" -p Linger' gives Linger=yes (rc 0). 'systemctl --user list-timers --all --no-pager --no-legend' rc 0 lists 23 timers, 0 containing 'claude'.",
         "correction": "Durability is bounded by WSL2 distro uptime. See correction_to_default (1)."
        }
       ],
