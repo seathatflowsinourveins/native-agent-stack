@@ -194,6 +194,85 @@ class SourcePolicyTests(unittest.TestCase):
         self.write(self.spec_path, self.spec)
         self.assert_refused_before_open(ordinary)
 
+    def test_committed_policy_approves_every_committed_native_index_source(self):
+        policy = module(ROOT / "tools/local-pages/source_policy.py", "committed_parity_policy").load_policy(ROOT / "tools/local-pages/source_policy.json")
+        index = json.loads((ROOT / "tools/north-star/sources.json").read_text())
+        self.assertTrue(index["sources"])
+        for key, record in index["sources"].items():
+            with self.subTest(key=key):
+                policy.validate("source:" + key, record["root"], record["path"])
+        policy.validate_sources(index)
+
+    def test_ordinary_unlisted_paths_require_each_native_read_role(self):
+        repo_path = self.root / "fixtures/ordinary-public.json"
+        state_path = self.state / "fixtures/ordinary-public.json"
+        self.write(repo_path, {})
+        self.write(state_path, {})
+        for key in self.spec["sources"]:
+            with self.subTest(role="source:" + key):
+                original = self.spec["sources"][key]
+                self.spec["sources"][key] = {"root": "repo", "path": repo_path.relative_to(self.root).as_posix()}
+                self.write(self.spec_path, self.spec)
+                self.assert_refused_before_open(repo_path)
+                self.spec["sources"][key] = original
+        self.write(self.spec_path, self.spec)
+        with self.subTest(role="supporting"):
+            self.support["receipts"][0]["path"] = repo_path.relative_to(self.root).as_posix()
+            self.write(self.root / "fixtures/evidence.json", self.support)
+            self.assert_refused_before_open(repo_path)
+            self.support["receipts"][0]["path"] = "fixtures/support.json"
+            self.write(self.root / "fixtures/evidence.json", self.support)
+        with self.subTest(role="sdk_item"):
+            self.sdk_index["items"][0]["receipt_path"] = str(state_path)
+            self.sdk_index["items"][0]["receipt_sha256"] = self.digest(state_path)
+            self.write(self.root / "fixtures/sdk_rows.json", self.sdk_index)
+            self.assert_refused_before_open(state_path)
+        self.sdk_index["items"][0]["receipt_path"] = str(self.item_path)
+        with self.subTest(role="sdk_raw"):
+            self.item["raw_receipt"]["path"] = str(state_path)
+            self.item["raw_receipt"]["sha256"] = self.digest(state_path)
+            self.write(self.item_path, self.item)
+            self.sdk_index["items"][0]["receipt_sha256"] = self.digest(self.item_path)
+            self.write(self.root / "fixtures/sdk_rows.json", self.sdk_index)
+            self.assert_refused_before_open(state_path)
+        policy = module(ROOT / "tools/local-pages/source_policy.py", "ordinary_index_policy")
+        with self.subTest(role="source_index"), self.watch_forbidden_opens(repo_path) as calls:
+            with self.assertRaises(ValueError):
+                with policy.guard_native(self.native, self.root, self.state, repo_path, policy_path=self.policy_path):
+                    self.native.build(self.root, self.state, repo_path)
+        self.assertEqual(calls, [])
+
+    def test_missing_or_malformed_policy_refuses_before_any_native_input_open(self):
+        original_builtin, original_io, original_os = builtins.open, io.open, os.open
+        cases = ("absent", "invalid JSON", "non-object", "unknown schema", "missing reader pin")
+        for invalid in cases:
+            with self.subTest(invalid=invalid):
+                if invalid == "absent":
+                    self.policy_path.unlink(missing_ok=True)
+                elif invalid == "invalid JSON":
+                    self.policy_path.write_text("{invalid", encoding="utf-8")
+                elif invalid == "non-object":
+                    self.write(self.policy_path, [])
+                elif invalid == "unknown schema":
+                    self.write(self.policy_path, {**self.permissions, "schema": "local-pages-source-policy/999"})
+                else:
+                    self.write(self.policy_path, {**self.permissions, "native_reader": {}})
+                attempts = []
+                def guard(original):
+                    def checked(value, *args, **kwargs):
+                        if not isinstance(value, int):
+                            path = Path(os.fsdecode(value)).absolute()
+                            if path.is_relative_to(self.root) or path.is_relative_to(self.state):
+                                attempts.append(path)
+                                raise AssertionError("invalid policy reached a native input open")
+                        return original(value, *args, **kwargs)
+                    return checked
+                with patch.object(builtins, "open", guard(original_builtin)), patch.object(io, "open", guard(original_io)), patch.object(os, "open", guard(original_os)):
+                    with self.assertRaises((OSError, ValueError)):
+                        with self.guard():
+                            self.native.build(self.root, self.state, self.spec_path)
+                self.assertEqual(attempts, [])
+
     def test_hypothetical_protected_policy_entries_are_rejected_before_membership(self):
         for relative in ["fixtures/.env", "fixtures/credential.env", "fixtures/env.json", "fixtures/environment.txt", "fixtures/client-secret.json", "fixtures/client_secrets.json", "e2e-truth-20261006/probe/receipt.json"]:
             with self.subTest(relative=relative):

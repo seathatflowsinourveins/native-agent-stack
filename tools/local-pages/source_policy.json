@@ -93,6 +93,18 @@
         "path": "coordination/command-center/ITEM-ns2604-coop-20261008T160905Z.md"
       }
     ],
+    "cc_g2_started": [
+      {
+        "root": "state",
+        "path": "coordination/ns2604-coop/notes/rnd-start-20261008/ledger-r3-start.md"
+      }
+    ],
+    "cc_g2_started_correction": [
+      {
+        "root": "state",
+        "path": "coordination/ns2604-coop/notes/rnd-start-20261008/ledger-r3-start-correction.md"
+      }
+    ],
     "cc_g3": [
       {
         "root": "state",
@@ -109,6 +121,18 @@
       {
         "root": "state",
         "path": "coordination/command-center/ROW-ns2604-coop-20261008T1822Z-g5shape.md"
+      }
+    ],
+    "cc_g5_closure": [
+      {
+        "root": "state",
+        "path": "coordination/command-center/ITEM-ns2604-coop-20261008T210228Z.md"
+      }
+    ],
+    "cc_g6_f9": [
+      {
+        "root": "state",
+        "path": "coordination/command-center/windows/f9-g6a-881-20261008/RECEIPT.md"
       }
     ],
     "paper_hold": [
@@ -1533,6 +1557,13 @@
       "path": "tools/north-star/sources.json",
       "sha256": "80b379f2c8c2f9f7904d6b5834c1534168555f919561170f13b3fa4887341fd5",
       "pin": "0d86b53d1b8647cbf61085124403defe5b0fbc25"
+    },
+    {
+      "root": "repo",
+      "path": "tools/north-star/sources.json",
+      "sha256": "4cdfe0a722a8e2a620551f5b092e2db762555deb06eef085686623561996dcd2",
+      "pin": "958a6d1ab770c807c5ee59748475a5c14df7ba52",
+      "scope": "Exact root/path grants for cc_g2_started, cc_g2_started_correction, cc_g5_closure and cc_g6_f9 from the committed main index; linked state bodies unread."
     },
     {
       "root": "repo",

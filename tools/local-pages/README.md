@@ -22,16 +22,21 @@ nice -n 10 ionice -c2 -n7 python3 tools/local-pages/build_pages.py \
 `--root` selects native readiness code and its default source index. Assets
 always come from `assets/` beside this composer, independent of the selected
 source checkout. `--sources` selects a native source index confined to that
-checkout. `--gaps-source`, `--roadmap-source` and `--roadmap-inputs` override the
-three CC snapshot paths. The defaults use
-`state-root/coordination/command-center/cc-tools/{gaps,roadmap}`. With no output
-or receipt flags, output defaults to `coordination/command-center/local-pages`
+checkout. `--gaps-source`, `--roadmap-source` and `--roadmap-inputs` select only
+the exact paths approved for their role in the committed `source_policy.json`.
+The policy currently approves the default state-root files:
+`coordination/command-center/cc-tools/gaps/gaps.json`,
+`coordination/command-center/cc-tools/roadmap/roadmap-status.json` and
+`coordination/command-center/cc-tools/roadmap/roadmap-inputs.json`, respectively.
+The flags do not grant access to other files, even inside the selected roots.
+With no output or receipt flags, output defaults to `coordination/command-center/local-pages`
 and receipt defaults to
 `research/fullspeed-20261008/g5-stars-gap/local-pages/refresh-receipt.json`
 under the chosen state root.
 
-`--current-source` selects a read-only `cc-now/1` JSON file; its default is
-`state-root/coordination/command-center/pages/cc-now.json`. It supplies the
+`--current-source` selects the exact approved read-only `cc-now/1` JSON path,
+currently only `state-root/coordination/command-center/pages/cc-now.json`.
+Another path requires a separately reviewed committed policy grant. It supplies the
 readiness page's compact current view and the index's shared gate strip.
 The CC-owned headline, gate count, estimate and basis are presented as recorded.
 Events and owner deadlines show America/New_York first and UTC second, using
