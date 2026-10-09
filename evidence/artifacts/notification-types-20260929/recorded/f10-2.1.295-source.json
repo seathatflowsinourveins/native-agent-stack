@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "client_version": "2.1.295",
+  "source_url": "https://downloads.claude.ai/claude-code-releases/2.1.295/linux-x64/claude",
+  "retained_artifact_sha256": "4503bfe11a6c7fcc1e0b39b5e0d347c04248f750b03b0977b3ad6b531fe6f358",
+  "retained_artifact_bytes": 256113848,
+  "artifact_rehashed_in_this_fold": false,
+  "installed_version_command": "claude --version",
+  "installed_version_output": "2.1.295 (Claude Code)",
+  "installed_version_rc": 0,
+  "source_inspection": "Bounded byte reads of the installed 2.1.295 artifact; no install, live notification delivery or credential read.",
+  "notification_type": "plugin_notification",
+  "classification": "quiet",
+  "documented_in_the_hooks_reference": false,
+  "emitter": {
+    "notification_type_zero_based_byte_offset": 217182500,
+    "plugin_api": "$.ui.notify",
+    "excerpt": "sI()?.notify?.({message:e.text,title:e.title||n.plugin,notificationType:\"plugin_notification\"},n.origin)",
+    "semantics": "Forwards plugin text/title and origin; defaults title to the plugin name. The enclosing emitter reports delivery channel or failure and has no approval/input-wait predicate."
+  },
+  "catalog": {
+    "notification_type_zero_based_byte_offset": 207984418,
+    "matcher_value_present": true
+  },
+  "hooks_reference_sample": {
+    "url": "https://code.claude.com/docs/en/hooks#notification",
+    "fetched_at": "2026-10-09T08:53:56Z",
+    "reader": "independent lane source researcher",
+    "html_sha256": "eed92dc40935f74820bc090b899e529e11574171570e6e1b69d636825a15202b",
+    "plugin_notification_occurrences": 0,
+    "reference_is_version_pinned": false,
+    "root_followup": "A direct urllib request returned HTTP403; the installed context-mode fetch subsequently fetched/indexed the official reference successfully."
+  },
+  "decision_table_count": 19,
+  "documented_type_count": 12,
+  "repository_bell_matcher_includes_plugin_notification": false,
+  "baseline_head": "d73b1caa1cdba1f94521a34bec5c327e9d35a206",
+  "baseline_module": "tests.test_windows_terminal_defaults",
+  "baseline_rc": 1,
+  "baseline_cases": 45,
+  "baseline_failure": "OverlayTests.test_the_installed_client_knows_no_notification_type_without_a_decision: ['plugin_notification']",
+  "limits": [
+    "Presence at 2.1.295 is established; the introduction version was not established.",
+    "Source inspection is not live notification-delivery or bell acceptance.",
+    "The generic type itself does not establish an escalation or input wait; dedicated escalation types retain their decisions."
+  ]
+}

@@ -539,7 +539,7 @@
       "component_id": "claude-code",
       "repository": "https://github.com/anthropics/claude-code",
       "selected_repository_url": "https://github.com/anthropics/claude-code",
-      "selected_version": "2.1.284",
+      "selected_version": "2.1.295",
       "selected_source_pin": null,
       "checks": [
         {
@@ -591,7 +591,7 @@
       "adoption_recommendation": "retain_selected_pending_capability_comparison",
       "source_pin_kind": "version_only",
       "primary_repository": "https://github.com/anthropics/claude-code",
-      "release_relationship": "selected_version_matches_latest_stable"
+      "release_relationship": "selected_newer_than_dated_release_snapshot"
     },
     {
       "component_id": "claude-hud",
@@ -6978,6 +6978,15 @@
       "api_commands": 4,
       "api_nonzero_results": 0,
       "methodology": "Add the missing selected Hindsight component using the existing native gh api endpoint method: repository, latest stable release, selected commit and release tag commit. The current release and both commit responses agree at v0.10.2/5fc4ce20917b916240cef27c212c387a177f115b. Summary counts include this four-call addition; every earlier component, star observation and dated refresh remains unchanged. This is public metadata verification, not a new host or provider acceptance run."
+    },
+    {
+      "checked_at": "2026-10-09T09:07:07Z",
+      "component_ids": ["claude-code"],
+      "api_commands": 0,
+      "api_nonzero_results": 0,
+      "evidence_class": "local_integration",
+      "source": "docs/decisions/2026-10-09-claude-code-floor.md",
+      "methodology": "Synchronize the selected-version mirror with the 2.1.295 native installer minimum and current stack manifest. The selected release is newer than the retained September 29 upstream observation; no new latest-release observation is asserted. Original checks, release metadata, timestamps and summary retain their recorded scope."
     }
   ]
 }

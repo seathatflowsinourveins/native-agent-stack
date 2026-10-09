@@ -149,7 +149,7 @@ GitHub-hosted macOS runner; see
    "none of N" pinned installs none of its own components through the script
    (only the `node`, `uv` and `gh` every run installs); use the recipes.
    `pins-linux-x86_64.json` changed after `v2026.09.24.1` in `install_note`
-   text and in its `claude-code` pin (2.1.280 at that tag, 2.1.284 on main; the
+   text and in its `claude-code` pin (2.1.280 at that tag, 2.1.295 on main; the
    Claude Code paragraph below has the details). The text changes: the
    markitdown, tavily-cli, orx and agent-browser notes attribute their
    installed-state observations to the 2026-09-23 recording host. Apart from
@@ -166,7 +166,7 @@ GitHub-hosted macOS runner; see
    the earlier two of those as well; on a host with an existing ai-memory
    store, 2.4.1 migrates it forward-only at the next service start, so take
    the at-rest copy in [the recipe's upgrade steps](../recipes/README.md#upgrading-an-existing-store) first.
-   `pins-linux-x86_64.json` (the rtk and headroom `install_note` text and its `claude-code` entry, 2.1.281 at that tag and 2.1.284 on main) and `adoption/bootstrap-linux.sh` changed after `v2026.09.26`: its rtk config reminder now also asks the installed `rtk hook check`; `install_npm` now adds `--ignore-scripts` for a pin with `ignore_scripts: true` (socraticode), a field the tag's script ignores, so there npm runs every install script in socraticode's dependency tree; and `install_uv_tool` now downloads a uv-tool pin's wheel `url` (headroom), verifies its `sha256` before uv runs and installs that file as `'headroom-ai[mcp] @ file://<percent-encoded path>'`, where the tag's script resolves `headroom-ai[mcp]==0.37.0` from the index and never reads the wheel or its hash (the markitdown and tavily-cli sdist hashes stay cross-checks).
+   `pins-linux-x86_64.json` (the rtk and headroom `install_note` text and its `claude-code` entry, 2.1.281 at that tag and 2.1.295 on main) and `adoption/bootstrap-linux.sh` changed after `v2026.09.26`: its rtk config reminder now also asks the installed `rtk hook check`; `install_npm` now adds `--ignore-scripts` for a pin with `ignore_scripts: true` (socraticode), a field the tag's script ignores, so there npm runs every install script in socraticode's dependency tree; and `install_uv_tool` now downloads a uv-tool pin's wheel `url` (headroom), verifies its `sha256` before uv runs and installs that file as `'headroom-ai[mcp] @ file://<percent-encoded path>'`, where the tag's script resolves `headroom-ai[mcp]==0.37.0` from the index and never reads the wheel or its hash (the markitdown and tavily-cli sdist hashes stay cross-checks).
    `pins-linux-x86_64.json` changed after `v2026.09.26.2` in its `codex` entry: 0.155.1 moves to 0.160.0 (URL, hashes and note; 0.157.1 from 2026-09-26, 0.159.2 from 2026-09-30, 0.159.3 from 2026-10-01, and the repository 0.160.0 pair from 2026-10-03), so a host at that tag installs 0.155.1, and in its `claude-code` entry: 2.1.281 moves to 2.1.284 (URL, hashes and note), so a host at that tag installs 2.1.281. `adoption/templates/codex.config.template.toml` changed after the same tag to set `daemon_auto_start = false`: 0.157.1's first interactive launch otherwise installs a self-updating app-server daemon (see `evidence/receipts/codex-01571-qualification-20260926.json`; 0.159.2 still lists the feature as stable and on, `evidence/receipts/codex-01592-qualification-20260930.json`). It changed again on 2026-09-30 to default to `gpt-6.1-sol`, which Codex's bundled model catalog carries from `rust-v0.159.1` on (0.157.1's has no such entry). The macOS pin stays at 0.155.1: macOS needs its own qualification of a version carrying the new model before the template default applies there. The [October 3 compatibility record](../evidence/artifacts/runtime-sdk-20261003/receipt.json) retains completed 0.160.0 markers on the existing Linux host; incomplete original invocation/timing evidence prevents native E2E acceptance; its shared launcher and daemon still run 0.159.3 until a coordinated switch.
    The 2026-10-04 bounded move selects RTK 0.51.0 and Linux MCPorter 0.14.2,
    and pins the Claude HUD plugin tag v0.10.0. Mac MCPorter stays at 0.13.13
@@ -223,14 +223,21 @@ GitHub-hosted macOS runner; see
    Both scripts and both claude-code pins changed after `v2026.09.24.1`: at
    that tag the pins are 2.1.280 and `adoption/bootstrap-linux.sh` and
    `adoption/bootstrap-macos.sh` reinstall the pin even over a newer Claude
-   Code; on main the pins are 2.1.284 and both scripts keep an installed
+   Code; on main the pins are 2.1.295 and both scripts keep an installed
    `~/.local/bin/claude` at or above the pin (logging `Kept installed
    claude-code <version>`), running the checksum-verified install only when
    that launcher is missing, older or unreadable. Both pins also changed after `v2026.09.26.2`,
    where both are 2.1.281: 2.1.284 is the first Claude Code release whose
    `sonnet` alias resolves to Sonnet 5.5 (on the Anthropic API; an older client routes it to Sonnet 5; [model-config](https://code.claude.com/docs/en/model-config)),
-   so on main a launcher reporting 2.1.281 to 2.1.283 no longer counts as at
-   or above the pin and takes the checksum-verified install.
+   On 2026-10-09 the floor rises again to **2.1.295** using the signed manifest
+   reported by cc-native-practice at 06:13:50Z: manifest `b36d7b37`, Good
+   signature, fingerprint `31DD DE24 … CACE`; linux-x64 `4503bfe1…f358`,
+   256,113,848 B. [The dated floor record](../docs/decisions/2026-10-09-claude-code-floor.md)
+   binds that retained report and its full digests. A launcher below 2.1.295
+   takes the checksum-verified native install; an equal or newer launcher is
+   kept, with native latest-channel auto-update. Functional acceptance still
+   runs on the resulting version. Currency did not re-download or re-verify
+   the reported artifacts.
 
    Both scripts also write the ecosystem `claude` launcher (`$eco/bin/claude`;
    none is written when that directory is `~/.local/bin`, where the native
