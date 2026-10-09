@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -20,6 +21,18 @@ class ArchitectureEvidenceFixTests(unittest.TestCase):
         self.addCleanup(temporary.cleanup)
         self.root = Path(temporary.name) / "repo"
         self.state = Path(temporary.name) / "state"
+        policy = json.loads((ROOT / "tools/local-pages/source_policy.json").read_text())
+        policy["architecture"] = {
+            "architecture_registry": [{"root": "repo", "path": "manifests/evidence.json"}],
+            "architecture_readiness": [{"root": "repo", "path": "catalogs/north-star/readiness.json"}],
+            "architecture_receipt": [{"root": "repo", "path": path} for path in ("adoption/receipt.json", "evidence/receipts/older.json", "evidence/receipts/newer.json", "evidence/receipts/exact.json", "evidence/artifacts/exact/commands.json")],
+        }
+        policy["architecture_families"] = {"architecture_adoption_snapshot": {"root": "state", "directory": "coordination/ns2604-coop/notes/adoption-evidence-20261008", "filename": r"adoption-now-[a-f0-9]{16}\.json"}}
+        policy_path = Path(temporary.name) / "independent-policy.json"
+        policy_path.write_text(json.dumps(policy), encoding="utf-8")
+        approval = patch.object(evidence, "SOURCE_POLICY_PATH", policy_path)
+        approval.start()
+        self.addCleanup(approval.stop)
 
     def write(self, relative, document, root=None):
         path = (root or self.root) / relative

@@ -12,6 +12,8 @@ https://docs.python.org/3.13/library/contextvars.html.
 
 from contextlib import contextmanager
 from contextvars import ContextVar
+from datetime import datetime, timezone
+import errno
 import hashlib
 import inspect
 import json
@@ -31,6 +33,10 @@ _BLOCKED = {"auth.json", "credentials.json", "credentials.toml", "credential.jso
 
 class SourcePolicyError(ValueError):
     """An input has no independent exact-role approval or violates its boundary."""
+
+
+class SourceReadLimitError(SourcePolicyError):
+    """An approved regular file exceeds the caller's bounded read size."""
 
 
 def protected_path(relative):
@@ -90,8 +96,12 @@ def _open_regular(path, *, mode="rb", buffering=-1, encoding=None, errors=None, 
         descriptor = os.open(path.name, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK, dir_fd=directory)
     try:
         info = os.fstat(descriptor)
-        if not stat.S_ISREG(info.st_mode) or info.st_size > limit:
-            raise SourcePolicyError("source is nonregular or exceeds the read bound")
+        if not stat.S_ISREG(info.st_mode):
+            raise SourcePolicyError("source is nonregular")
+        if info.st_size > limit:
+            # fstat reports this descriptor's size before fdopen or any read.
+            # https://docs.python.org/3.13/library/os.html#os.fstat
+            raise SourceReadLimitError("approved source exceeds the read bound")
         return os.fdopen(descriptor, mode, buffering=buffering, encoding=encoding, errors=errors, newline=newline)
     except BaseException:
         os.close(descriptor)
@@ -102,7 +112,7 @@ def _read_regular(path, limit):
     with _open_regular(path, limit=limit) as stream:
         raw = stream.read(limit + 1)
     if len(raw) > limit:
-        raise SourcePolicyError("source exceeds the read bound")
+        raise SourceReadLimitError("approved source exceeds the read bound")
     return raw
 
 
@@ -211,6 +221,85 @@ def validate_index_path(root, state_root, spec_path, policy_path=POLICY_PATH):
 
 def validate_override(key, path, root, state_root, policy_path=POLICY_PATH):
     return load_policy(policy_path).validate_override(key, path, root, state_root)
+
+
+class ArchitectureReads:
+    """Authorize Architecture data roles before content or digest access.
+
+    Exact grants come from the committed policy, never a catalog or receipt
+    selecting another file. The one dynamic family has a fixed reviewed
+    directory and a strict immutable-projection filename. Native permissions
+    remain separately limited to repo/state; only design custody may use user.
+    """
+
+    limit_error = SourceReadLimitError
+
+    def __init__(self, root, state_root, policy_path=POLICY_PATH, *, user_root=None):
+        self.policy = load_policy(policy_path)
+        self.roots = {"repo": Path(root).absolute(), "state": Path(state_root).absolute(),
+                      "user": Path(user_root if user_root is not None else Path.home()).absolute()}
+        self.allowed = {}
+        entries = self.policy.document.get("architecture", {})
+        if not isinstance(entries, dict):
+            raise SourcePolicyError("Architecture permissions must be a role map")
+        for role, paths in entries.items():
+            if not isinstance(role, str) or not role.startswith("architecture_") or not isinstance(paths, list):
+                raise SourcePolicyError("invalid Architecture exact-path role")
+            self.allowed[role] = set()
+            for record in paths:
+                if not isinstance(record, dict) or record.get("root") not in self.roots:
+                    raise SourcePolicyError("Architecture permission requires a known root")
+                if record["root"] == "user" and role != "architecture_design":
+                    raise SourcePolicyError("user root is permitted only for exact design custody")
+                self.allowed[role].add((record["root"], _relative(record.get("path"))))
+        self.families = self.policy.document.get("architecture_families", {})
+        reviewed = {"architecture_adoption_snapshot": {
+            "root": "state", "directory": "coordination/ns2604-coop/notes/adoption-evidence-20261008",
+            "filename": "adoption-now-[a-f0-9]{16}\\.json",
+        }}
+        if not isinstance(self.families, dict) or any(reviewed.get(role) != record for role, record in self.families.items()):
+            raise SourcePolicyError("Architecture family differs from its reviewed exact directory/form")
+
+    def authorize(self, role, path):
+        path = Path(path).absolute()
+        for root, base in self.roots.items():
+            try:
+                relative = path.relative_to(base).as_posix()
+            except ValueError:
+                continue
+            relative = _relative(relative)
+            if (root, relative) in self.allowed.get(role, set()):
+                return path
+            family = self.families.get(role)
+            if family and root == family["root"] and PurePosixPath(relative).parent.as_posix() == family["directory"] and re.fullmatch(family["filename"], path.name):
+                return path
+        raise SourcePolicyError("Architecture role/path has no independent approval: " + str(role))
+
+    @contextmanager
+    def open(self, role, path, max_bytes=MAX_SOURCE_BYTES):
+        path = self.authorize(role, path)
+        if isinstance(max_bytes, bool) or not isinstance(max_bytes, int) or max_bytes <= 0:
+            raise SourcePolicyError("Architecture read bound must be a positive integer")
+        _check_target(path)
+        try:
+            handle = _open_regular(path, limit=max_bytes)
+        except OSError as error:
+            if error.errno in {errno.ELOOP, errno.ENOTDIR}:
+                raise SourcePolicyError("Architecture source or ancestor is a symlink") from error
+            raise
+        with handle:
+            yield handle
+
+    def read(self, role, path, max_bytes=MAX_SOURCE_BYTES):
+        path = self.authorize(role, path)
+        with self.open(role, path, max_bytes=max_bytes) as handle:
+            info = os.fstat(handle.fileno())
+            raw = handle.read(max_bytes + 1)
+        if len(raw) > max_bytes:
+            raise SourceReadLimitError("approved Architecture input exceeds its bounded read")
+        return raw, {"path": str(path), "role": role, "sha256": hashlib.sha256(raw).hexdigest(),
+                     "bytes": len(raw), "status": "independently authorized Architecture input",
+                     "file_utc": datetime.fromtimestamp(info.st_mtime, timezone.utc).isoformat().replace("+00:00", "Z")}
 
 
 @contextmanager

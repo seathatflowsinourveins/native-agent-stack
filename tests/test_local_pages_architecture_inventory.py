@@ -172,6 +172,31 @@ class InventoryTests(unittest.TestCase):
         self.assertTrue(all(item["sha256"] == hashlib.sha256(real.read_bytes()).hexdigest() for item in result["items"]))
         self.assertEqual(result["coverage"]["hash_bytes"], real.stat().st_size)
 
+    def test_every_hashed_inventory_input_is_declared_once_with_computed_digest(self):
+        workflow = self.write(self.root / ".github/workflows/harness-audit.yml", "name: fixture audit\n")
+        agent = self.write(self.root / "adoption/agents/blind-judge.md", "fixture agent\n")
+        script = self.write(self.root / "scripts/evidence_manifest.py", "# fixture script\n")
+        skill = self.write(self.skills / "known/SKILL.md", "fixture skill\n")
+        alias = self.skills / "alias"
+        alias.symlink_to(skill.parent, target_is_directory=True)
+        self.manifest([self.record("known", hashlib.sha256(skill.read_bytes()).hexdigest())])
+        hashed = []
+        original = inventory._hash
+        with patch.object(inventory, "_hash", side_effect=lambda path: (hashed.append(path), original(path))[1]):
+            result = self.build()
+        sources = {source["path"]: source for source in result["sources"]}
+        self.assertEqual(set(sources), {str(path) for path in hashed})
+        self.assertEqual(len(result["sources"]), len(hashed))
+        for path, kind in [(workflow, "workflow"), (agent, "agent"), (script, "script"), (skill, "skill")]:
+            source = sources[str(path.resolve())]
+            self.assertEqual(source["sha256"], hashlib.sha256(path.read_bytes()).hexdigest())
+            self.assertEqual(source["bytes"], path.stat().st_size)
+            self.assertEqual(source["type"], kind)
+            self.assertEqual(source["resolved_path"], str(path.resolve()))
+            self.assertTrue(source["status"])
+        self.assertEqual(sources[str(skill)]["input_paths"], sorted([str(skill), str(alias / "SKILL.md")]))
+        self.assertEqual(sources[str(skill)]["symlink_paths"], [str(alias / "SKILL.md")])
+
     def test_roles_checksums_and_components_do_not_assert_wiring(self):
         role = self.write(self.root / "adoption/agents/codex/reviewer.toml", "fixture role")
         digest = hashlib.sha256(role.read_bytes()).hexdigest()

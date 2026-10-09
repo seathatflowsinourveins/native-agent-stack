@@ -6,14 +6,10 @@ pointers are retained; receipt declarations are never promoted to vendor tests.
 
 from datetime import datetime, timezone
 from collections import deque
-import errno
-import hashlib
 import json
-import os
 from pathlib import Path
 import re
 import shlex
-import stat
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 
@@ -67,7 +63,7 @@ def _index_utc(value):
         return None
 
 
-def host_receipts_index(state_root):
+def host_receipts_index(state_root, reads):
     """Project only the CC index; never access any referenced host receipt.
 
     Source custody is computed from the index bytes. Receipt hashes and mtimes
@@ -78,24 +74,15 @@ def host_receipts_index(state_root):
     def unavailable(reason, sources=None):
         return {"items": [], "sources": sources or [], "scope": "local", "generated_utc": None, "label": _HOST_LABEL, "coverage": {"status": "unreported", "reason": reason, "retained_receipts": 0, "rejected_receipts": 0}}
 
-    # O_NOFOLLOW rejects a symlink atomically. Metadata checks concern this one
-    # index descriptor; target paths are never passed to filesystem functions.
+    # The shared reader authorizes this fixed role/path and refuses all symlink
+    # ancestors. Referenced receipt targets never reach filesystem functions.
     try:
-        descriptor = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK | os.O_CLOEXEC)
-        with os.fdopen(descriptor, "rb") as source:
-            metadata = os.fstat(source.fileno())
-            if not stat.S_ISREG(metadata.st_mode):
-                return unavailable("source index is not a regular file")
-            if metadata.st_size > _HOST_INDEX_LIMIT:
-                return unavailable("source index exceeds the bounded read limit")
-            raw = source.read(_HOST_INDEX_LIMIT + 1)
+        raw, metadata = reads.read("architecture_projection", path, max_bytes=_HOST_INDEX_LIMIT)
     except FileNotFoundError:
         return unavailable("CC host receipt index is absent")
-    except OSError as error:
-        return unavailable("source index symlink is not an authorized source" if error.errno == errno.ELOOP else "CC host receipt index is unreadable")
     if len(raw) > _HOST_INDEX_LIMIT:
         return unavailable("source index exceeds the bounded read limit")
-    custody = [{"path": str(path), "sha256": hashlib.sha256(raw).hexdigest(), "bytes": len(raw), "scope": "local", "label": _HOST_LABEL}]
+    custody = [{"path": str(path), "sha256": metadata["sha256"], "bytes": metadata["bytes"], "scope": "local", "label": _HOST_LABEL}]
     try:
         document = json.loads(raw)
     except (ValueError, UnicodeError):

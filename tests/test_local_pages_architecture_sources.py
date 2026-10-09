@@ -9,6 +9,9 @@ import subprocess
 import tarfile
 import tempfile
 import unittest
+from unittest.mock import patch
+
+from tests.local_pages_architecture_policy_fixture import G5, policy_fixture
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -25,7 +28,14 @@ class ArchitectureSourcesTests(unittest.TestCase):
         self.temporary = tempfile.TemporaryDirectory()
         self.addCleanup(self.temporary.cleanup)
         base = Path(self.temporary.name)
-        self.root, self.state, self.asset = base / "repo", base / "state", base / "evidence.tar.zst"
+        self.root, self.state = base / "repo", base / "state"
+        self.asset = self.state / G5
+        self.asset.parent.mkdir(parents=True, exist_ok=True)
+        self.policy_path = policy_fixture(base / "independent-policy.json")
+        for module in (sources, evidence):
+            approved = patch.object(module, "SOURCE_POLICY_PATH", self.policy_path)
+            approved.start()
+            self.addCleanup(approved.stop)
         self.write(self.root, "catalogs/landscape/manifest.json", {"catalogs": {"foundation": "catalogs/landscape/foundation.json", "us-equities": "catalogs/landscape/us-equities.json"}})
         self.foundation = {"layers": [self.layer("instructions-skills", "https://github.com/anthropics/skills")]}
         self.trading = {"layers": [self.layer("market-data-reference", "https://github.com/alpacahq/alpaca-py")]}

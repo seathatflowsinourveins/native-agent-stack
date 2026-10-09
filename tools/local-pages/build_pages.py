@@ -255,7 +255,7 @@ def readiness_body(native: Any, manifest: dict[str, Any], current: dict[str, Any
     fragment = fragment.replace('<table>', '<div class="table-wrap"><table>').replace('</table>', '</table></div>')
     summary = manifest["summary"]
     counts = "".join(f'<p><strong>{int(summary[key])}</strong> {title}</p>' for key, title in (("recorded_claims", "recorded claims"), ("unverified_claims", "unverified claims"), ("unverified_sources", "unverified sources")))
-    running = sorted({row.get("cli_version") for row in (fleet or {}).get("lanes_live", []) if row.get("cli_version")})
+    running = sorted({row.get("cli_version") for row in ((fleet or {}).get("lanes_live") or []) if row.get("cli_version")})
     currency = []
     for row in manifest.get("layers", []):
         for tool in row.get("selected_tools", []):

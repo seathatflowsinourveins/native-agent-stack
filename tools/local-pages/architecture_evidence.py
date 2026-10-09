@@ -20,6 +20,15 @@ _ALIASES = {"plugin_context-mode_context-mode": "context-mode", "plugin_socratic
 _SOURCE_SPEC = importlib.util.spec_from_file_location("architecture_evidence_sources", Path(__file__).with_name("evidence_sources.py"))
 _receipt_sources = importlib.util.module_from_spec(_SOURCE_SPEC)
 _SOURCE_SPEC.loader.exec_module(_receipt_sources)
+_POLICY_SPEC = importlib.util.spec_from_file_location("architecture_evidence_policy", Path(__file__).with_name("source_policy.py"))
+_policy = importlib.util.module_from_spec(_POLICY_SPEC)
+_POLICY_SPEC.loader.exec_module(_policy)
+SOURCE_POLICY_PATH = Path(__file__).with_name("source_policy.json")
+
+
+def architecture_reads(root, state_root=None):
+    """Use independently reviewed paths before opening any evidence bytes."""
+    return _policy.ArchitectureReads(Path(root), Path(state_root) if state_root is not None else Path(root), policy_path=SOURCE_POLICY_PATH)
 
 
 def _label(value):
@@ -28,10 +37,12 @@ def _label(value):
     return value if isinstance(value, str) and _LABEL.fullmatch(value) and not _SENSITIVE.search(value) else "withheld label"
 
 
-def _read(path):
-    if not path.exists() or path.stat().st_size > _LIMIT:
+def _read(path, reads, role="architecture_static"):
+    try:
+        raw, _ = reads.read(role, path, max_bytes=_LIMIT)
+    except FileNotFoundError:
         return None
-    value = json.loads(path.read_text(encoding="utf-8"))
+    value = json.loads(raw)
     return value if isinstance(value, dict) else None
 
 
@@ -39,20 +50,22 @@ def _count(value):
     return value if isinstance(value, int) and not isinstance(value, bool) and value >= 0 else None
 
 
-def host_receipts_index(state_root):
+def host_receipts_index(state_root, reads=None):
     """Return the CC's local metadata projection without accessing raw receipts."""
-    return _receipt_sources.host_receipts_index(state_root)
+    reads = reads or architecture_reads(Path(__file__).resolve().parents[2], state_root)
+    return _receipt_sources.host_receipts_index(state_root, reads=reads)
 
 
-def invocation_source(state_root):
+def invocation_source(state_root, reads=None):
     """Select the newest hash-verified published snapshot by observation time."""
     directory = state_root / "coordination/ns2604-coop/notes/adoption-evidence-20261008"
+    reads = reads or architecture_reads(Path(__file__).resolve().parents[2], state_root)
     valid = []
     for path in directory.glob("adoption-now-*.json"):
-        if path.stat().st_size > _LIMIT:
+        if not re.fullmatch(r"adoption-now-[a-f0-9]{16}\.json", path.name):
             continue
-        raw = path.read_bytes()
-        digest = hashlib.sha256(raw).hexdigest()
+        raw, metadata = reads.read("architecture_adoption_snapshot", path, max_bytes=_LIMIT)
+        digest = metadata["sha256"]
         if path.name != f"adoption-now-{digest[:16]}.json":
             continue
         try:
@@ -161,28 +174,43 @@ def _safe_command(value):
 class _EvidenceSources:
     """Load registered metadata once and cache only explicitly linked receipts."""
 
-    def __init__(self, root, state_root=None):
+    def __init__(self, root, state_root=None, reads=None):
         self.root, self.cache, self.registered, self.fresh, self.sources = root, {}, [], {}, []
         self.projections = {}
+        self.readability = {}
+        self.reads = reads or architecture_reads(root, state_root)
         self.native = _native_receipts(root)
         index_path = root / "manifests/evidence.json"
-        records = self.native.evidence_files(root) if self.native else {}
-        doc = json.loads(index_path.read_text(encoding="utf-8")) if index_path.is_file() and index_path.stat().st_size <= 8 * 1024 * 1024 else {}
-        if not records:
-            records = {row["path"]: row for row in doc.get("files", []) if isinstance(row, dict) and isinstance(row.get("path"), str)}
+        try:
+            index_raw, index_metadata = self.reads.read("architecture_registry", index_path)
+        except FileNotFoundError:
+            index_raw, index_metadata = b"{}", None
+        doc = json.loads(index_raw)
+        if not isinstance(doc, dict):
+            raise ValueError("Architecture evidence registry must be an object")
+        records = {row["path"]: row for row in doc.get("files", []) if isinstance(row, dict) and isinstance(row.get("path"), str)}
         self.receipts = {row["path"]: row for row in doc.get("receipts", []) if isinstance(row, dict) and isinstance(row.get("path"), str)}
+        for relative in self.receipts:
+            self.reads.authorize("architecture_receipt", root / relative)
+        for relative in records:
+            if relative.endswith(".json") and relative.startswith(("evidence/hosts/", "evidence/receipts/")):
+                self.reads.authorize("architecture_receipt", root / relative)
         self.explicit_native_paths = {path for path, row in self.receipts.items() if row.get("kind") in _receipt_sources.NATIVE_KINDS and _safe_path(path, registered=True)}
         self.explicit_receipt_paths = {path for path in self.receipts if _safe_path(path, registered=True)}
         paths = [(path, record) for path, record in records.items() if _safe_path(path, registered=path in self.explicit_receipt_paths) and (path.startswith(("evidence/hosts/", "evidence/receipts/")) or path in self.explicit_receipt_paths)]
         self.registry_expected = {path: record.get("sha256") for path, record in records.items() if _safe_path(path, registered=path in self.explicit_receipt_paths)}
-        scope_bytes = sum((root / path).stat().st_size for path, _ in paths if (root / path).is_file())
-        self.stats = {"registered_metadata_paths": len(paths), "registered_metadata_bytes": scope_bytes, "registered_native_receipts": len(self.explicit_native_paths), "native_registry_verified": 0, "registry_verified": 0, "registry_digest_mismatch": 0, "registry_unreadable_or_nonobject": 0, "readiness_tools": 0}
+        scope_bytes = sum(record.get("bytes", 0) for _, record in paths if isinstance(record.get("bytes"), int) and not isinstance(record.get("bytes"), bool) and record["bytes"] >= 0)
+        self.stats = {"registered_metadata_paths": len(paths), "registered_metadata_bytes": scope_bytes, "registered_native_receipts": len(self.explicit_native_paths), "native_registry_verified": 0, "registry_verified": 0, "registry_digest_mismatch": 0, "registry_unreadable_or_nonobject": 0, "registry_read_limit": 0, "readiness_tools": 0}
         if scope_bytes > 64 * 1024 * 1024:
             raise ValueError("registered receipt metadata exceeds the bounded read scope")
-        if index_path.exists():
-            self.sources.append({"path": "manifests/evidence.json", "sha256": hashlib.sha256(index_path.read_bytes()).hexdigest(), "bytes": index_path.stat().st_size})
+        if index_metadata is not None:
+            self.sources.append({"path": "manifests/evidence.json", "sha256": index_metadata["sha256"], "bytes": index_metadata["bytes"]})
+        actual_bytes = 0
         for relative, record in paths:
             loaded = self.load(relative, record.get("sha256"))
+            actual_bytes += loaded["bytes"] if loaded else 0
+            if actual_bytes > 64 * 1024 * 1024:
+                raise ValueError("registered receipt metadata exceeds the bounded read scope")
             if loaded and loaded["digest_verified"]:
                 loaded["registry"] = self.receipts.get(relative, {})
                 self.registered.append(loaded)
@@ -192,10 +220,16 @@ class _EvidenceSources:
                 self.stats["registry_digest_mismatch"] += 1
             else:
                 self.stats["registry_unreadable_or_nonobject"] += 1
+        self.stats["registered_metadata_bytes"] = actual_bytes
         readiness_path = root / "catalogs/north-star/readiness.json"
-        doc = _read(readiness_path) or {}
-        if readiness_path.exists():
-            self.sources.append({"path": "catalogs/north-star/readiness.json", "sha256": hashlib.sha256(readiness_path.read_bytes()).hexdigest(), "bytes": readiness_path.stat().st_size})
+        try:
+            raw, metadata = self.reads.read("architecture_readiness", readiness_path, max_bytes=_LIMIT)
+            doc = json.loads(raw)
+            if not isinstance(doc, dict):
+                raise ValueError("Architecture readiness metadata must be an object")
+            self.sources.append({"path": "catalogs/north-star/readiness.json", "sha256": metadata["sha256"], "bytes": metadata["bytes"]})
+        except FileNotFoundError:
+            doc = {}
         for layer_index, layer in enumerate(doc.get("layers", []) if isinstance(doc.get("layers"), list) else []):
             for tool_index, tool in enumerate(layer.get("selected_tools", []) if isinstance(layer, dict) and isinstance(layer.get("selected_tools"), list) else []):
                 fields = tool.get("fields") if isinstance(tool, dict) and isinstance(tool.get("fields"), dict) else {}
@@ -215,18 +249,29 @@ class _EvidenceSources:
         if relative not in self.cache:
             path = self.root / relative
             try:
-                document = _read(path) if not path.is_symlink() else None
-                if document is None and path.is_file() and not path.is_symlink() and path.stat().st_size <= _LIMIT:
-                    array = json.loads(path.read_text(encoding="utf-8"))
-                    document = {"commands": array} if isinstance(array, list) else None
+                raw, metadata = self.reads.read("architecture_receipt", path, max_bytes=_LIMIT)
+            except self.reads.limit_error:
+                self.cache[relative] = None
+                self.readability[relative] = "approved receipt exceeds the metadata read bound; body unmeasured"
+                self.stats["registry_read_limit"] += 1
+            except OSError:
+                self.cache[relative] = None
+            else:
+                # Reader policy errors remain outside the parse-error fallback,
+                # including readers imported through another module instance.
+                try:
+                    document = json.loads(raw)
+                except (ValueError, UnicodeError):
+                    document = None
+                if isinstance(document, list):
+                    document = {"commands": document}
+                elif not isinstance(document, dict):
+                    document = None
                 if not document:
                     self.cache[relative] = None
                 else:
-                    raw = path.read_bytes()
-                    digest = hashlib.sha256(raw).hexdigest()
+                    digest = metadata["sha256"]
                     self.cache[relative] = {"path": relative, "sha256": digest, "bytes": len(raw), "document": document}
-            except (OSError, ValueError):
-                self.cache[relative] = None
         value = self.cache[relative]
         expected = expected if expected is not None else self.registry_expected.get(relative)
         return {**value, "digest_verified": isinstance(expected, str) and expected == value["sha256"], "digest_required": expected is not None} if value else None
@@ -300,12 +345,16 @@ def _e2e(root, component, matrix, matrix_source, sources=None):
             receipt, digest = loaded["document"], loaded["sha256"]
         else:
             try:
-                receipt = _read(path)
+                reads = architecture_reads(root)
+                raw, metadata = reads.read("architecture_receipt", path, max_bytes=_LIMIT)
+                receipt = json.loads(raw)
+            except _policy.SourcePolicyError:
+                raise
             except (ValueError, OSError):
                 continue
             if not receipt:
                 continue
-            digest = hashlib.sha256(path.read_bytes()).hexdigest()
+            digest = metadata["sha256"]
         registry = sources.receipts.get(relative, {}) if sources else {}
         kind = receipt.get("kind") or registry.get("kind")
         native_kind = kind in _receipt_sources.NATIVE_KINDS
@@ -367,13 +416,14 @@ def _e2e(root, component, matrix, matrix_source, sources=None):
     return {**base, "source_proofs": proofs, "other_evidence": other}
 
 
-def enrich(root, state_root, layers):
+def enrich(root, state_root, layers, reads=None):
     """Attach evidence to source candidates; keep missing observations explicit."""
-    observation = invocation_source(state_root)
-    sources = _EvidenceSources(root, state_root)
+    reads = reads or architecture_reads(root, state_root)
+    observation = invocation_source(state_root, reads=reads)
+    sources = _EvidenceSources(root, state_root, reads=reads)
     observation["evidence_sources"] = sources.sources
     matrix_path = root / "catalogs/landscape/component-evidence-matrix.json"
-    document = _read(matrix_path) or {}
+    document = _read(matrix_path, reads) or {}
     matrix_rows = document.get("rows") if isinstance(document.get("rows"), list) else []
     by_layer = {f"{row.get('catalog')}:{row.get('layer_id')}": row for row in matrix_rows if isinstance(row, dict)}
     for layer in layers:
@@ -414,12 +464,13 @@ def evidence_index(layers):
     return result
 
 
-def attach_inventory(items, index, *, root=None, state_root=None, sources=None, observation=None):
+def attach_inventory(items, index, *, root=None, state_root=None, sources=None, observation=None, reads=None):
     """Join source identities; registry fallback covers non-catalog components."""
     if root is not None and sources is None:
-        sources = _EvidenceSources(root, state_root)
+        reads = reads or architecture_reads(root, state_root)
+        sources = _EvidenceSources(root, state_root, reads=reads)
     if state_root is not None and observation is None:
-        observation = invocation_source(state_root)
+        observation = invocation_source(state_root, reads=reads)
     for item in items:
         matches = []
         for identity in sorted(_identity(item)):

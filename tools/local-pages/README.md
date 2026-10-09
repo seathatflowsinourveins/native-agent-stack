@@ -155,6 +155,27 @@ hashes are declared by the index and mtime is file metadata; no referenced
 markdown bodies are opened, and no execution date, command, result or E2E
 acceptance is inferred. The mixed `e2e-truth-20261006` directory is excluded.
 
+Architecture's native manifest identity and instance-to-role mapping come from
+the retained `research/fullspeed-20261008/g5-stars-gap/local-pages/refresh-receipt.json`
+projection. Its own path, byte hash and generation date are bound separately
+from the reported native manifest hash. Architecture does not call the native
+readiness builder against the state root or follow that projection's input
+paths. Retained role attribution keeps its observation window; a different
+invocation window retains published counts with attribution marked unassigned.
+The complete hashed inventory input set is declared in `inventory_sources`,
+including computed hashes, byte counts, input types and symlink aliases.
+
+Architecture source, projection and registered receipt selections also bind
+independent exact roles in `source_policy.json` before parsing or hashing.
+The shared bounded reader rejects leaf and ancestor symlinks. A protected or
+unapproved catalog or receipt stops publication while preserving the last
+successful output. Immutable Adoption candidates require the exact
+`adoption-now-[a-f0-9]{16}.json` form in the reviewed snapshot directory before
+any byte read; invalid names are ignored, and symlink candidates are refused.
+An approved receipt above its existing read limit remains explicitly unmeasured
+without widening that limit. The G5 archive is hashed and streamed to zstd
+through its authorized descriptor, which avoids reopening its pathname.
+
 Each component row reports observational use from the retained hash-verified
 snapshot. Client components use session counts; unmeasured rows explain the
 producer boundary, including missing Bash-run CLI counters. Registered receipts

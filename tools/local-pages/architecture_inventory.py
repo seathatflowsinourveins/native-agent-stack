@@ -307,15 +307,29 @@ def build(root, state_root, skill_roots=None):
     metadata_paths += [projection_path, MAPPING_PATH]
     approved = [root / ".claude/skills", root / "adoption/agents", root / ".github/workflows", root / "scripts", root / "adoption/skills", root / "manifests", root / "adoption/manifest.json", root / "catalogs/landscape", unit_root, USER_ROOT / ".claude/agents", USER_ROOT / ".codex/agents", projection_path, MAPPING_PATH] + skill_roots
     candidates = {}
-    for path in [path for _, path in groups] + metadata_paths:
+    input_paths, input_types, symlink_paths = {}, {}, {}
+    for kind, path in groups + [("metadata", path) for path in metadata_paths]:
         resolved = _safe_path(path, approved)
         if resolved is not None and resolved.is_file():
-            candidates[str(resolved)] = resolved
-    total_bytes = sum(path.stat().st_size for path in candidates.values())
+            key = str(resolved)
+            candidates[key] = resolved
+            input_paths.setdefault(key, set()).add(str(path))
+            input_types.setdefault(key, set()).add(kind)
+            if resolved != path.absolute():
+                symlink_paths.setdefault(key, set()).add(str(path))
+    input_bytes = {key: path.stat().st_size for key, path in candidates.items()}
+    total_bytes = sum(input_bytes.values())
     if total_bytes > MAX_HASH_BYTES:
         raise ValueError("LARGE-READ bytes=" + str(total_bytes) + "; notify coordinator before hashing")
     hashes = {key: _hash(path) for key, path in candidates.items()}
-    sources = [{"path": str(path), "sha256": hashes.get(str(path.resolve())), "status": "recorded metadata"} for path in metadata_paths if str(path.resolve()) in hashes]
+    sources = [{
+        "path": key, "resolved_path": key, "input_paths": sorted(input_paths[key]),
+        "symlink_paths": sorted(symlink_paths.get(key, set())),
+        "sha256": hashes[key], "sha256_kind": "computed", "bytes": input_bytes[key],
+        "type": "metadata" if "metadata" in input_types[key] else "/".join(sorted(input_types[key])),
+        "types": sorted(input_types[key]),
+        "status": "recorded metadata" if "metadata" in input_types[key] else "hashed inventory input; runtime and wiring unverified",
+    } for key in sorted(candidates)]
     skill_manifest, adoption, stack = [
         _json(path) if str(path.resolve()) in hashes else {}
         for path in metadata_paths[:3]
@@ -326,7 +340,7 @@ def build(root, state_root, skill_roots=None):
     projection_present = projection.get("schema") == "automation-projection/1"
     mapping = _json(MAPPING_PATH) if str(MAPPING_PATH.resolve()) in hashes else {}
     for source in sources:
-        if source["path"] == str(metadata_paths[1]):
+        if source["path"] == str(metadata_paths[1].resolve()):
             source["reference_paths"] = [
                 {"key": key, "path": value}
                 for key, value in adoption.get("sources", {}).items()
@@ -396,7 +410,7 @@ def build(root, state_root, skill_roots=None):
         items.append(item)
     items.extend(_projection_items(projection_path, projection, projection_digest))
     if projection_present:
-        source = next(source for source in sources if source["path"] == str(projection_path))
+        source = next(source for source in sources if source["path"] == str(projection_path.resolve()))
         source.update({"status": "local sanitized automation projection", "local": True,
                        "generated_utc": projection.get("generated_utc"), "method": projection.get("method")})
     for item in items:

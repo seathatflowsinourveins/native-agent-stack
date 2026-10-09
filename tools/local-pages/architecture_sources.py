@@ -12,6 +12,7 @@ import codecs
 import importlib.util
 import hashlib
 import json
+import os
 from pathlib import Path
 import re
 import subprocess
@@ -28,6 +29,10 @@ _LABEL = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.:/()+ -]{0,199}\Z")
 _EMAIL = re.compile(r"\b[^\s<>]+@[^\s<>]+\.[A-Za-z]{2,}\b")
 _SECRET = re.compile(r"(?:\bBearer\s+\S+|\bsk-[A-Za-z0-9_-]{12,}|\bgh[pousr]_[A-Za-z0-9_]+|\bgithub_pat_[A-Za-z0-9_]+)", re.I)
 _HASH = re.compile(r"[a-fA-F0-9]{40}(?:[a-fA-F0-9]{24})?\Z")
+_POLICY_SPEC = importlib.util.spec_from_file_location("architecture_sources_policy", Path(__file__).with_name("source_policy.py"))
+_policy = importlib.util.module_from_spec(_POLICY_SPEC)
+_POLICY_SPEC.loader.exec_module(_policy)
+SOURCE_POLICY_PATH = Path(__file__).with_name("source_policy.json")
 _COMPONENT_FIELDS = (
     "name", "component_id", "repository", "pin", "revision", "source_head_pin",
     "disposition", "decision", "rationale", "why_selected", "why_not_default",
@@ -66,25 +71,24 @@ def _label(value: Any) -> str | None:
     return value if isinstance(value, str) and _LABEL.fullmatch(value) and not _EMAIL.search(value) and not _SECRET.search(value) else None
 
 
-def _sha(path: Path) -> str:
+def _sha(handle) -> str:
     digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for block in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(block)
+    for block in iter(lambda: handle.read(1024 * 1024), b""):
+        digest.update(block)
     return digest.hexdigest()
 
 
-def _receipt(path: Path, source: str) -> dict[str, Any]:
-    return {"path": source, "sha256": _sha(path), "bytes": path.stat().st_size, "file_utc": datetime.fromtimestamp(path.stat().st_mtime, timezone.utc).isoformat().replace("+00:00", "Z")}
+def _receipt(path: Path, source: str, reads, role: str) -> dict[str, Any]:
+    _, receipt = reads.read(role, path, max_bytes=_DOC_LIMIT)
+    return {**receipt, "path": source}
 
 
-def _json(path: Path) -> dict[str, Any]:
-    if path.stat().st_size > _DOC_LIMIT:
-        raise ValueError("source document exceeds the bounded read limit")
-    value = json.loads(path.read_text(encoding="utf-8"))
+def _json(path: Path, reads, role: str) -> tuple[dict[str, Any], dict[str, Any]]:
+    raw, receipt = reads.read(role, path, max_bytes=_DOC_LIMIT)
+    value = json.loads(raw)
     if not isinstance(value, dict):
         raise ValueError("source document must be an object")
-    return value
+    return value, receipt
 
 
 def _repo(value: Any) -> str | None:
@@ -254,78 +258,84 @@ def _g5_row(row: dict[str, Any], source: str, gate_met: bool) -> dict[str, Any]:
     }
 
 
-def _g5(asset: Path, layers: list[dict[str, Any]], gate_met: bool) -> tuple[dict[str, Any], dict[str, Any]]:
-    receipt = _receipt(asset, str(asset))
-    meta = {"status": "candidate, PENDING G5" if not gate_met else "G5 MET in current view", "accepted": False, "rows": 0, "matched_rows": 0, "unmatched_rows": 0, "matched_associations": 0, "member": _ROWS_MEMBER}
-    by_key = {row["key"]: row for row in layers}
-    by_repo: dict[str, set[str]] = {}
-    for layer in layers:
-        for candidate in layer["winners"] + layer["candidates"] + layer["alternatives"]:
-            if repository := _repo(candidate.get("repository")):
-                by_repo.setdefault(repository, set()).add(layer["key"])
-    member_digest = hashlib.sha256()
-    process = subprocess.Popen(["/usr/bin/zstd", "-dc", str(asset)], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
-    found = False
-    try:
-        with tarfile.open(fileobj=process.stdout, mode="r|") as archive:
-            for member in archive:
-                if member.name != _ROWS_MEMBER or not member.isfile():
-                    continue
-                found = True
-                meta["member_bytes"] = member.size
-                handle = archive.extractfile(member)
-                # TextIOWrapper would hide the exact bytes used by the member receipt.
-                class TextChunks:
-                    decoder = codecs.getincrementaldecoder("utf-8")()
-                    def read(self, size):
-                        block = handle.read(size)
-                        member_digest.update(block)
-                        return self.decoder.decode(block, final=not block)
-                for record in _ArrayRecords(TextChunks()):
-                    meta["rows"] += 1
-                    qualification = record.get("qualification") if isinstance(record.get("qualification"), dict) else {}
-                    catalog, slot = qualification.get("catalog"), qualification.get("slot")
-                    explicit = f"{catalog}:{slot}" if isinstance(catalog, str) and isinstance(slot, str) else None
-                    matches = {explicit} if explicit in by_key else set()
-                    pin = record.get("pin") if isinstance(record.get("pin"), dict) else {}
-                    for value in (record.get("repository_or_entry"), pin.get("repository_or_source")):
-                        if repository := _repo(value):
-                            matches.update(by_repo.get(repository, set()))
-                    if matches:
-                        meta["matched_rows"] += 1
-                        safe = _g5_row(record, str(asset) + "#/" + _ROWS_MEMBER, gate_met)
-                        for key in sorted(matches):
-                            by_key[key]["g5_candidates"].append(safe)
-                            meta["matched_associations"] += 1
-                    else:
-                        meta["unmatched_rows"] += 1
-        if process.wait(timeout=30) != 0 or not found:
-            raise ValueError("retained G5 asset could not supply compact rows")
-    finally:
-        if process.poll() is None:
-            process.kill()
-            process.wait(timeout=5)
-        process.stdout.close()
-    receipt.update({"member": _ROWS_MEMBER, "member_sha256": member_digest.hexdigest(), "member_bytes": meta.get("member_bytes")})
-    return meta, receipt
+def _g5(asset: Path, layers: list[dict[str, Any]], gate_met: bool, reads) -> tuple[dict[str, Any], dict[str, Any]]:
+    # The authorized archive descriptor supplies both its digest and zstd input.
+    with reads.open("architecture_g5_asset", asset, max_bytes=512 * 1024 * 1024) as handle:
+        stat = os.fstat(handle.fileno())
+        receipt = {"path": str(asset), "sha256": _sha(handle), "bytes": stat.st_size,
+                   "file_utc": datetime.fromtimestamp(stat.st_mtime, timezone.utc).isoformat().replace("+00:00", "Z")}
+        handle.seek(0)
+        meta = {"status": "candidate, PENDING G5" if not gate_met else "G5 MET in current view", "accepted": False, "rows": 0, "matched_rows": 0, "unmatched_rows": 0, "matched_associations": 0, "member": _ROWS_MEMBER}
+        by_key = {row["key"]: row for row in layers}
+        by_repo: dict[str, set[str]] = {}
+        for layer in layers:
+            for candidate in layer["winners"] + layer["candidates"] + layer["alternatives"]:
+                if repository := _repo(candidate.get("repository")):
+                    by_repo.setdefault(repository, set()).add(layer["key"])
+        member_digest = hashlib.sha256()
+        process = subprocess.Popen(["/usr/bin/zstd", "-dc"], stdin=handle, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+        found = False
+        try:
+            with tarfile.open(fileobj=process.stdout, mode="r|") as archive:
+                for member in archive:
+                    if member.name != _ROWS_MEMBER or not member.isfile():
+                        continue
+                    found = True
+                    meta["member_bytes"] = member.size
+                    handle = archive.extractfile(member)
+                    # TextIOWrapper would hide the exact bytes used by the member receipt.
+                    class TextChunks:
+                        decoder = codecs.getincrementaldecoder("utf-8")()
+                        def read(self, size):
+                            block = handle.read(size)
+                            member_digest.update(block)
+                            return self.decoder.decode(block, final=not block)
+                    for record in _ArrayRecords(TextChunks()):
+                        meta["rows"] += 1
+                        qualification = record.get("qualification") if isinstance(record.get("qualification"), dict) else {}
+                        catalog, slot = qualification.get("catalog"), qualification.get("slot")
+                        explicit = f"{catalog}:{slot}" if isinstance(catalog, str) and isinstance(slot, str) else None
+                        matches = {explicit} if explicit in by_key else set()
+                        pin = record.get("pin") if isinstance(record.get("pin"), dict) else {}
+                        for value in (record.get("repository_or_entry"), pin.get("repository_or_source")):
+                            if repository := _repo(value):
+                                matches.update(by_repo.get(repository, set()))
+                        if matches:
+                            meta["matched_rows"] += 1
+                            safe = _g5_row(record, str(asset) + "#/" + _ROWS_MEMBER, gate_met)
+                            for key in sorted(matches):
+                                by_key[key]["g5_candidates"].append(safe)
+                                meta["matched_associations"] += 1
+                        else:
+                            meta["unmatched_rows"] += 1
+            if process.wait(timeout=30) != 0 or not found:
+                raise ValueError("retained G5 asset could not supply compact rows")
+        finally:
+            if process.poll() is None:
+                process.kill()
+                process.wait(timeout=5)
+            process.stdout.close()
+        receipt.update({"member": _ROWS_MEMBER, "member_sha256": member_digest.hexdigest(), "member_bytes": meta.get("member_bytes")})
+        return meta, receipt
 
 
-def build(root: Path, state_root: Path, asset: Path | None = None) -> dict[str, Any]:
+def build(root: Path, state_root: Path, asset: Path | None = None, reads=None) -> dict[str, Any]:
     """Build one dated source section for every manifest-declared layer."""
     manifest_path = root / "catalogs/landscape/manifest.json"
-    manifest = _json(manifest_path)
+    reads = reads or _policy.ArchitectureReads(root, state_root, policy_path=SOURCE_POLICY_PATH)
+    manifest, manifest_receipt = _json(manifest_path, reads, "architecture_manifest")
     catalogs = manifest.get("catalogs")
     if not isinstance(catalogs, dict) or not catalogs:
         raise ValueError("landscape manifest requires a catalogs map")
-    sources = [_receipt(manifest_path, "catalogs/landscape/manifest.json")]
+    sources = [{**manifest_receipt, "path": "catalogs/landscape/manifest.json"}]
     layers, documents = [], {}
     for catalog, relative in catalogs.items():
         if not _label(catalog) or not isinstance(relative, str) or not relative.startswith("catalogs/landscape/") or ".." in Path(relative).parts:
             raise ValueError("canonical catalog path is outside its source root")
         path = root / relative
-        doc = _json(path)
+        doc, captured = _json(path, reads, "architecture_catalog")
         documents[relative] = doc
-        sources.append(_receipt(path, relative))
+        sources.append({**captured, "path": relative})
         if not isinstance(doc.get("layers"), list):
             raise ValueError("canonical catalog requires layers")
         for index, row in enumerate(doc["layers"]):
@@ -364,8 +374,11 @@ def build(root: Path, state_root: Path, asset: Path | None = None) -> dict[str, 
         relative = path.relative_to(root).as_posix()
         if relative in documents or path == manifest_path:
             continue
-        doc = _json(path)
-        sources.append(_receipt(path, relative))
+        # Protected filenames are excluded from the glob before any byte access.
+        if _policy.protected_path(relative):
+            raise _policy.SourcePolicyError("protected supplementary catalog excluded before access")
+        doc, captured = _json(path, reads, "architecture_supplement")
+        sources.append({**captured, "path": relative})
         for collection in ("layers", "rows", "candidates", "components"):
             for index, record in enumerate(doc.get(collection, []) if isinstance(doc.get(collection), list) else []):
                 if not isinstance(record, dict):
@@ -391,16 +404,17 @@ def build(root: Path, state_root: Path, asset: Path | None = None) -> dict[str, 
                     elif safe:
                         by_key[key]["dated_views"].append(safe)
     cc_path = state_root / "coordination/command-center/pages/cc-now.json"
-    cc = _json(cc_path) if cc_path.exists() else {}
+    cc = {}
     if cc_path.exists():
-        sources.append(_receipt(cc_path, str(cc_path)))
+        cc, captured = _json(cc_path, reads, "architecture_projection")
+        sources.append({**captured, "path": str(cc_path)})
     gates = cc.get("gates") if isinstance(cc.get("gates"), list) else []
     g5_gate = next((gate for gate in gates if isinstance(gate, dict) and gate.get("id") == "G5"), {})
     gate_met = g5_gate.get("state") == "MET"
     chosen_asset = asset or state_root / _FINAL_ASSET
     notes = ["Dated source choices are retained; candidate metadata does not establish installation or acceptance.", "Per-tool adoption stages are not reported by the current source."]
     if chosen_asset.exists():
-        g5, receipt = _g5(chosen_asset, layers, gate_met)
+        g5, receipt = _g5(chosen_asset, layers, gate_met, reads)
         sources.append(receipt)
     else:
         g5 = {"status": "not reported", "accepted": False, "rows": None, "matched_rows": None, "unmatched_rows": None}
@@ -411,20 +425,20 @@ def build(root: Path, state_root: Path, asset: Path | None = None) -> dict[str, 
     adoption_path = state_root / "coordination/command-center/pages/adoption-now.json"
     observation = {}
     if adoption_path.exists():
-        adoption = _json(adoption_path)
-        sources.append(_receipt(adoption_path, str(adoption_path)))
+        adoption, captured = _json(adoption_path, reads, "architecture_projection")
+        sources.append({**captured, "path": str(adoption_path)})
         orchestration = adoption.get("orchestration") if isinstance(adoption.get("orchestration"), dict) else {}
         observation = {"schema": _text(adoption.get("schema"), 100), "generated_utc": _text(adoption.get("generated_utc"), 40), "window_hours": adoption.get("window_hours") if isinstance(adoption.get("window_hours"), int) else None, "orchestration_published": bool(orchestration), "unmeasured": [_text(item, 200) for item in orchestration.get("unmeasured", []) if isinstance(item, str)]}
     skill_manifest = root / "adoption/skills/manifest.json"
     design = {"status": "not reported"}
     if skill_manifest.exists():
-        skills = _json(skill_manifest)
-        sources.append(_receipt(skill_manifest, "adoption/skills/manifest.json"))
+        skills, captured = _json(skill_manifest, reads, "architecture_skill_manifest")
+        sources.append({**captured, "path": "adoption/skills/manifest.json"})
         frontend = next((row for row in skills.get("skills", []) if isinstance(row, dict) and row.get("name") == "frontend-design"), {})
         design = {key: _text(frontend.get(key), 500) for key in ("name", "source", "url", "ref", "path", "tree_sha", "skill_md_sha256", "status")}
         skill_path = Path.home() / ".agents/skills/frontend-design/SKILL.md"
         if skill_path.is_file():
-            design["installed"] = _receipt(skill_path, str(skill_path))
+            design["installed"] = _receipt(skill_path, str(skill_path), reads, "architecture_design")
         design["source_manifest"] = "adoption/skills/manifest.json"
     helper_path = Path(__file__).with_name("architecture_evidence.py")
     evidence_index = {}
@@ -432,10 +446,10 @@ def build(root: Path, state_root: Path, asset: Path | None = None) -> dict[str, 
         spec = importlib.util.spec_from_file_location("local_architecture_evidence", helper_path)
         helper = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(helper)
-        immutable = helper.enrich(root, state_root, layers)
+        immutable = helper.enrich(root, state_root, layers, reads=reads)
         evidence_index = helper.evidence_index(layers)
         observation = immutable
         sources.extend(immutable.get("evidence_sources", []))
         if immutable.get("verified"):
-            sources.append(_receipt(Path(immutable["path"]), immutable["path"]))
+            sources.append(_receipt(Path(immutable["path"]), immutable["path"], reads, "architecture_adoption_snapshot"))
     return {"schema": "local-architecture-sources/1", "layers": layers, "layer_count": len(layers), "sources": sources, "design": design, "g5": g5, "adoption_program": adoption_program, "adoption_observation": observation, "evidence_index": evidence_index, "notes": notes}

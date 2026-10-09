@@ -6,6 +6,7 @@ import tempfile
 from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
+from tests.local_pages_architecture_policy_fixture import policy_fixture, G5
 
 ROOT = Path(__file__).resolve().parents[1]
 SPEC = importlib.util.spec_from_file_location("architecture_builder", ROOT / "tools/local-pages/architecture_builder.py")
@@ -28,8 +29,12 @@ class ArchitectureCacheTests(unittest.TestCase):
             current.write_text("{}")
             observation = {"sha256": "a" * 64}
             page_module = SimpleNamespace(no_symlinks=lambda path: path.absolute())
-            evidence_module = SimpleNamespace(invocation_source=lambda unused: observation)
-            modules = {"build_pages": page_module, "architecture_evidence": evidence_module}
+            evidence_module = SimpleNamespace(invocation_source=lambda unused, reads=None: observation)
+            original_load = MODULE.load
+            modules = {"build_pages": page_module, "architecture_evidence": evidence_module,
+                       "source_policy": original_load("source_policy"),
+                       "architecture_sources": SimpleNamespace(_FINAL_ASSET=G5)}
+            policy_path = policy_fixture(base / "independent-policy.json")
             calls = []
             def generate(*unused):
                 calls.append(observation["sha256"])
@@ -39,7 +44,7 @@ class ArchitectureCacheTests(unittest.TestCase):
                 result = {"generated_utc": "2026-01-01T00:00:00Z", "sources": []}
                 receipt.write_text(json.dumps(result))
                 return result
-            with patch.object(MODULE, "load", side_effect=lambda name: modules[name]), patch.object(MODULE, "build", side_effect=generate):
+            with patch.object(MODULE, "SOURCE_POLICY_PATH", policy_path), patch.object(MODULE, "load", side_effect=lambda name: modules[name]), patch.object(MODULE, "build", side_effect=generate):
                 MODULE.refresh_if_changed(root, state, output, receipt)
                 MODULE.refresh_if_changed(root, state, output, receipt)
                 self.assertEqual(len(calls), 1)
@@ -57,8 +62,13 @@ class ArchitectureCacheTests(unittest.TestCase):
                 local_index.write_text('{"schema":"host-receipts-index/1","receipts":[]}')
                 MODULE.refresh_if_changed(root, state, output, receipt)
                 self.assertEqual(len(calls), 4)
+                retained = state / "research/fullspeed-20261008/g5-stars-gap/local-pages/refresh-receipt.json"
+                retained.parent.mkdir(parents=True, exist_ok=True)
+                retained.write_text('{"schema_version":1,"kind":"local_page_refresh"}')
                 MODULE.refresh_if_changed(root, state, output, receipt)
-                self.assertEqual(len(calls), 4)
+                self.assertEqual(len(calls), 5)
+                MODULE.refresh_if_changed(root, state, output, receipt)
+                self.assertEqual(len(calls), 5)
 
 
 if __name__ == "__main__":
