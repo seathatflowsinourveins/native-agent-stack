@@ -5051,8 +5051,8 @@
     },
     {
       "path": ".github/workflows/harness-audit.yml",
-      "sha256": "d231af6fa302506a9d12b048ceed32dd93dc5566aaf28944c4c3961cd9fe5994",
-      "bytes": 15067
+      "sha256": "6f958276e2389c898f027e95eba56dcaf9cd93e634cfedcee322262a1755ee7b",
+      "bytes": 15639
     },
     {
       "path": ".github/workflows/native-foundation-e2e.yml",
@@ -18317,8 +18317,8 @@
     },
     {
       "path": "docs/decisions/2026-10-08-claude-actions-harness-audit-bounds.md",
-      "sha256": "779d7cfae09f5e509889e42bbb3f714260d7ab6bdd225565fbc36f49a3a69b53",
-      "bytes": 28672
+      "sha256": "552a3dd663a5eeb33e8bb44934309bda95ef508e2b5a0acde274d666f9775a53",
+      "bytes": 31263
     },
     {
       "path": "docs/decisions/2026-10-08-claude-actions-pr-review.md",
@@ -19779,6 +19779,11 @@
       "path": "evidence/artifacts/child-lane-baseline-20260926/skill-invoke-rate.json",
       "sha256": "5c1e13b427dd9c8818721a1788eab19d55ef0ceef269d5eb644c25557760238b",
       "bytes": 39479
+    },
+    {
+      "path": "evidence/artifacts/claude-actions-fence-smoke-20261008/deny-probe-receipt.json",
+      "sha256": "7b6fcee51e75d84623ae80474f4864d181358db8f101b66ff78b67f07a264e27",
+      "bytes": 6272
     },
     {
       "path": "evidence/artifacts/claude-actions-fence-smoke-20261008/local-parity-receipt.json",
@@ -59797,8 +59802,8 @@
     },
     {
       "path": "tests/test_claude_harness_audit_bounds.py",
-      "sha256": "95f247426e6dd70aca4ade76c0954b7fe7f729152fa609199e6e47570cc9e882",
-      "bytes": 20144
+      "sha256": "4e6aab5660b9f3b44c5aecce1b3e94ed4c1bbe577dcc099ded8f7e98f74b84ff",
+      "bytes": 21635
     },
     {
       "path": "tests/test_claude_pr_review_workflow.py",

@@ -58,7 +58,7 @@ step and the `show_full_output` input were still missing. All are listed here.
 
 ## What was wrong with the job as landed
 
-Read from `main` at `e48de2e6`:
+Read from `main` at `e48de2e6` (the workflow file is unchanged from there to this PR's merge base, `aba02ec3`):
 
 - `--max-turns 60` and no budget flag, so one run had no cost bound the workflow could show.
 - The model's only shell tool was `Bash(gh issue create:*)` and the job held `issues: write`. `gh issue create`
@@ -162,12 +162,16 @@ holding marker strings in `.git`, a nested repository's `.git` and `.env`. The p
 | Read `.git/PROBE_MARKER`, and `.env` | refused: denied by the permission settings | returns each marker |
 
 So the empty Glob and Grep results come from the deny rules, not from the tools skipping hidden paths. That is one
-model and one prompt per arm; the runs' streams stay outside the repository.
+model and one prompt per arm. `evidence/artifacts/claude-actions-fence-smoke-20261008/deny-probe-receipt.json` records
+both runs: their flags, client, model and authentication, and every call with its outcome, and it names each run's
+stream by its sha256; the streams stay outside the repository. Both runs passed `--setting-sources user`; neither
+passed `--add-dir` or `--effort`.
 
 Whether `blockReadsOutsideWorkingDirectories` also binds Glob and Grep is not established: no runtime test exists,
-and the receipt's runs did not set it. For both questions the documentation says more than the runs show: the
-settings reference says that setting denies `Read`, `Grep`, `Glob` and `LSP` calls outside the working directories,
-and the permissions page says Claude Code makes "a best-effort attempt" to apply `Read` rules to Grep and Glob.
+and the receipt's runs did not set it. Here the documentation says more than the runs show: the settings reference
+says that setting denies `Read`, `Grep`, `Glob` and `LSP` calls outside the working directories. (For the deny rules
+the permissions page says Claude Code makes "a best-effort attempt" to apply `Read` rules to Grep and Glob; the
+probe above measured that it does, for these rules.)
 
 The action passes `claude_args` through its own parser (`shell-quote`); replaying that parser on this workflow's text
 yields the same flags and the same JSON. This workflow's own prompt and `claude_args`, read from this file, also ran
@@ -236,7 +240,7 @@ Runs spend from the Console organization that the repository variables `ANTHROPI
   entry for `harness-audit.yml:audit` changes from `["id-token: write", "issues: write"]` to `["id-token: write"]`.
   No other entry and no exemption changes.
 
-New, in `tests/test_claude_harness_audit_bounds.py` (24 tests): the job's condition, permissions, pin, inputs, flags
+New, in `tests/test_claude_harness_audit_bounds.py` (26 tests): the job's condition, permissions, pin, inputs, flags
 and settings are asserted from the workflow file, and the guard, numbers and report steps are executed as written on
 synthetic inputs. Sixteen weakened copies of the workflow each fail at least one test: a $30 budget check, a
 600,000-byte cap, 60 or 200 turns, a settings check that passes a symlink, a cache check that accepts zero, an added
@@ -257,6 +261,31 @@ weakened copies each fail at least one of these, and an unmodified copy fails no
 subtype dropped from the record, dropped from the message, taken without the name filter, a missing subtype read as
 `success`, and the summary column dropped from the header only, the row only, or the whole table. The step tests no
 longer skip without PyYAML: they read the workflow with the policy test's own loader when PyYAML is absent.
+
+## Debug logging set as a repository secret or variable (2026-10-09)
+
+A read of this workflow against official practice for `anthropics/claude-code-action` v1.0.247 (the cc-native-practice
+lane's L3 delta, requirement R4) found that the guard step could not see debug logging enabled through a repository
+secret or variable. Step debug logging and runner diagnostic logging are each enabled by a secret or a variable named
+`ACTIONS_STEP_DEBUG` or `ACTIONS_RUNNER_DEBUG`, the secret taking precedence (GitHub, "Enabling debug logging"), and
+neither reaches a step's shell unless it is bound; `runner.debug` reflects step debug logging, a debug re-run
+included, but not runner diagnostic logging. The guard now binds
+`(secrets.ACTIONS_STEP_DEBUG || vars.ACTIONS_STEP_DEBUG) == 'true'` as `STEP_DEBUG_SETTING` and
+`(secrets.ACTIONS_RUNNER_DEBUG || vars.ACTIONS_RUNNER_DEBUG) == 'true'` as `RUNNER_DIAGNOSTICS_SETTING`, so only
+`true` or `false` reaches the shell, and refuses either before any token is requested. This is hardening, not a closed
+leak: the action step already pins `ACTIONS_STEP_DEBUG: 'false'` in its own environment, which is what the action's
+full-output switch reads (`base-action/src/parse-sdk-options.ts`). zizmor's auditor persona reports
+`secrets-outside-env` (medium) on the two secret reads; the repository's CI runs the regular persona, pedantic
+suppresses it, and each read yields a boolean only. A test pins both bindings and the guard test refuses each
+setting; weakened copies are listed with the checks of this change.
+
+## The report notice at the cap (2026-10-09)
+
+The J8 micro read of #892 found an off-by-one in the publish step: `jq -r` adds a newline, so the file it wrote was
+one byte longer than the report text, and a report of exactly 60,000 bytes was announced as cut although nothing
+was. The step now writes the text with `jq -j`, which adds none, and a test publishes reports of exactly 60,000 and
+60,001 bytes (no notice, then the notice); a copy that writes with `jq -r` again fails it. The step's comment now
+says it publishes the last non-empty result text, which it does.
 
 ## Alternatives considered
 
@@ -286,7 +315,7 @@ longer skip without PyYAML: they read the workflow with the policy test's own lo
 checked at runtime lists every way it differs from this workflow's `claude_args`), not for this workflow's flags, and
 not through the action or on a GitHub runner. `local_static_analysis`: actionlint 1.17.0 and zizmor 1.30.1
 (offline, regular and pedantic), no findings. `local_integration`: the unit tests named above, PyYAML 6.0.3 on Python 3.12, and the
-2026-10-09 local probe of the `.git` and `.env` deny rules and its control without them (two subscription runs on
+2026-10-09 local probe of the `.git` and `.env` deny rules and its control without them (`deny-probe-receipt.json`; two subscription runs on
 the installed client with this workflow's fence flags; their streams stay outside the repository). `documented_api_check`: the `gh api` reads
 named above. No hosted run of this workflow is part of this record.
 
