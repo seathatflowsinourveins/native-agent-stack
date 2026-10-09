@@ -64,7 +64,7 @@ the same flags and the same JSON.
 
 After the run, one step reads the action's execution file and keeps only numbers and fixed names: cost, turns, the
 success flag, the Claude Code version, the session's tool list, the number of MCP servers and per-model token
-counts. It then fails the job unless the run succeeded, used 1 to 12 turns, cost at most $3 by the client's
+counts. It then fails the job unless the run succeeded, used 1 to 12 assistant turns (distinct assistant message ids; the client's `num_turns` counts transcript messages, tool results included, so a 12-request run on 2.1.295 reported 57, and it is only recorded), cost at most $3 by the client's
 estimate, read the prompt cache, had no MCP server and had none of Bash, Write, Edit, MultiEdit, NotebookEdit,
 WebFetch, WebSearch, Task, Agent or an `mcp__` tool. The review text is published only when that check passed,
 escaped, inside `<pre>`, capped at 60,000 bytes.
