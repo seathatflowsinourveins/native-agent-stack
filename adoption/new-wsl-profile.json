@@ -551,7 +551,7 @@
       "repository": "https://github.com/anthropics/claude-code",
       "layer_id": "native-clients",
       "owner_layer_id": "native-clients",
-      "pin": "2.1.284",
+      "pin": "2.1.295",
       "component_id": "claude-code",
       "source_selection_layer": "native-clients",
       "source_selection_name": "Claude Code",
@@ -564,17 +564,17 @@
       "blocking_gaps": [],
       "artifact": {
         "name": "claude (linux-x64)",
-        "url": "https://downloads.claude.ai/claude-code-releases/2.1.284/linux-x64/claude"
+        "url": "https://downloads.claude.ai/claude-code-releases/2.1.295/linux-x64/claude"
       },
       "checksum": {
         "algorithm": "sha256",
-        "value": "5cd90aabd83f8a15136c35aa37bb1d92b348993573316643dc3fe4e04afbf88f",
-        "source": "https://downloads.claude.ai/claude-code-releases/2.1.284/manifest.json",
+        "value": "4503bfe11a6c7fcc1e0b39b5e0d347c04248f750b03b0977b3ad6b531fe6f358",
+        "source": "https://downloads.claude.ai/claude-code-releases/2.1.295/manifest.json",
         "kind": "artifact"
       },
       "integrity_observation": "published_manifest_digest_not_rehashed",
       "install": {
-        "command": "curl -fsSL https://claude.ai/install.sh | bash -s 2.1.284",
+        "command": "curl -fsSL https://claude.ai/install.sh | bash -s 2.1.295",
         "source": "https://code.claude.com/docs/en/setup#install-a-specific-version",
         "execution_status": "UNRUN",
         "scope": "The documented specific-version form with the accepted pin as its operand: the floor that the selected bootstrap installs through the native binary's own `install <version>`. The bootstrap keeps a newer existing install instead of downgrading it. This is a reviewed example; the move to the current release is the native update below."
@@ -583,10 +583,10 @@
         "command": "claude -p \"explain this function\"",
         "source": "https://code.claude.com/docs/en/quickstart#essential-commands",
         "evidence_class": "documented_upstream_example_not_executed",
-        "scope": "Official one-off query example. A prompt without actual function context is not a functional oracle. Host 2.1.287 is above the 2.1.284 floor and counts as installed; acceptance has not passed on that host. No model request occurred.",
+        "scope": "Official one-off query example. A prompt without actual function context is not a functional oracle. The historical host 2.1.287 observation met the former 2.1.284 floor but is below the current 2.1.295 floor. The CC-native-practice report of an installed Linux 2.1.295 binary hash is release-integrity evidence, not this acceptance command. Acceptance remains UNRUN; no model request occurred.",
         "execution_status": "UNRUN",
         "prerequisites": [
-          "Claude Code at or above the 2.1.284 floor installed, with its installed version recorded in the receipt.",
+          "Claude Code at or above the 2.1.295 floor installed, with its installed version recorded in the receipt.",
           "Existing authorized native sign-in and actual function/project context sufficient to answer the example."
         ]
       },
@@ -599,11 +599,12 @@
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
         "https://code.claude.com/docs/en/setup#install-a-specific-version",
         "https://code.claude.com/docs/en/quickstart",
-        "evidence/artifacts/new-wsl-profile-20261001/upstream-gap-closure.json"
+        "evidence/artifacts/new-wsl-profile-20261001/upstream-gap-closure.json",
+        "docs/decisions/2026-10-09-claude-code-floor.md"
       ],
       "release": {
-        "tag": "2.1.284",
-        "source": "https://registry.npmjs.org/%40anthropic-ai%2Fclaude-code/2.1.284",
+        "tag": "2.1.295",
+        "source": "https://downloads.claude.ai/claude-code-releases/2.1.295/manifest.json",
         "kind": "native_package_release"
       },
       "source_pin_kind": "release_or_artifact_version",
@@ -620,7 +621,7 @@
         "after_update": "The acceptance command then runs on the version that results. A release newer than the pin counts as installed and not yet qualified until that acceptance has passed on that host.",
         "execution_status": "UNRUN",
         "receipt_fields": {
-          "floor": "The pin of this entry, 2.1.284: the release the bootstrap installs when no newer one is present.",
+          "floor": "The pin of this entry, 2.1.295: the release the bootstrap installs when no newer one is present.",
           "version_after_native_update": "The version that PATH resolves to after the native update, or after the updater's refusal.",
           "acceptance_result_on_that_version": "The result of this entry's acceptance command on that version."
         }

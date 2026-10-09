@@ -845,10 +845,10 @@ os.replace(sys.argv[1], sys.argv[2])
 # The pin is a floor, not a ceiling (2026-09-24): `"$bin" install <pin>`
 # moves the installer's own launcher back to the pin, dropping a newer
 # auto-updated release's fixes. A launcher at $HOME/.local/bin/<bin> whose
-# `--version` first word ("2.1.284" of "2.1.284 (Claude Code)") is a dotted
+# `--version` first word ("2.1.295" of "2.1.295 (Claude Code)") is a dotted
 # numeric version at or above the pin is kept: nothing is downloaded or
 # installed, and install_pin logs "Kept" instead of "Installed". Fields are
-# compared as base-10 numbers (2.1.99 is older than 2.1.284). No launcher, a
+# compared as base-10 numbers (2.1.99 is older than 2.1.295). No launcher, a
 # failing --version, a non-numeric version or an older one takes the
 # unchanged checksum-verified install. The function is identical to
 # adoption/bootstrap-macos.sh's install_native, which added this floor first;

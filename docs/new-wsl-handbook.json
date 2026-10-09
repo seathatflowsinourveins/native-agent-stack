@@ -7836,7 +7836,7 @@
     },
     {
       "path": "adoption/new-wsl-profile.json",
-      "sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5"
+      "sha256": "309fa245e3aaa07ed8045ee8969727280c890679e71256424b7c873f491cdec4"
     },
     {
       "path": "adoption/platforms/linux-wsl2-new-distro.md",
@@ -8071,10 +8071,10 @@
         "evidence_class": "documented_upstream_example_not_executed",
         "execution_status": "UNRUN",
         "prerequisites": [
-          "Claude Code at or above the 2.1.284 floor installed, with its installed version recorded in the receipt.",
+          "Claude Code at or above the 2.1.295 floor installed, with its installed version recorded in the receipt.",
           "Existing authorized native sign-in and actual function/project context sufficient to answer the example."
         ],
-        "scope": "Official one-off query example. A prompt without actual function context is not a functional oracle. Host 2.1.287 is above the 2.1.284 floor and counts as installed; acceptance has not passed on that host. No model request occurred.",
+        "scope": "Official one-off query example. A prompt without actual function context is not a functional oracle. The historical host 2.1.287 observation met the former 2.1.284 floor but is below the current 2.1.295 floor. The CC-native-practice report of an installed Linux 2.1.295 binary hash is release-integrity evidence, not this acceptance command. Acceptance remains UNRUN; no model request occurred.",
         "source": "https://code.claude.com/docs/en/quickstart#essential-commands"
       },
       "aliases": [
@@ -8085,8 +8085,8 @@
       "checksum": {
         "algorithm": "sha256",
         "kind": "artifact",
-        "source": "https://downloads.claude.ai/claude-code-releases/2.1.284/manifest.json",
-        "value": "5cd90aabd83f8a15136c35aa37bb1d92b348993573316643dc3fe4e04afbf88f"
+        "source": "https://downloads.claude.ai/claude-code-releases/2.1.295/manifest.json",
+        "value": "4503bfe11a6c7fcc1e0b39b5e0d347c04248f750b03b0977b3ad6b531fe6f358"
       },
       "documented_install": [
         {
@@ -8105,10 +8105,11 @@
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
         "https://code.claude.com/docs/en/setup#install-a-specific-version",
         "https://code.claude.com/docs/en/quickstart",
-        "evidence/artifacts/new-wsl-profile-20261001/upstream-gap-closure.json"
+        "evidence/artifacts/new-wsl-profile-20261001/upstream-gap-closure.json",
+        "docs/decisions/2026-10-09-claude-code-floor.md"
       ],
       "install": {
-        "command": "curl -fsSL https://claude.ai/install.sh | bash -s 2.1.284",
+        "command": "curl -fsSL https://claude.ai/install.sh | bash -s 2.1.295",
         "execution_status": "UNRUN",
         "scope": "The documented specific-version form with the accepted pin as its operand: the floor that the selected bootstrap installs through the native binary's own `install <version>`. The bootstrap keeps a newer existing install instead of downgrading it. This is a reviewed example; the move to the current release is the native update below.",
         "source": "https://code.claude.com/docs/en/setup#install-a-specific-version"
@@ -8123,7 +8124,7 @@
         "order": "It runs after the bootstrap has installed the pin or kept a newer existing install, and before this client's acceptance command.",
         "receipt_fields": {
           "acceptance_result_on_that_version": "The result of this entry's acceptance command on that version.",
-          "floor": "The pin of this entry, 2.1.284: the release the bootstrap installs when no newer one is present.",
+          "floor": "The pin of this entry, 2.1.295: the release the bootstrap installs when no newer one is present.",
           "version_after_native_update": "The version that PATH resolves to after the native update, or after the updater's refusal."
         },
         "sources": [
@@ -8133,7 +8134,7 @@
       },
       "owner_layer_id": "native-clients",
       "ownership_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
-      "pin": "2.1.284",
+      "pin": "2.1.295",
       "position": 2,
       "provisioning_status": "unprovisioned_source_review",
       "repository": "https://github.com/anthropics/claude-code",
