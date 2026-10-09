@@ -1,15 +1,15 @@
 # Retirement: PR #508, the 2026-09-29 token-stack winner record, closed unmerged
 
-**Custody practice:** session `native-agent-stack-0c` retains the closed branch and head; GitHub's [reopen operation](https://docs.github.com/en/graphql/reference/pulls#mutation-reopenpullrequest) keeps reconsideration possible.
+**Decided by:** session `native-agent-stack-0c`, under custody of unowned PRs for the user's clean-resolution request.
 
 **Scope:** this record changes no selection, verdict, catalog, pin, profile, carrier or install. Lane: `lane:foundation`.
 
-**Historical PR:** #508, head; use [Harbor's versioned evaluation interface][harbor-native] for any new comparison, rather than treating a proposal as acceptance.
+**Historical PR:** [#508](https://github.com/seathatflowsinourveins/native-agent-stack/pull/508), head
 `b7fcc2196c9ff5557f30486468f614fc0dc9d8b5`, base `df4123684fb55655b885a8dc6431a263c18b4c4c`
 (`df412368`), branch `claude/token-stack-winner-20260929`.
 
 **Written at:** `origin/main@9b0b8d6d25f9e3fb8f71770500e774170423315e`. Every main `path:line` citation below was
-re-verified at that SHA; new method citations below identify pinned upstream sources, not authority from proposal wording.
+re-verified at that SHA; citations to #508's original refer to its pinned head instead.
 
 **Disposition:** after this record merges, close #508 unmerged and keep its branch and head. The source review observed
 #508 OPEN at the pinned head after the two-hour objection window in the
@@ -17,19 +17,19 @@ re-verified at that SHA; new method citations below identify pinned upstream sou
 The title names that retirement disposition; it is not a claim that closure had already happened during the build.
 
 **North-star action served:** preserve the foundation's decision history so the native harness used for US-equities
-research and historical simulation follows dated evidence; [Harbor's native run bindings][harbor-native] keep future comparisons tied to dataset, model and agent.
+research and historical simulation follows its later selection records without losing the user's earlier directions.
 
 ## 1. What #508 proposed (historical)
 
-Use [Harbor's pinned evaluation interface][harbor-native] to bind any new stack comparison to its dataset, model and agent.
-This method reference changes no historical execution claim. The proposal's six decisions remain:
+The [full original text](https://github.com/seathatflowsinourveins/native-agent-stack/blob/b7fcc2196c9ff5557f30486468f614fc0dc9d8b5/docs/decisions/2026-09-29-token-stack-winner.md)
+remains the source for this historical proposal. Its six decisions were:
 
 1. A token-efficiency winner could be one full stack; per-tool rows remained evidence rather than the layer's verdict unit.
 2. Choose the recorded stack provisionally for the Mac coordinator until Gate A, a paired stack comparison or the 32-layer wave confirmed or overturned it.
 3. Let S3 (#390) decide the memory slot on merit per host, with ai-memory the reference arm and production control during isolated trials.
 4. Install through upstream-supported channels at reviewed pins and publisher digests; use upstream tests and evals, and record adaptations and missing evals.
 5. Classify under-invocation before changing a tool or skill; fix the owning layer, keep a gap ledger and never remove something on zero invocations alone.
-6. Retire only after a replacement's clean install and E2E, retain the old prefix through a regression window and require separate deletion authorization; [RTK's native inverse][rtk-native] supplies its tool-specific removal path.
+6. Retire only after a replacement's clean install and E2E, retain the old prefix through a regression window and require a separate explicit owner decision before deleting it.
 
 **The 2026-09-29 full-stack arm (historical, no precedence):**
 
@@ -58,7 +58,7 @@ benefit; a command-text match can count for several tools. They establish no pro
 
 The original alternatives, one line each:
 
-- Per-tool winners: not chosen because the historical unit was a full stack; [Harbor's native run bindings][harbor-native] allow an explicit composed-agent comparison.
+- Per-tool winners: not chosen because the user's direction allowed a full stack as one winner.
 - A paired stack comparison first: not chosen then; the recorded-evidence choice left the comparison owed.
 - Wait for Gate A: not chosen; Gate A would confirm or overturn afterward.
 - Retire before installing: not chosen; replacement installation and E2E came first.
@@ -69,35 +69,35 @@ The original overturn conditions, one line each:
 - A paired composition matched quality at lower complete provider usage against the cheapest adequate native baseline.
 - S3 or the 32-layer wave recorded a different memory system or token-layer winner.
 - An upstream release or eval showed a supported integration difference that changed results.
-- Cause classification showed that the stack itself, rather than the harness, caused the required lane's under-invocation; inspect [native RTK hook status][rtk-native] separately from run results.
+- Cause classification showed that the stack itself, rather than the harness, caused a lane owner's under-invocation.
 
 ## 2. Unique facts preserved
 
-Historical source review at the written-at SHA recorded four phrase searches with no hits (each exit 1);
-future lookup uses neutral identifiers `#508`, `2026-09-29` and `token-stack`. [RTK's pinned initializer][rtk-native] reports installation state;
-its supported install/uninstall stays separate from documentary lookup and historical search observations.
-Practice references refreshed 2026-10-08; no historical installation or result is requalified:
+The four owner answers below were given on 2026-09-29 to Claude Code session `os-b4` on the Mac coordinator.
+They are paraphrases of [#508's original record](https://github.com/seathatflowsinourveins/native-agent-stack/blob/b7fcc2196c9ff5557f30486468f614fc0dc9d8b5/docs/decisions/2026-09-29-token-stack-winner.md), not new choices or measured results.
+The original source review's phrase searches found no copies on main at the written-at SHA (each exit 1);
+this preserves that dated observation without repeating the owner's message text.
 
-Compare a composed token layer against adequate native controls with a fixed dataset, model and agent;
-[Harbor's pinned evaluation interface][harbor-native] binds those run inputs. Invocation counts remain adoption evidence only.
+**Full-stack request (original :4–5):** the owner permitted a single winner to consist of a complete token-efficiency
+stack. They requested evidence-backed retirement, a clean replacement install and end-to-end use of upstream skills.
 
-Keep agentmemory and Hindsight as memory candidates alongside ai-memory; S3 (#390) remains the memory decision gate.
-The pinned [agentmemory Codex guide](https://github.com/rohitg00/agentmemory/blob/8bf0c827aaaada297896b2b6efe2a64651ae9389/docs/plugins/codex-local.md) distinguishes preview builds from released installation;
-the [Hindsight Codex guide](https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/hindsight-docs/docs-integrations/codex.md) points to its successor plugin. Neither source selects a memory winner.
+**Memory answer (original :47–48):** the owner asked the current macOS memory landscape to include agentmemory,
+Hindsight and other candidates with evidence for being best. They did not select a memory winner in that answer.
+S3 (#390) remains the decision gate; ai-memory stays the production control while candidates run in isolation.
+The separate Mac ai-memory cutover choice remains open, as preserved below.
 
-Install the maintained upstream distribution and retain source/version identity before testing its integration.
-[RTK's native initializer][rtk-native] provides install, status and inverse commands; this citation qualifies no Mac installation.
+**Upstream answer (original :53–55):** the owner made the repositories' own upstream practice the source of truth.
+An E2E trial that departs from that practice is not evidence about the upstream tool. Use the upstream's supported
+installation and native tests/evals; record an adaptation's reason and any missing upstream evaluation.
+This source-of-truth boundary does not accept an installation or runtime merely because its proposal exists.
 
-Diagnose missing tool use at the actual integration and run configuration; keep cause and capability evidence distinct.
-[RTK's hook-status checks][rtk-native] expose configuration state; [Harbor][harbor-native] identifies execution inputs.
+**Under-invocation answer (original :60–63):** the owner required investigation and improvement rather than removal
+on low or zero use. Adapt tools and skills natively, and use their upstream evaluations as the standard.
+The historical proposal classifies causes at the owning layer and records harness gaps before a change;
+it leaves the skills trial's prune rule with its owner and adopts newly discovered skills through the pinned manifest.
 
-Decisions 1–5 remain historical selection practices. Decision 6 remains the proposal's staged retirement default,
-with replacement install/E2E, regression-window retention and separate deletion authorization. No retire depth was selected.
-
-[rtk-native]: https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/hooks/init/codex.rs
-[harbor-native]: https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/README.md
-
-
+Original lines 5–6 distinguish decisions 1–5, which record the owner's answers, from **decision 6, the approved
+plan's default**. The owner selected no retirement depth; deleting the retained prefix still needs their separate approval.
 
 The original **Not decided here** item (lines 70–71) is preserved: whether the Mac's production ai-memory would stay
 the local build under Stage 1's no-service-change rule until the first official 2.5 release, or move by a cold-copy
@@ -112,17 +112,17 @@ The following upstream-alignment gaps are **observations dated at `df412368`, no
 
 ## 3. Why retired: dated supersession
 
-**Decisions 1–2 retain a superseded proposal, not an accepted current winner. Compare dated records with
-[Harbor's native run bindings][harbor-native]; a revised full-stack comparison scope can reopen selection.** The later records at the written-at
+**Decisions 1–2 are superseded in 0c's reading of the later directives. This supersession is the coordinator's
+interpretation, not the user's words. The user can reinstate a full-stack unit.** The later records at the written-at
 SHA are:
 
-- The 2026-10-01 merit comparison retains repository quality and matched upstream-installed arms;
-  [Harbor's native run interface][harbor-native] supplies the evaluation-method source, not a winner verdict.
-  The edition's lines **87–88** call token-efficiency `comparison_required` and the accepted profile one arm;
-  its line **110** gives the lean base equal standing. These are documentary comparison inputs, not new runs.
-- The one-default-per-slot practice separates an installation default from acceptance on matched results;
-  [RTK's native installation/status/inverse][rtk-native] illustrates distribution checks distinct from [Harbor evaluation][harbor-native].
-  The 2026-10-01 program's token-efficiency row at **:236** remains `comparison_required`;
+- The user's 2026-10-01 merit rule in
+  [`docs/decisions/2026-10-01-new-wsl-architecture-edition.md:92–114`](https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-10-01-new-wsl-architecture-edition.md#L92-L114)
+  makes repository quality and matched upstream-installed arms decisive. Lines **87–88** call token-efficiency
+  `comparison_required` and the accepted profile one arm; line **110** gives the lean base equal standing.
+- The user's one-default-per-slot directive in
+  [`docs/decisions/2026-10-01-definitive-sota-wsl-program.md:119–131`](https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-10-01-definitive-sota-wsl-program.md#L119-L131)
+  separates an install default from merit acceptance. The token-efficiency row at **:236** remains `comparison_required`;
   the accepted install profile is provisional and the multi-agent comparison remains open.
 - The new-WSL context-supply default is **No context-supply layer** in
   [`docs/decisions/2026-10-01-new-wsl-definitive-defaults.md:79`](https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-10-01-new-wsl-definitive-defaults.md#L79),
@@ -143,21 +143,21 @@ The other decisions have narrower dispositions:
 - **3, carried elsewhere:** the durable-memory comparison remains required; the edition's **:101–107** makes ai-memory
   a reference arm and limits the agentmemory result to configuration-level evidence, not a production head-to-head,
   and the program's **:234** is `comparison_required`.
-- **4, carried elsewhere:** use [RTK's pinned native initializer][rtk-native] for its supported installation and inverse,
-  and [Harbor's pinned interface][harbor-native] for task-bound upstream-harness execution.
-  Source/install observations and native evaluation results retain separate evidence classes;
-  use the selected upstream revision's supported installation and test commands.
+- **4, carried elsewhere:** [`AGENTS.md:3`](https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/AGENTS.md#L3)
+  carries the upstream source-of-truth and upstream-harness requirements, and
+  [`AGENTS.md:12`](https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/AGENTS.md#L12)
+  the supported installation and native test commands of the selected upstream revision.
 - **5, carried partly:** [`adoption/skills/manifest.json`](../../adoption/skills/manifest.json), `trial.prune_rule`, requires a
   dated keep/remove review, leaves invocable skills listed despite zero use and protects verdict changes through re-recording.
   The exact cause classification and gap-ledger proposal in #508 are preserved here as history only.
-- **6, preserved, not carried forward:** Mac retirement gating and agent-ecosystem#28 remain historical;
-  retain its 2026-09-27 single-writer scope and separate deletion authorization.
-  [RTK's native inverse][rtk-native] is the removal-method source, not proof that a retirement or rollback ran.
+- **6, preserved, not carried forward:** Mac retirement gating and its notice on
+  [agent-ecosystem#28](https://github.com/seathatflowsinourveins/agent-ecosystem/issues/28) are historical; the single-writer
+  context is [`docs/decisions/2026-09-27-mac-single-writer-staged.md:12`](https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-09-27-mac-single-writer-staged.md#L12).
   This record claims no current retirement or cutover status.
 
 For this retirement, merging #508 as the winner would preserve an overtaken selection; dropping it without a record
-would lose decision conditions and corrections. A dated historical record is chosen; a revised scope for [Harbor comparison][harbor-native]
-restoring a full-stack unit, or primary evidence invalidating the supersession reading, would reopen that disposition.
+would lose unique user directions and corrections. A dated historical record is chosen. A new user direction restoring
+a full-stack unit, or primary evidence invalidating this supersession reading, would reopen that disposition.
 
 ## 4. Review findings, resolved as corrections of the historical text
 
@@ -191,8 +191,8 @@ These are source corrections; the coordinator replies to and resolves the preser
 
 ## 5. The -76 input
 
-The -76 input is dated 2026-09-29; treat its narrative as a lead for a task-bound [Harbor run][harbor-native],
-with dataset, model and agent identity retained separately from a verdict or lane acknowledgement.
+The [preserved -76 comment](https://github.com/seathatflowsinourveins/native-agent-stack/pull/508#issuecomment-5893854484)
+is dated 2026-09-29 and distinguishes its input from a verdict or lane acknowledgement.
 
 - **Item 1 is on main:** #506 merged as `84f6ee215d604c97a852774fb9db3d58889a8484` (`84f6ee21`), with the token-layer sweep.
 - **Item 2 is on main:** #500 merged as `b2767df2492f5830291b4e3e7f4218c6f5e4ff1f`, with the run-shape attribution.
@@ -224,12 +224,12 @@ merges with different membership rows would fire it and require the restatement 
 That paragraph also names independent Gate A and code-navigation-current-choice changes; closure does not erase those
 conditions. While #508 stays closed, the admission condition for adding ast-grep to the accepted profile is **:217–218**,
 expanded at **:219–225**: reviewed pins on both platforms, a host receipt for each and the follow-up profile/check
-updates. No admission follows from this retirement; use [native installation checks][rtk-native] and [matched runs][harbor-native].
-The historical **:311–314** reference remains a proposal pointer, not authority for a new selection; #508's branch and head are kept.
+updates. No admission follows from this retirement. The head-blob link at **:311–314** stays reachable because #508's
+branch and head are kept.
 
 ## 7. Not decided here
 
-#509 is planned separately. Gate A (#381) and S3 (#390) retain separate decisions and acceptance gates; [Harbor][harbor-native] supplies no verdict by citation. No install, tool
+#509 is planned separately. Gate A (#381) and S3 (#390) keep their own owners and decisions. No install, tool
 retirement or Mac change follows from this record, including either ai-memory cutover option preserved in section 2.
 
 ## 8. Limitations
@@ -240,7 +240,7 @@ they do not upgrade any historical claim's evidence class.
 
 | Claim | Evidence class and boundary |
 | --- | --- |
-| Historical proposal, later comparison conditions and retirement interpretation | `source_review`; source documents and pinned [native evaluation method][harbor-native], without execution acceptance |
+| User directions, proposal, later directives and retirement interpretation | `source_review`; pinned documents and preserved GitHub input |
 | Historical invocation counts | `local_integration`; transcript-derived adoption, not benefit |
 | Mac RTK 0.49.0 use | Historical `native_proven` receipt; no transfer to 0.50.0 Claude-hook wiring |
 | RTK 0.50.0 Linux qualification | Historical native operation with local integration checks; Linux scope only |
@@ -248,8 +248,8 @@ they do not upgrade any historical claim's evidence class.
 | -76 item 3 | Unreceipted `local_integration` lead; its 166- and 207-trial batches are not the #570 run |
 | #570 Harbor receipt | Historical provider execution with local integration wrappers; source-reviewed here, not replayed |
 
-Completeness check: the record preserves all six decisions, the historical member and non-member sets, four source-backed
-selection practices, the deferred ai-memory choice, the dated alignment gaps, all three review corrections and the -76 input; [Harbor][harbor-native] remains a method reference only.
+Completeness check: the record preserves all six decisions, the historical member and non-member sets, the four user
+answers, the deferred ai-memory choice, the dated alignment gaps, all three review corrections and the -76 input.
 The unresolved source gaps remain explicit for the owning layer's next sweep: the Mac's dated returned coverage
-report, provenance for the -76 item-3 batches and the new-WSL ccusage reconciliation; [RTK's status checks][rtk-native] qualify only their named installation. Independent review and
+report, provenance for the -76 item-3 batches and the new-WSL owner's ccusage wording. Independent review and
 publication remain coordinator steps; this source review does not claim those steps ran.

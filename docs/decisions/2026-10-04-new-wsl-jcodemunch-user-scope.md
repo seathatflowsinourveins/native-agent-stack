@@ -1,12 +1,12 @@
 # Decision: jCodeMunch is registered at user scope on NativeStack2604 (2026-10-04)
 
-**Decision date:** 2026-10-04; implemented by unit U8. Register jCodeMunch once at user scope so fresh projects and
-worktrees inherit the reviewed code-lookup server. Its [pinned upstream integration contract](https://github.com/jgravelle/jcodemunch-mcp/blob/6d5ae86c130f96624e2ca2d797fa3b853c210b9d/README.md)
-supplies the MCP server interface; the native client configuration supplies registration scope.
-This changes registration reach, not the selected retrieval winner or the 1.387-times jCodeMunch cost observation.
-Both client templates retain the same named owner and its existing approval, timeout and savings settings.
-Per-project registration remains an alternative when the task requires a project-specific configuration.
-The destination still needs its own native loading and invocation checks.
+**Decided by:** the owner on 2026-10-04, responding to the You-should-know side agent's report that per-project
+registration leaves fresh projects and worktrees without jCodeMunch. Paraphrased, they asked for SOTA repositories,
+MCP tools, harness rules and native hooks to be prepared for seamless use in future sessions. The command center
+(session `wsl-architecture-design`) interpreted that answer as choosing one registration for every project and agreed;
+session native-agent-stack-99's unit U8 implemented it. This is the coordinator's scoped reading of the owner's reply.
+The [pinned upstream integration](https://github.com/jgravelle/jcodemunch-mcp/blob/6d5ae86c130f96624e2ca2d797fa3b853c210b9d/README.md) supplies the MCP interface, rather than selection authority.
+Registration reach leaves the recorded 1.387-times cost and client loading/invocation limits below in force.
 
 **Scope:**
 
@@ -73,8 +73,8 @@ releases); its result decides which tools stay in the default at all.
 - decision 2 of `docs/decisions/2026-09-25-codex-mcp-scope.md` and F6 of `docs/decisions/2026-09-26-token-practice-f1-f9.md`
   ("jcodemunch stays project-scoped").
 
-Those reasons still describe real costs. The [pinned upstream MCP integration](https://github.com/jgravelle/jcodemunch-mcp/blob/6d5ae86c130f96624e2ca2d797fa3b853c210b9d/README.md) supports this once-per-user registration scope;
-destination loading and the recorded cost limitation remain explicit rather than inferred from configuration reach.
+Those reasons still describe real costs. The owner's October 4 direction, interpreted by the command center as requiring
+ready tools in every fresh session, overrides both earlier scope decisions above for this distribution; an upstream README does not grant that authority.
 
 ## Alternatives considered
 

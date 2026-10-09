@@ -84,21 +84,21 @@ was 86 bytes including its leading space; its exact removal leaves the
 
 **Amended by repair round 3 (2026-10-05):** the initial audit item 8
 recommendation to remove the fraction override and make nine audit skills
-`name-only` is overturned by native invocation and the retained September 30
-listing settings. Keep `skillListingBudgetFraction: 0.05` and every eligible local skill
+`name-only` is overturned by the owner's September 30 [standing LLM-native invocation direction](2026-09-30-skills-llm-native-listing.md).
+Keep `skillListingBudgetFraction: 0.05` and every eligible local skill
 `on`, including `security-best-practices`, `security-threat-model`, `codeql`,
 `supply-chain-risk-auditor`, `agentic-actions-auditor`, `sarif-parsing`, `fp-check`,
 `variant-analysis` and `security-audit`. The initial name-only rationale cited
-2026-10-05T05:58:36Z; [Claude's native skill invocation](https://code.claude.com/docs/en/skills#control-who-invokes-a-skill) keeps
-eligible descriptions available while loading bodies on demand. All entries, pins, statuses
+the owner's 2026-10-05T05:58:36Z workflow-quality direction (paraphrased from the coordinator relay below); it does not revoke
+the more specific standing listing direction. All entries, pins, statuses
 and Codex eligibility remain in place. The listed-description sum returns from
 5,357 to 9,484 Unicode code points; this is a manifest calculation, not a live
 skill-listing byte measurement. Skill listing is governed independently of the
 startup instruction-file budget. Native `/skill-doctor` remains the host check;
 plugin skills ignore `skillOverrides`.
 [Claude skills documentation](https://code.claude.com/docs/en/skills) and the
-retained September 30 listing settings below provide the native configuration and
-dated evidence. The round 3 addendum records the
+[accepted September 30 record](2026-09-30-skills-llm-native-listing.md) provide the
+native settings and dated evidence. The round 3 addendum records the
 restoration and alternatives.
 
 **Amended by [Required startup behavior and accepted-record amendments](#required-startup-behavior-and-accepted-record-amendments):**
@@ -210,8 +210,8 @@ behavior while bounding the owned surface. Overturn this choice when:
   adopt it and remove the redundant local gate.
 - A document watch or client update changes file discovery, imports, skill listing
   or native RTK initialization; verify the new source and remeasure before adoption.
-- An upstream interface or the required invocation scope changes; repeat the same byte and activation checks,
-  preserving the bounded measurement and its native evidence-class limits.
+- The owner revises the standing LLM-native invocation direction, or an upstream
+  change supplies better native discovery while preserving proactive invocation;
   compare host listings and invocation evidence in a dated listing decision.
   Startup file savings alone do not justify hiding a skill's description.
 - Real task evidence shows a relocated rule is not reached through its pointer;
@@ -276,20 +276,20 @@ The coordinator's commit message is `.bounded-job-075/msg.txt`.
 
 ## Addendum (2026-10-05): PR #726 Claude cross-family repair
 
-The cross-family repair separates native client behavior from retained measurements
-and applies the selected upstream installers and invocation contracts:
+The coordinator accepts the cross-family read against the original source records
+and records these owner directions as paraphrases of its PR #726 source relay:
 
-2026-10-05T05:51:21Z:
+Owner direction at 2026-10-05T05:51:21Z (source: coordinator's PR #726 relay; paraphrase):
 
-Use [RTK's native Codex installer at e001f773](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/hooks/init/codex.rs) and [Context Mode 1.0.169's client integrations](https://github.com/mksglu/context-mode/blob/v1.0.169/README.md) through their maintained installation formats; bind the clean new-WSL session to selected sources and the instructions it actually loads.
+They required current SOTA convergence practice in GitHub and local instructions so new sessions, including the new WSL, begin with clean upstream practice rather than inherit local adaptations without renewed convergence.
 
-2026-10-05T05:58:36Z:
+Owner direction at 2026-10-05T05:58:36Z (source: coordinator's PR #726 relay; paraphrase):
 
-Keep workflow quality and the stated acceptance limits as the qualification target; [Claude's skill contract](https://code.claude.com/docs/en/skills) makes relevant descriptions available for model invocation and loads bodies on demand. Retain task-specific security skills without adding startup procedure or disabling their descriptions to meet a separate byte budget.
+They prioritized real tasks and workflow quality and asked the coordinator to avoid security overengineering. The coordinator's reading leaves the more specific standing skill-invocation scope in force.
 
-The 2026-10-05T05:58:36Z repair initially selected nine name-only listings. Repair
-round 3 restores their full descriptions under [Claude's native invocation contract](https://code.claude.com/docs/en/skills#control-who-invokes-a-skill)
-and the retained September 30 settings. The Skills-CLI/local installation route remains
+The latter owner direction was cited for the initial nine name-only selections. Repair
+round 3 restores their descriptions under the more specific [September 30 standing direction](2026-09-30-skills-llm-native-listing.md)
+paraphrased below. The Skills-CLI/local installation route remains
 in the manifest; plugin skills ignore this setting. Actual installation and
 `/skill-doctor` read-back on 2604 remain coordinator observations. No selected
 skill is deleted or newly disabled here.
@@ -324,14 +324,14 @@ record establish the installed equivalents; availability is checked per client.
 
 The never-rebuild clause retains the prohibition on rebuilding or forking shipped
 tools; glue fills only a demonstrated gap with a pinned reference implementation.
-Use [RTK's native installer](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/hooks/init/codex.rs) and [Context Mode's maintained integrations](https://github.com/mksglu/context-mode/blob/v1.0.169/README.md), rather than replacement installers.
-The 2026-10-05T04:26:41Z correction separates that practice from the earlier
-fork/wrap interpretation. A clean release is the maintainer's published release
+The [official-upstream record](2026-10-05-official-upstream-never-rebuild.md) preserves the owner's 2026-10-05T04:26:41Z direction and its relay provenance.
+The earlier fork/wrap ban was the coordinator's interpretation and must not be
+attributed to the owner. A clean release is the maintainer's published release
 or tag installed by its documented installer; a prerelease counts only where the
 selected lane names it, as rc5 does.
 
-Use [Claude's native instruction hierarchy](https://code.claude.com/docs/en/memory) and [Codex's AGENTS.md discovery](https://developers.openai.com/codex/guides/agents-md)
-to keep task scope and source-backed practice distinct. The retained S1 carrier
+The owner's co-op direction supplied by the coordinator asks it to treat prompts as
+starting points and improve the approach through current SOTA convergence (paraphrase). S1 therefore
 reads identically on the three sources and their projections: "Prompts fix the
 objective, scope and authorization; improve the approach from current evidence."
 S2 changes only root AGENTS.md's material-decision stop condition to one that a
@@ -358,7 +358,7 @@ seeds 0.05 and an unrelated host key, proves dry-run preservation, checks both
 after apply, and checks the backup and identical second apply. Actual 2604
 read-back of 0.05 and the native Skills row remain a coordinator host gate. The
 native 1% default documented by [Claude](https://code.claude.com/docs/en/skills)
-does not establish a new invocation scope; native source support and the retained activation checks govern that claim.
+does not supersede the owner's [standing invocation direction](2026-09-30-skills-llm-native-listing.md).
 
 ### Expanded byte scope and fixed amended ceilings
 
@@ -456,7 +456,7 @@ acceptance results are recorded below after execution.
 
 Completeness review: the repairs cover startup guards, shared wording, accepted
 records, owned settings migration, both client loaders, child-carrier scope, all
-pointer branches and source-backed invocation practice. The remaining evidence class is
+pointer branches and the paraphrased owner directions with their source provenance. The remaining evidence class is
 host observation, explicitly assigned to the coordinator gate. A changed native
 loader/doc watch, a missed rule at its trigger, an evidenced client schema fix,
 or an upstream machine-readable byte audit reopens the corresponding choice and
@@ -468,16 +468,16 @@ is added.
 
 **Decision.** NativeStack's part of the two-host read-back requirement above is
 waived until its retirement. NativeStack2604 has a recorded measured read-back
-pass; the recorded `/context` observation supplies the Skills row: **64 skills,
+pass; the owner's recorded `/context` observation supplies the Skills row: **64 skills,
 7.8k tokens**. The bounded SDK jobs' `codex-home-full` read-back remains due at
 the first bounded SDK job after the night of 2026-10-06, owned by the SDK kit
 owner (the co-op). The remaining read-back requirement still governs replacement
 of the inline root routing; this amendment changes no client configuration.
 
-**Recorded evidence and rollout limits.** The measured observations are recorded in
+**Evidence and authority.** The coordinator records the measured observations in
 `coordination/session-d91d55ad-20261006/IMPROVEMENT-MANIFEST.md`, B3. The waiver
-and deferred SDK check remain dated bookkeeping in `task-ns2604-coop-20261006T203515Z`, section 5, B3.
-These are retained observations and a dated rollout exception, rather than a new read-back
+and deferred SDK check follow the co-op task ruling relayed in `task-ns2604-coop-20261006T203515Z`, section 5, B3.
+These are retained observations and a dated ruling that authorizes this rollout exception, rather than a new read-back
 performed by this amendment. The Skills figure describes the displayed context
 row and establishes no provider-token saving or comparative benchmark.
 
@@ -617,23 +617,23 @@ commits and refreshes the registry last; both protected manifests remain unchang
 
 CI run 37283231657, job 111676262001 at `ee37894af`, reported three failures
 among 11,047 tests. The same three failures were reproduced locally before this
-repair. They identify a conflict with native skill discovery and a native
+repair. They identify a conflict with an accepted owner direction and a native
 source-preservation regression, rather than a new upstream recommendation.
 
-The September 30 listing practice follows the native invocation contract:
+Authority (paraphrase): the coordinator supplies the owner's September 30 standing direction:
 
-Keep eligible descriptions available for [Claude's model-invoked skills](https://code.claude.com/docs/en/skills#control-who-invokes-a-skill); load a skill's complete instructions only when selected, and verify actual client exposure independently of the startup file budget.
+They required all eligible skills to invoke seamlessly through the LLM-native interface. [Claude's model-invoked skills contract](https://code.claude.com/docs/en/skills#control-who-invokes-a-skill) supplies the mechanism: expose descriptions, load bodies on selection, and check actual client exposure independently of startup bytes.
 
-The retained September 30 listing record notes that
+The [accepted September 30 listing record](2026-09-30-skills-llm-native-listing.md) notes that
 `name-only` depresses proactive invocation. All nine changed skills therefore
 return to `claude_listing: on` and template `skillOverrides: on`; existing Codex
 eligibility is preserved, including its native `skill-creator` copy exception.
 The map restores `skillListingBudgetFraction: 0.05`, also kept on NativeStack2604.
 Main's ordinary settings merge preserves unmentioned host keys. Related tests
 require full eligible descriptions and preservation of the fraction. Audit item 8's name-only/default-fraction proposal
-is overturned by the native invocation contract. The October 5 workflow-quality repair
+is overturned by that standing owner direction. The October 5 workflow-quality direction
 does not revoke it. The rejected alternative is hiding descriptions to save startup
-context; the skill catalog follows [Claude's invocation settings](https://code.claude.com/docs/en/skills#control-who-invokes-a-skill) and is measured as a
+context; the skill catalog is governed by the owner direction and measured as a
 separate client surface, independently of the instruction-file byte gate.
 
 At base `77d7516d8`, the upstream awareness body lived inline in both the Codex
@@ -655,7 +655,7 @@ carrier, its CLI and the native/gateway worker lanes. No Codex `@` import is use
 The recorded inclusion gap is separate from RTK's native hook rewriting:
 [RTK's Codex installer](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/hooks/init/codex.rs) owns `RTK.md`, `AGENTS.md` references and `hooks.json`; its [Claude installer](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/hooks/init/claude.rs) owns that client's hook registration.
 The pinned [awareness configuration](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/AWARENESS_CONFIG.md#L12-L38) reserves full prefix reminders for operation without a hook or explicit manual use.
-The historical [instruction-loader review](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/agents_md.rs) found no `@` expansion; [Codex 0.160.0 hook RPC](https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/tui/src/hooks_rpc.rs) separately exposes `hooks/list`.
+The historical [instruction-loader review](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/agents_md.rs) found no `@` expansion; [Codex 0.160.0 hook RPC at `a956835d`](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/tui/src/hooks_rpc.rs) separately exposes `hooks/list` (source fetched 2026-10-09T19:08:48Z).
 Reuse those upstream surfaces and the existing writer's measured inclusion contract,
 preserving the dated carrier bytes without replacing either native installer.
 The unchanged awareness text has separate exceptions that qualify its blanket
@@ -731,7 +731,7 @@ The first seven-module pass found one incorrect generated-record count (0 rather
 than 24 pieces not wired by their own entry). Correcting the dated counts and
 rerunning the record checks and the full seven-module group gave the passing
 result above. The initial writer run also refused a `directive` field on a
-practice entry; that field is for slot-owner selection. The practice's task-specific
+practice entry; that field is for slot-owner selection. The practice's owner-direction
 source belongs in its `source` and `note` fields, where it now stays; the rerun
 passed. These are local integration and synthetic-fixture checks. No full CI
 suite, macOS run, provider/model trial or host rollout is claimed here. The
@@ -749,7 +749,7 @@ NativeStack lacks it, and both hosts trail the template's overrides. Repository
 unit tests do not turn those historical host observations into completed adoption.
 The coordinator's host render/read-back gate remains pending.
 
-The September 30 listing settings follow [Claude's native invocation contract](https://code.claude.com/docs/en/skills#control-who-invokes-a-skill): keep
+The owner's [September 30 listing direction](2026-09-30-skills-llm-native-listing.md) requires
 every eligible skill listed; the 0.05 fraction prevents listing truncation. Amend
 the remaining anti-pattern row to distinguish unbounded startup instructions
 from that accepted listing setting. Keep listing governed independently of the

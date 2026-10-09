@@ -1,8 +1,8 @@
 # Decision: the shared template and the default install hold out the token-lane carriers, a re-apply retires them, and jCodeMunch registers at user scope in both user templates (2026-10-04)
 
-**Decision date:** 2026-10-04. The repository's own harness reported that the full token stack cost 1.12 times the
-no-token arm; that harness was not qualified as an upstream A/B instrument. Installation uses the shipped native routes,
-including [RTK's pinned Codex initializer](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/hooks/init/codex.rs), while comparative merit requires a qualified harness.
+**Decided by:** the owner's 2026-10-04 direction, relayed by the command center, responding to the repository's own
+1.12-times token-stack cost report. Paraphrased, they required a clean upstream installation and an A/B run through upstream
+commands, and questioned whether the repository's adaptation and tests met that standard. [RTK's pinned Codex initializer](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/hooks/init/codex.rs) supplies native installation support.
 The command center
 (session `wsl-architecture-design`) decided the same day that NativeStack follows NativeStack2604, so the carriers leave the
 shared template too, and asked for this change; session native-agent-stack-99's unit U9 carried it out. It extends
@@ -63,9 +63,9 @@ left the shared template unchanged.
    `config/read`, wrote a 0600 backup, a second dry run found nothing to prune, and the live `config.toml` kept its hash. That run
    pointed `--codex-process-name` at a name no process has, because five other codex processes were running; the live apply must
    not, and stays a quiet-window host step.
-6. **jCodeMunch is registered at user scope in both shared user templates**, using the [pinned vendor integration](https://github.com/jgravelle/jcodemunch-mcp/blob/6d5ae86c130f96624e2ca2d797fa3b853c210b9d/README.md).
-   The dated scope record (`docs/decisions/2026-10-04-new-wsl-jcodemunch-user-scope.md`) keeps the
-   measured cost visible). The repository's own tests require the Claude and Codex user-scope sets to mirror each other, so the
+6. **jCodeMunch is registered at user scope in both shared user templates**, under the owner's same-day direction for ready
+   tools in every fresh session. The [scope record](2026-10-04-new-wsl-jcodemunch-user-scope.md) preserves that authority and the measured cost.
+   The [pinned vendor integration](https://github.com/jgravelle/jcodemunch-mcp/blob/6d5ae86c130f96624e2ca2d797fa3b853c210b9d/README.md) supplies the server interface. Repository tests require the Claude and Codex user-scope sets to mirror each other, so the
    entry is in `adoption/mcp/claude-user.json` and in the Codex user template (the per-project Codex entry moved to user scope:
    approval mode, the three front-door verbs, a 60 s start-up allowance, the savings opt-out). The 2604 builder reads both
    templates, so its additions files no longer carry it. `jcodemunch` shares serena's lane in the Codex AGENTS template
@@ -92,8 +92,8 @@ left the shared template unchanged.
 
 ## Alternatives considered
 
-- **Drop the carrier files from the repository.** Rejected: the labelled, byte-pinned files preserve the opt-in reference until
-  the specified operating-point comparison returns; the current hold-out does not establish a universal carrier-quality result.
+- **Drop the carrier files from the repository.** Rejected under the recorded owner direction: keep them labelled and byte-pinned
+  until the command center's operating-point A/B decides; they remain the opt-in reference, without a universal carrier-quality claim.
 - **Make the applier keep every base hook** (its earlier rule) **and retire by hand on NativeStack.** Rejected: any host that
   applied an older template would keep the carrier forever, and a hand edit leaves no record.
 - **A one-off script that edits `~/.codex/config.toml`.** Rejected for the generic upstream-driven tool above: the next flag

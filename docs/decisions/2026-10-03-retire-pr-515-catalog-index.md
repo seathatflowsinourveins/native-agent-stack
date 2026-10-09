@@ -28,9 +28,9 @@ pointers below retain the five specific pairs without naming components in a dec
 
 ## What the proposal did
 
-The historical proposal attempted to combine catalogs, evidence metadata and ranking. Repository evidence needs its
-own scope: [OpenSSF Scorecard's documented assessment](https://github.com/ossf/scorecard/blob/ac4b584439389e57f8d56d925f7fef245d8dda1f/README.md) and [CNCF Landscape's catalog representation](https://github.com/cncf/landscape2/blob/2ee800dfe0d43a5a3beace3bec83ba469c7ccdc0/README.md) do not establish a universal merit ordering.
-The retained branch adds four files; their exact Git blob identities at the retained head are:
+The PR body says it answered the owner's 2026-09-29 request to combine catalogs and the evidence
+manifest into a ranked index. Its own record says the owner asked for evidence strength first
+([docs/decisions/2026-09-29-catalog-index-ranking.md:164-167][old-evidence-order]). The branch adds
 four files; their exact Git blob identities at the retained head are:
 
 | New file | Blob |
@@ -57,14 +57,14 @@ The active ranking rule gives the source host's selection of record precedence:
 | K3, `host_verification_at_pin` | [scripts/catalog_index.py:220-234][k3] | Source-host receipts on `linux-wsl2-x86_64`, with recorded verdict or stack pins and role-specific levels. |
 | K4, `measured_rank` | [scripts/catalog_index.py:244-250][k4] | A comparable verified measurement could order a tie; every actual K4 is zero. |
 
-Merit requires repository-specific primary evidence and a comparison on the same frozen tasks, using the arms'
-supported upstream interfaces. A source host's installed state, pins, bookkeeping and integration holds describe
-deployment custody; they supply no comparative repository result. [Harbor's native task interface][program-5]
-supports the bounded comparison, while [Scorecard's documented scope][scorecard] keeps security assessment distinct.
-Those practice and evidence boundaries ground this retirement; an unmeasured rank remains undetermined.
+Program decision 5 records the user's rule: repository quality, supported by upstream evidence and a
+comparison on the same frozen tasks, decides merit. The source host's installed state, pins,
+bookkeeping and integration holds are no evidence for or against a repository; without a comparison,
+merit remains undetermined ([docs/decisions/2026-10-01-definitive-sota-wsl-program.md:96-106 at
+main][program-5]). That user rule is the basis for this retirement.
 
 U11 remains **proposed, revision 5**, rather than accepted policy ([U11:1-9 at main][u11-status]).
-Its proposed frozen-task procedure is distinct from an upstream runtime result; the native harness is the execution basis.
+Its context records the user's question about the biased list ([U11:14-17][u11-context]); its proposed
 selection rule gives the selection of record no precedence in selection, ties or arm order
 ([U11:126-127][u11-precedence]). A qualifying merit claim under that design needs a preregistered rule,
 a registered comparison receipt and a recomputed outcome ([U11:111-117][u11-receipt]).
@@ -74,16 +74,16 @@ above a recorded winner ([old record:139-140][old-role-first]). The record in #5
 merging #515 and says it does not depend on it ([docs/decisions/2026-10-01-final-catalog.md:303-306 at
 #595 head `7f6a1781a5d8803a04baddb36f936c237e5ce8ba`][p595-independent]).
 
-**A merit-neutral re-key supplies no ranking result until a layer records a qualifying head-to-head comparison.**
-Use the same frozen tasks and supported native installation/test commands for each arm, through
-[the pinned upstream harness][program-5-merit]. U11 remains a proposed additional protocol rather than accepted policy;
-its extra bar applies only after that design is accepted. Removing bookkeeping keys supplies no measurement:
+**A merit-neutral re-key leaves no active key until a layer records a head-to-head comparison that
+decides merit under program decision 5:** upstream evidence and the same frozen tasks, each arm
+installed fresh by its upstream command ([program decision 5:97-104][program-5-merit]). Because U11 is
+not accepted policy, its bar adds to that gate only if U11 is accepted first. Removing the bookkeeping
 keys supplies no measurement: the retained JSON has an empty `measurements` array, no
 measurement-ordered placements and zero K4 on every placement
 ([catalogs/landscape/catalog-index.json:34-57][index-counts], [JSON:42085][index-measurements]).
-Keeping an inert index or merely renaming its keys supplies no evidence-strength comparison.
-The alternatives are to retain this history and reopen on a qualified result, or to record a separately reviewed
-selection-policy change with its supported sources and consequences.
+Keeping an inert index or merely renaming its keys would not answer the user's evidence-strength
+request. The alternatives are to retain this history and reopen on qualifying evidence, or to restore
+selection-of-record precedence through an explicit user decision.
 
 ## Defects and staleness observed at retirement
 
@@ -207,7 +207,7 @@ as a correction rather than repeated ([old record:162-164][old-evidence-order], 
 
 ### Rejected alternatives, sources and review history
 
-- A blended score was rejected because it hides the underlying behaviors; [OpenSSF Scorecard's per-check explanation][scorecard] supplies the upstream basis.
+- A blended score was rejected because it hides the underlying behaviors ([old record:136-138][old-alternatives]).
   The cited upstream source, [OpenSSF Scorecard README:109-112 at
   `ac4b584439389e57f8d56d925f7fef245d8dda1f`][scorecard], says an aggregate tells "nothing about what
   individual behaviors a repository is or is not doing". That passage was re-read at build time.
@@ -285,11 +285,11 @@ PR needs no trading-lane ACK ([docs/lanes.md:145-150][lane-labels]).
 [k2]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/3d4a9510136c8f38b636b70b04e0ac53060b2fa9/scripts/catalog_index.py#L210-L216
 [k3]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/3d4a9510136c8f38b636b70b04e0ac53060b2fa9/scripts/catalog_index.py#L220-L234
 [k4]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/3d4a9510136c8f38b636b70b04e0ac53060b2fa9/scripts/catalog_index.py#L244-L250
-[program-5]: https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/README.md
-[program-5-merit]: https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/README.md
-[program-5-overturn]: https://github.com/adr/madr/blob/ba75bb1b20d42af5746b246ad348c202419ae681/template/adr-template.md
+[program-5]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-10-01-definitive-sota-wsl-program.md#L96-L106
+[program-5-merit]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-10-01-definitive-sota-wsl-program.md#L97-L104
+[program-5-overturn]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-10-01-definitive-sota-wsl-program.md#L105-L106
 [u11-status]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-10-01-u11-merit-neutral-selection.md#L1-L9
-[u11-context]: https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/README.md
+[u11-context]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-10-01-u11-merit-neutral-selection.md#L14-L17
 [u11-precedence]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-10-01-u11-merit-neutral-selection.md#L126-L127
 [u11-receipt]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-10-01-u11-merit-neutral-selection.md#L111-L117
 [old-role-first]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/3d4a9510136c8f38b636b70b04e0ac53060b2fa9/docs/decisions/2026-09-29-catalog-index-ranking.md#L139-L140
@@ -313,7 +313,7 @@ PR needs no trading-lane ACK ([docs/lanes.md:145-150][lane-labels]).
 [pair-63]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/3d4a9510136c8f38b636b70b04e0ac53060b2fa9/catalogs/landscape/catalog-index.json#L42787-L42795
 [pair-64]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/3d4a9510136c8f38b636b70b04e0ac53060b2fa9/catalogs/landscape/catalog-index.json#L42797-L42805
 [pair-placements]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/3d4a9510136c8f38b636b70b04e0ac53060b2fa9/catalogs/landscape/catalog-index.json#L23376-L23756
-[old-alternatives]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/3d4a9510136c8f38b636b70b04e0ac53060b2fa9/docs/decisions/2026-09-29-catalog-index-ranking.md#L146-L150
+[old-alternatives]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/3d4a9510136c8f38b636b70b04e0ac53060b2fa9/docs/decisions/2026-09-29-catalog-index-ranking.md#L134-L150
 [scorecard]: https://github.com/ossf/scorecard/blob/ac4b584439389e57f8d56d925f7fef245d8dda1f/README.md#L109-L112
 [pin-rule]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/3d4a9510136c8f38b636b70b04e0ac53060b2fa9/catalogs/landscape/manifest.json#L32
 [old-sources]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/3d4a9510136c8f38b636b70b04e0ac53060b2fa9/docs/decisions/2026-09-29-catalog-index-ranking.md#L175-L185

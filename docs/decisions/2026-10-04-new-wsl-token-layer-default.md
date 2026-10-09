@@ -1,18 +1,18 @@
 # Decision: the token layer is the new distribution's client default (2026-10-04)
 
-## Native configuration practice
+## Owner directive and native configuration practice
 
-The dated 2026-10-04 configuration review triggered the native integration scope below.
+On 2026-10-04 the owner directed the token-efficiency stack to become the native default for future sessions.
 
-Install selected token integrations through their shipped lifecycle interfaces and retained source pins,
-including [RTK's native initializer](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/hooks/init/codex.rs) and [Context Mode 1.0.169](https://github.com/mksglu/context-mode/blob/v1.0.169/README.md).
+They required clean upstream installation, default launch and invocation, real fresh-session end-to-end execution,
+and monitoring of token use, saved tokens and repository invocation rates with upstream lifecycle commands and skills.
+Their scope included Ultracode subagents and experimental teams; they asked to keep resolving the native workflow and
+report readiness to the main session. [RTK's native initializer](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/hooks/init/codex.rs) and [Context Mode 1.0.169](https://github.com/mksglu/context-mode/blob/589d8214d56740a28b5f7bf63167743d586b0b40/README.md) supply the shipped interfaces.
+This directive sets the configuration default below; installed components and unexecuted plans establish no savings.
 SessionStart notices and task-specific SubagentStart carriers retain separate loading and lifecycle checks.
-Monitor invocation and native usage counters without treating installed components or unexecuted plans as savings.
-The profile's Ultracode/subagent and experimental-team settings remain the declared configuration choices below;
-they do not turn the repository's token-stack diagnostic into a qualified upstream A/B result.
-Destination loading, useful invocation and native counter observations are required for a new execution claim.
+Destination loading, useful invocation and native counter observations are required for a new execution claim; the diagnostic is not a qualified upstream A/B result.
 
-This record states NativeStack2604's client configuration practice. The configuration is built by
+This record applies that owner directive to NativeStack2604's client configuration. The configuration is built by
 `tools/adoption/new_wsl_client_config.py` from `adoption/new-wsl/client-config-map.json`. The workstation
 (NativeStack) already runs these pieces.
 
@@ -32,7 +32,7 @@ distribution does not install stays unwired.
 
 ### How each piece works
 
-1. **The `directive` field.** A slot entry may name its dated, source-backed configuration record. The builder then wires
+1. **The `directive` field.** A slot entry may name the dated record of an owner's directive. The builder then wires
    the entry's owner beside what the slot installs, but only while the slot installs anything. If the slot's deciding
    measurement ends with the slot installing nothing, the rtk pieces unwire along with it. `--check` fails when the
    record is not a file of the repository. The manifest is not changed: context-supply's decided default and its

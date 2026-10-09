@@ -1,9 +1,9 @@
 # Decision: changelog parity between NativeStack and NativeStack2604 (2026-10-04)
 
-**Decision date:** 2026-10-04; unit U7 measured and implemented the four settings below.
-Parity follows installed native capability and versioned changelog/schema checks, including [Codex 0.160.0's tier implementation](https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/tui/src/service_tier_resolution.rs).
-The recorded option labels and settings stay distinct from performance or cross-host acceptance.
-The four decisions retain their original measurements and rollout boundaries.
+**Decided by:** the owner's 2026-10-04 direction, relayed by the command center (session `wsl-architecture-design`).
+Paraphrased, they required the new WSL to inherit the latest SOTA features and changelog capabilities seamlessly in native workflows.
+The command center took the four decisions below under that direction and the owner's earlier choices; session native-agent-stack-99's unit U7 measured and implemented them.
+Versioned support includes [Codex 0.160.0's tier implementation at `a956835d`](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/tui/src/service_tier_resolution.rs), fetched 2026-10-09T19:08:48Z; the recorded authority, measurements and rollout boundaries stay in force.
 
 **Scope:**
 
@@ -50,7 +50,7 @@ NativeStack lags the shared template on four items that a re-apply fixes: `skill
    delivers a message from another session without the approval hold that applies to a sender that is not in bypass mode.
    It is written only with `--with-authorization-settings` and never over a value the file already has. This overturns the
    wave-2 messaging ruling, which left the key unset because a message between two bypass-mode sessions delivers anyway,
-   within the dated 2026-10-02 Claude-Codex messaging posture and the native configuration contract, without requalifying transport.
+   under the owner's parity direction relayed above and their affirmative 2026-10-02 Claude-Codex messaging decision; transport is not requalified here.
 3. **Codex `service_tier = "fast"` is on 2604.** The user chose the fast tier for every route that honours it on
    2026-10-03, and NativeStack runs it (measured through the gateway the same day: 61 against 33 output tokens per second).
    The 0.160.0 config schema calls `fast` the legacy spelling of the `priority` tier and says it still works. The tier

@@ -2,9 +2,9 @@
 
 Lane: foundation. North-star action served: the GPT lane can run GPT-6.1 Sol and GPT-6 Astra at max through the
 gateway for every unit that serves the north star, including the clean-room definitive round. Status: switched on the
-Mac coordinator on 2026-10-02 at 03:43:45Z through a workstation-style rebuild using [the pinned upstream release scripts](https://github.com/diegosouzapw/OmniRoute/blob/52823517533cfceec7abef2ff3e6285a19fe4121/package.json).
-The update policy follows the installed Codex version and notifies when a qualifying official gateway release is available;
-it does not install nightly builds. The workstation gateway is untouched.
+Mac coordinator on 2026-10-02 at 03:43:45Z under the owner's direction to resolve upstream and enable seamless update support.
+The coordinator records their choices here as a paraphrase: a workstation-style rebuild and follow-and-notify updates. The [pinned upstream release scripts](https://github.com/diegosouzapw/OmniRoute/blob/52823517533cfceec7abef2ff3e6285a19fe4121/package.json) supply build commands (source fetched 2026-10-09T19:08:48Z).
+The daily check follows the installed Codex version and notifies about qualifying releases; it installs no nightly build. The workstation gateway is untouched.
 
 ## Decision
 
@@ -63,10 +63,10 @@ own pre-migration database backup before migrating; it was not needed.
 
 ## Alternatives
 
-- **Announce Codex 0.159.3 on the old build only.** Rejected by the documented capability check: GPT-6.1 Sol appears but `max`
+- **Announce Codex 0.159.3 on the old build only.** Rejected by the owner's rebuild choice: GPT-6.1 Sol appears but `max`
   clamps to `xhigh` without PR 15167.
 - **Wait for an official v3.8.52.** Rejected: no release carries GPT-6.1 Sol yet, and the GPT lane needs it now.
-- **Rebuild and switch automatically every night.** Rejected by the qualified-release gate: it would put untested upstream
+- **Rebuild and switch automatically every night.** Rejected by the owner's follow-and-notify choice: it would put untested upstream
   changes into the live gateway; the daily check notifies instead.
 
 ## Overturn

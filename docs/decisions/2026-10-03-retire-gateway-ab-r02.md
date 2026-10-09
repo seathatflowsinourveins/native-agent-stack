@@ -1,6 +1,6 @@
 # Decision: retire the gateway A/B R02 preregistration draft (PR #445) and record the R02 freeze on 20128 as overtaken (2026-10-03)
 
-**Status: retired by the 2026-10-03 custody review; this dated decision follows [versioned upstream evaluation interfaces](https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/README.md) and retains source-only R02 evidence.**
+**Status: decided by session native-agent-stack-0c under the owner's 2026-10-03 custody direction for unowned PRs.**
 The [custody notice on #445](https://github.com/seathatflowsinourveins/native-agent-stack/pull/445#issuecomment-5967135175)
 was posted at 08:22:02Z. Its two-hour objection window ended at 10:22:02Z without an objection or a lane claiming
 R02. The post-window read checked #445, the newest #608 comments and coordination files newer than the notice;

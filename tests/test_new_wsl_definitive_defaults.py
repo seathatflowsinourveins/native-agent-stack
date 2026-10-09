@@ -1059,12 +1059,16 @@ class Manifest(unittest.TestCase):
                                       row["interim"]["authority"]["kind"].replace("_", " "), row["interim"]["decided_by"]]
                                      for row in self.rows if row.get("interim")])
 
-    def test_current_consensus_record_keeps_contracts_and_uses_primary_sources(self):
+    def test_current_consensus_record_preserves_authority_without_owner_quote(self):
         text = CONSENSUS_RECORD.read_text(encoding="utf-8")
         self.assertIn(self.consensus["rule"], text)
         self.assertIn(self.wave2["interim_rule"], text)
         self.assertIn(self.wave2["no_install_rule_exception"], text)
         self.assertNotIn(self.consensus["authorization"]["verbatim"], text)
+        normalized = " ".join(text.split()).casefold()
+        for clause in self.consensus["authorization"]["reading"].split("; "):
+            self.assertIn(clause.casefold(), normalized)
+        self.assertIn("the owner delegated", normalized)
         for sid in list(self.consensus_rows) + [entry["slot_id"] for entry in self.amend_rows] + list(self.interims):
             self.assertIn(f"`{sid}`", text, sid)
         for sentence in self.consensus["not_established"]:

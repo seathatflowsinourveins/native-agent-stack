@@ -1,7 +1,7 @@
 # Decision: the new distribution's default holds out this repository's own token-lane carriers (2026-10-04)
 
-**Decision date:** 2026-10-04; implemented by unit U5-CARVE using the [pinned native RTK hook contract](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/hooks/init/codex.rs).
-The clean-install hold-out narrows Decision 3 of
+**Decided by:** the owner's 2026-10-04 direction, relayed by the command center (session `wsl-architecture-design`)
+and implemented by session native-agent-stack-99's unit U5-CARVE. This clean-install hold-out narrows Decision 3 of
 `docs/decisions/2026-10-04-new-wsl-token-layer-default.md` (the token-lane carrier installed whole) for this
 distribution only.
 
@@ -15,14 +15,14 @@ distribution only.
 
 ## Requirement
 
-The 2026-10-04 hold-out follows the 1.12-times token-stack observation from the repository's own harness.
-That result is a local diagnostic; it does not establish an upstream-quality A/B result.
-Use supported upstream installers, native test commands and task-specific invocation observations to qualify a destination.
-The [RTK initializer](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/hooks/init/codex.rs) owns its hook and inverse, while [Context Mode 1.0.169](https://github.com/mksglu/context-mode/blob/v1.0.169/README.md) describes its native integration.
+The owner responded on 2026-10-04 to the repository harness's report of 1.12-times token-stack cost. Paraphrased from
+the command-center relay, they required a clean SOTA install and an A/B through upstream commands, questioned the
+repository's adaptation and test alignment, and asked for prompt, highest-quality finalization. The 1.12-times result
+remains a local diagnostic; [RTK's initializer](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/hooks/init/codex.rs) and [Context Mode 1.0.169 at `589d8214`](https://github.com/mksglu/context-mode/blob/589d8214d56740a28b5f7bf63167743d586b0b40/README.md), fetched 2026-10-09T19:09:27Z, supply native installation support.
 
-Every token-layer piece on NativeStack2604 installs through that supported upstream lifecycle and configuration;
-a repository-specific carrier remains a separately qualified adaptation, so it stays outside this clean default.
-Context Mode's own Agent-prompt rewrite is an upstream feature and remains within the selected scope.
+The command center interpreted that direction as requiring every token-layer piece on NativeStack2604 to use its
+upstream installer and default configuration, with repository adaptations held out. That is the coordinator's scoped
+reading of the owner's direction; Context Mode's own Agent-prompt rewrite is an upstream feature and stays.
 
 ## Decision
 
@@ -57,7 +57,7 @@ use, which is the command center's upstream-harness A/B below.
 
 ## Alternatives considered
 
-- **Keep the carrier wired until the A/B finishes.** Rejected by this clean-install scope: the
+- **Keep the carrier wired until the A/B finishes.** Rejected: the owner's direction requires a clean install now, and the
   repository's own harness, which produced the 1.12 times figure, is retired as an A/B instrument.
 - **Delete the carrier files and template entries.** Not done: other hosts render the shared template, and the files
   are the byte-pinned reference an adopter would use.
