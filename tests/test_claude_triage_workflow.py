@@ -202,9 +202,17 @@ class TriageShapeTests(unittest.TestCase):
                          "--permission-prompts none", "--setting-sources user", "--strict-mcp-config",
                          "--add-dir ${{ runner.temp }}/triage"):
             self.assertIn(expected, arguments())
+        for name in ("show_full_output", "display_report", "track_progress"):
+            self.assertEqual(run["with"][name], "false")
         text = WORKFLOW.read_text(encoding="utf-8")
         for static_credential in ("ANTHROPIC_API_KEY", "ANTHROPIC_AUTH_TOKEN", "CLAUDE_CODE_OAUTH_TOKEN"):
             self.assertNotIn(static_credential, text)
+
+    def test_a_green_run_with_items_always_has_an_execution_file(self):
+        check = step("Require the run's execution file")
+        self.assertEqual(check["if"], "${{ success() && steps.collect.outputs.count != '0' && "
+                                      "steps.claude_triage.outputs.execution_file == '' }}")
+        self.assertIn("exit 1", check["run"])
 
     def test_the_schema_allows_only_the_three_lanes_or_none(self):
         schema = flag_json("--json-schema")

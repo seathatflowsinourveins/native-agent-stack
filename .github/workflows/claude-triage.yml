@@ -261,6 +261,15 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
           rm -f "$raw"
 
+      # When there were items to classify, a classify step that reports success without an execution file would leave
+      # the job green with nothing checked; that fails here. With no items, the classify step is skipped by design.
+      - name: Require the run's execution file
+        if: ${{ success() && steps.collect.outputs.count != '0' && steps.claude_triage.outputs.execution_file == '' }}
+        shell: bash
+        run: |
+          echo 'The classify step finished without an execution file: no bounds were checked.' >&2
+          exit 1
+
       - name: Keep the numeric usage record
         if: ${{ always() && steps.claude_triage.outputs.execution_file != '' }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1

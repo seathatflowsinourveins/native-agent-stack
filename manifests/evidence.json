@@ -5021,8 +5021,8 @@
     },
     {
       "path": ".github/workflows/claude-triage.yml",
-      "sha256": "99f3db4dd9044f8b57aa5eac3943da6c355a23b2d2962dacdcc5c79a07a19d5f",
-      "bytes": 19599
+      "sha256": "8e2410bc4fc62ea0cccd93a6bb175954ff990329ed23512dd3fa97af78158106",
+      "bytes": 20151
     },
     {
       "path": ".github/workflows/dependency-review.yml",
@@ -17872,8 +17872,8 @@
     },
     {
       "path": "docs/decisions/2026-10-04-ci-least-privilege.md",
-      "sha256": "15a837aebea0fb781e8b10e9a040f005265a7086e4fabf97fa746ceb3d2825d2",
-      "bytes": 41242
+      "sha256": "e5d473621cfb4fa383f8633b3ebb08baa8923d1a5b9b9c7abf799d0a290d62bd",
+      "bytes": 41830
     },
     {
       "path": "docs/decisions/2026-10-04-claude-template-holds-out-token-lane-carriers.md",
@@ -18157,8 +18157,8 @@
     },
     {
       "path": "docs/decisions/2026-10-08-claude-actions-triage.md",
-      "sha256": "9ebf2b1a6fdd562475b5ca41d19e8a048ab8e146319eb819c21a17c5837fa919",
-      "bytes": 11360
+      "sha256": "aed806b24370167625b7652c21aaede03c8b643485c3f02a029f24fc13e8b8fe",
+      "bytes": 11739
     },
     {
       "path": "docs/decisions/2026-10-08-coordinator-research-routing.md",
@@ -57887,8 +57887,8 @@
     },
     {
       "path": "tests/test_claude_triage_workflow.py",
-      "sha256": "3fa077cd6f1a009eaa8278f7c3e72ae963a7cbae67efa3343a527824ad7664bc",
-      "bytes": 19903
+      "sha256": "1e80912ac41880c82e24e0331e5c97648129beb6c857dfadfa68225341d50524",
+      "bytes": 20403
     },
     {
       "path": "tests/test_codex_agents.py",
