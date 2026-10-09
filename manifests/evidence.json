@@ -18296,6 +18296,11 @@
       "bytes": 9003
     },
     {
+      "path": "docs/decisions/2026-10-09-forgejo-source-reviews.md",
+      "sha256": "ce5f586f6090b13f3d7e0b8b5f6bbefb88d170dda3ce15e068e659283cee2e32",
+      "bytes": 6546
+    },
+    {
       "path": "docs/direct-results.md",
       "sha256": "12a511fee11f22c90b9b622701d5485be9c8247167102b5768d694244f939a5b",
       "bytes": 4022
@@ -57741,6 +57746,16 @@
       "bytes": 1029
     },
     {
+      "path": "tests/fixtures/source_reviews_forgejo/codeberg-20261009.json",
+      "sha256": "2d4f8873a41f0fcc36cffe6a8e720e4e0efed29ace506a2b0f90f960f46e5c7f",
+      "bytes": 212799
+    },
+    {
+      "path": "tests/fixtures/source_reviews_forgejo/synthetic-protocol-cases.json",
+      "sha256": "184afdb21bab2d7e69dc3a7bc2c8a3af5194ed25ed70bb47a67117c59f9549a7",
+      "bytes": 4294
+    },
+    {
       "path": "tests/fixtures/workflow-security/unsafe.yml.txt",
       "sha256": "9e1c6130a396200387a0b9f1d445a33dbf154370db5460a3b50e086321bb737a",
       "bytes": 304
@@ -59357,8 +59372,8 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/source_reviews.py",
-      "sha256": "5ccae0e2b5f0e9c5b640727837705fae46121d20b8909780934daf9898a5191d",
-      "bytes": 84195
+      "sha256": "3ddd3590dd3d34cb9989f8fb50937187a6689c0554beae74e6ec5ba81ddb666b",
+      "bytes": 95271
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/sweep.js",

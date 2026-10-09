@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""Write one upstream-provenance source review per sweep survivor (network: gh api, and the public Hugging Face
-Hub API for a model repository; no model calls).
+"""Write one upstream-provenance source review per sweep survivor (network: gh api, anonymous Codeberg/Forgejo
+REST GETs, and the public Hugging Face Hub API for a model repository; no model calls).
 
   source_reviews.py --survivors OUT/survivors.json --out evidence/artifacts/<lane> --lane <lane>
                     [--fit-models "Claude Opus 5.5 and GPT-6-Astra"] [--skills-yaml <dir>] > OUT/reviews.json
@@ -73,6 +73,8 @@ import re
 import shutil
 import subprocess
 import sys
+import time
+import tomllib
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -88,6 +90,13 @@ except ImportError:  # the subset reader then decides, or says it cannot
 
 OWNER_REPO = re.compile(r"[a-z0-9-]+/[a-z0-9._-]+")
 HUB = "https://huggingface.co"
+CODEBERG = "https://codeberg.org"
+CODEBERG_API = f"{CODEBERG}/api/v1/"
+CODEBERG_OWNER_REPO = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]*/[A-Za-z0-9][A-Za-z0-9_.-]*")
+# Forgejo v16.0.5 templates/swagger/v1_json.tmpl; deployed Codeberg responses are checked in recorded fixtures.
+FORGEJO_SPEC = "https://code.forgejo.org/forgejo/forgejo/raw/tag/v16.0.5/templates/swagger/v1_json.tmpl"
+CODEBERG_LAST_REQUEST = None
+CODEBERG_MAX_BODY = 8 * 1024 * 1024
 HUB_MODEL = re.compile(r"https://huggingface\.co/([A-Za-z0-9][A-Za-z0-9_.-]*/[A-Za-z0-9][A-Za-z0-9_.-]*)/?")
 # First path segments that are Hub sections, never a model repository's namespace.
 HUB_SECTIONS = {"api", "blog", "buckets", "collections", "containers", "datasets", "docs", "models", "organizations",
@@ -182,6 +191,191 @@ class HubError(GhError):
     """The Hugging Face Hub could not answer (reported and skipped like a repository gh cannot read)."""
 
 
+class CodebergError(GhError):
+    """An anonymous Codeberg request failed; only explicit 404s may be optional evidence."""
+
+    def __init__(self, message, *, status=None):
+        super().__init__(message)
+        self.status = status
+
+
+def codeberg_url(url: str) -> str:
+    """Check the origin before any request or redirect, including explicit ports and userinfo."""
+    try:
+        parsed = urllib.parse.urlsplit(url)
+        valid = (parsed.scheme == "https" and parsed.hostname == "codeberg.org" and parsed.port in (None, 443)
+                 and parsed.username is None and parsed.password is None and not parsed.fragment)
+    except ValueError:
+        valid = False
+    if not valid:
+        raise CodebergError("only anonymous HTTPS requests to codeberg.org:443 are allowed")
+    return url
+
+
+def codeberg_wait():
+    """At most one request start per second, including redirected requests; no automatic retries."""
+    global CODEBERG_LAST_REQUEST
+    if CODEBERG_LAST_REQUEST is not None:
+        time.sleep(max(0, 1.0 - (time.monotonic() - CODEBERG_LAST_REQUEST)))
+    CODEBERG_LAST_REQUEST = time.monotonic()
+
+
+class CodebergRedirect(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        codeberg_url(newurl)
+        codeberg_wait()
+        return super().redirect_request(req, fp, code, msg, headers, newurl)
+
+
+def codeberg_get(path: str, *, response_headers=None):
+    """Anonymous Forgejo REST v1 JSON GET; preserve only pagination headers when requested."""
+    url = codeberg_url(path if "://" in path else CODEBERG_API + path.lstrip("/"))
+    if not urllib.parse.urlsplit(url).path.startswith("/api/v1/"):
+        raise CodebergError("Codeberg JSON requests must stay under /api/v1/")
+    request = urllib.request.Request(url, headers={"User-Agent": "native-agent-stack source_reviews.py",
+                                                  "Accept": "application/json"}, method="GET")
+    opener = urllib.request.build_opener(urllib.request.ProxyHandler({}), CodebergRedirect())
+    codeberg_wait()
+    try:
+        with opener.open(request, timeout=60) as response:
+            codeberg_url(response.geturl())
+            body = response.read(CODEBERG_MAX_BODY + 1)
+            if len(body) > CODEBERG_MAX_BODY:
+                raise CodebergError("Codeberg JSON response exceeds the 8 MiB evidence bound")
+            if response_headers is not None:
+                response_headers.update({key: response.headers.get(key, "") for key in ("Link", "x-total-count")})
+        return json.loads(body)
+    except urllib.error.HTTPError as error:
+        retry = error.headers.get("Retry-After") if error.headers else None
+        raise CodebergError(f"Codeberg GET returned HTTP {error.code}"
+                            + (f" (Retry-After: {retry})" if retry else ""), status=error.code) from None
+    except (urllib.error.URLError, http.client.HTTPException, OSError, ValueError) as error:
+        raise CodebergError(f"Codeberg GET failed: {type(error).__name__}") from None
+
+
+def codeberg_pages(path: str, *, limit=50, max_pages=20) -> list:
+    """Follow same-origin Link pagination; refuse a capped listing rather than silently truncate it."""
+    if not 1 <= limit <= 50 or max_pages < 1:
+        raise ValueError("Codeberg pagination requires limit 1..50 and a positive page bound")
+    url = CODEBERG_API + path.lstrip("/")
+    separator = "&" if "?" in url else "?"
+    current = f"{url}{separator}page=1&limit={limit}"
+    rows, seen = [], set()
+    for page in range(1, max_pages + 1):
+        if current in seen:
+            raise CodebergError("Codeberg pagination repeated a page")
+        seen.add(current)
+        headers = {}
+        items = codeberg_get(current, response_headers=headers)
+        if not isinstance(items, list) or any(not isinstance(item, dict) for item in items):
+            raise CodebergError("Codeberg collection is not a list of JSON objects")
+        rows.extend(items)
+        link, next_url = headers.get("Link", ""), None
+        for section in urllib.request.parse_http_list(link):
+            if re.search(r';\s*rel=(?:"[^"]*\bnext\b[^"]*"|next)(?:\s*;|\s*$)', section):
+                match = re.match(r"\s*<([^>]+)>", section)
+                if not match:
+                    raise CodebergError("Codeberg pagination has an invalid next link")
+                next_url = codeberg_url(urllib.parse.urljoin(current, match.group(1)))
+        if next_url:
+            current = next_url
+        elif link or len(items) < limit:
+            return rows
+        else:
+            current = f"{url}{separator}page={page + 1}&limit={limit}"
+    raise CodebergError("Codeberg pagination exceeds the evidence page bound")
+
+
+def codeberg_repo(repository: str) -> str | None:
+    parsed = urllib.parse.urlsplit(str(repository or "").strip())
+    if parsed.hostname != "codeberg.org":
+        return None
+    codeberg_url(parsed.geturl())
+    full = parsed.path.strip("/")
+    if parsed.query or not CODEBERG_OWNER_REPO.fullmatch(full):
+        raise CodebergError("Codeberg review requires an owner/repository URL")
+    return full
+
+
+def codeberg_content(full: str, path: str, commit: str) -> dict:
+    """Read a regular-file blob at the resolved commit, checking the API's blob identity."""
+    data = codeberg_get(f"repos/{full}/contents/{urllib.parse.quote(path, safe='/')}?ref={commit}")
+    if not isinstance(data, dict) or data.get("type") != "file" or data.get("encoding") != "base64":
+        raise CodebergError("Codeberg contents did not return a regular base64 file")
+    try:
+        raw = base64.b64decode(data["content"], validate=True)
+    except (KeyError, ValueError, TypeError):
+        raise CodebergError("Codeberg file content is not valid base64") from None
+    if data.get("path") != path or data.get("sha") != git_blob_id(raw):
+        raise CodebergError("Codeberg file content does not match the pinned path/blob")
+    return {**data, "text": raw.decode("utf-8", "replace"), "sha256": hashlib.sha256(raw).hexdigest()}
+
+
+def codeberg_release(data: dict) -> dict:
+    return {key: data.get(key) for key in ("tag_name", "name", "target_commitish", "created_at", "published_at")} | {
+        "assets": [{"name": item.get("name"), "url": item.get("browser_download_url"), "size": item.get("size")}
+                   for item in data.get("assets") or []]}
+
+
+def codeberg_review(full: str, layers: list, lane: str, fit_models: str) -> dict:
+    meta = codeberg_get(f"repos/{full}")
+    full, branch = meta["full_name"], meta["default_branch"]
+    if not CODEBERG_OWNER_REPO.fullmatch(full):
+        raise CodebergError("Codeberg reported an invalid repository identity")
+    head = codeberg_get(f"repos/{full}/branches/{urllib.parse.quote(branch, safe='')}")["commit"]
+    commit = head["id"]
+    if not isinstance(commit, str) or not HEX40.fullmatch(commit):
+        raise CodebergError("Codeberg reported no SHA-1 default-branch commit")
+    excerpts, readme_path, license_id, license_source = [], None, "NOASSERTION", None
+    try:
+        readme = codeberg_content(full, "README.md", commit)
+        readme_path = readme["path"]
+        excerpts = excerpts_from(readme["text"], f"{readme_path}@{commit}")
+    except CodebergError as error:
+        if error.status != 404:
+            raise
+    # Forgejo's Repository schema has no license field or repository-license route. Cargo's declared SPDX
+    # expression is source evidence, not an inferred classification of arbitrary LICENSE text.
+    try:
+        cargo = codeberg_content(full, "Cargo.toml", commit)
+        package = tomllib.loads(cargo["text"]).get("package", {})
+        declared = package.get("license")
+        if declared == {"workspace": True}:
+            declared = tomllib.loads(cargo["text"]).get("workspace", {}).get("package", {}).get("license")
+        if isinstance(declared, str) and declared.strip():
+            license_id = declared.strip()
+            license_source = {"path": "Cargo.toml", "sha256": cargo["sha256"], "commit": commit}
+    except CodebergError as error:
+        if error.status != 404:
+            raise
+    try:
+        latest = codeberg_get(f"repos/{full}/releases/latest")
+        if not isinstance(latest, dict):
+            raise CodebergError("Codeberg latest release is not a JSON object")
+        latest = codeberg_release(latest)
+    except CodebergError as error:
+        if error.status != 404:
+            raise
+        latest = None
+    releases = [codeberg_release(item) for item in codeberg_pages(f"repos/{full}/releases")]
+    tags = [{"name": item.get("name"), "commit": (item.get("commit") or {}).get("sha")}
+            for item in codeberg_pages(f"repos/{full}/tags")]
+    description = (meta.get("description") or "").strip()
+    return {"schema_version": 1, "id": f"source-review-codeberg-{review_name(full)}", "kind": "upstream_provenance",
+            "evidence_class": "source_review", "repository": f"{CODEBERG}/{full}", "reviewed_commit": commit,
+            "readme_path": readme_path, "license": license_id, "layers": sorted(set(layers)),
+            "claim": (f"Source and documentation review of {full} at commit {commit} (license {license_id}), read from "
+                      f"{readme_path or 'the repository metadata'} at that commit"
+                      + (f". Repository description: \"{description}\"." if description else ".")
+                      + f" Survived the {lane} facts refuter and both fit refuters ({fit_models}); "
+                        "no native install, run or comparison with a winner."),
+            "observed": {"stars": meta.get("stars_count"), "pushed_at": None, "updated_at": meta.get("updated_at"),
+                         "head_committed_at": head.get("timestamp"), "archived": meta.get("archived"),
+                         "default_branch": branch, "license_source": license_source, "latest_release": latest,
+                         "releases": releases, "tags": tags, "api_spec": FORGEJO_SPEC},
+            "documentation_excerpts": excerpts}
+
+
 def gh(path: str) -> dict:
     done = subprocess.run(["gh", "api", path], capture_output=True, text=True, check=False)
     if done.returncode != 0:
@@ -212,10 +406,17 @@ def hub_model(repository: str) -> str | None:
 
 def repository_key(repository: str) -> str:
     """One key per repository: the lowercased owner/repo for GitHub (sweep_common.slug) and hf:<namespace>/<name>
-    for a Hugging Face model, so the same model with and without a trailing slash gets one review. A skill ref
+    for a Hugging Face model, or codeberg:<owner>/<repo>, so repository URLs with and without a trailing slash get
+    one review. A skill ref
     (owner/repo@name) is its own lowercased key: slug leaves it whole."""
     repo_id = hub_model(repository)
-    return f"hf:{repo_id.lower()}" if repo_id else slug(repository)
+    try:
+        forgejo = codeberg_repo(repository)
+    except (CodebergError, ValueError):
+        # Identity grouping must not abort the batch. review() reports unsafe URLs per repository,
+        # so valid survivors still get their source reviews even beside a malformed Codeberg URL.
+        forgejo = None
+    return f"hf:{repo_id.lower()}" if repo_id else f"codeberg:{forgejo.lower()}" if forgejo else slug(repository)
 
 
 def excerpts_from(text: str, source: str) -> list:
@@ -1240,6 +1441,9 @@ def pinned_skill_review(meta: dict, name: str, pin: str, layers: list, lane: str
 
 
 def review(repository: str, layers: list, lane: str, fit_models: str, pin=None, expected_sha256=()) -> dict:
+    forgejo = codeberg_repo(repository)
+    if forgejo:
+        return codeberg_review(forgejo, layers, lane, fit_models)
     repo_id = hub_model(repository)
     if repo_id:
         return hub_review(repo_id, layers, lane, fit_models)
@@ -1248,7 +1452,7 @@ def review(repository: str, layers: list, lane: str, fit_models: str, pin=None, 
         return skill_review(skill.group(1), skill.group(2), layers, lane, fit_models, pin, expected_sha256)
     owner_repo = slug(repository)
     if not OWNER_REPO.fullmatch(owner_repo):
-        raise GhError(f"{repository} is neither a GitHub repository nor a Hugging Face model repository URL")
+        raise GhError(f"{repository} is not a GitHub, Codeberg or Hugging Face model repository URL")
     meta = gh(f"repos/{owner_repo}")
     full, branch = meta["full_name"], meta["default_branch"]
     commit = gh(f"repos/{full}/commits/{branch}")["sha"]

@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "origin": "synthetic_protocol_cases",
+  "description": "Static protocol boundaries for offline replay. These statuses, redirect targets and errors were not captured from Codeberg and do not describe observed vendor behavior.",
+  "references": {
+    "forgejo": {
+      "repository": "https://code.forgejo.org/forgejo/forgejo",
+      "pin": "v16.0.5",
+      "file": "templates/swagger/v1_json.tmpl",
+      "url": "https://code.forgejo.org/forgejo/forgejo/raw/tag/v16.0.5/templates/swagger/v1_json.tmpl",
+      "routes": [
+        "/repos/{owner}/{repo}",
+        "/repos/{owner}/{repo}/branches/{branch}",
+        "/repos/{owner}/{repo}/contents/{filepath}",
+        "/repos/{owner}/{repo}/releases/latest",
+        "/repos/{owner}/{repo}/releases",
+        "/repos/{owner}/{repo}/tags"
+      ]
+    },
+    "http_status_and_redirects": "https://www.rfc-editor.org/rfc/rfc9110.html#section-15",
+    "rate_limit": "https://www.rfc-editor.org/rfc/rfc6585.html#section-4",
+    "retry_after": "https://www.rfc-editor.org/rfc/rfc9110.html#section-10.2.3",
+    "link_pagination": "https://www.rfc-editor.org/rfc/rfc8288.html#section-3",
+    "cargo_license": "https://doc.rust-lang.org/cargo/reference/manifest.html#the-license-and-license-file-fields",
+    "cargo_workspace_inheritance": "https://doc.rust-lang.org/cargo/reference/workspaces.html#the-package-table"
+  },
+  "http_cases": [
+    {"origin": "synthetic_protocol_case", "id": "unauthorized", "status": 401, "headers": {}, "body": {"message": "Synthetic unauthorized"}},
+    {"origin": "synthetic_protocol_case", "id": "forbidden", "status": 403, "headers": {}, "body": {"message": "Synthetic forbidden"}},
+    {"origin": "synthetic_protocol_case", "id": "not_found", "status": 404, "headers": {}, "body": {"message": "Synthetic not found"}},
+    {"origin": "synthetic_protocol_case", "id": "rate_limited", "status": 429, "headers": {"Retry-After": "30"}, "body": {"message": "Synthetic rate limit"}},
+    {"origin": "synthetic_protocol_case", "id": "server_error", "status": 500, "headers": {}, "body": {"message": "Synthetic server error"}},
+    {"origin": "synthetic_protocol_case", "id": "unavailable", "status": 503, "headers": {}, "body": {"message": "Synthetic unavailable"}}
+  ],
+  "pagination_cases": {
+    "origin": "synthetic_protocol_case",
+    "path": "repos/synthetic/protocol/tags",
+    "first": [{"name": "synthetic-one"}, {"name": "synthetic-two"}],
+    "second": [{"name": "synthetic-three"}, {"name": "synthetic-four"}],
+    "short_final": [{"name": "synthetic-three"}],
+    "wrong_shapes": [{"message": "Synthetic wrong collection shape"}, ["synthetic non-object"], null]
+  },
+  "cargo_license_cases": [
+    {
+      "origin": "synthetic_protocol_case",
+      "id": "workspace_inheritance",
+      "text": "[package]\nname = 'synthetic'\nlicense.workspace = true\n[workspace.package]\nlicense = 'MIT OR Apache-2.0'\n",
+      "expected": "MIT OR Apache-2.0"
+    },
+    {
+      "origin": "synthetic_protocol_case",
+      "id": "undeclared",
+      "text": "[package]\nname = 'synthetic'\n",
+      "expected": "NOASSERTION"
+    },
+    {
+      "origin": "synthetic_protocol_case",
+      "id": "malformed_toml",
+      "text": "[package\nlicense = 'synthetic malformed TOML'\n",
+      "fatal": true
+    }
+  ],
+  "redirect_cases": {
+    "origin": "synthetic_protocol_case",
+    "statuses": [301, 302, 303, 307, 308],
+    "blocked_targets": [
+      "https://collector.invalid/api/v1/repos/synthetic/protocol",
+      "http://codeberg.org/api/v1/repos/synthetic/protocol",
+      "https://codeberg.org.collector.invalid/api/v1/repos/synthetic/protocol",
+      "https://codeberg.org@collector.invalid/api/v1/repos/synthetic/protocol",
+      "https://user:password@codeberg.org/api/v1/repos/synthetic/protocol",
+      "https://codeberg.org:8443/api/v1/repos/synthetic/protocol",
+      "https://codeberg.org:invalid/api/v1/repos/synthetic/protocol",
+      "https://codeberg.org/api/v1/repos/synthetic/protocol#fragment",
+      "ftp://codeberg.org/api/v1/repos/synthetic/protocol"
+    ],
+    "allowed_targets": [
+      "https://codeberg.org/api/v1/repos/synthetic/redirect-target",
+      "https://codeberg.org:443/api/v1/repos/synthetic/redirect-target",
+      "/api/v1/repos/synthetic/redirect-target"
+    ]
+  }
+}
