@@ -257,20 +257,10 @@ metadata scope; none is a final-lock rerun.
 
 | Component | Delivered pin | Primary source |
 | --- | --- | --- |
-| CPython / uv | 3.12.3 / 0.12.17 | [Adapter's tested Python line](https://github.com/seathatflowsinourveins/native-agent-stack/blob/dca821cca85dce3647fa7b488d5a23fbe5b85d4a/blueprints/us-equities/adaptive-paper/requirements.txt), [retained rc5 runtime](../../../evidence/receipts/native-nautilus-v2-20260920.json), [uv Python installation](https://github.com/astral-sh/uv/blob/0.12.17/docs/guides/install-python.md) and [locked sync](https://github.com/astral-sh/uv/blob/0.12.17/docs/concepts/projects/sync.md) |
+| CPython / uv | 3.12.3 / 0.12.17 | [Adapter's tested Python line](https://github.com/seathatflowsinourveins/native-agent-stack/blob/dfeea13377cfb15936f856d9ed8df3c6575a7895/blueprints/us-equities/adaptive-paper/requirements.txt), [retained rc5 runtime](../../../evidence/receipts/native-nautilus-v2-20260920.json), [uv Python installation](https://github.com/astral-sh/uv/blob/0.12.17/docs/guides/install-python.md) and [locked sync](https://github.com/astral-sh/uv/blob/0.12.17/docs/concepts/projects/sync.md) |
 | NautilusTrader / IBKR adapter | 2.0.0rc5; source `1b0a49d2792a9432a3aca3fcb617ce7a630d905e`; in-tree Rust ibapi 3.3.0 | [Installation](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/docs/getting_started/installation.md), [IBKR integration](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/docs/integrations/interactive_brokers.md) |
 | alpaca-py | 0.44.0 | [README at cc4cb3b7](https://github.com/alpacahq/alpaca-py/blob/cc4cb3b7ba50ae250e621983c2779047fb16bb28/README.md) |
-| Separate Alpaca adapter | `dfeea13377cfb15936f856d9ed8df3c6575a7895` | [Landed dry-run-only native adapter source](https://github.com/seathatflowsinourveins/native-agent-stack/blob/dfeea13377cfb15936f856d9ed8df3c6575a7895/blueprints/us-equities/adaptive-paper/native_adapter.py) |
-
-The installer and acceptance bind this landed source commit and adapter SHA256
-`50c9cff32944b45abb4c4aff20d2235688f5240c52e892a623aa6e19ecd9b037`.
-The landed adapter, source-map and seam-test bytes match the reviewed #939 head.
-This recipe source-pin update does not assert that an existing host checkout has
-moved. Native compatibility is checked offline with the installed rc5 runtime;
-broker order acceptance remains NOT_RUN, and builtin strategies are restricted
-to upstream `dry_run=True` configs. Protected N2 source/bundle pins and historical
-runtime receipts are unchanged. A runtime owner must preserve that closure and
-own the maintenance slot before applying the full installer to a shared checkout.
+| adaptive-paper staged source / separate Alpaca adapter | `dfeea13377cfb15936f856d9ed8df3c6575a7895` | [Selected source tree](https://github.com/seathatflowsinourveins/native-agent-stack/tree/dfeea13377cfb15936f856d9ed8df3c6575a7895/blueprints/us-equities/adaptive-paper), [landed dry-run-only native adapter](https://github.com/seathatflowsinourveins/native-agent-stack/blob/dfeea13377cfb15936f856d9ed8df3c6575a7895/blueprints/us-equities/adaptive-paper/native_adapter.py) |
 | EdgarTools | 5.61.1 | [Version-specific PyPI metadata](https://pypi.org/pypi/edgartools/5.61.1/json); [imported native installation/verification scopes](../../../evidence/receipts/runtime-final-lock-binding-20261008.json). The older SEC index receipt remains at 5.60.0. |
 | exchange_calendars | 4.13.2 | [README at dbe38b1f](https://github.com/gerrymanoim/exchange_calendars/blob/dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a/README.md) |
 | DuckDB | 1.5.5 | [Python README at b236c819](https://github.com/duckdb/duckdb-python/blob/b236c8194ed14c7a7c685e0534dde501cc855b3a/README.md) |
@@ -283,6 +273,42 @@ own the maintenance slot before applying the full installer to a shared checkout
 | arch | 8.0.0 | [README at 038d78b7](https://github.com/bashtage/arch/blob/038d78b709e75f2590890757af32705817a6fad8/README.md) |
 | purgedcv (eslazarev) | 0.1.10 | [README at aee1215c](https://github.com/eslazarev/purged-cross-validation/blob/aee1215c58d65a60a1d6af4b483f929fecde76e2/README.md) |
 | NumPy / pandas | 2.5.3 / 3.0.6 | [Unchanged rc5 quickstart](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/docs/getting_started/quickstart.py) and [retained rc5 runtime](../../../evidence/receipts/native-nautilus-v2-20260920.json) |
+
+The adaptive-paper source selection advances from
+`dca821cca85dce3647fa7b488d5a23fbe5b85d4a` to
+`dfeea13377cfb15936f856d9ed8df3c6575a7895`. The full Git delta under
+`blueprints/us-equities/adaptive-paper` is **102 paths: 81 added and 21 modified**.
+It includes runner, recovery, safety, native_strategy, sessions and transport
+changes, plus the added `exchange-calendars==4.13.2` requirement. This scope
+extends beyond #939's adapter, source-map and seam-test bytes.
+
+At the selected commit, the installer's sparse patterns stage **35 top-level
+files**: all **26 `*.py` modules**, seven `README*.md` files, `requirements.txt`
+and `source-hashes.json`. Within that selected subset, **18 paths are modified**
+(11 Python modules, five READMEs, requirements and the source map), with no added
+paths. The other 84 paths in the full delta are outside the sparse selection.
+The Git-blob audit finds matching source-map entries for all 26 selected Python
+modules. Prospective acceptance checks every staged `*.py` against that staged
+map, refuses missing keys or changed content, and retains the pinned HEAD,
+clean checkout and separate native-adapter SHA256 checks. The latter digest is
+`50c9cff32944b45abb4c4aff20d2235688f5240c52e892a623aa6e19ecd9b037`.
+This follows the existing
+[repository source-hash oracle](../../../tests/test_adaptive_paper_source_hashes_manifest.py).
+
+On 2026-10-09, the paper lane owner acknowledges responsibility for selecting
+the full staged source set described above, including the requirements change,
+with the protected N2 closure held at its existing source and bundle pins.
+This records source-selection responsibility; independent trading acknowledgment
+and native qualification remain separate requirements.
+
+This recipe update records source selection. An existing host checkout must
+still be observed separately. Offline rc5 fixture receipts cover the tested
+landed modules and source integrity; they do not exercise this full installer
+or its complete host acceptance shell. Broker order acceptance remains NOT_RUN;
+builtin strategies retain upstream `dry_run=True` configs. Historical runtime
+receipts retain their dated scope. Applying the full installer to a shared
+checkout belongs in the runtime owner's maintenance slot, with the protected
+N2 closure preserved.
 
 Package installation follows their PyPI requirements through uv's documented
 project workflow. The rc5 wheel declares no runtime dependencies, so NumPy and

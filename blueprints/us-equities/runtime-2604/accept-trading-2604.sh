@@ -158,15 +158,25 @@ check ibkr_adapter "$python" -I -c \
 
 # The separate adapter is staged source, not an official Nautilus Alpaca plugin.
 # https://github.com/seathatflowsinourveins/native-agent-stack/blob/dfeea13377cfb15936f856d9ed8df3c6575a7895/blueprints/us-equities/adaptive-paper/native_adapter.py
-check alpaca_adapter_source "$python" -I - "$adapter_commit" <<'PY'
+check alpaca_adapter_source "$python" -I - "$adapter_commit" "50c9cff32944b45abb4c4aff20d2235688f5240c52e892a623aa6e19ecd9b037" <<'PY'
 import hashlib
+import json
 from pathlib import Path
 import subprocess
 import sys
 assert subprocess.check_output(["/usr/bin/git", "-C", "/source", "rev-parse", "HEAD"], text=True).strip() == sys.argv[1]
 assert not subprocess.check_output(["/usr/bin/git", "-C", "/source", "status", "--porcelain"], text=True).strip(), "Adapter source has local changes"
-path = Path("/source/blueprints/us-equities/adaptive-paper/native_adapter.py")
-assert hashlib.sha256(path.read_bytes()).hexdigest() == "50c9cff32944b45abb4c4aff20d2235688f5240c52e892a623aa6e19ecd9b037"
+source = Path("/source")
+directory = source / "blueprints/us-equities/adaptive-paper"
+hashes = json.loads((directory / "source-hashes.json").read_text(encoding="utf-8"))
+paths = sorted(directory.glob("*.py"))
+for path in paths:
+    key = path.relative_to(source).as_posix()
+    assert key in hashes, f"Staged Python source is not registered: {key}"
+    assert hashlib.sha256(path.read_bytes()).hexdigest() == hashes[key], f"Staged Python source hash differs: {key}"
+path = directory / "native_adapter.py"
+assert hashlib.sha256(path.read_bytes()).hexdigest() == sys.argv[2], "Native adapter source hash differs from the selected pin"
+print(f"Verified {len(paths)} staged Python source hashes")
 PY
 if ((last_exit == 0)); then
     check alpaca_adapter_import "$python" -I -c \

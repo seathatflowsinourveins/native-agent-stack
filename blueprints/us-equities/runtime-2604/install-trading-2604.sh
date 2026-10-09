@@ -75,7 +75,7 @@ status_fd=3
 
 readonly project="$HOME/projects/us-equities-runtime"
 # Both the pinned adapter requirements and accepted rc5 receipt use Python 3.12.
-# https://github.com/seathatflowsinourveins/native-agent-stack/blob/dca821cca85dce3647fa7b488d5a23fbe5b85d4a/blueprints/us-equities/adaptive-paper/requirements.txt
+# https://github.com/seathatflowsinourveins/native-agent-stack/blob/dfeea13377cfb15936f856d9ed8df3c6575a7895/blueprints/us-equities/adaptive-paper/requirements.txt
 # https://github.com/seathatflowsinourveins/native-agent-stack/blob/d323b53437e025be3d054b9b5e4d292fe396c75e/evidence/receipts/native-nautilus-v2-20260920.json
 readonly owner='native-stack-trading-2604-v1'
 readonly completion='native-stack-trading-2604-no-dvc-r4'
