@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "captured_utc": "2026-10-09T03:27:22Z",
+  "registry_root": "$HOME/.local/state/native-agent-stack/coordination/ns2604-coop/lanes",
+  "registry_scope": "hcom-lanes.json and all 90 named timestamped backups; threads.json and named backups for historical join",
+  "extraction": "Only name/previous_name/parked_name/last_parked_name, launch timestamp and source hashes retained. Voni joins a thread-registry entry to supported hcom stopped metadata; thread identifier is hashed. Every observed alias for these three lanes is retained, including post-window revi.",
+  "limit": "Launch UTC is registry-reported, not event-level attribution. Bucket sums cannot deduplicate identities across aliases because source captures omit session IDs. Names absent in a snapshot stay unmeasured.",
+  "hcom_join_command": "hcom list --stopped memory-h2h-voni --json --name revi",
+  "roles": {
+    "memory-h2h": [
+      {
+        "alias": "revi",
+        "name": "memory-h2h-revi",
+        "launch_utc": "2026-10-09T03:14:10Z",
+        "field": "name",
+        "source": "hcom-lanes.json",
+        "source_sha256": "7094935b8fe668a3004c774941679b1867c3ecc3f8f362f3099221f84f6e45bf"
+      },
+      {
+        "alias": "rumi",
+        "name": "memory-h2h-rumi",
+        "launch_utc": "2026-10-08T23:24:36Z",
+        "field": "name",
+        "source": "hcom-lanes.json.pre-park-2026-10-08T234644Z",
+        "source_sha256": "87a993eca68e95c60aed0c273fcd958c89b9e7edf8905feae9d5e07f0d22a311"
+      },
+      {
+        "alias": "voni",
+        "name": "memory-h2h-voni",
+        "launch_utc": null,
+        "field": "memory-h2h thread joined to stopped hcom tag/name",
+        "source": "threads.json.pre-crit-stop-2026-10-08T160609Z",
+        "source_sha256": "75d7a1a8f90a8222762ceff644761e1fdbebb6b4b4f236b10b63308d578e9e78",
+        "thread_sha256": "fcfeecfec8b17308c8295760a02387ad7ed0a716941e47d67aa6bdca932d69b7",
+        "stopped_utc": "2026-10-08T20:12:38.063071+00:00",
+        "hcom_metadata_sha256": "5d985df0475afa7b315ffdcfe0955de3c2a28ffb8fa6d0c01a46d007c0f54568"
+      },
+      {
+        "alias": "zimu",
+        "name": "memory-h2h-zimu",
+        "launch_utc": "2026-10-08T20:23:06Z",
+        "field": "name",
+        "source": "hcom-lanes.json.pre-memory-h2h-835-20261008T232405Z",
+        "source_sha256": "efe149214b0ec0395bd04517b3e6f501778d84b23a4a6664d2ff81ec4b0fa3c3"
+      }
+    ],
+    "codex-token-parity": [
+      {
+        "alias": "dove",
+        "name": "codex-token-parity-dove",
+        "launch_utc": "2026-10-08T22:01:44Z",
+        "field": "name",
+        "source": "hcom-lanes.json.pre-memory-h2h-835-20261008T232405Z",
+        "source_sha256": "efe149214b0ec0395bd04517b3e6f501778d84b23a4a6664d2ff81ec4b0fa3c3"
+      },
+      {
+        "alias": "novu",
+        "name": "codex-token-parity-novu",
+        "launch_utc": "2026-10-08T20:21:12Z",
+        "field": "name",
+        "source": "hcom-lanes.json.pre-park-2026-10-08T210752Z",
+        "source_sha256": "39b10d5470f09a3486f2cd25974eda48cc23bd5bf6438566d9210cd476b9bf72"
+      },
+      {
+        "alias": "zonu",
+        "name": "codex-token-parity-zonu",
+        "launch_utc": "2026-10-09T00:14:43Z",
+        "field": "name",
+        "source": "hcom-lanes.json",
+        "source_sha256": "7094935b8fe668a3004c774941679b1867c3ecc3f8f362f3099221f84f6e45bf"
+      }
+    ],
+    "overlap-token": [
+      {
+        "alias": "lise",
+        "name": "overlap-token-lise",
+        "launch_utc": "2026-10-08T23:02:27Z",
+        "field": "name",
+        "source": "hcom-lanes.json",
+        "source_sha256": "7094935b8fe668a3004c774941679b1867c3ecc3f8f362f3099221f84f6e45bf"
+      },
+      {
+        "alias": "luva",
+        "name": "overlap-token-luva",
+        "launch_utc": "2026-10-08T21:08:59Z",
+        "field": "name",
+        "source": "hcom-lanes.json.pre-park-2026-10-08T211452Z",
+        "source_sha256": "ed60f65ce713881ee813521bc8a161e0c324af66b8a549b95dd3208a6b1adbd4"
+      },
+      {
+        "alias": "vuru",
+        "name": "overlap-token-vuru",
+        "launch_utc": "2026-10-08T20:23:06Z",
+        "field": "name",
+        "source": "hcom-lanes.json.pre-park-2026-10-08T210752Z",
+        "source_sha256": "39b10d5470f09a3486f2cd25974eda48cc23bd5bf6438566d9210cd476b9bf72"
+      }
+    ]
+  }
+}

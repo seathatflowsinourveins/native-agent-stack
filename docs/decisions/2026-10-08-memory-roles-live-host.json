@@ -14,6 +14,13 @@
     "service_changes": 0
   },
   "adoption_evidence": {
+    "identity_registry": {
+      "source_file": "docs/decisions/memory-adoption-835/registry-role-identities.json",
+      "sha256": "03abf51ca7477c6b40c03e5f60a64177730fc838495b9bc174062555fc7f8cf6",
+      "scope": "all observed aliases from canonical hcom registry and timestamped backups for the three owning lanes; older voni thread-registry join is source-pinned",
+      "all_observed_aliases_bound": true,
+      "aggregation_policy": "Every alias remains separately bound to exact source buckets. Sum of identities across aliases is not a deduplicated distinct-lane/session count."
+    },
     "snapshots": {
       "baseline": {
         "source_file": "docs/decisions/memory-adoption-835/adoption-now-5de97cf238b3d28a.json",
@@ -46,11 +53,11 @@
     ],
     "per_decision_bindings": {
       "claude_native_memory": {
-        "disposition": "KEEP",
-        "decision_status": "source-backed proposal; counters inform and do not gate readiness",
+        "disposition": "KEEP proposed",
+        "decision_status": "PROPOSED_SELECTION — PENDING until G5; accepted KEEP requires organic evidence in stage 3 or 4",
         "job": "durable rules/preferences",
         "owning_lane_or_role": "native Claude feature; no named native-memory counter",
-        "binding_basis": "Named launch/dispatch identities: memory-h2h rumi, historical memory-h2h voni, context codex-token-parity dove, code-intelligence overlap-token lise. Snapshot keys alone do not encode durable ownership. Claude named consumers stay consumers; unattributed buckets stay unattributed.",
+        "binding_basis": "Every observed Codex identity for the owning lane and named memory consumer is bound through a pinned SHA256 registry excerpt. Claude architecture is a named consumer; other Claude sessions is context only. Registry launch timestamps and bucket sums do not supply event-level/cross-alias identity deduplication.",
         "snapshot_sources": [
           "baseline",
           "reconciled"
@@ -59,9 +66,9 @@
           {
             "client": "claude",
             "snapshot_bucket": "wsl-architecture-design",
-            "role_relation": "named native consumer; native-memory use not measured",
+            "role_relation": "named consumer; owning-Claude-lane binding OUTSTANDING",
             "scope_pointer": "/claude_by_role/wsl-architecture-design",
-            "server_namespace": null,
+            "server_namespace": "native-Claude-auto-memory (outside MCP metric)",
             "identity_kind": "sessions",
             "denominator_kind": "all sessions in this exact snapshot bucket",
             "snapshots": {
@@ -69,18 +76,41 @@
                 "calls": null,
                 "identities": null,
                 "denominator": 1,
-                "measurement": "UNMEASURED; no eligible native-memory MCP counter"
+                "measurement": "UNMEASURED — namespace absent in this exact bucket"
               },
               "reconciled": {
                 "calls": null,
                 "identities": null,
                 "denominator": 1,
-                "measurement": "UNMEASURED; no eligible native-memory MCP counter"
+                "measurement": "UNMEASURED — namespace absent in this exact bucket"
+              }
+            }
+          },
+          {
+            "client": "claude",
+            "snapshot_bucket": "other Claude sessions",
+            "role_relation": "unattributed context only; never owning-role evidence",
+            "scope_pointer": "/claude_by_role/other Claude sessions",
+            "server_namespace": "native-Claude-auto-memory (outside MCP metric)",
+            "identity_kind": "sessions",
+            "denominator_kind": "all sessions in this exact snapshot bucket",
+            "snapshots": {
+              "baseline": {
+                "calls": null,
+                "identities": null,
+                "denominator": 55,
+                "measurement": "UNMEASURED — namespace absent in this exact bucket"
+              },
+              "reconciled": {
+                "calls": null,
+                "identities": null,
+                "denominator": 66,
+                "measurement": "UNMEASURED — namespace absent in this exact bucket"
               }
             }
           }
         ],
-        "organic_use": "UNRESOLVED in these counters; no native task outcome classifier attached",
+        "organic_use": "UNRESOLVED — stage 3 and 4 organic-use observations are OUTSTANDING; MCP counters and bucket sums do not classify task outcomes",
         "evidence_limit": "Organic use unresolved: no native-session load/read/use observation is attached. Native file freshness is historical inventory, not substitute use evidence.",
         "g5_binding": {
           "component_identity": "https://github.com/anthropics/claude-code",
@@ -95,14 +125,21 @@
           "catalog_owner": "g5-stars-gap (G5 #878 catalog owner)",
           "resolution_dependency": "Catalog owner must publish the matching component row; bind the published commit/pointer and identity before resolving.",
           "evidence_limit": "No matching row in this exact 118-row draft; no global absence or measured-zero claim."
-        }
+        },
+        "registry_reference": {
+          "source_file": "docs/decisions/memory-adoption-835/registry-role-identities.json",
+          "sha256": "03abf51ca7477c6b40c03e5f60a64177730fc838495b9bc174062555fc7f8cf6",
+          "role_pointer": null
+        },
+        "lane_aggregates": {},
+        "accepted_keep": false
       },
       "ai_memory": {
         "disposition": "WIRE",
-        "decision_status": "source-backed proposal; counters inform and do not gate readiness",
+        "decision_status": "source-backed proposed selection; PENDING until G5; unexecuted routing and checks remain OUTSTANDING",
         "job": "cross-session project memory",
         "owning_lane_or_role": "memory-h2h",
-        "binding_basis": "Named launch/dispatch identities: memory-h2h rumi, historical memory-h2h voni, context codex-token-parity dove, code-intelligence overlap-token lise. Snapshot keys alone do not encode durable ownership. Claude named consumers stay consumers; unattributed buckets stay unattributed.",
+        "binding_basis": "Every observed Codex identity for the owning lane and named memory consumer is bound through a pinned SHA256 registry excerpt. Claude architecture is a named consumer; other Claude sessions is context only. Registry launch timestamps and bucket sums do not supply event-level/cross-alias identity deduplication.",
         "snapshot_sources": [
           "baseline",
           "reconciled"
@@ -110,8 +147,33 @@
         "role_evidence": [
           {
             "client": "codex",
+            "snapshot_bucket": "revi",
+            "role_relation": "owning-lane current or historical identity",
+            "scope_pointer": "/codex_by_lane/revi",
+            "server_namespace": "ai-memory",
+            "identity_kind": "conversations",
+            "denominator_kind": "all conversations in this exact snapshot bucket",
+            "snapshots": {
+              "baseline": {
+                "calls": null,
+                "identities": null,
+                "denominator": null,
+                "measurement": "UNMEASURED — identity absent from this exact snapshot"
+              },
+              "reconciled": {
+                "calls": null,
+                "identities": null,
+                "denominator": null,
+                "measurement": "UNMEASURED — identity absent from this exact snapshot"
+              }
+            },
+            "lane_id": "memory-h2h",
+            "identity_registry_pointer": "/roles/memory-h2h/0"
+          },
+          {
+            "client": "codex",
             "snapshot_bucket": "rumi",
-            "role_relation": "current owning-lane identity",
+            "role_relation": "owning-lane current or historical identity",
             "scope_pointer": "/codex_by_lane/rumi",
             "server_namespace": "ai-memory",
             "identity_kind": "conversations",
@@ -129,12 +191,14 @@
                 "denominator": 2,
                 "measurement": "reported MCP counter"
               }
-            }
+            },
+            "lane_id": "memory-h2h",
+            "identity_registry_pointer": "/roles/memory-h2h/1"
           },
           {
             "client": "codex",
             "snapshot_bucket": "voni",
-            "role_relation": "separate historical owning-lane identity",
+            "role_relation": "owning-lane current or historical identity",
             "scope_pointer": "/codex_by_lane/voni",
             "server_namespace": "ai-memory",
             "identity_kind": "conversations",
@@ -152,12 +216,39 @@
                 "denominator": 4,
                 "measurement": "reported MCP counter"
               }
-            }
+            },
+            "lane_id": "memory-h2h",
+            "identity_registry_pointer": "/roles/memory-h2h/2"
+          },
+          {
+            "client": "codex",
+            "snapshot_bucket": "zimu",
+            "role_relation": "owning-lane current or historical identity",
+            "scope_pointer": "/codex_by_lane/zimu",
+            "server_namespace": "ai-memory",
+            "identity_kind": "conversations",
+            "denominator_kind": "all conversations in this exact snapshot bucket",
+            "snapshots": {
+              "baseline": {
+                "calls": null,
+                "identities": null,
+                "denominator": 2,
+                "measurement": "UNMEASURED — namespace absent in this exact bucket"
+              },
+              "reconciled": {
+                "calls": null,
+                "identities": null,
+                "denominator": 2,
+                "measurement": "UNMEASURED — namespace absent in this exact bucket"
+              }
+            },
+            "lane_id": "memory-h2h",
+            "identity_registry_pointer": "/roles/memory-h2h/3"
           },
           {
             "client": "claude",
             "snapshot_bucket": "wsl-architecture-design",
-            "role_relation": "named consumer; Claude memory-h2h owner attribution unresolved",
+            "role_relation": "named consumer; owning-Claude-lane binding OUTSTANDING",
             "scope_pointer": "/claude_by_role/wsl-architecture-design",
             "server_namespace": "ai-memory",
             "identity_kind": "sessions",
@@ -176,9 +267,32 @@
                 "measurement": "reported MCP counter"
               }
             }
+          },
+          {
+            "client": "claude",
+            "snapshot_bucket": "other Claude sessions",
+            "role_relation": "unattributed context only; never owning-role evidence",
+            "scope_pointer": "/claude_by_role/other Claude sessions",
+            "server_namespace": "ai-memory",
+            "identity_kind": "sessions",
+            "denominator_kind": "all sessions in this exact snapshot bucket",
+            "snapshots": {
+              "baseline": {
+                "calls": 7,
+                "identities": 5,
+                "denominator": 55,
+                "measurement": "reported MCP counter"
+              },
+              "reconciled": {
+                "calls": 7,
+                "identities": 5,
+                "denominator": 66,
+                "measurement": "reported MCP counter"
+              }
+            }
           }
         ],
-        "organic_use": "UNRESOLVED in these counters; no native task outcome classifier attached",
+        "organic_use": "UNRESOLVED — stage 3 and 4 organic-use observations are OUTSTANDING; MCP counters and bucket sums do not classify task outcomes",
         "evidence_limit": "Native MCP result events are not useful outcomes; these snapshots do not separate all probes from organic work. A named Claude consumer is not proof of an owning lane. The other Claude sessions bucket is unattributed.",
         "g5_binding": {
           "component_identity": "https://github.com/akitaonrails/ai-memory",
@@ -195,20 +309,66 @@
           "evidence_limit": "SOURCE-REVIEW/WATCH; draft pointer is not adoption or current-host acceptance."
         },
         "wiring": {
-          "vendor_command": "ai-memory --data-dir %h/.local/share/ai-memory --config %h/.config/ai-memory/config.toml install-skills --scope global --agent both",
+          "client_supported_commands": {"claude_preview":"ai-memory --data-dir \"$HOME/.local/share/ai-memory\" --config \"$HOME/.config/ai-memory/config.toml\" install-instructions --target CLAUDE.md --compact --skills-agent claude-code --print","codex_preview":"ai-memory --data-dir \"$HOME/.local/share/ai-memory\" --config \"$HOME/.config/ai-memory/config.toml\" install-instructions --target AGENTS.md --compact --skills-agent agents --print","application":"Remove --print only from the CC-reviewed target/scope commands. Vendor install-instructions writes matched skills; do not add duplicate managed skills. Existing global install-skills command remains a separate reviewed option, no scope silently selected.","status":"OUTSTANDING","applied":false},
+          "vendor_command": "ai-memory --data-dir \"$HOME/.local/share/ai-memory\" --config \"$HOME/.config/ai-memory/config.toml\" install-skills --scope global --agent both",
           "instruction_route": "ai-memory install-instructions, only the vendor managed block with reviewed client/project scope",
           "version": "2.6.0",
           "source_commit": "89bd8ded3c1ab8b769cf99417d038ed0364403c8",
           "host_observation": "No ai-memory managed skill directories found in the named Claude and cross-agent roots; installation is not claimed.",
-          "applied": false
-        }
+          "applied": false,
+          "packet": {
+            "source_file": "docs/decisions/memory-adoption-835/wire-inverses-smokes.md",
+            "sha256": "31ab5d5c5d8986df30bd367c5428423f2b18c1cad98fc39d5de78e33bb30e5bd"
+          },
+          "inverse": "Preview ai-memory uninstall --only skills and --only instructions; apply only the reviewed transaction inverse with --apply, preserving pre-existing managed routes via captured preimages. Packet AM-02 records the transaction scope.",
+          "smoke": "AM-03: ai-memory --version / install-skills --print and fresh client supported recall route verification; OUTSTANDING, no returned result.",
+          "status": "OUTSTANDING"
+        },
+        "registry_reference": {
+          "source_file": "docs/decisions/memory-adoption-835/registry-role-identities.json",
+          "sha256": "03abf51ca7477c6b40c03e5f60a64177730fc838495b9bc174062555fc7f8cf6",
+          "role_pointer": "/roles/memory-h2h"
+        },
+        "lane_aggregates": {
+          "memory-h2h": {
+            "baseline": {
+              "calls": 13,
+              "identities_sum": 2,
+              "denominator_sum": 8,
+              "buckets_present": [
+                "rumi",
+                "voni",
+                "zimu"
+              ],
+              "buckets_absent": [
+                "revi"
+              ],
+              "measurement": "sum of separate registry-bound buckets; no cross-alias identity deduplication"
+            },
+            "reconciled": {
+              "calls": 13,
+              "identities_sum": 2,
+              "denominator_sum": 8,
+              "buckets_present": [
+                "rumi",
+                "voni",
+                "zimu"
+              ],
+              "buckets_absent": [
+                "revi"
+              ],
+              "measurement": "sum of separate registry-bound buckets; no cross-alias identity deduplication"
+            }
+          }
+        },
+        "accepted_keep": false
       },
       "hindsight": {
         "disposition": "WIRE",
-        "decision_status": "source-backed proposal; counters inform and do not gate readiness",
+        "decision_status": "source-backed proposed selection; PENDING until G5; unexecuted routing and checks remain OUTSTANDING",
         "job": "Accepted research job: retain/recall hypotheses and experiment records in trading-research; coding memory stays ai-memory",
         "owning_lane_or_role": "memory-h2h",
-        "binding_basis": "Named launch/dispatch identities: memory-h2h rumi, historical memory-h2h voni, context codex-token-parity dove, code-intelligence overlap-token lise. Snapshot keys alone do not encode durable ownership. Claude named consumers stay consumers; unattributed buckets stay unattributed.",
+        "binding_basis": "Every observed Codex identity for the owning lane and named memory consumer is bound through a pinned SHA256 registry excerpt. Claude architecture is a named consumer; other Claude sessions is context only. Registry launch timestamps and bucket sums do not supply event-level/cross-alias identity deduplication.",
         "snapshot_sources": [
           "baseline",
           "reconciled"
@@ -216,8 +376,33 @@
         "role_evidence": [
           {
             "client": "codex",
+            "snapshot_bucket": "revi",
+            "role_relation": "owning-lane current or historical identity",
+            "scope_pointer": "/codex_by_lane/revi",
+            "server_namespace": "hindsight",
+            "identity_kind": "conversations",
+            "denominator_kind": "all conversations in this exact snapshot bucket",
+            "snapshots": {
+              "baseline": {
+                "calls": null,
+                "identities": null,
+                "denominator": null,
+                "measurement": "UNMEASURED — identity absent from this exact snapshot"
+              },
+              "reconciled": {
+                "calls": null,
+                "identities": null,
+                "denominator": null,
+                "measurement": "UNMEASURED — identity absent from this exact snapshot"
+              }
+            },
+            "lane_id": "memory-h2h",
+            "identity_registry_pointer": "/roles/memory-h2h/0"
+          },
+          {
+            "client": "codex",
             "snapshot_bucket": "rumi",
-            "role_relation": "current owning-lane identity",
+            "role_relation": "owning-lane current or historical identity",
             "scope_pointer": "/codex_by_lane/rumi",
             "server_namespace": "hindsight",
             "identity_kind": "conversations",
@@ -235,12 +420,14 @@
                 "denominator": 2,
                 "measurement": "reported MCP counter"
               }
-            }
+            },
+            "lane_id": "memory-h2h",
+            "identity_registry_pointer": "/roles/memory-h2h/1"
           },
           {
             "client": "codex",
             "snapshot_bucket": "voni",
-            "role_relation": "separate historical owning-lane identity",
+            "role_relation": "owning-lane current or historical identity",
             "scope_pointer": "/codex_by_lane/voni",
             "server_namespace": "hindsight",
             "identity_kind": "conversations",
@@ -258,12 +445,39 @@
                 "denominator": 4,
                 "measurement": "reported MCP counter"
               }
-            }
+            },
+            "lane_id": "memory-h2h",
+            "identity_registry_pointer": "/roles/memory-h2h/2"
+          },
+          {
+            "client": "codex",
+            "snapshot_bucket": "zimu",
+            "role_relation": "owning-lane current or historical identity",
+            "scope_pointer": "/codex_by_lane/zimu",
+            "server_namespace": "hindsight",
+            "identity_kind": "conversations",
+            "denominator_kind": "all conversations in this exact snapshot bucket",
+            "snapshots": {
+              "baseline": {
+                "calls": null,
+                "identities": null,
+                "denominator": 2,
+                "measurement": "UNMEASURED — namespace absent in this exact bucket"
+              },
+              "reconciled": {
+                "calls": null,
+                "identities": null,
+                "denominator": 2,
+                "measurement": "UNMEASURED — namespace absent in this exact bucket"
+              }
+            },
+            "lane_id": "memory-h2h",
+            "identity_registry_pointer": "/roles/memory-h2h/3"
           },
           {
             "client": "claude",
             "snapshot_bucket": "wsl-architecture-design",
-            "role_relation": "named consumer with no reported Hindsight entry",
+            "role_relation": "named consumer; owning-Claude-lane binding OUTSTANDING",
             "scope_pointer": "/claude_by_role/wsl-architecture-design",
             "server_namespace": "hindsight",
             "identity_kind": "sessions",
@@ -273,20 +487,20 @@
                 "calls": null,
                 "identities": null,
                 "denominator": 1,
-                "measurement": "UNMEASURED; server absent in this exact bucket"
+                "measurement": "UNMEASURED — namespace absent in this exact bucket"
               },
               "reconciled": {
                 "calls": null,
                 "identities": null,
                 "denominator": 1,
-                "measurement": "UNMEASURED; server absent in this exact bucket"
+                "measurement": "UNMEASURED — namespace absent in this exact bucket"
               }
             }
           },
           {
             "client": "claude",
             "snapshot_bucket": "other Claude sessions",
-            "role_relation": "unattributed context only; not owning-role evidence",
+            "role_relation": "unattributed context only; never owning-role evidence",
             "scope_pointer": "/claude_by_role/other Claude sessions",
             "server_namespace": "hindsight",
             "identity_kind": "sessions",
@@ -307,7 +521,7 @@
             }
           }
         ],
-        "organic_use": "UNRESOLVED in these counters; no native task outcome classifier attached",
+        "organic_use": "UNRESOLVED — stage 3 and 4 organic-use observations are OUTSTANDING; MCP counters and bucket sums do not classify task outcomes",
         "evidence_limit": "The canonical accepted job remains. Sparse MCP calls or zero mental models do not remove it; no same-job replacement evidence or host-install impossibility is shown. Native organic routing use is unresolved in these counter snapshots.",
         "g5_binding": {
           "component_identity": "https://github.com/vectorize-io/hindsight",
@@ -346,17 +560,123 @@
             "adoption/templates/systemd/hindsight-research.mcp-tools.env.template",
             "existing native client registrations and retained bank"
           ],
-          "retirement_step": "No retirement is authorized or performed. A future rule-5-qualified removal would remove native registrations and disable the service under the recipe inverse; data deletion is separately destructive.",
-          "inverse": "Restore native bank-specific registrations, pinned service/drop-in/allowlist and enable the service; preserve existing bank. No removal/reinstallation is run here.",
-          "applied": false
-        }
+          "inverse": "Reverse only the CC-approved additions: restore exact reviewed preimages or remove only transaction-created hindsight-memory directories and dedicated $HOME/.local/opt/hindsight-cli/0.10.2 prefix after verifying ownership. Restore any client config/PATH preimage touched by the CC. Preserve all pre-existing registrations, active service, 15-tool allowlist and research bank/data. Packet HW-05 defines the transaction inverse; no service-retirement inverse is used.",
+          "applied": false,
+          "retirement_context": "No retirement authorized. The retained service/bank/registrations/allowlist are outside this wiring transaction.",
+          "packet": {
+            "source_file": "docs/decisions/memory-adoption-835/hindsight-wire.diff.md",
+            "sha256": "d55fcbd57147fe76e124cbc942591cb3d850eb7b11c084fcbcd26702f81208fb"
+          },
+          "cli": {
+            "version": "0.10.2",
+            "source_commit": "5fc4ce20917b916240cef27c212c387a177f115b",
+            "installer": "hindsight-docs/static/get-cli",
+            "installer_sha256": "ed7489a0287d51e1a3bb045b506c806118131b401c8e229e4ae2e714efa9ee4a",
+            "install_command": "HINDSIGHT_CLI_VERSION=0.10.2 HINDSIGHT_INSTALL_DIR=\"$HOME/.local/opt/hindsight-cli/0.10.2/bin\" bash \"$memory835_stage/get-cli\"",
+            "version_smoke": "\"$HOME/.local/opt/hindsight-cli/0.10.2/bin/hindsight\" --version",
+            "status": "OUTSTANDING",
+            "applied": false
+          },
+          "client_routes": {
+            "claude": {
+              "route": "vendor Skills + existing bank-specific MCP, manual; automatic plugin hooks unselected",
+              "skill_root": "$HOME/.claude/skills/hindsight-memory",
+              "install_command": "install -m 0644 \"$memory835_stage/hindsight-memory.SKILL.md\" $HOME/.claude/skills/hindsight-memory/SKILL.md",
+              "status": "OUTSTANDING",
+              "applied": false
+            },
+            "codex": {
+              "route": "vendor skill + existing bank-specific MCP, manual",
+              "skill_root": "$HOME/.agents/skills/hindsight-memory",
+              "install_command": "install -m 0644 \"$memory835_stage/hindsight-memory.SKILL.md\" $HOME/.agents/skills/hindsight-memory/SKILL.md",
+              "status": "OUTSTANDING",
+              "applied": false
+            }
+          },
+          "smokes": {
+            "claude": {
+              "vendor_operation": "get_bank via existing bank-specific MCP",
+              "command": "claude --print --output-format json 'Perform a connection smoke with the configured hindsight get_bank tool. Report whether it selects trading-research. Do not retain, change, or delete anything.'",
+              "status": "OUTSTANDING",
+              "executed": false,
+              "result": null
+            },
+            "codex": {
+              "vendor_operation": "get_bank via existing bank-specific MCP",
+              "command": "codex exec --json 'Perform a connection smoke with the configured hindsight get_bank tool. Report whether it selects trading-research. Do not retain, change, or delete anything.'",
+              "status": "OUTSTANDING",
+              "executed": false,
+              "result": null
+            },
+            "upstream_harness": {
+              "source": "vectorize-io/hindsight@5fc4ce20917b916240cef27c212c387a177f115b:hindsight-cli/smoke-test.sh",
+              "sha256": "c57a3506017164997bd45b88bf9d87cfeec69b511fcf90bd50c8f20278593848",
+              "command": "HINDSIGHT_API_URL=http://127.0.0.1:8888 HINDSIGHT_CLI=\"$memory835_cli_root/bin/hindsight\" bash \"$memory835_stage/hindsight-cli-smoke-test.sh\"",
+              "status": "OUTSTANDING",
+              "executed": false,
+              "result": null,
+              "scope": "CC authorizes scratch-bank write/delete/provider smoke; never substitute the accepted bank as scratch"
+            }
+          },
+          "organic_fresh_session_checks": {
+            "retain_and_recall_per_client": "Packet HW-08 Claude and HW-09 Codex; natural research tasks without tool names; retain and subsequent fresh-session recall, world/experience verbatim text and strict experiment isolation",
+            "executed": false,
+            "status": "OUTSTANDING",
+            "results": []
+          },
+          "follow_up": {
+            "wiring_timestamp_utc": null,
+            "due": "each owning lane and named consumer role at wiring +24h; hourly rolling capture plan in stage 4",
+            "status": "OUTSTANDING",
+            "scheduled": false,
+            "results": []
+          }
+        },
+        "registry_reference": {
+          "source_file": "docs/decisions/memory-adoption-835/registry-role-identities.json",
+          "sha256": "03abf51ca7477c6b40c03e5f60a64177730fc838495b9bc174062555fc7f8cf6",
+          "role_pointer": "/roles/memory-h2h"
+        },
+        "lane_aggregates": {
+          "memory-h2h": {
+            "baseline": {
+              "calls": 5,
+              "identities_sum": 2,
+              "denominator_sum": 8,
+              "buckets_present": [
+                "rumi",
+                "voni",
+                "zimu"
+              ],
+              "buckets_absent": [
+                "revi"
+              ],
+              "measurement": "sum of separate registry-bound buckets; no cross-alias identity deduplication"
+            },
+            "reconciled": {
+              "calls": 5,
+              "identities_sum": 2,
+              "denominator_sum": 8,
+              "buckets_present": [
+                "rumi",
+                "voni",
+                "zimu"
+              ],
+              "buckets_absent": [
+                "revi"
+              ],
+              "measurement": "sum of separate registry-bound buckets; no cross-alias identity deduplication"
+            }
+          }
+        },
+        "accepted_keep": false
       },
       "context_mode": {
-        "disposition": "KEEP",
-        "decision_status": "source-backed proposal; counters inform and do not gate readiness",
+        "disposition": "KEEP proposed",
+        "decision_status": "PROPOSED_SELECTION — PENDING until G5; accepted KEEP requires organic evidence in stage 3 or 4",
         "job": "session continuity/captured-output retrieval",
         "owning_lane_or_role": "codex-token-parity",
-        "binding_basis": "Named launch/dispatch identities: memory-h2h rumi, historical memory-h2h voni, context codex-token-parity dove, code-intelligence overlap-token lise. Snapshot keys alone do not encode durable ownership. Claude named consumers stay consumers; unattributed buckets stay unattributed.",
+        "binding_basis": "Every observed Codex identity for the owning lane and named memory consumer is bound through a pinned SHA256 registry excerpt. Claude architecture is a named consumer; other Claude sessions is context only. Registry launch timestamps and bucket sums do not supply event-level/cross-alias identity deduplication.",
         "snapshot_sources": [
           "baseline",
           "reconciled"
@@ -365,7 +685,7 @@
           {
             "client": "codex",
             "snapshot_bucket": "dove",
-            "role_relation": "owning-lane identity",
+            "role_relation": "owning-lane current or historical identity",
             "scope_pointer": "/codex_by_lane/dove",
             "server_namespace": "context-mode",
             "identity_kind": "conversations",
@@ -383,7 +703,84 @@
                 "denominator": 2,
                 "measurement": "reported MCP counter"
               }
-            }
+            },
+            "lane_id": "codex-token-parity",
+            "identity_registry_pointer": "/roles/codex-token-parity/0"
+          },
+          {
+            "client": "codex",
+            "snapshot_bucket": "novu",
+            "role_relation": "owning-lane current or historical identity",
+            "scope_pointer": "/codex_by_lane/novu",
+            "server_namespace": "context-mode",
+            "identity_kind": "conversations",
+            "denominator_kind": "all conversations in this exact snapshot bucket",
+            "snapshots": {
+              "baseline": {
+                "calls": 23,
+                "identities": 2,
+                "denominator": 2,
+                "measurement": "reported MCP counter"
+              },
+              "reconciled": {
+                "calls": 23,
+                "identities": 2,
+                "denominator": 2,
+                "measurement": "reported MCP counter"
+              }
+            },
+            "lane_id": "codex-token-parity",
+            "identity_registry_pointer": "/roles/codex-token-parity/1"
+          },
+          {
+            "client": "codex",
+            "snapshot_bucket": "zonu",
+            "role_relation": "owning-lane current or historical identity",
+            "scope_pointer": "/codex_by_lane/zonu",
+            "server_namespace": "context-mode",
+            "identity_kind": "conversations",
+            "denominator_kind": "all conversations in this exact snapshot bucket",
+            "snapshots": {
+              "baseline": {
+                "calls": null,
+                "identities": null,
+                "denominator": null,
+                "measurement": "UNMEASURED — identity absent from this exact snapshot"
+              },
+              "reconciled": {
+                "calls": 67,
+                "identities": 2,
+                "denominator": 2,
+                "measurement": "reported MCP counter"
+              }
+            },
+            "lane_id": "codex-token-parity",
+            "identity_registry_pointer": "/roles/codex-token-parity/2"
+          },
+          {
+            "client": "codex",
+            "snapshot_bucket": "revi",
+            "role_relation": "separate memory-h2h consumer identity",
+            "scope_pointer": "/codex_by_lane/revi",
+            "server_namespace": "context-mode",
+            "identity_kind": "conversations",
+            "denominator_kind": "all conversations in this exact snapshot bucket",
+            "snapshots": {
+              "baseline": {
+                "calls": null,
+                "identities": null,
+                "denominator": null,
+                "measurement": "UNMEASURED — identity absent from this exact snapshot"
+              },
+              "reconciled": {
+                "calls": null,
+                "identities": null,
+                "denominator": null,
+                "measurement": "UNMEASURED — identity absent from this exact snapshot"
+              }
+            },
+            "lane_id": "memory-h2h",
+            "identity_registry_pointer": "/roles/memory-h2h/0"
           },
           {
             "client": "codex",
@@ -406,12 +803,64 @@
                 "denominator": 2,
                 "measurement": "reported MCP counter"
               }
-            }
+            },
+            "lane_id": "memory-h2h",
+            "identity_registry_pointer": "/roles/memory-h2h/1"
+          },
+          {
+            "client": "codex",
+            "snapshot_bucket": "voni",
+            "role_relation": "separate memory-h2h consumer identity",
+            "scope_pointer": "/codex_by_lane/voni",
+            "server_namespace": "context-mode",
+            "identity_kind": "conversations",
+            "denominator_kind": "all conversations in this exact snapshot bucket",
+            "snapshots": {
+              "baseline": {
+                "calls": 863,
+                "identities": 4,
+                "denominator": 4,
+                "measurement": "reported MCP counter"
+              },
+              "reconciled": {
+                "calls": 863,
+                "identities": 4,
+                "denominator": 4,
+                "measurement": "reported MCP counter"
+              }
+            },
+            "lane_id": "memory-h2h",
+            "identity_registry_pointer": "/roles/memory-h2h/2"
+          },
+          {
+            "client": "codex",
+            "snapshot_bucket": "zimu",
+            "role_relation": "separate memory-h2h consumer identity",
+            "scope_pointer": "/codex_by_lane/zimu",
+            "server_namespace": "context-mode",
+            "identity_kind": "conversations",
+            "denominator_kind": "all conversations in this exact snapshot bucket",
+            "snapshots": {
+              "baseline": {
+                "calls": 16,
+                "identities": 2,
+                "denominator": 2,
+                "measurement": "reported MCP counter"
+              },
+              "reconciled": {
+                "calls": 16,
+                "identities": 2,
+                "denominator": 2,
+                "measurement": "reported MCP counter"
+              }
+            },
+            "lane_id": "memory-h2h",
+            "identity_registry_pointer": "/roles/memory-h2h/3"
           },
           {
             "client": "claude",
             "snapshot_bucket": "wsl-architecture-design",
-            "role_relation": "named consumer; owning-lane attribution unresolved",
+            "role_relation": "named consumer; owning-Claude-lane binding OUTSTANDING",
             "scope_pointer": "/claude_by_role/wsl-architecture-design",
             "server_namespace": "plugin_context-mode_context-mode",
             "identity_kind": "sessions",
@@ -430,9 +879,32 @@
                 "measurement": "reported MCP counter"
               }
             }
+          },
+          {
+            "client": "claude",
+            "snapshot_bucket": "other Claude sessions",
+            "role_relation": "unattributed context only; never owning-role evidence",
+            "scope_pointer": "/claude_by_role/other Claude sessions",
+            "server_namespace": "plugin_context-mode_context-mode",
+            "identity_kind": "sessions",
+            "denominator_kind": "all sessions in this exact snapshot bucket",
+            "snapshots": {
+              "baseline": {
+                "calls": 16,
+                "identities": 5,
+                "denominator": 55,
+                "measurement": "reported MCP counter"
+              },
+              "reconciled": {
+                "calls": 16,
+                "identities": 5,
+                "denominator": 66,
+                "measurement": "reported MCP counter"
+              }
+            }
           }
         ],
-        "organic_use": "UNRESOLVED in these counters; no native task outcome classifier attached",
+        "organic_use": "UNRESOLVED — stage 3 and 4 organic-use observations are OUTSTANDING; MCP counters and bucket sums do not classify task outcomes",
         "evidence_limit": "Native MCP result events are not useful outcomes; these snapshots do not separate all probes from organic work. A named Claude consumer is not proof of an owning lane. The other Claude sessions bucket is unattributed.",
         "g5_binding": {
           "component_identity": "https://github.com/mksglu/context-mode",
@@ -447,14 +919,79 @@
           "catalog_owner": "g5-stars-gap (G5 #878 catalog owner)",
           "resolution_dependency": "Catalog owner must publish the matching component row; bind the published commit/pointer and identity before resolving.",
           "evidence_limit": "No matching row in this exact 118-row draft; no global absence or measured-zero claim."
-        }
+        },
+        "registry_reference": {
+          "source_file": "docs/decisions/memory-adoption-835/registry-role-identities.json",
+          "sha256": "03abf51ca7477c6b40c03e5f60a64177730fc838495b9bc174062555fc7f8cf6",
+          "role_pointer": "/roles/codex-token-parity"
+        },
+        "lane_aggregates": {
+          "codex-token-parity": {
+            "baseline": {
+              "calls": 205,
+              "identities_sum": 4,
+              "denominator_sum": 4,
+              "buckets_present": [
+                "dove",
+                "novu"
+              ],
+              "buckets_absent": [
+                "zonu"
+              ],
+              "measurement": "sum of separate registry-bound buckets; no cross-alias identity deduplication"
+            },
+            "reconciled": {
+              "calls": 276,
+              "identities_sum": 6,
+              "denominator_sum": 6,
+              "buckets_present": [
+                "dove",
+                "novu",
+                "zonu"
+              ],
+              "buckets_absent": [],
+              "measurement": "sum of separate registry-bound buckets; no cross-alias identity deduplication"
+            }
+          },
+          "memory-h2h": {
+            "baseline": {
+              "calls": 947,
+              "identities_sum": 8,
+              "denominator_sum": 8,
+              "buckets_present": [
+                "rumi",
+                "voni",
+                "zimu"
+              ],
+              "buckets_absent": [
+                "revi"
+              ],
+              "measurement": "sum of separate registry-bound buckets; no cross-alias identity deduplication"
+            },
+            "reconciled": {
+              "calls": 979,
+              "identities_sum": 8,
+              "denominator_sum": 8,
+              "buckets_present": [
+                "rumi",
+                "voni",
+                "zimu"
+              ],
+              "buckets_absent": [
+                "revi"
+              ],
+              "measurement": "sum of separate registry-bound buckets; no cross-alias identity deduplication"
+            }
+          }
+        },
+        "accepted_keep": false
       },
       "codebase_memory": {
-        "disposition": "KEEP",
-        "decision_status": "source-backed proposal; counters inform and do not gate readiness",
+        "disposition": "KEEP proposed",
+        "decision_status": "PROPOSED_SELECTION — PENDING until G5; accepted KEEP requires organic evidence in stage 3 or 4",
         "job": "structural code graph",
         "owning_lane_or_role": "overlap-token",
-        "binding_basis": "Named launch/dispatch identities: memory-h2h rumi, historical memory-h2h voni, context codex-token-parity dove, code-intelligence overlap-token lise. Snapshot keys alone do not encode durable ownership. Claude named consumers stay consumers; unattributed buckets stay unattributed.",
+        "binding_basis": "Every observed Codex identity for the owning lane and named memory consumer is bound through a pinned SHA256 registry excerpt. Claude architecture is a named consumer; other Claude sessions is context only. Registry launch timestamps and bucket sums do not supply event-level/cross-alias identity deduplication.",
         "snapshot_sources": [
           "baseline",
           "reconciled"
@@ -463,7 +1000,7 @@
           {
             "client": "codex",
             "snapshot_bucket": "lise",
-            "role_relation": "owning-lane identity",
+            "role_relation": "owning-lane current or historical identity",
             "scope_pointer": "/codex_by_lane/lise",
             "server_namespace": "codebase-memory-mcp",
             "identity_kind": "conversations",
@@ -481,12 +1018,89 @@
                 "denominator": 1,
                 "measurement": "reported MCP counter"
               }
-            }
+            },
+            "lane_id": "overlap-token",
+            "identity_registry_pointer": "/roles/overlap-token/0"
+          },
+          {
+            "client": "codex",
+            "snapshot_bucket": "luva",
+            "role_relation": "owning-lane current or historical identity",
+            "scope_pointer": "/codex_by_lane/luva",
+            "server_namespace": "codebase-memory-mcp",
+            "identity_kind": "conversations",
+            "denominator_kind": "all conversations in this exact snapshot bucket",
+            "snapshots": {
+              "baseline": {
+                "calls": 3,
+                "identities": 1,
+                "denominator": 2,
+                "measurement": "reported MCP counter"
+              },
+              "reconciled": {
+                "calls": 3,
+                "identities": 1,
+                "denominator": 2,
+                "measurement": "reported MCP counter"
+              }
+            },
+            "lane_id": "overlap-token",
+            "identity_registry_pointer": "/roles/overlap-token/1"
+          },
+          {
+            "client": "codex",
+            "snapshot_bucket": "vuru",
+            "role_relation": "owning-lane current or historical identity",
+            "scope_pointer": "/codex_by_lane/vuru",
+            "server_namespace": "codebase-memory-mcp",
+            "identity_kind": "conversations",
+            "denominator_kind": "all conversations in this exact snapshot bucket",
+            "snapshots": {
+              "baseline": {
+                "calls": null,
+                "identities": null,
+                "denominator": 2,
+                "measurement": "UNMEASURED — namespace absent in this exact bucket"
+              },
+              "reconciled": {
+                "calls": null,
+                "identities": null,
+                "denominator": 2,
+                "measurement": "UNMEASURED — namespace absent in this exact bucket"
+              }
+            },
+            "lane_id": "overlap-token",
+            "identity_registry_pointer": "/roles/overlap-token/2"
+          },
+          {
+            "client": "codex",
+            "snapshot_bucket": "revi",
+            "role_relation": "separate memory-h2h consumer identity",
+            "scope_pointer": "/codex_by_lane/revi",
+            "server_namespace": "codebase-memory-mcp",
+            "identity_kind": "conversations",
+            "denominator_kind": "all conversations in this exact snapshot bucket",
+            "snapshots": {
+              "baseline": {
+                "calls": null,
+                "identities": null,
+                "denominator": null,
+                "measurement": "UNMEASURED — identity absent from this exact snapshot"
+              },
+              "reconciled": {
+                "calls": null,
+                "identities": null,
+                "denominator": null,
+                "measurement": "UNMEASURED — identity absent from this exact snapshot"
+              }
+            },
+            "lane_id": "memory-h2h",
+            "identity_registry_pointer": "/roles/memory-h2h/0"
           },
           {
             "client": "codex",
             "snapshot_bucket": "rumi",
-            "role_relation": "separate memory-h2h inventory consumer",
+            "role_relation": "separate memory-h2h consumer identity",
             "scope_pointer": "/codex_by_lane/rumi",
             "server_namespace": "codebase-memory-mcp",
             "identity_kind": "conversations",
@@ -504,12 +1118,87 @@
                 "denominator": 2,
                 "measurement": "reported MCP counter"
               }
+            },
+            "lane_id": "memory-h2h",
+            "identity_registry_pointer": "/roles/memory-h2h/1"
+          },
+          {
+            "client": "codex",
+            "snapshot_bucket": "voni",
+            "role_relation": "separate memory-h2h consumer identity",
+            "scope_pointer": "/codex_by_lane/voni",
+            "server_namespace": "codebase-memory-mcp",
+            "identity_kind": "conversations",
+            "denominator_kind": "all conversations in this exact snapshot bucket",
+            "snapshots": {
+              "baseline": {
+                "calls": null,
+                "identities": null,
+                "denominator": 4,
+                "measurement": "UNMEASURED — namespace absent in this exact bucket"
+              },
+              "reconciled": {
+                "calls": null,
+                "identities": null,
+                "denominator": 4,
+                "measurement": "UNMEASURED — namespace absent in this exact bucket"
+              }
+            },
+            "lane_id": "memory-h2h",
+            "identity_registry_pointer": "/roles/memory-h2h/2"
+          },
+          {
+            "client": "codex",
+            "snapshot_bucket": "zimu",
+            "role_relation": "separate memory-h2h consumer identity",
+            "scope_pointer": "/codex_by_lane/zimu",
+            "server_namespace": "codebase-memory-mcp",
+            "identity_kind": "conversations",
+            "denominator_kind": "all conversations in this exact snapshot bucket",
+            "snapshots": {
+              "baseline": {
+                "calls": null,
+                "identities": null,
+                "denominator": 2,
+                "measurement": "UNMEASURED — namespace absent in this exact bucket"
+              },
+              "reconciled": {
+                "calls": null,
+                "identities": null,
+                "denominator": 2,
+                "measurement": "UNMEASURED — namespace absent in this exact bucket"
+              }
+            },
+            "lane_id": "memory-h2h",
+            "identity_registry_pointer": "/roles/memory-h2h/3"
+          },
+          {
+            "client": "claude",
+            "snapshot_bucket": "wsl-architecture-design",
+            "role_relation": "named consumer; owning-Claude-lane binding OUTSTANDING",
+            "scope_pointer": "/claude_by_role/wsl-architecture-design",
+            "server_namespace": "codebase-memory-mcp",
+            "identity_kind": "sessions",
+            "denominator_kind": "all sessions in this exact snapshot bucket",
+            "snapshots": {
+              "baseline": {
+                "calls": null,
+                "identities": null,
+                "denominator": 1,
+                "measurement": "UNMEASURED — namespace absent in this exact bucket"
+              },
+              "reconciled": {
+                "calls": null,
+                "identities": null,
+                "denominator": 1,
+                "measurement": "UNMEASURED — namespace absent in this exact bucket"
+              }
             }
           },
           {
             "client": "claude",
             "snapshot_bucket": "other Claude sessions",
-            "role_relation": "unattributed context only; not owning-role evidence",
+            "role_relation": "unattributed context only; never owning-role evidence",
             "scope_pointer": "/claude_by_role/other Claude sessions",
             "server_namespace": "codebase-memory-mcp",
             "identity_kind": "sessions",
@@ -530,7 +1219,7 @@
             }
           }
         ],
-        "organic_use": "UNRESOLVED in these counters; no native task outcome classifier attached",
+        "organic_use": "UNRESOLVED — stage 3 and 4 organic-use observations are OUTSTANDING; MCP counters and bucket sums do not classify task outcomes",
         "evidence_limit": "Native MCP result events are not useful outcomes; these snapshots do not separate all probes from organic work. A named Claude consumer is not proof of an owning lane. The other Claude sessions bucket is unattributed.",
         "g5_binding": {
           "component_identity": "https://github.com/DeusData/codebase-memory-mcp",
@@ -545,14 +1234,78 @@
           "catalog_owner": "g5-stars-gap (G5 #878 catalog owner)",
           "resolution_dependency": "Catalog owner must publish the matching component row; bind the published commit/pointer and identity before resolving.",
           "evidence_limit": "SOURCE-REVIEW/WATCH; draft pointer is not adoption or current-host acceptance."
-        }
+        },
+        "registry_reference": {
+          "source_file": "docs/decisions/memory-adoption-835/registry-role-identities.json",
+          "sha256": "03abf51ca7477c6b40c03e5f60a64177730fc838495b9bc174062555fc7f8cf6",
+          "role_pointer": "/roles/overlap-token"
+        },
+        "lane_aggregates": {
+          "overlap-token": {
+            "baseline": {
+              "calls": 8,
+              "identities_sum": 2,
+              "denominator_sum": 5,
+              "buckets_present": [
+                "lise",
+                "luva",
+                "vuru"
+              ],
+              "buckets_absent": [],
+              "measurement": "sum of separate registry-bound buckets; no cross-alias identity deduplication"
+            },
+            "reconciled": {
+              "calls": 8,
+              "identities_sum": 2,
+              "denominator_sum": 5,
+              "buckets_present": [
+                "lise",
+                "luva",
+                "vuru"
+              ],
+              "buckets_absent": [],
+              "measurement": "sum of separate registry-bound buckets; no cross-alias identity deduplication"
+            }
+          },
+          "memory-h2h": {
+            "baseline": {
+              "calls": 1,
+              "identities_sum": 1,
+              "denominator_sum": 8,
+              "buckets_present": [
+                "rumi",
+                "voni",
+                "zimu"
+              ],
+              "buckets_absent": [
+                "revi"
+              ],
+              "measurement": "sum of separate registry-bound buckets; no cross-alias identity deduplication"
+            },
+            "reconciled": {
+              "calls": 1,
+              "identities_sum": 1,
+              "denominator_sum": 8,
+              "buckets_present": [
+                "rumi",
+                "voni",
+                "zimu"
+              ],
+              "buckets_absent": [
+                "revi"
+              ],
+              "measurement": "sum of separate registry-bound buckets; no cross-alias identity deduplication"
+            }
+          }
+        },
+        "accepted_keep": false
       },
       "qmd": {
         "disposition": "WIRE",
-        "decision_status": "source-backed proposal; counters inform and do not gate readiness",
+        "decision_status": "source-backed proposed selection; PENDING until G5; unexecuted routing and checks remain OUTSTANDING",
         "job": "markdown retrieval",
         "owning_lane_or_role": "memory-h2h",
-        "binding_basis": "Named launch/dispatch identities: memory-h2h rumi, historical memory-h2h voni, context codex-token-parity dove, code-intelligence overlap-token lise. Snapshot keys alone do not encode durable ownership. Claude named consumers stay consumers; unattributed buckets stay unattributed.",
+        "binding_basis": "Every observed Codex identity for the owning lane and named memory consumer is bound through a pinned SHA256 registry excerpt. Claude architecture is a named consumer; other Claude sessions is context only. Registry launch timestamps and bucket sums do not supply event-level/cross-alias identity deduplication.",
         "snapshot_sources": [
           "baseline",
           "reconciled"
@@ -560,8 +1313,33 @@
         "role_evidence": [
           {
             "client": "codex",
+            "snapshot_bucket": "revi",
+            "role_relation": "owning-lane current or historical identity",
+            "scope_pointer": "/codex_by_lane/revi",
+            "server_namespace": "qmd",
+            "identity_kind": "conversations",
+            "denominator_kind": "all conversations in this exact snapshot bucket",
+            "snapshots": {
+              "baseline": {
+                "calls": null,
+                "identities": null,
+                "denominator": null,
+                "measurement": "UNMEASURED — identity absent from this exact snapshot"
+              },
+              "reconciled": {
+                "calls": null,
+                "identities": null,
+                "denominator": null,
+                "measurement": "UNMEASURED — identity absent from this exact snapshot"
+              }
+            },
+            "lane_id": "memory-h2h",
+            "identity_registry_pointer": "/roles/memory-h2h/0"
+          },
+          {
+            "client": "codex",
             "snapshot_bucket": "rumi",
-            "role_relation": "current owning-lane identity",
+            "role_relation": "owning-lane current or historical identity",
             "scope_pointer": "/codex_by_lane/rumi",
             "server_namespace": "qmd",
             "identity_kind": "conversations",
@@ -579,12 +1357,14 @@
                 "denominator": 2,
                 "measurement": "reported MCP counter"
               }
-            }
+            },
+            "lane_id": "memory-h2h",
+            "identity_registry_pointer": "/roles/memory-h2h/1"
           },
           {
             "client": "codex",
             "snapshot_bucket": "voni",
-            "role_relation": "separate historical identity; namespace absent",
+            "role_relation": "owning-lane current or historical identity",
             "scope_pointer": "/codex_by_lane/voni",
             "server_namespace": "qmd",
             "identity_kind": "conversations",
@@ -594,20 +1374,47 @@
                 "calls": null,
                 "identities": null,
                 "denominator": 4,
-                "measurement": "UNMEASURED; server absent in this exact bucket"
+                "measurement": "UNMEASURED — namespace absent in this exact bucket"
               },
               "reconciled": {
                 "calls": null,
                 "identities": null,
                 "denominator": 4,
-                "measurement": "UNMEASURED; server absent in this exact bucket"
+                "measurement": "UNMEASURED — namespace absent in this exact bucket"
               }
-            }
+            },
+            "lane_id": "memory-h2h",
+            "identity_registry_pointer": "/roles/memory-h2h/2"
+          },
+          {
+            "client": "codex",
+            "snapshot_bucket": "zimu",
+            "role_relation": "owning-lane current or historical identity",
+            "scope_pointer": "/codex_by_lane/zimu",
+            "server_namespace": "qmd",
+            "identity_kind": "conversations",
+            "denominator_kind": "all conversations in this exact snapshot bucket",
+            "snapshots": {
+              "baseline": {
+                "calls": null,
+                "identities": null,
+                "denominator": 2,
+                "measurement": "UNMEASURED — namespace absent in this exact bucket"
+              },
+              "reconciled": {
+                "calls": null,
+                "identities": null,
+                "denominator": 2,
+                "measurement": "UNMEASURED — namespace absent in this exact bucket"
+              }
+            },
+            "lane_id": "memory-h2h",
+            "identity_registry_pointer": "/roles/memory-h2h/3"
           },
           {
             "client": "claude",
             "snapshot_bucket": "wsl-architecture-design",
-            "role_relation": "named consumer; Claude memory-h2h owner attribution unresolved",
+            "role_relation": "named consumer; owning-Claude-lane binding OUTSTANDING",
             "scope_pointer": "/claude_by_role/wsl-architecture-design",
             "server_namespace": "qmd",
             "identity_kind": "sessions",
@@ -626,9 +1433,32 @@
                 "measurement": "reported MCP counter"
               }
             }
+          },
+          {
+            "client": "claude",
+            "snapshot_bucket": "other Claude sessions",
+            "role_relation": "unattributed context only; never owning-role evidence",
+            "scope_pointer": "/claude_by_role/other Claude sessions",
+            "server_namespace": "qmd",
+            "identity_kind": "sessions",
+            "denominator_kind": "all sessions in this exact snapshot bucket",
+            "snapshots": {
+              "baseline": {
+                "calls": 4,
+                "identities": 4,
+                "denominator": 55,
+                "measurement": "reported MCP counter"
+              },
+              "reconciled": {
+                "calls": 4,
+                "identities": 4,
+                "denominator": 66,
+                "measurement": "reported MCP counter"
+              }
+            }
           }
         ],
-        "organic_use": "UNRESOLVED in these counters; no native task outcome classifier attached",
+        "organic_use": "UNRESOLVED — stage 3 and 4 organic-use observations are OUTSTANDING; MCP counters and bucket sums do not classify task outcomes",
         "evidence_limit": "Native MCP result events are not useful outcomes; these snapshots do not separate all probes from organic work. A named Claude consumer is not proof of an owning lane. The other Claude sessions bucket is unattributed.",
         "g5_binding": {
           "component_identity": "https://github.com/tobi/qmd",
@@ -644,14 +1474,65 @@
           "resolution_dependency": "Catalog owner must publish the matching component row; bind the published commit/pointer and identity before resolving.",
           "evidence_limit": "No matching row in this exact 118-row draft; no global absence or measured-zero claim."
         },
-        "separate_namespace": "qmdshared is preserved as a separate producer namespace; its identities are not merged with qmd."
+        "separate_namespace": "qmdshared is preserved as a separate producer namespace; its identities are not merged with qmd.",
+        "registry_reference": {
+          "source_file": "docs/decisions/memory-adoption-835/registry-role-identities.json",
+          "sha256": "03abf51ca7477c6b40c03e5f60a64177730fc838495b9bc174062555fc7f8cf6",
+          "role_pointer": "/roles/memory-h2h"
+        },
+        "lane_aggregates": {
+          "memory-h2h": {
+            "baseline": {
+              "calls": 1,
+              "identities_sum": 1,
+              "denominator_sum": 8,
+              "buckets_present": [
+                "rumi",
+                "voni",
+                "zimu"
+              ],
+              "buckets_absent": [
+                "revi"
+              ],
+              "measurement": "sum of separate registry-bound buckets; no cross-alias identity deduplication"
+            },
+            "reconciled": {
+              "calls": 1,
+              "identities_sum": 1,
+              "denominator_sum": 8,
+              "buckets_present": [
+                "rumi",
+                "voni",
+                "zimu"
+              ],
+              "buckets_absent": [
+                "revi"
+              ],
+              "measurement": "sum of separate registry-bound buckets; no cross-alias identity deduplication"
+            }
+          }
+        },
+        "accepted_keep": false,
+        "wiring": {
+          "packet": {
+            "source_file": "docs/decisions/memory-adoption-835/wire-inverses-smokes.md",
+            "sha256": "31ab5d5c5d8986df30bd367c5428423f2b18c1cad98fc39d5de78e33bb30e5bd"
+          },
+          "source_commit": "facd35e01359e59d938bc9418e93fb9318addee3",
+          "version": "2.8.3",
+          "vendor_command": "qmd skill install --yes (only after QMD-01 scope review)",
+          "inverse": "Restore only touched skill/bootstrap/symlink and registration preimages; remove only transaction-created paths; preserve named index, models and other collections. QMD-03.",
+          "smoke": "qmd --index native-agent-stack-catalog-lex status; per-client fresh-session retrieval observation with cited checked-in text. QMD-03 is OUTSTANDING.",
+          "applied": false,
+          "status": "OUTSTANDING"
+        }
       },
       "graphiti": {
         "disposition": "DEFER",
-        "decision_status": "source-backed proposal; counters inform and do not gate readiness",
+        "decision_status": "source-backed proposed selection; PENDING until G5; unexecuted routing and checks remain OUTSTANDING",
         "job": "defer temporal-graph installation; keep outside defaults",
         "owning_lane_or_role": "memory-h2h",
-        "binding_basis": "Named launch/dispatch identities: memory-h2h rumi, historical memory-h2h voni, context codex-token-parity dove, code-intelligence overlap-token lise. Snapshot keys alone do not encode durable ownership. Claude named consumers stay consumers; unattributed buckets stay unattributed.",
+        "binding_basis": "Every observed Codex identity for the owning lane and named memory consumer is bound through a pinned SHA256 registry excerpt. Claude architecture is a named consumer; other Claude sessions is context only. Registry launch timestamps and bucket sums do not supply event-level/cross-alias identity deduplication.",
         "snapshot_sources": [
           "baseline",
           "reconciled"
@@ -659,8 +1540,33 @@
         "role_evidence": [
           {
             "client": "codex",
+            "snapshot_bucket": "revi",
+            "role_relation": "owning-lane current or historical identity",
+            "scope_pointer": "/codex_by_lane/revi",
+            "server_namespace": "graphiti",
+            "identity_kind": "conversations",
+            "denominator_kind": "all conversations in this exact snapshot bucket",
+            "snapshots": {
+              "baseline": {
+                "calls": null,
+                "identities": null,
+                "denominator": null,
+                "measurement": "UNMEASURED — identity absent from this exact snapshot"
+              },
+              "reconciled": {
+                "calls": null,
+                "identities": null,
+                "denominator": null,
+                "measurement": "UNMEASURED — identity absent from this exact snapshot"
+              }
+            },
+            "lane_id": "memory-h2h",
+            "identity_registry_pointer": "/roles/memory-h2h/0"
+          },
+          {
+            "client": "codex",
             "snapshot_bucket": "rumi",
-            "role_relation": "owning-lane scope; no reported graphiti counter",
+            "role_relation": "owning-lane current or historical identity",
             "scope_pointer": "/codex_by_lane/rumi",
             "server_namespace": "graphiti",
             "identity_kind": "conversations",
@@ -670,20 +1576,72 @@
                 "calls": null,
                 "identities": null,
                 "denominator": 2,
-                "measurement": "UNMEASURED; server absent in this exact bucket"
+                "measurement": "UNMEASURED — namespace absent in this exact bucket"
               },
               "reconciled": {
                 "calls": null,
                 "identities": null,
                 "denominator": 2,
-                "measurement": "UNMEASURED; server absent in this exact bucket"
+                "measurement": "UNMEASURED — namespace absent in this exact bucket"
               }
-            }
+            },
+            "lane_id": "memory-h2h",
+            "identity_registry_pointer": "/roles/memory-h2h/1"
+          },
+          {
+            "client": "codex",
+            "snapshot_bucket": "voni",
+            "role_relation": "owning-lane current or historical identity",
+            "scope_pointer": "/codex_by_lane/voni",
+            "server_namespace": "graphiti",
+            "identity_kind": "conversations",
+            "denominator_kind": "all conversations in this exact snapshot bucket",
+            "snapshots": {
+              "baseline": {
+                "calls": null,
+                "identities": null,
+                "denominator": 4,
+                "measurement": "UNMEASURED — namespace absent in this exact bucket"
+              },
+              "reconciled": {
+                "calls": null,
+                "identities": null,
+                "denominator": 4,
+                "measurement": "UNMEASURED — namespace absent in this exact bucket"
+              }
+            },
+            "lane_id": "memory-h2h",
+            "identity_registry_pointer": "/roles/memory-h2h/2"
+          },
+          {
+            "client": "codex",
+            "snapshot_bucket": "zimu",
+            "role_relation": "owning-lane current or historical identity",
+            "scope_pointer": "/codex_by_lane/zimu",
+            "server_namespace": "graphiti",
+            "identity_kind": "conversations",
+            "denominator_kind": "all conversations in this exact snapshot bucket",
+            "snapshots": {
+              "baseline": {
+                "calls": null,
+                "identities": null,
+                "denominator": 2,
+                "measurement": "UNMEASURED — namespace absent in this exact bucket"
+              },
+              "reconciled": {
+                "calls": null,
+                "identities": null,
+                "denominator": 2,
+                "measurement": "UNMEASURED — namespace absent in this exact bucket"
+              }
+            },
+            "lane_id": "memory-h2h",
+            "identity_registry_pointer": "/roles/memory-h2h/3"
           },
           {
             "client": "claude",
             "snapshot_bucket": "wsl-architecture-design",
-            "role_relation": "named consumer scope; no reported graphiti counter",
+            "role_relation": "named consumer; owning-Claude-lane binding OUTSTANDING",
             "scope_pointer": "/claude_by_role/wsl-architecture-design",
             "server_namespace": "graphiti",
             "identity_kind": "sessions",
@@ -693,18 +1651,41 @@
                 "calls": null,
                 "identities": null,
                 "denominator": 1,
-                "measurement": "UNMEASURED; server absent in this exact bucket"
+                "measurement": "UNMEASURED — namespace absent in this exact bucket"
               },
               "reconciled": {
                 "calls": null,
                 "identities": null,
                 "denominator": 1,
-                "measurement": "UNMEASURED; server absent in this exact bucket"
+                "measurement": "UNMEASURED — namespace absent in this exact bucket"
+              }
+            }
+          },
+          {
+            "client": "claude",
+            "snapshot_bucket": "other Claude sessions",
+            "role_relation": "unattributed context only; never owning-role evidence",
+            "scope_pointer": "/claude_by_role/other Claude sessions",
+            "server_namespace": "graphiti",
+            "identity_kind": "sessions",
+            "denominator_kind": "all sessions in this exact snapshot bucket",
+            "snapshots": {
+              "baseline": {
+                "calls": null,
+                "identities": null,
+                "denominator": 55,
+                "measurement": "UNMEASURED — namespace absent in this exact bucket"
+              },
+              "reconciled": {
+                "calls": null,
+                "identities": null,
+                "denominator": 66,
+                "measurement": "UNMEASURED — namespace absent in this exact bucket"
               }
             }
           }
         ],
-        "organic_use": "UNRESOLVED in these counters; no native task outcome classifier attached",
+        "organic_use": "UNRESOLVED — stage 3 and 4 organic-use observations are OUTSTANDING; MCP counters and bucket sums do not classify task outcomes",
         "evidence_limit": "UNMEASURED in both snapshots; absence is not zero. Installation remains defer; no adopted unique job is demonstrated.",
         "g5_binding": {
           "component_identity": "https://github.com/getzep/graphiti",
@@ -719,7 +1700,45 @@
           "catalog_owner": "g5-stars-gap (G5 #878 catalog owner)",
           "resolution_dependency": "Catalog owner must publish the matching component row; bind the published commit/pointer and identity before resolving.",
           "evidence_limit": "No matching row in this exact 118-row draft; no global absence or measured-zero claim."
-        }
+        },
+        "registry_reference": {
+          "source_file": "docs/decisions/memory-adoption-835/registry-role-identities.json",
+          "sha256": "03abf51ca7477c6b40c03e5f60a64177730fc838495b9bc174062555fc7f8cf6",
+          "role_pointer": "/roles/memory-h2h"
+        },
+        "lane_aggregates": {
+          "memory-h2h": {
+            "baseline": {
+              "calls": null,
+              "identities_sum": null,
+              "denominator_sum": 8,
+              "buckets_present": [
+                "rumi",
+                "voni",
+                "zimu"
+              ],
+              "buckets_absent": [
+                "revi"
+              ],
+              "measurement": "UNMEASURED — no counter entry across these registry-bound buckets"
+            },
+            "reconciled": {
+              "calls": null,
+              "identities_sum": null,
+              "denominator_sum": 8,
+              "buckets_present": [
+                "rumi",
+                "voni",
+                "zimu"
+              ],
+              "buckets_absent": [
+                "revi"
+              ],
+              "measurement": "UNMEASURED — no counter entry across these registry-bound buckets"
+            }
+          }
+        },
+        "accepted_keep": false
       }
     },
     "reconciliation": {
@@ -1425,8 +2444,8 @@
       "claude_native_memory": "KEEP proposed; organic use unresolved",
       "ai_memory": "WIRE",
       "hindsight": "WIRE",
-      "context_mode": "KEEP",
-      "codebase_memory": "KEEP",
+      "context_mode": "KEEP proposed",
+      "codebase_memory": "KEEP proposed",
       "qmd": "WIRE",
       "graphiti": "DEFER"
     },
@@ -1916,6 +2935,512 @@
     "claude_verdict_sha256": "c5a288b0f351f7d67d6542140a968be7a30fdb1f7716e2ba417df8589517de32",
     "native_installs_or_model_tasks_performed": false
   },
+  "delta_review_correction": {
+    "private_host_wiring_diff": {"source_file":"$HOME/.local/state/native-agent-stack/coordination/ns2604-coop/memory-roles-835-delta-20261009/hindsight-wire.diff.md","sha256":"2feb35c0551cef34d13953c10a024947a9097b1cfb4c14d4410928d64040b700","status":"OUTSTANDING","applied":false,"scope":"Concrete host paths retained privately before publication sanitation. Public packet uses portable $HOME references and has its own SHA256. Both describe the same pending transaction; CC applies only a reviewed private diff."},
+    "native_environment_property_observation": {
+      "observed_utc": "2026-10-09T03:26:00Z",
+      "command": "systemctl --user show ai-memory.service --property=EnvironmentFiles --no-pager",
+      "exit_code": 0,
+      "environment_file_paths_only": [
+        {
+          "path": "$HOME/.config/ai-memory/env",
+          "ignore_errors": true
+        }
+      ],
+      "draft_directive": "EnvironmentFile=-%h/.config/ai-memory/env",
+      "contents_read": false,
+      "limit": "Optional additive file only; required consolidation/model override paths were reported separately and not copied into draft cadence jobs. No environment values/file bytes inspected."
+    },
+    "graph_route_primary_checks": {
+      "observed_utc": "2026-10-09T03:37:48Z",
+      "commands": [
+        {
+          "command": "codebase-memory-mcp --help",
+          "exit_code": 0
+        },
+        {
+          "command": "codebase-memory-mcp install --clients",
+          "exit_code": 0,
+          "result": "supported claude/codex tokens; list-only"
+        }
+      ],
+      "version": "0.11.0",
+      "source": "DeusData/codebase-memory-mcp@8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798:README.md",
+      "host_install": false
+    },
+    "new_tests_evidence_class": "structural_validation; source/pin/window/lane/table/stage regression checks do not establish install/organic/upstream acceptance",
+    "reviewed_head": "7f2dc865cc1ead227621bb23fce8d0c771f22440",
+    "cc_verdict_sha256": "c5ce6546da699ca08ecd8a3f83ec52fd2d5802232d8922b35abd5e8acd961e31",
+    "gpt_verdict_sha256": "6041041dd85cb7854b9e3ca8cd9389de57cdfb1415acd96965947cda8c45ec0c",
+    "scope": "both delta reads; one fix head; no host apply",
+    "outstanding_count": 50,
+    "completed_record_fixes": [
+      "vendor wiring packet exact commands/pins/inverse/client smokes (all unexecuted)",
+      "all observed lane identities source-bound",
+      "four stages per component",
+      "KEEP proposed pending organic evidence",
+      "SocratiCode/Serena structural overlap declared",
+      "ai-memory/QMD inverses and smokes",
+      "shell $HOME versus systemd %h corrected",
+      "optional live ai-memory EnvironmentFile named without contents",
+      "unattributed context present uniformly"
+    ],
+    "host_installs": 0,
+    "host_route_changes": 0,
+    "native_provider_smokes_executed": 0
+  },
+  "outstanding": [
+    {
+      "id": "HW-01",
+      "component": "hindsight",
+      "operation": "CC-approved wiring/check step",
+      "source_file": "docs/decisions/memory-adoption-835/hindsight-wire.diff.md",
+      "status": "OUTSTANDING",
+      "executed": false,
+      "result": null
+    },
+    {
+      "id": "HW-02",
+      "component": "hindsight",
+      "operation": "CC-approved wiring/check step",
+      "source_file": "docs/decisions/memory-adoption-835/hindsight-wire.diff.md",
+      "status": "OUTSTANDING",
+      "executed": false,
+      "result": null
+    },
+    {
+      "id": "HW-03",
+      "component": "hindsight",
+      "operation": "CC-approved wiring/check step",
+      "source_file": "docs/decisions/memory-adoption-835/hindsight-wire.diff.md",
+      "status": "OUTSTANDING",
+      "executed": false,
+      "result": null
+    },
+    {
+      "id": "HW-04",
+      "component": "hindsight",
+      "operation": "CC-approved wiring/check step",
+      "source_file": "docs/decisions/memory-adoption-835/hindsight-wire.diff.md",
+      "status": "OUTSTANDING",
+      "executed": false,
+      "result": null
+    },
+    {
+      "id": "HW-05",
+      "component": "hindsight",
+      "operation": "CC-approved wiring/check step",
+      "source_file": "docs/decisions/memory-adoption-835/hindsight-wire.diff.md",
+      "status": "OUTSTANDING",
+      "executed": false,
+      "result": null
+    },
+    {
+      "id": "HW-06",
+      "component": "hindsight",
+      "operation": "CC-approved wiring/check step",
+      "source_file": "docs/decisions/memory-adoption-835/hindsight-wire.diff.md",
+      "status": "OUTSTANDING",
+      "executed": false,
+      "result": null
+    },
+    {
+      "id": "HW-07",
+      "component": "hindsight",
+      "operation": "CC-approved wiring/check step",
+      "source_file": "docs/decisions/memory-adoption-835/hindsight-wire.diff.md",
+      "status": "OUTSTANDING",
+      "executed": false,
+      "result": null
+    },
+    {
+      "id": "HW-08",
+      "component": "hindsight",
+      "operation": "CC-approved wiring/check step",
+      "source_file": "docs/decisions/memory-adoption-835/hindsight-wire.diff.md",
+      "status": "OUTSTANDING",
+      "executed": false,
+      "result": null
+    },
+    {
+      "id": "HW-09",
+      "component": "hindsight",
+      "operation": "CC-approved wiring/check step",
+      "source_file": "docs/decisions/memory-adoption-835/hindsight-wire.diff.md",
+      "status": "OUTSTANDING",
+      "executed": false,
+      "result": null
+    },
+    {
+      "id": "HW-10",
+      "component": "hindsight",
+      "operation": "CC-approved wiring/check step",
+      "source_file": "docs/decisions/memory-adoption-835/hindsight-wire.diff.md",
+      "status": "OUTSTANDING",
+      "executed": false,
+      "result": null
+    },
+    {
+      "id": "AM-01",
+      "component": "ai_memory",
+      "operation": "reviewed routing/inverse/smoke",
+      "source_file": "docs/decisions/memory-adoption-835/wire-inverses-smokes.md",
+      "status": "OUTSTANDING",
+      "executed": false,
+      "result": null
+    },
+    {
+      "id": "AM-02",
+      "component": "ai_memory",
+      "operation": "reviewed routing/inverse/smoke",
+      "source_file": "docs/decisions/memory-adoption-835/wire-inverses-smokes.md",
+      "status": "OUTSTANDING",
+      "executed": false,
+      "result": null
+    },
+    {
+      "id": "AM-03",
+      "component": "ai_memory",
+      "operation": "reviewed routing/inverse/smoke",
+      "source_file": "docs/decisions/memory-adoption-835/wire-inverses-smokes.md",
+      "status": "OUTSTANDING",
+      "executed": false,
+      "result": null
+    },
+    {
+      "id": "QMD-01",
+      "component": "qmd",
+      "operation": "reviewed routing/inverse/smoke",
+      "source_file": "docs/decisions/memory-adoption-835/wire-inverses-smokes.md",
+      "status": "OUTSTANDING",
+      "executed": false,
+      "result": null
+    },
+    {
+      "id": "QMD-02",
+      "component": "qmd",
+      "operation": "reviewed routing/inverse/smoke",
+      "source_file": "docs/decisions/memory-adoption-835/wire-inverses-smokes.md",
+      "status": "OUTSTANDING",
+      "executed": false,
+      "result": null
+    },
+    {
+      "id": "QMD-03",
+      "component": "qmd",
+      "operation": "reviewed routing/inverse/smoke",
+      "source_file": "docs/decisions/memory-adoption-835/wire-inverses-smokes.md",
+      "status": "OUTSTANDING",
+      "executed": false,
+      "result": null
+    },
+    {
+      "id": "MV-PSS-claude_native_memory",
+      "component": "claude_native_memory",
+      "operation": "component per-role/session/process PSS measurement",
+      "source_pointer": "/adoption_stages/stage2/tools/claude_native_memory",
+      "status": "OUTSTANDING",
+      "executed": false,
+      "result": null
+    },
+    {
+      "id": "MV-S3-claude_native_memory",
+      "component": "claude_native_memory",
+      "operation": "natural fresh-task role/client observations",
+      "source_pointer": "/adoption_stages/stage3/tools/claude_native_memory",
+      "status": "OUTSTANDING",
+      "executed": false,
+      "result": null
+    },
+    {
+      "id": "MV-S4-claude_native_memory",
+      "component": "claude_native_memory",
+      "operation": "hourly role comparison and T0+24h follow-up",
+      "source_pointer": "/adoption_stages/stage4/tools/claude_native_memory",
+      "status": "OUTSTANDING",
+      "executed": false,
+      "result": null
+    },
+    {
+      "id": "MV-G5-claude_native_memory",
+      "component": "claude_native_memory",
+      "operation": "catalog-owner publication and exact individual binding resolution",
+      "source_pointer": "/adoption_evidence/per_decision_bindings/claude_native_memory/g5",
+      "status": "OUTSTANDING",
+      "executed": false,
+      "result": null
+    },
+    {
+      "id": "MV-PSS-ai_memory",
+      "component": "ai_memory",
+      "operation": "component per-role/session/process PSS measurement",
+      "source_pointer": "/adoption_stages/stage2/tools/ai_memory",
+      "status": "OUTSTANDING",
+      "executed": false,
+      "result": null
+    },
+    {
+      "id": "MV-S3-ai_memory",
+      "component": "ai_memory",
+      "operation": "natural fresh-task role/client observations",
+      "source_pointer": "/adoption_stages/stage3/tools/ai_memory",
+      "status": "OUTSTANDING",
+      "executed": false,
+      "result": null
+    },
+    {
+      "id": "MV-S4-ai_memory",
+      "component": "ai_memory",
+      "operation": "hourly role comparison and T0+24h follow-up",
+      "source_pointer": "/adoption_stages/stage4/tools/ai_memory",
+      "status": "OUTSTANDING",
+      "executed": false,
+      "result": null
+    },
+    {
+      "id": "MV-G5-ai_memory",
+      "component": "ai_memory",
+      "operation": "catalog-owner publication and exact individual binding resolution",
+      "source_pointer": "/adoption_evidence/per_decision_bindings/ai_memory/g5",
+      "status": "OUTSTANDING",
+      "executed": false,
+      "result": null
+    },
+    {
+      "id": "MV-PSS-hindsight",
+      "component": "hindsight",
+      "operation": "component per-role/session/process PSS measurement",
+      "source_pointer": "/adoption_stages/stage2/tools/hindsight",
+      "status": "OUTSTANDING",
+      "executed": false,
+      "result": null
+    },
+    {
+      "id": "MV-S3-hindsight",
+      "component": "hindsight",
+      "operation": "natural fresh-task role/client observations",
+      "source_pointer": "/adoption_stages/stage3/tools/hindsight",
+      "status": "OUTSTANDING",
+      "executed": false,
+      "result": null
+    },
+    {
+      "id": "MV-S4-hindsight",
+      "component": "hindsight",
+      "operation": "hourly role comparison and T0+24h follow-up",
+      "source_pointer": "/adoption_stages/stage4/tools/hindsight",
+      "status": "OUTSTANDING",
+      "executed": false,
+      "result": null
+    },
+    {
+      "id": "MV-G5-hindsight",
+      "component": "hindsight",
+      "operation": "catalog-owner publication and exact individual binding resolution",
+      "source_pointer": "/adoption_evidence/per_decision_bindings/hindsight/g5",
+      "status": "OUTSTANDING",
+      "executed": false,
+      "result": null
+    },
+    {
+      "id": "MV-PSS-context_mode",
+      "component": "context_mode",
+      "operation": "component per-role/session/process PSS measurement",
+      "source_pointer": "/adoption_stages/stage2/tools/context_mode",
+      "status": "OUTSTANDING",
+      "executed": false,
+      "result": null
+    },
+    {
+      "id": "MV-S3-context_mode",
+      "component": "context_mode",
+      "operation": "natural fresh-task role/client observations",
+      "source_pointer": "/adoption_stages/stage3/tools/context_mode",
+      "status": "OUTSTANDING",
+      "executed": false,
+      "result": null
+    },
+    {
+      "id": "MV-S4-context_mode",
+      "component": "context_mode",
+      "operation": "hourly role comparison and T0+24h follow-up",
+      "source_pointer": "/adoption_stages/stage4/tools/context_mode",
+      "status": "OUTSTANDING",
+      "executed": false,
+      "result": null
+    },
+    {
+      "id": "MV-G5-context_mode",
+      "component": "context_mode",
+      "operation": "catalog-owner publication and exact individual binding resolution",
+      "source_pointer": "/adoption_evidence/per_decision_bindings/context_mode/g5",
+      "status": "OUTSTANDING",
+      "executed": false,
+      "result": null
+    },
+    {
+      "id": "MV-PSS-codebase_memory",
+      "component": "codebase_memory",
+      "operation": "component per-role/session/process PSS measurement",
+      "source_pointer": "/adoption_stages/stage2/tools/codebase_memory",
+      "status": "OUTSTANDING",
+      "executed": false,
+      "result": null
+    },
+    {
+      "id": "MV-S3-codebase_memory",
+      "component": "codebase_memory",
+      "operation": "natural fresh-task role/client observations",
+      "source_pointer": "/adoption_stages/stage3/tools/codebase_memory",
+      "status": "OUTSTANDING",
+      "executed": false,
+      "result": null
+    },
+    {
+      "id": "MV-S4-codebase_memory",
+      "component": "codebase_memory",
+      "operation": "hourly role comparison and T0+24h follow-up",
+      "source_pointer": "/adoption_stages/stage4/tools/codebase_memory",
+      "status": "OUTSTANDING",
+      "executed": false,
+      "result": null
+    },
+    {
+      "id": "MV-G5-codebase_memory",
+      "component": "codebase_memory",
+      "operation": "catalog-owner publication and exact individual binding resolution",
+      "source_pointer": "/adoption_evidence/per_decision_bindings/codebase_memory/g5",
+      "status": "OUTSTANDING",
+      "executed": false,
+      "result": null
+    },
+    {
+      "id": "MV-PSS-qmd",
+      "component": "qmd",
+      "operation": "component per-role/session/process PSS measurement",
+      "source_pointer": "/adoption_stages/stage2/tools/qmd",
+      "status": "OUTSTANDING",
+      "executed": false,
+      "result": null
+    },
+    {
+      "id": "MV-S3-qmd",
+      "component": "qmd",
+      "operation": "natural fresh-task role/client observations",
+      "source_pointer": "/adoption_stages/stage3/tools/qmd",
+      "status": "OUTSTANDING",
+      "executed": false,
+      "result": null
+    },
+    {
+      "id": "MV-S4-qmd",
+      "component": "qmd",
+      "operation": "hourly role comparison and T0+24h follow-up",
+      "source_pointer": "/adoption_stages/stage4/tools/qmd",
+      "status": "OUTSTANDING",
+      "executed": false,
+      "result": null
+    },
+    {
+      "id": "MV-G5-qmd",
+      "component": "qmd",
+      "operation": "catalog-owner publication and exact individual binding resolution",
+      "source_pointer": "/adoption_evidence/per_decision_bindings/qmd/g5",
+      "status": "OUTSTANDING",
+      "executed": false,
+      "result": null
+    },
+    {
+      "id": "MV-PSS-graphiti",
+      "component": "graphiti",
+      "operation": "component per-role/session/process PSS measurement",
+      "source_pointer": "/adoption_stages/stage2/tools/graphiti",
+      "status": "OUTSTANDING",
+      "executed": false,
+      "result": null
+    },
+    {
+      "id": "MV-S3-graphiti",
+      "component": "graphiti",
+      "operation": "natural fresh-task role/client observations",
+      "source_pointer": "/adoption_stages/stage3/tools/graphiti",
+      "status": "OUTSTANDING",
+      "executed": false,
+      "result": null
+    },
+    {
+      "id": "MV-S4-graphiti",
+      "component": "graphiti",
+      "operation": "hourly role comparison and T0+24h follow-up",
+      "source_pointer": "/adoption_stages/stage4/tools/graphiti",
+      "status": "OUTSTANDING",
+      "executed": false,
+      "result": null
+    },
+    {
+      "id": "MV-G5-graphiti",
+      "component": "graphiti",
+      "operation": "catalog-owner publication and exact individual binding resolution",
+      "source_pointer": "/adoption_evidence/per_decision_bindings/graphiti/g5",
+      "status": "OUTSTANDING",
+      "executed": false,
+      "result": null
+    },
+    {
+      "id": "MV-CLAUDE-OWNER",
+      "component": "all",
+      "operation": "CC binds named Claude consumers to durable owning roles",
+      "source_pointer": "/adoption_stages/stage3",
+      "status": "OUTSTANDING",
+      "executed": false,
+      "result": null
+    },
+    {
+      "id": "MV-READ-GPT",
+      "component": "all",
+      "operation": "designated GPT micro read of this one fix head",
+      "owner": "co-op",
+      "status": "OUTSTANDING",
+      "executed": false,
+      "result": null
+    },
+    {
+      "id": "MV-READ-CC",
+      "component": "all",
+      "operation": "designated CC micro read of this one fix head",
+      "owner": "CC",
+      "status": "OUTSTANDING",
+      "executed": false,
+      "result": null
+    },
+    {
+      "id": "MV-CI",
+      "component": "all",
+      "operation": "all required hosted checks at this exact fix head",
+      "owner": "CI",
+      "status": "OUTSTANDING",
+      "executed": false,
+      "result": null
+    },
+    {
+      "id": "MV-PRE-CUE",
+      "component": "all",
+      "operation": "required pre-cue tool/landing check executed only under maintained CC/5f procedure",
+      "owner": "CC/5f",
+      "status": "OUTSTANDING",
+      "executed": false,
+      "result": null
+    },
+    {
+      "id": "MV-CUE",
+      "component": "all",
+      "operation": "explicit CC cue and owner decisions for host application/landing",
+      "owner": "CC",
+      "status": "OUTSTANDING",
+      "executed": false,
+      "result": null
+    }
+  ],
   "adoption_stages": {
     "stage1": {
       "role_slots": {
@@ -1923,7 +3448,7 @@
           "role_slot": "native-claude-durable-preferences",
           "current_choice": "Claude Code native auto-memory",
           "version": "2.1.295",
-          "choice_status": "KEEP",
+          "choice_status": "PENDING until G5",
           "primary_source_binding": "adoption_evidence.per_decision_bindings.claude_native_memory",
           "evidence_class": "documented selection plus bounded native metadata; no new task-quality comparison",
           "overlap_disposition": "ai-memory global-profile pages remain historical context, not a parallel native-preference authoring default",
@@ -1938,13 +3463,16 @@
             "applied": false
           },
           "stage2_admission": "BLOCKED ADOPT-NOW until role/session/process-bound PSS evidence exists",
-          "revisit": "Pinned vendor release/source changes and G5 catalog-owner refresh/reopen triggers; no duplicate default selected"
+          "revisit": "Pinned vendor release/source changes and G5 catalog-owner refresh/reopen triggers; no duplicate default selected",
+          "desired_disposition": "KEEP",
+          "selection_status": "PROPOSED_SELECTION",
+          "accepted_keep": false
         },
         "ai_memory": {
           "role_slot": "cross-client-project-events-decisions",
           "current_choice": "akitaonrails/ai-memory",
           "version": "2.6.0",
-          "choice_status": "WIRE",
+          "choice_status": "PENDING until G5",
           "primary_source_binding": "adoption_evidence.per_decision_bindings.ai_memory",
           "evidence_class": "documented selection plus bounded native metadata; no new task-quality comparison",
           "overlap_disposition": "Hindsight generic coding-capture route is not enabled; research memory has its own slot",
@@ -1959,13 +3487,16 @@
             "applied": false
           },
           "stage2_admission": "BLOCKED ADOPT-NOW until role/session/process-bound PSS evidence exists",
-          "revisit": "Pinned vendor release/source changes and G5 catalog-owner refresh/reopen triggers; no duplicate default selected"
+          "revisit": "Pinned vendor release/source changes and G5 catalog-owner refresh/reopen triggers; no duplicate default selected",
+          "desired_disposition": "WIRE",
+          "selection_status": "PROPOSED_SELECTION",
+          "accepted_keep": false
         },
         "hindsight": {
           "role_slot": "research-hypotheses-experiment-records",
           "current_choice": "vectorize-io/hindsight",
           "version": "0.10.2",
-          "choice_status": "WIRE",
+          "choice_status": "PENDING until G5",
           "primary_source_binding": "adoption_evidence.per_decision_bindings.hindsight",
           "evidence_class": "documented selection plus bounded native metadata; no new task-quality comparison",
           "overlap_disposition": "Generic project/coding capture belongs to ai-memory; vendor skill only in named research consumer scope",
@@ -1980,13 +3511,16 @@
             "applied": false
           },
           "stage2_admission": "BLOCKED ADOPT-NOW until role/session/process-bound PSS evidence exists",
-          "revisit": "Pinned vendor release/source changes and G5 catalog-owner refresh/reopen triggers; no duplicate default selected"
+          "revisit": "Pinned vendor release/source changes and G5 catalog-owner refresh/reopen triggers; no duplicate default selected",
+          "desired_disposition": "WIRE",
+          "selection_status": "PROPOSED_SELECTION",
+          "accepted_keep": false
         },
         "context_mode": {
           "role_slot": "session-continuity-captured-output",
           "current_choice": "mksglu/context-mode",
           "version": "1.0.169",
-          "choice_status": "KEEP",
+          "choice_status": "PENDING until G5",
           "primary_source_binding": "adoption_evidence.per_decision_bindings.context_mode",
           "evidence_class": "documented selection plus bounded native metadata; no new task-quality comparison",
           "overlap_disposition": "Persistent session capture is continuity/scratch evidence, not a parallel durable project decision store",
@@ -2001,16 +3535,19 @@
             "applied": false
           },
           "stage2_admission": "BLOCKED ADOPT-NOW until role/session/process-bound PSS evidence exists",
-          "revisit": "Pinned vendor release/source changes and G5 catalog-owner refresh/reopen triggers; no duplicate default selected"
+          "revisit": "Pinned vendor release/source changes and G5 catalog-owner refresh/reopen triggers; no duplicate default selected",
+          "desired_disposition": "KEEP",
+          "selection_status": "PROPOSED_SELECTION",
+          "accepted_keep": false
         },
         "codebase_memory": {
           "role_slot": "structural-code-graph",
           "current_choice": "DeusData/codebase-memory-mcp",
           "version": "0.11.0",
-          "choice_status": "KEEP",
+          "choice_status": "PENDING until G5",
           "primary_source_binding": "adoption_evidence.per_decision_bindings.codebase_memory",
           "evidence_class": "documented selection plus bounded native metadata; no new task-quality comparison",
-          "overlap_disposition": "SocratiCode/semble textual-semantic search remains a separate job; Graphiti application fact graph is not a parallel code-graph default",
+          "overlap_disposition": "SocratiCode dependency/flow/impact routes and Serena references overlap the structural-graph slot. Proposed structural default is codebase-memory only; proposed SocratiCode scope is semantic/context search and Serena scope is source editing/refactoring. No parallel structural default, host routing change or replacement is accepted before role-bound comparison.",
           "parallel_default": false,
           "per_session_pss_kb": null,
           "pss_status": "UNMEASURED for this component in a role-bound native session; no attribution from whole-arm totals",
@@ -2022,13 +3559,16 @@
             "applied": false
           },
           "stage2_admission": "BLOCKED ADOPT-NOW until role/session/process-bound PSS evidence exists",
-          "revisit": "Pinned vendor release/source changes and G5 catalog-owner refresh/reopen triggers; no duplicate default selected"
+          "revisit": "Pinned vendor release/source changes and G5 catalog-owner refresh/reopen triggers; no duplicate default selected",
+          "desired_disposition": "KEEP",
+          "selection_status": "PROPOSED_SELECTION",
+          "accepted_keep": false
         },
         "qmd": {
           "role_slot": "checked-in-markdown-retrieval",
           "current_choice": "tobi/qmd",
           "version": "2.8.3",
-          "choice_status": "WIRE",
+          "choice_status": "PENDING until G5",
           "primary_source_binding": "adoption_evidence.per_decision_bindings.qmd",
           "evidence_class": "documented selection plus bounded native metadata; no new task-quality comparison",
           "overlap_disposition": "Native memory/event stores do not become an additional default markdown-corpus search engine",
@@ -2043,13 +3583,16 @@
             "applied": false
           },
           "stage2_admission": "BLOCKED ADOPT-NOW until role/session/process-bound PSS evidence exists",
-          "revisit": "Pinned vendor release/source changes and G5 catalog-owner refresh/reopen triggers; no duplicate default selected"
+          "revisit": "Pinned vendor release/source changes and G5 catalog-owner refresh/reopen triggers; no duplicate default selected",
+          "desired_disposition": "WIRE",
+          "selection_status": "PROPOSED_SELECTION",
+          "accepted_keep": false
         },
         "graphiti": {
           "role_slot": "application-temporal-fact-graph",
           "current_choice": "getzep/graphiti",
           "version": "0.30.2; MCP1.1.0 separately deferred",
-          "choice_status": "DEFER",
+          "choice_status": "PENDING until G5",
           "primary_source_binding": "adoption_evidence.per_decision_bindings.graphiti",
           "evidence_class": "documented selection plus bounded native metadata; no new task-quality comparison",
           "overlap_disposition": "DEFER candidate only, no parallel default exposure and no current retirement action",
@@ -2064,7 +3607,10 @@
             "applied": false
           },
           "stage2_admission": "BLOCKED ADOPT-NOW until role/session/process-bound PSS evidence exists",
-          "revisit": "Pinned vendor release/source changes and G5 catalog-owner refresh/reopen triggers; no duplicate default selected"
+          "revisit": "Pinned vendor release/source changes and G5 catalog-owner refresh/reopen triggers; no duplicate default selected",
+          "desired_disposition": "DEFER",
+          "selection_status": "PROPOSED_SELECTION",
+          "accepted_keep": false
         }
       },
       "catalog_projection_owner": "grand-catalog in a separate PR after G5#878; this record names slots/overlaps, not a new parallel catalog",
@@ -2104,6 +3650,1041 @@
         ],
         "scope": "after-task whole-arm owned-process PSS, one run per arm with different real tasks; includes alive subagents/tools",
         "limits": "Not per-component/session attribution, not paired measured savings; first-completion token figures are not provider-bound first-request proof. No division by tool count or reuse as a missing component memory figure."
+      },
+      "tools": {
+        "claude_native_memory": {
+          "owning_lane_or_role": "native Claude feature; no named native-memory counter",
+          "pin": {
+            "repository": "anthropics/claude-code",
+            "version": "2.1.295",
+            "commit": "602df92bf481ed904533e95c09f740f40aab5aed",
+            "route": "native /memory and official memory docs; no new configuration delta"
+          },
+          "install_routing": {
+            "operation": "PRESERVE_EXISTING",
+            "route": "native /memory and official memory docs; no new configuration delta",
+            "install_command": null,
+            "inverse": "No host configuration delta in this correction; any later scoped addition requires a reviewed transaction inverse.",
+            "status": "existing route observed; qualification OUTSTANDING",
+            "applied": false
+          },
+          "component_per_session_pss_kb": null,
+          "pss_status": "UNMEASURED; MV-PSS-claude_native_memory OUTSTANDING",
+          "cost_gate": "BLOCKED ADOPT-NOW until per-role/session/process PSS and sharing/load evidence",
+          "shared_copy_capability": "Native feature; no standalone shared MCP copy",
+          "load_scope": "only the owning/using roles; per-role MCP set proposal, no global activation change",
+          "executed_host_steps": [],
+          "unexecuted_steps_status": "OUTSTANDING",
+          "supported_routing_commands": {
+            "claude": "native /memory review (existing feature; no new setting or install)",
+            "codex": "N/A — this slot is Claude-native; ai-memory/Hindsight separate cross-client slots",
+            "inverse": "No host delta; leave existing native memory preimages and client defaults unchanged",
+            "smoke": "New Claude session /memory status and established native-only convention source/load/use observation (OUTSTANDING)",
+            "source": "anthropics/claude-code@602df92bf481ed904533e95c09f740f40aab5aed:CHANGELOG.md; official Claude memory docs dated 2026-10-08"
+          }
+        },
+        "ai_memory": {
+          "owning_lane_or_role": "memory-h2h",
+          "pin": {
+            "repository": "akitaonrails/ai-memory",
+            "version": "2.6.0",
+            "commit": "89bd8ded3c1ab8b769cf99417d038ed0364403c8"
+          },
+          "install_routing": {
+            "client_supported_commands": {"claude_preview":"ai-memory --data-dir \"$HOME/.local/share/ai-memory\" --config \"$HOME/.config/ai-memory/config.toml\" install-instructions --target CLAUDE.md --compact --skills-agent claude-code --print","codex_preview":"ai-memory --data-dir \"$HOME/.local/share/ai-memory\" --config \"$HOME/.config/ai-memory/config.toml\" install-instructions --target AGENTS.md --compact --skills-agent agents --print","application":"Remove --print only from the CC-reviewed target/scope commands. Vendor install-instructions writes matched skills; do not add duplicate managed skills. Existing global install-skills command remains a separate reviewed option, no scope silently selected.","status":"OUTSTANDING","applied":false},
+            "vendor_command": "ai-memory --data-dir \"$HOME/.local/share/ai-memory\" --config \"$HOME/.config/ai-memory/config.toml\" install-skills --scope global --agent both",
+            "instruction_route": "ai-memory install-instructions, only the vendor managed block with reviewed client/project scope",
+            "version": "2.6.0",
+            "source_commit": "89bd8ded3c1ab8b769cf99417d038ed0364403c8",
+            "host_observation": "No ai-memory managed skill directories found in the named Claude and cross-agent roots; installation is not claimed.",
+            "applied": false,
+            "packet": {
+              "source_file": "docs/decisions/memory-adoption-835/wire-inverses-smokes.md",
+              "sha256": "31ab5d5c5d8986df30bd367c5428423f2b18c1cad98fc39d5de78e33bb30e5bd"
+            },
+            "inverse": "Preview ai-memory uninstall --only skills and --only instructions; apply only the reviewed transaction inverse with --apply, preserving pre-existing managed routes via captured preimages. Packet AM-02 records the transaction scope.",
+            "smoke": "AM-03: ai-memory --version / install-skills --print and fresh client supported recall route verification; OUTSTANDING, no returned result.",
+            "status": "OUTSTANDING"
+          },
+          "component_per_session_pss_kb": null,
+          "pss_status": "UNMEASURED; MV-PSS-ai_memory OUTSTANDING",
+          "cost_gate": "BLOCKED ADOPT-NOW until per-role/session/process PSS and sharing/load evidence",
+          "shared_copy_capability": "Documented and observed shared HTTP native service",
+          "load_scope": "only the owning/using roles; per-role MCP set proposal, no global activation change",
+          "executed_host_steps": [],
+          "unexecuted_steps_status": "OUTSTANDING"
+        },
+        "hindsight": {
+          "owning_lane_or_role": "memory-h2h",
+          "pin": {
+            "repository": "vectorize-io/hindsight",
+            "version": "0.10.2",
+            "commit": "5fc4ce20917b916240cef27c212c387a177f115b"
+          },
+          "install_routing": {
+            "packet": {
+              "source_file": "docs/decisions/memory-adoption-835/hindsight-wire.diff.md",
+              "sha256": "d55fcbd57147fe76e124cbc942591cb3d850eb7b11c084fcbcd26702f81208fb"
+            },
+            "cli": {
+              "version": "0.10.2",
+              "source_commit": "5fc4ce20917b916240cef27c212c387a177f115b",
+              "installer": "hindsight-docs/static/get-cli",
+              "installer_sha256": "ed7489a0287d51e1a3bb045b506c806118131b401c8e229e4ae2e714efa9ee4a",
+              "install_command": "HINDSIGHT_CLI_VERSION=0.10.2 HINDSIGHT_INSTALL_DIR=\"$HOME/.local/opt/hindsight-cli/0.10.2/bin\" bash \"$memory835_stage/get-cli\"",
+              "version_smoke": "\"$HOME/.local/opt/hindsight-cli/0.10.2/bin/hindsight\" --version",
+              "status": "OUTSTANDING",
+              "applied": false
+            },
+            "client_routes": {
+              "claude": {
+                "route": "vendor Skills + existing bank-specific MCP, manual; automatic plugin hooks unselected",
+                "skill_root": "$HOME/.claude/skills/hindsight-memory",
+                "install_command": "install -m 0644 \"$memory835_stage/hindsight-memory.SKILL.md\" $HOME/.claude/skills/hindsight-memory/SKILL.md",
+                "status": "OUTSTANDING",
+                "applied": false
+              },
+              "codex": {
+                "route": "vendor skill + existing bank-specific MCP, manual",
+                "skill_root": "$HOME/.agents/skills/hindsight-memory",
+                "install_command": "install -m 0644 \"$memory835_stage/hindsight-memory.SKILL.md\" $HOME/.agents/skills/hindsight-memory/SKILL.md",
+                "status": "OUTSTANDING",
+                "applied": false
+              }
+            },
+            "inverse": "Reverse only the CC-approved additions: restore exact reviewed preimages or remove only transaction-created hindsight-memory directories and dedicated $HOME/.local/opt/hindsight-cli/0.10.2 prefix after verifying ownership. Restore any client config/PATH preimage touched by the CC. Preserve all pre-existing registrations, active service, 15-tool allowlist and research bank/data. Packet HW-05 defines the transaction inverse; no service-retirement inverse is used.",
+            "smokes": {
+              "claude": {
+                "vendor_operation": "get_bank via existing bank-specific MCP",
+                "command": "claude --print --output-format json 'Perform a connection smoke with the configured hindsight get_bank tool. Report whether it selects trading-research. Do not retain, change, or delete anything.'",
+                "status": "OUTSTANDING",
+                "executed": false,
+                "result": null
+              },
+              "codex": {
+                "vendor_operation": "get_bank via existing bank-specific MCP",
+                "command": "codex exec --json 'Perform a connection smoke with the configured hindsight get_bank tool. Report whether it selects trading-research. Do not retain, change, or delete anything.'",
+                "status": "OUTSTANDING",
+                "executed": false,
+                "result": null
+              },
+              "upstream_harness": {
+                "source": "vectorize-io/hindsight@5fc4ce20917b916240cef27c212c387a177f115b:hindsight-cli/smoke-test.sh",
+                "sha256": "c57a3506017164997bd45b88bf9d87cfeec69b511fcf90bd50c8f20278593848",
+                "command": "HINDSIGHT_API_URL=http://127.0.0.1:8888 HINDSIGHT_CLI=\"$memory835_cli_root/bin/hindsight\" bash \"$memory835_stage/hindsight-cli-smoke-test.sh\"",
+                "status": "OUTSTANDING",
+                "executed": false,
+                "result": null,
+                "scope": "CC authorizes scratch-bank write/delete/provider smoke; never substitute the accepted bank as scratch"
+              }
+            }
+          },
+          "component_per_session_pss_kb": null,
+          "pss_status": "UNMEASURED; MV-PSS-hindsight OUTSTANDING",
+          "cost_gate": "BLOCKED ADOPT-NOW until per-role/session/process PSS and sharing/load evidence",
+          "shared_copy_capability": "Documented and observed shared bank-specific HTTP service",
+          "load_scope": "only the owning/using roles; per-role MCP set proposal, no global activation change",
+          "executed_host_steps": [],
+          "unexecuted_steps_status": "OUTSTANDING"
+        },
+        "context_mode": {
+          "owning_lane_or_role": "codex-token-parity",
+          "pin": {
+            "repository": "mksglu/context-mode",
+            "version": "1.0.169",
+            "commit": "589d8214d56740a28b5f7bf63167743d586b0b40",
+            "route": "preserve existing vendor plugin/skill route; source/Claude/Codex pin boundaries retained in sources[3]"
+          },
+          "install_routing": {
+            "operation": "PRESERVE_EXISTING",
+            "route": "preserve existing vendor plugin/skill route; source/Claude/Codex pin boundaries retained in sources[3]",
+            "install_command": null,
+            "inverse": "No host configuration delta in this correction; any later scoped addition requires a reviewed transaction inverse.",
+            "status": "existing route observed; qualification OUTSTANDING",
+            "applied": false
+          },
+          "component_per_session_pss_kb": null,
+          "pss_status": "UNMEASURED; MV-PSS-context_mode OUTSTANDING",
+          "cost_gate": "BLOCKED ADOPT-NOW until per-role/session/process PSS and sharing/load evidence",
+          "shared_copy_capability": "Selected native session transport observed; shared MCP HTTP transport not verified here",
+          "load_scope": "only the owning/using roles; per-role MCP set proposal, no global activation change",
+          "executed_host_steps": [],
+          "unexecuted_steps_status": "OUTSTANDING",
+          "supported_routing_commands": {
+            "claude": {
+              "route": "vendor plugin, preserved existing route",
+              "commands": [
+                "/plugin marketplace add mksglu/context-mode",
+                "/plugin install context-mode@context-mode"
+              ],
+              "pin": "v1.0.169/source pins remain separately recorded; CC previews any future delta"
+            },
+            "codex": {
+              "route": "vendor Codex plugin, preserved existing route",
+              "commands": [
+                "codex plugin marketplace add mksglu/context-mode",
+                "install context-mode via Codex plugin UI; review hooks/plugin_hooks trust"
+              ]
+            },
+            "inverse": "No new delta here. Any future plugin addition must restore only reviewed plugin/marketplace/hooks preimages; no context storage purge.",
+            "smoke": "One fresh session per client: ctx stats proves reachability only; role task/output recovery and source provenance in stage3 proves organic use (OUTSTANDING).",
+            "source": "mksglu/context-mode@589d8214d56740a28b5f7bf63167743d586b0b40:README.md; installed Codex checkout6f0cc6841c687e754059f36714a11233fda1a02b README.md"
+          }
+        },
+        "codebase_memory": {
+          "owning_lane_or_role": "overlap-token",
+          "pin": {
+            "repository": "DeusData/codebase-memory-mcp",
+            "version": "0.11.0",
+            "commit": "8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798",
+            "route": "preserve existing vendor MCP and codebase-memory skill route; no new registration"
+          },
+          "install_routing": {
+            "operation": "PRESERVE_EXISTING",
+            "route": "preserve existing vendor MCP and codebase-memory skill route; no new registration",
+            "install_command": null,
+            "inverse": "No host configuration delta in this correction; any later scoped addition requires a reviewed transaction inverse.",
+            "status": "existing route observed; qualification OUTSTANDING",
+            "applied": false
+          },
+          "component_per_session_pss_kb": null,
+          "pss_status": "UNMEASURED; MV-PSS-codebase_memory OUTSTANDING",
+          "cost_gate": "BLOCKED ADOPT-NOW until per-role/session/process PSS and sharing/load evidence",
+          "shared_copy_capability": "Native per-account shared daemon; per-session stdio frontends. Shared HTTP MCP front end not verified",
+          "load_scope": "only the owning/using roles; per-role MCP set proposal, no global activation change",
+          "executed_host_steps": [],
+          "unexecuted_steps_status": "OUTSTANDING",
+          "supported_routing_commands": {
+            "claude": "codebase-memory-mcp install --clients=claude --dry-run (preview only, not executed)",
+            "codex": "codebase-memory-mcp install --clients=codex --dry-run (preview only, not executed)",
+            "shared_native_installer": "v0.11.0 install route documented; existing install preserved, no reinstall",
+            "inverse": "No new delta here. Supported codebase-memory-mcp uninstall --dry-run is a preview of broad native removal, not authorized deletion; any later scoped addition reverses only reviewed registration/skill preimages.",
+            "smoke": "codebase-memory-mcp --version and native list_projects from each client (OUTSTANDING client qualification), then role-bound caller/impact task plus cited-path check_index_coverage in stage3.",
+            "source": "DeusData/codebase-memory-mcp@8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798:README.md; installed0.11.0 --help and install --clients returned0"
+          }
+        },
+        "qmd": {
+          "owning_lane_or_role": "memory-h2h",
+          "pin": {
+            "repository": "tobi/qmd",
+            "version": "2.8.3",
+            "commit": "facd35e01359e59d938bc9418e93fb9318addee3"
+          },
+          "install_routing": {
+            "packet": {
+              "source_file": "docs/decisions/memory-adoption-835/wire-inverses-smokes.md",
+              "sha256": "31ab5d5c5d8986df30bd367c5428423f2b18c1cad98fc39d5de78e33bb30e5bd"
+            },
+            "source_commit": "facd35e01359e59d938bc9418e93fb9318addee3",
+            "version": "2.8.3",
+            "vendor_command": "qmd skill install --yes (only after QMD-01 scope review)",
+            "inverse": "Restore only touched skill/bootstrap/symlink and registration preimages; remove only transaction-created paths; preserve named index, models and other collections. QMD-03.",
+            "smoke": "qmd --index native-agent-stack-catalog-lex status; per-client fresh-session retrieval observation with cited checked-in text. QMD-03 is OUTSTANDING.",
+            "applied": false,
+            "status": "OUTSTANDING"
+          },
+          "component_per_session_pss_kb": null,
+          "pss_status": "UNMEASURED; MV-PSS-qmd OUTSTANDING",
+          "cost_gate": "BLOCKED ADOPT-NOW until per-role/session/process PSS and sharing/load evidence",
+          "shared_copy_capability": "Documented native shared HTTP; configured service pending activation",
+          "load_scope": "only the owning/using roles; per-role MCP set proposal, no global activation change",
+          "executed_host_steps": [],
+          "unexecuted_steps_status": "OUTSTANDING"
+        },
+        "graphiti": {
+          "owning_lane_or_role": "memory-h2h",
+          "pin": {
+            "repository": "getzep/graphiti",
+            "version": "0.30.2",
+            "commit": "eaa4128681bc53487138a4bbc22d58336ebe70d2",
+            "route": "DEFER; no installer or registration proposed; mcp-v1.1.0 source remains separate"
+          },
+          "install_routing": {
+            "operation": "DEFER",
+            "route": "DEFER; no installer or registration proposed; mcp-v1.1.0 source remains separate",
+            "install_command": null,
+            "inverse": "No host configuration delta in this correction; any later scoped addition requires a reviewed transaction inverse.",
+            "status": "DEFERRED",
+            "applied": false
+          },
+          "component_per_session_pss_kb": null,
+          "pss_status": "UNMEASURED; MV-PSS-graphiti OUTSTANDING",
+          "cost_gate": "BLOCKED ADOPT-NOW until per-role/session/process PSS and sharing/load evidence",
+          "shared_copy_capability": "No adopted host process; shared HTTP deployment capability not verified",
+          "load_scope": "only the owning/using roles; per-role MCP set proposal, no global activation change",
+          "executed_host_steps": [],
+          "unexecuted_steps_status": "OUTSTANDING",
+          "supported_routing_commands": {
+            "claude": "DEFER — no install or routing delta authorized",
+            "codex": "DEFER — no install or routing delta authorized",
+            "inverse": "No change to reverse; any future specialist-job install needs its own reviewed native inverse",
+            "smoke": "OUTSTANDING/deferred until an owner-authorized specialist temporal job; no synthetic acceptance",
+            "source": "getzep/graphiti@eaa4128681bc53487138a4bbc22d58336ebe70d2:graphiti_core/graphiti.py; mcp series pin remains separate"
+          }
+        }
+      }
+    },
+    "stage3": {
+      "acceptance_rule": "Accepted KEEP requires a returned, role/session/source-bound organic-use observation in stage 3 or 4. Counters alone, smoke calls, inventory and synthetic tasks do not establish organic use. This KEEP condition does not replace #833 READY criteria or authorize retirement for low use.",
+      "tools": {
+        "claude_native_memory": {
+          "owning_lane_or_role": "native Claude feature; no named native-memory counter",
+          "execution_status": "OUTSTANDING",
+          "organic_use_established": false,
+          "results": [],
+          "per_role_tasks": [
+            {
+              "role": "wsl-architecture-design",
+              "client": "claude",
+              "relation": "named consumer; owning-Claude-lane mapping OUTSTANDING",
+              "registry_pointer": null,
+              "natural_fresh_tasks": [
+                "In a fresh project session, apply this project's established response and validation conventions to a small documentation correction.",
+                "In a later fresh session, explain which project convention governed that correction and cite its retained source."
+              ],
+              "observables": [
+                "returned task outcome",
+                "original source evidence",
+                "role/session/time-bound use observation"
+              ],
+              "executed": false,
+              "session_reference": null,
+              "result": null
+            }
+          ],
+          "eligibility": "OUTSTANDING; no scripted smoke promoted to organic use"
+        },
+        "ai_memory": {
+          "owning_lane_or_role": "memory-h2h",
+          "execution_status": "OUTSTANDING",
+          "organic_use_established": false,
+          "results": [],
+          "per_role_tasks": [
+            {
+              "role": "memory-h2h",
+              "client": "codex",
+              "relation": "owning lane",
+              "registry_pointer": "/roles/memory-h2h",
+              "natural_fresh_tasks": [
+                "In a fresh project session, explain why the previous foundation decision preserves the named research job and cite the recorded decision.",
+                "Record the source correction from this task; in a later fresh session, recover it with its original source."
+              ],
+              "observables": [
+                "returned task outcome",
+                "original source evidence",
+                "role/session/time-bound use observation"
+              ],
+              "executed": false,
+              "session_reference": null,
+              "result": null
+            },
+            {
+              "role": "wsl-architecture-design",
+              "client": "claude",
+              "relation": "named consumer; owning-Claude-lane mapping OUTSTANDING",
+              "registry_pointer": null,
+              "natural_fresh_tasks": [
+                "In a fresh project session, explain why the previous foundation decision preserves the named research job and cite the recorded decision.",
+                "Record the source correction from this task; in a later fresh session, recover it with its original source."
+              ],
+              "observables": [
+                "returned task outcome",
+                "original source evidence",
+                "role/session/time-bound use observation"
+              ],
+              "executed": false,
+              "session_reference": null,
+              "result": null
+            }
+          ],
+          "eligibility": "OUTSTANDING; no scripted smoke promoted to organic use"
+        },
+        "hindsight": {
+          "owning_lane_or_role": "memory-h2h",
+          "execution_status": "OUTSTANDING",
+          "organic_use_established": false,
+          "results": [],
+          "per_role_tasks": [
+            {
+              "role": "memory-h2h",
+              "client": "codex",
+              "relation": "owning lane",
+              "registry_pointer": "/roles/memory-h2h",
+              "natural_fresh_tasks": [
+                "Record the hypothesis, cited inputs, experiment isolation label and result of the current authorized research task.",
+                "In a separate fresh session, recover the original hypothesis and result for that experiment; identify whether a differently labelled experiment is excluded."
+              ],
+              "observables": [
+                "organic retain",
+                "later fresh-session recall",
+                "original source and hypothesis/outcome",
+                "world/experience verbatim text",
+                "all_strict experiment isolation",
+                "role/session/time-bound counters"
+              ],
+              "executed": false,
+              "session_reference": null,
+              "result": null
+            },
+            {
+              "role": "wsl-architecture-design",
+              "client": "claude",
+              "relation": "named consumer; owning-Claude-lane mapping OUTSTANDING",
+              "registry_pointer": null,
+              "natural_fresh_tasks": [
+                "Record the hypothesis, cited inputs, experiment isolation label and result of the current authorized research task.",
+                "In a separate fresh session, recover the original hypothesis and result for that experiment; identify whether a differently labelled experiment is excluded."
+              ],
+              "observables": [
+                "organic retain",
+                "later fresh-session recall",
+                "original source and hypothesis/outcome",
+                "world/experience verbatim text",
+                "all_strict experiment isolation",
+                "role/session/time-bound counters"
+              ],
+              "executed": false,
+              "session_reference": null,
+              "result": null
+            }
+          ],
+          "eligibility": "OUTSTANDING; no scripted smoke promoted to organic use"
+        },
+        "context_mode": {
+          "owning_lane_or_role": "codex-token-parity",
+          "execution_status": "OUTSTANDING",
+          "organic_use_established": false,
+          "results": [],
+          "per_role_tasks": [
+            {
+              "role": "codex-token-parity",
+              "client": "codex",
+              "relation": "owning lane",
+              "registry_pointer": "/roles/codex-token-parity",
+              "natural_fresh_tasks": [
+                "Inspect the supplied local validation output, identify the relevant failing assertion and propose a bounded correction.",
+                "In a later fresh session, recover the assertion and proposed correction from the prior task and verify its source."
+              ],
+              "observables": [
+                "returned task outcome",
+                "original source evidence",
+                "role/session/time-bound use observation"
+              ],
+              "executed": false,
+              "session_reference": null,
+              "result": null
+            },
+            {
+              "role": "memory-h2h",
+              "client": "codex",
+              "relation": "separate named consumer",
+              "registry_pointer": "/roles/memory-h2h",
+              "natural_fresh_tasks": [
+                "Inspect the supplied local validation output, identify the relevant failing assertion and propose a bounded correction.",
+                "In a later fresh session, recover the assertion and proposed correction from the prior task and verify its source."
+              ],
+              "observables": [
+                "returned task outcome",
+                "original source evidence",
+                "role/session/time-bound use observation"
+              ],
+              "executed": false,
+              "session_reference": null,
+              "result": null
+            },
+            {
+              "role": "wsl-architecture-design",
+              "client": "claude",
+              "relation": "named consumer; owning-Claude-lane mapping OUTSTANDING",
+              "registry_pointer": null,
+              "natural_fresh_tasks": [
+                "Inspect the supplied local validation output, identify the relevant failing assertion and propose a bounded correction.",
+                "In a later fresh session, recover the assertion and proposed correction from the prior task and verify its source."
+              ],
+              "observables": [
+                "returned task outcome",
+                "original source evidence",
+                "role/session/time-bound use observation"
+              ],
+              "executed": false,
+              "session_reference": null,
+              "result": null
+            }
+          ],
+          "eligibility": "OUTSTANDING; no scripted smoke promoted to organic use"
+        },
+        "codebase_memory": {
+          "owning_lane_or_role": "overlap-token",
+          "execution_status": "OUTSTANDING",
+          "organic_use_established": false,
+          "results": [],
+          "per_role_tasks": [
+            {
+              "role": "overlap-token",
+              "client": "codex",
+              "relation": "owning lane",
+              "registry_pointer": "/roles/overlap-token",
+              "natural_fresh_tasks": [
+                "For the supplied foundation function, identify its callers and downstream dependencies with exact source locations.",
+                "In a separate fresh session, assess which callers a proposed signature change would affect and verify the relevant source coverage."
+              ],
+              "observables": [
+                "returned task outcome",
+                "original source evidence",
+                "role/session/time-bound use observation"
+              ],
+              "executed": false,
+              "session_reference": null,
+              "result": null
+            },
+            {
+              "role": "memory-h2h",
+              "client": "codex",
+              "relation": "separate named consumer",
+              "registry_pointer": "/roles/memory-h2h",
+              "natural_fresh_tasks": [
+                "For the supplied foundation function, identify its callers and downstream dependencies with exact source locations.",
+                "In a separate fresh session, assess which callers a proposed signature change would affect and verify the relevant source coverage."
+              ],
+              "observables": [
+                "returned task outcome",
+                "original source evidence",
+                "role/session/time-bound use observation"
+              ],
+              "executed": false,
+              "session_reference": null,
+              "result": null
+            },
+            {
+              "role": "wsl-architecture-design",
+              "client": "claude",
+              "relation": "named consumer; owning-Claude-lane mapping OUTSTANDING",
+              "registry_pointer": null,
+              "natural_fresh_tasks": [
+                "For the supplied foundation function, identify its callers and downstream dependencies with exact source locations.",
+                "In a separate fresh session, assess which callers a proposed signature change would affect and verify the relevant source coverage."
+              ],
+              "observables": [
+                "returned task outcome",
+                "original source evidence",
+                "role/session/time-bound use observation"
+              ],
+              "executed": false,
+              "session_reference": null,
+              "result": null
+            }
+          ],
+          "eligibility": "OUTSTANDING; no scripted smoke promoted to organic use"
+        },
+        "qmd": {
+          "owning_lane_or_role": "memory-h2h",
+          "execution_status": "OUTSTANDING",
+          "organic_use_established": false,
+          "results": [],
+          "per_role_tasks": [
+            {
+              "role": "memory-h2h",
+              "client": "codex",
+              "relation": "owning lane",
+              "registry_pointer": "/roles/memory-h2h",
+              "natural_fresh_tasks": [
+                "Find the checked-in decision that defines foundation evidence and cite its exact passage and lines.",
+                "In a later fresh session, recover that same decision passage and explain the boundary it imposes."
+              ],
+              "observables": [
+                "returned task outcome",
+                "original source evidence",
+                "role/session/time-bound use observation"
+              ],
+              "executed": false,
+              "session_reference": null,
+              "result": null
+            },
+            {
+              "role": "wsl-architecture-design",
+              "client": "claude",
+              "relation": "named consumer; owning-Claude-lane mapping OUTSTANDING",
+              "registry_pointer": null,
+              "natural_fresh_tasks": [
+                "Find the checked-in decision that defines foundation evidence and cite its exact passage and lines.",
+                "In a later fresh session, recover that same decision passage and explain the boundary it imposes."
+              ],
+              "observables": [
+                "returned task outcome",
+                "original source evidence",
+                "role/session/time-bound use observation"
+              ],
+              "executed": false,
+              "session_reference": null,
+              "result": null
+            }
+          ],
+          "eligibility": "OUTSTANDING; no scripted smoke promoted to organic use"
+        },
+        "graphiti": {
+          "owning_lane_or_role": "memory-h2h",
+          "execution_status": "OUTSTANDING",
+          "organic_use_established": false,
+          "results": [],
+          "per_role_tasks": [
+            {
+              "role": "memory-h2h",
+              "client": "codex",
+              "relation": "owning lane",
+              "registry_pointer": "/roles/memory-h2h",
+              "natural_fresh_tasks": [
+                "When a specialist temporal-relation job is authorized, recover the provenance and validity interval of the supplied relation.",
+                "Verify that a differently scoped relation is excluded and return the original source; execution remains deferred."
+              ],
+              "observables": [
+                "returned task outcome",
+                "original source evidence",
+                "role/session/time-bound use observation"
+              ],
+              "executed": false,
+              "session_reference": null,
+              "result": null
+            },
+            {
+              "role": "wsl-architecture-design",
+              "client": "claude",
+              "relation": "named consumer; owning-Claude-lane mapping OUTSTANDING",
+              "registry_pointer": null,
+              "natural_fresh_tasks": [
+                "When a specialist temporal-relation job is authorized, recover the provenance and validity interval of the supplied relation.",
+                "Verify that a differently scoped relation is excluded and return the original source; execution remains deferred."
+              ],
+              "observables": [
+                "returned task outcome",
+                "original source evidence",
+                "role/session/time-bound use observation"
+              ],
+              "executed": false,
+              "session_reference": null,
+              "result": null
+            }
+          ],
+          "eligibility": "DEFERRED until an owner-authorized specialist job"
+        }
+      }
+    },
+    "stage4": {
+      "baseline_policy": "Use the immutable October 8 baseline and separate reconciled rolling window; do not merge windows or recount Loki. New CC-producer role rows must be pinned/hashed and launch-window verified before comparison.",
+      "tools": {
+        "claude_native_memory": {
+          "owning_lane_or_role": "native Claude feature; no named native-memory counter",
+          "execution_status": "OUTSTANDING",
+          "organic_use_established": false,
+          "results": [],
+          "baseline": {
+            "source_file": "docs/decisions/memory-adoption-835/adoption-now-5de97cf238b3d28a.json",
+            "sha256": "5de97cf238b3d28aa9f7d5110a05857204a847b0c75cda8971de8e142e362e36",
+            "generated_utc": "2026-10-08T23:42:51Z",
+            "window_hours": 24,
+            "method": "docs/decisions/2026-09-26-tool-invoke-rates.md (Loki count of record)",
+            "codex_population": 841,
+            "claude_population": 63
+          },
+          "reconciled_context": {
+            "source_file": "docs/decisions/memory-adoption-835/adoption-now-8682d1d326f29798.json",
+            "sha256": "8682d1d326f2979802efa32d156d9db14dba3ce04273328b6b48a0e227533ac7",
+            "generated_utc": "2026-10-09T00:31:25Z",
+            "window_hours": 24,
+            "method": "docs/decisions/2026-09-26-tool-invoke-rates.md (Loki count of record)",
+            "codex_population": 850,
+            "claude_population": 70
+          },
+          "registry_reference": {
+            "source_file": "docs/decisions/memory-adoption-835/registry-role-identities.json",
+            "sha256": "03abf51ca7477c6b40c03e5f60a64177730fc838495b9bc174062555fc7f8cf6"
+          },
+          "hourly_plan": {
+            "anchor": "CC-applied wiring or reviewed unchanged-route verification timestamp",
+            "anchor_utc": null,
+            "interval_hours": 1,
+            "first_sample": "T0 (post-wiring)",
+            "last_sample": "T0+24h",
+            "per_role_follow_up": [
+              {
+                "role": "wsl-architecture-design",
+                "client": "claude",
+                "relation": "named consumer; owning-Claude-lane mapping OUTSTANDING",
+                "registry_pointer": null,
+                "due": "T0+24h",
+                "status": "OUTSTANDING"
+              }
+            ],
+            "source": "CC hourly adoption-now.json role rows, or newly pinned registry excerpt joined to source buckets",
+            "scheduled": false,
+            "compared": false
+          },
+          "comparison": "Report calls/identities/denominator per role and exact rolling window, with role-row/launch-window provenance. Counters alone do not establish organic use; attach the natural-task outcome provenance before accepted KEEP.",
+          "limitations": "Rolling-window count differences are descriptive; not paired causal savings or product acceptance."
+        },
+        "ai_memory": {
+          "owning_lane_or_role": "memory-h2h",
+          "execution_status": "OUTSTANDING",
+          "organic_use_established": false,
+          "results": [],
+          "baseline": {
+            "source_file": "docs/decisions/memory-adoption-835/adoption-now-5de97cf238b3d28a.json",
+            "sha256": "5de97cf238b3d28aa9f7d5110a05857204a847b0c75cda8971de8e142e362e36",
+            "generated_utc": "2026-10-08T23:42:51Z",
+            "window_hours": 24,
+            "method": "docs/decisions/2026-09-26-tool-invoke-rates.md (Loki count of record)",
+            "codex_population": 841,
+            "claude_population": 63
+          },
+          "reconciled_context": {
+            "source_file": "docs/decisions/memory-adoption-835/adoption-now-8682d1d326f29798.json",
+            "sha256": "8682d1d326f2979802efa32d156d9db14dba3ce04273328b6b48a0e227533ac7",
+            "generated_utc": "2026-10-09T00:31:25Z",
+            "window_hours": 24,
+            "method": "docs/decisions/2026-09-26-tool-invoke-rates.md (Loki count of record)",
+            "codex_population": 850,
+            "claude_population": 70
+          },
+          "registry_reference": {
+            "source_file": "docs/decisions/memory-adoption-835/registry-role-identities.json",
+            "sha256": "03abf51ca7477c6b40c03e5f60a64177730fc838495b9bc174062555fc7f8cf6"
+          },
+          "hourly_plan": {
+            "anchor": "CC-applied wiring or reviewed unchanged-route verification timestamp",
+            "anchor_utc": null,
+            "interval_hours": 1,
+            "first_sample": "T0 (post-wiring)",
+            "last_sample": "T0+24h",
+            "per_role_follow_up": [
+              {
+                "role": "memory-h2h",
+                "client": "codex",
+                "relation": "owning lane",
+                "registry_pointer": "/roles/memory-h2h",
+                "due": "T0+24h",
+                "status": "OUTSTANDING"
+              },
+              {
+                "role": "wsl-architecture-design",
+                "client": "claude",
+                "relation": "named consumer; owning-Claude-lane mapping OUTSTANDING",
+                "registry_pointer": null,
+                "due": "T0+24h",
+                "status": "OUTSTANDING"
+              }
+            ],
+            "source": "CC hourly adoption-now.json role rows, or newly pinned registry excerpt joined to source buckets",
+            "scheduled": false,
+            "compared": false
+          },
+          "comparison": "Report calls/identities/denominator per role and exact rolling window, with role-row/launch-window provenance. Counters alone do not establish organic use; attach the natural-task outcome provenance before accepted KEEP.",
+          "limitations": "Rolling-window count differences are descriptive; not paired causal savings or product acceptance."
+        },
+        "hindsight": {
+          "owning_lane_or_role": "memory-h2h",
+          "execution_status": "OUTSTANDING",
+          "organic_use_established": false,
+          "results": [],
+          "baseline": {
+            "source_file": "docs/decisions/memory-adoption-835/adoption-now-5de97cf238b3d28a.json",
+            "sha256": "5de97cf238b3d28aa9f7d5110a05857204a847b0c75cda8971de8e142e362e36",
+            "generated_utc": "2026-10-08T23:42:51Z",
+            "window_hours": 24,
+            "method": "docs/decisions/2026-09-26-tool-invoke-rates.md (Loki count of record)",
+            "codex_population": 841,
+            "claude_population": 63
+          },
+          "reconciled_context": {
+            "source_file": "docs/decisions/memory-adoption-835/adoption-now-8682d1d326f29798.json",
+            "sha256": "8682d1d326f2979802efa32d156d9db14dba3ce04273328b6b48a0e227533ac7",
+            "generated_utc": "2026-10-09T00:31:25Z",
+            "window_hours": 24,
+            "method": "docs/decisions/2026-09-26-tool-invoke-rates.md (Loki count of record)",
+            "codex_population": 850,
+            "claude_population": 70
+          },
+          "registry_reference": {
+            "source_file": "docs/decisions/memory-adoption-835/registry-role-identities.json",
+            "sha256": "03abf51ca7477c6b40c03e5f60a64177730fc838495b9bc174062555fc7f8cf6"
+          },
+          "hourly_plan": {
+            "anchor": "CC-applied wiring or reviewed unchanged-route verification timestamp",
+            "anchor_utc": null,
+            "interval_hours": 1,
+            "first_sample": "T0 (post-wiring)",
+            "last_sample": "T0+24h",
+            "per_role_follow_up": [
+              {
+                "role": "memory-h2h",
+                "client": "codex",
+                "relation": "owning lane",
+                "registry_pointer": "/roles/memory-h2h",
+                "due": "T0+24h",
+                "status": "OUTSTANDING"
+              },
+              {
+                "role": "wsl-architecture-design",
+                "client": "claude",
+                "relation": "named consumer; owning-Claude-lane mapping OUTSTANDING",
+                "registry_pointer": null,
+                "due": "T0+24h",
+                "status": "OUTSTANDING"
+              }
+            ],
+            "source": "CC hourly adoption-now.json role rows, or newly pinned registry excerpt joined to source buckets",
+            "scheduled": false,
+            "compared": false
+          },
+          "comparison": "Report calls/identities/denominator per role and exact rolling window, with role-row/launch-window provenance. Counters alone do not establish organic use; attach the natural-task outcome provenance before accepted KEEP.",
+          "limitations": "Rolling-window count differences are descriptive; not paired causal savings or product acceptance."
+        },
+        "context_mode": {
+          "owning_lane_or_role": "codex-token-parity",
+          "execution_status": "OUTSTANDING",
+          "organic_use_established": false,
+          "results": [],
+          "baseline": {
+            "source_file": "docs/decisions/memory-adoption-835/adoption-now-5de97cf238b3d28a.json",
+            "sha256": "5de97cf238b3d28aa9f7d5110a05857204a847b0c75cda8971de8e142e362e36",
+            "generated_utc": "2026-10-08T23:42:51Z",
+            "window_hours": 24,
+            "method": "docs/decisions/2026-09-26-tool-invoke-rates.md (Loki count of record)",
+            "codex_population": 841,
+            "claude_population": 63
+          },
+          "reconciled_context": {
+            "source_file": "docs/decisions/memory-adoption-835/adoption-now-8682d1d326f29798.json",
+            "sha256": "8682d1d326f2979802efa32d156d9db14dba3ce04273328b6b48a0e227533ac7",
+            "generated_utc": "2026-10-09T00:31:25Z",
+            "window_hours": 24,
+            "method": "docs/decisions/2026-09-26-tool-invoke-rates.md (Loki count of record)",
+            "codex_population": 850,
+            "claude_population": 70
+          },
+          "registry_reference": {
+            "source_file": "docs/decisions/memory-adoption-835/registry-role-identities.json",
+            "sha256": "03abf51ca7477c6b40c03e5f60a64177730fc838495b9bc174062555fc7f8cf6"
+          },
+          "hourly_plan": {
+            "anchor": "CC-applied wiring or reviewed unchanged-route verification timestamp",
+            "anchor_utc": null,
+            "interval_hours": 1,
+            "first_sample": "T0 (post-wiring)",
+            "last_sample": "T0+24h",
+            "per_role_follow_up": [
+              {
+                "role": "codex-token-parity",
+                "client": "codex",
+                "relation": "owning lane",
+                "registry_pointer": "/roles/codex-token-parity",
+                "due": "T0+24h",
+                "status": "OUTSTANDING"
+              },
+              {
+                "role": "memory-h2h",
+                "client": "codex",
+                "relation": "separate named consumer",
+                "registry_pointer": "/roles/memory-h2h",
+                "due": "T0+24h",
+                "status": "OUTSTANDING"
+              },
+              {
+                "role": "wsl-architecture-design",
+                "client": "claude",
+                "relation": "named consumer; owning-Claude-lane mapping OUTSTANDING",
+                "registry_pointer": null,
+                "due": "T0+24h",
+                "status": "OUTSTANDING"
+              }
+            ],
+            "source": "CC hourly adoption-now.json role rows, or newly pinned registry excerpt joined to source buckets",
+            "scheduled": false,
+            "compared": false
+          },
+          "comparison": "Report calls/identities/denominator per role and exact rolling window, with role-row/launch-window provenance. Counters alone do not establish organic use; attach the natural-task outcome provenance before accepted KEEP.",
+          "limitations": "Rolling-window count differences are descriptive; not paired causal savings or product acceptance."
+        },
+        "codebase_memory": {
+          "owning_lane_or_role": "overlap-token",
+          "execution_status": "OUTSTANDING",
+          "organic_use_established": false,
+          "results": [],
+          "baseline": {
+            "source_file": "docs/decisions/memory-adoption-835/adoption-now-5de97cf238b3d28a.json",
+            "sha256": "5de97cf238b3d28aa9f7d5110a05857204a847b0c75cda8971de8e142e362e36",
+            "generated_utc": "2026-10-08T23:42:51Z",
+            "window_hours": 24,
+            "method": "docs/decisions/2026-09-26-tool-invoke-rates.md (Loki count of record)",
+            "codex_population": 841,
+            "claude_population": 63
+          },
+          "reconciled_context": {
+            "source_file": "docs/decisions/memory-adoption-835/adoption-now-8682d1d326f29798.json",
+            "sha256": "8682d1d326f2979802efa32d156d9db14dba3ce04273328b6b48a0e227533ac7",
+            "generated_utc": "2026-10-09T00:31:25Z",
+            "window_hours": 24,
+            "method": "docs/decisions/2026-09-26-tool-invoke-rates.md (Loki count of record)",
+            "codex_population": 850,
+            "claude_population": 70
+          },
+          "registry_reference": {
+            "source_file": "docs/decisions/memory-adoption-835/registry-role-identities.json",
+            "sha256": "03abf51ca7477c6b40c03e5f60a64177730fc838495b9bc174062555fc7f8cf6"
+          },
+          "hourly_plan": {
+            "anchor": "CC-applied wiring or reviewed unchanged-route verification timestamp",
+            "anchor_utc": null,
+            "interval_hours": 1,
+            "first_sample": "T0 (post-wiring)",
+            "last_sample": "T0+24h",
+            "per_role_follow_up": [
+              {
+                "role": "overlap-token",
+                "client": "codex",
+                "relation": "owning lane",
+                "registry_pointer": "/roles/overlap-token",
+                "due": "T0+24h",
+                "status": "OUTSTANDING"
+              },
+              {
+                "role": "memory-h2h",
+                "client": "codex",
+                "relation": "separate named consumer",
+                "registry_pointer": "/roles/memory-h2h",
+                "due": "T0+24h",
+                "status": "OUTSTANDING"
+              },
+              {
+                "role": "wsl-architecture-design",
+                "client": "claude",
+                "relation": "named consumer; owning-Claude-lane mapping OUTSTANDING",
+                "registry_pointer": null,
+                "due": "T0+24h",
+                "status": "OUTSTANDING"
+              }
+            ],
+            "source": "CC hourly adoption-now.json role rows, or newly pinned registry excerpt joined to source buckets",
+            "scheduled": false,
+            "compared": false
+          },
+          "comparison": "Report calls/identities/denominator per role and exact rolling window, with role-row/launch-window provenance. Counters alone do not establish organic use; attach the natural-task outcome provenance before accepted KEEP.",
+          "limitations": "Rolling-window count differences are descriptive; not paired causal savings or product acceptance."
+        },
+        "qmd": {
+          "owning_lane_or_role": "memory-h2h",
+          "execution_status": "OUTSTANDING",
+          "organic_use_established": false,
+          "results": [],
+          "baseline": {
+            "source_file": "docs/decisions/memory-adoption-835/adoption-now-5de97cf238b3d28a.json",
+            "sha256": "5de97cf238b3d28aa9f7d5110a05857204a847b0c75cda8971de8e142e362e36",
+            "generated_utc": "2026-10-08T23:42:51Z",
+            "window_hours": 24,
+            "method": "docs/decisions/2026-09-26-tool-invoke-rates.md (Loki count of record)",
+            "codex_population": 841,
+            "claude_population": 63
+          },
+          "reconciled_context": {
+            "source_file": "docs/decisions/memory-adoption-835/adoption-now-8682d1d326f29798.json",
+            "sha256": "8682d1d326f2979802efa32d156d9db14dba3ce04273328b6b48a0e227533ac7",
+            "generated_utc": "2026-10-09T00:31:25Z",
+            "window_hours": 24,
+            "method": "docs/decisions/2026-09-26-tool-invoke-rates.md (Loki count of record)",
+            "codex_population": 850,
+            "claude_population": 70
+          },
+          "registry_reference": {
+            "source_file": "docs/decisions/memory-adoption-835/registry-role-identities.json",
+            "sha256": "03abf51ca7477c6b40c03e5f60a64177730fc838495b9bc174062555fc7f8cf6"
+          },
+          "hourly_plan": {
+            "anchor": "CC-applied wiring or reviewed unchanged-route verification timestamp",
+            "anchor_utc": null,
+            "interval_hours": 1,
+            "first_sample": "T0 (post-wiring)",
+            "last_sample": "T0+24h",
+            "per_role_follow_up": [
+              {
+                "role": "memory-h2h",
+                "client": "codex",
+                "relation": "owning lane",
+                "registry_pointer": "/roles/memory-h2h",
+                "due": "T0+24h",
+                "status": "OUTSTANDING"
+              },
+              {
+                "role": "wsl-architecture-design",
+                "client": "claude",
+                "relation": "named consumer; owning-Claude-lane mapping OUTSTANDING",
+                "registry_pointer": null,
+                "due": "T0+24h",
+                "status": "OUTSTANDING"
+              }
+            ],
+            "source": "CC hourly adoption-now.json role rows, or newly pinned registry excerpt joined to source buckets",
+            "scheduled": false,
+            "compared": false
+          },
+          "comparison": "Report calls/identities/denominator per role and exact rolling window, with role-row/launch-window provenance. Counters alone do not establish organic use; attach the natural-task outcome provenance before accepted KEEP.",
+          "limitations": "Rolling-window count differences are descriptive; not paired causal savings or product acceptance."
+        },
+        "graphiti": {
+          "owning_lane_or_role": "memory-h2h",
+          "execution_status": "OUTSTANDING",
+          "organic_use_established": false,
+          "results": [],
+          "baseline": {
+            "source_file": "docs/decisions/memory-adoption-835/adoption-now-5de97cf238b3d28a.json",
+            "sha256": "5de97cf238b3d28aa9f7d5110a05857204a847b0c75cda8971de8e142e362e36",
+            "generated_utc": "2026-10-08T23:42:51Z",
+            "window_hours": 24,
+            "method": "docs/decisions/2026-09-26-tool-invoke-rates.md (Loki count of record)",
+            "codex_population": 841,
+            "claude_population": 63
+          },
+          "reconciled_context": {
+            "source_file": "docs/decisions/memory-adoption-835/adoption-now-8682d1d326f29798.json",
+            "sha256": "8682d1d326f2979802efa32d156d9db14dba3ce04273328b6b48a0e227533ac7",
+            "generated_utc": "2026-10-09T00:31:25Z",
+            "window_hours": 24,
+            "method": "docs/decisions/2026-09-26-tool-invoke-rates.md (Loki count of record)",
+            "codex_population": 850,
+            "claude_population": 70
+          },
+          "registry_reference": {
+            "source_file": "docs/decisions/memory-adoption-835/registry-role-identities.json",
+            "sha256": "03abf51ca7477c6b40c03e5f60a64177730fc838495b9bc174062555fc7f8cf6"
+          },
+          "hourly_plan": {
+            "anchor": "CC-applied wiring or reviewed unchanged-route verification timestamp",
+            "anchor_utc": null,
+            "interval_hours": 1,
+            "first_sample": "T0 (post-wiring)",
+            "last_sample": "T0+24h",
+            "per_role_follow_up": [
+              {
+                "role": "memory-h2h",
+                "client": "codex",
+                "relation": "owning lane",
+                "registry_pointer": "/roles/memory-h2h",
+                "due": "T0+24h",
+                "status": "OUTSTANDING"
+              },
+              {
+                "role": "wsl-architecture-design",
+                "client": "claude",
+                "relation": "named consumer; owning-Claude-lane mapping OUTSTANDING",
+                "registry_pointer": null,
+                "due": "T0+24h",
+                "status": "OUTSTANDING"
+              }
+            ],
+            "source": "CC hourly adoption-now.json role rows, or newly pinned registry excerpt joined to source buckets",
+            "scheduled": false,
+            "compared": false
+          },
+          "comparison": "Report calls/identities/denominator per role and exact rolling window, with role-row/launch-window provenance. Counters alone do not establish organic use; attach the natural-task outcome provenance before accepted KEEP.",
+          "limitations": "Rolling-window count differences are descriptive; not paired causal savings or product acceptance."
+        }
       }
     }
   }

@@ -102,32 +102,20 @@ bucket's denominator. Its `adoption_evidence.reconciliation.changed_fields`
 lists every changed counter for these seven namespaces across all source
 buckets/producer layers and every changed role/client population.
 
-The owning Codex identities are memory-h2h `rumi`, the separate historical
-memory-h2h identity `voni`, context owner codex-token-parity `dove`, and
-code-intelligence owner overlap-token `lise`, as supplied by the lane launches
-and role dispatch. The snapshots themselves index these identities, not durable
-lane ownership. `wsl-architecture-design` is a named Claude consumer; it does
-not prove an owning lane. `other Claude sessions` is unattributed. Claude
-owning-role adoption therefore remains unresolved where that is the only
-reported bucket. Those consumer/context rows are labelled separately from
-owning-lane evidence.
+The owning Codex identities are bound from the [pinned registry/history excerpt](memory-adoption-835/registry-role-identities.json): memory-h2h `voni/zimu/rumi/revi`, context owner codex-token-parity `novu/dove/zonu`, and code-intelligence owner overlap-token `vuru/luva/lise`. All observed aliases are recorded even when absent from a source window. `wsl-architecture-design` stays a named Claude consumer and `other Claude sessions` is context only. Exact alias/source bindings and separate bucket sums are below; raw thread/session ids and credential values are not added.
 
-Cells below are **calls / distinct identities / exact role denominator**,
-shown **5de97cf2 → 8682d1d3**. Identities are Codex conversations or Claude
-sessions. No aliases, client populations, namespaces or windows are merged.
-Counters show invocation, not useful outcomes or organic acceptance. Missing
-entries remain unmeasured. KEEP/WIRE/DEFER remain source-backed proposals. A successful ordinary fresh task
-is an organic-use observation; under the landed rule it does not gate readiness.
+Cells below bind **separate source buckets** at 5de97cf2 → 8682d1d3. MCP counters classify invocation only. KEEP is proposed until stage 3 or 4 establishes organic use; WIRE and DEFER do not claim deployment. Exact complete owning-lane sums and per-alias source pointers are in the JSON and machine-checked successor table below.
 
-| Layer | Disposition | Owning-role/lane binding and evidence limits |
+| Layer | Proposed disposition | Complete owning-lane binding and limits |
 | --- | --- | --- |
-| Claude native auto-memory | **KEEP proposed** | **Organic use unresolved.** Named Claude consumer population is 1 → 1, but native memory has no eligible MCP counter: calls/identities remain null. No native-session load/read/use observation is attached; file freshness is not a substitute |
-| ai-memory | **WIRE** | Current memory-h2h `rumi`: 5/1/2 → 5/1/2; historical `voni`: 8/1/4 → 8/1/4, kept separate. Named Claude consumer: 6/1/1 → 6/1/1; owning Claude lane is unresolved. Managed recall/maintenance skills are missing in the inspected native roots; use [vendor managed skill sources](https://github.com/akitaonrails/ai-memory/tree/89bd8ded3c1ab8b769cf99417d038ed0364403c8/crates/ai-memory-core/src/routing_skills) and native `ai-memory install-skills --scope global --agent both` / reviewed `install-instructions`; no installation is claimed. Invocation does not certify task use |
-| Hindsight | **WIRE** | Current memory-h2h `rumi`: 4/1/2 → 4/1/2; historical `voni`: 1/1/4 → 1/1/4. Named Claude consumer has no Hindsight entry; the unattributed bucket is 4/4/55 → 4/4/66 and cannot prove an owner. The canonical research job is accepted; complete the vendor research skill route and preserve its native registrations/service/bank. Counts are not removal evidence |
-| context-mode | **KEEP** | Owning context lane `dove`: 182/2/2 → 186/2/2. Separate memory-h2h consumer `rumi`: 68/2/2 → 100/2/2. Named Claude consumer uses `plugin_context-mode_context-mode`: 1975/1/1 → 1931/1/1; it is not a Codex `context-mode` counter or owning-lane proof. Preserve native session routing; useful outcomes remain unmeasured by these counters |
-| codebase-memory | **KEEP** | Owning code-intelligence lane `lise`: 5/1/1 → 5/1/1. Separate memory inventory consumer `rumi`: 1/1/2 → 1/1/2. Claude's 4/4/55 → 4/4/66 is wholly unattributed; owning-role use is unresolved. Preserve native graph routing; inventory calls alone do not prove traversal usefulness |
-| QMD | **WIRE** | Current memory-h2h `rumi`: 1/1/2 → 1/1/2; historical `voni` has no entry. Named Claude consumer: 1/1/1 → 1/1/1; owning Claude lane unresolved. Both bootstrap skills exist. The unregistered [first-party Claude plugin route](https://github.com/tobi/qmd/blob/facd35e01359e59d938bc9418e93fb9318addee3/.claude-plugin/marketplace.json) and [runtime skill](https://github.com/tobi/qmd/blob/facd35e01359e59d938bc9418e93fb9318addee3/skills/qmd/SKILL.md) remain the wiring proposal; effective bootstrap use is unverified. Reconcile the named index/transport before adding a competing server |
-| Graphiti | **DEFER** | **Unmeasured in both snapshots.** No Graphiti entry in the owning-lane or named-consumer scopes; null calls/identities are not zero. Installation remains **defer**, with no current adopted specialist job; no retirement action is proposed |
+| Claude native auto-memory | **KEEP proposed** | No native-memory MCP counter; organic source-bound use remains OUTSTANDING |
+| ai-memory | **WIRE** | Every memory-h2h alias, both source windows and all named/context Claude buckets bound. Shell routing/inverse/smoke in the vendor packet remains OUTSTANDING |
+| Hindsight | **WIRE** | Every memory-h2h alias bound; accepted research job preserved. CC-applied CLI/client routes, inverse, per-client smoke and fresh retain/recall checks remain OUTSTANDING |
+| context-mode | **KEEP proposed** | Every codex-token-parity alias bound; source sum 205/4/4 → 276/6/6. Memory-h2h consumers stay separate. Organic usefulness remains OUTSTANDING |
+| codebase-memory | **KEEP proposed** | Every overlap-token alias bound; source sum 8/2/5 → 8/2/5. Memory-h2h consumer evidence separate. SocratiCode/Serena structural overlap explicitly flagged |
+| QMD | **WIRE** | Every memory-h2h alias and uniform named/context Claude buckets bound; native skill/inverse/client smoke remains OUTSTANDING |
+| Graphiti | **DEFER** | No reported Graphiti counter across owning-lane or named/context scopes; null does not mean zero |
+
 
 Reconciliation keeps the producer populations separate: Codex 841 → 850 and
 Claude 63 → 70. The exec-reader denominator changes 286 → 285; it is not mixed
@@ -177,12 +165,7 @@ native client exposure before claiming the scoped skill is active.
 
 The accepted job, `adoption/manifest.json#/recipe_map/hindsight`, research
 recipe, native registrations, service/drop-in/allowlist templates and retained
-bank remain dependents. No retirement step is authorized or performed. A later
-rule-5-qualified retirement would follow the recipe inverse: remove the two
-client registrations and disable the service, with any data/database removal
-separately destructive. Its inverse restores the bank-specific registrations,
-pinned service/drop-in/allowlist and service activation while retaining the
-bank. These are documented contingencies, not commands run by this PR.
+bank remain dependents. No retirement step is authorized or performed. The inverse of this proposed wiring restores only reviewed client preimages or removes verified transaction-created skill/CLI additions, preserving all existing client registrations, pinned service/drop-in/allowlist and bank data. The precise CLI pin, per-client routes, inverse and smokes are in the [CC-reviewed wiring packet](memory-adoption-835/hindsight-wire.diff.md). Every host step remains OUTSTANDING. The service-retirement inverse is a separate recipe operation and is not used as this wiring inverse.
 
 ai-memory's managed recall/maintenance skills are not installed in the inspected
 Claude/cross-agent roots. WIRE names native `install-skills --scope global
@@ -510,3 +493,82 @@ coordinator verifies that no other path changed (this log).
 Each row carries its own overturn condition. A cited upstream regression, a failed
 gate or an independent matched result reopens a row; the retained failure
 observations above stay in the record when a later release fixes them.
+
+## Combined delta correction — 2026-10-09
+
+This successor correction carries the CC delta at
+`c5ce6546da699ca08ecd8a3f83ec52fd2d5802232d8922b35abd5e8acd961e31`
+and GPT delta at
+`6041041dd85cb7854b9e3ca8cd9389de57cdfb1415acd96965947cda8c45ec0c`
+for `7f2dc865cc1ead227621bb23fce8d0c771f22440`. No prior source capture,
+whole-arm trial, G5 draft or historical host observation was replayed.
+
+The [registry excerpt](memory-adoption-835/registry-role-identities.json) is
+pinned at SHA256 `03abf51ca7477c6b40c03e5f60a64177730fc838495b9bc174062555fc7f8cf6`.
+It covers memory-h2h `voni/zimu/rumi/revi`, context owner
+codex-token-parity `novu/dove/zonu`, and code-intelligence owner overlap-token
+`vuru/luva/lise`, including names absent from one or both source captures.
+Voni is joined through its canonical thread-registry row and supported stopped
+hcom metadata; raw thread identity is hashed. Current relaunch names do not
+replace earlier buckets. Context-owner whole-lane sums reproduce
+**205 calls / 4 bucket identities / 4 denominator → 276 / 6 / 6**.
+Each alias stays separately inspectable; no event-level deduplication is claimed.
+Named Claude architecture consumers and `other Claude sessions` context are
+now present uniformly for all seven components. Context never proves ownership.
+
+The [Hindsight wiring diff](memory-adoption-835/hindsight-wire.diff.md), SHA256
+`d55fcbd57147fe76e124cbc942591cb3d850eb7b11c084fcbcd26702f81208fb`,
+records the pinned vendor CLI installer, Claude manual Skills + MCP route,
+Codex `$HOME/.agents/skills` root, transaction-specific inverse and one
+vendor smoke per client, including the shipped vendor harness boundary.
+Every host addition, smoke, organic fresh-session retain/recall and +24 h role
+follow-up remains **OUTSTANDING**. The CC selects research scopes, reviews the
+concrete diff and applies user-level client changes. The wiring inverse only
+reverses reviewed additions/preimages; it preserves the existing service, bank,
+registrations, 15-tool allowlist and accepted research job.
+
+The [ai-memory/QMD packet](memory-adoption-835/wire-inverses-smokes.md), SHA256
+`31ab5d5c5d8986df30bd367c5428423f2b18c1cad98fc39d5de78e33bb30e5bd`,
+records upstream inverses, preview/application commands and client checks.
+Shell commands use `$HOME`; `%h` appears only in systemd directives. The two
+ai-memory maintenance drafts now name the live optional
+`EnvironmentFile=-%h/.config/ai-memory/env`. Only the unit property's path and
+ignore-errors flag were inspected; no environment-file content was read.
+
+The JSON now records stage 1 candidate/G5 status, stage 2 install/routing/pin/
+inverse/PSS/load scope, stage 3 natural fresh tasks per owning lane and named
+consumer, and stage 4 hourly capture/role comparisons from T0 to T0+24 h.
+All seven candidates remain **PENDING until G5**. Native memory, context-mode
+and codebase-memory are **KEEP proposed** because stage 3/4 organic observations
+are unexecuted. Accepted KEEP requires a returned role/session/source-bound
+organic-use observation in one of those stages. Smoke/inventory counts do not
+supply it. This condition leaves the separate #833 READY rule and retention
+rule intact; sparse counters do not authorize removal.
+
+SocratiCode impact/flow/dependency queries and Serena references overlap the
+structural-graph slot. The proposed default is codebase-memory, SocratiCode is
+scoped to semantic/context search, and Serena to source editing/refactoring.
+Capability sources are the installed [SocratiCode 1.16.0 vendor manifest/skill](https://github.com/giancarloerra/socraticode/tree/v1.16.0) (skill SHA256 `629aaed8c034787773095475b7086ae1ada99dcec75318ce356da9081c29b2ec`) and its impact/flow tool interfaces, plus the installed [Serena](https://github.com/oraios/serena) initial-instructions/reference interface. Serena's build pin is unverified; these are capability observations, not a paired quality comparison. That routing split is a proposal pending owner review and comparative role observations. No host change or parallel structural default is accepted here.
+
+The canonical JSON `outstanding` array has **50** unique steps: 16 packet steps,
+seven each for component PSS, natural-task observations, hourly follow-ups and
+G5 bindings, plus Claude-owner binding, both micro reads, current CI, the required
+pre-cue tool and explicit CC cue/owner decisions. All are unexecuted. The fix head
+is record qualification; it is not host installation or upstream acceptance.
+
+### Machine-checked lane summary
+
+Bucket identities are summed across every registry-bound alias; these sums are
+not deduplicated lane identities. Each source window stays separate. The null
+native-memory/Graphiti calls do not represent zero use. Exact per-alias counters,
+denominators, registry pointers and absent names remain in the JSON record.
+
+| Component | Lane | Baseline calls / identities sum / denominator sum | Reconciled calls / identities sum / denominator sum |
+| --- | --- | --- | --- |
+| claude_native_memory | native Claude feature; no named native-memory counter | null / null / null | null / null / null |
+| ai_memory | memory-h2h | 13 / 2 / 8 | 13 / 2 / 8 |
+| hindsight | memory-h2h | 5 / 2 / 8 | 5 / 2 / 8 |
+| context_mode | codex-token-parity | 205 / 4 / 4 | 276 / 6 / 6 |
+| codebase_memory | overlap-token | 8 / 2 / 5 | 8 / 2 / 5 |
+| qmd | memory-h2h | 1 / 1 / 8 | 1 / 1 / 8 |
+| graphiti | memory-h2h | null / null / 8 | null / null / 8 |

@@ -35,3 +35,30 @@ G5 pointers, preservation of the accepted job, config/project drift and source
 identity/time grouping. These are local record-consistency checks, not component
 quality or organic-use acceptance. The draft units remain uninstalled; no native
 model task or host routing repair is executed by this documentation correction.
+
+## Both delta reads at 7f2dc865 — successor fix
+
+Reviewed-head delta sources: CC SHA256
+`c5ce6546da699ca08ecd8a3f83ec52fd2d5802232d8922b35abd5e8acd961e31`;
+GPT SHA256
+`6041041dd85cb7854b9e3ca8cd9389de57cdfb1415acd96965947cda8c45ec0c`.
+These corrections address the record; unexecuted native qualification remains
+explicitly OUTSTANDING and is not claimed as completion.
+
+| Delta finding | Concrete correction and remaining execution boundary |
+| --- | --- |
+| CC P2-1 / GPT P2-1 Hindsight rule-A wiring | [CC-ready vendor diff](hindsight-wire.diff.md) pins installer/CLI and unchanged manual skill routes, exact Claude/Codex roots, wiring-specific transaction inverse, one vendor smoke per client and shipped smoke harness; fresh organic retain/recall and +24h per-role checks. All 10 steps OUTSTANDING, no user-level config mutation |
+| CC P2-2 complete lane identity | [Hashed registry/history excerpt](registry-role-identities.json) covers all observed lane aliases, including zimu/rumi/revi/voni, novu/dove/zonu and vuru/luva/lise; every alias is bound in both source windows, including absences. Source sums 205/4/4 to 276/6/6 reproduced, no cross-alias dedup claim |
+| CC P3-3 / GPT P2-2 four stages and KEEP | Seven entries in each stage, explicit G5-pending selection, client route/inverse/PSS, per-role fresh tasks and hourly source-bound follow-up. All three KEEP outcomes are proposed until organic returned evidence in stage3/4; no #833 READY or retention-rule change |
+| CC P3-4 structural overlap | SocratiCode dependency/flow/impact and Serena references overlap codebase-memory graph scope; proposed routing separation is source-backed and pending comparative role checks, no parallel structural default applied |
+| CC P3-5 ai-memory/QMD inverses/smokes | [Vendor packet](wire-inverses-smokes.md) records native removal previews/application plus transaction preimages and per-client smokes; six steps OUTSTANDING |
+| CC P3-6 shell systemd specifier | Shell vendor command uses quoted `$HOME`; `%h` remains only systemd syntax |
+| CC P3-7 optional EnvironmentFile | Both ai-memory drafts name `EnvironmentFile=-%h/.config/ai-memory/env`, verified from live EnvironmentFiles property only. No environment value/file content read |
+| CC P3-8 tests | Assert exact window-key sets, complete registry alias bindings and source aggregates; parse both Markdown summary tables and whole-arm PSS/process source table. Mutation checks reject missing aliases/stages, changed windows/counters/PSS and raw KEEP without organic provenance. These are structural checks |
+| CC P3-9 uniform context bucket | Every tool includes named Claude consumer and uniformly unattributed other-Claude context; those rows never establish owning-role adoption |
+
+The JSON's 50 unique OUTSTANDING ids distinguish packet steps, per-tool PSS,
+organic task/hourly/G5 work, Claude-owner mapping, both micro reads, hosted CI,
+the pre-cue tool and explicit CC cue/owner decisions. Source snapshots/trial/G5
+bytes remain unchanged. One fix head on the current base, no rebase/host apply;
+landing remains CC through 5f after required reads, CI and the cue.

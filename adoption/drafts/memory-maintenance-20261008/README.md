@@ -4,7 +4,15 @@ These seven native oneshot services and seven timers are **drafts** for the
 [memory-role decision](../../../docs/decisions/2026-10-07-foundation-finalization.md#nativestack2604-memory-roles-and-maintenance-2026-10-08).
 They were not installed, enabled or executed. Cadences are proposed operating
 choices, not vendor defaults, measured quality improvements or model-use
-authorization. Each service requires the operator marker
+authorization.
+
+The two ai-memory drafts include `EnvironmentFile=-%h/.config/ai-memory/env`,
+matching the live unit's optional additive file reported by the native
+`systemctl --user show ai-memory.service --property=EnvironmentFiles` read.
+No environment-file content was opened. `%h` is a systemd specifier; proposed
+shell commands in the [vendor wiring packets](../../../docs/decisions/memory-adoption-835/README.md)
+use `$HOME`. Every client/CLI install and smoke remains OUTSTANDING for the CC.
+ Each service requires the operator marker
 `%h/.config/native-stack/memory-maintenance.approved`, which this PR does not
 create. Timers have no catch-up (`Persistent=false`), use UTC and add 15-minute
 jitter. Services have a 600-second bound and reduced CPU/I/O priority.
