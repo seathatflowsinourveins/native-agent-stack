@@ -41,7 +41,8 @@ On another PC, native `claude` is sufficient; retain any accepted local launcher
 For Windows Terminal, add a named profile with the distro, WSL user and project resolved on that PC. The
 [fragment example](../examples/claude-native/windows-terminal.fragment.example.json) carries the Shell, Codex and
 Claude set and one resume profile for each client. It also carries `Trade - Claude` and `Trade - Codex`, which
-start from the trading MAIN checkout, attempt a clean fast-forward refresh and use the clients' native
+start from the trading MAIN checkout, attempt a fast-forward when tracked/staged files are clean (auxiliary
+untracked files do not block it) and use the clients' native
 `--worktree` sessions. A skipped or failed refresh prints one note and still starts the client; `uv run --locked`
 syncs the project runtime on first use. Resolve `<TRADE_PROJECT>` to the US-equities main checkout; `<PROJECT>` remains the generic
 profiles' project. The [Trade launch decision](../docs/decisions/2026-10-09-trade-launch-profiles.md) records

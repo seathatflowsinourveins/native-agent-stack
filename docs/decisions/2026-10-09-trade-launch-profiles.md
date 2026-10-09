@@ -15,12 +15,16 @@ worktree/branch, uses Worktrunk, or embeds a date-format `%` in the command line
 
 ## Refresh and launch
 
-The login shell checks `git status --porcelain`. Only a successful clean result
+The login shell checks `git status --porcelain --untracked-files=no`. Auxiliary
+untracked files such as the host's `.serena/` do not block a refresh. Only a
+successful result with no tracked/staged changes
 allows `git fetch origin main` followed by `git merge --ff-only origin/main`.
-Dirty state, status/fetch failure or an unavailable fast-forward emits one line
+Tracked/staged changes, status/fetch failure or an unavailable fast-forward emit one line
 and continues to the client in that same main checkout. Refresh output is
 suppressed so the fallback stays finite. It never merges over local changes or
-blocks client startup because a repository refresh failed.
+blocks client startup because a repository refresh failed. Git still refuses a
+fast-forward that would overwrite a non-ignored untracked file; that collision
+uses the same fallback and preserves the file.
 
 - Claude: `exec env -u ANTHROPIC_API_KEY -u ANTHROPIC_AUTH_TOKEN claude --worktree`.
 - Codex: `exec codex --worktree -c model_reasoning_effort=ultra -c service_tier=priority`.
@@ -63,8 +67,9 @@ commands. This change makes no market-data call and adds no protocol landing
 condition or frozen trading CI edit.
 
 Local tests execute the exact shell with real Git and inert client executables.
-They verify main-checkout cwd, native flags, clean fast-forward, dirty skips,
-failed-fetch/non-fast-forward fallbacks, credential-variable removal, no lane
+They verify main-checkout cwd, native flags, clean fast-forward, tracked/staged
+skips, non-conflicting untracked files and collision fallback, failed-fetch/
+non-fast-forward fallbacks, credential-variable removal, no lane
 tag and no `%` in the command line. They are fixture integration, not a live
 Windows Terminal/native-client/trust/runtime/MCP result.
 

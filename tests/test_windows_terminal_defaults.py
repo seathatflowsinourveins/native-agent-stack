@@ -702,9 +702,45 @@ with Path(os.environ["TRADE_TEST_LOG"]).open("a", encoding="utf-8") as stream:
         (self.source / "tracked.txt").write_text("uncommitted tracked edit\n", encoding="utf-8")
         self.assert_dirty_refresh_skipped()
 
-    def test_untracked_main_skips_refresh_and_still_launches(self):
-        (self.source / "untracked.txt").write_text("local untracked content\n", encoding="utf-8")
-        self.assert_dirty_refresh_skipped()
+    def test_untracked_auxiliary_files_allow_refresh_and_remain_intact(self):
+        auxiliary_file = self.source / "synthetic.serena"
+        auxiliary_file.write_bytes(b"fixture-only auxiliary file\n")
+        auxiliary_dir = self.source / "auxiliary-state"
+        auxiliary_dir.mkdir()
+        auxiliary_note = auxiliary_dir / "note.txt"
+        auxiliary_note.write_bytes(b"fixture-only auxiliary directory content\n")
+        status = self.git("status", "--porcelain", "--untracked-files=all").stdout
+        self.assertTrue(status, "this fixture has untracked auxiliary state")
+        for name in TRADE_COMMANDS:
+            with self.subTest(profile=name):
+                run = self.launch(name)
+                self.assertEqual(run.stdout, "")
+                self.assertEqual(self.git("rev-parse", "HEAD").stdout.strip(), self.main_head)
+                self.assertEqual(self.git("rev-parse", "origin/main").stdout.strip(), self.main_head)
+                self.assertEqual(auxiliary_file.read_bytes(), b"fixture-only auxiliary file\n")
+                self.assertEqual(auxiliary_note.read_bytes(), b"fixture-only auxiliary directory content\n")
+                self.assertEqual(self.git("status", "--porcelain", "--untracked-files=all").stdout, status)
+
+    def test_untracked_file_conflicting_with_new_remote_path_refuses_overwrite_and_still_launches(self):
+        old_paths = set(self.git("ls-tree", "-r", "--name-only", self.old_head, cwd=self.seed).stdout.splitlines())
+        remote_paths = set(self.git("ls-tree", "-r", "--name-only", self.main_head, cwd=self.seed).stdout.splitlines())
+        newly_tracked = remote_paths - old_paths
+        self.assertEqual(len(newly_tracked), 1, "the remote fixture adds exactly one tracked path")
+        relative_path = newly_tracked.pop()
+        collision = self.source / relative_path
+        self.assertFalse(collision.exists())
+        collision.write_bytes(b"local untracked bytes must survive\n")
+        status = self.git("status", "--porcelain", "--untracked-files=all").stdout
+        for name in TRADE_COMMANDS:
+            with self.subTest(profile=name):
+                run = self.launch(name)
+                self.assertEqual(run.stdout, self.SKIPPED_REFRESH)
+                self.assertEqual(self.git("rev-parse", "origin/main").stdout.strip(), self.main_head,
+                                 "the fetch succeeds before Git refuses the untracked-file overwrite")
+                self.assertEqual(self.git("rev-parse", "HEAD").stdout.strip(), self.old_head)
+                self.assertEqual(collision.read_bytes(), b"local untracked bytes must survive\n")
+                self.assertEqual(self.git("ls-files", "--", relative_path).stdout, "")
+                self.assertEqual(self.git("status", "--porcelain", "--untracked-files=all").stdout, status)
 
     def test_staged_main_skips_refresh_and_still_launches(self):
         (self.source / "tracked.txt").write_text("staged tracked edit\n", encoding="utf-8")

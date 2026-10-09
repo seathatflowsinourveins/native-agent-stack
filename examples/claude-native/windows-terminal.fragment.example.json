@@ -59,7 +59,7 @@
     },
     {
       "name": "Trade - Claude",
-      "commandline": "wsl.exe -d <DISTRO> -u <WSL_USER> --cd <TRADE_PROJECT> --exec /bin/bash -lc \"if trade_status=$(git status --porcelain 2>/dev/null) && [[ -z $trade_status ]] && git fetch --quiet origin main >/dev/null 2>&1 && git merge --ff-only origin/main >/dev/null 2>&1; then :; else echo 'Trade: main refresh skipped; starting the native worktree session.'; fi; exec env -u ANTHROPIC_API_KEY -u ANTHROPIC_AUTH_TOKEN claude --worktree\"",
+      "commandline": "wsl.exe -d <DISTRO> -u <WSL_USER> --cd <TRADE_PROJECT> --exec /bin/bash -lc \"if trade_status=$(git status --porcelain --untracked-files=no 2>/dev/null) && [[ -z $trade_status ]] && git fetch --quiet origin main >/dev/null 2>&1 && git merge --ff-only origin/main >/dev/null 2>&1; then :; else echo 'Trade: main refresh skipped; starting the native worktree session.'; fi; exec env -u ANTHROPIC_API_KEY -u ANTHROPIC_AUTH_TOKEN claude --worktree\"",
       "startingDirectory": "%USERPROFILE%",
       "hidden": false,
       "environment": { "COLORTERM": "truecolor" },
@@ -71,7 +71,7 @@
     },
     {
       "name": "Trade - Codex",
-      "commandline": "wsl.exe -d <DISTRO> -u <WSL_USER> --cd <TRADE_PROJECT> --exec /bin/bash -lc \"if trade_status=$(git status --porcelain 2>/dev/null) && [[ -z $trade_status ]] && git fetch --quiet origin main >/dev/null 2>&1 && git merge --ff-only origin/main >/dev/null 2>&1; then :; else echo 'Trade: main refresh skipped; starting the native worktree session.'; fi; exec codex --worktree -c model_reasoning_effort=ultra -c service_tier=priority\"",
+      "commandline": "wsl.exe -d <DISTRO> -u <WSL_USER> --cd <TRADE_PROJECT> --exec /bin/bash -lc \"if trade_status=$(git status --porcelain --untracked-files=no 2>/dev/null) && [[ -z $trade_status ]] && git fetch --quiet origin main >/dev/null 2>&1 && git merge --ff-only origin/main >/dev/null 2>&1; then :; else echo 'Trade: main refresh skipped; starting the native worktree session.'; fi; exec codex --worktree -c model_reasoning_effort=ultra -c service_tier=priority\"",
       "startingDirectory": "%USERPROFILE%",
       "hidden": false,
       "tabTitle": "Trade - Codex",
