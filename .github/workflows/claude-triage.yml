@@ -153,7 +153,8 @@ jobs:
             --add-dir ${{ runner.temp }}/triage
 
       # Numbers and fixed names only: the execution file holds the whole transcript and is never printed or uploaded.
-      # The record is written first, so a failed or over-budget run still leaves its cost; the acceptance check
+      # The record is written first, so a failed or over-budget run that wrote its execution file still leaves its
+      # cost (a run cancelled at the job timeout may leave no execution file; that case is unmeasured); the acceptance check
       # follows. It also reads the session's own tool list and version: a missing list, any tool outside the
       # allow-list (an entry that is not a string included), an MCP server or a Claude Code version other than
       # 2.1.295, the one v1.0.247 installs (a new action pin moves it), fails the run, and the step names every bound

@@ -355,9 +355,9 @@ that date.
 > Title: success with num_turns > maxTurns fails the step, but num_turns counts messages, not turns.
 > base-action/src/run-claude-sdk.ts:241-250 (v1.0.247, 2dca132f) compares `resultMessage.num_turns` with
 > `sdkOptions.maxTurns`. On Claude Code 2.1.295 the result's num_turns counts transcript messages (tool results
-> included): a headless run of 12 requests under `--max-turns 12` reported num_turns 57. A normal successful run
-> under `--max-turns N` therefore throws "exceeding the configured maximum". Repro: a successful run whose reported
-> num_turns (a message count) exceeds --max-turns.
+> included): a headless run of 12 requests under `--max-turns 12` reported num_turns 57. A successful, non-error
+> result whose reported `num_turns` exceeds the configured `maxTurns` therefore throws "exceeding the configured
+> maximum". Repro: a successful run whose reported num_turns (a message count) exceeds --max-turns.
 
 ### The exact pins tell `true` from `1` (2026-10-09)
 
@@ -394,11 +394,19 @@ fixed and 2 partly fixed. This round fixes those 2 and the new findings, as the 
   form or place.
 - **New finding 5 (confidence 25): the $2 case could not see an overrun message.** At the budget itself the test now
   asserts that no "above 2" message appears.
-- **New finding 4 (confidence 25), disposition: no change.** A runaway could reach the 15-minute timeout before the
-  $2 budget and leave no usage record.
-  - That needs about 100K output tokens at `high` effort within 15 minutes, against a measured run of about 15,000.
-  - A timed-out run fails the job and applies no label either way, so nothing wrong is written.
-  - The read was speculative: it could not see the action's behaviour on cancel.
+- **New finding 4 (confidence 25), disposition: no change.** A run could reach the job's 15-minute timeout and leave
+  no usage record. The timeout does not depend on the budget being spent.
+  - Cancellation behaviour has not been measured.
+  - A timeout fails classify and so prevents apply, so no label is written.
+  - If cancellation leaves no execution file, usage accounting and publication for that run remain unverified. The
+    numbers step's comment now says so.
+  - (Corrected after the GPT read of fea7821a: the first version of this disposition compared a token count against
+    "a measured run of about 15,000". This job has no measured run; 15,000 output tokens is the estimate under "Cost
+    of one run".)
+- **GPT read of fea7821a (two P3s), fixed in a follow-up commit.**
+  1. The upstream-issue draft's middle sentence generalized beyond the narrowed reproduction. It now states the
+     predicate: a successful, non-error result whose reported `num_turns` exceeds the configured `maxTurns`.
+  2. The new finding 4 disposition is corrected as above.
 - **New finding 6 (confidence 20), disposition: no change.** Four tests assert the first unmet bound, so they depend
   on the order of the bounds list. That order is part of what the numbers step promises, so a reorder that breaks
   them should be reviewed.
