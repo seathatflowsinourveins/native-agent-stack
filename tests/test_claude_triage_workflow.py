@@ -8,6 +8,7 @@ stops enforcing a bound.
 
 import json
 import os
+import re
 import shlex
 import shutil
 import subprocess
@@ -28,6 +29,16 @@ WORKFLOW = ROOT / ".github/workflows/claude-triage.yml"
 ACTION = "anthropics/claude-code-action@2dca132ff0e0c4094ce6048b422c6915a071210b"
 REPOSITORY = "synthetic/example"
 LANES = ["lane:foundation", "lane:trading", "lane:shared"]
+RUNNER_TEMP_EXAMPLE = "/runner/temp"  # a stand-in for the path GitHub puts in place of ${{ runner.temp }}
+SETTINGS = {"disableAllHooks": True, "permissions": {"blockReadsOutsideWorkingDirectories": True, "deny": [
+    "Read(./.git/**)", "Read(./**/.git/**)", "Read(./**/.env)", "Read(./**/.env.*)", "Read(./**/*.pem)",
+    "Read(./**/*.key)"]}}
+SCHEMA = {"type": "object", "additionalProperties": False, "required": ["items"], "properties": {"items": {
+    "type": "array", "maxItems": 30, "items": {
+        "type": "object", "additionalProperties": False, "required": ["number", "lane", "confidence"],
+        "properties": {"number": {"type": "integer", "minimum": 1}, "lane": {"enum": LANES + ["none"]},
+                       "confidence": {"enum": ["high", "medium", "low"]},
+                       "reason": {"type": "string", "maxLength": 160}}}}}}
 
 GUARD = "Refuse debug logging and pre-existing Claude settings"
 COLLECT = "Collect the open items without a lane label"
@@ -44,6 +55,9 @@ GH_STAND_IN = textwrap.dedent("""\
     with open(os.path.join(state_dir, "calls.jsonl"), "a") as log:
         log.write(json.dumps(args) + "\\n")
     fixtures = json.load(open(os.path.join(state_dir, "fixtures.json")))
+    if fixtures.get("read_stdin"):  # a call that reads its standard input, as `gh api --input -` does
+        with open(os.path.join(state_dir, "stdin.jsonl"), "a") as seen:
+            seen.write(json.dumps(sys.stdin.read()) + "\\n")
     if args[:2] == ["issue", "list"]:
         print(json.dumps(fixtures["issues"]))
     elif args[:2] == ["pr", "list"]:
@@ -88,6 +102,56 @@ def flag_json(flag):
     return json.loads(value)
 
 
+def github_expression(text, secrets, variables):
+    """Evaluate a `${{ ... }}` binding as GitHub does, for the parts the guard's bindings use.
+
+    `a || b` gives the first truthy operand, else the last; any non-empty string is truthy, 'false' included.
+    `==` compares two strings ignoring case. An unset secret or variable reads as an empty string. The result is
+    the text GitHub puts in the step's environment. Anything else in the expression raises, so a new shape is never
+    guessed at.
+    """
+    tokens = re.findall(r"\|\||==|[()]|'(?:[^']|'')*'|[A-Za-z_][\w.]*|\S",
+                        re.fullmatch(r"\$\{\{(.*)\}\}", text, re.S).group(1))
+    contexts = {"secrets": secrets, "vars": variables}
+
+    def operand():
+        token = tokens.pop(0)
+        if token == "(":
+            value = either()
+            if tokens.pop(0) != ")":
+                raise ValueError(f"unbalanced parentheses in {text}")
+            return value
+        if token.startswith("'"):
+            return token[1:-1].replace("''", "'")
+        context, _, name = token.partition(".")
+        if context not in contexts or not name:
+            raise ValueError(f"unsupported token {token!r} in {text}")
+        return contexts[context].get(name, "")
+
+    def equality():
+        left = operand()
+        while tokens and tokens[0] == "==":
+            tokens.pop(0)
+            right = operand()
+            if not (isinstance(left, str) and isinstance(right, str)):
+                raise ValueError(f"only strings are compared in {text}")
+            left = left.lower() == right.lower()
+        return left
+
+    def either():
+        value = equality()
+        while tokens and tokens[0] == "||":
+            tokens.pop(0)
+            right = equality()
+            value = value if (value is True or (isinstance(value, str) and value != "")) else right
+        return value
+
+    value = either()
+    if tokens:
+        raise ValueError(f"unsupported tokens {tokens} in {text}")
+    return {True: "true", False: "false"}[value] if isinstance(value, bool) else value
+
+
 def issue(number, labels=(), title="t", body="b", state="open", pull=False):
     data = {"number": number, "title": title, "body": body, "state": state,
             "labels": [{"name": name} for name in labels]}
@@ -102,14 +166,16 @@ def model_usage(read=9000, cost=0.25):
 
 
 def execution(tools=("Glob", "Grep", "Read", "StructuredOutput"), turns=None, lists=True, start=True, mcp=(),
-              **changes):
+              version="2.1.295", **changes):
     final = {"type": "result", "subtype": "success", "is_error": False, "num_turns": 3,
              "total_cost_usd": 0.25, "modelUsage": model_usage(), "structured_output": {"items": []}}
     final.update(changes)
     # The client streams one message per content block, so one API turn spans several messages with one id.
     assistants = [{"type": "assistant", "message": {"id": f"msg_{turn:02d}", "content": []}}
                   for turn in range(final["num_turns"] if turns is None else turns) for _ in range(2)]
-    init = {"type": "system", "subtype": "init", "claude_code_version": "2.1.295"}
+    init = {"type": "system", "subtype": "init"}
+    if version is not None:
+        init["claude_code_version"] = version
     if lists:
         init.update(tools=list(tools), mcp_servers=[{"name": name, "status": "connected"} for name in mcp])
     return ([init] if start else []) + [*assistants, final]
@@ -134,9 +200,12 @@ class Run:
                     "GH_STATE": str(self.dir), "GH_REPO": REPOSITORY, "GH_TOKEN": "synthetic-not-a-token"}
 
     def run(self, name, job_name="classify", **env):
+        return self.run_text(step(name, job_name)["run"], **env)
+
+    def run_text(self, script, **env):
         merged = dict(self.env, **env)
-        done = subprocess.run(["bash", "-c", step(name, job_name)["run"]], env=merged, capture_output=True,
-                              text=True, check=False, cwd=self.dir)
+        done = subprocess.run(["bash", "-c", script], env=merged, capture_output=True, text=True, check=False,
+                              cwd=self.dir)
         return done.returncode, done.stdout + done.stderr
 
     def read(self, relative):
@@ -202,16 +271,29 @@ class TriageShapeTests(unittest.TestCase):
         for forbidden in ("anthropic_api_key", "claude_code_oauth_token", "allowed_non_write_users", "allowed_bots",
                           "settings", "plugins", "plugin_marketplaces"):
             self.assertNotIn(forbidden, run["with"])
-        for expected in ("--model claude-opus-5-5", "--effort low", "--max-turns 6", "--max-budget-usd 1",
-                         "--tools Read,Glob,Grep", "--allowedTools Read,Glob,Grep", "--restricted",
-                         "--permission-prompts none", "--setting-sources user", "--strict-mcp-config",
-                         "--add-dir ${{ runner.temp }}/triage"):
-            self.assertIn(expected, arguments())
         for name in ("show_full_output", "display_report", "track_progress"):
             self.assertEqual(run["with"][name], "false")
         text = WORKFLOW.read_text(encoding="utf-8")
         for static_credential in ("ANTHROPIC_API_KEY", "ANTHROPIC_AUTH_TOKEN", "CLAUDE_CODE_OAUTH_TOKEN"):
             self.assertNotIn(static_credential, text)
+
+    def test_claude_args_are_pinned_exactly(self):
+        # Each line is split as a shell splits it (the action runs shell-quote over the whole input) after GitHub
+        # fills in runner.temp, and the two JSON values are parsed. A flag added, dropped or given twice (a second
+        # --add-dir, budget or turn limit), a wider --add-dir, or any change to the settings or the schema fails here.
+        # --restricted and --setting-sources user each keep the repository's project settings out (six runs of
+        # Claude Code 2.1.295, 2026-10-09: either flag alone did), so both stay and either holds if the other changes.
+        parsed = []
+        for line in arguments():
+            flag, *values = shlex.split(line.replace("${{ runner.temp }}", RUNNER_TEMP_EXAMPLE))
+            parsed.append([flag] + [json.loads(value) if flag in ("--settings", "--json-schema") else value
+                                    for value in values])
+        self.assertEqual(parsed, [
+            ["--model", "claude-opus-5-5"], ["--effort", "high"], ["--max-turns", "8"], ["--max-budget-usd", "2"],
+            ["--tools", "Read,Glob,Grep"], ["--allowedTools", "Read,Glob,Grep"], ["--restricted"],
+            ["--permission-prompts", "none"], ["--setting-sources", "user"], ["--strict-mcp-config"],
+            ["--settings", SETTINGS],
+            ["--json-schema", SCHEMA], ["--add-dir", RUNNER_TEMP_EXAMPLE + "/triage"]])
 
     def test_a_green_run_with_items_always_has_an_execution_file(self):
         check = step("Require the run's execution file")
@@ -250,10 +332,8 @@ class TriageShapeTests(unittest.TestCase):
         self.assertEqual(schema["properties"]["items"]["maxItems"], 30)
 
     def test_settings_turn_hooks_off_and_deny_every_git_directory(self):
-        settings = flag_json("--settings")
-        self.assertIs(settings["disableAllHooks"], True)
-        for rule in ("Read(./.git/**)", "Read(./**/.git/**)"):
-            self.assertIn(rule, settings["permissions"]["deny"])
+        # The whole object, so a dropped rule or an added key (permissions.additionalDirectories, say) fails here.
+        self.assertEqual(flag_json("--settings"), SETTINGS)
 
 
 @unittest.skipUnless(shutil.which("jq"), "jq is needed to run the workflow's steps")
@@ -280,6 +360,28 @@ class TriageStepTests(unittest.TestCase):
             settings.unlink()
             settings.write_text("{}", encoding="utf-8")
             self.assertEqual(run.run(GUARD)[0], 2)
+        finally:
+            run.close()
+
+    def test_each_source_of_a_debug_setting_reaches_the_guard(self):
+        # Each binding the workflow holds is evaluated for a repository secret, a variable, both and neither, then
+        # given to the guard's shell. With both set the secret takes precedence (GitHub, "Enabling debug logging"):
+        # its 'false' is a non-empty string, so `||` keeps it and the variable's 'true' is never used.
+        bindings = step(GUARD)["env"]
+        cases = (("secret only", "true", None, "true", 2), ("variable only", None, "true", "true", 2),
+                 ("both, the secret 'false' and the variable 'true'", "false", "true", "false", 0),
+                 ("neither", None, None, "false", 0))
+        run = Run()
+        try:
+            for binding, setting in (("STEP_DEBUG_SETTING", "ACTIONS_STEP_DEBUG"),
+                                     ("RUNNER_DIAGNOSTICS_SETTING", "ACTIONS_RUNNER_DEBUG")):
+                for label, secret, variable, bound, code in cases:
+                    with self.subTest(binding=binding, case=label):
+                        value = github_expression(bindings[binding],
+                                                  secrets={} if secret is None else {setting: secret},
+                                                  variables={} if variable is None else {setting: variable})
+                        self.assertEqual(value, bound)
+                        self.assertEqual(run.run(GUARD, **{binding: value})[0], code)
         finally:
             run.close()
 
@@ -400,7 +502,7 @@ class TriageStepTests(unittest.TestCase):
         code, console, posts, summary = self.apply([{"number": 13, "lane": "lane:shared"},
                                                     {"number": 5, "lane": "lane:trading"}])
         self.assertEqual(code, 1, console)
-        self.assertIn("could not be read or labelled", console)
+        self.assertIn("could not be read, checked or labelled", console)
         self.assertEqual(posts, [["api", "-X", "POST", f"repos/{REPOSITORY}/issues/5/labels",
                                   "-f", "labels[]=lane:trading"]])
         self.assertIn("| #13 | lane:shared | failed: the issue could not be read |", summary)
@@ -429,12 +531,51 @@ class TriageStepTests(unittest.TestCase):
                                                     {"number": 16, "lane": "lane:shared"},
                                                     {"number": 5, "lane": "lane:trading"}], fixtures)
         self.assertEqual(code, 1, console)
+        self.assertIn("could not be read, checked or labelled", console)
         self.assertEqual([call[3] for call in posts], [f"repos/{REPOSITORY}/issues/5/labels"])
         for number in (14, 15, 16):
             row = summary.split(f"| #{number} |", 1)[1].split("\n", 1)[0]
             self.assertIn("failed: the issue could not be checked (jq exit", row)
         self.assertNotIn("skipped", summary)
         self.assertIn("| #5 | lane:trading | added |", summary)
+
+    def test_a_gh_call_cannot_read_the_rows_the_loop_has_not_reached(self):
+        # A gh call that read the loop's input would take the remaining rows with it, and their issues would never be
+        # tried. This stand-in reads whatever input it is given; every call must have been given none.
+        fixtures = self.fixtures()
+        fixtures["read_stdin"] = True
+        run = Run(fixtures)
+        try:
+            code, console = run.run(APPLY, "apply", PROPOSAL=json.dumps([{"number": 5, "lane": "lane:trading"},
+                                                                         {"number": 7, "lane": "lane:foundation"}]))
+            self.assertEqual(code, 0, console)
+            self.assertEqual([call[3] for call in run.calls() if call[:3] == ["api", "-X", "POST"]],
+                             [f"repos/{REPOSITORY}/issues/5/labels", f"repos/{REPOSITORY}/issues/7/labels"])
+            self.assertEqual([json.loads(line) for line in (run.read("stdin.jsonl") or "").splitlines()], [""] * 4)
+        finally:
+            run.close()
+
+    def test_the_rows_are_built_and_counted_before_the_loop(self):
+        # The proposal check admits only well-formed entries, so these runs change the rows filter itself: one that
+        # fails must stop the step, and one that loses an entry must be refused, each before any label is written.
+        script = step(APPLY, "apply")["run"]
+        rows = ".[] | [.number, .lane] | @tsv"
+        self.assertEqual(script.count(rows), 1)
+        proposal = json.dumps([{"number": 5, "lane": "lane:trading"}, {"number": 7, "lane": "lane:foundation"}])
+        for label, replacement, words in (
+                ("a filter that fails", 'error("synthetic")', "synthetic"),
+                ("a filter that loses an entry", ".[1:][] | [.number, .lane] | @tsv",
+                 "Refused: the rows built from the proposal do not match its length.")):
+            with self.subTest(case=label):
+                run = Run(self.fixtures())
+                try:
+                    code, console = run.run_text(script.replace(rows, replacement), PROPOSAL=proposal)
+                    self.assertNotEqual(code, 0, console)
+                    self.assertIn(words, console)
+                    self.assertEqual([call for call in run.calls() if call[:3] == ["api", "-X", "POST"]], [])
+                    self.assertNotIn("| #", run.read("summary.md") or "")
+                finally:
+                    run.close()
 
     def test_a_malformed_proposal_adds_nothing(self):
         cases = {
@@ -445,12 +586,17 @@ class TriageStepTests(unittest.TestCase):
             "a fractional number": [{"number": 5.5, "lane": "lane:trading"}],
             "a number given twice": [{"number": 5, "lane": "lane:trading"}, {"number": 5, "lane": "lane:shared"}],
             "not a list": {"number": 5, "lane": "lane:trading"},
+            # The job's condition already skips an empty proposal; the step refuses one too, so its loop always has
+            # at least one row to read.
+            "an empty list": [],
         }
         for label, proposal in cases.items():
             with self.subTest(case=label):
-                code, _, posts, _ = self.apply(proposal)
+                code, console, posts, _ = self.apply(proposal)
                 self.assertEqual(code, 2)
                 self.assertEqual(posts, [])
+                self.assertIn("Refused: the proposal is not a non-empty list of issue numbers with allow-listed lane "
+                              "labels.", console)
 
     def test_the_numbers_step_accepts_the_structured_output_tool_and_refuses_a_shell(self):
         run = Run()
@@ -464,8 +610,8 @@ class TriageStepTests(unittest.TestCase):
             # Each weakened run fails the step, and the step names the bound that failed.
             for changes, words in (
                     ({"tools": ("Read", "Bash")}, "tools outside Glob, Grep, Read and StructuredOutput: Bash"),
-                    ({"total_cost_usd": 1.01}, "client cost estimate 1.01 USD, above 1"),
-                    ({"turns": 7}, "7 assistant turns, outside 1 to 6"),
+                    ({"total_cost_usd": 2.01}, "client cost estimate 2.01 USD, above 2"),
+                    ({"turns": 9}, "9 assistant turns, outside 1 to 8"),
                     ({"modelUsage": model_usage(read=0)}, "no cache read"),
                     ({"tools": ("Glob", "Grep", "Read", "StructuredOutput", "Skill")},
                      "tools outside Glob, Grep, Read and StructuredOutput: Skill"),
@@ -485,12 +631,62 @@ class TriageStepTests(unittest.TestCase):
         run = Run()
         try:
             path = run.dir / "execution.json"
-            path.write_text(json.dumps(execution(turns=7, total_cost_usd=1.5, structured_output=None,
+            path.write_text(json.dumps(execution(turns=9, total_cost_usd=2.5, structured_output=None,
                                                  tools=("Read", "Skill"))), encoding="utf-8")
             code, console = run.run(NUMBERS, EXECUTION_FILE=str(path))
             self.assertNotEqual(code, 0)
-            for words in ("7 assistant turns, outside 1 to 6", "above 1", "Skill", "no structured output"):
+            for words in ("9 assistant turns, outside 1 to 8", "above 2", "Skill", "no structured output"):
                 self.assertIn(words, console)
+        finally:
+            run.close()
+
+    def test_a_tool_entry_that_is_not_a_string_is_a_forbidden_tool(self):
+        # Such an entry was once filtered out of the list, so the allow-list never saw it; now each one is a forbidden
+        # tool, and the bounds message names it.
+        run = Run()
+        try:
+            path = run.dir / "execution.json"
+            for entry in ({"name": "Bash"}, None, 17):
+                with self.subTest(entry=entry):
+                    path.write_text(json.dumps(execution(tools=("Glob", "Grep", "Read", "StructuredOutput", entry))),
+                                    encoding="utf-8")
+                    code, console = run.run(NUMBERS, EXECUTION_FILE=str(path))
+                    self.assertNotEqual(code, 0, console)
+                    self.assertIn("Bounds not met: tools outside Glob, Grep, Read and StructuredOutput: "
+                                  "non-string tool entry", console)
+        finally:
+            run.close()
+
+    def test_the_usage_record_lists_a_tool_entry_that_is_not_a_string_as_other(self):
+        # The record is written before the bounds are checked, so a refused run still keeps its tool list; an entry
+        # that is not a string stays in it, named `other`, and is never dropped.
+        run = Run()
+        try:
+            path = run.dir / "execution.json"
+            for entry in ({"name": "Bash"}, None, 17):
+                with self.subTest(entry=entry):
+                    path.write_text(json.dumps(execution(tools=("Glob", "Grep", "Read", "StructuredOutput", entry))),
+                                    encoding="utf-8")
+                    code, console = run.run(NUMBERS, EXECUTION_FILE=str(path))
+                    self.assertNotEqual(code, 0, console)
+                    self.assertEqual(json.loads(run.read("triage-usage/usage.json"))["tools"],
+                                     ["Glob", "Grep", "Read", "StructuredOutput", "other"])
+        finally:
+            run.close()
+
+    def test_the_session_must_run_the_client_version_the_pin_installs(self):
+        # v1.0.247 installs Claude Code 2.1.295 (base-action/action.yml and src/entrypoints/run.ts at the pin), and
+        # the session's start record reports its version; another version, or none, is an unmet bound.
+        run = Run()
+        try:
+            path = run.dir / "execution.json"
+            for version, shown in (("2.1.294", "2.1.294"), (None, "unknown")):
+                with self.subTest(version=version):
+                    path.write_text(json.dumps(execution(version=version)), encoding="utf-8")
+                    code, console = run.run(NUMBERS, EXECUTION_FILE=str(path))
+                    self.assertNotEqual(code, 0, console)
+                    self.assertIn(f"Bounds not met: Claude Code {shown}, not the 2.1.295 that v1.0.247 installs",
+                                  console)
         finally:
             run.close()
 
@@ -500,11 +696,30 @@ class TriageStepTests(unittest.TestCase):
         run = Run()
         try:
             path = run.dir / "execution.json"
-            path.write_text(json.dumps(execution(turns=6, num_turns=57)), encoding="utf-8")
+            path.write_text(json.dumps(execution(turns=8, num_turns=57)), encoding="utf-8")
             code, console = run.run(NUMBERS, EXECUTION_FILE=str(path))
             self.assertEqual(code, 0, console)
-            path.write_text(json.dumps(execution(turns=7, num_turns=7)), encoding="utf-8")
+            path.write_text(json.dumps(execution(turns=9, num_turns=9)), encoding="utf-8")
             self.assertNotEqual(run.run(NUMBERS, EXECUTION_FILE=str(path))[0], 0)
+        finally:
+            run.close()
+
+    def test_the_caps_hold_at_eight_turns_and_two_dollars_and_fail_just_above(self):
+        # The caps (8 turns, $2) bound a runaway and never trim a normal run, so a run exactly at both passes; one
+        # more turn or one more cent fails, and the step names the bound.
+        run = Run()
+        try:
+            path = run.dir / "execution.json"
+            path.write_text(json.dumps(execution(turns=8, total_cost_usd=2)), encoding="utf-8")
+            code, console = run.run(NUMBERS, EXECUTION_FILE=str(path))
+            self.assertEqual(code, 0, console)
+            for changes, words in (({"turns": 9, "total_cost_usd": 2}, "9 assistant turns, outside 1 to 8"),
+                                   ({"turns": 8, "total_cost_usd": 2.01}, "client cost estimate 2.01 USD, above 2")):
+                with self.subTest(changes=changes):
+                    path.write_text(json.dumps(execution(**changes)), encoding="utf-8")
+                    code, console = run.run(NUMBERS, EXECUTION_FILE=str(path))
+                    self.assertNotEqual(code, 0, console)
+                    self.assertIn(f"Bounds not met: {words}", console)
         finally:
             run.close()
 

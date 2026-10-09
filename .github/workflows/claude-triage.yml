@@ -50,6 +50,7 @@ jobs:
       # The action prints full model output when step debugging is on, whatever its show_full_output input says, and
       # its setup prints a pre-existing user settings file. This repository is public, so both stop the job here,
       # before any token is requested. The checks test presence only and print no value.
+      # Debug logging set as a repository secret or variable is bound in the step's env and refused too.
       - name: Refuse debug logging and pre-existing Claude settings
         shell: bash
         env:
@@ -102,9 +103,11 @@ jobs:
           echo "Open items without a lane label: $count"
 
       # Federation inputs only: the action prefers a static key over federation when both are present, and this
-      # workflow passes none. --restricted removes the tools that run code and WebFetch, ignores every settings file
-      # and keeps the file tools inside the workspace and the item directory; --permission-prompts none denies
-      # whatever would ask; --settings carries the deny rules. The answer comes back through --json-schema only.
+      # workflow passes none. --restricted removes the tools that run code and WebFetch, ignores the user, project
+      # and local settings files and keeps the file tools inside the workspace and the item directory;
+      # --setting-sources user keeps the project and local files out as well, so either holds if the other changes;
+      # --permission-prompts none denies whatever would ask; --settings carries the deny rules. The answer comes back
+      # through --json-schema only.
       - name: Classify the items
         id: claude_triage
         if: steps.collect.outputs.count != '0'
@@ -137,9 +140,9 @@ jobs:
             Return the result as structured output, one entry per item, with its number.
           claude_args: |
             --model claude-opus-5-5
-            --effort low
-            --max-turns 6
-            --max-budget-usd 1
+            --effort high
+            --max-turns 8
+            --max-budget-usd 2
             --tools Read,Glob,Grep
             --allowedTools Read,Glob,Grep
             --restricted
@@ -152,8 +155,10 @@ jobs:
 
       # Numbers and fixed names only: the execution file holds the whole transcript and is never printed or uploaded.
       # The record is written first, so a failed or over-budget run still leaves its cost; the acceptance check
-      # follows. It also reads the session's own tool list: a missing list, any tool outside the allow-list or
-      # an MCP server fails the run, and the step names every bound it finds unmet.
+      # follows. It also reads the session's own tool list and version: a missing list, any tool outside the
+      # allow-list (an entry that is not a string included), an MCP server or a Claude Code version other than
+      # 2.1.295, the one v1.0.247 installs (a new action pin moves it), fails the run, and the step names every bound
+      # it finds unmet.
       # The turn bound counts distinct assistant message ids. The result's num_turns counts transcript
       # messages, tool results included (a 12-request run on Claude Code 2.1.295 reported 57), so it is
       # kept in the record only.
@@ -176,7 +181,7 @@ jobs:
             if ($result.total_cost_usd | type == "number" and . >= 0) and ($result.num_turns | count) and
                ($result.modelUsage | type == "object" and length > 0)
             then . else error("usage unavailable") end |
-            (($init.tools // []) | map(select(type == "string"))) as $tools |
+            ($init.tools // []) as $tools |
             ([.[] | select(.type == "result") | .structured_output | select(. != null)] | last) as $answer |
             ([.[] | select(.type == "assistant") | .message.id? | select(type == "string")] | unique | length) as $turns |
             {total_cost_usd: $result.total_cost_usd, num_turns: $result.num_turns, assistant_turns: $turns,
@@ -186,7 +191,8 @@ jobs:
              session_started: ($init != null),
              claude_code_version: (($init.claude_code_version // "unknown") | name),
              tools: ($tools | map(name)),
-             forbidden_tools: ($tools | map(select(IN("Glob", "Grep", "Read", "StructuredOutput") | not)) | map(name)),
+             forbidden_tools: ($tools | map(if type == "string"
+               then select(IN("Glob", "Grep", "Read", "StructuredOutput") | not) | name else "non-string tool entry" end)),
              mcp_servers: (($init.mcp_servers // []) | length),
              models: ($result.modelUsage | to_entries | map(
                if (.value.inputTokens | count) and (.value.outputTokens | count) and
@@ -215,9 +221,11 @@ jobs:
             (if (.forbidden_tools | length) > 0 then "tools outside Glob, Grep, Read and StructuredOutput: \(.forbidden_tools | join(" "))"
              else empty end),
             (if .mcp_servers != 0 then "\(.mcp_servers) MCP servers in the session" else empty end),
-            (if .assistant_turns < 1 or .assistant_turns > 6 then "\(.assistant_turns) assistant turns, outside 1 to 6"
+            (if .claude_code_version != "2.1.295" then "Claude Code \(.claude_code_version), not the 2.1.295 that v1.0.247 installs"
              else empty end),
-            (if .total_cost_usd > 1 then "client cost estimate \(.total_cost_usd) USD, above 1" else empty end),
+            (if .assistant_turns < 1 or .assistant_turns > 8 then "\(.assistant_turns) assistant turns, outside 1 to 8"
+             else empty end),
+            (if .total_cost_usd > 2 then "client cost estimate \(.total_cost_usd) USD, above 2" else empty end),
             (if ((.models | map(.cache_read_input_tokens) | add) // 0) <= 0 then "no cache read" else empty end),
             (if .structured_output_present != true then "no structured output" else empty end)
           ] | join("; ")' "$out/usage.json")"
@@ -305,8 +313,10 @@ jobs:
           egress-policy: audit
 
       # The proposal is re-checked here, then each issue is read again: a label is added only to an issue that is
-      # open, is not a pull request and still has no lane label. An issue that cannot be read or labelled fails the
-      # step once the others have been tried, and the summary names it; it is never reported as skipped.
+      # open, is not a pull request and still has no lane label. An issue that cannot be read, checked or labelled
+      # fails the step once the others have been tried, and the summary names it; it is never reported as skipped.
+      # The rows are built before the loop, so a jq failure stops the step, and there must be one per proposed
+      # issue. Every gh call reads /dev/null: one that read the loop's input would take the remaining rows with it.
       - name: Add the labels
         shell: bash
         env:
@@ -315,11 +325,16 @@ jobs:
           PROPOSAL: ${{ needs.classify.outputs.proposal }}
         run: |
           set -euo pipefail
-          printf '%s' "$PROPOSAL" | jq -e 'type == "array" and length <= 30 and
+          printf '%s' "$PROPOSAL" | jq -e 'type == "array" and length >= 1 and length <= 30 and
             ([.[].number] | length == (unique | length)) and
             all(.[]; (keys == ["lane", "number"]) and (.number | type == "number" and . == floor and . >= 1) and
               (.lane | IN("lane:foundation", "lane:trading", "lane:shared")))' > /dev/null ||
-            { echo 'Refused: the proposal is not a list of issue numbers with allow-listed lane labels.' >&2; exit 2; }
+            { echo 'Refused: the proposal is not a non-empty list of issue numbers with allow-listed lane labels.' >&2; exit 2; }
+          rows="$(printf '%s' "$PROPOSAL" | jq -r '.[] | [.number, .lane] | @tsv')"
+          if [ "$(printf '%s' "$rows" | awk 'END { print NR }')" != "$(printf '%s' "$PROPOSAL" | jq length)" ]; then
+            echo 'Refused: the rows built from the proposal do not match its length.' >&2
+            exit 2
+          fi
           {
             echo '### Triage: labels'
             echo
@@ -328,7 +343,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
           failed=0
           while IFS=$'\t' read -r number lane; do
-            if ! issue="$(gh api "repos/$GH_REPO/issues/$number")"; then
+            if ! issue="$(gh api "repos/$GH_REPO/issues/$number" < /dev/null)"; then
               echo "| #$number | $lane | failed: the issue could not be read |" >> "$GITHUB_STEP_SUMMARY"
               failed=1
               continue
@@ -339,7 +354,7 @@ jobs:
             printf '%s' "$issue" | jq -e '.state == "open" and .pull_request == null and
               ([.labels[].name | select(startswith("lane:"))] | length == 0)' > /dev/null || status=$?
             if [ "$status" -eq 0 ]; then
-              if gh api -X POST "repos/$GH_REPO/issues/$number/labels" -f "labels[]=$lane" > /dev/null; then
+              if gh api -X POST "repos/$GH_REPO/issues/$number/labels" -f "labels[]=$lane" < /dev/null > /dev/null; then
                 echo "| #$number | $lane | added |" >> "$GITHUB_STEP_SUMMARY"
               else
                 echo "| #$number | $lane | failed: the label could not be added |" >> "$GITHUB_STEP_SUMMARY"
@@ -351,8 +366,8 @@ jobs:
               echo "| #$number | $lane | failed: the issue could not be checked (jq exit $status) |" >> "$GITHUB_STEP_SUMMARY"
               failed=1
             fi
-          done < <(printf '%s' "$PROPOSAL" | jq -r '.[] | [.number, .lane] | @tsv')
+          done <<< "$rows"
           if [ "$failed" -ne 0 ]; then
-            echo 'Failed: at least one issue could not be read or labelled; the summary names each one.' >&2
+            echo 'Failed: at least one issue could not be read, checked or labelled; the summary names each one.' >&2
             exit 1
           fi
