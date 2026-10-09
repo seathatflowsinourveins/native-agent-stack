@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """R3-VERIFY structural glue; not an upstream or scientific acceptance test.
 
-Sources: CPython v3.12.3 Lib/json/__init__.py (load) and Lib/hashlib.py
-(file_digest), and native uutils-coreutils 0.10.0 sha256sum --check format.
-R3-F2: CPython v3.13.16 json.JSONDecodeError, pathlib/OSError and re.fullmatch;
-mandatory schema from this packet at native-agent-stack@36e36ea4.
+Sources: CPython v3.13.16 Lib/json/__init__.py (loads), Lib/hashlib.py (sha256),
+json.JSONDecodeError, pathlib/OSError and re.fullmatch; native uutils-coreutils
+0.10.0 sha256sum --check format. Lineage: small structural join glue for
+CC-R3-1 at native-agent-stack@36e36ea498e23ffd5bfc103035a2da883a6a08e4;
+R3-F2 hardens that check using the same packet's mandatory schema.
+This is not an upstream test, A/B or E2E runner or scientific acceptance.
 Gap: native carrier integrity does not compare JSON's embedded normative
 path/hash references with that carrier. This verifier adds only that join.
 It reads declared current candidate members, never external credentials,
@@ -46,11 +48,6 @@ UNFILLED_INPUTS = {
     ("R2-SURVIVORSHIP.json", "/native_PIT04_exclusions/accepted_layer15_receipt"),
     ("R2-SURVIVORSHIP.json", "/native_PIT04_exclusions/accepted_layer15_manifest"),
 }
-
-
-def digest(path):
-    with path.open("rb") as stream:
-        return hashlib.file_digest(stream, "sha256").hexdigest()
 
 
 def verification_result(errors, manifest, manifest_hash, bindings, semantic, boundaries):
@@ -186,6 +183,9 @@ def verify(root):
             except json.JSONDecodeError as error:
                 errors.append(f"invalid JSON: {name}: {error.msg} at line {error.lineno}, column {error.colno}")
                 continue
+            except (RecursionError, ValueError) as error:
+                errors.append(f"invalid JSON: {name}: {type(error).__name__} decoding limit")
+                continue
             if not isinstance(document, dict):
                 errors.append(f"expected JSON object: {name}")
                 continue
@@ -234,7 +234,10 @@ def verify(root):
         for key in sorted(rows.keys() - allowed):
             errors.append(f"unexpected mandatory contract: {file}/{'/'.join(keys)}/{key}")
     for file, document in documents.items():
-        walk(file, document)
+        try:
+            walk(file, document)
+        except RecursionError:
+            errors.append(f"JSON traversal limit: {file}: RecursionError")
 
     required_documents = set(MANDATORY_OBJECTS) | {
         target for joins in MANDATORY_OBJECTS.values() for target in joins.values() if target.endswith(".json")

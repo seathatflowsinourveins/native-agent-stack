@@ -83,6 +83,65 @@ class R3VerifierTests(unittest.TestCase):
         self.assertEqual(cli.returncode, 0, cli.stderr)
         self.assertEqual(json.loads(cli.stdout)["status"], "PASS")
 
+    def test_changed_member_bytes_without_resealing_are_detected(self):
+        path = self.root / "R2-CONSTRUCTION.json"
+        path.write_bytes(path.read_bytes() + b"\n")
+        self.failed("carrier mismatch: R2-CONSTRUCTION.json")
+
+    def test_wrong_row_digest_without_resealing_is_detected(self):
+        row = self.read("ROW14-SUBMISSION-R3.json")
+        row["contracts"]["R2-CONSTRUCTION.json"] = "0" * 64
+        self.write("ROW14-SUBMISSION-R3.json", row)
+        self.failed("internal binding mismatch")
+
+    def test_retarget_to_another_valid_member_is_rejected(self):
+        protocol = self.read("protocol.draft.json")
+        target = "R2-COMPARISON.json"
+        protocol["R2_bound_contracts"]["construction"] = {"path": target, "sha256": sha(self.root / target)}
+        self.write("protocol.draft.json", protocol)
+        self.seal()
+        result = self.failed("mandatory target")
+        self.assertFalse(any("carrier mismatch" in item or "internal binding mismatch" in item for item in result["errors"]))
+
+    def test_deep_json_decoder_failure_returns_json(self):
+        depth = sys.getrecursionlimit() + 100
+        (self.root / "protocol.draft.json").write_bytes(b'{"nested":' + b'[' * depth + b'0' + b']' * depth + b'}')
+        self.seal()
+        self.failed("RecursionError")
+        self.assert_cli_failure()
+
+    def test_huge_integer_decoder_failure_returns_json(self):
+        original = sys.get_int_max_str_digits()
+        self.addCleanup(sys.set_int_max_str_digits, original)
+        sys.set_int_max_str_digits(4300)
+        (self.root / "protocol.draft.json").write_text('{"number":' + "1" * 4400 + '}')
+        self.seal()
+        self.failed("ValueError")
+        self.assert_cli_failure(interpreter_args=("-X", "int_max_str_digits=4300"))
+
+    def test_decoder_limit_error_classes_are_named(self):
+        for error in (RecursionError("synthetic nesting limit"), ValueError("synthetic number limit")):
+            with self.subTest(error=type(error).__name__):
+                with patch.object(VERIFIER.json, "loads", side_effect=error):
+                    self.failed("protocol.draft.json: " + type(error).__name__)
+
+    def test_walker_recursion_failure_is_reported_separately(self):
+        name = "synthetic-deep.json"
+        marker = '{"synthetic_deep_fixture": true}'
+        (self.root / name).write_text(marker)
+        self.members.append(name)
+        self.seal()
+        nested = {}
+        for _ in range(sys.getrecursionlimit() + 100):
+            nested = {"nested": nested}
+        native_loads = json.loads
+        def loaded(value, *args, **kwargs):
+            return nested if value == marker else native_loads(value, *args, **kwargs)
+        with patch.object(VERIFIER.json, "loads", loaded):
+            result = self.failed("JSON traversal limit: " + name)
+        self.assertTrue(all(result["semantic_checks"].values()))
+        self.assertFalse(any("carrier mismatch" in item for item in result["errors"]))
+
     def probe_failures(self, operation, target):
         original = getattr(Path, operation)
         for failure in (PermissionError(errno.EACCES, "Permission denied"),
@@ -419,8 +478,8 @@ class R3VerifierTests(unittest.TestCase):
         self.seal()
         self.assert_cli_failure()
 
-    def assert_cli_failure(self):
-        result = subprocess.run([sys.executable, str(SCRIPT), "--root", str(self.root)],
+    def assert_cli_failure(self, interpreter_args=()):
+        result = subprocess.run([sys.executable, *interpreter_args, str(SCRIPT), "--root", str(self.root)],
                                 capture_output=True, text=True, timeout=30)
         self.assertEqual(result.returncode, 1)
         self.assertNotIn("Traceback", result.stderr)

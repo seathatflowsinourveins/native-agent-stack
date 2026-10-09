@@ -15497,8 +15497,8 @@
     },
     {
       "path": "blueprints/us-equities/event-anchored-ranking/R3-VERIFY.py",
-      "sha256": "a2143983c3a59eb703a54f3f22178ac7f81af2fd7ddd6d01e8a9623b1c5ba652",
-      "bytes": 14098
+      "sha256": "069b02a4fe697606207390daf7e91bedbaca82fe03507a64a85f75144a3becbf",
+      "bytes": 14430
     },
     {
       "path": "blueprints/us-equities/event-anchored-ranking/README.md",
@@ -15507,22 +15507,22 @@
     },
     {
       "path": "blueprints/us-equities/event-anchored-ranking/ROW14-SUBMISSION-R3.json",
-      "sha256": "e90079cd20e9122c952dce1979c70adcd01b17cec626fc90e2bc454ebf1f26b5",
-      "bytes": 13683
+      "sha256": "5559c0d0c8ea47013b0767906f06fd3caaa9976a95d0431a94a5890e02e0d017",
+      "bytes": 13746
     },
     {
       "path": "blueprints/us-equities/event-anchored-ranking/SHA256SUMS",
-      "sha256": "fa98ad008cbdab5beba631f8544a979f3da77a62f5dd549196968e675b811b9e",
+      "sha256": "6c915c70c259992eb5f6dbbdb0ce5aeb0bc784c08e92a3717c9a79d4c7ab48b0",
       "bytes": 1056
     },
     {
       "path": "blueprints/us-equities/event-anchored-ranking/SHA256SUMS.R3",
-      "sha256": "fa98ad008cbdab5beba631f8544a979f3da77a62f5dd549196968e675b811b9e",
+      "sha256": "6c915c70c259992eb5f6dbbdb0ce5aeb0bc784c08e92a3717c9a79d4c7ab48b0",
       "bytes": 1056
     },
     {
       "path": "blueprints/us-equities/event-anchored-ranking/SHA256SUMS.R3B",
-      "sha256": "fa98ad008cbdab5beba631f8544a979f3da77a62f5dd549196968e675b811b9e",
+      "sha256": "6c915c70c259992eb5f6dbbdb0ce5aeb0bc784c08e92a3717c9a79d4c7ab48b0",
       "bytes": 1056
     },
     {
@@ -58552,8 +58552,8 @@
     },
     {
       "path": "tests/test_r3_verify.py",
-      "sha256": "91c20a57fee6932830ef6cd532e2b2a0b498914cd31bffca6914c9bd6a79d6a3",
-      "bytes": 20400
+      "sha256": "16d60855563eea73ada829dc96f91cd7cc7dcc3d3754b8f192a2c17304f4b23b",
+      "bytes": 23418
     },
     {
       "path": "tests/test_receipt_staleness.py",
