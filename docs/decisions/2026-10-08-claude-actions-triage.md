@@ -22,10 +22,13 @@ PR (#892, 2026-10-09), which found changes its record had not named; the same re
   the pinned `action.yml`, lines 136-139 and 152-155 at `2dca132f`) and answers only through `--json-schema`; a
   numbers step that checks the bounds (an allow-list of Glob, Grep, Read and StructuredOutput, tool and MCP lists
   present, 1 to 6 assistant turns, at most $1, a cache read, a structured output; every unmet bound is named); a
-  validation step that keeps only allowed labels for collected issues; and an artifact that keeps `usage.json`
-  (numbers only) for 14 days.
+  validation step that keeps only allowed labels for collected issues (it checks every answer, not that every item
+  is answered: an item the model leaves out gets no label and is collected again by the next run); and an artifact
+  that keeps `usage.json` (numbers only) for 14 days.
 - `apply` job: no model; `timeout-minutes: 5`; `issues: write` only; it re-reads every proposed issue and adds one
-  allow-listed lane label to an open issue that still has none. Pull requests get suggestions in the summary only.
+  allow-listed lane label to an open issue that still has none. An issue that cannot be read or labelled fails the
+  step once the others have been tried, and the summary names it; it is never reported as skipped. Pull requests
+  get suggestions in the summary only.
 - The pin, v1.0.247, is hours old: the user ended the seven-day cooldown for clean releases on 2026-10-03
   (`docs/decisions/2026-10-03-currency-wave-w1.md`, "Holds and cooldown waiver"), which keeps qualification.
 
@@ -96,7 +99,7 @@ Runs spend from the Console organization that the four `ANTHROPIC_*` repository 
 - `tests.test_workflow_security_coverage.NewWorkflowSecurityCoverageTests`: the coverage set gains
   `claude-triage.yml`, with its own offline zizmor test.
 
-New, in `tests/test_claude_triage_workflow.py` (18 tests): triggers, conditions, permissions per job, the pin, the
+New, in `tests/test_claude_triage_workflow.py` (25 tests): triggers, conditions, permissions per job, the pin, the
 flags, the schema's enums and the settings are asserted from the workflow file; the collect, numbers, validation and
 apply steps are executed as written against a local stand-in for `gh`. Thirteen weakened copies of the workflow each
 fail at least one test (no check that a number was collected, labels for pull requests or low confidence passed on,
@@ -106,6 +109,16 @@ no pull request or existing-label re-check before writing, no allow-list in the 
 The 2026-10-09 bound changes have their own tests (an unknown tool, a start record without lists, a missing
 structured output, the named failures), the turn bound was checked with three mutants, and the step tests no longer
 skip without PyYAML.
+
+The pre-cue toolkit read of 53379c7e (J8, 2026-10-09) left three findings at confidence 80 or above, fixed on
+2026-10-09: the guard step now has a test (each debug signal, a settings file and a dangling link to one); `apply`
+fails on an issue it cannot read or label instead of reporting it skipped; and the tests now assert the numbers
+step's `always()`, the validation step's `success()`, the usage artifact, an item the model leaves out, and each
+numbers-step failure by its message, the run that did not succeed, the missing start record and an MCP server
+included. The shape tests no longer skip without PyYAML either: the repository's fallback parser reads every
+condition they check. Ten weakened copies each fail at least one test: a read error reported as skipped, a label
+error ignored, no failing exit, three weakened guard checks, the numbers step only after success, a 30-day usage
+record, and two failure messages dropped.
 
 ## Alternatives considered
 

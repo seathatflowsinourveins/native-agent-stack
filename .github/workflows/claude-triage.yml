@@ -300,7 +300,8 @@ jobs:
           egress-policy: audit
 
       # The proposal is re-checked here, then each issue is read again: a label is added only to an issue that is
-      # open, is not a pull request and still has no lane label.
+      # open, is not a pull request and still has no lane label. An issue that cannot be read or labelled fails the
+      # step once the others have been tried, and the summary names it; it is never reported as skipped.
       - name: Add the labels
         shell: bash
         env:
@@ -320,12 +321,24 @@ jobs:
             echo '| issue | label | result |'
             echo '| ---: | --- | --- |'
           } >> "$GITHUB_STEP_SUMMARY"
+          failed=0
           while IFS=$'\t' read -r number lane; do
-            if gh api "repos/$GH_REPO/issues/$number" | jq -e '.state == "open" and .pull_request == null and
+            if ! issue="$(gh api "repos/$GH_REPO/issues/$number")"; then
+              echo "| #$number | $lane | failed: the issue could not be read |" >> "$GITHUB_STEP_SUMMARY"
+              failed=1
+            elif printf '%s' "$issue" | jq -e '.state == "open" and .pull_request == null and
                 ([.labels[].name | select(startswith("lane:"))] | length == 0)' > /dev/null; then
-              gh api -X POST "repos/$GH_REPO/issues/$number/labels" -f "labels[]=$lane" > /dev/null
-              echo "| #$number | $lane | added |" >> "$GITHUB_STEP_SUMMARY"
+              if gh api -X POST "repos/$GH_REPO/issues/$number/labels" -f "labels[]=$lane" > /dev/null; then
+                echo "| #$number | $lane | added |" >> "$GITHUB_STEP_SUMMARY"
+              else
+                echo "| #$number | $lane | failed: the label could not be added |" >> "$GITHUB_STEP_SUMMARY"
+                failed=1
+              fi
             else
               echo "| #$number | $lane | skipped: not an open issue without a lane label |" >> "$GITHUB_STEP_SUMMARY"
             fi
           done < <(printf '%s' "$PROPOSAL" | jq -r '.[] | [.number, .lane] | @tsv')
+          if [ "$failed" -ne 0 ]; then
+            echo 'Failed: at least one issue could not be read or labelled; the summary names each one.' >&2
+            exit 1
+          fi
