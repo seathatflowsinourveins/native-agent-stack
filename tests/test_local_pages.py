@@ -298,7 +298,11 @@ class LocalPagesTests(unittest.TestCase):
     def real_fleet_adapter(self, state, cache, root):
         def native_transport(command, **kwargs):
             return subprocess.CompletedProcess(command, 0, stdout="[]" if command[0] == "gh" else "", stderr="")
-        return BUILDER.load_local("fleet_data").collect(state, cache, root, run=native_transport)
+        return BUILDER.load_local("fleet_data").collect(
+            state, cache, root, run=native_transport,
+            tracking_fetch=lambda *args, **kwargs: {"status": "success", "data": {"resultType": "vector", "result": []}},
+            tracking_probe=lambda *args, **kwargs: None,
+        )
 
     def test_real_fleet_adapter_rejects_snapshot_symlink_before_publication(self) -> None:
         producer = self.state / "coordination/ns2604-coop/tools/fleet_block.py"

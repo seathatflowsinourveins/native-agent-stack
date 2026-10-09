@@ -29,6 +29,8 @@ class NativeRunner:
 
     def __call__(self, command, **kwargs):
         self.commands.append(command)
+        if command[0] == "hcom":
+            return subprocess.CompletedProcess(command, 0, "", "")
         if command[0] == sys.executable:
             return subprocess.CompletedProcess(command, 1 if self.fleet_fail else 0, json.dumps(self.direct), "")
         if self.gh_fail:
@@ -63,6 +65,11 @@ class FleetDataTests(unittest.TestCase):
         workflows.mkdir(parents=True)
         (workflows / "audit.yml").write_text("name: harness-audit\njobs:\n  review:\n    steps:\n      - uses: anthropics/claude-code-action@pin\n", encoding="utf-8")
         self.runner = NativeRunner(self.direct)
+        for name, transport in (("_tracking_fetch", lambda *args, **kwargs: {"status": "success", "data": {"resultType": "vector", "result": []}}),
+                                ("_tracking_probe", lambda *args, **kwargs: None)):
+            replacement = patch.object(fleet_data, name, side_effect=transport)
+            replacement.start()
+            self.addCleanup(replacement.stop)
 
     def write_json(self, relative, value):
         path = self.state / relative

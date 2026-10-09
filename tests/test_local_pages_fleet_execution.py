@@ -60,7 +60,12 @@ class FleetExecutionTests(unittest.TestCase):
                 self.assertEqual(fcntl.fcntl(descriptor, 1034) & 0x000F, 0x000F)
             return subprocess.run(command, **kwargs)
         def adapter(state, cache, root):
-            return composer_fixtures.BUILDER.load_local("fleet_data").collect(state, cache, root, run=transport)
+            return composer_fixtures.BUILDER.load_local("fleet_data").collect(
+                state, cache, root, run=transport,
+                tracking_run=lambda command, **kwargs: subprocess.CompletedProcess(command, 0, "", ""),
+                tracking_fetch=lambda *args, **kwargs: {"status": "success", "data": {"resultType": "vector", "result": []}},
+                tracking_probe=lambda *args, **kwargs: None,
+            )
         with patch.object(composer_fixtures.BUILDER, "collect_fleet", side_effect=adapter):
             receipt = self.fixture.refresh()
         page = (self.fixture.output / "fleet.html").read_text()

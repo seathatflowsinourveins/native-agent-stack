@@ -57,11 +57,11 @@ the native producer. Actual amounts are summed as spend; summed `max_usd`
 reservations remain separate from the CC-owned credit ceiling. Unrecognized
 ledger formats remain UNKNOWN.
 
-Actions use one native `gh run list` invocation for the newest100 repository
+Actions use one native `gh run list` invocation for the newest 100 repository
 runs, then filter against checked-out workflow files that actually invoke a
 model. Only workflow/status/time/run-ID fields are requested; prompt-like
 display titles and branch names are omitted. The native CLI has no cache flag
-for this command, so a540-second nonserved JSON cache with a native file lock
+for this command, so a 540-second nonserved JSON cache with a native file lock
 coordinates refreshes. Fresh cache hits make no additional CLI request;
 failure preserves earlier observations with their original time, never an
 invented zero. The Fleet section identifies its bounded Actions scope.
@@ -73,6 +73,38 @@ descriptor, with its original file location, arguments and sibling-import
 path. The child starts with Python isolated mode (`-I`), then adds the approved
 producer sibling directory after verification. Bootstrap stdlib imports cannot
 be shadowed by the page process's working directory or ambient Python path.
+
+Fleet tracking extends that collector with the native hcom roster and local
+observability sources. A safe `hcom list --format ... --name navi` projection
+captures all listed agents without reading prompts, config, argv or account
+data. Its current roster remains separate from historical `ecosystem_lane`
+labels in telemetry. Query failures and empty metric results stay UNKNOWN;
+an observed numeric zero remains zero.
+
+Prometheus at recorded port 21090 supplies five-minute native token and MCP
+counter rates. Each client and token category remains separate because token
+categories overlap. Native MCP calls, tool-result records and API attempts
+are different counters. Rates apply `rate` before aggregation; a companion
+`timestamp(counter)` query retains source scrape time separately from query
+evaluation. A fresh selected scrape does not establish last invocation time
+or complete coverage of every writer.
+
+Model-service rows retain their source scope. Selected user-manager properties
+observe `vllm-embed.service` without reading its unit body, environment or
+arguments. Hindsight's documented health route measures DB reachability;
+ai-memory's route measures process-listening liveness. The old documented
+vLLM health port and a Prometheus scrape observation do not establish their
+binding to the named service or embedding readiness. Native HTTP reads use
+recorded loopback endpoints, bounded responses, no proxy and no redirects;
+health bodies are not read. Grafana port 21301 provides anonymous search
+metadata for existing dashboard links. No unverified lane-variable link is
+invented, and no model, service, broker or vendor session is launched.
+
+The optional `fleet-tracking/1` member contains source dates, metric units,
+window and query availability. Its explicit CLI/query/probe seams keep all
+synthetic tests independent of runtime state. Failure of one optional source
+leaves the existing Fleet observations available. Shared sanitization applies
+before escaping fields and links; complete markup is preserved.
 A dedicated process session has a90-second limit; timeout cleanup kills its
 descendant process group. Execution digest and byte count are retained;
 collection never reopens
@@ -218,6 +250,8 @@ nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p t
 nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_fleet_execution.py
 nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_fleet_regressions.py
 nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_fleet_view.py
+nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_fleet_tracking.py
+nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_fleet_tracking_view.py
 nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_adoption.py
 ```
 
