@@ -17142,8 +17142,8 @@
     },
     {
       "path": "catalogs/landscape/grand-catalog-20261008.json",
-      "sha256": "e03c802ca06cec8af18f4bb7d69329dc1c677862a1c89b7ca18ce8214007846b",
-      "bytes": 28382652
+      "sha256": "4d453182cd177d042d137fe7d0fbf5810731eee2d2d9b7248dfd3203ee95e0f6",
+      "bytes": 28382891
     },
     {
       "path": "catalogs/landscape/grand-catalog-index-20261008.json",
@@ -18467,8 +18467,8 @@
     },
     {
       "path": "docs/decisions/2026-10-08-g5-compact-evidence.md",
-      "sha256": "1e222499a9db043ad9ad4807bdfb66b5ec487ea58560e737860f34ec2176ff88",
-      "bytes": 26167
+      "sha256": "f155c7eed5dfa502a18c3e928d9d9acd9f6dc4f0469cdfeb42ce8c4a1bf414e0",
+      "bytes": 28677
     },
     {
       "path": "docs/decisions/2026-10-08-guard-hook-fails-closed.md",
@@ -18657,8 +18657,8 @@
     },
     {
       "path": "docs/g5-refresh-procedure.md",
-      "sha256": "4706d4c4a5f50cafe1f2f01b53c4ebab3ebbf1880133345b094aa39f4bbc9b7b",
-      "bytes": 19736
+      "sha256": "91700dc886f354439f47a55e0caa2cfe2f663652df99275cc91491ae0ebd6cf7",
+      "bytes": 21269
     },
     {
       "path": "docs/gap-crosswalk-92bb279.md",
@@ -21592,8 +21592,8 @@
     },
     {
       "path": "evidence/artifacts/g5-start-closure-1-20261009/asset-row-sync.json",
-      "sha256": "109e2cd35a3141e6d40ef79c717ed8cf87f45d3a557b301703475de65f2fe1e9",
-      "bytes": 3822
+      "sha256": "1d768f69ac10f9176fe5d4d5018714ad3a4657ec4b7d0d59c5ef6f553eb50ac8",
+      "bytes": 4300
     },
     {
       "path": "evidence/artifacts/g5-start-closure-1-20261009/class-gates.json",
@@ -21606,9 +21606,39 @@
       "bytes": 25019837
     },
     {
+      "path": "evidence/artifacts/g5-start-closure-1-20261009/confirmed-four-archive-delta.json",
+      "sha256": "8e6f4e2eb4bfc56bee699df0733100b471c90e3ebffbd6a8f664752dc2c12a76",
+      "bytes": 1255
+    },
+    {
+      "path": "evidence/artifacts/g5-start-closure-1-20261009/confirmed-four-fix.json",
+      "sha256": "4446cc7369c5154d715ff80b23552eaeb1792e48d5504efecde0ac17f9b3e4df",
+      "bytes": 11925
+    },
+    {
+      "path": "evidence/artifacts/g5-start-closure-1-20261009/confirmed-four-population-receipt.json",
+      "sha256": "90200fa69a2f23c8a73e01b7ceb2875df05216b93ab18dc2aabd37a83b1efbde",
+      "bytes": 249297
+    },
+    {
+      "path": "evidence/artifacts/g5-start-closure-1-20261009/confirmed-four-suite-comparison.json",
+      "sha256": "d643d71b32cc639610b84685b999d2cf3189c4f363fc02d93c5e8b0e440540b8",
+      "bytes": 30312
+    },
+    {
       "path": "evidence/artifacts/g5-start-closure-1-20261009/full-suite-comparison.json",
       "sha256": "623784ea49a51d2f3f57692539f2a516636a4ae6d7c77b6ffd50fb06962464af",
       "bytes": 18984
+    },
+    {
+      "path": "evidence/artifacts/g5-start-closure-1-20261009/j8-preparation.json",
+      "sha256": "afd919ae8636f9b467767ed2717107c4b16e9c79e79fc128714c5acbf1752b75",
+      "bytes": 9494
+    },
+    {
+      "path": "evidence/artifacts/g5-start-closure-1-20261009/native-row-sync-rebuild.json",
+      "sha256": "bae10cadcfe61166087f8bf79609ed0896d0760eb71721392297fb5515fc30a3",
+      "bytes": 2666
     },
     {
       "path": "evidence/artifacts/g5-start-closure-1-20261009/origin-family-declarations.json",
@@ -21617,8 +21647,8 @@
     },
     {
       "path": "evidence/artifacts/g5-start-closure-1-20261009/origin-map.json",
-      "sha256": "676cd4e5374b8dff156e4cb3b619a5b0a9e03f83b92eee2f33dd7c58b0c01c2c",
-      "bytes": 3064954
+      "sha256": "a7bb04e413cf5c7a533c671e745a7a61fc3459690c9c59bdd0309367c71a4ea6",
+      "bytes": 3064963
     },
     {
       "path": "evidence/artifacts/g5-start-closure-1-20261009/r3-reseal-proof.json",
@@ -60887,8 +60917,8 @@
     },
     {
       "path": "tests/test_start_closure_sampler.py",
-      "sha256": "a26c3ec66f8aa87180671776a1ce85955840ba1a1d10e9bc3e1c5b14b07539cf",
-      "bytes": 41851
+      "sha256": "0bc62e279933c5ed543dcda65d53836ce09c27545dd00404f647108b19cce34c",
+      "bytes": 56150
     },
     {
       "path": "tests/test_supply_chain_scan.py",
@@ -61522,8 +61552,8 @@
     },
     {
       "path": "tools/sota-convergence/start_closure_sampler.py",
-      "sha256": "8f42c4332388dc0e3b45c2677bc54b3620f61cebdd8175ff089e16aea60a4fda",
-      "bytes": 38573
+      "sha256": "6255be2d5c8bd7e766ba717df4a0bfc87649e13179c940f1fa97568a7ac7ee3a",
+      "bytes": 41767
     },
     {
       "path": "tools/token-e2e/README.md",

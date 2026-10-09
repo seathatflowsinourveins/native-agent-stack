@@ -28,6 +28,8 @@
   },
   "native_rebuild": {
     "evidence_class": "local_integration",
+    "public_receipt": "evidence/artifacts/g5-start-closure-1-20261009/native-row-sync-rebuild.json",
+    "public_receipt_sha256": "bae10cadcfe61166087f8bf79609ed0896d0760eb71721392297fb5515fc30a3",
     "rebuild_receipt_sha256": "35a5ad7595f1c35148d0ac35b84c622bc24532e2ad18d88c42dcd0365f624fc8",
     "tar_exit_code": 0,
     "zstd_exit_code": 0
@@ -73,10 +75,11 @@
   "source_head": "503c470149069caaf2bf9c87f24caa38091ce3a6",
   "source_reuse": [
     "native compact_manifest.py read_archive/row_list at source_head",
-    "sealed_r3_generator.py canonical JSON at unchanged SHA256759facff52170f452290077b71d328f299b2c763df0358d126973c60886515c7",
+    "sealed_r3_generator.py canonical JSON at unchanged SHA256 759facff52170f452290077b71d328f299b2c763df0358d126973c60886515c7",
     "Native GNU tar and Zstandard; retained recipe source pin in the rebuild receipt"
   ],
-  "status": "prepared",
+  "status": "historical-preparation",
+  "historical_scope": "The source_head, E03 manifest, 8f42c433 gate and 32-test observations are the original asset-only delta. The current canonical binding/full qualification and revised tests are recorded in j8-preparation.json; this receipt is not a new run.",
   "tests": {
     "drift_test": "NativeSamplerTests.test_packet_build_refuses_asset_manifest_row_drift_before_selection",
     "evidence_class": "synthetic",

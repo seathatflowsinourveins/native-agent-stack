@@ -356,20 +356,43 @@ def output_directory(root, name):
     return output
 
 
-def verify_asset_rows(manifest, asset_path, native, r3):
-    """Compare every ordered row field using the native bounded archive reader."""
-    asset_sha, _, captured = native.read_archive(Path(asset_path), wanted={native.ROWS_MEMBER})
-    require(native.ROWS_MEMBER in captured, "Asset is missing compact/rows.json")
-    asset_rows = native.row_list(captured[native.ROWS_MEMBER])
+def verify_asset_rows(manifest, asset_path, native, r3, manifest_raw=None):
+    """Qualify the entire asset and compare its native-computed output, not its inputs."""
     manifest_rows = manifest.get("rows")
     require(isinstance(manifest_rows, list), "Manifest rows must be a list")
-    asset_canonical = r3.canonical(asset_rows)
-    require(asset_canonical == r3.canonical(manifest_rows),
-            "Asset compact/rows.json differs from manifest rows; rebuild the asset before drawing")
-    return {"asset_sha256": asset_sha, "member": native.ROWS_MEMBER,
-            "rows": len(asset_rows), "rows_diff": 0,
-            "ordered_rows_sha256": r3.digest(asset_canonical.encode()),
-            "comparison": "Complete ordered rows, including every closure, origin and disposition field"}
+    qualified, qualified_raw = native.build_manifest(
+        Path(asset_path), manifest.get("release_tag"), profile=PROFILE)
+    require(qualified["validation"]["status"] == "PASS",
+            "Asset native qualification blocked: " + r3.canonical(qualified["validation"]["blockers"]))
+    computed_rows = qualified["rows"]
+    differences = [position for position in range(max(len(computed_rows), len(manifest_rows)))
+                   if position >= len(computed_rows) or position >= len(manifest_rows)
+                   or r3.canonical(computed_rows[position]) != r3.canonical(manifest_rows[position])]
+    if differences:
+        position = differences[0]
+        actual = computed_rows[position] if position < len(computed_rows) else None
+        expected = manifest_rows[position] if position < len(manifest_rows) else None
+        field = "<row>"
+        if isinstance(actual, dict) and isinstance(expected, dict):
+            field = next((name for name in sorted(set(actual) | set(expected))
+                          if name not in actual or name not in expected
+                          or r3.canonical(actual[name]) != r3.canonical(expected[name])), "<row>")
+        raise ValueError("Native-computed rows differ from manifest rows: rows_diff="
+                         + str(len(differences)) + "; first_index=" + str(position) + "; field=" + field)
+    require(qualified == manifest,
+            "Manifest differs from native asset-only rebuild; run the native --write and FULL --check")
+    if manifest_raw is not None:
+        require(qualified_raw == manifest_raw,
+                "Manifest bytes differ from native asset-only rebuild; run the native --write and FULL --check")
+    asset = qualified["asset"]
+    return {"asset_sha256": asset["sha256"], "member": native.ROWS_MEMBER,
+            "rows": len(computed_rows), "rows_diff": len(differences),
+            "ordered_rows_sha256": r3.digest(r3.canonical(computed_rows).encode()),
+            "rows_member_sha256": asset["rows_sha256"], "coverage_member_sha256": asset["coverage_sha256"],
+            "native_qualification": {"status": "PASS", "profile": PROFILE,
+                                     "manifest_sha256": r3.digest(qualified_raw),
+                                     "byte_exact": manifest_raw is not None},
+            "comparison": "Complete native-computed ordered rows and the full asset-only manifest, including capture/coverage qualification"}
 
 
 def build_packet(*, profile, manifest_path, manifest_sha256, origin_map_path, origin_map_sha256,
@@ -385,13 +408,28 @@ def build_packet(*, profile, manifest_path, manifest_sha256, origin_map_path, or
     origin_raw = pinned_bytes(origin_map_path, origin_map_sha256)
     contract_raw = pinned_bytes(CONTRACT, CONTRACT_SHA256)
     manifest, origin_map = native.load(manifest_raw), native.load(origin_raw)
-    manifest_asset_sha = manifest.get("asset", {}).get("sha256")
+    require(isinstance(manifest, dict), "Manifest must be an object")
+    require(isinstance(manifest.get("asset"), dict), "Manifest asset must be an object")
+    manifest_asset_sha = manifest["asset"].get("sha256")
+    require(isinstance(manifest_asset_sha, str) and SHA.fullmatch(manifest_asset_sha),
+            "Manifest asset pin must be a full lowercase SHA256")
     expected_asset_sha = manifest_asset_sha if asset_sha256 is None else asset_sha256
-    require(isinstance(expected_asset_sha, str) and re.fullmatch(r"[0-9a-f]{64}", expected_asset_sha),
+    require(isinstance(expected_asset_sha, str) and SHA.fullmatch(expected_asset_sha),
             "Asset pin must be a full lowercase SHA256")
-    asset_verification = verify_asset_rows(manifest, asset_path, native, r3)
-    require(asset_verification["asset_sha256"] == expected_asset_sha,
-            "Asset SHA256 differs from the explicit pin or hash-checked manifest binding")
+    require(expected_asset_sha == manifest_asset_sha,
+            "Asset SHA256 differs from manifest binding: explicit=" + expected_asset_sha
+            + "; manifest=" + manifest_asset_sha + "; qualify and rebuild the canonical manifest")
+    asset_path = Path(asset_path)
+    require(asset_path.is_file() and asset_path.stat().st_size <= native.ASSET_LIMIT,
+            "Missing or oversized asset")
+    with asset_path.open("rb") as stream:
+        actual_asset_sha, _ = native.digest_stream(stream)
+    require(actual_asset_sha == expected_asset_sha,
+            "Asset SHA256 differs: observed=" + actual_asset_sha + "; expected=" + expected_asset_sha
+            + "; source=hash-checked manifest" + (" and explicit confirmation" if asset_sha256 is not None else ""))
+    asset_verification = verify_asset_rows(manifest, asset_path, native, r3, manifest_raw)
+    require(asset_verification["asset_sha256"] == actual_asset_sha,
+            "Asset changed during native qualification")
     require(manifest.get("row_schema", {}).get("path") == ROW_SCHEMA, "Manifest does not bind the profile row schema")
     schema_raw = pinned_bytes(repo / ROW_SCHEMA, manifest["row_schema"]["sha256"])
     from jsonschema import Draft202012Validator
@@ -455,7 +493,7 @@ def build_packet(*, profile, manifest_path, manifest_sha256, origin_map_path, or
                "profile_review_sources": [{"path": "profile-code/" + name, "sha256": r3.digest(files["profile-code/" + name])}
                                           for name in sorted(review_sources)],
                "asset_rows_verification": asset_verification,
-               "capture_verification": "The native bounded reader hashes the supplied asset and checks complete ordered rows against the exact PASS manifest before selection. Prior full-profile qualification remains separate.",
+               "capture_verification": "The native asset-only builder qualifies every declared capture and coverage binding, compares complete computed rows and reproduces the exact PASS manifest bytes before selection. Immutable asset inputs and computed output remain distinct.",
                "strata": [{"stratum": p["stratum"], "path": "strata/" + p["stratum_id"] + ".json",
                            "sha256": r3.digest(files["strata/" + p["stratum_id"] + ".json"])} for p in packets]}
     files["manifest.json"] = (r3.canonical(summary) + "\n").encode()
@@ -512,7 +550,9 @@ def main(argv=None):
     parser.add_argument("--draw-proof", action="store_true")
     parser.add_argument("--proof-r3-sha256")
     parser.add_argument("--redraw-seed", type=int)
-    for name in ("asset", "asset-sha256", "manifest", "manifest-sha256", "origin-map", "origin-map-sha256", "protocol-sha256", "r3-generator", "head", "output-root", "output"):
+    parser.add_argument("--asset")
+    parser.add_argument("--asset-sha256", help="optional confirmation of the canonical manifest asset pin; never an override")
+    for name in ("manifest", "manifest-sha256", "origin-map", "origin-map-sha256", "protocol-sha256", "r3-generator", "head", "output-root", "output"):
         parser.add_argument("--" + name)
     for name in ("origin-provenance", "origin-provenance-sha256", "family-declarations", "family-declarations-sha256", "origin-map-output"):
         parser.add_argument("--" + name)
@@ -525,6 +565,9 @@ def main(argv=None):
         require(not (args.derive_origin_map and args.draw_proof), "Choose one native preparation mode")
         require(args.redraw_seed is None or not (args.derive_origin_map or args.draw_proof),
                 "Redraw seed applies only to the new production packet, never the historical equivalence proof")
+        require(not (args.derive_origin_map or args.draw_proof)
+                or (args.asset is None and args.asset_sha256 is None),
+                "Asset flags apply only to production packet mode, never preparation or proof modes")
         if args.derive_origin_map:
             for name in ("manifest", "manifest_sha256", "protocol_sha256", "r3_generator", "origin_provenance", "origin_provenance_sha256", "family_declarations", "family_declarations_sha256", "origin_map_output"):
                 require(getattr(args, name) is not None, "Missing --" + name.replace("_", "-"))

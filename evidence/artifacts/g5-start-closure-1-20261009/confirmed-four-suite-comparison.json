@@ -1,0 +1,581 @@
+{
+  "schema_version": 1,
+  "kind": "g5-confirmed-four-complete-suite-comparison",
+  "profile": "start-closure/1",
+  "observed_utc": "2026-10-09T22:27:35.432Z",
+  "source_parent": "c54b4a464ac00c3b9e2af4e8b4081ca101aae262",
+  "baseline_commit": "2ecce6ec2221704db642ddec8f70f7152ed2afb6",
+  "prior_tested_head": "a7d501c73827a7d859a655eea71d80353a73e5a4",
+  "run": {
+    "complete": true,
+    "tests": 11834,
+    "elapsed_seconds": 2192.765,
+    "failures": 22,
+    "errors": 0,
+    "skipped": 1187,
+    "final_status_line": "FAILED (failures=22, skipped=1187)"
+  },
+  "actual_return_code": 1,
+  "raw_logs": {
+    "stdout": {
+      "name": "full-ci-env-unittest.stdout.log",
+      "bytes": 130303,
+      "sha256": "640bec6d49398714fc80c9218f3061363e043f7664afa4634e08980cf23b8868"
+    },
+    "stderr": {
+      "name": "full-ci-env-unittest.stderr.log",
+      "bytes": 2182288,
+      "sha256": "f0dfa8e08ed74d4090395cbcee7055b938fab5757ab513a39c355b6d7ddf5a79"
+    }
+  },
+  "independent_strict_counts": {
+    "PRE-EXISTING": 21,
+    "HEAD-INTRODUCED": 0,
+    "UNRESOLVED": 1,
+    "baseline_failure_occurrences": 23,
+    "prior_head_failure_occurrences": 22,
+    "current_failure_occurrences": 22,
+    "current_FAIL": 22,
+    "current_ERROR": 0,
+    "normalized_entire_block_matches_to_baseline": 21,
+    "normalized_entire_block_matches_to_prior_head": 21,
+    "distinct_baseline_occurrences_consumed": 21,
+    "distinct_prior_head_occurrences_consumed": 21,
+    "duplicate_occurrences_deduplicated": 0,
+    "duplicates_preserved": true,
+    "timing_progress_equivalence_exceptions": 0
+  },
+  "strict_method": {
+    "unit": [
+      "test_id",
+      "subtest",
+      "result_type",
+      "normalized_entire_full_failure_block"
+    ],
+    "normalization": "Only the exact two checkout prefixes and independently observed native TemporaryDirectory random8 suffixes; preserve frames, exception chains, semantic messages and duplicate occurrences.",
+    "calibration": "Independent parser exactly reproduced all 45 retained historical blocks and raw ranges.",
+    "ordering_normalized": false,
+    "timing_progress_removed": false
+  },
+  "occurrences": [
+    {
+      "current_record_id": "CURRENT-CI-ENV-01",
+      "test_id": "test_adaptive_paper_credential_race.MutationDriverSelfTests.test_import_error_mutation_is_not_a_kill",
+      "subtest": null,
+      "result_type": "FAIL",
+      "classification": "PRE-EXISTING",
+      "current_raw_log_lines": [
+        12804,
+        12810
+      ],
+      "current_full_failure_block_sha256": "cf801ed7def084c925c4b10b62a9b941b4aca06a08775a6d1404797a71823bb6",
+      "current_normalized_entire_full_failure_block_sha256": "94d556ac20b48aa82ff3b8a21755d84fcc354bf7ef36080abd11078b90555fdc",
+      "baseline_record_id": "BASELINE-STABLE02-01",
+      "baseline_full_failure_block_sha256": "ce6f8a80a9a80534643bb965c80924cd83d409d397cf1676f58907a9b04dc537",
+      "prior_head_record_id": "HEAD-STABLE03-01",
+      "prior_head_full_failure_block_sha256": "cf801ed7def084c925c4b10b62a9b941b4aca06a08775a6d1404797a71823bb6",
+      "normalized_entire_block_equal_to_baseline": true,
+      "normalized_entire_block_equal_to_prior_head": true
+    },
+    {
+      "current_record_id": "CURRENT-CI-ENV-02",
+      "test_id": "test_adaptive_paper_credential_race.MutationDriverSelfTests.test_pristine_worktree_precondition_holds_in_the_copy",
+      "subtest": null,
+      "result_type": "FAIL",
+      "classification": "PRE-EXISTING",
+      "current_raw_log_lines": [
+        12813,
+        12819
+      ],
+      "current_full_failure_block_sha256": "e87f458eb7207c54ef753cabfca6161866de67efa00fcf72c568e9697fdcfeb7",
+      "current_normalized_entire_full_failure_block_sha256": "b028f19fc7333b7abaaff7d311c834caf5e376cbf8b870175480867a38537bf6",
+      "baseline_record_id": "BASELINE-STABLE02-02",
+      "baseline_full_failure_block_sha256": "73de871175e7327dfeedbaf643d4d8f3366c66c4360d0785312814c7e66aea63",
+      "prior_head_record_id": "HEAD-STABLE03-02",
+      "prior_head_full_failure_block_sha256": "190ca8b4519afe587a7c11782cd65b245781bf0fd5d1eafec2192f55e9a41aca",
+      "normalized_entire_block_equal_to_baseline": true,
+      "normalized_entire_block_equal_to_prior_head": true
+    },
+    {
+      "current_record_id": "CURRENT-CI-ENV-03",
+      "test_id": "test_adaptive_paper_credential_race.MutationDriverSelfTests.test_skipped_test_is_inconclusive_not_survived",
+      "subtest": null,
+      "result_type": "FAIL",
+      "classification": "PRE-EXISTING",
+      "current_raw_log_lines": [
+        12822,
+        12831
+      ],
+      "current_full_failure_block_sha256": "8d237620241165e197c679a0ebf2f35afb7d9e56e2246bd9310e096a99380707",
+      "current_normalized_entire_full_failure_block_sha256": "5f8189b3d30919840a91bd14346e9e8acd52ddc5e1b2e9efcf09dfeb3991aa4c",
+      "baseline_record_id": "BASELINE-STABLE02-03",
+      "baseline_full_failure_block_sha256": "e8211b0df89cda612824eb8626eec589616780f83397f412a2d103b6c5a6eef7",
+      "prior_head_record_id": "HEAD-STABLE03-03",
+      "prior_head_full_failure_block_sha256": "4dbba7511c0b26828990f6a33888e29b207b271bebe4ade2f086eec7e55ed0e7",
+      "normalized_entire_block_equal_to_baseline": true,
+      "normalized_entire_block_equal_to_prior_head": true
+    },
+    {
+      "current_record_id": "CURRENT-CI-ENV-04",
+      "test_id": "test_adaptive_paper_credential_race.MutationDriverSelfTests.test_teardownclass_error_is_inconclusive_not_survived",
+      "subtest": null,
+      "result_type": "FAIL",
+      "classification": "PRE-EXISTING",
+      "current_raw_log_lines": [
+        12834,
+        12843
+      ],
+      "current_full_failure_block_sha256": "8c2c99d5b65eb60a54fb02f77dc3b10ace6c207dece82c93a2e3f6e6944a30be",
+      "current_normalized_entire_full_failure_block_sha256": "752c740b044627ae391f7cca16ad0bc0fb5a40eb1a03b36ba2cb4c4f55662c6b",
+      "baseline_record_id": "BASELINE-STABLE02-04",
+      "baseline_full_failure_block_sha256": "b4d0a21008d9f5e88ee52e0f9a5d93547ae14a15c0e8454ac6d21b88a70dfe46",
+      "prior_head_record_id": "HEAD-STABLE03-04",
+      "prior_head_full_failure_block_sha256": "7ec6cc48696fbd5170a9f205fb5ed79d4645d352809c0028a8f425587f4fae90",
+      "normalized_entire_block_equal_to_baseline": true,
+      "normalized_entire_block_equal_to_prior_head": true
+    },
+    {
+      "current_record_id": "CURRENT-CI-ENV-05",
+      "test_id": "test_adaptive_paper_credential_race.RealMutationKills.test_every_mutation_is_really_killed_by_the_named_test",
+      "subtest": null,
+      "result_type": "FAIL",
+      "classification": "PRE-EXISTING",
+      "current_raw_log_lines": [
+        12846,
+        12857
+      ],
+      "current_full_failure_block_sha256": "59e6803435023a520f122e69736e676c9f817b1bbee3e48baf3f77615137fe1b",
+      "current_normalized_entire_full_failure_block_sha256": "33dd3f74e437c08a67c956a7afd372af5f9dd6ade125f69ba6853a650ffb7ee2",
+      "baseline_record_id": "BASELINE-STABLE02-05",
+      "baseline_full_failure_block_sha256": "c0627972a9ade7c93a519b4a60dcf3ed4210aa158035897390eb4813dbb097f7",
+      "prior_head_record_id": "HEAD-STABLE03-05",
+      "prior_head_full_failure_block_sha256": "dbd065dfd32d6ab5e29b59fd0c3923cf05c3e0d54d960f4fd2779c7ec0f39f33",
+      "normalized_entire_block_equal_to_baseline": true,
+      "normalized_entire_block_equal_to_prior_head": true
+    },
+    {
+      "current_record_id": "CURRENT-CI-ENV-06",
+      "test_id": "test_new_wsl_definitive_defaults.FixwaveAcceptanceRepairs.test_conformance_release_cli_is_not_resolved_from_the_same_named_source_package",
+      "subtest": null,
+      "result_type": "FAIL",
+      "classification": "PRE-EXISTING",
+      "current_raw_log_lines": [
+        12860,
+        12868
+      ],
+      "current_full_failure_block_sha256": "e8956a4a8c41e3c70e638839b2d03a7103968ca740c5164b3f5cf30beb4367d3",
+      "current_normalized_entire_full_failure_block_sha256": "72828277085568d5b840e3622443c18a292b0e0734eb8195552826b3574d779a",
+      "baseline_record_id": "BASELINE-STABLE02-07",
+      "baseline_full_failure_block_sha256": "1d3da91ae994497d0492e95c79d4c539749dc21d8a42766324856b91b0662e50",
+      "prior_head_record_id": "HEAD-STABLE03-06",
+      "prior_head_full_failure_block_sha256": "e8956a4a8c41e3c70e638839b2d03a7103968ca740c5164b3f5cf30beb4367d3",
+      "normalized_entire_block_equal_to_baseline": true,
+      "normalized_entire_block_equal_to_prior_head": true
+    },
+    {
+      "current_record_id": "CURRENT-CI-ENV-07",
+      "test_id": "test_new_wsl_mcp_conformance_lifecycle.ConformanceLifecycleTests.test_failure_cleans_detached_wildcard_server_and_preserves_status",
+      "subtest": null,
+      "result_type": "FAIL",
+      "classification": "PRE-EXISTING",
+      "current_raw_log_lines": [
+        12872,
+        12883
+      ],
+      "current_full_failure_block_sha256": "b9727371087f3e3daafdbb535bec1549480fbaafe6e562521d47af4fd128b93e",
+      "current_normalized_entire_full_failure_block_sha256": "cb28e6ce6db2eb7d3ae32764938ab3f9ab5fd0b8e03138d2c453ebf089ee36f7",
+      "baseline_record_id": "BASELINE-STABLE02-08",
+      "baseline_full_failure_block_sha256": "eb6f7eca18147bee157d457dff46b9aa1bef8bae2f0cec63ec972c4bfbd72881",
+      "prior_head_record_id": "HEAD-STABLE03-07",
+      "prior_head_full_failure_block_sha256": "b9727371087f3e3daafdbb535bec1549480fbaafe6e562521d47af4fd128b93e",
+      "normalized_entire_block_equal_to_baseline": true,
+      "normalized_entire_block_equal_to_prior_head": true
+    },
+    {
+      "current_record_id": "CURRENT-CI-ENV-08",
+      "test_id": "test_new_wsl_mcp_conformance_lifecycle.ConformanceLifecycleTests.test_interrupt_cleans_detached_wildcard_server",
+      "subtest": null,
+      "result_type": "FAIL",
+      "classification": "PRE-EXISTING",
+      "current_raw_log_lines": [
+        12887,
+        12898
+      ],
+      "current_full_failure_block_sha256": "87c563a3c9299dda110b9b53fb1836d3c639e5099ae0a2d716e1b99a702d9cd8",
+      "current_normalized_entire_full_failure_block_sha256": "21242cb3d503262a99f631cbc186637fb48df5268822d0c11b5362e923e90d2d",
+      "baseline_record_id": "BASELINE-STABLE02-09",
+      "baseline_full_failure_block_sha256": "de62aa9cf528b538d9cf1ae39a81546410ef4b6a857678775e23146961413cad",
+      "prior_head_record_id": "HEAD-STABLE03-08",
+      "prior_head_full_failure_block_sha256": "87c563a3c9299dda110b9b53fb1836d3c639e5099ae0a2d716e1b99a702d9cd8",
+      "normalized_entire_block_equal_to_baseline": true,
+      "normalized_entire_block_equal_to_prior_head": true
+    },
+    {
+      "current_record_id": "CURRENT-CI-ENV-09",
+      "test_id": "test_new_wsl_mcp_conformance_lifecycle.ConformanceLifecycleTests.test_missing_listener_observation_is_unknown_and_fails_acceptance",
+      "subtest": null,
+      "result_type": "FAIL",
+      "classification": "PRE-EXISTING",
+      "current_raw_log_lines": [
+        12902,
+        12913
+      ],
+      "current_full_failure_block_sha256": "5d4ea1eb3abb218099a6e9d9d455206ae2690f44cc1873d5ebdb31ef2c12a309",
+      "current_normalized_entire_full_failure_block_sha256": "585f6535c5c8ac001c7e112d5317400e9f2cf65ea7eab40c3818a4866792ca24",
+      "baseline_record_id": "BASELINE-STABLE02-10",
+      "baseline_full_failure_block_sha256": "616b5e4d6323bbcad4fc7e08fc783e95c66275ee6ed0f365e501d7af0abf80b9",
+      "prior_head_record_id": "HEAD-STABLE03-09",
+      "prior_head_full_failure_block_sha256": "5d4ea1eb3abb218099a6e9d9d455206ae2690f44cc1873d5ebdb31ef2c12a309",
+      "normalized_entire_block_equal_to_baseline": true,
+      "normalized_entire_block_equal_to_prior_head": true
+    },
+    {
+      "current_record_id": "CURRENT-CI-ENV-10",
+      "test_id": "test_new_wsl_mcp_conformance_lifecycle.ConformanceLifecycleTests.test_startup_termination_is_deferred_until_ownership_is_recorded",
+      "subtest": null,
+      "result_type": "FAIL",
+      "classification": "PRE-EXISTING",
+      "current_raw_log_lines": [
+        12917,
+        12928
+      ],
+      "current_full_failure_block_sha256": "a82ea2801afbdfa112918b1cc1859d64bdfeb26eb88c2c3e5899598858ee9a9f",
+      "current_normalized_entire_full_failure_block_sha256": "59f321229f42c8676b3568b0da177b5bde6239cace63d31cd5f5cb18f5095a03",
+      "baseline_record_id": "BASELINE-STABLE02-11",
+      "baseline_full_failure_block_sha256": "f870f3475e073e431dfc5435fbdbf1002a1feeefbf392cfa7e7e41fa15ba8657",
+      "prior_head_record_id": "HEAD-STABLE03-10",
+      "prior_head_full_failure_block_sha256": "a82ea2801afbdfa112918b1cc1859d64bdfeb26eb88c2c3e5899598858ee9a9f",
+      "normalized_entire_block_equal_to_baseline": true,
+      "normalized_entire_block_equal_to_prior_head": true
+    },
+    {
+      "current_record_id": "CURRENT-CI-ENV-11",
+      "test_id": "test_new_wsl_mcp_conformance_lifecycle.ConformanceLifecycleTests.test_success_cleans_detached_wildcard_server",
+      "subtest": null,
+      "result_type": "FAIL",
+      "classification": "PRE-EXISTING",
+      "current_raw_log_lines": [
+        12932,
+        12943
+      ],
+      "current_full_failure_block_sha256": "baff8253c3ca450814108a721aee3d3c99167588ad4b8236f946d6d216895324",
+      "current_normalized_entire_full_failure_block_sha256": "4c0a172afe671e788cd8e0febc065ccc127d7a22cf0707658abb10208bb0e4be",
+      "baseline_record_id": "BASELINE-STABLE02-12",
+      "baseline_full_failure_block_sha256": "9b57aa693e1fca4cc5d28a28b34f1d330f3e0e47817a956eb60c303bc7f5bc1e",
+      "prior_head_record_id": "HEAD-STABLE03-11",
+      "prior_head_full_failure_block_sha256": "baff8253c3ca450814108a721aee3d3c99167588ad4b8236f946d6d216895324",
+      "normalized_entire_block_equal_to_baseline": true,
+      "normalized_entire_block_equal_to_prior_head": true
+    },
+    {
+      "current_record_id": "CURRENT-CI-ENV-12",
+      "test_id": "test_new_wsl_mcp_conformance_lifecycle.ConformanceLifecycleTests.test_termination_cleans_detached_wildcard_server",
+      "subtest": null,
+      "result_type": "FAIL",
+      "classification": "PRE-EXISTING",
+      "current_raw_log_lines": [
+        12947,
+        12958
+      ],
+      "current_full_failure_block_sha256": "0bbb71932011a7581cd105637f2516dedc3a514242a4576e29d36a208ac638b1",
+      "current_normalized_entire_full_failure_block_sha256": "3b155ac8c2b6efc64d0d5aed5a137d794ed15e5bb1a9c9f205b2455206ab793f",
+      "baseline_record_id": "BASELINE-STABLE02-13",
+      "baseline_full_failure_block_sha256": "061345bee3060f0c27c48a77bfe7d150517424c524ebbe4ffead842ae65f732f",
+      "prior_head_record_id": "HEAD-STABLE03-12",
+      "prior_head_full_failure_block_sha256": "0bbb71932011a7581cd105637f2516dedc3a514242a4576e29d36a208ac638b1",
+      "normalized_entire_block_equal_to_baseline": true,
+      "normalized_entire_block_equal_to_prior_head": true
+    },
+    {
+      "current_record_id": "CURRENT-CI-ENV-13",
+      "test_id": "test_token_e2e_grader.F19_Mutants.test_M31_user_base_dropped_from_the_allowlist",
+      "subtest": null,
+      "result_type": "FAIL",
+      "classification": "UNRESOLVED",
+      "current_raw_log_lines": [
+        12962,
+        12976
+      ],
+      "current_full_failure_block_sha256": "1bb034c3d38d2116ac7a1217b2b1429c16f2ffdc74b7b146fbc92b4932238fd4",
+      "current_normalized_entire_full_failure_block_sha256": "101360a6d0d9502a99310f1b42f2c047aa15518ba6dd792611513fde34034ff3",
+      "baseline_record_id": null,
+      "baseline_full_failure_block_sha256": null,
+      "prior_head_record_id": null,
+      "prior_head_full_failure_block_sha256": null,
+      "normalized_entire_block_equal_to_baseline": false,
+      "normalized_entire_block_equal_to_prior_head": false
+    },
+    {
+      "current_record_id": "CURRENT-CI-ENV-14",
+      "test_id": "test_token_e2e_grader.F19c_Stage3Mutants.test_M17c_manifest_canary_off",
+      "subtest": null,
+      "result_type": "FAIL",
+      "classification": "PRE-EXISTING",
+      "current_raw_log_lines": [
+        12979,
+        12989
+      ],
+      "current_full_failure_block_sha256": "fb2e3025f822975d12c3a65d07a16eca4008cf798db1c04d06ecdf6cf7b786d6",
+      "current_normalized_entire_full_failure_block_sha256": "0b30edb3a870b523544e124f066b3c685f57a21adc19ce3fa0676fdbbd5cc709",
+      "baseline_record_id": "BASELINE-STABLE02-15",
+      "baseline_full_failure_block_sha256": "b8abe1a74560152dfdd0bf8b134c0468cc3aa440de6117022f46aacaab72768a",
+      "prior_head_record_id": "HEAD-STABLE03-14",
+      "prior_head_full_failure_block_sha256": "fb2e3025f822975d12c3a65d07a16eca4008cf798db1c04d06ecdf6cf7b786d6",
+      "normalized_entire_block_equal_to_baseline": true,
+      "normalized_entire_block_equal_to_prior_head": true
+    },
+    {
+      "current_record_id": "CURRENT-CI-ENV-15",
+      "test_id": "test_token_e2e_grader.F19d_RepairRoundMutants.test_M56c_the_export_backstop_is_off",
+      "subtest": null,
+      "result_type": "FAIL",
+      "classification": "PRE-EXISTING",
+      "current_raw_log_lines": [
+        12992,
+        13002
+      ],
+      "current_full_failure_block_sha256": "a1c5be692ae843fff89b2fb35b0c57692eee365bcf0b136fc9670caa012b8152",
+      "current_normalized_entire_full_failure_block_sha256": "36d36e706c118ad553f3a3b005656948637d70859c5b1d913e0863f9ea5eb2fb",
+      "baseline_record_id": "BASELINE-STABLE02-16",
+      "baseline_full_failure_block_sha256": "d34eb03893828b0e6d6db6cf8b05590d27b7c824406865bb2001573a687528db",
+      "prior_head_record_id": "HEAD-STABLE03-15",
+      "prior_head_full_failure_block_sha256": "a1c5be692ae843fff89b2fb35b0c57692eee365bcf0b136fc9670caa012b8152",
+      "normalized_entire_block_equal_to_baseline": true,
+      "normalized_entire_block_equal_to_prior_head": true
+    },
+    {
+      "current_record_id": "CURRENT-CI-ENV-16",
+      "test_id": "test_token_e2e_grader.F29_Export.test_the_canary_runs_over_the_whole_manifest",
+      "subtest": null,
+      "result_type": "FAIL",
+      "classification": "PRE-EXISTING",
+      "current_raw_log_lines": [
+        13005,
+        13017
+      ],
+      "current_full_failure_block_sha256": "23233553f9a1769a1f5dcd3c022dea06df136be4cf0ec321182b110f6af25381",
+      "current_normalized_entire_full_failure_block_sha256": "5c28c10b42179c19258c2fa77c5241059af7e7b45d1ffebc2fcddb7a766f76a4",
+      "baseline_record_id": "BASELINE-STABLE02-17",
+      "baseline_full_failure_block_sha256": "db6c52cbe7b186a3cad4c687d5c59e93330fcf69dd3f151d1407f96dd2d2d7dc",
+      "prior_head_record_id": "HEAD-STABLE03-16",
+      "prior_head_full_failure_block_sha256": "23233553f9a1769a1f5dcd3c022dea06df136be4cf0ec321182b110f6af25381",
+      "normalized_entire_block_equal_to_baseline": true,
+      "normalized_entire_block_equal_to_prior_head": true
+    },
+    {
+      "current_record_id": "CURRENT-CI-ENV-17",
+      "test_id": "test_token_e2e_grader.F29_Export.test_the_manifest_holds_only_placeholders_and_attaches_the_aggregate_by_a_relative_path",
+      "subtest": null,
+      "result_type": "FAIL",
+      "classification": "PRE-EXISTING",
+      "current_raw_log_lines": [
+        13020,
+        13026
+      ],
+      "current_full_failure_block_sha256": "2d3ceb360cb04ce5bdadda371c2ad0f79ef94fbe8faa910e8042ae74e5ccfb3c",
+      "current_normalized_entire_full_failure_block_sha256": "eb2549bb415451677df0dbb97ceadd574e765e05a70e27da19d62a3bfe638c7f",
+      "baseline_record_id": "BASELINE-STABLE02-18",
+      "baseline_full_failure_block_sha256": "2ce322b68f09e7a2e9d2c48418c0e37fca3e0b3474cac923c41eec9cebb75ce9",
+      "prior_head_record_id": "HEAD-STABLE03-17",
+      "prior_head_full_failure_block_sha256": "2d3ceb360cb04ce5bdadda371c2ad0f79ef94fbe8faa910e8042ae74e5ccfb3c",
+      "normalized_entire_block_equal_to_baseline": true,
+      "normalized_entire_block_equal_to_prior_head": true
+    },
+    {
+      "current_record_id": "CURRENT-CI-ENV-18",
+      "test_id": "test_token_e2e_grader.F29_Export.test_the_token_report_importer_accepts_the_manifest",
+      "subtest": null,
+      "result_type": "FAIL",
+      "classification": "PRE-EXISTING",
+      "current_raw_log_lines": [
+        13030,
+        13036
+      ],
+      "current_full_failure_block_sha256": "73ba99534c98eeceb79499661c3b20ec35c89e9fcb67a42824f29f5eb6912e6e",
+      "current_normalized_entire_full_failure_block_sha256": "d36dccda7e8566c00b1056d22f5625e8c9a4b7ad9575ab2796a7f44d853ca626",
+      "baseline_record_id": "BASELINE-STABLE02-19",
+      "baseline_full_failure_block_sha256": "6c6b3cc61b9ab7e1047a6c80fea5360c47129321d9c09cc9e639fdd11faf0a95",
+      "prior_head_record_id": "HEAD-STABLE03-18",
+      "prior_head_full_failure_block_sha256": "73ba99534c98eeceb79499661c3b20ec35c89e9fcb67a42824f29f5eb6912e6e",
+      "normalized_entire_block_equal_to_baseline": true,
+      "normalized_entire_block_equal_to_prior_head": true
+    },
+    {
+      "current_record_id": "CURRENT-CI-ENV-19",
+      "test_id": "test_token_e2e_grader.F29b_CheckHtml.test_check_html_accepts_the_render_reports_output_of_a_relativized_capture",
+      "subtest": null,
+      "result_type": "FAIL",
+      "classification": "PRE-EXISTING",
+      "current_raw_log_lines": [
+        13039,
+        13045
+      ],
+      "current_full_failure_block_sha256": "3ab0092d6e14e7cef8c49d698efc0f203e14a3186ec980b0e52380d24af2ce9c",
+      "current_normalized_entire_full_failure_block_sha256": "eaced3cb592bc2f9675993796231051d29d1ea8138e185684ed55b0b271bcadc",
+      "baseline_record_id": "BASELINE-STABLE02-20",
+      "baseline_full_failure_block_sha256": "62e711722e302f6466797228a9528cb882d3dc3689a665537524ae5b3fd9dc8c",
+      "prior_head_record_id": "HEAD-STABLE03-19",
+      "prior_head_full_failure_block_sha256": "3ab0092d6e14e7cef8c49d698efc0f203e14a3186ec980b0e52380d24af2ce9c",
+      "normalized_entire_block_equal_to_baseline": true,
+      "normalized_entire_block_equal_to_prior_head": true
+    },
+    {
+      "current_record_id": "CURRENT-CI-ENV-20",
+      "test_id": "test_token_e2e_grader.F29b_CheckHtml.test_the_real_report_templates_and_their_script_pass_the_canary",
+      "subtest": null,
+      "result_type": "FAIL",
+      "classification": "PRE-EXISTING",
+      "current_raw_log_lines": [
+        13048,
+        13055
+      ],
+      "current_full_failure_block_sha256": "e8e177860b7b1ba230343ca4450957722c060bbe07774af7676975a9caa7fdb7",
+      "current_normalized_entire_full_failure_block_sha256": "ebb5d78fdf8b08c567b1215b2755fc951b59574cf11e8244320b9b2c17c737a5",
+      "baseline_record_id": "BASELINE-STABLE02-21",
+      "baseline_full_failure_block_sha256": "e9d5d32e98df8bca0a439858f08695dca1ded021b1806c9f8540c110cd62ca7e",
+      "prior_head_record_id": "HEAD-STABLE03-20",
+      "prior_head_full_failure_block_sha256": "e8e177860b7b1ba230343ca4450957722c060bbe07774af7676975a9caa7fdb7",
+      "normalized_entire_block_equal_to_baseline": true,
+      "normalized_entire_block_equal_to_prior_head": true
+    },
+    {
+      "current_record_id": "CURRENT-CI-ENV-21",
+      "test_id": "test_token_e2e_grader.F29c_ArgvSanitizer.test_a_grade_run_that_spells_its_flags_with_equals_records_no_path",
+      "subtest": null,
+      "result_type": "FAIL",
+      "classification": "PRE-EXISTING",
+      "current_raw_log_lines": [
+        13058,
+        13064
+      ],
+      "current_full_failure_block_sha256": "730be8aebfcd0f8c30aaad34bf2dd7014bc5a54509b27eba0d824e2c4dab5102",
+      "current_normalized_entire_full_failure_block_sha256": "91c642fcf413d3d37b03edeb2106015780403a9d841284bdd5115c77aecc3bac",
+      "baseline_record_id": "BASELINE-STABLE02-22",
+      "baseline_full_failure_block_sha256": "d391060cfd1c48d23d43e6a660d2c2db6b2d414c855ad22ee77e01b9d9ad3944",
+      "prior_head_record_id": "HEAD-STABLE03-21",
+      "prior_head_full_failure_block_sha256": "730be8aebfcd0f8c30aaad34bf2dd7014bc5a54509b27eba0d824e2c4dab5102",
+      "normalized_entire_block_equal_to_baseline": true,
+      "normalized_entire_block_equal_to_prior_head": true
+    },
+    {
+      "current_record_id": "CURRENT-CI-ENV-22",
+      "test_id": "test_windows_terminal_defaults.OverlayTests.test_the_installed_client_knows_no_notification_type_without_a_decision",
+      "subtest": null,
+      "result_type": "FAIL",
+      "classification": "PRE-EXISTING",
+      "current_raw_log_lines": [
+        13068,
+        13081
+      ],
+      "current_full_failure_block_sha256": "b827830cf6650b9f61ad18c62400f2b27c516de9be4bcad1f3b2c27d3497b3ec",
+      "current_normalized_entire_full_failure_block_sha256": "b116ad4b008d7f1de32cf906a1a2d1a0b56839461b81da4ee37d277154edf9f2",
+      "baseline_record_id": "BASELINE-STABLE02-23",
+      "baseline_full_failure_block_sha256": "c6007abc6f5df6aed45b8b37ab3cca7dec68dc089cc027b32250b1a132a2c1dc",
+      "prior_head_record_id": "HEAD-STABLE03-22",
+      "prior_head_full_failure_block_sha256": "b827830cf6650b9f61ad18c62400f2b27c516de9be4bcad1f3b2c27d3497b3ec",
+      "normalized_entire_block_equal_to_baseline": true,
+      "normalized_entire_block_equal_to_prior_head": true
+    }
+  ],
+  "independent_private_artifacts": [
+    {
+      "scoped_locator": "confirmed-four-fix-20261009T203114Z/complete-suite-reader-20261009T221832Z/current-full-discovery-failures.json",
+      "sha256": "01d763851694eaadde0ce035688e7a5e4ce3853615215ae052475d135726280b"
+    },
+    {
+      "scoped_locator": "confirmed-four-fix-20261009T203114Z/complete-suite-reader-20261009T221832Z/current-full-discovery-comparison.json",
+      "sha256": "158228fab0f5ea430ef148c25374f89c189fa43bd7586e1176e0eb79ed58126f"
+    },
+    {
+      "scoped_locator": "confirmed-four-fix-20261009T203114Z/complete-suite-reader-20261009T221832Z/m31-unordered-diagnostic-proof.json",
+      "sha256": "c9bde15e785b9a1839d92a96235ab8e77b25ba2057d15ed7ff566c2aea6c8a94"
+    }
+  ],
+  "coordinator_causal_classification": {
+    "pre_existing": 22,
+    "introduced": 0,
+    "unresolved": 0,
+    "strict_full_block_matches": 21,
+    "separate_source_supported_diagnostic_order_variations": 1,
+    "boundary": "This causal classification does not replace the independent strict 21/0/1 result or turn the failed broad suite into a PASS. The complete native raw blocks and the one exact ordering difference remain retained."
+  },
+  "diagnostic_order_variation": {
+    "current_record_id": "CURRENT-CI-ENV-13",
+    "test_id": "test_token_e2e_grader.F19_Mutants.test_M31_user_base_dropped_from_the_allowlist",
+    "strict_classification": "UNRESOLVED",
+    "causal_classification": "PRE-EXISTING_DIAGNOSTIC_ORDER_VARIATION",
+    "strict_whole_block_equivalence": false,
+    "additional_normalization_applied": false,
+    "baseline_record_id": "BASELINE-STABLE02-14",
+    "prior_head_record_id": "HEAD-STABLE03-13",
+    "raw_block_sha256": {
+      "current": "1bb034c3d38d2116ac7a1217b2b1429c16f2ffdc74b7b146fbc92b4932238fd4",
+      "baseline": "f6205f95e3e9a82f1ff8dea982cfd8ca787e7e536b646ada6fd61c9f2ae08a19",
+      "prior_head": "2857eaf642d63e6a775bd0b82949261b72e954d742b547a93961aed3a26ca6c3"
+    },
+    "only_changed_block_lines": [
+      14,
+      15
+    ],
+    "reported_set_members_in_current_native_order": [
+      "'test_token_e2e_grader.F27b_CaptureCommand.test_both_t0_conditions_keep_the_operators_user_site_packages'",
+      "'test_token_e2e_grader.F7b_T0Rerun.test_a_user_site_package_stays_visible_under_the_allowlisted_environment'"
+    ],
+    "prior_head_all_other_raw_lines_equal": true,
+    "prior_head_remainder_sha256": "0263227f19c61d68d1bd43f86a9cfaf2d14ad242257c34e46d14099d3f849cf3",
+    "baseline_all_other_lines_equal_after_allowed_checkout_normalization": true,
+    "baseline_normalized_remainder_sha256": "852efb4c240b85376a4402e796db66030061315b46812d87b0c355447288bc0d",
+    "unchanged_repository_producer": {
+      "path": "tests/test_token_e2e_grader.py",
+      "sha256": "42708be8476b880f4288f8cfc44622123ea18e8ae8198ca0c98a379460932cd3",
+      "identical_at": [
+        "baseline2ecce6ec",
+        "prior-heada7d501c7",
+        "parentc54b4a46",
+        "currentworkingtree"
+      ],
+      "set_construction_line": 5896,
+      "set_assertion_line": 5909
+    },
+    "native_upstream_producer": {
+      "runtime": "CPython3.13.16",
+      "file": "Lib/unittest/case.py",
+      "sha256": "ce2499ee6f34a9e6e24f11ae1e2f02e71a3529cca03d5488f0bdcfea8d5d8481",
+      "official_git_blob": "36daa61fa31adb829d9fdfb06f5498b14be2c5f8",
+      "official_source": "https://github.com/python/cpython/blob/v3.13.16/Lib/unittest/case.py#L1158-L1164",
+      "official_bytes_match_installed": true,
+      "finding": "assertSetEqual iterates both set differences without sorting their diagnostic members."
+    },
+    "classification_basis": "The same two missing set members, unchanged assertion source and exact equality of every other block line establish the retained baseline condition. Two native orders were observed; no test or output order was altered."
+  },
+  "sampler_coverage": {
+    "broad_run": "ModuleSkipped for missing jsonschema in the retained CI3.13.16 environment.",
+    "earlier_complete_fixture_run": {
+      "receipt": "evidence/artifacts/g5-start-closure-1-20261009/j8-preparation.json#/synthetic_controls",
+      "evidence_class": "synthetic",
+      "observed_utc": "2026-10-09T19:13:24.308345+00:00",
+      "interpreter": "CPython3.14.4",
+      "tests": 41,
+      "skipped": 0,
+      "exit_code": 0,
+      "stdout_sha256": "063db481565dc504673da733358ef2fc0c76c68045cd58e5f718c22ca41a0fcc",
+      "stderr_sha256": "e75d7aea77701e0231a69eb2f8b88ef4ab5bd40178a14a47f9379f9c23b66d30",
+      "all_five_relevant_inputs_byte_identical_now": true,
+      "inputs": "Sampler/test module/native compact protocol/sealed R3/CompactManifest fixture source",
+      "scope": "Reused earlier passing fixture evidence, not fresh execution after the four-row metadata correction."
+    },
+    "post_four_row_named41_attempt": {
+      "tests": 6,
+      "skipped_classes": 1,
+      "exit_code": 0,
+      "stderr_sha256": "bdab1dd2dfb0cc65fb44fc7add8a7fd818c5d01ded3127344ac74b107f7870a8",
+      "boundary": "NativeSamplerTests skipped because G5_R3_GENERATOR was unset; filename does not establish 41 tests."
+    }
+  },
+  "limits": [
+    "Incomplete system3.14 timeout attempt is preserved and excluded.",
+    "No provider/model execution, upstream runtime acceptance, G5 MET, trading readiness or landing result is inferred.",
+    "The baseline-only SIGTERM failure is observed as passing in the current full run; no general fix claim is made.",
+    "Full original raw captures remain private and unchanged; this compact record carries their hashes and scoped locators."
+  ]
+}
