@@ -141,7 +141,6 @@ jobs:
           claude_args: |
             --model claude-opus-5-5
             --effort high
-            --max-turns 8
             --max-budget-usd 2
             --tools Read,Glob,Grep
             --allowedTools Read,Glob,Grep
@@ -162,6 +161,9 @@ jobs:
       # The turn bound counts distinct assistant message ids. The result's num_turns counts transcript
       # messages, tool results included (a 12-request run on Claude Code 2.1.295 reported 57), so it is
       # kept in the record only.
+      # The cost bound is the $2 budget itself, not the budget times 1.10 that the other Claude workflows allow: a run
+      # that stops at its budget leaves no structured output, so nothing could be applied, and it fails here with its
+      # result subtype named.
       - name: Keep the run's numbers and check the bounds
         if: ${{ always() && steps.claude_triage.outputs.execution_file != '' }}
         shell: bash
@@ -188,6 +190,7 @@ jobs:
              structured_output_present: ($answer != null),
              tools_listed: (($init.tools | type) == "array" and ($init.mcp_servers | type) == "array"),
              successful_result: ($result.subtype == "success" and $result.is_error == false),
+             result_subtype: ($result.subtype | name),
              session_started: ($init != null),
              claude_code_version: (($init.claude_code_version // "unknown") | name),
              tools: ($tools | map(name)),
@@ -215,7 +218,8 @@ jobs:
               "$out/usage.json"
           } >> "$GITHUB_STEP_SUMMARY"
           failed="$(jq -r '[
-            (if .successful_result != true then "the run did not end in success" else empty end),
+            (if .successful_result != true then "the run did not end in success (result subtype \(.result_subtype))"
+             else empty end),
             (if .session_started != true then "no session start record" else empty end),
             (if .tools_listed != true then "the session start record lists no tools or MCP servers" else empty end),
             (if (.forbidden_tools | length) > 0 then "tools outside Glob, Grep, Read and StructuredOutput: \(.forbidden_tools | join(" "))"

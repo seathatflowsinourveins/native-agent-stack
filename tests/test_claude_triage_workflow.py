@@ -92,6 +92,11 @@ def step(name, job_name="classify"):
     return next(item for item in job(job_name)["steps"] if item.get("name") == name)
 
 
+def canonical(value):
+    """Canonical JSON text: unlike ==, it tells true from 1 and false from 0 (in Python 1 == True)."""
+    return json.dumps(value, sort_keys=True, separators=(",", ":"))
+
+
 def arguments():
     return [line.strip() for line in step(CLASSIFY)["with"]["claude_args"].split("\n") if line.strip()]
 
@@ -288,12 +293,16 @@ class TriageShapeTests(unittest.TestCase):
             flag, *values = shlex.split(line.replace("${{ runner.temp }}", RUNNER_TEMP_EXAMPLE))
             parsed.append([flag] + [json.loads(value) if flag in ("--settings", "--json-schema") else value
                                     for value in values])
-        self.assertEqual(parsed, [
-            ["--model", "claude-opus-5-5"], ["--effort", "high"], ["--max-turns", "8"], ["--max-budget-usd", "2"],
+        # Compared as canonical JSON, because the list holds the parsed JSON values, where 1 == True. No --max-turns:
+        # the action fails a success whose num_turns exceeds it, and num_turns counts transcript messages, not turns;
+        # the numbers step bounds the assistant turns instead.
+        self.assertEqual(canonical(parsed), canonical([
+            ["--model", "claude-opus-5-5"], ["--effort", "high"], ["--max-budget-usd", "2"],
             ["--tools", "Read,Glob,Grep"], ["--allowedTools", "Read,Glob,Grep"], ["--restricted"],
             ["--permission-prompts", "none"], ["--setting-sources", "user"], ["--strict-mcp-config"],
             ["--settings", SETTINGS],
-            ["--json-schema", SCHEMA], ["--add-dir", RUNNER_TEMP_EXAMPLE + "/triage"]])
+            ["--json-schema", SCHEMA], ["--add-dir", RUNNER_TEMP_EXAMPLE + "/triage"]]))
+        self.assertNotIn("--max-turns", [words[0] for words in parsed])
 
     def test_a_green_run_with_items_always_has_an_execution_file(self):
         check = step("Require the run's execution file")
@@ -332,8 +341,9 @@ class TriageShapeTests(unittest.TestCase):
         self.assertEqual(schema["properties"]["items"]["maxItems"], 30)
 
     def test_settings_turn_hooks_off_and_deny_every_git_directory(self):
-        # The whole object, so a dropped rule or an added key (permissions.additionalDirectories, say) fails here.
-        self.assertEqual(flag_json("--settings"), SETTINGS)
+        # The whole object, so a dropped rule or an added key (permissions.additionalDirectories, say) fails here, and
+        # so does a boolean written as 1 or 0 (canonical JSON, not dict equality).
+        self.assertEqual(canonical(flag_json("--settings")), canonical(SETTINGS))
 
 
 @unittest.skipUnless(shutil.which("jq"), "jq is needed to run the workflow's steps")
@@ -720,6 +730,30 @@ class TriageStepTests(unittest.TestCase):
                     code, console = run.run(NUMBERS, EXECUTION_FILE=str(path))
                     self.assertNotEqual(code, 0, console)
                     self.assertIn(f"Bounds not met: {words}", console)
+        finally:
+            run.close()
+
+    def test_a_budget_stop_fails_at_the_budget_and_names_the_stop(self):
+        # The deliberate exception to the budget-times-1.10 cost bound of the other Claude workflows: with
+        # --json-schema the pinned action sets structured_output only for a successful result, so a run that stops at
+        # its budget leaves nothing to apply. It fails here at the budget itself, and at $2.20, the bound the factor
+        # would give, the overrun is named as well.
+        run = Run()
+        try:
+            path = run.dir / "execution.json"
+            for cost, overrun in ((2, False), (2.2, True)):
+                with self.subTest(cost=cost):
+                    path.write_text(json.dumps(execution(subtype="error_max_budget_usd", is_error=True,
+                                                         total_cost_usd=cost, structured_output=None)),
+                                    encoding="utf-8")
+                    code, console = run.run(NUMBERS, EXECUTION_FILE=str(path))
+                    self.assertNotEqual(code, 0, console)
+                    self.assertIn("Bounds not met: the run did not end in success (result subtype "
+                                  "error_max_budget_usd)", console)
+                    self.assertIn("no structured output", console)
+                    self.assertEqual("client cost estimate 2.2 USD, above 2" in console, overrun, console)
+                    self.assertEqual(json.loads(run.read("triage-usage/usage.json"))["result_subtype"],
+                                     "error_max_budget_usd")
         finally:
             run.close()
 

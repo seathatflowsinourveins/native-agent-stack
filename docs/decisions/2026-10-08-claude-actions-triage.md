@@ -20,7 +20,7 @@ PR (#892, 2026-10-09), which found changes its record had not named; the same re
   setting `true` as a repository secret or variable, bound in the step's env with the secret taking precedence) or on
   a pre-existing `~/.claude/settings.json` (a dangling symlink included); a model-free collect step (at most 30 items
   without a lane label, text cut to 2,000 characters); the action step, which runs `claude-opus-5-5` at `high` effort
-  with at most 8 turns and a $2 client budget, pins `ACTIONS_STEP_DEBUG: 'false'` and passes `show_full_output`,
+  with a $2 client budget and no `--max-turns` (R6; the numbers step bounds the assistant turns), pins `ACTIONS_STEP_DEBUG: 'false'` and passes `show_full_output`,
   `display_report` and `track_progress` as `'false'` (the last two are their defaults, declared in the pinned
   `action.yml`, lines 136-139 and 152-155 at `2dca132f`) and answers only through `--json-schema`; a numbers step that
   checks the bounds (an allow-list of Glob, Grep, Read and StructuredOutput, in which an entry that is not a string is
@@ -96,7 +96,8 @@ at about twice its measured p95, so that a cap bounds a runaway and never trims 
 about 2,200 characters, read once, are about 27,000 input tokens; at `high` effort up to about 15,000 output tokens are
 assumed. That is about $0.41 at Claude Opus 5.5's standard prices, so a run is expected to cost about $0.40. Twice
 that, with a margin for high-effort thinking, gives the $2 client budget (`--max-budget-usd 2`; $1 before R5). One read
-and one answer is the typical run, so 8 turns (`--max-turns 8`; 6 before R5) bounds a runaway. The same accounting
+and one answer is the typical run, so 8 assistant turns bound a runaway (`--max-turns 8` until R6, 6 before R5;
+since R6 the numbers step alone applies the bound, after the run). The same accounting
 step as the other Claude workflows keeps the numbers and fails the job unless the run succeeded, used 1 to 8
 assistant turns (distinct assistant message ids; the client's `num_turns` counts transcript messages, tool results
 included, so a 12-request run on 2.1.295 reported 57, and it is only recorded), cost at most $2, ran Claude Code
@@ -115,7 +116,7 @@ Runs spend from the Console organization that the four `ANTHROPIC_*` repository 
 - `tests.test_workflow_security_coverage.NewWorkflowSecurityCoverageTests`: the coverage set gains
   `claude-triage.yml`, with its own offline zizmor test.
 
-New, in `tests/test_claude_triage_workflow.py` (35 tests since R5, 27 before): triggers, conditions, permissions per job, the pin, the
+New, in `tests/test_claude_triage_workflow.py` (36 tests since R6; 35 at R5, 27 before): triggers, conditions, permissions per job, the pin, the
 flags, the schema's enums and the settings are asserted from the workflow file; the collect, numbers, validation and
 apply steps are executed as written against a local stand-in for `gh`. Thirteen weakened copies of the workflow each
 fail at least one test (no check that a number was collected, labels for pull requests or low confidence passed on,
@@ -276,6 +277,96 @@ both; the module, 35 tests, OK with PyYAML 6.0.3 on Python 3.12 and without PyYA
 and documentation modules beside it, OK; `scripts/evidence_manifest.py --check` and `scripts/validate.py` pass. The
 action's argument parser was not replayed at R5; the exact-pin test splits each line as a shell does. No model ran.
 
+## R6: the cost bound stays at the budget (2026-10-09)
+
+The client stops only after it crosses its budget. In the measured J8 runs on a $5 budget, the largest overrun was
+9.2%: the sibling security-review PR (#895) at $5.46, then trading #11 at $5.33, #902 at $5.16 and #894 at $5.0007. A
+cost bound equal to the bare budget would therefore fail a normal budget stop, so the Claude workflows of this series
+set the cost bound at `--max-budget-usd` times 1.10, a factor that rounds up the largest measured overrun and is
+re-derived after each workflow's first three hosted runs, and a budget stop at or under that bound publishes what the
+run produced and names the stop.
+
+This workflow is the stated exception: its cost bound stays at its $2 budget, not $2.20, because a run that stops at
+its budget produces nothing this workflow could publish. Its only product is the label proposal, which comes from the
+action's `structured_output` output. With `--json-schema`, the pinned action sets that output only for a successful
+result; for any other result, a budget stop (result subtype `error_max_budget_usd`) included, it marks the step failed
+and throws (`base-action/src/run-claude-sdk.ts:252-277` at `2dca132f`), while its entrypoint's error path still sets
+`execution_file` (`src/entrypoints/run.ts:316-324`). So after a budget stop the numbers step runs, but the
+validation step (`success()`) is skipped, no proposal is kept, and the apply job, which needs `classify` to succeed,
+does not run; the job fails at the action step whatever bound the numbers step uses. A bound of $2.20 would only drop
+the overrun from a budget stop's failure message, and would let a run that ended in success above $2 have its labels
+applied beyond the per-run spend limit. Whether a run can end in success above its budget has not been measured; if
+one does, it fails here, deliberately.
+
+Changes, by name:
+
+- **Numbers step.** The cost bound stays `above 2`, and a comment on the step now says why: "The cost bound is the $2
+  budget itself, not the budget times 1.10 that the other Claude workflows allow: a run that stops at its budget leaves
+  no structured output, so nothing could be applied, and it fails here with its result subtype named." The usage
+  record gains `result_subtype` (the result's subtype, through the same name filter as the other fixed names), and the
+  failure for a run that did not succeed now names it: "the run did not end in success (result subtype
+  error_max_budget_usd)" for a budget stop.
+- **Test.** New: `test_a_budget_stop_fails_at_the_budget_and_names_the_stop`, a budget stop at $2 and at $2.20 (the
+  bound the factor would give): each fails and names the stop and the missing structured output, the $2.20 one names
+  its overrun as well, and the usage record keeps the subtype. `test_the_caps_hold_at_eight_turns_and_two_dollars_and_fail_just_above`
+  (R5) already shows that a run at $2 passes and one at $2.01 fails with the overrun named. The module now runs 36
+  tests.
+- **Weakened copies.** Four more each fail the new test: the cost bound raised to $2.20 (the factor applied), a
+  budget stop counted as success, the subtype dropped from the message, and `result_subtype` left out of the usage
+  record; the R5 copy that widens the bound to $3 still fails the R5 cap test. The script then held 34 copies (36
+  after the two subsections below), and each fails the test named for it.
+- **Record.** This section, the test count above, and a new trigger under "What would overturn it".
+
+Checks at this change: actionlint 1.17.0, no findings, run without ShellCheck, which this host lacks; zizmor 1.30.1
+offline, pedantic and regular with `--no-ignores`, no findings (the two auditor-only `secrets-outside-env` findings on
+the R4 secret reads suppressed in both); the module, 36 tests, OK with PyYAML 6.0.3 on Python 3.12 and without PyYAML;
+this module with the five workflow and documentation modules beside it, OK; `scripts/evidence_manifest.py --check` and
+`scripts/validate.py` pass. No model ran.
+
+### `--max-turns` dropped from `claude_args` (command center decision, 2026-10-09)
+
+At the pin, anthropics/claude-code-action `2dca132f` (v1.0.247), `base-action/src/run-claude-sdk.ts` lines 241-250
+throw "Claude reported a successful result after N turns, exceeding the configured maximum" when a successful result
+has `num_turns` above `maxTurns`, the value `--max-turns` sets. The check came in with commit `6ef6450f`, "fix:
+enforce max turns from claude args (#1607)", on 2026-08-07. On Claude Code 2.1.295 the result's `num_turns` counts
+transcript messages, tool results included: a local run of 12 API requests (distinct assistant message ids) under
+`--max-turns 12` reported `num_turns` 57 (the LR entry of `local-parity-receipt.json`, recorded with #892, not carried
+in this PR). With `--max-turns 8`, a successful triage that makes a few tool calls would therefore fail the action
+step, and with it the proposal and the apply job. This is a code reading of the pinned source plus a local
+measurement, not a hosted run. Upstream has no fix as of 2026-10-09: upstream `main` is identical to `2dca132f` on
+that date.
+
+- `--max-turns 8` is removed from `claude_args`. The runaway bounds that stay are the $2 client budget, which the
+  numbers step checks at the budget itself (this section's exception above), and the numbers step's own turn bound,
+  1 to 8 distinct assistant message ids, which fails closed. The prompt states no turn limit, before or after.
+- `test_claude_args_are_pinned_exactly` no longer expects `--max-turns 8` and asserts that no `--max-turns` flag is
+  present. The turn-bound tests are unchanged. The module still runs 36 tests.
+- Record sentences changed with this subsection: the action step in the by-name list and the turn sentence under
+  "Cost of one run".
+- Weakened copies: "`--max-turns 8` put back" on its own line and on the budget line each fail
+  `test_claude_args_are_pinned_exactly`. They replace the R5 copies "a second turn flag on the same line" and
+  "`--max-turns 6` restored", whose anchor text no longer exists.
+
+#### Upstream issue (draft, not filed; the owner decides)
+
+> Title: success with num_turns > maxTurns fails the step, but num_turns counts messages, not turns.
+> base-action/src/run-claude-sdk.ts:241-250 (v1.0.247, 2dca132f) compares `resultMessage.num_turns` with
+> `sdkOptions.maxTurns`. On Claude Code 2.1.295 the result's num_turns counts transcript messages (tool results
+> included): a headless run of 12 requests under `--max-turns 12` reported num_turns 57. A normal successful run
+> under `--max-turns N` therefore throws "exceeding the configured maximum". Repro: any `claude_args: --max-turns 5`
+> run that makes a few tool calls and succeeds.
+
+### The exact pins tell `true` from `1` (2026-10-09)
+
+`test_claude_args_are_pinned_exactly` and `test_settings_turn_hooks_off_and_deny_every_git_directory` compared the
+parsed `--settings` and `--json-schema` JSON with the expected dicts by `==`; in Python `1 == True`, so
+`"disableAllHooks": 1` passed both, and no other test of this module checks that value's type. Both now compare
+canonical JSON (the helper `canonical()`: `json.dumps` with `sort_keys=True` and `separators=(",", ":")`), which tells
+them apart; the schema's `additionalProperties: false` is held the same way. The weakened copies
+`"disableAllHooks":1` and `"blockReadsOutsideWorkingDirectories":1` (this workflow has no `autoMemoryEnabled` key, so
+the second copy writes its other settings boolean as `1`) each fail both tests. The script now holds 36 copies, and
+each fails the test named for it.
+
 ## Alternatives considered
 
 - **The action's issue-triage example** (`issues: opened`, any author, write token in the model's job). Rejected
@@ -297,6 +388,9 @@ action's argument parser was not replayed at R5; the exact-pin test splits each 
 - A parity check on triage items shows that `low` holds: the effort returns to `low`.
 - A new action pin brings another Claude Code version: the settings-source runs of R5 are repeated on it, since what
   each flag keeps out was measured on 2.1.295 only.
+- The pinned action starts to return a structured output from a run that stops at its budget, or the apply job is
+  made to act on a partial proposal: the cost bound becomes the budget times 1.10, as in the other Claude workflows
+  (R6). The factor itself is re-derived after each workflow's first three hosted runs.
 
 ## Evidence class
 
