@@ -80,8 +80,13 @@ html { scroll-padding-top: 1.5rem; }
 .architecture-layer summary, #architecture-custody summary { cursor: pointer; padding-block: .4rem; }
 .architecture-layer summary:hover, #architecture-custody summary:hover { color: var(--link); }
 .architecture-layer summary:focus-visible, #architecture-custody summary:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+.architecture-detail-content { min-width: 0; }
+.architecture-detail-content[aria-busy="true"] { opacity: .7; }
+#architecture-detail-content details, #architecture-unmapped details { margin-block: 1rem; }
+#architecture-detail-content summary, #architecture-unmapped summary { cursor: pointer; padding-block: .4rem; }
+#architecture-detail-content .source-note, #architecture-automation { overflow-wrap: anywhere; }
 .architecture-table { margin-block: .75rem; }
-.architecture-table table { font-size: .875rem; }
+.architecture-table table { font-size: .875rem; min-width: 72rem; }
 .architecture-table th, .architecture-table td { overflow-wrap: anywhere; max-width: 48ch; }
 .architecture-quality { max-height: 24rem; white-space: pre-wrap; overflow-wrap: anywhere; }
 .architecture-stages { max-width: 80ch; }

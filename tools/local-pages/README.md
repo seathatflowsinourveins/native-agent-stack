@@ -138,19 +138,42 @@ gate is not MET. The four program stages come from `cc-now.json`; missing
 per-tool stage data is unreported. Readiness labels dated selections as catalog
 pins and shows observed host-version differences with their source time.
 
-Inventory rows come from the named skills/agents/runtime/workflow/unit roots
-and recorded upstream manifests. File/hash equality is metadata provenance,
-not client wiring or fresh-session acceptance. Only explicit layer IDs and
-exact repository identity map records; the remaining items are listed as
-unmapped. Credential stores, env files, client-secret configurations and
-actual cron contents are excluded from the inventory reader.
+Inventory rows use canonical winner component-ID and candidate repository
+joins, followed by the reviewed `architecture_mapping.json` for remaining
+skills, agents, workflows and runtime automation. Each remaining unmapped item
+has its specific reason. File/hash equality remains metadata provenance.
+Hook and cron registrations come only from the CC's sanitized
+`coordination/command-center/pages/automation-projection.json`; its digest and
+stated limits are bound in the receipt. The reader does not open raw hook
+sources, client configuration, credentials, env files or crontab contents.
 
-Each component row includes recorded role calls/populations from the newest
-hash-verified snapshot and source-bound upstream E2E receipt metadata. Unknown
-measurements say `unmeasured`; missing full proof says `no upstream E2E evidence`.
-The header's joint count requires positive observed use and verified E2E for
-the same component. Install metadata, source review and documented harness
-instructions alone cannot produce a completed E2E claim.
+State-root host receipts come only from the CC's sanitized
+`coordination/command-center/pages/host-receipts-index.json`. Its path/hash and
+each index-provided title/path/hash/byte count/mtime are retained in a separate
+collapsed detail table labelled `local host receipt (state root)`. Receipt
+hashes are declared by the index and mtime is file metadata; no referenced
+markdown bodies are opened, and no execution date, command, result or E2E
+acceptance is inferred. The mixed `e2e-truth-20261006` directory is excluded.
+
+Each component row reports observational use from the retained hash-verified
+snapshot. Client components use session counts; unmeasured rows explain the
+producer boundary, including missing Bash-run CLI counters. Registered receipts
+are verified against `manifests/evidence.json` `files[]` hashes; the class falls
+back from the receipt and registration `evidence_class` to `kind`. The newest
+receipt retains its date, command count/program, result and path/hash, including
+failures or an absent result field. Native host E2E and local receipts remain
+distinct from vendor test-suite runs. Receipt presence, metadata completeness
+and a successful qualifying result are separate facts.
+
+The initial HTML contains layer choices and closed detail summaries. Component
+tables are generated as per-layer pages and fetched only on expansion, using
+native [HTML details](https://html.spec.whatwg.org/multipage/interactive-elements.html#the-details-element)
+and [Fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch).
+Every component table stays collapsed with its count in the summary. Each
+summary links the ordinary detail page as a fallback; failed loads can be retried.
+The builder enforces initial HTML below1,500,000 bytes and records HTML/detail
+sizes. Installed Playwright's native browser measures the served response and
+checks deferred loading separately from the Python fixture contracts.
 
 The existing refresh service rebuilds Architecture on a changed hourly
 snapshot or relevant source/code metadata, and otherwise uses its nonserved

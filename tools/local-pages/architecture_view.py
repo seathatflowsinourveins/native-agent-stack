@@ -6,6 +6,7 @@ Design provenance is recorded from the installed skill manifest, not copied.
 from __future__ import annotations
 
 from html import escape
+import hashlib
 import json
 import math
 import re
@@ -49,7 +50,7 @@ def _repositories(layer: dict) -> set[str]:
 
 
 def join_inventory(model: dict, inventory: dict) -> tuple[dict[str, list[dict]], list[dict]]:
-    """Map only explicit layer IDs or exact source repository identity."""
+    """Retain canonical catalog joins and explicit reviewed mappings."""
     layers = model["layers"]
     mapping = {layer["key"]: [] for layer in layers}
     repositories = {layer["key"]: _repositories(layer) for layer in layers}
@@ -57,16 +58,22 @@ def join_inventory(model: dict, inventory: dict) -> tuple[dict[str, list[dict]],
     for original in inventory.get("items", []):
         row = dict(original)
         explicit = row.get("layer_id")
-        matches = [layer["key"] for layer in layers if explicit in (layer["key"], layer["layer_id"])] if explicit else []
+        keys = row.get("layer_keys") or []
+        if not isinstance(keys, list):
+            keys = []
+        matches = [layer["key"] for layer in layers if any(key in (layer["key"], layer["catalog"] + "/" + layer["layer_id"]) for key in keys)]
+        if not matches and explicit:
+            matches = [layer["key"] for layer in layers if explicit in (layer["key"], layer["layer_id"]) and row.get("catalog", layer["catalog"]) == layer["catalog"]]
         if not matches:
             repository = repo_key(row.get("repository"))
             if repository:
                 matches = [key for key, values in repositories.items() if repository in values]
         if matches:
-            row["mapping_basis"] = "explicit layer ID" if explicit else "exact repository identity"
+            row["mapping_basis"] = row.get("mapping_reason") or ("explicit layer ID" if explicit or keys else "exact repository identity")
             for key in matches:
                 mapping[key].append(row)
         else:
+            row["unmapped_reason"] = row.get("unmapped_reason") or "No canonical component/repository join or reviewed mapping matches this item"
             unmapped.append(row)
     return mapping, unmapped
 
@@ -84,12 +91,13 @@ def _source_refs(item: dict) -> str:
 def _invoke_text(item: dict, model: dict | None) -> str:
     observed = item.get("invoke")
     if not isinstance(observed, dict) or observed.get("status") == "unmeasured":
-        return "unmeasured"
+        reason = observed.get("reason") if isinstance(observed, dict) else None
+        return "unmeasured: " + str(reason or "No attached producer observation matches this component identity")
     descriptions = []
     for row in observed.get("roles") or []:
         if not isinstance(row, dict):
             continue
-        owner = row.get("role") or "owning role unmeasured"
+        owner = row.get("role") or "owning role unmeasured (producer attribution absent)"
         if owner == "native-agent-stack-1a":
             owner = "owner session (reports to CC)"
         client = row.get("client")
@@ -100,24 +108,44 @@ def _invoke_text(item: dict, model: dict | None) -> str:
         measured = isinstance(calls, int) and not isinstance(calls, bool) and calls >= 0
         hours = row.get("window_hours", observed.get("window_hours"))
         timed = isinstance(hours, (int, float)) and not isinstance(hours, bool) and math.isfinite(hours) and hours > 0
-        text = f'{label}: {calls} recorded calls' if measured else f'{label}: unmeasured'
-        text += f'; {calls / hours:.3f} calls/hour' if measured and timed else '; rate unmeasured'
+        unit = "sessions" if observed.get("measure") == "sessions" else "calls"
+        text = f'{label}: {calls} recorded {unit}' if measured else f'{label}: unmeasured (published count absent)'
+        text += f'; {calls / hours:.3f} {unit}/hour' if measured and timed else '; rate unmeasured (window duration absent)'
         for field, population in (("sessions", "session"), ("conversations", "conversation")):
             if field in row:
                 count = row[field]
-                count_text = str(count) if isinstance(count, int) and not isinstance(count, bool) and count >= 0 else "unmeasured"
+                count_text = str(count) if isinstance(count, int) and not isinstance(count, bool) and count >= 0 else "unmeasured (producer count absent or invalid)"
                 text += f'; published {population} count: {count_text}'
         if row.get("aggregation_scope"):
             text += '; ' + str(row["aggregation_scope"])
         descriptions.append(text)
-    return "; ".join(descriptions) if descriptions else "unmeasured"
+    return "; ".join(descriptions) if descriptions else "unmeasured: " + str(observed.get("reason") or "Producer supplied no owning-role observations")
 
 
 def _e2e_text(item: dict) -> str:
     evidence = item.get("e2e") or item.get("upstream_e2e")
-    if not isinstance(evidence, dict) or not evidence.get("verified") or not evidence.get("path") or not evidence.get("sha256"):
-        return "no upstream E2E evidence"
-    return "; ".join(f'{key}: {value(evidence.get(key))}' for key in ("date", "path", "sha256", "command", "result", "evidence_class"))
+    if not isinstance(evidence, dict):
+        return "no upstream E2E evidence: no registered receipt matches this component identity"
+    recorded = evidence.get("path") and evidence.get("sha256") and (evidence.get("verified") or evidence.get("receipt_verified") or evidence.get("kind"))
+    if not recorded:
+        return "no upstream E2E evidence: " + str(evidence.get("reason") or "No digest-bound E2E receipt is registered for this component")
+    scope = evidence.get("evidence_scope") or evidence.get("source_scope")
+    label = {"native_host": "native E2E on this host", "vendor_test_suite": "vendor test-suite run", "local": "local host E2E receipt"}.get(scope, str(scope or "recorded E2E receipt"))
+    if evidence.get("kind") in ("historical_inventory", "compatibility_attempt"):
+        label = "not E2E; " + str(evidence["kind"])
+    elif evidence.get("kind") == "artifact_measurement":
+        label = "measurement receipt"
+    elif evidence.get("kind") == "upstream_provenance":
+        label = "source provenance receipt"
+    details = [label, f'kind: {value(evidence.get("kind") or evidence.get("evidence_class"))}', f'UTC date: {value(evidence.get("date"))}', f'result: {value(evidence.get("result"))}', f'receipt: {evidence["path"]}#{evidence["sha256"]}', f'command: {value(evidence.get("command"))}']
+    if evidence.get("command_count") is not None:
+        details.append(f'commands: {evidence["command_count"]}; programs: {value(evidence.get("command_programs"))}')
+    if evidence.get("date_original") and not evidence.get("date"):
+        details.append(f'recorded date: {value(evidence["date_original"])}; timezone: {value(evidence.get("date_timezone"))}')
+    for key in ("evidence_class", "selected_pin", "observed_pin", "reason"):
+        if evidence.get(key):
+            details.append(f'{key}: {value(evidence[key])}')
+    return "; ".join(details)
 
 
 def _candidate_table(items: list[Any], caption: str, model: dict | None = None) -> str:
@@ -138,7 +166,7 @@ def _candidate_table(items: list[Any], caption: str, model: dict | None = None) 
 
 
 def _inventory_table(items: list[dict], caption: str, model: dict | None = None) -> str:
-    rows = [[esc(item.get("name", "UNREPORTED")), esc(value(item.get("kind"))), esc(value(item.get("path"))), esc(value(item.get("repository"))), esc(value(item.get("pin"))), esc(value(item.get("sha256"))), esc(value(item.get("status"))), esc(value(item.get("mapping_basis"))), esc(_invoke_text(item, model)), esc(_e2e_text(item))] for item in items]
+    rows = [[esc(item.get("name", "UNREPORTED")), esc(value(item.get("kind"))), esc(value(item.get("path"))), esc(value(item.get("repository"))), esc(value(item.get("pin"))), esc(value(item.get("sha256"))), esc(value(item.get("status"))), esc(value(item.get("mapping_basis") or item.get("unmapped_reason"))) + ("; source: " + esc(value(item["mapping_source"])) if item.get("mapping_source") else ""), esc(_invoke_text(item, model)), esc(_e2e_text(item))] for item in items]
     return _table(caption, ["Name", "Inventory", "Path", "Upstream", "Pin", "SHA-256", "Metadata state", "Layer binding", "Invoke rate per owning role", "Latest upstream E2E evidence"], rows) if rows else '<p>No source-bound inventory item is reported for this layer.</p>'
 
 
@@ -182,7 +210,43 @@ def _tool_progress(items: list[Any], model: dict) -> str:
     return labels + _table("Per-candidate stage and recorded role use", ["Candidate", "Recorded stage", "Invoke rate per owning role", "Latest upstream E2E evidence"], tool_rows) + f'<p class="source-note">Invoke snapshot {esc(value(adoption.get("generated_utc")))}; {esc(value(adoption.get("window_hours")))} hours. Observed calls are not evidence of completed clean install, fresh-session acceptance or a final selection.</p>'
 
 
-def render(model: dict, inventory: dict, first_layer: str | None = None) -> tuple[str, dict]:
+def _closed(label: str, count: int, content: str) -> str:
+    return f'<details><summary>{esc(label)} · {count} records</summary>{content}</details>'
+
+
+def _layer_detail(row: dict, items: list[dict], model: dict) -> str:
+    candidates, grand = row.get("candidates") or [], row.get("g5_candidates") or []
+    content = '<p class="source-note">Detail for ' + esc(value(row.get("title"))) + ' · ' + esc(row["key"]) + '</p>'
+    content += _closed("Recorded winners", len(row.get("winners") or []), _candidate_table(row.get("winners") or [], "Winners and retained pins", model))
+    content += _closed("Full landscape candidates and reasons", len(candidates), _candidate_table(candidates, "Landscape candidates", model))
+    for field, label in (("alternatives", "Alternatives"), ("rejected", "Rejected records")):
+        content += _closed(label, len(row.get(field) or []), _candidate_table(row.get(field) or [], label, model))
+    content += _closed("G5 upstream quality candidates", len(grand), '<p class="g5-boundary">' + esc(value((model.get("g5") or {}).get("candidate_label") or "candidate, PENDING G5")) + '</p>' + _candidate_table(grand, "Grand catalog candidate identities", model) + '<pre class="architecture-quality">' + esc(value(row.get("source_quality"))) + '</pre>')
+    content += _closed("Inventory mapped by sources", len(items), _inventory_table(items, "Skills, agents, automation, SDKs, actions and pinned repositories", model))
+    content += _closed("Adoption stages and use per role", len(grand or candidates), _tool_progress(grand or candidates, model))
+    return content
+
+
+def _deferred(key: str, label: str, content: str, outputs: dict[str, bytes] | None) -> str:
+    if outputs is None:
+        return content
+    raw = content.encode("utf-8")
+    slug = re.sub(r"[^a-zA-Z0-9_-]+", "-", key).strip("-") or "detail"
+    path = f'architecture/layers/{slug}-{hashlib.sha256(raw).hexdigest()[:16]}.html'
+    outputs[path] = raw
+    return f'<details class="architecture-detail" data-layer-src="{esc(path)}"><summary>{esc(label)}</summary><div class="architecture-detail-content" aria-live="polite"><p>Expand to load these component tables. <a href="{esc(path)}">Open the detail page</a>.</p></div></details>'
+
+
+def _local_host_receipts(host: dict) -> str:
+    items = host.get("items") or []
+    rows = [[esc(value(item.get("title"))), "local host receipt (state root)", esc(value(item.get("path"))), esc(value(item.get("sha256"))), esc(value(item.get("bytes"))), esc(value(item.get("mtime_utc")))] for item in items]
+    note = '<p>The sanitized index does not supply execution date, command or result. Receipt hashes are index-declared; mtime is file metadata. Referenced receipt bodies are not read, and this metadata does not establish native E2E or selected-pin acceptance.</p>'
+    table = _table("State-root host receipt metadata", ["Receipt title", "Scope", "Index-provided path", "SHA-256 (index-declared)", "Bytes (index)", "mtime UTC (index)"], rows) if rows else '<p>' + esc(value((host.get("coverage") or {}).get("status") or "Sanitized local receipt index unavailable")) + '</p>'
+    return _closed("Local host receipt metadata", len(items), note + table)
+
+
+def render(model: dict, inventory: dict, first_layer: str | None = None,
+           detail_outputs: dict[str, bytes] | None = None) -> tuple[str, dict]:
     mapped, unmapped = join_inventory(model, inventory)
     all_layers = model["layers"]
     selected = [row for row in all_layers if first_layer in (None, row["key"], row["layer_id"], row["catalog"] + "/" + row["layer_id"])]
@@ -196,20 +260,29 @@ def render(model: dict, inventory: dict, first_layer: str | None = None) -> tupl
         observation_source = observation if observation.get("sha256") else model.get("adoption_source") or next((source for source in model.get("sources", []) if "adoption-now" in str(source.get("path"))), {})
         both = sum(1 for item in candidates if isinstance(item, dict) and (item.get("invoke") or {}).get("calls", 0) is not None and (item.get("invoke") or {}).get("calls", 0) > 0 and (item.get("e2e") or {}).get("verified", False))
         body = f'<section class="architecture-layer" id="layer-{esc(key)}" data-layer="{esc(key)}"><header><h2>{esc(row["title"])}</h2><p class="architecture-layer-id">{esc(row["catalog"])} / {esc(row["layer_id"])}</p><p class="architecture-observation">Invoke snapshot {esc(value(observation.get("generated_utc")))} · SHA-256 <code>{esc(value(observation_source.get("sha256")))}</code></p><p><strong>{both} of {len(candidates)}</strong> source components with both recorded organic use and upstream E2E evidence.</p></header><dl class="architecture-choice"><div><dt>Current choice</dt><dd>{esc(value(row.get("current_choice")))}</dd></div><div><dt>Recorded verdict</dt><dd>{esc(value(row.get("verdict_status") or row.get("decision")))}</dd></div><div><dt>Requirement</dt><dd>{esc(value(row.get("requirement")))}</dd></div><div><dt>Reason</dt><dd>{esc(value(row.get("rationale")))}</dd></div></dl>'
-        body += '<h3>Recorded winners</h3>' + _candidate_table(row.get("winners") or [], "Winners and retained pins", model)
-        body += '<details open><summary>Full landscape candidates and reasons</summary>' + _candidate_table(candidates, "Landscape candidates", model) + '</details>'
-        body += '<details><summary>Alternatives and rejected records</summary>' + _candidate_table(row.get("alternatives") or [], "Alternatives", model) + _candidate_table(row.get("rejected") or [], "Rejected", model) + '</details>'
-        body += '<details><summary>G5 upstream quality candidates</summary><p class="g5-boundary">' + esc(value((model.get("g5") or {}).get("candidate_label") or "candidate, PENDING G5")) + '</p>' + _candidate_table(grand, "Grand catalog candidate identities", model) + '<pre class="architecture-quality">' + esc(value(row.get("source_quality"))) + '</pre></details>'
-        body += '<details><summary>Inventory mapped by sources</summary>' + _inventory_table(mapped[key], "Skills, agents, automation, SDKs, actions and pinned repositories", model) + '</details>'
-        body += '<details><summary>Adoption stages and use per role</summary>' + _tool_progress(grand or candidates, model) + '</details>'
+        counts_text = f'Component tables · {len(row.get("winners") or [])} winners · {len(candidates)} landscape candidates · {len(grand)} G5 candidates · {len(mapped[key])} inventory items'
+        body += _deferred(key, counts_text, _layer_detail(row, mapped[key], model), detail_outputs)
         body += '<p class="source-note">Catalog date ' + esc(value(row.get("checked_at"))) + '; source references ' + _source_refs(row) + '</p></section>'
         sections.append(body)
     design = model.get("design") or {}
     design_text = esc(value({key: design.get(key) for key in ("path", "source", "ref", "tree_sha", "skill_md_sha256")}))
     sources = (model.get("sources") or []) + (inventory.get("sources") or [])
     custody = _table("Architecture input custody", ["Source path", "SHA-256", "Source date / state"], [[esc(value(source.get("path"))), esc(value(source.get("sha256"))), esc(value(source.get("checked_at") or source.get("generated_utc") or source.get("status")))] for source in sources if isinstance(source, dict)])
-    body = f'<div class="architecture-summary"><p><strong>{len(selected)}</strong> rendered sections / <strong>{len(all_layers)}</strong> canonical landscape layers.</p><p>Selection, inventory observations, source quality and invoke measurement remain separate records.</p></div>' + toc + '<div class="architecture-sections">' + "".join(sections) + '</div>'
-    body += '<section id="architecture-unmapped"><h2>Unmapped inventory</h2><p>Items without an explicit layer or exact source repository association remain here; no layer is guessed.</p>' + _inventory_table(unmapped, "Unmapped observed items", model) + '</section>'
-    body += '<details id="architecture-custody"><summary>Builder sources and design provenance</summary><p>Installed frontend-design metadata: <code>' + design_text + '</code></p>' + custody + '</details>'
+    body = f'<div class="architecture-summary"><p><strong>{len(selected)}</strong> rendered sections / <strong>{len(all_layers)}</strong> canonical landscape layers.</p><p>Invoke counts are observational (organic use, not a controlled trial). Client counts measure sessions; Bash-run CLI invocations are outside the producer’s MCP counters. Native host E2E, local receipts and vendor test-suite runs retain their distinct scopes.</p></div>' + toc + '<div class="architecture-sections">' + "".join(sections) + '</div>'
+    coverage = inventory.get("coverage") or {}
+    projection = coverage.get("automation_projection") or {}
+    limits = projection.get("limits") or coverage.get("automation_limits") or []
+    automation = '<p>Hooks: ' + esc(value(coverage.get("client_hook_wiring"))) + '. Cron: ' + esc(value(coverage.get("cron_status"))) + '.</p>'
+    automation += '<ul>' + ''.join('<li>' + esc(str(limit)) + '</li>' for limit in limits) + '</ul>' if limits else ''
+    body += '<section id="architecture-automation"><h2>Automation observation</h2>' + automation + '</section>'
+    host = model.get("host_receipts") or {}
+    local_items = host.get("items") or []
+    local_source = next(iter(host.get("sources") or []), {})
+    local_intro = f'<p>{len(local_items)} local host receipts · index <code>{esc(value(local_source.get("path")))}#{esc(value(local_source.get("sha256")))}</code></p>'
+    body += '<section id="architecture-local-host-receipts"><h2>Local host receipts</h2>' + local_intro + _deferred("local-host-receipts", f'Local host receipt metadata · {len(local_items)} records', _local_host_receipts(host), detail_outputs) + '</section>'
+    unmapped_detail = _closed("Unmapped observed items", len(unmapped), _inventory_table(unmapped, "Unmapped observed items", model))
+    body += '<section id="architecture-unmapped"><h2>Unmapped inventory</h2><p>' + str(len(unmapped)) + ' items remain outside canonical joins and the committed mapping; each carries its specific reason.</p>' + (_deferred("unmapped", f'Unmapped observed items · {len(unmapped)} records', unmapped_detail, detail_outputs) if unmapped else '') + '</section>'
+    custody_detail = '<p>Installed frontend-design metadata: <code>' + design_text + '</code></p>' + _closed("Architecture input custody", len(sources), custody)
+    body += '<section id="architecture-custody"><h2>Builder sources and design provenance</h2>' + _deferred("custody", f'Source custody · {len(sources)} records', custody_detail, detail_outputs) + '</section>'
     receipt = {"canonical_layer_count": len(all_layers), "rendered_layer_count": len(selected), "layer_keys": [row["key"] for row in selected], "mapped_inventory_occurrences": sum(len(items) for items in mapped.values()), "unmapped_inventory_items": len(unmapped)}
     return body, receipt

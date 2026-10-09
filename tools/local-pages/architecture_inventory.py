@@ -20,6 +20,7 @@ BLOCKED_NAMES = {
 }
 SKIP_DIRS = {".trash", ".git", "__pycache__", "node_modules"}
 SCRIPT_SUFFIXES = {".py", ".sh", ".js", ".mjs", ".cjs", ".ts"}
+MAPPING_PATH = Path(__file__).with_name("architecture_mapping.json")
 
 
 def _blocked(path):
@@ -126,7 +127,7 @@ def _record(item, record, source_ref, expected_hash=None):
     item["source_refs"] = [source_ref]
     if isinstance(record.get("url"), str):
         item["source_refs"].append(record["url"])
-    for key in ("layer_id", "component_id", "tree_sha"):
+    for key in ("catalog", "layer_id", "component_id", "tree_sha"):
         if record.get(key) is not None:
             item[key] = record[key]
     if record.get("status") is not None:
@@ -165,6 +166,124 @@ def _timers():
         return [], "UNREPORTED: timer query unavailable"
 
 
+def _repo_key(value):
+    """Use the repository identity, including manifests with release/tree URLs."""
+    if not isinstance(value, str):
+        return None
+    match = re.match(r"https://github\.com/([\w.-]+/[\w.-]+)(?:/|$)", value, re.I)
+    if match:
+        return "github.com/" + match[1].lower().removesuffix(".git")
+    return value.lower().rstrip("/") if value.startswith("https://") else None
+
+
+def _catalog_paths(root):
+    manifest = root / "catalogs/landscape/manifest.json"
+    paths = []
+    if _safe_path(manifest, [root / "catalogs/landscape"]) is None:
+        return manifest, paths
+    for catalog, relative in _json(manifest).get("catalogs", {}).items():
+        if (isinstance(catalog, str) and re.fullmatch(r"[\w.-]+", catalog) and isinstance(relative, str)
+                and relative.startswith("catalogs/landscape/") and ".." not in Path(relative).parts):
+            paths.append((catalog, root / relative))
+    return manifest, paths
+
+
+def _layer_links(catalogs):
+    components, repositories, keys = {}, {}, set()
+    for catalog, path, document in catalogs:
+        for index, layer in enumerate(document.get("layers", [])):
+            if not isinstance(layer, dict) or not isinstance(layer.get("layer_id"), str):
+                continue
+            key = catalog + "/" + layer["layer_id"]
+            keys.add(key)
+            for collection in ("winners", "candidates"):
+                for number, record in enumerate(layer.get(collection, [])):
+                    if not isinstance(record, dict):
+                        continue
+                    source = str(path) + f"#/layers/{index}/{collection}/{number}"
+                    component = record.get("component_id")
+                    if isinstance(component, str):
+                        components.setdefault(component, []).append((key, source, "canonical " + collection + ".component_id join"))
+                    repository = _repo_key(_repository(record))
+                    if repository:
+                        repositories.setdefault(repository, []).append((key, source, "canonical " + collection + " repository identity join"))
+    return components, repositories, keys
+
+
+def _catalog_mapping(item, links):
+    components, repositories, keys = links
+    matches = list(components.get(item.get("component_id"), []))
+    matches.extend(repositories.get(_repo_key(item.get("repository")), []))
+    explicit = item.get("layer_id")
+    if isinstance(explicit, str):
+        for key in keys:
+            if key == item.get("catalog", "") + "/" + explicit or (not item.get("catalog") and key.split("/", 1)[1] == explicit):
+                matches.append((key, item["source_refs"][0], "explicit manifest layer_id"))
+    if matches:
+        item["layer_keys"] = sorted({match[0] for match in matches})
+        item["mapping_source"] = "; ".join(dict.fromkeys(match[1] for match in matches))
+        item["mapping_reason"] = "; ".join(dict.fromkeys(match[2] for match in matches))
+
+
+def _projection_items(path, projection, digest):
+    """Read only the CC's sanitized registration fields, without source lookup."""
+    if projection.get("schema") != "automation-projection/1":
+        return []
+    items = []
+    for kind, collection, fields in (
+        ("hook", "hooks", ("client", "scope", "event", "matcher", "program", "timeout_s")),
+        ("cron", "cron", ("schedule", "program")),
+    ):
+        rows = projection.get(collection, [])
+        if not isinstance(rows, list) or len(rows) > MAX_ENTRIES:
+            raise ValueError("automation projection entry limit or shape invalid")
+        for index, row in enumerate(rows):
+            if not isinstance(row, dict) or not isinstance(row.get("program"), str):
+                continue
+            if not re.fullmatch(r"[\w.@:+-]{1,120}", row["program"]):
+                continue
+            source = str(path) + f"#/{collection}/{index}"
+            item = {"kind": kind, "name": row["program"], "path": source,
+                    "sha256": digest, "repository": None, "pin": None,
+                    "source_refs": [source], "status": "UNREPORTED",
+                    "recorded_status": "registered", "local": True,
+                    "provenance": "local sanitized registration; execution unverified"}
+            for key in fields:
+                value = row.get(key)
+                if isinstance(value, str):
+                    item[key] = value[:1024]
+                elif key == "timeout_s" and (value is None or isinstance(value, (int, float))):
+                    item[key] = value
+            items.append(item)
+    return items
+
+
+def _explicit_mapping(item, mapping, known_keys):
+    if mapping.get("schema") != "local-architecture-mapping/1":
+        return
+    for index, record in enumerate(mapping.get("mappings", [])):
+        if not isinstance(record, dict):
+            continue
+        if item["kind"] not in record.get("kinds", []) or item["name"] not in record.get("names", []):
+            continue
+        if isinstance(record.get("unmapped_reason"), str):
+            item["unmapped_reason"] = record["unmapped_reason"]
+        targets = record.get("layer_keys", [])
+        if not isinstance(targets, list) or not all(isinstance(key, str) for key in targets):
+            item["unmapped_reason"] = "committed mapping has an invalid layer_keys list"
+            continue
+        unknown = sorted(set(targets) - known_keys)
+        if unknown:
+            item["unmapped_reason"] = "committed mapping names an unknown canonical layer: " + ", ".join(unknown)
+            continue
+        if targets and isinstance(record.get("reason"), str) and record["reason"].strip():
+            item["layer_keys"] = sorted(set(item.get("layer_keys", [])) | set(targets))
+            source = str(MAPPING_PATH) + f"#/mappings/{index}"
+            item["mapping_source"] = "; ".join(filter(None, (item.get("mapping_source"), source)))
+            item["mapping_reason"] = "; ".join(filter(None, (item.get("mapping_reason"), record["reason"])))
+            item.setdefault("mapping_evidence_refs", []).extend(record.get("source_refs", []))
+
+
 def build(root, state_root, skill_roots=None):
     """Inventory approved paths and canonical metadata without guessing layers."""
     root = Path(root)
@@ -176,16 +295,17 @@ def build(root, state_root, skill_roots=None):
     groups = [("skill", path) for directory in skill_roots for path in _skills(directory)]
     for directory in (root / "adoption/agents", USER_ROOT / ".claude/agents", USER_ROOT / ".codex/agents"):
         groups.extend(("role" if path.suffix == ".toml" else "agent", path) for path in _files(directory, 2) if path.suffix in {".md", ".toml"} and path.name != "AGENTS.md")
-    hook_roots = [root / "hooks", root / "scripts/hooks", root / "scripts/git-hooks", root / "adoption/hooks", USER_ROOT / ".claude/hooks"]
-    for directory in hook_roots:
-        groups.extend(("hook", path) for path in _files(directory, 2) if path.suffix in SCRIPT_SUFFIXES or not path.suffix)
     groups.extend(("workflow", path) for path in _files(root / ".github/workflows") if path.suffix in {".yml", ".yaml"})
     groups.extend(("script", path) for path in _files(root / "scripts") if path.suffix in SCRIPT_SUFFIXES)
     unit_root = USER_ROOT / ".config/systemd/user"
     groups.extend(("timer" if path.suffix == ".timer" else "unit", path) for path in _files(unit_root) if path.suffix in {".timer", ".service", ".path"})
     metadata_paths = [root / "adoption/skills/manifest.json", root / "adoption/manifest.json", root / "manifests/stack.json"]
     metadata_paths += [path for path in _files(root / "adoption/agents", 2) if path.name.endswith("manifest.json") or path.name == "SHA256SUMS"]
-    approved = [root / ".claude/skills", root / "adoption/agents", root / ".github/workflows", root / "scripts", root / "adoption/hooks", root / "hooks", root / "adoption/skills", root / "manifests", root / "adoption/manifest.json", unit_root, USER_ROOT / ".claude/agents", USER_ROOT / ".codex/agents", USER_ROOT / ".claude/hooks"] + skill_roots
+    catalog_manifest, catalog_paths = _catalog_paths(root)
+    metadata_paths += [catalog_manifest] + [path for _, path in catalog_paths]
+    projection_path = state_root / "coordination/command-center/pages/automation-projection.json"
+    metadata_paths += [projection_path, MAPPING_PATH]
+    approved = [root / ".claude/skills", root / "adoption/agents", root / ".github/workflows", root / "scripts", root / "adoption/skills", root / "manifests", root / "adoption/manifest.json", root / "catalogs/landscape", unit_root, USER_ROOT / ".claude/agents", USER_ROOT / ".codex/agents", projection_path, MAPPING_PATH] + skill_roots
     candidates = {}
     for path in [path for _, path in groups] + metadata_paths:
         resolved = _safe_path(path, approved)
@@ -200,6 +320,11 @@ def build(root, state_root, skill_roots=None):
         _json(path) if str(path.resolve()) in hashes else {}
         for path in metadata_paths[:3]
     ]
+    links = _layer_links([(catalog, path, _json(path)) for catalog, path in catalog_paths if str(path.resolve()) in hashes])
+    projection_digest = hashes.get(str(projection_path.resolve()))
+    projection = _json(projection_path) if projection_digest else {}
+    projection_present = projection.get("schema") == "automation-projection/1"
+    mapping = _json(MAPPING_PATH) if str(MAPPING_PATH.resolve()) in hashes else {}
     for source in sources:
         if source["path"] == str(metadata_paths[1]):
             source["reference_paths"] = [
@@ -269,15 +394,40 @@ def build(root, state_root, skill_roots=None):
         item["recorded_version"] = component.get("version")
         item["provenance"] = "manifest reference; installed runtime and wiring unverified"
         items.append(item)
+    items.extend(_projection_items(projection_path, projection, projection_digest))
+    if projection_present:
+        source = next(source for source in sources if source["path"] == str(projection_path))
+        source.update({"status": "local sanitized automation projection", "local": True,
+                       "generated_utc": projection.get("generated_utc"), "method": projection.get("method")})
+    for item in items:
+        _catalog_mapping(item, links)
+        _explicit_mapping(item, mapping, links[2])
+        for action in item.get("action_refs", []):
+            identity = _repo_key(action.get("repository"))
+            if not identity:
+                continue
+            projected = {"kind": "action", "name": identity.removeprefix("github.com/"),
+                         "repository": action["repository"], "source_refs": item["source_refs"]}
+            _catalog_mapping(projected, links)
+            _explicit_mapping(projected, mapping, links[2])
+            for key in ("layer_keys", "mapping_source", "mapping_reason"):
+                if projected.get(key):
+                    action[key] = projected[key]
+        if not item.get("layer_keys") and not item.get("layer_id"):
+            item.setdefault("unmapped_reason", "no canonical component ID or repository join, and no committed mapping for " + item["kind"] + ":" + item["name"])
     timer_rows, timer_status = _timers()
     coverage = {
         "hash_bytes": total_bytes,
         "canonical_skill_records": len(skills),
-        "unmapped": [{"kind": item["kind"], "name": item["name"], "path": item["path"], "reason": "no explicit layer_id"} for item in items if not item.get("layer_id")],
+        "unmapped": [{"kind": item["kind"], "name": item["name"], "path": item["path"], "reason": item["unmapped_reason"]} for item in items if not item.get("layer_keys") and not item.get("layer_id")],
         "excluded_skills": [{"skills": entry.get("skills"), "repository": _repository(entry), "source_ref": str(metadata_paths[0]) + "#excluded"} for entry in skill_manifest.get("excluded", []) if isinstance(entry, dict)],
         "timer_rows": timer_rows, "timer_status": timer_status,
-        "cron_status": "UNREPORTED: installed crontab intentionally unread",
-        "client_hook_wiring": "UNREPORTED: credential-bearing client configuration intentionally unread",
+        "cron_status": ("local sanitized projection: " + str(len(projection.get("cron", []))) + " registrations; execution unverified") if projection_present else "UNREPORTED: sanitized projection absent or unsupported; installed crontab unread",
+        "client_hook_wiring": ("local sanitized projection: " + str(len(projection.get("hooks", []))) + " registrations; execution unverified") if projection_present else "UNREPORTED: sanitized projection absent or unsupported; hook sources and client settings unread",
+        "projected_hook_registrations": len(projection.get("hooks", [])) if projection_present else None,
+        "projected_cron_registrations": len(projection.get("cron", [])) if projection_present else None,
+        "projection_limits": projection.get("limits", []) if projection_present else [],
+        "automation_limits": projection.get("limits", []) if projection_present else [],
         "state_root": str(state_root),
         "acceptance": "file inventory does not establish installation, wiring or fresh-session acceptance",
     }

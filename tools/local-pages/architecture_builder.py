@@ -87,8 +87,10 @@ def build(root: Path, state_root: Path, output_dir: Path, receipt: Path,
     model = load("architecture_sources").build(root, state_root, asset)
     inventory = load("architecture_inventory").build(root, state_root)
     evidence = load("architecture_evidence")
+    model["host_receipts"] = evidence.host_receipts_index(state_root)
+    model["sources"] = list(model.get("sources") or []) + model["host_receipts"].get("sources", [])
     if hasattr(evidence, "attach_inventory"):
-        inventory["items"] = evidence.attach_inventory(inventory.get("items", []), model.get("evidence_index", {}))
+        inventory["items"] = evidence.attach_inventory(inventory.get("items", []), model.get("evidence_index", {}), root=root, state_root=state_root)
     role_projection = None
     if (HERE / "adoption_roles.py").exists():
         observation = model.get("adoption_observation") or {}
@@ -99,7 +101,8 @@ def build(root: Path, state_root: Path, output_dir: Path, receipt: Path,
             role_map = role_projection.get("instances", {}).get("role_map") or {}
             components = inventory.get("items", []) + [component for layer in model["layers"] for category in ("winners", "candidates", "alternatives", "rejected", "source_quality", "g5_candidates") for component in layer.get(category, []) if isinstance(component, dict)]
             _normalize_invocation_roles(components, role_map)
-    body, counts = load("architecture_view").render(model, inventory, first_layer)
+    detail_outputs = {}
+    body, counts = load("architecture_view").render(model, inventory, first_layer, detail_outputs=detail_outputs)
     if first_layer is None and counts["rendered_layer_count"] != model["layer_count"]:
         raise ValueError("architecture section count differs from canonical landscape")
     if counts["rendered_layer_count"] == 0:
@@ -111,20 +114,31 @@ def build(root: Path, state_root: Path, output_dir: Path, receipt: Path,
     html = pages.document("architecture", "Architecture by layer", "Read the selected tools, alternatives, inventories and evidence for each layer.", scope, body, generated, manifest_sha, [])
     builder_path = Path(__file__).resolve()
     outputs = {"architecture.html": html}
+    for name, raw in detail_outputs.items():
+        detail_body = '<p><a href="architecture.html">All Architecture layers</a></p><div id="architecture-detail-content">' + raw.decode("utf-8") + '</div>'
+        detail = pages.document("architecture", "Architecture component detail", "Expand a table to read its component evidence.", scope, detail_body, generated, manifest_sha, [])
+        outputs[name] = detail.replace(b"<head>", b'<head>\n  <base href="../../">', 1).replace(b'href="#architecture-custody"', b'href="architecture.html#architecture-custody"')
+    if len(html) >= 1_500_000:
+        raise ValueError("initial Architecture HTML must be under 1500000 bytes")
+    components = [item for item in inventory.get("items", []) if item.get("kind") == "component"]
+    e2e_components = sum(1 for item in components if (item.get("e2e") or {}).get("sha256") and (item.get("e2e") or {}).get("path") and "e2e" in str((item.get("e2e") or {}).get("kind", "")).lower())
     for name in ("site.css", "site.js"):
         outputs["assets/" + name] = (HERE / "assets" / name).read_bytes()
     result = {"schema": "local-architecture/1", "generated_utc": generated,
               "builder": {"path": str(builder_path), "sha256": hashlib.sha256(builder_path.read_bytes()).hexdigest()},
               **counts, "first_layer": first_layer,
+                "page_bytes": len(html), "detail_file_count": len(detail_outputs),
+                "local_host_receipts": model["host_receipts"],
+                "e2e_components": {"with_evidence": e2e_components, "total": len(components), "successful_qualifying": sum(1 for item in components if (item.get("e2e") or {}).get("verified"))},
               "design": model.get("design"), "g5": model.get("g5"),
               "invocation_source": {key: (model.get("adoption_observation") or {}).get(key) for key in ("path", "sha256", "generated_utc", "window_hours")},
               "role_attribution_sources": role_projection.get("sources", []) if role_projection else [],
-              "modules": [{"path": str(HERE / (name + ".py")), "sha256": hashlib.sha256((HERE / (name + ".py")).read_bytes()).hexdigest()} for name in ("architecture_sources", "architecture_inventory", "architecture_evidence", "architecture_view", "build_pages")],
+                "modules": [{"path": str(HERE / (name + ".py")), "sha256": hashlib.sha256((HERE / (name + ".py")).read_bytes()).hexdigest()} for name in ("architecture_sources", "architecture_inventory", "architecture_evidence", "architecture_view", "evidence_sources", "build_pages") if (HERE / (name + ".py")).exists()],
               "sources": model.get("sources"), "inventory_sources": inventory.get("sources"),
               "inventory_coverage": inventory.get("coverage"),
               "native_readiness_manifest_sha256": manifest_sha,
               "outputs": {name: {"sha256": hashlib.sha256(raw).hexdigest(), "bytes": len(raw)} for name, raw in outputs.items()},
-              "limits": ["Published source records and metadata observations do not confer gate acceptance or fresh-session evidence.", "Only explicit layer IDs or exact repository identity associate inventory; unmapped items remain visible."]}
+                "limits": ["Published source records and metadata observations do not confer gate acceptance or fresh-session evidence.", "Catalog component/repository joins and the committed inventory mapping associate layers; remaining unmapped items carry their reason.", "Initial HTML defers closed component tables to generated layer pages, loaded only on expansion."]}
     pages.publish(output_dir, receipt, outputs, result)
     return result
 
@@ -139,6 +153,7 @@ def refresh_if_changed(root: Path, state_root: Path, output_dir: Path, receipt: 
     paths += [state_root / "coordination/command-center/pages/cc-now.json", root / "adoption/skills/manifest.json", root / "manifests/stack.json", root / "adoption/manifest.json"]
     paths += [HERE / (name + ".py") for name in ("architecture_builder", "architecture_sources", "architecture_inventory", "architecture_evidence", "architecture_view")]
     paths += [HERE / "build_pages.py", HERE / "assets/site.css", HERE / "assets/site.js", root / "manifests/evidence.json", root / "catalogs/north-star/readiness.json"]
+    paths += [path for path in (HERE / "architecture_mapping.json", HERE / "evidence_sources.py", state_root / "coordination/command-center/pages/automation-projection.json", state_root / "coordination/command-center/pages/host-receipts-index.json") if path.exists()]
     if (HERE / "adoption_roles.py").exists():
         paths.append(HERE / "adoption_roles.py")
     if receipt.exists():

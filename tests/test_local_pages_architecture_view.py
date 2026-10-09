@@ -113,7 +113,7 @@ class ArchitectureViewTests(unittest.TestCase):
         html = VIEW._tool_progress([measured, unknown], self.model)
         self.assertIn("recorded-lane: 0 recorded calls; 0.000 calls/hour", html)
         self.assertIn("published conversation count: 0", html)
-        self.assertIn("<td>unmeasured</td>", html)
+        self.assertIn("<td>unmeasured: No attached producer observation", html)
         self.assertIn("no upstream E2E evidence", html)
         self.assertEqual(html.count("0 recorded calls"), 1)
 
@@ -122,10 +122,10 @@ class ArchitectureViewTests(unittest.TestCase):
         self.model["adoption_observation"]["codex_by_lane"] = {
             "raw-fixture": {"conversations": 1, "servers": {"measured-tool": {"calls": 24}}},
         }
-        self.assertEqual(VIEW._invoke_text(raw, self.model), "unmeasured")
+        self.assertIn("unmeasured: No attached producer observation", VIEW._invoke_text(raw, self.model))
         html = VIEW._tool_progress([raw], self.model)
         self.assertNotIn("raw-fixture", html)
-        self.assertIn("<td>unmeasured</td>", html)
+        self.assertIn("<td>unmeasured: No attached producer observation", html)
 
     def test_role_counts_remain_visible_when_rate_window_is_unknown(self):
         self.tool["invoke"].update(window_hours=None, roles=[{"client": "Claude", "role": "native-agent-stack-1a", "calls": 4, "sessions": 1}])

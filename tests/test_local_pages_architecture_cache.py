@@ -46,7 +46,19 @@ class ArchitectureCacheTests(unittest.TestCase):
                 observation["sha256"] = "b" * 64
                 MODULE.refresh_if_changed(root, state, output, receipt)
                 self.assertEqual(len(calls), 2)
+                projection = current.with_name("automation-projection.json")
+                projection.write_text('{"schema":"automation-projection/1","hooks":[],"cron":[]}')
+                MODULE.refresh_if_changed(root, state, output, receipt)
+                self.assertEqual(len(calls), 3)
+                MODULE.refresh_if_changed(root, state, output, receipt)
+                self.assertEqual(len(calls), 3)
                 self.assertFalse(receipt.is_relative_to(output))
+                local_index = current.with_name("host-receipts-index.json")
+                local_index.write_text('{"schema":"host-receipts-index/1","receipts":[]}')
+                MODULE.refresh_if_changed(root, state, output, receipt)
+                self.assertEqual(len(calls), 4)
+                MODULE.refresh_if_changed(root, state, output, receipt)
+                self.assertEqual(len(calls), 4)
 
 
 if __name__ == "__main__":
