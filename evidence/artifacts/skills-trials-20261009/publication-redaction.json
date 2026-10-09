@@ -9,9 +9,10 @@
     {
       "path": "RESULT.json",
       "original_sha256": "223fed27bb15dc994358520d964368679730daee35af1bb875a9e94d6404ab48",
-      "published_sha256": "8346e0a2d4c96bfc0a214c795c55ec9f3f0be81049e333833ec35354ad89afe2",
+      "published_sha256": "e20375c4a62bb5e5c6eaff19e075767940bcf42a932cc051fd0b0625fd65ff71",
       "changes": [
-        "explicit publication metadata or hash-domain clarification; native outcomes unchanged"
+        "explicit publication metadata or hash-domain clarification; native outcomes unchanged",
+        "P2-1: explicit CC-gated routing-proof status and CC-owned manifest/install prerequisite; historical native observation unchanged"
       ],
       "private_original_retained": true
     },
@@ -63,18 +64,20 @@
     {
       "path": "fresh-session.json",
       "original_sha256": "5199cefe15c218d04dc443695d9b10cf1519958ecc67283ea032e9111d9215e8",
-      "published_sha256": "4729c64a4becd0347f6913c00d04a125ba778786ed0d57c26eee7ad6c999187b",
+      "published_sha256": "33c1382496a741bdeced7d6863407c1c818ffb14976064f9700ed15e047b4579",
       "changes": [
-        "home prefix redaction"
+        "home prefix redaction",
+        "P2-1: explicit CC-gated routing-proof status and CC-owned manifest/install prerequisite; historical native observation unchanged"
       ],
       "private_original_retained": true
     },
     {
       "path": "install-and-inverse.json",
       "original_sha256": "61b5e903b8adcf907c36c679cefd072cbfb472d028f3a3851587810c5a040685",
-      "published_sha256": "555b800e92a074ba6cc3d9aaf1d8941ba2fe1a9ce365f29876d92351b57a57d5",
+      "published_sha256": "918da8416a4eee4aa23a45c4d4691297ecb2a9a76789811a534d88c169f3c894",
       "changes": [
-        "explicit publication metadata or hash-domain clarification; native outcomes unchanged"
+        "explicit publication metadata or hash-domain clarification; native outcomes unchanged",
+        "P2-1: explicit CC-gated routing-proof status and CC-owned manifest/install prerequisite; historical native observation unchanged"
       ],
       "private_original_retained": true
     },

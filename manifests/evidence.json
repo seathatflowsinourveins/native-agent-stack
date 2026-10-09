@@ -17072,8 +17072,8 @@
     },
     {
       "path": "catalogs/landscape/skills-lifecycle.json",
-      "sha256": "02ecc110296491c06c00d7f024717009a0c902b13a98837050a8b6353f7738d3",
-      "bytes": 26580
+      "sha256": "affdb8d3969dd13ae5d4edbf63448fd4a461f574434f2890c050ff39a74a62f6",
+      "bytes": 26356
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
@@ -18332,8 +18332,8 @@
     },
     {
       "path": "docs/decisions/2026-10-09-skills-blinded-trials.md",
-      "sha256": "e3031ef371ebbae6094aaf56d2f0d21365a2a84157cd2bfcff200ae1c533aa12",
-      "bytes": 6059
+      "sha256": "65d2fb708f07afb6c46b8bfeb57950374f52d529cb8b785083cc50efdb02b4d0",
+      "bytes": 7510
     },
     {
       "path": "docs/direct-results.md",
@@ -49932,8 +49932,8 @@
     },
     {
       "path": "evidence/artifacts/skills-trials-20261009/RESULT.json",
-      "sha256": "8346e0a2d4c96bfc0a214c795c55ec9f3f0be81049e333833ec35354ad89afe2",
-      "bytes": 6621
+      "sha256": "e20375c4a62bb5e5c6eaff19e075767940bcf42a932cc051fd0b0625fd65ff71",
+      "bytes": 6896
     },
     {
       "path": "evidence/artifacts/skills-trials-20261009/agnix-source-review.md",
@@ -49949,6 +49949,11 @@
       "path": "evidence/artifacts/skills-trials-20261009/blinding-audit.md",
       "sha256": "6444c430ae92f082af1e4abfd3bc19e321d5e1b919eb55118b9757282b99c67b",
       "bytes": 2496
+    },
+    {
+      "path": "evidence/artifacts/skills-trials-20261009/checks/README.md",
+      "sha256": "b784cd10a43186cc8bd54755b1ba5978adabc1d7fef67446cf35f3b964afbc42",
+      "bytes": 970
     },
     {
       "path": "evidence/artifacts/skills-trials-20261009/checks/agnix-vendor-eval.log",
@@ -50102,13 +50107,13 @@
     },
     {
       "path": "evidence/artifacts/skills-trials-20261009/fresh-session.json",
-      "sha256": "4729c64a4becd0347f6913c00d04a125ba778786ed0d57c26eee7ad6c999187b",
-      "bytes": 2205
+      "sha256": "33c1382496a741bdeced7d6863407c1c818ffb14976064f9700ed15e047b4579",
+      "bytes": 2476
     },
     {
       "path": "evidence/artifacts/skills-trials-20261009/install-and-inverse.json",
-      "sha256": "555b800e92a074ba6cc3d9aaf1d8941ba2fe1a9ce365f29876d92351b57a57d5",
-      "bytes": 5598
+      "sha256": "918da8416a4eee4aa23a45c4d4691297ecb2a9a76789811a534d88c169f3c894",
+      "bytes": 5861
     },
     {
       "path": "evidence/artifacts/skills-trials-20261009/judge-events.jsonl",
@@ -51032,8 +51037,8 @@
     },
     {
       "path": "evidence/artifacts/skills-trials-20261009/publication-redaction.json",
-      "sha256": "fa13c3d34faf4c83630a453a5a4ba709544fae8f2283cfdbab70e9089fe592b5",
-      "bytes": 15134
+      "sha256": "98f8e4923f13fe0d9227a535c8c850ff0d2c7cf1579bde6415edc8c4de60caeb",
+      "bytes": 15554
     },
     {
       "path": "evidence/artifacts/skills-trials-20261009/run_static_trial.py",
@@ -60037,8 +60042,8 @@
     },
     {
       "path": "tests/test_landscape_sweep_skills.py",
-      "sha256": "f2095097742a5084c5ffdbab1e11e627c6776c01de5f4c3c8b74406f9f91c5c9",
-      "bytes": 184138
+      "sha256": "4f789458553548cae2b40545c83dcd52cc810faa73b28a724cdfc3cd5aa89a9b",
+      "bytes": 184120
     },
     {
       "path": "tests/test_lane_packets.py",

@@ -21,6 +21,8 @@
     "archive_and_source_retained": true,
     "fresh_session_reached": false,
     "fresh_session_boundary": "Fresh unnamed request chose the built-in validator. Project skill add was policy blocked; no denial bypass.",
+    "routing_proof_status": "unavailable: skill install is CC-gated",
+    "routing_proof_prerequisite": "The CC must apply a reviewed adoption/skills/manifest.json row through tools/adoption/install_skills.py before owning the later fresh-session routing proof",
     "per_session_pss_kib": null,
     "adopt_now": false
   },

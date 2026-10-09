@@ -19,6 +19,8 @@
   "agnix_reached": false,
   "skillevaluator_reached": false,
   "path_boundary": "The lane bin prefixes were supplied to the launcher PATH; the child login shell did not reach either candidate through its command discovery. This is a failed routing observation, not proof that upstream routing cannot work.",
+  "agnix_routing_proof_status": "unavailable: skill install is CC-gated",
+  "agnix_routing_proof_prerequisite": "The CC must apply a reviewed adoption/skills/manifest.json row through tools/adoption/install_skills.py before owning the later fresh-session routing proof",
   "agnix_vendor_routing_install": "Host deny policy blocks skills add, including the read-only help probe; no bypass or installed skill edit",
   "skillevaluator_vendor_routing_install": "No native auto-routing skill or plugin for validation at v0.5.0",
   "user_configuration_changed": false,

@@ -71,11 +71,24 @@ The unnamed fresh native request reached Codex's built-in skill-creator
 validator. It did not reach either candidate. The supplied launcher PATH did
 not establish discovery in the child's login shell. agnix's project-skill add
 route is host-policy blocked; SkillEvaluator does not ship a native routing
-skill/plugin for its validator at this pin. These are unproved stages, not
-permission to write a local substitute. Native command-child PSS samples are
-retained; incremental per-session PSS remains unmeasured. ADOPT-NOW is withheld.
+skill/plugin for its validator at this pin. The agnix routing-proof status is
+exactly **`unavailable: skill install is CC-gated`** under the CC's option (a)
+decision. The earlier unnamed-session observation remains a separate historical
+result. Before the later fresh-session proof, the CC must apply a reviewed
+`adoption/skills/manifest.json` row through `tools/adoption/install_skills.py`;
+the CC owns that application and the subsequent proof. No install, alternative
+routing probe or skill-file copy is performed by this lane. Native command-child
+PSS samples are retained; incremental per-session PSS remains unmeasured.
+ADOPT-NOW is withheld.
 
-For openai/skills, REST reported `default_branch=main`, `archived=false`, and
+The catalog's tested 2026-09-30 maintenance snapshot and the regression test's
+literal expectations remain byte-identical to the experiment's merge base.
+The October 9 recheck is a new dated observation in
+[openai-maintenance.json](../../evidence/artifacts/skills-trials-20261009/openai-maintenance.json),
+which retains its own date, cutoff, command and default-branch result. A later
+observation does not rewrite the frozen snapshot or change its test contract.
+
+For openai/skills, this October 9 REST recheck reported `default_branch=main`, `archived=false`, and
 zero commits since `2026-07-11T05:20:15Z`. Its latest default-branch commit is
 still `49f948faa9258a0c61caceaf225e179651397431` at 2026-06-24T02:36:12Z.
 The slot's proposed maintenance rule is **stale-not-maintenance-qualified**:
@@ -89,12 +102,21 @@ winner ledger is left for the separately routed catalog disposition.
 
 This is one small synthetic corpus, one fresh host/model session and one
 independent judge. No confidence interval, published independent benchmark or
-whole-skill task advantage is claimed. Recorded setup/API-path failures,
-controller correction and the dated maintenance-test expectation update are
-retained. The frozen corpus, thresholds and judge were not changed after
+whole-skill task advantage is claimed. Recorded setup/API-path failures and
+controller correction are retained. The initial publication rewrote the dated
+maintenance snapshot and its test expectations; both were restored under the
+CC's append-only-evidence ruling. The October 9 recheck remains a separate
+dated record. The frozen corpus, thresholds and judge were not changed after
 outcomes, and no outcome-driven rerun was performed.
 
 Both designated reads must review the exact draft PR head. Hosted required CI,
 the designated pre-cue tool, the CC's cue, and owner configuration decisions
 remain gates. This trial PR authorizes none of those steps or any host apply.
 The lane parks after its publication CHECKPOINT; the CC and 5f own landing.
+
+The retained `checks/landscape-skills-tests.log` is explicitly
+**pre-restoration**, as recorded in
+`evidence/artifacts/skills-trials-20261009/checks/README.md`. Its original
+bytes remain historical evidence from `8bff1669`; fresh landscape module,
+validator and designated pre-cue results at the final rebased head are
+retained separately in the rebase publication receipt cited there.

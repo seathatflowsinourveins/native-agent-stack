@@ -189,13 +189,13 @@ class CatalogTests(unittest.TestCase):
             self.assertIn(fragment, problems)
 
     def test_a_stale_source_is_marked_and_kept_for_its_installed_skills(self):
-        # openai/skills still has no main commit since 2026-06-24 at the 2026-10-09 REST recheck: stale under the common
+        # openai/skills has no main commit since 2026-06-24 (98 days before 2026-09-30): stale under the common
         # block's 90-day maintenance rule. It stays a source and keeps its four installed skills; the tasks they serve
         # say so as an open gap, and the discover template labels a stale source's skills not_adopted.
         sources = {source["source_id"]: source for source in self.catalog["sources"]}
         record = sources["openai-skills"]["maintenance"]
-        self.assertEqual((record["status"], record["checked_at"]), ("stale", "2026-10-09"))
-        for fact in ("sha=main&since=2026-07-11T05:20:15Z", "49f948faa9258a0c61caceaf225e179651397431", "2026-06-24T02:36:12Z",
+        self.assertEqual((record["status"], record["checked_at"]), ("stale", "2026-09-30"))
+        for fact in ("since=2026-07-02T00:00:00Z", "49f948faa9258a0c61caceaf225e179651397431", "2026-06-24T02:36:12Z",
                      "pushed_at"):
             self.assertIn(fact, record["evidence"])
         self.assertEqual([source_id for source_id, source in sources.items() if "maintenance" in source],

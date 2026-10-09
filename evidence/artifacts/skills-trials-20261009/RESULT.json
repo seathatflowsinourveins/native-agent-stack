@@ -107,6 +107,8 @@
     "native_check": "50 complete supported reports; six explicit unsupported instruction scopes",
     "inverse": "both executed and verified",
     "fresh_session": "one unnamed natural request reached built-in validator; neither candidate reached",
+    "agnix_routing_proof_status": "unavailable: skill install is CC-gated",
+    "agnix_routing_proof_prerequisite": "The CC must apply a reviewed adoption/skills/manifest.json row through tools/adoption/install_skills.py before owning the later fresh-session routing proof",
     "per_session_pss": "unmeasured; child samples do not qualify adoption",
     "owner_apply": "not applied; owner gated"
   },
