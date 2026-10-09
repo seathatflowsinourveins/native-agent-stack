@@ -5021,8 +5021,8 @@
     },
     {
       "path": ".github/workflows/claude-security-review.yml",
-      "sha256": "60d318041b730e1c58aa8b24554148bf7d25bf8411be605ddd30d6bdac426b8b",
-      "bytes": 21508
+      "sha256": "ffa2ed759f54366bd2ae82dfd81bd874e69cde4489c14935ae7624c262cccc67",
+      "bytes": 22193
     },
     {
       "path": ".github/workflows/dependency-review.yml",
@@ -18162,8 +18162,8 @@
     },
     {
       "path": "docs/decisions/2026-10-08-claude-actions-security-review.md",
-      "sha256": "1484c74ade4344a75cfd14d2ece89703edd807d8ab324d86f7111668be254800",
-      "bytes": 18232
+      "sha256": "d884dacd3e3b1e6030b72c860b539acec9d0a67dfda4c5aa3bbb94275ef0c639",
+      "bytes": 28537
     },
     {
       "path": "docs/decisions/2026-10-08-coordinator-research-routing.md",
@@ -18332,7 +18332,7 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "6ffc3d854f2193118bdbda7b5fcd26a61989d94a8166c887a11c42c028040cb1",
+      "sha256": "c2cffcf966e372ef3c14b77ee18ea16d434128eb4631fe348b3f8d5e99337f28",
       "bytes": 101996
     },
     {
@@ -57887,8 +57887,8 @@
     },
     {
       "path": "tests/test_claude_security_review_workflow.py",
-      "sha256": "1197f9a99af74285c1670fdf6f6c4eccb134e0eb7100dcb38a0560f2977dd64a",
-      "bytes": 31646
+      "sha256": "3cd7617ec49521043c27b84ed17d9e479b43e0c359448ffb829e9167b7540fa2",
+      "bytes": 38239
     },
     {
       "path": "tests/test_claude_spend_scan.py",

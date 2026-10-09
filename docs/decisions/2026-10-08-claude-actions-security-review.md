@@ -31,10 +31,14 @@ harness-audit PR (#892, 2026-10-09), which found changes its record had not name
 - The head is checked out as data under `pr-head/` with main at the root, and the diff is written by git in the root
   only, with diff drivers off. The optional paths expand as `${scope[@]+"${scope[@]}"}`, so an empty list does not
   trip `set -u` on bash before 4.4 (macOS `/bin/bash` 3.2), which treats an empty array as unset.
+- Right after the head checkout, a model-free step, "Remove symbolic links from the pull request head", runs
+  `find pr-head -path pr-head/.git -prune -o -type l -exec rm -f {} +` under `set -euo pipefail`: every symbolic link
+  under `pr-head/` is deleted before the model starts, and the checkout's own `pr-head/.git` is not entered (added in
+  R5, 2026-10-09, below).
 - The action step runs `anthropics/claude-code-action@2dca132ff0e0c4094ce6048b422c6915a071210b` (v1.0.247), federated
   through the repository variables `ANTHROPIC_FEDERATION_RULE_ID`, `ANTHROPIC_ORGANIZATION_ID`,
   `ANTHROPIC_SERVICE_ACCOUNT_ID` and `ANTHROPIC_WORKSPACE_ID` (no stored key), with `claude_args`
-  `--model claude-opus-5-5 --effort max --max-turns 12 --max-budget-usd 3 --tools Read,Glob,Grep --allowedTools
+  `--model claude-opus-5-5 --effort max --max-turns 30 --max-budget-usd 5 --tools Read,Glob,Grep --allowedTools
   Read,Glob,Grep --restricted --permission-prompts none --setting-sources user --strict-mcp-config`, a `--settings`
   that turns hooks off, sets `claudeMdExcludes` over `pr-head/` and `blockReadsOutsideWorkingDirectories`, and denies
   seven read patterns (the `.git` directories, `.env` files, `*.pem` and `*.key`), and `--add-dir` for the prompt
@@ -42,8 +46,9 @@ harness-audit PR (#892, 2026-10-09), which found changes its record had not name
 - The action step pins `ACTIONS_STEP_DEBUG: 'false'` and passes `show_full_output`, `display_report` and
   `track_progress` as `'false'`; the last two are their defaults, declared in the pinned `action.yml` (lines
   136-139 and 152-155 at `2dca132f`).
-- A numbers step checks the bounds (an allow-list of Read, Glob and Grep, tool and MCP lists present, 1 to 12
-  assistant turns, at most $3, a cache read, result text; every unmet bound is named), and an artifact keeps
+- A numbers step checks the bounds (an allow-list of Read, Glob and Grep, where a tool-list entry that is not a
+  string is a forbidden tool named `non-string tool entry`; tool and MCP lists present, 1 to 30 assistant turns, at
+  most $5, a cache read, result text; every unmet bound is named), and an artifact keeps
   `usage.json` (numbers only) for 14 days. The review, the last non-empty result, goes to the job summary only when
   the bounds passed, capped at 60,000 bytes on a character boundary with a line saying so when it was longer.
   Nothing is posted to the pull request. A final step, "Require the run's execution file", fails the job when the
@@ -124,12 +129,24 @@ job in a final step, so a green run always means the bounds were checked.
 
 ## Effort
 
-`--effort max` in `claude_args`, set under the command center's effort mapping of 2026-10-08, which runs judgment work (designated reads, adjudication, pull request and security reviews, audits) at `max`. Every job records its level and the reason, because an unset level is a defect. The level has to be in `claude_args`: `--restricted` ignores the settings files that would otherwise carry a session's level, and on the Claude API Opus 5.5 runs at `medium` when a request leaves effort unset (bundled `claude-api` skill 2.1.295, `shared/model-migration.md`). `claude --help` (2.1.295) lists `low, medium, high, xhigh, max`. At `max`, thinking takes a larger share of the output than at the default level, so the estimate below is a floor; the client budget still bounds each run.
+`--effort max` in `claude_args`, set under the command center's effort mapping of 2026-10-08, which runs judgment work (designated reads, adjudication, pull request and security reviews, audits) at `max`. Every job records its level and the reason, because an unset level is a defect. The level has to be in `claude_args`: `--restricted` ignores the settings files that would otherwise carry a session's level, and on the Claude API Opus 5.5 runs at `medium` when a request leaves effort unset (bundled `claude-api` skill 2.1.295, `shared/model-migration.md`). `claude --help` (2.1.295) lists `low, medium, high, xhigh, max`. At `max`, thinking takes a larger share of the output than at the default level; the figures below come from runs at `max`, and the client budget still bounds each run.
 
 ## Cost of one run
 
-Dry estimate $0.70 to $1.30 for a diff up to about 1,000 lines at Claude Opus 5.5's
-standard prices, a $3 client budget checked again from the run's own numbers, 12 turns (checked after the run as distinct assistant message ids, because the result's `num_turns` counts transcript messages, tool results included: a 12-request run on 2.1.295 reported 57). The flag costs nothing.
+Caps from measurement (command center, 2026-10-09): 30 assistant turns and a $5 client budget, each a multiple of
+the measured need. A cap bounds a runaway; it does not trim a normal run. This review has no runs of its own yet. It has
+the task shape of the on-demand pull request review (#894): the same fence, model and effort, with a security prompt,
+so it takes that review's caps until its own runs replace them. That review's prompt and `claude_args`, reading one
+pull request in full, used 12 of its 12 assistant turns and cost $2.23 (the client reported $1.87). It used
+every turn it had, so 12 is a floor rather than a 95th percentile, and 2.5 times that floor gives 30 turns; twice
+$2.23 is about $4.5, rounded up to $5. Four delta re-reads of the same pull request took 5, 6, 7 and 6 turns and cost
+$1.75, $1.35, $1.54 and $0.73. Those runs used the installed Claude Code 2.1.295 directly, not the action, and billed
+a second Anthropic key; a hosted run bills the federated organization instead, so the caps are the owner's per-run
+spend limit once the enabling variable is set. Expected cost per run: about $2, by that shape, not yet measured. The
+earlier dry estimate here, $0.70 to $1.30 for a diff of up to about 1,000 lines, was below the measured cost of that
+shape and is withdrawn. The numbers step checks both caps again from the run's own numbers. Turns are counted after
+the run as distinct assistant message ids, because the result's `num_turns` counts transcript messages, tool results
+included: a 12-request run on 2.1.295 reported 57. The flag costs nothing.
 
 ## Changed existing test contracts
 
@@ -140,7 +157,7 @@ standard prices, a $3 client budget checked again from the run's own numbers, 12
 - `tests.test_workflow_security_coverage.NewWorkflowSecurityCoverageTests`: the coverage set gains both workflows,
   each with its own offline zizmor test.
 
-New, in `tests/test_claude_security_review_workflow.py` (36 tests): the review workflow's shape, and its steps' shell
+New, in `tests/test_claude_security_review_workflow.py` (42 tests): the review workflow's shape, and its steps' shell
 taken from the workflow file and run against a local stand-in for `gh` and a local git repository, and the flag's trigger paths, empty permissions, absence of any secret,
 variable, OIDC token, checkout or model, and its notice. Eleven weakened copies of the two workflows each fail at
 least one test (measured on 2026-10-08 against that day's bounds). The 2026-10-09 bound changes have their own tests
@@ -175,6 +192,85 @@ was. The step now writes the text with `jq -j`, which adds none, and a test publ
 60,001 bytes (no notice, then the notice); a copy that writes with `jq -r` again fails it. The step's comment now
 says it publishes the last non-empty result text, which it does.
 
+## Symbolic links, exact pins, non-string tool entries, caps and what has run (2026-10-09, R5)
+
+The command center's security read and the GPT designated read of this PR, both at f5f1fd22 (2026-10-09), and the
+command center's caps from measurement of the same day asked for the changes below; this round keeps to quality and
+correctness.
+
+- **Symbolic links in the pull request head (P2).** A link in the head to the job process's environment
+  (`/proc/self/environ`) or to `../.git/config` could carry what it points at into the review, and from there into
+  the public job summary. `--restricted` confines the file tools to the working directories, `--add-dir` included;
+  `claude --help` on 2.1.295 does not say whether a link's target is resolved before that check or the deny rules
+  apply. The new step "Remove symbolic links from the pull request head", right after the head checkout, deletes
+  every link under `pr-head/` before the model starts; it runs no model and nothing from the head.
+- New tests: `test_symbolic_links_in_the_head_are_removed_and_nothing_else` runs the step's shell on a tree holding
+  a link to `/proc/self/environ`, a link to `../.git/config`, a link inside a subdirectory to the root `.git`
+  directory and a link inside `pr-head/.git`: the first three are gone, and the regular files, both `.git/config`
+  files and `pr-head/.git` with its link stay. `test_the_symbolic_link_step_has_no_condition_and_a_fixed_script`
+  pins the whole step: no `if:`, no `continue-on-error`, nothing in its shell but the deletion.
+- Changed tests: `test_steps_run_in_the_order_the_binding_depends_on` requires the step right after the head
+  checkout. `test_no_step_executes_anything_from_the_pull_request_head` exempts that one step by name, as the only
+  shell that names `pr-head/`, and pins its script instead; it now checks `working-directory` on every step, that
+  one included.
+- **Exact pins.** `test_claude_args_are_exactly_the_reviewed_list` compares all of `claude_args`, each line split
+  with `shlex.split` as `cli_settings()` splits it, after `${{ runner.temp }}` is replaced by a stand-in path (the
+  runner substitutes it before the action reads the text), with the `--settings` value decoded.
+  `test_settings_are_exactly_the_reviewed_json` compares the whole `--settings` JSON. A widened or repeated
+  `--add-dir`, a repeated budget or turn flag, and `permissions.additionalDirectories` now each fail a test; the
+  existing tests checked that each expected line was present, so an added line passed them.
+- **What has run.** "Evidence class" said this workflow adds `--setting-sources user` and that it "has not run,
+  locally or hosted". Both were wrong by this record's own evidence: the fence smoke's receipt shows that flag in
+  two of its three runs, and the review's model-free steps run locally under the unit tests. The paragraph now says
+  what ran where, and names `blockReadsOutsideWorkingDirectories`, which the smoke's settings did not hold, among
+  this workflow's additions.
+- **Non-string tool entries (GPT designated read, P2).** The numbers step filtered entries that are not strings out
+  of the session's tool list before checking it, so a start record listing `{"name":"Bash"}`, `null` or `17` passed
+  every bound and the review would have been published. That was a synthetic reproduction; it does not show that the
+  client emits such entries. Each such entry is now a forbidden tool, named `non-string tool entry` in `usage.json`,
+  in the summary's tools column and in the bounds message; string entries are checked against Read, Glob and Grep as
+  before, and the step's comment names the new case. `test_a_tool_entry_that_is_not_a_string_is_a_forbidden_tool`
+  refuses each of the three; the valid list and a string `Bash` stay covered by the existing tests. Of the tool-list
+  shape follow-up below, a non-empty list and the `tool_use` names in assistant messages remain open.
+- **Caps from measurement (command center, 2026-10-09).** `--max-turns` goes from 12 to 30 and `--max-budget-usd`
+  from 3 to 5, derived in "Cost of one run" above, which now restates the derivation with its measured figures and
+  withdraws the earlier dry estimate. The numbers step's bounds follow: 1 to 30 assistant turns and at most $5, and
+  the bounds message names each with its new number. The prompt now says "at most 30 turns", and the workflow's
+  opening comment, the by-name list, "Evidence class" and the `docs/github-automation.md` bullet carry the new
+  values. The last sentence of "Effort" says the figures come from runs at `max` instead of calling the estimate a
+  floor. Changed tests: `test_claude_args_are_exactly_the_reviewed_list` and
+  `test_claude_has_three_read_tools_and_fixed_bounds` pin the new values, the latter also the prompt's turn count;
+  `test_an_unmet_bound_fails_after_the_numbers_were_kept`, `test_the_step_names_every_unmet_bound` and
+  `test_the_turn_bound_counts_assistant_turns_not_transcript_messages` go just past the caps (31 turns, $5.01 or
+  $5.50). New: `test_the_caps_hold_at_the_bound_and_fail_just_above_it`, where 30 turns and $5 pass and 31 turns and
+  $5.01 fail, each named in the bounds message.
+- The module has 42 tests (36 before). On 2026-10-09, twenty-two weakened copies of the review workflow were run, by
+  a script kept outside the repository, with PyYAML 6.0.3 present, as the Linux validate job has it, and each failed
+  at least one of the tests. Six weaken the new step: it is
+  removed, skipped with `if: ${{ false }}`, given `continue-on-error: true`, stripped of `-type l` or of the `.git`
+  prune, or moved before the head checkout. Six weaken the arguments: a second `--add-dir /`, `--add-dir` widened to
+  the whole temporary directory, a repeated `--max-turns 50`, a repeated `--max-budget-usd 30`, an added
+  `permissions.additionalDirectories`, or the dropped deny rule `Read(./**/*.key)`; five of these pass f5f1fd22's
+  tests, and only the widened `--add-dir` failed one there. Two weaken the tool check: the filter restored, or
+  non-string entries named `other` again. Eight weaken the caps: `--max-turns` left at 12 or `--max-budget-usd` at
+  3, the turn bound left at 12 or widened to 31, the cost bound left at 3, widened to 6 or refusing $5 itself, and
+  the prompt left at 12 turns.
+- Without PyYAML, as on the macOS validate job, the module's shape tests skip. Of the new tests, three run there:
+  `test_symbolic_links_in_the_head_are_removed_and_nothing_else`,
+  `test_a_tool_entry_that_is_not_a_string_is_a_forbidden_tool` and
+  `test_the_caps_hold_at_the_bound_and_fail_just_above_it`, with the three changed bounds tests. The three other new
+  tests, the step pin and both exact pins, skip, as do the changed order, pull-request-head and fixed-bounds tests.
+  Measured the same day without PyYAML, ten of the twenty-two copies still fail a test. The twelve that pass change
+  only what the skipped tests read: the step's condition, `continue-on-error` or position, `claude_args`, the
+  `--settings` JSON and the prompt's turn count.
+
+In agent mode the action rewrites the checkout's `origin` URL with the job token (`src/github/operations/git-config.ts:129-134`, called from `src/modes/agent/index.ts:52-61` at `2dca132f`), so `persist-credentials: false` does not keep the token out of `.git/config`; the deny rules `Read(./.git/**)` and `Read(./**/.git/**)` are what keep the model from reading it, as two 2026-10-09 probes on the installed 2.1.295 measured.
+
+A link in the head to `../.git/config` would reach that file under a path those rules do not name, which is why the
+step above removes links instead of relying on the client.
+
+Security hardening from the 2026-10-09 read (flag-path additions, a fork notice, debug-value widening, tool-list shape, extra deny rules, token-source and guard-step assertions) is filed as follow-ups before any enabling variable is set.
+
 ## Alternatives considered
 
 - **`anthropics/claude-code-security-review`.** Rejected above.
@@ -200,8 +296,15 @@ says it publishes the last non-empty result text, which it does.
 Read,Glob,Grep, `--strict-mcp-config`, `--permission-prompts none`, `--settings` with hooks off and three deny rules,
 on Claude Haiku 5.5 with 10 turns and $0.50; `evidence/artifacts/claude-actions-fence-smoke-20261008/receipt.json`,
 recorded with the pull request review; this PR carries a byte-identical copy of that file, as #892 and #894 do, so
-the citation does not depend on which PR lands first). This workflow adds `--setting-sources user`, `--add-dir`, `--effort max` and
-more deny rules and runs Opus 5.5 with 12 turns and $3; it has not run, locally or hosted.
+the citation does not depend on which PR lands first). Two of that receipt's three runs also passed
+`--setting-sources` (`run2-user` with `user`, `run2-user-project-local` with `user,project,local`), so
+`--setting-sources user` has run there. The smoke ran the client directly on the workstation, not through the
+action, whose parser path the receipt records as replayed offline, not run. This workflow adds `--add-dir`,
+`--effort max`, `blockReadsOutsideWorkingDirectories` and four more deny rules (`Read(./pr-head/.git/**)`,
+`Read(./**/.env.*)`, `Read(./**/*.pem)`, `Read(./**/*.key)`) and runs Opus 5.5 with 30 turns and $5 through the
+action; no run of that configuration, local or hosted, is part of this record. What has run is model-free and
+local: the shells of the review's guard, binding, symbolic-link, diff, numbers and publish steps and of the flag's
+notice step, on synthetic inputs under the unit tests above.
 `local_static_analysis`: actionlint 1.17.0 and zizmor 1.30.1 (offline, regular and pedantic), no findings on either
 workflow. `local_integration`: the unit tests above with PyYAML 6.0.3 on Python 3.12. `source_review`: the sources
 below. No hosted run of either workflow is part of this record.
