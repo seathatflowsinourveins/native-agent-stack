@@ -126,6 +126,12 @@ conversation by itself, with a five-minute lifetime when the run is billed to a 
 few minutes reads its own cache, so the one-hour lifetime (`promptCacheTtl`, twice the base input price to write
 against 1.25 times) would cost more and buy nothing.
 
+## Visibility
+
+The repository is public, so the job summary of every run, and with it the audit report, is readable by anyone. The
+audit reads the harness's own configuration, which is public in this repository already. An audit step that reports
+success without an execution file fails the job in a final step, so a green run always means the bounds were checked.
+
 ## Effort
 
 `--effort max` in `claude_args`, set under the command center's effort mapping of 2026-10-08, which runs judgment work (designated reads, adjudication, pull request and security reviews, audits) at `max`. Every job records its level and the reason, because an unset level is a defect. The level has to be in `claude_args`: `--restricted` ignores the settings files that would otherwise carry a session's level, and on the Claude API Opus 5.5 runs at `medium` when a request leaves effort unset (bundled `claude-api` skill 2.1.295, `shared/model-migration.md`). `claude --help` (2.1.295) lists `low, medium, high, xhigh, max`. A loopback dry run of the installed 2.1.295 client with this workflow's `claude_args` sent `output_config.effort: "max"`, adaptive thinking and no `speed` field on every request. At `max`, thinking takes a larger share of the output than at the default level, so the estimate below is a floor; the client budget still bounds each run. A local run of this workflow's prompt and `claude_args` at `max` (Opus 5.5, Claude Code 2.1.295, billed to a second Anthropic key through the credential runner) used 10 of 20 assistant turns and a client cost estimate of about $2.03 of the $3 budget, and its result's `num_turns` was 46 (`evidence/artifacts/claude-actions-fence-smoke-20261008/local-parity-receipt.json`).

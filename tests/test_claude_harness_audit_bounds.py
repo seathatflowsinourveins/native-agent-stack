@@ -139,6 +139,8 @@ class HarnessAuditShapeTests(unittest.TestCase):
                      "anthropic_service_account_id", "anthropic_workspace_id"):
             self.assertRegex(inputs[name], r"^\$\{\{ vars\.[A-Z_]+ \}\}$")
         self.assertEqual(inputs["show_full_output"], "false")
+        self.assertEqual(inputs["display_report"], "false")
+        self.assertEqual(inputs["track_progress"], "false")
         text = WORKFLOW.read_text(encoding="utf-8")
         for static_credential in ("ANTHROPIC_API_KEY", "ANTHROPIC_AUTH_TOKEN", "CLAUDE_CODE_OAUTH_TOKEN"):
             self.assertNotIn(static_credential, text)
@@ -170,6 +172,11 @@ class HarnessAuditShapeTests(unittest.TestCase):
         self.assertEqual(names[0], "Harden the runner (audit-only network egress)")
         self.assertLess(names.index(GUARD), names.index("Check out"))
         self.assertLess(names.index(GUARD), names.index(AUDIT))
+
+    def test_a_green_run_always_has_an_execution_file(self):
+        check = step("Require the run's execution file")
+        self.assertEqual(check["if"], "${{ success() && steps.claude_audit.outputs.execution_file == '' }}")
+        self.assertIn("exit 1", check["run"])
 
     def test_the_report_is_published_only_after_the_bounds_check_passed(self):
         self.assertIn("success()", step(REPORT)["if"])

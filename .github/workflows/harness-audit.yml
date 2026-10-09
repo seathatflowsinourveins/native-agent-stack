@@ -225,6 +225,15 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
           rm -f "$report"
 
+      # An audit step that reports success without an execution file would leave the job green with nothing
+      # checked or published; that fails here.
+      - name: Require the run's execution file
+        if: ${{ success() && steps.claude_audit.outputs.execution_file == '' }}
+        shell: bash
+        run: |
+          echo 'The audit step finished without an execution file: no bounds were checked and no report was published.' >&2
+          exit 1
+
       - name: Keep the numeric usage record
         if: ${{ always() && steps.claude_audit.outputs.execution_file != '' }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
