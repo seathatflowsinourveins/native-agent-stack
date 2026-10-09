@@ -1796,7 +1796,7 @@ class NativeInstallFloorTests(unittest.TestCase):
 
     @unittest.skipUnless(BASH32, "no real bash 3.2 binary reachable (set BASH32_BINARY, or run on a real Mac)")
     def test_the_floor_check_runs_under_real_bash_32(self):
-        self.assert_kept("2.1.290 (Claude Code)", bash=BASH32)
+        self.assert_kept(f"{self.PIN} (Claude Code)", bash=BASH32)
         self.assert_installed("2.1.99 (Claude Code)", bash=BASH32)
 
 

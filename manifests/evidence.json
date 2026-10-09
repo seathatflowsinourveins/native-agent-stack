@@ -58412,8 +58412,8 @@
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",
-      "sha256": "4630fa0612f65eb0ac3e606a8f727278e4241214b840179437028716a056aa29",
-      "bytes": 230673
+      "sha256": "25d12e0cc419d176760dff7e604b9548d26d20af77f0b71636fc42395f2718b5",
+      "bytes": 230677
     },
     {
       "path": "tests/test_adoption_bootstrap_parity.py",
