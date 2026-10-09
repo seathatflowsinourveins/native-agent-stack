@@ -1,0 +1,5 @@
+Client.listTools() called but server does not advertise tools capability - returning empty list
+localhost
+
+  Tools: <none>
+  0 tools · 332ms · HTTP http://localhost:23833/

@@ -1,0 +1,7 @@
+[mcporter] HTTP endpoints require --allow-http to confirm insecure usage.
+Error: HTTP endpoints require --allow-http to confirm insecure usage.
+    at resolveEphemeralServer (file:///home/example/.local/share/mise/installs/node/24.21.0/lib/node_modules/mcporter/dist/cli/adhoc-server.js:23:19)
+    at prepareEphemeralServerTarget (file:///home/example/.local/share/mise/installs/node/24.21.0/lib/node_modules/mcporter/dist/cli/ephemeral-target.js:53:24)
+    at handleList (file:///home/example/.local/share/mise/installs/node/24.21.0/lib/node_modules/mcporter/dist/cli/list-command.js:27:28)
+    at runCli (file:///home/example/.local/share/mise/installs/node/24.21.0/lib/node_modules/mcporter/dist/cli.js:262:19)
+    at async main (file:///home/example/.local/share/mise/installs/node/24.21.0/lib/node_modules/mcporter/dist/cli.js:379:5)

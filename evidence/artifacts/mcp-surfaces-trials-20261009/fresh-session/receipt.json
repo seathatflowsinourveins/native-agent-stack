@@ -1,0 +1,35 @@
+{
+  "schema": "mcp-fresh-session-observation/1",
+  "prompt_names_candidate": false,
+  "prompt_file": "prompt.md",
+  "launch": "codex exec -p omniroute -m cx/gpt-6.1-sol --ephemeral --skip-git-repo-check --json --sandbox read-only -c service_tier=default",
+  "credential_boundary": "Fixed non-secret loopback placeholder supplied inline by the approved launcher pattern; no credential read or copied.",
+  "MCP_servers_enabled": [],
+  "raw_rollout_sha256": "ec76590fd6756e335650398c7ffc15037a2ea070062549a1f98822d2b7023a81",
+  "return_code": -15,
+  "timed_out": true,
+  "observation_bound_seconds": 180,
+  "completed_command_count": 18,
+  "organically_reached": "mcporter",
+  "candidate_reach": {
+    "conformance": false,
+    "inspector": false
+  },
+  "candidate_visibility": "Trial prefix binaries were placed on launch PATH, but the native discovery shell found only the global mcporter shim. Candidate discovery is unproven.",
+  "diagnostic_result": "Version negotiation probe failed: fetch failed. No HTTP status; origin host native endpoint checks pass. Child shell access boundary is unverified.",
+  "successful_task_completion": false,
+  "adoption_fresh_gate": "NOT_PROVEN",
+  "setup_attempts": [
+    {
+      "label": "r1",
+      "rc": 1,
+      "reason": "Non-repository cwd required --skip-git-repo-check."
+    },
+    {
+      "label": "r2",
+      "rc": 1,
+      "reason": "OMNIROUTE_API_KEY absent; before inference."
+    }
+  ],
+  "custody": "Full raw rollout and three native launcher observations retained privately. Public record includes only completed tool calls, not model prose or reasoning."
+}

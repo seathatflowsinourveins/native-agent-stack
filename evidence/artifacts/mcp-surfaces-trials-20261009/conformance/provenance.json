@@ -1,0 +1,70 @@
+{
+  "schema": "mcp-surfaces-trial-provenance/1",
+  "observed_utc": "2026-10-09",
+  "repository": "https://github.com/modelcontextprotocol/conformance",
+  "tag": "v0.1.16",
+  "commit": "21a9a2febd7100d7c17ac1021ee7f2ed9f66a1e0",
+  "package": "@modelcontextprotocol/conformance@0.1.16",
+  "package_url": "https://registry.npmjs.org/@modelcontextprotocol/conformance/-/conformance-0.1.16.tgz",
+  "package_bytes": 49842,
+  "package_sha256": "f936f57efb5372dba650ea1a6a2186d8fb61660357c8ab09954221da3f12f9af",
+  "package_integrity": "sha512-GI7qiN0r39/MH2srVUR3AXaEN0YLCro20lIBbnvc1frBhszenxvUifBuTzxeVQVagILfBzCIcnungUOma8OrgA==",
+  "environment": {
+    "host": "Linux WSL",
+    "node": "24.21.0",
+    "published_package_resolved_mcp_sdk": "1.32.1",
+    "boundary": "Source harness is pinned. Published-package dependency resolution is captured separately; it is not the upstream source lockfile."
+  },
+  "quality": {
+    "upstream_warning": "README: work in progress and unstable",
+    "ci_at_commit": "https://github.com/modelcontextprotocol/conformance/actions/runs/23662264662",
+    "ci_receipt": "quality/upstream-pin-ci.stdout",
+    "native_build_rc": 0,
+    "native_check_rc": 0,
+    "targeted_native_test_rc": 0,
+    "targeted_native_test_files": 3,
+    "targeted_native_tests_passed": 29,
+    "test_command": "npm test -- src/checks/checks.test.ts src/scenarios/spec-version.test.ts src/expected-failures.test.ts",
+    "source_dev_install_advisories": {"low": 2, "moderate": 6, "high": 13, "critical": 1},
+    "advisory_boundary": "Counts were reported by npm ci for the pinned source development tree. No vulnerability triage or remediation is claimed. Published runtime-prefix installation reported zero advisories."
+  },
+  "install_check_inverse": {
+    "install": "npm install --prefix <lane-prefix>/install --save-exact @modelcontextprotocol/conformance@0.1.16",
+    "package_capture": "npm pack @modelcontextprotocol/conformance@0.1.16 --pack-destination <lane-prefix>/package --json",
+    "check": "conformance server --url http://127.0.0.1:29374/mcp --scenario server-initialize --spec-version 2025-11-25 --output-dir <results>",
+    "check_rc": 0,
+    "inverse": "npm uninstall --prefix <lane-prefix>/install @modelcontextprotocol/conformance",
+    "inverse_rc": 0,
+    "inverse_verified": "The lane-prefix node_modules/.bin/conformance did not exist after uninstall. The exact pinned package was reinstalled for the remaining trial commands.",
+    "source_dev_install_side_effect": {
+      "cause": "lefthook 2.1.4 postinstall uses INIT_CWD and invoked install -f from the caller worktree during npm ci --prefix.",
+      "observed_generated_files": ["lefthook.yml", "Git hooks/prepare-commit-msg"],
+      "generated_hook_sha256": "1ccb47e4c7fd278d7f08615de512d059addc8b37fbbd0575512d0b81b3c623c9",
+      "inverse": "lefthook uninstall --remove-configs",
+      "inverse_rc": 0,
+      "verified": "Generated config absent; no non-sample hooks remained. The inverse did not use --force.",
+      "reproduction": "Run npm ci from the source directory with CI=1. The vendor postinstall skips hook installation under CI unless LEFTHOOK is explicitly enabled.",
+      "vendor_source_sha256": "7077c18744b77e3c819006878294735f4426c3432c47da0e2a144a0a4a90c395"
+    }
+  },
+  "specification": {
+    "tested_filter": "2025-11-25",
+    "native_client_protocol_versions_sent": {"mcporter": "2025-11-25", "inspector-cli": "2025-11-25"},
+    "supported_filters": ["2025-03-26", "2025-06-18", "2025-11-25", "draft", "extension"],
+    "2026-07-28_filter_rc": 1,
+    "2026-07-28_boundary": "This release rejects that string as a protocol filter before execution. No verdict for a 2026-07-28 protocol revision or separately frozen harness leg is claimed."
+  },
+  "archived_primary_files": {
+    "README.md": "fe85b50e7d85a3c2f9597dfc0cf85123d2bd68337dddd17fe5cfb06466d14c32",
+    "AGENTS.md": "ca180ff7eb29b1512c8bc6a4bfa36098cb100eccc1c70a0cb4b93d14ad8c7e57",
+    "package.json": "2d99f94129bcaa84b8613dfd5ac50f1885cd8e01b72965da57e66ea848b4d0ab",
+    "package-lock.json": "df89d138b91871a7fb041f8d3923a78b9a1e2d5bdf28ba589fe6f944f30814fe",
+    "src/index.ts": "8295dafd5cc4a61665052f619ab6b457e5b624f0018200c6a34d5eb14c820bc7",
+    "src/scenarios/index.ts": "99dca94e99f4ccf2215af7a8e075416876f3d25b4434a55d50fdc4f12f71ad21",
+    "src/scenarios/server/client-helper.ts": "e592d6374ccaafb9d9bd393d37aabf60e6814e9fae6517d9a51adda84b3d491c",
+    "src/scenarios/server/lifecycle.ts": "3df31a9105816aa90e0770000fe4b36e75d14b58f9f126d5f9935ad0cc022030",
+    "src/scenarios/client/initialize.ts": "da91feee1e7046216e8e13700b6677f6ec727fd175a3c4f6b579e1e444568288",
+    ".github/workflows/ci.yml": "090314d6553f83c96e5749268a76e58c447bc95c0dae12f541de8dc0832957dc"
+  },
+  "custody": "Pinned source blobs, official package archive and unredacted native captures are retained in the lane-owned research prefix. Public logs replace personal home paths and ephemeral session identifiers; raw capture digests and public artifact digests are distinguished."
+}

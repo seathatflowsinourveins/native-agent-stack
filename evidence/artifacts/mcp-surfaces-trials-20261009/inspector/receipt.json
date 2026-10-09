@@ -1,0 +1,112 @@
+{
+  "observation_date_utc": "2026-10-09",
+  "candidate": {
+    "package": "@modelcontextprotocol/inspector",
+    "version": "2.10.1",
+    "repository": "https://github.com/modelcontextprotocol/inspector",
+    "tag": "2.10.1",
+    "commit": "0d2bc1d91ce177ea8d497ee3efe91bcc59e40a1c",
+    "release_published_at": "2026-10-08T05:05:05Z",
+    "release_url": "https://github.com/modelcontextprotocol/inspector/releases/tag/2.10.1",
+    "npm_tarball": "https://registry.npmjs.org/@modelcontextprotocol/inspector/-/inspector-2.10.1.tgz",
+    "npm_shasum": "9909181efea1ca6ec15d26184acaa268f06a3db8",
+    "npm_integrity": "sha512-5lU14Qms3MNQQ+3OUKKYPWewWh9cUsPCmJrZ3vsQTSR4O9UAXfmIcZiSx5gDgvJtrXRXGn7E1gIDC5TY7cI1pQ==",
+    "archive_sha256": "1786803aaf058445aaf647973e848f7a5c17391b99bd6e17ddb01b63d4ae7c96",
+    "archive_bytes": 1541080,
+    "archive_retained": "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/inspector/packages/modelcontextprotocol-inspector-2.10.1.tgz",
+    "required_node": ">=22.19.0",
+    "actual_node": "v24.21.0",
+    "upstream_status_of_mcpdo": "experimental",
+    "readme_source": "https://github.com/modelcontextprotocol/inspector/blob/0d2bc1d91ce177ea8d497ee3efe91bcc59e40a1c/clients/mcpdo/README.md"
+  },
+  "baseline": {
+    "package": "mcporter",
+    "version": "0.14.2",
+    "installed_bin": "/home/example/.local/share/mise/installs/node/24.21.0/bin/mcporter",
+    "repository": "https://github.com/openclaw/mcporter",
+    "tag": "v0.14.2",
+    "tag_object": "a031fc437df4bfb3b1c4362d479026a5045805bc",
+    "commit": "aa0f55f9bffcde9d2070c86145f37d4dd3525f6c",
+    "tag_date_utc": "2026-10-01T05:42:05Z",
+    "installation_action": "Existing vendor installation verified; not uninstalled or replaced"
+  },
+  "quality_at_pins": {
+    "inspector": {
+      "ci_run": "https://github.com/modelcontextprotocol/inspector/actions/runs/37730418763",
+      "build_job": "https://github.com/modelcontextprotocol/inspector/actions/runs/37730418763/job/113158032141",
+      "successful_steps": [
+        "Validate (coverage guards, format, lint, typecheck, build, fast tests)",
+        "Verify the browser-externalized-builtin build gate (#1769)",
+        "Verify no externalized dependency was inlined (#2067)",
+        "Run cross-client smokes",
+        "Run Storybook play-function tests"
+      ],
+      "coverage_job": "https://github.com/modelcontextprotocol/inspector/actions/runs/37730418763/job/113158032393",
+      "coverage_step": "Enforce per-file coverage gate (≥90% on all four dimensions)",
+      "coverage_conclusion": "success",
+      "local_suite_rerun": false,
+      "release_discipline": "2.10.1 patched the npm default-bin ambiguity introduced by mcpdo; official release names the pack:verify default-bin check",
+      "other_workflow_failure": {
+        "run": "https://github.com/modelcontextprotocol/inspector/actions/runs/37734413577",
+        "workflow": "SDK Watch",
+        "failed_job": "analyze (2606, MCP TypeScript SDK, modelcontextprotocol/typescript-sdk, 2.2.0, 2.3.1)",
+        "failed_steps": ["Review the SDK changes with Claude", "Stage the analysis for the posting job"],
+        "boundary": "Reported separately; no claim that every workflow at the release pin passed"
+      }
+    },
+    "mcporter": {
+      "ci_run": "https://github.com/openclaw/mcporter/actions/runs/36819995965",
+      "jobs": ["build (windows-latest)", "build (ubuntu-latest, Node 26)", "build (ubuntu-latest)", "build (macos-15)"],
+      "job_conclusions": "all success",
+      "verified_ubuntu_steps": ["Run pnpm check", "Build docs site", "Test with coverage"],
+      "release_verification_run": "https://github.com/openclaw/mcporter/actions/runs/36905665366",
+      "release_verification_conclusion": "success",
+      "local_suite_rerun": false
+    }
+  },
+  "vendor_install_check_inverse": {
+    "prefix": "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/inspector/install",
+    "install": "npm install --global --prefix <prefix> @modelcontextprotocol/inspector@2.10.1 --no-audit --no-fund",
+    "install_rc": 0,
+    "native_check": "<prefix>/bin/mcpdo --help",
+    "native_check_rc": 0,
+    "native_version_after_reinstall": "2.10.1",
+    "inverse": "npm uninstall --global --prefix <prefix> @modelcontextprotocol/inspector --no-audit --no-fund",
+    "inverse_rc": 0,
+    "inverse_verified_absent": ["bin/mcpdo", "bin/inspector", "bin/mcp-inspector", "lib/node_modules/@modelcontextprotocol/inspector"],
+    "reinstall": "npm install --global --prefix <prefix> <retained-exact-npm-tarball> --no-audit --no-fund",
+    "reinstall_rc": 0,
+    "retained_install_reason": "ONE trial and root conformance client checks; no user client or skill registration"
+  },
+  "native_isolation": {
+    "inspector_daemon_env": "MCP_INSPECTOR_DAEMON_DIR=<lane-prefix>/d",
+    "inspector_state_env": "MCP_STORAGE_DIR=<lane-prefix>/s",
+    "inspector_source": "https://github.com/modelcontextprotocol/inspector/blob/0d2bc1d91ce177ea8d497ee3efe91bcc59e40a1c/clients/mcpdo/src/daemon/paths.ts",
+    "mcporter_daemon_env": "MCPORTER_DAEMON_DIR=<lane-prefix>/m",
+    "mcporter_source": "https://github.com/openclaw/mcporter/blob/aa0f55f9bffcde9d2070c86145f37d4dd3525f6c/src/daemon/paths.ts",
+    "production_daemons_touched": false,
+    "credential_values_read_printed_or_copied": false,
+    "user_client_config_changed": false
+  },
+  "same_task_configuration": {
+    "endpoint": "http://127.0.0.1:29374/mcp",
+    "endpoint_selection": "Actual host ai-memory shared unauthenticated HTTP endpoint designated by parent; no test server authored",
+    "inspector_config_sha256": "c1a3327b760e99c8236dfbf4d141b5b74b4966adf9db138c66cdf399e1b96472",
+    "mcporter_config_sha256": "88bde5b486f406283a62bcaa78705910ff0281f5cd59bdaa00634e7c0e3f7509",
+    "mcporter_imports": [],
+    "tasks": ["tools/list", "tools/call memory_status {}"],
+    "memory_status_input_schema_source": "Native tools/list from both clients; project/workspace optional nullable strings, no required arguments",
+    "output_retention": "Numeric counts and schema digests only; no memory content"
+  },
+  "native_routing_for_fresh_session": {
+    "source": "https://github.com/modelcontextprotocol/inspector/blob/0d2bc1d91ce177ea8d497ee3efe91bcc59e40a1c/skills/mcpdo/SKILL.md",
+    "installed_lane_path": "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/inspector/install/lib/node_modules/@modelcontextprotocol/inspector/skills/mcpdo/SKILL.md",
+    "sha256": "a79042f432014263f84d1e5c16a3a6704c76f3cf6368534fe2d133684a4f4e16",
+    "host_registration_changed": false,
+    "fresh_session_status": "Parent owns independent fresh-session proof; source presence is not execution proof"
+  },
+  "measured_boundary": "Two read-only tasks against one existing local HTTP server, ten alternating warm pairs per task, one cold discovery per arm. No OAuth, stdio process retention, remote latency, resources, prompts, generators, browser UI, or protocol-version matrix parity measured here.",
+  "proposed_default": "mcporter 0.14.2",
+  "proposal_reason": "All 42 cold/warm task operations succeeded and tool-schema digests agreed. Inspector mcpdo is faster on the two warm tasks, but uses higher persistent and peak PSS, takes longer for the single cold discovery, and is marked experimental upstream. Retain the installed default while catalog and fresh-session/owner gates are evaluated.",
+  "adoption_disposition": "TRIAL evidence; no ADOPT-NOW and no configuration switch; grand-catalog owns catalog disposition"
+}

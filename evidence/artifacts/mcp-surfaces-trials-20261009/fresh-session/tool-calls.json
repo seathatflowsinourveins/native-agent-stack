@@ -1,0 +1,96 @@
+{
+  "completed_native_commands": [
+    {
+      "command": "/bin/bash -lc \"pwd; rtk rg --files -g AGENTS.md -g pyproject.toml -g package.json -g Cargo.toml -g go.mod -g '*.sln' -g README.md -g '*.py' -g '*.ts' -g '*.js' -g '*.go' -g '*.rs' -g '\"'!node_modules'\"' -g '\"'!.git'\"' -g '\"'!vendor'\"' .\"",
+      "status": "failed",
+      "exit_code": 1
+    },
+    {
+      "command": "/bin/bash -lc \"sed -n '1,240p' /home/example/.codex/plugins/cache/context-mode/context-mode/1.0.169/skills/context-mode/SKILL.md\"",
+      "status": "completed",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/bash -lc 'command -v mcp-inspector mcp-inspector-cli inspector mcp mcpt mcporter fastmcp mcp-cli mcp-client mcp-remote'",
+      "status": "completed",
+      "exit_code": 0,
+      "output": "/home/example/.local/share/mise/shims/mcporter\n"
+    },
+    {
+      "command": "/bin/bash -lc 'mcporter --version'",
+      "status": "completed",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/bash -lc 'mcporter --help'",
+      "status": "completed",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/bash -lc 'mcporter list --help'",
+      "status": "completed",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/bash -lc 'mise which mcporter'",
+      "status": "completed",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/bash -lc 'readlink -f /home/example/.local/share/mise/installs/node/24.21.0/bin/mcporter'",
+      "status": "completed",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/bash -lc \"rtk rg --files /home/example/.local/share/mise/installs/node/24.21.0/lib/node_modules/mcporter -g package.json -g '*config*' -g '*list*' -g '*auth*' -g '*transport*' -g '*runtime*' -g '*adhoc*' -g '\"'!node_modules'\"' -g '\"'!*.map'\"'\"",
+      "status": "completed",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/bash -lc \"sed -n '1,180p' /home/example/.local/share/mise/installs/node/24.21.0/lib/node_modules/mcporter/dist/cli/adhoc-server.js\"",
+      "status": "completed",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/bash -lc \"sed -n '1,220p' /home/example/.local/share/mise/installs/node/24.21.0/lib/node_modules/mcporter/dist/runtime/http-transport.js\"",
+      "status": "completed",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/bash -lc \"sed -n '1,210p' /home/example/.local/share/mise/installs/node/24.21.0/lib/node_modules/mcporter/dist/config/read-config.js\"",
+      "status": "completed",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/bash -lc \"node -e 'const p=require(\\\"/home/example/.local/share/mise/installs/node/24.21.0/lib/node_modules/mcporter/package.json\\\"); console.log(JSON.stringify({name:p.name,version:p.version,repository:p.repository,engines:p.engines}));'\"",
+      "status": "completed",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/bash -lc \"rtk rg -n -C 3 'imports|disableOAuth|no-oauth|cachedAuth|listTools|loadServerDefinitions' /home/example/.local/share/mise/installs/node/24.21.0/lib/node_modules/mcporter/dist/config.js /home/example/.local/share/mise/installs/node/24.21.0/lib/node_modules/mcporter/dist/config-schema.js /home/example/.local/share/mise/installs/node/24.21.0/lib/node_modules/mcporter/dist/cli/list-command.js /home/example/.local/share/mise/installs/node/24.21.0/lib/node_modules/mcporter/dist/runtime.js /home/example/.local/share/mise/installs/node/24.21.0/lib/node_modules/mcporter/dist/runtime/cached-auth.js\"",
+      "status": "completed",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/bash -lc \"sed -n '1,95p' /home/example/.local/share/mise/installs/node/24.21.0/lib/node_modules/mcporter/dist/config.js\"",
+      "status": "completed",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/bash -lc \"sed -n '190,210p' /home/example/.local/share/mise/installs/node/24.21.0/lib/node_modules/mcporter/dist/config-schema.js\"",
+      "status": "completed",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/bash -lc \"sed -n '1,175p' /home/example/.local/share/mise/installs/node/24.21.0/lib/node_modules/mcporter/dist/runtime/cached-auth.js\"",
+      "status": "completed",
+      "exit_code": 0
+    },
+    {
+      "command": "/bin/bash -lc \"mcporter --config /dev/stdin list --http-url http://127.0.0.1:29374/mcp --allow-http --name endpoint-check --header 'Authorization=' --no-oauth --json --exit-code --timeout 10000 <<<'{\\\"mcpServers\\\":{},\\\"imports\\\":[]}'\"",
+      "status": "failed",
+      "exit_code": 1,
+      "output": "{\n  \"mode\": \"server\",\n  \"name\": \"endpoint-check\",\n  \"status\": \"offline\",\n  \"durationMs\": 19,\n  \"transport\": \"HTTP http://127.0.0.1:29374/mcp\",\n  \"source\": {\n    \"kind\": \"local\",\n    \"path\": \"<adhoc>\"\n  },\n  \"issue\": {\n    \"kind\": \"offline\",\n    \"rawMessage\": \"Version negotiation probe failed: fetch failed\"\n  },\n  \"error\": \"offline\"\n}\n"
+    }
+  ]
+}

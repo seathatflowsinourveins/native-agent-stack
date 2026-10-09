@@ -1,0 +1,43 @@
+{
+  "label": "unsupported-spec-filter",
+  "started_utc": "2026-10-09T05:37:52.867971+00:00",
+  "command": [
+    "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/conformance/install/node_modules/.bin/conformance",
+    "server",
+    "--url",
+    "http://127.0.0.1:29374/mcp",
+    "--scenario",
+    "server-initialize",
+    "--spec-version",
+    "2026-07-28"
+  ],
+  "cwd": "/home/example/code/native-agent-stack-ns2604-landscape-mcp",
+  "return_code": 1,
+  "timed_out": false,
+  "elapsed_seconds": 0.417375,
+  "pss": {
+    "peak_process_tree_kib": 48927,
+    "max_observed_processes": 1,
+    "samples": 8,
+    "interval_seconds": 0.05,
+    "source": "/proc/<owned-pid>/smaps_rollup:Pss",
+    "scope": "owned command process tree; shared host servers excluded"
+  },
+  "logs": {
+    "stdout": {
+      "path": "unsupported-spec-filter.stdout",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "public_bytes": 0
+    },
+    "stderr": {
+      "path": "unsupported-spec-filter.stderr",
+      "raw_sha256": "bdf1d2fad4941ee996d061361977c5d4ae21e5a8530e801437cd05f84e5f7aa9",
+      "raw_bytes": 102,
+      "public_sha256": "bdf1d2fad4941ee996d061361977c5d4ae21e5a8530e801437cd05f84e5f7aa9",
+      "public_bytes": 102
+    }
+  },
+  "publication_boundary": "Personal home paths and ephemeral session identifiers redacted. Raw captures are private; public log digests refer to the redacted files."
+}

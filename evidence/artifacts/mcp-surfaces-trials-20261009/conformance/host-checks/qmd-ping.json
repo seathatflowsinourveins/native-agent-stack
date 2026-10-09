@@ -1,0 +1,45 @@
+{
+  "label": "qmd-ping",
+  "started_utc": "2026-10-09T05:30:16.715493+00:00",
+  "command": [
+    "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/conformance/install/node_modules/.bin/conformance",
+    "server",
+    "--url",
+    "http://127.0.0.1:21851/mcp",
+    "--scenario",
+    "ping",
+    "--spec-version",
+    "2025-11-25",
+    "--output-dir",
+    "/home/example/code/native-agent-stack-ns2604-landscape-mcp/evidence/artifacts/mcp-surfaces-trials-20261009/conformance/host-checks/qmd-ping"
+  ],
+  "cwd": "/home/example/code/native-agent-stack-ns2604-landscape-mcp",
+  "return_code": 1,
+  "timed_out": false,
+  "elapsed_seconds": 10.94706,
+  "pss": {
+    "peak_process_tree_kib": 51738,
+    "max_observed_processes": 1,
+    "samples": 206,
+    "interval_seconds": 0.05,
+    "source": "/proc/<owned-pid>/smaps_rollup:Pss",
+    "scope": "owned command process tree; shared host servers excluded"
+  },
+  "logs": {
+    "stdout": {
+      "path": "qmd-ping.stdout",
+      "raw_sha256": "4c754cde16f32a7cd8e009eae9e3f2d4c8e99839ad8a5334e8cf5fde2f569c66",
+      "raw_bytes": 1106,
+      "public_sha256": "4be3270ba354e20a126ff9de85aa6d1d592676e8da4626f16e6328733790a00e",
+      "public_bytes": 1108
+    },
+    "stderr": {
+      "path": "qmd-ping.stderr",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "public_bytes": 0
+    }
+  },
+  "publication_boundary": "Personal home paths and ephemeral session identifiers redacted. Raw captures are private; public log digests refer to the redacted files."
+}

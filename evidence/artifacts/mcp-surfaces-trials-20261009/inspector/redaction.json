@@ -1,0 +1,85 @@
+{
+  "generated_utc": "2026-10-09T05:43:59.724Z",
+  "raw_retention": "Private lane-owned research prefix; raw copies are not committed",
+  "redactions": [
+    "Personal home prefix replaced with /home/example",
+    "Native opaque connection IDs replaced with stable connection-NN labels"
+  ],
+  "public_script_change": "TRIAL_ROOT and MCPORTER_BIN parameters replace hard-coded personal paths; measurement logic unchanged",
+  "report_change": "Report also adds final persistence observations and replay instructions",
+  "digest_boundary": "Raw stdout digests in measurement rows refer to raw native output; raw capture digests below differ from committed public artifact digests; package archive SHA-256 identifies the original vendor tarball",
+  "artifacts": [
+    {
+      "file": "measure.py",
+      "raw_retained": "<private-lane-prefix>/raw/measure.py",
+      "raw_sha256": "16e3e4d9f911f1768d3b694b92f57b2f287288e0a4dc3f534bc34c70027de418",
+      "raw_bytes": 10911,
+      "public_sha256": "dc5ea79f75f639374a07e280a368208024f37455d0dd5f773af833c7885829b5",
+      "public_bytes": 10920
+    },
+    {
+      "file": "persistence.py",
+      "raw_retained": "<private-lane-prefix>/raw/persistence.py",
+      "raw_sha256": "fdf998953410548f2ae147224edaa10d1000a75adcb6a2b62d567f08fe311769",
+      "raw_bytes": 4122,
+      "public_sha256": "ce9791b908a3c8c05b7337689cf01cd13f4a0c63440cd3c8b4bce731e43fffc8",
+      "public_bytes": 4131
+    },
+    {
+      "file": "measurements.json",
+      "raw_retained": "<private-lane-prefix>/raw/measurements.json",
+      "raw_sha256": "e3a504bc1f84194ba49671da999c19660355f57a22e93f2c723121b0d352dfc8",
+      "raw_bytes": 48638,
+      "public_sha256": "014f915da6d7d304363ab48d17569689a48d4264636569915bdceab419a8f601",
+      "public_bytes": 48774
+    },
+    {
+      "file": "persistence.json",
+      "raw_retained": "<private-lane-prefix>/raw/persistence.json",
+      "raw_sha256": "550d7cbaa3b0e08a7f631a192cc04e36e91531a9d7c33c5dacaa58ee8f6029a8",
+      "raw_bytes": 2030,
+      "public_sha256": "e25cd08f18744a45feb8f7d59f43c8bc53e2f6a28dc3423ceab27d97e04c6045",
+      "public_bytes": 1800
+    },
+    {
+      "file": "receipt.json",
+      "raw_retained": "<private-lane-prefix>/raw/receipt.json",
+      "raw_sha256": "41d0febeae991c37e396d54db3ba902d3d7d111213fb430c0983abdfc98d90fd",
+      "raw_bytes": 7552,
+      "public_sha256": "818b3d371ae196797fcd261e43bbf9987116ff0cb1a34bdd600a2ecdb83ef5a3",
+      "public_bytes": 7560
+    },
+    {
+      "file": "attempts.json",
+      "raw_retained": "<private-lane-prefix>/raw/attempts.json",
+      "raw_sha256": "82dc92742ecd1f5cdc41cb6f8119faabb97a99bd8a3a6597fcfc80a1d9ee55e9",
+      "raw_bytes": 1552,
+      "public_sha256": "6094b63d08cb6d33a0d56790f5e83580125a349491f0efd75a9b7499446dfd12",
+      "public_bytes": 1554
+    },
+    {
+      "file": "REPORT.md",
+      "raw_retained": "<private-lane-prefix>/raw/REPORT.md",
+      "raw_sha256": "d812cb13d0e06b4718fd91275230af3a269e764cc1c0935a4cc065aec04cc8d9",
+      "raw_bytes": 9321,
+      "public_sha256": "6f86dbb7d2701b03dd823c3dc2841d78797ce740afa1148d827b701f52286c2a",
+      "public_bytes": 10737
+    },
+    {
+      "file": "mcpdo.json",
+      "raw_retained": "<private-lane-prefix>/mcpdo.json",
+      "raw_sha256": "c1a3327b760e99c8236dfbf4d141b5b74b4966adf9db138c66cdf399e1b96472",
+      "raw_bytes": 121,
+      "public_sha256": "c1a3327b760e99c8236dfbf4d141b5b74b4966adf9db138c66cdf399e1b96472",
+      "public_bytes": 121
+    },
+    {
+      "file": "mcporter.json",
+      "raw_retained": "<private-lane-prefix>/mcporter.json",
+      "raw_sha256": "88bde5b486f406283a62bcaa78705910ff0281f5cd59bdaa00634e7c0e3f7509",
+      "raw_bytes": 153,
+      "public_sha256": "88bde5b486f406283a62bcaa78705910ff0281f5cd59bdaa00634e7c0e3f7509",
+      "public_bytes": 153
+    }
+  ]
+}

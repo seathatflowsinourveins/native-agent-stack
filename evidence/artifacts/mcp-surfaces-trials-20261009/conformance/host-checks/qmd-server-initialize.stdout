@@ -1,0 +1,25 @@
+Running client scenario 'server-initialize' against server: http://127.0.0.1:21851/mcp
+Results saved to /home/example/code/native-agent-stack-ns2604-landscape-mcp/evidence/artifacts/mcp-surfaces-trials-20261009/conformance/host-checks/qmd-server-initialize/server-server-initialize-2026-10-09T05-30-06-116Z
+Checks:
+[90m2026-10-09T05:30:16.657Z[0m [server-initialize] [31mFAILURE[0m Server responds to initialize request with valid structure
+
+Test Results:
+Passed: 0/1, 1 failed, 0 warnings
+
+=== Failed Checks ===
+
+  - ServerInitialize: Server responds to initialize request with valid structure
+    Error: Failed to initialize: fetch failed
+
+Test basic server initialization handshake.
+
+[1mServer Implementation Requirements:[0m
+
+[1mEndpoint[0m: [2minitialize[0m
+
+[1mRequirements[0m:
+- Accept [2minitialize[0m request with client info and capabilities
+- Return valid initialize response with server info, protocol version, and capabilities
+- Accept [2minitialized[0m notification from client after handshake
+
+This test verifies the server can complete the two-phase initialization handshake successfully.

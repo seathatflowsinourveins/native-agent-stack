@@ -1,0 +1,27 @@
+{
+  "observation_date_utc": "2026-10-09",
+  "excluded_measurement_attempts": [
+    {
+      "command": "measure.py before asynchronous stdout drain correction",
+      "rc": 1,
+      "cause": "Measurement script sampled PSS before draining stdout, so native tools/list blocked on the pipe and hit the 40-second bound. Cleanup also initially expected an object where mcporter daemon status returns null when stopped.",
+      "correction": "Drain stdout/stderr with communicate while a separate sampler collects smaps_rollup. Accept the native null stopped-status value.",
+      "measurement_use": "Excluded; this was trial instrumentation failure, not an MCP client failure.",
+      "retained_log": "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/inspector/measurement-run.log"
+    }
+  ],
+  "native_argument_setup_observations": [
+    {
+      "command": "mcpdo --config <lane-config> servers/show trial-ai-memory with MCP_CATALOG_PATH also set",
+      "rc": 1,
+      "cause": "Vendor rejects combining read-only --config and writable catalog selection.",
+      "correction": "Use --config only, with MCP_STORAGE_DIR and private daemon directory for isolation."
+    },
+    {
+      "command": "mcp-inspector --cli --method tools/list --transport http --format json <URL>",
+      "rc": 1,
+      "cause": "Target after flags is not consumed as a target by the shipped CLI parser.",
+      "correction": "Verified mcp-inspector --cli <URL> --method tools/list --transport http --format json returns rc 0 on the same host."
+    }
+  ]
+}

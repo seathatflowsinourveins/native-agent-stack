@@ -1,0 +1,77 @@
+{
+  "generated_utc": "2026-10-09T05:39:06Z",
+  "scope": "Native named MCP connection retention, not HTTP session-token identity",
+  "endpoint": "http://127.0.0.1:29374/mcp",
+  "http_session_tokens_read": false,
+  "inspector_before": [
+    {
+      "name": "trial-ai-memory",
+      "connectedAt": 1791524347257,
+      "protocolEra": "legacy"
+    }
+  ],
+  "mcporter_before": {
+    "pid": 211346,
+    "servers": [
+      {
+        "name": "connection-01",
+        "connectionId": "connection-01",
+        "connectionGeneration": 1,
+        "connected": true
+      }
+    ]
+  },
+  "inspector_after": [
+    {
+      "name": "trial-ai-memory",
+      "connectedAt": 1791524347257,
+      "protocolEra": "legacy"
+    }
+  ],
+  "mcporter_after": {
+    "pid": 211346,
+    "servers": [
+      {
+        "name": "connection-01",
+        "connectionId": "connection-01",
+        "connectionGeneration": 1,
+        "connected": true
+      },
+      {
+        "name": "connection-02",
+        "connectionId": "connection-02",
+        "connectionGeneration": 1,
+        "connected": true
+      }
+    ]
+  },
+  "inspector_connection_unchanged": true,
+  "mcporter_connection_unchanged": false,
+  "inspector_after_repeat": [
+    {
+      "name": "trial-ai-memory",
+      "connectedAt": 1791524347257,
+      "protocolEra": "legacy"
+    }
+  ],
+  "mcporter_after_repeat": {
+    "pid": 211346,
+    "servers": [
+      {
+        "name": "connection-01",
+        "connectionId": "connection-01",
+        "connectionGeneration": 1,
+        "connected": true
+      },
+      {
+        "name": "connection-02",
+        "connectionId": "connection-02",
+        "connectionGeneration": 1,
+        "connected": true
+      }
+    ]
+  },
+  "inspector_warm_set_unchanged": true,
+  "mcporter_warm_set_unchanged": true,
+  "cleanup_verified": true
+}

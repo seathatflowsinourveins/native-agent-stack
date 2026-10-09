@@ -18296,6 +18296,11 @@
       "bytes": 9003
     },
     {
+      "path": "docs/decisions/2026-10-09-mcp-surfaces-trials.md",
+      "sha256": "958c1b81443d1a3041986672f0cf1c41c072339cc731e4acfd6cb43fcc9c4ac9",
+      "bytes": 9154
+    },
+    {
       "path": "docs/direct-results.md",
       "sha256": "12a511fee11f22c90b9b622701d5485be9c8247167102b5768d694244f939a5b",
       "bytes": 4022
@@ -37849,6 +37854,476 @@
       "path": "evidence/artifacts/macos-token-pins-20260926/verify_pins_fail_closed.py",
       "sha256": "16a90804f3246f7ed35269e50cebed99eda4860eba66864d142413b4264212ec",
       "bytes": 15432
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/README.md",
+      "sha256": "57eae1532d687587f11a03f6a0e5eb9f8e72052c9155afcb1a1553f5e7365673",
+      "bytes": 2009
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/RESULT.json",
+      "sha256": "82602df88dafacf261491382f8b07ced28008c88e447304763be64bc32532b35",
+      "bytes": 3469
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/client-checks/client-inspector-initialize-r2.json",
+      "sha256": "3e4534f52e26e0bf971d45206263d6db108ee560d3f60adf886d610db5b83801",
+      "bytes": 1813
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/client-checks/client-inspector-initialize-r2.stderr",
+      "sha256": "cccf67b57ba134f5e8c2e7248ae18fb274218bad5a2b8ecddb3e94798cbe44a0",
+      "bytes": 913
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/client-checks/client-inspector-initialize-r2.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/client-checks/client-inspector-initialize.json",
+      "sha256": "a0306458ba8d078b42a426aa01837a1d110ac6bd9fb78fb72d3233c0afbd5484",
+      "bytes": 1860
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/client-checks/client-inspector-initialize.stderr",
+      "sha256": "bbf323a9189377735d8fb214e2fa04c258b9f8d5ecc6402dbc47daa7e8c85b1b",
+      "bytes": 924
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/client-checks/client-inspector-initialize.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/client-checks/client-mcporter-initialize-r2.json",
+      "sha256": "3e3084bbbb4054f70c8d9f310ab62859c88a8c94e2ec7c5420e2310f40b3eaae",
+      "bytes": 1845
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/client-checks/client-mcporter-initialize-r2.stderr",
+      "sha256": "b9c655dfddc4b7c6671f78b91c0531064ef28a1ffdb60a2aeb5ffb5503913322",
+      "bytes": 948
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/client-checks/client-mcporter-initialize-r2.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/client-checks/client-mcporter-initialize.json",
+      "sha256": "9ba0497a5ae9b87ece31425a8929c8fd4a9889581566c9201a9c5f66f6f4c9bd",
+      "bytes": 1821
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/client-checks/client-mcporter-initialize.stderr",
+      "sha256": "30b2091941415b1782c377c17883ccd60a57c8bc288f4cbce8869eb5da6ffcc4",
+      "bytes": 1626
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/client-checks/client-mcporter-initialize.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/client-checks/inspector-r2/initialize-2026-10-09T05-33-04-182Z/checks.json",
+      "sha256": "d829add4e95a67a31a3438e8ad1a4377f9b90e31d350a0d6ef8c8197bff2f479",
+      "bytes": 1056
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/client-checks/inspector-r2/initialize-2026-10-09T05-33-04-182Z/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/client-checks/inspector-r2/initialize-2026-10-09T05-33-04-182Z/stdout.txt",
+      "sha256": "ed791c3fcc47bf7af0a50752e21343a02c01f11fd10ec2be169406f1a918e86a",
+      "bytes": 24
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/client-checks/inspector/initialize-2026-10-09T05-31-38-128Z/checks.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "bytes": 2
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/client-checks/inspector/initialize-2026-10-09T05-31-38-128Z/stderr.txt",
+      "sha256": "7248668e4c8580539459c8c36527be1629e51cee10cb2985ec38a2c16131e78e",
+      "bytes": 98
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/client-checks/inspector/initialize-2026-10-09T05-31-38-128Z/stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/client-checks/mcporter-r2/initialize-2026-10-09T05-33-02-968Z/checks.json",
+      "sha256": "0d1394d2543245ae402273a6b472c34a85dda1023771b84573d62e81259163d4",
+      "bytes": 1051
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/client-checks/mcporter-r2/initialize-2026-10-09T05-33-02-968Z/stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/client-checks/mcporter-r2/initialize-2026-10-09T05-33-02-968Z/stdout.txt",
+      "sha256": "18187a35f8bf683e184351e8ba10b37282a443290a6ff324c7f9e3c21df0bf3c",
+      "bytes": 174
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/client-checks/mcporter/initialize-2026-10-09T05-31-37-380Z/checks.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "bytes": 2
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/client-checks/mcporter/initialize-2026-10-09T05-31-37-380Z/stderr.txt",
+      "sha256": "a38f794f469a7c1f397a0bc5aa08f97c1bcd19c73fce0a9823d750e430632a8f",
+      "bytes": 839
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/client-checks/mcporter/initialize-2026-10-09T05-31-37-380Z/stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/host-ai-memory/server-server-initialize-2026-10-09T05-25-57-595Z/checks.json",
+      "sha256": "b14735004422c6b38c0246a4446dc508fab3de0ffabfccb3b956d3cdce00b78a",
+      "bytes": 505
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/host-checks/ai-memory-ping.json",
+      "sha256": "b84c4a4c36b491d3d8fe9780e4dc4479612fd0f756d3ce98c796340c53c51b28",
+      "bytes": 1702
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/host-checks/ai-memory-ping.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/host-checks/ai-memory-ping.stdout",
+      "sha256": "8f4d749fae067777547d93849b2f7928afde1e6340aaaed35afdb59124e685c8",
+      "bytes": 422
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/host-checks/ai-memory-ping/server-ping-2026-10-09T05-30-05-024Z/checks.json",
+      "sha256": "385cbadc1184796514181e0e995e75caf6a77f72e37cb69efd418d6043209e72",
+      "bytes": 384
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/host-checks/ai-memory-server-initialize.json",
+      "sha256": "0992de0a97a9e2bedefe6f02bc0edac5e82b3728a0e820be0f707cd998a74fef",
+      "bytes": 1767
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/host-checks/ai-memory-server-initialize.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/host-checks/ai-memory-server-initialize.stdout",
+      "sha256": "f8d02ec3a1bdea8a814a0bc8f6fb0b0af8e65fb6af29975ba6d9ad2fb3264efd",
+      "bytes": 500
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/host-checks/ai-memory-server-initialize/server-server-initialize-2026-10-09T05-30-04-509Z/checks.json",
+      "sha256": "c71b9bb58d6f29e526ab83ddadeabe83f1959217c1cce51940e05b8c20ab7a5a",
+      "bytes": 505
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/host-checks/ai-memory-tools-list.json",
+      "sha256": "39120cef2c57bfa77fef59e1cbe18e3c9deed3a4fd7344efdd3fc9600343e12d",
+      "bytes": 1733
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/host-checks/ai-memory-tools-list.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/host-checks/ai-memory-tools-list.stdout",
+      "sha256": "64a879f4f66490703f8d22158b7af3e21148a2820a4e89e90a0b722f43b3f67c",
+      "bytes": 463
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/host-checks/ai-memory-tools-list/server-tools-list-2026-10-09T05-30-05-550Z/checks.json",
+      "sha256": "caf732bb8d497cf4f83aa634ef3ebcb45d63e9c7fc3f8850f6a01b41f9e8be1e",
+      "bytes": 1145
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/host-checks/hindsight-ping.json",
+      "sha256": "5fff68fa10d20ad4b60ae83817cb427eb6218e90822134150c96ae5dd2fe3fc1",
+      "bytes": 1719
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/host-checks/hindsight-ping.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/host-checks/hindsight-ping.stdout",
+      "sha256": "a82f51026696cf4f8139982a5447e18e9a2a31a40a6efc20a63258010a0495fa",
+      "bytes": 439
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/host-checks/hindsight-ping/server-ping-2026-10-09T05-30-39-527Z/checks.json",
+      "sha256": "8b8625fc8f66181bfd9bf15f8d3ebf856bf27d1fff2eed58f77fc6356f36424d",
+      "bytes": 384
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/host-checks/hindsight-server-initialize.json",
+      "sha256": "205591e1e6a8e0d58436cf8e38093a927b0ee79cbc82d5df6213cee47c923592",
+      "bytes": 1784
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/host-checks/hindsight-server-initialize.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/host-checks/hindsight-server-initialize.stdout",
+      "sha256": "f5a9f16184ef12c08dc03d1c7ae2db78a78e366c5fe3d4d7dac3209d999b1308",
+      "bytes": 517
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/host-checks/hindsight-server-initialize/server-server-initialize-2026-10-09T05-30-39-005Z/checks.json",
+      "sha256": "8b6860309344f40a1b5e20c7417c54fb24d22d48ef7e82d34cf237d69db04c9c",
+      "bytes": 522
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/host-checks/hindsight-tools-list.json",
+      "sha256": "7102d53e9b0c0dce8077d0a9f3ccd8da8cbb84d82f0c9e0a29a71fb2be31f659",
+      "bytes": 1749
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/host-checks/hindsight-tools-list.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/host-checks/hindsight-tools-list.stdout",
+      "sha256": "94d0e6c3eb369cfa7233f98eef7a52965a6e45c228dbc6fa18055838b185b70f",
+      "bytes": 480
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/host-checks/hindsight-tools-list/server-tools-list-2026-10-09T05-30-40-046Z/checks.json",
+      "sha256": "f544e1e994b05ff5b6e6a08c508f3535a0aa5bcd943d2780004b918d072971bb",
+      "bytes": 813
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/host-checks/qmd-ping.json",
+      "sha256": "4dc5b49f852814c54f1651adf038def9589f708ac4e623196a8fda3cf7835a5b",
+      "bytes": 1682
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/host-checks/qmd-ping.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/host-checks/qmd-ping.stdout",
+      "sha256": "4be3270ba354e20a126ff9de85aa6d1d592676e8da4626f16e6328733790a00e",
+      "bytes": 1108
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/host-checks/qmd-ping/server-ping-2026-10-09T05-30-17-074Z/checks.json",
+      "sha256": "5b0893ccd439e88cc54e275aa7a0328674d6c5ae23f30ea3e219d9d156a7d4e1",
+      "bytes": 385
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/host-checks/qmd-server-initialize.json",
+      "sha256": "06308fc600ced7bb2c439d4997404abc8e6c9839494de77e11ad219495924145",
+      "bytes": 1748
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/host-checks/qmd-server-initialize.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/host-checks/qmd-server-initialize.stdout",
+      "sha256": "b2a8884ef22a95a37b24056c3e996468c625fe4b07196b4ff186c8838dac3f4d",
+      "bytes": 1121
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/host-checks/qmd-server-initialize/server-server-initialize-2026-10-09T05-30-06-116Z/checks.json",
+      "sha256": "8425d88fa3a6e8b919688e8ea45954cd325d84557bea339bc6f4c564494fee87",
+      "bytes": 466
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/host-checks/qmd-tools-list.json",
+      "sha256": "e937e0bec36e2c55108fb225ea165242ebfb7646ab9ebc646fd83ef3f64c716a",
+      "bytes": 1711
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/host-checks/qmd-tools-list.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/host-checks/qmd-tools-list.stdout",
+      "sha256": "d10991aabe56cd722ce7aaa1665b0c1e00050227c2a3ba0271480956a1ad6646",
+      "bytes": 886
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/host-checks/qmd-tools-list/server-tools-list-2026-10-09T05-30-28-040Z/checks.json",
+      "sha256": "e799a2b9aa7a1ba0af649392659af85f5a1b5bc1d85c7b799343e40500595283",
+      "bytes": 425
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/provenance.json",
+      "sha256": "d739a00bf38013eb27c86652f29800a5b88232032ab8e2f2be408957b933f6d6",
+      "bytes": 5042
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/quality/unsupported-spec-filter.json",
+      "sha256": "17f5cb00124eb78afc2ed881ad331d34c9dab91b353237e50a05a24e3c4c8544",
+      "bytes": 1569
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/quality/unsupported-spec-filter.stderr",
+      "sha256": "bdf1d2fad4941ee996d061361977c5d4ae21e5a8530e801437cd05f84e5f7aa9",
+      "bytes": 102
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/quality/unsupported-spec-filter.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/quality/upstream-build.json",
+      "sha256": "12e91d8c59b17d40f99e7596dee27175e8d293e97051f5d0fff8f51cc38d8185",
+      "bytes": 1337
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/quality/upstream-build.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/quality/upstream-build.stdout",
+      "sha256": "8df8322ef437de8088db2e08d102c7a5f57383470979f07fdd49987a467a66db",
+      "bytes": 421
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/quality/upstream-check.json",
+      "sha256": "bd612ee586aef1208e41c46213ecedbabd81b4fc434445b1ccfcda9680ebc08b",
+      "bytes": 1338
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/quality/upstream-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/quality/upstream-check.stdout",
+      "sha256": "270f0836a02f2f2b77accde0810772c4cd1455efef67508c912696d802561821",
+      "bytes": 320
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/quality/upstream-pin-ci.json",
+      "sha256": "9bef1e312e5ee2a6ae536796e8e860e23398fe9b05c80add7550fc818fe9ba53",
+      "bytes": 1540
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/quality/upstream-pin-ci.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/quality/upstream-pin-ci.stdout",
+      "sha256": "1da5a9b348ff913f9c34356b6e4c8e385d9e34c3e3350d7bd62c0acfe38b719a",
+      "bytes": 1099
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/quality/upstream-tests.json",
+      "sha256": "0f8555058577dce6668f018efd4daf8f78c576efb6dda763880aadab02fb6036",
+      "bytes": 1501
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/quality/upstream-tests.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/quality/upstream-tests.stdout",
+      "sha256": "85dcbfcb2e90c6984e0e9bd66864e5dd952b86c3efd995409478ba1ef71b7c6e",
+      "bytes": 431
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/redaction.json",
+      "sha256": "4fb9f81d80f8ae56bcf1d406013690fb953c08015a437d21503eb5a2c4bfa110",
+      "bytes": 9137
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/fresh-session/prompt.md",
+      "sha256": "c2699f04c4a1f908777dc575dd0d257e57a4c6088bf79d3478f05f1b98e59287",
+      "bytes": 479
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/fresh-session/receipt.json",
+      "sha256": "6fc17b234660250d59e14921dfd6b740a04a92a997cbfe6b21ec147a2507e7f4",
+      "bytes": 1609
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/fresh-session/tool-calls.json",
+      "sha256": "f4eb932809ec85f02290174c751a561a319eb1e9a399538de297389c67f238dc",
+      "bytes": 4946
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/inspector/REPORT.md",
+      "sha256": "6f86dbb7d2701b03dd823c3dc2841d78797ce740afa1148d827b701f52286c2a",
+      "bytes": 10737
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/inspector/attempts.json",
+      "sha256": "6094b63d08cb6d33a0d56790f5e83580125a349491f0efd75a9b7499446dfd12",
+      "bytes": 1554
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/inspector/mcpdo.json",
+      "sha256": "c1a3327b760e99c8236dfbf4d141b5b74b4966adf9db138c66cdf399e1b96472",
+      "bytes": 121
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/inspector/mcporter.json",
+      "sha256": "88bde5b486f406283a62bcaa78705910ff0281f5cd59bdaa00634e7c0e3f7509",
+      "bytes": 153
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/inspector/measure.py",
+      "sha256": "dc5ea79f75f639374a07e280a368208024f37455d0dd5f773af833c7885829b5",
+      "bytes": 10920
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/inspector/measurements.json",
+      "sha256": "014f915da6d7d304363ab48d17569689a48d4264636569915bdceab419a8f601",
+      "bytes": 48774
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/inspector/persistence.json",
+      "sha256": "e25cd08f18744a45feb8f7d59f43c8bc53e2f6a28dc3423ceab27d97e04c6045",
+      "bytes": 1800
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/inspector/persistence.py",
+      "sha256": "ce9791b908a3c8c05b7337689cf01cd13f4a0c63440cd3c8b4bce731e43fffc8",
+      "bytes": 4131
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/inspector/receipt.json",
+      "sha256": "818b3d371ae196797fcd261e43bbf9987116ff0cb1a34bdd600a2ecdb83ef5a3",
+      "bytes": 7560
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/inspector/redaction.json",
+      "sha256": "c652db4386c4caee1a06a5fb5c43882ef2b3eda7815e6ea445a77191e08d8e77",
+      "bytes": 3813
+    },
+    {
+      "path": "evidence/artifacts/mcp-surfaces-trials-20261009/run_native.py",
+      "sha256": "6b24f50d7ea5cb87d6d3ee04b9f8a1333783ef80178117286e3b6904b61f7f51",
+      "bytes": 4238
     },
     {
       "path": "evidence/artifacts/mcporter-0141-daemon-correction-20260926/README.md",

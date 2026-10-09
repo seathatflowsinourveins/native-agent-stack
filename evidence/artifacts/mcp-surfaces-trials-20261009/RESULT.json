@@ -1,0 +1,70 @@
+{
+  "schema": "mcp-surfaces-trial-result/1",
+  "date_utc": "2026-10-09",
+  "decision_record": "docs/decisions/2026-10-09-mcp-surfaces-trials.md",
+  "discovery_trigger": {
+    "logical_path": "research/api-surfaces-20261008/FINAL.md",
+    "captured_utc": "2026-10-09T05:20:37Z",
+    "sha256": "77e17817d8ecc8e53329ac32303ece8dc4e86eaf67cba1e3ae36196aa328a109",
+    "boundary": "Discovery input. Current trial claims are independently tied to primary vendor pins and native measurements."
+  },
+  "conformance": {
+    "version": "0.1.16",
+    "commit": "21a9a2febd7100d7c17ac1021ee7f2ed9f66a1e0",
+    "verdict": "PASS_SCOPED_2025-11-25_TRIAL",
+    "host_http_registrations_tested": 2,
+    "role_host_registrations": 6,
+    "host_http_checks_passed": 6,
+    "host_stdio_registrations_untested": 4,
+    "unavailable_proposed_qmd_http_probes": 3,
+    "client_final_assertions_passed": 2,
+    "client_final_informational_results": 2,
+    "client_initial_zero_check_setup_failures": 2,
+    "source_targeted_test_files_passed": 3,
+    "source_targeted_tests_passed": 29,
+    "unsupported_protocol_filter": "2026-07-28",
+    "unsupported_filter_rc": 1,
+    "frozen_2026-07-28_revision_verdict": "NOT_ESTABLISHED"
+  },
+  "inspector_vs_mcporter": {
+    "verdict": "KEEP_MCPORTER_SCOPED",
+    "candidate": "modelcontextprotocol/inspector@2.10.1",
+    "candidate_commit": "0d2bc1d91ce177ea8d497ee3efe91bcc59e40a1c",
+    "baseline": "openclaw/mcporter@0.14.2",
+    "baseline_commit": "aa0f55f9bffcde9d2070c86145f37d4dd3525f6c",
+    "endpoint": "http://127.0.0.1:29374/mcp",
+    "tasks": ["tools/list", "memory_status {}"],
+    "timed_operations_rc_zero": 42,
+    "discovery_schema_comparisons_equal": 11,
+    "tools_returned": 23,
+    "warm_pairs": 20,
+    "warm_pairs_exactly_equal": 18,
+    "warm_status_pairs_differing_only_live_observations_counter": 2,
+    "pss_scope": "Native command plus arm-owned private daemon; shared host server excluded",
+    "private_daemons_stopped_and_verified": true,
+    "cold_sample_pairs": 1,
+    "limits": "Single host and two read-only tasks. HTTP session-token identity untested. Timing and PSS are pilot observations."
+  },
+  "adoption": {
+    "one_proposed_default": "mcporter 0.14.2",
+    "proposal_basis": "Lower measured PSS and cold discovery cost under the host memory gate; Inspector's faster warm latency and experimental upstream status remain explicit.",
+    "conformance": "TRIAL",
+    "inspector": "TRIAL",
+    "adopt_now": [],
+    "install_check_inverse_evidence": "RECORDED_AND_VERIFIED",
+    "candidate_fresh_proof": "NOT_PROVEN",
+    "fresh_observation_bound_seconds": 180,
+    "fresh_organically_reached": "mcporter",
+    "fresh_task_completed": false,
+    "open_gates": ["candidate native routing and successful fresh proof", "dated conformance revision boundary", "independent designated reads", "required CI", "pre-cue at pushed head", "CC cue and owner decisions"],
+    "catalog_disposition_owner": "grand-catalog"
+  },
+  "evidence_classes": {
+    "actual_host_http_checks": "native_proven",
+    "same_task_cli_pss_and_latency": "native_proven",
+    "client_checks_against_vendor_reference_scenario": "local_integration",
+    "upstream_release_and_ci_inspection": "source_review",
+    "source_unit_tests": "local_integration"
+  },
+  "publication_boundary": "Public captures are sanitized. Separate redaction maps and per-log raw/public digests preserve custody without publishing personal paths or session identifiers."
+}

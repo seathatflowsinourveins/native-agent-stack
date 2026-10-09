@@ -1,0 +1,1545 @@
+{
+  "generated_utc": "2026-10-09T05:33:34Z",
+  "endpoint": "http://127.0.0.1:29374/mcp",
+  "inspector": "2.10.1",
+  "mcporter": "0.14.2",
+  "inspector_protocol_era": "legacy",
+  "tasks": [
+    "tools/list",
+    "tools/call memory_status {}"
+  ],
+  "pss_source": "/proc/<pid>/smaps_rollup Pss (KiB)",
+  "pss_scope": "Native CLI process tree plus this arm's private persistent daemon; shared server excluded",
+  "sample_period_seconds": 0.025,
+  "timing_limit": "CLI latency includes polling and PSS sampling overhead, identical in both arms",
+  "cleanup": [
+    {
+      "phase": "before",
+      "arm": "inspector",
+      "argv": [
+        "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/inspector/install/bin/mcpdo",
+        "--format",
+        "json",
+        "daemon",
+        "stop"
+      ],
+      "rc": 0,
+      "elapsed_ms": 297.482,
+      "stdout_sha256": "4adb2acbbeeb9e2882a179711cc5e5f3d1a74598a2cefef8fad58e6451abfd83",
+      "stdout_bytes": 64,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0,
+      "peak_client_plus_daemon_pss_kib": 44485,
+      "pss_sample_count": 4
+    },
+    {
+      "phase": "before",
+      "arm": "mcporter",
+      "argv": [
+        "/home/example/.local/share/mise/installs/node/24.21.0/bin/mcporter",
+        "--config",
+        "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/inspector/mcporter.json",
+        "daemon",
+        "stop"
+      ],
+      "rc": 0,
+      "elapsed_ms": 288.671,
+      "stdout_sha256": "d7791c58499cc72fdded0b839da7a27920fd95360ac9efa10ae0f58f14ee9904",
+      "stdout_bytes": 36,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0,
+      "peak_client_plus_daemon_pss_kib": 42779,
+      "pss_sample_count": 4
+    },
+    {
+      "phase": "after",
+      "arm": "inspector",
+      "stop_rc": 0,
+      "status_rc": 0,
+      "daemon_alive": false
+    },
+    {
+      "phase": "after",
+      "arm": "mcporter",
+      "stop_rc": 0,
+      "status_rc": 0,
+      "daemon_alive": false
+    }
+  ],
+  "persistent_pss": {
+    "inspector": {
+      "total_kib": 68497,
+      "processes": [
+        {
+          "pid": 51854,
+          "pss_kib": 68497
+        }
+      ]
+    },
+    "mcporter": {
+      "total_kib": 59581,
+      "processes": [
+        {
+          "pid": 51997,
+          "pss_kib": 59581
+        }
+      ]
+    },
+    "inspector_after": {
+      "total_kib": 82372,
+      "processes": [
+        {
+          "pid": 51854,
+          "pss_kib": 82372
+        }
+      ]
+    },
+    "mcporter_after": {
+      "total_kib": 74424,
+      "processes": [
+        {
+          "pid": 51997,
+          "pss_kib": 74424
+        }
+      ]
+    }
+  },
+  "rows": [
+    {
+      "phase": "cold",
+      "arm": "inspector",
+      "task": "tools/list",
+      "stages": [
+        {
+          "argv": [
+            "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/inspector/install/bin/mcpdo",
+            "--format",
+            "json",
+            "--config",
+            "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/inspector/mcpdo.json",
+            "connect",
+            "trial-ai-memory"
+          ],
+          "rc": 0,
+          "elapsed_ms": 713.013,
+          "stdout_sha256": "6605125e9fdc1e4524e5a1c4bc6964abd27320d89f66510d1a26c7b6d5228742",
+          "stdout_bytes": 193,
+          "stderr_sha256": "23a199a8cd924a8c2a53c4ef8f858f26cf4363885d0f05573b3dace33ff1e967",
+          "stderr_bytes": 911,
+          "peak_client_plus_daemon_pss_kib": 108433,
+          "pss_sample_count": 11
+        },
+        {
+          "argv": [
+            "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/inspector/install/bin/mcpdo",
+            "--format",
+            "json",
+            "--connection",
+            "trial-ai-memory",
+            "tools/list"
+          ],
+          "rc": 0,
+          "elapsed_ms": 359.517,
+          "stdout_sha256": "f8bb2d9b233b8fc5fc41e34fd36eec6a1c36e0aa76c7ecb82c8593eaad778904",
+          "stdout_bytes": 78200,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_bytes": 0,
+          "peak_client_plus_daemon_pss_kib": 51563,
+          "pss_sample_count": 5
+        }
+      ],
+      "elapsed_ms": 1072.53,
+      "normalized": {
+        "tool_count": 23,
+        "name_input_schema_sha256": "a20a2817cca685b284b54a9bdde6b46f963972aa5dd4e80fa7b2e7b455f4092f"
+      }
+    },
+    {
+      "phase": "cold",
+      "arm": "mcporter",
+      "task": "tools/list",
+      "stages": [
+        {
+          "argv": [
+            "/home/example/.local/share/mise/installs/node/24.21.0/bin/mcporter",
+            "--config",
+            "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/inspector/mcporter.json",
+            "list",
+            "trial-ai-memory",
+            "--schema",
+            "--json"
+          ],
+          "rc": 0,
+          "elapsed_ms": 842.592,
+          "stdout_sha256": "4bf1959012383d68f170f53ad6d6662e70f9d175249a43c9bffacfea9e80aa78",
+          "stdout_bytes": 129737,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_bytes": 0,
+          "peak_client_plus_daemon_pss_kib": 112865,
+          "pss_sample_count": 13
+        }
+      ],
+      "elapsed_ms": 842.592,
+      "normalized": {
+        "tool_count": 23,
+        "name_input_schema_sha256": "a20a2817cca685b284b54a9bdde6b46f963972aa5dd4e80fa7b2e7b455f4092f"
+      }
+    },
+    {
+      "phase": "warm",
+      "repetition": 0,
+      "arm": "inspector",
+      "task": "tools/list",
+      "argv": [
+        "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/inspector/install/bin/mcpdo",
+        "--format",
+        "json",
+        "--connection",
+        "trial-ai-memory",
+        "tools/list"
+      ],
+      "rc": 0,
+      "elapsed_ms": 301.755,
+      "stdout_sha256": "f8bb2d9b233b8fc5fc41e34fd36eec6a1c36e0aa76c7ecb82c8593eaad778904",
+      "stdout_bytes": 78200,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0,
+      "peak_client_plus_daemon_pss_kib": 119676,
+      "pss_sample_count": 3,
+      "normalized": {
+        "tool_count": 23,
+        "name_input_schema_sha256": "a20a2817cca685b284b54a9bdde6b46f963972aa5dd4e80fa7b2e7b455f4092f"
+      }
+    },
+    {
+      "phase": "warm",
+      "repetition": 0,
+      "arm": "mcporter",
+      "task": "tools/list",
+      "argv": [
+        "/home/example/.local/share/mise/installs/node/24.21.0/bin/mcporter",
+        "--config",
+        "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/inspector/mcporter.json",
+        "list",
+        "trial-ai-memory",
+        "--schema",
+        "--json"
+      ],
+      "rc": 0,
+      "elapsed_ms": 433.895,
+      "stdout_sha256": "4d5c9a7a37bf4cd9b1b6935ef49571a100e33f124559c6b98ca7705d802b13c2",
+      "stdout_bytes": 129736,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0,
+      "peak_client_plus_daemon_pss_kib": 112389,
+      "pss_sample_count": 4,
+      "normalized": {
+        "tool_count": 23,
+        "name_input_schema_sha256": "a20a2817cca685b284b54a9bdde6b46f963972aa5dd4e80fa7b2e7b455f4092f"
+      }
+    },
+    {
+      "phase": "warm",
+      "repetition": 0,
+      "arm": "inspector",
+      "task": "memory_status",
+      "argv": [
+        "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/inspector/install/bin/mcpdo",
+        "--format",
+        "json",
+        "--connection",
+        "trial-ai-memory",
+        "tools/call",
+        "memory_status",
+        "{}"
+      ],
+      "rc": 0,
+      "elapsed_ms": 503.317,
+      "stdout_sha256": "84bfef01e62b9b8115ba4be6d03861900edf27f286e4d9e778cf3f8a0d954b2b",
+      "stdout_bytes": 414,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0,
+      "peak_client_plus_daemon_pss_kib": 120204,
+      "pss_sample_count": 5,
+      "normalized": {
+        "counts": {
+          "pages_latest": 211,
+          "pages_all": 635,
+          "sessions": 362,
+          "observations": 661528,
+          "evidence_rows": 209
+        },
+        "counts_sha256": "2758dd218ec8760d49d257b865801289d3420e898d84831152d6b8b1508e1e28"
+      }
+    },
+    {
+      "phase": "warm",
+      "repetition": 0,
+      "arm": "mcporter",
+      "task": "memory_status",
+      "argv": [
+        "/home/example/.local/share/mise/installs/node/24.21.0/bin/mcporter",
+        "--config",
+        "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/inspector/mcporter.json",
+        "call",
+        "trial-ai-memory.memory_status",
+        "--args",
+        "{}",
+        "--output",
+        "json"
+      ],
+      "rc": 0,
+      "elapsed_ms": 490.39,
+      "stdout_sha256": "032fd3312ef9d36638f6442437f6bb1c4831c93d0de82c8760d567a4c87b1a35",
+      "stdout_bytes": 282,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0,
+      "peak_client_plus_daemon_pss_kib": 107467,
+      "pss_sample_count": 5,
+      "normalized": {
+        "counts": {
+          "pages_latest": 211,
+          "pages_all": 635,
+          "sessions": 362,
+          "observations": 661535,
+          "evidence_rows": 209
+        },
+        "counts_sha256": "8ba44cce3f01456732d4f14aa885ad7fef04065ed51730bbf9efa9b168bf0514"
+      }
+    },
+    {
+      "phase": "warm",
+      "repetition": 1,
+      "arm": "mcporter",
+      "task": "tools/list",
+      "argv": [
+        "/home/example/.local/share/mise/installs/node/24.21.0/bin/mcporter",
+        "--config",
+        "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/inspector/mcporter.json",
+        "list",
+        "trial-ai-memory",
+        "--schema",
+        "--json"
+      ],
+      "rc": 0,
+      "elapsed_ms": 523.698,
+      "stdout_sha256": "aac1d49de63f788979f46305f85c03b972cc4c20c6326a738d9d3c5ff643bf9e",
+      "stdout_bytes": 129736,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0,
+      "peak_client_plus_daemon_pss_kib": 113766,
+      "pss_sample_count": 5,
+      "normalized": {
+        "tool_count": 23,
+        "name_input_schema_sha256": "a20a2817cca685b284b54a9bdde6b46f963972aa5dd4e80fa7b2e7b455f4092f"
+      }
+    },
+    {
+      "phase": "warm",
+      "repetition": 1,
+      "arm": "inspector",
+      "task": "tools/list",
+      "argv": [
+        "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/inspector/install/bin/mcpdo",
+        "--format",
+        "json",
+        "--connection",
+        "trial-ai-memory",
+        "tools/list"
+      ],
+      "rc": 0,
+      "elapsed_ms": 308.101,
+      "stdout_sha256": "f8bb2d9b233b8fc5fc41e34fd36eec6a1c36e0aa76c7ecb82c8593eaad778904",
+      "stdout_bytes": 78200,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0,
+      "peak_client_plus_daemon_pss_kib": 120280,
+      "pss_sample_count": 3,
+      "normalized": {
+        "tool_count": 23,
+        "name_input_schema_sha256": "a20a2817cca685b284b54a9bdde6b46f963972aa5dd4e80fa7b2e7b455f4092f"
+      }
+    },
+    {
+      "phase": "warm",
+      "repetition": 1,
+      "arm": "mcporter",
+      "task": "memory_status",
+      "argv": [
+        "/home/example/.local/share/mise/installs/node/24.21.0/bin/mcporter",
+        "--config",
+        "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/inspector/mcporter.json",
+        "call",
+        "trial-ai-memory.memory_status",
+        "--args",
+        "{}",
+        "--output",
+        "json"
+      ],
+      "rc": 0,
+      "elapsed_ms": 489.518,
+      "stdout_sha256": "032fd3312ef9d36638f6442437f6bb1c4831c93d0de82c8760d567a4c87b1a35",
+      "stdout_bytes": 282,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0,
+      "peak_client_plus_daemon_pss_kib": 109672,
+      "pss_sample_count": 5,
+      "normalized": {
+        "counts": {
+          "pages_latest": 211,
+          "pages_all": 635,
+          "sessions": 362,
+          "observations": 661535,
+          "evidence_rows": 209
+        },
+        "counts_sha256": "8ba44cce3f01456732d4f14aa885ad7fef04065ed51730bbf9efa9b168bf0514"
+      }
+    },
+    {
+      "phase": "warm",
+      "repetition": 1,
+      "arm": "inspector",
+      "task": "memory_status",
+      "argv": [
+        "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/inspector/install/bin/mcpdo",
+        "--format",
+        "json",
+        "--connection",
+        "trial-ai-memory",
+        "tools/call",
+        "memory_status",
+        "{}"
+      ],
+      "rc": 0,
+      "elapsed_ms": 387.123,
+      "stdout_sha256": "1b32c5c98e64466c94cededccd7a81408330887d4e9d80d9c1418ccb61b01920",
+      "stdout_bytes": 414,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0,
+      "peak_client_plus_daemon_pss_kib": 121406,
+      "pss_sample_count": 4,
+      "normalized": {
+        "counts": {
+          "pages_latest": 211,
+          "pages_all": 635,
+          "sessions": 362,
+          "observations": 661535,
+          "evidence_rows": 209
+        },
+        "counts_sha256": "8ba44cce3f01456732d4f14aa885ad7fef04065ed51730bbf9efa9b168bf0514"
+      }
+    },
+    {
+      "phase": "warm",
+      "repetition": 2,
+      "arm": "inspector",
+      "task": "tools/list",
+      "argv": [
+        "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/inspector/install/bin/mcpdo",
+        "--format",
+        "json",
+        "--connection",
+        "trial-ai-memory",
+        "tools/list"
+      ],
+      "rc": 0,
+      "elapsed_ms": 296.905,
+      "stdout_sha256": "f8bb2d9b233b8fc5fc41e34fd36eec6a1c36e0aa76c7ecb82c8593eaad778904",
+      "stdout_bytes": 78200,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0,
+      "peak_client_plus_daemon_pss_kib": 124695,
+      "pss_sample_count": 3,
+      "normalized": {
+        "tool_count": 23,
+        "name_input_schema_sha256": "a20a2817cca685b284b54a9bdde6b46f963972aa5dd4e80fa7b2e7b455f4092f"
+      }
+    },
+    {
+      "phase": "warm",
+      "repetition": 2,
+      "arm": "mcporter",
+      "task": "tools/list",
+      "argv": [
+        "/home/example/.local/share/mise/installs/node/24.21.0/bin/mcporter",
+        "--config",
+        "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/inspector/mcporter.json",
+        "list",
+        "trial-ai-memory",
+        "--schema",
+        "--json"
+      ],
+      "rc": 0,
+      "elapsed_ms": 427.032,
+      "stdout_sha256": "4d5c9a7a37bf4cd9b1b6935ef49571a100e33f124559c6b98ca7705d802b13c2",
+      "stdout_bytes": 129736,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0,
+      "peak_client_plus_daemon_pss_kib": 115525,
+      "pss_sample_count": 4,
+      "normalized": {
+        "tool_count": 23,
+        "name_input_schema_sha256": "a20a2817cca685b284b54a9bdde6b46f963972aa5dd4e80fa7b2e7b455f4092f"
+      }
+    },
+    {
+      "phase": "warm",
+      "repetition": 2,
+      "arm": "inspector",
+      "task": "memory_status",
+      "argv": [
+        "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/inspector/install/bin/mcpdo",
+        "--format",
+        "json",
+        "--connection",
+        "trial-ai-memory",
+        "tools/call",
+        "memory_status",
+        "{}"
+      ],
+      "rc": 0,
+      "elapsed_ms": 401.72,
+      "stdout_sha256": "1b32c5c98e64466c94cededccd7a81408330887d4e9d80d9c1418ccb61b01920",
+      "stdout_bytes": 414,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0,
+      "peak_client_plus_daemon_pss_kib": 124530,
+      "pss_sample_count": 4,
+      "normalized": {
+        "counts": {
+          "pages_latest": 211,
+          "pages_all": 635,
+          "sessions": 362,
+          "observations": 661535,
+          "evidence_rows": 209
+        },
+        "counts_sha256": "8ba44cce3f01456732d4f14aa885ad7fef04065ed51730bbf9efa9b168bf0514"
+      }
+    },
+    {
+      "phase": "warm",
+      "repetition": 2,
+      "arm": "mcporter",
+      "task": "memory_status",
+      "argv": [
+        "/home/example/.local/share/mise/installs/node/24.21.0/bin/mcporter",
+        "--config",
+        "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/inspector/mcporter.json",
+        "call",
+        "trial-ai-memory.memory_status",
+        "--args",
+        "{}",
+        "--output",
+        "json"
+      ],
+      "rc": 0,
+      "elapsed_ms": 530.07,
+      "stdout_sha256": "032fd3312ef9d36638f6442437f6bb1c4831c93d0de82c8760d567a4c87b1a35",
+      "stdout_bytes": 282,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0,
+      "peak_client_plus_daemon_pss_kib": 112017,
+      "pss_sample_count": 5,
+      "normalized": {
+        "counts": {
+          "pages_latest": 211,
+          "pages_all": 635,
+          "sessions": 362,
+          "observations": 661535,
+          "evidence_rows": 209
+        },
+        "counts_sha256": "8ba44cce3f01456732d4f14aa885ad7fef04065ed51730bbf9efa9b168bf0514"
+      }
+    },
+    {
+      "phase": "warm",
+      "repetition": 3,
+      "arm": "mcporter",
+      "task": "tools/list",
+      "argv": [
+        "/home/example/.local/share/mise/installs/node/24.21.0/bin/mcporter",
+        "--config",
+        "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/inspector/mcporter.json",
+        "list",
+        "trial-ai-memory",
+        "--schema",
+        "--json"
+      ],
+      "rc": 0,
+      "elapsed_ms": 510.16,
+      "stdout_sha256": "057e9e447e005d1492e6472f62d4026e4d9c63a71ed3db2b90b6573acefcb303",
+      "stdout_bytes": 129736,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0,
+      "peak_client_plus_daemon_pss_kib": 118984,
+      "pss_sample_count": 5,
+      "normalized": {
+        "tool_count": 23,
+        "name_input_schema_sha256": "a20a2817cca685b284b54a9bdde6b46f963972aa5dd4e80fa7b2e7b455f4092f"
+      }
+    },
+    {
+      "phase": "warm",
+      "repetition": 3,
+      "arm": "inspector",
+      "task": "tools/list",
+      "argv": [
+        "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/inspector/install/bin/mcpdo",
+        "--format",
+        "json",
+        "--connection",
+        "trial-ai-memory",
+        "tools/list"
+      ],
+      "rc": 0,
+      "elapsed_ms": 411.589,
+      "stdout_sha256": "f8bb2d9b233b8fc5fc41e34fd36eec6a1c36e0aa76c7ecb82c8593eaad778904",
+      "stdout_bytes": 78200,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0,
+      "peak_client_plus_daemon_pss_kib": 126647,
+      "pss_sample_count": 4,
+      "normalized": {
+        "tool_count": 23,
+        "name_input_schema_sha256": "a20a2817cca685b284b54a9bdde6b46f963972aa5dd4e80fa7b2e7b455f4092f"
+      }
+    },
+    {
+      "phase": "warm",
+      "repetition": 3,
+      "arm": "mcporter",
+      "task": "memory_status",
+      "argv": [
+        "/home/example/.local/share/mise/installs/node/24.21.0/bin/mcporter",
+        "--config",
+        "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/inspector/mcporter.json",
+        "call",
+        "trial-ai-memory.memory_status",
+        "--args",
+        "{}",
+        "--output",
+        "json"
+      ],
+      "rc": 0,
+      "elapsed_ms": 531.172,
+      "stdout_sha256": "032fd3312ef9d36638f6442437f6bb1c4831c93d0de82c8760d567a4c87b1a35",
+      "stdout_bytes": 282,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0,
+      "peak_client_plus_daemon_pss_kib": 114720,
+      "pss_sample_count": 5,
+      "normalized": {
+        "counts": {
+          "pages_latest": 211,
+          "pages_all": 635,
+          "sessions": 362,
+          "observations": 661535,
+          "evidence_rows": 209
+        },
+        "counts_sha256": "8ba44cce3f01456732d4f14aa885ad7fef04065ed51730bbf9efa9b168bf0514"
+      }
+    },
+    {
+      "phase": "warm",
+      "repetition": 3,
+      "arm": "inspector",
+      "task": "memory_status",
+      "argv": [
+        "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/inspector/install/bin/mcpdo",
+        "--format",
+        "json",
+        "--connection",
+        "trial-ai-memory",
+        "tools/call",
+        "memory_status",
+        "{}"
+      ],
+      "rc": 0,
+      "elapsed_ms": 434.387,
+      "stdout_sha256": "1b32c5c98e64466c94cededccd7a81408330887d4e9d80d9c1418ccb61b01920",
+      "stdout_bytes": 414,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0,
+      "peak_client_plus_daemon_pss_kib": 127869,
+      "pss_sample_count": 4,
+      "normalized": {
+        "counts": {
+          "pages_latest": 211,
+          "pages_all": 635,
+          "sessions": 362,
+          "observations": 661535,
+          "evidence_rows": 209
+        },
+        "counts_sha256": "8ba44cce3f01456732d4f14aa885ad7fef04065ed51730bbf9efa9b168bf0514"
+      }
+    },
+    {
+      "phase": "warm",
+      "repetition": 4,
+      "arm": "inspector",
+      "task": "tools/list",
+      "argv": [
+        "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/inspector/install/bin/mcpdo",
+        "--format",
+        "json",
+        "--connection",
+        "trial-ai-memory",
+        "tools/list"
+      ],
+      "rc": 0,
+      "elapsed_ms": 333.076,
+      "stdout_sha256": "f8bb2d9b233b8fc5fc41e34fd36eec6a1c36e0aa76c7ecb82c8593eaad778904",
+      "stdout_bytes": 78200,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0,
+      "peak_client_plus_daemon_pss_kib": 127575,
+      "pss_sample_count": 3,
+      "normalized": {
+        "tool_count": 23,
+        "name_input_schema_sha256": "a20a2817cca685b284b54a9bdde6b46f963972aa5dd4e80fa7b2e7b455f4092f"
+      }
+    },
+    {
+      "phase": "warm",
+      "repetition": 4,
+      "arm": "mcporter",
+      "task": "tools/list",
+      "argv": [
+        "/home/example/.local/share/mise/installs/node/24.21.0/bin/mcporter",
+        "--config",
+        "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/inspector/mcporter.json",
+        "list",
+        "trial-ai-memory",
+        "--schema",
+        "--json"
+      ],
+      "rc": 0,
+      "elapsed_ms": 449.384,
+      "stdout_sha256": "4d5c9a7a37bf4cd9b1b6935ef49571a100e33f124559c6b98ca7705d802b13c2",
+      "stdout_bytes": 129736,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0,
+      "peak_client_plus_daemon_pss_kib": 121183,
+      "pss_sample_count": 4,
+      "normalized": {
+        "tool_count": 23,
+        "name_input_schema_sha256": "a20a2817cca685b284b54a9bdde6b46f963972aa5dd4e80fa7b2e7b455f4092f"
+      }
+    },
+    {
+      "phase": "warm",
+      "repetition": 4,
+      "arm": "inspector",
+      "task": "memory_status",
+      "argv": [
+        "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/inspector/install/bin/mcpdo",
+        "--format",
+        "json",
+        "--connection",
+        "trial-ai-memory",
+        "tools/call",
+        "memory_status",
+        "{}"
+      ],
+      "rc": 0,
+      "elapsed_ms": 409.512,
+      "stdout_sha256": "1b32c5c98e64466c94cededccd7a81408330887d4e9d80d9c1418ccb61b01920",
+      "stdout_bytes": 414,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0,
+      "peak_client_plus_daemon_pss_kib": 129001,
+      "pss_sample_count": 4,
+      "normalized": {
+        "counts": {
+          "pages_latest": 211,
+          "pages_all": 635,
+          "sessions": 362,
+          "observations": 661535,
+          "evidence_rows": 209
+        },
+        "counts_sha256": "8ba44cce3f01456732d4f14aa885ad7fef04065ed51730bbf9efa9b168bf0514"
+      }
+    },
+    {
+      "phase": "warm",
+      "repetition": 4,
+      "arm": "mcporter",
+      "task": "memory_status",
+      "argv": [
+        "/home/example/.local/share/mise/installs/node/24.21.0/bin/mcporter",
+        "--config",
+        "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/inspector/mcporter.json",
+        "call",
+        "trial-ai-memory.memory_status",
+        "--args",
+        "{}",
+        "--output",
+        "json"
+      ],
+      "rc": 0,
+      "elapsed_ms": 515.165,
+      "stdout_sha256": "032fd3312ef9d36638f6442437f6bb1c4831c93d0de82c8760d567a4c87b1a35",
+      "stdout_bytes": 282,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0,
+      "peak_client_plus_daemon_pss_kib": 117350,
+      "pss_sample_count": 5,
+      "normalized": {
+        "counts": {
+          "pages_latest": 211,
+          "pages_all": 635,
+          "sessions": 362,
+          "observations": 661535,
+          "evidence_rows": 209
+        },
+        "counts_sha256": "8ba44cce3f01456732d4f14aa885ad7fef04065ed51730bbf9efa9b168bf0514"
+      }
+    },
+    {
+      "phase": "warm",
+      "repetition": 5,
+      "arm": "mcporter",
+      "task": "tools/list",
+      "argv": [
+        "/home/example/.local/share/mise/installs/node/24.21.0/bin/mcporter",
+        "--config",
+        "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/inspector/mcporter.json",
+        "list",
+        "trial-ai-memory",
+        "--schema",
+        "--json"
+      ],
+      "rc": 0,
+      "elapsed_ms": 478.737,
+      "stdout_sha256": "4e904f686390ce00af6dc720571ecb043c419f54bf98a01e3b62146d3de5dbba",
+      "stdout_bytes": 129736,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0,
+      "peak_client_plus_daemon_pss_kib": 122962,
+      "pss_sample_count": 5,
+      "normalized": {
+        "tool_count": 23,
+        "name_input_schema_sha256": "a20a2817cca685b284b54a9bdde6b46f963972aa5dd4e80fa7b2e7b455f4092f"
+      }
+    },
+    {
+      "phase": "warm",
+      "repetition": 5,
+      "arm": "inspector",
+      "task": "tools/list",
+      "argv": [
+        "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/inspector/install/bin/mcpdo",
+        "--format",
+        "json",
+        "--connection",
+        "trial-ai-memory",
+        "tools/list"
+      ],
+      "rc": 0,
+      "elapsed_ms": 293.888,
+      "stdout_sha256": "f8bb2d9b233b8fc5fc41e34fd36eec6a1c36e0aa76c7ecb82c8593eaad778904",
+      "stdout_bytes": 78200,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0,
+      "peak_client_plus_daemon_pss_kib": 132296,
+      "pss_sample_count": 3,
+      "normalized": {
+        "tool_count": 23,
+        "name_input_schema_sha256": "a20a2817cca685b284b54a9bdde6b46f963972aa5dd4e80fa7b2e7b455f4092f"
+      }
+    },
+    {
+      "phase": "warm",
+      "repetition": 5,
+      "arm": "mcporter",
+      "task": "memory_status",
+      "argv": [
+        "/home/example/.local/share/mise/installs/node/24.21.0/bin/mcporter",
+        "--config",
+        "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/inspector/mcporter.json",
+        "call",
+        "trial-ai-memory.memory_status",
+        "--args",
+        "{}",
+        "--output",
+        "json"
+      ],
+      "rc": 0,
+      "elapsed_ms": 509.96,
+      "stdout_sha256": "032fd3312ef9d36638f6442437f6bb1c4831c93d0de82c8760d567a4c87b1a35",
+      "stdout_bytes": 282,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0,
+      "peak_client_plus_daemon_pss_kib": 117418,
+      "pss_sample_count": 5,
+      "normalized": {
+        "counts": {
+          "pages_latest": 211,
+          "pages_all": 635,
+          "sessions": 362,
+          "observations": 661535,
+          "evidence_rows": 209
+        },
+        "counts_sha256": "8ba44cce3f01456732d4f14aa885ad7fef04065ed51730bbf9efa9b168bf0514"
+      }
+    },
+    {
+      "phase": "warm",
+      "repetition": 5,
+      "arm": "inspector",
+      "task": "memory_status",
+      "argv": [
+        "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/inspector/install/bin/mcpdo",
+        "--format",
+        "json",
+        "--connection",
+        "trial-ai-memory",
+        "tools/call",
+        "memory_status",
+        "{}"
+      ],
+      "rc": 0,
+      "elapsed_ms": 404.296,
+      "stdout_sha256": "8b8a41ec571c0f425a9f70ba4b2f1411e81f07b3d080b54db8efb4a32fc2cef6",
+      "stdout_bytes": 414,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0,
+      "peak_client_plus_daemon_pss_kib": 130747,
+      "pss_sample_count": 4,
+      "normalized": {
+        "counts": {
+          "pages_latest": 211,
+          "pages_all": 635,
+          "sessions": 362,
+          "observations": 661566,
+          "evidence_rows": 209
+        },
+        "counts_sha256": "5954a3198bc210e3a1da5ebde4c60fec1f982c4e8585cf48984f20ddd7e94db7"
+      }
+    },
+    {
+      "phase": "warm",
+      "repetition": 6,
+      "arm": "inspector",
+      "task": "tools/list",
+      "argv": [
+        "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/inspector/install/bin/mcpdo",
+        "--format",
+        "json",
+        "--connection",
+        "trial-ai-memory",
+        "tools/list"
+      ],
+      "rc": 0,
+      "elapsed_ms": 288.489,
+      "stdout_sha256": "f8bb2d9b233b8fc5fc41e34fd36eec6a1c36e0aa76c7ecb82c8593eaad778904",
+      "stdout_bytes": 78200,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0,
+      "peak_client_plus_daemon_pss_kib": 116917,
+      "pss_sample_count": 3,
+      "normalized": {
+        "tool_count": 23,
+        "name_input_schema_sha256": "a20a2817cca685b284b54a9bdde6b46f963972aa5dd4e80fa7b2e7b455f4092f"
+      }
+    },
+    {
+      "phase": "warm",
+      "repetition": 6,
+      "arm": "mcporter",
+      "task": "tools/list",
+      "argv": [
+        "/home/example/.local/share/mise/installs/node/24.21.0/bin/mcporter",
+        "--config",
+        "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/inspector/mcporter.json",
+        "list",
+        "trial-ai-memory",
+        "--schema",
+        "--json"
+      ],
+      "rc": 0,
+      "elapsed_ms": 396.452,
+      "stdout_sha256": "51e143d205164e662663dace5a2565e33a94b7fbbf11f1366e6ba672214e9c8c",
+      "stdout_bytes": 129736,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0,
+      "peak_client_plus_daemon_pss_kib": 122358,
+      "pss_sample_count": 4,
+      "normalized": {
+        "tool_count": 23,
+        "name_input_schema_sha256": "a20a2817cca685b284b54a9bdde6b46f963972aa5dd4e80fa7b2e7b455f4092f"
+      }
+    },
+    {
+      "phase": "warm",
+      "repetition": 6,
+      "arm": "inspector",
+      "task": "memory_status",
+      "argv": [
+        "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/inspector/install/bin/mcpdo",
+        "--format",
+        "json",
+        "--connection",
+        "trial-ai-memory",
+        "tools/call",
+        "memory_status",
+        "{}"
+      ],
+      "rc": 0,
+      "elapsed_ms": 366.038,
+      "stdout_sha256": "8b8a41ec571c0f425a9f70ba4b2f1411e81f07b3d080b54db8efb4a32fc2cef6",
+      "stdout_bytes": 414,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0,
+      "peak_client_plus_daemon_pss_kib": 133464,
+      "pss_sample_count": 4,
+      "normalized": {
+        "counts": {
+          "pages_latest": 211,
+          "pages_all": 635,
+          "sessions": 362,
+          "observations": 661566,
+          "evidence_rows": 209
+        },
+        "counts_sha256": "5954a3198bc210e3a1da5ebde4c60fec1f982c4e8585cf48984f20ddd7e94db7"
+      }
+    },
+    {
+      "phase": "warm",
+      "repetition": 6,
+      "arm": "mcporter",
+      "task": "memory_status",
+      "argv": [
+        "/home/example/.local/share/mise/installs/node/24.21.0/bin/mcporter",
+        "--config",
+        "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/inspector/mcporter.json",
+        "call",
+        "trial-ai-memory.memory_status",
+        "--args",
+        "{}",
+        "--output",
+        "json"
+      ],
+      "rc": 0,
+      "elapsed_ms": 379.134,
+      "stdout_sha256": "dcd792b579a2dedff2b98f10aa481af774185119d92493587bdedf2296538e67",
+      "stdout_bytes": 282,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0,
+      "peak_client_plus_daemon_pss_kib": 117401,
+      "pss_sample_count": 4,
+      "normalized": {
+        "counts": {
+          "pages_latest": 211,
+          "pages_all": 635,
+          "sessions": 362,
+          "observations": 661566,
+          "evidence_rows": 209
+        },
+        "counts_sha256": "5954a3198bc210e3a1da5ebde4c60fec1f982c4e8585cf48984f20ddd7e94db7"
+      }
+    },
+    {
+      "phase": "warm",
+      "repetition": 7,
+      "arm": "mcporter",
+      "task": "tools/list",
+      "argv": [
+        "/home/example/.local/share/mise/installs/node/24.21.0/bin/mcporter",
+        "--config",
+        "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/inspector/mcporter.json",
+        "list",
+        "trial-ai-memory",
+        "--schema",
+        "--json"
+      ],
+      "rc": 0,
+      "elapsed_ms": 390.241,
+      "stdout_sha256": "92273ea6428611a28247a14e002969eee9501833e4983b4d6ffdbf5d067266fd",
+      "stdout_bytes": 129736,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0,
+      "peak_client_plus_daemon_pss_kib": 121990,
+      "pss_sample_count": 4,
+      "normalized": {
+        "tool_count": 23,
+        "name_input_schema_sha256": "a20a2817cca685b284b54a9bdde6b46f963972aa5dd4e80fa7b2e7b455f4092f"
+      }
+    },
+    {
+      "phase": "warm",
+      "repetition": 7,
+      "arm": "inspector",
+      "task": "tools/list",
+      "argv": [
+        "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/inspector/install/bin/mcpdo",
+        "--format",
+        "json",
+        "--connection",
+        "trial-ai-memory",
+        "tools/list"
+      ],
+      "rc": 0,
+      "elapsed_ms": 274.964,
+      "stdout_sha256": "f8bb2d9b233b8fc5fc41e34fd36eec6a1c36e0aa76c7ecb82c8593eaad778904",
+      "stdout_bytes": 78200,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0,
+      "peak_client_plus_daemon_pss_kib": 134119,
+      "pss_sample_count": 3,
+      "normalized": {
+        "tool_count": 23,
+        "name_input_schema_sha256": "a20a2817cca685b284b54a9bdde6b46f963972aa5dd4e80fa7b2e7b455f4092f"
+      }
+    },
+    {
+      "phase": "warm",
+      "repetition": 7,
+      "arm": "mcporter",
+      "task": "memory_status",
+      "argv": [
+        "/home/example/.local/share/mise/installs/node/24.21.0/bin/mcporter",
+        "--config",
+        "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/inspector/mcporter.json",
+        "call",
+        "trial-ai-memory.memory_status",
+        "--args",
+        "{}",
+        "--output",
+        "json"
+      ],
+      "rc": 0,
+      "elapsed_ms": 485.579,
+      "stdout_sha256": "dcd792b579a2dedff2b98f10aa481af774185119d92493587bdedf2296538e67",
+      "stdout_bytes": 282,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0,
+      "peak_client_plus_daemon_pss_kib": 117928,
+      "pss_sample_count": 5,
+      "normalized": {
+        "counts": {
+          "pages_latest": 211,
+          "pages_all": 635,
+          "sessions": 362,
+          "observations": 661566,
+          "evidence_rows": 209
+        },
+        "counts_sha256": "5954a3198bc210e3a1da5ebde4c60fec1f982c4e8585cf48984f20ddd7e94db7"
+      }
+    },
+    {
+      "phase": "warm",
+      "repetition": 7,
+      "arm": "inspector",
+      "task": "memory_status",
+      "argv": [
+        "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/inspector/install/bin/mcpdo",
+        "--format",
+        "json",
+        "--connection",
+        "trial-ai-memory",
+        "tools/call",
+        "memory_status",
+        "{}"
+      ],
+      "rc": 0,
+      "elapsed_ms": 404.041,
+      "stdout_sha256": "8b8a41ec571c0f425a9f70ba4b2f1411e81f07b3d080b54db8efb4a32fc2cef6",
+      "stdout_bytes": 414,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0,
+      "peak_client_plus_daemon_pss_kib": 133354,
+      "pss_sample_count": 4,
+      "normalized": {
+        "counts": {
+          "pages_latest": 211,
+          "pages_all": 635,
+          "sessions": 362,
+          "observations": 661566,
+          "evidence_rows": 209
+        },
+        "counts_sha256": "5954a3198bc210e3a1da5ebde4c60fec1f982c4e8585cf48984f20ddd7e94db7"
+      }
+    },
+    {
+      "phase": "warm",
+      "repetition": 8,
+      "arm": "inspector",
+      "task": "tools/list",
+      "argv": [
+        "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/inspector/install/bin/mcpdo",
+        "--format",
+        "json",
+        "--connection",
+        "trial-ai-memory",
+        "tools/list"
+      ],
+      "rc": 0,
+      "elapsed_ms": 311.757,
+      "stdout_sha256": "f8bb2d9b233b8fc5fc41e34fd36eec6a1c36e0aa76c7ecb82c8593eaad778904",
+      "stdout_bytes": 78200,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0,
+      "peak_client_plus_daemon_pss_kib": 132532,
+      "pss_sample_count": 3,
+      "normalized": {
+        "tool_count": 23,
+        "name_input_schema_sha256": "a20a2817cca685b284b54a9bdde6b46f963972aa5dd4e80fa7b2e7b455f4092f"
+      }
+    },
+    {
+      "phase": "warm",
+      "repetition": 8,
+      "arm": "mcporter",
+      "task": "tools/list",
+      "argv": [
+        "/home/example/.local/share/mise/installs/node/24.21.0/bin/mcporter",
+        "--config",
+        "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/inspector/mcporter.json",
+        "list",
+        "trial-ai-memory",
+        "--schema",
+        "--json"
+      ],
+      "rc": 0,
+      "elapsed_ms": 493.909,
+      "stdout_sha256": "dce28a1841a1b387b2ce2b410150d3a16a796bb397305ba846a6bd5e350337e3",
+      "stdout_bytes": 129736,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0,
+      "peak_client_plus_daemon_pss_kib": 123769,
+      "pss_sample_count": 5,
+      "normalized": {
+        "tool_count": 23,
+        "name_input_schema_sha256": "a20a2817cca685b284b54a9bdde6b46f963972aa5dd4e80fa7b2e7b455f4092f"
+      }
+    },
+    {
+      "phase": "warm",
+      "repetition": 8,
+      "arm": "inspector",
+      "task": "memory_status",
+      "argv": [
+        "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/inspector/install/bin/mcpdo",
+        "--format",
+        "json",
+        "--connection",
+        "trial-ai-memory",
+        "tools/call",
+        "memory_status",
+        "{}"
+      ],
+      "rc": 0,
+      "elapsed_ms": 386.291,
+      "stdout_sha256": "8b8a41ec571c0f425a9f70ba4b2f1411e81f07b3d080b54db8efb4a32fc2cef6",
+      "stdout_bytes": 414,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0,
+      "peak_client_plus_daemon_pss_kib": 133521,
+      "pss_sample_count": 4,
+      "normalized": {
+        "counts": {
+          "pages_latest": 211,
+          "pages_all": 635,
+          "sessions": 362,
+          "observations": 661566,
+          "evidence_rows": 209
+        },
+        "counts_sha256": "5954a3198bc210e3a1da5ebde4c60fec1f982c4e8585cf48984f20ddd7e94db7"
+      }
+    },
+    {
+      "phase": "warm",
+      "repetition": 8,
+      "arm": "mcporter",
+      "task": "memory_status",
+      "argv": [
+        "/home/example/.local/share/mise/installs/node/24.21.0/bin/mcporter",
+        "--config",
+        "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/inspector/mcporter.json",
+        "call",
+        "trial-ai-memory.memory_status",
+        "--args",
+        "{}",
+        "--output",
+        "json"
+      ],
+      "rc": 0,
+      "elapsed_ms": 501.11,
+      "stdout_sha256": "dcd792b579a2dedff2b98f10aa481af774185119d92493587bdedf2296538e67",
+      "stdout_bytes": 282,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0,
+      "peak_client_plus_daemon_pss_kib": 119433,
+      "pss_sample_count": 5,
+      "normalized": {
+        "counts": {
+          "pages_latest": 211,
+          "pages_all": 635,
+          "sessions": 362,
+          "observations": 661566,
+          "evidence_rows": 209
+        },
+        "counts_sha256": "5954a3198bc210e3a1da5ebde4c60fec1f982c4e8585cf48984f20ddd7e94db7"
+      }
+    },
+    {
+      "phase": "warm",
+      "repetition": 9,
+      "arm": "mcporter",
+      "task": "tools/list",
+      "argv": [
+        "/home/example/.local/share/mise/installs/node/24.21.0/bin/mcporter",
+        "--config",
+        "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/inspector/mcporter.json",
+        "list",
+        "trial-ai-memory",
+        "--schema",
+        "--json"
+      ],
+      "rc": 0,
+      "elapsed_ms": 524.917,
+      "stdout_sha256": "057e9e447e005d1492e6472f62d4026e4d9c63a71ed3db2b90b6573acefcb303",
+      "stdout_bytes": 129736,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0,
+      "peak_client_plus_daemon_pss_kib": 124704,
+      "pss_sample_count": 5,
+      "normalized": {
+        "tool_count": 23,
+        "name_input_schema_sha256": "a20a2817cca685b284b54a9bdde6b46f963972aa5dd4e80fa7b2e7b455f4092f"
+      }
+    },
+    {
+      "phase": "warm",
+      "repetition": 9,
+      "arm": "inspector",
+      "task": "tools/list",
+      "argv": [
+        "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/inspector/install/bin/mcpdo",
+        "--format",
+        "json",
+        "--connection",
+        "trial-ai-memory",
+        "tools/list"
+      ],
+      "rc": 0,
+      "elapsed_ms": 304.102,
+      "stdout_sha256": "f8bb2d9b233b8fc5fc41e34fd36eec6a1c36e0aa76c7ecb82c8593eaad778904",
+      "stdout_bytes": 78200,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0,
+      "peak_client_plus_daemon_pss_kib": 133901,
+      "pss_sample_count": 3,
+      "normalized": {
+        "tool_count": 23,
+        "name_input_schema_sha256": "a20a2817cca685b284b54a9bdde6b46f963972aa5dd4e80fa7b2e7b455f4092f"
+      }
+    },
+    {
+      "phase": "warm",
+      "repetition": 9,
+      "arm": "mcporter",
+      "task": "memory_status",
+      "argv": [
+        "/home/example/.local/share/mise/installs/node/24.21.0/bin/mcporter",
+        "--config",
+        "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/inspector/mcporter.json",
+        "call",
+        "trial-ai-memory.memory_status",
+        "--args",
+        "{}",
+        "--output",
+        "json"
+      ],
+      "rc": 0,
+      "elapsed_ms": 508.607,
+      "stdout_sha256": "dcd792b579a2dedff2b98f10aa481af774185119d92493587bdedf2296538e67",
+      "stdout_bytes": 282,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0,
+      "peak_client_plus_daemon_pss_kib": 121690,
+      "pss_sample_count": 5,
+      "normalized": {
+        "counts": {
+          "pages_latest": 211,
+          "pages_all": 635,
+          "sessions": 362,
+          "observations": 661566,
+          "evidence_rows": 209
+        },
+        "counts_sha256": "5954a3198bc210e3a1da5ebde4c60fec1f982c4e8585cf48984f20ddd7e94db7"
+      }
+    },
+    {
+      "phase": "warm",
+      "repetition": 9,
+      "arm": "inspector",
+      "task": "memory_status",
+      "argv": [
+        "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/inspector/install/bin/mcpdo",
+        "--format",
+        "json",
+        "--connection",
+        "trial-ai-memory",
+        "tools/call",
+        "memory_status",
+        "{}"
+      ],
+      "rc": 0,
+      "elapsed_ms": 396.559,
+      "stdout_sha256": "8b8a41ec571c0f425a9f70ba4b2f1411e81f07b3d080b54db8efb4a32fc2cef6",
+      "stdout_bytes": 414,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0,
+      "peak_client_plus_daemon_pss_kib": 133273,
+      "pss_sample_count": 4,
+      "normalized": {
+        "counts": {
+          "pages_latest": 211,
+          "pages_all": 635,
+          "sessions": 362,
+          "observations": 661566,
+          "evidence_rows": 209
+        },
+        "counts_sha256": "5954a3198bc210e3a1da5ebde4c60fec1f982c4e8585cf48984f20ddd7e94db7"
+      }
+    }
+  ],
+  "paired": [
+    {
+      "repetition": 0,
+      "task": "tools/list",
+      "same_normalized_result": true
+    },
+    {
+      "repetition": 0,
+      "task": "memory_status",
+      "same_normalized_result": false
+    },
+    {
+      "repetition": 1,
+      "task": "tools/list",
+      "same_normalized_result": true
+    },
+    {
+      "repetition": 1,
+      "task": "memory_status",
+      "same_normalized_result": true
+    },
+    {
+      "repetition": 2,
+      "task": "tools/list",
+      "same_normalized_result": true
+    },
+    {
+      "repetition": 2,
+      "task": "memory_status",
+      "same_normalized_result": true
+    },
+    {
+      "repetition": 3,
+      "task": "tools/list",
+      "same_normalized_result": true
+    },
+    {
+      "repetition": 3,
+      "task": "memory_status",
+      "same_normalized_result": true
+    },
+    {
+      "repetition": 4,
+      "task": "tools/list",
+      "same_normalized_result": true
+    },
+    {
+      "repetition": 4,
+      "task": "memory_status",
+      "same_normalized_result": true
+    },
+    {
+      "repetition": 5,
+      "task": "tools/list",
+      "same_normalized_result": true
+    },
+    {
+      "repetition": 5,
+      "task": "memory_status",
+      "same_normalized_result": false
+    },
+    {
+      "repetition": 6,
+      "task": "tools/list",
+      "same_normalized_result": true
+    },
+    {
+      "repetition": 6,
+      "task": "memory_status",
+      "same_normalized_result": true
+    },
+    {
+      "repetition": 7,
+      "task": "tools/list",
+      "same_normalized_result": true
+    },
+    {
+      "repetition": 7,
+      "task": "memory_status",
+      "same_normalized_result": true
+    },
+    {
+      "repetition": 8,
+      "task": "tools/list",
+      "same_normalized_result": true
+    },
+    {
+      "repetition": 8,
+      "task": "memory_status",
+      "same_normalized_result": true
+    },
+    {
+      "repetition": 9,
+      "task": "tools/list",
+      "same_normalized_result": true
+    },
+    {
+      "repetition": 9,
+      "task": "memory_status",
+      "same_normalized_result": true
+    }
+  ],
+  "summary": {
+    "inspector:tools/list": {
+      "n": 10,
+      "latency_median_ms": 302.928,
+      "latency_min_ms": 274.964,
+      "latency_max_ms": 411.589,
+      "pss_peak_median_kib": 127111.0,
+      "pss_peak_max_kib": 134119
+    },
+    "inspector:memory_status": {
+      "n": 10,
+      "latency_median_ms": 402.88,
+      "latency_min_ms": 366.038,
+      "latency_max_ms": 503.317,
+      "pss_peak_median_kib": 129874.0,
+      "pss_peak_max_kib": 133521
+    },
+    "mcporter:tools/list": {
+      "n": 10,
+      "latency_median_ms": 464.061,
+      "latency_min_ms": 390.241,
+      "latency_max_ms": 524.917,
+      "pss_peak_median_kib": 121586.5,
+      "pss_peak_max_kib": 124704
+    },
+    "mcporter:memory_status": {
+      "n": 10,
+      "latency_median_ms": 504.859,
+      "latency_min_ms": 379.134,
+      "latency_max_ms": 531.172,
+      "pss_peak_median_kib": 117375.5,
+      "pss_peak_max_kib": 121690
+    }
+  }
+}

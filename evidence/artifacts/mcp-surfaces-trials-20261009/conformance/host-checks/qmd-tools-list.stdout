@@ -1,0 +1,25 @@
+Running client scenario 'tools-list' against server: http://127.0.0.1:21851/mcp
+Results saved to /home/example/code/native-agent-stack-ns2604-landscape-mcp/evidence/artifacts/mcp-surfaces-trials-20261009/conformance/host-checks/qmd-tools-list/server-tools-list-2026-10-09T05-30-28-040Z
+Checks:
+[90m2026-10-09T05:30:38.581Z[0m [tools-list] [31mFAILURE[0m Server lists available tools with valid structure
+
+Test Results:
+Passed: 0/1, 1 failed, 0 warnings
+
+=== Failed Checks ===
+
+  - ToolsList: Server lists available tools with valid structure
+    Error: Failed: fetch failed
+
+Test listing available tools.
+
+[1mServer Implementation Requirements:[0m
+
+[1mEndpoint[0m: [2mtools/list[0m
+
+[1mRequirements[0m:
+- Return array of all available tools
+- Each tool MUST have:
+  - [2mname[0m (string)
+  - [2mdescription[0m (string)
+  - [2minputSchema[0m (valid JSON Schema object)

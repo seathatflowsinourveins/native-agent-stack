@@ -1,0 +1,14 @@
+
+> @modelcontextprotocol/conformance@0.1.16 check
+> npm run typecheck && npm run lint
+
+
+> @modelcontextprotocol/conformance@0.1.16 typecheck
+> tsgo --noEmit
+
+
+> @modelcontextprotocol/conformance@0.1.16 lint
+> eslint src/ examples/ && prettier --check .
+
+Checking formatting...
+All matched files use Prettier code style!

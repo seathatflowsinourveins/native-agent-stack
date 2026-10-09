@@ -1,0 +1,47 @@
+{
+  "label": "client-mcporter-initialize",
+  "started_utc": "2026-10-09T05:31:37.030088+00:00",
+  "command": [
+    "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/conformance/install/node_modules/.bin/conformance",
+    "client",
+    "--command",
+    "mcporter --config /home/example/.local/state/native-agent-stack/research/api-surfaces-trials/conformance/mcporter-empty.json list",
+    "--scenario",
+    "initialize",
+    "--spec-version",
+    "2025-11-25",
+    "--timeout",
+    "30000",
+    "--output-dir",
+    "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/client-checks/mcporter"
+  ],
+  "cwd": "/home/example/code/native-agent-stack-ns2604-landscape-mcp",
+  "return_code": 1,
+  "timed_out": false,
+  "elapsed_seconds": 0.698965,
+  "pss": {
+    "peak_process_tree_kib": 96615,
+    "max_observed_processes": 3,
+    "samples": 13,
+    "interval_seconds": 0.05,
+    "source": "/proc/<owned-pid>/smaps_rollup:Pss",
+    "scope": "owned command process tree; shared host servers excluded"
+  },
+  "logs": {
+    "stdout": {
+      "path": "client-mcporter-initialize.stdout",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "public_bytes": 0
+    },
+    "stderr": {
+      "path": "client-mcporter-initialize.stderr",
+      "raw_sha256": "2e3fab8ebf348da4b1b4118d802f9851bdf517ab84629d9d280a35346b7a97ee",
+      "raw_bytes": 1614,
+      "public_sha256": "30b2091941415b1782c377c17883ccd60a57c8bc288f4cbce8869eb5da6ffcc4",
+      "public_bytes": 1626
+    }
+  },
+  "publication_boundary": "Personal home paths and ephemeral session identifiers redacted. Raw captures are private; public log digests refer to the redacted files."
+}

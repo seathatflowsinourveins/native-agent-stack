@@ -1,0 +1,13 @@
+
+> @modelcontextprotocol/conformance@0.1.16 build
+> tsdown src/index.ts --minify --clean --target node20 --no-fixed-extension
+
+ℹ tsdown v0.21.5 powered by rolldown v1.0.0-rc.11
+ℹ entry: src/index.ts
+ℹ target: node20
+ℹ tsconfig: tsconfig.json
+ℹ Build start
+ℹ Granting execute permission to dist/index.js
+ℹ dist/index.js  202.83 kB │ gzip: 41.78 kB
+ℹ 1 files, total: 202.83 kB
+✔ Build complete in 138ms

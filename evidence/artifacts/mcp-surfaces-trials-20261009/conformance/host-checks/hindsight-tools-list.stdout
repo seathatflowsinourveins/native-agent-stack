@@ -1,0 +1,7 @@
+Running client scenario 'tools-list' against server: http://127.0.0.1:8888/mcp/trading-research/
+Results saved to /home/example/code/native-agent-stack-ns2604-landscape-mcp/evidence/artifacts/mcp-surfaces-trials-20261009/conformance/host-checks/hindsight-tools-list/server-tools-list-2026-10-09T05-30-40-046Z
+Checks:
+[90m2026-10-09T05:30:40.117Z[0m [tools-list] [32mSUCCESS[0m Server lists available tools with valid structure
+
+Test Results:
+Passed: 1/1, 0 failed, 0 warnings
