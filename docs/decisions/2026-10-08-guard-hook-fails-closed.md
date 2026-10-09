@@ -256,10 +256,10 @@ step before `claude-settings`, and the new-WSL render copies the checksum-verifi
 missing script after install is therefore removal or damage.
 
 The template command now refuses when the script is missing:
-`f="${HOME}/.claude/hooks/secret_path_guard.py"; [ -f "$$f" ] && exec python3 "$$f"; exec python3 -c '<print the refusal; exit 2>' "$$f"`.
-It runs only `[` and `python3`, the command words the new-WSL renderer admits for a practice hook
-(`tools/adoption/new_wsl_client_config.py` `BASE_COMMAND_WORDS`). Exit 2 blocks a PreToolUse call on every client
-version, so this part does not depend on `onFailure`. One test
+`f="${HOME}/.claude/hooks/secret_path_guard.py"; [ -f "$$f" ] && exec python3 "$$f"; exec jq -n --arg f "$$f" '"Refused: …\($$f)\n" | halt_error(2)'`.
+It runs only `[`, `python3` and `jq`, command words the new-WSL renderer admits for a practice hook
+(`tools/adoption/new_wsl_client_config.py` `BASE_COMMAND_WORDS`), and the refusal itself needs no Python. Exit 2
+blocks a PreToolUse call on every client version, so this part does not depend on `onFailure`. One test
 contract changes, declared: `test_rendered_hook_blocks_after_install_and_is_inert_before` becomes
 `test_rendered_hook_blocks_before_and_after_install`; before install it now expects exit 2 and the refusal text, and
 the after-install assertions are unchanged.

@@ -5536,8 +5536,8 @@
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "a568e034024d1777ce4a75890653eb43f241df164041bd988e9180fd5b92b3ec",
-      "bytes": 13845
+      "sha256": "fc7417ea1e7137f689cdd06dafdb32e71f36c78bee6e41505290e0637893f95f",
+      "bytes": 13812
     },
     {
       "path": "adoption/templates/codex.AGENTS.template.md",
@@ -18257,8 +18257,8 @@
     },
     {
       "path": "docs/decisions/2026-10-08-guard-hook-fails-closed.md",
-      "sha256": "ab3c829436a6d69319dd6311beca830656acbc8b68d94011ab035cd150a2f59d",
-      "bytes": 18075
+      "sha256": "ddb28f698b419552dba6892822ae2a8fdb26ad0f849a6110fb5592ffe18c1508",
+      "bytes": 18131
     },
     {
       "path": "docs/decisions/2026-10-08-harness-rules-consolidation.md",

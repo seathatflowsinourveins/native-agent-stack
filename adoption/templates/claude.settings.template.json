@@ -192,7 +192,7 @@
           },
           {
             "type": "command",
-            "command": "f=\"${HOME}/.claude/hooks/secret_path_guard.py\"; [ -f \"$$f\" ] && exec python3 \"$$f\"; exec python3 -c 'import sys; sys.stderr.write(\"Refused: the secret-path guard is not installed at %s\\n\" % sys.argv[1]); sys.exit(2)' \"$$f\"",
+            "command": "f=\"${HOME}/.claude/hooks/secret_path_guard.py\"; [ -f \"$$f\" ] && exec python3 \"$$f\"; exec jq -n --arg f \"$$f\" '\"Refused: the secret-path guard is not installed at \\($$f)\\n\" | halt_error(2)'",
             "timeout": 10,
             "onFailure": "block"
           }
