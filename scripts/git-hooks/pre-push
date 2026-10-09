@@ -1,5 +1,5 @@
 #!/bin/sh
-# Local registry gate for pushed commits. Activate once per clone (the same
+# Local committed-name and registry gate for pushed commits. Activate once per clone (the same
 # setting enables the pre-commit gate):
 #   git config core.hooksPath scripts/git-hooks
 # Runs the three repository registry tests that failed CI's validate job on
@@ -9,6 +9,8 @@
 # there is a commit to test, because the workflow-coverage class skips without
 # it, and a skip is not a pass. `git push --no-verify` is the explicit, visible
 # override. CI (validate.yml) still runs the whole suite.
+# The runtime host-name deny rule scans tracked bytes in each committed tip
+# before the registry tests. An unavailable or failed scanner also refuses.
 #
 # githooks(5), pre-push: stdin carries "<local ref> <local oid> <remote ref>
 # <remote oid>" lines, and a non-zero exit aborts the push. The all-zero oid and
@@ -96,10 +98,24 @@ names = sys.argv[1:]
 result = unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromNames(names))
 passed = result.testsRun == len(names) and result.wasSuccessful() and not result.skipped and not result.expectedFailures
 sys.exit(0 if passed else 1)'
+# Isolated Python ignores PYTHONPATH/PYTHONSAFEPATH from another checkout.
+# The only added import directory belongs to this immutable tip.
+name_runner='import json, os, runpy, sys
+sys.path.insert(0, os.path.join(os.getcwd(), "scripts"))
+sys.argv = ["scripts/validate.py", "--scan-tracked"]
+try:
+    runpy.run_path("scripts/validate.py", run_name="__main__")
+except Exception:
+    print(json.dumps({"status": "error", "scanned_files": 0}, sort_keys=True))
+    sys.exit(2)'
 status=0
 for commit in $commits; do
   echo "pre-push: running the registry tests on $commit in $tree" >&2
   git -c core.hooksPath=/dev/null worktree add --quiet --detach "$tree" "$commit"
+  if ! (cd "$tree" && TMPDIR="$scratch/tmp" python3 -I -B -c "$name_runner" </dev/null); then
+    echo "pre-push: the committed host-name scan failed on $commit. Push refused; \`git push --no-verify\` overrides." >&2
+    status=1
+  fi
   if ! (cd "$tree" && TMPDIR="$scratch/tmp" PYTHONDONTWRITEBYTECODE=1 python3 -c "$runner" \
     tests.test_osv_lockfile_coverage.LockfileInventoryTests.test_every_tracked_lockfile_and_manifest_is_listed \
     tests.test_blind_checkout.RepositoryClassificationTests.test_every_blueprint_value_under_a_label_key_is_classified \

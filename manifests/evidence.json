@@ -4945,6 +4945,11 @@
       "bytes": 808
     },
     {
+      "path": ".github/actions/setup-host-name-scanner/action.yml",
+      "sha256": "449a85bc904cc92b7eb825169b72eec4ebbf612d573c9599bca10c1ff17b889b",
+      "bytes": 1245
+    },
+    {
       "path": ".github/agent-branch-ruleset.json",
       "sha256": "bc4df163c810f26dacdfaaae90667fc0cdd4edd3beea35b86ed4efc00c3d5f24",
       "bytes": 315
@@ -5071,8 +5076,8 @@
     },
     {
       "path": ".github/workflows/publish-catalog.yml",
-      "sha256": "6f48ef65db2a270121e607aea1f08f2cad7c9f883009babd40af42b21c8f3167",
-      "bytes": 20399
+      "sha256": "10e4f258548115707abc39ae26e4bba4eb239a48c3da2e45ca68d2eca9e3d726",
+      "bytes": 20825
     },
     {
       "path": ".github/workflows/receipt-staleness.yml",
@@ -5116,8 +5121,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "4a26082ea361b31cc164ffe20dc1a288a9933dec770d60b64f41c8f3741a7392",
-      "bytes": 42878
+      "sha256": "582a58df627e2430ea2c918143d9c33f285bf9d28bf09f9b0bf09f63e4e55444",
+      "bytes": 43019
     },
     {
       "path": ".gitignore",
@@ -18309,6 +18314,11 @@
       "path": "docs/decisions/2026-10-09-codex-native-review-trial.md",
       "sha256": "337ec932d1e70994adc7b6e90458114e604d70ec065c49fc7d7ff8c2191e11fc",
       "bytes": 9003
+    },
+    {
+      "path": "docs/decisions/2026-10-09-host-name-scan.md",
+      "sha256": "ecb85946f5cbea82eb47700226d71d753b1fd2add3bc2ff5d9a3dc0442396780",
+      "bytes": 7758
     },
     {
       "path": "docs/decisions/2026-10-09-mcp-surfaces-trials.md",
@@ -57962,8 +57972,8 @@
     },
     {
       "path": "scripts/git-hooks/pre-push",
-      "sha256": "398be3114466272628f9615d847a7355989837b5b482a6d504137bdbb8b62924",
-      "bytes": 5576
+      "sha256": "b69fa6e3fcb4e7bac4f999b40ead6a4c94b769d569b6253cd09d1f03cdf60824",
+      "bytes": 6455
     },
     {
       "path": "scripts/hardware_profile.py",
@@ -57974,6 +57984,11 @@
       "path": "scripts/hooks/secret_path_guard.py",
       "sha256": "fd516d8b78de7e3a9da4917c8d126fc71d7ab216a014bb28fb8bd189d6b0fb7b",
       "bytes": 296975
+    },
+    {
+      "path": "scripts/host_name_scan.py",
+      "sha256": "8786f897f1bf862d4d6c3020853f2588a5c305bcede6d9540ee86b3c2a5ce08e",
+      "bytes": 9902
     },
     {
       "path": "scripts/host_receipts.py",
@@ -58047,8 +58062,8 @@
     },
     {
       "path": "scripts/validate.py",
-      "sha256": "96ffe49eafbc676f4cdd80d61f049ec4081a82ad332dfa5ad5d2689d4db8e531",
-      "bytes": 37976
+      "sha256": "c9216144708a42b980f1bdcb60386a4e18443cecc5fe536d08893b671328407f",
+      "bytes": 40188
     },
     {
       "path": "scripts/validate_catalogs.py",
@@ -58816,6 +58831,11 @@
       "bytes": 36179
     },
     {
+      "path": "tests/test_host_name_scan.py",
+      "sha256": "14e2fbe3ef8eb06e1098dc6c7b1a109915c3b599fe87ea877e536b6f3ffda655",
+      "bytes": 13575
+    },
+    {
       "path": "tests/test_host_receipts.py",
       "sha256": "04f54683ee97d99f3383ac1f9989c0aad843562bdc31f890dece4177f114448f",
       "bytes": 144843
@@ -59177,8 +59197,8 @@
     },
     {
       "path": "tests/test_pre_push_gate.py",
-      "sha256": "0e86e30013f7daf0a3a2875bb5a4f4255c74782478baac8428898b7e63b08b31",
-      "bytes": 18294
+      "sha256": "a8d037db132374678fb0c5a1a3636aa74de158ac50b4db0a106baabb6601e5b4",
+      "bytes": 22791
     },
     {
       "path": "tests/test_promotion_gate.py",
@@ -59427,8 +59447,8 @@
     },
     {
       "path": "tests/test_validate.py",
-      "sha256": "808407035264cde55ee7d2e47a1da6baf8d85f578d877adde60c2e5a4437cdbc",
-      "bytes": 43953
+      "sha256": "0be52615600a1723f7ac4706d4faf209ed914287506b109653d6c58b8320355e",
+      "bytes": 46410
     },
     {
       "path": "tests/test_validate_shards.py",

@@ -92,8 +92,15 @@ jobs:
           cp docs/ecosystem/index.html "$explorer"
           cd "$PUBLICATION_DIR"
           sha256sum "$(basename "$explorer")" | tee -a archive.sha256
+      - name: Install the native runtime-name scanner
+        uses: ./.github/actions/setup-host-name-scanner
       - name: Scan the built explorer for private content before attesting it
         shell: bash
+        env:
+          # CI cannot hold the author's host identities. Exercise the native
+          # entry point with a synthetic source; local pre-push and CC pre-cue
+          # enforce the real names. PRIVATE_CONTENT still checks this artifact.
+          NATIVE_AGENT_HOST_NAMES_JSON: '["fixture_ci_host_name"]'
         run: |
           set -euo pipefail
           # The build step above regenerates docs/ecosystem/index.html fresh

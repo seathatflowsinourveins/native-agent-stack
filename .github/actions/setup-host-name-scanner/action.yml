@@ -1,0 +1,25 @@
+name: Set up the host-name scanner
+description: Install the checksum-pinned upstream Betterleaks 1.9.0 Linux release
+runs:
+  using: composite
+  steps:
+    - name: Install the native scanner from its immutable upstream release
+      shell: bash
+      env:
+        BETTERLEAKS_VERSION: '1.9.0'
+        BETTERLEAKS_SHA256: f8b185a39ffcece2a1ca82bf3a4e7435cd81963ffd16b7a9128daf75f35f6de7
+      run: |
+        set -euo pipefail
+        case "${RUNNER_OS}:${RUNNER_ARCH}" in
+          Linux:X64) ;;
+          *) echo 'This CI setup requires Linux X64.' >&2; exit 2 ;;
+        esac
+        scanner_dir=$(mktemp -d "${RUNNER_TEMP}/host-name-scanner.XXXXXX")
+        archive="betterleaks_${BETTERLEAKS_VERSION}_linux_x64.tar.gz"
+        curl --disable --fail --silent --show-error --location --retry 3 \
+          "https://github.com/betterleaks/betterleaks/releases/download/v${BETTERLEAKS_VERSION}/${archive}" \
+          --output "$scanner_dir/$archive"
+        printf '%s  %s\n' "$BETTERLEAKS_SHA256" "$scanner_dir/$archive" | sha256sum --check
+        tar -xzf "$scanner_dir/$archive" -C "$scanner_dir" betterleaks
+        test "$("$scanner_dir/betterleaks" version)" = "$BETTERLEAKS_VERSION"
+        printf '%s\n' "$scanner_dir" >> "$GITHUB_PATH"

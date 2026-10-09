@@ -302,7 +302,7 @@ def is_supported_pdf_framing(content: bytes) -> bool:
             and re.search(rb"/(?:Encrypt|Prev)\b", content) is None)
 
 
-def scan_file_for_private_content(path: Path) -> list[str]:
+def scan_file_for_private_content(path: Path, *, locations: list[int] | None = None) -> list[str]:
     """Scan one file's bytes for PRIVATE_CONTENT patterns directly.
 
     `Validator.scan_publication()` only inspects paths returned by
@@ -325,9 +325,12 @@ def scan_file_for_private_content(path: Path) -> list[str]:
     except UnicodeError:
         content = raw.decode("latin-1")
     for description, pattern in PRIVATE_CONTENT:
-        if pattern.search(content):
+        match = pattern.search(content)
+        if match:
             # Never echo matched credentials or personal paths.
             findings.append(f"{path}: contains possible {description}")
+            if locations is not None:
+                locations.append(content.count("\n", 0, match.start()) + 1)
     return findings
 
 
@@ -685,19 +688,51 @@ def main() -> int:
     parser.add_argument(
         "--scan-file", action="append", default=[], type=Path, metavar="PATH",
         help="Scan an arbitrary file (repeatable) for PRIVATE_CONTENT patterns and "
-             "exit 1 on a match, independent of --root's git-tracked publication scan. "
+             "runtime host-local names; report counts and file:line only. "
+             "Exit 1 on a match or 2 on scanner error, independent of --root's "
+             "git-tracked publication scan. "
              "Use this for a generated, gitignored artifact (e.g. a freshly built "
              "docs/ecosystem/index.html) that scan_publication() never walks.")
+    parser.add_argument(
+        "--scan-tracked", action="store_true",
+        help="Scan tracked files for runtime host-local names with Betterleaks 1.9.0; "
+             "report counts and file:line only. Hooks select an immutable checkout.")
     args = parser.parse_args()
-    if args.scan_file:
-        findings = []
-        for file_path in args.scan_file:
-            findings.extend(scan_file_for_private_content(file_path))
-        if findings:
-            print("Private-content scan failed:\n" + "\n".join(findings))
-            return 1
-        print(json.dumps({"status": "passed", "scanned_files": len(args.scan_file)}, sort_keys=True))
-        return 0
+    if args.scan_file or args.scan_tracked:
+        try:
+            try:
+                from .host_name_scan import HostNameScanError, host_names, safe_locator, scan_paths
+            except ImportError:
+                from host_name_scan import HostNameScanError, host_names, safe_locator, scan_paths
+        except ImportError:
+            print(json.dumps({"status": "error", "scanned_files": len(args.scan_file)}, sort_keys=True))
+            return 2
+        paths = list(args.scan_file)
+        try:
+            if args.scan_tracked:
+                tracked = subprocess.run(
+                    ["git", "-C", str(args.root), "ls-files", "-z"],
+                    capture_output=True, timeout=30, check=True)
+                paths.extend(args.root / os.fsdecode(name) for name in tracked.stdout.split(b"\0") if name)
+            paths = list(dict.fromkeys(paths))
+            names = host_names(args.root)
+            locators = {safe_locator(path, line, root=args.root, names=names)
+                        for path, line in scan_paths(paths, root=args.root, names=names)}
+            for path in dict.fromkeys(args.scan_file):
+                private_lines: list[int] = []
+                if scan_file_for_private_content(path, locations=private_lines) and not private_lines:
+                    raise OSError  # A second read failed; no fabricated finding location.
+                locators.update(safe_locator(path, line, root=args.root, names=names)
+                                for line in private_lines)
+        except (HostNameScanError, OSError, subprocess.SubprocessError):
+            # Native diagnostic/config text and exception values are private.
+            print(json.dumps({"status": "error", "scanned_files": len(paths)}, sort_keys=True))
+            return 2
+        print(json.dumps({"status": "failed" if locators else "passed",
+                          "scanned_files": len(paths), "findings": len(locators)}, sort_keys=True))
+        for locator in sorted(locators):
+            print(locator)
+        return 1 if locators else 0
     try:
         summary = validate(args.root, today=args.today)
     except InvalidPublication as error:
