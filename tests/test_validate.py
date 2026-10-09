@@ -879,7 +879,8 @@ class ScanFileForPrivateContentTests(unittest.TestCase):
             result = self.run_cli("--scan-file", str(path))
         self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
         self.assertEqual(json.loads(result.stdout), {"status": "error", "source": "synthetic", "scanned_files": 1})
-        self.assertIn("synthetic sources", result.stderr)
+        self.assertEqual(result.stderr,
+                         "Host-name scan uses synthetic sources; this is not real-host acceptance.\n")
 
     def test_cli_scan_file_refuses_a_missing_input_without_its_absolute_path(self):
         path = self.root / "missing.html"

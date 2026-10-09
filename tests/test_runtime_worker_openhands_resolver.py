@@ -573,6 +573,112 @@ class HostExecutedDerivationTests(unittest.TestCase):
                 self.assertFalse(derived.covers(path))
         self.assertEqual(derivation_gaps(tree, derived), set())
 
+    def test_isolated_inline_file_loaders_trace_files_and_imports_without_sweeping_directory(self):
+        sources = {
+            "importlib": (
+                'import importlib.util\n'
+                'spec = importlib.util.spec_from_file_location("loaded", "scripts/loaded.py")\n'
+                'module = importlib.util.module_from_spec(spec)\n'
+                'spec.loader.exec_module(module)\n'
+            ),
+            "runpy": 'import runpy\nrunpy.run_path("scripts/loaded.py")\n',
+        }
+        for loader, source in sources.items():
+            for binding in (False, True):
+                command = (f"runner={shlex.quote(source)}\npython3 -I -B -c \"$runner\""
+                           if binding else f"python3 -I -B -c {shlex.quote(source)}")
+                with self.subTest(loader=loader, binding=binding):
+                    files = {
+                        "scripts/git-hooks/pre-push": "#!/bin/sh\n" + command + "\n",
+                        "scripts/loaded.py": "import pkg.helper\n",
+                        "scripts/unrelated.py": "",
+                        "pkg/__init__.py": "",
+                        "pkg/helper.py": "from . import leaf\n",
+                        "pkg/leaf.py": "",
+                        "pkg/unrelated.py": "",
+                    }
+                    derived = self.p.derive_host_executed(self.p.MemoryTree(files))
+                    for path in ("scripts/loaded.py", "pkg/__init__.py", "pkg/helper.py", "pkg/leaf.py"):
+                        self.assertIn(path, derived.files)
+                    self.assertNotIn("scripts", derived.dirs)
+                    self.assertNotIn("pkg", derived.dirs)
+                    self.assertFalse(derived.covers("scripts/unrelated.py"))
+                    self.assertFalse(derived.covers("pkg/unrelated.py"))
+
+    def test_direct_shell_script_still_sweeps_directory_also_used_by_inline_loader(self):
+        source = 'import runpy\nrunpy.run_path("scripts/loaded.py")\n'
+        files = {
+            "scripts/git-hooks/pre-push": (
+                "#!/bin/sh\n"
+                f"python3 -I -c {shlex.quote(source)}\n"
+                "python3 scripts/loaded.py\n"
+            ),
+            "scripts/loaded.py": "import pkg.helper\n",
+            "scripts/unrelated.py": "",
+            "pkg/__init__.py": "",
+            "pkg/helper.py": "",
+        }
+        derived = self.p.derive_host_executed(self.p.MemoryTree(files))
+        self.assertIn("scripts", derived.dirs)
+        self.assertTrue(derived.covers("scripts/unrelated.py"))
+        self.assertIn("pkg/helper.py", derived.files)
+
+    def test_isolated_inline_explicit_search_path_still_sweeps_directory(self):
+        source = 'import sys\nsys.path.insert(0, "./scripts")\n'
+        files = {
+            "scripts/git-hooks/pre-push": "#!/bin/sh\n" + f"python3 -I -c {shlex.quote(source)}\n",
+            "scripts/unrelated.py": "",
+        }
+        derived = self.p.derive_host_executed(self.p.MemoryTree(files))
+        self.assertIn("scripts", derived.dirs)
+        self.assertTrue(derived.covers("scripts/unrelated.py"))
+
+    def test_shared_inline_binding_retains_unsupported_use_directory_coverage(self):
+        source = 'import runpy\nrunpy.run_path("scripts/loaded.py")\n'
+        for other_use in ('python3 -c "$code"', 'python3 -I -X dev -c "$code"', 'printf %s "$code"'):
+            with self.subTest(other_use=other_use):
+                files = {
+                    "scripts/git-hooks/pre-push": (
+                        "#!/bin/sh\n"
+                        f"code={shlex.quote(source)}\n"
+                        'python3 -I -c "$code"\n'
+                        f"{other_use}\n"
+                    ),
+                    "scripts/loaded.py": "import pkg.helper\n",
+                    "scripts/unrelated.py": "",
+                    "pkg/__init__.py": "",
+                    "pkg/helper.py": "",
+                }
+                derived = self.p.derive_host_executed(self.p.MemoryTree(files))
+                self.assertIn("scripts", derived.dirs)
+                self.assertTrue(derived.covers("scripts/unrelated.py"))
+                self.assertIn("pkg/helper.py", derived.files)
+
+    def test_reassigned_inline_binding_retains_each_assignment_directory_coverage(self):
+        first = 'import runpy\nrunpy.run_path("first/loaded.py")\n'
+        second = 'import runpy\nrunpy.run_path("second/loaded.py")\n'
+        files = {
+            "scripts/git-hooks/pre-push": (
+                "#!/bin/sh\n"
+                f"code={shlex.quote(first)}\n"
+                'python3 -I -c "$code"\n'
+                f"code={shlex.quote(second)}\n"
+                'python3 -I -c "$code"\n'
+            ),
+            "first/loaded.py": "import pkg.first\n",
+            "first/unrelated.py": "",
+            "second/loaded.py": "import pkg.second\n",
+            "second/unrelated.py": "",
+            "pkg/__init__.py": "",
+            "pkg/first.py": "",
+            "pkg/second.py": "",
+        }
+        derived = self.p.derive_host_executed(self.p.MemoryTree(files))
+        for directory in ("first", "second"):
+            self.assertIn(directory, derived.dirs)
+            self.assertTrue(derived.covers(f"{directory}/unrelated.py"))
+            self.assertIn(f"pkg/{directory}.py", derived.files)
+
     def test_malformed_settings_fail_closed(self):
         tree = self.p.MemoryTree({".claude/settings.json": "{not json"})
         with self.assertRaises(self.p.DerivationError):

@@ -32,10 +32,10 @@ class HostNameScanError(Exception):
 
 
 def _command(argv: list[str], *, root: Path,
-             environment: dict[str, str] | None = None) -> subprocess.CompletedProcess:
+             environment: dict[str, str] | None = None, timeout: int = 10) -> subprocess.CompletedProcess:
     try:
         return subprocess.run(argv, cwd=root, capture_output=True, text=True,
-                              encoding="utf-8", errors="strict", timeout=10, env=environment)
+                              encoding="utf-8", errors="strict", timeout=timeout, env=environment)
     except (OSError, UnicodeError, subprocess.SubprocessError):
         raise HostNameScanError("host-name source unavailable") from None
 
@@ -56,7 +56,11 @@ def host_names(root: Path) -> tuple[str, ...]:
         hostname = _command(["uname", "-n"], root=root)
         if hostname.returncode or not hostname.stdout.strip():
             raise HostNameScanError("host-name source unavailable")
-        names = [identity.stdout.strip(), hostname.stdout.strip()]
+        names = [identity.stdout.strip()]
+        # WSL can expose its public distro/project label as the Linux hostname.
+        # Exclude that hostname source only; coincident private sources remain.
+        if hostname.stdout.strip().casefold() != os.environ.get("WSL_DISTRO_NAME", "").casefold():
+            names.append(hostname.stdout.strip())
         windows = shutil.which("powershell.exe")
         if windows is None and "WSL_DISTRO_NAME" in os.environ:
             installed_windows = Path("/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe")
@@ -68,9 +72,11 @@ def host_names(root: Path) -> tuple[str, ...]:
             # No environment dump, account data, or authentication store is read.
             collected = _command([windows, "-NoLogo", "-NoProfile", "-NonInteractive", "-Command",
                 "$ErrorActionPreference='Stop'; "
+                "[Console]::OutputEncoding=[System.Text.UTF8Encoding]::new($false); "
                 "@{computer=$env:COMPUTERNAME; profiles=@(Get-CimInstance Win32_UserProfile "
                 "-ErrorAction Stop | Where-Object { -not $_.Special } | "
-                "ForEach-Object { Split-Path -Leaf $_.LocalPath })} | ConvertTo-Json -Compress"], root=root)
+                "ForEach-Object { Split-Path -Leaf $_.LocalPath })} | ConvertTo-Json -Compress"],
+                root=root, timeout=30)
             try:
                 result = json.loads(collected.stdout.lstrip("\ufeff"))
                 if collected.returncode or not isinstance(result, dict):
@@ -107,6 +113,8 @@ def host_names(root: Path) -> tuple[str, ...]:
             # identities. Other coincident id/profile/host sources stay active.
             if separator and domain.casefold() != "users.noreply.github.com":
                 names.append(local)
+            elif not separator:
+                names.append(domain)
     if any(not isinstance(name, str) or not name or len(name) > 512
            or any(ord(char) < 32 or ord(char) == 127
                   or 0xD800 <= ord(char) <= 0xDFFF for char in name)
@@ -191,6 +199,9 @@ def _scan_entries(entries: Iterable[tuple[Path, str]], *, root: Path,
     for path, text in entries:
         # Go's regexp treats malformed UTF-8 as replacement runes. Preserve
         # valid UTF-8 literals in mixed binary input instead of using Latin-1.
+        # Raw data must not impersonate framing markers. Replacement preserves
+        # the original line and Unicode neighbor boundary without hiding names.
+        text = text.translate({0x1E: 0xFFFD, 0x1F: 0xFFFD})
         for original_line, text_line in enumerate(text.split("\n"), 1):
             for start in range(0, max(1, len(text_line)), step):
                 end = min(start + 4096, len(text_line))

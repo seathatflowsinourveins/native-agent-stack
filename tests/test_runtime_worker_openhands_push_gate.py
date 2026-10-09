@@ -545,6 +545,7 @@ class WorkflowReaderTests(unittest.TestCase):
                 "      - run: 'python3 scripts/d.py'\n"
                 "      - run: python3 scripts/e.py\n          --long\n"
                 "      - uses: ./tools/action # local\n"
+                "      - uses: $/tools/action # exact workflow commit\n"
                 "      - uses: actions/github-script@v7\n        with:\n          script: |\n            core.info('x')\n"
                 "      - env:\n          BODY: |\n            run: not a key\n        run: echo env\n")
         facts = self.g.scan_workflow(text)
@@ -554,7 +555,22 @@ class WorkflowReaderTests(unittest.TestCase):
                                       "echo env"])
         self.assertEqual(facts.scripts, ["core.info('x')\n"])
         self.assertEqual(facts.working_dirs, ["tools/x"])
-        self.assertEqual(facts.local_uses, ["./tools/action"])
+        self.assertEqual(facts.local_uses, ["./tools/action", "$/tools/action"])
+
+    def test_same_commit_action_keeps_composite_and_script_dependencies(self):
+        for prefix in ("./", "$/"):
+            with self.subTest(prefix=prefix):
+                files = {
+                    ".github/workflows/fixture.yml": "on: pull_request\njobs:\n  check:\n    steps:\n"
+                        "      - uses: " + prefix + "tools/action\n",
+                    "tools/action/action.yml": "runs:\n  using: composite\n  steps:\n"
+                        "    - run: python3 tools/action/check.py\n      shell: bash\n",
+                    "tools/action/check.py": "import json\n",
+                }
+                tree = load_resolver().patch_policy.MemoryTree(files)
+                derived = self.g.derive_ci_protected(tree)
+                self.assertEqual(derived.prefixes.get("tools/action"), "ci_local_action")
+                self.assertIn("tools/action/check.py", derived.files)
 
     def test_triggers_are_listed_or_unknown(self):
         cases = {"on: push\n": frozenset({"push"}),
@@ -1100,7 +1116,7 @@ class RepositoryWorkflowTests(unittest.TestCase):
                         found[key].append(value.strip())
                     elif key == "working-directory" and isinstance(value, str):
                         found["working-directory"].append(value.strip())
-                    elif key == "uses" and isinstance(value, str) and value.startswith("./"):
+                    elif key == "uses" and isinstance(value, str) and value.startswith(("./", "$/")):
                         found["uses"].append(value.strip())
                     walk(value, found)
             elif isinstance(node, list):

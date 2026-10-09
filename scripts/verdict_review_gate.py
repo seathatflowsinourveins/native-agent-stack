@@ -167,6 +167,7 @@ PUBLISHED_ALTERNATIVE_FIELDS = ("name", "repository", "disposition", "why_not_de
 TRUST_PATHS = (
     "scripts/verdict_review_gate.py", "scripts/landscape.py", "scripts/platform_status.py",
     "scripts/catalog_decisions.py", "scripts/host_receipts.py", "scripts/validate.py",
+    "scripts/host_name_scan.py",
     "tools/sota-convergence/build_verdicts.py", "tools/sota-convergence/record_verdicts.py",
     "tools/sota-convergence/build_manifest.py", "tools/sota-convergence/lane_packets.py",
     "tools/sota-convergence/codex_lane.py",

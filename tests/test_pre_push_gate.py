@@ -308,10 +308,17 @@ class PrePushGateTests(unittest.TestCase):
     @unittest.skipUnless(ZIZMOR, "zizmor not on PATH")
     def test_a_tip_without_the_name_scanner_fails_closed(self):
         commit = self.commit_on_head({"scripts/validate.py": None})
-        result = self.push(f"refs/heads/old {commit} refs/heads/old {self.zero}")
+        result = self.native_push(commit, "scanner-absent")
         self.assertNotEqual(result.returncode, 0)
+        reports = [json.loads(line) for line in result.stdout.splitlines() if line.startswith("{")]
+        self.assertEqual(len(reports), 1)
+        self.assertEqual(reports[0]["status"], "error")
+        self.assertEqual(reports[0]["source"], "synthetic")
+        self.assertIsNone(reports[0]["scanned_files"])
         self.assertIn("committed host-name scan failed", result.stderr)
         self.assertIn("Ran 3 tests", result.stderr)
+        self.assertNotIn(FIXTURE_NAME, result.stdout + result.stderr)
+        self.assert_remote_ref_absent("scanner-absent")
         self.assert_nothing_left()
 
     @unittest.skipUnless(ZIZMOR, "zizmor not on PATH")

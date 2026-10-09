@@ -22,7 +22,8 @@ runs:
           Linux:X64) ;;
           *) echo 'This CI setup requires Linux X64.' >&2; exit 2 ;;
         esac
-        scanner_dir=$(mktemp -d "${RUNNER_TEMP}/host-name-scanner.XXXXXX")
+        scanner_dir='${{ runner.temp }}/host-name-scanner'
+        mkdir -p "$scanner_dir"
         curl --disable --fail --silent --show-error --location --retry 3 \
           "https://github.com/sigstore/cosign/releases/download/${COSIGN_VERSION}/cosign-linux-amd64" \
           --output "$scanner_dir/cosign"
@@ -47,4 +48,4 @@ runs:
         printf '%s  %s\n' "$BETTERLEAKS_SHA256" "$scanner_dir/$archive" | sha256sum --check
         tar -xzf "$scanner_dir/$archive" -C "$scanner_dir" betterleaks
         test "$("$scanner_dir/betterleaks" version)" = "$BETTERLEAKS_VERSION"
-        printf '%s\n' "$scanner_dir" >> "$GITHUB_PATH"
+        printf '%s\n' '${{ runner.temp }}/host-name-scanner' >> "$GITHUB_PATH"

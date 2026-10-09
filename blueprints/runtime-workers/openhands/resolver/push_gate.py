@@ -366,7 +366,7 @@ def scan_workflow(text):
             scripts.append(text_value)
         elif key == "working-directory":
             working_dirs.append(text_value.strip())
-        elif key == "uses" and text_value.strip().startswith("./"):
+        elif key == "uses" and text_value.strip().startswith(("./", "$/")):
             local_uses.append(text_value.strip())
     return WorkflowFacts(_triggers(lines), runs, scripts, working_dirs, local_uses)
 
@@ -725,7 +725,7 @@ def derive_ci_protected(tree):
                     if start_dir and start_dir in dirs:
                         result.add_prefix(start_dir, "ci_discovered")
         for use in facts.local_uses:
-            relative = _relative(use)
+            relative = _relative(use[2:] if use.startswith("$/") else use)
             if not relative:
                 continue
             if relative in blobs and relative.startswith(".github/workflows/"):

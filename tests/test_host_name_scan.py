@@ -129,18 +129,70 @@ class HostNameSourceTests(unittest.TestCase):
                 self.assertEqual(host_name_scan.host_names(Path.cwd()),
                                  ("fixturepublic", "fixturehostname"))
 
+    def test_noreply_email_exclusion_discriminates_private_email_collection(self):
+        for role, email in (("public", "123+fixturemail@users.noreply.github.com"),
+                            ("public_case", "fixturemail@USERS.NOREPLY.GITHUB.COM"),
+                            ("private", "fixturemail@example.invalid"),
+                            ("without_separator", "fixturemail")):
+            values = {("id", "-un"): "fixtureagent\n", ("uname", "-n"): "fixturehostname\n",
+                      ("git", "config", "--get", "user.email"): email + "\n"}
+            def command(argv, **kwargs):
+                return subprocess.CompletedProcess(argv, 0, values[tuple(argv)], "")
+            with self.subTest(role=role), \
+                    mock.patch.object(host_name_scan, "PROFILE_ROOT") as profiles, \
+                    mock.patch.object(host_name_scan, "_command", side_effect=command):
+                profiles.iterdir.return_value = []
+                expected = ("fixtureagent", "fixturehostname")
+                if role in ("private", "without_separator"):
+                    expected += ("fixturemail",)
+                self.assertEqual(host_name_scan.host_names(Path.cwd()), expected)
+
+    def test_hostname_equal_to_public_distro_is_excluded_only_from_hostname_source(self):
+        for hostname in ("fixture-distro", "FIXTURE-DISTRO", "fixture-private-host"):
+            results = [subprocess.CompletedProcess([], 0, "fixtureagent\n", ""),
+                       subprocess.CompletedProcess([], 0, hostname + "\n", ""),
+                       subprocess.CompletedProcess([], 0, json.dumps({
+                           "computer": "fixturecomputer", "profiles": []}), ""),
+                       subprocess.CompletedProcess([], 1, "", "")]
+            with self.subTest(role="public" if hostname.casefold() == "fixture-distro" else "private"), \
+                    mock.patch.dict(os.environ, {"WSL_DISTRO_NAME": "fixture-distro"}), \
+                    mock.patch.object(host_name_scan.shutil, "which", return_value="powershell.exe"), \
+                    mock.patch.object(host_name_scan, "PROFILE_ROOT") as profiles, \
+                    mock.patch.object(host_name_scan, "_command", side_effect=results):
+                profiles.iterdir.return_value = []
+                expected = ("fixtureagent", "fixturecomputer") if hostname.casefold() == "fixture-distro" \
+                    else ("fixtureagent", hostname, "fixturecomputer")
+                self.assertEqual(host_name_scan.host_names(Path.cwd()), expected)
+
+    def test_public_distro_does_not_filter_coincident_private_identity_sources(self):
+        results = [subprocess.CompletedProcess([], 0, "fixture-distro\n", ""),
+                   subprocess.CompletedProcess([], 0, "fixture-distro\n", ""),
+                   subprocess.CompletedProcess([], 0, json.dumps({
+                       "computer": "fixturecomputer", "profiles": []}), ""),
+                   subprocess.CompletedProcess([], 0, "fixture-distro@example.invalid\n", "")]
+        with mock.patch.dict(os.environ, {"WSL_DISTRO_NAME": "fixture-distro"}), \
+                mock.patch.object(host_name_scan.shutil, "which", return_value="powershell.exe"), \
+                mock.patch.object(host_name_scan, "PROFILE_ROOT") as profiles, \
+                mock.patch.object(host_name_scan, "_command", side_effect=results):
+            profiles.iterdir.return_value = []
+            self.assertEqual(host_name_scan.host_names(Path.cwd()),
+                             ("fixture-distro", "fixturecomputer"))
+
     def test_windows_native_sources_work_without_mnt_c_profile_mount(self):
         results = [subprocess.CompletedProcess([], 0, "fixtureagent\n", ""),
                    subprocess.CompletedProcess([], 0, "fixturehostname\n", ""),
                    subprocess.CompletedProcess([], 0, json.dumps({
-                       "computer": "fixturecomputer", "profiles": ["fixtureprofile", "Public"]}), ""),
+                       "computer": "fixturecomputer", "profiles": ["fixtureprofilé", "Public"]},
+                       ensure_ascii=False), ""),
                    subprocess.CompletedProcess([], 0, "fixturemail@example.invalid\n", "")]
         with mock.patch.object(host_name_scan, "PROFILE_ROOT") as profiles, \
                 mock.patch.object(host_name_scan.shutil, "which", return_value="powershell.exe"), \
-                mock.patch.object(host_name_scan, "_command", side_effect=results):
+                mock.patch.object(host_name_scan, "_command", side_effect=results) as command:
             profiles.iterdir.side_effect = FileNotFoundError()
             self.assertEqual(host_name_scan.host_names(Path.cwd()),
-                             ("fixtureagent", "fixturehostname", "fixturecomputer", "fixtureprofile", "fixturemail"))
+                             ("fixtureagent", "fixturehostname", "fixturecomputer", "fixtureprofilé", "fixturemail"))
+            self.assertIn("[Console]::OutputEncoding", command.call_args_list[2].args[0][-1])
+            self.assertEqual(command.call_args_list[2].kwargs["timeout"], 30)
 
     def test_wsl_without_windows_source_refuses_without_values(self):
         with mock.patch.dict(os.environ, {"WSL_DISTRO_NAME": "fixture"}), \
@@ -215,6 +267,12 @@ class NativeHostNameScanTests(unittest.TestCase):
         other.write_text("clean\nfixture--agent\n", encoding="utf-8")
         self.assertEqual(host_name_scan.scan_paths([self.target, other], root=self.root),
                          [(other, 2), (self.target, 2)])
+
+    def test_raw_record_separators_before_names_preserve_probe_lines(self):
+        self.target.write_bytes(b"prefix\x1efixtureagent\n"
+                                b"prefix\x1ffixtureagent\n")
+        self.assertEqual(host_name_scan.scan_paths([self.target], root=self.root),
+                         [(self.target, 1), (self.target, 2)])
 
     def test_larger_multiline_input_retains_end_findings(self):
         lines = ["safe text"] * 18000 + ["fixtureagent"]

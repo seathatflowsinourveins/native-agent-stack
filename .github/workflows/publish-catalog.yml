@@ -93,7 +93,7 @@ jobs:
           cd "$PUBLICATION_DIR"
           sha256sum "$(basename "$explorer")" | tee -a archive.sha256
       - name: Install the native runtime-name scanner
-        uses: ./.github/actions/setup-host-name-scanner
+        uses: $/.github/actions/setup-host-name-scanner
       - name: Scan the built explorer for private content before attesting it
         shell: bash
         env:

@@ -109,13 +109,20 @@ passed = result.testsRun == len(names) and result.wasSuccessful() and not result
 sys.exit(0 if passed else 1)'
 # Isolated Python ignores PYTHONPATH/PYTHONSAFEPATH from another checkout.
 # The only added import directory belongs to this immutable tip.
-name_runner='import json, os, runpy, sys
-sys.path.insert(0, os.path.join(os.getcwd(), "scripts"))
+name_runner='import importlib.util, json, os, runpy, sys
 sys.argv = ["scripts/validate.py", "--scan-tracked", "--scan-history", sys.argv[1], sys.argv[2]]
 try:
+    spec = importlib.util.spec_from_file_location("host_name_scan", "scripts/host_name_scan.py")
+    if spec is None or spec.loader is None:
+        raise ImportError
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
     runpy.run_path("scripts/validate.py", run_name="__main__")
 except Exception:
-    print(json.dumps({"status": "error", "scanned_files": 0}, sort_keys=True))
+    print(json.dumps({"status": "error",
+                      "source": "synthetic" if "NATIVE_AGENT_HOST_NAMES_JSON" in os.environ else "host",
+                      "scanned_files": None}, sort_keys=True))
     sys.exit(2)'
 status=0
 for commit in $commits; do
