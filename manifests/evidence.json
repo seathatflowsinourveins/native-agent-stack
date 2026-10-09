@@ -21596,6 +21596,11 @@
       "bytes": 3990
     },
     {
+      "path": "evidence/artifacts/g5-start-closure-1-20261009/full-suite-comparison.json",
+      "sha256": "623784ea49a51d2f3f57692539f2a516636a4ae6d7c77b6ffd50fb06962464af",
+      "bytes": 18984
+    },
+    {
       "path": "evidence/artifacts/g5-start-closure-1-20261009/origin-family-declarations.json",
       "sha256": "6350a713b79c12677d8c5de62539ea6dad40c6a758864b3b071e4e56167d850d",
       "bytes": 10012
@@ -21617,8 +21622,8 @@
     },
     {
       "path": "evidence/artifacts/g5-start-closure-1-20261009/strict-class-fix.json",
-      "sha256": "b7e7bde6a0cbea0e76a75da5dcce4294b812867e33c9af321edd78eb0c2377ec",
-      "bytes": 6082
+      "sha256": "74f14576abc03bc7bae9e86e57f001824cec7c2631e47ae446c06ae41e8bcd35",
+      "bytes": 6614
     },
     {
       "path": "evidence/artifacts/g5-start-closure-1-20261009/trial-ref-repairs.json",
