@@ -544,10 +544,140 @@ The client stops a run only after its cost has crossed `--max-budget-usd`, so a 
   - The entry for this workflow in `docs/github-automation.md` now reads "a $5 client budget and at most 30
     assistant turns" in place of "30 turns and a $5 client budget".
 
+## Every pull request (2026-10-09)
+
+The owner requires the cross-family review gate to run through the vendor path on every pull request: the Claude
+side is this workflow, pinned, with federation and Opus 5.5. The command center ruled the trigger on 2026-10-09
+(about 15:3xZ). The review stays advisory until cc-native-practice's blind paired comparison decides. Its runs on real
+pull requests give that comparison its vendor arm, and the command center reads the summary before it merges a
+non-draft head.
+
+**Trigger: a 15-minute schedule, beside the dispatch.** Two other designs were checked and rejected:
+- **A `pull_request` trigger** presents the OIDC subject `repo:OWNER/REPO:pull_request` (GitHub's OpenID Connect
+  reference, "Filtering for pull_request events"), which the federation rule does not accept. It would also run the
+  pull request's own copy of the workflow file with the token.
+- **`workflow_run`** runs main's copy with main's subject (GitHub's "Events that trigger workflows": GITHUB_REF is
+  the default branch). claude-code-action supports it as an automation event at the pin
+  (`src/github/context.ts:67, 243`). But zizmor's `dangerous-triggers` audit flags it, and this repository runs
+  zizmor with `--no-config --no-ignores`, so no file can suppress that, and `tests/test_workflow_policy.py` bans the
+  trigger outright. Weakening either gate was rejected.
+- **A `schedule` run** executes main's file with main's subject, the pattern `harness-audit.yml` already uses on the
+  same federation rule. It needs no federation change and no exemption, and zizmor 1.30.1 reports nothing at either
+  persona.
+
+**How a head is chosen.** A new job, `resolve`, holds no token (`pull-requests: read`, `actions: read`), checks
+nothing out and reads no secret.
+- **On a dispatch:** it checks the two inputs' format and passes them through. Drafts may be dispatched.
+- **On a tick, it lists the open pull requests through the API and keeps each one that:**
+  - is not a draft;
+  - comes from this repository (a fork never qualifies);
+  - targets main;
+  - has no completed review of its current head yet, and a new push is a new head.
+- **What counts as a completed review.** A review leaves the completion marker `claude-pr-review-done-pr<N>-<sha>`
+  only when its bounds check passed and its review was published. A failed or unpublished review leaves only its
+  usage record, and the head is tried again on a later tick.
+  - A marker counts only when the run that uploaded it is looked up through the API and is this workflow's own
+    (`workflow_id`), a `schedule` or `workflow_dispatch` run, on `main`, in this repository. An artifact's name and its
+    branch name can come from anywhere, including a fork's branch named `main`.
+  - The marker is kept 90 days. A head still open and unchanged after that is reviewed again.
+- **Limits:** at most 2 heads per tick, oldest pull request first. None once today's reviews reach the daily ceiling:
+  the repository variable `CLAUDE_PR_REVIEW_DAILY_USD`, default 55, counted at the 5.50 USD cost bound per review
+  from this workflow's schedule and dispatch runs on main since 00:00 UTC. A tick at the ceiling skips and says so
+  in its summary.
+- **Every list is read to its last page:** the open pull requests, today's runs, each run's jobs and each marker
+  name's artifacts (`gh api --paginate`).
+- **Failure:** an API failure fails the job, and nothing is reviewed.
+
+**The review.** The review job runs once per chosen head as a matrix (`max-parallel: 2`), with a concurrency group
+per pull request and head.
+- **The recheck.** Once it holds its head's group, a scheduled review first looks for a trusted completion marker
+  again (`actions: read`). A dispatch of the same head may have completed while it waited, and the scheduled review
+  then skips every later step. A dispatch always reviews.
+- Its binding step reads the pull request again with its own read before any token step, and fails closed. The pull
+  request must be open, from this repository, targeting main and at the chosen commit, and on a scheduled review not
+  a draft.
+- Everything else is as above:
+  - the head is data under `pr-head/` and nothing from it executes;
+  - Read, Glob and Grep only;
+  - the summary only, nothing posted;
+  - the `2dca132f` pin;
+  - the 5 USD budget with its 5.50 USD bound;
+  - no debug or full output.
+- **Switches:** the schedule runs only while `CLAUDE_PR_REVIEW_ENABLED` and `CLAUDE_PR_REVIEW_EVERY_PR` are both
+  `true`, and only on a run's first attempt.
+- **Cost:** a tick with nothing to review costs runner time only. Each review's spend is in its usage artifact; the
+  api-actions lane enters it in its ledger.
+
+**Tests** (tests/test_claude_pr_review_workflow.py: 69 tests; 26 cover the resolve and recheck steps). They run the
+resolve step against a stand-in `gh`:
+- a fork head, a draft, another base and a closed pull request are never chosen;
+- a head already reviewed is skipped, and a new head of the same pull request is chosen;
+- at most two heads per tick;
+- at the daily ceiling, nothing is chosen and the tick reports it;
+- an API failure on any of the three endpoints fails the job;
+- a malformed dispatch or ceiling is refused or skipped;
+- the binding refuses a draft on a scheduled review and accepts one on a dispatch.
+
+The shape tests pin the triggers, the resolve job's read-only scopes, the matrix and group, and the artifact name. The
+id-token exemption in tests/test_workflow_policy.py now names the schedule.
+
+**agentic-actions-auditor (Trail of Bits' skill, run on this change, 2026-10-09).** The workflow has one AI action
+instance (claude-code-action at `2dca132f`, job `review`).
+- **Vectors D, F, G, H and I: no finding.**
+  - No `pull_request_target`.
+  - Read, Glob and Grep only; no shell tool.
+  - No step evaluates the model's output: it is parsed with jq and published HTML-escaped inside `<pre>`.
+  - `--restricted`, no dangerous sandbox, and no `allowed_non_write_users`.
+- **Vector B (expressions in the prompt): Info.** The prompt and the job name interpolate `matrix.pr_number` and
+  `matrix.head_sha`, which come only from the resolve job's output. That output is the API's numeric `.number` and a
+  `.head.sha` that must match `^[0-9a-f]{40}$` (a dispatch passes the same two format checks), so no pull request
+  text (title, body, branch name) can reach the prompt, a shell or a job name.
+- **Vector A (env intermediaries): no finding.** The only event-derived env values are those two checked fields, the
+  dispatch inputs (format-checked) and `paths` (pattern-checked by the guard). The prompt reads no environment
+  variable.
+- **Vectors C and E (content the agent reads): Low, by design.** The agent reads the diff and the files of the pull
+  request head, which a collaborator writes. The prompt calls them material, never instructions, and the agent can
+  only read, with reads confined to the workspace and the diff directory. Symbolic links are removed, and the output
+  goes only to the job summary. An injection can at most skew the advisory review text.
+- **Who can cause a run.** Anyone who can push a branch to this repository and open a non-draft pull request
+  against main, which the daily ceiling bounds. A fork never qualifies (`head.repo.full_name` is checked in both
+  jobs).
+- **Found by the audit before the PR (Medium, gate evasion), and fixed only by the GPT read's round.** The first
+  version counted any artifact with the review's name, and any run of `claude-pr-review.yml`, toward the dedupe and
+  the ceiling. The pre-PR fix filtered artifacts on `head_branch == "main"`. That filter was not enough: a fork's
+  branch can be named `main` (GPT read of a22c483d, P2 1). The uploading run is now looked up and must be this
+  workflow's own schedule or dispatch run on main in this repository.
+
+**GPT read of a22c483d (CHANGES_REQUESTED, four P2s), fixed in one commit:**
+1. **A fork's branch named `main` passed the marker filter.** Fixed by the run lookup above. Test:
+   `test_a_marker_from_anything_but_this_workflows_schedule_or_dispatch_on_main_here_is_ignored` (a fork's branch
+   named main, a pull_request run, another workflow, another branch).
+2. **No pagination.** Every list now pages to its end. Tests: 101 eligible pull requests with the oldest 100
+   completed choose the 101st; 100 newer runs without reviews ahead of an older run with ten still reach the ceiling.
+   The stand-in `gh` returns pages of 100.
+3. **A failed review's usage record was the dedupe marker.** Fixed with the separate completion marker, gated on the
+   bounds check and the publish step (`id: publish`). Tests: the gate, and a head with only a usage record is
+   chosen again.
+4. **A scheduled review that waited behind a dispatch of the same head reviewed it again.** Fixed by the recheck.
+   Tests: a head completed meanwhile is skipped, one not completed goes ahead, a dispatch always reviews, and an API
+   failure fails the step.
+
+The two copies of the marker check (resolve and recheck) are held identical by a test. An API failure inside the
+check stops the step: the result is assigned first, so the shell's errexit applies. Seven weakened copies each fail
+the module:
+- any uploading run trusted;
+- the old branch-name filter;
+- pull requests not paginated;
+- runs not paginated;
+- the marker written whatever the outcome;
+- no recheck;
+- the check's result compared inside `[ ]` (which swallowed an API failure in the first draft).
+
 ## Alternatives considered
 
-- **Review every pull request automatically** (the action's `docs/solutions.md` example on `pull_request`). Not
-  possible under the federation rule, and it would spend on every push.
+- **Review every pull request on `pull_request` or `workflow_run`** (the action's `docs/solutions.md` example).
+  The first is not possible under the federation rule; the second is refused by this repository's zizmor gate and
+  policy. "Every pull request (2026-10-09)" reaches every head through the schedule instead.
 - **`anthropics/claude-code-security-review`.** Covered by the security-review record; not used.
 - **The upstream `/code-review` plugin** (`plugin_marketplaces: https://github.com/anthropics/claude-code.git`).
   The marketplace fetch is unpinned; this repository pins every action by commit.
@@ -562,7 +692,11 @@ The client stops a run only after its cost has crossed `--max-budget-usd`, so a 
   one bound that stopped it, with that run's numbers.
 - The numbers step reports a forbidden tool or an MCP server: stop using the workflow and read the action's change.
 - GitHub or Anthropic ship a way for a pull request run to authenticate without exposing the token to the pull
-  request's workflow text: reconsider an automatic trigger.
+  request's workflow text: reconsider the schedule in favour of an event trigger.
+- The scheduled reviews reach the daily ceiling on a normal day, or a head waits more than a few ticks: raise the
+  ceiling or the per-tick count with that day's numbers.
+- cc-native-practice's paired comparison finds the vendor arm worse than the current reads: keep it advisory or
+  remove the schedule.
 
 ## Evidence class
 
@@ -584,7 +718,11 @@ the action and client sources below. No hosted run of this workflow is part of t
 - Claude Code 2.1.295 `--help` for `--restricted`, `--permission-prompts`, `--tools`, `--settings`,
   `--strict-mcp-config`, `--max-budget-usd`.
 - GitHub, OpenID Connect reference, "Filtering for pull_request events" and "Filtering for a specific branch":
-  <https://docs.github.com/en/actions/reference/security/oidc>; GitHub Security Lab, Preventing pwn requests:
+  <https://docs.github.com/en/actions/reference/security/oidc> (read again 2026-10-09T14:43Z); Events that trigger
+  workflows, `schedule` and `workflow_run`:
+  <https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows> (read
+  2026-10-09T14:43Z); zizmor 1.30.1 `dangerous-triggers`, run with `--no-config --no-ignores` (this repository's
+  pin); GitHub Security Lab, Preventing pwn requests:
   <https://securitylab.github.com/research/github-actions-preventing-pwn-requests/>.
 - Anthropic: Workload identity federation,
   <https://platform.claude.com/docs/en/manage-claude/workload-identity-federation>; How Claude Code uses prompt

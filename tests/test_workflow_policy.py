@@ -114,9 +114,9 @@ EXEMPTIONS = {
     # 2026-10-08 (docs/decisions/2026-10-04-ci-least-privilege.md, "Federation exemption (2026-10-08)").
     "id-token-write": {
         # 2026-10-08 (docs/decisions/2026-10-08-claude-actions-pr-review.md): a second job on the same federation rule.
-        "claude-pr-review.yml:review": "Anthropic workload identity federation, not provenance. Manual dispatch on "
-                                       "main by the owner only; no pull_request trigger, no write scope, read-only "
-                                       "model tools",
+        "claude-pr-review.yml:review": "Anthropic workload identity federation, not provenance. Dispatch and the "
+                                       "15-minute schedule on main (never a pull_request run), owner-triggered; "
+                                       "no write scope, read-only model tools",
         "harness-audit.yml:audit": "Anthropic workload identity federation, not provenance: the action exchanges the "
                                    "job's GitHub OIDC token for a short-lived Claude API token. The federation rule "
                                    "accepts workflows on this repository's main and never pull requests; which "

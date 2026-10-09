@@ -74,9 +74,13 @@ The Actions allow-list and harness description below were checked against live s
   The owner checks the native [Claude Console federation history](https://platform.claude.com/settings/workload-identity-federation?tab=history)
   for the reason and corrects the relevant rule or claim; the Console denial reason is not established by the retained
   workflow evidence.
-- **Pull request review on demand.** [`claude-pr-review.yml`](../.github/workflows/claude-pr-review.yml) is
-  dispatched by hand from `main` with a pull request number and the exact head commit, and only while the repository
-  variable `CLAUDE_PR_REVIEW_ENABLED` is `true`. It uses the action pin v1.0.247 (`2dca132f`) and the federation
+- **Pull request review, every head and on demand.** [`claude-pr-review.yml`](../.github/workflows/claude-pr-review.yml)
+  reviews each open, non-draft, same-repository pull request head targeting main until one review of it completes
+  (a trusted completion marker, kept 90 days), from a 15-minute schedule (at
+  most 2 heads a tick, up to the daily ceiling `CLAUDE_PR_REVIEW_DAILY_USD`, default 55), and can be dispatched by
+  hand from `main` with a pull request number and the exact head commit. It runs only while the repository variable
+  `CLAUDE_PR_REVIEW_ENABLED` is `true`, and the schedule only while `CLAUDE_PR_REVIEW_EVERY_PR` is also `true`; a
+  tokenless resolve job chooses the heads, and the review is advisory. It uses the action pin v1.0.247 (`2dca132f`) and the federation
   variables `ANTHROPIC_FEDERATION_RULE_ID`, `ANTHROPIC_ORGANIZATION_ID`, `ANTHROPIC_SERVICE_ACCOUNT_ID` and
   `ANTHROPIC_WORKSPACE_ID`. `main` is at the workspace root and the pull request head is data under `pr-head/`; Claude has Read, Glob
   and Grep only, a $5 client budget and at most 30 assistant turns; the job grants `contents: read`, `pull-requests: read` and

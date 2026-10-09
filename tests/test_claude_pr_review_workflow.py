@@ -42,6 +42,7 @@ DIFF = "Write the diff from the merge base"
 REVIEW = "Review the diff"
 NUMBERS = "Keep the run's numbers and check the bounds"
 REPORT = "Publish the review to the job summary"
+FRESH = "Skip a head completed while this review waited"
 
 # What the guard step's env holds when no debug logging is on: each repository setting binds false, and
 # ${{ runner.debug }} renders empty because GitHub sets runner.debug only while debug logging is on.
@@ -91,7 +92,7 @@ def claude_args():
 
 
 def pull(**changes):
-    data = {"state": "open", "title": TITLE_MARKER,
+    data = {"state": "open", "draft": False, "title": TITLE_MARKER,
             "head": {"repo": {"full_name": REPOSITORY}, "sha": HEAD},
             "base": {"repo": {"full_name": REPOSITORY}, "ref": "main"}}
     for key, value in changes.items():
@@ -174,7 +175,7 @@ def run_step(name, env_changes=None, execution_file=None, settings=None, pull_re
         env = {"PATH": str(bin_dir) + os.pathsep + os.environ.get("PATH", os.defpath), "LANG": "C.UTF-8",
                "HOME": str(home), "RUNNER_TEMP": str(directory), "GITHUB_STEP_SUMMARY": str(summary),
                "TMPDIR": str(directory), "GH_REPO": REPOSITORY, "GH_TOKEN": "synthetic-not-a-token",
-               "PR_NUMBER": "12", "HEAD_SHA": HEAD, "DIFF_PATHS": "",
+               "PR_NUMBER": "12", "HEAD_SHA": HEAD, "DIFF_PATHS": "", "EVENT_NAME": "workflow_dispatch",
                "GIT_CONFIG_GLOBAL": os.devnull, "GIT_CONFIG_SYSTEM": os.devnull}
         if execution_file is not None:
             path = directory / "claude-execution-output.json"
@@ -233,9 +234,12 @@ def repository_pair(directory, big=False):
 
 @unittest.skipUnless(yaml, "PyYAML is needed to read the workflow's steps")
 class PullRequestReviewShapeTests(unittest.TestCase):
-    def test_the_only_trigger_is_a_manual_dispatch_with_a_number_and_a_commit(self):
+    def test_the_triggers_are_a_manual_dispatch_and_a_15_minute_schedule(self):
+        # No pull_request, pull_request_target or workflow_run: the review runs only from main's copy of this file
+        # (docs/decisions/2026-10-08-claude-actions-pr-review.md, "Every pull request (2026-10-09)").
         triggers = workflow()[True] if True in workflow() else workflow()["on"]
-        self.assertEqual(list(triggers), ["workflow_dispatch"])
+        self.assertEqual(list(triggers), ["workflow_dispatch", "schedule"])
+        self.assertEqual(triggers["schedule"], [{"cron": "*/15 * * * *"}])
         inputs = triggers["workflow_dispatch"]["inputs"]
         self.assertTrue(inputs["pr_number"]["required"])
         self.assertTrue(inputs["head_sha"]["required"])
@@ -250,12 +254,36 @@ class PullRequestReviewShapeTests(unittest.TestCase):
                        "github.run_attempt == 1",
                        "vars.CLAUDE_PR_REVIEW_ENABLED == 'true'"):
             self.assertIn(clause, condition)
-        self.assertEqual(condition.count("&&"), 5)
+        self.assertIn("needs.resolve.outputs.go == 'true'", condition)
+        self.assertEqual(condition.count("&&"), 6)
         self.assertNotIn("||", condition)
+        self.assertEqual(job()["needs"], "resolve")
+
+    def test_the_resolve_job_holds_no_token_and_reads_only(self):
+        resolve = workflow()["jobs"]["resolve"]
+        self.assertEqual(resolve["permissions"], {"pull-requests": "read", "actions": "read"})
+        condition = " ".join(resolve["if"].split())
+        for clause in ("github.ref == 'refs/heads/main'", "github.actor == github.repository_owner",
+                       "github.triggering_actor == github.repository_owner", "github.run_attempt == 1",
+                       "vars.CLAUDE_PR_REVIEW_ENABLED == 'true'",
+                       "(github.event_name == 'workflow_dispatch' || vars.CLAUDE_PR_REVIEW_EVERY_PR == 'true')"):
+            self.assertIn(clause, condition)
+        self.assertNotIn("uses: actions/checkout", json.dumps(resolve))
+        self.assertNotIn("secrets.", json.dumps(resolve))
+
+    def test_each_review_is_one_matrix_head_with_its_own_group_at_most_two_at_once(self):
+        strategy = job()["strategy"]
+        self.assertEqual(strategy["max-parallel"], 2)
+        self.assertIs(strategy["fail-fast"], False)
+        self.assertEqual(strategy["matrix"], {"include": "${{ fromJSON(needs.resolve.outputs.heads) }}"})
+        self.assertEqual(job()["concurrency"], {
+            "group": "claude-pr-review-pr${{ matrix.pr_number }}-${{ matrix.head_sha }}", "cancel-in-progress": False})
+        self.assertTrue(job()["name"].startswith("Review "))  # the resolve step counts today's reviews by this prefix
 
     def test_the_job_holds_the_oidc_token_and_no_write_scope(self):
+        # actions: read is for the completion-marker recheck (the fresh step) only.
         self.assertEqual(job()["permissions"],
-                         {"contents": "read", "pull-requests": "read", "id-token": "write"})
+                         {"contents": "read", "pull-requests": "read", "actions": "read", "id-token": "write"})
 
     def test_the_job_timeout_leaves_room_for_the_30_turn_bound(self):
         # 30 assistant turns at the measured pace of about 43 s a turn take about 21.4 minutes before checkout and
@@ -270,13 +298,13 @@ class PullRequestReviewShapeTests(unittest.TestCase):
         self.assertNotIn("path", root)
         self.assertIs(root["persist-credentials"], False)
         head = step("Check out the pull request head as data")["with"]
-        self.assertEqual(head["ref"], "${{ inputs.head_sha }}")
+        self.assertEqual(head["ref"], "${{ matrix.head_sha }}")
         self.assertEqual(head["path"], "pr-head")
         self.assertIs(head["persist-credentials"], False)
 
     def test_steps_run_in_the_order_the_binding_depends_on(self):
         names = [item.get("name") for item in job()["steps"]]
-        order = [GUARD, "Check out main at the workspace root", BIND, HEAD_CHECKOUT, STRIP, DIFF, REVIEW, NUMBERS,
+        order = [FRESH, GUARD, "Check out main at the workspace root", BIND, HEAD_CHECKOUT, STRIP, DIFF, REVIEW, NUMBERS,
                  REPORT]
         self.assertEqual([n for n in names if n in order], order)
         self.assertEqual(names[0], "Harden the runner (audit-only network egress)")
@@ -285,7 +313,7 @@ class PullRequestReviewShapeTests(unittest.TestCase):
         names = [item.get("name") for item in job()["steps"]]
         self.assertEqual(names[names.index(HEAD_CHECKOUT) + 1], STRIP)
         self.assertEqual(step(STRIP), {
-            "name": STRIP, "shell": "bash",
+            "name": STRIP, "shell": "bash", "if": "${{ steps.fresh.outputs.go == 'true' }}",
             "run": "set -euo pipefail\nfind pr-head -path pr-head/.git -prune -o -type l -exec rm -f {} +\n"})
 
     def test_no_step_executes_anything_from_the_pull_request_head(self):
@@ -352,7 +380,8 @@ class PullRequestReviewShapeTests(unittest.TestCase):
 
     def test_a_green_run_always_has_an_execution_file(self):
         check = step("Require the run's execution file")
-        self.assertEqual(check["if"], "${{ success() && steps.claude_review.outputs.execution_file == '' }}")
+        self.assertEqual(check["if"], "${{ success() && steps.fresh.outputs.go == 'true' && "
+                                    "steps.claude_review.outputs.execution_file == '' }}")
         self.assertIn("exit 1", check["run"])
 
     def test_the_review_is_published_only_after_the_bounds_check_passed_and_only_numbers_are_uploaded(self):
@@ -364,12 +393,40 @@ class PullRequestReviewShapeTests(unittest.TestCase):
         upload = step("Keep the numeric usage record")
         self.assertTrue(upload["with"]["path"].endswith("/pr-review-usage/usage.json"))
 
-    def test_the_usage_artifact_is_named_for_the_run_and_its_attempt(self):
-        # The decision record names the artifact claude-pr-review-usage-<run id>-<attempt>; the path check above
-        # does not read the name, so the exact name is pinned here.
+    def test_the_usage_artifact_is_named_for_the_pull_request_and_its_head(self):
+        # The resolve step skips a head whose artifact claude-pr-review-usage-pr<N>-<sha> exists, so the exact name is
+        # pinned here.
         upload = step("Keep the numeric usage record")
         self.assertEqual(upload["with"]["name"],
-                         "claude-pr-review-usage-${{ github.run_id }}-${{ github.run_attempt }}")
+                         "claude-pr-review-usage-pr${{ matrix.pr_number }}-${{ matrix.head_sha }}-${{ github.run_id }}")
+
+    def test_the_completion_marker_is_written_only_after_the_bounds_passed_and_the_review_was_published(self):
+        # A usage record is written for failed runs too, so it is never the dedupe key (GPT read of #932, P2 3).
+        gate = "${{ !cancelled() && steps.numbers.outcome == 'success' && steps.publish.outcome == 'success' }}"
+        self.assertEqual(step(REPORT)["id"], "publish")
+        self.assertEqual(step("Write the completion marker")["if"], gate)
+        keep = step("Keep the completion marker")
+        self.assertEqual(keep["if"], gate)
+        self.assertEqual(keep["with"]["name"], "claude-pr-review-done-pr${{ matrix.pr_number }}-${{ matrix.head_sha }}")
+        self.assertEqual(keep["with"]["retention-days"], 90)
+        self.assertEqual(keep["with"]["if-no-files-found"], "error")
+        names = [item.get("name") for item in job()["steps"]]
+        self.assertLess(names.index(REPORT), names.index("Write the completion marker"))
+
+    def test_every_step_before_the_numbers_waits_for_the_recheck(self):
+        # P2 4: a scheduled review that waited on its head's group skips when the head was completed meanwhile.
+        names = [item.get("name") for item in job()["steps"]]
+        self.assertEqual(names[1], FRESH)
+        for item in job()["steps"][2:names.index(NUMBERS)]:
+            self.assertEqual(item.get("if"), "${{ steps.fresh.outputs.go == 'true' }}", item.get("name"))
+        self.assertIn("steps.fresh.outputs.go == 'true'", step("Require the run's execution file")["if"])
+
+    def test_both_jobs_use_the_same_completion_check(self):
+        def body(script):
+            start = script.index("completed() {")
+            return script[start:script.index("echo no", start)]
+        resolve = next(item for item in workflow()["jobs"]["resolve"]["steps"] if item.get("name") == CHOOSE)
+        self.assertEqual(body(resolve["run"]), body(step(FRESH)["run"]))
 
 
 @unittest.skipUnless(shutil.which("jq") and shutil.which("git"),
@@ -433,6 +490,14 @@ class PullRequestReviewStepTests(unittest.TestCase):
                 code, console, _, _, _ = run_step(BIND, pull_request=pull(**changes))
                 self.assertEqual(code, 2, console)
                 self.assertNotIn(TITLE_MARKER, console)
+
+    def test_a_draft_is_bound_on_a_dispatch_and_refused_on_a_scheduled_review(self):
+        code, console, _, _, _ = run_step(BIND, pull_request=pull(draft=True))
+        self.assertEqual(code, 0, console)
+        code, console, _, _, _ = run_step(BIND, {"EVENT_NAME": "schedule"}, pull_request=pull(draft=True))
+        self.assertEqual(code, 2, console)
+        code, console, _, _, _ = run_step(BIND, {"EVENT_NAME": "schedule"}, pull_request=pull())
+        self.assertEqual(code, 0, console)
 
     def test_symbolic_links_in_the_head_are_removed_and_nothing_else(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -700,3 +765,282 @@ class PullRequestReviewStepTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+
+CHOOSE = "Choose the heads"
+WORKFLOW_ID = 4242
+# A stand-in for `gh api` with the GitHub REST shapes the workflow reads: --paginate walks pages of 100 and applies
+# --jq to each page, as gh does; without --paginate only the first page comes back. `fail` names an endpoint whose
+# call exits 1, as an API error does.
+FAKE_GH = """\
+#!/usr/bin/env python3
+import json, os, re, subprocess, sys
+fx = json.load(open(os.path.join(os.environ["RUNNER_TEMP"], "fixtures.json")))
+args = sys.argv[1:]
+if not args or args[0] != "api":
+    sys.exit(99)
+paginate = "--paginate" in args
+rest = [a for a in args[1:] if a != "--paginate"]
+path = rest[0]
+jq = rest[rest.index("--jq") + 1] if "--jq" in rest else None
+def pages(items, key=None):
+    chunks = [items[i:i + 100] for i in range(0, len(items), 100)] or [[]]
+    chunks = chunks if paginate else chunks[:1]
+    return [chunk if key is None else {key: chunk} for chunk in chunks]
+if path.endswith("/actions/workflows/claude-pr-review.yml"):
+    kind, bodies = "workflow", [{"id": fx["workflow_id"]}]
+elif "/actions/workflows/claude-pr-review.yml/runs?" in path:
+    kind, bodies = "runs", pages(fx["runs"], "workflow_runs")
+elif re.search(r"/actions/runs/[0-9]+/jobs", path):
+    run = re.search(r"/actions/runs/([0-9]+)/jobs", path).group(1)
+    jobs = [{"id": i + 1, "name": "Review pull request 1 (read-only, bounded)", "conclusion": "success"}
+            for i in range(fx["jobs"].get(run, 0))]
+    jobs.append({"id": 0, "name": "Choose the pull request heads to review (no token)", "conclusion": "success"})
+    kind, bodies = "jobs", pages(jobs, "jobs")
+elif re.search(r"/actions/runs/[0-9]+$", path):
+    info = fx["run_info"].get(path.rsplit("/", 1)[1])
+    kind = "run"
+    bodies = None if info is None else [{"workflow_id": info[0], "event": info[1], "head_branch": info[2],
+                                         "head_repository": {"full_name": info[3]}}]
+elif "/pulls?" in path:
+    kind, bodies = "pulls", pages(fx["pulls"])
+elif "/actions/artifacts?name=" in path:
+    name = path.split("name=", 1)[1].split("&", 1)[0]
+    arts = [{"name": name, "expired": False, "workflow_run": {"id": run_id}}
+            for run_id in fx["artifacts"].get(name, [])]
+    kind, bodies = "artifacts", pages(arts, "artifacts")
+else:
+    sys.exit(98)
+if fx["fail"] == kind or bodies is None:
+    sys.stderr.write("gh: HTTP 502\\n")
+    sys.exit(1)
+for body in bodies:
+    text = json.dumps(body)
+    if jq is None:
+        sys.stdout.write(text)
+    else:
+        sys.stdout.write(subprocess.run(["jq", "-r", jq], input=text, capture_output=True, text=True,
+                                        check=True).stdout)
+"""
+
+
+def open_pull(number, sha, **changes):
+    data = pull(**changes)
+    data["number"] = number
+    data["head"]["sha"] = sha
+    return data
+
+
+def sha_of(n):
+    return f"{n:040x}"
+
+
+class Api:
+    """Fixtures for the stand-in gh: today's runs, their review jobs, open pull requests and completion markers."""
+
+    def __init__(self, pulls=(), fail=None):
+        self.data = {"workflow_id": WORKFLOW_ID, "runs": [], "jobs": {}, "pulls": list(pulls), "artifacts": {},
+                     "run_info": {}, "fail": fail}
+
+    def marker(self, pr, sha, run_id, workflow_id=WORKFLOW_ID, event="schedule", branch="main", repo=REPOSITORY):
+        self.data["artifacts"].setdefault(f"claude-pr-review-done-pr{pr}-{sha}", []).append(run_id)
+        self.data["run_info"][str(run_id)] = [workflow_id, event, branch, repo]
+        return self
+
+    def reviews_today(self, run_id, count, event="schedule", branch="main"):
+        self.data["runs"].append({"id": run_id, "head_branch": branch, "event": event})
+        self.data["jobs"][str(run_id)] = count
+        return self
+
+
+def run_api_step(script, api, values):
+    """Run a step's shell against the stand-in gh. Returns (exit code, console, outputs, summary)."""
+    with tempfile.TemporaryDirectory() as temporary:
+        directory = Path(temporary)
+        (directory / "fixtures.json").write_text(json.dumps(api.data), encoding="utf-8")
+        bin_dir = directory / "bin"
+        bin_dir.mkdir()
+        (bin_dir / "gh").write_text(FAKE_GH, encoding="utf-8")
+        (bin_dir / "gh").chmod(0o755)
+        output, summary = directory / "output", directory / "summary.md"
+        variables = {"PATH": str(bin_dir) + os.pathsep + SEARCH_PATH,
+                     "LANG": "C.UTF-8", "HOME": str(directory), "RUNNER_TEMP": str(directory),
+                     "GITHUB_OUTPUT": str(output), "GITHUB_STEP_SUMMARY": str(summary), "GH_REPO": REPOSITORY,
+                     "GH_TOKEN": "synthetic-not-a-token"}
+        variables.update(values)
+        done = subprocess.run(["bash", "-c", script], env=variables, capture_output=True, text=True, check=False,
+                              cwd=directory)
+        outputs = dict(line.split("=", 1) for line in output.read_text().splitlines()) if output.exists() else {}
+        return (done.returncode, done.stdout + done.stderr, outputs,
+                summary.read_text(encoding="utf-8") if summary.exists() else "")
+
+
+SEARCH_PATH = os.environ.get("PATH", os.defpath)
+
+
+def run_choose(api, event="schedule", changes=None):
+    choose = next(item for item in workflow()["jobs"]["resolve"]["steps"] if item.get("name") == CHOOSE)
+    values = {"EVENT_NAME": event, "PR_NUMBER": "", "HEAD_SHA": "", "DAILY_USD": "55"}
+    values.update(changes or {})
+    return run_api_step(choose["run"], api, values)
+
+
+def heads_of(outputs):
+    return [(h["pr_number"], h["head_sha"]) for h in json.loads(outputs.get("heads", "[]"))]
+
+
+@unittest.skipUnless(shutil.which("jq"), "jq is needed to run the resolve step")
+class ResolveStepTests(unittest.TestCase):
+    """The tokenless resolve job: which heads a tick reviews. A skipped tick exits 0 with go=false and no heads."""
+
+    def test_a_dispatch_passes_its_checked_inputs_through(self):
+        code, console, outputs, _ = run_choose(Api(), "workflow_dispatch", {"PR_NUMBER": "12", "HEAD_SHA": HEAD})
+        self.assertEqual(code, 0, console)
+        self.assertEqual(outputs["go"], "true")
+        self.assertEqual(heads_of(outputs), [(12, HEAD)])
+
+    def test_a_malformed_dispatch_is_refused(self):
+        for changes in ({"PR_NUMBER": "12; x", "HEAD_SHA": HEAD}, {"PR_NUMBER": "12", "HEAD_SHA": "main"}):
+            with self.subTest(changes=changes):
+                code, console, outputs, _ = run_choose(Api(), "workflow_dispatch", changes)
+                self.assertEqual(code, 2, console)
+                self.assertNotIn("go", outputs)
+
+    def test_an_open_same_repository_non_draft_head_not_yet_reviewed_is_chosen(self):
+        code, console, outputs, summary = run_choose(Api([open_pull(7, HEAD)]))
+        self.assertEqual(code, 0, console)
+        self.assertEqual(outputs["go"], "true")
+        self.assertEqual(heads_of(outputs), [(7, HEAD)])
+        self.assertIn(f"Review: pull request #7 at {HEAD}", summary)
+        self.assertNotIn(TITLE_MARKER, console + summary)
+
+    def test_a_fork_head_a_draft_another_base_and_a_closed_pull_request_are_never_chosen(self):
+        pulls = [open_pull(1, sha_of(1), **{"head.repo.full_name": "someone/fork"}),
+                 open_pull(2, sha_of(2), draft=True),
+                 open_pull(3, sha_of(3), **{"base.ref": "release"}),
+                 open_pull(4, sha_of(4), state="closed"),
+                 open_pull(5, sha_of(5), **{"base.repo.full_name": "someone/else"})]
+        code, console, outputs, summary = run_choose(Api(pulls))
+        self.assertEqual(code, 0, console)
+        self.assertEqual(outputs, {"go": "false", "heads": "[]"})
+        self.assertIn("No review this run", summary)
+
+    def test_a_completed_head_is_skipped_and_a_new_head_of_the_same_pull_request_is_chosen(self):
+        code, console, outputs, _ = run_choose(Api([open_pull(7, HEAD)]).marker(7, HEAD, 9001))
+        self.assertEqual(code, 0, console)
+        self.assertEqual(outputs["go"], "false")
+        code, console, outputs, _ = run_choose(Api([open_pull(7, "c" * 40)]).marker(7, HEAD, 9001))
+        self.assertEqual(code, 0, console)
+        self.assertEqual(heads_of(outputs), [(7, "c" * 40)])
+
+    def test_a_marker_from_anything_but_this_workflows_schedule_or_dispatch_on_main_here_is_ignored(self):
+        # GPT read of #932, P2 1: a fork's branch can be named main, and any workflow can upload an artifact with the
+        # marker's name; the uploading run is looked up and must be this workflow's own on main in this repository.
+        spoofs = {
+            "a fork's branch named main": dict(repo="someone/fork"),
+            "a pull_request run": dict(event="pull_request"),
+            "another workflow": dict(workflow_id=999),
+            "another branch": dict(branch="feature"),
+        }
+        for label, changes in spoofs.items():
+            with self.subTest(spoof=label):
+                code, console, outputs, _ = run_choose(Api([open_pull(7, HEAD)]).marker(7, HEAD, 9002, **changes))
+                self.assertEqual(code, 0, console)
+                self.assertEqual(heads_of(outputs), [(7, HEAD)])
+        api = Api([open_pull(7, HEAD)]).marker(7, HEAD, 9003, event="workflow_dispatch")
+        self.assertEqual(run_choose(api)[2]["go"], "false")
+
+    def test_a_usage_record_without_a_completion_marker_does_not_count_as_reviewed(self):
+        # P2 3: a failed review leaves a usage record but no marker, so the head is tried again.
+        api = Api([open_pull(7, HEAD)])
+        api.data["artifacts"][f"claude-pr-review-usage-pr7-{HEAD}-9004"] = [9004]
+        api.data["run_info"]["9004"] = [WORKFLOW_ID, "schedule", "main", REPOSITORY]
+        self.assertEqual(heads_of(run_choose(api)[2]), [(7, HEAD)])
+
+    def test_more_than_a_page_of_pull_requests_still_reaches_every_head(self):
+        # P2 2: with 101 eligible pull requests and the oldest 100 completed, the 101st is chosen.
+        api = Api([open_pull(n, sha_of(n)) for n in range(1, 102)])
+        for n in range(1, 101):
+            api.marker(n, sha_of(n), 10000 + n)
+        code, console, outputs, _ = run_choose(api)
+        self.assertEqual(code, 0, console)
+        self.assertEqual(heads_of(outputs), [(101, sha_of(101))])
+
+    def test_the_daily_ceiling_counts_reviews_past_the_first_page_of_runs(self):
+        # P2 2: 100 newer runs without reviews come before an older run with ten; the ceiling still holds.
+        api = Api([open_pull(7, HEAD)])
+        for run_id in range(1, 101):
+            api.reviews_today(run_id, 0)
+        api.reviews_today(500, 10)
+        code, console, outputs, summary = run_choose(api)
+        self.assertEqual(code, 0, console)
+        self.assertEqual(outputs, {"go": "false", "heads": "[]"})
+        self.assertIn("daily ceiling of 55 USD", summary)
+
+    def test_at_most_two_heads_per_tick_oldest_first(self):
+        code, console, outputs, _ = run_choose(Api([open_pull(n, sha_of(n)) for n in (3, 4, 5)]))
+        self.assertEqual(code, 0, console)
+        self.assertEqual([n for n, _ in heads_of(outputs)], [3, 4])
+
+    def test_the_daily_ceiling_stops_new_reviews_and_reports_it(self):
+        code, console, outputs, summary = run_choose(Api([open_pull(7, HEAD)]).reviews_today(101, 10))
+        self.assertEqual(code, 0, console)
+        self.assertEqual(outputs, {"go": "false", "heads": "[]"})
+        self.assertIn("daily ceiling of 55 USD", summary)
+        api = Api([open_pull(7, HEAD), open_pull(8, "d" * 40)]).reviews_today(101, 9)
+        self.assertEqual(heads_of(run_choose(api)[2]), [(7, HEAD)])  # room for one more review at 5.50 USD
+
+    def test_runs_from_pull_request_events_or_other_branches_do_not_count_toward_the_ceiling(self):
+        api = Api([open_pull(7, HEAD)]).reviews_today(101, 50, event="pull_request")
+        api.reviews_today(102, 50, branch="feature")
+        self.assertEqual(heads_of(run_choose(api)[2]), [(7, HEAD)])
+
+    def test_a_malformed_ceiling_skips(self):
+        code, console, outputs, _ = run_choose(Api([open_pull(7, HEAD)]), changes={"DAILY_USD": "1e9"})
+        self.assertEqual(code, 0, console)
+        self.assertEqual(outputs["go"], "false")
+
+    def test_an_api_failure_fails_the_job_and_chooses_nothing(self):
+        for endpoint in ("workflow", "runs", "jobs", "pulls", "artifacts", "run"):
+            with self.subTest(endpoint=endpoint):
+                api = Api([open_pull(7, "e" * 40)], fail=endpoint).reviews_today(101, 1).marker(7, "e" * 40, 9005)
+                code, console, outputs, _ = run_choose(api)
+                self.assertNotEqual(code, 0, console)
+                self.assertNotEqual(outputs.get("go"), "true")
+
+    def test_another_event_skips(self):
+        code, console, outputs, _ = run_choose(Api([open_pull(7, HEAD)]), "push")
+        self.assertEqual(code, 0, console)
+        self.assertEqual(outputs["go"], "false")
+
+
+@unittest.skipUnless(shutil.which("jq"), "jq is needed to run the recheck step")
+class RecheckStepTests(unittest.TestCase):
+    """P2 4: the review job's recheck once it holds its head's group."""
+
+    def run_fresh(self, api, event="schedule"):
+        return run_api_step(step(FRESH)["run"], api, {"EVENT_NAME": event, "PR_NUMBER": "7", "HEAD_SHA": HEAD})
+
+    def test_a_scheduled_review_of_a_head_completed_while_it_waited_is_skipped(self):
+        code, console, outputs, summary = self.run_fresh(Api().marker(7, HEAD, 9010, event="workflow_dispatch"))
+        self.assertEqual(code, 0, console)
+        self.assertEqual(outputs, {"go": "false"})
+        self.assertIn("was reviewed while this run waited", summary)
+
+    def test_a_scheduled_review_of_an_uncompleted_head_goes_ahead(self):
+        code, console, outputs, _ = self.run_fresh(Api().marker(7, HEAD, 9011, repo="someone/fork"))
+        self.assertEqual(code, 0, console)
+        self.assertEqual(outputs, {"go": "true"})
+
+    def test_a_dispatch_always_reviews(self):
+        code, console, outputs, _ = self.run_fresh(Api().marker(7, HEAD, 9012), "workflow_dispatch")
+        self.assertEqual(code, 0, console)
+        self.assertEqual(outputs, {"go": "true"})
+
+    def test_an_api_failure_fails_the_step(self):
+        for endpoint in ("workflow", "artifacts", "run"):
+            with self.subTest(endpoint=endpoint):
+                code, console, outputs, _ = self.run_fresh(Api(fail=endpoint).marker(7, HEAD, 9013))
+                self.assertNotEqual(code, 0, console)
+                self.assertNotEqual(outputs.get("go"), "true")
