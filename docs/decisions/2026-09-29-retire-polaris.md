@@ -24,7 +24,7 @@ Before the retirement, Polaris ran the services listed below. Each was classifie
 | `lane-proxy` container (gVisor) and its bridge networks; `lane-egress`, `polaris-gate`, `polaris-drift` and `memguard` units | Plumbing from the pre-convergence agent estate. `polaris-drift` had already been failing (exit 203). | Removed through Polaris's own dockerd, then retired |
 | `wslinterop-guard.timer` | Kept the VM-wide WSLInterop entry alive against a peer distro's shutdown. With one distro left, WSL's generated `systemd-binfmt` override (`/run/systemd/generator/systemd-binfmt.service.d/override.conf`: no unregister on stop, re-registration on start) covers NativeStack. `cmd.exe` ran from NativeStack after the terminate and again after the unregister. | Retired |
 | A private project workspace and its Windows Terminal profile | Still in use. | Migrated to NativeStack at the same absolute path |
-| Windows scheduled task `\NoesisBackup` | Ran a meridian backup script that no longer existed (last result 127). | Definition exported, task deleted |
+| Windows scheduled task `\<win-host>Backup` | Ran a meridian backup script that no longer existed (last result 127). | Definition exported, task deleted |
 
 ## What was kept
 

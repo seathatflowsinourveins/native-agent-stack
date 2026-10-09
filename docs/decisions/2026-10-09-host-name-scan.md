@@ -134,9 +134,16 @@ remain distinct from the native host run.
 The CC's second host read separated the public distro hostname from the genuine
 Windows computer source. A source-specific equality exclusion addresses the
 public identifier. The two named current-tree files contained three bare
-computer-name references, which are now masked; a longer ordinary task-name
-substring is preserved. Original historical execution claims stay unchanged;
-their publication metadata is rehashed after this privacy correction.
+computer-name references, which are now masked. A further CC read identified
+the computer name joined to `Backup` in a scheduled-task name; that token is
+also masked with the `<win-host>` placeholder. The earlier description of it as an ordinary
+task-name substring was wrong. Original historical execution claims stay
+unchanged; their publication metadata is rehashed after this privacy correction.
+
+Joined words such as `<name>Backup` are outside the scanner's bare-name coverage:
+the native Unicode letter/number boundary filter excludes them. The masked
+scheduled-task token is a manual privacy correction, and the clean host scan
+does not establish detection of names inside joined words.
 
 Remaining measured-scope limits from the micro-read: commit messages, annotated
 tag contents and ref names are not scanned; metadata checks cover author and
@@ -145,6 +152,13 @@ uses its default merge-diff behavior. New refs exclude commits reachable from
 all local remote-tracking refs, rather than only the push destination. ANSI,
 hex/octal/backspace/NUL delimiter escape coverage is not claimed by the current
 boundary exception. These remain declared P3 scope items, not passing tests.
+
+Other non-blocking P3 follow-ups from the final micro-read remain open: deriving
+the public distro identifier without relying on `WSL_DISTRO_NAME`; non-import
+file coverage for isolated inline Python in `patch_policy`; encoded record
+separators before a name; stale pre-push and `RESOLVER.md` comments; and the
+nullable `scanned_files` count. They are not resolved by this documentation and
+privacy correction.
 
 ## SOTA sources
 

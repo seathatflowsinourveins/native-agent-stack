@@ -17772,8 +17772,8 @@
     },
     {
       "path": "docs/decisions/2026-09-29-retire-polaris.md",
-      "sha256": "a8b13e549ec2da5667884b20ee2157bb6a38126446ac2d2a211dd04ca1428c2c",
-      "bytes": 5303
+      "sha256": "1b5b1b866e70ca58aed0ca8391de2355dd1a7a5497134e4d64d65bbfd35b39b6",
+      "bytes": 5307
     },
     {
       "path": "docs/decisions/2026-09-29-shell-command-parser.md",
@@ -18317,8 +18317,8 @@
     },
     {
       "path": "docs/decisions/2026-10-09-host-name-scan.md",
-      "sha256": "1522293a8643bd60316d44e416a855a21e1b2dd6b610c7072fb365c2e311d20f",
-      "bytes": 14477
+      "sha256": "35da3d0ed9e661ac1834589d5438ab6a8e29ffdf4f5ac29da8a22393b7cfa751",
+      "bytes": 15360
     },
     {
       "path": "docs/decisions/2026-10-09-mcp-surfaces-trials.md",
