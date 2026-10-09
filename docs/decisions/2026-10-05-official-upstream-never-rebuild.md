@@ -1,28 +1,28 @@
 # Official upstream releases; never rebuild shipped functionality
 
-Date: 2026-10-05. Status: accepted instruction change for bounded job 072; no runtime selection or installation change.
+Date: 2026-10-05. Status: accepted instruction change for bounded job 072; no runtime selection or installation change. The surfaces, bindings and checks below describe that integration; the non-trading instruction carriers now use the later Native engineering defaults.
 
-## User instruction
+## Owner instruction and upstream source practice
 
-The user's words at 2026-10-05T04:26:41Z, verbatim:
+At 2026-10-05T04:26:41Z the owner directed clean installation of SOTA upstream repositories, especially vendor-owned organizations such as [Alpaca's organization](https://github.com/alpacahq), instead of rebuilding or self-building shipped functionality, across the existing and new WSL harness rules, including the trading lane.
 
-> not rebuilt,self built ,always using thesota rpeos upstream clean install etc it should reflect within our harness rules across new wsl and ours, including the trading lane, using the sota upstream especially the org repos like https://github.com/alpacahq and other sota repos ,never rebuilt that is already sota ,and always find sota referneces, platfroms, trading engines,rutnimes and beyond as clean install practice or referneces
+They also required SOTA references across platforms, trading engines and runtimes. [Alpaca's SDK README](https://github.com/alpacahq/alpaca-py/blob/cc4cb3b7ba50ae250e621983c2779047fb16bb28/README.md#installation), [Alpaca's MCP README](https://github.com/alpacahq/alpaca-mcp-server/blob/9b0c72beda5579de088413ce9c3720456cde8f5f/README.md), and [Nautilus's IBKR guide](https://github.com/nautechsystems/nautilus_trader/blob/7b766f8825b2539c5b2ac1375e9d97b41c509edb/docs/integrations/interactive_brokers.md) document maintained native distributions; reuse the interface that supplies the task's capability.
 
 ## Decision and purpose
 
-Carry the user's official-upstream rule into the existing-host, portable, scaffold and new-WSL instructions, including the trading lane. This serves the north-star action of building the research harness for US-equities research, historical simulation and independently qualified broker paper operation using maintained upstream components.
+Carry the owner's official-upstream rule into existing-host, portable, scaffold and new-WSL instructions, including the trading lane, using the pinned SDK, MCP and IBKR source guides above. This serves US-equities research, historical simulation and independently qualified broker paper operation using maintained upstream components.
 
-The original job 072 sentence below was superseded by the October 5 PR #726 repair addendum. It records that job's wording, not the user's verbatim instruction:
+The original job 072 sentence below was superseded by the October 5 PR #726 repair addendum. It records that job's wording, not the owner's direct instruction:
 
 > Prefer the maintainer's own organization repositories (the vendor's GitHub org, such as alpacahq for Alpaca) and their clean releases, and never rebuild, fork or wrap what an upstream already ships.
 
 The trading clause names the vendor-owned SDK, optional MCP server, engine and official IBKR API distribution. An upstream adapter is reused when shipped; glue is limited to a demonstrated upstream gap and cites its source at a pin. Release discovery is evidence for the instruction, not an upgrade directive. `catalogs/us-equities/runtime-target.json` and `manifests/evidence.json` remain under their lane/coordinator ownership.
 
-Alternatives considered: retain only the previous cited-reference implementation rule; prefer community forks or local wrappers despite an upstream release providing the capability; adopt the explicit vendor-organization and clean-release rule. Adopt the last alternative because it directly implements the user's instruction and the sources below already provide maintained native products and installation paths. No new runtime, dependency, adapter or runner is needed for this change.
+Alternatives considered: retain only the previous cited-reference implementation rule; prefer community forks or local wrappers despite an upstream release providing the capability; adopt the explicit vendor-organization and clean-release rule. Adopt the last alternative because it implements the owner's instruction and the pinned SDK, MCP and IBKR guides above provide native products and installation paths. No new runtime, dependency, adapter or runner is needed for this change.
 
-The bounded builder uses the requested GPT Sol at max pin. The installed `writing-for-agents` skill guides instruction placement and lossless pruning; `search-first` was read and its inline workflow used for the existing rules, generators and official sources. This documentation task requires no package installation or new research runner. The scoped ai-memory query (`pin_first=true`, `limit=2`) returned `MCP tool call requires approval, but approval policy is never`; canonical repository files and current primary sources supplied the evidence instead.
+The requested GPT Sol at max pin remains the bounded job's historical builder route, not a model default. Its `writing-for-agents` and `search-first` steps handled existing rules, generators and official sources; [Alpaca's pinned SDK installation](https://github.com/alpacahq/alpaca-py/blob/cc4cb3b7ba50ae250e621983c2779047fb16bb28/README.md#installation) supplies the native reuse example. No package installation or new research runner ran here. The scoped ai-memory query (`pin_first=true`, `limit=2`) returned `MCP tool call requires approval, but approval policy is never`; repository files and primary sources supplied the evidence instead.
 
-## Instruction surfaces and bindings
+## Instruction surfaces and bindings (2026-10-05)
 
 | Surface | Change and binding |
 | --- | --- |
@@ -35,11 +35,11 @@ The bounded builder uses the requested GPT Sol at max pin. The installed `writin
 | `docs/decisions/2026-10-02-new-wsl-client-configuration.md` | Append the dated current dropped-unit projection printed by `--check --markdown`; `RecordTests` also binds this surface to the generator output. Earlier snapshots retain their original counts. |
 | `docs/new-wsl-handbook.md` and `docs/new-wsl-handbook.json` | Regenerated with `python3 scripts/build_new_wsl_handbook.py --write`; the builder's source metadata determines whether their bytes change. |
 
-The existing test bindings are updated for the exact added sentence and the new Codex block hash/count. No test budget is relaxed. `adoption/scaffold/CLAUDE.md` already imports `AGENTS.md`, and `adoption/bootstrap.md` points to the scaffold rather than repeating the rule; neither needs another copy.
+At job 072, the test bindings were updated for the exact added sentence and the new Codex block hash/count; no test budget was relaxed. `adoption/scaffold/CLAUDE.md` imported `AGENTS.md`, and `adoption/bootstrap.md` pointed to the scaffold rather than repeating the rule. This table records that dated integration, not the current carriers' exact wording.
 
 ## Codex byte budget and every compression
 
-At base `4c897418fe35a030a1188ae447eaf31c893f8eff`, the Codex template is 8,187 bytes. The exact sentence and its newline add 199 bytes. Six wording-only compressions save 196 bytes, yielding **8,190 bytes**. This meets the requested 8,192-byte ceiling and the existing test's stricter `< 8192` assertion. The staged block including session lanes moves from 827 to 822 whitespace-separated words; its SHA-256 is `819e63e9e6c2e90eca91a788f4f0b33c382271ebff9d7a99f6cc45b6d45bb54f`.
+At base `4c897418fe35a030a1188ae447eaf31c893f8eff`, the Codex template is 8,187 bytes. The exact sentence and its newline add 199 bytes. Six wording-only compressions save 196 bytes, yielding **8,190 bytes**. This meets the fixed 8,192-byte ceiling and the existing test's stricter `< 8192` assertion. The staged block including session lanes moves from 827 to 822 whitespace-separated words; its SHA-256 is `819e63e9e6c2e90eca91a788f4f0b33c382271ebff9d7a99f6cc45b6d45bb54f`. Keep native awareness distinct from local compression, as [RTK's pinned Codex initializer](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/hooks/init/codex.rs) does.
 
 All compressions are after `<!-- native-agent-stack:session-lanes -->`, outside the top-rule block shared with the scaffold. The complete RTK upstream text and exceptions block stay byte-identical to the base. This also keeps this job away from the RTK exceptions edits in open [PR #709](https://github.com/seathatflowsinourveins/native-agent-stack/pull/709), whose template and test changes still need normal coordinator reconciliation at integration.
 
@@ -82,25 +82,25 @@ The first complete suite run returned exit 1: 488 tests in 147.662 s, one failur
 | `wc -c adoption/templates/codex.AGENTS.template.md` | 0 | 8,190 bytes. |
 | `git diff --check` | 0 | No whitespace errors. |
 
-Completeness check: the rule reaches repository, both client templates, scaffold, both manifest-filtered new-WSL instruction carriers and the trading lane. The review includes SDK, MCP, engine/native adapter and API-distribution source classes. Discovery distinguishes stable from prerelease and installation/source evidence from execution. It leaves host credentials, runtime selections and the evidence registry untouched. The next trading landscape sweep should compare rc6 and API 1051 compatibility against its selected pins rather than treating this documentation update as adoption.
+Job 072's completeness check: the rule reached repository, both client templates, scaffold, both manifest-filtered new-WSL instruction carriers and the trading lane. The review included SDK, MCP, engine/native adapter and API-distribution source classes. Discovery distinguished stable from prerelease and installation/source evidence from execution. It left host credentials, runtime selections and the evidence registry untouched. Its follow-up was a trading landscape comparison of rc6 and API 1051 compatibility against selected pins, not adoption by this documentation update.
 
 ## Overturn condition
 
-Revisit a named source when the vendor supersedes it, stops maintaining it or publishes a better native distribution. Replace its citation only after official release/source review and the lane's applicable native compatibility checks establish the successor. Glue must shrink or disappear when upstream ships its capability. A documented, pinned missing capability can justify limited glue; it does not overturn the prohibition on duplicating shipped functionality. The user's rebuilding and self-building instruction is quoted verbatim above. The original blanket fork/wrap ban was our interpretation and is superseded below; it must not be attributed to the user.
+Revisit a named source when the vendor supersedes it, stops maintaining it or publishes a better native distribution. Replace its citation only after official release/source review and applicable native compatibility checks establish the successor. Glue must shrink or disappear when upstream ships its capability. [Nautilus's pinned IBKR guide](https://github.com/nautechsystems/nautilus_trader/blob/7b766f8825b2539c5b2ac1375e9d97b41c509edb/docs/integrations/interactive_brokers.md#installation) supplies a shipped-adapter example; a documented, pinned missing capability can justify limited glue, while duplication of that adapter cannot. The owner's rebuilding and self-building instruction is paraphrased above; the original blanket fork/wrap ban was the coordinator's interpretation, is superseded below and must not be attributed to the owner.
 
 ## Addendum (2026-10-05): PR #726 wording and clean releases
 
-The coordinator adopts this sentence on the root, both client sources, scaffold,
-trading adapter clause and generated instruction carriers:
+At PR #726 on 2026-10-05, the coordinator adopted this exact sentence on the root, both client sources, scaffold,
+trading adapter clause and generated instruction carriers; this is the historical adoption, not a claim that the current carriers retain it:
 
 > Prefer the maintainer's own organization repositories (the vendor's GitHub org, such as alpacahq for Alpaca) and their clean releases, and never rebuild or fork what an upstream already ships; glue only fills a demonstrated gap, cited at a pin.
 
-Only the 2026-10-05T04:26:41Z words under User instruction are attributed to the
-user. They say "not rebuilt,self built" and "never rebuilt that is already sota";
-they do not say fork or wrap. The explicit fork rule is the coordinator's adopted
-implementation. The glue allowance reconciles the rule with required upstream
-installers, the ecosystem launcher and `gpt_researcher.sh`, rather than treating
-their presence as authority to duplicate a shipped capability.
+Among the rebuild/fork/wrap restrictions, only the rebuilding and self-building prohibition in the 2026-10-05T04:26:41Z owner directive is attributed to them.
+They did not explicitly prohibit forks or wraps; the explicit fork rule is the coordinator's adopted implementation,
+and the superseded blanket fork/wrap ban must not be attributed to the owner. [Alpaca's pinned SDK README](https://github.com/alpacahq/alpaca-py/blob/cc4cb3b7ba50ae250e621983c2779047fb16bb28/README.md#installation),
+[MCP setup guide](https://github.com/alpacahq/alpaca-mcp-server/blob/9b0c72beda5579de088413ce9c3720456cde8f5f/README.md) and [Nautilus's pinned IBKR integration](https://github.com/nautechsystems/nautilus_trader/blob/7b766f8825b2539c5b2ac1375e9d97b41c509edb/docs/integrations/interactive_brokers.md) support native reuse.
+The glue allowance reconciles the rule with required upstream installers, the ecosystem launcher and `gpt_researcher.sh`,
+rather than treating their presence as authority to duplicate a shipped capability; cite a demonstrated missing capability at a pin.
 
 Here, a **clean release** is the maintainer's published release or tag, installed
 by its documented installer. A prerelease counts only where the lane's selection

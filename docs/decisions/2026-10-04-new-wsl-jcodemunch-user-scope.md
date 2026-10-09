@@ -1,12 +1,12 @@
 # Decision: jCodeMunch is registered at user scope on NativeStack2604 (2026-10-04)
 
-**Decided by:** the user, on 2026-10-04, in reply to a note of the You-should-know side agent ("The new WSL registers the
-jCodeMunch code-lookup tool per project, so new projects and worktrees start without it ... Decide which you want:
-per-project setup, or one registration for all projects on the new WSL"): "we need to set up all the sota repos, mcp
-tools, harness rules, upstream cc native hooks and beyond, resolute them cleanly for future session to make sure their
-seamless pick up and thier native workflow enhanced with the sota practice". The command center (session
-`wsl-architecture-design`) read it as the choice of one registration for every project and agreed; session
-native-agent-stack-99's unit U8 carried it out.
+**Decided by:** the owner on 2026-10-04, responding to the You-should-know side agent's report that per-project
+registration leaves fresh projects and worktrees without jCodeMunch. Paraphrased, they asked for SOTA repositories,
+MCP tools, harness rules and native hooks to be prepared for seamless use in future sessions. The command center
+(session `wsl-architecture-design`) interpreted that answer as choosing one registration for every project and agreed;
+session native-agent-stack-99's unit U8 implemented it. This is the coordinator's scoped reading of the owner's reply.
+The [pinned upstream integration](https://github.com/jgravelle/jcodemunch-mcp/blob/6d5ae86c130f96624e2ca2d797fa3b853c210b9d/README.md) supplies the MCP interface, rather than selection authority.
+Registration reach leaves the recorded 1.387-times cost and client loading/invocation limits below in force.
 
 **Scope:**
 
@@ -73,8 +73,8 @@ releases); its result decides which tools stay in the default at all.
 - decision 2 of `docs/decisions/2026-09-25-codex-mcp-scope.md` and F6 of `docs/decisions/2026-09-26-token-practice-f1-f9.md`
   ("jcodemunch stays project-scoped").
 
-Those reasons still describe real costs. The user's directive, that every fresh session starts with the tools ready, ranks
-above them.
+Those reasons still describe real costs. The owner's October 4 direction, interpreted by the command center as requiring
+ready tools in every fresh session, overrides both earlier scope decisions above for this distribution; an upstream README does not grant that authority.
 
 ## Alternatives considered
 

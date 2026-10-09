@@ -28,8 +28,8 @@ pointers below retain the five specific pairs without naming components in a dec
 
 ## What the proposal did
 
-The PR body says it answered the 2026-09-29 request, "all catalogs, evidence manifest cleanly into one
-with ranking". Its own record says the user asked for evidence strength first
+The PR body says it answered the owner's 2026-09-29 request to combine catalogs and the evidence
+manifest into a ranked index. Its own record says the owner asked for evidence strength first
 ([docs/decisions/2026-09-29-catalog-index-ranking.md:164-167][old-evidence-order]). The branch adds
 four files; their exact Git blob identities at the retained head are:
 

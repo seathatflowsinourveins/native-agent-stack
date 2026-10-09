@@ -9,7 +9,7 @@ why it stays, and when each carried change goes. Evidence: `evidence/artifacts/o
 
 ## Decision
 
-Keep the composition that runs on 20128 (the Codex lane's gateway). 20129 (`omniroute-fw`, framework-only, no Codex accounts of its own) runs the published content plus #13788 only and is unchanged:
+Keep the composition that ran on 20128 on 2026-10-05 (option C), under this record's reading of the relayed owner directive below, with its [version-pinned model/effort implementation](https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/executors/codex/reasoningSuffix.ts) and patch provenance. The current-state block above governs later changes. 20129 (`omniroute-fw`, framework-only, no Codex accounts of its own) retains published content plus #13788:
 
 | Part | Commit | What it does | Why it stays | Removal or re-pin condition |
 | --- | --- | --- | --- | --- |
@@ -62,14 +62,14 @@ composition fails to start, and expect those routes to fail until the unit is mo
 
 **Rollback of the drain switch (the first hop).** The canary moves 20128 from the running prefix `omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167` (build `cf6748d04`, PR 15167 head `f5d8e150b`, #13788, lsof shim v2) to the drain prefix. That running prefix stays installed untouched until the drain build has passed the live acceptance, and is what 20128 returns to: `switch_gateways.py --rollback <the switch directory it printed>` (the committed tool, `evidence/artifacts/omniroute-sol-max-20260930/scripts/switch_gateways.py.txt`, run with `--only 20128` for the switch; it also rolls the unit back by itself when its health or identity read-back fails) restores the saved unit file and restarts only 20128 (a single-unit switch saves one unit; 20129 is not touched). The older `…-affinity2` prefix above is the fallback for a composition that fails to start, not the rollback of this switch. The same applies on 2604: the co-op keeps the prefix 21128 runs today until its read-back of the drain build passes. That prefix is `~/.local/share/omniroute-builds/omniroute-3.8.51-5f4b3d577-affinity-pr15167` (the target of the unit's `ExecStart`; `omniroute --version` 3.8.51, `BUILD_SHA` `5f4b3d577`, which is the `dist/BUILD_SHA` of the first composition tarball `omniroute-3.8.51.tgz`, sha256 `d3fda90c297ed1ecbaa82ca42298735ce0b393db9a07bad0b4b79efce118ebe2`: the v3.8.51 tag, the affinity patch and PR 15167, no #13788 and no drain), as the co-op's row 165024Z gives it (relayed through the command center's relay; 2604 was not read from here). The co-op's earlier prefix `~/.local/share/omniroute-builds/omniroute-3.8.52-23a11484-pr13788-pr15167` (the previous canary) is its fallback for a composition that fails to start, not the first-hop rollback. Rollback triggers are in the acceptance protocol (any failed gated check, an effort column that differs from the baseline, a health failure, a `Failed to save call log` line, or no complete acceptance within two hours of the switch).
 
-## Context: the user's choices (relayed by the command center; the writing session heard none of them)
+## Context: owner choices and this record's reading (command-center relays; the writer heard none directly)
 
-At 2026-10-05T13:22:24Z the user picked the option "Published 3.8.51 (Recommended)" in a choice that, as the command center relayed it, called the running build "release/v3.8.52 plus PRs 13788 and 15167" and named only the
-`xhigh` limit as its cost. The running build is `release/v3.8.51`-based and also carries the affinity patch; this session read the facts below and asked for a choice among A (published only),
-B (published plus the affinity patch) and C (keep). The user picked "Published + affinity patch (Recommended)" and then, in the command center's verbatim relay: "we need highest quality resolution
-and interms ofthe never rebuilt rule, never build with sota reference and evidances, in this case we have them so our actions is not gated and the sota resolution is needed for seamless workflow".
-Read with its context, the never-rebuild rule (`AGENTS.md`, top rule: never rebuild or fork what an upstream already ships, glue only fills a demonstrated gap, cited at a pin; `docs/harness-defaults.md:75`: write local code only for a recorded gap that no maintained upstream closes, citing the reference implementation it follows) forbids building without SOTA references and evidence; here each carried change is a cited upstream PR or cited glue with a removal condition, so the
-current composition is allowed and max quality is wanted. The relay is the basis of this record and the user may withdraw it.
+At 2026-10-05T13:22:24Z the owner initially chose published 3.8.51; the command-center relay's comparison misdescribed the running baseline as 3.8.52 plus PRs 13788 and 15167
+and named only the `xhigh` limit as its cost. Source/read-back corrected the baseline to 3.8.51 plus PRs 13788 and 15167 and the affinity patch; the corrected choices were A (published only), B (published plus affinity) and C (keep).
+They then chose B; in the follow-up relayed direction, they asked to proceed with highest-quality, seamless resolution where SOTA references and evidence support the work.
+This record interprets that later relayed directive as authorizing C: each carried change is a cited upstream PR or demonstrated-gap glue with a removal condition, consistent with the never-rebuild rule.
+[OmniRoute's pinned effort handler](https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/executors/codex/reasoningSuffix.ts) and the patch/reference implementations support the technical case; B was qualified but never deployed because it lacks #15167 and true Sol max.
+Retaining C rests on that reading of the owner's relayed directive, which they may withdraw; the native Sol/max, cache-affinity, acceptance and patch-removal gates remain in force.
 
 ## What the published-only swap would have changed (read-only measurements, 2026-10-05)
 

@@ -1,12 +1,12 @@
 # Decision: RTK's Codex PreToolUse hook is qualified and becomes the upstream default for Codex hosts, installed with `rtk init -g --codex` and trusted through Codex's own config writer (2026-10-04)
 
-**Decided by:** the user's directive of 2026-10-04, as the command center (session `wsl-architecture-design`) and session
-native-agent-stack-5f relayed it. About 21:30Z, in 5f's session: "install cleanly with upstreamcommands, best sota practice natively, and e2e
-with upstream commands with new session launched e2e for our wsls". About 22:05Z, to the command center: "yes frictionless", which the
-command center reads as covering the authorization settings and the trust grant of a plan-installed, qualified upstream hook. The session
-that wrote this record heard neither quotation itself; both are relayed, and the grant below rests on that reading, which the user may
-withdraw. Evidence for the qualification and the proposal to flip came from session native-agent-stack-99; the command center said "go" on
-the flip the same evening, to be written on main after the install plan's rows (PR 684) land.
+**Decided by:** the owner's directive of 2026-10-04, relayed by the command center (session `wsl-architecture-design`) and
+session native-agent-stack-5f. At about 21:30Z they asked for clean upstream native installation and fresh-session WSL E2E;
+at about 22:05Z they approved frictionless rollout. The command center interpreted that reply as covering authorization settings and
+the hash-scoped trust grant for a plan-installed, qualified upstream hook. This writer heard neither message directly: both are
+relayed, the grant rests on that reading, and the owner may withdraw it. [RTK's pinned installer](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/hooks/init/codex.rs) supplies the native installation path.
+Qualification evidence and the flip proposal came from native-agent-stack-99; the command center authorized the flip that evening.
+The flip was scheduled for main after the install-plan rows (PR 684) land; source support and destination execution remain separate checks.
 
 **Status:** this record lands with the trust tool, its tests and the evidence (the first of two pull requests, which touch no file
 that PR 684 owns). The install plan's RTK row, the handbook and card text follow in a second pull request once PR 684 lands on
@@ -29,7 +29,7 @@ At the RTK 0.50.0 pin this catalog ran no Codex hook: `rtk init --global --codex
 catalog has not qualified" (`docs/token-session-handbook.md`), where 0.49.0 had written instructions only, as an `@RTK.md` line that Codex
 does not expand. Codex homes got RTK's text from the stack's `AGENTS.md` block instead, and the model prefixed `rtk` itself. At 0.51.0 upstream
 documents the hook as the Codex integration (rtk-ai/rtk v0.51.0, commit e001f773f80b22b7dc4c7a79521b30e35aaef026, `README.md` L133 and L460:
-"**Codex** | `rtk init -g --codex` | PreToolUse hook (`updatedInput`) + AGENTS.md"), and the user's directive asks for the upstream install.
+"**Codex** | `rtk init -g --codex` | PreToolUse hook (`updatedInput`) + AGENTS.md"); the owner's directive calls for that upstream install.
 
 ## Decision
 
@@ -42,11 +42,11 @@ documents the hook as the Codex integration (rtk-ai/rtk v0.51.0, commit e001f773
    equals one named with `--command` and for no other hook; a dry run is the default, `--apply` backs up `config.toml` (mode 0600), refuses
    while a codex process runs and reads every named hook back through `hooks/list` by key and hash (a hook that vanished, moved or
    changed during the write, or a discovery error that was not there before it, is exit 3: `expectedVersion` guards `config.toml`, not the
-   hooks file). This grant is the trust decision for the hook that sees every Bash command; the user's "yes frictionless" above is its authority.
+   hooks file). This grants trust to the hook that sees every Bash command; its authority is the command center's reading of the owner's approval above, scoped to the reviewed hash.
    The upstream command is not hook-only: it also creates `RTK.md` and appends a pointer line `@<Codex home>/RTK.md` to `AGENTS.md`
    (`rtk-init-codex-probe.json`; `--hook-only`, `--no-patch` and `--auto-patch` are refused with `--codex`). Codex expands no `@` reference,
    so the pointer is inert text, and NativeStack's `AGENTS.md` already carries it; but it is an edit of the instruction file, which the
-   user's reply about authorization settings does not name, so the second pull request lists it among the points for the user to confirm.
+   owner's authorization-settings reply did not name; the second pull request sought their confirmation, given in the addendum below.
    `rtk init -g --codex --uninstall` removes the hook, `RTK.md` and the pointer together.
 2. The row's acceptance is `rtk init --show --codex` with every line `[ok]`, `codex_hook_trust.py --command "rtk hook codex"` reporting the
    hook trusted, a fresh `codex exec --json --ephemeral` probe whose executed command carries the `rtk` prefix from each real launcher (the
@@ -78,7 +78,7 @@ documents the hook as the Codex integration (rtk-ai/rtk v0.51.0, commit e001f773
 
 ## Alternatives considered
 
-- **Keep the hold-out** (the 0.50.0 state, instructions only). Rejected: the user's directive is the upstream install, the qualification passed,
+- **Keep the hold-out** (the 0.50.0 state, instructions only). Rejected: the owner's directive calls for upstream installation, qualification passed,
   and the hook handles four of the six exceptions of the awareness text itself.
 - **Copy the hook entry from a template** instead of running `rtk init -g --codex`. Rejected: it is not upstream's command, and the entry
   would drift from what rtk writes (rtk owns the hooks.json patch, its idempotence and its `--uninstall`).
@@ -98,7 +98,7 @@ documents the hook as the Codex integration (rtk-ai/rtk v0.51.0, commit e001f773
   `grep -l` output causes beyond the upstream-native `exclude_commands` remedy: the row then adds that exclusion, or holds the hook out again.
 - A Codex release that changes the trust model or the hook schema (`hooks.state`, `trusted_hash`, the hash), or an rtk release whose
   `rtk hook codex` or `rtk init -g --codex` changes the hook's definition (its hash changes and the grant must be repeated).
-- The user withdrawing the reading of "yes frictionless" for this grant: the row then stops after `rtk init -g --codex` and leaves the review to `/hooks`.
+- The owner withdrawing the command center's reading of their rollout approval for this grant: the row then stops after `rtk init -g --codex` and leaves the hash review to Codex's native `/hooks` interface.
 
 2026-10-05 update: the [published RTK fold Harbor phase-2 record](2026-10-05-rtk-fold-harbor-phase2.md) resolves the study trigger above with `remedy_triggered=false`; the default stays within the studied grep scope, with broader remedy coverage unresolved.
 
@@ -117,13 +117,13 @@ its summary is the E2E's own.
 
 ## Addendum (2026-10-05): the pointer line is approved
 
-The upstream command `rtk init -g --codex` appends an inert `@<Codex home>/RTK.md` pointer to the Codex `AGENTS.md` and creates `RTK.md`
-(`rtk-init-codex-probe.json`; there is no hook-only mode with `--codex`). That is an instruction-file edit, which the earlier reply about
-authorization settings does not name, so the command center put it to the user as one yes/no question and relayed the answer. By the command center's transcript the user wrote,
-on 2026-10-05, "yes for rtk pointer" at 00:49:16Z (part of a longer message) and, as a queued message at 00:50:08Z, a standing rule: "for the
-practice like rtk, always proceed with sota convergence highest quality practice with upstream repos". (The command center first relayed
-them as "about 00:55Z", an estimate, and corrected the times afterwards.) The session that wrote this record heard neither quotation itself;
-both are the user's words as the command center relayed them, and the row's behaviour rests on that reading, which the user may withdraw.
+The upstream command `rtk init -g --codex` appends an inert `@<Codex home>/RTK.md` pointer to the Codex `AGENTS.md` and creates `RTK.md`.
+The [pinned installer](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/hooks/init/codex.rs) and the retained `rtk-init-codex-probe.json` establish those side effects; there is no hook-only mode with `--codex`.
+Because the earlier authorization-settings reply did not name instruction-file edits, the command center put this to the owner and relayed their approval.
+By its transcript, they approved the RTK pointer at 2026-10-05T00:49:16Z; their queued 00:50:08Z message set a standing rule to
+always proceed with highest-quality SOTA-converged practice using upstream repositories for RTK-like work, including shipped installer effects.
+The command center corrected its earlier about-00:55Z estimate; this writer heard neither message directly and relies on those relays.
+The approval and standing rule rest on that reading, which the owner may withdraw; each installer effect still retains its measurement and rollback checks.
 
 Effect: the install plan's `command-output` row runs `rtk init -g --codex` as upstream implements it, pointer line and `RTK.md` included, and
 the same rule covers future upstream installer side effects of this kind (each still recorded with its measurement). `rtk init -g --codex
@@ -274,7 +274,7 @@ state-changing prefix would track upstream's registry, change the shared config 
 compression only on short mutating-command output. That read's own probe shows the limit: `exclude_commands = ["git push"]` excludes `git push` but still rewrites
 `git -C /tmp push`, so exclusions reduce the risk without preserving a rule or constraining a command the model prefixes with `rtk` itself; not done here, and
 the first thing to add if a bypass is ever observed. (b) *Prove rtk never rewrites mutating commands*: false (item 4). (c) *Hold the Codex hook out again*:
-against the user's directive of 2026-10-04. (d) *Ship `rtk ...` rules with the plan*: under `approval_policy = "never"` a `prompt` rule is rejected by policy and
+against the owner's directive of 2026-10-04 unless they withdraw its scoped grant. (d) *Ship `rtk ...` rules with the plan*: under `approval_policy = "never"` a `prompt` rule is rejected by policy and
 becomes `forbidden` (`exec_policy.rs` L216-L236 and the match at L407-L415), which would block the authorization-settings hosts, and a twin cannot be shown to
 cover every rewrite. (e) *Refuse whenever a rules file exists* (the first version): it blocks the row for nothing once #713 installs `hcom-deny.rules`; the hash list
 refuses only what is not reviewed or allow-only. (f) *Compare decisions on probed and sampled commands* (the second version): abandoned, the 705e counterexamples.

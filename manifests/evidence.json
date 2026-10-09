@@ -17832,8 +17832,8 @@
     },
     {
       "path": "docs/decisions/2026-10-01-new-wsl-definitive-defaults.md",
-      "sha256": "1b59e7b2100199d2b3a2125a811c7959c11dc55be9d029d4c0f676bbd9059ff5",
-      "bytes": 80195
+      "sha256": "1b696a28d3582819ab59a7feb0208f80042529d65a9cda5a3fcfd53e614a5e3b",
+      "bytes": 80611
     },
     {
       "path": "docs/decisions/2026-10-01-new-wsl-distro-recipe.md",
@@ -17862,8 +17862,8 @@
     },
     {
       "path": "docs/decisions/2026-10-02-omniroute-mac-rebuild.md",
-      "sha256": "de41496b2958fd1270ff4f2936f75b6e9606e973877b4756e8b7acc71595715a",
-      "bytes": 6141
+      "sha256": "7e7e4b961f23a37947eb16e8f2922ad1098bed4cd5271b0b7db6d2ce929cbcaa",
+      "bytes": 6488
     },
     {
       "path": "docs/decisions/2026-10-02-two-host-north-star-architecture.md",
@@ -17907,8 +17907,8 @@
     },
     {
       "path": "docs/decisions/2026-10-03-omniroute-3851-pin.md",
-      "sha256": "dc22610e9a76a64c67a2ce4a13126d2efa74b974d666d7f6036662ac282f187a",
-      "bytes": 23724
+      "sha256": "ada53d3c59fec2998ccee5e68e26989b1b64f77a85c8448f36d74703a6660d42",
+      "bytes": 24072
     },
     {
       "path": "docs/decisions/2026-10-03-omniroute-sdk-worker-0160.md",
@@ -17927,13 +17927,13 @@
     },
     {
       "path": "docs/decisions/2026-10-03-retire-gateway-ab-r02.md",
-      "sha256": "d8b119ccf00931c0d3ab837a2dcbc9c583a0dfa987a79056cd0176eaacf34356",
-      "bytes": 27952
+      "sha256": "fb318f2bd523eaab4e14bacbec77282a630d9fcedb6326cf0a632f6a17fd7bc8",
+      "bytes": 28003
     },
     {
       "path": "docs/decisions/2026-10-03-retire-gpt6-lane-compression-ab.md",
-      "sha256": "dbb6de8a5b1dde770ea8615b0646b24570e86146b402c9ee4b917c6f668dd57e",
-      "bytes": 43121
+      "sha256": "c6111da14b3d915aa446d8545a9ed767ea36974c76fdbe62cc8ffd9113f1a7b6",
+      "bytes": 43158
     },
     {
       "path": "docs/decisions/2026-10-03-retire-pr-392-mac-token-receipts.md",
@@ -17942,8 +17942,8 @@
     },
     {
       "path": "docs/decisions/2026-10-03-retire-pr-515-catalog-index.md",
-      "sha256": "3bea5ca46d16828674678da49b3a5237f6642514b29b88e5a63997b6d97baa50",
-      "bytes": 28741
+      "sha256": "821b9a7067ffc5ae7455da2f4b5ab9160fa96de37a209cbfe98bae0275815934",
+      "bytes": 28751
     },
     {
       "path": "docs/decisions/2026-10-03-retire-pr320-loki-denominator-host-receipts.md",
@@ -17952,8 +17952,8 @@
     },
     {
       "path": "docs/decisions/2026-10-03-retire-pr508-token-stack-winner.md",
-      "sha256": "59f58e14e624f1783b5182ae0ea0bd3caa92298b4b5b6ebab556eae26d76c70d",
-      "bytes": 21398
+      "sha256": "73b49dfb4c0714dc89f4885f3ea19fabc6bb50d17678c87252aed5508d59e40e",
+      "bytes": 22458
     },
     {
       "path": "docs/decisions/2026-10-03-retire-token-stack-release-review.md",
@@ -17977,8 +17977,8 @@
     },
     {
       "path": "docs/decisions/2026-10-04-claude-template-holds-out-token-lane-carriers.md",
-      "sha256": "e56e1fdcfeb37a3256c494e23d067c647986dd6e2a27f2d93c445cb7f865f336",
-      "bytes": 18256
+      "sha256": "6df2f89a5b90363e1165e14ecbea0d0fcf57f8dbd20835e2f17689e69692a163",
+      "bytes": 18480
     },
     {
       "path": "docs/decisions/2026-10-04-codex-dated-holds.md",
@@ -17987,13 +17987,13 @@
     },
     {
       "path": "docs/decisions/2026-10-04-codex-rtk-hook-qualified.md",
-      "sha256": "5cf4c39ec5c38dafedf48a651738e46b0a718cfbd224dcc0c5dc468d45139233",
-      "bytes": 39899
+      "sha256": "3e89bf4a294f0be69662238a67964b35d121e630367840674e5e58aae362d5e6",
+      "bytes": 40226
     },
     {
       "path": "docs/decisions/2026-10-04-coordinator-dispatch-and-spend.md",
-      "sha256": "d091a1021eff71b11bf409b7896577566713788ecbf33e8f8c629e4d45ad26e1",
-      "bytes": 15230
+      "sha256": "c26c69fca06b26a4eea9b4039c2ea833872295971ec44a904f0981c9e984c5e2",
+      "bytes": 15629
     },
     {
       "path": "docs/decisions/2026-10-04-host-baseline-recorder.md",
@@ -18007,23 +18007,23 @@
     },
     {
       "path": "docs/decisions/2026-10-04-new-wsl-changelog-parity.md",
-      "sha256": "e025fdf43cb7c4051b2e74ed89cca78aa15e60f655934bf8da9694ba4bf61b87",
-      "bytes": 7847
+      "sha256": "3a85a5e0745b58d49bc2b5dba1d017a38eb97439066f87af193bf751e4b6e156",
+      "bytes": 8223
     },
     {
       "path": "docs/decisions/2026-10-04-new-wsl-clean-default-holdouts.md",
-      "sha256": "924c9464c703f5f14babb29cee45be5acbd0052df84bcecd0d6b15cea28b84d7",
-      "bytes": 5174
+      "sha256": "9bec4f5f503bded8af711da0ec69350177b11dcbab0209d4664764e3c82f678b",
+      "bytes": 5482
     },
     {
       "path": "docs/decisions/2026-10-04-new-wsl-jcodemunch-user-scope.md",
-      "sha256": "f94c6638f3912fdef6d03383ca0d11fefcc43dbf141de27c00c424ac39382769",
-      "bytes": 6758
+      "sha256": "0568ac59fd390b1d9ba39dec95f7b55fa5100c39b72334136edb5bcc3b70e24d",
+      "bytes": 7049
     },
     {
       "path": "docs/decisions/2026-10-04-new-wsl-token-layer-default.md",
-      "sha256": "98e53fa2f1054599165493011557d05bc2fb636ab5b064419ef49267e6cd893b",
-      "bytes": 10832
+      "sha256": "f729b8ae7e270c7603b3d2e4b4b0514eb40e0a344a1ccca3642503b04b85cec5",
+      "bytes": 11216
     },
     {
       "path": "docs/decisions/2026-10-04-ns2604-verified-e2e.md",
@@ -18077,8 +18077,8 @@
     },
     {
       "path": "docs/decisions/2026-10-05-dagu-mise-pin-move.md",
-      "sha256": "c1eaaffe72e840c7655e05a44e71116174dc1701675d2e08730ba54a8c9a6e87",
-      "bytes": 135389
+      "sha256": "78549bebd5eacf42cde109532a3ad8b815eb473c5cad8b264c2203e4097cef55",
+      "bytes": 135701
     },
     {
       "path": "docs/decisions/2026-10-05-disk-headroom-enospc.md",
@@ -18087,13 +18087,13 @@
     },
     {
       "path": "docs/decisions/2026-10-05-harness-context-budget.md",
-      "sha256": "42a11cd3d1dfe3d7f805991313600da97e460a8902cee1563ec752aad3564763",
-      "bytes": 58779
+      "sha256": "fb88f3d136176bbfddc51ca512a70c70b1ad74c4520a4f1257c68752e880dda3",
+      "bytes": 60419
     },
     {
       "path": "docs/decisions/2026-10-05-main-checkout-backup-disposition.md",
-      "sha256": "22839061d0826b5272f5b840f1765e5b175845b25b8f0e3c9a8ce8ccc8dfedba",
-      "bytes": 129176
+      "sha256": "97a3eeb3c2e4c207c9d08e4504caf8528f403f678929bc96db51415caa7e4dfc",
+      "bytes": 130066
     },
     {
       "path": "docs/decisions/2026-10-05-ns2604-foundation-requalification.md",
@@ -18102,8 +18102,8 @@
     },
     {
       "path": "docs/decisions/2026-10-05-omniroute-gateway-composition.md",
-      "sha256": "e07a3838ad4fea54786150c1746c5c420b100f73bcaa76ec7c17aceae3fe7f8c",
-      "bytes": 91155
+      "sha256": "124b035a26fcb63b38629cdc466f411b046dc8b7e92a78ec1a28648a89b7ddf8",
+      "bytes": 91325
     },
     {
       "path": "docs/decisions/2026-10-05-overfitting-riskl-parity.md",
@@ -18477,8 +18477,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "9557391861663af05fd2b39f85d2246d2d586208cfc7491ce4c98b08554aff72",
-      "bytes": 252754
+      "sha256": "2d4d95d20879dd8ada8fc80732beb8a2506bc001561421b17361c52d5a7fd610",
+      "bytes": 253822
     },
     {
       "path": "docs/harness-rule-enforcement.md",
@@ -18657,8 +18657,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "bbe03ecc59bfcff562c62492de8f1615b6ec5a3ebea8dc9bae74c07672c314f1",
-      "bytes": 194203
+      "sha256": "c83bde7f25ae7877096e69bebcf44961b49c0b73d8dd65e87278cf431b82cb8e",
+      "bytes": 194667
     },
     {
       "path": "docs/stack.md",
@@ -60202,8 +60202,8 @@
     },
     {
       "path": "tests/test_new_wsl_definitive_defaults.py",
-      "sha256": "b759c7cf154f96661bbedd0dfd29cbc241a8c05a06866db6278ded963d7a0021",
-      "bytes": 308693
+      "sha256": "9d34ac271a74820d3d547157e8a97821d1894f79897f40bf2573ce261b2c194a",
+      "bytes": 308960
     },
     {
       "path": "tests/test_new_wsl_handbook.py",

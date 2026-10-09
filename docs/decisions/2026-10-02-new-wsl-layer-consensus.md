@@ -24,14 +24,14 @@ decisions, not an installation run.
 The tables of all rows, with the consensus rows and a table of the amendments, are generated into
 [the definitive-defaults record](2026-10-01-new-wsl-definitive-defaults.md).
 
-## The owner's sentence and the rule
+## The owner's delegation and recorded rules
 
-The owner said, on 2026-10-02, shortly before 17:59:40Z (the time stamp of the request note that relays it), verbatim:
+The owner delegated the consensus research on 2026-10-02, shortly before 17:59:40Z (the request note's relay timestamp).
 
-> you can reseach  consensus wit hlive codex session, we need frictionless seamless llm native workflow
+They authorized consensus research with a live Codex session and asked for a frictionless, seamless LLM-native workflow. Native [Codex skill loading](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/skills/src/lib.rs) and [paired skill qualification](https://github.com/anthropics/skills/blob/8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4/skills/skill-creator/SKILL.md) supply source support, not measured acceptance.
 
-The record reads it this way: the two lanes settle research results between themselves and bring the owner only what
-needs a sign-in, a grant or capacity. It grants no permission, sign-in or capacity to either lane.
+The record's interpretation is that the two lanes settle research results between themselves and bring the owner only what needs a sign-in, a grant or capacity;
+it grants no permission, sign-in or capacity to either lane. This preserves both clauses of the frozen consensus.json `authorization.reading`.
 
 The rule, verbatim from the record. The assembler appends it to the manifest's `decision_rule`:
 
@@ -180,10 +180,10 @@ alternatives it admits and the comparison that would overturn the row.
   match across arms. Judged on claim-to-source support, numeric units and denominators, accessible citations and
   coverage, plus usage, time and footprint. Fetching a citation is not an entailment verdict." The comparison's result
   decides the second gatherer.
-- **`agent-messaging`: the owner wants messaging between sessions and between the two clients; the transport is
-  measured before one is selected.** This amendment is by the owner's decision, then by direct consensus on the arms.
-  The owner's sentence, verbatim:
-  "need to be passwardless seamless workflow,passwardmangement and llm native is a must,bypasspremission seamless across session messaging, claude-codex messaging etc".
+- **`agent-messaging`: the owner requires messaging between sessions and between both clients;
+  measure transport before selection.** This amendment rests on their permission-posture decision, then direct consensus on the arms.
+  They asked for passwordless, seamless password management, LLM-native operation and permission bypass in Claude/Codex messaging.
+  Native support and measured delivery remain separate questions; credentials and grants do not transfer with a message.
   The row's first condition, the owner's decision on the permission posture, is answered. Native Claude Code covers
   Claude to Claude; cross-vendor delivery was not established by the reviewed native sources. Concord MCP, an arm of the
   earlier text, is not among the agreed arms. The earlier message-count contract is amended with the owner before a
@@ -478,9 +478,9 @@ the slot installs; and the definitive-defaults record lists the interims in a ta
   confirmatory: semble selected, it becomes final once its pins equal the annex's; another arm selected, it replaces
   semble; no selection, the slot returns to empty.
 - **`context-supply`**: context-mode 1.0.169 (`mksglu/context-mode` at `6f0cc6841c687e754059f36714a11233fda1a02b` for the
-  plugins, the npm tarball 1.0.169 for the Codex session server). Authority: the owner's pin, in the owner's words
-  "please always use the sota gpt powered sota sdks, runtime for the research, context mode etc, we are evolve beyond
-  simple action of web search". The row's decided default stays the definitive no-install verdict of the decision round.
+  plugins, the npm tarball 1.0.169 for the Codex session server). Authority: the owner's explicit pin; they directed continued use of SOTA GPT-powered SDKs and
+  runtime research, including context-mode, beyond simple web search. Its [versioned native integration](https://github.com/mksglu/context-mode/blob/6f0cc6841c687e754059f36714a11233fda1a02b/README.md) supplies source support.
+  The row's decided default stays the definitive no-install verdict of the decision round; documented fit claims no measured quality lead or provider savings.
   Reviews: the Claude ruling adopts the pin as the slot's interim; the GPT check disagreed and named no additional layer,
   with context-mode kept as the user-mandated exception until acceptance and a comparison support promotion; the
   whole-wave read keeps the explicit user pin. Decided by a preregistered end-to-end comparison against the clients'

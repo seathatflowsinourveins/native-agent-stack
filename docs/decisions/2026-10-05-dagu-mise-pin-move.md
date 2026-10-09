@@ -43,9 +43,9 @@ Dagu release-note bodies read: [v2.17.0](https://github.com/dagucloud/dagu/relea
 
 ## Command center correction and NativeStack2604 state (2026-10-05, r2b)
 
-The command center's dated correction, quoted as theirs and relayed by the coordinator:
+The command center corrected their earlier migration-free claim on 2026-10-05, as relayed by the coordinator; their correction is paraphrased here:
 
-> Our earlier statement "no data migration in 2.17.0-2.18.2" was wrong. Our grep of the release bodies missed #2784, #2776 and #2858. The 2026-09-25 record at lines 477-479 already documents that 2.17.2 deletes the legacy dags/.dag.index.
+The command center acknowledged that their release-body grep missed #2784, #2776 and #2858, so their earlier claim that 2.17.0-2.18.2 was migration-free was wrong. Upstream [v2.17.0](https://github.com/dagucloud/dagu/releases/tag/v2.17.0) records #2784/#2776 and [v2.17.2](https://github.com/dagucloud/dagu/releases/tag/v2.17.2) records #2858; the 2026-09-25 record already documented the legacy dags/.dag.index deletion. These source facts do not establish destination rollback acceptance.
 
 The verification path is the v2.17.0 and v2.17.2 release bodies cited above and the [2026-09-25 record](2026-09-25-workstation-sota-refresh.md#held-by-the-trading-lane), lines 477-479. The command center's earlier grep does not support a migration-free upgrade or rollback.
 

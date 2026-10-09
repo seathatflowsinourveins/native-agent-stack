@@ -41,13 +41,13 @@ a new preregistration for work whose bindings have changed.
 
 ## Scope: the instrument only. It does not decide compression on 20128.
 
-Main's open decision (a) is unchanged. The relevant wording in
-[2026-09-30-omniroute-rebuild.md L276-279][decision-a-quote] is:
+Main's decision (a) remains an **open owner decision**, as recorded in
+[2026-09-30-omniroute-rebuild.md L276-279][decision-a-authority] (paraphrase):
 
-> **Open user decisions.** (a) Compression on 20128 (the Codex lane itself; it would rewrite real Codex CLI traffic). The
-> user's conditional answer of 2026-09-30 about 02:25Z, relayed by another session and not seen first-hand here, was "yes
-> if SOTA converged, the quality itself needs to be maintained at suitable high output": a reproduced saving on real
-> traffic and no output regression. It is **not applied**.
+The owner's 2026-09-30 conditional answer (about 02:25Z, relayed by another session, not seen first-hand here)
+allowed compression of real Codex CLI traffic on 20128 only after SOTA-converged, reproduced savings with no output regression.
+It remains **not applied**. Gate A's owner prefers it off through the windows; any change must land at least
+6 h before the seal announcement with a new owner record ([L294-295][decision-a]).
 
 The unchanged [foundation-stack.md L250][foundation-l250] says:
 
@@ -459,7 +459,7 @@ every `#431` reference on main at the source-review base.
 [vela]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-09-25-retire-vela-velanext.md
 [rebuild]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-09-30-omniroute-rebuild.md#L1
 [decision-a]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-09-30-omniroute-rebuild.md#L276-L295
-[decision-a-quote]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-09-30-omniroute-rebuild.md#L276-L279
+[decision-a-authority]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-09-30-omniroute-rebuild.md#L276-L279
 [settings]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-09-30-omniroute-rebuild.md#L64-L85
 [stored-combos]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-09-30-omniroute-rebuild.md#L81-L85
 [omniglyph-off]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-09-30-omniroute-rebuild.md#L115

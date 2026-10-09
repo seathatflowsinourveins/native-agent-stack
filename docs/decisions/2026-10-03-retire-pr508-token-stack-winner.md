@@ -29,7 +29,7 @@ remains the source for this historical proposal. Its six decisions were:
 3. Let S3 (#390) decide the memory slot on merit per host, with ai-memory the reference arm and production control during isolated trials.
 4. Install through upstream-supported channels at reviewed pins and publisher digests; use upstream tests and evals, and record adaptations and missing evals.
 5. Classify under-invocation before changing a tool or skill; fix the owning layer, keep a gap ledger and never remove something on zero invocations alone.
-6. Retire only after a replacement's clean install and E2E, retain the old prefix through a regression window and require a separate user go before deleting it.
+6. Retire only after a replacement's clean install and E2E, retain the old prefix through a regression window and require a separate explicit owner decision before deleting it.
 
 **The 2026-09-29 full-stack arm (historical, no precedence):**
 
@@ -73,31 +73,31 @@ The original overturn conditions, one line each:
 
 ## 2. Unique facts preserved
 
-At the written-at SHA, `git grep -c -F` over `origin/main -- .` returned no hits for each of `not blindly delete`,
-`sourceof truth`, `full stacks for each` and `os-b4` (each exit 1). The following are the user's 2026-09-29 answers
-to Claude Code session `os-b4` on the Mac coordinator, preserved with the original spelling and ellipsis from #508.
-The request is at original lines 4–5:
+The four owner answers below were given on 2026-09-29 to Claude Code session `os-b4` on the Mac coordinator.
+They are paraphrases of [#508's original record](https://github.com/seathatflowsinourveins/native-agent-stack/blob/b7fcc2196c9ff5557f30486468f614fc0dc9d8b5/docs/decisions/2026-09-29-token-stack-winner.md), not new choices or measured results.
+The original source review's phrase searches found no copies on main at the written-at SHA (each exit 1);
+this preserves that dated observation without repeating the owner's message text.
 
-> how about token effiency repos,note just one winner can be full stacks for each,and retire,clean install new with
-> evidances,sota upstream skills used e2e
+**Full-stack request (original :4–5):** the owner permitted a single winner to consist of a complete token-efficiency
+stack. They requested evidence-backed retirement, a clean replacement install and end-to-end use of upstream skills.
 
-The memory answer is at original lines 47–48:
+**Memory answer (original :47–48):** the owner asked the current macOS memory landscape to include agentmemory,
+Hindsight and other candidates with evidence for being best. They did not select a memory winner in that answer.
+S3 (#390) remains the decision gate; ai-memory stays the production control while candidates run in isolation.
+The separate Mac ai-memory cutover choice remains open, as preserved below.
 
-> add the
-> agentmemory,hindsight etc for whatever best macos memory repos at current landscape should be
+**Upstream answer (original :53–55):** the owner made the repositories' own upstream practice the source of truth.
+An E2E trial that departs from that practice is not evidence about the upstream tool. Use the upstream's supported
+installation and native tests/evals; record an adaptation's reason and any missing upstream evaluation.
+This source-of-truth boundary does not accept an installation or runtime merely because its proposal exists.
 
-The upstream answer spans original lines 53–54, with its consequence at line 55:
+**Under-invocation answer (original :60–63):** the owner required investigation and improvement rather than removal
+on low or zero use. Adapt tools and skills natively, and use their upstream evaluations as the standard.
+The historical proposal classifies causes at the owning layer and records harness gaps before a change;
+it leaves the skills trial's prune rule with its owner and adopts newly discovered skills through the pinned manifest.
 
-> the repos
-> upstream itself is sourceof truth ... otherwise the trail e2e practice itself cannot be the evidance
-
-The under-invocation answer is at original lines 60–61:
-
-> not blindly delete, but improve the sota repos, skills use adapt them natively, the evl of the sota
-> repos, skills themself should be the standard
-
-Original lines 5–6 distinguish decisions 1–5, which recorded the user's choices, from **decision 6, the approved
-plan's default**. The user selected no retire depth.
+Original lines 5–6 distinguish decisions 1–5, which record the owner's answers, from **decision 6, the approved
+plan's default**. The owner selected no retirement depth; deleting the retained prefix still needs their separate approval.
 
 The original **Not decided here** item (lines 70–71) is preserved: whether the Mac's production ai-memory would stay
 the local build under Stage 1's no-service-change rule until the first official 2.5 release, or move by a cold-copy

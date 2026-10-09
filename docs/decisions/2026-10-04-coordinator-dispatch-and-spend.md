@@ -2,9 +2,9 @@
 
 **Decided by:** the command-center session `wsl-architecture-design`, with the amendments of session `native-agent-stack-5f`, which both coordinators accepted on 2026-10-04 at about 14:20Z.
 
-**Requested by the user on 2026-10-04:**
-- "our current token spending need to be fully optimized as it is increase drastically since before wsl update"
-- "we need high invoke rate and upstream hooks to truly make the sota token efficiency practice live within our native workflow, that with upstream commands e2e, monitor the token saved with observation layers, with muti angle convergence"
+**Requested by the owner on 2026-10-04 (paraphrased in the command-center record):**
+- They asked to fully optimize token spending after its sharp rise since the WSL update. [RTK's native initializer](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/hooks/init/codex.rs) supplies hook integration; savings require observation.
+- They asked for high invocation and live upstream hooks through native end-to-end commands, with observed savings and multiple converging checks. [Harbor's pinned harness](https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/README.md) is an evaluation reference; retain each counter's scope, failures and limits.
 
 **Builds on:** [2026-09-29 token spend attribution](2026-09-29-token-spend-attribution.md). Run shape is where spend concentrates, and savings are sought in architecture. Effort stays `max` and the advisor stays on, as the user chose. The later Advisor model decision below changes the advisor model at the user's request. Effort, compaction, hooks and the main-model pin remain unchanged.
 
@@ -96,7 +96,7 @@ The arms differ: Claude-built work received GPT review with historical budgets n
 
 - **Lower effort for mechanical stages.** Out of scope: the user's standing answer is to keep `max` (2026-09-29 record, decision 1). The upstream guidance on effort and thinking (`https://code.claude.com/docs/en/costs`, "Adjust extended thinking", read 2026-10-04) remains the overturn path through the max-default record's arms.
 - **A smaller compaction window.** Native defaults stay. #416 is retired; the successor is a separately reviewed and frozen confirmatory cohort through Harbor or Inspect, with quality non-inferiority and a preregistered cost criterion, as specified in the [retirement reopen conditions](2026-10-03-compaction-window-ab-retirement.md#i-reopen-conditions). No such result is claimed here. It would also miss the cause, because main sessions were flat.
-- **Fewer token hooks or carriers.** Rejected. They are small (above), and the user asked for them to be live.
+- **Fewer token hooks or carriers.** Rejected: the owner asked for live hooks in the October 4 direction above, and their recorded size is small. No matched removal result establishes a saving.
 - **Trimming always-loaded files.** The auto-memory index (about 22 KB) and the instruction files are carried by every call. Upstream advises keeping CLAUDE.md small and moving workflow-specific text into skills ("Move instructions from CLAUDE.md to skills", same page). The estimated effect is under 1% of daily cost. It is kept as a follow-up, not a decision here.
 
 ## Overturn conditions
