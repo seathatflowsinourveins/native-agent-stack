@@ -142,3 +142,48 @@ Supplying the ledger also exposed rc5's PyO3 allocator keyword boundary; a thin
 subclass `__new__` now leaves Python-only dependencies for `__init__`. Both
 repository generators rerun in the unchanged T13 rc5 environment, with no native
 test skips. Overnight paper/session qualification remains a disclosed boundary.
+
+## Lifecycle correction at 93871505
+
+The earlier matrix could finish a synthetic position while still issuing an
+invalid early cancel. A native regression reproduces that cancel at the forced
+exit's submission nanosecond, before its four-second timeout. The corrected
+pending branch applies deadline cancellation to entries and non-forced exits;
+an already-forced time exit observes its normal timeout and can fill once.
+
+The pinned source for cancel-by-ID and cancel-reject dispatch is
+`nautechsystems/nautilus_trader@1b0a49d2792a9432a3aca3fcb617ce7a630d905e`,
+`crates/trading/src/python/strategy.rs` (`py_cancel_order`,
+`on_order_cancel_rejected`) and `python/nautilus_trader/model/__init__.pyi`
+(`OrderCancelRejected`). Cancel rejection is non-terminal; missing acknowledgement
+does not release an order. T22 keeps that identity, freezes and escalates rather
+than submitting a replacement under uncertainty. Acknowledgement grace uses the
+same bounded per-role timeout, measured from the cancel request.
+
+Durable safety reuses the existing `safety.Ledger.freeze` and follows
+`native_adapter.record_callback_fault`: attempt both the durable halt and
+fault_sink even if either fails, retain only safe error types, and stop submits.
+Tests close/reopen the actual SQLite ledger and separately verify a pre-existing
+halt with no exposure. Held stale/halted/closed/budget hazards have durable
+handoff, with no automatic resume. The review's native_strategy line reference
+differs in this branch; the equivalent verified failure-isolation pattern is in
+native_adapter.py:136-164. No shared paper file is modified here.
+
+Clock primary sources at the same rc5 pin are `crates/common/src/python/clock.rs`
+and `python/nautilus_trader/common/__init__.pyi` (`Clock.timestamp_ns`). Upstream
+does not expose a live-clock constructor or permit setting live time. An actual
+installed-client probe verified that a strategy registered through
+`LiveNode.add_strategy` receives the native Clock before the run. Fixtures borrow
+that clock through an independent no-trade actor, use the actual family actor's
+clock for events/quotes/journal timestamps, and declare synthetic RTH at the
+calendar boundary. They do not change the engine clock or skip weekends.
+
+Ten new lifecycle regressions include nine that fail against unchanged93871505
+(13 assertion failures including subtests). The consumed-entry isolating test
+already passes there: no unresolved order, position, halt or exhausted sequence
+can explain its refusal, and a new instance enters in the positive control.
+Removing only the consumed assignment in the isolated baseline makes that test
+fail (sequence3 instead of1); the baseline source is then restored. This is
+disclosed as missing coverage, not falsely labelled a repaired behaviour bug.
+The corrected native suite passes34 tests with zero skips. Local results remain
+synthetic engineering; historical timing, paper and performance gates stand.

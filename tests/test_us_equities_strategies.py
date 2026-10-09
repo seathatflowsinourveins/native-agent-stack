@@ -8,6 +8,7 @@ import importlib.util
 import tempfile
 import time
 import unittest
+from contextlib import ExitStack, contextmanager
 from dataclasses import replace
 from datetime import datetime, timezone
 from pathlib import Path
@@ -19,6 +20,38 @@ NATIVE = importlib.util.find_spec("nautilus_trader") is not None
 if NATIVE:
     families = importlib.import_module("blueprints.us-equities.strategies.families")
     simulation = importlib.import_module("blueprints.us-equities.strategies.simulation")
+
+
+@contextmanager
+def synthetic_rth_context():
+    """Declare the LiveNode fixture's market session independently of today.
+
+    Event/quote timestamps still come from the registered native engine clock.
+    Only the external calendar boundary is a synthetic RTH scenario; the native
+    engine, callbacks, risk engine and FakePort order lifecycle remain real.
+    """
+    sessions = families._sessions
+    anchor = datetime(2026, 10, 8, 13, 35, tzinfo=timezone.utc)
+    info = sessions.session_at(anchor)
+
+    def session_at(ts):
+        return replace(
+            info,
+            session_date=ts.astimezone(sessions.NY).date(),
+            open=ts + (info.open - anchor),
+            close=ts + (info.close - anchor),
+            next_open=ts + (info.next_open - anchor),
+        )
+
+    # The reused adapter exposes a supported local import as well as the
+    # package module; both must see this same explicit synthetic scenario.
+    modules = [sessions, importlib.import_module("sessions")]
+    with ExitStack() as stack:
+        for module in {id(m): m for m in modules}.values():
+            stack.enter_context(
+                patch.object(module, "session_at", side_effect=session_at)
+            )
+        yield
 
 
 class ContractTests(unittest.TestCase):
@@ -411,12 +444,22 @@ class NativeStrategyTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "ledger.sqlite3"
             ledger = safety.Ledger(path)
-            ledger.start_trial(time.time())
 
             async def attempt(ambiguous):
                 port = fixture.FakePort("unknown" if ambiguous else "fills")
+                probe = families.NoTradeStrategy(
+                    contracts.StrategySpec(
+                        "SPY.ALPACA", cohort, instance_id="clock_fixture"
+                    )
+                )
+                session = adapter.build_node(
+                    port, [{"symbol": "SPY", "currency": "USD"}], [probe]
+                )
                 strategy = families.GapPremarketStrategy(spec, ledger=ledger)
-                now = time.time_ns()
+                session.node.add_strategy(strategy)
+                now = strategy.clock.timestamp_ns()
+                if ambiguous:
+                    ledger.start_trial(now / 1e9)
                 values = dict(
                     simulation.POSITIVE_FACTORS,
                     atr_price="2",
@@ -441,7 +484,7 @@ class NativeStrategyTests(unittest.TestCase):
                 async def submit(payload):
                     # Synthetic wire seam uses the unchanged durable governor:
                     # reserve and journal the explicit native ID before send.
-                    observed = time.time()
+                    observed = strategy.clock.timestamp_ns() / 1e9
                     ledger.reserve_intent(
                         payload["client_order_id"],
                         "SPY",
@@ -463,9 +506,6 @@ class NativeStrategyTests(unittest.TestCase):
                     return await original_submit(payload)
 
                 port.start, port.submit = start, submit
-                session = adapter.build_node(
-                    port, [{"symbol": "SPY", "currency": "USD"}], [strategy]
-                )
                 strategy.fault_sink = session.fail
 
                 async def stop_when_resolved():
@@ -482,7 +522,8 @@ class NativeStrategyTests(unittest.TestCase):
                 return strategy, port, session
 
             try:
-                first, port, session = asyncio.run(attempt(True))
+                with synthetic_rth_context():
+                    first, port, session = asyncio.run(attempt(True))
                 self.assertEqual(len(port.submissions), 1, first.trace)
                 self.assertTrue(session.errors)
                 original_id = port.submissions[0]["client_order_id"]
@@ -490,7 +531,8 @@ class NativeStrategyTests(unittest.TestCase):
                 self.assertTrue(ledger.intents()[0].submit_attempted)
                 ledger.close()
                 ledger = safety.Ledger(path)
-                restarted, port, session = asyncio.run(attempt(False))
+                with synthetic_rth_context():
+                    restarted, port, session = asyncio.run(attempt(False))
                 self.assertEqual(port.submissions, [])
                 self.assertIn(
                     "startup_unresolved_intent_requires_reconciliation", restarted.flags
@@ -579,10 +621,18 @@ class NativeStrategyTests(unittest.TestCase):
 
                 async def exercise(strategy_class=cls):
                     port = fixture.FakePort()
-                    now = time.time_ns()
                     cohort = contracts.digest(
                         {"fixture": "t22-live-port", "members": ["SPY.ALPACA"]}
                     )
+                    probe = families.NoTradeStrategy(
+                        contracts.StrategySpec(
+                            "SPY.ALPACA", cohort, instance_id="clock_fixture"
+                        )
+                    )
+                    session = adapter.build_node(
+                        port, [{"symbol": "SPY", "currency": "USD"}], [probe]
+                    )
+                    now = probe.clock.timestamp_ns()
                     spec = contracts.StrategySpec(
                         "SPY.ALPACA",
                         cohort,
@@ -593,6 +643,8 @@ class NativeStrategyTests(unittest.TestCase):
                         exit_deadline_ns=now + 1_000_000_000,
                     )
                     strategy = strategy_class(spec)
+                    session.node.add_strategy(strategy)
+                    now = strategy.clock.timestamp_ns()
                     values = dict(
                         simulation.POSITIVE_FACTORS,
                         atr_price="2",
@@ -618,9 +670,6 @@ class NativeStrategyTests(unittest.TestCase):
                         await original_start(on_quote, on_order)
 
                     port.start = start
-                    session = adapter.build_node(
-                        port, [{"symbol": "SPY", "currency": "USD"}], [strategy]
-                    )
                     strategy.fault_sink = session.fail
 
                     async def feed():
@@ -634,7 +683,7 @@ class NativeStrategyTests(unittest.TestCase):
                                         "ask": "100.01",
                                         "bid_size": "100",
                                         "ask_size": "100",
-                                        "ts_ns": time.time_ns(),
+                                        "ts_ns": strategy.clock.timestamp_ns(),
                                     }
                                 )
                                 if (
@@ -656,7 +705,8 @@ class NativeStrategyTests(unittest.TestCase):
                             job.cancel()
                     return port, strategy, session
 
-                port, strategy, session = asyncio.run(exercise())
+                with synthetic_rth_context():
+                    port, strategy, session = asyncio.run(exercise())
                 self.assertEqual(session.errors, [], session.errors)
                 self.assertEqual(strategy.callback_faults, [])
                 self.assertEqual(len(port.submissions), 2, strategy.trace)

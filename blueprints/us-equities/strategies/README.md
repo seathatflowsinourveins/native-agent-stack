@@ -133,7 +133,8 @@ Windows-gate waits apply. Heavy builds use the standard 10G scope and the
 vendor's worker controls.
 
 ```sh
-"$ENGINE_PYTHON" -m unittest tests.test_us_equities_strategies -v
+"$ENGINE_PYTHON" -m unittest tests.test_us_equities_strategies \
+  tests.test_us_equities_strategy_lifecycle -v
 "$ENGINE_PYTHON" -m blueprints.us-equities.strategies.simulation \
   --output blueprints/us-equities/strategies/synthetic-receipt.json
 python3 scripts/validate.py
@@ -175,6 +176,38 @@ survivor must return to Nautilus/T13 before any strategy claim.
 [vectorbt-acceptance.json](vectorbt-acceptance.json) records the precompiled
 install, 41 unchanged vendor engine/parity checks and ten overlapping inverse
 checks, with licence/owner override and resource limits.
+
+## Safety, cancels and clock fixtures
+
+A forced time-exit order rests until its configured exit timeout; an already
+expired strategy deadline never cancels that same forced exit early. The
+deadline can still cancel an entry or a non-forced exit. Replacement waits for
+native terminal confirmation. After a cancel request, the pending role's bounded
+timeout also bounds acknowledgement waiting. A native cancel rejection or a
+missing acknowledgement freezes durably and escalates, preserving the original
+order identity and residual rather than guessing that a replacement is safe.
+
+Startup refusals and held-position hazards call the existing Ledger.freeze and
+the injected fault_sink independently, following the reused adapter callback
+guard's failure handling. Stale quotes, observed halts, unsupported closed
+sessions and exhausted exit budgets hold the position and require the existing
+paper-lane reconciliation path. A durable halt also blocks a flat restart.
+If journal persistence fails, the session stop is still attempted and its error
+type is retained; that path does not claim successful durability. Explicit
+synthetic fixtures can still use the documented empty local ledger boundary.
+
+LiveNode fixtures obtain timestamps from a registered native actor's engine
+clock. Their market session is a declared synthetic RTH scenario anchored to
+the existing calendar, independently of the wall-clock day. No live clock is
+mutated and no weekend case is skipped. Actual calendar boundaries remain
+covered separately by the dated early-close/holiday/DST regressions.
+
+The lifecycle regressions reproduce the semantic defects on 93871505. The
+consumed-entry case is a coverage correction: a terminal, flat, low-sequence
+entry already remains consumed on that baseline. Its new isolating test also
+has a distinct-instance positive control, and fails when the consumed-entry
+assignment is deliberately removed in an isolated test-only source mutation.
+It is not represented as a pre-existing behavioural failure.
 
 ## Restart and multiple instances
 

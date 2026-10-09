@@ -105,10 +105,11 @@ class FamilyStrategy(Strategy):
             ledger
             if ledger is not None
             else SimpleNamespace(
-                freeze=self._freeze,
+                freeze=lambda reason: None,
                 intents=lambda: (),
                 unresolved=lambda: (),
                 positions=dict,
+                halted_reason=lambda: None,
             )
         )
         self.entry_attempted = False
@@ -117,6 +118,7 @@ class FamilyStrategy(Strategy):
         self.pending_remaining = D(0)
         self.pending_since_ns = 0
         self.cancel_requested = False
+        self.cancel_requested_ns = 0
         self.quantity = D(0)
         self.entry_price = D(0)
         self.entry_atr = D(0)
@@ -135,6 +137,23 @@ class FamilyStrategy(Strategy):
         self.faulted = True
         self.enabled = False
         self.flags.add(reason)
+        # Match native_adapter.record_callback_fault's guarantee: attempt the
+        # durable halt and session escalation independently, even if one fails.
+        errors = {}
+        try:
+            self.ledger.freeze(reason.lower())
+        except Exception as error:  # noqa: BLE001 -- still attempt the independent session stop
+            errors["freeze_error"] = type(error).__name__
+        if self.fault_sink is not None:
+            try:
+                self.fault_sink(reason)
+            except Exception as error:  # noqa: BLE001 -- preserve both cleanup outcomes without raw errors
+                errors["stop_error"] = type(error).__name__
+        self._record("safety_freeze", reason=reason, **errors)
+        if errors:
+            self.callback_faults.append(
+                {"callback": "safety_freeze", "freeze_reason": reason, **errors}
+            )
 
     def _record(self, event, **fields):
         self.trace.append(
@@ -153,7 +172,8 @@ class FamilyStrategy(Strategy):
             return
         instrument = self.cache.instrument(self.instrument_id)
         if instrument is None:
-            raise ValueError("instrument_not_registered")
+            self._freeze("startup_instrument_not_registered")
+            return
         if not isinstance(instrument, Equity):
             self._freeze("equity_instrument_required")
             self._record("capability_refused", reason="non_equity_instrument")
@@ -216,6 +236,8 @@ class FamilyStrategy(Strategy):
         unresolved = self.ledger.unresolved()
         position = self.ledger.positions().get(symbol)
         reasons = []
+        if self.ledger.halted_reason() is not None:
+            reasons.append("startup_ledger_halted_requires_reconciliation")
         if any(
             i.symbol == symbol or i.client_id.startswith(self.client_id_prefix)
             for i in unresolved
@@ -324,9 +346,14 @@ class FamilyStrategy(Strategy):
                 if self.pending_role == "entry"
                 else self.spec.exit_timeout_ns
             )
+            if self.cancel_requested:
+                if now - self.cancel_requested_ns >= timeout:
+                    self._freeze("cancel_ack_timeout_requires_reconciliation")
+                return  # Never assume an unacknowledged cancel freed the order.
             force = (
                 self.spec.exit_deadline_ns is not None
                 and now >= self.spec.exit_deadline_ns
+                and (self.pending_role == "entry" or self.exit_reason != "time_exit")
             )
             if (
                 not halted
@@ -334,25 +361,26 @@ class FamilyStrategy(Strategy):
                 and (now - self.pending_since_ns >= timeout or force)
             ):
                 self.cancel_requested = True
+                self.cancel_requested_ns = now
                 self._record("cancel_requested", role=self.pending_role)
                 self.cancel_order(self.pending.client_order_id)
             return  # Never replace before terminal confirmation or overlap buys/sells.
         fresh = self._fresh_quote(now)
         if self.quantity and not fresh:
-            self.flags.add("held_quote_stale")
+            self._freeze("held_quote_stale")
             return  # Includes forced/time exits: R9 never prices from a stale quote.
         if not fresh or self.snapshot is None:
             return
         self.flags.discard("held_quote_stale")
         if halted:
             if self.quantity:
-                self.flags.add("held_halted")
+                self._freeze("held_halted")
             return
         self.flags.discard("held_halted")
         session = self._session(now)
         if session.kind == _sessions.SessionKind.CLOSED:
             if self.quantity:
-                self.flags.add("closed_session_requires_handoff")
+                self._freeze("closed_session_requires_handoff")
             return
         bid = decimal(str(self.last_quote.bid_price))
         if self.quantity:
@@ -547,17 +575,17 @@ class FamilyStrategy(Strategy):
                 return
             quantity = int(self.quantity * decimal(str(decision.fraction)))
             if quantity <= 0:
-                self.flags.add("partial_take_profit_not_representable")
+                self._freeze("partial_take_profit_not_representable")
                 return
             self.exit_reason, self.exit_remaining = decision.reason, D(quantity)
         elif decision is not None and decision.reason != "take_profit":
             self.exit_reason, self.exit_remaining = decision.reason, self.quantity
         if self.exit_orders >= self.spec.max_exit_orders:
-            self.flags.add("exit_budget_exhausted_requires_handoff")
+            self._freeze("exit_budget_exhausted_requires_handoff")
             return
         price = self._limit_price(bid, OrderSide.SELL)
         if price <= 0:
-            self.flags.add("positive_exit_limit_unavailable")
+            self._freeze("positive_exit_limit_unavailable")
             return
         self.exit_orders += 1
         self._submit(
@@ -596,6 +624,7 @@ class FamilyStrategy(Strategy):
         self.pending_remaining = quantity
         self.pending_since_ns = self.clock.timestamp_ns()
         self.cancel_requested = False
+        self.cancel_requested_ns = 0
         self._record(
             "submit",
             side=str(side),
@@ -648,6 +677,7 @@ class FamilyStrategy(Strategy):
         self.pending_role = None
         self.pending_remaining = D(0)
         self.cancel_requested = False
+        self.cancel_requested_ns = 0
 
     def _terminal(self, event, refused=False):
         if (
@@ -658,6 +688,17 @@ class FamilyStrategy(Strategy):
             if refused:
                 self._freeze("native_order_refused_requires_handoff")
             self._clear_pending()
+
+    @guarded_callback
+    def on_order_cancel_rejected(self, event):
+        if (
+            self.pending is not None
+            and event.client_order_id == self.pending.client_order_id
+        ):
+            # rc5's native cancel-reject callback is non-terminal: the original
+            # order can still fill. Keep its ID/residual and require recovery.
+            self._record("cancel_rejected", client_order_id=str(event.client_order_id))
+            self._freeze("native_cancel_rejected_requires_reconciliation")
 
     @guarded_callback
     def on_order_canceled(self, event):

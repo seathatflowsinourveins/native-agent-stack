@@ -29,6 +29,7 @@ def main():
         "-m",
         "unittest",
         "tests.test_us_equities_strategies",
+        "tests.test_us_equities_strategy_lifecycle",
         "-v",
     ]
     # The test process inherits no credential-bearing environment values.
@@ -46,6 +47,7 @@ def main():
     source = [
         *sorted(Path(__file__).parent.glob("*.py")),
         root / "tests/test_us_equities_strategies.py",
+        root / "tests/test_us_equities_strategy_lifecycle.py",
         root / "blueprints/us-equities/adaptive-paper/exits.py",
         root / "blueprints/us-equities/adaptive-paper/sessions.py",
         root / "blueprints/us-equities/adaptive-paper/native_adapter.py",
@@ -63,7 +65,7 @@ def main():
         "evidence_class": "synthetic",
         "engine_version": "2.0.0rc5",
         "runtime_install": "T13 unchanged uv sync --locked from ee3883699870d972058516192b1ee1c6e3ffb762",
-        "command": "ENGINE_PYTHON -m unittest tests.test_us_equities_strategies -v",
+        "command": "ENGINE_PYTHON -m unittest tests.test_us_equities_strategies tests.test_us_equities_strategy_lifecycle -v",
         "generator": "ENGINE_PYTHON -m blueprints.us-equities.strategies.acceptance --output test-acceptance.json",
         "exit": completed.returncode,
         "tests_run": int(count.group(1)) if count else 0,
@@ -79,7 +81,7 @@ def main():
             str(p.relative_to(root)): hashlib.sha256(p.read_bytes()).hexdigest()
             for p in source
         },
-        "scope": "ten equity classes, versioned exit-timing candidates, instrument/session gates plus restart and multi-instance regressions in BacktestEngine/LiveNode; synthetic ports and real local ledger only",
+        "scope": "ten equity classes, timing candidates, forced-exit/cancel lifecycle, durable freeze and restart, startup/session hazards, clock-independent LiveNode fixtures and instance regressions; synthetic ports and real local ledger only",
         "broker_e2e": "NOT_RUN",
         "historical_layer15_e2e": "NOT_RUN",
         "historical_exit_timing": "NOT_RUN",
