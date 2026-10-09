@@ -88,6 +88,19 @@ dependency to a full commit (`docs/decisions/2026-10-04-ci-least-privilege.md`; 
 from an `actions/checkout` of a full commit, checked file by file, and is loaded with `--plugin-dir`. The test file
 fails the workflow if either input appears.
 
+## Visibility
+
+The repository is public, so the job summary of every run, and with it both reports, is readable by anyone. A change
+whose findings should not be public before a fix does not belong in this workflow; the local route on the second key
+(job J8) keeps its report off GitHub. A read step that reports success without an execution file fails the job in a
+final step, so a green run always means the bounds were checked.
+
+## Machine-readable counts
+
+Each agent ends its report with one line, `J8-SUMMARY {"undeclared": <n>, "confidences": [...]}`, so the command
+center's "defects caught before a cue" ledger counts from the agents' own numbers and never from prose (command center,
+2026-10-09). The line adds nothing to the review itself.
+
 ## Effort and model
 
 `--effort max` on Claude Sonnet 5.5, as the command center set J8: the agents' work is judgment (the effort mapping of
@@ -114,7 +127,7 @@ then the same agents run locally on the second key, which already meets the need
 - `tests.test_workflow_security_coverage.NewWorkflowSecurityCoverageTests`: the coverage set gains the workflow, with
   its own offline zizmor test.
 
-New, in `tests/test_claude_pr_toolkit_review_workflow.py` (37 tests): the trigger, condition, permissions, checkout
+New, in `tests/test_claude_pr_toolkit_review_workflow.py` (39 tests): the trigger, condition, permissions, checkout
 layout, toolkit checkout, step order, pin, inputs, time limits, flags, prompt and settings are asserted from the
 workflow file; the guard, binding, diff, toolkit check, numbers and report steps are executed as written against
 local stand-ins for `gh` and `git` and a local git repository. They run without PyYAML, through the policy test's own
