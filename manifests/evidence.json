@@ -41047,8 +41047,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/grafana-lanes.json",
-      "sha256": "01f95f3cf7353644ba93b2bc234356982f6612bc5232de02a0d5e1c16bfa55da",
-      "bytes": 81763
+      "sha256": "6f9d1f17da4819fce42d848e5a0835f4ddc7717ec57318c4d2551e4765c11dc3",
+      "bytes": 90651
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/grafana-native-foundation-data.json",
@@ -56926,6 +56926,11 @@
       "bytes": 1825
     },
     {
+      "path": "observability/backends/templates/ns2604-claude-api-stall.yaml.example",
+      "sha256": "90813fd074e7ec32e2c88439c67670138b7d3f4fc7f50f351b0a1482df09b863",
+      "bytes": 3666
+    },
+    {
       "path": "observability/collector/README.md",
       "sha256": "b6e15fabde242bf7e16c9a67e12e78dc5463bbe978aed5fb6ac8eec8c5df22bf",
       "bytes": 46135
@@ -57037,8 +57042,8 @@
     },
     {
       "path": "observability/lanes_dashboard.py",
-      "sha256": "f97b8cb68ca0e3fad8ce24d243c46d2a4d69ddc925ea50c671279d2c905caf9f",
-      "bytes": 25250
+      "sha256": "2e4a5d6d4a8a7cea5125ca7c0820250d8efbe40335a4cfe92a0df575ea684b3a",
+      "bytes": 28838
     },
     {
       "path": "observability/memory-scheduled-20260923.json",
@@ -57854,6 +57859,11 @@
       "path": "tests/test_child_usage_suite.py",
       "sha256": "73d9b3ccf9ef348d1cd74494a7e7fdc169666b1b748d7310a78a2913f5fd55dd",
       "bytes": 22660
+    },
+    {
+      "path": "tests/test_claude_api_stall_alert.py",
+      "sha256": "4b2fea03f375e05b04d68521b55918a5488fe2f732b8a1ee87f6c1fa0463ca90",
+      "bytes": 8987
     },
     {
       "path": "tests/test_claude_recovery.py",

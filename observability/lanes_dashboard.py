@@ -7,6 +7,9 @@ Rate/cost: Prometheus rate/increase; Claude Code monitoring-usage#cost-counter.
 Gateway: opentelemetry-collector-contrib v0.162.0 spanmetricsconnector/README.md;
 semantic-conventions-genai 06ec68e7 client-inference.md (Development);
 OmniRoute c1e30b76 open-sse/services/routing/otel.ts:193-216.
+Speed and latency: Claude Code api_request events (duration_ms, output_tokens; monitoring-usage, 2.1.295);
+openai/codex rust-v0.161.0 7e21416b codex-rs/otel/src/metrics/names.rs:16,36 (codex.api_request.duration_ms,
+codex.turn.ttft.duration_ms); Prometheus histogram_quantile; Loki quantile_over_time.
 The named nested-call stream was qualified once on 2026-10-06. Result rows,
 started turns, request token counters and native status are distinct measures.
 """
@@ -360,4 +363,44 @@ def dashboard():
         'the gateway does not set span status. Native status 0 means unknown, not success. '
         'The existing metrics/spans export guard preserves these dimensions. Deployment '
         'and received-event coverage remain the CC host read-back.', 'ops', PROMETHEUS)
+    claude_request = f'{CLAUDE} | event_name="api_request"'
+    plot('Claude output tokens per second by model — lower bound', [
+        ('{{model}}',
+         f'sum by (model) (sum_over_time({claude_request} | unwrap output_tokens | __error__="" [5m])) / '
+         f'(sum by (model) (sum_over_time({claude_request} | unwrap duration_ms | __error__="" [5m])) / 1000)')],
+        'Output tokens divided by request seconds over 5m, per model, from the native api_request events. '
+        'duration_ms includes time to first token, thinking and any retry inside the request, and output tokens '
+        'include thinking, so this is a lower bound on generation speed, not a decode rate. Claude Code emits no '
+        'time to first token without the enhanced-telemetry beta (proposal P-06). No request in the window is '
+        'UNKNOWN.', 'none')
+    plot('Claude API request duration by model, p50 and p95', [
+        (f'{{{{model}}}} · p{q}',
+         f'quantile_over_time(0.{q}, {claude_request} | unwrap duration_ms | __error__="" [5m]) by (model)')
+        for q in (50, 95)],
+        'Per-request duration_ms quantiles over 5m from the native api_request events, retries inside the '
+        'request included. Long outputs at high effort raise the quantiles without any slowdown; read with the '
+        'tokens-per-second panel. No request in the window is UNKNOWN.', 'ms')
+    plot('Codex time to first token per lane, p50 and p95', [
+        (f'{{{{ecosystem_lane}}}} · p{q}',
+         f'histogram_quantile(0.{q}, sum by (le, ecosystem_lane) '
+         f'(rate(codex_turn_ttft_duration_ms_milliseconds_bucket{{ecosystem_lane!=""}}[5m])))')
+        for q in (50, 95)],
+        'Native codex.turn.ttft.duration_ms histogram (rust-v0.161.0 otel names.rs:36): turn start to first '
+        'token, per lane. Quantiles are interpolated inside histogram buckets, so values near a bucket edge '
+        'are estimates. A lane with no turn in the window is UNKNOWN.', 'ms', PROMETHEUS)
+    plot('Codex API request duration per lane, p95', [
+        ('{{ecosystem_lane}} · p95',
+         'histogram_quantile(0.95, sum by (le, ecosystem_lane) '
+         '(rate(codex_api_request_duration_ms_milliseconds_bucket{ecosystem_lane!=""}[5m])))')],
+        'Native codex.api_request.duration_ms histogram (names.rs:16), each attempt including retries. Bucket '
+        'interpolation applies; many lanes reading the same value means one bucket holds most requests. A lane '
+        'with no request in the window is UNKNOWN.', 'ms', PROMETHEUS)
+    plot('Gateway span duration by provider and model, p95', [
+        ('{{gen_ai_provider_name}} · {{gen_ai_request_model}}',
+         'histogram_quantile(0.95, sum by (le, gen_ai_provider_name, gen_ai_request_model) '
+         '(rate(traces_span_metrics_duration_milliseconds_bucket{service_name="omniroute"}[5m])))')],
+        'Native OmniRoute routing spans through the spanmetrics connector: whole-span duration, not time to '
+        'first token. The gateway records omniroute.routing.ttft_ms as a span attribute only; turning it into a '
+        'histogram needs a collector change (signaltometrics), which is not part of this panel. Gateway spans '
+        'have no lane parentage. No received span is UNKNOWN.', 'ms', PROMETHEUS)
     return base

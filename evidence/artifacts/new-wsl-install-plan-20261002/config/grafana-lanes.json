@@ -1964,6 +1964,289 @@
           "sort": "none"
         }
       }
+    },
+    {
+      "id": 27,
+      "title": "Claude output tokens per second by model \u2014 lower bound",
+      "type": "timeseries",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 234,
+        "w": 24,
+        "h": 9
+      },
+      "description": "Output tokens divided by request seconds over 5m, per model, from the native api_request events. duration_ms includes time to first token, thinking and any retry inside the request, and output tokens include thinking, so this is a lower bound on generation speed, not a decode rate. Claude Code emits no time to first token without the enhanced-telemetry beta (proposal P-06). No request in the window is UNKNOWN.",
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (model) (sum_over_time({service_name=\"claude-code\"} | event_name=\"api_request\" | unwrap output_tokens | __error__=\"\" [5m])) / (sum by (model) (sum_over_time({service_name=\"claude-code\"} | event_name=\"api_request\" | unwrap duration_ms | __error__=\"\" [5m])) / 1000)",
+          "queryType": "range",
+          "legendFormat": "{{model}}",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "UNKNOWN",
+          "unit": "none",
+          "custom": {
+            "spanNulls": false
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "last"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      }
+    },
+    {
+      "id": 28,
+      "title": "Claude API request duration by model, p50 and p95",
+      "type": "timeseries",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 243,
+        "w": 24,
+        "h": 9
+      },
+      "description": "Per-request duration_ms quantiles over 5m from the native api_request events, retries inside the request included. Long outputs at high effort raise the quantiles without any slowdown; read with the tokens-per-second panel. No request in the window is UNKNOWN.",
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "quantile_over_time(0.50, {service_name=\"claude-code\"} | event_name=\"api_request\" | unwrap duration_ms | __error__=\"\" [5m]) by (model)",
+          "queryType": "range",
+          "legendFormat": "{{model}} \u00b7 p50",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          }
+        },
+        {
+          "refId": "B",
+          "expr": "quantile_over_time(0.95, {service_name=\"claude-code\"} | event_name=\"api_request\" | unwrap duration_ms | __error__=\"\" [5m]) by (model)",
+          "queryType": "range",
+          "legendFormat": "{{model}} \u00b7 p95",
+          "datasource": {
+            "type": "loki",
+            "uid": "ns2604-loki"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "UNKNOWN",
+          "unit": "ms",
+          "custom": {
+            "spanNulls": false
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "last"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      }
+    },
+    {
+      "id": 29,
+      "title": "Codex time to first token per lane, p50 and p95",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ns2604-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 252,
+        "w": 24,
+        "h": 9
+      },
+      "description": "Native codex.turn.ttft.duration_ms histogram (rust-v0.161.0 otel names.rs:36): turn start to first token, per lane. Quantiles are interpolated inside histogram buckets, so values near a bucket edge are estimates. A lane with no turn in the window is UNKNOWN.",
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "histogram_quantile(0.50, sum by (le, ecosystem_lane) (rate(codex_turn_ttft_duration_ms_milliseconds_bucket{ecosystem_lane!=\"\"}[5m])))",
+          "legendFormat": "{{ecosystem_lane}} \u00b7 p50",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ns2604-prometheus"
+          },
+          "instant": false,
+          "range": true,
+          "format": "time_series"
+        },
+        {
+          "refId": "B",
+          "expr": "histogram_quantile(0.95, sum by (le, ecosystem_lane) (rate(codex_turn_ttft_duration_ms_milliseconds_bucket{ecosystem_lane!=\"\"}[5m])))",
+          "legendFormat": "{{ecosystem_lane}} \u00b7 p95",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ns2604-prometheus"
+          },
+          "instant": false,
+          "range": true,
+          "format": "time_series"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "UNKNOWN",
+          "unit": "ms",
+          "custom": {
+            "spanNulls": false
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "last"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      }
+    },
+    {
+      "id": 30,
+      "title": "Codex API request duration per lane, p95",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ns2604-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 261,
+        "w": 24,
+        "h": 9
+      },
+      "description": "Native codex.api_request.duration_ms histogram (names.rs:16), each attempt including retries. Bucket interpolation applies; many lanes reading the same value means one bucket holds most requests. A lane with no request in the window is UNKNOWN.",
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "histogram_quantile(0.95, sum by (le, ecosystem_lane) (rate(codex_api_request_duration_ms_milliseconds_bucket{ecosystem_lane!=\"\"}[5m])))",
+          "legendFormat": "{{ecosystem_lane}} \u00b7 p95",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ns2604-prometheus"
+          },
+          "instant": false,
+          "range": true,
+          "format": "time_series"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "UNKNOWN",
+          "unit": "ms",
+          "custom": {
+            "spanNulls": false
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "last"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      }
+    },
+    {
+      "id": 31,
+      "title": "Gateway span duration by provider and model, p95",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ns2604-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 270,
+        "w": 24,
+        "h": 9
+      },
+      "description": "Native OmniRoute routing spans through the spanmetrics connector: whole-span duration, not time to first token. The gateway records omniroute.routing.ttft_ms as a span attribute only; turning it into a histogram needs a collector change (signaltometrics), which is not part of this panel. Gateway spans have no lane parentage. No received span is UNKNOWN.",
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "histogram_quantile(0.95, sum by (le, gen_ai_provider_name, gen_ai_request_model) (rate(traces_span_metrics_duration_milliseconds_bucket{service_name=\"omniroute\"}[5m])))",
+          "legendFormat": "{{gen_ai_provider_name}} \u00b7 {{gen_ai_request_model}}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ns2604-prometheus"
+          },
+          "instant": false,
+          "range": true,
+          "format": "time_series"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "UNKNOWN",
+          "unit": "ms",
+          "custom": {
+            "spanNulls": false
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "last"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      }
     }
   ],
   "templating": {
