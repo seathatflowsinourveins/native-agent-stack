@@ -48,7 +48,7 @@ not a reviewed pin like this one; it will propose later releases on its usual sc
 | nothing waits for an answer | `--permission-prompts none` | same `--help`: "nobody: anything that would prompt is denied automatically"; changelog 2.1.259: "for unattended headless hosts" |
 | no MCP server | `--strict-mcp-config` | same `--help` |
 | hooks off; no read of any `.git` directory, `.env` or key file | `--settings` JSON (`disableAllHooks`, `permissions.deny`) | `--settings` still applies under `--restricted`; the action sets git authentication in the root checkout (`src/github/operations/git-config.ts`) |
-| 20 turns | `--max-turns 20` | accepted by the 2.1.295 argument parser (`option '--max-turns <turns>'`) |
+| 20 turns | `--max-turns 20` | accepted by the 2.1.295 argument parser (`option '--max-turns <turns>'`); checked again after the run as distinct assistant message ids, because the result's `num_turns` counts transcript messages |
 | $3 per run | `--max-budget-usd 3` | same `--help`: "Maximum dollar amount to spend on API calls"; a client estimate, checked again from the run's own numbers |
 | no full model output in a public log | `show_full_output: 'false'`, `ACTIONS_STEP_DEBUG: 'false'` in the action step's environment, and a first guard step that refuses a run with runner debugging on | `showFullOutput = options.showFullOutput === "true" \|\| isDebugMode`, where `isDebugMode` is `ACTIONS_STEP_DEBUG === "true"` (`base-action/src/parse-sdk-options.ts` at the pin) |
 | no key in GitHub | federation inputs only; the workflow passes no static credential | "a static credential takes precedence and federation will not be used" (`docs/setup.md` at the pin) |
@@ -78,7 +78,7 @@ parser (`shell-quote`); replaying that parser on this workflow's text yields the
 One step reads the action's execution file and keeps only numbers and fixed names: cost, turns, the success flag,
 the Claude Code version, the session's tool list, the number of MCP servers and per-model token counts. The record
 is written before the check, so a failed or over-budget run still leaves its cost. The step then fails the job
-unless the run succeeded, used 1 to 20 turns, cost at most $3 by the client's estimate, read the prompt cache, had
+unless the run succeeded, used 1 to 20 assistant turns (distinct assistant message ids; the client's `num_turns` counts transcript messages, tool results included, so a 12-request run on 2.1.295 reported 57, and it is only recorded), cost at most $3 by the client's estimate, read the prompt cache, had
 no MCP server and had none of Bash, Write, Edit, MultiEdit, NotebookEdit, WebFetch, WebSearch, Task, Agent or an
 `mcp__` tool. The execution file itself holds the whole transcript and is never printed or uploaded. A second step,
 which runs only when the check passed, copies the final result text to the job summary, escaped, inside `<pre>`,
