@@ -1,0 +1,319 @@
+{
+  "schema_version": 1,
+  "kind": "sanitized_native_orchestration_observation",
+  "observed_utc": "2026-10-09T01:02:40.973754Z",
+  "hcom": {
+    "version": "0.7.28",
+    "repository": "https://github.com/aannoo/hcom",
+    "commit": "b2a7c192003e7fd67ed93265289e4ac36276f965",
+    "source_locator": "~/.hcom/hcom.db:events_v",
+    "window": {
+      "start": "2026-10-08T00:31:25Z",
+      "end": "2026-10-09T00:31:25Z",
+      "end_exclusive": true
+    },
+    "read": {
+      "mode": "ro",
+      "query_only": true,
+      "transaction": "BEGIN; first max(id) fixes snapshot",
+      "started_utc": "2026-10-09T01:02:40.860358Z",
+      "ended_utc": "2026-10-09T01:02:40.973754Z",
+      "snapshot_high_id": 65430,
+      "window_min_id": 35442,
+      "window_max_id": 65232,
+      "db_bytes": 108019712,
+      "wal_bytes": 5487872,
+      "nice": 10,
+      "ionice": "c2/n7"
+    },
+    "events_v_schema_sha256": "bb34d662e930436a640bfa7653a4c153505e020ec640abf98be09cf9dae7e0e2",
+    "selected_logical_projection_sha256": "d7abb784ed8380bb393dad397081923c94b91be9f511d0efe0f84c6b6f9991d1",
+    "projection_digest_scope": "Logical selected metadata, not database bytes; original full projection is not published. Later live delivery/current-row changes can change its digest.",
+    "columns": [
+      "role",
+      "ready",
+      "launch_failed",
+      "launch_blocked",
+      "stopped",
+      "killed_reason",
+      "status_active",
+      "status_listening",
+      "status_blocked",
+      "messages_sent",
+      "reply_metadata",
+      "delivered_metadata"
+    ],
+    "per_role_rows": [
+      ["claude:fixwave-mcp",1,0,0,1,1,17,4,0,2,2,2],
+      ["claude:github-ci-finalize-read",3,0,0,3,3,69,25,0,11,8,11],
+      ["codex:api-credit-sota",3,0,0,3,3,1030,65,0,144,39,144],
+      ["codex:codex-token-parity",6,0,0,6,5,1188,60,0,78,37,78],
+      ["codex:convergence-practice",6,0,0,7,7,885,45,0,62,18,62],
+      ["codex:coop-read-pr881",1,0,0,1,1,1,1,0,0,0,0],
+      ["codex:coop-read-uet-pr13",1,0,0,1,1,1,1,0,0,0,0],
+      ["codex:currency",7,0,0,7,6,1789,55,1,94,9,94],
+      ["codex:fixwave-defects",7,0,0,8,7,1285,39,1,74,20,74],
+      ["codex:g5-fields-a",3,0,0,3,3,320,8,0,30,9,30],
+      ["codex:g5-fields-b",3,0,0,3,2,185,8,0,39,6,39],
+      ["codex:g5-stars-gap",3,0,0,2,2,474,18,0,35,8,35],
+      ["codex:github-ci-finalize",6,0,0,7,6,1426,70,2,92,30,92],
+      ["codex:github-consolidation",4,0,0,4,3,851,111,0,136,35,136],
+      ["codex:grand-catalog",7,0,0,7,6,2038,44,69,235,50,235],
+      ["codex:harness-rules",3,0,0,3,2,732,34,0,26,17,26],
+      ["codex:landscape-gap",4,0,0,4,2,409,16,0,85,7,85],
+      ["codex:landscape-live-foundation",2,0,0,2,2,621,14,0,66,24,66],
+      ["codex:landscape-live-trading",4,0,0,4,4,526,23,0,47,13,47],
+      ["codex:landscape-mcp",2,0,0,2,2,237,6,0,52,7,52],
+      ["codex:landscape-stars",5,0,0,5,4,684,30,0,48,30,48],
+      ["codex:layer15-build",4,0,0,4,3,1170,42,0,49,5,49],
+      ["codex:memory-h2h",7,0,0,7,6,1068,54,1,66,28,66],
+      ["codex:ns-readiness-manifest",4,0,0,3,3,348,14,0,40,5,40],
+      ["codex:orch-records",5,0,0,5,5,1258,47,0,66,11,66],
+      ["codex:overlap-token",7,0,0,7,6,1010,39,0,36,6,36],
+      ["codex:paper-open-e2e",3,0,0,2,2,975,32,1,73,0,73],
+      ["codex:readiness-runner",6,0,0,7,7,1034,58,0,97,8,97],
+      ["codex:rnd-r1",6,0,0,6,6,1209,51,0,25,5,25],
+      ["codex:runtime-workers",2,0,0,2,1,888,16,0,96,11,96],
+      ["codex:sdk-harness-ready",3,0,1,2,1,293,12,0,39,5,39],
+      ["codex:sdk-invoke-dspy",1,0,1,1,1,2,1,3,0,0,0],
+      ["codex:sdk-invoke-dspy-r2",1,0,0,1,1,1,1,0,0,0,0],
+      ["codex:skills-lifecycle",5,0,0,6,5,1931,68,5,78,18,78],
+      ["native-system",0,0,0,0,0,0,0,0,210,0,75],
+      ["unknown",0,0,0,0,0,0,0,0,0,0,0]
+    ],
+    "totals": {
+      "window_events": 29791,
+      "life": 410,
+      "status": 27150,
+      "message": 2231,
+      "batch_launched": 135,
+      "ready": 135,
+      "launch_failed": 0,
+      "launch_blocked": 2,
+      "stopped": 136,
+      "killed_reason": 119,
+      "created": 2,
+      "batch_targets_requested": 135,
+      "batch_targets_launched": 135,
+      "batch_reported_failures": 0,
+      "status_active": 25955,
+      "status_listening": 1112,
+      "status_blocked": 83,
+      "instance_sender_messages": 2021,
+      "native_system_messages": 210,
+      "reply_metadata": 471,
+      "delivered_metadata": 2096,
+      "stored_recipient_members": 2139
+    },
+    "denominators": {
+      "observed_target_role_tags": 34,
+      "overlapping_native_lifespans": 147,
+      "stopped_snapshots": 136,
+      "current_lifespans": 11,
+      "status_with_session_metadata": 24911,
+      "status_without_session_metadata": 2239
+    },
+    "initiating_roles": {
+      "codex:fixwave-defects": {
+        "batch_launched": 1,
+        "ready": 1,
+        "stopped": 1,
+        "killed_reason": 1
+      },
+      "codex:github-ci-finalize": {
+        "batch_launched": 3,
+        "ready": 3,
+        "stopped": 2,
+        "killed_reason": 2
+      },
+      "codex:sdk-harness-ready": {
+        "batch_launched": 2,
+        "ready": 2,
+        "launch_blocked": 1,
+        "stopped": 2,
+        "killed_reason": 2
+      },
+      "unknown": {
+        "batch_launched": 129,
+        "ready": 129,
+        "launch_blocked": 1,
+        "stopped": 131,
+        "killed_reason": 114,
+        "created": 2
+      }
+    },
+    "mapping_rules": [
+      "Ready/failed/blocked: exact life_batch_id -> native batch; instance must be in native instances array; use recorded batch tool/tag.",
+      "Stopped: use that event's snapshot.tool/snapshot.tag.",
+      "Status and instance sender: exact instance plus native created_at<=event<=stop/read-snapshot lifespan; require session identity match when emitted; conflicts/missing labels stay unknown.",
+      "All147 overlapping lifespans have a matching native batch tool/tag;0 missing,0 conflicting. No name-prefix or current-only historical inference."
+    ],
+    "sql_parameters": {
+      "fixed_high_id": 65430,
+      "window_start": "2026-10-08T00:31:25+00:00",
+      "window_end": "2026-10-09T00:31:25+00:00"
+    },
+    "selection_sql": [
+      "SELECT id,timestamp,instance,life_action,life_by,life_batch_id,life_reason='killed',json_extract(data,'$.tag'),json_extract(data,'$.tool'),json_extract(data,'$.instances'),json_extract(data,'$.snapshot.tag'),json_extract(data,'$.snapshot.tool'),json_extract(data,'$.snapshot.created_at'),json_extract(data,'$.snapshot.session_id'),json_extract(data,'$.snapshot.name'),json_extract(data,'$.launched'),json_extract(data,'$.failed') FROM events_v WHERE type='life' AND id<=? ORDER BY id;",
+      "SELECT name,tag,tool,created_at,session_id FROM instances ORDER BY name;",
+      "SELECT id,timestamp,instance,status_val,json_extract(data,'$.session') FROM events_v WHERE type='status' AND timestamp>=? AND timestamp<? AND id<=? ORDER BY id;",
+      "SELECT id,timestamp,instance,msg_from,msg_sender_kind,msg_intent,msg_reply_to,msg_reply_to_local,msg_delivered_to FROM events_v WHERE type='message' AND timestamp>=? AND timestamp<? AND id<=? ORDER BY id;"
+    ],
+    "sources": [
+      {
+        "file": "src/db/events.rs",
+        "sha256": "d14c36f2132f2d14b204a721899cc157156c4d9c646e6e5c4517d158b82af871",
+        "lines": "223-314"
+      },
+      {
+        "file": "src/hooks/common.rs",
+        "sha256": "9c0ab8b15ef390c3d2824c3dc6069cebd25fc012755a5146983ccce73740bc75",
+        "lines": "1327-1350;1440-1447"
+      },
+      {
+        "file": "src/commands/kill.rs",
+        "sha256": "24b1001d9ed909c2838659af6d793d8512254d8bf7cba6c6f2eca3716e8fa3ee",
+        "lines": "144-147;376-395"
+      }
+    ],
+    "limits": [
+      "Native lifecycle/message/status counts are not tool_result, model success, organic trigger or completed-task counts.",
+      "Target-role use is distinct from initiating-role use; CC/co-op initiation is unknown.",
+      "Window uses retained current event store; no archive recovery is claimed.",
+      "Unrecorded intermediate tag changes remain unmeasured.",
+      "Reply/delivery metadata concerns messages created in the window, not response/delivery timing or recipient-role acceptance.",
+      "Reason killed includes already-dead/untracked cleanup and is not independent successful process termination."
+    ],
+    "failed_queries_retained": [
+      "Alias ambiguity in metadata key probe, corrected before role claims.",
+      "Batch-target probe assumed objects; native array contains strings; malformed-JSON probe corrected."
+    ],
+    "independent_observation": "Coordinator directly reproduced fixed-window type/lifecycle totals and all34 stopped/killed target-role totals."
+  },
+  "claude_installed_source": {
+    "version": "2.1.295",
+    "build": "07e8f67ea328",
+    "locator": "~/.local/share/claude/versions/2.1.295",
+    "bytes": 256113848,
+    "sha256": "4503bfe11a6c7fcc1e0b39b5e0d347c04248f750b03b0977b3ad6b531fe6f358",
+    "span_convention": "zero-based bytes;end-exclusive;hash original embedded source bytes",
+    "spans": [
+      {
+        "name": "approved-plan named-teammate suggestion",
+        "start": 222621541,
+        "end": 222621762,
+        "sha256": "ce55db19fe73e044b9032af59cc569b0f350e3d2eb736246a078a8abc24f8a5b"
+      },
+      {
+        "name": "approved-plan call site",
+        "start": 222629099,
+        "end": 222629753,
+        "sha256": "dd78918fb778605787cf8d89b81342854cbe1d42b11509ab377cb9f48744a75f"
+      },
+      {
+        "name": "Agent interpolation constant",
+        "start": 211021637,
+        "end": 211021647,
+        "sha256": "1f25c7bbddb03e09144c247973f8914b6885529ed9e184bc15748cb8263958c1"
+      },
+      {
+        "name": "Team Coordination reminder",
+        "start": 219305232,
+        "end": 219306000,
+        "sha256": "63f06d2e02c1e0cfb096b2e252616753c63108dcda0e749ee0d37bf58f7cbd73"
+      },
+      {
+        "name": "TeammateIdle schema",
+        "start": 207519342,
+        "end": 207519578,
+        "sha256": "3f5e1954b4af338efcc38141c0d3e66c3c92d318d9e49d634b9f1b619842b199"
+      },
+      {
+        "name": "TaskCreated schema",
+        "start": 207519578,
+        "end": 207519896,
+        "sha256": "3c01d5747a5cdb55df2bacd341b96e8d4411fefc92c40f1d51ae821ddfd60e8c"
+      },
+      {
+        "name": "Ultracode session schema",
+        "start": 208317678,
+        "end": 208318041,
+        "sha256": "40e7f6683e96ac4dfcf30753566cd4933267dd4d3187810eecc3bcfbd4086a9e"
+      },
+      {
+        "name": "Ultracode requested/available/active fields",
+        "start": 207893099,
+        "end": 207893802,
+        "sha256": "13bc3ec911668616367f3a37e81ab9b1f93a508b66d423a1829d547f9a46d6ca"
+      }
+    ],
+    "vendor_selection_text_resolved": "If this plan can be broken down into multiple independent tasks, consider spawning named teammates with the Agent tool (pass a `name`) to parallelize the work.",
+    "selection_guard": "Helper requires truthy native flag and lF()==default; verified approved-plan result appends it. Not unconditional startup routing.",
+    "coordination_scope": "Native teammate reminder directs findings/completion to lead and peer communication by native names; task-list addition is conditional.",
+    "hook_scope": "Declared TeammateIdle/TaskCreated input schemas, not invocation proof or a peer-spawn router; no such hook configured in selected scopes.",
+    "ultracode_scope": "Session-scoped via supported --settings/apply_flag_settings; interactive toggles do not persist. Requested, available and active are separate; requires enabled workflows and a supported model.",
+    "todo_disposition": {
+      "file": "catalogs/foundation/upstream-surface-dispositions.json",
+      "file_sha256": "2c9847e1460661e953d59add75e82808c9e2ea33e46fc0fc67c4c375f38187f3",
+      "row_key": "claude:env:CLAUDE_CODE_ENABLE_TODO_TOOLS",
+      "disposition": "declined",
+      "claim": "This record does not adopt shared task claiming/dependencies; absence of the flag is not universal model/account unavailability proof."
+    },
+    "read_method": "nice10/ionice-c2/n7 plus drop-behind for256MB source pass; targeted byte-span verification; no runtime/hook/model trial.",
+    "coordinator_span_checks": [
+      "approved-plan suggestion",
+      "Team Coordination reminder",
+      "Ultracode session schema"
+    ]
+  },
+  "memory_observations": {
+    "sample_utc": "2026-10-09T01:48:37.106663Z",
+    "pid_source": "Native claude agents --json --all selected owning-role rows; proc comm verified claude",
+    "rollup_source": "procfs <selected native session PID>/smaps_rollup; Pss and RSS in kB",
+    "role_rows": [
+      {
+        "role": "ns2604-coop",
+        "pss_kb": 577507,
+        "rss_kb": 674244,
+        "rollup_sha256": "11ea0239e9aa91f2be9f35f4570d58f7d0bf2574b9330f1713f43613908ef180"
+      },
+      {
+        "role": "wsl-architecture-design",
+        "pss_kb": 582073,
+        "rss_kb": 678800,
+        "rollup_sha256": "7e7d450330248a324093a53e26798aebea15b006a5e7b7245abb59999aaeac35"
+      },
+      {
+        "role": "api-actions",
+        "pss_kb": 515465,
+        "rss_kb": 612824,
+        "rollup_sha256": "d0ccf43d737266969024c9a6e50f4cf502a40f9055e4da7041e8b8edbf137a7e"
+      },
+      {
+        "role": "native-agent-stack-1a",
+        "pss_kb": 534463,
+        "rss_kb": 648076,
+        "rollup_sha256": "1fd57b373c7829f046901e0f6f94044179d7b76fa2612ef08ec7da1c7982ca87"
+      }
+    ],
+    "scope": "One live parent-process sample per role. Excludes separately owned child/MCP processes. Not per-feature/marginal Team/Workflow PSS; do not sum shared client figures across features.",
+    "component_pss": {
+      "hcom": null,
+      "team_incremental": null,
+      "workflow_incremental": null,
+      "agent_orchestrator": null
+    },
+    "gate": "Incomplete tool/session component coverage keeps ADOPT-NOW blocked; null is unknown, never zero.",
+    "whole_lane_reference": {
+      "file": "research/coverage-gap-20261008/O3/ROLE-MCP-TRIAL-PLAN-20261008/ROLE-MCP-TRIAL-REPORT-20261009.md",
+      "sha256": "f0afc2c734b3ad1b70e68cd38d3c844c7f4b1338cc030c8fc40fc88db1e53989",
+      "owned_pss_kb": {
+        "A_control": 1431973,
+        "B_structural_scout": 674966,
+        "B_supplied_artifact": 837623,
+        "C_token_parity_parent": 947334
+      },
+      "scope": "Whole owned-lane after-task PSS, different tasks/one run each; not individual orchestration tool PSS or matched savings."
+    }
+  }
+}
