@@ -5486,8 +5486,8 @@
     },
     {
       "path": "adoption/new-wsl-profile.json",
-      "sha256": "309fa245e3aaa07ed8045ee8969727280c890679e71256424b7c873f491cdec4",
-      "bytes": 261517
+      "sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
+      "bytes": 261886
     },
     {
       "path": "adoption/new-wsl-profile.md",
@@ -18531,6 +18531,11 @@
       "bytes": 8899
     },
     {
+      "path": "docs/decisions/2026-10-09-harbor-0240-profile.md",
+      "sha256": "e94c44fa033ed655ca043db15cfe9f359e00025b7f2b4760f54bb181249e409b",
+      "bytes": 4237
+    },
+    {
       "path": "docs/decisions/2026-10-09-host-name-scan.md",
       "sha256": "35da3d0ed9e661ac1834589d5438ab6a8e29ffdf4f5ac29da8a22393b7cfa751",
       "bytes": 15360
@@ -18842,13 +18847,13 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "96d182f3554119c4dc85deb2e97910e4bff84133e8fcf179fbee4bcc726b0479",
-      "bytes": 693491
+      "sha256": "51ecdbbdc0238f001097717659ebb136179dcec55c7e5f50b5481acfd7657ead",
+      "bytes": 693715
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "1d23732ee73842b85cb799a220492715418be74be329daf7f4f8e8e815fed19c",
-      "bytes": 369468
+      "sha256": "508701b5827a0348a5119df44cca138ddfe12fe1d66d6eed552fa11ae6df3786",
+      "bytes": 369530
     },
     {
       "path": "docs/next-host-stages.md",
@@ -35326,6 +35331,11 @@
       "bytes": 15311
     },
     {
+      "path": "evidence/artifacts/harbor-0240-currency-20261009/receipt.json",
+      "sha256": "d07c5ccb2e876337725c6e0de1a189ad43939b0b9af07cd7b3486dbc6a022f34",
+      "bytes": 4019
+    },
+    {
       "path": "evidence/artifacts/harness-rules-20261008/B-run-receipts.json",
       "sha256": "9ab28797579bc392a8536fbe9a5e6a2f8f6daa2f5e3c90c0e7279b65f5485c4d",
       "bytes": 7859
@@ -41922,8 +41932,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "3300e5c3eca756825a0cd33b23b21dc31c688cdf68e352419b1463906f906db0",
-      "bytes": 63050
+      "sha256": "0471c6e52b8f1fee33dad515a376849f0d0e9ee10f2c28ae59ccd5d2f2a7a62e",
+      "bytes": 64894
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/slot-state-and-core-recipes.json",

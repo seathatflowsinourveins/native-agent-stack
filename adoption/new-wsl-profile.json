@@ -1745,7 +1745,7 @@
       "repository": "https://github.com/harbor-framework/harbor",
       "layer_id": "quality-evaluation",
       "owner_layer_id": "quality-evaluation",
-      "pin": "0.23.0",
+      "pin": "0.24.0",
       "component_id": null,
       "source_selection_layer": "quality-evaluation",
       "source_selection_name": "Harbor (containerized agent E2E runner)",
@@ -1756,39 +1756,39 @@
       "default_precedence": null,
       "default_install": false,
       "blocking_gaps": [
-        "No install artifact or native lock checksum verified; only the immutable Git source identity was checked."
+        "No native installation or locked-environment acceptance verified; the official wheel was downloaded and its SHA256 matched the published digest."
       ],
       "artifact": {
-        "name": "git source at 1e5c5c6db929a10a140d05e606882c671ae20729",
-        "url": "https://github.com/harbor-framework/harbor/tree/1e5c5c6db929a10a140d05e606882c671ae20729"
+        "name": "harbor-0.24.0-py3-none-any.whl",
+        "url": "https://files.pythonhosted.org/packages/9e/63/0e3d788e8d1ed116125507c6a01e3fb95cf82be71f2ea7040a1458709d21/harbor-0.24.0-py3-none-any.whl"
       },
       "checksum": {
-        "algorithm": "git-sha1",
-        "value": "1e5c5c6db929a10a140d05e606882c671ae20729",
-        "source": "https://api.github.com/repos/harbor-framework/harbor/commits/1e5c5c6db929a10a140d05e606882c671ae20729",
-        "kind": "source"
+        "algorithm": "sha256",
+        "value": "23b7ba616a3aae4eff561ced5e2c51c7186f2981e53a770dea9c689d3969877c",
+        "source": "https://pypi.org/pypi/harbor/0.24.0/json",
+        "kind": "artifact"
       },
-      "integrity_observation": "source_identity_only",
+      "integrity_observation": "downloaded_and_rehashed",
       "install": {
-        "command": "uv tool install harbor==0.23.0",
-        "source": "https://github.com/harbor-framework/harbor/blob/v0.23.0/README.md",
+        "command": "uv tool install harbor==0.24.0",
+        "source": "https://github.com/harbor-framework/harbor/blob/b53b8134e1241686dca7759af188f987ecc48e8b/README.md#L22",
         "execution_status": "UNRUN",
         "prerequisites": [
-          "uv and an owned tool installation scope for harbor 0.23.0."
+          "uv and an owned tool installation scope for harbor 0.24.0."
         ],
-        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
+        "source_review_ref": "evidence/artifacts/harbor-0240-currency-20261009/receipt.json"
       },
       "acceptance": {
-        "command": "uv sync --all-packages --all-extras --locked && uv run pytest tests/ -m \"not runtime\" --cov=src/harbor --cov-report=term-missing",
-        "source": "https://github.com/harbor-framework/harbor/blob/v0.23.0/.github/workflows/pytest.yml",
+        "command": "uv sync --all-packages --all-extras --locked && uv run pytest tests/ packages/rewardkit/tests/unit/ -m \"not runtime\" --cov=src/harbor --cov=packages/rewardkit/src/rewardkit --cov-report=term-missing",
+        "source": "https://github.com/harbor-framework/harbor/blob/b53b8134e1241686dca7759af188f987ecc48e8b/.github/workflows/pytest.yml#L54",
         "evidence_class": "upstream_test_command_not_executed",
         "execution_status": "UNRUN",
         "prerequisites": [
-          "Run from the v0.23.0 Linux source checkout with the locked all-packages/all-extras environment and Python 3.13.",
+          "Run from the v0.24.0 Linux source checkout at b53b8134e1241686dca7759af188f987ecc48e8b with the locked all-packages/all-extras environment and Python 3.13.",
           "The upstream Linux workflow sets up Docker, Docker Compose and Deno v2.x before this non-runtime suite. Those developer prerequisites remain unprovisioned."
         ],
-        "scope": "Exact Linux non-runtime pytest steps; the separate runtime/Podman and Windows suites, agent/provider benchmarks and destination acceptance are excluded. Published wheel metadata is not a downloaded or rehashed artifact.",
-        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
+        "scope": "Exact v0.24.0 Linux non-runtime pytest steps including RewardKit unit tests and coverage. The wheel digest was downloaded/rehashed; no native install, upstream suite, runtime/Podman or Windows suite, agent/provider benchmark or destination acceptance was run.",
+        "source_review_ref": "evidence/artifacts/harbor-0240-currency-20261009/receipt.json"
       },
       "provisioning_status": "unprovisioned_source_review",
       "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
@@ -1797,13 +1797,15 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/quality-evaluation.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/README.md",
-        "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
+        "https://github.com/harbor-framework/harbor/blob/b53b8134e1241686dca7759af188f987ecc48e8b/README.md#L22",
+        "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json",
+        "evidence/artifacts/harbor-0240-currency-20261009/receipt.json",
+        "docs/decisions/2026-10-09-harbor-0240-profile.md"
       ],
       "release": {
-        "tag": "v0.23.0",
-        "source": "https://github.com/harbor-framework/harbor/releases/tag/v0.23.0",
-        "published_at": "2026-09-12T04:55:17Z"
+        "tag": "v0.24.0",
+        "source": "https://github.com/harbor-framework/harbor/releases/tag/v0.24.0",
+        "published_at": "2026-10-05T05:04:52Z"
       },
       "source_pin_kind": "release_or_artifact_version"
     },

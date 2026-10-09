@@ -1,19 +1,19 @@
 {
   "schema_version": 1,
   "kind": "new-wsl-handbook-profile-integration",
-  "source_main": "a88c9865b91b0fb55553f3ac65c7713090a94823",
+  "source_main": "86bb669ad6c81b9adafdb222d545a1bf2aa95218",
   "evidence_class": "local_integration",
   "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
-  "profile_sha256": "309fa245e3aaa07ed8045ee8969727280c890679e71256424b7c873f491cdec4",
+  "profile_sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
   "outputs": {
-    "docs/new-wsl-handbook.md": "1d23732ee73842b85cb799a220492715418be74be329daf7f4f8e8e815fed19c",
-    "docs/new-wsl-handbook.json": "96d182f3554119c4dc85deb2e97910e4bff84133e8fcf179fbee4bcc726b0479"
+    "docs/new-wsl-handbook.md": "508701b5827a0348a5119df44cca138ddfe12fe1d66d6eed552fa11ae6df3786",
+    "docs/new-wsl-handbook.json": "51ecdbbdc0238f001097717659ebb136179dcec55c7e5f50b5481acfd7657ead"
   },
   "inventory": {
     "layers": 37,
     "profile_entries": 78,
     "projected_tools": 82,
-    "canonical_package_ids": 25
+    "canonical_package_ids": 26
   },
   "validation": [
     {
@@ -892,6 +892,23 @@
       },
       "evidence_class": "local_integration",
       "scope": "Actual generator execution and artifact identity after historical-field/pointer/citation corrections; no target-host, client, model/provider or strategy acceptance."
+    },
+    {
+      "recorded_at_utc": "2026-10-09T10:14:45Z",
+      "source_base": "958a6d1ab770c807c5ee59748475a5c14df7ba52",
+      "cause": "Harbor 0.24.0 profile currency update, pinned source acceptance command and downloaded wheel digest; no install or host acceptance.",
+      "command": "nice -n 10 ionice -c2 -n7 timeout 600 python3 scripts/build_new_wsl_handbook.py --write",
+      "native_exit_code": 0,
+      "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
+      "profile_sha256": "a97f7fc6a5eba2bf8938ac42db231d8cf8ad30d894e0369525490d1f8b861ec5",
+      "current_outputs": {
+        "docs/new-wsl-handbook.md": "4856a52ab9de12efe0c1b58685a9ee53ffb59aacb82b5bc50394c42897d32702",
+        "docs/new-wsl-handbook.json": "f92ea8aaaaedd6eaf85a9bdfeb3533ad9023753edc87661e9ad9517a920288af"
+      },
+      "check": "nice -n 10 ionice -c2 -n7 timeout 600 python3 scripts/build_new_wsl_handbook.py --check",
+      "check_exit_code": 0,
+      "evidence_class": "local_integration",
+      "scope": "Current generated-byte binding only. All previous validation rows and regeneration history remain preserved."
     }
   ],
   "previous_outputs": [
@@ -1016,6 +1033,17 @@
         "docs/new-wsl-handbook.json": "78f5c26c47fb622c0923e1643df0212db8a77d46b64a2cb296e2e44068710f62"
       },
       "reason": "CC-cued T19 landing rebase and native source/citation regeneration; historical execution observations remain retained."
+    },
+    {
+      "superseded_at_utc": "2026-10-09T10:14:45Z",
+      "reason": "Preserve the prior current binding before the Harbor 0.24.0 profile currency update; earlier observations remain unchanged.",
+      "source_main": "424b8a778222ae8857aade42c49ae6f7a13b3138",
+      "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
+      "profile_sha256": "d28c143a00e4ff33d54a293ce7b70310f813225ce60d8ba921c516ce4bab3ab5",
+      "outputs": {
+        "docs/new-wsl-handbook.md": "981e9634500ce4ab0d3083990236ada854d845f24e3dbdcd32d37b262f91dfb7",
+        "docs/new-wsl-handbook.json": "f14476918ca459c3cefc5336dd3ac76b9d187f14aeae482935bfbf51300b55d1"
+      }
     }
   ]
 }
