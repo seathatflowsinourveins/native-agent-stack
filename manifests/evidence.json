@@ -18297,8 +18297,8 @@
     },
     {
       "path": "docs/decisions/2026-10-09-mcp-surfaces-trials.md",
-      "sha256": "958c1b81443d1a3041986672f0cf1c41c072339cc731e4acfd6cb43fcc9c4ac9",
-      "bytes": 9154
+      "sha256": "b4db5597ed5a1792f40e4dffcaed462659a8d5b8146fd7da83d64c9d653e058d",
+      "bytes": 12188
     },
     {
       "path": "docs/direct-results.md",
@@ -37862,8 +37862,8 @@
     },
     {
       "path": "evidence/artifacts/mcp-surfaces-trials-20261009/RESULT.json",
-      "sha256": "82602df88dafacf261491382f8b07ced28008c88e447304763be64bc32532b35",
-      "bytes": 3469
+      "sha256": "86e7d65eed85206e2146c377329b3ffc8fa1ecff3a72220982c87abe648b4bea",
+      "bytes": 7332
     },
     {
       "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/client-checks/client-inspector-initialize-r2.json",
@@ -38172,8 +38172,8 @@
     },
     {
       "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/provenance.json",
-      "sha256": "d739a00bf38013eb27c86652f29800a5b88232032ab8e2f2be408957b933f6d6",
-      "bytes": 5042
+      "sha256": "f4304713c05dcd53439ed63dea630c6555be4490ad87f43cfad0bbd171c265a8",
+      "bytes": 9141
     },
     {
       "path": "evidence/artifacts/mcp-surfaces-trials-20261009/conformance/quality/unsupported-spec-filter.json",

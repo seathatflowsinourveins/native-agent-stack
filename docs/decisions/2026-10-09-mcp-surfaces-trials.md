@@ -67,10 +67,40 @@ The small shell adapter only places the conformance-supplied URL into Inspector'
 native argument position; it implements no MCP messages.
 
 This release accepts `2025-03-26`, `2025-06-18`, `2025-11-25`, `draft` and
-`extension` as protocol filters. It rejects `2026-07-28` before execution.
-**This trial establishes no verdict for a 2026-07-28 protocol revision or a
-separately frozen harness leg bearing that date.** The verdict is
-`PASS_SCOPED_2025-11-25_TRIAL`.
+`extension` as protocol filters. The retained v0.1.16
+`server --scenario server-initialize --spec-version 2026-07-28` refusal
+establishes only that invocation's boundary. It executes and scores neither
+of the original frozen `--requirements 2026-07-28` legs below.
+
+The [frozen acceptance declaration](../../evidence/artifacts/new-wsl-install-plan-20261002/config/mcp-conformance-accept.sh)
+at repository revision `b7dfe638fc825a52ff4e7d1a9ccf2fde7de889fd` pins
+`@modelcontextprotocol/conformance@0.2.0-alpha.11` (line 8), with separate client
+and server invocations (lines 57 and 54). Its SHA-256 is
+`1084b5a567c2c6df7b0443c6547661aad81f91882b56001708efb11c81f8987d`. The
+[install-plan target selection](../../evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json)
+at line 4998 declares the destination selectors without a default destination;
+line 5000 fixes source commit `c321dd32035556e6769d3724a8ee97d87c3faaac`.
+The package's primary npm metadata independently gives that same source commit.
+The [pinned upstream requirements declaration](https://github.com/modelcontextprotocol/conformance/blob/c321dd32035556e6769d3724a8ee97d87c3faaac/README.md#conformance-requirements)
+defines the revision-frozen requirement sets.
+
+| Original frozen leg | Frozen runtime pin / requirement revision | Declared requirement invocation | Intended target | Disposition |
+| --- | --- | --- | --- | --- |
+| Client | `@modelcontextprotocol/conformance@0.2.0-alpha.11`, source `c321dd32035556e6769d3724a8ee97d87c3faaac`; requirements `2026-07-28` | `npx --offline --yes --ignore-scripts @modelcontextprotocol/conformance@0.2.0-alpha.11 client --command "$MCP_CONFORMANCE_CLIENT_COMMAND" --requirements 2026-07-28 "${extra[@]}"` | Owner-selected scenario-driven MCP client command or fixture inside the qualified isolated loopback namespace; selector `MCP_CONFORMANCE_CLIENT_COMMAND` is unbound for this frozen trial | `NOT_ESTABLISHED`: not run at the frozen revision |
+| Server | `@modelcontextprotocol/conformance@0.2.0-alpha.11`, source `c321dd32035556e6769d3724a8ee97d87c3faaac`; requirements `2026-07-28` | `npx --offline --yes --ignore-scripts @modelcontextprotocol/conformance@0.2.0-alpha.11 server --url "$MCP_CONFORMANCE_SERVER_URL" --requirements 2026-07-28 "${extra[@]}"` | Owner-selected HTTP MCP server endpoint supplied by a qualified startup adapter or fixture inside the isolated loopback namespace; selector `MCP_CONFORMANCE_SERVER_URL` is unbound for this frozen trial | `NOT_ESTABLISHED`: not run at the frozen revision |
+
+The optional `extra` arguments are only the explicitly supplied expected-failure
+baseline declared by the helper. Neither destination selector was bound for a
+frozen invocation in this trial. The helper's isolation/target guards remain
+applicable; the 2025 live endpoints and simple client adapters do not qualify
+a destination for either frozen leg.
+
+`PASS_SCOPED_2025-11-25_TRIAL` maps only to the retained v0.1.16
+initialization, ping and discovery observations. Those 2025 observations execute
+neither the frozen client nor the frozen server requirement set. Both original
+legs remain `NOT_ESTABLISHED`, so the original two-leg requirement is
+**not satisfied** by the scoped verdict. No frozen harness was run for this
+record correction.
 
 ## Same-task comparison
 

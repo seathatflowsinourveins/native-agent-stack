@@ -24,7 +24,68 @@
     "source_targeted_tests_passed": 29,
     "unsupported_protocol_filter": "2026-07-28",
     "unsupported_filter_rc": 1,
-    "frozen_2026-07-28_revision_verdict": "NOT_ESTABLISHED"
+    "frozen_2026-07-28_revision_verdict": "NOT_ESTABLISHED",
+    "frozen_requirement_legs": [
+      {
+        "id": "frozen-client-2026-07-28",
+        "mode": "client",
+        "frozen_package": "@modelcontextprotocol/conformance@0.2.0-alpha.11",
+        "frozen_source_commit": "c321dd32035556e6769d3724a8ee97d87c3faaac",
+        "requirements_revision": "2026-07-28",
+        "requirement_invocation": "npx --offline --yes --ignore-scripts @modelcontextprotocol/conformance@0.2.0-alpha.11 client --command \"$MCP_CONFORMANCE_CLIENT_COMMAND\" --requirements 2026-07-28 \"${extra[@]}\"",
+        "intended_target": {
+          "selector": "MCP_CONFORMANCE_CLIENT_COMMAND",
+          "description": "Owner-selected scenario-driven MCP client command or fixture, qualified to execute inside the isolated loopback namespace.",
+          "selected_target_in_this_trial": null,
+          "binding_status": "NOT_BOUND_FOR_FROZEN_REQUIREMENT"
+        },
+        "declaration": {
+          "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/mcp-conformance-accept.sh",
+          "repository_revision": "b7dfe638fc825a52ff4e7d1a9ccf2fde7de889fd",
+          "sha256": "1084b5a567c2c6df7b0443c6547661aad81f91882b56001708efb11c81f8987d",
+          "package_line": 8,
+          "invocation_line": 57,
+          "target_selection_path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+          "target_selection_line": 4998
+        },
+        "status": "NOT_ESTABLISHED",
+        "execution_status": "NOT_RUN_AT_FROZEN_REVISION"
+      },
+      {
+        "id": "frozen-server-2026-07-28",
+        "mode": "server",
+        "frozen_package": "@modelcontextprotocol/conformance@0.2.0-alpha.11",
+        "frozen_source_commit": "c321dd32035556e6769d3724a8ee97d87c3faaac",
+        "requirements_revision": "2026-07-28",
+        "requirement_invocation": "npx --offline --yes --ignore-scripts @modelcontextprotocol/conformance@0.2.0-alpha.11 server --url \"$MCP_CONFORMANCE_SERVER_URL\" --requirements 2026-07-28 \"${extra[@]}\"",
+        "intended_target": {
+          "selector": "MCP_CONFORMANCE_SERVER_URL",
+          "description": "Owner-selected HTTP MCP server endpoint supplied by an owner-qualified startup adapter or fixture inside the isolated loopback namespace.",
+          "selected_target_in_this_trial": null,
+          "binding_status": "NOT_BOUND_FOR_FROZEN_REQUIREMENT"
+        },
+        "declaration": {
+          "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/mcp-conformance-accept.sh",
+          "repository_revision": "b7dfe638fc825a52ff4e7d1a9ccf2fde7de889fd",
+          "sha256": "1084b5a567c2c6df7b0443c6547661aad81f91882b56001708efb11c81f8987d",
+          "package_line": 8,
+          "invocation_line": 54,
+          "target_selection_path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+          "target_selection_line": 4998
+        },
+        "status": "NOT_ESTABLISHED",
+        "execution_status": "NOT_RUN_AT_FROZEN_REVISION"
+      }
+    ],
+    "original_two_leg_requirement_mapping": {
+      "scoped_verdict": "PASS_SCOPED_2025-11-25_TRIAL",
+      "established_scope": "Retained v0.1.16 initialization, ping and discovery observations at 2025-11-25, including the two native client initialization checks.",
+      "original_frozen_client_leg": "NOT_ESTABLISHED",
+      "original_frozen_server_leg": "NOT_ESTABLISHED",
+      "satisfies_original_two_leg_requirement": false,
+      "filter_refusal_scope": "The v0.1.16 server-initialize --spec-version 2026-07-28 refusal establishes only that invocation boundary. It executes and scores neither frozen alpha.11 --requirements 2026-07-28 leg.",
+      "successful_2025_observations_scope": "The 2025 initialization, ping and discovery observations execute neither frozen client nor frozen server requirement set."
+    }
   },
   "inspector_vs_mcporter": {
     "verdict": "KEEP_MCPORTER_SCOPED",
@@ -33,7 +94,10 @@
     "baseline": "openclaw/mcporter@0.14.2",
     "baseline_commit": "aa0f55f9bffcde9d2070c86145f37d4dd3525f6c",
     "endpoint": "http://127.0.0.1:29374/mcp",
-    "tasks": ["tools/list", "memory_status {}"],
+    "tasks": [
+      "tools/list",
+      "memory_status {}"
+    ],
     "timed_operations_rc_zero": 42,
     "discovery_schema_comparisons_equal": 11,
     "tools_returned": 23,
@@ -56,7 +120,14 @@
     "fresh_observation_bound_seconds": 180,
     "fresh_organically_reached": "mcporter",
     "fresh_task_completed": false,
-    "open_gates": ["candidate native routing and successful fresh proof", "dated conformance revision boundary", "independent designated reads", "required CI", "pre-cue at pushed head", "CC cue and owner decisions"],
+    "open_gates": [
+      "candidate native routing and successful fresh proof",
+      "dated conformance revision boundary",
+      "independent designated reads",
+      "required CI",
+      "pre-cue at pushed head",
+      "CC cue and owner decisions"
+    ],
     "catalog_disposition_owner": "grand-catalog"
   },
   "evidence_classes": {

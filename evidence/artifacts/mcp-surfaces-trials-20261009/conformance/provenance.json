@@ -25,7 +25,12 @@
     "targeted_native_test_files": 3,
     "targeted_native_tests_passed": 29,
     "test_command": "npm test -- src/checks/checks.test.ts src/scenarios/spec-version.test.ts src/expected-failures.test.ts",
-    "source_dev_install_advisories": {"low": 2, "moderate": 6, "high": 13, "critical": 1},
+    "source_dev_install_advisories": {
+      "low": 2,
+      "moderate": 6,
+      "high": 13,
+      "critical": 1
+    },
     "advisory_boundary": "Counts were reported by npm ci for the pinned source development tree. No vulnerability triage or remediation is claimed. Published runtime-prefix installation reported zero advisories."
   },
   "install_check_inverse": {
@@ -38,7 +43,10 @@
     "inverse_verified": "The lane-prefix node_modules/.bin/conformance did not exist after uninstall. The exact pinned package was reinstalled for the remaining trial commands.",
     "source_dev_install_side_effect": {
       "cause": "lefthook 2.1.4 postinstall uses INIT_CWD and invoked install -f from the caller worktree during npm ci --prefix.",
-      "observed_generated_files": ["lefthook.yml", "Git hooks/prepare-commit-msg"],
+      "observed_generated_files": [
+        "lefthook.yml",
+        "Git hooks/prepare-commit-msg"
+      ],
       "generated_hook_sha256": "1ccb47e4c7fd278d7f08615de512d059addc8b37fbbd0575512d0b81b3c623c9",
       "inverse": "lefthook uninstall --remove-configs",
       "inverse_rc": 0,
@@ -49,10 +57,81 @@
   },
   "specification": {
     "tested_filter": "2025-11-25",
-    "native_client_protocol_versions_sent": {"mcporter": "2025-11-25", "inspector-cli": "2025-11-25"},
-    "supported_filters": ["2025-03-26", "2025-06-18", "2025-11-25", "draft", "extension"],
+    "native_client_protocol_versions_sent": {
+      "mcporter": "2025-11-25",
+      "inspector-cli": "2025-11-25"
+    },
+    "supported_filters": [
+      "2025-03-26",
+      "2025-06-18",
+      "2025-11-25",
+      "draft",
+      "extension"
+    ],
     "2026-07-28_filter_rc": 1,
-    "2026-07-28_boundary": "This release rejects that string as a protocol filter before execution. No verdict for a 2026-07-28 protocol revision or separately frozen harness leg is claimed."
+    "2026-07-28_boundary": "The v0.1.16 server-initialize --spec-version 2026-07-28 refusal establishes only that invocation boundary. It executes and scores neither frozen alpha.11 --requirements 2026-07-28 leg.",
+    "frozen_requirement_legs": [
+      {
+        "id": "frozen-client-2026-07-28",
+        "mode": "client",
+        "frozen_package": "@modelcontextprotocol/conformance@0.2.0-alpha.11",
+        "frozen_source_commit": "c321dd32035556e6769d3724a8ee97d87c3faaac",
+        "requirements_revision": "2026-07-28",
+        "requirement_invocation": "npx --offline --yes --ignore-scripts @modelcontextprotocol/conformance@0.2.0-alpha.11 client --command \"$MCP_CONFORMANCE_CLIENT_COMMAND\" --requirements 2026-07-28 \"${extra[@]}\"",
+        "intended_target": {
+          "selector": "MCP_CONFORMANCE_CLIENT_COMMAND",
+          "description": "Owner-selected scenario-driven MCP client command or fixture, qualified to execute inside the isolated loopback namespace.",
+          "selected_target_in_this_trial": null,
+          "binding_status": "NOT_BOUND_FOR_FROZEN_REQUIREMENT"
+        },
+        "declaration": {
+          "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/mcp-conformance-accept.sh",
+          "repository_revision": "b7dfe638fc825a52ff4e7d1a9ccf2fde7de889fd",
+          "sha256": "1084b5a567c2c6df7b0443c6547661aad81f91882b56001708efb11c81f8987d",
+          "package_line": 8,
+          "invocation_line": 57,
+          "target_selection_path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+          "target_selection_line": 4998
+        },
+        "status": "NOT_ESTABLISHED",
+        "execution_status": "NOT_RUN_AT_FROZEN_REVISION"
+      },
+      {
+        "id": "frozen-server-2026-07-28",
+        "mode": "server",
+        "frozen_package": "@modelcontextprotocol/conformance@0.2.0-alpha.11",
+        "frozen_source_commit": "c321dd32035556e6769d3724a8ee97d87c3faaac",
+        "requirements_revision": "2026-07-28",
+        "requirement_invocation": "npx --offline --yes --ignore-scripts @modelcontextprotocol/conformance@0.2.0-alpha.11 server --url \"$MCP_CONFORMANCE_SERVER_URL\" --requirements 2026-07-28 \"${extra[@]}\"",
+        "intended_target": {
+          "selector": "MCP_CONFORMANCE_SERVER_URL",
+          "description": "Owner-selected HTTP MCP server endpoint supplied by an owner-qualified startup adapter or fixture inside the isolated loopback namespace.",
+          "selected_target_in_this_trial": null,
+          "binding_status": "NOT_BOUND_FOR_FROZEN_REQUIREMENT"
+        },
+        "declaration": {
+          "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/mcp-conformance-accept.sh",
+          "repository_revision": "b7dfe638fc825a52ff4e7d1a9ccf2fde7de889fd",
+          "sha256": "1084b5a567c2c6df7b0443c6547661aad81f91882b56001708efb11c81f8987d",
+          "package_line": 8,
+          "invocation_line": 54,
+          "target_selection_path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+          "target_selection_line": 4998
+        },
+        "status": "NOT_ESTABLISHED",
+        "execution_status": "NOT_RUN_AT_FROZEN_REVISION"
+      }
+    ],
+    "original_two_leg_requirement_mapping": {
+      "scoped_verdict": "PASS_SCOPED_2025-11-25_TRIAL",
+      "established_scope": "Retained v0.1.16 initialization, ping and discovery observations at 2025-11-25, including the two native client initialization checks.",
+      "original_frozen_client_leg": "NOT_ESTABLISHED",
+      "original_frozen_server_leg": "NOT_ESTABLISHED",
+      "satisfies_original_two_leg_requirement": false,
+      "filter_refusal_scope": "The v0.1.16 server-initialize --spec-version 2026-07-28 refusal establishes only that invocation boundary. It executes and scores neither frozen alpha.11 --requirements 2026-07-28 leg.",
+      "successful_2025_observations_scope": "The 2025 initialization, ping and discovery observations execute neither frozen client nor frozen server requirement set."
+    },
+    "frozen_upstream_source": "https://github.com/modelcontextprotocol/conformance/blob/c321dd32035556e6769d3724a8ee97d87c3faaac/README.md#conformance-requirements"
   },
   "archived_primary_files": {
     "README.md": "fe85b50e7d85a3c2f9597dfc0cf85123d2bd68337dddd17fe5cfb06466d14c32",
