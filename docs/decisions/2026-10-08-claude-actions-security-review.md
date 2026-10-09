@@ -23,7 +23,7 @@ harness-audit PR (#892, 2026-10-09), which found changes its record had not name
 - Its job condition: this repository (slug guard), the `main` ref, `github.actor` and `github.triggering_actor` both
   the repository owner, the first attempt of a run, and `CLAUDE_SECURITY_REVIEW_ENABLED == 'true'`. A dispatch by
   anyone else, or a re-run, is skipped.
-- `timeout-minutes: 20`. Grants: `contents: read`, `pull-requests: read` and `id-token: write`.
+- `timeout-minutes: 30` (R7, below). Grants: `contents: read`, `pull-requests: read` and `id-token: write`.
 - A guard step stops the job with exit 2 on debug signals, a pre-existing `~/.claude/settings.json` (a dangling
   symlink included) or a malformed input; a binding step stops it with exit 2 unless the pull request is open, from
   this repository, targets `main` and has exactly the requested head. The binding step has no step id: its id `bind`
@@ -161,7 +161,7 @@ included: a 12-request run on 2.1.295 reported 57. The flag costs nothing.
 - `tests.test_workflow_security_coverage.NewWorkflowSecurityCoverageTests`: the coverage set gains both workflows,
   each with its own offline zizmor test.
 
-New, in `tests/test_claude_security_review_workflow.py` (44 tests): the review workflow's shape, and its steps' shell
+New, in `tests/test_claude_security_review_workflow.py` (45 tests): the review workflow's shape, and its steps' shell
 taken from the workflow file and run against a local stand-in for `gh` and a local git repository, and the flag's trigger paths, empty permissions, absence of any secret,
 variable, OIDC token, checkout or model, and its notice. Eleven weakened copies of the two workflows each fail at
 least one test (measured on 2026-10-08 against that day's bounds). The 2026-10-09 bound changes have their own tests
@@ -384,6 +384,25 @@ Both now compare canonical JSON (the helper `canonical()`: `json.dumps` with `so
 other boolean as `1`) each fail both exact pins and
 `test_settings_turn_hooks_off_exclude_the_heads_instruction_files_and_confine_reads` with PyYAML 6.0.3; without
 PyYAML those shape tests skip.
+
+## R7 (2026-10-09): the job timeout is 30 minutes
+
+The review job's `timeout-minutes` rises from 20 to 30, the command center's decision of 2026-10-09 under its
+standing rule to raise any cap that would truncate a normal run:
+
+- With `--max-turns` removed in R6, the numbers step's bound of 30 assistant turns is the turn limit. The job timeout
+  is a further limit, and the one that leaves no record: a timeout cancels the review step before it writes
+  `execution_file`, so the numbers step is skipped and nothing is published or uploaded.
+- The one measured run of this shape, `LR` (Opus 5.5 at max effort; the LR entry of `local-parity-receipt.json`,
+  recorded with #892, not carried in this PR), took 512,670 ms for 12 assistant turns, about 43 seconds a turn. At
+  that pace 30 turns take 1,281,675 ms, about 21.4 minutes of client time, before checkout and setup, so a 20-minute
+  timeout would cancel a run inside the approved bounds.
+- #892 and #894 use 30 minutes.
+- **Tests (45; 44 at R6):** new, `test_the_job_timeout_leaves_room_for_the_30_turn_bound` pins `timeout-minutes` to
+  the integer 30, as #894's test of that name does.
+- **Weakened copy, 2026-10-09:** `timeout-minutes` back at 20 fails that test with PyYAML 6.0.3 present. With it, all
+  36 copies fail a test with PyYAML present; without PyYAML 17 fail and 19 pass, the new copy among those that pass,
+  since only a shape test reads it.
 
 ## Alternatives considered
 

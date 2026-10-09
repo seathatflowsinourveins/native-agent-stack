@@ -48,7 +48,7 @@ jobs:
       github.run_attempt == 1 &&
       vars.CLAUDE_SECURITY_REVIEW_ENABLED == 'true'
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 30
     permissions:
       contents: read
       pull-requests: read # the pull request's state, base and head, read once to bind the request to it

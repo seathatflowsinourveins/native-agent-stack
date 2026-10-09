@@ -251,6 +251,13 @@ class SecurityReviewShapeTests(unittest.TestCase):
         self.assertEqual(job()["permissions"],
                          {"contents": "read", "pull-requests": "read", "id-token": "write"})
 
+    def test_the_job_timeout_leaves_room_for_the_30_turn_bound(self):
+        # 30 assistant turns at the measured pace of about 43 s a turn take about 21.4 minutes before checkout and
+        # setup; a 20-minute timeout would cancel a run inside the bounds before it writes execution_file.
+        timeout = job()["timeout-minutes"]
+        self.assertIs(type(timeout), int)
+        self.assertEqual(timeout, 30)
+
     def test_main_is_at_the_workspace_root_and_the_head_is_data_in_a_subdirectory(self):
         root = step("Check out main at the workspace root")["with"]
         self.assertNotIn("ref", root)
