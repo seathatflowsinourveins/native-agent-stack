@@ -189,13 +189,19 @@ content is restricted to exact `SKILL.md` assets. The separate
 and cannot authorize a content open. Native descriptor-relative no-follow
 stat supplies their file metadata. Shared protected checks apply to both
 lexical and canonical paths before reads. Ordinary unapproved discoveries are
-listed by name only as UNAPPROVED, with no candidate stat, resolve, open or
-hash. Their asset presence and runtime use remain unmeasured. Protected input
+reduced to counts by source root and kind before public inventory, custody or
+detail rendering, with no candidate stat, resolve, open or hash. Individual
+unapproved names and paths never enter served documents. Their asset presence
+and runtime use remain unmeasured. Protected input
 or a poisoned known alias still refuses the Architecture observation; the
 composer preserves its last page while refreshing the other documents, or
 publishes an explicit UNREPORTED placeholder on its first failure. Hashes and
 parsed metadata derive from the same captured approved bytes. Unknown names
-also enter cache signatures so additions/removals update the source view.
+enter only cache signatures outside the serving root, so additions, removals
+and renames invalidate the observation without publishing those names. Each
+successful Architecture publication removes superseded generated detail HTML
+from its fixed architecture/layers namespace before replacing the receipt;
+cache reuse also removes details outside its retained output set.
 
 `scripts/local_pages_policy_grants.py --pin <full-source-sha>` prints a static
 proposal from native Git tree/registered-path metadata for review. Runtime

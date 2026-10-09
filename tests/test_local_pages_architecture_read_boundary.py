@@ -77,6 +77,39 @@ def observed_file_reads(observe, *, observe_metadata=None):
         yield
 
 
+@contextmanager
+def observed_forbidden_targets(targets):
+    """Watch content, metadata, resolution and digest access to denied fixtures."""
+    targets = {Path(path).absolute() for path in targets}
+    calls = {kind: [] for kind in ("open", "metadata", "resolve", "hash")}
+    original_resolve, original_load = Path.resolve, builder.load
+
+    def observe(kind, path):
+        path = Path(path).absolute()
+        if path in targets:
+            calls[kind].append(path)
+            raise AssertionError("ungranted target reached " + kind)
+
+    def resolve(path, *args, **kwargs):
+        observe("resolve", path)
+        return original_resolve(path, *args, **kwargs)
+
+    def load(name):
+        module = original_load(name)
+        if name == "architecture_inventory":
+            original_hash = module._hash
+            def digest(path, *args, **kwargs):
+                observe("hash", path)
+                return original_hash(path, *args, **kwargs)
+            module._hash = digest
+        return module
+
+    with observed_file_reads(lambda path: observe("open", path),
+                             observe_metadata=lambda path: observe("metadata", path)), \
+            patch.object(Path, "resolve", new=resolve), patch.object(builder, "load", side_effect=load):
+        yield calls
+
+
 class ArchitectureReadBoundaryTests(unittest.TestCase):
     def setUp(self):
         temporary = tempfile.TemporaryDirectory()
@@ -363,28 +396,15 @@ class ArchitectureReadBoundaryTests(unittest.TestCase):
         self.assertEqual(calls, [])
         self.assertEqual(self.published_bytes(), before)
 
-    def assert_name_only_unknown(self, target, *, cache=False):
-        original_resolve = Path.resolve
-        def metadata(path):
-            if path == target:
-                raise AssertionError("unapproved discovery reached target stat or lstat")
-        def resolve(path, *args, **kwargs):
-            if path.absolute() == target:
-                raise AssertionError("unapproved discovery reached target resolve")
-            return original_resolve(path, *args, **kwargs)
-        calls = []
-        def observe(path):
-            if path.absolute() == target:
-                calls.append(path)
-                raise AssertionError("unapproved discovery reached target read")
-        with observed_file_reads(observe, observe_metadata=metadata), patch.object(Path, "resolve", new=resolve):
+    def assert_count_only_unknown(self, target, *, cache=False):
+        with observed_forbidden_targets([target]) as calls:
             result = builder.refresh_if_changed(self.root, self.state, self.output, self.receipt) if cache else builder.build(self.root, self.state, self.output, self.receipt)
-        self.assertEqual(calls, [])
-        record = next(row for row in result["inventory_sources"] if row["path"] == str(target))
-        self.assertEqual(record["status"], "UNAPPROVED")
-        self.assertIsNone(record["sha256"])
-        self.assertIsNone(record["bytes"])
-        self.assertIsNone(record["resolved_path"])
+        self.assertEqual(calls, {kind: [] for kind in ("open", "metadata", "resolve", "hash")})
+        self.assertGreaterEqual(result["unapproved_inventory_counts"]["total"], 1)
+        self.assertNotIn(target.name, json.dumps(result))
+        for path in self.output.rglob("*"):
+            if path.is_file():
+                self.assertFalse(target.name.encode() in path.read_bytes(), "ungranted name reached served output")
         return result
 
     def test_metadata_watcher_detects_descriptor_relative_stat_and_lstat(self):
@@ -432,17 +452,17 @@ class ArchitectureReadBoundaryTests(unittest.TestCase):
         forbidden.write_text("Synthetic protected inventory role\n", encoding="utf-8")
         self.assert_production_refusal_preserves_publication(forbidden)
 
-    def test_real_builder_lists_unreviewed_inventory_script_without_target_access(self):
+    def test_real_builder_counts_unreviewed_inventory_script_without_target_access(self):
         builder.build(self.root, self.state, self.output, self.receipt)
         forbidden = self.root / "scripts/unreviewed.py"
         forbidden.parent.mkdir(parents=True)
         forbidden.write_text("# Synthetic unreviewed inventory file\n", encoding="utf-8")
-        self.assert_name_only_unknown(forbidden)
+        self.assert_count_only_unknown(forbidden)
 
-    def test_real_builder_lists_unreviewed_inventory_metadata_without_target_access(self):
+    def test_real_builder_counts_unreviewed_inventory_metadata_without_target_access(self):
         builder.build(self.root, self.state, self.output, self.receipt)
         forbidden = self.write(self.root, "adoption/agents/unreviewed-manifest.json", {"agents": []})
-        self.assert_name_only_unknown(forbidden)
+        self.assert_count_only_unknown(forbidden)
 
     def test_real_builder_refuses_protected_inventory_alias_target_before_open(self):
         builder.build(self.root, self.state, self.output, self.receipt)
@@ -462,17 +482,20 @@ class ArchitectureReadBoundaryTests(unittest.TestCase):
         alias.symlink_to(target)
         self.assert_production_refusal_preserves_publication(target)
 
-    def test_real_cache_tracks_unknown_inventory_name_additions_and_removals(self):
-        builder.refresh_if_changed(self.root, self.state, self.output, self.receipt)
+    def test_real_cache_tracks_count_only_inventory_additions_and_removals(self):
+        initial = builder.refresh_if_changed(self.root, self.state, self.output, self.receipt)
+        initial_count = initial["unapproved_inventory_counts"]["total"]
         forbidden = self.root / "scripts/unreviewed.py"
         forbidden.parent.mkdir(parents=True)
         forbidden.write_text("# Synthetic cache discovery cannot add permission\n", encoding="utf-8")
-        self.assert_name_only_unknown(forbidden, cache=True)
-        cached = self.assert_name_only_unknown(forbidden, cache=True)
-        self.assertTrue(any(row["path"] == str(forbidden) for row in cached["inventory_sources"]))
+        added = self.assert_count_only_unknown(forbidden, cache=True)
+        self.assertEqual(added["unapproved_inventory_counts"]["total"], initial_count + 1)
+        cached = self.assert_count_only_unknown(forbidden, cache=True)
+        self.assertEqual(cached["unapproved_inventory_counts"], added["unapproved_inventory_counts"])
         forbidden.unlink()
         rebuilt = builder.refresh_if_changed(self.root, self.state, self.output, self.receipt)
-        self.assertFalse(any(row["path"] == str(forbidden) for row in rebuilt["inventory_sources"]))
+        self.assertEqual(rebuilt["unapproved_inventory_counts"]["total"], initial_count)
+        self.assertNotIn(forbidden.name, json.dumps(rebuilt))
 
     def test_inventory_boundary_watchers_need_no_proc_descriptor_lookup(self):
         original = os.readlink
@@ -504,12 +527,12 @@ class ArchitectureReadBoundaryTests(unittest.TestCase):
             self.assertIsNone(records[0]["sha256"])
             self.assertNotEqual(records[0].get("sha256_kind"), "computed")
 
-    def test_real_builder_lists_unlisted_user_unit_without_metadata_or_content(self):
+    def test_real_builder_counts_unlisted_user_unit_without_metadata_or_content(self):
         builder.build(self.root, self.state, self.output, self.receipt)
         forbidden = self.user / ".config/systemd/user/unreviewed.service"
         forbidden.parent.mkdir(parents=True)
         forbidden.write_text("Synthetic unreviewed unit; no metadata approval\n", encoding="utf-8")
-        self.assert_name_only_unknown(forbidden)
+        self.assert_count_only_unknown(forbidden)
 
     def test_real_builder_refuses_registered_receipt_parent_symlink_before_open(self):
         builder.build(self.root, self.state, self.output, self.receipt)

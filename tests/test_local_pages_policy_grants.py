@@ -5,12 +5,14 @@ from contextlib import ExitStack
 import copy
 import json
 from pathlib import Path
+import re
 import subprocess
 import unittest
 from unittest import mock
 
 
 ROOT = Path(__file__).resolve().parents[1]
+REVIEWED_RECEIPT_PIN = "c945ea1f011e4c7e69a0b5f19052717b2af9d46e"
 spec = importlib.util.spec_from_file_location("local_policy_grant_tests", ROOT / "scripts/local_pages_policy_grants.py")
 grants = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(grants)
@@ -76,6 +78,58 @@ class PolicyGrantDerivation(unittest.TestCase):
         actual = {row["path"] for row in policy["architecture"]["architecture_inventory"] if row["root"] == "repo"}
         self.assertEqual(len(actual), 90)
         self.assertEqual(actual, expected, "Regenerate reviewed repository grants at the landing head; runtime discovery remains names-only.")
+
+    def test_receipt_documentation_identifies_the_reviewed_union_and_ungranted_proposal(self):
+        for relative in (
+            "tools/local-pages/README.md",
+            "docs/decisions/2026-10-09-architecture-inventory-boundary.md",
+        ):
+            with self.subTest(document=relative):
+                document = (ROOT / relative).read_text()
+                declaration = re.search(
+                    r"receipt grant set\s+was(?: independently)? reviewed at\s+`([a-f0-9]{40})`",
+                    document,
+                )
+                self.assertIsNotNone(declaration, "Receipt grants must name their independently reviewed full source SHA.")
+                self.assertEqual(declaration.group(1), REVIEWED_RECEIPT_PIN)
+                paragraph = next(block for block in document.split("\n\n")
+                                 if declaration.group(0) in block)
+                paragraph = " ".join(paragraph.split())
+                self.assertRegex(paragraph, r"\b4648\b")
+                self.assertRegex(paragraph, r"\b4725\b")
+                self.assertRegex(
+                    paragraph,
+                    r"\b(?:do not add permissions without independent review|"
+                    r"does not expand the independently reviewed pinned receipt grant set)\b",
+                )
+
+    def test_committed_receipt_grants_equal_the_native_reviewed_source_proposal(self):
+        reviewed = grants.proposal(ROOT, REVIEWED_RECEIPT_PIN)
+        self.assertEqual(reviewed["source_pin"], REVIEWED_RECEIPT_PIN)
+        self.assertEqual(reviewed["receipt_count"], 4648)
+        policy = json.loads((ROOT / "tools/local-pages/source_policy.json").read_text())
+        actual = policy["architecture"]["architecture_receipt"]
+        expected = reviewed["architecture_receipt"]
+        self.assertEqual(len(actual), 4648)
+        self.assertTrue(sorted(actual, key=lambda row: (row["root"], row["path"])) == expected,
+                        "Receipt grants differ from the exact independently reviewed union; paths omitted.")
+
+    def test_reviewed_user_source_pin_is_an_ancestor_with_matching_snapshot(self):
+        relative = "tools/local-pages/inventory_user_names.json"
+        snapshot = json.loads((ROOT / relative).read_text())
+        pin = snapshot["source_pin"]
+        self.assertRegex(pin, r"\A[a-f0-9]{40}\Z")
+        head = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, check=True,
+                              capture_output=True, text=True).stdout.strip()
+        ancestry = subprocess.run(["git", "merge-base", "--is-ancestor", pin, head],
+                                  cwd=ROOT, capture_output=True)
+        self.assertEqual(ancestry.returncode, 0,
+                         "The user source pin must be an ancestor of the reviewed head; an existing orphan object is insufficient.")
+        pinned = json.loads(subprocess.run(["git", "show", f"{pin}:{relative}"], cwd=ROOT,
+                                           check=True, capture_output=True).stdout)
+        self.assertTrue({key: value for key, value in snapshot.items() if key != "source_pin"}
+                        == {key: value for key, value in pinned.items() if key != "source_pin"},
+                        "Reviewed snapshot differs from its pinned source outside the self-referential source_pin; paths omitted.")
 
     def test_reviewed_user_snapshot_reproduces_grants_and_aliases(self):
         snapshot = json.loads((ROOT / "tools/local-pages/inventory_user_names.json").read_text())

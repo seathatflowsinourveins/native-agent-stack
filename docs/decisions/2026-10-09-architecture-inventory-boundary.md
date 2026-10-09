@@ -24,15 +24,20 @@ metadata and cache signatures. Hashes and parsed metadata use one captured
 approved payload. Exact canonical approval precedes content/digest access,
 and shared checks reject protected lexical and canonical aliases. The later
 CC read at 64809272 identified an availability regression: ordinary unknown
-names had become fatal to all pages. Those names now produce UNAPPROVED
-name-only records, without target stat/resolve/open/hash or invented presence.
-They cannot add themselves to permissions. Protected inputs still refuse the
+names had become fatal to all pages. Those discoveries now produce aggregate
+counts by source root and kind before public projection, without target
+stat/resolve/open/hash or invented presence. Individual unapproved names and
+paths never enter served inventory, custody or detail documents, and cannot
+add themselves to permissions. Protected inputs still refuse the
 Architecture observation; the optional composer adapter retains its last
 page or shows an UNREPORTED placeholder while other pages refresh. Cache
-signatures include unknown names, so installing an unapproved entry changes
-the inventory observation without accessing its content. Complete-builder
-synthetic regressions retain zero forbidden opens and verify this availability
-and privacy distinction.
+signatures outside the serving root include unknown names, so installing,
+removing or renaming an unapproved entry changes the observation without
+accessing its content or publishing its name. Complete-builder synthetic
+regressions cover an ungranted unit, skill and Codex agent, retain zero forbidden
+opens and metadata calls, and scan every served output. Publication prunes old
+generated detail HTML from the fixed architecture/layers namespace before its
+receipt replacement; cache reuse applies the same retained-output check.
 
 There are 132 independent exact inventory content paths: 90 pinned repo selectors,
 the fixed sanitized automation projection and 41 reviewed installed skill

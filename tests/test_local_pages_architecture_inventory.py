@@ -266,7 +266,8 @@ class InventoryTests(unittest.TestCase):
         self.assertIsNone(item["hash_match"])
         self.assertIn("not checked", item["provenance"])
 
-    def test_unlisted_discoveries_are_names_only_before_any_target_metadata(self):
+    def test_unlisted_discoveries_publish_counts_before_any_target_metadata(self):
+        before = self.build()
         targets = [
             self.write(self.root / "scripts/unreviewed.py", "unread fixture"),
             self.write(self.root / ".github/workflows/unreviewed.yml", "unread fixture"),
@@ -286,18 +287,18 @@ class InventoryTests(unittest.TestCase):
             return original_resolve(path, *args, **kwargs)
         with observed_file_reads(lambda path: self.assertNotIn(path, guarded), observe_metadata=metadata), patch.object(Path, "resolve", new=resolve):
             result = self.build()
-        records = {item["path"]: item for item in result["items"]}
-        for target in targets:
-            if target.name == "SKILL.md":
-                target = target.parent
-            record = records[str(target)]
-            self.assertEqual(record["status"], "UNAPPROVED")
-            self.assertIsNone(record["sha256"])
-            self.assertIsNone(record["bytes"])
-            self.assertIsNone(record["resolved_path"])
-            self.assertIn("name only", record["reason"])
+        self.assertNotIn("unreviewed", json.dumps(result))
+        self.assertEqual(result["unapproved_counts"]["total"] - before["unapproved_counts"]["total"], 6)
+        counts = {(row["root"], row["kind"]): row["count"] for row in result["unapproved_counts"]["by_kind_root"]}
+        baseline = {(row["root"], row["kind"]): row["count"] for row in before["unapproved_counts"]["by_kind_root"]}
+        for group in (("repo", "script"), ("repo", "workflow"), ("repo", "agent"),
+                      ("user", "skill-directory"), ("user", "role"), ("user", "unit")):
+            self.assertEqual(counts[group] - baseline.get(group, 0), 1)
+        for row in result["unapproved_counts"]["by_kind_root"]:
+            self.assertEqual(set(row), {"root", "kind", "count"})
 
     def test_unknown_skill_and_agent_entries_are_not_entered_or_resolved(self):
+        before = self.build()
         skill = self.write(self.skills / "new-vendor/SKILL.md", "unread fixture")
         agent = self.write(self.root / "adoption/agents/new-vendor/role.md", "unread fixture")
         forbidden = {skill.parent, skill, agent.parent, agent}
@@ -310,13 +311,11 @@ class InventoryTests(unittest.TestCase):
             return call
         with patch.object(os, "open", side_effect=checked(original_open)), patch.object(os, "stat", side_effect=checked(original_stat)), patch.object(os, "lstat", side_effect=checked(original_lstat)):
             result = self.build()
-        records = {item["path"]: item for item in result["items"]}
-        for path in (skill.parent, agent.parent):
-            self.assertEqual(records[str(path)]["status"], "UNAPPROVED")
-        self.assertNotIn(str(skill), records)
-        self.assertNotIn(str(agent), records)
+        self.assertNotIn("new-vendor", json.dumps(result))
+        self.assertEqual(result["unapproved_counts"]["total"] - before["unapproved_counts"]["total"], 2)
 
     def test_unknown_symlink_entry_never_inspects_its_target(self):
+        before = self.build()
         target = self.write(self.base / "outside/credentials.json", "unread fixture")
         alias = self.user / ".codex/agents/unlisted.toml"
         alias.parent.mkdir(parents=True)
@@ -332,9 +331,28 @@ class InventoryTests(unittest.TestCase):
             return real_resolve(path, *args, **kwargs)
         with patch.object(os, "readlink", side_effect=readlink), patch.object(Path, "resolve", new=resolve):
             result = self.build()
-        record = next(item for item in result["items"] if item["path"] == str(alias))
-        self.assertEqual(record["status"], "UNAPPROVED")
-        self.assertIsNone(record["resolved_path"])
+        self.assertNotIn(alias.name, json.dumps(result))
+        self.assertEqual(result["unapproved_counts"]["total"] - before["unapproved_counts"]["total"], 1)
+
+    def test_discovery_names_invalidate_only_the_nonserved_input_signature(self):
+        known = self.write(self.skills / "known/SKILL.md", "reviewed fixture skill")
+        first = self.write(self.user / ".config/systemd/user/fixture-private-first.service", "unread fixture")
+        reads = inventory._policy().ArchitectureReads(self.root, self.base / "state", policy_path=self.policy_path, user_root=self.user)
+        before_signature = inventory.input_signature(self.root, self.base / "state", reads=reads)
+        before_public = self.build()
+        second = first.with_name("fixture-private-second.service")
+        first.rename(second)
+        reads = inventory._policy().ArchitectureReads(self.root, self.base / "state", policy_path=self.policy_path, user_root=self.user)
+        after_signature = inventory.input_signature(self.root, self.base / "state", reads=reads)
+        after_public = self.build()
+        self.assertNotEqual(before_signature, after_signature)
+        self.assertIn(first.name, json.dumps(before_signature))
+        self.assertIn(second.name, json.dumps(after_signature))
+        self.assertEqual(before_public, after_public)
+        for token in (first.name, second.name, "fixture-private-first", "fixture-private-second"):
+            self.assertNotIn(token, json.dumps(after_public))
+        item = next(row for row in after_public["items"] if row["path"] == str(known))
+        self.assertEqual(item["sha256"], hashlib.sha256(known.read_bytes()).hexdigest())
 
     def test_reviewed_alias_cannot_retarget_to_a_different_approved_skill(self):
         known = self.write(self.skills / "known/SKILL.md", "known fixture")

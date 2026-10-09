@@ -193,11 +193,12 @@ def build(root: Path, state_root: Path, output_dir: Path, receipt: Path,
               "sources": model.get("sources"), "inventory_sources": inventory.get("sources"),
               "source_policy": dict(reads.policy.receipt),
               "inventory_coverage": inventory.get("coverage"),
+              "unapproved_inventory_counts": inventory.get("unapproved_counts", {"total": 0, "by_kind_root": []}),
               "native_readiness_manifest_sha256": manifest_sha,
               "native_readiness_source": retained["source"],
               "outputs": {name: {"sha256": hashlib.sha256(raw).hexdigest(), "bytes": len(raw)} for name, raw in outputs.items()},
                 "limits": ["Published source records and metadata observations do not confer gate acceptance or fresh-session evidence.", "Catalog component/repository joins and the committed inventory mapping associate layers; remaining unmapped items carry their reason.", "Initial HTML defers closed component tables to generated layer pages, loaded only on expansion."]}
-    pages.publish(output_dir, receipt, outputs, result)
+    pages.publish(output_dir, receipt, outputs, result, architecture_details=True)
     return result
 
 
@@ -254,7 +255,9 @@ def refresh_if_changed(root: Path, state_root: Path, output_dir: Path, receipt: 
     if cache_path.exists() and receipt.exists() and (output_dir / "architecture.html").exists():
         previous = json.loads(policy._read_regular(cache_path, 8 * 1024 * 1024))
         if previous.get("signature") == signature:
-            return json.loads(policy._read_regular(receipt, 8 * 1024 * 1024))
+            result = json.loads(policy._read_regular(receipt, 8 * 1024 * 1024))
+            pages.prune_architecture_details(output_dir, result.get("outputs") or {})
+            return result
     result = build(root, state_root, output_dir, receipt)
     cache_path.parent.mkdir(parents=True, exist_ok=True)
     temporary = pages.no_symlinks(cache_path.with_suffix(".tmp"))

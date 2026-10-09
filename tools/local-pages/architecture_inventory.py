@@ -477,6 +477,7 @@ def _capture(root, state_root, skill_roots, reads):
 
 
 def input_signature(root, state_root, *, reads):
+    """Private cache input: discovery names must never enter served output."""
     _, _, _, _, _, sources, _, _, _, _ = _capture(root, state_root, None, reads)
     return sources
 
@@ -486,6 +487,20 @@ def build(root, state_root, skill_roots=None, *, reads=None):
     root, state_root = Path(root), Path(state_root)
     reads = reads or _policy().ArchitectureReads(root, state_root, user_root=USER_ROOT)
     groups, metadata_paths, catalog_paths, snapshots, hashes, sources, total_bytes, resolutions, unknown, listings = _capture(root, state_root, skill_roots, reads)
+    # Discovery permits counting an ungranted entry, never publishing its name
+    # or path. _capture/input_signature retain lexical names only for the
+    # nonserved cache; this public projection uses no target metadata operations.
+    unapproved_groups = {}
+    roots = sorted(reads.roots.items(), key=lambda row: len(row[1].parts), reverse=True)
+    for path, source in unknown.items():
+        root_name = next((name for name, directory in roots if _inside(Path(path), directory)), "other")
+        group = (root_name, source["type"])
+        unapproved_groups[group] = unapproved_groups.get(group, 0) + 1
+    unapproved_counts = {"total": len(unknown), "by_kind_root": [
+        {"root": root_name, "kind": kind, "count": count}
+        for (root_name, kind), count in sorted(unapproved_groups.items())
+    ]}
+    sources = [source for source in sources if source.get("status") != "UNAPPROVED"]
     projection_path = metadata_paths[-2]
     def data(path):
         return _json(snapshots.get(str(resolutions.get(str(path.absolute())))))
@@ -531,10 +546,6 @@ def build(root, state_root, skill_roots=None, *, reads=None):
     items = []
     for kind, path in sorted(set(groups), key=lambda group: (group[0], str(group[1]))):
         if str(path.absolute()) in unknown:
-            source = unknown[str(path.absolute())]
-            items.append({**source, "kind": kind, "name": path.parent.name if kind == "skill" else path.name if kind == "skill-directory" else path.stem,
-                          "repository": None, "pin": None, "source_refs": [],
-                          "unmapped_reason": source["reason"]})
             continue
         resolved = resolutions.get(str(path.absolute()))
         digest = hashes.get(str(resolved)) if resolved else None
@@ -578,19 +589,11 @@ def build(root, state_root, skill_roots=None, *, reads=None):
         item["provenance"] = "manifest reference; installed runtime and wiring unverified"
         items.append(item)
     items.extend(_projection_items(projection_path, projection, projection_digest))
-    grouped = {str(path.absolute()) for _, path in groups}
-    for key, source in unknown.items():
-        if key not in grouped:
-            items.append({**source, "kind": "metadata", "name": Path(key).name,
-                          "repository": None, "pin": None, "source_refs": [],
-                          "unmapped_reason": source["reason"]})
     if projection_present:
         source = next(source for source in sources if source["path"] == captured_key(projection_path))
         source.update({"status": "local sanitized automation projection", "local": True,
                        "generated_utc": projection.get("generated_utc"), "method": projection.get("method")})
     for item in items:
-        if item.get("status") == "UNAPPROVED":
-            continue
         _catalog_mapping(item, links)
         _explicit_mapping(item, mapping, links[2], metadata_paths[-1])
         for action in item.get("action_refs", []):
@@ -623,4 +626,4 @@ def build(root, state_root, skill_roots=None, *, reads=None):
         "state_root": str(state_root),
         "acceptance": "file inventory does not establish installation, wiring or fresh-session acceptance",
     }
-    return {"items": items, "sources": sources, "coverage": coverage}
+    return {"items": items, "sources": sources, "coverage": coverage, "unapproved_counts": unapproved_counts}

@@ -82,6 +82,8 @@ def join_inventory(model: dict, inventory: dict) -> tuple[dict[str, list[dict]],
     repositories = {layer["key"]: _repositories(layer) for layer in layers}
     unmapped = []
     for original in inventory.get("items", []):
+        if original.get("status") == "UNAPPROVED":
+            continue
         row = dict(original)
         explicit = row.get("layer_id")
         keys = row.get("layer_keys") or []
@@ -292,8 +294,9 @@ def render(model: dict, inventory: dict, first_layer: str | None = None,
         sections.append(body)
     design = model.get("design") or {}
     design_text = esc(value({key: design.get(key) for key in ("path", "source", "ref", "tree_sha", "skill_md_sha256")}))
-    sources = (model.get("sources") or []) + (inventory.get("sources") or [])
-    custody = _table("Architecture input custody", ["Source path", "SHA-256", "Source date / state"], [[esc(value(source.get("path"))), esc(value(source.get("sha256"))), esc(value(source.get("checked_at") or source.get("generated_utc") or source.get("status")))] for source in sources if isinstance(source, dict)])
+    sources = [source for source in (model.get("sources") or []) + (inventory.get("sources") or [])
+               if isinstance(source, dict) and source.get("status") != "UNAPPROVED"]
+    custody = _table("Architecture input custody", ["Source path", "SHA-256", "Source date / state"], [[esc(value(source.get("path"))), esc(value(source.get("sha256"))), esc(value(source.get("checked_at") or source.get("generated_utc") or source.get("status")))] for source in sources])
     body = f'<div class="architecture-summary"><p><strong>{len(selected)}</strong> rendered sections / <strong>{len(all_layers)}</strong> canonical landscape layers.</p><p>Invoke counts are observational (organic use, not a controlled trial). Client counts measure sessions; Bash-run CLI invocations are outside the producer’s MCP counters. Native host E2E, local receipts and vendor test-suite runs retain their distinct scopes.</p></div>' + toc + '<div class="architecture-sections">' + "".join(sections) + '</div>'
     coverage = inventory.get("coverage") or {}
     projection = coverage.get("automation_projection") or {}
@@ -308,7 +311,14 @@ def render(model: dict, inventory: dict, first_layer: str | None = None,
     body += '<section id="architecture-local-host-receipts"><h2>Local host receipts</h2>' + local_intro + _deferred("local-host-receipts", f'Local host receipt metadata · {len(local_items)} records', _local_host_receipts(host), detail_outputs) + '</section>'
     unmapped_detail = _closed("Unmapped observed items", len(unmapped), _inventory_table(unmapped, "Unmapped observed items", model))
     body += '<section id="architecture-unmapped"><h2>Unmapped inventory</h2><p>' + str(len(unmapped)) + ' items remain outside canonical joins and the committed mapping; each carries its specific reason.</p>' + (_deferred("unmapped", f'Unmapped observed items · {len(unmapped)} records', unmapped_detail, detail_outputs) if unmapped else '') + '</section>'
+    unapproved = inventory.get("unapproved_counts") or {}
+    unapproved_total = unapproved.get("total")
+    counts_list = '<ul>' + ''.join(
+        '<li>' + esc(value(row.get("root"))) + ' / ' + esc(value(row.get("kind"))) + ': ' + esc(value(row.get("count"))) + '</li>'
+        for row in unapproved.get("by_kind_root", []) if isinstance(row, dict)
+    ) + '</ul>'
+    body += '<section id="architecture-unapproved"><h2>Unapproved discoveries</h2><p>' + esc(value(unapproved_total)) + ' unapproved inventory entries; individual names and paths withheld, metadata and content unread. Unavailable directory inventories remain UNREPORTED.</p>' + counts_list + '</section>'
     custody_detail = '<p>Installed frontend-design metadata: <code>' + design_text + '</code></p>' + _closed("Architecture input custody", len(sources), custody)
     body += '<section id="architecture-custody"><h2>Builder sources and design provenance</h2>' + _deferred("custody", f'Source custody · {len(sources)} records', custody_detail, detail_outputs) + '</section>'
-    receipt = {"canonical_layer_count": len(all_layers), "rendered_layer_count": len(selected), "layer_keys": [row["key"] for row in selected], "mapped_inventory_occurrences": sum(len(items) for items in mapped.values()), "unmapped_inventory_items": len(unmapped)}
+    receipt = {"canonical_layer_count": len(all_layers), "rendered_layer_count": len(selected), "layer_keys": [row["key"] for row in selected], "mapped_inventory_occurrences": sum(len(items) for items in mapped.values()), "unmapped_inventory_items": len(unmapped), "unapproved_inventory_items": unapproved_total}
     return body, receipt

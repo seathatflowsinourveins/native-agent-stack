@@ -55,6 +55,39 @@ class ArchitectureViewTests(unittest.TestCase):
         self.assertIn("Unmapped inventory", html)
         self.assertEqual(receipt["unmapped_inventory_items"], 1)
 
+    def test_unapproved_cached_items_and_custody_records_never_publish_names(self):
+        names = ("fixture-private-calendar.service", "fixture-private-lab-notes", "fixture-private-agent.toml")
+        inventory = {"items": [
+            {"name": name, "path": "/fixture/user/" + name, "kind": "role", "status": "UNAPPROVED",
+             "layer_id": "fixture", "unmapped_reason": "No grant for " + name} for name in names
+        ], "sources": [{"path": "/fixture/user/" + name, "status": "UNAPPROVED"} for name in names]}
+        self.model["sources"] = [{"path": "/fixture/user/" + names[0], "status": "UNAPPROVED"}]
+        mapped, unmapped = VIEW.join_inventory(self.model, inventory)
+        self.assertEqual(mapped[self.layer["key"]], [])
+        self.assertEqual(unmapped, [])
+        details = {}
+        html, receipt = VIEW.render(self.model, inventory, detail_outputs=details)
+        publications = html + "".join(payload.decode() for payload in details.values())
+        for name in names:
+            self.assertNotIn(name, publications)
+        self.assertEqual(receipt["mapped_inventory_occurrences"], 0)
+        self.assertEqual(receipt["unmapped_inventory_items"], 0)
+
+    def test_unapproved_counts_render_without_becoming_inventory_or_custody_rows(self):
+        inventory = {"items": [], "sources": [], "unapproved_counts": {
+            "total": 3, "by_kind_root": [{"kind": "unit", "root": "user", "count": 1},
+                                          {"kind": "skill-directory", "root": "user", "count": 2}],
+        }}
+        details = {}
+        html, receipt = VIEW.render(self.model, inventory, detail_outputs=details)
+        publications = html + "".join(payload.decode() for payload in details.values())
+        self.assertIn("Unapproved discoveries", html)
+        self.assertIn("3 unapproved", html)
+        self.assertIn("skill-directory", publications)
+        self.assertIn("metadata and content unread", publications)
+        self.assertEqual(receipt["unapproved_inventory_items"], 3)
+        self.assertEqual(receipt["unmapped_inventory_items"], 0)
+
     def test_first_layer_alias_is_a_subset_not_a_new_canonical_layer(self):
         html, receipt = VIEW.render(self.model, {"items": []}, "foundation/fixture")
         self.assertEqual(receipt["rendered_layer_count"], 1)

@@ -28,7 +28,8 @@ class ArchitectureCacheTests(unittest.TestCase):
             current.parent.mkdir(parents=True)
             current.write_text("{}")
             observation = {"sha256": "a" * 64}
-            page_module = SimpleNamespace(no_symlinks=lambda path: path.absolute())
+            page_module = SimpleNamespace(no_symlinks=lambda path: path.absolute(),
+                                          prune_architecture_details=MODULE.load("build_pages").prune_architecture_details)
             evidence_module = SimpleNamespace(invocation_source=lambda unused, reads=None: observation)
             original_load = MODULE.load
             modules = {"build_pages": page_module, "architecture_evidence": evidence_module,

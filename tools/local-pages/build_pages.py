@@ -572,7 +572,20 @@ def refresh(root: Path, state_root: Path, output_dir: Path, receipt: Path,
     return receipt_doc
 
 
-def publish(output_dir: Path, receipt: Path, outputs: dict[str, bytes], receipt_doc: dict[str, Any]) -> None:
+def prune_architecture_details(output_dir: Path, outputs: dict) -> None:
+    """Remove superseded generated details from their fixed serving namespace."""
+    directory = no_symlinks(output_dir / "architecture/layers")
+    if not directory.exists():
+        return
+    retained = {Path(name).name for name in outputs if Path(name).parent == Path("architecture/layers")}
+    for path in directory.iterdir():
+        if path.suffix == ".html" and path.name not in retained:
+            no_symlinks(path)
+            path.unlink()
+
+
+def publish(output_dir: Path, receipt: Path, outputs: dict[str, bytes], receipt_doc: dict[str, Any],
+            *, architecture_details: bool = False) -> None:
     """Prepare every file first; replace only generated files, receipt last."""
     receipt.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix="local-pages-refresh-", dir=receipt.parent) as staging:
@@ -597,6 +610,8 @@ def publish(output_dir: Path, receipt: Path, outputs: dict[str, bytes], receipt_
                 replacements.append((path, destination))
             for source, destination in replacements:
                 no_symlinks(destination)
+                if architecture_details and destination == receipt:
+                    prune_architecture_details(output_dir, outputs)
                 os.replace(source, destination)
         finally:
             for path, _ in replacements:
