@@ -3335,7 +3335,7 @@
    "key": "codex:config_group:otel.metrics_exporter",
    "disposition": "enabled",
    "reason": "set in the configuration of both hosts (read 2026-10-04); the cited record names it",
-   "source": "adoption/templates/codex.config.template.toml:291",
+   "source": "adoption/templates/codex.config.template.toml:290",
    "carrier": "host configuration",
    "value": null,
    "scope": "both",

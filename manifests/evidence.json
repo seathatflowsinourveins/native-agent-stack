@@ -16972,7 +16972,7 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "2c9847e1460661e953d59add75e82808c9e2ea33e46fc0fc67c4c375f38187f3",
+      "sha256": "528d8bd07ada4e44a4d1865f5bc005e9a9c0a9810e8ab018d1c6c8ae8d3811f0",
       "bytes": 159863
     },
     {
@@ -17837,8 +17837,8 @@
     },
     {
       "path": "docs/decisions/2026-10-02-new-wsl-client-configuration.md",
-      "sha256": "498634a2a6b27e9d70143b6b8e43ce00c0914c914dec1d346dca38807c4941f5",
-      "bytes": 147135
+      "sha256": "77b0610b2ce98361906d3c4fc202b3b4f65e14203b54a4f05a441e6457e1e26e",
+      "bytes": 148760
     },
     {
       "path": "docs/decisions/2026-10-02-omniroute-mac-rebuild.md",

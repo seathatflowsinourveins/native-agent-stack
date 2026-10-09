@@ -1309,3 +1309,28 @@ Today: 403 pieces, 363 wired (212 practice, 151 through a slot), 24 not wired
 (0 through a slot that does not install, 24 by their own entry) and 16 authorization
 pieces. This is repository source consistency, not fresh native-client, model or
 provider acceptance. The existing Inspector plan warnings remain separate.
+
+## Addendum 2026-10-09: generic child model default omission
+
+The repository practice inventory removes
+`codex/config/agents.default_subagent_model`, following the
+[generic child model default omission record](../token-practice.md#generic-child-model-default-omission).
+The user template omits the generic model override and retains
+`agents.default_subagent_reasoning_effort = "max"`. The root
+`model = "${CODEX_MODEL}"` still renders from the selected platform's Codex pin.
+A generic child with no explicit spawn model retains the active parent step's
+`model_info.slug`, including its routed alias; explicit spawn selections and role
+configuration retain their native precedence.
+
+The source is [openai/codex rust-v0.162.0, child_config.rs](https://github.com/openai/codex/blob/rust-v0.162.0/codex-rs/core/src/agent/child_config.rs#L109):
+the constructors copy the parent slug at lines 115 and 137, the generic model
+override is selected at line 204, and the effort-only path at lines 243–249 leaves
+the inherited model in place. The same file at
+[rust-v0.161.0](https://github.com/openai/codex/blob/rust-v0.161.0/codex-rs/core/src/agent/child_config.rs)
+is byte-identical: 13,496 bytes with SHA-256
+`33d4dd6f70e6640af1059398272c48b88e16e0005105fbd1ef13e30456d39a39`.
+This projection records repository source wiring; it establishes no live
+configuration application or token or cache savings. All earlier projections
+remain historical observations.
+
+Today: 402 pieces, 362 wired (211 practice, 151 through a slot), 24 not wired (0 through a slot that does not install, 24 by their own entry) and 16 authorization pieces
