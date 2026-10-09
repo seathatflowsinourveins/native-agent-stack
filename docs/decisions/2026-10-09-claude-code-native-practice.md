@@ -294,3 +294,65 @@ No setting, hook, permission, catalog or installed component changed in this pul
 - Community repositories at the pins in the practice-references candidate file
   ([practice-references-candidate.json](../../evidence/artifacts/claude-native-practice-20261009/practice-references-candidate.json)).
 - Anthropic pricing, https://platform.claude.com/docs/en/about-claude/pricing, read 2026-10-09.
+
+## Addendum (2026-10-09): primary sources, one practice for both clients, and measured probes
+
+**Primary-source reading.** After the owner directed this lane to the quality of code and workflows, run
+`wf_bee0b670-035` read 31 primary sources: 22 Anthropic engineering and Claude blog posts on code and workflow quality,
+and 9 cross-client sources (the Agent Skills specification and its skill-evaluation guide; the Codex skills, subagents,
+hooks, AGENTS.md, non-interactive and plugins documentation; OpenAI's harness-engineering post). For each source an Opus
+5.5 reader at xhigh extracted the practices it states and mapped each to a role slot and a client, and an Opus 5.5
+refuter at max re-read the page and refuted each practice by default. All 31 sources were readable. Of 248 practices
+the refuters kept 195 and refuted 53; of the 195, 56 agree with a default, 127 extend one, 3 contradict one and 9 match
+no slot; 19 rest on a measurement the source reports, and 124 apply to both clients. Each source carries its fetch
+time and the sha256 of the bytes read
+([primary-source-reading.json](../../evidence/artifacts/claude-native-practice-20261009/primary-source-reading.json));
+the layer pages list each slot's sources. Before this run one post backed a default (planning-persistence); the
+others were only links inside community sources. Spend: $63.87 at API list price (usage record).
+
+**One practice, native execution per client** (command center, 2026-10-09): procedure in a short AGENTS.md map and
+Agent Skills, which both clients load; execution in each client's own mechanism, with nothing ported; and, as the
+landing rule for every author, a deep multi-agent review of every PR by the other model family, each finding given a
+landing-time disposition and precision tracked per family. The mapping and its sources are in
+[`reference/cross-client.md`](../../.claude/skills/claude-native-practice/reference/cross-client.md). The gate rests
+on measurements: Anthropic's code-review post reports substantive review comments on 54% of PRs, up from 16%, and
+its multiagent-systems post finds that agents sharing a model, scaffold and context act almost identically, so their
+agreement is weak evidence.
+
+**Default extensions accepted by the command center:** orchestration keeps a single session for ordinary coding and
+fans out only when parallelism or specialization earns its cost, with harness components ablated at each model
+release; completion evaluators exercise the running system against explicit thresholds; long builds start with a
+spec step and keep execution plans with progress and decision logs in the repository; each skill is evaluated with
+and without it in clean contexts. **Contradictions held as candidates:** classifier routing to Sonnet (until the M7
+A/B), a one-hour cache TTL for long API-key sessions (api-actions' scope), and Ralph-style headless loops (until the
+planning-persistence paired run).
+
+**Model and effort routing** (ruled about 12:40Z; the owner delegated it to the command center): Opus 5.5 is the
+floor; xhigh is the session default; max is for verify, judge and adjudication roles and the coordinators; a cheaper
+model needs a frozen paired A/B at parity; `CLAUDE_CODE_EFFORT_LEVEL` and `CLAUDE_CODE_SUBAGENT_MODEL_FORCE` stay unset.
+The keys, as `settings-reference.md` documents them for 2.1.295 (`model` line 1090, `effortLevel` line 942,
+`modelSettings` line 1230; the two environment variables in `env-vars.md`), already carry these values in the
+template (`model: "opus[1m]"`, `effortLevel: "xhigh"`, `modelSettings` at xhigh, `CLAUDE_CODE_SUBAGENT_MODEL=opus`), and
+the judge, verifier and reviewer agents declare `model: opus`, `effort: max`. No key changes: builder and research
+agents stay at max until the M7 sweep shows parity at xhigh, and `source-scout` stays on Sonnet 5.5 under the
+2026-09-29 split decision (benchmark evidence and an Opus review of its output), an open item against the A/B rule.
+
+**Retention and the session archive.** The command center set `cleanupPeriodDays` to 180 on the host; the template now
+carries 180. The archive probe passed: agentsview 0.44.0 keeps a session, its messages and its export row after the
+transcript is deleted, through incremental and full resyncs. All 2,501 sessions of the pre-move archive were found in
+the live one, no process held it, and its database and usage-cache files (1,784,512,512 bytes) were deleted at
+13:50:06Z under the owner's superseded-items rule; its small leftovers stay until 2026-10-23
+([probes-20261009.json](../../evidence/artifacts/claude-native-practice-20261009/probes-20261009.json)).
+
+**Sandbox measurements, kept as facts.** M1 on this host: the native sandbox runs the RTK hook, `gh`, `codex` and
+explicit-path commits; it blocks direct connections to host loopback services (they answer through the sandbox
+proxy), `git add -A` (protected-path placeholders in the working tree) and writes outside the working directory; it
+refuses `dangerouslyDisableSandbox`, denies unlisted hosts under `strictAllowlist` and blocks the docker socket. With no
+deny list the sandbox exposes credential files and secret variables; the template's `Read(...)` denies alone cover
+all 24 credential stores it names, and secret variables need `sandbox.credentials.envVars` entries. After the owner's
+direction against further security work, the sandbox profile was dropped and these results stand as measurements.
+
+**Paired runs (W5 of the finalization program).** Preregistered before any arm runs, in this lane's research
+directory: orchestration on six validated north-star fixtures (single session, a verify Workflow, an agent team; AO's
+bounded role in a separate PR-cycle run); planning persistence under forced compaction; and the review gate (vendor
+paths against the current reads, with the co-op). Their results follow in a later addendum.

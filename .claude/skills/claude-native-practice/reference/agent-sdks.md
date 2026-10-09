@@ -13,3 +13,8 @@ Client 2.1.295, checked 2026-10-09. Index: [slots.md](slots.md).
 - **Notes:** HOST-07 required `--bare` outside trusted checkouts; on this OAuth host the documented fence is `--restricted` with `--permission-prompts none` and `--strict-mcp-config`. Two call sites lack fences (skill_usage.py).
 - **Supersedes:** M6 (the fence for non-bare lanes); HOST-07 on OAuth hosts; M46 (`-p` start mode can be auto)
 - **Overturn when:** A release changes `-p` defaults or `--bare` authentication, or a measured fence gap.
+- **Primary sources** (read 2026-10-09; 4 of 4 practices the refuters kept, measured first; fetch time and sha256 of the bytes read in the record's reading file):
+  - [Non-interactive mode](https://developers.openai.com/codex/noninteractive) (unknown; asserted; extends): When a script consumes the run, use a machine-readable event stream, so every event and its per-turn token usage can be captured and measured.
+  - [Non-interactive mode](https://developers.openai.com/codex/noninteractive) (unknown; asserted; extends): Split multi-stage headless work, such as review then fix, into runs where the second stage resumes the first session instead of starting cold.
+  - [Non-interactive mode](https://developers.openai.com/codex/noninteractive) (unknown; asserted; extends): A headless run that depends on an MCP server should fail when that server does not start, rather than quietly finishing without the tool.
+  - [Non-interactive mode](https://developers.openai.com/codex/noninteractive) (unknown; asserted; agrees): When later steps need stable fields, require the final response to match a JSON Schema instead of parsing free text.

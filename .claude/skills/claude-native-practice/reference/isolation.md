@@ -25,3 +25,5 @@ Client 2.1.295, checked 2026-10-09. Index: [slots.md](slots.md).
 - **Notes:** Adjudicated: the current practice stands (refuter pending at writing). Owed: the M49 probe on 2.1.295 for the WorktreeCreate and pre-create paths.
 - **Supersedes:** M49 refined
 - **Overturn when:** The M49 probe passes for a native path: concurrent builders from different exact bases, the four checks applied and core.hooksPath unchanged.
+- **Primary sources** (read 2026-10-09; 1 of 1 practices the refuters kept, measured first; fetch time and sha256 of the bytes read in the record's reading file):
+  - [Harness engineering: leveraging Codex in an agent-first world](https://openai.com/index/harness-engineering/) (2026-02-11; asserted; extends): Make the running application legible to the agent: one bootable app instance per git worktree, browser automation through Chrome DevTools Protocol skills, and a short-lived per-worktree logs, metrics and traces stack the agent queries with LogQL and PromQL, so it can reproduce bugs and validate fixes itself.

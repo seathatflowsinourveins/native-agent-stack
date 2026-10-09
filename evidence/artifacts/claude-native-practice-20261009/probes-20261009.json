@@ -1,0 +1,807 @@
+{
+ "schema": "claude-native-practice-probes/1",
+ "agentsview_retention_probe": {
+  "probe": "agentsview keeps a Claude session after its transcript file is deleted",
+  "run_utc": "2026-10-09T07:23:30Z",
+  "subject": {
+   "repo": "kenn-io/agentsview",
+   "version": "v0.44.0",
+   "commit": "413a87f7bfbd67b2815b1119ac51abc1efbeeaba",
+   "binary": "~/.local/share/codex-ecosystem/tools/agentsview-0.44.0/agentsview (the host's installed build, called directly so the launcher's live data dir is not used)"
+  },
+  "isolation": "env -i with a scratch HOME, AGENTSVIEW_DATA_DIR and CLAUDE_PROJECTS_DIR; AGENTSVIEW_NO_DAEMON=1; the launcher's own settings otherwise (TELEMETRY_ENABLED=0, DISABLE_UPDATE_CHECK=1, ARCHIVE_CONTENT=full). The live archive and ~/.claude were not written.",
+  "input": "a copy of one 434,399-byte fresh-session transcript from this lane's proofs",
+  "results": [
+   {
+    "step": "sync (ingest)",
+    "rc": 0,
+    "session_rows": 1,
+    "message_rows": 7,
+    "source_missing_at": null,
+    "export_sessions_lines": 1
+   },
+   {
+    "step": "delete the transcript, then sync (incremental)",
+    "rc": 0,
+    "session_rows": 1,
+    "message_rows": 7,
+    "source_missing_at": null,
+    "export_sessions_lines": 1
+   },
+   {
+    "step": "sync --full",
+    "rc": 0,
+    "session_rows": 1,
+    "message_rows": 7,
+    "source_missing_at": null,
+    "export_sessions_lines": 1
+   }
+  ],
+  "source": [
+   "internal/db/sessions.go:4646-4670 MarkSessionSourceMissing: UPDATE sets source_missing_at only; no delete path for a missing source",
+   "internal/sync/engine.go:7336-7378 markSessionSourceMissing clears freshness caches, then marks; a byte-identical return clears the mark"
+  ],
+  "live_host_2026-10-09T07:24Z": {
+   "archive_dir": "~/.local/share/new-wsl-native-stack/agentsview",
+   "archive_size": "4.6G",
+   "claude_sessions": 3296,
+   "codex_sessions": 2150,
+   "since": "2026-10-02",
+   "last_write": "07:23:54Z",
+   "source_missing_rows": 0,
+   "stale_archive": "~/.agentsview/sessions.db 1.75 GB, last write 2026-10-06 (pre-move)",
+   "transcripts": {
+    "count": 3445,
+    "size": "3.9G",
+    "oldest": "2026-10-02",
+    "gb_by_day": {
+     "10-02": 0.04,
+     "10-03": 0.23,
+     "10-04": 0.12,
+     "10-05": 0.77,
+     "10-06": 1.25,
+     "10-07": 0.3,
+     "10-08": 0.31,
+     "10-09 (partial)": 0.67
+    }
+   },
+   "file_history": "22M",
+   "home_fs": "1007G, 279G free (71% used)",
+   "cleanupPeriodDays": "3650 in ~/.claude/settings.json and the repo template",
+   "records_on_main_citing_transcript_paths": 27
+  },
+  "verdict": "PASS: the archive keeps the session, its messages and its export row after the transcript is gone, through incremental and full resyncs."
+ },
+ "old_archive_coverage": {
+  "check": "read-only coverage of the stale pre-move agentsview archive by the live one (command center ruling, 2026-10-09)",
+  "run_utc": "2026-10-09T12:44:22Z",
+  "old": "~/.agentsview/sessions.db (opened mode=ro)",
+  "live": "~/.local/share/new-wsl-native-stack/agentsview/sessions.db (opened mode=ro)",
+  "key": [
+   "agent",
+   "id"
+  ],
+  "old_sessions": 2501,
+  "live_sessions": 5522,
+  "old_sessions_missing_from_live": 0,
+  "old_message_rows": 128030,
+  "sessions_where_live_has_fewer_messages_than_old": 0,
+  "verdict": "covered: every old session is in the live archive with at least as many messages"
+ },
+ "old_archive_identification": {
+  "check": "read-only identification of ~/.agentsview for the command center's deletion gate (2026-10-09)",
+  "run_utc": "2026-10-09T12:47:37Z",
+  "method": "ps args; /proc/PID/exe, cwd and fd symlinks (paths only); a find over /proc/*/fd for any holder; the systemd unit's ExecStart; the launcher's exported variable names; the Claude MCP registration's command and args; find -printf sizes and mtimes. No file content and no /proc/PID/environ was read (the secret-path guard refuses environment reads by design).",
+  "a_is_it_live": {
+   "answer": "no: ~/.agentsview is neither the live daemon's data, config nor lock directory, and no process holds a file in it",
+   "live_daemon": "pid 482, `agentsview serve --host 127.0.0.1 --port 21808 --no-browser --no-update-check --replace`, started by agentsview.service (ExecStart ~/.local/bin/agentsview -> tools/agentsview-0.44.0/launcher, which exports AGENTSVIEW_DATA_DIR, AGENTSVIEW_TELEMETRY_ENABLED, AGENTSVIEW_DISABLE_UPDATE_CHECK, AGENTSVIEW_ARCHIVE_CONTENT; AGENTSVIEW_DATA_DIR=${XDG_DATA_HOME:-$HOME/.local/share}/new-wsl-native-stack/agentsview); holds 19 files open in that directory and 0 in ~/.agentsview",
+   "mcp_servers": "5 `agentsview mcp` processes (parents: Claude sessions); registered at user scope as command `agentsview`, args [mcp]; both PATH entries for agentsview (~/.local/share/codex-ecosystem/bin and ~/.local/bin) resolve to the same launcher; none holds an archive file open",
+   "holders_of_any_file_under_~/.agentsview": 0,
+   "live_dir_has_its_own": [
+    "config.toml",
+    "daemon.lock",
+    "db.write.lock",
+    "serve.background.lock",
+    "sessions.db"
+   ],
+   "other_references": "repository: one stale doc line, docs/native-dashboards.md:291 (the 2026-09-25 workstation receipt: the unit served the default ~/.agentsview); coordination scripts and systemd user units: none"
+  },
+  "b_paths": {
+   "times": "mtime in America/New_York (EDT), UTC beside",
+   "total_bytes": 1784947905,
+   "files": [
+    {
+     "path": "~/.agentsview/sessions.db",
+     "bytes": 1749852160,
+     "mtime": "2026-10-06 12:17:00 EDT (16:17:00Z)"
+    },
+    {
+     "path": "~/.agentsview/usage-cache-v13-2c3c2967552b67e5cfd16265ab423d4e.db",
+     "bytes": 34627584,
+     "mtime": "2026-10-06 12:17:00 EDT (16:17:00Z)"
+    },
+    {
+     "path": "~/.agentsview/debug.log",
+     "bytes": 433535,
+     "mtime": "2026-10-06 12:17:00 EDT (16:17:00Z)"
+    },
+    {
+     "path": "~/.agentsview/sessions.db-shm",
+     "bytes": 32768,
+     "mtime": "2026-10-09 08:44:33 EDT (12:44:33Z), touched by this lane's coverage check (see correction)"
+    },
+    {
+     "path": "~/.agentsview/serve.log",
+     "bytes": 1703,
+     "mtime": "2026-10-06 11:56:28 EDT (15:56:28Z)"
+    },
+    {
+     "path": "~/.agentsview/config.toml",
+     "bytes": 122,
+     "mtime": "2026-10-06 11:54:50 EDT (15:54:50Z)",
+     "note": "holds the old daemon's auth token and cursor secret by key name; the live daemon has its own"
+    },
+    {
+     "path": "~/.agentsview/telemetry-install-id",
+     "bytes": 33,
+     "mtime": "2026-10-06 11:54:49 EDT (15:54:49Z)"
+    },
+    {
+     "path": "~/.agentsview/sessions.db-wal",
+     "bytes": 0,
+     "mtime": "2026-10-06 12:49:12 EDT (16:49:12Z)"
+    },
+    {
+     "path": "~/.agentsview/config.toml.lock",
+     "bytes": 0,
+     "mtime": "2026-10-06 11:54:49 EDT (15:54:49Z)"
+    },
+    {
+     "path": "~/.agentsview/db.write.lock",
+     "bytes": 0,
+     "mtime": "2026-10-06 11:54:49 EDT (15:54:49Z)"
+    },
+    {
+     "path": "~/.agentsview/serve.background.lock",
+     "bytes": 0,
+     "mtime": "2026-10-06 11:54:49 EDT (15:54:49Z)"
+    },
+    {
+     "path": "~/.agentsview/usage-cache-v13-2c3c2967552b67e5cfd16265ab423d4e.db.lease",
+     "bytes": 0,
+     "mtime": "2026-10-06 11:56:29 EDT (15:56:29Z)"
+    },
+    {
+     "path": "~/.agentsview/daemon.lock",
+     "bytes": 0,
+     "mtime": "2026-10-04 23:25:46 EDT (2026-10-05 03:25:46Z)"
+    },
+    {
+     "path": "~/.agentsview/scratch/codex/",
+     "bytes": "directory",
+     "mtime": "2026-10-06 11:54:50 EDT (15:54:50Z)",
+     "note": "empty directories scratch/ and scratch/codex/; the total above is the sum of the file sizes"
+    }
+   ],
+   "stale_archive": "sessions.db (98.0%) and the usage cache (1.9%); everything else is the old daemon's config, logs, locks and empty scratch directories"
+  },
+  "correction": "The 12:44:22Z coverage check opened both sessions.db files with SQLite mode=ro; for a WAL database a read-only connection still writes the -shm index, so ~/.agentsview/sessions.db-shm moved from 2026-10-06 12:49 EDT to 2026-10-09 08:44:33 EDT. sessions.db and sessions.db-wal are unchanged. Before that check, no file under ~/.agentsview had changed since 2026-10-06 12:49 EDT. Later read-only checks use the immutable=1 URI parameter, which opens neither the -shm nor locks.",
+  "coverage_receipt": "old-archive-coverage-20261009T1244Z.json: 2,501 old sessions, 0 missing from the live archive, 0 with fewer messages",
+  "deletion_set_if_approved": "the whole ~/.agentsview directory (1,784,947,905 bytes): no running process uses it and the live daemon carries its own config and locks; or, narrowest, sessions.db, sessions.db-shm, sessions.db-wal and the usage-cache db and lease (1,784,512,512 bytes) with the config, logs, locks and scratch kept"
+ },
+ "old_archive_deletion": {
+  "action": "delete the superseded pre-move agentsview archive files",
+  "ruling": "command center ~13:05Z 2026-10-09, under the owner's 2026-10-08 superseded-items rule",
+  "basis": [
+   "agentsview-probe/old-archive-coverage-20261009T1244Z.json: 0 of 2,501 sessions missing from the live archive",
+   "agentsview-probe/old-archive-identification-20261009T1247Z.json: no process holds the directory; it is not the live daemon's data, config or lock directory"
+  ],
+  "targets": [
+   "sessions.db",
+   "sessions.db-shm",
+   "sessions.db-wal",
+   "usage-cache-v13-2c3c2967552b67e5cfd16265ab423d4e.db",
+   "usage-cache-v13-2c3c2967552b67e5cfd16265ab423d4e.db.lease"
+  ],
+  "kept_until": "2026-10-23: config.toml, logs, locks, telemetry id, scratch",
+  "deleted": [
+   {
+    "name": "sessions.db",
+    "bytes": 1749852160
+   },
+   {
+    "name": "sessions.db-shm",
+    "bytes": 32768
+   },
+   {
+    "name": "sessions.db-wal",
+    "bytes": 0
+   },
+   {
+    "name": "usage-cache-v13-2c3c2967552b67e5cfd16265ab423d4e.db",
+    "bytes": 34627584
+   },
+   {
+    "name": "usage-cache-v13-2c3c2967552b67e5cfd16265ab423d4e.db.lease",
+    "bytes": 0
+   }
+  ],
+  "bytes_freed": 1784512512,
+  "before": [
+   {
+    "path": "~/.agentsview/config.toml",
+    "bytes": 122,
+    "mtime": "2026-10-06T11:54:50-0400"
+   },
+   {
+    "path": "~/.agentsview/config.toml.lock",
+    "bytes": 0,
+    "mtime": "2026-10-06T11:54:49-0400"
+   },
+   {
+    "path": "~/.agentsview/daemon.lock",
+    "bytes": 0,
+    "mtime": "2026-10-04T23:25:46-0400"
+   },
+   {
+    "path": "~/.agentsview/db.write.lock",
+    "bytes": 0,
+    "mtime": "2026-10-06T11:54:49-0400"
+   },
+   {
+    "path": "~/.agentsview/debug.log",
+    "bytes": 433535,
+    "mtime": "2026-10-06T12:17:00-0400"
+   },
+   {
+    "path": "~/.agentsview/scratch",
+    "bytes": 4096,
+    "mtime": "2026-10-06T11:54:50-0400"
+   },
+   {
+    "path": "~/.agentsview/scratch/codex",
+    "bytes": 4096,
+    "mtime": "2026-10-06T11:54:50-0400"
+   },
+   {
+    "path": "~/.agentsview/serve.background.lock",
+    "bytes": 0,
+    "mtime": "2026-10-06T11:54:49-0400"
+   },
+   {
+    "path": "~/.agentsview/serve.log",
+    "bytes": 1703,
+    "mtime": "2026-10-06T11:56:28-0400"
+   },
+   {
+    "path": "~/.agentsview/sessions.db",
+    "bytes": 1749852160,
+    "mtime": "2026-10-06T12:17:00-0400"
+   },
+   {
+    "path": "~/.agentsview/sessions.db-shm",
+    "bytes": 32768,
+    "mtime": "2026-10-09T08:44:33-0400"
+   },
+   {
+    "path": "~/.agentsview/sessions.db-wal",
+    "bytes": 0,
+    "mtime": "2026-10-06T12:49:12-0400"
+   },
+   {
+    "path": "~/.agentsview/telemetry-install-id",
+    "bytes": 33,
+    "mtime": "2026-10-06T11:54:49-0400"
+   },
+   {
+    "path": "~/.agentsview/usage-cache-v13-2c3c2967552b67e5cfd16265ab423d4e.db",
+    "bytes": 34627584,
+    "mtime": "2026-10-06T12:17:00-0400"
+   },
+   {
+    "path": "~/.agentsview/usage-cache-v13-2c3c2967552b67e5cfd16265ab423d4e.db.lease",
+    "bytes": 0,
+    "mtime": "2026-10-06T11:56:29-0400"
+   }
+  ],
+  "after": [
+   {
+    "path": "~/.agentsview/config.toml",
+    "bytes": 122,
+    "mtime": "2026-10-06T11:54:50-0400"
+   },
+   {
+    "path": "~/.agentsview/config.toml.lock",
+    "bytes": 0,
+    "mtime": "2026-10-06T11:54:49-0400"
+   },
+   {
+    "path": "~/.agentsview/daemon.lock",
+    "bytes": 0,
+    "mtime": "2026-10-04T23:25:46-0400"
+   },
+   {
+    "path": "~/.agentsview/db.write.lock",
+    "bytes": 0,
+    "mtime": "2026-10-06T11:54:49-0400"
+   },
+   {
+    "path": "~/.agentsview/debug.log",
+    "bytes": 433535,
+    "mtime": "2026-10-06T12:17:00-0400"
+   },
+   {
+    "path": "~/.agentsview/scratch",
+    "bytes": 4096,
+    "mtime": "2026-10-06T11:54:50-0400"
+   },
+   {
+    "path": "~/.agentsview/scratch/codex",
+    "bytes": 4096,
+    "mtime": "2026-10-06T11:54:50-0400"
+   },
+   {
+    "path": "~/.agentsview/serve.background.lock",
+    "bytes": 0,
+    "mtime": "2026-10-06T11:54:49-0400"
+   },
+   {
+    "path": "~/.agentsview/serve.log",
+    "bytes": 1703,
+    "mtime": "2026-10-06T11:56:28-0400"
+   },
+   {
+    "path": "~/.agentsview/telemetry-install-id",
+    "bytes": 33,
+    "mtime": "2026-10-06T11:54:49-0400"
+   }
+  ]
+ },
+ "m1_sandbox": {
+  "measurement": "M1: native Bash sandbox arms on this host (command center go, 2026-10-09)",
+  "client": "Claude Code 2.1.295 native binary, headless -p, bypassPermissions (the host's mode), RTK PreToolUse hook",
+  "isolation": "scratch HOME per arm whose user settings carry the arm; scratch git working directory; no live setting read or written",
+  "driver": "m1_mock.py loopback stand-in (adapted from api-actions cc_mock.py): one scripted Bash call per turn; no model, no credential; ANTHROPIC_API_KEY is a dummy",
+  "spend_usd": 0,
+  "host": {
+   "bwrap": "0.11.1",
+   "socat": "1.8.1.1",
+   "apparmor_userns_sysctl": "absent on this WSL kernel",
+   "kernel": "6.18.40.1-microsoft-standard-WSL2"
+  },
+  "arms": {
+   "control": "no sandbox",
+   "base": {
+    "sandbox": {
+     "enabled": true,
+     "failIfUnavailable": true,
+     "allowUnsandboxedCommands": false,
+     "autoAllowBashIfSandboxed": false
+    }
+   },
+   "strict": "base + network.allowedDomains [api.github.com, github.com] + network.strictAllowlist true (user scope)",
+   "remedy (round 2)": "strict + allowedDomains 127.0.0.1, localhost + filesystem.allowWrite ~/.cache/qmd"
+  },
+  "works_under_sandbox": [
+   "RTK PreToolUse hook: a direct call of `rtk hook claude` on a `git status --short` payload returns updatedInput `rtk git status --short`; in every arm the in-session output lacks git's trailing newline, which matches rtk's format (indirect: the stream does not carry the rewritten input). rtk proxy git log and rtk 0.51.0 run in every arm.",
+   "gh 2.102.0; api.github.com reachable in every arm (403 is GitHub's unauthenticated answer, same as control)",
+   "codex-cli 0.161.0 (warns it cannot create PATH aliases: read-only file system); the codex companion script; ai-memory 2.6.0 binary",
+   "writes in the working directory; temporary files through TMPDIR=/tmp/claude-1000",
+   "explicit-path git add and git commit (round 3, strict arm)"
+  ],
+  "breaks_under_sandbox": [
+   "Host loopback services by direct connection: Qdrant 127.0.0.1:21633, ai-memory 127.0.0.1:29374, OmniRoute 127.0.0.1:21128 (curl: Failed to connect). Each sandboxed command has a private loopback and NO_PROXY sends loopback direct. Through the sandbox proxy (curl -x $HTTP_PROXY --noproxy '') they answer 200 in base and in strict when 127.0.0.1 is allowlisted. Docs remedy on Linux and WSL2: excludedCommands, or proxy plus an allowedDomains entry such as 127.0.0.1:PORT (sandboxing.md 'A command fails to reach a server on localhost').",
+   "git add -A: 'error: .bash_profile: can only add regular files, symbolic links or git directories'. The sandbox mounts 12 protected-path placeholders in the working tree (.bash_profile .bashrc .claude/ .gitconfig .gitmodules .idea .mcp.json .profile .ripgreprc .vscode .zprofile .zshrc), which git status lists as untracked.",
+   "Writes outside the working directory: HOME and /tmp are read-only. qmd could not create or open its index under a fresh HOME, and allowWrite ~/.cache/qmd did not help while the directory did not exist."
+  ],
+  "hardening_confirmed": [
+   "dangerouslyDisableSandbox: true is refused under allowUnsandboxedCommands false (the write stayed denied)",
+   "strictAllowlist in user scope denies a host outside the allowlist (example.com: CONNECT tunnel failed, 403); base under bypass lets it through (200)",
+   "Unix socket to the rootless docker daemon blocked (Operation not permitted)",
+   "NoNewPrivs 1 and Seccomp 2 inside the sandbox; HTTP(S)_PROXY, ALL_PROXY and NO_PROXY set"
+  ],
+  "residue": ".claude/.cc-writes is left in the working directory after a sandboxed session",
+  "not_tested": [
+   "guarded gitleaks (not installed on this host)",
+   "credentials arm (waiting on the command center)",
+   "real-HOME runs of qmd, ai-memory and SocratiCode CLIs with existing state",
+   "MCP servers and hooks: they run outside the sandbox, so only Bash use of these tools is affected"
+  ],
+  "credentials_arm": {
+   "approved": "command center, 2026-10-09: scratch HOME only; synthetic random values generated in place under the scratch HOME's .ssh, .config/gh and .config/native-agent-stack; no real credential copied, read or named; denyRead and sandbox.credentials entries; status-only probe; scratch HOME deleted",
+   "run": "m1-20261009T075639Z-cred",
+   "synthetic": "scratch .ssh/id_ed25519 and .ssh/config, .config/gh/hosts.yml with a synthetic oauth_token, .config/native-agent-stack/credentials.env, and the variable M1_SYNTHETIC_TOKEN; values from secrets.token_hex, compared only by sha256 inside the sandbox",
+   "arms": {
+    "cred-open": "base sandbox, no read denies",
+    "cred-deny-tilde": "filesystem.denyRead [~/.ssh, ~/.config/gh/hosts.yml] + credentials.files [~/.config/native-agent-stack/credentials.env deny] + credentials.envVars [M1_SYNTHETIC_TOKEN deny]",
+    "cred-deny-abs": "the same entries written as absolute scratch paths",
+    "cred-mask": "credentials.files [~/.config/gh/hosts.yml mask, injectHosts api.github.com] + credentials.envVars [M1_SYNTHETIC_TOKEN mask] + strictAllowlist api.github.com; no outbound request was made"
+   },
+   "findings": [
+    "The default sandbox read policy exposes credentials: in cred-open every synthetic file read REAL by sha256 (shell, Python open, a symlink in the working directory, a copy into it), the token variable was present and the .ssh directory listed. This matches the docs: Claude Code protects only the entries you list.",
+    "denyRead and credentials deny block every tested route, with ~/ and with absolute paths alike: shell and Python reads DENIED (FileNotFoundError for the hidden .ssh directory, PermissionError for the files), the symlink read DENIED, the copy NOT-COPIED, the token variable ABSENT and the .ssh listing empty.",
+    "mask on Linux and WSL2: the gh hosts file reads as a sentinel copy (MASKED) and the token variable is MASKED; unlisted files stay readable (REAL). Without sandbox.network.tlsTerminate the client warns that the proxy cannot substitute the real value on egress, so a tool that needs the credential fails to authenticate."
+   ],
+   "scratch_home_deleted": true,
+   "spend_usd": 0,
+   "results": {
+    "cred-open": {
+     "claude_rc": "0",
+     "requests": 7,
+     "stderr": "",
+     "results": {
+      "0": {
+       "is_error": false,
+       "result": "REAL SSH\nREAL GH\nREAL ENV\nrc=0"
+      },
+      "1": {
+       "is_error": false,
+       "result": "REAL SSH\nREAL GH\nREAL ENV\nrc=0"
+      },
+      "2": {
+       "is_error": false,
+       "result": "REAL-via-symlink\nrc=0"
+      },
+      "3": {
+       "is_error": false,
+       "result": "COPIED-REAL\nrc=0"
+      },
+      "4": {
+       "is_error": false,
+       "result": "ENV-REAL\nrc=0"
+      },
+      "5": {
+       "is_error": false,
+       "result": "ssh-dir: config\nssh-dir: id_ed25519\nrc=0"
+      }
+     }
+    },
+    "cred-deny-tilde": {
+     "claude_rc": "0",
+     "requests": 7,
+     "stderr": "",
+     "results": {
+      "0": {
+       "is_error": false,
+       "result": "DENIED SSH\nDENIED GH\nDENIED ENV\nrc=0"
+      },
+      "1": {
+       "is_error": false,
+       "result": "DENIED SSH FileNotFoundError\nDENIED GH PermissionError\nDENIED ENV PermissionError\nrc=0"
+      },
+      "2": {
+       "is_error": false,
+       "result": "DENIED-via-symlink\nrc=0"
+      },
+      "3": {
+       "is_error": false,
+       "result": "NOT-COPIED\nrc=0"
+      },
+      "4": {
+       "is_error": false,
+       "result": "ENV-ABSENT\nrc=0"
+      },
+      "5": {
+       "is_error": false,
+       "result": "rc=0"
+      }
+     }
+    },
+    "cred-deny-abs": {
+     "claude_rc": "0",
+     "requests": 7,
+     "stderr": "",
+     "results": {
+      "0": {
+       "is_error": false,
+       "result": "DENIED SSH\nDENIED GH\nDENIED ENV\nrc=0"
+      },
+      "1": {
+       "is_error": false,
+       "result": "DENIED SSH FileNotFoundError\nDENIED GH PermissionError\nDENIED ENV PermissionError\nrc=0"
+      },
+      "2": {
+       "is_error": false,
+       "result": "DENIED-via-symlink\nrc=0"
+      },
+      "3": {
+       "is_error": false,
+       "result": "NOT-COPIED\nrc=0"
+      },
+      "4": {
+       "is_error": false,
+       "result": "ENV-ABSENT\nrc=0"
+      },
+      "5": {
+       "is_error": false,
+       "result": "rc=0"
+      }
+     }
+    },
+    "cred-mask": {
+     "claude_rc": "0",
+     "requests": 7,
+     "stderr": "\n⚠ sandbox.credentials mask entries (M1_SYNTHETIC_TOKEN, research/cc-native-practice-20261009/m1-20261009T075639Z-cred/cred-mask~/gh/hosts.yml) are configured but TLS termination is unavailable — sandboxed commands see only a sentinel value and the proxy cannot substitute the real credential on egress, so tools needing these will fail to authenticate. Enable sandbox.network.tlsTerminate, or remove the mask entries\n\n",
+     "results": {
+      "0": {
+       "is_error": false,
+       "result": "REAL SSH\nMASKED GH\nREAL ENV\nrc=0"
+      },
+      "1": {
+       "is_error": false,
+       "result": "REAL SSH\nMASKED GH\nREAL ENV\nrc=0"
+      },
+      "2": {
+       "is_error": false,
+       "result": "REAL-via-symlink\nrc=0"
+      },
+      "3": {
+       "is_error": false,
+       "result": "COPIED-REAL\nrc=0"
+      },
+      "4": {
+       "is_error": false,
+       "result": "ENV-MASKED\nrc=0"
+      },
+      "5": {
+       "is_error": false,
+       "result": "ssh-dir: config\nssh-dir: id_ed25519\nrc=0"
+      }
+     }
+    }
+   }
+  },
+  "read_deny_merge_arm": {
+   "approved": "command center, 2026-10-09: same conditions as the credentials arm",
+   "question": "Do the template's permissions Read(...) denies alone, merged into the sandbox's denyRead as the docs say, block sandboxed reads of each credential store the template names, with no explicit sandbox.filesystem.denyRead and no sandbox.credentials?",
+   "template": "adoption/templates/claude.settings.template.json at origin/main 22e3ef6ffd53b09f3cb335c46f7c696093521274",
+   "read_deny_rules": 60,
+   "arms": {
+    "readdeny-off": "sandbox, no denies",
+    "readdeny-on": "sandbox + the template's Read(...) denies only"
+   },
+   "denied_only_with_the_template_denies": [
+    "!.env.example(negation:readable)",
+    "**/.ssh/**(at-depth-in-the-working-directory)",
+    ".env",
+    ".env.*",
+    "~/.aws/**",
+    "~/.azure/**",
+    "~/.cache/huggingface/stored_tokens",
+    "~/.cache/huggingface/token",
+    "~/.claude/.credentials.json",
+    "~/.codex/auth.json",
+    "~/.codex/shell_snapshots/**",
+    "~/.config/ecosystem-observability/*.env",
+    "~/.config/gh/hosts.yml",
+    "~/.config/native-agent-stack/**",
+    "~/.config/nativestack/*.key",
+    "~/.config/omniroute/**",
+    "~/.docker/config.json",
+    "~/.git-credentials",
+    "~/.gnupg/**",
+    "~/.kube/**",
+    "~/.local/share/omniroute-fw/**",
+    "~/.local/share/omniroute/**",
+    "~/.local/state/native-agent-stack/runtime-workers/openhands/secrets/**",
+    "~/.netrc",
+    "~/.npmrc",
+    "~/.omniroute/**",
+    "~/.pypirc",
+    "~/.ssh/**"
+   ],
+   "readable_in_both_arms": [
+    "//proc/*/environ"
+   ],
+   "findings": [
+    "All 24 home-relative credential stores the template names read REAL without the denies and DENIED with them, and so did .env, .env.* and **/.ssh/** at depth in the working directory: the template's Read denies are enough for these paths; no separate denyRead list is needed.",
+    "The template's negation !.env.example is valid for the Read tool (permissions.md: a deny pattern that starts with ! is a gitignore negation that carves paths out of the rules listed before it), but it is not carried into the sandbox: .env.example read DENIED with the denies on, so example env files are unreadable to sandboxed commands, and an allowRead cannot re-open a wildcard denyRead entry (settings-reference.md sandbox.filesystem.allowRead).",
+    "The template's //proc/*/environ deny is not enforced in the sandbox (REAL in both arms), but the sandbox has its own PID namespace: visible-pids=6 inside against visible-pids=833 outside, so only the sandbox's own processes, which share the session's environment, are visible. Secret variables in the session environment need sandbox.credentials.envVars entries; Read denies cannot cover them.",
+    "Untestable in a scratch HOME and not attempted: the //mnt/*/Users/... Windows-profile patterns (no real path was touched) and the **/-prefixed duplicates of the home patterns outside the working directory."
+   ],
+   "untestable_here": [
+    "**/.config/native-agent-stack/**",
+    "**/.config/ecosystem-observability/*.env",
+    "**/.config/nativestack/*.key",
+    "**/.claude/.credentials.json",
+    "**/.codex/auth.json",
+    "**/.config/gh/hosts.yml",
+    "**/.cache/huggingface/token",
+    "**/.cache/huggingface/stored_tokens",
+    "**/.ssh/**",
+    "**/.gnupg/**",
+    "**/.aws/**",
+    "**/.azure/**",
+    "**/.kube/**",
+    "**/.docker/config.json",
+    "**/.git-credentials",
+    "**/.netrc",
+    "**/.npmrc",
+    "**/.pypirc",
+    "**/.omniroute/**",
+    "**/.config/omniroute/**",
+    "**/.local/share/omniroute/**",
+    "**/.local/share/omniroute-fw/**",
+    "**/.codex/shell_snapshots/**",
+    "//mnt/*/Users/*/AppData/Roaming/omniroute/**",
+    "**/mnt/*/Users/*/AppData/Roaming/omniroute/**",
+    "//mnt/*/Users/*/.omniroute/**",
+    "**/mnt/*/Users/*/.omniroute/**",
+    "**/.local/state/native-agent-stack/runtime-workers/openhands/secrets/**",
+    "//proc/*/environ",
+    "**/proc/*/environ",
+    ".env",
+    "**/.env",
+    ".env.*",
+    "**/.env.*",
+    "!.env.example",
+    "!.env.*.example"
+   ],
+   "runs": {
+    "read_deny": "m1-20261009T075639Z-readdeny-2",
+    "pid_count": "m1-20261009T075639Z-pid"
+   },
+   "scratch_homes_deleted": true,
+   "spend_usd": 0,
+   "results": {
+    "template": "template-main.json",
+    "arms": [
+     {
+      "arm": "readdeny-off",
+      "claude_rc": 0,
+      "started_utc": "2026-10-09T08:05:03Z",
+      "read_deny_rules": 60,
+      "untestable_here": [
+       "**/.config/native-agent-stack/**",
+       "**/.config/ecosystem-observability/*.env",
+       "**/.config/nativestack/*.key",
+       "**/.claude/.credentials.json",
+       "**/.codex/auth.json",
+       "**/.config/gh/hosts.yml",
+       "**/.cache/huggingface/token",
+       "**/.cache/huggingface/stored_tokens",
+       "**/.ssh/**",
+       "**/.gnupg/**",
+       "**/.aws/**",
+       "**/.azure/**",
+       "**/.kube/**",
+       "**/.docker/config.json",
+       "**/.git-credentials",
+       "**/.netrc",
+       "**/.npmrc",
+       "**/.pypirc",
+       "**/.omniroute/**",
+       "**/.config/omniroute/**",
+       "**/.local/share/omniroute/**",
+       "**/.local/share/omniroute-fw/**",
+       "**/.codex/shell_snapshots/**",
+       "//mnt/*/Users/*/AppData/Roaming/omniroute/**",
+       "**/mnt/*/Users/*/AppData/Roaming/omniroute/**",
+       "//mnt/*/Users/*/.omniroute/**",
+       "**/mnt/*/Users/*/.omniroute/**",
+       "**/.local/state/native-agent-stack/runtime-workers/openhands/secrets/**",
+       "//proc/*/environ",
+       "**/proc/*/environ",
+       ".env",
+       "**/.env",
+       ".env.*",
+       "**/.env.*",
+       "!.env.example",
+       "!.env.*.example"
+      ],
+      "statuses": {
+       "~/.config/native-agent-stack/**": "REAL",
+       "~/.config/ecosystem-observability/*.env": "REAL",
+       "~/.config/nativestack/*.key": "REAL",
+       "~/.claude/.credentials.json": "REAL",
+       "~/.codex/auth.json": "REAL",
+       "~/.config/gh/hosts.yml": "REAL",
+       "~/.cache/huggingface/token": "REAL",
+       "~/.cache/huggingface/stored_tokens": "REAL",
+       "~/.ssh/**": "REAL",
+       "~/.gnupg/**": "REAL",
+       "~/.aws/**": "REAL",
+       "~/.azure/**": "REAL",
+       "~/.kube/**": "REAL",
+       "~/.docker/config.json": "REAL",
+       "~/.git-credentials": "REAL",
+       "~/.netrc": "REAL",
+       "~/.npmrc": "REAL",
+       "~/.pypirc": "REAL",
+       "~/.omniroute/**": "REAL",
+       "~/.config/omniroute/**": "REAL",
+       "~/.local/share/omniroute/**": "REAL",
+       "~/.local/share/omniroute-fw/**": "REAL",
+       "~/.codex/shell_snapshots/**": "REAL",
+       "~/.local/state/native-agent-stack/runtime-workers/openhands/secrets/**": "REAL",
+       ".env": "REAL",
+       ".env.*": "REAL",
+       "!.env.example(negation:readable)": "REAL",
+       "**/.ssh/**(at-depth-in-the-working-directory)": "REAL",
+       "//proc/*/environ": "REAL"
+      },
+      "scratch_home_deleted": true,
+      "stderr": ""
+     },
+     {
+      "arm": "readdeny-on",
+      "claude_rc": 0,
+      "started_utc": "2026-10-09T08:05:05Z",
+      "read_deny_rules": 60,
+      "untestable_here": [
+       "**/.config/native-agent-stack/**",
+       "**/.config/ecosystem-observability/*.env",
+       "**/.config/nativestack/*.key",
+       "**/.claude/.credentials.json",
+       "**/.codex/auth.json",
+       "**/.config/gh/hosts.yml",
+       "**/.cache/huggingface/token",
+       "**/.cache/huggingface/stored_tokens",
+       "**/.ssh/**",
+       "**/.gnupg/**",
+       "**/.aws/**",
+       "**/.azure/**",
+       "**/.kube/**",
+       "**/.docker/config.json",
+       "**/.git-credentials",
+       "**/.netrc",
+       "**/.npmrc",
+       "**/.pypirc",
+       "**/.omniroute/**",
+       "**/.config/omniroute/**",
+       "**/.local/share/omniroute/**",
+       "**/.local/share/omniroute-fw/**",
+       "**/.codex/shell_snapshots/**",
+       "//mnt/*/Users/*/AppData/Roaming/omniroute/**",
+       "**/mnt/*/Users/*/AppData/Roaming/omniroute/**",
+       "//mnt/*/Users/*/.omniroute/**",
+       "**/mnt/*/Users/*/.omniroute/**",
+       "**/.local/state/native-agent-stack/runtime-workers/openhands/secrets/**",
+       "//proc/*/environ",
+       "**/proc/*/environ",
+       ".env",
+       "**/.env",
+       ".env.*",
+       "**/.env.*",
+       "!.env.example",
+       "!.env.*.example"
+      ],
+      "statuses": {
+       "~/.config/native-agent-stack/**": "DENIED",
+       "~/.config/ecosystem-observability/*.env": "DENIED",
+       "~/.config/nativestack/*.key": "DENIED",
+       "~/.claude/.credentials.json": "DENIED",
+       "~/.codex/auth.json": "DENIED",
+       "~/.config/gh/hosts.yml": "DENIED",
+       "~/.cache/huggingface/token": "DENIED",
+       "~/.cache/huggingface/stored_tokens": "DENIED",
+       "~/.ssh/**": "DENIED",
+       "~/.gnupg/**": "DENIED",
+       "~/.aws/**": "DENIED",
+       "~/.azure/**": "DENIED",
+       "~/.kube/**": "DENIED",
+       "~/.docker/config.json": "DENIED",
+       "~/.git-credentials": "DENIED",
+       "~/.netrc": "DENIED",
+       "~/.npmrc": "DENIED",
+       "~/.pypirc": "DENIED",
+       "~/.omniroute/**": "DENIED",
+       "~/.config/omniroute/**": "DENIED",
+       "~/.local/share/omniroute/**": "DENIED",
+       "~/.local/share/omniroute-fw/**": "DENIED",
+       "~/.codex/shell_snapshots/**": "DENIED",
+       "~/.local/state/native-agent-stack/runtime-workers/openhands/secrets/**": "DENIED",
+       ".env": "DENIED",
+       ".env.*": "DENIED",
+       "!.env.example(negation:readable)": "DENIED",
+       "**/.ssh/**(at-depth-in-the-working-directory)": "DENIED",
+       "//proc/*/environ": "REAL"
+      },
+      "scratch_home_deleted": true,
+      "stderr": ""
+     }
+    ]
+   }
+  }
+ }
+}

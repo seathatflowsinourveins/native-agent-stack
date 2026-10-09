@@ -61,7 +61,82 @@
    "supersedes": [
     "M2 (wider rule triggers)",
     "MI-7 sizes are dated history"
-   ]
+   ],
+   "primary_sources": [
+    {
+     "title": "The AI-native SDLC playbook",
+     "url": "https://claude.com/blog/the-ai-native-sdlc-playbook",
+     "published": "2026-08-21",
+     "fetched_utc": "2026-10-09T13:48:02Z",
+     "sha256": "76fb2ae32301b1cde4e0a686a1872bbe5c835cb91b7b33dc7b798a92bc429a8a",
+     "practice": "Keep the instruction file under a page, holding commands, conventions and the mistakes the agent keeps making. When the agent makes the same mistake twice, including one flagged twice in review, write the correction into it.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "both",
+     "native_mechanism": "Claude Code: CLAUDE.md that imports @AGENTS.md, plus paths-scoped .claude/rules. Codex: AGENTS.md."
+    },
+    {
+     "title": "Best practices for Claude Code - Claude Code Docs",
+     "url": "https://www.anthropic.com/engineering/claude-code-best-practices",
+     "published": "unknown",
+     "fetched_utc": "2026-10-09T13:48:03Z",
+     "sha256": "76832cd2eb01a962b9149231fa480b87df192d6be8c1cda055f56448fac98943",
+     "practice": "Keep CLAUDE.md short and broadly applicable: cut any line whose removal would not cause mistakes, move sometimes-relevant knowledge to skills and must-always actions to hooks, and treat the file like code by pruning it, testing that behavior shifts and letting /doctor propose cuts.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "both",
+     "native_mechanism": "Claude Code: CLAUDE.md (with @path imports), /context to confirm it loaded, /doctor to propose cuts for a checked-in CLAUDE.md, skills for on-demand knowledge and hooks for deterministic actions. Codex: AGENTS.md; a /doctor-style pruning equivalent is not verified."
+    },
+    {
+     "title": "Effective context engineering for AI agents",
+     "url": "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents",
+     "published": "2025-09-29",
+     "fetched_utc": "2026-10-09T13:49:34Z",
+     "sha256": "0f978585c63258469bbd5a50709e918b78bb98407c5ebdde629aef9b65cf76aa",
+     "practice": "Write instructions at the right altitude, neither brittle hardcoded logic nor vague guidance. Aim for the minimal set (not necessarily short) that fully specifies behavior: start with a minimal prompt on the best model and add instructions and examples only for failure modes seen in testing.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "both",
+     "native_mechanism": "Claude Code: the always-loaded CLAUDE.md/AGENTS.md core, with practice moved into skills and path-scoped rules. Codex: AGENTS.md."
+    },
+    {
+     "title": "Custom instructions with AGENTS.md | ChatGPT Learn",
+     "url": "https://developers.openai.com/codex/guides/agents-md",
+     "published": "unknown",
+     "fetched_utc": "2026-10-09T13:50:36Z",
+     "sha256": "a53db55014ddcd743d7dfbc453ca4e92413075978e665e39b4a6c7c0aa42a3d7",
+     "practice": "Codex stops adding project instruction files once their combined size reaches project_doc_max_bytes (32 KiB by default). When the cap is hit, split guidance across nested directories or raise the limit, so that critical text is not truncated.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "codex",
+     "native_mechanism": "Codex: the project_doc_max_bytes key in ~/.codex/config.toml (unset on this host, observed now, so 32 KiB applies). Claude Code: no byte cap is named in our records; the memory docs give a writing target of under 200 lines per CLAUDE.md (docs/harness-rules-convergence-20260922.md:110), which is guidance rather than truncation."
+    },
+    {
+     "title": "Custom instructions with AGENTS.md | ChatGPT Learn",
+     "url": "https://developers.openai.com/codex/guides/agents-md",
+     "published": "unknown",
+     "fetched_utc": "2026-10-09T13:50:36Z",
+     "sha256": "a53db55014ddcd743d7dfbc453ca4e92413075978e665e39b4a6c7c0aa42a3d7",
+     "practice": "Codex loads nested guidance only for directories between the project root and the working directory, so specialized rules belong as close to that work as possible, and the agent has to start inside the subtree to pick them up.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "both",
+     "native_mechanism": "Codex: a nested AGENTS.md or AGENTS.override.md, loaded when Codex starts with `codex --cd <subtree>`. Claude Code: a nested CLAUDE.md (here `@AGENTS.md`) loaded on demand when files there are read, plus paths:-scoped .claude/rules (observed now: .claude/rules/trading.md)."
+    },
+    {
+     "title": "Custom instructions with AGENTS.md | ChatGPT Learn",
+     "url": "https://developers.openai.com/codex/guides/agents-md",
+     "published": "unknown",
+     "fetched_utc": "2026-10-09T13:50:36Z",
+     "sha256": "a53db55014ddcd743d7dfbc453ca4e92413075978e665e39b4a6c7c0aa42a3d7",
+     "practice": "After changing instruction files, check which files the agent actually loaded and in what order: ask it to list its instruction sources, or audit the session log, rather than assuming discovery worked.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "both",
+     "native_mechanism": "Codex: the `codex -c log_dir=...` TUI log, session-*.jsonl, or a prompt asking it to summarize the active instructions. Claude Code: `/memory` and `/context` (docs/harness-defaults.md:68) and the InstructionsLoaded hook event."
+    }
+   ],
+   "primary_sources_total": 15
   },
   {
    "id": "auto-memory",
@@ -165,7 +240,58 @@
    "supersedes": [
     "M40 refined",
     "M28 refined (onFailure does not make Stop gates fail closed)"
-   ]
+   ],
+   "primary_sources": [
+    {
+     "title": "Hooks (subtitle: Run scripts or MCP tools during the Codex lifecycle)",
+     "url": "https://developers.openai.com/codex/hooks",
+     "published": "unknown",
+     "fetched_utc": "2026-10-09T13:50:32Z",
+     "sha256": "6b337cf64b69be8efa81715b48e20da418f37f9ac6b3983bfe38a9c6979d9f09",
+     "practice": "Background (async) hooks cannot block, approve, rewrite or continue anything, and their output arrives only at the next safe point, so policy checks and turn-continuation gates must stay synchronous.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "both",
+     "native_mechanism": "Codex: \"async\": true on a command handler (up to eight background hooks run at once per session; unfinished ones are cancelled at session end). Claude Code: \"async\": true on a command hook (2.1.295 schema text: \"If true, hook runs in background without blocking\"), plus asyncRewake."
+    },
+    {
+     "title": "Hooks (subtitle: Run scripts or MCP tools during the Codex lifecycle)",
+     "url": "https://developers.openai.com/codex/hooks",
+     "published": "unknown",
+     "fetched_utc": "2026-10-09T13:50:32Z",
+     "sha256": "6b337cf64b69be8efa81715b48e20da418f37f9ac6b3983bfe38a9c6979d9f09",
+     "practice": "A PostToolUse hook can check a tool result after the fact: decision block replaces the result with the hook's feedback, and additionalContext adds developer context, so the model fixes the problem on its next step.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "both",
+     "native_mechanism": "Codex: PostToolUse hook matched on Bash, apply_patch/Edit/Write or an MCP tool name, either as a command or as an mcp_tool hook (the page's example sends each patch to a scanner MCP tool). Claude Code: PostToolUse hook returning decision block with reason or hookSpecificOutput.additionalContext; mcp_tool hooks are present in the 2.1.295 binary."
+    },
+    {
+     "title": "Harness engineering: leveraging Codex in an agent-first world",
+     "url": "https://openai.com/index/harness-engineering/",
+     "published": "2026-02-11",
+     "fetched_utc": "2026-10-09T13:50:37Z",
+     "sha256": "163ebbf5f8925c432122231b12f020d4286aa90d587ab85f4614e8cd71d9ad2e",
+     "practice": "Architecture and taste invariants are enforced by custom linters and structural tests whose error messages are written as remediation instructions for the agent.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "both",
+     "native_mechanism": "Codex: custom linters and structural tests run by the agent and in CI. Claude Code: a PostToolUse command hook that runs the linter after Edit or Write and returns its message to Claude (exit 2 stderr), plus CI."
+    },
+    {
+     "title": "Steering Claude Code: when to use CLAUDE.md, skills, hooks, and subagents | Claude by Anthropic",
+     "url": "https://claude.com/blog/steering-claude-code-skills-hooks-rules-subagents-and-more",
+     "published": "2026-06-18",
+     "fetched_utc": "2026-10-09T13:48:01Z",
+     "sha256": "e71c2190f0d2db85d7a574e760368671175aba61c2e84698a3b8a918dceed089",
+     "practice": "Behavior that must happen reliably on every occurrence, such as formatting after each edit or notifying on completion, should be a settings hook, not a CLAUDE.md instruction the model may or may not act on.",
+     "relation": "agrees",
+     "evidence_kind": "asserted",
+     "clients": "claude-code",
+     "native_mechanism": "Claude Code: command hooks registered in settings.json (e.g. PostToolUse for formatters and linters, Stop for completion actions)"
+    }
+   ],
+   "primary_sources_total": 4
   },
   {
    "id": "statusline",
@@ -213,7 +339,34 @@
    ],
    "notes": "`cleanupPeriodDays: 3650` keeps plaintext transcripts and pre-edit snapshots for about ten years: an exposure window for any secret a tool read. Retention is the owner's choice; the record gives the trade-off and a recommended value.",
    "overturn_when": "A measured footprint or an owner retention decision, or a release changes what checkpoints restore.",
-   "supersedes": []
+   "supersedes": [],
+   "primary_sources": [
+    {
+     "title": "Using Claude Code: session management and 1M context | Claude by Anthropic",
+     "url": "https://claude.com/blog/using-claude-code-session-management-and-1m-context",
+     "published": "2026-04-15",
+     "fetched_utc": "2026-10-09T13:48:02Z",
+     "sha256": "462a9190a99f72661001047a757c46a5c81382e26009ff4a988f133d81194b4a",
+     "practice": "When an attempt fails, rewind the conversation to the last useful point, for example just after the file reads, and re-prompt with what you learned instead of adding a correction turn on top of the failed attempt.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "claude-code",
+     "native_mechanism": "Claude Code: /rewind or Esc Esc, choosing a conversation-restore option at the checkpoint after the useful reads (interactive coordinator only). Codex: not stated by the source."
+    },
+    {
+     "title": "Using Claude Code: session management and 1M context | Claude by Anthropic",
+     "url": "https://claude.com/blog/using-claude-code-session-management-and-1m-context",
+     "published": "2026-04-15",
+     "fetched_utc": "2026-10-09T13:48:02Z",
+     "sha256": "462a9190a99f72661001047a757c46a5c81382e26009ff4a988f133d81194b4a",
+     "practice": "Use the rewind menu's summarize option to turn a failed branch into a handoff message that keeps its learnings, instead of simply dropping it.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "claude-code",
+     "native_mechanism": "Claude Code: the 'Summarize from here' option in the /rewind (Esc Esc) menu, documented per our record's claim checkpoints-rewind-O2. Codex: not stated by the source."
+    }
+   ],
+   "primary_sources_total": 2
   },
   {
    "id": "sandbox",
@@ -263,7 +416,22 @@
    "supersedes": [
     "M49 refined"
    ],
-   "notes": "Adjudicated: the current practice stands (refuter pending at writing). Owed: the M49 probe on 2.1.295 for the WorktreeCreate and pre-create paths."
+   "notes": "Adjudicated: the current practice stands (refuter pending at writing). Owed: the M49 probe on 2.1.295 for the WorktreeCreate and pre-create paths.",
+   "primary_sources": [
+    {
+     "title": "Harness engineering: leveraging Codex in an agent-first world",
+     "url": "https://openai.com/index/harness-engineering/",
+     "published": "2026-02-11",
+     "fetched_utc": "2026-10-09T13:50:37Z",
+     "sha256": "163ebbf5f8925c432122231b12f020d4286aa90d587ab85f4614e8cd71d9ad2e",
+     "practice": "Make the running application legible to the agent: one bootable app instance per git worktree, browser automation through Chrome DevTools Protocol skills, and a short-lived per-worktree logs, metrics and traces stack the agent queries with LogQL and PromQL, so it can reproduce bugs and validate fixes itself.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "both",
+     "native_mechanism": "Codex: per-worktree runtime plus skills and the Chrome DevTools Protocol wired into the agent runtime (as described). Claude Code: coordinator-created worktrees, MCP servers (a browser automation server; a Grafana/Loki/Prometheus server for LogQL and PromQL) and skills that drive them."
+    }
+   ],
+   "primary_sources_total": 1
   },
   {
    "id": "model-effort-routing",
@@ -273,7 +441,8 @@
    "route": "Opus 5.5 for judgment and build; Sonnet 5.5 or Haiku 5.5 only for a task class with a frozen paired A/B at parity; keep `CLAUDE_CODE_EFFORT_LEVEL` and `CLAUDE_CODE_SUBAGENT_MODEL_FORCE` unset, because they override frontmatter and per-call effort; Codex lanes through the gateway for fan-out research",
    "alternatives": [
     "Re-run failed attempts at a higher effort",
-    "Native advisor pairing"
+    "Native advisor pairing",
+    "Classifier routing to Sonnet or Opus by task complexity (dynamic workflows post; candidate until the M7 paired A/B)"
    ],
    "rejections": [
     "musistudio/claude-code-router",
@@ -294,7 +463,82 @@
     "R52 (Ultracode is a separate toggle since 2.1.284)",
     "AN-05 (`sonnet` resolves to Sonnet 5.5)",
     "M7 extended with Anthropic's published effort priors"
-   ]
+   ],
+   "primary_sources": [
+    {
+     "title": "The advisor strategy: Give agents an intelligence boost",
+     "url": "https://claude.com/blog/the-advisor-strategy",
+     "published": "2026-04-09",
+     "fetched_utc": "2026-10-09T13:47:59Z",
+     "sha256": "c284ecef25aa4c9ccef8f4529e1c40c921b489e893e42fcf113f8a77bc6b7b49",
+     "practice": "Let a cheaper executor model run the whole task with tools and consult a stronger model only at decisions it cannot resolve. Anthropic reports +2.7 percentage points on SWE-bench Multilingual and 11.9% lower cost per task for Sonnet 4.6 with an Opus 4.6 advisor against Sonnet alone.",
+     "relation": "extends",
+     "evidence_kind": "measured",
+     "clients": "claude-code",
+     "native_mechanism": "Claude Code: the native advisor tool (observed in this 2.1.295 session's tool list) with the advisor model set by the `advisorModel` settings key (observed at ~/.claude/settings.json:605). Codex: no native advisor found in codex-cli 0.161.0 --help (not verified further)."
+    },
+    {
+     "title": "Patterns and problems in emerging multiagent systems",
+     "url": "https://www.anthropic.com/research/multiagent-systems",
+     "published": "2026-08-13",
+     "fetched_utc": "2026-10-09T13:50:01Z",
+     "sha256": "a1557d5f0dce083c5e37e1e11dbd6e3dd191f79bf4aca85f38f6b6ab81da2757",
+     "practice": "How well agents share code differs by model and does not follow individual capability. Sonnet 4.6 and Opus 4.6 opened conflicting PRs that were abandoned, Opus 4.8 and Mythos Preview avoided conflict by keeping their own files, and only Sonnet 5 combined high code sharing with a high merge rate. The source adds that models stronger at execution are not necessarily better coordinated.",
+     "relation": "extends",
+     "evidence_kind": "measured",
+     "clients": "claude-code",
+     "native_mechanism": "Claude Code: per-role `model` in subagent or teammate frontmatter, or the Agent tool's `model` and `effort` parameters (2.1.292+), measured with the M7 sweep. The source does not cover Codex or GPT models."
+    },
+    {
+     "title": "A harness for every task: dynamic workflows in Claude Code",
+     "url": "https://claude.com/blog/a-harness-for-every-task-dynamic-workflows-in-claude-code",
+     "published": "2026-06-02",
+     "fetched_utc": "2026-10-09T13:48:00Z",
+     "sha256": "3203a50099e2c21213e32a028b7cc1f669ffebd43abbee297b30f7acaeb9ea46",
+     "practice": "Use a classifier agent to research a task first and then route it to Sonnet or Opus by expected complexity; workflows can set the model and worktree isolation for each agent.",
+     "relation": "contradicts",
+     "evidence_kind": "asserted",
+     "clients": "claude-code",
+     "native_mechanism": "Claude Code: a classify-and-act Workflow stage that sets the model (and optionally a worktree) per agent() call; per-call model and effort on the Agent tool"
+    },
+    {
+     "title": "Choosing a Claude model and effort level in Claude Code",
+     "url": "https://claude.com/blog/claude-model-and-effort-level-in-claude-code",
+     "published": "2026-07-07",
+     "fetched_utc": "2026-10-09T13:50:02Z",
+     "sha256": "701649d85428a489988f596c2dcba99d391abac1dadf99e9f1a3f0015cf9dd5b",
+     "practice": "When the agent gets something wrong, first check the context it had (how clear the prompt and task scope were, the instruction file, connected tools and skills) before changing model or effort.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "both",
+     "native_mechanism": "Claude Code: CLAUDE.md (importing AGENTS.md), skills, MCP tool configuration and task scoping in the subagent prompt. Codex: AGENTS.md, skills and MCP configuration in config.toml."
+    },
+    {
+     "title": "Choosing a Claude model and effort level in Claude Code",
+     "url": "https://claude.com/blog/claude-model-and-effort-level-in-claude-code",
+     "published": "2026-07-07",
+     "fetched_utc": "2026-10-09T13:50:02Z",
+     "sha256": "701649d85428a489988f596c2dcba99d391abac1dadf99e9f1a3f0015cf9dd5b",
+     "practice": "Pick the escalation by the kind of failure. If the agent skipped files, tests or double-checking, raise effort. If it had full context, clearly tried and was still wrong, use a larger model.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "both",
+     "native_mechanism": "Claude Code: re-run with a higher `--effort` or Agent tool `effort` for skipped work, or a larger `--model` / Agent tool `model` for a knowledge miss. Codex: `-c model_reasoning_effort=<level>` or a profile for skipped work, and `-m <model>` for a knowledge miss."
+    },
+    {
+     "title": "Choosing a Claude model and effort level in Claude Code",
+     "url": "https://claude.com/blog/claude-model-and-effort-level-in-claude-code",
+     "published": "2026-07-07",
+     "fetched_utc": "2026-10-09T13:50:02Z",
+     "sha256": "701649d85428a489988f596c2dcba99d391abac1dadf99e9f1a3f0015cf9dd5b",
+     "practice": "Use a smaller model for routine work: precisely describable edits, mechanical changes and questions about code already in context. Drop down after a stretch of routine work.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "claude-code",
+     "native_mechanism": "Claude Code: `model` in subagent or skill frontmatter, the Agent tool's `model`, or `--model` on headless jobs for the routine task class."
+    }
+   ],
+   "primary_sources_total": 15
   },
   {
    "id": "context-compaction",
@@ -322,7 +566,82 @@
     "topic: auto-compact threshold (window now saved per model)",
     "M16 (compaction retraction defect fixed in 2.1.293)",
     "M17 (SessionStart compact matcher is the documented route)"
-   ]
+   ],
+   "primary_sources": [
+    {
+     "title": "Coding sessions are longer and use more context. Claude Opus 5.5 is built with that in mind.",
+     "url": "https://claude.com/blog/claude-opus-5-5-built-for-coding-sessions-that-use-more-context",
+     "published": "2026-09-24",
+     "fetched_utc": "2026-10-09T13:50:15Z",
+     "sha256": "2e111c21a5a9b920ec6f4c3e3bc935606abf7c1dbfd66b4e12b081aeb4c9a398",
+     "practice": "Run compaction before an idle gap, not after coming back, so the compaction call reads a still-warm cache rather than re-reading the whole context uncached.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "claude-code",
+     "native_mechanism": "Claude Code: manual `/compact <focus>` in top-level interactive sessions, with a Compact Instructions section in CLAUDE.md. Timing follows the native cache TTL buckets (5 minutes or 1 hour, per the prompt-caching route)."
+    },
+    {
+     "title": "Using Claude Code: session management and 1M context | Claude by Anthropic",
+     "url": "https://claude.com/blog/using-claude-code-session-management-and-1m-context",
+     "published": "2026-04-15",
+     "fetched_utc": "2026-10-09T13:48:02Z",
+     "sha256": "462a9190a99f72661001047a757c46a5c81382e26009ff4a988f133d81194b4a",
+     "practice": "When you need exact control over what carries forward, /clear and start the fresh session with a brief you write yourself: the task, its constraints, the files that matter and the approaches already ruled out.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "claude-code",
+     "native_mechanism": "Claude Code: /clear followed by a hand-written brief prompt (or a pointer to repository-resident state files). Codex: not stated by the source."
+    },
+    {
+     "title": "Using Claude Code: session management and 1M context | Claude by Anthropic",
+     "url": "https://claude.com/blog/using-claude-code-session-management-and-1m-context",
+     "published": "2026-04-15",
+     "fetched_utc": "2026-10-09T13:48:02Z",
+     "sha256": "462a9190a99f72661001047a757c46a5c81382e26009ff4a988f133d81194b4a",
+     "practice": "Auto-compaction goes badly when the model cannot predict where the work is heading, and it fires when context rot leaves the model least capable. So compact proactively, before auto-compaction fires, with a description of the next intended work.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "claude-code",
+     "native_mechanism": "Claude Code: a manual /compact <focus> that names the next step, run before the auto-compaction threshold on long interactive sessions. Codex: not stated by the source."
+    },
+    {
+     "title": "Best practices for Claude Code - Claude Code Docs",
+     "url": "https://www.anthropic.com/engineering/claude-code-best-practices",
+     "published": "unknown",
+     "fetched_utc": "2026-10-09T13:48:03Z",
+     "sha256": "76832cd2eb01a962b9149231fa480b87df192d6be8c1cda055f56448fac98943",
+     "practice": "Manage context actively: /clear between unrelated tasks, rely on auto-compaction, steer it with /compact <instructions> and compaction instructions in CLAUDE.md, summarize only part of the history from the rewind menu, and ask side questions with /btw so they never enter history.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "claude-code",
+     "native_mechanism": "Claude Code: auto-compaction, /clear, /compact <instructions>, a CLAUDE.md compaction-instructions section, Esc Esc or /rewind with 'Summarize from here' and 'Summarize up to here', and /btw."
+    },
+    {
+     "title": "Best practices for Claude Code - Claude Code Docs",
+     "url": "https://www.anthropic.com/engineering/claude-code-best-practices",
+     "published": "unknown",
+     "fetched_utc": "2026-10-09T13:48:03Z",
+     "sha256": "76832cd2eb01a962b9149231fa480b87df192d6be8c1cda055f56448fac98943",
+     "practice": "When the same issue needs more than two corrections, the context is polluted with failed approaches, so clear it and restart with a more specific prompt that includes what you learned instead of continuing to correct.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "both",
+     "native_mechanism": "Claude Code: /clear (or Esc and Esc Esc / rewind to back out earlier) followed by a rewritten prompt. Codex: start a new session with a rewritten prompt; the exact slash command is not verified on 0.161.0."
+    },
+    {
+     "title": "Effective context engineering for AI agents",
+     "url": "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents",
+     "published": "2025-09-29",
+     "fetched_utc": "2026-10-09T13:49:34Z",
+     "sha256": "0f978585c63258469bbd5a50709e918b78bb98407c5ebdde629aef9b65cf76aa",
+     "practice": "Tune the compaction prompt on complex agent traces: first maximize recall so everything relevant survives, then improve precision by removing superfluous content.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "both",
+     "native_mechanism": "Claude Code: the CLAUDE.md Compact Instructions section and `/compact <focus>`, plus a SessionStart(compact) hook for state that must survive. Codex: no compaction-prompt setting verified at 0.161.0."
+    }
+   ],
+   "primary_sources_total": 12
   },
   {
    "id": "prompt-caching",
@@ -344,12 +663,87 @@
     "context-token-O9, O11, O12, O18",
     "Measured here: daily prompt-cache hit 94-97.5% (ccusage)"
    ],
-   "notes": "No quality loss measured or claimed: caching does not change outputs.",
+   "notes": "No quality loss measured or claimed: caching does not change outputs. The Opus 5.5 long-context post recommends the one-hour TTL for long API-key or cloud-provider sessions; that scope is api-actions' (command center, 2026-10-09).",
    "overturn_when": "A release changes the TTL buckets, or a measured cache-hit drop on a run shape we use.",
    "supersedes": [
     "R53, R59 and the 1-hour TTL topic (buckets now native)",
     "AN-23 (experimental.cacheTtl is fourth in precedence)"
-   ]
+   ],
+   "primary_sources": [
+    {
+     "title": "Coding sessions are longer and use more context. Claude Opus 5.5 is built with that in mind.",
+     "url": "https://claude.com/blog/claude-opus-5-5-built-for-coding-sessions-that-use-more-context",
+     "published": "2026-09-24",
+     "fetched_utc": "2026-10-09T13:50:15Z",
+     "sha256": "2e111c21a5a9b920ec6f4c3e3bc935606abf7c1dbfd66b4e12b081aeb4c9a398",
+     "practice": "Sessions on an API key or cloud provider that run long should set the one-hour prompt-cache lifetime instead of the default five minutes.",
+     "relation": "contradicts",
+     "evidence_kind": "asserted",
+     "clients": "claude-code",
+     "native_mechanism": "Claude Code: the `promptCacheTtl` setting, keeping `subagentPromptCacheTtl` at 5 minutes (changelog line 2888, 2.1.232), supplied per run through `--settings`. The `ENABLE_PROMPT_CACHING_1H` env var also exists (changelog line 5704)."
+    },
+    {
+     "title": "Coding sessions are longer and use more context. Claude Opus 5.5 is built with that in mind.",
+     "url": "https://claude.com/blog/claude-opus-5-5-built-for-coding-sessions-that-use-more-context",
+     "published": "2026-09-24",
+     "fetched_utc": "2026-10-09T13:50:15Z",
+     "sha256": "2e111c21a5a9b920ec6f4c3e3bc935606abf7c1dbfd66b4e12b081aeb4c9a398",
+     "practice": "Forked subagents start from the parent's cached prefix, so delegating work that needs the parent's context through a fork avoids paying again for that context.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "claude-code",
+     "native_mechanism": "Claude Code: `subagent_type: \"fork\"` subagents, on by default and inheriting the full conversation and prompt cache (changelog line 3201, 2.1.243), plus `context: fork` skills (changelog line 7415)."
+    },
+    {
+     "title": "Lessons from building Claude Code: Prompt caching is everything",
+     "url": "https://claude.com/blog/lessons-from-building-claude-code-prompt-caching-is-everything",
+     "published": "2026-04-30",
+     "fetched_utc": "2026-10-09T13:47:58Z",
+     "sha256": "3fb13790e6794e02ff6cb32ddd2d92c6485512cc639f5c298bdb2026ecb60edf",
+     "practice": "Order everything sent before the conversation from most stable to least stable (system prompt and tools, then project instructions, then session context, then messages). Keep volatile values such as detailed timestamps, nondeterministic tool ordering and changing tool parameters out of the shared prefix.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "client-agnostic",
+     "native_mechanism": "Claude Code: the harness already orders its prompt this way (static system prompt and tools, CLAUDE.md, session context, messages). What we control is the content we inject: CLAUDE.md and its @AGENTS.md import, SessionStart hook additionalContext, and --append-system-prompt on headless workers. For scripted fan-out, --exclude-dynamic-system-prompt-sections moves cwd, env, memory paths and git status out of the system prompt (flag confirmed in 2.1.295 --help). Codex: keep AGENTS.md stable; how Codex places it in the cache prefix was not verified at 0.161.0."
+    },
+    {
+     "title": "Lessons from building Claude Code: Prompt caching is everything",
+     "url": "https://claude.com/blog/lessons-from-building-claude-code-prompt-caching-is-everything",
+     "published": "2026-04-30",
+     "fetched_utc": "2026-10-09T13:47:58Z",
+     "sha256": "3fb13790e6794e02ff6cb32ddd2d92c6485512cc639f5c298bdb2026ecb60edf",
+     "practice": "Run any side computation over an existing conversation (compaction, summarization, skill execution) with the parent's identical cache-relevant parameters, so it reuses the parent's cached prefix instead of re-sending the transcript at the uncached rate.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "claude-code",
+     "native_mechanism": "Claude Code: `claude -p --resume <id> --fork-session` (flag confirmed in 2.1.295 --help) with the parent's model, settings, tools and system-prompt flags unchanged, and the side task as the new user message. Whether this path gets cache hits on the parent prefix in 2.1.295 is not verified. Codex: not verified."
+    },
+    {
+     "title": "Lessons from building Claude Code: Prompt caching is everything",
+     "url": "https://claude.com/blog/lessons-from-building-claude-code-prompt-caching-is-everything",
+     "published": "2026-04-30",
+     "fetched_utc": "2026-10-09T13:47:58Z",
+     "sha256": "3fb13790e6794e02ff6cb32ddd2d92c6485512cc639f5c298bdb2026ecb60edf",
+     "practice": "Treat the prompt-cache hit rate as an operational health signal: alert on cache breaks and handle them as incidents, because small miss-rate changes move cost and latency.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "client-agnostic",
+     "native_mechanism": "Claude Code: native OTel metric claude_code.token.usage, whose type label (cacheRead, cacheCreation, input, output) is present now in the local Prometheus as claude_code_token_usage_tokens_total. Add a Prometheus or Grafana alert rule on it (none of the 4 current Prometheus rules mentions cache). Codex: whether cache tokens appear in its OTel export was not verified at 0.161.0."
+    },
+    {
+     "title": "Lessons from building Claude Code: Prompt caching is everything",
+     "url": "https://claude.com/blog/lessons-from-building-claude-code-prompt-caching-is-everything",
+     "published": "2026-04-30",
+     "fetched_utc": "2026-10-09T13:47:58Z",
+     "sha256": "3fb13790e6794e02ff6cb32ddd2d92c6485512cc639f5c298bdb2026ecb60edf",
+     "practice": "Keep the tool set fixed for the whole session and represent mode changes such as plan mode as tool calls plus a system message, not as a swap of the tool set, because any tool change invalidates the cached prefix.",
+     "relation": "agrees",
+     "evidence_kind": "asserted",
+     "clients": "claude-code",
+     "native_mechanism": "Claude Code: native plan mode (EnterPlanMode and ExitPlanMode tools, toggled by the user or called by the model). Plugins and MCP servers are enabled at launch, not toggled mid-session, and the tools of custom MCP servers and skills are designed so modes are tool calls, not tool-list changes. Codex: not verified."
+    }
+   ],
+   "primary_sources_total": 6
   },
   {
    "id": "output-compression",
@@ -374,14 +768,89 @@
    "overturn_when": "A paired same-task run shows a tool at quality parity with a measured saving; it then becomes the default for the mechanism it covers.",
    "supersedes": [
     "M35 (pin and proxy facts moved)"
-   ]
+   ],
+   "primary_sources": [
+    {
+     "title": "Introducing advanced tool use on the Claude Developer Platform \\ Anthropic",
+     "url": "https://www.anthropic.com/engineering/advanced-tool-use",
+     "published": "2025-11-24 (page reads \"Published Nov 24, 2025\"; JSON-LD datePublished 2025-11-24T00:00:00.000Z)",
+     "fetched_utc": "2026-10-09T13:48:02Z",
+     "sha256": "2b8e532e21eb3929bcf0f64e37fce0d378beafad2debddfe16023efcafbc2722",
+     "practice": "Let the model orchestrate many or dependent tool calls in code that filters and aggregates results, so only the final output enters context. Anthropic reports 37% fewer tokens and small accuracy gains (knowledge retrieval 25.6% to 28.5%, GIA 46.5% to 51.2%).",
+     "relation": "extends",
+     "evidence_kind": "measured",
+     "clients": "both",
+     "native_mechanism": "Claude Code: a Bash or Python script that calls the tools and prints only the derived answer, subagents for large reads, and saved Workflows whose script holds intermediate results. A client-level Programmatic Tool Calling equivalent is not verified. Codex: code mode (code_mode_host stable/true on 0.161.0)."
+    },
+    {
+     "title": "Using Claude Code: session management and 1M context | Claude by Anthropic",
+     "url": "https://claude.com/blog/using-claude-code-session-management-and-1m-context",
+     "published": "2026-04-15",
+     "fetched_utc": "2026-10-09T13:48:02Z",
+     "sha256": "462a9190a99f72661001047a757c46a5c81382e26009ff4a988f133d81194b4a",
+     "practice": "Delegate a step to a subagent when its intermediate output will not be needed again and only the conclusion will, so the tool noise stays in the child's fresh context and only its report returns. Examples are codebase search, verification and doc writing.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "claude-code",
+     "native_mechanism": "Claude Code: subagents spawned with the Agent tool (each with its own fresh context window), including file-based definitions in .claude/agents. Codex: not stated by the source."
+    },
+    {
+     "title": "Introducing advanced tool use on the Claude Developer Platform \\ Anthropic",
+     "url": "https://www.anthropic.com/engineering/advanced-tool-use",
+     "published": "2025-11-24 (page reads \"Published Nov 24, 2025\"; JSON-LD datePublished 2025-11-24T00:00:00.000Z)",
+     "fetched_utc": "2026-10-09T13:48:02Z",
+     "sha256": "2b8e532e21eb3929bcf0f64e37fce0d378beafad2debddfe16023efcafbc2722",
+     "practice": "Code-side processing helps most with large data needing only aggregates, multi-step dependent calls, pre-filtering and parallel fan-out. It helps less for single quick calls, and when the model must see and reason over every intermediate result.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "both",
+     "native_mechanism": "Claude Code: choosing between a direct tool call (full output in context, bounded by BASH_MAX_OUTPUT_LENGTH) and a script or subagent that returns a summary. Codex: choosing between direct tool calls and code mode."
+    },
+    {
+     "title": "Building a C compiler with a team of parallel Claudes",
+     "url": "https://www.anthropic.com/engineering/building-c-compiler",
+     "published": "2026-02-05",
+     "fetched_utc": "2026-10-09T13:50:42Z",
+     "sha256": "c73835c13c67fbe675caddc90cbf0cd8b52c99a218815bc908c130e62ccaa8dc",
+     "practice": "Design test-harness output for the agent's context window. Print only a few lines, log details to a file, put ERROR and its reason on one grep-able line, and precompute aggregate statistics.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "client-agnostic",
+     "native_mechanism": "The verification script's own output contract. In Claude Code it is called from Bash or a Stop-hook command and stays within native output bounds; in Codex it is called from the test commands in AGENTS.md."
+    },
+    {
+     "title": "Code execution with MCP: building more efficient AI agents \\ Anthropic",
+     "url": "https://www.anthropic.com/engineering/code-execution-with-mcp",
+     "published": "2025-11-04",
+     "fetched_utc": "2026-10-09T13:49:52Z",
+     "sha256": "e45c22c8d1e5f607a15156273d64633719a67fff59c8e0fed8cbf5514b9333a7",
+     "practice": "Filter, aggregate or join large tool results in code inside the execution environment, and return only the derived subset to the model.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "both",
+     "native_mechanism": "Claude Code: a Bash script (python, jq) that reads the data, or an MCP result saved to a file over 25,000 tokens, and prints only the answer; or a subagent for the large read. Codex: the shell / unified_exec tool running the same kind of script."
+    },
+    {
+     "title": "Equipping agents for the real world with Agent Skills",
+     "url": "https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills",
+     "published": "2025-10-16",
+     "fetched_utc": "2026-10-09T13:50:35Z",
+     "sha256": "5c8a8edbb3fb6b89003c9251c9316692043f0c6d82a8fcf35d8c1b5683e252fa",
+     "practice": "Put deterministic or bulk operations into scripts bundled with the skill, which the agent runs without loading the script or its input data into context, for efficiency and repeatable results.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "both",
+     "native_mechanism": "Claude Code: a script bundled in the skill directory and run through the Bash tool, with only its output entering context. Codex: a script bundled in an .agents/skills skill and run through the shell tool."
+    }
+   ],
+   "primary_sources_total": 8
   },
   {
    "id": "skills-library",
    "layer_id": "instructions-skills",
    "status": "default",
    "default": "Native Agent Skills at personal scope, filled from the pinned vendor manifest (adoption/skills/manifest.json) and governed by `skillOverrides`, `skillListingBudgetFraction` and `/skill-doctor`",
-   "route": "Claude Code discovers nested `<subdir>/.claude/skills` (at start or lazily) and names clashes `<dir>:<name>`; Codex reads `<dir>/.agents/skills` only from the project root down to its working directory",
+   "route": "Claude Code discovers nested `<subdir>/.claude/skills` (at start or lazily) and names clashes `<dir>:<name>`; Codex reads `<dir>/.agents/skills` only from the project root down to its working directory Skill evaluation [read 2026-10-09]: run each test case with and without the skill (or against its previous version), each in a clean context: a fresh subagent per run in Claude Code, `codex exec --ephemeral` in Codex (agentskills.io, evaluating skills).",
    "alternatives": [
     "anthropics/claude-plugins-official",
     "anthropics/skills content (a blinded comparison is owed before any re-rule)",
@@ -403,7 +872,82 @@
    "supersedes": [
     "M9 (judge still defaults to haiku)",
     "M23 (disable-model-invocation documented)"
-   ]
+   ],
+   "primary_sources": [
+    {
+     "title": "Improving skill-creator: Test, measure, and refine Agent Skills | Claude by Anthropic",
+     "url": "https://claude.com/blog/improving-skill-creator-test-measure-and-refine-agent-skills",
+     "published": "2026-03-03",
+     "fetched_utc": "2026-10-09T13:50:43Z",
+     "sha256": "53d9c856a5c61baa79c79f5cb83255fdd29986bb0b17cfc6578589f448638a6e",
+     "practice": "Skill evals should be re-run whenever the model or its surrounding infrastructure changes, to catch quality regressions before they affect real work.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "both",
+     "native_mechanism": "Claude Code: skill-creator benchmark mode, started by the release-tracking trackers (the host upstream surface watch or catalog-freshness.yml) or by a systemd --user timer running `claude -p` with explicit settings. Codex: none verified; Codex model releases would need the same trigger, with the eval run from the Claude side."
+    },
+    {
+     "title": "Improving skill-creator: Test, measure, and refine Agent Skills | Claude by Anthropic",
+     "url": "https://claude.com/blog/improving-skill-creator-test-measure-and-refine-agent-skills",
+     "published": "2026-03-03",
+     "fetched_utc": "2026-10-09T13:50:43Z",
+     "sha256": "53d9c856a5c61baa79c79f5cb83255fdd29986bb0b17cfc6578589f448638a6e",
+     "practice": "A capability-uplift skill should be retired once the base model passes its evals without the skill loaded, because its techniques have become default model behavior.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "both",
+     "native_mechanism": "Claude Code: the skill-creator with-skill versus without-skill benchmark, then `skillOverrides` to turn the skill off. Codex: the manifest's codex_enabled flag or the Codex skills config entry; no native eval verified."
+    },
+    {
+     "title": "Improving skill-creator: Test, measure, and refine Agent Skills | Claude by Anthropic",
+     "url": "https://claude.com/blog/improving-skill-creator-test-measure-and-refine-agent-skills",
+     "published": "2026-03-03",
+     "fetched_utc": "2026-10-09T13:50:43Z",
+     "sha256": "53d9c856a5c61baa79c79f5cb83255fdd29986bb0b17cfc6578589f448638a6e",
+     "practice": "Eval runs should execute in parallel, each in an independent agent with a clean context and its own token and timing metrics, so that context accumulated in one run cannot contaminate another.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "claude-code",
+     "native_mechanism": "Claude Code: subagents spawned by skill-creator (or separate `claude -p` sessions, or a saved Workflow fanning out arms), each arm with its own context and metrics."
+    },
+    {
+     "title": "Improving skill-creator: Test, measure, and refine Agent Skills | Claude by Anthropic",
+     "url": "https://claude.com/blog/improving-skill-creator-test-measure-and-refine-agent-skills",
+     "published": "2026-03-03",
+     "fetched_utc": "2026-10-09T13:50:43Z",
+     "sha256": "53d9c856a5c61baa79c79f5cb83255fdd29986bb0b17cfc6578589f448638a6e",
+     "practice": "Skills should be classed as capability-uplift or encoded-preference, because uplift skills need checks for whether the model has outgrown them and preference skills need checks for fidelity to the actual workflow.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "both",
+     "native_mechanism": "Claude Code and Codex: a field on each entry in the pinned vendor manifest (adoption/skills/manifest.json); the eval runs use skill-creator on Claude Code. No Codex-native classification feature."
+    },
+    {
+     "title": "Steering Claude Code: when to use CLAUDE.md, skills, hooks, and subagents | Claude by Anthropic",
+     "url": "https://claude.com/blog/steering-claude-code-skills-hooks-rules-subagents-and-more",
+     "published": "2026-06-18",
+     "fetched_utc": "2026-10-09T13:48:01Z",
+     "sha256": "e71c2190f0d2db85d7a574e760368671175aba61c2e84698a3b8a918dceed089",
+     "practice": "After compaction, invoked skills come back only up to a shared token budget, and the oldest invoked skills drop first, so a long session that invokes many skills can lose earlier procedures.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "claude-code",
+     "native_mechanism": "Claude Code: skill re-injection on compaction under a shared budget across invoked skills"
+    },
+    {
+     "title": "The AI-native SDLC playbook",
+     "url": "https://claude.com/blog/the-ai-native-sdlc-playbook",
+     "published": "2026-08-21",
+     "fetched_utc": "2026-10-09T13:48:02Z",
+     "sha256": "76fb2ae32301b1cde4e0a686a1872bbe5c835cb91b7b33dc7b798a92bc429a8a",
+     "practice": "Regression-test agent configuration with an eval suite of 20 to 50 real tasks. Run it headless in CI on a schedule and on any change to CLAUDE.md, skills or hooks, gate changes that lower the pass rate, and add an eval for every incident.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "claude-code",
+     "native_mechanism": "Claude Code (page example): `claude -p` with --allowedTools and --output-format json per eval, in a GitHub workflow triggered on paths CLAUDE.md and .claude/** plus a nightly cron. Under our selection rule, promptfoo 0.124.0 or the skill-creator benchmark would carry the checks."
+    }
+   ],
+   "primary_sources_total": 40
   },
   {
    "id": "plugin-marketplaces",
@@ -427,7 +971,46 @@
    "supersedes": [
     "M8 answered (no sha on marketplace sources)",
     "R56 reaffirmed"
-   ]
+   ],
+   "primary_sources": [
+    {
+     "title": "Plugins",
+     "url": "https://developers.openai.com/codex/plugins",
+     "published": "unknown",
+     "fetched_utc": "2026-10-09T13:54:09Z",
+     "sha256": "edd34c3c68a36da86d1883d24568e3500627c2853648158d2b4cc3db48bf89f5",
+     "practice": "After installing a plugin from a marketplace, start a fresh session before relying on its bundled skills or tools, because they only load into new sessions.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "both",
+     "native_mechanism": "Codex: a fresh CLI session after `codex plugin add`. Claude Code: restart after install or update (`claude plugin update` help says \"restart required to apply\", observed now), or `/reload-plugins` (documented in repo records adoption/skills/lifecycle.md:167 and adoption/bootstrap.md:714, not checked on 2.1.295 in this session)."
+    },
+    {
+     "title": "Plugins",
+     "url": "https://developers.openai.com/codex/plugins",
+     "published": "unknown",
+     "fetched_utc": "2026-10-09T13:54:09Z",
+     "sha256": "edd34c3c68a36da86d1883d24568e3500627c2853648158d2b4cc3db48bf89f5",
+     "practice": "The Codex CLI plugin browser groups plugins by marketplace and lets you turn an installed plugin on or off without uninstalling it.",
+     "relation": "not-covered",
+     "evidence_kind": "asserted",
+     "clients": "both",
+     "native_mechanism": "Codex: /plugins browser with a Space toggle. Claude Code: `claude plugin enable` and `disable`, plus `claude plugin details` showing component inventory and projected token cost (all observed in the 2.1.295 help)."
+    },
+    {
+     "title": "Plugins",
+     "url": "https://developers.openai.com/codex/plugins",
+     "published": "unknown",
+     "fetched_utc": "2026-10-09T13:54:09Z",
+     "sha256": "edd34c3c68a36da86d1883d24568e3500627c2853648158d2b4cc3db48bf89f5",
+     "practice": "A plugin is the unit that packages reusable workflow capability, bundling skills and MCP servers (and optionally hooks and browser extensions) for install from a shared directory.",
+     "relation": "agrees",
+     "evidence_kind": "asserted",
+     "clients": "both",
+     "native_mechanism": "Codex: plugins installed with `codex plugin add` from a configured marketplace, or with /plugins in the CLI (observed in the 0.161.0 help). Claude Code: native plugins that bundle skills, agents, hooks and MCP servers, installed with `claude plugin install <plugin>@<marketplace>` (observed in the 2.1.295 help)."
+    }
+   ],
+   "primary_sources_total": 3
   },
   {
    "id": "output-styles",
@@ -450,7 +1033,22 @@
    "overturn_when": "M19's paired run shows Concise at quality parity with a measured saving.",
    "supersedes": [
     "M19 (runs on 2.1.295)"
-   ]
+   ],
+   "primary_sources": [
+    {
+     "title": "Steering Claude Code: when to use CLAUDE.md, skills, hooks, and subagents | Claude by Anthropic",
+     "url": "https://claude.com/blog/steering-claude-code-skills-hooks-rules-subagents-and-more",
+     "published": "2026-06-18",
+     "fetched_utc": "2026-10-09T13:48:01Z",
+     "sha256": "e71c2190f0d2db85d7a574e760368671175aba61c2e84698a3b8a918dceed089",
+     "practice": "A custom output style replaces the default software-engineering instructions, including verification habits such as running tests before declaring work complete, unless keep-coding-instructions: true is set, so check the built-in styles first.",
+     "relation": "agrees",
+     "evidence_kind": "asserted",
+     "clients": "claude-code",
+     "native_mechanism": "Claude Code: built-in output styles; keep-coding-instructions: true in a custom style's frontmatter"
+    }
+   ],
+   "primary_sources_total": 1
   },
   {
    "id": "commands",
@@ -471,7 +1069,22 @@
     "skills-O9 (2.1.286 verify)"
    ],
    "overturn_when": "A release separates commands from skills again.",
-   "supersedes": []
+   "supersedes": [],
+   "primary_sources": [
+    {
+     "title": "Plugins",
+     "url": "https://developers.openai.com/codex/plugins",
+     "published": "unknown",
+     "fetched_utc": "2026-10-09T13:54:09Z",
+     "sha256": "edd34c3c68a36da86d1883d24568e3500627c2853648158d2b4cc3db48bf89f5",
+     "practice": "Invoke a plugin or one of its bundled skills explicitly by name when you need that specific one, rather than leaving the choice to the model.",
+     "relation": "agrees",
+     "evidence_kind": "asserted",
+     "clients": "both",
+     "native_mechanism": "Codex/ChatGPT: an @ mention of the plugin or skill. Claude Code: an explicit slash invocation of the skill, namespaced as /<plugin>:<skill> for plugin skills (for example /context-mode:ctx-doctor in repo records). Otherwise the model invokes skills from their descriptions."
+    }
+   ],
+   "primary_sources_total": 1
   },
   {
    "id": "practice-references",
@@ -514,7 +1127,58 @@
    ],
    "notes": "Four host copies differ from adoption/agents/claude and four host-only definitions exist (G6b). Portability: the user-scope copies run in other projects, where 4 are stale and 4 of 11 bodies point at native-agent-stack-only paths; the north star needs repository-neutral bodies before relying on them.",
    "overturn_when": "A release changes definition scope or priority, or a measured role-quality gap.",
-   "supersedes": []
+   "supersedes": [],
+   "primary_sources": [
+    {
+     "title": "Patterns and problems in emerging multiagent systems",
+     "url": "https://www.anthropic.com/research/multiagent-systems",
+     "published": "2026-08-13",
+     "fetched_utc": "2026-10-09T13:50:01Z",
+     "sha256": "a1557d5f0dce083c5e37e1e11dbd6e3dd191f79bf4aca85f38f6b6ab81da2757",
+     "practice": "Models know in principle that sources have incentives and that consensus is not evidence, but they do not act on it unless prompted. In the experiments, listeners were never told a source might lie, and groups underweighted a member's decisive private facts. Hidden-profile accuracy rose with model capability but did not saturate (n=400 episodes per model).",
+     "relation": "extends",
+     "evidence_kind": "measured",
+     "clients": "both",
+     "native_mechanism": "Claude Code: the bodies of reviewer, arbiter and coordinator subagent definitions in `.claude/agents` (installed to ~/.claude/agents), plus skill text. Codex: AGENTS.md and the multi_agent subagent brief."
+    },
+    {
+     "title": "Steering Claude Code: when to use CLAUDE.md, skills, hooks, and subagents | Claude by Anthropic",
+     "url": "https://claude.com/blog/steering-claude-code-skills-hooks-rules-subagents-and-more",
+     "published": "2026-06-18",
+     "fetched_utc": "2026-10-09T13:48:01Z",
+     "sha256": "e71c2190f0d2db85d7a574e760368671175aba61c2e84698a3b8a918dceed089",
+     "practice": "Put a side task in a subagent when its intermediate results would clutter the main conversation and will not be referenced again; keep it a skill when the user needs to see and steer each step in the main thread.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "claude-code",
+     "native_mechanism": "Claude Code: subagent definitions in .claude/agents invoked through the Agent tool (isolated context; only the final message returns); skills for in-thread procedures"
+    },
+    {
+     "title": "Building a C compiler with a team of parallel Claudes",
+     "url": "https://www.anthropic.com/engineering/building-c-compiler",
+     "published": "2026-02-05",
+     "fetched_utc": "2026-10-09T13:50:42Z",
+     "sha256": "c73835c13c67fbe675caddc90cbf0cd8b52c99a218815bc908c130e62ccaa8dc",
+     "practice": "Use parallelism for specialization: run standing quality roles beside the builders. Examples are an agent that coalesces duplicate code (which LLM-written code tends to produce), a performance agent, a design critic that restructures the code, and a documentation agent.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "both",
+     "native_mechanism": "Claude Code: file-based subagent definitions in .claude/agents (tools, model and effort per role), run as Workflow stages or teammates. Codex: separate `codex exec` lanes with a role prompt and AGENTS.md."
+    },
+    {
+     "title": "Subagents | ChatGPT Learn",
+     "url": "https://developers.openai.com/codex/subagents",
+     "published": "unknown",
+     "fetched_utc": "2026-10-09T13:50:32Z",
+     "sha256": "51853f9d8e1cd7cf458a0a7a922744d53df5bc8c943c6b1936b04ab673e1140b",
+     "practice": "Define custom agents as narrow, opinionated roles, each with one clear job, a tool surface (MCP servers, sandbox mode, skills) that fits that job, and instructions that keep it out of adjacent work, such as read-only explorers and reviewers.",
+     "relation": "agrees",
+     "evidence_kind": "asserted",
+     "clients": "both",
+     "native_mechanism": "Claude Code: project-scope .claude/agents definitions with description, tools allowlist, model, effort and a system-prompt body. Codex: project-scope .codex/agents/*.toml with name, description and developer_instructions, plus model, model_reasoning_effort, sandbox_mode, mcp_servers and skills.config."
+    }
+   ],
+   "primary_sources_total": 4
   },
   {
    "id": "agent-teams",
@@ -539,7 +1203,34 @@
    "overturn_when": "A paired run shows teams lose quality or cost more for the same work, or the feature leaves experimental status with changed semantics.",
    "supersedes": [
     "R50 effort clause"
-   ]
+   ],
+   "primary_sources": [
+    {
+     "title": "Patterns and problems in emerging multiagent systems",
+     "url": "https://www.anthropic.com/research/multiagent-systems",
+     "published": "2026-08-13",
+     "fetched_utc": "2026-10-09T13:50:01Z",
+     "sha256": "a1557d5f0dce083c5e37e1e11dbd6e3dd191f79bf4aca85f38f6b6ab81da2757",
+     "practice": "On open-ended discovery work that splits easily into parallel parts (vulnerability hunting), a long-running swarm with a shared forum, peer review and a separate arbiter found mostly different findings from independent agents assigned to fixed code sections. Inside the shared core directories, the two cost about the same tokens per finding.",
+     "relation": "extends",
+     "evidence_kind": "measured",
+     "clients": "claude-code",
+     "native_mechanism": "Claude Code: native agent teams (shared task list and teammate messaging) with a separate arbiter subagent that rules each finding new and valid; partitioned subagents or a Workflow fan-out as the comparison arm. Codex: no stable shared channel (agent_message_board is under development and disabled in 0.161.0), so only the partitioned arm is native there, via multi_agent subagents."
+    },
+    {
+     "title": "Patterns and problems in emerging multiagent systems",
+     "url": "https://www.anthropic.com/research/multiagent-systems",
+     "published": "2026-08-13",
+     "fetched_utc": "2026-10-09T13:50:01Z",
+     "sha256": "a1557d5f0dce083c5e37e1e11dbd6e3dd191f79bf4aca85f38f6b6ab81da2757",
+     "practice": "Agents work together efficiently when they call each other like tools, with a defined prompt in and a response or artifact back. They stumble when they treat each other as long-lived peers with no clear hierarchy.",
+     "relation": "agrees",
+     "evidence_kind": "asserted",
+     "clients": "both",
+     "native_mechanism": "Claude Code: subagents through the Agent tool or a Workflow stage, where the lead sends a prompt and gets a returned result. Codex: native multi_agent subagents (stable and enabled in codex-cli 0.161.0, observed via `codex features list`)."
+    }
+   ],
+   "primary_sources_total": 2
   },
   {
    "id": "background-workflows",
@@ -563,14 +1254,65 @@
    "overturn_when": "A release changes Workflow resume or limits, or a measured failure mode on our runs.",
    "supersedes": [
     "R52 Ultracode clause"
-   ]
+   ],
+   "primary_sources": [
+    {
+     "title": "A harness for every task: dynamic workflows in Claude Code",
+     "url": "https://claude.com/blog/a-harness-for-every-task-dynamic-workflows-in-claude-code",
+     "published": "2026-06-02",
+     "fetched_utc": "2026-10-09T13:48:00Z",
+     "sha256": "3203a50099e2c21213e32a028b7cc1f669ffebd43abbee297b30f7acaeb9ea46",
+     "practice": "Pair each agent that produces output with a separate agent that adversarially checks that output against a rubric or criteria.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "claude-code",
+     "native_mechanism": "Claude Code: a Workflow stage that spawns a verifier agent() for each producer agent and gives it an explicit rubric"
+    },
+    {
+     "title": "A harness for every task: dynamic workflows in Claude Code",
+     "url": "https://claude.com/blog/a-harness-for-every-task-dynamic-workflows-in-claude-code",
+     "published": "2026-06-02",
+     "fetched_utc": "2026-10-09T13:48:00Z",
+     "sha256": "3203a50099e2c21213e32a028b7cc1f669ffebd43abbee297b30f7acaeb9ea46",
+     "practice": "Save a useful workflow run as a reusable workflow and share it by putting the JavaScript file in a skill folder referenced from SKILL.md, telling Claude to treat it as a template rather than a script to run verbatim.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "claude-code",
+     "native_mechanism": "Claude Code: press 's' in the workflow menu to save to ~/.claude/workflows; a skill (SKILL.md plus bundled .js workflow files) to distribute"
+    },
+    {
+     "title": "Building Effective AI Agents \\ Anthropic",
+     "url": "https://www.anthropic.com/research/building-effective-agents",
+     "published": "2024-12-19",
+     "fetched_utc": "2026-10-09T13:50:31Z",
+     "sha256": "a9f34f8e8471f70c1511ce2f55e55b8b68be2a398e5b893c16a9723bec7f2133",
+     "practice": "In a chain of model calls, put programmatic checks (gates) on intermediate outputs so the process stops or corrects course before bad output moves forward.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "both",
+     "native_mechanism": "Claude Code: a deterministic check step between agent stages in a saved Workflow script, or a Stop hook in the stage agent's frontmatter (runs as SubagentStop). Codex: a script that runs codex exec stages with a check between them; no native chaining surface verified."
+    },
+    {
+     "title": "Steering Claude Code: when to use CLAUDE.md, skills, hooks, and subagents | Claude by Anthropic",
+     "url": "https://claude.com/blog/steering-claude-code-skills-hooks-rules-subagents-and-more",
+     "published": "2026-06-18",
+     "fetched_utc": "2026-10-09T13:48:01Z",
+     "sha256": "e71c2190f0d2db85d7a574e760368671175aba61c2e84698a3b8a918dceed089",
+     "practice": "Dynamic workflows scale orchestration to many background agents by keeping the plan and intermediate results in script variables instead of the model's context window.",
+     "relation": "agrees",
+     "evidence_kind": "asserted",
+     "clients": "claude-code",
+     "native_mechanism": "Claude Code: dynamic Workflows (Workflow tool) orchestrating background subagents"
+    }
+   ],
+   "primary_sources_total": 4
   },
   {
    "id": "orchestration-frameworks",
    "layer_id": "workers",
    "status": "default",
    "default": "Native composition without a framework layer: subagent definitions, Workflows, agent teams, background sessions and cross-session messaging",
-   "route": "Choose by who coordinates, whether workers talk and whether files overlap (agents.md); recipes from a framework enter only as skill content through native extension points",
+   "route": "Choose by who coordinates, whether workers talk and whether files overlap (agents.md); recipes from a framework enter only as skill content through native extension points Cost test [read 2026-10-09]: a single session stays the default for ordinary coding; fan out to a Workflow, a team or a reviewer panel only when parallelism or specialization earns its coordination and token cost (dynamic workflows post), and remove harness components one at a time at each model release to find which still carry weight (harness-design post, measured).",
    "alternatives": [
     "`/batch` (bundled; one large change across worktree-isolated subagents)",
     "OrchestratorInc/agent-orchestrator in its bounded role for sessions it launches (2026-10-08 decision)"
@@ -588,14 +1330,89 @@
    ],
    "overturn_when": "A paired same-task run shows a framework ahead of native composition on quality at equal or lower cost.",
    "supersedes": [],
-   "notes": "Adjudicated: native composition stands; the refuter upheld it. No framework shows a measured gain on our tasks. Scope: Claude-side composition; Codex lanes compose through hcom (2026-10-06 decision). G5 holds two rows for agent-orchestrator (OrchestratorInc and its former name, one repository id) to reconcile."
+   "notes": "Adjudicated: native composition stands; the refuter upheld it. No framework shows a measured gain on our tasks. Scope: Claude-side composition; Codex lanes compose through hcom (2026-10-06 decision). G5 holds two rows for agent-orchestrator (OrchestratorInc and its former name, one repository id) to reconcile.",
+   "primary_sources": [
+    {
+     "title": "Harness design for long-running application development",
+     "url": "https://www.anthropic.com/engineering/harness-design-long-running-apps",
+     "published": "2026-03-24",
+     "fetched_utc": "2026-10-09T13:48:01Z",
+     "sha256": "fe37bba54ab5f1470a176c43b124968aeac50000037aa913bb215e8cfa3717ca",
+     "practice": "Treat every harness component as an assumption about what the model cannot do. Remove components one at a time to find which are load-bearing, and re-examine the harness when a new model lands.",
+     "relation": "extends",
+     "evidence_kind": "measured",
+     "clients": "both",
+     "native_mechanism": "Claude Code: saved Workflow stages (planner, builder, evaluator) switched off one at a time and compared on paired same-task runs with promptfoo or the skill-creator benchmark. Codex: the same stages run as separate `codex exec` steps."
+    },
+    {
+     "title": "Patterns and problems in emerging multiagent systems",
+     "url": "https://www.anthropic.com/research/multiagent-systems",
+     "published": "2026-08-13",
+     "fetched_utc": "2026-10-09T13:50:01Z",
+     "sha256": "a1557d5f0dce083c5e37e1e11dbd6e3dd191f79bf4aca85f38f6b6ab81da2757",
+     "practice": "Agents that share a model, scaffolding and context act almost identically, so one bad choice repeats across a fan-out and agreement among them is weak evidence. In the source, 18 of 30 agents picked the same branch name, and more than half of a swarm built the same two kinds of project and hit similar failures.",
+     "relation": "extends",
+     "evidence_kind": "measured",
+     "clients": "both",
+     "native_mechanism": "Claude Code: a separate prompt per worker in the Workflow or Agent call (distinct slice, branch, worktree and output path), with per-role model in frontmatter for judging stages. Codex: separate multi_agent subagent briefs, plus `codex review` as a cross-model check."
+    },
+    {
+     "title": "Patterns and problems in emerging multiagent systems",
+     "url": "https://www.anthropic.com/research/multiagent-systems",
+     "published": "2026-08-13",
+     "fetched_utc": "2026-10-09T13:50:01Z",
+     "sha256": "a1557d5f0dce083c5e37e1e11dbd6e3dd191f79bf4aca85f38f6b6ab81da2757",
+     "practice": "Parallel agents competing for a finite shared resource without an agreed protocol flood it: one run had 2.4 million job requests and only 117 accepted. The source suggests a shared forum where agents agree on protocols, and says whether that works depends on prompting and on the model.",
+     "relation": "extends",
+     "evidence_kind": "measured",
+     "clients": "both",
+     "native_mechanism": "Claude Code: the protocol written into the Workflow or coordinator prompt (or a shared skill) that every worker receives, with agent-team messaging as the shared channel. Codex: the same protocol in AGENTS.md, read by every multi_agent subagent and lane."
+    },
+    {
+     "title": "Patterns and problems in emerging multiagent systems",
+     "url": "https://www.anthropic.com/research/multiagent-systems",
+     "published": "2026-08-13",
+     "fetched_utc": "2026-10-09T13:50:01Z",
+     "sha256": "a1557d5f0dce083c5e37e1e11dbd6e3dd191f79bf4aca85f38f6b6ab81da2757",
+     "practice": "Concurrent agents given contradictory goals on one shared target, and unaware of each other, escalated into sabotage with every model tested over four-hour runs (n=120 episodes per model). Delegation should keep concurrent goals compatible and tell agents to stop and defer to a human when goals collide.",
+     "relation": "extends",
+     "evidence_kind": "measured",
+     "clients": "both",
+     "native_mechanism": "Claude Code: the coordinating Workflow or lead session assigns goals, and subagent definitions carry a stop-and-escalate instruction (agent-team members can be gated with TeammateIdle). Codex: AGENTS.md plus the multi_agent subagent briefs."
+    },
+    {
+     "title": "Patterns and problems in emerging multiagent systems",
+     "url": "https://www.anthropic.com/research/multiagent-systems",
+     "published": "2026-08-13",
+     "fetched_utc": "2026-10-09T13:50:01Z",
+     "sha256": "a1557d5f0dce083c5e37e1e11dbd6e3dd191f79bf4aca85f38f6b6ab81da2757",
+     "practice": "In 12-hour game-building runs, giving the swarm prescriptive team roles or a CEO hierarchy made little difference compared with a plain \"form teams\" prompt. The products stayed poor without significant human direction.",
+     "relation": "agrees",
+     "evidence_kind": "measured",
+     "clients": "both",
+     "native_mechanism": "Claude Code: native composition (subagent definitions, Workflows, agent teams) without a role-hierarchy framework layer. Codex: multi_agent subagents briefed through AGENTS.md, with no framework layer."
+    },
+    {
+     "title": "A harness for every task: dynamic workflows in Claude Code",
+     "url": "https://claude.com/blog/a-harness-for-every-task-dynamic-workflows-in-claude-code",
+     "published": "2026-06-02",
+     "fetched_utc": "2026-10-09T13:48:00Z",
+     "sha256": "3203a50099e2c21213e32a028b7cc1f669ffebd43abbee297b30f7acaeb9ea46",
+     "practice": "Do not use multi-agent workflows for routine coding; parallelism and specialization must pay for their coordination and token cost, and most ordinary coding tasks do not need a panel of reviewers.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "client-agnostic",
+     "native_mechanism": "Claude Code: a single session (or one subagent) by default, with the Workflow tool only when the task justifies it; Codex: the source says nothing"
+    }
+   ],
+   "primary_sources_total": 18
   },
   {
    "id": "planning-persistence",
    "layer_id": "workers",
    "status": "default",
    "default": "Repository-resident task state per Anthropic's multi-context-window guidance (a JSON status file, free-text progress notes and git commits, read at session start), with native plan mode for the plan",
-   "route": "One recipe paragraph names the files; set `plansDirectory` at project scope to a path inside the repository (unset, plans go to ~/.claude/plans and are not repository-resident), or copy the approved plan into the state files",
+   "route": "One recipe paragraph names the files; set `plansDirectory` at project scope to a path inside the repository (unset, plans go to ~/.claude/plans and are not repository-resident), or copy the approved plan into the state files Long autonomous builds [read 2026-10-09] start with a planning step that expands the prompt into a deliverable-level spec; execution plans with progress and decision logs are checked into the repository (harness-design post, measured; OpenAI harness-engineering post).",
    "alternatives": [
     "Native Task tools with `CLAUDE_CODE_TASK_LIST_ID`",
     "Native plan mode with `plansDirectory`",
@@ -614,20 +1431,95 @@
    ],
    "overturn_when": "Paired same-task runs on long multi-session tasks, with forced restarts and compaction, show an alternative ahead on quality.",
    "supersedes": [],
-   "notes": "Adjudicated: the Anthropic convention stands; the refuter upheld it."
+   "notes": "Adjudicated: the Anthropic convention stands; the refuter upheld it.",
+   "primary_sources": [
+    {
+     "title": "Harness design for long-running application development",
+     "url": "https://www.anthropic.com/engineering/harness-design-long-running-apps",
+     "published": "2026-03-24",
+     "fetched_utc": "2026-10-09T13:48:01Z",
+     "sha256": "fe37bba54ab5f1470a176c43b124968aeac50000037aa913bb215e8cfa3717ca",
+     "practice": "For an autonomous build from a short prompt, run a planning step first that expands it into an ambitious, deliverable-level product spec. Leave implementation details to the builder so spec errors do not cascade.",
+     "relation": "extends",
+     "evidence_kind": "measured",
+     "clients": "both",
+     "native_mechanism": "Claude Code: native plan mode, or a planner subagent that writes the spec file into the repository (`plansDirectory` set to a path inside the repository). Codex: a planning `codex exec` turn that writes the spec file the builder reads through AGENTS.md."
+    },
+    {
+     "title": "Best practices for Claude Code - Claude Code Docs",
+     "url": "https://www.anthropic.com/engineering/claude-code-best-practices",
+     "published": "unknown",
+     "fetched_utc": "2026-10-09T13:48:03Z",
+     "sha256": "76832cd2eb01a962b9149231fa480b87df192d6be8c1cda055f56448fac98943",
+     "practice": "Separate exploration and planning from implementation (explore in plan mode, write a plan, implement and verify against it, then commit), but skip planning for small, clear changes and use it when the approach is uncertain, many files change or the code is unfamiliar.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "both",
+     "native_mechanism": "Claude Code: native plan mode (Shift+Tab or claude --permission-mode plan), with Ctrl+G to edit the plan before approval. Codex: no plan-mode equivalent verified on 0.161.0; use a read-only exploration prompt before editing."
+    },
+    {
+     "title": "Best practices for Claude Code - Claude Code Docs",
+     "url": "https://www.anthropic.com/engineering/claude-code-best-practices",
+     "published": "unknown",
+     "fetched_utc": "2026-10-09T13:48:03Z",
+     "sha256": "76832cd2eb01a962b9149231fa480b87df192d6be8c1cda055f56448fac98943",
+     "practice": "For larger features, have Claude interview you and write a self-contained spec (files and interfaces, out-of-scope items, an end-to-end verification step) to a file, then implement it in a fresh session with clean context.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "both",
+     "native_mechanism": "Claude Code: the AskUserQuestion tool for the interview, a SPEC.md file in the repository, then a new session (or /clear) to implement. Codex: a repository spec file read at the start of a new session; an interview tool is not verified."
+    },
+    {
+     "title": "Effective harnesses for long-running agents",
+     "url": "https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents",
+     "published": "2025-11-26 (page states \"Published Nov 26, 2025\"; JSON-LD datePublished 2025-11-26T00:00:00.000Z)",
+     "fetched_utc": "2026-10-09T13:48:01Z",
+     "sha256": "919145986a04e774969a3e628c40dbe4ef33de67881b778efb7e11a0a2484425",
+     "practice": "At the start of each session, the agent gets its bearings: it runs pwd, reads the git log and progress file, reads the feature list and picks the top unfinished feature. It then runs init.sh and a basic end-to-end check, and fixes any broken state before starting new work.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "both",
+     "native_mechanism": "Claude Code: a SessionStart hook (startup, resume and compact matchers) that injects git log -20 and the progress file as context, plus a recipe step to run init.sh and one end-to-end check. Codex: a SessionStart hook in ~/.codex/hooks.json (seen in a repository receipt for 0.159.3, not verified on 0.161.0) or the same startup steps in AGENTS.md."
+    },
+    {
+     "title": "Harness design for long-running application development",
+     "url": "https://www.anthropic.com/engineering/harness-design-long-running-apps",
+     "published": "2026-03-24",
+     "fetched_utc": "2026-10-09T13:48:01Z",
+     "sha256": "fe37bba54ab5f1470a176c43b124968aeac50000037aa913bb215e8cfa3717ca",
+     "practice": "Before building each chunk, the builder proposes what it will build and how success will be verified, and the evaluator reviews it until both agree on testable done criteria. This bridges a high-level spec and checkable behavior.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "both",
+     "native_mechanism": "Claude Code: a contract entry in the repository-resident state file (or a plan in plan mode with `plansDirectory` set inside the repository), written by the builder and reviewed by an evaluator subagent before implementation. Codex: the same repository file, which AGENTS.md tells the session to read and update."
+    },
+    {
+     "title": "Harness engineering: leveraging Codex in an agent-first world",
+     "url": "https://openai.com/index/harness-engineering/",
+     "published": "2026-02-11",
+     "fetched_utc": "2026-10-09T13:50:37Z",
+     "sha256": "163ebbf5f8925c432122231b12f020d4286aa90d587ab85f4614e8cd71d9ad2e",
+     "practice": "Small changes use short-lived lightweight plans; complex work gets execution plans with progress and decision logs, checked into the repository next to completed plans and a technical-debt record.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "both",
+     "native_mechanism": "Codex: execution-plan files checked into the repository (the article's convention). Claude Code: native plan mode with `plansDirectory` set to a path inside the repository, plus the repository-resident status file and progress notes."
+    }
+   ],
+   "primary_sources_total": 9
   },
   {
    "id": "loops-completion",
    "layer_id": "workers",
    "status": "default",
    "default": "Native Stop hook as the completion gate, with `/goal` and the self-paced `/loop` for fitting conditions",
-   "route": "Command type for deterministic checks; prompt type with an explicit model for judged conditions; `stop_hook_active` and the continuation cap bound the loop",
+   "route": "Command type for deterministic checks; prompt type with an explicit model for judged conditions; `stop_hook_active` and the continuation cap bound the loop Evaluator [read 2026-10-09]: the evaluator exercises the running system against explicit criteria with hard thresholds, and runs only where it pays for itself; with a stronger model one pass at the end can replace per-step grading (harness-design post, measured).",
    "alternatives": [
     "`/goal`",
-    "cobusgreyling/loop-engineering patterns as reference"
+    "cobusgreyling/loop-engineering patterns as reference",
+    "Ralph-style headless loops: one fresh `claude -p` or `codex exec` per iteration on the same prompt file (building-c-compiler post; candidate until the planning-persistence paired run)"
    ],
    "rejections": [
-    "Ralph-style bash loops",
     "ralph-loop plugin as the default"
    ],
    "evidence": [
@@ -638,7 +1530,82 @@
    "overturn_when": "A paired run shows a loop pattern catching more real defects at equal cost, or a release changes Stop semantics.",
    "supersedes": [
     "Completion-loops topic (native composition now converged)"
-   ]
+   ],
+   "primary_sources": [
+    {
+     "title": "Harness design for long-running application development",
+     "url": "https://www.anthropic.com/engineering/harness-design-long-running-apps",
+     "published": "2026-03-24",
+     "fetched_utc": "2026-10-09T13:48:01Z",
+     "sha256": "fe37bba54ab5f1470a176c43b124968aeac50000037aa913bb215e8cfa3717ca",
+     "practice": "The evaluator should exercise the running application the way a user would, here through the Playwright MCP, and grade it against explicit criteria that each have a hard threshold. If any criterion falls short, the chunk fails and the builder gets detailed feedback.",
+     "relation": "extends",
+     "evidence_kind": "measured",
+     "clients": "both",
+     "native_mechanism": "Claude Code: a Stop hook (SubagentStop for Workflow children) that blocks and returns the evaluator's per-criterion findings as the reason, with the evaluator subagent given a browser MCP (Playwright) to drive the live app. Codex: an evaluator `codex exec` session with the Playwright MCP configured, whose failing findings go back to the builder."
+    },
+    {
+     "title": "Harness design for long-running application development",
+     "url": "https://www.anthropic.com/engineering/harness-design-long-running-apps",
+     "published": "2026-03-24",
+     "fetched_utc": "2026-10-09T13:48:01Z",
+     "sha256": "fe37bba54ab5f1470a176c43b124968aeac50000037aa913bb215e8cfa3717ca",
+     "practice": "Use the evaluator only where it pays for itself, on tasks beyond what the current model does reliably alone. With a stronger model, one evaluator pass at the end of the run replaced grading after every chunk.",
+     "relation": "extends",
+     "evidence_kind": "measured",
+     "clients": "both",
+     "native_mechanism": "Claude Code: limit the judged Stop hook, or the evaluator stage in a saved Workflow, to task classes at the model's edge, with deterministic command checks always on. Codex: run `codex review` or an evaluator exec pass only for those task classes."
+    },
+    {
+     "title": "Building a C compiler with a team of parallel Claudes",
+     "url": "https://www.anthropic.com/engineering/building-c-compiler",
+     "published": "2026-02-05",
+     "fetched_utc": "2026-10-09T13:50:42Z",
+     "sha256": "c73835c13c67fbe675caddc90cbf0cd8b52c99a218815bc908c130e62ccaa8dc",
+     "practice": "For sustained unattended progress, the author ran a bash loop that starts a fresh headless Claude Code session on the same prompt file each time the previous one ends (a Ralph-loop pattern), so the agent always picks up the next task.",
+     "relation": "contradicts",
+     "evidence_kind": "asserted",
+     "clients": "both",
+     "native_mechanism": "Claude Code: one `claude -p \"$(cat AGENT_PROMPT.md)\"` per iteration with repository-resident state, versus our in-session Stop hook, /goal and /loop. Codex: one `codex exec` per iteration reading AGENTS.md and the state files."
+    },
+    {
+     "title": "A harness for every task: dynamic workflows in Claude Code",
+     "url": "https://claude.com/blog/a-harness-for-every-task-dynamic-workflows-in-claude-code",
+     "published": "2026-06-02",
+     "fetched_utc": "2026-10-09T13:48:00Z",
+     "sha256": "3203a50099e2c21213e32a028b7cc1f669ffebd43abbee297b30f7acaeb9ea46",
+     "practice": "When the amount of work is unknown, keep spawning agents until a stop condition holds (for example no new findings, or no errors left in the logs) rather than running a fixed number of passes.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "claude-code",
+     "native_mechanism": "Claude Code: a loop inside a Workflow script that spawns agent() calls until a data-defined stop condition holds"
+    },
+    {
+     "title": "The AI-native SDLC playbook",
+     "url": "https://claude.com/blog/the-ai-native-sdlc-playbook",
+     "published": "2026-08-21",
+     "fetched_utc": "2026-10-09T13:48:02Z",
+     "sha256": "76fb2ae32301b1cde4e0a686a1872bbe5c835cb91b7b33dc7b798a92bc429a8a",
+     "practice": "Run the final completion check as a report-only verifier subagent in a fresh context once the session believes it is done. Keep it separate from the in-task test loop so the verdict is not colored by the assumptions that produced the code.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "claude-code",
+     "native_mechanism": "Claude Code: a file-based subagent in .claude/agents (the page's verifier.md: tools Bash and Read; runs the app, reports mismatches against plan.md and fixes nothing). It runs before the Stop gate lets the session finish. For Workflow children, a Stop hook goes in the agent frontmatter and runs as SubagentStop."
+    },
+    {
+     "title": "Building a C compiler with a team of parallel Claudes",
+     "url": "https://www.anthropic.com/engineering/building-c-compiler",
+     "published": "2026-02-05",
+     "fetched_utc": "2026-10-09T13:50:42Z",
+     "sha256": "c73835c13c67fbe675caddc90cbf0cd8b52c99a218815bc908c130e62ccaa8dc",
+     "practice": "Because an autonomous agent solves whatever its verifier checks, make the verifier nearly perfect. Add tests for each failure mode you see, and enforce a CI gate so new commits cannot break existing functionality.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "both",
+     "native_mechanism": "Claude Code: a command-type Stop hook (TeammateIdle for team members, a frontmatter Stop hook for Workflow children) that runs the regression suite, plus a required CI check. Codex: test commands named in AGENTS.md plus the same required CI check."
+    }
+   ],
+   "primary_sources_total": 16
   },
   {
    "id": "scheduled-tasks",
@@ -663,7 +1630,22 @@
    ],
    "overturn_when": "A native scheduler survives a host restart with catch-up, or the systemd run fails where a native one passes.",
    "supersedes": [],
-   "notes": "Adjudicated: systemd stands (refuter pending at writing). Owed: a `claude -p` run started by a systemd timer across a WSL restart. Verified: on WSL2 the timers outlast sessions and terminal closes but not the distro; after a shutdown nothing fires until the distro starts, and missed runs catch up only with `Persistent=true` (token-report-refresh lacks it)."
+   "notes": "Adjudicated: systemd stands (refuter pending at writing). Owed: a `claude -p` run started by a systemd timer across a WSL restart. Verified: on WSL2 the timers outlast sessions and terminal closes but not the distro; after a shutdown nothing fires until the distro starts, and missed runs catch up only with `Persistent=true` (token-report-refresh lacks it).",
+   "primary_sources": [
+    {
+     "title": "Harness engineering: leveraging Codex in an agent-first world",
+     "url": "https://openai.com/index/harness-engineering/",
+     "published": "2026-02-11",
+     "fetched_utc": "2026-10-09T13:50:37Z",
+     "sha256": "163ebbf5f8925c432122231b12f020d4286aa90d587ab85f4614e8cd71d9ad2e",
+     "practice": "Fight agent-replicated drift with garbage collection: encode 'golden principles' in the repository and run recurring background agent tasks that scan for deviations, update quality grades and open small, targeted refactoring PRs. A recurring doc-gardening agent likewise fixes docs that no longer match the code.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "both",
+     "native_mechanism": "Codex: recurring background Codex tasks (as described). Claude Code: a systemd --user timer running a bounded `claude -p` with explicit settings, or a GitHub Actions schedule running anthropics/claude-code-action for repository jobs."
+    }
+   ],
+   "primary_sources_total": 1
   },
   {
    "id": "mcp-config-tool-search",
@@ -687,7 +1669,82 @@
    "overturn_when": "A measured context or quality gap from deferral, or a release changes tool-search defaults.",
    "supersedes": [
     "topic: MCP tool loading (native deferral converged)"
-   ]
+   ],
+   "primary_sources": [
+    {
+     "title": "Introducing advanced tool use on the Claude Developer Platform \\ Anthropic",
+     "url": "https://www.anthropic.com/engineering/advanced-tool-use",
+     "published": "2025-11-24 (page reads \"Published Nov 24, 2025\"; JSON-LD datePublished 2025-11-24T00:00:00.000Z)",
+     "fetched_utc": "2026-10-09T13:48:02Z",
+     "sha256": "2b8e532e21eb3929bcf0f64e37fce0d378beafad2debddfe16023efcafbc2722",
+     "practice": "Defer MCP and other tool definitions and let the model find them on demand through a search tool, instead of loading every definition upfront. Anthropic reports this cuts context use and raises tool-selection accuracy on large tool libraries.",
+     "relation": "agrees",
+     "evidence_kind": "measured",
+     "clients": "both",
+     "native_mechanism": "Claude Code: native MCP tool search (MCP tools deferred by default, loaded through the ToolSearch tool; ENABLE_TOOL_SEARCH=true behind a non-first-party base URL). Codex: deferred MCP tools via tool search (codex features list shows tool_search_always_defer_mcp_tools removed/true on 0.161.0)."
+    },
+    {
+     "title": "Introducing advanced tool use on the Claude Developer Platform \\ Anthropic",
+     "url": "https://www.anthropic.com/engineering/advanced-tool-use",
+     "published": "2025-11-24 (page reads \"Published Nov 24, 2025\"; JSON-LD datePublished 2025-11-24T00:00:00.000Z)",
+     "fetched_utc": "2026-10-09T13:48:02Z",
+     "sha256": "2b8e532e21eb3929bcf0f64e37fce0d378beafad2debddfe16023efcafbc2722",
+     "practice": "Search matches tool names and descriptions, so give tools clear, distinct, descriptive definitions. Also tell the model in its system prompt which capability areas exist and that it should search for them.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "both",
+     "native_mechanism": "Claude Code: each MCP server's instructions field (shown in the system prompt) plus the deferred-tool name list. Skill description frontmatter does the same job for skill discovery. Codex: AGENTS.md capability lines and MCP server tool descriptions."
+    },
+    {
+     "title": "Code execution with MCP: building more efficient AI agents \\ Anthropic",
+     "url": "https://www.anthropic.com/engineering/code-execution-with-mcp",
+     "published": "2025-11-04",
+     "fetched_utc": "2026-10-09T13:49:52Z",
+     "sha256": "e45c22c8d1e5f607a15156273d64633719a67fff59c8e0fed8cbf5514b9333a7",
+     "practice": "Give a tool-discovery tool a detail-level parameter (name only, name and description, full schema), so the agent pulls only as much definition as it needs.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "client-agnostic",
+     "native_mechanism": "This is a design choice for MCP servers we author or admit. The client side is the same for both: Claude Code's deferred-tools list (names) plus ToolSearch select (full schema), which has no description-only tier. Codex: skill_search is stable; MCP tool search not verified. A server-side example already registered is jcodemunch's menu/order/route front door."
+    },
+    {
+     "title": "Effective context engineering for AI agents",
+     "url": "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents",
+     "published": "2025-09-29",
+     "fetched_utc": "2026-10-09T13:49:34Z",
+     "sha256": "0f978585c63258469bbd5a50709e918b78bb98407c5ebdde629aef9b65cf76aa",
+     "practice": "Curate a minimal, non-overlapping and token-efficient tool set, because tools whose functions overlap create ambiguous decision points the agent cannot resolve any better than a human engineer.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "both",
+     "native_mechanism": "Claude Code: per-role `tools` allowlists in subagent frontmatter, MCP registration scope and deferred tool search. Codex: per-profile MCP server registration in config.toml (not verified at 0.161.0)."
+    },
+    {
+     "title": "Plugins",
+     "url": "https://developers.openai.com/codex/plugins",
+     "published": "unknown",
+     "fetched_utc": "2026-10-09T13:54:09Z",
+     "sha256": "edd34c3c68a36da86d1883d24568e3500627c2853648158d2b4cc3db48bf89f5",
+     "practice": "The source describes MCP servers as the tool layer that defines tools, returns structured data and acts on external systems, with custom UI optional.",
+     "relation": "not-covered",
+     "evidence_kind": "asserted",
+     "clients": "both",
+     "native_mechanism": "Codex: MCP servers bundled in plugins or set in config.toml. Claude Code: MCP servers bundled in plugins or configured with native MCP configuration (tool search defers tools by default)."
+    },
+    {
+     "title": "Lessons from building Claude Code: Prompt caching is everything",
+     "url": "https://claude.com/blog/lessons-from-building-claude-code-prompt-caching-is-everything",
+     "published": "2026-04-30",
+     "fetched_utc": "2026-10-09T13:47:58Z",
+     "sha256": "3fb13790e6794e02ff6cb32ddd2d92c6485512cc639f5c298bdb2026ecb60edf",
+     "practice": "Rather than removing rarely used tools to save context, send stable name-only stubs marked for deferred loading and let the model load full schemas through tool search, so the prefix stays identical.",
+     "relation": "agrees",
+     "evidence_kind": "asserted",
+     "clients": "claude-code",
+     "native_mechanism": "Claude Code: native MCP tool search with tools deferred (the default) and `alwaysLoad` unset. The model loads schemas through ToolSearch when it needs them. Codex: not verified."
+    }
+   ],
+   "primary_sources_total": 9
   },
   {
    "id": "mcp-shared-servers",
@@ -738,7 +1795,58 @@
     "M6 (the fence for non-bare lanes)",
     "HOST-07 on OAuth hosts",
     "M46 (`-p` start mode can be auto)"
-   ]
+   ],
+   "primary_sources": [
+    {
+     "title": "Non-interactive mode",
+     "url": "https://developers.openai.com/codex/noninteractive",
+     "published": "unknown",
+     "fetched_utc": "2026-10-09T13:54:00Z (upper bound: date -u printed after the single fetch)",
+     "sha256": "1ab113e9fb128ade3fd7ffd4ae31232396284ce83be8e09099a7f61b66e136c9",
+     "practice": "When a script consumes the run, use a machine-readable event stream, so every event and its per-turn token usage can be captured and measured.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "both",
+     "native_mechanism": "Codex: codex exec --json, whose turn.completed event carries usage. Claude Code: --output-format json (a single result) or stream-json (realtime events) with -p (observed in --help 2.1.295)."
+    },
+    {
+     "title": "Non-interactive mode",
+     "url": "https://developers.openai.com/codex/noninteractive",
+     "published": "unknown",
+     "fetched_utc": "2026-10-09T13:54:00Z (upper bound: date -u printed after the single fetch)",
+     "sha256": "1ab113e9fb128ade3fd7ffd4ae31232396284ce83be8e09099a7f61b66e136c9",
+     "practice": "Split multi-stage headless work, such as review then fix, into runs where the second stage resumes the first session instead of starting cold.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "both",
+     "native_mechanism": "Codex: codex exec resume --last or codex exec resume <SESSION_ID>. Claude Code: claude -p with -r/--resume <session-id>, -c/--continue, --session-id <uuid> and --fork-session (observed in --help 2.1.295)."
+    },
+    {
+     "title": "Non-interactive mode",
+     "url": "https://developers.openai.com/codex/noninteractive",
+     "published": "unknown",
+     "fetched_utc": "2026-10-09T13:54:00Z (upper bound: date -u printed after the single fetch)",
+     "sha256": "1ab113e9fb128ade3fd7ffd4ae31232396284ce83be8e09099a7f61b66e136c9",
+     "practice": "A headless run that depends on an MCP server should fail when that server does not start, rather than quietly finishing without the tool.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "both",
+     "native_mechanism": "Codex: required = true on the MCP server entry in config.toml. Claude Code: no required-server flag was observed in claude --help 2.1.295. --strict-mcp-config with --mcp-config fixes which servers load, but whether a failed server aborts the run is not verified."
+    },
+    {
+     "title": "Non-interactive mode",
+     "url": "https://developers.openai.com/codex/noninteractive",
+     "published": "unknown",
+     "fetched_utc": "2026-10-09T13:54:00Z (upper bound: date -u printed after the single fetch)",
+     "sha256": "1ab113e9fb128ade3fd7ffd4ae31232396284ce83be8e09099a7f61b66e136c9",
+     "practice": "When later steps need stable fields, require the final response to match a JSON Schema instead of parsing free text.",
+     "relation": "agrees",
+     "evidence_kind": "asserted",
+     "clients": "both",
+     "native_mechanism": "Codex: codex exec --output-schema <file>, with -o to write the result. Claude Code: claude -p --json-schema <schema> (observed in --help 2.1.295; already in our headless-sdk route)."
+    }
+   ],
+   "primary_sources_total": 4
   },
   {
    "id": "github-action",
@@ -763,7 +1871,22 @@
    "supersedes": [
     "M45 (adopted on main)",
     "Action-pinning topic"
-   ]
+   ],
+   "primary_sources": [
+    {
+     "title": "The AI-native SDLC playbook",
+     "url": "https://claude.com/blog/the-ai-native-sdlc-playbook",
+     "published": "2026-08-21",
+     "fetched_utc": "2026-10-09T13:48:02Z",
+     "sha256": "76fb2ae32301b1cde4e0a686a1872bbe5c835cb91b7b33dc7b798a92bc429a8a",
+     "practice": "Let a reviewer or the author tag @claude on a review comment so that Claude, running through claude-code-action, addresses the comment and pushes the fix to the PR, with the thread recording both the request and the change.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "claude-code",
+     "native_mechanism": "Claude Code: claude-code-action triggered by an @claude mention on a PR review comment, with write tools. The page also describes a custom slash command (a skill) that sweeps unresolved comments and failing checks until the PR is green."
+    }
+   ],
+   "primary_sources_total": 1
   },
   {
    "id": "pr-review-pre-cue",
@@ -785,7 +1908,82 @@
     "M42",
     "M31"
    ],
-   "notes": "Ultrareview from a script runs as `claude ultrareview <PR#> --json`; `claude -p '/code-review ultra'` exits without findings."
+   "notes": "Ultrareview from a script runs as `claude ultrareview <PR#> --json`; `claude -p '/code-review ultra'` exits without findings.",
+   "primary_sources": [
+    {
+     "title": "Bringing Code Review to Claude Code",
+     "url": "https://claude.com/blog/code-review",
+     "published": "2026-03-09",
+     "fetched_utc": "2026-10-09T13:47:58Z",
+     "sha256": "f2ccc23876529e75c0bf4ad54ead749d74b9d53eee6f6a7092ef5905bbfa58f9",
+     "practice": "Deep review yield rises sharply with PR size: 84% of PRs over 1,000 changed lines had findings (7.5 on average), against 31% (0.5 on average) for PRs under 50 lines.",
+     "relation": "extends",
+     "evidence_kind": "measured",
+     "clients": "client-agnostic",
+     "native_mechanism": "Claude Code and Codex: a diff-size field per run in the J8 defects record, joined with findings counts."
+    },
+    {
+     "title": "Bringing Code Review to Claude Code",
+     "url": "https://claude.com/blog/code-review",
+     "published": "2026-03-09",
+     "fetched_utc": "2026-10-09T13:47:58Z",
+     "sha256": "f2ccc23876529e75c0bf4ad54ead749d74b9d53eee6f6a7092ef5905bbfa58f9",
+     "practice": "Measure the reviewer's precision as the share of findings engineers mark incorrect; the source reports under 1%.",
+     "relation": "extends",
+     "evidence_kind": "measured",
+     "clients": "client-agnostic",
+     "native_mechanism": "Claude Code and Codex: a per-finding confirmed or rejected verdict recorded by the lane in the J8 defects record (the managed app's analytics dashboard tracks acceptance rate, per the source's skipped Cost and control section)."
+    },
+    {
+     "title": "Bringing Code Review to Claude Code",
+     "url": "https://claude.com/blog/code-review",
+     "published": "2026-03-09",
+     "fetched_utc": "2026-10-09T13:47:58Z",
+     "sha256": "f2ccc23876529e75c0bf4ad54ead749d74b9d53eee6f6a7092ef5905bbfa58f9",
+     "practice": "Run a deep automated multi-agent review on nearly every PR rather than relying on human skims; internally this raised the share of PRs with substantive review comments from 16% to 54%.",
+     "relation": "agrees",
+     "evidence_kind": "measured",
+     "clients": "both",
+     "native_mechanism": "Claude Code: pr-review-toolkit subagents (pr-test-analyzer, silent-failure-hunter) run as the pre-cue locally in J8 and in Actions through #909; the managed Code Review GitHub App is the source's carrier. Codex: `codex review --base <branch>` (observed on 0.161.0)."
+    },
+    {
+     "title": "Bringing Code Review to Claude Code",
+     "url": "https://claude.com/blog/code-review",
+     "published": "2026-03-09",
+     "fetched_utc": "2026-10-09T13:47:58Z",
+     "sha256": "f2ccc23876529e75c0bf4ad54ead749d74b9d53eee6f6a7092ef5905bbfa58f9",
+     "practice": "Structure the review as parallel bug-finding agents, then a verification pass that filters out false positives, then a ranking of the surviving bugs by severity.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "both",
+     "native_mechanism": "Claude Code: parallel subagents in a saved Workflow (.claude/workflows) with a separate verifier stage before results reach the lane. Codex: `codex review` with a custom PROMPT as one finder; its help output shows no fan-out, verify stage or severity ranking (not verified)."
+    },
+    {
+     "title": "Bringing Code Review to Claude Code",
+     "url": "https://claude.com/blog/code-review",
+     "published": "2026-03-09",
+     "fetched_utc": "2026-10-09T13:47:58Z",
+     "sha256": "f2ccc23876529e75c0bf4ad54ead749d74b9d53eee6f6a7092ef5905bbfa58f9",
+     "practice": "Scale review depth with the change: large or complex PRs get more agents and a deeper read, while trivial PRs still get a lightweight pass.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "both",
+     "native_mechanism": "Claude Code: a Workflow that branches on diff size, and the Agent tool's per-call model and effort (2.1.292+). Codex: `codex review` with -c overrides for model and reasoning effort."
+    },
+    {
+     "title": "Bringing Code Review to Claude Code",
+     "url": "https://claude.com/blog/code-review",
+     "published": "2026-03-09",
+     "fetched_utc": "2026-10-09T13:47:58Z",
+     "sha256": "f2ccc23876529e75c0bf4ad54ead749d74b9d53eee6f6a7092ef5905bbfa58f9",
+     "practice": "Let the reviewer read code adjacent to the diff, so it can surface latent pre-existing bugs in code the PR touches that a changeset-only read would miss.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "both",
+     "native_mechanism": "Claude Code: pre-cue subagents with repository-wide Read and Grep beyond the diff. Codex: `codex review --base <branch>` with a custom PROMPT asking for checks on adjacent code."
+    }
+   ],
+   "primary_sources_total": 8
   },
   {
    "id": "release-tracking",
@@ -836,7 +2034,104 @@
    ],
    "overturn_when": "A measured gap the native path cannot close (for example per-lane cost attribution the counters lack).",
    "supersedes": [],
-   "notes": "Adjudicated mixed: native default, with ccusage and agentsview ranked first among alternatives; the refuter upheld it. Owed: a fixed-window same-task reconciliation of native counters against ccusage. Scope verified: not covered are Actions under WIF (read the Console organisation's usage), ultrareview cloud runs (usage credits) and `--bare` workers; under the subscription `claude_code_cost_usage` is API-list-price value, not spend; the series carry effort, query_source, model, type and ecosystem_lane. Integrity preconditions: the prompt and response content gates stay off (OTEL_LOG_ASSISTANT_RESPONSES explicitly false); because the template sets OTEL_LOG_TOOL_DETAILS=1, the collector's tool-name and privacy allowlists are required; backends stay on loopback and no log or event export with values goes into the public repository."
+   "notes": "Adjudicated mixed: native default, with ccusage and agentsview ranked first among alternatives; the refuter upheld it. Owed: a fixed-window same-task reconciliation of native counters against ccusage. Scope verified: not covered are Actions under WIF (read the Console organisation's usage), ultrareview cloud runs (usage credits) and `--bare` workers; under the subscription `claude_code_cost_usage` is API-list-price value, not spend; the series carry effort, query_source, model, type and ecosystem_lane. Integrity preconditions: the prompt and response content gates stay off (OTEL_LOG_ASSISTANT_RESPONSES explicitly false); because the template sets OTEL_LOG_TOOL_DETAILS=1, the collector's tool-name and privacy allowlists are required; backends stay on loopback and no log or event export with values goes into the public repository.",
+   "primary_sources": [
+    {
+     "title": "The advisor strategy: Give agents an intelligence boost",
+     "url": "https://claude.com/blog/the-advisor-strategy",
+     "published": "2026-04-09",
+     "fetched_utc": "2026-10-09T13:47:59Z",
+     "sha256": "c284ecef25aa4c9ccef8f4529e1c40c921b489e893e42fcf113f8a77bc6b7b49",
+     "practice": "Cap advisor consultations per request and track advisor-model tokens separately from executor tokens, so spend can be attributed per model tier.",
+     "relation": "extends",
+     "evidence_kind": "asserted",
+     "clients": "claude-code",
+     "native_mechanism": "API: `max_uses` on the advisor tool entry and a separate usage block. Claude Code: a per-session cap knob and the advisor-token split in claude_code.* OpenTelemetry metrics are not verified. Codex: none found."
+    },
+    {
+     "title": "Coding sessions are longer and use more context. Claude Opus 5.5 is built with that in mind.",
+     "url": "https://claude.com/blog/claude-opus-5-5-built-for-coding-sessions-that-use-more-context",
+     "published": "2026-09-24",
+     "fetched_utc": "2026-10-09T13:50:15Z",
+     "sha256": "2e111c21a5a9b920ec6f4c3e3bc935606abf7c1dbfd66b4e12b081aeb4c9a398",
+     "practice": "Check how much of your usage is cached reads with /usage, and treat that share as a number to protect.",
+     "relation": "agrees",
+     "evidence_kind": "asserted",
+     "clients": "claude-code",
+     "native_mechanism": "Claude Code: interactive /usage, plus the native OpenTelemetry claude_code.* token metrics (cache-read tokens) for continuous tracking."
+    }
+   ],
+   "primary_sources_total": 2
   }
- ]
+ ],
+ "cross_client": {
+  "ruled": "command center, 2026-10-09 ~14:2xZ (layer 3 as the landing rule for every author; layers 1 and 2 here)",
+  "layers": [
+   {
+    "layer": "1. Procedure",
+    "rule": "Instructions as a short AGENTS.md map into versioned docs, and Agent Skills loaded by progressive disclosure; both clients read both.",
+    "sources": [
+     "https://agentskills.io/specification",
+     "https://developers.openai.com/codex/skills",
+     "https://developers.openai.com/codex/guides/agents-md",
+     "https://openai.com/index/harness-engineering/"
+    ]
+   },
+   {
+    "layer": "2. Native execution",
+    "rule": "Each client runs the procedure with its own mechanism; nothing is ported between them.",
+    "sources": [
+     "https://developers.openai.com/codex/subagents",
+     "https://developers.openai.com/codex/hooks",
+     "https://developers.openai.com/codex/noninteractive",
+     "https://developers.openai.com/codex/plugins"
+    ]
+   },
+   {
+    "layer": "3. Gate",
+    "rule": "A deep multi-agent review of every PR by the other model family, each finding given a landing-time disposition, precision tracked per family per week.",
+    "sources": [
+     "https://claude.com/blog/code-review",
+     "https://www.anthropic.com/research/multiagent-systems"
+    ]
+   }
+  ],
+  "mapping": [
+   [
+    "Delegation with fresh context",
+    "subagents (Agent tool), saved Workflows",
+    "subagents (explorer and custom agents)"
+   ],
+   [
+    "Completion gate",
+    "Stop hook returning decision block; stop_hook_active bounds the loop",
+    "Stop hook returning decision block; stop_hook_active in the input"
+   ],
+   [
+    "Structured headless result",
+    "`claude -p --json-schema`",
+    "`codex exec --output-schema`"
+   ],
+   [
+    "Machine-readable event stream",
+    "`--output-format stream-json`",
+    "`codex exec --json`"
+   ],
+   [
+    "Packaged capability",
+    "plugins (skills, agents, hooks, MCP)",
+    "`codex plugin add` (skills, MCP)"
+   ],
+   [
+    "Native review",
+    "`/review-changes` (saved Workflow), `/code-review` in the main session",
+    "`codex review --base <ref>` or `--commit <sha>`"
+   ],
+   [
+    "Clean-context run for an eval",
+    "a fresh subagent or `claude -p` session",
+    "`codex exec --ephemeral`"
+   ]
+  ]
+ }
 }
