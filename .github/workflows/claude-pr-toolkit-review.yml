@@ -33,6 +33,7 @@ on:
 
 # No token scope by default; each job grants its own (docs/decisions/2026-10-04-ci-least-privilege.md).
 permissions: {}
+cache-mode: none
 
 concurrency:
   group: claude-pr-toolkit-review-${{ inputs.pr_number }}
@@ -320,10 +321,11 @@ jobs:
             if type != "array" then error("unsupported execution shape") else . end |
             (map(select(.type == "system" and .subtype == "init")) | first) as $init |
             map(select(.type == "result")) as $results |
+            (any($results[]; .is_error == true and .total_cost_usd == 0 and .modelUsage == {})) as $zero_cost_error |
             (($results | length) > 0 and all($results[]; usable)) as $complete |
             ([.[] | select(.type == "assistant") | .message | select(type == "object" and (.usage | type) == "object")]
               | group_by(.id) | map(first)) as $messages |
-            if $complete or ($messages | length) > 0 then . else error("usage unavailable") end |
+            if $complete or ($messages | length) > 0 or $zero_cost_error then . else error("usage unavailable") end |
             ($init.tools // []) as $listed |
             ($listed | map(select(type == "string"))) as $tools |
             ([.[] | select(.type == "result") | .result // "" | select(type == "string" and . != "")] | last // "")
@@ -344,7 +346,8 @@ jobs:
               | select(. as $agent | any($returned[]; .agent == $agent))] | length) as $handed_back |
             ([.[] | select(.type == "assistant" and (.parent_tool_use_id == null)) | .message.id?
               | select(type == "string")] | unique | length) as $turns |
-            {complete: $complete,
+            {error_class: (if $zero_cost_error then "zero_cost_error_without_model_usage" else null end),
+             complete: $complete,
              total_cost_usd: (if $complete then ([$results[].total_cost_usd] | max) else null end),
              num_turns: (if $complete then ([$results[].num_turns] | max) else null end),
              assistant_turns: $turns,
@@ -389,6 +392,8 @@ jobs:
                    "| coordinator turns | messages | client cost estimate (USD) | completed | reports | Claude Code | tools | MCP servers |",
                    "| ---: | ---: | ---: | --- | ---: | --- | --- | ---: |",
                    "| \(.assistant_turns) | \(.num_turns // "none") | \(.total_cost_usd // "none") | \(.successful_result) | \(.report_sections | length) | \(.claude_code_version) | \(.tools | join(" ")) | \(.mcp_servers) |",
+                   (if .error_class != null then "", "Error class: \(.error_class). No model usage was reported; no review is accepted."
+                    else empty end),
                    "", "Result records: \(.result_subtypes | listed). Agents called: \(.agents_called | listed). Handbacks: \(.handbacks) of 2.",
                    (if any(.result_subtypes[]; . == "error_max_budget_usd")
                     then "", "Budget stop: the client stopped the run at its \($budget) USD budget (error_max_budget_usd), with \(.handbacks) of 2 handbacks."

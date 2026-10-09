@@ -35,6 +35,11 @@ The workflow is new, so this is all of its behaviour.
   repository owner, the first attempt of a run, and `CLAUDE_PR_TOOLKIT_ENABLED == 'true'`. A dispatch by anyone else,
   or a re-run, is skipped.
 - `timeout-minutes: 45` for the job. Grants: `contents: read`, `pull-requests: read` and `id-token: write`.
+  Top-level `cache-mode: none` denies GitHub Actions cache restores and saves; Claude prompt-cache token
+  accounting is separate. Federation uses the repository's immutable main subject,
+  `repo:seathatflowsinourveins@234074349/native-agent-stack@1376766892:ref:refs/heads/main`.
+  GitHub's OIDC customization API reports `use_immutable_subject: true` and that immutable prefix, matching the
+  repository metadata IDs (checked 2026-10-09); see [immutable subject claims](https://docs.github.com/en/actions/reference/security/oidc#immutable-subject-claims).
 - A guard step stops the job with exit 2 on debug signals, on a pre-existing `~/.claude/settings.json` (a dangling
   symlink included) or on a malformed input.
 - A binding step stops the job with exit 2 unless the pull request is open, from this repository, targets `main` and
@@ -111,7 +116,7 @@ The workflow is new, so this is all of its behaviour.
   `complete` is false, the cost and turn count are null, `models` is empty, and `lower_bound_models` holds the
   assistant messages' input, output, cache-read and cache-write tokens per model, each message id counted once,
   as a lower bound; the step then fails. An execution file with neither result usage nor assistant usage leaves no
-  record.
+  record, except for the bounded zero-cost error diagnostic below.
 - The job summary's numbers table shows `none` for a missing cost or turn count, a line
   `Result records: <subtypes>. Agents called: <agents>. Handbacks: <n> of 2.`, and one row per lower-bound model,
   marked `(lower bound from the assistant messages)`. When a result record is a budget stop it adds
@@ -132,6 +137,23 @@ The workflow is new, so this is all of its behaviour.
   published. A cancelled run publishes nothing (R6). The numbers step runs only when the action set an execution file,
   so its success implies one. The reports are capped at 60,000 bytes on a character boundary, with a line saying so
   when they were longer.
+
+## Zero-cost error diagnostic (2026-10-09, CC dispatch item 7)
+
+When any result record has `is_error: true`, `total_cost_usd: 0` and an empty `modelUsage` object, the numbers step
+retains `error_class: "zero_cost_error_without_model_usage"` and prints that fixed class in the summary before
+failing its bounds. It no longer aborts in jq with `usage unavailable` when no assistant usage exists. The
+diagnostic preserves `complete: false`, null cost and turns, and empty `models`; any actual assistant token
+counts still remain a lower bound. It never publishes the error text or accepts the review. Other records carry
+`error_class: null`; other missing or malformed usage keeps its existing refusal behavior.
+
+The existing step-test harness reproduces this failure before the fix and verifies the retained class and summary,
+failure status and exclusion of raw text after it, using only synthetic execution-file messages. The top-level
+cache-mode contract also fails before its change. These are local integration checks, not a hosted workflow run.
+Sources: `anthropics/claude-code-action` at `2dca132ff0e0c4094ce6048b422c6915a071210b` (`action.yml`,
+execution-file output) and GitHub's [workflow cache-mode](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#cache-mode).
+The existing vendor output is retained; no replacement runner or parser is introduced. A changed upstream result
+shape would require rechecking the regression. `harness-audit.yml` remains in api-actions' separate #892 slice.
 
 ## Why the pinned checkout and not the action's `plugins` input
 
