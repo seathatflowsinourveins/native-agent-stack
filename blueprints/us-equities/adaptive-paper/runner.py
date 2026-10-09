@@ -808,8 +808,10 @@ class LiveEventLog(list):
 
 
 class Controller:
-    def __init__(self, ledger, close, *, market_open, clock=time.time):
+    def __init__(self, ledger, close, *, market_open, clock=time.time, stop_file=None):
         self.ledger, self.close, self.market_open, self.clock = ledger, close, market_open, clock
+        # A run-specific latch supplements, never replaces, the canonical account abort.
+        self.stop_file = None if stop_file is None else Path(stop_file)
         self.port = None
         self.quotes = {}
         self.requests = []
@@ -834,6 +836,18 @@ class Controller:
         self._halt_seed_task = None
         self._halt_seed_deadline = 0.0
 
+    def stop_requested(self):
+        """Keep the global abort effective alongside an optional per-run latch."""
+        return (self.stop or DEFAULT_STOP.exists()
+                or (self.stop_file is not None and self.stop_file.exists()))
+
+    def _stop_options(self):
+        if self.stop_file is None:
+            return {}
+        # The ledger already enforces its stop_file input. Prefer the global
+        # latch when present so an explicit diagnostic path cannot bypass it.
+        return {"stop_file": DEFAULT_STOP if DEFAULT_STOP.exists() else self.stop_file}
+
     async def before_request(self, kind, client_id=None):
         if kind == "data_read":
             return
@@ -844,8 +858,10 @@ class Controller:
                 if intent is None:
                     raise SafetyError("submit_without_intent")
                 self.ledger.validate_pending(client_id, quote=self.quotes[intent.symbol], now=self.clock(),
-                                             market_open=self.market_open, session_close=self.close)
-                if intent.side == "buy" and (self.stop or not self.port.ready):
+                                             market_open=self.market_open, session_close=self.close,
+                                             **self._stop_options())
+                if intent.side == "buy" and (self.stop or not self.port.ready
+                        or (self.stop_file is not None and self.stop_requested())):
                     raise SafetyError("admissions_not_ready")
             # The durable row binds only a submit to its intent (requests.client_id is a
             # foreign key), so naming a cancel can never make its budget reservation fail.
@@ -868,7 +884,8 @@ class Controller:
     def before_submit(self, order):
         from native_adapter import NativeOrderRejected
         try:
-            if order["side"] == "buy" and (self.stop or not self.port.ready):
+            if order["side"] == "buy" and (self.stop or not self.port.ready
+                    or (self.stop_file is not None and self.stop_requested())):
                 raise SafetyError("admissions_not_ready")
             quote = self.quotes.get(order["symbol"])
             if quote is None:
@@ -876,7 +893,7 @@ class Controller:
             intent = self.ledger.reserve_intent(order["client_order_id"], order["symbol"], order["side"],
                                                 order["qty"], order["limit_price"], quote=quote,
                                                 now=self.clock(), market_open=self.market_open,
-                                                session_close=self.close)
+                                                session_close=self.close, **self._stop_options())
             if not intent.newly_reserved:
                 raise SafetyError("duplicate_intent_not_resubmitted")
         except SafetyError as exc:
@@ -1682,7 +1699,7 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
                 session.reconciliation["ledger_delta"] = ledger_delta
                 ledger_adopted = True
             state = controller.ledger.accounting()
-            force_exit = (controller.stop or DEFAULT_STOP.exists() or bool(session.errors)
+            force_exit = (controller.stop_requested() or bool(session.errors)
                           or bool(state.halted_reason) or elapsed >= config["duration_seconds"]
                           or controller.close - now <= config["cleanup_seconds"])
             if force_exit and cleanup_started is None:

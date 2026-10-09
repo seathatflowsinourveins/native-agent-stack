@@ -947,7 +947,13 @@ def logger_config(log_directory=None):
 
 def build_node(port, symbols, strategies, *, account_id="ALPACA-PAPER", trader_id="ADAPTIVE-001",
                max_order_submit_rate="180/00:01:00", account_type=AccountType.CASH, session_policy=None,
-               log_directory=None):
+               log_directory=None, builtin_strategies=()):
+    """Build the guarded node, optionally registering unchanged upstream builtins.
+
+    ``builtin_strategies`` contains (name, config) pairs for LiveNode's supported
+    add_builtin_strategy API. See Nautilus rc5@1b0a49d's
+    examples/live/interactive_brokers/exec_tester.py; no tester code is copied here.
+    """
     if importlib.metadata.version("nautilus_trader") != "2.0.0rc5":
         raise ValueError("unqualified_native_version")
     if not account_id.startswith("ALPACA-"):
@@ -980,4 +986,6 @@ def build_node(port, symbols, strategies, *, account_id="ALPACA-PAPER", trader_i
     session.handle = session.node.handle()
     for strategy in strategies:
         session.node.add_strategy(strategy)
+    for name, builtin_config in builtin_strategies:
+        session.node.add_builtin_strategy(name, builtin_config)
     return session
