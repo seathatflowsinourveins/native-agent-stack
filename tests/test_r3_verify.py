@@ -4,11 +4,15 @@ Harness: CPython unittest/tempfile/importlib; seed: published metadata packet at
 36e36ea498e23ffd5bfc103035a2da883a6a08e4. No study outcomes or external evidence read.
 """
 import hashlib
+from contextlib import redirect_stderr, redirect_stdout
+import errno
 import importlib.util
+import io
 import json
 import os
 from pathlib import Path
 import shutil
+import runpy
 import subprocess
 import sys
 import tempfile
@@ -67,6 +71,135 @@ class R3VerifierTests(unittest.TestCase):
         self.assertEqual(len(locations), len(set(locations)))
         # 17 distinct digest locations, independently enumerated in the seed packet.
         self.assertEqual(len(locations), 17)
+
+    def test_exact_committed_bundle_passes_without_resealing(self):
+        result = VERIFIER.verify(PACKET)
+        self.assertEqual(result["status"], "PASS", result["errors"])
+        self.assertEqual(result["internal_binding_count"], 17)
+        self.assertEqual(result["internal_binding_count"], len(result["internal_bindings"]))
+        self.assertIn("digest JSON-pointer", result["binding_count_scope"])
+        cli = subprocess.run([sys.executable, str(SCRIPT), "--root", str(PACKET)],
+                             capture_output=True, text=True, timeout=30)
+        self.assertEqual(cli.returncode, 0, cli.stderr)
+        self.assertEqual(json.loads(cli.stdout)["status"], "PASS")
+
+    def probe_failures(self, operation, target):
+        original = getattr(Path, operation)
+        for failure in (PermissionError(errno.EACCES, "Permission denied"),
+                        OSError(errno.ENAMETOOLONG, "File name too long")):
+            with self.subTest(operation=operation, errno=failure.errno):
+                def failing_probe(path, *args, **kwargs):
+                    if path == target:
+                        raise failure
+                    return original(path, *args, **kwargs)
+                stdout, stderr = io.StringIO(), io.StringIO()
+                with patch.object(Path, operation, failing_probe), \
+                     patch.object(sys, "argv", [str(SCRIPT), "--root", str(self.root)]), \
+                     redirect_stdout(stdout), redirect_stderr(stderr):
+                    with self.assertRaises(SystemExit) as exit_status:
+                        runpy.run_path(str(SCRIPT), run_name="__main__")
+                self.assertEqual(exit_status.exception.code, 1)
+                self.assertNotIn("Traceback", stderr.getvalue())
+                data = json.loads(stdout.getvalue())
+                self.assertEqual(data["status"], "FAIL")
+                self.assertTrue(any(target.name in error for error in data["errors"]), data["errors"])
+                self.assertTrue(any(failure.strerror in error for error in data["errors"]), data["errors"])
+
+    def test_symlink_probe_oserrors_return_json_failure(self):
+        self.probe_failures("is_symlink", self.root / "SHA256SUMS")
+
+    def test_regular_file_probe_oserrors_return_json_failure(self):
+        self.probe_failures("is_file", self.root / "R2-CONSTRUCTION.json")
+
+    def test_byte_read_oserrors_return_json_failure(self):
+        self.probe_failures("read_bytes", self.root / "SHA256SUMS")
+
+    def test_optional_reference_probe_oserrors_return_json_failure(self):
+        target = self.root / "optional-target.json"
+        protocol = self.read("protocol.draft.json")
+        protocol["synthetic_optional"] = {"path": target.name, "sha256": "f" * 64}
+        self.write("protocol.draft.json", protocol)
+        self.seal()
+        self.probe_failures("is_file", target)
+
+    def test_cli_root_resolution_oserrors_return_json_failure(self):
+        self.probe_failures("resolve", self.root)
+
+    def test_cli_long_carrier_filename_returns_json_failure(self):
+        self.set_carrier((self.root / "SHA256SUMS").read_bytes() + ("f" * 64 + "  " + "x" * 256 + "\n").encode())
+        self.assert_cli_failure()
+
+    def test_cli_long_optional_reference_returns_json_failure(self):
+        protocol = self.read("protocol.draft.json")
+        protocol["synthetic_optional"] = {"path": "x" * 256, "sha256": "f" * 64}
+        self.write("protocol.draft.json", protocol)
+        self.seal()
+        self.assert_cli_failure()
+
+    def set_carrier(self, value):
+        for name in ("SHA256SUMS", "SHA256SUMS.R3", "SHA256SUMS.R3B"):
+            (self.root / name).write_bytes(value)
+
+    def test_symlinked_carriers_and_member_fail(self):
+        for name in ("SHA256SUMS", "SHA256SUMS.R3", "SHA256SUMS.R3B", "R2-CONSTRUCTION.json"):
+            with self.subTest(name=name):
+                path = self.root / name
+                raw = path.read_bytes()
+                target = Path(self.temp.name) / "link-target"
+                target.write_bytes(raw)
+                path.unlink()
+                path.symlink_to(target)
+                try:
+                    self.failed("file is a symlink: " + name)
+                finally:
+                    path.unlink()
+                    path.write_bytes(raw)
+
+    def test_non_utf8_canonical_carrier_returns_early_failure(self):
+        self.set_carrier(b"\xff")
+        result = self.failed("invalid UTF-8: SHA256SUMS")
+        self.assertIsNotNone(result["manifest_sha256"])
+        self.assertEqual(result["semantic_checks"], {})
+
+    def test_malformed_manifest_lines_fail(self):
+        original = (self.root / "SHA256SUMS").read_bytes()
+        lines = ["", "short", "f" * 64 + " one-space.json", "F" * 64 + "  uppercase.json",
+                 original.decode().splitlines()[0], "f" * 64 + "  /synthetic/absolute.json",
+                 "f" * 64 + "  ../parent.json", "f" * 64 + "  .", "f" * 64 + "  "]
+        for line in lines:
+            with self.subTest(line=line):
+                self.set_carrier(original + (line + "\n").encode())
+                self.failed("manifest line")
+
+    def test_standalone_sha256_is_validated_without_becoming_a_join(self):
+        for value in ("f" * 64, "F" * 64, "f" * 63, None, {}, []):
+            with self.subTest(value=value):
+                protocol = self.read("protocol.draft.json")
+                protocol["synthetic_standalone"] = {"sha256": value}
+                self.write("protocol.draft.json", protocol)
+                self.seal()
+                if value == "f" * 64:
+                    result = VERIFIER.verify(self.root)
+                    self.assertEqual(result["status"], "PASS", result["errors"])
+                    self.assertEqual(result["internal_binding_count"], 17)
+                else:
+                    self.failed("invalid digest")
+
+    def test_manifest_named_dict_or_list_is_an_invalid_digest(self):
+        for value in ({"path": "optional.json", "sha256": "f" * 64}, [{"sha256": "f" * 64}]):
+            with self.subTest(value=value):
+                protocol = self.read("protocol.draft.json")
+                protocol["synthetic_named"] = {"R2-CONSTRUCTION.json": value}
+                self.write("protocol.draft.json", protocol)
+                self.seal()
+                self.failed("invalid digest")
+
+    def test_optional_json_carrier_member_requires_object_root(self):
+        name = "synthetic-list.json"
+        self.write(name, [])
+        self.members.append(name)
+        self.seal()
+        self.failed("expected JSON object: " + name)
 
     def test_invalid_embedded_digest_is_an_error(self):
         for value in ("F" * 64, "f" * 63, "f" * 65, "g" * 64, "f" * 64 + "\n", "", None, 123):
@@ -176,7 +309,10 @@ class R3VerifierTests(unittest.TestCase):
 
     def test_missing_canonical_carrier_is_an_error(self):
         (self.root / "SHA256SUMS").unlink()
-        self.failed("SHA256SUMS")
+        result = self.failed("SHA256SUMS")
+        self.assertIsNone(result["manifest_sha256"])
+        self.assertEqual(result["internal_binding_count"], 0)
+        self.assertEqual(result["semantic_checks"], {})
 
     def test_missing_member_is_an_error_without_traceback(self):
         (self.root / "R2-COMPARISON.json").unlink()

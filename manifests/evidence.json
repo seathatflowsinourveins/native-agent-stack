@@ -15497,32 +15497,32 @@
     },
     {
       "path": "blueprints/us-equities/event-anchored-ranking/R3-VERIFY.py",
-      "sha256": "dd89dd9af5d7b8a2faad05715fda3787741b82c8dcb6e00a139b5c4d7e4adc63",
-      "bytes": 13260
+      "sha256": "a2143983c3a59eb703a54f3f22178ac7f81af2fd7ddd6d01e8a9623b1c5ba652",
+      "bytes": 14098
     },
     {
       "path": "blueprints/us-equities/event-anchored-ranking/README.md",
-      "sha256": "1b3f37d95ba70f610bb1bd23fdf318fa729d0701ff7935a2381e98026c08b0b8",
-      "bytes": 7275
+      "sha256": "9ee17075fef0a2d78267e33e78845d7648f0f0c1098320e03573ddfe236a0b57",
+      "bytes": 7377
     },
     {
       "path": "blueprints/us-equities/event-anchored-ranking/ROW14-SUBMISSION-R3.json",
-      "sha256": "188a30b82b9bb813f05eb4e0a700e3babe2b0dd78591908d104ea4f99cf982f8",
+      "sha256": "e90079cd20e9122c952dce1979c70adcd01b17cec626fc90e2bc454ebf1f26b5",
       "bytes": 13683
     },
     {
       "path": "blueprints/us-equities/event-anchored-ranking/SHA256SUMS",
-      "sha256": "3138a05a008167f0195e99298d5ef32b85d9b1a034b50fe12c1051aa5427340f",
+      "sha256": "fa98ad008cbdab5beba631f8544a979f3da77a62f5dd549196968e675b811b9e",
       "bytes": 1056
     },
     {
       "path": "blueprints/us-equities/event-anchored-ranking/SHA256SUMS.R3",
-      "sha256": "3138a05a008167f0195e99298d5ef32b85d9b1a034b50fe12c1051aa5427340f",
+      "sha256": "fa98ad008cbdab5beba631f8544a979f3da77a62f5dd549196968e675b811b9e",
       "bytes": 1056
     },
     {
       "path": "blueprints/us-equities/event-anchored-ranking/SHA256SUMS.R3B",
-      "sha256": "3138a05a008167f0195e99298d5ef32b85d9b1a034b50fe12c1051aa5427340f",
+      "sha256": "fa98ad008cbdab5beba631f8544a979f3da77a62f5dd549196968e675b811b9e",
       "bytes": 1056
     },
     {
@@ -58552,8 +58552,8 @@
     },
     {
       "path": "tests/test_r3_verify.py",
-      "sha256": "eb1ff6e71c8e497ad45f2bb6a4b03271a920625446020ceb9aacb4a5d2376973",
-      "bytes": 13540
+      "sha256": "91c20a57fee6932830ef6cd532e2b2a0b498914cd31bffca6914c9bd6a79d6a3",
+      "bytes": 20400
     },
     {
       "path": "tests/test_receipt_staleness.py",

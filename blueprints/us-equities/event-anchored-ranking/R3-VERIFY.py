@@ -53,32 +53,36 @@ def digest(path):
         return hashlib.file_digest(stream, "sha256").hexdigest()
 
 
+def verification_result(errors, manifest, manifest_hash, bindings, semantic, boundaries):
+    return {"status": "PASS" if not errors else "FAIL", "carrier_entries": len(manifest),
+            "manifest_sha256": manifest_hash, "internal_bindings": bindings,
+            "internal_binding_count": len(bindings),
+            "binding_count_scope": "Distinct source file and digest JSON-pointer locations; repeated checks of one location count once.",
+            "semantic_checks": semantic, "external_or_historical_boundaries": boundaries,
+            "errors": errors,
+            "scope": "Structural carrier/internal-reference/status checks only; no source truth, reviewer PASS, native strategy or data/execution acceptance."}
+
+
 def verify(root):
     errors, bindings, boundaries = [], [], []
     manifest, semantic = {}, {}
     manifest_hash = None
 
     def result():
-        return {"status": "PASS" if not errors else "FAIL", "carrier_entries": len(manifest),
-                "manifest_sha256": manifest_hash, "internal_bindings": bindings,
-                "internal_binding_count": len(bindings),
-                "binding_count_scope": "Distinct source file and digest JSON-pointer locations; repeated checks of one location count once.",
-                "semantic_checks": semantic, "external_or_historical_boundaries": boundaries,
-                "errors": errors,
-                "scope": "Structural carrier/internal-reference/status checks only; no source truth, reviewer PASS, native strategy or data/execution acceptance."}
+        return verification_result(errors, manifest, manifest_hash, bindings, semantic, boundaries)
 
     def read_bytes(name):
         path = root / name
-        if path.is_symlink():
-            errors.append(f"file is a symlink: {name}")
-            return None
-        if not path.is_file():
-            errors.append(f"missing or not a regular file: {name}")
-            return None
         try:
+            if path.is_symlink():
+                errors.append(f"file is a symlink: {name}")
+                return None
+            if not path.is_file():
+                errors.append(f"missing or not a regular file: {name}")
+                return None
             return path.read_bytes()
         except OSError as error:
-            errors.append(f"cannot read file: {name}: {error.strerror}")
+            errors.append(f"cannot read file: {name}: {error.strerror or type(error).__name__}")
             return None
 
     carrier_bytes = read_bytes("SHA256SUMS")
@@ -133,11 +137,17 @@ def verify(root):
             bindings.append({"file": file, "pointer": pointer, "target": reference, "matches_manifest": equal})
             if not equal:
                 errors.append(f"internal binding mismatch: {file}{pointer} -> {reference}")
-        elif not Path(reference).is_absolute() and not reference.startswith("attempt-") and (root / reference).is_file():
-            errors.append(f"current local binding absent from carrier: {file}{pointer} -> {reference}")
         else:
-            boundaries.append({"file": file, "pointer": pointer, "reference": reference,
-                               "scope": "external, historical or separately pinned source; not read by this verifier"})
+            try:
+                local = not Path(reference).is_absolute() and not reference.startswith("attempt-") and (root / reference).is_file()
+            except OSError as error:
+                errors.append(f"cannot inspect binding target: {file}{pointer} -> {reference}: {error.strerror or type(error).__name__}")
+                return
+            if local:
+                errors.append(f"current local binding absent from carrier: {file}{pointer} -> {reference}")
+            else:
+                boundaries.append({"file": file, "pointer": pointer, "reference": reference,
+                                   "scope": "external, historical or separately pinned source; not read by this verifier"})
 
     def walk(file, obj, pointer=""):
         if isinstance(obj, dict):
@@ -262,8 +272,15 @@ def verify(root):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parent)
+    parser.add_argument("--root", type=Path)
     args = parser.parse_args()
-    result = verify(args.root.resolve())
+    try:
+        root = args.root.resolve() if args.root is not None else Path(__file__).resolve().parent
+    except OSError as error:
+        name = args.root.name if args.root is not None else "default packet"
+        result = verification_result([f"cannot resolve packet root: {name}: {error.strerror or type(error).__name__}"],
+                                     {}, None, [], {}, [])
+    else:
+        result = verify(root)
     print(json.dumps(result, indent=2, sort_keys=True))
     raise SystemExit(0 if result["status"] == "PASS" else 1)
