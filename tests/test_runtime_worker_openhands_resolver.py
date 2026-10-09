@@ -398,7 +398,7 @@ BASE_FILES = {
                            "TOOL = ROOT / 'tools' / 'conv'\n"
                            "SPEC = importlib.util.spec_from_file_location('blind', TOOL / 'blind.py')\n"
                            "DATA = ROOT / 'docs' / 'guide.md'\n"),
-    # As tools/sota-convergence/blind_checkout.py:964 does before its lazy import.
+    # As tools/sota-convergence/blind_checkout.py:971 does before its lazy import.
     "tools/conv/blind.py": ("import sys\nfrom pathlib import Path\n"
                             "sys.path.insert(0, str(Path(__file__).resolve().parent))\n"),
     "tools/other/free.py": "value = 2\n",
@@ -550,7 +550,7 @@ class HostExecutedDerivationTests(unittest.TestCase):
             "pkg/helper.py": ("import importlib.util\nfrom pathlib import Path\n"
                               "importlib.util.spec_from_file_location('s', Path(__file__).with_name('side.py'))\n"),
             "pkg/side.py": "", "pkg/sibling.py": "", "pkg/unused.py": "",
-            # A loaded file that puts its own directory on sys.path (blind_checkout.py:419-421).
+            # A loaded file that puts its own directory on sys.path (blind_checkout.py:426-428).
             "plugins/loaded/plugin.py": ("import sys\nfrom pathlib import Path\n"
                                          "def lazy():\n    here = str(Path(__file__).resolve().parent)\n"
                                          "    sys.path.insert(0, here)\n"),

@@ -1,0 +1,133 @@
+{
+  "schema_version": 1,
+  "revision": "R3: GPTchange1/CC C2 accepted-receipt intake and reporting",
+  "authority": {
+    "path": "retained-evidence:coordination/command-center/ITEM-ns2604-coop-20261008T101427Z.md",
+    "sha256": "e3a6ca1d6548fe35e912528cc97d1638ccb7f5815db79301341bc01f716ff9bc",
+    "instruction": "Layer 1.5 is not accepted. Bind PIT-04 counted exclusions in R2's survivorship disclosure. N1 remains engine evidence only."
+  },
+  "layer15_source": {
+    "repository": "us-equities-trading",
+    "commit": "465def0220f55c67031fa1eb2b22576f0ef71c73",
+    "evidence_level": "Committed source review and retained corpus metadata; not historical-data or strategy acceptance.",
+    "docs": [
+      {
+        "path": "docs/layer15/revision-24.md",
+        "sha256": "66f6586407113e6849710bfec02699b5f1f7f45731d04c94be2a08eb7dced375",
+        "lines": [
+          21,
+          28
+        ],
+        "scope": "PIT-04 included-or-excluded coverage and PIT-11 full blocked status inventory"
+      },
+      {
+        "path": "docs/layer15/README.md",
+        "sha256": "86cce4ea146f2de7a3f7729bf9e9c0fb08416d5a578b286d60d17f4ae70ce438",
+        "lines": [
+          89,
+          93
+        ],
+        "scope": "Bound universe_inventory and explicit exclusions; no market-wide completeness claim"
+      }
+    ],
+    "gate_source": {
+      "path": "harness/layer15/gate.py",
+      "sha256": "939e1c8ab6f4b540174d9875a3ff40ad98f9fa50a655595797f5c1b96a127de3",
+      "lines": [
+        270,
+        285,
+        559
+      ],
+      "scope": "Exact security_id/reason/source exclusion schema, anchored inventory equality and counted citation output"
+    }
+  },
+  "retained_partial_package_scope": {
+    "path": "retained-evidence:research/layer15-two-leg-20261008/package-scope.json",
+    "sha256": "328c3a148ab2fa5a86d72065b1c2de12bc43eaade64b2de260310937a205bde7",
+    "event_keys": 1172,
+    "symbol_alias_strings": 890,
+    "historical_universe_complete": false,
+    "strategy_citation_allowed": false,
+    "count_basis": "Retrospective package event keys and recorded symbol strings. 890 is a symbol-list count, not an independently established label or immutable-security count."
+  },
+  "retained_blocked_corpus": {
+    "path": "retained-evidence:coordination/ns2604-coop/lanes/layer15-build-checks/package-271-ledger-committed-465def0.json",
+    "sha256": "6db3005423bce59b2dfc5db907d07c2ce8a78b0c59b21fbd417dafbbf4264be3",
+    "classification": "untrusted_package_corpus_inventory",
+    "evidence_class": "source_review",
+    "forward_rows": 957,
+    "forward_status_counts": {
+      "OK": 686,
+      "NO_DATA": 265,
+      "EVENT_BAR_MISSING": 6
+    },
+    "blocked_case_count": 271,
+    "reason_counts": [
+      {
+        "source_status": "NO_DATA",
+        "count": 265,
+        "reason": "CIK/security identity and complete economic entitlement evidence required",
+        "source_selector": "cases"
+      },
+      {
+        "source_status": "EVENT_BAR_MISSING",
+        "count": 6,
+        "reason": "event bar absent; numeric results cannot qualify",
+        "source_selector": "event_bar_missing_cases"
+      }
+    ],
+    "verified_terminal_cases": 0,
+    "strategy_citation_allowed": false,
+    "use": "Carry all 271 blocked package keys with their retained reasons/source. Never silently drop the six EVENT_BAR_MISSING cases. The 686 OK source statuses are not accepted identities, terminal valuations, eligible native exclusions or strategy admission.",
+    "denominator_boundary": "957 audited forward rows and 1172 package event keys describe different retained scopes. They are not a complete eligible historical market universe and are not added to the E2 inspection counts."
+  },
+  "native_PIT04_exclusions": {
+    "status": "INCOMPLETE_ACCEPTED_LAYER15_RECEIPT_UNAVAILABLE",
+    "accepted_layer15_receipt": {
+      "path": null,
+      "sha256": null,
+      "verdict": null
+    },
+    "accepted_layer15_manifest": {
+      "path": null,
+      "sha256": null
+    },
+    "artifact": null,
+    "artifact_sha256": null,
+    "exclusion_count": null,
+    "universe_members": null,
+    "reason": "Layer1.5 has not passed its acceptance run and no accepted native eligible-universe exclusions dataset was delivered. This requirement is incomplete and blocks the relevant survivorship/cohort/data and strategy-evidence acceptance claims. Counts remain unknown; source-level code, an unaccepted receipt or 271 corpus-blocked keys cannot substitute for an accepted receipt.",
+    "mandatory_intake": "Consume counted exclusions[] ONLY from a Layer1.5 acceptance receipt that passed the required native acceptance run and binds the exact manifest, universe inventory and exclusions bytes. Retain and verify the accepted receipt path/SHA256 and its accepted manifest/exclusions path/SHA256. The receipt's counted exclusions must equal the carried rows; no independently reconstructed list, source-test result or partial package ledger grants acceptance.",
+    "required_row_fields": [
+      "security_id",
+      "reason",
+      "source.artifact"
+    ],
+    "source_binding": "Each source.artifact names a retained original artifact id/path/hash in the same admitted manifest. Effective membership, availability and revision fields use the pinned Layer 1.5 temporal contract.",
+    "accounting": "Every anchored/eligible active historical identity must appear exactly once as included universe membership or an explicit counted exclusion for that bound inventory. Account for the complete inventory, preserve unknown membership/identity status and all provenance. The cohort/survivorship citation report carries every accepted exclusions[] row's security_id, reason and source.artifact, the accepted receipt/manifest/exclusions hashes, total exclusion_count and counts by reason, alongside scoped included/unknown counts. Verify equality of report rows/counts with the accepted source; a summary count without its identities and reasons is incomplete.",
+    "pre_outcome_rule": "Materialize and hash the actual dated candidate inventory and included/excluded rows from qualified source/identity/feature metadata before outcome values are loaded. Same cohort and exclusion policy apply to all models and controls. Outcome, return or eventual mover status never supplies an exclusion reason.",
+    "after_sealing": "PIT-04 pre-cutoff inventory exclusions do not authorize deleting sealed top-K picks. Later missing prices, halts, delistings or unknown entitlement remain censored picks in precision@K and block economic acceptance as specified in the other R2 contracts.",
+    "completeness": "Report source coverage and survivorship bias alongside every diagnostic. Anchored partial inventories do not establish market-wide historical completeness.",
+    "execution_gate": "If the accepted Layer1.5 receipt, its bound counted exclusion identities/reasons or their hashes/count equality are unavailable or fail verification, retain INCOMPLETE status and block the relevant survivorship/cohort/data acceptance and strategy-evidence evaluation/promotion. A reviewed protocol hash cannot clear that requirement. Unknown or unaccepted required membership, split or terminal evidence also remains blocking. Cutoff inventory exclusion and later censored sealed-pick accounting remain separate ledgers.",
+    "current_receipt_state": "Accepted receipt path/hash/verdict, accepted manifest path/hash, native exclusions artifact/hash, included count and exclusion count are all null. This is an explicit incomplete requirement, not a successful receipt or zero exclusions."
+  },
+  "G4_scope": {
+    "ruling": "CC101427Z requires three checks, not three independent providers.",
+    "checks": [
+      "Provider action ratio parsed with alpaca_split from retained Alpaca page bytes.",
+      "Native LEAN factor and effective event at 985ef30ad3ac774218c5ac516b4cb0aa2655730f.",
+      "Raw bars compared against independently acquired Alpaca Adjustment.SPLIT bars, never a series derived from the raw bars; declared provider-rounding tolerance."
+    ],
+    "upgrade": "The owner's Tiingo/Alpaca/SEC three-provider design remains a separate owner-gated upgrade. The current locked runtime has no Tiingo client.",
+    "acceptance": "Neither this ruling nor source-level implementation accepts the historical-data E2E. Existing N1 receipt df92a20d remains engine evidence only."
+  },
+  "current_candidate": {
+    "new_outcome_values_read": false,
+    "market_acquisition_run": false,
+    "model_fit_run": false,
+    "runtime_install_performed": true,
+    "runtime_install_evidence": "R3-RUNTIME-ACCEPTANCE.json retains the unchanged original13:50:35Z authorized17221888 installation snapshot; currentf451ef97 verification is separate in R3-RUNTIME-LOCK-VERIFICATION.json. No new installation was performed for this R3B document revision.",
+    "alpaca_paper_key_used": false,
+    "scope": "Current combined R3B under CC152445Z folds all seven CC/Claude/GPT document corrections. The previously authorized runtime installation is recorded as performed, distinct from no new install in this revision. Both named readers review one full hash set before freeze; accepted Layer1.5 receipt and native counted exclusions remain incomplete. No strategy claim or execution release."
+  }
+}

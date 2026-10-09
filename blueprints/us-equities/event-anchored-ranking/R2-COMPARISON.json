@@ -1,0 +1,157 @@
+{
+  "schema_version": 1,
+  "revision": "R3: computable portfolio, explicit macro-session statistics and scoped forward training",
+  "common_target": "Frozen close-based+100percent within the next5XNYS sessions; the five+200percent labels are separate secondary targets",
+  "common_cohort": "Exactly R2-CONSTRUCTION.json cohort_C and identical original inspection/data/identity predicates for every arm",
+  "mandatory_arms": [
+    "LightGBM_binary",
+    "v2_S2_morning_adaptation",
+    "CKX_eight_predictor_five_session_logit",
+    "KZ_tail_predictor_five_session_logit"
+  ],
+  "v2_adaptation": {
+    "source_pin": "native-agent-stack@ee01dd1274b3e6339ac388b53e2fea3d3b1ec52b",
+    "protocol": "blueprints/us-equities/mover-early-entry/protocol-v2.json:78-96",
+    "implementation": "evaluate_v2.py:349-358,396-403; SHA256d2007077ac7367e16061e49a645a54802fbb58c41d79d3b2da6417b0275b2fe4",
+    "qualify_at_q_t": "On completed anchor_a: volume_a>=5*median(volume_a-20..a-1), close_a>=max(high_a-20..a-1), close_a/close_a-1>=1.10, with20consecutive preceding sessions and the common price/dollar-volume screens",
+    "rank": "Only qualifying cohort_C names; descending actual anchorVWAP*volume, then immutable security_id lexicographic",
+    "K": [
+      5,
+      10,
+      20
+    ],
+    "underfill": "Take min(K,qualifying_count); do not pad with nonqualifiers. Unused comparison slots and notional remain cash.",
+    "clock_horizon_change": "The paper experiment uses new09:25rank/09:35entry and five-session15:55exit for ALL arms. Original_v2 used anchor-close entry, next-session exits and cap5. This is explicitly a frozen adaptation, not an exact original-v2 performance reproduction.",
+    "capture": "Use identical future-label definitions and eligible-positive denominator to the new models; historical11.7percent capture/about0.25percent precision are context only"
+  },
+  "logit_fit_shared": {
+    "implementation": "scikit-learn1.9.1 Pipeline(StandardScaler(),LogisticRegression(solver='lbfgs',C=infinity,l1_ratio=0.0,fit_intercept=True,class_weight=None,tol=0.00000001,max_iter=10000,warm_start=False))",
+    "native_source": "scikit-learn@1.9.1 sklearn/linear_model/_logistic.py; official generatedLogisticRegression docs expose supported solver/no-regularization surface. No library is reimplemented.",
+    "objective": "Unpenalized binary maximum likelihood with intercept; predict_proba class1 ranks candidates, then immutable security_id. No published full-sample coefficients copied into this study.",
+    "target_horizon": "Refit on the frozen N1+100percent-within-five-close target, separately for each declared+200percent label. This changes the native literature label/horizon and is named a five-session adaptation, not an annual/native jump probability replication.",
+    "input_units": "Exact predictor definitions/units from the bound paper-adaptation operator sheet; no hidden pooled scaling or generic-feature substitution",
+    "winsorization": "Per predictor5th/95th percentiles from training fold only, quantile interpolation='linear', clip validation with those same fixed bounds",
+    "scaling": "Train-only StandardScaler population variance(ddof0); constant train predictors map to zero using vendor's scale1 convention",
+    "sample_weights": "One issuer/accession event totals weight1 across its admitted share classes; each row weight=1/group_training_row_count. Same rule applied to LightGBM.",
+    "minimum_training": "At least30positive and100negative qualified labels and at least40decision sessions; otherwise INSUFFICIENT_EVIDENCE for that fold/target",
+    "failure": "Separation/nonfinite coefficients/convergence warning/unsupported input yields MODEL_FAILURE or INSUFFICIENT_EVIDENCE. No rescue regularization, missing-variable deletion or guessed paper parameters after outcomes. Any changed fit requires a reviewed successor before evaluation.",
+    "validation": "Fixed final fits use development2022-2023 only under the explicit R2-CONSTRUCTION.json retrospective training scope.2024predictions/labels are inspected diagnostics, never a clean holdout or fitting input;2025remains quarantined. No prospective refit."
+  },
+  "metric_definitions": {
+    "K": [
+      5,
+      10,
+      20
+    ],
+    "slot_denominator_D_tK": "min(K,|eligible cohort_C_t|), common for every arm",
+    "primary_precision_at_K": "TP_tK/D_tK. A known v2 underfill contributes unused cash slots and no true positives. Separately report conditional precision TP/n_selected; conditional precision is not the promotion comparator.",
+    "event_capture": "TP_tK/P_t, where_P_t is the number of positive labels in cohort_C_t. Sessions with_P_t=0 are reported separately and excluded from capture-difference tests, identically for every arm.",
+    "censored_labels": "Seal topK atcutoff andneverrefill. Unresolvedpicks remain in the fixedD_tKdenominator, withunknowncount andidentificationbounds[knownTP/D,(knownTP+unknownpicks)/D]. They are not true negatives. Censoring/unknownpositive-denominator prevents promotion unless qualifiedevidence resolvesit; never removeunknowns to improveprecision or choose a favorable subset.",
+    "lift": "Slot_precision/(P_t/|C_t|); undefined when_P_t=0. Report descriptively with denominators, never a separate hidden promotion test.",
+    "net_returns": "Use the sealed control map for the complete cohort, the cash/whole-share/fee/impact/5K-cap contract in portfolio, and the fixed per-session paired slot-excess mean in statistical_aggregation.net. Retain nonfill cash, unmatched rows and censored economics. Portfolio net return/drawdown are separately defined by the actual NAV ledger; no hidden aggregate choice.",
+    "net_costs": "Exactly portfolio.fees and portfolio.impact.300/600 round-trip bps split equally per side in modeled executable prices, plus the frozen per-order commission. Cross the supported ask/bid once; no second spread or duplicate impact debit."
+  },
+  "uncertainty_and_multiplicity": {
+    "bootstrap": "arch8.0.0 arch.bootstrap.CircularBlockBootstrap(5, numpy.arange(n_scored_sessions), seed=20261008).bootstrap(49999), using each returned positional index vector as the shared native draw of the complete ordered scored-session grid. All same-session securities/arms/labels/validity masks/metrics move together, including empty-C and zero-selection cash slots. No custom resampling code; source bashtage/arch@038d78b709e75f2590890757af32705817a6fad8 arch/bootstrap/base.py. Runtime bound to f451ef979cdb1ae3686a30df1c883c257402b32753478c1f9c686c057e9c3989.",
+    "primary_family": "126 fixed one-sided statements: 3K*6labels*3baselines*2 named metrics(slot precision@K and event capture)=108, plus3K*2cost scenarios*3 session-net-excess versions(original,winsorised,top5removed)=18. Each uses the fixed equal-weight session-mean aggregation above. Keep126 even when a secondary statement lacks evidence.",
+    "alpha_family": 0.05,
+    "treatment": "BonferroniFWER0.05over126statements; eachpairedlowerbootstrapbound uses native numpy2.5.3 quantile over all49999 finite required draw statistics at q=float64(0.05)/float64(126), method='linear', weights=None. In sorted zero-based order h=(49999-1)*q=19.840476190476192, j=19 and fractional weight0.8404761904761919 toward y[20] from y[19]; this is H&Ftype7, not invertedCDF/higher or the (n+1)q plotting position. The native numpy.quantile call is normative, with no replacement quantile formula. One-sidedconfidence1-0.05/126. Promotion remains ALLK and its18baseline metricbounds plusALL18netreturnbounds>0. Any undefined/nonfinite required draw makes that statement INSUFFICIENT_EVIDENCE/lower_bound=null, never a survivor-onlyquantile orPASS.",
+    "estimator_source": "numpy/numpy v2.5.3 numpy/lib/_function_base_impl.py, linearQuantileMethods/quantile/percentile; installed source SHA256000d045b739c89974bfd9bae66beaa35bfd97ea7a06d13378aa234153a3b6116 agrees with pinned upstream bytes. Official2.5quantile docs support method='linear'. R3B-NATIVE-METHOD-EVIDENCE.json records primitive-only execution and source parity.",
+    "index_digest_gate": "Before any inference on the complete121-session scored grid, verify the upstream arch8.0.0CBB length5/seed20261008/49999draw index stream. Concatenate each returned positional vector in draw order as numpy.asarray(idx,dtype='<i8').tobytes(order='C'), no header/delimiter;48399032bytes SHA256281cc481bf5eb7872d837d3bda7cf9340efd7bb97a6a56ec06e6a3737b31f527. Keep every chronological empty/masked session in the grid. Any version/index/grid/digest mismatch blocks inference; do not drop sessions to match. Use a fresh seeded instance for actual inference after this diagnostic so its generator is not advanced. This digest is an index-only primitive result, not strategy inference.",
+    "secondary_family": "Allfive+200labels atall3Khave the SAME126-familyadjustment. Inferentialsecondaryclaims requiretheir own30positive/100negative minima and bound>0; otherwisecounts/insufficientonly. Secondarywins cannot replace failedprimary100percent statements.",
+    "descriptive": "Report every K/label/cost scenario, denominators, failures and point estimates even when no promotion claim is possible. Do not pool before/after model-cutoff LLM data in any future arm."
+  },
+  "decision": {
+    "DATA_INVALID": "Any future-input, original-version, historical-identity, split/dividend/terminal accounting, unmatched inspected-exposure, or forbidden2026-01-02..09-18outcome violation rejects this execution; no strategy number is citable",
+    "INSUFFICIENT_EVIDENCE": "Any mandatoryarm/data/identity/fitfailure, quarantine, primarytarget<30positive/<100negative, <250filledmain/controlpairs, <100distinctissuers, <40distinctentrysessions, <10positive-labelsessions, matchedcoverage<90percent or unresolvedpicks preventspromotion. No armdeletion or favorablecohortrefill.",
+    "NOT_BEATEN": "A qualifiedforwardconfirmatory cohort exists but any of36promotionbounds(18primary100percentbaseline comparisons+18netreturnrobustness) <=0. No promotion or reserveunlock; preservefailures.",
+    "HISTORICAL_DIAGNOSTIC": "2024/2025were previouslyinspected and cannot providefreshconfirmatoryPASS. Any later historicalnumbers remain inspecteddiagnostics and still needLayer1.5/nativeaccountingacceptance.",
+    "FORWARD_HOLDOUT_PASS": "At the fixedforwardperiodend allsource/mechanical/inspectiongates andALLmandatoryarms qualify, all36promotionlowerbounds>0 atBonferroni126level, minimumfills/issuers/sessions/matches pass, nettotalreturn>0 anddrawdown<=20percent inbothcostscenarios. Onlythisunreadprospectiveperiod canpromote thisversion.",
+    "RESERVE_ELIGIBLE": "Separate CC disposition and complete historical inspection eligibility are required before a single2025pass. The current conservative quarantine does not grant it. Freeze alone is not a reserve-access or strategy-execution cue.",
+    "PROMOTE_FOR_SEPARATE_RESEARCH": "Only FORWARD_HOLDOUT_PASS may proceed toseparatelyreviewedresearch/papercandidatework.2025quarantineis not waived; no automaticpaper/liveorders.",
+    "all_or_none": "All K, all3baseline arms and both cost scenarios are mandatory. Unresolved comparators do not remain conveniently unevaluated while the main model is called a winner."
+  },
+  "return_robustness": {
+    "winsorised": "For eachK/cost, on the occurrence vector selected only by the original shared validity mask, compute native numpy2.5.3percentile(values,[2.5,97.5],method='linear',weights=None), float64; clip with numpy.clip and take the declared equal-weight arithmetic mean. Recompute thresholds/clip/mean within every draw, keeping duplicated sampled occurrences with their multiplicity. Never use nanpercentile or a mask selected by return magnitude; empty/nonfinite required values make that draw undefined under the fixed rule.",
+    "top5removed": "Remove exactly FIVE DRAW OCCURRENCES with the highest paired session excess mean. Sort occurrences by value descending, original ISOsessiondate ascending, then zero-based returned-draw-position ascending; remove first5positions. Do not remove all copies of5distinctsessions. Recompute within every draw, preserving duplicate multiplicities in the remaining mean. Five or fewer valid occurrences yields undefined/INSUFFICIENT_EVIDENCE. Base-ledger picks/outcomes/denominators remain intact.",
+    "decision": "Original,winsorised andtop5removedlowerbounds each>0 forALLK/costs, includedin the126testfamily. Too fewsessions orundefinedrobustness isINSUFFICIENT_EVIDENCE, not automaticpass."
+  },
+  "forward_holdout": {
+    "start": "2026-10-14",
+    "last_decision_session": "2027-04-15",
+    "last_five_session_label_date": "2027-04-21",
+    "calendar_pin": "exchange-calendars4.13.2XNYS; date-onlymetadata computed beforeoutcomes",
+    "unreadness": "Future relative to the protocoldraft/commit. Every09:25rank andinput/modelhash is immutable beforeentry/outcomes. CurrentLLMfeaturesdisabled; no claimabout unknownmodeltrainingcutoffs isneededtoenablethem.",
+    "training": "Fixed fits use development2022-2023 only. Recollected RAW bars MAY enter the explicitly retrospective training-quality lane in R2-CONSTRUCTION.json if retained/quality-admitted before the fixed fit snapshot and prospective decisions. Other feature provenance remains unchanged. No historical PIT-success claim follows and no refit/reselection uses2024/2025 or the forward holdout.",
+    "evaluation": "Same6labels, K5/10/20, mandatorybaselines, costs, matchedcontrols,126familybounds andsampleminima. No aggregateforwardperformance read until the lastlabeldate; operationalfreeze/mechanicalchecks do notinspectoutcomes.",
+    "duration_rule": "No earlystop, extension or replacement based onresults. Counts belowminima at fixedend remainINSUFFICIENT_EVIDENCE.",
+    "boundary_gap_sessions": [
+      "2026-10-14",
+      "2026-10-15",
+      "2026-10-16",
+      "2026-10-19",
+      "2026-10-20"
+    ],
+    "potentially_scored_sessions": 121,
+    "first_scored_decision": "2026-10-21",
+    "training_recollection_scope": "Recollected RAW bars with retained bytes/hash, request adjustment/feed/window, observed-at and version/asof disclosure MAY train the fixed forward model on2022-2023, if captured and quality-admitted before the frozen fit snapshot and before any prospective decision. This is retrospective reconstructed-bar training, NOT an original-publication claim. Future split actions cannot change a historical feature's share basis; source capture time never becomes historical availability. Actual historical publication/version proof remains required to claim a point-in-time historical backtest. At prospective q_t, the current accepted bar/feature version must truly be available by that cutoff. No2024/2025 fitting, no forbidden2026 outcome training, no refit after forward outcomes.",
+    "unready": "If LightGBM exactbinaryparameters/determinism, the installed skfolio1.7.0source/API/issuer-session-horizon compatibility and reviewedexecution-pin amendment, nativeindexdigest gate, singleentryfill/qualifiedNAVaccounting, or any mandatory option/accounting/identity/Layer1.5 input is unaccepted at the start, record NOT_RUN; a run with inadequate qualified data is INSUFFICIENT_EVIDENCE. No shifted/extended window and no dropped KZ comparator.",
+    "scheduled_decision_sessions": 126
+  },
+  "sources": [
+    "GPT-REVIEW-ranking-protocol-232ad868.md required change1; SHA2567aad16abfa4e66f31b3004a0b0bc2320d2e8bf0b3ff50621145d3beceaa3b6bf",
+    "native predecessor catalyst-experiment/protocol.json supplies explicit evidence/sample/control and outcome-separation boundaries; new comparison/multiplicity constants above are frozen local study choices, not measured results"
+  ],
+  "statistical_aggregation": {
+    "named_two_metrics": [
+      "slot precision@K",
+      "event capture (recall over eligible positives)"
+    ],
+    "precision": "For each K/label/baseline, d_t=(TP_main,t/D_tK)-(TP_baseline,t/D_tK). The estimand is the arithmetic MEAN of these per-session differences over the shared set with |C_t|>0 and qualified labels. Each session gets weight1, independent of cohort size. It is not pooled sum(TP)/sum(D). Empty-C sessions remain logged and contribute no undefined precision.",
+    "capture": "For each K/label/baseline, e_t=(TP_main,t/P_t)-(TP_baseline,t/P_t). The estimand is the arithmetic MEAN of per-session differences over the common qualified sessions with P_t>0. P_t=0 sessions are retained/counted but excluded identically for every arm. It is not a pooled ratio.",
+    "bootstrap": "Use the same native arch.bootstrap.CircularBlockBootstrap index vector for every paired arm/label/mask/metric in the complete fixed49999drawstream on the ordered scored-session grid. Recompute each declared equal-weight pairedmean and robustness transform over its sampled commonvalidoccurrences; multiplicity follows the native index vector. If the original statement is insufficient or ANY required draw statistic is undefined/nonfinite/all-invalid/insufficient after its transform, record its drawposition/reason/count and mark thatstatementINSUFFICIENT_EVIDENCE withlower_bound=null. Complete the fixed shared stream; neverdelete/retry/regenerate a draw, substitutezero/-infinity, use nanquantile, or calculate from survivingdraws. Valid draws use the fixed native linearquantile rule in uncertainty_and_multiplicity. Preserve the126family and36promotionbounds; no default archCI/StepM/SPA/MCS. First-fiveboundarysessions are not scored/addedback; empty-Cchronologicalsessions stay. Nativeprimitive evidence is separate; no study statistic computed.",
+    "net": "For each main selected slot use its sealed control and each leg's realized net lot PnL divided by its declared pre-entry allocation budget, including whole-share residual cash. A supported nonfill is zero exposure/zero lot PnL, not a missing exit. Unused main selection slots are actual cash with zero difference. Let x_t be the mean of these paired slot excess returns over the common D_tK slots. The net-return estimand is the arithmetic mean of x_t across scored decision sessions with defined paired economics; neither pooling fills nor weighting sessions by fill count is allowed. Missing selected controls/entitlements/exits remain missing and cannot be set to zero, dropped to obtain a positive full-slot bound or rematched. Conditional diagnostics may show counts, but undefined full-slot economics blocks its acceptance.",
+    "portfolio_distinction": "The session excess-return comparison concerns entry-cohort slot quality; the net-total-return/drawdown gate separately uses the actual cash-constrained portfolio NAV path below. Neither statistic substitutes for the other."
+  },
+  "portfolio": {
+    "source": {
+      "repository": "native-agent-stack",
+      "pin": "ee01dd1274b3e6339ac388b53e2fea3d3b1ec52b",
+      "path": "blueprints/us-equities/catalyst-experiment/protocol.json",
+      "sha256": "f2aa3e4944ba2bd7cfb1fa41155e304075fff791f10b8c60996e3257dcbfe1e4",
+      "section": "portfolio",
+      "adaptation": "Adopt100000USD, no leverage, whole shares, causal1% trade-volume/10% displayed-size limits and its per-share/minimum fee schedule. Adapt position budget/cap to five overlapping sessions and K5/10/20; retain the already declared300/600bps round-trip impact sensitivities instead of adding the predecessor's10/50bps schedule."
+    },
+    "starting_capital_usd": "100000.00",
+    "books": "Independent USD cash portfolios for every model/K/cost scenario and each main matched-control counterfactual. Each starts with100000.00; no leverage, cash interest or financing. Never combine lanes or choose the better cost scenario.",
+    "allocation": "At cutoff q_t determine E_t only from the explicitly qualified causal mark rule below. A held long position needs bid event/available clocks<=q_t and age<=15seconds plus supportedprice/spread/session/halt evidence; missing/inactivepremarket support makes sizing incomplete, not a previous-closefallback. Each sealed slot targets B_tK=E_t/(5*K) including fees/impact; K20/10/5target1%/2%/4%NAV. At the selectedentryquote recheckcash/gross/concurrency with equally qualified currentriskmarks. No unsupportedNAVbudget orfutureproceeds. Controlsuse the sameformulaontheir ownNAV/sealedtreatedslot. Nonfills/cash retained; scores/slotsneverrefilled.",
+    "concurrency": "At most5*K open lots (25/50/100 for K5/10/20) in each book, and no same-security overlapping lot within a book. Before a new fill require projected gross marked exposure <= contemporaneous qualified NAV and nonnegative available cash after entry charges. Exits due at15:55 do not free capacity for that day's earlier09:35 entries. Rejected capacity/cash/overlap slots remain documented nonfills; no top-K refill.",
+    "participation": "For the SINGLE chosenfullqentry, q<=floor(0.01*eligible cumulative tradedshares observed from09:35throughthatcandidateinstant) andq<=floor(0.10*thatinstant's displayedexecutableasksize). Tradeidentity/sourceadmission deduplicateseligibletrades and requires event/availableclocks<=theevaluationinstant. Caps apply once to the fullentryquantity, not perpartialfill; noworkingorder/replenishment/futurewindowvolume. Missing/zerocapacity skips thatquote; nofeasiblecandidateby09:40exclusive yieldsretainednonfill. Separatebooks are counterfactuals,notcombinedexternalparticipation.",
+    "fees": {
+      "per_share_per_side_usd": "0.005",
+      "minimum_per_executed_order_usd": "1.00",
+      "formula": "For one entry or exit order with whole-share quantity q, commission=max(1.00,0.005*q)USD, quantized to USDcentsROUND_HALF_UP, charged exactly onceperorder. Eachlotmodels onefullqentry andonefullremainingquantityexit. A partial,multievent,multprice,lateentry orlate/unresolvedexit cannot silentlyaggregate into the prescribed model; its nativeaccountingacceptance fails/remainsincomplete ratherthan addingminimumfees or zeroing economics.",
+      "status": "Frozen hypothetical research tariff from the cited precedent, not an Alpaca tariff claim. Its native engine fee realization/account reconciliation is not yet accepted."
+    },
+    "impact": {
+      "round_trip_bps": [
+        300,
+        600
+      ],
+      "per_side_bps": [
+        150,
+        300
+      ],
+      "formula": "Each side uses the fixed scenario h=round_trip_bps/2. Effective buy price=ceil_to_instrument_tick(qualified ask*(1+h/10000)); effective sell price=floor_to_instrument_tick(qualified bid*(1-h/10000)). The positive dated instrument tick is a qualified input; otherwise the case is incomplete. Crossing the supported ask/bid already pays the full spread; do not subtract it again and do not also post a duplicate impact charge.",
+      "scope": "Deterministic adverse execution sensitivity, not vendor-calibrated actual market impact. Original quote prices, tick, modeled prices and charges remain separately reported."
+    },
+    "entry_fill_rule": "At most one full entry per sealed slot. Search causal supported quotes with evaluation timestamp in [09:35:00,09:40:00)ET. Select the earliest evaluation timestamp at which at least one whole share is feasible; equal timestamps use accepted quote source/artifact UTF-8 ID then native row/sequence index. At that instant use current positive finite bid/ask, ask>=bid, spread10000*(ask-bid)/mid<=100bps, quoteage<=15seconds and supported active session/halt evidence. Choose largest whole q satisfying portfolio budget/cash/gross/concurrency, q<=floor(0.01*eligible cumulative traded shares observed since09:35 with event/available clocks<=that instant), and q<=floor(0.10*current executable ask size). Apply the fixed adverse impact/tick rounding once to that ask. No working order, quote replenishment, later/accumulated partial entry, future volume, topK refill or control rematch. No feasible supported quote yields a retained nonfill. Exact shared rule R2-COMPARISON.json#/portfolio/entry_fill_rule.",
+    "quantity": "At the one selected feasiblequote choose largest wholeq>=1meetingthefullentrycaps,cash/gross/5*Klotcap/samesecurityoverlap,and q*effective_buy_price+entry_commission(q)<=B_tK. Effectivepriceusescurrentask/scenarioimpact/tick once; executeexactlyonefullqmodeledentry atthatevaluationinstant. No accumulatedpartialfillsorworkingorder; nofeasiblequotein[09:35,09:40) isnonfill. NativeLIMIT/FOKis asupportedcandidatebutnotproof of onefill-event/price; independentnativeacceptancemustrejectpartial/multievent/laterentry orprice mismatch. Noadapter/custommatchingengineis authored to forcecompliance.",
+    "exit": "The fixed fifth-holding-session15:55/early-close rule remains. Exit at supported bid with adverse impact and one per-order commission; unknown exit/terminal entitlement is censored, not zero proceeds. Qualified cash/quantity actions apply exactly once.",
+    "NAV": "At initialcapital,everyaccepted same-sessionclose,eachfill/action/casheventandentryriskdecision,NAV=cashaftercosts+actualremainingsharevalue+qualifiedentitlements. Atnonclosemarks,longsharesusequalifiedbid event/available<=mark,age<=15seconds and existingprice/spread/active-session/halt predicates. Atclosemark,useonly separatelyacceptedofficialclosingpriceforthatsamescheduledsession withpublication/availability<=thatspecifiedmark; no previousclose,cachelastprice/nativefallback/carryforward/backfill. Ahaltedheldposition,missing/stale/inactivepremarket/unsupportedmark orentitlement makesNAV/budget/risk/net/drawdownincomplete; sealedpicksare retainedwithoutunsupportedsize/replacement,cash-onlyNAVorzero-proceeds. Retainentireorderednativeledger; anyothervaluationneedsreviewedfreshnessbeforeuse. Lastlots exitby2027-04-21/decisionsend2027-04-15. Noafter-outcomemark-gridchange.",
+    "native_source_boundary": "nautechsystems/nautilus_trader@1b0a49d2792a9432a3aca3fcb617ce7a630d905e crates/model/src/enums.rsTimeInForceFok andcrates/execution/src/matching_engine/mod.rsfullleaves_qtyprecheck/filltupleloop exposeFOK,butdo notguaranteeoneevent/price. crates/portfolio/src/portfolio.rsget_price mayfallbacktosidequote/last/bar/cache; returnednativeequitydoesnotproveprotocolfreshness. Exactentry/impact/fee/mark realization staysanunacceptednativegate.",
+    "return_and_drawdown": "Net total return=(final fully reconciled NAV-100000.00)/100000.00. For the full ordered qualified NAV series including initial capital, peak_j=max(NAV_0..NAV_j) and positive max drawdown=max_j(1-NAV_j/peak_j). Main must have net total return>0 and max drawdown<=0.20 for every K and both scenarios, as already required. Report main/control NAV paths and fill/nonfill/censored counts separately. An undefined final NAV or mark is never PASS.",
+    "engine_acceptance": "This is a frozen computation contract, not a native execution result. Upstream Nautilus fill/order/account/position reports and independent Decimal cash, fee, action and NAV reconciliation must realize it before a strategy number is citable. N1 df92a20d is still engine evidence only.",
+    "fincore_adoption": "fincore0.5.1 is installed but ZERO_USE_IN_R3 under CC134735Z's explicit option. No fincore net-return/drawdown gate or numerical-equivalence execution is claimed. The declared ordered native NAV ledger, exact formula and independent Decimal reconciliation remain the C3 contract. Do not remove the dependency in this unit; its owner can decide its role at the next authorized lock change."
+  }
+}

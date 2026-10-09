@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "scope": "Two fully declared literature-motivated five-session refits; not exact published probability or return replications",
+  "fit_reference": "R2-COMPARISON.json#/logit_fit_shared gives the fixed native implementation, target/horizon, train-only transformations and failure states",
+  "CKX": {
+    "id": "CKX_eight_predictor_five_session_logit",
+    "primary_source": {
+      "authors": "Conrad, Kapadia and Xing",
+      "publication_doi": "10.1016/j.jfineco.2014.04.001",
+      "accessible_version": "Author-hosted February2013preprint, linked under2014JFEarticle; UNC explicitly labels editionPreprint",
+      "pdf": "r2-sources/ckx/Jackpot_JFE_Mar22.pdf",
+      "sha256": "3a0256d3fc0a94ed8f2c55dbf986e48a56891a4eb9ce78a5234b3608b1eaed81",
+      "urls": ["https://www.ruf.rice.edu/~yxing/Jackpot_JFE_Mar22.pdf", "https://cdr.lib.unc.edu/concern/articles/br86bc45v"],
+      "locators": "MinerUdoc:3a0256d/tier:standard/page:15(lines4,7-9),page:18(line7),page:43(Appendix1),page:51(Table3)",
+      "limits": "Final2014method equivalence and printed coefficient scaling are not established. No table coefficients or historical OOS probabilities are reused."
+    },
+    "native_literature_contract": "Eight-variable logistic model of next12-month continuously compounded return>1.00, with delisting returns. End-June annual estimation expands from1951with at least20years, accounting lag6months, predictors winsorized5/95. This is not the same target, sample length or cadence as N1.",
+    "fixed_N1_adaptation": "Use exactly the eight supported predictor families below, with declared daily historical operators, and refit native binary logit on the commonN1close-based+100percent-within5session target using2022-2023only. No claim that this is CKX's calibrated annual jackpot probability.",
+    "predictors": {
+      "RET12": "Sum of log total-wealth daily returns whose session date is in(a minus12calendar months,a], using date-offset months, not an approximated252-row year. Wealth includes verified dividends/delisting proceeds and consistent share basis; missing economic adjustments reject the row.",
+      "STDEV": "SampleSD(ddof1) of daily log total-wealth returns in(a minus3calendar months,a], expressed as raw return fraction. Train-fold centering/scaling replaces ambiguous printed-table units.",
+      "SKEW": "Adjusted Fisher-Pearson sample skewness of those same3-month daily log returns; known zero dispersion maps to0",
+      "TURN": "Mean monthly share turnover over the last6completecalendar months minus mean over the last18completecalendar months before decision_t. Each month's turnover=sum daily volume/shares_outstanding in the same cutoff-consistent share units; original dated shares required.",
+      "SIZE": "ln(split-consistent anchor_close*original as-of shares_outstanding/1000), USD market cap in thousands",
+      "AGE": "Calendar days since the earliest admitted original listing start for this immutable security divided by365.25; original lifetime evidence is required, not first date in the downloaded sample. This is the declared available-security-master adaptation of the paper's firstCRSPappearance operator.",
+      "TANG": "Original annual grossPPE/total_assets from the latest fiscal-year record actually disseminated by cutoff and whose fiscal-year-end precedes cutoff by at least6calendar months; positive assets required",
+      "SALESGRTH": "ln(Sales_y/Sales_y-1) from those original consecutive annual records, same availability and6-month lag. Nonpositive/missing sales or revision history is unknown, not0."
+    },
+    "local_choices_declared": "Daily sample/target, explicit log-return convention, sample skewness/ddof, daily availability, listing-date mapping, calendar-month windows and native optimizer are fixed local adaptations. They are not silently attributed to the paper.",
+    "required_data": "Historical total-wealth prices/actions/terminal entitlements, dated shares, listing lifetimes and original accounting versions. Unavailable data makes the mandatory comparison INSUFFICIENT_EVIDENCE, never a seven-variable replacement."
+  },
+  "KZ": {
+    "id": "KZ_tail_predictor_five_session_logit",
+    "primary_concept": {
+      "authors": "Nishad Kapadia and Morad Zekhnini",
+      "doi": "10.1016/j.jfineco.2018.08.014",
+      "primary_public_preview": "r2-sources/kz/sciencedirect-primary-public-preview.md",
+      "url": "https://www.sciencedirect.com/science/article/abs/pii/S0304405X18302393",
+      "locators": "Public introduction lines119 and121: left/right option-implied tails from Bollerslev/Todorov2011, option-implied volatility and realized-versus-implied-volatility difference predict jumps OOS",
+      "native_label": "Absolute idiosyncratic return>3conditional idiosyncratic standard deviations; not theN1+100percent close label",
+      "horizon_limit": "Public nextday/week/month wording describes portfolio return evaluation; it is not proof of a native probability horizon. Native KZlogit/tenor/optimizer is not asserted from this preview."
+    },
+    "primary_operator_source": {
+      "authors": "Bollerslev and Todorov",
+      "title": "Tails, Fears, and Risk Premia",
+      "source": "https://public.econ.duke.edu/~boller/Published_Papers/jf_11.pdf",
+      "pdf_sha256": "0ec6cf94fcad9e3cd38af955003183229dd82b7c58abfdd2793d785a1a73a4e5",
+      "locators": "MinerUdoc:0ec6cf9/tier:standard/page:10,JFp2174§II.Aeq17-18; page17/JFp2181nearestexpiry/interpolation; page18/JFp2182tailratio discussion",
+      "operator_definition": "RTQ_t(k) approximately exp(integrated_r)*C_t(K)/(tau*F_tminus); LTQ_t(k) approximately exp(integrated_r)*P_t(K)/(tau*F_tminus); k=ln(K/F_tminus)",
+      "semantic_limit": "These are annualized normalized tailPAYOFF measures, not automatically probabilities in[0,1]. Do not relabel them as calibrated jump probabilities.",
+      "notation_resolution": "Primarycaption/body conflict over 'log-moneyness'. This adaptation explicitly uses strikeRATIOS0.9and1.1 and k=ln(ratio), never logk0.9/1.1."
+    },
+    "fixed_N1_adaptation": "A NEW binary five-session logit over the three supported predictor classes, using the exact tail/volatility operators below. It is named KZ-tail-inspired refit, not a replication of unidentified original logit coefficients or probability horizon. It is mandatory in the common-cohort comparison.",
+    "option_selection": {
+      "observation": "Original options snapshot at the completed anchor_a close, demonstrated available by_q_t; current reconstructed chain or future intraday quote is forbidden",
+      "expiry": "Earliest standard listed expiry with at least8calendar days remaining after_a; no maturity chosen from future return or quality of fit",
+      "price": "Supported original positive finite two-sided midpoint=(bid+ask)/2, same timestamp/expiry for selected call/put, executable-spread metadata retained",
+      "forward": "Original verified same-expiry forward/futures-equivalentF and integrated riskfree rate for that tenor from qualified sources; missingF/r is unknown. No current-rate substitution.",
+      "target_strikes": "K_L=0.9F for OTMput, K_R=1.1F for OTMcall; bracket each target with two listed strikes and linearly interpolate their Black-Scholes implied volatilities, then use the supportedBS pricing operator at the target strike",
+      "interpolation": "No extrapolation or deepest-strike proxy. Missing bracketing quotes excludes the common row. Use installed NautilusTrader2.0.0rc5 imply_vol and black_scholes_greeks; native input/output signatures are bound below. No new dependency, locally rebuilt pricing formula or solver.",
+      "tau": "Remaining XNYS trading sessions including expiry, counted from_a using the frozen calendar, divided by252; retain exact calendar and maturity timestamps",
+      "IV_ATM": "Annualized fractional implied vol for the same expiry atK=F, interpolated by the same qualified upstream operator; no mixing tenor or percent units",
+      "exercise_style": "Require European exercise or originally archived European-equivalent premium/IV with supported exercise/dividend conversion and version provenance. Raw American equity mids without that equivalence are unqualified; no local guessed early-exercise adjustment.",
+      "native_pricing_mapping": "nautechsystems/nautilus_trader@1b0a49d2792a9432a3aca3fcb617ce7a630d905e: nautilus_trader.model.imply_vol(s=F,r=integrated_r/tau,b=0,is_call=is_call,k=K,t=tau,price=qualified_mid) at each bracketing strike. Linear-IV interpolate to targetK; black_scholes_greeks(s=F,r=integrated_r/tau,b=0,vol=interpolated_vol,is_call=is_call,k=targetK,t=tau).price. Sources crates/model/src/data/greeks.rs:193-226 and python/data/greeks.rs:275-306; native signatures verified, no pricing/model fit run. This generalizedBSforward mapping is the declared European-equivalent implementation, not an assertion that raw American quotes fit that model.",
+      "numeric_admission": "FinitepositiveF/tau/premium and finiteinterest/vol; IVmust befinitepositive. Native imply_vol returns0onfailure; reject0rather than using safe-vol fallback. Native greeks pricing internally usesf32; require premium-roundtrip absolute error<=max(original source premium_tick,0.000001*max(1,premium)) and record error. Nonfinite/nonconverged/incompatible style inputs yield INSUFFICIENT_EVIDENCE rather than a fallback solver."
+    },
+    "predictors": {
+      "LEFT_TAIL_PAYOFF": "exp(integrated_r)*put_mid_at0.9F/(tau*F), nonnegative annualized payoff rate",
+      "RIGHT_TAIL_PAYOFF": "exp(integrated_r)*call_mid_at1.1F/(tau*F), nonnegative annualized payoff rate",
+      "RV_MINUS_IV": "sqrt252*sampleSD(ddof1) of preceding20complete daily log total-wealth returns ending_a minus_IV_ATM, both annualized fractions. The20-session lookback and realized-minus-implied orientation are explicitly local choices, not inferred KZparameters."
+    },
+    "fitting": "Exactly R2-COMPARISON.json logit_fit_shared: binary commonN1five-session target, training-only5/95winsorization and scaling, unpenalized nativeLBFGSfit, no copied paper weights",
+    "required_data": "Qualified original compatible options quotes/tenor/forward/rate and historical total-wealth returns. Owner-held OPRA/other paid-option data is not acquired by this document task. Missing data or identity prevents execution/promotion; the arm is never silently replaced by a genericprice-volume logit.",
+    "method_distinction": "KZpublicpreview supports the predictor classes; BTprimarysource supplies computational tailoperators; concrete orientation/lookback/fit/target/no-extrapolation rules are declared pre-outcome research adaptations. Both readers must approve this exact adaptation scope before freeze."
+  },
+  "mandatory_comparison_rule": "Both literature arms are specified and required. No absence of a paid input, native method equivalence, convergence or sample eligibility can be hidden by leaving the comparator unevaluated and declaring main-model success. Preserve INSUFFICIENT_EVIDENCE until all mandatory arms execute under this frozen contract."
+}

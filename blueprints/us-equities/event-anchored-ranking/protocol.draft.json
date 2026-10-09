@@ -1,0 +1,517 @@
+{
+  "schema_version": 1,
+  "id": "n1-extreme-mover-ranking-20261008",
+  "status": "draft",
+  "revision": "R3 census-2018 identity-plan successor: P2 binds the exact PLAN and requires qualified joins, accounting and upstream-engine historical acceptance before census or fit; both designated delta reads remain required",
+  "parent_candidate_sha256": "8e203bcea1f3df307db3ccabb0294d5bad07cc24125eab77b6d1e320e3e9e704",
+  "required_changes": [
+    1,
+    2
+  ],
+  "review_state": "This census-2018 successor is authorised as a draft PR by CC223631Z before both designated R3 reads. Prior verdicts do not accept these changed bytes. Both named readers must PASS the same complete portable bundle before any census count, freeze or landing; after reads start hold its bytes until both returns. The predecessor R3B and withdrawn earlycc8attempt remain retained; no inherited PASS or execution release.",
+  "prior_R3_checkpoint": {
+    "path": "attempt-r3-f5f44980-gpt-revise/protocol.draft.json",
+    "sha256": "f5f4498084cc931a46450f410b3b1fde640b0377a7b51ab5219736ea97d56ebb",
+    "reason": "Retain bothfamilies' exactfailedsubject. Buildfresh fromf5; withdrawncc8successor ishistoryonly,notadopted."
+  },
+  "prior_R2_checkpoint": {
+    "path": "attempt-r2-bc8cba78/protocol.draft.json",
+    "sha256": "bc8cba78c6b7a4ce134a4da6980f25aa8c4280f3de060f025ac70838c95eb0ce",
+    "earlier_checkpoint": "attempt-r2-bec914/protocol.draft.json",
+    "earlier_sha256": "bec914efb5331aa774bbc17ab04e08f8a1be96d93c7e05a5b3f7f9a290cadf3e",
+    "reason": "Both R2 snapshots and their original manifests/receipts retained. R3 replaces the stale root hash carrier only after the combined packet is complete."
+  },
+  "R1_GPT_review": {
+    "path": "retained-evidence:coordination/ns2604-coop/gpt-reads/s4/GPT-REVIEW-ranking-protocol-232ad868.md",
+    "sha256": "7aad16abfa4e66f31b3004a0b0bc2320d2e8bf0b3ff50621145d3beceaa3b6bf",
+    "verdict": "FAIL",
+    "required_change_count": 3
+  },
+  "R1_Claude_review": {
+    "path": "retained-evidence:coordination/command-center/research-cc-role-20261008/ranking-protocol-232ad868-claude-reader-abdf9b75.output",
+    "sha256": "59022553cdb6561406afbe6e588c19d7a14367d314b18601d09917127071e2ae",
+    "verdict": "REVISE",
+    "CC_relay": "095919Z(a)-(h); folded into this sameR2"
+  },
+  "frozen_at": null,
+  "protocol_sha256": null,
+  "protocol_commit": null,
+  "purpose": "Prospective extreme-mover ranking after a detected catalyst; preregister labels, comparison and evaluation before reading outcomes",
+  "authority": "task-ns2604-coop-20261008T080508Z row14, completing070938Z synthesis action11",
+  "freeze_prerequisites": {
+    "action_1_asof_inputs": {
+      "state": "closed as the CC's owner-held dated gap",
+      "dated_utc": "2026-10-08T07:35Z",
+      "disposition": "inputs never retained; owner may hold them",
+      "path": "retained-evidence:coordination/command-center/ITEM-5f-asof-close-20261008T0735Z.md",
+      "sha256": "c1b5732bd67b1892b817cfbe7441755878c8b59922c26f7dde4b3dc74e740081",
+      "blocks_freeze": false,
+      "native_gate": "NOT_RUN; no reconstructed successful custody/coverage claim",
+      "supersession": "Event-anchored ranking replaces this missing-input as-of re-run for the north star"
+    },
+    "action_10_timing": {
+      "state": "received; 4/5 documented contracts, unresolved features excluded",
+      "path": "retained-evidence:coordination/ns2604-coop/lanes/convergence-practice-work/north-star-timing-keys-20261008T072128Z.md",
+      "sha256": "bc39dd5da7e6d9b720ebb18de23afec94f36bada7d2ec1f31e504c65e29b9d9a"
+    },
+    "inspection_registry": {
+      "state": "Known72pipelinecasesplus715E2events/713labelkeys:52dated2021warmup+103development2022-2023+278dated2024+280dated2025=713. Requestedcases2020/2021=13/65overlapandarepredevelopmentexposure. Allretainedmetadataaccounted; conservative dispositionAPPLIED; identityclosure/priorviewdepthunproved. No globalhistoricalunreadnessclaim.",
+      "path": "inspection-registry.draft.json",
+      "retained_metadata_complete": true,
+      "known5b_cases": 72,
+      "E2_event_cases": 715,
+      "E2_dated2025_label_keys": 280,
+      "sha256": "a64e61cccb5db24c51326364961ebeb630e6da1983732aae369d5e6be1a9c55d"
+    },
+    "CC_inspection_completeness": {
+      "state": "CC095919ZconservativeE2exclusiondisposition applied; no unreadhistoricalholdoutclaim",
+      "source_sha256": "9e8d8f1bbf10de712edb3c11c84fc4ebe24699eb6716d9ed19f7516b6e81f9a6",
+      "policy": "Excludeall286E2touched2025spans including280labelkeys; whole2025andinspected2024quarantined; forward126sessionholdout isconfirmatory",
+      "blocks_freeze": false
+    },
+    "two_readers": {
+      "co_op_GPT": {
+        "state": "pending R3",
+        "receipt": null
+      },
+      "CC_Claude": {
+        "state": "pending R3",
+        "client": "Claude Code on Max subscription",
+        "receipt": null
+      },
+      "acceptance": "Both named readers must pass the same R3 protocol, registry and all bound contract hashes in the canonical SHA256SUMS before freeze/commit. A read of R1/R2 cannot accept R3."
+    },
+    "order": "CC223631Z authorises this census-2018 portable draft and its ordinary candidate commit before both designated R3 reads. Publish the complete canonical SHA256SUMS, obtain both named same-byte R3 passes and qualified inputs before any census count or frozen protocol release. A candidate commit is not a freeze; frozen_at/protocol_sha256/protocol_commit remain null until the explicit CC cue. Any later reviewed-byte change needs a new hash and both reads.",
+    "hash_identity": "The protocol SHA256 is carried externally by canonical SHA256SUMS, identical SHA256SUMS.R3 and ROW14-PROTOCOL-R3/ROW14-SUBMISSION-R3.json; no self-embedded hash. R1/R2 carriers are archived."
+  },
+  "periods": {
+    "descriptive_census": [
+      "2018-01-02",
+      "2023-12-29"
+    ],
+    "descriptive_census_XNYS_sessions": 1509,
+    "develop": [
+      "2022-01-01",
+      "2023-12-31"
+    ],
+    "validate": [
+      "2024-01-01",
+      "2024-12-31"
+    ],
+    "reserved": [
+      "2025-01-01",
+      "2025-12-31"
+    ],
+    "forbidden_outcomes": [
+      "2026-01-02",
+      "2026-09-18"
+    ],
+    "minimum_gap_sessions": 5,
+    "calendar": "exchange-calendars4.13.2XNYS pinned",
+    "forward_confirmatory_holdout": {
+      "start": "2026-10-14",
+      "last_decision": "2027-04-15",
+      "scheduled_decision_sessions": 126,
+      "boundary_gap_sessions": [
+        "2026-10-14",
+        "2026-10-15",
+        "2026-10-16",
+        "2026-10-19",
+        "2026-10-20"
+      ],
+      "first_scored_decision": "2026-10-21",
+      "potentially_scored_decision_sessions": 121,
+      "last_label_date": "2027-04-21",
+      "status": "Unread future confirmatory period. The first-five-session gap removes five opportunities; do not extend the fixed end date. Action12 cue and all acceptance gates are still required."
+    },
+    "prior_exposure_disclosed": "Broad-universeinspected2017-2023development/validationandreserve2024-01-01..2026-08-14; mover-v1inspected2024-2025. E2all713labelkeys=52dated2021predevelopment/warmup+52dated2022+51dated2023+278dated2024+280dated2025. Requestedintervals separatelytouch13cases2020/65cases2021,66cases2022/118cases2023; overlappingyearcountsnotaddedtokeys. T1/T5/T20datemetadata24/23events2022/2023doesnotproveoriginalviewedoutcomevalues. Historicalperiodsareexposeddevelopment/diagnostics,neverfreshconfirmatoryholdouts; summaries/ownpipelineexposure remaininregistry/R2-INSPECTION.",
+    "warmup": "All declared lagged operators need their full support, including18completecalendar months of turnover and12calendar months of return history. Never score warmup outcomes.",
+    "boundary_rule": "Evaluation-side first5XNYSdecision sessions removed, exact dates inR2-INSPECTION.json; additional actual-horizon/issuer-event purging and boundary censoring apply. No outcome interval crosses a partition or forbidden period.",
+    "reserve_rule": "2025remains the declared reserved period but is wholly quarantined;2024is marked inspected and quarantined from fresh confirmatory claims. E2plus5bexclusion uses identity/event/time closure over planned future label/return evidence. Only explicit CCdisposition and verified closure could permit narrower eligibility; no favorable replacement cohort.",
+    "forbidden_rule": "No price-return label, ranking score evaluation, feature-derived outcome or simulated return is computed for any case whose outcome interval intersects 2026-01-02 through 2026-09-18."
+  },
+  "formation": {
+    "decision_time": "09:25 America/New_York before session t open",
+    "information_cutoff": "09:20 America/New_York on t, with original public availability and revision evidence",
+    "anchor_session": "a, the preceding completed XNYS session",
+    "entry_time_for_return_evaluation": "09:35 America/New_York on t; fresh executable ask and supported quote/halt evidence required",
+    "exit_time_for_return_evaluation": "15:55ET on fifth holding session(count_t as1), or5minutes before an early calendar close, firstsupportedbid within5minutes; missing exit or terminal entitlement is unresolved",
+    "causality": "The current day's final bar, future high, future revision and eventual mover status are never candidate or feature inputs. Daily past bars are released only at their XNYS closes."
+  },
+  "universe": {
+    "security_identity": "Historical ordinary-share listing interval with CIK-anchored issuer and distinct share-class/security identity; CIK alone is insufficient",
+    "selection": "Background_U: historical ordinaryshares, actualrawtradedanchorclose>=1USD, rawanchorVWAP*rawvolume>=1000000USD, prior20medianDV>=1000000USD. Scored_C is the fixedevent-conditionedcommoncohort withfullwarmup/predictors;20sessionscreenaloneis not252/18monthfiteligibility.",
+    "asof_membership": "Layer1.5 accepted dated identity/lifetime evidence at each cutoff; current Alpaca status or a current ticker map is not historical membership",
+    "survivorship_disclosure": "R2-SURVIVORSHIP.json binds CC101427Z PIT-04 accounting: every anchored eligible identity is included or explicitly excluded with reason/source and counted citation output. Current Layer 1.5 is unaccepted; native universe_members and exclusion_count remain unknown. The retained partial corpus has 271 blocked keys (265 NO_DATA and 6 EVENT_BAR_MISSING), distinct from native excluded-security counts; 686 OK source statuses are not acceptance. Required input acceptance precedes strategy evaluation.",
+    "delisted": "Eligibility is decidedonlyatcutoff, neverconditional onfutureterminaloutcomes. A laterdelisting/unresolvedexit remains a censoredsealedpick inprecisiondenominators andblocks economicacceptance untilentitlementresolved. Count/disclosesurvivorship andunknowns.",
+    "controls": "Same eligible universe, same cutoff, same price/liquidity constraints, same fills/costs and same missing-data rules for every compared model",
+    "duplicates": "One firsteligible row per security/accession, one selected event per security/session, exact age0..3/cutoff/tiebreak/consumption rules andCIK|accession grouping inR2-CONSTRUCTION.json. Share classes remain distinct.",
+    "option_scope": "Background_U remains the declared US ordinary-share universe. Scored_C is restricted to historically listed-option stocks with every mandatory KZ option/forward/rate/exercise-equivalence predictor qualified, alongside CKX/main inputs. This is an explicit model-comparison scope restriction, not a claim about all ordinary shares. Missing listed options or compatible data is a counted pre-cutoff common-cohort exclusion; no mandatory-arm deletion."
+  },
+  "labels": {
+    "exactness": "Thresholds use exact rational source ratios; a +200% simple return is ratio>=3 and +100% is ratio>=2. Invalid basis, missing horizons or unsupported prices stay censored, not negative.",
+    "five_plus_200": {
+      "regular_close_to_prior_close": "regular_close[t] / regular_close[a] >=3",
+      "regular_high_to_open": "regular_high[t] / regular_open[t] >=3; ex-post excursion, never an attainable sale",
+      "regular_high_to_prior_close": "regular_high[t] / regular_close[a] >=3; ex-post excursion",
+      "five_session_close": "regular_close[a+5 XNYS sessions] / regular_close[a] >=3",
+      "declared_entry_to_exit_midpoint": "supported declared exit midpoint / supported executable-entry midpoint >=3, with the fixed entry/exit clocks above; midpoint label is distinct from bid/ask cash PnL"
+    },
+    "plus_100_within_five": "max regular_close over sessions a+1..a+5 / regular_close[a] >=2; main binary target, exactly this close-based definition",
+    "training_target": "plus_100_within_five",
+    "secondary_targets": "Train/evaluate each +200% definition separately with the same frozen settings; never merge the five into one mover label or select the best after inspection",
+    "resolution": "Daily highs do not establish an exact intraday first crossing. Missing executable quotes censor the midpoint/return arm."
+  },
+  "features": {
+    "common_point_in_time_contract": "Prospective scoring inputs require qualified availability/version <=q_t. Retrospective 2022-2023 bar training has the explicitly scoped recollection rule in R2-CONSTRUCTION.json; it cannot establish historical point-in-time performance or relax original event/identity/accounting/option provenance.",
+    "price_volume_core": [
+      "RET1",
+      "RET5",
+      "RET20",
+      "RV20",
+      "RV60",
+      "MAX20",
+      "SKEW20",
+      "REL_VOLUME",
+      "LOG_RAW_CLOSE_A",
+      "LOG_MEDIAN_DV20",
+      "EVENT_AGE"
+    ],
+    "structured_catalyst": "Item1.01 positive flag is constant over scored_C and is cohort membership, not a LightGBM input. EVENT_AGE0..3 is the eleventh numeric input. Unknown provenance is excluded, never encoded as a supported negative.",
+    "timing_keys": {
+      "alpaca_news": "Excluded: interval filter field and historical paper/news entitlement unresolved",
+      "finra_short_interest": "Official seventh-business-day publication schedule alone does not prove intraday release or original revision. Excluded unless original publication/version evidence is supplied before freeze.",
+      "sec_ftd": "Semimonthly release schedule is not settlement-date availability. Excluded without original historical file-release/version evidence.",
+      "edgar": "Timezone-aware acceptance is normalized to ET; eligibility follows demonstrated dissemination. After16:00 acceptance cannot enter an earlier cutoff; typical API delays are not guaranteed deadlines.",
+      "xbrl": "filed is date-only; exclude filed-only intraday features and current reconstructed revisions without original accession/version availability"
+    },
+    "unresolved_policy": "Disabled optional news/FINRA/FTD/XBRL features remain excluded. Missing any of the closed11main or mandatory baseline inputs excludes the common row or yields NOT_RUN/INSUFFICIENT_EVIDENCE; never delete a mandatory column, replace it with zero or add a new feature without a reviewed successor.",
+    "llm_labels": "None; Jev excluded. A reviewed successor must establish each exact model's primary-source training cutoff, mandatory identifier/date masking and100percent post-cutoff primary evaluation with before-cutoff descriptive results separate. Unknown cutoff or unsupported masking prevents enabling that arm."
+  },
+  "models": {
+    "main": {
+      "library": "Official lightgbm-org/LightGBM (the microsoft alias redirects here), v4.7.0 at8f7036f03627054d5a54a6f965b13f4b9ff2cb63. Native installed pin4.7.0, Python3.12.3 locked installation and unchanged vendor regression example are verified in R3-RUNTIME-ACCEPTANCE.json. Exact binary-study fixed-parameter/determinism acceptance remains NOT_RUN and mandatory before study fitting.",
+      "estimator": "LGBMClassifier, binary objective, GBDT",
+      "fixed_parameters": {
+        "n_estimators": 200,
+        "learning_rate": 0.05,
+        "num_leaves": 15,
+        "max_depth": 4,
+        "min_child_samples": 100,
+        "subsample": 1,
+        "colsample_bytree": 1,
+        "random_state": 20261008,
+        "n_jobs": 1,
+        "deterministic": true,
+        "force_col_wise": true
+      },
+      "class_weights": "None; report class imbalance and calibrated probability scope without fitting on validation",
+      "selection": "Fixed parameters above; no hyperparameter search on2024/2025. Issuer-event sample weights and forward-safe nativeCPCVmask are the same as bothlogits. No new labeling or fit occurs in this document task.",
+      "input_columns": [
+        "RET1",
+        "RET5",
+        "RET20",
+        "RV20",
+        "RV60",
+        "MAX20",
+        "SKEW20",
+        "REL_VOLUME",
+        "LOG_RAW_CLOSE_A",
+        "LOG_MEDIAN_DV20",
+        "EVENT_AGE"
+      ],
+      "input_contract": "Exactly the 11 numeric columns and operators in R2-CONSTRUCTION.json closed_LightGBM_inputs. EVENT_AGE is included. The constant positive Item1.01 flag defines cohort eligibility and is excluded as an input. No CIK, security/ticker/name, calendar-date, news, XBRL, accounting, option or LLM column is silently added to the main model.",
+      "runtime_state": {
+        "status": "INSTALLED_PIN_NATIVE_VERIFIED",
+        "requested_pin": "4.7.0",
+        "pin_native_verified": true,
+        "parameters_native_verified": false,
+        "install": "DONE under CC133502Z after PAPER-WINDOW-CLOSED: guarded native WSL entrypoint, prepared uv0.12.17 locked route, Python3.12.3, installed lock17221888e8f3017d61e8a96eacd87a8bd8eda60ff6b1738eb683ed52980e175a. Exact receipt and evidence scope: R3-RUNTIME-ACCEPTANCE.json. Later authorized dev additions may change the current lock; this is the observed installation snapshot.",
+        "native_example": "Unchanged LightGBM v4.7.0 simple_example.py at8f7036f03627054d5a54a6f965b13f4b9ff2cb63 passed on its public regression fixture. The prepared repository runtime acceptance passed24/24. These do not verify the exact binary-study fixed_parameters, their determinism or study-input semantics.",
+        "before_study_fit": "Native exact binary-parameter and determinism acceptance remains mandatory and NOT_RUN; no strategy-fit readiness is inferred from installation or the vendor regression example.",
+        "runtime_lock_sha256": "f451ef979cdb1ae3686a30df1c883c257402b32753478c1f9c686c057e9c3989",
+        "current_lock_receipt": "R3-RUNTIME-LOCK-VERIFICATION.json; final existing lock verified after pytest9.1.1 dev addition, without a second relock. The earlier17221888 install snapshot remains historical evidence.",
+        "fit_run": false
+      }
+    },
+    "baselines": [
+      {
+        "id": "v2_S2_morning_adaptation",
+        "source": "Frozen_v2 qualifying conditions on anchor_a, descending anchorVWAP*volume, no nonqualifier padding; K5/10/20 and common09:35/five-session execution are explicit adaptations",
+        "contract": "R2-COMPARISON.json#/v2_adaptation"
+      },
+      {
+        "id": "CKX_eight_predictor_five_session_logit",
+        "doi": "10.1016/j.jfineco.2014.04.001",
+        "source_version": "VerifiedFebruary2013author preprint; final2014equivalence not asserted",
+        "predictors": [
+          "RET12",
+          "STDEV",
+          "SKEW",
+          "TURN",
+          "SIZE",
+          "AGE",
+          "TANG",
+          "SALESGRTH"
+        ],
+        "target": "Refit the declaredN1five-session target, not native12-month logreturn>1",
+        "contract": "R2-LOGIT-OPERATORS.json#/CKX and R2-COMPARISON.json#/logit_fit_shared; native sklearn1.9.1fit; no reused paperweights"
+      },
+      {
+        "id": "KZ_tail_predictor_five_session_logit",
+        "doi": "10.1016/j.jfineco.2018.08.014",
+        "source_version": "KZprimarypublicpreview confirms option-tail/vol-spread classes; BT2011primarypaper supplies concrete tailoperators; originalKZlogit/fit is not verified",
+        "predictors": [
+          "LEFT_TAIL_PAYOFF",
+          "RIGHT_TAIL_PAYOFF",
+          "RV_MINUS_IV"
+        ],
+        "target": "New native binary refit on commonN1five-session target, not a claimed nativeKZjump probability",
+        "contract": "R2-LOGIT-OPERATORS.json#/KZ supplies exact expiry/strikes/forward/rate/style/nativeNautilusBSoperators/units; R2-COMPARISON.json supplies fixed sklearn1.9.1fit",
+        "review_scope": "Both readers explicitly assess this supported literature-inspired adaptation; do not call it an exact published-paper reproduction"
+      }
+    ],
+    "jev_arm": "Excluded; no TypeSafe or Jev call, feature, ranking or reranker is authorized by this draft",
+    "tie_break": "Descending score then stable security ID; no outcome-dependent tie resolution",
+    "baseline_completion": "All3comparison arms are mandatory fixed contracts. Missing required accounting/option/identity data, fit failure or inadequate evidence yields INSUFFICIENT_EVIDENCE/no promotion; no arm may be deleted or conveniently left unevaluated while claiming main-model success. Scientific adaptation boundaries and primary-source limits remain explicit."
+  },
+  "cross_validation": {
+    "native_harness": "skfolio CombinatorialPurgedCV on session rows in2022-2023, then exactly one2024 evaluation",
+    "fixed_parameters": {
+      "n_folds": 6,
+      "n_test_folds": 2,
+      "purged_size": 5,
+      "embargo_size": 5
+    },
+    "version_pin": "The reviewed CPCV execution contract remains the previously verified skfolio1.2.9 method. CC133502Z's prepared locked runtime now installs skfolio1.7.0 alongside LightGBM; its native import/vendor example passed, but source/APIcompatibility acceptance and a reviewed study execution-pin amendment remain required before study execution. Installation does not silently amend the fixed method.",
+    "session_input": "Feed nativeCPCVone row per orderedXNYSsession, then map its selectedsessionindices toALLcandidate/issuer-eventrows; do not let nativepurged_size=5mean5securityrows",
+    "grouping": "Session groups andCIK|originalaccession groups fromR2-CONSTRUCTION.json; fullshare-class and planned-horizon purge independent of coarsegap",
+    "causal_training": "After the nativeCPCVsplit remove future-side training and any training label_end>=earliesttestdecision. Retain insufficient splits; no future-label training or favorable split selection.",
+    "preprocessing": "Fit transforms, missing-value policy and model coefficients only on each development training partition; never use full-sample normalization",
+    "validation": "Previously inspected 2024 remains diagnostic/quarantined from a fresh confirmatory superiority claim under the APPLIED CC095919Z disposition. Only a later explicit narrower release could alter this; no disposition is pending.",
+    "reserved": "Entire 2025 remains quarantined under the APPLIED CC095919Z conservative disposition. No single-pass or unread claim and no current reserve access."
+  },
+  "metrics": {
+    "K": [
+      5,
+      10,
+      20
+    ],
+    "precision_at_K": "SealcutofftopKneverrefill; primaryTP/min(K,|C_t|)retainsunresolvedpicks inDwithunknowncounts andidentificationbounds[TP/D,(TP+unknown)/D]. Unknownsnotnegatives; conditionalTP/n_selecteddescriptiveonly.",
+    "event_capture": "Per named +100%/+200% target, eligible positive events in topK / all eligible positive events that session; zero-positive sessions recorded separately",
+    "lift": "Precision@K / same-session eligible-universe positive rate; undefined when denominator is zero, never imputed",
+    "net_topK_return": "Declared per-slot budget-normalized net lot return, paired with the sealed control and averaged within commonD_tK and then equally across sessions. The separate cash-constrained portfolio net total return/drawdown uses the exact native NAV path; R2-COMPARISON.json is normative.",
+    "uncertainty": "49999fixed-seed20261008circular5-sessiondraws; single126statementBonferroniFWER0.05family across3K*6labels*3baselines*2metrics=108 plus18netreturn/base/winsor/top5removedchecks. Fixedprimary100percenttarget atALLKpromotesonlywhenits18baseline+18returnbounds>0 atconfidence1-0.05/126; minimum250fills,100issuers,40sessions,90percentmatched.",
+    "minimum_evidence": "At least30positive and100negative cases per label/segment for inferential precision/capture claims; otherwise counts and insufficient evidence only",
+    "selection_rule": "Report every K, label and cost scenario. No best-K, best-label or favorable-subset promotion.",
+    "session_aggregation": "Equal-weight mean of per-session paired differences for the named two metrics(slot precision@K and event capture), not a pooled ratio. Net/control excess uses the defined session mean over common slot budgets. Exact masks/bootstrap/grid and separate portfolio NAV net-return/drawdown are inR2-COMPARISON.json."
+  },
+  "costs_and_controls": {
+    "cost_scenarios": "Both300/600bps round-trip modeled adverse price scenarios, explicitper-order tariff, supported spread once; exactcontractR2-COMPARISON.json#/portfolio",
+    "capital": "100000.00USD independent unlevered books. Per-lot targetE_t/(5*K), cap5*K(openlots25/50/100), cash/gross caps and causal1% observed volume/10%displayed-size limits. Whole shares, noorders.",
+    "matched_controls": "Joint exact price/median-prior20-dollar-volume bins, qualified negative-catalyst Background_U pool, fixed treated UTF-8 traversal and deterministic SHA/ID collision handling inR2-CONSTRUCTION.json. One sealed full-cohort map is reused for all arms/K/costs. Unmatched rows retained.",
+    "cash_baseline": "Unfilled or unused slots are supported idle cash at0%interest. Unknown execution or entitlements cannot be assigned cash/zero.",
+    "reconciliation": "NativeNautilus accounts/fills/positions plus independent Decimal cash/fees/actions/NAV reconciliation must implement the frozen portfolio contract; all economic integration remains unaccepted pending the upstream historical E2E."
+  },
+  "eligibility_for_strategy_evidence": {
+    "identity_join_acceptance": {
+      "required_for": ["descriptive_census", "fit"],
+      "plan_pointer": "/descriptive_census/gates/identity_join_plan",
+      "gate_3_status": "OPEN",
+      "acceptance_state": "INCOMPLETE",
+      "qualified_joins": "Before census or fit, require the bound plan's nonempty covered dated LEAN map/resolver path and historical native SID, original filing CIK, qualified immutable provider security ID/source namespace, and dated ordinary-share issuer/class/listing evidence containing the cutoff; reject empty/default/fallback mappings, inferred aliases, conflicting lifetimes and backdated availability.",
+      "inventory_and_exclusions": "Before census or fit, freeze and hash the supplied ticker/session inventory, actual map inputs and expected joins; reconcile every supplied row as uniquely admitted or explicitly unknown/excluded with original-source identity/reason/hash accounting under the accepted Layer1.5 receipt. Partial inventory and original source counts are not market-wide acceptance.",
+      "historical_upstream_engine_acceptance": "Before census or fit, require the bound plan's new historical diagnostic through NautilusTrader2.0.0rc5 ParquetDataCatalog write/query and BacktestEngine.run, using qualified inputs and real historical rename/reuse/share-class/end-point cases, refusal controls and independent per-security fill/cash reconciliation; retain commands, rc and source/input/output hashes and matched/unknown/excluded totals. Synthetic controls, engine/source pins and the earlier AAPL diagnostic alone cannot close gate3.",
+      "separate_gate_2": "Accepted dated options listing-state evidence remains a separate conditional requirement; PLAN, qualified identity or a later archive floor does not close gate2 or turn absent chains into negative membership.",
+      "failure": "Until these preconditions are accepted, keep gate3 OPEN and record NOT_RUN; inadequate qualified data remains INSUFFICIENT_EVIDENCE. No census/fit, replacement cohort or deleted mandatory KZ arm is permitted by the plan."
+    },
+    "layer15": "INCOMPLETE: Only an accepted Layer1.5 native acceptance receipt, binding its exact manifest/exclusions hashes, can supply PIT-04 counted identities/reasons into survivorship reporting. All native included/excluded counts remain unknown until then; code tests/partial corpus do not grant acceptance. G4 is three checks: retained Alpaca ratio, pinnedLEANfactor/effective event985ef30a, and independently acquired AlpacaSPLITversusRAWwith declared tolerance. The paid three-provider version is an owner-gated upgrade. ExactcontractR2-SURVIVORSHIP.json.",
+    "N1_engine_exam": "retained-evidence:research/n1-entrance-exam-20261008T0715Z/receipt.json sha256df92a20de4678b271b1aa2af0e2599e815998ce49b26db7625cd2020c643fa5c; engineevidenceonly/Alpaca-onlysplitglue. Itdoesnotmeet theseparatelyboundLayer1.5triple-check. Frozen-input/strategy-datasetboundary source=native-agent-stack@ee01dd1274b3e6339ac388b53e2fea3d3b1ec52b:blueprints/us-equities/AGENTS.md:38-44, verifiednativegitshow; synthetictiming/LEANscheduleisnotacceptedhistoricalstrategydata. No strategy number citable. Historical-data replay/acceptance remains a separate layer15 task on its accepted source/head/currentlock.",
+    "promotion": "R2-COMPARISON.json exactstates: DATA_INVALID,INSUFFICIENT_EVIDENCE,NOT_BEATEN,HISTORICAL_DIAGNOSTIC,FORWARD_HOLDOUT_PASS. Onlyfixedfuture126sessionholdoutcanpromote; all36primarybounds atBonferroni126level>0,250fills,100issuers,40sessions,90percentmatched,nettotal>0/drawdown<=20percentbothcosts, includingwinsor/top5removed. No historicalfreshPASSororders.",
+    "paper": "This protocol authorizes no broker orders"
+  },
+  "inspection_policy": {
+    "2021": "N1 engine exam and previously inspected2021Q1 ETF control are diagnostics only; never fresh holdouts",
+    "registry": "Per security/event/session original access, purpose, response/artifact hashes, outcomes read and observer; no return or outcome value stored in the public protocol",
+    "known_2025_exposure": "72known5bcases;715E2events/713labelkeyswithall713yearsaccounted:52warmup2021,103development2022-2023,278inspected2024,280quarantined2025. Predevelopmentrequestedcases2020/2021=13/65,developmentrequests2022/2023=66/118areoverlappingyearpopulations.2862025requestspansremainexcluded. Horizon-date24/23metadata2022/2023doesnotestablishviewedoutcomecolumns. Priorcontext/summariesremainrecorded; no neweventoutcomeinspection.",
+    "exclusion_algorithm": "R2-INSPECTION.json: explicit evaluation-sidefirst5sessions, historicalissuer/security/event closure and plannedpost-cutofflabel/return overlap, including earlierunlistedcandidates. Unknownidentities do not establish unrelated/unreadcases; whole2024/2025quarantine applies under the explicit CC095919Z conservative disposition.",
+    "amendments": "Once frozen, new sources/features/model/horizon choices require a dated superseding protocol and separate inspection accounting, not edits driven by observed validation/reserve outcomes"
+  },
+  "action12": {
+    "state": "held",
+    "prerequisites": [
+      "explicit start ruling",
+      "action2 bounded N1 engine exam",
+      "action7 authorized runtime bump/acceptance",
+      "action11 reviewed hash and commit",
+      "required Layer1.5 and source-availability acceptance",
+      "installed skfolio1.7.0source/API/issuer-session-horizon compatibility and reviewed study execution-pin amendment",
+      "native LightGBM binary-parameter/determinism, bootstrap index-digest, single-entry-fill and qualified NAV economic acceptance"
+    ],
+    "forward_shadow": "Only when separately released: ranking logged before each market open from2026-10-14; no order generation"
+  },
+  "R2_bound_contracts": {
+    "rule": "All five exact-hash contracts remain normative for this census-2018 successor. R2 filenames retain continuity, not acceptance of an older candidate. R3-VERIFY compares current internal bindings with the current carrier; both designated readers independently read the full revised bundle and its separately pinned retained source context. CC223631Z authorises the new draft before reads; once its fresh reads start, hold these bytes until both returns. No prior verdict or portable-path edit supplies scientific, data or freeze acceptance.",
+    "construction": {
+      "path": "R2-CONSTRUCTION.json",
+      "sha256": "237c4d3dfdef5b4aeac6a4ab388f1f02f1812be568c54e85f9ef528c088101ba"
+    },
+    "comparison": {
+      "path": "R2-COMPARISON.json",
+      "sha256": "da89c13fa9f2e2113eebd3b0e517757ed8eb39c40d6c35b2cc38a55d348286a7"
+    },
+    "logit_operators": {
+      "path": "R2-LOGIT-OPERATORS.json",
+      "sha256": "b26bf0fac3102f5aae6477dcb5f19ee0844c2a7e2b22d74390879eb7ab51d644"
+    },
+    "inspection": {
+      "path": "R2-INSPECTION.json",
+      "sha256": "6a21266974134ecfba560be1ad3b97bd0a677e184600775aa3725419352d112d"
+    },
+    "survivorship": {
+      "path": "R2-SURVIVORSHIP.json",
+      "sha256": "71229fdb6204dc10fbc7d8a109e9bb6e513f569c7809906748a559937c91ab1b"
+    }
+  },
+  "references": [
+    "CC110116Z c861616b, ClaudeR2return1585f6d0 and GPTR2return7f47b785; one combined R3 with5blocking,5same-revision fixes and2gaps. Sources/limits are bound in the same candidate.",
+    "CC101427Z, SHA256 e3a6ca1d6548fe35e912528cc97d1638ccb7f5815db79301341bc01f716ff9bc; PIT-04 exclusions and G4 three-check ruling. Layer 1.5 source at 465def0220f55c67031fa1eb2b22576f0ef71c73 and partial blocked corpus 6db30054 are bound in R2-SURVIVORSHIP.json; neither is strategy acceptance.",
+    "Coauthor-hosted CKXFebruary2013preprint PDF3a0256d; UNCdeposit labelsPreprint. The eightvariablefive-session refit is explicit, not final2014probability reproduction.",
+    "KZpublisher primarypublicpreview lines101/119/121 obtained through nativeTavilySDK; predictorclasses verified, originalKZlogit/forecast horizon not inferred.",
+    "Bollerslev/Todorov2011authorDukePDF0ec6cf9, equations17-18 and§IV.B; tailpayoffoperators and ratio/lognotation distinction visually verified using localMinerU4.0.10.",
+    "InstalledNautilusTrader2.0.0rc5nativeimply_vol/black_scholes_greeks signatures and pinnedRustsourcegreeks.rs; officialscikit-learn1.9.1LogisticRegression. Only metadata/source inspected; no pricing/fit/outcome run.",
+    "RetainedoriginalE2request/snapshot/sourcehash ledger a48cbf79 and complete715eventmetadata791a4bd3; E1notrun never implied E2notrun.",
+    "CC ITEM-5f-asof-close-20261008T0735Z.md, owner-held dated gap; sha256c1b5732bd67b1892b817cfbe7441755878c8b59922c26f7dde4b3dc74e740081",
+    "CC foundation-finalize-synthesis-wf_be8c098c-ede.md row14 and row30; sha2568524119a0e3e01bcf4c021c09fd4eec10a6ac836c39bf22410ec7c94db64b336",
+    "CC north-star-synthesis-wf_c26bdb24-384.md sections1 action11/12 and2 conflicts/UNVERIFIED",
+    "native-agent-stack blueprints/us-equities/catalyst-experiment/README.md:56-62,76-86 and protocol.json",
+    "native-agent-stack catalogs/us-equities/research-20260928-movers.md:87-140",
+    "Owner package desk-sota-architecture/00-definitive-architecture.md:17,31-32 (untrusted research input; no code run)",
+    "Crossref primary DOI metadata for10.1016/j.jfineco.2014.04.001 and10.1016/j.jfineco.2018.08.014",
+    "Official FINRA equity-short-interest publication/amendment documentation and SEC FTD/API release schedules, re-read2026-10-08"
+  ],
+  "R2_GPT_review": {
+    "path": "retained-evidence:coordination/ns2604-coop/gpt-reads/s4/GPT-REVIEW-ranking-protocol-r2-bec914ef.md",
+    "sha256": "7f47b785efb193f43e2cc943b46eba63bdc4181ab92c71042adc653a26f7f0c3",
+    "verdict": "FAIL",
+    "required_change_count": 2,
+    "subject": "bec914ef with registry2618c51f; control-assignment contract was byte-identical in bc8cba78"
+  },
+  "R2_Claude_review": {
+    "path": "retained-evidence:coordination/command-center/research-cc-role-20261008/ranking-protocol-r2-bec914ef-claude-reader.md",
+    "sha256": "1585f6d0f8a073a3676abce38162ad703133759b01171b891320c29e889dc6ca",
+    "verdict": "REVISE",
+    "subject": "bec914ef; live bc8cba78 refresh acknowledged but not fully reviewed"
+  },
+  "CC_R3_ruling": {
+    "path": "retained-evidence:coordination/command-center/ITEM-ns2604-coop-20261008T110116Z.md",
+    "sha256": "c861616b7d577965136393449530abefad66d26bd59d8c3ed76e439a1effb685",
+    "blocking": [
+      "C1",
+      "C2",
+      "C3",
+      "C4",
+      "GPT-change-2"
+    ],
+    "same_revision": [
+      "C5",
+      "C6",
+      "C7",
+      "C8",
+      "C9"
+    ],
+    "gaps": [
+      "LightGBM4.7.0 installed/native pin/vendor example PASS; exact binary-study parameter/determinism acceptance still owed before study fitting",
+      "European-equivalent option data not acquired"
+    ]
+  },
+  "execution_gaps": {
+    "LightGBM": {
+      "status": "INSTALLED_PIN_NATIVE_VERIFIED",
+      "requested_pin": "4.7.0",
+      "pin_native_verified": true,
+      "parameters_native_verified": false,
+      "install": "DONE under CC133502Z after PAPER-WINDOW-CLOSED: guarded native WSL entrypoint, prepared uv0.12.17 locked route, Python3.12.3, installed lock17221888e8f3017d61e8a96eacd87a8bd8eda60ff6b1738eb683ed52980e175a. Exact receipt and evidence scope: R3-RUNTIME-ACCEPTANCE.json. Later authorized dev additions may change the current lock; this is the observed installation snapshot.",
+      "native_example": "Unchanged LightGBM v4.7.0 simple_example.py at8f7036f03627054d5a54a6f965b13f4b9ff2cb63 passed on its public regression fixture. The prepared repository runtime acceptance passed24/24. These do not verify the exact binary-study fixed_parameters, their determinism or study-input semantics.",
+      "before_study_fit": "Native exact binary-parameter and determinism acceptance remains mandatory and NOT_RUN; no strategy-fit readiness is inferred from installation or the vendor regression example.",
+      "runtime_lock_sha256": "f451ef979cdb1ae3686a30df1c883c257402b32753478c1f9c686c057e9c3989",
+      "current_lock_receipt": "R3-RUNTIME-LOCK-VERIFICATION.json; final existing lock verified after pytest9.1.1 dev addition, without a second relock. The earlier17221888 install snapshot remains historical evidence.",
+      "fit_run": false
+    },
+    "KZ": {
+      "state": "OPTION_DATA_NOT_ACQUIRED",
+      "source_status": "unresolved",
+      "qualified_provider": null,
+      "source_inputs": {
+        "original_option_quotes": {"status": "unresolved", "source": null, "requirement": "Positive two-sided anchor-close bid/ask, original observation/availability/version evidence, consistent call/put timestamp and expiry, earliest standard expiry at least eight calendar days out and valid bracketing strikes; an archive row or vendor IV column is insufficient."},
+        "same_expiry_forward": {"status": "unresolved", "source": null, "requirement": "Verified same-expiry forward F with units, tenor, original availability and retained source/version provenance."},
+        "integrated_risk_free_rate": {"status": "unresolved", "source": null, "requirement": "Verified same-expiry integrated risk-free rate with units, tenor and original source/version provenance."},
+        "exercise_equivalent_premium_or_IV": {"status": "unresolved", "source": null, "requirement": "European exercise or vendor-supported archived European-equivalent premium/IV with exercise, dividend/conversion and version provenance; native Black-Scholes inversion does not convert raw American premiums."},
+        "preceding_20_session_total_wealth_returns": {"status": "unresolved", "source": null, "requirement": "Qualified accepted historical total-wealth inputs; an options file does not supply the equity-wealth construction."},
+        "same_expiry_ATM_IV": {"status": "unresolved", "source": null, "requirement": "Qualified same-expiry ATM IV under the bound operators and the same exercise-equivalence/source requirements."}
+      },
+      "common_cohort_scope": "Background_U remains the declared US ordinary-share universe. Scored_C is restricted to historically listed-option stocks with every mandatory KZ option/forward/rate/exercise-equivalence predictor qualified, alongside CKX/main inputs. This is an explicit model-comparison scope restriction, not a claim about all ordinary shares. Missing listed options or compatible data is a counted pre-cutoff common-cohort exclusion; no mandatory-arm deletion.",
+      "plan": "Before fitting/scoring, require owner-authorized retained original options quotes, same-expiry forward/rate and vendor-supported archived European-equivalent premium/IV conversion with exercise/dividend/version provenance. NativeBS does not itself convert rawAmericanequitypremiums. No new paid acquisition, local conversion solver or API/key use is authorized by this protocol preparation.",
+      "failure": "If LightGBM installation/native parameters or any mandatory option/accounting/identity/Layer1.5 input is unaccepted at the start, record NOT_RUN; a run with inadequate qualified data is INSUFFICIENT_EVIDENCE. No shifted/extended window and no dropped KZ comparator."
+    },
+    "economic_native_integration": "The C3 formula is fixed and computable; actual native fee/impact/cash/NAV realization and accepted Layer1.5 historical-data E2E are not supplied by this document."
+  },
+  "descriptive_census": {
+    "status": "NOT_RUN",
+    "decision_id": "task-ns2604-coop-20261008T223631Z",
+    "decision_at_utc": "2026-10-08T22:38:00Z",
+    "decision_source_sha256": "5a2458c02430f45367df90a57f65d35885c8ddf633a09315c97dfae0b8615370",
+    "start_session": "2018-01-02",
+    "last_session": "2023-12-29",
+    "calendar": "exchange-calendars4.13.2XNYS pinned",
+    "session_count": 1509,
+    "previous_window": {"start": "2017-01-01", "end": "2023-12-31", "session_count": 1760},
+    "lost_date_slots": 251,
+    "lost_date_slot_percent": 14.261363636363637,
+    "lost_events": "unknown",
+    "power_change": "unknown",
+    "count_values_opened": false,
+    "count_access": "BLOCKED until both designated R3 readers PASS the same revised bytes and all applicable source/identity/output-right inputs are qualified",
+    "scope": "Descriptive census date amendment only; preserve the declared mover/event definition, equity observations and all missing/terminal policies identically in both count arms. Model fit stays development2022-2023, with rolling warmup back to July2020 and original lifetime/AGE metadata still required.",
+    "rationale": "Availability-driven decision recorded before any census count: no checked source is qualified for both adequate2017 membership and publication rights; the best-licensed candidate's metadata has1450 of10017 tickers first dated2018-01-02, with about3100 interval-spanning tickers on2017 days versus4494 on2018-01-02. These undefined metadata intervals are not verified listing dates. The later floor does not resolve daily continuity, adjusted/silent classes or identity. No outcome-selected replacement cohort.",
+    "source_evidence": {
+      "design_answer_sha256": "b5f1415dfbfbb0948eda0dfa8ec722b2695244c29cf064c5ce9f694400eb8e2f",
+      "revised_source_list_sha256": "7175bfaaf0adfb33a7b059a6da0f27bd679a4b12ffb4db88555ae05461b325c3",
+      "primary_sample_record_sha256": "a9b08269a9f8a6bd7402fd694d5e82404978db39a33856601c0edd008b11ca0b",
+      "primary_sample_zip_sha256": "b3a5932d26dd4d7860a6534f7dde5a1e489dc0b22c8eddb0fbdbdf8ddf1d7f7a",
+      "evidence_scope": "Retained public documentation/sample metadata and native calendar observations, not paid delivery or accepted historical strategy data; licensed bytes are not published here."
+    },
+    "gates": {
+      "daily_listing_state": "unresolved; gate2 OPEN and separately conditional on accepted dated listing-state evidence. PLAN, identity mapping, engine/source pins or a later archive floor do not pass gate2; absent chain rows cannot establish negative membership.",
+      "historical_identity_and_survivorship": "unresolved; gate3 OPEN. Before census or fit, accept the adjacent hash-bound PLAN's qualified dated CIK/immutable security/share-class joins, original-source inventory/exclusion accounting and new historical upstream-engine acceptance; plan/source pins alone supply no gate3 PASS.",
+      "identity_join_plan": {
+        "path": "retained-evidence:research/layer15-build-r3-identity-20261008/R3-IDENTITY-JOIN-PLAN.md",
+        "sha256": "b25064aabc4ba363f1bbda05729874d44d39606bf1d2470c8978def21b59b56c",
+        "classification": "PLAN",
+        "gate_3_status": "OPEN",
+        "custodian_path": "research/layer15-build-r3-identity-20261008/R3-IDENTITY-JOIN-PLAN.md",
+        "path_resolution": "Resolve the retained-evidence identifier at the custodian's native-agent-stack state root; it names the exact retained file, not a reconstructed or sanitised plan. Both designated review packets must carry that same file/hash as source context.",
+        "execution_precondition_pointer": "/eligibility_for_strategy_evidence/identity_join_acceptance",
+        "required_before": ["descriptive_census", "fit"],
+        "scope": "Dated original CIK/issuer/class/provider-security joins, bound inventory/exclusion accounting and historical Nautilus upstream-engine acceptance are mandatory before execution. The exact source plan remains off-repository; its private host locator is not republished. No implementation, acquisition, gate PASS or strategy evidence is asserted."
+      },
+      "published_count_rights": "unresolved for actual selected delivery; purchase remains owner-controlled",
+      "mandatory_KZ_inputs": "unresolved separately in execution_gaps.KZ.source_inputs"
+    },
+    "post_purchase_acceptance": {
+      "daily_continuity": "Verify only against retained paid delivery: reconcile all1509 admitted census sessions to the accepted dated class inventory, resolving/accounting for gaps, silent/adjusted classes and unknown states under the frozen policy; a missing chain never becomes negative membership.",
+      "delisted_underlyings": "Verify only against retained paid delivery: reconcile delivered dead/renamed/reused symbols to immutable security IDs, dated issuer/share-class/listing intervals and the accepted included/excluded ledger with original source hashes and unresolved identities retained."
+    },
+    "failure": "NOT_RUN while required accepted inputs are unavailable; INSUFFICIENT_EVIDENCE for inadequate qualified data. No replacement cohort, deleted KZ arm or changed model/forward window.",
+    "follow_up": {"id": "R3-F1", "status": "DEFERRED_NOT_RUN", "period": "2017", "return_gate": "Reintroduce2017 only after a source has verified adequate2017 coverage AND an applicable publication grant; CC records a reviewed successor before counts. No follow-up acquisition or research run is authorised now."}
+  },
+  "native_library_assignments": {
+    "authority": "CC134735Z, source/runtime evidence in R3-SWEEP-ADOPTIONS.json and R3-RUNTIME-LOCK-VERIFICATION.json",
+    "runtime_lock_sha256": "f451ef979cdb1ae3686a30df1c883c257402b32753478c1f9c686c057e9c3989",
+    "arch": "ADOPT_NOW arch8.0.0 arch.bootstrap.CircularBlockBootstrap for the fixed49999 length5 seed20261008 session draws; existing paired-mean/mask/robustness/Bonferroni126 rules remain as R2-COMPARISON specifies. Index-only native smoke passes; study inference NOT_RUN.",
+    "fincore": "ZERO_USE_IN_R3 fincore0.5.1; no new metric gate execution. Existing C3 ordered-NAV/native-engine/Decimal contract remains. No dependency removal.",
+    "purgedcv": "ZERO_USE_NOT_RUN purgedcv0.1.10; both sweep trials remain NOT_RUN: DSR/PBO on the retained6605-record ledger and interval leakage audit of the skfolio CPCV masks. No ledger outcomes were opened and no agreement/leakage result is claimed. The fixed skfolio splitter is not replaced; no dependency removal.",
+    "nautilus": "Stay2.0.0rc5;2.0.0rc6 is WATCH while its upstream G5 remains missing."
+  },
+  "prior_exposure_disclosed": "Before R3 freeze the drafter saw v2's11.7%capture/about0.25%precision, the excluded gapAUC0.976 and own5b/N1engine economics. During R3 source verification the predecessor author's WaveH77%/rho0.04 disclosure was also read. Exact figures, source roles and historical/development exposure are in the registry. Those summaries may have informed choices; there was no new study outcome inspection or parameter tuning run. Only the fixed future period can provide fresh confirmatory evidence."
+}

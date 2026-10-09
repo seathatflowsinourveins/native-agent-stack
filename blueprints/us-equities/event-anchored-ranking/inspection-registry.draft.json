@@ -1,0 +1,262 @@
+{
+  "schema_version": 2,
+  "revision": "R3 census-2018 successor: prior exposure disposition retained; both designated R3 reads pending for the new portable bytes",
+  "census_window_disposition": {"decision_id": "task-ns2604-coop-20261008T223631Z", "source_sha256": "5a2458c02430f45367df90a57f65d35885c8ddf633a09315c97dfae0b8615370", "decision_at_utc": "2026-10-08T22:38:00Z", "start": "2018-01-02", "end": "2023-12-29", "XNYS_sessions": 1509, "previous_XNYS_sessions": 1760, "lost_sessions": 251, "lost_events": "unknown", "power_change": "unknown", "before_any_census_count": true, "count_values_opened": false, "new_outcome_read": false, "reason": "Declared data-availability amendment before counts; no outcome-selected cohort; fitting/development2022-2023 and prior quarantine rules remain unchanged", "follow_up": "R3-F1:2017 returns only after verified coverage AND publication grant, with CC-reviewed successor before counts"},
+  "status": "Retained72-case5b and715-eventE2 metadata accounting complete; conservative CC095919Z disposition APPLIED. Historical identity/closure remains unproven. Both named complete-bundle R3B rereads remain pending.",
+  "complete": true,
+  "scope": "All72known5bname-session cases plus the complete715retainedE2event/request/snapshot inventory. These are different, overlapping inspection representations and are not summed as independent cases. No global untouched-holdout claim.",
+  "reserved_access_allowed": false,
+  "case_key_semantics": "Symbol and XNYS session identify prior exposure only; these are not accepted historical security IDs or outcome labels",
+  "known_exposure": {
+    "observer": "rnd-r1",
+    "observed_at": "2026-10-08T06:24:40Z through 06:30:17Z",
+    "purpose": "5b pipeline acquisition, simulation and deterministic report review",
+    "inspection_kind": "Historical raw prices and simulated economics inspected; exclude from reserved evaluation",
+    "source_receipt": "retained-evidence:research/5b-backtest-e2e-20261008T0621Z/receipt.json",
+    "source_receipt_sha256": "09d108addb6f21ea539c56703d78b87cf2725e97527524a3fc9318e37bd9d52e",
+    "raw_response_sha256": "b46bd832130939c8a7a0e65c8f8d7fc0bcdeb8a22354467f72d91051e4d165b9",
+    "case_count": 72,
+    "case_keys": [
+      "AAPL|2025-01-06",
+      "AAPL|2025-01-07",
+      "AAPL|2025-01-08",
+      "AAPL|2025-01-10",
+      "AAPL|2025-01-13",
+      "AAPL|2025-01-14",
+      "AAPL|2025-01-15",
+      "AAPL|2025-01-16",
+      "AAPL|2025-01-17",
+      "AAPL|2025-01-21",
+      "AAPL|2025-01-22",
+      "AAPL|2025-01-23",
+      "AAPL|2025-01-24",
+      "AAPL|2025-01-27",
+      "AAPL|2025-01-28",
+      "AAPL|2025-01-29",
+      "AAPL|2025-01-30",
+      "AAPL|2025-01-31",
+      "MSFT|2025-01-06",
+      "MSFT|2025-01-07",
+      "MSFT|2025-01-08",
+      "MSFT|2025-01-10",
+      "MSFT|2025-01-13",
+      "MSFT|2025-01-14",
+      "MSFT|2025-01-15",
+      "MSFT|2025-01-16",
+      "MSFT|2025-01-17",
+      "MSFT|2025-01-21",
+      "MSFT|2025-01-22",
+      "MSFT|2025-01-23",
+      "MSFT|2025-01-24",
+      "MSFT|2025-01-27",
+      "MSFT|2025-01-28",
+      "MSFT|2025-01-29",
+      "MSFT|2025-01-30",
+      "MSFT|2025-01-31",
+      "AMZN|2025-01-06",
+      "AMZN|2025-01-07",
+      "AMZN|2025-01-08",
+      "AMZN|2025-01-10",
+      "AMZN|2025-01-13",
+      "AMZN|2025-01-14",
+      "AMZN|2025-01-15",
+      "AMZN|2025-01-16",
+      "AMZN|2025-01-17",
+      "AMZN|2025-01-21",
+      "AMZN|2025-01-22",
+      "AMZN|2025-01-23",
+      "AMZN|2025-01-24",
+      "AMZN|2025-01-27",
+      "AMZN|2025-01-28",
+      "AMZN|2025-01-29",
+      "AMZN|2025-01-30",
+      "AMZN|2025-01-31",
+      "GOOG|2025-01-06",
+      "GOOG|2025-01-07",
+      "GOOG|2025-01-08",
+      "GOOG|2025-01-10",
+      "GOOG|2025-01-13",
+      "GOOG|2025-01-14",
+      "GOOG|2025-01-15",
+      "GOOG|2025-01-16",
+      "GOOG|2025-01-17",
+      "GOOG|2025-01-21",
+      "GOOG|2025-01-22",
+      "GOOG|2025-01-23",
+      "GOOG|2025-01-24",
+      "GOOG|2025-01-27",
+      "GOOG|2025-01-28",
+      "GOOG|2025-01-29",
+      "GOOG|2025-01-30",
+      "GOOG|2025-01-31"
+    ]
+  },
+  "pending_for_retained_metadata_completion": [],
+  "source_provenance_correction": "E1 did not run, but E2 independently did. R1's72known5b entries were accurate but did not complete E2accounting. R2verified originalE2hashes and projected only event/request/date/alias metadata, never new outcomes. Historical issuer/security identity remains unproved and is conservatively quarantined.",
+  "E2": {
+    "year_exposure_accounting": {
+      "all_existing_label_keys": 713,
+      "dated2021_predevelopment_warmup": 52,
+      "dated2022": 52,
+      "dated2023": 51,
+      "dated2024": 278,
+      "dated2025": 280,
+      "requested_cases_touching2020": 13,
+      "requested_cases_touching2021": 65,
+      "scope": "Disjoint dated keys sum713; requested-yearcasecounts overlap.715metadataevents are separate. No originalraw outcome column opened."
+    },
+    "event_inventory": {
+      "path": "r2-sources/e2/e2-inspection-metadata.json",
+      "sha256": "791a4bd37bdbe96a62be47d86ec1c334a6b4c82abb1e56218ae8d361fa28d2db",
+      "cases": 715
+    },
+    "existing_label_key_inventory": {
+      "path": "r2-sources/e2/e2-label-key-metadata.json",
+      "sha256": "0ea488fb39de46f17df34e3b651a3f7b15419b2322ef58c9c340491879de64b9",
+      "keys": 713,
+      "dated2025": 280,
+      "dated2024": 278,
+      "original_labels_sha256": "19e276665707e3ec2ba70aad365afaf6d2277240d4619681627ec87dd8993108",
+      "values_present": false
+    },
+    "year2025_inventory": {
+      "path": "r2-sources/e2/e2-inspection-2025.json",
+      "sha256": "79381bafee2af4d571dcad408fc10c27e03aa5bb41ad406590d546821d14ce9d",
+      "requested_scope_cases": 286,
+      "returned_scope_cases": 285,
+      "event_date_cases": 281
+    },
+    "year2024": {
+      "requested_scope_cases": 339,
+      "returned_scope_cases": 337,
+      "event_date_cases": 279
+    },
+    "identity_interval_index": {
+      "path": "r2-sources/e2/e2-identity-interval-index.json",
+      "sha256": "0dcdcc94d55bd021fd00f7dccf5b0154edf9b902a40ed67d1443e93dc2d03ba9",
+      "recorded_symbol_aliases": 662,
+      "proven_original_security_ids": 0
+    },
+    "summary": {
+      "path": "r2-sources/e2/e2-inspection-summary.json",
+      "sha256": "897dfc6cc99ec572ff5f785e4358c77d27cf2f9a236f09c64588eb01afd10d6b"
+    },
+    "source_ledger": {
+      "path": "r2-sources/e2/e2-source-ledger.json",
+      "sha256": "a48cbf7929a17dba4193a10bcc6369b007a0300257cfc061decab41342a03397"
+    },
+    "original_integrity": "All11private-file hashes match committedE2receipt,715IDs join bothsnapshot maps and package record indices, all3585requests map once to retained pages; originals unchanged",
+    "metadata_only": true,
+    "new_outcomes_inspected": false,
+    "development_exposure": {
+      "E2_requested_cases_touching2022": 66,
+      "E2_requested_cases_touching2023": 118,
+      "E2_existing_label_keys_dated2022": 52,
+      "E2_existing_label_keys_dated2023": 51,
+      "total_dated2022_2023_keys": 103,
+      "metadata_source": "r2-sources/e2/e2-inspection-summary.json sha256897dfc6cc99ec572ff5f785e4358c77d27cf2f9a236f09c64588eb01afd10d6b; labelkeymetadata0ea488fb",
+      "values_read_by_this_revision": false
+    }
+  },
+  "exclusion_contract": {
+    "path": "R2-INSPECTION.json",
+    "sha256": "6a21266974134ecfba560be1ad3b97bd0a677e184600775aa3725419352d112d"
+  },
+  "CC_completeness_disposition": {
+    "state": "CC095919Z conservative disposition APPLIED; complete R3 rereads pending, no reserve access.",
+    "applied_conservative_policy": "Quarantine entire2025from untouched-reserve access and mark2024previously inspected/quarantined from fresh confirmatory validation; no narrower exception without explicit disposition and immutable identity closure",
+    "reason": "E2metadata is complete, but neither immutable historical security/issuer IDs nor exhaustive alias/prior-view identity closure can be established from retained rows",
+    "source": "ITEM-ns2604-coop-20261008T095919Z.md SHA2569e8d8f1bbf10de712edb3c11c84fc4ebe24699eb6716d9ed19f7516b6e81f9a6",
+    "excluded_count": "All286E2cases whose requests intersect2025(includingall280existingdated2025labelkeys) are excluded; representations overlap andarenot addedtothe72known5bcount. Whole2025quarantinealso covers prior-v1/broad-universeexposure. No claim of a clean2024/2025holdout.",
+    "future_rule": "Any narrowereligibility wouldrequire new explicitdisposition plus verifiedhistoricalidentityclosure beforeoutcomes; the closedE1searchis not reopened."
+  },
+  "dated_gaps": [
+    {
+      "action": "synthesis action1 as-of coverage re-run",
+      "disposition": "closed as owner-held dated gap; inputs never retained; owner may hold them",
+      "dated_utc": "2026-10-08T07:35Z",
+      "source_path": "retained-evidence:coordination/command-center/ITEM-5f-asof-close-20261008T0735Z.md",
+      "source_sha256": "c1b5732bd67b1892b817cfbe7441755878c8b59922c26f7dde4b3dc74e740081",
+      "blocks_protocol_completion": false,
+      "replacement": "Event-anchored ranking pipeline; no claimed successful historical as-of re-run"
+    }
+  ],
+  "action1_state": {
+    "authority": "CC0735Z disposition, reaffirmed by CC080508Z row14",
+    "state": "Closed as owner-held dated gap; native as-of gate NOT_RUN",
+    "blocks_protocol_freeze": false,
+    "note": "The old plan ZIPa0b0aabf does not supply the three missing audit/candidate inputs; the newer owner packagecdf568b8 is not substituted. No further source search is required for this protocol."
+  },
+  "prior_nonreserved_exposure": {
+    "pre_development_or_warmup": {
+      "E2_requested_cases_touching2020": 13,
+      "E2_requested_cases_touching2021": 65,
+      "E2_returned_session_cases_touching2020": 12,
+      "E2_returned_session_cases_touching2021": 64,
+      "E2_existing_label_keys_dated2021": 52,
+      "E2_existing_label_keys_dated2020": 0,
+      "scope": "Existing pre-development/warm-up exposure; requested-calendar-year populations overlap and are not additional dated label keys. No historical unreadness or outcome-value-view depth claim."
+    },
+    "complete_dated_key_accounting": {
+      "total": 713,
+      "dated2021": 52,
+      "dated2022": 52,
+      "dated2023": 51,
+      "dated2024": 278,
+      "dated2025": 280,
+      "development2022_2023": 103,
+      "metadata_event_population": 715,
+      "scope": "713 label keys versus715 metadata events; both different overlapping populations, never added together."
+    },
+    "forward_horizon_metadata": {
+      "T1_T5_T20_metadata_events_in2022": 24,
+      "T1_T5_T20_metadata_events_in2023": 23,
+      "source": "r2-sources/e2/e2-inspection-summary.json#/requested_returned_calendar_year_overlap/{2022,2023}/forward_source_T1_T5_T20_metadata_event_count",
+      "interpretation": "Date metadata only; every event states this is not proof of which outcome columns were viewed in the original run.",
+      "values_read": false
+    },
+    "development": {
+      "E2_requested_cases_touching2022": 66,
+      "E2_requested_cases_touching2023": 118,
+      "E2_existing_label_keys_dated2022": 52,
+      "E2_existing_label_keys_dated2023": 51,
+      "total_dated2022_2023_keys": 103,
+      "metadata_source": "r2-sources/e2/e2-inspection-summary.json sha256897dfc6cc99ec572ff5f785e4358c77d27cf2f9a236f09c64588eb01afd10d6b; labelkeymetadata0ea488fb",
+      "values_read_by_this_revision": false
+    },
+    "broad_universe": {
+      "inspected_development": "2017-2021",
+      "inspected_validation": "2022-2023",
+      "inspected_reserve": "2024-01-01..2026-08-14",
+      "source": "blueprints/us-equities/broad-universe/README.md:95",
+      "sha256": "b0aaac2a7d6124eb769fab5d2964bd554a9ebd132df59c0570517771878fc674",
+      "meaning": "Existing broad-universe research exposure, not a new read of its case outcome data."
+    },
+    "known_numerical_context": [
+      {
+        "figure": "v2 capture11.7% and approximately0.25%precision",
+        "source": "R2-COMPARISON.json#/v2_adaptation/capture and cited predecessor v2 summary",
+        "exposure": "Already present in the R2 document read by the drafter; contextual historical summaries only."
+      },
+      {
+        "figure": "gap AUC0.976",
+        "source": "CC063928Z date-shift/leakage ruling and existing R2-CONSTRUCTION.json excluded_result",
+        "exposure": "Known before R3; explicitly excluded from features, selection, calibration, evidence and promotion."
+      },
+      {
+        "figure": "WaveH premarket leadership77%, rho0.04",
+        "source": "blueprints/us-equities/mover-early-entry/protocol.json:7 prior_exposure_disclosed",
+        "exposure": "Predecessor author's documented exposure; the drafter has now read that disclosure during R3 source verification. It is a historical package summary, not new case-label/return inspection or strategy evidence."
+      },
+      {
+        "figure": "5b pipeline PnL-63.70USD; return-0.0637%; trades8; maxdrawdown_fraction-0.004065999999999792; Sharpe252d-0.3708004940592432",
+        "source": "Own already-posted5Bline, receipt09d108addb6f21ea539c56703d78b87cf2725e97527524a3fc9318e37bd9d52e",
+        "exposure": "Own pipeline economics viewed06:24-06:30;72known5bname/session cases are quarantined. Pipeline checks only, not strategy evidence."
+      }
+    ],
+    "N1": "Own df92a20d2019-2021 entrance exam account/fill economics were viewed; engine evidence only, single-leg split glue and uncredited dividends. Receipt remains bound; no new exam outcome was calculated.",
+    "view_depth": "No complete reconstruction of every prior person's/model's viewed case values is claimed. The E2 projection excludes values, and this revision does not open its originals' label/return columns. All historical development/validation exposure and whole2025quarantine are disclosed; the fixed future window is the only fresh confirmatory holdout."
+  },
+  "publication": "Private ID/date/hash/count and already-seen summary disclosure only. No new study outcome values, rawlabelcolumns orcase gains published. All prior exposure boundaries and unknown view depth remain explicit.",
+  "completeness_scope": "Known72pipelinecasesand715E2events/713labelkeysaremetadata-accounted. All713datedkeys=52warmup2021+52development2022+51development2023+278inspected2024+280quarantined2025. Requested-year13cases2020/65cases2021areoverlappingpredevelopment/warmupexposure,notmorekeys. T1/T5/T20date metadata24/23events2022/2023doesnotproveviewedoutcomecolumns. Priorviewdepth/originalidentityclosurestayunproved; no newraw outcome read or globaluntouchedholdoutclaim."
+}

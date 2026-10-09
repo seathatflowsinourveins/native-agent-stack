@@ -11267,8 +11267,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/resolver/patch_policy.py",
-      "sha256": "fba292f3204475e0cc192bb0e30663675ffebcff309b035395fcee53468122ad",
-      "bytes": 43493
+      "sha256": "246b2c65fb296747e676182591b87d1fbbc622a2f9be83d023e8106d6853d557",
+      "bytes": 43497
     },
     {
       "path": "blueprints/runtime-workers/openhands/resolver/push_gate.py",
@@ -15459,6 +15459,81 @@
       "path": "blueprints/us-equities/engine/resolution.md",
       "sha256": "aa46db23be0c20b279026e24f1727e0bd3120df3349bb244cfa30f66725bc4ad",
       "bytes": 10783
+    },
+    {
+      "path": "blueprints/us-equities/event-anchored-ranking/R2-COMPARISON.json",
+      "sha256": "da89c13fa9f2e2113eebd3b0e517757ed8eb39c40d6c35b2cc38a55d348286a7",
+      "bytes": 27384
+    },
+    {
+      "path": "blueprints/us-equities/event-anchored-ranking/R2-CONSTRUCTION.json",
+      "sha256": "237c4d3dfdef5b4aeac6a4ab388f1f02f1812be568c54e85f9ef528c088101ba",
+      "bytes": 25074
+    },
+    {
+      "path": "blueprints/us-equities/event-anchored-ranking/R2-INSPECTION.json",
+      "sha256": "6a21266974134ecfba560be1ad3b97bd0a677e184600775aa3725419352d112d",
+      "bytes": 12962
+    },
+    {
+      "path": "blueprints/us-equities/event-anchored-ranking/R2-LOGIT-OPERATORS.json",
+      "sha256": "b26bf0fac3102f5aae6477dcb5f19ee0844c2a7e2b22d74390879eb7ab51d644",
+      "bytes": 11092
+    },
+    {
+      "path": "blueprints/us-equities/event-anchored-ranking/R2-SURVIVORSHIP.json",
+      "sha256": "71229fdb6204dc10fbc7d8a109e9bb6e513f569c7809906748a559937c91ab1b",
+      "bytes": 9274
+    },
+    {
+      "path": "blueprints/us-equities/event-anchored-ranking/R3-RUNTIME-ACCEPTANCE.json",
+      "sha256": "1a29f1572326dca40c853d3b7fbc26bc9dd12388262ef50ee38e13246dd821ff",
+      "bytes": 6099
+    },
+    {
+      "path": "blueprints/us-equities/event-anchored-ranking/R3-RUNTIME-LOCK-VERIFICATION.json",
+      "sha256": "95cb1caebc07e725fa46c6408ae31ea0e4806b14ec75416ab999b18df143e56b",
+      "bytes": 4370
+    },
+    {
+      "path": "blueprints/us-equities/event-anchored-ranking/R3-VERIFY.py",
+      "sha256": "8d86e1d3cc517c549ad4f7b9dff660a50bc95cc3804822989b1d72086b9f5018",
+      "bytes": 6744
+    },
+    {
+      "path": "blueprints/us-equities/event-anchored-ranking/README.md",
+      "sha256": "37ce6de89c5a6ce5ff8032942e6efb2ade0f755818cfa8e924749880c168a7be",
+      "bytes": 5519
+    },
+    {
+      "path": "blueprints/us-equities/event-anchored-ranking/ROW14-SUBMISSION-R3.json",
+      "sha256": "5252d7243f0ad5606a80c56f9dec364f03bd7ecfd84a1d45c5f290eabfcf22aa",
+      "bytes": 13494
+    },
+    {
+      "path": "blueprints/us-equities/event-anchored-ranking/SHA256SUMS",
+      "sha256": "a920411fe56e9bb86b41d0d9d785625fefd66ca66833fa4fdb1200e267b3b775",
+      "bytes": 1056
+    },
+    {
+      "path": "blueprints/us-equities/event-anchored-ranking/SHA256SUMS.R3",
+      "sha256": "a920411fe56e9bb86b41d0d9d785625fefd66ca66833fa4fdb1200e267b3b775",
+      "bytes": 1056
+    },
+    {
+      "path": "blueprints/us-equities/event-anchored-ranking/SHA256SUMS.R3B",
+      "sha256": "a920411fe56e9bb86b41d0d9d785625fefd66ca66833fa4fdb1200e267b3b775",
+      "bytes": 1056
+    },
+    {
+      "path": "blueprints/us-equities/event-anchored-ranking/inspection-registry.draft.json",
+      "sha256": "a64e61cccb5db24c51326364961ebeb630e6da1983732aae369d5e6be1a9c55d",
+      "bytes": 14565
+    },
+    {
+      "path": "blueprints/us-equities/event-anchored-ranking/protocol.draft.json",
+      "sha256": "65be1aab008e52670a3611ddb6221b1c00422c8b68ea519d61aeaa9e301063c5",
+      "bytes": 48382
     },
     {
       "path": "blueprints/us-equities/execution-realism/ExecutionSensitivityAlgorithm.cs",
@@ -58527,7 +58602,7 @@
     },
     {
       "path": "tests/test_runtime_worker_openhands_resolver.py",
-      "sha256": "bcb1218394b20467dcd5d76242bbe2023038807248f3eedbc2decb290233f052",
+      "sha256": "2b2414c3fd322e496126cdbc2f2af9a0bef62a4d54e59b0466f2ec282123a658",
       "bytes": 271414
     },
     {
@@ -59042,8 +59117,8 @@
     },
     {
       "path": "tools/sota-convergence/blind_checkout.py",
-      "sha256": "b0c08456764cc0443b54818ba809f4ba34a98fcd9eb974f3901344b5707d2a9c",
-      "bytes": 55855
+      "sha256": "780a2b931ecbff453ce4caeeb153614d1dcef98d77b4318687aa592e066f88ce",
+      "bytes": 56215
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",
