@@ -113,6 +113,10 @@ EXEMPTIONS = {
     "pull-request-cache-mode": {},
     # 2026-10-08 (docs/decisions/2026-10-04-ci-least-privilege.md, "Federation exemption (2026-10-08)").
     "id-token-write": {
+        # 2026-10-08 (docs/decisions/2026-10-08-claude-actions-security-review.md): a job on the same federation rule.
+        "claude-security-review.yml:review": "Anthropic workload identity federation, not provenance. Manual "
+                                             "dispatch on main by the owner only; no pull_request trigger, no "
+                                             "write scope, read-only model tools",
         "harness-audit.yml:audit": "Anthropic workload identity federation, not provenance: the action exchanges the "
                                    "job's GitHub OIDC token for a short-lived Claude API token. The federation rule "
                                    "accepts workflows on this repository's main and never pull requests; which "
@@ -123,6 +127,8 @@ EXEMPTIONS = {
 # Every write grant in the repository, by job. A new one is a reviewed change to this inventory.
 WRITE_GRANTS = {
     "catalog-freshness.yml:propose": ["contents: write", "pull-requests: write"],
+    # Federation needs id-token (EXEMPTIONS, id-token-write); the review goes to the job summary, not to the PR.
+    "claude-security-review.yml:review": ["id-token: write"],
     # Federation needs id-token (EXEMPTIONS, id-token-write); the result is one issue.
     "harness-audit.yml:audit": ["id-token: write", "issues: write"],
     "publish-catalog.yml:publish": ["id-token: write", "attestations: write"],

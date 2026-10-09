@@ -46,6 +46,7 @@ The existing write grants stay on their own jobs, and none runs on `pull_request
 | Job | Grant | Why it is not reachable from a pull request |
 | --- | --- | --- |
 | `catalog-freshness.yml:propose` | `contents: write`, `pull-requests: write` | schedule and dispatch only |
+| `claude-security-review.yml:review` (2026-10-08) | `id-token: write` | dispatch only, on `main`, by the owner; federation, not attestation (addendum below) |
 | `harness-audit.yml:audit` (2026-10-08) | `id-token: write`, `issues: write` | schedule and dispatch only, on `main`; federation, not attestation ("Federation exemption (2026-10-08)") |
 | `publish-catalog.yml:publish` | `id-token: write`, `attestations: write` | tag push and dispatch only; attests provenance |
 | `publish-catalog.yml:release` | `contents: write` | tag push only |
@@ -167,6 +168,8 @@ inventories.
 | `action-compatibility.yml` | `{}` | none (no checkout) | `none` | kept | |
 | `adoption-bootstrap.yml` | `{}` | `contents: read` on all 5 jobs | `none` on 4 jobs | kept | restore/save cache split |
 | `catalog-freshness.yml` | `{}` | `freshness: contents: read` | | job-scoped (kept) | |
+| `claude-security-review.yml` (added 2026-10-08) | `{}` | `review`: `contents: read`, `pull-requests: read`, `id-token: write` | | added | `id-token-write` exemption |
+| `security-review-flag.yml` (added 2026-10-08) | `{}` | `flag`: none | `none` | added | |
 | `dependency-review.yml` | `{}` | `contents: read` | `none` | kept | |
 | `hardware-profile-smoke.yml` | `{}` | `contents: read` on both jobs | `none` | kept | |
 | `harness-audit.yml` (added 2026-10-08) | `{}` | `audit`: `contents: read`, `id-token: write`, `issues: write` | | added | `id-token-write` exemption |
@@ -399,8 +402,9 @@ The federation rule accepts workflows on this repository's `main` and never pull
 of a run on `main`, and a pull request run's subject ends in `:pull_request` instead (GitHub's OpenID Connect reference,
 "Filtering for pull_request events" and "Filtering for a specific branch"). It has no `workflow_ref` condition, by
 design, so other workflows on `main` may use it later. Which workflows may request an OIDC token is therefore governed
-by the reviewed write-grant inventory (`id-token: write`) that `tests/test_workflow_policy.py` enforces, and this
-exemption names the one job that may request a token without an attestation.
+by the reviewed write-grant inventory (`id-token: write`) that `tests/test_workflow_policy.py` enforces, and the
+`id-token-write` exemptions name each job that may request a token without an attestation (`harness-audit.yml:audit`,
+and `claude-security-review.yml:review` by the addendum below).
 
 This repository was created on 2026-09-19, after GitHub's 2026-07-15 move to immutable subject claims, and
 `GET repos/seathatflowsinourveins/native-agent-stack/actions/oidc/customization/sub` returned
@@ -418,6 +422,15 @@ federation inputs, and `anthropic_oidc_audience` defaulting to `https://api.anth
 reference, <https://docs.github.com/en/actions/reference/security/oidc> (subject formats, the `workflow_ref` claim and
 "Immutable subject claims"); Anthropic, Workload identity federation,
 <https://platform.claude.com/docs/en/manage-claude/workload-identity-federation> ("Match"); all read 2026-10-08.
+
+### Addendum (2026-10-08): the security-review job on the federation rule
+
+`claude-security-review.yml:review` requests a token for the same rule, so, as the Overturn paragraph above requires,
+it has its own entry in the reviewed inventory (`id-token: write`, its only write grant) and its own `id-token-write`
+exemption in `tests/test_workflow_policy.py`. Its only trigger is a manual dispatch, and its job requires
+`refs/heads/main` and the owner. The companion `security-review-flag.yml` runs on `pull_request` with
+`permissions: {}` and `cache-mode: none` and requests no token
+([2026-10-08-claude-actions-security-review.md](2026-10-08-claude-actions-security-review.md)).
 
 ## Alternatives considered
 

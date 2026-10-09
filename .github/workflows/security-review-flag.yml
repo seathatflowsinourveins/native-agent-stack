@@ -1,0 +1,60 @@
+name: security-review-flag
+
+# Says, in its job summary, that a pull request touches workflows, hooks, credential tooling or the paper-trading path
+# and that a maintainer can ask for a security review of it (claude-security-review.yml, dispatched from main). It runs
+# no model, checks out nothing, holds no token scope and requests no OIDC token, so it is safe on every pull request
+# (docs/decisions/2026-10-08-claude-actions-security-review.md). It is not a required check and never fails a pull
+# request: the model run itself cannot start from a pull_request event, because the federation rule accepts runs on
+# main only.
+on:
+  pull_request:
+    paths:
+      - .github/workflows/**
+      - scripts/hooks/**
+      - tools/credentials/**
+      - adoption/credential-inventory.json
+      - blueprints/us-equities/adaptive-paper/**
+      - blueprints/us-equities/alpaca-paper/**
+
+# No token scope and no cache access (docs/decisions/2026-10-04-ci-least-privilege.md); the job adds none.
+permissions: {}
+cache-mode: none
+
+concurrency:
+  group: security-review-flag-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  flag:
+    name: Say that a security review is due
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+
+      # The two values come from the event payload as environment variables and are checked as text before they are
+      # written; nothing from the pull request is executed.
+      - name: Write the notice
+        shell: bash
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          [[ "$PR_NUMBER" =~ ^[1-9][0-9]{0,6}$ ]] || exit 2
+          [[ "$HEAD_SHA" =~ ^[0-9a-f]{40}$ ]] || exit 2
+          {
+            echo '### Security review due'
+            echo
+            echo 'This pull request changes a workflow, a hook, credential tooling or the paper-trading path.'
+            echo 'A maintainer can ask for a read-only security review of this exact commit:'
+            echo
+            echo '```'
+            echo "gh workflow run claude-security-review.yml --ref main -f pr_number=$PR_NUMBER -f head_sha=$HEAD_SHA"
+            echo '```'
+            echo
+            echo 'The review needs the repository variable CLAUDE_SECURITY_REVIEW_ENABLED set to true; it posts nothing here.'
+          } >> "$GITHUB_STEP_SUMMARY"
