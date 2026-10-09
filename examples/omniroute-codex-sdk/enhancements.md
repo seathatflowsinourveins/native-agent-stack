@@ -3,7 +3,7 @@
 Use this kit by default for foundation OmniRoute workers dispatched by Claude,
 with selected skills, MCP tools, native agents and a readiness gate. The official
 SDK owns execution, tools, compaction, resume and interruption. The worker retains
-Sol/Max on port 20128; native parent sessions retain their accounts.
+Sol/Max on port 21128; native parent sessions retain their accounts.
 
 ## Prepare an owned worker
 
@@ -84,7 +84,7 @@ selecting retry or fresh recovery.
 [runtime-worker.yaml](runtime-worker.yaml) uses maintained Dagu 2.16.6 to run
 readiness before one bounded SDK task. Export `STACK_ROOT`, `WORKER_PROJECT`,
 `WORKER_CODEX_HOME`, `WORKER_TASK_FILE`, `WORKER_BASE_URL` (normally
-`http://127.0.0.1:20128/v1`) and a new private `WORKER_RESULT` path.
+`http://127.0.0.1:21128/v1`) and a new private `WORKER_RESULT` path.
 The task comes from the owned input file rather than a scheduler prompt.
 Keep skill requirements in the task's graph configuration: add
 `--require-skill NAME` only after the documented installer and `--check-only`
