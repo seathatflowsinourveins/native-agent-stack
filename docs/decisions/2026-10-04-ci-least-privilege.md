@@ -430,6 +430,14 @@ exemption in `tests/test_workflow_policy.py`. It is not reachable from a pull re
 dispatch, and its job requires `refs/heads/main` and the owner
 ([2026-10-08-claude-actions-pr-review.md](2026-10-08-claude-actions-pr-review.md)).
 
+### Addendum (2026-10-09): the toolkit read on the federation rule
+
+`claude-pr-toolkit-review.yml:review` requests a token for the same rule, so, as the Overturn paragraph above
+requires, it has its own entry in the reviewed inventory (`id-token: write`, its only write grant) and its own
+`id-token-write` exemption in `tests/test_workflow_policy.py`. Its only trigger is a manual dispatch, and its job
+requires `refs/heads/main` and the owner
+([2026-10-09-claude-actions-pr-toolkit-review.md](2026-10-09-claude-actions-pr-toolkit-review.md)).
+
 ## Alternatives considered
 
 - **Keep workflow-level `contents: read`.** It already met OpenSSF Scorecard's Token-Permissions top score (read-only

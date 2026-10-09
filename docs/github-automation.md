@@ -82,6 +82,15 @@ The Actions allow-list and harness description below were checked against live s
   and Grep only, a $5 client budget and at most 30 assistant turns; the job grants `contents: read`, `pull-requests: read` and
   `id-token: write`. A model-free step copies the review to the job summary; nothing is posted to the pull request
   ([decision](decisions/2026-10-08-claude-actions-pr-review.md)). No hosted run has been made.
+- **Pre-cue toolkit read** (`claude-pr-toolkit-review.yml`, added 2026-10-09): Anthropic's pr-review-toolkit agents
+  `pr-test-analyzer` and `silent-failure-hunter`, from `anthropics/claude-code` at
+  `602df92bf481ed904533e95c09f740f40aab5aed` (checked out with its three files' SHA-256 verified, loaded with
+  `--plugin-dir`, never installed from a marketplace at run time), read one pull request head in parallel and list
+  every behaviour and test change its description does not declare. Dispatched by hand from `main` by the owner, and
+  only while `CLAUDE_PR_TOOLKIT_ENABLED` is `true`; Opus 5.5 at `max` effort, Read, Glob, Grep and the Agent tool, a
+  $22 client budget and a time limit scaled by the diff's size; a model-free step copies both reports to the job
+  summary and nothing is posted to the pull request ([decision](decisions/2026-10-09-claude-actions-pr-toolkit-review.md)).
+  Its output is an input before the command center's cue, never a designated read. No hosted run has been made.
 - **Against the final catalog of 2026-10-01** (`docs/final-catalog-20261001.md`, #595): the picks each blind model
   family made for these layers. The clean-room definitive round announced there decides one pick per slot.
   - git-github-automation: both families picked git, gh, Worktrunk and sem (the Claude pick keeps sem only if a
