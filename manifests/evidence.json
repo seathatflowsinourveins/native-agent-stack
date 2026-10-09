@@ -17787,8 +17787,8 @@
     },
     {
       "path": "docs/decisions/2026-09-29-codex-lane-default-effort.md",
-      "sha256": "6958318dec04e9c749a44357f21400d528c2a30e5adc15d884dc649d2ed772f8",
-      "bytes": 9049
+      "sha256": "a1677a1cddc6050f37919268f4fb552be2e79655849799ffe17237e9800cec68",
+      "bytes": 9158
     },
     {
       "path": "docs/decisions/2026-09-29-frozen-check-grader.md",

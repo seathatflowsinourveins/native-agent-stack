@@ -64,8 +64,8 @@ the standing rule.
 
 ## Amendment (2026-09-30)
 
-The owner amended the standing rule on 2026-09-30 to permit staged Ultra for suitable lanes;
-its stager chooses per the current GPT worker
+On 2026-09-30 the owner amended the standing rule for highest-quality resolution without limits, selecting GPT-6.1 Sol at Ultra
+and reserving Astra for tasks that truly need it. A lane may stage Ultra; its stager chooses per the current GPT worker
 standard. The landscape-sweep harness default stays max. Blind or isolated review lanes must stay at max,
 because ultra auto-delegates through proactive multi-agent mode (openai/codex `rust-v0.159.2`, `ff6aec96948b`,
 `codex-rs/core/src/session/multi_agents.rs:77-103`). This amendment supersedes the blanket prohibition above;
