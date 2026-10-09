@@ -6,14 +6,14 @@
   "source_packet": {
     "repository": "seathatflowsinourveins/us-equities-trading",
     "pr": 16,
-    "commit": "e0bc1630bb657775983fa0c78654c6438dcdeccb",
+    "commit": "d266975235a06fd733998ccc59503e2569a75762",
     "path": "docs/research/ns-movers/decisions.json",
-    "sha256": "3be265e02dc63df67e0cfa034c0bbea4f62c1448afd4ecf7b7d7ff928ff9db0b",
+    "sha256": "e62e7aaf6443181f7d3ff4d08b53a3b0b904d4d1bf77826fe0c641cbece78339",
     "carrier_path": "docs/research/ns-movers/SHA256SUMS",
-    "protocol_sha256": "02885694ebdae203815e2901d889f504c9e5f7a19cf0e6f73269e9a07f61cf7b",
+    "protocol_sha256": "abc83b042b3c9f6f0c1a8ced4ed9dad13fbed069a65bce703f88bfeab4abf0df",
     "grand_review_path": "docs/research/ns-movers/grand-package-review.json",
-    "carrier_sha256": "7e043c825e6a61021ba5870bbb338293cf83cd8e8db42e92c41e2781fbc931aa",
-    "freeze_sha256": "1922e0f0448c2397109fac36508ebe1e12b6c2e6a5c80c1c7525f3b8b94486f2"
+    "carrier_sha256": "d99e53686bf5d873cb97d9ca62be612b5b9f9fde073331553ca0cc421871288e",
+    "freeze_sha256": "54203f11da898ab1c91e2a3cd0e21469bc2d149e5289b6b262342fea3cf19851"
   },
   "source_package": {
     "sha256": "cdf568b8484fe252c2474d685cde7b8814100c780c6e24c1d8f2ae85a8bbda95",
@@ -23,15 +23,15 @@
     "access": "Read in place; no package bytes/owner text/code/datasets copied into this repository.",
     "locator": "retained-evidence:research/inbox/north-star/extracted-extreme-gainer-grand-package-cdf568b8"
   },
-  "registration_authority": "CC2026-10-09 fixes brief authorizes ONE #926 follow-up after all23 #16 fixes, native registrar/fullvalidate and exact-head reads. CC handles landing while5f is out until2026-10-12T09:00Z. CC15:23authorizesreviewedS3/S4fold; this samefixcommit rebinds its finalhead without extraadoption or extraPR.",
+  "registration_authority": "CC-authorized regeneration after us-equities-trading #16 landed as d266975235a06fd733998ccc59503e2569a75762. One source-content regeneration commit, then the assigned one landing rebase/push; CC micro, co-op GPT and hana trading acknowledgement required. No runtime, data, engine or scientific acceptance.",
   "decisions": [
     {
       "id": "NSM-NAUTILUS",
       "repository": "nautechsystems/nautilus_trader",
       "source_commit": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
       "version": "2.0.0rc5",
-      "decision": "selected engine; source API and release verified; new study execution NOT_RUN",
-      "review": "source_review_and_existing_receipt_leads_only",
+      "decision": "Select the pinned NautilusTrader engine. Upstream source and release identity are verified; this study's native execution remains NOT_RUN.",
+      "review": "source review and existing receipt leads only",
       "execution": "NOT_RUN_BY_NS_MOVERS",
       "phase0_install": false,
       "source_paths": [
@@ -45,9 +45,10 @@
         "mementum/backtrader"
       ],
       "landscape_reference": "native-agent-stack@861c475e:catalogs/landscape/us-equities.json#/layers/4..7 (SHA256 cf441d393b1a1ee49c57d62592e2c7477de2003ca40aa9e1933a6c9b28d4a618); maintained-source capability before new residual glue; candidates are not measured winners.",
-      "source_verification": "Official GitHub tag/object at the version verified2026-10-09; existing uv.lock pins reviewed. Source identity does not prove this study's native acceptance.",
-      "review_level": "source_review; exact scope in source_packet, no study E2E upgrade",
-      "evidence_level": "source_review_no_empirical_acceptance",
+      "source_verification": "Official upstream tag or commit object verified on2026-10-09. Existing uv.lock pins were reviewed. Source identity is distinct from native study acceptance.",
+      "phase0_install_scope": "no study runtime installed in Phase0",
+      "review_level": "source review; exact scope in the landed source packet, no study E2E upgrade",
+      "evidence_level": "source review without empirical acceptance",
       "source_packet_pointer": "docs/research/ns-movers/decisions.json#/decisions/0"
     },
     {
@@ -55,13 +56,18 @@
       "repository": "QuantConnect/Lean",
       "source_commit": "80e7843f645673bcbeaab963049f76f20f6785e1",
       "version": "master snapshot 2026-10-09",
-      "decision": "source comparison snapshot; execute only the installed accepted LEAN engine after a reviewed pin/fixture check, not an automatic upgrade",
-      "review": "source_review_and_existing_receipt_leads_only",
+      "decision": "Use open-source LEAN at source 80e 7843f locally through its supported .NET 10 build and launcher CLI. No QuantConnect billing, cloud or sign-in. Authenticated leanCLI is excluded; Docker 18176 remains a candidate with unproven application-source mapping. Study execution is NOT_RUN.",
+      "review": "source review and existing receipt leads only",
       "execution": "NOT_RUN_BY_NS_MOVERS",
       "phase0_install": false,
       "source_paths": [
         "Common/Data/Auxiliary/MapFile.cs",
-        "Common/Data/Auxiliary/FactorFile.cs"
+        "Common/Data/Auxiliary/FactorFile.cs",
+        "Common/Data/Auxiliary/CorporateFactorProvider.cs",
+        "readme.md:160-170",
+        "Launcher/Program.cs:47-65",
+        "Configuration/Config.cs:57-63",
+        "Launcher/config.json:39-43,374-381"
       ],
       "alternatives": [
         "nautechsystems/nautilus_trader",
@@ -69,24 +75,19 @@
         "lumiwealth/lumibot"
       ],
       "landscape_reference": "native-agent-stack@861c475e:catalogs/landscape/us-equities.json#/layers/4..7 (SHA256 cf441d393b1a1ee49c57d62592e2c7477de2003ca40aa9e1933a6c9b28d4a618); maintained-source capability before new residual glue; candidates are not measured winners.",
-      "source_verification": "Official GitHub tag/object at the version verified2026-10-09; existing uv.lock pins reviewed. Source identity does not prove this study's native acceptance.",
-      "review_level": "source_review; exact scope in source_packet, no study E2E upgrade",
-      "evidence_level": "source_review_no_empirical_acceptance",
+      "source_verification": "Official upstream tag or commit object verified on2026-10-09. Existing uv.lock pins were reviewed. Source identity is distinct from native study acceptance.",
+      "phase0_install_scope": "no study runtime installed in Phase0",
+      "review_level": "source review; exact scope in the landed source packet, no study E2E upgrade",
+      "evidence_level": "source review without empirical acceptance",
       "source_packet_pointer": "docs/research/ns-movers/decisions.json#/decisions/1"
     },
     {
       "id": "NSM-SKFOLIO",
       "repository": "skfolio/skfolio",
-      "historical_reference": {
-        "repository": "skfolio/skfolio",
-        "version": "1.2.9",
-        "source_commit": "c99fcf71349e2df4a7a1033ee85ca2e9ced9abee",
-        "role": "retained splitter precedent only; current selected source is separately pinned"
-      },
       "source_commit": "8a399757200d46b1ac1bff1b3daa71d9f0fa4170",
       "version": "1.7.0 installed route",
-      "decision": "Reuse native WalkForward after exact study API/session/purge acceptance; retained v1.2.9 precedent is a separate typed source reference; v1.7.1 watched, not installed.",
-      "review": "source_review_and_existing_receipt_leads_only",
+      "decision": "Reuse native WalkForward after exact study API, session and purge acceptance. Retained v 1.2.9 is a separate historical reference; v 1.7.1 is watched and is not installed.",
+      "review": "source review and existing receipt leads only",
       "execution": "NOT_RUN_BY_NS_MOVERS",
       "phase0_install": false,
       "source_paths": [
@@ -99,18 +100,25 @@
         "manual split code rejected in favor of native WalkForward"
       ],
       "landscape_reference": "native-agent-stack@861c475e:catalogs/landscape/us-equities.json#/layers/4..7 (SHA256 cf441d393b1a1ee49c57d62592e2c7477de2003ca40aa9e1933a6c9b28d4a618); maintained-source capability before new residual glue; candidates are not measured winners.",
-      "source_verification": "Official GitHub tag/object at the version verified2026-10-09; existing uv.lock pins reviewed. Source identity does not prove this study's native acceptance.",
-      "review_level": "source_review; exact scope in source_packet, no study E2E upgrade",
-      "evidence_level": "source_review_no_empirical_acceptance",
-      "source_packet_pointer": "docs/research/ns-movers/decisions.json#/decisions/2"
+      "source_verification": "Official upstream tag or commit object verified on2026-10-09. Existing uv.lock pins were reviewed. Source identity is distinct from native study acceptance.",
+      "phase0_install_scope": "no study runtime installed in Phase0",
+      "review_level": "source review; exact scope in the landed source packet, no study E2E upgrade",
+      "evidence_level": "source review without empirical acceptance",
+      "source_packet_pointer": "docs/research/ns-movers/decisions.json#/decisions/2",
+      "historical_reference": {
+        "repository": "skfolio/skfolio",
+        "version": "1.2.9",
+        "source_commit": "c99fcf71349e2df4a7a1033ee85ca2e9ced9abee",
+        "role": "retained splitter precedent only; current source pin is separate"
+      }
     },
     {
       "id": "NSM-EDGARTOOLS",
       "repository": "dgunning/edgartools",
       "source_commit": "7338aa335f6442c52dfa0695422cf1cd27e946e0",
       "version": "5.61.1",
-      "decision": "Adopt existing locked5.61.1 from upstreamv5.61.1; qualify CIK/ticker/filing original-vintage behavior through upstream tests before study use; no parser rebuild.",
-      "review": "source_review_and_existing_receipt_leads_only",
+      "decision": "Reuse locked EdgarTools 5.61.1 at its upstream tag. Qualify CIK, ticker and original filing-vintage behavior through upstream tests before study use; no parser rebuild.",
+      "review": "source review and existing receipt leads only",
       "execution": "NOT_RUN_BY_NS_MOVERS",
       "phase0_install": false,
       "source_paths": [
@@ -121,9 +129,10 @@
         "custom filing parser rejected without residual gap"
       ],
       "landscape_reference": "native-agent-stack@861c475e:catalogs/landscape/us-equities.json#/layers/4..7 (SHA256 cf441d393b1a1ee49c57d62592e2c7477de2003ca40aa9e1933a6c9b28d4a618); maintained-source capability before new residual glue; candidates are not measured winners.",
-      "source_verification": "Official GitHub tag/object at the version verified2026-10-09; existing uv.lock pins reviewed. Source identity does not prove this study's native acceptance.",
-      "review_level": "source_review; exact scope in source_packet, no study E2E upgrade",
-      "evidence_level": "source_review_no_empirical_acceptance",
+      "source_verification": "Official upstream tag or commit object verified on2026-10-09. Existing uv.lock pins were reviewed. Source identity is distinct from native study acceptance.",
+      "phase0_install_scope": "no study runtime installed in Phase0",
+      "review_level": "source review; exact scope in the landed source packet, no study E2E upgrade",
+      "evidence_level": "source review without empirical acceptance",
       "source_packet_pointer": "docs/research/ns-movers/decisions.json#/decisions/3"
     },
     {
@@ -131,8 +140,8 @@
       "repository": "lightgbm-org/LightGBM",
       "source_commit": "8f7036f03627054d5a54a6f965b13f4b9ff2cb63",
       "version": "4.7.0 retained native example",
-      "decision": "Canonical upstream redirect verified2026-10-09. Reuse4.7.0native example; exact binary/deterministic study acceptance remains NOT_RUN.",
-      "review": "source_review_and_existing_receipt_leads_only",
+      "decision": "Use canonical lightgbm-org/LightGBM 4.7.0. The microsoft/LightGBM redirect is verified. Reuse the native example; binary-study parameter and determinism acceptance remains NOT_RUN.",
+      "review": "source review and existing receipt leads only",
       "execution": "NOT_RUN_BY_NS_MOVERS",
       "phase0_install": false,
       "source_paths": [
@@ -146,15 +155,16 @@
         "microsoft/qlib"
       ],
       "landscape_reference": "native-agent-stack@861c475e:catalogs/landscape/us-equities.json#/layers/4..7 (SHA256 cf441d393b1a1ee49c57d62592e2c7477de2003ca40aa9e1933a6c9b28d4a618); maintained-source capability before new residual glue; candidates are not measured winners.",
-      "source_verification": "Official GitHub tag/object at the version verified2026-10-09; existing uv.lock pins reviewed. Source identity does not prove this study's native acceptance.",
-      "review_level": "source_review; exact scope in source_packet, no study E2E upgrade",
-      "evidence_level": "source_review_no_empirical_acceptance",
+      "source_verification": "Official upstream tag or commit object verified on2026-10-09. Existing uv.lock pins were reviewed. Source identity is distinct from native study acceptance.",
+      "phase0_install_scope": "no study runtime installed in Phase0",
+      "review_level": "source review; exact scope in the landed source packet, no study E2E upgrade",
+      "evidence_level": "source review without empirical acceptance",
       "source_packet_pointer": "docs/research/ns-movers/decisions.json#/decisions/4"
     },
     {
       "id": "NSM-DUCKDB",
       "repository": "duckdb/duckdb",
-      "decision": "Use existing locked DuckDB1.5.5 native as-of/Parquet path; exact temporal/session/decimal checks before study; no SQL engine rebuild.",
+      "decision": "Reuse locked DuckDB 1.5.5 native ASOF and Parquet support. Qualify exact temporal, session and numeric behavior before study use; no SQL engine rebuild.",
       "review": "prior_upstream_adoption_lead_no_new_acceptance",
       "execution": "NOT_RUN_BY_NS_MOVERS",
       "phase0_install": false,
@@ -168,15 +178,16 @@
         "polars native asof"
       ],
       "landscape_reference": "native-agent-stack@861c475e:catalogs/landscape/us-equities.json#/layers/4..7 (SHA256 cf441d393b1a1ee49c57d62592e2c7477de2003ca40aa9e1933a6c9b28d4a618); maintained-source capability before new residual glue; candidates are not measured winners.",
-      "source_verification": "Official GitHub tag/object at the version verified2026-10-09; existing uv.lock pins reviewed. Source identity does not prove this study's native acceptance.",
-      "review_level": "source_review; exact scope in source_packet, no study E2E upgrade",
-      "evidence_level": "source_review_no_empirical_acceptance",
+      "source_verification": "Official upstream tag or commit object verified on2026-10-09. Existing uv.lock pins were reviewed. Source identity is distinct from native study acceptance.",
+      "phase0_install_scope": "no study runtime installed in Phase0",
+      "review_level": "source review; exact scope in the landed source packet, no study E2E upgrade",
+      "evidence_level": "source review without empirical acceptance",
       "source_packet_pointer": "docs/research/ns-movers/decisions.json#/decisions/5"
     },
     {
       "id": "NSM-ARCH",
       "repository": "bashtage/arch",
-      "decision": "Reuse installed arch 8.0.0 CircularBlockBootstrap for session-grouped inference after native exact block/determinism test; not reimplement bootstrap.",
+      "decision": "Reuse upstream arch 8.0.0 CircularBlockBootstrap for session-grouped inference after the native block-length and determinism checks. No bootstrap reimplementation or study acceptance.",
       "review": "R3 pinned native-assignment lead; study inference not accepted",
       "execution": "NOT_RUN_BY_NS_MOVERS",
       "phase0_install": false,
@@ -185,14 +196,20 @@
         "custom bootstrap rejected"
       ],
       "landscape_reference": "native-agent-stack@861c475e:catalogs/landscape/us-equities.json#/layers/4..7 (SHA256 cf441d393b1a1ee49c57d62592e2c7477de2003ca40aa9e1933a6c9b28d4a618); maintained-source capability before new residual glue; candidates are not measured winners.",
-      "review_level": "source_review; exact scope in source_packet, no study E2E upgrade",
-      "evidence_level": "source_review_no_empirical_acceptance",
+      "phase0_install_scope": "no study runtime installed in Phase0",
+      "version": "8.0.0",
+      "source_commit": "038d78b709e75f2590890757af32705817a6fad8",
+      "source_paths": [
+        "arch/bootstrap/base.py"
+      ],
+      "review_level": "source review; exact scope in the landed source packet, no study E2E upgrade",
+      "evidence_level": "source review without empirical acceptance",
       "source_packet_pointer": "docs/research/ns-movers/decisions.json#/decisions/6"
     },
     {
       "id": "NSM-ALPACA",
       "repository": "alpacahq/alpaca-py",
-      "decision": "Official SDK only. OD2 owner approves held Algo Trader Plus SIP/OPRA; source acquisition still waits for landed freeze. Current Asset/OptionsSnapshot fields do not supply original universe/fee/quantity/OI history.",
+      "decision": "Use the official alpaca-py 0.44.0 SDK. OD 2 authorizes held Algo Trader Plus SIP and OPRA; source access still waits for landed freeze. Current Asset and OptionsSnapshot fields do not supply complete original universe, fee, quantity or OI history.",
       "review": "official_data_docs_read_2026-10-09; historical universe/rights unaccepted",
       "execution": "NOT_RUN_BY_NS_MOVERS",
       "phase0_install": false,
@@ -207,15 +224,17 @@
         "lumiwealth/lumibot"
       ],
       "landscape_reference": "native-agent-stack@861c475e:catalogs/landscape/us-equities.json#/layers/4..7 (SHA256 cf441d393b1a1ee49c57d62592e2c7477de2003ca40aa9e1933a6c9b28d4a618); maintained-source capability before new residual glue; candidates are not measured winners.",
-      "source_verification": "Official GitHub tag/object at the version verified2026-10-09; existing uv.lock pins reviewed. Source identity does not prove this study's native acceptance.",
-      "review_level": "source_review; exact scope in source_packet, no study E2E upgrade",
-      "evidence_level": "source_review_no_empirical_acceptance",
+      "source_verification": "Official upstream tag or commit object verified on2026-10-09. Existing uv.lock pins were reviewed. Source identity is distinct from native study acceptance.",
+      "phase0_install_scope": "no study runtime installed in Phase0",
+      "version": "0.44.0",
+      "review_level": "source review; exact scope in the landed source packet, no study E2E upgrade",
+      "evidence_level": "source review without empirical acceptance",
       "source_packet_pointer": "docs/research/ns-movers/decisions.json#/decisions/7"
     },
     {
       "id": "NSM-SKLEARN",
       "repository": "scikit-learn/scikit-learn",
-      "decision": "Use existing locked1.9.1 official logistic/preprocessing/calibration APIs; exact frozen parameter checks before fit.",
+      "decision": "Reuse locked scikit-learn 1.9.1 logistic, preprocessing and calibration APIs. Exact frozen parameter checks must pass before fitting.",
       "review": "methodology proposal; installed pin/native parameter proof pending Phase1",
       "execution": "NOT_RUN_BY_NS_MOVERS",
       "phase0_install": false,
@@ -230,25 +249,31 @@
         "microsoft/qlib"
       ],
       "landscape_reference": "native-agent-stack@861c475e:catalogs/landscape/us-equities.json#/layers/4..7 (SHA256 cf441d393b1a1ee49c57d62592e2c7477de2003ca40aa9e1933a6c9b28d4a618); maintained-source capability before new residual glue; candidates are not measured winners.",
-      "source_verification": "Official GitHub tag/object at the version verified2026-10-09; existing uv.lock pins reviewed. Source identity does not prove this study's native acceptance.",
-      "review_level": "source_review; exact scope in source_packet, no study E2E upgrade",
-      "evidence_level": "source_review_no_empirical_acceptance",
+      "source_verification": "Official upstream tag or commit object verified on2026-10-09. Existing uv.lock pins were reviewed. Source identity is distinct from native study acceptance.",
+      "phase0_install_scope": "no study runtime installed in Phase0",
+      "review_level": "source review; exact scope in the landed source packet, no study E2E upgrade",
+      "evidence_level": "source review without empirical acceptance",
       "source_packet_pointer": "docs/research/ns-movers/decisions.json#/decisions/8"
     },
     {
       "id": "NSM-JSONSCHEMA",
       "repository": "python-jsonschema/jsonschema",
       "version": "4.26.0",
-      "decision": "Use upstream Draft202012Validator for Phase0 schema/meta-schema validation in an isolated uv environment; no dependency or runtime upgrade in this PR.",
+      "decision": "Use upstream jsonschema 4.26.0 Draft 202012Validator for the Phase 0 schema and meta-schema checks in an isolated uv environment. This is validation-tool installation only, with no trading runtime upgrade.",
       "review": "PyPI release metadata verified 2026-10-09; actual validation receipt required",
       "execution": "PHASE0_SCHEMA_STRUCTURAL_CHECKS_PASSED_NO_EMPIRICAL_ACCEPTANCE",
-      "phase0_install": "isolated_validation_tool_only",
+      "phase0_install": true,
       "alternatives": [
         "manual schema validation rejected"
       ],
       "landscape_reference": "native-agent-stack@861c475e:catalogs/landscape/us-equities.json#/layers/4..7 (SHA256 cf441d393b1a1ee49c57d62592e2c7477de2003ca40aa9e1933a6c9b28d4a618); maintained-source capability before new residual glue; candidates are not measured winners.",
-      "review_level": "source_review; exact scope in source_packet, no study E2E upgrade",
-      "evidence_level": "Phase0_synthetic_structural_validation_only",
+      "phase0_install_scope": "isolated validation tool only; no trading runtime adoption",
+      "source_commit": "a7277432b0f7bcd0551f6e589d30457017125df4",
+      "source_paths": [
+        "jsonschema/validators.py"
+      ],
+      "review_level": "source review; exact scope in the landed source packet, no study E2E upgrade",
+      "evidence_level": "Phase0 synthetic structural validation only",
       "source_packet_pointer": "docs/research/ns-movers/decisions.json#/decisions/9"
     },
     {
@@ -260,7 +285,7 @@
         "desk/screen/factors.py",
         "desk/screen/history_legs.py"
       ],
-      "decision": "Existing upstream31-factor interface first, after supported native tests and original-release/identity/actions/coverage acceptance. No package copy/scanner rebuild/inherited weights/performance; crosswalk in grand-package-review.json.",
+      "decision": "Qualify and reuse the existing upstream 31-factor interface through supported native tests and original-release, identity, actions and coverage checks. No scanner rebuild or owner code copy. Fixed secondary diagnostics are source-bound; prior fit and performance are unaccepted.",
       "review": "source_review_only_2026-10-09_GRANDrev8_deskrev212",
       "execution": "NOT_RUN_BY_NS_MOVERS",
       "phase0_install": false,
@@ -269,9 +294,10 @@
         "eight-factor core arm remains distinct"
       ],
       "landscape_reference": "native-agent-stack@861c475e:catalogs/landscape/us-equities.json#/layers/4..7 (SHA256 cf441d393b1a1ee49c57d62592e2c7477de2003ca40aa9e1933a6c9b28d4a618); maintained-source capability before new residual glue; candidates are not measured winners.",
-      "source_verification": "Official GitHub tag/object at the version verified2026-10-09; existing uv.lock pins reviewed. Source identity does not prove this study's native acceptance.",
-      "review_level": "source_review; exact scope in source_packet, no study E2E upgrade",
-      "evidence_level": "source_review_no_empirical_acceptance",
+      "source_verification": "Official upstream tag or commit object verified on2026-10-09. Existing uv.lock pins were reviewed. Source identity is distinct from native study acceptance.",
+      "phase0_install_scope": "no study runtime installed in Phase0",
+      "review_level": "source review; exact scope in the landed source packet, no study E2E upgrade",
+      "evidence_level": "source review without empirical acceptance",
       "source_packet_pointer": "docs/research/ns-movers/decisions.json#/decisions/10"
     },
     {
@@ -282,7 +308,7 @@
       "source_paths": [
         "exchange_calendars/exchange_calendar_xnys.py"
       ],
-      "decision": "Reuse locked4.13.2native XNYS schedule; session boundaries/early closes/completion window tested before study. No calendar rebuild.",
+      "decision": "Reuse locked exchange-calendars 4.13.2 native XNYS schedule. Test session boundaries, early closes and completion windows before study use; no calendar rebuild.",
       "alternatives": [
         "QuantConnect/Lean exchange hours",
         "manual holiday calendar rejected"
@@ -290,19 +316,22 @@
       "review": "official_tag_verified_2026-10-09_runtime_study_acceptance_pending",
       "execution": "NOT_RUN_BY_NS_MOVERS",
       "phase0_install": false,
-      "review_level": "source_review; exact scope in source_packet, no study E2E upgrade",
-      "evidence_level": "source_review_no_empirical_acceptance",
+      "phase0_install_scope": "no study runtime installed in Phase0",
+      "review_level": "source review; exact scope in the landed source packet, no study E2E upgrade",
+      "evidence_level": "source review without empirical acceptance",
       "source_packet_pointer": "docs/research/ns-movers/decisions.json#/decisions/11"
     }
   ],
   "boundaries": [
-    "Only repository-identity decision union registration; no financial purchase/access, runtime/code/strategy order change.",
-    "OD2 held Algo Trader Plus SIP/OPRA owner-authorized; OD7 CCcustodian identity decided. Residual licensed-history/rights/source-start/identity/actions/terminal/native and custody-enforcement gates remain explicit. No source access before #16 landed/freeze recorded.",
-    "Required read/CI/pre-cue/CC cue and5f trading ack mandatory; draft/registrar/validator success alone is not accepted scientific freeze."
+    "Register repository identities and source decisions only; no financial purchase, data access, runtime or order change.",
+    "OD2 held Algo Trader Plus SIP/OPRA and OD7 CC custodian identity are decided. Residual historical membership, original source clocks, chain/OI, actions/terminal and enforcement acceptance are still separate gates.",
+    "Hana supplies the trading acknowledgement while 5f is out. CC micro, co-op GPT, final CI and assigned landing cue are required.",
+    "CC ruling after N2 refers to today's concluded attempt (2026-10-09 13:38Z NO-GO, no orders). Monday's retry does not gate Phase1; this lane never accesses paper-open-e2e's bundle or evidence.",
+    "Real ingestion still waits for the separate CC landed-freeze receipt and explicit co-op release. No lane pulls or persists Alpaca data dated2026-10-14 or later; historical ingestion ends by2026-10-13 EOD ET."
   ],
   "references": [
     "native-agent-stack@22e3ef6ffd53b09f3cb335c46f7c696093521274:scripts/catalog_decisions.py",
     "native-agent-stack@22e3ef6ffd53b09f3cb335c46f7c696093521274:blueprints/us-equities/AGENTS.md",
-    "us-equities-trading@e0bc1630bb657775983fa0c78654c6438dcdeccb:docs/research/ns-movers/sources.json"
+    "us-equities-trading@d266975235a06fd733998ccc59503e2569a75762:docs/research/ns-movers/sources.json"
   ]
 }

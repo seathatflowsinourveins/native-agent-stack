@@ -11332,7 +11332,7 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "336a1eaa495412bf3dbc5b66644a4bde714cc9a8d739ab82b29fa703dc87bad4",
+      "sha256": "39507165e70ff78cd76cf80e61da42f83531e150e968013289f5bd548bc5feae",
       "bytes": 502946
     },
     {
@@ -17262,8 +17262,8 @@
     },
     {
       "path": "catalogs/us-equities/coverage.json",
-      "sha256": "a06f57eb7c7360c1426755e24dd4b5cd38aec8bd1a422c4299975e9f46db57b8",
-      "bytes": 85304
+      "sha256": "7b355f4c1f8cbfead4ad315d4ddc79f0efd5cd75e3bcb7812db4e7f509bf04a5",
+      "bytes": 85355
     },
     {
       "path": "catalogs/us-equities/data-evaluation-followup.json",
@@ -17292,8 +17292,8 @@
     },
     {
       "path": "catalogs/us-equities/decision-index.json",
-      "sha256": "c34abe51f1afd85ccaf6ce042b9ad7c271f00dcda5184b805c811725a675ec53",
-      "bytes": 772315
+      "sha256": "73cccc63841b31ad499ef49e638db9705fc23fc985b3afd6add3d3742e34f58a",
+      "bytes": 773583
     },
     {
       "path": "catalogs/us-equities/engines-strategies.json",
@@ -17382,8 +17382,8 @@
     },
     {
       "path": "catalogs/us-equities/ns-movers-phase0-decisions-20261009.json",
-      "sha256": "ae197a4b944eac506df3db92ff67b173995517b1e802e6654e1713c9366734ab",
-      "bytes": 10956
+      "sha256": "c7297b51d89ed1b5719a16ef77d0ae1bcfbf93e8d6d5136acf2d4b7ddcae523b",
+      "bytes": 21582
     },
     {
       "path": "catalogs/us-equities/paper-practice-20260921.md",
