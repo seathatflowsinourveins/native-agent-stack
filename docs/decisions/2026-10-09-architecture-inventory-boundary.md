@@ -13,7 +13,11 @@ Git tree and registration metadata and the pinned test's eligibility
 declaration, excluding frozen and shared protected paths. It prints proposals
 for review; it never writes runtime permissions from discovered input files,
 opens the referenced artifact bodies or pins executable grants as descriptions.
-The exact receipt union narrows 4650 to 4648; no other receipt is added or removed.
+The receipt grant set was independently reviewed at
+`c945ea1f011e4c7e69a0b5f19052717b2af9d46e`. Its exact union narrows 4650 to
+4648; no other receipt is added or removed. Native proposal regeneration at
+the landing rebase reports 4725 eligible paths for current main; that proposal
+does not expand the independently reviewed pinned receipt grant set.
 
 The complete builder's independent reader now reaches inventory content,
 metadata and cache signatures. Hashes and parsed metadata use one captured
@@ -30,7 +34,7 @@ the inventory observation without accessing its content. Complete-builder
 synthetic regressions retain zero forbidden opens and verify this availability
 and privacy distinction.
 
-There are 131 independent exact inventory content paths: 89 pinned repo selectors,
+There are 132 independent exact inventory content paths: 90 pinned repo selectors,
 the fixed sanitized automation projection and 41 reviewed installed skill
 targets. User content is restricted to exact `SKILL.md` assets. A separate
 94-path metadata-only role covers user agent/service registrations; it cannot
@@ -43,12 +47,17 @@ establish wiring, execution or acceptance.
 
 A checked-in collection of independently reviewed bindings reproduces
 the 41 skill, 94 metadata and one design grant, including 33 exact aliases.
+The binding source is re-pinned to reachable rebased commit
+`994ab9b279c8915cbdb637e1786aaa41d1306e57`; its reviewed binding bytes remain
+equal to the CC-read snapshot at `c225909e50128ef5730765bb842006a27404743b`.
 Public data contains no user directory listings or unapproved names. Additional
 runtime names remain unapproved rather than expanding permissions. A CI test
 compares repository grants with the current committed `git ls-files` selector.
-The authorized rebase onto main 3a4cc28840ba7e8a1a9474a989102a669955f243 preserves
-the final Fleet implementation and sanitization and adds the two reviewed
-workflow grants. Repository grant regeneration uses the rebased Git tree.
+The authorized landing rebase onto main
+`3c01bdddc66896f8e36f9f21d452710808a9557e` preserves the final Fleet implementation
+and sanitization, retains the two reviewed workflow grants and adds the
+committed host-name scanner selected by native grant regeneration. Repository
+grant regeneration uses the rebased Git tree, without runtime discovery.
 Adoption role attribution separately reuses the same native no-follow reader
 for fixed co-op metadata paths and reviewed parking/capacity filenames;
 refusals leave measured call counts unattributed and report safe source errors.

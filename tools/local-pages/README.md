@@ -183,7 +183,7 @@ through its authorized descriptor, which avoids reopening its pathname.
 Inventory uses that same independently approved reader for every content
 hash and metadata parse, including its catalogs, manifests, checksum lists,
 mapping and sanitized automation projection. The committed
-`architecture_inventory` role contains 131 exact content paths; installed user
+`architecture_inventory` role contains 132 exact content paths; installed user
 content is restricted to exact `SKILL.md` assets. The separate
 `architecture_inventory_metadata` role contains 94 exact user agent/unit paths
 and cannot authorize a content open. Native descriptor-relative no-follow
@@ -200,8 +200,11 @@ also enter cache signatures so additions/removals update the source view.
 `scripts/local_pages_policy_grants.py --pin <full-source-sha>` prints a static
 proposal from native Git tree/registered-path metadata for review. Runtime
 discovery never adds a grant. Receipt proposals also apply the pinned frozen
-eligibility declaration from the repository tripwire; the two unused frozen
-receipt permissions are removed, leaving 4648 eligible exact JSON receipt paths.
+eligibility declaration from the repository tripwire. The receipt grant set
+was reviewed at `c945ea1f011e4c7e69a0b5f19052717b2af9d46e`: removing the two
+unused frozen permissions leaves 4648 exact JSON receipt paths. This remains
+the reviewed pinned union; the current main proposal's 4725 eligible paths
+do not add permissions without independent review.
 Derivation does not open referenced receipt or frozen artifact bodies and
 does not add descriptive-pin exceptions. Separately reviewed user canonical
 filenames are metadata during permission generation. The shared reader uses
@@ -211,15 +214,19 @@ the policy digest before a prior render can be reused.
 
 `inventory_user_names.json` contains only independently reviewed bindings
 and safe provenance that reproduce the 41 skill, 94 metadata and one design
-grant. User directory listings and unapproved names are not committed.
+grant. Its source pin is the reachable rebased snapshot
+`994ab9b279c8915cbdb637e1786aaa41d1306e57`; the reviewed binding bytes are
+unchanged from the CC-read head. User directory listings and unapproved names
+are not committed.
 Runtime discoveries never create permissions. The 33 exact alias
 bindings name an already approved canonical target; the reader must verify
 that target before any content or metadata observation. The CI grant test
 compares committed repo grants with `inventory_paths(git ls-files)`. The
-authorized rebase onto main's final Fleet and sanitization changes adds the
-two reviewed workflow paths, yielding 89 repository grants. Regenerate the
-proposal after an authorized rebase, using committed paths rather than runtime
-discovery. No raw user file body is used for these derivations.
+authorized landing rebase onto main `3c01bdddc66896f8e36f9f21d452710808a9557e`
+retains the reviewed workflow paths and adds the committed host-name scanner,
+yielding 90 repository grants. Regenerate the proposal after an authorized
+rebase, using committed paths rather than runtime discovery. No raw user file
+body is used for these derivations.
 
 Directory-listing failures remain UNREPORTED rather than implying an empty
 inventory, and unapproved rows receive no name-based evidence joins. Optional

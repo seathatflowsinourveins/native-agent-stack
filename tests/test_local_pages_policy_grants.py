@@ -74,7 +74,7 @@ class PolicyGrantDerivation(unittest.TestCase):
         expected = set(grants.inventory_paths([path for path in tracked if path], manifest["catalogs"]))
         policy = json.loads((ROOT / "tools/local-pages/source_policy.json").read_text())
         actual = {row["path"] for row in policy["architecture"]["architecture_inventory"] if row["root"] == "repo"}
-        self.assertEqual(len(actual), 89)
+        self.assertEqual(len(actual), 90)
         self.assertEqual(actual, expected, "Regenerate reviewed repository grants at the landing head; runtime discovery remains names-only.")
 
     def test_reviewed_user_snapshot_reproduces_grants_and_aliases(self):

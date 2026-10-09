@@ -2054,6 +2054,10 @@
     },
     {
       "root": "repo",
+      "path": "scripts/host_name_scan.py"
+    },
+    {
+      "root": "repo",
       "path": "scripts/host_receipts.py"
     },
     {
