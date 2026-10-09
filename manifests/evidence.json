@@ -17637,8 +17637,8 @@
     },
     {
       "path": "docs/decisions/2026-09-25-skills-trial-and-usage.md",
-      "sha256": "1c20e7da87850c067b1fe174f100f57747d2ae7de693284f25fd9d8c6f18d852",
-      "bytes": 146558
+      "sha256": "7f0add53c92220af752fa36b281ccc0585a6e02edef206674a356da97f76045f",
+      "bytes": 150275
     },
     {
       "path": "docs/decisions/2026-09-25-workstation-sota-refresh.md",
@@ -59752,8 +59752,8 @@
     },
     {
       "path": "tools/skill-usage/README.md",
-      "sha256": "34cda0de60388ff139f55bec45f875ca6f104471913120d540c072f9b3f05c01",
-      "bytes": 54151
+      "sha256": "33b45544c1fa16b530b9bc2f2877e5892b46fc8f679c63796213eea0343e9e98",
+      "bytes": 54550
     },
     {
       "path": "tools/skill-usage/skill_usage.py",
