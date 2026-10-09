@@ -164,14 +164,14 @@ settings against that schema.
 Existing texts describe the behaviour without the key:
 - in the guard: its docstring at `scripts/hooks/secret_path_guard.py:88-89` and
   its comments at `:5195`, `:5203` and `:5209`;
-- the dated accounts in `docs/secret-storage.md`: lines 1147-1152 ("An internal
-  error blocks; a timeout does not"), 1184 and 1190.
+- the dated accounts in `docs/secret-storage.md`: lines 1165-1170 ("An internal
+  error blocks; a timeout does not"), 1202 and 1208.
 
 All of them remain true for clients before 2.1.295 and for any guard hook entry
 without the key, which includes an existing host's user-level guard hook until
 the key is added to it (see "Applying it to a host"). The guard is
 checksum-pinned, so its text stays as written. The secret-storage texts also
-stay as written, except for one dated note added on line 1147 (on the same
+stay as written, except for one dated note added on line 1165 (on the same
 line, so no later line moves). The note points here and states the same
 condition: the key on the hook entry, not the client version alone.
 
