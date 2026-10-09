@@ -41,18 +41,22 @@ next pull request. As of 2026-10-09:
   session's rules unchanged: an explicit cue, one rebase at the landing turn,
   the checks read at that head, the cross-family read and, where it applies, the
   trading acknowledgement. Pull requests in another host's session custody stay
-  parked until that custody is transferred.
+  parked until that custody is transferred. Ruled in coordination ledger row
+  `ROW-cc-20261009T1305Z`.
 - **Trading acknowledgement.** A pull request that touches trading work
   (research, data acquisition, strategy gates, decision registration, paper or
   broker operation; [trading lane rules](../blueprints/us-equities/AGENTS.md))
   lands only with the trading acknowledger's acknowledgement at its final head.
   While the landing session is out, the paper-operation lane (`paper-open-e2e`)
-  gives it.
+  gives it. Ruled in coordination ledger row `ROW-cc-20261009T1305Z`.
 - **Holdout custodian.** The command center holds the north-star study's
   prospective holdout. It seals the frozen model before the holdout opens, and
   on each trading day it commits that day's rank rows by SHA-256 before 09:25
   America/New_York, so no row can be revised after the open. Lanes produce the
-  rows; they never hold or reseal the custody record.
+  rows; they never hold or reseal the custody record. Recorded in
+  us-equities-trading `docs/research/ns-movers/protocol.json` at
+  `/holdout/custodian` and `/holdout/custodian_provenance` (the 2026-10-09 OD7
+  disposition, landed in `d266975235a06fd733998ccc59503e2569a75762`).
 - **Cross-family review gate.** A head is read by the other model family before
   it lands. A Codex-authored head (a `codex/` branch) gets the command center's
   Claude read; a Claude-authored head (a `claude/` branch) gets the co-op's GPT
@@ -62,19 +66,22 @@ next pull request. As of 2026-10-09:
   their own: a run on the shared subscription spends every session's usage
   window. The vendor paths are the Claude Code GitHub Action
   ([`claude-pr-review.yml`](../.github/workflows/claude-pr-review.yml), in the
-  [GitHub automation guide](github-automation.md)) and `codex review`.
+  [GitHub automation guide](github-automation.md)) and `codex review`. Ruled in
+  coordination ledger row `ROW-cc-20261009T1808Z`.
 - **Co-op.** The session that orchestrates the lanes dispatches workstream
   slices to them, keeps the read queue in landing order, runs the GPT reads and
   tracks the program's exit criteria in one file. It messages the command center
   only for decisions, landing cues, incidents and owner items; progress goes to
-  the lanes' status files.
+  the lanes' status files. Set in the coordination brief
+  `brief-ns-ready-final-20261009` ("Co-op duties").
 - **API keys.** The Anthropic API keys are spent on demand, on work the
   subscription cannot carry and on north-star work first; spend never caps
   quality. A key reaches one command at a time through the credential runner
   (`tools/credentials/credential_run.py`, [secret storage](secret-storage.md))
   and is never set in a session's environment. When a key runs out of credit,
   work fails over to the next key in a fixed order. Claude Code sessions stay on
-  the subscription.
+  the subscription. Ruled in coordination ledger row `ROW-cc-20261009T1536Z`
+  (item 1).
 
 ## Decide from evidence
 
