@@ -74,6 +74,12 @@ The Actions allow-list and harness description below were checked against live s
   The owner checks the native [Claude Console federation history](https://platform.claude.com/settings/workload-identity-federation?tab=history)
   for the reason and corrects the relevant rule or claim; the Console denial reason is not established by the retained
   workflow evidence.
+- **Lane triage.** [`claude-triage.yml`](../.github/workflows/claude-triage.yml) runs weekly and on dispatch from
+  `main`, only while `CLAUDE_TRIAGE_ENABLED` is `true`. A model job with no write scope proposes a lane label for each
+  open issue and pull request that has none, through a JSON schema; a model-free job with `issues: write` re-checks
+  each issue and adds only an allow-listed lane label to an open issue that still has none. Pull requests get
+  suggestions in the job summary only ([decision](decisions/2026-10-08-claude-actions-triage.md)). No hosted run has
+  been made.
 - **Against the final catalog of 2026-10-01** (`docs/final-catalog-20261001.md`, #595): the picks each blind model
   family made for these layers. The clean-room definitive round announced there decides one pick per slot.
   - git-github-automation: both families picked git, gh, Worktrunk and sem (the Claude pick keeps sem only if a
