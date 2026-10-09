@@ -326,16 +326,25 @@ jobs:
             if ! issue="$(gh api "repos/$GH_REPO/issues/$number")"; then
               echo "| #$number | $lane | failed: the issue could not be read |" >> "$GITHUB_STEP_SUMMARY"
               failed=1
-            elif printf '%s' "$issue" | jq -e '.state == "open" and .pull_request == null and
-                ([.labels[].name | select(startswith("lane:"))] | length == 0)' > /dev/null; then
+              continue
+            fi
+            # jq -e exits 1 only when the check is false; an unparseable body or a runtime error exits otherwise
+            # (5 on jq 1.8.1, 4 on an empty body), and that is a failure, never a skip.
+            status=0
+            printf '%s' "$issue" | jq -e '.state == "open" and .pull_request == null and
+              ([.labels[].name | select(startswith("lane:"))] | length == 0)' > /dev/null || status=$?
+            if [ "$status" -eq 0 ]; then
               if gh api -X POST "repos/$GH_REPO/issues/$number/labels" -f "labels[]=$lane" > /dev/null; then
                 echo "| #$number | $lane | added |" >> "$GITHUB_STEP_SUMMARY"
               else
                 echo "| #$number | $lane | failed: the label could not be added |" >> "$GITHUB_STEP_SUMMARY"
                 failed=1
               fi
-            else
+            elif [ "$status" -eq 1 ]; then
               echo "| #$number | $lane | skipped: not an open issue without a lane label |" >> "$GITHUB_STEP_SUMMARY"
+            else
+              echo "| #$number | $lane | failed: the issue could not be checked (jq exit $status) |" >> "$GITHUB_STEP_SUMMARY"
+              failed=1
             fi
           done < <(printf '%s' "$PROPOSAL" | jq -r '.[] | [.number, .lane] | @tsv')
           if [ "$failed" -ne 0 ]; then

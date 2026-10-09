@@ -50,6 +50,9 @@ GH_STAND_IN = textwrap.dedent("""\
         print(json.dumps(fixtures["pulls"]))
     elif args[0] == "api" and len(args) == 2 and "/issues/" in args[1]:
         number = args[1].rsplit("/", 1)[1]
+        if number in fixtures.get("raw_bodies", {}):
+            print(fixtures["raw_bodies"][number])
+            sys.exit(0)
         if number not in fixtures["by_number"]:
             sys.exit(1)
         print(json.dumps(fixtures["by_number"][number]))
@@ -391,14 +394,34 @@ class TriageStepTests(unittest.TestCase):
         self.assertIn("| #5 | lane:trading | added |", summary)
         self.assertNotIn("skipped", summary)
 
-    def test_a_label_that_cannot_be_added_fails_the_step(self):
+    def test_a_label_that_cannot_be_added_fails_the_step_after_the_others_are_tried(self):
         fixtures = self.fixtures()
         fixtures["post_fails"] = ["5"]
-        code, console, posts, summary = self.apply([{"number": 5, "lane": "lane:trading"}], fixtures)
+        code, console, posts, summary = self.apply([{"number": 5, "lane": "lane:trading"},
+                                                    {"number": 7, "lane": "lane:foundation"}], fixtures)
         self.assertEqual(code, 1, console)
-        self.assertEqual(len(posts), 1)
+        self.assertEqual([call[3] for call in posts], [f"repos/{REPOSITORY}/issues/5/labels",
+                                                       f"repos/{REPOSITORY}/issues/7/labels"])
         self.assertIn("| #5 | lane:trading | failed: the label could not be added |", summary)
-        self.assertNotIn("| added |", summary)
+        self.assertIn("| #7 | lane:foundation | added |", summary)
+
+    def test_an_issue_that_cannot_be_checked_fails_the_step_and_is_never_skipped(self):
+        # A read that succeeds with a body jq cannot use: not JSON (jq exits 5 on 1.8.1), an empty body (4), and a
+        # labels field that is not a list (a runtime error, 5). Each is a failure; only a false check is a skip.
+        fixtures = self.fixtures()
+        fixtures["raw_bodies"] = {"14": "not json", "15": "",
+                                  "16": json.dumps({"state": "open", "pull_request": None, "labels": None})}
+        code, console, posts, summary = self.apply([{"number": 14, "lane": "lane:shared"},
+                                                    {"number": 15, "lane": "lane:shared"},
+                                                    {"number": 16, "lane": "lane:shared"},
+                                                    {"number": 5, "lane": "lane:trading"}], fixtures)
+        self.assertEqual(code, 1, console)
+        self.assertEqual([call[3] for call in posts], [f"repos/{REPOSITORY}/issues/5/labels"])
+        for number in (14, 15, 16):
+            row = summary.split(f"| #{number} |", 1)[1].split("\n", 1)[0]
+            self.assertIn("failed: the issue could not be checked (jq exit", row)
+        self.assertNotIn("skipped", summary)
+        self.assertIn("| #5 | lane:trading | added |", summary)
 
     def test_a_malformed_proposal_adds_nothing(self):
         cases = {

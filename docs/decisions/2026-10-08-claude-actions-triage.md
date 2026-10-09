@@ -26,9 +26,11 @@ PR (#892, 2026-10-09), which found changes its record had not named; the same re
   is answered: an item the model leaves out gets no label and is collected again by the next run); and an artifact
   that keeps `usage.json` (numbers only) for 14 days.
 - `apply` job: no model; `timeout-minutes: 5`; `issues: write` only; it re-reads every proposed issue and adds one
-  allow-listed lane label to an open issue that still has none. An issue that cannot be read or labelled fails the
-  step once the others have been tried, and the summary names it; it is never reported as skipped. Pull requests
-  get suggestions in the summary only.
+  allow-listed lane label to an open issue that still has none. An issue that cannot be read, checked or labelled
+  fails the step once the others have been tried, and the summary names it; it is never reported as skipped. Only a
+  false check is a skip: `jq -e` exits 1 for that, and any other exit (on jq 1.8.1, 5 for a body that is not JSON or
+  a runtime error such as a `labels` field that is not a list, 4 for an empty body) is a failure. Pull requests get
+  suggestions in the summary only.
 - The pin, v1.0.247, is hours old: the user ended the seven-day cooldown for clean releases on 2026-10-03
   (`docs/decisions/2026-10-03-currency-wave-w1.md`, "Holds and cooldown waiver"), which keeps qualification.
 
@@ -99,7 +101,7 @@ Runs spend from the Console organization that the four `ANTHROPIC_*` repository 
 - `tests.test_workflow_security_coverage.NewWorkflowSecurityCoverageTests`: the coverage set gains
   `claude-triage.yml`, with its own offline zizmor test.
 
-New, in `tests/test_claude_triage_workflow.py` (25 tests): triggers, conditions, permissions per job, the pin, the
+New, in `tests/test_claude_triage_workflow.py` (26 tests): triggers, conditions, permissions per job, the pin, the
 flags, the schema's enums and the settings are asserted from the workflow file; the collect, numbers, validation and
 apply steps are executed as written against a local stand-in for `gh`. Thirteen weakened copies of the workflow each
 fail at least one test (no check that a number was collected, labels for pull requests or low confidence passed on,
@@ -119,6 +121,14 @@ included. The shape tests no longer skip without PyYAML either: the repository's
 condition they check. Ten weakened copies each fail at least one test: a read error reported as skipped, a label
 error ignored, no failing exit, three weakened guard checks, the numbers step only after success, a 30-day usage
 record, and two failure messages dropped.
+
+The J8 micro read of that fix (53379c7e to 5d9b35df) found the three findings fixed and two smaller gaps, fixed the
+same day: a body `jq` could not check (not JSON, empty, or a runtime error) still fell to "skipped", so the claim
+above was wider than the code; and the label-failure test proposed one issue, so it could not show that the others
+are still tried. `apply` now reads `jq`'s exit status and treats only 1 as a skip, and two tests cover the checked
+failures (three bodies, then an issue that is still labelled) and a label failure followed by an issue that is still
+labelled. Five more weakened copies each fail at least one test: a `jq` error reported as a skip, a `jq` error that
+does not fail the step, every `jq` failure read as false, and a read or label failure that stops the loop.
 
 ## Alternatives considered
 
