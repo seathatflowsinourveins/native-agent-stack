@@ -9,7 +9,8 @@ name: harness-audit
 # "Federation exemption (2026-10-08)").
 #
 # Bounded since 2026-10-08 (docs/decisions/2026-10-08-claude-actions-harness-audit-bounds.md): Claude has Read, Glob and
-# Grep only, at most 20 turns and a $3 client budget; the job holds no write scope; a model-free step copies the report
+# Grep only, at most 20 turns and a $3 client budget; the job holds no write scope beyond the OIDC token;
+# a model-free step copies the report
 # to the job summary and keeps the run's token and cost numbers. The job runs only while the repository variable
 # CLAUDE_HARNESS_AUDIT_ENABLED is 'true', and only on the first attempt of a run: a re-run would spend again without a
 # new schedule tick or request, so it is skipped.
@@ -121,7 +122,8 @@ jobs:
 
       # Numbers and fixed names only: the execution file holds the whole transcript and is never printed or uploaded.
       # The record is written first, so a failed or over-budget run still leaves its cost; the acceptance check
-      # follows. It also reads the session's own tool list: a shell, write, web, subagent or MCP tool fails the run.
+      # follows. It also reads the session's own tool list: a missing list, any tool outside the allow-list or
+      # an MCP server fails the run, and the step names every bound it finds unmet.
       # The turn bound counts distinct assistant message ids. The result's num_turns counts transcript
       # messages, tool results included (a 12-request run on Claude Code 2.1.295 reported 57), so it is
       # kept in the record only.
@@ -145,15 +147,17 @@ jobs:
                ($result.modelUsage | type == "object" and length > 0)
             then . else error("usage unavailable") end |
             (($init.tools // []) | map(select(type == "string"))) as $tools |
+            ([.[] | select(.type == "result") | .result // "" | select(type == "string" and . != "")] | last // "")
+              as $text |
             ([.[] | select(.type == "assistant") | .message.id? | select(type == "string")] | unique | length) as $turns |
             {total_cost_usd: $result.total_cost_usd, num_turns: $result.num_turns, assistant_turns: $turns,
+             result_chars: ($text | length),
+             tools_listed: (($init.tools | type) == "array" and ($init.mcp_servers | type) == "array"),
              successful_result: ($result.subtype == "success" and $result.is_error == false),
              session_started: ($init != null),
              claude_code_version: (($init.claude_code_version // "unknown") | name),
              tools: ($tools | map(name)),
-             forbidden_tools: ($tools | map(select(
-               test("^(Bash|Write|Edit|MultiEdit|NotebookEdit|WebFetch|WebSearch|Task|Agent)$") or
-               startswith("mcp__"))) | map(name)),
+             forbidden_tools: ($tools | map(select(IN("Read", "Glob", "Grep") | not)) | map(name)),
              mcp_servers: (($init.mcp_servers // []) | length),
              models: ($result.modelUsage | to_entries | map(
                if (.value.inputTokens | count) and (.value.outputTokens | count) and
@@ -175,9 +179,23 @@ jobs:
                    (.models[] | "| \(.model) | \(.input_tokens) | \(.cache_creation_input_tokens) | \(.cache_read_input_tokens) | \(.output_tokens) |")' \
               "$out/usage.json"
           } >> "$GITHUB_STEP_SUMMARY"
-          jq -e '.successful_result == true and .session_started == true and (.forbidden_tools | length) == 0 and
-                 .mcp_servers == 0 and .assistant_turns >= 1 and .assistant_turns <= 20 and .total_cost_usd <= 3 and
-                 (.models | map(.cache_read_input_tokens) | add) > 0' "$out/usage.json" > /dev/null
+          failed="$(jq -r '[
+            (if .successful_result != true then "the run did not end in success" else empty end),
+            (if .session_started != true then "no session start record" else empty end),
+            (if .tools_listed != true then "the session start record lists no tools or MCP servers" else empty end),
+            (if (.forbidden_tools | length) > 0 then "tools outside Read, Glob and Grep: \(.forbidden_tools | join(" "))"
+             else empty end),
+            (if .mcp_servers != 0 then "\(.mcp_servers) MCP servers in the session" else empty end),
+            (if .assistant_turns < 1 or .assistant_turns > 20 then "\(.assistant_turns) assistant turns, outside 1 to 20"
+             else empty end),
+            (if .total_cost_usd > 3 then "client cost estimate \(.total_cost_usd) USD, above 3" else empty end),
+            (if ((.models | map(.cache_read_input_tokens) | add) // 0) <= 0 then "no cache read" else empty end),
+            (if .result_chars < 1 then "no result text" else empty end)
+          ] | join("; ")' "$out/usage.json")"
+          if [ -n "$failed" ]; then
+            echo "Bounds not met: $failed" >&2
+            exit 1
+          fi
 
       # The report is the final result text only, capped and shown as preformatted text so nothing in it renders
       # as Markdown or HTML on the run page.
@@ -189,14 +207,21 @@ jobs:
         run: |
           set -euo pipefail
           report="$(mktemp)"
-          jq -r 'map(select(.type == "result")) | last | .result // ""' "$EXECUTION_FILE" > "$report"
+          jq -r '[.[] | select(.type == "result") | .result // "" | select(type == "string" and . != "")] | last // ""' \
+            "$EXECUTION_FILE" > "$report"
+          size="$(wc -c < "$report")"
           {
             echo '### Harness audit: report'
             echo
             echo '<pre>'
-            head -c 60000 "$report" | sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' -e 's/>/\&gt;/g'
+            # iconv -c drops a character cut in half at the 60,000-byte mark; it still exits 1 for that, so the
+            # pipeline keeps its valid prefix instead of failing the step.
+            head -c 60000 "$report" | { iconv -f UTF-8 -t UTF-8 -c 2>/dev/null || true; } | sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' -e 's/>/\&gt;/g'
             echo
             echo '</pre>'
+            if [ "$size" -gt 60000 ]; then
+              echo "The report is $size bytes; the first 60,000 are shown."
+            fi
           } >> "$GITHUB_STEP_SUMMARY"
           rm -f "$report"
 

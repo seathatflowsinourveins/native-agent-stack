@@ -5051,8 +5051,8 @@
     },
     {
       "path": ".github/workflows/harness-audit.yml",
-      "sha256": "f7e6f840b7a4b33f41b6a9bcb795408644ac8de49bc39deffd13b5c5e03bbfae",
-      "bytes": 12579
+      "sha256": "d58dab1bd808f45269a6ed78339aecc0236443c8401eb99af4123469f25913fd",
+      "bytes": 14211
     },
     {
       "path": ".github/workflows/native-foundation-e2e.yml",
@@ -18032,8 +18032,8 @@
     },
     {
       "path": "docs/decisions/2026-10-04-ci-least-privilege.md",
-      "sha256": "c3530ab55032a5f05136605a5b709078b10e6cd29e30600864fcebcb666b101b",
-      "bytes": 42971
+      "sha256": "69f7fcd2c2f91412dc478f8d10503820a186efba9788f09f723d3212695cf3d0",
+      "bytes": 43157
     },
     {
       "path": "docs/decisions/2026-10-04-claude-template-holds-out-token-lane-carriers.md",
@@ -18317,8 +18317,8 @@
     },
     {
       "path": "docs/decisions/2026-10-08-claude-actions-harness-audit-bounds.md",
-      "sha256": "fe79432c619b2d1020cb6b569e48be1c8106a54ef459527983ab330700bca27c",
-      "bytes": 15752
+      "sha256": "787b19426bf5387fa8b8287dc0cab06cbcb23c83aed1f197cfe9d6d24dbbc4a7",
+      "bytes": 20226
     },
     {
       "path": "docs/decisions/2026-10-08-claude-actions-pr-review.md",
@@ -59797,8 +59797,8 @@
     },
     {
       "path": "tests/test_claude_harness_audit_bounds.py",
-      "sha256": "e5eee3e84d67df48190e3af725bc9b499a3420b443123bc25f3fcbb103f4d11e",
-      "bytes": 15729
+      "sha256": "48bd6faa3c919337cb32418a633cc42ba4375b979384c6e9d37782adc1218f38",
+      "bytes": 17441
     },
     {
       "path": "tests/test_claude_pr_review_workflow.py",

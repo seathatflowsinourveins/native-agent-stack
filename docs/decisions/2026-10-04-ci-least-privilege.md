@@ -47,7 +47,7 @@ The existing write grants stay on their own jobs, and none runs on `pull_request
 | --- | --- | --- |
 | `catalog-freshness.yml:propose` | `contents: write`, `pull-requests: write` | schedule and dispatch only |
 | `claude-pr-review.yml:review` (2026-10-08) | `id-token: write` | dispatch only, on `main`, by the owner; federation, not attestation (addendum below) |
-| `harness-audit.yml:audit` (2026-10-08) | `id-token: write`, `issues: write` | schedule and dispatch only, on `main`; federation, not attestation ("Federation exemption (2026-10-08)") |
+| `harness-audit.yml:audit` (2026-10-08) | `id-token: write` (`issues: write` removed 2026-10-08, see the addendum below) | schedule and dispatch only, on `main`; federation, not attestation ("Federation exemption (2026-10-08)") |
 | `publish-catalog.yml:publish` | `id-token: write`, `attestations: write` | tag push and dispatch only; attests provenance |
 | `publish-catalog.yml:release` | `contents: write` | tag push only |
 | `saturation-tracking.yml:issue` | `issues: write` | schedule and dispatch only |
@@ -171,7 +171,7 @@ inventories.
 | `claude-pr-review.yml` (added 2026-10-08) | `{}` | `review`: `contents: read`, `pull-requests: read`, `id-token: write` | | added | `id-token-write` exemption |
 | `dependency-review.yml` | `{}` | `contents: read` | `none` | kept | |
 | `hardware-profile-smoke.yml` | `{}` | `contents: read` on both jobs | `none` | kept | |
-| `harness-audit.yml` (added 2026-10-08) | `{}` | `audit`: `contents: read`, `id-token: write`, `issues: write` | | added | `id-token-write` exemption |
+| `harness-audit.yml` (added 2026-10-08) | `{}` | `audit`: `contents: read`, `id-token: write` (`issues: write` removed 2026-10-08, addendum below) | | added | `id-token-write` exemption |
 | `native-foundation-e2e.yml` | `{}` | `contents: read` | `none` | added | |
 | `native-offhost-app-state.yml` | unchanged (`contents: read`) | | | | hash-bound |
 | `native-offhost-restore.yml` | unchanged (`contents: read`) | | | | hash-bound |
@@ -394,8 +394,9 @@ new rule yet.
 workload identity federation: the action exchanges the job's GitHub OIDC token for a short-lived Claude API token, so
 no Anthropic key is stored in this repository. That needs `id-token: write` on a job that attests nothing, which
 `id-token-write` refuses, so `EXEMPTIONS` names the one job (`harness-audit.yml:audit`) with its reason and
-`test_each_exemption_is_still_needed` drops the entry once it suppresses nothing. The job's two write grants,
-`id-token: write` and `issues: write` (its one scorecard issue), are in the reviewed inventory.
+`test_each_exemption_is_still_needed` drops the entry once it suppresses nothing. The job's write grant,
+`id-token: write`, is in the reviewed inventory (it also held `issues: write` for its scorecard issue until the
+bounded audit removed it on 2026-10-08; addendum below).
 
 The federation rule accepts workflows on this repository's `main` and never pull requests: it matches the OIDC subject
 of a run on `main`, and a pull request run's subject ends in `:pull_request` instead (GitHub's OpenID Connect reference,
@@ -440,7 +441,8 @@ requires `refs/heads/main` and the owner
 
 ### Addendum (2026-10-08): the audit job gives up `issues: write`
 
-The two tables above list `harness-audit.yml:audit` with `id-token: write` and `issues: write`, as it was added. The
+The two tables above listed `harness-audit.yml:audit` with `id-token: write` and `issues: write`, as it was added;
+they now show the grant as removed. The
 bounded audit ([2026-10-08-claude-actions-harness-audit-bounds.md](2026-10-08-claude-actions-harness-audit-bounds.md))
 removes the model's `gh issue create` tool and the `issues: write` grant: the report goes to the job summary from a
 model-free step. The job's only write grant is now `id-token: write`, the reviewed inventory in
