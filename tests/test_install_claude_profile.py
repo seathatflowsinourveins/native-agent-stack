@@ -638,9 +638,10 @@ class SecretGuardProfileTests(unittest.TestCase):
                     return hook["command"]
         self.fail("no secret guard hook in the template")
 
-    def run_rendered(self, command: str, bash_command: str) -> subprocess.CompletedProcess:
+    def run_rendered(self, command: str, bash_command: str, env: dict | None = None) -> subprocess.CompletedProcess:
         payload = json.dumps({"tool_name": "Bash", "tool_input": {"command": bash_command}})
-        return subprocess.run(["sh", "-c", command], input=payload, capture_output=True, text=True, timeout=30)
+        return subprocess.run(["/bin/sh", "-c", command], input=payload, capture_output=True, text=True, timeout=30,
+                              env=env)
 
     def test_rendered_hook_blocks_before_and_after_install(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -654,6 +655,30 @@ class SecretGuardProfileTests(unittest.TestCase):
             self.assertEqual(blocked.returncode, 2)
             self.assertIn("credential_file_read", blocked.stderr)
             allowed = self.run_rendered(command, "git status")
+            self.assertEqual((allowed.returncode, allowed.stderr), (0, ""))
+
+    @unittest.skipUnless(Path("/usr/bin/python3").is_file() and shutil.which("jq"), "needs /usr/bin/python3 and jq")
+    def test_rendered_hook_runs_the_system_interpreter_without_a_working_python3_on_path(self):
+        # PATH holds jq and a python3 that fails the way an inactive mise shim does, and no mise shim directory.
+        with tempfile.TemporaryDirectory() as tmp:
+            home, bin_dir = Path(tmp) / "home", Path(tmp) / "bin"
+            home.mkdir()
+            bin_dir.mkdir()
+            (bin_dir / "jq").symlink_to(shutil.which("jq"))
+            shim = bin_dir / "python3"
+            shim.write_text("#!/bin/sh\necho 'python3: no version is set for this shim' >&2\nexit 1\n")
+            shim.chmod(0o755)
+            env = {"PATH": str(bin_dir), "HOME": str(home)}
+            command = self.rendered_hook(home)
+            self.assertIn('exec /usr/bin/python3 "$f"', command)
+            missing = self.run_rendered(command, "git status", env)
+            self.assertEqual(missing.returncode, 2, "a missing guard must still block through the jq refusal")
+            self.assertIn("secret-path guard is not installed", missing.stderr)
+            icp.install_guards(home, dry_run=False)
+            blocked = self.run_rendered(command, "cat \"$PAPER_ENV_FILE\"", env)
+            self.assertEqual(blocked.returncode, 2)
+            self.assertIn("credential_file_read", blocked.stderr)
+            allowed = self.run_rendered(command, "git status", env)
             self.assertEqual((allowed.returncode, allowed.stderr), (0, ""))
 
     def test_apply_merge_keeps_host_rules_and_adds_the_guard(self):

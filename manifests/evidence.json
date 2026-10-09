@@ -5536,8 +5536,8 @@
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "fc7417ea1e7137f689cdd06dafdb32e71f36c78bee6e41505290e0637893f95f",
-      "bytes": 13812
+      "sha256": "e10fc53e6fb57e6b342246fcbc9d516f376cef7c1d50a24fcabc54ff849787bd",
+      "bytes": 13821
     },
     {
       "path": "adoption/templates/codex.AGENTS.template.md",
@@ -18262,8 +18262,8 @@
     },
     {
       "path": "docs/decisions/2026-10-08-guard-hook-fails-closed.md",
-      "sha256": "ddb28f698b419552dba6892822ae2a8fdb26ad0f849a6110fb5592ffe18c1508",
-      "bytes": 18131
+      "sha256": "315bc21041ad3a0a5543b419f31a4cfb0e7961ef99136ed29bd0773422f2dac3",
+      "bytes": 19863
     },
     {
       "path": "docs/decisions/2026-10-08-harness-rules-consolidation.md",
@@ -58302,8 +58302,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "fba5766547bce320f34f28a60140465a914ae3f41fbe6d30db3f73ed9d0b16a4",
-      "bytes": 136153
+      "sha256": "546c693013daec00927f238a0a50e5a5d289748f57d51b257fb5cef13bbc2a8f",
+      "bytes": 137778
     },
     {
       "path": "tests/test_install_skills.py",
@@ -58502,8 +58502,8 @@
     },
     {
       "path": "tests/test_new_wsl_client_config.py",
-      "sha256": "eef09d97ee48c2c6f1c8040f1d8cb400baad2f082bc052740de7bd3d69fe430a",
-      "bytes": 344217
+      "sha256": "e7a1a2761c138bb91be87336e65327452e0f208880dfd576ffd3dd47f5c89bc0",
+      "bytes": 345309
     },
     {
       "path": "tests/test_new_wsl_definitive_defaults.py",
@@ -59017,8 +59017,8 @@
     },
     {
       "path": "tools/adoption/new_wsl_client_config.py",
-      "sha256": "2a0878760da8f20fdd2a3020ae8793e4dd2818ab941ced824d76d82339ae3e00",
-      "bytes": 165834
+      "sha256": "27dda8f30a2409eb6eb99fd3f6e15850060423acc348bfe1fd92faffe30e0798",
+      "bytes": 166048
     },
     {
       "path": "tools/adoption/prove_codex_lane.py",
