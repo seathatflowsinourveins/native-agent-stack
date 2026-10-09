@@ -274,6 +274,18 @@ class LocalPagesTests(unittest.TestCase):
                 self.assertIn("UNKNOWN</strong> live Codex lanes", html)
                 self.assertIn(type(failure).__name__, html)
 
+    def test_fleet_source_notes_render_reported_actions_cache_ttl(self) -> None:
+        for seconds in (540, 731):
+            with self.subTest(seconds=seconds):
+                self.fleet_result["actions"]["cache_ttl_seconds"] = seconds
+                self.refresh()
+                text = (self.output / "sources.html").read_text()
+                self.assertIn(f"reported TTL of {seconds} seconds", text)
+                self.assertNotIn("ten-minute nonserved cache", text)
+        self.fleet_result["actions"].pop("cache_ttl_seconds")
+        self.refresh()
+        self.assertIn("reported TTL of UNKNOWN seconds", (self.output / "sources.html").read_text())
+
     def test_short_home_names_preserve_native_readiness_fragment_html(self) -> None:
         for name in ("li", "link", "section"):
             with self.subTest(name=name), patch.object(Path, "home", return_value=self.base / name):

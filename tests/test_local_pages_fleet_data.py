@@ -175,12 +175,12 @@ class FleetDataTests(unittest.TestCase):
 
     def test_whitelist_excludes_tasks_prompts_emails_and_opaque_tokens(self):
         self.direct.update({"text": "PRIVATE-PROMPT", "prompt": "PRIVATE-PROMPT", "task": "PRIVATE-TASK"})
-        self.direct["lanes_live"][0].update({"task": "PRIVATE-TASK", "account": "operator@example.test", "flags": ["operator@example.test", "PRIVATE PROMPT"], "subagent_models": {"ghp_" + "X" * 40: 1}})
+        self.direct["lanes_live"][0].update({"task": "PRIVATE-TASK", "account": "operator@example.test", "flags": ["operator@example.test", "PRIVATE PROMPT"], "subagent_models": {"abcdefghijklmnopqrstuvwx1234567890": 1}})
         self.direct["pool_accounts"].append({"account": "operator@example.test", "used_pct": 10})
         self.runner.runs = [{"workflowName": "harness-audit", "status": "completed", "conclusion": "success", "databaseId": 123, "startedAt": "2026-10-08T21:00:00Z", "updatedAt": "2026-10-08T21:02:00Z", "url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/123", "displayTitle": "PRIVATE-PROMPT", "headBranch": "operator@example.test"}]
         view = self.collect()
         serialized = json.dumps(view) + (self.cache / "fleet-actions.json").read_text()
-        for text in ["PRIVATE-PROMPT", "PRIVATE-TASK", "operator@example.test", "ghp_" + "X" * 40, "displayTitle", "headBranch"]:
+        for text in ["PRIVATE-PROMPT", "PRIVATE-TASK", "operator@example.test", "abcdefghijklmnopqrstuvwx1234567890", "displayTitle", "headBranch"]:
             self.assertNotIn(text, serialized)
         self.assertEqual(len(view["actions"]["runs"]), 1)
         self.assertEqual(view["cc_agents"]["running"], [{"name": "review-a", "type": "Explore"}])

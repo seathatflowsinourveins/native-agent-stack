@@ -3,6 +3,7 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import sys
 import threading
 import time
 import unittest
@@ -161,6 +162,122 @@ class FleetReviewRegressionTests(unittest.TestCase):
         cached = json.loads((self.cache / 'fleet-actions.json').read_text())
         self.assertEqual(cached['attempt_epoch'], self.now + 50)
         self.assertEqual(view['actions']['cache_age_seconds'], 1)
+
+    def test_underscore_and_hyphen_delimited_prefixes_are_private_workflow_labels(self):
+        names = ['Review_ghp_fixture', 'Review-sk-fixture']
+        directory = self.root / '.github/workflows'
+        for index, name in enumerate(names):
+            (directory / f'secret-boundary-{index}.yml').write_text(f'name: "{name}"\njobs:\n  audit:\n    steps:\n      - uses: anthropics/claude-code-action@pin\n')
+        self.runner.runs = [{'workflowName': name, 'status': 'queued', 'databaseId': index + 1} for index, name in enumerate(names)]
+        view = self.collect()
+        for name in names:
+            self.assertNotIn(name, json.dumps(view['actions']))
+            self.assertNotIn(name, (self.cache / 'fleet-actions.json').read_text())
+
+    def test_all_rejected_nonempty_rosters_are_unknown_when_no_fallback_exists(self):
+        (self.state / 'coordination/ns2604-coop/watchers/fleet-now.json').unlink()
+        rejected = {
+            'lanes_live': [{'lane': 'not a publishable lane'}],
+            'lanes_parked': ['not a publishable lane'],
+            'claude_sessions': [{'name': 'not a publishable session'}],
+            'pool_accounts': [{'account': 'not a publishable account'}],
+        }
+        for field, values in rejected.items():
+            with self.subTest(field=field):
+                original = self.direct[field]
+                self.direct[field] = values
+                try:
+                    view = self.collect()
+                    self.assertIsNone(view[field])
+                    self.assertEqual(view['availability'][field]['status'], 'not reported')
+                    self.assertIsNotNone(view['availability'][field]['reason'])
+                    if field in view['section_counts']:
+                        self.assertIsNone(view['section_counts'][field])
+                finally:
+                    self.direct[field] = original
+
+    def test_rejected_direct_roster_can_use_a_valid_dated_snapshot(self):
+        self.direct['lanes_live'] = [{'lane': 'not a publishable lane'}]
+        view = self.collect()
+        self.assertEqual(view['lanes_live'][0]['lane'], 'g5-stars-gap')
+        self.assertEqual(view['availability']['lanes_live']['status'], 'snapshot fallback')
+        self.assertEqual(view['availability']['lanes_live']['read_utc'], self.snapshot['at'])
+
+    def test_all_rejected_named_subagent_groups_do_not_claim_a_known_count(self):
+        self.direct['claude_subagents_running']['cc'] = ['not a publishable name']
+        self.snapshot['claude_subagents_running']['cc'] = ['not a publishable name']
+        self.write_json('coordination/ns2604-coop/watchers/fleet-now.json', self.snapshot)
+        native = self.collect()['claude_subagents_running']['native_cc']
+        self.assertIsNone(native['names'])
+        self.assertIsNone(native['count'])
+        self.assertIsNone(native['read_utc'])
+        self.assertEqual(native['source'], 'unavailable')
+
+    def test_overflowing_native_run_and_cache_dates_leave_other_observations_available(self):
+        low = '0001-01-01T00:00:00+00:01'
+        high = '9999-12-31T23:59:59-00:01'
+        self.direct['at'] = low
+        self.runner.runs = [{'workflowName': 'harness-audit', 'status': 'queued', 'databaseId': 123, 'startedAt': low, 'updatedAt': high}]
+        self.cache.mkdir()
+        (self.cache / 'fleet-actions.json').write_text(json.dumps({'schema': 'local-fleet-actions/1', 'attempt_epoch': self.now, 'read_utc': low, 'runs': self.runner.runs}))
+        view = self.collect()
+        self.assertEqual(view['fleet_source'], 'direct native')
+        self.assertIsNone(view['at'])
+        self.assertEqual(view['lanes_live'][0]['lane'], 'g5-stars-gap')
+        self.assertIsNone(view['actions']['read_utc'])
+        self.assertIsNone(view['actions']['cache_age_seconds'])
+        self.assertEqual(len(view['actions']['runs']), 1)
+        self.assertIsNone(view['actions']['runs'][0]['startedAt'])
+        self.assertIsNone(view['actions']['runs'][0]['updatedAt'])
+        self.assertEqual(fleet_data._stamp('0001-01-01T00:00:00Z'), '0001-01-01T00:00:00Z')
+        self.assertEqual(fleet_data._stamp('2026-10-08T23:10:00+01:00'), '2026-10-08T22:10:00Z')
+        cached = json.loads((self.cache / 'fleet-actions.json').read_text())
+        cached['read_utc'] = '0001-01-01T00:00:00Z'
+        (self.cache / 'fleet-actions.json').write_text(json.dumps(cached))
+        supported = self.collect()['actions']
+        self.assertEqual(supported['read_utc'], '0001-01-01T00:00:00Z')
+        self.assertGreater(supported['cache_age_seconds'], 1_000_000_000)
+
+    def test_cache_age_timestamp_overflow_is_unknown_without_dropping_cache_rows(self):
+        self.runner.runs = [{'workflowName': 'harness-audit', 'status': 'queued', 'databaseId': 123}]
+        self.collect()
+        real_datetime = fleet_data.datetime
+        class TimestampUnavailable:
+            def __init__(self, parsed):
+                self.parsed = parsed
+            @property
+            def tzinfo(self):
+                return self.parsed.tzinfo
+            def astimezone(self, zone):
+                return self.parsed.astimezone(zone)
+            def timestamp(self):
+                raise OverflowError('Synthetic platform timestamp boundary')
+        class DateFacade:
+            fromtimestamp = staticmethod(real_datetime.fromtimestamp)
+            @staticmethod
+            def fromisoformat(value):
+                return TimestampUnavailable(real_datetime.fromisoformat(value))
+        with patch.object(fleet_data, 'datetime', DateFacade):
+            view = self.collect(1)
+        self.assertEqual(view['actions']['read_utc'], self.direct['at'])
+        self.assertIsNone(view['actions']['cache_age_seconds'])
+        self.assertEqual(view['actions']['runs'][0]['databaseId'], 123)
+        self.assertEqual(view['fleet_source'], 'direct native')
+        self.assertEqual(sum(command[0] == 'gh' for command in self.runner.commands), 1)
+
+    def test_actions_observation_completes_before_a_timed_out_producer(self):
+        def transport(command, **kwargs):
+            if command[0] == sys.executable:
+                self.assertTrue((self.cache / 'fleet-actions.json').exists(), 'Actions observation was deferred behind the producer.')
+                self.assertEqual(sum(previous[0] == 'gh' for previous in self.runner.commands), 1)
+                raise subprocess.TimeoutExpired(command, kwargs['timeout'])
+            return self.runner(command, **kwargs)
+        with patch.object(fleet_data.time, 'time', return_value=self.now):
+            view = fleet_data.collect(self.state, self.cache, self.root, transport)
+        self.assertEqual(view['fleet_source'], 'snapshot fallback')
+        self.assertEqual(view['actions']['read_utc'], self.direct['at'])
+        producer = next(row for row in view['source_inputs'] if row['type'] == 'native Fleet producer')
+        self.assertEqual(producer['execution']['status'], 'timed out')
 
 
 class FleetProducerReviewRegressionTests(unittest.TestCase):

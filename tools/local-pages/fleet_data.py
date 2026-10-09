@@ -38,7 +38,7 @@ _GET_SEALS = getattr(fcntl, "F_GET_SEALS", 1034)
 _REQUIRED_SEALS = (getattr(fcntl, "F_SEAL_SEAL", 0x0001) | getattr(fcntl, "F_SEAL_SHRINK", 0x0002)
                    | getattr(fcntl, "F_SEAL_GROW", 0x0004) | getattr(fcntl, "F_SEAL_WRITE", 0x0008))
 _IDENTIFIER = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.:/+-]{0,99}\Z")
-_OPAQUE = re.compile(r"(?<![\w-])(?:sk-|gh[pousr]_|github_pat_|Bearer\s)", re.I)
+_OPAQUE = re.compile(r"(?<![A-Za-z0-9])(?:sk-|gh[pousr]_|github_pat_|Bearer\s)|[A-Za-z0-9]{32,}", re.I)
 _PRIVATE_LABEL = re.compile(r"(?:https?://|/home/|/Users/|[A-Za-z]:[\\/]|\b[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}\b)", re.I)
 _SOURCE_POLICY = None
 _POOL_LABEL = re.compile(
@@ -89,7 +89,7 @@ def _stamp(value: Any) -> str | None:
     try:
         parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
         return parsed.astimezone(timezone.utc).isoformat().replace("+00:00", "Z") if parsed.tzinfo else None
-    except ValueError:
+    except (ValueError, OverflowError):
         return None
 
 
@@ -297,7 +297,8 @@ def _write_cache(path: Path, value: dict) -> None:
 def _names(value: Any) -> list[str] | None:
     if not isinstance(value, list):
         return None
-    return [name for row in value[:200] if (name := _identifier(row.get("name") if isinstance(row, dict) else row))]
+    names = [name for row in value[:200] if (name := _identifier(row.get("name") if isinstance(row, dict) else row))]
+    return names if names or not value else None
 
 
 def _models(value: Any) -> dict[str, int | None] | list[str] | None:
@@ -430,7 +431,10 @@ def _actions_locked(cache_dir: Path, root: Path, run: Callable[..., Any], now: f
             _write_cache(path, safe_cache)
         except OSError:
             pass
-    age = max(0, now - datetime.fromisoformat(read_utc.replace("Z", "+00:00")).timestamp()) if read_utc else None
+    try:
+        age = max(0, now - datetime.fromisoformat(read_utc.replace("Z", "+00:00")).timestamp()) if read_utc else None
+    except (ValueError, OverflowError):
+        age = None
     return {
         "runs": rows, "workflow_names": names,
         "scope": "Newest 100 repository runs, filtered to workflows that invoke models",
@@ -514,10 +518,21 @@ def _exec_reads(value: Any) -> list[dict] | None:
 
 
 def _roster(value: Any, kind: str) -> bool:
-    # Shape selects the dated observation; each public row is filtered below.
-    # One rejected identity cannot replace an entire current roster with a
-    # stale snapshot or UNKNOWN when valid rows are available.
-    return isinstance(value, list)
+    # An explicit empty list reports zero. A nonempty list must contain at
+    # least one publishable row; individual rejected rows do not erase peers.
+    if not isinstance(value, list):
+        return False
+    if not value:
+        return True
+    if kind == "lanes_live":
+        return any(_lane(row) is not None for row in value[:200])
+    if kind == "lanes_parked":
+        return _names(value) is not None
+    if kind == "claude_sessions":
+        return any(isinstance(row, dict) and _identifier(row.get("name")) for row in value[:100])
+    if kind == "pool_accounts":
+        return any(isinstance(row, dict) and isinstance(row.get("account"), str) and _POOL_LABEL.fullmatch(row["account"]) for row in value[:100])
+    return False
 
 
 def collect(state_root: Path, cache_dir: Path, root: Path, run: Callable[..., Any] | None = None) -> dict[str, Any]:
@@ -531,6 +546,9 @@ def collect(state_root: Path, cache_dir: Path, root: Path, run: Callable[..., An
     now = time.time()
     observed = _utc(now)
     inputs = {}
+    # Publish the independently cached Actions observation before attempting
+    # a native producer that may consume its whole timeout budget.
+    actions = _actions(cache_dir, root, run, now, inputs)
     snapshot_path = state_root / "coordination/ns2604-coop/watchers/fleet-now.json"
     snapshot = _read_json(snapshot_path, state_root, inputs, kind="Fleet snapshot")
     snapshot = snapshot if snapshot.get("schema") == "coop-fleet/1" else {}
@@ -580,19 +598,20 @@ def collect(state_root: Path, cache_dir: Path, root: Path, run: Callable[..., An
         key = "cc" if group == "native_cc" else group
         value = snap_subgroup.get(key) if group == "coop" else subgroup.get(key)
         group_source, group_time = ("snapshot", snapshot_time) if group == "coop" else (source, native_time)
-        if group != "coop" and not isinstance(value, list) and isinstance(snap_subgroup.get(key), list):
-            value, group_source, group_time = snap_subgroup[key], "snapshot", snapshot_time
         names = _names(value)
-        subagents[group] = {"names": names, "count": len(value) if isinstance(value, list) else None, "read_utc": group_time if names is not None else None, "source": group_source if names is not None else "unavailable"}
+        if group != "coop" and names is None:
+            snapshot_names = _names(snap_subgroup.get(key))
+            if snapshot_names is not None:
+                value, names, group_source, group_time = snap_subgroup[key], snapshot_names, "snapshot", snapshot_time
+        subagents[group] = {"names": names, "count": len(value) if names is not None else None, "read_utc": group_time if names is not None else None, "source": group_source if names is not None else "unavailable"}
     cc_time = _stamp(cc.get("updated_utc"))
     cc_names = _names(cc_running)
     subagents["cc"] = {"names": cc_names, "count": len(cc_running) if cc_running is not None else None, "read_utc": cc_time if cc_running is not None else None, "source": "cc-now" if cc_running is not None else "unavailable"}
     availability["cc_agents"] = {"status": "reported" if cc_running is not None else "not reported", "source": "cc-now" if cc_running is not None else "unavailable", "read_utc": cc_time if cc_running is not None else None, "reason": None if cc_running is not None else "CC running-agent section absent, null or malformed"}
     sessions = section("claude_sessions", lambda value: _roster(value, "claude_sessions"))
-    accounts = section("pool_accounts", lambda value: isinstance(value, list))
+    accounts = section("pool_accounts", lambda value: _roster(value, "pool_accounts"))
     reads = section("exec_reads_in_flight", lambda value: _exec_reads(value) is not None)
     jobs = section("sdk_jobs_running", lambda value: isinstance(value, list) or _count(value) is not None)
-    actions = _actions(cache_dir, root, run, now, inputs)
     ledger_path = state_root / "coordination/api-actions-20261008/api-actions-ledger.jsonl"
     native_ledger = fleet.get("api_spend_ledger")
     if isinstance(native_ledger, dict) and isinstance(native_ledger.get("sums"), dict):

@@ -216,6 +216,7 @@ nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p t
 nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_north_star_readiness.py
 nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_fleet_data.py
 nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_fleet_execution.py
+nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_fleet_regressions.py
 nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_fleet_view.py
 nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_adoption.py
 ```
