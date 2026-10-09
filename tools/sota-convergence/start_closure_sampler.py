@@ -22,7 +22,8 @@ from jsonschema.exceptions import ValidationError
 PROFILE = "start-closure/1"
 SEED = 202610081850
 QUOTA = 59
-R3_SHA256 = "80e69ff94f97fffdf906583fa280f2a60a7487a54f0b58b05342264a5adf9627"
+R3_SHA256 = "759facff52170f452290077b71d328f299b2c763df0358d126973c60886515c7"
+R3_CUSTODY_SHA256 = "80e69ff94f97fffdf906583fa280f2a60a7487a54f0b58b05342264a5adf9627"
 CONTRACT = Path(__file__).with_name("start-closure-stratum-contract.json")
 CONTRACT_SHA256 = "744e1729ddd16a7d91378aebd35feea0acfba9932e49b831675fb1246a32ffde"
 PROTOCOL = Path(__file__).with_name("compact_manifest.py")

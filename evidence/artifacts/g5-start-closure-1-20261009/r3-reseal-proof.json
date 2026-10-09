@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "kind": "g5-r3-privacy-reseal-proof",
+  "observed_at": "2026-10-09T01:37:12Z",
+  "evidence_class": "local_integration",
+  "profile": "start-closure/1",
+  "original_r3": {"sha256": "80e69ff94f97fffdf906583fa280f2a60a7487a54f0b58b05342264a5adf9627", "custody": "private research root", "published_bytes": false},
+  "resealed_r3": {"path": "tools/sota-convergence/sealed_r3_generator.py", "sha256": "759facff52170f452290077b71d328f299b2c763df0358d126973c60886515c7", "changed_lines": [34, 36], "change": "Only PROTOCOL and STRATUM_CONTRACT historical path defaults become repository siblings."},
+  "source_comparison": {"all_functions_byte_identical": true, "remaining_source_byte_identical": true, "seed": 202610081850, "quota": 59},
+  "historical_r2_contract": {"path": "tools/sota-convergence/sealed_r3_stratum_contract.json", "sha256": "c12428493bd8aa76785a6b08f15b1e0e20b5cc169f2bcd6831c7d75ea84573fd"},
+  "comparison_inputs": {
+    "head": "aac97d5aa66b39df53977de269d1257d8dde4d53",
+    "manifest_sha256": "04dbfd7faf7595c25e88bcff12000cc16c00bfb85de1331c238105b1c37ce807",
+    "asset_sha256": "1359fb196f46d0983c0d180fa982ceb1e4decaa58fc0aee96e19ffefaca0a1eb",
+    "origin_map_sha256": "0155eb321619338889195dd6427a2a0413b290eb8afd045eb29d3e807277befa",
+    "stratum_contract_sha256": "744e1729ddd16a7d91378aebd35feea0acfba9932e49b831675fb1246a32ffde",
+    "protocol_sha256": "d67f8a1dc9f66a6ee4e97fc1dc30691f960ac2258a2e05e8458c3d5d31303917",
+    "python": "3.14.4",
+    "random_module_sha256": "62dca8cdae7482513b99bb093ff038afd5131954e7eb78166d673a772cee871c"
+  },
+  "origin_derivation": {"retained_provenance_sha256": "72125c0c9ddf5ba5ce5ca4f2adb05b26ddeede79e26a2aa67ad9f6534a68ecdf", "retained_origins": 4582, "pending_origins": 24, "pending_origin_census_only": 24, "unreachable_sampled_rows": 0, "fragments": 46, "root_rollup_declaration_sha256": "6350a713b79c12677d8c5de62539ea6dad40c6a758864b3b071e4e56167d850d", "original_reference_matches": 4587, "original_reference_metadata_changes": 0},
+  "original_run": {"exit_code": 0, "packet_sha256": "c94f316fed3f0197f3872e7d4557b88ba0873ccc002f471609973ce295f890e6", "packet_bytes": 24319223, "stderr_bytes": 0},
+  "reseal_run": {"exit_code": 0, "packet_sha256": "c94f316fed3f0197f3872e7d4557b88ba0873ccc002f471609973ce295f890e6", "packet_bytes": 24319223, "stderr_bytes": 0},
+  "equality": {"entire_packet_bytes": true, "strata": 414, "selected_row_ids_each_stratum": true, "population_key_sha256_each_stratum": true, "population_size_each_stratum": true},
+  "counts": {"empty_strata": 211, "sample_memberships": 4458, "unique_sampled_rows": 2673, "sample_overlap_memberships": 1785, "final_action_rows": 83, "pending_conflict_rows": 13, "unique_required_census_rows": 96, "unique_selected_rows": 2769},
+  "native_commands": [
+    "timeout 600 nice -n 10 ionice -c2 -n7 python3 tools/sota-convergence/start_closure_sampler.py --profile start-closure/1 --draw-proof --manifest catalogs/landscape/grand-catalog-20261008.json --manifest-sha256 04dbfd7faf7595c25e88bcff12000cc16c00bfb85de1331c238105b1c37ce807 --origin-map $G5_ORIGIN_MAP --origin-map-sha256 0155eb321619338889195dd6427a2a0413b290eb8afd045eb29d3e807277befa --protocol-sha256 d67f8a1dc9f66a6ee4e97fc1dc30691f960ac2258a2e05e8458c3d5d31303917 --r3-generator $G5_CUSTODY_R3 --proof-r3-sha256 80e69ff94f97fffdf906583fa280f2a60a7487a54f0b58b05342264a5adf9627 --head aac97d5aa66b39df53977de269d1257d8dde4d53 --output $G5_ORIGINAL_PROOF",
+    "timeout 600 nice -n 10 ionice -c2 -n7 python3 tools/sota-convergence/start_closure_sampler.py --profile start-closure/1 --draw-proof --manifest catalogs/landscape/grand-catalog-20261008.json --manifest-sha256 04dbfd7faf7595c25e88bcff12000cc16c00bfb85de1331c238105b1c37ce807 --origin-map $G5_ORIGIN_MAP --origin-map-sha256 0155eb321619338889195dd6427a2a0413b290eb8afd045eb29d3e807277befa --protocol-sha256 d67f8a1dc9f66a6ee4e97fc1dc30691f960ac2258a2e05e8458c3d5d31303917 --r3-generator tools/sota-convergence/sealed_r3_generator.py --proof-r3-sha256 759facff52170f452290077b71d328f299b2c763df0358d126973c60886515c7 --head aac97d5aa66b39df53977de269d1257d8dde4d53 --output $G5_RESEAL_PROOF"
+  ],
+  "native_module_controls": {"module": "tests.test_start_closure_sampler", "tests": 25, "exit_code": 0, "stdout_sha256": "5f3ce21469c1323f6421cbec4c91cf257ace422ac0a987df35c74b5bcd19a3b1", "stderr_sha256": "61a4a004c3f3d4bfbdedb783e835204f6340b9ad5a76dd424b9e935ac72a2e7c"},
+  "usage": {"step_tokens": null, "provider_tokens": null},
+  "claim_limit": "Actual native selection on the full frozen inputs. Comparison packets are not completed model reads, zero-defect acceptance, a landing cue or publication. Original private custody and failed intermediate attempts remain retained."
+}

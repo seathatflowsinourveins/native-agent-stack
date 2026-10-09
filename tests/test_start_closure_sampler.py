@@ -47,7 +47,12 @@ class FileGuardTests(unittest.TestCase):
         contract = json.loads(sampler.pinned_bytes(sampler.CONTRACT, sampler.CONTRACT_SHA256))
         self.assertEqual(contract["profile"], sampler.PROFILE)
         self.assertEqual(contract["seed"], 202610081850)
-        self.assertEqual(contract["r3_generator_sha256"], sampler.R3_SHA256)
+        self.assertEqual(contract["r3_generator_sha256"], sampler.R3_CUSTODY_SHA256)
+
+    def test_accepted_reseal_pin_matches_tracked_bytes_and_keeps_historical_contract(self):
+        source = sampler.PROTOCOL.with_name("sealed_r3_generator.py")
+        self.assertEqual(digest(source.read_bytes()), sampler.R3_SHA256)
+        self.assertNotEqual(sampler.R3_SHA256, sampler.R3_CUSTODY_SHA256)
 
     def test_profile_must_be_explicit(self):
         with redirect_stderr(io.StringIO()), self.assertRaises(SystemExit) as error:
@@ -389,6 +394,32 @@ class NativeSamplerTests(unittest.TestCase):
         declarations["declarations"][0]["owner_lane"] = "invented-owner"
         with self.assertRaisesRegex(ValueError, "owner differs"):
             sampler.derive_origin_map(manifest, manifest_sha, provenance, provenance_sha, declarations, self.native, self.r3)
+
+    def test_native_draw_proof_uses_exact_inputs_and_preserves_population_hashes(self):
+        self.add_row("WATCH")
+        self.add_row("TRIAL")
+        manifest, origins, manifest_sha = self.inputs()
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        directory = Path(temporary.name)
+        manifest_path = directory / "manifest.json"
+        origin_path = directory / "origins.json"
+        manifest_path.write_bytes(raw(manifest))
+        origin_path.write_bytes(raw(origins))
+        result = sampler.draw_proof(manifest_path=manifest_path, manifest_sha256=manifest_sha,
+            origin_map_path=origin_path, origin_map_sha256=digest(origin_path.read_bytes()),
+            protocol_sha256=self.protocol_sha, r3_generator=self.r3_path, r3_sha256=sampler.R3_SHA256,
+            head="a" * 40, output=directory / "proof.json")
+        packets = json.loads((directory / "proof.json").read_bytes())
+        self.assertEqual(result["packet_sha256"], digest((directory / "proof.json").read_bytes()))
+        self.assertEqual(packets["manifest_sha256"], manifest_sha)
+        self.assertEqual(packets["origin_map_sha256"], digest(origin_path.read_bytes()))
+        self.assertTrue(all(len(p["population_key_sha256"]) == 64 for p in packets["packets"]))
+        with self.assertRaisesRegex(ValueError, "changed"):
+            sampler.draw_proof(manifest_path=manifest_path, manifest_sha256="d" * 64,
+                origin_map_path=origin_path, origin_map_sha256=digest(origin_path.read_bytes()),
+                protocol_sha256=self.protocol_sha, r3_generator=self.r3_path, r3_sha256=sampler.R3_SHA256,
+                head="a" * 40, output=directory / "invalid-proof.json")
 
     def test_action_row_and_every_primary_source_remain_pinned(self):
         self.add_row("TRIAL")
