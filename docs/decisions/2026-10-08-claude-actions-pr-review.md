@@ -3,8 +3,35 @@
 `claude-pr-review.yml` lets a maintainer ask for a review of one pull request head. It is dispatched by hand from
 `main` with a pull request number and the exact head commit; Claude reads the diff and the files with Read, Glob and
 Grep, within 12 turns and a $3 client budget; a model-free step copies the review to the job summary. Nothing is
-posted to the pull request and the job holds no write scope. It runs only while the repository variable
-`CLAUDE_PR_REVIEW_ENABLED` is `true`. Nothing in this change starts a run or sets a variable.
+posted to the pull request and the job holds no write scope beyond the OIDC token. It runs only while the repository
+variable `CLAUDE_PR_REVIEW_ENABLED` is `true`. Nothing in this change starts a run or sets a variable.
+
+## What the workflow does, by name
+
+The workflow is new, so this is all of its behaviour. The list follows the pre-cue read of the sibling harness-audit
+PR (#892, 2026-10-09), which found changes its record had not named; the same review was applied here.
+
+- Trigger: `workflow_dispatch` only, with inputs `pr_number`, `head_sha` and optional `paths`. The concurrency group
+  is per pull request, without cancelling a run in progress.
+- Job condition: this repository (slug guard), the `main` ref, `github.actor` and `github.triggering_actor` both the
+  repository owner, the first attempt of a run, and `CLAUDE_PR_REVIEW_ENABLED == 'true'`. A dispatch by anyone else,
+  or a re-run, is skipped.
+- `timeout-minutes: 20`. Grants: `contents: read`, `pull-requests: read` and `id-token: write`.
+- A guard step stops the job with exit 2 when step or runner debugging is on, when `~/.claude/settings.json` already
+  exists on the runner (a dangling symlink included), or when an input is malformed.
+- A binding step stops the job with exit 2 unless the pull request is open, from this repository, targets `main` and
+  has exactly the requested head.
+- The head is checked out as data under `pr-head/`, with main at the root; the diff step runs git only in the root,
+  with external diff drivers and text conversion off, and refuses an empty diff or one over 250,000 bytes.
+- The action step pins `ACTIONS_STEP_DEBUG: 'false'` and passes `show_full_output`, `display_report` and
+  `track_progress` as `'false'`; the last two are their defaults, declared in the pinned `action.yml` (lines
+  136-139 and 152-155 at `2dca132f`).
+- A numbers step checks the bounds (below) and an artifact `pr-review-usage-<run id>-<attempt>` keeps `usage.json`
+  (numbers only) for 14 days; the review goes to the job summary only when the bounds passed. Nothing is posted to
+  the pull request.
+- The pin, v1.0.247, is hours old: the user ended the seven-day cooldown for clean releases on 2026-10-03
+  (`docs/decisions/2026-10-03-currency-wave-w1.md`, "Holds and cooldown waiver"), which keeps qualification; the
+  fence receipt and the local parity run below are that qualification.
 
 ## Why a manual dispatch and no pull request trigger
 
@@ -52,7 +79,11 @@ Claude Code gets `--restricted --permission-prompts none --tools Read,Glob,Grep 
 - `pr-head` is not passed to `--add-dir`: it is already inside the working directory, and an added directory's
   `.claude/skills`, commands and agents are loaded.
 
-The same flag set was run on the installed client (Claude Code 2.1.295, the version the pin installs) against a
+The fence flags were run on the installed client (Claude Code 2.1.295, the version the pin installs): `--restricted`,
+`--tools` and `--allowedTools` Read,Glob,Grep, `--strict-mcp-config`, `--permission-prompts none` and `--settings` with
+hooks off, `claudeMdExcludes` for `pr-head` and three deny rules, on Claude Haiku 5.5 with `--max-turns 10` and a
+$0.50 budget; the receipt lists them. This workflow adds `--setting-sources user`, `--add-dir`, `--effort max`, four
+more deny rules and `blockReadsOutsideWorkingDirectories`, and runs Opus 5.5 with 12 turns and $3. The runs used a
 throwaway tree with an untrusted `pr-head` carrying its own `CLAUDE.md`, a skill and a hook, a root settings file
 with a hook, a root `CLAUDE.md`, `.git/config` files and a file outside the tree. In three runs the session's tools
 were exactly Glob, Grep and Read; the files at the root and under `pr-head` were read; the file outside the tree and
@@ -60,14 +91,19 @@ both `.git/config` files were denied; no hook ran; neither instruction file chan
 (`evidence/artifacts/claude-actions-fence-smoke-20261008/receipt.json`). That is one small model and one prompt: it
 shows these controls held there, not that no input can defeat them. The action passes `claude_args` through its own
 parser (`shell-quote`, `base-action/src/parse-sdk-options.ts`); replaying that parser on this workflow's text yields
-the same flags and the same JSON.
+the same flags and the same JSON. This workflow's own prompt and `claude_args`, read from this file, also ran on
+Opus 5.5 at `max` for one real pull request (#897): 12 of 12 assistant turns, a client cost estimate of about
+$1.87 of $3, tools Glob, Grep and Read, no MCP server, a report with two blocking findings
+(`evidence/artifacts/claude-actions-fence-smoke-20261008/local-parity-receipt.json`, added by #892).
 
 After the run, one step reads the action's execution file and keeps only numbers and fixed names: cost, turns, the
 success flag, the Claude Code version, the session's tool list, the number of MCP servers and per-model token
 counts. It then fails the job unless the run succeeded, used 1 to 12 assistant turns (distinct assistant message ids; the client's `num_turns` counts transcript messages, tool results included, so a 12-request run on 2.1.295 reported 57, and it is only recorded), cost at most $3 by the client's
-estimate, read the prompt cache, had no MCP server and had none of Bash, Write, Edit, MultiEdit, NotebookEdit,
-WebFetch, WebSearch, Task, Agent or an `mcp__` tool. The review text is published only when that check passed,
-escaped, inside `<pre>`, capped at 60,000 bytes.
+estimate, read the prompt cache, had no MCP server, listed its tools and MCP servers in the session start record (a
+missing list fails instead of passing as empty), used no tool outside Read, Glob and Grep (an allow-list) and returned
+result text; the step names every bound it finds unmet. The review text, the last non-empty result, is published
+only when that check passed, escaped, inside `<pre>`, capped at 60,000 bytes on a character boundary, with a line
+saying so when the review was longer.
 
 ## Effort
 
@@ -97,14 +133,18 @@ Runs spend from the Console organization that the four `ANTHROPIC_*` repository 
 Unchanged and still passing: `test_pull_requests_write_is_granted_only_to_the_propose_job` and
 `test_no_workflow_reviews_or_approves_a_pull_request`.
 
-New, in `tests/test_claude_pr_review_workflow.py` (24 tests): the trigger, condition, permissions, checkout layout,
+New, in `tests/test_claude_pr_review_workflow.py` (28 tests): the trigger, condition, permissions, checkout layout,
 step order, pin, inputs, flags and settings are asserted from the workflow file, and the guard, binding, diff,
 numbers and review steps are executed as written against a local stand-in for `gh` and a local git repository.
 Twenty weakened copies of the workflow each fail at least one test: a missing head or repository check, a missing
 first-attempt or triggering-actor condition, a 25 MB diff cap, a $30 or 120-turn check, a missing tool, MCP or
 session-start check, metadata left in the model's directory, the head checked out at the root, a path check without
 `..` or without a leading `-`, diff drivers left on, `--restricted` or `--permission-prompts none` removed, the
-`.git` deny rule or `claudeMdExcludes` removed, and Bash added to `--tools`.
+`.git` deny rule or `claudeMdExcludes` removed, and Bash added to `--tools` (measured on 2026-10-08 against that
+day's bounds). The 2026-10-09 bound changes have their own tests: an unknown tool, a session start record without its
+lists, an empty result, the named failure messages, the character-safe cap with its notice and the last non-empty
+result; the turn bound was checked with three mutants. The step tests no longer skip without PyYAML: they read the
+workflow with the policy test's own loader when PyYAML is absent.
 
 ## Alternatives considered
 

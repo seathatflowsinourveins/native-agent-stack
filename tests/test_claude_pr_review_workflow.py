@@ -16,6 +16,8 @@ import textwrap
 import unittest
 from pathlib import Path
 
+from tests.test_workflow_policy import load_workflow
+
 try:
     import yaml
 except ImportError:  # the macOS job installs no package; the hosted validate job has PyYAML
@@ -39,7 +41,8 @@ REPORT = "Publish the review to the job summary"
 
 
 def workflow():
-    return yaml.safe_load(WORKFLOW.read_text(encoding="utf-8"))
+    text = WORKFLOW.read_text(encoding="utf-8")
+    return (yaml.safe_load(text) if yaml else load_workflow(text))
 
 
 def job():
@@ -76,7 +79,8 @@ def model_usage(read=160000, cost=0.7):
                                 "cacheCreationInputTokens": 30000, "costUSD": cost}}
 
 
-def execution(result=None, tools=("Read", "Glob", "Grep"), mcp_servers=(), init=True, turns=None, **changes):
+def execution(result=None, tools=("Read", "Glob", "Grep"), mcp_servers=(), init=True, turns=None, lists=True,
+              **changes):
     final = {"type": "result", "subtype": "success", "is_error": False, "num_turns": 7,
              "total_cost_usd": 0.7, "modelUsage": model_usage(), "result": "Verdict\nFinding 1"}
     final.update(changes)
@@ -84,8 +88,10 @@ def execution(result=None, tools=("Read", "Glob", "Grep"), mcp_servers=(), init=
         final["result"] = result
     messages = []
     if init:
-        messages.append({"type": "system", "subtype": "init", "tools": list(tools),
-                         "mcp_servers": list(mcp_servers), "claude_code_version": "2.1.295"})
+        start = {"type": "system", "subtype": "init", "claude_code_version": "2.1.295"}
+        if lists:
+            start.update(tools=list(tools), mcp_servers=list(mcp_servers))
+        messages.append(start)
     for turn in range(final["num_turns"] if turns is None else turns):
         # The client streams one message per content block, so one API turn spans several messages with one id.
         messages.append({"type": "assistant", "message": {"id": f"msg_{turn:02d}", "content": [
@@ -292,8 +298,8 @@ class PullRequestReviewShapeTests(unittest.TestCase):
         self.assertTrue(upload["with"]["path"].endswith("/pr-review-usage/usage.json"))
 
 
-@unittest.skipUnless(yaml and shutil.which("jq") and shutil.which("git"),
-                     "PyYAML, jq and git are needed to run the workflow's steps")
+@unittest.skipUnless(shutil.which("jq") and shutil.which("git"),
+                     "jq and git are needed to run the workflow's steps")
 class PullRequestReviewStepTests(unittest.TestCase):
     def test_well_formed_inputs_pass_the_guard(self):
         for paths in ("", "docs", "docs tests/test_a.py scripts/x-y_z.py"):
@@ -376,9 +382,7 @@ class PullRequestReviewStepTests(unittest.TestCase):
         code, console, summary, usage, _ = run_step(NUMBERS, execution_file=execution())
         self.assertEqual(code, 0, console)
         record = json.loads(usage)
-        self.assertEqual(sorted(record), ["assistant_turns", "claude_code_version", "forbidden_tools", "mcp_servers", "models",
-                                          "num_turns", "session_started", "successful_result", "tools",
-                                          "total_cost_usd"])
+        self.assertEqual(sorted(record), ["assistant_turns", "claude_code_version", "forbidden_tools", "mcp_servers", "models", "num_turns", "result_chars", "session_started", "successful_result", "tools", "tools_listed", "total_cost_usd"])
         self.assertEqual(record["tools"], ["Read", "Glob", "Grep"])
         self.assertEqual(record["forbidden_tools"], [])
         for text in (usage, summary, console):
@@ -398,12 +402,22 @@ class PullRequestReviewStepTests(unittest.TestCase):
             "an MCP tool in the session": {"tools": ("Read", "mcp__github__create_issue")},
             "an MCP server in the session": {"mcp_servers": ({"name": "x", "status": "connected"},)},
             "no session start record": {"init": False},
+            "a tool outside the allow-list": {"tools": ("Read", "Glob", "Grep", "Skill")},
+            "no tool or MCP list in the session start record": {"lists": False},
+            "no result text": {"result": ""},
         }
         for label, changes in cases.items():
             with self.subTest(case=label):
                 code, _, _, usage, _ = run_step(NUMBERS, execution_file=execution(**changes))
                 self.assertNotEqual(code, 0)
                 self.assertIsInstance(json.loads(usage)["total_cost_usd"], (int, float))
+
+    def test_the_step_names_every_unmet_bound(self):
+        code, console, *_ = run_step(NUMBERS, execution_file=execution(turns=13, total_cost_usd=3.5,
+                                                         tools=("Read", "Skill"), result=""))
+        self.assertNotEqual(code, 0)
+        for words in ("13 assistant turns, outside 1 to 12", "above 3", "Skill", "no result text"):
+            self.assertIn(words, console)
 
     def test_the_turn_bound_counts_assistant_turns_not_transcript_messages(self):
         # On Claude Code 2.1.295 a 12-request run with parallel reads reported num_turns 57 (api-actions LR
@@ -450,6 +464,23 @@ class PullRequestReviewStepTests(unittest.TestCase):
         self.assertNotIn("<script>", summary)
         self.assertLess(len(summary.encode("utf-8")), 61000)
         self.assertNotIn(TRANSCRIPT_MARKER, summary)
+        self.assertIn("bytes; the first 60,000 are shown.", summary)
+
+    def test_the_cap_never_splits_a_character_and_a_short_report_has_no_notice(self):
+        code, console, summary, *_ = run_step(REPORT, execution_file=execution(result="a" + "é" * 40000))
+        self.assertEqual(code, 0, console)
+        summary.encode("utf-8")  # the summary file decoded as UTF-8 when it was read
+        self.assertNotIn("\ufffd", summary)
+        code, console, summary, *_ = run_step(REPORT, execution_file=execution(result="short report"))
+        self.assertNotIn("are shown.", summary)
+
+    def test_the_report_is_the_last_result_with_text(self):
+        log = execution(result="the report")
+        log.append({"type": "result", "subtype": "success", "is_error": False, "num_turns": 0, "result": "",
+                    "total_cost_usd": 0.7, "modelUsage": model_usage()})
+        code, console, summary, *_ = run_step(REPORT, execution_file=log)
+        self.assertEqual(code, 0, console)
+        self.assertIn("the report", summary)
 
 
 if __name__ == "__main__":
