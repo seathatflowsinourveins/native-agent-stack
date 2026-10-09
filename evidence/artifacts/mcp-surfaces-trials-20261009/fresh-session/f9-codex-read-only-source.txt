@@ -1,0 +1,35 @@
+Primary source: https://github.com/openai/codex/blob/979011409de0a60b52f179721948e65531d26144/codex-rs/protocol/src/protocol.rs
+Repository: openai/codex
+Release tag: rust-v0.161.0
+Tag object: 7e21416b38834816c224ea0dfd135c3de94b2f15
+Commit: 979011409de0a60b52f179721948e65531d26144
+Path: codex-rs/protocol/src/protocol.rs
+Git blob: abc4e90847636bfe51e6275ede528a13616c8573
+Full upstream file SHA256: d3d3d384da91b2824c10091de4331a2bc26ec5474887ed0aef1e3f3c4ae110f4
+Capture: GitHub tag and contents APIs, 2026-10-09; installed client codex-cli 0.161.0.
+Boundary: numbered excerpts only, not the full source file. The full-file hash does not describe this excerpt's bytes.
+
+1077:    /// Read-only access configuration.
+1078:    #[serde(rename = "read-only")]
+1079:    ReadOnly {
+1080:        /// When set to `true`, outbound network access is allowed. `false` by
+1081:        /// default.
+1082:        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+1083:        network_access: bool,
+1084:    },
+
+1203:    /// Returns a policy with read-only disk access and no network.
+1204:    pub fn new_read_only_policy() -> Self {
+1205:        SandboxPolicy::ReadOnly {
+1206:            network_access: false,
+1207:        }
+1208:    }
+
+1235:    pub fn has_full_network_access(&self) -> bool {
+1236:        match self {
+1237:            SandboxPolicy::DangerFullAccess => true,
+1238:            SandboxPolicy::ExternalSandbox { network_access } => network_access.is_enabled(),
+1239:            SandboxPolicy::ReadOnly { network_access, .. } => *network_access,
+1240:            SandboxPolicy::WorkspaceWrite { network_access, .. } => *network_access,
+1241:        }
+1242:    }

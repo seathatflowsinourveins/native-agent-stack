@@ -1,0 +1,44 @@
+Running client scenario 'ping' against server: http://127.0.0.1:21851/mcp
+Results saved to /home/example/code/native-agent-stack-ns2604-landscape-mcp/evidence/artifacts/mcp-surfaces-trials-20261009/conformance/host-checks/qmd-ping/server-ping-2026-10-09T05-30-17-074Z
+Checks:
+[90m2026-10-09T05:30:27.611Z[0m [ping] [31mFAILURE[0m Server responds to ping requests
+
+Test Results:
+Passed: 0/1, 1 failed, 0 warnings
+
+=== Failed Checks ===
+
+  - Ping: Server responds to ping requests
+    Error: Failed: fetch failed
+
+Test ping utility for connection health check.
+
+[1mServer Implementation Requirements:[0m
+
+[1mEndpoint[0m: [2mping[0m
+
+[1mRequirements[0m:
+- Accept ping request with no parameters
+- Respond promptly with empty object [2m{}[0m
+
+[1mRequest Format[0m:
+
+``[2mjson
+{
+  "jsonrpc": "2.0",
+  "id": "123",
+  "method": "ping"
+}
+[0m`[2m
+
+[1mResponse Format[0m:
+
+[0m`[2mjson
+{
+  "jsonrpc": "2.0",
+  "id": "123",
+  "result": {}
+}
+[0m``
+
+[1mImplementation Note[0m: The ping utility allows either party to verify that their counterpart is still responsive and the connection is alive.

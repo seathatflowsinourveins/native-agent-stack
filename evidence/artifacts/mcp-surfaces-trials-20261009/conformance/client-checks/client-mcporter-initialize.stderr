@@ -1,0 +1,26 @@
+Starting scenario: initialize
+Executing client: mcporter --config /home/example/.local/state/native-agent-stack/research/api-surfaces-trials/conformance/mcporter-empty.json list http://localhost:24553
+(node:4176271) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+Client exited with code 1
+
+Stderr:
+[mcporter] HTTP endpoints require --allow-http to confirm insecure usage.
+Error: HTTP endpoints require --allow-http to confirm insecure usage.
+    at resolveEphemeralServer (file:///home/example/.local/share/mise/installs/node/24.21.0/lib/node_modules/mcporter/dist/cli/adhoc-server.js:23:19)
+    at prepareEphemeralServerTarget (file:///home/example/.local/share/mise/installs/node/24.21.0/lib/node_modules/mcporter/dist/cli/ephemeral-target.js:53:24)
+    at handleList (file:///home/example/.local/share/mise/installs/node/24.21.0/lib/node_modules/mcporter/dist/cli/list-command.js:27:28)
+    at runCli (file:///home/example/.local/share/mise/installs/node/24.21.0/lib/node_modules/mcporter/dist/cli.js:262:19)
+    at async main (file:///home/example/.local/share/mise/installs/node/24.21.0/lib/node_modules/mcporter/dist/cli.js:379:5)
+
+Results saved to evidence/artifacts/mcp-surfaces-trials-20261009/conformance/client-checks/mcporter/initialize-2026-10-09T05-31-37-380Z
+Checks:
+
+
+Test Results:
+Passed: 0/0, 0 failed, 0 warnings
+
+⚠️  CLIENT EXITED WITH ERROR (code 1) - Test may be incomplete
+
+❌ OVERALL: FAILED

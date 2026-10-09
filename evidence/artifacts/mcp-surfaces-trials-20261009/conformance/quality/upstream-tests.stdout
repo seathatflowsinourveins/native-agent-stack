@@ -1,0 +1,12 @@
+
+> @modelcontextprotocol/conformance@0.1.16 test
+> vitest run src/checks/checks.test.ts src/scenarios/spec-version.test.ts src/expected-failures.test.ts
+
+
+ RUN  v4.1.1 /home/example/.local/state/native-agent-stack/research/api-surfaces-trials/conformance/source
+
+
+ Test Files  3 passed (3)
+      Tests  29 passed (29)
+   Start at  01:30:03
+   Duration  1.20s (transform 352ms, setup 0ms, import 760ms, tests 47ms, environment 0ms)

@@ -1,0 +1,7 @@
+Running client scenario 'ping' against server: http://127.0.0.1:8888/mcp/trading-research/
+Results saved to /home/example/code/native-agent-stack-ns2604-landscape-mcp/evidence/artifacts/mcp-surfaces-trials-20261009/conformance/host-checks/hindsight-ping/server-ping-2026-10-09T05-30-39-527Z
+Checks:
+[90m2026-10-09T05:30:39.583Z[0m [ping] [32mSUCCESS[0m Server responds to ping requests
+
+Test Results:
+Passed: 1/1, 0 failed, 0 warnings

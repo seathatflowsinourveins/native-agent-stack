@@ -1,0 +1,45 @@
+{
+  "label": "ai-memory-tools-list",
+  "started_utc": "2026-10-09T05:30:05.178811+00:00",
+  "command": [
+    "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/conformance/install/node_modules/.bin/conformance",
+    "server",
+    "--url",
+    "http://127.0.0.1:29374/mcp",
+    "--scenario",
+    "tools-list",
+    "--spec-version",
+    "2025-11-25",
+    "--output-dir",
+    "/home/example/code/native-agent-stack-ns2604-landscape-mcp/evidence/artifacts/mcp-surfaces-trials-20261009/conformance/host-checks/ai-memory-tools-list"
+  ],
+  "cwd": "/home/example/code/native-agent-stack-ns2604-landscape-mcp",
+  "return_code": 0,
+  "timed_out": false,
+  "elapsed_seconds": 0.530589,
+  "pss": {
+    "peak_process_tree_kib": 59523,
+    "max_observed_processes": 1,
+    "samples": 10,
+    "interval_seconds": 0.05,
+    "source": "/proc/<owned-pid>/smaps_rollup:Pss",
+    "scope": "owned command process tree; shared host servers excluded"
+  },
+  "logs": {
+    "stdout": {
+      "path": "ai-memory-tools-list.stdout",
+      "raw_sha256": "af59e0f2aa7f09f14be0ac928cbe814cf0165b5f84f149dfb2706437d66b4b85",
+      "raw_bytes": 461,
+      "public_sha256": "64a879f4f66490703f8d22158b7af3e21148a2820a4e89e90a0b722f43b3f67c",
+      "public_bytes": 463
+    },
+    "stderr": {
+      "path": "ai-memory-tools-list.stderr",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "public_bytes": 0
+    }
+  },
+  "publication_boundary": "Personal home paths and ephemeral session identifiers redacted. Raw captures are private; public log digests refer to the redacted files."
+}

@@ -1,0 +1,176 @@
+{
+  "schema": "mcp-fresh-session-f9-controls/1",
+  "original_command_source": "tool-calls.json:90",
+  "mcporter_version": "0.14.2",
+  "codex_version": "0.161.0",
+  "stdin": "{\"mcpServers\":{},\"imports\":[]}\n",
+  "mcporter_argv": [
+    "mcporter",
+    "--config",
+    "/dev/stdin",
+    "list",
+    "--http-url",
+    "http://127.0.0.1:29374/mcp",
+    "--allow-http",
+    "--name",
+    "endpoint-check",
+    "--header",
+    "Authorization=",
+    "--no-oauth",
+    "--json",
+    "--exit-code",
+    "--timeout",
+    "10000"
+  ],
+  "controls": [
+    {
+      "label": "f9-control-host",
+      "started_utc": "2026-10-09T09:59:21.946946+00:00",
+      "argv": [
+        "mcporter",
+        "--config",
+        "/dev/stdin",
+        "list",
+        "--http-url",
+        "http://127.0.0.1:29374/mcp",
+        "--allow-http",
+        "--name",
+        "endpoint-check",
+        "--header",
+        "Authorization=",
+        "--no-oauth",
+        "--json",
+        "--exit-code",
+        "--timeout",
+        "10000"
+      ],
+      "return_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 0.423544,
+      "native_recorder_rc": 0,
+      "raw_capture_digests": {
+        "json": {
+          "bytes": 1184,
+          "sha256": "fbf7ff2c20f9b5bd341570d53e7e5550c4f1a247fb400ee8861148eba6f2b7f0"
+        },
+        "stdout": {
+          "bytes": 146499,
+          "sha256": "410d3788db7c8685caa289c8807193ba7393e5f6f71c93544b404b5cf4846fdd"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "observation": {
+        "status": "ok",
+        "tools": 23,
+        "sorted_tool_names_sha256": "b1248e002020ebdb596079b39b4e0bc755ae3f0c84167d03ee84921a11d78f9f",
+        "stderr_empty": true
+      }
+    },
+    {
+      "label": "f9-control-read-only",
+      "started_utc": "2026-10-09T09:59:22.402207+00:00",
+      "argv": [
+        "codex",
+        "sandbox",
+        "-c",
+        "sandbox_mode=\"read-only\"",
+        "--",
+        "mcporter",
+        "--config",
+        "/dev/stdin",
+        "list",
+        "--http-url",
+        "http://127.0.0.1:29374/mcp",
+        "--allow-http",
+        "--name",
+        "endpoint-check",
+        "--header",
+        "Authorization=",
+        "--no-oauth",
+        "--json",
+        "--exit-code",
+        "--timeout",
+        "10000"
+      ],
+      "return_code": 1,
+      "timed_out": false,
+      "elapsed_seconds": 0.471249,
+      "native_recorder_rc": 0,
+      "raw_capture_digests": {
+        "json": {
+          "bytes": 1278,
+          "sha256": "e9b538dbb4f354d9eea5a05436138fb8b1963e6bb934f6cdc87e5b06a9d5cd11"
+        },
+        "stdout": {
+          "bytes": 336,
+          "sha256": "73d3371b33e073892911f26061ef0d413a9e0c2d22bb051d63273d9f3416913a"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "observation": {
+        "mode": "server",
+        "name": "endpoint-check",
+        "status": "offline",
+        "durationMs": 23,
+        "transport": "HTTP http://127.0.0.1:29374/mcp",
+        "source": {
+          "kind": "local",
+          "path": "<adhoc>"
+        },
+        "issue": {
+          "kind": "offline",
+          "rawMessage": "Version negotiation probe failed: fetch failed"
+        },
+        "error": "offline"
+      },
+      "stderr_empty": true
+    },
+    {
+      "label": "f9-control-socket-read-only",
+      "started_utc": "2026-10-09T09:59:22.905493+00:00",
+      "argv": [
+        "codex",
+        "sandbox",
+        "-c",
+        "sandbox_mode=\"read-only\"",
+        "--",
+        "python3",
+        "-c",
+        "import socket; socket.socket()"
+      ],
+      "return_code": 1,
+      "timed_out": false,
+      "elapsed_seconds": 0.156138,
+      "native_recorder_rc": 0,
+      "raw_capture_digests": {
+        "json": {
+          "bytes": 1073,
+          "sha256": "a77bc0aa30757985332f907352460e97b3a25ae0ab586916b7a0480850cb03e6"
+        },
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 432,
+          "sha256": "59381ef40206bbfa30887c4021a43f0ee373e4b46eb10dc7bd408a00952025f4"
+        }
+      },
+      "observation": {
+        "errno": 1,
+        "exception": "PermissionError",
+        "error": "Operation not permitted",
+        "failure_stage": "socket.socket() before connect",
+        "stdout_empty": true
+      },
+      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 1, in <module>\n    import socket; socket.socket()\n                   ~~~~~~~~~~~~~^^\n  File \"/home/example/.local/share/mise/installs/python/3.13.16/lib/python3.13/socket.py\", line 233, in __init__\n    _socket.socket.__init__(self, family, type, proto, fileno)\n    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nPermissionError: [Errno 1] Operation not permitted\n"
+    }
+  ],
+  "privacy_boundary": "No credentials, cached OAuth tokens, memory contents or tools/call requests were used. Host tools/list raw bytes remain private; only status, tool count and sorted-name digest are public. Read-only sandbox stdout and socket errno are retained."
+}

@@ -1,0 +1,16 @@
+[
+  {
+    "id": "ping",
+    "name": "Ping",
+    "description": "Server responds to ping requests",
+    "status": "FAILURE",
+    "timestamp": "2026-10-09T05:30:27.611Z",
+    "errorMessage": "Failed: fetch failed",
+    "specReferences": [
+      {
+        "id": "MCP-Ping",
+        "url": "https://modelcontextprotocol.io/specification/2025-06-18/basic/utilities/ping"
+      }
+    ]
+  }
+]

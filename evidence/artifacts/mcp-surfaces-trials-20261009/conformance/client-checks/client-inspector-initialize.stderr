@@ -1,0 +1,20 @@
+Starting scenario: initialize
+Executing client: /home/example/.local/state/native-agent-stack/research/api-surfaces-trials/inspector/install/bin/mcp-inspector --cli --method tools/list --transport http --format json http://localhost:24467
+(node:4176437) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+Client exited with code 1
+
+Stderr:
+{"error":{"code":"error","message":"Target is required. Specify a URL or a command to execute."}}
+
+Results saved to evidence/artifacts/mcp-surfaces-trials-20261009/conformance/client-checks/inspector/initialize-2026-10-09T05-31-38-128Z
+Checks:
+
+
+Test Results:
+Passed: 0/0, 0 failed, 0 warnings
+
+⚠️  CLIENT EXITED WITH ERROR (code 1) - Test may be incomplete
+
+❌ OVERALL: FAILED

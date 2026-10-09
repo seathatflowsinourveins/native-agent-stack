@@ -1,0 +1,45 @@
+{
+  "label": "qmd-tools-list",
+  "started_utc": "2026-10-09T05:30:27.701256+00:00",
+  "command": [
+    "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/conformance/install/node_modules/.bin/conformance",
+    "server",
+    "--url",
+    "http://127.0.0.1:21851/mcp",
+    "--scenario",
+    "tools-list",
+    "--spec-version",
+    "2025-11-25",
+    "--output-dir",
+    "/home/example/code/native-agent-stack-ns2604-landscape-mcp/evidence/artifacts/mcp-surfaces-trials-20261009/conformance/host-checks/qmd-tools-list"
+  ],
+  "cwd": "/home/example/code/native-agent-stack-ns2604-landscape-mcp",
+  "return_code": 1,
+  "timed_out": false,
+  "elapsed_seconds": 10.913477,
+  "pss": {
+    "peak_process_tree_kib": 50379,
+    "max_observed_processes": 1,
+    "samples": 205,
+    "interval_seconds": 0.05,
+    "source": "/proc/<owned-pid>/smaps_rollup:Pss",
+    "scope": "owned command process tree; shared host servers excluded"
+  },
+  "logs": {
+    "stdout": {
+      "path": "qmd-tools-list.stdout",
+      "raw_sha256": "1bf41e69352b0a8edd0a8053402e5a3ae64092aee7f37e4acc001bf47c50e8c1",
+      "raw_bytes": 884,
+      "public_sha256": "d10991aabe56cd722ce7aaa1665b0c1e00050227c2a3ba0271480956a1ad6646",
+      "public_bytes": 886
+    },
+    "stderr": {
+      "path": "qmd-tools-list.stderr",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "public_bytes": 0
+    }
+  },
+  "publication_boundary": "Personal home paths and ephemeral session identifiers redacted. Raw captures are private; public log digests refer to the redacted files."
+}

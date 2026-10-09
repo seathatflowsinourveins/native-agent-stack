@@ -1,0 +1,13 @@
+Starting scenario: initialize
+Executing client: /home/example/.local/state/native-agent-stack/research/api-surfaces-trials/conformance/inspector-client.sh http://localhost:23669
+(node:35286) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+Results saved to evidence/artifacts/mcp-surfaces-trials-20261009/conformance/client-checks/inspector-r2/initialize-2026-10-09T05-33-04-182Z
+Checks:
+[90m2026-10-09T05:33:04.533Z[0m [mcp-client-initialization] [32mSUCCESS[0m Validates that MCP client properly initializes with server
+[90m2026-10-09T05:33:04.533Z[0m [server-info              ] [36mINFO   [0m Test server info returned to client
+
+Test Results:
+Passed: 1/1, 0 failed, 0 warnings
+
+✅ OVERALL: PASSED

@@ -1,0 +1,42 @@
+{
+  "label": "upstream-pin-ci",
+  "started_utc": "2026-10-09T05:36:59.212015+00:00",
+  "command": [
+    "gh",
+    "api",
+    "--cache",
+    "120s",
+    "repos/modelcontextprotocol/conformance/actions/runs?head_sha=21a9a2febd7100d7c17ac1021ee7f2ed9f66a1e0&per_page=10",
+    "--jq",
+    "{total_count,runs:[.workflow_runs[]|{name,head_sha,conclusion,html_url,event}]}"
+  ],
+  "cwd": "/home/example/code/native-agent-stack-ns2604-landscape-mcp",
+  "return_code": 0,
+  "timed_out": false,
+  "elapsed_seconds": 0.517365,
+  "pss": {
+    "peak_process_tree_kib": 49856,
+    "max_observed_processes": 1,
+    "samples": 10,
+    "interval_seconds": 0.05,
+    "source": "/proc/<owned-pid>/smaps_rollup:Pss",
+    "scope": "owned command process tree; shared host servers excluded"
+  },
+  "logs": {
+    "stdout": {
+      "path": "upstream-pin-ci.stdout",
+      "raw_sha256": "1da5a9b348ff913f9c34356b6e4c8e385d9e34c3e3350d7bd62c0acfe38b719a",
+      "raw_bytes": 1099,
+      "public_sha256": "1da5a9b348ff913f9c34356b6e4c8e385d9e34c3e3350d7bd62c0acfe38b719a",
+      "public_bytes": 1099
+    },
+    "stderr": {
+      "path": "upstream-pin-ci.stderr",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "public_bytes": 0
+    }
+  },
+  "publication_boundary": "Personal home paths and ephemeral session identifiers redacted. Raw captures are private; public log digests refer to the redacted files."
+}

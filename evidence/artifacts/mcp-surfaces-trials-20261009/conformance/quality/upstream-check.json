@@ -1,0 +1,38 @@
+{
+  "label": "upstream-check",
+  "started_utc": "2026-10-09T05:29:32.828071+00:00",
+  "command": [
+    "npm",
+    "run",
+    "check"
+  ],
+  "cwd": "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/conformance/source",
+  "return_code": 0,
+  "timed_out": false,
+  "elapsed_seconds": 5.338735,
+  "pss": {
+    "peak_process_tree_kib": 442772,
+    "max_observed_processes": 6,
+    "samples": 88,
+    "interval_seconds": 0.05,
+    "source": "/proc/<owned-pid>/smaps_rollup:Pss",
+    "scope": "owned command process tree; shared host servers excluded"
+  },
+  "logs": {
+    "stdout": {
+      "path": "upstream-check.stdout",
+      "raw_sha256": "270f0836a02f2f2b77accde0810772c4cd1455efef67508c912696d802561821",
+      "raw_bytes": 320,
+      "public_sha256": "270f0836a02f2f2b77accde0810772c4cd1455efef67508c912696d802561821",
+      "public_bytes": 320
+    },
+    "stderr": {
+      "path": "upstream-check.stderr",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "public_bytes": 0
+    }
+  },
+  "publication_boundary": "Personal home paths and ephemeral session identifiers redacted. Raw captures are private; public log digests refer to the redacted files."
+}

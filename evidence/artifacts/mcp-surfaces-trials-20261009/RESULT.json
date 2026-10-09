@@ -1,0 +1,161 @@
+{
+  "schema": "mcp-surfaces-trial-result/1",
+  "date_utc": "2026-10-09",
+  "decision_record": "docs/decisions/2026-10-09-mcp-surfaces-trials.md",
+  "discovery_trigger": {
+    "logical_path": "research/api-surfaces-20261008/FINAL.md",
+    "captured_utc": "2026-10-09T05:20:37Z",
+    "sha256": "77e17817d8ecc8e53329ac32303ece8dc4e86eaf67cba1e3ae36196aa328a109",
+    "boundary": "Discovery input. Current trial claims are independently tied to primary vendor pins and native measurements."
+  },
+  "conformance": {
+    "version": "0.1.16",
+    "commit": "21a9a2febd7100d7c17ac1021ee7f2ed9f66a1e0",
+    "verdict": "PASS_SCOPED_2025-11-25_TRIAL",
+    "host_http_registrations_tested": 2,
+    "role_host_registrations": 6,
+    "host_http_checks_passed": 6,
+    "host_stdio_registrations_untested": 4,
+    "unavailable_proposed_qmd_http_probes": 3,
+    "client_final_assertions_passed": 2,
+    "client_final_informational_results": 2,
+    "client_initial_zero_check_setup_failures": 2,
+    "source_targeted_test_files_passed": 3,
+    "source_targeted_tests_passed": 29,
+    "unsupported_protocol_filter": "2026-07-28",
+    "unsupported_filter_rc": 1,
+    "frozen_2026-07-28_revision_verdict": "NOT_ESTABLISHED",
+    "frozen_requirement_legs": [
+      {
+        "id": "frozen-client-2026-07-28",
+        "mode": "client",
+        "frozen_package": "@modelcontextprotocol/conformance@0.2.0-alpha.11",
+        "frozen_source_commit": "c321dd32035556e6769d3724a8ee97d87c3faaac",
+        "requirements_revision": "2026-07-28",
+        "requirement_invocation": "npx --offline --yes --ignore-scripts @modelcontextprotocol/conformance@0.2.0-alpha.11 client --command \"$MCP_CONFORMANCE_CLIENT_COMMAND\" --requirements 2026-07-28 \"${extra[@]}\"",
+        "intended_target": {
+          "selector": "MCP_CONFORMANCE_CLIENT_COMMAND",
+          "description": "Owner-selected scenario-driven MCP client command or fixture, qualified to execute inside the isolated loopback namespace.",
+          "selected_target_in_this_trial": null,
+          "binding_status": "NOT_BOUND_FOR_FROZEN_REQUIREMENT"
+        },
+        "declaration": {
+          "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/mcp-conformance-accept.sh",
+          "repository_revision": "b7dfe638fc825a52ff4e7d1a9ccf2fde7de889fd",
+          "sha256": "1084b5a567c2c6df7b0443c6547661aad81f91882b56001708efb11c81f8987d",
+          "package_line": 8,
+          "invocation_line": 57,
+          "target_selection_path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+          "target_selection_line": 4998
+        },
+        "status": "NOT_ESTABLISHED",
+        "execution_status": "NOT_RUN_AT_FROZEN_REVISION"
+      },
+      {
+        "id": "frozen-server-2026-07-28",
+        "mode": "server",
+        "frozen_package": "@modelcontextprotocol/conformance@0.2.0-alpha.11",
+        "frozen_source_commit": "c321dd32035556e6769d3724a8ee97d87c3faaac",
+        "requirements_revision": "2026-07-28",
+        "requirement_invocation": "npx --offline --yes --ignore-scripts @modelcontextprotocol/conformance@0.2.0-alpha.11 server --url \"$MCP_CONFORMANCE_SERVER_URL\" --requirements 2026-07-28 \"${extra[@]}\"",
+        "intended_target": {
+          "selector": "MCP_CONFORMANCE_SERVER_URL",
+          "description": "Owner-selected HTTP MCP server endpoint supplied by an owner-qualified startup adapter or fixture inside the isolated loopback namespace.",
+          "selected_target_in_this_trial": null,
+          "binding_status": "NOT_BOUND_FOR_FROZEN_REQUIREMENT"
+        },
+        "declaration": {
+          "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/mcp-conformance-accept.sh",
+          "repository_revision": "b7dfe638fc825a52ff4e7d1a9ccf2fde7de889fd",
+          "sha256": "1084b5a567c2c6df7b0443c6547661aad81f91882b56001708efb11c81f8987d",
+          "package_line": 8,
+          "invocation_line": 54,
+          "target_selection_path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+          "target_selection_line": 4998
+        },
+        "status": "NOT_ESTABLISHED",
+        "execution_status": "NOT_RUN_AT_FROZEN_REVISION"
+      }
+    ],
+    "original_two_leg_requirement_mapping": {
+      "scoped_verdict": "PASS_SCOPED_2025-11-25_TRIAL",
+      "established_scope": "Retained v0.1.16 initialization, ping and discovery observations at 2025-11-25, including the two native client initialization checks.",
+      "original_frozen_client_leg": "NOT_ESTABLISHED",
+      "original_frozen_server_leg": "NOT_ESTABLISHED",
+      "satisfies_original_two_leg_requirement": false,
+      "filter_refusal_scope": "The v0.1.16 server-initialize --spec-version 2026-07-28 refusal establishes only that invocation boundary. It executes and scores neither frozen alpha.11 --requirements 2026-07-28 leg.",
+      "successful_2025_observations_scope": "The 2025 initialization, ping and discovery observations execute neither frozen client nor frozen server requirement set."
+    }
+  },
+  "inspector_vs_mcporter": {
+    "verdict": "KEEP_MCPORTER_SCOPED",
+    "candidate": "modelcontextprotocol/inspector@2.10.1",
+    "candidate_commit": "0d2bc1d91ce177ea8d497ee3efe91bcc59e40a1c",
+    "baseline": "openclaw/mcporter@0.14.2",
+    "baseline_commit": "aa0f55f9bffcde9d2070c86145f37d4dd3525f6c",
+    "endpoint": "http://127.0.0.1:29374/mcp",
+    "tasks": [
+      "tools/list",
+      "memory_status {}"
+    ],
+    "timed_operations_rc_zero": 42,
+    "discovery_schema_comparisons_equal": 11,
+    "tools_returned": 23,
+    "warm_pairs": 20,
+    "warm_pairs_exactly_equal": 18,
+    "warm_status_pairs_differing_only_live_observations_counter": 2,
+    "pss_scope": "Native command plus arm-owned private daemon; shared host server excluded",
+    "private_daemons_stopped_and_verified": true,
+    "cold_sample_pairs": 1,
+    "limits": "Single host and two read-only tasks. HTTP session-token identity untested. Timing and PSS are pilot observations."
+  },
+  "adoption": {
+    "one_proposed_default": "mcporter 0.14.2",
+    "proposal_basis": "Lower measured PSS and cold discovery cost under the host memory gate; Inspector's faster warm latency and experimental upstream status remain explicit.",
+    "conformance": "TRIAL",
+    "inspector": "TRIAL",
+    "adopt_now": [],
+    "install_check_inverse_evidence": "RECORDED_AND_VERIFIED",
+    "candidate_fresh_proof": "NOT_PROVEN",
+    "fresh_observation_bound_seconds": 180,
+    "fresh_organically_reached": "mcporter",
+    "fresh_task_completed": false,
+    "open_gates": [
+      "candidate native routing and successful fresh proof",
+      "dated conformance revision boundary",
+      "independent designated reads",
+      "required CI",
+      "pre-cue at pushed head",
+      "CC cue and owner decisions"
+    ],
+    "catalog_disposition_owner": "grand-catalog"
+  },
+  "evidence_classes": {
+    "actual_host_http_checks": "native_proven",
+    "same_task_cli_pss_and_latency": "native_proven",
+    "client_checks_against_vendor_reference_scenario": "local_integration",
+    "upstream_release_and_ci_inspection": "source_review",
+    "source_unit_tests": "local_integration"
+  },
+  "publication_boundary": "Public captures are sanitized. Separate redaction maps and per-log raw/public digests preserve custody without publishing personal paths or session identifiers.",
+  "fresh_session_f9": {
+    "receipt": "fresh-session/f9-receipt.json",
+    "controls": "fresh-session/f9-controls.json",
+    "tool_calls": "fresh-session/f9-tool-calls.json",
+    "fetch_failed_classification": "environmental",
+    "environmental_boundary": "Read-only sandbox denies socket creation; matched host replay succeeds and sandbox replay reproduces fetch failed. Historical r3 errno was not retained, so attribution is inference.",
+    "gateway_env_boundary": "The historical missing-key setup failure preceded inference. The later fetch-failed observation already used the fixed placeholder. F9 supplies the kit variables only to the child, without claiming they fix the MCP fetch.",
+    "prompt_identical_to_original": true,
+    "retry_return_code": -15,
+    "retry_timed_out": true,
+    "retry_completed_commands": 15,
+    "retry_endpoint_attempt_completed": false,
+    "retry_successful_task_completion": false,
+    "candidate_fresh_proof": "NOT_PROVEN",
+    "original_observations_unchanged": true,
+    "host_control_rc": 0,
+    "host_control_tools": 23,
+    "sandbox_control_rc": 1,
+    "sandbox_socket_errno": 1
+  }
+}

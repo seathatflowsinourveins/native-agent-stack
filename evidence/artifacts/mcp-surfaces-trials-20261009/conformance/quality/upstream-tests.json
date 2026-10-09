@@ -1,0 +1,41 @@
+{
+  "label": "upstream-tests",
+  "started_utc": "2026-10-09T05:30:02.943226+00:00",
+  "command": [
+    "npm",
+    "test",
+    "--",
+    "src/checks/checks.test.ts",
+    "src/scenarios/spec-version.test.ts",
+    "src/expected-failures.test.ts"
+  ],
+  "cwd": "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/conformance/source",
+  "return_code": 0,
+  "timed_out": false,
+  "elapsed_seconds": 1.778826,
+  "pss": {
+    "peak_process_tree_kib": 210724,
+    "max_observed_processes": 4,
+    "samples": 31,
+    "interval_seconds": 0.05,
+    "source": "/proc/<owned-pid>/smaps_rollup:Pss",
+    "scope": "owned command process tree; shared host servers excluded"
+  },
+  "logs": {
+    "stdout": {
+      "path": "upstream-tests.stdout",
+      "raw_sha256": "b340b2526fbf76ccc6914b3e051c5e94a87fb156b3ade9b1a0518d831d427390",
+      "raw_bytes": 430,
+      "public_sha256": "85dcbfcb2e90c6984e0e9bd66864e5dd952b86c3efd995409478ba1ef71b7c6e",
+      "public_bytes": 431
+    },
+    "stderr": {
+      "path": "upstream-tests.stderr",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "public_bytes": 0
+    }
+  },
+  "publication_boundary": "Personal home paths and ephemeral session identifiers redacted. Raw captures are private; public log digests refer to the redacted files. Captured terminal blank lines are normalized at EOF."
+}

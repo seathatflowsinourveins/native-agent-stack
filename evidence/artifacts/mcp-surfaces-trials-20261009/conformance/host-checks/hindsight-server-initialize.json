@@ -1,0 +1,45 @@
+{
+  "label": "hindsight-server-initialize",
+  "started_utc": "2026-10-09T05:30:38.658127+00:00",
+  "command": [
+    "/home/example/.local/state/native-agent-stack/research/api-surfaces-trials/conformance/install/node_modules/.bin/conformance",
+    "server",
+    "--url",
+    "http://127.0.0.1:8888/mcp/trading-research/",
+    "--scenario",
+    "server-initialize",
+    "--spec-version",
+    "2025-11-25",
+    "--output-dir",
+    "/home/example/code/native-agent-stack-ns2604-landscape-mcp/evidence/artifacts/mcp-surfaces-trials-20261009/conformance/host-checks/hindsight-server-initialize"
+  ],
+  "cwd": "/home/example/code/native-agent-stack-ns2604-landscape-mcp",
+  "return_code": 0,
+  "timed_out": false,
+  "elapsed_seconds": 0.474624,
+  "pss": {
+    "peak_process_tree_kib": 63131,
+    "max_observed_processes": 1,
+    "samples": 9,
+    "interval_seconds": 0.05,
+    "source": "/proc/<owned-pid>/smaps_rollup:Pss",
+    "scope": "owned command process tree; shared host servers excluded"
+  },
+  "logs": {
+    "stdout": {
+      "path": "hindsight-server-initialize.stdout",
+      "raw_sha256": "682a25857930c2c8a17c1c7dce2700044781bad20d30c87a6785cb6ed4566dc3",
+      "raw_bytes": 515,
+      "public_sha256": "f5a9f16184ef12c08dc03d1c7ae2db78a78e366c5fe3d4d7dac3209d999b1308",
+      "public_bytes": 517
+    },
+    "stderr": {
+      "path": "hindsight-server-initialize.stderr",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "public_bytes": 0
+    }
+  },
+  "publication_boundary": "Personal home paths and ephemeral session identifiers redacted. Raw captures are private; public log digests refer to the redacted files."
+}
