@@ -33,7 +33,7 @@ SETTINGS_MARKER = "SYNTHETIC-SETTINGS-CONTENT-MUST-NOT-BE-PRINTED"
 SETTINGS_TEXT = ('{"disableAllHooks":true,"permissions":{"blockReadsOutsideWorkingDirectories":true,"deny":['
                  '"Read(./.git/**)","Read(./**/.git/**)","Read(./**/.env)","Read(./**/.env.*)","Read(./**/*.pem)",'
                  '"Read(./**/*.key)"]}}')
-CLAUDE_ARGS = ["--model", "claude-opus-5-5", "--effort", "max", "--max-turns", "20", "--max-budget-usd", "5",
+CLAUDE_ARGS = ["--model", "claude-opus-5-5", "--effort", "max", "--max-budget-usd", "5",
                "--tools", "Read,Glob,Grep", "--allowedTools", "Read,Glob,Grep", "--restricted",
                "--permission-prompts", "none", "--setting-sources", "user", "--strict-mcp-config",
                "--settings", SETTINGS_TEXT, "--add-dir", "${{", "runner.temp", "}}/harness-audit"]
@@ -160,7 +160,7 @@ class HarnessAuditShapeTests(unittest.TestCase):
             self.assertNotIn(static_credential, text)
 
     def test_claude_has_three_read_tools_and_fixed_bounds(self):
-        for expected in ("--model claude-opus-5-5", "--effort max", "--max-turns 20", "--max-budget-usd 5",
+        for expected in ("--model claude-opus-5-5", "--effort max", "--max-budget-usd 5",
                          "--tools Read,Glob,Grep", "--allowedTools Read,Glob,Grep",
                          "--restricted", "--permission-prompts none",
                          "--setting-sources user", "--strict-mcp-config"):
@@ -168,7 +168,9 @@ class HarnessAuditShapeTests(unittest.TestCase):
         joined = " ".join(line for line in arguments() if not line.startswith("--settings "))
         for tool in ("Bash", "Write", "Edit", "WebFetch", "WebSearch", "Task", "Agent", "mcp__"):
             self.assertNotIn(tool, joined)
-        for flag in ("--debug", "--dangerously-skip-permissions", "--permission-mode", "--mcp-config"):
+        # No --max-turns: the action fails a success whose num_turns exceeds it, and num_turns counts transcript
+        # messages, not turns. The numbers step bounds the assistant turns instead.
+        for flag in ("--debug", "--dangerously-skip-permissions", "--permission-mode", "--mcp-config", "--max-turns"):
             self.assertNotIn(flag, joined)
 
     def test_settings_turn_hooks_off_and_deny_every_git_directory(self):
@@ -186,7 +188,9 @@ class HarnessAuditShapeTests(unittest.TestCase):
         # budget flag, or a new settings key such as permissions.additionalDirectories passed them (command center
         # security read of #892, 2026-10-09). These compare the whole token list and the whole JSON.
         self.assertEqual([token for line in arguments() for token in shlex.split(line)], CLAUDE_ARGS)
-        self.assertEqual(cli_settings(), SETTINGS)
+        # Canonical JSON, not dict equality: in Python 1 == True, so a dict comparison passes "disableAllHooks": 1.
+        self.assertEqual(json.dumps(cli_settings(), sort_keys=True, separators=(",", ":")),
+                         json.dumps(SETTINGS, sort_keys=True, separators=(",", ":")))
 
     def test_the_guard_runs_before_checkout_and_before_the_action(self):
         names = [item.get("name") for item in job()["steps"]]
@@ -200,7 +204,9 @@ class HarnessAuditShapeTests(unittest.TestCase):
         self.assertIn("exit 1", check["run"])
 
     def test_the_report_is_published_only_after_the_bounds_check_passed(self):
-        self.assertIn("success()", step(REPORT)["if"])
+        # The action fails its own step on a budget stop, so the report step reads the check's outcome (R6).
+        self.assertEqual(step(NUMBERS)["id"], "bounds")
+        self.assertEqual(step(REPORT)["if"], "${{ !cancelled() && steps.bounds.outcome == 'success' }}")
         self.assertIn("always()", step(NUMBERS)["if"])
         names = [item.get("name") for item in job()["steps"]]
         self.assertLess(names.index(NUMBERS), names.index(REPORT))
@@ -260,11 +266,11 @@ class HarnessAuditStepTests(unittest.TestCase):
     def test_an_unmet_bound_fails_after_the_numbers_were_kept(self):
         cases = {
             "no cache read": {"modelUsage": model_usage(read=0)},
-            "over the client budget": {"total_cost_usd": 5.01},
+            "over the cost bound": {"total_cost_usd": 5.51},
             "over the turn limit": {"turns": 21},
             "an error result": {"is_error": True},
             "a turn-limit stop": {"subtype": "error_max_turns"},
-            "a budget stop": {"subtype": "error_max_budget_usd"},
+            "a budget stop above the cost bound": {"subtype": "error_max_budget_usd", "total_cost_usd": 5.51},
             "a shell tool in the session": {"tools": ("Read", "Glob", "Grep", "Bash")},
             "a write tool in the session": {"tools": ("Read", "Write")},
             "an MCP tool in the session": {"tools": ("Read", "mcp__github__create_issue")},
@@ -291,18 +297,19 @@ class HarnessAuditStepTests(unittest.TestCase):
                 self.assertEqual(json.loads(usage)["forbidden_tools"], ["non-string tool entry"])
 
     def test_the_step_names_every_unmet_bound(self):
-        code, console, *_ = run_step(NUMBERS, execution(turns=21, total_cost_usd=5.5,
+        code, console, *_ = run_step(NUMBERS, execution(turns=21, total_cost_usd=6.5,
                                                          tools=("Read", "Skill"), result=""))
         self.assertNotEqual(code, 0)
-        for words in ("21 assistant turns, outside 1 to 20", "above 5", "Skill", "no result text"):
+        for words in ("21 assistant turns, outside 1 to 20", "6.5 USD, above 5.5", "Skill", "no result text"):
             self.assertIn(words, console)
 
     def test_a_run_that_did_not_succeed_is_named_by_its_result_subtype(self):
         # A turn-limit stop and a budget stop call for different changes, so the record, the summary row and the
-        # failure message each carry the result's subtype; a success result flagged as an error keeps its own.
+        # failure message each carry the result's subtype; a success result flagged as an error keeps its own. A
+        # budget stop fails only above the cost bound (R6).
         cases = {
             "error_max_turns": {"subtype": "error_max_turns", "is_error": True},
-            "error_max_budget_usd": {"subtype": "error_max_budget_usd", "is_error": True},
+            "error_max_budget_usd": {"subtype": "error_max_budget_usd", "is_error": True, "total_cost_usd": 5.51},
             "success": {"is_error": True},
         }
         for subtype, changes in cases.items():
@@ -320,8 +327,9 @@ class HarnessAuditStepTests(unittest.TestCase):
         self.assertIn("the run did not end in success (subtype unknown)", console)
 
     def test_the_summary_tables_are_well_formed(self):
-        # Every row of each table has as many cells as its header, the result subtype column included.
-        for subtype in ("success", "error_max_turns"):
+        # Every row of each table has as many cells as its header, the result subtype column included, and a budget
+        # stop's note stays outside the tables.
+        for subtype in ("success", "error_max_turns", "error_max_budget_usd"):
             with self.subTest(subtype=subtype):
                 _, _, summary, _ = run_step(NUMBERS, execution(subtype=subtype))
                 tables = [block.splitlines() for block in summary.split("\n\n") if block.startswith("|")]
@@ -342,14 +350,39 @@ class HarnessAuditStepTests(unittest.TestCase):
         self.assertNotEqual(code, 0)
         self.assertIn("Bounds not met: 0 assistant turns, outside 1 to 20\n", console)
 
-    def test_the_cost_bound_is_the_five_dollar_budget(self):
-        # Caps from measurement (command center, 2026-10-09): the budget is $5, and the step's own check with it. A run
-        # that cost exactly the budget passes; one a cent above it fails, named.
-        code, console, *_ = run_step(NUMBERS, execution(total_cost_usd=5))
+    def test_the_cost_bound_is_the_budget_times_1_10(self):
+        # R6 (command center, 2026-10-09): the client stops only after crossing its $5 budget, and measured runs ended
+        # up to 9.2% above it, so the bound is $5.50. A run at the bound passes; one a cent above it fails, named.
+        code, console, *_ = run_step(NUMBERS, execution(total_cost_usd=5.5))
         self.assertEqual(code, 0, console)
-        code, console, *_ = run_step(NUMBERS, execution(total_cost_usd=5.01))
+        code, console, *_ = run_step(NUMBERS, execution(total_cost_usd=5.51))
         self.assertNotEqual(code, 0)
-        self.assertIn("Bounds not met: client cost estimate 5.01 USD, above 5\n", console)
+        self.assertIn("Bounds not met: client cost estimate 5.51 USD, above 5.5\n", console)
+
+    def test_a_budget_stop_within_the_bound_is_published_and_named(self):
+        # A budget stop at or under the bound passes the check, even without result text; the summary names the stop
+        # and the report step publishes what the run returned. Above the bound it fails, naming the stop and overrun.
+        for cost, result in ((5.5, None), (5.2, "partial report")):
+            with self.subTest(cost=cost, result=result):
+                log = execution(subtype="error_max_budget_usd", is_error=True, total_cost_usd=cost)
+                if result is None:
+                    del log[-1]["result"]
+                else:
+                    log[-1]["result"] = result
+                code, console, summary, usage = run_step(NUMBERS, log)
+                self.assertEqual(code, 0, console)
+                self.assertEqual(json.loads(usage)["result_subtype"], "error_max_budget_usd")
+                self.assertIn(f"The run stopped at its client budget (error_max_budget_usd), at a client cost estimate "
+                              f"of {cost} USD, within the 5.5 bound (the budget times 1.10).", summary)
+                code, console, summary, _ = run_step(REPORT, log)
+                self.assertEqual(code, 0, console)
+                self.assertIn(f"<pre>\n{result or ''}\n</pre>", summary)
+        code, console, summary, _ = run_step(NUMBERS, execution(subtype="error_max_budget_usd", is_error=True,
+                                                                total_cost_usd=5.51))
+        self.assertNotEqual(code, 0)
+        self.assertIn("Bounds not met: the run did not end in success (subtype error_max_budget_usd); client cost "
+                      "estimate 5.51 USD, above 5.5\n", console)
+        self.assertNotIn("The run stopped at its client budget", summary)
 
     def test_names_that_are_not_plain_identifiers_are_replaced(self):
         hostile = "<img src=x onerror=alert(1)> | injected"

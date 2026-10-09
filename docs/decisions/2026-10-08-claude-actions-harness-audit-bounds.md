@@ -1,7 +1,8 @@
 # Bounded harness audit on the current Claude action pin — 2026-10-08
 
 `harness-audit.yml` moves from `anthropics/claude-code-action` v1.0.245 to v1.0.247 and becomes a bounded,
-read-only job: Claude gets Read, Glob and Grep under `--restricted`, at most 20 turns and a $5 client budget; the
+read-only job: Claude gets Read, Glob and Grep under `--restricted`, at most 20 assistant turns (checked after the
+run) and a $5 client budget; the
 job holds `contents: read` and `id-token: write` and nothing else; a model-free step copies the report to the job
 summary and keeps the run's token and cost numbers. The job runs only while the repository variable
 `CLAUDE_HARNESS_AUDIT_ENABLED` is `true`, and only on the first attempt of a run. Nothing in this change starts a
@@ -32,10 +33,12 @@ step and the `show_full_output` input were still missing. All are listed here.
   explicitly, `show_full_output: 'false'`, `display_report: 'false'` and `track_progress: 'false'` (declared in the
   pinned `action.yml` at `2dca132f`, lines 156-159, 152-155 and 136-139, each with default `"false"`), and pins
   `ACTIONS_STEP_DEBUG: 'false'` in its environment.
-- `claude_args` carries the bounds (`--model`, `--effort max`, `--max-turns 20`, `--max-budget-usd 5`, `--tools`,
+- `claude_args` carries the bounds (`--model`, `--effort max`, `--max-budget-usd 5`, `--tools`,
   `--allowedTools`, `--restricted`, `--permission-prompts none`, `--setting-sources user`, `--strict-mcp-config`,
-  `--settings` with the deny rules, `--add-dir`).
-- New step "Keep the run's numbers and check the bounds" (`always()`, when the action left an execution file) writes
+  `--settings` with the deny rules, `--add-dir`) and no longer passes `--max-turns` (60 on `main`; R6, "`--max-turns`
+  dropped from `claude_args`"). The bounds step checks the assistant turns after the run.
+- New step "Keep the run's numbers and check the bounds" (`id: bounds`; `always()`, when the action left an execution
+  file) writes
   `usage.json` with `total_cost_usd`, `num_turns`, `assistant_turns`, `result_chars`, `tools_listed`,
   `successful_result`, `result_subtype` (the result's `subtype` through the step's name filter: `unknown` when
   missing, `other` when not a plain identifier), `session_started`, `claude_code_version`, `tools`,
@@ -48,9 +51,13 @@ step and the `show_full_output` input were still missing. All are listed here.
   with "Bounds not met:" and the message of every unmet bound:
   "the run did not end in success (subtype <subtype>)", "no session start record", "the session start record lists
   no tools or MCP servers", "tools outside Read, Glob and Grep: <names>", "<n> MCP servers in the session", "<n>
-  assistant turns, outside 1 to 20", "client cost estimate <x> USD, above 5", "no cache read" and "no result text".
-- New step "Publish the report to the job summary" (`success()`, with an execution file) copies the report (After
-  the run, below).
+  assistant turns, outside 1 to 20", "client cost estimate <x> USD, above 5.5", "no cache read" and "no result text".
+  A budget stop (`error_max_budget_usd`) at or under the $5.50 cost bound fails with neither the first message nor
+  the last, and the summary then names it: "The run stopped at its client budget (error_max_budget_usd), at a client
+  cost estimate of <x> USD, within the 5.5 bound (the budget times 1.10). The report below is the result text it
+  returned, if any."
+- New step "Publish the report to the job summary" (`!cancelled()`, when the bounds step passed) copies the report
+  (After the run, below).
 - New step "Require the run's execution file" (`success()`, without an execution file) fails the job with "The audit
   step finished without an execution file: no bounds were checked and no report was published.", so a green run
   always had its bounds checked.
@@ -102,8 +109,8 @@ keeps qualification. This pin's qualification is the fence receipt and the local
 | nothing waits for an answer | `--permission-prompts none` | same `--help`: "nobody: anything that would prompt is denied automatically"; changelog 2.1.259: "for unattended headless hosts" |
 | no MCP server | `--strict-mcp-config` | same `--help` |
 | hooks off; no read of any `.git` directory, `.env` or key file (Glob, Grep and Read measured as bound by the deny rules against a control run, below) | `--settings` JSON (`disableAllHooks`, `permissions.deny`) | `--settings` still applies under `--restricted`; the action sets git authentication in the root checkout (`src/github/operations/git-config.ts`) |
-| 20 turns | `--max-turns 20` | accepted by the 2.1.295 argument parser (`option '--max-turns <turns>'`); checked again after the run as distinct assistant message ids, because the result's `num_turns` counts transcript messages |
-| $5 per run | `--max-budget-usd 5` | same `--help`: "Maximum dollar amount to spend on API calls"; a client estimate, checked again from the run's own numbers |
+| 20 assistant turns | the bounds step, after the run: 1 to 20 distinct assistant message ids, failing closed; `claude_args` passes no `--max-turns` (R6) | the action fails a success whose `num_turns` exceeds `--max-turns`, and the result's `num_turns` counts transcript messages (R6, "`--max-turns` dropped from `claude_args`") |
+| $5 per run | `--max-budget-usd 5` | same `--help`: "Maximum dollar amount to spend on API calls"; a client estimate, which the client acts on only after crossing it, checked again from the run's own numbers against $5.50, the budget times 1.10 (R6) |
 | no full model output in a public log | `show_full_output: 'false'`, `ACTIONS_STEP_DEBUG: 'false'` in the action step's environment, and a first guard step that refuses a run with runner debugging on | `showFullOutput = options.showFullOutput === "true" \|\| isDebugMode`, where `isDebugMode` is `ACTIONS_STEP_DEBUG === "true"` (`base-action/src/parse-sdk-options.ts` at the pin) |
 | no key in GitHub | federation inputs only; the workflow passes no static credential | "a static credential takes precedence and federation will not be used" (`docs/setup.md` at the pin) |
 | one spend per request | `github.run_attempt == 1`, and for a dispatch the owner as both actor and triggering actor | GitHub contexts reference: a re-run keeps `github.actor`; `github.triggering_actor` is who re-ran it. A re-run, the case the triggering-actor clause exists for, is already skipped by the first-attempt clause; the triggering-actor clause stays as an independent second guard, so a dispatch stays owner-only if the first-attempt clause is ever relaxed (for example to let the owner re-run a failed attempt), and removing either clause fails a test |
@@ -128,7 +135,7 @@ The fence was run on the installed client (Claude Code 2.1.295, the version the 
 | --- | --- | --- |
 | `--model` | `claude-haiku-5-5` | `claude-opus-5-5` |
 | `--effort` | not passed | `max` |
-| `--max-turns` | `10` | `20` |
+| `--max-turns` | `10` | not passed (R6; `20` before) |
 | `--max-budget-usd` | `0.5` | `5` |
 | `--setting-sources` | not passed (run1), `user` (run2-user), `user,project,local` (run2-user-project-local) | `user` |
 | `--add-dir` | not passed | `${{ runner.temp }}/harness-audit` |
@@ -185,14 +192,14 @@ One step reads the action's execution file and keeps only numbers and fixed name
 the result's subtype, the Claude Code version, the session's tool list, the number of MCP servers and per-model token
 counts. The record is written before the check, so a failed or over-budget run still leaves its cost. The step then
 fails the job
-unless the run succeeded, used 1 to 20 assistant turns (distinct assistant message ids; the client's `num_turns` counts transcript messages, tool results included: a 12-request run on 2.1.295 reported 57, `local-parity-receipt.json`; it is only recorded), cost at most $5 by the client's estimate, read the prompt cache, had
+unless the run succeeded (or stopped at its budget at or under the cost bound), used 1 to 20 assistant turns (distinct assistant message ids; the client's `num_turns` counts transcript messages, tool results included: a 12-request run on 2.1.295 reported 57, `local-parity-receipt.json`; it is only recorded), cost at most $5.50 by the client's estimate (the $5 budget times 1.10), read the prompt cache, had
 no MCP server, listed its tools and MCP servers in the session start record (a missing list fails instead of passing
 as empty), used no tool outside Read, Glob and Grep (an allow-list, so a tool name it does not know also fails) and
-returned result text. The step names every bound it finds unmet. A run that did not succeed is named by its result
+returned result text (a budget stop within the cost bound need not). The step names every bound it finds unmet. A run that did not succeed is named by its result
 subtype, in the message ("the run did not end in success (subtype error_max_turns)") and in the summary's result
 subtype column, so a turn-limit stop and a budget stop (`error_max_budget_usd`) read apart; a `success` result
 flagged `is_error` reads `(subtype success)`, and a missing subtype reads `unknown`. The execution file itself holds
-the whole transcript and is never printed or uploaded. A second step, which runs only when the check passed, copies the last
+the whole transcript and is never printed or uploaded. A second step, which runs only when the check passed (it reads the check's outcome, because the action fails its own step on a budget stop), copies the last
 non-empty result text to the job summary, escaped, inside `<pre>`, capped at 60,000 bytes on a character boundary,
 with a line saying so when the report was longer.
 
@@ -224,8 +231,10 @@ and never trims a normal run. This workflow has one measured run of its own prom
 under Effort: 10 assistant turns and $2.03, billed to the second Anthropic key on the installed 2.1.295 and not
 through the action. With one run, its figures stand in for the p95. Twice them is 20 turns and about $4.1, so the
 turn limit stays 20 and the budget moves from $3 to $5, rounded up. The expected cost of a run is about $2. Hosted
-runs bill the Console organization named below, not the second key, so $5 is this workflow's spend limit per run
+runs bill the Console organization named below, not the second key, so $5 is this workflow's client budget per run
 once `CLAUDE_HARNESS_AUDIT_ENABLED` is set; from then on each weekly schedule tick and each owner dispatch is one run.
+A run can end a little above the budget, because the client stops only after crossing it; the bounds check accepts
+up to $5.50 (R6, below).
 
 The pinned audit prompt has four phases and eight dimensions and was written for a session with a shell; `main`
 gave it 60 turns. Twenty turns without a shell may not finish it. The prompt tells the model its limit, and a run
@@ -251,7 +260,7 @@ Runs spend from the Console organization that the repository variables `ANTHROPI
   entry for `harness-audit.yml:audit` changes from `["id-token: write", "issues: write"]` to `["id-token: write"]`.
   No other entry and no exemption changes.
 
-New, in `tests/test_claude_harness_audit_bounds.py` (29 tests): the job's condition, permissions, pin, inputs, flags
+New, in `tests/test_claude_harness_audit_bounds.py` (30 tests): the job's condition, permissions, pin, inputs, flags
 and settings are asserted from the workflow file, and the guard, numbers and report steps are executed as written on
 synthetic inputs. Sixteen weakened copies of the workflow each fail at least one test: a $30 budget check, a
 600,000-byte cap, 60 or 200 turns, a settings check that passes a symlink, a cache check that accepts zero, an added
@@ -397,6 +406,121 @@ Also recorded in this round:
   could exchange its token for a Claude token. Binding the rule to the token's `job_workflow_ref` claim is a Console
   setting, so it is the owner's credential decision; nothing here changes the rule.
 - Security hardening from the 2026-10-09 read (debug-value widening, tool-list shape, extra deny rules, token-source and guard-step assertions) is filed as follow-ups before any enabling variable is set.
+
+## R6: the cost bound is the budget times 1.10 (2026-10-09)
+
+The client stops a run only after its cost has crossed `--max-budget-usd`, so a cost bound equal to the budget fails
+a normal budget stop. Four measured J8 runs on a $5 budget ended above it: $5.46 (9.2% over, the largest overrun),
+$5.33, $5.16 and $5.0007, on #895, trading #11, #902 and #894. The cost bound is therefore the budget times 1.10, a
+factor that rounds up the largest measured overrun; the factor is derived again after this workflow's first three
+hosted runs. A run at or under the bound passes the cost check. A budget stop (result subtype `error_max_budget_usd`)
+at or under the bound publishes what the run produced, and the summary names the stop. A run above the bound fails
+closed and names the overrun. This workflow's budget is $5, so its bound is $5.50.
+
+In this workflow the action fails its own step on any result other than an error-free `success`. At the pin,
+`base-action/src/run-claude-sdk.ts` writes the execution file (line 222) and then throws for such a result (lines
+254-256 and 280-298); the entry point fails the step and still sets the `execution_file` output
+(`src/entrypoints/run.ts` lines 316-324, read at v1.0.246, whose v1.0.247 change is the bundled client version only;
+`base-action/src/execution-file.ts` lines 34-42). The bounds step already ran on `always()`, but the publish step ran
+on `success()`, so before this round a budget stop was never published, whatever the bound. Every change, by name:
+
+- Step "Keep the run's numbers and check the bounds" gains `id: bounds` and the shell variable `bound=5.5` (the
+  budget times 1.10), which its cost check and its summary note both read. The cost check is now
+  `.total_cost_usd > $bound`, with the message "client cost estimate <x> USD, above 5.5" (it was `> 5` and "above
+  5"). A budget stop at or under the bound no longer fails with "the run did not end in success (subtype
+  error_max_budget_usd)" or, when it returned no text, with "no result text"; above the bound it fails with both the
+  subtype message and the cost message. For a budget stop at or under the bound, the step adds this line to the
+  summary after its two tables: "The run stopped at its client budget (error_max_budget_usd), at a client cost
+  estimate of <x> USD, within the 5.5 bound (the budget times 1.10). The report below is the result text it returned,
+  if any." The step's comment gains two sentences on the bound and the budget stop.
+- Step "Publish the report to the job summary" runs on `!cancelled() && steps.bounds.outcome == 'success'` instead of
+  `success() && steps.claude_audit.outputs.execution_file != ''`, so it publishes whenever the check passed, a budget
+  stop within the bound included, and its comment says why. It still publishes only the last non-empty result text,
+  which a budget stop may not have. The job still ends failed after a budget stop, because the action step failed.
+- `test_the_cost_bound_is_the_five_dollar_budget` becomes `test_the_cost_bound_is_the_budget_times_1_10`: a run that
+  cost $5.50 passes, and one that cost $5.51 fails with "Bounds not met: client cost estimate 5.51 USD, above 5.5".
+- New test `test_a_budget_stop_within_the_bound_is_published_and_named`: a budget stop at $5.50 without result text
+  and one at $5.20 with text each pass the check, carry the summary line above and are published by the report step
+  (an empty `<pre>` block, then the text); one at $5.51 fails with "Bounds not met: the run did not end in success
+  (subtype error_max_budget_usd); client cost estimate 5.51 USD, above 5.5" and carries no such line.
+- `test_the_report_is_published_only_after_the_bounds_check_passed` now asserts the bounds step's `id` and the publish
+  step's exact condition. In `test_an_unmet_bound_fails_after_the_numbers_were_kept` the over-budget case, renamed
+  "over the cost bound", costs $5.51, and the budget-stop case, renamed "a budget stop above the cost bound", costs
+  $5.51 as well. `test_the_step_names_every_unmet_bound` costs $6.50 and looks for "6.5 USD, above 5.5". The
+  budget-stop case of `test_a_run_that_did_not_succeed_is_named_by_its_result_subtype` costs $5.51.
+  `test_the_summary_tables_are_well_formed` also runs a budget stop, whose summary line stays outside the tables.
+- The module runs 30 tests with PyYAML 6.0.3 and 30 without PyYAML, none skipped (Python 3.12); the count under
+  Changed existing test contracts changes from 29 to 30.
+- Record sentences changed with this section: in the by-name list, the bounds step's description (its `id`, the cost
+  message and the budget-stop line) and the publish step's condition; the $5 row of the bounds table; under After the
+  run, the cost bound, the budget-stop exception, the result-text exception and the publish step's condition; under
+  Cost of one run, "spend limit per run" becomes "client budget per run", followed by a sentence on the $5.50 bound;
+  and the test count.
+
+Weakened copies of the workflow, each run against the module as changed here (a script outside the repository;
+measured 2026-10-09 with PyYAML 6.0.3 and without PyYAML, with identical results). The seven R5 copies whose text
+this round left unchanged were run again, and each still fails at least one test (eight before "`--max-turns`
+dropped from `claude_args`" below removed the anchor of "a second `--max-turns 200`").
+
+| Weakened copy | Tests that fail |
+| --- | --- |
+| none (control) | none |
+| the factor dropped: `bound=5`, the bound back at the budget | the cost-bound test, the budget-stop test (both runs within the bound) and `test_the_step_names_every_unmet_bound` |
+| the factor widened: `bound=6` | those three, `test_a_run_that_did_not_succeed_is_named_by_its_result_subtype` and two cases of `test_an_unmet_bound_fails_after_the_numbers_were_kept` |
+| the bound refusing itself (`>= $bound`) | the cost-bound test and the budget-stop test at $5.50 |
+| a budget stop held to the success check again | the budget-stop test, both runs within the bound |
+| a budget stop exempt at any cost | the budget-stop test (the run above the bound) and the budget-stop case of `test_a_run_that_did_not_succeed_is_named_by_its_result_subtype` |
+| a budget stop held to the result-text check again | the budget-stop test at $5.50 |
+| the stop not named in the summary | the budget-stop test, both runs within the bound |
+| the summary line written above the bound too | the budget-stop test (the run above the bound) |
+| the publish step back on `success()` | `test_the_report_is_published_only_after_the_bounds_check_passed` |
+| the publish step on `always()`, whatever the check | the same test |
+| the bounds step without its `id` | the same test |
+
+### `--max-turns` dropped from `claude_args` (command center decision, 2026-10-09)
+
+At the pin, anthropics/claude-code-action `2dca132f` (v1.0.247), `base-action/src/run-claude-sdk.ts` lines 241-250
+throw "Claude reported a successful result after N turns, exceeding the configured maximum" when a successful result
+has `num_turns` above `maxTurns`, the value `--max-turns` sets. The check came in with commit `6ef6450f`, "fix:
+enforce max turns from claude args (#1607)", on 2026-08-07. On Claude Code 2.1.295 the result's `num_turns` counts
+transcript messages, tool results included: the local run LR made 12 API requests (distinct assistant message ids)
+under `--max-turns 12` and reported `num_turns` 57 (`local-parity-receipt.json`). With `--max-turns 20`, a normal
+successful audit would therefore fail the action step. This is a code reading of the pinned source plus a local
+measurement, not a hosted run. Upstream has no fix as of 2026-10-09: upstream `main` is identical to `2dca132f` on
+that date.
+
+- `--max-turns 20` is removed from `claude_args`. The runaway bounds that stay are the client budget, checked against
+  $5.50 (the budget times 1.10), and the bounds step's own turn bound, 1 to 20 distinct assistant message ids, which
+  fails closed. The prompt's sentence "You have at most 20 turns" is unchanged.
+- `CLAUDE_ARGS` in the test module no longer holds `--max-turns 20`, and
+  `test_claude_has_three_read_tools_and_fixed_bounds` no longer expects it and asserts that `--max-turns` is absent.
+  The turn-bound tests are unchanged. The module still runs 30 tests.
+- Record sentences changed with this subsection: the summary at the top, the `claude_args` entry of the by-name list,
+  the turn row of the bounds table and the `--max-turns` row of the fence-flag table.
+- The weakened copy "`--max-turns 20` put back" fails the pin test and
+  `test_claude_has_three_read_tools_and_fixed_bounds`, with PyYAML 6.0.3 and without it. It replaces the R5 copy "a
+  second `--max-turns 200`", whose anchor text no longer exists; seven R5 copies run again, and each still fails at
+  least one test.
+
+#### Upstream issue (draft, not filed; the owner decides)
+
+> Title: success with num_turns > maxTurns fails the step, but num_turns counts messages, not turns.
+> base-action/src/run-claude-sdk.ts:241-250 (v1.0.247, 2dca132f) compares `resultMessage.num_turns` with
+> `sdkOptions.maxTurns`. On Claude Code 2.1.295 the result's num_turns counts transcript messages (tool results
+> included): a headless run of 12 requests under `--max-turns 12` reported num_turns 57. A normal successful run
+> under `--max-turns N` therefore throws "exceeding the configured maximum". Repro: any `claude_args: --max-turns 5`
+> run that makes a few tool calls and succeeds.
+
+### The exact `--settings` pin tells `true` from `1` (2026-10-09)
+
+`test_claude_args_and_the_settings_json_are_pinned_exactly` compared the parsed `--settings` JSON with the expected
+dict by `==`; in Python `1 == True`, so `"disableAllHooks": 1` passed that comparison. It now compares canonical JSON
+(`json.dumps` with `sort_keys=True` and `separators=(",", ":")`), which tells them apart. The weakened copies
+`"disableAllHooks":1` and `"blockReadsOutsideWorkingDirectories":1` (this workflow has no `autoMemoryEnabled` key, so
+the second copy writes its other boolean as `1`) each fail the pin test and
+`test_settings_turn_hooks_off_and_deny_every_git_directory`, with PyYAML 6.0.3 and without it. In this module the pin
+test's token-list comparison, which runs first, already catches both; the same script checked the settings comparison
+on its own: dict equality calls each copy equal, canonical JSON calls it different.
 
 ## Alternatives considered
 

@@ -72,7 +72,8 @@ The Actions allow-list and harness description below were checked against live s
   Its job grants `contents: read` and `id-token: write` over an empty workflow permission default.
   Anthropic workload identity federation exchanges GitHub's OIDC token using the four configured repository variables;
   the workflow fetches a pinned, SHA-256-verified audit prompt and asks for a project-scoped read-only audit. Claude
-  has Read, Glob and Grep only, at most 20 turns and a $5 client budget; a model-free step copies the report to the
+  has Read, Glob and Grep only, at most 20 assistant turns (checked after the run) and a $5 client budget; a
+  model-free step copies the report to the
   job summary and keeps the run's token and cost numbers
   ([decision](decisions/2026-10-08-claude-actions-harness-audit-bounds.md)). Hosted acceptance remains open after
   [run 37739403956 failed](https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/37739403956).
