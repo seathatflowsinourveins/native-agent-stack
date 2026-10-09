@@ -4921,8 +4921,8 @@
     },
     {
       "path": ".claude/settings.json",
-      "sha256": "a1ec95b039955774e7873393a5146ce6001a711aaf6278d76f387d853a057806",
-      "bytes": 2884
+      "sha256": "2e67fcd45c61944ec7171438e3283542ddbab4bfcdf39ccc3b18a8f3612fcca2",
+      "bytes": 2918
     },
     {
       "path": ".claude/skills/omniroute-runtime-worker/SKILL.md",
@@ -5401,8 +5401,8 @@
     },
     {
       "path": "adoption/new-wsl/client-config-map.json",
-      "sha256": "b5a998e63e4690fd4c58c448697965d7ec6dfccb585dfdb149947e9f0bddd4d4",
-      "bytes": 56432
+      "sha256": "d6bf7a553a0daafb1bc108b9167ea355de620dcd584f4369f3ce44143aba0a14",
+      "bytes": 56682
     },
     {
       "path": "adoption/new-wsl/codex-user-instructions.md",
@@ -5536,8 +5536,8 @@
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "ae6c0bd5bf02d0b8e5b06cb46a5ce0b1ea33acf0cbd3e9f440a0e08197d0e67d",
-      "bytes": 13668
+      "sha256": "633dfc7a3665dc12557c14eb008727e62885d7584303052978471abf8467b73c",
+      "bytes": 13702
     },
     {
       "path": "adoption/templates/codex.AGENTS.template.md",
@@ -18171,6 +18171,11 @@
       "bytes": 5631
     },
     {
+      "path": "docs/decisions/2026-10-08-guard-hook-fails-closed.md",
+      "sha256": "8128264f6c8a1a15e26ef0726b1081f46654583d8847133d51a7a2cb6415e797",
+      "bytes": 16203
+    },
+    {
       "path": "docs/decisions/2026-10-08-harness-rules-consolidation.md",
       "sha256": "cfcaaba02b60cd71d797a3aac287d32193fc32d68e4c4b551230c86539ee8cd8",
       "bytes": 9249
@@ -18507,8 +18512,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "0b0122c707592c525166e4e578d8746ea3ca791c54ba5dd59d38fe89d2d79599",
-      "bytes": 192864
+      "sha256": "917f8d1d0db59af5454d9530beb5696dcb2208a7191f3e82790848aaab5083f0",
+      "bytes": 193318
     },
     {
       "path": "docs/stack.md",
@@ -58122,8 +58127,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "b35dc500dc809033782fad235a8eb74a73b37d75a45aa1ea26a253315dc2b421",
-      "bytes": 134454
+      "sha256": "7cda2a2626e5cbd855c73d96933b0ade4e48f954e8806087e2440af810d402e6",
+      "bytes": 136091
     },
     {
       "path": "tests/test_install_skills.py",

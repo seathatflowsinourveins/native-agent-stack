@@ -193,7 +193,8 @@
           {
             "type": "command",
             "command": "f=\"${HOME}/.claude/hooks/secret_path_guard.py\"; [ ! -f \"$$f\" ] || exec python3 \"$$f\"",
-            "timeout": 10
+            "timeout": 10,
+            "onFailure": "block"
           }
         ]
       },

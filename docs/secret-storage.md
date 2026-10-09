@@ -1162,7 +1162,7 @@ text heuristic, not a shell parser; the recorded limits below apply subject to t
   The original-text marker-byte exception remains: if a command contains the internal `\x01` marker, the conservative
   fallback may count separated numeric words as descriptors. `set 1 > out; echo \x01` therefore refuses, where
   `\x01` denotes the actual marker byte; plain `set 1 > out` allows and `set 1>out` refuses.
-- **An internal error blocks; a timeout does not.** Only exit 2 blocks a PreToolUse call. `main()` now catches any
+- **An internal error blocks; a timeout does not.** (Dated note, 2026-10-08: on Claude Code 2.1.295 and later, a guard hook entry that carries `"onFailure": "block"` (this checkout's project hook, and hosts built from the settings template since that change) also blocks on a timeout, a failure to start or an exit code other than 0 and 2; an existing host's user-level guard hook keeps the behaviour this item describes until the key is added to it; docs/decisions/2026-10-08-guard-hook-fails-closed.md.) Only exit 2 blocks a PreToolUse call. `main()` now catches any
   exception from the rules (`RecursionError` and `MemoryError` included) and blocks with one line,
   `blocked (guard_error)`, that names no command text and prints no traceback. A hook that runs past its timeout is
   cancelled and the call goes ahead (Claude Code hooks documentation, "Timeouts", read 2026-09-29: "A timed-out
