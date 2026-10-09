@@ -5,6 +5,11 @@ The native node builder accepts optional `(name, config)` pairs through
 supported `LiveNode.add_builtin_strategy` API while preserving the existing
 Python strategy registrations, native risk engine and startup reconciliation.
 The default empty tuple preserves the existing builder behavior.
+Builtin configs are accepted only with the upstream `dry_run` field set to
+literal `True`. A false, missing or non-boolean flag refuses the entire builtin
+set before node construction. Upstream-generated client order IDs have not
+been qualified under R-PAP-04; an executable diagnostic needs a separately
+reviewed change before a non-dry-run builtin may be registered.
 
 The reference is NautilusTrader **2.0.0rc5**, commit
 [`1b0a49d2792a9432a3aca3fcb617ce7a630d905e`](https://github.com/nautechsystems/nautilus_trader/tree/1b0a49d2792a9432a3aca3fcb617ce7a630d905e).

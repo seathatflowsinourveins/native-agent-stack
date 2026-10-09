@@ -74,6 +74,44 @@ class BuiltinRegistration(unittest.TestCase):
             builtin_strategies=[("ExecTester", builtin)],
         )
 
+    def test_non_dry_run_builtin_is_refused_before_node_construction(self):
+        builtin = ExecTesterConfig(
+            instrument_id=InstrumentId.from_str("SPY.ALPACA"),
+            order_qty=Quantity.from_int(1), limit_time_in_force=TimeInForce.DAY,
+            dry_run=False, log_data=False,
+        )
+        with patch.object(native_adapter, "LiveNode") as native_node:
+            with self.assertRaisesRegex(ValueError, "builtin_strategy_requires_dry_run"):
+                native_adapter.build_node(
+                    object(), [{"symbol": "SPY"}], [],
+                    builtin_strategies=[("ExecTester", builtin)],
+                )
+        native_node.build.assert_not_called()
+
+    def test_missing_dry_run_in_mixed_builtins_refuses_all_registration(self):
+        valid = ExecTesterConfig(
+            instrument_id=InstrumentId.from_str("SPY.ALPACA"),
+            order_qty=Quantity.from_int(1), dry_run=True, log_data=False,
+        )
+        with patch.object(native_adapter, "LiveNode") as native_node:
+            with self.assertRaisesRegex(ValueError, "builtin_strategy_requires_dry_run"):
+                native_adapter.build_node(
+                    object(), [{"symbol": "SPY"}], [object()],
+                    builtin_strategies=[("ExecTester", valid), ("MissingFlag", object())],
+                )
+        native_node.build.assert_not_called()
+
+    def test_truthy_dry_run_value_does_not_authorize_builtin_registration(self):
+        for value in (1, "true", None):
+            with self.subTest(value=value):
+                with patch.object(native_adapter, "LiveNode") as native_node:
+                    with self.assertRaisesRegex(ValueError, "builtin_strategy_requires_dry_run"):
+                        native_adapter.build_node(
+                            object(), [{"symbol": "SPY"}], [],
+                            builtin_strategies=[("InvalidFlag", SimpleNamespace(dry_run=value))],
+                        )
+                native_node.build.assert_not_called()
+
 
 @unittest.skipUnless(NATIVE, "requires pinned Nautilus runtime for NativeOrderRejected")
 class ControllerStopBoundaries(unittest.TestCase):

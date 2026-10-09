@@ -953,11 +953,17 @@ def build_node(port, symbols, strategies, *, account_id="ALPACA-PAPER", trader_i
     ``builtin_strategies`` contains (name, config) pairs for LiveNode's supported
     add_builtin_strategy API. See Nautilus rc5@1b0a49d's
     examples/live/interactive_brokers/exec_tester.py; no tester code is copied here.
+    Only vendor dry_run=True configs are admitted. Generator IDs are not yet
+    qualified under R-PAP-04; native broker acceptance remains NOT_RUN.
     """
     if importlib.metadata.version("nautilus_trader") != "2.0.0rc5":
         raise ValueError("unqualified_native_version")
     if not account_id.startswith("ALPACA-"):
         raise ValueError("account_identity_must_be_ALPACA_scoped")
+    builtin_strategies = tuple(builtin_strategies)
+    for _, builtin_config in builtin_strategies:
+        if getattr(builtin_config, "dry_run", None) is not True:
+            raise ValueError("builtin_strategy_requires_dry_run")
     session = NativeSession(port, symbols, session_policy=session_policy)
 
     class DataFactory(DataClientFactory):
