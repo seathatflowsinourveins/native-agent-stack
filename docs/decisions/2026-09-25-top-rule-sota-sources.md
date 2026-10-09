@@ -17,7 +17,7 @@ based on `origin/main@0074a0c3`.
 
 The owner's September 25 decision requires every layer, component and action to have a maintained SOTA
 repository or published reference: install directly, or build only from a cited reference implementation.
-They made this the first rule in the instruction files; a missing source requires stopping and reporting.
+They made this the first rule in the instruction files; a missing source requires stopping and reporting. This record's decided wording follows:
 
 > **Top rule: never self-write without a SOTA source.** Every layer, component and action comes from a maintained
 > SOTA repository or published reference: install it directly, or build only from a cited reference implementation,

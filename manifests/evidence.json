@@ -17657,13 +17657,13 @@
     },
     {
       "path": "docs/decisions/2026-09-25-skills-trial-and-usage.md",
-      "sha256": "9ee38b2a470b227961dd091dfa307a4ecb222bafe378d1a9104576819058efb8",
-      "bytes": 147866
+      "sha256": "8abe5324f26cfc389d2aaa9117dd8f10ad6b654c928f2feafa9d69fb0b398784",
+      "bytes": 147879
     },
     {
       "path": "docs/decisions/2026-09-25-top-rule-sota-sources.md",
-      "sha256": "d4fe325bbb759d4ee950d47d6b75ca2215d7784d0f032dfac490cc88a86cdec9",
-      "bytes": 5187
+      "sha256": "6d3f575b608c77b9bd1f976c3a67e509181afe758f534eac4f7e30df4457da77",
+      "bytes": 5226
     },
     {
       "path": "docs/decisions/2026-09-25-workstation-sota-refresh.md",
@@ -17767,8 +17767,8 @@
     },
     {
       "path": "docs/decisions/2026-09-28-ecosystem-roadmap.md",
-      "sha256": "516266d538bd673891b705436623b7d5ab3713f0e388d1b6487f7245a498f866",
-      "bytes": 36973
+      "sha256": "fcdf0ff4a6e3f2a6818933bbd3310ed7ac717fddb3f92fa1e999e9135f4b25b3",
+      "bytes": 37047
     },
     {
       "path": "docs/decisions/2026-09-28-openhands-resolver-isolation.md",
@@ -17797,7 +17797,7 @@
     },
     {
       "path": "docs/decisions/2026-09-29-key-management.md",
-      "sha256": "d4572e45af7b2d90af601f7296dc9d0b57336e97a9d965195c1550131f50efaa",
+      "sha256": "e3a34084ab1682dbbaa17e9d58649e50a2700f7df1d87a42f7c976f4cd21df56",
       "bytes": 94496
     },
     {

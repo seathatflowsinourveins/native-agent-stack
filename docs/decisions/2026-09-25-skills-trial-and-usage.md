@@ -860,7 +860,7 @@ holds the failing pre-edit run, the edit, the passing post-edit run and the sett
 [`evidence/artifacts/skills-listing-restore-20260928/`](../../evidence/artifacts/skills-listing-restore-20260928/README.md)
 holds the `supply-chain-risk-auditor` tree check and its five controls.
 
-**Decided by:** the coordinator under the owner's 2026-09-28 delegation to decide through evidence and research convergence and carry out the work on the coordinator's end, with full access.
+**Decided by:** the coordinator under the owner's 2026-09-28 delegation to decide through evidence and research convergence and carry out the work on the coordinator's end, with full access to the items.
 [Claude skills](https://code.claude.com/docs/en/skills) defines loading behavior; [Skills CLI v1.7.0](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/installer.ts) supplies the portable installed-source contract, not the delegated authority.
 A coordinator decision workflow (three lens proposals, a synthesis and an adversarial refute)
 produced the per-skill verdicts. The refute upheld all 15 and listed defects in the drafted
