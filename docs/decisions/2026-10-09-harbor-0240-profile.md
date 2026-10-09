@@ -115,6 +115,9 @@ selection before regenerating any derived output:
 
 1. Restore the Harbor entry in `adoption/new-wsl-profile.json`, including its
    pin, checksum, install/acceptance references and prior receipt binding.
+   Update its prose, source table and exact command/checksum block in
+   `adoption/new-wsl-profile.md` to that restored JSON contract as well
+   (the current profile prose/table were at lines194-196 and225).
 2. Remove the 2026-10-09 Harbor entry from
    `evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json`'s
    `current_owner_pin_amendments`. Its original 2026-10-04 Scout owner row
@@ -124,14 +127,23 @@ selection before regenerating any derived output:
    `render_tables.py --write docs/decisions/2026-10-01-new-wsl-definitive-defaults.md`.
 3. Restore the Harbor owner and Scout companion fields in
    `evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json`, and
-   the Harbor release metadata in the adjacent `owners.json`. Restore all
+   the Harbor release metadata in the adjacent `owners.json`. Its note and
+   `current_release_source` must describe the restored0.23.0 source, removing
+   the current0.24.0 release claim while retaining the historical repository
+   timestamp qualification. Restore all
    executable mirrors together: the Scout wheel URL/checksum in
    `install.sh:1034,1036` and version assertion in `accept.sh:2726`; the direct
    Harbor wheel URL/checksum, version assertion and source-checkout commit
    in those same scripts; and the exact Harbor checkout in
-   `config/harbor-worker-telemetry-accept.sh`. Use the retained 0.23.0 source
-   records for its wheel checksum and commit, preserving the historical
-   timestamp qualification in `owners.json` and the dated README wording.
+   `config/harbor-worker-telemetry-accept.sh`. Restore the Scout plan summary
+   printed by `install.sh:1136`. Use the retained0.23.0 source records for
+   its wheel checksum and commit. Update the adjacent install-plan `README.md`:
+   its G5 paragraph must identify0.23.0 as the restored current selection,
+   with the10-09/0.24.0 amendment retained only as dated reverted history;
+   also restore the Scout/Harbor rows formerly at README:624 and:715.
+   Restore the current version/commit statements in
+   `config/harbor-worker-telemetry-contract.md` (its heading and lines8-12),
+   preserving separately identified historical source-method citations.
 4. Regenerate `docs/new-wsl-handbook.json` and `.md` through
    `python3 scripts/build_new_wsl_handbook.py --write`. Append a new binding
    to the rolling handbook integration receipt, preserving its earlier
@@ -141,6 +153,8 @@ selection before regenerating any derived output:
 5. Restore pin-dependent regression fixtures/expectations in
    `tests/test_new_wsl_definitive_defaults.py` and
    `tests/test_new_wsl_handbook.py` with the same prior selection. Require
+   the corresponding source-contract fixtures in
+   `tests/test_harbor_currency_contracts.py` to describe that inverse too.
    the affected definitive-defaults, handbook and evidence tests,
    both generator checks, and FULL `python3 scripts/validate.py` to pass
    before publishing the inverse. The current companion/direct-owner pin

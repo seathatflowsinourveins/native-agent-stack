@@ -6,8 +6,8 @@
   "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
   "profile_sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
   "outputs": {
-    "docs/new-wsl-handbook.md": "a1f801ddb392e34b0b4bf76d96de2cf7ee425489fdca1e143ba6ce2bebe24a5d",
-    "docs/new-wsl-handbook.json": "7fccf1605ed7a8fe37f72391046eef7445bdd5cfb902e38e60a2cd2a05814b51"
+    "docs/new-wsl-handbook.md": "e2212ffd84fbdc7b23fec7d46ed85e557b3550546fc6128be94a416f2e9d999d",
+    "docs/new-wsl-handbook.json": "9a30d61e035bf73abd81aafe34260ab1bb3b6b9fa61247cdbe5ee98d178157ed"
   },
   "inventory": {
     "layers": 37,
@@ -943,6 +943,27 @@
       "check_exit_code": 0,
       "evidence_class": "local_integration",
       "scope": "Current generated-byte consistency only; no native install, provider execution or host acceptance."
+    },
+    {
+      "recorded_at_utc": "2026-10-09T23:49:53Z",
+      "source_head": "47426bb9b72b1e4bc7c29b4cbbdffc54f5937007",
+      "cause": "PR927 N1: name the real coordinator maintenance authority under the standing keep-current direction, not a newly dated owner decision. Regenerate the native consensus/default/handbook projection and retain all prior observations.",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "native_exit_code": 0,
+      "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
+      "profile_sha256": "3c4b10726565a713a205a40ce372e79f590d556d544df55aad2b15214a06867a",
+      "previous_outputs": {
+        "docs/new-wsl-handbook.md": "8a869f457069928a270da2f25ad6ff027576f2f758cd898bb8ace9346cf72e3d",
+        "docs/new-wsl-handbook.json": "f4a7f2e937e82d15fc5da9f8c81bd0a068196ebe5a85cbf55c495d6ad3665ed2"
+      },
+      "current_outputs": {
+        "docs/new-wsl-handbook.md": "0f940894b548cfa647cc01133ea90c1040a530972e133c55e2b719a61493ecf7",
+        "docs/new-wsl-handbook.json": "8950a8acdad08eb2510c1f87bf15c204cea3279460cfa62edb1d3fdbfc0361a2"
+      },
+      "check": "python3 scripts/build_new_wsl_handbook.py --check",
+      "check_exit_code": 0,
+      "evidence_class": "local_integration",
+      "scope": "Current source-authority/generated-byte binding only; the recorded source_head is the repair's working-tree base."
     }
   ],
   "previous_outputs": [

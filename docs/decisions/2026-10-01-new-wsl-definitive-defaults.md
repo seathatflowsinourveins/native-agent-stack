@@ -232,7 +232,7 @@ A row the owner added, or gave a default, prints that default in the tables abov
 
 The current tables carry these later pins; the owner-decision table above retains its original dated selections.
 
-- `trajectory-analysis` (2026-10-09; the owner's Harbor 0.24.0 profile amendment): docs/decisions/2026-10-09-harbor-0240-profile.md supersedes only the Harbor companion pin; the 2026-10-04 owner decision selected Harbor 0.23.0. Current companion: harbor 0.24.0; previous: 0.23.0. Source: `evidence/artifacts/harbor-0240-currency-20261009/receipt.json`.
+- `trajectory-analysis` (2026-10-09; the coordinator's 2026-10-09 currency amendment under the owner's standing direction to keep tools current): docs/decisions/2026-10-09-harbor-0240-profile.md supersedes only the Harbor companion pin; the 2026-10-04 owner decision selected Harbor 0.23.0. Current companion: harbor 0.24.0; previous: 0.23.0. Source: `evidence/artifacts/harbor-0240-currency-20261009/receipt.json`.
 
 <!-- tables:end -->
 

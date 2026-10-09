@@ -210,7 +210,7 @@
         },
         "consensus": {
           "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-          "sha256": "67ee2b1dec48c7b8d93655e53e27503ecf9d224d0381ad6d60b40ae2d9b59ef1"
+          "sha256": "3d35d64d44571ee4bc91b5ffb0329eefdbbc5017c11c57f16fbfea5a59e3b9c7"
         },
         "convergence": {
           "file": "convergence.json",
@@ -3202,7 +3202,7 @@
             "claude": "Opus verification of decide round 2 (2026-10-04): settled the split under rule D (every gate passes; no candidate clearly stronger); never a second inspect-ai beside the owner's",
             "coincides_with_lane_record": null,
             "current_owner_pin_amendment": {
-              "by": "the owner's Harbor 0.24.0 profile amendment",
+              "by": "the coordinator's 2026-10-09 currency amendment under the owner's standing direction to keep tools current",
               "current_pin": "0.24.0",
               "date_utc": "2026-10-09",
               "decision": "docs/decisions/2026-10-09-harbor-0240-profile.md supersedes only the Harbor companion pin; the 2026-10-04 owner decision selected Harbor 0.23.0",
@@ -8007,7 +8007,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
-      "sha256": "f0f1489999b67dd750d64454712e346b80fa885464865cd991e7a024f346100b"
+      "sha256": "5bace4abad48ef09ddf80f77ef42461668706a0617859bfda0c1304ea3adac3f"
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/foundation-definitive.compact.json",
@@ -8031,7 +8031,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-      "sha256": "67ee2b1dec48c7b8d93655e53e27503ecf9d224d0381ad6d60b40ae2d9b59ef1"
+      "sha256": "3d35d64d44571ee4bc91b5ffb0329eefdbbc5017c11c57f16fbfea5a59e3b9c7"
     },
     {
       "path": "evidence/artifacts/ns2604-requalification-20261005/review-715-corrections.json",

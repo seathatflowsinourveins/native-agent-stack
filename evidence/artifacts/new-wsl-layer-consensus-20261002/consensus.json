@@ -6,7 +6,7 @@
   {
    "slot_id": "trajectory-analysis",
    "date_utc": "2026-10-09",
-   "by": "the owner's Harbor 0.24.0 profile amendment",
+   "by": "the coordinator's 2026-10-09 currency amendment under the owner's standing direction to keep tools current",
    "decision": "docs/decisions/2026-10-09-harbor-0240-profile.md supersedes only the Harbor companion pin; the 2026-10-04 owner decision selected Harbor 0.23.0",
    "package": "harbor",
    "previous_pin": "0.23.0",

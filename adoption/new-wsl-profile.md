@@ -196,6 +196,23 @@ the published PyPI digest; native installation and acceptance remain unrun.
 The profile records `downloaded_and_rehashed`. promptfoo's `npm test`
 maps to `vitest run`; provider evaluations remain separate. mise requires its
 upstream development setup, and the selected E2E regex runs only `test_use`.
+
+The current Harbor source contract in `new-wsl-profile.json` is explicit:
+
+- Install recommendation: `uv tool install harbor==0.24.0`, from
+  [README:22 at the exact release commit](https://github.com/harbor-framework/harbor/blob/b53b8134e1241686dca7759af188f987ecc48e8b/README.md#L22).
+- Wheel SHA256: `23b7ba616a3aae4eff561ced5e2c51c7186f2981e53a770dea9c689d3969877c`,
+  bound to the retained [0.24.0 receipt](../evidence/artifacts/harbor-0240-currency-20261009/receipt.json).
+- Exact non-runtime source acceptance, from
+  [the Linux workflow:54](https://github.com/harbor-framework/harbor/blob/b53b8134e1241686dca7759af188f987ecc48e8b/.github/workflows/pytest.yml#L54):
+
+```sh
+uv sync --all-packages --all-extras --locked && uv run pytest tests/ packages/rewardkit/tests/unit/ -m "not runtime" --cov=src/harbor --cov=packages/rewardkit/src/rewardkit --cov-report=term-missing
+```
+
+Both commands remain UNRUN; the downloaded wheel digest is a separate
+artifact-integrity observation. The profile contract test checks these
+commands, source citations and checksum against the JSON entry.
 The receipt retains the prior mise source-fetch 404 and researcher capacity
 retry with the actual backend unknown. This wave preserves the historical
 freeze and first command-review files byte for byte.
