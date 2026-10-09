@@ -268,3 +268,31 @@ The command center applied the same command to this host's user settings at 2026
 in isolated temporary home directories (missing script: exit 2 with the refusal; passing stub: 0; blocking stub: 2).
 Raising the pinned client floor from 2.1.284 to 2.1.295, so that `onFailure` is honoured on every host at the floor,
 is a separate change owned by the currency lane.
+
+## Addendum (2026-10-09): the guard runs the system interpreter
+
+The template now starts the guard with `/usr/bin/python3` instead of the first `python3` on `PATH`. A `PATH` whose
+`python3` cannot run, such as an inactive mise shim or a removed toolchain, made every guarded Bash call exit 1: a
+client without `onFailure` let the call through, and a client with it blocked every call. Measured on this host with
+the rendered command, the installed guard and a failing `python3` stub as the only `python3` on `PATH`: the unpinned
+command returned 1 for both a credential-file read and `git status`; the pinned command returned 2 and 0. The guard
+uses the standard library only and parses as Python 3.9 through 3.14 (`ast.parse` with `feature_version`); this
+host's `/usr/bin/python3` is 3.14.4.
+
+The new-WSL renderer admits that one absolute path beside `python3` (`tools/adoption/new_wsl_client_config.py`
+`BASE_COMMAND_WORDS`). A test shows it still refuses `/usr/local/bin/python3`, `/usr/bin/python3.14`,
+`/usr/bin/python`, `/bin/python3`, `/tmp/python3`, `./python3`, `/usr/bin//python3`, `/usr/bin/../bin/python3` and
+`/usr/bin/env`. The missing-script refusal is unchanged: it runs `jq` from `PATH` and exits 2. A second test runs the
+rendered hook with only `jq` and a failing `python3` on `PATH`, before and after install.
+
+The repository's own project hook in `.claude/settings.json` takes the same form: it starts
+`${CLAUDE_PROJECT_DIR}/scripts/hooks/secret_path_guard.py` with `/usr/bin/python3` and refuses with exit 2 when the
+script is missing. A third test runs it behind the same `PATH`: a checkout without the script gives 2 and the
+refusal, and the repository's guard gives 2 for a credential-file read and 0 for `git status`. Its earlier form, a
+bare `python3`, would with its `onFailure: "block"` have blocked every Bash call in a checkout whose `python3` cannot
+run.
+
+Limits: a host without `/usr/bin/python3` now fails the guard with exit 127, which `onFailure: "block"` turns into a
+block from Claude Code 2.1.295 (the floor raise is the currency lane's change); the same holds for a missing script
+when `jq` is not on `PATH`. The command center aligns this host's user settings to the rendered form after this
+lands; until then the host keeps its own pinned form.

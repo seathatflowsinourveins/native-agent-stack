@@ -1330,6 +1330,21 @@ class MapTests(unittest.TestCase):
             errors = cfg.analyse(root)[3]
         self.assertTrue(any("runs not-copied.py, which the repository does not copy" in e for e in errors), errors)
 
+    def test_a_practice_hook_may_name_only_the_pinned_system_interpreter_by_absolute_path(self):
+        admitted = {"/usr/bin/python3": True, "/usr/local/bin/python3": False, "/usr/bin/python3.14": False,
+                    "/usr/bin/python": False, "/bin/python3": False, "/tmp/python3": False, "./python3": False,
+                    "/usr/bin//python3": False, "/usr/bin/../bin/python3": False, "/usr/bin/env": False}
+        with tempfile.TemporaryDirectory() as tmp:
+            root = make_catalog(Path(tmp))
+            edit_json(root / cfg.TEMPLATES["claude/settings"], lambda d: d["hooks"]["SessionStart"][0]["hooks"].extend(
+                {"type": "command", "command": f'{word} "${{HOME}}/.claude/hooks/secret_path_guard.py"'}
+                for word in admitted))
+            errors = cfg.analyse(root)[3]
+        for word, ok in admitted.items():
+            with self.subTest(word=word):
+                refused = [e for e in errors if f"a practice piece runs `{word}`, which is not in the repository" in e]
+                self.assertEqual(bool(refused), not ok, errors)
+
     def test_a_wired_hook_whose_file_is_not_a_wired_file_fails_the_check(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = make_catalog(Path(tmp))

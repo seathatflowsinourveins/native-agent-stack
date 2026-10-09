@@ -200,9 +200,11 @@ LAUNCHER_PIECE, PATH_BLOCK_PIECE = STEP_PIECES[0], STEP_PIECES[1]
 STEPS = ("claude-hooks", "claude-agents", "claude-mcp", "claude-settings", "claude-launcher", "rtk-claude-init", "claude-md",
          "codex-config", "codex-files", "codex-md", "login-path", "verify")
 # Command words a practice hook may run besides the files the repository copies: the shell's own words, python3 (the
-# interpreter of every tool in tools/adoption/) and jq (F4 of adoption/platforms/linux-wsl2-new-distro.md installs it and
-# adoption/bootstrap-linux.sh requires it). Any other word is a tool outside the repository.
-BASE_COMMAND_WORDS = frozenset({"python3", "jq", "[", "test", "true", ":"})
+# interpreter of every tool in tools/adoption/), /usr/bin/python3 (the system interpreter the secret-path guard pins, so
+# a PATH without a working python3, such as an inactive mise shim, cannot stop the guard; that one absolute path only)
+# and jq (F4 of adoption/platforms/linux-wsl2-new-distro.md installs it and adoption/bootstrap-linux.sh requires it).
+# Any other word is a tool outside the repository.
+BASE_COMMAND_WORDS = frozenset({"python3", "/usr/bin/python3", "jq", "[", "test", "true", ":"})
 TOML_BARE_KEY = re.compile(r"[A-Za-z0-9_-]+")
 LIST_ITEM = re.compile(r"^\s*(?:[-*+]|\d+[.)])\s+")
 HEADING = re.compile(r"^(#{1,6})\s")
