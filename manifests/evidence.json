@@ -5021,8 +5021,8 @@
     },
     {
       "path": ".github/workflows/claude-security-review.yml",
-      "sha256": "1063e111fb504be9c9f93ca14bed0ed2caebeab79e9898d05fc75ebb25022cbf",
-      "bytes": 20936
+      "sha256": "60d318041b730e1c58aa8b24554148bf7d25bf8411be605ddd30d6bdac426b8b",
+      "bytes": 21508
     },
     {
       "path": ".github/workflows/dependency-review.yml",
@@ -18162,8 +18162,8 @@
     },
     {
       "path": "docs/decisions/2026-10-08-claude-actions-security-review.md",
-      "sha256": "9422b8ffcf64e27a9a0ad3217cdee3efaf4f24de6daaf7d4e5f39e7da92c72a0",
-      "bytes": 14972
+      "sha256": "1484c74ade4344a75cfd14d2ece89703edd807d8ab324d86f7111668be254800",
+      "bytes": 18232
     },
     {
       "path": "docs/decisions/2026-10-08-coordinator-research-routing.md",
@@ -18332,8 +18332,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "ceb37cf216757e2b78ca189ff984c9cbfafab1404b15387710e5e10b0823e48c",
-      "bytes": 101931
+      "sha256": "6ffc3d854f2193118bdbda7b5fcd26a61989d94a8166c887a11c42c028040cb1",
+      "bytes": 101996
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -19574,6 +19574,11 @@
       "path": "evidence/artifacts/child-lane-baseline-20260926/skill-invoke-rate.json",
       "sha256": "5c1e13b427dd9c8818721a1788eab19d55ef0ceef269d5eb644c25557760238b",
       "bytes": 39479
+    },
+    {
+      "path": "evidence/artifacts/claude-actions-fence-smoke-20261008/receipt.json",
+      "sha256": "01872dc3a5b14f9aec4034ed45100fd30c4c6087e8e4e0bb74a2460964380d40",
+      "bytes": 4827
     },
     {
       "path": "evidence/artifacts/claude-foundation-finalization-20260921/qualification.json",
@@ -57882,8 +57887,8 @@
     },
     {
       "path": "tests/test_claude_security_review_workflow.py",
-      "sha256": "a7c0cdc347b93c7908f24aa3e922d5325c04e3f84de145137dcbc83ff5e7c51d",
-      "bytes": 30125
+      "sha256": "1197f9a99af74285c1670fdf6f6c4eccb134e0eb7100dcb38a0560f2977dd64a",
+      "bytes": 31646
     },
     {
       "path": "tests/test_claude_spend_scan.py",

@@ -79,8 +79,9 @@ The Actions allow-list and harness description below were checked against live s
   paper-trading blueprints, and only writes a notice with the dispatch command; it runs no model and holds no scope.
   [`claude-security-review.yml`](../.github/workflows/claude-security-review.yml) is that review: dispatched by hand
   from `main` for one pull request head, only while `CLAUDE_SECURITY_REVIEW_ENABLED` is `true`, with a
-  security-review prompt and the action pin, federation, read-only fence and bounds of the on-demand pull request
-  review; those four are defined in #894, which lands before this review's pull request, #895
+  security-review prompt, the action pin v1.0.247 (`2dca132f`), the federation variables
+  `ANTHROPIC_FEDERATION_RULE_ID`, `ANTHROPIC_ORGANIZATION_ID`, `ANTHROPIC_SERVICE_ACCOUNT_ID` and
+  `ANTHROPIC_WORKSPACE_ID`, Read, Glob and Grep only, 12 turns and a $3 client budget
   ([decision](decisions/2026-10-08-claude-actions-security-review.md)). No hosted run has been made.
 - **Against the final catalog of 2026-10-01** (`docs/final-catalog-20261001.md`, #595): the picks each blind model
   family made for these layers. The clean-room definitive round announced there decides one pick per slot.
