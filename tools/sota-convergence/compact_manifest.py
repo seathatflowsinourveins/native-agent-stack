@@ -1483,7 +1483,7 @@ def build_manifest(asset, release_tag, witnesses=(), profile=None):
             closure_metadata(row, index)
             if "closure" in row:
                 for residue in row["closure"].get("residue", []):
-                    if "origin_pointer_before" in residue:
+                    if "origin_pointer_before" in residue and row.get("origin_pointer") == "unresolved":
                         prior = residue["origin_pointer_before"]
                         if prior is None:
                             row.pop("origin_pointer", None)

@@ -5,7 +5,7 @@
   "evidence_class": "local_integration",
   "profile": "start-closure/1",
   "source_baseline": "82de6ffa6d713d8b18ae6e9b3229c05729c75da2",
-  "protocol_sha256": "04622d1b00f2a8dcfc1400b6012b520b94b78441a97899d2c6231edb3b191b8a",
+  "protocol_sha256": "d67f8a1dc9f66a6ee4e97fc1dc30691f960ac2258a2e05e8458c3d5d31303917",
   "asset": {"name": "g5-landscape-evidence-2026-10-08.tar.zst", "sha256": "1359fb196f46d0983c0d180fa982ceb1e4decaa58fc0aee96e19ffefaca0a1eb", "bytes": 28981260, "publication_status": "PREPARED"},
   "manifest_sha256": "04dbfd7faf7595c25e88bcff12000cc16c00bfb85de1331c238105b1c37ce807",
   "write_exit_code": 0,
@@ -19,7 +19,7 @@
   "g5_f3": {"count": 803, "occurrence_ids_sha256": "97330c518cd9c9cb84bcb3a54c8cd23f3aaa94c81bc24e8083990ef20b2fa078", "cc_disposition_id": "G5-F3", "action_associated_references": 6, "action_associated_rows": 5},
   "trial_scope": {"repository": "massive-com/client-python", "slot": "market-data-reference", "source": "wilsonfreitas/awesome-quant", "commit": "48e48a76b2054b5fe6eede6852ffef7783b992ce", "blob": "5fd2caf71fcdacc47d1e64ff37e8d9abc34b7303", "source_sha256": "fa346fdbc05f651f500795e7ea95e90b6d8c0cb394daee1f7b612470650caa86", "line": 683, "section_start": 675, "section_end": 760, "scope_witness_sha256": "932d268b8fe7ca7aa03af3b9a1e0e0fdc438180e30f25bed21b87505b9789f2f", "result": "VERIFIED", "native_execution": false},
   "tests": [
-    {"module": "tests.test_compact_manifest", "runtime": "Python 3.14.4", "tests": 84, "pre_existing_external_original_skips": 2, "exit_code": 0, "stderr_sha256": "43bf72e93ca841c96de389405623d8a31006c353907f0ad8abe59523242a45e5"},
+    {"module": "tests.test_compact_manifest", "runtime": "Python 3.14.4", "tests": 85, "pre_existing_external_original_skips": 2, "exit_code": 0, "stderr_sha256": "b144160c321761c1ce2aa42135508ad4f57e4a458a9946a56e2fef4c6f1b0173"},
     {"module": "tests.test_start_closure_sampler", "runtime": "Python 3.14.4", "tests": 20, "exit_code": 0, "stderr_sha256": "edce880cde5b76fa1182d76d3db84ca1f46009761de21a00bfc1e95d1e65d93c", "sealed_r3_generator_sha256": "80e69ff94f97fffdf906583fa280f2a60a7487a54f0b58b05342264a5adf9627"}
   ],
   "default_schemas_changed": false,

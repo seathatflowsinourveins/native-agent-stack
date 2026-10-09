@@ -267,6 +267,18 @@ class CompactManifestTests(unittest.TestCase):
         repaired, _ = self.closure_build()
         self.assertEqual(repaired["counts"]["residue_by_class"]["foreign-primary-pin-scope-unqualified"], 0)
 
+    def test_refreshed_bound_origin_survives_old_source_identity_residue(self):
+        row = self.residue_case("original-source-entry-identity-unbound")
+        prior, _ = self.closure_build()
+        row["closure"] = deepcopy(next(r for r in prior["rows"] if compact.decision_key(r) == compact.decision_key(row))["closure"])
+        row["pin"] = pin("example/project-0")
+        row["primary_sources"] = self.row("example/project-0")["primary_sources"]
+        row["origin_pointer"] = self.witness("refreshed-original-origin", {"rows": [{"repository_or_entry": "example/project-0", "slot": "native-clients"}]}) | {"pointer": "/rows/0"}
+        refreshed, _ = self.closure_build()
+        self.assertEqual(refreshed["validation"]["status"], "PASS")
+        self.assertEqual(refreshed["counts"]["origin_pointer_bound"], 1)
+        self.assertEqual(refreshed["counts"]["origin_unresolved"], 0)
+
     def test_global_f3_requires_exact_declared_count_hash_and_keeps_action_ids(self):
         extra = deepcopy(self.rows[0]["source_refs"][0])
         extra["occurrence_id"] = "outside-declared-union:1"
