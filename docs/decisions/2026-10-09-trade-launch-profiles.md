@@ -1,92 +1,100 @@
-# Trade profiles launch fresh worktrees with the locked runtime
+# Trade profiles use the clients' native worktree sessions
 
-The Trade terminal profiles need to open a new US-equities project session with
-the selected runtime already synced. The generic WSL profiles still serve their
-existing project and resume pickers; Trade has a separate project placeholder.
+`Trade - Claude` and `Trade - Codex` start from the US-equities **main checkout**,
+bound by the CC to `<TRADE_PROJECT>` (the host's `~/code/us-equities-trading`).
+The CC performs its one-time trust confirmation and applies the checked-in
+Windows Terminal fragment with a backup and inverse. Native client worktree
+sessions then own checkout creation, trust binding and lifecycle.
 
-The checked-in Windows Terminal fragment adds `Trade - Claude` and
-`Trade - Codex`. `<TRADE_PROJECT>` is the US-equities repository path in WSL;
-`<PROJECT>` remains the generic profiles' project. `<DISTRO>` and `<WSL_USER>`
-retain their existing meaning. Host-specific values are applied by the CC, with
-the host fragment's backup and inverse, rather than committed here.
+The external-worktree design at the first PR head is superseded by the CC's
+2026-10-09 verdict. Claude Code's pinned changelog states that nested git
+repositories no longer inherit parent trust; each repository needs its own
+confirmation. Reusing the client's native worktree interface from the trusted
+main checkout is the supported route. The profile no longer creates its own
+worktree/branch, uses Worktrunk, or embeds a date-format `%` in the command line.
 
-Each Trade launch follows the installed upstream commands:
+## Refresh and launch
 
-1. Fetch `origin/main` from the Trade project directory.
-2. `wt switch --create` creates a `foundation/trade-<client>-<UTC>-<pid>` branch
-   from `origin/main`. The timestamp and launcher process ID keep simultaneous
-   tabs distinct; no branch/session is resumed automatically.
-3. Worktrunk's `-x sh -- -c` starts a thin shell in that new worktree. It runs
-   `uv sync --locked` and then replaces itself with the native client. Sync
-   failure ends the launch before the client starts.
+The login shell checks `git status --porcelain`. Only a successful clean result
+allows `git fetch origin main` followed by `git merge --ff-only origin/main`.
+Dirty state, status/fetch failure or an unavailable fast-forward emits one line
+and continues to the client in that same main checkout. Refresh output is
+suppressed so the fallback stays finite. It never merges over local changes or
+blocks client startup because a repository refresh failed.
 
-The branch prefix follows the US-equities repository's existing foundation
-branch contract. The profile invokes the client directly and assigns no hcom
-lane tag. It does not attach to ns-movers, ns-seeds or paper-open-e2e. The generic
-five profiles and their resume ordering remain intact.
+- Claude: `exec env -u ANTHROPIC_API_KEY -u ANTHROPIC_AUTH_TOKEN claude --worktree`.
+- Codex: `exec codex --worktree -c model_reasoning_effort=ultra -c service_tier=priority`.
 
-Trade Codex supplies `-c model_reasoning_effort=max -c service_tier=priority`.
-The selected model remains the client's configured model. The installed
-0.161.0 schema supports explicit `priority`; official documentation records
-that the older `fast` spelling maps to that request value. These settings are
-per-launch arguments and do not rewrite a user configuration.
+Claude's two inherited credential variables are removed without reading their
+values. The selected model remains the client's configured model. Codex effort
+matches the existing `adoption/templates/codex.config.template.toml` interactive
+`ultra` default; there is no Trade-specific reduction to `max`. Priority remains
+an explicit per-launch tier supported by the pinned client. No client session,
+lane tag, custom launcher or permission policy is selected by the profile.
 
-Trade Claude uses the native interactive client after sync, removing inherited
-`ANTHROPIC_API_KEY` and `ANTHROPIC_AUTH_TOKEN` variables without reading their
-values. It retains the existing truecolor/tab/bell policy. No model API key,
-custom sandbox, permission policy, security workflow or subscription-funded
-headless process is introduced. The CC performs any real Claude launch and
-Claude-family read under the standing launch rule.
+`<PROJECT>` still belongs to the original five generic profiles, which keep
+their exact default/resume behavior. `<DISTRO>` and `<WSL_USER>` are unchanged.
+`<TRADE_PROJECT>` points specifically to the trading main checkout rather than
+a lane's worktree. Host paths and GUIDs are not committed.
 
-T1 owns the runtime dependency group and its default selection: a plain
-`uv sync --locked` must install that delivered runtime. T4/T5/T6 own the MCP,
-plugins and skill copies that native clients discover from the Trade worktree.
-The profile does not embed alternate installations, runtime paths or skill
-registries. These environment changes do not add a north-star protocol landing
-condition, and this change does not edit UET's frozen CI or protocol files.
+## Runtime, cleanup and acceptance
 
-## Lifecycle and host acceptance
+There is no pre-launch `uv sync`. On first project use, `uv run --locked`
+synchronizes the native session worktree's environment from its delivered
+`pyproject.toml` and `uv.lock`; the runtime slice owns those package/default-group
+pins. The CC records that first-sync elapsed time once during host acceptance.
 
-The CC's host acceptance launches each profile once, records the initial
-`uv sync --locked` elapsed time, and confirms a fresh worktree and no fixed hcom
-lane identity. The delivered runtime imports `nautilus_trader`, `alpaca`,
-`edgar` and `duckdb`; the session lists the selected skills/plugins and performs
-one permitted MCP call with no commands typed by hand. Local fixture-client
-tests prove the launch sequence, cwd, distinct worktrees and sync-failure
-behavior; they are not a Windows Terminal or authenticated native-client run.
+Cleanup stays with the clients. Claude's `/exit` offers Remove worktree and,
+at the pinned release, stops the servers/shells it started there before removal.
+Codex uses its managed-worktree lifecycle; its pinned manager refuses deletion
+of the current checkout or a checkout carrying local/ignored files. A startup
+failure keeps its checkout and gives the native `git worktree remove` recovery
+instruction. This record does not promise automatic deletion of every Codex
+checkout. No cleanup script, forced deletion or external worktree manager is
+added.
 
-After the session has ended, the CC/operator cleans up its selected merged
-Trade worktree with `wt remove <branch>`. For an explicitly idle, clean
-unmerged Trade tree, `wt remove --no-delete-branch <branch>` preserves the
-branch. Worktrunk keeps its default dirty-tree checks; this change adds no
-background cleanup hook, forced deletion or process-reaping command. Active
-lane worktrees and protected paper work are not cleanup targets.
+The CC's host facts are retained as reported observations: `wt`, `uv`, `claude`
+and `codex` are on the login PATH; trading main has `pyproject.toml` and `uv.lock`
+with dev/lint/validation groups; it has no `.config/wt.toml`. The profiles only
+need Git and the native clients to start. Actual first-launch acceptance remains
+with the CC: skills/plugins listed, `nautilus_trader`/`alpaca`/`edgar`/`duckdb`
+import through the native project runtime, one permitted MCP call, and no manual
+commands. This change makes no market-data call and adds no protocol landing
+condition or frozen trading CI edit.
 
-## SOTA sources
+Local tests execute the exact shell with real Git and inert client executables.
+They verify main-checkout cwd, native flags, clean fast-forward, dirty skips,
+failed-fetch/non-fast-forward fallbacks, credential-variable removal, no lane
+tag and no `%` in the command line. They are fixture integration, not a live
+Windows Terminal/native-client/trust/runtime/MCP result.
 
-- Installed **Worktrunk v0.80.0**, [max-sixty/worktrunk at
-  b49ca7eea9b03145791a5b94eccaf9c59412ed37](https://github.com/max-sixty/worktrunk/tree/b49ca7eea9b03145791a5b94eccaf9c59412ed37).
-  `wt switch --help` and `wt remove --help` verify the supported create/base,
-  execute-program/argument, cwd and cleanup interfaces. Official
-  [switch](https://worktrunk.dev/switch/) and
-  [remove](https://worktrunk.dev/remove/) documentation fetched 2026-10-09.
-- **OpenAI Codex 0.161.0**, pin
-  [979011409de0a60b52f179721948e65531d26144](https://github.com/openai/codex/blob/979011409de0a60b52f179721948e65531d26144/codex-rs/core/config.schema.json).
-  Installed `codex --version`, versioned config schema and official
-  [CLI overrides](https://developers.openai.com/codex/cli/reference/) and
-  [configuration reference](https://developers.openai.com/codex/config-reference/),
-  fetched 2026-10-09, establish the effort/service-tier arguments. Availability
-  and actual model-request execution remain the host acceptance boundary.
+## Versioned sources
+
+- Installed **Claude Code 2.1.295**, selected login-PATH `claude --version` and
+  TTY `claude --help`, read 2026-10-09: `-w, --worktree [name]` creates a new git
+  worktree for the session. Piped help here omitted that option; TTY help and the
+  pinned installed binary both contain it. No session was launched to inspect it.
+- **anthropics/claude-code v2.1.295**, full commit
+  `602df92bf481ed904533e95c09f740f40aab5aed`,
+  [CHANGELOG.md:3215](https://github.com/anthropics/claude-code/blob/602df92bf481ed904533e95c09f740f40aab5aed/CHANGELOG.md#L3215)
+  for per-repository trust,
+  [CHANGELOG.md:801](https://github.com/anthropics/claude-code/blob/602df92bf481ed904533e95c09f740f40aab5aed/CHANGELOG.md#L801)
+  for `/exit` worktree removal, and
+  [CHANGELOG.md:6877](https://github.com/anthropics/claude-code/blob/602df92bf481ed904533e95c09f740f40aab5aed/CHANGELOG.md#L6877)
+  for introducing `--worktree`/`-w`. Tagged changelog blob
+  `bf5498e82d135de9021e53b4ead8be2d8f7e30e4` was fetched 2026-10-09.
+- Selected login-PATH **Codex 0.161.0**, `codex --version`/`codex --help`, read
+  2026-10-09: `--worktree` runs the session in a new managed Git worktree.
+  Pin **openai/codex 979011409de0a60b52f179721948e65531d26144**,
+  [config schema](https://github.com/openai/codex/blob/979011409de0a60b52f179721948e65531d26144/codex-rs/core/config.schema.json),
+  [native startup/trust recovery](https://github.com/openai/codex/blob/979011409de0a60b52f179721948e65531d26144/codex-rs/tui/src/worktree_startup.rs#L47),
+  and [native removal](https://github.com/openai/codex/blob/979011409de0a60b52f179721948e65531d26144/codex-rs/worktree/src/lib.rs#L284).
+  The selected 0.161.0 PATH command is the cited client; a newer direct-home
+  executable found on this host is not substituted for that version.
 - **Astral uv**, installed 0.12.22;
-  [official `uv sync` CLI](https://docs.astral.sh/uv/reference/cli/#uv-sync),
-  fetched 2026-10-09. `--locked` checks the existing lock; the native runtime
-  group, managed Python and package pins are delivered by the trading runtime
-  slice, rather than reselected in a terminal profile.
-- [Microsoft Windows Terminal JSON fragment extensions](https://learn.microsoft.com/en-us/windows/terminal/json-fragment-extensions),
-  fetched 2026-10-09. The existing fragment/profile format, generated GUID
-  behavior, visibility, title and bell settings are retained.
-
-The design uses Worktrunk's shipped worktree/execution lifecycle and uv's
-shipped sync command. A small command composition in the existing fragment is
-sufficient; no replacement launcher framework, hcom process launcher or
-runtime manager is built.
+  [project command execution](https://docs.astral.sh/uv/concepts/projects/run/),
+  fetched 2026-10-09, confirms that `uv run` updates the project environment
+  before the command. `--locked` preserves the delivered lock boundary.
+- Existing native fragment/profile format is retained from the first head.
+  This revision's client behavior is bound to installed-version help and tagged
+  source above rather than a changing live CLI documentation page.

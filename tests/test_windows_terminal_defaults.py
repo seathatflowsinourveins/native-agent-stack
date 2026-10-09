@@ -1,7 +1,7 @@
 """The repository-carried Windows Terminal, notification and login-shell defaults.
 
 These are local consistency checks over the checked-in files, not a run of Windows Terminal, Claude Code or Codex. Trade
-launches also exercise real Git and Worktrunk in isolated local repositories with inert runtime/client executables. The
+launches also exercise real Git in isolated local repositories with inert native-client executables. The
 policy is docs/decisions/2026-09-28-terminal-experience.md: each AI tab shows the title its client sends, the bell rings
 only for a real needed action and quietly, and a profile that starts a client through a login shell reaches its PATH. A resume profile
 (the update of 2026-10-02 in that record) opens its client's own session picker and nothing else, sits right after the client's default
@@ -53,8 +53,8 @@ PLACEHOLDERS = ("<DISTRO>", "<WSL_USER>", "<PROJECT>")
 LEGACY_FRAGMENT_ORDER = ["WSL - Shell", "WSL - Codex", "WSL - Codex - resume", "WSL - Claude", "WSL - Claude - resume"]
 AI_COMMANDS = {"WSL - Codex": "codex", "WSL - Codex - resume": "codex resume", "WSL - Claude": "claude", "WSL - Claude - resume": "claude --resume"}
 TRADE_COMMANDS = {
-    "Trade - Claude": "env -u ANTHROPIC_API_KEY -u ANTHROPIC_AUTH_TOKEN claude",
-    "Trade - Codex": "codex -c model_reasoning_effort=max -c service_tier=priority",
+    "Trade - Claude": "env -u ANTHROPIC_API_KEY -u ANTHROPIC_AUTH_TOKEN claude --worktree",
+    "Trade - Codex": "codex --worktree -c model_reasoning_effort=ultra -c service_tier=priority",
 }
 FRAGMENT_ORDER = LEGACY_FRAGMENT_ORDER + list(TRADE_COMMANDS)
 TRADE_LAUNCH = re.compile(r'^wsl\.exe -d <DISTRO> -u <WSL_USER> --cd <TRADE_PROJECT> --exec /bin/bash -lc "([^\"]+)"$')
@@ -366,11 +366,10 @@ class ProfilePolicyMixin:
         match = TRADE_LAUNCH.fullmatch(profile["commandline"])
         self.assertIsNotNone(match, "a Trade profile uses its own project and a login shell")
         body = match.group(1)
-        self.assertIn("git fetch origin main && exec wt switch --create ", body)
-        self.assertIn("--base origin/main --no-cd -x sh -- -c ", body)
-        self.assertTrue(body.endswith(f"'uv sync --locked && exec {TRADE_COMMANDS[profile['name']]}'"),
-                        "locked runtime sync must succeed before the Trade client starts")
-        self.assertNotRegex(body, r"(?i)\bhcom\b|\bHCOM_[A-Z_]+\b|--(?:session-id|resume|continue|last)\b",
+        self.assertTrue(body.endswith(f"; exec {TRADE_COMMANDS[profile['name']]}"),
+                        "Trade launches the client's native worktree session after the refresh attempt")
+        self.assertNotIn("%", body, "Trade launch bodies must not depend on percent expansion")
+        self.assertNotRegex(body, r"(?i)\b(?:hcom|wt|uv)\b|\bHCOM_[A-Z_]+\b|--(?:session-id|resume|continue|last|base|create)\b",
                             "Trade tabs start without a fixed lane tag or a selected session")
 
     def check_shell(self, profile: dict):
@@ -558,28 +557,26 @@ class FragmentExampleTests(ProfilePolicyMixin, unittest.TestCase):
                 self.assertEqual(session_flag_problems({"commandline": f'{launch} "{text}"'}), [])
 
 
-@unittest.skipUnless(Path("/bin/bash").is_file() and shutil.which("git") and shutil.which("wt"),
-                     "needs Bash, Git and native Worktrunk for isolated Trade launch checks")
 class TradeLaunchTests(unittest.TestCase):
-    """Run the shipped shell bodies; only uv and the clients are inert fixture executables.
+    """Run the shipped refresh shell with real Git and inert native-client probes.
 
-    Worktrunk's supported WORKTRUNK_*_CONFIG_PATH overrides isolate every config layer.
-    The scratch project has no hooks to approve; no trust gate is suppressed. Login-shell
-    startup files are disabled for these checks, so they cannot read a live host config.
+    Git reads only scratch configs and local repositories. The subprocess environment
+    is an explicit allowlist, and its PATH contains no real client, runtime installer
+    or orchestration command. Login-shell startup files are disabled in the fixture.
     """
+
+    SKIPPED_REFRESH = "Trade: main refresh skipped; starting the native worktree session.\n"
 
     def setUp(self):
         scratch = tempfile.TemporaryDirectory(prefix="native-stack-trade-launch-")
         self.addCleanup(scratch.cleanup)
         self.scratch = Path(scratch.name).resolve()
-        self.source = self.scratch / "Trade project"
+        self.source = self.scratch / "Trade main project"
         self.seed = self.scratch / "publisher"
         self.remote = self.scratch / "origin.git"
         self.log = self.scratch / "launch.jsonl"
         fixture_bin = self.scratch / "bin"
         fixture_bin.mkdir()
-        config = self.scratch / "worktrunk.toml"
-        config.write_text("worktree-path = " + json.dumps(str(self.scratch / "worktrees") + "/{{ branch | sanitize }}") + "\n", encoding="utf-8")
         empty_config = self.scratch / "empty-config"
         empty_config.write_text("", encoding="utf-8")
         hooks = self.scratch / "empty-hooks"
@@ -588,19 +585,14 @@ class TradeLaunchTests(unittest.TestCase):
             "PATH": str(fixture_bin),
             "LC_ALL": "C",
             "TERM": "dumb",
-            "NO_COLOR": "1",
             "GIT_CONFIG_NOSYSTEM": "1",
             "GIT_CONFIG_GLOBAL": str(empty_config),
             "GIT_TERMINAL_PROMPT": "0",
             "XDG_CONFIG_HOME": str(self.scratch / "xdg-user"),
             "XDG_CONFIG_DIRS": str(self.scratch / "xdg-system"),
-            "WORKTRUNK_CONFIG_PATH": str(config),
-            "WORKTRUNK_SYSTEM_CONFIG_PATH": str(empty_config),
-            "WORKTRUNK_PROJECT_CONFIG_PATH": str(empty_config),
-            "WORKTRUNK_MAX_CONCURRENT_COMMANDS": "2",
             "TRADE_TEST_LOG": str(self.log),
         }
-        for command in ("git", "wt", "date", "env", "sh", "bash"):
+        for command in ("git", "env", "bash"):
             (fixture_bin / command).symlink_to(Path(shutil.which(command)).resolve())
         # Only presence is recorded for the two synthetic auth markers used below;
         # neither fixture code nor the subprocess environment reads a live credential.
@@ -609,49 +601,39 @@ import os
 import sys
 from pathlib import Path
 
-command = Path(sys.argv[0]).name
-cwd = Path.cwd()
-ready = cwd / ".trade-runtime-ready"
 event = {
-    "command": command,
+    "command": Path(sys.argv[0]).name,
     "argv": sys.argv[1:],
-    "cwd": str(cwd),
-    "runtime_root": (cwd / "pyproject.toml").is_file() and (cwd / "uv.lock").is_file(),
-    "runtime_ready": ready.is_file(),
+    "cwd": str(Path.cwd()),
     "auth_markers_present": any(key in os.environ for key in ("ANTHROPIC_API_KEY", "ANTHROPIC_AUTH_TOKEN")),
     "hcom_environment_present": any(key.startswith("HCOM_") for key in os.environ),
 }
 with Path(os.environ["TRADE_TEST_LOG"]).open("a", encoding="utf-8") as stream:
     stream.write(json.dumps(event) + "\\n")
-if command == "uv":
-    result = int(os.environ.get("TRADE_TEST_SYNC_RC", "0"))
-    if result:
-        sys.exit(result)
-    ready.write_text("fixture runtime synced\\n", encoding="utf-8")
 '''
-        for command in ("uv", "claude", "codex"):
+        for command in ("claude", "codex"):
             executable = fixture_bin / command
             executable.write_text(probe, encoding="utf-8")
             executable.chmod(0o755)
 
         self.git("init", "--bare", "--initial-branch=main", str(self.remote), cwd=self.scratch)
         self.git("init", "--initial-branch=main", str(self.seed), cwd=self.scratch)
-        (self.seed / "pyproject.toml").write_text('[project]\nname = "trade-launch-fixture"\nversion = "0.0.0"\n', encoding="utf-8")
-        (self.seed / "uv.lock").write_text("fixture-only locked runtime\n", encoding="utf-8")
-        self.git("add", "pyproject.toml", "uv.lock", cwd=self.seed)
-        self.git("-c", "user.name=Trade fixture", "-c", "user.email=fixture@example.invalid", "commit", "-m", "initial runtime", cwd=self.seed)
+        (self.seed / "tracked.txt").write_text("initial tracked content\n", encoding="utf-8")
+        self.git("add", "tracked.txt", cwd=self.seed)
+        self.commit("initial main", cwd=self.seed)
         self.git("remote", "add", "origin", str(self.remote), cwd=self.seed)
         self.git("push", "origin", "main", cwd=self.seed)
         self.git("clone", str(self.remote), str(self.source), cwd=self.scratch)
         self.git("config", "core.hooksPath", str(hooks))
-        old_head = self.git("rev-parse", "origin/main").stdout.strip()
+        self.old_head = self.git("rev-parse", "HEAD").stdout.strip()
+        self.original_worktrees = self.git("worktree", "list", "--porcelain").stdout
         (self.seed / "current-main").write_text("published after the Trade launcher checkout\n", encoding="utf-8")
         self.git("add", "current-main", cwd=self.seed)
-        self.git("-c", "user.name=Trade fixture", "-c", "user.email=fixture@example.invalid", "commit", "-m", "new main", cwd=self.seed)
+        self.commit("new main", cwd=self.seed)
         self.git("push", "origin", "main", cwd=self.seed)
         self.main_head = self.git("rev-parse", "HEAD", cwd=self.seed).stdout.strip()
-        self.assertNotEqual(old_head, self.main_head, "the profile must fetch a genuinely newer main")
-        self.assertEqual(self.git("rev-parse", "origin/main").stdout.strip(), old_head)
+        self.assertNotEqual(self.old_head, self.main_head, "the profile must fetch a genuinely newer main")
+        self.assertEqual(self.git("rev-parse", "origin/main").stdout.strip(), self.old_head)
         self.profiles = {profile["name"]: profile for profile in json.loads(FRAGMENT.read_text(encoding="utf-8"))["profiles"]}
 
     def git(self, *arguments, cwd=None):
@@ -660,68 +642,100 @@ if command == "uv":
         self.assertEqual(run.returncode, 0, run.stderr)
         return run
 
-    def launch(self, name, **environment):
+    def commit(self, message, cwd=None):
+        self.git("-c", "user.name=Trade fixture", "-c", "user.email=fixture@example.invalid",
+                 "commit", "-m", message, cwd=cwd)
+
+    def launch(self, name):
         match = TRADE_LAUNCH.fullmatch(self.profiles[name]["commandline"])
         self.assertIsNotNone(match, name)
         self.log.write_text("", encoding="utf-8")
+        # These are fixture-only markers; the allowlist never inherits host credentials.
+        environment = {**self.env, "ANTHROPIC_API_KEY": "inert-test-marker", "ANTHROPIC_AUTH_TOKEN": "inert-test-marker"}
         run = subprocess.run(["/bin/bash", "--noprofile", "--norc", "-lc", match.group(1)],
-                             cwd=self.source, env={**self.env, **environment},
+                             cwd=self.source, env=environment,
                              capture_output=True, text=True, timeout=45)
         events = [json.loads(line) for line in self.log.read_text(encoding="utf-8").splitlines()]
-        return run, events
+        self.assertEqual(run.returncode, 0, run.stderr)
+        self.assertEqual(run.stderr, "", "refresh diagnostics are replaced by the single fallback note")
+        self.assertEqual(len(events), 1, "the native client starts exactly once")
+        event = events[0]
+        client = "claude" if name == "Trade - Claude" else "codex"
+        self.assertEqual(event["command"], client)
+        self.assertEqual(Path(event["cwd"]), self.source, "the client owns worktree creation from the main checkout")
+        expected = ["--worktree"] if client == "claude" else ["--worktree", "-c", "model_reasoning_effort=ultra", "-c", "service_tier=priority"]
+        self.assertEqual(event["argv"], expected)
+        self.assertFalse(event["hcom_environment_present"])
+        if client == "claude":
+            self.assertFalse(event["auth_markers_present"])
+        self.assertEqual(self.git("branch", "--show-current").stdout.strip(), "main")
+        # No pre-launch worktree should exist; the inert client does not create one.
+        trees = self.git("worktree", "list", "--porcelain").stdout
+        self.assertEqual(re.findall(r"(?m)^worktree (.+)$", trees),
+                         re.findall(r"(?m)^worktree (.+)$", self.original_worktrees))
+        return run
 
-    def test_repeated_trade_tabs_get_distinct_fetched_main_worktrees_and_sync_before_the_client(self):
-        paths, branches = set(), set()
-        for name, client in (("Trade - Claude", "claude"), ("Trade - Codex", "codex")):
-            for tab in range(2):
-                with self.subTest(profile=name, tab=tab):
-                    # Explicitly inert markers exercise env -u without inheriting any host environment.
-                    run, events = self.launch(name, ANTHROPIC_API_KEY="inert-test-marker", ANTHROPIC_AUTH_TOKEN="inert-test-marker")
-                    self.assertEqual(run.returncode, 0, run.stderr)
-                    self.assertEqual([event["command"] for event in events], ["uv", client])
-                    sync, started = events
-                    self.assertEqual(sync["argv"], ["sync", "--locked"])
-                    self.assertTrue(sync["runtime_root"])
-                    self.assertFalse(sync["runtime_ready"])
-                    self.assertTrue(started["runtime_ready"], "the client can start only after runtime sync")
-                    self.assertEqual(sync["cwd"], started["cwd"])
-                    tree = Path(started["cwd"])
-                    self.assertNotEqual(tree, self.source)
-                    self.assertTrue(tree.is_relative_to(self.scratch / "worktrees"))
-                    self.assertNotIn(tree, paths, "each tab needs a fresh worktree")
-                    self.assertEqual(self.git("rev-parse", "HEAD", cwd=tree).stdout.strip(), self.main_head)
-                    branch = self.git("branch", "--show-current", cwd=tree).stdout.strip()
-                    self.assertRegex(branch, rf"^foundation/trade-{client}-\d{{8}}T\d{{6}}-\d+$")
-                    self.assertNotIn(branch, branches, "no two tabs may share a fixed branch")
-                    self.assertFalse(started["hcom_environment_present"])
-                    if client == "claude":
-                        self.assertEqual(started["argv"], [])
-                        self.assertFalse(started["auth_markers_present"])
-                    else:
-                        self.assertEqual(started["argv"], ["-c", "model_reasoning_effort=max", "-c", "service_tier=priority"])
-                    paths.add(tree)
-                    branches.add(branch)
-        self.assertEqual(len(paths), 4)
-
-    def test_failed_runtime_sync_stops_before_either_client_starts(self):
+    def test_clean_main_refreshes_to_fetched_remote_then_starts_the_native_worktree_client(self):
         for name in TRADE_COMMANDS:
             with self.subTest(profile=name):
-                run, events = self.launch(name, TRADE_TEST_SYNC_RC="23")
-                self.assertNotEqual(run.returncode, 0)
-                self.assertEqual([event["command"] for event in events], ["uv"])
-                self.assertEqual(events[0]["argv"], ["sync", "--locked"])
-                self.assertTrue(events[0]["runtime_root"])
-                self.assertFalse((Path(events[0]["cwd"]) / ".trade-runtime-ready").exists())
+                run = self.launch(name)
+                self.assertEqual(run.stdout, "")
+                self.assertEqual(self.git("rev-parse", "HEAD").stdout.strip(), self.main_head)
+                self.assertEqual(self.git("rev-parse", "origin/main").stdout.strip(), self.main_head)
+                self.assertEqual((self.source / "current-main").read_text(encoding="utf-8"),
+                                 "published after the Trade launcher checkout\n")
 
-    def test_failed_fetch_stops_before_creating_a_worktree_or_syncing(self):
+    def assert_dirty_refresh_skipped(self):
+        status = self.git("status", "--porcelain").stdout
+        self.assertTrue(status, "this fixture must be dirty")
+        contents = {path.name: path.read_bytes() for path in self.source.iterdir() if path.is_file()}
+        for name in TRADE_COMMANDS:
+            with self.subTest(profile=name):
+                run = self.launch(name)
+                self.assertEqual(run.stdout, self.SKIPPED_REFRESH)
+                self.assertEqual(self.git("rev-parse", "HEAD").stdout.strip(), self.old_head)
+                self.assertEqual(self.git("rev-parse", "origin/main").stdout.strip(), self.old_head, "a dirty checkout skips fetch")
+                self.assertEqual(self.git("status", "--porcelain").stdout, status)
+                self.assertEqual({path.name: path.read_bytes() for path in self.source.iterdir() if path.is_file()}, contents)
+
+    def test_dirty_tracked_main_skips_refresh_and_still_launches(self):
+        (self.source / "tracked.txt").write_text("uncommitted tracked edit\n", encoding="utf-8")
+        self.assert_dirty_refresh_skipped()
+
+    def test_untracked_main_skips_refresh_and_still_launches(self):
+        (self.source / "untracked.txt").write_text("local untracked content\n", encoding="utf-8")
+        self.assert_dirty_refresh_skipped()
+
+    def test_staged_main_skips_refresh_and_still_launches(self):
+        (self.source / "tracked.txt").write_text("staged tracked edit\n", encoding="utf-8")
+        self.git("add", "tracked.txt")
+        self.assert_dirty_refresh_skipped()
+
+    def test_failed_fetch_keeps_main_and_still_launches_with_one_fallback_note(self):
         self.git("remote", "set-url", "origin", str(self.scratch / "missing-origin.git"))
-        before = self.git("worktree", "list", "--porcelain").stdout
         for name in TRADE_COMMANDS:
             with self.subTest(profile=name):
-                run, events = self.launch(name)
-                self.assertNotEqual(run.returncode, 0)
-                self.assertEqual(events, [])
-                self.assertEqual(self.git("worktree", "list", "--porcelain").stdout, before)
+                run = self.launch(name)
+                self.assertEqual(run.stdout, self.SKIPPED_REFRESH)
+                self.assertEqual(self.git("rev-parse", "HEAD").stdout.strip(), self.old_head)
+                self.assertEqual(self.git("rev-parse", "origin/main").stdout.strip(), self.old_head)
+                self.assertEqual(self.git("status", "--porcelain").stdout, "")
+
+    def test_divergent_main_refuses_a_non_fast_forward_and_still_launches_with_one_fallback_note(self):
+        (self.source / "tracked.txt").write_text("committed local main edit\n", encoding="utf-8")
+        self.git("add", "tracked.txt")
+        self.commit("divergent local main")
+        local_head = self.git("rev-parse", "HEAD").stdout.strip()
+        self.assertNotEqual(local_head, self.main_head)
+        for name in TRADE_COMMANDS:
+            with self.subTest(profile=name):
+                run = self.launch(name)
+                self.assertEqual(run.stdout, self.SKIPPED_REFRESH)
+                self.assertEqual(self.git("rev-parse", "origin/main").stdout.strip(), self.main_head, "fetch succeeds before the FF refusal")
+                self.assertEqual(self.git("rev-parse", "HEAD").stdout.strip(), local_head)
+                self.assertEqual((self.source / "tracked.txt").read_text(encoding="utf-8"), "committed local main edit\n")
+                self.assertFalse((self.source / "current-main").exists(), "a divergent main must not be merged")
+                self.assertEqual(self.git("status", "--porcelain").stdout, "")
 
 
 class ScanReaderTests(unittest.TestCase):
