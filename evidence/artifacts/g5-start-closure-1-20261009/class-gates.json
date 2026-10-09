@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "kind": "g5-start-closure-class-gates",
+  "observed_at": "2026-10-09T00:38:10Z",
+  "evidence_class": "local_integration",
+  "profile": "start-closure/1",
+  "source_baseline": "82de6ffa6d713d8b18ae6e9b3229c05729c75da2",
+  "protocol_sha256": "04622d1b00f2a8dcfc1400b6012b520b94b78441a97899d2c6231edb3b191b8a",
+  "asset": {"name": "g5-landscape-evidence-2026-10-08.tar.zst", "sha256": "1359fb196f46d0983c0d180fa982ceb1e4decaa58fc0aee96e19ffefaca0a1eb", "bytes": 28981260, "publication_status": "PREPARED"},
+  "manifest_sha256": "04dbfd7faf7595c25e88bcff12000cc16c00bfb85de1331c238105b1c37ce807",
+  "write_exit_code": 0,
+  "independent_check_exit_code": 0,
+  "check_stdout": {"sha256": "5f2df6db03d23ff769a423fd971add99ad0444bd8630851c75ab56966793a640", "bytes": 15049},
+  "check_stderr": {"sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", "bytes": 0},
+  "counts": {"rows": 4606, "action": 83, "pinned": 1648, "pending_pin": 3816, "pending_locator": 2117, "counted_inventory": 1082, "origin_unresolved": 143, "f1": 10, "f2": 166, "f3": 803, "disagreements_resolved": 10, "disagreements_total": 10, "lists": 1047, "pending_conflict_census": 13},
+  "non_action_append_events_by_class": {"foreign-primary-pin-scope-unqualified": 706, "original-source-entry-identity-unbound": 96, "unsupported-json-pointer-capture": 36, "native-skill-entry-witness-unverified": 53, "skill-entry-primary-bytes-unestablished": 113, "unbound-field-selector": 10, "original-list-occurrence-scope-unverified": 1082},
+  "residue_events_by_bucket": {"PENDING-PIN": 856, "PENDING-LOCATOR": 52, "counted-inventory": 1082, "origin-unresolved": 96, "G5-F1": 10, "G5-F2": 166, "G5-F3": 803},
+  "counting_note": "Pin/locator face values count unique rows. Row-level class/bucket values count append events. G5-F2 overlaps pin/locator; G5-F3 counts global mappings. Original unresolved-origin claims and qualified rows remain distinct. No overlapping counters are added.",
+  "g5_f3": {"count": 803, "occurrence_ids_sha256": "97330c518cd9c9cb84bcb3a54c8cd23f3aaa94c81bc24e8083990ef20b2fa078", "cc_disposition_id": "G5-F3", "action_associated_references": 6, "action_associated_rows": 5},
+  "trial_scope": {"repository": "massive-com/client-python", "slot": "market-data-reference", "source": "wilsonfreitas/awesome-quant", "commit": "48e48a76b2054b5fe6eede6852ffef7783b992ce", "blob": "5fd2caf71fcdacc47d1e64ff37e8d9abc34b7303", "source_sha256": "fa346fdbc05f651f500795e7ea95e90b6d8c0cb394daee1f7b612470650caa86", "line": 683, "section_start": 675, "section_end": 760, "scope_witness_sha256": "932d268b8fe7ca7aa03af3b9a1e0e0fdc438180e30f25bed21b87505b9789f2f", "result": "VERIFIED", "native_execution": false},
+  "tests": [
+    {"module": "tests.test_compact_manifest", "runtime": "Python 3.14.4", "tests": 84, "pre_existing_external_original_skips": 2, "exit_code": 0, "stderr_sha256": "43bf72e93ca841c96de389405623d8a31006c353907f0ad8abe59523242a45e5"},
+    {"module": "tests.test_start_closure_sampler", "runtime": "Python 3.14.4", "tests": 20, "exit_code": 0, "stderr_sha256": "edce880cde5b76fa1182d76d3db84ca1f46009761de21a00bfc1e95d1e65d93c", "sealed_r3_generator_sha256": "80e69ff94f97fffdf906583fa280f2a60a7487a54f0b58b05342264a5adf9627"}
+  ],
+  "default_schemas_changed": false,
+  "original_rows_sha256": "e7abe385adc1e1456ee3658299bf67705f2079c773b45653358d70a87ca54a10",
+  "network_calls_for_scope_binding": 0,
+  "usage": {"step_tokens": null, "provider_tokens": null},
+  "declared_follow_ups": ["G5-F1", "G5-F2", "G5-F3"],
+  "required_acceptance": {"both_designated_reads": "NOT_RUN", "pre_cue": "NOT_RUN", "hosted_ci_for_final_head": "NOT_RUN", "explicit_cue": "NOT_RECEIVED", "landing": "NOT_RUN", "release": "NOT_RUN"},
+  "claim_limit": "Synthetic module controls and actual archive consistency; no upstream installation, model run, source semantic completeness, candidate acceptance or G5 MET is inferred. Failed attempts remain in private retained logs."
+}

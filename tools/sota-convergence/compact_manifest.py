@@ -40,7 +40,23 @@ ACTION_CLASSES = {"ADOPT-NOW", "TRIAL"}
 PIN_REASONS = {"no-body", "no-match", "not-a-repository-file"}
 LOCATOR_REASONS = {"unsupported-transport", "unestablished-pinned-locator", "source-disagreement"}
 OMISSION_FOLLOW_UPS = {"complete-typed-list-populations-not-frozen": "G5-F1",
-                     "source-primary-qualification-unresolved": "G5-F2", "missing-list-capture": "G5-F1"}
+                     "source-primary-qualification-unresolved": "G5-F2", "missing-list-capture": "G5-F1",
+                     "occurrences-outside-declared-union": "G5-F3"}
+RESIDUE_BUCKETS = {"foreign-primary-pin-scope-unqualified": "PENDING-PIN",
+                   "skill-entry-primary-bytes-unestablished": "PENDING-PIN",
+                   "native-skill-entry-witness-unverified": "PENDING-PIN",
+                   "original-source-entry-identity-unbound": "origin-unresolved",
+                   "unsupported-json-pointer-capture": "PENDING-LOCATOR",
+                   "unbound-field-selector": "G5-F1",
+                   "original-list-occurrence-scope-unverified": "counted-inventory"}
+RESIDUE_MEASUREMENTS = {
+    "foreign-primary-pin-scope-unqualified": "Establish the candidate/source-entry subject from pinned primary evidence.",
+    "skill-entry-primary-bytes-unestablished": "Retain and bind the exact upstream SKILL.md bytes and locator.",
+    "native-skill-entry-witness-unverified": "Bind the original skill identity, lifecycle task and primary bytes.",
+    "original-source-entry-identity-unbound": "Bind the original source entry identity to this retained decision.",
+    "unsupported-json-pointer-capture": "Establish a supported locator into the retained original capture.",
+    "unbound-field-selector": "Complete the frozen typed list and field census.",
+    "original-list-occurrence-scope-unverified": "Verify the original occurrence against its pinned list scope."}
 POPULATION_FACTS = ("source_repository", "pin", "path", "capture_sha256", "archive_member", "parser")
 COUNT_UNITS = {"physical_entries": "physical entries in the frozen source list before deduplication",
                "typed_source_ids": "distinct typed source ids already present in the retained mining input",
@@ -330,10 +346,50 @@ def validation_profile(profile):
     return profile == START_CLOSURE_PROFILE
 
 
+def residue_bucket(row, code):
+    if code in {"skill-entry-primary-bytes-unestablished", "native-skill-entry-witness-unverified"} and "pending_locator" in row.get("closure", {}):
+        return "PENDING-LOCATOR"
+    return RESIDUE_BUCKETS[code]
+
+
+def profile_blocker(row, code, blockers, profile=None, detail=None):
+    """Gate at the original append site; action defects and default mode stay strict."""
+    if validation_profile(profile) and row["disposition"] not in ACTION_CLASSES:
+        residue = {"reason_code": code, "bucket": residue_bucket(row, code), "count": 1,
+                   "measurement": RESIDUE_MEASUREMENTS[code]}
+        if detail and "occurrence_id" in detail:
+            residue["occurrence_id"] = detail["occurrence_id"]
+        if code == "original-source-entry-identity-unbound":
+            residue["origin_pointer_before"] = row.get("origin_pointer")
+            row["origin_pointer"] = "unresolved"
+        row.setdefault("closure", {}).setdefault("residue", []).append(residue)
+    else:
+        blockers.append(code if detail is None else {"code": code, **detail})
+
+
+def closure_bucket(row, bucket):
+    flag = {"PENDING-PIN": "pending_pin", "PENDING-LOCATOR": "pending_locator"}[bucket]
+    return flag in row.get("closure", {}) or any(item["bucket"] == bucket for item in row.get("closure", {}).get("residue", []))
+
+
 def closure_metadata(row, index):
     """Validate explicit residue declarations; none is evidence or a source pin."""
     closure = row.get("closure", {})
-    closed(closure, set(), {"pending_pin", "pending_locator", "pending_conflict", "disagreements"}, "closure")
+    closed(closure, set(), {"pending_pin", "pending_locator", "pending_conflict", "disagreements", "residue"}, "closure")
+    for item in closure.get("residue", []):
+        closed(item, {"reason_code", "bucket", "count", "measurement"}, {"occurrence_id", "origin_pointer_before"}, "closure.residue")
+        require(row["disposition"] not in ACTION_CLASSES, "closure residue can never carry ADOPT-NOW or TRIAL")
+        require(item["reason_code"] in RESIDUE_BUCKETS and item["bucket"] == residue_bucket(row, item["reason_code"]), "unsupported closure residue class/bucket")
+        require(type(item["count"]) is int and item["count"] == 1, "closure residue counts one original append event")
+        text(item["measurement"], "closure.residue.measurement")
+        if "occurrence_id" in item:
+            text(item["occurrence_id"], "closure.residue.occurrence_id")
+        if "origin_pointer_before" in item:
+            require(item["reason_code"] == "original-source-entry-identity-unbound", "only origin residue retains a prior origin pointer")
+            prior = item["origin_pointer_before"]
+            require(prior in (None, "unresolved") or isinstance(prior, dict), "unsupported prior origin pointer")
+            if isinstance(prior, dict):
+                validate_ref(prior, index)
     for name, reasons in (("pending_pin", PIN_REASONS), ("pending_locator", LOCATOR_REASONS)):
         if name in closure:
             residue = closure[name]
@@ -474,8 +530,10 @@ def closure_locator(source, label, closure, blockers):
     return False
 
 
-def validate_row(row, index, profile=None):
+def validate_row(row, index, profile=None, *, record_residue=True):
     start_closure = validation_profile(profile)
+    if not record_residue:
+        row = {**row, "closure": {**row.get("closure", {}), "residue": list(row.get("closure", {}).get("residue", []))}} if start_closure else dict(row)
     closed(row, ROW_REQUIRED, ROW_OPTIONAL | ({"closure", "provenance", "origin_pointer", "origin_claim_ids"} if start_closure else set()), "row")
     identity, slot, _ = decision_key(row)
     require(row["disposition"] in CLASSES and row["evidence_class"] in EVIDENCE, "unsupported disposition/evidence class")
@@ -515,7 +573,7 @@ def validate_row(row, index, profile=None):
             require(row["pin"]["subject"] in {"source-entry", "reference"}, "foreign source pin is not an implementation pin")
             require(row["evidence_class"] in {"SOURCE-REVIEW", "DOCUMENTARY"}, "foreign primary source pin cannot establish recorded execution")
             if row.get("decision_scope") != "source-entry-screen" or row.get("candidate_implementation_status") != "UNESTABLISHED" or not {"source_pointer", "source_entry_witness"} & row.keys():
-                blockers.append("foreign-primary-pin-scope-unqualified")
+                profile_blocker(row, "foreign-primary-pin-scope-unqualified", blockers, profile)
         if skill:
             if (row["evidence_class"] not in {"SOURCE-REVIEW", "DOCUMENTARY"} or row["disposition"] != "PENDING"
                     or row["pin"]["kind"] != "commit" or row["pin"]["subject"] != "implementation" or "source_pointer" not in row):
@@ -615,7 +673,7 @@ def pointer(document, value):
     return result
 
 
-def selected_capture(member, locator, captures, cache, blockers, label):
+def selected_capture(member, locator, captures, cache, blockers, label, row=None, profile=None):
     if member not in captures:
         blockers.append({"code": "unsupported-large-pointer-capture", "source": label})
         return None
@@ -625,7 +683,10 @@ def selected_capture(member, locator, captures, cache, blockers, label):
             try:
                 cache[member] = load(raw)
             except CompactError:
-                blockers.append({"code": "unsupported-json-pointer-capture", "source": label})
+                if row is None:
+                    blockers.append({"code": "unsupported-json-pointer-capture", "source": label})
+                else:
+                    profile_blocker(row, "unsupported-json-pointer-capture", blockers, profile, {"source": label})
                 return None
         try:
             selected = pointer(cache[member], locator)
@@ -793,7 +854,7 @@ def skill_source_path(locator):
     return parent, ref, path
 
 
-def validate_native_skill_entry(row, index, captures, cache, blockers):
+def validate_native_skill_entry(row, index, captures, cache, blockers, profile=None):
     """Bind the documented native skills entry without turning claims into bytes."""
     skill = NATIVE_SKILL_REF.fullmatch(row["repository_or_entry"])
     if not skill:
@@ -806,7 +867,7 @@ def validate_native_skill_entry(row, index, captures, cache, blockers):
         require(p is not None and p["subject"] == "implementation" and p["kind"] == "commit"
                 and canonical(p["repository_or_source"]) == canonical(skill[1]), "native skill entry pin must bind its actual containing repository")
         require(re.fullmatch(r"/proposed/(?:0|[1-9][0-9]*)", row.get("source_pointer", "")), "native skill entry requires its original proposal pointer")
-        original = selected_capture(row["archive_member"], "", captures, cache, blockers, label)
+        original = selected_capture(row["archive_member"], "", captures, cache, blockers, label, row, profile)
         require(isinstance(original, dict), "native skills original must be its discovery object")
         schema = load(NATIVE_SKILLS_SCHEMA.read_bytes())
         require(set(original) == set(schema["required"]), "native skills original must retain its exact five-key discovery shape")
@@ -823,7 +884,7 @@ def validate_native_skill_entry(row, index, captures, cache, blockers):
         require(isinstance(proposal["evidence"], list) and all(isinstance(item, str) for item in proposal["evidence"]), "native skill evidence must retain original locator strings")
         skill_hash = proposal["skill_md_sha256"]
         if skill_hash is None:
-            blockers.append({"code": "skill-entry-primary-bytes-unestablished", "source": label})
+            profile_blocker(row, "skill-entry-primary-bytes-unestablished", blockers, profile, {"source": label})
             return
         sha(skill_hash, "native SKILL.md SHA256")
         original_paths = set()
@@ -858,16 +919,16 @@ def validate_native_skill_entry(row, index, captures, cache, blockers):
                 continue  # JSON scalars and BOM-prefixed receipts are metadata too.
             established = True
         if not established:
-            blockers.append({"code": "skill-entry-primary-bytes-unestablished", "source": label})
+            profile_blocker(row, "skill-entry-primary-bytes-unestablished", blockers, profile, {"source": label})
     except (CompactError, ValueError, KeyError, TypeError) as error:
-        blockers.append({"code": "native-skill-entry-witness-unverified", "source": label, "reason": str(error)})
+        profile_blocker(row, "native-skill-entry-witness-unverified", blockers, profile, {"source": label, "reason": str(error)})
 
 
-def validate_reference_pointers(rows, captures, blockers, cache):
+def validate_reference_pointers(rows, captures, blockers, cache, profile=None):
     for row in rows:
         label = canonical(row["repository_or_entry"]) + ":" + row["slot"]
         if "source_pointer" in row:
-            original_entry = selected_capture(row["archive_member"], row["source_pointer"], captures, cache, blockers, label)
+            original_entry = selected_capture(row["archive_member"], row["source_pointer"], captures, cache, blockers, label, row, profile)
             if not NATIVE_SKILL_REF.fullmatch(row["repository_or_entry"]) and row["pin"] is not None and canonical(row["pin"]["repository_or_source"]) != canonical(row["repository_or_entry"]):
                 entry_identity = None
                 if isinstance(original_entry, dict):
@@ -875,20 +936,20 @@ def validate_reference_pointers(rows, captures, blockers, cache):
                 elif isinstance(original_entry, str):
                     entry_identity = original_entry
                 if entry_identity is None or canonical(entry_identity) != canonical(row["repository_or_entry"]):
-                    blockers.append({"code": "original-source-entry-identity-unbound", "source": label})
+                    profile_blocker(row, "original-source-entry-identity-unbound", blockers, profile, {"source": label})
         refs = list(row.get("source_refs", []))
         refs += [ref for choice in row.get("choices", []) for ref in choice["source_refs"]]
         for ref in refs:
             if "archive_member" not in ref:
                 blockers.append({"code": "unbound-source-reference", "source": label, "sha256": ref["sha256"], "pointer": ref["pointer"]})
             else:
-                selected_capture(ref["archive_member"], ref["pointer"], captures, cache, blockers, label)
+                selected_capture(ref["archive_member"], ref["pointer"], captures, cache, blockers, label, row, profile)
         for source in row["primary_sources"]:
             if "pointer" in source:
                 if "archive_member" not in source:
                     blockers.append({"code": "unbound-primary-pointer", "source": label})
                 else:
-                    selected_capture(source["archive_member"], source["pointer"], captures, cache, blockers, label)
+                    selected_capture(source["archive_member"], source["pointer"], captures, cache, blockers, label, row, profile)
 
 
 def validate_origin_pointer(row, captures, cache, blockers):
@@ -959,7 +1020,8 @@ def closure_omissions(omissions, index):
         if not isinstance(omission, dict):
             unresolved.append(omission)
             continue
-        closed(omission, {"code", "count", "cc_disposition_id", "follow_up_id", "resolution"}, set(POPULATION_FACTS), "closure omission")
+        closed(omission, {"code", "count", "cc_disposition_id", "follow_up_id", "resolution"},
+               set(POPULATION_FACTS) | {"occurrence_ids_sha256"}, "closure omission")
         require(type(omission["count"]) is int and omission["count"] >= 0, "omission count must be a measured nonnegative integer")
         text(omission["resolution"], "omission resolution")
         code = text(omission["code"], "omission code")
@@ -978,6 +1040,9 @@ def closure_omissions(omissions, index):
             sha(omission["capture_sha256"], "missing list capture hash")
             member_name(omission["archive_member"])
             require(omission["archive_member"] not in index, "missing-list-capture omission must identify an absent capture")
+        if code == "occurrences-outside-declared-union":
+            require(omission["cc_disposition_id"] == "G5-F3", "outside-union omission requires CC disposition G5-F3")
+            sha(omission.get("occurrence_ids_sha256"), "outside-union occurrence id-list hash")
         approved.append(omission)
     return approved, unresolved
 
@@ -1101,7 +1166,8 @@ def validate_coverage(coverage, rows, index, captures, cache, profile=None):
                 continue
             catalog = row.get("qualification", {}).get("catalog")
             if not any(slot == row["slot"] and (catalog is None or catalog == cat) for slot, cat in allowed_fields):
-                blockers.append({"code": "unbound-field-selector", "repository_or_entry": canonical(row["repository_or_entry"]), "slot": row["slot"]})
+                profile_blocker(row, "unbound-field-selector", blockers, profile,
+                                {"repository_or_entry": canonical(row["repository_or_entry"]), "slot": row["slot"]})
     elif field_inventory is not None:
         blockers.append({"code": "field-inventory-unfrozen-or-unsupported"})
     document_count = 0
@@ -1200,7 +1266,7 @@ def validate_coverage(coverage, rows, index, captures, cache, profile=None):
                 unpromoted_keys.update(ids)
         for occurrence in population["expected_occurrences"]:
             closed(occurrence, {"occurrence_id", "repository_or_entry", "slot", "capture_sha256", "archive_member", "pointer"},
-                   {"qualification"} | ({"physical_occurrence_id"} if start_closure else set()), "list occurrence")
+                   {"qualification"} | ({"physical_occurrence_id", "scope_witness"} if start_closure else set()), "list occurrence")
             occurrence_id = text(occurrence["occurrence_id"], "occurrence_id")
             physical_id = text(occurrence.get("physical_occurrence_id", occurrence_id), "physical_occurrence_id")
             require(counted or physical_id == occurrence_id, "physical occurrence aliases require a counted population")
@@ -1241,8 +1307,14 @@ def validate_coverage(coverage, rows, index, captures, cache, profile=None):
                     native = cache[("native-entry-bound", occurrence_key, occurrence["archive_member"], occurrence["capture_sha256"], occurrence["pointer"])]
                     if canonical(native["linked_repository"]) != occurrence_key[0] or native["layer_fit"] != occurrence_key[1]:
                         blockers.append({"code": "original-list-occurrence-identity-scope-mismatch", "occurrence_id": occurrence_id})
+                elif start_closure and "scope_witness" in occurrence and verified_list_scope(population, occurrence, original, index, captures, cache, blockers):
+                    pass  # Exact pinned section and the existing declared selector bind this occurrence.
                 else:
-                    blockers.append({"code": "original-list-occurrence-scope-unverified", "occurrence_id": occurrence_id})
+                    retained_row = actual.get(occurrence_key)
+                    if retained_row is None:
+                        blockers.append({"code": "original-list-occurrence-scope-unverified", "occurrence_id": occurrence_id})
+                    else:
+                        profile_blocker(retained_row, "original-list-occurrence-scope-unverified", blockers, profile, {"occurrence_id": occurrence_id})
             actual_ref = ref_map.get(occurrence_mapping if start_closure else occurrence_id)
             if actual_ref is None or actual_ref[0] != occurrence_key or any(actual_ref[1].get(name) != occurrence[source] for name, source in
                     (("sha256", "capture_sha256"), ("archive_member", "archive_member"), ("pointer", "pointer"))):
@@ -1265,10 +1337,25 @@ def validate_coverage(coverage, rows, index, captures, cache, profile=None):
                  != sorted((population_fact(p) for p in inventory_populations), key=lambda p: json.dumps(p, sort_keys=True))):
             blockers.append({"code": "source-inventory-unfrozen-or-population-mismatch"})
     extra = set(ref_map) - (occurrence_mappings if start_closure else occurrence_keys)
-    if extra:
-        blockers.append({"code": "occurrences-outside-declared-union", "count": len(extra)})
+    outside_union = None
+    ids = sorted(item[0] if start_closure else item for item in extra)
+    ids_sha = hashlib.sha256(json_text(ids, indent=2).encode("utf-8")).hexdigest()
+    union_omissions = [o for o in approved_omissions if o["code"] == "occurrences-outside-declared-union"]
+    require(len(union_omissions) <= 1, "duplicate G5-F3 outside-union omission")
+    omission = union_omissions[0] if union_omissions else None
+    if extra or omission is not None:
+        if start_closure and omission is not None:
+            require(omission["cc_disposition_id"] == "G5-F3", "outside-union omission requires CC disposition G5-F3")
+            require(omission["count"] == len(extra) and omission.get("occurrence_ids_sha256") == ids_sha,
+                    "G5-F3 occurrence count/hash differs from actual outside-union census")
+            outside_union = {"count": len(extra), "occurrence_ids": ids, "occurrence_ids_sha256": ids_sha,
+                             "cc_disposition_id": "G5-F3", "follow_up_id": "G5-F3"}
+        else:
+            blockers.append({"code": "occurrences-outside-declared-union", "count": len(extra)})
     require(not physical_occurrence_keys & unpromoted_keys, "an occurrence cannot be both promoted and unpromoted")
     coverage_summary = {"status": coverage["status"], "omissions": coverage["omissions"], "list_populations": summary}
+    if outside_union is not None:
+        coverage_summary["outside_declared_union"] = outside_union
     coverage_summary.update({name: coverage[name] for name in ("source_inventory_witness", "field_inventory_witness", "star_inventory_witness") if name in coverage})
     counts = {
         "expected_rows": len(expected), "starred_identities": len(stars), "represented_stars": len(stars) - len(missing_stars),
@@ -1292,6 +1379,72 @@ def validate_coverage(coverage, rows, index, captures, cache, profile=None):
                        "missing_list_captures": sum(o["code"] == "missing-list-capture" for o in approved_omissions),
                        "missing_list_capture_entries": sum(o["count"] for o in approved_omissions if o["code"] == "missing-list-capture")})
     return blockers, coverage_summary, counts
+
+
+def verified_list_scope(population, occurrence, original, index, captures, cache, blockers):
+    """Verify a derived scope receipt against primary bytes and retained declarations."""
+    proof = declared_witness(occurrence["scope_witness"], index, captures, cache, blockers, "list-scope-witness")
+    if not isinstance(proof, dict):
+        return False
+    names = ("boundary_witness", "slot_witness", "field_witness", "commit_witness", "tree_witness")
+    selected = {}
+    for name in names:
+        selected[name] = declared_witness(proof.get(name), index, captures, cache, blockers, name)
+    try:
+        closed(proof, set(POPULATION_FACTS) | set(names) | {"section_heading", "section_start", "section_end", "section_sha256", "line_sha256"}, set(), "list scope proof")
+        require(all(proof[name] == population[name] for name in POPULATION_FACTS), "scope proof differs from its exact population")
+        require(isinstance(original, dict), "scope proof requires the original occurrence object")
+        p = population["pin"]
+        require(p is not None and p["kind"] == "commit", "scope proof requires a commit pin")
+        for name, value in (("source_repository", population["source_repository"]), ("source_pin", p["version_or_commit"]),
+                            ("source_path", population["path"]), ("source_content_sha256", population["capture_sha256"])):
+            require(original.get(name) == value and selected["boundary_witness"].get(name) == value, "original/boundary differs from pinned source")
+        body = captures[population["archive_member"]]
+        lines = body.decode("utf-8").splitlines(keepends=True)
+        line_number = original["source_line"]
+        require(type(line_number) is int and 1 <= line_number <= len(lines), "original source line is outside pinned file")
+        require(lines[line_number - 1].rstrip("\r\n") == original["entry_text"], "original entry differs from pinned physical line")
+        require(hashlib.sha256(lines[line_number - 1].encode()).hexdigest() == proof["line_sha256"], "scope line hash differs")
+        start, end = proof["section_start"], proof["section_end"]
+        require(type(start) is int and type(end) is int and 1 <= start <= line_number <= end <= len(lines), "entry is outside declared section")
+        heading = re.fullmatch(r"(#{1,6})[ \t]+(.+?)\s*", lines[start - 1].rstrip("\r\n"))
+        require(heading is not None and lines[start - 1].rstrip("\r\n") == proof["section_heading"], "declared section heading differs")
+        require(original["source_heading"].split(" / ")[-1] == heading[2], "original heading differs from declared section")
+        fence = None
+        peer = len(lines) + 1
+        for number, line in enumerate(lines, 1):
+            marker = re.match(r"^ {0,3}(`{3,}|~{3,})", line)
+            if marker:
+                if fence is None:
+                    fence = (marker[1][0], len(marker[1]))
+                elif marker[1][0] == fence[0] and len(marker[1]) >= fence[1] and not line[marker.end():].strip():
+                    fence = None
+                continue
+            if number in {start, line_number}:
+                require(fence is None, "scope heading/entry occurs inside a code fence")
+            match = re.match(r"^ {0,3}(#{1,6})[ \t]+", line)
+            if number > start and fence is None and match and len(match[1]) <= len(heading[1]):
+                peer = number
+                break
+        require(end == peer - 1, "declared section end differs from next peer heading")
+        require(hashlib.sha256("".join(lines[start - 1:end]).encode()).hexdigest() == proof["section_sha256"], "section bytes differ")
+        candidate = decision_key(occurrence)[0]
+        links = {github_repository_href(m[1]) for m in re.finditer(r"(?<!!)\[[^\]\r\n]*\]\((https://github\.com/[^\s)]+)\)", lines[line_number - 1], re.I)}
+        require(candidate in links, "primary line lacks exact candidate link")
+        slot, field = selected["slot_witness"], selected["field_witness"]
+        require(slot["repository"] and canonical(slot["repository"]) == candidate
+                and occurrence["slot"] in slot["layer_ids"].split(",")
+                and slot["source_pin"] == p["version_or_commit"]
+                and slot["input_id"].endswith(population["source_repository"] + ":" + population["path"] + ":" + str(line_number)), "existing ledger selector does not bind source line/slot")
+        require(field["slot"] == occurrence["slot"] and occurrence.get("qualification", {}).get("catalog") in {None, field["catalog"]}, "frozen field selector differs")
+        commit, tree = selected["commit_witness"], selected["tree_witness"]
+        require(commit["sha"] == p["version_or_commit"] and commit["commit"]["tree"]["sha"] == tree["sha"] and tree["truncated"] is False,
+                "cached primary commit/tree chain differs")
+        blob = hashlib.sha1(b"blob " + str(len(body)).encode() + b"\0" + body).hexdigest()
+        require(any(item.get("path") == population["path"] and item.get("type") == "blob" and item.get("sha") == blob for item in tree["tree"]), "pinned tree lacks exact captured blob")
+        return True
+    except (CompactError, KeyError, TypeError, ValueError, UnicodeError):
+        return False
 
 
 def row_list(raw):
@@ -1324,6 +1477,19 @@ def build_manifest(asset, release_tag, witnesses=(), profile=None):
     asset_sha, index, captured = read_archive(asset)
     require(ROWS_MEMBER in captured and COVERAGE_MEMBER in captured, "asset requires compact/rows.json and compact/coverage.json")
     rows = row_list(captured[ROWS_MEMBER])
+    if start_closure:
+        # Output residue is recomputed from original defects, never trusted as a waiver.
+        for row in rows:
+            closure_metadata(row, index)
+            if "closure" in row:
+                for residue in row["closure"].get("residue", []):
+                    if "origin_pointer_before" in residue:
+                        prior = residue["origin_pointer_before"]
+                        if prior is None:
+                            row.pop("origin_pointer", None)
+                        else:
+                            row["origin_pointer"] = prior
+                row["closure"].pop("residue", None)
     all_keys = [decision_key(row) for row in rows]
     require(len(set(all_keys)) == len(all_keys), "duplicate canonical identity+slot+qualification decision key")
     blockers = []
@@ -1351,6 +1517,11 @@ def build_manifest(asset, release_tag, witnesses=(), profile=None):
             wanted.add(coverage_raw["document_inventory_witness"]["archive_member"])
         for population in coverage_raw.get("list_populations", []):
             wanted |= {o["archive_member"] for o in population.get("expected_occurrences", [])}
+            if start_closure:
+                scope_refs = [o["scope_witness"] for o in population.get("expected_occurrences", []) if "scope_witness" in o]
+                wanted |= {ref["archive_member"] for ref in scope_refs}
+                if scope_refs:
+                    wanted.add(population["archive_member"])
             wanted |= {population[name]["archive_member"] for name in ("source_witness", "census_witness") if isinstance(population.get(name), dict) and "archive_member" in population[name]}
             if start_closure and isinstance(population.get("counted", {}).get("unpromoted_ids"), dict):
                 wanted.add(population["counted"]["unpromoted_ids"]["archive_member"])
@@ -1366,6 +1537,16 @@ def build_manifest(asset, release_tag, witnesses=(), profile=None):
     if start_closure:
         alias_members, alias_cache = set(), {}
         for population in coverage_raw.get("list_populations", []):
+            for occurrence in population.get("expected_occurrences", []):
+                if "scope_witness" in occurrence:
+                    proof = declared_witness(occurrence["scope_witness"], index, receipts, alias_cache, blockers, "list-scope-witness")
+                    require(isinstance(proof, dict), "list scope witness must select an object")
+                    for name in ("boundary_witness", "slot_witness", "field_witness", "commit_witness", "tree_witness"):
+                        ref = proof.get(name)
+                        closed(ref, {"archive_member", "sha256", "pointer"}, set(), "list scope reference")
+                        match_capture(ref["archive_member"], ref["sha256"], index)
+                        require(isinstance(ref["pointer"], str) and (ref["pointer"] == "" or ref["pointer"].startswith("/")), "list scope reference must use a JSON Pointer")
+                        alias_members.add(ref["archive_member"])
             alias_ref = population.get("counted", {}).get("alias_witness")
             if alias_ref is None:
                 continue
@@ -1382,14 +1563,17 @@ def build_manifest(asset, release_tag, witnesses=(), profile=None):
             require(alias_sha == asset_sha and alias_index == index, "asset changed before original alias receipt check")
             receipts.update(alias_captures)
     cache = {}
-    validate_reference_pointers(rows, receipts, blockers, cache)
+    validate_reference_pointers(rows, receipts, blockers, cache, profile)
     if start_closure:
         for row in rows:
+            for residue in row.get("closure", {}).get("residue", []):
+                if isinstance(residue.get("origin_pointer_before"), dict):
+                    validate_origin_pointer({**row, "origin_pointer": residue["origin_pointer_before"]}, receipts, cache, blockers)
             validate_origin_pointer(row, receipts, cache, blockers)
             validate_origin_claims(row, receipts, cache, blockers)
     for row in rows:
         validate_native_source_entry(row, index, receipts, cache, blockers)
-        validate_native_skill_entry(row, index, receipts, cache, blockers)
+        validate_native_skill_entry(row, index, receipts, cache, blockers, profile)
     coverage_blockers, coverage, counts = validate_coverage(coverage_raw, rows, index, receipts, cache, profile)
     blockers.extend(coverage_blockers)
     counts.update({"rows": len(rows), "identities": len({decision_key(row)[0] for row in rows}),
@@ -1424,8 +1608,26 @@ def build_manifest(asset, release_tag, witnesses=(), profile=None):
                         selected_capture(ref["archive_member"], ref["pointer"], receipts, cache, blockers, item["id"])
         residue_counts = {}
         for name in ("pending_pin", "pending_locator"):
-            residue_counts[name + "_rows"] = sum(name in row.get("closure", {}) for row in rows)
+            bucket = {"pending_pin": "PENDING-PIN", "pending_locator": "PENDING-LOCATOR"}[name]
+            residue_counts[name + "_rows"] = sum(closure_bucket(row, bucket) for row in rows)
             residue_counts[name + "_by_reason"] = dict(sorted(Counter(row["closure"][name]["reason_code"] for row in rows if name in row.get("closure", {})).items()))
+            residue_counts[name + "_declared_rows"] = sum(name in row.get("closure", {}) for row in rows)
+        class_counts, bucket_counts = Counter(), Counter()
+        for row in rows:
+            for item in row.get("closure", {}).get("residue", []):
+                class_counts[item["reason_code"]] += item["count"]
+                bucket_counts[item["bucket"]] += item["count"]
+        residue_counts["residue_by_class"] = {code: class_counts[code] for code in RESIDUE_BUCKETS}
+        residue_counts["residue_by_bucket"] = {bucket: bucket_counts[bucket] for bucket in
+                                                ("PENDING-PIN", "PENDING-LOCATOR", "counted-inventory", "origin-unresolved", "G5-F1")}
+        residue_counts["residue_events"] = sum(class_counts.values())
+        residue_counts["residue_rows"] = sum(bool(row.get("closure", {}).get("residue")) for row in rows)
+        residue_counts["counted_inventory"] = bucket_counts["counted-inventory"]
+        residue_counts["f1"] = class_counts["unbound-field-selector"]
+        residue_counts["f2"] = sum(class_counts[code] for code in ("skill-entry-primary-bytes-unestablished", "native-skill-entry-witness-unverified"))
+        residue_counts["f3"] = coverage.get("outside_declared_union", {}).get("count", 0)
+        residue_counts["residue_by_class"]["occurrences-outside-declared-union"] = residue_counts["f3"]
+        residue_counts["residue_by_bucket"].update({"G5-F2": residue_counts["f2"], "G5-F3": residue_counts["f3"]})
         pin_items = Counter()
         for row in rows:
             if "pending_pin" in row.get("closure", {}):
@@ -1459,11 +1661,21 @@ def build_manifest(asset, release_tag, witnesses=(), profile=None):
                        "origin_pointer_bound": sum(isinstance(row.get("origin_pointer"), dict) for row in rows),
                        "pinned_rows": sum(row["pin"] is not None for row in rows),
                        "pending_pin": residue_counts["pending_pin_rows"], "pending_locator": residue_counts["pending_locator_rows"],
+                       "counted_inventory": residue_counts["counted_inventory"],
+                       "origin_unresolved": residue_counts["origin_pointer_unresolved"],
+                       "f1": residue_counts["f1"], "f2": residue_counts["f2"], "f3": residue_counts["f3"],
+                       "residue_by_class": residue_counts["residue_by_class"], "residue_by_bucket": residue_counts["residue_by_bucket"],
                        "disagreements_resolved": sum(item["status"] == "RESOLVED" for item in disagreements), "disagreements_total": len(disagreements)})
         manifest["validation"].update({"profile": START_CLOSURE_PROFILE, "nonblocking_counts": residue_counts, "disagreements": disagreements,
                                        "status": "BLOCKED" if blockers else "PASS"})
         coverage["count_units"].update({"origin_pointer_unresolved": "distinct hash-bound original origin_claim_ids plus one legacy unit per unresolved row without declared claim ids",
-                                        "origin_pointer_unresolved_rows": "retained decision rows with literal origin_pointer unresolved, including qualified keys sharing one original claim"})
+                                        "origin_pointer_unresolved_rows": "retained decision rows with literal origin_pointer unresolved, including qualified keys sharing one original claim",
+                                        "residue_by_class": "original append events on non-action rows; G5-F3 instead counts outside-union occurrence mappings",
+                                        "residue_by_bucket": "sum of per-row residue events; G5-F2 overlaps its pin/locator bucket and G5-F3 is global",
+                                        "counted_inventory": "non-action original-list scope append events, separate from unpromoted physical inventory",
+                                        "f1": "unbound-field-selector residue events, separate from the declared typed-census omission count",
+                                        "f2": "skill-source qualification residue events, overlapping PENDING-PIN or PENDING-LOCATOR",
+                                        "f3": "outside-union occurrence mappings bound to the sorted occurrence-id list SHA256"})
     raw = json_text(sorted_tree(manifest), indent=2).encode("utf-8")
     require(len(raw) < MANIFEST_LIMIT, "compact manifest must remain below GitHub's 100 MiB regular-file limit")
     return manifest, raw

@@ -45,7 +45,7 @@
     },
     "omissions": {
       "type": "array",
-      "description": "An explicitly CC-dispositioned G5-F1/F2 omission is visible and nonblocking only under start-closure/1. Undispositioned omissions still block.",
+      "description": "An explicitly dispositioned G5-F1/F2/F3 omission is visible and nonblocking only under start-closure/1. Undispositioned omissions still block.",
       "items": {
         "anyOf": [
           {
@@ -67,7 +67,8 @@
                 "enum": [
                   "complete-typed-list-populations-not-frozen",
                   "source-primary-qualification-unresolved",
-                  "missing-list-capture"
+                  "missing-list-capture",
+                  "occurrences-outside-declared-union"
                 ]
               },
               "count": {
@@ -81,12 +82,16 @@
               "follow_up_id": {
                 "enum": [
                   "G5-F1",
-                  "G5-F2"
+                  "G5-F2",
+                  "G5-F3"
                 ]
               },
               "resolution": {
                 "type": "string",
                 "minLength": 1
+              },
+              "occurrence_ids_sha256": {
+                "$ref": "compact-decision-start-closure-1.json#/$defs/sha256"
               },
               "source_repository": {
                 "type": "string",
@@ -118,6 +123,13 @@
               }
             },
             "allOf": [
+              {
+                "if": {"properties": {"code": {"const": "occurrences-outside-declared-union"}}},
+                "then": {
+                  "required": ["occurrence_ids_sha256"],
+                  "properties": {"cc_disposition_id": {"const": "G5-F3"}, "follow_up_id": {"const": "G5-F3"}}
+                }
+              },
               {
                 "if": {
                   "properties": {
@@ -325,6 +337,7 @@
         "pointer"
       ],
       "properties": {
+        "scope_witness": {"$ref": "compact-decision-start-closure-1.json#/properties/acceptance_witness"},
         "occurrence_id": {
           "type": "string",
           "minLength": 1

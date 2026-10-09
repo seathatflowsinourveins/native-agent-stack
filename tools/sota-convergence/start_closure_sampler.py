@@ -24,7 +24,7 @@ SEED = 202610081850
 QUOTA = 59
 R3_SHA256 = "80e69ff94f97fffdf906583fa280f2a60a7487a54f0b58b05342264a5adf9627"
 CONTRACT = Path(__file__).with_name("start-closure-stratum-contract.json")
-CONTRACT_SHA256 = "894deff0dfa44a9c56b8465f54fa3bf0af42ac22d9a236969a4aae5d2a58eb29"
+CONTRACT_SHA256 = "744e1729ddd16a7d91378aebd35feea0acfba9932e49b831675fb1246a32ffde"
 PROTOCOL = Path(__file__).with_name("compact_manifest.py")
 ROW_SCHEMA = "tools/sota-convergence/schemas/compact-decision-start-closure-1.json"
 ACTION = ("ADOPT-NOW", "TRIAL")
@@ -122,13 +122,13 @@ def rows_and_origins(manifest, origin_map, manifest_sha, native, validator, r3):
     rows, origins, fragments = {}, {}, {}
     for position, row in enumerate(manifest["rows"]):
         validator.validate(row)
-        require(not native.validate_row(row, index, profile=PROFILE), "Native profile row validation blocked")
+        require(not native.validate_row(row, index, profile=PROFILE, record_residue=False), "Native profile row validation blocked")
         key = native.decision_key(row)
         require(key not in rows, "Duplicate native identity+slot+qualification key")
         if row["disposition"] in ACTION:
             require(row["pin"] is not None and all(s["pin"] is not None for s in row["primary_sources"]),
                     "An action row or primary source has a null pin")
-            require(not any(flag in row.get("closure", {}) for flag in (*FLAGS.values(), CONFLICT_FLAG)),
+            require(not any(flag in row.get("closure", {}) for flag in (*FLAGS.values(), CONFLICT_FLAG, "residue")),
                     "An action row has closure residue")
         rows[key] = {"manifest_pointer": f"/rows/{position}",
                      "row_sha256": r3.digest(r3.canonical(row).encode()), "row": row}
@@ -177,7 +177,7 @@ def select(rows, origins, fragments, classes, r3):
     for label, flag in FLAGS.items():
         projected = {}
         for key, item in eligible.items():
-            if flag in item["row"].get("closure", {}):
+            if flag in item["row"].get("closure", {}) or any(residue["bucket"] == label for residue in item["row"].get("closure", {}).get("residue", [])):
                 projected[key] = {**item, "row": {**item["row"], "disposition": label}}
         packets.extend(p for p in r3.select(projected, draw_origins, fragments, [label], SEED, QUOTA)
                        if p["stratum"]["bucket_kind"] == r3.FINAL_BUCKET)
@@ -208,9 +208,9 @@ def packet_counts(packets, rows):
             "final_action_census_memberships": sum(p["selected_count"] for p in packets if p["selection_mode"] == "FULL-CENSUS"),
             "sample_memberships": memberships, "unique_sampled_rows": len(sampled_keys),
             "sample_overlap_memberships": memberships - len(sampled_keys), "unique_selected_rows": len(selected_keys | conflicts),
-            "rows_with_both_closure_flags": sum(all(f in i["row"].get("closure", {}) for f in FLAGS.values()) for i in rows.values()),
+            "rows_with_both_closure_flags": sum(all(f in i["row"].get("closure", {}) or any(residue["bucket"] == label for residue in i["row"].get("closure", {}).get("residue", [])) for label, f in FLAGS.items()) for i in rows.values()),
             "pending_conflict_excluded_from_samples": len(conflicts),
-            "conflict_sample_flag_exclusions": {label: sum(flag in rows[key]["row"].get("closure", {}) for key in conflicts)
+            "conflict_sample_flag_exclusions": {label: sum(flag in rows[key]["row"].get("closure", {}) or any(residue["bucket"] == label for residue in rows[key]["row"].get("closure", {}).get("residue", [])) for key in conflicts)
                                                 for label, flag in FLAGS.items()},
             "origin_pointer_unresolved_rows": sum(i["row"].get("origin_pointer") == "unresolved" for i in rows.values()),
             "action_origin_pointer_unresolved_rows": sum(rows[key]["row"].get("origin_pointer") == "unresolved" for key in actions),

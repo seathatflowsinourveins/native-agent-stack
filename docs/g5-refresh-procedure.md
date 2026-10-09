@@ -46,3 +46,43 @@ Run native catalog and manifest checks. Register owned evidence with `host_recei
 Both designated families review every ADOPT-NOW and TRIAL row against primary sources. Other rows follow the [stratified plan](decisions/2026-10-08-g5-compact-evidence.md): 59 random rows per fragment and disposition, or census for smaller strata, with a frozen seed, population and sampler version. Retain defects, root-cause corrections, failed attempts and revised seeds. State only the verification claim supported by actual results.
 
 Keep the PR a draft while inputs or required checks are open. The explicit catalog and release cue controls landing and publication. After landing, attach the final asset and `SHA256SUMS` to its pinned release, verify remote bytes and the tag binding on main, and retain the receipt. A prospective tag or local archive does not substitute for that verification.
+
+For the bounded START gate, apply the complete [start-closure/1 definition](decisions/2026-10-08-g5-compact-evidence.md). Keep original fragments byte-identical. Resolve eligible null pins from retained repository-file bytes through Git blob IDs and GitHub's cached tree/path-history interfaces: default head first, then at most 20 path-history commits, one cached recursive tree per repository and fewer than 1,000 observed GitHub calls per hour. Record resolved/no-body/no-match/not-a-repository-file counts and actual request usage. Preserve the ten original disagreement assertions and their evidence-backed resolution or visible PENDING state. Normalize transport placeholders only in derived inputs. Retain hash-pinned source, field, 368-star and two-document witnesses and distinct per-list counting units. List omissions with their specific disposition and G5-F1/G5-F2/G5-F3 follow-up IDs; undispositioned omissions still block.
+
+At each of the nine source-defect append sites, default qualification keeps its original blocker. Under the explicit profile, an action row remains a blocker; a non-action row retains the exact class, bucket, count and settling measurement in `closure.residue`. The definition maps list scope to counted-inventory, foreign source subject to PENDING-PIN, skill source qualification to PENDING-PIN/PENDING-LOCATOR and G5-F2, original identity to literal origin-unresolved, unsupported JSON selection to PENDING-LOCATOR, and unbound fields to G5-F1. Residue reasons cannot accompany ADOPT-NOW or TRIAL. Byte integrity, archive confinement, duplicate keys, declared pin/source disagreements, schemas, action evidence and promoted mapping checks remain strict.
+
+For the single direct massive-com/client-python TRIAL scope defect, retain a derived `scope_witness` on its declared occurrence. Verify line 683 against the pinned awesome-quant README bytes and computed section 675–760, plus the existing boundary and slot/field declarations and cached commit/tree/blob chain. A failure remains a blocker; a disposition change requires its separate owner decision. Original source bytes and original ledgers stay unchanged.
+
+For G5-F3, declare the actual outside-union count and SHA256 of the sorted occurrence-ID list with `cc_disposition_id: "G5-F3"` and `follow_up_id: "G5-F3"`. Complete the union declaration or exclude each source with its reason later. Its 803 IDs include six references on five TRIAL rows; this is a global census omission. The face prints its count and hash. A duplicate, missing or stale declaration fails, and the default profile still blocks it.
+
+These commands use the actual prepared full asset and its intended profile-specific manifest path. The default command retains the complete qualification contract; its returned failures remain evidence rather than being relabeled as a closure result.
+
+```sh
+python3 tools/sota-convergence/compact_manifest.py \
+  --asset g5-landscape-evidence-2026-10-08.tar.zst \
+  --manifest catalogs/landscape/grand-catalog-20261008.json \
+  --write --profile start-closure/1
+python3 tools/sota-convergence/compact_manifest.py \
+  --asset g5-landscape-evidence-2026-10-08.tar.zst \
+  --manifest catalogs/landscape/grand-catalog-20261008.json \
+  --check --profile start-closure/1
+python3 tools/sota-convergence/compact_manifest.py \
+  --asset g5-landscape-evidence-2026-10-08.tar.zst \
+  --manifest full-qualification.manifest.json --write
+python3 tools/sota-convergence/compact_manifest.py \
+  --asset g5-landscape-evidence-2026-10-08.tar.zst \
+  --manifest full-qualification.manifest.json --check
+```
+
+The face must identify `validation.profile` and every class/bucket count, including PENDING-PIN, PENDING-LOCATOR, counted-inventory, origin-unresolved and G5-F1/F2/F3. Test each row-level class against default blocking, action blocking, non-action counting and equality of face counts to per-row residue sums. Record separate unique-row, append-event, physical inventory, claim-ID and global mapping units; overlapping buckets are not added. Run module tests with a 600-second timeout. Register the two owned docs with the repository's `host_receipts.register_file` before `python3 scripts/validate.py`, and commit the shared registry last.
+
+Post the actual result, preserving stdout/stderr and the failed attempts:
+
+```text
+## G5-CHECK rc=<n> profile=start-closure/1 asset=<sha256> rows=<n> action=<n> pinned=<n> pending_pin=<n> pending_locator=<n> counted_inventory=<n> origin_unresolved=<n> f1=<n> f2=<n> f3=<n> disagreements=<resolved>/10 lists=<n> blockers=<list or none>
+## G5-CHECK-STDERR <actual stderr when rc is not 0; explicitly empty if zero bytes>
+```
+
+After a full-asset closure-profile check returns 0, derive the literal final ADOPT-NOW/TRIAL projection with each native row identity, exact pin, all primary locators and capture SHA256. Post its actual count/hash and compare that set with the earlier action packet before designated reads. Both designated families read that action census and every PENDING-CONFLICT row, including its original contradictory claims; conflicts are excluded from all sampled pools. Draw the other final disposition and PENDING-PIN/PENDING-LOCATOR buckets, including source-residue rows, with the companion profile and sealed R3 seed 202610081850. Preserve sample overlaps and code/test hashes for both readers; a wider held-source-claim crosswalk remains a follow-up. A defect requires correction and a new sealed draw, never repeated sampling for a favorable result. The exact result, class/bucket reasons, ten-disagreement outcomes, list counts, action projection and conflict census belong in the read packet. Both reads cover profile code/tests and all required census/sample rows; packet generation does not establish a passed read.
+
+Only check 0 and both passing designated reads permit G5 MET under this profile, with G5-F1, G5-F2 and G5-F3 open on the readiness manifest. The designated pre-cue tool, required hosted CI, explicit owner cue and 5f landing remain separate required steps. Keep the PR draft until those conditions pass; never push to a cued or LANDING-READY PR. After landing and a release cue, publish and verify the hash-pinned asset and release-tag binding. The default full-profile target remains check 0 after deferred qualification is completed.

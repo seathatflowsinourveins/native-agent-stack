@@ -22,8 +22,8 @@
   },
   "sampled_final_dispositions": ["WATCH", "REJECT", "NO-GAP", "OUT-OF-SCOPE", "PENDING"],
   "sampled_closure_flags": {
-    "PENDING-PIN": "closure.pending_pin",
-    "PENDING-LOCATOR": "closure.pending_locator"
+    "PENDING-PIN": "closure.pending_pin or closure.residue[].bucket=PENDING-PIN",
+    "PENDING-LOCATOR": "closure.pending_locator or closure.residue[].bucket=PENDING-LOCATOR"
   },
   "sample_quota": "min(59,N)",
   "acceptance_number": 0,

@@ -247,6 +247,23 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
+        "residue": {
+          "type": "array",
+          "description": "Recomputed non-action append events under start-closure/1; never an action-row waiver.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["reason_code", "bucket", "count", "measurement"],
+            "properties": {
+              "reason_code": {"enum": ["foreign-primary-pin-scope-unqualified", "skill-entry-primary-bytes-unestablished", "native-skill-entry-witness-unverified", "original-source-entry-identity-unbound", "unsupported-json-pointer-capture", "unbound-field-selector", "original-list-occurrence-scope-unverified"]},
+              "bucket": {"enum": ["PENDING-PIN", "PENDING-LOCATOR", "counted-inventory", "origin-unresolved", "G5-F1"]},
+              "count": {"const": 1},
+              "measurement": {"type": "string", "minLength": 1},
+              "occurrence_id": {"type": "string", "minLength": 1},
+              "origin_pointer_before": {"anyOf": [{"type": "null"}, {"const": "unresolved"}, {"$ref": "#/$defs/sourceRef"}]}
+            }
+          }
+        },
         "pending_pin": {
           "type": "object",
           "additionalProperties": false,
@@ -523,10 +540,11 @@
               }
             }
           },
-          "closure": {
-            "not": {
-              "anyOf": [
-                {
+        "closure": {
+          "not": {
+            "anyOf": [
+              {"required": ["residue"]},
+              {
                   "required": [
                     "pending_pin"
                   ]

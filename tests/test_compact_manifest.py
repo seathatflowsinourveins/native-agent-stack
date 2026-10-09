@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from contextlib import redirect_stdout, redirect_stderr
+from collections import Counter
 from copy import deepcopy
 import hashlib
 import importlib.util
@@ -170,6 +171,189 @@ class CompactManifestTests(unittest.TestCase):
                     "follow_up_id": compact.OMISSION_FOLLOW_UPS[code], "resolution": "retain the measured residue in the declared follow-up"}
         self.coverage["omissions"].append(omission)
         return omission
+
+    def residue_case(self, code):
+        """Actual malformed source inputs, without a generated residue waiver."""
+        row = self.rows[0]
+        if code in {"foreign-primary-pin-scope-unqualified", "original-source-entry-identity-unbound"}:
+            row["pin"] = pin("example/awesome", "b" * 40, "source-entry")
+            row["primary_sources"] = [{"pin": row["pin"], "locator": "example/awesome@" + "b" * 40 + ":README.md", "subject": "source entry"}]
+            if code == "original-source-entry-identity-unbound":
+                row.update(decision_scope="source-entry-screen", candidate_implementation_status="UNESTABLISHED", source_pointer="")
+        elif code == "unsupported-json-pointer-capture":
+            self.files["captures/non-json.md"] = b"# Original Markdown\n"
+            row["source_refs"].append({"archive_member": "captures/non-json.md", "sha256": digest(self.files["captures/non-json.md"]), "pointer": "/entry"})
+        elif code == "unbound-field-selector":
+            row = self.rows[1]
+            row["slot"] = "unbound-selector"
+        elif code == "original-list-occurrence-scope-unverified":
+            census = json.loads(self.files["captures/list-census.json"])
+            census["rows"][0].pop("slot")
+            self.files["captures/list-census.json"] = raw(census)
+            for occurrence in self.coverage["list_populations"][0]["expected_occurrences"]:
+                occurrence["capture_sha256"] = digest(self.files["captures/list-census.json"])
+            for ref in row["source_refs"]:
+                ref["sha256"] = digest(self.files["captures/list-census.json"])
+            self.add_authority_witnesses()
+        else:
+            original_star = deepcopy(row)
+            row = deepcopy(self.native_skill())
+            self.rows[0] = original_star
+            self.rows.append(row)
+            field_ref = self.coverage["field_inventory_witness"]
+            fields = json.loads(self.files[field_ref["archive_member"]])
+            fields["fields"][-1]["slot"] = row["slot"]
+            self.coverage["field_inventory_witness"] = self.witness("field-inventory", fields)
+            if code == "native-skill-entry-witness-unverified":
+                row["source_pointer"] = "/proposed/99"
+        self.coverage["expected_keys"] = [self.row_key(item) for item in self.rows]
+        return row
+
+    def test_each_blocker_class_default_action_and_non_action_profile_counts(self):
+        for code in compact.RESIDUE_BUCKETS:
+            with self.subTest(code=code):
+                case = CompactManifestTests()
+                case.setUp()
+                self.addCleanup(case.doCleanups)
+                row = case.residue_case(code)
+                strict, _ = case.build()
+                self.assertIn(code, {item["code"] for item in strict["validation"]["blockers"]})
+                closure, _ = case.closure_build()
+                self.assertNotIn(code, {item["code"] for item in closure["validation"]["blockers"]})
+                self.assertGreater(closure["counts"]["residue_by_class"][code], 0)
+                per_class = Counter()
+                per_bucket = Counter()
+                for output in closure["rows"]:
+                    for item in output.get("closure", {}).get("residue", []):
+                        per_class[item["reason_code"]] += item["count"]
+                        per_bucket[item["bucket"]] += item["count"]
+                        self.assertNotIn(output["disposition"], compact.ACTION_CLASSES)
+                for reason in compact.RESIDUE_BUCKETS:
+                    self.assertEqual(closure["counts"]["residue_by_class"][reason], per_class[reason])
+                for bucket in {"PENDING-PIN", "PENDING-LOCATOR", "origin-unresolved", "counted-inventory", "G5-F1"}:
+                    self.assertEqual(closure["counts"]["residue_by_bucket"][bucket], per_bucket[bucket])
+                self.assertEqual(closure["counts"]["f1"], per_class["unbound-field-selector"])
+                self.assertEqual(closure["counts"]["f2"], per_class["skill-entry-primary-bytes-unestablished"] + per_class["native-skill-entry-witness-unverified"])
+                if code == "original-source-entry-identity-unbound":
+                    self.assertEqual(next(r for r in closure["rows"] if r["slot"] == row["slot"] and r["repository_or_entry"] == compact.canonical(row["repository_or_entry"]))["origin_pointer"], "unresolved")
+                row["disposition"] = "TRIAL"
+                row.pop("pending", None)
+                action, _ = case.closure_build()
+                # Native skill entries additionally fail their existing PENDING-only guard.
+                expected = "native-skill-entry-witness-unverified" if "skill-entry" in code else code
+                self.assertIn(expected, {item["code"] for item in action["validation"]["blockers"]})
+                action_row = next(r for r in action["rows"] if compact.decision_key(r) == compact.decision_key(row))
+                self.assertFalse(action_row.get("closure", {}).get("residue"))
+
+    def test_skill_primary_body_miss_at_both_append_sites_is_counted(self):
+        self.native_skill("d" * 64)
+        blockers = []
+        index = {name: {"sha256": digest(body), "bytes": len(body)} for name, body in self.files.items()}
+        compact.validate_native_skill_entry(self.rows[0], index, self.files, {}, blockers, compact.START_CLOSURE_PROFILE)
+        self.assertFalse(blockers)
+        self.assertEqual(self.rows[0]["closure"]["residue"][0]["reason_code"], "skill-entry-primary-bytes-unestablished")
+
+    def test_declared_residue_never_waives_action_or_survives_repaired_input(self):
+        self.residue_case("foreign-primary-pin-scope-unqualified")
+        manifest, _ = self.closure_build()
+        output = next(r for r in manifest["rows"] if r["repository_or_entry"] == compact.canonical(self.rows[0]["repository_or_entry"]))
+        self.rows[0]["closure"] = deepcopy(output["closure"])
+        self.rows[0]["disposition"] = "TRIAL"
+        with self.assertRaisesRegex(compact.CompactError, "residue can never"):
+            self.closure_build()
+        self.rows[0]["disposition"] = "WATCH"
+        self.rows[0]["pin"] = pin("example/project-0")
+        self.rows[0]["primary_sources"] = self.row("example/project-0")["primary_sources"]
+        repaired, _ = self.closure_build()
+        self.assertEqual(repaired["counts"]["residue_by_class"]["foreign-primary-pin-scope-unqualified"], 0)
+
+    def test_global_f3_requires_exact_declared_count_hash_and_keeps_action_ids(self):
+        extra = deepcopy(self.rows[0]["source_refs"][0])
+        extra["occurrence_id"] = "outside-declared-union:1"
+        self.rows[0]["source_refs"].append(extra)
+        strict, _ = self.build()
+        self.assertIn("occurrences-outside-declared-union", {item["code"] for item in strict["validation"]["blockers"]})
+        unapproved, _ = self.closure_build()
+        self.assertIn("occurrences-outside-declared-union", {item["code"] for item in unapproved["validation"]["blockers"]})
+        omission = self.closure_omission("occurrences-outside-declared-union")
+        omission.update(cc_disposition_id="G5-F3", occurrence_ids_sha256=digest(compact.json_text([extra["occurrence_id"]], indent=2).encode()))
+        for disposition in ("WATCH", "TRIAL"):
+            self.rows[0]["disposition"] = disposition
+            manifest, _ = self.closure_build()
+            self.assertEqual(manifest["validation"]["status"], "PASS")
+            self.assertEqual(manifest["counts"]["f3"], 1)
+            self.assertEqual(manifest["coverage"]["outside_declared_union"]["occurrence_ids"], [extra["occurrence_id"]])
+            self.assertFalse(self.rows[0].get("closure", {}).get("residue"))
+        omission["count"] = 2
+        with self.assertRaisesRegex(compact.CompactError, "count/hash"):
+            self.closure_build()
+        omission["count"] = 1
+        omission["occurrence_ids_sha256"] = "d" * 64
+        with self.assertRaisesRegex(compact.CompactError, "count/hash"):
+            self.closure_build()
+        self.rows[0]["source_refs"].pop()
+        with self.assertRaisesRegex(compact.CompactError, "count/hash"):
+            self.closure_build()
+        self.coverage["omissions"].append(deepcopy(omission))
+        with self.assertRaisesRegex(compact.CompactError, "duplicate G5-F3"):
+            self.closure_build()
+
+    def scoped_occurrence(self):
+        population = self.coverage["list_populations"][0]
+        body = b"# Pinned list\n## Declared section\n- [Candidate](https://github.com/example/project-0)\n## Next section\n"
+        self.files[population["archive_member"]] = body
+        population["capture_sha256"] = digest(body)
+        census = json.loads(self.files["captures/list-census.json"])
+        original = {"source_repository": "example/awesome", "source_pin": "b" * 40, "source_path": "README.md",
+                    "source_content_sha256": digest(body), "source_line": 3, "entry_text": body.decode().splitlines()[2],
+                    "source_heading": "Pinned list / Declared section"}
+        census["rows"][0] = original
+        self.files["captures/list-census.json"] = raw(census)
+        for occurrence in population["expected_occurrences"]:
+            occurrence["capture_sha256"] = digest(self.files["captures/list-census.json"])
+        for ref in self.rows[0]["source_refs"]:
+            ref["sha256"] = digest(self.files["captures/list-census.json"])
+        self.add_authority_witnesses()
+        proof = {name: deepcopy(population[name]) for name in compact.POPULATION_FACTS}
+        proof.update(section_heading="## Declared section", section_start=2, section_end=3,
+                     section_sha256=digest(b"".join(body.splitlines(keepends=True)[1:3])), line_sha256=digest(body.splitlines(keepends=True)[2]),
+                     boundary_witness=self.witness("declared-boundary", original),
+                     slot_witness=self.witness("declared-slot", {"repository": "example/project-0", "layer_ids": "native-clients", "source_pin": "b" * 40,
+                                                               "input_id": "list-screen:example/awesome:README.md:3"}),
+                     field_witness=self.witness("declared-field", {"catalog": "foundation", "slot": "native-clients"}),
+                     commit_witness=self.witness("primary-commit", {"sha": "b" * 40, "commit": {"tree": {"sha": "c" * 40}}}),
+                     tree_witness=self.witness("primary-tree", {"sha": "c" * 40, "truncated": False,
+                         "tree": [{"path": "README.md", "type": "blob", "sha": hashlib.sha1(b"blob " + str(len(body)).encode() + b"\0" + body).hexdigest()}]}))
+        population["expected_occurrences"][0]["scope_witness"] = self.witness("scope-proof", proof)
+        self.add_authority_witnesses()
+        self.rows[0]["disposition"] = "TRIAL"
+        return proof
+
+    def test_action_list_scope_binds_primary_section_pin_blob_and_declared_selector(self):
+        proof = self.scoped_occurrence()
+        manifest, _ = self.closure_build()
+        self.assertEqual(manifest["validation"]["status"], "PASS")
+        self.assertEqual(manifest["counts"]["counted_inventory"], 0)
+        for changed in ({"section_end": 4}, {"section_start": 4}, {"capture_sha256": "d" * 64}, {"line_sha256": "d" * 64}):
+            with self.subTest(changed=changed):
+                altered = proof | changed
+                self.coverage["list_populations"][0]["expected_occurrences"][0]["scope_witness"] = self.witness("scope-proof", altered)
+                self.add_authority_witnesses()
+                failed, _ = self.closure_build()
+                self.assertIn("original-list-occurrence-scope-unverified", {b["code"] for b in failed["validation"]["blockers"]})
+        proof["slot_witness"] = self.witness("declared-slot", {"repository": "example/project-0", "layer_ids": "workers", "source_pin": "b" * 40,
+                                                               "input_id": "list-screen:example/awesome:README.md:3"})
+        self.coverage["list_populations"][0]["expected_occurrences"][0]["scope_witness"] = self.witness("scope-proof", proof)
+        self.add_authority_witnesses()
+        failed, _ = self.closure_build()
+        self.assertIn("original-list-occurrence-scope-unverified", {b["code"] for b in failed["validation"]["blockers"]})
+
+    def test_action_list_scope_hash_mismatch_remains_a_byte_integrity_error(self):
+        self.scoped_occurrence()
+        self.coverage["list_populations"][0]["expected_occurrences"][0]["scope_witness"]["sha256"] = "d" * 64
+        self.add_authority_witnesses()
+        with self.assertRaisesRegex(compact.CompactError, "capture"):
+            self.closure_build()
 
     def closure_missing_list(self):
         omission = self.closure_omission("missing-list-capture")

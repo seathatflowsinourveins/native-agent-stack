@@ -230,6 +230,19 @@ class NativeSamplerTests(unittest.TestCase):
             self.assertFalse(packet["family_review"]["zero_defects_established"])
             self.assertEqual(packet["acceptance_number"], 0)
 
+    def test_source_residue_buckets_join_seeded_pin_and_locator_strata(self):
+        for bucket, reason in (("PENDING-PIN", "foreign-primary-pin-scope-unqualified"), ("PENDING-LOCATOR", "unsupported-json-pointer-capture")):
+            row = self.add_row("WATCH")
+            row["closure"] = {"residue": [{"reason_code": reason, "bucket": bucket, "count": 1, "measurement": "Verify retained primary source"}]}
+        rows, origins, fragments = self.validated()
+        packets = sampler.select(rows, origins, fragments, list(self.native.CLASSES), self.r3)
+        for bucket in ("PENDING-PIN", "PENDING-LOCATOR"):
+            self.assertEqual(self.bucket(packets, bucket)["selected_count"], 1)
+        for row in self.rows:
+            row["disposition"] = "TRIAL"
+        with self.assertRaises((ValueError, ValidationError, self.native.CompactError)):
+            self.validated()
+
     def test_conflicts_are_uncapped_census_and_excluded_from_all_samples(self):
         for _ in range(70):
             self.add_row("PENDING", flags=("pending_pin", "pending_locator"), conflict=True)
