@@ -21,7 +21,9 @@
     ],
     "settings_changed": false,
     "model_route_changed": false,
-    "paired_runs_pending": true
+    "paired_runs_pending": true,
+    "role_quality_gate": "Per-role observed-call coverage required before server reduction or shared-MCP topology; invoke rates do not select candidate quality.",
+    "managed_roles_exclusion": "native-agent-stack-1a is observed owner-session bucket only"
   },
   "sources": [
     {
@@ -46,13 +48,14 @@
     },
     {
       "source_id": "invoke-snapshot",
-      "locator": "coordination/command-center/pages/adoption-now.json",
+      "locator": "coordination/ns2604-coop/lanes/overlap-token-durable/roles-table-pr910-inputs-3274c945/adoption-now-e129759fe91ffbb1.json",
       "generated_utc": "2026-10-09T01:39:38Z",
       "sha256": "e129759fe91ffbb133de2719a7d5194fe96ac65c44b222adf7fdd4d65af0e872",
       "window_hours": 24,
       "method": "docs/decisions/2026-09-26-tool-invoke-rates.md (Loki count of record)",
       "evidence_class": "native_proven",
-      "scope": "retained rolling record; original 2026-10-08 baseline not bound"
+      "scope": "immutable retained dated copy; not bound to the 2026-10-08 baseline",
+      "rolling_locator": "coordination/command-center/pages/adoption-now.json"
     },
     {
       "source_id": "private-role-coop",
@@ -96,6 +99,43 @@
       "url": "https://code.claude.com/docs/en/sub-agents#scope-mcp-servers-to-a-subagent",
       "evidence_class": "source_review",
       "scope": "prior reviewed client contract; no new runtime acceptance"
+    },
+    {
+      "source_id": "current-role-mcp-off",
+      "locator": "coordination/ns2604-coop/lanes/role-mcp-off.json",
+      "sha256": "77c91cdc0433f54ecacb070a4581ec7f20443d9d5835e7fb938f3994e6563107",
+      "version": 2,
+      "evidence_class": "source_review",
+      "scope": "CC-owned current Codex lane exclusions; effective registrations beyond exclusions unenumerated"
+    },
+    {
+      "source_id": "claude-coordinator-selection",
+      "locator": "research/coverage-gap-20261008/O3/per-role-review-20261008/draft/adoption/mcp/roles/coordinator.claude.selection.json",
+      "sha256": "a44935bd08dbfe402f8332bec9b3d55a3615986f7d440eb10965dfd7a3c1a903",
+      "evidence_class": "source_review",
+      "scope": "12-component selection contract; native materialization and observed-call coverage required"
+    },
+    {
+      "source_id": "cc-identity",
+      "locator": "coordination/command-center/cc-tools/ITEM-native-agent-stack-99-20261008T021058Z.md:4",
+      "sha256": "0a17230d27c875c5abdee9ef31aa212dd82051c1ba4e28beee4db7a09e8606cc",
+      "evidence_class": "source_review",
+      "scope": "CC item originates from wsl-architecture-design; designated read confirms CC bucket"
+    },
+    {
+      "source_id": "claude-native-fields",
+      "locator": "installed Claude Code 2.1.295 --help and embedded stdio schema at byte offset 207499116",
+      "schema_span_sha256": "98c935556619bbd70ec55ddd7b923bb1b8ff797de883af82e9af1401f47e1cc9",
+      "evidence_class": "source_review",
+      "scope": "alwaysLoad controls prompt deferral; true waits up to 5s for connection; no memory acceptance"
+    },
+    {
+      "source_id": "codex-profile",
+      "url": "https://developers.openai.com/codex/config-reference",
+      "native_readback": "codex-cli 0.161.0; -p, --profile <CONFIG_PROFILE_V2>",
+      "checked_at": "2026-10-09",
+      "evidence_class": "source_review",
+      "scope": "independent process configuration profile; no host configuration read or change"
     }
   ],
   "slots": [
@@ -112,10 +152,18 @@
       "slot_id": "research-episodes",
       "current_choice": null,
       "status": "PENDING_G5_FINAL_CHOICE",
-      "prior_documented_choice": "hindsight",
-      "alternatives": [],
+      "prior_documented_choice": null,
+      "alternatives": [
+        {
+          "tool_id": "hindsight",
+          "disposition": "unqualified; existing research bank contract is not candidate acceptance",
+          "ranking": "G5 pending"
+        }
+      ],
       "checked_at": "2026-10-09",
-      "overturn_when": "G5 upstream evidence or a vendor release changes the job/quality/transport contract; retain dated primary sources and re-open only the affected slot"
+      "overturn_when": "G5 upstream evidence or a vendor release changes the job/quality/transport contract; retain dated primary sources and re-open only the affected slot",
+      "prior_disposition": "unqualified",
+      "catalog_locator": "catalogs/landscape/foundation.json#/layers/7/alternatives/7"
     },
     {
       "slot_id": "scoped-documents",
@@ -136,19 +184,18 @@
           "tool_id": "jcodemunch",
           "ranking": "pending G5",
           "disposition": "alternative_pending_G5_not_parallel_default"
+        },
+        {
+          "tool_id": "codebase-memory-mcp",
+          "ranking": "catalog conditional; G5 pending",
+          "disposition": "conditional graph questions or language-server gap; no separate default slot",
+          "catalog_locator": "catalogs/landscape/foundation.json#/layers/4/alternatives/3"
         }
       ],
       "checked_at": "2026-10-09",
-      "overturn_when": "G5 upstream evidence or a vendor release changes the job/quality/transport contract; retain dated primary sources and re-open only the affected slot"
-    },
-    {
-      "slot_id": "static-relationships",
-      "current_choice": null,
-      "status": "PENDING_G5_FINAL_CHOICE",
-      "prior_documented_choice": "codebase-memory-mcp",
-      "alternatives": [],
-      "checked_at": "2026-10-09",
-      "overturn_when": "G5 upstream evidence or a vendor release changes the job/quality/transport contract; retain dated primary sources and re-open only the affected slot"
+      "overturn_when": "G5 upstream evidence or a vendor release changes the job/quality/transport contract; retain dated primary sources and re-open only the affected slot",
+      "prior_disposition": "catalog_winner",
+      "catalog_locator": "catalogs/landscape/foundation.json#/layers/4/winners/0"
     },
     {
       "slot_id": "conceptual-code-retrieval",
@@ -166,19 +213,27 @@
       "overturn_when": "G5 upstream evidence or a vendor release changes the job/quality/transport contract; retain dated primary sources and re-open only the affected slot"
     },
     {
-      "slot_id": "bounded-output-processing",
+      "slot_id": "bounded-artifact-compression",
       "current_choice": null,
       "status": "PENDING_G5_FINAL_CHOICE",
-      "prior_documented_choice": "context-mode",
+      "prior_documented_choice": "headroom",
       "alternatives": [
         {
-          "tool_id": "headroom",
-          "ranking": "pending G5",
-          "disposition": "alternative_pending_G5_not_parallel_default"
+          "tool_id": "context-mode",
+          "disposition": "measured_tradeoff; qualified processing contract only",
+          "ranking": "G5 pending",
+          "catalog_locator": "catalogs/landscape/foundation.json#/layers/9/alternatives/0"
         }
       ],
       "checked_at": "2026-10-09",
-      "overturn_when": "G5 upstream evidence or a vendor release changes the job/quality/transport contract; retain dated primary sources and re-open only the affected slot"
+      "overturn_when": "G5 upstream evidence or a vendor release changes the job/quality/transport contract; retain dated primary sources and re-open only the affected slot",
+      "prior_disposition": "catalog_winner",
+      "catalog_locator": "catalogs/landscape/foundation.json#/layers/9/winners/1",
+      "layer_winners": [
+        "rtk",
+        "headroom",
+        "ccusage"
+      ]
     },
     {
       "slot_id": "command-output-formatting",
@@ -219,11 +274,34 @@
     {
       "slot_id": "agent-coordination",
       "current_choice": null,
-      "status": "PENDING_G5_FINAL_CHOICE",
-      "prior_documented_choice": "hcom",
+      "status": "PENDING_ORCH_RECORDS_COMPOSITION",
+      "prior_documented_choice": null,
       "alternatives": [],
       "checked_at": "2026-10-09",
-      "overturn_when": "G5 upstream evidence or a vendor release changes the job/quality/transport contract; retain dated primary sources and re-open only the affected slot"
+      "overturn_when": "G5 upstream evidence or a vendor release changes the job/quality/transport contract; retain dated primary sources and re-open only the affected slot",
+      "owner": "orch-records",
+      "composition_sources": [
+        "docs/decisions/2026-10-06-cc-orchestration-composition.md:78-85",
+        "docs/decisions/2026-10-08-ao-adoption.md:3-8,72-79"
+      ],
+      "mechanisms": [
+        {
+          "mechanism": "ledger plus native SendMessage",
+          "scope": "CC/co-op authorization and Claude-native messaging/liveness"
+        },
+        {
+          "mechanism": "codex queue",
+          "scope": "co-op retains native Codex dispatch"
+        },
+        {
+          "mechanism": "hcom",
+          "scope": "installed Codex lane transport; ledger-bound cross-client direction; Claude lanes outside hcom launches"
+        },
+        {
+          "mechanism": "bounded AO",
+          "scope": "dispatch/tracking/PR-CI-review feedback for AO-launched sessions; existing hcom lanes and Claude-native workers retain routes"
+        }
+      ]
     },
     {
       "slot_id": "git-github-operations",
@@ -233,6 +311,17 @@
       "alternatives": [],
       "checked_at": "2026-10-09",
       "overturn_when": "G5 upstream evidence or a vendor release changes the job/quality/transport contract; retain dated primary sources and re-open only the affected slot"
+    },
+    {
+      "slot_id": "session-archive-observation",
+      "current_choice": null,
+      "status": "PENDING_G5_FINAL_CHOICE",
+      "prior_documented_choice": "agentsview",
+      "prior_disposition": "existing task contract",
+      "deciding_source": "docs/command-center.md:55",
+      "alternatives": [],
+      "checked_at": "2026-10-09",
+      "overturn_when": "A named better-evidenced archive route meets role coverage and native qualification."
     }
   ],
   "mcp_sets": [
@@ -255,7 +344,10 @@
       "disabled_native_aliases": [],
       "cbm_profile": "all",
       "evidence": "A-control",
-      "status": "one observed full-base run; entire runtime base not enumerated by this record"
+      "status": "one observed full-base run; entire runtime base not enumerated by this record",
+      "client": "Codex",
+      "scope": "historical trial-base/source-review contract, not current deployment",
+      "current_set_source_id": "current-role-mcp-off"
     },
     {
       "set_id": "ENGINEERING",
@@ -277,7 +369,10 @@
       ],
       "cbm_profile": "all",
       "evidence": "role-review",
-      "status": "source-reviewed contract; not trialed"
+      "status": "source-reviewed contract; not trialed",
+      "client": "Codex",
+      "scope": "historical trial-base/source-review contract, not current deployment",
+      "current_set_source_id": "current-role-mcp-off"
     },
     {
       "set_id": "REVIEW",
@@ -299,7 +394,10 @@
       ],
       "cbm_profile": "analysis",
       "evidence": "role-review",
-      "status": "source-reviewed contract; not trialed"
+      "status": "source-reviewed contract; not trialed",
+      "client": "Codex",
+      "scope": "historical trial-base/source-review contract, not current deployment",
+      "current_set_source_id": "current-role-mcp-off"
     },
     {
       "set_id": "SCOUT",
@@ -321,7 +419,10 @@
       ],
       "cbm_profile": "scout",
       "evidence": "B-scout",
-      "status": "one observed run; paired acceptance pending"
+      "status": "one observed run; paired acceptance pending",
+      "client": "Codex",
+      "scope": "historical trial-base/source-review contract, not current deployment",
+      "current_set_source_id": "current-role-mcp-off"
     },
     {
       "set_id": "ARTIFACT",
@@ -343,7 +444,10 @@
       ],
       "cbm_profile": "off",
       "evidence": "B-artifact",
-      "status": "one observed run; paired acceptance pending"
+      "status": "one observed run; paired acceptance pending",
+      "client": "Codex",
+      "scope": "historical trial-base/source-review contract, not current deployment",
+      "current_set_source_id": "current-role-mcp-off"
     },
     {
       "set_id": "EVALUATION",
@@ -365,7 +469,10 @@
       ],
       "cbm_profile": "analysis",
       "evidence": "role-review",
-      "status": "source-reviewed contract; not trialed"
+      "status": "source-reviewed contract; not trialed",
+      "client": "Codex",
+      "scope": "historical trial-base/source-review contract, not current deployment",
+      "current_set_source_id": "current-role-mcp-off"
     },
     {
       "set_id": "TOKEN-PARITY-PARENT",
@@ -387,7 +494,10 @@
       ],
       "cbm_profile": "off",
       "evidence": "C-token-parity",
-      "status": "explicit phase-specific trial exception; no fleet default change"
+      "status": "explicit phase-specific trial exception; no fleet default change",
+      "client": "Codex",
+      "scope": "historical trial-base/source-review contract, not current deployment",
+      "current_set_source_id": "current-role-mcp-off"
     }
   ],
   "roles": [
@@ -402,7 +512,11 @@
         "context-mode",
         "hcom",
         "git-gh",
-        "grafana-observation"
+        "grafana-observation",
+        "agentsview",
+        "chrome-devtools",
+        "serena",
+        "socraticode"
       ],
       "conditional_alternatives": [],
       "expectation_evidence_class": "source_review",
@@ -412,7 +526,7 @@
       "deployment_status": "unchanged; role-table does not apply a launch delta",
       "exact_effective_host_mcp_set": "unmeasured",
       "native_child_scope": "tool/instruction carrier is separate from independent-process MCP startup selection",
-      "snapshot_binding": "unknown; wsl-architecture-design bucket alias unverified",
+      "snapshot_binding": "wsl-architecture-design; CC item and designated read establish identity",
       "per_tool_memory_reference": "tools[].stages.wiring.memory",
       "shared_copy_reference": "tools[].stages.wiring.shared_copy",
       "fresh_session_task": {
@@ -420,7 +534,40 @@
         "status": "not run by this record",
         "prompt_contains_tool_names": false
       },
-      "remaining_gaps": []
+      "remaining_gaps": [],
+      "client": "Claude Code",
+      "client_basis": "client-specific designated role read",
+      "process_set_scope": "trial analogue/candidate; native selection follows client_selection_contracts",
+      "current_set_source_id": null,
+      "current_lane_binding": null,
+      "current_set_status": "current set retained; selection unmaterialized or client unmeasured",
+      "observed_call_coverage_gate": {
+        "source_id": "invoke-snapshot",
+        "sha256": "e129759fe91ffbb133de2719a7d5194fe96ac65c44b222adf7fdd4d65af0e872",
+        "source_pointer": "#/claude_by_role/wsl-architecture-design",
+        "observed_calls_by_native_server": {
+          "agentsview": 6,
+          "ai-memory": 6,
+          "chrome-devtools": 39,
+          "grafana": 27,
+          "plugin_context-mode_context-mode": 2012,
+          "qmd": 1,
+          "serena": 14,
+          "socraticode": 2
+        },
+        "required_native_servers": [
+          "agentsview",
+          "ai-memory",
+          "chrome-devtools",
+          "grafana",
+          "plugin_context-mode_context-mode",
+          "qmd",
+          "serena",
+          "socraticode"
+        ],
+        "status": "covered_by_role_specific_selection_contract; effective registrations unmeasured",
+        "acceptance": "Retain all observed necessary servers and archive route. The prior 12-component contract alone cannot pass. Resolve exact existing aliases before strict materialization."
+      }
     },
     {
       "role_id": "co-op",
@@ -432,7 +579,8 @@
         "hcom",
         "git-gh",
         "grafana-observation",
-        "chrome-devtools"
+        "chrome-devtools",
+        "agentsview"
       ],
       "conditional_alternatives": [],
       "expectation_evidence_class": "source_review",
@@ -450,7 +598,31 @@
         "status": "not run by this record",
         "prompt_contains_tool_names": false
       },
-      "remaining_gaps": []
+      "remaining_gaps": [],
+      "client": "Claude Code",
+      "client_basis": "client-specific designated role read",
+      "process_set_scope": "trial analogue/candidate; native selection follows client_selection_contracts",
+      "current_set_source_id": null,
+      "current_lane_binding": null,
+      "current_set_status": "current set retained; selection unmaterialized or client unmeasured",
+      "observed_call_coverage_gate": {
+        "source_id": "invoke-snapshot",
+        "sha256": "e129759fe91ffbb133de2719a7d5194fe96ac65c44b222adf7fdd4d65af0e872",
+        "source_pointer": "#/claude_by_role/ns2604-coop",
+        "observed_calls_by_native_server": {
+          "chrome-devtools": 133,
+          "grafana": 43,
+          "plugin_context-mode_context-mode": 209
+        },
+        "required_native_servers": [
+          "chrome-devtools",
+          "grafana",
+          "plugin_context-mode_context-mode",
+          "agentsview"
+        ],
+        "status": "covered_by_role_specific_selection_contract; effective registrations unmeasured",
+        "acceptance": "Retain all observed necessary servers and archive route. The prior 12-component contract alone cannot pass. Resolve exact existing aliases before strict materialization."
+      }
     },
     {
       "role_id": "lander-5f",
@@ -478,7 +650,21 @@
         "status": "not run by this record",
         "prompt_contains_tool_names": false
       },
-      "remaining_gaps": []
+      "remaining_gaps": [],
+      "client": "Claude Code",
+      "client_basis": "client-specific designated role read",
+      "process_set_scope": "trial analogue/candidate; native selection follows client_selection_contracts",
+      "current_set_source_id": null,
+      "current_lane_binding": null,
+      "current_set_status": "current set retained; selection unmaterialized or client unmeasured",
+      "observed_call_coverage_gate": {
+        "source_id": "invoke-snapshot",
+        "sha256": "e129759fe91ffbb133de2719a7d5194fe96ac65c44b222adf7fdd4d65af0e872",
+        "observed_calls_by_native_server": null,
+        "required_native_servers": null,
+        "status": "unmeasured; no dedicated verified bucket",
+        "acceptance": "Preserve current server set; establish actual role/client/lane evidence before reduction."
+      }
     },
     {
       "role_id": "99",
@@ -510,7 +696,21 @@
         "status": "not run by this record",
         "prompt_contains_tool_names": false
       },
-      "remaining_gaps": []
+      "remaining_gaps": [],
+      "client": "unresolved",
+      "client_basis": "private investigation brief does not establish running native client",
+      "process_set_scope": "trial analogue/candidate; native selection follows client_selection_contracts",
+      "current_set_source_id": null,
+      "current_lane_binding": null,
+      "current_set_status": "current set retained; selection unmaterialized or client unmeasured",
+      "observed_call_coverage_gate": {
+        "source_id": "invoke-snapshot",
+        "sha256": "e129759fe91ffbb133de2719a7d5194fe96ac65c44b222adf7fdd4d65af0e872",
+        "observed_calls_by_native_server": null,
+        "required_native_servers": null,
+        "status": "unmeasured; no dedicated verified bucket",
+        "acceptance": "Preserve current server set; establish actual role/client/lane evidence before reduction."
+      }
     },
     {
       "role_id": "api-actions",
@@ -540,7 +740,28 @@
       },
       "remaining_gaps": [
         "independent reviewer task evidenced; full carrier definition not established"
-      ]
+      ],
+      "client": "Claude Code",
+      "client_basis": "client-specific designated role read",
+      "process_set_scope": "trial analogue/candidate; native selection follows client_selection_contracts",
+      "current_set_source_id": null,
+      "current_lane_binding": null,
+      "current_set_status": "current set retained; selection unmaterialized or client unmeasured",
+      "observed_call_coverage_gate": {
+        "source_id": "invoke-snapshot",
+        "sha256": "e129759fe91ffbb133de2719a7d5194fe96ac65c44b222adf7fdd4d65af0e872",
+        "source_pointer": "#/claude_by_role/api-actions",
+        "observed_calls_by_native_server": {
+          "plugin_context-mode_context-mode": 213,
+          "serena": 1
+        },
+        "required_native_servers": [
+          "plugin_context-mode_context-mode",
+          "serena"
+        ],
+        "status": "covered_by_role_specific_selection_contract; effective registrations unmeasured",
+        "acceptance": "Retain all observed necessary servers and archive route. The prior 12-component contract alone cannot pass. Resolve exact existing aliases before strict materialization."
+      }
     },
     {
       "role_id": "codex-builder",
@@ -570,7 +791,21 @@
         "status": "not run by this record",
         "prompt_contains_tool_names": false
       },
-      "remaining_gaps": []
+      "remaining_gaps": [],
+      "client": "Codex",
+      "client_basis": "native Codex carrier/reader contract",
+      "process_set_scope": "trial analogue/candidate; native selection follows client_selection_contracts",
+      "current_set_source_id": "current-role-mcp-off",
+      "current_lane_binding": null,
+      "current_set_status": "hash-bound named-lane exclusions; generic role binding unmeasured",
+      "observed_call_coverage_gate": {
+        "source_id": "invoke-snapshot",
+        "sha256": "e129759fe91ffbb133de2719a7d5194fe96ac65c44b222adf7fdd4d65af0e872",
+        "observed_calls_by_native_server": null,
+        "required_native_servers": null,
+        "status": "unmeasured; no dedicated verified bucket",
+        "acceptance": "Preserve current server set; establish actual role/client/lane evidence before reduction."
+      }
     },
     {
       "role_id": "codex-reader",
@@ -603,7 +838,21 @@
       },
       "remaining_gaps": [
         "resolve reviewer/verifier alias"
-      ]
+      ],
+      "client": "Codex",
+      "client_basis": "native Codex carrier/reader contract",
+      "process_set_scope": "trial analogue/candidate; native selection follows client_selection_contracts",
+      "current_set_source_id": "current-role-mcp-off",
+      "current_lane_binding": null,
+      "current_set_status": "hash-bound named-lane exclusions; generic role binding unmeasured",
+      "observed_call_coverage_gate": {
+        "source_id": "invoke-snapshot",
+        "sha256": "e129759fe91ffbb133de2719a7d5194fe96ac65c44b222adf7fdd4d65af0e872",
+        "observed_calls_by_native_server": null,
+        "required_native_servers": null,
+        "status": "unmeasured; no dedicated verified bucket",
+        "acceptance": "Preserve current server set; establish actual role/client/lane evidence before reduction."
+      }
     },
     {
       "role_id": "codex-researcher",
@@ -636,7 +885,21 @@
         "status": "not run by this record",
         "prompt_contains_tool_names": false
       },
-      "remaining_gaps": []
+      "remaining_gaps": [],
+      "client": "Codex",
+      "client_basis": "native Codex carrier/reader contract",
+      "process_set_scope": "trial analogue/candidate; native selection follows client_selection_contracts",
+      "current_set_source_id": "current-role-mcp-off",
+      "current_lane_binding": null,
+      "current_set_status": "hash-bound named-lane exclusions; generic role binding unmeasured",
+      "observed_call_coverage_gate": {
+        "source_id": "invoke-snapshot",
+        "sha256": "e129759fe91ffbb133de2719a7d5194fe96ac65c44b222adf7fdd4d65af0e872",
+        "observed_calls_by_native_server": null,
+        "required_native_servers": null,
+        "status": "unmeasured; no dedicated verified bucket",
+        "acceptance": "Preserve current server set; establish actual role/client/lane evidence before reduction."
+      }
     },
     {
       "role_id": "codex-scout",
@@ -666,7 +929,21 @@
       },
       "remaining_gaps": [
         "native Codex scout carrier not established; trial proves independent-process role only"
-      ]
+      ],
+      "client": "Codex",
+      "client_basis": "native Codex carrier/reader contract",
+      "process_set_scope": "trial analogue/candidate; native selection follows client_selection_contracts",
+      "current_set_source_id": "current-role-mcp-off",
+      "current_lane_binding": "overlap-token",
+      "current_set_status": "hash-bound named-lane exclusions; generic role binding unmeasured",
+      "observed_call_coverage_gate": {
+        "source_id": "invoke-snapshot",
+        "sha256": "e129759fe91ffbb133de2719a7d5194fe96ac65c44b222adf7fdd4d65af0e872",
+        "observed_calls_by_native_server": null,
+        "required_native_servers": null,
+        "status": "unmeasured; no dedicated verified bucket",
+        "acceptance": "Preserve current server set; establish actual role/client/lane evidence before reduction."
+      }
     },
     {
       "role_id": "exec-readers",
@@ -694,7 +971,42 @@
         "status": "not run by this record",
         "prompt_contains_tool_names": false
       },
-      "remaining_gaps": []
+      "remaining_gaps": [],
+      "client": "Codex",
+      "client_basis": "native Codex carrier/reader contract",
+      "process_set_scope": "trial analogue/candidate; native selection follows client_selection_contracts",
+      "current_set_source_id": "current-role-mcp-off",
+      "current_lane_binding": null,
+      "current_set_status": "hash-bound named-lane exclusions; generic role binding unmeasured",
+      "observed_call_coverage_gate": {
+        "source_id": "invoke-snapshot",
+        "sha256": "e129759fe91ffbb133de2719a7d5194fe96ac65c44b222adf7fdd4d65af0e872",
+        "source_pointer": "#/codex_by_lane/exec readers",
+        "observed_calls_by_native_server": {
+          "ai-memory": 3,
+          "codebase-memory-mcp": 200,
+          "context-mode": 2992,
+          "headroom": 1,
+          "hindsight": 1,
+          "promptfoo": 2,
+          "semble": 1,
+          "serena": 136,
+          "socraticode": 2
+        },
+        "required_native_servers": [
+          "ai-memory",
+          "codebase-memory-mcp",
+          "context-mode",
+          "headroom",
+          "hindsight",
+          "promptfoo",
+          "semble",
+          "serena",
+          "socraticode"
+        ],
+        "status": "phase_binding_unmeasured; preserve necessary capabilities",
+        "acceptance": "ARTIFACT/REVIEW alone misses observed servers. Bind actual phase and lane; aggregate use does not override live exclusions or imply universal defaults."
+      }
     }
   ],
   "tools": [
@@ -708,13 +1020,14 @@
         "final_candidate": {
           "status": "PENDING_G5",
           "slot_id": "coding-decisions",
-          "prior_disposition": "current-documented-choice",
-          "catalog_locator": "catalogs/landscape/foundation.json#/layers/durable-memory",
-          "overlap_disposition": "one prior documented choice; final slot adjudication pending G5"
+          "prior_disposition": "catalog_winner",
+          "catalog_locator": "catalogs/landscape/foundation.json#/layers/7/winners/0",
+          "overlap_disposition": "catalog disposition catalog_winner; final G5 pending; existing install/source supplements retain separate scope",
+          "catalog_locator_scope": "historical catalog verdict, not new G5 acceptance"
         },
         "wiring": {
           "status": "record_existing_contract_only",
-          "install_source": "https://github.com/akitaonrails/ai-memory/blob/433a19f3d54dea287571b1423591db2a89965fa9/README.md#L197",
+          "install_source": "https://github.com/akitaonrails/ai-memory/blob/433a19f3d54dea287571b1423591db2a89965fa9/docs/install.md#L1518",
           "install_commands": [
             "gh release download v2.4.1 --repo akitaonrails/ai-memory --pattern ai-memory-linux-x86_64.tar.gz --dir \"$OWNED_DOWNLOAD_DIR\"",
             "tar -xf \"$OWNED_DOWNLOAD_DIR/ai-memory-linux-x86_64.tar.gz\" -C \"$OWNED_PREFIX\""
@@ -731,12 +1044,14 @@
           },
           "shared_copy": {
             "capability": "native_shared_http",
-            "source": "https://github.com/akitaonrails/ai-memory/blob/433a19f3d54dea287571b1423591db2a89965fa9/docs/install.md#L83",
+            "source": "https://github.com/akitaonrails/ai-memory/blob/433a19f3d54dea287571b1423591db2a89965fa9/docs/install.md#L793",
             "evidence_class": "source_review",
             "fresh_concurrent_client_acceptance": "unmeasured"
           },
-          "role_loading": "unchanged until paired runs; stage_policy.alwaysLoad_false",
-          "portable_or_inspected_transport": "http"
+          "role_loading": "current sets retained; client selection and observed-call coverage govern processes; alwaysLoad controls Claude prompt deferral only",
+          "portable_or_inspected_transport": "http",
+          "release_asset_source": "https://github.com/akitaonrails/ai-memory/releases/tag/v2.4.1",
+          "install_source_scope": "Primary release assets contain the native archive; vendor cookbook documents the mise GitHub binary backend and checksum sidecar."
         },
         "fresh_session": {
           "status": "unmeasured",
@@ -745,7 +1060,7 @@
         "invoke_measurement": {
           "source_id": "invoke-snapshot",
           "baseline_date": "2026-10-08",
-          "baseline_status": "unmeasured_missing_named_baseline",
+          "baseline_status": "unmeasured_not_bound_to_named_2026_10_08_baseline",
           "delta": null
         }
       },
@@ -767,9 +1082,10 @@
         "final_candidate": {
           "status": "PENDING_G5",
           "slot_id": "scoped-documents",
-          "prior_disposition": "current-documented-choice",
-          "catalog_locator": "catalogs/landscape/foundation.json#/layers/document-retrieval",
-          "overlap_disposition": "one prior documented choice; final slot adjudication pending G5"
+          "prior_disposition": "catalog_winner",
+          "catalog_locator": "catalogs/landscape/foundation.json#/layers/5/winners/0",
+          "overlap_disposition": "catalog disposition catalog_winner; final G5 pending; existing install/source supplements retain separate scope",
+          "catalog_locator_scope": "historical catalog verdict, not new G5 acceptance"
         },
         "wiring": {
           "status": "record_existing_contract_only",
@@ -793,7 +1109,7 @@
             "evidence_class": "source_review",
             "fresh_concurrent_client_acceptance": "unmeasured"
           },
-          "role_loading": "unchanged until paired runs; stage_policy.alwaysLoad_false",
+          "role_loading": "current sets retained; client selection and observed-call coverage govern processes; alwaysLoad controls Claude prompt deferral only",
           "portable_or_inspected_transport": "http"
         },
         "fresh_session": {
@@ -803,7 +1119,7 @@
         "invoke_measurement": {
           "source_id": "invoke-snapshot",
           "baseline_date": "2026-10-08",
-          "baseline_status": "unmeasured_missing_named_baseline",
+          "baseline_status": "unmeasured_not_bound_to_named_2026_10_08_baseline",
           "delta": null
         }
       },
@@ -820,13 +1136,14 @@
         "final_candidate": {
           "status": "PENDING_G5",
           "slot_id": "exact-source-navigation",
-          "prior_disposition": "current-documented-choice",
-          "catalog_locator": "catalogs/landscape/foundation.json#/layers/code-navigation",
-          "overlap_disposition": "one prior documented choice; final slot adjudication pending G5"
+          "prior_disposition": "catalog_winner",
+          "catalog_locator": "catalogs/landscape/foundation.json#/layers/4/winners/0",
+          "overlap_disposition": "catalog disposition catalog_winner; final G5 pending; existing install/source supplements retain separate scope",
+          "catalog_locator_scope": "historical catalog verdict, not new G5 acceptance"
         },
         "wiring": {
           "status": "record_existing_contract_only",
-          "install_source": "https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/README.md#L220",
+          "install_source": "https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/README.md#L226",
           "install_commands": [
             "UV_TOOL_DIR=\"$OWNED_PREFIX/uv-tools\" UV_TOOL_BIN_DIR=\"$OWNED_PREFIX/bin\" uv tool install --python 3.13 git+https://github.com/oraios/serena@c6fbd1c5932df2494ffa0020af5a9fbe80b82143"
           ],
@@ -842,12 +1159,18 @@
           },
           "shared_copy": {
             "capability": "native_http_same_worktree_conditional",
-            "source": "https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/src/serena/mcp.py#L380",
+            "source": "https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/src/serena/cli.py#L275",
             "evidence_class": "source_review",
-            "fresh_concurrent_client_acceptance": "unmeasured"
+            "fresh_concurrent_client_acceptance": "unmeasured",
+            "project_scope_source": "https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/src/serena/cli.py#L369"
           },
-          "role_loading": "unchanged until paired runs; stage_policy.alwaysLoad_false",
-          "portable_or_inspected_transport": "stdio"
+          "role_loading": "current sets retained; client selection and observed-call coverage govern processes; alwaysLoad controls Claude prompt deferral only",
+          "portable_or_inspected_transport": "stdio",
+          "vendor_default_install_commands": [
+            "uv tool install -p 3.13 serena-agent",
+            "serena init"
+          ],
+          "install_source_scope": "README registry route versus retained pinned Git/uv recipe; neither executes in this record."
         },
         "fresh_session": {
           "status": "unmeasured",
@@ -856,7 +1179,7 @@
         "invoke_measurement": {
           "source_id": "invoke-snapshot",
           "baseline_date": "2026-10-08",
-          "baseline_status": "unmeasured_missing_named_baseline",
+          "baseline_status": "unmeasured_not_bound_to_named_2026_10_08_baseline",
           "delta": null
         }
       },
@@ -872,10 +1195,11 @@
       "stages": {
         "final_candidate": {
           "status": "PENDING_G5",
-          "slot_id": "static-relationships",
-          "prior_disposition": "current-documented-choice",
-          "catalog_locator": "catalogs/landscape/foundation.json#/layers/code-navigation",
-          "overlap_disposition": "one prior documented choice; final slot adjudication pending G5"
+          "slot_id": "exact-source-navigation",
+          "prior_disposition": "conditional",
+          "catalog_locator": "catalogs/landscape/foundation.json#/layers/4/alternatives/3",
+          "overlap_disposition": "catalog disposition conditional; final G5 pending; existing install/source supplements retain separate scope",
+          "catalog_locator_scope": "historical catalog verdict, not new G5 acceptance"
         },
         "wiring": {
           "status": "record_existing_contract_only",
@@ -900,7 +1224,7 @@
             "evidence_class": "source_review",
             "fresh_concurrent_client_acceptance": "unmeasured"
           },
-          "role_loading": "unchanged until paired runs; stage_policy.alwaysLoad_false",
+          "role_loading": "current sets retained; client selection and observed-call coverage govern processes; alwaysLoad controls Claude prompt deferral only",
           "portable_or_inspected_transport": "stdio"
         },
         "fresh_session": {
@@ -910,7 +1234,7 @@
         "invoke_measurement": {
           "source_id": "invoke-snapshot",
           "baseline_date": "2026-10-08",
-          "baseline_status": "unmeasured_missing_named_baseline",
+          "baseline_status": "unmeasured_not_bound_to_named_2026_10_08_baseline",
           "delta": null
         }
       },
@@ -927,9 +1251,10 @@
         "final_candidate": {
           "status": "PENDING_G5",
           "slot_id": "conceptual-code-retrieval",
-          "prior_disposition": "current-documented-choice",
-          "catalog_locator": "catalogs/landscape/foundation.json#/layers/semantic-rag",
-          "overlap_disposition": "one prior documented choice; final slot adjudication pending G5"
+          "prior_disposition": "catalog_winner",
+          "catalog_locator": "catalogs/landscape/foundation.json#/layers/6/winners/0",
+          "overlap_disposition": "catalog disposition catalog_winner; final G5 pending; existing install/source supplements retain separate scope",
+          "catalog_locator_scope": "historical catalog verdict, not new G5 acceptance"
         },
         "wiring": {
           "status": "record_existing_contract_only",
@@ -953,7 +1278,7 @@
             "evidence_class": "source_review",
             "fresh_concurrent_client_acceptance": "unmeasured"
           },
-          "role_loading": "unchanged until paired runs; stage_policy.alwaysLoad_false",
+          "role_loading": "current sets retained; client selection and observed-call coverage govern processes; alwaysLoad controls Claude prompt deferral only",
           "portable_or_inspected_transport": "stdio"
         },
         "fresh_session": {
@@ -963,7 +1288,7 @@
         "invoke_measurement": {
           "source_id": "invoke-snapshot",
           "baseline_date": "2026-10-08",
-          "baseline_status": "unmeasured_missing_named_baseline",
+          "baseline_status": "unmeasured_not_bound_to_named_2026_10_08_baseline",
           "delta": null
         }
       },
@@ -985,9 +1310,11 @@
         "final_candidate": {
           "status": "PENDING_G5",
           "slot_id": "exact-source-navigation",
-          "prior_disposition": "alternative_pending_G5",
-          "catalog_locator": "catalogs/landscape/foundation.json#/layers/code-navigation",
-          "overlap_disposition": "alternative; no parallel default"
+          "prior_disposition": "source-reviewed role contract; G5 pending",
+          "catalog_locator": "catalogs/landscape/foundation.json#/layers/4",
+          "overlap_disposition": "layer does not imply a catalog verdict; existing phase contract only",
+          "catalog_locator_scope": "layer context only",
+          "deciding_source_id": "role-review"
         },
         "wiring": {
           "status": "record_existing_contract_only",
@@ -1011,7 +1338,7 @@
             "evidence_class": "source_review",
             "fresh_concurrent_client_acceptance": "unmeasured"
           },
-          "role_loading": "unchanged until paired runs; stage_policy.alwaysLoad_false",
+          "role_loading": "current sets retained; client selection and observed-call coverage govern processes; alwaysLoad controls Claude prompt deferral only",
           "portable_or_inspected_transport": "stdio",
           "http_extra_reference": "jcodemunch-mcp[http]==1.108.327, native pyproject.toml:84; dependencies and concurrent acceptance remain unmeasured"
         },
@@ -1022,7 +1349,7 @@
         "invoke_measurement": {
           "source_id": "invoke-snapshot",
           "baseline_date": "2026-10-08",
-          "baseline_status": "unmeasured_missing_named_baseline",
+          "baseline_status": "unmeasured_not_bound_to_named_2026_10_08_baseline",
           "delta": null
         }
       },
@@ -1044,9 +1371,11 @@
         "final_candidate": {
           "status": "PENDING_G5",
           "slot_id": "conceptual-code-retrieval",
-          "prior_disposition": "alternative_pending_G5",
-          "catalog_locator": "catalogs/landscape/foundation.json#/layers/semantic-rag",
-          "overlap_disposition": "alternative; no parallel default"
+          "prior_disposition": "source-reviewed role contract; G5 pending",
+          "catalog_locator": "catalogs/landscape/foundation.json#/layers/6",
+          "overlap_disposition": "layer does not imply a catalog verdict; existing phase contract only",
+          "catalog_locator_scope": "layer context only",
+          "deciding_source_id": "role-review"
         },
         "wiring": {
           "status": "record_existing_contract_only",
@@ -1070,7 +1399,7 @@
             "evidence_class": "source_review",
             "fresh_concurrent_client_acceptance": "unmeasured"
           },
-          "role_loading": "unchanged until paired runs; stage_policy.alwaysLoad_false",
+          "role_loading": "current sets retained; client selection and observed-call coverage govern processes; alwaysLoad controls Claude prompt deferral only",
           "portable_or_inspected_transport": "stdio"
         },
         "fresh_session": {
@@ -1080,7 +1409,7 @@
         "invoke_measurement": {
           "source_id": "invoke-snapshot",
           "baseline_date": "2026-10-08",
-          "baseline_status": "unmeasured_missing_named_baseline",
+          "baseline_status": "unmeasured_not_bound_to_named_2026_10_08_baseline",
           "delta": null
         }
       },
@@ -1096,10 +1425,11 @@
       "stages": {
         "final_candidate": {
           "status": "PENDING_G5",
-          "slot_id": "bounded-output-processing",
-          "prior_disposition": "current-documented-choice",
-          "catalog_locator": "catalogs/landscape/foundation.json#/layers/token-efficiency",
-          "overlap_disposition": "one prior documented choice; final slot adjudication pending G5"
+          "slot_id": "bounded-artifact-compression",
+          "prior_disposition": "measured_tradeoff",
+          "catalog_locator": "catalogs/landscape/foundation.json#/layers/9/alternatives/0",
+          "overlap_disposition": "catalog disposition measured_tradeoff; final G5 pending; existing install/source supplements retain separate scope",
+          "catalog_locator_scope": "historical catalog verdict, not new G5 acceptance"
         },
         "wiring": {
           "status": "record_existing_contract_only",
@@ -1123,7 +1453,7 @@
             "evidence_class": "source_review",
             "fresh_concurrent_client_acceptance": "unmeasured"
           },
-          "role_loading": "unchanged until paired runs; stage_policy.alwaysLoad_false",
+          "role_loading": "current sets retained; client selection and observed-call coverage govern processes; alwaysLoad controls Claude prompt deferral only",
           "portable_or_inspected_transport": "stdio",
           "plugin_install_references": [
             "codex plugin marketplace add mksglu/context-mode --ref 6f0cc6841c687e754059f36714a11233fda1a02b --json",
@@ -1140,7 +1470,7 @@
         "invoke_measurement": {
           "source_id": "invoke-snapshot",
           "baseline_date": "2026-10-08",
-          "baseline_status": "unmeasured_missing_named_baseline",
+          "baseline_status": "unmeasured_not_bound_to_named_2026_10_08_baseline",
           "delta": null
         }
       },
@@ -1156,10 +1486,11 @@
       "stages": {
         "final_candidate": {
           "status": "PENDING_G5",
-          "slot_id": "bounded-output-processing",
-          "prior_disposition": "alternative_pending_G5",
-          "catalog_locator": "catalogs/landscape/foundation.json#/layers/token-efficiency",
-          "overlap_disposition": "alternative; no parallel default"
+          "slot_id": "bounded-artifact-compression",
+          "prior_disposition": "catalog_winner",
+          "catalog_locator": "catalogs/landscape/foundation.json#/layers/9/winners/1",
+          "overlap_disposition": "catalog disposition catalog_winner; final G5 pending; existing install/source supplements retain separate scope",
+          "catalog_locator_scope": "historical catalog verdict, not new G5 acceptance"
         },
         "wiring": {
           "status": "record_existing_contract_only",
@@ -1183,7 +1514,7 @@
             "evidence_class": "source_review",
             "fresh_concurrent_client_acceptance": "unmeasured"
           },
-          "role_loading": "unchanged until paired runs; stage_policy.alwaysLoad_false",
+          "role_loading": "current sets retained; client selection and observed-call coverage govern processes; alwaysLoad controls Claude prompt deferral only",
           "portable_or_inspected_transport": "stdio"
         },
         "fresh_session": {
@@ -1193,7 +1524,7 @@
         "invoke_measurement": {
           "source_id": "invoke-snapshot",
           "baseline_date": "2026-10-08",
-          "baseline_status": "unmeasured_missing_named_baseline",
+          "baseline_status": "unmeasured_not_bound_to_named_2026_10_08_baseline",
           "delta": null
         }
       },
@@ -1210,9 +1541,10 @@
         "final_candidate": {
           "status": "PENDING_G5",
           "slot_id": "research-episodes",
-          "prior_disposition": "current-documented-distinct-scope",
-          "catalog_locator": "catalogs/landscape/foundation.json#/layers/durable-memory",
-          "overlap_disposition": "one prior documented choice; final slot adjudication pending G5"
+          "prior_disposition": "unqualified",
+          "catalog_locator": "catalogs/landscape/foundation.json#/layers/7/alternatives/7",
+          "overlap_disposition": "catalog disposition unqualified; final G5 pending; existing install/source supplements retain separate scope",
+          "catalog_locator_scope": "historical catalog verdict, not new G5 acceptance"
         },
         "wiring": {
           "status": "record_existing_contract_only",
@@ -1237,7 +1569,7 @@
             "evidence_class": "source_review",
             "fresh_concurrent_client_acceptance": "unmeasured"
           },
-          "role_loading": "unchanged until paired runs; stage_policy.alwaysLoad_false",
+          "role_loading": "current sets retained; client selection and observed-call coverage govern processes; alwaysLoad controls Claude prompt deferral only",
           "portable_or_inspected_transport": "http"
         },
         "fresh_session": {
@@ -1247,7 +1579,7 @@
         "invoke_measurement": {
           "source_id": "invoke-snapshot",
           "baseline_date": "2026-10-08",
-          "baseline_status": "unmeasured_missing_named_baseline",
+          "baseline_status": "unmeasured_not_bound_to_named_2026_10_08_baseline",
           "delta": null
         }
       },
@@ -1264,9 +1596,11 @@
         "final_candidate": {
           "status": "PENDING_G5",
           "slot_id": "browser-inspection",
-          "prior_disposition": "current-source-contract_pending_G5",
-          "catalog_locator": "catalogs/landscape/foundation.json#/layers/mcp-surfaces",
-          "overlap_disposition": "one prior documented choice; final slot adjudication pending G5"
+          "prior_disposition": "source-reviewed role contract; G5 pending",
+          "catalog_locator": "catalogs/landscape/foundation.json#/layers/17",
+          "overlap_disposition": "layer does not imply a catalog verdict; existing phase contract only",
+          "catalog_locator_scope": "layer context only",
+          "deciding_source_id": "role-review"
         },
         "wiring": {
           "status": "record_existing_contract_only",
@@ -1290,7 +1624,7 @@
             "evidence_class": "source_review",
             "fresh_concurrent_client_acceptance": "unmeasured"
           },
-          "role_loading": "unchanged until paired runs; stage_policy.alwaysLoad_false",
+          "role_loading": "current sets retained; client selection and observed-call coverage govern processes; alwaysLoad controls Claude prompt deferral only",
           "portable_or_inspected_transport": "stdio"
         },
         "fresh_session": {
@@ -1300,7 +1634,7 @@
         "invoke_measurement": {
           "source_id": "invoke-snapshot",
           "baseline_date": "2026-10-08",
-          "baseline_status": "unmeasured_missing_named_baseline",
+          "baseline_status": "unmeasured_not_bound_to_named_2026_10_08_baseline",
           "delta": null
         }
       },
@@ -1317,9 +1651,10 @@
         "final_candidate": {
           "status": "PENDING_G5",
           "slot_id": "llm-evaluation",
-          "prior_disposition": "current-source-contract_pending_G5",
-          "catalog_locator": "catalogs/landscape/foundation.json#/layers/quality-evaluation",
-          "overlap_disposition": "one prior documented choice; final slot adjudication pending G5"
+          "prior_disposition": "catalog_winner",
+          "catalog_locator": "catalogs/landscape/foundation.json#/layers/10/winners/0",
+          "overlap_disposition": "catalog disposition catalog_winner; final G5 pending; existing install/source supplements retain separate scope",
+          "catalog_locator_scope": "historical catalog verdict, not new G5 acceptance"
         },
         "wiring": {
           "status": "record_existing_contract_only",
@@ -1343,7 +1678,7 @@
             "evidence_class": "source_review",
             "fresh_concurrent_client_acceptance": "unmeasured"
           },
-          "role_loading": "unchanged until paired runs; stage_policy.alwaysLoad_false",
+          "role_loading": "current sets retained; client selection and observed-call coverage govern processes; alwaysLoad controls Claude prompt deferral only",
           "portable_or_inspected_transport": "stdio"
         },
         "fresh_session": {
@@ -1353,7 +1688,7 @@
         "invoke_measurement": {
           "source_id": "invoke-snapshot",
           "baseline_date": "2026-10-08",
-          "baseline_status": "unmeasured_missing_named_baseline",
+          "baseline_status": "unmeasured_not_bound_to_named_2026_10_08_baseline",
           "delta": null
         }
       },
@@ -1370,13 +1705,14 @@
         "final_candidate": {
           "status": "PENDING_G5",
           "slot_id": "command-output-formatting",
-          "prior_disposition": "current-documented-choice",
-          "catalog_locator": "catalogs/landscape/foundation.json#/layers/token-efficiency",
-          "overlap_disposition": "one prior documented choice; final slot adjudication pending G5"
+          "prior_disposition": "catalog_winner",
+          "catalog_locator": "catalogs/landscape/foundation.json#/layers/9/winners/0",
+          "overlap_disposition": "catalog disposition catalog_winner; final G5 pending; existing install/source supplements retain separate scope",
+          "catalog_locator_scope": "historical catalog verdict, not new G5 acceptance"
         },
         "wiring": {
           "status": "record_existing_contract_only",
-          "install_source": "https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/README.md#L1",
+          "install_source": "https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/README.md#L103",
           "install_commands": null,
           "integration": "rtk hook <selected-client>; existing hook configuration is preserved",
           "recipe": "docs/token-practice.md",
@@ -1394,8 +1730,9 @@
             "evidence_class": "source_review",
             "fresh_concurrent_client_acceptance": "unmeasured"
           },
-          "role_loading": "unchanged until paired runs; stage_policy.alwaysLoad_false",
-          "portable_or_inspected_transport": "not-MCP"
+          "role_loading": "current sets retained; client selection and observed-call coverage govern processes; alwaysLoad controls Claude prompt deferral only",
+          "portable_or_inspected_transport": "not-MCP",
+          "integration_source": "https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/README.md#L129"
         },
         "fresh_session": {
           "status": "unmeasured",
@@ -1404,7 +1741,7 @@
         "invoke_measurement": {
           "source_id": "invoke-snapshot",
           "baseline_date": "2026-10-08",
-          "baseline_status": "unmeasured_missing_named_baseline",
+          "baseline_status": "unmeasured_not_bound_to_named_2026_10_08_baseline",
           "delta": null
         }
       },
@@ -1413,12 +1750,12 @@
     },
     {
       "tool_id": "grafana-observation",
-      "repository": "https://github.com/grafana/grafana",
-      "version": "13.2.3",
-      "source_pin": "6193dc03311b631b9727b560d24369e683dc396e",
+      "repository": "https://github.com/grafana/mcp-grafana",
+      "version": null,
+      "source_pin": "7514746a763b794ead31902b7821bf73280503b4",
       "slot_id": "operational-observation",
       "source": "docs/command-center.md#evidence-the-command-center-publishes",
-      "note": "Native Grafana HTTP service is distinct from an MCP connector; no exact MCP connector pin or registration was established.",
+      "note": "Pin is the MCP connector; Grafana server is a distinct service dependency. Connector runtime/sharing acceptance unmeasured.",
       "evidence_class": "source_review",
       "stages": {
         "final_candidate": {
@@ -1426,11 +1763,15 @@
           "slot_id": "operational-observation",
           "prior_disposition": "existing task contract",
           "catalog_locator": "G5 final row pending",
-          "overlap_disposition": "final slot disposition pending"
+          "overlap_disposition": "final slot disposition pending",
+          "deciding_sources": [
+            "docs/decisions/2026-10-08-skills-cc-lanes-picks.md:21",
+            "docs/command-center.md:45-55"
+          ]
         },
         "wiring": {
           "status": "record_existing_task_contract_only",
-          "install_source": "docs/command-center.md#evidence-the-command-center-publishes",
+          "install_source": "https://github.com/grafana/mcp-grafana/blob/7514746a763b794ead31902b7821bf73280503b4/README.md#usage",
           "install_commands": null,
           "integration": "docs/command-center.md#evidence-the-command-center-publishes",
           "recipe": "docs/command-center.md#evidence-the-command-center-publishes",
@@ -1446,7 +1787,7 @@
             "capability": "native_HTTP_service; MCP connector sharing unmeasured",
             "evidence_class": "source_review"
           },
-          "role_loading": "unchanged until paired runs; stage_policy.alwaysLoad_false"
+          "role_loading": "current sets retained; client selection and observed-call coverage govern processes; alwaysLoad controls Claude prompt deferral only"
         },
         "fresh_session": {
           "status": "unmeasured",
@@ -1455,29 +1796,39 @@
         "invoke_measurement": {
           "source_id": "invoke-snapshot",
           "baseline_date": "2026-10-08",
-          "baseline_status": "unmeasured_missing_named_baseline",
+          "baseline_status": "unmeasured_not_bound_to_named_2026_10_08_baseline",
           "delta": null
         }
       },
       "outcome": "DEFER_new_adoption_claims",
-      "adopt_now": false
+      "adopt_now": false,
+      "service_dependency": {
+        "repository": "https://github.com/grafana/grafana",
+        "version": "13.2.3",
+        "source_pin": "6193dc03311b631b9727b560d24369e683dc396e"
+      }
     },
     {
       "tool_id": "hcom",
       "repository": "https://github.com/aannoo/hcom",
       "version": "0.7.27",
-      "source_pin": null,
+      "source_pin": "2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b",
       "slot_id": "agent-coordination",
       "source": "docs/decisions/2026-10-06-hcom-relaxation.md",
-      "note": "Existing native CLI contract; no new install/invoke trial; resolve full release pin in G5 before new adoption.",
+      "note": "Tree 0.7.27 pin retained; installed hcom --version returns 0.7.28. Composition is orch-records-owned and pending here.",
       "evidence_class": "source_review",
       "stages": {
         "final_candidate": {
-          "status": "PENDING_G5",
+          "status": "PENDING_ORCH_RECORDS_COMPOSITION",
           "slot_id": "agent-coordination",
-          "prior_disposition": "existing task contract",
+          "prior_disposition": "one mechanism in composed coordination",
           "catalog_locator": "G5 final row pending",
-          "overlap_disposition": "final slot disposition pending"
+          "overlap_disposition": "final slot disposition pending",
+          "owner": "orch-records",
+          "deciding_sources": [
+            "docs/decisions/2026-10-06-cc-orchestration-composition.md:78-85",
+            "docs/decisions/2026-10-08-ao-adoption.md:3-8"
+          ]
         },
         "wiring": {
           "status": "record_existing_task_contract_only",
@@ -1497,7 +1848,7 @@
             "capability": "not_applicable_native_CLI",
             "evidence_class": "source_review"
           },
-          "role_loading": "unchanged until paired runs; stage_policy.alwaysLoad_false"
+          "role_loading": "current sets retained; client selection and observed-call coverage govern processes; alwaysLoad controls Claude prompt deferral only"
         },
         "fresh_session": {
           "status": "unmeasured",
@@ -1506,12 +1857,21 @@
         "invoke_measurement": {
           "source_id": "invoke-snapshot",
           "baseline_date": "2026-10-08",
-          "baseline_status": "unmeasured_missing_named_baseline",
+          "baseline_status": "unmeasured_not_bound_to_named_2026_10_08_baseline",
           "delta": null
         }
       },
       "outcome": "DEFER_new_adoption_claims",
-      "adopt_now": false
+      "adopt_now": false,
+      "installed_source_review": {
+        "version": "0.7.28",
+        "source_pin": "b2a7c192003e7fd67ed93265289e4ac36276f965",
+        "primary_source": "https://github.com/aannoo/hcom/blob/b2a7c192003e7fd67ed93265289e4ac36276f965/src/bootstrap.rs",
+        "record": "evidence/receipts/ao-orchestration-landscape-20261008.json:40",
+        "native_version_readback": "hcom 0.7.28",
+        "evidence_class": "source_review",
+        "scope": "version readback and cited release source; no new lifecycle run"
+      }
     },
     {
       "tool_id": "git-gh",
@@ -1548,7 +1908,7 @@
             "capability": "not_applicable_native_CLI",
             "evidence_class": "source_review"
           },
-          "role_loading": "unchanged until paired runs; stage_policy.alwaysLoad_false"
+          "role_loading": "current sets retained; client selection and observed-call coverage govern processes; alwaysLoad controls Claude prompt deferral only"
         },
         "fresh_session": {
           "status": "unmeasured",
@@ -1557,7 +1917,63 @@
         "invoke_measurement": {
           "source_id": "invoke-snapshot",
           "baseline_date": "2026-10-08",
-          "baseline_status": "unmeasured_missing_named_baseline",
+          "baseline_status": "unmeasured_not_bound_to_named_2026_10_08_baseline",
+          "delta": null
+        }
+      },
+      "outcome": "DEFER_new_adoption_claims",
+      "adopt_now": false
+    },
+    {
+      "tool_id": "agentsview",
+      "repository": "https://github.com/kenn-io/agentsview",
+      "version": "0.44.0",
+      "source_pin": "413a87f7bfbd67b2815b1119ac51abc1efbeeaba",
+      "slot_id": "session-archive-observation",
+      "source": "docs/command-center.md:55",
+      "note": "Existing archive route; CC observed six calls, co-op retains archive capability. Per-tool PSS and independent shared-client acceptance unmeasured.",
+      "evidence_class": "source_review",
+      "stages": {
+        "final_candidate": {
+          "status": "PENDING_G5",
+          "slot_id": "session-archive-observation",
+          "prior_disposition": "existing archive task contract; G5 pending",
+          "catalog_locator": "G5 final row pending",
+          "overlap_disposition": "final slot disposition pending",
+          "deciding_sources": [
+            "docs/command-center.md:55",
+            "manifests/stack.json:68-92"
+          ]
+        },
+        "wiring": {
+          "status": "record_existing_task_contract_only",
+          "install_source": "https://github.com/kenn-io/agentsview/tree/413a87f7bfbd67b2815b1119ac51abc1efbeeaba",
+          "install_commands": null,
+          "integration": "existing supervised HTTP archive/MCP route; do not launch an unsupervised copy",
+          "recipe": "docs/decisions/2026-10-06-cc-orchestration-composition.md:65",
+          "inverse_source": "adoption/lifecycle.md",
+          "inverse_policy_ref": "stage_policy.inverse_scope",
+          "memory": {
+            "per_session_pss_kb": null,
+            "status": "unmeasured",
+            "source_id": "role-trial",
+            "attribution": "lane totals have no tool binding"
+          },
+          "shared_copy": {
+            "capability": "supervised native HTTP archive service; MCP frontend grant/lifecycle/accounting unmeasured",
+            "source": "docs/decisions/2026-10-06-cc-orchestration-composition.md:65",
+            "evidence_class": "source_review"
+          },
+          "role_loading": "current sets retained; client selection and observed-call coverage govern processes; alwaysLoad controls Claude prompt deferral only"
+        },
+        "fresh_session": {
+          "status": "unmeasured",
+          "natural_tasks_ref": "roles[].fresh_session_task"
+        },
+        "invoke_measurement": {
+          "source_id": "invoke-snapshot",
+          "baseline_date": "2026-10-08",
+          "baseline_status": "unmeasured_not_bound_to_named_2026_10_08_baseline",
           "delta": null
         }
       },
@@ -1578,7 +1994,9 @@
       "evidence_class": "native_proven",
       "scope": "native root descendants plus explicit owned PIDs, excludes declared shared PIDs; after-task snapshot",
       "per_tool_attribution": "unmeasured",
-      "paired_task_acceptance": "not run"
+      "paired_task_acceptance": "not run",
+      "role_mcp_off": "skip",
+      "source_id": "role-trial"
     },
     {
       "arm": "B-scout",
@@ -1592,7 +2010,9 @@
       "evidence_class": "native_proven",
       "scope": "native root descendants plus explicit owned PIDs, excludes declared shared PIDs; after-task snapshot",
       "per_tool_attribution": "unmeasured",
-      "paired_task_acceptance": "not run"
+      "paired_task_acceptance": "not run",
+      "role_mcp_off": "skip",
+      "source_id": "role-trial"
     },
     {
       "arm": "B-artifact",
@@ -1606,7 +2026,9 @@
       "evidence_class": "native_proven",
       "scope": "native root descendants plus explicit owned PIDs, excludes declared shared PIDs; after-task snapshot",
       "per_tool_attribution": "unmeasured",
-      "paired_task_acceptance": "not run"
+      "paired_task_acceptance": "not run",
+      "role_mcp_off": "skip",
+      "source_id": "role-trial"
     },
     {
       "arm": "C-token-parity",
@@ -1620,17 +2042,17 @@
       "evidence_class": "native_proven",
       "scope": "native root descendants plus explicit owned PIDs, excludes declared shared PIDs; after-task snapshot",
       "per_tool_attribution": "unmeasured",
-      "paired_task_acceptance": "not run"
+      "paired_task_acceptance": "not run",
+      "role_mcp_off": "skip",
+      "source_id": "role-trial"
     }
   ],
   "qmd_pilot": {
     "source": "docs/decisions/2026-10-08-qmd-shared-mcp.md:70-93",
-    "two_lane_owned_before_kb": 29801,
-    "two_lane_owned_after_kb": 0,
-    "shared_before_kb": 48077,
-    "shared_after_kb": 55768,
     "individual_per_session_pss": "unmeasured",
-    "scope": "historical attributed two-lane cohort plus shared lexical service; not a split of the role-trial totals"
+    "scope": "historical attributed two-lane cohort plus shared lexical service; not a split of the role-trial totals",
+    "numerical_evidence_status": "unmeasured_here; optional figures omitted because native observer files are not bound to this retained packet",
+    "source_scope": "historical layer context only; no substitute for hash-bound numerical rows"
   },
   "invoke_projection": {
     "claude_roles": {
@@ -1652,7 +2074,7 @@
         }
       },
       "wsl-architecture-design": {
-        "alias_status": "not verified as CC",
+        "alias_status": "CC bucket: CC item source and designated read establish identity",
         "sessions": 1,
         "tool_calls": 9937,
         "servers": {
@@ -1685,7 +2107,10 @@
     },
     "generic_codex_role_attribution": "unmeasured; lane names not mapped to native role definitions",
     "baseline_delta": "unmeasured",
-    "zero_or_low_use_selection_input": false
+    "zero_or_low_use_selection_input": false,
+    "source_id": "invoke-snapshot",
+    "sha256": "e129759fe91ffbb133de2719a7d5194fe96ac65c44b222adf7fdd4d65af0e872",
+    "alias_projection_ref": "server_aliases"
   },
   "corrections": [
     {
@@ -1697,6 +2122,26 @@
       "claim": "Clean graph coverage makes heuristic destinations authoritative",
       "correction": "The scout source trace disagrees with four low-confidence destinations despite metadata_match; retain source-first caveat.",
       "source_id": "scout-result"
+    },
+    {
+      "claim": "Historical CORE equals current deployment",
+      "correction": "Trial arms used role_mcp_off=skip; live named Codex exclusions are separately hash-bound.",
+      "source_id": "current-role-mcp-off"
+    },
+    {
+      "claim": "Layer context determines a winning disposition",
+      "correction": "Use indexed verdict pointers: Context Mode measured_tradeoff, Headroom winner, CBM conditional, Hindsight unqualified. Semble/browser links are layer context only.",
+      "source": "catalogs/landscape/foundation.json#/layers"
+    },
+    {
+      "claim": "alwaysLoad selects process memory",
+      "correction": "Installed schema describes prompt deferral; native process selection and observed-call coverage govern topology.",
+      "source_id": "claude-native-fields"
+    },
+    {
+      "claim": "Secondary QMD table supplies numerical provenance here",
+      "correction": "Optional figures omitted; native numerical evidence remains unmeasured until original hash-bound rows supplied.",
+      "source": "docs/decisions/2026-10-08-qmd-shared-mcp.md:35-39,70-93"
     }
   ],
   "completeness_critic": {
@@ -1707,7 +2152,12 @@
       "per-tool four stages and memory/sharing fields",
       "source identity/version mismatches",
       "separate native child/instruction mechanism",
-      "overlap alternatives without parallel defaults"
+      "overlap alternatives without parallel defaults",
+      "live Codex exclusion hash versus trial role_mcp_off=skip",
+      "client field and per-role coverage gates retaining grafana/agentsview",
+      "native plugin alias preserved; catalog verdict pointers and composed coordination",
+      "tree/installed hcom pins and grafana connector pin",
+      "architecture locator restored; unbound QMD figures omitted"
     ],
     "remaining": [
       "G5 final candidate/slot rows",
@@ -1716,7 +2166,10 @@
       "per-tool memory attribution",
       "paired role/client tasks",
       "2026-10-08 baseline",
-      "independent shared-client lifecycle/attribution"
+      "independent shared-client lifecycle/attribution",
+      "99 native client/current lane identity",
+      "effective Claude registration readback",
+      "native QMD observer rows for this packet"
     ]
   },
   "upstream_api_limits": {
@@ -1747,7 +2200,417 @@
       "claude mcp remove --scope \"$ORIGINAL_SCOPE\" \"$SERVER_NAME\""
     ],
     "inverse_scope": "only the originating native registration/plugin/owned installation; restore retained before-image and preserve data/index/sign-ins/hooks/unrelated settings",
-    "alwaysLoad_false": "required where natively supported; actual literal-field support unqualified here and no setting written",
-    "outcome": "DEFER new final-candidate/adoption claims; existing installations unchanged. If a candidate is final and low-use: WIRE vendor route, fresh-session check, then remeasure."
+    "alwaysLoad_false": "Installed Claude Code 2.1.295 stdio schema supports optional alwaysLoad. False defers prompt tools; true waits up to 5s for connection. Neither prevents process initialization or establishes PSS savings. Process selection uses strict MCP config or qualified Codex profile/enabled layers; no setting changed.",
+    "outcome": "DEFER new final-candidate/adoption claims; existing installations unchanged. If a candidate is final and low-use: WIRE vendor route, fresh-session check, then remeasure.",
+    "role_coverage": "Per-role observed_call_coverage_gate feeds shared-MCP topology; unknown coverage cannot pass a reduction."
+  },
+  "current_codex_lane_sets": {
+    "source_id": "current-role-mcp-off",
+    "sha256": "77c91cdc0433f54ecacb070a4581ec7f20443d9d5835e7fb938f3994e6563107",
+    "version": 2,
+    "selection_contract": "Current named lane exclusions from existing host profile; not a complete registration inventory or trial set.",
+    "lanes": {
+      "codex-token-parity": {
+        "source_id": "current-role-mcp-off",
+        "source_pointer": "#/lanes/codex-token-parity",
+        "sha256": "77c91cdc0433f54ecacb070a4581ec7f20443d9d5835e7fb938f3994e6563107",
+        "mcp_off": [
+          "chrome-devtools",
+          "headroom",
+          "promptfoo",
+          "semble"
+        ]
+      },
+      "overlap-token": {
+        "source_id": "current-role-mcp-off",
+        "source_pointer": "#/lanes/overlap-token",
+        "sha256": "77c91cdc0433f54ecacb070a4581ec7f20443d9d5835e7fb938f3994e6563107",
+        "mcp_off": [
+          "semble"
+        ]
+      },
+      "github-ci-finalize": {
+        "source_id": "current-role-mcp-off",
+        "source_pointer": "#/lanes/github-ci-finalize",
+        "sha256": "77c91cdc0433f54ecacb070a4581ec7f20443d9d5835e7fb938f3994e6563107",
+        "mcp_off": [
+          "chrome-devtools",
+          "headroom",
+          "jcodemunch",
+          "promptfoo",
+          "semble",
+          "socraticode"
+        ]
+      },
+      "skills-lifecycle": {
+        "source_id": "current-role-mcp-off",
+        "source_pointer": "#/lanes/skills-lifecycle",
+        "sha256": "77c91cdc0433f54ecacb070a4581ec7f20443d9d5835e7fb938f3994e6563107",
+        "mcp_off": [
+          "chrome-devtools",
+          "headroom",
+          "jcodemunch",
+          "promptfoo",
+          "semble",
+          "socraticode"
+        ]
+      },
+      "convergence-practice": {
+        "source_id": "current-role-mcp-off",
+        "source_pointer": "#/lanes/convergence-practice",
+        "sha256": "77c91cdc0433f54ecacb070a4581ec7f20443d9d5835e7fb938f3994e6563107",
+        "mcp_off": [
+          "chrome-devtools",
+          "headroom",
+          "promptfoo",
+          "semble"
+        ]
+      },
+      "orch-records": {
+        "source_id": "current-role-mcp-off",
+        "source_pointer": "#/lanes/orch-records",
+        "sha256": "77c91cdc0433f54ecacb070a4581ec7f20443d9d5835e7fb938f3994e6563107",
+        "mcp_off": [
+          "chrome-devtools",
+          "headroom",
+          "jcodemunch",
+          "promptfoo",
+          "semble",
+          "socraticode"
+        ]
+      },
+      "fixwave-defects": {
+        "source_id": "current-role-mcp-off",
+        "source_pointer": "#/lanes/fixwave-defects",
+        "sha256": "77c91cdc0433f54ecacb070a4581ec7f20443d9d5835e7fb938f3994e6563107",
+        "mcp_off": [
+          "chrome-devtools",
+          "headroom",
+          "promptfoo",
+          "semble"
+        ]
+      },
+      "readiness-runner": {
+        "source_id": "current-role-mcp-off",
+        "source_pointer": "#/lanes/readiness-runner",
+        "sha256": "77c91cdc0433f54ecacb070a4581ec7f20443d9d5835e7fb938f3994e6563107",
+        "mcp_off": [
+          "chrome-devtools",
+          "headroom",
+          "jcodemunch",
+          "promptfoo",
+          "semble",
+          "socraticode"
+        ]
+      },
+      "grand-catalog": {
+        "source_id": "current-role-mcp-off",
+        "source_pointer": "#/lanes/grand-catalog",
+        "sha256": "77c91cdc0433f54ecacb070a4581ec7f20443d9d5835e7fb938f3994e6563107",
+        "mcp_off": [
+          "chrome-devtools",
+          "headroom",
+          "jcodemunch",
+          "promptfoo",
+          "semble",
+          "socraticode"
+        ]
+      },
+      "memory-h2h": {
+        "source_id": "current-role-mcp-off",
+        "source_pointer": "#/lanes/memory-h2h",
+        "sha256": "77c91cdc0433f54ecacb070a4581ec7f20443d9d5835e7fb938f3994e6563107",
+        "mcp_off": [
+          "chrome-devtools",
+          "headroom",
+          "promptfoo",
+          "semble"
+        ]
+      },
+      "rnd-r1": {
+        "source_id": "current-role-mcp-off",
+        "source_pointer": "#/lanes/rnd-r1",
+        "sha256": "77c91cdc0433f54ecacb070a4581ec7f20443d9d5835e7fb938f3994e6563107",
+        "mcp_off": [
+          "chrome-devtools",
+          "headroom",
+          "jcodemunch",
+          "promptfoo",
+          "semble",
+          "serena",
+          "socraticode"
+        ]
+      },
+      "currency": {
+        "source_id": "current-role-mcp-off",
+        "source_pointer": "#/lanes/currency",
+        "sha256": "77c91cdc0433f54ecacb070a4581ec7f20443d9d5835e7fb938f3994e6563107",
+        "mcp_off": [
+          "chrome-devtools",
+          "headroom",
+          "promptfoo",
+          "semble",
+          "socraticode"
+        ]
+      },
+      "layer15-build": {
+        "source_id": "current-role-mcp-off",
+        "source_pointer": "#/lanes/layer15-build",
+        "sha256": "77c91cdc0433f54ecacb070a4581ec7f20443d9d5835e7fb938f3994e6563107",
+        "mcp_off": [
+          "chrome-devtools",
+          "headroom",
+          "promptfoo",
+          "semble"
+        ]
+      },
+      "paper-open-e2e": {
+        "source_id": "current-role-mcp-off",
+        "source_pointer": "#/lanes/paper-open-e2e",
+        "sha256": "77c91cdc0433f54ecacb070a4581ec7f20443d9d5835e7fb938f3994e6563107",
+        "mcp_off": [
+          "chrome-devtools",
+          "headroom",
+          "promptfoo",
+          "semble"
+        ]
+      },
+      "api-credit-sota": {
+        "source_id": "current-role-mcp-off",
+        "source_pointer": "#/lanes/api-credit-sota",
+        "sha256": "77c91cdc0433f54ecacb070a4581ec7f20443d9d5835e7fb938f3994e6563107",
+        "mcp_off": [
+          "semble"
+        ]
+      },
+      "github-consolidation": {
+        "source_id": "current-role-mcp-off",
+        "source_pointer": "#/lanes/github-consolidation",
+        "sha256": "77c91cdc0433f54ecacb070a4581ec7f20443d9d5835e7fb938f3994e6563107",
+        "mcp_off": [
+          "chrome-devtools",
+          "headroom",
+          "jcodemunch",
+          "promptfoo",
+          "semble",
+          "socraticode"
+        ]
+      },
+      "landscape-gap": {
+        "source_id": "current-role-mcp-off",
+        "source_pointer": "#/lanes/landscape-gap",
+        "sha256": "77c91cdc0433f54ecacb070a4581ec7f20443d9d5835e7fb938f3994e6563107",
+        "mcp_off": [
+          "chrome-devtools",
+          "headroom",
+          "jcodemunch",
+          "promptfoo",
+          "semble",
+          "socraticode"
+        ]
+      },
+      "landscape-mcp": {
+        "source_id": "current-role-mcp-off",
+        "source_pointer": "#/lanes/landscape-mcp",
+        "sha256": "77c91cdc0433f54ecacb070a4581ec7f20443d9d5835e7fb938f3994e6563107",
+        "mcp_off": [
+          "chrome-devtools",
+          "headroom",
+          "jcodemunch",
+          "promptfoo",
+          "semble",
+          "socraticode"
+        ]
+      },
+      "landscape-stars": {
+        "source_id": "current-role-mcp-off",
+        "source_pointer": "#/lanes/landscape-stars",
+        "sha256": "77c91cdc0433f54ecacb070a4581ec7f20443d9d5835e7fb938f3994e6563107",
+        "mcp_off": [
+          "chrome-devtools",
+          "headroom",
+          "jcodemunch",
+          "promptfoo",
+          "semble",
+          "socraticode"
+        ]
+      },
+      "runtime-workers": {
+        "source_id": "current-role-mcp-off",
+        "source_pointer": "#/lanes/runtime-workers",
+        "sha256": "77c91cdc0433f54ecacb070a4581ec7f20443d9d5835e7fb938f3994e6563107",
+        "mcp_off": [
+          "chrome-devtools",
+          "headroom",
+          "promptfoo",
+          "semble"
+        ]
+      },
+      "landscape-live-foundation": {
+        "source_id": "current-role-mcp-off",
+        "source_pointer": "#/lanes/landscape-live-foundation",
+        "sha256": "77c91cdc0433f54ecacb070a4581ec7f20443d9d5835e7fb938f3994e6563107",
+        "mcp_off": [
+          "chrome-devtools",
+          "headroom",
+          "promptfoo",
+          "semble"
+        ]
+      },
+      "landscape-live-trading": {
+        "source_id": "current-role-mcp-off",
+        "source_pointer": "#/lanes/landscape-live-trading",
+        "sha256": "77c91cdc0433f54ecacb070a4581ec7f20443d9d5835e7fb938f3994e6563107",
+        "mcp_off": [
+          "chrome-devtools",
+          "headroom",
+          "jcodemunch",
+          "promptfoo",
+          "semble",
+          "serena",
+          "socraticode"
+        ]
+      },
+      "harness-rules": {
+        "source_id": "current-role-mcp-off",
+        "source_pointer": "#/lanes/harness-rules",
+        "sha256": "77c91cdc0433f54ecacb070a4581ec7f20443d9d5835e7fb938f3994e6563107",
+        "mcp_off": [
+          "chrome-devtools",
+          "headroom",
+          "promptfoo",
+          "semble"
+        ]
+      },
+      "g5-fields-a": {
+        "source_id": "current-role-mcp-off",
+        "source_pointer": "#/lanes/g5-fields-a",
+        "sha256": "77c91cdc0433f54ecacb070a4581ec7f20443d9d5835e7fb938f3994e6563107",
+        "mcp_off": [
+          "chrome-devtools",
+          "headroom",
+          "jcodemunch",
+          "promptfoo",
+          "semble",
+          "socraticode"
+        ]
+      },
+      "g5-fields-b": {
+        "source_id": "current-role-mcp-off",
+        "source_pointer": "#/lanes/g5-fields-b",
+        "sha256": "77c91cdc0433f54ecacb070a4581ec7f20443d9d5835e7fb938f3994e6563107",
+        "mcp_off": [
+          "chrome-devtools",
+          "headroom",
+          "jcodemunch",
+          "promptfoo",
+          "semble",
+          "socraticode"
+        ]
+      },
+      "g5-stars-gap": {
+        "source_id": "current-role-mcp-off",
+        "source_pointer": "#/lanes/g5-stars-gap",
+        "sha256": "77c91cdc0433f54ecacb070a4581ec7f20443d9d5835e7fb938f3994e6563107",
+        "mcp_off": [
+          "chrome-devtools",
+          "headroom",
+          "jcodemunch",
+          "promptfoo",
+          "semble",
+          "socraticode"
+        ]
+      },
+      "sdk-harness-ready": {
+        "source_id": "current-role-mcp-off",
+        "source_pointer": "#/lanes/sdk-harness-ready",
+        "sha256": "77c91cdc0433f54ecacb070a4581ec7f20443d9d5835e7fb938f3994e6563107",
+        "mcp_off": [
+          "chrome-devtools",
+          "headroom",
+          "jcodemunch",
+          "promptfoo",
+          "semble",
+          "socraticode"
+        ]
+      },
+      "ns-readiness-manifest": {
+        "source_id": "current-role-mcp-off",
+        "source_pointer": "#/lanes/ns-readiness-manifest",
+        "sha256": "77c91cdc0433f54ecacb070a4581ec7f20443d9d5835e7fb938f3994e6563107",
+        "mcp_off": [
+          "chrome-devtools",
+          "headroom",
+          "jcodemunch",
+          "promptfoo",
+          "semble",
+          "socraticode"
+        ]
+      }
+    },
+    "generic_role_binding": "unmeasured; resolve actual managed lane before applying exclusions",
+    "scope_boundary": "native-agent-stack-1a is an observed owner session, not a managed role"
+  },
+  "client_selection_contracts": {
+    "codex": {
+      "client": "Codex",
+      "source_id": "current-role-mcp-off",
+      "profile_source_id": "codex-profile",
+      "launch": "codex --profile NAME plus qualified independent-process mcp_servers.<existing-name> deltas",
+      "trial_scope": "historical trial-base contracts; four arms used role_mcp_off=skip",
+      "native_child_scope": "native child roles reuse parent connections; reviewed role-file fields do not select mcp_servers",
+      "coverage_gate": "Preserve every observed necessary server; unknown role-to-lane binding cannot pass a reduction."
+    },
+    "claude": {
+      "client": "Claude Code",
+      "source_id": "claude-coordinator-selection",
+      "prior_coordinator_component_count": 12,
+      "prior_components": [
+        "ai-memory",
+        "context-mode",
+        "headroom",
+        "hindsight",
+        "qmd",
+        "semble",
+        "serena",
+        "codebase-memory-mcp",
+        "jcodemunch",
+        "socraticode",
+        "chrome-devtools",
+        "promptfoo"
+      ],
+      "launch": "claude --mcp-config ROLE.json --strict-mcp-config",
+      "materialization": "Resolve exactly one existing native registration per selected component; preserve transports/auth/tool filters and actual plugin identity. Account for inline child exceptions. No native definitions copied here.",
+      "prior_contract_coverage": "insufficient for CC/co-op: grafana and agentsview absent",
+      "required_role_additions": {
+        "CC": [
+          "grafana",
+          "agentsview"
+        ],
+        "co-op": [
+          "grafana",
+          "agentsview"
+        ]
+      },
+      "status": "reviewed coverage contract; not materialized or deployed; effective registrations unenumerated"
+    }
+  },
+  "server_aliases": {
+    "context-mode": {
+      "observed_native_server_names": {
+        "Claude": "plugin_context-mode_context-mode",
+        "Codex": "context-mode"
+      },
+      "projection": "display ID normalization only; preserve native registration/plugin contribution"
+    },
+    "codebase-memory-mcp": {
+      "trial_native_name": "codebase-memory-mcp",
+      "portable_native_name": "codebase-memory",
+      "projection": "resolve one existing alias per client; no duplicate or registration rename"
+    },
+    "grafana-observation": {
+      "observed_native_server_name": "grafana",
+      "repository": "https://github.com/grafana/mcp-grafana"
+    }
   }
 }
