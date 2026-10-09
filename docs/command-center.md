@@ -17,7 +17,8 @@ It owns five things:
    in an owned worktree ([lanes](lanes.md)).
 2. **Rulings:** decisions with their evidence, written as items and relayed.
 3. **Landing cues:** a pull request lands only on the command center's explicit
-   cue to the landing session.
+   cue to the landing session, or by the command center itself while that
+   session is out ([current role holders](#current-role-holders)).
 4. **Tools windows:** every change of stored client configuration, hooks, hook
    trust, instruction files or services on the host.
 5. **Evidence for the owner:** what new sessions call, what it costs, and how
@@ -28,6 +29,52 @@ configuration. Those are the command center's own acts, and only under a direct
 owner instruction. Credentials and sign-ins, spending, retiring a host, live
 trading and model choices are the owner's alone; the command center does not
 take them either ([secret storage](secret-storage.md)).
+
+## Current role holders
+
+These assignments name sessions and lanes, so they change. Each change is
+ruled, recorded in the coordination ledger and carried into this section by the
+next pull request. As of 2026-10-09:
+
+- **Landing.** The landing session is out until its usage window resets at
+  2026-10-12 09:00 UTC. Until then the command center lands, under the landing
+  session's rules unchanged: an explicit cue, one rebase at the landing turn,
+  the checks read at that head, the cross-family read and, where it applies, the
+  trading acknowledgement. Pull requests in another host's session custody stay
+  parked until that custody is transferred.
+- **Trading acknowledgement.** A pull request that touches trading work
+  (research, data acquisition, strategy gates, decision registration, paper or
+  broker operation; [trading lane rules](../blueprints/us-equities/AGENTS.md))
+  lands only with the trading acknowledger's acknowledgement at its final head.
+  While the landing session is out, the paper-operation lane (`paper-open-e2e`)
+  gives it.
+- **Holdout custodian.** The command center holds the north-star study's
+  prospective holdout. It seals the frozen model before the holdout opens, and
+  on each trading day it commits that day's rank rows by SHA-256 before 09:25
+  America/New_York, so no row can be revised after the open. Lanes produce the
+  rows; they never hold or reseal the custody record.
+- **Cross-family review gate.** A head is read by the other model family before
+  it lands. A Codex-authored head (a `codex/` branch) gets the command center's
+  Claude read; a Claude-authored head (a `claude/` branch) gets the co-op's GPT
+  read. The branch prefix decides the family, not custody. A read names the head
+  it read, and a later push needs a micro-read of the delta. Each family's
+  precision is tracked. Lanes never start headless Claude runs to get a read of
+  their own: a run on the shared subscription spends every session's usage
+  window. The vendor paths are the Claude Code GitHub Action
+  ([`claude-pr-review.yml`](../.github/workflows/claude-pr-review.yml), in the
+  [GitHub automation guide](github-automation.md)) and `codex review`.
+- **Co-op.** The session that orchestrates the lanes dispatches workstream
+  slices to them, keeps the read queue in landing order, runs the GPT reads and
+  tracks the program's exit criteria in one file. It messages the command center
+  only for decisions, landing cues, incidents and owner items; progress goes to
+  the lanes' status files.
+- **API keys.** The Anthropic API keys are spent on demand, on work the
+  subscription cannot carry and on north-star work first; spend never caps
+  quality. A key reaches one command at a time through the credential runner
+  (`tools/credentials/credential_run.py`, [secret storage](secret-storage.md))
+  and is never set in a session's environment. When a key runs out of credit,
+  work fails over to the next key in a fixed order. Claude Code sessions stay on
+  the subscription.
 
 ## Decide from evidence
 
@@ -157,7 +204,8 @@ the host's local zone first with UTC beside them, read from the clock.
 
 ## Taking over
 
-1. Read this guide, [lanes](lanes.md) and the decisions of the last three days.
+1. Read this guide (its current role holders first), [lanes](lanes.md) and the
+   decisions of the last three days.
 2. Read the ledger's tail, the lanes' status files and the live lane list.
 3. Query the shared memory for maintained decisions before describing the
    deployed architecture.
