@@ -180,15 +180,35 @@
           "status": "RECORDED",
           "value": "rnd-r1"
         },
-        "state": {
+        "start_policy": {
           "receipt": {
-            "locator": "line:15;regex:^\\*\\*1\\. G2 \\(the R3 freeze\\) (?P<value>leaves the foundation gate set and becomes R&D task 1)\\.\\*\\*$",
-            "path": "coordination/command-center/ITEM-ns2604-coop-20261008T160905Z.md",
+            "locator": "line:5;regex:^Gate effect: G2 = R&D task 1 STARTED at [^\\n]+ \\((?P<value>dependency-driven start)\\);[^\\n]+$",
+            "path": "coordination/ns2604-coop/notes/rnd-start-20261008/ledger-r3-start.md",
             "root": "state",
-            "sha256": "1e24ca907495004513483d9f7c8756c8847ddfe89e22b2e61a32d09d9b6ccd31"
+            "sha256": "5807c4e97fd9a9b50d61d9dba833dc5b99370d30fa1be7a8d8b86d3e3d2bb43f"
           },
           "status": "RECORDED",
-          "value": "leaves the foundation gate set and becomes R&D task 1"
+          "value": "dependency-driven start"
+        },
+        "started_at": {
+          "receipt": {
+            "locator": "line:1;regex:^\\[CORRECTION\\] Row report-ns2604-coop-20261008T230430Z \\(the R3 R&D START record\\): the start time is (?P<value>2026-10-08T23:02:18Z),[^\\n]+$",
+            "path": "coordination/ns2604-coop/notes/rnd-start-20261008/ledger-r3-start-correction.md",
+            "root": "state",
+            "sha256": "ac5cdc0d12ac91fea1c5c3fb3a72788d4222e2796926e39e6a852dcd3848263c"
+          },
+          "status": "RECORDED",
+          "value": "2026-10-08T23:02:18Z"
+        },
+        "state": {
+          "receipt": {
+            "locator": "line:5;regex:^Gate effect: G2 = R&D task 1 (?P<value>STARTED) at [^\\n]+$",
+            "path": "coordination/ns2604-coop/notes/rnd-start-20261008/ledger-r3-start.md",
+            "root": "state",
+            "sha256": "5807c4e97fd9a9b50d61d9dba833dc5b99370d30fa1be7a8d8b86d3e3d2bb43f"
+          },
+          "status": "RECORDED",
+          "value": "STARTED"
         }
       },
       "id": "G2",
@@ -378,6 +398,16 @@
           "status": "RECORDED",
           "value": "explicit cue, then the release with the hash-pinned asset."
         },
+        "gating_scope": {
+          "receipt": {
+            "locator": "line:5;regex:^Gate effect: G2 = R&D task 1 STARTED at [^\\n]+; G5 keeps closing in parallel and gates only (?P<value>tool-adoption decisions);[^\\n]+$",
+            "path": "coordination/ns2604-coop/notes/rnd-start-20261008/ledger-r3-start.md",
+            "root": "state",
+            "sha256": "5807c4e97fd9a9b50d61d9dba833dc5b99370d30fa1be7a8d8b86d3e3d2bb43f"
+          },
+          "status": "RECORDED",
+          "value": "tool-adoption decisions"
+        },
         "owner": {
           "receipt": {
             "locator": "line:51;regex:^- \\*\\*(?P<value>grand-catalog):\\*\\* #878\\.$",
@@ -410,13 +440,13 @@
         },
         "state": {
           "receipt": {
-            "locator": "line:12;regex:^\\*\\*Why this row\\.\\*\\* G5 is the (?P<value>only START gate left)\\.[^\\n]+$",
-            "path": "coordination/command-center/ITEM-ns2604-coop-20261008T210228Z.md",
+            "locator": "line:5;regex:^Gate effect: G2 = R&D task 1 STARTED at [^\\n]+; G5 (?P<value>keeps closing in parallel) and gates only tool-adoption decisions;[^\\n]+$",
+            "path": "coordination/ns2604-coop/notes/rnd-start-20261008/ledger-r3-start.md",
             "root": "state",
-            "sha256": "d3868b6a0a81826407ade426c6f8a2c6511401177d3801eb24b3ae0e9023aa43"
+            "sha256": "5807c4e97fd9a9b50d61d9dba833dc5b99370d30fa1be7a8d8b86d3e3d2bb43f"
           },
           "status": "RECORDED",
-          "value": "only START gate left"
+          "value": "keeps closing in parallel"
         }
       },
       "id": "G5",
@@ -18534,13 +18564,13 @@
         },
         "state": {
           "receipt": {
-            "locator": "line:12;regex:^\\*\\*Why this row\\.\\*\\* G5 is the (?P<value>only START gate left)\\.[^\\n]+$",
-            "path": "coordination/command-center/ITEM-ns2604-coop-20261008T210228Z.md",
+            "locator": "line:5;regex:^Gate effect: G2 = R&D task 1 STARTED at [^\\n]+; G5 (?P<value>keeps closing in parallel) and gates only tool-adoption decisions;[^\\n]+$",
+            "path": "coordination/ns2604-coop/notes/rnd-start-20261008/ledger-r3-start.md",
             "root": "state",
-            "sha256": "d3868b6a0a81826407ade426c6f8a2c6511401177d3801eb24b3ae0e9023aa43"
+            "sha256": "5807c4e97fd9a9b50d61d9dba833dc5b99370d30fa1be7a8d8b86d3e3d2bb43f"
           },
           "status": "RECORDED",
-          "value": "only START gate left"
+          "value": "keeps closing in parallel"
         }
       },
       "id": "G5-878",
@@ -19172,6 +19202,22 @@
       "sha256": "1e24ca907495004513483d9f7c8756c8847ddfe89e22b2e61a32d09d9b6ccd31",
       "status": "RECORDED"
     },
+    "cc_g2_started": {
+      "bytes": 1309,
+      "expected_sha256": "5807c4e97fd9a9b50d61d9dba833dc5b99370d30fa1be7a8d8b86d3e3d2bb43f",
+      "path": "coordination/ns2604-coop/notes/rnd-start-20261008/ledger-r3-start.md",
+      "root": "state",
+      "sha256": "5807c4e97fd9a9b50d61d9dba833dc5b99370d30fa1be7a8d8b86d3e3d2bb43f",
+      "status": "RECORDED"
+    },
+    "cc_g2_started_correction": {
+      "bytes": 402,
+      "expected_sha256": "ac5cdc0d12ac91fea1c5c3fb3a72788d4222e2796926e39e6a852dcd3848263c",
+      "path": "coordination/ns2604-coop/notes/rnd-start-20261008/ledger-r3-start-correction.md",
+      "root": "state",
+      "sha256": "ac5cdc0d12ac91fea1c5c3fb3a72788d4222e2796926e39e6a852dcd3848263c",
+      "status": "RECORDED"
+    },
     "cc_g3": {
       "bytes": 2874,
       "expected_sha256": "e8bfce23b3d90ec3da6902f530b0a5d15ee718a03c79463141c50c832150d586",
@@ -19205,10 +19251,10 @@
       "status": "RECORDED"
     },
     "evidence": {
-      "bytes": 2928311,
+      "bytes": 2931510,
       "path": "manifests/evidence.json",
       "root": "repo",
-      "sha256": "d07bbce85f1f4f3eee404771a80e3b79e2333ea50de49c90e56f855babb43b98",
+      "sha256": "211df213899a2284dba589155094995bd1508ed01f84547b7213b8dc86145762",
       "status": "RECORDED"
     },
     "foundation": {
@@ -20748,13 +20794,13 @@
         },
         "state": {
           "receipt": {
-            "locator": "line:12;regex:^\\*\\*Why this row\\.\\*\\* G5 is the (?P<value>only START gate left)\\.[^\\n]+$",
-            "path": "coordination/command-center/ITEM-ns2604-coop-20261008T210228Z.md",
+            "locator": "line:5;regex:^Gate effect: G2 = R&D task 1 STARTED at [^\\n]+; G5 (?P<value>keeps closing in parallel) and gates only tool-adoption decisions;[^\\n]+$",
+            "path": "coordination/ns2604-coop/notes/rnd-start-20261008/ledger-r3-start.md",
             "root": "state",
-            "sha256": "d3868b6a0a81826407ade426c6f8a2c6511401177d3801eb24b3ae0e9023aa43"
+            "sha256": "5807c4e97fd9a9b50d61d9dba833dc5b99370d30fa1be7a8d8b86d3e3d2bb43f"
           },
           "status": "RECORDED",
-          "value": "only START gate left"
+          "value": "keeps closing in parallel"
         }
       },
       "id": "g5_catalog",
@@ -20904,7 +20950,7 @@
           "status": "RECORDED",
           "value": "bc8ec9b8"
         },
-        "state": {
+        "revision_state": {
           "receipt": {
             "locator": "line:33;regex:^5\\. \\*\\*R&D task 1:\\*\\*[^\\n]+R3B is bc8ec9b8, (?P<value>held)\\.[^\\n]+$",
             "path": "coordination/command-center/north-star-rnd-launch-spec-20261008.md",
@@ -20913,6 +20959,26 @@
           },
           "status": "RECORDED",
           "value": "held"
+        },
+        "started_at": {
+          "receipt": {
+            "locator": "line:1;regex:^\\[CORRECTION\\] Row report-ns2604-coop-20261008T230430Z \\(the R3 R&D START record\\): the start time is (?P<value>2026-10-08T23:02:18Z),[^\\n]+$",
+            "path": "coordination/ns2604-coop/notes/rnd-start-20261008/ledger-r3-start-correction.md",
+            "root": "state",
+            "sha256": "ac5cdc0d12ac91fea1c5c3fb3a72788d4222e2796926e39e6a852dcd3848263c"
+          },
+          "status": "RECORDED",
+          "value": "2026-10-08T23:02:18Z"
+        },
+        "state": {
+          "receipt": {
+            "locator": "line:5;regex:^Gate effect: G2 = R&D task 1 (?P<value>STARTED) at [^\\n]+$",
+            "path": "coordination/ns2604-coop/notes/rnd-start-20261008/ledger-r3-start.md",
+            "root": "state",
+            "sha256": "5807c4e97fd9a9b50d61d9dba833dc5b99370d30fa1be7a8d8b86d3e3d2bb43f"
+          },
+          "status": "RECORDED",
+          "value": "STARTED"
         }
       },
       "id": "ranking_protocol",
@@ -34024,12 +34090,12 @@
   "source_index": {
     "path": "tools/north-star/sources.json",
     "root": "repo",
-    "sha256": "37144d0045b3d6dad597dc5f22fd20c1ba36cbed93e6ea00dc9eb92f16590538"
+    "sha256": "4cdfe0a722a8e2a620551f5b092e2db762555deb06eef085686623561996dcd2"
   },
   "summary": {
     "gates": 8,
     "layers": 20,
-    "recorded_claims": 1524,
+    "recorded_claims": 1529,
     "sdk_items": 36,
     "unverified_claims": 194,
     "unverified_sources": 0

@@ -12,6 +12,8 @@
     "sdk_route_reconciliation": {"root": "state", "path": "research/fullspeed-20261008/sdk-harness-ready/route-reconciliation-final.receipt.json", "expected_sha256": "fad6c1703ea5b5d48b6cf4ed3eb98eba3d05cbf84404a5d35e36ed3f76b0249f"},
     "cc_g1": {"root": "state", "path": "coordination/command-center/ROW-ns2604-coop-20261008T1725Z-g1met.md", "expected_sha256": "3c8d21d687bc94bee07cb6e2c14179bd010804047c14d562b76e3d2842b16690"},
     "cc_g2": {"root": "state", "path": "coordination/command-center/ITEM-ns2604-coop-20261008T160905Z.md", "expected_sha256": "1e24ca907495004513483d9f7c8756c8847ddfe89e22b2e61a32d09d9b6ccd31"},
+    "cc_g2_started": {"root": "state", "path": "coordination/ns2604-coop/notes/rnd-start-20261008/ledger-r3-start.md", "expected_sha256": "5807c4e97fd9a9b50d61d9dba833dc5b99370d30fa1be7a8d8b86d3e3d2bb43f"},
+    "cc_g2_started_correction": {"root": "state", "path": "coordination/ns2604-coop/notes/rnd-start-20261008/ledger-r3-start-correction.md", "expected_sha256": "ac5cdc0d12ac91fea1c5c3fb3a72788d4222e2796926e39e6a852dcd3848263c"},
     "cc_g3": {"root": "state", "path": "coordination/command-center/ITEM-ns2604-coop-20261008T164839Z.md", "expected_sha256": "e8bfce23b3d90ec3da6902f530b0a5d15ee718a03c79463141c50c832150d586"},
     "cc_batch": {"root": "state", "path": "coordination/command-center/ITEM-ns2604-coop-20261008T175944Z.md", "expected_sha256": "001341383c83daf6cebc25e620eb9551c7231ff280efe8d05c812c7893a2a78a"},
     "cc_g5": {"root": "state", "path": "coordination/command-center/ROW-ns2604-coop-20261008T1822Z-g5shape.md", "expected_sha256": "9ec37ed6667227745db87827577a33c32ca2a8e3fedd777693097e39b8702d36"},
@@ -77,7 +79,9 @@
     {
       "id": "G2", "title": "Ranking protocol transfer to R&D",
       "fields": {
-        "state": {"source": "cc_g2", "regex": "^\\*\\*1\\. G2 \\(the R3 freeze\\) (?P<value>leaves the foundation gate set and becomes R&D task 1)\\.\\*\\*$"},
+        "state": {"source": "cc_g2_started", "regex": "^Gate effect: G2 = R&D task 1 (?P<value>STARTED) at [^\\n]+$"},
+        "started_at": {"source": "cc_g2_started_correction", "regex": "^\\[CORRECTION\\] Row report-ns2604-coop-20261008T230430Z \\(the R3 R&D START record\\): the start time is (?P<value>2026-10-08T23:02:18Z),[^\\n]+$"},
+        "start_policy": {"source": "cc_g2_started", "regex": "^Gate effect: G2 = R&D task 1 STARTED at [^\\n]+ \\((?P<value>dependency-driven start)\\);[^\\n]+$"},
         "owner": {"source": "fullspeed", "regex": "^- \\*\\*(?P<value>rnd-r1):\\*\\* the R3 options-source item\\.$"},
         "freeze_deadline": {"source": "rnd_launch", "regex": "^   - \\*\\*Freeze deadline:\\*\\* before (?P<value>2026-10-14)\\.[^\\n]+$"}
       }
@@ -106,7 +110,8 @@
     {
       "id": "G5", "title": "Landscape catalog",
       "fields": {
-        "state": {"source": "cc_g5_closure", "regex": "^\\*\\*Why this row\\.\\*\\* G5 is the (?P<value>only START gate left)\\.[^\\n]+$"},
+        "state": {"source": "cc_g2_started", "regex": "^Gate effect: G2 = R&D task 1 STARTED at [^\\n]+; G5 (?P<value>keeps closing in parallel) and gates only tool-adoption decisions;[^\\n]+$"},
+        "gating_scope": {"source": "cc_g2_started", "regex": "^Gate effect: G2 = R&D task 1 STARTED at [^\\n]+; G5 keeps closing in parallel and gates only (?P<value>tool-adoption decisions);[^\\n]+$"},
         "owner": {"source": "fullspeed", "regex": "^- \\*\\*(?P<value>grand-catalog):\\*\\* #878\\.$"},
         "pull_request": {"source": "cc_g5", "regex": "^1\\. grand-catalog restructures (?P<value>#878) into the compact manifest[^\\n]+$"},
         "review_stage": {"source": "cc_g5", "regex": "^1\\. grand-catalog restructures #878[^\\n]+Keep it a (?P<value>draft) and build the asset locally;[^\\n]+$"},
@@ -191,7 +196,7 @@
       "id": "g5_catalog", "title": "G5 catalog on main",
       "fields": {
         "input": {"source": "rnd_launch", "regex": "^2\\. \\*\\*The (?P<value>G5 grand catalog)\\*\\*[^\\n]+$"},
-        "state": {"source": "cc_g5_closure", "regex": "^\\*\\*Why this row\\.\\*\\* G5 is the (?P<value>only START gate left)\\.[^\\n]+$"},
+        "state": {"source": "cc_g2_started", "regex": "^Gate effect: G2 = R&D task 1 STARTED at [^\\n]+; G5 (?P<value>keeps closing in parallel) and gates only tool-adoption decisions;[^\\n]+$"},
         "owner": {"source": "fullspeed", "regex": "^- \\*\\*(?P<value>grand-catalog):\\*\\* #878\\.$"}
       }
     },
@@ -217,7 +222,9 @@
       "fields": {
         "input": {"source": "rnd_launch", "regex": "^5\\. \\*\\*(?P<value>R&D task 1):\\*\\*[^\\n]+$"},
         "revision": {"source": "rnd_launch", "regex": "^5\\. \\*\\*R&D task 1:\\*\\*[^\\n]+R3B is (?P<value>bc8ec9b8), held\\.[^\\n]+$"},
-        "state": {"source": "rnd_launch", "regex": "^5\\. \\*\\*R&D task 1:\\*\\*[^\\n]+R3B is bc8ec9b8, (?P<value>held)\\.[^\\n]+$"},
+        "state": {"source": "cc_g2_started", "regex": "^Gate effect: G2 = R&D task 1 (?P<value>STARTED) at [^\\n]+$"},
+        "started_at": {"source": "cc_g2_started_correction", "regex": "^\\[CORRECTION\\] Row report-ns2604-coop-20261008T230430Z \\(the R3 R&D START record\\): the start time is (?P<value>2026-10-08T23:02:18Z),[^\\n]+$"},
+        "revision_state": {"source": "rnd_launch", "regex": "^5\\. \\*\\*R&D task 1:\\*\\*[^\\n]+R3B is bc8ec9b8, (?P<value>held)\\.[^\\n]+$"},
         "freeze_deadline": {"source": "rnd_launch", "regex": "^   - \\*\\*Freeze deadline:\\*\\* before (?P<value>2026-10-14)\\.[^\\n]+$"},
         "development_years": {"source": "rnd_launch", "regex": "^   - \\*\\*First question:\\*\\*[^\\n]+over (?P<value>2017-2023) only,[^\\n]+$"},
         "first_scored_decision": {"source": "rnd_launch", "regex": "^   - \\*\\*Freeze deadline:\\*\\*[^\\n]+the first scored decision is (?P<value>2026-10-21)\\.$"},
@@ -268,7 +275,7 @@
     {
       "id": "G5-878", "title": "G5 compact catalog and release asset",
       "fields": {
-        "state": {"source": "cc_g5_closure", "regex": "^\\*\\*Why this row\\.\\*\\* G5 is the (?P<value>only START gate left)\\.[^\\n]+$"},
+        "state": {"source": "cc_g2_started", "regex": "^Gate effect: G2 = R&D task 1 STARTED at [^\\n]+; G5 (?P<value>keeps closing in parallel) and gates only tool-adoption decisions;[^\\n]+$"},
         "owner": {"source": "fullspeed", "regex": "^- \\*\\*(?P<value>grand-catalog):\\*\\* #878\\.$"}
       }
     },
