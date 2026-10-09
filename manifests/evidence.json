@@ -57492,8 +57492,8 @@
     },
     {
       "path": "scripts/validate.py",
-      "sha256": "9086d7c9dd5abcf2fe0a67c090de7287a74851edb1a5486ca3c1e93b954df0d2",
-      "bytes": 37667
+      "sha256": "be4ef0f4519005979c0cd955cb07d0e4506a40c06af9a07979f012012bfd507e",
+      "bytes": 37973
     },
     {
       "path": "scripts/validate_catalogs.py",
@@ -58867,8 +58867,8 @@
     },
     {
       "path": "tests/test_validate.py",
-      "sha256": "505b9e65352d8683e6f85848d6962836ea836e6d906151e9983587a1dbcb5021",
-      "bytes": 37188
+      "sha256": "0534c6b5d98e194df93dfd203dbee92bf7656ac99e19c9678f74903380a665be",
+      "bytes": 43680
     },
     {
       "path": "tests/test_validate_shards.py",
