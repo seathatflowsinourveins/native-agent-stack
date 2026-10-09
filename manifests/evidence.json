@@ -16507,17 +16507,17 @@
     },
     {
       "path": "blueprints/us-equities/runtime-2604/README.md",
-      "sha256": "0428df473d1245ce9222692bf78dd2fa8d6957271cc02bead76a1aebc7e34c60",
-      "bytes": 35736
+      "sha256": "7b17a09e24eb1ec85ab84a354c3a69b4fe489f11980a962599192bcf3fde19b4",
+      "bytes": 38252
     },
     {
       "path": "blueprints/us-equities/runtime-2604/accept-trading-2604.sh",
-      "sha256": "c0b2dc45cbe77949969eeb94f65e5b98750a720333b9fd337ca5903337baac44",
-      "bytes": 13990
+      "sha256": "564082b6b13655d2da3db3d825314809c44182536691b01065a8e1c7a0e2a994",
+      "bytes": 14560
     },
     {
       "path": "blueprints/us-equities/runtime-2604/install-trading-2604.sh",
-      "sha256": "dbe61ddab078356a24430cf7b5ef91643a88506fbb6748c888bb3665f2900ee9",
+      "sha256": "78b212139108ec8767806ad3a3b7bf338af6c3a71080066b49d91a751720f251",
       "bytes": 20381
     },
     {
@@ -60629,6 +60629,11 @@
       "path": "tests/test_trading_2604_lock.py",
       "sha256": "43ec520d08fb78e6a6dae5df82ea251ca8d9c44dec51f02ef54e7e2d30a22a3f",
       "bytes": 10502
+    },
+    {
+      "path": "tests/test_trading_2604_source_acceptance.py",
+      "sha256": "190385d4cbcd0758ccc764a45f2315ebf89716cc78492d79f35b2ddbb82e205f",
+      "bytes": 4564
     },
     {
       "path": "tests/test_trading_gates.py",

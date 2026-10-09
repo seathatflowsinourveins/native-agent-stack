@@ -14,7 +14,7 @@ readonly adapter="$project/vendor/adaptive-paper"
 readonly project_hash=aa370e42e29dc2419e586358254ff2e821df48a693aa9a3ee16b65d30036ee0b
 readonly lock_hash=f451ef979cdb1ae3686a30df1c883c257402b32753478c1f9c686c057e9c3989
 readonly quickstart_hash=487e6807dedd1a38062638eb671f6110799451611819542bf0f0c10646cb2c53
-readonly adapter_commit=dca821cca85dce3647fa7b488d5a23fbe5b85d4a
+readonly adapter_commit=dfeea13377cfb15936f856d9ed8df3c6575a7895
 readonly ib_image='ghcr.io/gnzsnz/ib-gateway@sha256:91165c0752ca534c0dad3c40683ae7c2745974d4d277651a90e90411ca609d8d'
 readonly lean_image='docker.io/quantconnect/lean@sha256:70071d1bbb90385deb60c7d20bc3830c7f4c79f6c09c5d1ade9196c009f68861'
 
@@ -157,16 +157,26 @@ check ibkr_adapter "$python" -I -c \
     'from nautilus_trader.adapters.interactive_brokers import InteractiveBrokersDataClientConfig, InteractiveBrokersExecutionClientConfig, MarketDataType'
 
 # The separate adapter is staged source, not an official Nautilus Alpaca plugin.
-# https://github.com/seathatflowsinourveins/native-agent-stack/blob/dca821cca85dce3647fa7b488d5a23fbe5b85d4a/blueprints/us-equities/adaptive-paper/native_adapter.py
-check alpaca_adapter_source "$python" -I - "$adapter_commit" <<'PY'
+# https://github.com/seathatflowsinourveins/native-agent-stack/blob/dfeea13377cfb15936f856d9ed8df3c6575a7895/blueprints/us-equities/adaptive-paper/native_adapter.py
+check alpaca_adapter_source "$python" -I - "$adapter_commit" "50c9cff32944b45abb4c4aff20d2235688f5240c52e892a623aa6e19ecd9b037" <<'PY'
 import hashlib
+import json
 from pathlib import Path
 import subprocess
 import sys
 assert subprocess.check_output(["/usr/bin/git", "-C", "/source", "rev-parse", "HEAD"], text=True).strip() == sys.argv[1]
 assert not subprocess.check_output(["/usr/bin/git", "-C", "/source", "status", "--porcelain"], text=True).strip(), "Adapter source has local changes"
-path = Path("/source/blueprints/us-equities/adaptive-paper/native_adapter.py")
-assert hashlib.sha256(path.read_bytes()).hexdigest() == "fbf530884c2ad3b9e0c2b1f989eda399531647cc1db3c56dc9bcac10174fea47"
+source = Path("/source")
+directory = source / "blueprints/us-equities/adaptive-paper"
+hashes = json.loads((directory / "source-hashes.json").read_text(encoding="utf-8"))
+paths = sorted(directory.glob("*.py"))
+for path in paths:
+    key = path.relative_to(source).as_posix()
+    assert key in hashes, f"Staged Python source is not registered: {key}"
+    assert hashlib.sha256(path.read_bytes()).hexdigest() == hashes[key], f"Staged Python source hash differs: {key}"
+path = directory / "native_adapter.py"
+assert hashlib.sha256(path.read_bytes()).hexdigest() == sys.argv[2], "Native adapter source hash differs from the selected pin"
+print(f"Verified {len(paths)} staged Python source hashes")
 PY
 if ((last_exit == 0)); then
     check alpaca_adapter_import "$python" -I -c \
