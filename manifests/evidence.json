@@ -15507,22 +15507,22 @@
     },
     {
       "path": "blueprints/us-equities/event-anchored-ranking/ROW14-SUBMISSION-R3.json",
-      "sha256": "ea4404c7b1ef9d5963e83b0bd56e5a555e7003bfadc57bfea9b6fab66fa52536",
-      "bytes": 9693
+      "sha256": "d7cab10869ac5628c9537ab60df46652ea85d854891c068ec77cf1a0dca4d4b8",
+      "bytes": 13346
     },
     {
       "path": "blueprints/us-equities/event-anchored-ranking/SHA256SUMS",
-      "sha256": "a05ee8f8adc71908e28965ae321d3d1bd619791c8a662e785ea9f4b76f9e9849",
+      "sha256": "26f5db9c430b015d4fb0d7ba4b2f125492d4d43f6f57275e8fbcd716beeba5f0",
       "bytes": 1056
     },
     {
       "path": "blueprints/us-equities/event-anchored-ranking/SHA256SUMS.R3",
-      "sha256": "a05ee8f8adc71908e28965ae321d3d1bd619791c8a662e785ea9f4b76f9e9849",
+      "sha256": "26f5db9c430b015d4fb0d7ba4b2f125492d4d43f6f57275e8fbcd716beeba5f0",
       "bytes": 1056
     },
     {
       "path": "blueprints/us-equities/event-anchored-ranking/SHA256SUMS.R3B",
-      "sha256": "a05ee8f8adc71908e28965ae321d3d1bd619791c8a662e785ea9f4b76f9e9849",
+      "sha256": "26f5db9c430b015d4fb0d7ba4b2f125492d4d43f6f57275e8fbcd716beeba5f0",
       "bytes": 1056
     },
     {
@@ -15532,8 +15532,8 @@
     },
     {
       "path": "blueprints/us-equities/event-anchored-ranking/protocol.draft.json",
-      "sha256": "8e203bcea1f3df307db3ccabb0294d5bad07cc24125eab77b6d1e320e3e9e704",
-      "bytes": 44761
+      "sha256": "65be1aab008e52670a3611ddb6221b1c00422c8b68ea519d61aeaa9e301063c5",
+      "bytes": 48382
     },
     {
       "path": "blueprints/us-equities/execution-realism/ExecutionSensitivityAlgorithm.cs",
@@ -59112,8 +59112,8 @@
     },
     {
       "path": "tools/sota-convergence/blind_checkout.py",
-      "sha256": "b0c08456764cc0443b54818ba809f4ba34a98fcd9eb974f3901344b5707d2a9c",
-      "bytes": 55855
+      "sha256": "780a2b931ecbff453ce4caeeb153614d1dcef98d77b4318687aa592e066f88ce",
+      "bytes": 56215
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",
