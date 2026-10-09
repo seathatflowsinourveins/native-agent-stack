@@ -5126,8 +5126,8 @@
     },
     {
       "path": ".gitleaks.toml",
-      "sha256": "36d8049cef393b9786c912975cbad5eddf676d1e357f2773ed47afee0dc7d342",
-      "bytes": 32556
+      "sha256": "4a7d27ebf7d7477eb62a2282c24f1419d46659ca4478ac608df83b185f26138b",
+      "bytes": 34966
     },
     {
       "path": ".gitleaksignore",
@@ -18309,6 +18309,11 @@
       "path": "docs/decisions/2026-10-09-codex-native-review-trial.md",
       "sha256": "337ec932d1e70994adc7b6e90458114e604d70ec065c49fc7d7ff8c2191e11fc",
       "bytes": 9003
+    },
+    {
+      "path": "docs/decisions/2026-10-09-gitleaks-sweep-commit-context.md",
+      "sha256": "35de9221649da044dde1be59d03baa4a6ae30c73ef1a5b5802967180df22cfcd",
+      "bytes": 3548
     },
     {
       "path": "docs/decisions/2026-10-09-mcp-surfaces-trials.md",
