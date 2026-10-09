@@ -1,0 +1,1980 @@
+{
+  "requires_parent_anonymization": true,
+  "records": [
+    {
+      "record_index": 0,
+      "case_id": "C01",
+      "scope": "skill",
+      "status": "complete",
+      "findings": [
+        {
+          "severity": "info",
+          "message": "No tool or spec versions pinned. Version-dependent rules will use default assumptions.",
+          "suggestion": "Pin versions in .validator.toml [tool_versions] or [spec_revisions] for deterministic validation."
+        }
+      ],
+      "detail": null
+    },
+    {
+      "record_index": 1,
+      "case_id": "C02",
+      "scope": "skill",
+      "status": "complete",
+      "findings": [
+        {
+          "severity": "error",
+          "message": "Skill frontmatter is missing required 'name' field",
+          "suggestion": "Add 'name: your-skill-name' to frontmatter"
+        },
+        {
+          "severity": "info",
+          "message": "No tool or spec versions pinned. Version-dependent rules will use default assumptions.",
+          "suggestion": "Pin versions in .validator.toml [tool_versions] or [spec_revisions] for deterministic validation."
+        }
+      ],
+      "detail": null
+    },
+    {
+      "record_index": 2,
+      "case_id": "C03",
+      "scope": "skill",
+      "status": "complete",
+      "findings": [
+        {
+          "severity": "error",
+          "message": "Skill frontmatter is missing required 'description' field",
+          "suggestion": "Add 'description: Use when...' to frontmatter"
+        },
+        {
+          "severity": "info",
+          "message": "No tool or spec versions pinned. Version-dependent rules will use default assumptions.",
+          "suggestion": "Pin versions in .validator.toml [tool_versions] or [spec_revisions] for deterministic validation."
+        }
+      ],
+      "detail": null
+    },
+    {
+      "record_index": 3,
+      "case_id": "C04",
+      "scope": "skill",
+      "status": "complete",
+      "findings": [
+        {
+          "severity": "error",
+          "message": "Failed to parse SKILL.md: description: invalid type: sequence, expected a string at line 2 column 14",
+          "suggestion": "Check YAML frontmatter syntax -- ensure proper indentation, colon spacing, and matching quotes"
+        },
+        {
+          "severity": "info",
+          "message": "No tool or spec versions pinned. Version-dependent rules will use default assumptions.",
+          "suggestion": "Pin versions in .validator.toml [tool_versions] or [spec_revisions] for deterministic validation."
+        }
+      ],
+      "detail": null
+    },
+    {
+      "record_index": 4,
+      "case_id": "C05",
+      "scope": "skill",
+      "status": "complete",
+      "findings": [
+        {
+          "severity": "error",
+          "message": "Name 'Bad_Name' must be 1-64 characters per segment using lowercase letters, digits, and hyphens, as a bare skill name or plugin:skill-name",
+          "suggestion": "Lowercase and trim each name segment, replace spaces and '_' with '-', collapse multiple '-' into one, remove invalid characters, and truncate each segment to 64 characters"
+        },
+        {
+          "severity": "info",
+          "message": "No tool or spec versions pinned. Version-dependent rules will use default assumptions.",
+          "suggestion": "Pin versions in .validator.toml [tool_versions] or [spec_revisions] for deterministic validation."
+        }
+      ],
+      "detail": null
+    },
+    {
+      "record_index": 5,
+      "case_id": "C06",
+      "scope": "skill",
+      "status": "complete",
+      "findings": [
+        {
+          "severity": "error",
+          "message": "Name 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' must be 1-64 characters per segment using lowercase letters, digits, and hyphens, as a bare skill name or plugin:skill-name",
+          "suggestion": "Lowercase and trim each name segment, replace spaces and '_' with '-', collapse multiple '-' into one, remove invalid characters, and truncate each segment to 64 characters"
+        },
+        {
+          "severity": "info",
+          "message": "No tool or spec versions pinned. Version-dependent rules will use default assumptions.",
+          "suggestion": "Pin versions in .validator.toml [tool_versions] or [spec_revisions] for deterministic validation."
+        }
+      ],
+      "detail": null
+    },
+    {
+      "record_index": 6,
+      "case_id": "C07",
+      "scope": "skill",
+      "status": "complete",
+      "findings": [
+        {
+          "severity": "error",
+          "message": "Description must be 1-1024 characters, got 1025",
+          "suggestion": "Trim the description to 1024 characters or fewer"
+        },
+        {
+          "severity": "info",
+          "message": "No tool or spec versions pinned. Version-dependent rules will use default assumptions.",
+          "suggestion": "Pin versions in .validator.toml [tool_versions] or [spec_revisions] for deterministic validation."
+        }
+      ],
+      "detail": null
+    },
+    {
+      "record_index": 7,
+      "case_id": "C08",
+      "scope": "skill",
+      "status": "complete",
+      "findings": [
+        {
+          "severity": "error",
+          "message": "Broken markdown link: 'references/csv-guide.md' (file not found: [path]/references/csv-guide.md)",
+          "suggestion": "Fix the link target or remove the broken link"
+        },
+        {
+          "severity": "info",
+          "message": "No tool or spec versions pinned. Version-dependent rules will use default assumptions.",
+          "suggestion": "Pin versions in .validator.toml [tool_versions] or [spec_revisions] for deterministic validation."
+        }
+      ],
+      "detail": null
+    },
+    {
+      "record_index": 8,
+      "case_id": "C09",
+      "scope": "skill",
+      "status": "complete",
+      "findings": [
+        {
+          "severity": "info",
+          "message": "No tool or spec versions pinned. Version-dependent rules will use default assumptions.",
+          "suggestion": "Pin versions in .validator.toml [tool_versions] or [spec_revisions] for deterministic validation."
+        }
+      ],
+      "detail": null
+    },
+    {
+      "record_index": 9,
+      "case_id": "C10",
+      "scope": "skill",
+      "status": "complete",
+      "findings": [
+        {
+          "severity": "info",
+          "message": "No tool or spec versions pinned. Version-dependent rules will use default assumptions.",
+          "suggestion": "Pin versions in .validator.toml [tool_versions] or [spec_revisions] for deterministic validation."
+        }
+      ],
+      "detail": null
+    },
+    {
+      "record_index": 10,
+      "case_id": "C11",
+      "scope": "skill",
+      "status": "complete",
+      "findings": [
+        {
+          "severity": "error",
+          "message": "Description must be 1-1024 characters, got 0",
+          "suggestion": "Trim the description to 1024 characters or fewer"
+        },
+        {
+          "severity": "info",
+          "message": "No tool or spec versions pinned. Version-dependent rules will use default assumptions.",
+          "suggestion": "Pin versions in .validator.toml [tool_versions] or [spec_revisions] for deterministic validation."
+        }
+      ],
+      "detail": null
+    },
+    {
+      "record_index": 11,
+      "case_id": "C12",
+      "scope": "skill",
+      "status": "complete",
+      "findings": [
+        {
+          "severity": "error",
+          "message": "SKILL.md must have YAML frontmatter between --- markers",
+          "suggestion": "Add frontmatter between --- markers"
+        },
+        {
+          "severity": "info",
+          "message": "No tool or spec versions pinned. Version-dependent rules will use default assumptions.",
+          "suggestion": "Pin versions in .validator.toml [tool_versions] or [spec_revisions] for deterministic validation."
+        }
+      ],
+      "detail": null
+    },
+    {
+      "record_index": 12,
+      "case_id": "I01",
+      "scope": "instructions",
+      "status": "complete",
+      "findings": [
+        {
+          "severity": "warning",
+          "message": "Missing project context section in AGENTS instruction file",
+          "suggestion": "Add a '# Project' or '## Overview' section describing the project purpose and tech stack"
+        },
+        {
+          "severity": "info",
+          "message": "No tool or spec versions pinned. Version-dependent rules will use default assumptions.",
+          "suggestion": "Pin versions in .validator.toml [tool_versions] or [spec_revisions] for deterministic validation."
+        }
+      ],
+      "detail": null
+    },
+    {
+      "record_index": 13,
+      "case_id": "I02",
+      "scope": "instructions",
+      "status": "complete",
+      "findings": [
+        {
+          "severity": "error",
+          "message": "Broken markdown link: 'missing-guide.md' (file not found: [path]/missing-guide.md)",
+          "suggestion": "Fix the link target or remove the broken link"
+        },
+        {
+          "severity": "warning",
+          "message": "Missing project context section in AGENTS instruction file",
+          "suggestion": "Add a '# Project' or '## Overview' section describing the project purpose and tech stack"
+        },
+        {
+          "severity": "info",
+          "message": "No tool or spec versions pinned. Version-dependent rules will use default assumptions.",
+          "suggestion": "Pin versions in .validator.toml [tool_versions] or [spec_revisions] for deterministic validation."
+        }
+      ],
+      "detail": null
+    },
+    {
+      "record_index": 14,
+      "case_id": "C01",
+      "scope": "skill",
+      "status": "complete",
+      "findings": [
+        {
+          "severity": "medium",
+          "message": "Skill not in standard location (skills/ or team-skills/)",
+          "suggestion": "Move skill to skills/<skill-name>/ or team-skills/<team>/<skill-name>/"
+        },
+        {
+          "severity": "medium",
+          "message": "Missing recommended section: '## Instructions'",
+          "suggestion": "Consider adding a '## Instructions' or '## Usage' section. Per agentskills.io the body format is unrestricted, so this is a convention nudge — it also gives the quality scorer a stable anchor for instruction-quality heuristics."
+        },
+        {
+          "severity": "medium",
+          "message": "Missing recommended section: '## Examples'",
+          "suggestion": "Consider adding a '## Examples' section. If examples are already inline under instructions, this can be skipped."
+        },
+        {
+          "severity": "high",
+          "message": "Author not specified in metadata",
+          "suggestion": "Add 'metadata.author' field with format 'Name <email@example.com>'"
+        },
+        {
+          "severity": "error",
+          "message": "[SCHEMA-HIGH] Author not specified in metadata in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[SCHEMA-MEDIUM] Skill not in standard location (skills/ or team-skills/) in [path]"
+        },
+        {
+          "severity": "warning",
+          "message": "[SCHEMA-MEDIUM] Missing recommended section: '## Instructions' in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[SCHEMA-MEDIUM] Missing recommended section: '## Examples' in [path]/SKILL.md"
+        },
+        {
+          "severity": "medium",
+          "message": "Guide-only skill has very little content (6 lines)",
+          "suggestion": "Guide skills should have detailed instructions since they have no code"
+        },
+        {
+          "severity": "low",
+          "message": "No examples provided",
+          "suggestion": "Add example usage with code blocks"
+        },
+        {
+          "severity": "medium",
+          "message": "SKILL_SPEC recommended field missing: 'version'",
+          "suggestion": "Add 'version' to frontmatter — Semantic version (e.g., \"1.0.0\")"
+        },
+        {
+          "severity": "medium",
+          "message": "SKILL_SPEC recommended field missing: 'metadata.author'",
+          "suggestion": "Add 'author' under metadata: — Author name or team (under metadata:)"
+        },
+        {
+          "severity": "medium",
+          "message": "SKILL_SPEC recommended field missing: 'metadata.tags'",
+          "suggestion": "Add 'tags' under metadata: — Categorization tags (under metadata:, list of 1-5 items)"
+        },
+        {
+          "severity": "low",
+          "message": "No '## Purpose' section",
+          "suggestion": "Add purpose section to clarify use cases"
+        },
+        {
+          "severity": "low",
+          "message": "No mention of error handling or validation",
+          "suggestion": "Document expected errors and how to handle them"
+        },
+        {
+          "severity": "low",
+          "message": "No prerequisites/requirements documented",
+          "suggestion": "Document dependencies, API keys, or setup needed"
+        },
+        {
+          "severity": "low",
+          "message": "No limitations documented",
+          "suggestion": "Add '## Limitations' section with known issues/constraints"
+        },
+        {
+          "severity": "low",
+          "message": "No troubleshooting section documented",
+          "suggestion": "Add '## Troubleshooting' with Error/Cause/Solution patterns"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-MEDIUM] Guide-only skill has very little content (6 lines) in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No examples provided in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-MEDIUM] SKILL_SPEC recommended field missing: 'version' in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-MEDIUM] SKILL_SPEC recommended field missing: 'metadata.author' in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-MEDIUM] SKILL_SPEC recommended field missing: 'metadata.tags' in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No '## Purpose' section in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No mention of error handling or validation in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No prerequisites/requirements documented in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No limitations documented in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No troubleshooting section documented in [path]/SKILL.md"
+        }
+      ],
+      "detail": null
+    },
+    {
+      "record_index": 15,
+      "case_id": "C02",
+      "scope": "skill",
+      "status": "complete",
+      "findings": [
+        {
+          "severity": "high",
+          "message": "Field 'name': Field required",
+          "suggestion": "Fix the 'name' field in frontmatter according to schema requirements"
+        },
+        {
+          "severity": "error",
+          "message": "[SCHEMA-HIGH] Field 'name': Field required in [path]/SKILL.md"
+        },
+        {
+          "severity": "medium",
+          "message": "Guide-only skill has very little content (4 lines)",
+          "suggestion": "Guide skills should have detailed instructions since they have no code"
+        },
+        {
+          "severity": "low",
+          "message": "No examples provided",
+          "suggestion": "Add example usage with code blocks"
+        },
+        {
+          "severity": "medium",
+          "message": "SKILL_SPEC recommended field missing: 'version'",
+          "suggestion": "Add 'version' to frontmatter — Semantic version (e.g., \"1.0.0\")"
+        },
+        {
+          "severity": "medium",
+          "message": "SKILL_SPEC recommended field missing: 'metadata.author'",
+          "suggestion": "Add 'author' under metadata: — Author name or team (under metadata:)"
+        },
+        {
+          "severity": "medium",
+          "message": "SKILL_SPEC recommended field missing: 'metadata.tags'",
+          "suggestion": "Add 'tags' under metadata: — Categorization tags (under metadata:, list of 1-5 items)"
+        },
+        {
+          "severity": "low",
+          "message": "No '## Purpose' section",
+          "suggestion": "Add purpose section to clarify use cases"
+        },
+        {
+          "severity": "low",
+          "message": "No mention of error handling or validation",
+          "suggestion": "Document expected errors and how to handle them"
+        },
+        {
+          "severity": "low",
+          "message": "No prerequisites/requirements documented",
+          "suggestion": "Document dependencies, API keys, or setup needed"
+        },
+        {
+          "severity": "low",
+          "message": "No limitations documented",
+          "suggestion": "Add '## Limitations' section with known issues/constraints"
+        },
+        {
+          "severity": "low",
+          "message": "No troubleshooting section documented",
+          "suggestion": "Add '## Troubleshooting' with Error/Cause/Solution patterns"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-MEDIUM] Guide-only skill has very little content (4 lines) in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No examples provided in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-MEDIUM] SKILL_SPEC recommended field missing: 'version' in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-MEDIUM] SKILL_SPEC recommended field missing: 'metadata.author' in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-MEDIUM] SKILL_SPEC recommended field missing: 'metadata.tags' in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No '## Purpose' section in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No mention of error handling or validation in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No prerequisites/requirements documented in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No limitations documented in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No troubleshooting section documented in [path]/SKILL.md"
+        }
+      ],
+      "detail": null
+    },
+    {
+      "record_index": 16,
+      "case_id": "C03",
+      "scope": "skill",
+      "status": "complete",
+      "findings": [
+        {
+          "severity": "high",
+          "message": "Field 'description': Field required",
+          "suggestion": "Fix the 'description' field in frontmatter according to schema requirements"
+        },
+        {
+          "severity": "error",
+          "message": "[SCHEMA-HIGH] Field 'description': Field required in [path]/SKILL.md"
+        },
+        {
+          "severity": "medium",
+          "message": "Guide-only skill has very little content (4 lines)",
+          "suggestion": "Guide skills should have detailed instructions since they have no code"
+        },
+        {
+          "severity": "low",
+          "message": "No examples provided",
+          "suggestion": "Add example usage with code blocks"
+        },
+        {
+          "severity": "medium",
+          "message": "SKILL_SPEC recommended field missing: 'version'",
+          "suggestion": "Add 'version' to frontmatter — Semantic version (e.g., \"1.0.0\")"
+        },
+        {
+          "severity": "medium",
+          "message": "SKILL_SPEC recommended field missing: 'metadata.author'",
+          "suggestion": "Add 'author' under metadata: — Author name or team (under metadata:)"
+        },
+        {
+          "severity": "medium",
+          "message": "SKILL_SPEC recommended field missing: 'metadata.tags'",
+          "suggestion": "Add 'tags' under metadata: — Categorization tags (under metadata:, list of 1-5 items)"
+        },
+        {
+          "severity": "low",
+          "message": "No '## Purpose' section",
+          "suggestion": "Add purpose section to clarify use cases"
+        },
+        {
+          "severity": "low",
+          "message": "No mention of error handling or validation",
+          "suggestion": "Document expected errors and how to handle them"
+        },
+        {
+          "severity": "low",
+          "message": "No prerequisites/requirements documented",
+          "suggestion": "Document dependencies, API keys, or setup needed"
+        },
+        {
+          "severity": "low",
+          "message": "No limitations documented",
+          "suggestion": "Add '## Limitations' section with known issues/constraints"
+        },
+        {
+          "severity": "low",
+          "message": "No troubleshooting section documented",
+          "suggestion": "Add '## Troubleshooting' with Error/Cause/Solution patterns"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-MEDIUM] Guide-only skill has very little content (4 lines) in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No examples provided in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-MEDIUM] SKILL_SPEC recommended field missing: 'version' in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-MEDIUM] SKILL_SPEC recommended field missing: 'metadata.author' in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-MEDIUM] SKILL_SPEC recommended field missing: 'metadata.tags' in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No '## Purpose' section in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No mention of error handling or validation in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No prerequisites/requirements documented in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No limitations documented in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No troubleshooting section documented in [path]/SKILL.md"
+        }
+      ],
+      "detail": null
+    },
+    {
+      "record_index": 17,
+      "case_id": "C04",
+      "scope": "skill",
+      "status": "complete",
+      "findings": [
+        {
+          "severity": "high",
+          "message": "Invalid YAML syntax in frontmatter: while parsing a flow sequence\n  in \"<unicode string>\", line 2, column 14:\n    description: [Unclosed flow sequence\n                 ^\nexpected ',' or ']', but got '<stream end>'\n  in \"<unicode string>\", line 2, column 37:\n    description: [Unclosed flow sequence\n                                        ^",
+          "suggestion": "Fix YAML syntax errors (check indentation, quotes, colons)"
+        },
+        {
+          "severity": "error",
+          "message": "[SCHEMA-HIGH] Invalid YAML syntax in frontmatter: while parsing a flow sequence\n  in \"<unicode string>\", line 2, column 14:\n    description: [Unclosed flow sequence\n                 ^\nexpected ',' or ']', but got '<stream end>'\n  in \"<unicode string>\", line 2, column 37:\n    description: [Unclosed flow sequence\n                                        ^ in [path]/SKILL.md:3"
+        },
+        {
+          "severity": "medium",
+          "message": "Guide-only skill has very little content (5 lines)",
+          "suggestion": "Guide skills should have detailed instructions since they have no code"
+        },
+        {
+          "severity": "low",
+          "message": "No examples provided",
+          "suggestion": "Add example usage with code blocks"
+        },
+        {
+          "severity": "low",
+          "message": "No '## Purpose' section",
+          "suggestion": "Add purpose section to clarify use cases"
+        },
+        {
+          "severity": "low",
+          "message": "No mention of error handling or validation",
+          "suggestion": "Document expected errors and how to handle them"
+        },
+        {
+          "severity": "low",
+          "message": "No prerequisites/requirements documented",
+          "suggestion": "Document dependencies, API keys, or setup needed"
+        },
+        {
+          "severity": "low",
+          "message": "No limitations documented",
+          "suggestion": "Add '## Limitations' section with known issues/constraints"
+        },
+        {
+          "severity": "low",
+          "message": "No troubleshooting section documented",
+          "suggestion": "Add '## Troubleshooting' with Error/Cause/Solution patterns"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-MEDIUM] Guide-only skill has very little content (5 lines) in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No examples provided in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No '## Purpose' section in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No mention of error handling or validation in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No prerequisites/requirements documented in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No limitations documented in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No troubleshooting section documented in [path]/SKILL.md"
+        }
+      ],
+      "detail": null
+    },
+    {
+      "record_index": 18,
+      "case_id": "C05",
+      "scope": "skill",
+      "status": "complete",
+      "findings": [
+        {
+          "severity": "high",
+          "message": "Field 'name': Value error, Skill name 'Bad_Name' must be in kebab-case format (lowercase letters, numbers, and hyphens only, starting with a letter)",
+          "suggestion": "Fix the 'name' field in frontmatter according to schema requirements"
+        },
+        {
+          "severity": "error",
+          "message": "[SCHEMA-HIGH] Field 'name': Value error, Skill name 'Bad_Name' must be in kebab-case format (lowercase letters, numbers, and hyphens only, starting with a letter) in [path]/SKILL.md"
+        },
+        {
+          "severity": "high",
+          "message": "Invalid name format: 'Bad_Name' (lowercase/numbers/hyphens only)",
+          "suggestion": "Use only lowercase letters, numbers, and hyphens"
+        },
+        {
+          "severity": "medium",
+          "message": "Guide-only skill has very little content (5 lines)",
+          "suggestion": "Guide skills should have detailed instructions since they have no code"
+        },
+        {
+          "severity": "low",
+          "message": "No examples provided",
+          "suggestion": "Add example usage with code blocks"
+        },
+        {
+          "severity": "medium",
+          "message": "SKILL_SPEC recommended field missing: 'version'",
+          "suggestion": "Add 'version' to frontmatter — Semantic version (e.g., \"1.0.0\")"
+        },
+        {
+          "severity": "medium",
+          "message": "SKILL_SPEC recommended field missing: 'metadata.author'",
+          "suggestion": "Add 'author' under metadata: — Author name or team (under metadata:)"
+        },
+        {
+          "severity": "medium",
+          "message": "SKILL_SPEC recommended field missing: 'metadata.tags'",
+          "suggestion": "Add 'tags' under metadata: — Categorization tags (under metadata:, list of 1-5 items)"
+        },
+        {
+          "severity": "low",
+          "message": "No '## Purpose' section",
+          "suggestion": "Add purpose section to clarify use cases"
+        },
+        {
+          "severity": "medium",
+          "message": "Skill name not following convention: 'Bad_Name'",
+          "suggestion": "Use lowercase with hyphens: my-skill-name"
+        },
+        {
+          "severity": "low",
+          "message": "No mention of error handling or validation",
+          "suggestion": "Document expected errors and how to handle them"
+        },
+        {
+          "severity": "low",
+          "message": "No prerequisites/requirements documented",
+          "suggestion": "Document dependencies, API keys, or setup needed"
+        },
+        {
+          "severity": "low",
+          "message": "No limitations documented",
+          "suggestion": "Add '## Limitations' section with known issues/constraints"
+        },
+        {
+          "severity": "low",
+          "message": "No troubleshooting section documented",
+          "suggestion": "Add '## Troubleshooting' with Error/Cause/Solution patterns"
+        },
+        {
+          "severity": "error",
+          "message": "[QUALITY-HIGH] Invalid name format: 'Bad_Name' (lowercase/numbers/hyphens only) in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-MEDIUM] Guide-only skill has very little content (5 lines) in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No examples provided in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-MEDIUM] SKILL_SPEC recommended field missing: 'version' in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-MEDIUM] SKILL_SPEC recommended field missing: 'metadata.author' in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-MEDIUM] SKILL_SPEC recommended field missing: 'metadata.tags' in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No '## Purpose' section in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-MEDIUM] Skill name not following convention: 'Bad_Name' in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No mention of error handling or validation in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No prerequisites/requirements documented in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No limitations documented in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No troubleshooting section documented in [path]/SKILL.md"
+        }
+      ],
+      "detail": null
+    },
+    {
+      "record_index": 19,
+      "case_id": "C06",
+      "scope": "skill",
+      "status": "complete",
+      "findings": [
+        {
+          "severity": "high",
+          "message": "Field 'name': String should have at most 64 characters",
+          "suggestion": "Fix the 'name' field in frontmatter according to schema requirements"
+        },
+        {
+          "severity": "error",
+          "message": "[SCHEMA-HIGH] Field 'name': String should have at most 64 characters in [path]/SKILL.md"
+        },
+        {
+          "severity": "medium",
+          "message": "Guide-only skill has very little content (5 lines)",
+          "suggestion": "Guide skills should have detailed instructions since they have no code"
+        },
+        {
+          "severity": "low",
+          "message": "No examples provided",
+          "suggestion": "Add example usage with code blocks"
+        },
+        {
+          "severity": "medium",
+          "message": "SKILL_SPEC recommended field missing: 'version'",
+          "suggestion": "Add 'version' to frontmatter — Semantic version (e.g., \"1.0.0\")"
+        },
+        {
+          "severity": "medium",
+          "message": "SKILL_SPEC recommended field missing: 'metadata.author'",
+          "suggestion": "Add 'author' under metadata: — Author name or team (under metadata:)"
+        },
+        {
+          "severity": "medium",
+          "message": "SKILL_SPEC recommended field missing: 'metadata.tags'",
+          "suggestion": "Add 'tags' under metadata: — Categorization tags (under metadata:, list of 1-5 items)"
+        },
+        {
+          "severity": "low",
+          "message": "No '## Purpose' section",
+          "suggestion": "Add purpose section to clarify use cases"
+        },
+        {
+          "severity": "low",
+          "message": "No mention of error handling or validation",
+          "suggestion": "Document expected errors and how to handle them"
+        },
+        {
+          "severity": "low",
+          "message": "No prerequisites/requirements documented",
+          "suggestion": "Document dependencies, API keys, or setup needed"
+        },
+        {
+          "severity": "low",
+          "message": "No limitations documented",
+          "suggestion": "Add '## Limitations' section with known issues/constraints"
+        },
+        {
+          "severity": "low",
+          "message": "No troubleshooting section documented",
+          "suggestion": "Add '## Troubleshooting' with Error/Cause/Solution patterns"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-MEDIUM] Guide-only skill has very little content (5 lines) in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No examples provided in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-MEDIUM] SKILL_SPEC recommended field missing: 'version' in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-MEDIUM] SKILL_SPEC recommended field missing: 'metadata.author' in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-MEDIUM] SKILL_SPEC recommended field missing: 'metadata.tags' in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No '## Purpose' section in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No mention of error handling or validation in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No prerequisites/requirements documented in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No limitations documented in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No troubleshooting section documented in [path]/SKILL.md"
+        }
+      ],
+      "detail": null
+    },
+    {
+      "record_index": 20,
+      "case_id": "C07",
+      "scope": "skill",
+      "status": "complete",
+      "findings": [
+        {
+          "severity": "high",
+          "message": "Field 'description': String should have at most 1024 characters",
+          "suggestion": "Fix the 'description' field in frontmatter according to schema requirements"
+        },
+        {
+          "severity": "error",
+          "message": "[SCHEMA-HIGH] Field 'description': String should have at most 1024 characters in [path]/SKILL.md"
+        },
+        {
+          "severity": "medium",
+          "message": "Guide-only skill has very little content (5 lines)",
+          "suggestion": "Guide skills should have detailed instructions since they have no code"
+        },
+        {
+          "severity": "low",
+          "message": "No examples provided",
+          "suggestion": "Add example usage with code blocks"
+        },
+        {
+          "severity": "medium",
+          "message": "SKILL_SPEC recommended field missing: 'version'",
+          "suggestion": "Add 'version' to frontmatter — Semantic version (e.g., \"1.0.0\")"
+        },
+        {
+          "severity": "medium",
+          "message": "SKILL_SPEC recommended field missing: 'metadata.author'",
+          "suggestion": "Add 'author' under metadata: — Author name or team (under metadata:)"
+        },
+        {
+          "severity": "medium",
+          "message": "SKILL_SPEC recommended field missing: 'metadata.tags'",
+          "suggestion": "Add 'tags' under metadata: — Categorization tags (under metadata:, list of 1-5 items)"
+        },
+        {
+          "severity": "low",
+          "message": "Description very long (1025 chars, recommend 50-150)",
+          "suggestion": "Keep descriptions concise for progressive disclosure"
+        },
+        {
+          "severity": "low",
+          "message": "Description doesn't mention WHEN to use this skill",
+          "suggestion": "Add trigger context: 'Use for...', 'When you need to...'"
+        },
+        {
+          "severity": "low",
+          "message": "No '## Purpose' section",
+          "suggestion": "Add purpose section to clarify use cases"
+        },
+        {
+          "severity": "low",
+          "message": "No mention of error handling or validation",
+          "suggestion": "Document expected errors and how to handle them"
+        },
+        {
+          "severity": "low",
+          "message": "No prerequisites/requirements documented",
+          "suggestion": "Document dependencies, API keys, or setup needed"
+        },
+        {
+          "severity": "low",
+          "message": "No limitations documented",
+          "suggestion": "Add '## Limitations' section with known issues/constraints"
+        },
+        {
+          "severity": "low",
+          "message": "No troubleshooting section documented",
+          "suggestion": "Add '## Troubleshooting' with Error/Cause/Solution patterns"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-MEDIUM] Guide-only skill has very little content (5 lines) in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No examples provided in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-MEDIUM] SKILL_SPEC recommended field missing: 'version' in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-MEDIUM] SKILL_SPEC recommended field missing: 'metadata.author' in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-MEDIUM] SKILL_SPEC recommended field missing: 'metadata.tags' in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] Description very long (1025 chars, recommend 50-150) in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] Description doesn't mention WHEN to use this skill in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No '## Purpose' section in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No mention of error handling or validation in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No prerequisites/requirements documented in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No limitations documented in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No troubleshooting section documented in [path]/SKILL.md"
+        }
+      ],
+      "detail": null
+    },
+    {
+      "record_index": 21,
+      "case_id": "C08",
+      "scope": "skill",
+      "status": "complete",
+      "findings": [
+        {
+          "severity": "medium",
+          "message": "Skill not in standard location (skills/ or team-skills/)",
+          "suggestion": "Move skill to skills/<skill-name>/ or team-skills/<team>/<skill-name>/"
+        },
+        {
+          "severity": "high",
+          "message": "Missing top-level heading (# Title) in SKILL.md body",
+          "suggestion": "Add a top-level heading after the frontmatter, e.g. '# My Skill'"
+        },
+        {
+          "severity": "medium",
+          "message": "Missing recommended section: '## Instructions'",
+          "suggestion": "Consider adding a '## Instructions' or '## Usage' section. Per agentskills.io the body format is unrestricted, so this is a convention nudge — it also gives the quality scorer a stable anchor for instruction-quality heuristics."
+        },
+        {
+          "severity": "medium",
+          "message": "Missing recommended section: '## Examples'",
+          "suggestion": "Consider adding a '## Examples' section. If examples are already inline under instructions, this can be skipped."
+        },
+        {
+          "severity": "high",
+          "message": "Author not specified in metadata",
+          "suggestion": "Add 'metadata.author' field with format 'Name <email@example.com>'"
+        },
+        {
+          "severity": "error",
+          "message": "[SCHEMA-HIGH] Missing top-level heading (# Title) in SKILL.md body in [path]/SKILL.md"
+        },
+        {
+          "severity": "error",
+          "message": "[SCHEMA-HIGH] Author not specified in metadata in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[SCHEMA-MEDIUM] Skill not in standard location (skills/ or team-skills/) in [path]"
+        },
+        {
+          "severity": "warning",
+          "message": "[SCHEMA-MEDIUM] Missing recommended section: '## Instructions' in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[SCHEMA-MEDIUM] Missing recommended section: '## Examples' in [path]/SKILL.md"
+        },
+        {
+          "severity": "medium",
+          "message": "Guide-only skill has very little content (5 lines)",
+          "suggestion": "Guide skills should have detailed instructions since they have no code"
+        },
+        {
+          "severity": "low",
+          "message": "No examples provided",
+          "suggestion": "Add example usage with code blocks"
+        },
+        {
+          "severity": "medium",
+          "message": "SKILL_SPEC recommended field missing: 'version'",
+          "suggestion": "Add 'version' to frontmatter — Semantic version (e.g., \"1.0.0\")"
+        },
+        {
+          "severity": "medium",
+          "message": "SKILL_SPEC recommended field missing: 'metadata.author'",
+          "suggestion": "Add 'author' under metadata: — Author name or team (under metadata:)"
+        },
+        {
+          "severity": "medium",
+          "message": "SKILL_SPEC recommended field missing: 'metadata.tags'",
+          "suggestion": "Add 'tags' under metadata: — Categorization tags (under metadata:, list of 1-5 items)"
+        },
+        {
+          "severity": "low",
+          "message": "No '## Purpose' section",
+          "suggestion": "Add purpose section to clarify use cases"
+        },
+        {
+          "severity": "low",
+          "message": "No mention of error handling or validation",
+          "suggestion": "Document expected errors and how to handle them"
+        },
+        {
+          "severity": "low",
+          "message": "No prerequisites/requirements documented",
+          "suggestion": "Document dependencies, API keys, or setup needed"
+        },
+        {
+          "severity": "low",
+          "message": "No limitations documented",
+          "suggestion": "Add '## Limitations' section with known issues/constraints"
+        },
+        {
+          "severity": "low",
+          "message": "No troubleshooting section documented",
+          "suggestion": "Add '## Troubleshooting' with Error/Cause/Solution patterns"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-MEDIUM] Guide-only skill has very little content (5 lines) in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No examples provided in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-MEDIUM] SKILL_SPEC recommended field missing: 'version' in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-MEDIUM] SKILL_SPEC recommended field missing: 'metadata.author' in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-MEDIUM] SKILL_SPEC recommended field missing: 'metadata.tags' in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No '## Purpose' section in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No mention of error handling or validation in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No prerequisites/requirements documented in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No limitations documented in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No troubleshooting section documented in [path]/SKILL.md"
+        }
+      ],
+      "detail": null
+    },
+    {
+      "record_index": 22,
+      "case_id": "C09",
+      "scope": "skill",
+      "status": "complete",
+      "findings": [
+        {
+          "severity": "medium",
+          "message": "Skill not in standard location (skills/ or team-skills/)",
+          "suggestion": "Move skill to skills/<skill-name>/ or team-skills/<team>/<skill-name>/"
+        },
+        {
+          "severity": "high",
+          "message": "Missing top-level heading (# Title) in SKILL.md body",
+          "suggestion": "Add a top-level heading after the frontmatter, e.g. '# My Skill'"
+        },
+        {
+          "severity": "medium",
+          "message": "Missing recommended section: '## Instructions'",
+          "suggestion": "Consider adding a '## Instructions' or '## Usage' section. Per agentskills.io the body format is unrestricted, so this is a convention nudge — it also gives the quality scorer a stable anchor for instruction-quality heuristics."
+        },
+        {
+          "severity": "medium",
+          "message": "Missing recommended section: '## Examples'",
+          "suggestion": "Consider adding a '## Examples' section. If examples are already inline under instructions, this can be skipped."
+        },
+        {
+          "severity": "high",
+          "message": "Author not specified in metadata",
+          "suggestion": "Add 'metadata.author' field with format 'Name <email@example.com>'"
+        },
+        {
+          "severity": "error",
+          "message": "[SCHEMA-HIGH] Missing top-level heading (# Title) in SKILL.md body in [path]/SKILL.md"
+        },
+        {
+          "severity": "error",
+          "message": "[SCHEMA-HIGH] Author not specified in metadata in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[SCHEMA-MEDIUM] Skill not in standard location (skills/ or team-skills/) in [path]"
+        },
+        {
+          "severity": "warning",
+          "message": "[SCHEMA-MEDIUM] Missing recommended section: '## Instructions' in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[SCHEMA-MEDIUM] Missing recommended section: '## Examples' in [path]/SKILL.md"
+        },
+        {
+          "severity": "medium",
+          "message": "Guide-only skill has very little content (5 lines)",
+          "suggestion": "Guide skills should have detailed instructions since they have no code"
+        },
+        {
+          "severity": "low",
+          "message": "No examples provided",
+          "suggestion": "Add example usage with code blocks"
+        },
+        {
+          "severity": "medium",
+          "message": "SKILL_SPEC recommended field missing: 'version'",
+          "suggestion": "Add 'version' to frontmatter — Semantic version (e.g., \"1.0.0\")"
+        },
+        {
+          "severity": "medium",
+          "message": "SKILL_SPEC recommended field missing: 'metadata.author'",
+          "suggestion": "Add 'author' under metadata: — Author name or team (under metadata:)"
+        },
+        {
+          "severity": "medium",
+          "message": "SKILL_SPEC recommended field missing: 'metadata.tags'",
+          "suggestion": "Add 'tags' under metadata: — Categorization tags (under metadata:, list of 1-5 items)"
+        },
+        {
+          "severity": "low",
+          "message": "No '## Purpose' section",
+          "suggestion": "Add purpose section to clarify use cases"
+        },
+        {
+          "severity": "low",
+          "message": "No mention of error handling or validation",
+          "suggestion": "Document expected errors and how to handle them"
+        },
+        {
+          "severity": "low",
+          "message": "No prerequisites/requirements documented",
+          "suggestion": "Document dependencies, API keys, or setup needed"
+        },
+        {
+          "severity": "low",
+          "message": "No limitations documented",
+          "suggestion": "Add '## Limitations' section with known issues/constraints"
+        },
+        {
+          "severity": "low",
+          "message": "No troubleshooting section documented",
+          "suggestion": "Add '## Troubleshooting' with Error/Cause/Solution patterns"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-MEDIUM] Guide-only skill has very little content (5 lines) in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No examples provided in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-MEDIUM] SKILL_SPEC recommended field missing: 'version' in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-MEDIUM] SKILL_SPEC recommended field missing: 'metadata.author' in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-MEDIUM] SKILL_SPEC recommended field missing: 'metadata.tags' in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No '## Purpose' section in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No mention of error handling or validation in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No prerequisites/requirements documented in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No limitations documented in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No troubleshooting section documented in [path]/SKILL.md"
+        }
+      ],
+      "detail": null
+    },
+    {
+      "record_index": 23,
+      "case_id": "C10",
+      "scope": "skill",
+      "status": "complete",
+      "findings": [
+        {
+          "severity": "medium",
+          "message": "Skill not in standard location (skills/ or team-skills/)",
+          "suggestion": "Move skill to skills/<skill-name>/ or team-skills/<team>/<skill-name>/"
+        },
+        {
+          "severity": "high",
+          "message": "Missing top-level heading (# Title) in SKILL.md body",
+          "suggestion": "Add a top-level heading after the frontmatter, e.g. '# My Skill'"
+        },
+        {
+          "severity": "medium",
+          "message": "Missing recommended section: '## Instructions'",
+          "suggestion": "Consider adding a '## Instructions' or '## Usage' section. Per agentskills.io the body format is unrestricted, so this is a convention nudge — it also gives the quality scorer a stable anchor for instruction-quality heuristics."
+        },
+        {
+          "severity": "medium",
+          "message": "Missing recommended section: '## Examples'",
+          "suggestion": "Consider adding a '## Examples' section. If examples are already inline under instructions, this can be skipped."
+        },
+        {
+          "severity": "high",
+          "message": "Author must be of the form 'Name <email@host>'",
+          "suggestion": "Use format: 'Full Name <email@example.com>'"
+        },
+        {
+          "severity": "error",
+          "message": "[SCHEMA-HIGH] Missing top-level heading (# Title) in SKILL.md body in [path]/SKILL.md"
+        },
+        {
+          "severity": "error",
+          "message": "[SCHEMA-HIGH] Author must be of the form 'Name <email@host>' in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[SCHEMA-MEDIUM] Skill not in standard location (skills/ or team-skills/) in [path]"
+        },
+        {
+          "severity": "warning",
+          "message": "[SCHEMA-MEDIUM] Missing recommended section: '## Instructions' in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[SCHEMA-MEDIUM] Missing recommended section: '## Examples' in [path]/SKILL.md"
+        },
+        {
+          "severity": "medium",
+          "message": "Guide-only skill has very little content (10 lines)",
+          "suggestion": "Guide skills should have detailed instructions since they have no code"
+        },
+        {
+          "severity": "low",
+          "message": "No examples provided",
+          "suggestion": "Add example usage with code blocks"
+        },
+        {
+          "severity": "medium",
+          "message": "SKILL_SPEC recommended field missing: 'version'",
+          "suggestion": "Add 'version' to frontmatter — Semantic version (e.g., \"1.0.0\")"
+        },
+        {
+          "severity": "medium",
+          "message": "SKILL_SPEC recommended field missing: 'metadata.tags'",
+          "suggestion": "Add 'tags' under metadata: — Categorization tags (under metadata:, list of 1-5 items)"
+        },
+        {
+          "severity": "low",
+          "message": "No '## Purpose' section",
+          "suggestion": "Add purpose section to clarify use cases"
+        },
+        {
+          "severity": "low",
+          "message": "No mention of error handling or validation",
+          "suggestion": "Document expected errors and how to handle them"
+        },
+        {
+          "severity": "low",
+          "message": "No prerequisites/requirements documented",
+          "suggestion": "Document dependencies, API keys, or setup needed"
+        },
+        {
+          "severity": "low",
+          "message": "No limitations documented",
+          "suggestion": "Add '## Limitations' section with known issues/constraints"
+        },
+        {
+          "severity": "low",
+          "message": "No troubleshooting section documented",
+          "suggestion": "Add '## Troubleshooting' with Error/Cause/Solution patterns"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-MEDIUM] Guide-only skill has very little content (10 lines) in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No examples provided in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-MEDIUM] SKILL_SPEC recommended field missing: 'version' in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-MEDIUM] SKILL_SPEC recommended field missing: 'metadata.tags' in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No '## Purpose' section in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No mention of error handling or validation in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No prerequisites/requirements documented in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No limitations documented in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No troubleshooting section documented in [path]/SKILL.md"
+        }
+      ],
+      "detail": null
+    },
+    {
+      "record_index": 24,
+      "case_id": "C11",
+      "scope": "skill",
+      "status": "complete",
+      "findings": [
+        {
+          "severity": "high",
+          "message": "Field 'description': String should have at least 1 character",
+          "suggestion": "Fix the 'description' field in frontmatter according to schema requirements"
+        },
+        {
+          "severity": "error",
+          "message": "[SCHEMA-HIGH] Field 'description': String should have at least 1 character in [path]/SKILL.md"
+        },
+        {
+          "severity": "medium",
+          "message": "Guide-only skill has very little content (5 lines)",
+          "suggestion": "Guide skills should have detailed instructions since they have no code"
+        },
+        {
+          "severity": "low",
+          "message": "No examples provided",
+          "suggestion": "Add example usage with code blocks"
+        },
+        {
+          "severity": "medium",
+          "message": "SKILL_SPEC recommended field missing: 'version'",
+          "suggestion": "Add 'version' to frontmatter — Semantic version (e.g., \"1.0.0\")"
+        },
+        {
+          "severity": "medium",
+          "message": "SKILL_SPEC recommended field missing: 'metadata.author'",
+          "suggestion": "Add 'author' under metadata: — Author name or team (under metadata:)"
+        },
+        {
+          "severity": "medium",
+          "message": "SKILL_SPEC recommended field missing: 'metadata.tags'",
+          "suggestion": "Add 'tags' under metadata: — Categorization tags (under metadata:, list of 1-5 items)"
+        },
+        {
+          "severity": "low",
+          "message": "No '## Purpose' section",
+          "suggestion": "Add purpose section to clarify use cases"
+        },
+        {
+          "severity": "low",
+          "message": "No mention of error handling or validation",
+          "suggestion": "Document expected errors and how to handle them"
+        },
+        {
+          "severity": "low",
+          "message": "No prerequisites/requirements documented",
+          "suggestion": "Document dependencies, API keys, or setup needed"
+        },
+        {
+          "severity": "low",
+          "message": "No limitations documented",
+          "suggestion": "Add '## Limitations' section with known issues/constraints"
+        },
+        {
+          "severity": "low",
+          "message": "No troubleshooting section documented",
+          "suggestion": "Add '## Troubleshooting' with Error/Cause/Solution patterns"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-MEDIUM] Guide-only skill has very little content (5 lines) in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No examples provided in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-MEDIUM] SKILL_SPEC recommended field missing: 'version' in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-MEDIUM] SKILL_SPEC recommended field missing: 'metadata.author' in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-MEDIUM] SKILL_SPEC recommended field missing: 'metadata.tags' in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No '## Purpose' section in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No mention of error handling or validation in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No prerequisites/requirements documented in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No limitations documented in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No troubleshooting section documented in [path]/SKILL.md"
+        }
+      ],
+      "detail": null
+    },
+    {
+      "record_index": 25,
+      "case_id": "C12",
+      "scope": "skill",
+      "status": "complete",
+      "findings": [
+        {
+          "severity": "high",
+          "message": "SKILL.md must have YAML frontmatter between --- markers",
+          "suggestion": "Add frontmatter block: start with '---', add YAML content, end with '---'"
+        },
+        {
+          "severity": "error",
+          "message": "[SCHEMA-HIGH] SKILL.md must have YAML frontmatter between --- markers in [path]/SKILL.md:1"
+        },
+        {
+          "severity": "medium",
+          "message": "Guide-only skill has very little content (2 lines)",
+          "suggestion": "Guide skills should have detailed instructions since they have no code"
+        },
+        {
+          "severity": "low",
+          "message": "No examples provided",
+          "suggestion": "Add example usage with code blocks"
+        },
+        {
+          "severity": "low",
+          "message": "No '## Purpose' section",
+          "suggestion": "Add purpose section to clarify use cases"
+        },
+        {
+          "severity": "low",
+          "message": "No mention of error handling or validation",
+          "suggestion": "Document expected errors and how to handle them"
+        },
+        {
+          "severity": "low",
+          "message": "No prerequisites/requirements documented",
+          "suggestion": "Document dependencies, API keys, or setup needed"
+        },
+        {
+          "severity": "low",
+          "message": "No limitations documented",
+          "suggestion": "Add '## Limitations' section with known issues/constraints"
+        },
+        {
+          "severity": "low",
+          "message": "No troubleshooting section documented",
+          "suggestion": "Add '## Troubleshooting' with Error/Cause/Solution patterns"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-MEDIUM] Guide-only skill has very little content (2 lines) in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No examples provided in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No '## Purpose' section in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No mention of error handling or validation in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No prerequisites/requirements documented in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No limitations documented in [path]/SKILL.md"
+        },
+        {
+          "severity": "warning",
+          "message": "[QUALITY-LOW] No troubleshooting section documented in [path]/SKILL.md"
+        }
+      ],
+      "detail": null
+    },
+    {
+      "record_index": 26,
+      "case_id": "I01",
+      "scope": "instructions",
+      "status": "unsupported_scope",
+      "findings": [],
+      "detail": "instruction scope unsupported"
+    },
+    {
+      "record_index": 27,
+      "case_id": "I02",
+      "scope": "instructions",
+      "status": "unsupported_scope",
+      "findings": [],
+      "detail": "instruction scope unsupported"
+    },
+    {
+      "record_index": 28,
+      "case_id": "C01",
+      "scope": "skill",
+      "status": "complete",
+      "findings": [],
+      "detail": null
+    },
+    {
+      "record_index": 29,
+      "case_id": "C02",
+      "scope": "skill",
+      "status": "complete",
+      "findings": [
+        {
+          "severity": "error",
+          "message": "Missing 'name' in frontmatter"
+        }
+      ],
+      "detail": null
+    },
+    {
+      "record_index": 30,
+      "case_id": "C03",
+      "scope": "skill",
+      "status": "complete",
+      "findings": [
+        {
+          "severity": "error",
+          "message": "Missing 'description' in frontmatter"
+        }
+      ],
+      "detail": null
+    },
+    {
+      "record_index": 31,
+      "case_id": "C04",
+      "scope": "skill",
+      "status": "complete",
+      "findings": [
+        {
+          "severity": "error",
+          "message": "Invalid YAML in frontmatter: while parsing a flow sequence\n  in \"<unicode string>\", line 2, column 14:\n    description: [Unclosed flow sequence\n                 ^\nexpected ',' or ']', but got '<stream end>'\n  in \"<unicode string>\", line 2, column 37:\n    description: [Unclosed flow sequence\n                                        ^"
+        }
+      ],
+      "detail": null
+    },
+    {
+      "record_index": 32,
+      "case_id": "C05",
+      "scope": "skill",
+      "status": "complete",
+      "findings": [
+        {
+          "severity": "error",
+          "message": "Name 'Bad_Name' should be hyphen-case (lowercase letters, digits, and hyphens only)"
+        }
+      ],
+      "detail": null
+    },
+    {
+      "record_index": 33,
+      "case_id": "C06",
+      "scope": "skill",
+      "status": "complete",
+      "findings": [
+        {
+          "severity": "error",
+          "message": "Name is too long (65 characters). Maximum is 64 characters."
+        }
+      ],
+      "detail": null
+    },
+    {
+      "record_index": 34,
+      "case_id": "C07",
+      "scope": "skill",
+      "status": "complete",
+      "findings": [
+        {
+          "severity": "error",
+          "message": "Description is too long (1025 characters). Maximum is 1024 characters."
+        }
+      ],
+      "detail": null
+    },
+    {
+      "record_index": 35,
+      "case_id": "C08",
+      "scope": "skill",
+      "status": "complete",
+      "findings": [],
+      "detail": null
+    },
+    {
+      "record_index": 36,
+      "case_id": "C09",
+      "scope": "skill",
+      "status": "complete",
+      "findings": [],
+      "detail": null
+    },
+    {
+      "record_index": 37,
+      "case_id": "C10",
+      "scope": "skill",
+      "status": "complete",
+      "findings": [
+        {
+          "severity": "error",
+          "message": "Unexpected key(s) in SKILL.md frontmatter: compatibility. Allowed properties are: allowed-tools, description, license, metadata, name"
+        }
+      ],
+      "detail": null
+    },
+    {
+      "record_index": 38,
+      "case_id": "C11",
+      "scope": "skill",
+      "status": "complete",
+      "findings": [],
+      "detail": null
+    },
+    {
+      "record_index": 39,
+      "case_id": "C12",
+      "scope": "skill",
+      "status": "complete",
+      "findings": [
+        {
+          "severity": "error",
+          "message": "No YAML frontmatter found"
+        }
+      ],
+      "detail": null
+    },
+    {
+      "record_index": 40,
+      "case_id": "I01",
+      "scope": "instructions",
+      "status": "unsupported_scope",
+      "findings": [],
+      "detail": "instruction scope unsupported"
+    },
+    {
+      "record_index": 41,
+      "case_id": "I02",
+      "scope": "instructions",
+      "status": "unsupported_scope",
+      "findings": [],
+      "detail": "instruction scope unsupported"
+    },
+    {
+      "record_index": 42,
+      "case_id": "C01",
+      "scope": "skill",
+      "status": "complete",
+      "findings": [],
+      "detail": null
+    },
+    {
+      "record_index": 43,
+      "case_id": "C02",
+      "scope": "skill",
+      "status": "complete",
+      "findings": [
+        {
+          "severity": "error",
+          "message": "Missing 'name' in frontmatter"
+        }
+      ],
+      "detail": null
+    },
+    {
+      "record_index": 44,
+      "case_id": "C03",
+      "scope": "skill",
+      "status": "complete",
+      "findings": [
+        {
+          "severity": "error",
+          "message": "Missing 'description' in frontmatter"
+        }
+      ],
+      "detail": null
+    },
+    {
+      "record_index": 45,
+      "case_id": "C04",
+      "scope": "skill",
+      "status": "complete",
+      "findings": [
+        {
+          "severity": "error",
+          "message": "Invalid YAML in frontmatter: while parsing a flow sequence\n  in \"<unicode string>\", line 2, column 14:\n    description: [Unclosed flow sequence\n                 ^\nexpected ',' or ']', but got '<stream end>'\n  in \"<unicode string>\", line 2, column 37:\n    description: [Unclosed flow sequence\n                                        ^"
+        }
+      ],
+      "detail": null
+    },
+    {
+      "record_index": 46,
+      "case_id": "C05",
+      "scope": "skill",
+      "status": "complete",
+      "findings": [
+        {
+          "severity": "error",
+          "message": "Name 'Bad_Name' should be kebab-case (lowercase letters, digits, and hyphens only)"
+        }
+      ],
+      "detail": null
+    },
+    {
+      "record_index": 47,
+      "case_id": "C06",
+      "scope": "skill",
+      "status": "complete",
+      "findings": [
+        {
+          "severity": "error",
+          "message": "Name is too long (65 characters). Maximum is 64 characters."
+        }
+      ],
+      "detail": null
+    },
+    {
+      "record_index": 48,
+      "case_id": "C07",
+      "scope": "skill",
+      "status": "complete",
+      "findings": [
+        {
+          "severity": "error",
+          "message": "Description is too long (1025 characters). Maximum is 1024 characters."
+        }
+      ],
+      "detail": null
+    },
+    {
+      "record_index": 49,
+      "case_id": "C08",
+      "scope": "skill",
+      "status": "complete",
+      "findings": [],
+      "detail": null
+    },
+    {
+      "record_index": 50,
+      "case_id": "C09",
+      "scope": "skill",
+      "status": "complete",
+      "findings": [],
+      "detail": null
+    },
+    {
+      "record_index": 51,
+      "case_id": "C10",
+      "scope": "skill",
+      "status": "complete",
+      "findings": [],
+      "detail": null
+    },
+    {
+      "record_index": 52,
+      "case_id": "C11",
+      "scope": "skill",
+      "status": "complete",
+      "findings": [],
+      "detail": null
+    },
+    {
+      "record_index": 53,
+      "case_id": "C12",
+      "scope": "skill",
+      "status": "complete",
+      "findings": [
+        {
+          "severity": "error",
+          "message": "No YAML frontmatter found"
+        }
+      ],
+      "detail": null
+    },
+    {
+      "record_index": 54,
+      "case_id": "I01",
+      "scope": "instructions",
+      "status": "unsupported_scope",
+      "findings": [],
+      "detail": "instruction scope unsupported"
+    },
+    {
+      "record_index": 55,
+      "case_id": "I02",
+      "scope": "instructions",
+      "status": "unsupported_scope",
+      "findings": [],
+      "detail": "instruction scope unsupported"
+    }
+  ]
+}

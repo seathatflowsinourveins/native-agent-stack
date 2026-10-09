@@ -1,0 +1,160 @@
+{
+  "schema_version": 1,
+  "sealed_judge_sha256": "26e68e1b8950e0f289f3e994b1a90a6b84f75859bba8ec10418003e052b6f386",
+  "anonymous_packet_sha256": "7145370d6584747569e585be9d345b1f51fdb542b0a0ee08315d63539f49f440",
+  "preregistration": {
+    "schema_version": 1,
+    "locked_at": "2026-10-09T05:36:11Z",
+    "execution_started": false,
+    "preregistration_sha256": "6fc7045aed40d6a0d82ebc1234d2566f6ac51d0c3da7a946676eb92c0286836b",
+    "corpus_sha256": "c31ca2e699473cd39754dc22d5cb784fa010c1709358f2e0530cc8b0402fef63",
+    "corpus_hash_method": "Sorted file relative path UTF-8, NUL, then raw file bytes concatenated into SHA256; includes cases.json",
+    "private_arm_mapping_sha256": "fae1643bc5aff64fb654b2eac45e5a15aae6236fdaa20c539cfca5277516bb3e",
+    "judge_mapping_access": false,
+    "prior_unblinded_scores_reused": false
+  },
+  "blinded": true,
+  "judge_origin_leak_detected": false,
+  "judge_tool_calls": 0,
+  "mapping_revealed_after_seal": true,
+  "scope": "Frozen static validation synthetic diagnostic, not live skill-task or whole-source superiority",
+  "metric_formula": "precision=TP/(TP+FP); recall=TP/(TP+FN); F1=2TP/(2TP+FP+FN); FP counts unsupported assertions under the sealed rubric",
+  "shared_skill_metrics": [
+    {
+      "arm": "Arm-1",
+      "source": "openai",
+      "true_positives": 7,
+      "false_negatives": 2,
+      "unsupported_defect_assertions": 1,
+      "clean_true_negatives": 2,
+      "clean_false_positive_assertions": 1,
+      "precision": 0.875,
+      "recall": 0.7777777777777778,
+      "f1": 0.8235294117647058,
+      "static_threshold_pass": false
+    },
+    {
+      "arm": "Arm-2",
+      "source": "skillevaluator",
+      "true_positives": 8,
+      "false_negatives": 1,
+      "unsupported_defect_assertions": 95,
+      "clean_true_negatives": 0,
+      "clean_false_positive_assertions": 34,
+      "precision": 0.07766990291262135,
+      "recall": 0.8888888888888888,
+      "f1": 0.14285714285714285,
+      "static_threshold_pass": false
+    },
+    {
+      "arm": "Arm-3",
+      "source": "agnix",
+      "true_positives": 9,
+      "false_negatives": 0,
+      "unsupported_defect_assertions": 0,
+      "clean_true_negatives": 3,
+      "clean_false_positive_assertions": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "static_threshold_pass": true
+    },
+    {
+      "arm": "Arm-4",
+      "source": "anthropic",
+      "true_positives": 7,
+      "false_negatives": 2,
+      "unsupported_defect_assertions": 0,
+      "clean_true_negatives": 3,
+      "clean_false_positive_assertions": 0,
+      "precision": 1.0,
+      "recall": 0.7777777777777778,
+      "f1": 0.875,
+      "static_threshold_pass": false
+    }
+  ],
+  "agnix_gain_over_stronger_reference_control": 0.125,
+  "gain_threshold_pass": true,
+  "separate_instruction_case_labels": [
+    {
+      "arm": "Arm-3",
+      "case_id": "I01",
+      "status": "scored",
+      "seed_detected": null,
+      "unsupported_defect_count": 1,
+      "reason": "warning: \"Missing project context section in AGENTS instruction file\" asserts a missing section without stating that it is optional; its \"Add\" suggestion does not clarify optionality. The entire clean fixture is valid, so this assertion is unsupported. Info pinning is excluded."
+    },
+    {
+      "arm": "Arm-3",
+      "case_id": "I02",
+      "status": "scored",
+      "seed_detected": true,
+      "unsupported_defect_count": 1,
+      "reason": "error: \"Broken markdown link: 'missing-guide.md' (file not found: [path]/missing-guide.md)\" detects the seed. warning: \"Missing project context section in AGENTS instruction file\" adds an unsupported section assertion because optionality is unstated. Info pinning is excluded."
+    }
+  ],
+  "instruction_gate_pass": false,
+  "candidate_verdicts": {
+    "agnix": "trial-static-pass-routing-unproved",
+    "skillevaluator": "keep-but-compare-no-adopt-now",
+    "openai_skills": "stale-not-maintenance-qualified",
+    "anthropics_skills": "reference-control-only-general-rerule-unresolved"
+  },
+  "adopt_now": false,
+  "stages": {
+    "quality_at_pin": "source-reviewed and targeted native upstream checks passed",
+    "vendor_install": "both isolated vendor installs completed, exact pins and hashes retained",
+    "native_check": "50 complete supported reports; six explicit unsupported instruction scopes",
+    "inverse": "both executed and verified",
+    "fresh_session": "one unnamed natural request reached built-in validator; neither candidate reached",
+    "agnix_routing_proof_status": "unavailable: skill install is CC-gated",
+    "agnix_routing_proof_prerequisite": "The CC must apply a reviewed adoption/skills/manifest.json row through tools/adoption/install_skills.py before owning the later fresh-session routing proof",
+    "per_session_pss": "unmeasured; child samples do not qualify adoption",
+    "owner_apply": "not applied; owner gated"
+  },
+  "sampled_child_pss": {
+    "agnix": {
+      "samples": 14,
+      "min_kib": 28,
+      "median_kib": 109.0,
+      "max_kib": 51994,
+      "qualification": "Sampled native command child only; not per-session PSS or incremental client memory"
+    },
+    "skillevaluator": {
+      "samples": 12,
+      "min_kib": 31825,
+      "median_kib": 32161.5,
+      "max_kib": 38826,
+      "qualification": "Sampled native command child only; not per-session PSS or incremental client memory"
+    },
+    "openai_validator": {
+      "samples": 12,
+      "min_kib": 4972,
+      "median_kib": 5091.5,
+      "max_kib": 5099,
+      "qualification": "Sampled native command child only; not per-session PSS or incremental client memory"
+    },
+    "anthropic_validator": {
+      "samples": 12,
+      "min_kib": 4449,
+      "median_kib": 4526.5,
+      "max_kib": 4914,
+      "qualification": "Sampled native command child only; not per-session PSS or incremental client memory"
+    }
+  },
+  "method_limits": [
+    "One synthetic corpus, one fresh host/model session and one independent judge; no confidence interval or general ranking",
+    "NVIDIA quality template warnings and duplicate native structured/legacy findings were retained. The preregistered assertion-count F1 penalizes these; it does not establish its semantic quality, safety or Tier2/Tier3 performance",
+    "The instruction clean control elicited an optionality-ambiguous project-context warning; candidate instruction gate fails as preregistered",
+    "The static reference scripts do not constitute installation or a live task comparison of the whole skill repositories",
+    "No rerun of prior unblinded scoring and no outcome-driven rerun"
+  ],
+  "publication_gates": {
+    "designated_reads": "pending exact PR head",
+    "hosted_ci": "pending publication",
+    "pre_cue_tool": "required before landing; co-op to supply/run designated route",
+    "cc_cue": "not received",
+    "landing": "not authorized or performed"
+  },
+  "local_validation_rc": 0
+}

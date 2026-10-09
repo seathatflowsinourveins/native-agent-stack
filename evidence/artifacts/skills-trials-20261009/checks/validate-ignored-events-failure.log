@@ -1,0 +1,3 @@
+Publication validation failed:
+evidence/artifacts/skills-trials-20261009/fresh-events.jsonl: hash-listed but ignored by Git and not tracked, so a commit would leave it out; rename it, add a narrow .gitignore exception, or force-add it
+evidence/artifacts/skills-trials-20261009/judge-events.jsonl: hash-listed but ignored by Git and not tracked, so a commit would leave it out; rename it, add a narrow .gitignore exception, or force-add it

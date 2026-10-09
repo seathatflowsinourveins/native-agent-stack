@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "cases": [
+    {
+      "id": "C01",
+      "path": "C01/case-minimal",
+      "scope": "skill",
+      "expected": "clean",
+      "clean": true
+    },
+    {
+      "id": "C02",
+      "path": "C02/case-no-name",
+      "scope": "skill",
+      "expected": "name missing",
+      "clean": false
+    },
+    {
+      "id": "C03",
+      "path": "C03/case-no-description",
+      "scope": "skill",
+      "expected": "description missing",
+      "clean": false
+    },
+    {
+      "id": "C04",
+      "path": "C04/case-broken-yaml",
+      "scope": "skill",
+      "expected": "invalid YAML",
+      "clean": false
+    },
+    {
+      "id": "C05",
+      "path": "C05/Bad_Name",
+      "scope": "skill",
+      "expected": "invalid name",
+      "clean": false
+    },
+    {
+      "id": "C06",
+      "path": "C06/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "scope": "skill",
+      "expected": "name too long",
+      "clean": false
+    },
+    {
+      "id": "C07",
+      "path": "C07/case-long-description",
+      "scope": "skill",
+      "expected": "description too long",
+      "clean": false
+    },
+    {
+      "id": "C08",
+      "path": "C08/case-missing-reference",
+      "scope": "skill",
+      "expected": "missing local resource",
+      "clean": false
+    },
+    {
+      "id": "C09",
+      "path": "C09/case-existing-reference",
+      "scope": "skill",
+      "expected": "clean",
+      "clean": true
+    },
+    {
+      "id": "C10",
+      "path": "C10/case-optional-fields",
+      "scope": "skill",
+      "expected": "clean",
+      "clean": true
+    },
+    {
+      "id": "C11",
+      "path": "C11/case-empty-description",
+      "scope": "skill",
+      "expected": "description empty",
+      "clean": false
+    },
+    {
+      "id": "C12",
+      "path": "C12/case-no-frontmatter",
+      "scope": "skill",
+      "expected": "frontmatter missing",
+      "clean": false
+    },
+    {
+      "id": "I01",
+      "path": "I01",
+      "scope": "instructions",
+      "expected": "clean",
+      "clean": true
+    },
+    {
+      "id": "I02",
+      "path": "I02",
+      "scope": "instructions",
+      "expected": "missing local resource",
+      "clean": false
+    }
+  ]
+}

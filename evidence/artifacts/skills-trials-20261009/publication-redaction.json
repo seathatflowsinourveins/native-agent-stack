@@ -1,0 +1,360 @@
+{
+  "schema_version": 1,
+  "reason": "Native publication privacy validation prohibits personal home prefixes",
+  "rule": "Redact exact home prefix; normalize trailing whitespace in public vendor stdout and setup-failure log only; explicit derived metadata changes listed individually. No corpus, judge packet or label edits.",
+  "original_tree_retained_privately": true,
+  "frozen_inputs_and_judge_labels_changed": false,
+  "native_artifact_hashes": "native-results.json artifact entries refer private original bytes; use this mapping for public copies",
+  "changed_files": [
+    {
+      "path": "RESULT.json",
+      "original_sha256": "223fed27bb15dc994358520d964368679730daee35af1bb875a9e94d6404ab48",
+      "published_sha256": "e20375c4a62bb5e5c6eaff19e075767940bcf42a932cc051fd0b0625fd65ff71",
+      "changes": [
+        "explicit publication metadata or hash-domain clarification; native outcomes unchanged",
+        "P2-1: explicit CC-gated routing-proof status and CC-owned manifest/install prerequisite; historical native observation unchanged"
+      ],
+      "private_original_retained": true
+    },
+    {
+      "path": "blinding-audit.md",
+      "original_sha256": "512265c93af366c61cd2de264dc25d03e5c2ae7288fd63ea8410fb2ee9162834",
+      "published_sha256": "6444c430ae92f082af1e4abfd3bc19e321d5e1b919eb55118b9757282b99c67b",
+      "changes": [
+        "explicit publication metadata or hash-domain clarification; native outcomes unchanged"
+      ],
+      "private_original_retained": true
+    },
+    {
+      "path": "checks/judge-preexecution-failure.log",
+      "original_sha256": "4d92f29c4ec23c78fa352135893e7b68c2957b3b20cce635ce043743c47bbc42",
+      "published_sha256": "bc90d92ba5df93e01f3ac7924fa0d37001462e0be2770f2b424c8ebfccac2ecc",
+      "changes": [
+        "trailing presentation whitespace normalization"
+      ],
+      "private_original_retained": true
+    },
+    {
+      "path": "checks/landscape-skills-tests-initial-failure.log",
+      "original_sha256": "ea4e2998b50e9023fe316c36317523cbbe93bc5f083ccffda2d82d65290a5fcd",
+      "published_sha256": "55cd2d0621f886c7c66bfb9e212d8fb84ddf2b2913a983e3fa354ad5a5dd68a0",
+      "changes": [
+        "home prefix redaction"
+      ],
+      "private_original_retained": true
+    },
+    {
+      "path": "checks/skillevaluator-schema-initial-failure.log",
+      "original_sha256": "c8b28445ba14075abdaf90020d806855daab87de3939e07f42b110e35993b2f7",
+      "published_sha256": "52dd9b8b5fe73240ca6c10140de369f2afc37c128ac0ba270c104b482f0bd186",
+      "changes": [
+        "home prefix redaction"
+      ],
+      "private_original_retained": true
+    },
+    {
+      "path": "fresh-events.jsonl",
+      "original_sha256": "c4a6249b6ad0cdc66aee1ba4e97ec7715cba097bf91bddd9201de27990fda09c",
+      "published_sha256": "b8e49ab89268901008cc41b2c68045173897954236d4d4780981889a167a67ab",
+      "changes": [
+        "home prefix redaction"
+      ],
+      "private_original_retained": true
+    },
+    {
+      "path": "fresh-session.json",
+      "original_sha256": "5199cefe15c218d04dc443695d9b10cf1519958ecc67283ea032e9111d9215e8",
+      "published_sha256": "33c1382496a741bdeced7d6863407c1c818ffb14976064f9700ed15e047b4579",
+      "changes": [
+        "home prefix redaction",
+        "P2-1: explicit CC-gated routing-proof status and CC-owned manifest/install prerequisite; historical native observation unchanged"
+      ],
+      "private_original_retained": true
+    },
+    {
+      "path": "install-and-inverse.json",
+      "original_sha256": "61b5e903b8adcf907c36c679cefd072cbfb472d028f3a3851587810c5a040685",
+      "published_sha256": "918da8416a4eee4aa23a45c4d4691297ecb2a9a76789811a534d88c169f3c894",
+      "changes": [
+        "explicit publication metadata or hash-domain clarification; native outcomes unchanged",
+        "P2-1: explicit CC-gated routing-proof status and CC-owned manifest/install prerequisite; historical native observation unchanged"
+      ],
+      "private_original_retained": true
+    },
+    {
+      "path": "native/agnix/C08/stdout.txt",
+      "original_sha256": "55b5ad933560a34e830d694746bb086ee332c3b7c3a32630566da6cb883ae5c9",
+      "published_sha256": "7275a9bca580d5c3b851059d3d5a2fc538ee15315e156744f3e9a1538aa31d00",
+      "changes": [
+        "home prefix redaction",
+        "trailing presentation whitespace normalization"
+      ],
+      "private_original_retained": true
+    },
+    {
+      "path": "native/agnix/I02/stdout.txt",
+      "original_sha256": "9db79be8c3f82591d0a87f4e2532029e435c21a9488b4f633619bdf6748b461e",
+      "published_sha256": "cb2f76d93924f513d1b3fef31b2dc245c249d60aaeb36adbb8c5268394abad5e",
+      "changes": [
+        "home prefix redaction",
+        "trailing presentation whitespace normalization"
+      ],
+      "private_original_retained": true
+    },
+    {
+      "path": "native/native-results.json",
+      "original_sha256": "f86be1015a7d94a835d6c21b577669de27e9364ce70adc9169df54e7c01a328d",
+      "published_sha256": "5762d0c7294f96c5a7419dcf575e03a38282b254f3a78b2095c4147020360a29",
+      "changes": [
+        "home prefix redaction"
+      ],
+      "private_original_retained": true
+    },
+    {
+      "path": "native/skillevaluator/C01/reports/skillevaluator-output-20261009054055.json",
+      "original_sha256": "f24c80a6eeaa1b1ff390a9cd85b2e84d9626c6f82ec1d04490972687b9dcc11c",
+      "published_sha256": "430f97900d14ddd530bf27a0da57486331272952582ee3f071d03fb2839725f8",
+      "changes": [
+        "home prefix redaction"
+      ],
+      "private_original_retained": true
+    },
+    {
+      "path": "native/skillevaluator/C01/stdout.txt",
+      "original_sha256": "ea42a6a6552446f3a66896fed01fb74a89ce2b701ab2a7c9d1e1e14216b5e14c",
+      "published_sha256": "83190599f6a076c5da89286cb3c97bc90a985123361cf70adff8e460bc3ca721",
+      "changes": [
+        "home prefix redaction",
+        "trailing presentation whitespace normalization"
+      ],
+      "private_original_retained": true
+    },
+    {
+      "path": "native/skillevaluator/C02/reports/skillevaluator-output-20261009054056.json",
+      "original_sha256": "c0e26a1a53409cd5cddb7c1886f1504ec8f496591c3ad6c69ec64454cef43706",
+      "published_sha256": "0cc313f84598a540f7e5fb3512daa8d03b982dcc40dbf51708fad791bacbfd26",
+      "changes": [
+        "home prefix redaction"
+      ],
+      "private_original_retained": true
+    },
+    {
+      "path": "native/skillevaluator/C02/stdout.txt",
+      "original_sha256": "14fea1b5c08a00c282e8eba2eea79c7312be5d1a45d6d53ba3d13368dfdb5d7d",
+      "published_sha256": "ab32e967dbebc337872e43053ee279e94000aa5942ba624413fd3d52de0564c7",
+      "changes": [
+        "home prefix redaction",
+        "trailing presentation whitespace normalization"
+      ],
+      "private_original_retained": true
+    },
+    {
+      "path": "native/skillevaluator/C03/reports/skillevaluator-output-20261009054056.json",
+      "original_sha256": "9f27c1bf40ad1bb27cce1cd03a1aa4769cf3e479b0d979000db835cffcb21f8d",
+      "published_sha256": "05476421b77618925c9806159e1ab1ae14279212993fd78abdc6a3f89ff32d9b",
+      "changes": [
+        "home prefix redaction"
+      ],
+      "private_original_retained": true
+    },
+    {
+      "path": "native/skillevaluator/C03/stdout.txt",
+      "original_sha256": "63b79a37722e0378e4c000ffd047cace31dca30f829a61a810da5ca12e3ac97d",
+      "published_sha256": "cb7f02d7e30f59021e47adc600abd5fd6521a28dc696b96982554cba9b7a0d72",
+      "changes": [
+        "home prefix redaction",
+        "trailing presentation whitespace normalization"
+      ],
+      "private_original_retained": true
+    },
+    {
+      "path": "native/skillevaluator/C04/reports/skillevaluator-output-20261009054056.json",
+      "original_sha256": "50482c8331dfcf539e4516ea68f854d1ff32bdea6c83363ed3ec3733f2274cd3",
+      "published_sha256": "7a225e9998f2b59c93adfaf7af310e0423bbefcec6518f917db3f968da5a7b8c",
+      "changes": [
+        "home prefix redaction"
+      ],
+      "private_original_retained": true
+    },
+    {
+      "path": "native/skillevaluator/C04/stdout.txt",
+      "original_sha256": "b9adefc690c1984b1a6fa2c6288beca5044e75a71881397d5f59000286d08f1e",
+      "published_sha256": "dfc418e9fc1863510bfcc0f2212f66c577077f2d45faa26ee3647e307f761ecd",
+      "changes": [
+        "home prefix redaction",
+        "trailing presentation whitespace normalization"
+      ],
+      "private_original_retained": true
+    },
+    {
+      "path": "native/skillevaluator/C05/reports/skillevaluator-output-20261009054057.json",
+      "original_sha256": "3d3c39bfea8630e54f05274df1e452afa3875b6caf6c234381ed43619d388bfb",
+      "published_sha256": "99476a9507f76433cb639575dd367f953afa5a9e68f97d9f821b2394a8b9de08",
+      "changes": [
+        "home prefix redaction"
+      ],
+      "private_original_retained": true
+    },
+    {
+      "path": "native/skillevaluator/C05/stdout.txt",
+      "original_sha256": "6c6217e35c97baabcaaa913b388a2da5d40f2ac01c53218a3f79aa8a706912b6",
+      "published_sha256": "3e88462e887539d82232225c8ca17bdc6342e3c96b345d8f7bb457c30e53fb2b",
+      "changes": [
+        "home prefix redaction",
+        "trailing presentation whitespace normalization"
+      ],
+      "private_original_retained": true
+    },
+    {
+      "path": "native/skillevaluator/C06/reports/skillevaluator-output-20261009054057.json",
+      "original_sha256": "eae15e47d90a2191ae88b50e37aea26937b6415f922894dc318c7165fdbb1872",
+      "published_sha256": "0cc1c7ebe94a95f5e792d84b3f6b5336dba662fddb924ee867f037837e85cd30",
+      "changes": [
+        "home prefix redaction"
+      ],
+      "private_original_retained": true
+    },
+    {
+      "path": "native/skillevaluator/C06/stdout.txt",
+      "original_sha256": "c5bd387cfe352e1baaf22a585b4f33d9c99cd8d9ce33bb0b183730c37b60df3e",
+      "published_sha256": "1068904975bd67d27911793a241b7ec0631cfbbc9ee0f1f2afac41539dd242f4",
+      "changes": [
+        "home prefix redaction",
+        "trailing presentation whitespace normalization"
+      ],
+      "private_original_retained": true
+    },
+    {
+      "path": "native/skillevaluator/C07/reports/skillevaluator-output-20261009054058.json",
+      "original_sha256": "a631fbab39ef8b3fbd5e65f39797d9f7e9bf6a84916f74f3e35ed341f1611fd6",
+      "published_sha256": "ba7c06990662edbbc951b15862e9cde9fa547694601269955340540df84a8298",
+      "changes": [
+        "home prefix redaction"
+      ],
+      "private_original_retained": true
+    },
+    {
+      "path": "native/skillevaluator/C07/stdout.txt",
+      "original_sha256": "543ef49a00516fcdeed0979e62020c8cd32d0456464f148a20c3893ab1ca419e",
+      "published_sha256": "f1314a862a5b0e6ab7e4cc39a3b0a93636f5c0f887acf6a81374a91633e8df57",
+      "changes": [
+        "home prefix redaction",
+        "trailing presentation whitespace normalization"
+      ],
+      "private_original_retained": true
+    },
+    {
+      "path": "native/skillevaluator/C08/reports/skillevaluator-output-20261009054058.json",
+      "original_sha256": "9d1cf555ceee5c2dd8cad5dbc8ccd75d71b9773d846fa56871842e490cc55e3b",
+      "published_sha256": "fe85f2925c088e0802068e4ccac59b42b349be6ae3232b494437f4634ca8f8d3",
+      "changes": [
+        "home prefix redaction"
+      ],
+      "private_original_retained": true
+    },
+    {
+      "path": "native/skillevaluator/C08/stdout.txt",
+      "original_sha256": "0c36c8a5df2610e1c734978ac84b44d70c5b49c3e990afcdee73c8b3d5bf999b",
+      "published_sha256": "be97ce3936afafaeca6ce30ed9689be088e5070f88e1b2fe30fe284368496ef3",
+      "changes": [
+        "home prefix redaction",
+        "trailing presentation whitespace normalization"
+      ],
+      "private_original_retained": true
+    },
+    {
+      "path": "native/skillevaluator/C09/reports/skillevaluator-output-20261009054059.json",
+      "original_sha256": "42f5814749b92259ee2635010477acf67c49e139a03952b30ea2cf58aea2d54b",
+      "published_sha256": "18b23a8be5c40524aa0531d4c923d223be749ebaa355b3034e1a028b9a724d82",
+      "changes": [
+        "home prefix redaction"
+      ],
+      "private_original_retained": true
+    },
+    {
+      "path": "native/skillevaluator/C09/stdout.txt",
+      "original_sha256": "044a116a103974d02043c62f51cccee842a1bf775b7be1044c38dfc46776f644",
+      "published_sha256": "bbc8468e854e2277e7167a12acb1b398d17d3ca37f7b1f31036fe3f319c4d8c3",
+      "changes": [
+        "home prefix redaction",
+        "trailing presentation whitespace normalization"
+      ],
+      "private_original_retained": true
+    },
+    {
+      "path": "native/skillevaluator/C10/reports/skillevaluator-output-20261009054059.json",
+      "original_sha256": "d05bc8b1e8cb67508ac2ecc35433a965dfe1d987fe4947d5733eff0ed1e2be33",
+      "published_sha256": "45de9e081e3c9901f73dc0aaba04a9f66faf9b314064ab25e2cfc8ed918afb80",
+      "changes": [
+        "home prefix redaction"
+      ],
+      "private_original_retained": true
+    },
+    {
+      "path": "native/skillevaluator/C10/stdout.txt",
+      "original_sha256": "dda4897b53c43b9cfc01531e3e9fdbd138ec7c8ab01b429040952e9f444778ef",
+      "published_sha256": "53435ab2adaadd3e2a563e7f12dbf096ddb6193b689e0b318d1b13ac27d7354a",
+      "changes": [
+        "home prefix redaction",
+        "trailing presentation whitespace normalization"
+      ],
+      "private_original_retained": true
+    },
+    {
+      "path": "native/skillevaluator/C11/reports/skillevaluator-output-20261009054059.json",
+      "original_sha256": "49d14380c983edc9f0b3a5937400e2e409d7a0d2716d319d395b23e1760ae6f4",
+      "published_sha256": "11c625892be0bce1c079499bf485f2dc5c10d83ba0f6ce06628c0fa4656f6579",
+      "changes": [
+        "home prefix redaction"
+      ],
+      "private_original_retained": true
+    },
+    {
+      "path": "native/skillevaluator/C11/stdout.txt",
+      "original_sha256": "87464c9e10f0749127dfd373568541775fa600d17b3d583e502bc1cff5655625",
+      "published_sha256": "2bc954e506af1608919099b7ebb440a102645b5e93230492a11ca098a0bf9d44",
+      "changes": [
+        "home prefix redaction",
+        "trailing presentation whitespace normalization"
+      ],
+      "private_original_retained": true
+    },
+    {
+      "path": "native/skillevaluator/C12/reports/skillevaluator-output-20261009054100.json",
+      "original_sha256": "06b68251549059b74fdec6ba737504979e4d95c74b7fe38f4e0ae43a1ffdbbfc",
+      "published_sha256": "c0edfbef2047a3296d2ca3f8079916e3b4b7015f4d51dc891a1313087fc9dd90",
+      "changes": [
+        "home prefix redaction"
+      ],
+      "private_original_retained": true
+    },
+    {
+      "path": "native/skillevaluator/C12/stdout.txt",
+      "original_sha256": "56140b1949b026e9212b144a1547212fe2ce750a80578add0de68cf9117561cc",
+      "published_sha256": "51f7c7bb39fc5601c36f8b45c42a9df160e85a9545ddba34d1a506ad490bdd3b",
+      "changes": [
+        "home prefix redaction",
+        "trailing presentation whitespace normalization"
+      ],
+      "private_original_retained": true
+    },
+    {
+      "path": "native-session-retention.json",
+      "original_sha256": "e60ade7f98284453f89a0f9f3fc06bfc79a6e6f4d9034d857d189f4ee7a4c52b",
+      "published_sha256": "e474c9cca1b69cb409aa2d6e5ba65a6bbb7b72c48009e15c4cc3e18a094f6997",
+      "changes": [
+        "explicit publication metadata or hash-domain clarification; native outcomes unchanged"
+      ],
+      "private_original_retained": true
+    },
+    {
+      "path": "skillevaluator-source-review.md",
+      "original_sha256": "f7fa1723f1dcbbeece4f8bf483b3b599d23b150adeb3200eee648693447409dd",
+      "published_sha256": "6aac9f54babfb5c20008856daba903095da329a0d7497b60ac9e739f420e1eae",
+      "changes": [
+        "home prefix redaction"
+      ],
+      "private_original_retained": true
+    }
+  ]
+}

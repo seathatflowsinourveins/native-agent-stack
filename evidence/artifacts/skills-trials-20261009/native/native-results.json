@@ -1,0 +1,2182 @@
+{
+  "artifact_hash_domain": "Artifact hashes bind complete private native originals; publication-redaction.json binds those originals to home-prefix-redacted public files",
+  "preregistration_sha256": "6fc7045aed40d6a0d82ebc1234d2566f6ac51d0c3da7a946676eb92c0286836b",
+  "cases_sha256": "0e2dc9534fe26f8bdc49a49e7ee3588804f9f59be6d4dc556e456549f366c7f1",
+  "tool_files": {
+    "agnix": {
+      "path": "<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/agnix/bin/agnix",
+      "sha256": "a9f788f9a89c3f5e1563379de44b16c66494b49e1a780765d255f62654ba9ec7"
+    },
+    "skillevaluator": {
+      "path": "<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/skillevaluator/tools/skillevaluator/bin/skillevaluator",
+      "sha256": "79d40fcad520f33467ecaf61bff4cab196f86fafc9832481c6ff224683aa16a3"
+    },
+    "openai_validator": {
+      "path": "<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/skills-trials-20261009/sources/openai-quick-validate.py",
+      "sha256": "6cc9dc3199c935916cf6f73fcbbbb0e3bb1b58c8f5109fefa499978908164f51"
+    },
+    "anthropic_validator": {
+      "path": "<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/skills-trials-20261009/sources/anthropic-quick-validate.py",
+      "sha256": "67cf5703402013936c8fb75ad6a1afecd8841d45cc5e606b634eb05825fde365"
+    }
+  },
+  "python": "3.13.16 (main, Oct  1 2026, 20:59:14) [Clang 22.1.3 ]",
+  "records": [
+    {
+      "tool": "agnix",
+      "case_id": "C01",
+      "scope": "skill",
+      "command": [
+        "<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/agnix/bin/agnix",
+        "--target",
+        "codex",
+        "--format",
+        "json",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/corpus/C01/case-minimal"
+      ],
+      "rc": 0,
+      "execution_error": null,
+      "started_utc": "2026-10-09T05:40:54.433132+00:00",
+      "pss_kib": 152,
+      "pss_samples": 1,
+      "pss_scope": "child process only",
+      "pid": 310871,
+      "wall_seconds": 0.021343,
+      "status": "complete",
+      "detail": null,
+      "artifacts": [
+        {
+          "path": "agnix/C01/smaps_rollup.txt",
+          "sha256": "72998e93ed2c469431641ad46bd7a43e26fb2e1f8cb38726a323ec8311f76b9c"
+        },
+        {
+          "path": "agnix/C01/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "agnix/C01/stdout.txt",
+          "sha256": "3feceea1d891d581800be5c11483ab7f038cf5ba8a9596758dac0fa08a87293b"
+        }
+      ]
+    },
+    {
+      "tool": "agnix",
+      "case_id": "C02",
+      "scope": "skill",
+      "command": [
+        "<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/agnix/bin/agnix",
+        "--target",
+        "codex",
+        "--format",
+        "json",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/corpus/C02/case-no-name"
+      ],
+      "rc": 1,
+      "execution_error": null,
+      "started_utc": "2026-10-09T05:40:54.470223+00:00",
+      "pss_kib": 112,
+      "pss_samples": 1,
+      "pss_scope": "child process only",
+      "pid": 310986,
+      "wall_seconds": 0.021021,
+      "status": "complete",
+      "detail": null,
+      "artifacts": [
+        {
+          "path": "agnix/C02/smaps_rollup.txt",
+          "sha256": "e151d688b8d14b903d85f9138eafb3f74229f2c121953466c03630d9338fcb6a"
+        },
+        {
+          "path": "agnix/C02/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "agnix/C02/stdout.txt",
+          "sha256": "8809d9d3db34b1c496a38f3f96e7bc45e3926ba9535eb221bae3583b5c0dbcbf"
+        }
+      ]
+    },
+    {
+      "tool": "agnix",
+      "case_id": "C03",
+      "scope": "skill",
+      "command": [
+        "<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/agnix/bin/agnix",
+        "--target",
+        "codex",
+        "--format",
+        "json",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/corpus/C03/case-no-description"
+      ],
+      "rc": 1,
+      "execution_error": null,
+      "started_utc": "2026-10-09T05:40:54.503852+00:00",
+      "pss_kib": 109,
+      "pss_samples": 1,
+      "pss_scope": "child process only",
+      "pid": 311103,
+      "wall_seconds": 0.021042,
+      "status": "complete",
+      "detail": null,
+      "artifacts": [
+        {
+          "path": "agnix/C03/smaps_rollup.txt",
+          "sha256": "23202cbe4f1616edccdfb652de66083465de4527bf6e2c999381655139459b84"
+        },
+        {
+          "path": "agnix/C03/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "agnix/C03/stdout.txt",
+          "sha256": "7ae2a4d65a8a9899c40c42ebcacf186b3a76b32ed447c4a8de61a99da28c8662"
+        }
+      ]
+    },
+    {
+      "tool": "agnix",
+      "case_id": "C04",
+      "scope": "skill",
+      "command": [
+        "<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/agnix/bin/agnix",
+        "--target",
+        "codex",
+        "--format",
+        "json",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/corpus/C04/case-broken-yaml"
+      ],
+      "rc": 1,
+      "execution_error": null,
+      "started_utc": "2026-10-09T05:40:54.534413+00:00",
+      "pss_kib": 109,
+      "pss_samples": 1,
+      "pss_scope": "child process only",
+      "pid": 311213,
+      "wall_seconds": 0.021183,
+      "status": "complete",
+      "detail": null,
+      "artifacts": [
+        {
+          "path": "agnix/C04/smaps_rollup.txt",
+          "sha256": "20b82d3ddf8023975a53464b133d89c1263102135a4b23d57c9ef98e8a9372e5"
+        },
+        {
+          "path": "agnix/C04/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "agnix/C04/stdout.txt",
+          "sha256": "e16ee3582836bf545c2398279a31a1640bb090813833dc0ebce77f8410474fdd"
+        }
+      ]
+    },
+    {
+      "tool": "agnix",
+      "case_id": "C05",
+      "scope": "skill",
+      "command": [
+        "<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/agnix/bin/agnix",
+        "--target",
+        "codex",
+        "--format",
+        "json",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/corpus/C05/Bad_Name"
+      ],
+      "rc": 1,
+      "execution_error": null,
+      "started_utc": "2026-10-09T05:40:54.564833+00:00",
+      "pss_kib": 109,
+      "pss_samples": 1,
+      "pss_scope": "child process only",
+      "pid": 311307,
+      "wall_seconds": 0.021116,
+      "status": "complete",
+      "detail": null,
+      "artifacts": [
+        {
+          "path": "agnix/C05/smaps_rollup.txt",
+          "sha256": "0dd4c4ac1463a440694f93f54284f193c7ac162de6d67562a68302b2d62b5762"
+        },
+        {
+          "path": "agnix/C05/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "agnix/C05/stdout.txt",
+          "sha256": "ea918f05e20a79fbc1cb2b92f005c2fff6e29c910e482026b115d8cf5037d008"
+        }
+      ]
+    },
+    {
+      "tool": "agnix",
+      "case_id": "C06",
+      "scope": "skill",
+      "command": [
+        "<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/agnix/bin/agnix",
+        "--target",
+        "codex",
+        "--format",
+        "json",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/corpus/C06/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      ],
+      "rc": 1,
+      "execution_error": null,
+      "started_utc": "2026-10-09T05:40:54.594982+00:00",
+      "pss_kib": 109,
+      "pss_samples": 1,
+      "pss_scope": "child process only",
+      "pid": 311477,
+      "wall_seconds": 0.021493,
+      "status": "complete",
+      "detail": null,
+      "artifacts": [
+        {
+          "path": "agnix/C06/smaps_rollup.txt",
+          "sha256": "96e6b69c6751c5fa001ac2290a3abc562b334d99bd3d1f76dfc1149dbb3dc98c"
+        },
+        {
+          "path": "agnix/C06/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "agnix/C06/stdout.txt",
+          "sha256": "c982bd64894d8f16a6c4229b285d480585a125c6d869c18db05b8c070f384871"
+        }
+      ]
+    },
+    {
+      "tool": "agnix",
+      "case_id": "C07",
+      "scope": "skill",
+      "command": [
+        "<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/agnix/bin/agnix",
+        "--target",
+        "codex",
+        "--format",
+        "json",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/corpus/C07/case-long-description"
+      ],
+      "rc": 1,
+      "execution_error": null,
+      "started_utc": "2026-10-09T05:40:54.626184+00:00",
+      "pss_kib": 109,
+      "pss_samples": 1,
+      "pss_scope": "child process only",
+      "pid": 311586,
+      "wall_seconds": 0.021169,
+      "status": "complete",
+      "detail": null,
+      "artifacts": [
+        {
+          "path": "agnix/C07/smaps_rollup.txt",
+          "sha256": "73d74efdd8de3e4e2174725a99dccba186efb6b7076f9f12044e28a60c5002b0"
+        },
+        {
+          "path": "agnix/C07/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "agnix/C07/stdout.txt",
+          "sha256": "9cfeb16fb3860b8852a540f9400003123aad688d4185dbe9bb2c8a6c0c5f82cc"
+        }
+      ]
+    },
+    {
+      "tool": "agnix",
+      "case_id": "C08",
+      "scope": "skill",
+      "command": [
+        "<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/agnix/bin/agnix",
+        "--target",
+        "codex",
+        "--format",
+        "json",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/corpus/C08/case-missing-reference"
+      ],
+      "rc": 1,
+      "execution_error": null,
+      "started_utc": "2026-10-09T05:40:54.656679+00:00",
+      "pss_kib": 32,
+      "pss_samples": 1,
+      "pss_scope": "child process only",
+      "pid": 311673,
+      "wall_seconds": 0.02115,
+      "status": "complete",
+      "detail": null,
+      "artifacts": [
+        {
+          "path": "agnix/C08/smaps_rollup.txt",
+          "sha256": "88ae990e459ea9f9b696e40c83c33d98a0ea307313846796d41a2f4a6acac253"
+        },
+        {
+          "path": "agnix/C08/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "agnix/C08/stdout.txt",
+          "sha256": "55b5ad933560a34e830d694746bb086ee332c3b7c3a32630566da6cb883ae5c9"
+        }
+      ]
+    },
+    {
+      "tool": "agnix",
+      "case_id": "C09",
+      "scope": "skill",
+      "command": [
+        "<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/agnix/bin/agnix",
+        "--target",
+        "codex",
+        "--format",
+        "json",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/corpus/C09/case-existing-reference"
+      ],
+      "rc": 0,
+      "execution_error": null,
+      "started_utc": "2026-10-09T05:40:54.686717+00:00",
+      "pss_kib": 120,
+      "pss_samples": 1,
+      "pss_scope": "child process only",
+      "pid": 311770,
+      "wall_seconds": 0.020993,
+      "status": "complete",
+      "detail": null,
+      "artifacts": [
+        {
+          "path": "agnix/C09/smaps_rollup.txt",
+          "sha256": "c13f5f43b827c76719d954e992c5f06f6601f747737ed13037e01776493d5a07"
+        },
+        {
+          "path": "agnix/C09/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "agnix/C09/stdout.txt",
+          "sha256": "f2139137eed6f7e1d9b57190cc283d8698bfe94db59a3d19870ea6d37163550b"
+        }
+      ]
+    },
+    {
+      "tool": "agnix",
+      "case_id": "C10",
+      "scope": "skill",
+      "command": [
+        "<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/agnix/bin/agnix",
+        "--target",
+        "codex",
+        "--format",
+        "json",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/corpus/C10/case-optional-fields"
+      ],
+      "rc": 0,
+      "execution_error": null,
+      "started_utc": "2026-10-09T05:40:54.716584+00:00",
+      "pss_kib": 28,
+      "pss_samples": 1,
+      "pss_scope": "child process only",
+      "pid": 311867,
+      "wall_seconds": 0.020867,
+      "status": "complete",
+      "detail": null,
+      "artifacts": [
+        {
+          "path": "agnix/C10/smaps_rollup.txt",
+          "sha256": "85e97e7d2738f225008db3507dde5f239064eb1571f145d60e55a677cf7f6308"
+        },
+        {
+          "path": "agnix/C10/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "agnix/C10/stdout.txt",
+          "sha256": "3feceea1d891d581800be5c11483ab7f038cf5ba8a9596758dac0fa08a87293b"
+        }
+      ]
+    },
+    {
+      "tool": "agnix",
+      "case_id": "C11",
+      "scope": "skill",
+      "command": [
+        "<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/agnix/bin/agnix",
+        "--target",
+        "codex",
+        "--format",
+        "json",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/corpus/C11/case-empty-description"
+      ],
+      "rc": 1,
+      "execution_error": null,
+      "started_utc": "2026-10-09T05:40:54.746762+00:00",
+      "pss_kib": 120,
+      "pss_samples": 1,
+      "pss_scope": "child process only",
+      "pid": 311953,
+      "wall_seconds": 0.021064,
+      "status": "complete",
+      "detail": null,
+      "artifacts": [
+        {
+          "path": "agnix/C11/smaps_rollup.txt",
+          "sha256": "46ad492e990a7a881b1954173bbfc787c9a9bb15bd81798dd90ee48f0c22b040"
+        },
+        {
+          "path": "agnix/C11/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "agnix/C11/stdout.txt",
+          "sha256": "dc18f398550c57bc3e454d8ce6669697a94a5c7d18e8f70a3f87e8e647194831"
+        }
+      ]
+    },
+    {
+      "tool": "agnix",
+      "case_id": "C12",
+      "scope": "skill",
+      "command": [
+        "<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/agnix/bin/agnix",
+        "--target",
+        "codex",
+        "--format",
+        "json",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/corpus/C12/case-no-frontmatter"
+      ],
+      "rc": 1,
+      "execution_error": null,
+      "started_utc": "2026-10-09T05:40:54.776758+00:00",
+      "pss_kib": 32,
+      "pss_samples": 1,
+      "pss_scope": "child process only",
+      "pid": 312050,
+      "wall_seconds": 0.020883,
+      "status": "complete",
+      "detail": null,
+      "artifacts": [
+        {
+          "path": "agnix/C12/smaps_rollup.txt",
+          "sha256": "386943a6bc9fcf1759f11542d3a968a45e059002874e0936432f88d2ad718ca7"
+        },
+        {
+          "path": "agnix/C12/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "agnix/C12/stdout.txt",
+          "sha256": "58ab1f2819eb275ef98f8828beadc20c43bdb163e69181ab468480fc5d861f79"
+        }
+      ]
+    },
+    {
+      "tool": "agnix",
+      "case_id": "I01",
+      "scope": "instructions",
+      "command": [
+        "<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/agnix/bin/agnix",
+        "--target",
+        "codex",
+        "--format",
+        "json",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/corpus/I01"
+      ],
+      "rc": 0,
+      "execution_error": null,
+      "started_utc": "2026-10-09T05:40:54.807055+00:00",
+      "pss_kib": 51994,
+      "pss_samples": 2,
+      "pss_scope": "child process only",
+      "pid": 312152,
+      "wall_seconds": 0.041972,
+      "status": "complete",
+      "detail": null,
+      "artifacts": [
+        {
+          "path": "agnix/I01/smaps_rollup.txt",
+          "sha256": "39faa86684e054a824d1274234d11b086df0fe8f044c90db61d12faedf8de8fc"
+        },
+        {
+          "path": "agnix/I01/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "agnix/I01/stdout.txt",
+          "sha256": "ae3dcdcfbd8a05ca2b6e9b261f1c211ff2d9e139cd9f55c1728ba01676d030df"
+        }
+      ]
+    },
+    {
+      "tool": "agnix",
+      "case_id": "I02",
+      "scope": "instructions",
+      "command": [
+        "<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/agnix/bin/agnix",
+        "--target",
+        "codex",
+        "--format",
+        "json",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/corpus/I02"
+      ],
+      "rc": 1,
+      "execution_error": null,
+      "started_utc": "2026-10-09T05:40:54.858092+00:00",
+      "pss_kib": 41638,
+      "pss_samples": 2,
+      "pss_scope": "child process only",
+      "pid": 312275,
+      "wall_seconds": 0.042295,
+      "status": "complete",
+      "detail": null,
+      "artifacts": [
+        {
+          "path": "agnix/I02/smaps_rollup.txt",
+          "sha256": "c7939c6598888042e57ad6b1869f8d32fc9cf60474e2c455d651f17fdfe461d4"
+        },
+        {
+          "path": "agnix/I02/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "agnix/I02/stdout.txt",
+          "sha256": "9db79be8c3f82591d0a87f4e2532029e435c21a9488b4f633619bdf6748b461e"
+        }
+      ]
+    },
+    {
+      "tool": "skillevaluator",
+      "case_id": "C01",
+      "scope": "skill",
+      "command": [
+        "<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/skillevaluator/tools/skillevaluator/bin/skillevaluator",
+        "validate",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/corpus/C01/case-minimal",
+        "--tiers",
+        "1",
+        "--checks",
+        "schema,quality",
+        "--no-llm",
+        "--min-score",
+        "70",
+        "-r",
+        "json",
+        "-o",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/native/skillevaluator/C01/reports"
+      ],
+      "rc": 1,
+      "execution_error": null,
+      "started_utc": "2026-10-09T05:40:54.910162+00:00",
+      "pss_kib": 38826,
+      "pss_samples": 44,
+      "pss_scope": "child process only",
+      "pid": 312405,
+      "wall_seconds": 0.958447,
+      "native_validators": [
+        {
+          "validator": "Schema & Repository Governance",
+          "status": "failed"
+        },
+        {
+          "validator": "QUALITY",
+          "status": "passed"
+        }
+      ],
+      "status": "complete",
+      "detail": null,
+      "artifacts": [
+        {
+          "path": "skillevaluator/C01/reports/BENCHMARK.md",
+          "sha256": "498508533ef50bb2a684edcb83b0587dc9478010738b9369de1df29874812038"
+        },
+        {
+          "path": "skillevaluator/C01/reports/skillevaluator-output-20261009054055.json",
+          "sha256": "f24c80a6eeaa1b1ff390a9cd85b2e84d9626c6f82ec1d04490972687b9dcc11c"
+        },
+        {
+          "path": "skillevaluator/C01/smaps_rollup.txt",
+          "sha256": "0850f4d31b938e0d507c3ceda96208293b6ed08f92e0b44ab7cd676aeeeaf6c8"
+        },
+        {
+          "path": "skillevaluator/C01/stderr.txt",
+          "sha256": "fd45d200adde9a4a3d9ef87e26ce7582d4f570826ad5c7b124e04449eb283906"
+        },
+        {
+          "path": "skillevaluator/C01/stdout.txt",
+          "sha256": "ea42a6a6552446f3a66896fed01fb74a89ce2b701ab2a7c9d1e1e14216b5e14c"
+        }
+      ]
+    },
+    {
+      "tool": "skillevaluator",
+      "case_id": "C02",
+      "scope": "skill",
+      "command": [
+        "<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/skillevaluator/tools/skillevaluator/bin/skillevaluator",
+        "validate",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/corpus/C02/case-no-name",
+        "--tiers",
+        "1",
+        "--checks",
+        "schema,quality",
+        "--no-llm",
+        "--min-score",
+        "70",
+        "-r",
+        "json",
+        "-o",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/native/skillevaluator/C02/reports"
+      ],
+      "rc": 1,
+      "execution_error": null,
+      "started_utc": "2026-10-09T05:40:55.879076+00:00",
+      "pss_kib": 32210,
+      "pss_samples": 17,
+      "pss_scope": "child process only",
+      "pid": 313617,
+      "wall_seconds": 0.386703,
+      "native_validators": [
+        {
+          "validator": "Schema & Repository Governance",
+          "status": "failed"
+        },
+        {
+          "validator": "QUALITY",
+          "status": "passed"
+        }
+      ],
+      "status": "complete",
+      "detail": null,
+      "artifacts": [
+        {
+          "path": "skillevaluator/C02/reports/BENCHMARK.md",
+          "sha256": "8fce0449e4770c8eef7a5d41ece892386a5352cbac436756a5148f7e46914692"
+        },
+        {
+          "path": "skillevaluator/C02/reports/skillevaluator-output-20261009054056.json",
+          "sha256": "c0e26a1a53409cd5cddb7c1886f1504ec8f496591c3ad6c69ec64454cef43706"
+        },
+        {
+          "path": "skillevaluator/C02/smaps_rollup.txt",
+          "sha256": "6dffaf7f49f2be1d4e289d001e6be9c2a97692d6aef60c201b0c26e5ad2afad6"
+        },
+        {
+          "path": "skillevaluator/C02/stderr.txt",
+          "sha256": "fd45d200adde9a4a3d9ef87e26ce7582d4f570826ad5c7b124e04449eb283906"
+        },
+        {
+          "path": "skillevaluator/C02/stdout.txt",
+          "sha256": "14fea1b5c08a00c282e8eba2eea79c7312be5d1a45d6d53ba3d13368dfdb5d7d"
+        }
+      ]
+    },
+    {
+      "tool": "skillevaluator",
+      "case_id": "C03",
+      "scope": "skill",
+      "command": [
+        "<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/skillevaluator/tools/skillevaluator/bin/skillevaluator",
+        "validate",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/corpus/C03/case-no-description",
+        "--tiers",
+        "1",
+        "--checks",
+        "schema,quality",
+        "--no-llm",
+        "--min-score",
+        "70",
+        "-r",
+        "json",
+        "-o",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/native/skillevaluator/C03/reports"
+      ],
+      "rc": 1,
+      "execution_error": null,
+      "started_utc": "2026-10-09T05:40:56.275530+00:00",
+      "pss_kib": 32214,
+      "pss_samples": 17,
+      "pss_scope": "child process only",
+      "pid": 313939,
+      "wall_seconds": 0.388253,
+      "native_validators": [
+        {
+          "validator": "Schema & Repository Governance",
+          "status": "failed"
+        },
+        {
+          "validator": "QUALITY",
+          "status": "passed"
+        }
+      ],
+      "status": "complete",
+      "detail": null,
+      "artifacts": [
+        {
+          "path": "skillevaluator/C03/reports/BENCHMARK.md",
+          "sha256": "1224d0374ee3c57c766028ce7295d28723b1590eb13f5521c80a848f8ed51130"
+        },
+        {
+          "path": "skillevaluator/C03/reports/skillevaluator-output-20261009054056.json",
+          "sha256": "9f27c1bf40ad1bb27cce1cd03a1aa4769cf3e479b0d979000db835cffcb21f8d"
+        },
+        {
+          "path": "skillevaluator/C03/smaps_rollup.txt",
+          "sha256": "0c79ec14b738b9ac94fc0f08c6f3f8ef45e83978490c1591ea5c4569dde36953"
+        },
+        {
+          "path": "skillevaluator/C03/stderr.txt",
+          "sha256": "fd45d200adde9a4a3d9ef87e26ce7582d4f570826ad5c7b124e04449eb283906"
+        },
+        {
+          "path": "skillevaluator/C03/stdout.txt",
+          "sha256": "63b79a37722e0378e4c000ffd047cace31dca30f829a61a810da5ca12e3ac97d"
+        }
+      ]
+    },
+    {
+      "tool": "skillevaluator",
+      "case_id": "C04",
+      "scope": "skill",
+      "command": [
+        "<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/skillevaluator/tools/skillevaluator/bin/skillevaluator",
+        "validate",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/corpus/C04/case-broken-yaml",
+        "--tiers",
+        "1",
+        "--checks",
+        "schema,quality",
+        "--no-llm",
+        "--min-score",
+        "70",
+        "-r",
+        "json",
+        "-o",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/native/skillevaluator/C04/reports"
+      ],
+      "rc": 1,
+      "execution_error": null,
+      "started_utc": "2026-10-09T05:40:56.673438+00:00",
+      "pss_kib": 31825,
+      "pss_samples": 18,
+      "pss_scope": "child process only",
+      "pid": 314380,
+      "wall_seconds": 0.409415,
+      "native_validators": [
+        {
+          "validator": "Schema & Repository Governance",
+          "status": "failed"
+        },
+        {
+          "validator": "QUALITY",
+          "status": "passed"
+        }
+      ],
+      "status": "complete",
+      "detail": null,
+      "artifacts": [
+        {
+          "path": "skillevaluator/C04/reports/BENCHMARK.md",
+          "sha256": "594e0a62530a9067dc92666b85d947a005358cd8e911d10b65261eb12a309845"
+        },
+        {
+          "path": "skillevaluator/C04/reports/skillevaluator-output-20261009054056.json",
+          "sha256": "50482c8331dfcf539e4516ea68f854d1ff32bdea6c83363ed3ec3733f2274cd3"
+        },
+        {
+          "path": "skillevaluator/C04/smaps_rollup.txt",
+          "sha256": "f1672026dffc736bd1818c65fc01ba5052e6a6d0d3d73aaa8b32bf429f7e09b7"
+        },
+        {
+          "path": "skillevaluator/C04/stderr.txt",
+          "sha256": "fd45d200adde9a4a3d9ef87e26ce7582d4f570826ad5c7b124e04449eb283906"
+        },
+        {
+          "path": "skillevaluator/C04/stdout.txt",
+          "sha256": "b9adefc690c1984b1a6fa2c6288beca5044e75a71881397d5f59000286d08f1e"
+        }
+      ]
+    },
+    {
+      "tool": "skillevaluator",
+      "case_id": "C05",
+      "scope": "skill",
+      "command": [
+        "<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/skillevaluator/tools/skillevaluator/bin/skillevaluator",
+        "validate",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/corpus/C05/Bad_Name",
+        "--tiers",
+        "1",
+        "--checks",
+        "schema,quality",
+        "--no-llm",
+        "--min-score",
+        "70",
+        "-r",
+        "json",
+        "-o",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/native/skillevaluator/C05/reports"
+      ],
+      "rc": 1,
+      "execution_error": null,
+      "started_utc": "2026-10-09T05:40:57.093264+00:00",
+      "pss_kib": 32227,
+      "pss_samples": 19,
+      "pss_scope": "child process only",
+      "pid": 314735,
+      "wall_seconds": 0.410537,
+      "native_validators": [
+        {
+          "validator": "Schema & Repository Governance",
+          "status": "failed"
+        },
+        {
+          "validator": "QUALITY",
+          "status": "failed"
+        }
+      ],
+      "status": "complete",
+      "detail": null,
+      "artifacts": [
+        {
+          "path": "skillevaluator/C05/reports/BENCHMARK.md",
+          "sha256": "e2d4f09476092cbbe7f6568896d41b347ef0272ae51e4f97b19b382cf22394e5"
+        },
+        {
+          "path": "skillevaluator/C05/reports/skillevaluator-output-20261009054057.json",
+          "sha256": "3d3c39bfea8630e54f05274df1e452afa3875b6caf6c234381ed43619d388bfb"
+        },
+        {
+          "path": "skillevaluator/C05/smaps_rollup.txt",
+          "sha256": "4c7075e2d1dc031fe2640889931e0570e0f41a03c839ff7fd411399c352af439"
+        },
+        {
+          "path": "skillevaluator/C05/stderr.txt",
+          "sha256": "fd45d200adde9a4a3d9ef87e26ce7582d4f570826ad5c7b124e04449eb283906"
+        },
+        {
+          "path": "skillevaluator/C05/stdout.txt",
+          "sha256": "6c6217e35c97baabcaaa913b388a2da5d40f2ac01c53218a3f79aa8a706912b6"
+        }
+      ]
+    },
+    {
+      "tool": "skillevaluator",
+      "case_id": "C06",
+      "scope": "skill",
+      "command": [
+        "<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/skillevaluator/tools/skillevaluator/bin/skillevaluator",
+        "validate",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/corpus/C06/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "--tiers",
+        "1",
+        "--checks",
+        "schema,quality",
+        "--no-llm",
+        "--min-score",
+        "70",
+        "-r",
+        "json",
+        "-o",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/native/skillevaluator/C06/reports"
+      ],
+      "rc": 1,
+      "execution_error": null,
+      "started_utc": "2026-10-09T05:40:57.513735+00:00",
+      "pss_kib": 32163,
+      "pss_samples": 19,
+      "pss_scope": "child process only",
+      "pid": 315285,
+      "wall_seconds": 0.414009,
+      "native_validators": [
+        {
+          "validator": "Schema & Repository Governance",
+          "status": "failed"
+        },
+        {
+          "validator": "QUALITY",
+          "status": "passed"
+        }
+      ],
+      "status": "complete",
+      "detail": null,
+      "artifacts": [
+        {
+          "path": "skillevaluator/C06/reports/BENCHMARK.md",
+          "sha256": "b81a42a51fe41b261ee7847032f667838c822f93d98a06af44b8cdfd2e90ca9b"
+        },
+        {
+          "path": "skillevaluator/C06/reports/skillevaluator-output-20261009054057.json",
+          "sha256": "eae15e47d90a2191ae88b50e37aea26937b6415f922894dc318c7165fdbb1872"
+        },
+        {
+          "path": "skillevaluator/C06/smaps_rollup.txt",
+          "sha256": "0de2eaeb445d60a243b33cd86f59b22b0e993f719383d37f44e84c96f5180978"
+        },
+        {
+          "path": "skillevaluator/C06/stderr.txt",
+          "sha256": "fd45d200adde9a4a3d9ef87e26ce7582d4f570826ad5c7b124e04449eb283906"
+        },
+        {
+          "path": "skillevaluator/C06/stdout.txt",
+          "sha256": "c5bd387cfe352e1baaf22a585b4f33d9c99cd8d9ce33bb0b183730c37b60df3e"
+        }
+      ]
+    },
+    {
+      "tool": "skillevaluator",
+      "case_id": "C07",
+      "scope": "skill",
+      "command": [
+        "<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/skillevaluator/tools/skillevaluator/bin/skillevaluator",
+        "validate",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/corpus/C07/case-long-description",
+        "--tiers",
+        "1",
+        "--checks",
+        "schema,quality",
+        "--no-llm",
+        "--min-score",
+        "70",
+        "-r",
+        "json",
+        "-o",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/native/skillevaluator/C07/reports"
+      ],
+      "rc": 1,
+      "execution_error": null,
+      "started_utc": "2026-10-09T05:40:57.938842+00:00",
+      "pss_kib": 32160,
+      "pss_samples": 20,
+      "pss_scope": "child process only",
+      "pid": 315892,
+      "wall_seconds": 0.441619,
+      "native_validators": [
+        {
+          "validator": "Schema & Repository Governance",
+          "status": "failed"
+        },
+        {
+          "validator": "QUALITY",
+          "status": "passed"
+        }
+      ],
+      "status": "complete",
+      "detail": null,
+      "artifacts": [
+        {
+          "path": "skillevaluator/C07/reports/BENCHMARK.md",
+          "sha256": "8915217e3076e02b402b4cb7b741689747016d99dcedcaf85758c6a20f86103f"
+        },
+        {
+          "path": "skillevaluator/C07/reports/skillevaluator-output-20261009054058.json",
+          "sha256": "a631fbab39ef8b3fbd5e65f39797d9f7e9bf6a84916f74f3e35ed341f1611fd6"
+        },
+        {
+          "path": "skillevaluator/C07/smaps_rollup.txt",
+          "sha256": "5a5202f7e1ab4aaa5719afb6a492712f9118792d0cecf9fbc7bbffafd91146e5"
+        },
+        {
+          "path": "skillevaluator/C07/stderr.txt",
+          "sha256": "fd45d200adde9a4a3d9ef87e26ce7582d4f570826ad5c7b124e04449eb283906"
+        },
+        {
+          "path": "skillevaluator/C07/stdout.txt",
+          "sha256": "543ef49a00516fcdeed0979e62020c8cd32d0456464f148a20c3893ab1ca419e"
+        }
+      ]
+    },
+    {
+      "tool": "skillevaluator",
+      "case_id": "C08",
+      "scope": "skill",
+      "command": [
+        "<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/skillevaluator/tools/skillevaluator/bin/skillevaluator",
+        "validate",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/corpus/C08/case-missing-reference",
+        "--tiers",
+        "1",
+        "--checks",
+        "schema,quality",
+        "--no-llm",
+        "--min-score",
+        "70",
+        "-r",
+        "json",
+        "-o",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/native/skillevaluator/C08/reports"
+      ],
+      "rc": 1,
+      "execution_error": null,
+      "started_utc": "2026-10-09T05:40:58.390676+00:00",
+      "pss_kib": 32159,
+      "pss_samples": 17,
+      "pss_scope": "child process only",
+      "pid": 316252,
+      "wall_seconds": 0.386147,
+      "native_validators": [
+        {
+          "validator": "Schema & Repository Governance",
+          "status": "failed"
+        },
+        {
+          "validator": "QUALITY",
+          "status": "passed"
+        }
+      ],
+      "status": "complete",
+      "detail": null,
+      "artifacts": [
+        {
+          "path": "skillevaluator/C08/reports/BENCHMARK.md",
+          "sha256": "77d815a1054a8419390cc43f5f2bb773a0b7cd2ce7d3efa92686dd2ab306ab0d"
+        },
+        {
+          "path": "skillevaluator/C08/reports/skillevaluator-output-20261009054058.json",
+          "sha256": "9d1cf555ceee5c2dd8cad5dbc8ccd75d71b9773d846fa56871842e490cc55e3b"
+        },
+        {
+          "path": "skillevaluator/C08/smaps_rollup.txt",
+          "sha256": "f23908390c7deb3cc63c67bc438c6df47be8632c3bd1a5bc34388296180101f9"
+        },
+        {
+          "path": "skillevaluator/C08/stderr.txt",
+          "sha256": "fd45d200adde9a4a3d9ef87e26ce7582d4f570826ad5c7b124e04449eb283906"
+        },
+        {
+          "path": "skillevaluator/C08/stdout.txt",
+          "sha256": "0c36c8a5df2610e1c734978ac84b44d70c5b49c3e990afcdee73c8b3d5bf999b"
+        }
+      ]
+    },
+    {
+      "tool": "skillevaluator",
+      "case_id": "C09",
+      "scope": "skill",
+      "command": [
+        "<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/skillevaluator/tools/skillevaluator/bin/skillevaluator",
+        "validate",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/corpus/C09/case-existing-reference",
+        "--tiers",
+        "1",
+        "--checks",
+        "schema,quality",
+        "--no-llm",
+        "--min-score",
+        "70",
+        "-r",
+        "json",
+        "-o",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/native/skillevaluator/C09/reports"
+      ],
+      "rc": 1,
+      "execution_error": null,
+      "started_utc": "2026-10-09T05:40:58.787128+00:00",
+      "pss_kib": 32232,
+      "pss_samples": 17,
+      "pss_scope": "child process only",
+      "pid": 316864,
+      "wall_seconds": 0.365591,
+      "native_validators": [
+        {
+          "validator": "Schema & Repository Governance",
+          "status": "failed"
+        },
+        {
+          "validator": "QUALITY",
+          "status": "passed"
+        }
+      ],
+      "status": "complete",
+      "detail": null,
+      "artifacts": [
+        {
+          "path": "skillevaluator/C09/reports/BENCHMARK.md",
+          "sha256": "9edb6550fc6370b25495ba51381d144c793ed608aedb45092dda3f014043c669"
+        },
+        {
+          "path": "skillevaluator/C09/reports/skillevaluator-output-20261009054059.json",
+          "sha256": "42f5814749b92259ee2635010477acf67c49e139a03952b30ea2cf58aea2d54b"
+        },
+        {
+          "path": "skillevaluator/C09/smaps_rollup.txt",
+          "sha256": "9fbd2050043415b0e1bd3e3bc26c585b2a23d2c3edcf094ce1801dba6f63c5ae"
+        },
+        {
+          "path": "skillevaluator/C09/stderr.txt",
+          "sha256": "fd45d200adde9a4a3d9ef87e26ce7582d4f570826ad5c7b124e04449eb283906"
+        },
+        {
+          "path": "skillevaluator/C09/stdout.txt",
+          "sha256": "044a116a103974d02043c62f51cccee842a1bf775b7be1044c38dfc46776f644"
+        }
+      ]
+    },
+    {
+      "tool": "skillevaluator",
+      "case_id": "C10",
+      "scope": "skill",
+      "command": [
+        "<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/skillevaluator/tools/skillevaluator/bin/skillevaluator",
+        "validate",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/corpus/C10/case-optional-fields",
+        "--tiers",
+        "1",
+        "--checks",
+        "schema,quality",
+        "--no-llm",
+        "--min-score",
+        "70",
+        "-r",
+        "json",
+        "-o",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/native/skillevaluator/C10/reports"
+      ],
+      "rc": 1,
+      "execution_error": null,
+      "started_utc": "2026-10-09T05:40:59.163202+00:00",
+      "pss_kib": 32159,
+      "pss_samples": 16,
+      "pss_scope": "child process only",
+      "pid": 317145,
+      "wall_seconds": 0.363265,
+      "native_validators": [
+        {
+          "validator": "Schema & Repository Governance",
+          "status": "failed"
+        },
+        {
+          "validator": "QUALITY",
+          "status": "passed"
+        }
+      ],
+      "status": "complete",
+      "detail": null,
+      "artifacts": [
+        {
+          "path": "skillevaluator/C10/reports/BENCHMARK.md",
+          "sha256": "4d4b40f1d1f80b97b0871d4cfcf8556ba7d28d2083b417db4c4f6e6d1b7b1d8e"
+        },
+        {
+          "path": "skillevaluator/C10/reports/skillevaluator-output-20261009054059.json",
+          "sha256": "d05bc8b1e8cb67508ac2ecc35433a965dfe1d987fe4947d5733eff0ed1e2be33"
+        },
+        {
+          "path": "skillevaluator/C10/smaps_rollup.txt",
+          "sha256": "66c53c42eddd5132fecabec323a81ad73c0096c1cf67119025498e8a4c7c9e84"
+        },
+        {
+          "path": "skillevaluator/C10/stderr.txt",
+          "sha256": "fd45d200adde9a4a3d9ef87e26ce7582d4f570826ad5c7b124e04449eb283906"
+        },
+        {
+          "path": "skillevaluator/C10/stdout.txt",
+          "sha256": "dda4897b53c43b9cfc01531e3e9fdbd138ec7c8ab01b429040952e9f444778ef"
+        }
+      ]
+    },
+    {
+      "tool": "skillevaluator",
+      "case_id": "C11",
+      "scope": "skill",
+      "command": [
+        "<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/skillevaluator/tools/skillevaluator/bin/skillevaluator",
+        "validate",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/corpus/C11/case-empty-description",
+        "--tiers",
+        "1",
+        "--checks",
+        "schema,quality",
+        "--no-llm",
+        "--min-score",
+        "70",
+        "-r",
+        "json",
+        "-o",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/native/skillevaluator/C11/reports"
+      ],
+      "rc": 1,
+      "execution_error": null,
+      "started_utc": "2026-10-09T05:40:59.536448+00:00",
+      "pss_kib": 32151,
+      "pss_samples": 17,
+      "pss_scope": "child process only",
+      "pid": 317341,
+      "wall_seconds": 0.366148,
+      "native_validators": [
+        {
+          "validator": "Schema & Repository Governance",
+          "status": "failed"
+        },
+        {
+          "validator": "QUALITY",
+          "status": "passed"
+        }
+      ],
+      "status": "complete",
+      "detail": null,
+      "artifacts": [
+        {
+          "path": "skillevaluator/C11/reports/BENCHMARK.md",
+          "sha256": "eaceb764e99b8bb9f8aec501ec235077a21a8a654d5d7702ff6bd232b598abf1"
+        },
+        {
+          "path": "skillevaluator/C11/reports/skillevaluator-output-20261009054059.json",
+          "sha256": "49d14380c983edc9f0b3a5937400e2e409d7a0d2716d319d395b23e1760ae6f4"
+        },
+        {
+          "path": "skillevaluator/C11/smaps_rollup.txt",
+          "sha256": "ebf716001bb8583044556d4a68658b798907b51bafbe50d63093ebe6b12d8057"
+        },
+        {
+          "path": "skillevaluator/C11/stderr.txt",
+          "sha256": "fd45d200adde9a4a3d9ef87e26ce7582d4f570826ad5c7b124e04449eb283906"
+        },
+        {
+          "path": "skillevaluator/C11/stdout.txt",
+          "sha256": "87464c9e10f0749127dfd373568541775fa600d17b3d583e502bc1cff5655625"
+        }
+      ]
+    },
+    {
+      "tool": "skillevaluator",
+      "case_id": "C12",
+      "scope": "skill",
+      "command": [
+        "<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/skillevaluator/tools/skillevaluator/bin/skillevaluator",
+        "validate",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/corpus/C12/case-no-frontmatter",
+        "--tiers",
+        "1",
+        "--checks",
+        "schema,quality",
+        "--no-llm",
+        "--min-score",
+        "70",
+        "-r",
+        "json",
+        "-o",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/native/skillevaluator/C12/reports"
+      ],
+      "rc": 1,
+      "execution_error": null,
+      "started_utc": "2026-10-09T05:40:59.912993+00:00",
+      "pss_kib": 31862,
+      "pss_samples": 17,
+      "pss_scope": "child process only",
+      "pid": 317890,
+      "wall_seconds": 0.369003,
+      "native_validators": [
+        {
+          "validator": "Schema & Repository Governance",
+          "status": "failed"
+        },
+        {
+          "validator": "QUALITY",
+          "status": "passed"
+        }
+      ],
+      "status": "complete",
+      "detail": null,
+      "artifacts": [
+        {
+          "path": "skillevaluator/C12/reports/BENCHMARK.md",
+          "sha256": "5a70f5aa3ad37bdc274d8e660c6fa23e22f00d06f3f793ca663afc0c9b99839b"
+        },
+        {
+          "path": "skillevaluator/C12/reports/skillevaluator-output-20261009054100.json",
+          "sha256": "06b68251549059b74fdec6ba737504979e4d95c74b7fe38f4e0ae43a1ffdbbfc"
+        },
+        {
+          "path": "skillevaluator/C12/smaps_rollup.txt",
+          "sha256": "658ee9a8469d287cc7a895a833481bf3280129892ffc69c5ca48f7fa5439bf0a"
+        },
+        {
+          "path": "skillevaluator/C12/stderr.txt",
+          "sha256": "fd45d200adde9a4a3d9ef87e26ce7582d4f570826ad5c7b124e04449eb283906"
+        },
+        {
+          "path": "skillevaluator/C12/stdout.txt",
+          "sha256": "56140b1949b026e9212b144a1547212fe2ce750a80578add0de68cf9117561cc"
+        }
+      ]
+    },
+    {
+      "tool": "skillevaluator",
+      "case_id": "I01",
+      "scope": "instructions",
+      "status": "unsupported_scope",
+      "command": null,
+      "rc": null,
+      "wall_seconds": null,
+      "pss_kib": null,
+      "artifacts": []
+    },
+    {
+      "tool": "skillevaluator",
+      "case_id": "I02",
+      "scope": "instructions",
+      "status": "unsupported_scope",
+      "command": null,
+      "rc": null,
+      "wall_seconds": null,
+      "pss_kib": null,
+      "artifacts": []
+    },
+    {
+      "tool": "openai_validator",
+      "case_id": "C01",
+      "scope": "skill",
+      "command": [
+        "<host-home>/.local/share/mise/installs/python/3.13.16/bin/python3",
+        "<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/skills-trials-20261009/sources/openai-quick-validate.py",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/corpus/C01/case-minimal"
+      ],
+      "rc": 0,
+      "execution_error": null,
+      "started_utc": "2026-10-09T05:41:00.309978+00:00",
+      "pss_kib": 5085,
+      "pss_samples": 2,
+      "pss_scope": "child process only",
+      "pid": 318306,
+      "wall_seconds": 0.041646,
+      "status": "complete",
+      "detail": null,
+      "artifacts": [
+        {
+          "path": "openai_validator/C01/smaps_rollup.txt",
+          "sha256": "02106fca84e738196d666d4a6fed4cc751e0c9e24f8c9211924eb9998ac18e42"
+        },
+        {
+          "path": "openai_validator/C01/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "openai_validator/C01/stdout.txt",
+          "sha256": "db349825903d66adffea3ecf1bd8e1803043e8a71cf1a051235dabc5371f5bb0"
+        }
+      ]
+    },
+    {
+      "tool": "openai_validator",
+      "case_id": "C02",
+      "scope": "skill",
+      "command": [
+        "<host-home>/.local/share/mise/installs/python/3.13.16/bin/python3",
+        "<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/skills-trials-20261009/sources/openai-quick-validate.py",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/corpus/C02/case-no-name"
+      ],
+      "rc": 1,
+      "execution_error": null,
+      "started_utc": "2026-10-09T05:41:00.361125+00:00",
+      "pss_kib": 5087,
+      "pss_samples": 2,
+      "pss_scope": "child process only",
+      "pid": 318379,
+      "wall_seconds": 0.041764,
+      "status": "complete",
+      "detail": null,
+      "artifacts": [
+        {
+          "path": "openai_validator/C02/smaps_rollup.txt",
+          "sha256": "08fcfd282c6eb3a3121914e9999ed0fd56d105416bdbf184ecee02cbf69962d7"
+        },
+        {
+          "path": "openai_validator/C02/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "openai_validator/C02/stdout.txt",
+          "sha256": "e0cab01a68d3ec208b8003bde34ebb63e1f279098d3d2c3c86b403e8f2715794"
+        }
+      ]
+    },
+    {
+      "tool": "openai_validator",
+      "case_id": "C03",
+      "scope": "skill",
+      "command": [
+        "<host-home>/.local/share/mise/installs/python/3.13.16/bin/python3",
+        "<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/skills-trials-20261009/sources/openai-quick-validate.py",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/corpus/C03/case-no-description"
+      ],
+      "rc": 1,
+      "execution_error": null,
+      "started_utc": "2026-10-09T05:41:00.412489+00:00",
+      "pss_kib": 5083,
+      "pss_samples": 2,
+      "pss_scope": "child process only",
+      "pid": 318450,
+      "wall_seconds": 0.041756,
+      "status": "complete",
+      "detail": null,
+      "artifacts": [
+        {
+          "path": "openai_validator/C03/smaps_rollup.txt",
+          "sha256": "6e8d3258aae48685cd86a06b9e8fe4641d2f1d543430af7bf2812a939fcdb89f"
+        },
+        {
+          "path": "openai_validator/C03/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "openai_validator/C03/stdout.txt",
+          "sha256": "613e1b8f99a4e5eca744ba22e65a6d15fd2811ebf7ea76f0587727a0aaad3fdf"
+        }
+      ]
+    },
+    {
+      "tool": "openai_validator",
+      "case_id": "C04",
+      "scope": "skill",
+      "command": [
+        "<host-home>/.local/share/mise/installs/python/3.13.16/bin/python3",
+        "<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/skills-trials-20261009/sources/openai-quick-validate.py",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/corpus/C04/case-broken-yaml"
+      ],
+      "rc": 1,
+      "execution_error": null,
+      "started_utc": "2026-10-09T05:41:00.463945+00:00",
+      "pss_kib": 5094,
+      "pss_samples": 2,
+      "pss_scope": "child process only",
+      "pid": 318517,
+      "wall_seconds": 0.041833,
+      "status": "complete",
+      "detail": null,
+      "artifacts": [
+        {
+          "path": "openai_validator/C04/smaps_rollup.txt",
+          "sha256": "9533d85cccf9b1e868ffbc55146f5c7272f8f8e3a8d3affa0043d7be1136e17c"
+        },
+        {
+          "path": "openai_validator/C04/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "openai_validator/C04/stdout.txt",
+          "sha256": "761356466ad421ec080a238b36f10f6fd01487519ba326ddec0033c3b98c8035"
+        }
+      ]
+    },
+    {
+      "tool": "openai_validator",
+      "case_id": "C05",
+      "scope": "skill",
+      "command": [
+        "<host-home>/.local/share/mise/installs/python/3.13.16/bin/python3",
+        "<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/skills-trials-20261009/sources/openai-quick-validate.py",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/corpus/C05/Bad_Name"
+      ],
+      "rc": 1,
+      "execution_error": null,
+      "started_utc": "2026-10-09T05:41:00.515750+00:00",
+      "pss_kib": 5098,
+      "pss_samples": 2,
+      "pss_scope": "child process only",
+      "pid": 318579,
+      "wall_seconds": 0.041885,
+      "status": "complete",
+      "detail": null,
+      "artifacts": [
+        {
+          "path": "openai_validator/C05/smaps_rollup.txt",
+          "sha256": "00e3ccf1ed2aa66c50a66baebf97d478d40a89dd83f6da5ffe0fd8804a4d4e34"
+        },
+        {
+          "path": "openai_validator/C05/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "openai_validator/C05/stdout.txt",
+          "sha256": "ed6db84fba500178e4ae32410c0fc5a2450c5b456b315f5ec9f6c984a53e6469"
+        }
+      ]
+    },
+    {
+      "tool": "openai_validator",
+      "case_id": "C06",
+      "scope": "skill",
+      "command": [
+        "<host-home>/.local/share/mise/installs/python/3.13.16/bin/python3",
+        "<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/skills-trials-20261009/sources/openai-quick-validate.py",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/corpus/C06/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      ],
+      "rc": 1,
+      "execution_error": null,
+      "started_utc": "2026-10-09T05:41:00.567666+00:00",
+      "pss_kib": 5099,
+      "pss_samples": 2,
+      "pss_scope": "child process only",
+      "pid": 318623,
+      "wall_seconds": 0.041903,
+      "status": "complete",
+      "detail": null,
+      "artifacts": [
+        {
+          "path": "openai_validator/C06/smaps_rollup.txt",
+          "sha256": "4c3f0e94523092927514278d1bd830d6760ba9171d46cc6a1c2440a2c8e9eeed"
+        },
+        {
+          "path": "openai_validator/C06/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "openai_validator/C06/stdout.txt",
+          "sha256": "a73028856d902b8ea0afedcc0e439a662d08e06037d56651c63f8b49d761fd9d"
+        }
+      ]
+    },
+    {
+      "tool": "openai_validator",
+      "case_id": "C07",
+      "scope": "skill",
+      "command": [
+        "<host-home>/.local/share/mise/installs/python/3.13.16/bin/python3",
+        "<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/skills-trials-20261009/sources/openai-quick-validate.py",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/corpus/C07/case-long-description"
+      ],
+      "rc": 1,
+      "execution_error": null,
+      "started_utc": "2026-10-09T05:41:00.619269+00:00",
+      "pss_kib": 4972,
+      "pss_samples": 2,
+      "pss_scope": "child process only",
+      "pid": 318667,
+      "wall_seconds": 0.041684,
+      "status": "complete",
+      "detail": null,
+      "artifacts": [
+        {
+          "path": "openai_validator/C07/smaps_rollup.txt",
+          "sha256": "76573120458ee096ad62a8a3fc5809ac6bd3a64adf9eae55ea4ca2f5772f7022"
+        },
+        {
+          "path": "openai_validator/C07/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "openai_validator/C07/stdout.txt",
+          "sha256": "fb6c4763dca6810f162ac79707a2ccc35c948e7b39e8f4bc2fadc4525a825bdc"
+        }
+      ]
+    },
+    {
+      "tool": "openai_validator",
+      "case_id": "C08",
+      "scope": "skill",
+      "command": [
+        "<host-home>/.local/share/mise/installs/python/3.13.16/bin/python3",
+        "<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/skills-trials-20261009/sources/openai-quick-validate.py",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/corpus/C08/case-missing-reference"
+      ],
+      "rc": 0,
+      "execution_error": null,
+      "started_utc": "2026-10-09T05:41:00.671224+00:00",
+      "pss_kib": 5095,
+      "pss_samples": 2,
+      "pss_scope": "child process only",
+      "pid": 318694,
+      "wall_seconds": 0.041832,
+      "status": "complete",
+      "detail": null,
+      "artifacts": [
+        {
+          "path": "openai_validator/C08/smaps_rollup.txt",
+          "sha256": "b936cfb61f0d8928904ebd103118c2027a13ff5e4a91c8343d7cca4ee0a00839"
+        },
+        {
+          "path": "openai_validator/C08/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "openai_validator/C08/stdout.txt",
+          "sha256": "db349825903d66adffea3ecf1bd8e1803043e8a71cf1a051235dabc5371f5bb0"
+        }
+      ]
+    },
+    {
+      "tool": "openai_validator",
+      "case_id": "C09",
+      "scope": "skill",
+      "command": [
+        "<host-home>/.local/share/mise/installs/python/3.13.16/bin/python3",
+        "<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/skills-trials-20261009/sources/openai-quick-validate.py",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/corpus/C09/case-existing-reference"
+      ],
+      "rc": 0,
+      "execution_error": null,
+      "started_utc": "2026-10-09T05:41:00.722598+00:00",
+      "pss_kib": 5096,
+      "pss_samples": 2,
+      "pss_scope": "child process only",
+      "pid": 318721,
+      "wall_seconds": 0.041631,
+      "status": "complete",
+      "detail": null,
+      "artifacts": [
+        {
+          "path": "openai_validator/C09/smaps_rollup.txt",
+          "sha256": "bb19126077c0f6a28693f3ba2c9a6cfd45774abb2394b362d976dd544683e4d9"
+        },
+        {
+          "path": "openai_validator/C09/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "openai_validator/C09/stdout.txt",
+          "sha256": "db349825903d66adffea3ecf1bd8e1803043e8a71cf1a051235dabc5371f5bb0"
+        }
+      ]
+    },
+    {
+      "tool": "openai_validator",
+      "case_id": "C10",
+      "scope": "skill",
+      "command": [
+        "<host-home>/.local/share/mise/installs/python/3.13.16/bin/python3",
+        "<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/skills-trials-20261009/sources/openai-quick-validate.py",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/corpus/C10/case-optional-fields"
+      ],
+      "rc": 1,
+      "execution_error": null,
+      "started_utc": "2026-10-09T05:41:00.773346+00:00",
+      "pss_kib": 5096,
+      "pss_samples": 2,
+      "pss_scope": "child process only",
+      "pid": 318761,
+      "wall_seconds": 0.041788,
+      "status": "complete",
+      "detail": null,
+      "artifacts": [
+        {
+          "path": "openai_validator/C10/smaps_rollup.txt",
+          "sha256": "55e9077459d03e74388a87e88e9bf10d945a1f75fea63b94a0039b1aebaf0af6"
+        },
+        {
+          "path": "openai_validator/C10/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "openai_validator/C10/stdout.txt",
+          "sha256": "827ba0e94d91270c68f97ad2f56d578024f95b5e0da53761525c48f67e6e45b4"
+        }
+      ]
+    },
+    {
+      "tool": "openai_validator",
+      "case_id": "C11",
+      "scope": "skill",
+      "command": [
+        "<host-home>/.local/share/mise/installs/python/3.13.16/bin/python3",
+        "<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/skills-trials-20261009/sources/openai-quick-validate.py",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/corpus/C11/case-empty-description"
+      ],
+      "rc": 0,
+      "execution_error": null,
+      "started_utc": "2026-10-09T05:41:00.824621+00:00",
+      "pss_kib": 5084,
+      "pss_samples": 2,
+      "pss_scope": "child process only",
+      "pid": 318798,
+      "wall_seconds": 0.041854,
+      "status": "complete",
+      "detail": null,
+      "artifacts": [
+        {
+          "path": "openai_validator/C11/smaps_rollup.txt",
+          "sha256": "ae04cc92031e96464d4c94d1fe51ac79b1df2ddcb8b544867843a29537be4049"
+        },
+        {
+          "path": "openai_validator/C11/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "openai_validator/C11/stdout.txt",
+          "sha256": "db349825903d66adffea3ecf1bd8e1803043e8a71cf1a051235dabc5371f5bb0"
+        }
+      ]
+    },
+    {
+      "tool": "openai_validator",
+      "case_id": "C12",
+      "scope": "skill",
+      "command": [
+        "<host-home>/.local/share/mise/installs/python/3.13.16/bin/python3",
+        "<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/skills-trials-20261009/sources/openai-quick-validate.py",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/corpus/C12/case-no-frontmatter"
+      ],
+      "rc": 1,
+      "execution_error": null,
+      "started_utc": "2026-10-09T05:41:00.876228+00:00",
+      "pss_kib": 5089,
+      "pss_samples": 2,
+      "pss_scope": "child process only",
+      "pid": 318906,
+      "wall_seconds": 0.042139,
+      "status": "complete",
+      "detail": null,
+      "artifacts": [
+        {
+          "path": "openai_validator/C12/smaps_rollup.txt",
+          "sha256": "14a236a0c1c24bd087c542d8b01faad0b0b4ab1285f8a2196d44bb8d4d43bd54"
+        },
+        {
+          "path": "openai_validator/C12/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "openai_validator/C12/stdout.txt",
+          "sha256": "9af0794619d2b78c81a58020e378bfbfd4969f3b012f12e41792c15367e2121c"
+        }
+      ]
+    },
+    {
+      "tool": "openai_validator",
+      "case_id": "I01",
+      "scope": "instructions",
+      "status": "unsupported_scope",
+      "command": null,
+      "rc": null,
+      "wall_seconds": null,
+      "pss_kib": null,
+      "artifacts": []
+    },
+    {
+      "tool": "openai_validator",
+      "case_id": "I02",
+      "scope": "instructions",
+      "status": "unsupported_scope",
+      "command": null,
+      "rc": null,
+      "wall_seconds": null,
+      "pss_kib": null,
+      "artifacts": []
+    },
+    {
+      "tool": "anthropic_validator",
+      "case_id": "C01",
+      "scope": "skill",
+      "command": [
+        "<host-home>/.local/share/mise/installs/python/3.13.16/bin/python3",
+        "<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/skills-trials-20261009/sources/anthropic-quick-validate.py",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/corpus/C01/case-minimal"
+      ],
+      "rc": 0,
+      "execution_error": null,
+      "started_utc": "2026-10-09T05:41:00.945524+00:00",
+      "pss_kib": 4466,
+      "pss_samples": 2,
+      "pss_scope": "child process only",
+      "pid": 319046,
+      "wall_seconds": 0.041938,
+      "status": "complete",
+      "detail": null,
+      "artifacts": [
+        {
+          "path": "anthropic_validator/C01/smaps_rollup.txt",
+          "sha256": "742c0db74030df584883e6cdac2a0b7202dc044e2dba96b207d464ed0b51e9f8"
+        },
+        {
+          "path": "anthropic_validator/C01/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "anthropic_validator/C01/stdout.txt",
+          "sha256": "db349825903d66adffea3ecf1bd8e1803043e8a71cf1a051235dabc5371f5bb0"
+        }
+      ]
+    },
+    {
+      "tool": "anthropic_validator",
+      "case_id": "C02",
+      "scope": "skill",
+      "command": [
+        "<host-home>/.local/share/mise/installs/python/3.13.16/bin/python3",
+        "<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/skills-trials-20261009/sources/anthropic-quick-validate.py",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/corpus/C02/case-no-name"
+      ],
+      "rc": 1,
+      "execution_error": null,
+      "started_utc": "2026-10-09T05:41:00.997762+00:00",
+      "pss_kib": 4463,
+      "pss_samples": 2,
+      "pss_scope": "child process only",
+      "pid": 319147,
+      "wall_seconds": 0.041796,
+      "status": "complete",
+      "detail": null,
+      "artifacts": [
+        {
+          "path": "anthropic_validator/C02/smaps_rollup.txt",
+          "sha256": "6a16406f94929c80c08d6c4ceb35344c1eb72facab9914afe00a19b553830dd2"
+        },
+        {
+          "path": "anthropic_validator/C02/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "anthropic_validator/C02/stdout.txt",
+          "sha256": "e0cab01a68d3ec208b8003bde34ebb63e1f279098d3d2c3c86b403e8f2715794"
+        }
+      ]
+    },
+    {
+      "tool": "anthropic_validator",
+      "case_id": "C03",
+      "scope": "skill",
+      "command": [
+        "<host-home>/.local/share/mise/installs/python/3.13.16/bin/python3",
+        "<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/skills-trials-20261009/sources/anthropic-quick-validate.py",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/corpus/C03/case-no-description"
+      ],
+      "rc": 1,
+      "execution_error": null,
+      "started_utc": "2026-10-09T05:41:01.049289+00:00",
+      "pss_kib": 4899,
+      "pss_samples": 2,
+      "pss_scope": "child process only",
+      "pid": 319163,
+      "wall_seconds": 0.041997,
+      "status": "complete",
+      "detail": null,
+      "artifacts": [
+        {
+          "path": "anthropic_validator/C03/smaps_rollup.txt",
+          "sha256": "e0538aa2e68240b9a77d0893374cbdb56636e9bbec22c3d8f88e870a6c1dd2b4"
+        },
+        {
+          "path": "anthropic_validator/C03/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "anthropic_validator/C03/stdout.txt",
+          "sha256": "613e1b8f99a4e5eca744ba22e65a6d15fd2811ebf7ea76f0587727a0aaad3fdf"
+        }
+      ]
+    },
+    {
+      "tool": "anthropic_validator",
+      "case_id": "C04",
+      "scope": "skill",
+      "command": [
+        "<host-home>/.local/share/mise/installs/python/3.13.16/bin/python3",
+        "<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/skills-trials-20261009/sources/anthropic-quick-validate.py",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/corpus/C04/case-broken-yaml"
+      ],
+      "rc": 1,
+      "execution_error": null,
+      "started_utc": "2026-10-09T05:41:01.101776+00:00",
+      "pss_kib": 4516,
+      "pss_samples": 2,
+      "pss_scope": "child process only",
+      "pid": 319195,
+      "wall_seconds": 0.04195,
+      "status": "complete",
+      "detail": null,
+      "artifacts": [
+        {
+          "path": "anthropic_validator/C04/smaps_rollup.txt",
+          "sha256": "3e5bb806e9445df0d501efaab8e18e9159810d56c116bbd773167fcc3a7a5804"
+        },
+        {
+          "path": "anthropic_validator/C04/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "anthropic_validator/C04/stdout.txt",
+          "sha256": "761356466ad421ec080a238b36f10f6fd01487519ba326ddec0033c3b98c8035"
+        }
+      ]
+    },
+    {
+      "tool": "anthropic_validator",
+      "case_id": "C05",
+      "scope": "skill",
+      "command": [
+        "<host-home>/.local/share/mise/installs/python/3.13.16/bin/python3",
+        "<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/skills-trials-20261009/sources/anthropic-quick-validate.py",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/corpus/C05/Bad_Name"
+      ],
+      "rc": 1,
+      "execution_error": null,
+      "started_utc": "2026-10-09T05:41:01.154459+00:00",
+      "pss_kib": 4543,
+      "pss_samples": 2,
+      "pss_scope": "child process only",
+      "pid": 319197,
+      "wall_seconds": 0.042014,
+      "status": "complete",
+      "detail": null,
+      "artifacts": [
+        {
+          "path": "anthropic_validator/C05/smaps_rollup.txt",
+          "sha256": "c8f15c9644fab2c8232684fd500db2f8e74d5b5760b030dafe5291a6ed7e4d8c"
+        },
+        {
+          "path": "anthropic_validator/C05/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "anthropic_validator/C05/stdout.txt",
+          "sha256": "0ef95f23db2456e4702ef9666d76e10b182f7c9fb1e9b34d7bb7508307f043c5"
+        }
+      ]
+    },
+    {
+      "tool": "anthropic_validator",
+      "case_id": "C06",
+      "scope": "skill",
+      "command": [
+        "<host-home>/.local/share/mise/installs/python/3.13.16/bin/python3",
+        "<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/skills-trials-20261009/sources/anthropic-quick-validate.py",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/corpus/C06/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      ],
+      "rc": 1,
+      "execution_error": null,
+      "started_utc": "2026-10-09T05:41:01.207073+00:00",
+      "pss_kib": 4663,
+      "pss_samples": 2,
+      "pss_scope": "child process only",
+      "pid": 319268,
+      "wall_seconds": 0.042675,
+      "status": "complete",
+      "detail": null,
+      "artifacts": [
+        {
+          "path": "anthropic_validator/C06/smaps_rollup.txt",
+          "sha256": "39bd47bcc748894f21bb9aaacce43380151f5f380f33649310a54ecb376dec39"
+        },
+        {
+          "path": "anthropic_validator/C06/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "anthropic_validator/C06/stdout.txt",
+          "sha256": "a73028856d902b8ea0afedcc0e439a662d08e06037d56651c63f8b49d761fd9d"
+        }
+      ]
+    },
+    {
+      "tool": "anthropic_validator",
+      "case_id": "C07",
+      "scope": "skill",
+      "command": [
+        "<host-home>/.local/share/mise/installs/python/3.13.16/bin/python3",
+        "<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/skills-trials-20261009/sources/anthropic-quick-validate.py",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/corpus/C07/case-long-description"
+      ],
+      "rc": 1,
+      "execution_error": null,
+      "started_utc": "2026-10-09T05:41:01.259976+00:00",
+      "pss_kib": 4449,
+      "pss_samples": 2,
+      "pss_scope": "child process only",
+      "pid": 319421,
+      "wall_seconds": 0.042749,
+      "status": "complete",
+      "detail": null,
+      "artifacts": [
+        {
+          "path": "anthropic_validator/C07/smaps_rollup.txt",
+          "sha256": "0b72388830a892ed557a3401b0ec36031b0032c4108f793046cca77657ac75c9"
+        },
+        {
+          "path": "anthropic_validator/C07/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "anthropic_validator/C07/stdout.txt",
+          "sha256": "fb6c4763dca6810f162ac79707a2ccc35c948e7b39e8f4bc2fadc4525a825bdc"
+        }
+      ]
+    },
+    {
+      "tool": "anthropic_validator",
+      "case_id": "C08",
+      "scope": "skill",
+      "command": [
+        "<host-home>/.local/share/mise/installs/python/3.13.16/bin/python3",
+        "<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/skills-trials-20261009/sources/anthropic-quick-validate.py",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/corpus/C08/case-missing-reference"
+      ],
+      "rc": 0,
+      "execution_error": null,
+      "started_utc": "2026-10-09T05:41:01.314489+00:00",
+      "pss_kib": 4526,
+      "pss_samples": 2,
+      "pss_scope": "child process only",
+      "pid": 319434,
+      "wall_seconds": 0.042919,
+      "status": "complete",
+      "detail": null,
+      "artifacts": [
+        {
+          "path": "anthropic_validator/C08/smaps_rollup.txt",
+          "sha256": "7191681a768a96035c18604b00c6169de7959a667b0416f7ba16d561863b45cb"
+        },
+        {
+          "path": "anthropic_validator/C08/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "anthropic_validator/C08/stdout.txt",
+          "sha256": "db349825903d66adffea3ecf1bd8e1803043e8a71cf1a051235dabc5371f5bb0"
+        }
+      ]
+    },
+    {
+      "tool": "anthropic_validator",
+      "case_id": "C09",
+      "scope": "skill",
+      "command": [
+        "<host-home>/.local/share/mise/installs/python/3.13.16/bin/python3",
+        "<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/skills-trials-20261009/sources/anthropic-quick-validate.py",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/corpus/C09/case-existing-reference"
+      ],
+      "rc": 0,
+      "execution_error": null,
+      "started_utc": "2026-10-09T05:41:01.367591+00:00",
+      "pss_kib": 4914,
+      "pss_samples": 2,
+      "pss_scope": "child process only",
+      "pid": 319447,
+      "wall_seconds": 0.04183,
+      "status": "complete",
+      "detail": null,
+      "artifacts": [
+        {
+          "path": "anthropic_validator/C09/smaps_rollup.txt",
+          "sha256": "1466d552ddf964c35454f03d3c5385fc34381eee216367e349fe3cffd6b16aa4"
+        },
+        {
+          "path": "anthropic_validator/C09/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "anthropic_validator/C09/stdout.txt",
+          "sha256": "db349825903d66adffea3ecf1bd8e1803043e8a71cf1a051235dabc5371f5bb0"
+        }
+      ]
+    },
+    {
+      "tool": "anthropic_validator",
+      "case_id": "C10",
+      "scope": "skill",
+      "command": [
+        "<host-home>/.local/share/mise/installs/python/3.13.16/bin/python3",
+        "<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/skills-trials-20261009/sources/anthropic-quick-validate.py",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/corpus/C10/case-optional-fields"
+      ],
+      "rc": 0,
+      "execution_error": null,
+      "started_utc": "2026-10-09T05:41:01.420505+00:00",
+      "pss_kib": 4527,
+      "pss_samples": 2,
+      "pss_scope": "child process only",
+      "pid": 319467,
+      "wall_seconds": 0.041933,
+      "status": "complete",
+      "detail": null,
+      "artifacts": [
+        {
+          "path": "anthropic_validator/C10/smaps_rollup.txt",
+          "sha256": "b326847a1cd97acc0b63c863348a07f3097ab8dfa77abb90eb18cc3b8d4504f9"
+        },
+        {
+          "path": "anthropic_validator/C10/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "anthropic_validator/C10/stdout.txt",
+          "sha256": "db349825903d66adffea3ecf1bd8e1803043e8a71cf1a051235dabc5371f5bb0"
+        }
+      ]
+    },
+    {
+      "tool": "anthropic_validator",
+      "case_id": "C11",
+      "scope": "skill",
+      "command": [
+        "<host-home>/.local/share/mise/installs/python/3.13.16/bin/python3",
+        "<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/skills-trials-20261009/sources/anthropic-quick-validate.py",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/corpus/C11/case-empty-description"
+      ],
+      "rc": 0,
+      "execution_error": null,
+      "started_utc": "2026-10-09T05:41:01.472224+00:00",
+      "pss_kib": 4679,
+      "pss_samples": 2,
+      "pss_scope": "child process only",
+      "pid": 319470,
+      "wall_seconds": 0.042254,
+      "status": "complete",
+      "detail": null,
+      "artifacts": [
+        {
+          "path": "anthropic_validator/C11/smaps_rollup.txt",
+          "sha256": "9241efac90344417b79ed42727644df4d463030ec066690114b1b4af74fa8fd4"
+        },
+        {
+          "path": "anthropic_validator/C11/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "anthropic_validator/C11/stdout.txt",
+          "sha256": "db349825903d66adffea3ecf1bd8e1803043e8a71cf1a051235dabc5371f5bb0"
+        }
+      ]
+    },
+    {
+      "tool": "anthropic_validator",
+      "case_id": "C12",
+      "scope": "skill",
+      "command": [
+        "<host-home>/.local/share/mise/installs/python/3.13.16/bin/python3",
+        "<host-home>/.local/state/native-agent-stack/research/api-surfaces-trials/skills-trials-20261009/sources/anthropic-quick-validate.py",
+        "<host-home>/code/native-agent-stack-ns2604-skills-trials/evidence/artifacts/skills-trials-20261009/corpus/C12/case-no-frontmatter"
+      ],
+      "rc": 1,
+      "execution_error": null,
+      "started_utc": "2026-10-09T05:41:01.525032+00:00",
+      "pss_kib": 4450,
+      "pss_samples": 2,
+      "pss_scope": "child process only",
+      "pid": 319499,
+      "wall_seconds": 0.042058,
+      "status": "complete",
+      "detail": null,
+      "artifacts": [
+        {
+          "path": "anthropic_validator/C12/smaps_rollup.txt",
+          "sha256": "c9ffdef89b64212daa5a4c05473d3671585dc17f107c79b68daef7c077d132e4"
+        },
+        {
+          "path": "anthropic_validator/C12/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "anthropic_validator/C12/stdout.txt",
+          "sha256": "9af0794619d2b78c81a58020e378bfbfd4969f3b012f12e41792c15367e2121c"
+        }
+      ]
+    },
+    {
+      "tool": "anthropic_validator",
+      "case_id": "I01",
+      "scope": "instructions",
+      "status": "unsupported_scope",
+      "command": null,
+      "rc": null,
+      "wall_seconds": null,
+      "pss_kib": null,
+      "artifacts": []
+    },
+    {
+      "tool": "anthropic_validator",
+      "case_id": "I02",
+      "scope": "instructions",
+      "status": "unsupported_scope",
+      "command": null,
+      "rc": null,
+      "wall_seconds": null,
+      "pss_kib": null,
+      "artifacts": []
+    }
+  ]
+}

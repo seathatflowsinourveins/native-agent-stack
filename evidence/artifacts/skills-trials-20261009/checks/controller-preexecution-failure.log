@@ -1,0 +1,5 @@
+usage: run_static_trial.py [-h] --agnix AGNIX --skillevaluator SKILLEVALUATOR
+                           --openai-validator OPENAI_VALIDATOR
+                           --anthropic-validator ANTHROPIC_VALIDATOR
+                           --corpus CORPUS --out OUT [--timeout TIMEOUT]
+run_static_trial.py: error: case scope/path is invalid or outside corpus

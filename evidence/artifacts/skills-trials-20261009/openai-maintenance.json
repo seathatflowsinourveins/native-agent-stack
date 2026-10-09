@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-10-09T05:20:15Z",
+  "repository": "https://github.com/openai/skills",
+  "default_branch": "main",
+  "archived": false,
+  "window_days": 90,
+  "cutoff": "2026-07-11T05:20:15Z",
+  "command": "gh api --cache 120s 'repos/openai/skills/commits?sha=main&since=2026-07-11T05:20:15Z&per_page=1'",
+  "command_rc": 0,
+  "matching_commits": [],
+  "last_default_branch_commit": {
+    "sha": "49f948faa9258a0c61caceaf225e179651397431",
+    "committer_date": "2026-06-24T02:36:12Z",
+    "url": "https://github.com/openai/skills/commit/49f948faa9258a0c61caceaf225e179651397431"
+  },
+  "source_rule": "catalogs/landscape/skills-lifecycle.json notes: archived or no default-branch commit in the last 90 days is stale",
+  "rule": "stale-not-maintenance-qualified",
+  "quality_boundary": "Maintenance is independent of static validator quality. The preregistered anonymous validator control does not compare whole skills repositories on live tasks.",
+  "installed_skills_changed": false,
+  "replacement_source_selected": false
+}

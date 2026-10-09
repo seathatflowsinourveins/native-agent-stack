@@ -1,0 +1,455 @@
+{
+  "cases": [
+    {
+      "arm": "Arm-1",
+      "case_id": "C01",
+      "status": "scored",
+      "seed_detected": null,
+      "unsupported_defect_count": 0,
+      "reason": "Clean case; no findings."
+    },
+    {
+      "arm": "Arm-1",
+      "case_id": "C02",
+      "status": "scored",
+      "seed_detected": true,
+      "unsupported_defect_count": 0,
+      "reason": "error: \"Missing 'name' in frontmatter\" correctly identifies the missing required name."
+    },
+    {
+      "arm": "Arm-1",
+      "case_id": "C03",
+      "status": "scored",
+      "seed_detected": true,
+      "unsupported_defect_count": 0,
+      "reason": "error: \"Missing 'description' in frontmatter\" correctly identifies the missing required description."
+    },
+    {
+      "arm": "Arm-1",
+      "case_id": "C04",
+      "status": "scored",
+      "seed_detected": true,
+      "unsupported_defect_count": 0,
+      "reason": "The error message begins \"Invalid YAML in frontmatter: while parsing a flow sequence\" and reports \"expected ',' or ']', but got '<stream end>'\", correctly identifying malformed YAML."
+    },
+    {
+      "arm": "Arm-1",
+      "case_id": "C05",
+      "status": "scored",
+      "seed_detected": true,
+      "unsupported_defect_count": 0,
+      "reason": "error: \"Name 'Bad_Name' should be hyphen-case (lowercase letters, digits, and hyphens only)\" identifies the invalid name characters and capitalization."
+    },
+    {
+      "arm": "Arm-1",
+      "case_id": "C06",
+      "status": "scored",
+      "seed_detected": true,
+      "unsupported_defect_count": 0,
+      "reason": "error: \"Name is too long (65 characters). Maximum is 64 characters.\" correctly identifies the length violation."
+    },
+    {
+      "arm": "Arm-1",
+      "case_id": "C07",
+      "status": "scored",
+      "seed_detected": true,
+      "unsupported_defect_count": 0,
+      "reason": "error: \"Description is too long (1025 characters). Maximum is 1024 characters.\" correctly identifies the length violation."
+    },
+    {
+      "arm": "Arm-1",
+      "case_id": "C08",
+      "status": "scored",
+      "seed_detected": false,
+      "unsupported_defect_count": 0,
+      "reason": "No findings; the seeded missing local Markdown resource was not identified."
+    },
+    {
+      "arm": "Arm-1",
+      "case_id": "C09",
+      "status": "scored",
+      "seed_detected": null,
+      "unsupported_defect_count": 0,
+      "reason": "Clean case; no findings."
+    },
+    {
+      "arm": "Arm-1",
+      "case_id": "C10",
+      "status": "scored",
+      "seed_detected": null,
+      "unsupported_defect_count": 1,
+      "reason": "error: \"Unexpected key(s) in SKILL.md frontmatter: compatibility. Allowed properties are: allowed-tools, description, license, metadata, name\" asserts a defect in the fully valid clean fixture."
+    },
+    {
+      "arm": "Arm-1",
+      "case_id": "C11",
+      "status": "scored",
+      "seed_detected": false,
+      "unsupported_defect_count": 0,
+      "reason": "No findings; the seeded empty description was not identified."
+    },
+    {
+      "arm": "Arm-1",
+      "case_id": "C12",
+      "status": "scored",
+      "seed_detected": true,
+      "unsupported_defect_count": 0,
+      "reason": "error: \"No YAML frontmatter found\" correctly identifies missing frontmatter."
+    },
+    {
+      "arm": "Arm-1",
+      "case_id": "I01",
+      "status": "excluded",
+      "seed_detected": null,
+      "unsupported_defect_count": null,
+      "reason": "Packet status is unsupported_scope; detail: \"instruction scope unsupported\"."
+    },
+    {
+      "arm": "Arm-1",
+      "case_id": "I02",
+      "status": "excluded",
+      "seed_detected": null,
+      "unsupported_defect_count": null,
+      "reason": "Packet status is unsupported_scope; detail: \"instruction scope unsupported\"."
+    },
+    {
+      "arm": "Arm-2",
+      "case_id": "C01",
+      "status": "scored",
+      "seed_detected": null,
+      "unsupported_defect_count": 10,
+      "reason": "Unsupported medium/warning claims \"Skill not in standard location (skills/ or team-skills/)\" and high/error claims \"Author not specified in metadata\" contribute four entries. Six unqualified QUALITY-LOW absence warnings contribute six more. Explicit recommendations and separate style suggestions are excluded."
+    },
+    {
+      "arm": "Arm-2",
+      "case_id": "C02",
+      "status": "scored",
+      "seed_detected": true,
+      "unsupported_defect_count": 6,
+      "reason": "high: \"Field 'name': Field required\", repeated as an error with [SCHEMA-HIGH], detects the seed. Six unqualified QUALITY-LOW absence warnings assert unsupported documentation requirements."
+    },
+    {
+      "arm": "Arm-2",
+      "case_id": "C03",
+      "status": "scored",
+      "seed_detected": true,
+      "unsupported_defect_count": 6,
+      "reason": "high: \"Field 'description': Field required\", repeated as an error with [SCHEMA-HIGH], detects the seed. Six unqualified QUALITY-LOW absence warnings assert unsupported documentation requirements."
+    },
+    {
+      "arm": "Arm-2",
+      "case_id": "C04",
+      "status": "scored",
+      "seed_detected": true,
+      "unsupported_defect_count": 6,
+      "reason": "The high finding begins \"Invalid YAML syntax in frontmatter: while parsing a flow sequence\" and reports \"expected ',' or ']', but got '<stream end>'\"; its error copy also detects malformed YAML. Six unqualified QUALITY-LOW absence warnings are unsupported."
+    },
+    {
+      "arm": "Arm-2",
+      "case_id": "C05",
+      "status": "scored",
+      "seed_detected": true,
+      "unsupported_defect_count": 6,
+      "reason": "high: \"Invalid name format: 'Bad_Name' (lowercase/numbers/hyphens only)\", its error copy, and the high/error schema findings identify the seed. Six unqualified QUALITY-LOW absence warnings are unsupported; repeated name findings do not add unrelated defects."
+    },
+    {
+      "arm": "Arm-2",
+      "case_id": "C06",
+      "status": "scored",
+      "seed_detected": true,
+      "unsupported_defect_count": 6,
+      "reason": "high: \"Field 'name': String should have at most 64 characters\", repeated as an error with [SCHEMA-HIGH], detects the seed. Six unqualified QUALITY-LOW absence warnings are unsupported."
+    },
+    {
+      "arm": "Arm-2",
+      "case_id": "C07",
+      "status": "scored",
+      "seed_detected": true,
+      "unsupported_defect_count": 7,
+      "reason": "high: \"Field 'description': String should have at most 1024 characters\", with an error copy, detects the seed. Six recurring absence warnings plus warning \"[QUALITY-LOW] Description doesn't mention WHEN to use this skill in [path]/SKILL.md\" are unsupported. The explicitly recommended 50–150-character style target is excluded."
+    },
+    {
+      "arm": "Arm-2",
+      "case_id": "C08",
+      "status": "scored",
+      "seed_detected": false,
+      "unsupported_defect_count": 12,
+      "reason": "No finding identifies the missing local resource. Unsupported location, \"Missing top-level heading (# Title) in SKILL.md body\", and \"Author not specified in metadata\" claims each appear twice, at medium/warning or high/error severity. These six entries and six unqualified QUALITY-LOW absence warnings total twelve."
+    },
+    {
+      "arm": "Arm-2",
+      "case_id": "C09",
+      "status": "scored",
+      "seed_detected": null,
+      "unsupported_defect_count": 12,
+      "reason": "The clean fixture is valid. Unsupported location, \"Missing top-level heading (# Title) in SKILL.md body\", and \"Author not specified in metadata\" claims each appear twice, at medium/warning or high/error severity. Six additional unqualified QUALITY-LOW absence warnings bring the count to twelve."
+    },
+    {
+      "arm": "Arm-2",
+      "case_id": "C10",
+      "status": "scored",
+      "seed_detected": null,
+      "unsupported_defect_count": 12,
+      "reason": "The clean fixture is valid. Unsupported location, \"Missing top-level heading (# Title) in SKILL.md body\", and \"Author must be of the form 'Name <email@host>'\" claims each appear twice, at medium/warning or high/error severity. Six unqualified QUALITY-LOW absence warnings bring the count to twelve."
+    },
+    {
+      "arm": "Arm-2",
+      "case_id": "C11",
+      "status": "scored",
+      "seed_detected": true,
+      "unsupported_defect_count": 6,
+      "reason": "high: \"Field 'description': String should have at least 1 character\", repeated as an error with [SCHEMA-HIGH], detects the empty description. Six unqualified QUALITY-LOW absence warnings are unsupported."
+    },
+    {
+      "arm": "Arm-2",
+      "case_id": "C12",
+      "status": "scored",
+      "seed_detected": true,
+      "unsupported_defect_count": 6,
+      "reason": "high: \"SKILL.md must have YAML frontmatter between --- markers\", repeated as an error with [SCHEMA-HIGH], detects the seed. Six unqualified QUALITY-LOW absence warnings are unsupported."
+    },
+    {
+      "arm": "Arm-2",
+      "case_id": "I01",
+      "status": "excluded",
+      "seed_detected": null,
+      "unsupported_defect_count": null,
+      "reason": "Packet status is unsupported_scope; detail: \"instruction scope unsupported\"."
+    },
+    {
+      "arm": "Arm-2",
+      "case_id": "I02",
+      "status": "excluded",
+      "seed_detected": null,
+      "unsupported_defect_count": null,
+      "reason": "Packet status is unsupported_scope; detail: \"instruction scope unsupported\"."
+    },
+    {
+      "arm": "Arm-3",
+      "case_id": "C01",
+      "status": "scored",
+      "seed_detected": null,
+      "unsupported_defect_count": 0,
+      "reason": "Only info: \"No tool or spec versions pinned. Version-dependent rules will use default assumptions.\" Informational pinning guidance is not a defect."
+    },
+    {
+      "arm": "Arm-3",
+      "case_id": "C02",
+      "status": "scored",
+      "seed_detected": true,
+      "unsupported_defect_count": 0,
+      "reason": "error: \"Skill frontmatter is missing required 'name' field\" detects the seed. The info pinning finding is excluded."
+    },
+    {
+      "arm": "Arm-3",
+      "case_id": "C03",
+      "status": "scored",
+      "seed_detected": true,
+      "unsupported_defect_count": 0,
+      "reason": "error: \"Skill frontmatter is missing required 'description' field\" detects the seed. The info pinning finding is excluded."
+    },
+    {
+      "arm": "Arm-3",
+      "case_id": "C04",
+      "status": "scored",
+      "seed_detected": true,
+      "unsupported_defect_count": 0,
+      "reason": "error: \"Failed to parse SKILL.md: description: invalid type: sequence, expected a string at line 2 column 14\" identifies a frontmatter parsing failure at the malformed YAML, with a suggestion to check YAML syntax. The info pinning finding is excluded."
+    },
+    {
+      "arm": "Arm-3",
+      "case_id": "C05",
+      "status": "scored",
+      "seed_detected": true,
+      "unsupported_defect_count": 0,
+      "reason": "error: \"Name 'Bad_Name' must be 1-64 characters per segment using lowercase letters, digits, and hyphens, as a bare skill name or plugin:skill-name\" correctly rejects the seeded invalid name. The info pinning finding is excluded."
+    },
+    {
+      "arm": "Arm-3",
+      "case_id": "C06",
+      "status": "scored",
+      "seed_detected": true,
+      "unsupported_defect_count": 0,
+      "reason": "The error rejects the supplied 65-character name with the message requirement \"must be 1-64 characters per segment using lowercase letters, digits, and hyphens, as a bare skill name or plugin:skill-name\". This detects the length violation; info pinning is excluded."
+    },
+    {
+      "arm": "Arm-3",
+      "case_id": "C07",
+      "status": "scored",
+      "seed_detected": true,
+      "unsupported_defect_count": 0,
+      "reason": "error: \"Description must be 1-1024 characters, got 1025\" correctly identifies the length violation. The info pinning finding is excluded."
+    },
+    {
+      "arm": "Arm-3",
+      "case_id": "C08",
+      "status": "scored",
+      "seed_detected": true,
+      "unsupported_defect_count": 0,
+      "reason": "error: \"Broken markdown link: 'references/csv-guide.md' (file not found: [path]/references/csv-guide.md)\" identifies the missing local resource. The info pinning finding is excluded."
+    },
+    {
+      "arm": "Arm-3",
+      "case_id": "C09",
+      "status": "scored",
+      "seed_detected": null,
+      "unsupported_defect_count": 0,
+      "reason": "Only info: \"No tool or spec versions pinned. Version-dependent rules will use default assumptions.\" Informational pinning guidance is not a defect."
+    },
+    {
+      "arm": "Arm-3",
+      "case_id": "C10",
+      "status": "scored",
+      "seed_detected": null,
+      "unsupported_defect_count": 0,
+      "reason": "Only info: \"No tool or spec versions pinned. Version-dependent rules will use default assumptions.\" Informational pinning guidance is not a defect."
+    },
+    {
+      "arm": "Arm-3",
+      "case_id": "C11",
+      "status": "scored",
+      "seed_detected": true,
+      "unsupported_defect_count": 0,
+      "reason": "error: \"Description must be 1-1024 characters, got 0\" detects the empty description, despite the mismatched trimming suggestion. The info pinning finding is excluded."
+    },
+    {
+      "arm": "Arm-3",
+      "case_id": "C12",
+      "status": "scored",
+      "seed_detected": true,
+      "unsupported_defect_count": 0,
+      "reason": "error: \"SKILL.md must have YAML frontmatter between --- markers\" detects missing frontmatter. The info pinning finding is excluded."
+    },
+    {
+      "arm": "Arm-3",
+      "case_id": "I01",
+      "status": "scored",
+      "seed_detected": null,
+      "unsupported_defect_count": 1,
+      "reason": "warning: \"Missing project context section in AGENTS instruction file\" asserts a missing section without stating that it is optional; its \"Add\" suggestion does not clarify optionality. The entire clean fixture is valid, so this assertion is unsupported. Info pinning is excluded."
+    },
+    {
+      "arm": "Arm-3",
+      "case_id": "I02",
+      "status": "scored",
+      "seed_detected": true,
+      "unsupported_defect_count": 1,
+      "reason": "error: \"Broken markdown link: 'missing-guide.md' (file not found: [path]/missing-guide.md)\" detects the seed. warning: \"Missing project context section in AGENTS instruction file\" adds an unsupported section assertion because optionality is unstated. Info pinning is excluded."
+    },
+    {
+      "arm": "Arm-4",
+      "case_id": "C01",
+      "status": "scored",
+      "seed_detected": null,
+      "unsupported_defect_count": 0,
+      "reason": "Clean case; no findings."
+    },
+    {
+      "arm": "Arm-4",
+      "case_id": "C02",
+      "status": "scored",
+      "seed_detected": true,
+      "unsupported_defect_count": 0,
+      "reason": "error: \"Missing 'name' in frontmatter\" correctly identifies the missing required name."
+    },
+    {
+      "arm": "Arm-4",
+      "case_id": "C03",
+      "status": "scored",
+      "seed_detected": true,
+      "unsupported_defect_count": 0,
+      "reason": "error: \"Missing 'description' in frontmatter\" correctly identifies the missing required description."
+    },
+    {
+      "arm": "Arm-4",
+      "case_id": "C04",
+      "status": "scored",
+      "seed_detected": true,
+      "unsupported_defect_count": 0,
+      "reason": "The error message begins \"Invalid YAML in frontmatter: while parsing a flow sequence\" and reports \"expected ',' or ']', but got '<stream end>'\", correctly identifying malformed YAML."
+    },
+    {
+      "arm": "Arm-4",
+      "case_id": "C05",
+      "status": "scored",
+      "seed_detected": true,
+      "unsupported_defect_count": 0,
+      "reason": "error: \"Name 'Bad_Name' should be kebab-case (lowercase letters, digits, and hyphens only)\" identifies the invalid name characters and capitalization."
+    },
+    {
+      "arm": "Arm-4",
+      "case_id": "C06",
+      "status": "scored",
+      "seed_detected": true,
+      "unsupported_defect_count": 0,
+      "reason": "error: \"Name is too long (65 characters). Maximum is 64 characters.\" correctly identifies the length violation."
+    },
+    {
+      "arm": "Arm-4",
+      "case_id": "C07",
+      "status": "scored",
+      "seed_detected": true,
+      "unsupported_defect_count": 0,
+      "reason": "error: \"Description is too long (1025 characters). Maximum is 1024 characters.\" correctly identifies the length violation."
+    },
+    {
+      "arm": "Arm-4",
+      "case_id": "C08",
+      "status": "scored",
+      "seed_detected": false,
+      "unsupported_defect_count": 0,
+      "reason": "No findings; the seeded missing local Markdown resource was not identified."
+    },
+    {
+      "arm": "Arm-4",
+      "case_id": "C09",
+      "status": "scored",
+      "seed_detected": null,
+      "unsupported_defect_count": 0,
+      "reason": "Clean case; no findings."
+    },
+    {
+      "arm": "Arm-4",
+      "case_id": "C10",
+      "status": "scored",
+      "seed_detected": null,
+      "unsupported_defect_count": 0,
+      "reason": "Clean case; no findings."
+    },
+    {
+      "arm": "Arm-4",
+      "case_id": "C11",
+      "status": "scored",
+      "seed_detected": false,
+      "unsupported_defect_count": 0,
+      "reason": "No findings; the seeded empty description was not identified."
+    },
+    {
+      "arm": "Arm-4",
+      "case_id": "C12",
+      "status": "scored",
+      "seed_detected": true,
+      "unsupported_defect_count": 0,
+      "reason": "error: \"No YAML frontmatter found\" correctly identifies missing frontmatter."
+    },
+    {
+      "arm": "Arm-4",
+      "case_id": "I01",
+      "status": "excluded",
+      "seed_detected": null,
+      "unsupported_defect_count": null,
+      "reason": "Packet status is unsupported_scope; detail: \"instruction scope unsupported\"."
+    },
+    {
+      "arm": "Arm-4",
+      "case_id": "I02",
+      "status": "excluded",
+      "seed_detected": null,
+      "unsupported_defect_count": null,
+      "reason": "Packet status is unsupported_scope; detail: \"instruction scope unsupported\"."
+    }
+  ],
+  "origin_leak_detected": false,
+  "origin_leak_reason": null,
+  "metric_notes": "Counts are per finding entry; separately emitted prefixed copies count separately, while repetition within one finding counts once. Explicit recommendations, separate qualitative style suggestions, and info pinning are excluded. Arm-2's six recurring warning messages begin '[QUALITY-LOW]' and assert: 'No examples provided', \"No '## Purpose' section\", 'No mention of error handling or validation', 'No prerequisites/requirements documented', 'No limitations documented', and 'No troubleshooting section documented'; each ends ' in [path]/SKILL.md'. These warnings lack optional wording and count as unsupported assertions. I01–I02 are assessed separately from skill cases; unsupported scopes are excluded."
+}
