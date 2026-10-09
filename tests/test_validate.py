@@ -612,6 +612,151 @@ class EncodedHomePathTests(unittest.TestCase):
                     self.assertIsNotNone(pattern.search(prefix + content))
 
 
+class DirectCodegraphHomePrivacyProperties(unittest.TestCase):
+    """Finite semantic domains for graph identifiers, independent of the regex.
+
+    Every fixture is constructed at runtime from synthetic components so the
+    publication validator does not encounter private-looking literals in this
+    source. No host username, fixture exclusion or regex-derived generator is
+    used. These are exhaustive properties over declared finite domains, using
+    the repository's existing unittest runner without a new dependency.
+    """
+
+    from string import punctuation as PUNCTUATION
+
+    NAME_CLASSES = (
+        ("ascii", "fixtureagent"),
+        ("dot", "fixture.agent"),
+        ("underscore", "fixture_agent"),
+        ("hyphen", "fixture-agent"),
+        ("consecutive-hyphens", "fixture--agent"),
+        ("trailing-hyphen", "fixtureagent-"),
+        ("Lu", "fixtureÅagent"),
+        ("Ll", "fixtureéagent"),
+        ("Lt", "fixtureǅagent"),
+        ("Lm", "fixtureʰagent"),
+        ("Lo", "fixture中agent"),
+        ("example-dot", "example.person"),
+        ("example-underscore", "example_person"),
+        ("example-plural", "examples"),
+    )
+    PLACEHOLDERS = ("<user>", "%u", "example")
+    NON_PUNCTUATION_BOUNDARIES = ("", " ", "\t", "\n")
+    FILE_SCAN_WRAPPERS = ("", '"', "`")
+    property_cases_executed = 0
+
+    @classmethod
+    def setUpClass(cls):
+        cls.property_cases_executed = 0
+
+    @staticmethod
+    def graph_id(name):
+        return "-".join(("home", name, "code", "native", "agent", "stack"))
+
+    @staticmethod
+    def unicode_letters():
+        for point in range(128, 0x110000):
+            character = chr(point)
+            if character.isalpha():
+                yield character
+
+    @classmethod
+    def property_case_counts(cls):
+        """Export deterministic domain sizes for the parent evidence marker."""
+        import unicodedata
+
+        categories = {}
+        for character in cls.unicode_letters():
+            category = unicodedata.category(character)
+            categories[category] = categories.get(category, 0) + 1
+        count = sum(categories.values())
+        pairs = len(cls.PUNCTUATION) ** 2
+        whitespace_pairs = len(cls.NON_PUNCTUATION_BOUNDARIES) ** 2
+        counts = {
+            "punctuation_pairs_per_name": pairs,
+            "representative_name_classes": len(cls.NAME_CLASSES),
+            "positive_punctuation": pairs * len(cls.NAME_CLASSES),
+            "placeholder_punctuation": pairs * len(cls.PLACEHOLDERS),
+            "positive_empty_whitespace": whitespace_pairs * len(cls.NAME_CLASSES),
+            "placeholder_empty_whitespace": whitespace_pairs * len(cls.PLACEHOLDERS),
+            "unicode_letter_names": count,
+            "unicode_letter_left_neighbors": count,
+            "ascii_alphanumeric_left_neighbors": 62,
+            "scan_file_wrappers": len(cls.NAME_CLASSES) * len(cls.FILE_SCAN_WRAPPERS),
+            "unicode_categories": categories,
+            "unicode_version": unicodedata.unidata_version,
+        }
+        counts["property_cases"] = sum(counts[key] for key in (
+            "positive_punctuation", "placeholder_punctuation", "positive_empty_whitespace",
+            "placeholder_empty_whitespace", "unicode_letter_names",
+            "unicode_letter_left_neighbors", "ascii_alphanumeric_left_neighbors",
+            "scan_file_wrappers"))
+        return counts
+
+    def assert_semantic_domain(self, candidates, expected_private):
+        pattern = dict(PRIVATE_CONTENT)["encoded home path"]
+        checked = mismatches = 0
+        for candidate in candidates:
+            checked += 1
+            mismatches += (pattern.search(candidate) is not None) != expected_private
+        type(self).property_cases_executed += checked
+        self.assertGreater(checked, 0, "property domain must be exercised")
+        self.assertEqual(mismatches, 0, f"{mismatches} mismatches across {checked} semantic cases")
+
+    @classmethod
+    def wrapped_ids(cls, names, boundaries):
+        for name in names:
+            identifier = cls.graph_id(name)
+            for left in boundaries:
+                for right in boundaries:
+                    yield left + identifier + right
+
+    def test_every_punctuation_pair_preserves_private_name_classification(self):
+        self.assertEqual(len(self.PUNCTUATION), 32)
+        self.assert_semantic_domain(self.wrapped_ids(
+            (name for _, name in self.NAME_CLASSES), self.PUNCTUATION), True)
+
+    def test_every_punctuation_pair_preserves_placeholder_classification(self):
+        self.assert_semantic_domain(self.wrapped_ids(self.PLACEHOLDERS, self.PUNCTUATION), False)
+
+    def test_empty_and_whitespace_boundaries_preserve_private_classification(self):
+        self.assert_semantic_domain(self.wrapped_ids(
+            (name for _, name in self.NAME_CLASSES), self.NON_PUNCTUATION_BOUNDARIES), True)
+
+    def test_empty_and_whitespace_boundaries_preserve_placeholder_classification(self):
+        self.assert_semantic_domain(self.wrapped_ids(
+            self.PLACEHOLDERS, self.NON_PUNCTUATION_BOUNDARIES), False)
+
+    def test_all_non_ascii_unicode_letters_are_private_name_characters(self):
+        self.assert_semantic_domain(
+            ('"' + self.graph_id("fixture" + letter + "agent") + '"'
+             for letter in self.unicode_letters()), True)
+
+    def test_unicode_letter_left_neighbors_do_not_create_a_graph_boundary(self):
+        identifier = self.graph_id("fixtureagent")
+        self.assert_semantic_domain((letter + identifier for letter in self.unicode_letters()), False)
+
+    def test_ascii_alphanumeric_left_neighbors_do_not_create_a_graph_boundary(self):
+        from string import ascii_letters, digits
+
+        identifier = self.graph_id("fixtureagent")
+        self.assert_semantic_domain((letter + identifier for letter in ascii_letters + digits), False)
+
+    def test_direct_file_scan_flags_bare_quotes_and_backticks_without_echoing_identifier(self):
+        mismatches = 0
+        with tempfile.TemporaryDirectory(prefix="codegraph-privacy-") as directory:
+            target = Path(directory) / "synthetic.txt"
+            for _, name in self.NAME_CLASSES:
+                identifier = self.graph_id(name)
+                for wrapper in self.FILE_SCAN_WRAPPERS:
+                    target.write_text(wrapper + identifier + wrapper, encoding="utf-8")
+                    findings = scan_file_for_private_content(target)
+                    type(self).property_cases_executed += 1
+                    mismatches += not any("encoded home path" in finding for finding in findings)
+                    mismatches += any(identifier in finding for finding in findings)
+        self.assertEqual(mismatches, 0, f"{mismatches} scan classification/redaction mismatches")
+
+
 class ScanFileForPrivateContentTests(unittest.TestCase):
     """`scan_publication()` only walks git-tracked/listed paths; a generated,
     gitignored artifact built fresh right before publication (e.g.

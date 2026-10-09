@@ -107,9 +107,13 @@ ENCODED_PROFILE_ROOT = (
 ENCODED_PROFILE_START = ENCODED_PROFILE_ROOT + r"(?!example(?:-|(?![A-Za-z0-9_.])))"
 # No restricted tail: punctuation or Unicode after a real name is private in every context. Preserve
 # sentence periods after ordinary names; a dots-only name is consumed entirely rather than left as a residue.
+# Direct graph IDs use the validator's Unicode name grammar and punctuation boundaries, including a
+# dash joined to preceding text. Consecutive and trailing username hyphens precede the final -code-.
 ENCODED_USER_PROFILE = re.compile(
     r"(?<![\w-])" + ENCODED_PROFILE_START
-    + r"(?=[A-Za-z0-9_.])(?:[\w.-]*[\w-]|\.+)")
+    + r"(?=[A-Za-z0-9_.])(?:[\w.-]*[\w-]|\.+)"
+    + r"|(?<![^\W_])home-(?!example-code-)[\w.]+(?:-+[\w.]+)*-*-code-"
+    + r"(?:[\w.-]*[\w-])?")
 
 
 def method_limits(models: dict, gpt6_model: str = GPT6_DEFAULT["model"], skills: bool = False) -> list[str]:
@@ -712,7 +716,10 @@ def redact_project_dirs(value, work: Path | None = None, repo_root: Path | None 
     Users branch ignores case. A name starts with [A-Za-z0-9_.] and needs no restricted terminator. Lowercase
     example before a dash, end or any character outside that ASCII class is exempt. Project suffixes and
     dots-only names are removed. Local encodings and extra Windows separators receive stricter coverage;
-    local continuations consume Unicode word characters, dots and dashes. Plain home-assistant and my-home-page prose survives;
+    local continuations consume Unicode word characters, dots and dashes. Direct graph IDs also admit
+    Unicode names and consecutive/trailing username hyphens behind any punctuation boundary, including
+    a dash joined to preceding text; their exact example prefix and template names remain exempt.
+    Plain home-assistant and my-home-page prose survives;
     URL, query, fragment and assignment contexts receive no exemption. Colliding keys raise RedactionKeyCollision.
     The CLI scans decoded documents and exact emitted JSON with the selected checkout's PRIVATE_CONTENT
     before writing or printing. Regression fixtures use its actual encoded home path rule, not a synthetic marker.
