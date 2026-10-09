@@ -18,6 +18,8 @@ PR (#892, 2026-10-09), which found changes its record had not named; the same re
   repository owner, the first attempt of a run, and `CLAUDE_PR_REVIEW_ENABLED == 'true'`. A dispatch by anyone else,
   or a re-run, is skipped.
 - `timeout-minutes: 30` (R6, below). Grants: `contents: read`, `pull-requests: read` and `id-token: write`.
+  Top-level `cache-mode: none` denies GitHub Actions cache restores and saves to every job; Claude prompt-cache
+  token accounting is separate.
 - A guard step stops the job with exit 2 when step or runner debugging is on (debug logging set as a repository
   secret or variable included, 2026-10-09, below), when `~/.claude/settings.json` already exists on the runner (a
   dangling symlink included), or when an input is malformed.
@@ -40,7 +42,11 @@ PR (#892, 2026-10-09), which found changes its record had not named; the same re
 ## Why a manual dispatch and no pull request trigger
 
 - **The federation subject.** Runs authenticate by Anthropic workload identity federation, and the rule matches the
-  subject of a run on `main`. A `pull_request` run's subject ends in `:pull_request`
+  immutable subject of a run on `main`:
+  `repo:seathatflowsinourveins@234074349/native-agent-stack@1376766892:ref:refs/heads/main`.
+  The repository's OIDC customization API reports `use_immutable_subject: true` and the matching `sub_claim_prefix`;
+  the IDs agree with its repository metadata (checked 2026-10-09). GitHub's [immutable subject claims](https://docs.github.com/en/actions/reference/security/oidc#immutable-subject-claims)
+  include the owner and repository IDs. A `pull_request` run's immutable subject ends in `:pull_request`
   (GitHub, OpenID Connect reference), so it cannot authenticate by this rule, and widening the rule to pull request
   runs would let a pull request's own workflow text ask for the token. `pull_request_target` runs main's workflow
   text but is banned here outright (`dangerous-trigger` in `tests/test_workflow_policy.py`).
@@ -552,8 +558,9 @@ side is this workflow, pinned, with federation and Opus 5.5. The command center 
 pull requests give that comparison its vendor arm, and the command center reads the summary before it merges a
 non-draft head.
 
-**Trigger: a 15-minute schedule, beside the dispatch.** Two other designs were checked and rejected:
-- **A `pull_request` trigger** presents the OIDC subject `repo:OWNER/REPO:pull_request` (GitHub's OpenID Connect
+**Trigger: a 15-minute schedule (`7,22,37,52 * * * *`, UTC), beside the dispatch.** The offset avoids the hour's
+start. Two other designs were checked and rejected:
+- **A `pull_request` trigger** presents the immutable OIDC subject `repo:OWNER@OWNER-ID/REPO@REPO-ID:pull_request` (GitHub's OpenID Connect
   reference, "Filtering for pull_request events"), which the federation rule does not accept. It would also run the
   pull request's own copy of the workflow file with the token.
 - **`workflow_run`** runs main's copy with main's subject (GitHub's "Events that trigger workflows": GITHUB_REF is
@@ -581,10 +588,17 @@ nothing out and reads no secret.
     branch name can come from anywhere, including a fork's branch named `main`.
   - The marker is kept 90 days. A head still open and unchanged after that is reviewed again.
 - **Limits:** at most 2 heads per tick, oldest pull request first. None once today's reviews reach the daily ceiling:
-  the repository variable `CLAUDE_PR_REVIEW_DAILY_USD`, default 55, counted at the 5.50 USD cost bound per review
-  from this workflow's schedule and dispatch runs on main since 00:00 UTC. A tick at the ceiling skips and says so
-  in its summary.
-- **Every list is read to its last page:** the open pull requests, today's runs, each run's jobs and each marker
+  the repository variable `CLAUDE_PR_REVIEW_DAILY_USD`, default 55, counted at the 5.50 USD cost bound per retained
+  usage artifact from this workflow's schedule and dispatch runs on main since 00:00 UTC. Only nonexpired
+  `claude-pr-review-usage-pr<N>-<sha>-<run id>` names bound to that run count, once per name. This remains a
+  conservative reservation, not a sum of billed costs; jobs without a usage record consume no room.
+  A tick at the ceiling skips and says so in its summary.
+- **Diff preflight:** after checking the completion marker, the resolver requests the GitHub REST diff media type
+  and measures bytes. A diff over 250,000 bytes is skipped with its number, head and byte count in the summary,
+  before allocating a matrix slot. Exactly 250,000 bytes qualifies. This prevents unchanged oversized heads from
+  starving later pull requests every tick; a maintainer can dispatch a narrower `paths` selection. The review's
+  later merge-base git diff and exact-head binding still enforce the final bound before the action.
+- **Every list is read to its last page:** the open pull requests, today's runs, each run's usage artifacts and each marker
   name's artifacts (`gh api --paginate`).
 - **Failure:** an API failure fails the job, and nothing is reviewed.
 
@@ -614,7 +628,7 @@ resolve step against a stand-in `gh`:
 - a head already reviewed is skipped, and a new head of the same pull request is chosen;
 - at most two heads per tick;
 - at the daily ceiling, nothing is chosen and the tick reports it;
-- an API failure on any of the three endpoints fails the job;
+- an API failure on any endpoint fails the job;
 - a malformed dispatch or ceiling is refused or skipped;
 - the binding refuses a draft on a scheduled review and accepts one on a dispatch.
 
@@ -672,6 +686,32 @@ the module:
 - the marker written whatever the outcome;
 - no recheck;
 - the check's result compared inside `[ ]` (which swallowed an API failure in the first draft).
+
+## Review workflow corrections (2026-10-09, CC dispatch item 7)
+
+The numbers step now retains `error_class: "zero_cost_error_without_model_usage"` when a result has
+`is_error: true`, `total_cost_usd: 0` and an empty `modelUsage` object. It prints that fixed class in the summary
+before failing the bounds, instead of aborting in jq with `usage unavailable`. Raw error strings and result text
+are excluded from the diagnostic; the failed run never publishes a review or writes a completion marker. Normal
+usage records carry `error_class: null`. This does not relax the requirements for any other malformed usage.
+
+The existing workflow-step tests reproduce both zero-cost failures before the fix. Resolver fixtures reproduce
+the oversized-head starvation and the difference between jobs and retained usage records, including pagination
+and the exact byte boundary; schedule and cache-mode contracts also fail before their changes. They execute the
+workflow's own shell against synthetic inputs, without a model or token exchange. Hosted execution of the changed
+workflow remains untested by these local checks.
+
+Sources: `anthropics/claude-code-action` at `2dca132ff0e0c4094ce6048b422c6915a071210b` (`action.yml`,
+`docs/security.md`, execution-file output); GitHub [workflow cache-mode](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#cache-mode),
+[immutable subject claims](https://docs.github.com/en/actions/reference/security/oidc#immutable-subject-claims),
+and [pull request diff media types](https://docs.github.com/en/rest/pulls/pulls#get-a-pull-request).
+Using the vendor's existing outputs and REST interfaces keeps the correction inside the pinned workflow.
+Counting review jobs was rejected because pre-model refusals are not usage records; a persistent refusal marker
+is unnecessary when the resolver skips the oversized diff before allocating a slot. A changed upstream result
+shape, diff API semantics or immutable-subject customization requires rechecking these contracts.
+
+The two Claude review workflows set top-level `cache-mode: none`. The third workflow, `harness-audit.yml`, belongs
+to api-actions' separate #892 slice and is outside this change.
 
 ## Alternatives considered
 

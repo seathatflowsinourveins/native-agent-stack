@@ -342,6 +342,11 @@ def toolkit_tree(commit, tamper=False, extra=None):
 
 
 class PullRequestToolkitShapeTests(unittest.TestCase):
+    def test_no_job_can_restore_or_save_an_actions_cache(self):
+        self.assertEqual(workflow().get("cache-mode"), "none")
+        for item in workflow()["jobs"].values():
+            self.assertEqual(item.get("cache-mode", "none"), "none")
+
     def test_the_only_trigger_is_a_manual_dispatch_with_a_number_and_a_commit(self):
         triggers = workflow()[True] if True in workflow() else workflow()["on"]
         self.assertEqual(list(triggers), ["workflow_dispatch"])
@@ -703,7 +708,7 @@ class PullRequestToolkitStepTests(unittest.TestCase):
         code, console, summary, usage, _ = run_step(NUMBERS, execution_file=execution(subagent_turns=40))
         self.assertEqual(code, 0, console)
         record = json.loads(usage)
-        self.assertEqual(sorted(record), ["agents_called", "assistant_turns", "claude_code_version", "complete",
+        self.assertEqual(sorted(record), ["agents_called", "assistant_turns", "claude_code_version", "complete", "error_class",
                                           "forbidden_tools", "handbacks", "lower_bound_models", "mcp_servers",
                                           "models", "num_turns", "report_sections", "report_source", "result_chars",
                                           "result_subtypes", "session_started", "successful_result", "tools",
@@ -1104,6 +1109,21 @@ class PullRequestToolkitStepTests(unittest.TestCase):
         self.assertNotEqual(code, 0)
         self.assertEqual(json.loads(usage)["total_cost_usd"], 24.5)
         self.assertIn("client cost estimate 24.5 USD, above the 24.2 USD bound", console)
+
+    def test_zero_cost_error_without_model_usage_keeps_a_bounded_class_and_fails(self):
+        log = execution(is_error=True, subtype="error_during_execution", total_cost_usd=0,
+                        modelUsage={}, num_turns=0, turns=0, agents=(), handbacks={},
+                        errors=[TRANSCRIPT_MARKER], result=TRANSCRIPT_MARKER)
+        code, console, summary, usage, _ = run_step(NUMBERS, execution_file=log)
+        self.assertNotEqual(code, 0)
+        self.assertIsNotNone(usage, console)
+        record = json.loads(usage)
+        self.assertEqual(record["error_class"], "zero_cost_error_without_model_usage")
+        self.assertFalse(record["complete"])
+        self.assertIsNone(record["total_cost_usd"])
+        self.assertEqual(record["models"], [])
+        self.assertIn("Error class: zero_cost_error_without_model_usage", summary)
+        self.assertNotIn(TRANSCRIPT_MARKER, console + summary + usage)
 
     def test_a_run_cut_off_before_its_result_keeps_a_lower_bound_of_its_usage_and_fails(self):
         # The action writes the messages it has read when the client stops with an error; such a file has no result

@@ -12,7 +12,7 @@ name: claude-pr-review
 #
 # Authentication is Anthropic workload identity federation (no Anthropic key in this repository). A dispatch or a
 # schedule run on main presents the subject the federation rule accepts, as harness-audit.yml does. A pull_request
-# run would not (its subject is `repo:OWNER/REPO:pull_request`) and would run the pull request's own copy of this
+# run would not (its immutable subject ends in `:pull_request`) and would run the pull request's own copy of this
 # file, and workflow_run is a trigger this repository's zizmor gate and policy refuse, so the schedule is how every
 # pull request is reached. The resolve job, which holds no token, picks the heads and checks each through the API;
 # the review job checks again with its own read before any token is requested. Both run only while the repository
@@ -35,10 +35,11 @@ on:
         type: string
         default: ""
   schedule:
-    - cron: "*/15 * * * *"
+    - cron: "7,22,37,52 * * * *"
 
 # No token scope by default; each job grants its own (docs/decisions/2026-10-04-ci-least-privilege.md).
 permissions: {}
+cache-mode: none
 
 # Ticks never overlap: a tick that is still reviewing makes the next one wait. A dispatch has its own group per pull
 # request. Each review also holds a group for its pull request and head (the review job's concurrency).
@@ -53,7 +54,8 @@ jobs:
   # of its current head yet: a review that passed its bounds and was published leaves the completion marker
   # claude-pr-review-done-pr<N>-<sha> (kept 90 days), and a head with a trusted one is skipped.
   # At most 2 heads per tick, and none once today's reviews reach the daily ceiling (CLAUDE_PR_REVIEW_DAILY_USD,
-  # default 55, counted at the 5.50 USD cost bound per review). An API failure fails the job, and nothing is reviewed.
+  # default 55, counted at the 5.50 USD cost bound per retained usage record). Oversized diffs are skipped before a
+  # matrix slot is allocated. An API failure fails the job, and nothing is reviewed.
   resolve:
     name: Choose the pull request heads to review (no token)
     if: >-
@@ -128,9 +130,8 @@ jobs:
             mkdir -p "$work"
             WORKFLOW_ID="$(gh api "repos/$GH_REPO/actions/workflows/claude-pr-review.yml" --jq .id)"
             [[ "$WORKFLOW_ID" =~ ^[0-9]{1,15}$ ]] || { echo 'Refused: unexpected workflow id from the API.' >&2; exit 2; }
-            # Today's reviews: this workflow's schedule and dispatch runs on main since 00:00 UTC whose jobs include a
-            # review that ran. A pull request's branch can carry its own copy of this file with another trigger, so a
-            # run from anywhere else does not count (its review job could never obtain a token anyway).
+            # Today's retained usage records, not jobs that started and refused a diff before model execution.
+            # Only this workflow's schedule and dispatch runs on main since 00:00 UTC count, at the cost bound each.
             today="$(date -u +%Y-%m-%d)"
             gh api --paginate "repos/$GH_REPO/actions/workflows/claude-pr-review.yml/runs?created=%3E%3D$today&branch=main&per_page=100" \
               --jq '.workflow_runs[] | select(.head_branch == "main" and (.event == "schedule" or .event == "workflow_dispatch")) | .id' \
@@ -138,13 +139,16 @@ jobs:
             reviewed=0
             while read -r run; do
               [[ "$run" =~ ^[0-9]{1,15}$ ]] || { echo "Refused: unexpected run id from the API." >&2; exit 2; }
-              gh api --paginate "repos/$GH_REPO/actions/runs/$run/jobs?per_page=100" \
-                --jq '.jobs[] | select((.name | startswith("Review ")) and .conclusion != "skipped") | .id' > "$work/jobs"
-              reviewed=$((reviewed + $(grep -c . "$work/jobs" || true)))
+              gh api --paginate "repos/$GH_REPO/actions/runs/$run/artifacts?per_page=100" \
+                --jq '.artifacts[] | select(.expired == false) | .name' > "$work/usage-names"
+              records="$(jq -Rsc --arg run "$run" '[split("\n")[] | select(
+                test("^claude-pr-review-usage-pr[1-9][0-9]{0,6}-[0-9a-f]{40}-" + $run + "$"))] | unique | length' \
+                "$work/usage-names")"
+              reviewed=$((reviewed + records))
             done < "$work/runs"
             room="$(jq -n --argjson d "$DAILY_USD" --argjson r "$reviewed" --argjson b "$cost_bound" \
               '[(($d - $r * $b) / $b | floor), 0] | max')"
-            [ "$room" -gt 0 ] || skip "today's $reviewed reviews reach the daily ceiling of $DAILY_USD USD at $cost_bound USD each"
+            [ "$room" -gt 0 ] || skip "today's $reviewed usage records reach the daily ceiling of $DAILY_USD USD at $cost_bound USD each"
             gh api --paginate "repos/$GH_REPO/pulls?state=open&base=main&sort=created&direction=asc&per_page=100" \
               --jq '.[] | @json' > "$work/pulls.jsonl"
             jq -c --arg repo "$GH_REPO" -s '[.[] | select(.state == "open" and .draft == false and
@@ -156,6 +160,15 @@ jobs:
               n="$(jq -r .pr_number <<< "$head")" s="$(jq -r .head_sha <<< "$head")"
               done_state="$(completed "$n" "$s")" # an assignment, so an API failure stops the step
               [ "$done_state" = no ] || continue
+              # Refuse before allocating a matrix slot: the later git diff guard remains authoritative for the
+              # bound head, but an unchanged oversized head must not starve the other heads on every tick.
+              gh api "repos/$GH_REPO/pulls/$n" --header 'Accept: application/vnd.github.diff' > "$work/pr.diff"
+              size="$(wc -c < "$work/pr.diff")"
+              if [ "$size" -gt 250000 ]; then
+                echo "Skipped: pull request #$n at $s has a $size bytes diff, above 250000; dispatch with paths to narrow it." \
+                  | tee -a "$GITHUB_STEP_SUMMARY"
+                continue
+              fi
               heads="$(jq -c --argjson h "$head" '. + [$h]' <<< "$heads")"
               chosen="$(jq length <<< "$heads")"
               if [ "$chosen" -ge "$per_tick" ] || [ "$chosen" -ge "$room" ]; then break; fi
@@ -444,8 +457,9 @@ jobs:
             (map(select(.type == "system" and .subtype == "init")) | first) as $init |
             (map(select(.type == "result")) | last) as $result |
             if $result == null then error("no result") else . end |
-            if ($result.total_cost_usd | type == "number" and . >= 0) and ($result.num_turns | count) and
-               ($result.modelUsage | type == "object" and length > 0)
+            ($result.is_error == true and $result.total_cost_usd == 0 and $result.modelUsage == {}) as $zero_cost_error |
+            if $zero_cost_error or (($result.total_cost_usd | type == "number" and . >= 0) and
+               ($result.num_turns | count) and ($result.modelUsage | type == "object" and length > 0))
             then . else error("usage unavailable") end |
             ($init.tools // []) as $listed |
             ($listed | map(select(type == "string"))) as $tools |
@@ -456,7 +470,9 @@ jobs:
             (if $result_text != "" then $result_text
              elif $result.subtype == "error_max_budget_usd" then $written else "" end) as $text |
             ([.[] | select(.type == "assistant") | .message.id? | select(type == "string")] | unique | length) as $turns |
-            {total_cost_usd: $result.total_cost_usd, num_turns: $result.num_turns, assistant_turns: $turns,
+            {error_class: (if $zero_cost_error then "zero_cost_error_without_model_usage" else null end),
+             total_cost_usd: $result.total_cost_usd,
+             num_turns: (if ($result.num_turns | count) then $result.num_turns else null end), assistant_turns: $turns,
              result_chars: ($text | length),
              tools_listed: (($init.tools | type) == "array" and ($init.mcp_servers | type) == "array"),
              successful_result: ($result.subtype == "success" and $result.is_error == false),
@@ -484,6 +500,8 @@ jobs:
                    "| assistant turns | messages | client cost estimate (USD) | completed | Claude Code | tools | MCP servers |",
                    "| ---: | ---: | ---: | --- | --- | --- | ---: |",
                    "| \(.assistant_turns) | \(.num_turns) | \(.total_cost_usd) | \(.successful_result) | \(.claude_code_version) | \(.tools | join(" ")) | \(.mcp_servers) |",
+                   (if .error_class != null then "", "Error class: \(.error_class). No model usage was reported; no review is accepted."
+                    else empty end),
                    (if .budget_stop
                     then "", "Budget stop: the client stopped the run at its \($budget) USD budget (error_max_budget_usd), before a final report."
                     else empty end),
@@ -495,6 +513,7 @@ jobs:
               "$out/usage.json"
           } >> "$GITHUB_STEP_SUMMARY"
           failed="$(jq -r --argjson budget "$budget" --argjson bound "$cost_bound" '[
+            (if .error_class != null then "error class: \(.error_class)" else empty end),
             (if .successful_result != true and .budget_stop != true
              then "the run did not end in success or in a budget stop" else empty end),
             (if .session_started != true then "no session start record" else empty end),

@@ -239,11 +239,16 @@ class PullRequestReviewShapeTests(unittest.TestCase):
         # (docs/decisions/2026-10-08-claude-actions-pr-review.md, "Every pull request (2026-10-09)").
         triggers = workflow()[True] if True in workflow() else workflow()["on"]
         self.assertEqual(list(triggers), ["workflow_dispatch", "schedule"])
-        self.assertEqual(triggers["schedule"], [{"cron": "*/15 * * * *"}])
+        self.assertEqual(triggers["schedule"], [{"cron": "7,22,37,52 * * * *"}])
         inputs = triggers["workflow_dispatch"]["inputs"]
         self.assertTrue(inputs["pr_number"]["required"])
         self.assertTrue(inputs["head_sha"]["required"])
         self.assertEqual(workflow()["permissions"], {})
+
+    def test_no_job_can_restore_or_save_an_actions_cache(self):
+        self.assertEqual(workflow().get("cache-mode"), "none")
+        for item in workflow()["jobs"].values():
+            self.assertEqual(item.get("cache-mode", "none"), "none")
 
     def test_the_job_needs_main_the_owner_a_first_attempt_and_the_enabling_variable(self):
         condition = " ".join(job()["if"].split())
@@ -564,11 +569,25 @@ class PullRequestReviewStepTests(unittest.TestCase):
             code, console, *_ = run_step(DIFF, {"HEAD_SHA": head, "DIFF_PATHS": "docs"}, cwd=clone)
             self.assertEqual(code, 0, console)
 
+    def test_zero_cost_error_without_model_usage_keeps_a_bounded_class_and_fails(self):
+        log = execution(is_error=True, subtype="error_during_execution", total_cost_usd=0,
+                        modelUsage={}, num_turns=0, turns=0,
+                        errors=[TRANSCRIPT_MARKER], result=TRANSCRIPT_MARKER)
+        code, console, summary, usage, _ = run_step(NUMBERS, execution_file=log)
+        self.assertNotEqual(code, 0)
+        self.assertIsNotNone(usage, console)
+        record = json.loads(usage)
+        self.assertEqual(record["error_class"], "zero_cost_error_without_model_usage")
+        self.assertEqual(record["total_cost_usd"], 0)
+        self.assertEqual(record["models"], [])
+        self.assertIn("Error class: zero_cost_error_without_model_usage", summary)
+        self.assertNotIn(TRANSCRIPT_MARKER, console + summary + usage)
+
     def test_a_bounded_cached_read_only_run_is_accepted_and_only_numbers_and_fixed_names_are_kept(self):
         code, console, summary, usage, _ = run_step(NUMBERS, execution_file=execution())
         self.assertEqual(code, 0, console)
         record = json.loads(usage)
-        self.assertEqual(sorted(record), ["assistant_turns", "budget_stop", "claude_code_version", "forbidden_tools", "mcp_servers", "models", "num_turns", "result_chars", "session_started", "successful_result", "tools", "tools_listed", "total_cost_usd"])
+        self.assertEqual(sorted(record), ["assistant_turns", "budget_stop", "claude_code_version", "error_class", "forbidden_tools", "mcp_servers", "models", "num_turns", "result_chars", "session_started", "successful_result", "tools", "tools_listed", "total_cost_usd"])
         self.assertIs(record["budget_stop"], False)
         self.assertNotIn("Budget stop", summary)
         self.assertNotIn("Over the cost bound", summary)
@@ -798,6 +817,9 @@ elif re.search(r"/actions/runs/[0-9]+/jobs", path):
             for i in range(fx["jobs"].get(run, 0))]
     jobs.append({"id": 0, "name": "Choose the pull request heads to review (no token)", "conclusion": "success"})
     kind, bodies = "jobs", pages(jobs, "jobs")
+elif re.search(r"/actions/runs/[0-9]+/artifacts", path):
+    run = re.search(r"/actions/runs/([0-9]+)/artifacts", path).group(1)
+    kind, bodies = "usage", pages(fx["run_artifacts"].get(run, []), "artifacts")
 elif re.search(r"/actions/runs/[0-9]+$", path):
     info = fx["run_info"].get(path.rsplit("/", 1)[1])
     kind = "run"
@@ -805,6 +827,14 @@ elif re.search(r"/actions/runs/[0-9]+$", path):
                                          "head_repository": {"full_name": info[3]}}]
 elif "/pulls?" in path:
     kind, bodies = "pulls", pages(fx["pulls"])
+elif re.search(r"/pulls/[0-9]+$", path):
+    if "--header" not in args or args[args.index("--header") + 1] != "Accept: application/vnd.github.diff":
+        sys.exit(99)
+    if fx["fail"] == "diff":
+        sys.exit(1)
+    number = path.rsplit("/", 1)[1]
+    sys.stdout.write(fx["diffs"].get(number, "synthetic diff\\n"))
+    sys.exit(0)
 elif "/actions/artifacts?name=" in path:
     name = path.split("name=", 1)[1].split("&", 1)[0]
     arts = [{"name": name, "expired": False, "workflow_run": {"id": run_id}}
@@ -840,8 +870,8 @@ class Api:
     """Fixtures for the stand-in gh: today's runs, their review jobs, open pull requests and completion markers."""
 
     def __init__(self, pulls=(), fail=None):
-        self.data = {"workflow_id": WORKFLOW_ID, "runs": [], "jobs": {}, "pulls": list(pulls), "artifacts": {},
-                     "run_info": {}, "fail": fail}
+        self.data = {"workflow_id": WORKFLOW_ID, "runs": [], "jobs": {}, "pulls": list(pulls), "artifacts": {}, "diffs": {},
+                     "run_info": {}, "run_artifacts": {}, "fail": fail}
 
     def marker(self, pr, sha, run_id, workflow_id=WORKFLOW_ID, event="schedule", branch="main", repo=REPOSITORY):
         self.data["artifacts"].setdefault(f"claude-pr-review-done-pr{pr}-{sha}", []).append(run_id)
@@ -851,6 +881,9 @@ class Api:
     def reviews_today(self, run_id, count, event="schedule", branch="main"):
         self.data["runs"].append({"id": run_id, "head_branch": branch, "event": event})
         self.data["jobs"][str(run_id)] = count
+        self.data["run_artifacts"][str(run_id)] = [
+            {"name": f"claude-pr-review-usage-pr{n}-{sha_of(n)}-{run_id}", "expired": False}
+            for n in range(1, count + 1)]
         return self
 
 
@@ -983,6 +1016,26 @@ class ResolveStepTests(unittest.TestCase):
         self.assertEqual(code, 0, console)
         self.assertEqual([n for n, _ in heads_of(outputs)], [3, 4])
 
+    def test_oversized_heads_are_skipped_before_they_consume_a_slot(self):
+        api = Api([open_pull(n, sha_of(n)) for n in (709, 754, 870, 900)])
+        for n in (709, 754, 870):
+            api.data["diffs"][str(n)] = "x" * 250001
+        code, console, outputs, summary = run_choose(api)
+        self.assertEqual(code, 0, console)
+        self.assertEqual(heads_of(outputs), [(900, sha_of(900))])
+        for n in (709, 754, 870):
+            self.assertIn(f"Skipped: pull request #{n}", summary)
+        self.assertIn("250001 bytes", summary)
+
+    def test_the_resolver_diff_cap_counts_bytes_and_accepts_exactly_250000(self):
+        api = Api([open_pull(n, sha_of(n)) for n in (7, 8, 9)])
+        api.data["diffs"]["7"] = "é" * 125001
+        api.data["diffs"]["8"] = "x" * 250000
+        code, console, outputs, summary = run_choose(api)
+        self.assertEqual(code, 0, console)
+        self.assertEqual(heads_of(outputs), [(8, sha_of(8)), (9, sha_of(9))])
+        self.assertIn("250002 bytes", summary)
+
     def test_the_daily_ceiling_stops_new_reviews_and_reports_it(self):
         code, console, outputs, summary = run_choose(Api([open_pull(7, HEAD)]).reviews_today(101, 10))
         self.assertEqual(code, 0, console)
@@ -990,6 +1043,35 @@ class ResolveStepTests(unittest.TestCase):
         self.assertIn("daily ceiling of 55 USD", summary)
         api = Api([open_pull(7, HEAD), open_pull(8, "d" * 40)]).reviews_today(101, 9)
         self.assertEqual(heads_of(run_choose(api)[2]), [(7, HEAD)])  # room for one more review at 5.50 USD
+
+    def test_review_jobs_without_usage_records_do_not_consume_the_daily_ceiling(self):
+        api = Api([open_pull(7, HEAD)]).reviews_today(101, 10)
+        api.data["run_artifacts"]["101"] = []
+        code, console, outputs, _ = run_choose(api)
+        self.assertEqual(code, 0, console)
+        self.assertEqual(heads_of(outputs), [(7, HEAD)])
+
+    def test_usage_records_count_even_if_no_review_job_is_returned(self):
+        api = Api([open_pull(7, HEAD)]).reviews_today(101, 10)
+        api.data["jobs"]["101"] = 0
+        code, console, outputs, summary = run_choose(api)
+        self.assertEqual(code, 0, console)
+        self.assertEqual(outputs["go"], "false")
+        self.assertIn("daily ceiling of 55 USD", summary)
+
+    def test_only_nonexpired_usage_records_for_the_run_count_and_all_pages_are_read(self):
+        api = Api([open_pull(7, HEAD)]).reviews_today(101, 10)
+        records = api.data["run_artifacts"]["101"]
+        api.data["run_artifacts"]["101"] = [
+            {"name": f"unrelated-{i}", "expired": False} for i in range(100)] + records + [
+            {"name": f"claude-pr-review-usage-pr7-{HEAD}-102", "expired": False},
+            {"name": f"claude-pr-review-usage-pr7-{HEAD}-101", "expired": True}]
+        code, console, outputs, summary = run_choose(api, changes={"DAILY_USD": "60.50"})
+        self.assertEqual(code, 0, console)
+        self.assertEqual(heads_of(outputs), [(7, HEAD)])
+        code, console, outputs, summary = run_choose(api)
+        self.assertEqual(code, 0, console)
+        self.assertEqual(outputs["go"], "false")
 
     def test_runs_from_pull_request_events_or_other_branches_do_not_count_toward_the_ceiling(self):
         api = Api([open_pull(7, HEAD)]).reviews_today(101, 50, event="pull_request")
@@ -1002,9 +1084,9 @@ class ResolveStepTests(unittest.TestCase):
         self.assertEqual(outputs["go"], "false")
 
     def test_an_api_failure_fails_the_job_and_chooses_nothing(self):
-        for endpoint in ("workflow", "runs", "jobs", "pulls", "artifacts", "run"):
+        for endpoint in ("workflow", "runs", "usage", "pulls", "artifacts", "run", "diff"):
             with self.subTest(endpoint=endpoint):
-                api = Api([open_pull(7, "e" * 40)], fail=endpoint).reviews_today(101, 1).marker(7, "e" * 40, 9005)
+                api = Api([open_pull(7, "e" * 40), open_pull(8, HEAD)], fail=endpoint).reviews_today(101, 1).marker(7, "e" * 40, 9005)
                 code, console, outputs, _ = run_choose(api)
                 self.assertNotEqual(code, 0, console)
                 self.assertNotEqual(outputs.get("go"), "true")

@@ -5026,13 +5026,13 @@
     },
     {
       "path": ".github/workflows/claude-pr-review.yml",
-      "sha256": "e13d993405c7774d931ef5aa0e053963815d40c905299f1e24e1b39358ca4ead",
-      "bytes": 37867
+      "sha256": "168bf7da3553a056e5873b9bd1f5016d3076f253847690256fe821509b19fd5a",
+      "bytes": 39269
     },
     {
       "path": ".github/workflows/claude-pr-toolkit-review.yml",
-      "sha256": "6f4cd72c95d6970b773bfd1d1f0a3c2c61ee43cb4ad23c840820e6d4566c64ba",
-      "bytes": 33316
+      "sha256": "5a375b11fcf9be636c802bda8f9b7c52776f159c1c974a05a33132181ea63c9c",
+      "bytes": 33751
     },
     {
       "path": ".github/workflows/dependency-review.yml",
@@ -18262,8 +18262,8 @@
     },
     {
       "path": "docs/decisions/2026-10-08-claude-actions-pr-review.md",
-      "sha256": "ae0a32b4875d7ddae697cbb9c2d2f18fb5accaed69863e3511e3fc6049cc3bed",
-      "bytes": 59968
+      "sha256": "825e83ed7eefaadf32335ac58df1f48bee931a24c140332861c2d1cc76637751",
+      "bytes": 63654
     },
     {
       "path": "docs/decisions/2026-10-08-coordinator-research-routing.md",
@@ -18322,8 +18322,8 @@
     },
     {
       "path": "docs/decisions/2026-10-09-claude-actions-pr-toolkit-review.md",
-      "sha256": "5ba1c9290ba3d0e00d9f94a40b544f47aa383f08c5e1883bf337bf55f79fe49a",
-      "bytes": 49682
+      "sha256": "24eee4ab38fe1ce67a37cf718b13be7f29bb508930ca185e2b56ab91a51cf52f",
+      "bytes": 51828
     },
     {
       "path": "docs/decisions/2026-10-09-claude-code-floor.md",
@@ -59737,13 +59737,13 @@
     },
     {
       "path": "tests/test_claude_pr_review_workflow.py",
-      "sha256": "cfaa2b171fcffdd1c31ce65269482efe15a5d6b9a515330f81aa314bd8274759",
-      "bytes": 59337
+      "sha256": "c9123fb81516e0d1753c3b596dbe89dc89cb228a6e3346aeb89068e0bb7474fc",
+      "bytes": 63856
     },
     {
       "path": "tests/test_claude_pr_toolkit_review_workflow.py",
-      "sha256": "f69c19cbc1eb3d3e306fb35c5e308b85cf905c218fb210b66a5f5b62124c3c61",
-      "bytes": 75282
+      "sha256": "64fb77eb7337346f0b6cc82ddcb0290ac600ebb9cc53fc458a56fee76a086823",
+      "bytes": 76470
     },
     {
       "path": "tests/test_claude_recovery.py",
