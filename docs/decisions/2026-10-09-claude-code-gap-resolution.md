@@ -62,7 +62,8 @@ Four rows were ruled by the command center on 2026-10-09 and are marked below.
   is off. Overturn is a measured retry exhaustion in an unattended lane.
 - **WebSearch refill.** `CLAUDE_CODE_WEB_SEARCH_REFILLS_PER_HOUR` is `default-on`
   (100 an hour interactive, 0 non-interactive). The project's per-session cap
-  stays the bound; the interaction of the two is unverified.
+  stays the bound; the interaction of the two is unverified and no probe is
+  scheduled, so a session that hits the limit is the trigger.
 - **Cyber access cluster** (command center ruling; `daybreak`,
   `api_key_cyber_access_programs`): account programs, so `defer-user` as owner
   information only, with no stack change. `cli_daybreak` is declined as native-off.
@@ -114,7 +115,9 @@ nonzero. On 2026-10-09 the release notes had 8 dated entries in the previous 14
 days and the active-model currency data already cites that page; the index lists
 267 links; the Projects page is a beta page that will keep editing. Follow-up, not
 built: a report-only page-URL diff of the docs index and a headline diff of the
-release notes, which surface new pages without a standing unreviewed count.
+release notes, which surface new pages without a standing unreviewed count. Owner:
+the command center. The diffs would arrive through `upstream-surface-watch.service`,
+which it installs after #943 lands, and it reviews that service's daily report.
 
 ## What the watch cannot see
 
@@ -123,12 +126,13 @@ release notes, which surface new pages without a standing unreviewed count.
   binary, and absent from the environment-variable reference the watch reads. They
   have rows here by hand. Follow-up, not built: report `CLAUDE_CODE_*` tokens from
   the changelog's "Added" bullets as report-only items, tested with a synthetic
-  changelog.
+  changelog. Owner: the currency lane.
 - **Hosted surfaces and non-name changes** (Projects, Managed Agents, routines;
   subagent frontmatter keys such as `autoCompactWindow`; tool parameters such as
   the Read tool's `allow_large`; defaults and meanings): outside the name diff by
-  design ([guide](../upstream-surface-watch.md)). The weekly practice pass reads
-  the changelog and release notes for them until the page-URL diff above exists.
+  design ([guide](../upstream-surface-watch.md)). The weekly practice pass, owned by
+  the currency lane, reads the changelog and release notes for them until the
+  page-URL diff above exists.
 
 ## Handed off, not changed here
 
@@ -141,11 +145,12 @@ release notes, which surface new pages without a standing unreviewed count.
   first daily run (otherwise it reports the whole backlog again). The command center
   creates that checkout and installs both units after #943 lands, because that PR's
   collector exits 2 once the committed model manifest is a day old.
-- **Settings drift** for the inventory (template, user and local settings
-  disagree): `ultracode`, `model`, `advisorModel`, `cleanupPeriodDays`,
+- **Settings drift** (template, user and local settings disagree): `ultracode`,
+  `model`, `advisorModel`, `cleanupPeriodDays`,
   `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` and two plugins present only live. In this
   checkout the gitignored local settings file turns `ultracode` off over the
-  project's `true`.
+  project's `true`. Owner: cc-native-practice, as input to the G6 settings-drift
+  inventory; the command center applies any change only through a reviewed diff.
 - **cc-native-practice, living page** (draft #923; after it lands, client version
   to 2.1.296): `background-workflows`, `subagent-definitions`,
   `context-compaction`, `headless-sdk`, `agent-teams`, `output-compression`,
@@ -163,11 +168,13 @@ release notes, which surface new pages without a standing unreviewed count.
   touch credentials and spending. The Codex cyber access programs (`daybreak`,
   `api_key_cyber_access_programs`) are information only. Sonnet 5.5 cache reads fell
   from $0.20 to $0.10 per million tokens on 2026-10-07; cost readings from
-  third-party price data may lag.
+  third-party price data may lag, so the command center's next cost reading checks
+  that its price data carries the new rate.
 - **Currency lane:** the `model_providers.*.capabilities*` trial after #943, with
   the effort-ladder proof first.
 - **Agent teams** stay as decided: experimental, narrow use, `TeammateIdle` pending
-  a first real team run; `TaskCreated` and `TaskCompleted` are already
+  a first real team run, after which the owner installs the bounded locator gate
+  (the existing row); `TaskCreated` and `TaskCompleted` are already
   `not-applicable`.
 
 ## Evidence
