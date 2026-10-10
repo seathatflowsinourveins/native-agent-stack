@@ -5361,8 +5361,8 @@
     },
     {
       "path": "adoption/credential-inventory.json",
-      "sha256": "65ba72f1a088fb953f66aa4a0abfa39b1703a9d2f215c0cd55f43a76eca9cdbd",
-      "bytes": 31151
+      "sha256": "a0cf9a37556f4c6c93d047da28d3ec13698b0b3c351621eda4ee4009c946ebf1",
+      "bytes": 39862
     },
     {
       "path": "adoption/hardware-profiles.json",
@@ -17082,7 +17082,7 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "7b7ee4cf2f492917f3f9616cc6cd6a7c4908c29e6b38a66c14d4da96123090fa",
+      "sha256": "731dca0002eade7b74b058ed50662559a2c4f33e81798f14f1ead2032f6c8d25",
       "bytes": 160022
     },
     {
@@ -18561,6 +18561,11 @@
       "bytes": 11363
     },
     {
+      "path": "docs/decisions/2026-10-10-anthropic-key-slots-and-practice.md",
+      "sha256": "25eb79320fbe5f8f3813f9d8e160d633791f7ba589fc7a967321d2f77a938625",
+      "bytes": 12150
+    },
+    {
       "path": "docs/decisions/2026-10-10-claude-federation-diagnostics.md",
       "sha256": "463053861fd6211c90f4082ac218ce4e419cb345beab445991179b67ff951788",
       "bytes": 10105
@@ -18722,8 +18727,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "f11a74b3ed6b2f26ecdb119103684929c5b1013e264b3ea0ae4b5e6027553002",
-      "bytes": 255950
+      "sha256": "8a6a293538f3beb5cf785239f9eb086375a2082750384bd3e568dad46c02993b",
+      "bytes": 256071
     },
     {
       "path": "docs/harness-rule-enforcement.md",
@@ -18902,8 +18907,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "c83bde7f25ae7877096e69bebcf44961b49c0b73d8dd65e87278cf431b82cb8e",
-      "bytes": 194667
+      "sha256": "a136dba4428061f7e61260b38c0f7bd802b44f80b4fc5fd6c41e7fbca3bf6557",
+      "bytes": 203437
     },
     {
       "path": "docs/stack.md",
@@ -60176,6 +60181,11 @@
       "bytes": 22270
     },
     {
+      "path": "tests/test_anthropic_key_health.py",
+      "sha256": "0a2462b43c8d9ab6fe2b3c441f7cbe396dc2a769acb8504a9ecb2d690c5289bf",
+      "bytes": 24953
+    },
+    {
       "path": "tests/test_apply_claude_settings.py",
       "sha256": "4c40b74a699fa29a307935c1b309edc7869e7b50e390c5b5d8613ae74ea6a5d3",
       "bytes": 47548
@@ -60387,8 +60397,8 @@
     },
     {
       "path": "tests/test_credential_run.py",
-      "sha256": "815c19451749117963299a4adda8a87e3998d6397bf882d05f6f74297eee2027",
-      "bytes": 132965
+      "sha256": "d1e8f69499904503612e529c1b53a6faf0dddd8320a334f58983029fce929537",
+      "bytes": 133029
     },
     {
       "path": "tests/test_credential_status.py",
@@ -61434,6 +61444,11 @@
       "path": "tools/capability-gate/run_gate.py",
       "sha256": "3efdc4b54ba33b11c67f8f2449167de03b558e8c53c7e09cdb5a9f66593311a7",
       "bytes": 22476
+    },
+    {
+      "path": "tools/credentials/anthropic_key_health.py",
+      "sha256": "4d4160a4d8a3db7b83aa9c232532f68d67aa088a64e4d18dca24ef66c89f58c3",
+      "bytes": 17424
     },
     {
       "path": "tools/credentials/canary_lane_consumer.sh",

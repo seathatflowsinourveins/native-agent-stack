@@ -36,9 +36,10 @@ sys.path.insert(0, str(TOOLS))
 import credential_run as run_mod  # noqa: E402
 import set_credential as writer  # noqa: E402
 
+ANTHROPIC_IDS = ("anthropic-api", "anthropic-api-2", "anthropic-api-3", "anthropic-api-4", "anthropic-api-5",
+                 "anthropic-api-6", "anthropic-api-7", "anthropic-api-8", "anthropic-api-9", "anthropic-api-10")
 INJECTABLE_IDS = {"alpaca-paper", "alpaca-paper-2", "sec-contact", "databento", "typesafe", "omniroute", "tavily",
-                  "claude-oauth-token", "canary-e2e", "anthropic-api", "anthropic-api-2",
-                  "anthropic-api-3", "anthropic-api-4"}
+                  "claude-oauth-token", "canary-e2e", *ANTHROPIC_IDS}
 NOT_INJECTABLE_IDS = ("grafana-admin", "nativestack-generation-key", "openhands-session", "claude-native",
                       "codex-native", "gh-native", "huggingface-native", "huggingface-native-stored", "ibkr-gateway",
                       "github-actions")
@@ -385,8 +386,7 @@ class InjectionTests(RunnerCase):
         name = "ANTHROPIC_API_KEY"
         first_path = self.store / "anthropic-api.env"
         for tail in ("", " space;tilde~"):
-            values = {entry_id: fake("sk-test-", tail)
-                      for entry_id in ("anthropic-api", "anthropic-api-2", "anthropic-api-3", "anthropic-api-4")}
+            values = {entry_id: fake("sk-test-", tail) for entry_id in ANTHROPIC_IDS}
             first_before = None
             for entry_id, value in values.items():
                 with self.subTest(id=entry_id, quoted=bool(tail)):
