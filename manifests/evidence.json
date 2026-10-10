@@ -61587,8 +61587,8 @@
     },
     {
       "path": "tools/sota-convergence/evidence/codex-lane-omniroute-20261010.json",
-      "sha256": "56c6316e11edb2b2bdad80b903db970c51b34f6a393d07e6daf7d1230832e56e",
-      "bytes": 8715
+      "sha256": "fd73b770ab8ea933e7b9b09bf4ecdbde1c190afaf9aa8f5f601988185c6e7999",
+      "bytes": 8707
     },
     {
       "path": "tools/sota-convergence/export_isolation_check.py",
@@ -61732,13 +61732,13 @@
     },
     {
       "path": "tools/sota-convergence/lane-provenance.json",
-      "sha256": "f127260b012f6fb43e82df11ad8df032b40601e8a36eb09d831dc7b0f70fa764",
-      "bytes": 16614
+      "sha256": "ce015e0434eea22f45388d394789c2da2dfc82caa22ea7d78feb2cd5914af823",
+      "bytes": 16595
     },
     {
       "path": "tools/sota-convergence/lane-return.schema.json",
-      "sha256": "aeeae954f297ab9db318e908d69b0ffe1f0da83565652a41bea724f5c46e16a2",
-      "bytes": 7563
+      "sha256": "2bf6d646da644cb417db663684efbdb76012a7dc3326e08e84fd49dfb90db392",
+      "bytes": 7792
     },
     {
       "path": "tools/sota-convergence/merge_fragments.py",
