@@ -60617,8 +60617,8 @@
     },
     {
       "path": "tests/test_primary_source_reading_counts.py",
-      "sha256": "7366ddf20b9348b9c42c36dc89351e45f0d170744da9f71565e515efc31320ec",
-      "bytes": 5355
+      "sha256": "6b1aa1f844ac20abdbfa9aa29de4b824e81abf2e090917341f53f4afa2d580df",
+      "bytes": 8510
     },
     {
       "path": "tests/test_promotion_gate.py",

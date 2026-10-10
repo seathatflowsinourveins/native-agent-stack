@@ -1,10 +1,11 @@
-"""The primary-source reading's published counts recompute from its artifact, by this code, on every run.
+"""The addendum's published figures recompute from the artifacts it cites, by this code, on every run.
 
 A published figure is computed from the published events, never from a separate summary (the first read of #923 found a
 rate that did not recompute). Each check recounts one figure that reference/slots.json or the addendum of
 docs/decisions/2026-10-09-claude-code-native-practice.md states, from
-evidence/artifacts/claude-native-practice-20261009/primary-source-reading.json. Repository-text checks only: no page is
-fetched, so the sha256 values are compared with each other and never with the web.
+evidence/artifacts/claude-native-practice-20261009/primary-source-reading.json (the reading) or probes-20261009.json (the
+probes). Repository-text checks only: no page is fetched, so the sha256 values are compared with each other and never
+with the web, and the host's launcher and archive are read through the probe artifact.
 """
 
 from __future__ import annotations
@@ -14,12 +15,19 @@ import json
 import re
 import unittest
 from pathlib import Path
+from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parents[1]
 READING = ROOT / "evidence/artifacts/claude-native-practice-20261009/primary-source-reading.json"
+PROBES = ROOT / "evidence/artifacts/claude-native-practice-20261009/probes-20261009.json"
 SLOTS = ROOT / ".claude/skills/claude-native-practice/reference/slots.json"
 RECORD = ROOT / "docs/decisions/2026-10-09-claude-code-native-practice.md"
 RELATIONS = ("agrees", "extends", "contradicts", "not-covered")
+ANTHROPIC_HOSTS = ("claude.com", "www.anthropic.com")
+
+
+def record_text() -> str:
+    return " ".join(RECORD.read_text(encoding="utf-8").split())
 
 
 class ReadingCountsTests(unittest.TestCase):
@@ -85,6 +93,52 @@ class ReadingCountsTests(unittest.TestCase):
                 self.assertRegex(source["sha256"], r"^[0-9a-f]{64}$")
                 self.assertRegex(source["fetched_utc"], r"^2026-10-09T\d\d:\d\d:\d\dZ|^2026-10-09T\d\d:\d\d")
         self.assertEqual(len({s["url"] for s in self.reading["sources"]}), len(self.reading["sources"]))
+
+    def test_the_addendum_states_the_source_split_readability_run_and_spend(self):
+        sources = self.reading["sources"]
+        anthropic = sum(1 for s in sources if urlparse(s["url"]).netloc in ANTHROPIC_HOSTS)
+        text = record_text()
+        self.assertIn(f"read {len(sources)} primary sources: {anthropic} Anthropic engineering and Claude blog posts", text)
+        self.assertIn(f"and {len(sources) - anthropic} cross-client sources", text)
+        self.assertTrue(all(s["readable"] for s in sources))
+        self.assertIn(f"All {len(sources)} sources were readable.", text)
+        run_id = self.reading["run"].split(" ", 1)[0]
+        self.assertIn(f"run `{run_id}` read", text)
+        self.assertIn("Opus 5.5 xhigh reader", self.reading["run"])
+        self.assertIn("Opus 5.5 max refuter", self.reading["run"])
+        spend = self.reading["usage"]["priced_usd_api_list"]
+        self.assertEqual(self.reading["usage"]["status"], "complete")
+        self.assertIn(f"Spend: ${spend:.2f} at API list price", text)
+
+    def test_the_gate_rests_on_a_source_figure_the_reading_kept(self):
+        # The addendum quotes Anthropic's code-review post (54% of PRs, up from 16%); one kept practice carries both.
+        carrying = [p for p in self.kept if "54%" in p["statement"] + p.get("quote", "")
+                    and "16%" in p["statement"] + p.get("quote", "")]
+        self.assertEqual(len(carrying), 1)
+        self.assertIn("substantive review comments on 54% of PRs, up from 16%", record_text())
+
+
+class ProbeFiguresTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.probes = json.loads(PROBES.read_text(encoding="utf-8"))
+
+    def test_the_retention_paragraph_states_the_probe_figures(self):
+        coverage = self.probes["old_archive_coverage"]
+        deletion = self.probes["old_archive_deletion"]
+        freed = sum(item["bytes"] for item in deletion["deleted"])
+        self.assertEqual(freed, deletion["bytes_freed"])
+        self.assertEqual(coverage["old_sessions_missing_from_live"], 0)
+        text = record_text()
+        self.assertIn(f"All {coverage['old_sessions']:,} sessions of the pre-move archive were found in the live one", text)
+        self.assertIn(f"usage-cache files ({freed:,} bytes) were deleted", text)
+        self.assertTrue(deletion["kept_until"].startswith("2026-10-23"))
+        self.assertIn("its small leftovers stay until 2026-10-23", text)
+
+    def test_the_sandbox_paragraph_states_the_credential_store_count(self):
+        stated = set(re.findall(r"All (\d+) home-relative credential stores", json.dumps(self.probes["m1_sandbox"])))
+        self.assertEqual(len(stated), 1, stated)
+        self.assertIn(f"all {stated.pop()} credential stores it names", record_text())
 
 
 if __name__ == "__main__":
