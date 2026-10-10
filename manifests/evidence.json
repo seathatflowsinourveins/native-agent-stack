@@ -5206,8 +5206,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "2227f9b199214354d20637fc5e4a17adc9801228c7f7c71b7b9b04b80203a4d1",
-      "bytes": 35714
+      "sha256": "7d14fe92369a10987bb290e688aee6f0532ca1dc25d809035f2f261ee516da62",
+      "bytes": 35809
     },
     {
       "path": ".gitignore",
@@ -18577,8 +18577,8 @@
     },
     {
       "path": "docs/decisions/2026-10-10-secret-scan-large-targets.md",
-      "sha256": "faa1e0cec57b8bf63b06bb66574ccdbc974e7f2627f2a3847540f8202d5c76e7",
-      "bytes": 5377
+      "sha256": "4412c41f1a71fea2a5d26fbed04a7ef0a21b052dacae972b1b83c3af1c94bb53",
+      "bytes": 6820
     },
     {
       "path": "docs/direct-results.md",
@@ -61057,8 +61057,8 @@
     },
     {
       "path": "tests/test_secret_scan_size.py",
-      "sha256": "dec506c7fb35dd8d36a9c3cdeee248d36f57fa315ff97eed369675e23039730c",
-      "bytes": 6911
+      "sha256": "3670d957b57dbbff90b220f757df6cc1d10893af9c75f93315760e65a2669197",
+      "bytes": 8361
     },
     {
       "path": "tests/test_security_identity.py",

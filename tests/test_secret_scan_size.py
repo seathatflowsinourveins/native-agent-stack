@@ -98,6 +98,25 @@ def scan_fixture(binary, job, mode, size, path="manifests/large-shape.json"):
         return located
 
 
+class ScannerMechanismSourcesTests(unittest.TestCase):
+    def test_decision_cites_betterleaks_native_path_prefilter_and_source_callback(self):
+        # betterleaks v1.8.1: translation96-108 -> SkipFunc436-451 -> source callbacks.
+        decision = (ROOT / "docs/decisions/2026-10-10-secret-scan-large-targets.md").read_text()
+        prefix = "https://github.com/betterleaks/betterleaks/blob/5eab48332cc48565864514e3bc6de89df091a7c4/"
+        for locator in ("config/translate_filters.go#L96", "detect/detect.go#L436",
+                        "sources/common.go#L55", "sources/files.go#L117"):
+            with self.subTest(locator=locator):
+                self.assertTrue(prefix + locator in decision, f"Missing pinned betterleaks mechanism: {locator}")
+        self.assertTrue("prefilter" in decision, "Decision must identify the native prefilter")
+        self.assertFalse("Both implementations use" in decision, "The two scanners have different path mechanisms")
+
+    def test_decision_pins_the_gitleaks_path_allowlist_definition(self):
+        # gitleaks v8.30.1 defines PathAllowed at136, after the comment at135.
+        decision = (ROOT / "docs/decisions/2026-10-10-secret-scan-large-targets.md").read_text()
+        self.assertTrue("https://github.com/gitleaks/gitleaks/blob/83d9cd684c87d95d656c1458ef04895a7f1cbd8e/config/allowlist.go#L136" in decision,
+                        "Gitleaks PathAllowed starts at136;135 is its comment")
+
+
 @unittest.skipUnless(GITLEAKS, "gitleaks is installed in its native secret-scan job")
 class GitleaksLargeFileTests(unittest.TestCase):
     def test_git_and_dir_find_canaries_above_both_old_skip_boundaries(self):

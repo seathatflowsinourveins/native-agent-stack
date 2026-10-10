@@ -409,8 +409,9 @@ jobs:
     # moved to Betterleaks. Its context is not in .github/main-ruleset.json, so no run of it blocks a merge;
     # the required secret-scan job above is unchanged. Verification, parity and triage:
     # evidence/artifacts/betterleaks-parity-20260927/. The job is report-only, like security-scan.yml's
-    # zizmor online audits: findings and fixture-test assertion failures go to the step summary as counts
-    # and do not fail it, so it is red only when verification, the scanner or the test run errors. Its
+    # zizmor online audits: findings and parity-fixture assertion failures go to the step summary as
+    # counts and do not fail it. The large-target detection regressions must pass. The job is red when
+    # verification, scanning or a test run errors, or a required large-target regression fails. Its
     # green therefore does not say that a change adds no secret: secret-scan stays the gate.
     runs-on: ubuntu-24.04
     # On the recording workstation the full-history scan took 55 s wall, 1,546 CPU-seconds and a 7.9 GiB
@@ -528,7 +529,7 @@ jobs:
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: |
           # The secret-scan job's config, including the exact generated explorer path exclusion.
-          # No size cap: large current targets stay scanned. The native large-file tests below
+          # No size cap: large current targets stay scanned. The native large-file tests above
           # measure Linux elapsed time/peak RSS after the verified binary installation.
           # Two flags keep gitleaks's behaviour (betterleaks cmd/root.go at v1.8.1):
           # --max-archive-depth 0, because betterleaks opens archives to depth 8 by default (line 103)
