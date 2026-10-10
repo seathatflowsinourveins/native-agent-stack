@@ -96,8 +96,9 @@ checked in both the HTML and the markdown:
   secret.
 
 Command-center inputs, used as leads and not re-measured here: the
-practice record `key-practice-20261010.md` (finalized 2026-10-10T14:15Z,
-`sha256:69dd4a8e1cad1cb63218358c5febfe47259435a909bfebfab05fa4a4e75f3eee`) and
+practice record `key-practice-20261010.md` (finalized 2026-10-10T14:15Z and
+refreshed to the 15:12Z order,
+`sha256:4759614646ac94c32633fa046f6841e504dc4d85a693e9e02f6ce23b4b8d0f21`) and
 `cc-tools/anthropic_key_health.sh`
 (`sha256:713453037a589118f575f7500783291968ecc1ab497838a5017b6b82a8d922d1`).
 Both live in the command center's private state directory. They supplied

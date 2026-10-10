@@ -18557,8 +18557,8 @@
     },
     {
       "path": "docs/decisions/2026-10-10-anthropic-key-slots-and-practice.md",
-      "sha256": "04e53899245bcdb9d58d8352d423719ec6c2916ff640b24b00d71537d6bebc47",
-      "bytes": 12116
+      "sha256": "25eb79320fbe5f8f3813f9d8e160d633791f7ba589fc7a967321d2f77a938625",
+      "bytes": 12150
     },
     {
       "path": "docs/decisions/2026-10-10-claude-federation-diagnostics.md",
