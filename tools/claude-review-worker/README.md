@@ -16,21 +16,31 @@ measurements and its open boundaries is
 
 1. Takes the tick lock (`$CLAUDE_REVIEW_STATE/worker.lock`); a second tick, or a probe, waits its turn by stopping.
 2. Checks it can run at all: the ledger is named, the pinned binary exists, bubblewrap starts the binary in the sandbox.
-3. Settles anything a stopped tick left open: an open `CRW` debit becomes an unknown settle at 11 USD, and an attempt
-   still marked `started` becomes `interrupted` (counted, not final).
+3. Settles anything a stopped tick left open: an open `CRW` debit becomes an unknown settle at 11 USD, an attempt
+   still marked `started` becomes `interrupted` (counted, not final), and the stopped run's leftover scratch (its
+   CLAUDE_CONFIG_DIR, an archive) is deleted.
 4. Lists the open pull requests of each repository with `gh api --paginate` (pages of 100), keeps same-repository heads
-   targeting `main` whose author is not a bot (drafts included), newest update first. For `native-agent-stack` it keeps
-   a head only when a changed file matches an essential path (cached per head).
+   targeting `main` whose author is not a bot (drafts included), newest update first.
+   - For `native-agent-stack` it keeps a head only when a changed file matches an essential path (cached per head).
+     The essential paths include the gate itself: this tool, the credential inventory and schema, the hooks,
+     `.gitleaks.toml` and the agent instruction files.
+   - A head with nothing to review (already in main, or an empty diff) is skipped without a status and never selected
+     again.
 5. Posts any stored result not posted yet for a head that is still current (see Posting).
 6. Reviews at most two heads, one after another, each only while the day's ledger rows leave room for its 11 USD bound
    under the 55 USD ceiling.
 
-A review refreshes the repository's detached worktree of `origin/main` under the state directory, fetches
-`refs/pull/<n>/head`, checks it is the selected commit, exports it with `git archive` into `pr-head/` (links and
-special files are never written; any link left is removed; the head's own `export-ignore` and `export-subst` are
-overridden by `info/attributes`), and writes the diff from the merge base and its `--stat` into a separate input
-directory. A diff over 250,000 bytes is refused before any debit: the status is `error`, the description names the size
-and asks for a paths-limited review, and the attempt is final.
+A review:
+1. refreshes the repository's detached worktree of `origin/main` under the state directory;
+2. fetches `refs/pull/<n>/head` and checks it is the selected commit;
+3. reads the head's size from git. Over 40,000 files or 600,000,000 bytes nothing is extracted, and the head is refused
+   before any debit with status `error`, final;
+4. exports the head with `git archive` into `pr-head/`. Links and special files are never written, any link left is
+   removed, and the head's own `export-ignore` and `export-subst` are overridden by `info/attributes`;
+5. writes the diff from the merge base and its `--stat` into a separate input directory.
+
+A diff over 250,000 bytes is refused before any debit: the status is `error`, the description names the size and asks
+for a paths-limited review, and the attempt is final.
 
 The review process is started as `credential_run.py <key> -- bwrap … /opt/claude-review/claude -p …`. The runner reads
 the key store outside the sandbox and passes the key in the environment, never in argv. The sandbox has a new root:
@@ -46,15 +56,22 @@ A trading head (every `us-equities-trading` head, and a `native-agent-stack` hea
 an upstream pin (`~/code/upstream/<owner>/<repo>@<sha>:path:line`) or a vendor documentation URL, and the reviewer
 reports `[upstream]` findings for an uncited claim, a pin that does not support its claim, or code that deviates from
 the cited behaviour. The pinned files the diff cites are exported from the local mirrors' git objects into the input
-directory as data. For any other citation, and for every URL, the prompt says the check covers citation presence only.
+directory as data. The citation labels come from the pull request, so they go to the data file
+`upstream-citations.txt` and never into the prompt's instructions. For any other citation, and for every URL, the
+prompt says the check covers citation presence only.
 
 ## Install (command center)
 
-1. Run the offline probes, then the live probes (needs a key; three paid runs, debited in the ledger). The offline
-   checks cover the sandbox, the client's start, main's project settings, and the L checks. The L checks drive the
-   exact invocation against a loopback stand-in for the Messages API, which plays the model with fixed tool calls and
-   shows what would reach a model. The live checks repeat them with the model, and add the planted-fact check with
-   its control arm and the planted uncited upstream claim:
+1. Run the offline probes, then the live probes.
+   - The offline checks cover the sandbox, the client's start, main's project settings, the run's config directory
+     and the L checks. The L checks drive the exact invocation against a loopback stand-in for the Messages API, which
+     plays the model with fixed tool calls (credential files, `/proc` and `/dev/fd`, links in main, a planted gh login)
+     and shows what would reach a model. They are where the permission layer is measured.
+   - The live mode needs a key and makes three paid runs, debited in the ledger: two short facts arms (the
+     planted-fact check with its control arm), and one review of the probe head (no MCP server, no secret-like value
+     echoed, and the planted uncited upstream claim flagged).
+   - The live mode makes no tool-call checks. The Opus 5.5 safeguard refused that arm, and whether a call is denied is
+     decided by the client, not the model.
 
    ```sh
    CLAUDE_REVIEW_STATE=~/.local/state/native-agent-stack/claude-review-worker \
@@ -76,8 +93,10 @@ directory as data. For any other citation, and for every URL, the prompt says th
    # CLAUDE_REVIEW_UPSTREAM=~/code/upstream   # the local upstream mirrors, read as git objects only
    # PATH=...   # only if gh and git are not under the unit's PATH (the mise shims, /usr/local/bin, /usr/bin, /bin)
    ```
-3. Install the units from the live clone (the service header has the exact `sed`, `cp` and `systemd-analyze verify`
-   lines), then keep the user manager running without a login session and start the timer:
+3. Install the units from the live clone `~/code/native-agent-stack-live`, a detached worktree of `origin/main` that the
+   service refreshes before every tick (`ExecStartPre`: `git fetch`, then `git switch --detach origin/main`; a failure
+   stops the tick). The service header has the exact `sed`, `cp` and `systemd-analyze verify` lines. Then keep the
+   user manager running without a login session and start the timer:
 
    ```sh
    loginctl enable-linger "$USER"
@@ -98,10 +117,11 @@ directory as data. For any other citation, and for every URL, the prompt says th
   - `reports/<owner__repo>/pr<n>-<sha>/attempt<k>/`: `prompt.txt`, `stream-<try>.jsonl` (the masked stream),
     `report.md`, `verdict.json`, `numbers.json`, `status.json`, `comment.md` (private repository only) and
     `receipt.json` (run id, keys, ledger refs, cost, client version, binary sha256, stop class, posting state);
-  - `repos/`, `work/`: the bare clones and the main worktrees; `essential/`: the per-head path decisions.
+  - `repos/`, `work/`: the bare clones and the main worktrees; `essential/`: the per-head path decisions;
+    `skipped/`: heads with nothing to review.
 - Review a head again: move its attempt marker out of `attempts/`; the next tick treats the head as new.
-- A head refused for its diff size needs a paths-limited review by other means (for example the `paths` input of
-  `claude-pr-review.yml`); the worker has no paths option.
+- A head refused for its diff size or its own size needs a paths-limited review by other means (for example the
+  `paths` input of `claude-pr-review.yml`); the worker has no paths option.
 
 ## Posting
 
@@ -111,12 +131,18 @@ Posting uses the ambient `gh` login in this process; the sandboxed process never
   `description` of at most 140 characters built from parsed fields only, for example
   `Claude local review: CHANGES (P1 0, P2 3, P3 1)`. No `target_url`.
 - `us-equities-trading` only, and only when the configuration and the API both say private: one comment with the
-  verdict, the counts and the findings. The text is sanitized first: absolute paths under the review's working and
-  input directories become relative, secret-like values are omitted, every `@` gets a zero-width space after it, and
-  the comment is refused when it still names the home directory or the user name (both read at run time). It is cut at
-  60,000 characters.
-- Status mapping: PASS with no P1 and no P2 is `success`; CHANGES, BLOCKING, or any P1 or P2 is `failure`; a refusal, a
-  bounds failure or a missing verdict is `error`; a budget stop never passes a head (its PASS becomes `error`).
+  verdict, the counts and the findings.
+  - The findings are the only model text, and they sit inside one fenced code block. Every backtick in them is replaced
+    so the fence cannot be closed, which means no image, link, HTML or `#N` reference renders.
+  - They are sanitized first: absolute paths under the review's working and input directories become relative,
+    secret-like values are omitted, and every `@` gets a zero-width space after it.
+  - The comment is refused when it still names the home directory or the user name (both read at run time). It is cut
+    at 60,000 characters.
+- Status mapping:
+  - PASS with no P1 and no P2 is `success`;
+  - CHANGES, BLOCKING, or any P1 or P2 is `failure`;
+  - a refusal, a bounds failure or a missing verdict is `error`;
+  - a budget stop is `error`, whatever it found.
 
 ## Inverse
 

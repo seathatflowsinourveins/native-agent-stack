@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "description": "Which pull request heads the local Claude review worker reviews (tools/claude-review-worker/worker.py), and how. every_pr reviews each same-repository, non-bot head; otherwise a head is reviewed when a changed file (or a renamed file's old path) matches an essential path glob (** crosses directories, * does not). visibility decides what is posted: a commit status on both, and one sanitized summary comment only on a private repository that the API also reports private. rules_files are read from main's copy into the prompt. A reviewed head is a trading change, and its prompt carries the upstream-alignment rule, when trading_every_pr is true or a changed path matches trading_paths (the trading lane's paths of docs/lanes.md; its adoption/manifest.json profile entries cannot be told apart by path).",
+  "description": "Which pull request heads the local Claude review worker reviews (tools/claude-review-worker/worker.py), and how. every_pr reviews each same-repository, non-bot head; otherwise a head is reviewed when a changed file (or a renamed file's old path) matches an essential path glob (** crosses directories, * does not). visibility decides what is posted: a commit status on both, and one sanitized summary comment only on a private repository that the API also reports private. rules_files are read from main's copy into the prompt. native-agent-stack's essential paths also cover the gate itself, so a change to it is reviewed by it: the worker and its configuration (tools/claude-review-worker/**), the credential runner's inventory and schema (adoption/credential-inventory.json, scripts/credential_status.py, from the security review), the guard and git hooks (scripts/hooks/**, scripts/git-hooks/**), the secret-scan rules (.gitleaks.toml) and every agent instruction file (AGENTS.md, CLAUDE.md and REVIEW.md at the root, and AGENTS.md anywhere), per the command center's decision on #953 of 2026-10-10. A reviewed head is a trading change, and its prompt carries the upstream-alignment rule, when trading_every_pr is true or a changed path matches trading_paths (the trading lane's paths of docs/lanes.md; its adoption/manifest.json profile entries cannot be told apart by path).",
   "decision_record": "docs/decisions/2026-10-09-claude-review-worker.md",
   "repositories": [
     {
@@ -22,7 +22,17 @@
         "scripts/validate*.py",
         "tools/credentials/**",
         "adoption/hooks/**",
-        "tools/local-pages/**"
+        "tools/local-pages/**",
+        "tools/claude-review-worker/**",
+        "adoption/credential-inventory.json",
+        "scripts/credential_status.py",
+        "scripts/hooks/**",
+        "scripts/git-hooks/**",
+        ".gitleaks.toml",
+        "AGENTS.md",
+        "CLAUDE.md",
+        "REVIEW.md",
+        "**/AGENTS.md"
       ],
       "trading_paths": [
         "catalogs/us-equities/**",
