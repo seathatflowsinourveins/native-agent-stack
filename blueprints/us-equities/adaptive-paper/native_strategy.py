@@ -37,6 +37,7 @@ class AdaptiveStrategy(Strategy):
             exit_session_at = lambda now: session_at(datetime.fromtimestamp(now, timezone.utc)).kind
         self._exit_session_at = exit_session_at
         self._exit_pending_attention = {}
+        self._exit_attention_next = None
         # E4: a symbol halted, paused or quotation-only per the status stream or an
         # unexpired startup seed (runner.Controller.is_halted) gets no new order, entry or
         # exit, and its resting exit is not re-priced until it resumes. The quote's own
@@ -865,13 +866,45 @@ class AdaptiveStrategy(Strategy):
         ), self.policy.config)
 
     def _flag_exit_position(self, symbol, decision):
-        previous = self._exit_pending_attention.get(symbol)
-        self._exit_pending_attention[symbol] = decision.reason
-        if previous != decision.reason:
-            self.event_sink({"type": "exit_attention", "symbol": symbol,
-                             "reason": decision.reason})
+        if self._exit_attention_next is not None:
+            self._exit_attention_next[symbol] = decision.reason
+            return
+        self._publish_exit_attention({**self._exit_pending_attention, symbol: decision.reason})
+
+    def _publish_exit_attention(self, attention):
+        previous = self._exit_pending_attention
+        self._exit_pending_attention = attention
+        for symbol, reason in attention.items():
+            if previous.get(symbol) != reason:
+                self.event_sink({"type": "exit_attention", "symbol": symbol, "reason": reason})
+
+    def _resolve_exit_attention(self, symbol):
+        # A clear quote/order disposition cannot clear a still-applicable
+        # corporate-action refusal. Its final summary is rechecked by the runner.
+        if symbol in self._ca_last_needs_attention_held:
+            return
+        attention = (self._exit_attention_next if self._exit_attention_next is not None
+                     else self._exit_pending_attention)
+        attention.pop(symbol, None)
 
     def rebalance(self, now=None, *, force_exit=False):
+        """Publish one attention transition after the entire owner tick."""
+        completed = False
+        try:
+            decision = self._rebalance(now, force_exit=force_exit)
+            completed = True
+            return decision
+        finally:
+            attention = self._exit_attention_next
+            self._exit_attention_next = None
+            if attention is not None:
+                if not completed:
+                    # A partial/failed tick may add refusals but cannot prove
+                    # an earlier held problem resolved.
+                    attention = {**self._exit_pending_attention, **attention}
+                self._publish_exit_attention(attention)
+
+    def _rebalance(self, now=None, *, force_exit=False):
         """Called on the native owner loop, never a socket thread. A strategy whose
         order callback raised (``faulted``) submits nothing more; recovery cleans up."""
         if self.faulted:
@@ -898,11 +931,11 @@ class AdaptiveStrategy(Strategy):
         flagged_exits = {symbol: value for symbol, value in
                          getattr(self.policy, "last_exit_decisions", {}).items()
                          if value.flag_position}
-        # A fresh policy decision can resolve earlier attention; throttled
-        # ticks returned above, so cached metadata never clears a live flag.
-        for symbol in tuple(self._exit_pending_attention):
-            if symbol not in self.policy.holdings or symbol not in flagged_exits:
-                self._exit_pending_attention.pop(symbol)
+        # Keep previous active reasons until all runtime guards have decided.
+        # Throttled/not-started ticks return above without starting a collector.
+        held = {s: Decimal(p["qty"]) for s, p in self.positions().items()}
+        self._exit_attention_next = {s: reason for s, reason in self._exit_pending_attention.items()
+                                     if held.get(s, 0) > 0}
         # If this tick's selector decision liquidates (FLATTEN_BEFORE_SWITCH),
         # policy.decide() already force-exited every holding above; propagate
         # that into this method's own force_exit so (a) no fresh entry is
@@ -917,7 +950,6 @@ class AdaptiveStrategy(Strategy):
             # cancel resting sells too. Use an unreachable timeout so only
             # the all_entries clause (buy-side entries) applies here.
             self.cancel_expired(now, float("inf"), all_entries=True)
-        held = {s: Decimal(p["qty"]) for s, p in self.positions().items()}
         busy = {i.symbol for i in self.ledger.unresolved()}
         busy.update(item["symbol"] for item in self.pending.values())
         # D4 (round 4): _gap_risk_stop_symbols is now called before the
@@ -1032,6 +1064,9 @@ class AdaptiveStrategy(Strategy):
                 # joined by a new one (a limit sell cannot fill in a halt); the next tick
                 # after the resume, or the seed's expiry, acts again. A gap_risk_stop
                 # stays armed (fire-once is only marked on submit).
+                if side == "sell":
+                    self._flag_exit_position(symbol, ExitDecision(
+                        "exit_halted", 0.0, "hold", submit=False, flag_position=True))
                 continue
             quote = self.policy.latest.get(symbol)
             session_exit = self._session_exit_decision(symbol, now, reason) if side == "sell" else None
@@ -1107,6 +1142,8 @@ class AdaptiveStrategy(Strategy):
                     else REASON_PRICE_RULE.get(reason, "market"))
                 self.pending[client_id]["price"] = price_str
             busy.add(symbol)
+            if side == "sell":
+                self._resolve_exit_attention(symbol)
             self.submit_order(order)
             # D2 (round 3): mark fire-once applied only now that the order
             # has actually been submitted, not preemptively when the stop
@@ -1309,7 +1346,10 @@ class AdaptiveStrategy(Strategy):
         if (self.faulted or self._halted(symbol) or not quote
                 or now - quote.timestamp > self.policy.config.quote_age_seconds
                 or now < quote.timestamp - QUOTE_FUTURE_TOLERANCE_SECONDS):
-            if (not quote or now - quote.timestamp > self.policy.config.quote_age_seconds
+            if self._halted(symbol):
+                self._flag_exit_position(symbol, ExitDecision(
+                    "exit_halted", 0.0, "hold", submit=False, flag_position=True))
+            elif (not quote or now - quote.timestamp > self.policy.config.quote_age_seconds
                     or now < quote.timestamp - QUOTE_FUTURE_TOLERANCE_SECONDS):
                 self._flag_exit_position(symbol, ExitDecision(
                     "quote_stale", 0.0, "hold", submit=False, flag_position=True))
@@ -1345,6 +1385,7 @@ class AdaptiveStrategy(Strategy):
             tags=[f"strategy={reason}", f"reason={reason}", f"price_rule={price_rule}"])
         self.pending[client_id] = {"symbol": symbol, "side": "sell", "created": now,
                                    "price_rule": price_rule, "price": price_str, "reason": reason}
+        self._resolve_exit_attention(symbol)
         self.submit_order(order)
         # D1 (round 4): fire-once is marked here -- once the replacement
         # order has actually been submitted -- not on replace_exit's

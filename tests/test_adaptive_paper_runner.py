@@ -426,6 +426,100 @@ class IntegratedRunner(unittest.TestCase):
             self.assertEqual(ledger.unresolved(), [])
             self.assertEqual(ledger.intents(), [])
 
+    def test_native_queued_buy_rechecks_dispatch_session_and_preserves_supported_sessions(self):
+        """Defensive native admission; the supplied long close is not an R9-bypass proof."""
+        from nautilus_trader.common import Clock
+        from nautilus_trader.config import StrategyConfig
+        from nautilus_trader.model import InstrumentId, OrderSide, Quantity, TimeInForce
+        from nautilus_trader.trading import Strategy
+        from native_adapter import AlpacaExecutionClient, build_node
+
+        class QueuedEntry(Strategy):
+            def __init__(self):
+                super().__init__(StrategyConfig(log_events=False, log_commands=False))
+                self.order, self.fills, self.denials = None, 0, []
+
+            def on_start(self):
+                self.subscribe_quotes(InstrumentId.from_str("SPY.ALPACA"))
+
+            def on_quote(self, tick):
+                if self.order is None:
+                    self.order = self.order_factory.limit(tick.instrument_id, OrderSide.BUY,
+                        Quantity.from_int(1), tick.ask_price, time_in_force=TimeInForce.DAY)
+                    self.submit_order(self.order)
+
+            def on_order_filled(self, event):
+                self.fills += 1
+                self.shutdown_system("synthetic entry filled")
+
+            def on_order_denied(self, event):
+                self.denials.append(str(event.reason))
+                self.shutdown_system("synthetic entry denied")
+
+        native_submit = AlpacaExecutionClient._submit_order
+        native_denied = AlpacaExecutionClient.generate_order_denied
+        cases = (("CLOSED", 24, False), ("RTH", 15, False), ("PRE", 12, True), ("POST", 22, True))
+        for kind, utc_hour, expected_extended in cases:
+            with self.subTest(session=kind), tempfile.TemporaryDirectory() as root:
+                dispatch_now = datetime(2026, 3, 11, tzinfo=timezone.utc).timestamp() if utc_hour == 24 else \
+                    datetime(2026, 3, 10, utc_hour, tzinfo=timezone.utc).timestamp()
+                owner_now = dispatch_now - .1 if kind == "CLOSED" else dispatch_now
+                dispatch_ns = int(dispatch_now * 1e9)
+                seen, generated_denials = [], []
+
+                def record_native_denial(client, order, reason):
+                    generated_denials.append((reason, client.clock.timestamp_ns()))
+                    native_denied(client, order, reason)
+
+                async def delayed_dispatch(client, command):
+                    await asyncio.sleep(0)
+                    original_clock = client.clock
+                    client.clock = Clock.new_test()
+                    client.clock.set_time(dispatch_ns)
+                    seen.append((str(command.order.side).lower(), client.clock.timestamp_ns()))
+                    try:
+                        await native_submit(client, command)
+                    finally:
+                        client.clock = original_clock
+
+                ledger = Ledger(Path(root) / "journal.db", RiskLimits())
+                self.addCleanup(ledger.close)
+                ledger.start_trial(owner_now)
+                # This caller intentionally keeps its synthetic admission window
+                # open to isolate native dispatch; production close/R9 guards remain.
+                controller = Controller(ledger, owner_now + 3600, market_open=True, clock=lambda: owner_now)
+                port = SimulatedPort(controller, ("SPY",))
+                controller.port = port
+                watcher = QueuedEntry()
+                session = build_node(port, [{"symbol": "SPY"}], [watcher],
+                                     session_policy={"extended_hours": True, "overnight_holds": False})
+
+                async def exercise():
+                    await asyncio.wait_for(session.run_async(), timeout=5)
+
+                with patch.object(runner_module.time, "time", return_value=owner_now), \
+                     patch.object(runner_module.time, "time_ns", return_value=int(owner_now * 1e9)), \
+                     patch.object(AlpacaExecutionClient, "generate_order_denied", record_native_denial), \
+                     patch.object(AlpacaExecutionClient, "_submit_order", delayed_dispatch):
+                    asyncio.run(exercise())
+                self.assertEqual(seen, [("buy", dispatch_ns)])
+                if kind == "CLOSED":
+                    self.assertEqual(port.orders, {})
+                    self.assertEqual(port.submitted_at, [])
+                    self.assertEqual(watcher.fills, 0)
+                    # The real pinned method queues native output. Fault stop can
+                    # precede custom strategy callback delivery, which is not required.
+                    self.assertEqual(generated_denials, [("entry_dispatch_session_unavailable", dispatch_ns)])
+                    self.assertTrue(any(e.startswith("entry_dispatch_session_unavailable:") for e in session.errors))
+                    self.assertEqual(ledger.intents(), [])
+                else:
+                    self.assertEqual(generated_denials, [])
+                    self.assertEqual(session.errors, [])
+                    self.assertEqual(watcher.denials, [])
+                    self.assertEqual(watcher.fills, 1)
+                    self.assertEqual(len(port.orders), 1)
+                    self.assertEqual(next(iter(port.orders.values()))["extended_hours"], expected_extended)
+
     def test_native_cleanup_reports_an_unchanged_exit_attention_reason_once(self):
         """Repeated native cleanup ticks preserve the hold without journal spam."""
         from zoneinfo import ZoneInfo
@@ -459,6 +553,69 @@ class IntegratedRunner(unittest.TestCase):
             self.assertEqual(result["corporate_action_guard"]["pending_exit_attention_held"], ["AAPL"])
             self.assertEqual(ledger.positions()["AAPL"].qty, Decimal(2))
             self.assertEqual(port.submitted_at, [])
+
+    def test_native_post_cleanup_keeps_halt_attention_after_quotes_become_fresh(self):
+        """A final fresh quote cannot turn a halted forced exit into an honest hold."""
+        from zoneinfo import ZoneInfo
+        from corporate_actions import GuardDecision
+
+        fixed_now = datetime(2026, 3, 10, 18, tzinfo=ZoneInfo("America/New_York")).timestamp()
+
+        class ClearGuard:
+            def refresh(self, symbols, *, start, end, now):
+                pass
+
+            def evaluate(self, *, today, next_session_date, held_symbols, candidate_symbols, now):
+                return {s: GuardDecision(symbol=s, block_entry=False, must_flatten=False,
+                                          needs_attention=False, reason=None)
+                        for s in held_symbols | candidate_symbols}
+
+        for guard in (None, ClearGuard()):
+            with self.subTest(corporate_action_guard=guard is not None), tempfile.TemporaryDirectory() as root:
+                config, _, _ = load_config(SOURCE / "config.json")
+                config.update(duration_seconds=1, cleanup_seconds=2, order_timeout_seconds=1,
+                              regular_session_only=False, extended_hours_enabled=True,
+                              sessions={"extended_hours": True, "overnight_holds": True},
+                              _corporate_action_guard=guard)
+                policy = PolicyConfig(symbols=("SPY", "QQQ", "IWM", "DIA", "AAPL", "MSFT"),
+                                      max_positions=6)
+                ledger = Ledger(Path(root) / "journal.db", RiskLimits(trial_seconds=3, cleanup_seconds=2))
+                self.addCleanup(ledger.close)
+                ledger.start_trial(fixed_now)
+                controller = Controller(ledger, fixed_now + 3600, market_open=True, clock=lambda: fixed_now)
+                port = SimulatedPort(controller, policy.symbols)
+                port.positions["AAPL"] = {"symbol": "AAPL", "qty": Decimal(2), "avg_entry_price": "100"}
+                port.cash = Decimal("99800")
+                controller.port = port
+                transitioned = []
+
+                def quote_clock():
+                    had_stale_exit = any(e["type"] == "exit_attention" and e["reason"] == "quote_stale"
+                                         for e in controller.events)
+                    if had_stale_exit and not transitioned:
+                        controller.trading_status({"symbol": "AAPL", "halted": True, "state": "halted",
+                                                   "ts_ns": int(fixed_now * 1e9)})
+                        controller.stop = True
+                        transitioned.append(True)
+                    return int((fixed_now if transitioned else fixed_now - 60) * 1e9)
+
+                with patch.object(runner_module.time, "time", return_value=fixed_now), \
+                     patch.object(runner_module.time, "time_ns", side_effect=quote_clock):
+                    result = asyncio.run(run_native(controller, policy, [{"symbol": s} for s in policy.symbols],
+                                                    "post-halted-cleanup", config, "99800"))
+                self.assertEqual(transitioned, [True])
+                self.assertEqual(controller.quotes["AAPL"].timestamp, fixed_now)
+                self.assertTrue(controller.is_halted("AAPL"))
+                self.assertIsNone(result["accounting"]["halted_reason"])
+                self.assertEqual(result["adapter_errors"], [])
+                self.assertEqual(port.submitted_at, [])
+                self.assertEqual(ledger.positions()["AAPL"].qty, Decimal(2))
+                self.assertEqual((result["status"], trial_phase_and_exit_code(result)),
+                                 ("needs_attention", ("needs_attention", 3)))
+                self.assertEqual(result["corporate_action_guard"]["pending_exit_attention_held"], ["AAPL"])
+                self.assertEqual([e["reason"] for e in result["events"] if e["type"] == "exit_attention"],
+                                 ["quote_stale", "exit_halted"])
+                self.assertEqual(result["corporate_action_guard"]["enabled"], guard is not None)
 
     def test_reconcile_rejects_external_position_and_cash_gap(self):
         with tempfile.TemporaryDirectory() as root:
@@ -3319,6 +3476,27 @@ class LeveragePreflightIntegrationTests(unittest.TestCase):
 
 
 class CorporateActionGuardRunnerWiringTests(unittest.TestCase):
+    @contextlib.contextmanager
+    def regular_session_dispatch(self):
+        """Admit this fixture's buys without changing its real refresh/deadline clocks."""
+        from nautilus_trader.common import Clock
+        from native_adapter import AlpacaExecutionClient
+
+        native_submit = AlpacaExecutionClient._submit_order
+        stamp = int(datetime(2026, 3, 10, 15, tzinfo=timezone.utc).timestamp() * 1e9)
+
+        async def dispatch(client, command):
+            original_clock = client.clock
+            client.clock = Clock.new_test()
+            client.clock.set_time(stamp)
+            try:
+                await native_submit(client, command)
+            finally:
+                client.clock = original_clock
+
+        with patch.object(AlpacaExecutionClient, "_submit_order", dispatch):
+            yield
+
     """Runner-level tests (per the fix-round brief) of the corporate-action
     guard's fetch-window sizing (finding 1), its wiring decision (finding
     8), and its bounded/threaded refresh scheduling (finding 2) -- the
@@ -3656,7 +3834,7 @@ class CorporateActionGuardRunnerWiringTests(unittest.TestCase):
                                                  action_type="cash_dividend", action_date=today)}
 
         config["_corporate_action_guard"] = FlattenOnceHeldGuard()
-        with tempfile.TemporaryDirectory() as root:
+        with self.regular_session_dispatch(), tempfile.TemporaryDirectory() as root:
             ledger = Ledger(Path(root) / "journal.db", RiskLimits(trial_seconds=2, cleanup_seconds=2))
             ledger.start_trial(time.time())
             controller = Controller(ledger, time.time() + 3600, market_open=True)
@@ -3707,6 +3885,9 @@ class CorporateActionGuardRunnerWiringTests(unittest.TestCase):
             controller.port = port
             outcome = asyncio.run(run_native(controller, policy, [{"symbol": s} for s in policy.symbols],
                                              "fixture", config, "100000"))
+            self.assertGreater(outcome["native_fill_events"], 0, outcome["adapter_errors"])
+            self.assertGreater(ledger.positions()["AAPL"].qty, 0)
+            self.assertEqual(outcome["adapter_errors"], [])
             ledger.close()
         self.assertIn("AAPL", outcome["corporate_action_guard"]["pending_must_flatten"])
 
@@ -3816,7 +3997,7 @@ class CorporateActionGuardRunnerWiringTests(unittest.TestCase):
 
         started_at = time.time()
         config["_corporate_action_guard"] = LateDegradingGuard(started_at, config["duration_seconds"])
-        with tempfile.TemporaryDirectory() as root:
+        with self.regular_session_dispatch(), tempfile.TemporaryDirectory() as root:
             ledger = Ledger(Path(root) / "journal.db", RiskLimits(trial_seconds=1, cleanup_seconds=2))
             ledger.start_trial(time.time())
             controller = Controller(ledger, time.time() + 3600, market_open=True)
@@ -3858,6 +4039,9 @@ class CorporateActionGuardRunnerWiringTests(unittest.TestCase):
             controller.port = port
             outcome = asyncio.run(run_native(controller, policy, [{"symbol": s} for s in policy.symbols],
                                              "fixture", config, "100000"))
+            self.assertGreater(outcome["native_fill_events"], 0, outcome["adapter_errors"])
+            self.assertGreater(ledger.positions()["AAPL"].qty, 0)
+            self.assertEqual(outcome["adapter_errors"], [])
             ledger.close()
         self.assertIn("AAPL", outcome["corporate_action_guard"]["pending_needs_attention_held"],
                       "the REAL outcome must reflect the guard's post-rebalance degraded state")

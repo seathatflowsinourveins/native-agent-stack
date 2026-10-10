@@ -289,6 +289,75 @@ class NativeExtendedExitCallerTests(unittest.TestCase):
         self.assertTrue(any(e["type"] == "exit_attention" and e["reason"] == "quote_stale"
                             for e in events))
 
+    def test_repeated_stale_exit_attention_deduplicates_default_and_explicit_rth(self):
+        # Caller fixture uses the installed native Strategy with fake order I/O;
+        # the actual policy/session/freshness path owns each disposition.
+        for session in (None, "RTH", "POST"):
+            with self.subTest(session=session or "default_RTH"):
+                strategy, helper, now, events = self.strategy(session=session)
+                strategy._exit_session_at = None if session is None else lambda at: session
+                strategy.policy.observe("AAPL", 100.0, 100.02, 900.0)
+                for at in (1000.0, 1000.1, 1000.2):
+                    strategy.rebalance(now=at, force_exit=True)
+                self.assertEqual(strategy.submitted, [])
+                self.assertEqual(strategy._exit_pending_attention, {"AAPL": "quote_stale"})
+                self.assertEqual([e["reason"] for e in events if e["type"] == "exit_attention"],
+                                 ["quote_stale"])
+
+    def test_attention_survives_throttled_not_started_and_faulted_ticks(self):
+        strategy, helper, now, events = self.strategy(session="POST")
+        strategy.policy.observe("AAPL", 100.0, 100.02, 900.0)
+        strategy.rebalance(now=now[0], force_exit=True)
+        strategy.policy.observe("AAPL", 100.0, 100.02, now[0])
+        self.assertIsNone(strategy.rebalance(now=now[0] + .01))
+        strategy.started = False
+        self.assertIsNone(strategy.rebalance(now=now[0], force_exit=True))
+        strategy.started, strategy.faulted = True, True
+        self.assertIsNone(strategy.rebalance(now=now[0], force_exit=True))
+        self.assertEqual(strategy._exit_pending_attention, {"AAPL": "quote_stale"})
+        self.assertEqual([e["reason"] for e in events if e["type"] == "exit_attention"], ["quote_stale"])
+
+    def test_attention_is_not_resolved_by_a_fresh_tick_with_another_order_pending(self):
+        from dataclasses import replace
+
+        strategy, helper, now, events = self.strategy(session="POST")
+        strategy.policy.observe("AAPL", 100.0, 100.02, 900.0)
+        strategy.rebalance(now=now[0], force_exit=True)
+        strategy.policy.observe("AAPL", 100.0, 100.02, now[0])
+        strategy.policy.config = replace(strategy.policy.config, exit_replace_enabled=False)
+        helper.seed_resting_sell(strategy)
+        strategy.rebalance(now=now[0], force_exit=True)
+        self.assertEqual(strategy._exit_pending_attention, {"AAPL": "quote_stale"})
+        self.assertEqual(strategy.submitted, [])
+        strategy.pending.clear()
+        strategy.rebalance(now=now[0], force_exit=True)
+        self.assertEqual(strategy._exit_pending_attention, {})
+        self.assertEqual(len(strategy.submitted), 1)
+
+    def test_a_failed_submit_tick_cannot_clear_the_previous_active_attention(self):
+        strategy, helper, now, events = self.strategy(session="POST")
+        strategy.policy.observe("AAPL", 100.0, 100.02, 900.0)
+        strategy.rebalance(now=now[0], force_exit=True)
+        strategy.policy.observe("AAPL", 100.0, 100.02, now[0])
+
+        def fail_submit(order):
+            raise RuntimeError("synthetic submission callback failure")
+
+        strategy.submit_order = fail_submit
+        with self.assertRaisesRegex(RuntimeError, "synthetic submission callback failure"):
+            strategy.rebalance(now=now[0], force_exit=True)
+        self.assertEqual(strategy._exit_pending_attention, {"AAPL": "quote_stale"})
+        self.assertIsNone(strategy._exit_attention_next)
+        self.assertEqual([e["reason"] for e in events if e["type"] == "exit_attention"], ["quote_stale"])
+
+    def test_a_completed_tick_clears_attention_for_a_holding_that_is_gone(self):
+        strategy, helper, now, events = self.strategy(session="POST")
+        strategy.policy.observe("AAPL", 100.0, 100.02, 900.0)
+        strategy.rebalance(now=now[0], force_exit=True)
+        strategy.positions = lambda: {}
+        strategy.rebalance(now=now[0], force_exit=True)
+        self.assertEqual(strategy._exit_pending_attention, {})
+
     def test_forced_stale_exit_cannot_be_a_successful_overnight_hold(self):
         from datetime import datetime, timezone
         from zoneinfo import ZoneInfo
@@ -409,6 +478,35 @@ class NativeExtendedExitCallerTests(unittest.TestCase):
         self.assertEqual(strategy.submitted, [])
         self.assertTrue(any(e["type"] == "exit_attention" and e["reason"] == "quote_stale"
                             for e in events))
+
+    def test_cancel_ack_during_halt_flags_the_held_exit_without_another_tick(self):
+        import runner
+        from datetime import datetime, timezone
+
+        strategy, helper, now, events = self.strategy(session="POST")
+        strategy.policy.observe("AAPL", 100.0, 100.02, now[0])
+        helper.seed_resting_sell(strategy)
+        self.assertEqual(strategy.replace_exit("AAPL", now[0], Decimal("2"), "stop_loss"), "cancel_requested")
+        strategy._halted = lambda symbol: True
+        strategy.on_order_canceled(SimpleNamespace(client_order_id="adp-fixture-0000001"))
+        self.assertEqual(strategy.submitted, [])
+        self.assertFalse(strategy.faulted)
+        self.assertEqual(strategy.callback_faults, [])
+        self.assertEqual(strategy._exit_pending_attention, {"AAPL": "exit_halted"})
+        summary = runner._final_corporate_action_guard_summary(strategy, {"AAPL"}, now[0])
+        boundary = datetime(2026, 3, 10, 22, tzinfo=timezone.utc).timestamp()
+        reconciliation = {"positions": 1, "open_orders": 0}
+        outcome = {"reconciliation": reconciliation, "adapter_errors": [], "flat": False,
+                   "accounting": {"halted_reason": None}, "corporate_action_guard": summary}
+        outcome["status"] = runner._run_native_status(
+            reconciliation, [], 0, outcome, {"overnight_holds": True, "extended_hours": True}, boundary)
+        self.assertEqual(runner.trial_phase_and_exit_code(outcome), ("needs_attention", 3))
+        strategy.rebalance(now=now[0], force_exit=True)
+        self.assertEqual([e["reason"] for e in events if e["type"] == "exit_attention"], ["exit_halted"])
+        strategy._halted = lambda symbol: False
+        strategy.rebalance(now=now[0], force_exit=True)
+        self.assertEqual(strategy._exit_pending_attention, {})
+        self.assertEqual(len(strategy.submitted), 1)
 
     def test_failed_session_classification_at_ack_flags_without_callback_fault(self):
         strategy, helper, now, events = self.strategy()

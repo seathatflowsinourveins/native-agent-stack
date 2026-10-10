@@ -32,20 +32,32 @@ submission or replacement. A fresh PRE/POST exit is an explicit marketable
 limit, using the existing bid/ask pricing helper. The strategy still uses the
 native LIMIT/DAY order factory and its existing instrument, risk, and account
 writer controls. Replacements recheck session and quote at cancellation ACK.
-Validated extended-hours runs also reclassify each native SELL at the execution
+Validated extended-hours runs also reclassify each native BUY/SELL at the execution
 client's clock immediately before asynchronous dispatch. Only RTH/PRE/POST may
 reach the broker. An unavailable/unqualified session or classifier `ValueError`
 produces a native denial before submission and records a session fault that
 stops the node. The held residual remains visible and ends `needs_attention`
-with exit 3, preventing a plain LIMIT/DAY exit from queuing for the next session.
+with exit 3, preventing a plain LIMIT/DAY order from queuing for the next session.
+SELL refusals retain `exit_dispatch_*` reasons; BUY refusals use `entry_dispatch_*`.
+The native BUY regression deliberately supplies a long synthetic admission
+window to isolate dispatch. It does not show a bypass of the production runner's
+cleanup/cutoff checks or the existing R9 entry guards.
 
 `last_exit_decisions` carries submit/attention/limit metadata outside the golden
 serialized `Decision`. Flagged holdings retain their targets so allocation cannot
 turn a hold into a portfolio-rotation exit. Runtime events include attention
 reasons; partial take-profit fractions and the existing RTH thresholds remain.
 An `exit_attention` event is emitted only when that symbol's active reason
-changes. Repeated cleanup ticks preserve the reason without emitting it again;
-clearing the active hold allows the same reason to be emitted if it returns.
+changes after the complete policy/runtime tick. Policy flags and runtime
+session/freshness/halt refusals collect into one next state while the previous
+state remains active. A fresh but halted forced exit records `exit_halted`,
+including when a cancellation ACK drops its replacement. Repeated cleanup ticks
+preserve the reason without emitting it again in default RTH, classified RTH
+and POST. Clearing requires the holding to be gone or a positively admitted
+current exit after the applicable guards; a fresh policy result alone supplies
+no clearance. Throttled/not-started/faulted ticks preserve active attention,
+and an exception cannot clear an earlier reason. After resolution the same
+reason emits again if it returns.
 Native sell dispatch and replacement ACK also flag stale quotes in RTH, while
 the historical RTH policy rule ordering stays unchanged. Active attention is
 retained across throttled ticks, cleared by a new unflagged policy disposition,

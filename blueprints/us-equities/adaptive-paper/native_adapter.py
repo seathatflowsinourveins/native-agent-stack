@@ -764,17 +764,18 @@ class AlpacaExecutionClient(ExecutionClient):
             return
         tags = list(order.tags or [])
         now = datetime.fromtimestamp(self.clock.timestamp_ns() / 1e9, tz=timezone.utc)
-        if order.side == OrderSide.SELL and self.session.session_policy.get("extended_hours", False):
+        if self.session.session_policy.get("extended_hours", False):
             # A native owner tick and this async dispatch may straddle 20:00.
             # Deny before submission: LIMIT/DAY with extended_hours=False
-            # would otherwise queue the exit for the next session at Alpaca.
+            # would otherwise queue the order for the next session at Alpaca.
+            prefix = "exit" if order.side == OrderSide.SELL else "entry"
             try:
                 dispatch_session = session_at(now).kind
             except ValueError:
-                refusal = "exit_dispatch_session_classification_failed"
+                refusal = prefix + "_dispatch_session_classification_failed"
             else:
                 refusal = (None if dispatch_session in (SessionKind.RTH, SessionKind.PRE, SessionKind.POST)
-                           else "exit_dispatch_session_unavailable")
+                           else prefix + "_dispatch_session_unavailable")
             if refusal is not None:
                 self.generate_order_denied(order, refusal)
                 # Retain the held residual in reconciliation and surface an
