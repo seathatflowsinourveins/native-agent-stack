@@ -303,9 +303,9 @@ and 9 cross-client sources (the Agent Skills specification and its skill-evaluat
 hooks, AGENTS.md, non-interactive and plugins documentation; OpenAI's harness-engineering post). For each source an Opus
 5.5 reader at xhigh extracted the practices it states and mapped each to a role slot and a client, and an Opus 5.5
 refuter at max re-read the page and refuted each practice by default. All 31 sources were readable. Of 248 practices
-the refuters kept 195 and refuted 53; of the 195, 56 agree with a default, 127 extend one, 3 contradict one and 9 match
-no slot; 19 rest on a measurement the source reports, and 124 apply to both clients. Each source carries its fetch
-time and the sha256 of the bytes read
+the refuters kept 195 and refuted 53; of the 195, 56 agree with a default, 127 extend one, 3 contradict one and 9 are
+not covered by any default; 186 map to one of 24 role slots and 9 to none; 19 rest on a measurement the source
+reports, and 124 apply to both clients. Each source carries its fetch time and the sha256 of the bytes read
 ([primary-source-reading.json](../../evidence/artifacts/claude-native-practice-20261009/primary-source-reading.json));
 the layer pages list each slot's sources. Before this run one post backed a default (planning-persistence); the
 others were only links inside community sources. Spend: $63.87 at API list price (usage record).
