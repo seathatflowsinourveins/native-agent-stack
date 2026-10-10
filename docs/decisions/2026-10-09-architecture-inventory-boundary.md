@@ -52,9 +52,12 @@ establish wiring, execution or acceptance.
 
 A checked-in collection of independently reviewed bindings reproduces
 the 41 skill, 94 metadata and one design grant, including 33 exact aliases.
-The binding source is re-pinned to reachable rebased commit
-`994ab9b279c8915cbdb637e1786aaa41d1306e57`; its reviewed binding bytes remain
+The binding source is re-pinned to landed squash commit
+`f96f2cd2decef021c259d853d442956dc73f1ecf`, reachable from `origin/main`;
+its reviewed binding bytes remain
 equal to the CC-read snapshot at `c225909e50128ef5730765bb842006a27404743b`.
+Pins must remain reachable from `origin/main` after squash merging; ancestry
+confined to a PR branch or PR merge ref does not provide durable provenance.
 Public data contains no user directory listings or unapproved names. Additional
 runtime names remain unapproved rather than expanding permissions. A CI test
 compares repository grants with the current committed `git ls-files` selector.

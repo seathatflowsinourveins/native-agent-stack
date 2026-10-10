@@ -263,10 +263,12 @@ the policy digest before a prior render can be reused.
 
 `inventory_user_names.json` contains only independently reviewed bindings
 and safe provenance that reproduce the 41 skill, 94 metadata and one design
-grant. Its source pin is the reachable rebased snapshot
-`994ab9b279c8915cbdb637e1786aaa41d1306e57`; the reviewed binding bytes are
-unchanged from the CC-read head. User directory listings and unapproved names
-are not committed.
+grant. Its source pin is the landed squash commit
+`f96f2cd2decef021c259d853d442956dc73f1ecf`, reachable from `origin/main`;
+the reviewed binding bytes are unchanged from the CC-read head. Pins must
+remain reachable from `origin/main` after squash merging; ancestry confined
+to a PR branch or PR merge ref does not qualify. User directory listings and
+unapproved names are not committed.
 Runtime discoveries never create permissions. The 33 exact alias
 bindings name an already approved canonical target; the reader must verify
 that target before any content or metadata observation. The CI grant test
