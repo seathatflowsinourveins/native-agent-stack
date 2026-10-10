@@ -1,8 +1,8 @@
 """Local checks of the repository's pinned jCodeMunch project configuration.
 
-Sources: jgravelle/jcodemunch-mcp v1.108.319, src/jcodemunch_mcp/config.py
-L536-544 (schema), L630-727 (JSONC algorithm), L1230-1254 (project loading):
-https://github.com/jgravelle/jcodemunch-mcp/blob/v1.108.319/src/jcodemunch_mcp/config.py
+Sources: jgravelle/jcodemunch-mcp v1.108.333, src/jcodemunch_mcp/config.py
+L542-548 (schema), L642-739 (JSONC algorithm), L1278-1305 (project loading):
+https://github.com/jgravelle/jcodemunch-mcp/blob/v1.108.333/src/jcodemunch_mcp/config.py
 
 The JSONC helper follows the pinned loader, including its adjacent-comment
 handling. Keeping this small, sourced helper here lets ordinary stdlib unittest
@@ -289,6 +289,20 @@ class JCodeMunchCoverageRegressionTests(unittest.TestCase):
         files = self.files | {"blueprints/convergence-practice/data/notes.txt"}
         result = self.run_coverage(files, self.ignored)
         self.assertTrue(result.wasSuccessful(), result.failures + result.errors)
+
+    def test_retained_wave_sources_fit_configured_cap(self):
+        # Keep every current coverage obligation and add retained source files
+        # as the consolidation wave does, without creating files on disk.
+        additions = {
+            f"tests/jcodemunch_wave/source_{number:04d}.py"
+            for number in range(1000)
+        }
+        self.assertFalse(additions & self.files)
+        files = self.files | additions
+        self.assertGreater(len(files - self.ignored), 4000)
+        result = self.run_coverage(files, self.ignored)
+        self.assertFalse(result.errors)
+        self.assertTrue(result.wasSuccessful(), result.failures)
 
     def test_empty_blueprint_output_union_is_rejected(self):
         directories = {"receipts", "native-outputs", "judge_results", "data"}

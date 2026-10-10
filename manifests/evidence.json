@@ -5221,8 +5221,8 @@
     },
     {
       "path": ".jcodemunch.jsonc",
-      "sha256": "54f9c2a44f6d8ceac528a9369468f3af9dd84e1c6f1230f269c63700782f2cdd",
-      "bytes": 2751
+      "sha256": "e7ea177b1364d2bef9e4b18429b504ff0714a8cc63010b5fa987f034b9f3b7c0",
+      "bytes": 2729
     },
     {
       "path": "AGENTS.md",
@@ -60257,8 +60257,8 @@
     },
     {
       "path": "tests/test_jcodemunch_config.py",
-      "sha256": "8316931b0d82ddb539518ed3322736879d7da6ea358c9ccd5344031eb4e859da",
-      "bytes": 13287
+      "sha256": "1559b0ced6e703e285b7e28c16c0430b3d841c43ee79f9b820378f88c6948b05",
+      "bytes": 13941
     },
     {
       "path": "tests/test_jev_p1_casepack.py",
