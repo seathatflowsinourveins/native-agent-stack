@@ -79,7 +79,7 @@
     "failures": 0,
     "errors": 0,
     "elapsed_seconds": 6.235,
-    "class": "local_integration",
+    "class": "synthetic",
     "covers": ["native default", "original exact native provenance assertion", "implicit and explicit native receipts/usage omit transport fields including failed retries", "loopback refusal", "credential/query/fragment/port refusal", "extra environment exclusion", "unchanged blind environment audit", "fresh keyless homes", "OmniRoute provider/family receipts", "exact not_attested disclosure on every Omni packet/attempt", "model disclosure spoof overwrite", "native/Claude disclosure refusal", "provider and endpoint resume invalidation", "canonical endpoint/model identity", "malformed metadata refusal", "legacy native sealer compatibility", "isolation args guard", "README block guard", "append-only code registries"]
   },
   "tier1_dry_run": {
