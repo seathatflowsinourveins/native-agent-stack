@@ -269,15 +269,8 @@ def command_identifiers(value: str | list[str], locate: bool = False):
         raise CurrencyError("active command string could not be parsed") from None
     def native_short_flag(prefix):
         # Git v2.53.0 commit -m is a message; Python -m selects a module.
-        # Recognize model -m only for a native client behind known wrappers.
-        for token in prefix:
-            program = Path(token).name
-            if (program in {"env", "rtk", "proxy", "command", "exec", "timeout"}
-                    or token.startswith("-") or re.match(r"^[A-Za-z_]\w*=", token)
-                    or re.fullmatch(r"\d+(?:\.\d+)?[smhd]?", token)):
-                continue
-            return program in {"codex", "claude"}
-        return False
+        # Native clients retain model -m behind arbitrary command wrappers.
+        return any(Path(token).name in {"codex", "claude"} for token in prefix)
     result = []
     start = 0
     for index, token in enumerate(tokens):
@@ -412,6 +405,9 @@ def selectors(text: str, path: Path):
     historical_setup = prose and bool(re.search(r"setup below records.*?earlier.*?historical", text[:1500], re.S | re.I))
     record_section = False
     for number, line in enumerate(text.splitlines(), 1):
+        if path.suffix == ".md":
+            # Formatting delimiters separate code from adjacent prose punctuation.
+            line = line.replace("`", " ")
         stripped = line.strip()
         if not stripped or stripped.startswith(("#", "//", "<!--", ";")):
             if prose and stripped.startswith("#"):

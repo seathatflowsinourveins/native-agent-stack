@@ -272,6 +272,56 @@ class ActiveModelCurrencyTests(unittest.TestCase):
         ]}))
         self.assertEqual(self.check()["stale_count"], 3)
 
+    def test_wrapped_native_short_flags_are_checked_in_strings_and_argv(self):
+        wrappers = (["nice", "-n", "5"], ["flock", "/tmp/model.lock"], ["nohup"])
+        clients = ((["/opt/bin/codex", "exec"], "gpt-6-sol"),
+                   (["/opt/bin/claude"], "claude-opus-5"))
+        for wrapper in wrappers:
+            for client, model in clients:
+                argv = [*wrapper, *client, "-m", model]
+                for form in ("command", "argv", "shell"):
+                    with self.subTest(wrapper=wrapper[0], client=client[0], form=form):
+                        if form == "shell":
+                            name = "tools/wrapped-model.sh"
+                            text = " ".join(argv) + "\n"
+                        else:
+                            name = "config/wrapped-model.json"
+                            text = json.dumps({form: argv if form == "argv" else " ".join(argv)})
+                        path = self.write(name, text)
+                        try:
+                            result = self.check()
+                        finally:
+                            path.unlink()
+                        self.assertEqual(result["stale_count"], 1)
+                        finding, = result["findings"]
+                        self.assertEqual(finding["model"], model)
+                        if form != "shell":
+                            pointer = f"/argv/{len(argv) - 1}" if form == "argv" else "/command"
+                            self.assertEqual(finding["json_pointer"], pointer)
+
+    def test_backticked_markdown_native_model_arguments_are_checked(self):
+        for text in (
+                "Use `--model gpt-6-sol` for the active client.\n",
+                "Use `--model` `gpt-6-sol` for the active client.\n",
+                "Use ``--model=gpt-6-sol`` for the active client.\n",
+                "Use `codex exec -m gpt-6-sol` for the active client.\n",
+                "Use `nice -n 5 codex exec -m gpt-6-sol` for the active client.\n"):
+            with self.subTest(text=text):
+                self.write("docs/model-selection.md", text)
+                self.assertEqual(self.check()["stale_count"], 1)
+
+    def test_markdown_code_spans_keep_prose_punctuation_out_of_model_values(self):
+        for model, stale_count in (("gpt-6-sol", 1), ("gpt-6.1-sol", 0), ('"gpt-6.1-sol."', 1)):
+            with self.subTest(model=model):
+                self.write("docs/model-selection.md", f"Use `codex exec --model {model}`.\n")
+                result = self.check()
+                self.assertEqual(result["stale_count"], stale_count)
+                if stale_count:
+                    finding, = result["findings"]
+                    self.assertEqual(finding["model"], model.strip('"'))
+                else:
+                    self.assertEqual(result["status"], "current")
+
     def test_an_unclosed_model_argument_remains_a_coverage_gap(self):
         self.write("config/commands.json", json.dumps({"command": 'codex exec --model "gpt-6-sol'}))
         self.assertEqual(self.cli("check")[0], 2)

@@ -59507,8 +59507,8 @@
     },
     {
       "path": "scripts/active_model_currency.py",
-      "sha256": "9d7f5c5cd1bf8f3d808767bdeea7b3fea8a6036bfc73c5fac6da17fc7a16979b",
-      "bytes": 34262
+      "sha256": "e63ab05729d851d14cd454212e978e2ffd4bca9e114cc9697f0bf2075afc7859",
+      "bytes": 34101
     },
     {
       "path": "scripts/adoption_status.py",
@@ -59927,8 +59927,8 @@
     },
     {
       "path": "tests/test_active_model_currency.py",
-      "sha256": "d5ab2d06bec562df9bf81e9b4cb9aaf5796426889147ae2cfd3817b1c2058de9",
-      "bytes": 35228
+      "sha256": "d4f3b6dad9c8358b228c700ec768a9a22568f21ba91ed019c50aba1dfcf76f8c",
+      "bytes": 38056
     },
     {
       "path": "tests/test_active_recovery_plans.py",
