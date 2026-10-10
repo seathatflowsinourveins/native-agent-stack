@@ -114,6 +114,33 @@ class FakeStream:
 
 
 class Normalization(unittest.TestCase):
+    def test_utp_manual_bid_and_ask_quote_is_not_halted(self):
+        quote = {"S": "XYZ", "bp": "10.00", "ap": "10.02", "bs": 1, "as": 1,
+                 "t": "2026-09-23T15:00:00.000000001Z", "z": "C", "c": ["H"]}
+        self.assertIs(t.normalize_quote(quote)["halted"], False)
+
+    def test_untradable_utp_manual_quote_uses_ordinary_invalid_quote(self):
+        quote = {"S": "XYZ", "bp": "10.00", "ap": "10.02", "bs": 1, "as": 1,
+                 "t": "2026-09-23T15:00:00.000000001Z", "z": "C", "c": ["H"]}
+        for changes, reason in (({"bp": "0"}, "one_sided"),
+                                ({"ap": "0"}, "one_sided"),
+                                ({"bp": "10.03"}, "crossed")):
+            with self.subTest(changes=changes):
+                with self.assertRaises(t.InvalidQuote) as caught:
+                    t.normalize_quote({**quote, **changes})
+                self.assertIs(type(caught.exception), t.InvalidQuote)
+                self.assertEqual(caught.exception.reason, reason)
+
+    def test_manual_quote_correction_preserves_explicit_and_stream_halts(self):
+        quote = {"S": "XYZ", "bp": "10.00", "ap": "10.02", "bs": 1, "as": 1,
+                 "t": "2026-09-23T15:00:00.000000001Z", "z": "C", "c": ["H"]}
+        self.assertIs(t.normalize_quote({**quote, "halted": True})["halted"], True)
+        status = t.normalize_trading_status(
+            {"S": "XYZ", "sc": "H", "z": "C", "t": quote["t"]}
+        )
+        self.assertIs(status["halted"], True)
+        self.assertEqual(status["state"], "halted")
+
     def test_fractional_exit_is_preserved_but_entry_rejected(self):
         self.assertEqual(t.normalize_intent(intent(side="sell", qty="0.123456789"), ["SPY"])["qty"], "0.123456789")
         with self.assertRaises(t.TransportError):
@@ -181,7 +208,7 @@ class Normalization(unittest.TestCase):
             self.assertEqual(caught.exception.reason, reason)
         # Malformed data, or an untradable quote that is also malformed or halt-flagged, fails closed.
         for changes in ({"bp": "-1"}, {"t": None}, {"bs": -1}, {"ap": "NaN"}, {"bp": 0, "t": None},
-                        {"bp": 0, "bs": -1}, {"bp": "101", "c": ["H"]}, {"ap": 0, "halted": True},
+                        {"bp": 0, "bs": -1}, {"bp": "101", "halted": True}, {"ap": 0, "halted": True},
                         {"S": None}):
             with self.subTest(changes=changes), self.assertRaises(t.TransportError) as caught:
                 t.normalize_quote({**base, **changes})
@@ -1205,7 +1232,7 @@ class AsyncTransport(unittest.IsolatedAsyncioTestCase):
         self.assertFalse(self.port.ready)
 
     async def test_halted_or_unsubscribed_invalid_quote_fails_closed(self):
-        for changes in ({"bp": "100.05", "ap": "100.04", "c": ["H"]}, {"S": "TSLA", "bp": "100.05", "ap": "100.04"}):
+        for changes in ({"bp": "100.05", "ap": "100.04", "halted": True}, {"S": "TSLA", "bp": "100.05", "ap": "100.04"}):
             with self.subTest(changes=changes):
                 self.port._reasons.clear()
                 self.port._on_quote = lambda quote: None
