@@ -59832,8 +59832,8 @@
     },
     {
       "path": "tests/test_claude_review_worker.py",
-      "sha256": "7e3844ec55500f2baac0225ca17e9e14a2ef27fb5456b79e1e199a64f1832439",
-      "bytes": 99222
+      "sha256": "4580f7cad0222d4c84177894bafa495c3c7a305ae44704425d900deb27222f94",
+      "bytes": 109470
     },
     {
       "path": "tests/test_claude_spend_scan.py",
@@ -60927,8 +60927,8 @@
     },
     {
       "path": "tools/claude-review-worker/probes.py",
-      "sha256": "5fa38e3f0bd8b9c09efef62df17208f5f9eefbc90d31f7781735755f170d5810",
-      "bytes": 50898
+      "sha256": "a4c54c099c94e9a9e0a271364d9bfe11f79907d291b6dab7291c578916c8637a",
+      "bytes": 51029
     },
     {
       "path": "tools/claude-review-worker/systemd/claude-review-worker.service",
@@ -60942,8 +60942,8 @@
     },
     {
       "path": "tools/claude-review-worker/worker.py",
-      "sha256": "e1922317c04d335939e17b6948a2aafad486905f5f57d078dc115f5697744955",
-      "bytes": 104874
+      "sha256": "4ea8ba361bc6c7cecdabbe175f076fa6ba01c031c47d83fa1b043949db2ba151",
+      "bytes": 117253
     },
     {
       "path": "tools/credentials/canary_lane_consumer.sh",

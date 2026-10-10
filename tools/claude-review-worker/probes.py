@@ -744,8 +744,9 @@ def live(worker: crw.Worker, fixture: Fixture, candidate, plan, out: Path, check
                                      crw.SANDBOX_INPUT, plan.trading, plan.upstream)
     launchers = {
         "facts-control": crw.SandboxLauncher(worker.settings.claude_bin, worker.bwrap, flags=control_flags(),
-                                             extra_unset=[SWITCH], config_files=memory),
-        "facts-fenced": crw.SandboxLauncher(worker.settings.claude_bin, worker.bwrap, config_files=memory),
+                                             extra_unset=[SWITCH], config_files=memory, boundary=worker.boundary),
+        "facts-fenced": crw.SandboxLauncher(worker.settings.claude_bin, worker.bwrap, config_files=memory,
+                                            boundary=worker.boundary),
         "review": None,
     }
     prompts = {"facts-control": FACTS_PROMPT, "facts-fenced": FACTS_PROMPT, "review": review_prompt}
@@ -794,7 +795,7 @@ def main(argv=None) -> int:
         worker = crw.Worker([], probe_settings, env, log=lambda m: print(f"probes: {m}", flush=True))
         checks = []
         receipt = {"ts": crw.iso(now), "mode": args.mode, "checks": checks}
-        problems = worker.preflight(sandbox=True, need_ledger=args.mode == "live")
+        problems = worker.preflight(sandbox=True, need_ledger=args.mode == "live", network_check=args.mode == "live")
         receipt["sandbox"] = worker.preflight_detail
         if problems:
             receipt["not_ready"] = problems

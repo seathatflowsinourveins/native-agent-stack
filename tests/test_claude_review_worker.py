@@ -1245,6 +1245,116 @@ class InvocationTest(unittest.TestCase):
                                                           "XDG_CONFIG_HOME": "/h/.c", "PATH": "/usr/bin:/bin",
                                                           "LANG": "C.UTF-8"})
 
+    def fake_boundary(self, base: Path, version="v24.21.0", integrity=None, search="/usr/bin:/bin"):
+        node = base / "node"
+        node.write_text(f"#!/bin/sh\necho {version}\n")
+        node.chmod(0o755)
+        prefix = base / "srt"
+        cli = prefix / "node_modules" / crw.SRT_PACKAGE / "dist" / "cli.js"
+        cli.parent.mkdir(parents=True)
+        cli.write_text("// srt\n")
+        lock = {"packages": {f"node_modules/{crw.SRT_PACKAGE}": {"version": crw.SRT_VERSION,
+                                                                 "integrity": integrity or crw.SRT_INTEGRITY}}}
+        (prefix / "package-lock.json").write_text(json.dumps(lock))
+        return crw.Boundary(node, prefix, base / "net", search=search)
+
+    def test_the_review_runs_inside_srt_which_allows_the_api_host_only(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            base = Path(temporary)
+            boundary = self.fake_boundary(base)
+            plan = crw.Plan(None, 1, "a" * 40, Path("/s/main"), Path("/s/input"), base / "config")
+            launcher = crw.SandboxLauncher(Path("/c/claude"), "/usr/bin/bwrap", boundary=boundary)
+            with boundary.run_dir(plan.config_dir) as net:
+                argv = launcher.command("anthropic-api-4", plan, net)
+                self.assertEqual(argv[2:6], ["-S", str(crw.CREDENTIAL_RUN), "anthropic-api-4", "--"])
+                self.assertEqual(argv[6:15], ["/usr/bin/env", f"HOME={net / 'home'}", f"TMPDIR={net / 't'}",
+                                              f"PATH={base}:/usr/bin:/bin", str(base / "node"), str(boundary.cli),
+                                              "--settings", str(net / "srt.json"), "--"])
+                self.assertEqual(argv[15], "/usr/bin/bwrap")
+                # srt's namespace is the network fence; the inner bwrap keeps it, since its own would cut the proxy off.
+                self.assertNotIn("--unshare-net", argv)
+                self.assertNotIn("ANTHROPIC_API_KEY", " ".join(argv))
+                written = json.loads((net / "srt.json").read_text())
+                self.assertEqual(written, {"network": {"allowedDomains": ["api.anthropic.com"], "deniedDomains": []},
+                                           "filesystem": {"denyRead": [], "allowWrite": [str(plan.config_dir)],
+                                                          "denyWrite": []}})
+                for forbidden in crw.SRT_FORBIDDEN:
+                    self.assertNotIn(forbidden, json.dumps(written))
+                self.assertEqual((net / "srt.json").stat().st_mode & 0o777, 0o600)
+                self.assertEqual(sorted(p.name for p in net.iterdir()), ["cwd", "home", "srt.json", "t"])
+            self.assertFalse(net.exists())  # removed after the run, with what srt left in TMPDIR
+
+    def test_the_boundary_refuses_without_its_pinned_parts(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            self.assertEqual(self.fake_boundary(Path(temporary) / "a").problems() if (Path(temporary) / "a").mkdir()
+                             is None else None, [])
+            cases = {"is not at least 22.12": dict(version="v20.11.1"),
+                     "from the pinned tarball": dict(integrity="sha512-other"),
+                     "socat is not installed": dict(search="/nonexistent")}
+            for needle, options in cases.items():
+                base = Path(temporary) / needle.split()[0]
+                base.mkdir()
+                with self.subTest(needle=needle):
+                    problems = self.fake_boundary(base, **options).problems()
+                    self.assertTrue(any(needle in problem for problem in problems), problems)
+            missing = crw.Boundary(Path(temporary) / "none", Path(temporary) / "none", Path("/tmp"))
+            self.assertEqual(len(missing.problems()), 2)  # no node, no srt
+            deep = crw.Boundary(Path(temporary) / "none", Path(temporary) / "none", Path("/" + "x" * 60))
+            self.assertTrue(any("too long" in problem for problem in deep.problems()))
+
+    MEASURED = ("interfaces lo \napi 0 404 200\nother 7 000 403\ndirect 6 000 000\nloopback_direct 7 000 000\n"
+                "loopback_proxy 0 403 000\n")
+
+    def test_the_boundary_check_passes_only_what_was_measured_closed(self):
+        self.assertTrue(crw.judge_boundary(self.MEASURED, 0)[0])
+        broken = {
+            "a host interface": ("interfaces lo ", "interfaces eth0 lo "),
+            "no proxy (the client would hang)": ("api 0 404 200", "api 7 000 000"),
+            "another host allowed": ("other 7 000 403", "other 0 200 200"),
+            "a direct route": ("direct 6 000 000", "direct 35 000 000"),
+            "host loopback direct": ("loopback_direct 7 000 000", "loopback_direct 0 200 000"),
+            "host loopback through the proxy": ("loopback_proxy 0 403 000", "loopback_proxy 0 200 000"),
+            "a probe missing": ("direct 6 000 000\n", ""),
+        }
+        for name, (old, new) in broken.items():
+            with self.subTest(name=name):
+                self.assertIn(old, self.MEASURED)
+                self.assertFalse(crw.judge_boundary(self.MEASURED.replace(old, new), 0)[0])
+        self.assertFalse(crw.judge_boundary(self.MEASURED, 1)[0])  # the host listener was reached
+
+    def test_no_tick_reads_a_key_without_the_boundary_and_its_check(self):
+        h = Harness(self)
+        repo, shas = h.repo("o/priv", heads={1: {"a.py": "a\n"}})
+        h.pulls("o/priv", [pull("o/priv", 1, shas[1])])
+        h.gh_fixtures.write_text(json.dumps(h.fixtures))
+        settings = crw.Settings(h.state, h.ledger_path, KEYS, h.claude, False, 60)
+        worker = crw.Worker([repo], settings, h.env(), clock=h.clock, log=h.logs.append, bwrap="/usr/bin/true")
+        self.assertIs(worker.launcher.boundary, worker.boundary)  # the worker's own launcher always has srt
+        original = (crw.sandbox_self_check, crw.boundary_self_check)
+        self.addCleanup(setattr, crw, "sandbox_self_check", original[0])
+        self.addCleanup(setattr, crw, "boundary_self_check", original[1])
+        crw.sandbox_self_check = lambda *a: (True, "Claude Code stand-in")
+        started = []
+        worker.launcher.run = lambda *a, **k: started.append(a)
+        worker.boundary = worker.launcher.boundary = self.fake_boundary(h.base)
+        crw.boundary_self_check = lambda *a: (False, "network boundary: other: rc 0, http 200, connect 200")
+        self.assertEqual(worker.tick(), 1)
+        self.assertTrue(any("network boundary: other" in line for line in h.logs))
+        worker.launcher.boundary = None
+        self.assertIn("the launcher has no network boundary (srt); the review never runs without it",
+                      worker.preflight())
+        worker.launcher.boundary = self.fake_boundary(h.base / "b", version="v18.0.0") if (h.base / "b").mkdir() \
+            is None else None
+        self.assertTrue(any("is not at least" in p for p in worker.preflight()))
+        checked = []
+        crw.boundary_self_check = lambda *a: checked.append(a) or (True, "ok")
+        worker.launcher.boundary = self.fake_boundary(h.base / "c") if (h.base / "c").mkdir() is None else None
+        self.assertEqual(worker.preflight(network_check=False), [])  # probes.py offline: static checks only
+        self.assertEqual(checked, [])
+        self.assertEqual(worker.preflight(), [])
+        self.assertEqual(len(checked), 1)
+        self.assertEqual((started, h.rows()), ([], []))  # no run started and nothing debited
+
     def test_settings_read_the_environment(self):
         settings = crw.settings_from({"HOME": "/h", "API_ACTIONS_LEDGER": "~/l.jsonl"})
         self.assertEqual(settings.keys, KEYS)
@@ -1676,6 +1786,50 @@ class RealSandboxChainTest(unittest.TestCase):
         self.assertEqual(facts["switch"], "1")  # the instruction fence reaches the client's environment
         self.assertEqual(run["stop"], "bounds_failed")
         self.assertIn("the stream carries a masked credential", run["unmet"])
+
+
+SRT_PREFIX, SRT_NODE = os.environ.get("CRW_TEST_SRT", ""), os.environ.get("CRW_TEST_NODE", "")
+
+
+@unittest.skipIf(sandbox_usable() is not None or not (SRT_PREFIX and SRT_NODE),
+                 "real srt chain: set CRW_TEST_SRT (the npm prefix) and CRW_TEST_NODE, on a host where bwrap works")
+class RealBoundaryChainTest(unittest.TestCase):
+    def test_the_key_reaches_the_client_inside_srt_whose_namespace_has_only_lo_and_the_proxy(self):
+        h = Harness(self)
+        config = h.base / "xdg"
+        store = config / "native-agent-stack"
+        store.mkdir(parents=True)
+        store.chmod(0o700)
+        planted = "sk-ant-test-" + os.urandom(12).hex()
+        (store / "anthropic-api-3.env").write_text(f"export ANTHROPIC_API_KEY={planted}\n")
+        (store / "anthropic-api-3.env").chmod(0o600)
+        stand_in = h.base / "stand-in-claude"
+        stand_in.write_text(STAND_IN.replace("REAL_HOME", str(Path.home())).replace(
+            '"switch": os.environ.get("CLAUDE_CODE_DISABLE_CLAUDE_MDS")}',
+            '"switch": os.environ.get("CLAUDE_CODE_DISABLE_CLAUDE_MDS"), "proxy": bool(os.environ.get("HTTPS_PROXY")),'
+            ' "interfaces": sorted(l.split(":")[0].strip() for l in open("/proc/net/dev").read().splitlines()[2:])}'))
+        stand_in.chmod(0o755)
+        repo, shas = h.repo("o/priv", heads={1: {"a.py": "a = 1\n"}})
+        h.pulls("o/priv", [pull("o/priv", 1, shas[1])])
+        h.gh_fixtures.write_text(json.dumps(h.fixtures))
+        env = {**h.env(), "XDG_CONFIG_HOME": str(config)}
+        settings = crw.Settings(h.state, h.ledger_path, ("anthropic-api-3",), stand_in, False, 120)
+        boundary = crw.Boundary(Path(SRT_NODE), Path(SRT_PREFIX), crw.net_base(dict(os.environ)))
+        self.assertEqual(boundary.problems(), [])
+        launcher = crw.SandboxLauncher(stand_in, shutil.which("bwrap"), boundary=boundary)
+        worker = crw.Worker([repo], settings, env, launcher=launcher, clock=Clock(), log=h.logs.append)
+        candidate = worker.list_heads()[0]
+        plan = worker.prepare(candidate)
+        report_dir = h.state / "chain"
+        worker.run_keys(candidate, plan, "Review it.", report_dir, "crw-test", {})
+        raw = (report_dir / "stream-1.jsonl").read_text()
+        self.assertNotIn(planted, raw)
+        self.assertIn("[REDACTED:ANTHROPIC_API_KEY]", raw)
+        facts = crw.read_stream(report_dir / "stream-1.jsonl")[0][0]["facts"]
+        self.assertEqual((facts["key_present"], facts["argv_has_key"], facts["home"], facts["cwd"]),
+                         (True, False, "/review/home", "/review/main"))
+        self.assertEqual((facts["interfaces"], facts["proxy"]), (["lo"], True))  # srt's namespace and its proxy
+        self.assertFalse(facts["real_home_exists"])
 
 
 if __name__ == "__main__":

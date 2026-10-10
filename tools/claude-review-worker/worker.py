@@ -44,10 +44,12 @@ import pwd
 import re
 import shutil
 import signal
+import socket
 import subprocess
 import sys
 import tarfile
 import tempfile
+import threading
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -85,6 +87,23 @@ UPSTREAM_CITATIONS = 50            # citations considered per review, at most
 UPSTREAM_LABEL_CHARS = 200         # one citation label, at most, in the data file the reviewer reads
 # The head exported into pr-head/, at most: native-agent-stack's own tree was 12,054 files and 236.8 MB on 2026-10-09,
 # so these leave twice its size before a head is refused as too large to review whole.
+# The network boundary (#953 P2-3; the command center's ruling of 2026-10-10): Anthropic's sandbox runtime, srt, wraps
+# the bwrap fence. srt's own bwrap unshares the network, and its host proxy, reached through a bound unix socket,
+# passes only SRT_ALLOWED (anthropics/sandbox-runtime@d9aac2098351ca17f3743fbaf6ecbd0051b7e00e, tag v0.0.79:
+# src/sandbox/linux-sandbox-utils.ts:1343-1363 and :3378, src/sandbox/sandbox-manager.ts:355-415). It is installed
+# from its npm tarball (sha256 5a730e4367c264ccc4b592af01dab038a6c39db7c184efbd132841688fa854f1) with
+# `npm install --prefix <CLAUDE_REVIEW_SRT> --ignore-scripts`; npm's lock records the integrity below.
+SRT_PACKAGE = "@anthropic-ai/sandbox-runtime"
+SRT_VERSION = "0.0.79"
+SRT_INTEGRITY = ("sha512-WjBmS9fbTpnQwQkM9SU+JjhM2CcXo9eWEELktY1100RMvTy/jPhP44yZ3NXhh+GHB350OgPbM3+FubE5WVRtSA==")
+SRT_ALLOWED = ("api.anthropic.com",)  # with nonessential traffic off, the client's only host (measured on 2.1.296)
+SRT_FORBIDDEN = ("tlsTerminate", "mitmProxy", "parentProxy", "allowLocalBinding", "credentials",
+                 "enableWeakerNestedSandbox")
+NODE_MIN = (22, 12)  # srt's engines.node
+DEFAULT_SRT = "~/.local/share/claude-review-worker/srt"
+DEFAULT_NODE = "~/.local/share/mise/installs/node/24.21.0/bin/node"  # the host's mise install (command center)
+NET_DIR_CHARS = 70  # srt puts claude-http-<16 hex>.sock in its TMPDIR; a unix socket path has at most 107 bytes
+BOUNDARY_SECONDS = 90
 HEAD_LIMIT_BYTES = 600_000_000
 HEAD_LIMIT_FILES = 40_000
 ALLOWED_TOOLS = ("Read", "Glob", "Grep")
@@ -260,6 +279,8 @@ class Settings:
     post: bool
     timeout: int
     upstream: Path = Path("/nonexistent")  # the local upstream mirrors, ~/code/upstream/<owner>/<repo>
+    srt: Path = Path("/nonexistent")  # the npm prefix srt is installed under
+    node: Path = Path("/nonexistent")
 
 
 def settings_from(env: dict) -> Settings:
@@ -280,6 +301,8 @@ def settings_from(env: dict) -> Settings:
         post=env.get("CLAUDE_REVIEW_POST", "0") == "1",
         timeout=int(timeout),
         upstream=expand(env.get("CLAUDE_REVIEW_UPSTREAM", DEFAULT_UPSTREAM)),
+        srt=expand(env.get("CLAUDE_REVIEW_SRT", DEFAULT_SRT)),
+        node=expand(env.get("CLAUDE_REVIEW_NODE", DEFAULT_NODE)),
     )
 
 
@@ -657,23 +680,95 @@ def run_process(argv: list, env: dict, prompt: str, stream_path: Path, stderr_pa
     return Launch(process.returncode, timed_out, round(time.monotonic() - started, 1))
 
 
+class Boundary:
+    """srt around the bwrap fence: one private directory per run (srt's settings, TMPDIR, HOME and an empty working
+    directory), removed after it. Nothing here reads a key."""
+
+    def __init__(self, node: Path, srt: Path, base: Path, search: str = "/usr/bin:/bin"):
+        self.node, self.srt, self.base, self.search = Path(node), Path(srt), Path(base), search
+        self.cli = self.srt / "node_modules" / SRT_PACKAGE / "dist" / "cli.js"
+
+    @staticmethod
+    def settings(config_dir) -> dict:
+        """The whole srt settings file: the API host only, and writes to the run's CLAUDE_CONFIG_DIR only."""
+        return {"network": {"allowedDomains": list(SRT_ALLOWED), "deniedDomains": []},
+                "filesystem": {"denyRead": [], "allowWrite": [str(config_dir)], "denyWrite": []}}
+
+    def problems(self) -> list:
+        """What stops a run before any key is read: the node, the pinned srt install, socat, the socket path room."""
+        found = []
+        version = ""
+        if not (self.node.is_file() and os.access(self.node, os.X_OK)):
+            found.append(f"node is not an executable file at CLAUDE_REVIEW_NODE ({self.node.name})")
+        else:
+            try:
+                version = subprocess.run([str(self.node), "--version"], capture_output=True, text=True, timeout=20,
+                                         env={"PATH": self.search}, check=False).stdout.strip()
+            except (OSError, subprocess.TimeoutExpired) as error:
+                version = type(error).__name__
+            match = re.fullmatch(r"v([0-9]+)\.([0-9]+)\.[0-9]+", version)
+            if not match or (int(match.group(1)), int(match.group(2))) < NODE_MIN:
+                found.append(f"node {version or '?'} is not at least {NODE_MIN[0]}.{NODE_MIN[1]}")
+        lock = read_json(self.srt / "package-lock.json", None)
+        entry = ((lock or {}).get("packages") or {}).get(f"node_modules/{SRT_PACKAGE}") if isinstance(lock, dict) else None
+        if not isinstance(entry, dict) or entry.get("version") != SRT_VERSION or entry.get("integrity") != SRT_INTEGRITY:
+            found.append(f"srt {SRT_VERSION} from the pinned tarball is not installed at CLAUDE_REVIEW_SRT")
+        elif not self.cli.is_file():
+            found.append("srt's dist/cli.js is missing")
+        if not shutil.which("socat", path=self.search):
+            found.append("socat is not installed; srt bridges its proxy into the sandbox with it")
+        if len(str(self.base)) + len("/crw-XXXXXXXX/t") > NET_DIR_CHARS:
+            found.append(f"the run directory base is too long for srt's socket paths ({len(str(self.base))} chars)")
+        return found
+
+    @contextlib.contextmanager
+    def run_dir(self, config_dir):
+        ensure_dir(self.base)
+        net = Path(tempfile.mkdtemp(prefix="crw-", dir=self.base))
+        try:
+            for name in ("home", "t", "cwd"):
+                (net / name).mkdir(mode=0o700)
+            write_private(net / "srt.json", json.dumps(self.settings(config_dir), sort_keys=True))
+            yield net
+        finally:
+            shutil.rmtree(net, ignore_errors=True)  # srt 0.0.79 leaves its socket files in TMPDIR
+
+    def prefix(self, net: Path) -> list:
+        """env (HOME, TMPDIR and PATH for srt only; the key and the rest pass through) -> node srt --settings -- ..."""
+        return ["/usr/bin/env", f"HOME={net / 'home'}", f"TMPDIR={net / 't'}", f"PATH={self.node.parent}:{self.search}",
+                str(self.node), str(self.cli), "--settings", str(net / "srt.json"), "--"]
+
+
+def net_base(env: dict) -> Path:
+    """A short private base for the run directories: srt's socket paths must fit in a unix socket address."""
+    runtime = env.get("XDG_RUNTIME_DIR", "")
+    return Path(runtime) / "claude-review-worker" if runtime.startswith("/") and Path(runtime).is_dir() \
+        else Path("/tmp") / f"claude-review-worker-{os.getuid()}"
+
+
 class SandboxLauncher:
-    """credential_run.py (outside, reads the key store) -> bwrap -> claude. The key travels in the environment only."""
+    """credential_run.py (outside, reads the key store) -> srt (the network boundary) -> bwrap -> claude. The key
+    travels in the environment only."""
 
     main_view = SANDBOX_MAIN
     input_view = SANDBOX_INPUT
 
     def __init__(self, claude_bin: Path, bwrap: str, credential_run: Path = CREDENTIAL_RUN,
                  python: str = sys.executable, extra_ro_binds=(), extra_env=(), extra_unset=(), flags=None,
-                 config_files=None):
+                 config_files=None, boundary: Boundary | None = None):
         """The keyword options after python serve probes.py only (a bound file, a planted variable, a control arm's
-        flags, a planted user memory file); the worker uses none of them."""
+        flags, a planted user memory file); the worker uses none of them. boundary is srt: the worker always sets it,
+        and its preflight refuses to run without it."""
         self.claude_bin, self.bwrap, self.credential_run, self.python = claude_bin, bwrap, credential_run, python
         self.extra_ro_binds, self.extra_env = tuple(extra_ro_binds), tuple(extra_env)
         self.extra_unset, self.flags, self.config_files = tuple(extra_unset), flags, dict(config_files or {})
+        self.boundary = boundary
 
-    def command(self, key: str, plan) -> list:
-        return [self.python, "-I", "-S", str(self.credential_run), key, "--",
+    def command(self, key: str, plan, net: Path | None = None) -> list:
+        # The inner bwrap keeps srt's network namespace (no --unshare-net of its own): that namespace has only lo and
+        # srt's bridge to its filtering proxy, and a second one would cut the proxy off.
+        outer = self.boundary.prefix(net) if self.boundary is not None and net is not None else []
+        return [self.python, "-I", "-S", str(self.credential_run), key, "--", *outer,
                 *sandbox_argv(self.bwrap, plan.main_dir, plan.input_dir, plan.config_dir, self.claude_bin,
                               extra_ro_binds=self.extra_ro_binds, extra_env=self.extra_env,
                               extra_unset=self.extra_unset),
@@ -683,8 +778,109 @@ class SandboxLauncher:
             env: dict) -> Launch:
         for name, text in self.config_files.items():
             write_private(Path(plan.config_dir) / name, text)
-        return run_process(self.command(key, plan), runner_environment(env), prompt, stream_path, stderr_path,
-                           timeout)
+        if self.boundary is None:
+            return run_process(self.command(key, plan), runner_environment(env), prompt, stream_path, stderr_path,
+                               timeout)
+        with self.boundary.run_dir(plan.config_dir) as net:
+            return run_process(self.command(key, plan, net), runner_environment(env), prompt, stream_path,
+                               stderr_path, timeout, cwd=net / "cwd")
+
+
+# Run inside srt and the bwrap fence by boundary_self_check, with no key: the interfaces, then five requests. $1 is a
+# host loopback port the check listens on; nothing may reach it.
+BOUNDARY_PROBE = r"""
+port=$1
+echo "interfaces $(tail -n +3 /proc/net/dev | cut -d: -f1 | tr -d ' ' | sort | tr '\n' ' ')"
+try() { name=$1; shift; out=$(curl -sS -o /dev/null --connect-timeout 5 --max-time 20 -w '%{http_code} %{http_connect}' "$@" 2>/dev/null); echo "$name $? $out"; }
+try api https://api.anthropic.com/
+try other https://example.com/
+try direct --noproxy '*' https://api.anthropic.com/
+try loopback_direct --noproxy '*' "http://127.0.0.1:$port/"
+try loopback_proxy --noproxy '' "http://127.0.0.1:$port/"
+"""
+
+
+NO_ROUTE = (6, 7, 28)  # curl's exit codes for: could not resolve, could not connect, timed out
+
+
+def judge_boundary(output: str, reached: int) -> tuple:
+    """(ok, detail) from BOUNDARY_PROBE's lines and the number of connections the host listener took."""
+    seen = {}
+    for line in output.splitlines():
+        parts = line.split()
+        if parts and parts[0] == "interfaces":
+            seen["interfaces"] = parts[1:]
+        elif len(parts) == 4 and parts[1].isdigit():
+            seen[parts[0]] = (int(parts[1]), parts[2], parts[3])
+    unmet = []
+    if seen.get("interfaces") != ["lo"]:
+        unmet.append(f"interfaces {seen.get('interfaces')}, not lo alone")
+    expect = {
+        "api": lambda rc, code, connect: rc == 0 and code != "000",  # the proxy is live and passes the API
+        "other": lambda rc, code, connect: rc != 0 and connect == "403",  # refused by the allowlist
+        # No route around the proxy: the name does not resolve (6), nothing connects (7) or the connect times out (28);
+        # any other failure (a TLS error, 35) means a connection was made.
+        "direct": lambda rc, code, connect: rc in NO_ROUTE and code == "000",
+        "loopback_direct": lambda rc, code, connect: rc in NO_ROUTE and code == "000",
+        "loopback_proxy": lambda rc, code, connect: code != "200",
+    }
+    for name, good in expect.items():
+        if name not in seen:
+            unmet.append(f"{name}: no answer")
+        elif not good(*seen[name]):
+            unmet.append(f"{name}: rc {seen[name][0]}, http {seen[name][1]}, connect {seen[name][2]}")
+    if reached:
+        unmet.append(f"the host loopback listener took {reached} connection(s)")
+    detail = "; ".join(f"{k} {' '.join(map(str, v)) if isinstance(v, (list, tuple)) else v}" for k, v in seen.items())
+    return (not unmet), ("network boundary: " + ("; ".join(unmet) if unmet else "lo only, API through srt, the rest refused")
+                         + f" [{detail}]")
+
+
+def boundary_self_check(bwrap: str, claude_bin: Path, boundary: Boundary, scratch: Path) -> tuple:
+    """Run BOUNDARY_PROBE through the same srt -> bwrap chain as a review, with no key. (ok, detail)"""
+    ensure_dir(scratch)
+    listener = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    listener.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    listener.bind(("127.0.0.1", 0))
+    listener.listen(8)
+    listener.settimeout(0.5)
+    reached, done = [0], threading.Event()
+
+    def accept() -> None:
+        while not done.is_set():
+            try:
+                connection, _ = listener.accept()
+            except (socket.timeout, OSError):
+                continue
+            reached[0] += 1
+            connection.close()
+
+    watcher = threading.Thread(target=accept, daemon=True)
+    watcher.start()
+    try:
+        with tempfile.TemporaryDirectory(dir=scratch, prefix="boundary-") as temporary:
+            base = Path(temporary)
+            for name in ("main", "input", "config"):
+                ensure_dir(base / name)
+            with boundary.run_dir(base / "config") as net:
+                argv = [*boundary.prefix(net), *sandbox_argv(bwrap, base / "main", base / "input", base / "config",
+                                                             claude_bin),
+                        "/bin/sh", "-c", BOUNDARY_PROBE, "sh", str(listener.getsockname()[1])]
+                try:
+                    finished = subprocess.run(argv, env={"PATH": "/usr/bin:/bin", "LANG": "C.UTF-8"},
+                                              capture_output=True, text=True, timeout=BOUNDARY_SECONDS,
+                                              cwd=net / "cwd", check=False)
+                except (OSError, subprocess.TimeoutExpired) as error:
+                    return False, f"network boundary check did not finish: {type(error).__name__}"
+        ok, detail = judge_boundary(finished.stdout, reached[0])
+        if finished.returncode != 0:
+            last = (finished.stderr.strip().splitlines() or [""])[-1][:160]
+            return False, f"network boundary check exit {finished.returncode}: {last}"
+        return ok, detail
+    finally:
+        done.set()
+        watcher.join(timeout=2)
+        listener.close()
 
 
 def sandbox_self_check(bwrap: str, claude_bin: Path, scratch: Path) -> tuple:
@@ -1320,7 +1516,8 @@ class Worker:
         self.git_env = git_environment(self.env)
         search = os.pathsep.join(p for p in (self.env.get("PATH", ""), "/usr/bin", "/bin") if p)
         self.bwrap = bwrap if bwrap is not None else (shutil.which("bwrap", path=search) or "")
-        self.launcher = launcher or SandboxLauncher(settings.claude_bin, self.bwrap)
+        self.boundary = Boundary(settings.node, settings.srt, net_base(self.env))
+        self.launcher = launcher or SandboxLauncher(settings.claude_bin, self.bwrap, boundary=self.boundary)
         self.ledger = Ledger(settings.ledger) if settings.ledger else None
         self.attempts = Attempts(self.state)
         self.visibility: dict = {}
@@ -1344,7 +1541,9 @@ class Worker:
         finally:
             os.close(descriptor)
 
-    def preflight(self, sandbox: bool = True, need_ledger: bool = True) -> list:
+    def preflight(self, sandbox: bool = True, need_ledger: bool = True, network_check: bool = True) -> list:
+        """What stops the tick before any key is read. network_check runs the keyless boundary check, which sends
+        requests through srt's proxy; probes.py offline sends nothing and skips it."""
         problems = []
         if need_ledger and self.ledger is None:
             problems.append("API_ACTIONS_LEDGER is not set; nothing is spent without a ledger")
@@ -1360,6 +1559,17 @@ class Worker:
                 self.preflight_detail = detail
                 if not ok:
                     problems.append(detail)
+            boundary = self.launcher.boundary
+            if boundary is None:
+                problems.append("the launcher has no network boundary (srt); the review never runs without it")
+            else:
+                problems += boundary.problems()
+                if sandbox and network_check and not problems:
+                    ok, detail = boundary_self_check(self.bwrap, self.settings.claude_bin, boundary,
+                                                     self.state / "tmp")
+                    self.preflight_detail = f"{self.preflight_detail}; {detail}"
+                    if not ok:
+                        problems.append(detail)
         return problems
 
     def tick(self) -> int:
