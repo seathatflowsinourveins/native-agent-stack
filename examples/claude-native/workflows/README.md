@@ -40,7 +40,13 @@ the Codex side.
 
 ## Adopt
 
-1. Copy `agents/` into the destination project's `.claude/agents/` and the
+On a host with this repository's Claude profile, `tools/adoption/install_claude_profile.py --only workflows`
+installs the three reviewed scripts into `~/.claude/workflows/` (checksum-checked and create-only; the inverse is
+`--only workflows --remove-workflows`), and the default `agents` step installs the agents; a fresh session then lists
+`/review-changes`, `/readiness-audit` and `/layer-verdict-lane` (verified 2026-10-09 on Claude Code 2.1.295). For
+another project:
+
+1. Copy [`../agents/`](../agents/) into the destination project's `.claude/agents/` and the
    `.js`/`.mjs` files here into `.claude/workflows/`. Preserve existing
    same-name files until their differences are reviewed.
 2. Copy `contract.config.json` beside the workflows and point its paths at the

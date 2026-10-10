@@ -382,7 +382,7 @@
   "ultracode": true,
   "enableWorkflows": true,
   "showThinkingSummaries": true,
-  "cleanupPeriodDays": 3650,
+  "cleanupPeriodDays": 180,
   "autoContinueAtUsageLimit": true,
   "switchModelsOnFlag": false,
   "syncClaudeAiSkills": false,

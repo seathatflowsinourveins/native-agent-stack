@@ -9,7 +9,8 @@ Start by reading [`reference/slots.md`](reference/slots.md) in this skill's dire
 touches and is newer than repository notes or memory. It is the index, one row per role slot with its status, default
 and `overturn_when`, and each row links to a layer page (for example `reference/native-clients.md`) holding the slot's
 route, alternatives, rejections, evidence and notes. [`reference/slots.json`](reference/slots.json) is the same content
-for scripts.
+for scripts. Codex lanes follow the same practice through their own native mechanisms:
+[`reference/cross-client.md`](reference/cross-client.md).
 
 1. **Find the slot.** Match the task to one row of `reference/slots.md`, then read that slot's section on its layer page.
 2. **Check currency.** Compare `claude --version` with the page's `client_version`. When the installed client is

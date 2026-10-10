@@ -6,6 +6,8 @@ Selection rule: One default per role slot; overlaps become ranked alternatives o
 
 Open the layer page a row links to for the slot's route, alternatives, rejections, evidence and notes. Claim ids such as `hooks-O9` resolve, with their locators, in the record's claims file ([claims.json](https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/evidence/artifacts/claude-native-practice-20261009/claims.json)).
 
+Codex lanes follow the same practice through their own native mechanisms: [cross-client.md](cross-client.md).
+
 | Slot | Status | Default | Overturn when |
 | --- | --- | --- | --- |
 | [client-core](native-clients.md#client-core) | default | Native installer build on the latest auto-update channel (`autoUpdatesChannel` unset or `latest`) | An observed auto-update regression breaks a qualified workflow (then `stable` plus `minimumVersion`), or Anthropic changes the default channel. |

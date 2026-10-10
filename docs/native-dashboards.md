@@ -288,7 +288,15 @@ processes share this loopback address.
 - Telemetry and the update check are off, but the pricing refresh still fetches
   from raw.githubusercontent.com and openrouter.ai at start and every 24 hours
   ([pricing schedule](https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/cmd/agentsview/pricing_schedule.go)).
-- On the workstation, the unit serves the default directory `~/.agentsview`. The
+- On the workstation the unit serves the directory its launcher sets,
+  `${XDG_DATA_HOME:-~/.local/share}/new-wsl-native-stack/agentsview`: `AGENTSVIEW_DATA_DIR` in the host file
+  `${ECO_ROOT:-~/.local/share/codex-ecosystem}/tools/agentsview-0.44.0/launcher`, which `~/.local/bin/agentsview`
+  links to and the unit's `ExecStart` runs; the variable overrides the default directory
+  ([source](https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/internal/config/config.go#L2051-L2053),
+  v0.44.0). The pre-move archive in the default `~/.agentsview` was deleted on 2026-10-09 after a coverage check
+  found every one of its 2,501 sessions in the live archive
+  (`evidence/artifacts/claude-native-practice-20261009/probes-20261009.json`).
+- On the workstation, the unit served the default directory `~/.agentsview`. The
   2026-09-25 host receipt filled it by default discovery, with no allowlist, and
   live mode keeps importing from every default and configured home. So the token
   protects it, not scoping.
