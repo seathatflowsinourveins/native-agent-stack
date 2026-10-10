@@ -5376,7 +5376,7 @@
     },
     {
       "path": "adoption/hooks/claude/SHA256SUMS",
-      "sha256": "9db7433fa8c7d1c37a55b027e8eb3b66ed400ad375403abfa9808aa86fb82c66",
+      "sha256": "3db9bdb63032c32d5a96b8a32f91ecbe92fa6a9c5dc0f54ed9fb03f7aa771076",
       "bytes": 1229
     },
     {
@@ -18472,8 +18472,8 @@
     },
     {
       "path": "docs/decisions/2026-10-08-guard-hook-fails-closed.md",
-      "sha256": "9a1097a58c45a2e84d177e839a9ef0e4c7a40f4d68a913ba3527aba24438dac3",
-      "bytes": 20420
+      "sha256": "7d6db09d9058a0a2d9923428ca2e4683149e382ba58eb3c74bd6003ddd350cc0",
+      "bytes": 20528
     },
     {
       "path": "docs/decisions/2026-10-08-harness-rules-consolidation.md",
@@ -59507,8 +59507,8 @@
     },
     {
       "path": "scripts/hooks/secret_path_guard.py",
-      "sha256": "fd516d8b78de7e3a9da4917c8d126fc71d7ab216a014bb28fb8bd189d6b0fb7b",
-      "bytes": 296975
+      "sha256": "a0efaffdfbf104778a86c75cb099438ae5b6b0b89396c8cb35461cc5f7bdef31",
+      "bytes": 307312
     },
     {
       "path": "scripts/host_name_scan.py",
@@ -60867,8 +60867,8 @@
     },
     {
       "path": "tests/test_secret_path_guard.py",
-      "sha256": "36edfe372be11f424e36576c1533111514662958063f429aec7a7284cc81b958",
-      "bytes": 391697
+      "sha256": "60fb6c6a444cb58dfbf215fd7ec72592a62784b7af6cf299c09d150a49df5fa6",
+      "bytes": 405623
     },
     {
       "path": "tests/test_security_identity.py",

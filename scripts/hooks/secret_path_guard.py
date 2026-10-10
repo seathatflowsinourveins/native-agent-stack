@@ -100,6 +100,17 @@ that imports a loader, a name assembled at run time, or a renamed or
 obfuscated path passes; see docs/secret-storage.md "Threat model" for the
 residual risk.
 
+S6 (2026-10-10) adds three narrow diagnostic corrections in both word readings:
+jq's recognized FILTER argument is code, while every input and file-taking
+option retains the dotenv check; a single TMPDIR printenv operand is a
+targeted non-secret read; and exact
+no-command `env -i`/`env --ignore-environment` output contains no inherited
+variables. The prior env walk keeps that clearing flag instead of inventing
+a bare env dump. A diagnostic reached through xargs retains a conservative
+refusal because xargs can append additional operands. No here-document body
+is exempted, and real dotenv, store,
+secret-name, environment-dump and executable-substitution denials remain.
+
 The same file is installed for every session on a host as
 ~/.claude/hooks/secret_path_guard.py by tools/adoption/install_claude_profile.py
 (sha256-pinned in adoption/hooks/claude/SHA256SUMS).
@@ -1076,13 +1087,13 @@ def skip_wrapper_options(words: list[str], index: int, wrapper: str, moved: list
     return wrapper_options(words, index, wrapper, moved)[1]
 
 
-def strip_prefix(words: list[str]) -> list[str]:
+def strip_prefix(words: list[str], appended: set[str] | None = None) -> list[str]:
     """The command itself: without assignments, output redirections before it (`> out cmd`), and
     launchers with their options (timeout also with its duration). A leading input redirection stays,
     for segment_reason's check of what is redirected in."""
-    words = words[prefix_end(words):]
+    words = words[prefix_end(words, appended=appended):]
     while (dispatched := coreutils_command(words)) is not None:
-        words = dispatched[prefix_end(dispatched):]
+        words = dispatched[prefix_end(dispatched, appended=appended):]
     return words
 
 
@@ -1111,15 +1122,17 @@ def coreutils_command(words: list[str]) -> list[str] | None:
     return [utility, *arguments[start:], *moved]
 
 
-def prefix_end(words: list[str], index: int = 0, moved: list[str] | None = None, ends: dict[int, int] | None = None) -> int:
+def prefix_end(words: list[str], index: int = 0, moved: list[str] | None = None, ends: dict[int, int] | None = None,
+               appended: set[str] | None = None) -> int:
     """Index of the command in words[index:], past what strip_prefix drops. It returns an index and copies
     nothing, so a chain of launchers is walked once, not once per hop. Input redirections that a launcher's options
     stand around go to `moved` (skip_redirections). `ends` (given without `moved`) keeps the answer for every position the walk
     steps on, since a walk from a position ends where the walk from its next step ends: a caller that walks from many positions of
-    one list (the actions of a `find`) then walks each position once."""
+    one list (the actions of a `find`) then walks each position once. `appended` records an xargs walk; when given, the
+    walk cannot reuse `ends`, whose cached index alone does not preserve operand provenance."""
     steps: list[int] = []
     while index < len(words):
-        if ends is not None:
+        if ends is not None and appended is None:
             if index in ends:
                 index = ends[index]
                 break
@@ -1131,6 +1144,8 @@ def prefix_end(words: list[str], index: int = 0, moved: list[str] | None = None,
         elif width and REDIRECT_OUT.match(words[index + width - 2]):
             index += width
         elif (name := word.rsplit("/", 1)[-1]) in WRAPPERS or name == "timeout":
+            if name == "xargs" and appended is not None:
+                appended.add(name)
             index = skip_wrapper_options(words, index + 1, name, moved)
             if name == "timeout":
                 # The mandatory duration, then the command. GNU timeout (getopt_long "+fk:ps:v", src/timeout.c at v9.7 and v9.12) runs the
@@ -1554,7 +1569,22 @@ def rtk_command_start(words: list[str], at: int, moved: list[str] | None = None)
     return index
 
 
-def launcher_chain(words: list[str]) -> tuple[list[list[str]], int, list[str]]:
+def xargs_diagnostic_sentinel(words: list[str]) -> list[str] | None:
+    """Preserve refusal when xargs may append operands to an otherwise allowed diagnostic.
+
+    GNU findutils 4.10.0 xargs.1 DESCRIPTION: initial arguments are followed by
+    items read from stdin. Neither batching nor replacement options establish
+    that the explicit argv is complete. Ordinary argv sentinels also survive
+    historical deduplication and reserialization without word metadata.
+    """
+    program = program_of(words)
+    if program == "printenv" and not printenv_is_environment_dump(words) \
+            or program == "env" and is_empty_environment(words):
+        return [program]
+    return None
+
+
+def launcher_chain(words: list[str], appended: set[str] | None = None) -> tuple[list[list[str]], int, list[str]]:
     """The env, rtk and systemd-run launchers that start words, the index of the command they start, and the input
     redirections that stood among the launchers' options (a redirection is no option and no value, so the walk steps over it;
     the caller reads it with the command that gets it). A systemd-run comes back as its own words (the rule on its options
@@ -1581,18 +1611,20 @@ def launcher_chain(words: list[str]) -> tuple[list[list[str]], int, list[str]]:
                 break
         else:
             break
-        at = prefix_end(words, start, moved)
+        at = prefix_end(words, start, moved, appended=appended)
     return entries, at, moved
 
 
-def expand(command: str, depth: int = 0) -> list[list[str]]:
+def expand(command: str, depth: int = 0, inherited: set[str] | None = None) -> list[list[str]]:
     """Command segments of the command, and of the command substitutions that the shell runs inside its double
     quotes (scan_shell: `echo "$(printenv)"` runs printenv), at any nesting up to MAX_SUBSTITUTION_NESTING and while
     the bodies read stay within SUBSTITUTION_BUDGET_FACTOR times the command's length (plus SUBSTITUTION_BUDGET_FLOOR):
     every level is read again from the start, so quotes nested n deep would otherwise cost n times the command. A segment
     that comes up more than once is returned once (identical segments get identical verdicts, and each copy would be
-    analysed again)."""
+    analysed again). An inherited xargs state follows shell/eval text and its command substitutions: GNU findutils
+    4.10.0 xargs.1 -I substitutes occurrences in the initial arguments, including a shell's program string."""
     result: list[list[str]] = []
+    inherited = inherited.copy() if inherited else set()
     level = [command]
     budget = SUBSTITUTION_BUDGET_FACTOR * len(command) + SUBSTITUTION_BUDGET_FLOOR
     spent = 0
@@ -1600,7 +1632,7 @@ def expand(command: str, depth: int = 0) -> list[list[str]]:
         following: list[str] = []
         for text in level:
             bodies, comments, protected, ansi_c = scan_shell(text)
-            result.extend(command_segments(text, depth, comments, protected, ansi_c))
+            result.extend(command_segments(text, depth, comments, protected, ansi_c, inherited))
             following.extend(bodies)
         spent += sum(map(len, following))
         if not following or spent > budget:
@@ -1652,7 +1684,8 @@ def note_identity_collision(kept: list[str], dropped: list[str]) -> None:
 
 
 def command_segments(command: str, depth: int = 0, comments: list[tuple[int, int]] | tuple = (),
-                     protected: list[int] | tuple = (), ansi_c: list[tuple[int, int]] | tuple = ()) -> list[list[str]]:
+                     protected: list[int] | tuple = (), ansi_c: list[tuple[int, int]] | tuple = (),
+                     inherited: set[str] | None = None) -> list[list[str]]:
     """Command segments, including those of `sh -c '...'`, `eval ...`, `env ... command`, of the
     command that a keyring exec starts, of the command an `rtk` invocation runs and of the command a
     `systemd-run` starts (each launcher's own segment stays in the result, for the rules on its options). Read twice
@@ -1684,9 +1717,11 @@ def command_segments(command: str, depth: int = 0, comments: list[tuple[int, int
                 seen.setdefault(key, raw)
             emit(raw)  # as written, before any launcher walk: a redirection is checked wherever the walk would put it
             skipped: list[str] = []
-            words = raw[prefix_end(raw, 0, skipped):]
+            # Descendants of an xargs-controlled string inherit its provenance; independent raw commands only get their own copy.
+            appended = inherited.copy() if inherited else set()
+            words = raw[prefix_end(raw, 0, skipped, appended=appended):]
             while words:
-                entries, start, moved = launcher_chain(words)
+                entries, start, moved = launcher_chain(words, appended)
                 for entry in entries:
                     emit(entry)
                 if start:
@@ -1699,6 +1734,8 @@ def command_segments(command: str, depth: int = 0, comments: list[tuple[int, int
                     skipped = []
                 if not words:
                     break
+                if appended and (sentinel := xargs_diagnostic_sentinel(words)) is not None:
+                    emit(sentinel)
                 emit(words)
                 for redirected in input_redirection_segments(words):  # `$(< FILE)` is `$(cat FILE)`; zsh's `< FILE` alone reads it too
                     emit(redirected)
@@ -1706,16 +1743,16 @@ def command_segments(command: str, depth: int = 0, comments: list[tuple[int, int
                 if program in MULTICALL_LAUNCHERS:
                     dispatched = coreutils_command(words)
                     if dispatched is not None:
-                        words = strip_prefix(dispatched)
+                        words = strip_prefix(dispatched, appended)
                         continue
                 if program == "env":
                     expanded = env_split_argv(words)
                     if expanded is not None:
-                        words = strip_prefix(expanded)
+                        words = strip_prefix(expanded, appended)
                         continue
                     break  # launcher_chain walked every ordinary env that starts a command: this one prints its environment
                 if program == "rtk":
-                    words = strip_prefix(rtk_command(words))  # `rtk run` and the file readers
+                    words = strip_prefix(rtk_command(words), appended)  # `rtk run` and the file readers
                     continue
                 # The K4 walk (RUN-START, contract-v2 section 4) reads a shell's `-c` string or an eval's text before any keyring or
                 # runner unwrap, so an argument shaped like a runner or keyring start cannot hide the real shell program
@@ -1725,9 +1762,9 @@ def command_segments(command: str, depth: int = 0, comments: list[tuple[int, int
                     if program in SHELLS:
                         inline = shell_parts(words)[1]
                         if inline is not None:
-                            result.extend(expand(inline, depth + 1))
+                            result.extend(expand(inline, depth + 1, appended))
                     elif program == "eval" and len(words) > 1:
-                        result.extend(expand(" ".join(words[1:]), depth + 1))
+                        result.extend(expand(" ".join(words[1:]), depth + 1, appended))
                 if not _baseline:
                     runner = k4_runner_start(words)
                     if runner is not None:
@@ -1736,19 +1773,19 @@ def command_segments(command: str, depth: int = 0, comments: list[tuple[int, int
                             and words[at + 1:at + 2] == ['exec']), len(words))
                         if runner[0] < keyring_at:
                             spend("reads", 1)
-                            words = strip_prefix(runner[2])
+                            words = strip_prefix(runner[2], appended)
                             continue
                 started = keyring_exec(words)
                 if started is not None:
-                    words = strip_prefix(started[1])
+                    words = strip_prefix(started[1], appended)
                     continue
                 if _baseline and depth < MAX_DEPTH:
                     if program in SHELLS:
                         inline = shell_parts(words)[1]
                         if inline is not None:
-                            result.extend(expand(inline, depth + 1))
+                            result.extend(expand(inline, depth + 1, appended))
                     elif program == "eval" and len(words) > 1:
-                        result.extend(expand(" ".join(words[1:]), depth + 1))
+                        result.extend(expand(" ".join(words[1:]), depth + 1, appended))
                 break
     return result
 
@@ -1918,6 +1955,142 @@ def is_env_file_word(word: str) -> bool:
     return bool(ENV_FILE_WORD.search(word)) and not word.endswith(".example")
 
 
+def jq_filter_reads_environment(program: str) -> bool:
+    """jq 1.8.1 src/lexer.l:41-46,99-133 distinguishes code from literal text.
+
+    This is a conservative scan for the env/$ENV primitives, not a jq parser.
+    The installed jq 1.8.1 manual:2235-2239 defines their environment access.
+    """
+    k4_charge(program)
+    modes = [("code", 0)]
+    at = 0
+    while at < len(program):
+        mode, depth = modes[-1]
+        character = program[at]
+        if mode == "string":
+            if character == "\\":
+                if program[at:at + 2] == "\\(":
+                    modes.append(("interpolation", 1))
+                at += 2
+                continue
+            if character == '"':
+                modes.pop()
+        elif character == '"':
+            modes.append(("string", 0))
+        elif character == "#":
+            # jq comments can continue over a backslash-escaped newline.
+            at += 1
+            while at < len(program):
+                if program[at] == "\\" and program[at + 1:at + 2] in {"\\", "\n"}:
+                    at += 2
+                elif program[at] == "\\" and program[at + 1:at + 3] == "\r\n":
+                    at += 3
+                elif program[at] in "\r\n":
+                    break
+                else:
+                    at += 1
+            continue
+        elif mode == "interpolation" and character in "()":
+            depth += 1 if character == "(" else -1
+            if depth:
+                modes[-1] = (mode, depth)
+            else:
+                modes.pop()
+        else:
+            match = JQ_ENVIRONMENT.match(program, at)
+            if match:
+                # The unquoted object key env: names a member; $ENV always
+                # remains a binding. A .env FIELD is excluded by the pattern.
+                following = match.end()
+                while following < len(program) and program[following].isspace():
+                    following += 1
+                if match.group() != "env" or program[following:following + 1] != ":":
+                    return True
+                at = following
+                continue
+        at += 1
+    return False
+
+
+def is_dotenv_read(words: list[str], arguments: list[str]) -> bool:
+    """jq 1.8.1 src/main.c: its filter is code, every input/file option stays a read.
+
+    Exempt only the filter's original argv position, never a matching filename
+    or a from-file program. Unknown option shapes retain the whole reading.
+    """
+    if program_of(words) != "jq":
+        return any(is_env_file_word(word) for word in arguments)
+    flags = {"--raw-output", "--raw-output0", "--join-output", "--compact-output", "--exit-status",
+             "--monochrome-output", "--color-output", "--ascii-output", "--sort-keys", "--tab",
+             "--unbuffered", "--stream", "--stream-errors", "--seq", "--raw-input", "--slurp",
+             "--null-input", "--args", "--jsonargs"}
+    values = {"--arg": 2, "--argjson": 2, "--rawfile": 2, "--slurpfile": 2, "--indent": 1, "-L": 1}
+
+    at = 1
+    while (at := skip_redirections(words, at)) < len(words):
+        word = words[at]
+        if word == "--":
+            at = skip_redirections(words, at + 1)
+            break
+        if word in {"-f", "--from-file"} or word.startswith(("-f", "--from-file=")):
+            return any(is_env_file_word(item) for item in arguments)
+        if word in values:
+            for _ in range(values[word]):
+                at = skip_redirections(words, at + 1)
+                if at >= len(words):
+                    return any(is_env_file_word(item) for item in arguments)
+        elif word in flags or (word.startswith("-") and not word.startswith("--")
+                               and len(word) > 1 and set(word[1:]) <= set("rcjeMaCSnsR")):
+            pass
+        elif word.startswith("-"):
+            return any(is_env_file_word(item) for item in arguments)
+        else:
+            break
+        at += 1
+    if at >= len(words):
+        return any(is_env_file_word(item) for item in arguments)
+    # Keep an existing dotenv refusal when the recognized filter executes an
+    # environment primitive. Literal member/string text is still exempt, and
+    # bare environment filters retain the pre-S6 classification.
+    if is_env_file_word(words[at]) and jq_filter_reads_environment(words[at]):
+        return True
+    # Remove by position: an identical .env input before a redirection/filter
+    # must never be removed by a value-based search. Write targets still follow
+    # read_operands' existing handling; input redirections remain in its output.
+    without_filter = words[:at] + words[at + 1:]
+    return any(is_env_file_word(item) for item in read_operands(without_filter))
+
+
+def printenv_is_environment_dump(words: list[str]) -> bool:
+    """Admit only the explicitly non-secret TMPDIR diagnostic; keep other reads denied.
+
+    uutils coreutils 0.10.0 printenv.rs prints every variable only without
+    operands. A missing, dynamic, secret-bearing or unclassified name remains
+    refused; quoting or an output redirection cannot supply a missing name.
+    """
+    if any(word in {"<", "<<<", "<>"} for word in words):
+        return True  # the shell still opens a credential input even if printenv ignores stdin
+    arguments = command_arguments(words, touching_only=True)
+    at = 0
+    while at < len(arguments) and arguments[at] in {"-0", "--null"}:
+        at += 1
+    if at < len(arguments) and arguments[at] == "--":
+        at += 1
+    return arguments[at:] != ["TMPDIR"]
+
+
+def is_empty_environment(words: list[str]) -> bool:
+    """uutils coreutils 0.10.0 env.rs clears inherited variables before output.
+
+    Only the exact no-command, no-assignment form is admitted. This also keeps
+    a literal env -i line in a heredoc from being mistaken for secret output,
+    without exempting any heredoc body or hiding executable substitutions.
+    """
+    if any(word in {"<", "<<<", "<>"} for word in words):
+        return False  # preserve the denial of any input read before the empty-environment diagnostic
+    return command_arguments(words, touching_only=True) in [["-i"], ["--ignore-environment"]]
+
+
 def is_environment_dump(words: list[str]) -> bool:
     """Whether the command prints the environment or every shell variable. A redirection is no argument: `set < FILE` and `set > FILE`
     still print every variable, where `set a b` sets positional parameters (command_arguments drops the redirections). A number is a
@@ -1925,9 +2098,9 @@ def is_environment_dump(words: list[str]) -> bool:
     when it stands apart (`set 1 > out` and `set 3 < input` set positional parameters: third verification review, 2026-09-29)."""
     program = program_of(words)
     if program == "printenv":
-        return True
+        return printenv_is_environment_dump(words)
     if program == "env":
-        return env_command_start(words) is None
+        return env_command_start(words) is None and not is_empty_environment(words)
     if program == "ps":
         return ps_shows_environment(words)
     if program not in {"set", "export", "declare", "typeset"}:
@@ -1942,7 +2115,10 @@ def is_environment_dump(words: list[str]) -> bool:
 def dumps_after_source(words: list[str]) -> bool:
     """Forms that print values once a credential file is sourced, even with a name filter."""
     program = program_of(words)
-    if is_environment_dump(words):
+    # Bash 5.3.9: source executes in this shell, and prefix assignments are in
+    # the child's environment. TMPDIR's name cannot establish a safe value once
+    # a credential source is present (bash.1 L5917-5923, L9016-9020).
+    if program == "printenv" or is_environment_dump(words):
         return True
     return program in {"declare", "typeset", "export", "readonly", "local"} and any(
         w.startswith("-") and not w.startswith("--") and set(w[1:]) & set("px") for w in words[1:])
@@ -2122,7 +2298,7 @@ def segment_reason(words: list[str]) -> str | None:
         return "credential_file_read"
     if any(HF_HOME_ROOT.search(w) for w in arguments):
         return "native_store_path"
-    if any(is_env_file_word(w) for w in arguments):
+    if is_dotenv_read(words, arguments):
         return "dotenv_read"
     if any((BASE_SECRET_NAME if _baseline else SECRET_NAME).search(w) for w in arguments):
         return "secret_name_search"
@@ -2172,13 +2348,14 @@ def prior_skip_wrapper_options(words: list[str], index: int, wrapper: str) -> in
     return index
 
 
-def prior_prefix_end(words: list[str], index: int = 0, ends: dict[int, int] | None = None) -> int:
+def prior_prefix_end(words: list[str], index: int = 0, ends: dict[int, int] | None = None,
+                     appended: set[str] | None = None) -> int:
     """Index of the command in words[index:] as the strip_prefix of c26800f3 found it: past assignments, output redirections and the
     wrappers of WRAPPERS named exactly (timeout with its duration, then the options and `--` that uutils reads after it: see the note
-    above). `ends` as in prefix_end."""
+    above). `ends` and `appended` as in prefix_end."""
     steps: list[int] = []
     while index < len(words):
-        if ends is not None:
+        if ends is not None and appended is None:
             if index in ends:
                 index = ends[index]
                 break
@@ -2190,6 +2367,8 @@ def prior_prefix_end(words: list[str], index: int = 0, ends: dict[int, int] | No
         elif width and REDIRECT_OUT.match(words[index + width - 2]):
             index += width
         elif word in WRAPPERS or word == "timeout":
+            if word == "xargs" and appended is not None:
+                appended.add(word)
             index = prior_skip_wrapper_options(words, index + 1, word)
             if word == "timeout":
                 # the mandatory duration, then the options and `--` uutils timeout reads after it (prefix_end has the sources)
@@ -2204,8 +2383,8 @@ def prior_prefix_end(words: list[str], index: int = 0, ends: dict[int, int] | No
     return index
 
 
-def prior_strip_prefix(words: list[str]) -> list[str]:
-    return words[prior_prefix_end(words):]
+def prior_strip_prefix(words: list[str], appended: set[str] | None = None) -> list[str]:
+    return words[prior_prefix_end(words, appended=appended):]
 
 
 def prior_env_command_start(words: list[str]) -> int | None:
@@ -2240,68 +2419,83 @@ def prior_keyring_exec(words: list[str]) -> tuple[str | None, list[str]] | None:
     return None
 
 
-def prior_expand(command: str, depth: int = 0) -> list[list[str]]:
+def prior_expand(command: str, depth: int = 0, inherited: set[str] | None = None) -> list[list[str]]:
     """The command segments that c26800f3 read: of the command, of `sh -c '...'`, `eval ...`, `env ... command`, the command that a
     keyring exec starts and the command an `rtk` invocation runs, plus the GNU and uutils env candidates. Each text is one `texts` and each
     distinct segment its words and one `words` of the work budget. A work list keeps every candidate when another branch continues or
     ends; duplicate segments reuse their reading. A long chain spends the existing budget instead of outlasting the hook."""
     spend("texts", 1)
     result: list[list[str]] = []
-    pending = [prior_strip_prefix(raw) for raw in segments(lex(command, legacy=True))]
+    pending: list[tuple[list[str], set[str]]] = []
+
+    def enqueue(words: list[str], appended: set[str], strip: bool = True) -> None:
+        inherited = appended.copy()  # alternative argv readings must not mutate a sibling's provenance
+        pending.append((prior_strip_prefix(words, inherited) if strip else words, inherited))
+
+    for raw in segments(lex(command, legacy=True)):
+        enqueue(raw, inherited if inherited else set())
     pending.reverse()  # pop the original segments in their historical order
     seen: dict[tuple, list[str]] = {}
     while pending:
-        words = pending.pop()
+        words, appended = pending.pop()
         while words:
-            key = segment_identity(words)
+            key = segment_identity(words), bool(appended)
             kept = seen.get(key)
             if kept is not None:
                 note_identity_collision(kept, words)
                 break
             spend("words", len(words) + 1)
             seen[key] = words
+            if appended and (sentinel := xargs_diagnostic_sentinel(words)) is not None:
+                spend("words", len(sentinel) + 1)
+                result.append(sentinel)
             result.append(words)
             program = program_of(words)
             if program in MULTICALL_LAUNCHERS:
                 started = prior_keyring_exec(words)
                 if started is not None:
-                    pending.append(prior_strip_prefix(started[1]))
+                    enqueue(started[1], appended)
                 dispatched = coreutils_command(words)
                 if dispatched is not None:
-                    words = prior_strip_prefix(dispatched)
+                    words = prior_strip_prefix(dispatched, appended)
                     continue
             if program == "env":
                 candidates = [words]
                 gnu = env_split_argv(words)
                 if gnu is not None:
                     candidates.append(gnu)
-                    pending.append(gnu)  # GNU restarts option parsing, so generated split options can expand again
+                    enqueue(gnu, appended, strip=False)  # GNU restarts option parsing, so generated split options can expand again
                 uutils = uutils_env_argv(words)
                 if uutils is not None:
                     candidates.append(uutils)
                     start = env_command_start(uutils, split_strings=False)
-                    pending.append(["env"] if start is None else prior_strip_prefix(uutils[start:]))
+                    if start is not None:
+                        enqueue(uutils[start:], appended)
+                    else:
+                        enqueue(uutils if is_empty_environment(uutils) else ["env"], appended, strip=False)
                 for argv in candidates:
                     start = prior_env_command_start(argv)
                     if start is None:
-                        pending.append(["env"])  # retain this candidate's no-command refusal independently of other branches
+                        # Keep the clearing flag on the exact empty-environment candidate; every other no-command reading
+                        # retains its historical bare-env refusal independently of the other branches.
+                        enqueue(argv if is_empty_environment(argv) else ["env"], appended, strip=False)
                     else:
-                        pending.append(prior_strip_prefix(argv[start:]))
+                        enqueue(argv[start:], appended)
                 break
             if program == "rtk":
-                words = prior_strip_prefix(rtk_command(words))
+                words = prior_strip_prefix(rtk_command(words), appended)
                 continue
             started = prior_keyring_exec(words)
             if started is not None:
-                words = prior_strip_prefix(started[1])
+                words = prior_strip_prefix(started[1], appended)
                 continue
             if depth < MAX_DEPTH:
                 if program in SHELLS:
                     inline = shell_parts(words)[1]
                     if inline is not None:
-                        result.extend(prior_expand(inline, depth + 1))
+                        result.extend(prior_expand(inline, depth + 1, appended))
                 elif program == "eval" and len(words) > 1:
-                    result.extend(prior_expand(" ".join(words[1:]), depth + 1))
+                    result.extend(prior_expand(" ".join(words[1:]), depth + 1, appended))
             break
     return result
 
@@ -2331,9 +2525,9 @@ def prior_reader_arguments(words: list[str]) -> list[str] | None:
 def prior_is_environment_dump(words: list[str]) -> bool:
     program = program_of(words)
     if program == "printenv":
-        return True
+        return printenv_is_environment_dump(words)
     if program == "env":
-        return prior_env_command_start(words) is None
+        return prior_env_command_start(words) is None and not is_empty_environment(words)
     if program in {"set", "export"} and (len(words) == 1 or words[1:] == ["-p"]):
         return True
     if program in {"declare", "typeset"} and all(w.startswith("-") for w in words[1:]) \
@@ -2344,7 +2538,7 @@ def prior_is_environment_dump(words: list[str]) -> bool:
 
 def prior_dumps_after_source(words: list[str]) -> bool:
     program = program_of(words)
-    if prior_is_environment_dump(words):
+    if program == "printenv" or prior_is_environment_dump(words):
         return True
     return program in {"declare", "typeset", "export", "readonly", "local"} and any(
         w.startswith("-") and not w.startswith("--") and set(w[1:]) & set("px") for w in words[1:])
@@ -2413,7 +2607,7 @@ def prior_segment_reason(words: list[str]) -> str | None:
         return "credential_file_read"
     if any(HF_HOME_ROOT.search(w) for w in arguments):
         return "native_store_path"
-    if any(is_env_file_word(w) for w in arguments):
+    if is_dotenv_read(words, arguments):
         return "dotenv_read"
     if any((BASE_SECRET_NAME if _baseline else SECRET_NAME).search(w) for w in arguments):
         return "secret_name_search"
