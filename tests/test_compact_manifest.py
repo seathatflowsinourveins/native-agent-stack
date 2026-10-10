@@ -1,4 +1,4 @@
-"""Synthetic artifact-integrity controls; these are not upstream or host acceptance."""
+"""Artifact-integrity and pinned data regressions; no upstream or host acceptance."""
 from __future__ import annotations
 
 from contextlib import redirect_stdout, redirect_stderr
@@ -33,6 +33,69 @@ def digest(value):
 
 def pin(repository, value="a" * 40, subject="implementation"):
     return {"kind": "commit", "version_or_commit": value, "repository_or_source": repository, "subject": subject}
+
+
+class OpenHandsExtensionsSlotTests(unittest.TestCase):
+    """The adjudicated placement, bound to upstream bytes and pre-fix row facts.
+
+    G5_SLOT_REGRESSION_MANIFEST selects retained historical input for the red
+    control. The normal suite reads the current native manifest directly.
+    """
+
+    PIN = "ba3f165139cd3705c5d56a4ca26293d11a464c7b"
+    SOURCE_SHA256 = "d71111c39c773c9c238e32e517c074b8b7ab6115592440bf6c0d243b331326c9"
+    BEFORE_ROWS_SHA256 = "6fbf29d62600b32b5b68dec01c7d0bd3f3f1d141545ff8f223c3ae18156636ca"
+
+    @classmethod
+    def setUpClass(cls):
+        root = TOOL.parents[2]
+        fixtures = root / "evidence/artifacts/g5-start-closure-1-20261009/openhands-slot-regression"
+        cls.source = (fixtures / "AGENTS-ba3f1651.txt").read_bytes()
+        cls.before = json.loads((fixtures / "before-c54b4a46.json").read_text())
+        manifest = Path(os.environ.get("G5_SLOT_REGRESSION_MANIFEST",
+                                       root / "catalogs/landscape/grand-catalog-20261008.json"))
+        cls.rows = [row for row in json.loads(manifest.read_text())["rows"]
+                    if row["repository_or_entry"] == "https://github.com/openhands/extensions"]
+
+    def assert_registry_placement(self, rows):
+        self.assertEqual(digest(self.source), self.SOURCE_SHA256)
+        cited_lines = "\n".join(self.source.decode().splitlines()[2:17])
+        self.assertIn("**public extensions registry**", cited_lines)
+        self.assertIn("**shareable skills and plugins**", cited_lines)
+        self.assertIn("OpenHands/software-agent-sdk", cited_lines)
+        by_slot = {row["slot"]: row for row in rows}
+        self.assertEqual(len(rows), 2)
+        self.assertEqual(set(by_slot), {"instructions-skills", "workers"})
+        row = by_slot["instructions-skills"]
+        self.assertEqual(row["disposition"], "TRIAL")
+        self.assertEqual(row["qualification"], {"catalog": "foundation"})
+        self.assertEqual(row["pin"], pin("openhands/extensions", self.PIN))
+        agents_source = [source for source in row["primary_sources"]
+                         if source["locator"] == f"openhands/extensions@{self.PIN}:AGENTS.md"]
+        self.assertEqual(len(agents_source), 1)
+        self.assertEqual(agents_source[0]["capture_sha256"], digest(self.source))
+        self.assertEqual(agents_source[0]["pin"], row["pin"])
+
+    def test_current_extensions_placement_matches_pinned_registry_source(self):
+        self.assert_registry_placement(self.rows)
+
+    def test_pre_fix_agent_sdks_placement_is_rejected(self):
+        with self.assertRaisesRegex(AssertionError, "instructions-skills"):
+            self.assert_registry_placement(self.before["rows"])
+
+    def test_valid_workers_and_immutable_original_claim_bindings_are_preserved(self):
+        self.assertEqual(self.before["source_head"], "c54b4a464ac00c3b9e2af4e8b4081ca101aae262")
+        self.assertEqual(digest(raw(self.before["rows"])), self.BEFORE_ROWS_SHA256)
+        before = {row["slot"]: row for row in self.before["rows"]}
+        current = {row["slot"]: row for row in self.rows}
+        self.assertEqual(current["workers"], before["workers"])
+        allowed = {"slot", "note", "origin_claim_ids"}
+        self.assertEqual({key: value for key, value in current["instructions-skills"].items() if key not in allowed},
+                         {key: value for key, value in before["agent-sdks"].items() if key not in allowed})
+        original_claims = lambda row: [source for source in row["source_refs"]
+                                       if source.get("source_id") == "original-action-claim-facts"]
+        self.assertEqual(len(original_claims(before["agent-sdks"])), 2)
+        self.assertEqual(original_claims(current["instructions-skills"]), original_claims(before["agent-sdks"]))
 
 
 @unittest.skipUnless(shutil.which("zstd"), "supported native zstd prerequisite is unavailable")

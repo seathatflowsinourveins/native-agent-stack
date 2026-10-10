@@ -1,0 +1,101 @@
+{
+  "kind": "g5-pr878-micro-fix",
+  "evidence_class": "local_integration_fixture",
+  "reviewed_head": "3ed3f6ff73f2392f22e81e248f26c767c45346bc",
+  "review_verdict_sha256": "dc501e31f58cb5c323a8c1051d9b8eeda04dbe7fc7f125dd4ddb7fd9c7c27227",
+  "scope": "ONE no-rebase fix for the P2 origin-map documentation pins and the two P3 slot-regression/J8 summary findings. No row, manifest, map, selector, archive, source claim, verdict or gate changes.",
+  "source_selection": "Coordinator search-first quick-mode review selected the existing CPython unittest harness, the native pinned_bytes input check and host_receipts.register_file. No new runner, dependency, upstream fork, provider call or installation is needed for this bounded data/documentation correction.",
+  "origin_map": {
+    "path": "evidence/artifacts/g5-start-closure-1-20261009/origin-map.json",
+    "bytes": 3064963,
+    "current_sha256": "50a577cb25fc0650355c3ddf9b709b18d0fadb5a426415b6f497c1e78fe83e7a",
+    "superseded_b5_sha256": "a7bb04e413cf5c7a533c671e745a7a61fc3459690c9c59bdd0309367c71a4ea6",
+    "changed_current_documents": [
+      "docs/g5-refresh-procedure.md",
+      "docs/decisions/2026-10-08-g5-compact-evidence.md"
+    ],
+    "before_native_result": "Each document's advertised current hash raises ValueError: Pinned input changed: origin-map.json in the unchanged start_closure_sampler.pinned_bytes function.",
+    "after_native_result": "Each corrected current hash is accepted by the same native function and returns the actual 3,064,963 bytes.",
+    "historical_receipt": "evidence/artifacts/g5-start-closure-1-20261009/confirmed-four-fix.json",
+    "historical_receipt_unchanged_sha256": "4446cc7369c5154d715ff80b23552eaeb1792e48d5504efecde0ac17f9b3e4df"
+  },
+  "openhands_source": {
+    "repository": "openhands/extensions",
+    "pin": "ba3f165139cd3705c5d56a4ca26293d11a464c7b",
+    "path": "AGENTS.md",
+    "locator": "https://github.com/openhands/extensions/blob/ba3f165139cd3705c5d56a4ca26293d11a464c7b/AGENTS.md#L3-L17",
+    "verification": "Maintainer GitHub contents API at the exact commit; native Git hash-object matches the returned commit-scoped blob ID. The complete returned body is retained as a read-only regression fixture.",
+    "git_blob": "8dea5090addd32a8eaf500e1b087da0a93ce6563",
+    "bytes": 21348,
+    "sha256": "d71111c39c773c9c238e32e517c074b8b7ab6115592440bf6c0d243b331326c9",
+    "fixture": "evidence/artifacts/g5-start-closure-1-20261009/openhands-slot-regression/AGENTS-ba3f1651.txt",
+    "source_scope": "Lines 3-17 identify the public skills/plugins registry and distinguish the Software Agent SDK repository. This is source-informed placement evidence, not runtime acceptance."
+  },
+  "openhands_regression": {
+    "test_class": "tests.test_compact_manifest.OpenHandsExtensionsSlotTests",
+    "historical_data_head": "c54b4a464ac00c3b9e2af4e8b4081ca101aae262",
+    "historical_source_manifest_sha256": "e03c802ca06cec8af18f4bb7d69329dc1c677862a1c89b7ca18ce8214007846b",
+    "historical_fixture": "evidence/artifacts/g5-start-closure-1-20261009/openhands-slot-regression/before-c54b4a46.json",
+    "historical_fixture_bytes": 12488,
+    "historical_fixture_sha256": "62e5f09c81c320121ad94264ba3e3b441534da23123e37ee67bdd7b48fbeb5cb",
+    "canonical_before_rows_sha256": "6fbf29d62600b32b5b68dec01c7d0bd3f3f1d141545ff8f223c3ae18156636ca",
+    "before_command": "G5_SLOT_REGRESSION_MANIFEST=evidence/artifacts/g5-start-closure-1-20261009/openhands-slot-regression/before-c54b4a46.json python3 -m unittest -v tests.test_compact_manifest.OpenHandsExtensionsSlotTests.test_current_extensions_placement_matches_pinned_registry_source",
+    "before_exit_code": 1,
+    "before_actual_output": "Ran 1 test in 0.001s; FAILED (failures=1). Actual slot set contains agent-sdks and lacks instructions-skills.",
+    "before_scope": "The new regression executed against exact retained pre-fix row data from c54b4a46; this is not a claim that the test existed at that old revision.",
+    "after_command": "python3 -m unittest -v tests.test_compact_manifest.OpenHandsExtensionsSlotTests",
+    "after_exit_code": 0,
+    "after_actual_output": "Ran 3 tests in 0.264s; OK.",
+    "assertions": [
+      "Complete cited AGENTS.md bytes match the fixed digest and the current row's exact source locator, capture digest and implementation pin.",
+      "The current row uses instructions-skills with TRIAL and foundation qualification; the retained old agent-sdks input fails the same placement assertion.",
+      "The valid workers row equals the exact pre-fix row in all fields.",
+      "The corrected row equals the exact pre-fix row outside the three already adjudicated fields slot, note and origin_claim_ids.",
+      "Both immutable original-action-claim-facts references, member digests and selectors remain identical."
+    ],
+    "preservation_boundary": "The regression checks complete row facts and immutable claim-member bindings. The production archive is unchanged and was not rebuilt or re-executed by this micro fix."
+  },
+  "j8_current": {
+    "only_changed_json_path": "/finding_dispositions/TA_N7",
+    "summary_count": 42,
+    "historical_nested_41_statement_preserved": true,
+    "path": "evidence/artifacts/g5-start-closure-1-20261009/j8-preparation.json",
+    "bytes": 19305,
+    "sha256": "c9d0dffd999e29bb465b59d3e57a69782c14608739b607846b5a48a077217351",
+    "updated_binding": "evidence/artifacts/g5-start-closure-1-20261009/note-class-fix.json#/j8_current_receipt",
+    "execution_boundary": "The 42-test sampler result remains the retained independently reproduced result; no sampler run is relabeled or repeated by this wording correction."
+  },
+  "checks": {
+    "compact_module": {
+      "command": "python3 -m unittest -v tests.test_compact_manifest",
+      "exit_code": 0,
+      "actual_summary": "Ran 95 tests in 39.093s; OK (skipped=2).",
+      "tests": 95,
+      "skipped": 2,
+      "skip_reasons": [
+        "immutable original native-skills capture is not supplied",
+        "immutable external native-example packet is not supplied"
+      ]
+    },
+    "whitespace": {"command": "git diff --check", "exit_code": 0},
+    "final_validation_contract": "Native registration of every changed/new file precedes python3 scripts/validate.py in FULL mode. Its actual result is reported with the final fix head, outside this non-self-referential receipt."
+  },
+  "unchanged_production_inputs": {
+    "manifest_sha256": "afb38c9427d7a344792b5ddcfa7cab64e9613a2fda64d1cecb30e2b0eae825bb",
+    "origin_map_sha256": "50a577cb25fc0650355c3ddf9b709b18d0fadb5a426415b6f497c1e78fe83e7a",
+    "comparison": "Actual bytes compared with 3ed3f6ff: both identical. Prior 414-population equality is reused on its unchanged inputs; no redraw or new population replay is claimed."
+  },
+  "completeness_critic": {
+    "current_and_historical_pins": "Both current documentation passages now advertise the actual map digest; the historical b5 receipt remains byte-identical.",
+    "source_modality": "Full pinned upstream source bytes and exact historical row fixtures are now in the reviewable tree, closing the micro's missing-source gap.",
+    "regression_reach": "The same source-bound assertion demonstrably fails the old data and passes the current data; full workers facts and original claim bindings are covered separately.",
+    "j8_scope": "Only the current count changed; nested historical text is intact and the dependent current receipt binding matches.",
+    "limits": "These are local integration/data controls, not upstream installation acceptance, completed designated reviews, production packet construction or a G5 gate transition."
+  },
+  "gates": {
+    "g5": "NOT_MET",
+    "release": "NOT_AUTHORIZED",
+    "landing_rebase": "NOT_RUN; requires a later explicit CC landing cue after main is green",
+    "post_push_reviews": "co-op GPT micro and CC micro pending"
+  }
+}

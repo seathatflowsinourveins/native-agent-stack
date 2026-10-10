@@ -910,7 +910,7 @@
   "j8_current_receipt": {
     "bytes": 19305,
     "path": "evidence/artifacts/g5-start-closure-1-20261009/j8-preparation.json",
-    "sha256": "c147f0c2b5f3186b65f7905d72f18cc7abf2994b3f6d72da6bc22c5818adb81b"
+    "sha256": "c9d0dffd999e29bb465b59d3e57a69782c14608739b607846b5a48a077217351"
   },
   "kind": "g5-native-note-class-sync",
   "origin_map_sha256": "50a577cb25fc0650355c3ddf9b709b18d0fadb5a426415b6f497c1e78fe83e7a",

@@ -1,0 +1,237 @@
+{
+  "source_head": "c54b4a464ac00c3b9e2af4e8b4081ca101aae262",
+  "source_path": "catalogs/landscape/grand-catalog-20261008.json",
+  "source_manifest_sha256": "e03c802ca06cec8af18f4bb7d69329dc1c677862a1c89b7ca18ce8214007846b",
+  "rows": [
+    {
+      "archive_member": "captures/action-primary/openhands__extensions/ba3f165139cd3705c5d56a4ca26293d11a464c7b/source/.claude-plugin",
+      "capture_sha256": "09c8926af391c088e62f8d757c738645db444fcee7c25555ebdae192abf3b52d",
+      "decision_scope": "implementation-merit",
+      "disposition": "TRIAL",
+      "evidence_class": "SOURCE-REVIEW",
+      "note": "Restored historical source-supported TRIAL claim; origin provenance unresolved, native installation and trial acceptance not executed. CC A2 restores the original source-evidenced TRIAL; exact origin-pointer binding remains unresolved rather than being represented as a decision change. No executed native acceptance is asserted.",
+      "origin_claim_ids": [
+        "309e7b577dad510a9f54",
+        "bfc424cc8502f1825f19"
+      ],
+      "origin_pointer": "unresolved",
+      "owner_lane": "runtime-workers",
+      "pin": {
+        "kind": "commit",
+        "repository_or_source": "openhands/extensions",
+        "subject": "implementation",
+        "version_or_commit": "ba3f165139cd3705c5d56a4ca26293d11a464c7b"
+      },
+      "primary_sources": [
+        {
+          "archive_member": "captures/primary-pin/bodies/sha256/09c8926af391c088e62f8d757c738645db444fcee7c25555ebdae192abf3b52d.blob",
+          "capture_sha256": "09c8926af391c088e62f8d757c738645db444fcee7c25555ebdae192abf3b52d",
+          "locator": "openhands/extensions@ba3f165139cd3705c5d56a4ca26293d11a464c7b:.claude-plugin",
+          "pin": {
+            "kind": "commit",
+            "repository_or_source": "openhands/extensions",
+            "subject": "implementation",
+            "version_or_commit": "ba3f165139cd3705c5d56a4ca26293d11a464c7b"
+          },
+          "pin_witness": {
+            "archive_member": "provenance/primary-pin-witnesses/aebbc66f9b9f21c2e412542f2e1d48222e86c4bcb29b2313b5130b98ddf5b72b.json",
+            "pointer": "",
+            "sha256": "0bc39c94c956b122a58d57e8488d0c5cb5f05e8b3e707d3c681dadbea05772be"
+          },
+          "subject": "Exact upstream file bytes verified by native Git blob ID against its repository commit tree."
+        },
+        {
+          "archive_member": "captures/primary-pin/bodies/sha256/883d5e223183aee35f74e04982080c351cc85c0a6384560c5be865599f022e15.blob",
+          "capture_sha256": "883d5e223183aee35f74e04982080c351cc85c0a6384560c5be865599f022e15",
+          "locator": "openhands/extensions@ba3f165139cd3705c5d56a4ca26293d11a464c7b:marketplaces/openhands-extensions.json",
+          "pin": {
+            "kind": "commit",
+            "repository_or_source": "openhands/extensions",
+            "subject": "implementation",
+            "version_or_commit": "ba3f165139cd3705c5d56a4ca26293d11a464c7b"
+          },
+          "pin_witness": {
+            "archive_member": "provenance/primary-pin-witnesses/d6b1110fe6daa961b40a6c88dbe84e9dd02e77dbb6832a18e1d7d752d54e0b67.json",
+            "pointer": "",
+            "sha256": "906348c4586d145b806534adc3dcdb33ee79cbd998ca322fbfa492382b8c4a2d"
+          },
+          "subject": "Exact upstream file bytes verified by native Git blob ID against its repository commit tree."
+        },
+        {
+          "archive_member": "captures/primary-pin/bodies/sha256/d71111c39c773c9c238e32e517c074b8b7ab6115592440bf6c0d243b331326c9.blob",
+          "capture_sha256": "d71111c39c773c9c238e32e517c074b8b7ab6115592440bf6c0d243b331326c9",
+          "locator": "openhands/extensions@ba3f165139cd3705c5d56a4ca26293d11a464c7b:AGENTS.md",
+          "pin": {
+            "kind": "commit",
+            "repository_or_source": "openhands/extensions",
+            "subject": "implementation",
+            "version_or_commit": "ba3f165139cd3705c5d56a4ca26293d11a464c7b"
+          },
+          "pin_witness": {
+            "archive_member": "provenance/primary-pin-witnesses/ab83a6df65283902f9504d7930a31c1fd3182c458fdb94ffe1e4d801ac45db99.json",
+            "pointer": "",
+            "sha256": "50f4f41301b6fe59ccbbb1fbb6196bddffdf79c30ac7fc450959cd1483ee6b09"
+          },
+          "subject": "Exact upstream file bytes verified by native Git blob ID against its repository commit tree."
+        }
+      ],
+      "qualification": {
+        "catalog": "foundation"
+      },
+      "refresh_date": "2026-10-08",
+      "repository_or_entry": "https://github.com/openhands/extensions",
+      "slot": "agent-sdks",
+      "source_refs": [
+        {
+          "archive_member": "captures/action-restoration/original-unbound-claim-facts.json",
+          "owner_lane": "runtime-workers",
+          "pointer": "/rows/34",
+          "sha256": "6e4a8bf1aaf1e447f6e0ffec3cbd77255244d290e07c3b7d61f5d34ef4332cbc",
+          "source_id": "original-action-claim-facts"
+        },
+        {
+          "archive_member": "captures/action-restoration/original-unbound-claim-facts.json",
+          "owner_lane": "runtime-workers",
+          "pointer": "/rows/35",
+          "sha256": "6e4a8bf1aaf1e447f6e0ffec3cbd77255244d290e07c3b7d61f5d34ef4332cbc",
+          "source_id": "original-action-claim-facts"
+        },
+        {
+          "archive_member": "captures/action-primary/openhands__extensions/ba3f165139cd3705c5d56a4ca26293d11a464c7b/commit.json",
+          "pointer": "/sha",
+          "sha256": "aa1176bc20ea6abe78accc0e64e45c9d9d003d2e13ebfbbd8bfd4c00b3821d62"
+        },
+        {
+          "archive_member": "captures/action-primary/openhands__extensions/ba3f165139cd3705c5d56a4ca26293d11a464c7b/tree.json",
+          "pointer": "/tree/3",
+          "sha256": "b983224e457deed35e4dc2aca44b52a55c1e7a26c43dbede7856883992c6fe35"
+        },
+        {
+          "archive_member": "captures/action-primary/openhands__extensions/ba3f165139cd3705c5d56a4ca26293d11a464c7b/tree.json",
+          "pointer": "/tree/196",
+          "sha256": "b983224e457deed35e4dc2aca44b52a55c1e7a26c43dbede7856883992c6fe35"
+        },
+        {
+          "archive_member": "captures/action-primary/openhands__extensions/ba3f165139cd3705c5d56a4ca26293d11a464c7b/tree.json",
+          "pointer": "/tree/30",
+          "sha256": "b983224e457deed35e4dc2aca44b52a55c1e7a26c43dbede7856883992c6fe35"
+        }
+      ]
+    },
+    {
+      "archive_member": "captures/action-primary/openhands__extensions/ba3f165139cd3705c5d56a4ca26293d11a464c7b/source/.claude-plugin",
+      "capture_sha256": "09c8926af391c088e62f8d757c738645db444fcee7c25555ebdae192abf3b52d",
+      "decision_scope": "implementation-merit",
+      "disposition": "TRIAL",
+      "evidence_class": "SOURCE-REVIEW",
+      "note": "Restored historical source-supported TRIAL claim; origin provenance unresolved, native installation and trial acceptance not executed. CC A2 restores the original source-evidenced TRIAL; exact origin-pointer binding remains unresolved rather than being represented as a decision change. No executed native acceptance is asserted.",
+      "origin_claim_ids": [
+        "309e7b577dad510a9f54",
+        "bfc424cc8502f1825f19"
+      ],
+      "origin_pointer": "unresolved",
+      "owner_lane": "runtime-workers",
+      "pin": {
+        "kind": "commit",
+        "repository_or_source": "openhands/extensions",
+        "subject": "implementation",
+        "version_or_commit": "ba3f165139cd3705c5d56a4ca26293d11a464c7b"
+      },
+      "primary_sources": [
+        {
+          "archive_member": "captures/primary-pin/bodies/sha256/09c8926af391c088e62f8d757c738645db444fcee7c25555ebdae192abf3b52d.blob",
+          "capture_sha256": "09c8926af391c088e62f8d757c738645db444fcee7c25555ebdae192abf3b52d",
+          "locator": "openhands/extensions@ba3f165139cd3705c5d56a4ca26293d11a464c7b:.claude-plugin",
+          "pin": {
+            "kind": "commit",
+            "repository_or_source": "openhands/extensions",
+            "subject": "implementation",
+            "version_or_commit": "ba3f165139cd3705c5d56a4ca26293d11a464c7b"
+          },
+          "pin_witness": {
+            "archive_member": "provenance/primary-pin-witnesses/aebbc66f9b9f21c2e412542f2e1d48222e86c4bcb29b2313b5130b98ddf5b72b.json",
+            "pointer": "",
+            "sha256": "0bc39c94c956b122a58d57e8488d0c5cb5f05e8b3e707d3c681dadbea05772be"
+          },
+          "subject": "Exact upstream file bytes verified by native Git blob ID against its repository commit tree."
+        },
+        {
+          "archive_member": "captures/primary-pin/bodies/sha256/883d5e223183aee35f74e04982080c351cc85c0a6384560c5be865599f022e15.blob",
+          "capture_sha256": "883d5e223183aee35f74e04982080c351cc85c0a6384560c5be865599f022e15",
+          "locator": "openhands/extensions@ba3f165139cd3705c5d56a4ca26293d11a464c7b:marketplaces/openhands-extensions.json",
+          "pin": {
+            "kind": "commit",
+            "repository_or_source": "openhands/extensions",
+            "subject": "implementation",
+            "version_or_commit": "ba3f165139cd3705c5d56a4ca26293d11a464c7b"
+          },
+          "pin_witness": {
+            "archive_member": "provenance/primary-pin-witnesses/d6b1110fe6daa961b40a6c88dbe84e9dd02e77dbb6832a18e1d7d752d54e0b67.json",
+            "pointer": "",
+            "sha256": "906348c4586d145b806534adc3dcdb33ee79cbd998ca322fbfa492382b8c4a2d"
+          },
+          "subject": "Exact upstream file bytes verified by native Git blob ID against its repository commit tree."
+        },
+        {
+          "archive_member": "captures/primary-pin/bodies/sha256/d71111c39c773c9c238e32e517c074b8b7ab6115592440bf6c0d243b331326c9.blob",
+          "capture_sha256": "d71111c39c773c9c238e32e517c074b8b7ab6115592440bf6c0d243b331326c9",
+          "locator": "openhands/extensions@ba3f165139cd3705c5d56a4ca26293d11a464c7b:AGENTS.md",
+          "pin": {
+            "kind": "commit",
+            "repository_or_source": "openhands/extensions",
+            "subject": "implementation",
+            "version_or_commit": "ba3f165139cd3705c5d56a4ca26293d11a464c7b"
+          },
+          "pin_witness": {
+            "archive_member": "provenance/primary-pin-witnesses/ab83a6df65283902f9504d7930a31c1fd3182c458fdb94ffe1e4d801ac45db99.json",
+            "pointer": "",
+            "sha256": "50f4f41301b6fe59ccbbb1fbb6196bddffdf79c30ac7fc450959cd1483ee6b09"
+          },
+          "subject": "Exact upstream file bytes verified by native Git blob ID against its repository commit tree."
+        }
+      ],
+      "qualification": {
+        "catalog": "foundation"
+      },
+      "refresh_date": "2026-10-08",
+      "repository_or_entry": "https://github.com/openhands/extensions",
+      "slot": "workers",
+      "source_refs": [
+        {
+          "archive_member": "captures/action-restoration/original-unbound-claim-facts.json",
+          "owner_lane": "runtime-workers",
+          "pointer": "/rows/34",
+          "sha256": "6e4a8bf1aaf1e447f6e0ffec3cbd77255244d290e07c3b7d61f5d34ef4332cbc",
+          "source_id": "original-action-claim-facts"
+        },
+        {
+          "archive_member": "captures/action-restoration/original-unbound-claim-facts.json",
+          "owner_lane": "runtime-workers",
+          "pointer": "/rows/35",
+          "sha256": "6e4a8bf1aaf1e447f6e0ffec3cbd77255244d290e07c3b7d61f5d34ef4332cbc",
+          "source_id": "original-action-claim-facts"
+        },
+        {
+          "archive_member": "captures/action-primary/openhands__extensions/ba3f165139cd3705c5d56a4ca26293d11a464c7b/commit.json",
+          "pointer": "/sha",
+          "sha256": "aa1176bc20ea6abe78accc0e64e45c9d9d003d2e13ebfbbd8bfd4c00b3821d62"
+        },
+        {
+          "archive_member": "captures/action-primary/openhands__extensions/ba3f165139cd3705c5d56a4ca26293d11a464c7b/tree.json",
+          "pointer": "/tree/3",
+          "sha256": "b983224e457deed35e4dc2aca44b52a55c1e7a26c43dbede7856883992c6fe35"
+        },
+        {
+          "archive_member": "captures/action-primary/openhands__extensions/ba3f165139cd3705c5d56a4ca26293d11a464c7b/tree.json",
+          "pointer": "/tree/196",
+          "sha256": "b983224e457deed35e4dc2aca44b52a55c1e7a26c43dbede7856883992c6fe35"
+        },
+        {
+          "archive_member": "captures/action-primary/openhands__extensions/ba3f165139cd3705c5d56a4ca26293d11a464c7b/tree.json",
+          "pointer": "/tree/30",
+          "sha256": "b983224e457deed35e4dc2aca44b52a55c1e7a26c43dbede7856883992c6fe35"
+        }
+      ]
+    }
+  ]
+}

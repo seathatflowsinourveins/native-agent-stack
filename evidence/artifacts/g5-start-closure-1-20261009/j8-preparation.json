@@ -64,7 +64,7 @@
     "TA_N4": "Explicit wrong/invalid/uppercase/truncated pins tested.",
     "TA_N5": "Native CLI wiring and clean exits tested on genuine synthetic assets; real production packet command stays co-op-owned and NOT_RUN here.",
     "TA_N6": "Preparation modes explicitly refuse asset flags.",
-    "TA_N7": "Required packet controls fail on absent zstd; final test run records 41 tests and zero skips.",
+    "TA_N7": "Required packet controls fail on absent zstd; final test run records 42 tests and zero skips.",
     "TA_N8": "Changed-manifest fixtures rebind origin-map SHA consistently.",
     "TA_N9": "Measured ordered-row difference count and safe canonical index/field/hash diagnostics."
   },

@@ -18257,8 +18257,8 @@
     },
     {
       "path": "docs/decisions/2026-10-05-dagu-mise-pin-move.md",
-      "sha256": "5d30860f8b178b654014e66e6ffbb4afa13afad1f9c80eec8fe2b0fd6483d587",
-      "bytes": 146906
+      "sha256": "1aed824a320a6644562027d8da365ac278394774bee82a4597e30107e46d0ddf",
+      "bytes": 146594
     },
     {
       "path": "docs/decisions/2026-10-05-disk-headroom-enospc.md",
@@ -18467,7 +18467,7 @@
     },
     {
       "path": "docs/decisions/2026-10-08-g5-compact-evidence.md",
-      "sha256": "4f5ad28dba10bdb563f6d52dcfb9523c49458cded85965e82831b041032b0898",
+      "sha256": "1dc89017de93d4ca90005cccf63c9f130b1c2d95a0cd73e871512ebf25940a9f",
       "bytes": 30980
     },
     {
@@ -18657,7 +18657,7 @@
     },
     {
       "path": "docs/g5-refresh-procedure.md",
-      "sha256": "91700dc886f354439f47a55e0caa2cfe2f663652df99275cc91491ae0ebd6cf7",
+      "sha256": "33473572420778e226d0f5d0f9347f1f3534e972d13c012420743f3330d941cf",
       "bytes": 21269
     },
     {
@@ -21632,8 +21632,13 @@
     },
     {
       "path": "evidence/artifacts/g5-start-closure-1-20261009/j8-preparation.json",
-      "sha256": "c147f0c2b5f3186b65f7905d72f18cc7abf2994b3f6d72da6bc22c5818adb81b",
+      "sha256": "c9d0dffd999e29bb465b59d3e57a69782c14608739b607846b5a48a077217351",
       "bytes": 19305
+    },
+    {
+      "path": "evidence/artifacts/g5-start-closure-1-20261009/micro-fix-3ed3f6ff.json",
+      "sha256": "0081ea20734ebf6c7ac3593328241f741f0df94ca55838642423b5ed6d1e51ef",
+      "bytes": 7891
     },
     {
       "path": "evidence/artifacts/g5-start-closure-1-20261009/native-row-sync-rebuild.json",
@@ -21642,13 +21647,23 @@
     },
     {
       "path": "evidence/artifacts/g5-start-closure-1-20261009/note-class-fix.json",
-      "sha256": "fe34a625d599b437ae182e5cc576411aa1159a27cb7340351520cb90cc8cdcb2",
+      "sha256": "65d924884fd8d1ece499693bbfa28bf895ca01c937c1c726ec443ad31794fbad",
       "bytes": 29462
     },
     {
       "path": "evidence/artifacts/g5-start-closure-1-20261009/note-class-population-receipt.json",
       "sha256": "8598ca152de68c7d6aef20278afaf04bfc104c0e43573fe4b2fada996433b6fe",
       "bytes": 317521
+    },
+    {
+      "path": "evidence/artifacts/g5-start-closure-1-20261009/openhands-slot-regression/AGENTS-ba3f1651.txt",
+      "sha256": "d71111c39c773c9c238e32e517c074b8b7ab6115592440bf6c0d243b331326c9",
+      "bytes": 21348
+    },
+    {
+      "path": "evidence/artifacts/g5-start-closure-1-20261009/openhands-slot-regression/before-c54b4a46.json",
+      "sha256": "62e5f09c81c320121ad94264ba3e3b441534da23123e37ee67bdd7b48fbeb5cb",
+      "bytes": 12488
     },
     {
       "path": "evidence/artifacts/g5-start-closure-1-20261009/origin-family-declarations.json",
@@ -60172,8 +60187,8 @@
     },
     {
       "path": "tests/test_compact_manifest.py",
-      "sha256": "545c29ebd3f0dda427989516c7afae1386091152640100693a811bacd43c3064",
-      "bytes": 104328
+      "sha256": "a915b748a3ab6cf275d6192101c012562dc19aeb57ba73f2c55fcb396f3ebd23",
+      "bytes": 108123
     },
     {
       "path": "tests/test_component_matrix.py",
