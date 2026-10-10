@@ -7,6 +7,7 @@ import json
 from pathlib import Path
 import re
 import subprocess
+import tempfile
 import unittest
 from unittest import mock
 
@@ -114,22 +115,59 @@ class PolicyGrantDerivation(unittest.TestCase):
         self.assertTrue(sorted(actual, key=lambda row: (row["root"], row["path"])) == expected,
                         "Receipt grants differ from the exact independently reviewed union; paths omitted.")
 
-    def test_reviewed_user_source_pin_is_an_ancestor_with_matching_snapshot(self):
+    def test_reviewed_user_source_pin_is_reachable_from_main_with_matching_snapshot(self):
         relative = "tools/local-pages/inventory_user_names.json"
         snapshot = json.loads((ROOT / relative).read_text())
         pin = snapshot["source_pin"]
         self.assertRegex(pin, r"\A[a-f0-9]{40}\Z")
-        head = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, check=True,
+        main = subprocess.run(["git", "rev-parse", "--verify", "refs/remotes/origin/main^{commit}"], cwd=ROOT, check=True,
                               capture_output=True, text=True).stdout.strip()
-        ancestry = subprocess.run(["git", "merge-base", "--is-ancestor", pin, head],
+        ancestry = subprocess.run(["git", "merge-base", "--is-ancestor", pin, main],
                                   cwd=ROOT, capture_output=True)
         self.assertEqual(ancestry.returncode, 0,
-                         "The user source pin must be an ancestor of the reviewed head; an existing orphan object is insufficient.")
+                         "The user source pin must be reachable from origin/main; an existing object or PR-only ancestor is insufficient.")
         pinned = json.loads(subprocess.run(["git", "show", f"{pin}:{relative}"], cwd=ROOT,
                                            check=True, capture_output=True).stdout)
         self.assertTrue({key: value for key, value in snapshot.items() if key != "source_pin"}
                         == {key: value for key, value in pinned.items() if key != "source_pin"},
                         "Reviewed snapshot differs from its pinned source outside the self-referential source_pin; paths omitted.")
+
+    def test_matching_user_snapshot_on_a_pr_only_ancestor_is_refused(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+
+            def git(*arguments, input=None):
+                return subprocess.run(
+                    ["git", "-c", "user.name=Synthetic Fixture", "-c", "user.email=fixture@example.invalid",
+                     "-C", str(root), *arguments], input=input, check=True,
+                    capture_output=True, text=True,
+                ).stdout.strip()
+
+            git("init", "--quiet", "--initial-branch=main")
+            snapshot = {**reviewed_snapshot(), "source_pin": "0" * 40}
+            blob = git("hash-object", "-w", "--stdin", input=json.dumps(snapshot))
+            local_pages = git("mktree", input=f"100644 blob {blob}\tinventory_user_names.json\n")
+            tools = git("mktree", input=f"040000 tree {local_pages}\tlocal-pages\n")
+            tree = git("mktree", input=f"040000 tree {tools}\ttools\n")
+            main = git("commit-tree", tree, input="Synthetic main snapshot\n")
+            branch = git("commit-tree", tree, "-p", main, input="Synthetic PR-only snapshot\n")
+            git("update-ref", "refs/remotes/origin/main", main)
+            git("update-ref", "refs/heads/review", branch)
+            git("symbolic-ref", "HEAD", "refs/heads/review")
+            git("merge-base", "--is-ancestor", branch, "HEAD")
+            original_read_text = Path.read_text
+
+            def read_text(path, *arguments, **keywords):
+                if path == root / "tools/local-pages/inventory_user_names.json":
+                    return json.dumps(snapshot)
+                return original_read_text(path, *arguments, **keywords)
+
+            with mock.patch(__name__ + ".ROOT", root), mock.patch.object(Path, "read_text", read_text):
+                snapshot["source_pin"] = main
+                self.test_reviewed_user_source_pin_is_reachable_from_main_with_matching_snapshot()
+                snapshot["source_pin"] = branch
+                with self.assertRaisesRegex(AssertionError, "reachable from origin/main"):
+                    self.test_reviewed_user_source_pin_is_reachable_from_main_with_matching_snapshot()
 
     def test_reviewed_user_snapshot_reproduces_grants_and_aliases(self):
         snapshot = json.loads((ROOT / "tools/local-pages/inventory_user_names.json").read_text())
