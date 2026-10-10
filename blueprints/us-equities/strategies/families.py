@@ -117,6 +117,7 @@ class FamilyStrategy(Strategy):
         self.pending_role = None
         self.pending_remaining = D(0)
         self.pending_since_ns = 0
+        self.pending_policy_deadline_ns = None
         self.cancel_requested = False
         self.cancel_requested_ns = 0
         self.quantity = D(0)
@@ -355,10 +356,19 @@ class FamilyStrategy(Strategy):
                 and now >= self.spec.exit_deadline_ns
                 and (self.pending_role == "entry" or self.exit_reason != "time_exit")
             )
-            if (
-                not halted
-                and not self.cancel_requested
-                and (now - self.pending_since_ns >= timeout or force)
+            entry_blocked = self.pending_role == "entry" and (
+                halted
+                or (
+                    self.spec.entry_deadline_ns is not None
+                    and now >= self.spec.entry_deadline_ns
+                )
+                or (
+                    self.pending_policy_deadline_ns is not None
+                    and now >= self.pending_policy_deadline_ns
+                )
+            )
+            if (self.pending_role == "entry" or not halted) and (
+                now - self.pending_since_ns >= timeout or force or entry_blocked
             ):
                 self.cancel_requested = True
                 self.cancel_requested_ns = now
@@ -399,6 +409,8 @@ class FamilyStrategy(Strategy):
         ):
             return False
         if self.spec.exit_deadline_ns is not None and now >= self.spec.exit_deadline_ns:
+            return False
+        if self.preset.exit_policy is not None and now >= self._holding_deadline(now):
             return False
         if self.spec.evidence_class == "development" and any(
             x not in self.spec.qualified_data
@@ -623,6 +635,13 @@ class FamilyStrategy(Strategy):
         self.pending, self.pending_role = order, role
         self.pending_remaining = quantity
         self.pending_since_ns = self.clock.timestamp_ns()
+        # Latch the entry's selected boundary at submission. Recomputing after
+        # a session/day rollover could move its cutoff into the future.
+        self.pending_policy_deadline_ns = (
+            self._holding_deadline(self.pending_since_ns)
+            if role == "entry" and self.preset.exit_policy is not None
+            else None
+        )
         self.cancel_requested = False
         self.cancel_requested_ns = 0
         self._record(
@@ -654,7 +673,7 @@ class FamilyStrategy(Strategy):
             self.quantity += quantity
             self.entry_price = cost / self.quantity
             if self.entered_ns is None:
-                self.entered_ns = self.clock.timestamp_ns()
+                self.entered_ns = event.ts_event
                 self.close_deadline_ns = self._holding_deadline(self.entered_ns)
             self.high_bid = max(self.high_bid, price)
         else:
@@ -676,6 +695,7 @@ class FamilyStrategy(Strategy):
         self.pending = None
         self.pending_role = None
         self.pending_remaining = D(0)
+        self.pending_policy_deadline_ns = None
         self.cancel_requested = False
         self.cancel_requested_ns = 0
 

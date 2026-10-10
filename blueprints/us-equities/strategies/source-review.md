@@ -187,3 +187,45 @@ fail (sequence3 instead of1); the baseline source is then restored. This is
 disclosed as missing coverage, not falsely labelled a repaired behaviour bug.
 The corrected native suite passes34 tests with zero skips. Local results remain
 synthetic engineering; historical timing, paper and performance gates stand.
+
+## Codex correction at 45ebe5c4
+
+The three reviewed findings reproduce on the immutable
+`45ebe5c4e996a53fa0627bbfd2087c1e936e86b0` baseline with only the new regression
+module overlaid. The native rc5 focused run fails on policy-cutoff entries and
+resting buys, halt cancellation, and callback-clock entry anchoring. Positive
+controls admit entries before the cutoff and keep pending exits separate.
+
+Comment 4235547318 now uses the existing `_holding_deadline` calendar resolver
+to refuse new entries at the selected policy boundary, and latches that boundary
+when submitting an entry so a rollover cannot move a resting buy's deadline.
+Comment 4235547324 cancels a pending entry on a halt independently of the pending
+exit gate; the identity survives until a native terminal event, and a missing
+acknowledgement still freezes with that same identity. Comment 4235547328 anchors
+the first buy to `OrderFilled.ts_event`; both its holding timer and selected
+calendar deadline therefore describe the fill, including delayed delivery.
+
+The primary API remains
+`nautechsystems/nautilus_trader@1b0a49d2792a9432a3aca3fcb617ce7a630d905e`,
+`python/nautilus_trader/model/__init__.pyi` (`OrderFilled.ts_event`,
+`OrderCanceled`, `OrderCancelRejected`),
+`crates/trading/src/python/strategy.rs` (native event dispatch and
+`py_cancel_order`) and `crates/common/src/python/clock.rs` (`Clock.timestamp_ns`).
+The unchanged installed 2.0.0rc5 engine reproduces the failures and exercises the
+fixes through its quote, custom-data, order and timer boundaries. Shared
+`adaptive-paper/sessions.py`, backed by
+`exchange_calendars@dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a`, still owns calendar
+semantics; no replacement calendar or broker adapter is introduced.
+
+The acceptance generator retains its credential-free subprocess environment
+without inherited one-thread test caps, following the CC's corrected suite
+resource rule. README records lido's exact-head source answer: the T22 local
+residual flag has no established bridge to continuing shared-runner management.
+That test-backed follow-up remains a T13-runtime gate under the CC ruling;
+synthetic landing and paper acceptance are separate.
+
+The final focused baseline run has six tests and nine assertion failures; the
+pending-exit separation control already passes. All six pass after the fix. The
+regenerated full native receipt has 40 tests, zero skips and 14 matching source
+bindings. The matrix has 120 timing candidates, 30 legacy cases, four controls,
+ten noncohort inverses and seven matching bindings. Both retain `NOT_CITED`.

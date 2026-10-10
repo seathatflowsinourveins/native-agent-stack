@@ -8,6 +8,7 @@ import tempfile
 import time
 import unittest
 from dataclasses import replace
+from datetime import datetime
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
@@ -30,6 +31,8 @@ def run_strategy(
     advance_to_ns=None,
     start_ns=None,
     halt_after_ns=None,
+    reopen_at_ns=None,
+    strategy_type=None,
 ):
     """Drive the real class through native data/clock/callback boundaries."""
     from nautilus_trader.model import CustomData
@@ -46,7 +49,7 @@ def run_strategy(
         contracts.StrategySpec(simulation.INSTRUMENT_ID, simulation.COHORT_SHA256),
         **fields,
     )
-    strategy = families.GapPremarketStrategy(
+    strategy = (strategy_type or families.GapPremarketStrategy)(
         spec, ledger=ledger, fault_sink=faults.append
     )
     snapshot = replace(
@@ -78,6 +81,13 @@ def run_strategy(
                 ),
             )
         )
+    if reopen_at_ns is not None:
+        data.append(
+            CustomData(
+                families.snapshot_data_type(simulation.INSTRUMENT_ID),
+                replace(snapshot, ts_event=reopen_at_ns, ts_init=reopen_at_ns),
+            )
+        )
     try:
         engine.add_strategy(strategy)
         engine.add_data(data, sort=True)
@@ -89,6 +99,190 @@ def run_strategy(
 
 @unittest.skipUnless(NATIVE, "requires the exact locked Nautilus rc5 runtime")
 class LifecycleTests(unittest.TestCase):
+    def test_policy_boundary_refuses_new_entries_at_and_after_cutoff(self):
+        for policy, boundary in (
+            ("regular-close-v1", "2026-10-08T19:58:00+00:00"),
+            ("after-hours-v1", "2026-10-08T23:58:00+00:00"),
+        ):
+            cutoff = int(datetime.fromisoformat(boundary).timestamp() * 1e9)
+            for offset in (-2, 0, 60):
+                start = cutoff + offset * 1_000_000_000
+                with self.subTest(policy=policy, offset=offset):
+                    strategy = run_strategy(
+                        ledger=None,
+                        faults=[],
+                        start_ns=start,
+                        bids=("10",) * 5,
+                        overrides={
+                            "preset": "aggressive-v1",
+                            "exit_policy": policy,
+                            "exit_deadline_ns": start + 30_000_000_000,
+                        },
+                    )
+                    buys = [
+                        r
+                        for r in strategy.trace
+                        if r["event"] == "submit" and r["side"] == "BUY"
+                    ]
+                    self.assertEqual(len(buys), int(offset < 0))
+
+    def test_resting_entry_is_cancelled_at_selected_policy_boundary(self):
+        for policy, boundary in (
+            ("regular-close-v1", "2026-10-08T19:58:00+00:00"),
+            ("after-hours-v1", "2026-10-08T23:58:00+00:00"),
+        ):
+            cutoff = int(datetime.fromisoformat(boundary).timestamp() * 1e9)
+            start = cutoff - 1_000_000_000
+            with self.subTest(policy=policy):
+                strategy = run_strategy(
+                    ledger=None,
+                    faults=[],
+                    start_ns=start,
+                    bids=("10", "11", "11", "10", "10", "10"),
+                    overrides={
+                        "preset": "aggressive-v1",
+                        "exit_policy": policy,
+                        "entry_timeout_ns": 10_000_000_000,
+                        "exit_deadline_ns": start + 30_000_000_000,
+                    },
+                )
+                cancels = [
+                    r for r in strategy.trace if r["event"] == "cancel_requested"
+                ]
+                self.assertEqual(len(cancels), 1)
+                self.assertEqual(cancels[0]["now_ns"], cutoff)
+                self.assertEqual(cancels[0]["role"], "entry")
+                self.assertTrue(any(r["event"] == "terminal" for r in strategy.trace))
+                self.assertFalse(any(r["event"] == "fill" for r in strategy.trace))
+                self.assertEqual(strategy.quantity, 0)
+                self.assertEqual(strategy.sequence, 1)
+
+    def test_halt_cancels_entry_and_keeps_identity_until_native_terminal(self):
+        native_cancel = families.FamilyStrategy.cancel_order
+        observed = []
+
+        def observe_cancel(strategy, client_id):
+            native_cancel(strategy, client_id)
+            observed.append(
+                (
+                    str(client_id),
+                    str(strategy.pending.client_order_id),
+                    strategy.cancel_requested,
+                    strategy.clock.timestamp_ns(),
+                )
+            )
+
+        with patch.object(families.FamilyStrategy, "cancel_order", new=observe_cancel):
+            strategy = run_strategy(
+                ledger=None,
+                faults=[],
+                bids=("10", "11", "11", "10", "10", "10"),
+                halt_after_ns=simulation.BASE_NS + 1_000_000_000,
+                reopen_at_ns=simulation.BASE_NS + 3_000_000_000,
+                overrides={"entry_timeout_ns": 10_000_000_000},
+            )
+        self.assertEqual(len(observed), 1)
+        client_id, pending_id, cancel_requested, cancelled_at = observed[0]
+        self.assertEqual(client_id, pending_id)
+        self.assertTrue(cancel_requested)
+        self.assertEqual(cancelled_at, simulation.BASE_NS + 1_000_000_000)
+        self.assertTrue(any(r["event"] == "terminal" for r in strategy.trace))
+        self.assertFalse(any(r["event"] == "fill" for r in strategy.trace))
+        self.assertIsNone(strategy.pending)
+        self.assertEqual(strategy.sequence, 1)
+
+    def test_halt_cancel_without_ack_retains_original_entry_identity(self):
+        requested = []
+
+        def drop_cancel_ack(strategy, client_id):
+            requested.append((str(client_id), strategy.clock.timestamp_ns()))
+
+        with patch.object(families.FamilyStrategy, "cancel_order", new=drop_cancel_ack):
+            faults = []
+            strategy = run_strategy(
+                ledger=None,
+                faults=faults,
+                bids=("10",) + ("11",) * 7,
+                halt_after_ns=simulation.BASE_NS + 1_000_000_000,
+            )
+        self.assertEqual(
+            requested,
+            [
+                (
+                    strategy.client_id_prefix + "0000001",
+                    simulation.BASE_NS + 1_000_000_000,
+                )
+            ],
+        )
+        self.assertEqual(str(strategy.pending.client_order_id), requested[0][0])
+        self.assertEqual(strategy.sequence, 1)
+        self.assertEqual(faults, ["cancel_ack_timeout_requires_reconciliation"])
+        self.assertTrue(strategy.faulted)
+
+    def test_halt_does_not_apply_entry_cancellation_to_pending_exit(self):
+        faults = []
+        strategy = run_strategy(
+            ledger=None,
+            faults=faults,
+            bids=("10", "10", "9", "8", "8", "8", "10", "10"),
+            halt_after_ns=simulation.BASE_NS + 3_000_000_000,
+            reopen_at_ns=simulation.BASE_NS + 6_000_000_000,
+            overrides={"exit_deadline_ns": simulation.BASE_NS + 2_000_000_000},
+        )
+        sells = [
+            r for r in strategy.trace if r["event"] == "submit" and r["side"] == "SELL"
+        ]
+        self.assertEqual(len(sells), 1)
+        self.assertEqual(sells[0]["now_ns"], simulation.BASE_NS + 2_000_000_000)
+        self.assertFalse(any(r["event"] == "cancel_requested" for r in strategy.trace))
+        self.assertEqual(strategy.quantity, 0)
+        self.assertEqual(strategy.sequence, 2)
+        self.assertEqual(faults, [])
+
+    def test_delayed_first_buy_callback_uses_native_fill_event_time(self):
+        from nautilus_trader.model import OrderSide
+
+        class DelayedFillStrategy(families.GapPremarketStrategy):
+            def __init__(self, *args, **kwargs):
+                super().__init__(*args, **kwargs)
+                self.delayed_fill = None
+                self.first_fill_ns = None
+                self.callback_ns = None
+
+            def on_order_filled(self, event):
+                if event.order_side == OrderSide.BUY and self.first_fill_ns is None:
+                    self.first_fill_ns = event.ts_event
+                    self.delayed_fill = event
+                else:
+                    super().on_order_filled(event)
+
+            def on_quote(self, quote):
+                if (
+                    self.delayed_fill is not None
+                    and quote.ts_event >= self.first_fill_ns + 2_000_000_000
+                ):
+                    self.callback_ns = self.clock.timestamp_ns()
+                    super().on_order_filled(self.delayed_fill)
+                    self.delayed_fill = None
+                super().on_quote(quote)
+
+        strategy = run_strategy(
+            ledger=None,
+            faults=[],
+            bids=("10",) * 12,
+            strategy_type=DelayedFillStrategy,
+            overrides={"entry_timeout_ns": 10_000_000_000},
+        )
+        self.assertIsNotNone(strategy.first_fill_ns)
+        self.assertGreater(strategy.callback_ns, strategy.first_fill_ns)
+        self.assertEqual(strategy.entered_ns, strategy.first_fill_ns)
+        self.assertEqual(
+            strategy.close_deadline_ns,
+            strategy._holding_deadline(strategy.first_fill_ns),
+        )
+        self.assertEqual(strategy.quantity, 0)
+        self.assertFalse(strategy.faulted)
+
     def test_session_is_notified_even_when_durable_freeze_fails(self):
         with tempfile.TemporaryDirectory() as directory:
             ledger = safety.Ledger(Path(directory) / "ledger.sqlite3")

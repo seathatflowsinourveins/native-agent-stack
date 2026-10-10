@@ -187,6 +187,13 @@ timeout also bounds acknowledgement waiting. A native cancel rejection or a
 missing acknowledgement freezes durably and escalates, preserving the original
 order identity and residual rather than guessing that a replacement is safe.
 
+Explicit exit policies also bound entry: no new buy at or after the selected
+calendar boundary, and a resting buy is cancelled when its latched boundary,
+entry deadline or an observed halt arrives. A halt does not apply that entry
+cancellation rule to pending exits. Identity remains pending until native
+terminal confirmation. Holding time and calendar deadlines start from the
+first buy fill's native `event.ts_event`, including delayed callback delivery.
+
 Startup refusals and held-position hazards call the existing Ledger.freeze and
 the injected fault_sink independently, following the reused adapter callback
 guard's failure handling. Stale quotes, observed halts, unsupported closed
@@ -195,6 +202,29 @@ paper-lane reconciliation path. A durable halt also blocks a flat restart.
 If journal persistence fails, the session stop is still attempted and its error
 type is retained; that path does not claim successful durability. Explicit
 synthetic fixtures can still use the documented empty local ledger boundary.
+
+Lido's source answer (#85545) leaves residual management unqualified. At #938
+`45ebe5c4e996a53fa0627bbfd2087c1e936e86b0`, `families.py:136` attempts the
+durable halt and fault sink, while `families.py:259` leaves only the local
+`owned_residual_requires_operator_reconciliation` flag on stop. At #940
+`8c9357c7e9face151e0da1ccb14816d95a279dd1`, `native_adapter.py:233` stops the
+node on failure. The adaptive receipt exposes its wired fault (`runner.py:1628`,
+`:1863`), but held-position status uses adaptive-strategy attention fields
+(`native_strategy.py:868`, `runner.py:1521`); the T22 local flag has no established
+bridge into that status.
+
+The CLI makes a bounded recovery attempt (`runner.py:2496`), subject to fresh
+quotes, allowed sessions and budget (`recovery.py:239`). Stale/near-close
+refusals can leave a residual; finalization closes the port (`recovery.py:322`)
+and reports `native_engine_resumed=False` (`recovery.py:339`). This does not
+establish a continuing T22 manager or next-fresh-quote takeover. Native
+paper/journal acceptance remains NOT_RUN (`README-exits-session.md:100`).
+
+Under the CC ruling of 2026-10-10T00:08:00Z, that missing join gates T13-runtime
+and permits synthetic #938 to land. Before the runtime run, a test-backed T22
+follow-up must join fault sink and journal, operator-visible frozen/held-position
+run status, and the shared R9 paper exit logic taking over at the next fresh
+quote. A stale-tick carry is never evidence-qualified overnight holding.
 
 LiveNode fixtures obtain timestamps from a registered native actor's engine
 clock. Their market session is a declared synthetic RTH scenario anchored to

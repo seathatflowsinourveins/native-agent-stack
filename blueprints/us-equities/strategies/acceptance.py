@@ -36,9 +36,6 @@ def main():
     env = {
         "PATH": os.defpath,
         "PYTHONDONTWRITEBYTECODE": "1",
-        "OMP_NUM_THREADS": "1",
-        "OPENBLAS_NUM_THREADS": "1",
-        "MKL_NUM_THREADS": "1",
     }
     completed = subprocess.run(
         command, cwd=root, env=env, capture_output=True, text=True, check=False
@@ -81,7 +78,7 @@ def main():
             str(p.relative_to(root)): hashlib.sha256(p.read_bytes()).hexdigest()
             for p in source
         },
-        "scope": "ten equity classes, timing candidates, forced-exit/cancel lifecycle, durable freeze and restart, startup/session hazards, clock-independent LiveNode fixtures and instance regressions; synthetic ports and real local ledger only",
+        "scope": "ten equity classes, timing candidates and entry cutoffs, halt cancellation, fill-event deadline anchors, forced-exit/cancel lifecycle, durable freeze and restart, startup/session hazards, clock-independent LiveNode fixtures and instance regressions; synthetic ports and real local ledger only",
         "broker_e2e": "NOT_RUN",
         "historical_layer15_e2e": "NOT_RUN",
         "historical_exit_timing": "NOT_RUN",
