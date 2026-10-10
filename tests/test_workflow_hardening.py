@@ -25,6 +25,7 @@ import sys
 import tempfile
 import textwrap
 import unittest
+from unittest import mock
 
 import tests
 
@@ -1319,9 +1320,9 @@ class GitleaksConfigTestsRunInCI(unittest.TestCase):
 
 
 class CiSecretScanWorkflowRangeTests(unittest.TestCase):
-    """History scanners must select the landed range, never the whole HEAD ancestry."""
+    """History scanners consume verified event modes, never a hardcoded HEAD ancestry."""
 
-    def test_every_git_history_scan_uses_an_explicit_commit_range(self):
+    def test_every_git_history_scan_uses_the_verified_event_log_options(self):
         workflow = (WORKFLOWS / "validate.yml").read_text(encoding="utf-8")
         found = set()
         for job_id, job in jobs(workflow).items():
@@ -1345,20 +1346,36 @@ class CiSecretScanWorkflowRangeTests(unittest.TestCase):
                         if "--log-opts" in options:
                             position = options.index("--log-opts")
                             ranges.append(options[position + 1] if position + 1 < len(options) else "")
-                        self.assertEqual(len(ranges), 1, "each history scan must supply one --log-opts range")
-                        self.assertRegex(ranges[0], r"^[^.\s]+\.\.[^.\s]+$",
-                                         "history scans need explicit nonempty start..end endpoints, not HEAD")
-                        self.assertNotIn("--all", options, "history scans may not expand to all refs")
+                        self.assertEqual(len(ranges), 1, "each history scan must supply one verified --log-opts input")
+                        self.assertEqual(ranges[0], "$SCAN_LOG_OPTS",
+                                         "event modes must come from the verified resolver, never hardcoded HEAD")
+                        self.assertNotIn("--all", options, "full CI backstops must be selected by the resolver")
+                        self.assertIn("--max-target-megabytes", options)
+                        self.assertEqual(options[options.index("--max-target-megabytes") + 1], "2")
         self.assertEqual(found, {("secret-scan", "gitleaks"),
                                  ("secret-scan-betterleaks", "betterleaks")},
                          "both gate and parity git scanners must remain covered")
+
+    def test_pinned_baseline_history_commands_fail_the_event_options_contract(self):
+        baseline = subprocess.run(["git", "show", "318089f9e99a916c1609af9e36d099712e5f82fe:.github/workflows/validate.yml"],
+                                  cwd=ROOT, capture_output=True, text=True, check=True)
+        with tempfile.TemporaryDirectory(prefix="ci-secret-scan-baseline-") as scratch:
+            workflows = Path(scratch)
+            (workflows / "validate.yml").write_text(baseline.stdout, encoding="utf-8")
+            result = unittest.TestResult()
+            with mock.patch(f"{__name__}.WORKFLOWS", workflows):
+                CiSecretScanWorkflowRangeTests("test_every_git_history_scan_uses_the_verified_event_log_options").run(result)
+        self.assertEqual(len(result.failures), 2, result.errors)
+        self.assertEqual(result.errors + result.skipped, [])
+        for _, failure in result.failures:
+            self.assertIn("HEAD", failure)
 
     @staticmethod
     def parsed_workflow():
         from tests.test_workflow_policy import load_workflow
         return load_workflow((WORKFLOWS / "validate.yml").read_text(encoding="utf-8"))
 
-    def test_verified_range_outputs_reach_both_scanners_and_the_required_history_fixture(self):
+    def test_verified_event_outputs_reach_both_scanners_and_the_required_history_fixture(self):
         for job_id in ("secret-scan", "secret-scan-betterleaks"):
             with self.subTest(job=job_id):
                 steps = self.parsed_workflow()["jobs"][job_id]["steps"]
@@ -1370,21 +1387,22 @@ class CiSecretScanWorkflowRangeTests(unittest.TestCase):
                 command = shlex.split(re.sub(r"\\\n\s*", " ", resolver["run"]))
                 self.assertEqual(command, ["python3", "scripts/ci_secret_scan_range.py",
                                            "--event-name", "$GITHUB_EVENT_NAME",
-                                           "--event-path", "$GITHUB_EVENT_PATH", ">>", "$GITHUB_OUTPUT"],
+                                           "--event-path", "$GITHUB_EVENT_PATH", "--ci-backstop", ">>", "$GITHUB_OUTPUT"],
                                  "the verified CLI outputs must become the scanner step outputs")
                 checkout = next(step for step in steps if step.get("uses", "").startswith("actions/checkout@"))
                 self.assertEqual(str(checkout["with"]["fetch-depth"]), "0")
                 self.assertLess(steps.index(checkout), steps.index(resolver))
                 history = next(step for step in steps if "Scan git history" in step.get("name", ""))
                 self.assertLess(steps.index(resolver), steps.index(history))
-                self.assertEqual(history["env"]["SCAN_START"], "${{ steps.scan_range.outputs.start }}")
-                self.assertEqual(history["env"]["SCAN_END"], "${{ steps.scan_range.outputs.end }}")
-                self.assertIn('--log-opts="${SCAN_START}..${SCAN_END}"', history["run"])
+                self.assertEqual(history["env"]["SCAN_LOG_OPTS"], "${{ steps.scan_range.outputs.log_opts }}")
+                self.assertIn('--log-opts="$SCAN_LOG_OPTS"', history["run"])
                 if job_id == "secret-scan":
                     fixture = next(step for step in steps if "gitleaks allowlist regression tests" in step.get("name", ""))
                     self.assertLess(steps.index(resolver), steps.index(fixture))
                     self.assertEqual(fixture["env"]["GITLEAKS_HISTORY_RANGE"],
                                      "${{ steps.scan_range.outputs.range }}")
+                    self.assertEqual(fixture["env"]["GITLEAKS_HISTORY_MODE"],
+                                     "${{ steps.scan_range.outputs.mode }}")
 
     def test_failed_or_missing_range_outputs_disable_every_real_history_scan(self):
         workflow = self.parsed_workflow()

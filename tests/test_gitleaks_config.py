@@ -3,7 +3,9 @@
 Most scanner checks run the PATH `gitleaks` in no-git `dir` mode against small
 synthetic fixture directories built under a temp dir, using the real repository
 `.gitleaks.toml`. The real-checkout history check requires an explicit
-GITLEAKS_HISTORY_RANGE; it never falls back to scanning all HEAD ancestry.
+GITLEAKS_HISTORY_RANGE in range mode; intentional CI tip/full events skip this
+duplicate check because the main step performs that native scan. It never falls
+back to scanning all HEAD ancestry locally.
 Scanner-dependent checks skip if gitleaks is not on PATH, while mocked contract
 tests still run. Individual cases skip if the guarded launcher reports its
 per-user scan lock is held by another scan (a busy lock is not a passing or
@@ -837,10 +839,13 @@ class GitleaksIgnoreFingerprintTests(unittest.TestCase):
 class GitleaksBranchAncestryHistoryTests(unittest.TestCase):
     """The real landed commit range must scan clean, independently of other refs.
 
-    CI supplies GITLEAKS_HISTORY_RANGE from scripts/ci_secret_scan_range.py. A
-    local run must supply its verified PR range explicitly; absence skips this
-    integration check unless CI requires it. The 2026-10-09 full-history OOM
-    incident replaced the former HEAD-ancestry check with this bounded range.
+    CI supplies GITLEAKS_HISTORY_RANGE and GITLEAKS_HISTORY_MODE from the event
+    helper. Range mode verifies and scans that window; intentional CI push-tip
+    and scheduled/manual backstop modes skip this duplicate scan because the
+    main step performs it. A local run must supply its verified PR range
+    explicitly; absence skips this integration check unless CI requires it.
+    The 2026-10-09 full-history OOM incident replaced the former local
+    HEAD-ancestry check with this bounded range.
     Git verifies the range before scanning, so an invalid or empty range cannot
     read as zero findings. A scanner failure still errors (_scan_findings), and
     the per-user busy lock still skips without starting another scan.
@@ -848,8 +853,19 @@ class GitleaksBranchAncestryHistoryTests(unittest.TestCase):
 
     def setUp(self):
         self.history_range = os.environ.get("GITLEAKS_HISTORY_RANGE", "")
+        required = bool(os.environ.get("GITLEAKS_TESTS_REQUIRED"))
+        mode = os.environ.get("GITLEAKS_HISTORY_MODE", "" if required else "range")
+        if mode not in ("range", "tip", "full"):
+            raise _ScannerError("the history integration check requires a recognized event scan mode")
+        if mode != "range":
+            events = {"tip": ("push",), "full": ("schedule", "workflow_dispatch")}
+            if os.environ.get("GITHUB_ACTIONS") != "true" or os.environ.get("GITHUB_EVENT_NAME") not in events[mode]:
+                raise _ScannerError("native tip/full history modes are permitted only for matching GitHub CI events")
+            if self.history_range:
+                raise _ScannerError("native tip/full history modes must not carry a commit range")
+            self.skipTest(f"the main CI history step performs the intentional {mode} event scan")
         if not self.history_range:
-            if os.environ.get("GITLEAKS_TESTS_REQUIRED"):
+            if required:
                 self.fail("CI requires an explicit GITLEAKS_HISTORY_RANGE from the event range step")
             self.skipTest("GITLEAKS_HISTORY_RANGE is required for the real PR-range integration scan")
         self.assertRegex(self.history_range, r"^[0-9a-f]{40}\.\.[0-9a-f]{40}$",
@@ -899,8 +915,15 @@ class HistoryRangeContractTests(unittest.TestCase):
     START = "1" * 40
     END = "2" * 40
 
-    def run_history_test(self, value, *, required=True, git_reply=None):
+    def run_history_test(self, value, *, required=True, mode="range", github_actions=False,
+                         event=None, git_reply=None):
         environment = {"GITLEAKS_TESTS_REQUIRED": "1"} if required else {}
+        if mode is not None:
+            environment["GITLEAKS_HISTORY_MODE"] = mode
+        if github_actions:
+            environment["GITHUB_ACTIONS"] = "true"
+        if event is not None:
+            environment["GITHUB_EVENT_NAME"] = event
         if value is not None:
             environment["GITLEAKS_HISTORY_RANGE"] = value
 
@@ -931,6 +954,31 @@ class HistoryRangeContractTests(unittest.TestCase):
         self.assertEqual(result.failures + result.errors, [])
         git.assert_not_called()
         scanner.assert_not_called()
+
+    def test_intentional_native_modes_skip_only_for_matching_ci_events(self):
+        for mode, event in (("tip", "push"), ("full", "schedule"), ("full", "workflow_dispatch")):
+            with self.subTest(mode=mode, event=event):
+                result, git, scanner = self.run_history_test("", mode=mode, github_actions=True, event=event)
+                self.assertEqual(len(result.skipped), 1)
+                self.assertEqual(result.failures + result.errors, [])
+                git.assert_not_called()
+                scanner.assert_not_called()
+
+    def test_unknown_local_or_mismatched_native_modes_error_before_git_or_scanner(self):
+        for mode, ci, event, value in (("unknown", True, "push", ""),
+                                      (None, True, "push", ""),
+                                      ("tip", False, "push", ""),
+                                      ("full", False, "workflow_dispatch", ""),
+                                      ("tip", True, "pull_request", ""),
+                                      ("full", True, "push", ""),
+                                      ("full", True, None, ""),
+                                      ("full", True, "workflow_dispatch", f"{self.START}..{self.END}")):
+            with self.subTest(mode=mode, ci=ci, event=event):
+                result, git, scanner = self.run_history_test(value, mode=mode, github_actions=ci, event=event)
+                self.assertEqual(len(result.errors), 1, result.failures)
+                self.assertEqual(result.skipped, [])
+                git.assert_not_called()
+                scanner.assert_not_called()
 
     def test_wrong_head_nonancestor_and_failed_or_empty_git_ranges_never_start_a_scan(self):
         for broken in ("wrong-head", "missing-head", "nonancestor", "count-error", "zero-count", "bad-count"):
@@ -1070,7 +1118,8 @@ class ScannerErrorTests(unittest.TestCase):
         stream = io.StringIO()
         with mock.patch.object(subprocess, "run", side_effect=run), \
                 mock.patch(f"{__name__}.GITLEAKS", "gitleaks"), \
-                mock.patch.dict(os.environ, {"GITLEAKS_HISTORY_RANGE": f"{start}..{end}"}):
+                mock.patch.dict(os.environ, {"GITLEAKS_HISTORY_RANGE": f"{start}..{end}",
+                                             "GITLEAKS_HISTORY_MODE": "range"}):
             unittest.TextTestRunner(stream=stream, verbosity=0).run(
                 GitleaksBranchAncestryHistoryTests("test_head_ancestry_scoped_scan_has_zero_findings"))
         output = stream.getvalue()

@@ -8,6 +8,7 @@ would actually supply to the scanners.
 import json
 import os
 from pathlib import Path
+import shlex
 import subprocess
 import sys
 import tempfile
@@ -63,29 +64,57 @@ class CiSecretScanRangeTests(unittest.TestCase):
         self.git("update-ref", "refs/heads/scan", head)
         self.git("symbolic-ref", "HEAD", "refs/heads/scan")
 
-    def run_range(self, event, payload):
+    def run_range(self, event, payload, *, ci_backstop=False, github_actions=False):
         event_path = self.repo.parent / "event.json"
         event_path.write_text(json.dumps(payload), encoding="utf-8")
-        return subprocess.run([sys.executable, "-B", str(SCRIPT),
-                               "--event-name", event, "--event-path", str(event_path)],
-                              cwd=self.repo, env=self.env, capture_output=True,
+        args = [sys.executable, "-B", str(SCRIPT),
+                "--event-name", event, "--event-path", str(event_path)]
+        if ci_backstop:
+            args.append("--ci-backstop")
+        env = dict(self.env)
+        if github_actions:
+            env["GITHUB_ACTIONS"] = "true"
+        return subprocess.run(args, cwd=self.repo, env=env, capture_output=True,
                               text=True, timeout=15)
 
-    def assert_range(self, event, payload, start, end, commits):
+    def assert_range(self, event, payload, start, end, commits, *, log_opts=None):
         result = self.run_range(event, payload)
         self.assertEqual(result.returncode, 0, result.stderr)
         outputs = dict(line.split("=", 1) for line in result.stdout.splitlines() if "=" in line)
+        self.assertEqual(outputs.get("mode"), "range")
         self.assertEqual(outputs.get("start"), start)
         self.assertEqual(outputs.get("end"), end)
         self.assertEqual(outputs.get("range"), f"{start}..{end}")
+        self.assertEqual(outputs.get("log_opts"), log_opts or f"{start}..{end}")
         self.assertRegex(outputs.get("reason", ""), r"^[a-z][a-z0-9-]+$")
-        actual = set(self.git("rev-list", outputs["range"]).splitlines())
+        actual = set(self.git("rev-list", *shlex.split(outputs["log_opts"])).splitlines())
         self.assertEqual(actual, set(commits), "the emitted range must contain exactly the landed commits")
         self.assertGreater(len(actual), 0, "a successful range may not scan nothing")
         return outputs
 
-    def assert_rejected(self, event, payload):
-        result = self.run_range(event, payload)
+    def assert_tip(self, payload, end):
+        result = self.run_range("push", payload)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        outputs = dict(line.split("=", 1) for line in result.stdout.splitlines() if "=" in line)
+        self.assertEqual(outputs.get("mode"), "tip")
+        self.assertEqual(outputs.get("log_opts"), "-1")
+        self.assertEqual(outputs.get("start"), "")
+        self.assertEqual(outputs.get("range"), "")
+        self.assertEqual(outputs.get("end"), end)
+        self.assertEqual(self.git("rev-list", "-1", end), end)
+
+    def assert_ci_backstop(self, event, end):
+        result = self.run_range(event, {}, ci_backstop=True, github_actions=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        outputs = dict(line.split("=", 1) for line in result.stdout.splitlines() if "=" in line)
+        self.assertEqual(outputs.get("mode"), "full")
+        self.assertEqual(outputs.get("log_opts"), "--full-history --all --diff-filter=tuxdb")
+        self.assertEqual(outputs.get("start"), "")
+        self.assertEqual(outputs.get("range"), "")
+        self.assertEqual(outputs.get("end"), end)
+
+    def assert_rejected(self, event, payload, **kwargs):
+        result = self.run_range(event, payload, **kwargs)
         self.assertNotEqual(result.returncode, 0, "invalid or empty ranges must fail the CI step")
         self.assertNotIn("range=", result.stdout, "a rejected event must not publish scanner inputs")
 
@@ -95,16 +124,34 @@ class CiSecretScanRangeTests(unittest.TestCase):
 
     def test_push_scans_the_before_after_range(self):
         self.assert_range("push", {"before": self.base, "after": self.feature_two},
-                          self.base, self.feature_two, (self.feature_one, self.feature_two))
+                          self.base, self.feature_two, (self.feature_one, self.feature_two),
+                          log_opts=f"--no-merges --first-parent {self.base}..{self.feature_two}")
 
-    def test_first_branch_push_uses_the_merge_base_with_main(self):
-        self.assert_range("push", {"before": ZERO_SHA, "after": self.feature_two},
-                          self.base, self.feature_two, (self.feature_one, self.feature_two))
+    def test_push_options_exclude_merges_and_side_branch_commits(self):
+        side = self.commit("push side branch", self.base)
+        merge = self.commit("push merged side branch", self.feature_one, side)
+        head = self.commit("push after merge", merge)
+        self.checkout(head)
+        self.assert_range("push", {"before": self.base, "after": head},
+                          self.base, head, (self.feature_one, head),
+                          log_opts=f"--no-merges --first-parent {self.base}..{head}")
 
-    def test_force_push_excludes_the_shared_history_of_before_and_after(self):
+    def test_first_branch_push_scans_only_the_tip(self):
+        self.assert_tip({"before": ZERO_SHA, "after": self.feature_two}, self.feature_two)
+
+    def test_force_push_scans_only_the_tip(self):
         before = self.commit("abandoned force-push branch", self.base)
-        self.assert_range("push", {"before": before, "after": self.feature_two},
-                          self.base, self.feature_two, (self.feature_one, self.feature_two))
+        self.assert_tip({"before": before, "after": self.feature_two}, self.feature_two)
+
+    def test_force_push_with_an_unavailable_old_tip_requires_the_forced_event_flag(self):
+        before = "a" * 40
+        self.assert_tip({"before": before, "after": self.feature_two, "forced": True}, self.feature_two)
+        self.assert_rejected("push", {"before": before, "after": self.feature_two})
+        self.assert_rejected("push", {"before": before, "after": self.feature_two, "forced": "true"})
+
+    def test_first_branch_push_can_scan_a_root_commit(self):
+        self.checkout(self.root)
+        self.assert_tip({"before": ZERO_SHA, "after": self.root}, self.root)
 
     def test_pull_request_merge_scans_from_its_actual_first_parent_when_base_moved(self):
         merge = self.commit("PR test merge", self.base, self.feature_two)
@@ -132,19 +179,21 @@ class CiSecretScanRangeTests(unittest.TestCase):
         self.assert_range("pull_request", self.pr(self.main, head),
                           self.main, head, (self.feature_one, self.feature_two, head))
 
-    def test_workflow_dispatch_on_a_feature_scans_the_main_merge_base_range(self):
-        self.assert_range("workflow_dispatch", {}, self.base, self.feature_two,
-                          (self.feature_one, self.feature_two))
+    def test_scheduled_and_manual_backstops_require_ci_and_the_explicit_flag(self):
+        for event in ("schedule", "workflow_dispatch"):
+            with self.subTest(event=event):
+                self.assert_ci_backstop(event, self.feature_two)
+                for flag, ci in ((False, False), (True, False), (False, True)):
+                    with self.subTest(flag=flag, ci=ci):
+                        self.assert_rejected(event, {}, ci_backstop=flag, github_actions=ci)
 
-    def test_workflow_dispatch_on_main_scans_only_the_latest_commit(self):
-        self.checkout(self.main)
-        self.assert_range("workflow_dispatch", {}, self.base, self.main, (self.main,))
+    def test_ci_backstop_supports_a_root_commit_without_a_main_ref(self):
+        self.checkout(self.root)
+        self.git("update-ref", "-d", "refs/remotes/origin/main")
+        self.assert_ci_backstop("workflow_dispatch", self.root)
 
     def test_empty_push_ranges_fail_closed(self):
-        for before, after in ((self.feature_two, self.feature_two), (ZERO_SHA, self.main)):
-            with self.subTest(before=before):
-                self.checkout(after)
-                self.assert_rejected("push", {"before": before, "after": after})
+        self.assert_rejected("push", {"before": self.feature_two, "after": self.feature_two})
 
     def test_push_after_must_match_the_checked_out_head(self):
         self.assert_rejected("push", {"before": self.base, "after": self.main})
@@ -162,15 +211,10 @@ class CiSecretScanRangeTests(unittest.TestCase):
             with self.subTest(event=event, payload=payload):
                 self.assert_rejected(event, payload)
 
-    def test_unrelated_histories_fail_closed(self):
+    def test_unrelated_pr_histories_fail_closed_but_rewritten_push_tips_are_supported(self):
         unrelated = self.commit("unrelated root")
-        for event, payload in (("push", {"before": unrelated, "after": self.feature_two}),
-                               ("pull_request", self.pr(unrelated, self.feature_two))):
-            with self.subTest(event=event):
-                self.assert_rejected(event, payload)
-        self.git("update-ref", "refs/remotes/origin/main", unrelated)
-        self.assert_rejected("push", {"before": ZERO_SHA, "after": self.feature_two})
-        self.assert_rejected("workflow_dispatch", {})
+        self.assert_rejected("pull_request", self.pr(unrelated, self.feature_two))
+        self.assert_tip({"before": unrelated, "after": self.feature_two}, self.feature_two)
 
     def test_pull_request_merge_must_contain_the_event_head_as_its_second_parent(self):
         other_head = self.commit("other PR", self.base)
@@ -184,13 +228,9 @@ class CiSecretScanRangeTests(unittest.TestCase):
         self.checkout(merge)
         self.assert_rejected("pull_request", self.pr(self.main, self.feature_two))
 
-    def test_dispatch_without_a_main_ref_or_commit_parent_fails_closed(self):
+    def test_first_branch_push_does_not_require_a_main_ref(self):
         self.git("update-ref", "-d", "refs/remotes/origin/main")
-        self.assert_rejected("workflow_dispatch", {})
-        self.assert_rejected("push", {"before": ZERO_SHA, "after": self.feature_two})
-        self.git("update-ref", "refs/remotes/origin/main", self.root)
-        self.checkout(self.root)
-        self.assert_rejected("workflow_dispatch", {})
+        self.assert_tip({"before": ZERO_SHA, "after": self.feature_two}, self.feature_two)
 
     def test_empty_pull_request_head_range_fails_closed(self):
         self.checkout(self.main)
