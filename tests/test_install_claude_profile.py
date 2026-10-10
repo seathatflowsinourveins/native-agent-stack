@@ -2082,6 +2082,121 @@ class StandingRuleSurfacesTests(unittest.TestCase):
         self.assertEqual(engine["requested_version"], "2.0.0rc5")
         self.assertEqual(engine["source_commit"], self.LAYER_15_RELEASES[0][3])
 
+    LAYER_15_LOCK = "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock"
+    LAYER_15_TIME = re.compile(r"(\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d)(?:\.\d+)?Z")
+
+    def layer_15_wheel_table(self, record_text):
+        """The record's wheel table as {wheel file name: {header cell: value}}, read by its header cells."""
+        lines = [line.strip() for line in record_text.splitlines()]
+        starts = [index for index, line in enumerate(lines) if line.startswith("| Release | Wheel |")]
+        if len(starts) != 1:
+            raise ValueError("the record needs exactly one wheel table, headed 'Release | Wheel | ...'")
+        header = [cell.strip() for cell in lines[starts[0]].strip("|").split("|")]
+        missing = [column for column in ("Wheel", "Bytes", "sha256", "Wheel uploaded") if column not in header]
+        if missing:
+            raise ValueError(f"the wheel table has no {missing} column")
+        table = {}
+        for line in lines[starts[0] + 2:]:  # the line under the header is the alignment row
+            if not line.startswith("|"):
+                break
+            row = dict(zip(header, [cell.strip() for cell in line.strip("|").split("|")]))
+            table[row["Wheel"].strip("`")] = row
+        return table
+
+    def layer_15_to_the_second(self, value):
+        found = self.LAYER_15_TIME.fullmatch(value.strip())
+        if found is None:
+            raise ValueError(f"not an RFC 3339 UTC time: {value!r}")
+        return found.group(1) + "Z"
+
+    def layer_15_upload_drift(self, record_text, lock_text):
+        """What is wrong with the record's wheel upload times: against the lock (rc5) and against the sdist times."""
+        rc5, rc6 = self.LAYER_15_RELEASES[0][0], self.LAYER_15_RELEASES[1][0]
+        try:
+            table = self.layer_15_wheel_table(record_text)
+            if sorted(table) != sorted([rc5, rc6]):
+                return [f"the wheel table lists {sorted(table)}, not the two wheels"]
+            packages = [package for package in tomllib.loads(lock_text)["package"] if package["name"] == "nautilus-trader"]
+            if len(packages) != 1:
+                return [f"the lock must hold one nautilus-trader package, it holds {len(packages)}"]
+            entries = [entry for entry in packages[0].get("wheels", []) if entry["url"].rsplit("/", 1)[-1] == rc5]
+            if len(entries) != 1:
+                return [f"the lock must hold exactly one entry for {rc5}, it holds {len(entries)}"]
+            locked, row, problems = entries[0], table[rc5], []
+            if self.layer_15_to_the_second(row["Wheel uploaded"]) != self.layer_15_to_the_second(locked["upload-time"]):
+                problems.append("the rc5 wheel upload time is not the lock's, to the second")
+            if row["sha256"].strip("`") != locked["hash"].removeprefix("sha256:"):
+                problems.append("the rc5 sha256 is not the lock's")
+            if row["Bytes"] != f"{locked['size']:,}":
+                problems.append("the rc5 size is not the lock's")
+            labelled = re.findall(r"(\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ) \((rc[56])\)", record_text)
+            if sorted(label for _, label in labelled) != ["rc5", "rc6"]:
+                return problems + ["the record must give each sdist time once, as '<time> (rc5)' and '<time> (rc6)'"]
+            stated = {label: self.layer_15_to_the_second(when) for when, label in labelled}
+            if stated["rc5"] != self.layer_15_to_the_second(packages[0]["sdist"]["upload-time"]):
+                problems.append("the rc5 sdist time is not the lock's, to the second")
+            for wheel, label in ((rc5, "rc5"), (rc6, "rc6")):
+                # fixed-width UTC strings: lexicographic order is chronological order
+                if not self.layer_15_to_the_second(table[wheel]["Wheel uploaded"]) < stated[label]:
+                    problems.append(f"the {label} wheel time is not earlier than its sdist time")
+            return problems
+        except ValueError as problem:
+            return [str(problem)]
+
+    def test_layer_15_record_wheel_upload_times_match_the_lock_and_precede_the_sdists(self):
+        """The record's "Wheel uploaded" cells are the wheels' upload times, not their source distributions'.
+
+        The first version of the record put each release's sdist time (the later file of the release: 2026-09-15T06:13:57Z
+        and 2026-10-05T02:59:49Z) in the wheel column; PyPI's per-file upload_time for the wheels is 2026-09-15T06:08:05Z
+        and 2026-10-05T02:57:21Z. Two checks that would have caught it:
+
+        1. The rc5 row equals the entry that this repository's own uv.lock holds for that wheel file name: its
+           upload-time cut to the second, its size and its sha256; and the rc5 sdist time the record states is the
+           lock's sdist upload-time.
+        2. The record states each release's sdist upload time once, as "<time> (rc5)" and "<time> (rc6)", and each wheel
+           time is strictly earlier than its sdist time.
+
+        The lock pins nautilus-trader==2.0.0rc5 only, so the rc6 times have no second source in this repository: check 2
+        rejects a wheel time that is its sdist time or later, and their exact seconds are held by the record alone.
+
+        The controls below run the same checks on edited copies, so neither check can be weakened unseen.
+        """
+        record = (ROOT / self.LAYER_15_RECORD).read_text(encoding="utf-8")
+        lock = (ROOT / self.LAYER_15_LOCK).read_text(encoding="utf-8")
+        self.assertEqual(self.layer_15_upload_drift(record, lock), [])
+
+        def edited(text, old, new):
+            self.assertEqual(text.count(old), 1, f"the control's anchor {old!r} is not unique")
+            return text.replace(old, new)
+
+        controls = {
+            "the rc5 cell holds its sdist time": edited(record, "| 2026-09-15T06:08:05Z |", "| 2026-09-15T06:13:57Z |"),
+            "the rc5 cell is one second off the lock": edited(record, "| 2026-09-15T06:08:05Z |", "| 2026-09-15T06:08:06Z |"),
+            "the rc6 cell holds its sdist time": edited(record, "| 2026-10-05T02:57:21Z |", "| 2026-10-05T02:59:49Z |"),
+            "the rc6 cell is later than its sdist time": edited(record, "| 2026-10-05T02:57:21Z |", "| 2026-10-05T02:59:50Z |"),
+            "the column is named Uploaded again": edited(record, "| Wheel uploaded |", "| Uploaded |"),
+            "an sdist time is not labelled rc6": edited(record, "2026-10-05T02:59:49Z (rc6)", "2026-10-05T02:59:49Z (rc7)"),
+            "the rc5 size is changed": edited(record, "| 69,963,442 |", "| 69,963,443 |"),
+            "the rc5 sha256 is changed": edited(
+                record, "`eab45fafd2312deda1236554c49a9798bfc76bc8465af864878e2f70189ebebe` |",
+                "`eab45fafd2312deda1236554c49a9798bfc76bc8465af864878e2f70189ebebf` |"),
+            "the rc5 sdist time is one second off the lock": edited(record, "2026-09-15T06:13:57Z (rc5)",
+                                                                   "2026-09-15T06:13:58Z (rc5)"),
+        }
+        for name, text in controls.items():
+            with self.subTest(change=name):
+                self.assertNotEqual(self.layer_15_upload_drift(text, lock), [])
+        relocked = edited(lock, 'upload-time = "2026-09-15T06:08:05.461Z"', 'upload-time = "2026-09-15T06:08:06.461Z"')
+        with self.subTest(change="the lock's rc5 wheel time changes"):
+            self.assertNotEqual(self.layer_15_upload_drift(record, relocked), [])
+        resdisted = edited(lock, 'upload-time = "2026-09-15T06:13:57.781Z"', 'upload-time = "2026-09-15T06:13:58.781Z"')
+        with self.subTest(change="the lock's rc5 sdist time changes"):
+            self.assertNotEqual(self.layer_15_upload_drift(record, resdisted), [])
+        unlisted = edited(lock, "nautilus_trader-2.0.0rc5-cp312-cp312-manylinux_2_34_x86_64.whl\"",
+                          "nautilus_trader-2.0.0rc5-cp312-cp312-manylinux_2_34_x86_65.whl\"")
+        with self.subTest(change="the lock holds no entry for the rc5 wheel"):
+            self.assertNotEqual(self.layer_15_upload_drift(record, unlisted), [])
+
     def test_root_review_rules_flag_unsourced_fixes_and_missing_regressions(self):
         text = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
         self.assertIn("## Code Review Rules\n", text)
