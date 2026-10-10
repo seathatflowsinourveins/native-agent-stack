@@ -2164,9 +2164,9 @@ Reference edition: [catalogs/foundation/new-wsl-architecture-20261001.json](../c
 | [adoption/manifest.json](../adoption/manifest.json) | `c0d7c2efbd2a954e020f432b8cf677a7a4027a54f2deb3b2fb6e0c70bdd01368` (without source.release_tag, source.release_commit, updated_at) |
 | [adoption/new-wsl-profile.json](../adoption/new-wsl-profile.json) | `309fa245e3aaa07ed8045ee8969727280c890679e71256424b7c873f491cdec4` |
 | [adoption/platforms/linux-wsl2-new-distro.md](../adoption/platforms/linux-wsl2-new-distro.md) | `d79da9e44ea865913f3dc9d78a0dcc2dc235ae02d7873ff60ed7ebcdd72d3781` |
-| [catalogs/foundation/new-wsl-architecture-20261001.json](../catalogs/foundation/new-wsl-architecture-20261001.json) | `e35a8d2c2a4199a14799f65f1a25ed572bfcc0f974315a864cd7d768a6fcba1c` |
+| [catalogs/foundation/new-wsl-architecture-20261001.json](../catalogs/foundation/new-wsl-architecture-20261001.json) | `d1ed06b8db2a6de06b4e3e3ff9e7455ffd9a10cafee3cbb0ed0196a6da8c8c9c` |
 | [catalogs/landscape/research-state.json](../catalogs/landscape/research-state.json) | `fe142c1b8b8ec8b92d69ec5971d68028225899c101ffc43cea618883b119332a` |
-| [catalogs/landscape/us-equities.json](../catalogs/landscape/us-equities.json) | `67722d7cd828b406c27d716391e20dd085944cd5f0d9d81c1e4c457356569763` |
+| [catalogs/landscape/us-equities.json](../catalogs/landscape/us-equities.json) | `6aff6411e711dcf3f0a487f343bb0e45c319a0a9235763a54eae9316e1597b0e` |
 | [docs/decisions/2026-10-05-ns2604-foundation-requalification.md](../docs/decisions/2026-10-05-ns2604-foundation-requalification.md) | `44d667b2b63de07784aa8816c65bd8949ed91bfb83a8cc77b69c52516663fc6d` |
 | [evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json](../evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json) | `ad86d1d4c2cddeeebc2bc327fddc897b161cec092706db24c779603321246bc7` |
 | [evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/agent-sdks.json](../evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/agent-sdks.json) | `eff4adb3683062fb31acb63f494fb15c39d08bd50627a68ca32262c007adb519` |

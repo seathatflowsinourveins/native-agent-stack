@@ -178,10 +178,11 @@
       "review_level": "source_review",
       "identities": [
         {
-          "scope": "CC-declared protocol engine record",
-          "build": "18176",
+          "scope": "frozen_study_native_source_build",
+          "build": "18176 (unproven container candidate)",
           "source_commit": "80e7843f645673bcbeaab963049f76f20f6785e1",
-          "association_source": "CC T19 dispatch; protocol build/source association is declared, not newly reproduced by this catalog review."
+          "association_source": "CC T19 dispatch; the study identity is the native LEAN source build at 80e7843f, and no association with Docker 18176 is established, not newly reproduced by this catalog review.",
+          "build_scope": "The study engine is the native LEAN source build at 80e7843f645673bcbeaab963049f76f20f6785e1; Docker 18176 is an unproven candidate, not its accepted engine label."
         },
         {
           "scope": "Current local runtime recipe/image record",
@@ -214,7 +215,10 @@
     "manifest_sha256": "aa370e42e29dc2419e586358254ff2e821df48a693aa9a3ee16b65d30036ee0b",
     "acceptance_receipt": "evidence/receipts/runtime-final-native-24-acceptance-20261008.json",
     "acceptance_receipt_sha256": "cc32a1462171763446809fb675bd946f3b45875c797bea5049d1a925d4809086",
-    "acceptance_run_utc": ["2026-10-08T17:48:39Z", "2026-10-08T17:49:09Z"],
+    "acceptance_run_utc": [
+      "2026-10-08T17:48:39Z",
+      "2026-10-08T17:49:09Z"
+    ],
     "acceptance_result": "24/24 PASS, rc 0; actual full lock SHA printed before and after in the same stdout stream",
     "acceptance_evidence_class": "local_integration",
     "earlier_run": "catalogs/us-equities/runtime-target.json#/offline_runtime_followup_20261004/historical_acceptance_20261008_0620"
@@ -234,8 +238,14 @@
     "scope": "These are historical or derived views, not two independent GRAND selections. This refresh does not claim an October 9 re-review of every September 22 layer."
   },
   "primary_fetches": {
-    "package_identity_window_utc": ["2026-10-09T19:30:59.926Z", "2026-10-09T19:35:08.174Z"],
-    "pinned_edgartools_source_window_utc": ["2026-10-09T19:33:36.068Z", "2026-10-09T19:33:37.672Z"],
+    "package_identity_window_utc": [
+      "2026-10-09T19:30:59.926Z",
+      "2026-10-09T19:35:08.174Z"
+    ],
+    "pinned_edgartools_source_window_utc": [
+      "2026-10-09T19:33:36.068Z",
+      "2026-10-09T19:33:37.672Z"
+    ],
     "licence_readme_fetched_utc": "2026-10-09T19:36:26Z",
     "tradingview_terms": {
       "url": "https://www.tradingview.com/policies/#terms-of-use",
@@ -253,7 +263,13 @@
       "tradesdontlie_LICENSE_at_c05b8f57": "1f368594b544a3b7d96cd78e059861d089e7302a364cab766f86939b79f18ae6",
       "tradesdontlie_README_at_c05b8f57": "c52470ccb9d7c55c57a2e9b41127ad5f9297eea3171282640b290a43e073f30e"
     },
-    "lean_commit_fetch_window_utc": ["2026-10-09T19:38:56Z", "2026-10-09T19:38:57Z"],
-    "lean_status_fetch_window_utc": ["2026-10-09T19:47:26.127846Z", "2026-10-09T19:47:26.435170Z"]
+    "lean_commit_fetch_window_utc": [
+      "2026-10-09T19:38:56Z",
+      "2026-10-09T19:38:57Z"
+    ],
+    "lean_status_fetch_window_utc": [
+      "2026-10-09T19:47:26.127846Z",
+      "2026-10-09T19:47:26.435170Z"
+    ]
   }
 }

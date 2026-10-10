@@ -1,4 +1,4 @@
-"""Canonical identity and source-pointer checks use synthetic public fixtures."""
+"""Canonical identity, fixture pointers and published current-record checks."""
 
 import copy
 from contextlib import redirect_stdout
@@ -10,8 +10,41 @@ import unittest
 
 from scripts.catalog_decisions import (
     BASE, BASE_SOURCES, INDEX, MANIFEST, InvalidDecisionIndex,
-    build_index, identity, main, pointer, supplement, validate_index,
+    build_index, identity, load, main, pointer, supplement, validate_index,
 )
+
+
+class CurrentDecisionRecordTests(unittest.TestCase):
+    def test_current_decision_records_resolve_to_the_same_repository(self):
+        root = Path(__file__).resolve().parents[1]
+        checked = 0
+        for source_path in (
+            "catalogs/landscape/us-equities.json",
+            "catalogs/us-equities/engines-strategies.json",
+            "catalogs/us-equities/data-research.json",
+        ):
+            pending = [("", load(root, source_path))]
+            while pending:
+                location, node = pending.pop()
+                if isinstance(node, list):
+                    pending.extend((f"{location}/{index}", value)
+                                   for index, value in enumerate(node))
+                elif isinstance(node, dict):
+                    pending.extend((f"{location}/{key}", value)
+                                   for key, value in node.items())
+                    if "current_decision_record" not in node:
+                        continue
+                    checked += 1
+                    reference = node["current_decision_record"]
+                    with self.subTest(source=source_path, pointer=location):
+                        path, separator, fragment = reference.partition("#")
+                        self.assertEqual(separator, "#", "current decision needs an entry pointer")
+                        record = pointer(load(root, path), fragment)
+                        self.assertIsInstance(record, dict, "pointer must resolve to one decision record")
+                        if "repository" in node:
+                            self.assertEqual(identity(record["repository"]), identity(node["repository"]),
+                                             "current decision must belong to the referring repository")
+        self.assertGreater(checked, 0, "exercise the published current-decision records")
 
 
 class DecisionIndexTests(unittest.TestCase):

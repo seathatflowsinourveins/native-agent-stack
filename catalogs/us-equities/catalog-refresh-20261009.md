@@ -107,7 +107,7 @@ data use; this evidence does not forbid every human-readable chart interaction.
 
 | Scope | Build / full source | Evidence boundary |
 | --- | --- | --- |
-| CC-declared protocol record | 18176 / `80e7843f645673bcbeaab963049f76f20f6785e1` | Dispatch identifies the protocol mapping; maintainer commit resolves. T19 did not reproduce that build association or execute the protocol engine. |
+| Frozen study route | Native LEAN source build at `80e7843f645673bcbeaab963049f76f20f6785e1` | The native source build is the study engine of record. Docker 18176 is a separate, unproven candidate; no source-to-image association or new engine execution is inferred. |
 | Current local runtime recipe | 18149 / `33e3945f2faa95308d972dfd3d7b762f7743d1d5` | Install recipe records this mapping and image digest `sha256:70071d1bbb90385deb60c7d20bc3830c7f4c79f6c09c5d1ade9196c009f68861`; image inspect has no revision/version labels. Source-to-image reproduction remains open. |
 | September source build/sample | `985ef30ad3ac774218c5ac516b4cb0aa2655730f` | Retained native source-build/sample execution, with its original date and inputs |
 

@@ -711,7 +711,7 @@
         "source": "catalogs/sota-convergence/layer-verdicts-20260922.json"
       },
       "current_decision_record": "catalogs/us-equities/catalog-refresh-20261009.json#/entries/2",
-      "rationale": "Use retained dataset manifests/private content-addressed artifacts. DVC remains a source-reviewed implementation candidate, with installation held after the October 5 dependency-security removal. The historical September 23 dvc checkout fixture remains local integration; no safe-use or full historical equity-dataset qualification is established.",
+      "rationale": "2026-10-09: Use retained dataset manifests/private content-addressed artifacts. DVC remains a source-reviewed implementation candidate, with installation held after the October 5 dependency-security removal. The historical September 23 dvc checkout fixture remains local integration; no safe-use or full historical equity-dataset qualification is established.",
       "version_or_commit": "3.67.1; source 356dfa03278058b02df42124f243c2c345329dae",
       "release_date": "2026-03-31",
       "license": "Apache-2.0",
@@ -751,7 +751,9 @@
         "https://pypi.org/pypi/dvc/3.67.1/json",
         "https://osv.dev/vulnerability/PYSEC-2026-2447",
         "https://github.com/advisories/GHSA-w8v5-vhqr-4h9v"
-      ]
+      ],
+      "historical_rationale": "Use lightweight dataset manifests and private content-addressed artifacts before adding a lake service.",
+      "current_reviewed_at": "2026-10-09"
     },
     {
       "id": "data-lakefs",

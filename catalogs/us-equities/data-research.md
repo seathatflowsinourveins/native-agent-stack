@@ -184,7 +184,7 @@ The earlier `1fb9f8ca…` run stays historical. The
 
 ## DVC advisory disposition — 2026-10-05
 
-The `data-dvc` historical source-reviewed default remains recorded at 3.67.1;
+2026-10-09 reconciliation: the `data-dvc` historical source-reviewed default remains recorded at 3.67.1;
 its current decision is **conditional, installation held**, with a
 data-versioning re-judgement open.
 It pulls `dvc-data -> diskcache 5.6.3`, affected by

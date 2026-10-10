@@ -7844,7 +7844,7 @@
     },
     {
       "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
-      "sha256": "e35a8d2c2a4199a14799f65f1a25ed572bfcc0f974315a864cd7d768a6fcba1c"
+      "sha256": "d1ed06b8db2a6de06b4e3e3ff9e7455ffd9a10cafee3cbb0ed0196a6da8c8c9c"
     },
     {
       "path": "catalogs/landscape/research-state.json",
@@ -7852,7 +7852,7 @@
     },
     {
       "path": "catalogs/landscape/us-equities.json",
-      "sha256": "67722d7cd828b406c27d716391e20dd085944cd5f0d9d81c1e4c457356569763"
+      "sha256": "6aff6411e711dcf3f0a487f343bb0e45c319a0a9235763a54eae9316e1597b0e"
     },
     {
       "path": "docs/decisions/2026-10-05-ns2604-foundation-requalification.md",

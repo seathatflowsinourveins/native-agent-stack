@@ -1960,7 +1960,7 @@
           "role": "the layer's verdict selection (keep_but_compare): data versioning and reproducibility",
           "repository": "https://github.com/treeverse/dvc",
           "pin": "3.67.1 (the 2026-09-22 verdict's baseline; the new distribution installs the current upstream release)",
-          "pin_source": "catalogs/landscape/us-equities.json:628-632",
+          "pin_source": "catalogs/landscape/us-equities.json:633-637",
           "install": {"command": "python -m pip install dvc (the current upstream release at install time; the verdict's baseline is dvc==3.67.1)", "kind": "upstream_documented", "url": "https://github.com/treeverse/dvc/blob/356dfa03278058b02df42124f243c2c345329dae/README.rst"},
           "acceptance": {"command": "the DVC 3.67.1 command line on scratch git and DVC repositories (2026-09-23, synthetic fixtures): dvc add, then dvc checkout restored the added directory byte-identically; dvc repro ran a six-stage pipeline with a lock and a second repro skipped all six stages; a whole-tree restore took git checkout of two git-tracked .gitignore files plus dvc checkout, after dvc checkout alone failed the restore criterion as first written", "evidence_class": "upstream_example_or_native_operation", "source_path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/0-dvc-repro-restore-contract.json"},
           "upstream_currency": {"latest_release": "not read for this edition; the 2026-09-22 verdict records 3.67.1 at source commit 356dfa03", "checked_at": "2026-10-01", "pin_is_latest": "unknown", "url": ""}
@@ -2165,7 +2165,7 @@
           "role": "the layer's verdict selection for data validation, beside Dagu for scheduling",
           "repository": "https://github.com/unionai-oss/pandera",
           "pin": "0.33.1 (the 2026-09-22 verdict's baseline; the new distribution installs the current upstream release)",
-          "pin_source": "catalogs/landscape/us-equities.json:1443-1447",
+          "pin_source": "catalogs/landscape/us-equities.json:1448-1452",
           "install": {"command": "python -m pip install 'pandera[pandas]' (the current upstream release at install time; the verdict's baseline is 0.33.1)", "kind": "upstream_documented", "url": "https://github.com/unionai-oss/pandera/blob/62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6/README.md"},
           "acceptance": {"command": "the promotion gate on DuckDB inputs with pandera 0.33.1, duckdb 1.5.5 and pandas 3.0.6 (2026-09-23): five synthetic fixture cases, each built two ways, all matched the CSV path's status, row count and named checks; the good case exits 0 and the four bad cases exit 1", "evidence_class": "local_integration_check", "source_path": "evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/5-duckdb-gate-input.json"},
           "upstream_currency": {"latest_release": "not read for this edition; the 2026-09-22 verdict records v0.33.1 at source commit 62f55e2d", "checked_at": "2026-10-01", "pin_is_latest": "unknown", "url": ""}
@@ -2591,7 +2591,7 @@
           "role": "a verdict selection: the offline retrieval baseline",
           "repository": "https://github.com/eyuansu62/agent-retrieval-bench",
           "pin": "v0.2.1 at source commit b487f386 (the 2026-09-22 verdict's baseline)",
-          "pin_source": "catalogs/landscape/us-equities.json:3209-3213",
+          "pin_source": "catalogs/landscape/us-equities.json:3286-3290",
           "install": {"command": "python -m pip install -e . in a checkout of the repository at its current upstream tag", "kind": "upstream_documented", "url": "https://github.com/eyuansu62/agent-retrieval-bench/blob/b487f3866cc13dd971819cb902517a6a50282404/README.md"},
           "acceptance": {"command": "the repository's own offline retrieval evaluation (its BM25 and lexical runs on the published dataset, at commit b487f386, unmodified), with every headline metric recomputed independently", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/convergence-practice/arb-trace2code/receipt.json"},
           "upstream_currency": {"latest_release": "not read for this edition; the receipt ran source commit b487f386", "checked_at": "2026-10-01", "pin_is_latest": "unknown", "url": ""}
@@ -2601,7 +2601,7 @@
           "role": "a verdict selection: the typed evaluation, log and retry route",
           "repository": "https://github.com/UKGovernmentBEIS/inspect_ai",
           "pin": "0.3.266 (the 2026-09-22 verdict's baseline; the new distribution installs the current upstream release)",
-          "pin_source": "catalogs/landscape/us-equities.json:3228-3232",
+          "pin_source": "catalogs/landscape/us-equities.json:3305-3309",
           "install": {"command": "python -m pip install inspect-ai (the current upstream release at install time; the verdict's baseline is 0.3.266)", "kind": "upstream_documented", "url": "https://inspect.aisi.org.uk/"},
           "acceptance": {"command": "Inspect AI 0.3.266 in a fresh venv (2026-09-23): inspect --help exits 0 and inspect eval runs the mock-model task of 8 samples to exit 0, with no model provider", "evidence_class": "upstream_example_or_native_operation", "source_path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/1-five-package-installs.json"},
           "upstream_currency": {"latest_release": "not read for this edition; the 2026-09-22 verdict records 0.3.266", "checked_at": "2026-10-01", "pin_is_latest": "unknown", "url": ""}
@@ -2611,7 +2611,7 @@
           "role": "a verdict selection: experiment and dataset lineage",
           "repository": "https://github.com/mlflow/mlflow",
           "pin": "3.16.1 (the 2026-09-22 verdict's baseline; the new distribution installs the current upstream release)",
-          "pin_source": "catalogs/landscape/us-equities.json:3247-3251",
+          "pin_source": "catalogs/landscape/us-equities.json:3324-3328",
           "install": {"command": "python -m pip install mlflow (the current upstream release at install time; the verdict's baseline is 3.16.1)", "kind": "upstream_documented", "url": "https://github.com/mlflow/mlflow/blob/32792afe5b0183fce10532d3a023f5cfa8612d09/README.md"},
           "acceptance": {"command": "MLflow 3.16.1 in a fresh venv (2026-09-23): the catalog's tracking snippet with a sqlite store exits 0; mlflow server on loopback reports health OK and answers experiments/search (exit 0)", "evidence_class": "upstream_example_or_native_operation", "source_path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/1-five-package-installs.json"},
           "upstream_currency": {"latest_release": "not read for this edition; the 2026-09-22 verdict records v3.16.1", "checked_at": "2026-10-01", "pin_is_latest": "unknown", "url": ""}

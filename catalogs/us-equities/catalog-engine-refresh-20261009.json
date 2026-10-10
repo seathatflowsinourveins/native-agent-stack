@@ -6,7 +6,10 @@
   "evidence_class": "source_review",
   "authority": "Trading CC engine-catalog dispatch relayed 2026-10-09T20:03:51Z",
   "scope": "Current engine/product source identities, entitlement boundaries and owner-directed candidate/stale dispositions. No installation, broker/provider/model call or native strategy acceptance. Historical builds and family verdict fields remain dated.",
-  "primary_observation_window_utc": ["2026-10-09T21:23:00Z", "2026-10-09T21:30:00Z"],
+  "primary_observation_window_utc": [
+    "2026-10-09T21:23:00Z",
+    "2026-10-09T21:30:00Z"
+  ],
   "entries": [
     {
       "id": "t19-lean-alpaca-entitlement",
@@ -15,11 +18,14 @@
       "decision": "backtest_reference_only_no_local_paper",
       "review_level": "source_review",
       "license": "Apache-2.0 source; QuantConnect product entitlement separate",
-      "rationale": "AlpacaBrokerage initialization calls ValidateSubscription():179. Invalid/expired product347 entitlement reaches Environment.Exit(1):1544. Official CLI instructions require QC login and paid-tier organization. No local-paper acceptance follows from the historical compilation.",
+      "rationale": "AlpacaBrokerage initialization calls ValidateSubscription():179. Invalid/expired product 347 entitlement reaches Environment.Exit(1):1544. Official CLI instructions require QC login and paid-tier organization. No local-paper acceptance follows from the historical compilation.",
       "source_path": "QuantConnect.AlpacaBrokerage/AlpacaBrokerage.cs",
       "git_blob": "2affb717fa7a494770bf58a5784a0f5741660935",
       "source_sha256": "ec9aac52e1e549b0463a23c4547aca357c49311f8429144c720e2ee80e13f920",
-      "sources": ["https://github.com/QuantConnect/Lean.Brokerages.Alpaca/blob/e69f39b0d8869329cf084d08dfce7a3b5985b4d0/QuantConnect.AlpacaBrokerage/AlpacaBrokerage.cs#L179", "https://www.quantconnect.com/docs/v2/lean-cli/live-trading/brokerages/alpaca"],
+      "sources": [
+        "https://github.com/QuantConnect/Lean.Brokerages.Alpaca/blob/e69f39b0d8869329cf084d08dfce7a3b5985b4d0/QuantConnect.AlpacaBrokerage/AlpacaBrokerage.cs#L179",
+        "https://www.quantconnect.com/docs/v2/lean-cli/live-trading/brokerages/alpaca"
+      ],
       "historical_compilation_source": "1973f6165bee212acf656ed2f9cb0af86d4f2a18",
       "limits": "Source reachability only; no entitlement failure or brokerage startup was executed. Paper diagnostic/qualification authorizations and selected Nautilus/official SDK boundaries retain their own scope."
     },
@@ -30,11 +36,14 @@
       "decision": "backtest_reference_only_no_local_paper",
       "review_level": "source_review",
       "license": "Apache-2.0 source; QuantConnect product entitlement separate",
-      "rationale": "Initialization calls ValidateSubscription():1470; product181 invalid/expired entitlement reaches Environment.Exit(1):6219. Official CLI instructions require QC login and paid-tier organization. Preserve this separately from the selected Nautilus IBKR adapter.",
+      "rationale": "Initialization calls ValidateSubscription():1470; product 181 invalid/expired entitlement reaches Environment.Exit(1):6219. Official CLI instructions require QC login and paid-tier organization. Preserve this separately from the selected Nautilus IBKR adapter.",
       "source_path": "QuantConnect.InteractiveBrokersBrokerage/InteractiveBrokersBrokerage.cs",
       "git_blob": "a7646681a6735d07813d969e1837f5f0397d2e36",
       "source_sha256": "d8800f77674587aa041f720350927bbfdc7e075622f5f477734dce3609795818",
-      "sources": ["https://github.com/QuantConnect/Lean.Brokerages.InteractiveBrokers/blob/fb86123c7ea07c3e9d02d56ed7476675e3e4578a/QuantConnect.InteractiveBrokersBrokerage/InteractiveBrokersBrokerage.cs#L1470", "https://www.quantconnect.com/docs/v2/lean-cli/live-trading/brokerages/interactive-brokers"],
+      "sources": [
+        "https://github.com/QuantConnect/Lean.Brokerages.InteractiveBrokers/blob/fb86123c7ea07c3e9d02d56ed7476675e3e4578a/QuantConnect.InteractiveBrokersBrokerage/InteractiveBrokersBrokerage.cs#L1470",
+        "https://www.quantconnect.com/docs/v2/lean-cli/live-trading/brokerages/interactive-brokers"
+      ],
       "limits": "Source reachability only; no live/paper startup, entitlement acceptance or broker order performed."
     },
     {
@@ -46,10 +55,18 @@
       "decision": "conditional_second_engine_candidate",
       "review_level": "source_review",
       "license": "GPL-3.0",
-      "rationale": "Owner-directed second-engine candidate. LICENSE/setup.py at4.6.11 agree on GPLv3; old4.5.91 MIT-package metadata conflict remains historical. Candidate inclusion is not an adopted second active engine.",
-      "sources": ["https://github.com/Lumiwealth/lumibot/releases/tag/v4.6.11", "https://github.com/Lumiwealth/lumibot/blob/862504052407df2586122b752a645f88ce87afa1/setup.py#L62", "https://github.com/Lumiwealth/lumibot/blob/862504052407df2586122b752a645f88ce87afa1/LICENSE", "https://pypi.org/pypi/lumibot/4.6.11/json"],
-      "source_hashes": {"setup.py": "7b1cfa0dd9f0c16ce0f5a230adcd37fb96ff9c16b6273b5816601634f1cb0103", "LICENSE": "7d8846232c63c8d5c00a0a4d412df1c69c4339a54e59157164c0916ec0eff24d"},
-      "currency_limit": "At21:23:43Z GitHub latest release was4.6.11, while tag4.6.15 resolved86e6d8e0e268b2e7c49c37273984bd4a489bb3f3; version-specific PyPI4.6.15 returned404. New tags feed the next convergence sweep without implied package/native acceptance.",
+      "rationale": "Owner-directed second-engine candidate. LICENSE/setup.py at 4.6.11 agree on GPLv3; old 4.5.91 MIT-package metadata conflict remains historical. Candidate inclusion is not an adopted second active engine.",
+      "sources": [
+        "https://github.com/Lumiwealth/lumibot/releases/tag/v4.6.11",
+        "https://github.com/Lumiwealth/lumibot/blob/862504052407df2586122b752a645f88ce87afa1/setup.py#L62",
+        "https://github.com/Lumiwealth/lumibot/blob/862504052407df2586122b752a645f88ce87afa1/LICENSE",
+        "https://pypi.org/pypi/lumibot/4.6.11/json"
+      ],
+      "source_hashes": {
+        "setup.py": "7b1cfa0dd9f0c16ce0f5a230adcd37fb96ff9c16b6273b5816601634f1cb0103",
+        "LICENSE": "7d8846232c63c8d5c00a0a4d412df1c69c4339a54e59157164c0916ec0eff24d"
+      },
+      "currency_limit": "At 21:23:43Z GitHub latest release was 4.6.11, while tag 4.6.15 resolved 86e6d8e0e268b2e7c49c37273984bd4a489bb3f3; version-specific PyPI 4.6.15 returned 404. New tags feed the next convergence sweep without implied package/native acceptance.",
       "limits": "Native historical simulation, data/fill/risk/recovery and broker-specific acceptance remain required. No source-quality or performance win is inferred from recency."
     },
     {
@@ -63,7 +80,10 @@
       "license": "GPL-3.0-or-later",
       "archived": false,
       "rationale": "Owner demotes current adoption because of dated code/integrations. Unarchived metadata is preserved; no abandonment claim or compatibility run.",
-      "sources": ["https://github.com/mementum/backtrader/blob/b853d7c90b6721476eb5a5ea3135224e33db1f14/backtrader/version.py", "https://github.com/mementum/backtrader/commit/b853d7c90b6721476eb5a5ea3135224e33db1f14"],
+      "sources": [
+        "https://github.com/mementum/backtrader/blob/b853d7c90b6721476eb5a5ea3135224e33db1f14/backtrader/version.py",
+        "https://github.com/mementum/backtrader/commit/b853d7c90b6721476eb5a5ea3135224e33db1f14"
+      ],
       "version_source_sha256": "c5dce0cf347ddb1c57204e1dc959324b407ca5b10da0ca5ab7ad5a75737149b9"
     },
     {
@@ -78,7 +98,10 @@
       "license": "Apache-2.0",
       "archived": false,
       "rationale": "Owner-directed current adoption demotion; keep historical research evidence and distinct release/default-branch pins. No abandonment claim.",
-      "sources": ["https://github.com/stefan-jansen/zipline-reloaded/releases/tag/3.1.1", "https://github.com/stefan-jansen/zipline-reloaded/commit/943010b9da848e317fc520de87edade2b884d329"]
+      "sources": [
+        "https://github.com/stefan-jansen/zipline-reloaded/releases/tag/3.1.1",
+        "https://github.com/stefan-jansen/zipline-reloaded/commit/943010b9da848e317fc520de87edade2b884d329"
+      ]
     },
     {
       "id": "t19-alpaca-backtrader-stale",
@@ -90,8 +113,11 @@
       "review_level": "source_review",
       "license": "Apache-2.0",
       "archived": false,
-      "rationale": "Current north-star exclusion retains the historical legacy-migration role. Default-branch code date2022 differs from pushed_at2026-06-23; no current broker compatibility follows from repository activity.",
-      "sources": ["https://github.com/alpacahq/alpaca-backtrader-api/releases/tag/v0.15.0", "https://github.com/alpacahq/alpaca-backtrader-api/commit/475bb54b8b16506092eb97df5a7cb1d05f0b86be"]
+      "rationale": "Current north-star exclusion retains the historical legacy-migration role. Default-branch code date 2022 differs from pushed_at 2026-06-23; no current broker compatibility follows from repository activity.",
+      "sources": [
+        "https://github.com/alpacahq/alpaca-backtrader-api/releases/tag/v0.15.0",
+        "https://github.com/alpacahq/alpaca-backtrader-api/commit/475bb54b8b16506092eb97df5a7cb1d05f0b86be"
+      ]
     },
     {
       "id": "t19-hftbacktest-stale",
@@ -105,7 +131,10 @@
       "license": "MIT",
       "archived": false,
       "rationale": "Owner-directed current engine-candidate demotion; historical crypto/HFT source reviews stay dated. Unarchived metadata does not prove adoption fitness or abandonment.",
-      "sources": ["https://github.com/nkaz001/hftbacktest/releases/tag/rust-v0.9.4", "https://github.com/nkaz001/hftbacktest/commit/5f3ec40b2afb764e0fea112f941ed85523ef4e88"]
+      "sources": [
+        "https://github.com/nkaz001/hftbacktest/releases/tag/rust-v0.9.4",
+        "https://github.com/nkaz001/hftbacktest/commit/5f3ec40b2afb764e0fea112f941ed85523ef4e88"
+      ]
     }
   ],
   "conditional_product": {
@@ -117,6 +146,17 @@
     "private_source_pin": null,
     "limits": "Public licence grant is private/non-commercial scope; additional commercial rights require written consent. Membership/private source access, installed version and native acceptance remain unknown. This is a product card, not a fabricated public GitHub identity."
   },
-  "public_vectorbt_source": {"version": "1.1.2", "source_commit": "f0d2afba7af8a6e6c1b02afde27c9a16413e86ff", "record": "catalogs/us-equities/catalog-refresh-20261009.json#/entries/3", "scope": "Metadata refresh; current owner-routed public-edition disposition retains its scope. PRO is separate."},
-  "completeness_next_sweep": ["Separate core/CLI licence from brokerage product entitlement", "Lumibot tag/release/PyPI convergence", "Public vectorbt and private PRO identities/access", "Owner stale disposition versus upstream maintenance evidence", "Generated/indexed catalog projection currency"]
+  "public_vectorbt_source": {
+    "version": "1.1.2",
+    "source_commit": "f0d2afba7af8a6e6c1b02afde27c9a16413e86ff",
+    "record": "catalogs/us-equities/catalog-refresh-20261009.json#/entries/3",
+    "scope": "Metadata refresh; current owner-routed public-edition disposition retains its scope. PRO is separate."
+  },
+  "completeness_next_sweep": [
+    "Separate core/CLI licence from brokerage product entitlement",
+    "Lumibot tag/release/PyPI convergence",
+    "Public vectorbt and private PRO identities/access",
+    "Owner stale disposition versus upstream maintenance evidence",
+    "Generated/indexed catalog projection currency"
+  ]
 }
