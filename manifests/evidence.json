@@ -5371,7 +5371,7 @@
     },
     {
       "path": "adoption/hooks/claude/SHA256SUMS",
-      "sha256": "9db7433fa8c7d1c37a55b027e8eb3b66ed400ad375403abfa9808aa86fb82c66",
+      "sha256": "ea1d41db7ad339b2809eecdbb8af2af46e49b447a73bb60274245546042530cb",
       "bytes": 1229
     },
     {
@@ -59352,8 +59352,8 @@
     },
     {
       "path": "scripts/hooks/secret_path_guard.py",
-      "sha256": "fd516d8b78de7e3a9da4917c8d126fc71d7ab216a014bb28fb8bd189d6b0fb7b",
-      "bytes": 296975
+      "sha256": "fb4cb91c1bb8abf76b853270929c48b5bd02e885244ea65de4d21589ce863fd0",
+      "bytes": 300779
     },
     {
       "path": "scripts/host_name_scan.py",
@@ -60687,8 +60687,8 @@
     },
     {
       "path": "tests/test_secret_path_guard.py",
-      "sha256": "36edfe372be11f424e36576c1533111514662958063f429aec7a7284cc81b958",
-      "bytes": 391697
+      "sha256": "aab787c6e65164062e15cd2fe6c0b05826deedc81645fa87b21eb7f5626b1b77",
+      "bytes": 398499
     },
     {
       "path": "tests/test_security_identity.py",

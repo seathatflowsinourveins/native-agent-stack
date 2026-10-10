@@ -100,6 +100,14 @@ that imports a loader, a name assembled at run time, or a renamed or
 obfuscated path passes; see docs/secret-storage.md "Threat model" for the
 residual risk.
 
+S6 (2026-10-10) adds three narrow diagnostic corrections in both word readings:
+a jq literal key filter over explicit JSON inputs is not a dotenv path; a
+single TMPDIR printenv operand is a targeted non-secret read; and exact
+no-command `env -i`/`env --ignore-environment` output contains no inherited
+variables. The prior env walk keeps that clearing flag instead of inventing
+a bare env dump. No here-document body is exempted, and real dotenv, store,
+secret-name, environment-dump and executable-substitution denials remain.
+
 The same file is installed for every session on a host as
 ~/.claude/hooks/secret_path_guard.py by tools/adoption/install_claude_profile.py
 (sha256-pinned in adoption/hooks/claude/SHA256SUMS).
@@ -1918,6 +1926,65 @@ def is_env_file_word(word: str) -> bool:
     return bool(ENV_FILE_WORD.search(word)) and not word.endswith(".example")
 
 
+def is_dotenv_read(words: list[str], arguments: list[str]) -> bool:
+    """Keep dotenv denials; admit jq's literal key filter over explicit JSON inputs.
+
+    jq 1.8.1 src/main.c separates its filter from input filenames. Only this
+    simple JSON-only shape is recognized: raw/file-reading options, dynamic
+    filters and non-JSON operands retain the conservative reading. Store and
+    secret-name checks still run independently of this classification.
+    """
+    if not any(is_env_file_word(word) for word in arguments):
+        return False
+    if program_of(words) != "jq":
+        return True
+    if any(word in {"<", "<<<", "<>"} for word in words):
+        return True  # input redirection operands remain actual reads, independently of JSON filename operands
+    argv = command_arguments(words, touching_only=True)
+    flags = {"-r", "--raw-output", "-c", "--compact-output", "-e", "--exit-status", "-M", "--monochrome-output"}
+    at = 0
+    while at < len(argv) and argv[at] in flags:
+        at += 1
+    if at < len(argv) and argv[at] == "--":
+        at += 1
+    if at >= len(argv) or not re.fullmatch(r"\.[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*", argv[at]):
+        return True
+    inputs = argv[at + 1:]
+    return not inputs or not all(
+        word.endswith(".json") and not word.startswith("-")
+        and not any(char in word for char in "$`*?[]") for word in inputs)
+
+
+def printenv_is_environment_dump(words: list[str]) -> bool:
+    """Admit only the explicitly non-secret TMPDIR diagnostic; keep other reads denied.
+
+    uutils coreutils 0.10.0 printenv.rs prints every variable only without
+    operands. A missing, dynamic, secret-bearing or unclassified name remains
+    refused; quoting or an output redirection cannot supply a missing name.
+    """
+    if any(word in {"<", "<<<", "<>"} for word in words):
+        return True  # the shell still opens a credential input even if printenv ignores stdin
+    arguments = command_arguments(words, touching_only=True)
+    at = 0
+    while at < len(arguments) and arguments[at] in {"-0", "--null"}:
+        at += 1
+    if at < len(arguments) and arguments[at] == "--":
+        at += 1
+    return arguments[at:] != ["TMPDIR"]
+
+
+def is_empty_environment(words: list[str]) -> bool:
+    """GNU coreutils v9.5 src/env.c: -i clears inherited variables before output.
+
+    Only the exact no-command, no-assignment form is admitted. This also keeps
+    a literal env -i line in a heredoc from being mistaken for secret output,
+    without exempting any heredoc body or hiding executable substitutions.
+    """
+    if any(word in {"<", "<<<", "<>"} for word in words):
+        return False  # preserve the denial of any input read before the empty-environment diagnostic
+    return command_arguments(words, touching_only=True) in [["-i"], ["--ignore-environment"]]
+
+
 def is_environment_dump(words: list[str]) -> bool:
     """Whether the command prints the environment or every shell variable. A redirection is no argument: `set < FILE` and `set > FILE`
     still print every variable, where `set a b` sets positional parameters (command_arguments drops the redirections). A number is a
@@ -1925,9 +1992,9 @@ def is_environment_dump(words: list[str]) -> bool:
     when it stands apart (`set 1 > out` and `set 3 < input` set positional parameters: third verification review, 2026-09-29)."""
     program = program_of(words)
     if program == "printenv":
-        return True
+        return printenv_is_environment_dump(words)
     if program == "env":
-        return env_command_start(words) is None
+        return env_command_start(words) is None and not is_empty_environment(words)
     if program == "ps":
         return ps_shows_environment(words)
     if program not in {"set", "export", "declare", "typeset"}:
@@ -2122,7 +2189,7 @@ def segment_reason(words: list[str]) -> str | None:
         return "credential_file_read"
     if any(HF_HOME_ROOT.search(w) for w in arguments):
         return "native_store_path"
-    if any(is_env_file_word(w) for w in arguments):
+    if is_dotenv_read(words, arguments):
         return "dotenv_read"
     if any((BASE_SECRET_NAME if _baseline else SECRET_NAME).search(w) for w in arguments):
         return "secret_name_search"
@@ -2280,11 +2347,16 @@ def prior_expand(command: str, depth: int = 0) -> list[list[str]]:
                 if uutils is not None:
                     candidates.append(uutils)
                     start = env_command_start(uutils, split_strings=False)
-                    pending.append(["env"] if start is None else prior_strip_prefix(uutils[start:]))
+                    if start is not None:
+                        pending.append(prior_strip_prefix(uutils[start:]))
+                    else:
+                        pending.append(uutils if is_empty_environment(uutils) else ["env"])
                 for argv in candidates:
                     start = prior_env_command_start(argv)
                     if start is None:
-                        pending.append(["env"])  # retain this candidate's no-command refusal independently of other branches
+                        # Keep the clearing flag on the exact empty-environment candidate; every other no-command reading
+                        # retains its historical bare-env refusal independently of the other branches.
+                        pending.append(argv if is_empty_environment(argv) else ["env"])
                     else:
                         pending.append(prior_strip_prefix(argv[start:]))
                 break
@@ -2331,9 +2403,9 @@ def prior_reader_arguments(words: list[str]) -> list[str] | None:
 def prior_is_environment_dump(words: list[str]) -> bool:
     program = program_of(words)
     if program == "printenv":
-        return True
+        return printenv_is_environment_dump(words)
     if program == "env":
-        return prior_env_command_start(words) is None
+        return prior_env_command_start(words) is None and not is_empty_environment(words)
     if program in {"set", "export"} and (len(words) == 1 or words[1:] == ["-p"]):
         return True
     if program in {"declare", "typeset"} and all(w.startswith("-") for w in words[1:]) \
@@ -2413,7 +2485,7 @@ def prior_segment_reason(words: list[str]) -> str | None:
         return "credential_file_read"
     if any(HF_HOME_ROOT.search(w) for w in arguments):
         return "native_store_path"
-    if any(is_env_file_word(w) for w in arguments):
+    if is_dotenv_read(words, arguments):
         return "dotenv_read"
     if any((BASE_SECRET_NAME if _baseline else SECRET_NAME).search(w) for w in arguments):
         return "secret_name_search"

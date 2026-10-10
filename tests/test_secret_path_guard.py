@@ -5593,5 +5593,126 @@ class K4GuardTests(unittest.TestCase):
                 self.assertNotIn("$", hint)
 
 
+class S6FalsePositiveTests(unittest.TestCase):
+    """CC S6: public guard decisions on inert command strings, never secret reads."""
+
+    def assert_allowed_hook(self, command):
+        self.assertIsNone(guard.check(command))
+        done = run_hook({"tool_name": "Bash", "tool_input": {"command": command}})
+        self.assertEqual(done.returncode, 0, done.stderr)
+        self.assertEqual(done.stdout, "")
+        self.assertEqual(done.stderr, "")
+
+    def test_jq_json_env_key_and_filename_are_not_dotenv_reads(self):
+        for command in (
+                "jq -r '.env.TMPDIR' runtime.json",
+                "jq -r '.env.TMPDIR' .env-metadata.json",
+                "jq -r '.env.TMPDIR' snapshots/.env.json",
+                "jq -r '.temporary_directory' snapshots/.env.json"):
+            with self.subTest(command=command):
+                self.assert_allowed_hook(command)
+
+    def test_actual_dotenv_and_credential_store_reads_stay_denied(self):
+        denied = {
+            "cat .env": "dotenv_read",
+            "cat .env.local": "dotenv_read",
+            "cat .envrc": "dotenv_read",
+            "cat deployment.env": "dotenv_read",
+            "cat .env.json": "dotenv_read",
+            "jq -r '.env.TMPDIR' .env": "dotenv_read",
+            "jq -r '.env.TMPDIR' .env.local": "dotenv_read",
+            "jq --rawfile data .env '.env.TMPDIR' metadata.json": "dotenv_read",
+            "jq --slurpfile data .env '.env.TMPDIR' metadata.json": "dotenv_read",
+            "jq -f .env metadata.json": "dotenv_read",
+            "jq -R '.' .env": "dotenv_read",
+            "jq -r '.env.TMPDIR' metadata.json < .env": "dotenv_read",
+            "jq -r '.env.TMPDIR' metadata.json < .env.local": "dotenv_read",
+            "jq -r '.env.TMPDIR' metadata.json < .env.json": "dotenv_read",
+            "jq -r '.env.TMPDIR' metadata.json <<< .env": "dotenv_read",
+            "jq -r '.env.TMPDIR' ~/.claude/.credentials.json": "native_store_path",
+            "jq -r '.env.TMPDIR' ~/.codex/auth.json": "native_store_path",
+            "jq -r '.env.TMPDIR' ~/.config/native-agent-stack/.env.json": "credential_store_path",
+            "cat ~/.aws/credentials": "credential_file_read",
+        }
+        for command, reason in denied.items():
+            with self.subTest(command=command):
+                self.assertEqual(guard.check(command), reason)
+                done = run_hook({"tool_name": "Bash", "tool_input": {"command": command}})
+                self.assertEqual(done.returncode, 2)
+                self.assertIn(f"blocked ({reason})", done.stderr)
+                self.assertEqual(done.stdout, "")
+
+    def test_printenv_one_non_secret_variable_is_not_an_environment_dump(self):
+        for command in ("printenv TMPDIR", "printenv -- TMPDIR", "printenv -0 TMPDIR",
+                        "rtk proxy printenv TMPDIR", "timeout 5 printenv TMPDIR"):
+            with self.subTest(command=command):
+                self.assert_allowed_hook(command)
+
+    def test_environment_dumps_and_secret_printenv_names_stay_denied(self):
+        for command in ("printenv", "printenv -0", "printenv | grep TMPDIR", "env | grep TMPDIR",
+                        "printenv GH_TOKEN", "printenv OPENAI_API_KEY", "printenv EXAMPLE_TOKEN",
+                        "printenv TMPDIR GH_TOKEN", "printenv $NAME", "printenv ${NAME}",
+                        "rtk proxy printenv GH_TOKEN", "printenv > TMPDIR", "printenv 2>TMPDIR"):
+            with self.subTest(command=command):
+                self.assertIsNotNone(guard.check(command))
+                done = run_hook({"tool_name": "Bash", "tool_input": {"command": command}})
+                self.assertEqual(done.returncode, 2)
+                self.assertEqual(done.stdout, "")
+
+    def test_literal_cat_heredoc_mentioning_env_is_not_an_environment_dump(self):
+        for command in (
+                "cat <<'EOF' > note.md\nenv -i\nEOF",
+                'cat <<"EOF" > note.md\nenv -i\nEOF',
+                "cat > note.md <<'EOF'\nenv -i\nEOF\n",
+                "cat <<EOF > note.md\nenv -i\nEOF",
+                "cat <<'EOF'\nenv -i\nEOF"):
+            with self.subTest(command=command):
+                self.assert_allowed_hook(command)
+
+    def test_only_exact_empty_environment_invocations_are_admitted(self):
+        for command in ("env -i", "env --ignore-environment"):
+            with self.subTest(command=command):
+                self.assert_allowed_hook(command)
+        for command in ("env", "env -u NAME", "env -i NAME=example", "env -i cat .env",
+                        "env -i sh -c printenv", "env --ignore-environment cat ~/.aws/credentials"):
+            with self.subTest(command=command):
+                self.assertIsNotNone(guard.check(command))
+
+    def test_diagnostic_exemptions_never_hide_credential_input_redirections(self):
+        for command in ("printenv TMPDIR < .env", "printenv TMPDIR 0<.env.local",
+                        "printenv TMPDIR < ~/.aws/credentials", "printenv TMPDIR <> .env",
+                        "env -i < .env", "env --ignore-environment < .env",
+                        "env -i 0<~/.aws/credentials", "env -i <> .env",
+                        "printenv TMPDIR <<< .env", "env -i <<< .env"):
+            with self.subTest(command=command):
+                self.assertIsNotNone(guard.check(command))
+                done = run_hook({"tool_name": "Bash", "tool_input": {"command": command}})
+                self.assertEqual(done.returncode, 2)
+                self.assertEqual(done.stdout, "")
+
+    def test_jq_numeric_input_before_output_redirection_is_not_a_descriptor(self):
+        for command in ("jq -r '.env.TMPDIR' 3 > output.log metadata.json",
+                        'jq -r \'.env.TMPDIR\' "3" > output.log metadata.json'):
+            with self.subTest(command=command):
+                self.assertEqual(guard.check(command), "dotenv_read")
+
+    def test_executable_heredocs_substitutions_and_suffixes_stay_denied(self):
+        for command in (
+                "cat <<EOF > note.md\n$(printenv)\nEOF",
+                "cat <<EOF > note.md\n`printenv`\nEOF",
+                "cat <<EOF > note.md\n$(cat .env)\nEOF",
+                "cat <<'EOF'\nenv -i\nEOF\nprintenv",
+                "cat <<'EOF' | bash\nprintenv\nEOF",
+                "bash <<'EOF'\nprintenv\nEOF",
+                "eval \"$(cat <<'EOF'\nprintenv\nEOF\n)\"",
+                "cat <<'EOF' > note.md\nenv -i\nEOF\ncat .env",
+                "cat <<'EOF' > note.md\nenv -i\nEOF\ncat ~/.aws/credentials"):
+            with self.subTest(command=command):
+                self.assertIsNotNone(guard.check(command))
+                done = run_hook({"tool_name": "Bash", "tool_input": {"command": command}})
+                self.assertEqual(done.returncode, 2)
+                self.assertEqual(done.stdout, "")
+
+
 if __name__ == "__main__":
     unittest.main()
