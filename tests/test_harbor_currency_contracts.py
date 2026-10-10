@@ -8,6 +8,7 @@ The fixtures also work after squash merging or in a Git-free archive.
 """
 import hashlib
 import json
+import os
 from pathlib import Path
 import re
 import shutil
@@ -152,12 +153,58 @@ class HarborPredecessorEvidenceTests(unittest.TestCase):
         if history.returncode != 0:
             self.skipTest("origin/main history unavailable in this checkout or Git-free archive")
         reachable = subprocess.run(
-            ["git", "-C", str(ROOT), "merge-base", "--is-ancestor", revision, "origin/main"],
+            ["git", "-C", str(ROOT), "merge-base", "--is-ancestor", revision, history.stdout.strip()],
             capture_output=True, text=True,
         )
         self.assertEqual(reachable.returncode, 0,
                          "fixture repository revision must be reachable from origin/main; "
                          "retained PR capture bytes require explicit pr-branch-pre-squash provenance")
+
+    def test_repository_revision_uses_remote_main_despite_a_shadowing_local_branch(self):
+        # Git v2.53.0 Documentation/revisions.adoc resolves local branch names
+        # before remote refs; follow the #952 native synthetic-repository control.
+        executable = shutil.which("git")
+        if executable is None:
+            self.skipTest("Git unavailable for the synthetic repository ancestry control")
+        environment = {
+            "GIT_CONFIG_NOSYSTEM": "1", "GIT_CONFIG_GLOBAL": os.devnull,
+            "GIT_AUTHOR_NAME": "Synthetic Fixture", "GIT_AUTHOR_EMAIL": "fixture@example.invalid",
+            "GIT_COMMITTER_NAME": "Synthetic Fixture", "GIT_COMMITTER_EMAIL": "fixture@example.invalid",
+        }
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+
+            def git(*arguments, data=None):
+                return subprocess.run([executable, "-C", str(root), *arguments], input=data,
+                                      env=environment, check=True, capture_output=True, text=True).stdout.strip()
+
+            git("init", "--quiet", "--template=", "--initial-branch=main")
+            tree = git("mktree", data="")
+            main = git("commit-tree", tree, data="Synthetic main\n")
+            branch = git("commit-tree", tree, "-p", main, data="Synthetic branch-only child\n")
+            git("update-ref", "refs/remotes/origin/main", main)
+            git("update-ref", "refs/heads/origin/main", branch)
+            fixtures = root / "fixtures"
+            fixtures.mkdir()
+            for kind, revision, accepted in (("main", main, True), ("branch-only", branch, False),
+                                             ("unknown", "f" * 40, False)):
+                with self.subTest(revision_kind=kind):
+                    (fixtures / "manifest.json").write_text(json.dumps({"source_revision": revision}),
+                                                           encoding="utf-8")
+                    case = HarborPredecessorEvidenceTests(
+                        "test_manifest_revision_is_main_reachable_or_declared_pre_squash")
+                    result = unittest.TestResult()
+                    with mock.patch(__name__ + ".ROOT", root), \
+                            mock.patch(__name__ + ".PREDECESSOR_FIXTURES", fixtures):
+                        case.run(result)
+                    self.assertEqual(result.testsRun, 1)
+                    self.assertEqual(result.skipped, [])
+                    self.assertEqual(result.wasSuccessful(), accepted,
+                                     "repository pin ancestry was not checked against remote main")
+                    if not accepted:
+                        self.assertEqual(len(result.failures), 1)
+                        self.assertEqual(result.errors, [])
+                        self.assertIn("must be reachable from origin/main", result.failures[0][1])
 
     def test_mismatched_git_blob_cannot_satisfy_semantic_rejection(self):
         for name, guard_name, source_path in self.CASES:

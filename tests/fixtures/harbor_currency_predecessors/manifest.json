@@ -11,7 +11,8 @@
   "capture_command": "git show <provenance.commit>:<source_path>",
   "capture_reference": "https://github.com/git/git/blob/v2.53.0/Documentation/git-show.adoc",
   "reachability_reference": "https://github.com/git/git/blob/v2.53.0/Documentation/git-merge-base.adoc",
-  "git_blob_reference": "https://github.com/git/git/blob/v2.53.0/Documentation/git-hash-object.adoc",
+  "git_blob_reference": "https://github.com/git/git/blob/v2.53.0/Documentation/user-manual.adoc#object-details",
+  "hash_object_reference": "https://github.com/git/git/blob/v2.53.0/Documentation/git-hash-object.adoc",
   "assertion_boundary_reference": "https://github.com/python/cpython/blob/v3.13.16/Lib/unittest/case.py#L253-L278",
   "fixtures": [
     {
