@@ -17,6 +17,11 @@ units, placement and behavior.
   `MemoryAccounting=yes` enables the controller through ancestors;
   the pinned kernel explains creation of child interface files below.
 - Same pin: [unit drop-ins, systemd.unit.xml:203](https://github.com/systemd/systemd/blob/b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a/man/systemd.unit.xml#L203);
+  [lexicographic precedence, :233–239](https://github.com/systemd/systemd/blob/b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a/man/systemd.unit.xml#L233);
+  [set-property drop-in writer, src/core/unit.c:4735–4740](https://github.com/systemd/systemd/blob/b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a/src/core/unit.c#L4735)
+  writes priority 50, so the persisted `60-native-stack-memory.conf` sorts
+  later. Future policy edits must update the 60- file rather than rely on
+  later set-property calls to override it;
   [enablement links, :181–200](https://github.com/systemd/systemd/blob/b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a/man/systemd.unit.xml#L181);
   [slice section, systemd.slice.xml:54](https://github.com/systemd/systemd/blob/b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a/man/systemd.slice.xml#L54);
   [oneshot and RemainAfterExit, systemd.service.xml:209](https://github.com/systemd/systemd/blob/b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a/man/systemd.service.xml#L209);
@@ -49,6 +54,10 @@ units, placement and behavior.
   supplies it for direct payload creation.
   [main.cpp:4298–4330](https://github.com/microsoft/WSL/blob/91f161fa240dc355c1a88daabc8aac4273e35ba5/src/linux/init/main.cpp#L4298)
   removes the subtree at distro exit.
+  [System reserve, :105](https://github.com/microsoft/WSL/blob/91f161fa240dc355c1a88daabc8aac4273e35ba5/src/linux/init/main.cpp#L105)
+  is 32 MiB; [wsl-user cap, :3908–3909](https://github.com/microsoft/WSL/blob/91f161fa240dc355c1a88daabc8aac4273e35ba5/src/linux/init/main.cpp#L3908)
+  is guest `sysinfo` total RAM minus that reserve. The configured VM maximum
+  and usable guest MemTotal are different observations.
   [config.cpp:1000](https://github.com/microsoft/WSL/blob/91f161fa240dc355c1a88daabc8aac4273e35ba5/src/linux/init/config.cpp#L1000)
   launches boot.command asynchronously; directory creation alone does not prove
   the memory controller is ready at that point.
@@ -81,13 +90,24 @@ units, placement and behavior.
 
 ## Time and calendar
 
+- Installed **microsoft/WSL 3.0.1** at
+  `91f161fa240dc355c1a88daabc8aac4273e35ba5`:
+  [VM-init time agent start, main.cpp:3219–3222](https://github.com/microsoft/WSL/blob/91f161fa240dc355c1a88daabc8aac4273e35ba5/src/linux/init/main.cpp#L3219)
+  and [generated configuration/launch, :3698–3710](https://github.com/microsoft/WSL/blob/91f161fa240dc355c1a88daabc8aac4273e35ba5/src/linux/init/main.cpp#L3698)
+  start WSL's own chronyd with `refclock PHC /dev/ptp0 poll 3 dpoll -2 offset 0`,
+  `makestep 1.0 3` and `rtcsync`. The explicit `::1:323` capture selects its
+  PHC0 reference. These offsets establish agreement with the Hyper-V host
+  clock, not accuracy against UTC. This is separate from distro configuration;
+  no distro PHC refclock confirmation or stable-link edit is needed.
 - **MicrosoftDocs/azure-compute-docs**
   `40aaa64a2771acda033ca09289e1e777241f201e`:
   [Linux time-sync.md:102](https://github.com/MicrosoftDocs/azure-compute-docs/blob/40aaa64a2771acda033ca09289e1e777241f201e/articles/virtual-machines/linux/time-sync.md#L102)
   recommends the stable Hyper-V PHC link `/dev/ptp_hyperv`;
   [:127](https://github.com/MicrosoftDocs/azure-compute-docs/blob/40aaa64a2771acda033ca09289e1e777241f201e/articles/virtual-machines/linux/time-sync.md#L127)
   supplies the chrony PHC example. This is Hyper-V/Azure guidance; the
-  host measurement proves selected PHC0, not the uninspected device link.
+  VM endpoint measurement proves selected PHC0, not the uninspected device link.
+  The WSL source above supplies the installed VM-init implementation; the
+  Azure example is supporting context rather than a replacement configuration.
 - Installed **chrony 4.8**, maintainer mirror **mlichvar/chrony**
   (upstream `gitlab.com/chrony/chrony`),
   `9e8541e3c4c89bfb7a60b404f646fab57c69ce59`:
@@ -98,6 +118,24 @@ units, placement and behavior.
   [:1365](https://github.com/mlichvar/chrony/blob/9e8541e3c4c89bfb7a60b404f646fab57c69ce59/doc/chrony.conf.adoc#L1365)
   explains makestep limits and recommends stepping during boot before sensitive programs.
   This PR does not copy the Azure example's unrestricted stepping policy.
+  [chronyd.adoc:196–201](https://github.com/mlichvar/chrony/blob/9e8541e3c4c89bfb7a60b404f646fab57c69ce59/doc/chronyd.adoc#L196)
+  establishes that `-x` makes no system-clock adjustments and still estimates
+  clock error relative to its time sources. The distro monitor is queried at
+  `127.0.0.1:3323`; the fresh process receipt retains observed `-x` flags.
+  [chronyc.adoc:108–122](https://github.com/mlichvar/chrony/blob/9e8541e3c4c89bfb7a60b404f646fab57c69ce59/doc/chronyc.adoc#L108)
+  documents explicit `-h`/`-p` and the default Unix-socket/network fallback.
+  The capture queries both daemons by explicit address/port. Distro
+  `chronyd --version` does not establish the VM-init daemon's binary version.
+  A selected Cloudflare source alone does not prove NTS negotiation; the CC's
+  NTS configuration observation is attributed to its read.
+- Installed **git/git v2.53.0**, release commit
+  `67ad42147a7acc2af6074753ebd03d904476118f`:
+  [random minute, builtin/gc.c:2375–2382](https://github.com/git/git/blob/67ad42147a7acc2af6074753ebd03d904476118f/builtin/gc.c#L2375),
+  [calendar construction, :3033–3041](https://github.com/git/git/blob/67ad42147a7acc2af6074753ebd03d904476118f/builtin/gc.c#L3033)
+  and [scheduler setup, :3235–3247](https://github.com/git/git/blob/67ad42147a7acc2af6074753ebd03d904476118f/builtin/gc.c#L3235)
+  show why `git maintenance start` can rewrite all three base timers.
+  Check each live base hash against `base_unit_sha256` before applying and
+  regenerate the record/drop-ins after a rerun changes them.
 - Same systemd 259.5 pin:
   [systemd.time.xml:120 and :254](https://github.com/systemd/systemd/blob/b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a/man/systemd.time.xml#L120)
   defines local/default and explicit zones;
@@ -146,3 +184,7 @@ units, placement and behavior.
 | WSL docs WSL/wsl-config.md | 2f84606529d3486b0b62dadea3afcbcb26cbccdd20ceb6cc0e4470b1520eee74 |
 | Azure Linux time-sync.md | f73b8090e09707ec6944dbffee31ab6d2b7bcc8c3b60b9972a75c69bbdd68dbf |
 | chrony doc/chrony.conf.adoc | e203e8c18b98069db894e93360dcc15c6475a9f16cb7424612f6e165f5b1d3bb |
+| chrony doc/chronyd.adoc | 751ade8be1c264cc87936dc306632be5ba9d2d598018eae6ca42f4485eba06dd |
+| chrony doc/chronyc.adoc | d3b0a7dd93fb8bfaf0e0945b49833e955a33f79b5bed35b5861ebb00bc2ff4dc |
+| Git builtin/gc.c | 9b33422c7d0c5948a470db5a340992816aedf04dabaf0da6d57e3b004471d775 |
+| systemd src/core/unit.c | d4970d32aac859429911a41e7642ca90c1d31f46073b18c9a5f8860cc9f683ee |

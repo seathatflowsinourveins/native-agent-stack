@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "evidence_class": "local_integration",
+  "mutations": "Worktree draft files and temporary fixtures only; no host configuration or daemon is changed. Red fixtures remove one fix at a time from the candidate; these are software regressions, not boot or clock accuracy acceptance.",
+  "checks": [
+    {
+      "phase": "P2-1 red: remove explicit dual-endpoint fix",
+      "command": [
+        "python3",
+        "test_drafts.py",
+        "DraftTests.test_capture_separates_vm_clock_and_distro_monitor"
+      ],
+      "start_utc": "2026-10-10T05:28:32Z",
+      "end_utc": "2026-10-10T05:28:32Z",
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "test_capture_separates_vm_clock_and_distro_monitor (__main__.DraftTests.test_capture_separates_vm_clock_and_distro_monitor) ... \n  test_capture_separates_vm_clock_and_distro_monitor (__main__.DraftTests.test_capture_separates_vm_clock_and_distro_monitor) (fail_vm=False) ... FAIL\n  test_capture_separates_vm_clock_and_distro_monitor (__main__.DraftTests.test_capture_separates_vm_clock_and_distro_monitor) (fail_vm=True) ... FAIL\n\n======================================================================\nFAIL: test_capture_separates_vm_clock_and_distro_monitor (__main__.DraftTests.test_capture_separates_vm_clock_and_distro_monitor) (fail_vm=False)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<temporary-fixture>/test_drafts.py\", line 66, in test_capture_separates_vm_clock_and_distro_monitor\n    self.assertEqual({tuple(r[\"command\"]) for r in queries}, expected)\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: Items in the first set but not the second:\n('chronyc', 'tracking')\n('chronyc', 'sources')\nItems in the second set but not the first:\n('chronyc', '-h', '::1', '-p', '323', 'sources')\n('chronyc', '-h', '127.0.0.1', '-p', '3323', 'tracking')\n('chronyc', '-h', '127.0.0.1', '-p', '3323', 'sources')\n('chronyc', '-h', '::1', '-p', '323', 'tracking')\n\n======================================================================\nFAIL: test_capture_separates_vm_clock_and_distro_monitor (__main__.DraftTests.test_capture_separates_vm_clock_and_distro_monitor) (fail_vm=True)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<temporary-fixture>/test_drafts.py\", line 66, in test_capture_separates_vm_clock_and_distro_monitor\n    self.assertEqual({tuple(r[\"command\"]) for r in queries}, expected)\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: Items in the first set but not the second:\n('chronyc', 'tracking')\n('chronyc', 'sources')\nItems in the second set but not the first:\n('chronyc', '-h', '::1', '-p', '323', 'sources')\n('chronyc', '-h', '127.0.0.1', '-p', '3323', 'tracking')\n('chronyc', '-h', '127.0.0.1', '-p', '3323', 'sources')\n('chronyc', '-h', '::1', '-p', '323', 'tracking')\n\n----------------------------------------------------------------------\nRan 1 test in 0.007s\n\nFAILED (failures=2)\n",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "f6e6005bf5e600c48a641b187830461044b9cd58e7836e36aca774ae0c360291",
+      "output_handling": "Published output masks home/temporary prefixes before hashing; command exit code is unmodified."
+    },
+    {
+      "phase": "P2-2 red: remove calendar and byte-hash binding assertions",
+      "command": [
+        "python3",
+        "test_drafts.py",
+        "DraftTests.test_timer_mutations_are_rejected"
+      ],
+      "start_utc": "2026-10-10T05:28:32Z",
+      "end_utc": "2026-10-10T05:28:32Z",
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "test_timer_mutations_are_rejected (__main__.DraftTests.test_timer_mutations_are_rejected) ... \n  test_timer_mutations_are_rejected (__main__.DraftTests.test_timer_mutations_are_rejected) (mutation='coordinated calendar') ... FAIL\n  test_timer_mutations_are_rejected (__main__.DraftTests.test_timer_mutations_are_rejected) (mutation='plan hash') ... FAIL\n  test_timer_mutations_are_rejected (__main__.DraftTests.test_timer_mutations_are_rejected) (mutation='recorded hash') ... FAIL\n\n======================================================================\nFAIL: test_timer_mutations_are_rejected (__main__.DraftTests.test_timer_mutations_are_rejected) (mutation='coordinated calendar')\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<temporary-fixture>/test_drafts.py\", line 169, in test_timer_mutations_are_rejected\n    with self.assertRaisesRegex(AssertionError, error):\n         ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: AssertionError not raised\n\n======================================================================\nFAIL: test_timer_mutations_are_rejected (__main__.DraftTests.test_timer_mutations_are_rejected) (mutation='plan hash')\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<temporary-fixture>/test_drafts.py\", line 169, in test_timer_mutations_are_rejected\n    with self.assertRaisesRegex(AssertionError, error):\n         ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: AssertionError not raised\n\n======================================================================\nFAIL: test_timer_mutations_are_rejected (__main__.DraftTests.test_timer_mutations_are_rejected) (mutation='recorded hash')\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<temporary-fixture>/test_drafts.py\", line 169, in test_timer_mutations_are_rejected\n    with self.assertRaisesRegex(AssertionError, error):\n         ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: AssertionError not raised\n\n----------------------------------------------------------------------\nRan 1 test in 0.016s\n\nFAILED (failures=3)\n",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "26b1b2dabc523728a4c93a3d14a7f7872071269f8e227276d654ddd6a4080413",
+      "output_handling": "Published output masks home/temporary prefixes before hashing; command exit code is unmodified."
+    },
+    {
+      "phase": "green: all eight normal draft checks, including rejected mutants",
+      "command": [
+        "python3",
+        "adoption/drafts/wsl-memory-persistence-20261010/test_drafts.py"
+      ],
+      "start_utc": "2026-10-10T05:28:32Z",
+      "end_utc": "2026-10-10T05:28:33Z",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "test_capture_separates_vm_clock_and_distro_monitor (__main__.DraftTests.test_capture_separates_vm_clock_and_distro_monitor) ... ok\ntest_every_effective_configuration_line_has_a_citation (__main__.DraftTests.test_every_effective_configuration_line_has_a_citation) ... ok\ntest_exact_inverse_and_absent_target_preconditions (__main__.DraftTests.test_exact_inverse_and_absent_target_preconditions) ... ok\ntest_native_systemd_parser_without_activation (__main__.DraftTests.test_native_systemd_parser_without_activation) ... ok\ntest_oneshot_is_boot_enabled_and_fail_closed (__main__.DraftTests.test_oneshot_is_boot_enabled_and_fail_closed) ... ok\ntest_slice_and_sysctl_values (__main__.DraftTests.test_slice_and_sysctl_values) ... ok\ntest_timer_mutations_are_rejected (__main__.DraftTests.test_timer_mutations_are_rejected) ... ok\ntest_timer_resets_preserve_all_original_expressions (__main__.DraftTests.test_timer_resets_preserve_all_original_expressions) ... ok\n\n----------------------------------------------------------------------\nRan 8 tests in 0.123s\n\nOK\n",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "7858bb6d40e9b38a0326df769c8545dd503cc4b3fff2a74f004866cc128bc246",
+      "output_handling": "Published output masks home/temporary prefixes before hashing; command exit code is unmodified."
+    }
+  ],
+  "earlier_observations": {
+    "capture_regression_before_fix": "Actual unmodified capture used only chronyc tracking/sources; new endpoint test exited 1 in both success and failed-VM cases. The early command timing was not captured.",
+    "timer_mutation_before_fix": "Actual original acceptance check passed coordinated plan/drop-in :35 against recorded :34 and passed a mismatched base_unit_sha256. Early command timing was not captured."
+  }
+}

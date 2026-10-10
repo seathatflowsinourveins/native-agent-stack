@@ -25,8 +25,8 @@ preserve it and obtain a new disposition rather than overwrite it.
 | `systemd/user-1000.slice.d/60-native-stack-memory.conf` | New `/etc/systemd/system/user-1000.slice.d/60-native-stack-memory.conf`; `MemoryMax=64G`, `MemoryHigh=infinity` | Remove only this new file; remove the directory only if the CC created it and it is empty. |
 | `systemd/native-stack-non-systemd-memory.service` | New `/etc/systemd/system/native-stack-non-systemd-memory.service`; native enablement creates only `/etc/systemd/system/multi-user.target.wants/native-stack-non-systemd-memory.service` | Remove only that new enablement link and service file. Do not stop an unrelated service or remove another link. |
 | `sysctl.d/90-native-stack-swappiness.conf` | New `/etc/sysctl.d/90-native-stack-swappiness.conf`; boot applies `vm.swappiness=10` | Remove only this new file. |
-| `windows/wslconfig-96GB.fragment.ini` | **Optional reviewed key edit**, never a replacement file: set existing `[wsl2] memory=96GB` in `C:\Users\<PROFILE>\.wslconfig`; preserve every other byte where possible | Restore the CC's complete pre-edit byte backup, SHA-256 `2de9d6a9196acc54ddda90590e55228f9aa4dba2afdfd48a308ca47dfcb87a67`. `windows/wslconfig-104GB.inverse.fragment.ini` shows the original key but is not a byte-exact substitute for the backup. |
-| Seven `user-systemd/<name>.timer.d/90-native-stack-explicit-zone.conf` files | Corresponding new `~/.config/systemd/user/<name>.timer.d/90-native-stack-explicit-zone.conf`; UTC for pages refresh and expired WU watch, NY for Git daily/hourly/weekly and backup/prune | Remove only each new drop-in; remove newly created empty directories. Original timer bytes/hashes are retained in the time snapshot. |
+| `windows/wslconfig-96GB.fragment.ini` | **Optional reviewed key edit**, never a replacement file: set existing `[wsl2] memory=96GB` in `C:\Users\<PROFILE>\.wslconfig`; preserve encoding, BOM, CRLF and all other bytes | Restore the CC's complete pre-edit byte backup, SHA-256 `2de9d6a9196acc54ddda90590e55228f9aa4dba2afdfd48a308ca47dfcb87a67`. `windows/wslconfig-104GB.inverse.fragment.ini` shows the original key but is not a byte-exact substitute for the backup. |
+| Six `user-systemd/<name>.timer.d/90-native-stack-explicit-zone.conf` files | Corresponding new `~/.config/systemd/user/<name>.timer.d/90-native-stack-explicit-zone.conf`; UTC for pages refresh, NY for Git daily/hourly/weekly and backup/prune | Remove only each new drop-in; remove newly created empty directories. Original timer bytes/hashes are retained in the time snapshot. The expired WU watch stays outside the apply set. |
 
 The file/link inverse restores the original **persistent** state. The existing
 runtime-only settings are untouched by this PR. Removing persistent files does
@@ -42,8 +42,28 @@ drafts as root/user-owned configuration with mode 0644, and use systemd's
 native enablement without `--now` for the new oneshot. Configuration loading,
 timer re-evaluation and the WSL restart belong to that reviewed application
 turn. Do not enable or reactivate the expired `wu-watch-20261006.timer`.
-All other timer active/enabled states are preserved. See
+All other timer active/enabled states are preserved. Immediately before copying
+each timer drop-in, require the live base file's SHA-256 to equal its
+`base_unit_sha256` and its sole `OnCalendar=` to equal `original_calendar`.
+If either differs, stop that application and regenerate the record and drop-in
+from the new base. `git maintenance start` rewrites Git's three timers using a
+fresh random minute; repeat this check and regenerate their explicit-zone
+drop-ins after each rerun ([Git 2.53.0 source](sources.md#time-and-calendar)). See
 [systemd.unit(5) enablement/drop-ins and sysctl.d(5)](sources.md#memory-and-boot).
+
+For the Windows key edit, first require the live file's hash to equal
+`2de9d6a9196acc54ddda90590e55228f9aa4dba2afdfd48a308ca47dfcb87a67`
+and save a complete byte backup. Preserve its detected encoding, BOM and line
+endings; change only the existing `[wsl2]` `memory=104GB` assignment to
+`memory=96GB`. Verify the post-edit byte diff consists exactly of that value
+change and verify every other active key is unchanged before restarting.
+If the hash or unique assignment differs, obtain a new reviewed edit instead
+of using this historical precondition. The inverse restores the complete backup.
+
+Future slice policy changes edit the installed `60-native-stack-memory.conf`.
+Its filename sorts after the `50-*.conf` files written by
+`systemctl set-property`, so those writes cannot override the persisted
+MemoryMax/MemoryHigh values ([systemd precedence](sources.md#memory-and-boot)).
 
 ## Per-line citations and boot behavior
 
@@ -69,8 +89,15 @@ A native boot of these drafts has **not** been run. The service's enablement
 does not establish a measured zero-window guarantee before every external
 WSL payload can allocate. The CC's restart acceptance checks the loaded
 drop-in, oneshot success and cap readback on two distro starts; it also checks
-`vm.swappiness`, the Windows memory key, selected PHC0, timezone and effective
-timer expressions. This is a future CC application smoke, not a gate on work.
+`vm.swappiness`, the Windows memory key, timezone and effective timer expressions.
+Clock acceptance has two distinct checks: `chronyc -h ::1 -p 323 tracking`
+and `sources` for WSL's VM-init PHC0, then `chronyc -h 127.0.0.1 -p 3323
+tracking` and `sources` for the distro's observe-only `-x` network monitor.
+VM PHC0 offsets measure agreement with the Hyper-V host clock; the monitor
+estimates error relative to network time. Neither a PHC0 label nor a selected
+network source proves UTC accuracy or NTS negotiation. No distro refclock
+confirmation or chrony edit is proposed. This is a CC application smoke,
+not a gate on work. [Pinned daemon and client semantics](sources.md#time-and-calendar).
 
 ## Validation and receipts
 
@@ -81,25 +108,40 @@ python3 adoption/drafts/wsl-memory-persistence-20261010/test_drafts.py
 python3 scripts/validate.py
 ```
 
-The six small tests parse the slice, service, sysctl and Windows fragments,
-check all per-line citations and inverse preconditions, verify seven timer
-resets preserve their original expressions, exercise the helper only against
-a temporary regular file (including missing-path refusal), and run the
-installed `systemd-analyze verify` on temporary unit fixtures. No test executes
-the real ExecStart or a host apply/inverse command.
+The eight small tests parse the slice, service, sysctl and Windows fragments,
+check all per-line citations and both memory/time inverse preconditions, and
+verify six timer resets against the recorded base expressions and byte hashes.
+Mutations coordinate plan/drop-in `:35` against the recorded `:34`, corrupt
+the plan hash or corrupt the recorded byte hash; each must be rejected.
+Mocked capture tests require both explicit endpoints and retain a failed VM
+query alongside a successful monitor query. Tests also exercise the helper
+only against a temporary regular file (including missing-path refusal) and
+run installed `systemd-analyze verify` on temporary unit fixtures. No test
+executes the real ExecStart or a host apply/inverse command.
 
 [measurements/memory.json](measurements/memory.json) and
 [measurements/time.json](measurements/time.json) retain UTC command intervals,
 outputs and exit codes. `capture_memory_readonly.py` and
 `capture_time_readonly.py` reproduce those read-only captures; the Windows
-capture masks the profile before emitting any path. The memory capture reads
+capture masks the profile before emitting any path. The time capture explicitly
+labels both chrony endpoints and does not look for WSL's VM-init PHC refclock
+in distro configuration. The memory capture reads
 the selected WSL fields rather than hardcoding them.
 [measurements/calendar.json](measurements/calendar.json) and
 [measurements/calendar-utc.json](measurements/calendar-utc.json) retain native
 fold enumerations. [validation.json](validation.json) records local checks.
+[The review correction record](review-corrections.md) maps both P2s and all
+eight P3 notes to their dispositions; [regression receipts](measurements/regression-checks.json)
+retain red/green command outputs and exit codes.
 The [effective timer readbacks](measurements/effective-timers.json) record
 empty DropInPaths for all seven, six active/enabled timers and the
-inactive/disabled WU watch; no live state is changed by reading these properties.
+inactive/disabled WU watch; these are pre-application observations.
+[The post-restart endpoint/base receipt](measurements/time-post-restart.json)
+separately retains both chrony reads, observed `-x` process flags, unchanged
+base hashes, six present drop-ins and an absent WU-watch drop-in. Target
+absence in the original receipt is historical; reapplying drafts must respect
+the current files. This receipt does not establish memory/boot/workload
+acceptance. No live state is changed by reading these properties.
 The [scoped time audit](local-time-audit.md) lists each classified file:line;
 its JSON retains commands and exact origin/main revisions. No host receipt
 or platform-status file is changed.

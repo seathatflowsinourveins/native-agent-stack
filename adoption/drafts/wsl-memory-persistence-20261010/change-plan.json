@@ -5,8 +5,8 @@
   "activation": "CC-only planned restart; no draft apply/inverse command has been run",
   "rollback_scope": "Persistent file/link state is restored exactly. Existing runtime-only values are untouched now; across a restart their baseline defaults are not inferred. This inverse does not invent future defaults.",
   "time_zone_decision": {
-    "selected": "keep America/New_York guest and useWindowsTimezone=true; UTC for the two minute-cadence calendars, America/New_York for Git maintenance and local backup/prune; retain chrony/PHC0",
-    "inverse": "no guest zone, chrony, shell TZ or clock-hook edit; remove only seven new timer drop-ins"
+    "selected": "keep America/New_York guest and useWindowsTimezone=true; UTC for pages refresh, America/New_York for Git maintenance and local backup/prune; retain WSL VM-init chronyd PHC0 on ::1:323 and distro observe-only -x monitor on 127.0.0.1:3323; leave expired WU watch out of the apply set",
+    "inverse": "no guest zone, chrony, shell TZ or clock-hook edit; remove only six new timer drop-ins"
   },
   "changes": [
     {
@@ -156,22 +156,6 @@
       "activate_if": "currently active only; do not enable expired/disabled timers",
       "calendar_zone": "America/New_York",
       "new_calendar": "Sun *-*-* 04:00:00 America/New_York"
-    },
-    {
-      "id": "zone-wu-watch-20261006.timer",
-      "draft": "user-systemd/wu-watch-20261006.timer.d/90-native-stack-explicit-zone.conf",
-      "target": "~/.config/systemd/user/wu-watch-20261006.timer.d/90-native-stack-explicit-zone.conf",
-      "before": "absent",
-      "base_unit_sha256": "cc59e9ca742cf48a09f848245b49a51d8933e17c69e767249f32b61ffb336994",
-      "original_calendar": "*-*-* *:05,35:00",
-      "inverse": {
-        "operation": "remove-only-new-file",
-        "target": "~/.config/systemd/user/wu-watch-20261006.timer.d/90-native-stack-explicit-zone.conf"
-      },
-      "source": "https://github.com/systemd/systemd/blob/b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a/man/systemd.unit.xml#L203",
-      "activate_if": "currently active only; do not enable expired/disabled timers",
-      "calendar_zone": "UTC",
-      "new_calendar": "*-*-* *:05,35:00 UTC"
     }
   ]
 }

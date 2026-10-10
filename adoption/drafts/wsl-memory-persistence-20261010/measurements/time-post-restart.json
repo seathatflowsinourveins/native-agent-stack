@@ -1,0 +1,164 @@
+{
+  "evidence_class": "native_proven",
+  "mutations": [],
+  "start_utc": "2026-10-10T05:24:01Z",
+  "end_utc": "2026-10-10T05:24:02Z",
+  "commands": [
+    {
+      "command": [
+        "chronyc",
+        "-h",
+        "::1",
+        "-p",
+        "323",
+        "tracking"
+      ],
+      "start_utc": "2026-10-10T05:24:01Z",
+      "end_utc": "2026-10-10T05:24:01Z",
+      "exit_code": 0,
+      "stdout": "Reference ID    : 50484330 (PHC0)\nStratum         : 1\nRef time (UTC)  : Sat Oct 10 05:23:52 2026\nSystem time     : 0.000000006 seconds fast of NTP time\nLast offset     : -0.000128645 seconds\nRMS offset      : 0.000887001 seconds\nFrequency       : 24.413 ppm slow\nResidual freq   : -1.090 ppm\nSkew            : 21.916 ppm\nRoot delay      : 0.000000001 seconds\nRoot dispersion : 0.000266085 seconds\nUpdate interval : 8.0 seconds\nLeap status     : Normal\n",
+      "stderr": "",
+      "daemon_role": "wsl-vm-init"
+    },
+    {
+      "command": [
+        "chronyc",
+        "-h",
+        "::1",
+        "-p",
+        "323",
+        "sources"
+      ],
+      "start_utc": "2026-10-10T05:24:01Z",
+      "end_utc": "2026-10-10T05:24:01Z",
+      "exit_code": 0,
+      "stdout": "MS Name/IP address         Stratum Poll Reach LastRx Last sample               \n===============================================================================\n#* PHC0                          0   3   377     8    -32us[ -145us] +/- 8096ns\n",
+      "stderr": "",
+      "daemon_role": "wsl-vm-init"
+    },
+    {
+      "command": [
+        "chronyc",
+        "-h",
+        "127.0.0.1",
+        "-p",
+        "3323",
+        "tracking"
+      ],
+      "start_utc": "2026-10-10T05:24:01Z",
+      "end_utc": "2026-10-10T05:24:01Z",
+      "exit_code": 0,
+      "stdout": "Reference ID    : A29FC87B (time.cloudflare.com)\nStratum         : 4\nRef time (UTC)  : Sat Oct 10 05:23:03 2026\nSystem time     : 0.007606074 seconds slow of NTP time\nLast offset     : +0.000814426 seconds\nRMS offset      : 0.319682240 seconds\nFrequency       : 11.863 ppm slow\nResidual freq   : -0.031 ppm\nSkew            : 28.511 ppm\nRoot delay      : 0.017332351 seconds\nRoot dispersion : 0.003429542 seconds\nUpdate interval : 65.1 seconds\nLeap status     : Normal\n",
+      "stderr": "",
+      "daemon_role": "distro-observe-only"
+    },
+    {
+      "command": [
+        "chronyc",
+        "-h",
+        "127.0.0.1",
+        "-p",
+        "3323",
+        "sources"
+      ],
+      "start_utc": "2026-10-10T05:24:01Z",
+      "end_utc": "2026-10-10T05:24:02Z",
+      "exit_code": 0,
+      "stdout": "MS Name/IP address         Stratum Poll Reach LastRx Last sample               \n===============================================================================\n^- ntp-nts-2.ps5.canonical.>     2   6   377    58   +652us[+1467us] +/-   43ms\n^- ntp-nts-3.ps5.canonical.>     2   6   377    55  +1411us[+1411us] +/-   42ms\n^- ntp-nts-2.ps6.canonical.>     2   6   377    60  +2185us[+2999us] +/-   30ms\n^- ntp-nts-3.ps6.canonical.>     2   6   377    58   +373us[ +373us] +/-   31ms\n^- ntp-nts-1.ps5.canonical.>     2   6   377    61  +1450us[+2265us] +/-   42ms\n^? time-a-g.nist.gov             1   6   377     3   +492us[ +492us] +/- 8308us\n^* time.cloudflare.com           3   6   377    59  +2250us[+3064us] +/- 9307us\n",
+      "stderr": "",
+      "daemon_role": "distro-observe-only"
+    },
+    {
+      "command": [
+        "chronyd",
+        "--version"
+      ],
+      "start_utc": "2026-10-10T05:24:02Z",
+      "end_utc": "2026-10-10T05:24:02Z",
+      "exit_code": 0,
+      "stdout": "chronyd (chrony) version 4.8 (+CMDMON +REFCLOCK +RTC +PRIVDROP +SCFILTER +SIGND +NTS +SECHASH +IPV6 -DEBUG)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "timedatectl",
+        "show"
+      ],
+      "start_utc": "2026-10-10T05:24:02Z",
+      "end_utc": "2026-10-10T05:24:02Z",
+      "exit_code": 0,
+      "stdout": "Timezone=America/New_York\nLocalRTC=no\nCanNTP=yes\nNTP=yes\nNTPSynchronized=yes\nTimeUSec=Sat 2026-10-10 01:24:02 EDT\nRTCTimeUSec=Sat 2026-10-10 01:24:02 EDT\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "ps",
+        "-C",
+        "chronyd",
+        "-o",
+        "args="
+      ],
+      "start_utc": "2026-10-10T05:24:02Z",
+      "end_utc": "2026-10-10T05:24:02Z",
+      "exit_code": 0,
+      "stdout": "/usr/sbin/chronyd -n -F 1 -x\n/usr/sbin/chronyd -n -F 1 -x\n",
+      "stderr": ""
+    }
+  ],
+  "chrony_interpretation": {
+    "wsl-vm-init": "PHC0 measures agreement with the Hyper-V host clock, not accuracy against UTC",
+    "distro-observe-only": "-x monitor estimates system-clock error against network time; source selection alone does not prove NTS negotiation"
+  },
+  "timer_base_readbacks": [
+    {
+      "file": "~/.config/systemd/user/git-maintenance@daily.timer",
+      "sha256": "3a2b271ea190f09b33a6ba0e3f027173d23ebdfbbcdad36b3bfcde2720437db4",
+      "draft_target": "~/.config/systemd/user/git-maintenance@daily.timer.d/90-native-stack-explicit-zone.conf",
+      "draft_target_precondition": "present",
+      "matches_recorded_base": true
+    },
+    {
+      "file": "~/.config/systemd/user/git-maintenance@hourly.timer",
+      "sha256": "f57c12651a519774d0dd3acdb80a9ceb457c41080009bf4695a07b1f5f18d1a9",
+      "draft_target": "~/.config/systemd/user/git-maintenance@hourly.timer.d/90-native-stack-explicit-zone.conf",
+      "draft_target_precondition": "present",
+      "matches_recorded_base": true
+    },
+    {
+      "file": "~/.config/systemd/user/git-maintenance@weekly.timer",
+      "sha256": "234a3f95377cec91b75cef23e48c8058ded5815c82b67376bab88f58e2238a4b",
+      "draft_target": "~/.config/systemd/user/git-maintenance@weekly.timer.d/90-native-stack-explicit-zone.conf",
+      "draft_target_precondition": "present",
+      "matches_recorded_base": true
+    },
+    {
+      "file": "~/.config/systemd/user/native-agent-pages-refresh.timer",
+      "sha256": "0ca42829f4b7d8c420782de7419c7eb5ba57cc1a9350b59726bc03afb7d670b2",
+      "draft_target": "~/.config/systemd/user/native-agent-pages-refresh.timer.d/90-native-stack-explicit-zone.conf",
+      "draft_target_precondition": "present",
+      "matches_recorded_base": true
+    },
+    {
+      "file": "~/.config/systemd/user/restic-backup-nativestack2604.timer",
+      "sha256": "03b8ead43c508fa22f4a79a1ee4669b4a856724fb4eb2cacb7869e8b783415da",
+      "draft_target": "~/.config/systemd/user/restic-backup-nativestack2604.timer.d/90-native-stack-explicit-zone.conf",
+      "draft_target_precondition": "present",
+      "matches_recorded_base": true
+    },
+    {
+      "file": "~/.config/systemd/user/restic-prune-nativestack2604.timer",
+      "sha256": "40912d9651b581d01c0c5c15edac4c9c5f397e85da025656dcc09bff5097345c",
+      "draft_target": "~/.config/systemd/user/restic-prune-nativestack2604.timer.d/90-native-stack-explicit-zone.conf",
+      "draft_target_precondition": "present",
+      "matches_recorded_base": true
+    },
+    {
+      "file": "~/.config/systemd/user/wu-watch-20261006.timer",
+      "sha256": "cc59e9ca742cf48a09f848245b49a51d8933e17c69e767249f32b61ffb336994",
+      "draft_target": "~/.config/systemd/user/wu-watch-20261006.timer.d/90-native-stack-explicit-zone.conf",
+      "draft_target_precondition": "absent",
+      "matches_recorded_base": true
+    }
+  ],
+  "scope": "Read-only post-restart endpoint and timer-base capture; not memory/boot/workload acceptance. Original pre-application time.json remains unchanged."
+}

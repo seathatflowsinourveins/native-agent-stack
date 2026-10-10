@@ -66,12 +66,24 @@
       "scope": "All 27 staged additions after whitespace correction; command timing was not captured."
     }
   ],
+  "review_correction_checks": {
+    "regression_receipt": "measurements/regression-checks.json",
+    "post_restart_read_receipt": "measurements/time-post-restart.json",
+    "full_validation_attempt": {
+      "command": ["python3", "scripts/validate.py"],
+      "start_utc": "2026-10-10T05:29:29Z",
+      "end_utc": "2026-10-10T05:30:36Z",
+      "exit_code": 1,
+      "stdout": "Publication validation failed:\nadoption/drafts/wsl-memory-persistence-20261010/user-systemd/wu-watch-20261006.timer.d/90-native-stack-explicit-zone.conf: file missing\n",
+      "disposition": "The removed WU-watch draft still appeared in the Git index before staging its deletion. Stage only explicit correction paths, then rerun the full validator normally. Final result is recorded in PR/coordination after checking the final candidate."
+    }
+  },
   "earlier_orchestration_attempt": {
     "status": "ctx_execute exceeded 30000ms; no per-command result was returned",
     "exit_code": null,
     "disposition": "No validator process remained. Required validator rerun normally with an exec session; failed publication-hygiene result and successful correction are retained above."
   },
-  "native_boot": "not run; CC applies at planned restart",
-  "ci_scope": "Full repository CI not rerun. CC reports main shard-6 red from #913 pin until navi's repair; unrelated to these drafts.",
+  "native_boot": "not run by this lane; the post-restart endpoint/base receipt does not establish memory boot or workload acceptance",
+  "ci_scope": "Full repository CI not rerun locally. The earlier shard-6-red note was stale: CC's 2026-10-10T03:52Z read reported all 35 checks green/skipped; the lane's 05:19Z GitHub read of the prior draft head found 28 success and 8 skipped, zero failures. These dated reads do not establish corrected-head CI or memory/workload acceptance.",
   "gitleaks": "Post-commit PR-range scan recorded in PR/coordination, not a self-referential commit receipt."
 }

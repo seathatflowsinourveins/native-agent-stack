@@ -1,14 +1,19 @@
 #!/usr/bin/env python3
 """Parse reviewed drafts and their inverses; never apply a host setting."""
 import configparser
+import contextlib
+import hashlib
+import io
 import json
 import os
 from pathlib import Path
+import runpy
 import shlex
 import shutil
 import subprocess
 import tempfile
 import unittest
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parent
 PLAN = json.loads((ROOT / "change-plan.json").read_text())
@@ -27,6 +32,48 @@ def ini(path):
 
 
 class DraftTests(unittest.TestCase):
+    def test_capture_separates_vm_clock_and_distro_monitor(self):
+        endpoints = {
+            ("::1", "323"): "wsl-vm-init",
+            ("127.0.0.1", "3323"): "distro-observe-only",
+        }
+        expected = {("chronyc", "-h", host, "-p", port, query)
+                    for host, port in endpoints for query in ("tracking", "sources")}
+        for fail_vm in (False, True):
+            with self.subTest(fail_vm=fail_vm):
+                def respond(argv, **kwargs):
+                    if argv[0] != "chronyc":
+                        return subprocess.CompletedProcess(argv, 0, "fixture\n", "")
+                    vm = "323" in argv or "-p" not in argv
+                    if vm and fail_vm:
+                        return subprocess.CompletedProcess(argv, 1, "506 Cannot talk to daemon\n", "")
+                    if argv[-1] == "tracking":
+                        output = "Reference ID : 50484330 (PHC0)\n" if vm else "Reference ID : 01020304 (nts.monitor.test)\n"
+                    else:
+                        output = "#* PHC0\n" if vm else "^* nts.monitor.test\n"
+                    return subprocess.CompletedProcess(argv, 0, output, "")
+
+                output = io.StringIO()
+                # Mock commands and file probes: no daemon or host config is read.
+                with mock.patch("subprocess.run", side_effect=respond), \
+                     mock.patch("subprocess.check_output", return_value="2026-10-10T00:00:00Z\n"), \
+                     mock.patch.object(Path, "glob", return_value=[]), \
+                     mock.patch.object(Path, "is_file", return_value=False), \
+                     contextlib.redirect_stdout(output):
+                    runpy.run_path(str(ROOT / "capture_time_readonly.py"), run_name="__main__")
+                receipt = json.loads(output.getvalue().removeprefix("DATA="))
+                queries = [r for r in receipt["commands"] if r["command"][0] == "chronyc"]
+                self.assertEqual({tuple(r["command"]) for r in queries}, expected)
+                self.assertEqual(len(queries), 4)
+                for item in queries:
+                    host, port = item["command"][2], item["command"][4]
+                    self.assertEqual(item["daemon_role"], endpoints[(host, port)])
+                    self.assertEqual(item["exit_code"], 1 if port == "323" and fail_vm else 0)
+                    if port == "323":
+                        self.assertIn("506 Cannot talk" if fail_vm else "PHC0", item["stdout"])
+                    else:
+                        self.assertIn("nts.monitor.test", item["stdout"])
+
     def test_slice_and_sysctl_values(self):
         dropin = ini(ROOT / "systemd/user-1000.slice.d/60-native-stack-memory.conf")
         self.assertEqual(dict(dropin["Slice"]), {"MemoryMax": "64G", "MemoryHigh": "infinity"})
@@ -76,12 +123,19 @@ class DraftTests(unittest.TestCase):
     def test_timer_resets_preserve_all_original_expressions(self):
         original = json.loads((ROOT / "measurements/time.json").read_text())["timer_files"]
         timers = [c for c in PLAN["changes"] if c["id"].startswith("zone-")]
-        self.assertEqual(len(timers), 7)
+        self.assertEqual(len(timers), 6)
         for change in timers:
             before = next(t for t in original if t["draft_target"] == change["target"])
             native = [
                 line.strip() for line in before["text"].splitlines()
-                if line.strip() and not line.startswith("#")]
+                if line.strip() and not line.lstrip().startswith(("#", ";"))]
+            self.assertEqual([line.partition("=")[2] for line in native
+                              if line.startswith("OnCalendar=")],
+                             [change["original_calendar"]], "base calendar differs from plan")
+            self.assertEqual(hashlib.sha256(before["text"].encode("utf-8")).hexdigest(),
+                             before["sha256"], "recorded base bytes differ from hash")
+            self.assertEqual(before["sha256"], change["base_unit_sha256"],
+                             "base hash differs from plan")
             # Empty OnCalendar resets monotonic settings too. Refuse losing any.
             self.assertFalse(any(line.startswith(("OnBootSec=", "OnStartupSec=",
                               "OnUnitActiveSec=", "OnUnitInactiveSec=",
@@ -90,13 +144,44 @@ class DraftTests(unittest.TestCase):
                              ["[Timer]", "OnCalendar=", "OnCalendar=" + change["new_calendar"]])
             self.assertEqual(change["new_calendar"],
                              change["original_calendar"] + " " + change["calendar_zone"])
-            expected = "UTC" if any(name in change["id"] for name in
-                       ("native-agent-pages-refresh", "wu-watch")) else "America/New_York"
+            expected = "UTC" if "native-agent-pages-refresh" in change["id"] else "America/New_York"
             self.assertEqual(change["calendar_zone"], expected)
+
+    def test_timer_mutations_are_rejected(self):
+        for mutation, error in (("coordinated calendar", "base calendar"),
+                                ("plan hash", "base hash"),
+                                ("recorded hash", "recorded base bytes")):
+            with self.subTest(mutation=mutation), tempfile.TemporaryDirectory() as directory:
+                fixture = Path(directory) / "drafts"
+                shutil.copytree(ROOT, fixture)
+                plan = json.loads((fixture / "change-plan.json").read_text())
+                change = next(c for c in plan["changes"]
+                              if c["id"] == "zone-git-maintenance@hourly.timer")
+                if mutation == "coordinated calendar":
+                    change["original_calendar"] = change["original_calendar"].replace(":34:", ":35:")
+                    change["new_calendar"] = change["new_calendar"].replace(":34:", ":35:")
+                    dropin = fixture / change["draft"]
+                    dropin.write_text(dropin.read_text().replace(":34:", ":35:"))
+                elif mutation == "plan hash":
+                    change["base_unit_sha256"] = "0" * 64
+                else:
+                    path = fixture / "measurements/time.json"
+                    receipt = json.loads(path.read_text())
+                    before = next(t for t in receipt["timer_files"]
+                                  if t["draft_target"] == change["target"])
+                    before["sha256"] = "0" * 64
+                    path.write_text(json.dumps(receipt))
+                # Run the normal acceptance check against corrupted fixtures.
+                with mock.patch.dict(globals(), ROOT=fixture, PLAN=plan):
+                    with self.assertRaisesRegex(AssertionError, error):
+                        self.test_timer_resets_preserve_all_original_expressions()
 
     def test_exact_inverse_and_absent_target_preconditions(self):
         memory = json.loads((ROOT / "measurements/memory.json").read_text())
+        time = json.loads((ROOT / "measurements/time.json").read_text())
         self.assertTrue(all(v == "absent" for v in memory["new_targets"].values()))
+        self.assertTrue(all(t["draft_target_precondition"] == "absent"
+                            for t in time["timer_files"]))
         for change in PLAN["changes"]:
             inverse = change["inverse"]
             if change["id"] == "wsl-vm-96GiB-option":
@@ -107,6 +192,10 @@ class DraftTests(unittest.TestCase):
                 self.assertEqual(ini(ROOT / inverse["fragment"])["wsl2"]["memory"], "104GB")
             else:
                 self.assertEqual(change["before"], "absent")
+                if change["id"].startswith("zone-"):
+                    before = next(t for t in time["timer_files"]
+                                  if t["draft_target"] == change["target"])
+                    self.assertEqual(before["draft_target_precondition"], "absent")
                 self.assertEqual(inverse["target"], change["target"])
                 self.assertTrue(inverse["operation"].startswith("remove-only-new-file"))
                 if "enable_link" in change:

@@ -64,6 +64,19 @@ Windows workload peaks, restart cost, swap I/O and performance at either
 future cap are unmeasured. VmmemWSL and the distro cgroup counters have
 different scopes/accounting and were not equated.
 
+The CC's dated 03:52Z review reports **102.16 GiB guest MemTotal at 104GB**.
+That is a CC-reported observation, not the configured maximum or an atomic
+counter in the Windows receipt. WSL 3.0.1 caps `wsl-user` at `sysinfo` total
+RAM minus **32 MiB** ([main.cpp:105 and :3908–3909](../../adoption/drafts/wsl-memory-persistence-20261010/sources.md#memory-and-boot)).
+Thus the 64+40 GiB sibling ceilings already exceed that reported MemTotal
+by about **1.8 GiB**. If the same difference between configured cap and
+MemTotal persists at 96GB, usable RAM would be about **94.16 GiB**, and
+the sibling sum would exceed it by about **9.8 GiB**. This is a linear
+estimate; a post-restart MemTotal/ancestor-limit read is required to measure
+it. Lowering to 96GB can force guest-wide reclaim before either sibling
+ceiling is reached, even when each is below its own limit. The CC and user
+own that policy trade-off; no workload success is inferred from the draft.
+
 **Recommend the 96GB key-only option for the CC's planned restart.** The
 current private Chrome demand leaves only about 4.3 GiB nominal room for
 other Windows consumers at a fully used 104 GiB cap, compared with about
@@ -85,9 +98,14 @@ The boot application is source-reviewed, not yet native-proven.
 
 ## Clock synchronization and timezone decision
 
-At **02:35:15Z**, chrony **4.8** selects `#* PHC0` with reach 377,
-poll 3, normal leap status; tracking reports **5.116 µs fast**,
-last offset **+7.179 µs**, RMS **35.039 µs**, stratum 1.
+At **02:35:15Z**, the original default chronyc query selected `#* PHC0`
+with reach 377, poll 3 and normal leap status; tracking reported
+**5.116 µs fast**, last offset **+7.179 µs**, RMS **35.039 µs**, stratum 1.
+The CC's review corrected the attribution: this reference belongs to
+**WSL's VM-init chronyd**, whose PHC offsets measure agreement with the
+Hyper-V host clock. They do not measure accuracy against UTC. The separate
+`chronyd --version` command reports the distro binary's **4.8** version;
+it does not establish the VM-init daemon's version.
 `timedatectl show` reports `Timezone=America/New_York`,
 `LocalRTC=no`, `NTP=yes`, `NTPSynchronized=yes`.
 `/etc/wsl.conf` was independently read at **02:39:02Z**:
@@ -95,21 +113,36 @@ last offset **+7.179 µs**, RMS **35.039 µs**, stratum 1.
 [Raw time receipt](../../adoption/drafts/wsl-memory-persistence-20261010/measurements/time.json);
 [selected config and calendar capture](../../adoption/drafts/wsl-memory-persistence-20261010/measurements/calendar.json).
 
-**Retain chrony with the selected PHC0 reference.** Microsoft's Hyper-V/Azure
-Linux guidance recommends a PHC source and the stable `/dev/ptp_hyperv`
-link; chrony 4.8 documents this driver and explains the PHC0 default refid.
-PHC0 is a reference label, not proof of a device pathname. No active refclock
-line was found in the permitted `/etc/chrony*` samples, and device files are
-outside the named read roots; the actual configured device path remains
-unmeasured. Confirm the stable link at the CC's application turn rather than
-invent a new chrony config here. Do not infer that the Azure example's
-stratum or unrestricted stepping policy matches this host. Timezone changes
-are independent of PHC synchronization.
+The corrected read-only capture at **05:24:02Z** explicitly queries both
+endpoints. `chronyc -h ::1 -p 323 tracking` and `sources` select VM-init
+PHC0, stratum 1, with system time **0.006 µs fast relative to the host
+reference** in that sample. `chronyc -h 127.0.0.1 -p 3323 tracking` and
+`sources` select the distro monitor's `time.cloudflare.com`, stratum 4,
+with system time **7.606074 ms slow relative to its network-time estimate**.
+Both endpoint pairs exit 0. The process read retains `chronyd -n -F 1 -x`;
+chrony 4.8's `-x` disables clock adjustment while tracking network-time
+error. The CC reports NTS configuration; source selection alone does not
+prove negotiated NTS transport. These sequential samples are separate
+reference/error estimates, not a guarantee of UTC accuracy.
+[Post-restart receipt](../../adoption/drafts/wsl-memory-persistence-20261010/measurements/time-post-restart.json).
+
+**Retain WSL's VM-init PHC synchronization and the distro observe-only
+monitor; change nothing in chrony.** The pinned installed WSL source starts
+the VM agent at main.cpp:3219–3222 and generates `refclock PHC /dev/ptp0
+poll 3 dpoll -2 offset 0`, `makestep 1.0 3` and `rtcsync` at :3698–3710.
+There is no reason to seek that VM refclock in distro config or to confirm
+a distro PHC refclock. PHC0 alone is a reference label; the source supplies
+the implementation, while the explicit endpoint captures supply selection.
+Microsoft's Hyper-V/Azure stable-link example remains supporting context,
+not a configuration to transplant. Explicit hosts/ports bypass chronyc's
+default Unix-socket/network fallback. Earlier pre-restart IPv4 :323 probes
+failed with 506/exit 1; IPv6 succeeded, so those failures did not establish
+an absent VM daemon. Timezone changes are independent of synchronization.
 [Microsoft, chrony and WSL primary references](../../adoption/drafts/wsl-memory-persistence-20261010/sources.md#time-and-calendar).
 
 | Zone option | Measured dependencies and DST effect | Trade-off / inverse |
 | --- | --- | --- |
-| **Selected: retain NY guest; make every observed machine calendar explicit** | Use UTC for the two minute-cadence timers; NY for Git maintenance and local backup/prune. Existing explicit UTC/NY paper schedules and the explicit-zone clock hook retain their meaning. | Avoids changing implicit local records/guards found by the audit. Inverse removes only seven new drop-ins; no guest zone/chrony/shell/hook edit. |
+| **Selected: retain NY guest; make the six active machine calendars explicit** | Use UTC for pages refresh; NY for Git maintenance and local backup/prune. Keep the expired WU watch out of the apply set; its UTC comparison remains audit evidence. Existing explicit UTC/NY paper schedules and the explicit-zone clock hook retain their meaning. | Avoids changing implicit local records/guards found by the audit. Inverse removes only six new drop-ins; no guest zone/chrony/shell/hook edit. |
 | Move guest to Etc/UTC | Requires `useWindowsTimezone=false` and CC's `timedatectl set-timezone Etc/UTC`. Without explicit NY suffixes, local 03:30 backup, 04:00 Sunday prune and midnight Git daily/weekly shift to UTC wall time. The template weekday/hour guard and local report stamps also change. | UTC is a supported server convention, but not enough evidence to override these existing local intents. Exact inverse restores the CC's original /etc/wsl.conf bytes (hash in calendar receipt), original America/New_York zone with timedatectl, and any separately backed-up display edits. No display edits are drafted because shell startup files are outside scope and the clock hook already names NY explicitly. |
 
 The fresh user-bus timer snapshot contains **24 loaded timers**, compared
@@ -133,7 +166,7 @@ accuracy/persistence/activation remain separate.
 | Calendar / proposed zone | Measured November fold sequence (UTC) | Result |
 | --- | --- | --- |
 | Pages `*:00/10:00 UTC` | NY arm: 05:30, 05:40, 05:50, **07:00**; UTC arm: 05:30, 05:40, 05:50, **06:00**, 06:10 | Explicit UTC removes the measured 70-minute NY fold gap for the described ten-minute cadence. |
-| WU watch `*:05,35:00 UTC` | NY arm: 05:35, **07:05**; UTC arm: 05:35, **06:05**, 06:35 | Explicit UTC removes the 90-minute fold gap if this expired timer is reused; it is not enabled by this PR. |
+| WU watch `*:05,35:00 UTC` (audit only) | NY arm: 05:35, **07:05**; UTC arm: 05:35, **06:05**, 06:35 | Explicit UTC would remove the 90-minute fold gap if this expired timer is separately reviewed for reuse. Its drop-in is excluded from this apply set. |
 | Backup `03:30 America/New_York` | Nov 1 08:30; subsequent days 08:30 | Retains 03:30 local; UTC moves from 07:30 EDT to 08:30 EST. Using 03:30 UTC instead would move it to the preceding local date at 23:30 EDT / 22:30 EST. |
 | Git hourly `1..23:34 America/New_York` | 05:34, **07:34**, 08:34 | Preserves the observed NY policy, including its fold gap and exclusion of local 00:34. Pairing hourly/daily/weekly in the same zone avoids reanchoring only one Git-generated cadence. |
 | Git daily / weekly, NY | Tue Nov 3 05:34 / Mon Nov 2 05:34 after the base | Retains the local weekday and 00:34. |
@@ -158,9 +191,26 @@ replace the whole file with a two-line fragment. The same rule applies if
 the unselected UTC guest alternative is later adopted. No live setting or
 timer is changed by this proposal.
 
-The six parsing/fixture/native-parser checks are local integration; the
+Before applying each of the six timer drop-ins, recheck that the live base
+SHA-256 and sole `OnCalendar=` equal the plan's recorded hash/expression.
+Git 2.53.0 regenerates daily/hourly/weekly timers with a random minute on
+`git maintenance start`; re-record bases and regenerate their drop-ins after
+any such change. The post-restart read observes all seven historical base
+hashes unchanged, six draft targets present and the WU-watch target absent.
+It does not authorize overwriting present files. Future slice policy changes
+edit the `60-` drop-in because it overrides later `50-` set-property files.
+The README also specifies the Windows pre-edit hash/byte backup and
+encoding/BOM/CRLF-preserving memory-line-only diff procedure.
+
+The eight parsing/fixture/native-parser checks are local integration; the
 current-state and calendar captures are native read-only observations.
-Persistent boot success and 96 GiB workload behavior remain unmeasured.
+The new tests distinguish both chrony endpoints and reject a coordinated
+`:35` plan/drop-in mutation against a recorded `:34` base, plus corrupt
+base hashes. Persistent memory boot success and 96 GiB workload behavior
+are not established by this lane's endpoint/base reads.
 [validation.json](../../adoption/drafts/wsl-memory-persistence-20261010/validation.json)
-records actual commands and exit codes. Known main shard-6 red from the #913
-pin is outside this proposal; it does not authorize editing unrelated files.
+records actual commands and exit codes. The earlier shard-6-red statement
+was stale: the CC's 03:52Z read reported 35 checks green/skipped, and the
+lane's 05:19Z read of the existing draft head found 28 successful and 8
+skipped checks, with no failures. These are dated CI observations, not local
+full-suite results or acceptance of the corrected head.
