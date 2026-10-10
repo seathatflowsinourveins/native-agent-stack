@@ -65,7 +65,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -785,8 +785,7 @@ def main(argv=None) -> int:
         return 2
     now = crw.utc_now()
     out = crw.ensure_dir(settings.state / "probes" / crw.stamp(now))
-    probe_settings = crw.Settings(out / "state", settings.ledger, settings.keys, settings.claude_bin, False,
-                                  settings.timeout, settings.upstream)
+    probe_settings = replace(settings, state=out / "state", post=False)
     production = crw.Worker([], settings, env)  # holds the tick lock: no tick runs while probing
     with production.tick_lock() as held:
         if not held:

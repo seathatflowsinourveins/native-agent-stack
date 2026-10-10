@@ -18392,8 +18392,8 @@
     },
     {
       "path": "docs/decisions/2026-10-09-claude-review-worker.md",
-      "sha256": "580e6f1c9e3fa81e71878706476abb406296845fe6ce56610994cdd4066be662",
-      "bytes": 43685
+      "sha256": "1db72df180c3ae7d472bf9d305ca8b9f9d9889424be132303aae9f2675973ca6",
+      "bytes": 49890
     },
     {
       "path": "docs/decisions/2026-10-09-codex-native-review-trial.md",
@@ -60917,8 +60917,8 @@
     },
     {
       "path": "tools/claude-review-worker/README.md",
-      "sha256": "f2f9f32902555e96e14ea2c9c81ebb1666258cfb28308fa9ceb7227f6b56d177",
-      "bytes": 11223
+      "sha256": "e52950f90f34b0720fcc41071798f6729d406ff3b9dc1e1defd1430b4ac4d838",
+      "bytes": 13530
     },
     {
       "path": "tools/claude-review-worker/essential-paths.json",
@@ -60927,8 +60927,8 @@
     },
     {
       "path": "tools/claude-review-worker/probes.py",
-      "sha256": "a4c54c099c94e9a9e0a271364d9bfe11f79907d291b6dab7291c578916c8637a",
-      "bytes": 51029
+      "sha256": "79bea326b639c367bedd391b843fbca442f1de18a781eb16ff418d315d013bfa",
+      "bytes": 50930
     },
     {
       "path": "tools/claude-review-worker/systemd/claude-review-worker.service",

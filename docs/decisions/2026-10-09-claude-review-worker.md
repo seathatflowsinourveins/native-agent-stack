@@ -344,6 +344,61 @@ edge, and the other two keys were near theirs), against the api-actions ledger. 
     exercise that layer with the same client, sandbox and fence, using a scripted stand-in for the model, and pass.
   - `probes.py live` now makes the three runs above.
 
+## The network boundary: Anthropic's sandbox runtime (command center, ruling received 2026-10-10 06:02Z)
+
+The GPT read at 4b8027b8 (P2-3) held that the brief asks for egress to the API host only, which a shared network
+namespace is not. The coordinator measured four options on this host (proposal `readers/p23-network-boundary/
+PROPOSAL.md`, sha256 `446292c8…e288e`, coordination record), and the command center approved the first: wrap the
+unchanged bwrap fence in srt, Anthropic's sandbox runtime, the runtime Claude Code's own sandboxing uses.
+
+- **Source.** `anthropics/sandbox-runtime@d9aac2098351ca17f3743fbaf6ecbd0051b7e00e` (tag v0.0.79), npm
+  `@anthropic-ai/sandbox-runtime@0.0.79`, tarball sha256 `5a730e4367c264ccc4b592af01dab038a6c39db7c184efbd132841688fa854f1`.
+  On Linux it runs the command under its own bwrap with `--unshare-net` (`src/sandbox/linux-sandbox-utils.ts:3378`);
+  a proxy on the host, reached through a bound unix socket and bridged by socat inside, does the domain filtering
+  ("Domain filtering happens at the host proxy level, not the sandbox boundary", `:1359-1362`), allowing only
+  `allowedDomains` (`src/sandbox/sandbox-manager.ts:355-415`) and refusing a host process without its session token
+  (407, `src/sandbox/http-proxy.ts:204,253-258,430,670`).
+- **The chain.** `credential_run.py <key> -- env HOME=… TMPDIR=… PATH=… node <srt>/dist/cli.js --settings <run>/srt.json
+  -- bwrap … claude`. The settings allow `api.anthropic.com` only and writes to the run's CLAUDE_CONFIG_DIR only; none of
+  `tlsTerminate`, `mitmProxy`, `parentProxy`, `allowLocalBinding`, `credentials` or `enableWeakerNestedSandbox` is set.
+  The inner bwrap keeps srt's namespace (a second `--unshare-net` would cut the proxy off) and stays the filesystem
+  fence. Each run's srt directory (settings, TMPDIR, HOME, an empty working directory) is private, under
+  `$XDG_RUNTIME_DIR/claude-review-worker/`, and deleted after the run, with the socket files srt 0.0.79 leaves.
+- **Why one host is enough.** With `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1`, as the worker sets it, the 2.1.296
+  client contacted only `api.anthropic.com:443`, and it honours `HTTPS_PROXY` and `NO_PROXY` for its own API traffic
+  (measured with a logging proxy and a dummy key). With that variable unset it also contacted a Datadog intake host.
+- **Node** is the host's mise install, `~/.local/share/mise/installs/node/24.21.0/bin/node` (v24.21.0; srt needs at
+  least 22.12), named by `CLAUDE_REVIEW_NODE`. srt is installed with `npm install --prefix <CLAUDE_REVIEW_SRT>
+  --ignore-scripts <the pinned tarball>`; the worker checks npm's recorded version and integrity of the install.
+- **Preflight, fail closed, before any key is read.** The tick is refused when node is missing or older than 22.12, srt
+  is not the pinned install, socat is missing, the run directory base is too long for srt's socket paths, or the
+  keyless check fails. The check runs `curl` inside the same srt and bwrap chain, with no key, and requires: only `lo`
+  in `/proc/net/dev`; the API answering through the proxy (a dead proxy makes the client hang, measured at 200 s, so
+  this proves it live); `example.com` refused by the proxy (CONNECT 403); no direct route to the API (no resolution or
+  no connection); and nothing reaching a TCP listener the check opens on the host's loopback, directly or through the
+  proxy. `probes.py offline` makes the static checks only and sends nothing. The check runs on every tick that passes
+  the other checks, so each such tick makes one unauthenticated request to `api.anthropic.com` (no key, no cost), plus
+  one refused attempt each at `example.com` and a direct route.
+- **Measured through the worker (2026-10-10, 06:05Z to 06:12Z).** The keyless check passed: `lo` only; API 404 through
+  the proxy; `example.com` CONNECT 403; direct route rc 6; host loopback rc 7 direct and 403 through the proxy; the
+  listener reached 0 times. With `example.com` added to the allowlist, the same check failed (its control). A native
+  test (`RealBoundaryChainTest`, run when `CRW_TEST_SRT` and `CRW_TEST_NODE` are set) drives the real runner, srt and
+  bwrap with a fake key: the client sees the key in its environment, `lo` only and the proxy variable, and the key is
+  masked in the output. `probes.py live` on api-4 through srt (receipt `readers/crw-probes/probes/20261010T060816Z`)
+  passed P1, P2, P6 and P11, `native_proven`; its three runs ended `end_turn` and cost $0.6252 in all (facts control
+  $0.0683, facts fenced $0.0429, and the probe review $0.5139, which streamed for 204 s through the proxy).
+- **O4 measures the bwrap layer alone.** The offline O4 check (the API host reachable by DNS and TCP) runs the inner
+  sandbox without srt, as before; the boundary check above is what measures srt's namespace.
+
+### Known limits of the network boundary (not gates)
+
+- Concurrent runs, each with its own srt and proxy, were not measured; the worker runs reviews one after another.
+- IPv6: `api.anthropic.com` has an AAAA record; the proxy's choice of address family was not observed.
+- A later client version that needs another host would be refused by the allowlist (fail closed); not exercised.
+- srt 0.0.79 blocks `socket(AF_UNIX)` inside the sandbox with seccomp; no client feature the worker enables needs it.
+- A review longer than the probe review's 204 s, and a mid-stream proxy drop, were not measured.
+- The live run used a real key of the current format; other key formats were not run.
+
 ## Command center decisions on #953 (2026-10-10 01:17Z)
 
 - **A budget stop posts `error`.**
@@ -360,13 +415,15 @@ edge, and the other two keys were near theirs), against the api-actions ledger. 
 
 - **R1, same-user access to the key.** During a run the key sits in the environment of the sandboxed processes. Any
   host process of the same user can read it there, through `/proc/<pid>/environ`. `credential_run.py` declares same-user
-  processes out of scope, and this worker does not change that.
-- **R2, shared network.** The sandbox shares the host's network namespace so the client can reach the API. Services on
-  the host's loopback are therefore reachable from inside the sandbox. The client has no tool that makes a network call
-  (no Bash, WebFetch or WebSearch); its own requests go to the API. Open: the GPT read at 4b8027b8 (P2-3) holds that
-  the brief asks for an API-host-only boundary, which this is not. The coordinator is measuring the options on this
-  host (an isolated network namespace with a filtering proxy, as Claude Code's own sandbox runtime does, against the
-  alternatives) for the command center, who decides; this record changes with that decision.
+  processes out of scope, and this worker does not change that. Since the network boundary below, the key is also in
+  the environment of srt's node process and of the socat bridge srt starts on the host, for the length of the run:
+  more processes hold it, but the exposure is the same kind (same-user only). srt does nothing with it: with no
+  `credentials` block in its settings, its credential handling is off (`sandbox-config.ts:1142`,
+  `sandbox-manager.ts:447,463,475` at the pin), and with no `tlsTerminate` its proxy only tunnels, so it never sees a
+  request header or body.
+- **R2, shared network: closed by the network boundary below.** Measured before it, on 2026-10-10 at 05:26Z with no
+  key: from the shared namespace the open internet, the host's loopback services (port 8788 answered 200), the LAN and
+  WSL interfaces and the host's abstract unix sockets were all reachable.
 - **R3, host Claude Code policy.** All of `/etc` is bound read-only, so a host-managed Claude Code policy in
   `/etc/claude-code` would apply to the run. None exists on this host today, and adding one would change the fence.
 
@@ -467,22 +524,24 @@ edge, and the other two keys were near theirs), against the api-actions ledger. 
 
 ## Evidence class
 
-- The 75 local tests are `synthetic`: a stand-in gh, a stand-in claude, temporary git origins and mirrors. One test
+- The 80 local tests are `synthetic`: a stand-in gh, a stand-in claude, temporary git origins and mirrors. One test
   drives the real `credential_run.py` and bubblewrap with a fake key in a temporary store. It skips where bubblewrap
-  cannot create a user namespace or the host pipes crash dumps, which is the case on GitHub-hosted runners.
+  cannot create a user namespace or the host pipes crash dumps, which is the case on GitHub-hosted runners. A second,
+  `RealBoundaryChainTest`, adds srt to that chain; it also skips unless `CRW_TEST_SRT` and `CRW_TEST_NODE` name an
+  install, and it passed on this host.
 - The sandbox, offline-client and loopback measurements above are native measurements of the pinned client on this
   host without a model.
 - The fence's behaviour with a model (P1, P2, P6, P11) is `native_proven` by the coordinator's live run below.
 - The tool-call checks (L4, L5, L7 to L10) are native measurements of the client's permission layer with a scripted
   stand-in model; no model chose those calls (see "Live probes" below).
 - No real pull request review has run.
-- The fixes after the GPT read at 4b8027b8 (below) rest on unit tests and the offline probes only; no paid call was
-  made for them.
+- The fixes after the GPT read at 4b8027b8 (below) rest on unit tests, the offline probes and the keyless boundary
+  check; the network boundary also has one paid live probe run through srt ($0.6252, `native_proven`).
 
 ## Fixes after the GPT read at 4b8027b8 (2026-10-10)
 
-The GPT read of #953 at 4b8027b8 asked for changes with seven P2 findings. Six are fixed in forward commits, each guard
-with a test that fails on a weakened copy (12 weakened copies, all failing their tests):
+The GPT read of #953 at 4b8027b8 asked for changes with seven P2 findings. All seven are fixed in forward commits. For
+the first six, each guard has a test that fails on a weakened copy (12 weakened copies, all failing their tests):
 
 - **P2-1, a head that moves during publication:** decision 14.
 - **P2-2, a retry that posts twice:** decision 14.
@@ -491,7 +550,11 @@ with a test that fails on a weakened copy (12 weakened copies, all failing their
 - **P2-6, L7 to L9 passing with their calls removed:** the Probes section.
 - **P2-7, the routing row quoted verbatim:** replaced by an attributed paraphrase.
 
-P2-3 (the network boundary) is a design question for the command center; see R2.
+- **P2-3, no API-host-only network boundary:** the network boundary section (the command center's ruling); R2 is
+  closed and R1 records the wider set of processes holding the key.
+
+All of these rest on unit tests, the offline probes and the keyless boundary check; the one paid run for them is the
+live probe run through srt above ($0.6252).
 
 ## SOTA sources
 

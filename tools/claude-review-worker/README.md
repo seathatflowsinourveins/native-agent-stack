@@ -15,7 +15,10 @@ measurements and its open boundaries is
 ## What a tick does
 
 1. Takes the tick lock (`$CLAUDE_REVIEW_STATE/worker.lock`); a second tick, or a probe, waits its turn by stopping.
-2. Checks it can run at all: the ledger is named, the pinned binary exists, bubblewrap starts the binary in the sandbox.
+2. Checks it can run at all, before any key is read: the ledger is named, the pinned binary exists, bubblewrap starts
+   the binary in the sandbox, node, srt and socat are the pinned ones, and a keyless check through srt and bubblewrap
+   shows the network boundary closed (only `lo`, the API reachable through srt's proxy, `example.com` refused, no
+   direct route, and nothing reaching a listener on the host's loopback).
 3. Settles anything a stopped tick left open: an open `CRW` debit becomes an unknown settle at 11 USD, an attempt
    still marked `started` becomes `interrupted` (counted, not final), and the stopped run's leftover scratch (its
    CLAUDE_CONFIG_DIR, an archive) is deleted.
@@ -42,8 +45,13 @@ A review:
 A diff over 250,000 bytes is refused before any debit: the status is `error`, the description names the size and asks
 for a paths-limited review, and the attempt is final.
 
-The review process is started as `credential_run.py <key> -- bwrap … /opt/claude-review/claude -p …`. The runner reads
-the key store outside the sandbox and passes the key in the environment, never in argv. The sandbox has a new root:
+The review process is started as `credential_run.py <key> -- env … node <srt>/dist/cli.js --settings <run>/srt.json --
+bwrap … /opt/claude-review/claude -p …`. The runner reads the key store outside the sandbox and passes the key in the
+environment, never in argv. srt (Anthropic's sandbox runtime, `@anthropic-ai/sandbox-runtime` 0.0.79) is the network
+boundary: its own bubblewrap layer gives the run a network namespace with only `lo`, and its proxy on the host,
+reached through a bound unix socket, passes `api.anthropic.com` and refuses everything else. srt gets a private
+directory per run under `$XDG_RUNTIME_DIR/claude-review-worker/` (its settings, TMPDIR, HOME and an empty working
+directory), deleted after the run. The inner bubblewrap is the filesystem fence. It has a new root:
 `/usr` and `/etc` read-only, `/proc`, `/dev`, an empty `/tmp`, an empty home at `/review/home`, the main worktree at
 `/review/main` and the input directory at `/review/input` (both read-only), a fresh `CLAUDE_CONFIG_DIR` at
 `/review/config` (writable, deleted after the run) and the pinned binary. There is no `/home`, so the gh login, the key
@@ -62,6 +70,15 @@ prompt says the check covers citation presence only.
 
 ## Install (command center)
 
+0. Install srt from its pinned npm tarball (sha256
+   `5a730e4367c264ccc4b592af01dab038a6c39db7c184efbd132841688fa854f1`), without its install scripts, and check that
+   socat is installed. Node is the host's mise install (`~/.local/share/mise/installs/node/24.21.0/bin/node`, at least
+   22.12). The worker checks the version and npm's recorded integrity of the install on every tick.
+
+   ```sh
+   npm pack @anthropic-ai/sandbox-runtime@0.0.79   # then compare sha256sum of the .tgz with the value above
+   npm install --prefix ~/.local/share/claude-review-worker/srt --ignore-scripts ./anthropic-ai-sandbox-runtime-0.0.79.tgz
+   ```
 1. Run the offline probes, then the live probes.
    - The offline checks cover the sandbox, the client's start, main's project settings, the run's config directory
      and the L checks. The L checks drive the exact invocation against a loopback stand-in for the Messages API, which
@@ -91,6 +108,8 @@ prompt says the check covers citation presence only.
    # CLAUDE_REVIEW_STATE=~/.local/state/native-agent-stack/claude-review-worker
    # CLAUDE_REVIEW_TIMEOUT_SECONDS=2700
    # CLAUDE_REVIEW_UPSTREAM=~/code/upstream   # the local upstream mirrors, read as git objects only
+   # CLAUDE_REVIEW_SRT=~/.local/share/claude-review-worker/srt          # the npm prefix of the srt install
+   # CLAUDE_REVIEW_NODE=~/.local/share/mise/installs/node/24.21.0/bin/node
    # PATH=...   # only if gh and git are not under the unit's PATH (the mise shims, /usr/local/bin, /usr/bin, /bin)
    ```
 3. Install the units from the live clone `~/code/native-agent-stack-live`, a detached worktree of `origin/main` that the
@@ -127,6 +146,13 @@ prompt says the check covers citation presence only.
 
 Posting uses the ambient `gh` login in this process; the sandboxed process never sees it.
 
+- The pull request is read just before the status and again before the comment. If its head is no longer the reviewed
+  commit, or it is closed, nothing more is posted for that review (`superseded` in the attempt marker). If the head
+  moves after both were posted, the comment gets a superseded line.
+- Each post is marked `sending` before it and `posted` after it. A retry first looks on GitHub for the commit's latest
+  `claude-review/local` status and for the attempt's comment (a hidden marker line), by the same login, so a lost
+  reply or a stopped tick never posts twice.
+
 - Both repositories: `POST /repos/{owner}/{repo}/statuses/{sha}` with `state`, `context` (`claude-review/local`) and a
   `description` of at most 140 characters built from parsed fields only, for example
   `Claude local review: CHANGES (P1 0, P2 3, P3 1)`. No `target_url`.
@@ -151,6 +177,7 @@ systemctl --user disable --now claude-review-worker.timer
 rm ~/.config/systemd/user/claude-review-worker.service ~/.config/systemd/user/claude-review-worker.timer
 systemctl --user daemon-reload
 rm ~/.config/claude-review-worker.env
+rm -r ~/.local/share/claude-review-worker/srt
 ```
 
 The state directory can then be deleted; its ledger rows stay in the shared ledger. Posted statuses cannot be deleted
