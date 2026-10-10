@@ -8,6 +8,7 @@ checksums themselves are independent observations of publisher checksum files,
 release asset digests and re-hashed downloads recorded in the pins file.
 """
 
+import ast
 import hashlib
 import json
 import os
@@ -3790,6 +3791,28 @@ class PlatformPageTests(unittest.TestCase):
     def test_page_records_the_python_313_requirement(self):
         self.assertIn("brew install python@3.13", self.page)
         self.assertIn("3.9", self.page)
+
+    def test_retired_recording_smoke_keeps_a_portable_python_39_syntax_guard(self):
+        # CPython v3.13.16 Lib/ast.py parse and Doc/library/ast.rst:
+        # feature_version is a best-effort grammar check, not Python 3.9 execution.
+        paths = ("scripts/host_receipts.py", "scripts/component_matrix.py",
+                 "scripts/new_host_grand_list.py", "tools/sota-convergence/build_verdicts.py",
+                 "scripts/validate_convergence.py", "scripts/release_due.py")
+        for relative in paths:
+            with self.subTest(script=relative):
+                ast.parse((ROOT / relative).read_text(encoding="utf-8"),
+                          filename=relative, feature_version=(3, 9))
+        with self.assertRaises(SyntaxError):
+            ast.parse("match value:\n    case _: pass\n", feature_version=(3, 9))
+        bootstrap = (ROOT / "adoption/bootstrap.md").read_text(encoding="utf-8")
+        for page in (bootstrap, self.page):
+            recording = " ".join(page.split())
+            for marker in ("feature_version=(3, 9)", "syntax only",
+                           "2026-10-10-retire-macos-ci.md"):
+                self.assertTrue(marker in recording, f"recording guide lacks {marker}")
+            for stale in ("is exercised directly, not merely declared",
+                          "and tested directly, not merely declared"):
+                self.assertFalse(stale in recording, f"retired CI claim remains: {stale}")
 
 
 if __name__ == "__main__":

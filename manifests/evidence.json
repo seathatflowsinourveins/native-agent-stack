@@ -5356,8 +5356,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "0a448d9813a9c74f84ba23f935431eba558c55e8febe42061d4658f6ab8bf9da",
-      "bytes": 74706
+      "sha256": "9a81f6d200291a55f1abea93ced95ccce7c0451d6f239c114e0658f18326f840",
+      "bytes": 74970
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -5576,8 +5576,8 @@
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "886f06cc4bb3e1666b2cc81f82066dbe20ee73730e5f2aefe0351acb095443a8",
-      "bytes": 66851
+      "sha256": "ba9152882aaaccc27fc3ff0228b53a59117c9b85147cd142824695ddbee313be",
+      "bytes": 67387
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -18547,8 +18547,8 @@
     },
     {
       "path": "docs/decisions/2026-10-10-retire-macos-ci.md",
-      "sha256": "3d9c4867892d90241e14c05ffc222f3032472eb793fabcf11fcef82d91f34ab1",
-      "bytes": 6130
+      "sha256": "fa12ca08c3a536e37d43479f9c86069baf54d5c60dc97846f73e66005ebe335c",
+      "bytes": 7999
     },
     {
       "path": "docs/direct-results.md",
@@ -59817,8 +59817,8 @@
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",
-      "sha256": "ad7175273aa60cf619e2950cb52942295dca2e24fb9f5539ae94b8e1ecd19cbb",
-      "bytes": 217468
+      "sha256": "d25c3447663d9da2169d8ef409ac668b4b3647721fda15742718948578181f67",
+      "bytes": 218937
     },
     {
       "path": "tests/test_adoption_bootstrap_parity.py",

@@ -53,7 +53,8 @@ release, the note is history and the step is in your checkout (`test -e
    [`adoption/hardware-profiles.json`](../hardware-profiles.json).
 2. `bash adoption/bootstrap-macos.sh --profile macos-arm64-foundation`
    (usage and exit codes below). Use `macos-arm64-foundation`, the profile
-   this page documents and the hosted smoke job runs.
+   this page documents and the historical hosted smoke job ran before the
+   [2026-10-10 retirement](../../docs/decisions/2026-10-10-retire-macos-ci.md).
    `adoption/pins-macos-arm64.json` changed after `v2026.09.26` to pin `qmd`
    and `rtk`, whose missing macOS pins made `foundation-cpu` exit 3 at that
    tag, together with the rest of `token-efficiency` (the darwin-arm64 pinned
@@ -61,8 +62,9 @@ release, the note is history and the step is in your checkout (`test -e
    pin, and `--plan` resolves them without exit 3. That is a `--plan` result
    under a `uname`/`sw_vers` shim on Linux (`TokenEfficiencyPlanTests` in
    `tests/test_adoption_bootstrap_macos.py`): no Mac has installed those eight
-   pins or run their install paths, and the hosted macOS jobs run only
-   `macos-arm64-foundation`, which selects none of them.
+   pins or run their install paths. Before their
+   [2026-10-10 retirement](../../docs/decisions/2026-10-10-retire-macos-ci.md),
+   the hosted macOS jobs ran only `macos-arm64-foundation`, which selected none of them.
    `macos-arm64-foundation` stays this page's starting profile. Whatever the
    profile, a run also fetches the pinned 334 MB embedding model and writes a
    missing Qdrant config: those two steps are not gated on the selected
@@ -587,8 +589,8 @@ Still bounded, exactly as before:
   installed Homebrew state and the user's own account are all different.
 - Native sign-in for Codex, Claude and GitHub cannot happen on a hosted runner.
 - No `macos-arm64` `platform_status` is changed by this receipt (the
-  matrix/verdict machinery this same run's `validate-macos` job now gates
-  on requires a receipt with `host.second_physical_machine: true` plus an
+  matrix/verdict machinery that run's retired `validate-macos` job gated
+  still requires a receipt with `host.second_physical_machine: true` plus an
   independent, non-self review -- neither of which a hosted runner can
   ever provide by construction).
 
@@ -608,38 +610,44 @@ runs on `ubuntu-24.04` only. A future macOS host recording evidence with
 these exact scripts, on macOS's own BSD userland and system `git`, was
 entirely unexercised.
 
-Fixed (round 3i): `adoption-bootstrap.yml`'s `validate-macos` job (`macos-15`)
-now runs all six scripts as gating checks, then a **recording smoke**: it
-installs this profile (the same bootstrap step `bootstrap-macos` runs),
-records a real `host_receipts.py record` receipt for a cheap, already-
+Historical repair (round 3i): before the
+[2026-10-10 retirement](../../docs/decisions/2026-10-10-retire-macos-ci.md),
+`adoption-bootstrap.yml`'s `validate-macos` job (`macos-15`) ran all six
+scripts as gating checks, then a **recording smoke**. It installed this
+profile (the same bootstrap step `bootstrap-macos` ran) and recorded a real
+`host_receipts.py record` receipt for a cheap, already-
 installed component (`codex`, `--from-stack-commands`, `--evidence-class
 native_proven` -- a green hosted job is real execution for exactly what it
 ran, never a workstation acceptance receipt; see "What a hosted run proves"
 above) inside a **throwaway copy** of the checkout (`$RUNNER_TEMP/rec`, never
-the real one, so nothing is ever committed from this step), then re-runs
+the real one, so nothing was committed from this step), then re-ran
 `host_receipts.py validate`, `component_matrix.py --write`, then
 `component_matrix.py --check`, and `new_host_grand_list.py --write`, then
 `new_host_grand_list.py --check` (separate invocations: `--write` and
-`--check` are mutually exclusive) in that same copy. This proves the
-recording path works under macOS Python, BSD userland and the system `git`,
+`--check` are mutually exclusive) in that same copy. The retained run showed
+the recording path working under that macOS Python, BSD userland and system `git`,
 never that this ONE receipt establishes any platform-status change (it does
 not carry `second_physical_machine: true`, and it is discarded with the
 throwaway copy at the end of the job).
 
 **Minimum Python version: 3.9**, declared in
-[`adoption/bootstrap.md`](../bootstrap.md) and tested directly, not merely
-declared: the recording smoke above runs once against the manifest-pinned
-Python line (`python@3.13` via `actions/setup-python`) and once against the
-runner's own **system** `/usr/bin/python3` (macOS ships 3.9.6 there by
-default on every macOS 15 image observed so far, which is exactly this
-floor -- a version this project's own bootstrap already flags as below the
-`python@3.13` this profile's prerequisites require, in "Prerequisites"
-above). If a runner's system Python were ever below 3.9, that second run is
-skipped with a message rather than failing the job; the CI log states
-whichever happened. This is still hosted-runner evidence, not a workstation
-observation: it establishes that these scripts run under a real macOS
-Python 3.9 interpreter as installed by Apple on this runner image, not that
-every real Mac's system Python matches it forever.
+[`adoption/bootstrap.md`](../bootstrap.md). The historical recording smoke
+ran against the manifest-pinned Python line (`python@3.13` via
+`actions/setup-python`) and the runner's **system** `/usr/bin/python3`
+(3.9.6 in the retained macOS 15 observations). Its system-Python arm was
+configured to skip with a message when the version was below 3.9. Those
+observations remain hosted-runner evidence, not workstation acceptance or
+a guarantee about every Mac's interpreter.
+
+Since the **2026-10-10** retirement, `PlatformPageTests` checks the six
+recording/verdict scripts using `ast.parse(..., feature_version=(3, 9))`.
+This is **syntax only**: CPython documents the mode as a best-effort grammar
+check, with no guarantee of identical parsing on the target interpreter.
+The guard also rejects a Python 3.10 `match` statement as a discriminating
+control. It does not execute Python 3.9, run a current macOS CI job, or
+establish native host acceptance. Primary source:
+[CPython v3.13.16 AST documentation](https://github.com/python/cpython/blob/v3.13.16/Doc/library/ast.rst)
+and [its ast.parse implementation](https://github.com/python/cpython/blob/v3.13.16/Lib/ast.py).
 
 ## Embedding backend decision
 

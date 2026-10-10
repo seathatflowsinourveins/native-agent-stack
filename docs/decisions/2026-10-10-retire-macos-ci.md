@@ -53,10 +53,28 @@ records and artifacts are preserved.
 
 The generated WSL handbook records the normalized adoption manifest digest.
 Its maintained builder refreshes that reference and the output receipt when
-the historical hosted-smoke row gains retirement metadata. The resolver's
-repository fixture also stops assuming the retired Mac job supplies a literal
-tests directory. Its workflow-derived enforcement and advisory read-inventory
-implementation is unchanged.
+the historical hosted-smoke row gains retirement metadata. The landed
+[resolver prerequisite #959](https://github.com/seathatflowsinourveins/native-agent-stack/pull/959)
+at main `0a053e1e5861a5522dcbbeea1c5006c4d8937b95` recognizes Linux
+`scripts/validate_shards.py run` as root `test*.py` discovery. The repository
+fixture keeps `ci_discovered` protection for a future root test module;
+retirement does not turn the test package into an advisory inventory.
+
+The recording guides describe the retired jobs in past tense. Their Python
+3.9 floor remains guarded portably over all six recording/verdict scripts by
+`ast.parse(..., feature_version=(3, 9))`, with a Python 3.10 `match` rejection
+control. This is best-effort syntax validation, not execution on Python 3.9
+or a new macOS observation. The doc assertion failed before the stale
+current-CI claims were corrected.
+
+`docs/acceptance-evidence-policy.md` is unchanged and remains registered
+publication evidence. Only the retired jobs named it as a workflow-derived
+`ci_named` protected path; removing that category is the bounded consequence
+of retiring their run text. The document's acceptance standards remain in
+force, while future document edits receive normal publication/CI review.
+The resolver continues to exclude monitoring-only read inventories from
+refusal categories and unions trusted/base/head protection for outgoing
+changes; no gate permission, allow-list or protected-code rule is relaxed.
 
 ## Superseded decisions
 
@@ -109,3 +127,11 @@ fixture check does not establish a native macOS run.
   with its SHA256-verified release archive; `.github/requirements-ci.txt`
   checksum-locks [`zizmor` 1.30.1](https://github.com/zizmorcore/zizmor/releases/tag/v1.30.1).
   The installed clients report those same versions.
+- CPython [v3.13.16 ast.parse](https://github.com/python/cpython/blob/v3.13.16/Lib/ast.py)
+  and [AST documentation](https://github.com/python/cpython/blob/v3.13.16/Doc/library/ast.rst):
+  `feature_version=(3, 9)` is a best-effort grammar check, not target-version
+  execution or a parsing-equivalence guarantee.
+- The resolver discovery prerequisite at main
+  [`0a053e1e5861a5522dcbbeea1c5006c4d8937b95`](https://github.com/seathatflowsinourveins/native-agent-stack/tree/0a053e1e5861a5522dcbbeea1c5006c4d8937b95):
+  `scripts/validate_shards.py` root discovery and the own-repository
+  protected-module regression retain the Linux test enforcement after retirement.
