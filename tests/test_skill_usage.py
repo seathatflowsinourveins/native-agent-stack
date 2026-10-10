@@ -22,7 +22,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools" / "skill-usage"))
 import skill_usage as S  # noqa: E402
 
-REAL_MANAGED_MCP_CONFIG_PATHS = S.managed_mcp_config_paths  # RunSkillDoctor.setUp hides it behind a patch
+REAL_MANAGED_MCP_CONFIG_PATHS = S.MANAGED_MCP_CONFIG_PATHS  # RunSkillDoctor.setUp hides it behind a patch
 
 FIXTURES = ROOT / "tests" / "fixtures" / "skill_usage"
 NOW = "2026-10-30T00:00:00Z"
@@ -195,7 +195,7 @@ class SkillDoctorParsing(unittest.TestCase):
 class RunSkillDoctor(unittest.TestCase):
     def setUp(self):
         # Hermetic: no test here may depend on a managed-mcp.json that happens to exist on the host running it.
-        self.enterContext(mock.patch.object(S, "managed_mcp_config_paths", return_value=()))
+        self.enterContext(mock.patch.object(S, "MANAGED_MCP_CONFIG_PATHS", ()))
 
     def test_a_deployed_managed_mcp_config_drops_only_the_strict_flag(self):
         # Claude Code 2.1.296 refuses --strict-mcp-config while managed-mcp.json is deployed ("You cannot use
@@ -234,13 +234,16 @@ class RunSkillDoctor(unittest.TestCase):
     def test_the_default_paths_are_the_documented_system_paths(self):
         # https://code.claude.com/docs/en/managed-mcp, configuration summary (read 2026-10-10): /Library/Application
         # Support/ClaudeCode/ on macOS, /etc/claude-code/ on Linux (WSL included), C:\Program Files\ClaudeCode\ on Windows.
-        self.assertEqual(S.MANAGED_MCP_CONFIG_PATHS, {
-            "darwin": ("/Library/Application Support/ClaudeCode/managed-mcp.json",),
-            "linux": ("/etc/claude-code/managed-mcp.json",),
-            "win32": ("C:\\Program Files\\ClaudeCode\\managed-mcp.json",)})
-        for platform, expected in (("darwin", "darwin"), ("win32", "win32"), ("linux", "linux"), ("freebsd14", "linux")):
-            with self.subTest(platform=platform), mock.patch.object(sys, "platform", platform):
-                self.assertEqual(REAL_MANAGED_MCP_CONFIG_PATHS(), S.MANAGED_MCP_CONFIG_PATHS[expected])
+        # All three are checked on every system (another system's path cannot exist on this one), so the module has no
+        # platform branch for the macOS drift guard (tests.test_workflow_hardening.MacosPatternsTests) to flag.
+        self.assertEqual(REAL_MANAGED_MCP_CONFIG_PATHS, (
+            "/Library/Application Support/ClaudeCode/managed-mcp.json",
+            "/etc/claude-code/managed-mcp.json",
+            "C:\\Program Files\\ClaudeCode\\managed-mcp.json"))
+        # With no managed file on this host the unpatched default keeps every fence.
+        with mock.patch.object(S, "MANAGED_MCP_CONFIG_PATHS", REAL_MANAGED_MCP_CONFIG_PATHS):
+            if not any(os.path.isfile(path) for path in REAL_MANAGED_MCP_CONFIG_PATHS):
+                self.assertEqual(S.skill_doctor_argv(), S.SKILL_DOCTOR_ARGV)
 
     def test_the_managed_mcp_comment_and_guide_cite_the_client_and_the_docs(self):
         source = (ROOT / "tools/skill-usage/skill_usage.py").read_text(encoding="utf-8").split("\n")

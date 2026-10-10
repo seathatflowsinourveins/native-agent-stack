@@ -218,22 +218,18 @@ SKILL_DOCTOR_ARGV = ["claude", "-p", "/skill-doctor", "--output-format", "json",
 # while such a file is deployed, Claude Code exits at startup on a workstation and in a cloud session alike". The file
 # already keeps every other server out, so on such a host the argv drops only that flag and keeps the other fences.
 # System paths: the same page's configuration summary ("/Library/Application Support/ClaudeCode/", "/etc/claude-code/",
-# "C:\Program Files\ClaudeCode\"); Linux covers WSL.
-MANAGED_MCP_CONFIG_PATHS = {
-    "darwin": ("/Library/Application Support/ClaudeCode/managed-mcp.json",),
-    "linux": ("/etc/claude-code/managed-mcp.json",),
-    "win32": ("C:\\Program Files\\ClaudeCode\\managed-mcp.json",),
-}
-
-
-def managed_mcp_config_paths() -> tuple:
-    """The system path of managed-mcp.json on this platform."""
-    return MANAGED_MCP_CONFIG_PATHS["win32" if sys.platform == "win32" else "darwin" if sys.platform == "darwin" else "linux"]
+# "C:\Program Files\ClaudeCode\"); all three are checked, because another system's path cannot exist on this one, so no
+# platform branch is needed (Linux covers WSL).
+MANAGED_MCP_CONFIG_PATHS = (
+    "/Library/Application Support/ClaudeCode/managed-mcp.json",
+    "/etc/claude-code/managed-mcp.json",
+    "C:\\Program Files\\ClaudeCode\\managed-mcp.json",
+)
 
 
 def skill_doctor_argv(managed_paths=None) -> list:
     """SKILL_DOCTOR_ARGV, without --strict-mcp-config when a readable managed MCP config is deployed."""
-    paths = managed_mcp_config_paths() if managed_paths is None else managed_paths
+    paths = MANAGED_MCP_CONFIG_PATHS if managed_paths is None else managed_paths
     if any(os.path.isfile(path) and os.access(path, os.R_OK) for path in paths):
         return [word for word in SKILL_DOCTOR_ARGV if word != "--strict-mcp-config"]
     return list(SKILL_DOCTOR_ARGV)
