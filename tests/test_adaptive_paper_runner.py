@@ -333,6 +333,133 @@ class IntegratedRunner(unittest.TestCase):
             self.assertIn(result["status"], ("passed", "completed_no_signals"))
             ledger.close()
 
+    def test_run_native_extended_simulated_port_flags_a_closed_session_exit(self):
+        """The validated runner policy governs exits for every transport."""
+        from zoneinfo import ZoneInfo
+
+        fixed_now = datetime(2026, 3, 10, 20, tzinfo=ZoneInfo("America/New_York")).timestamp()
+        config, _, _ = load_config(SOURCE / "config.json")
+        config.update(duration_seconds=1, cleanup_seconds=2, order_timeout_seconds=1,
+                      regular_session_only=False, extended_hours_enabled=True,
+                      sessions={"extended_hours": True, "overnight_holds": True})
+        policy = PolicyConfig(symbols=("SPY", "QQQ", "IWM", "DIA", "AAPL", "MSFT"),
+                              max_positions=6)
+
+        with tempfile.TemporaryDirectory() as root:
+            ledger = Ledger(Path(root) / "journal.db", RiskLimits(trial_seconds=3, cleanup_seconds=2))
+            self.addCleanup(ledger.close)
+            ledger.start_trial(fixed_now)
+            controller = Controller(ledger, fixed_now + 3600, market_open=True, clock=lambda: fixed_now)
+            port = SimulatedPort(controller, policy.symbols)
+            self.assertFalse(hasattr(port, "extended_hours_allowed"))
+            port.positions["AAPL"] = {"symbol": "AAPL", "qty": Decimal(2), "avg_entry_price": "100"}
+            port.cash = Decimal("99800")
+            controller.port = port
+            with patch.object(runner_module.time, "time", return_value=fixed_now), \
+                 patch.object(runner_module.time, "time_ns", return_value=int(fixed_now * 1e9)):
+                result = asyncio.run(run_native(controller, policy, [{"symbol": s} for s in policy.symbols],
+                                                "extended-simulated", config, "99800"))
+            self.assertEqual(result["corporate_action_guard"]["pending_exit_attention_held"], ["AAPL"])
+            self.assertTrue(any(e["type"] == "exit_attention" and e["reason"] == "session_unavailable"
+                                for e in result["events"]))
+            self.assertEqual(port.submitted_at, [])
+            self.assertEqual(ledger.positions()["AAPL"].qty, Decimal(2))
+            self.assertEqual(result["status"], "needs_attention")
+            self.assertEqual(result["startup_reconciliation"]["ledger_delta"]["positions_after"], 1)
+
+    def test_native_sell_dispatch_crossing_post_close_never_reaches_the_broker(self):
+        """A POST owner tick cannot authorize a sell dispatched after 20:00."""
+        from zoneinfo import ZoneInfo
+        from nautilus_trader.common import Clock
+        from native_adapter import AlpacaExecutionClient
+
+        owner_now = datetime(2026, 3, 10, 19, 59, 59, 900000,
+                             tzinfo=ZoneInfo("America/New_York")).timestamp()
+        dispatch_ns = int(datetime(2026, 3, 10, 20,
+                                  tzinfo=ZoneInfo("America/New_York")).timestamp() * 1e9)
+        config, _, _ = load_config(SOURCE / "config.json")
+        config.update(duration_seconds=1, cleanup_seconds=2, order_timeout_seconds=1,
+                      regular_session_only=False, extended_hours_enabled=True,
+                      sessions={"extended_hours": True, "overnight_holds": True})
+        policy = PolicyConfig(symbols=("SPY", "QQQ", "IWM", "DIA", "AAPL", "MSFT"),
+                              max_positions=6)
+        dispatches = []
+        native_submit = AlpacaExecutionClient._submit_order
+
+        async def delayed_dispatch(client, command):
+            await asyncio.sleep(0)  # Preserve the actual asynchronous native dispatch boundary.
+            original_clock = client.clock
+            client.clock = Clock.new_test()
+            client.clock.set_time(dispatch_ns)
+            dispatches.append((str(command.order.side).lower(), client.clock.timestamp_ns()))
+            try:
+                await native_submit(client, command)
+            finally:
+                client.clock = original_clock
+
+        with tempfile.TemporaryDirectory() as root:
+            ledger = Ledger(Path(root) / "journal.db", RiskLimits(trial_seconds=3, cleanup_seconds=2))
+            self.addCleanup(ledger.close)
+            ledger.start_trial(owner_now)
+            controller = Controller(ledger, owner_now + 3600, market_open=True, clock=lambda: owner_now)
+            port = SimulatedPort(controller, policy.symbols)
+            port.positions["AAPL"] = {"symbol": "AAPL", "qty": Decimal(2), "avg_entry_price": "100"}
+            port.cash = Decimal("99800")
+            controller.port = port
+            with patch.object(runner_module.time, "time", return_value=owner_now), \
+                 patch.object(runner_module.time, "time_ns", return_value=int(owner_now * 1e9)), \
+                 patch.object(AlpacaExecutionClient, "_submit_order", delayed_dispatch):
+                result = asyncio.run(run_native(controller, policy, [{"symbol": s} for s in policy.symbols],
+                                                "post-close-dispatch", config, "99800"))
+            self.assertTrue(dispatches)
+            self.assertTrue(all(side == "sell" and stamp == dispatch_ns for side, stamp in dispatches))
+            self.assertEqual(port.orders, {})
+            self.assertEqual(port.submitted_at, [])
+            self.assertEqual(port.positions["AAPL"]["qty"], Decimal(2))
+            self.assertEqual(ledger.positions()["AAPL"].qty, Decimal(2))
+            self.assertEqual(result["native_rejections"], 1)
+            self.assertTrue(any(e.startswith("exit_dispatch_session_unavailable:")
+                                for e in result["adapter_errors"]))
+            self.assertFalse(result["flat"])
+            self.assertEqual(result["status"], "needs_attention")
+            self.assertEqual(trial_phase_and_exit_code(result), ("needs_attention", 3))
+            self.assertEqual(ledger.unresolved(), [])
+            self.assertEqual(ledger.intents(), [])
+
+    def test_native_cleanup_reports_an_unchanged_exit_attention_reason_once(self):
+        """Repeated native cleanup ticks preserve the hold without journal spam."""
+        from zoneinfo import ZoneInfo
+
+        fixed_now = datetime(2026, 3, 10, 20, tzinfo=ZoneInfo("America/New_York")).timestamp()
+        config, _, _ = load_config(SOURCE / "config.json")
+        config.update(duration_seconds=1, cleanup_seconds=2, order_timeout_seconds=1,
+                      regular_session_only=False, extended_hours_enabled=True,
+                      sessions={"extended_hours": True, "overnight_holds": True})
+        policy = PolicyConfig(symbols=("SPY", "QQQ", "IWM", "DIA", "AAPL", "MSFT"),
+                              max_positions=6)
+        with tempfile.TemporaryDirectory() as root:
+            ledger = Ledger(Path(root) / "journal.db", RiskLimits(trial_seconds=3, cleanup_seconds=2))
+            self.addCleanup(ledger.close)
+            ledger.start_trial(fixed_now)
+            controller = Controller(ledger, fixed_now + 3600, market_open=True, clock=lambda: fixed_now)
+            port = SimulatedPort(controller, policy.symbols)
+            port.positions["AAPL"] = {"symbol": "AAPL", "qty": Decimal(2), "avg_entry_price": "100"}
+            port.cash = Decimal("99800")
+            controller.port = port
+            with patch.object(runner_module.time, "time", return_value=fixed_now), \
+                 patch.object(runner_module.time, "time_ns", return_value=int(fixed_now * 1e9)):
+                result = asyncio.run(run_native(controller, policy, [{"symbol": s} for s in policy.symbols],
+                                                "held-cleanup", config, "99800"))
+            held_ticks = [e for e in result["events"] if e["type"] == "decision"
+                          and e.get("exit_flags", {}).get("AAPL") == "session_unavailable"]
+            self.assertGreaterEqual(len(held_ticks), 2)
+            attention = [(e["symbol"], e["reason"]) for e in result["events"]
+                         if e["type"] == "exit_attention"]
+            self.assertEqual(attention, [("AAPL", "session_unavailable")])
+            self.assertEqual(result["corporate_action_guard"]["pending_exit_attention_held"], ["AAPL"])
+            self.assertEqual(ledger.positions()["AAPL"].qty, Decimal(2))
+            self.assertEqual(port.submitted_at, [])
+
     def test_reconcile_rejects_external_position_and_cash_gap(self):
         with tempfile.TemporaryDirectory() as root:
             ledger = Ledger(Path(root) / "journal.db")

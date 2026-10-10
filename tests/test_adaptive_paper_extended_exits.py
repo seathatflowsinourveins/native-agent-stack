@@ -237,7 +237,10 @@ class ExtendedPolicyCallerTests(unittest.TestCase):
 class NativeExtendedExitCallerTests(unittest.TestCase):
     def strategy(self, *, session="PRE"):
         # Reuse the existing fake-native strategy factory, not an order adapter.
-        import test_adaptive_paper_exits as legacy
+        try:
+            from . import test_adaptive_paper_exits as legacy
+        except ImportError:
+            import test_adaptive_paper_exits as legacy
 
         helper = legacy.ReplaceExitTests()
         now = [1000.0]
@@ -259,11 +262,11 @@ class NativeExtendedExitCallerTests(unittest.TestCase):
         strategy.event_sink = events.append
         return strategy, helper, now, events
 
-    def test_existing_extended_transport_automatically_selects_session_context(self):
+    def test_validated_extended_policy_selects_session_context_without_a_port_attribute(self):
         strategy, helper, now, events = self.strategy()
         with patch("native_strategy.session_at", return_value=SimpleNamespace(kind="PRE")) as classify:
             actual = type(strategy)(strategy.policy, strategy.ledger, "fixture",
-                                    transport=SimpleNamespace(extended_hours_allowed=True))
+                                    transport=SimpleNamespace(), session_policy={"extended_hours": True})
             self.assertEqual(actual._exit_session(now[0]), "PRE")
             classify.assert_called_once()
 
@@ -271,7 +274,8 @@ class NativeExtendedExitCallerTests(unittest.TestCase):
         strategy, helper, now, events = self.strategy()
         with patch("native_strategy.session_at", side_effect=AssertionError("calendar consulted")):
             actual = type(strategy)(strategy.policy, strategy.ledger, "fixture",
-                                    transport=SimpleNamespace(extended_hours_allowed=False))
+                                    transport=SimpleNamespace(extended_hours_allowed=True),
+                                    session_policy={"extended_hours": False})
             self.assertEqual(actual._exit_session(1832677200.0), "RTH")
 
     def test_stale_extended_rebalance_flags_without_submit_or_replacement(self):
@@ -318,10 +322,25 @@ class NativeExtendedExitCallerTests(unittest.TestCase):
         strategy.rebalance(now=now[0], force_exit=True)
         held = runner._final_corporate_action_guard_summary(strategy, {"AAPL"}, now[0])
         self.assertIn("AAPL", held["pending_needs_attention_held"])
+        strategy.rebalance(now=now[0], force_exit=True)
+        self.assertEqual([e["reason"] for e in events if e["type"] == "exit_attention"], ["quote_stale"])
+        strategy._exit_session_at = lambda at: "CLOSED"
         strategy.policy.observe("AAPL", 100.0, 100.02, now[0])
+        strategy.rebalance(now=now[0], force_exit=True)
+        self.assertEqual([e["reason"] for e in events if e["type"] == "exit_attention"],
+                         ["quote_stale", "session_unavailable"])
+        self.assertEqual(strategy._exit_pending_attention, {"AAPL": "session_unavailable"})
+        strategy._exit_session_at = lambda at: "POST"
         strategy.rebalance(now=now[0], force_exit=True)
         cleared = runner._final_corporate_action_guard_summary(strategy, {"AAPL"}, now[0])
         self.assertNotIn("AAPL", cleared["pending_needs_attention_held"])
+        now[0] += strategy.policy.config.quote_age_seconds + 1
+        strategy.rebalance(now=now[0], force_exit=True)
+        reflagged = runner._final_corporate_action_guard_summary(strategy, {"AAPL"}, now[0])
+        self.assertIn("AAPL", reflagged["pending_needs_attention_held"])
+        self.assertEqual([e["reason"] for e in events if e["type"] == "exit_attention"],
+                         ["quote_stale", "session_unavailable", "quote_stale"])
+        self.assertEqual(strategy._exit_pending_attention, {"AAPL": "quote_stale"})
 
     def test_fresh_extended_rebalance_reuses_native_limit_order_factory(self):
         strategy, helper, now, events = self.strategy()

@@ -1009,6 +1009,23 @@ SCAN_TIME = datetime(2026, 9, 24, 12, 0, 5, tzinfo=timezone.utc).timestamp()  # 
 PRE_TS = datetime(2026, 9, 24, 12, 30, tzinfo=timezone.utc)                   # 08:30 ET
 
 
+def native_pre_dispatch():
+    """Use the same synthetic PRE clock for admission and the vendor flag."""
+    from nautilus_trader.common import Clock
+    real_submit = native_adapter.AlpacaExecutionClient._submit_order
+
+    async def dispatch(client, command):
+        original_clock = client.clock
+        client.clock = Clock.new_test()
+        client.clock.set_time(int(PRE_TS.timestamp() * 1e9))
+        try:
+            await real_submit(client, command)
+        finally:
+            client.clock = original_clock
+
+    return patch.object(native_adapter.AlpacaExecutionClient, "_submit_order", dispatch)
+
+
 def scan_row(symbol, rank, price):
     return {"symbol": symbol, "rank": rank, "price_at_t": price, "dollar_volume_at_t": "50000000",
             "entry_bar_dollar_volume": "2000000"}
@@ -1083,8 +1100,7 @@ class MoverLaneFees(FeePrivacyCapture, unittest.TestCase):
         import signal
         import transport
         out = Path(root) / f"{trial or command}.json"
-        real_load_scan, real_build_plan, real_flag = (mover_runner.load_scan, mover_runner.build_plan,
-                                                      native_adapter.order_extended_hours_flag)
+        real_load_scan, real_build_plan = mover_runner.load_scan, mover_runner.build_plan
         real_time = time.time
 
         def compressed_plan(settings, limits, scan, session, *, t0, **kwargs):
@@ -1154,7 +1170,7 @@ class MoverLaneFees(FeePrivacyCapture, unittest.TestCase):
                               lambda raw, settings, *, now: real_load_scan(raw, settings, now=SCAN_TIME + 20)), \
                  patch.object(mover_runner, "build_plan", compressed_plan), \
                  patch.object(mover_runner, "_controller_session", lambda close, now, policy: (now + 36000, True)), \
-                 patch.object(native_adapter, "order_extended_hours_flag", lambda ts, p: real_flag(PRE_TS, p)), \
+                 native_pre_dispatch(), \
                  (patch("time.time", lambda: real_time() + self.time_offset) if checkpoint_seam else nullcontext()), \
                  (patch.object(mover_runner, "run_mover", reconciled_trial) if checkpoint_seam else nullcontext()), \
                  (patch.object(mover_runner, "recover_mover", reconciled_recovery) if checkpoint_seam else nullcontext()):

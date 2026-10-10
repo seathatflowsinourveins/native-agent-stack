@@ -24,17 +24,16 @@ class AdaptiveStrategy(Strategy):
 
     def __init__(self, policy: AdaptivePolicy, ledger, trial_id: str, *, event_sink=None,
                   transport=None, stop_file=None, clock=time.time, account_multiplier=None, halted=None,
-                  corporate_action_guard=None, exit_session_at=None):
+                  corporate_action_guard=None, exit_session_at=None, session_policy=None):
         self.policy = policy
         self.ledger = ledger
         self.trial_id = trial_id
         self.event_sink = event_sink or (lambda event: None)
         self.transport = transport
         self.stop_file = stop_file
-        # The existing production runner passes its configured transport here.
-        # Select the existing classifier only for its explicit extended-hours
-        # policy; default RTH runs must not start consulting a calendar.
-        if exit_session_at is None and getattr(transport, "extended_hours_allowed", False):
+        # The runner's validated policy governs every transport, including
+        # SimulatedPort. Default RTH runs never start consulting a calendar.
+        if exit_session_at is None and (session_policy or {}).get("extended_hours", False):
             exit_session_at = lambda now: session_at(datetime.fromtimestamp(now, timezone.utc)).kind
         self._exit_session_at = exit_session_at
         self._exit_pending_attention = {}
@@ -866,9 +865,11 @@ class AdaptiveStrategy(Strategy):
         ), self.policy.config)
 
     def _flag_exit_position(self, symbol, decision):
+        previous = self._exit_pending_attention.get(symbol)
         self._exit_pending_attention[symbol] = decision.reason
-        self.event_sink({"type": "exit_attention", "symbol": symbol,
-                         "reason": decision.reason})
+        if previous != decision.reason:
+            self.event_sink({"type": "exit_attention", "symbol": symbol,
+                             "reason": decision.reason})
 
     def rebalance(self, now=None, *, force_exit=False):
         """Called on the native owner loop, never a socket thread. A strategy whose

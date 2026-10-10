@@ -25,7 +25,6 @@ try:
     from mover_simulation import MoverSimulatedPort, piecewise_path
     from runner import _apply_forced_recovery_outcome
     from safety import Ledger
-    from sessions import order_extended_hours_flag
     from transport import normalize_intent
     NATIVE = True
 except ImportError:
@@ -67,6 +66,23 @@ def scan_raw(rows):
 
 def flat(price, spread="0.02"):
     return [(0, D(price), D(spread))]
+
+
+def native_pre_dispatch():
+    """Bind the synthetic PRE fixture at the real native dispatch clock."""
+    from nautilus_trader.common import Clock
+    real_submit = native_adapter.AlpacaExecutionClient._submit_order
+
+    async def dispatch(client, command):
+        original_clock = client.clock
+        client.clock = Clock.new_test()
+        client.clock.set_time(int(PRE_TS.timestamp() * 1e9))
+        try:
+            await real_submit(client, command)
+        finally:
+            client.clock = original_clock
+
+    return patch.object(native_adapter.AlpacaExecutionClient, "_submit_order", dispatch)
 
 
 @unittest.skipUnless(NATIVE, "requires pinned combined native runtime")
@@ -236,8 +252,7 @@ class MoverNativeEndToEnd(unittest.TestCase):
         # PNY is scanned at the protocol's 1.00 minimum price and quoted below it at entry.
         rows = [row("AAA", 1, "10.00"), row("PNY", 2, "1.00")]
         points = {"AAA": flat("10.00"), "PNY": flat("0.8123", "0.0010")}
-        real = order_extended_hours_flag
-        with patch.object(native_adapter, "order_extended_hours_flag", lambda ts, policy: real(PRE_TS, policy)):
+        with native_pre_dispatch():
             receipt, port, held, unresolved = self.run_trial(rows, points, extended_hours=True)
         self.assert_clean(receipt, held, unresolved)
         self.assertEqual(receipt["native"]["session_policy"]["extended_hours"], True)
@@ -583,8 +598,7 @@ class MoverPaperCommandWiring(unittest.TestCase):
         import signal
         import transport
         out = Path(root) / f"{output or trial}.json"
-        real_load_scan, real_build_plan, real_flag = mover_runner.load_scan, mover_runner.build_plan, \
-            native_adapter.order_extended_hours_flag
+        real_load_scan, real_build_plan = mover_runner.load_scan, mover_runner.build_plan
 
         def compressed_plan(settings, limits, scan, session, *, t0, **kwargs):
             if refuse_plan:
@@ -634,7 +648,7 @@ class MoverPaperCommandWiring(unittest.TestCase):
                               lambda raw, settings, *, now: real_load_scan(raw, settings, now=SCAN_TIME + 20)), \
                  patch.object(mover_runner, "build_plan", compressed_plan), \
                  patch.object(mover_runner, "_controller_session", lambda close, now, policy: (now + 36000, True)), \
-                 patch.object(native_adapter, "order_extended_hours_flag", lambda ts, p: real_flag(PRE_TS, p)), \
+                 native_pre_dispatch(), \
                  patch("builtins.print"):
                 code = mover_runner.main(args + list(extra))
         finally:
