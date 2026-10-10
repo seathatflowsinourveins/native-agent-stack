@@ -1106,21 +1106,38 @@ class Ledger:
                          "max_usd": COST_BOUND_USD, "detail": detail})
             return True, spent
 
-    def close(self, row: dict) -> None:
+    @staticmethod
+    def open_debit(rows: list, ref: str) -> dict | None:
+        """The ref's debit when it is still open (its latest row is that debit), as the harness's _open_debit reads it."""
+        mine = [row for row in rows if row.get("ref") == ref]
+        return mine[-1] if mine and mine[-1].get("kind") == "debit" else None
+
+    def close(self, kind: str, ref: str, now: dt.datetime, *, if_open: bool = False, **fields) -> bool:
+        """One terminal row (settle or void) for an open debit, under the same lock as the debit: a ref is closed once,
+        and never without its debit. The key, and the amount an unknown outcome keeps, come from that debit. With
+        if_open, a ref another writer has closed meanwhile is skipped (False) instead of refused."""
         with self.locked():
-            self.append(row)
+            held = self.open_debit(self.rows(), ref)
+            if held is None:
+                if if_open:
+                    return False
+                raise LedgerError(f"{ref} has no open debit; a request is settled once")
+            if fields.pop("unknown", False):
+                reserved = held.get("max_usd")
+                fields = {"actual_usd": reserved if is_amount(reserved) else COST_BOUND_USD, "outcome": "unknown",
+                          **fields}
+            self.append({"kind": kind, "ts": iso(now), "key": held.get("key"), "workload": WORKLOAD, "ref": ref,
+                         **fields})
+            return True
 
-    def settle(self, ref: str, key: str, actual: float, detail: dict, now: dt.datetime) -> None:
-        self.close({"kind": "settle", "ts": iso(now), "key": key, "workload": WORKLOAD, "ref": ref,
-                    "actual_usd": actual, "detail": detail})
+    def settle(self, ref: str, actual: float, detail: dict, now: dt.datetime) -> None:
+        self.close("settle", ref, now, actual_usd=actual, detail=detail)
 
-    def settle_unknown(self, ref: str, key: str, reason: str, detail: dict, now: dt.datetime) -> None:
-        self.close({"kind": "settle", "ts": iso(now), "key": key, "workload": WORKLOAD, "ref": ref,
-                    "actual_usd": COST_BOUND_USD, "outcome": "unknown", "reason": reason, "detail": detail})
+    def settle_unknown(self, ref: str, reason: str, detail: dict, now: dt.datetime, *, if_open: bool = False) -> bool:
+        return self.close("settle", ref, now, if_open=if_open, unknown=True, reason=reason, detail=detail)
 
-    def void(self, ref: str, key: str, reason: str, detail: dict, now: dt.datetime) -> None:
-        self.close({"kind": "void", "ts": iso(now), "key": key, "workload": WORKLOAD, "ref": ref,
-                    "actual_usd": 0.0, "reason": reason, "detail": detail})
+    def void(self, ref: str, reason: str, detail: dict, now: dt.datetime) -> None:
+        self.close("void", ref, now, actual_usd=0.0, reason=reason, detail=detail)
 
     def open_debits(self) -> list:
         with self.locked():
@@ -1398,10 +1415,13 @@ class Worker:
                 with contextlib.suppress(OSError):
                     leftover.unlink()
         for row in self.ledger.open_debits():
-            self.ledger.settle_unknown(row.get("ref", ""), row.get("key", ""),
-                                       "no settle was recorded: the run that debited it ended without settling",
-                                       {"recovered_by": "claude-review-worker"}, now)
-            self.log(f"settled {row.get('ref')} as unknown ({COST_BOUND_USD} USD): no settle was recorded")
+            # Rechecked under the ledger lock: another writer may have closed the ref since the list was read.
+            if self.ledger.settle_unknown(row.get("ref", ""),
+                                          "no settle was recorded: the run that debited it ended without settling",
+                                          {"recovered_by": "claude-review-worker"}, now, if_open=True):
+                self.log(f"settled {row.get('ref')} as unknown ({row.get('max_usd')} USD): no settle was recorded")
+            else:
+                self.log(f"{row.get('ref')} was closed by another writer meanwhile; left as it is")
         for path, record in self.attempts.every_record():
             if not isinstance(record, dict):
                 continue
@@ -1711,7 +1731,7 @@ class Worker:
             tries.append({"key": key, "ref": ref, "class": stop, "cost_usd": numbers["total_cost_usd"],
                           "returncode": launch.returncode, "seconds": launch.seconds,
                           "api_error_status": numbers["api_error_status"], "stream": stream_path.name})
-            self.close_ref(ref, key, stop, numbers, launch, run_id)
+            self.close_ref(ref, stop, numbers, launch, run_id)
             if stop == "credit_exhausted":
                 self.log(f"{label}: {key} is out of credit; the next key is tried")
                 continue
@@ -1720,19 +1740,19 @@ class Worker:
             stop, unmet = "api_refused", ["every configured key is out of credit"]
         return {"tries": tries, "numbers": numbers, "stop": stop, "unmet": unmet}
 
-    def close_ref(self, ref: str, key: str, stop: str, numbers: dict, launch: Launch, run_id: str) -> None:
+    def close_ref(self, ref: str, stop: str, numbers: dict, launch: Launch, run_id: str) -> None:
         now = self.clock()
         detail = {"run_id": run_id, "class": stop, "subtype": numbers["subtype"], "stop_reason": numbers["stop_reason"],
                   "session_id": numbers["session_id"], "models": numbers["models"], "seconds": launch.seconds}
         if stop in ("credit_exhausted", "api_refused", "no_api_response"):
             status = numbers["api_error_status"]
-            self.ledger.void(ref, key, f"refused before any model call ({stop}, HTTP {status})", detail, now)
+            self.ledger.void(ref, f"refused before any model call ({stop}, HTTP {status})", detail, now)
         elif stop == "no_stream":
-            self.ledger.void(ref, key, "the run wrote no stream record, so no request was sent", detail, now)
+            self.ledger.void(ref, "the run wrote no stream record, so no request was sent", detail, now)
         elif numbers["total_cost_usd"] is None or launch.timed_out:
-            self.ledger.settle_unknown(ref, key, f"no usable cost ({stop})", detail, now)
+            self.ledger.settle_unknown(ref, f"no usable cost ({stop})", detail, now)
         else:
-            self.ledger.settle(ref, key, numbers["total_cost_usd"], detail, now)
+            self.ledger.settle(ref, numbers["total_cost_usd"], detail, now)
 
     def conclude(self, candidate, record, attempt, report_dir, plan, tries, numbers, stop, unmet, label) -> dict:
         repo = candidate.repo

@@ -429,15 +429,52 @@ class LedgerTest(unittest.TestCase):
             ledger = crw.Ledger(Path(temporary) / "l.jsonl")
             now = dt.datetime(2026, 10, 9, 12, tzinfo=dt.timezone.utc)
             ledger.debit("CRW:1", "anthropic-api-3", {"pr": 1}, now)
-            ledger.settle("CRW:1", "anthropic-api-3", 2.5, {}, now)
-            ledger.settle_unknown("CRW:2", "anthropic-api-3", "why", {}, now)
-            ledger.void("CRW:3", "anthropic-api-4", "refused", {}, now)
+            ledger.settle("CRW:1", 2.5, {}, now)
+            ledger.debit("CRW:2", "anthropic-api-3", {}, now)
+            ledger.settle_unknown("CRW:2", "why", {}, now)
+            ledger.debit("CRW:3", "anthropic-api-4", {}, now)
+            ledger.void("CRW:3", "refused", {}, now)
             rows = [json.loads(line) for line in ledger.path.read_text().splitlines()]
         self.assertEqual(rows[0], {"kind": "debit", "ts": "2026-10-09T12:00:00.000000Z", "key": "anthropic-api-3",
                                    "workload": "CRW", "ref": "CRW:1", "max_usd": 11.0, "detail": {"pr": 1}})
-        self.assertEqual((rows[1]["kind"], rows[1]["actual_usd"]), ("settle", 2.5))
-        self.assertEqual((rows[2]["actual_usd"], rows[2]["outcome"], rows[2]["reason"]), (11.0, "unknown", "why"))
-        self.assertEqual((rows[3]["kind"], rows[3]["actual_usd"], rows[3]["key"]), ("void", 0.0, "anthropic-api-4"))
+        self.assertEqual((rows[1]["kind"], rows[1]["actual_usd"], rows[1]["key"]), ("settle", 2.5, "anthropic-api-3"))
+        self.assertEqual((rows[3]["actual_usd"], rows[3]["outcome"], rows[3]["reason"]), (11.0, "unknown", "why"))
+        self.assertEqual((rows[5]["kind"], rows[5]["actual_usd"], rows[5]["key"]), ("void", 0.0, "anthropic-api-4"))
+
+    def test_a_ref_is_closed_once_and_never_without_its_debit(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            ledger = crw.Ledger(Path(temporary) / "l.jsonl")
+            now = dt.datetime(2026, 10, 9, 12, tzinfo=dt.timezone.utc)
+            ledger.debit("CRW:1", "anthropic-api-4", {}, now)
+            ledger.settle("CRW:1", 3.2, {}, now)
+            for close in (lambda: ledger.settle("CRW:1", 3.2, {}, now),  # a second settle
+                          lambda: ledger.settle_unknown("CRW:1", "again", {}, now),
+                          lambda: ledger.void("CRW:1", "again", {}, now),
+                          lambda: ledger.settle("CRW:orphan", 1.0, {}, now),  # no debit at all
+                          lambda: ledger.void("CRW:orphan", "none", {}, now)):
+                with self.assertRaises(crw.LedgerError):
+                    close()
+            self.assertFalse(ledger.settle_unknown("CRW:1", "skip", {}, now, if_open=True))
+            self.assertEqual(len(ledger.rows()), 2)
+            self.assertEqual(crw.Ledger.spend_on(ledger.rows(), "2026-10-09"), 3.2)
+
+    def test_recovery_skips_a_debit_another_writer_closed_after_the_open_list_was_read(self):
+        h = Harness(self)
+        repo, _ = h.repo("o/priv")
+        worker = h.worker([repo])
+        now = dt.datetime(2026, 10, 9, 12, tzinfo=dt.timezone.utc)
+        worker.ledger.debit("CRW:held", "anthropic-api-4", {}, now)
+        listed = worker.ledger.open_debits()
+
+        def closed_meanwhile():
+            worker.ledger.settle("CRW:held", 3.2, {"writer": "another"}, now)  # e.g. the harness, between list and close
+            return listed
+
+        worker.ledger.open_debits = closed_meanwhile
+        worker.recover()
+        rows = h.rows()
+        self.assertEqual([(r["kind"], r.get("actual_usd")) for r in rows], [("debit", None), ("settle", 3.2)])
+        self.assertTrue(any("closed by another writer" in line for line in h.logs))
 
     def test_a_tick_without_room_skips_and_logs_it(self):
         h = Harness(self)
