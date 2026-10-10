@@ -68,6 +68,49 @@ same regression against their checksum/signature-verified binaries and print
 elapsed/peak-RSS measurements for runner-specific acceptance after publication.
 No new package or YAML parser is installed; the existing stdlib job parser is used.
 
+## Timer portability and full-scan acceptance
+
+The initial fixture helper incorrectly treated any `/usr/bin/time` as GNU time
+and labeled an existing timer as Linux. It now checks `platform.system()`, file
+availability and the timer's successful GNU `--version` response. Darwin and an
+existing non-GNU timer execute the scanner directly with an accurate platform
+and an explicit unmeasured label. Simulated BSD-option rejection reproduces the
+old detection failure; Darwin/non-GNU fallback and native Linux GNU measurement
+controls pass. This is not a native macOS execution claim.
+
+GNU time's supported `%e`, `%M` and `%x` formats measure elapsed seconds, peak RSS
+in KiB and the command exit status. The native Linux workflow verifies GNU time
+and wraps all four actual uncapped scanner commands, preserving their reviewed
+arguments, redaction, HEAD ancestry scope and native exit status. The canary
+parser consumes the scanner options behind this timing prefix. The shipped-step
+control retains twelve scanner/status combinations in fresh Git fixtures;
+restoring the prior unmeasured steps fails all twelve receipt assertions.
+
+Each command emits a `full-*.metrics.json` resource receipt with the exact
+checked-out commit, native event/ref/run/attempt, tool version, actual result and
+workflow/config/ignore-file hashes. Only resource receipts are uploaded; raw
+betterleaks reports remain on the runner. The receipts are named
+`secret-scan-metrics-gitleaks-RUN_ID-ATTEMPT` and
+`secret-scan-metrics-betterleaks-RUN_ID-ATTEMPT`. `scripts/secret_scan_metrics.py`
+records numeric measurements and safe scope metadata, without paths to the host
+home, credentials or matched values. A failed metric writer fails a successful
+scan step; a nonzero scanner status keeps its original status.
+
+After publication, retain these four native receipts and the jobs API's start
+and completion times. Full job duration includes checkout, installation,
+verification, regressions, scans and post steps. Compare it with the unchanged
+600-second gitleaks and 1,200-second betterleaks budgets and report the remaining
+margin. The six local fixture figures above remain a separate measurement;
+they do not establish full-repository timeout or memory acceptance. No local
+unbounded-history measurement is performed.
+
+Mechanism sources: [GNU time manual](https://www.gnu.org/software/time/manual/time.html),
+version1.9 (installed package1.9-0.4; native `--help`/`--version` and shipped info
+manual independently checked), and [CPython v3.12.3:Doc/library/platform.rst](https://github.com/python/cpython/blob/v3.12.3/Doc/library/platform.rst)
+for `platform.system()`'s Linux/Darwin labels. Native Linux step execution
+reproduces GNU format/output/quiet/status behavior; the BSD controls are
+simulations at the external command boundary.
+
 The current base is main `c8a29c3ee9b4337564165d9e588b3fe81e8ba817`. It carries
 the landed large G5 catalog, strengthening the need to scan large current files.
 Scanner versions, event/history scope, archive-depth0, reviewed fingerprints,

@@ -1563,7 +1563,35 @@ class BetterleaksTrialJobTests(unittest.TestCase):
             path.write_text(text, encoding="utf-8")
             path.chmod(0o755)
         script = scratch / "step.sh"
-        script.write_text(self.run_script(name), encoding="utf-8")
+        script_text = self.run_script(name)
+        if name in self.SCAN_STEPS:
+            # This contract harness simulates the Linux job's timer on every
+            # host. Native GNU/status/scope execution has its separate suite.
+            timer = tools / "fixture-time"
+            timer.write_text(f"#!{sys.executable}\nimport json,subprocess,sys\n"
+                             "a=sys.argv[1:]\n"
+                             "if a==['--version']:print('time (GNU Time) fixture');sys.exit(0)\n"
+                             "output=a[a.index('--output')+1]\n"
+                             "command=a[a.index('--output')+2:]\n"
+                             "status=subprocess.run(command).returncode\n"
+                             "with open(output,'w') as f:json.dump({'elapsed_seconds':0.0,'peak_rss_kib':1,'exit_status':status},f)\n"
+                             "sys.exit(status)\n", encoding="utf-8")
+            timer.chmod(0o755)
+            script_text = script_text.replace("/usr/bin/time", shlex.quote(str(timer)))
+            checkout = cwd or scratch
+            (checkout / "scripts").mkdir(exist_ok=True)
+            shutil.copyfile(ROOT / "scripts/secret_scan_metrics.py", checkout / "scripts/secret_scan_metrics.py")
+            (checkout / ".github/workflows").mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(ROOT / ".github/workflows/validate.yml", checkout / ".github/workflows/validate.yml")
+            (checkout / ".gitleaks.toml").write_text("title='synthetic fixture'\n")
+            (checkout / ".gitleaksignore").write_text("")
+            git_env = {"PATH": os.environ.get("PATH", os.defpath), "HOME": str(scratch),
+                       "GIT_CONFIG_GLOBAL": os.devnull, "GIT_CONFIG_SYSTEM": os.devnull}
+            for args in (("init", "-q"), ("config", "user.name", "Fixture"),
+                         ("config", "user.email", "fixture@example.invalid"),
+                         ("commit", "--allow-empty", "-qm", "synthetic scope")):
+                subprocess.run(["git", *args], cwd=checkout, env=git_env, check=True, capture_output=True)
+        script.write_text(script_text, encoding="utf-8")
         summary = scratch / "summary.md"
         env = {"PATH": f"{tools}{os.pathsep}{os.environ.get('PATH', '')}", "HOME": str(scratch), "LC_ALL": "C",
                "PYTHONDONTWRITEBYTECODE": "1", "RUNNER_TEMP": str(runner_temp),
@@ -1594,13 +1622,18 @@ class BetterleaksTrialJobTests(unittest.TestCase):
         self.assertNotRegex(self.job, r"(?m)^    name:", "a job name would become its check context")
         self.assertNotIn("continue-on-error", self.job)
 
-    def test_read_only_hardened_and_uploads_nothing(self):
+    def test_read_only_hardened_and_uploads_only_resource_receipts(self):
         self.assertEqual(scopes(self.job), [{"contents": "read"}])
         step = first_step(self.job)
         self.assertIn(HARDEN, step)
         self.assertIn("egress-policy: audit", step)
         self.assertIn("persist-credentials: false", step_block(self.job, "Check out repository"))
-        self.assertNotIn("upload-artifact", self.job)
+        upload = step_block(self.job, "Retain full betterleaks timing receipts")
+        self.assertEqual(self.job.count("uses: actions/upload-artifact@"), 1)
+        self.assertIn("${{ runner.temp }}/betterleaks/full-*.metrics.json", upload)
+        self.assertIn("include-hidden-files: false", upload)
+        self.assertNotIn("history.json", upload)
+        self.assertNotIn("tree.json", upload)
         self.assertNotIn("GH_TOKEN", self.job)
 
     def test_runs_bash_with_pipefail(self):
@@ -1670,8 +1703,9 @@ class BetterleaksTrialJobTests(unittest.TestCase):
         for name in self.SCAN_STEPS:
             script = uncommented(self.run_script(name))
             self.assertEqual(re.findall(r"\bstatus=\S*", script), ["status=0", "status=$?"], name)
-            self.assertEqual(re.findall(r"(?m)^\s*exit\b.*$", script), ['exit "$status"'], name)
-            self.assertEqual(script.rstrip().splitlines()[-1], 'exit "$status"', name)
+            self.assertIn('if [ "$status" -ne 0 ]; then exit "$status"; fi', script, name)
+            self.assertEqual(re.findall(r"(?m)^\s*exit\b.*$", script), ['exit "$metrics_status"'], name)
+            self.assertEqual(script.rstrip().splitlines()[-1], 'exit "$metrics_status"', name)
 
     @unittest.skipUnless(shutil.which("bash") and shutil.which("jq"), "the scan steps need bash and jq, as the runner has")
     def test_scan_steps_fail_only_on_a_scan_error_and_count_findings_by_rule(self):

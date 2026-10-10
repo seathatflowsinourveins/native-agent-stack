@@ -5206,8 +5206,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "7d14fe92369a10987bb290e688aee6f0532ca1dc25d809035f2f261ee516da62",
-      "bytes": 35809
+      "sha256": "c12a0bea0aa8ec4265aa91cd2984a77650a5a536c6d416f7cb66e40c795d6305",
+      "bytes": 39199
     },
     {
       "path": ".gitignore",
@@ -18577,8 +18577,8 @@
     },
     {
       "path": "docs/decisions/2026-10-10-secret-scan-large-targets.md",
-      "sha256": "4412c41f1a71fea2a5d26fbed04a7ef0a21b052dacae972b1b83c3af1c94bb53",
-      "bytes": 6820
+      "sha256": "41e7ce7f213af96121e2bf2d0c1b0f4fd86b7769b61a3c0c113154188144ac76",
+      "bytes": 9635
     },
     {
       "path": "docs/direct-results.md",
@@ -59721,6 +59721,11 @@
       "bytes": 110935
     },
     {
+      "path": "scripts/secret_scan_metrics.py",
+      "sha256": "89bd8c4f4d21d9328a8955d7a6103f10b7e4d921deaa8418a60181f0cf2cd774",
+      "bytes": 3590
+    },
+    {
       "path": "scripts/skills_status.py",
       "sha256": "eeb462e9b6b2b4acb6cc39af42ea96bf4a6dd14892a45a71d9fa61db229b806d",
       "bytes": 42439
@@ -61056,9 +61061,14 @@
       "bytes": 391697
     },
     {
+      "path": "tests/test_secret_scan_metrics.py",
+      "sha256": "0ce1a4e1be35cb2e1c38a580388b19c87993044f967eb119d77decc0ef08c086",
+      "bytes": 5392
+    },
+    {
       "path": "tests/test_secret_scan_size.py",
-      "sha256": "3670d957b57dbbff90b220f757df6cc1d10893af9c75f93315760e65a2669197",
-      "bytes": 8361
+      "sha256": "b95e7df3214fb47715d20116c48f37797bc7cba5e2a7f4264312faafe988a585",
+      "bytes": 13496
     },
     {
       "path": "tests/test_security_identity.py",
@@ -61252,8 +61262,8 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "405e3b008140a11485d756cf46a7523201daa0f7e305b53d55b4ab078800e5dc",
-      "bytes": 176510
+      "sha256": "1a71b3ce7fee258f140e7140e5cc2429e52dd86ecdd2df4029464f366ebe9bdf",
+      "bytes": 179067
     },
     {
       "path": "tests/test_workflow_policy.py",
