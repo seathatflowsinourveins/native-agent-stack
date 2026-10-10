@@ -251,7 +251,7 @@ python3 tools/adoption/install_skills.py --skills-bin "$SKILLS" --dry-run   # pr
 python3 tools/adoption/install_skills.py --skills-bin "$SKILLS"             # installs every manifest entry at its pinned ref
 python3 tools/adoption/install_skills.py --print-codex-config              # [[skills.config]] lines for ~/.codex/config.toml
 python3 scripts/skills_status.py --skills-bin "$SKILLS"                    # per-skill ref, lock, links, listing state, Codex config, on-disk tree (informational)
-claude -p /skill-doctor --output-format json --permission-mode dontAsk --permission-prompts none --tools '' --strict-mcp-config --max-turns 1 --max-budget-usd 0.05   # native per-skill use count, 0 API tokens; headless fences as in tools/skill-usage/README.md
+claude -p /skill-doctor --output-format json --permission-mode dontAsk --permission-prompts none --tools '' --strict-mcp-config --max-turns 1 --max-budget-usd 0.05   # native per-skill use count, 0 API tokens; headless fences as in tools/skill-usage/README.md (drop --strict-mcp-config where a managed-mcp.json is deployed)
 ```
 
 Run the dry run first on a host that has never applied this manifest, and compare its printed

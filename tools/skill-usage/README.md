@@ -58,8 +58,16 @@ $0 and 0 turns, measured on Claude Code 2.1.295), and they keep a prompt the cli
 model with tools or MCP servers, deny anything not pre-approved without prompting (rule PERM-03 in
 `docs/harness-rules-convergence-20260922.md`), allow one turn and cap the spend.
 
-Or let the tool run it directly. It runs exactly the command above (`SKILL_DOCTOR_ARGV` in `skill_usage.py`)
-with stdin from `/dev/null` and a timeout, and refuses to use the result unless the run reports
+On a host with a managed MCP config, drop `--strict-mcp-config` from the command. A deployed `managed-mcp.json`
+(`/etc/claude-code/` on Linux and WSL, `/Library/Application Support/ClaudeCode/` on macOS,
+`C:\Program Files\ClaudeCode\` on Windows) already holds exclusive control of the MCP servers, and Claude Code
+refuses the flag while it is there: 2.1.296 prints "You cannot use --strict-mcp-config when an enterprise MCP config is
+present", and the [managed MCP page](https://code.claude.com/docs/en/managed-mcp) says Claude Code "exits at startup"
+(both read 2026-10-10). `--run-skill-doctor` drops the flag itself when it finds that file readable.
+
+Or let the tool run it directly. It runs the command above (`SKILL_DOCTOR_ARGV` in `skill_usage.py`, without
+`--strict-mcp-config` on a host with a managed MCP config) with stdin from `/dev/null` and a timeout, and refuses to
+use the result unless the run reports
 `total_cost_usd == 0` and `num_turns == 0` (both are recorded either way) — the documented shape of
 that native command; anything else means the captured text did not come from that code path:
 

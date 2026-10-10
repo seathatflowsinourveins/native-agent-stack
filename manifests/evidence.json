@@ -5761,8 +5761,8 @@
     },
     {
       "path": "adoption/update.md",
-      "sha256": "051a6e5ea99ee018c13ee7ba283b4f2dad3e4ccb4d22b498720e6210ecfe902e",
-      "bytes": 32323
+      "sha256": "f8226ac87c200e8e0c1cdacadd9bc2584064df855f54e0517d4fa082723b7cbd",
+      "bytes": 32387
     },
     {
       "path": "blueprints/blind-catalog-convergence/README.md",
@@ -10392,8 +10392,8 @@
     },
     {
       "path": "blueprints/native-skill-practice/README.md",
-      "sha256": "4a1cbba4fae315d1ad2f9febbce4fffbafb59c1e92d3507ffdf78a4f7cbcf139",
-      "bytes": 14131
+      "sha256": "fef88277fccc88bc64f4c4337d9b7c2ede9ddf0f7626dbd811b97c36b6d595cb",
+      "bytes": 14195
     },
     {
       "path": "blueprints/native-skill-practice/cases.json",
@@ -18197,7 +18197,7 @@
     },
     {
       "path": "docs/decisions/2026-10-04-pwsh7-windows-guidance.md",
-      "sha256": "4642a0b052a3c210c66de356fecc0083769bc7691f9e026d0517c59ebff7901e",
+      "sha256": "21903b926a6b7f23f31e16cec403ca510dd5a1f060c96fd473b0a3b242af7bf6",
       "bytes": 16799
     },
     {
@@ -60752,8 +60752,8 @@
     },
     {
       "path": "tests/test_skill_usage.py",
-      "sha256": "e99acd22b96534c45af334bc535f6879ac28e8f2ae50743ef392628c8e79b461",
-      "bytes": 253813
+      "sha256": "76906cd6901e127a3207d78ac03c8e00b3a959fc863ff631749a10622c82a7ee",
+      "bytes": 258233
     },
     {
       "path": "tests/test_skills_manifest.py",
@@ -61197,13 +61197,13 @@
     },
     {
       "path": "tools/skill-usage/README.md",
-      "sha256": "12694aee763e059292b657e5f6f18f5438d3f481582ae47df79a5911b2662df9",
-      "bytes": 54697
+      "sha256": "42882bd76dd3aa2602d0aa09e575cc24efe6586c9019176a9934444f0c8cd677",
+      "bytes": 55411
     },
     {
       "path": "tools/skill-usage/skill_usage.py",
-      "sha256": "0d7b7b3a668231b3f845f8d34f0d9f9362185c3fd86a35cf9c40bc080e9a0b2d",
-      "bytes": 149723
+      "sha256": "58830d353b3188990d526216fbfa7c5cc6c560bc695bd84af5616246aedcf7fc",
+      "bytes": 151884
     },
     {
       "path": "tools/sota-convergence/README.md",

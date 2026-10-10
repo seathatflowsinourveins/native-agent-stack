@@ -22,6 +22,8 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools" / "skill-usage"))
 import skill_usage as S  # noqa: E402
 
+REAL_MANAGED_MCP_CONFIG_PATHS = S.managed_mcp_config_paths  # RunSkillDoctor.setUp hides it behind a patch
+
 FIXTURES = ROOT / "tests" / "fixtures" / "skill_usage"
 NOW = "2026-10-30T00:00:00Z"
 # The tree-sitter-bash install the kernel's lane layer loads (child-usage.mjs loadShellParser): CHILD_USAGE_SHELL_PARSER,
@@ -191,6 +193,71 @@ class SkillDoctorParsing(unittest.TestCase):
 
 
 class RunSkillDoctor(unittest.TestCase):
+    def setUp(self):
+        # Hermetic: no test here may depend on a managed-mcp.json that happens to exist on the host running it.
+        self.enterContext(mock.patch.object(S, "managed_mcp_config_paths", return_value=()))
+
+    def test_a_deployed_managed_mcp_config_drops_only_the_strict_flag(self):
+        # Claude Code 2.1.296 refuses --strict-mcp-config while managed-mcp.json is deployed ("You cannot use
+        # --strict-mcp-config when an enterprise MCP config is present"); the file already holds exclusive control, so
+        # only that flag goes and every other fence stays, in order (the Codex review thread on #925, P2).
+        managed = Path(self.enterContext(tempfile.TemporaryDirectory())) / "managed-mcp.json"
+        managed.write_text("{}", encoding="utf-8")
+        self.assertEqual(S.skill_doctor_argv([managed]),
+                         ["claude", "-p", "/skill-doctor", "--output-format", "json", "--permission-mode", "dontAsk",
+                          "--permission-prompts", "none", "--tools", "", "--max-turns", "1", "--max-budget-usd", "0.05"])
+        self.assertIn("--strict-mcp-config", S.SKILL_DOCTOR_ARGV)  # the documented command keeps it
+
+    def test_run_skill_doctor_runs_the_managed_form_on_a_managed_host(self):
+        managed = Path(self.enterContext(tempfile.TemporaryDirectory())) / "managed-mcp.json"
+        managed.write_text("{}", encoding="utf-8")
+        captured = {}
+
+        def fake_runner(argv, **kwargs):
+            captured["argv"] = argv
+            return subprocess.CompletedProcess(argv, 0, "[]", "")
+
+        S.run_skill_doctor(runner=fake_runner, managed_paths=[managed])
+        self.assertNotIn("--strict-mcp-config", captured["argv"])
+        self.assertEqual(captured["argv"][captured["argv"].index("--permission-mode"):][:4],
+                         ["--permission-mode", "dontAsk", "--permission-prompts", "none"])
+        self.assertIn("--max-budget-usd", captured["argv"])
+
+    def test_without_a_readable_managed_file_every_fence_stays(self):
+        folder = Path(self.enterContext(tempfile.TemporaryDirectory()))
+        (folder / "a-directory-named-managed-mcp.json").mkdir()
+        for paths in ([], [folder / "absent.json"], [folder / "a-directory-named-managed-mcp.json"]):
+            with self.subTest(paths=[str(p) for p in paths]):
+                self.assertEqual(S.skill_doctor_argv(paths), S.SKILL_DOCTOR_ARGV)
+        self.assertEqual(S.skill_doctor_argv(()), S.SKILL_DOCTOR_ARGV)
+
+    def test_the_default_paths_are_the_documented_system_paths(self):
+        # https://code.claude.com/docs/en/managed-mcp, configuration summary (read 2026-10-10): /Library/Application
+        # Support/ClaudeCode/ on macOS, /etc/claude-code/ on Linux (WSL included), C:\Program Files\ClaudeCode\ on Windows.
+        self.assertEqual(S.MANAGED_MCP_CONFIG_PATHS, {
+            "darwin": ("/Library/Application Support/ClaudeCode/managed-mcp.json",),
+            "linux": ("/etc/claude-code/managed-mcp.json",),
+            "win32": ("C:\\Program Files\\ClaudeCode\\managed-mcp.json",)})
+        for platform, expected in (("darwin", "darwin"), ("win32", "win32"), ("linux", "linux"), ("freebsd14", "linux")):
+            with self.subTest(platform=platform), mock.patch.object(sys, "platform", platform):
+                self.assertEqual(REAL_MANAGED_MCP_CONFIG_PATHS(), S.MANAGED_MCP_CONFIG_PATHS[expected])
+
+    def test_the_managed_mcp_comment_and_guide_cite_the_client_and_the_docs(self):
+        source = (ROOT / "tools/skill-usage/skill_usage.py").read_text(encoding="utf-8").split("\n")
+        start = next(i for i, line in enumerate(source) if line.startswith("MANAGED_MCP_CONFIG_PATHS = "))
+        comment = []
+        for line in reversed(source[:start]):
+            if not line.startswith("#"):
+                break
+            comment.insert(0, line[1:].strip())
+        comment = " ".join(comment)
+        refusal = "You cannot use --strict-mcp-config when an enterprise MCP config is present"
+        self.assertIn(refusal, comment)
+        self.assertIn("https://code.claude.com/docs/en/managed-mcp", comment)
+        readme = (ROOT / "tools/skill-usage/README.md").read_text(encoding="utf-8")
+        self.assertIn(refusal, " ".join(readme.split()))
+        self.assertIn("drop `--strict-mcp-config`", readme)
+
     def test_runs_exact_argv_with_devnull_stdin_and_timeout(self):
         captured = {}
 

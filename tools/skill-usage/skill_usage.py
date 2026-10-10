@@ -10,6 +10,10 @@ answer this):
     python3 tools/skill-usage/skill_usage.py --claude-skill-doctor /path/outside/checkout/skill-doctor.json \\
         --codex-root ~/.codex/sessions --out /path/outside/checkout/report.json
 
+On a host with a managed MCP config (managed-mcp.json), drop --strict-mcp-config from that command: the client
+refuses the flag there ("You cannot use --strict-mcp-config when an enterprise MCP config is present", 2.1.296), and
+--run-skill-doctor drops it itself.
+
 Or run it directly (refuses the result unless the native call was the synthetic, zero-cost
 local command it is documented to be):
 
@@ -208,11 +212,38 @@ SKILL_DOCTOR_ARGV = ["claude", "-p", "/skill-doctor", "--output-format", "json",
                      "--permission-prompts", "none", "--tools", "", "--strict-mcp-config", "--max-turns", "1",
                      "--max-budget-usd", "0.05"]
 
+# A deployed managed-mcp.json holds exclusive control of the MCP servers, and Claude Code refuses --strict-mcp-config
+# while it is there: the 2.1.296 binary carries "You cannot use --strict-mcp-config when an enterprise MCP config is
+# present" (read 2026-10-10), and https://code.claude.com/docs/en/managed-mcp (read 2026-10-10) says "If a user passes it
+# while such a file is deployed, Claude Code exits at startup on a workstation and in a cloud session alike". The file
+# already keeps every other server out, so on such a host the argv drops only that flag and keeps the other fences.
+# System paths: the same page's configuration summary ("/Library/Application Support/ClaudeCode/", "/etc/claude-code/",
+# "C:\Program Files\ClaudeCode\"); Linux covers WSL.
+MANAGED_MCP_CONFIG_PATHS = {
+    "darwin": ("/Library/Application Support/ClaudeCode/managed-mcp.json",),
+    "linux": ("/etc/claude-code/managed-mcp.json",),
+    "win32": ("C:\\Program Files\\ClaudeCode\\managed-mcp.json",),
+}
 
-def run_skill_doctor(*, timeout: int = 30, runner=subprocess.run) -> dict:
-    """Run exactly SKILL_DOCTOR_ARGV, stdin from /dev/null."""
+
+def managed_mcp_config_paths() -> tuple:
+    """The system path of managed-mcp.json on this platform."""
+    return MANAGED_MCP_CONFIG_PATHS["win32" if sys.platform == "win32" else "darwin" if sys.platform == "darwin" else "linux"]
+
+
+def skill_doctor_argv(managed_paths=None) -> list:
+    """SKILL_DOCTOR_ARGV, without --strict-mcp-config when a readable managed MCP config is deployed."""
+    paths = managed_mcp_config_paths() if managed_paths is None else managed_paths
+    if any(os.path.isfile(path) and os.access(path, os.R_OK) for path in paths):
+        return [word for word in SKILL_DOCTOR_ARGV if word != "--strict-mcp-config"]
+    return list(SKILL_DOCTOR_ARGV)
+
+
+def run_skill_doctor(*, timeout: int = 30, runner=subprocess.run, managed_paths=None) -> dict:
+    """Run skill_doctor_argv() (SKILL_DOCTOR_ARGV; without --strict-mcp-config on a host with a managed MCP config),
+    stdin from /dev/null."""
     try:
-        completed = runner(SKILL_DOCTOR_ARGV,
+        completed = runner(skill_doctor_argv(managed_paths),
                             stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=timeout)
     except (OSError, subprocess.TimeoutExpired) as error:
         return {"format": None, "rows": {}, "total_cost_usd": None, "num_turns": None,
@@ -2236,7 +2267,8 @@ def build_parser() -> argparse.ArgumentParser:
                                      "(its result event's 'result' text), or a plain-text /skill-doctor table, from "
                                      "this file")
     claude_source.add_argument("--run-skill-doctor", action="store_true",
-                                help=f"Run '{shlex.join(SKILL_DOCTOR_ARGV)}' now (stdin from /dev/null); refused "
+                                help=f"Run '{shlex.join(SKILL_DOCTOR_ARGV)}' now (stdin from /dev/null; without "
+                                     "--strict-mcp-config where a managed MCP config is deployed); refused "
                                      "unless total_cost_usd == 0 and num_turns == 0")
     parser.add_argument("--claude-timeout", type=int, default=30, metavar="SECONDS",
                          help="Timeout for --run-skill-doctor (default: 30)")
