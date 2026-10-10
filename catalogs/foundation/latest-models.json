@@ -1,16 +1,16 @@
 {
   "schema_version": 1,
   "catalog_kind": "versioned_snapshot",
-  "generated_at": "2026-10-09T21:32:19.990335+00:00",
+  "generated_at": "2026-10-10T01:06:39.845576+00:00",
   "recorded_at": "2026-10-09T20:31:55Z",
   "latest": {
-    "gpt-sol": "gpt-6.1-sol",
-    "gpt-astra": "gpt-6-astra",
-    "gpt-luna": "gpt-6-luna",
+    "claude-fable": "claude-fable-5-1",
+    "claude-haiku": "claude-haiku-5-5",
     "claude-opus": "claude-opus-5-5",
     "claude-sonnet": "claude-sonnet-5-5",
-    "claude-haiku": "claude-haiku-5-5",
-    "claude-fable": "claude-fable-5-1"
+    "gpt-astra": "gpt-6-astra",
+    "gpt-luna": "gpt-6-luna",
+    "gpt-sol": "gpt-6.1-sol"
   },
   "aliases": {
     "claude-fable-5-1": "claude-fable-5-1",
@@ -120,24 +120,21 @@
     {
       "name": "codex",
       "observed_at": null,
-      "timestamp_origin": "not_independently_attested_in_original_bundle",
-      "declared_bundle_observed_at": "2026-10-09T20:31:55Z",
+      "timestamp_origin": "not_attested_in_capture",
       "sha256": "cc9279e1a7482f10ad1f79ba102d04f5437673107409f5aaf4921007deaeac37",
       "rows": 10
     },
     {
       "name": "omniroute",
       "observed_at": null,
-      "timestamp_origin": "not_independently_attested_in_original_bundle",
-      "declared_bundle_observed_at": "2026-10-09T20:31:55Z",
+      "timestamp_origin": "not_attested_in_capture",
       "sha256": "5ed5f7ddf57ee74537291d26c2417c9c27af870370de28256993c981b92ea3ab",
       "rows": 625
     },
     {
       "name": "claude",
       "observed_at": null,
-      "timestamp_origin": "not_independently_attested_in_original_bundle",
-      "declared_bundle_observed_at": "2026-10-09T20:31:55Z",
+      "timestamp_origin": "not_attested_in_capture",
       "sha256": "6074378b36551b3b6dfddab931b872a2a20536e7eced1d6c5b355c2174b6f3ec",
       "rows": 13
     }

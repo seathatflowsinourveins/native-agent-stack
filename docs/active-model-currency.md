@@ -46,24 +46,36 @@ the model ID check does not override or qualify that transport behavior.
 Check exits **0** for current declared selectors, **1** for stale selectors,
 and **2** when the manifest or scan cannot answer. The committed
 `versioned_snapshot` is a retained comparison reference and does not expire
-after24 hours. Its `current` result means selectors match that declared
+after 24 hours. Its `current` result means selectors match that declared
 snapshot; it does not certify today's upstream availability. Explicit live
-observations retain the24-hour age limit. Future generated/source times,
+observations retain the 24-hour age limit. Future generated/source times,
 missing catalogs and invalid alias targets remain incomplete. No check switches
 models, edits user settings or silently substitutes another family.
 
 ## Active scope and preserved records
 
 The checker extracts actual model fields, Python/environment/argument
-defaults, literal Python argv lists, JSON model fields/commands/argv,
-pinned `availableModels` lists, shell launcher flags and structured Markdown agent/template
-selectors. It covers active lane configuration too; `.md` and `lanes/`
+defaults, literal Python argv lists, JSON model fields and pinned
+`availableModels` lists, shell launcher flags and structured Markdown agent/template
+selectors. JSON command strings and lists of whole command strings use
+CPython 3.13.16's [POSIX shell lexer](https://github.com/python/cpython/blob/v3.13.16/Doc/library/shlex.rst).
+Keys `command`, `commands`, `command_line` and `exec_start`, plus keys ending
+in those names such as `upstream_commands` and `launchCommands`, carry
+commands; camel case and hyphens are normalized. Nested command containers
+retain that role. `argv`/`args` lists remain literal tokens, including quoted
+text within an argument; a command list containing separate model-flag tokens
+is also recognized as argv. This is lexical extraction, not shell execution
+or evaluation of computed commands. The short `-m` flag selects a model only
+for `codex`/`claude`, including the known `env`/`rtk`/`timeout` wrappers;
+Git commit messages and Python module flags are separate argument roles.
+The selector field's first value is parsed without requiring its explanatory
+tail to be shell syntax. It covers active lane configuration too; `.md` and `lanes/`
 are not blanket exemptions. `--host` adds the two named user settings files,
 agent directories, launcher directories, CC/co-op/API-action tools and the
 named `~/code/us-equities-trading` repository when present. There is no
 home-directory or disk crawl. Findings contain a locator and model IDs;
 other configuration values and source lines are never printed. JSON findings
-include an RFC6901 pointer and the actual source line, so repeated values in
+include an RFC 6901 pointer and the actual source line, so repeated values in
 different fields remain separate. Comments are not selectors; sentence
 punctuation is separated from prose model names while quoted runtime values
 remain exact. Candidate detection streams before applying size/UTF-8 bounds;
@@ -73,6 +85,15 @@ Exemptions identify records by role: evidence/receipts, dated decisions and
 research, native timestamped measurement objects, tests/dependencies, and
 the explicitly frozen convergence experiments and named research-efficiency
 replay programs/receipt listed in the implementation.
+Two additional exact paths preserve their dated commands:
+[`omniroute-runtime-workers/experiment.json`](https://github.com/seathatflowsinourveins/native-agent-stack/blob/a7f411faf6154329ceb592f045b4abae24168a26/blueprints/convergence-practice/omniroute-runtime-workers/experiment.json#L37)
+records the September 30 trials, with an October 3 note requiring those
+observations and commands to remain historical; and
+[`token-efficiency-stack.json`](https://github.com/seathatflowsinourveins/native-agent-stack/blob/a7f411faf6154329ceb592f045b4abae24168a26/docs/token-efficiency-stack.json#L6)
+is the dated September 27 reference edition, whose `upstream_commands` retain
+the observed source-host setup. These files are explicitly exempt as records.
+Regressions take both reported old-model commands from those files and require
+them to be flagged at active paths, while verifying that the records keep their bytes.
 A date in an active config filename does not exempt it. The maintained
 new-WSL install-kit configs remain active despite the dated kit directory.
 Historical sections of mixed guides are separate from their current
@@ -94,23 +115,27 @@ this source change makes no new native execution claim.
 ## Currency and SessionStart wiring
 
 Every `scripts/currency_due.py` collection invokes the offline check. A stale
-selector contributes a due notice and returns1. An incomplete model report
+selector contributes a due notice and returns 1. An incomplete model report
 is a coverage gap, preserving other known counts
 and any existing due notice. The collector writes known nonzero counts and
 otherwise retains the prior due-file when a requested check cannot answer.
-It exits0 for a coverage-only gap and1 when known stale model selectors exist;
-the model CLI itself still returns2 for an incomplete comparison.
+It exits 0 for a coverage-only gap and 1 when known stale model selectors exist;
+the model CLI itself still returns 2 for an incomplete comparison. The
+collector has seven possible counts: its five base counts, the conditional
+`surface_unreviewed` count and `stale_models`. An unknown model comparison
+adds the coverage message `model check incomplete`, preserving known counts
+and any earlier due-file.
 
 The daily systemd units are repository templates, not evidence of installation.
-On this host the native systemd259.5 readback returned `not-found` for
+On this host the native systemd 259.5 readback returned `not-found` for
 `stack-currency.timer` and an empty timer list. Host adoption remains with the
 CC; this change installs or starts no unit. The service's `@REPOSITORY@` must
 name the stable live clone when an operator adopts the template.
 
-The model-audit SessionStart template and RFC6902 user patch are withdrawn.
+The model-audit SessionStart template and RFC 6902 user patch are withdrawn.
 Startup reads only the existing precomputed `currency-due.json` summary through
 the established notice handler. This follows the
-[September30 notice decision](decisions/2026-09-30-session-currency-notice.md)
+[September 30 notice decision](decisions/2026-09-30-session-currency-notice.md)
 and token-practice prohibition on startup audits. No user settings, hooks,
 trust state or running session is changed by this repair.
 
@@ -136,11 +161,15 @@ An arbitrary old model cannot be declared a routing identity to pass the check.
   [shell lexer](https://github.com/python/cpython/blob/v3.13.16/Lib/shlex.py),
   [JSON decoder](https://github.com/python/cpython/blob/v3.13.16/Lib/json/decoder.py)
   and [subprocess environments](https://github.com/python/cpython/blob/v3.13.16/Lib/subprocess.py).
+- Git `v2.53.0` [commit options](https://github.com/git/git/blob/v2.53.0/Documentation/git-commit.adoc):
+  `-m` supplies the commit message. CPython `v3.13.16`
+  [command-line options](https://github.com/python/cpython/blob/v3.13.16/Doc/using/cmdline.rst)
+  define Python's distinct module flag. The model checker uses neither as a model selector.
 - Codex `rust-v0.162.0` at `c1382380de69521303b416720a52f42d51af6248`:
   [native cache timestamp/identity](https://github.com/openai/codex/blob/c1382380de69521303b416720a52f42d51af6248/codex-rs/models-manager/src/cache.rs)
   and [native refresh strategies](https://github.com/openai/codex/blob/c1382380de69521303b416720a52f42d51af6248/codex-rs/models-manager/src/manager.rs).
-- [RFC6901](https://www.rfc-editor.org/rfc/rfc6901) defines JSON pointer escaping;
-  [RFC6902 section4.1](https://www.rfc-editor.org/rfc/rfc6902#section-4.1) requires
+- [RFC 6901](https://www.rfc-editor.org/rfc/rfc6901) defines JSON pointer escaping;
+   [RFC 6902 section 4.1](https://www.rfc-editor.org/rfc/rfc6902#section-4.1) requires
   an existing parent for array append, supporting withdrawal of the unsafe proposal.
 - systemd `v259.5` [systemctl semantics](https://github.com/systemd/systemd/blob/v259.5/man/systemctl.xml)
   distinguish unit state/readback from a proposed unit file. The host absence

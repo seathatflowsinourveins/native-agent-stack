@@ -11,6 +11,7 @@ import argparse
 import ast
 import fnmatch
 import hashlib
+import io
 import json
 import os
 from pathlib import Path
@@ -180,6 +181,10 @@ def exempt(path: str) -> str | None:
         return "file registration or dated age-review inventory; not a runtime selector"
     if path.startswith(FROZEN_EXPERIMENTS):
         return "frozen completed experiment and exact replay source"
+    if path == "blueprints/convergence-practice/omniroute-runtime-workers/experiment.json":
+        return "September 30 frozen runtime-worker observations and replay commands; October 3 publication note preserves their historical identity"
+    if path == "docs/token-efficiency-stack.json":
+        return "dated 2026-09-27 token-efficiency reference edition; upstream_commands retain the observed source-host setup, not live model defaults"
     if path in {"blueprints/us-equities/convergence-review/README.md", "blueprints/us-equities/research-efficiency/README.md"}:
         return "dated review invocation or frozen comparison documentation"
     if path in {"blueprints/us-equities/research-efficiency/experiment.py",
@@ -222,6 +227,13 @@ def selector_key(value: str) -> bool:
     return bool(SELECTOR.search(key) or key in {"model", "modelid", "modelname", "fallback_models", "available_models"})
 
 
+def command_key(value: str) -> str | None:
+    key = re.sub(r"(?<=[a-z])(?=[A-Z])", "_", value).lower().replace("-", "_")
+    if key in COMMAND_KEYS or any(key.endswith("_" + suffix) for suffix in COMMAND_KEYS):
+        return "argv" if key in {"argv", "args"} or key.endswith(("_argv", "_args")) else "commands"
+    return None
+
+
 def identifiers(value: str, allow_cli_alias: bool = False, sentence: bool = False):
     found = [match.group(0).rstrip(".") if sentence else match.group(0) for match in MODEL.finditer(value)]
     if not found and allow_cli_alias and value in CLI_ALIASES:
@@ -230,19 +242,52 @@ def identifiers(value: str, allow_cli_alias: bool = False, sentence: bool = Fals
 
 
 def command_identifiers(value: str | list[str], locate: bool = False):
-    """Read literal model arguments with the installed standard shell lexer."""
+    """Read POSIX command strings with CPython v3.13.16 shlex; argv stays literal."""
     text = value if isinstance(value, str) else shlex.join(value)
     if not re.search(r"(?:--model(?:-id)?|-m)(?:[=\s\"',])", text):
         return []
     if not MODEL.search(text) and not any(re.search(r"\b" + alias + r"\b", text) for alias in CLI_ALIASES):
         return []
     try:
-        tokens = shlex.split(value, comments=True) if isinstance(value, str) else value
+        if isinstance(value, str):
+            class CommandInput(io.StringIO):
+                def readline(self, size=-1):
+                    # shlex skips comments with readline(). Keep their newline
+                    # available as a command boundary, as with uncommented lines.
+                    line = super().readline(size)
+                    if line.endswith("\n"):
+                        self.seek(self.tell() - 1)
+                        return line[:-1]
+                    return line
+            lexer = shlex.shlex(CommandInput(value), posix=True, punctuation_chars="\n;&|()")
+            lexer.whitespace = " \t\r"
+            lexer.whitespace_split = True
+            tokens = list(lexer)
+        else:
+            tokens = value
     except ValueError:
         raise CurrencyError("active command string could not be parsed") from None
+    def native_short_flag(prefix):
+        # Git v2.53.0 commit -m is a message; Python -m selects a module.
+        # Recognize model -m only for a native client behind known wrappers.
+        for token in prefix:
+            program = Path(token).name
+            if (program in {"env", "rtk", "proxy", "command", "exec", "timeout"}
+                    or token.startswith("-") or re.match(r"^[A-Za-z_]\w*=", token)
+                    or re.fullmatch(r"\d+(?:\.\d+)?[smhd]?", token)):
+                continue
+            return program in {"codex", "claude"}
+        return False
     result = []
+    start = 0
     for index, token in enumerate(tokens):
+        if token and set(token) <= set("\n;&|()"):
+            start = index + 1
+            continue
         flag = token.rstrip(",")
+        option = flag.split("=", 1)[0]
+        if option == "-m" and not native_short_flag(tokens[start:index]):
+            continue
         if flag in MODEL_FLAGS and index + 1 < len(tokens):
             ids = identifiers(tokens[index + 1], "claude" in tokens)
             result.extend((index + 1, item) if locate else item for item in ids)
@@ -293,7 +338,7 @@ def selectors(text: str, path: Path):
         def emit(pointer, identifier):
             location = "".join("/" + str(key).replace("~", "~0").replace("/", "~1") for key in pointer)
             results.append((text.count("\n", 0, positions[pointer]) + 1, identifier, location))
-        def walk(value, pointer=(), command=False):
+        def walk(value, pointer=(), command=None):
             if isinstance(value, dict):
                 if measurement(value):
                     return
@@ -307,12 +352,14 @@ def selectors(text: str, path: Path):
                             if isinstance(item, str):
                                 for identifier in identifiers(item, cli):
                                     emit((*pointer, key, index) if isinstance(child, list) else (*pointer, key), identifier)
-                    elif key in COMMAND_KEYS and isinstance(child, (str, list)):
-                        walk(child, (*pointer, key), True)
+                    elif command_key(key) and isinstance(child, (str, dict, list)):
+                        walk(child, (*pointer, key), command_key(key))
                     elif isinstance(child, (dict, list)):
                         walk(child, (*pointer, key), command)
             elif isinstance(value, list):
-                if all(isinstance(child, str) for child in value) and (command or any(child in MODEL_FLAGS for child in value)):
+                argv = command == "argv" or any(
+                    isinstance(child, str) and child.split("=", 1)[0] in MODEL_FLAGS for child in value)
+                if all(isinstance(child, str) for child in value) and argv:
                     for index, identifier in command_identifiers(value, locate=True):
                         emit((*pointer, index), identifier)
                     return
@@ -333,9 +380,10 @@ def selectors(text: str, path: Path):
         for node in ast.walk(tree):
             values = []
             if isinstance(node, (ast.List, ast.Tuple)):
-                for index, item in enumerate(node.elts[:-1]):
-                    if isinstance(item, ast.Constant) and item.value in MODEL_FLAGS:
-                        values.extend(strings(node.elts[index + 1]))
+                tokens = [item.value if isinstance(item, ast.Constant) and isinstance(item.value, str) else ""
+                          for item in node.elts]
+                for index, identifier in command_identifiers(tokens, locate=True):
+                    results.append((node.elts[index].lineno, identifier))
             elif isinstance(node, (ast.Assign, ast.AnnAssign)):
                 targets = node.targets if isinstance(node, ast.Assign) else [node.target]
                 regex_value = isinstance(node.value, ast.Call) and isinstance(node.value.func, ast.Attribute) and node.value.func.attr == "compile"
@@ -374,22 +422,31 @@ def selectors(text: str, path: Path):
         if not MODEL.search(line) and not (cli and any(re.search(r"\b" + alias + r"\b", line) for alias in CLI_ALIASES)):
             continue
         # Model fields/frontmatter, environment defaults and native CLI arguments.
-        field = re.search(r"(?:^|[\s{,])([\w.-]*model(?:_id|_name)?)[\s\"']*[:=]", line, re.I)
+        fields = [match for match in re.finditer(
+            r"(?:^|[\s{,])([\w.-]*model(?:_id|_name)?)[\s\"']*[:=]", line, re.I)
+                  if selector_key(match[1])]
         argument = re.search(r"(?:--model(?:-id)?(?:[=\s])|\b(?:codex|claude)\b.*\s-m\s)", line)
-        if field and selector_key(field[1]) or argument:
+        for field in fields:
+            # Only a field's first value is a selector. Its explanatory tail
+            # need not be valid shell syntax, including an owner's apostrophe.
             try:
-                logical = line.rstrip()
-                if logical.endswith("\\"):
-                    logical = logical[:-1]
-                tokens = shlex.split(logical, comments=True)
+                lexer = shlex.shlex(line[field.end():], posix=True)
+                lexer.whitespace_split = True
+                value = lexer.get_token() or ""
             except ValueError:
+                raise CurrencyError("active selector value could not be parsed") from None
+            for identifier in identifiers(value, cli, sentence=prose):
+                results.append((number, identifier))
+        if argument:
+            logical = line.rstrip().removesuffix("\\")
+            try:
+                selected = command_identifiers(logical)
+            except CurrencyError:
                 if prose:
-                    tokens = [line.split("#", 1)[0]]
+                    selected = identifiers(line.split("#", 1)[0], cli, sentence=True)
                 else:
                     raise CurrencyError("active selector line could not be parsed") from None
-            if path.suffix in {".js", ".cjs", ".mjs", ".ts"}:
-                tokens = tokens[:next((index for index, token in enumerate(tokens) if token.startswith("//")), len(tokens))]
-            for identifier in identifiers(shlex.join(tokens), cli, sentence=prose):
+            for identifier in selected:
                 results.append((number, identifier))
     return sorted(set(results))
 

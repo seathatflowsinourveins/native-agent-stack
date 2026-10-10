@@ -1571,7 +1571,7 @@ class SurfaceWatchTests(unittest.TestCase):
         self.assertNotIn("surface_unreviewed", document["due"])
         self.assertIsNone(document["details"][-1]["surface_watch"])
 
-    def test_the_line_keeps_its_limit_with_all_six_counts(self):
+    def test_the_line_keeps_its_limit_with_all_seven_counts(self):
         due = {key: 9999 for key in cd.COUNT_KEYS}
         line = cd.summary_line(due, "python3 ~/code/native-agent-stack-live/scripts/currency_due.py --dry-run")
         self.assertLessEqual(len(line), 160)
@@ -1600,6 +1600,7 @@ class ThisCheckoutTests(unittest.TestCase):
             self.assertEqual(list(document), ["generated_at", "root", "due", "summary_line", "details_command",
                                           "details"])
             self.assertEqual(list(document["due"]), list(cd.DUE_KEYS))
+            self.assertEqual(document["details"][-1]["active_models"], "current")
             self.assertTrue(all(isinstance(value, int) and value >= 0 for value in document["due"].values()))
             self.assertLessEqual(len(document["summary_line"]), 160)
             self.assertFalse(state.exists())

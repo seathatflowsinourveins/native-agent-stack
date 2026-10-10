@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Write a one-line currency notice for the next session when a pin, receipt or layer is due.
+"""Write the next session's one-line notice for known due counts and coverage gaps.
 
 The proposed daily user timer adoption/templates/systemd/stack-currency.timer can run this after host adoption.
 It runs this checkout's own
 read-only checks as subprocesses, with the arguments their weekly workflows use, reads the host's own status, and
-aggregates five counts, and a sixth when the upstream-surface watch ran recently:
+aggregates seven possible counts: five base counts, a surface-watch count when
+its report is fresh, and a stale-model count when the selector check finds drift:
 
 - pins_behind: components whose platform pin's version probe did not observe the pinned version
   (scripts/adoption_status.py --pinned-versions --json, the "mismatched" ids of each selected profile, each id
@@ -36,12 +37,15 @@ aggregates five counts, and a sixth when the upstream-surface watch ran recently
   existing watch state directory is stale. A file that exists but is stale or future-dated
   ("surface watch stale"), unreadable ("surface watch output unreadable") or only partly observed
   ("surface watch incomplete") is a check that could not answer, as an incomplete skill check is (below). None of
-  these is a count or an error (docs/upstream-surface-watch.md).
+  these is a count or an error (docs/upstream-surface-watch.md);
+- stale_models: active model selectors that differ from the committed versioned comparison snapshot
+  (scripts/active_model_currency.py check --json). An unknown or expired live model report is a coverage gap,
+  never evidence that no model selectors are due (docs/active-model-currency.md).
 
 When any count is nonzero it writes ${XDG_STATE_HOME:-~/.local/state}/native-agent-stack/currency-due.json
 atomically (a temporary file in the same directory, fsync, mode 0600, os.replace):
 
-  {"generated_at": "YYYY-MM-DDTHH:MM:SSZ", "root": "the inspected checkout", "due": {the four counts},
+  {"generated_at": "YYYY-MM-DDTHH:MM:SSZ", "root": "the inspected checkout", "due": {the known counts},
    "summary_line": "at most 160 characters, ending with the command below or with `cat <this file>`",
    "details_command": "the command below", "details": [...]}
 
@@ -49,10 +53,11 @@ and otherwise removes that file, unless the run could not see everything it was 
 (--network) that answered incompletely, meaning an error in its report, a skill left unfetched or in a state this
 script does not know, or a skills CLI release that was not fetched, is unknown, and unknown is not "nothing due"
 (the check's own report says "Incomplete fetches remain unknown"); so is a surface-watch report that exists but is
-stale, future-dated, unreadable or only partly observed. Such a run writes the file when the counts it did reach are
-nonzero, with the gap in the coverage entry of the details, and otherwise leaves the state directory as it was: no removal and no new
-file, exit 0. Its line then says "nothing known due" and names the gap ("skill check incomplete", "surface watch
-stale", "surface watch unreadable", "surface watch incomplete"); a surface gap adds the details command when it fits.
+stale, future-dated, unreadable or only partly observed, or an incomplete active-model report. Such a run writes
+the file when the counts it did reach are nonzero, with the gap in the coverage entry of the details, and otherwise
+leaves the state directory as it was: no removal and no new file, exit 0. Its line then says "nothing known due"
+and names the gap ("skill check incomplete", "surface watch stale", "surface watch unreadable", "surface watch
+incomplete", "model check incomplete"); a surface gap adds the details command when it fits.
 
 The command that ends summary_line is "python3 <checkout>/scripts/currency_due.py --dry-run", the inspected checkout's
 own copy of this script by its absolute path, written as ~/... under the home directory (so the command works from any

@@ -26,7 +26,8 @@ def catalog():
     aliases = {value: value for value in latest.values()}
     aliases["gpt-6.1-sol-max"] = "gpt-6.1-sol"
     aliases["claude-opus-5-5[1m]"] = "claude-opus-5-5"
-    return {"schema_version": 1, "generated_at": NOW, "latest": latest, "aliases": aliases,
+    return {"schema_version": 1, "catalog_kind": "versioned_snapshot", "generated_at": NOW,
+            "latest": latest, "aliases": aliases,
             "sources": [{"name": name, "observed_at": NOW, "sha256": "a" * 64, "rows": 1}
                         for name in ("codex", "omniroute", "claude")]}
 
@@ -163,6 +164,118 @@ class ActiveModelCurrencyTests(unittest.TestCase):
         self.assertEqual((code, stderr), (1, ""))
         self.assertEqual(json.loads(stdout)["stale_count"], 1)
 
+    def test_runtime_experiment_command_list_is_checked_at_an_active_path(self):
+        root = Path(mc.__file__).resolve().parents[1]
+        record = root / "blueprints/convergence-practice/omniroute-runtime-workers/experiment.json"
+        commands = json.loads(record.read_text())["commands"]
+        command, = [item for item in commands if "--model dva/claude-opus-5-max" in item]
+        self.write("config/worker.json", json.dumps({"commands": [command]}, indent=2))
+        code, stdout, stderr = self.cli("check")
+        self.assertEqual((code, stderr), (1, ""))
+        finding, = json.loads(stdout)["findings"]
+        self.assertEqual(finding["model"], "claude-opus-5-max")
+        self.assertEqual((finding["json_pointer"], finding["line"]), ("/commands/0", 3))
+
+    def test_token_reference_upstream_commands_are_checked_at_an_active_path(self):
+        root = Path(mc.__file__).resolve().parents[1]
+        document = json.loads((root / "docs/token-efficiency-stack.json").read_text())
+        def rows(value):
+            if isinstance(value, dict):
+                if value.get("component_id") == "omniroute":
+                    yield value
+                for child in value.values():
+                    yield from rows(child)
+            elif isinstance(value, list):
+                for child in value:
+                    yield from rows(child)
+        row, = rows(document)
+        commands = row["upstream_commands"]
+        self.assertIn("--model claude/claude-opus-5", commands["use"][2])
+        self.write("config/gateway.json", json.dumps({"upstream_commands": commands}, indent=2))
+        code, stdout, stderr = self.cli("check")
+        self.assertEqual((code, stderr), (1, ""))
+        finding, = json.loads(stdout)["findings"]
+        self.assertEqual(finding["model"], "claude-opus-5")
+        self.assertEqual(finding["json_pointer"], "/upstream_commands/use/2")
+
+    def test_command_lists_and_argv_keep_quoted_arguments_and_separate_locations(self):
+        command = 'claude --model "claude-opus-5" --prompt "owner\'s task"'
+        self.write("config/commands.json", json.dumps({
+            "launchCommands": [command, command],
+            "argv": ["claude", "--model", "claude-opus-5", "--prompt", "owner's task"],
+            "execStart": "codex exec -m gpt-6-sol",
+        }, indent=2))
+        code, stdout, _ = self.cli("check")
+        self.assertEqual(code, 1)
+        findings = json.loads(stdout)["findings"]
+        self.assertEqual({item["json_pointer"] for item in findings},
+                         {"/launchCommands/0", "/launchCommands/1", "/argv/2", "/execStart"})
+        self.assertEqual(len({item["line"] for item in findings}), 4)
+
+    def test_confirmed_misses_are_explicitly_dated_records_with_unchanged_bytes(self):
+        root = Path(mc.__file__).resolve().parents[1]
+        records = {
+            "blueprints/convergence-practice/omniroute-runtime-workers/experiment.json": "September 30",
+            "docs/token-efficiency-stack.json": "2026-09-27",
+        }
+        for name, date_label in records.items():
+            with self.subTest(record=name):
+                original = (root / name).read_bytes()
+                reason = mc.exempt(name)
+                self.assertIsNotNone(reason)
+                self.assertIn(date_label, reason)
+                path = self.write(name, original.decode())
+                self.assertEqual(self.cli("check")[0], 0)
+                self.assertEqual(path.read_bytes(), original)
+
+    def test_unquoted_selector_field_does_not_lex_its_apostrophe_prose(self):
+        for name in ("config.yaml", "adoption/agents/claude/helper.md"):
+            with self.subTest(source=name):
+                self.write(name, "model: gpt-6.1-sol, the owner's choice\n")
+                self.assertEqual(self.cli("check")[0], 0)
+                self.write(name, "model: gpt-6-sol, the owner's choice\n")
+                code, stdout, _ = self.cli("check")
+                self.assertEqual(code, 1)
+                self.assertTrue(any(item["model"] == "gpt-6-sol" for item in json.loads(stdout)["findings"]))
+                (self.root / name).unlink()
+
+    def test_git_message_is_not_a_short_model_flag_in_strings_or_argv(self):
+        self.write("config/commands.json", json.dumps({
+            "commands": ['git commit -m "claude-opus-5"', 'git commit -m "codex -m gpt-6-sol"'],
+            "argv": ["git", "commit", "-m", "gpt-6-sol"],
+        }))
+        self.write("tools/message.py", 'argv = ["git", "commit", "-m", "claude-opus-5"]\n')
+        self.write("tools/message.sh", 'git commit -m "codex -m gpt-6-sol"\n')
+        self.assertEqual(self.cli("check")[0], 0)
+
+    def test_multiline_commands_keep_comment_boundaries_for_short_flags(self):
+        self.write("config/commands.json", json.dumps({"commands": [
+            'codex exec --model gpt-6.1-sol # accepted\ngit commit -m "gpt-6-sol"',
+            'git status # observe\ncodex exec -m gpt-6-sol',
+        ]}))
+        code, stdout, _ = self.cli("check")
+        self.assertEqual(code, 1)
+        finding, = json.loads(stdout)["findings"]
+        self.assertEqual((finding["model"], finding["json_pointer"]), ("gpt-6-sol", "/commands/1"))
+
+    def test_multiple_selector_fields_on_one_line_remain_independent(self):
+        self.write("client.js", 'const MODEL = "gpt-6.1-sol"; const REVIEW_MODEL = "gpt-6-sol"; // owner\'s note\n')
+        code, stdout, _ = self.cli("check")
+        self.assertEqual(code, 1)
+        finding, = json.loads(stdout)["findings"]
+        self.assertEqual(finding["model"], "gpt-6-sol")
+
+    def test_native_short_model_flags_are_still_checked(self):
+        self.write("config/commands.json", json.dumps({"commands": [
+            "codex exec -m gpt-6-sol", "rtk claude -m claude-opus-5",
+            "git status && codex exec -m gpt-6-sol",
+        ]}))
+        self.assertEqual(self.check()["stale_count"], 3)
+
+    def test_an_unclosed_model_argument_remains_a_coverage_gap(self):
+        self.write("config/commands.json", json.dumps({"command": 'codex exec --model "gpt-6-sol'}))
+        self.assertEqual(self.cli("check")[0], 2)
+
     def test_frozen_research_comparison_keeps_its_exact_model_commands(self):
         name = "blueprints/us-equities/research-efficiency/experiment.py"
         path = self.write(name, 'command = ["claude", "--model", "claude-opus-5"]\n')
@@ -265,7 +378,7 @@ class ActiveModelCurrencyTests(unittest.TestCase):
     def test_missing_and_aged_manifest_are_unknown_not_current(self):
         self.manifest.unlink()
         self.assertEqual(self.cli("check")[0], 2)
-        old = catalog();old["generated_at"] = "2026-10-07T20:31:55Z"
+        old = catalog();old["catalog_kind"] = "live_observation";old["generated_at"] = "2026-10-07T20:31:55Z"
         self.write(mc.MANIFEST, json.dumps(old))
         self.assertEqual(self.cli("check")[0], 2)
 
@@ -293,6 +406,7 @@ class ActiveModelCurrencyTests(unittest.TestCase):
 
     def test_redating_manifest_does_not_refresh_old_source_observations(self):
         value = catalog()
+        value["catalog_kind"] = "live_observation"
         value["sources"][0]["observed_at"] = "2026-10-07T20:31:55Z"
         self.write(mc.MANIFEST, json.dumps(value))
         self.assertEqual(self.cli("check")[0], 2)
@@ -361,6 +475,18 @@ class GenerateLatestModelsTests(unittest.TestCase):
         self.assertEqual(sources["omniroute"]["observed_at"], "2026-10-09T04:00:00Z")
         self.assertIsNone(sources["claude"]["observed_at"])
         self.assertEqual(value["recorded_at"], NOW)
+
+    def test_committed_source_metadata_follows_the_native_generator_contract(self):
+        root = Path(mc.__file__).resolve().parents[1]
+        committed = json.loads((root / mc.MANIFEST).read_text())
+        self.assertEqual(committed["catalog_kind"], "versioned_snapshot")
+        generated = {row["name"]: row for row in self.generate()["sources"]}
+        for source in committed["sources"]:
+            with self.subTest(source=source["name"]):
+                reference = generated[source["name"]]
+                self.assertEqual(set(source), set(reference))
+                if source["observed_at"] is None:
+                    self.assertEqual(source["timestamp_origin"], reference["timestamp_origin"])
 
     def test_new_native_claude_family_is_not_silently_dropped(self):
         data = json.loads(self.claude.read_text())
@@ -448,6 +574,26 @@ class CurrencyCollectorIntegrationTests(unittest.TestCase):
 
 
 class CheckoutIsolationTests(unittest.TestCase):
+    def test_the_checkout_fixture_is_a_nonexpiring_comparison_snapshot(self):
+        value = catalog()
+        self.assertEqual(value.get("catalog_kind"), "versioned_snapshot")
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / "models.json"
+            path.write_text(json.dumps(value))
+            mc.load_manifest(path, mc.utc("2026-10-11T00:00:00Z"))
+
+    def test_checkout_smoke_test_rejects_unknown_model_coverage(self):
+        from tests import test_currency_due as due_tests
+        fixture = due_tests.Checkout(self)
+        fixture.set(due_tests.cd.ACTIVE_MODELS[0], {"schema_version": 1, "status": "unknown",
+                    "stale_count": 0, "findings": [], "errors": ["fixture coverage gap"]}, code=2)
+        case = due_tests.ThisCheckoutTests("test_the_real_checks_run_dry_and_write_nothing")
+        result = unittest.TestResult()
+        with mock.patch.object(due_tests, "ROOT", fixture.root):
+            case.run(result)
+        self.assertFalse(result.wasSuccessful(), "checkout smoke test accepted unknown model coverage")
+        self.assertTrue(any("unknown" in message for _, message in result.failures), result.failures + result.errors)
+
     def test_checkout_smoke_test_ignores_callers_stale_host_agent(self):
         from tests import test_currency_due as due_tests
         fixture = due_tests.Checkout(self)
