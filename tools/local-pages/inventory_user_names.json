@@ -1,7 +1,7 @@
 {
   "schema": "architecture-user-bindings/1",
   "captured_utc": "2026-10-09T18:55:40Z",
-  "source_pin": "994ab9b279c8915cbdb637e1786aaa41d1306e57",
+  "source_pin": "f96f2cd2decef021c259d853d442956dc73f1ecf",
   "reviewed_bindings": [
     {
       "role": "architecture_design",
