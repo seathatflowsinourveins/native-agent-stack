@@ -33,7 +33,7 @@ default_subagent_reasoning_effort = "max"
 # 272,000-token window of gpt-6.1-sol and gpt-6-astra in models-manager/models.json) and at 8,000 characters only when
 # the window is unknown; a set value is capped at 10,000 tokens (codex-rs/ext/skills/src/render.rs L19-22 and L126-152
 # at rust-v0.159.2, L17-20 and L123-149 at rust-v0.157.1; the key is core/config.schema.json L4122-4127 at
-# rust-v0.159.2). The manifest's 27 catalog-visible skills are counted by scripts/skills_status.py, which estimates
+# rust-v0.159.2). The manifest's 28 catalog-visible skills are counted by scripts/skills_status.py, which estimates
 # each rendered line and its newline at ceil(bytes / 4) (render.rs L154-160 and L25), using the installed skill root.
 # A fixed 6,000 leaves room for Codex's five .system skills and plugin skills on any model a child runs
 # (docs/decisions/2026-09-30-skills-llm-native-listing.md). Per-skill [[skills.config]] disables of manifest skills

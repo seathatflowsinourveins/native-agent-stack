@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "kind": "skills_trial_manifest",
-  "checked_at": "2026-10-08",
+  "checked_at": "2026-10-10",
   "decision_record": "docs/decisions/2026-09-25-skills-trial-and-usage.md",
   "cli": {
     "package": "skills",
@@ -26,7 +26,7 @@
     "started": "2026-09-25",
     "window_days": 30,
     "review_after": "2026-10-25",
-    "on_description_char_cap": 10500,
+    "on_description_char_cap": 11000,
     "prune_rule": "A trial skill installed for at least window_days with zero invocations in the last window_days is a prune candidate: the review keeps it or removes it through a dated decision record. Zero use no longer demotes a listing: under the user's 2026-09-30 directive every model-invocable skill stays listed so the model can invoke it. Kept verdict winners change status only through a verdict re-record, and their listing only through a dated decision record.",
     "confound": "name-only and user-invocable-only listings depress proactive invocation; compare only within a listing state.",
     "measurement": {
@@ -751,17 +751,40 @@
       "claude_listing": "on",
       "codex_enabled": true,
       "added": "2026-10-08"
+    },
+    {
+      "name": "claude-native-practice",
+      "source": "seathatflowsinourveins/native-agent-stack",
+      "url": "https://github.com/seathatflowsinourveins/native-agent-stack/tree/7a6bfbcf0a4f7201c64e5410c2ccbed1b224b511/.claude/skills/claude-native-practice",
+      "ref": "7a6bfbcf0a4f7201c64e5410c2ccbed1b224b511",
+      "path": ".claude/skills/claude-native-practice",
+      "tree_sha": "3a485d2a4bbe63dc1ae54e23101c472d21450b8c",
+      "skill_md_sha256": "a52a24bc7691fa18b3e4c532c6cbd15b79968d82a54acb4202c9fcced2ad8bcb",
+      "skill_md_bytes": 2224,
+      "description_chars": 349,
+      "upstream_disable_model_invocation": false,
+      "license": "MIT",
+      "official": false,
+      "first_party": true,
+      "audits": {
+        "url": "not applicable: a skill of this repository, reviewed in the pull request that changes it"
+      },
+      "status": "kept",
+      "gap": "Answers how to configure Claude Code (settings, permissions, hooks, skills, MCP, subagents, workflows) from current, source-cited defaults instead of repository notes or memory; docs/decisions/2026-10-09-claude-code-native-practice.md.",
+      "claude_listing": "on",
+      "codex_enabled": true,
+      "added": "2026-10-10"
     }
   ],
   "budget": {
-    "claude_on_description_chars": 10374,
-    "claude_on_cap": 10500,
-    "codex_enabled_description_chars": 10055,
-    "codex_catalog_description_chars": 10055,
+    "claude_on_description_chars": 10723,
+    "claude_on_cap": 11000,
+    "codex_enabled_description_chars": 10404,
+    "codex_catalog_description_chars": 10404,
     "codex_configured_budget_tokens": 6000,
     "codex_fallback_budget_chars": 8000,
     "description_chars_method": "Unicode code points of the SKILL.md frontmatter description parsed with PyYAML, surrounding whitespace stripped (2026-09-26; semgrep, codeql and sarif-parsing corrected from 709, 753 and 375).",
-    "client_budgets": "Claude Code fits the listing to skillListingBudgetFraction of the model's context window (default 0.01, settings reference), with an 8,000-character fallback (env-vars reference, SLASH_COMMAND_TOOL_CHAR_BUDGET row), and cuts each entry at 1,536 characters; the settings template sets 0.05 so eligible skills keep their descriptions under the user's 2026-09-30 LLM-native invocation directive (2026-09-30-skills-llm-native-listing). Codex fits its catalog to [skills] max_context_tokens, capped at 10,000 tokens when set; unset, the budget is 2% of the model's context window, and 8,000 characters only when the window is unknown (codex-rs/ext/skills/src/render.rs L19-22 and L126-152 at rust-v0.159.2, the same rule as L17-20 and L123-149 at rust-v0.157.1). codex_configured_budget_tokens is the Codex template's [skills] max_context_tokens (tests/test_skills_manifest.py keeps them equal), and codex_fallback_budget_chars keeps that 8,000-character fallback as metadata, not a cap. claude_on_cap is this manifest's own ceiling on the on-listed sum, not a client budget. codex_catalog_description_chars counts the 27 skills Codex shows the model: a skill whose agents/openai.yaml sets allow_implicit_invocation: false (upstream_allow_implicit_invocation) stays out of its catalog (codex-rs/ext/skills/src/provider/host.rs L147-148); since the retirements of 2026-10-03 no selected skill sets it, so it equals codex_enabled_description_chars. The sums include the held agent-browser, a ceiling for a host where it is still installed. scripts/skills_status.py estimates that catalog in tokens as render.rs charges it, each line '- name: description (file: <path>/SKILL.md)' plus its newline at ceil(bytes / 4) (L154-160, L25 and L258-267), and compares the estimate with codex_configured_budget_tokens. Recorded 2026-09-30 in docs/decisions/2026-09-30-skills-llm-native-listing.md."
+    "client_budgets": "Claude Code fits the listing to skillListingBudgetFraction of the model's context window (default 0.01, settings reference), with an 8,000-character fallback (env-vars reference, SLASH_COMMAND_TOOL_CHAR_BUDGET row), and cuts each entry at 1,536 characters; the settings template sets 0.05 so eligible skills keep their descriptions under the user's 2026-09-30 LLM-native invocation directive (2026-09-30-skills-llm-native-listing). Codex fits its catalog to [skills] max_context_tokens, capped at 10,000 tokens when set; unset, the budget is 2% of the model's context window, and 8,000 characters only when the window is unknown (codex-rs/ext/skills/src/render.rs L19-22 and L126-152 at rust-v0.159.2, the same rule as L17-20 and L123-149 at rust-v0.157.1). codex_configured_budget_tokens is the Codex template's [skills] max_context_tokens (tests/test_skills_manifest.py keeps them equal), and codex_fallback_budget_chars keeps that 8,000-character fallback as metadata, not a cap. claude_on_cap is this manifest's own ceiling on the on-listed sum, not a client budget. codex_catalog_description_chars counts the 28 skills Codex shows the model: a skill whose agents/openai.yaml sets allow_implicit_invocation: false (upstream_allow_implicit_invocation) stays out of its catalog (codex-rs/ext/skills/src/provider/host.rs L147-148); since the retirements of 2026-10-03 no selected skill sets it, so it equals codex_enabled_description_chars. The sums include the held agent-browser, a ceiling for a host where it is still installed. scripts/skills_status.py estimates that catalog in tokens as render.rs charges it, each line '- name: description (file: <path>/SKILL.md)' plus its newline at ceil(bytes / 4) (L154-160, L25 and L258-267), and compares the estimate with codex_configured_budget_tokens. Recorded 2026-09-30 in docs/decisions/2026-09-30-skills-llm-native-listing.md."
   },
   "excluded": [
     {

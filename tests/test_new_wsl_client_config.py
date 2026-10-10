@@ -1408,7 +1408,7 @@ class AgentGapTests(unittest.TestCase):
         selected = {skill["name"] for skill in json.loads((ROOT / cfg.SKILLS_MANIFEST_REL).read_text())["skills"]
                     if skill.get("status") not in ("pruned", "held")}
         self.assertEqual(plan["skills"], frozenset(selected))
-        self.assertEqual(len(plan["skills"]), 27)
+        self.assertEqual(len(plan["skills"]), 28)
         self.assertTrue({"tdd", "diagnosing-bugs", "codebase-design", "writing-for-agents", "skill-creator"} <= plan["skills"])
         self.assertEqual({"grill-me", "improve-codebase-architecture", "semgrep", "agent-browser", "domain-modeling",
                           "setup-matt-pocock-skills"} & plan["skills"], set())

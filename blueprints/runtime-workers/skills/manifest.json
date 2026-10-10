@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "skills_trial_manifest",
   "scope": "project",
-  "checked_at": "2026-10-08",
+  "checked_at": "2026-10-10",
   "decision_record": "blueprints/runtime-workers/skills/research.md",
   "cli": {
     "package": "skills",
@@ -4042,6 +4042,13 @@
       "source": "grafana/skills",
       "adoption_ref": "adoption/skills/manifest.json",
       "reason": "Selected for command-center and native lane log queries and monitoring; outside the current frozen runtime-worker deployment scope (docs/decisions/2026-10-08-skills-cc-lanes-picks.md).",
+      "overturn": "A dated owner or command-center assignment selects this skill for an identified runtime-worker role and authorizes its separately pinned worker deployment."
+    },
+    {
+      "name": "claude-native-practice",
+      "source": "seathatflowsinourveins/native-agent-stack",
+      "adoption_ref": "adoption/skills/manifest.json",
+      "reason": "A first-party skill for the command center and native lanes that configure Claude Code; outside the current frozen runtime-worker deployment scope (docs/decisions/2026-10-10-skills-claude-native-practice-row.md).",
       "overturn": "A dated owner or command-center assignment selects this skill for an identified runtime-worker role and authorizes its separately pinned worker deployment."
     }
   ],

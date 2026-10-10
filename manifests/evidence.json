@@ -5636,8 +5636,8 @@
     },
     {
       "path": "adoption/skills/manifest.json",
-      "sha256": "53298efae3fb0d9f86e30ed92d512c2ac693ab9891e10156ec9adb28ff29092c",
-      "bytes": 61133
+      "sha256": "57aa527012ecac84827156a72696d700b812143cd965ea53526e639e91d09ef0",
+      "bytes": 62359
     },
     {
       "path": "adoption/templates/claude.settings.linux-wsl2.overlay.json",
@@ -5646,8 +5646,8 @@
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "551fed9305c6e57069f2befe7e1c08c036d792e3e94f575b970d63674705aea8",
-      "bytes": 13820
+      "sha256": "7c83c567e7fadbae5cc67008fb508d71727579c3f23a6a712bce222afe63a92e",
+      "bytes": 13856
     },
     {
       "path": "adoption/templates/codex.AGENTS.template.md",
@@ -5656,7 +5656,7 @@
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
-      "sha256": "2642da698bc15584c5001c03c10aad33714e00c6635035ca2cdf6ea1b9a20da2",
+      "sha256": "785228084a51d8832dd35fac56adaf6ba559ea46e1b11d458b1c7a338a773747",
       "bytes": 19097
     },
     {
@@ -11412,8 +11412,8 @@
     },
     {
       "path": "blueprints/runtime-workers/skills/README.md",
-      "sha256": "904301a5d51361ae003ea278b86432d20e1cdf3ed4e60990cfb056bb347d8dfb",
-      "bytes": 45037
+      "sha256": "d2a65b82a10be0c8e2846a66ce7b6829b482b4e652c5be8a6a35370a49aa5126",
+      "bytes": 45388
     },
     {
       "path": "blueprints/runtime-workers/skills/freshness-20260927.json",
@@ -11422,8 +11422,8 @@
     },
     {
       "path": "blueprints/runtime-workers/skills/manifest.json",
-      "sha256": "76b750a7a758830c7730379ff2a9b17864ee92a89ad44fe2c4b01a55724ae205",
-      "bytes": 188365
+      "sha256": "0139f9bce5e8043fa2eb3fd292042cb855bd1c5c3698dc093dc3cf03fdef7a39",
+      "bytes": 188942
     },
     {
       "path": "blueprints/runtime-workers/skills/research.md",
@@ -17087,7 +17087,7 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "bc6b1e131953d1212e2c5e5e83073d1ad13f70750c3c8c9d065df1c76d9c24f5",
+      "sha256": "5965c46ed831c2ec8cf5e06b9e9c80569feb4c9f2032fbe909fb6d658cf54186",
       "bytes": 160022
     },
     {
@@ -17187,8 +17187,8 @@
     },
     {
       "path": "catalogs/landscape/skills-lifecycle.json",
-      "sha256": "affdb8d3969dd13ae5d4edbf63448fd4a461f574434f2890c050ff39a74a62f6",
-      "bytes": 26356
+      "sha256": "7293ca6d2a0aeb348c7021472b163318003132ba7f3cf4f267958be8b157f9f8",
+      "bytes": 27054
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
@@ -18579,6 +18579,11 @@
       "path": "docs/decisions/2026-10-10-openhands-shard-discovery-protection.md",
       "sha256": "634ea007962339fed50e933bdc7d407da28041b0cb21c610215f47a4455138e6",
       "bytes": 2956
+    },
+    {
+      "path": "docs/decisions/2026-10-10-skills-claude-native-practice-row.md",
+      "sha256": "5d09bcc37df78410545b831c8f73952d6206356695be9cadfaba2bcca381fff6",
+      "bytes": 5864
     },
     {
       "path": "docs/direct-results.md",
@@ -60832,7 +60837,7 @@
     },
     {
       "path": "tests/test_new_wsl_client_config.py",
-      "sha256": "c676e551f2cdb9c4bef41f7bd306b2cd208e4c7da62b11eac533c76d8d7d08f6",
+      "sha256": "c68f8381b03724fab218351bde359a6e149ba6c257792e6d912c8f9e190e9df4",
       "bytes": 345461
     },
     {
@@ -61127,13 +61132,13 @@
     },
     {
       "path": "tests/test_skills_manifest.py",
-      "sha256": "9020a7c87958c36df3c81e42e94869c5c49accde595e619c012e2f46d66d266e",
-      "bytes": 19524
+      "sha256": "5e866f2708e4a1f36e7b76f72fa82c8518b60c0d04b1168a53d92131a9447d77",
+      "bytes": 19996
     },
     {
       "path": "tests/test_skills_status.py",
-      "sha256": "ef28cf26ea0515628d4d92fafff7a45a3bbad4b55c286b18259295f7df2c78ac",
-      "bytes": 67573
+      "sha256": "49f075bb631348d1021c84bbd17a7d772696fc152782521295330bc4d61f66bc",
+      "bytes": 67596
     },
     {
       "path": "tests/test_sota_convergence.py",

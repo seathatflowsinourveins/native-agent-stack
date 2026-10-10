@@ -114,6 +114,12 @@ class SkillEntryTests(unittest.TestCase):
     def test_audit_url_is_on_skills_sh(self):
         for skill in self.skills:
             with self.subTest(skill=skill["name"]):
+                if skill.get("first_party"):
+                    # A skill of this repository has no skills.sh page: it is reviewed in the pull request that changes it,
+                    # and its source must be this repository.
+                    self.assertEqual(skill["source"], "seathatflowsinourveins/native-agent-stack")
+                    self.assertTrue(skill["audits"]["url"].startswith("not applicable"), skill["audits"]["url"])
+                    continue
                 self.assertTrue(skill["audits"]["url"].startswith("https://skills.sh/"),
                                skill["audits"]["url"])
 
