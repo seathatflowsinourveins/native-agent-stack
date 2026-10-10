@@ -33,9 +33,10 @@ def run_strategy(
     halt_after_ns=None,
     reopen_at_ns=None,
     strategy_type=None,
+    quote_offsets_ns=None,
 ):
     """Drive the real class through native data/clock/callback boundaries."""
-    from nautilus_trader.model import CustomData
+    from nautilus_trader.model import CustomData, QuoteTick
 
     engine, instrument = simulation.fixture_engine(instrument)
     start_ns = simulation.BASE_NS if start_ns is None else start_ns
@@ -61,6 +62,21 @@ def run_strategy(
     quotes = simulation.fixture_quotes(
         instrument, start_ns=start_ns, **({"bids": bids} if bids is not None else {})
     )
+    if quote_offsets_ns is not None:
+        if len(quote_offsets_ns) != len(quotes):
+            raise ValueError("one_timestamp_per_quote_required")
+        quotes = [
+            QuoteTick(
+                quote.instrument_id,
+                quote.bid_price,
+                quote.ask_price,
+                quote.bid_size,
+                quote.ask_size,
+                start_ns + offset,
+                start_ns + offset,
+            )
+            for quote, offset in zip(quotes, quote_offsets_ns, strict=True)
+        ]
     data = [
         CustomData(families.snapshot_data_type(simulation.INSTRUMENT_ID), snapshot),
         *quotes,
@@ -99,6 +115,264 @@ def run_strategy(
 
 @unittest.skipUnless(NATIVE, "requires the exact locked Nautilus rc5 runtime")
 class LifecycleTests(unittest.TestCase):
+    def test_fractional_policy_boundary_dispatches_cancel_before_crossing_quote(self):
+        native_cancel = families.FamilyStrategy.cancel_order
+        observed = []
+
+        def observe_cancel(strategy, client_id):
+            observed.append((str(client_id), str(strategy.pending.client_order_id)))
+            native_cancel(strategy, client_id)
+
+        for policy, boundary in (
+            ("regular-close-v1", "2026-10-08T19:58:00+00:00"),
+            ("after-hours-v1", "2026-10-08T23:58:00+00:00"),
+        ):
+            cutoff = int(datetime.fromisoformat(boundary).timestamp() * 1e9)
+            start = cutoff - 500_000_000
+            observed.clear()
+            with (
+                self.subTest(policy=policy),
+                patch.object(
+                    families.FamilyStrategy, "cancel_order", new=observe_cancel
+                ),
+            ):
+                strategy = run_strategy(
+                    ledger=None,
+                    faults=[],
+                    start_ns=start,
+                    bids=("10", "11", "11", "10", "10", "10"),
+                    quote_offsets_ns=(
+                        0,
+                        200_000_000,
+                        400_000_000,
+                        600_000_000,
+                        800_000_000,
+                        1_200_000_000,
+                    ),
+                    overrides={
+                        "preset": "aggressive-v1",
+                        "exit_policy": policy,
+                        "entry_timeout_ns": 10_000_000_000,
+                        "exit_deadline_ns": start + 30_000_000_000,
+                    },
+                )
+                cancels = [
+                    r for r in strategy.trace if r["event"] == "cancel_requested"
+                ]
+                buys = [
+                    r
+                    for r in strategy.trace
+                    if r["event"] == "submit" and r["side"] == "BUY"
+                ]
+                self.assertEqual(len(cancels), 1)
+                self.assertEqual(cancels[0]["now_ns"], cutoff)
+                self.assertEqual(cancels[0]["role"], "entry")
+                self.assertEqual(len(buys), 1)
+                self.assertEqual(buys[0]["now_ns"], start)
+                self.assertEqual(
+                    observed, [(buys[0]["client_order_id"], buys[0]["client_order_id"])]
+                )
+                # Native cancel latency allows this crossing fill. Dispatch at
+                # the boundary must retain fill ownership and the time exit.
+                fills = [r for r in strategy.trace if r["event"] == "fill"]
+                self.assertEqual([r["side"] for r in fills], ["BUY", "SELL"])
+                self.assertEqual(fills[0]["now_ns"], cutoff + 100_000_000)
+                self.assertEqual(strategy.quantity, 0)
+                self.assertIsNone(strategy.pending)
+                self.assertEqual(strategy.sequence, 2)
+                self.assertNotIn("t22-pending-entry", strategy.clock.timer_names())
+
+    def test_subsecond_halt_cancels_on_acceptance_before_reopen_and_fill(self):
+        start = simulation.BASE_NS
+        native_terminal = families.FamilyStrategy.on_order_canceled
+        retired = []
+
+        def observe_terminal(strategy, event):
+            native_terminal(strategy, event)
+            retired.append((str(event.client_order_id), strategy.clock.timer_names()))
+
+        with patch.object(
+            families.FamilyStrategy, "on_order_canceled", new=observe_terminal
+        ):
+            strategy = run_strategy(
+                ledger=None,
+                faults=[],
+                bids=("10", "11", "11", "10", "10", "10"),
+                quote_offsets_ns=(
+                    0,
+                    200_000_000,
+                    400_000_000,
+                    600_000_000,
+                    800_000_000,
+                    1_200_000_000,
+                ),
+                halt_after_ns=start + 300_000_000,
+                reopen_at_ns=start + 500_000_000,
+                overrides={
+                    "entry_timeout_ns": 10_000_000_000,
+                    "exit_deadline_ns": start + 30_000_000_000,
+                },
+            )
+        cancels = [r for r in strategy.trace if r["event"] == "cancel_requested"]
+        terminals = [r for r in strategy.trace if r["event"] == "terminal"]
+        self.assertEqual(len(cancels), 1)
+        self.assertEqual(cancels[0]["now_ns"], start + 300_000_000)
+        self.assertEqual(cancels[0]["role"], "entry")
+        self.assertEqual(len(terminals), 1)
+        self.assertEqual(terminals[0]["now_ns"], start + 400_000_000)
+        self.assertFalse(any(r["event"] == "fill" for r in strategy.trace))
+        self.assertEqual(strategy.quantity, 0)
+        self.assertIsNone(strategy.pending)
+        self.assertEqual(strategy.sequence, 1)
+        self.assertNotIn("t22-pending-entry", strategy.clock.timer_names())
+        self.assertEqual(len(retired), 1)
+        self.assertEqual(retired[0][0], strategy.client_id_prefix + "0000001")
+        self.assertNotIn("t22-pending-entry", retired[0][1])
+
+    def test_native_alert_selects_earliest_pending_entry_limit(self):
+        start = simulation.BASE_NS
+        for timeout, entry, exit_, earliest in (
+            (300_000_000, 350_000_000, 450_000_000, 300_000_000),
+            (450_000_000, 300_000_000, 350_000_000, 300_000_000),
+            (350_000_000, 450_000_000, 300_000_000, 300_000_000),
+        ):
+            with self.subTest(timeout=timeout, entry=entry, exit=exit_):
+                strategy = run_strategy(
+                    ledger=None,
+                    faults=[],
+                    bids=("10", "11", "11", "10", "10", "10"),
+                    quote_offsets_ns=(
+                        0,
+                        200_000_000,
+                        400_000_000,
+                        600_000_000,
+                        800_000_000,
+                        1_200_000_000,
+                    ),
+                    overrides={
+                        "entry_timeout_ns": timeout,
+                        "entry_deadline_ns": start + entry,
+                        "exit_deadline_ns": start + exit_,
+                    },
+                )
+                cancels = [
+                    r for r in strategy.trace if r["event"] == "cancel_requested"
+                ]
+                self.assertEqual(len(cancels), 1)
+                self.assertEqual(cancels[0]["now_ns"], start + earliest)
+                self.assertEqual(cancels[0]["role"], "entry")
+                self.assertTrue(any(r["event"] == "terminal" for r in strategy.trace))
+                self.assertFalse(any(r["event"] == "fill" for r in strategy.trace))
+                self.assertEqual(strategy.quantity, 0)
+                self.assertEqual(strategy.sequence, 1)
+
+    def test_entry_deadline_cancels_before_timeout_and_preserves_terminal_identity(
+        self,
+    ):
+        start = simulation.BASE_NS
+        native_cancel = families.FamilyStrategy.cancel_order
+        observed = []
+
+        def observe_cancel(strategy, client_id):
+            observed.append((str(client_id), str(strategy.pending.client_order_id)))
+            native_cancel(strategy, client_id)
+
+        with patch.object(families.FamilyStrategy, "cancel_order", new=observe_cancel):
+            strategy = run_strategy(
+                ledger=None,
+                faults=[],
+                bids=("10", "11", "11", "10", "10", "10"),
+                overrides={
+                    "entry_deadline_ns": start + 1_000_000_000,
+                    "entry_timeout_ns": 10_000_000_000,
+                    "exit_deadline_ns": start + 30_000_000_000,
+                },
+            )
+        cancels = [r for r in strategy.trace if r["event"] == "cancel_requested"]
+        self.assertEqual(len(cancels), 1)
+        self.assertEqual(cancels[0]["now_ns"], start + 1_000_000_000)
+        self.assertEqual(cancels[0]["role"], "entry")
+        self.assertEqual(observed, [(strategy.client_id_prefix + "0000001",) * 2])
+        self.assertTrue(any(r["event"] == "terminal" for r in strategy.trace))
+        self.assertFalse(any(r["event"] == "fill" for r in strategy.trace))
+        self.assertIsNone(strategy.pending)
+        self.assertEqual(strategy.quantity, 0)
+        self.assertEqual(strategy.sequence, 1)
+
+    def test_entry_deadline_admits_only_before_boundary(self):
+        cutoff = simulation.BASE_NS + 2_000_000_000
+        for offset in (-500_000_000, 0, 500_000_000):
+            with self.subTest(offset_ns=offset):
+                strategy = run_strategy(
+                    ledger=None,
+                    faults=[],
+                    start_ns=cutoff + offset,
+                    bids=("10", "11", "11", "11", "11"),
+                    quote_offsets_ns=(
+                        0,
+                        200_000_000,
+                        400_000_000,
+                        600_000_000,
+                        800_000_000,
+                    ),
+                    overrides={
+                        "entry_deadline_ns": cutoff,
+                        "entry_timeout_ns": 10_000_000_000,
+                        "exit_deadline_ns": cutoff + 30_000_000_000,
+                    },
+                )
+                buys = [
+                    r
+                    for r in strategy.trace
+                    if r["event"] == "submit" and r["side"] == "BUY"
+                ]
+                self.assertEqual(len(buys), int(offset < 0))
+                self.assertFalse(any(r["event"] == "fill" for r in strategy.trace))
+                self.assertEqual(strategy.quantity, 0)
+
+    def test_exit_deadline_cancels_pending_entry_before_ordinary_timeout(self):
+        start = simulation.BASE_NS
+        strategy = run_strategy(
+            ledger=None,
+            faults=[],
+            bids=("10", "11", "11", "10", "10", "10"),
+            overrides={
+                "entry_timeout_ns": 10_000_000_000,
+                "exit_deadline_ns": start + 1_000_000_000,
+            },
+        )
+        cancels = [r for r in strategy.trace if r["event"] == "cancel_requested"]
+        self.assertEqual(len(cancels), 1)
+        self.assertEqual(cancels[0]["now_ns"], start + 1_000_000_000)
+        self.assertEqual(cancels[0]["role"], "entry")
+        self.assertFalse(any(r["event"] == "fill" for r in strategy.trace))
+        self.assertTrue(any(r["event"] == "terminal" for r in strategy.trace))
+        self.assertEqual(strategy.quantity, 0)
+        self.assertEqual(strategy.sequence, 1)
+
+    def test_exit_deadline_cancels_pending_exit_before_ordinary_timeout(self):
+        start = simulation.BASE_NS
+        strategy = run_strategy(
+            ledger=None,
+            faults=[],
+            bids=("10", "10", "9", "8", "8", "9", "9"),
+            overrides={
+                "entry_timeout_ns": 10_000_000_000,
+                "exit_timeout_ns": 10_000_000_000,
+                "exit_deadline_ns": start + 3_000_000_000,
+            },
+        )
+        cancels = [r for r in strategy.trace if r["event"] == "cancel_requested"]
+        self.assertEqual(len(cancels), 1)
+        self.assertEqual(cancels[0]["now_ns"], start + 3_000_000_000)
+        self.assertEqual(cancels[0]["role"], "exit")
+        sells = [
+            r for r in strategy.trace if r["event"] == "submit" and r["side"] == "SELL"
+        ]
+        self.assertEqual([r["reason"] for r in sells], ["stop_loss", "time_exit"])
+        self.assertEqual(strategy.quantity, 0)
+        self.assertEqual(strategy.sequence, 3)
+
     def test_policy_boundary_refuses_new_entries_at_and_after_cutoff(self):
         for policy, boundary in (
             ("regular-close-v1", "2026-10-08T19:58:00+00:00"),

@@ -258,6 +258,7 @@ class FamilyStrategy(Strategy):
         return not reasons
 
     def on_stop(self):
+        self._retire_pending_entry_alert()
         if "t22-watchdog" in self.clock.timer_names():
             self.clock.cancel_timer("t22-watchdog")
         if self.quantity or self.pending is not None:
@@ -291,6 +292,8 @@ class FamilyStrategy(Strategy):
                     return
             self.snapshot = value
             self._record("snapshot", source_sha256=value.source_sha256)
+            if value.halted and self.pending_role == "entry":
+                self._drive()
         except Exception as error:
             self._fault("on_data", error)
             raise
@@ -317,6 +320,41 @@ class FamilyStrategy(Strategy):
         except Exception as error:
             self._fault("watchdog", error)
             raise
+
+    def _arm_pending_entry_alert(self):
+        if self.pending is None or self.pending_role != "entry":
+            return
+        deadlines = [self.pending_since_ns + self.spec.entry_timeout_ns]
+        deadlines.extend(
+            deadline
+            for deadline in (
+                self.spec.entry_deadline_ns,
+                self.spec.exit_deadline_ns,
+                self.pending_policy_deadline_ns,
+            )
+            if deadline is not None
+        )
+        deadline = min(deadlines)
+        if deadline <= self.clock.timestamp_ns():
+            self._drive()
+            return
+        # Official rc5 one-shot clock API, clock.rs:158-177 at 1b0a49d2.
+        # This dispatches cancellation at the deadline; native cancellation
+        # latency can still race a fill, whose original identity remains owned.
+        self.clock.set_time_alert_ns(
+            "t22-pending-entry", deadline, callback=self._on_pending_entry_deadline
+        )
+
+    def _on_pending_entry_deadline(self, event):
+        try:
+            self._drive()
+        except Exception as error:
+            self._fault("entry_deadline", error)
+            raise
+
+    def _retire_pending_entry_alert(self):
+        if "t22-pending-entry" in self.clock.timer_names():
+            self.clock.cancel_timer("t22-pending-entry")
 
     def _fresh_quote(self, now):
         q = self.last_quote
@@ -653,6 +691,7 @@ class FamilyStrategy(Strategy):
             client_order_id=client_id,
         )
         self.submit_order(order)
+        self._arm_pending_entry_alert()
 
     @guarded_callback
     def on_order_filled(self, event):
@@ -692,6 +731,7 @@ class FamilyStrategy(Strategy):
             self._clear_pending()
 
     def _clear_pending(self):
+        self._retire_pending_entry_alert()
         self.pending = None
         self.pending_role = None
         self.pending_remaining = D(0)

@@ -15,7 +15,8 @@
   "owner_override": {
     "licence_at": "2026-10-09T19:46:28Z",
     "dispatch_at": "2026-10-09T20:03:51Z",
-    "instruction": "T13 and T22: vectorbt 1.1.2 with its Rust engine for fast sweeps, through vendor install, check and inverse. Re-test anything that survives in Nautilus."
+    "attribution": "owner",
+    "paraphrase": "On 2026-10-09T20:03:51Z, they requested T13 and T22 qualify vectorbt 1.1.2 with its Rust engine through vendor installation, checks and inverse cases for fast sweeps. They required surviving candidates to be retested in Nautilus."
   },
   "coordination": "T13 agreed T22 owns one shared isolated acceptance run; T13 consumes this receipt rather than duplicate native jobs",
   "source_discovery": {

@@ -199,11 +199,28 @@ controls admit entries before the cutoff and keep pending exits separate.
 Comment 4235547318 now uses the existing `_holding_deadline` calendar resolver
 to refuse new entries at the selected policy boundary, and latches that boundary
 when submitting an entry so a rollover cannot move a resting buy's deadline.
-Comment 4235547324 cancels a pending entry on a halt independently of the pending
-exit gate; the identity survives until a native terminal event, and a missing
-acknowledgement still freezes with that same identity. Comment 4235547328 anchors
+The resolver uses [exchange_calendars session boundaries](https://github.com/gerrymanoim/exchange_calendars/blob/dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a/exchange_calendars/exchange_calendar.py#L1006-L1016)
+and [XNYS early-close rules](https://github.com/gerrymanoim/exchange_calendars/blob/dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a/exchange_calendars/exchange_calendar_xnys.py#L157).
+The later fractional-second correction schedules cancellation through the
+[native nanosecond alert API](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/common/src/python/clock.rs#L158-L177),
+with [native alert retirement](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/common/src/python/clock.rs#L258-L260).
+
+Comment 4235547324 originally added the pending-entry halt predicate separately
+from the pending-exit gate. That predicate did not itself dispatch cancellation
+on snapshot acceptance; the subsecond correction invokes the pending-entry path
+immediately after the native [custom-data callback](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/trading/src/python/strategy.rs#L640-L643)
+accepts the halted snapshot, using the existing [native cancellation API](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/trading/src/python/strategy.rs#L1999-L2016).
+The original identity survives until [terminal cancellation](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/python/nautilus_trader/model/__init__.pyi#L4252);
+[cancellation rejection](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/python/nautilus_trader/model/__init__.pyi#L4208)
+is non-terminal, and a missing acknowledgement still freezes with that identity.
+
+Comment 4235547328 anchors
 the first buy to `OrderFilled.ts_event`; both its holding timer and selected
 calendar deadline therefore describe the fill, including delayed delivery.
+The upstream [fill event timestamps](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/python/nautilus_trader/model/__init__.pyi#L4484-L4503)
+and [ts_event property](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/python/nautilus_trader/model/__init__.pyi#L4537-L4541)
+distinguish execution time from callback delivery; [native fill dispatch](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/trading/src/python/strategy.rs#L576-L580)
+preserves that event.
 
 The primary API remains
 `nautechsystems/nautilus_trader@1b0a49d2792a9432a3aca3fcb617ce7a630d905e`,
@@ -226,6 +243,40 @@ synthetic landing and paper acceptance are separate.
 
 The final focused baseline run has six tests and nine assertion failures; the
 pending-exit separation control already passes. All six pass after the fix. The
-regenerated full native receipt has 40 tests, zero skips and 14 matching source
+then-regenerated full native receipt has 40 tests, zero skips and 14 matching source
 bindings. The matrix has 120 timing candidates, 30 legacy cases, four controls,
 ten noncohort inverses and seven matching bindings. Both retain `NOT_CITED`.
+
+## Astra substitute correction after 31d63cd8
+
+The fractional-second native regressions refine the earlier cancellation claims.
+A resting entry now arms one native alert at the earliest entry timeout,
+explicit entry deadline, explicit exit deadline or latched policy cutoff. Its
+callback uses the existing cancellation predicate and retains the original ID
+until the native fill or terminal event clears the order and retires the alert.
+An accepted halted snapshot drives that same pending-entry path immediately;
+pending exits retain their separate halt handling.
+
+On the unchanged pre-fix source, six focused native tests give three assertion
+failures: both 15:57:59.500/19:57:59.500 policy straddles miss cancellation, and
+the 300 ms halt is only acted on at the 400 ms quote. The four deadline controls
+already pass there; they repair missing coverage. Separate single-site mutants
+remove the pending-entry deadline, new-entry deadline or pending exit-deadline
+force to verify that each isolated guard is necessary.
+
+First-hand before/after logs and pinned offline source captures are retained at
+`~/.local/state/native-agent-stack/coordination/ns2604-coop/lanes/strategies-astra-fix-20261010/`:
+`native-before.log`, `native-after.log`, the deadline mutation logs and
+`upstream-source-captures/SOURCE.json`. The three earlier thread fixes retain
+their focused baseline/final logs in the sibling `strategies-codex-fix-20261010/`.
+The new source/result digests and exact native acceptance are recorded in the
+new correction receipt there; the repository acceptance generators bind the
+current source in `test-acceptance.json` and `synthetic-receipt.json`.
+
+The straddle fixture still receives the native racing fill after timely cancel
+dispatch and accounts for it through the original order and time exit. This
+proves cancellation dispatch at the selected boundary; post-cutoff execution
+exclusion would need separate expiry/cancellation-latency qualification. The
+subsecond halt fixture receives terminal cancellation at 400 ms and stays flat.
+No broker, historical timing, continuing-manager or performance qualification
+is inferred from these synthetic engine runs.

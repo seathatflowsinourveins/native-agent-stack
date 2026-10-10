@@ -11377,7 +11377,7 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/resolver/patch_policy.py",
-      "sha256": "35b995962f9c803114beb507116963403cc391dbcc9bd9ab74547d19eaa34eeb",
+      "sha256": "6941086835b3dfca788ab8f6e578e8a9dd6c1fcf162a4d68a9270a32bca57219",
       "bytes": 46776
     },
     {
@@ -61017,8 +61017,8 @@
     },
     {
       "path": "tests/test_runtime_worker_openhands_resolver.py",
-      "sha256": "852f6115d6295c2ea54a3c9aede259a380d45c9c712963f1fcc3363bddaa766c",
-      "bytes": 276710
+      "sha256": "6ee381d57efc9bf2d136da4de6c5aa63247a4bccc1424d997d1be232c888fe63",
+      "bytes": 276714
     },
     {
       "path": "tests/test_runtime_worker_skills.py",

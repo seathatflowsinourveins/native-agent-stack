@@ -5,6 +5,8 @@ from __future__ import annotations
 import asyncio
 import importlib
 import importlib.util
+import json
+import re
 import tempfile
 import time
 import unittest
@@ -55,6 +57,72 @@ def synthetic_rth_context():
 
 
 class ContractTests(unittest.TestCase):
+    def test_owner_override_is_dated_attributed_history(self):
+        root = Path(__file__).resolve().parents[1]
+        receipt = json.loads(
+            (
+                root / "blueprints/us-equities/strategies/vectorbt-acceptance.json"
+            ).read_text()
+        )
+        override = receipt["owner_override"]
+        self.assertTrue(
+            "instruction" not in override, "owner direction must be attributed history"
+        )
+        self.assertEqual(override["attribution"], "owner")
+        self.assertIn(override["dispatch_at"], override["paraphrase"])
+        self.assertIn("they", override["paraphrase"])
+        self.assertIn("Nautilus", override["paraphrase"])
+
+    def test_correction_records_bind_pinned_source_lines_and_first_hand_results(self):
+        root = Path(__file__).resolve().parents[1]
+        text = (root / "blueprints/us-equities/strategies/source-review.md").read_text()
+        section = text.split("## Codex correction at 45ebe5c4", 1)[1]
+        for thread in ("4235547318", "4235547324", "4235547328"):
+            with self.subTest(thread=thread):
+                start = section.index("Comment " + thread)
+                correction = section[start:].split("\n\n", 1)[0]
+                self.assertRegex(
+                    correction,
+                    r"https://github\.com/[^\s)]+/blob/[0-9a-f]{40}/[^\s)]+#L\d+",
+                )
+        self.assertIn("native-before.log", section)
+        self.assertIn("native-after.log", section)
+        self.assertIn("upstream-source-captures", section)
+
+    def test_live_lazy_import_comment_locators_include_the_cited_blocks(self):
+        root = Path(__file__).resolve().parents[1]
+        source = (
+            (root / "tools/sota-convergence/blind_checkout.py").read_text().splitlines()
+        )
+        locations = (
+            (
+                "blueprints/runtime-workers/openhands/resolver/patch_policy.py",
+                "imported lazily:",
+            ),
+            (
+                "tests/test_runtime_worker_openhands_resolver.py",
+                "# As tools/sota-convergence/",
+            ),
+            (
+                "tests/test_runtime_worker_openhands_resolver.py",
+                "# A loaded file that puts",
+            ),
+        )
+        for path, marker in locations:
+            comment = next(
+                line
+                for line in (root / path).read_text().splitlines()
+                if marker in line
+            )
+            refs = re.search(r"blind_checkout\.py:([0-9,\-]+)", comment).group(1)
+            for locator in refs.split(","):
+                first, _, last = locator.partition("-")
+                start, end = int(first), int(last or first)
+                with self.subTest(path=path, locator=locator):
+                    snippet = "\n".join(source[start - 1 : end])
+                    self.assertIn("sys.path.insert", snippet)
+                    self.assertRegex(snippet, r"from \w+ import ")
+
     def test_instance_identity_is_explicit_stable_and_bounded(self):
         for value in ("", "a-b", "x" * 65, None, True):
             with self.subTest(value=value), self.assertRaises(ValueError):
