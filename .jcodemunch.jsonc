@@ -1,28 +1,28 @@
-// Source: jgravelle/jcodemunch-mcp v1.108.319,
-// src/jcodemunch_mcp/config.py L346-354, L536-544, L1230-1254.
-// https://github.com/jgravelle/jcodemunch-mcp/blob/v1.108.319/src/jcodemunch_mcp/config.py
-// UTF-8 JSONC at the indexed project root; loader rules are at L630-727.
+// Source: installed jgravelle/jcodemunch-mcp v1.108.333 (bbe30fa299c4),
+// src/jcodemunch_mcp/config.py L351-358, L542-548, L1278-1305.
+// https://github.com/jgravelle/jcodemunch-mcp/blob/v1.108.333/src/jcodemunch_mcp/config.py
+// UTF-8 JSONC at the indexed project root; loader rules are at L642-739.
 {
-  // 2026-09-27: git ls-files measured 7,883 tracked paths, 4,907 excluded,
-  // 2,976 remaining: 1,024 paths (34.4%) of growth above that inventory.
+  // 2026-10-10: main f6ae0de74 has 12,123 tracked paths, 8,149 excluded,
+  // 3,974 remaining: cap 8,000 leaves 4,026 paths (101.3%) of growth.
   // Counting all retained extensions is conservative; this is not a reindex
-  // result. This config and its new test add two paths when they are tracked.
+  // result. The regression also checks 1,000 added retained source paths.
   // tests/test_jcodemunch_config.py recomputes the count on each test run.
-  // Upstream's default 2,000-file folder cap: security.py L589-592.
-  // Project override: security.py L717-743; config.py L1084-1091.
-  // Walked-root repo key: tools/index_folder.py L1234, L1692 (v1.108.319).
-  "max_folder_files": 4000,
+  // Upstream's default 2,000-file folder cap: security.py L587-592.
+  // Project override: security.py L717-743; config.py L1145-1152.
+  // Walked-root repo key: tools/index_folder.py L1231-1234, L1685-1692.
+  "max_folder_files": 8000,
 
   // External context providers (for example git_blame, which writes per-file
   // authors and dates into the index) stay off. The MCP index_folder call has no
-  // context_providers argument (server.py L1597-1645, L5915-5932); providers are
+  // context_providers argument; providers are
   // gated by this config key through the project overlay instead:
-  // tools/index_folder.py L796-803; config.py L48, L374, L548, L1084-1091.
+  // tools/index_folder.py L798-804; config.py L60, L386, L560, L1145-1152.
   "context_providers": false,
 
   // Project patterns are merged by security.py L554-577 and compiled using
   // pathspec's gitignore dialect by tools/index_folder.py L1273-1279, at
-  // https://github.com/jgravelle/jcodemunch-mcp/tree/v1.108.319/src/jcodemunch_mcp
+  // https://github.com/jgravelle/jcodemunch-mcp/tree/v1.108.333/src/jcodemunch_mcp
   // Keep scripts, tools, tests, docs, examples, adoption, observability and
   // catalogs intact. Mixed blueprint trees retain their source/config files.
   "extra_ignore_patterns": [
