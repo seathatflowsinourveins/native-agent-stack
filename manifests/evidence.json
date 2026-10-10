@@ -11382,7 +11382,7 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/resolver/patch_policy.py",
-      "sha256": "35b995962f9c803114beb507116963403cc391dbcc9bd9ab74547d19eaa34eeb",
+      "sha256": "6941086835b3dfca788ab8f6e578e8a9dd6c1fcf162a4d68a9270a32bca57219",
       "bytes": 46776
     },
     {
@@ -61052,8 +61052,8 @@
     },
     {
       "path": "tests/test_runtime_worker_openhands_resolver.py",
-      "sha256": "852f6115d6295c2ea54a3c9aede259a380d45c9c712963f1fcc3363bddaa766c",
-      "bytes": 276710
+      "sha256": "6ee381d57efc9bf2d136da4de6c5aa63247a4bccc1424d997d1be232c888fe63",
+      "bytes": 276714
     },
     {
       "path": "tests/test_runtime_worker_skills.py",
@@ -61597,8 +61597,8 @@
     },
     {
       "path": "tools/sota-convergence/blind_checkout.py",
-      "sha256": "780a2b931ecbff453ce4caeeb153614d1dcef98d77b4318687aa592e066f88ce",
-      "bytes": 56215
+      "sha256": "3fcb2d2226ad02c1b41f1d8bc9d3108dc6b003a6c8b78bf0cabea23928217175",
+      "bytes": 56376
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",

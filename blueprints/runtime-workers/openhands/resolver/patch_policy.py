@@ -489,7 +489,7 @@ def python_references(path, source, blobs, dirs, import_names=None):
     A file loaded by path through importlib or runpy is traced as a file
     (tests/test_blind_checkout.py:22-34 loads tools/sota-convergence/blind_checkout.py).
     A directory a file puts on sys.path becomes a directory rule, because anything
-    placed there can be imported lazily: blind_checkout.py:426-429,971-972 and
+    placed there can be imported lazily: blind_checkout.py:428-431,973-974 and
     lane_packets.py:51-54 add tools/sota-convergence, so plan open item 23 denies
     that directory rather than tracing its lazy imports.
     """
