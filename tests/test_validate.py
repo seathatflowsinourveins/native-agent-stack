@@ -74,6 +74,59 @@ class PublicationValidationTests(unittest.TestCase):
     def test_valid_bundle_reports_counts(self):
         self.assertEqual(validate(self.root), {"components": 1, "profiles": 1, "receipts": 1, "hashed_files": 2})
 
+    def test_registered_exact_vendor_document_uuid_examples_are_public_sources(self):
+        folder = "evidence/artifacts/claude-federation-docs-20261010/"
+        for name in ("platform.claude.com_wif-providers_github-actions.md",
+                     "platform.claude.com_workload-identity-federation.md"):
+            with self.subTest(snapshot=name):
+                relative = folder + name
+                raw = (ROOT / relative).read_bytes()
+                self.write(relative, raw.decode())
+                self.evidence["files"].append({"path": relative, "sha256": hashlib.sha256(raw).hexdigest(),
+                                               "bytes": len(raw)})
+                self.save()
+                try:
+                    result = validate(self.root)
+                except InvalidPublication as error:
+                    self.fail(f"Exact registered public vendor snapshot was refused: {error}")
+                self.assertEqual(result["hashed_files"], len(self.evidence["files"]))
+
+    def test_vendor_uuid_exception_requires_exact_content_path_and_registration(self):
+        relative = ("evidence/artifacts/claude-federation-docs-20261010/"
+                    "platform.claude.com_wif-providers_github-actions.md")
+        original = (ROOT / relative).read_bytes()
+        for arm in ("changed-and-rehashed", "different-path", "unregistered"):
+            with self.subTest(arm=arm):
+                target = "evidence/artifacts/another-document.md" if arm == "different-path" else relative
+                raw = original + b"\nchanged\n" if arm == "changed-and-rehashed" else original
+                self.write(target, raw.decode())
+                self.evidence["files"] = self.evidence["files"][:2]
+                if arm != "unregistered":
+                    self.evidence["files"].append({"path": target, "sha256": hashlib.sha256(raw).hexdigest(),
+                                                   "bytes": len(raw)})
+                self.save()
+                self.assert_invalid("local session identifier")
+
+    def test_public_uuid_source_exception_does_not_exempt_other_private_patterns(self):
+        from scripts import validate as validator_module
+        relative = ("evidence/artifacts/claude-federation-docs-20261010/"
+                    "platform.claude.com_wif-providers_github-actions.md")
+        # Synthetic text, never a real host path or session identifier.
+        cases = [("/" + "home/fixture/file", "personal home path"),
+                 ("gh" + "p_" + "x" * 36, "GitHub token")]
+        for synthetic, label in cases:
+            with self.subTest(pattern=label):
+                public_example = "-".join(["0" * 8, "0" * 4, "0" * 4, "0" * 4, "0" * 12])
+                content = public_example + "\n" + synthetic + "\n"
+                raw = content.encode()
+                digest = hashlib.sha256(raw).hexdigest()
+                self.write(relative, content)
+                self.evidence["files"] = self.evidence["files"][:2]
+                self.evidence["files"].append({"path": relative, "sha256": digest, "bytes": len(raw)})
+                self.save()
+                with patch.dict(validator_module.PUBLIC_VENDOR_UUID_SNAPSHOTS, {relative: digest}):
+                    self.assert_invalid(label)
+
     def test_changed_artifact_fails_hash_even_when_length_unchanged(self):
         self.write("evidence/artifacts/output.txt", "example 9.0.0\n")
         self.assert_invalid("SHA-256 mismatch")

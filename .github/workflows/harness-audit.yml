@@ -2,8 +2,10 @@ name: harness-audit
 
 # Weekly audit of the always-loaded harness context with the owner's chosen reference, the claude-code-ultimate-guide
 # audit prompt v5.0 (pinned commit and sha256 below). Authenticates by Anthropic workload identity federation: GitHub
-# issues a short-lived OIDC token per run and no Anthropic key is stored in this repository. The federation rule accepts
-# workflows on this repository's main and never pull requests; which workflows may request an OIDC token is governed by
+# issues a short-lived OIDC token per run and no Anthropic key is stored in this repository. Main presents the immutable
+# subject `repo:seathatflowsinourveins@234074349/native-agent-stack@1376766892:ref:refs/heads/main`.
+# Acceptance still depends on the Console rule matching that subject; the denied historical run is not acceptance.
+# The main-only design excludes pull requests; which workflows may request an OIDC token is governed by
 # the reviewed write-grant inventory (id-token: write) that tests.test_workflow_policy enforces. id-token: write here is
 # a reviewed exemption from the tripwire's id-token-write rule (docs/decisions/2026-10-04-ci-least-privilege.md,
 # "Federation exemption (2026-10-08)").

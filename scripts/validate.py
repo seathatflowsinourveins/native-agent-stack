@@ -25,6 +25,16 @@ RECEIPT_KINDS = {
     "native_model_e2e", "native_cli_e2e", "artifact_measurement",
     "historical_inventory", "upstream_provenance", "compatibility_attempt",
 }
+# Public vendor organization-ID examples are not local session identifiers.
+# These two reviewed upstream Markdown captures are immutable by content hash
+# (snapshots.json records URLs, retrieval date and material source locators).
+# This permits only the UUID heuristic, never another private-content pattern.
+PUBLIC_VENDOR_UUID_SNAPSHOTS = {
+    "evidence/artifacts/claude-federation-docs-20261010/platform.claude.com_wif-providers_github-actions.md":
+        "edc97bf1872a1292911b08600aadfc494295009cc6db1da232279dae46c0429b",
+    "evidence/artifacts/claude-federation-docs-20261010/platform.claude.com_workload-identity-federation.md":
+        "d929e36810bcfdcc7a9bf5de39df8b08fbfde60a6d4c138b097f0940feb13bb7",
+}
 PRIVATE_CONTENT = (
     # Historical prose can glue a UUID to a word; word boundaries miss it.
     ("local session identifier", re.compile(r"[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}", re.I)),
@@ -548,6 +558,11 @@ class Validator:
                 continue
             for description, pattern in PRIVATE_CONTENT:
                 if pattern.search(content):
+                    digest = hashlib.sha256(raw).hexdigest()
+                    if (description == "local session identifier" and name in files
+                        and files[name].get("sha256") == digest
+                        and PUBLIC_VENDOR_UUID_SNAPSHOTS.get(name) == digest):
+                        continue
                     # Never echo matched credentials or personal paths.
                     self.error(f"{relative}: contains possible {description}")
 

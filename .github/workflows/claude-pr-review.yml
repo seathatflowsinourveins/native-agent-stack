@@ -13,8 +13,10 @@ name: claude-pr-review
 # Authentication is Anthropic workload identity federation (no Anthropic key in this repository). A dispatch or a
 # schedule run on main presents the immutable subject
 # `repo:seathatflowsinourveins@234074349/native-agent-stack@1376766892:ref:refs/heads/main`.
-# Acceptance still depends on the Console rule matching that subject. A pull_request run instead presents
-# `repo:OWNER@OWNER-ID/REPO@REPO-ID:pull_request` and would run the pull request's own copy of this
+# Acceptance still depends on the Console rule matching that subject. A pull_request run's derived form is
+# `repo:OWNER@OWNER-ID/REPO@REPO-ID:pull_request`: native REST sub_claim_prefix plus the separately documented
+# pull_request suffix (retained OIDC snapshot:332-336, revision35d79cb1, decision2026-10-10).
+# It would run the pull request's own copy of this
 # file, and workflow_run is a trigger this repository's zizmor gate and policy refuse, so the schedule is how every
 # pull request is reached. The resolve job, which holds no token, picks the heads and checks each through the API;
 # the review job checks again with its own read before any token is requested. Both run only while the repository

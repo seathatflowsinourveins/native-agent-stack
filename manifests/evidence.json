@@ -5096,8 +5096,8 @@
     },
     {
       "path": ".github/workflows/claude-pr-review.yml",
-      "sha256": "54464eebb0bab71305bc30433207e37a97d2b2332b2bc391b125786fa15b9abd",
-      "bytes": 38591
+      "sha256": "cd418f9e78fd361bae37dc95d4608c99b70ab6e9b7b2cc3edefd8622cd34876d",
+      "bytes": 38748
     },
     {
       "path": ".github/workflows/claude-pr-toolkit-review.yml",
@@ -5121,8 +5121,8 @@
     },
     {
       "path": ".github/workflows/harness-audit.yml",
-      "sha256": "6be00fced7dd5227c50e0281b8fae05e001b4fc1d5b9ee56d10eb187e6ae765b",
-      "bytes": 19214
+      "sha256": "83704e4710be1e97579e8f9597fa168f74db83e5e374555653d7619724b0b2dc",
+      "bytes": 19414
     },
     {
       "path": ".github/workflows/native-foundation-e2e.yml",
@@ -18442,8 +18442,8 @@
     },
     {
       "path": "docs/decisions/2026-10-08-claude-actions-pr-review.md",
-      "sha256": "d6b5921d5fa79726fbe0fbf4c810e579ee26e6b6fea12b03c8c428e201d71ca4",
-      "bytes": 60104
+      "sha256": "b5bf98840ec13db8957c20f18ca1cf990276af46316076572798894da5c8afb4",
+      "bytes": 60503
     },
     {
       "path": "docs/decisions/2026-10-08-coordinator-research-routing.md",
@@ -18557,8 +18557,8 @@
     },
     {
       "path": "docs/decisions/2026-10-10-claude-federation-diagnostics.md",
-      "sha256": "cbdb61ae50e5cf9effcc44b5dee3b0bc665a87e02445d15b5b46cd3ee4272a01",
-      "bytes": 7092
+      "sha256": "21a8337002fdc432779b8859dffed75c082c95ae43493ef8c5321a1e71b73d04",
+      "bytes": 9558
     },
     {
       "path": "docs/decisions/2026-10-10-codex-lane-omniroute.md",
@@ -19964,6 +19964,31 @@
       "path": "evidence/artifacts/claude-actions-fence-smoke-20261008/receipt.json",
       "sha256": "01872dc3a5b14f9aec4034ed45100fd30c4c6087e8e4e0bb74a2460964380d40",
       "bytes": 4827
+    },
+    {
+      "path": "evidence/artifacts/claude-federation-docs-20261010/README.md",
+      "sha256": "dca179d10a23a80346158e6b72cac68c8c480f3ce4116bce04639ab88081cbe8",
+      "bytes": 2558
+    },
+    {
+      "path": "evidence/artifacts/claude-federation-docs-20261010/docs.github.com_actions_reference_security_oidc.txt",
+      "sha256": "35d79cb17e94732a467c63e59c3a01d18029b47f4b5f9cbf15d92037164b03cd",
+      "bytes": 37248
+    },
+    {
+      "path": "evidence/artifacts/claude-federation-docs-20261010/platform.claude.com_wif-providers_github-actions.md",
+      "sha256": "edc97bf1872a1292911b08600aadfc494295009cc6db1da232279dae46c0429b",
+      "bytes": 14693
+    },
+    {
+      "path": "evidence/artifacts/claude-federation-docs-20261010/platform.claude.com_workload-identity-federation.md",
+      "sha256": "d929e36810bcfdcc7a9bf5de39df8b08fbfde60a6d4c138b097f0940feb13bb7",
+      "bytes": 25749
+    },
+    {
+      "path": "evidence/artifacts/claude-federation-docs-20261010/snapshots.json",
+      "sha256": "b023985d10a9b2b385b859f90b8b8e0658fe62bac608094f395db45e6150c0df",
+      "bytes": 3187
     },
     {
       "path": "evidence/artifacts/claude-foundation-finalization-20260921/qualification.json",
@@ -59652,8 +59677,8 @@
     },
     {
       "path": "scripts/validate.py",
-      "sha256": "abb6eb2f6a906bbbacace4d4a54a8b7d321229fa443c4fbe4fa4a13c4c1f7388",
-      "bytes": 41200
+      "sha256": "1bfad8a033d0b10af7591dba642a11bfc13ca419bd0c25837e87749e4c27bd82",
+      "bytes": 42239
     },
     {
       "path": "scripts/validate_catalogs.py",
@@ -60207,8 +60232,8 @@
     },
     {
       "path": "tests/test_claude_federation_diagnostics.py",
-      "sha256": "ebf3c40d82755a73971fde4ef2eb216f29ca08fce239ef6061ad03e4d968a781",
-      "bytes": 4112
+      "sha256": "9e88eab8e8d043e8935fdf09213998b04fe3266aad6058da6bbe70efd813dbe4",
+      "bytes": 6246
     },
     {
       "path": "tests/test_claude_harness_audit_bounds.py",
@@ -61132,8 +61157,8 @@
     },
     {
       "path": "tests/test_validate.py",
-      "sha256": "ddd4daa3e39a80964b5530dbdb65f3650c5fb26ed980403fb0e728146399a781",
-      "bytes": 47358
+      "sha256": "fee72fef942f9598ac278e3dd80ab74a1449458bbdd3c23f9e7c1736ced4c2fe",
+      "bytes": 50630
     },
     {
       "path": "tests/test_validate_shards.py",
