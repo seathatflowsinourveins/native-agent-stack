@@ -56,7 +56,7 @@ Reading the Markdown under `docs/` (213 files at rc5, 214 at rc6) for corporate 
 
 ## The data catalog
 
-`ParquetDataCatalog` (`nautilus_trader/persistence/__init__.pyi:101` at rc5, `:146` at rc6) stores and queries market data: `write_quote_ticks`, `write_trade_ticks`, `write_order_book_deltas`, `write_bars`, `write_order_book_depths`, `write_mark_price_updates`, `write_index_price_updates`, `write_option_greeks`, `write_instruments`, `write_custom`, `instruments`, the consolidate and delete methods, and in rc6 also status and close writers, a legacy-path migration and Arrow queries. No method adjusts prices. The catalog stays a candidate for what it does, which is storage and query of retained bars.
+`ParquetDataCatalog` (`nautilus_trader/persistence/__init__.pyi:101` at rc5, `:146` at rc6) stores and queries market data: `write_quote_ticks`, `write_trade_ticks`, `write_order_book_deltas`, `write_bars`, `write_order_book_depths`, `write_mark_price_updates`, `write_index_price_updates`, `write_option_greeks`, `write_instruments`, `write_custom_data` (`:218` at rc5, `:309` at rc6), `instruments`, the consolidate and delete methods, and in rc6 also status and close writers, a legacy-path migration and Arrow queries. No method adjusts prices. The catalog stays a candidate for what it does, which is storage and query of retained bars.
 
 ## Limits of the claim
 

@@ -2082,6 +2082,13 @@ class StandingRuleSurfacesTests(unittest.TestCase):
         self.assertEqual(engine["requested_version"], "2.0.0rc5")
         self.assertEqual(engine["source_commit"], self.LAYER_15_RELEASES[0][3])
 
+    def test_layer_15_record_names_the_catalog_custom_writer_as_the_stubs_declare_it(self):
+        """Both persistence stubs declare `write_custom_data` (nautilus_trader/persistence/__init__.pyi:218 at rc5,
+        :309 at rc6); the record once said `write_custom`, which neither release has."""
+        text = " ".join((ROOT / self.LAYER_15_RECORD).read_text(encoding="utf-8").split())
+        self.assertIn("`write_custom_data`", text)
+        self.assertIsNone(re.search(r"`write_custom`", text))
+
     LAYER_15_LOCK = "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock"
     LAYER_15_TIME = re.compile(r"(\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d)(?:\.\d+)?Z")
 
