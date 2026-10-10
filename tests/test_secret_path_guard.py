@@ -5603,12 +5603,14 @@ class S6FalsePositiveTests(unittest.TestCase):
         self.assertEqual(done.stdout, "")
         self.assertEqual(done.stderr, "")
 
-    def test_jq_json_env_key_and_filename_are_not_dotenv_reads(self):
+    def test_jq_filter_mentions_and_key_listings_are_not_dotenv_paths(self):
         for command in (
                 "jq -r '.env.TMPDIR' runtime.json",
-                "jq -r '.env.TMPDIR' .env-metadata.json",
-                "jq -r '.env.TMPDIR' snapshots/.env.json",
-                "jq -r '.temporary_directory' snapshots/.env.json"):
+                "jq -r '.env | keys[]' runtime.json",
+                "jq -r '.env // {} | keys[]' runtime.json",
+                "jq -r '.env | to_entries[] | .key' runtime.json",
+                "jq '.env' runtime.json",
+                "jq -r '.env | keys[]' runtime.env-metadata.json"):
             with self.subTest(command=command):
                 self.assert_allowed_hook(command)
 
@@ -5619,6 +5621,9 @@ class S6FalsePositiveTests(unittest.TestCase):
             "cat .envrc": "dotenv_read",
             "cat deployment.env": "dotenv_read",
             "cat .env.json": "dotenv_read",
+            "jq -r '.env.TMPDIR' .env-metadata.json": "dotenv_read",
+            "jq -r '.env.TMPDIR' snapshots/.env.json": "dotenv_read",
+            "jq -r '.temporary_directory' snapshots/.env.json": "dotenv_read",
             "jq -r '.env.TMPDIR' .env": "dotenv_read",
             "jq -r '.env.TMPDIR' .env.local": "dotenv_read",
             "jq --rawfile data .env '.env.TMPDIR' metadata.json": "dotenv_read",
@@ -5691,10 +5696,64 @@ class S6FalsePositiveTests(unittest.TestCase):
                 self.assertEqual(done.stdout, "")
 
     def test_jq_numeric_input_before_output_redirection_is_not_a_descriptor(self):
-        for command in ("jq -r '.env.TMPDIR' 3 > output.log metadata.json",
-                        'jq -r \'.env.TMPDIR\' "3" > output.log metadata.json'):
+        for command in ("jq -r '.env.TMPDIR' 3 > output.log .env.json",
+                        'jq -r \'.env.TMPDIR\' "3" > output.log .env.json'):
             with self.subTest(command=command):
                 self.assertEqual(guard.check(command), "dotenv_read")
+
+    def test_cc_p1_jq_actual_dotenv_json_inputs_stay_denied(self):
+        for command in ("jq -r .DB_PASSWORD .env.json", "jq .env .env.json",
+                        "jq -r .token secrets/.env.json", "jq -r .env.TMPDIR .envrc.json",
+                        "jq -r '.env.TMPDIR' .env-metadata.json",
+                        "jq -r '.env.TMPDIR' snapshots/.env.json"):
+            with self.subTest(command=command):
+                self.assertEqual(guard.check(command), "dotenv_read")
+                done = run_hook({"tool_name": "Bash", "tool_input": {"command": command}})
+                self.assertEqual(done.returncode, 2)
+                self.assertEqual(done.stdout, "")
+
+    def test_cc_jq_filter_exemption_keeps_file_options_and_stdin_checked(self):
+        for command in ("jq --rawfile data .env '.env | keys[]' runtime.json",
+                        "jq --slurpfile data .env '.env | keys[]' runtime.json",
+                        "jq -f .env runtime.json", "jq -f query.jq .env.json",
+                        "jq < .env -r '.env | keys[]' runtime.json",
+                        "jq -r '.env | keys[]' runtime.json < .env.json",
+                        "jq --arg key metadata '.env | keys[]' .env.local"):
+            with self.subTest(command=command):
+                self.assertEqual(guard.check(command), "dotenv_read")
+
+    def test_cc_jq_numeric_filter_before_redirection_never_hides_dotenv_input(self):
+        for command in ("jq 3 > output.log .env.json", "jq -r 3 > output.log .env.local",
+                        'jq "3" > output.log .env.json', "jq -r 3 > output.log .env"):
+            with self.subTest(command=command):
+                self.assertEqual(guard.check(command), "dotenv_read")
+
+    def test_cc_p1_xargs_appended_operands_never_get_diagnostic_exemptions(self):
+        for command in (
+                "echo GH_TOKEN | xargs printenv TMPDIR",
+                "echo ANTHROPIC_API_KEY | xargs printenv TMPDIR",
+                "echo CLAUDE_CODE_OAUTH_TOKEN | xargs printenv TMPDIR",
+                "echo GH_TOKEN | xargs -n1 printenv TMPDIR",
+                "xargs -a names.txt printenv TMPDIR",
+                "echo GH_TOKEN | xargs timeout 5 printenv TMPDIR",
+                "echo GH_TOKEN | xargs rtk proxy printenv TMPDIR",
+                "echo GH_TOKEN | xargs coreutils printenv TMPDIR",
+                "echo GH_TOKEN | timeout 5 xargs printenv TMPDIR",
+                "printenv TMPDIR; echo GH_TOKEN | xargs printenv TMPDIR",
+                "echo GH_TOKEN=example | xargs env -i",
+                "xargs -a assignments.txt env --ignore-environment",
+                "env -i; echo GH_TOKEN=example | xargs env -i"):
+            with self.subTest(command=command):
+                self.assertIsNotNone(guard.check(command))
+                done = run_hook({"tool_name": "Bash", "tool_input": {"command": command}})
+                self.assertEqual(done.returncode, 2)
+                self.assertEqual(done.stdout, "")
+
+    def test_xargs_operand_provenance_does_not_cross_independent_segments(self):
+        for command in ("xargs echo; printenv TMPDIR", "xargs echo; env -i",
+                        "echo hello | xargs echo; timeout 5 printenv TMPDIR"):
+            with self.subTest(command=command):
+                self.assert_allowed_hook(command)
 
     def test_executable_heredocs_substitutions_and_suffixes_stay_denied(self):
         for command in (
