@@ -839,32 +839,34 @@ header records this as synthetic/local-integration evidence on a disposable
 runner, not a second-machine developer-laptop acceptance. The schedule and PR
 selection follow the [2026-10-05 section](#scheduled-portability-and-report-only-lanes-2026-10-05).
 
-### Secret-scan coverage boundary (2026-09-22, updated 2026-09-23)
+### Secret-scan coverage boundary (2026-09-22, updated 2026-10-10)
 
 The first hosted run of the `secret-scan` job was cancelled by its own timeout while
 scanning history: every commit re-diffs the 11 MB generated explorer
-`docs/ecosystem/index.html`. The job now passes `--config .gitleaks.toml` and
-`--max-target-megabytes 2`.
+`docs/ecosystem/index.html`. The earlier workaround added
+`--max-target-megabytes 2`; that blanket skip is now removed from both scanners.
+The reviewed `.gitleaks.toml` excludes only the exact generated path
+`^docs/ecosystem/index\.html$`, including its retained historical versions.
 
 As of 2026-09-23 (`docs/decisions/2026-09-23-generated-explorer-sorted-manifest.md`),
 `docs/ecosystem/index.html` is generated locally with
 `python3 scripts/build_ecosystem.py --write` and is no longer committed: it is
 `.gitignore`d, and `publish-catalog.yml` builds and publishes it as its own attested
 workflow artifact instead (7-day retention, `workflow_dispatch`/`v*`-tag runs
-only). `gitleaks dir .` (working-tree mode) therefore has nothing
-generated left to skip in the current tree, and a `gitleaks git .` scan of any commit
-made after this change has nothing generated to skip either. The size-based skip
-remains an **incomplete-coverage boundary only for the repository's existing git
-history**: every commit before this change still carries the old committed
-`docs/ecosystem/index.html` (up to ~13 MB) inside `git`'s object history, so a full
-`gitleaks git .` history scan still skips those old blobs at `--max-target-megabytes 2`.
-`--max-target-megabytes 2` itself is kept as a general guard against any other
-oversized file that might be committed in the future, not specifically for the
-explorer any more.
+only). **Incomplete coverage is the explicit generated-HTML path exclusion**;
+other large current files and retained non-explorer changes are scanned under
+the run's existing event scope. Native tests found the old cap skipped dir
+targets above 2,000,000 bytes in gitleaks8.30.1 and betterleaks1.8.1, and git
+fragments at 3,000,000 bytes in gitleaks8.30.1. It therefore affected current
+manifests and source/evidence catalog files too, not only old explorer history.
+The vendor default is cap0. Canaries at both boundaries now detect using actual
+workflow arguments; adjacent/prefixed HTML paths remain covered. Linux runner
+test output records elapsed seconds and peak RSS. See the
+[native boundary and fix record](decisions/2026-10-10-secret-scan-large-targets.md).
 
-Gitleaks' size-based skip only ever applied to *git* scanning, and never covered
-the published artifact itself (gitleaks never saw a gitignored file at all,
-regardless of size). A fix round on 2026-09-22 found that the built,
+The earlier size-based skip applied to both git fragments and dir files; the
+generated explorer's separate publication check remains necessary for this
+explicit exclusion. A fix round on 2026-09-22 found that the built,
 soon-to-be-attested explorer therefore went through neither `validate.py`'s
 private-content scan (`scan_publication()` only walks git-tracked/listed
 paths) nor gitleaks before publication -- the same class of finding that

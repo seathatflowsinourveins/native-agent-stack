@@ -1,0 +1,258 @@
+{
+  "schema_version": 1,
+  "id": "secret-scan-large-targets-20261010",
+  "evidence_class": "local_integration",
+  "base_main": "c8a29c3ee9b4337564165d9e588b3fe81e8ba817",
+  "observed_at": "2026-10-10T08:55:12Z",
+  "time_source": "date -u",
+  "host_class": "Linux WSL; local scanner subprocess measurements, not hosted GitHub acceptance",
+  "gitleaks": {
+    "version": "8.30.1",
+    "pin": "83d9cd684c87d95d656c1458ef04895a7f1cbd8e"
+  },
+  "betterleaks": {
+    "version": "1.8.1",
+    "pin": "5eab48332cc48565864514e3bc6de89df091a7c4",
+    "release_sha256": "efa407244e1ea8e35f582b8a42becdeac08bdead04f68eb752adda722d583c2a"
+  },
+  "red": {
+    "rc": 1,
+    "output_sha256": "b116754b29af95484549813efdeed158cd2113ca68aa7303db9ee9d95b5cad55",
+    "summary": [
+      "large-file-scan-metrics: {\"elapsed_seconds\": 0.28, \"findings\": 0, \"host\": \"Linux\", \"mode\": \"dir\", \"peak_rss_kib\": 42236, \"rc\": 0, \"scanner\": \"betterleaks\", \"size_bytes\": 2000001}",
+      "large-file-scan-metrics: {\"elapsed_seconds\": 0.28, \"findings\": 0, \"host\": \"Linux\", \"mode\": \"dir\", \"peak_rss_kib\": 42732, \"rc\": 0, \"scanner\": \"betterleaks\", \"size_bytes\": 3000000}",
+      "large-file-scan-metrics: {\"elapsed_seconds\": 0.27, \"findings\": 1, \"host\": \"Linux\", \"mode\": \"dir\", \"peak_rss_kib\": 44284, \"rc\": 0, \"scanner\": \"betterleaks\", \"size_bytes\": 256}",
+      "large-file-scan-metrics: {\"elapsed_seconds\": 0.66, \"findings\": 1, \"host\": \"Linux\", \"mode\": \"git\", \"peak_rss_kib\": 106164, \"rc\": 1, \"scanner\": \"gitleaks\", \"size_bytes\": 2000001}",
+      "large-file-scan-metrics: {\"elapsed_seconds\": 0.55, \"findings\": 0, \"host\": \"Linux\", \"mode\": \"git\", \"peak_rss_kib\": 111284, \"rc\": 0, \"scanner\": \"gitleaks\", \"size_bytes\": 3000000}",
+      "large-file-scan-metrics: {\"elapsed_seconds\": 0.39, \"findings\": 0, \"host\": \"Linux\", \"mode\": \"dir\", \"peak_rss_kib\": 61556, \"rc\": 0, \"scanner\": \"gitleaks\", \"size_bytes\": 2000001}",
+      "large-file-scan-metrics: {\"elapsed_seconds\": 0.39, \"findings\": 0, \"host\": \"Linux\", \"mode\": \"dir\", \"peak_rss_kib\": 61612, \"rc\": 0, \"scanner\": \"gitleaks\", \"size_bytes\": 3000000}",
+      "large-file-scan-metrics: {\"elapsed_seconds\": 0.4, \"findings\": 1, \"host\": \"Linux\", \"mode\": \"git\", \"peak_rss_kib\": 59572, \"rc\": 1, \"scanner\": \"gitleaks\", \"size_bytes\": 256}",
+      "large-file-scan-metrics: {\"elapsed_seconds\": 0.41, \"findings\": 1, \"host\": \"Linux\", \"mode\": \"dir\", \"peak_rss_kib\": 61044, \"rc\": 1, \"scanner\": \"gitleaks\", \"size_bytes\": 256}",
+      "FAIL: test_dir_finds_canaries_above_both_old_skip_boundaries (tests.test_secret_scan_size.BetterleaksLargeFileTests.test_dir_finds_canaries_above_both_old_skip_boundaries) (size=2000001)",
+      "AssertionError: [] is not true : Native betterleaks workflow arguments silently skip this large canary target",
+      "FAIL: test_dir_finds_canaries_above_both_old_skip_boundaries (tests.test_secret_scan_size.BetterleaksLargeFileTests.test_dir_finds_canaries_above_both_old_skip_boundaries) (size=3000000)",
+      "AssertionError: [] is not true : Native betterleaks workflow arguments silently skip this large canary target",
+      "FAIL: test_only_the_exact_generated_explorer_path_is_excluded (tests.test_secret_scan_size.BetterleaksLargeFileTests.test_only_the_exact_generated_explorer_path_is_excluded)",
+      "AssertionError: Lists differ: [{'RuleID': 'github-pat', 'Description': '[549 chars] ''}] != []",
+      "FAIL: test_git_and_dir_find_canaries_above_both_old_skip_boundaries (tests.test_secret_scan_size.GitleaksLargeFileTests.test_git_and_dir_find_canaries_above_both_old_skip_boundaries) (mode='git', size=3000000)",
+      "AssertionError: [] is not true : Native workflow arguments silently skip this large canary target",
+      "FAIL: test_git_and_dir_find_canaries_above_both_old_skip_boundaries (tests.test_secret_scan_size.GitleaksLargeFileTests.test_git_and_dir_find_canaries_above_both_old_skip_boundaries) (mode='dir', size=2000001)",
+      "AssertionError: [] is not true : Native workflow arguments silently skip this large canary target",
+      "FAIL: test_git_and_dir_find_canaries_above_both_old_skip_boundaries (tests.test_secret_scan_size.GitleaksLargeFileTests.test_git_and_dir_find_canaries_above_both_old_skip_boundaries) (mode='dir', size=3000000)",
+      "AssertionError: [] is not true : Native workflow arguments silently skip this large canary target",
+      "FAIL: test_only_the_exact_generated_explorer_path_is_excluded (tests.test_secret_scan_size.GitleaksLargeFileTests.test_only_the_exact_generated_explorer_path_is_excluded) (mode='git')",
+      "AssertionError: Lists differ: [{'RuleID': 'github-pat', 'Description': '[593 chars]:1'}] != []",
+      "FAIL: test_only_the_exact_generated_explorer_path_is_excluded (tests.test_secret_scan_size.GitleaksLargeFileTests.test_only_the_exact_generated_explorer_path_is_excluded) (mode='dir')",
+      "AssertionError: Lists differ: [{'RuleID': 'github-pat', 'Description': '[448 chars]:1'}] != []",
+      "Ran 4 tests in 3.861s",
+      "FAILED (failures=8)"
+    ]
+  },
+  "green": {
+    "rc": 0,
+    "output_sha256": "c60350c23f78b5fedfc242fed26338a733cba5e1228d87709a15b7e36c1e6ab1",
+    "metrics": [
+      {
+        "elapsed_seconds": 0.31,
+        "findings": 1,
+        "host": "Linux",
+        "mode": "dir",
+        "peak_rss_kib": 43708,
+        "rc": 0,
+        "scanner": "betterleaks",
+        "size_bytes": 2000001
+      },
+      {
+        "elapsed_seconds": 0.33,
+        "findings": 1,
+        "host": "Linux",
+        "mode": "dir",
+        "peak_rss_kib": 46332,
+        "rc": 0,
+        "scanner": "betterleaks",
+        "size_bytes": 3000000
+      },
+      {
+        "elapsed_seconds": 0.34,
+        "findings": 0,
+        "host": "Linux",
+        "mode": "dir",
+        "peak_rss_kib": 42172,
+        "rc": 0,
+        "scanner": "betterleaks",
+        "size_bytes": 256
+      },
+      {
+        "elapsed_seconds": 0.29,
+        "findings": 1,
+        "host": "Linux",
+        "mode": "dir",
+        "peak_rss_kib": 42236,
+        "rc": 0,
+        "scanner": "betterleaks",
+        "size_bytes": 256
+      },
+      {
+        "elapsed_seconds": 0.65,
+        "findings": 1,
+        "host": "Linux",
+        "mode": "git",
+        "peak_rss_kib": 110700,
+        "rc": 1,
+        "scanner": "gitleaks",
+        "size_bytes": 2000001
+      },
+      {
+        "elapsed_seconds": 0.76,
+        "findings": 1,
+        "host": "Linux",
+        "mode": "git",
+        "peak_rss_kib": 135340,
+        "rc": 1,
+        "scanner": "gitleaks",
+        "size_bytes": 3000000
+      },
+      {
+        "elapsed_seconds": 0.43,
+        "findings": 1,
+        "host": "Linux",
+        "mode": "dir",
+        "peak_rss_kib": 62644,
+        "rc": 1,
+        "scanner": "gitleaks",
+        "size_bytes": 2000001
+      },
+      {
+        "elapsed_seconds": 0.45,
+        "findings": 1,
+        "host": "Linux",
+        "mode": "dir",
+        "peak_rss_kib": 61048,
+        "rc": 1,
+        "scanner": "gitleaks",
+        "size_bytes": 3000000
+      },
+      {
+        "elapsed_seconds": 0.41,
+        "findings": 0,
+        "host": "Linux",
+        "mode": "git",
+        "peak_rss_kib": 62072,
+        "rc": 0,
+        "scanner": "gitleaks",
+        "size_bytes": 256
+      },
+      {
+        "elapsed_seconds": 0.41,
+        "findings": 1,
+        "host": "Linux",
+        "mode": "git",
+        "peak_rss_kib": 60596,
+        "rc": 1,
+        "scanner": "gitleaks",
+        "size_bytes": 256
+      },
+      {
+        "elapsed_seconds": 0.41,
+        "findings": 1,
+        "host": "Linux",
+        "mode": "git",
+        "peak_rss_kib": 62072,
+        "rc": 1,
+        "scanner": "gitleaks",
+        "size_bytes": 256
+      },
+      {
+        "elapsed_seconds": 0.4,
+        "findings": 0,
+        "host": "Linux",
+        "mode": "dir",
+        "peak_rss_kib": 63668,
+        "rc": 0,
+        "scanner": "gitleaks",
+        "size_bytes": 256
+      },
+      {
+        "elapsed_seconds": 0.4,
+        "findings": 1,
+        "host": "Linux",
+        "mode": "dir",
+        "peak_rss_kib": 61620,
+        "rc": 1,
+        "scanner": "gitleaks",
+        "size_bytes": 256
+      },
+      {
+        "elapsed_seconds": 0.39,
+        "findings": 1,
+        "host": "Linux",
+        "mode": "dir",
+        "peak_rss_kib": 60532,
+        "rc": 1,
+        "scanner": "gitleaks",
+        "size_bytes": 256
+      }
+    ],
+    "tests": 4,
+    "seconds": 6.294
+  },
+  "betterleaks_directory_boundary": [
+    {
+      "elapsed_seconds": 0.3,
+      "findings": 1,
+      "host": "Linux",
+      "mode": "dir",
+      "peak_rss_kib": 45308,
+      "rc": 0,
+      "scanner": "betterleaks",
+      "size_bytes": 1999999
+    },
+    {
+      "elapsed_seconds": 0.29,
+      "findings": 1,
+      "host": "Linux",
+      "mode": "dir",
+      "peak_rss_kib": 44336,
+      "rc": 0,
+      "scanner": "betterleaks",
+      "size_bytes": 2000000
+    },
+    {
+      "elapsed_seconds": 0.28,
+      "findings": 0,
+      "host": "Linux",
+      "mode": "dir",
+      "peak_rss_kib": 42748,
+      "rc": 0,
+      "scanner": "betterleaks",
+      "size_bytes": 2000001
+    },
+    {
+      "elapsed_seconds": 0.27,
+      "findings": 0,
+      "host": "Linux",
+      "mode": "dir",
+      "peak_rss_kib": 42472,
+      "rc": 0,
+      "scanner": "betterleaks",
+      "size_bytes": 2999999
+    },
+    {
+      "elapsed_seconds": 0.27,
+      "findings": 0,
+      "host": "Linux",
+      "mode": "dir",
+      "peak_rss_kib": 42236,
+      "rc": 0,
+      "scanner": "betterleaks",
+      "size_bytes": 3000000
+    }
+  ],
+  "limits": [
+    "All canaries fabricated from the existing synthetic GitHub PAT fixture; no credential used.",
+    "Git fixtures contain a clean base and one target commit; local scans always use base..HEAD.",
+    "Measurements include the scanner as invoked and do not establish production full-repository cost.",
+    "Native hosted regression steps emit GNU-time metrics after their verified binary installation; those hosted values are acceptance after PR publication.",
+    "Only exact docs/ecosystem/index.html is deliberately excluded; all other size-based skips removed."
+  ]
+}

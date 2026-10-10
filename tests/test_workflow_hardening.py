@@ -1423,6 +1423,20 @@ class GitleaksConfigTestsRunInCI(unittest.TestCase):
         self.assertLess(install, job.index("gitleaks allowlist regression tests"),
                         "the tests must run after the pinned binary is installed")
 
+    def test_native_jobs_require_large_file_coverage_without_a_size_skip(self):
+        text = (WORKFLOWS / "validate.yml").read_text()
+        sections = jobs(text)
+        for job_name in ("secret-scan", "secret-scan-betterleaks"):
+            self.assertNotIn("--max-target-megabytes", uncommented(sections[job_name]))
+        required = step_block(sections["secret-scan"], "gitleaks allowlist regression tests")
+        self.assertIn("tests.test_secret_scan_size.GitleaksLargeFileTests", required)
+        trial = sections["secret-scan-betterleaks"]
+        native = step_block(trial, "Require detection in large working-tree fixtures")
+        self.assertEqual(block_if(native), "${{ !cancelled() && steps.install.outcome == 'success' }}")
+        self.assertIn("${{ runner.temp }}/betterleaks/betterleaks", native)
+        self.assertIn("tests.test_secret_scan_size.BetterleaksLargeFileTests", native)
+        self.assertLess(trial.index("Install betterleaks"), trial.index("Require detection in large working-tree fixtures"))
+
 
 class BetterleaksTrialJobTests(unittest.TestCase):
     """The non-required betterleaks trial beside secret-scan (plan move M3; receipt
@@ -1781,7 +1795,12 @@ class BetterleaksTrialJobTests(unittest.TestCase):
         and quoted its findings; it now redacts (tests/test_gitleaks_config.py ScannerErrorTests.test_f)."""
         step = step_block(self.job, "fixture tests with betterleaks")
         self.assertIn("GITLEAKS_TESTS_REQUIRED: '1'", step)
-        self.assertEqual(len(unittest_invocations(self.job)), 1, "the fixture step is the job's only unittest run")
+        self.assertEqual(len(unittest_invocations(self.job)), 2,
+                         "only the legacy fixture step and the native large-target class run")
+        large = step_block(self.job, "Require detection in large working-tree fixtures")
+        (large_args,) = unittest_invocations(large)
+        self.assertEqual([arg for arg in large_args if arg not in QUIET_FLAGS],
+                         ["tests.test_secret_scan_size.BetterleaksLargeFileTests"])
         (args,) = unittest_invocations(step)
         (module,) = re.findall(r"(?m)^\s*m=(\S+)\s*$", step)
         named = [arg.strip('"').replace("$m", module) for arg in args if arg not in QUIET_FLAGS]
