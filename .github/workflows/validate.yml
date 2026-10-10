@@ -493,9 +493,10 @@ jobs:
           # generated explorer HTML is skipped (recorded as incomplete coverage in
           # docs/github-automation.md). PRs use their verified range; pushes follow the
           # CC's vendor baseline (--no-merges --first-parent range, or -1 for a new/forced
-          # branch). Dispatch uses the intentional full-history backstop on CI only.
+          # branch). Dispatch uses the intentional HEAD-ancestry backstop on CI only.
           # Source: gitleaks/gitleaks-action@bcfb9cce, src/gitleaks.js:103-115.
-          # A local full-history scan reached 72.6 GB and was OOM-killed on 2026-10-09;
+          # A local full-history scan reached 72,638,124 KiB anon-rss (about 69.3 GiB)
+          # and was OOM-killed on 2026-10-09;
           # local scans remain PR-range-only. The 2 MB limit is per target, not a RAM cap.
           # Git's default merge-diff handling is unchanged; the dir scan checks the merge result.
           "$RUNNER_TEMP/gitleaks/gitleaks" git . --config .gitleaks.toml --max-target-megabytes 2 \
@@ -639,6 +640,8 @@ jobs:
           exit "$status"
       - name: Scan git history for secrets with betterleaks (findings do not fail this job)
         if: ${{ !cancelled() && steps.install.outcome == 'success' && steps.scan_range.outcome == 'success' }}
+        # Git mode has no size cap; keep its HEAD backstop within a native step budget.
+        timeout-minutes: 10
         env:
           SCAN_LOG_OPTS: ${{ steps.scan_range.outputs.log_opts }}
         run: |

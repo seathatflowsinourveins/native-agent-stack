@@ -5126,8 +5126,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "1fc258abc49c1a62f7a4e13124e85759e378d0eded4c61c2d1f0ac60feaa11be",
-      "bytes": 44417
+      "sha256": "9e39a3cff53b4fbdfca437f721215142d6bb62bdbaaae26949fb1e7756dff2bc",
+      "bytes": 44579
     },
     {
       "path": ".gitignore",
@@ -5136,8 +5136,8 @@
     },
     {
       "path": ".gitleaks.toml",
-      "sha256": "36d8049cef393b9786c912975cbad5eddf676d1e357f2773ed47afee0dc7d342",
-      "bytes": 32556
+      "sha256": "92e256ebcf4541508e74f254171dee657a8368b97de9a3b842a7f31724a16846",
+      "bytes": 32901
     },
     {
       "path": ".gitleaksignore",
@@ -5646,8 +5646,8 @@
     },
     {
       "path": "adoption/tools/README.md",
-      "sha256": "26cd1c2ac3d50e26f71e6080c9cff72711dd38f8fe9c5b2c4dfbb913e0f50d0a",
-      "bytes": 41166
+      "sha256": "bd53361db6d9fb8c9793a083931b8ea091b89d2eefeed7fc12cf4324e6ed1558",
+      "bytes": 42055
     },
     {
       "path": "adoption/tools/ecosystem-bounded-run",
@@ -18527,8 +18527,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "ccc7c8b9c951a39e537f42819a5c29ece64a8db5c6d4caf60d70e9dc945d61c6",
-      "bytes": 103436
+      "sha256": "993f10b5624b6ab74e2882ee8b54ceed9dd092cc9a3763f44d19b07216bc1f2c",
+      "bytes": 105063
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -59132,8 +59132,8 @@
     },
     {
       "path": "scripts/ci_secret_scan_range.py",
-      "sha256": "b3065c95d2cb12d2e073d37ba276481df0c1d9f32c984de2088653b07b7f1000",
-      "bytes": 8149
+      "sha256": "2191d6814d972ceedaac6db4d28bf9e4e474fd72146f7f489c31c2fb4b1331a6",
+      "bytes": 8103
     },
     {
       "path": "scripts/codex_quota.py",
@@ -59792,8 +59792,8 @@
     },
     {
       "path": "tests/test_ci_secret_scan_range.py",
-      "sha256": "bfc239b9b68c7ba88d6727dfc342594d1bfb93c87f4b0fc9e687aca80bb677ff",
-      "bytes": 13268
+      "sha256": "0a232c6a59491352cfb16cae82b8e02c06c36a1126dbce6f3ba971eab10da21c",
+      "bytes": 14570
     },
     {
       "path": "tests/test_claude_pr_review_workflow.py",
@@ -59992,8 +59992,8 @@
     },
     {
       "path": "tests/test_gitleaks_config.py",
-      "sha256": "73747790b37b525acae3a61ee3ec840410732da20329b96e9b83787eca1f7046",
-      "bytes": 70576
+      "sha256": "7e64a1344b45a121164d5fc8982f99bd6dd3b863a3b377f17b4cfac984caebf8",
+      "bytes": 74081
     },
     {
       "path": "tests/test_gitleaks_guarded_macos.py",
@@ -60697,8 +60697,8 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "030329e2af541e2a24363ca9620969556632d728772ccfc3c802d0bbe6630bca",
-      "bytes": 173156
+      "sha256": "1306f4e2645c3253b3d42d6eca547eb988346181e489b01c29ef64667dff1f3c",
+      "bytes": 173684
     },
     {
       "path": "tests/test_workflow_policy.py",

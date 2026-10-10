@@ -1423,6 +1423,13 @@ class CiSecretScanWorkflowRangeTests(unittest.TestCase):
                         self.assertFalse(evaluate_expression(expression, context),
                                          "a broken or absent range must never enable a scanner")
 
+    def test_betterleaks_history_scan_has_its_own_ten_minute_budget(self):
+        job = self.parsed_workflow()["jobs"]["secret-scan-betterleaks"]
+        self.assertEqual(str(job["timeout-minutes"]), "20", "the existing whole-job budget stays intact")
+        history = next(step for step in job["steps"] if "Scan git history" in step.get("name", ""))
+        self.assertEqual(str(history.get("timeout-minutes")), "10",
+                         "betterleaks git mode needs its own time bound because its size cap is ignored")
+
 
 class BetterleaksTrialJobTests(unittest.TestCase):
     """The non-required betterleaks trial beside secret-scan (plan move M3; receipt

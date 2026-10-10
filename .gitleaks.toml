@@ -84,8 +84,9 @@
 # the full rationale, the generation commands, and the rule that fingerprints
 # are added only for reviewed false positives, never for real secrets.
 #
-# After this config (and the root .gitleaksignore, which gitleaks reads by
-# default), `gitleaks git . --config .gitleaks.toml --max-target-megabytes 2`
+# Historical acceptance, re-measured 2026-09-22: after this config (and the
+# root .gitleaksignore, which gitleaks reads by default),
+# `gitleaks git . --config .gitleaks.toml --max-target-megabytes 2`
 # restricted to this branch's own ancestry (--log-opts="HEAD") scanned 409
 # commits (~1.03 GB) and produced 0 findings (re-measured 2026-09-22,
 # codex-review-83b fix round, after replacing the prose-narrative regex
@@ -100,17 +101,21 @@
 # before .gitleaksignore was added to re-suppress them individually. The
 # default-log-opts (all-refs) count and any out-of-ancestry sibling-branch
 # finding reported by an earlier revision of this comment were NOT re-measured
-# in this fix round: this is a shared repository with other active branches,
-# so a rerun on a different day can see a different count; only the
-# HEAD-scoped 0-findings result above is this unit's own acceptance evidence,
-# and reaching 0 on the default (all-refs) command may still require either
-# `--log-opts="HEAD"` or another branch's own fix -- unchanged from before,
-# and still a coordinator decision, not resolved by this unit.
-# Resolved 2026-09-23 by the coordinator: CI's secret-scan job now passes
-# --log-opts="HEAD", scanning the ancestry of what the run would land (a pull
-# request's merge commit, or main on push). The all-refs default had let
-# open PR #116's branch fail PR #117's required check; each branch is still
-# scanned by its own pull request's run.
+# in that fix round. Only the dated HEAD-scoped 0-findings result above was
+# that unit's acceptance evidence; the sibling-branch issue was then a
+# coordinator decision. These are historical results, not measurements of
+# the current PR-range policy.
+# Resolved 2026-09-23 by the coordinator: CI then passed --log-opts="HEAD",
+# scanning the ancestry of the PR merge commit or main on push. The all-refs
+# default had let open PR #116's branch fail PR #117's required check.
+# Current policy, 2026-10-10: PRs scan a verified PR-owned range; normal pushes
+# use --no-merges --first-parent <before>..<after>. All-zero or nonancestor
+# before selects --log-opts=-1, the head commit only. Scheduled and manually
+# dispatched CI backstops use --log-opts=HEAD, the checked-out commit's ancestry,
+# never all refs; those backstops are CI-only. Local scans use
+# --log-opts="<merge-base>..HEAD" only, never full history or --all.
+# The --max-target-megabytes 2 option is a per-target skip threshold, not an
+# aggregate-memory limit; betterleaks 1.8.1's Git source does not apply it.
 #
 # Before the whole-line-anchoring fix above, the same `--log-opts="HEAD"` command
 # (anchored to a single line only, pre-fix) additionally flagged two corpus_files

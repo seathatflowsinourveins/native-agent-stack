@@ -130,6 +130,19 @@ def _scan_findings(scan_args: list, report_path: Path, cwd=None) -> list:
     return _findings(report)
 
 
+def _commit_synthetic_fixture(directory: Path, message: str, *, env=None):
+    """Commit only a disposable fixture under the CC's explicit hook-isolation exception.
+
+    The per-command override follows scripts/git-hooks/pre-push:130. It does not
+    persist a Git setting or apply to a production commit or push.
+    """
+    return subprocess.run(
+        ["git", "-c", "core.hooksPath=/dev/null", "-c", "user.name=gitleaks-test", "-c", "user.email=gitleaks-test@example.invalid",
+         "commit", "-m", message],
+        cwd=str(directory), env=env, capture_output=True, text=True, check=False,
+    )
+
+
 def _run_gitleaks(target_dir: Path) -> list:
     """Run `gitleaks dir .` (cwd = target_dir) with the real repo config.
 
@@ -622,15 +635,6 @@ class GitleaksIgnoreFingerprintTests(unittest.TestCase):
     def setUp(self):
         self.assertTrue(self.GITLEAKSIGNORE_PATH.exists(), ".gitleaksignore must exist at repo root")
 
-    def tearDown(self):
-        worktree = getattr(self, "_worktree", None)
-        if worktree is not None:
-            subprocess.run(
-                ["git", "worktree", "remove", "--force", str(worktree)],
-                cwd=str(ROOT), capture_output=True, text=True, check=False,
-            )
-            shutil.rmtree(worktree, ignore_errors=True)
-
     def _ignore_lines(self):
         return [
             line.strip()
@@ -729,16 +733,8 @@ class GitleaksIgnoreFingerprintTests(unittest.TestCase):
         would fail this test differently than the correct one.
 
         Uses a real, tracked narrative line (not a synthetic fixture file),
-        modified in a disposable detached worktree so the injected marker
+        copied into a disposable isolated Git repository so the injected marker
         never touches this repository's actual history or working tree."""
-        rev_parse = subprocess.run(
-            ["git", "rev-parse", "HEAD"], cwd=str(ROOT),
-            capture_output=True, text=True, check=False,
-        )
-        if rev_parse.returncode != 0:
-            self.skipTest("could not resolve the fingerprint fixture's baseline commit")
-        baseline = rev_parse.stdout.strip()
-
         target_path = self.NARRATIVE_FILES[0]
         fingerprinted_lines = []
         for raw in self._ignore_lines():
@@ -754,16 +750,19 @@ class GitleaksIgnoreFingerprintTests(unittest.TestCase):
         marker_idx = target_line_no - 1  # fingerprint line numbers are 1-based
 
         worktree = Path(tempfile.mkdtemp(prefix="gitleaksignore-fp-test-"))
-        worktree.rmdir()  # `git worktree add` requires the target not already exist
-        add = subprocess.run(
-            ["git", "worktree", "add", "--detach", str(worktree), baseline],
-            cwd=str(ROOT), capture_output=True, text=True, check=False,
-        )
-        if add.returncode != 0:
-            self.skipTest("could not create the detached fingerprint fixture worktree")
-        self._worktree = worktree
-
+        self.addCleanup(shutil.rmtree, worktree, ignore_errors=True)
+        # A new repository has its own .git/config rather than a worktree's
+        # shared common config. No fixture setting can alter the real clone.
+        subprocess.run(["git", "init", "--quiet", "--object-format=sha1", str(worktree)],
+                       check=True, capture_output=True)
         target_file = worktree / target_path
+        target_file.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(ROOT / target_path, target_file)
+        subprocess.run(["git", "add", target_path], cwd=str(worktree), check=True, capture_output=True)
+        seed = _commit_synthetic_fixture(worktree, "test: seed real narrative snapshot for fingerprint fixture")
+        self.assertEqual(seed.returncode, 0, "the isolated fingerprint baseline must commit")
+        baseline = subprocess.run(["git", "rev-parse", "HEAD"], cwd=str(worktree),
+                                  capture_output=True, text=True, check=True).stdout.strip()
         lines = target_file.read_text().splitlines()
         self.assertLess(
             marker_idx, len(lines),
@@ -789,9 +788,8 @@ class GitleaksIgnoreFingerprintTests(unittest.TestCase):
         # ("ghp_" followed by 36 characters) so this test can prove it is
         # still caught when injected into a narrative line's SAME JSON
         # string. The literal never sits in any file committed to THIS
-        # repository's real history -- only inside the disposable worktree
-        # removed in tearDown -- so GitHub push protection is not a concern
-        # here.
+        # repository's real history -- only inside the isolated repository
+        # removed by this test's cleanup.
         marker_parts = ("ghp_", "wT9kLp3", "Qr7xNb2", "Yv5cMz8", "Hj4sDf6A", "Zn2Jf9K")
         injected_marker = "".join(marker_parts)
         self.assertEqual(len(injected_marker), 40, "expected a ghp_ + 36-char GitHub PAT shape")
@@ -805,11 +803,8 @@ class GitleaksIgnoreFingerprintTests(unittest.TestCase):
         target_file.write_text("\n".join(lines) + "\n")
 
         subprocess.run(["git", "add", "-A"], cwd=str(worktree), check=True, capture_output=True)
-        commit = subprocess.run(
-            ["git", "-c", "user.name=gitleaks-test", "-c", "user.email=gitleaks-test@example.invalid", "commit", "-m", "test: inject synthetic marker for gitleaksignore fingerprint test"],
-            cwd=str(worktree), capture_output=True, text=True, check=False,
-        )
-        self.assertEqual(commit.returncode, 0, "fingerprint fixture commit failed with repository hooks enabled")
+        commit = _commit_synthetic_fixture(worktree, "test: inject synthetic marker for gitleaksignore fingerprint test")
+        self.assertEqual(commit.returncode, 0, "the explicitly isolated fingerprint fixture commit must succeed")
         sha = subprocess.run(
             ["git", "rev-parse", "HEAD"], cwd=str(worktree),
             capture_output=True, text=True, check=True,
@@ -834,6 +829,50 @@ class GitleaksIgnoreFingerprintTests(unittest.TestCase):
             f"a secret injected into the SAME JSON string as a fingerprint-ignored narrative "
             f"commit reference, on a NEW commit, must still be detected: {located}",
         )
+
+
+@unittest.skipUnless(GITLEAKS, "gitleaks not found on PATH")
+class GitleaksFixtureHookIsolationTests(unittest.TestCase):
+    """The real pre-commit gate rejects the fixture; its explicit exception stays local."""
+
+    def test_repository_pre_commit_refuses_old_fixture_commit_and_per_command_isolation_succeeds(self):
+        with tempfile.TemporaryDirectory(prefix="gitleaks-fixture-hook-") as scratch:
+            repository = Path(scratch)
+            env = {"PATH": os.environ.get("PATH", os.defpath), "GIT_CONFIG_GLOBAL": os.devnull,
+                   "GIT_CONFIG_NOSYSTEM": "1"}
+            subprocess.run(["git", "init", "--quiet", "--object-format=sha1"], cwd=repository,
+                           env=env, check=True, capture_output=True)
+            (repository / "README.md").write_text("Isolated synthetic fixture.\n", encoding="utf-8")
+            subprocess.run(["git", "add", "README.md"], cwd=repository, env=env,
+                           check=True, capture_output=True)
+            baseline = _commit_synthetic_fixture(repository, "seed isolated fixture", env=env)
+            self.assertEqual(baseline.returncode, 0, "the isolated fixture baseline must commit")
+            shutil.copyfile(CONFIG_PATH, repository / ".gitleaks.toml")
+            hooks = str(ROOT / "scripts/git-hooks")
+            subprocess.run(["git", "config", "--local", "core.hooksPath", hooks], cwd=repository,
+                           env=env, check=True, capture_output=True)
+            parts = ("ghp_", "wT9kLp3", "Qr7xNb2", "Yv5cMz8", "Hj4sDf6A", "Zn2Jf9K")
+            synthetic = "".join(parts)
+            (repository / "marker.txt").write_text(f"api_key={synthetic}\n", encoding="utf-8")
+            subprocess.run(["git", "add", "marker.txt"], cwd=repository, env=env,
+                           check=True, capture_output=True)
+            old = subprocess.run(
+                ["git", "-c", "user.name=gitleaks-test", "-c", "user.email=gitleaks-test@example.invalid",
+                 "commit", "-m", "old fixture commit without isolation"],
+                cwd=repository, env=env, capture_output=True, text=True, check=False,
+            )
+            output = old.stdout + old.stderr
+            if LOCK_BUSY_MESSAGE in output:
+                self.skipTest("the real pre-commit scanner is busy; fixture refusal was not measured")
+            self.assertEqual(old.returncode, 1, "the real repository hook must refuse the old fixture commit")
+            self.assertTrue("leaks found" in output, "the hook must reject the staged synthetic finding")
+            self.assertFalse(synthetic in output, "the repository hook must redact the synthetic marker")
+            isolated = _commit_synthetic_fixture(repository, "test: commit synthetic fixture with isolation", env=env)
+            self.assertEqual(isolated.returncode, 0, "the fixture commit must isolate its hook for this command")
+            configured = subprocess.run(["git", "config", "--local", "--get", "core.hooksPath"],
+                                        cwd=repository, env=env, capture_output=True, text=True, check=True)
+            self.assertEqual(configured.stdout.strip(), hooks,
+                             "the fixture exception must not persist a disabled hook configuration")
 
 
 class GitleaksBranchAncestryHistoryTests(unittest.TestCase):

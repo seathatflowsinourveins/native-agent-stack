@@ -142,9 +142,9 @@ def select_range(event_name: str, event: dict, *, ci_backstop: bool = False) -> 
         log_opts = f"--no-merges --first-parent {scan_range}" if event_name == "push" else scan_range
     else:
         scan_range = ""
-        # Preserve the native default's diff filter as well as its history/ref flags
-        # (gitleaks v8.30.1 sources/git.go:92), with explicit CI authorization above.
-        log_opts = "-1" if mode == "tip" else "--full-history --all --diff-filter=tuxdb"
+        # CC 2026-10-10 amendment: the CI backstop scans only the checkout's ancestry.
+        # Unrelated lane refs must not turn a scheduled/dispatch run red.
+        log_opts = "-1" if mode == "tip" else "HEAD"
     return {"mode": mode, "log_opts": log_opts, "start": start, "end": head,
             "range": scan_range, "reason": reason}
 

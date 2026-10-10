@@ -108,14 +108,16 @@ class CiSecretScanRangeTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         outputs = dict(line.split("=", 1) for line in result.stdout.splitlines() if "=" in line)
         self.assertEqual(outputs.get("mode"), "full")
-        self.assertEqual(outputs.get("log_opts"), "--full-history --all --diff-filter=tuxdb")
+        self.assertEqual(outputs.get("log_opts"), "HEAD")
         self.assertEqual(outputs.get("start"), "")
         self.assertEqual(outputs.get("range"), "")
         self.assertEqual(outputs.get("end"), end)
+        return outputs
 
     def assert_rejected(self, event, payload, **kwargs):
         result = self.run_range(event, payload, **kwargs)
-        self.assertNotEqual(result.returncode, 0, "invalid or empty ranges must fail the CI step")
+        self.assertEqual(result.returncode, 1, "invalid or empty ranges must fail the CI step")
+        self.assertIn("::error::", result.stderr, "rejection must be controlled, not a CLI crash")
         self.assertNotIn("range=", result.stdout, "a rejected event must not publish scanner inputs")
 
     @staticmethod
@@ -192,6 +194,22 @@ class CiSecretScanRangeTests(unittest.TestCase):
         self.git("update-ref", "-d", "refs/remotes/origin/main")
         self.assert_ci_backstop("workflow_dispatch", self.root)
 
+    def test_ci_backstops_exclude_unrelated_lane_refs_from_the_checked_out_main_ancestry(self):
+        lane_tip = self.commit("unrelated lane ref", self.feature_two)
+        self.git("update-ref", "refs/heads/unrelated-lane", lane_tip)
+        self.checkout(self.main)
+        # The lane's history exists in this checkout; only the emitted HEAD scope
+        # keeps it out. These commands read Git metadata and invoke no scanner.
+        lane_history = set(self.git("log", "--format=%H", "refs/heads/unrelated-lane").splitlines())
+        self.assertIn(lane_tip, lane_history)
+        for event in ("schedule", "workflow_dispatch"):
+            with self.subTest(event=event):
+                outputs = self.assert_ci_backstop(event, self.main)
+                actual = set(self.git("log", "--format=%H", *shlex.split(outputs["log_opts"])).splitlines())
+                self.assertEqual(actual, {self.root, self.base, self.main})
+                self.assertTrue({lane_tip, self.feature_one, self.feature_two}.isdisjoint(actual),
+                                "a sibling lane ref must not enter a CI backstop")
+
     def test_empty_push_ranges_fail_closed(self):
         self.assert_rejected("push", {"before": self.feature_two, "after": self.feature_two})
 
@@ -251,7 +269,8 @@ class CiSecretScanRangeTests(unittest.TestCase):
                                          "--event-name", "push", "--event-path", str(event_path)],
                                         cwd=self.repo, env=self.env, capture_output=True,
                                         text=True, timeout=15)
-                self.assertNotEqual(result.returncode, 0)
+                self.assertEqual(result.returncode, 1)
+                self.assertIn("::error::", result.stderr, "rejection must be controlled, not a CLI crash")
                 self.assertNotIn("range=", result.stdout)
 
 

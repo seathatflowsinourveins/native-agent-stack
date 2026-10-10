@@ -293,8 +293,21 @@ Every caller must invoke the front end, not the native binary. That includes
 the global pre-commit hook, which the agent-ecosystem repository installs; the
 hook change is handed off to that repository's owner. Do not raise the caps to
 retry a scan the front end killed. Narrow the scope instead, for example to the
-CI history scope (`--log-opts=HEAD --max-target-megabytes 2`, measured at
-2.9 GiB), and record any size-based skip as incomplete coverage.
+local PR range (`--log-opts="<merge-base>..HEAD"`), and record any size-based
+skip as incomplete coverage. Local scans must use that PR range; full-history
+and `--all` scans are prohibited locally. The dated measurement above of
+`--log-opts=HEAD --max-target-megabytes 2` at 2.9 GiB remains historical
+evidence, rather than a measurement of the current PR range.
+
+CI scans a verified PR-owned range and, on normal pushes, uses
+`--no-merges --first-parent <before>..<after>`. An all-zero or nonancestor
+`before` selects `-1`, scanning the head commit only. Scheduled and manually
+dispatched CI backstops use `--log-opts=HEAD`, limited to the checked-out
+commit's ancestry, never all fetched refs. These backstops are permitted only
+on CI runners. The existing `--max-target-megabytes 2` option is a per-target
+skip threshold, not a process-memory limit; betterleaks 1.8.1 does not apply
+it to its Git-history source. See
+[the current scanning policy](../../docs/github-automation.md#secret-and-supply-chain-scanning-2026-09-22).
 
 ## What the tests establish
 
