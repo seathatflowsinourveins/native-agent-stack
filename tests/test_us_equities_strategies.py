@@ -56,6 +56,41 @@ def synthetic_rth_context():
         yield
 
 
+@contextmanager
+def synthetic_native_status_context():
+    """Supply declared native statuses to the synthetic LiveNode data client.
+
+    rc5 requires a client implementation for status subscriptions. This fixture
+    publishes a real native TRADING event through the upstream client output;
+    it does not qualify the shared adapter's broker trading-status stream.
+    """
+    from nautilus_trader.model import InstrumentStatus, MarketStatusAction
+
+    adapter = importlib.import_module(
+        "blueprints.us-equities.adaptive-paper.native_adapter"
+    )
+
+    class StatusFixtureClient(adapter.AlpacaDataClient):
+        async def _subscribe_instrument_status(self, command):
+            if command.instrument_id not in {
+                instrument.id for instrument in self.session.instruments.values()
+            }:
+                raise ValueError("unknown_status_fixture_instrument")
+            now = self.clock.timestamp_ns()
+            self._handle_data(
+                InstrumentStatus(
+                    command.instrument_id,
+                    MarketStatusAction.TRADING,
+                    now,
+                    now,
+                    is_trading=True,
+                )
+            )
+
+    with patch.object(adapter, "AlpacaDataClient", StatusFixtureClient):
+        yield
+
+
 class ContractTests(unittest.TestCase):
     def test_owner_override_is_dated_attributed_history(self):
         root = Path(__file__).resolve().parents[1]
@@ -88,6 +123,46 @@ class ContractTests(unittest.TestCase):
         self.assertIn("native-before.log", section)
         self.assertIn("native-after.log", section)
         self.assertIn("upstream-source-captures", section)
+        clock_record = text.split("Clock primary sources", 1)[1].split("\n\n", 1)[0]
+        for mechanism in (
+            "crates/common/src/python/clock.rs",
+            "crates/live/src/python/node.rs",
+            "crates/system/src/python/registration.rs",
+            "crates/system/src/trader.rs",
+        ):
+            with self.subTest(clock_mechanism=mechanism):
+                self.assertRegex(
+                    clock_record,
+                    r"https://github\.com/nautechsystems/nautilus_trader/blob/"
+                    r"1b0a49d2792a9432a3aca3fcb617ce7a630d905e/"
+                    + re.escape(mechanism)
+                    + r"#L\d+",
+                )
+        heading = "## Native instrument-status correction after 79a17b21"
+        self.assertIn(heading, text)
+        status_record = text.split(heading, 1)[1]
+        for mechanism in (
+            "python/nautilus_trader/model/__init__.pyi",
+            "python/nautilus_trader/trading/__init__.pyi",
+            "crates/trading/src/python/strategy.rs",
+            "crates/model/src/enums.rs",
+            "python/nautilus_trader/live/clients.py",
+            "examples/live/_template/data.py",
+        ):
+            with self.subTest(status_mechanism=mechanism):
+                self.assertRegex(
+                    status_record,
+                    r"https://github\.com/nautechsystems/nautilus_trader/blob/"
+                    r"1b0a49d2792a9432a3aca3fcb617ce7a630d905e/"
+                    + re.escape(mechanism)
+                    + r"#L\d+",
+                )
+        for evidence in (
+            "native-status-before.log",
+            "native-consolidated-executions.json",
+            "native-status-source-captures/SOURCE.json",
+        ):
+            self.assertIn(evidence, status_record)
 
     def test_live_lazy_import_comment_locators_include_the_cited_blocks(self):
         root = Path(__file__).resolve().parents[1]
@@ -441,7 +516,11 @@ class NativeStrategyTests(unittest.TestCase):
             async def stop_when_started():
                 deadline = time.monotonic() + 5
                 while time.monotonic() < deadline:
-                    if all(s.is_running() for s in strategies):
+                    if all(
+                        s.is_running()
+                        and any(row["event"] == "instrument_status" for row in s.trace)
+                        for s in strategies
+                    ):
                         session.stop()
                         return True
                     await asyncio.sleep(0.05)
@@ -452,7 +531,8 @@ class NativeStrategyTests(unittest.TestCase):
             await asyncio.wait_for(session.run_async(), timeout=8)
             return await started, strategies, session
 
-        started, strategies, session = asyncio.run(exercise())
+        with synthetic_native_status_context():
+            started, strategies, session = asyncio.run(exercise())
         self.assertTrue(started)
         self.assertEqual(session.errors, [])
         self.assertTrue(all(not s.callback_faults for s in strategies))
@@ -590,7 +670,7 @@ class NativeStrategyTests(unittest.TestCase):
                 return strategy, port, session
 
             try:
-                with synthetic_rth_context():
+                with synthetic_rth_context(), synthetic_native_status_context():
                     first, port, session = asyncio.run(attempt(True))
                 self.assertEqual(len(port.submissions), 1, first.trace)
                 self.assertTrue(session.errors)
@@ -599,7 +679,7 @@ class NativeStrategyTests(unittest.TestCase):
                 self.assertTrue(ledger.intents()[0].submit_attempted)
                 ledger.close()
                 ledger = safety.Ledger(path)
-                with synthetic_rth_context():
+                with synthetic_rth_context(), synthetic_native_status_context():
                     restarted, port, session = asyncio.run(attempt(False))
                 self.assertEqual(port.submissions, [])
                 self.assertIn(
@@ -773,10 +853,17 @@ class NativeStrategyTests(unittest.TestCase):
                             job.cancel()
                     return port, strategy, session
 
-                with synthetic_rth_context():
+                with synthetic_rth_context(), synthetic_native_status_context():
                     port, strategy, session = asyncio.run(exercise())
                 self.assertEqual(session.errors, [], session.errors)
                 self.assertEqual(strategy.callback_faults, [])
+                self.assertTrue(
+                    any(
+                        row["event"] == "instrument_status"
+                        and row["action"] == "TRADING"
+                        for row in strategy.trace
+                    )
+                )
                 self.assertEqual(len(port.submissions), 2, strategy.trace)
                 self.assertEqual(
                     (strategy.quantity, strategy.pending, port.qty, port.active),

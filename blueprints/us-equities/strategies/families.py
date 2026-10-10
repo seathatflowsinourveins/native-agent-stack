@@ -11,6 +11,7 @@ from __future__ import annotations
 import importlib
 from datetime import datetime, timedelta, timezone
 from decimal import ROUND_CEILING, ROUND_FLOOR, Decimal
+from inspect import isawaitable, iscoroutine
 from types import MappingProxyType, SimpleNamespace
 
 from nautilus_trader.model import (
@@ -18,6 +19,7 @@ from nautilus_trader.model import (
     DataType,
     Equity,
     InstrumentId,
+    MarketStatusAction,
     OrderSide,
     Price,
     Quantity,
@@ -54,12 +56,19 @@ class FamilyStrategy(Strategy):
 
     FAMILY = "abstract"
 
-    def __new__(cls, spec, *, ledger=None, fault_sink=None):
+    def __new__(cls, spec, *, ledger=None, fault_sink=None, post_cutoff_fill_sink=None):
         # The rc5 PyO3 allocator accepts only its native config argument;
         # Python-only injected dependencies belong to this subclass's __init__.
         return super().__new__(cls)
 
-    def __init__(self, spec: StrategySpec, *, ledger=None, fault_sink=None):
+    def __init__(
+        self,
+        spec: StrategySpec,
+        *,
+        ledger=None,
+        fault_sink=None,
+        post_cutoff_fill_sink=None,
+    ):
         self.spec = spec
         self.preset = preset_for(
             spec.preset, self.FAMILY, spec.catalyst_kind, exit_policy=spec.exit_policy
@@ -93,6 +102,8 @@ class FamilyStrategy(Strategy):
         )
         self.instrument_id = InstrumentId.from_str(spec.instrument_id)
         self.snapshot = None
+        self.instrument_status_halted = False
+        self.last_instrument_status = None
         self.last_quote = None
         self.trace = []
         self.flags = set()
@@ -100,6 +111,10 @@ class FamilyStrategy(Strategy):
         self.faulted = False
         self.enabled = True
         self.fault_sink = fault_sink
+        # The account/rung writer supplies this synchronous boundary. It builds
+        # the complete native post-fill account view, applies T14 state and
+        # installs that state before returning; no account figures are logged.
+        self.post_cutoff_fill_sink = post_cutoff_fill_sink
         self._durable_ledger_supplied = ledger is not None
         self.ledger = (
             ledger
@@ -185,6 +200,11 @@ class FamilyStrategy(Strategy):
         ):
             self._freeze("startup_durable_ledger_required")
             return
+        if self.spec.evidence_class != "synthetic" and not callable(
+            self.post_cutoff_fill_sink
+        ):
+            self._freeze("startup_post_cutoff_risk_sink_required")
+            return
         try:
             if not self._restore_ledger():
                 return
@@ -200,6 +220,7 @@ class FamilyStrategy(Strategy):
             raise
         self.subscribe_quotes(self.instrument_id)
         self.subscribe_data(snapshot_data_type(self.spec.instrument_id))
+        self.subscribe_instrument_status(self.instrument_id)
         self.clock.set_timer(
             "t22-watchdog", timedelta(seconds=1), callback=self._on_watchdog
         )
@@ -314,6 +335,44 @@ class FamilyStrategy(Strategy):
             self._fault("on_quote", error)
             raise
 
+    @guarded_callback
+    def on_instrument_status(self, status):
+        if status.instrument_id != self.instrument_id:
+            return
+        now = self.clock.timestamp_ns()
+        if status.ts_event > now or status.ts_init > now:
+            self._record("instrument_status_refused", reason="future_availability")
+            return
+        previous = self.last_instrument_status
+        if previous is not None and (
+            status.ts_event < previous.ts_event or status.ts_init < previous.ts_init
+        ):
+            self._record("instrument_status_refused", reason="out_of_order")
+            return
+        # Official rc5 InstrumentStatus/MarketStatusAction. Keep this carrier
+        # separate: a new factor snapshot cannot resume a native status halt.
+        if (
+            status.action
+            in {
+                MarketStatusAction.HALT,
+                MarketStatusAction.PAUSE,
+                MarketStatusAction.SUSPEND,
+                MarketStatusAction.QUOTING,
+                MarketStatusAction.NOT_AVAILABLE_FOR_TRADING,
+            }
+            or status.is_trading is False
+        ):
+            self.instrument_status_halted = True
+        elif status.action == MarketStatusAction.TRADING:
+            self.instrument_status_halted = False
+        self.last_instrument_status = status
+        self._record(
+            "instrument_status",
+            action=str(status.action),
+            status_halted=self.instrument_status_halted,
+        )
+        self._drive()
+
     def _on_watchdog(self, event):
         try:
             self._drive()
@@ -338,7 +397,7 @@ class FamilyStrategy(Strategy):
         if deadline <= self.clock.timestamp_ns():
             self._drive()
             return
-        # Official rc5 one-shot clock API, clock.rs:158-177 at 1b0a49d2.
+        # Official rc5 clock API, crates/common/src/python/clock.rs:158-177 at 1b0a49d2.
         # This dispatches cancellation at the deadline; native cancellation
         # latency can still race a fill, whose original identity remains owned.
         self.clock.set_time_alert_ns(
@@ -378,7 +437,11 @@ class FamilyStrategy(Strategy):
         if self.faulted or not self.enabled:
             return
         now = self.clock.timestamp_ns()
-        halted = self.snapshot is None or self.snapshot.halted
+        halted = (
+            self.instrument_status_halted
+            or self.snapshot is None
+            or self.snapshot.halted
+        )
         if self.pending is not None:
             timeout = (
                 self.spec.entry_timeout_ns
@@ -705,6 +768,12 @@ class FamilyStrategy(Strategy):
         quantity, price = decimal(str(event.last_qty)), decimal(str(event.last_px))
         if not D(0) < quantity <= self.pending_remaining:
             raise ValueError("fill_quantity_outside_pending")
+        cutoff = self.pending_policy_deadline_ns
+        post_cutoff = (
+            event.order_side == OrderSide.BUY
+            and cutoff is not None
+            and event.ts_event >= cutoff
+        )
         self.seen_fills.add(str(event.trade_id))
         self.pending_remaining -= quantity
         if event.order_side == OrderSide.BUY:
@@ -727,6 +796,20 @@ class FamilyStrategy(Strategy):
         self._record(
             "fill", side=str(event.order_side), quantity=str(quantity), price=str(price)
         )
+        if post_cutoff:
+            self.flags.add("post_cutoff_fill")
+            self._record("post_cutoff_fill", ts_event=event.ts_event, cutoff_ns=cutoff)
+            if self.post_cutoff_fill_sink is not None:
+                result = self.post_cutoff_fill_sink(self, event, cutoff)
+                if isawaitable(result):
+                    if iscoroutine(result):
+                        result.close()
+                    raise ValueError("synchronous_post_cutoff_risk_sink_required")
+                self._record("post_cutoff_risk_applied")
+            else:
+                # Only synthetic mechanics are qualified without the account
+                # writer. Non-synthetic acceptance must exercise this sink.
+                self.flags.add("post_cutoff_risk_sink_unqualified")
         if self.pending_remaining == 0:
             self._clear_pending()
 

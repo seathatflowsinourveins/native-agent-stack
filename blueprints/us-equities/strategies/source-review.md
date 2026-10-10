@@ -170,8 +170,13 @@ differs in this branch; the equivalent verified failure-isolation pattern is in
 native_adapter.py:136-164. No shared paper file is modified here.
 
 Clock primary sources at the same rc5 pin are `crates/common/src/python/clock.rs`
-and `python/nautilus_trader/common/__init__.pyi` (`Clock.timestamp_ns`). Upstream
-does not expose a live-clock constructor or permit setting live time. An actual
+and `python/nautilus_trader/common/__init__.pyi` (`Clock.timestamp_ns`). The
+[native timestamp API](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/common/src/python/clock.rs#L61-L64)
+reads the registered clock. The [LiveNode registration commit](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/live/src/python/node.rs#L1380-L1385)
+hands the Python strategy to the trader's [Python strategy registration and clock binding](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/system/src/python/registration.rs#L258-L306),
+using the [component clock factory](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/system/src/trader.rs#L282-L290)
+before initialization. Upstream does not expose a live-clock constructor or
+permit setting live time through the Python clock API. An actual
 installed-client probe verified that a strategy registered through
 `LiveNode.add_strategy` receives the native Clock before the run. Fixtures borrow
 that clock through an independent no-trade actor, use the actual family actor's
@@ -273,10 +278,148 @@ The new source/result digests and exact native acceptance are recorded in the
 new correction receipt there; the repository acceptance generators bind the
 current source in `test-acceptance.json` and `synthetic-receipt.json`.
 
-The straddle fixture still receives the native racing fill after timely cancel
-dispatch and accounts for it through the original order and time exit. This
-proves cancellation dispatch at the selected boundary; post-cutoff execution
-exclusion would need separate expiry/cancellation-latency qualification. The
-subsecond halt fixture receives terminal cancellation at 400 ms and stays flat.
-No broker, historical timing, continuing-manager or performance qualification
-is inferred from these synthetic engine runs.
+The straddle fixture proves cancellation dispatch at the selected boundary.
+It still receives the native racing BUY 100 ms later, matched before the cancel
+is processed; that fill is accounted through the original order and exited.
+Post-cutoff execution exclusion is not claimed. The late-fill ownership and
+time-exit assertions remain in the regression. F-2 uses the exception path
+below and never depends on venue expiry. GTD or IOC remains an optional
+execution-profile capability qualified per broker later. Complete paper
+acceptance of the exception path remains required before a non-synthetic run.
+
+Pending exits intentionally retain their working order and original identity
+through a halt, with timeout/deadline processing resumed after the halt clears.
+The existing native pending-exit separation test pins this policy. F-1 remains
+on T13-runtime/T15 acceptance before the first non-synthetic run: decide
+hold-and-flag versus cancel-and-escalate with the applicable caps and residual
+management. The subsecond snapshot-halt fixture receives terminal entry
+cancellation at 400 ms and stays flat. No broker, historical timing,
+continuing-manager or performance qualification is inferred from these
+synthetic engine runs.
+
+## Native instrument-status correction after 79a17b21
+
+The native-status review reproduced a missing subscription and callback at
+`79a17b2196f08af507248941262023544cf10d62`: an `InstrumentStatus(HALT)` at
+300 ms did not cancel a resting entry, which filled after native resumption.
+The pinned primary source is
+`nautechsystems/nautilus_trader@1b0a49d2792a9432a3aca3fcb617ce7a630d905e`:
+the [InstrumentStatus fields and event/availability timestamps](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/python/nautilus_trader/model/__init__.pyi#L2480-L2519),
+[native strategy callback](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/python/nautilus_trader/trading/__init__.pyi#L645)
+and [native subscription API](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/python/nautilus_trader/trading/__init__.pyi#L784-L789)
+are implemented by the [Python subscription binding](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/trading/src/python/strategy.rs#L2744-L2764)
+and [native callback dispatch](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/trading/src/python/strategy.rs#L756-L763).
+The [MarketStatusAction definitions](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/model/src/enums.rs#L969-L1002)
+distinguish trading, quoting without trading, halt, pause, suspension and
+unavailability. The correction uses those upstream events without a custom
+transport or a quote-condition mapping.
+
+The strategy subscribes to instrument status and immediately drives the
+existing pending-entry cancel path when it accepts a halt. A status-halt latch
+is separate from the factor snapshot's halt flag. Non-halted snapshots cannot
+clear it, nor can a stale, future or no-change native status. An accepted native
+`TRADING` action clears only the status latch; an explicit `is_trading=False`
+still blocks trading. A halted snapshot remains independently binding.
+Pending exits keep the intentional policy and pinning test described above.
+
+LiveNode also requires a status-capable data client. The upstream
+[client status-subscription extension](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/python/nautilus_trader/live/clients.py#L267-L268)
+raises `NotImplementedError` by default, and the
+[vendor client template](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/examples/live/_template/data.py#L101-L103)
+declares that required extension. The shared adaptive-paper `AlpacaDataClient`
+does not implement it. `native-live-startup-failure.log` reproduces the native
+operation failure and `ShutdownSystem` when the new strategy subscribes.
+
+The synthetic LiveNode fixtures now declare a status publisher at that client
+boundary and emit real `InstrumentStatus(TRADING)` through the
+[upstream queued-data output](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/python/nautilus_trader/live/clients.py#L192-L193).
+Their existing callback, order and restart assertions remain, and they require
+observable native status delivery. This fixture capability does not qualify a
+broker status stream or repair the shared adapter. Actual status subscription
+and publication for the runner remain an owning T13-runtime adjudication and
+qualification item before a non-synthetic run; directly using the unchanged
+adapter with this subscription fails closed. No subscription exception is
+silently swallowed and no shared adapter or transport is changed here.
+
+First-hand results are retained under
+`~/.local/state/native-agent-stack/coordination/ns2604-coop/lanes/strategies-t22-p2-prepare-20261010/`.
+The initial valid `native-status-before.log` has three assertion failures on
+the unchanged native-status path. `native-status-final-controls.log` exercises
+both carriers, native resumption, stale/future status refusal, action-only halts
+and explicit non-trading flags in the unchanged installed rc5 engine. Entry
+cancellation is dispatched at 300 ms, native terminal confirmation arrives at
+400 ms and no fill occurs. Original-ID and consumed-entry assertions remain.
+`native-consolidated-executions.json` binds these controls and individual
+handler/subscription/dispatch/latch/availability/ordering/action/flag/resumption
+mutants, plus the two admission/startup guards and three optional lifecycle
+controls. Each removed guard produces an assertion failure without native
+skips. Initial runner selection/import errors are retained separately and do
+not count as failing-first evidence.
+
+The same packet retains exact pinned excerpts in
+`native-status-source-captures/SOURCE.json` and
+`clock-source-captures/SOURCE.json`. The existing correction-record check first
+fails for the absent clock/source record, then passes with native timestamp,
+LiveNode registration and actual Python clock-binding citations. It also
+requires the status correction's pinned API/dispatch/enum citations and retained
+first-hand evidence. The admission and durable-ledger tests repair missing
+coverage; the synthetic development-labelled startup control does not qualify
+historical data. The CC-cued integration onto main
+`0947b01289dcaa9157aa38392a94cf00f592b86d` regenerates the source-bound
+acceptance receipts and evidence metadata. Its fresh controls, snapshot-halt
+guard mutant and full validation are retained in the sibling
+`strategies-pr938-integration-20261010/` packet; earlier preparation results
+remain distinct from the integrated head.
+
+## F-2 post-cutoff fill exception and synchronous risk handoff
+
+The revised F-2 definition requires a fill executed at or after the selected
+policy cutoff to be logged/flagged as `post_cutoff_fill`, immediately reflected
+in exposure and daily-loss state, then closed by the next session-permitted exit
+or held/flagged under F-1. It does not rely on venue-enforced expiry.
+
+The mechanism retains the [native fill event timestamp](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/python/nautilus_trader/model/__init__.pyi#L4484-L4503)
+and [native callback dispatch](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/trading/src/python/strategy.rs#L576-L583).
+The execution timestamp is compared with the entry's latched policy deadline,
+so a pre-cutoff execution delivered later is not misclassified. Owned quantity,
+cost basis and fill identity are updated before the synchronous injected sink
+is called. Duplicate native trade IDs cannot apply the exception twice. The
+callback accepts no awaitable accounting result; a deferred or failed sink
+uses the existing durable freeze/escalation path with owned residual retained.
+Only fixed exception/acknowledgement labels and timing are added to the trace;
+account totals are never copied into it.
+
+The sink uses Python 3.12's official
+[inspect.isawaitable contract](https://docs.python.org/3.12/library/inspect.html#inspect.isawaitable)
+to refuse deferred state updates, retiring an unawaited coroutine before the
+existing callback guard freezes and escalates.
+
+The strategies/T14 boundary is
+`post_cutoff_fill_sink(strategy, native_order_filled, cutoff_ns)`. The account's
+single writer supplies the complete post-fill native `AccountSnapshot`, owner
+`CapsConfig`, frozen trade-day anchors and current UTC time to the owned
+`risk.caps.post_cutoff_fill(state, snapshot, caps, now) -> AccountState`, then
+installs that returned state before the sink returns. The underlying governor
+seam is [UET risk.check and State at the selected merged main pin](https://github.com/seathatflowsinourveins/us-equities-trading/blob/586171951a1595cfd0811cfb8b9c012897eb9543/risk/__init__.py#L119-L198).
+The new caps consumer is the T14 follow-up's declared interface, not a PR-branch
+commit dependency or an already-qualified cross-repository runtime. A family
+actor cannot derive account-wide holdings, uncertain reservations or opening
+P&L anchors from its one instrument. A synthetic run without the sink remains
+explicitly `post_cutoff_risk_sink_unqualified`.
+Non-synthetic startup independently requires a callable sink and the durable
+ledger. An isolated native startup regression removes that guard and fails;
+the existing supplied-ledger control explicitly supplies the sink so the two
+requirements cannot mask each other's removal.
+
+The new native test uses a declared one-instrument account producer and the
+actual unchanged rc5 [portfolio exposure API](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/python/nautilus_trader/portfolio/__init__.pyi#L115-L121)
+and [portfolio P&L API](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/python/nautilus_trader/portfolio/__init__.pyi#L101-L107)
+after the racing fill. It verifies exposure/loss state has moved before the
+strategy callback returns, exact original identity, single application on a
+duplicate event and the subsequent native time exit. The deferred-result test
+verifies freeze/escalation and retained owned residual. The earlier delayed
+callback control proves execution-time classification. First-hand red/green
+logs and isolated exception/callback/awaitability mutants are retained in
+`strategies-pr938-integration-20261010/`; T14 independently owns the actual caps
+transition tests. Neither fixture substitutes for paper acceptance of the
+real main-to-main account writer, or qualifies F-1's held residual management.

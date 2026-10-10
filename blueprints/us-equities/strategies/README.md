@@ -188,11 +188,57 @@ missing acknowledgement freezes durably and escalates, preserving the original
 order identity and residual rather than guessing that a replacement is safe.
 
 Explicit exit policies also bound entry: no new buy at or after the selected
-calendar boundary, and a resting buy is cancelled when its latched boundary,
-entry deadline or an observed halt arrives. A halt does not apply that entry
-cancellation rule to pending exits. Identity remains pending until native
-terminal confirmation. Holding time and calendar deadlines start from the
+calendar boundary. A resting buy arms a native alert for its earliest latched
+policy boundary, explicit entry/exit deadline or entry timeout. Cancellation is
+dispatched at that boundary; a fill matched before cancellation is processed
+remains owned, accounted and exited. Post-cutoff execution exclusion is not
+claimed. Identity remains pending until a native fill or terminal confirmation.
+Holding time and calendar deadlines start from the
 first buy fill's native `event.ts_event`, including delayed callback delivery.
+
+Both an accepted halted factor snapshot and native `InstrumentStatus` halt
+immediately drive pending-entry cancellation. The native status subscription
+uses the upstream rc5 callback and a distinct halt latch. A non-halted snapshot
+cannot clear it; only an available, ordered native `TRADING` resumption without
+an explicit non-trading flag does. Native resumption likewise cannot clear a
+halted snapshot. Quote-only, paused, suspended and unavailable native status
+actions, or an explicit non-trading flag, also block trading.
+
+Pending exits intentionally keep their working order and original identity
+through a halt. The entry cancellation rule does not cancel them; timeout and
+deadline processing resumes after the halt clears. Follow-up F-1 remains on
+T13-runtime/T15 acceptance: decide hold-and-flag versus cancel-and-escalate
+with the applicable caps before the first non-synthetic run.
+
+F-2 never depends on venue expiry. A BUY executed at or after its latched policy
+cutoff is logged and flagged as `post_cutoff_fill`, while the original fill
+remains owned. An injected synchronous
+`post_cutoff_fill_sink(strategy, native_order_filled, cutoff_ns)` runs after
+fill accounting and before this callback returns or another admission occurs.
+The T14 account/rung writer builds the complete native post-fill account view,
+calls `risk.caps.post_cutoff_fill(state, snapshot, caps, now)` and installs the
+returned state in that same call. Exposure and daily-loss state therefore move
+together; neither is inferred from one instrument or logged by this strategy.
+An awaitable sink result is refused through the existing callback freeze and
+escalation path. Synthetic fixtures without the sink are explicitly flagged
+`post_cutoff_risk_sink_unqualified` and do not qualify account risk integration.
+Non-synthetic startup refuses without a callable sink, independently of the
+durable-ledger requirement; a deferred accounting result freezes at the fill.
+
+The next exit path applies the existing session rules; when F-1 requires a hold,
+the residual stays held and flagged. Paper acceptance must exercise the complete
+exception-to-accounting-to-exit/hold path before the first non-synthetic run.
+The sink fixture and T14's consumer tests remain separate engineering evidence
+until their actual main-to-main binding is qualified. GTD or IOC is an optional
+execution-profile capability qualified per broker later, not a dependency.
+
+The synthetic LiveNode fixtures supply a declared native status publisher
+through the rc5 data-client boundary and assert receipt of its events. The
+shared adaptive-paper AlpacaDataClient still inherits an unimplemented native
+status-subscription method; a direct native run with the new subscription
+fails closed and requests node shutdown. Its actual status publisher and
+subscription require T13-runtime adjudication and qualification before a
+non-synthetic run. These fixtures do not qualify that broker capability.
 
 Startup refusals and held-position hazards call the existing Ledger.freeze and
 the injected fault_sink independently, following the reused adapter callback
