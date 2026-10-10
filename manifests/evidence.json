@@ -18567,8 +18567,8 @@
     },
     {
       "path": "docs/decisions/2026-10-10-layer15-nautilus-adjustment-claim.md",
-      "sha256": "c63ecc858de5c16dbf3186aa85b0fa1ce66828f4ebd02197359b200de646e774",
-      "bytes": 11740
+      "sha256": "09f49a331b91735ccea38c0b08eaf2f39d7ebcb2d52630aac9e8b51101c6a8f1",
+      "bytes": 12993
     },
     {
       "path": "docs/decisions/2026-10-10-openhands-shard-discovery-protection.md",
@@ -60547,8 +60547,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "662d2572c04c3aa863fe24d2bd73c4fe7782a2d75f655761d357ec23f1ec635a",
-      "bytes": 147293
+      "sha256": "f5df12175a76803dc4942f6aa536e787809933ec82186ffec6a75696840aa5ce",
+      "bytes": 154229
     },
     {
       "path": "tests/test_install_skills.py",

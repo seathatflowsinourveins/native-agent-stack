@@ -17,6 +17,8 @@ The CPython 3.12 manylinux wheels of both releases were downloaded and checked a
 | 2.0.0rc5 | `nautilus_trader-2.0.0rc5-cp312-cp312-manylinux_2_34_x86_64.whl` | 69,963,442 | `eab45fafd2312deda1236554c49a9798bfc76bc8465af864878e2f70189ebebe` | 2026-09-15T06:13:57Z | `v2.0.0rc5` = `1b0a49d2792a9432a3aca3fcb617ce7a630d905e` (2026-09-15T02:13:21Z) |
 | 2.0.0rc6 | `nautilus_trader-2.0.0rc6-cp312-cp312-manylinux_2_34_x86_64.whl` | 69,828,675 | `9b4002a7bf5e6399c51073039b740ccf3ca7a1e2584ff72c7d479f03eaa9658d` | 2026-10-05T02:59:49Z | `v2.0.0rc6` = `7b766f8825b2539c5b2ac1375e9d97b41c509edb` (2026-10-04T22:24:44Z) |
 
+The rc5 tag commit is the one `catalogs/us-equities/runtime-target.json` records as `engine.source_commit` for the selected release; a test compares the two.
+
 Both scans return the same 13 declarations. Line numbers are in `nautilus_trader/model/__init__.pyi` unless another file is named.
 
 | Declaration | rc5 line | rc6 line | What it is |
@@ -68,7 +70,11 @@ What would overturn it: a later release, or the documentation of rc5, that decla
 
 ## Regression tests
 
-In `tests/test_install_claude_profile.py::StandingRuleSurfacesTests`, `test_layer_15_candidates_do_not_claim_nautilus_adjustment_handling` fails on the earlier sentence (it contains "adjustment handling") and on any paragraph that loses the correction or one of the other four candidates, and `test_layer_15_record_pins_the_scanned_releases_and_the_declared_adjustment_types` fails if this record is absent or loses a wheel name, size, sha256, tag commit or declared type.
+In `tests/test_install_claude_profile.py::StandingRuleSurfacesTests`:
+
+- `test_layer_15_candidates_do_not_claim_nautilus_adjustment_handling` pins the corrected paragraph by the facts it must state, in any wording. `layer_15_drift()` lists what is missing: the NautilusTrader data-catalog candidate is named; its parenthetical says that the selected release (the version `catalogs/us-equities/runtime-target.json` selects) and rc6 were checked; a negation precedes both "equity corporate-action" and "price-adjustment" inside that parenthetical; the dated record is pointed at; the candidate says nothing else about adjustment (the earlier phrase "adjustment handling" fails anywhere in the paragraph); and the other four candidates are still listed. It fails on the earlier text.
+- `test_layer_15_guard_accepts_the_current_form_and_meaning_preserving_rewordings` and `test_layer_15_guard_rejects_the_old_claim_and_each_lost_fact` run `layer_15_drift()` on sample paragraphs, so a later rewording of the real file cannot break them: the rewordings pass, and the earlier claim, a removed or reversed negative clause (key terms kept), a clause that negates only one term, a missing pointer, a missing or swapped release, an adjustment claim in other words, a renamed catalog and each dropped candidate fail.
+- `test_layer_15_record_pins_the_scanned_releases_and_the_declared_adjustment_types` fails if this record is absent or loses a wheel name, size, sha256, tag commit or declared type, or if the rc5 commit differs from the runtime target's `engine.source_commit`.
 
 ## Measured context cost
 

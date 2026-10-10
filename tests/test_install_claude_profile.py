@@ -1939,10 +1939,19 @@ class StandingRuleSurfacesTests(unittest.TestCase):
 
     # docs/decisions/2026-10-10-layer15-nautilus-adjustment-claim.md: the Layer 1.5 candidate list said "NautilusTrader's
     # data catalog and adjustment handling". The selected release, NautilusTrader 2.0.0rc5 (catalogs/us-equities/
-    # runtime-target.json:9), and rc6 declare no equity corporate-action or price-adjustment type in their public
-    # stubs, in crates/model/src/enums.rs at their tag commits, or in their documentation. The wheels were scanned.
+    # runtime-target.json, engine.requested_version), and rc6 declare no equity corporate-action or price-adjustment
+    # type in their public stubs, in crates/model/src/enums.rs at their tag commits, or in their documentation. The
+    # wheels were scanned. The paragraph is pinned by the facts it must state, in any wording, and not by its sentence:
+    # layer_15_drift() lists what a paragraph fails to say, and the controls below run it on edited copies.
     LAYER_15_RECORD = "docs/decisions/2026-10-10-layer15-nautilus-adjustment-claim.md"
-    LAYER_15_NAUTILUS = (
+    LAYER_15_CATALOG = "NautilusTrader's data catalog"
+    # The negative clause: a negation, then the two terms in order, inside one parenthetical (no ";" or ")" between).
+    LAYER_15_NEGATIVE = re.compile(
+        r"\b(?:no|not|neither|nor|without)\b[^;)]{0,40}?equity corporate[- ]action[^;)]{0,40}?price[- ]adjustment",
+        re.IGNORECASE,
+    )
+    # The current form of the catalog candidate, used only to build the sample paragraphs of the controls.
+    LAYER_15_CLAUSE = (
         "NautilusTrader's data catalog (storage and query: 2.0.0rc5, the selected release, and rc6 declare no equity "
         "corporate-action or price-adjustment type; `" + LAYER_15_RECORD + "`)"
     )
@@ -1965,13 +1974,98 @@ class StandingRuleSurfacesTests(unittest.TestCase):
         start = text.index('Desk data-integrity glue ("Layer 1.5")')
         return " ".join(text[start:text.index("\n\n", start)].split())
 
+    def layer_15_engine(self):
+        return json.loads((ROOT / "catalogs/us-equities/runtime-target.json").read_text(encoding="utf-8"))["engine"]
+
+    def layer_15_drift(self, paragraph, selected="2.0.0rc5"):
+        """What the paragraph fails to state about NautilusTrader's data catalog, by fact and not by wording."""
+        if self.LAYER_15_CATALOG not in paragraph:
+            return ["the NautilusTrader data-catalog candidate is not named"]
+        start, depth, end = paragraph.index(self.LAYER_15_CATALOG), 0, len(paragraph)
+        for position in range(start, len(paragraph)):  # the candidate runs to the next comma outside parentheses
+            if paragraph[position] == "(":
+                depth += 1
+            elif paragraph[position] == ")":
+                depth -= 1
+            elif paragraph[position] == "," and depth == 0:
+                end = position
+                break
+        clause, problems = paragraph[start:end], []
+        negative = self.LAYER_15_NEGATIVE.search(clause)
+        if negative is None:
+            problems.append("no clause says the releases declare no equity corporate-action or price-adjustment type")
+        rest = clause if negative is None else clause[:negative.start()] + clause[negative.end():]
+        rest = rest.replace(self.LAYER_15_RECORD, "")  # the record's own file name says "adjustment"
+        if "adjust" in rest.lower() or "adjustment handling" in paragraph.lower():
+            problems.append("the catalog candidate is described as supplying adjustment")
+        short = "rc" + selected.rsplit("rc", 1)[1]
+        if short not in clause or "selected" not in clause.lower() or re.search(r"rc6\W{1,3}(?:the\s+)?selected", clause):
+            problems.append(f"the clause does not say that {short} is the selected release")
+        if "rc6" not in clause:
+            problems.append("the clause does not say that rc6 was checked")
+        if self.LAYER_15_RECORD not in paragraph:
+            problems.append("the paragraph does not point at the decision record")
+        problems += [f"the candidate {name!r} is not listed" for name in self.LAYER_15_OTHER_CANDIDATES
+                     if name not in paragraph]
+        return problems
+
+    def layer_15_sample(self, clause, candidates=None):
+        listed = list(self.LAYER_15_OTHER_CANDIDATES if candidates is None else candidates)
+        names = [clause, *listed[:-1], "and " + listed[-1]]
+        return ('Desk data-integrity glue ("Layer 1.5"): foundation layers stay free of custom code. Candidates include '
+                + ", ".join(names) + ". Build the glue from cited SOTA references.")
+
     def test_layer_15_candidates_do_not_claim_nautilus_adjustment_handling(self):
-        paragraph = self.layer_15_paragraph()
-        self.assertNotIn("adjustment handling", paragraph)
-        self.assertIn(self.LAYER_15_NAUTILUS, paragraph)
+        problems = self.layer_15_drift(self.layer_15_paragraph(), self.layer_15_engine()["requested_version"])
+        self.assertEqual(problems, [])
+
+    def test_layer_15_guard_accepts_the_current_form_and_meaning_preserving_rewordings(self):
+        record = self.LAYER_15_RECORD
+        forms = {
+            "the current form": self.LAYER_15_CLAUSE,
+            "slash for 'and'": self.LAYER_15_CLAUSE.replace("storage and query:", "storage/query:"),
+            "neither and nor": f"NautilusTrader's data catalog (storage and query only; neither 2.0.0rc5, the selected "
+                               f"release, nor rc6 declares an equity corporate-action or a price-adjustment type; see "
+                               f"`{record}`)",
+            "spaces for hyphens": f"NautilusTrader's data catalog (storage and query; 2.0.0rc5, the selected release, "
+                                  f"and rc6 do not declare any equity corporate action or price adjustment type: "
+                                  f"`{record}`)",
+        }
+        for name, form in forms.items():
+            with self.subTest(wording=name):
+                self.assertEqual(self.layer_15_drift(self.layer_15_sample(form)), [])
+
+    def test_layer_15_guard_rejects_the_old_claim_and_each_lost_fact(self):
+        clause, record = self.LAYER_15_CLAUSE, self.LAYER_15_RECORD
+        negative = "declare no equity corporate-action or price-adjustment type"
+        forms = {
+            "the earlier claim": "NautilusTrader's data catalog and adjustment handling",
+            "the earlier claim beside the new clause": clause.replace("data catalog", "data catalog and adjustment handling"),
+            "no negative clause": clause.replace(" " + negative, ""),
+            "a reversed negative clause": clause.replace("declare no equity", "declare an equity"),
+            "a reversed clause in the plural": clause.replace(negative, "declare equity corporate-action and "
+                                                                      "price-adjustment types"),
+            "only one of the two terms negated": clause.replace(" or price-adjustment type", " type"),
+            "no pointer to the record": clause.replace("; `" + record + "`", ""),
+            "rc5 not called the selected release": clause.replace(", the selected release,", ""),
+            "another release named": clause.replace("2.0.0rc5", "2.0.0rc4"),
+            "rc6 not mentioned": clause.replace(" and rc6 declare", " declares"),
+            "rc6 called the selected release": clause.replace("2.0.0rc5, the selected release, and rc6 declare",
+                                                              "2.0.0rc5 and rc6, the selected release, declare"),
+            "the catalog renamed": clause.replace("data catalog", "catalog"),
+            "adjustment claimed in other words": clause + " that adjusts prices for splits",
+        }
+        for name, form in forms.items():
+            with self.subTest(change=name):
+                self.assertNotEqual(form, clause)
+                self.assertNotEqual(self.layer_15_drift(self.layer_15_sample(form)), [])
         for candidate in self.LAYER_15_OTHER_CANDIDATES:
-            with self.subTest(candidate=candidate):
-                self.assertIn(candidate, paragraph)
+            kept = [other for other in self.LAYER_15_OTHER_CANDIDATES if other != candidate]
+            with self.subTest(dropped=candidate):
+                self.assertNotEqual(self.layer_15_drift(self.layer_15_sample(clause, kept)), [])
+        with self.subTest(change="the earlier claim as a separate candidate"):
+            claimed = [*self.LAYER_15_OTHER_CANDIDATES, "NautilusTrader's adjustment handling"]
+            self.assertNotEqual(self.layer_15_drift(self.layer_15_sample(clause, claimed)), [])
 
     def test_layer_15_record_pins_the_scanned_releases_and_the_declared_adjustment_types(self):
         record = ROOT / self.LAYER_15_RECORD
@@ -1984,6 +2078,9 @@ class StandingRuleSurfacesTests(unittest.TestCase):
         for name in self.LAYER_15_DECLARED:
             with self.subTest(declaration=name):
                 self.assertIn(name, text)
+        engine = self.layer_15_engine()  # the repository's own pin of the selected release
+        self.assertEqual(engine["requested_version"], "2.0.0rc5")
+        self.assertEqual(engine["source_commit"], self.LAYER_15_RELEASES[0][3])
 
     def test_root_review_rules_flag_unsourced_fixes_and_missing_regressions(self):
         text = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
