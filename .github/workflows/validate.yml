@@ -451,6 +451,13 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 0
+      - name: Resolve the verified event options for secret scans
+        id: scan_range
+        shell: bash
+        run: |
+          python3 scripts/ci_secret_scan_range.py \
+            --event-name "$GITHUB_EVENT_NAME" --event-path "$GITHUB_EVENT_PATH" \
+            --ci-backstop >> "$GITHUB_OUTPUT"
       - name: Install checksum-verified pinned gitleaks
         env:
           GITLEAKS_VERSION: '8.30.1'
@@ -465,26 +472,34 @@ jobs:
           tar -xzf "$RUNNER_TEMP/gitleaks/archive.tar.gz" -C "$RUNNER_TEMP/gitleaks" gitleaks
           "$RUNNER_TEMP/gitleaks/gitleaks" version
       - name: Run the gitleaks allowlist regression tests with the pinned binary
-        if: always()
+        if: ${{ !cancelled() && steps.scan_range.outcome == 'success' }}
         env:
           # tests/test_gitleaks_config.py fails instead of skipping when this is set and gitleaks is
           # absent: the validate job has no gitleaks, so without this step the allowlist tests never
           # ran in CI (Codex review of #155).
           GITLEAKS_TESTS_REQUIRED: '1'
+          # The real-checkout integration test uses the same verified window as the gate.
+          GITLEAKS_HISTORY_RANGE: ${{ steps.scan_range.outputs.range }}
+          GITLEAKS_HISTORY_MODE: ${{ steps.scan_range.outputs.mode }}
         run: |
           export PATH="$RUNNER_TEMP/gitleaks:$PATH"
           python3 -m unittest tests.test_gitleaks_config -v
       - name: Scan git history for secrets
-        if: always()
+        if: ${{ !cancelled() && steps.scan_range.outcome == 'success' }}
+        env:
+          SCAN_LOG_OPTS: ${{ steps.scan_range.outputs.log_opts }}
         run: |
           # --config: reviewed allowlists (.gitleaks.toml); --max-target-megabytes 2: the
           # generated explorer HTML is skipped (recorded as incomplete coverage in
-          # docs/github-automation.md); measured 2026-09-22: 522 commits, 777 MB, 34 s locally.
-          # --log-opts=HEAD: scan what this run would land (a pull request's merge commit, or
-          # main on push). The default is every fetched ref, so one open branch's finding
-          # failed every other pull request (2026-09-23: #116's branch failed #117).
+          # docs/github-automation.md). PRs use their verified range; pushes follow the
+          # CC's vendor baseline (--no-merges --first-parent range, or -1 for a new/forced
+          # branch). Dispatch uses the intentional full-history backstop on CI only.
+          # Source: gitleaks/gitleaks-action@bcfb9cce, src/gitleaks.js:103-115.
+          # A local full-history scan reached 72.6 GB and was OOM-killed on 2026-10-09;
+          # local scans remain PR-range-only. The 2 MB limit is per target, not a RAM cap.
+          # Git's default merge-diff handling is unchanged; the dir scan checks the merge result.
           "$RUNNER_TEMP/gitleaks/gitleaks" git . --config .gitleaks.toml --max-target-megabytes 2 \
-            --log-opts="HEAD" \
+            --log-opts="$SCAN_LOG_OPTS" \
             --redact --no-banner --report-format json --report-path "$RUNNER_TEMP/gitleaks/gitleaks.json"
       - name: Scan working tree for secrets
         if: always()
@@ -510,8 +525,8 @@ jobs:
     # and do not fail it, so it is red only when verification, the scanner or the test run errors. Its
     # green therefore does not say that a change adds no secret: secret-scan stays the gate.
     runs-on: ubuntu-24.04
-    # On the recording workstation the full-history scan took 55 s wall, 1,546 CPU-seconds and a 7.9 GiB
-    # peak resident set (gitleaks: 74 s, 3.3 GiB); the hosted-runner figures are pending its first run.
+    # Historical full-history parity timings are in the receipt above; these jobs now use
+    # the same verified event policy as the gate, including the CI-only dispatch backstop.
     timeout-minutes: 20
     permissions:
       contents: read
@@ -531,6 +546,12 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 0
+      - name: Resolve the verified event options for secret scans
+        id: scan_range
+        run: |
+          python3 scripts/ci_secret_scan_range.py \
+            --event-name "$GITHUB_EVENT_NAME" --event-path "$GITHUB_EVENT_PATH" \
+            --ci-backstop >> "$GITHUB_OUTPUT"
       - name: Install cosign pinned by digest
         env:
           COSIGN_VERSION: 'v3.0.6'
@@ -617,9 +638,11 @@ jobs:
           fi
           exit "$status"
       - name: Scan git history for secrets with betterleaks (findings do not fail this job)
-        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        if: ${{ !cancelled() && steps.install.outcome == 'success' && steps.scan_range.outcome == 'success' }}
+        env:
+          SCAN_LOG_OPTS: ${{ steps.scan_range.outputs.log_opts }}
         run: |
-          # The secret-scan job's arguments. betterleaks 1.8.1 applies --max-target-megabytes to dir-mode
+          # The secret-scan job's verified event options and arguments. betterleaks 1.8.1 applies --max-target-megabytes to dir-mode
           # files only (cmd/directory.go); its git source (cmd/git.go) has no size limit, so this scan
           # also reads the generated explorer HTML in history that gitleaks skips as over 2 MB.
           # Two flags keep gitleaks's behaviour (betterleaks cmd/root.go at v1.8.1):
@@ -636,7 +659,7 @@ jobs:
           report="$RUNNER_TEMP/betterleaks/history.json"
           status=0
           "$RUNNER_TEMP/betterleaks/betterleaks" git . --config .gitleaks.toml --max-target-megabytes 2 \
-            --max-archive-depth 0 --gitleaks-ignore-path .gitleaksignore --log-opts="HEAD" \
+            --max-archive-depth 0 --gitleaks-ignore-path .gitleaksignore --log-opts="$SCAN_LOG_OPTS" \
             --redact --no-banner --report-format json --report-path "$report" --exit-code 0 || status=$?
           if [ -s "$report" ]; then
             jq -r '(. // [])[] | [.RuleID, .File, (.StartLine | tostring)] | @tsv' "$report" | sort | uniq -c
