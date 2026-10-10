@@ -17,7 +17,53 @@
     "cache_creation_input_tokens": 3743896
    }
   },
-  "priced_usd_api_list": 63.87
+  "by_phase": {
+   "Read": {
+    "role": "reader",
+    "children": 31,
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "xhigh"
+    ]
+   },
+   "Refute": {
+    "role": "refuter",
+    "children": 31,
+    "requested_model": "opus",
+    "resolved_models": [
+     "claude-opus-5-5"
+    ],
+    "efforts": [
+     "max"
+    ]
+   }
+  },
+  "priced_usd_api_list": 63.87,
+  "measurement": {
+   "tool": "examples/claude-native/workflows/child-usage.mjs",
+   "tool_commit": "3497f50ce66ff193fabec1196b39b3d83eed12fe",
+   "tool_sha256": "3e5189342734135e88a2295c1c2152275d9e26c0c7731ed5cbc8905bbccd98a4",
+   "command": "node examples/claude-native/workflows/child-usage.mjs <session-transcripts>/subagents/workflows/wf_bee0b670-035 --require-effort max",
+   "exit_code": 1,
+   "exit_code_reason": "--require-effort max lists the 31 Read children as effort_mismatches because the readers run at xhigh by design; the 31 Refute children are at max",
+   "raw_output_sha256": "44cfd1c938ec0179776acbc998fb03355f88a1be2717899d7f7926c68fa88892",
+   "measured_at_utc": "2026-10-09T14:13:16Z",
+   "record": {
+    "file": "child-usage-wf_bee0b670-035.json",
+    "sha256": "7b81e56efef8ca52ae778330f6882747f6f14fff5717cb3729b37d3258386d87",
+    "committed": false,
+    "note": "the tool's JSON for the run's retained transcripts; by_resolved_model above and by_phase are copied from it"
+   }
+  }
+ },
+ "local_references": {
+  "revision": "a30c2188e4423f05a7448e5f7a3bcfd858e0f5b8",
+  "applies_to": "page:line locators that name a file of this repository, in the practices' statement, change and refute_reason text (for example reference/slots.md:35 or reference/workers.md:66); <pr-checkout> is the readers' checkout of the #923 branch (head cbc9ea58 on 2026-10-09)",
+  "meaning": "Each locator resolves at this revision, the merge of #923 and the defaults the readers compared every practice against; the reference pages the readers read are byte-identical to this revision's. The follow-up that adds this file extends those pages, so at its own head the same locators can point at other lines. The recorded model output is unchanged.",
+  "measured": "git show <revision>:<path> for every locator that names a file of this repository (84): the cited lines read the same at the readers' checkout and at this revision. The six that quote a phrase directly before the locator find that phrase at the cited line at this revision; tests/test_native_practice_snapshot_provenance.py repeats that check where the history has the revision."
  },
  "sources": [
   {

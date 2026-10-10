@@ -18492,8 +18492,8 @@
     },
     {
       "path": "docs/decisions/2026-10-09-claude-code-native-practice.md",
-      "sha256": "a834686b8d21b6777d3dca2fb0ea6172a8988bb7b1612c2b35f2cf123395f462",
-      "bytes": 42966
+      "sha256": "c3f4d84edfe86f0f934c1f0bb20ceb206f4060847f3737c34344a3242d7bdd76",
+      "bytes": 44124
     },
     {
       "path": "docs/decisions/2026-10-09-codex-native-review-trial.md",
@@ -19932,8 +19932,8 @@
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/claude-native-slot-manifest.json",
-      "sha256": "193fc9a275abbb3c3efeb19334af0e2836c08a12e77960f17491d1440d9ebc17",
-      "bytes": 235246
+      "sha256": "1ada50b39afc9a02b29f5a28a935c7bcdf8615140d0aa7d0229d92cef8f85448",
+      "bytes": 236851
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/fresh-session.json",
@@ -19952,8 +19952,8 @@
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/primary-source-reading.json",
-      "sha256": "1f4d23fb17c810caa6894b1a2a488fc4f6abd39211114152ce5b5739da357b4e",
-      "bytes": 440719
+      "sha256": "f44ff6e88a662388c4f4c00ec2fb163fafa74ab47f5dd8fec8b151a8cda537d7",
+      "bytes": 443253
     },
     {
       "path": "evidence/artifacts/claude-native-practice-20261009/probes-20261009.json",
@@ -60441,6 +60441,11 @@
       "bytes": 3900
     },
     {
+      "path": "tests/test_native_practice_snapshot_provenance.py",
+      "sha256": "3528159a3da7fb770f716ae71e289b7aa7fcbf394beaa05ca0cfc351ec23d9de",
+      "bytes": 8127
+    },
+    {
       "path": "tests/test_native_recovery.py",
       "sha256": "99eee9a81f549b3c4e432ba686f0676cbc8a5691399413f8a437b7cff281bd4d",
       "bytes": 3345
@@ -60617,8 +60622,8 @@
     },
     {
       "path": "tests/test_primary_source_reading_counts.py",
-      "sha256": "6b1aa1f844ac20abdbfa9aa29de4b824e81abf2e090917341f53f4afa2d580df",
-      "bytes": 8510
+      "sha256": "4f35b75bc6104c9d9c765531eeba2d6eb6e48a52a1c99056113c86ec531ebfa9",
+      "bytes": 13021
     },
     {
       "path": "tests/test_promotion_gate.py",

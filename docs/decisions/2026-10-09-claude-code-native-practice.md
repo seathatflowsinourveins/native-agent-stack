@@ -327,6 +327,17 @@ and without it in clean contexts. **Contradictions held as candidates:** classif
 A/B), a one-hour cache TTL for long API-key sessions (api-actions' scope), and Ralph-style headless loops (until the
 planning-persistence paired run).
 
+**What the exports describe.** The reader and refuter settings above are those the run's children were measured at
+(`usage.by_phase` in the reading, from `child-usage.mjs` over the retained transcripts; the tool exits 1 under
+`--require-effort max` because the 31 readers run at xhigh by design). `claude-native-slot-manifest.json` is the data file
+built on 2026-10-09 from `reference/slots.json` as merged in #923 (`a30c2188e`, sha256 `a7d87f9a…`): a baseline snapshot,
+labeled so in its `snapshot` block, whose citation relations are relative to those rows. The current decision source is
+`reference/slots.json`, which adds the four route extensions and the two held alternatives above and moves
+loops-completion's Ralph-style entry from its rejections to a held candidate; the block lists each differing field. The
+reading's page:line locators (for example `slots.md:35`) resolve at that same revision, not at this change's head, and
+its `local_references` says so. `tests/test_native_practice_snapshot_provenance.py` checks the label, the listed
+differences and, where the history holds the revision, the baseline rows and six quoted-phrase locators.
+
 **Model and effort routing** (ruled about 12:40Z; the owner delegated it to the command center): Opus 5.5 is the
 floor; xhigh is the session default; max is for verify, judge and adjudication roles and the coordinators; a cheaper
 model needs a frozen paired A/B at parity; `CLAUDE_CODE_EFFORT_LEVEL` and `CLAUDE_CODE_SUBAGENT_MODEL_FORCE` stay unset.

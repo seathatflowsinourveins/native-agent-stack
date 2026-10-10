@@ -2,6 +2,32 @@
  "schema": "claude-native-slot-manifest/1",
  "generated_utc": "2026-10-09T15:00:51Z",
  "producer": "cc-native-practice (W5, NS-READY-FINAL)",
+ "snapshot": {
+  "kind": "baseline",
+  "revision": "a30c2188e4423f05a7448e5f7a3bcfd858e0f5b8",
+  "slots_json_sha256": "a7d87f9a30f1654761f93f4edbde6735998a6dfd48b31549dfd5ad0e1dacdb95",
+  "describes": "The 33 role-slot rows of .claude/skills/claude-native-practice/reference/slots.json as merged in #923, built before the follow-up that adds this file extended that file: the defaults the 2026-10-09 reading compared every practice against, so each citation's relation (agrees, extends, contradicts, not-covered) is relative to these rows. For the current defaults read current_decision_source.",
+  "current_decision_source": {
+   "path": ".claude/skills/claude-native-practice/reference/slots.json",
+   "sha256_when_labeled": "3765d9a30e8656e19e39931ef7398632f02ba824a8abed033db543e417fcd316",
+   "differs_from_this_snapshot_in": {
+    "route": [
+     "skills-library",
+     "orchestration-frameworks",
+     "planning-persistence",
+     "loops-completion"
+    ],
+    "alternatives": [
+     "model-effort-routing",
+     "loops-completion"
+    ],
+    "rejections": [
+     "loops-completion"
+    ]
+   },
+   "note": "The four routes carry the default extensions the command center accepted after the reading, each tagged [read 2026-10-09]; the two added alternatives are held candidates (classifier routing to Sonnet or Opus, Ralph-style headless loops); loops-completion's 'Ralph-style bash loops' moved from its rejections to that held alternative. Slot fields this export does not carry also differ (primary_sources and primary_sources_total on 24 slots, the prompt-caching notes, cross_client)."
+  }
+ },
  "sources": {
   "slots.json": "a7d87f9a30f1654761f93f4edbde6735998a6dfd48b31549dfd5ad0e1dacdb95",
   "wf_bee0b670-035.full.json": "d132103f64d9053b5404bc085596680ab297a37edb00422237c8dd4d01e4b55f",
