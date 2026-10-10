@@ -17022,8 +17022,8 @@
     },
     {
       "path": "catalogs/landscape/component-evidence-matrix.json",
-      "sha256": "c761d3e6ec61a3c2d822d36f0afc7d49c6cb0da0269245e1c06516818b23aa00",
-      "bytes": 314853
+      "sha256": "7c68cc6e9e0001e4953ad08c6dec86cca462a5ca9787e5d1035a90f515f27885",
+      "bytes": 315225
     },
     {
       "path": "catalogs/landscape/foundation.json",
@@ -17587,8 +17587,8 @@
     },
     {
       "path": "docs/component-evidence-matrix.md",
-      "sha256": "a1af27458583cabaebfe3d0299b239fdf23f42740165f02f9323d33f0647d26f",
-      "bytes": 32903
+      "sha256": "0fad007a8e9568b4271e2ac2b1996a57dd1fa52883f902b8c784eeca07e968a7",
+      "bytes": 32981
     },
     {
       "path": "docs/contributing-evidence.md",
@@ -59937,8 +59937,8 @@
     },
     {
       "path": "tests/test_component_matrix.py",
-      "sha256": "a98574895dd7e4dda8c45d6d993af8ec335a5a4a02644efaee64e1688d162de4",
-      "bytes": 83131
+      "sha256": "da4fe0a1c18baeaeaf65675b21f5ab0ed748f2d9eaab1a1675ea89144851a166",
+      "bytes": 84487
     },
     {
       "path": "tests/test_context_mode_practice_docs.py",

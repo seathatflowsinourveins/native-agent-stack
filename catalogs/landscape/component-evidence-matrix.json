@@ -272,7 +272,7 @@
             "converged": false,
             "host_e2e": "true",
             "id": "syft",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "id",
             "verdict_winner": "true",
             "winner_ids": [
@@ -288,7 +288,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "toon",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "id",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -319,8 +319,8 @@
             "unknown": 5
           },
           "pin_current": {
-            "false": 0,
-            "true": 7,
+            "false": 2,
+            "true": 5,
             "unknown": 0
           },
           "verdict_winner": {
@@ -586,7 +586,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "jcodemunch-mcp",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "id",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -600,7 +600,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "mcp-inspector",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "id",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -628,7 +628,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "qdrant",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "id",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -686,7 +686,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "toon",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "id",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -701,8 +701,8 @@
             "unknown": 9
           },
           "pin_current": {
-            "false": 1,
-            "true": 8,
+            "false": 5,
+            "true": 4,
             "unknown": 1
           },
           "verdict_winner": {
@@ -1182,7 +1182,7 @@
             "converged": false,
             "host_e2e": "true",
             "id": "ai-memory",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "id",
             "verdict_winner": "true",
             "winner_ids": [
@@ -1226,7 +1226,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "qdrant",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "id",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -1255,8 +1255,8 @@
             "unknown": 4
           },
           "pin_current": {
-            "false": 1,
-            "true": 4,
+            "false": 3,
+            "true": 2,
             "unknown": 0
           },
           "verdict_winner": {
@@ -1440,7 +1440,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "playwright-test",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "id",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -1482,7 +1482,7 @@
             "converged": false,
             "host_e2e": "true",
             "id": "worktrunk",
-            "pin_current": "false",
+            "pin_current": "true",
             "resolved_by": "id",
             "verdict_winner": "true",
             "winner_ids": [
@@ -1765,7 +1765,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "apple-container",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "id",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -1779,7 +1779,7 @@
             "converged": false,
             "host_e2e": "true",
             "id": "fastapi",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "id",
             "verdict_winner": "true",
             "winner_ids": [
@@ -1795,7 +1795,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "mcp-inspector",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "id",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -1823,7 +1823,7 @@
             "converged": false,
             "host_e2e": "true",
             "id": "nextjs",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "id",
             "verdict_winner": "true",
             "winner_ids": [
@@ -1884,8 +1884,8 @@
             "unknown": 5
           },
           "pin_current": {
-            "false": 0,
-            "true": 7,
+            "false": 4,
+            "true": 3,
             "unknown": 1
           },
           "verdict_winner": {
@@ -2217,7 +2217,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "ai-memory",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "id",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -2358,8 +2358,8 @@
             "unknown": 10
           },
           "pin_current": {
-            "false": 1,
-            "true": 5,
+            "false": 2,
+            "true": 4,
             "unknown": 5
           },
           "verdict_winner": {
@@ -2592,7 +2592,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "apple-container",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "id",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -2622,7 +2622,7 @@
             "converged": false,
             "host_e2e": "true",
             "id": "worktrunk",
-            "pin_current": "false",
+            "pin_current": "true",
             "resolved_by": "id",
             "verdict_winner": "true",
             "winner_ids": [
@@ -2813,7 +2813,7 @@
             "converged": false,
             "host_e2e": "true",
             "id": "mcp-inspector",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "id",
             "verdict_winner": "true",
             "winner_ids": [
@@ -2846,8 +2846,8 @@
             "unknown": 0
           },
           "pin_current": {
-            "false": 0,
-            "true": 2,
+            "false": 1,
+            "true": 1,
             "unknown": 0
           },
           "verdict_winner": {
@@ -3049,7 +3049,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "ai-memory",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "id",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -3138,8 +3138,8 @@
             "unknown": 4
           },
           "pin_current": {
-            "false": 1,
-            "true": 5,
+            "false": 2,
+            "true": 4,
             "unknown": 0
           },
           "verdict_winner": {
@@ -3383,7 +3383,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "agentsview",
-            "pin_current": "false",
+            "pin_current": "true",
             "resolved_by": "id",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -3511,7 +3511,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "ntfy",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "id",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -3585,7 +3585,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "vllm",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "id",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -3600,8 +3600,8 @@
             "unknown": 12
           },
           "pin_current": {
-            "false": 3,
-            "true": 12,
+            "false": 4,
+            "true": 11,
             "unknown": 0
           },
           "verdict_winner": {
@@ -3885,7 +3885,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "fastapi",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "id",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -3913,7 +3913,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "nextjs",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "id",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -3927,7 +3927,7 @@
             "converged": false,
             "host_e2e": "false",
             "id": "playwright-test",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "id",
             "verdict_winner": "true",
             "winner_ids": [
@@ -4015,7 +4015,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "syft",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "id",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -4044,8 +4044,8 @@
             "unknown": 10
           },
           "pin_current": {
-            "false": 0,
-            "true": 10,
+            "false": 4,
+            "true": 6,
             "unknown": 2
           },
           "verdict_winner": {
@@ -4246,7 +4246,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "ai-memory",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "id",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -4302,7 +4302,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "qdrant",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "id",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -4347,8 +4347,8 @@
             "unknown": 6
           },
           "pin_current": {
-            "false": 2,
-            "true": 4,
+            "false": 4,
+            "true": 2,
             "unknown": 1
           },
           "verdict_winner": {
@@ -4548,7 +4548,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "beads",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "id",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -4623,8 +4623,8 @@
             "unknown": 3
           },
           "pin_current": {
-            "false": 2,
-            "true": 2,
+            "false": 3,
+            "true": 1,
             "unknown": 1
           },
           "verdict_winner": {
@@ -4845,7 +4845,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "syft",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "id",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -4874,8 +4874,8 @@
             "unknown": 2
           },
           "pin_current": {
-            "false": 0,
-            "true": 3,
+            "false": 1,
+            "true": 2,
             "unknown": 0
           },
           "verdict_winner": {
@@ -5023,7 +5023,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "ai-memory",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "id",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -5051,7 +5051,7 @@
             "converged": false,
             "host_e2e": "true",
             "id": "qdrant",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "id",
             "verdict_winner": "true",
             "winner_ids": [
@@ -5097,7 +5097,7 @@
             "converged": false,
             "host_e2e": "true",
             "id": "vllm",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "id",
             "verdict_winner": "true",
             "winner_ids": [
@@ -5114,8 +5114,8 @@
             "unknown": 3
           },
           "pin_current": {
-            "false": 2,
-            "true": 4,
+            "false": 5,
+            "true": 1,
             "unknown": 0
           },
           "verdict_winner": {
@@ -5467,7 +5467,7 @@
             "converged": false,
             "host_e2e": "true",
             "id": "headroom",
-            "pin_current": "false",
+            "pin_current": "true",
             "resolved_by": "id",
             "verdict_winner": "true",
             "winner_ids": [
@@ -5483,7 +5483,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "jcodemunch-mcp",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "id",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -5541,7 +5541,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "toon",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "id",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -5556,8 +5556,8 @@
             "unknown": 5
           },
           "pin_current": {
-            "false": 1,
-            "true": 7,
+            "false": 2,
+            "true": 6,
             "unknown": 0
           },
           "verdict_winner": {
@@ -5859,7 +5859,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "playwright-cli",
-            "pin_current": "false",
+            "pin_current": "true",
             "resolved_by": "id",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -5890,8 +5890,8 @@
             "unknown": 1
           },
           "pin_current": {
-            "false": 2,
-            "true": 1,
+            "false": 1,
+            "true": 2,
             "unknown": 1
           },
           "verdict_winner": {
@@ -6180,7 +6180,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "beads",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "id",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -6252,7 +6252,7 @@
             "converged": false,
             "host_e2e": "true",
             "id": "worktrunk",
-            "pin_current": "false",
+            "pin_current": "true",
             "resolved_by": "id",
             "verdict_winner": "true",
             "winner_ids": [
@@ -6590,7 +6590,7 @@
             "converged": false,
             "host_e2e": "true",
             "id": "foundation-ai-memory",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "decision",
             "verdict_winner": "true",
             "winner_ids": [
@@ -6616,7 +6616,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "foundation-qdrant",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "decision",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -6681,8 +6681,8 @@
             "unknown": 5
           },
           "pin_current": {
-            "false": 4,
-            "true": 4,
+            "false": 6,
+            "true": 2,
             "unknown": 0
           },
           "verdict_winner": {
@@ -6922,7 +6922,7 @@
             "converged": false,
             "host_e2e": "true",
             "id": "nautilustrader",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "decision",
             "verdict_winner": "true",
             "winner_ids": [
@@ -6939,8 +6939,8 @@
             "unknown": 0
           },
           "pin_current": {
-            "false": 0,
-            "true": 1,
+            "false": 1,
+            "true": 0,
             "unknown": 1
           },
           "verdict_winner": {
@@ -6963,6 +6963,10 @@
           {
             "date": "2026-09-26",
             "sweep_id": "landscape-sweep-20260926"
+          },
+          {
+            "date": "2026-10-09",
+            "sweep_id": "landscape-sweep-20261009-pine"
           }
         ],
         "unresolved": [],
@@ -7119,7 +7123,7 @@
             "converged": false,
             "host_e2e": "true",
             "id": "data-pandera",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "decision",
             "verdict_winner": "true",
             "winner_ids": [
@@ -7136,8 +7140,8 @@
             "unknown": 0
           },
           "pin_current": {
-            "false": 0,
-            "true": 1,
+            "false": 1,
+            "true": 0,
             "unknown": 0
           },
           "verdict_winner": {
@@ -7607,7 +7611,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "nautilus-ibkr-adapter",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "decision",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -7622,8 +7626,8 @@
             "unknown": 5
           },
           "pin_current": {
-            "false": 0,
-            "true": 3,
+            "false": 1,
+            "true": 2,
             "unknown": 2
           },
           "verdict_winner": {
@@ -8181,7 +8185,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "grafana",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "decision",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -8205,7 +8209,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "ntfy",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "decision",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -8229,7 +8233,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "opentelemetry-collector-contrib",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "decision",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -8265,7 +8269,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "sandbox-runtime",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "decision",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -8280,8 +8284,8 @@
             "unknown": 9
           },
           "pin_current": {
-            "false": 2,
-            "true": 7,
+            "false": 6,
+            "true": 3,
             "unknown": 0
           },
           "verdict_winner": {
@@ -8838,7 +8842,7 @@
             "converged": false,
             "host_e2e": "true",
             "id": "syft",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "decision",
             "verdict_winner": "true",
             "winner_ids": [
@@ -8855,8 +8859,8 @@
             "unknown": 0
           },
           "pin_current": {
-            "false": 0,
-            "true": 2,
+            "false": 1,
+            "true": 1,
             "unknown": 0
           },
           "verdict_winner": {
@@ -9148,7 +9152,7 @@
             "converged": false,
             "host_e2e": "unknown",
             "id": "data-pandera",
-            "pin_current": "true",
+            "pin_current": "false",
             "resolved_by": "decision",
             "verdict_winner": "false",
             "winner_ids": [],
@@ -9163,8 +9167,8 @@
             "unknown": 1
           },
           "pin_current": {
-            "false": 1,
-            "true": 1,
+            "false": 2,
+            "true": 0,
             "unknown": 0
           },
           "verdict_winner": {
@@ -9351,9 +9355,9 @@
       },
       "manifest_layers_without_matrix_row": [],
       "newest_manifest": {
-        "checked_at": "2026-09-29",
-        "id": "sota-convergence-20260929",
-        "path": "catalogs/sota-convergence/manifest-20260929.json"
+        "checked_at": "2026-10-09",
+        "id": "sota-convergence-20261009",
+        "path": "catalogs/sota-convergence/manifest-20261009.json"
       },
       "newest_verdict_checked_at": {
         "foundation": "2026-09-22",
@@ -9386,6 +9390,12 @@
             "layers": 20,
             "manifest_ref": "catalogs/sota-convergence/manifest-20260929.json",
             "sweep_id": "landscape-sweep-20260929"
+          },
+          {
+            "date": "2026-10-09",
+            "layers": 1,
+            "manifest_ref": "catalogs/sota-convergence/manifest-20261009.json",
+            "sweep_id": "landscape-sweep-20261009-pine"
           }
         ],
         "host_e2e_platform": "linux-wsl2-x86_64",
