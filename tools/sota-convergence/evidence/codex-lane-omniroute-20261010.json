@@ -1,8 +1,9 @@
 {
   "schema_version": 1,
-  "checked_at": "2026-10-10T09:15:07Z",
-  "base_commit": "4d345267866403d75edece400fde6cd35ec4d05c",
-  "codex_lane_py_sha256": "6515b05e0a64b00a735d832e904dd2865b8a73d3df925fee7c0cdf540c258b1b",
+  "checked_at": "2026-10-10T09:45:29Z",
+  "base_commit": "86bb669ad6c81b9adafdb222d545a1bf2aa95218",
+  "original_base_commit": "4d345267866403d75edece400fde6cd35ec4d05c",
+  "codex_lane_py_sha256": "3ed9524ca7523b30a1258a18a06b1c7c7cc6d5f9826c2c14edfbc91394148d7a",
   "status": "cc_authorized_proceed_with_not_attested_disclosure",
   "cc_ruling": {
     "at": "2026-10-10T07:51Z",
@@ -13,6 +14,14 @@
     "rerun_rule": "If later attestation shows global system prompt, compression/adaptive budget, plugins or payload rules apply, OmniRoute-provider verdicts are re-run."
   },
   "native_default": true,
+  "native_receipt_contract": {
+    "cc_ruling_at": "2026-10-10T09:38Z",
+    "transport_fields": [],
+    "original_test_blob": "3f1132b46706001ab917c3d36d51a6cddc4b63ab",
+    "exact_provenance_assertion_restored_unedited": true,
+    "covers": ["absent provider flag", "explicit native provider", "native receipt fields", "all native usage attempts including failed retries"],
+    "original_suite_replay": {"class": "synthetic", "method": "Original Git test blob compiled in-memory against the fixed working-tree runner; actual test path retained for fixtures.", "tests": 81, "passed": 81, "exit_code": 0, "failures": 0, "errors": 0, "skips": 0}
+  },
   "opt_in": "--provider omniroute",
   "endpoint_env_addition": ["OMNIROUTE_BASE_URL"],
   "keyless": true,
@@ -20,6 +29,7 @@
   "isolation_args_unchanged": true,
   "receipt_transport_fields": ["provenance.provider", "provenance.provider_base_url", "provenance.pass_through"],
   "usage_transport_fields": ["provider", "provider_base_url", "pass_through"],
+  "transport_fields_apply_to": "omniroute only",
   "fail_before": {
     "fixture_class": "synthetic",
     "main_provider_class": {
@@ -49,17 +59,28 @@
     "endpoint_normalization": {"exit_code": 1, "observed": "HTTP://LOCALHOST:021128/v1", "expected": "http://localhost:21128/v1"},
     "malformed_endpoint_json": {"exit_code": 1, "endpoint": 1, "observed": "AttributeError from urllib.parse.urlsplit", "expected": "Graceful loopback endpoint refusal"},
     "model_route_identity": {"exit_code": 1, "observed": "cx/gpt-6.1-sol", "expected": "gpt-6.1-sol"},
-    "not_attested_disclosure": {"exit_code": 1, "failed_subtests": 5, "receipts": 2, "usage_attempts": 3, "includes_failed_attempt": true, "observed": "missing pass_through", "expected": "exact CC not_attested literal"}
+    "not_attested_disclosure": {"exit_code": 1, "failed_subtests": 5, "receipts": 2, "usage_attempts": 3, "includes_failed_attempt": true, "observed": "missing pass_through", "expected": "exact CC not_attested literal"},
+    "native_transport_metadata": {
+      "fixture_class": "synthetic",
+      "core_sha256": "6515b05e0a64b00a735d832e904dd2865b8a73d3df925fee7c0cdf540c258b1b",
+      "rebased_head": "1ce5c1c914ae4d9a32b40d3a0b6bad72413ef730",
+      "tests": 3, "exit_code": 1, "failures": 8, "errors": 0,
+      "observed": "provider=native added without opt-in to native provenance and every usage row",
+      "expected": "original exact provenance and native receipt/usage fields without transport metadata",
+      "includes_implicit_and_explicit_native": true,
+      "includes_failed_attempt": true,
+      "after_fix": {"tests": 3, "exit_code": 0, "failures": 0, "errors": 0, "elapsed_seconds": 0.160}
+    }
   },
   "required_tests": {
     "command": "python3 -m unittest tests.test_codex_lane tests.test_verdict_lane_vendoring -v",
     "exit_code": 0,
-    "tests": 111,
+    "tests": 112,
     "failures": 0,
     "errors": 0,
-    "elapsed_seconds": 6.730,
+    "elapsed_seconds": 6.235,
     "class": "local_integration",
-    "covers": ["native default", "loopback refusal", "credential/query/fragment/port refusal", "extra environment exclusion", "unchanged blind environment audit", "fresh keyless homes", "provider/family receipts", "exact not_attested disclosure on every Omni packet/attempt", "model disclosure spoof overwrite", "native/Claude disclosure refusal", "provider and endpoint resume invalidation", "canonical endpoint/model identity", "malformed metadata refusal", "legacy native sealer compatibility", "isolation args guard", "README block guard", "append-only code registries"]
+    "covers": ["native default", "original exact native provenance assertion", "implicit and explicit native receipts/usage omit transport fields including failed retries", "loopback refusal", "credential/query/fragment/port refusal", "extra environment exclusion", "unchanged blind environment audit", "fresh keyless homes", "OmniRoute provider/family receipts", "exact not_attested disclosure on every Omni packet/attempt", "model disclosure spoof overwrite", "native/Claude disclosure refusal", "provider and endpoint resume invalidation", "canonical endpoint/model identity", "malformed metadata refusal", "legacy native sealer compatibility", "isolation args guard", "README block guard", "append-only code registries"]
   },
   "tier1_dry_run": {
     "fixture_class": "synthetic",

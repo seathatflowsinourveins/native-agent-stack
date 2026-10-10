@@ -1492,11 +1492,12 @@ userinfo, queries, fragments and invalid ports are refused before a child starts
 only the validated endpoint joins the existing child environment allowlist. No gateway key variable or user
 configuration/profile is loaded. The blind audit still refuses environment-reading commands.
 
-Every packet's runner-owned provenance and each usage row record `provider`; OmniRoute provenance also records
-the canonical `provider_base_url`. Every OmniRoute packet and attempt also records exactly
+Only OmniRoute packets and attempts add transport metadata: runner-owned `provider=omniroute`, the canonical
+`provider_base_url`, and exactly
 `pass_through=not_attested (deployed settings unreadable by policy; OmniRoute@c1e30b76 chatCore.ts:3156, systemPrompt.ts:210-217/278-283, strategySelector.ts:234-249)`.
-Changing provider, endpoint or disclosure invalidates resume. The sealer validates these Codex-only fields
-while retaining all required code digests and legacy native receipts.
+Changing provider, endpoint or disclosure invalidates resume. Native provenance and usage retain their existing
+fields and omit all three transport fields, as required by the CC's 2026-10-10T09:38Z ruling. The sealer treats
+missing provider metadata as native and validates the OmniRoute-only additions while retaining every code digest.
 
 The CC's 2026-10-10T07:51Z ruling permits this opt-in under the exact not-attested disclosure; native remains
 default and preferred when the native sign-in window reopens. Gateway prompt preservation is **not established**

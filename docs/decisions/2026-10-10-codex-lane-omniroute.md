@@ -8,6 +8,14 @@ These fields are runner-owned, independent of model claims, and the sealer requi
 OmniRoute returns. The source does not prove gateway prompt preservation; the ruling accepts that explicit
 boundary without blocking the opt-in transport.
 
+The CC's 2026-10-10T09:38Z P2-2 ruling preserves the native receipt contract: `provider`, `provider_base_url`
+and `pass_through` are emitted only for OmniRoute. An absent flag or explicit `--provider native` keeps the
+original provenance and usage fields. The original exact-provenance assertion is restored unedited, with
+additional public receipt/usage coverage for both native selections and failed retries. The sealer already
+interprets a missing provider as native. This correction follows the
+[native contract at main 86bb669a](https://github.com/seathatflowsinourveins/native-agent-stack/blob/86bb669ad6c81b9adafdb222d545a1bf2aa95218/tests/test_codex_lane.py#L272-L283),
+the target of the one landing rebase from published head `4646b9da6c9c7fb85f335ce7ce336e2e3d380435`.
+
 The CC's acceptance rationale is the existing two-family vote/refutation protocol (lane-prompt.md rule 4),
 which does not promote a winner merely on agreement. Owner dashboard attestation remains the CC's item. If
 later attestation shows global system prompts, compression/adaptive budgets, plugins or payload rules apply,
@@ -22,8 +30,8 @@ Only `OMNIROUTE_BASE_URL` joins the existing child environment. The endpoint mus
 HTTP(S) `/v1` URL; port, userinfo, query, fragment and type checks run before a child or home is created.
 
 The default endpoint is `http://127.0.0.1:21128/v1`. The model defaults to `gpt-6.1-sol` on the `cx/` route;
-an explicit model is retained, with `cx/` treated only as routing syntax. Model identity, provider,
-pass-through disclosure and canonical endpoint are stamped by the runner; transport/disclosure changes
+an explicit model is retained, with `cx/` treated only as routing syntax. Model identity is stamped by the runner;
+OmniRoute alone adds provider, pass-through disclosure and canonical endpoint. Transport/disclosure changes
 invalidate resume. The shared sealer permits only the named Codex transport fields, keeps every required digest and accepts legacy native
 receipts. Code registration remains append-only. The memory opt-out and compression-off request are native
 provider headers, not new environment variables.
@@ -64,9 +72,11 @@ at 07:53:36Z and 08:22:46Z on October 10. It calls `account/rateLimits/read` thr
 client and does not manually read/copy credentials or native config. Native recovery requires an explicit
 allowed result; a timestamp or successful probe alone is insufficient.
 
-Fail-before tests cover the missing opt-in and provider receipts; follow-up regressions cover endpoint
+Fail-before tests cover the missing opt-in and OmniRoute provider receipts; follow-up regressions cover endpoint
 canonicalization, malformed JSON endpoint types, routed model identity and exact cross-family not-attested
-disclosure (including failed attempts and spoofed model provenance). All 111 Codex-lane and provenance
-registry tests pass, including the unchanged isolation tuple and README command guard. The synthetic tier-1
+disclosure (including failed attempts and spoofed model provenance). The native compatibility regression
+restores the original exact provenance and rejects transport fields on implicit/explicit native receipts and
+all attempts. The Codex-lane and provenance registry suites include the unchanged isolation tuple and README
+command guard. Current results are recorded in the dated receipt. The synthetic tier-1
 dry-run writes no output or home. Evidence classes and measured boundaries are in the
 [dated receipt](../../tools/sota-convergence/evidence/codex-lane-omniroute-20261010.json).

@@ -18552,8 +18552,8 @@
     },
     {
       "path": "docs/decisions/2026-10-10-codex-lane-omniroute.md",
-      "sha256": "fe8b46d5bd440d23cee7dc34a20c3a789f5903140f0f359b8109389273d4f009",
-      "bytes": 8137
+      "sha256": "4158df8208e2beb10694778866f9f3e94dcbaed0df5df82842e53ec9f197a709",
+      "bytes": 9146
     },
     {
       "path": "docs/decisions/2026-10-10-openhands-shard-discovery-protection.md",
@@ -60172,8 +60172,8 @@
     },
     {
       "path": "tests/test_codex_lane.py",
-      "sha256": "4c2a57f018318123066dae2060f8325c4d562c3f1485bd7614d898720e35e95e",
-      "bytes": 118934
+      "sha256": "2d07203ef7bc255098b667afa13d29407b1afecbf810aba07208b8423eee77eb",
+      "bytes": 120738
     },
     {
       "path": "tests/test_codex_quota.py",
@@ -61382,8 +61382,8 @@
     },
     {
       "path": "tools/sota-convergence/README.md",
-      "sha256": "59a1b94a1eb4b13675157df546871f9deb66c7aa4c1ff9a85e5cda7ad028384b",
-      "bytes": 192070
+      "sha256": "a1f2b37634d437e006567a131c8bde5c1c10a2d7e287a8d91d95442c5532e257",
+      "bytes": 192171
     },
     {
       "path": "tools/sota-convergence/adjudicate.py",
@@ -61412,8 +61412,8 @@
     },
     {
       "path": "tools/sota-convergence/codex_lane.py",
-      "sha256": "6515b05e0a64b00a735d832e904dd2865b8a73d3df925fee7c0cdf540c258b1b",
-      "bytes": 86208
+      "sha256": "3ed9524ca7523b30a1258a18a06b1c7c7cc6d5f9826c2c14edfbc91394148d7a",
+      "bytes": 86255
     },
     {
       "path": "tools/sota-convergence/compact_manifest.py",
@@ -61422,8 +61422,8 @@
     },
     {
       "path": "tools/sota-convergence/evidence/codex-lane-omniroute-20261010.json",
-      "sha256": "dd677c036dab4e34cf31e05b7c359db33fb5dac06bfad4950e77983019092f4c",
-      "bytes": 7103
+      "sha256": "56c6316e11edb2b2bdad80b903db970c51b34f6a393d07e6daf7d1230832e56e",
+      "bytes": 8715
     },
     {
       "path": "tools/sota-convergence/export_isolation_check.py",
@@ -61567,8 +61567,8 @@
     },
     {
       "path": "tools/sota-convergence/lane-provenance.json",
-      "sha256": "c3912cfe104b70dd376c207db2556d35dd9a0f50d9b501bdeac73eb541ad1f87",
-      "bytes": 15572
+      "sha256": "f127260b012f6fb43e82df11ad8df032b40601e8a36eb09d831dc7b0f70fa764",
+      "bytes": 16614
     },
     {
       "path": "tools/sota-convergence/lane-return.schema.json",

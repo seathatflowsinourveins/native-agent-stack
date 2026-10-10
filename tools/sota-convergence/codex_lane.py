@@ -1164,8 +1164,9 @@ def lane_provenance(prompt_path: Path, repo: Path = None, allow_escaping_links: 
     ``repo``) the digest of the evidence tree the lane read, so a resume against another export reruns
     (Codex review of #145)."""
     provenance = {"codex_lane_py_sha256": sha256_file(Path(__file__).resolve()),
-                  "prompt_sha256": sha256_file(Path(prompt_path)), "provider": provider}
+                  "prompt_sha256": sha256_file(Path(prompt_path))}
     if provider == "omniroute":
+        provenance["provider"] = provider
         provenance["provider_base_url"] = omniroute_endpoint(omniroute_base_url)
         provenance["pass_through"] = OMNIROUTE_PASS_THROUGH
     if repo is not None:
@@ -1441,9 +1442,10 @@ def run_pending(args, work_dir, repo, template, schema_path, codex_dir, events_d
             usage_row = {
                 "catalog": catalog, "layer": layer_id, "attempt": attempt,
                 "exit_code": result["exit_code"], "timed_out": result["timed_out"],
-                "model": model_name, "seconds": round(result["elapsed"], 3), "provider": args.provider,
+                "model": model_name, "seconds": round(result["elapsed"], 3),
             }
             if args.provider == "omniroute":
+                usage_row["provider"] = args.provider
                 usage_row["provider_base_url"] = args.omniroute_base_url
                 usage_row["pass_through"] = OMNIROUTE_PASS_THROUGH
             usage_row.update(usage)

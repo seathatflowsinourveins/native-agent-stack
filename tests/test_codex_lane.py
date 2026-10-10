@@ -275,7 +275,6 @@ class CodexLaneTests(CodexLaneFixture):
         self.assertEqual(self.run_lane(), 0)
         data = json.loads(self.out_path("foundation", "native-clients").read_text(encoding="utf-8"))
         self.assertEqual(data["provenance"], {
-            "provider": "native",
             "codex_lane_py_sha256": hashlib.sha256((TOOL_DIR / "codex_lane.py").read_bytes()).hexdigest(),
             "prompt_sha256": hashlib.sha256(FIXTURE_PROMPT.read_bytes()).hexdigest(),
             "repo_tree_sha256": codex_lane.tree_sha256(self.repo),
@@ -1398,7 +1397,7 @@ class OmniRouteProviderTests(CodexLaneFixture):
         self.assertTrue(any(argv[index:index + len(required)] == required
                             for index in range(len(argv))), "OmniRoute must retain every isolation argument")
 
-    def test_the_absent_provider_flag_keeps_native_and_records_it(self):
+    def test_the_absent_provider_flag_keeps_the_legacy_native_metadata(self):
         self.write_packet("foundation", "native-clients")
         # An endpoint in the parent environment does not opt a wave into failover.
         with mock.patch.dict(os.environ, {"OMNIROUTE_BASE_URL": self.ENDPOINT}):
@@ -1407,11 +1406,36 @@ class OmniRouteProviderTests(CodexLaneFixture):
         self.assertFalse(any(value.startswith("model_provider=") or value.startswith("model_providers.")
                              for value in argv))
         data = json.loads(self.out_path("foundation", "native-clients").read_text(encoding="utf-8"))
-        self.assertEqual(data["provenance"].get("provider"), "native")
-        self.assertNotIn("pass_through", data["provenance"])
-        self.assertEqual(self.usage_rows()[0].get("provider"), "native")
-        self.assertNotIn("provider_base_url", self.usage_rows()[0])
-        self.assertNotIn("pass_through", self.usage_rows()[0])
+        self.assertEqual(set(data["provenance"]), {"codex_lane_py_sha256", "prompt_sha256", "repo_tree_sha256"})
+        self.assertFalse({"provider", "provider_base_url", "pass_through"} & set(self.usage_rows()[0]))
+
+    def test_implicit_and_explicit_native_omit_transport_fields_on_receipts_and_retries(self):
+        self.write_packet("foundation", "native-clients")
+        os.environ["CODEX_FAKE_FAIL_ATTEMPTS"] = "1"
+        legacy_keys = {"codex_lane_py_sha256", "prompt_sha256", "repo_tree_sha256"}
+        transport_keys = {"provider", "provider_base_url", "pass_through"}
+        for args in ([], ["--provider", "native"]):
+            selection = "explicit" if args else "implicit"
+            self.counter_file.unlink(missing_ok=True)
+            self.out_path("foundation", "native-clients").unlink(missing_ok=True)
+            previous_calls, previous_rows = len(self.argv_calls()), len(self.usage_rows())
+            with mock.patch.dict(os.environ, {"OMNIROUTE_BASE_URL": self.ENDPOINT}):
+                self.assertEqual(self.run_lane(args), 0)
+            argv_calls = self.argv_calls()[previous_calls:]
+            self.assertEqual(len(argv_calls), 2, "the failed native attempt must retry")
+            for argv in argv_calls:
+                self.assertFalse(any(value.startswith("model_provider=") or value.startswith("model_providers.")
+                                     for value in argv), "native selection must retain native client config")
+            data = json.loads(self.out_path("foundation", "native-clients").read_text(encoding="utf-8"))
+            with self.subTest(selection=selection, receipt=True):
+                self.assertEqual(set(data["provenance"]), legacy_keys)
+            rows = self.usage_rows()[previous_rows:]
+            self.assertEqual([row["attempt"] for row in rows], [1, 2])
+            self.assertNotEqual(rows[0]["exit_code"], 0)
+            self.assertEqual(rows[1]["exit_code"], 0)
+            for row in rows:
+                with self.subTest(selection=selection, attempt=row["attempt"]):
+                    self.assertFalse(transport_keys & set(row), "native usage keeps the legacy metadata shape")
 
     def test_omniroute_dry_run_on_a_synthetic_tier1_packet_writes_nothing(self):
         self.write_packet("foundation", "native-clients", {
@@ -1620,7 +1644,7 @@ class OmniRouteProviderTests(CodexLaneFixture):
         self.assertEqual(len(self.argv_calls()), 2, "a provider change must rerun the packet")
         data = json.loads(self.out_path("foundation", "native-clients").read_text(encoding="utf-8"))
         self.assertEqual(data["provenance"]["provider"], "omniroute")
-        self.assertEqual([row["provider"] for row in self.usage_rows()], ["native", "omniroute"])
+        self.assertEqual([row.get("provider") for row in self.usage_rows()], [None, "omniroute"])
         self.assertEqual(self.run_lane(["--provider", "omniroute"]), 0)
         self.assertEqual(len(self.argv_calls()), 2, "the same OmniRoute provider resumes the clean return")
 
