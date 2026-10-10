@@ -1,0 +1,14 @@
+# Starts claude-review-worker.service at minutes 07, 22, 37 and 52 of every hour (tools/claude-review-worker/README.md).
+# A tick still running when the next one is due is not started twice: a timer does not start a unit that is active.
+# Without Persistent=, a tick missed while the host or the user manager was down is not caught up; the next one runs.
+# loginctl enable-linger keeps the user manager, and so this timer, running without a login session.
+[Unit]
+Description=Claude local review worker, every 15 minutes
+
+[Timer]
+OnCalendar=*-*-* *:07,22,37,52:00
+AccuracySec=1min
+Unit=claude-review-worker.service
+
+[Install]
+WantedBy=timers.target

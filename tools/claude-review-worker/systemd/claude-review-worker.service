@@ -1,0 +1,36 @@
+# One tick of the local Claude review worker (tools/claude-review-worker/README.md;
+# docs/decisions/2026-10-09-claude-review-worker.md). Drafted here, installed by the command center; the timer beside
+# this file starts it. It has no [Install] section, matching the timer-triggered oneshot convention of
+# adoption/templates/systemd.
+#
+# @REPOSITORY@ is the checkout that holds this tool. The command center owns the install (its decision on #953,
+# 2026-10-10): the live clone %h/code/native-agent-stack-live, a detached worktree of origin/main that each tick
+# refreshes first, never a working checkout and never a build worktree. Substitute it before installing, then verify:
+#   sed 's#@REPOSITORY@#%h/code/native-agent-stack-live#g' tools/claude-review-worker/systemd/claude-review-worker.service > ~/.config/systemd/user/claude-review-worker.service
+#   cp tools/claude-review-worker/systemd/claude-review-worker.timer ~/.config/systemd/user/
+#   systemd-analyze --user verify ~/.config/systemd/user/claude-review-worker.service ~/.config/systemd/user/claude-review-worker.timer
+#
+# The refresh fails closed: an ExecStartPre= command without a "-" prefix that fails stops the unit before ExecStart=
+# (systemd.service(5)), so a tick whose fetch or switch fails reviews nothing rather than running stale code.
+#
+# The environment file is documented in the README and is not created by the repository. It names the ledger and the
+# switches, never a key; without it the unit does not start. The key stays in the per-host store: credential_run.py
+# reads it and hands it to the sandboxed claude process through that process's environment only.
+#
+# PATH: gh is reached through the mise shims on the workstation, and the user manager's own PATH lacks them; on another
+# host use the directories that hold gh and git. A PATH set in the environment file wins over this line
+# (systemd.exec(5): settings from EnvironmentFile= override Environment=). python3 -I ignores PYTHON* variables.
+[Unit]
+Description=Claude local review worker (one tick)
+Documentation=https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/tools/claude-review-worker/README.md
+
+[Service]
+Type=oneshot
+EnvironmentFile=%h/.config/claude-review-worker.env
+Environment=PATH=%h/.local/share/mise/shims:/usr/local/bin:/usr/bin:/bin
+ExecStartPre=/usr/bin/git -C @REPOSITORY@ fetch --quiet origin
+ExecStartPre=/usr/bin/git -C @REPOSITORY@ switch --quiet --detach origin/main
+ExecStart=/usr/bin/python3 -I @REPOSITORY@/tools/claude-review-worker/worker.py run
+# Two reviews of at most CLAUDE_REVIEW_TIMEOUT_SECONDS each (2700 by default), one after another, plus git work.
+TimeoutStartSec=2h
+Nice=10
