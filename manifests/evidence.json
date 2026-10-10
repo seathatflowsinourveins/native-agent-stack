@@ -14766,6 +14766,16 @@
       "bytes": 12245
     },
     {
+      "path": "blueprints/us-equities/engine-nautilus/evidence/j2-sim-rc5-20261005/deviation-disposition-j2-rc5-20261006.json",
+      "sha256": "a900056304f0ae536457eae05a98a771f3860d6352d2aec76626fcb755b5df08",
+      "bytes": 3120
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/evidence/j2-sim-rc5-20261005/spy-one_zero-launcher-equivalent-20261006T044147Z.json",
+      "sha256": "7a5f23eef5cd65d964879bc3a5c4c4a056b786ca54beadabe97d5fb9ae7b6ba3",
+      "bytes": 18770
+    },
+    {
       "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/README.md",
       "sha256": "45534566fd22e51bfdc0c92f209c870b841de0a3604e73cc528a714affffc9ac",
       "bytes": 8682
@@ -15979,6 +15989,11 @@
       "path": "blueprints/us-equities/mover-coverage-asof/README.md",
       "sha256": "9d17fba8072711aa083e42d478a4110de016732484000031af2a5b5fd9fd9454",
       "bytes": 13876
+    },
+    {
+      "path": "blueprints/us-equities/mover-coverage-asof/evidence/native-e2-replay-2604-20261006.json",
+      "sha256": "de1d09f2b8d9479d9ace878b169d8688758bb81f110e208846822bb8bbdc2b03",
+      "bytes": 3724
     },
     {
       "path": "blueprints/us-equities/mover-coverage-asof/evidence/summary-asof-20260929.json",

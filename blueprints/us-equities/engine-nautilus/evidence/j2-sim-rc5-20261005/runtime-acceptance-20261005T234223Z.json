@@ -1,0 +1,353 @@
+{
+  "schema_version": 1,
+  "id": "native-j2-rc5-runtime-20261005",
+  "status": "PASS_24_OF_24_AFTER_TRANSIENT_HOST_METADATA_RESTORE",
+  "evidence_classes": [
+    "native_proven",
+    "local_integration",
+    "synthetic"
+  ],
+  "host": "NativeStack2604",
+  "base_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+  "north_star_action": "Historical simulation on the selected NautilusTrader destination",
+  "runtime": {
+    "root": "${HOME}/projects/us-equities-runtime",
+    "python": "3.12.3",
+    "engine": "2.0.0rc5",
+    "uv": "0.12.17",
+    "lock_sha256": "1fb9f8ca6fef9c47a4ded826ddf20012f78d6643926cce3a36b86c674f55eb9c",
+    "installed_and_checkout_lock_equal": true,
+    "owner_marker": "native-stack-trading-2604-v1",
+    "completion_marker": "native-stack-trading-2604-no-dvc-r4",
+    "reinstalled": false
+  },
+  "argv": [
+    "env",
+    "TMPDIR=/tmp/t2604-pkg-work",
+    "nice",
+    "-n",
+    "19",
+    "mise",
+    "exec",
+    "uv@0.12.17",
+    "--",
+    "bash",
+    "blueprints/us-equities/runtime-2604/accept-trading-2604.sh"
+  ],
+  "rtk_wrapper": [
+    "rtk",
+    "proxy"
+  ],
+  "nice": 19,
+  "output_capture": "Native stdout and stderr combined with 2>&1, without RTK filtering.",
+  "attempts": [
+    {
+      "start_utc": "2026-10-05T23:39:33Z",
+      "end_utc": "2026-10-05T23:39:33Z",
+      "exit_code": 1,
+      "duration_seconds": 0,
+      "combined_output_sha256": "3539898634321c23388426bed13c2dd2a7a597fc2d6a3078d353fe35539fc892",
+      "checks": [
+        {
+          "name": "offline_isolation",
+          "status": "BLOCKED",
+          "exit_code": 64
+        },
+        {
+          "name": "python",
+          "status": "BLOCKED",
+          "exit_code": 64
+        },
+        {
+          "name": "import_nautilus-trader",
+          "status": "BLOCKED",
+          "exit_code": 64
+        },
+        {
+          "name": "import_numpy",
+          "status": "BLOCKED",
+          "exit_code": 64
+        },
+        {
+          "name": "import_pandas",
+          "status": "BLOCKED",
+          "exit_code": 64
+        },
+        {
+          "name": "import_alpaca-py",
+          "status": "BLOCKED",
+          "exit_code": 64
+        },
+        {
+          "name": "import_edgartools",
+          "status": "BLOCKED",
+          "exit_code": 64
+        },
+        {
+          "name": "import_exchange-calendars",
+          "status": "BLOCKED",
+          "exit_code": 64
+        },
+        {
+          "name": "import_duckdb",
+          "status": "BLOCKED",
+          "exit_code": 64
+        },
+        {
+          "name": "import_pandera",
+          "status": "BLOCKED",
+          "exit_code": 64
+        },
+        {
+          "name": "import_skfolio",
+          "status": "BLOCKED",
+          "exit_code": 64
+        },
+        {
+          "name": "import_fincore",
+          "status": "BLOCKED",
+          "exit_code": 64
+        },
+        {
+          "name": "import_mlflow",
+          "status": "BLOCKED",
+          "exit_code": 64
+        },
+        {
+          "name": "import_arch",
+          "status": "BLOCKED",
+          "exit_code": 64
+        },
+        {
+          "name": "import_purgedcv",
+          "status": "BLOCKED",
+          "exit_code": 64
+        },
+        {
+          "name": "ibkr_adapter",
+          "status": "BLOCKED",
+          "exit_code": 64
+        },
+        {
+          "name": "alpaca_adapter_source",
+          "status": "BLOCKED",
+          "exit_code": 64
+        },
+        {
+          "name": "alpaca_adapter_import",
+          "status": "BLOCKED",
+          "exit_code": 64
+        },
+        {
+          "name": "nautilus_quickstart_sha256",
+          "status": "BLOCKED",
+          "exit_code": 64
+        },
+        {
+          "name": "nautilus_quickstart",
+          "status": "BLOCKED",
+          "exit_code": 64
+        },
+        {
+          "name": "duckdb_query",
+          "status": "BLOCKED",
+          "exit_code": 64
+        },
+        {
+          "name": "pandera_example",
+          "status": "BLOCKED",
+          "exit_code": 64
+        },
+        {
+          "name": "skfolio_example",
+          "status": "BLOCKED",
+          "exit_code": 64
+        },
+        {
+          "name": "arch_example",
+          "status": "BLOCKED",
+          "exit_code": 64
+        }
+      ],
+      "output": "runtime-acceptance-guard-blocked-20261005T233933Z.txt",
+      "environment": {
+        "WSL_DISTRO_NAME": "absent",
+        "native_prerequisite_code": 64
+      }
+    },
+    {
+      "start_utc": "2026-10-05T23:41:34Z",
+      "end_utc": "2026-10-05T23:42:23Z",
+      "exit_code": 0,
+      "duration_seconds": 49,
+      "combined_output_sha256": "fb2b9f40441298c9219f4656970c734bd470ee0d227ea5f6490501d37d16e94c",
+      "checks": [
+        {
+          "name": "offline_isolation",
+          "status": "PASS",
+          "exit_code": 0
+        },
+        {
+          "name": "python",
+          "status": "PASS",
+          "exit_code": 0
+        },
+        {
+          "name": "import_nautilus-trader",
+          "status": "PASS",
+          "exit_code": 0
+        },
+        {
+          "name": "import_numpy",
+          "status": "PASS",
+          "exit_code": 0
+        },
+        {
+          "name": "import_pandas",
+          "status": "PASS",
+          "exit_code": 0
+        },
+        {
+          "name": "import_alpaca-py",
+          "status": "PASS",
+          "exit_code": 0
+        },
+        {
+          "name": "import_edgartools",
+          "status": "PASS",
+          "exit_code": 0
+        },
+        {
+          "name": "import_exchange-calendars",
+          "status": "PASS",
+          "exit_code": 0
+        },
+        {
+          "name": "import_duckdb",
+          "status": "PASS",
+          "exit_code": 0
+        },
+        {
+          "name": "import_pandera",
+          "status": "PASS",
+          "exit_code": 0
+        },
+        {
+          "name": "import_skfolio",
+          "status": "PASS",
+          "exit_code": 0
+        },
+        {
+          "name": "import_fincore",
+          "status": "PASS",
+          "exit_code": 0
+        },
+        {
+          "name": "import_mlflow",
+          "status": "PASS",
+          "exit_code": 0
+        },
+        {
+          "name": "import_arch",
+          "status": "PASS",
+          "exit_code": 0
+        },
+        {
+          "name": "import_purgedcv",
+          "status": "PASS",
+          "exit_code": 0
+        },
+        {
+          "name": "ibkr_adapter",
+          "status": "PASS",
+          "exit_code": 0
+        },
+        {
+          "name": "alpaca_adapter_source",
+          "status": "PASS",
+          "exit_code": 0
+        },
+        {
+          "name": "alpaca_adapter_import",
+          "status": "PASS",
+          "exit_code": 0
+        },
+        {
+          "name": "nautilus_quickstart_sha256",
+          "status": "PASS",
+          "exit_code": 0
+        },
+        {
+          "name": "nautilus_quickstart",
+          "status": "PASS",
+          "exit_code": 0
+        },
+        {
+          "name": "duckdb_query",
+          "status": "PASS",
+          "exit_code": 0
+        },
+        {
+          "name": "pandera_example",
+          "status": "PASS",
+          "exit_code": 0
+        },
+        {
+          "name": "skfolio_example",
+          "status": "PASS",
+          "exit_code": 0
+        },
+        {
+          "name": "arch_example",
+          "status": "PASS",
+          "exit_code": 0
+        }
+      ],
+      "output": "runtime-acceptance-20261005T234223Z.txt",
+      "environment": {
+        "transient_subshell_export": {
+          "WSL_DISTRO_NAME": "NativeStack2604"
+        },
+        "reason": "Resumed command environment omitted this nonsecret native distro identifier. Task host identity, UID1000 and Microsoft WSL2 kernel were verified; the guard and all harness bytes remained unchanged."
+      }
+    }
+  ],
+  "scope": "24 offline runtime integration checks, including the unchanged upstream synthetic EUR/USD quickstart. This does not execute retained SPY/AAPL historical data, broker connections, paper orders or an unchanged upstream test suite.",
+  "sources": {
+    "nautilus_repository": "https://github.com/nautechsystems/nautilus_trader",
+    "nautilus_tag": "v2.0.0rc5",
+    "nautilus_commit": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+    "release": {
+      "published_at": "2026-09-15T06:17:23Z",
+      "tag_name": "v2.0.0rc5",
+      "target_commitish": "develop"
+    },
+    "quickstart": "docs/getting_started/quickstart.py",
+    "quickstart_sha256": "487e6807dedd1a38062638eb671f6110799451611819542bf0f0c10646cb2c53",
+    "runtime_recipe": "blueprints/us-equities/runtime-2604/README.md:97-98",
+    "runtime_guard": "blueprints/us-equities/runtime-2604/accept-trading-2604.sh:49",
+    "source_sha256": {
+      "blueprints/us-equities/runtime-2604/accept-trading-2604.sh": "900be972121b8be41a54871ec12eb2b61d11dbc077bc2af61dd208743664a26d",
+      "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock": "1fb9f8ca6fef9c47a4ded826ddf20012f78d6643926cce3a36b86c674f55eb9c",
+      "blueprints/us-equities/engine-nautilus/spy-parity/run.py": "c3917c2f6446ffb1bcfe411cc2339ffc1f804a87904ed3a1f1a67e51817ad2f2",
+      "blueprints/us-equities/engine-nautilus/spy-parity/compare.py": "c70386f869e45bcdc54602100991235a450d2a5854445d98ffe45b849454a5ec",
+      "blueprints/us-equities/engine-nautilus/spy-parity/convert.py": "08cba0a2aac938e9306935f91c2889b181dfc880b532b5943e0ccda395592c65",
+      "blueprints/us-equities/engine-nautilus/spy-parity/fixture_strategy.py": "59649ac50f26c8b6090dc976e4ec0b3b7e2121cc214674f6c122fbbca9b143f1",
+      "blueprints/us-equities/engine-nautilus/spy-parity/distribution_module.py": "eefee070b0dbe6ad3a1e68755ca959b5fff081fad61af8b84902a438996b126b",
+      "blueprints/us-equities/engine-nautilus/spy-parity/mapping-manifest-v2.json": "1b821d7ba42ea6121002a26a5082df08ed7a79f9a50b2edc9959503e1088ac67",
+      "blueprints/us-equities/engine-nautilus/spy-parity/PREREGISTRATION-v2.md": "4393a1b7d896b2f49c4091c18701bd08cfc72a8d313f0ad2a628e91db26d6f0c",
+      "blueprints/us-equities/engine-nautilus/equity-replay/launch.py": "c28222a977b005de5d6c14d963cb4338482795a3aac169c5a1448b37084dce97",
+      "blueprints/us-equities/engine-nautilus/equity-replay/run.py": "e036aa9354a478fe270258d3d2f2cb42a5c9c072d688b21313e0a89e715d796e",
+      "blueprints/us-equities/engine-nautilus/equity-replay/plan.json": "1e3cefdab959c9ce15e6d9d07ff6135b5720f8792bed06b2e02510dd880dd805"
+    }
+  },
+  "retained_failures_and_corrections": [
+    "First unchanged command exit1 retained: all24 checks BLOCKED64 before execution because WSL_DISTRO_NAME was absent.",
+    "An initial guessed installed project/uv.lock path was absent; the canonical runtime-root uv.lock from accept-trading-2604.sh:11 matched. This was a locator error, not a failed installation."
+  ],
+  "limits": [
+    "Native execution of local runtime integration, not a complete unchanged upstream suite.",
+    "Synthetic quickstart is distinct from retained historical replay and strategy merit.",
+    "No baseline, mapping, preregistration, existing receipt or runtime installation was changed."
+  ]
+}

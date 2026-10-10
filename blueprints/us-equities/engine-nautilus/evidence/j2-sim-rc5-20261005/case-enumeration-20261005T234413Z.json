@@ -1,0 +1,191 @@
+{
+  "schema_version": 1,
+  "id": "j2-rc5-historical-case-enumeration-20261005",
+  "base_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+  "enumerated_before_execution": true,
+  "status": "PARTIAL_RUNTIME_PASS_HISTORICAL_CASES_BLOCKED",
+  "runtime_acceptance": "native-j2-rc5-runtime-20261005; rc0,24/24",
+  "evidence_classes": [
+    "source_review",
+    "local_integration"
+  ],
+  "source_case_count": 8,
+  "source_implemented_case_count": 3,
+  "mapping_blocked_case_count": 5,
+  "historical_cases_executed": 0,
+  "cases": [
+    {
+      "case": "SPY/one_zero",
+      "source_implemented": true,
+      "status": "BLOCKED_HOST_INPUTS",
+      "blocked_by": [
+        "Five frozen LEAN inputs absent at both documented host roots",
+        "Documented isolation vector assumes interpreter resides entirely inside virtualenv mount; managed .python needs an owner-approved route"
+      ],
+      "exit_code": null,
+      "harness_checks": null,
+      "duration_seconds": null,
+      "sources": [
+        "blueprints/us-equities/engine-nautilus/spy-parity/README.md:69-76,181-193",
+        "blueprints/us-equities/engine-nautilus/spy-parity/run.py:708-719"
+      ],
+      "qualification_limit": "Repeat execution may pass execution/economic checks yet fail retained preregistration preconditions; retain full comparator verdict."
+    },
+    {
+      "case": "SPY/one_stress",
+      "source_implemented": false,
+      "status": "BLOCKED_NO_MAPPING",
+      "blocked_by": [
+        "costs_and_rounding_stress"
+      ],
+      "exit_code": null,
+      "harness_checks": null,
+      "duration_seconds": null,
+      "sources": [
+        "blueprints/us-equities/engine-nautilus/acceptance-plan.md:25-29",
+        "blueprints/us-equities/engine-nautilus/spy-parity/mapping-manifest-v2.json:341"
+      ]
+    },
+    {
+      "case": "SPY/two_zero",
+      "source_implemented": false,
+      "status": "BLOCKED_NO_MAPPING",
+      "blocked_by": [
+        "margin_and_adaptive_state"
+      ],
+      "exit_code": null,
+      "harness_checks": null,
+      "duration_seconds": null,
+      "sources": [
+        "blueprints/us-equities/engine-nautilus/acceptance-plan.md:25-29",
+        "blueprints/us-equities/engine-nautilus/spy-parity/mapping-manifest-v2.json:342"
+      ]
+    },
+    {
+      "case": "SPY/two_stress",
+      "source_implemented": false,
+      "status": "BLOCKED_NO_MAPPING",
+      "blocked_by": [
+        "margin_and_adaptive_state",
+        "costs_and_rounding_stress"
+      ],
+      "exit_code": null,
+      "harness_checks": null,
+      "duration_seconds": null,
+      "sources": [
+        "blueprints/us-equities/engine-nautilus/acceptance-plan.md:25-29",
+        "blueprints/us-equities/engine-nautilus/spy-parity/mapping-manifest-v2.json:343"
+      ]
+    },
+    {
+      "case": "SPY/adaptive_stress",
+      "source_implemented": false,
+      "status": "BLOCKED_NO_MAPPING",
+      "blocked_by": [
+        "margin_and_adaptive_state"
+      ],
+      "exit_code": null,
+      "harness_checks": null,
+      "duration_seconds": null,
+      "sources": [
+        "blueprints/us-equities/engine-nautilus/acceptance-plan.md:25-29",
+        "blueprints/us-equities/engine-nautilus/spy-parity/mapping-manifest-v2.json:344"
+      ]
+    },
+    {
+      "case": "SPY/over_limit",
+      "source_implemented": false,
+      "status": "BLOCKED_NO_MAPPING",
+      "blocked_by": [
+        "margin_and_adaptive_state"
+      ],
+      "exit_code": null,
+      "harness_checks": null,
+      "duration_seconds": null,
+      "sources": [
+        "blueprints/us-equities/engine-nautilus/acceptance-plan.md:25-29",
+        "blueprints/us-equities/engine-nautilus/spy-parity/mapping-manifest-v2.json:345"
+      ]
+    },
+    {
+      "case": "AAPL/baseline",
+      "source_implemented": true,
+      "status": "BLOCKED_HOST_INPUTS_AND_LAUNCH_ROUTE",
+      "blocked_by": [
+        "Retained authenticated Alpaca input root not located at source-derived host candidate",
+        "launch.py mounts only .venv; its Python symlink points into .python, which would be unavailable inside that unchanged namespace"
+      ],
+      "exit_code": null,
+      "harness_checks": null,
+      "duration_seconds": null,
+      "sources": [
+        "blueprints/us-equities/engine-nautilus/equity-replay/README.md:18-33,58-74",
+        "blueprints/us-equities/engine-nautilus/equity-replay/launch.py:24-33",
+        "blueprints/us-equities/engine-nautilus/equity-replay/run.py:177-187,207-210"
+      ],
+      "execution_contract": "Both cases run together in one unchanged isolated launcher invocation; no case-selector or alternative fixture was created."
+    },
+    {
+      "case": "AAPL/fee_slippage_stress",
+      "source_implemented": true,
+      "status": "BLOCKED_HOST_INPUTS_AND_LAUNCH_ROUTE",
+      "blocked_by": [
+        "Retained authenticated Alpaca input root not located at source-derived host candidate",
+        "launch.py mounts only .venv; its Python symlink points into .python, which would be unavailable inside that unchanged namespace"
+      ],
+      "exit_code": null,
+      "harness_checks": null,
+      "duration_seconds": null,
+      "sources": [
+        "blueprints/us-equities/engine-nautilus/equity-replay/README.md:18-33,58-74",
+        "blueprints/us-equities/engine-nautilus/equity-replay/launch.py:24-33",
+        "blueprints/us-equities/engine-nautilus/equity-replay/run.py:177-187,207-210"
+      ],
+      "execution_contract": "Both cases run together in one unchanged isolated launcher invocation; no case-selector or alternative fixture was created."
+    }
+  ],
+  "retained_input_observations": {
+    "scope": "Bounded lookups of documented/source-derived paths only, not a global filesystem absence claim",
+    "spy_roots": [
+      {
+        "path": "${HOME}/.local/share/codex-ecosystem/tools/lean-985ef30/Data",
+        "present": false,
+        "source": "blueprints/us-equities/engine-nautilus/spy-parity/README.md:73"
+      },
+      {
+        "path": "${HOME}/.local/share/codex-ecosystem/lean/Lean/Data",
+        "present": false,
+        "source": "blueprints/us-equities/engine-nautilus/spy-parity/README.md:183"
+      }
+    ],
+    "aapl_candidate": {
+      "path": "${HOME}/.local/share/codex-ecosystem/state/authenticated-data-20260920/alpaca-run-1",
+      "present": false,
+      "source": "evidence/artifacts/native-rollout-20260925/sim/equity-replay.json:18-19,137",
+      "required_receipt_sha256": "a59c6ed74e839ca43ee704033e207865ed938a22e4738afce22ec197e91b6bcd"
+    },
+    "native_checks_returned": false
+  },
+  "excluded_scopes": [
+    "Synthetic EUR/USD quickstart is already part of runtime24-check acceptance.",
+    "Synthetic #5039 callback-loss diagnostic is not historical-case breadth.",
+    "Broker-state faults, broker/paper acceptance and client IDs91/92 are outside J2."
+  ],
+  "question_for_owner": "Co-op Q7 requests retained-input locations and an authorized native managed-interpreter mount route, keeping every harness byte unchanged. No input acquisition or alternate runner was attempted.",
+  "source_sha256": {
+    "blueprints/us-equities/runtime-2604/accept-trading-2604.sh": "900be972121b8be41a54871ec12eb2b61d11dbc077bc2af61dd208743664a26d",
+    "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock": "1fb9f8ca6fef9c47a4ded826ddf20012f78d6643926cce3a36b86c674f55eb9c",
+    "blueprints/us-equities/engine-nautilus/spy-parity/run.py": "c3917c2f6446ffb1bcfe411cc2339ffc1f804a87904ed3a1f1a67e51817ad2f2",
+    "blueprints/us-equities/engine-nautilus/spy-parity/compare.py": "c70386f869e45bcdc54602100991235a450d2a5854445d98ffe45b849454a5ec",
+    "blueprints/us-equities/engine-nautilus/spy-parity/convert.py": "08cba0a2aac938e9306935f91c2889b181dfc880b532b5943e0ccda395592c65",
+    "blueprints/us-equities/engine-nautilus/spy-parity/fixture_strategy.py": "59649ac50f26c8b6090dc976e4ec0b3b7e2121cc214674f6c122fbbca9b143f1",
+    "blueprints/us-equities/engine-nautilus/spy-parity/distribution_module.py": "eefee070b0dbe6ad3a1e68755ca959b5fff081fad61af8b84902a438996b126b",
+    "blueprints/us-equities/engine-nautilus/spy-parity/mapping-manifest-v2.json": "1b821d7ba42ea6121002a26a5082df08ed7a79f9a50b2edc9959503e1088ac67",
+    "blueprints/us-equities/engine-nautilus/spy-parity/PREREGISTRATION-v2.md": "4393a1b7d896b2f49c4091c18701bd08cfc72a8d313f0ad2a628e91db26d6f0c",
+    "blueprints/us-equities/engine-nautilus/equity-replay/launch.py": "c28222a977b005de5d6c14d963cb4338482795a3aac169c5a1448b37084dce97",
+    "blueprints/us-equities/engine-nautilus/equity-replay/run.py": "e036aa9354a478fe270258d3d2f2cb42a5c9c072d688b21313e0a89e715d796e",
+    "blueprints/us-equities/engine-nautilus/equity-replay/plan.json": "1e3cefdab959c9ce15e6d9d07ff6135b5720f8792bed06b2e02510dd880dd805"
+  },
+  "immutable_scope": "No harness, mapping, preregistration, tolerance, existing receipt, catalog, gate or evidence registry change."
+}
+

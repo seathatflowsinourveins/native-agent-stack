@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "wave": "R2a",
+  "status": "REPRODUCED",
+  "status_exit_code": 0,
+  "host": "NativeStack2604",
+  "source_plan_commit": "c5834a1ba3b11261e7621e363e23420e6c2f98bf",
+  "arm_A_acquisition_provenance": {
+    "actual_mode": "pre-existing local object; no lane fetch",
+    "historical_ref_established": false,
+    "supported_fetch_ref": "refs/pull/485/head",
+    "reported_ref_head": "28a611b396541af3c901bc2ec5f719b508e06765",
+    "local_ancestry_exit": 0,
+    "pre_classify_blob_sha256": "fc6d5415550198601d1089f92d722026622e41ff2b12758e3a2c0b9e1f99d3e4",
+    "interpretation": "Co-op reported GitHub reachability; local object ancestry independently verified. Historical acquisition route not established; no ref invented. D5.1 accepted in substance, no rerun."
+  },
+  "native_exit_codes": {
+    "A_exact": {
+      "classify": 0,
+      "verify": 0
+    },
+    "B_current": {
+      "classify": 0,
+      "verify": 0
+    }
+  },
+  "runtime": {
+    "python": "3.12.3",
+    "numpy": "2.5.3"
+  },
+  "D3": {
+    "retained_files_matched": 11,
+    "package_zip_matched": true,
+    "original_preserved": true
+  },
+  "counts": {
+    "A_exact": {
+      "package_events": 715,
+      "N2": 594,
+      "ratios": {
+        "2": 261,
+        "3": 97,
+        "3/2": 507
+      }
+    },
+    "B_current": {
+      "package_events": 715,
+      "N2": 594,
+      "ratios": {
+        "2": 261,
+        "3": 97,
+        "3/2": 507
+      }
+    }
+  },
+  "output_hashes": {
+    "A_exact": {
+      "results": "406f582c484b67c3e352c2a31a69a8cd8eb76dfb66ec1fc2c3386a707cb7fb26",
+      "labels": "19e276665707e3ec2ba70aad365afaf6d2277240d4619681627ec87dd8993108",
+      "summary": "803fd31f8cd56d9a8cb81abd8c052a0c620acbeb2230007a342fab89fee0da84",
+      "verify": "24eb12f47201f16c975d66963bc258f7662715648fa360b190398e30a40516e0"
+    },
+    "B_current": {
+      "results": "406f582c484b67c3e352c2a31a69a8cd8eb76dfb66ec1fc2c3386a707cb7fb26",
+      "labels": "19e276665707e3ec2ba70aad365afaf6d2277240d4619681627ec87dd8993108",
+      "summary": "803fd31f8cd56d9a8cb81abd8c052a0c620acbeb2230007a342fab89fee0da84",
+      "verify": "4b2298e88c9a9f30e7b7f2f8fe79415945ea4950fd8447379bc2c8d58e330579"
+    }
+  },
+  "classification_outputs_identical": true,
+  "verify_repeatable": {
+    "A_exact": true,
+    "B_current": true
+  },
+  "verify_provenance": {
+    "A_exact": "99dfec7cf6bdd2bc49f0099206ed84fc1d88ebb1",
+    "B_current": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+    "both_clean": true,
+    "only_difference": "classify_code_revision.head"
+  },
+  "interpretation": "A11: compare three classification outputs; report verify provenance separately. Provenance-only differences are not revision effects.",
+  "interpretation_sources": {
+    "A_source_sha256": "fc6d5415550198601d1089f92d722026622e41ff2b12758e3a2c0b9e1f99d3e4",
+    "A_lines": [
+      1181,
+      1188
+    ],
+    "B_source_sha256": "cdac99732694dca24467af3dfb4dc8dc8c80be485c8ef27c995de9c9f9f6f0b9",
+    "B_lines": [
+      1206,
+      1213
+    ]
+  },
+  "first_outer_tool_exit": 1,
+  "first_native_exit": 0,
+  "orchestration_anomaly_retained": true,
+  "claims": {
+    "offline_reproduction": true,
+    "new_holdout": false,
+    "predictive_evidence": false,
+    "strategy_evidence": false,
+    "broker_or_paper_evidence": false
+  },
+  "publication_review": "Outputs accepted by the trading-custody cross-family read; public first-pass, command-center acknowledgment and owner landing remain pending.",
+  "meta_format_observation": "Exact-arm classify's older meta format recorded EXIT_CODE=0 while the outer tool reported1. D2 governs by native exit0; later commands explicitly record NATIVE_EXIT_CODE and SANITIZER_EXIT_CODE. The discrepancy is retained, not erased."
+}
