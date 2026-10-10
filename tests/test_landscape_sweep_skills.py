@@ -2319,11 +2319,10 @@ class SkillsDocsTests(unittest.TestCase):
 YAML_PIN_REL = "tools/sota-convergence/landscape-sweep/skills-yaml.pin.json"
 YAML_WORKFLOW, YAML_JOB = "validate.yml", "validate"
 YAML_KEY = f"{YAML_WORKFLOW}:{YAML_JOB}"
-# Whole-suite jobs that do not install the yaml pin yet: adoption-bootstrap.yml validate-macos and catalog-freshness.yml
-# freshness, the jobs tests/test_shell_parser_ci.py records for the tree-sitter pin. Unit A1 was widened to validate.yml
-# only, so their reader tests skip there, and the tripwire skips there and says so. To close a gap, add the provisioning
-# step to that job and delete its entry here; until then the ratchet reports the entry as stale.
-YAML_KNOWN_UNPROVISIONED = {"adoption-bootstrap.yml:validate-macos", "catalog-freshness.yml:freshness"}
+# The remaining serial suite without the YAML pin is catalog-freshness.yml:freshness.
+# Its reader tests and tripwire report this recorded gap; add provisioning and
+# delete the entry together. The ratchet rejects stale exemptions.
+YAML_KNOWN_UNPROVISIONED = {"catalog-freshness.yml:freshness"}
 YAML_TRIPWIRE = "tests.test_landscape_sweep_skills.SkillsYamlInstalledInCI"
 
 
@@ -2443,7 +2442,7 @@ class SkillsYamlTripwireControls(unittest.TestCase):
         unlisted = {"another job of the validate workflow": {"GITHUB_JOB": "another-job"},
                     "the validate job's name in another workflow": {
                         "GITHUB_WORKFLOW_REF": "owner/repo/.github/workflows/other.yml@refs/heads/main"},
-                    "a gap's job name in the validate workflow": {"GITHUB_JOB": "validate-macos"}}
+                    "a gap's job name in the validate workflow": {"GITHUB_JOB": "freshness"}}
         for label, extra in unlisted.items():
             with self.subTest(label), tempfile.TemporaryDirectory() as home:
                 self.assert_failed(self.run_tripwire(home, **extra), "not_installed")

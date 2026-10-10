@@ -551,10 +551,6 @@ class WorkflowReferenceTests(unittest.TestCase):
         text = WORKFLOW_PATH.read_text()
         self.assertIn("adoption/bootstrap-linux.sh", text)
 
-    def test_workflow_references_the_macos_bootstrap_script_path(self):
-        text = WORKFLOW_PATH.read_text()
-        self.assertIn("adoption/bootstrap-macos.sh", text)
-
     def test_workflow_references_the_status_script(self):
         text = WORKFLOW_PATH.read_text()
         self.assertIn("scripts/adoption_status.py", text)

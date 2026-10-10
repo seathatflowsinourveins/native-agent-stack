@@ -228,10 +228,10 @@
     },
     {
       "repository": "seathatflowsinourveins/native-agent-stack",
-      "version": "adoption-bootstrap.yml@2026-10-05",
+      "version": "adoption-bootstrap.yml@2026-10-10",
       "source": ".github/workflows/adoption-bootstrap.yml",
       "command": "bash adoption/bootstrap-linux.sh --profile foundation-cpu (run inside the bootstrap-linux job on ubuntu-24.04)",
-      "selection": "bootstrap-linux (20-minute timeout) exercises adoption/bootstrap-linux.sh's real pinned-download/SHA-256-verify/isolated-prefix install path for the foundation-cpu profile from adoption/pins-linux-x86_64.json, on pushes to main matching adoption-bootstrap.yml's existing paths filter, on pull requests whose diff matches that filter through the changes job, nightly at 06:47 UTC, and on manual dispatch. Current scheduling follows docs/github-automation.md's 2026-10-05 scheduled portability and report-only lanes section.",
+      "selection": "bootstrap-linux (20-minute timeout) exercises adoption/bootstrap-linux.sh's real pinned-download/SHA-256-verify/isolated-prefix install path for the foundation-cpu profile from adoption/pins-linux-x86_64.json, on pushes to main matching adoption-bootstrap.yml's existing paths filter, on pull requests whose diff matches that filter through the changes job, nightly at 06:47 UTC, and on manual dispatch. Current scheduling follows docs/github-automation.md's 2026-10-10 scheduled bootstrap and report-only lanes section.",
       "acceptance": "In-run scripts/adoption_status.py --profile foundation-cpu --json assertion that every required command is present, plus direct codex/claude/uv/node --version checks; workflow header records this as synthetic/local-integration evidence on a disposable runner, not a second-machine developer-laptop acceptance."
     },
     {
@@ -484,5 +484,34 @@
       "current_practice_20261002.required_checks (8 contexts, including validate-macos)"
     ],
     "decision_record": "docs/decisions/2026-10-05-macos-ci-advisory.md"
+  },
+  "current_practice_20261010": {
+    "observed_at": "2026-10-10",
+    "source": "Owner-selected adoption CI scope, 2026-10-10 around 02:28 UTC; required checks and merge policy retain the committed .github/main-ruleset.json values at a56f85e8. Earlier live-settings observations keep their own dates.",
+    "required_checks": [
+      "validate",
+      "token-report",
+      "secret-scan",
+      "dependency-review",
+      "osv-scanner",
+      "verdict-review-gate",
+      "sota-sources"
+    ],
+    "strict_required_status_checks": false,
+    "allowed_merge_methods": [
+      "squash"
+    ],
+    "macos_ci": "Adoption jobs bootstrap-macos, bootstrap-macos-brew and validate-macos retired; portable repairs, Darwin skip guards and historical receipts retained",
+    "macos_events": [],
+    "linux_bootstrap_schedule_utc": "47 6 * * *",
+    "merge_guard": "docs/lanes.md#labels-and-prs",
+    "supersedes": [
+      "current_practice_20261005.macos_ci and macos_events"
+    ],
+    "overturn": [
+      "The owner requests macOS CI",
+      "A macOS adopter needs maintained coverage"
+    ],
+    "decision_record": "docs/decisions/2026-10-10-retire-macos-ci.md"
   }
 }

@@ -7832,7 +7832,7 @@
         "updated_at"
       ],
       "path": "adoption/manifest.json",
-      "sha256": "c0d7c2efbd2a954e020f432b8cf677a7a4027a54f2deb3b2fb6e0c70bdd01368"
+      "sha256": "44c193b87cc03e0f52782e024deb8d80368fe843eb9153f98cd54cc9f9f9caf9"
     },
     {
       "path": "adoption/new-wsl-profile.json",

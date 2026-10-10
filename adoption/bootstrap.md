@@ -804,12 +804,15 @@ GitHub-hosted macOS runner; see
    `tools/sota-convergence/build_verdicts.py`,
    `scripts/validate_convergence.py` and `scripts/release_due.py`) needs
    **Python 3.9 or newer**: every one of those scripts parses under the
-   Python 3.9 grammar and uses `from __future__ import annotations`, and this
-   is exercised directly, not merely declared -- a macOS CI job runs the
-   recording smoke below against both the manifest-pinned Python line and the
-   host's own system `/usr/bin/python3` (macOS ships 3.9.6 there by default,
-   the same floor this bullet declares; see
-   [the macOS page](platforms/macos-arm64.md#recording-and-verdict-scripts)).
+   Python 3.9 grammar and uses `from __future__ import annotations`. The
+   historical macOS CI recording smoke exercised the manifest-pinned Python
+   line and the runner's system `/usr/bin/python3` (3.9.6 in the retained
+   observations). Those jobs were retired on **2026-10-10** under the
+   [retirement decision](../docs/decisions/2026-10-10-retire-macos-ci.md).
+   The portable `PlatformPageTests` guard now checks all six scripts with
+   `ast.parse(..., feature_version=(3, 9))`: **syntax only**, using CPython's
+   best-effort grammar mode, not Python 3.9 execution or current native macOS
+   acceptance (see [the macOS page](platforms/macos-arm64.md#recording-and-verdict-scripts)).
    Linux/WSL2 hosts use the manifest-pinned line (`python@3.13` on macOS,
    already required by step 1's prerequisites); this floor exists so a host
    that has not yet installed the pinned line -- or one recording a receipt

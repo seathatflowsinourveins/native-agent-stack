@@ -1,5 +1,9 @@
 # What may change in the required macOS check, decided by measurement (2026-10-03)
 
+**Superseded on 2026-10-10:** the adoption macOS CI coverage policy is replaced
+by [Retire adoption macOS CI](2026-10-10-retire-macos-ci.md).
+The earlier measurements and comparison rules below remain historical evidence.
+
 Lane: foundation. North-star action served: a reliable, fast landing path for every unit that moves the stack toward
 the north star (each unit lands as a pull request behind the required checks). Status: decided. O4 proceeds; O2 is a
 pre-registered fallback, not adopted; O1 and O3 are rejected; R1 to R6 are proposals for their owners. This record

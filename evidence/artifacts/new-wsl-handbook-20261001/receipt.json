@@ -6,8 +6,8 @@
   "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
   "profile_sha256": "309fa245e3aaa07ed8045ee8969727280c890679e71256424b7c873f491cdec4",
   "outputs": {
-    "docs/new-wsl-handbook.md": "1d23732ee73842b85cb799a220492715418be74be329daf7f4f8e8e815fed19c",
-    "docs/new-wsl-handbook.json": "96d182f3554119c4dc85deb2e97910e4bff84133e8fcf179fbee4bcc726b0479"
+    "docs/new-wsl-handbook.md": "2a9a484d30e516756f0a0c88191a455f66d754ed222263c80c0c17c4ec568bdb",
+    "docs/new-wsl-handbook.json": "090c59206178ba9605678430d2232d5125047e2936422f0288549962a65769d6"
   },
   "inventory": {
     "layers": 37,
@@ -892,6 +892,38 @@
       },
       "evidence_class": "local_integration",
       "scope": "Actual generator execution and artifact identity after historical-field/pointer/citation corrections; no target-host, client, model/provider or strategy acceptance."
+    },
+    {
+      "recorded_at_utc": "2026-10-10T03:36:26Z",
+      "source_base": "92dbb2a01d192f4615aa1eb46e9e687a86b29d6b",
+      "cause": "Regenerate the normalized adoption manifest source digest after retiring hosted Mac CI; no installation or native host acceptance.",
+      "command": "python3 -B scripts/build_new_wsl_handbook.py --write",
+      "native_exit_code": 0,
+      "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
+      "profile_sha256": "309fa245e3aaa07ed8045ee8969727280c890679e71256424b7c873f491cdec4",
+      "current_outputs": {
+        "docs/new-wsl-handbook.md": "d778017410cdf436a515d970e431175e9e547be0c3d2d0ef2872e7f2a2ebeee3",
+        "docs/new-wsl-handbook.json": "5d924645c72ca9e614283c82d7cf1f0e0bff31d76fb77562dc7e914ffae03e91"
+      },
+      "check": "python3 -B scripts/build_new_wsl_handbook.py --check",
+      "check_exit_code": 0,
+      "evidence_class": "local_integration",
+      "scope": "Current generated-byte binding; historical observations and earlier output bindings preserved."
+    },
+    {
+      "recorded_at_utc": "2026-10-10T07:52:37Z",
+      "source_main": "0a053e1e5861a5522dcbbeea1c5006c4d8937b95",
+      "cause": "Regenerate the maintained handbook after the CC-cued retirement replay; preserve both receipt histories and the #959 prerequisite.",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "native_exit_code": 0,
+      "current_outputs": {
+        "docs/new-wsl-handbook.md": "2a9a484d30e516756f0a0c88191a455f66d754ed222263c80c0c17c4ec568bdb",
+        "docs/new-wsl-handbook.json": "090c59206178ba9605678430d2232d5125047e2936422f0288549962a65769d6"
+      },
+      "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
+      "profile_sha256": "309fa245e3aaa07ed8045ee8969727280c890679e71256424b7c873f491cdec4",
+      "evidence_class": "local_integration",
+      "scope": "Generated-byte identity only; no destination-host, client, model or upstream acceptance."
     }
   ],
   "previous_outputs": [
@@ -1016,6 +1048,24 @@
         "docs/new-wsl-handbook.json": "78f5c26c47fb622c0923e1643df0212db8a77d46b64a2cb296e2e44068710f62"
       },
       "reason": "CC-cued T19 landing rebase and native source/citation regeneration; historical execution observations remain retained."
+    },
+    {
+      "superseded_at_utc": "2026-10-10T03:36:26Z",
+      "source_head": "92dbb2a01d192f4615aa1eb46e9e687a86b29d6b",
+      "reason": "Adoption macOS retirement changes the retained hosted-smoke metadata; refresh the unchanged maintained handbook builder output binding.",
+      "outputs": {
+        "docs/new-wsl-handbook.md": "39acb57d7bc9cae04739ec7c4f540881a32c1ae80f767582f1dff88507ea9abb",
+        "docs/new-wsl-handbook.json": "08586eeb653b3a0f24d70907b3e29636d798b3e7d14c4c2ddf4c9ce9db405baa"
+      }
+    },
+    {
+      "superseded_at_utc": "2026-10-10T07:52:37Z",
+      "source_main": "0a053e1e5861a5522dcbbeea1c5006c4d8937b95",
+      "outputs": {
+        "docs/new-wsl-handbook.md": "1d23732ee73842b85cb799a220492715418be74be329daf7f4f8e8e815fed19c",
+        "docs/new-wsl-handbook.json": "96d182f3554119c4dc85deb2e97910e4bff84133e8fcf179fbee4bcc726b0479"
+      },
+      "reason": "CC-cued native landing replay; both incoming main and retirement histories retained."
     }
   ]
 }

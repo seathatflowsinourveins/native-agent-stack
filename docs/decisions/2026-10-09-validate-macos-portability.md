@@ -1,5 +1,9 @@
 # Repair the macOS validation seams
 
+**CI execution update, 2026-10-10:** [Retire adoption macOS CI](2026-10-10-retire-macos-ci.md)
+ends the future adoption-CI execution expectation below. The portable code
+repairs remain in place; this policy change adds no native macOS acceptance result.
+
 Lane: foundation. The macOS validation job reached the full repository suite,
 then failed on lexical path aliases, Linux-only test instrumentation and native
 Linux integration contracts. This change repairs the portable interfaces and

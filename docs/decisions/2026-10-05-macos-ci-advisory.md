@@ -1,5 +1,9 @@
 # Decision: make macOS CI advisory (2026-10-05)
 
+**Superseded on 2026-10-10:** [Retire adoption macOS CI](2026-10-10-retire-macos-ci.md)
+replaces the advisory job policy and its overturn conditions. The earlier
+owner choice, implementation and observations below remain historical evidence.
+
 **Status:** the user chose the advisory option at **2026-10-05T01:41:33Z**.
 The coordinator then changed live ruleset 23739774 at **2026-10-05T01:42:03Z**,
 30 seconds later. [PR #711](https://github.com/seathatflowsinourveins/native-agent-stack/pull/711)

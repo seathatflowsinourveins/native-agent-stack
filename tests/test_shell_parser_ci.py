@@ -8,11 +8,9 @@ that true. A GitHub Actions job (GITHUB_ACTIONS=true) fails when the loader does
 install, and the suite fails when the provisioning step is dropped, moved after the suite, retyped away from the pin,
 no longer exports the directory, or can be skipped.
 
-Every Actions job is held to that runtime tripwire except the recorded gaps. Two other jobs run the whole suite under
-GITHUB_ACTIONS=true without installing the parser: adoption-bootstrap.yml validate-macos (advisory since
-2026-10-05, on matching main pushes, nightly schedules and dispatches) and catalog-freshness.yml freshness.
-Holding them to the tripwire would fail both, and those workflows are outside this unit's owned paths, so
-KNOWN_UNPROVISIONED records them and the tripwire skips there
+Every Actions job is held to that runtime tripwire except the recorded gap. The remaining serial suite without
+the parser is catalog-freshness.yml freshness. Its provisioning remains outside this unit's owned paths, so
+KNOWN_UNPROVISIONED records it and the tripwire skips there
 and says so. A job that is not listed fails closed, as does an Actions environment that names no job. A whole-suite
 job that neither provisions nor is listed there fails the suite, so the list can only shrink.
 
@@ -61,15 +59,10 @@ ENV_NAME = "CHILD_USAGE_SHELL_PARSER"
 PROVISIONING_WORKFLOW = "validate.yml"
 PROVISIONING_JOB = "validate"
 PROVISIONING_KEY = f"{PROVISIONING_WORKFLOW}:{PROVISIONING_JOB}"
-# Whole-suite jobs that do not provision the parser yet: adoption-bootstrap.yml runs the suite on macOS in its
-# validate-macos job (step "Run the full test suite (gating on macOS)"; advisory since
-# docs/decisions/2026-10-05-macos-ci-advisory.md) and catalog-freshness.yml runs it daily in its freshness job
-# (step "Run project test suite"). Their lane tests skip today, and the runtime tripwire skips in exactly these jobs
-# and says so. To close a
-# gap, add a provisioning step to that job in its own workflow and delete its entry here, nothing else: until the entry
-# is deleted the ratchet reports it as stale (test_every_whole_suite_job_provisions_the_parser_or_is_a_recorded_gap),
-# and once it is deleted the runtime tripwire and the structure checks hold that job like validate.yml's.
-KNOWN_UNPROVISIONED = {"adoption-bootstrap.yml:validate-macos", "catalog-freshness.yml:freshness"}
+# The remaining serial suite without this parser is catalog-freshness.yml:freshness.
+# Adding its provisioning step and deleting this entry closes the recorded gap;
+# the ratchet rejects stale exemptions.
+KNOWN_UNPROVISIONED = {"catalog-freshness.yml:freshness"}
 # The read-only check the handbook gives a host, run from the repository root.
 CHECK_PREFIX = "node --input-type=module -e "
 TRIPWIRE = "tests.test_shell_parser_ci.ShellParserInstalledInCI"
@@ -263,8 +256,8 @@ class TripwireControls(unittest.TestCase):
         # name is a gap's name in another workflow, or its workflow reference is missing.
         unlisted = {"another job of the validate workflow": {"GITHUB_JOB": "another-job"},
                     "the validate job's name in another workflow": {"GITHUB_WORKFLOW_REF": "owner/repo/.github/workflows/other.yml@refs/heads/main"},
-                    "a gap's job name in the validate workflow": {"GITHUB_JOB": "validate-macos"},
-                    "a gap's job name with no workflow reference": {"GITHUB_JOB": "validate-macos", "GITHUB_WORKFLOW_REF": ""}}
+                    "a gap's job name in the validate workflow": {"GITHUB_JOB": "freshness"},
+                    "a gap's job name with no workflow reference": {"GITHUB_JOB": "freshness", "GITHUB_WORKFLOW_REF": ""}}
         for label, extra in unlisted.items():
             with self.subTest(label), tempfile.TemporaryDirectory() as home:
                 self.assert_failed(self.run_tripwire(home, **extra), "not_installed")
