@@ -412,7 +412,9 @@ def lane_provenance_issue(lane, provenance):
     commit and the hash of the role definition its stages ran as; the Codex lane the hashes of codex_lane.py
     and the prompt it filled. Both name the digest of the evidence tree they read (repo_tree_sha256)."""
     fields = LANE_PROVENANCE_FIELDS[lane]
-    if not isinstance(provenance, dict) or set(provenance) != set(fields):
+    transport_fields = {"provider", "provider_base_url"} if lane == "codex" else set()
+    if not isinstance(provenance, dict) or not set(fields) <= set(provenance) \
+            or set(provenance) - set(fields) - transport_fields:
         return f"provenance must be an object with exactly {', '.join(fields)} for the {lane} lane"
     for field in fields:
         value = provenance[field]
@@ -425,6 +427,36 @@ def lane_provenance_issue(lane, provenance):
                   and ".." not in value.split("/"))
         if not ok:
             return f"provenance.{field} is malformed for the {lane} lane"
+    if lane == "codex":
+        # Legacy receipts without transport metadata remain native. Code registration
+        # still binds only LANE_PROVENANCE_KEYS; the runner's full provenance equality
+        # separately prevents native/OmniRoute or endpoint changes from resuming a return.
+        provider = provenance.get("provider", "native")
+        if provider not in ("native", "omniroute"):
+            return "provenance.provider is malformed for the codex lane"
+        if provider == "native" and "provider_base_url" in provenance:
+            return "provenance.provider_base_url is only valid for omniroute"
+        if provider == "omniroute":
+            value = provenance.get("provider_base_url")
+            if not isinstance(value, str):
+                return "provenance.provider_base_url must be a keyless loopback /v1 endpoint"
+            try:
+                parsed = urlsplit(value)
+                port = parsed.port
+                valid = (isinstance(value, str) and not any(character.isspace() for character in value)
+                         and parsed.scheme in ("http", "https")
+                         and parsed.hostname in ("127.0.0.1", "localhost", "::1")
+                         and parsed.username is None and parsed.password is None
+                         and "?" not in value and "#" not in value and parsed.path == "/v1"
+                         and (port is None or 1 <= port <= 65535))
+                if valid:
+                    host = "[::1]" if parsed.hostname == "::1" else parsed.hostname
+                    authority = f"{host}:{port}" if port is not None else host
+                    valid = value == f"{parsed.scheme}://{authority}/v1"
+            except (TypeError, ValueError):
+                valid = False
+            if not valid:
+                return "provenance.provider_base_url must be a keyless loopback /v1 endpoint"
     return None
 
 

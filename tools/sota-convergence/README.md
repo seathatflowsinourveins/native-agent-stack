@@ -1483,6 +1483,28 @@ The five isolation settings on the last two lines are `ISOLATION_ARGS`; `tests/t
 this block or the module docstring leaves one out. A blind child runs this with only an allowlisted environment,
 a fresh run-scoped `CODEX_HOME`, an empty `HOME` and no stdin (below).
 
+The transport remains native unless `codex_lane.py --provider omniroute` is supplied. This opt-in follows the
+[landscape-sweep transport/failover](landscape-sweep/README.md#automatic-native-to-omniroute-failover---gpt6-fallback-omniroute)
+using inline custom-provider overrides while preserving all five isolation settings. The keyless endpoint is
+`--omniroute-base-url`, then `OMNIROUTE_BASE_URL`, then `http://127.0.0.1:21128/v1`; non-loopback URLs,
+userinfo, queries, fragments and invalid ports are refused before a child starts. OmniRoute defaults to the pinned
+`cx/gpt-6.1-sol` route; `--model` keeps an explicitly chosen model. Its fresh home has no native-auth link, and
+only the validated endpoint joins the existing child environment allowlist. No gateway key variable or user
+configuration/profile is loaded. The blind audit still refuses environment-reading commands.
+
+Every packet's runner-owned provenance and each usage row record `provider`; OmniRoute provenance also records
+the canonical `provider_base_url`. Changing provider or endpoint invalidates resume. The sealer accepts those
+two Codex-only fields while retaining all required code digests and legacy native receipts.
+
+Gateway prompt preservation is an independent prerequisite for a blind wave, and is **not established** by
+this transport opt-in. The recorded OmniRoute source permits global prompt injection, plugins, payload rules and
+adaptive compression even on its native Responses passthrough route. The no-memory header is a supported
+opt-out; the compression-off header can still be overridden by adaptive planning. A client-side canary captures
+the exact submitted UTF-8 prompt, but provider-received bytes cannot be compared under the authorized gateway
+inspection boundary: call-log detail and settings routes expose private account/credential/body data and are
+forbidden. See [the dated source/evidence record](../../docs/decisions/2026-10-10-codex-lane-omniroute.md).
+Use the candidate's `--provider omniroute --dry-run` on a tier-1 packet for review; it does not launch a model turn.
+
 capturing the full JSON event stream to
 `<work-dir>/codex/events/<catalog>__<layer_id>.jsonl` and appending one usage
 row per attempt (`catalog`, `layer`, `attempt`, `exit_code`, `timed_out`,

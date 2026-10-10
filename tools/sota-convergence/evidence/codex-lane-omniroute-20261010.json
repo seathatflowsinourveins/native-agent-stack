@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-10-10T08:22:46Z",
+  "base_commit": "4d345267866403d75edece400fde6cd35ec4d05c",
+  "codex_lane_py_sha256": "33dcd00839fef2baf30847a7c815bce2e41ea03e1f1cfa09887497fc90b5e3a7",
+  "status": "candidate_transport_ready_preservation_unproved",
+  "native_default": true,
+  "opt_in": "--provider omniroute",
+  "endpoint_env_addition": ["OMNIROUTE_BASE_URL"],
+  "keyless": true,
+  "native_auth_access_in_omniroute_mode": false,
+  "isolation_args_unchanged": true,
+  "receipt_transport_fields": ["provenance.provider", "provenance.provider_base_url"],
+  "usage_transport_fields": ["provider", "provider_base_url"],
+  "fail_before": {
+    "fixture_class": "synthetic",
+    "main_provider_class": {"tests": 9, "exit_code": 1, "failures": 1, "errors": 14, "reason": "No provider flag or native provider provenance in unchanged core."},
+    "endpoint_normalization": {"exit_code": 1, "observed": "HTTP://LOCALHOST:021128/v1", "expected": "http://localhost:21128/v1"},
+    "malformed_endpoint_json": {"exit_code": 1, "endpoint": 1, "observed": "AttributeError from urllib.parse.urlsplit", "expected": "Graceful loopback endpoint refusal"},
+    "model_route_identity": {"exit_code": 1, "observed": "cx/gpt-6.1-sol", "expected": "gpt-6.1-sol"}
+  },
+  "required_tests": {
+    "command": "python3 -m unittest tests.test_codex_lane tests.test_verdict_lane_vendoring -v",
+    "exit_code": 0,
+    "tests": 110,
+    "failures": 0,
+    "errors": 0,
+    "elapsed_seconds": 6.143,
+    "class": "local_integration",
+    "covers": ["native default", "loopback refusal", "credential/query/fragment/port refusal", "extra environment exclusion", "unchanged blind environment audit", "fresh keyless homes", "provider/family receipts", "provider and endpoint resume invalidation", "canonical endpoint/model identity", "malformed metadata refusal", "legacy native sealer compatibility", "isolation args guard", "README block guard", "append-only code registries"]
+  },
+  "tier1_dry_run": {
+    "fixture_class": "synthetic",
+    "test": "tests.test_codex_lane.OmniRouteProviderTests.test_omniroute_dry_run_on_a_synthetic_tier1_packet_writes_nothing",
+    "packet": "foundation__native-clients",
+    "tier": 1,
+    "provider": "omniroute",
+    "exit_code": 0,
+    "model_turns": 0,
+    "output_files_created": 0,
+    "homes_created": 0
+  },
+  "client_http_canary": {
+    "class": "local_integration",
+    "receiver": "synthetic loopback HTTP capture",
+    "client": "codex-cli 0.162.1",
+    "checked_at": "2026-10-10T08:03:31Z",
+    "captured_requests": 1,
+    "prompt_bytes": 81,
+    "prompt_sha256": "77349a9f9ef7ed30bd56f9bdd702a22775aeb7bcd47af3942e764a3899809cb1",
+    "prompt_utf8_exact_match": true,
+    "model": "cx/gpt-6.1-sol",
+    "reasoning_effort": "max",
+    "policy_headers": {"no_memory": "true", "compression": "off"},
+    "instructions_nonblank": false,
+    "auth_link_present": false,
+    "client_exit_code": 1,
+    "intentional_receiver_http_status": 400,
+    "upstream_model_turns": 0,
+    "provider_received_body_comparison": "not performed; live gateway call-log detail is forbidden"
+  },
+  "native_quota": [
+    {"checked_at": "2026-10-10T07:53:36Z", "exit_code": 0, "ordinaryUsageAllowed": false, "primaryResetUtc": "2026-10-14T03:28Z", "secondaryResetUtc": null},
+    {"checked_at": "2026-10-10T08:22:46Z", "exit_code": 0, "ordinaryUsageAllowed": false, "primaryResetUtc": "2026-10-14T03:28Z", "secondaryResetUtc": null}
+  ],
+  "gateway_metadata": {"checked_at": "2026-10-10T07:33:37Z", "models_http_status": 200, "provider_limits_http_status": 200, "sol_cx_routes_present": true},
+  "gateway_source_review": {
+    "class": "source_review",
+    "recorded_base_pin": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+    "recorded_pr15167_pin": "0585aba5589d5a1f49243a13a8db249558e7c9e3",
+    "recorded_affinity_pin": "045aa81f3",
+    "recorded_build": "5f4b3d577",
+    "recorded_tree": "f1336dfd6c8ebd81586dd6c71e7ef668ef8c949f",
+    "native_passthrough_guarantees_format_only": true,
+    "memory_optout_supported": true,
+    "compression_off_can_be_overridden_by_adaptive_planning": true,
+    "global_instructions_payload_plugin_mutations_configuration_dependent": true,
+    "actual_post_october9_deployed_identity": "unverified",
+    "prompt_preservation_status": "unproved"
+  },
+  "limitations": [
+    "The gateway source does not supply the requested unconditional no-rewrite/no-injection guarantee; operational use is not qualified by this candidate.",
+    "Client-boundary byte capture does not establish the body a live gateway forwards to its upstream provider.",
+    "No settings or call-log detail endpoint was read. Permitted list metadata cannot attest upstream prompt bytes.",
+    "No live verdict wave, gateway model inference or provider-quality parity test was run.",
+    "The native quota helper uses standard native-client auth/config loading internally; the agent did not inspect or copy credential or config contents."
+  ]
+}
