@@ -1,5 +1,10 @@
 # Model currency
 
+Hosted active selectors have a separate [latest-family check](active-model-currency.md).
+It uses the generated native catalog manifest, runs on every currency collection,
+and has a SessionStart notice template. This inventory remains the dated
+model/package age and landscape-review record; it does not set runtime defaults.
+
 The model inventory is [model-currency.json](../catalogs/foundation/model-currency.json),
 with its [schema](../catalogs/foundation/model-currency.schema.json). The current
 partial inventory declares 21 artifact/model-consumer rows and seven package

@@ -6,6 +6,12 @@ catalog and Lite. The designated client-configuration owner applies profile
 and catalog changes; a currency lane prepares evidence and a review packet.
 See the [2026-10-06 decision](decisions/2026-10-06-codex-omniroute-opt-in-search.md).
 
+Every currency run also checks [active hosted-model selectors](active-model-currency.md):
+refresh the three native catalog observations when due, generate the latest-family
+manifest, then run `python3 scripts/active_model_currency.py check --root . --host`.
+The daily currency collector invokes this check automatically. Keep dated records
+unchanged and leave user configuration/hook application to the CC.
+
 1. Check and record capability evidence in this order: **FIRST, installed
    client** version (`rtk codex --version`), relevant help (including
    `rtk codex debug models --help`) and the relevant non-secret settings it

@@ -191,6 +191,8 @@ class Checkout:
         self.set(STALENESS, staleness_report())
         self.set(PINNED, pinned_report())
         self.set(SATURATION, saturation_report([("foundation/workers", False, "sweep-a")]))
+        self.set(cd.ACTIVE_MODELS[0], {"schema_version": 1, "status": "current", "stale_count": 0,
+                                      "findings": [], "errors": []})
         self.write_ledger(ledger(("sweep-a", "2026-09-29", "completed")))
         # The user manager's answer that run() hands the script instead of this host's: {unit: properties}, or a string
         # saying why it could not be asked. No unit by default.
@@ -1569,7 +1571,7 @@ class SurfaceWatchTests(unittest.TestCase):
         self.assertNotIn("surface_unreviewed", document["due"])
         self.assertIsNone(document["details"][-1]["surface_watch"])
 
-    def test_the_line_keeps_its_limit_with_all_six_counts(self):
+    def test_the_line_keeps_its_limit_with_all_seven_counts(self):
         due = {key: 9999 for key in cd.COUNT_KEYS}
         line = cd.summary_line(due, "python3 ~/code/native-agent-stack-live/scripts/currency_due.py --dry-run")
         self.assertLessEqual(len(line), 160)
@@ -1583,16 +1585,22 @@ class ThisCheckoutTests(unittest.TestCase):
         # catches a pathological slowdown on slower runners.
         with tempfile.TemporaryDirectory(dir=short_temp_base()) as temporary:
             state = Path(temporary) / "state"
+            home = Path(temporary) / "empty-home"
+            home.mkdir()
+            environment = {**os.environ, "HOME": str(home),
+                           "XDG_STATE_HOME": str(home / "state"), "XDG_CONFIG_HOME": str(home / "config"),
+                           "XDG_DATA_HOME": str(home / "data")}
             started = time.monotonic()
             result = subprocess.run([sys.executable, str(ROOT / "scripts/currency_due.py"), "--dry-run", "--json",
-                                     "--state-dir", str(state)], capture_output=True, text=True, timeout=600,
-                                    cwd=ROOT, stdin=subprocess.DEVNULL, check=False)
+                                      "--state-dir", str(state)], capture_output=True, text=True, timeout=600,
+                                    cwd=ROOT, stdin=subprocess.DEVNULL, check=False, env=environment)
             elapsed = time.monotonic() - started
             self.assertEqual(result.returncode, 0, result.stderr[-2000:])
             document = json.loads(result.stdout)
             self.assertEqual(list(document), ["generated_at", "root", "due", "summary_line", "details_command",
                                           "details"])
             self.assertEqual(list(document["due"]), list(cd.DUE_KEYS))
+            self.assertEqual(document["details"][-1]["active_models"], "current")
             self.assertTrue(all(isinstance(value, int) and value >= 0 for value in document["due"].values()))
             self.assertLessEqual(len(document["summary_line"]), 160)
             self.assertFalse(state.exists())

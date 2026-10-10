@@ -5706,8 +5706,8 @@
     },
     {
       "path": "adoption/templates/systemd/stack-currency.service",
-      "sha256": "8f18dbeb150cb9eff24994472c8d8b4f5a0c4ff6b8ea23349dda593f7497137f",
-      "bytes": 4862
+      "sha256": "7139eacb5dddab8ff163ff9c55e3fc6c335a1bcef61ef91610bcf58ca26eeacf",
+      "bytes": 5184
     },
     {
       "path": "adoption/templates/systemd/token-report-refresh.service",
@@ -16407,8 +16407,8 @@
     },
     {
       "path": "blueprints/us-equities/research-runtime/README.md",
-      "sha256": "26941ae2c64ec137c3a9dc97e8d766d93cf6bdcb103ee290f871fd0a181f2757",
-      "bytes": 9587
+      "sha256": "e0a9603dc17c871f57dcbb0fce1f555475381303734c22dd0bc09fec6595324c",
+      "bytes": 9728
     },
     {
       "path": "blueprints/us-equities/research-runtime/accepted-packet.json",
@@ -16447,8 +16447,8 @@
     },
     {
       "path": "blueprints/us-equities/research-runtime/run_worker.py",
-      "sha256": "67b68db77e5eda82b5d64d0fd271601f13e51ee55d918a7a76a4938e9e1bd8bb",
-      "bytes": 18813
+      "sha256": "005bf6a161c30bd20bf3363fcd7ce7d9208af0313da31595fd1aef65a520a25d",
+      "bytes": 18821
     },
     {
       "path": "blueprints/us-equities/retrieval-evaluation/README.md",
@@ -17031,6 +17031,11 @@
       "bytes": 140288
     },
     {
+      "path": "catalogs/foundation/latest-models.json",
+      "sha256": "a2fee3867fe09e64b0b8164710676e12eed071ae9ca38d0cf43dd6d5892fcd65",
+      "bytes": 5935
+    },
+    {
       "path": "catalogs/foundation/manifest.json",
       "sha256": "5a72d2cd395bdef2dbc807e6172c9526256f2784aa0dcb7acbfcefeda4061f6f",
       "bytes": 29964
@@ -17606,6 +17611,11 @@
       "bytes": 5651
     },
     {
+      "path": "docs/active-model-currency.md",
+      "sha256": "78736ad16d96e47cf294260d5f53e50688b165a0c56fd0125335c72754182df7",
+      "bytes": 15498
+    },
+    {
       "path": "docs/automation-upgrade-evidence.json",
       "sha256": "afe31d3eec6b14f69721a810f8719d3326154c9f2e2fadedeb5e292bb92ca7df",
       "bytes": 10044
@@ -17682,8 +17692,8 @@
     },
     {
       "path": "docs/codex-currency-upgrade-checklist.md",
-      "sha256": "4a7bff666f04d2c791f38a2249f56671a162215696ed2ab0160b6ead1bdeb8dc",
-      "bytes": 5494
+      "sha256": "ecd18e410d13a957e837ccfa6232678fb0b2ea4ed41e17fdf38241a33a593158",
+      "bytes": 5902
     },
     {
       "path": "docs/command-center.md",
@@ -18506,6 +18516,11 @@
       "bytes": 16124
     },
     {
+      "path": "docs/decisions/2026-10-09-active-model-currency.md",
+      "sha256": "bcb5699dd72f17e76f3992ddb7698234d3905496a3700696d2f759f6b930a48f",
+      "bytes": 9263
+    },
+    {
       "path": "docs/decisions/2026-10-09-anthropic-api-additional-keys.md",
       "sha256": "60e4c7cc58ec4aa4b7fb2a803afb49b10739cf94167ba7519f715704a1e7210e",
       "bytes": 6502
@@ -18787,8 +18802,8 @@
     },
     {
       "path": "docs/model-currency.md",
-      "sha256": "6ff91f2c3d3f883214c60ef348db703cd10dc485c4da3247ffd018edebfc2811",
-      "bytes": 9451
+      "sha256": "76e7aa43d641b89ffeea1fbfbaceb803d800e5ea384e613863e5bd767c023f01",
+      "bytes": 9777
     },
     {
       "path": "docs/native-dashboard-data.md",
@@ -59576,6 +59591,11 @@
       "bytes": 12146
     },
     {
+      "path": "scripts/active_model_currency.py",
+      "sha256": "73f6285fcb905f7d3d77959ffb847064ed21c1aea6e850a61e50ba3b6604dabc",
+      "bytes": 42844
+    },
+    {
       "path": "scripts/adoption_status.py",
       "sha256": "c5ea86bd324e9baf3263ac7f6edd107c736e3fa5c62c6395161d3319b4458998",
       "bytes": 98120
@@ -59617,8 +59637,8 @@
     },
     {
       "path": "scripts/currency_due.py",
-      "sha256": "4b2e9ecd31ebe0801d7ae44f958a173b372819a0b1984838277502a13ebfb9fe",
-      "bytes": 54767
+      "sha256": "ad7aefd8a4ba8c073c133df06796ecd83ee5333f5929f220d21a84fa6bc14e47",
+      "bytes": 57353
     },
     {
       "path": "scripts/env_freshness.py",
@@ -59989,6 +60009,11 @@
       "path": "tests/fixtures/workflow-security/unsafe.yml.txt",
       "sha256": "9e1c6130a396200387a0b9f1d445a33dbf154370db5460a3b50e086321bb737a",
       "bytes": 304
+    },
+    {
+      "path": "tests/test_active_model_currency.py",
+      "sha256": "7b2ac723190f3b221bd00a8c93480ccaaa57e304ffc134b5004d6010733b84f6",
+      "bytes": 51334
     },
     {
       "path": "tests/test_active_recovery_plans.py",
@@ -60402,8 +60427,8 @@
     },
     {
       "path": "tests/test_currency_due.py",
-      "sha256": "ce3f688cebe5a66b89b7a2770ceb018f0b9b7a144fc5e26fa6a167b1c8626d92",
-      "bytes": 103359
+      "sha256": "6735fe966e1f42f5a32fcffb32a7e311e71a6528c09458f7d6f14a0844db9878",
+      "bytes": 103935
     },
     {
       "path": "tests/test_delisting_coverage.py",
@@ -60677,7 +60702,7 @@
     },
     {
       "path": "tests/test_local_pages_policy_grants.py",
-      "sha256": "7ea348554ca4d467b71b18833167858f77715ee962832e1f503ed4682c983585",
+      "sha256": "6ee5152d9bb4827c8a27e4dec46d53c04c0b8bdb39d2c697f1760c6a2507be4a",
       "bytes": 19309
     },
     {
@@ -60997,8 +61022,8 @@
     },
     {
       "path": "tests/test_research_workflow.py",
-      "sha256": "89699bc56d4dfa8c6dad0708a9231ff47b400c72ff8c4ad5ab6aefdc170a26ce",
-      "bytes": 11549
+      "sha256": "8a723e997644fd795031eb770e788a130d782f5af88792d99771146c5dddb8fe",
+      "bytes": 11664
     },
     {
       "path": "tests/test_retrieval_quality_v2.py",
@@ -61492,8 +61517,8 @@
     },
     {
       "path": "tools/local-pages/source_policy.json",
-      "sha256": "3e65408d5fab88cb3ab7a3167b738ba207d053f37bbe25c5e4890ac6e3ed82b9",
-      "bytes": 755702
+      "sha256": "b434825c636395f78f1fc37661dab3c45788defcb3008ac246fbf341f541f7f6",
+      "bytes": 755786
     },
     {
       "path": "tools/omniroute/gateway_record.py",

@@ -1,5 +1,6 @@
 # Drafted, not run: no host has loaded, enabled or started this unit (the worktree that authored it made no host
-# changes). stack-currency.timer starts it once a day. It has no [Install] section, matching this directory's
+# changes). After adoption, stack-currency.timer starts it once a day. The template is not an installation
+# claim; the inspected host's timer is not-found. It has no [Install] section, matching this directory's
 # timer-triggered oneshot convention (codex-broker-reaper.service, host-requests-workstation.service). Why a timer
 # and a due-file rather than a check at session start: docs/decisions/2026-09-30-session-currency-notice.md.
 #
@@ -18,9 +19,12 @@
 # read-only primary-source checks; currency_due.py itself stays offline.
 #
 # The currency_due.py step makes no network call and writes nothing into the checkout. It runs
-# receipt_staleness.py, adoption_status.py --pinned-versions and saturation_ledger.py --report, then writes
+# receipt_staleness.py, adoption_status.py --pinned-versions, saturation_ledger.py --report and the offline
+# active_model_currency.py check, then writes
 # $XDG_STATE_HOME/native-agent-stack/currency-due.json (~/.local/state/... when XDG_STATE_HOME is unset; mode 0600)
-# when something is due and removes it otherwise. Its --network option (runtime-worker skill pins through gh api)
+# when something known is due, retaining earlier state on coverage gaps and removing it only after complete
+# empty results. Known stale selectors return 1; an incomplete model check preserves the other collected results.
+# Its --network option (runtime-worker skill pins through gh api)
 # stays off here. A flag added to ExecStart changes the notice: the command that ends the due-file's summary_line
 # repeats --network and a non-default --sweep-cadence-days, so it names the same flags as ExecStart (tests/
 # test_currency_due.py checks that), and a skill check that cannot fetch leaves an earlier due-file in place.

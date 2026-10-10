@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-"""Write a one-line currency notice for the next session when a pin, receipt or layer is due.
+"""Write the next session's one-line notice for known due counts and coverage gaps.
 
-The daily user timer adoption/templates/systemd/stack-currency.timer runs this. It runs this checkout's own
+The proposed daily user timer adoption/templates/systemd/stack-currency.timer can run this after host adoption.
+It runs this checkout's own
 read-only checks as subprocesses, with the arguments their weekly workflows use, reads the host's own status, and
-aggregates five counts, and a sixth when the upstream-surface watch ran recently:
+aggregates seven possible counts: five base counts, a surface-watch count when
+its report is fresh, and a stale-model count when the selector check finds drift:
 
 - pins_behind: components whose platform pin's version probe did not observe the pinned version
   (scripts/adoption_status.py --pinned-versions --json, the "mismatched" ids of each selected profile, each id
@@ -35,12 +37,15 @@ aggregates five counts, and a sixth when the upstream-surface watch ran recently
   existing watch state directory is stale. A file that exists but is stale or future-dated
   ("surface watch stale"), unreadable ("surface watch output unreadable") or only partly observed
   ("surface watch incomplete") is a check that could not answer, as an incomplete skill check is (below). None of
-  these is a count or an error (docs/upstream-surface-watch.md).
+  these is a count or an error (docs/upstream-surface-watch.md);
+- stale_models: active model selectors that differ from the committed versioned comparison snapshot
+  (scripts/active_model_currency.py check --json). An unknown or expired live model report is a coverage gap,
+  never evidence that no model selectors are due (docs/active-model-currency.md).
 
 When any count is nonzero it writes ${XDG_STATE_HOME:-~/.local/state}/native-agent-stack/currency-due.json
 atomically (a temporary file in the same directory, fsync, mode 0600, os.replace):
 
-  {"generated_at": "YYYY-MM-DDTHH:MM:SSZ", "root": "the inspected checkout", "due": {the four counts},
+  {"generated_at": "YYYY-MM-DDTHH:MM:SSZ", "root": "the inspected checkout", "due": {the known counts},
    "summary_line": "at most 160 characters, ending with the command below or with `cat <this file>`",
    "details_command": "the command below", "details": [...]}
 
@@ -48,10 +53,11 @@ and otherwise removes that file, unless the run could not see everything it was 
 (--network) that answered incompletely, meaning an error in its report, a skill left unfetched or in a state this
 script does not know, or a skills CLI release that was not fetched, is unknown, and unknown is not "nothing due"
 (the check's own report says "Incomplete fetches remain unknown"); so is a surface-watch report that exists but is
-stale, future-dated, unreadable or only partly observed. Such a run writes the file when the counts it did reach are
-nonzero, with the gap in the coverage entry of the details, and otherwise leaves the state directory as it was: no removal and no new
-file, exit 0. Its line then says "nothing known due" and names the gap ("skill check incomplete", "surface watch
-stale", "surface watch unreadable", "surface watch incomplete"); a surface gap adds the details command when it fits.
+stale, future-dated, unreadable or only partly observed, or an incomplete active-model report. Such a run writes
+the file when the counts it did reach are nonzero, with the gap in the coverage entry of the details, and otherwise
+leaves the state directory as it was: no removal and no new file, exit 0. Its line then says "nothing known due"
+and names the gap ("skill check incomplete", "surface watch stale", "surface watch unreadable", "surface watch
+incomplete", "model check incomplete"); a surface gap adds the details command when it fits.
 
 The command that ends summary_line is "python3 <checkout>/scripts/currency_due.py --dry-run", the inspected checkout's
 own copy of this script by its absolute path, written as ~/... under the home directory (so the command works from any
@@ -72,7 +78,8 @@ starts in when the file exists and nothing when it does not (docs/decisions/2026
   python3 scripts/currency_due.py --dry-run --json   # the due-file document; writes and removes nothing
   python3 scripts/currency_due.py --network          # also compare runtime-worker skill pins through gh api
 
-No network call unless --network is given. It exits 0 whether or not anything is due, and 2 on an internal error:
+No network call unless --network is given. It exits 1 for known stale model selectors, 0 for other known counts
+or coverage-only gaps, and 2 on an internal error in the required non-model checks:
 a check that fails, times out or prints something other than its JSON report (a field of the wrong type included),
 an unreadable saturation ledger or a failed write. An error leaves the state directory as it was.
 """
@@ -105,7 +112,9 @@ LABELS = {"pins_behind": ("pin behind", "pins behind"),
 # The upstream-surface watch's report (scripts/upstream_surface_watch.py, its default state directory under this one).
 # Its count joins the due counts only while the report is fresh, so DUE_KEYS keeps the five counts every run has.
 SURFACE_KEY = "surface_unreviewed"
-COUNT_KEYS = (*DUE_KEYS, SURFACE_KEY)
+MODEL_KEY = "stale_models"
+LABELS[MODEL_KEY] = ("stale model selector", "stale model selectors")
+COUNT_KEYS = (*DUE_KEYS, SURFACE_KEY, MODEL_KEY)
 SURFACE_DIR = "surface-watch"
 SURFACE_FILE = "latest.json"
 SURFACE_MAX_AGE_DAYS = 3
@@ -175,6 +184,7 @@ RECEIPTS = ("scripts/receipt_staleness.py", frozenset({0}), 120)
 LAYERS = ("scripts/saturation_ledger.py", frozenset({0}), 120)
 PINS = ("scripts/adoption_status.py", frozenset({0, 2}), 600)
 SKILLS = ("tools/adoption/runtime_skill_freshness.py", frozenset({0, 1}), 900)
+ACTIVE_MODELS = ("scripts/active_model_currency.py", frozenset({0, 1, 2}), 30)
 
 
 class CheckError(Exception):
@@ -326,8 +336,14 @@ def collect(root: Path, now_text: str, network: bool, state: Path | None = None)
         except OSError:
             observed_before = True  # an inaccessible state directory cannot prove that the watch never ran
         surface = {"record": read_record(surface_dir / SURFACE_FILE), "observed_before": observed_before}
+    try:
+        models = parse_report("active_model_currency.py", run_check(
+            root, ACTIVE_MODELS, ["check", "--root", str(root), "--host", "--json", "--now", now_text]))
+    except CheckError:
+        models = {"schema_version": 1, "status": "unknown", "stale_count": 0,
+                  "findings": [], "errors": ["active model check could not answer"]}
     return {"receipts": receipts, "layers": layers, "pins": pins, "skills": skills, "sweep_dates": sweep_dates(root),
-            "host": host, "surface": surface}
+            "host": host, "surface": surface, "active_models": models}
 
 
 def report_options(network: bool, cadence_days: int) -> list[str]:
@@ -668,20 +684,41 @@ def aggregate(reports: dict, now: datetime, now_text: str, cadence_days: int, ro
     surface_count, surface_details, surface_coverage = surface_findings(reports.get("surface"), now)
     details += surface_details
 
+    models = reports.get("active_models")
+    model_count = 0
+    model_coverage = {}
+    if models is not None:
+        valid = (isinstance(models, dict) and models.get("status") in {"current", "stale", "unknown"}
+                 and type(models.get("stale_count")) is int and models["stale_count"] >= 0
+                 and isinstance(models.get("findings"), list) and len(models["findings"]) == models["stale_count"]
+                 and all(isinstance(item, dict) for item in models["findings"])
+                 and isinstance(models.get("errors"), list)
+                 and (models["status"] == "unknown" or not models["errors"]
+                      and (models["status"] == "current") == (models["stale_count"] == 0)))
+        model_coverage = {"active_models": models["status"] if valid else "unknown"}
+        if valid:
+            model_count = models["stale_count"]
+            details += [{"kind": "stale_model", **item} for item in models["findings"]]
+
     details.append({"kind": "coverage", "pins_unchecked": len(unchecked), "due_layers_total": due_total,
                     "sweep_cadence_days": cadence_days, "network": skills is not None,
                     "skills_complete": skills_complete, "skills_fetch_errors": skills_errors,
-                    "skills_unresolved": skills_unresolved, **host_coverage, **surface_coverage})
+                    "skills_unresolved": skills_unresolved, **host_coverage, **surface_coverage, **model_coverage})
     due = {"pins_behind": pins_behind, "stale_receipts": stale_receipts, "due_layers": due_layers,
            "reopen_triggers": reopen_triggers, "host_alerts": len(alerts)}
     if surface_count is not None:
         due[SURFACE_KEY] = surface_count
+    if model_count:
+        due[MODEL_KEY] = model_count
     command = details_command(root, skills is not None, cadence_days)
     if due_file is None:  # a direct caller: the default state directory, as main() would resolve it
         due_file, from_xdg = default_state_dir() / DUE_FILE, os.path.isabs(os.environ.get("XDG_STATE_HOME") or "")
     gap = SURFACE_GAPS.get(surface_coverage.get("surface_watch"))
+    gaps = [gap] if gap else []
+    if model_coverage.get("active_models") == "unknown":
+        gaps.append("model check incomplete")
     line = summary_line(due, command, skills_complete is not False, due_file_pointers(due_file, from_xdg),
-                        (gap,) if gap else ())
+                        tuple(gaps))
     return {"generated_at": now_text, "root": str(root), "due": due, "summary_line": line,
             "details_command": command, "details": details}
 
@@ -691,7 +728,8 @@ def gaps_of(document: dict) -> list[str]:
     (SURFACE_GAPS); the coverage entry is always the last detail."""
     coverage = document["details"][-1]
     return ((["the skill check was incomplete"] if coverage.get("skills_complete") is False else [])
-            + ([SURFACE_GAPS[coverage["surface_watch"]]] if coverage.get("surface_watch") in SURFACE_GAPS else []))
+            + ([SURFACE_GAPS[coverage["surface_watch"]]] if coverage.get("surface_watch") in SURFACE_GAPS else [])
+            + (["model check incomplete"] if coverage.get("active_models") == "unknown" else []))
 
 
 def incomplete(document: dict) -> bool:
@@ -731,7 +769,9 @@ def render_text(document: dict) -> str:
     lines = [document["summary_line"]]
     for item in document["details"]:
         kind = item["kind"]
-        if kind == "pin_mismatch":
+        if kind == "stale_model":
+            lines.append(f"  model: {item.get('path')}:{item.get('line')} {item.get('model')} -> {item.get('expected')}")
+        elif kind == "pin_mismatch":
             lines.append(f"  pin: {item['component_id']} did not report its pin {item['pinned_version']} "
                          f"({', '.join(str(profile) for profile in item['profiles'])})")
         elif kind in ("skill_drift", "skill_pin_invalid"):
@@ -870,7 +910,7 @@ def main(argv: list[str] | None = None) -> int:
         print(render_text(document))
     else:
         print(f"{document['summary_line']} ({action})")
-    return 0
+    return 1 if document["due"].get(MODEL_KEY) else 0
 
 
 if __name__ == "__main__":

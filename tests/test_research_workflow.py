@@ -119,7 +119,9 @@ class ResearchWorkflowTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             m.verify_astra_items([{'type': 'mcpToolCall'}])
         self.assertFalse(m.is_opus5('claude-opus-50'))
-        self.assertTrue(m.is_opus5('claude-opus-5[1m]'))
+        self.assertFalse(m.is_opus5('claude-opus-5[1m]'))
+        self.assertTrue(m.is_opus5('claude-opus-5-5'))
+        self.assertTrue(m.is_opus5('claude-opus-5-5[1m]'))
 
     def test_independent_claude_is_explicit_and_cannot_silently_skip_handoff(self):
         m = self.implementation()

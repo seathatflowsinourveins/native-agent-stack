@@ -5,8 +5,10 @@ existing workflow completed fresh LEAN → Dagu → DuckDB → Astra → Claude 
 the recreated SDK. See [the paired receipt and native results](../../../adoption/paired/README.md).
 The standalone run and quota boundary below remain dated historical evidence.
 
-The local path now runs **LEAN → Dagu → DuckDB/Parquet → a cited packet → native
-Claude Opus 5**, with native hooks and recorded usage. The separate **GPT-6 Astra
+The maintained supervisor now selects **Claude Opus 5.5** for new reports.
+The **LEAN → Dagu → DuckDB/Parquet → a cited packet → native Claude Opus 5**
+acceptance below is dated September 19 evidence; no new Opus 5.5 execution or
+usage is claimed by the model-currency update. The separate **GPT-6 Astra
 → Claude critique** workflow is implemented and validated, but its new paired
 model execution is pending Linux Codex allowance/sign-in. An earlier successful
 Astra SDK run remains [separate historical evidence](../workers/README.md).
@@ -105,7 +107,7 @@ env -i HOME="$HOME" PATH="$NATIVE_RUNTIME_PATH" \
 "$DAGU" history --context local --dagu-home "$RESEARCH_HOME" --format json research-pair
 ```
 
-For an explicitly independent Claude report, the exercised supervisor command is:
+For an explicitly independent Claude report, the current supervisor command is:
 
 ```sh
 "$SDK_ENV/bin/python" "$STACK_REPO/blueprints/us-equities/research-runtime/run_worker.py" claude \
@@ -119,7 +121,7 @@ For an explicitly independent Claude report, the exercised supervisor command is
 It invokes the upstream command directly, with the bounded prompt on stdin:
 
 ```sh
-claude -p --model claude-opus-5 --output-format stream-json --verbose \
+claude -p --model claude-opus-5-5 --output-format stream-json --verbose \
   --include-hook-events --max-turns 2 --tools '' --disallowedTools '*' \
   --permission-mode dontAsk --permission-prompts none
 ```

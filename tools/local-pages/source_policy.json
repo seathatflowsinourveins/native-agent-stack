@@ -2010,6 +2010,10 @@
     },
     {
       "root": "repo",
+      "path": "scripts/active_model_currency.py"
+    },
+    {
+      "root": "repo",
       "path": "scripts/adoption_status.py"
     },
     {

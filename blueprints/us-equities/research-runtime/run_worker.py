@@ -74,7 +74,7 @@ def verify_astra_items(items: list[dict]) -> None:
 
 
 def is_opus5(model) -> bool:
-    return model in {'claude-opus-5', 'claude-opus-5[1m]'}
+    return model in {'claude-opus-5-5', 'claude-opus-5-5[1m]'}
 
 
 def report_json(text: str) -> dict:
@@ -279,7 +279,7 @@ def main() -> int:
     exclusive_json(args.run_dir / f'{args.role}.reserved.json', {'status': 'reserved'})
     result = {'role': args.role, 'status': 'failed', 'usage': None,
               'workflow': 'independent_report' if args.independent else 'astra_then_claude',
-              'inference_attempted': False, 'configured_model': 'gpt-6-astra' if args.role == 'astra' else 'claude-opus-5'}
+              'inference_attempted': False, 'configured_model': 'gpt-6-astra' if args.role == 'astra' else 'claude-opus-5-5'}
     started = time.monotonic()
     try:
         raw = args.packet.read_bytes()
@@ -306,7 +306,7 @@ def main() -> int:
                        '--turn-deadline-seconds', str(max(1, args.timeout - 45)),
                        '--observation-dir', str(args.observation_dir)]
         else:
-            command = [str(args.claude_bin), '-p', '--model', 'claude-opus-5',
+            command = [str(args.claude_bin), '-p', '--model', 'claude-opus-5-5',
                        '--output-format', 'stream-json', '--verbose', '--include-hook-events',
                        '--max-turns', '2', '--tools', '', '--disallowedTools', '*',
                        '--permission-mode', 'dontAsk', '--permission-prompts', 'none']
