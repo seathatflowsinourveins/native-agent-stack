@@ -1,9 +1,17 @@
 # Opt-in OmniRoute transport for the blind Codex lane
 
-Add the requested insurance transport as `codex_lane.py --provider omniroute`; native remains the default.
-The candidate is ready for code review, but the CC's requirement that the gateway applies no prompt rewriting,
-compression, memory or system-prompt injection is not proved. Do not use it as a qualified blind-wave failover
-until that independent requirement is resolved. A source review cannot substitute a guarantee the source lacks.
+Add the requested insurance transport as `codex_lane.py --provider omniroute`; native remains the default and
+preferred route when its sign-in window allows ordinary usage. The CC's 2026-10-10T07:51Z ruling authorizes
+proceeding under disclosure: every OmniRoute packet and attempt records `provider=omniroute` and exactly
+`pass_through=not_attested (deployed settings unreadable by policy; OmniRoute@c1e30b76 chatCore.ts:3156, systemPrompt.ts:210-217/278-283, strategySelector.ts:234-249)`.
+These fields are runner-owned, independent of model claims, and the sealer requires the disclosure for
+OmniRoute returns. The source does not prove gateway prompt preservation; the ruling accepts that explicit
+boundary without blocking the opt-in transport.
+
+The CC's acceptance rationale is the existing two-family vote/refutation protocol (lane-prompt.md rule 4),
+which does not promote a winner merely on agreement. Owner dashboard attestation remains the CC's item. If
+later attestation shows global system prompts, compression/adaptive budgets, plugins or payload rules apply,
+OmniRoute-provider verdicts are re-run. The gateway attestation is not performed by this lane.
 
 The implementation follows the existing landscape-sweep [automatic failover](https://github.com/seathatflowsinourveins/native-agent-stack/blob/4d345267866403d75edece400fde6cd35ec4d05c/tools/sota-convergence/landscape-sweep/README.md#L351-L388)
 and its [transport-only inline provider](https://github.com/seathatflowsinourveins/native-agent-stack/blob/4d345267866403d75edece400fde6cd35ec4d05c/tools/sota-convergence/landscape-sweep/codex_job.py#L695-L703)
@@ -14,9 +22,9 @@ Only `OMNIROUTE_BASE_URL` joins the existing child environment. The endpoint mus
 HTTP(S) `/v1` URL; port, userinfo, query, fragment and type checks run before a child or home is created.
 
 The default endpoint is `http://127.0.0.1:21128/v1`. The model defaults to `gpt-6.1-sol` on the `cx/` route;
-an explicit model is retained, with `cx/` treated only as routing syntax. Model identity, provider and
-canonical endpoint are stamped by the runner, and provider/endpoint changes invalidate resume. The shared
-sealer permits only the two new Codex transport fields, keeps every required digest and accepts legacy native
+an explicit model is retained, with `cx/` treated only as routing syntax. Model identity, provider,
+pass-through disclosure and canonical endpoint are stamped by the runner; transport/disclosure changes
+invalidate resume. The shared sealer permits only the named Codex transport fields, keeps every required digest and accepts legacy native
 receipts. Code registration remains append-only. The memory opt-out and compression-off request are native
 provider headers, not new environment variables.
 
@@ -48,8 +56,8 @@ measurements, not proof of provider-received bytes or the live gateway's configu
 
 Provider-body comparison cannot be obtained under the authorized read boundary. Gateway settings and call-log
 detail return private credential/account/body data and are forbidden; permitted list metadata is not a body
-attestation. No forbidden route was requested. A supported upstream route/configuration guarantee or an
-explicit CC revision of the preservation criterion is needed before operational use.
+attestation. No forbidden route was requested. The CC's ruling permits operation with the exact not-attested
+disclosure and the re-run rule, while native remains preferred whenever its window reopens.
 
 The no-model native quota helper reported `ordinaryUsageAllowed=false`, primary reset `2026-10-14T03:28Z`,
 at 07:53:36Z and 08:22:46Z on October 10. It calls `account/rateLimits/read` through the standard native
@@ -57,7 +65,8 @@ client and does not manually read/copy credentials or native config. Native reco
 allowed result; a timestamp or successful probe alone is insufficient.
 
 Fail-before tests cover the missing opt-in and provider receipts; follow-up regressions cover endpoint
-canonicalization, malformed JSON endpoint types and routed model identity. All 110 Codex-lane and provenance
+canonicalization, malformed JSON endpoint types, routed model identity and exact cross-family not-attested
+disclosure (including failed attempts and spoofed model provenance). All 111 Codex-lane and provenance
 registry tests pass, including the unchanged isolation tuple and README command guard. The synthetic tier-1
 dry-run writes no output or home. Evidence classes and measured boundaries are in the
 [dated receipt](../../tools/sota-convergence/evidence/codex-lane-omniroute-20261010.json).

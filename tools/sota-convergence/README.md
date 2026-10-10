@@ -1493,16 +1493,20 @@ only the validated endpoint joins the existing child environment allowlist. No g
 configuration/profile is loaded. The blind audit still refuses environment-reading commands.
 
 Every packet's runner-owned provenance and each usage row record `provider`; OmniRoute provenance also records
-the canonical `provider_base_url`. Changing provider or endpoint invalidates resume. The sealer accepts those
-two Codex-only fields while retaining all required code digests and legacy native receipts.
+the canonical `provider_base_url`. Every OmniRoute packet and attempt also records exactly
+`pass_through=not_attested (deployed settings unreadable by policy; OmniRoute@c1e30b76 chatCore.ts:3156, systemPrompt.ts:210-217/278-283, strategySelector.ts:234-249)`.
+Changing provider, endpoint or disclosure invalidates resume. The sealer validates these Codex-only fields
+while retaining all required code digests and legacy native receipts.
 
-Gateway prompt preservation is an independent prerequisite for a blind wave, and is **not established** by
-this transport opt-in. The recorded OmniRoute source permits global prompt injection, plugins, payload rules and
+The CC's 2026-10-10T07:51Z ruling permits this opt-in under the exact not-attested disclosure; native remains
+default and preferred when the native sign-in window reopens. Gateway prompt preservation is **not established**
+by the transport. The recorded OmniRoute source permits global prompt injection, plugins, payload rules and
 adaptive compression even on its native Responses passthrough route. The no-memory header is a supported
 opt-out; the compression-off header can still be overridden by adaptive planning. A client-side canary captures
 the exact submitted UTF-8 prompt, but provider-received bytes cannot be compared under the authorized gateway
 inspection boundary: call-log detail and settings routes expose private account/credential/body data and are
-forbidden. See [the dated source/evidence record](../../docs/decisions/2026-10-10-codex-lane-omniroute.md).
+forbidden. The CC owns the dashboard attestation item; if later attestation shows mutation settings apply,
+OmniRoute-provider verdicts are re-run. See [the dated source/evidence record](../../docs/decisions/2026-10-10-codex-lane-omniroute.md).
 Use the candidate's `--provider omniroute --dry-run` on a tier-1 packet for review; it does not launch a model turn.
 
 capturing the full JSON event stream to

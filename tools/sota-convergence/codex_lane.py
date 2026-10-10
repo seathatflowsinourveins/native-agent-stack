@@ -144,6 +144,10 @@ DEFAULT_OMNIROUTE_BASE_URL = "http://127.0.0.1:21128/v1"
 # OmniRoute@0585aba5589d5a1f49243a13a8db249558e7c9e3
 # open-sse/config/providers/registry/codex/index.ts:9-17,71-74 (cx Responses route).
 DEFAULT_OMNIROUTE_MODEL = "gpt-6.1-sol"
+# CC 2026-10-10T07:51Z disclosure ruling; verified against the pinned primary sources.
+OMNIROUTE_PASS_THROUGH = (
+    "not_attested (deployed settings unreadable by policy; OmniRoute@c1e30b76 chatCore.ts:3156, "
+    "systemPrompt.ts:210-217/278-283, strategySelector.ts:234-249)")
 
 
 def omniroute_endpoint(value: str) -> str:
@@ -1163,6 +1167,7 @@ def lane_provenance(prompt_path: Path, repo: Path = None, allow_escaping_links: 
                   "prompt_sha256": sha256_file(Path(prompt_path)), "provider": provider}
     if provider == "omniroute":
         provenance["provider_base_url"] = omniroute_endpoint(omniroute_base_url)
+        provenance["pass_through"] = OMNIROUTE_PASS_THROUGH
     if repo is not None:
         provenance["repo_tree_sha256"] = tree_sha256(Path(repo), allow_escaping_links)
     return provenance
@@ -1440,6 +1445,7 @@ def run_pending(args, work_dir, repo, template, schema_path, codex_dir, events_d
             }
             if args.provider == "omniroute":
                 usage_row["provider_base_url"] = args.omniroute_base_url
+                usage_row["pass_through"] = OMNIROUTE_PASS_THROUGH
             usage_row.update(usage)
             with usage_lock, usage_path.open("a", encoding="utf-8") as handle:
                 handle.write(json.dumps(usage_row, sort_keys=True) + "\n")

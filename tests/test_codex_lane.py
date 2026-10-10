@@ -1385,6 +1385,8 @@ class OmniRouteProviderTests(CodexLaneFixture):
     """
 
     ENDPOINT = "http://127.0.0.1:21128/v1"
+    PASS_THROUGH = ("not_attested (deployed settings unreadable by policy; OmniRoute@c1e30b76 chatCore.ts:3156, "
+                    "systemPrompt.ts:210-217/278-283, strategySelector.ts:234-249)")
 
     def setUp(self):
         super().setUp()
@@ -1406,8 +1408,10 @@ class OmniRouteProviderTests(CodexLaneFixture):
                              for value in argv))
         data = json.loads(self.out_path("foundation", "native-clients").read_text(encoding="utf-8"))
         self.assertEqual(data["provenance"].get("provider"), "native")
+        self.assertNotIn("pass_through", data["provenance"])
         self.assertEqual(self.usage_rows()[0].get("provider"), "native")
         self.assertNotIn("provider_base_url", self.usage_rows()[0])
+        self.assertNotIn("pass_through", self.usage_rows()[0])
 
     def test_omniroute_dry_run_on_a_synthetic_tier1_packet_writes_nothing(self):
         self.write_packet("foundation", "native-clients", {
@@ -1462,6 +1466,29 @@ class OmniRouteProviderTests(CodexLaneFixture):
             self.assertEqual(row["HOME"], str(home / "home"))
             self.assertEqual(list((home / "home").iterdir()), [])
             self.assertEqual(oct(home.stat().st_mode & 0o777), "0o700")
+
+    def test_omniroute_disclosure_is_runner_owned_on_every_packet_and_attempt(self):
+        families = [("foundation", "native-clients"), ("runtime", "bounded-workers")]
+        for catalog, layer_id in families:
+            self.write_packet(catalog, layer_id)
+        self.return_file.write_text(json.dumps(canned_return(provenance={
+            "provider": "native", "pass_through": "fixture-spoofed-attestation",
+        })), encoding="utf-8")
+        # Retain a failed attempt as well as both successful packets: every usage row needs the disclosure.
+        os.environ["CODEX_FAKE_FAIL_ATTEMPTS"] = "1"
+        self.assertEqual(self.run_lane(["--provider", "omniroute"]), 0)
+        for catalog, layer_id in families:
+            with self.subTest(packet=f"{catalog}__{layer_id}"):
+                data = json.loads(self.out_path(catalog, layer_id).read_text(encoding="utf-8"))
+                self.assertEqual(data["provenance"].get("provider"), "omniroute")
+                self.assertEqual(data["provenance"].get("pass_through"), self.PASS_THROUGH)
+        rows = self.usage_rows()
+        self.assertEqual(len(rows), 3)
+        self.assertTrue(any(row["exit_code"] != 0 for row in rows))
+        for row in rows:
+            with self.subTest(usage=(row["catalog"], row["layer"], row["attempt"])):
+                self.assertEqual(row.get("provider"), "omniroute")
+                self.assertEqual(row.get("pass_through"), self.PASS_THROUGH)
 
     def test_omniroute_uses_a_fresh_keyless_home_for_each_run(self):
         self.write_packet("foundation", "native-clients")
@@ -1626,22 +1653,28 @@ class OmniRouteProviderTests(CodexLaneFixture):
         from scripts.landscape import lane_provenance_issue
 
         legacy = {"codex_lane_py_sha256": "a" * 64, "prompt_sha256": "b" * 64, "repo_tree_sha256": "c" * 64}
-        accepted = [legacy, {**legacy, "provider": "native"},
-                    {**legacy, "provider": "omniroute", "provider_base_url": self.ENDPOINT}]
+        omniroute = {**legacy, "provider": "omniroute", "provider_base_url": self.ENDPOINT,
+                     "pass_through": self.PASS_THROUGH}
+        accepted = [legacy, {**legacy, "provider": "native"}, omniroute]
         for provenance in accepted:
             with self.subTest(provenance=provenance):
                 self.assertIsNone(lane_provenance_issue("codex", provenance))
         refused = [
             {**legacy, "provider": "unknown"},
             {**legacy, "provider": "omniroute"},
-            {**legacy, "provider": "omniroute", "provider_base_url": "https://example.invalid/v1"},
+            {**omniroute, "provider_base_url": "https://example.invalid/v1"},
             {**legacy, "provider": "native", "provider_base_url": self.ENDPOINT},
             {**legacy, "provider_base_url": self.ENDPOINT},
-            {**legacy, "provider": "omniroute", "provider_base_url": self.ENDPOINT, "extra_env": "not-allowed"},
+            {**omniroute, "extra_env": "not-allowed"},
             {"codex_lane_py_sha256": "a" * 64, "prompt_sha256": "b" * 64, "provider": "native"},
             {**legacy, "provider": "native", "prompt_sha256": "malformed"},
+            {**legacy, "provider": "omniroute", "provider_base_url": self.ENDPOINT},
+            {**omniroute, "pass_through": "fixture-spoofed-attestation"},
+            {**omniroute, "pass_through": None},
+            {**legacy, "provider": "native", "pass_through": self.PASS_THROUGH},
+            {**legacy, "pass_through": self.PASS_THROUGH},
         ]
-        refused.extend({**legacy, "provider": "omniroute", "provider_base_url": value}
+        refused.extend({**omniroute, "provider_base_url": value}
                        for value in (None, False, 0, 1, [self.ENDPOINT], {"url": self.ENDPOINT}))
         for provenance in refused:
             with self.subTest(provenance=provenance):
@@ -1656,7 +1689,8 @@ class OmniRouteProviderTests(CodexLaneFixture):
             "transcript_audit_py_sha256": "e" * 64, "repo_tree_sha256": "f" * 64,
         }
         self.assertIsNone(lane_provenance_issue("claude", claude))
-        for extra in ({"provider": "native"}, {"provider": "omniroute", "provider_base_url": self.ENDPOINT}):
+        for extra in ({"provider": "native"}, {"provider": "omniroute", "provider_base_url": self.ENDPOINT},
+                      {"pass_through": self.PASS_THROUGH}):
             with self.subTest(extra=extra):
                 self.assertIsNotNone(lane_provenance_issue("claude", {**claude, **extra}))
 

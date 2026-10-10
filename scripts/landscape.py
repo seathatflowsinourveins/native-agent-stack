@@ -412,7 +412,7 @@ def lane_provenance_issue(lane, provenance):
     commit and the hash of the role definition its stages ran as; the Codex lane the hashes of codex_lane.py
     and the prompt it filled. Both name the digest of the evidence tree they read (repo_tree_sha256)."""
     fields = LANE_PROVENANCE_FIELDS[lane]
-    transport_fields = {"provider", "provider_base_url"} if lane == "codex" else set()
+    transport_fields = {"provider", "provider_base_url", "pass_through"} if lane == "codex" else set()
     if not isinstance(provenance, dict) or not set(fields) <= set(provenance) \
             or set(provenance) - set(fields) - transport_fields:
         return f"provenance must be an object with exactly {', '.join(fields)} for the {lane} lane"
@@ -434,9 +434,13 @@ def lane_provenance_issue(lane, provenance):
         provider = provenance.get("provider", "native")
         if provider not in ("native", "omniroute"):
             return "provenance.provider is malformed for the codex lane"
-        if provider == "native" and "provider_base_url" in provenance:
-            return "provenance.provider_base_url is only valid for omniroute"
+        if provider == "native" and ({"provider_base_url", "pass_through"} & set(provenance)):
+            return "provenance transport endpoint/disclosure is only valid for omniroute"
         if provider == "omniroute":
+            disclosure = ("not_attested (deployed settings unreadable by policy; OmniRoute@c1e30b76 "
+                          "chatCore.ts:3156, systemPrompt.ts:210-217/278-283, strategySelector.ts:234-249)")
+            if provenance.get("pass_through") != disclosure:
+                return "provenance.pass_through must contain the exact not_attested disclosure for omniroute"
             value = provenance.get("provider_base_url")
             if not isinstance(value, str):
                 return "provenance.provider_base_url must be a keyless loopback /v1 endpoint"

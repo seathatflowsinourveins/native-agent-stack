@@ -1,33 +1,42 @@
 {
   "schema_version": 1,
-  "checked_at": "2026-10-10T08:22:46Z",
+  "checked_at": "2026-10-10T08:49:10Z",
   "base_commit": "4d345267866403d75edece400fde6cd35ec4d05c",
-  "codex_lane_py_sha256": "33dcd00839fef2baf30847a7c815bce2e41ea03e1f1cfa09887497fc90b5e3a7",
-  "status": "candidate_transport_ready_preservation_unproved",
+  "codex_lane_py_sha256": "6515b05e0a64b00a735d832e904dd2865b8a73d3df925fee7c0cdf540c258b1b",
+  "status": "cc_authorized_proceed_with_not_attested_disclosure",
+  "cc_ruling": {
+    "at": "2026-10-10T07:51Z",
+    "provider": "omniroute",
+    "pass_through": "not_attested (deployed settings unreadable by policy; OmniRoute@c1e30b76 chatCore.ts:3156, systemPrompt.ts:210-217/278-283, strategySelector.ts:234-249)",
+    "native_preferred": true,
+    "attestation_owner": "CC",
+    "rerun_rule": "If later attestation shows global system prompt, compression/adaptive budget, plugins or payload rules apply, OmniRoute-provider verdicts are re-run."
+  },
   "native_default": true,
   "opt_in": "--provider omniroute",
   "endpoint_env_addition": ["OMNIROUTE_BASE_URL"],
   "keyless": true,
   "native_auth_access_in_omniroute_mode": false,
   "isolation_args_unchanged": true,
-  "receipt_transport_fields": ["provenance.provider", "provenance.provider_base_url"],
-  "usage_transport_fields": ["provider", "provider_base_url"],
+  "receipt_transport_fields": ["provenance.provider", "provenance.provider_base_url", "provenance.pass_through"],
+  "usage_transport_fields": ["provider", "provider_base_url", "pass_through"],
   "fail_before": {
     "fixture_class": "synthetic",
     "main_provider_class": {"tests": 9, "exit_code": 1, "failures": 1, "errors": 14, "reason": "No provider flag or native provider provenance in unchanged core."},
     "endpoint_normalization": {"exit_code": 1, "observed": "HTTP://LOCALHOST:021128/v1", "expected": "http://localhost:21128/v1"},
     "malformed_endpoint_json": {"exit_code": 1, "endpoint": 1, "observed": "AttributeError from urllib.parse.urlsplit", "expected": "Graceful loopback endpoint refusal"},
-    "model_route_identity": {"exit_code": 1, "observed": "cx/gpt-6.1-sol", "expected": "gpt-6.1-sol"}
+    "model_route_identity": {"exit_code": 1, "observed": "cx/gpt-6.1-sol", "expected": "gpt-6.1-sol"},
+    "not_attested_disclosure": {"exit_code": 1, "failed_subtests": 5, "receipts": 2, "usage_attempts": 3, "includes_failed_attempt": true, "observed": "missing pass_through", "expected": "exact CC not_attested literal"}
   },
   "required_tests": {
     "command": "python3 -m unittest tests.test_codex_lane tests.test_verdict_lane_vendoring -v",
     "exit_code": 0,
-    "tests": 110,
+    "tests": 111,
     "failures": 0,
     "errors": 0,
-    "elapsed_seconds": 6.143,
+    "elapsed_seconds": 6.253,
     "class": "local_integration",
-    "covers": ["native default", "loopback refusal", "credential/query/fragment/port refusal", "extra environment exclusion", "unchanged blind environment audit", "fresh keyless homes", "provider/family receipts", "provider and endpoint resume invalidation", "canonical endpoint/model identity", "malformed metadata refusal", "legacy native sealer compatibility", "isolation args guard", "README block guard", "append-only code registries"]
+    "covers": ["native default", "loopback refusal", "credential/query/fragment/port refusal", "extra environment exclusion", "unchanged blind environment audit", "fresh keyless homes", "provider/family receipts", "exact not_attested disclosure on every Omni packet/attempt", "model disclosure spoof overwrite", "native/Claude disclosure refusal", "provider and endpoint resume invalidation", "canonical endpoint/model identity", "malformed metadata refusal", "legacy native sealer compatibility", "isolation args guard", "README block guard", "append-only code registries"]
   },
   "tier1_dry_run": {
     "fixture_class": "synthetic",
@@ -79,7 +88,7 @@
     "prompt_preservation_status": "unproved"
   },
   "limitations": [
-    "The gateway source does not supply the requested unconditional no-rewrite/no-injection guarantee; operational use is not qualified by this candidate.",
+    "The gateway source does not supply an unconditional no-rewrite/no-injection guarantee. The CC permits proceeding under the exact not_attested disclosure and adverse-attestation re-run rule.",
     "Client-boundary byte capture does not establish the body a live gateway forwards to its upstream provider.",
     "No settings or call-log detail endpoint was read. Permitted list metadata cannot attest upstream prompt bytes.",
     "No live verdict wave, gateway model inference or provider-quality parity test was run.",
