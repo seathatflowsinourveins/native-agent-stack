@@ -138,10 +138,10 @@ class HarnessAuditShapeTests(unittest.TestCase):
         self.assertEqual(condition.count("&&"), 5)
         self.assertEqual(condition.count("||"), 1)
 
-    def test_the_job_holds_the_oidc_token_and_no_write_scope(self):
-        self.assertEqual(job()["permissions"], {"contents": "read", "id-token": "write"})
+    def test_the_job_holds_no_write_scope_and_no_id_token(self):
+        self.assertEqual(job()["permissions"], {"contents": "read"})
 
-    def test_the_action_is_pinned_and_takes_federation_inputs_only(self):
+    def test_the_action_is_pinned_and_takes_the_api_key_secret_only(self):
         run = step(AUDIT)
         self.assertEqual(run["uses"], ACTION)
         # Codex P2 thread at harness-audit.yml:125 (R10): no CLAUDE.md memory file loads in the audit session.
@@ -149,22 +149,24 @@ class HarnessAuditShapeTests(unittest.TestCase):
         inputs = run["with"]
         # The complete reviewed input set (J8 micro N8; GPT read of 0cf13fc2): an input added to the action step, such
         # as claude_code_version or settings, fails here even when no test names it.
-        self.assertEqual(sorted(inputs), ["anthropic_federation_rule_id", "anthropic_organization_id",
-                                          "anthropic_service_account_id", "anthropic_workspace_id", "claude_args",
-                                          "display_report", "github_token", "prompt", "show_full_output",
-                                          "track_progress"])
-        for forbidden in ("anthropic_api_key", "claude_code_oauth_token", "allowed_non_write_users", "allowed_bots",
+        self.assertEqual(sorted(inputs), ["anthropic_api_key", "claude_args", "display_report", "github_token",
+                                          "prompt", "show_full_output", "track_progress"])
+        for forbidden in ("claude_code_oauth_token", "allowed_non_write_users", "allowed_bots",
                           "plugins", "plugin_marketplaces"):
             self.assertNotIn(forbidden, inputs)
+        # The owner's ruling of 2026-10-10: the repository secret ANTHROPIC_API_KEY, no federation input.
+        self.assertEqual(inputs["anthropic_api_key"], "${{ secrets.ANTHROPIC_API_KEY }}")
         for name in ("anthropic_federation_rule_id", "anthropic_organization_id",
                      "anthropic_service_account_id", "anthropic_workspace_id"):
-            self.assertRegex(inputs[name], r"^\$\{\{ vars\.[A-Z_]+ \}\}$")
+            self.assertNotIn(name, inputs)
         self.assertEqual(inputs["show_full_output"], "false")
         self.assertEqual(inputs["display_report"], "false")
         self.assertEqual(inputs["track_progress"], "false")
         text = WORKFLOW.read_text(encoding="utf-8")
-        for static_credential in ("ANTHROPIC_API_KEY", "ANTHROPIC_AUTH_TOKEN", "CLAUDE_CODE_OAUTH_TOKEN"):
+        # The API key is the one credential (the owner's ruling of 2026-10-10); no other static one appears.
+        for static_credential in ("ANTHROPIC_AUTH_TOKEN", "CLAUDE_CODE_OAUTH_TOKEN"):
             self.assertNotIn(static_credential, text)
+        self.assertEqual(text.count("secrets.ANTHROPIC_API_KEY"), 1)
 
     def test_claude_has_three_read_tools_and_fixed_bounds(self):
         for expected in ("--model claude-opus-5-5", "--effort max", "--max-budget-usd 5",

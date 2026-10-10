@@ -5101,13 +5101,13 @@
     },
     {
       "path": ".github/workflows/claude-pr-review.yml",
-      "sha256": "23a9066077a0426c68589cc1748fc31c08e24cce39407ac7ba305573488ed8eb",
-      "bytes": 38750
+      "sha256": "4af34f6f3ef8e0d4cf3d3411cfe9673c4e2c13d6c0ef488ff8fca031ca4159fb",
+      "bytes": 38394
     },
     {
       "path": ".github/workflows/claude-pr-toolkit-review.yml",
-      "sha256": "17f1aa5e5c311b3edfd0b3489fa82ea8068866f04ea815d705fb3c1eb8c441c8",
-      "bytes": 33920
+      "sha256": "cf5687fcf020602454a9325babd17eb0efb8c3dea024d2ac51e81b297cdd62d5",
+      "bytes": 33998
     },
     {
       "path": ".github/workflows/dependency-review.yml",
@@ -5126,8 +5126,8 @@
     },
     {
       "path": ".github/workflows/harness-audit.yml",
-      "sha256": "83704e4710be1e97579e8f9597fa168f74db83e5e374555653d7619724b0b2dc",
-      "bytes": 19414
+      "sha256": "d6164e93308aacab059ddc87dc2c1e8400f6d6b610a5621ed08eb8334731bb82",
+      "bytes": 18984
     },
     {
       "path": ".github/workflows/native-foundation-e2e.yml",
@@ -18162,8 +18162,8 @@
     },
     {
       "path": "docs/decisions/2026-10-04-ci-least-privilege.md",
-      "sha256": "b4a735ec0834156c89adf66ab7dc3b32c540c638475554621a99b1b702c3252b",
-      "bytes": 43474
+      "sha256": "b1aed62ea4b01699000e59017881479c1850aba255acfc3300a19e3d78e6137e",
+      "bytes": 44256
     },
     {
       "path": "docs/decisions/2026-10-04-claude-template-holds-out-token-lane-carriers.md",
@@ -18447,13 +18447,13 @@
     },
     {
       "path": "docs/decisions/2026-10-08-claude-actions-harness-audit-bounds.md",
-      "sha256": "e74fced9eaa05161cdb335b070b880219d59625e05e3f7d5e6863e3b4f3839ac",
-      "bytes": 63427
+      "sha256": "ef673655372a73f343ca49820170813323d819428f01b5fb524c9ebecaad8371",
+      "bytes": 64003
     },
     {
       "path": "docs/decisions/2026-10-08-claude-actions-pr-review.md",
-      "sha256": "c2887e60930f9676b93b9b083d1461ee1d3dc853488b3de1b9d0e25f923c3db8",
-      "bytes": 60504
+      "sha256": "0716dfb6e389ccc5df9bd95027ed8ae718712f446cffacf02bb8aad4fc0103c9",
+      "bytes": 64811
     },
     {
       "path": "docs/decisions/2026-10-08-coordinator-research-routing.md",
@@ -18517,8 +18517,8 @@
     },
     {
       "path": "docs/decisions/2026-10-09-claude-actions-pr-toolkit-review.md",
-      "sha256": "5ba1c9290ba3d0e00d9f94a40b544f47aa383f08c5e1883bf337bf55f79fe49a",
-      "bytes": 49682
+      "sha256": "5d731fdf84182f4d59d712c2929a444a64eac3d1d99a2d95f8d8fa4ffdf7e63a",
+      "bytes": 50213
     },
     {
       "path": "docs/decisions/2026-10-09-claude-code-floor.md",
@@ -18567,8 +18567,8 @@
     },
     {
       "path": "docs/decisions/2026-10-10-claude-federation-diagnostics.md",
-      "sha256": "463053861fd6211c90f4082ac218ce4e419cb345beab445991179b67ff951788",
-      "bytes": 10105
+      "sha256": "6ea3a1e4141991834586a4c5ae798d2a8f54888e4e601ce481b1829cd256babc",
+      "bytes": 10511
     },
     {
       "path": "docs/decisions/2026-10-10-codex-lane-omniroute.md",
@@ -18717,8 +18717,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "65f58a6631fa9ed2feb8e436b7c73775021f18eed3bf0095b88fa03aff98e876",
-      "bytes": 106676
+      "sha256": "ef1654f0bdcb863754793425243647eb56879837ebbc2af3d81535ce407c4fd0",
+      "bytes": 106604
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -60302,23 +60302,23 @@
     },
     {
       "path": "tests/test_claude_federation_diagnostics.py",
-      "sha256": "76917ed442df0e6aa6ed1f20f4f17e06c7dec1eb51489650ed5d0ace3de2a3ae",
-      "bytes": 9083
+      "sha256": "6613ea97a1783efa3382caae809583e695c19d4a8e8a10e40623cadd24946f22",
+      "bytes": 9225
     },
     {
       "path": "tests/test_claude_harness_audit_bounds.py",
-      "sha256": "5c8781fd102c134ff893788c7d64402b3fce40a1f60185a44c1f5deae46d1065",
-      "bytes": 32730
+      "sha256": "251d64898e618e4ce2d78bf4877a95464a9e54d78d4d92e45e8c8f03f1e8499f",
+      "bytes": 32825
     },
     {
       "path": "tests/test_claude_pr_review_workflow.py",
-      "sha256": "16b71fea0d13962ef4ee60f3f15894132d2f11602461dcdd0e002679d50499e0",
-      "bytes": 60478
+      "sha256": "0e46c3cb2930aaa7567f6bf22d07258684ef022c6590b4d529f173219efcc630",
+      "bytes": 60730
     },
     {
       "path": "tests/test_claude_pr_toolkit_review_workflow.py",
-      "sha256": "906e599f7cdf5bc9a122a9cf81c65dab59fb8e016ee6516b12edcf0ead9a746b",
-      "bytes": 76232
+      "sha256": "3c96cda1bc852314bba70fb764ef76bbdda80b7940b5bc4438c5deab188d96ca",
+      "bytes": 76484
     },
     {
       "path": "tests/test_claude_recovery.py",
@@ -61272,13 +61272,13 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "47e8748f35d046a208e564d8eabd37f1c73d539e50adff7fdf8cdc01e9f9fe09",
-      "bytes": 175127
+      "sha256": "86e4dc0183af8234ff78840354d8526d43b3e09bec0ea7c11dd54e5fc8233a88",
+      "bytes": 178463
     },
     {
       "path": "tests/test_workflow_policy.py",
-      "sha256": "2c132e9fee2c59d15bac9b42d28c6bb9b53ecfebcf331066199b9178fecf065f",
-      "bytes": 85103
+      "sha256": "23f9d234d2b2356a547a53c6de1a44e285cf22f6da881ec0a4b6de3ab5e930ea",
+      "bytes": 83184
     },
     {
       "path": "tests/test_workflow_security.py",

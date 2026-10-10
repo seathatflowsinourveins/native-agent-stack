@@ -362,9 +362,8 @@ class PullRequestToolkitShapeTests(unittest.TestCase):
         self.assertEqual(condition.count("&&"), 5)
         self.assertNotIn("||", condition)
 
-    def test_the_job_holds_the_oidc_token_and_no_write_scope(self):
-        self.assertEqual(job()["permissions"],
-                         {"contents": "read", "pull-requests": "read", "id-token": "write"})
+    def test_the_job_holds_no_write_scope_and_no_id_token(self):
+        self.assertEqual(job()["permissions"], {"contents": "read", "pull-requests": "read"})
 
     def test_main_is_at_the_workspace_root_and_the_head_is_data_in_a_subdirectory(self):
         root = step("Check out main at the workspace root")["with"]
@@ -426,25 +425,29 @@ class PullRequestToolkitShapeTests(unittest.TestCase):
             self.assertIn("--no-textconv", line)
         self.assertNotIn("git -C", script)
 
-    def test_the_action_is_pinned_and_takes_federation_inputs_only(self):
+    def test_the_action_is_pinned_and_takes_the_api_key_secret_only(self):
         run = step(REVIEW)
         self.assertEqual(run["uses"], ACTION)
         self.assertEqual(run["env"], {"ACTIONS_STEP_DEBUG": "false", "CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS": "0"})
         inputs = run["with"]
         # The action's own plugin inputs install from a marketplace at run time, unpinned; the toolkit comes from
         # the pinned checkout instead.
-        for forbidden in ("anthropic_api_key", "claude_code_oauth_token", "allowed_non_write_users", "allowed_bots",
+        for forbidden in ("claude_code_oauth_token", "allowed_non_write_users", "allowed_bots",
                           "plugins", "plugin_marketplaces", "settings"):
             self.assertNotIn(forbidden, inputs)
+        # The owner's ruling of 2026-10-10: the repository secret ANTHROPIC_API_KEY, no federation input.
+        self.assertEqual(inputs["anthropic_api_key"], "${{ secrets.ANTHROPIC_API_KEY }}")
         for name in ("anthropic_federation_rule_id", "anthropic_organization_id",
                      "anthropic_service_account_id", "anthropic_workspace_id"):
-            self.assertRegex(inputs[name], r"^\$\{\{ vars\.[A-Z_]+ \}\}$")
+            self.assertNotIn(name, inputs)
         self.assertEqual(inputs["show_full_output"], "false")
         self.assertEqual(inputs["display_report"], "false")
         self.assertEqual(inputs["track_progress"], "false")
         text = WORKFLOW.read_text(encoding="utf-8")
-        for static_credential in ("ANTHROPIC_API_KEY", "ANTHROPIC_AUTH_TOKEN", "CLAUDE_CODE_OAUTH_TOKEN"):
+        # The API key is the one credential (the owner's ruling of 2026-10-10); no other static one appears.
+        for static_credential in ("ANTHROPIC_AUTH_TOKEN", "CLAUDE_CODE_OAUTH_TOKEN"):
             self.assertNotIn(static_credential, text)
+        self.assertEqual(text.count("secrets.ANTHROPIC_API_KEY"), 1)
 
     def test_the_review_step_time_limit_follows_the_diff_size_inside_the_job_limit(self):
         self.assertEqual(step(REVIEW)["timeout-minutes"], "${{ fromJSON(steps.diff.outputs.minutes) }}")

@@ -511,6 +511,10 @@ The six copies new earlier in R6, and the cases of the new handback-bound test e
 - any handback counting for every call, the association to the coordinator's call dropped: both one-handback cases
   and the retry case.
 
+## Authentication by API key (2026-10-10)
+
+Since 2026-10-10 the owner ruled on 2026-10-10 that CI Claude review authenticates with an Anthropic API key, `ANTHROPIC_API_KEY` of the main-only `claude-review` environment, not federation (`docs/decisions/2026-10-08-claude-actions-pr-review.md`, "Authentication by API key"). The toolkit job passes `anthropic_api_key` and no federation input, and holds `contents: read` and `pull-requests: read` only. Dispatch on main by the owner, the bounds and the read-only tools are unchanged.
+
 ## Alternatives considered
 
 - **The action's `plugins` and `plugin_marketplaces` inputs.** Rejected: unpinned (above).

@@ -221,6 +221,63 @@ class HardenRunnerTests(unittest.TestCase):
             self.assertNotIn("egress-policy: block", path.read_text(encoding="utf-8"), path.name)
 
 
+CLAUDE_REVIEW_WORKFLOWS = ("claude-pr-review.yml", "claude-pr-toolkit-review.yml", "harness-audit.yml")
+FEDERATION_INPUTS = ("anthropic_federation_rule_id", "anthropic_organization_id", "anthropic_service_account_id",
+                     "anthropic_workspace_id")
+
+
+class ClaudeApiKeyAuthTests(unittest.TestCase):
+    """The owner's ruling of 2026-10-10 (docs/decisions/2026-10-08-claude-actions-pr-review.md): CI Claude review
+    authenticates with the repository secret ANTHROPIC_API_KEY, and federation stays unconfigured."""
+
+    def lines(self, name):
+        return [line.strip() for line in (WORKFLOWS / name).read_text(encoding="utf-8").splitlines()
+                if not line.strip().startswith("#")]
+
+    def test_each_claude_workflow_passes_the_api_key_secret_once(self):
+        for name in CLAUDE_REVIEW_WORKFLOWS:
+            with self.subTest(workflow=name):
+                lines = self.lines(name)
+                self.assertEqual(lines.count("anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}"), 1)
+                self.assertEqual([line for line in lines if line.startswith("claude_code_oauth_token:")], [])
+
+    def test_no_claude_workflow_carries_a_federation_input_or_an_id_token(self):
+        for name in CLAUDE_REVIEW_WORKFLOWS:
+            with self.subTest(workflow=name):
+                lines = self.lines(name)
+                for key in FEDERATION_INPUTS:
+                    self.assertEqual([line for line in lines if line.startswith(key + ":")], [], key)
+                self.assertEqual([line for line in lines if line.startswith("id-token:")], [])
+
+    def test_each_job_that_uses_the_key_runs_in_the_main_only_environment(self):
+        # The owner's ruling of 2026-10-10: the key is an environment secret of `claude-review` (deployment branch
+        # policy: main only), never a repository secret that any branch's workflow could read.
+        for name in CLAUDE_REVIEW_WORKFLOWS:
+            with self.subTest(workflow=name):
+                text = (WORKFLOWS / name).read_text(encoding="utf-8")
+                jobs = text.split("\njobs:\n", 1)[1]
+                blocks = re.split(r"\n(?=  [A-Za-z0-9_-]+:\n)", "\n" + jobs)
+                using = [block for block in blocks if "secrets.ANTHROPIC_API_KEY" in block]
+                self.assertEqual(len(using), 1)
+                self.assertIn("\n    environment: claude-review\n", using[0])
+                others = [block for block in blocks if block not in using]
+                self.assertFalse(any("environment:" in block for block in others))
+
+    def test_the_key_reaches_no_pull_request_run(self):
+        # A pull_request run would execute the pull request's own copy of the workflow with the secret.
+        for name in CLAUDE_REVIEW_WORKFLOWS:
+            with self.subTest(workflow=name):
+                lines = self.lines(name)
+                self.assertFalse(any(line.split(":")[0] in ("pull_request", "pull_request_target", "workflow_run")
+                                     for line in lines))
+
+    def test_no_other_workflow_names_the_secret(self):
+        for path in sorted(WORKFLOWS.glob("*.yml")):
+            if path.name not in CLAUDE_REVIEW_WORKFLOWS:
+                with self.subTest(workflow=path.name):
+                    self.assertNotIn("secrets.ANTHROPIC_API_KEY", path.read_text(encoding="utf-8"))
+
+
 class ScorecardTests(unittest.TestCase):
     text = (WORKFLOWS / "scorecard.yml").read_text(encoding="utf-8")
 

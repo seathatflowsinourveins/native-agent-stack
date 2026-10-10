@@ -1,5 +1,7 @@
 # Retain failed Claude federation diagnostics before acceptance — 2026-10-10
 
+**Superseded for CI review (2026-10-10).** The owner then ruled that CI Claude review authenticates with an API key, `ANTHROPIC_API_KEY` of the main-only `claude-review` environment, and federation stays unconfigured (`docs/decisions/2026-10-08-claude-actions-pr-review.md`, "Authentication by API key"). This record stays as the diagnosis behind that move; its vendor snapshots stay retained and tested.
+
 The three federated workflows already select Claude Opus 5.5 through
 `anthropics/claude-code-action` v1.0.247 at
 `2dca132ff0e0c4094ce6048b422c6915a071210b`. This P1 slice keeps that supported

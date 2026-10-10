@@ -17,7 +17,8 @@ PR (#892, 2026-10-09), which found changes its record had not named; the same re
 - Job condition: this repository (slug guard), the `main` ref, `github.actor` and `github.triggering_actor` both the
   repository owner, the first attempt of a run, and `CLAUDE_PR_REVIEW_ENABLED == 'true'`. A dispatch by anyone else,
   or a re-run, is skipped.
-- `timeout-minutes: 30` (R6, below). Grants: `contents: read`, `pull-requests: read` and `id-token: write`.
+- `timeout-minutes: 30` (R6, below). Grants: `contents: read`, `pull-requests: read` and `actions: read`; no
+  `id-token` since the API-key ruling (2026-10-10, below).
 - A guard step stops the job with exit 2 when step or runner debugging is on (debug logging set as a repository
   secret or variable included, 2026-10-09, below), when `~/.claude/settings.json` already exists on the runner (a
   dangling symlink included), or when an input is malformed.
@@ -39,11 +40,12 @@ PR (#892, 2026-10-09), which found changes its record had not named; the same re
 
 ## Why a manual dispatch and no pull request trigger
 
-- **The federation subject.** Runs authenticate by Anthropic workload identity federation, and the rule matches the
-  subject of a run on `main`. A `pull_request` run's subject ends in `:pull_request`
-  (GitHub, OpenID Connect reference), so it cannot authenticate by this rule, and widening the rule to pull request
-  runs would let a pull request's own workflow text ask for the token. `pull_request_target` runs main's workflow
-  text but is banned here outright (`dangerous-trigger` in `tests/test_workflow_policy.py`).
+- **Whose workflow text holds the credential.** Since 2026-10-10 runs authenticate with the repository secret
+  `ANTHROPIC_API_KEY` (below). A `pull_request` run would run the pull request's own copy of this file, so a
+  pull request trigger would hand the key to text the pull request controls; only main's copy, on a dispatch or the
+  schedule, reaches it. `pull_request_target` runs main's workflow text but is banned here outright
+  (`dangerous-trigger` in `tests/test_workflow_policy.py`). Until 2026-10-10 the same conclusion followed from the
+  federation rule, which matched only the subject of a run on `main`.
 - **Who can start it.** `workflow_dispatch` needs write access to the repository. The job also requires this
   repository, `refs/heads/main`, the owner as both actor and triggering actor, and the first attempt of the run: a
   re-run keeps `github.actor` and would spend again without a new request, so it is skipped.
@@ -677,10 +679,49 @@ the module:
 - no recheck;
 - the check's result compared inside `[ ]` (which swallowed an API failure in the first draft).
 
+## Authentication by API key (the owner's ruling, 2026-10-10)
+
+On 2026-10-10 at about 13:44Z the owner ruled, relayed by the command center, that CI Claude review authenticates
+with an Anthropic API key rather than federation, and that the keys are to be used fully as the repository's
+LLM-native practice; federation stays unconfigured. (Paraphrased.) The trigger: the acceptance dispatch of 13:36Z (run
+38056354892) was refused like the runs of 2026-10-08, most likely because the federation rule's subject does not
+match this repository's immutable OIDC subject.
+
+- **What changed.** `claude-pr-review.yml`, `claude-pr-toolkit-review.yml` and `harness-audit.yml` pass
+  `anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}` and no federation input, and none of their jobs holds
+  `id-token`. The action requests a GitHub OIDC token for two things only: federation, when its inputs are set
+  (`base-action/src/workload-identity.ts:43-47` at `2dca132f`), and its GitHub App token, when no `github_token` is
+  given (`src/github/token.ts:160-168`). All three workflows pass `github_token`, so neither applies. The Claude Code
+  GitHub Actions page says the same from the other side: `id-token: write` is required for the action's default
+  GitHub App authentication, and for the federation exchange.
+- **The secret, in an environment.** `ANTHROPIC_API_KEY` holds the inventory entry `anthropic-api-3`, the cold spare,
+  so CI spend is separable from the local worker's api-4. It is an environment secret of `claude-review`, whose
+  deployment branch policy allows `main` only, and each job that uses the key declares `environment: claude-review`.
+  The owner wanted the key kept away from this public repository: a repository secret reaches a workflow pushed on any
+  branch and dispatched from there, while an environment secret reaches only a job deploying from an allowed branch.
+  The command center set it on the owner's explicit OK, through `credential_run.py anthropic-api-3`, with the value on
+  `gh secret set`'s standard input only: first as a repository secret (2026-10-10T13:49:43Z), then in the environment
+  (2026-10-10T13:55:05Z, `gh secret list --env claude-review`), and the repository copy was deleted (read back by the
+  coordinator at 14:11Z: the environment has the branch policy `main` and the secret; the repository has none of that
+  name).
+- **What did not change.** Dispatch and schedule on `main` only, never a pull request run; the owner and first-attempt
+  guards; the bounds step; the daily ceiling; the read-only tool set; the job summary as the only output.
+- **Policy.** The federation exemption from `id-token-write` (`docs/decisions/2026-10-04-ci-least-privilege.md`) and
+  the three `id-token: write` write grants are removed from `tests/test_workflow_policy.py`. `tests.test_workflow_hardening.
+  ClaudeApiKeyAuthTests` requires the secret once in each of the three workflows, the key-using job in the
+  `claude-review` environment and no other job in one, no federation input, no `id-token`, no pull request trigger,
+  and the secret in no other workflow; it fails on main before this change and passes after it. zizmor 1.30.1 reports
+  nothing in the regular, pedantic and auditor personas (on main the auditor persona reports six `secrets-outside-env`
+  findings in these three files).
+- **Acceptance.** After this lands, the command center dispatches one review and checks for a successful review,
+  `total_cost_usd` above zero and a non-empty `modelUsage`.
+
 ## Alternatives considered
 
+- **Workload identity federation** (this record's choice until 2026-10-10). No stored key, but the rule refused every
+  run so far; the owner ruled for the API key.
 - **Review every pull request on `pull_request` or `workflow_run`** (the action's `docs/solutions.md` example).
-  The first is not possible under the federation rule; the second is refused by this repository's zizmor gate and
+  The first would run the pull request's own workflow text with the key; the second is refused by this repository's zizmor gate and
   policy. "Every pull request (2026-10-09)" reaches every head through the schedule instead.
 - **`anthropics/claude-code-security-review`.** Covered by the security-review record; not used.
 - **The upstream `/code-review` plugin** (`plugin_marketplaces: https://github.com/anthropics/claude-code.git`).
@@ -728,6 +769,10 @@ the action and client sources below. No hosted run of this workflow is part of t
   2026-10-09T14:43Z); zizmor 1.30.1 `dangerous-triggers`, run with `--no-config --no-ignores` (this repository's
   pin); GitHub Security Lab, Preventing pwn requests:
   <https://securitylab.github.com/research/github-actions-preventing-pwn-requests/>.
+- Claude Code GitHub Actions, <https://docs.claude.com/en/docs/claude-code/github-actions> (read 2026-10-10T13:48Z):
+  the `anthropic_api_key` input and the `${{ secrets.ANTHROPIC_API_KEY }}` setup; workload identity federation as the
+  alternative to a stored key; `id-token: write` required for the default GitHub App authentication and for the
+  federation exchange. With `2dca132f`'s `src/github/token.ts:160-168` and `base-action/src/workload-identity.ts:43-47`.
 - Anthropic: Workload identity federation,
   <https://platform.claude.com/docs/en/manage-claude/workload-identity-federation>; How Claude Code uses prompt
   caching, <https://code.claude.com/docs/en/prompt-caching>; Pricing,

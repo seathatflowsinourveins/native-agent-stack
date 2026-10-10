@@ -105,12 +105,9 @@ class DocumentationSnapshotTests(unittest.TestCase):
         self.assertIn("Syntax: repo:OWNER@OWNER-ID/REPO@REPO-ID:ref:refs/heads/BRANCH", lines[354])
         decision = (ROOT / "docs/decisions/2026-10-08-claude-actions-pr-review.md").read_text()
         claim = decision.split('- **A `pull_request` trigger**', 1)[1].split('- **`workflow_run`', 1)[0]
-        header = (ROOT / ".github/workflows/claude-pr-review.yml").read_text().split("\non:", 1)[0]
         for surface, text, qualifiers in (
             ("decision", claim, ("derived immutable form", "sub_claim_prefix", "Filtering for pull_request events",
                                  "derivation, not an example", "immutable-subject section", "sha256:" + digest)),
-            ("workflow header", header, ("derived form", "sub_claim_prefix", "separately documented",
-                                         "pull_request suffix")),
         ):
             with self.subTest(surface=surface):
                 normalized = " ".join(text.replace("\n# ", " ").split())
@@ -118,18 +115,24 @@ class DocumentationSnapshotTests(unittest.TestCase):
                 for qualifier in qualifiers:
                     self.assertIn(qualifier, normalized)
 
-    def test_harness_federation_header_requires_console_acceptance_and_rejects_denied_run_as_proof(self):
+    def test_workflow_headers_name_the_api_key_environment_and_claim_no_federation(self):
+        # The owner's ruling of 2026-10-10 (docs/decisions/2026-10-08-claude-actions-pr-review.md, "Authentication by
+        # API key"): the federation claims this record diagnosed leave the workflow headers.
+        for name in ("claude-pr-review.yml", "claude-pr-toolkit-review.yml", "harness-audit.yml"):
+            with self.subTest(workflow=name):
+                header = (ROOT / ".github/workflows" / name).read_text().split("\non:", 1)[0]
+                normalized = " ".join(header.replace("\n# ", " ").split())
+                self.assertIn("ANTHROPIC_API_KEY of the main-only claude-review environment", normalized)
+                for claim in ("workload identity federation", "immutable subject", "Console rule"):
+                    self.assertNotIn(claim, normalized)
+
+    def test_the_federation_concepts_snapshot_is_retained(self):
         # Retained Claude WIF concepts revision d929e368:42, retrieved 2026-10-10.
         source = ROOT / "evidence/artifacts/claude-federation-docs-20261010/platform.claude.com_workload-identity-federation.md"
         raw = source.read_bytes()
         self.assertEqual(hashlib.sha256(raw).hexdigest(),
                          "d929e36810bcfdcc7a9bf5de39df8b08fbfde60a6d4c138b097f0940feb13bb7")
         self.assertIn("all configured matchers must pass for the JWT to be accepted", raw.decode().splitlines()[41])
-        header = (ROOT / ".github/workflows/harness-audit.yml").read_text().split("\non:", 1)[0]
-        normalized = " ".join(header.replace("\n# ", " ").split())
-        self.assertIn("Acceptance still depends on the Console rule matching that subject", normalized)
-        self.assertIn("the denied historical run is not acceptance", normalized)
-        self.assertNotIn("The federation rule accepts workflows", normalized)
 
     def test_cited_vendor_revisions_match_retained_bytes_and_registry(self):
         self.assertTrue(SNAPSHOT_INDEX.is_file(), "no retained vendor-document revision index")
