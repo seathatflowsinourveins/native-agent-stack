@@ -92,20 +92,35 @@ class PublicationValidationTests(unittest.TestCase):
                 self.assertEqual(result["hashed_files"], len(self.evidence["files"]))
 
     def test_vendor_uuid_exception_requires_exact_content_path_and_registration(self):
-        relative = ("evidence/artifacts/claude-federation-docs-20261010/"
-                    "platform.claude.com_wif-providers_github-actions.md")
-        original = (ROOT / relative).read_bytes()
-        for arm in ("changed-and-rehashed", "different-path", "unregistered"):
-            with self.subTest(arm=arm):
-                target = "evidence/artifacts/another-document.md" if arm == "different-path" else relative
-                raw = original + b"\nchanged\n" if arm == "changed-and-rehashed" else original
-                self.write(target, raw.decode())
-                self.evidence["files"] = self.evidence["files"][:2]
-                if arm != "unregistered":
-                    self.evidence["files"].append({"path": target, "sha256": hashlib.sha256(raw).hexdigest(),
-                                                   "bytes": len(raw)})
-                self.save()
-                self.assert_invalid("local session identifier")
+        # CPython v3.13.16 Lib/unittest/case.py:538 (subTest) and647-651
+        # (run): setUp runs once per test method; subTest does not reset its
+        # fixture. Each arm therefore owns a fresh publication directory.
+        folder = "evidence/artifacts/claude-federation-docs-20261010/"
+        for name in ("platform.claude.com_wif-providers_github-actions.md",
+                     "platform.claude.com_workload-identity-federation.md"):
+            relative = folder + name
+            original = (ROOT / relative).read_bytes()
+            for arm in ("changed-and-rehashed", "different-path", "unregistered", "wrong-registration-hash"):
+                with self.subTest(snapshot=name, arm=arm), tempfile.TemporaryDirectory() as temporary:
+                    # Copy only the untouched base publication. No earlier arm's
+                    # vendor/copy file may supply this arm's expected UUID error.
+                    fresh = Path(temporary) / "publication"
+                    shutil.copytree(self.root, fresh)
+                    target = "evidence/artifacts/another-document.md" if arm == "different-path" else relative
+                    raw = original + b"\nchanged\n" if arm == "changed-and-rehashed" else original
+                    path = fresh / target
+                    path.parent.mkdir(parents=True, exist_ok=True)
+                    path.write_bytes(raw)
+                    registry = fresh / "manifests/evidence.json"
+                    evidence = json.loads(registry.read_text())
+                    if arm != "unregistered":
+                        digest = "0" * 64 if arm == "wrong-registration-hash" else hashlib.sha256(raw).hexdigest()
+                        evidence["files"].append({"path": target, "sha256": digest, "bytes": len(raw)})
+                        evidence["files"].sort(key=lambda entry: entry["path"])
+                    registry.write_text(json.dumps(evidence, indent=2) + "\n")
+                    with self.assertRaises(InvalidPublication) as refused:
+                        validate(fresh)
+                    self.assertIn(f"{target}: contains possible local session identifier", str(refused.exception))
 
     def test_public_uuid_source_exception_does_not_exempt_other_private_patterns(self):
         from scripts import validate as validator_module

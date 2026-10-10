@@ -77,7 +77,7 @@ implementation after it merges. This change does not depend on a PR-branch pin.
 
 - [anthropics/claude-code-action@2dca132ff0e0c4094ce6048b422c6915a071210b:base-action/src/run-claude-sdk.ts:141](https://github.com/anthropics/claude-code-action/blob/2dca132ff0e0c4094ce6048b422c6915a071210b/base-action/src/run-claude-sdk.ts#L141): the result's sanitized field list includes `is_error`, `total_cost_usd` and `modelUsage`; [line 222](https://github.com/anthropics/claude-code-action/blob/2dca132ff0e0c4094ce6048b422c6915a071210b/base-action/src/run-claude-sdk.ts#L222) writes the execution records.
 - [The same action:base-action/src/workload-identity.ts:51](https://github.com/anthropics/claude-code-action/blob/2dca132ff0e0c4094ce6048b422c6915a071210b/base-action/src/workload-identity.ts#L51) requests the GitHub identity token through the supported Actions client; [examples/claude-wif.yml:31](https://github.com/anthropics/claude-code-action/blob/2dca132ff0e0c4094ce6048b422c6915a071210b/examples/claude-wif.yml#L31) names the required federation permission.
-- GitHub OIDC reference, [retained snapshot:352](../../evidence/artifacts/claude-federation-docs-20261010/docs.github.com_actions_reference_security_oidc.txt#L352), revision `sha256:35d79cb17e94732a467c63e59c3a01d18029b47f4b5f9cbf15d92037164b03cd`, retrieved `2026-10-10`, 37248 bytes; [vendor URL](https://docs.github.com/en/actions/reference/security/oidc). Lines352–359 support the immutable owner/repository syntax. Primary REST reads confirmed this repository's customization; no JWT was read. The pull_request suffix is separately documented at332–336.
+- GitHub OIDC reference, [retained snapshot:352](../../evidence/artifacts/claude-federation-docs-20261010/docs.github.com_actions_reference_security_oidc.txt#L352), revision `sha256:35d79cb17e94732a467c63e59c3a01d18029b47f4b5f9cbf15d92037164b03cd`, retrieved `2026-10-10`, 37248 bytes; [vendor URL](https://docs.github.com/en/actions/reference/security/oidc). Lines 352–359 support the immutable owner/repository syntax. Primary REST reads confirmed this repository's customization; no JWT was read. The pull_request suffix is separately documented at 332–336.
 - Anthropic WIF GitHub guide, [retained snapshot:316](../../evidence/artifacts/claude-federation-docs-20261010/platform.claude.com_wif-providers_github-actions.md#L316), revision `sha256:edc97bf1872a1292911b08600aadfc494295009cc6db1da232279dae46c0429b`, retrieved `2026-10-10`, 14693 bytes; [vendor URL](https://platform.claude.com/docs/en/manage-claude/wif-providers/github-actions). The exchange failure is opaque; native history supplies the actual deny reason, with `match_subject_prefix` a common cause.
 - Anthropic WIF concepts, [retained snapshot:42](../../evidence/artifacts/claude-federation-docs-20261010/platform.claude.com_workload-identity-federation.md#L42), revision `sha256:d929e36810bcfdcc7a9bf5de39df8b08fbfde60a6d4c138b097f0940feb13bb7`, retrieved `2026-10-10`, 25749 bytes; [vendor URL](https://platform.claude.com/docs/en/manage-claude/workload-identity-federation). All configured subject, audience and exact claim matchers must pass. The source change preserves the vendor mechanism.
 
@@ -106,12 +106,20 @@ for native federation acceptance. The three existing complete workflow test
 modules remain part of the local validation, including their budget-stop and
 incomplete-accounting controls.
 The failed-exchange test also executes the retained hosted S2 shape: native
-run37988961127 reports `subtype: success`, `is_error: true` and `num_turns: 1`,
+run 37988961127 reports `subtype: success`, `is_error: true` and `num_turns: 1`,
 with zero cost and empty model usage. This is a synthetic subtest of the native
 observed shape, grounded in pinned `run-claude-sdk.ts:252–256`, not a replay of
 the provider exchange. A source regression checks that the cited three revision
 hashes, byte counts, claim-line content and evidence registrations match the
 actual retained bytes.
+
+The privacy arms use separate publication fixtures because CPython
+[v3.13.16:Lib/unittest/case.py:647](https://github.com/python/cpython/blob/v3.13.16/Lib/unittest/case.py#L647)
+calls `setUp` once before the test method at:651, while
+[subTest at:538](https://github.com/python/cpython/blob/v3.13.16/Lib/unittest/case.py#L538)
+is a context manager within that same test case. It does not reset fixture files.
+Each arm uses the supported `TemporaryDirectory`/`copytree` lifecycle so a prior
+arm cannot supply the next arm's expected UUID error.
 
 Returning only jq's original usage error would keep the diagnosis gap. Printing
 provider errors would publish arbitrary strings without establishing the cause.

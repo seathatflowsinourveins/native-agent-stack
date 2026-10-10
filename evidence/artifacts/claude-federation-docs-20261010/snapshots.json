@@ -5,7 +5,7 @@
   "retrieval_date_precision": "date",
   "source_packet_staged_at": "2026-10-10T07:03:18Z",
   "source_packet": "upstream-src-961-22d1cada/SOURCES.md",
-  "provenance_note": "Source packet records successful HTTP200 captures and its staging timestamp. Individual request timestamps are not available; retrieved_on preserves the recorded date without inventing finer precision. SHA256 revisions identify these retained bytes, not vendor publication versions.",
+  "provenance_note": "Source packet records successful HTTP 200 captures and its staging timestamp. Individual request timestamps are not available; retrieved_on preserves the recorded date without inventing finer precision. SHA-256 revisions identify these retained bytes, not vendor publication versions.",
   "snapshots": [
     {
       "id": "github-oidc",

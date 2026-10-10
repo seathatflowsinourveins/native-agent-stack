@@ -34,7 +34,7 @@ def failed_exchange(**changes):
                      "workflow execution requires bash, jq and PyYAML")
 class FederationDiagnosticTests(unittest.TestCase):
     def test_failed_exchange_keeps_fixed_diagnosis_and_still_fails(self):
-        # S2: native run37988961127; claude-code-action@2dca132f run-claude-sdk.ts:252-256.
+        # S2: native run 37988961127; claude-code-action@2dca132f run-claude-sdk.ts:252-256.
         # A result with subtype success can still carry is_error true before any model usage.
         for module in WORKFLOWS:
             for shape in ({}, {"subtype": "success", "num_turns": 1}):
@@ -94,6 +94,43 @@ class FederationDiagnosticTests(unittest.TestCase):
 
 
 class DocumentationSnapshotTests(unittest.TestCase):
+    def test_pull_request_subject_remains_a_derivation_from_prefix_and_event_suffix(self):
+        # Retained GitHub OIDC revision 35d79cb1:332-336 and 352-359, retrieved 2026-10-10.
+        source = ROOT / "evidence/artifacts/claude-federation-docs-20261010/docs.github.com_actions_reference_security_oidc.txt"
+        raw = source.read_bytes()
+        digest = "35d79cb17e94732a467c63e59c3a01d18029b47f4b5f9cbf15d92037164b03cd"
+        self.assertEqual(hashlib.sha256(raw).hexdigest(), digest)
+        lines = raw.decode().splitlines()
+        self.assertIn("Syntax: repo:ORG-NAME/REPO-NAME:pull_request", lines[334])
+        self.assertIn("Syntax: repo:OWNER@OWNER-ID/REPO@REPO-ID:ref:refs/heads/BRANCH", lines[354])
+        decision = (ROOT / "docs/decisions/2026-10-08-claude-actions-pr-review.md").read_text()
+        claim = decision.split('- **A `pull_request` trigger**', 1)[1].split('- **`workflow_run`', 1)[0]
+        header = (ROOT / ".github/workflows/claude-pr-review.yml").read_text().split("\non:", 1)[0]
+        for surface, text, qualifiers in (
+            ("decision", claim, ("derived immutable form", "sub_claim_prefix", "Filtering for pull_request events",
+                                 "derivation, not an example", "immutable-subject section", "sha256:" + digest)),
+            ("workflow header", header, ("derived form", "sub_claim_prefix", "separately documented",
+                                         "pull_request suffix")),
+        ):
+            with self.subTest(surface=surface):
+                normalized = " ".join(text.replace("\n# ", " ").split())
+                self.assertIn("repo:OWNER@OWNER-ID/REPO@REPO-ID:pull_request", normalized)
+                for qualifier in qualifiers:
+                    self.assertIn(qualifier, normalized)
+
+    def test_harness_federation_header_requires_console_acceptance_and_rejects_denied_run_as_proof(self):
+        # Retained Claude WIF concepts revision d929e368:42, retrieved 2026-10-10.
+        source = ROOT / "evidence/artifacts/claude-federation-docs-20261010/platform.claude.com_workload-identity-federation.md"
+        raw = source.read_bytes()
+        self.assertEqual(hashlib.sha256(raw).hexdigest(),
+                         "d929e36810bcfdcc7a9bf5de39df8b08fbfde60a6d4c138b097f0940feb13bb7")
+        self.assertIn("all configured matchers must pass for the JWT to be accepted", raw.decode().splitlines()[41])
+        header = (ROOT / ".github/workflows/harness-audit.yml").read_text().split("\non:", 1)[0]
+        normalized = " ".join(header.replace("\n# ", " ").split())
+        self.assertIn("Acceptance still depends on the Console rule matching that subject", normalized)
+        self.assertIn("the denied historical run is not acceptance", normalized)
+        self.assertNotIn("The federation rule accepts workflows", normalized)
+
     def test_cited_vendor_revisions_match_retained_bytes_and_registry(self):
         self.assertTrue(SNAPSHOT_INDEX.is_file(), "no retained vendor-document revision index")
         index = json.loads(SNAPSHOT_INDEX.read_text())

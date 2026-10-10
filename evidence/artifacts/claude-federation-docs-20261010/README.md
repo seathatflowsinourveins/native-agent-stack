@@ -7,9 +7,9 @@ The three captures are byte-identical to the reviewed source packet staged on
 request timestamps were not recorded. Its staging time is not relabeled as
 three exact fetch times.
 
-- GitHub OIDC visible text: 37,248 bytes, revision `sha256:35d79cb17e94732a467c63e59c3a01d18029b47f4b5f9cbf15d92037164b03cd`; immutable subject syntax at lines352–359, pull_request suffix at332–336.
-- Claude WIF GitHub guide Markdown: 14,693 bytes, revision `sha256:edc97bf1872a1292911b08600aadfc494295009cc6db1da232279dae46c0429b`; opaque denial and history diagnosis at316.
-- Claude WIF concepts Markdown: 25,749 bytes, revision `sha256:d929e36810bcfdcc7a9bf5de39df8b08fbfde60a6d4c138b097f0940feb13bb7`; all configured matchers required at42.
+- GitHub OIDC visible text: 37,248 bytes, revision `sha256:35d79cb17e94732a467c63e59c3a01d18029b47f4b5f9cbf15d92037164b03cd`; immutable subject syntax at lines 352–359, pull_request suffix at 332–336.
+- Claude WIF GitHub guide Markdown: 14,693 bytes, revision `sha256:edc97bf1872a1292911b08600aadfc494295009cc6db1da232279dae46c0429b`; opaque denial and history diagnosis at 316.
+- Claude WIF concepts Markdown: 25,749 bytes, revision `sha256:d929e36810bcfdcc7a9bf5de39df8b08fbfde60a6d4c138b097f0940feb13bb7`; all configured matchers required at 42.
 
 The source packet also records the GitHub raw HTML hash
 `5a88f1469d4a089770722ec216dca785396c432762b9be98c0843273c6d80325`.

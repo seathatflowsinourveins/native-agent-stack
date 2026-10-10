@@ -5096,8 +5096,8 @@
     },
     {
       "path": ".github/workflows/claude-pr-review.yml",
-      "sha256": "cd418f9e78fd361bae37dc95d4608c99b70ab6e9b7b2cc3edefd8622cd34876d",
-      "bytes": 38748
+      "sha256": "23a9066077a0426c68589cc1748fc31c08e24cce39407ac7ba305573488ed8eb",
+      "bytes": 38750
     },
     {
       "path": ".github/workflows/claude-pr-toolkit-review.yml",
@@ -18442,8 +18442,8 @@
     },
     {
       "path": "docs/decisions/2026-10-08-claude-actions-pr-review.md",
-      "sha256": "b5bf98840ec13db8957c20f18ca1cf990276af46316076572798894da5c8afb4",
-      "bytes": 60503
+      "sha256": "c2887e60930f9676b93b9b083d1461ee1d3dc853488b3de1b9d0e25f923c3db8",
+      "bytes": 60504
     },
     {
       "path": "docs/decisions/2026-10-08-coordinator-research-routing.md",
@@ -18557,8 +18557,8 @@
     },
     {
       "path": "docs/decisions/2026-10-10-claude-federation-diagnostics.md",
-      "sha256": "21a8337002fdc432779b8859dffed75c082c95ae43493ef8c5321a1e71b73d04",
-      "bytes": 9558
+      "sha256": "463053861fd6211c90f4082ac218ce4e419cb345beab445991179b67ff951788",
+      "bytes": 10105
     },
     {
       "path": "docs/decisions/2026-10-10-codex-lane-omniroute.md",
@@ -19967,8 +19967,8 @@
     },
     {
       "path": "evidence/artifacts/claude-federation-docs-20261010/README.md",
-      "sha256": "dca179d10a23a80346158e6b72cac68c8c480f3ce4116bce04639ab88081cbe8",
-      "bytes": 2558
+      "sha256": "d7add20cef7079e4fc18dbdeac2c9853e1bdc181a24a408e4e1cb048c489018a",
+      "bytes": 2562
     },
     {
       "path": "evidence/artifacts/claude-federation-docs-20261010/docs.github.com_actions_reference_security_oidc.txt",
@@ -19987,8 +19987,8 @@
     },
     {
       "path": "evidence/artifacts/claude-federation-docs-20261010/snapshots.json",
-      "sha256": "b023985d10a9b2b385b859f90b8b8e0658fe62bac608094f395db45e6150c0df",
-      "bytes": 3187
+      "sha256": "17502b40b5ad087f1852ed4df45c510d25ba1879c0d8ac21df69a642ada5158b",
+      "bytes": 3189
     },
     {
       "path": "evidence/artifacts/claude-foundation-finalization-20260921/qualification.json",
@@ -60232,8 +60232,8 @@
     },
     {
       "path": "tests/test_claude_federation_diagnostics.py",
-      "sha256": "9e88eab8e8d043e8935fdf09213998b04fe3266aad6058da6bbe70efd813dbe4",
-      "bytes": 6246
+      "sha256": "76917ed442df0e6aa6ed1f20f4f17e06c7dec1eb51489650ed5d0ace3de2a3ae",
+      "bytes": 9083
     },
     {
       "path": "tests/test_claude_harness_audit_bounds.py",
@@ -61157,8 +61157,8 @@
     },
     {
       "path": "tests/test_validate.py",
-      "sha256": "fee72fef942f9598ac278e3dd80ab74a1449458bbdd3c23f9e7c1736ced4c2fe",
-      "bytes": 50630
+      "sha256": "6e44ecb624d3ba1723c3af59b4a7fb3e38f6c12e342cd982b598af2e419fa06b",
+      "bytes": 51851
     },
     {
       "path": "tests/test_validate_shards.py",
