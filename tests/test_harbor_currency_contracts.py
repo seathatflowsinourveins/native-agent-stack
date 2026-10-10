@@ -3,13 +3,15 @@
 CPython v3.13.16 accepts any matching exception inside assertRaises:
 https://github.com/python/cpython/blob/v3.13.16/Lib/unittest/case.py#L253-L278
 Retrieve, hash-check and parse historical inputs before expecting content rejection.
-The source-bound fixtures also work after squash merging or in a Git-free archive.
+The retained bytes declare PR #927 pre-squash provenance, not a repository pin.
+The fixtures also work after squash merging or in a Git-free archive.
 """
 import hashlib
 import json
 from pathlib import Path
 import re
 import shutil
+import subprocess
 import tempfile
 import unittest
 from unittest import mock
@@ -20,7 +22,11 @@ DECISION = "docs/decisions/2026-10-09-harbor-0240-profile.md"
 PROFILE = "adoption/new-wsl-profile.json"
 CONSENSUS = "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json"
 AUTHORITY = "the coordinator's 2026-10-09 currency amendment under the owner's standing direction to keep tools current"
-PREDECESSOR_REVISION = "b67a28264d84c9e9b51e0671ee1db046270ff833"
+PRE_SQUASH_PROVENANCE = {
+    "kind": "pr-branch-pre-squash",
+    "pull_request": 927,
+    "commit": "b67a28264d84c9e9b51e0671ee1db046270ff833",
+}
 PREDECESSOR_FIXTURES = Path(__file__).resolve().parent / "fixtures/harbor_currency_predecessors"
 
 
@@ -63,7 +69,8 @@ class HarborCurrencyContracts(unittest.TestCase):
     def predecessor(self, path):
         manifest = json.loads((PREDECESSOR_FIXTURES / "manifest.json").read_text(encoding="utf-8"))
         self.assertEqual(manifest["schema_version"], 1)
-        self.assertEqual(manifest["source_revision"], PREDECESSOR_REVISION)
+        self.assertNotIn("source_revision", manifest, "pre-squash provenance is not a repository pin")
+        self.assertEqual(manifest["provenance"], PRE_SQUASH_PROVENANCE)
         rows = [row for row in manifest["fixtures"] if row["source_path"] == path]
         self.assertEqual(len(rows), 1, "predecessor fixture declaration missing or ambiguous: " + path)
         row, = rows
@@ -71,6 +78,9 @@ class HarborCurrencyContracts(unittest.TestCase):
         self.assertEqual(len(raw), row["bytes"], "predecessor fixture length mismatch: " + path)
         self.assertEqual(hashlib.sha256(raw).hexdigest(), row["sha256"],
                          "predecessor fixture SHA-256 mismatch: " + path)
+        header = f"blob {len(raw)}\0".encode("ascii")
+        self.assertEqual(hashlib.sha1(header + raw).hexdigest(), row["git_blob"],
+                         "predecessor fixture Git blob mismatch: " + path)
         return raw.decode("utf-8")
 
     def test_current_readme_routes_harbor_to_its_receipt_and_qualifies_history(self):
@@ -78,7 +88,7 @@ class HarborCurrencyContracts(unittest.TestCase):
 
     def test_predecessor_readme_fails_the_source_routing_guard(self):
         text = self.predecessor(PLAN + "/README.md")
-        with self.assertRaises(AssertionError):
+        with self.assertRaisesRegex(AssertionError, r"Regex didn't match:.*SOURCES.*0.*23.*history"):
             self.readme_contract(text)
 
     def test_inverse_names_every_operative_carrier(self):
@@ -86,7 +96,7 @@ class HarborCurrencyContracts(unittest.TestCase):
 
     def test_predecessor_profile_only_inverse_fails_the_inventory_guard(self):
         text = self.predecessor(DECISION)
-        with self.assertRaises(AssertionError):
+        with self.assertRaisesRegex(AssertionError, r"adoption/new-wsl-profile\.json.*not found"):
             self.inverse_contract(text)
 
     def test_current_owner_release_is_bound_and_retained_metadata_is_historical(self):
@@ -94,7 +104,7 @@ class HarborCurrencyContracts(unittest.TestCase):
 
     def test_predecessor_empty_note_fails_the_snapshot_guard(self):
         document = json.loads(self.predecessor(PLAN + "/owners.json"))
-        with self.assertRaises(AssertionError):
+        with self.assertRaisesRegex(AssertionError, r"Regex didn't match:.*pushed_at.*historical"):
             self.owners_contract(document)
 
     def test_profile_markdown_contains_the_actual_harbor_source_contract(self):
@@ -119,6 +129,70 @@ class HarborPredecessorEvidenceTests(unittest.TestCase):
         ("test_predecessor_profile_only_inverse_fails_the_inventory_guard", "inverse_contract", DECISION),
         ("test_predecessor_empty_note_fails_the_snapshot_guard", "owners_contract", PLAN + "/owners.json"),
     )
+
+    def test_manifest_revision_is_main_reachable_or_declared_pre_squash(self):
+        manifest = json.loads((PREDECESSOR_FIXTURES / "manifest.json").read_text(encoding="utf-8"))
+        provenance = manifest.get("provenance", {})
+        if provenance.get("kind") == "pr-branch-pre-squash":
+            self.assertNotIn("source_revision", manifest,
+                             "pre-squash provenance must not also declare a repository pin")
+            self.assertEqual(provenance["pull_request"], 927)
+            self.assertRegex(provenance["commit"], r"^[0-9a-f]{40}$")
+            self.assertEqual(manifest["capture_status"], "already-run-on-pr-branch-before-squash")
+            self.assertEqual(manifest["capture_command"], "git show <provenance.commit>:<source_path>")
+            return
+
+        revision = manifest["source_revision"]
+        if shutil.which("git") is None:
+            self.skipTest("Git unavailable; repository-pin ancestry cannot be measured")
+        history = subprocess.run(
+            ["git", "-C", str(ROOT), "rev-parse", "--verify", "refs/remotes/origin/main^{commit}"],
+            capture_output=True, text=True,
+        )
+        if history.returncode != 0:
+            self.skipTest("origin/main history unavailable in this checkout or Git-free archive")
+        reachable = subprocess.run(
+            ["git", "-C", str(ROOT), "merge-base", "--is-ancestor", revision, "origin/main"],
+            capture_output=True, text=True,
+        )
+        self.assertEqual(reachable.returncode, 0,
+                         "fixture repository revision must be reachable from origin/main; "
+                         "retained PR capture bytes require explicit pr-branch-pre-squash provenance")
+
+    def test_mismatched_git_blob_cannot_satisfy_semantic_rejection(self):
+        for name, guard_name, source_path in self.CASES:
+            with self.subTest(case=name), tempfile.TemporaryDirectory() as temporary:
+                fixture_root = Path(temporary) / "predecessors"
+                shutil.copytree(PREDECESSOR_FIXTURES, fixture_root)
+                manifest_path = fixture_root / "manifest.json"
+                manifest = json.loads(manifest_path.read_text())
+                row, = [row for row in manifest["fixtures"] if row["source_path"] == source_path]
+                row["git_blob"] = "0" * 40
+                manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+                case = HarborCurrencyContracts(name)
+                result = unittest.TestResult()
+                with mock.patch(__name__ + ".PREDECESSOR_FIXTURES", fixture_root), \
+                        mock.patch.object(case, guard_name, side_effect=AssertionError("semantic rejection")) as guard:
+                    case.run(result)
+                self.assertEqual(result.testsRun, 1)
+                self.assertFalse(result.wasSuccessful(), "incorrect Git blob was accepted as semantic evidence")
+                self.assertEqual(len(result.failures) + len(result.errors), 1)
+                self.assertIn("predecessor fixture Git blob mismatch", (result.failures + result.errors)[0][1])
+                guard.assert_not_called()
+
+    def test_wrong_guard_message_cannot_satisfy_semantic_rejection(self):
+        for name, guard_name, _ in self.CASES:
+            with self.subTest(case=name):
+                case = HarborCurrencyContracts(name)
+                result = unittest.TestResult()
+                message = "unrelated guard failure"
+                with mock.patch.object(case, guard_name, side_effect=AssertionError(message)) as guard:
+                    case.run(result)
+                guard.assert_called_once()
+                self.assertEqual(result.testsRun, 1)
+                self.assertFalse(result.wasSuccessful(), "unrelated failure was accepted as the targeted guard")
+                self.assertEqual(len(result.failures) + len(result.errors), 1)
+                self.assertIn(message, (result.failures + result.errors)[0][1])
 
     def test_retrieval_failure_cannot_satisfy_semantic_rejection(self):
         for name, guard_name, _ in self.CASES:

@@ -1,10 +1,17 @@
 {
   "schema_version": 1,
   "source_repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
-  "source_revision": "b67a28264d84c9e9b51e0671ee1db046270ff833",
-  "purpose": "Exact historical negative-control bytes, retained independently of squash-merge ancestry; current recommendations are read from the live checkout.",
-  "capture_command": "git show <source_revision>:<source_path>",
+  "provenance": {
+    "kind": "pr-branch-pre-squash",
+    "pull_request": 927,
+    "commit": "b67a28264d84c9e9b51e0671ee1db046270ff833"
+  },
+  "purpose": "Historical negative-control bytes already captured on PR #927 before squash, retained as fixture provenance rather than a repository pin; current recommendations are read from the live checkout.",
+  "capture_status": "already-run-on-pr-branch-before-squash",
+  "capture_command": "git show <provenance.commit>:<source_path>",
   "capture_reference": "https://github.com/git/git/blob/v2.53.0/Documentation/git-show.adoc",
+  "reachability_reference": "https://github.com/git/git/blob/v2.53.0/Documentation/git-merge-base.adoc",
+  "git_blob_reference": "https://github.com/git/git/blob/v2.53.0/Documentation/git-hash-object.adoc",
   "assertion_boundary_reference": "https://github.com/python/cpython/blob/v3.13.16/Lib/unittest/case.py#L253-L278",
   "fixtures": [
     {

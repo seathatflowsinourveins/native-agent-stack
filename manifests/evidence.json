@@ -59757,8 +59757,8 @@
     },
     {
       "path": "tests/fixtures/harbor_currency_predecessors/manifest.json",
-      "sha256": "3aca2dfb486c48c0a8de9ecf1f481a8238c6933f9cd41dd0e212bfdc93aa4ae5",
-      "bytes": 1534
+      "sha256": "d792ec85445ba3bd5d2b1c388cfcbd1763cd00ba63d5b739f554751e95c76504",
+      "bytes": 1929
     },
     {
       "path": "tests/fixtures/harbor_currency_predecessors/owners.json.fixture",
@@ -60437,8 +60437,8 @@
     },
     {
       "path": "tests/test_harbor_currency_contracts.py",
-      "sha256": "8c5dd1d98be63e7af2c683f2a999edd72c957627cfe89415ac8f5d1fb4f1610e",
-      "bytes": 9829
+      "sha256": "00f7f905b41e291c978ba5f770a6244b339aa351b3b91c76d67f7025168b7df3",
+      "bytes": 14454
     },
     {
       "path": "tests/test_hardware_profile.py",
