@@ -536,11 +536,14 @@ def _collect_fee_pages(client, fee_after, max_pages):
     raise TransportError("fee activity page bound reached; completeness unproven")
 
 
-# Best-effort CTA/UTP quote-condition code that can mark an individual NBBO
-# quote update as halted ("H"). Alpaca's primary halt signal is the separate
-# trading status stream message parsed by normalize_trading_status below, not
-# a field on ordinary quote updates; this remains a defensive fallback.
-QUOTE_HALT_CONDITION_CODES = frozenset({"H"})
+# UTP v4.1 (September 2026), section 3.3, PDF page 43: quote condition "H"
+# means Manual Bid and Ask and is NBBO eligible, not a trading halt.
+# https://www.utpplan.com/DOC/UtpBinaryOutputSpec.pdf
+# SHA256 68659d2f3ab4057adfad52cc20fb1c51c5b69481865d365014cec237a5399401.
+# Quote conditions alone do not establish trading status; use the separate
+# trading-status stream below or an explicit halted field. No CTA/CQS quote-
+# condition mapping is qualified here; normalize_quote has no tape dispatch.
+QUOTE_HALT_CONDITION_CODES = frozenset()
 
 
 def normalize_quote(raw, symbol=None):

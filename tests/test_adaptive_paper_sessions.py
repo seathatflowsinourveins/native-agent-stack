@@ -797,11 +797,11 @@ class LedgerBrokerSnapshotAdoptionTests(unittest.TestCase):
 class HaltMappingTests(unittest.TestCase):
     """D3: fake-payload tests locking in exactly which fields are read."""
 
-    def test_normalize_quote_maps_halt_condition_code(self):
+    def test_normalize_quote_utp_manual_condition_does_not_halt(self):
         raw = {"S": "SPY", "bp": 100.0, "ap": 100.05, "bs": 1, "as": 1,
-               "t": "2026-03-10T12:00:00Z", "c": ["H"]}
+               "t": "2026-03-10T12:00:00Z", "z": "C", "c": ["H"]}
         q = normalize_quote(raw)
-        self.assertTrue(q["halted"])
+        self.assertFalse(q["halted"])
 
     def test_normalize_quote_not_halted_without_halt_condition(self):
         raw = {"S": "SPY", "bp": 100.0, "ap": 100.05, "bs": 1, "as": 1,
