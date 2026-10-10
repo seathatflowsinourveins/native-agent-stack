@@ -5491,8 +5491,8 @@
     },
     {
       "path": "adoption/new-wsl-profile.md",
-      "sha256": "38effee66ad9ecae4ae31110a0f1cffb447a20468842f166509b26596309396d",
-      "bytes": 27186
+      "sha256": "63383931ce83151ff3228863f9a565d8d3e78364ec3287ad7c8feeff63d0806f",
+      "bytes": 27194
     },
     {
       "path": "adoption/new-wsl/claude-user-instructions.md",

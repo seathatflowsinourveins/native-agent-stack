@@ -200,7 +200,7 @@ upstream development setup, and the selected E2E regex runs only `test_use`.
 The current Harbor source contract in `new-wsl-profile.json` is explicit:
 
 - Install recommendation: `uv tool install harbor==0.24.0`, from
-  [README:22 at the exact release commit](https://github.com/harbor-framework/harbor/blob/b53b8134e1241686dca7759af188f987ecc48e8b/README.md#L22).
+  [README:22 at the exact Harbor source revision](https://github.com/harbor-framework/harbor/blob/b53b8134e1241686dca7759af188f987ecc48e8b/README.md#L22).
 - Wheel SHA256: `23b7ba616a3aae4eff561ced5e2c51c7186f2981e53a770dea9c689d3969877c`,
   bound to the retained [0.24.0 receipt](../evidence/artifacts/harbor-0240-currency-20261009/receipt.json).
 - Exact non-runtime source acceptance, from
