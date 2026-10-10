@@ -12,6 +12,7 @@ import json
 import math
 import time
 from datetime import datetime, timezone
+from http.client import HTTPException
 from urllib.error import HTTPError
 from urllib.parse import urlencode
 from urllib.request import HTTPRedirectHandler, ProxyHandler, build_opener
@@ -225,7 +226,7 @@ def collect(fallback, fetch=None, *, wsl_job=None):
         if payload.get("warnings"):
             raise ValueError("Prometheus API warnings")
         rows = data["result"]
-    except (OSError, ValueError, TypeError, KeyError, AttributeError) as error:
+    except (OSError, HTTPException, ValueError, TypeError, KeyError, AttributeError) as error:
         result["fetched_utc"] = _utc(time.time())
         result["API_errors"].append({
             "endpoint": ENDPOINT,

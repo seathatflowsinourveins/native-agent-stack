@@ -17937,8 +17937,8 @@
     },
     {
       "path": "docs/decisions/2026-09-29-retire-polaris.md",
-      "sha256": "f7816518890bae79ae7c86f98a1b4c6a9b244da03d8af8d72437d1ea863a97dc",
-      "bytes": 5445
+      "sha256": "b9cacaa3b0e389b81edea89a2ea8b156842c6efe8620da57972ec77e370ba1f5",
+      "bytes": 5447
     },
     {
       "path": "docs/decisions/2026-09-29-shell-command-parser.md",

@@ -7,7 +7,9 @@ import json
 from pathlib import Path
 import unittest
 from unittest.mock import patch
-from urllib.parse import urlencode
+from urllib.parse import parse_qs, urlsplit
+
+from tests import test_local_pages_fleet_tracking as tracking_contract
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -20,7 +22,9 @@ class FleetDOM(HTMLParser):
     def __init__(self, markup):
         super().__init__(convert_charrefs=True)
         self.rows, self.links, self.tags, self.attrs, self.tokens, self.rates = [], [], [], [], [], []
+        self.measurements = []
         self._row = None
+        self._measurement = None
         self.feed(markup)
     def handle_starttag(self, tag, attrs):
         attrs = dict(attrs)
@@ -32,12 +36,18 @@ class FleetDOM(HTMLParser):
             self.tokens.append(attrs.get('data-token-type'))
         if 'data-invocation-family' in attrs:
             self.rates.append(attrs['data-invocation-family'])
+            self._measurement = {'attrs': attrs, 'row': dict(self._row['attrs']) if self._row else {}, 'text': ''}
         if tag == 'tr' and any(key in attrs for key in ('data-hcom-name', 'data-tracking-lane', 'data-tracking-service', 'data-tracking-query')):
             self._row = {'attrs': attrs, 'text': ''}
     def handle_data(self, value):
         if self._row is not None:
             self._row['text'] += value + ' '
+        if self._measurement is not None:
+            self._measurement['text'] += value + ' '
     def handle_endtag(self, tag):
+        if tag == 'li' and self._measurement is not None:
+            self.measurements.append(self._measurement)
+            self._measurement = None
         if tag == 'tr' and self._row is not None:
             self.rows.append(self._row)
             self._row = None
@@ -76,6 +86,29 @@ def fixture():
                          'grafana': {'base_url': 'http://127.0.0.1:21301', 'status': 'reported', 'read_utc': '2026-10-09T20:00:30Z',
                                      'links': [{'title': 'Agent activity', 'uid': 'fixture-agent', 'url': 'http://127.0.0.1:21301/d/fixture-agent/agent-activity?var-lane=historic-source-lane'}]},
                          'limitations': ['Scrape time does not establish invocation recency or complete writer coverage.']}}
+
+
+def collected_fixture(*, api=0.2, tools=0.3):
+    """Actual collector output with both native transports supplied synthetically."""
+    native = tracking_contract.FleetTrackingTests('test_stopped_sender_identity_cannot_disable_the_product_roster')
+    lane, now = 'historic-source-lane', tracking_contract.NOW
+    def fetch(query, **kwargs):
+        if 'service_name="claude-code"' in query:
+            value = api if 'event_name="api_request"' in query else tools if 'event_name="tool_result"' in query else None
+            return tracking_contract.vector([] if value is None else [tracking_contract.sample({'ecosystem_lane': lane}, value)])
+        if 'codex_turn_token_usage_sum' in query:
+            labels, value = {'ecosystem_lane': lane, 'token_type': 'input'}, 0.25
+        elif 'claude_code_token_usage_tokens_total' in query:
+            labels, value = {'ecosystem_lane': lane, 'type': 'input'}, 0.5
+        elif any(counter in query for counter in ('codex_api_request_total', 'codex_tool_call_total', 'codex_mcp_call_total')):
+            labels, value = {'ecosystem_lane': lane}, 0.1
+        else:
+            return tracking_contract.vector([])
+        return tracking_contract.vector([tracking_contract.sample(labels, now - 30 if 'timestamp(' in query else value)])
+    data = fixture()
+    data['tracking'] = tracking_contract.fleet.collect_tracking(
+        run=native.run_hcom(()), fetch=fetch, probe=lambda *args, **kwargs: None, now=now)
+    return data
 
 
 class FleetTrackingViewTests(unittest.TestCase):
@@ -214,18 +247,68 @@ class FleetTrackingViewTests(unittest.TestCase):
         self.assertEqual(dom.links, [fixture()['tracking']['grafana']['links'][0]['url']])
         self.assertFalse(any('fake-password' in value or 'fake-secret' in value for value in dom.attrs))
 
-    def test_per_lane_explore_links_preserve_the_supported_panes_query(self):
+    def test_collected_claude_records_render_with_distinct_native_explore_datasources(self):
+        dom = FleetDOM(VIEW.render(collected_fixture()))
+        claude = {item['attrs']['data-invocation-family']: item for item in dom.measurements
+                  if item['row'].get('data-tracking-client') == 'claude'}
+        self.assertIn('API request records:', claude['api_requests']['text'])
+        self.assertIn('0.2 records/s', claude['api_requests']['text'])
+        self.assertIn('tool_results', claude)
+        self.assertIn('Tool result records:', claude['tool_results']['text'])
+        self.assertIn('0.3 records/s', claude['tool_results']['text'])
+        for family in ('api_requests', 'tool_results'):
+            self.assertIn('(reported)', claude[family]['text'])
+            self.assertIn('Window: 300 seconds', claude[family]['text'])
+        lane_rows = dom.group('data-tracking-lane')
+        self.assertIn('0.25 tokens/s', next(row['text'] for row in lane_rows if row['attrs']['data-tracking-client'] == 'codex'))
+        self.assertIn('0.5 tokens/s', next(row['text'] for row in lane_rows if row['attrs']['data-tracking-client'] == 'claude'))
+        queries = {}
+        for url in dom.links:
+            parsed = urlsplit(url)
+            if parsed.path != '/explore':
+                continue
+            parameters = parse_qs(parsed.query)
+            self.assertEqual(parameters['schemaVersion'], ['1'])
+            for pane in json.loads(parameters['panes'][0]).values():
+                for query in pane['queries']:
+                    self.assertEqual(query['datasource']['uid'], pane['datasource'])
+                    self.assertIn('ecosystem_lane="historic-source-lane"', query['expr'])
+                    queries.setdefault(pane['datasource'], []).append(query)
+        self.assertEqual(set(queries), {'ns2604-prometheus', 'ns2604-loki'})
+        self.assertTrue(all(query['datasource']['type'] == 'loki' and 'service_name="claude-code"' in query['expr'] for query in queries['ns2604-loki']))
+        self.assertTrue(any('event_name="api_request"' in query['expr'] for query in queries['ns2604-loki']))
+        self.assertTrue(any('event_name="tool_result"' in query['expr'] for query in queries['ns2604-loki']))
+        self.assertTrue(all(query['datasource']['type'] == 'prometheus' and 'service_name=' not in query['expr'] for query in queries['ns2604-prometheus']))
+
+    def test_loki_query_windows_do_not_claim_raw_event_freshness(self):
         data = fixture()
-        lane = data['tracking']['lanes'][0]['lane']
-        pane = {'datasource': 'ns2604-prometheus', 'queries': [
-            {'refId': 'A', 'datasource': {'uid': 'ns2604-prometheus', 'type': 'prometheus'},
-             'expr': 'sum(rate(codex_api_request_total{ecosystem_lane=' + json.dumps(lane) + '}[5m]))'}],
-            'range': {'from': '1791574200000', 'to': '1791576000000'}}
-        url = 'http://127.0.0.1:21301/explore?' + urlencode({'panes': json.dumps({'lane': pane}), 'schemaVersion': '1'})
-        data['tracking']['grafana']['links'].append({'title': lane + ' · API requests', 'url': url})
+        client = data['tracking']['lanes'][0]['clients'][1]
+        client['rates'] = [{**measurement(0.2, unit='records/s'), 'family': 'api_requests', 'label': 'API request records',
+                            'source_sample_utc': None, 'source': 'http://127.0.0.1:21300',
+                            'datasource': {'uid': 'ns2604-loki', 'type': 'loki'},
+                            'window_start_utc': '2026-10-09T19:56:00Z', 'window_end_utc': '2026-10-09T20:01:00Z',
+                            'scope': 'Exported api_request records in the query window.'}]
         dom = FleetDOM(VIEW.render(data))
-        self.assertIn(url, dom.links)
-        self.assertTrue(all('/api/' not in link for link in dom.links))
+        record = next(item for item in dom.measurements if item['row'].get('data-tracking-client') == 'claude')
+        self.assertIn('0.2 records/s', record['text'])
+        self.assertIn('(reported)', record['text'])
+        self.assertIn('Query window:', record['text'])
+        self.assertIn('2026-10-09T19:56:00Z', record['text'])
+        self.assertIn('2026-10-09T20:01:00Z', record['text'])
+        self.assertIn('Evaluated:', record['text'])
+        self.assertIn('Window: 300 seconds', record['text'])
+        self.assertNotIn('Source sample:', record['text'])
+        self.assertNotIn('last event', record['text'].lower())
+
+    def test_collected_zero_and_missing_claude_records_remain_unreported(self):
+        dom = FleetDOM(VIEW.render(collected_fixture(api=0, tools=None)))
+        claude = {item['attrs']['data-invocation-family']: item for item in dom.measurements
+                  if item['row'].get('data-tracking-client') == 'claude'}
+        self.assertIn('tool_results', claude)
+        for family in ('api_requests', 'tool_results'):
+            self.assertIn('UNKNOWN records/s', claude[family]['text'])
+            self.assertIn('(unreported)', claude[family]['text'])
+            self.assertNotIn('0 records/s', claude[family]['text'])
 
     def test_dynamic_tracking_values_are_sanitized_before_escaping_without_changing_markup(self):
         data = fixture()

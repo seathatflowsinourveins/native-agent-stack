@@ -100,19 +100,30 @@ Rates apply `rate` before aggregation; a companion
 evaluation. A fresh selected scrape does not establish last invocation time
 or complete coverage of every writer.
 
+Native Loki at port 21300 supplies separate Claude API-request-record and
+tool-result-record rates through numeric `rate(...[5m])` queries. These retain
+their query-window bounds and evaluation time; last event time and complete
+invocation coverage are unreported. Failed results and outer code-mode tool
+records remain tool-result observations, not MCP counts. Loki-only lane labels
+are retained. Missing, invalid and unqualified zero rates remain UNKNOWN. Raw
+log streams, arbitrary labels and diagnostic payloads are not projected.
+
 Model-service rows retain their source scope. Selected user-manager properties
 observe `vllm-embed.service` without reading its unit body, environment or
 arguments. Hindsight's documented health route measures DB reachability;
-ai-memory's route measures process-listening liveness. The vLLM health route
-uses host port 28231, measured by the command center. Its HTTP observation,
+ai-memory's route measures process-listening liveness. The vLLM `/v1/models`
+route uses host port 28231, measured by the command center. Its body-unread
+HTTP observation measures model-list API reachability;
 named-unit state and independent Prometheus scrape retain their separate
 scopes; embedding readiness remains unqualified. Native HTTP reads use
 recorded loopback endpoints, bounded responses, no proxy and no redirects;
-health bodies are not read. Grafana port 21301 provides anonymous search
+health/model-list bodies are not read. Grafana port 21301 provides anonymous search
 metadata for existing dashboard links. Per-lane Explore links use the supported
 `panes` JSON and `schemaVersion=1` URL contract with the qualified
-`ns2604-prometheus` datasource and native counter expressions. Dashboard
-lane-variable parameters remain unqualified.
+`ns2604-prometheus` datasource for native counter expressions and `ns2604-loki`
+for Claude LogQL expressions, with each pane's observation range. The exact
+Grafana 13.2.3 serializer and URL contract are pinned in the Fleet decision.
+Dashboard lane-variable parameters remain unqualified.
 
 The optional `fleet-tracking/1` member contains source dates, metric units,
 window and query availability. Its explicit CLI/query/probe seams keep all

@@ -97,11 +97,19 @@ def _created_time(value: Any) -> str:
 
 
 def _measurement_time(item: dict) -> str:
-    fields = [('Source sample', item.get('source_sample_utc')), ('Evaluated', item.get('evaluated_utc'))]
+    def displayed_time(value):
+        return f'<time datetime="{esc(value)}">{esc(value)}</time>' if value else 'UNKNOWN'
+
     lines = []
+    datasource = item.get('datasource')
+    if isinstance(datasource, dict) and datasource.get('type') == 'loki':
+        lines.append('Query window: ' + displayed_time(item.get('window_start_utc')) + ' to ' + displayed_time(item.get('window_end_utc')))
+        lines.append('Event freshness: unreported')
+        fields = [('Evaluated', item.get('evaluated_utc'))]
+    else:
+        fields = [('Source sample', item.get('source_sample_utc')), ('Evaluated', item.get('evaluated_utc'))]
     for label, value in fields:
-        time = f'<time datetime="{esc(value)}">{esc(value)}</time>' if value else 'UNKNOWN'
-        lines.append(label + ': ' + time)
+        lines.append(label + ': ' + displayed_time(value))
     window = item.get('window_seconds')
     if window is not None:
         lines.append('Window: ' + _metric_number(window) + ' seconds')
@@ -205,7 +213,7 @@ def _tracking(data: dict) -> str:
                 call_readings.append('<li data-invocation-family="' + esc(item.get('family')) + '"><strong>' + text(item.get('label') or item.get('family')) + ':</strong> ' + reading + '</li>')
             calls = '<ul>' + ''.join(call_readings) + '</ul>' if call_readings else 'UNKNOWN · unreported'
             telemetry_rows.append('<tr data-tracking-lane="' + esc(lane.get('lane')) + '" data-tracking-client="' + esc(client.get('client')) + '"><th scope="row">' + text(lane.get('lane')) + '</th><td>' + text(client.get('client')) + '</td><td>' + token_cell + '</td><td data-tracking-metric="invocations">' + calls + '</td></tr>')
-    telemetry = '<section class="fleet-codex" id="fleet-lane-metrics"><h2>Telemetry and invocation coverage</h2><p class="fleet-source-note">Telemetry retains its published lane labels and measurement windows. Token categories and API, tool, MCP, skill and agent invocations remain separate. Numeric readings are labelled reported or lower bound; unqualified rates are unreported. Source sample time describes the metric observation.</p>'
+    telemetry = '<section class="fleet-codex" id="fleet-lane-metrics"><h2>Telemetry and invocation coverage</h2><p class="fleet-source-note">Telemetry retains its published lane labels and measurement windows. Token categories and API, tool, MCP, skill and agent invocations remain separate. Numeric readings are labelled reported or lower bound; unqualified rates are unreported. Counter sample times and event query windows remain distinct.</p>'
     telemetry += _tracking_table('All published lane and client measurements', ['Published lane', 'Client', 'Token types and rates', 'Invocation rates and coverage'], telemetry_rows) if telemetry_rows else '<p>UNKNOWN: lane measurements are unreported.</p>'
     query_rows = []
     for item in tracking.get('query_observations') or []:
