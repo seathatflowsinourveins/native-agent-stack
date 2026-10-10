@@ -432,7 +432,8 @@ class HTTPBoundary(unittest.TestCase):
         payloads = {"/v2/account": {"id": "fixture-account-id", "cash": "1000", "equity": "1000", "buying_power": "1000"},
                     "/v2/clock": {"is_open": True, "timestamp": "2026-09-21T15:00:00Z", "next_close": "2026-09-21T20:00:00Z", "next_open": "2026-09-22T13:30:00Z"},
                     "/v2/positions": [], "/v2/orders": [],
-                    "/v2/assets/SPY": {"symbol": "SPY", "tradable": True, "fractionable": True},
+                    "/v2/assets/SPY": {"symbol": "SPY", "tradable": True, "fractionable": True,
+                                       "attributes": ["overnight_tradable", "overnight_halted"]},
                     "/v2/stocks/quotes/latest": {"quotes": {"SPY": {"bp": 100, "ap": 100.01, "bs": 1, "as": 1, "t": "2026-09-21T15:00:00Z"}}}}
         def request(method, url, **kwargs):
             self.assertEqual(method, "GET")
@@ -445,6 +446,10 @@ class HTTPBoundary(unittest.TestCase):
         self.assertTrue(result["open_orders_complete"])
         self.assertEqual(result["orders"], [])
         self.assertEqual(result["clock"]["received_at_ns"], received_at_ns)
+        self.assertEqual(result["assets"][0]["attributes"], ["overnight_tradable", "overnight_halted"])
+        self.assertIs(result["asset_statuses"][0]["overnight_tradable"], True)
+        self.assertIs(result["asset_statuses"][0]["overnight_halted"], True)
+        self.assertEqual(result["asset_statuses"][0]["ts_ns"], received_at_ns)
         self.assertEqual([c.args[0] for c in self.budget.call_args_list], ["read"] * 5 + ["data_read"])
 
     def _preflight_clients(self):
@@ -463,6 +468,7 @@ class HTTPBoundary(unittest.TestCase):
     def test_preflight_sends_the_configured_feed_on_the_quote_request(self):
         from alpaca.data.enums import DataFeed
         for keywords, expected in (({"feed": "sip"}, DataFeed.SIP), ({"feed": "iex"}, DataFeed.IEX),
+                                   ({"feed": "boats"}, DataFeed.BOATS),
                                    ({}, DataFeed.IEX)):
             with self.subTest(**keywords):
                 trading, data = self._preflight_clients()
@@ -1415,7 +1421,7 @@ class DataFeedSelection(unittest.TestCase):
     """One configured feed derives the quote stream endpoint; nothing else does."""
 
     def test_configured_feed_selects_the_matching_quote_stream(self):
-        self.assertEqual(t.DATA_FEEDS, ("iex", "sip"))
+        self.assertEqual(t.DATA_FEEDS, ("iex", "sip", "boats"))
         self.assertEqual(t.data_stream_url("iex"), "wss://stream.data.alpaca.markets/v2/iex")
         self.assertEqual(t.data_stream_url("sip"), "wss://stream.data.alpaca.markets/v2/sip")
 
@@ -1427,7 +1433,7 @@ class DataFeedSelection(unittest.TestCase):
             t.data_stream_url(FeedLike("iex"))
 
     def test_unqualified_feed_is_refused_before_any_endpoint_is_derived(self):
-        for value in ("otc", "delayed_sip", "boats", "overnight", "IEX", "iex ", "", None, 1, ["iex"]):
+        for value in ("otc", "delayed_sip", "overnight", "IEX", "iex ", "", None, 1, ["iex"]):
             with self.subTest(feed=value):
                 with self.assertRaises(t.UnsupportedDataFeed) as caught:
                     t.data_stream_url(value)

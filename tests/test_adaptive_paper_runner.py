@@ -337,35 +337,37 @@ class IntegratedRunner(unittest.TestCase):
         """The validated runner policy governs exits for every transport."""
         from zoneinfo import ZoneInfo
 
-        fixed_now = datetime(2026, 3, 10, 20, tzinfo=ZoneInfo("America/New_York")).timestamp()
-        config, _, _ = load_config(SOURCE / "config.json")
-        config.update(duration_seconds=1, cleanup_seconds=2, order_timeout_seconds=1,
-                      regular_session_only=False, extended_hours_enabled=True,
-                      sessions={"extended_hours": True, "overnight_holds": True})
-        policy = PolicyConfig(symbols=("SPY", "QQQ", "IWM", "DIA", "AAPL", "MSFT"),
-                              max_positions=6)
+        for day, reason in ((14, "session_unavailable"), (10, "overnight_unqualified")):
+            with self.subTest(day=day, reason=reason):
+                fixed_now = datetime(2026, 3, day, 20, tzinfo=ZoneInfo("America/New_York")).timestamp()
+                config, _, _ = load_config(SOURCE / "config.json")
+                config.update(duration_seconds=1, cleanup_seconds=2, order_timeout_seconds=1,
+                              regular_session_only=False, extended_hours_enabled=True,
+                              sessions={"extended_hours": True, "overnight_holds": True})
+                policy = PolicyConfig(symbols=("SPY", "QQQ", "IWM", "DIA", "AAPL", "MSFT"),
+                                      max_positions=6)
 
-        with tempfile.TemporaryDirectory() as root:
-            ledger = Ledger(Path(root) / "journal.db", RiskLimits(trial_seconds=3, cleanup_seconds=2))
-            self.addCleanup(ledger.close)
-            ledger.start_trial(fixed_now)
-            controller = Controller(ledger, fixed_now + 3600, market_open=True, clock=lambda: fixed_now)
-            port = SimulatedPort(controller, policy.symbols)
-            self.assertFalse(hasattr(port, "extended_hours_allowed"))
-            port.positions["AAPL"] = {"symbol": "AAPL", "qty": Decimal(2), "avg_entry_price": "100"}
-            port.cash = Decimal("99800")
-            controller.port = port
-            with patch.object(runner_module.time, "time", return_value=fixed_now), \
-                 patch.object(runner_module.time, "time_ns", return_value=int(fixed_now * 1e9)):
-                result = asyncio.run(run_native(controller, policy, [{"symbol": s} for s in policy.symbols],
-                                                "extended-simulated", config, "99800"))
-            self.assertEqual(result["corporate_action_guard"]["pending_exit_attention_held"], ["AAPL"])
-            self.assertTrue(any(e["type"] == "exit_attention" and e["reason"] == "session_unavailable"
-                                for e in result["events"]))
-            self.assertEqual(port.submitted_at, [])
-            self.assertEqual(ledger.positions()["AAPL"].qty, Decimal(2))
-            self.assertEqual(result["status"], "needs_attention")
-            self.assertEqual(result["startup_reconciliation"]["ledger_delta"]["positions_after"], 1)
+                with tempfile.TemporaryDirectory() as root:
+                    ledger = Ledger(Path(root) / "journal.db", RiskLimits(trial_seconds=3, cleanup_seconds=2))
+                    self.addCleanup(ledger.close)
+                    ledger.start_trial(fixed_now)
+                    controller = Controller(ledger, fixed_now + 3600, market_open=True, clock=lambda: fixed_now)
+                    port = SimulatedPort(controller, policy.symbols)
+                    self.assertFalse(hasattr(port, "extended_hours_allowed"))
+                    port.positions["AAPL"] = {"symbol": "AAPL", "qty": Decimal(2), "avg_entry_price": "100"}
+                    port.cash = Decimal("99800")
+                    controller.port = port
+                    with patch.object(runner_module.time, "time", return_value=fixed_now), \
+                         patch.object(runner_module.time, "time_ns", return_value=int(fixed_now * 1e9)):
+                        result = asyncio.run(run_native(controller, policy, [{"symbol": s} for s in policy.symbols],
+                                                        "extended-simulated", config, "99800"))
+                    self.assertEqual(result["corporate_action_guard"]["pending_exit_attention_held"], ["AAPL"])
+                    self.assertTrue(any(e["type"] == "exit_attention" and e["reason"] == reason
+                                        for e in result["events"]))
+                    self.assertEqual(port.submitted_at, [])
+                    self.assertEqual(ledger.positions()["AAPL"].qty, Decimal(2))
+                    self.assertEqual(result["status"], "needs_attention")
+                    self.assertEqual(result["startup_reconciliation"]["ledger_delta"]["positions_after"], 1)
 
     def test_native_sell_dispatch_crossing_post_close_never_reaches_the_broker(self):
         """A POST owner tick cannot authorize a sell dispatched after 20:00."""
@@ -524,7 +526,7 @@ class IntegratedRunner(unittest.TestCase):
         """Repeated native cleanup ticks preserve the hold without journal spam."""
         from zoneinfo import ZoneInfo
 
-        fixed_now = datetime(2026, 3, 10, 20, tzinfo=ZoneInfo("America/New_York")).timestamp()
+        fixed_now = datetime(2026, 3, 14, 20, tzinfo=ZoneInfo("America/New_York")).timestamp()
         config, _, _ = load_config(SOURCE / "config.json")
         config.update(duration_seconds=1, cleanup_seconds=2, order_timeout_seconds=1,
                       regular_session_only=False, extended_hours_enabled=True,

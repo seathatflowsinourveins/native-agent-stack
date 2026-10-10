@@ -14,11 +14,12 @@ exit_session_at=lambda now: session_at(datetime.fromtimestamp(now, timezone.utc)
 No wall clock, broker call, or new order adapter is added to the exit decision.
 The owning runtime supplies `ExitContext.session`. The current actionable
 classes are RTH, PRE and POST. A fresh OVERNIGHT label produces a flagged hold
-with reason `overnight_unqualified`: native classification, adapter support
+with reason `overnight_unqualified`: adapter support
 and owned T15 paper acceptance remain **NOT_RUN**. This preserves OVERNIGHT as
 an evidence-gated research candidate rather than declaring it permanently
-ineligible. The installed `sessions.session_at` still classifies only
-PRE/RTH/POST/CLOSED; its defaults and unrelated entry callers are unchanged.
+ineligible. The installed `sessions.session_at` also classifies the venue's
+OVERNIGHT market interval. [T15's session/feed/status implementation](README-overnight.md)
+keeps operational overnight admission separate from that market classification.
 
 CLOSED and unknown labels hold **every sell**, including stop-loss and forced
 cleanup, with `session_unavailable`. A classifier `ValueError` becomes the

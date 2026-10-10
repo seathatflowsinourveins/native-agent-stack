@@ -94,8 +94,8 @@ class SessionClockTests(unittest.TestCase):
         # Each year must be constructed once across repeated CLOSED queries.
         with mock.patch.object(sess.xcals, "get_calendar", wraps=sess.xcals.get_calendar) as get:
             for _ in range(3):
-                for ts, expected in ((ny(2026, 12, 31, 21, 0), ny(2027, 1, 4, 4, 0)),
-                                     (ny(2027, 12, 31, 21, 0), ny(2028, 1, 3, 4, 0))):
+                for ts, expected in ((ny(2026, 12, 31, 21, 0), ny(2027, 1, 3, 20, 0)),
+                                     (ny(2027, 12, 31, 21, 0), ny(2028, 1, 2, 20, 0))):
                     self.assertEqual(sess.session_at(ts).next_open, expected)
             self.assertEqual(get.call_count, 3, "one calendar per query year, including 2028")
 
@@ -140,27 +140,28 @@ class SessionClockTests(unittest.TestCase):
         self.assertEqual(info.open, ny(2026, 3, 10, 16, 0))
         self.assertEqual(info.close, ny(2026, 3, 10, 20, 0))
 
-    def test_closed_overnight_before_pre_open(self):
+    def test_overnight_before_pre_open(self):
         info = sess.session_at(ny(2026, 3, 10, 2, 0))
-        self.assertEqual(info.kind, sess.SessionKind.CLOSED)
-        self.assertEqual(info.next_open, ny(2026, 3, 10, 4, 0))
-        self.assertIsNone(info.seconds_to_close)
+        self.assertEqual(info.kind, sess.SessionKind.OVERNIGHT)
+        self.assertEqual(info.next_open, ny(2026, 3, 9, 20, 0))
+        self.assertEqual(info.seconds_to_close, 2 * 3600)
 
-    def test_closed_after_post_close_rolls_to_next_trading_day(self):
+    def test_overnight_after_post_close_belongs_to_next_trading_day(self):
         info = sess.session_at(ny(2026, 3, 10, 21, 0))  # Tuesday evening
-        self.assertEqual(info.kind, sess.SessionKind.CLOSED)
-        self.assertEqual(info.next_open, ny(2026, 3, 11, 4, 0))  # Wednesday PRE open
+        self.assertEqual(info.kind, sess.SessionKind.OVERNIGHT)
+        self.assertEqual(info.session_date, date(2026, 3, 11))
+        self.assertEqual(info.close, ny(2026, 3, 11, 4, 0))
 
     def test_closed_weekend(self):
         info = sess.session_at(ny(2026, 3, 14, 12, 0))  # Saturday
         self.assertEqual(info.kind, sess.SessionKind.CLOSED)
-        self.assertEqual(info.next_open, ny(2026, 3, 16, 4, 0))  # Monday PRE open
+        self.assertEqual(info.next_open, ny(2026, 3, 15, 20, 0))  # Sunday overnight open
 
     def test_closed_full_holiday(self):
         info = sess.session_at(ny(2026, 1, 1, 12, 0))  # New Year's Day, Thursday
         self.assertEqual(info.kind, sess.SessionKind.CLOSED)
         # Jan 2 (Fri) is an ordinary trading day.
-        self.assertEqual(info.next_open, ny(2026, 1, 2, 4, 0))
+        self.assertEqual(info.next_open, ny(2026, 1, 1, 20, 0))
 
     def test_early_close_thanksgiving_friday(self):
         info = sess.session_at(ny(2026, 11, 27, 12, 30))  # Friday after Thanksgiving
@@ -193,7 +194,7 @@ class SessionClockTests(unittest.TestCase):
     def test_is_trading_session(self):
         self.assertTrue(sess.is_trading_session(ny(2026, 3, 10, 12, 0)))
         self.assertTrue(sess.is_trading_session(ny(2026, 3, 10, 5, 0)))  # PRE
-        self.assertFalse(sess.is_trading_session(ny(2026, 3, 10, 2, 0)))  # CLOSED
+        self.assertTrue(sess.is_trading_session(ny(2026, 3, 10, 2, 0)))  # OVERNIGHT market, not lane admission
         self.assertFalse(sess.is_trading_session(ny(2026, 3, 14, 12, 0)))  # weekend
 
     def test_naive_datetime_rejected(self):
@@ -307,7 +308,7 @@ class SessionClockTests(unittest.TestCase):
             after_date = date(2026, month, after)
             closed = sess.session_at(ny(2026, month, sunday, 12, 0))
             self.assertEqual(closed.kind, sess.SessionKind.CLOSED)
-            self.assertEqual(closed.next_open, ny(2026, month, after, 4, 0))
+            self.assertEqual(closed.next_open, ny(2026, month, after - 1, 20, 0))
             for d, offset in ((before_date, before_offset), (after_date, after_offset)):
                 with self.subTest(date=d):
                     info = sess.session_at(ny(d.year, d.month, d.day, 12, 0))
@@ -347,7 +348,7 @@ class SessionClockTests(unittest.TestCase):
 
     def test_extended_session_close_refuses_when_closed(self):
         with self.assertRaisesRegex(ValueError, "no_active_extended_session"):
-            extended_session_close(ny(2026, 3, 10, 2, 0))
+            extended_session_close(ny(2026, 3, 14, 12, 0))
 
 
 class SessionPolicyTests(unittest.TestCase):
@@ -1567,6 +1568,28 @@ class GapRiskExitChainTests(unittest.TestCase):
         post = ny(2026, 3, 10, 17, 0).astimezone(timezone.utc).timestamp()
         strategy.policy.latest["SPY"] = _FakeQuote(100.0, 100.02, post)
         strategy._gap_risk_stop_symbols(post, {"SPY": D("1")})  # crosses RTH -> POST
+        self.assertAlmostEqual(float(strategy._prior_rth_close["SPY"]), 100.01, places=2)
+
+    def test_late_rth_to_overnight_capture_keeps_the_completed_rth_date(self):
+        strategy = self.strategy()
+        rth = ny(2026, 3, 10, 12, 0).timestamp()
+        strategy.policy.latest["SPY"] = _FakeQuote(100.0, 100.02, rth)
+        strategy._gap_risk_stop_symbols(rth, {"SPY": D("1")})
+        overnight = ny(2026, 3, 10, 20, 0).timestamp()
+        strategy.policy.latest["SPY"] = _FakeQuote(100.0, 100.02, overnight)
+        strategy._gap_risk_stop_symbols(overnight, {"SPY": D("1")})
+        self.assertEqual(strategy._prior_close_capture_session_date, date(2026, 3, 10))
+
+    def test_deferred_overnight_capture_keeps_the_rth_date_across_midnight(self):
+        strategy = self.strategy()
+        rth = ny(2026, 3, 10, 12, 0).timestamp()
+        strategy.policy.latest["SPY"] = _FakeQuote(100.0, 100.02, rth)
+        strategy._gap_risk_stop_symbols(rth, {"SPY": D("1")})
+        strategy._gap_risk_stop_symbols(ny(2026, 3, 10, 20, 0).timestamp(), {"SPY": D("1")})
+        midnight = ny(2026, 3, 11, 0, 1).timestamp()
+        strategy.policy.latest["SPY"] = _FakeQuote(100.0, 100.02, midnight)
+        strategy._gap_risk_stop_symbols(midnight, {"SPY": D("1")})
+        self.assertEqual(strategy._prior_close_capture_session_date, date(2026, 3, 10))
         self.assertAlmostEqual(float(strategy._prior_rth_close["SPY"]), 100.01, places=2)
 
     def test_gap_down_on_next_rth_open_triggers_stop(self):
