@@ -1,0 +1,96 @@
+# Retain failed Claude federation diagnostics before acceptance — 2026-10-10
+
+The three federated workflows already select Claude Opus 5.5 through
+`anthropics/claude-code-action` v1.0.247 at
+`2dca132ff0e0c4094ce6048b422c6915a071210b`. This P1 slice keeps that supported
+authentication and review mechanism and makes its zero-cost failure diagnosable.
+It starts from main at `f6ae0de74c151dce9204f6b6bdae7ea048932881`.
+
+## Problem and change
+
+An error result with `is_error: true`, `total_cost_usd: 0` and `modelUsage: {}`
+failed the existing nonempty-model guard before accounting wrote a record or
+summary. Synthetic execution of the actual shell independently reproduced this
+in `claude-pr-review.yml`, `claude-pr-toolkit-review.yml` and `harness-audit.yml`:
+all three exited at jq's `usage unavailable` error, rc 5.
+
+Accounting now retains the fixed class `zero_cost_error_without_model_usage`,
+includes it in the job summary and failed-bound message, and exits 1. The class
+describes exactly those three result fields; it does not establish a federation
+denial, its reason, or a successful model call. Raw provider error strings and
+transcript text are excluded. Normal usable results carry a null `error_class`.
+Toolkit accounting checks every result, so a later success cannot hide an earlier
+zero-cost error. Its incomplete record keeps null total cost and message count,
+with any usable assistant token counts still explicitly a lower bound.
+
+The original read-only tools, budgets, turn and cache checks, publication
+conditions, Opus selector and action pins retain their existing contract.
+P3's resolver, scheduling and cache changes belong to a separate slice.
+
+## Native state and remaining acceptance
+
+Native GitHub reads on 2026-10-10 confirmed repository ID `1376766892`, owner ID
+`234074349`, and OIDC customization `use_default: true`,
+`use_immutable_subject: true`. The main subject is therefore:
+
+```
+repo:seathatflowsinourveins@234074349/native-agent-stack@1376766892:ref:refs/heads/main
+```
+
+The following native run metadata was rechecked without reading credentials,
+repository variable values, identity tokens or an execution transcript:
+
+| Run | Event and source | Native conclusion |
+| --- | --- | --- |
+| [37739403956](https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/37739403956) | dispatch on main `7a3637f5df7111fda87f2f1408e23963d18caadc`, 2026-10-08T06:45:40Z | completed, failure |
+| [37988961127](https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/37988961127) | schedule on main `f1fae6faf1c74fcadde68f8495ddcd26a51ef942`, 2026-10-09T20:44:12Z | completed, failure |
+
+`harness-audit.yml` is natively `disabled_manually`. Its bounded-workflow PR
+[#892](https://github.com/seathatflowsinourveins/native-agent-stack/pull/892)
+already squash-merged as main commit `b0b4b10972def3741f90daa350a275a078aa3c8e`
+at 2026-10-10T00:46:20Z. This diagnostic patch does not re-enable it.
+
+The CC's native federation acceptance follows the vendor path:
+
+1. Read the failed exchange's native Console authentication-history reason.
+   An opaque authentication failure or this fixed accounting class cannot supply
+   that reason. For `match_subject_prefix`, bind the exact immutable main subject,
+   audience `https://api.anthropic.com`, and main/owner/repository claim values.
+   A workspace-membership denial instead needs the documented workspace correction.
+2. Dispatch the merged main workflow against an eligible current PR head.
+   Require native review success, positive client cost, nonempty actual model
+   usage naming Opus 5.5, and accepted authentication history. Keep the broad
+   review schedule off until this succeeds.
+3. Re-enable the separately bounded harness audit only after that acceptance.
+   Its native run must meet its existing client cost bound of $5.50.
+
+There is no new native model or federation run in this slice. The local review
+worker [#953](https://github.com/seathatflowsinourveins/native-agent-stack/pull/953)
+was still open at the native read; adoption and testing use its landed main
+implementation after it merges. This change does not depend on a PR-branch pin.
+
+## SOTA sources
+
+- [anthropics/claude-code-action@2dca132ff0e0c4094ce6048b422c6915a071210b:base-action/src/run-claude-sdk.ts:141](https://github.com/anthropics/claude-code-action/blob/2dca132ff0e0c4094ce6048b422c6915a071210b/base-action/src/run-claude-sdk.ts#L141): the result's sanitized field list includes `is_error`, `total_cost_usd` and `modelUsage`; [line 222](https://github.com/anthropics/claude-code-action/blob/2dca132ff0e0c4094ce6048b422c6915a071210b/base-action/src/run-claude-sdk.ts#L222) writes the execution records.
+- [The same action:base-action/src/workload-identity.ts:51](https://github.com/anthropics/claude-code-action/blob/2dca132ff0e0c4094ce6048b422c6915a071210b/base-action/src/workload-identity.ts#L51) requests the GitHub identity token through the supported Actions client; [examples/claude-wif.yml:31](https://github.com/anthropics/claude-code-action/blob/2dca132ff0e0c4094ce6048b422c6915a071210b/examples/claude-wif.yml#L31) names the required federation permission.
+- [GitHub OIDC reference, immutable subject claims](https://docs.github.com/en/actions/reference/security/oidc#immutable-subject-claims): the owner and repository IDs are part of this repository's opted-in subject. Primary REST reads confirmed its IDs and customization; no JWT was read.
+- [Anthropic WIF GitHub guide, verify the setup](https://platform.claude.com/docs/en/manage-claude/wif-providers/github-actions#verify-the-setup): the external authentication response is opaque; the native history contains the deny reason, with `match_subject_prefix` a common cause.
+- [Anthropic WIF concepts, federation rules](https://platform.claude.com/docs/en/manage-claude/workload-identity-federation#federation-rules): all configured subject, audience and exact claim matchers must pass. This slice preserves the vendor implementation.
+
+## Validation boundary
+
+`tests/test_claude_federation_diagnostics.py` executes the actual accounting shell
+through the existing isolated workflow harnesses, with synthetic result records.
+It checks retained diagnosis, continued rejection, no raw message publication,
+each of the three required fields, normal cached success, and toolkit error-before-
+success ordering. The initial red run reproduced four failed controls and the
+absence of the new field in three positive schema controls. No fixture stands in
+for native federation acceptance. The three existing complete workflow test
+modules remain part of the local validation, including their budget-stop and
+incomplete-accounting controls.
+
+Returning only jq's original usage error would keep the diagnosis gap. Printing
+provider errors would publish arbitrary strings without establishing the cause.
+Treating missing model usage as successful accounting would incorrectly accept
+an unmeasured review. The fixed class with continued rejection is the smallest
+change that distinguishes this known shape while preserving those boundaries.

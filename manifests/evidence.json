@@ -5096,13 +5096,13 @@
     },
     {
       "path": ".github/workflows/claude-pr-review.yml",
-      "sha256": "b617f6cc04d1789a6245d58aa3942773e3dcbb51e575aafad13b823095982022",
-      "bytes": 37887
+      "sha256": "54464eebb0bab71305bc30433207e37a97d2b2332b2bc391b125786fa15b9abd",
+      "bytes": 38591
     },
     {
       "path": ".github/workflows/claude-pr-toolkit-review.yml",
-      "sha256": "03731abcdcc8705f000432dae23f357c933b124d34119db6f427f60095e75375",
-      "bytes": 33336
+      "sha256": "17f1aa5e5c311b3edfd0b3489fa82ea8068866f04ea815d705fb3c1eb8c441c8",
+      "bytes": 33920
     },
     {
       "path": ".github/workflows/dependency-review.yml",
@@ -5121,8 +5121,8 @@
     },
     {
       "path": ".github/workflows/harness-audit.yml",
-      "sha256": "22c470acd8d8896d8fc215697bde0246fe152cb308f4fa53a510b64b3799bb87",
-      "bytes": 18634
+      "sha256": "6be00fced7dd5227c50e0281b8fae05e001b4fc1d5b9ee56d10eb187e6ae765b",
+      "bytes": 19214
     },
     {
       "path": ".github/workflows/native-foundation-e2e.yml",
@@ -18442,8 +18442,8 @@
     },
     {
       "path": "docs/decisions/2026-10-08-claude-actions-pr-review.md",
-      "sha256": "ae0a32b4875d7ddae697cbb9c2d2f18fb5accaed69863e3511e3fc6049cc3bed",
-      "bytes": 59968
+      "sha256": "d6b5921d5fa79726fbe0fbf4c810e579ee26e6b6fea12b03c8c428e201d71ca4",
+      "bytes": 60104
     },
     {
       "path": "docs/decisions/2026-10-08-coordinator-research-routing.md",
@@ -18554,6 +18554,11 @@
       "path": "docs/decisions/2026-10-09-validate-macos-portability.md",
       "sha256": "9bb4b115138f4abf6d74c0893e8ea1da50fef295598cfcf8a2ffe85e62089042",
       "bytes": 11363
+    },
+    {
+      "path": "docs/decisions/2026-10-10-claude-federation-diagnostics.md",
+      "sha256": "cbdb61ae50e5cf9effcc44b5dee3b0bc665a87e02445d15b5b46cd3ee4272a01",
+      "bytes": 7092
     },
     {
       "path": "docs/decisions/2026-10-10-codex-lane-omniroute.md",
@@ -18702,8 +18707,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "b5e80791e416eec587e8202253c764aac9454290d5afc6561187a045eee1747b",
-      "bytes": 105989
+      "sha256": "65f58a6631fa9ed2feb8e436b7c73775021f18eed3bf0095b88fa03aff98e876",
+      "bytes": 106676
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -60201,19 +60206,24 @@
       "bytes": 22660
     },
     {
+      "path": "tests/test_claude_federation_diagnostics.py",
+      "sha256": "ebf3c40d82755a73971fde4ef2eb216f29ca08fce239ef6061ad03e4d968a781",
+      "bytes": 4112
+    },
+    {
       "path": "tests/test_claude_harness_audit_bounds.py",
-      "sha256": "2119d4e93b000d820d0018364cd2daace48b2b5cc9f61e6630b41e88e550b41c",
-      "bytes": 32715
+      "sha256": "5c8781fd102c134ff893788c7d64402b3fce40a1f60185a44c1f5deae46d1065",
+      "bytes": 32730
     },
     {
       "path": "tests/test_claude_pr_review_workflow.py",
-      "sha256": "3a188cd59922be9f30a6ff25035f004335df5a1b7d37a09f62ba578815b8b049",
-      "bytes": 60463
+      "sha256": "16b71fea0d13962ef4ee60f3f15894132d2f11602461dcdd0e002679d50499e0",
+      "bytes": 60478
     },
     {
       "path": "tests/test_claude_pr_toolkit_review_workflow.py",
-      "sha256": "e77e385bbc17985a85106b525685068fcfc5f302741d55f35dc07a24f1aaae15",
-      "bytes": 76217
+      "sha256": "906e599f7cdf5bc9a122a9cf81c65dab59fb8e016ee6516b12edcf0ead9a746b",
+      "bytes": 76232
     },
     {
       "path": "tests/test_claude_recovery.py",
