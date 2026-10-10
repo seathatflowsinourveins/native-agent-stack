@@ -59382,8 +59382,8 @@
     },
     {
       "path": "observability/native-data/README.md",
-      "sha256": "1ab47e3f0af3cb3ebb02c4f16f1445aa6c43033568d011f123c08b2ee652f292",
-      "bytes": 17313
+      "sha256": "bd81fb0001ffc0f4d2488768ed7cae09580e061106cb007baf4c1bd07e556751",
+      "bytes": 18753
     },
     {
       "path": "observability/native-data/config.example.json",
@@ -59417,8 +59417,8 @@
     },
     {
       "path": "observability/native-data/snapshot.py",
-      "sha256": "ec68f05a9dea2c8d3e37888b2928760bd085ce1567bcdd09145e82a6196fb68b",
-      "bytes": 29140
+      "sha256": "2d0a0a899767b10d7c8c978dd4f0674d57af73335362825d2e670482cd9019be",
+      "bytes": 29861
     },
     {
       "path": "observability/ns2604_dashboards.py",
@@ -60667,8 +60667,8 @@
     },
     {
       "path": "tests/test_native_dashboard_data.py",
-      "sha256": "86046bfc209f68743cce27c01f6145cfd0fd234925f9e46898072c944a3da591",
-      "bytes": 41266
+      "sha256": "12171cca8c120f6132f2ba98eb242bfbe4dc2087518a5761015b03e4b50b1005",
+      "bytes": 45322
     },
     {
       "path": "tests/test_native_faults_min.py",

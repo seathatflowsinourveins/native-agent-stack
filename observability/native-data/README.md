@@ -20,7 +20,13 @@ python3 observability/native-data/snapshot.py --config /absolute/private/config.
 python3 observability/native-data/snapshot.py --config /absolute/private/config.json --publish
 ```
 
-Publishing uses only `http://127.0.0.1:13100/loki/api/v1/push`. Optional Qdrant
+Publishing uses the private config's `loki_url`: an `http://` URL with an
+IPv4 loopback literal (`127.0.0.0/8`) or IPv6 `::1`, an explicit port from 1 to
+65535 and exactly `/loki/api/v1/push`. For example, the backends example uses
+`http://127.0.0.1:13100/loki/api/v1/push`; NativeStack2604 uses
+`http://127.0.0.1:21300/loki/api/v1/push`. DNS names, credentials, scoped or
+IPv4-mapped IPv6, queries, fragments and URL control characters are rejected.
+Optional Qdrant
 configuration is an explicit literal loopback origin and one collection, for
 example `{"url":"http://127.0.0.1:16333","collection":"selected-collection"}`.
 HTTP proxies and redirects are disabled. There is no authentication discovery,
@@ -191,9 +197,24 @@ On NativeStack2604 (2026-10-06) the dashboard comes from the install plan's
 host's links (no Qdrant, vLLM, token report or ntfy there) and without the four
 Qdrant and vLLM panels, then retargets it to the `ns2604-*` datasources and
 unprefixed metric names. That row does not install this collector, which needs
-2604's Loki push endpoint (21300) and a private config with that host's binaries
-and data. Until a collector runs there, the savings, memory and coverage tables
-stay empty; the provider-telemetry panels work.
+`loki_url` set to `http://127.0.0.1:21300/loki/api/v1/push` and a private config
+with that host's binaries and data. Keep that config outside the checkout at
+`~/.config/ecosystem-observability/native-data.json` with mode `0600`, and its
+`state_dir` with mode `0700`. RTK, ai-memory and QMD use the config's selected
+binaries and scopes. Context Mode for both clients, Headroom, jCodeMunch and
+coverage come from the existing `token_report`; its `report_scopes` must match
+that report's captured runtime roots and counter labels. The native-data
+collector does not generate or refresh that report.
+
+After reviewing and applying the private config and the user service/timer
+examples above, the service's `--publish` sends each two-minute generation to
+the configured endpoint. Acceptance requires
+`count_over_time({service_name="agent-stack-native-data"}[30m]) > 0` in that
+Loki, then a screenshot of `native-foundation-data`, zero console errors and
+failed network requests, and each savings, memory and coverage panel showing
+the current generation. A reachable endpoint or a rendered dashboard alone
+does not establish collection. Until this acceptance passes, native collection
+on 2604 remains unverified; the provider-telemetry panels use their own sources.
 
 To undo the deployment, disable the timer, remove the installed units and the
 dashboard file, then reload the user manager. Undo only what the deployment
