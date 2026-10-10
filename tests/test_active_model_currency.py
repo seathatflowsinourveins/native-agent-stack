@@ -416,6 +416,26 @@ class ActiveModelCurrencyTests(unittest.TestCase):
                 finding, = result["findings"]
                 self.assertEqual(finding["model"], "gpt-6-sol")
 
+    def test_formatted_non_native_executable_keeps_its_operand_context(self):
+        for command in ("`echo` codex -m gpt-6-sol",
+                        "`printf` codex -m gpt-6-sol",
+                        "`/bin/echo` codex exec -m gpt-6-sol"):
+            with self.subTest(command=command):
+                self.write("docs/launch.md", command + "\n")
+                result = self.check()
+                self.assertEqual((result["status"], result["stale_count"]), ("current", 0))
+
+    def test_comment_spans_do_not_hide_formatted_native_model_arguments(self):
+        for comment in ("default model", "default"):
+            for command in ("codex exec -m `gpt-6-sol`",
+                            "`codex` exec `-m` `gpt-6-sol`"):
+                with self.subTest(comment=comment, command=command):
+                    self.write("docs/launch.md", command + f" # select `{comment}`\n")
+                    result = self.check()
+                    self.assertEqual((result["status"], result["stale_count"]), ("stale", 1))
+                    finding, = result["findings"]
+                    self.assertEqual((finding["model"], finding["line"]), ("gpt-6-sol", 1))
+
     def test_quoted_and_escaped_punctuation_remains_an_operand_in_command_strings(self):
         commands = ["echo ';' codex -m gpt-6-sol", r"echo \; codex -m gpt-6-sol",
                     'echo "&&" codex -m gpt-6-sol']

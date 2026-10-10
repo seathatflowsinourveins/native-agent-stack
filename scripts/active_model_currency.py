@@ -535,7 +535,7 @@ def selectors(text: str, path: Path):
     fence = None
     for number, line in enumerate(text.splitlines(), 1):
         code_spans = []
-        outside_command = formatted_command = None
+        outside_command = None
         if path.suffix == ".md":
             # CommonMark 0.31.2 sections 4.5/6.1: fenced content is literal;
             # inline formatting must not discard surrounding command text.
@@ -550,16 +550,18 @@ def selectors(text: str, path: Path):
                     continue
             if fence is None:
                 spans = r"(?<!`)(`+)(?!`)(.*?)(?<!`)\1(?!`)"
-                code_spans = [match[2] for match in re.finditer(spans, line)]
-                outside_command = re.sub(spans, " ", line)
-                line = re.sub(spans, lambda match: " " + match[2] + " ", line)
-                # Join formatted command tokens, not independent prose snippets.
-                # Full command spans are parsed separately below.
-                if (code_spans and all(not re.search(r"\s", span.strip()) for span in code_spans)
-                        and re.match(r"^\s*(?:[A-Za-z_]\w*=\S+\s+)*"
-                                     r"(?:codex\s+(?:exec\b|-)|claude\s+-|"
-                                     r"(?:nice|ionice|nohup|env|timeout|flock|rtk|hcom|command|exec)\b)", line)):
-                    formatted_command = line
+                def span_content(match):
+                    content = match[2]
+                    if content.startswith(" ") and content.endswith(" ") and content.strip(" "):
+                        content = content[1:-1]  # CommonMark 0.31.2 section 6.1
+                    return content
+                code_spans = [span_content(match) for match in re.finditer(spans, line)]
+                # CPython v3.13.16 shlex.quote preserves each literal span as
+                # one token in the surrounding command. Never delete an
+                # executable or let a span's operand suffix become a command.
+                # Full command spans retain their separate parse below.
+                outside_command = re.sub(spans, lambda match: shlex.quote(span_content(match)), line)
+                line = re.sub(spans, lambda match: " " + span_content(match) + " ", line)
         stripped = line.strip()
         if not stripped or stripped.startswith(("#", "//", "<!--", ";")):
             if prose and stripped.startswith("#"):
@@ -589,8 +591,6 @@ def selectors(text: str, path: Path):
             commands = code_spans or [line]
             if code_spans:
                 commands = [*commands, outside_command]
-                if formatted_command is not None:
-                    commands.append(formatted_command)
             selected = []
             try:
                 for index, command in enumerate(commands):

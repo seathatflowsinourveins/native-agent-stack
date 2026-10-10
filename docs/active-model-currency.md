@@ -86,8 +86,13 @@ Python module names and ordinary operands named `codex`/`claude` do not establis
 native-client context. Markdown command spans use the matching backtick
 delimiters described by [CommonMark 0.31.2 section 6.1](https://spec.commonmark.org/0.31.2/#code-spans);
 independent command spans stay separate. Inline formatting of individual command
-tokens or a model value preserves surrounding command text. Commands outside
-spans are also checked. [Fenced code, section 4.5](https://spec.commonmark.org/0.31.2/#fenced-code-blocks),
+tokens or a model value preserves surrounding command text. Each span is kept
+as one literal token when checking the surrounding command, using
+[CPython v3.13.16's `shlex.quote`](https://github.com/python/cpython/blob/v3.13.16/Doc/library/shlex.rst).
+A formatted executable is retained, so its ordinary operands cannot become a
+new executable. Unrelated spans in a trailing shell comment do not suppress
+the preceding model argument. Commands outside spans are also checked.
+[Fenced code, section 4.5](https://spec.commonmark.org/0.31.2/#fenced-code-blocks),
 stays literal: backticks in shell comments do not suppress the command.
 A pending flag can pair with the next code span on that line.
 Shell operators create command boundaries in command strings; in literal argv
