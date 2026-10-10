@@ -57,11 +57,11 @@ the native producer. Actual amounts are summed as spend; summed `max_usd`
 reservations remain separate from the CC-owned credit ceiling. Unrecognized
 ledger formats remain UNKNOWN.
 
-Actions use one native `gh run list` invocation for the newest100 repository
+Actions use one native `gh run list` invocation for the newest 100 repository
 runs, then filter against checked-out workflow files that actually invoke a
 model. Only workflow/status/time/run-ID fields are requested; prompt-like
 display titles and branch names are omitted. The native CLI has no cache flag
-for this command, so a540-second nonserved JSON cache with a native file lock
+for this command, so a 540-second nonserved JSON cache with a native file lock
 coordinates refreshes. Fresh cache hits make no additional CLI request;
 failure preserves earlier observations with their original time, never an
 invented zero. The Fleet section identifies its bounded Actions scope.
@@ -73,10 +73,53 @@ descriptor, with its original file location, arguments and sibling-import
 path. The child starts with Python isolated mode (`-I`), then adds the approved
 producer sibling directory after verification. Bootstrap stdlib imports cannot
 be shadowed by the page process's working directory or ambient Python path.
-A dedicated process session has a90-second limit; timeout cleanup kills its
+A dedicated process session has a 90-second limit; timeout cleanup kills its
 descendant process group. Execution digest and byte count are retained;
-collection never reopens
-the original producer pathname after validation.
+collection never reopens the original producer pathname after validation.
+
+Fleet tracking extends that collector with the native hcom roster and local
+observability sources. A safe `hcom list --format ...` projection
+captures all listed agents without reading prompts, config, argv or account
+data or depending on a particular lane remaining registered. Valid rows retain
+the native `launching` and `error` states; invalid rows leave other rows
+available. Creation epochs display as UTC. The current roster remains separate
+from historical `ecosystem_lane` labels in telemetry. Query failures, empty
+metric results and unqualified counter zeros stay UNKNOWN.
+
+Prometheus at recorded port 21090 supplies five-minute native counter rates.
+Each client and token category remains separate because token categories
+overlap. The invocation view covers API requests, tool calls, MCP calls, skill
+invocations and agent invocations for each published client. Codex API attempts
+(including retries), tool calls and MCP calls use their qualified native
+counters; each unqualified numeric source remains explicitly unreported.
+Numeric rates are labelled reported or lower bound. Codex counter rates remain
+lower bound until deployed start-timestamp ingestion and a newly born
+single-turn series read-back pass; a zero under that limit is unreported.
+Rates apply `rate` before aggregation; a companion
+`timestamp(counter)` query retains source scrape time separately from query
+evaluation. A fresh selected scrape does not establish last invocation time
+or complete coverage of every writer.
+
+Model-service rows retain their source scope. Selected user-manager properties
+observe `vllm-embed.service` without reading its unit body, environment or
+arguments. Hindsight's documented health route measures DB reachability;
+ai-memory's route measures process-listening liveness. The vLLM health route
+uses host port 28231, measured by the command center. Its HTTP observation,
+named-unit state and independent Prometheus scrape retain their separate
+scopes; embedding readiness remains unqualified. Native HTTP reads use
+recorded loopback endpoints, bounded responses, no proxy and no redirects;
+health bodies are not read. Grafana port 21301 provides anonymous search
+metadata for existing dashboard links. Per-lane Explore links use the supported
+`panes` JSON and `schemaVersion=1` URL contract with the qualified
+`ns2604-prometheus` datasource and native counter expressions. Dashboard
+lane-variable parameters remain unqualified.
+
+The optional `fleet-tracking/1` member contains source dates, metric units,
+window and query availability. Its explicit CLI/query/probe seams keep all
+synthetic tests independent of runtime state. Failure of one optional source
+leaves the existing Fleet observations available and displays tracking as
+unreported with its reason. Shared sanitization applies before escaping fields
+and links; complete markup is preserved.
 
 Optional memory totals accept a finite positive scalar or a
 `{value_gib, read_utc}` record. An invalid total becomes UNKNOWN with a reason;
@@ -218,6 +261,8 @@ nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p t
 nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_fleet_execution.py
 nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_fleet_regressions.py
 nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_fleet_view.py
+nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_fleet_tracking.py
+nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_fleet_tracking_view.py
 nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_adoption.py
 ```
 
