@@ -1,27 +1,28 @@
 """Regression coverage for .gitleaks.toml's allowlist context-restriction.
 
-Runs the PATH `gitleaks` (the guarded, memory-capped launcher; never the
-underlying binary directly) in no-git `dir` mode against small synthetic fixture
-directories built under a temp dir, using the real repository `.gitleaks.toml`.
-Skips the whole test module if gitleaks is not on PATH, and skips individual
-cases if the guarded launcher reports its per-user scan lock is held by another
-scan (a busy lock is not a passing or failing result here). A scan that does not
+Most scanner checks run the PATH `gitleaks` in no-git `dir` mode against small
+synthetic fixture directories built under a temp dir, using the real repository
+`.gitleaks.toml`. The real-checkout history check requires an explicit
+GITLEAKS_HISTORY_RANGE; it never falls back to scanning all HEAD ancestry.
+Scanner-dependent checks skip if gitleaks is not on PATH, while mocked contract
+tests still run. Individual cases skip if the guarded launcher reports its
+per-user scan lock is held by another scan (a busy lock is not a passing or
+failing result here). A scan that does not
 complete raises _ScannerError, which unittest records as an error, never as a
 detection result (_scan_findings).
 
 `gitleaks dir` is invoked with the fixture directory as the *current working
 directory* and "." as the source argument, matching how validate.yml's
-secret-scan job and the manually recorded full-history scans in .gitleaks.toml's
-header comment invoke it. Passing an absolute path instead makes gitleaks report
+secret-scan working-tree step invokes it. Passing an absolute path instead makes
+gitleaks report
 absolute `File` values, which never match this config's `^relative/path$`
 allowlist anchors - a distinct, previously-observed failure mode of this test
 file itself, not of the config.
 
-These are local integration checks against the installed gitleaks binary and
-synthetic fixture content; they do not assert anything about the repository's
-real git history (see .gitleaks.toml's header comment for the dated
-full-history scan counts, which are a separate, manually recorded evidence
-class).
+Synthetic integration checks assert the allowlist's behavior on fixture content.
+The real-checkout integration check separately asserts the supplied landed range
+is clean. Dated full-history counts in .gitleaks.toml remain historical evidence
+and are not rerun by this module.
 """
 
 import ast
@@ -733,7 +734,8 @@ class GitleaksIgnoreFingerprintTests(unittest.TestCase):
             capture_output=True, text=True, check=False,
         )
         if rev_parse.returncode != 0:
-            self.skipTest(f"could not resolve HEAD: {rev_parse.stderr.strip()}")
+            self.skipTest("could not resolve the fingerprint fixture's baseline commit")
+        baseline = rev_parse.stdout.strip()
 
         target_path = self.NARRATIVE_FILES[0]
         fingerprinted_lines = []
@@ -752,11 +754,11 @@ class GitleaksIgnoreFingerprintTests(unittest.TestCase):
         worktree = Path(tempfile.mkdtemp(prefix="gitleaksignore-fp-test-"))
         worktree.rmdir()  # `git worktree add` requires the target not already exist
         add = subprocess.run(
-            ["git", "worktree", "add", "--detach", str(worktree), "HEAD"],
+            ["git", "worktree", "add", "--detach", str(worktree), baseline],
             cwd=str(ROOT), capture_output=True, text=True, check=False,
         )
         if add.returncode != 0:
-            self.skipTest(f"could not create a detached worktree: {add.stderr.strip()}")
+            self.skipTest("could not create the detached fingerprint fixture worktree")
         self._worktree = worktree
 
         target_file = worktree / target_path
@@ -771,11 +773,11 @@ class GitleaksIgnoreFingerprintTests(unittest.TestCase):
             re.search(r'\b(?:pin|pinned|commit|tree|source_pin|source_commit|source)\b', selected_line, re.IGNORECASE)
             and re.search(r'[0-9a-f]{8,}', selected_line),
             f"fingerprinted line {target_line_no} does not look like a real commit-reference "
-            f"narrative line: {selected_line!r}",
+            "narrative line",
         )
         self.assertTrue(
             selected_line.rstrip().rstrip(",").endswith('"'),
-            f"expected a JSON string on the fingerprinted line: {selected_line!r}",
+            f"expected a JSON string on fingerprinted line {target_line_no}",
         )
 
         # Built at runtime from short chunks under a name with no
@@ -795,17 +797,17 @@ class GitleaksIgnoreFingerprintTests(unittest.TestCase):
         original = lines[marker_idx].rstrip()
         trailing_comma = original.endswith(",")
         core = original[:-1] if trailing_comma else original
-        self.assertTrue(core.endswith('"'), f"expected a JSON string on this line: {original!r}")
+        self.assertTrue(core.endswith('"'), f"expected a JSON string on fingerprinted line {target_line_no}")
         modified = core[:-1] + f"; api_key={injected_marker}" + '"' + ("," if trailing_comma else "")
         lines[marker_idx] = modified
         target_file.write_text("\n".join(lines) + "\n")
 
         subprocess.run(["git", "add", "-A"], cwd=str(worktree), check=True, capture_output=True)
         commit = subprocess.run(
-            ["git", "-c", "user.name=gitleaks-test", "-c", "user.email=gitleaks-test@example.invalid", "commit", "--no-verify", "-m", "test: inject synthetic marker for gitleaksignore fingerprint test"],
+            ["git", "-c", "user.name=gitleaks-test", "-c", "user.email=gitleaks-test@example.invalid", "commit", "-m", "test: inject synthetic marker for gitleaksignore fingerprint test"],
             cwd=str(worktree), capture_output=True, text=True, check=False,
         )
-        self.assertEqual(commit.returncode, 0, f"worktree commit failed: {commit.stderr}")
+        self.assertEqual(commit.returncode, 0, "fingerprint fixture commit failed with repository hooks enabled")
         sha = subprocess.run(
             ["git", "rev-parse", "HEAD"], cwd=str(worktree),
             capture_output=True, text=True, check=True,
@@ -815,49 +817,60 @@ class GitleaksIgnoreFingerprintTests(unittest.TestCase):
         # --config and --gitleaks-ignore-path point at THIS repository's real,
         # live files (not whatever the worktree's checked-out HEAD happens to
         # contain), so the test reflects the actual working-tree config even
-        # when run before these files are committed. No --redact: the test
-        # needs to find the injected marker in the report.
+        # when run before these files are committed. Redact the synthetic value;
+        # stable finding metadata proves it was detected at the injected line.
+        # The baseline excludes all existing repository history from this scan.
         try:
-            findings = _scan_findings(["git", str(worktree), "--config", str(CONFIG_PATH),
-                                       "--gitleaks-ignore-path", str(ROOT), f"--log-opts=-1 {sha}"], report_path)
+            findings = _scan_findings(["git", ".", "--config", str(CONFIG_PATH),
+                                       "--gitleaks-ignore-path", str(ROOT),
+                                       f"--log-opts={baseline}..{sha}", "--redact"], report_path, cwd=worktree)
         except _LockBusy as exc:
             self.skipTest(f"gitleaks per-user lock held by another scan: {exc}")
-        matches = [
-            f for f in findings
-            if injected_marker in (f.get("Match") or "") or injected_marker in (f.get("Secret") or "")
-        ]
-        self.assertTrue(
-            matches,
+        located = [(f.get("RuleID"), f.get("File"), f.get("StartLine"), f.get("Commit")) for f in findings]
+        self.assertIn(
+            ("github-pat", target_path, target_line_no, sha), located,
             f"a secret injected into the SAME JSON string as a fingerprint-ignored narrative "
-            f"commit reference, on a NEW commit, must still be detected: {findings}",
+            f"commit reference, on a NEW commit, must still be detected: {located}",
         )
 
 
 class GitleaksBranchAncestryHistoryTests(unittest.TestCase):
-    """Regression coverage for the branch-ancestry acceptance result recorded in
-    .gitleaks.toml's header comment: PR-3-codexfix-major-2.
+    """The real landed commit range must scan clean, independently of other refs.
 
-    A prior review round found that the published acceptance command (default
-    log-opts, i.e. all refs reachable in this shared repository) does not reach
-    zero findings because a concurrently active sibling branch contains an
-    unrelated synthetic-fixture leak that is not an ancestor of this branch.
-    `--log-opts="HEAD"` scopes the scan to commits this branch actually owns
-    (its own ancestry) and is this unit's real acceptance-relevant result; this
-    test asserts that scoped scan stays at zero findings for the real repository
-    history, independent of what other branches in the shared repo contain.
-
-    This is a local integration check against the real git history in this
-    worktree (not a synthetic fixture): it is slower (full-history scan, ~30s)
-    than the synthetic-fixture tests above, and it is skipped, not failed, if
-    gitleaks is absent or its per-user scan lock is held by another scan. A scan
-    that does not complete errors it (_scan_findings) instead of reading as zero
-    findings.
+    CI supplies GITLEAKS_HISTORY_RANGE from scripts/ci_secret_scan_range.py. A
+    local run must supply its verified PR range explicitly; absence skips this
+    integration check unless CI requires it. The 2026-10-09 full-history OOM
+    incident replaced the former HEAD-ancestry check with this bounded range.
+    Git verifies the range before scanning, so an invalid or empty range cannot
+    read as zero findings. A scanner failure still errors (_scan_findings), and
+    the per-user busy lock still skips without starting another scan.
     """
 
     def setUp(self):
+        self.history_range = os.environ.get("GITLEAKS_HISTORY_RANGE", "")
+        if not self.history_range:
+            if os.environ.get("GITLEAKS_TESTS_REQUIRED"):
+                self.fail("CI requires an explicit GITLEAKS_HISTORY_RANGE from the event range step")
+            self.skipTest("GITLEAKS_HISTORY_RANGE is required for the real PR-range integration scan")
+        self.assertRegex(self.history_range, r"^[0-9a-f]{40}\.\.[0-9a-f]{40}$",
+                         "history scans require exact start..end commit SHAs")
+        start, end = self.history_range.split("..")
+        self.assertNotEqual(start, end, "history scans may not use an empty commit range")
         if GITLEAKS is None:
             self.skipTest("gitleaks not found on PATH")
         self.assertTrue(CONFIG_PATH.exists(), ".gitleaks.toml must exist at repo root")
+        head = subprocess.run(["git", "rev-parse", "--verify", "HEAD"], cwd=ROOT,
+                              capture_output=True, text=True, timeout=30)
+        self.assertEqual(head.returncode, 0, "cannot verify the checked-out history-scan endpoint")
+        self.assertEqual(end, head.stdout.strip(), "history-scan endpoint must be the checked-out HEAD")
+        ancestor = subprocess.run(["git", "merge-base", "--is-ancestor", start, end], cwd=ROOT,
+                                  capture_output=True, text=True, timeout=30)
+        self.assertEqual(ancestor.returncode, 0, "history-scan start must be an available ancestor of its end")
+        count = subprocess.run(["git", "rev-list", "--count", self.history_range], cwd=ROOT,
+                               capture_output=True, text=True, timeout=30)
+        self.assertEqual(count.returncode, 0, "cannot enumerate the history-scan commit range")
+        self.assertTrue(count.stdout.strip().isdigit(), "history-scan range count must be a number")
+        self.assertGreater(int(count.stdout.strip()), 0, "history scans may not scan zero commits")
 
     def test_head_ancestry_scoped_scan_has_zero_findings(self):
         report_path = Path(tempfile.mkstemp(suffix=".json")[1])
@@ -868,17 +881,84 @@ class GitleaksBranchAncestryHistoryTests(unittest.TestCase):
             # the failure message names only non-secret fields.
             try:
                 findings = _scan_findings(["git", ".", "--config", str(CONFIG_PATH), "--max-target-megabytes", "2",
-                                           "--log-opts=HEAD", "--redact"], report_path, cwd=ROOT)
+                                           f"--log-opts={self.history_range}", "--redact"], report_path, cwd=ROOT)
             except _LockBusy as exc:
                 self.skipTest(f"gitleaks per-user lock held by another scan: {exc}")
             located = [(f.get("RuleID"), f.get("File"), f.get("StartLine"), f.get("Fingerprint")) for f in findings]
             self.assertEqual(
                 located, [],
-                "this branch's own ancestry (--log-opts=HEAD) must scan clean; a nonempty "
-                f"result here is this unit's own regression, not a sibling branch: {located}",
+                f"the landed commit range must scan clean: {located}",
             )
         finally:
             report_path.unlink(missing_ok=True)
+
+
+class HistoryRangeContractTests(unittest.TestCase):
+    """Invalid inputs fail before a real history scan; these tests invoke no scanner."""
+
+    START = "1" * 40
+    END = "2" * 40
+
+    def run_history_test(self, value, *, required=True, git_reply=None):
+        environment = {"GITLEAKS_TESTS_REQUIRED": "1"} if required else {}
+        if value is not None:
+            environment["GITLEAKS_HISTORY_RANGE"] = value
+
+        def valid_git(argv, **kwargs):
+            output = self.END if argv[1] == "rev-parse" else "1" if argv[1] == "rev-list" else ""
+            return subprocess.CompletedProcess(argv, 0, output, "")
+
+        result = unittest.TestResult()
+        with mock.patch.dict(os.environ, environment, clear=True), \
+                mock.patch(f"{__name__}.GITLEAKS", "range-fixture-scanner"), \
+                mock.patch.object(subprocess, "run", side_effect=git_reply or valid_git) as git, \
+                mock.patch(f"{__name__}._scan_findings", return_value=[]) as scanner:
+            GitleaksBranchAncestryHistoryTests("test_head_ancestry_scoped_scan_has_zero_findings").run(result)
+        return result, git, scanner
+
+    def test_ci_requires_a_range_and_invalid_or_empty_ranges_never_start_a_scan(self):
+        for value in (None, "", "HEAD", "--all", "..HEAD", f"{self.END}..{self.END}"):
+            with self.subTest(value=value):
+                result, git, scanner = self.run_history_test(value)
+                self.assertEqual(len(result.failures), 1, result.errors)
+                self.assertEqual(result.skipped, [])
+                git.assert_not_called()
+                scanner.assert_not_called()
+
+    def test_local_history_check_without_an_explicit_range_skips_before_git_or_scanner(self):
+        result, git, scanner = self.run_history_test(None, required=False)
+        self.assertEqual(len(result.skipped), 1)
+        self.assertEqual(result.failures + result.errors, [])
+        git.assert_not_called()
+        scanner.assert_not_called()
+
+    def test_wrong_head_nonancestor_and_failed_or_empty_git_ranges_never_start_a_scan(self):
+        for broken in ("wrong-head", "missing-head", "nonancestor", "count-error", "zero-count", "bad-count"):
+            with self.subTest(broken=broken):
+                def reply(argv, **kwargs):
+                    code, output = 0, ""
+                    if argv[1] == "rev-parse":
+                        code = 1 if broken == "missing-head" else 0
+                        output = self.START if broken == "wrong-head" else self.END
+                    elif argv[1] == "merge-base":
+                        code = 1 if broken == "nonancestor" else 0
+                    elif argv[1] == "rev-list":
+                        code = 1 if broken == "count-error" else 0
+                        output = "0" if broken == "zero-count" else "invalid" if broken == "bad-count" else "1"
+                    return subprocess.CompletedProcess(argv, code, output, "")
+
+                result, _, scanner = self.run_history_test(f"{self.START}..{self.END}", git_reply=reply)
+                self.assertEqual(len(result.failures), 1, result.errors)
+                scanner.assert_not_called()
+
+    def test_validated_range_is_passed_unchanged_to_the_redacted_scanner(self):
+        value = f"{self.START}..{self.END}"
+        result, git, scanner = self.run_history_test(value)
+        self.assertEqual(result.failures + result.errors + result.skipped, [])
+        self.assertEqual(git.call_count, 3)
+        scanner.assert_called_once()
+        self.assertIn(f"--log-opts={value}", scanner.call_args.args[0])
+        self.assertIn("--redact", scanner.call_args.args[0])
 
 
 class ScannerErrorTests(unittest.TestCase):
@@ -977,20 +1057,26 @@ class ScannerErrorTests(unittest.TestCase):
                    "Match": f"token: {sentinel}", "Line": f'"token": "{sentinel}"',
                    "Fingerprint": "0123abcd:a.json:generic-api-key:3"}
         argvs = []
+        start, end = "1" * 40, "2" * 40
 
         def run(argv, **kwargs):
+            if argv[0] == "git":
+                output = end if argv[1] == "rev-parse" else "1" if argv[1] == "rev-list" else ""
+                return subprocess.CompletedProcess(argv, 0, output, "")
             argvs.append(argv)
             Path(argv[argv.index("--report-path") + 1]).write_text(json.dumps([finding]))
             return subprocess.CompletedProcess(argv, 0, "", "")
 
         stream = io.StringIO()
         with mock.patch.object(subprocess, "run", side_effect=run), \
-                mock.patch(f"{__name__}.GITLEAKS", "gitleaks"):
+                mock.patch(f"{__name__}.GITLEAKS", "gitleaks"), \
+                mock.patch.dict(os.environ, {"GITLEAKS_HISTORY_RANGE": f"{start}..{end}"}):
             unittest.TextTestRunner(stream=stream, verbosity=0).run(
                 GitleaksBranchAncestryHistoryTests("test_head_ancestry_scoped_scan_has_zero_findings"))
         output = stream.getvalue()
         self.assertEqual(len(argvs), 1, argvs)
         self.assertIn("--redact", argvs[0])
+        self.assertIn(f"--log-opts={start}..{end}", argvs[0])
         self.assertEqual(output.strip().splitlines()[-1], "FAILED (failures=1)")
         self.assertIn(finding["Fingerprint"], output)
         self.assertNotIn(sentinel, output)

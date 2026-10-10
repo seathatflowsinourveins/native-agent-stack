@@ -1318,6 +1318,94 @@ class GitleaksConfigTestsRunInCI(unittest.TestCase):
                         "the tests must run after the pinned binary is installed")
 
 
+class CiSecretScanWorkflowRangeTests(unittest.TestCase):
+    """History scanners must select the landed range, never the whole HEAD ancestry."""
+
+    def test_every_git_history_scan_uses_an_explicit_commit_range(self):
+        workflow = (WORKFLOWS / "validate.yml").read_text(encoding="utf-8")
+        found = set()
+        for job_id, job in jobs(workflow).items():
+            # Join shell continuations before parsing so a flag moved onto another line
+            # remains part of its actual scanner command; comments are not invocations.
+            for line in re.sub(r"\\\n\s*", " ", job).splitlines():
+                if line.lstrip().startswith("#"):
+                    continue
+                if not re.search(r"(?:^|/|\s)(?:gitleaks|betterleaks)[\"']?\s+git\s", line):
+                    continue
+                tokens = shlex.split(line, comments=True)
+                for index, token in enumerate(tokens[:-1]):
+                    scanner = token.rsplit("/", 1)[-1]
+                    if scanner not in ("gitleaks", "betterleaks") or tokens[index + 1] != "git":
+                        continue
+                    found.add((job_id, scanner))
+                    with self.subTest(job=job_id, scanner=scanner):
+                        options = tokens[index + 2:]
+                        ranges = [option.split("=", 1)[1] for option in options
+                                  if option.startswith("--log-opts=")]
+                        if "--log-opts" in options:
+                            position = options.index("--log-opts")
+                            ranges.append(options[position + 1] if position + 1 < len(options) else "")
+                        self.assertEqual(len(ranges), 1, "each history scan must supply one --log-opts range")
+                        self.assertRegex(ranges[0], r"^[^.\s]+\.\.[^.\s]+$",
+                                         "history scans need explicit nonempty start..end endpoints, not HEAD")
+                        self.assertNotIn("--all", options, "history scans may not expand to all refs")
+        self.assertEqual(found, {("secret-scan", "gitleaks"),
+                                 ("secret-scan-betterleaks", "betterleaks")},
+                         "both gate and parity git scanners must remain covered")
+
+    @staticmethod
+    def parsed_workflow():
+        from tests.test_workflow_policy import load_workflow
+        return load_workflow((WORKFLOWS / "validate.yml").read_text(encoding="utf-8"))
+
+    def test_verified_range_outputs_reach_both_scanners_and_the_required_history_fixture(self):
+        for job_id in ("secret-scan", "secret-scan-betterleaks"):
+            with self.subTest(job=job_id):
+                steps = self.parsed_workflow()["jobs"][job_id]["steps"]
+                resolvers = [step for step in steps if step.get("id") == "scan_range"]
+                self.assertEqual(len(resolvers), 1, "each job must resolve and verify its event range")
+                resolver = resolvers[0]
+                self.assertNotIn("continue-on-error", resolver, "a failed range resolver must fail the job")
+                self.assertNotIn("if", resolver, "the event range resolver must run before history scans")
+                command = shlex.split(re.sub(r"\\\n\s*", " ", resolver["run"]))
+                self.assertEqual(command, ["python3", "scripts/ci_secret_scan_range.py",
+                                           "--event-name", "$GITHUB_EVENT_NAME",
+                                           "--event-path", "$GITHUB_EVENT_PATH", ">>", "$GITHUB_OUTPUT"],
+                                 "the verified CLI outputs must become the scanner step outputs")
+                checkout = next(step for step in steps if step.get("uses", "").startswith("actions/checkout@"))
+                self.assertEqual(str(checkout["with"]["fetch-depth"]), "0")
+                self.assertLess(steps.index(checkout), steps.index(resolver))
+                history = next(step for step in steps if "Scan git history" in step.get("name", ""))
+                self.assertLess(steps.index(resolver), steps.index(history))
+                self.assertEqual(history["env"]["SCAN_START"], "${{ steps.scan_range.outputs.start }}")
+                self.assertEqual(history["env"]["SCAN_END"], "${{ steps.scan_range.outputs.end }}")
+                self.assertIn('--log-opts="${SCAN_START}..${SCAN_END}"', history["run"])
+                if job_id == "secret-scan":
+                    fixture = next(step for step in steps if "gitleaks allowlist regression tests" in step.get("name", ""))
+                    self.assertLess(steps.index(resolver), steps.index(fixture))
+                    self.assertEqual(fixture["env"]["GITLEAKS_HISTORY_RANGE"],
+                                     "${{ steps.scan_range.outputs.range }}")
+
+    def test_failed_or_missing_range_outputs_disable_every_real_history_scan(self):
+        workflow = self.parsed_workflow()
+        for job_id in ("secret-scan", "secret-scan-betterleaks"):
+            guarded = [step for step in workflow["jobs"][job_id]["steps"]
+                       if "Scan git history" in step.get("name", "")
+                       or "GITLEAKS_HISTORY_RANGE" in step.get("env", {})]
+            self.assertGreater(len(guarded), 0)
+            for step in guarded:
+                expression = step.get("if", "")
+                context = {"cancelled()": False, "steps.install.outcome": "success",
+                           "steps.scan_range.outcome": "success"}
+                with self.subTest(job=job_id, step=step["name"], outcome="success"):
+                    self.assertTrue(evaluate_expression(expression, context))
+                for outcome in ("failure", "skipped", "cancelled", ""):
+                    with self.subTest(job=job_id, step=step["name"], outcome=outcome):
+                        context["steps.scan_range.outcome"] = outcome
+                        self.assertFalse(evaluate_expression(expression, context),
+                                         "a broken or absent range must never enable a scanner")
+
+
 class BetterleaksTrialJobTests(unittest.TestCase):
     """The non-required betterleaks trial beside secret-scan (plan move M3; receipt
     evidence/artifacts/betterleaks-parity-20260927/): it stays out of the required contexts and cannot be
@@ -1521,8 +1609,11 @@ class BetterleaksTrialJobTests(unittest.TestCase):
     def test_later_steps_need_the_verified_install_and_both_scans_redact(self):
         self.assertIn("id: install", step_block(self.job, "Install betterleaks"))
         for name in ("fixture tests with betterleaks", "Scan git history", "Scan working tree"):
+            guard = "${{ !cancelled() && steps.install.outcome == 'success'"
+            if name == "Scan git history":
+                guard += " && steps.scan_range.outcome == 'success'"
             self.assertEqual(block_if(step_block(self.job, name)),
-                             "${{ !cancelled() && steps.install.outcome == 'success' }}", name)
+                             guard + " }}", name)
         scans = self.scans()
         self.assertEqual([re.search(r'" (git|dir) ', scan).group(1) for scan in scans], ["git", "dir"])
         for scan in scans:
