@@ -249,10 +249,11 @@ def build_sdks(spec: dict[str, Any], receipts: Receipts) -> dict[str, Any]:
             absolute = Path(item["receipt_path"])
             if not absolute.is_absolute():
                 raise ValueError(f"SDK receipt_path must be absolute: {identity}")
+            resolved_absolute = absolute.resolve()
             state_root = receipts.roots["state"]
-            if not absolute.resolve().is_relative_to(state_root):
+            if not resolved_absolute.is_relative_to(state_root):
                 raise ValueError(f"SDK receipt escapes state root: {identity}")
-            source = receipts.linked("state", absolute.relative_to(state_root).as_posix(), item.get("receipt_sha256"))
+            source = receipts.linked("state", resolved_absolute.relative_to(state_root).as_posix(), item.get("receipt_sha256"))
             declaration = f"/items/{position}"
             fields = {}
             required_hash = item.get("receipt_sha256")
@@ -266,9 +267,12 @@ def build_sdks(spec: dict[str, Any], receipts: Receipts) -> dict[str, Any]:
                 raw_receipt = payload["raw_receipt"]
                 raw_path = Path(raw_receipt["path"])
                 raw_hash = raw_receipt.get("sha256")
-                if not raw_path.is_absolute() or not raw_path.resolve().is_relative_to(state_root):
+                if not raw_path.is_absolute():
                     raise ValueError(f"raw SDK receipt escapes state root: {identity}")
-                raw_source = receipts.linked("state", raw_path.relative_to(state_root).as_posix(), raw_hash)
+                resolved_raw_path = raw_path.resolve()
+                if not resolved_raw_path.is_relative_to(state_root):
+                    raise ValueError(f"raw SDK receipt escapes state root: {identity}")
+                raw_source = receipts.linked("state", resolved_raw_path.relative_to(state_root).as_posix(), raw_hash)
                 raw_reference = receipts.reference(raw_source, "")
                 if isinstance(raw_hash, str) and re.fullmatch(r"[0-9a-f]{64}", raw_hash) and receipts.get(raw_source)["status"] == "RECORDED":
                     raw_binding = "MATCH"

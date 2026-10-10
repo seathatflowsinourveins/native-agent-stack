@@ -10,7 +10,7 @@
   "native_reader": {
     "root": "repo",
     "path": "tools/north-star/build_readiness.py",
-    "sha256": "59428d63e09bab10e216e86af377891f8546aca6b3f9cc08c59d0803573b57b0"
+    "sha256": "3578e47e4b04d4161a0a62ace433f0918ede02d70a6764c78f18247d480364ef"
   },
   "overrides": {
     "gaps_source": [

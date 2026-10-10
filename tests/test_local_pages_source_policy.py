@@ -35,7 +35,9 @@ class SourcePolicyTests(unittest.TestCase):
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory()
         self.addCleanup(self.temporary.cleanup)
-        self.base = Path(self.temporary.name)
+        # Canonicalize the trusted fixture prefix once (macOS /var aliases).
+        # Source descendants still go through the production no-follow guard.
+        self.base = Path(self.temporary.name).resolve()
         self.root, self.state = self.base / "repo", self.base / "state"
         self.root.mkdir()
         self.state.mkdir()
@@ -100,6 +102,7 @@ class SourcePolicyTests(unittest.TestCase):
     @contextmanager
     def watch_forbidden_opens(self, forbidden):
         calls = []
+        opened_paths = {}
         target = forbidden.absolute()
         original_builtin, original_io, original_os = builtins.open, io.open, os.open
         def path_of(value, options):
@@ -107,7 +110,10 @@ class SourcePolicyTests(unittest.TestCase):
                 return None
             path = Path(os.fsdecode(value))
             if not path.is_absolute() and options.get("dir_fd") is not None:
-                path = Path(os.readlink("/proc/self/fd/" + str(options["dir_fd"]))) / path
+                directory = opened_paths.get(options["dir_fd"])
+                if directory is None:
+                    raise AssertionError("watcher received an untracked directory descriptor")
+                path = directory / path
             return path.absolute()
         def watched(function):
             def call(value, *args, **options):
@@ -115,7 +121,10 @@ class SourcePolicyTests(unittest.TestCase):
                 if candidate == target:
                     calls.append(str(candidate))
                     raise AssertionError("forbidden synthetic input reached a real file open")
-                return function(value, *args, **options)
+                result = function(value, *args, **options)
+                if function is original_os:
+                    opened_paths[result] = candidate
+                return result
             return call
         with patch.object(builtins, "open", watched(original_builtin)), patch.object(io, "open", watched(original_io)), patch.object(os, "open", watched(original_os)):
             yield calls
@@ -179,6 +188,18 @@ class SourcePolicyTests(unittest.TestCase):
         self.assertIs(self.native.Receipts, original_class)
         self.assertIs(self.native.Path, original_path)
         self.assertIs(self.native.build, original_build)
+
+    def test_forbidden_open_watcher_tracks_directory_descriptors_without_proc(self):
+        policy = module(ROOT / "tools/local-pages/source_policy.py", "watcher_policy_fixture")
+        allowed = self.root / "fixtures/profile.json"
+        with patch.object(os, "readlink", side_effect=AssertionError("watcher requires no proc filesystem")):
+            with self.watch_forbidden_opens(self.forbidden_repo) as calls:
+                with policy._open_regular(allowed) as stream:
+                    self.assertEqual(json.load(stream), {})
+                with policy._directory(self.forbidden_repo.parent) as directory:
+                    with self.assertRaisesRegex(AssertionError, "forbidden synthetic input"):
+                        os.open(self.forbidden_repo.name, os.O_RDONLY, dir_fd=directory)
+        self.assertEqual(calls, [str(self.forbidden_repo)])
 
     def test_source_index_override_is_approved_before_it_is_opened(self):
         policy = module(ROOT / "tools/local-pages/source_policy.py", "index_policy_fixture")
@@ -288,6 +309,13 @@ class SourcePolicyTests(unittest.TestCase):
         path.symlink_to(self.forbidden_repo)
         self.assert_refused_before_open(self.forbidden_repo)
 
+    def test_approved_source_ancestor_symlink_is_rejected_before_target_open(self):
+        fixtures = self.root / "fixtures"
+        outside = self.base / "outside-source-directory"
+        fixtures.rename(outside)
+        fixtures.symlink_to(outside, target_is_directory=True)
+        self.assert_refused_before_open(outside / "profile.json")
+
     def test_linked_source_symlink_and_nonregular_file_are_refused(self):
         self.item_path.unlink()
         self.item_path.symlink_to(self.forbidden_state)
@@ -295,6 +323,36 @@ class SourcePolicyTests(unittest.TestCase):
         self.item_path.unlink()
         os.mkfifo(self.item_path)
         self.assert_refused_before_open(self.forbidden_state)
+
+    def test_linked_item_symlink_cannot_alias_another_approved_path(self):
+        target = self.state / "fixtures/second-sdk-item.json"
+        self.write(target, self.item)
+        self.permissions["linked_receipts"]["sdk_item"].append({"root": "state", "path": "fixtures/second-sdk-item.json"})
+        self.write(self.policy_path, self.permissions)
+        self.item_path.unlink()
+        self.item_path.symlink_to(target)
+        self.assert_refused_before_open(target)
+
+    def test_linked_raw_symlink_cannot_alias_another_approved_path(self):
+        target = self.state / "fixtures/second-sdk-raw.json"
+        self.write(target, {"kind": "fixture"})
+        self.permissions["linked_receipts"]["sdk_raw"].append({"root": "state", "path": "fixtures/second-sdk-raw.json"})
+        self.write(self.policy_path, self.permissions)
+        self.raw_path.unlink()
+        self.raw_path.symlink_to(target)
+        self.assert_refused_before_open(target)
+
+    def test_linked_item_traversal_cannot_be_hidden_by_native_canonicalization(self):
+        self.sdk_index["items"][0]["receipt_path"] = str(self.state / "fixtures/../fixtures/sdk-item.json")
+        self.write(self.root / "fixtures/sdk_rows.json", self.sdk_index)
+        self.assert_refused_before_open(self.item_path)
+
+    def test_linked_raw_traversal_cannot_be_hidden_by_native_canonicalization(self):
+        self.item["raw_receipt"]["path"] = str(self.state / "fixtures/../fixtures/sdk-raw.json")
+        self.write(self.item_path, self.item)
+        self.sdk_index["items"][0]["receipt_sha256"] = self.digest(self.item_path)
+        self.write(self.root / "fixtures/sdk_rows.json", self.sdk_index)
+        self.assert_refused_before_open(self.raw_path)
 
     def test_policy_file_is_bounded_regular_and_never_follows_a_symlink(self):
         policy = module(ROOT / "tools/local-pages/source_policy.py", "bounded_policy_fixture")

@@ -48,7 +48,7 @@ class LocalPagesTests(unittest.TestCase):
     def setUp(self) -> None:
         self.temp = tempfile.TemporaryDirectory(prefix="local-pages-test-")
         self.addCleanup(self.temp.cleanup)
-        self.base = Path(self.temp.name)
+        self.base = Path(self.temp.name).resolve()
         self.root = self.base / "source-checkout"
         self.state = self.base / "state"
         self.output = self.base / "served"

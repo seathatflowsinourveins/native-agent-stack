@@ -9,6 +9,7 @@ from pathlib import Path
 import subprocess
 import sys
 import tempfile
+from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
@@ -17,6 +18,10 @@ ROOT = Path(__file__).resolve().parents[1]
 SPEC = importlib.util.spec_from_file_location("local_pages_fleet_data", ROOT / "tools/local-pages/fleet_data.py")
 fleet_data = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(fleet_data)
+SEALED_MEMFD_AVAILABLE = sys.platform == "linux" and all(
+    hasattr(os, name) for name in ("memfd_create", "MFD_CLOEXEC", "MFD_ALLOW_SEALING")
+)
+SEALED_MEMFD_REASON = "requires native Linux memfd snapshots and kernel file seals"
 
 
 class NativeRunner:
@@ -42,7 +47,9 @@ class FleetDataTests(unittest.TestCase):
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory()
         self.addCleanup(self.temporary.cleanup)
-        base = Path(self.temporary.name)
+        # Only the trusted fixture prefix is canonicalized; descendants remain
+        # subject to the real no-symlink source and cache checks.
+        base = Path(self.temporary.name).resolve()
         self.state, self.cache, self.root = base / "state", base / "cache", base / "repo"
         self.now = 1791497400.0
         self.direct = {
@@ -57,7 +64,7 @@ class FleetDataTests(unittest.TestCase):
         self.snapshot = {**self.direct, "at": "2026-10-08T22:00:00Z", "claude_subagents_running": {"coop": ["coop-read-a", "coop-read-b"], "cc": ["old-review"], "api_actions": None}}
         producer = self.state / "coordination/ns2604-coop/tools/fleet_block.py"
         producer.parent.mkdir(parents=True)
-        producer.write_text("# isolated fixture producer; transport is mocked\n", encoding="utf-8")
+        producer.write_text("# isolated fixture producer\n", encoding="utf-8")
         self.write_json("coordination/ns2604-coop/watchers/fleet-now.json", self.snapshot)
         self.write_json("coordination/command-center/pages/cc-now.json", {"schema": "cc-now/1", "updated_utc": "2026-10-08T22:02:00Z", "cc_agents": {"running": [{"name": "review-a", "type": "Explore", "task": "PRIVATE-TASK"}]}})
         self.write_json("coordination/command-center/lane-tiers.json", {"schema": "lane-tiers/1", "updated_utc": "2026-10-08T22:03:00Z", "default": "default", "fast": [], "parking": {"idle_minutes_default": 45, "idle_minutes_when_memory_tight": 15, "keep_alive": ["g5-stars-gap"]}, "codex_version": {"default": "0.162.0", "hold": {"grand-catalog": "0.161.0"}, "hold_until": {"grand-catalog": "gate opens"}}})
@@ -70,6 +77,18 @@ class FleetDataTests(unittest.TestCase):
             replacement = patch.object(fleet_data, name, side_effect=transport)
             replacement.start()
             self.addCleanup(replacement.stop)
+        # Retain the real sealed-descriptor path on supported Linux hosts.
+        # Other hosts can exercise collection/parsing with a mocked transport.
+        self.producer_patch = patch.object(fleet_data, "_execute_producer", side_effect=self.producer_transport)
+        if not SEALED_MEMFD_AVAILABLE:
+            self.producer_patch.start()
+            self.addCleanup(self.producer_patch.stop)
+
+    @staticmethod
+    def producer_transport(path, raw, receipt, run):
+        return run([sys.executable, str(path), "--json", "--no-gh"],
+                   capture_output=True, text=True, timeout=fleet_data.PRODUCER_TIMEOUT_SECONDS,
+                   start_new_session=True)
 
     def write_json(self, relative, value):
         path = self.state / relative
@@ -395,6 +414,7 @@ class FleetDataTests(unittest.TestCase):
         self.assertIsNone(view["claude_subagents_running"]["cc"]["names"])
         self.assertEqual(view["availability"]["cc_agents"]["status"], "not reported")
 
+    @unittest.skipUnless(SEALED_MEMFD_AVAILABLE, SEALED_MEMFD_REASON)
     def test_producer_execution_receipt_matches_sealed_bytes_and_public_arguments(self):
         view = self.collect()
         producer = self.state / "coordination/ns2604-coop/tools/fleet_block.py"
@@ -406,6 +426,124 @@ class FleetDataTests(unittest.TestCase):
         self.assertEqual(command[1:3], ["-I", "-c"])
         self.assertEqual(command[-2:], ["--json", "--no-gh"])
         self.assertNotEqual(command[1], str(producer))
+
+    def test_missing_memfd_api_keeps_dated_snapshot_and_actions_available(self):
+        self.producer_patch.stop()
+        platform_os = SimpleNamespace(**vars(os))
+        if hasattr(platform_os, "memfd_create"):
+            del platform_os.memfd_create
+        with patch.object(fleet_data, "os", platform_os):
+            view = self.collect()
+        self.assertEqual(view["fleet_source"], "snapshot fallback")
+        self.assertEqual(view["at"], self.snapshot["at"])
+        self.assertEqual(view["actions"]["read_utc"], self.direct["at"])
+        self.assertEqual(sum(command[0] == "gh" for command in self.runner.commands), 1)
+        self.assertFalse(any(command[0] == sys.executable for command in self.runner.commands))
+        producer = next(row for row in view["source_inputs"] if row["type"] == "native Fleet producer")
+        self.assertEqual(producer["execution"]["status"], "unavailable")
+        self.assertEqual(producer["execution"]["reason"], "native Linux sealed memfd snapshots unavailable")
+        self.assertEqual(producer["execution"]["sha256"], producer["sha256"])
+
+    def test_missing_memfd_flag_refuses_execution_before_transport(self):
+        self.producer_patch.stop()
+        platform_os = SimpleNamespace(**vars(os))
+        if hasattr(platform_os, "MFD_ALLOW_SEALING"):
+            del platform_os.MFD_ALLOW_SEALING
+        with patch.object(fleet_data, "os", platform_os):
+            view = self.collect()
+        self.assertEqual(view["fleet_source"], "snapshot fallback")
+        self.assertFalse(any(command[0] == sys.executable for command in self.runner.commands))
+        producer = next(row for row in view["source_inputs"] if row["type"] == "native Fleet producer")
+        self.assertEqual(producer["execution"]["reason"], "native Linux sealed memfd snapshots unavailable")
+
+    def test_unsupported_native_platform_without_snapshot_stays_unknown(self):
+        self.producer_patch.stop()
+        (self.state / "coordination/ns2604-coop/watchers/fleet-now.json").unlink()
+        platform_sys = SimpleNamespace(**vars(sys))
+        platform_sys.platform = "darwin"
+        with patch.object(fleet_data, "sys", platform_sys):
+            view = self.collect()
+        self.assertEqual(view["fleet_source"], "not reported")
+        self.assertIsNone(view["at"])
+        self.assertIsNone(view["lanes_live"])
+        self.assertIsNotNone(view["actions"]["read_utc"])
+        self.assertFalse(any(command[0] == sys.executable for command in self.runner.commands))
+
+    @unittest.skipUnless(SEALED_MEMFD_AVAILABLE, SEALED_MEMFD_REASON)
+    def test_producer_launch_failure_keeps_snapshot_with_transport_reason(self):
+        self.producer_patch.stop()
+        original_runner = self.runner
+
+        def fail_launch(command, **kwargs):
+            if command[0] == sys.executable:
+                raise OSError("synthetic private launch detail")
+            return original_runner(command, **kwargs)
+
+        self.runner = fail_launch
+        view = self.collect()
+        self.assertEqual(view["fleet_source"], "snapshot fallback")
+        self.assertEqual(view["at"], self.snapshot["at"])
+        self.assertEqual(view["actions"]["read_utc"], self.direct["at"])
+        producer = next(row for row in view["source_inputs"] if row["type"] == "native Fleet producer")
+        self.assertEqual(producer["execution"]["status"], "unavailable")
+        self.assertEqual(producer["execution"]["reason"], "producer transport unavailable")
+        self.assertNotIn("synthetic private launch detail", json.dumps(view))
+
+    @unittest.skipUnless(SEALED_MEMFD_AVAILABLE, SEALED_MEMFD_REASON)
+    def test_snapshot_seal_failure_refuses_transport_and_closes_descriptor(self):
+        self.producer_patch.stop()
+        created = []
+        original_create = os.memfd_create
+        def create_snapshot(*args):
+            descriptor = original_create(*args)
+            created.append(descriptor)
+            return descriptor
+        receipt = {}
+        with patch.object(fleet_data.os, "memfd_create", side_effect=create_snapshot), patch.object(fleet_data.fcntl, "fcntl", side_effect=OSError("synthetic kernel seal rejection")):
+            with self.assertRaises(OSError):
+                fleet_data._execute_producer(self.state / "fleet_block.py", b"# verified fixture\n", receipt, self.runner)
+        self.assertEqual(len(created), 1)
+        with self.assertRaises(OSError):
+            os.fstat(created[0])
+        self.assertEqual(self.runner.commands, [])
+        self.assertEqual(receipt["execution"]["status"], "unavailable")
+        self.assertEqual(receipt["execution"]["reason"], "sealed producer snapshot unavailable")
+
+    def test_cache_temporary_collision_does_not_reopen_a_host_path(self):
+        self.cache.mkdir()
+        outside = self.state.parent / "outside-collision-fixture"
+        outside.write_text("untouched outside fixture", encoding="utf-8")
+        colliding = self.cache / ".fleet-actions-collision.tmp"
+        colliding.symlink_to(outside)
+        opened = []
+        original_open = os.open
+        def record_open(path, flags, *args, **kwargs):
+            opened.append((path, flags, kwargs))
+            return original_open(path, flags, *args, **kwargs)
+        with patch.object(fleet_data.secrets, "token_hex", side_effect=["collision", "fresh"]), patch.object(fleet_data.os, "open", side_effect=record_open):
+            fleet_data._write_cache(self.cache / "fleet-actions.json", {"safe": True})
+        created = [call for call in opened if call[1] & os.O_EXCL]
+        self.assertEqual([call[0] for call in created], [".fleet-actions-collision.tmp", ".fleet-actions-fresh.tmp"])
+        self.assertTrue(all(call[2].get("dir_fd") is not None and call[2].get("mode") == 0o600 for call in created))
+        if hasattr(os, "O_CLOEXEC"):
+            self.assertTrue(all(call[1] & os.O_CLOEXEC for call in created))
+        self.assertEqual(outside.read_text(), "untouched outside fixture")
+        self.assertTrue(colliding.is_symlink())
+        destination = self.cache / "fleet-actions.json"
+        self.assertEqual(json.loads(destination.read_text()), {"safe": True})
+        self.assertEqual(destination.stat().st_mode & 0o777, 0o600)
+        self.assertFalse((self.cache / ".fleet-actions-fresh.tmp").exists())
+
+    def test_cache_temporary_collision_limit_is_finite(self):
+        self.cache.mkdir()
+        collision = self.cache / ".fleet-actions-collision.tmp"
+        collision.write_text("existing private fixture", encoding="utf-8")
+        with patch.object(fleet_data.secrets, "token_hex", return_value="collision") as names:
+            with self.assertRaisesRegex(FileExistsError, "attempts exhausted"):
+                fleet_data._write_cache(self.cache / "fleet-actions.json", {"safe": True})
+        self.assertEqual(names.call_count, 100)
+        self.assertEqual(collision.read_text(), "existing private fixture")
+        self.assertFalse((self.cache / "fleet-actions.json").exists())
 
 
 if __name__ == "__main__":

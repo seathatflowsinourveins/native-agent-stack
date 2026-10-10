@@ -134,6 +134,8 @@ class GatewayCompositionSources(unittest.TestCase):
                         "systemctl --user show --timestamp=us+utc -p ActiveEnterTimestamp omniroute.service"):
             self.assertLess(command.index(binding), client)
 
+    @unittest.skipIf(sys.platform == "darwin",
+                     "WSL systemd timestamp integration requires GNU date parsing and GNU stat nanosecond formats")
     def test_active_process_must_have_started_after_both_unit_files(self):
         """Real date/stat comparison, synthetic systemd timestamps; no manager call."""
         with tempfile.TemporaryDirectory() as directory:
@@ -176,6 +178,8 @@ class GatewayCompositionSources(unittest.TestCase):
                             self.assertNotEqual(result.returncode, 0, result.stderr)
 
 
+@unittest.skipIf(sys.platform == "darwin",
+                 "WSL gateway composition executes GNU sha256sum --check --status, stat -c and readlink path guards")
 class GatewayCompositionFilesystemControls(unittest.TestCase):
     """Execute the selected glue with isolated files and a declared artifact stand-in."""
 

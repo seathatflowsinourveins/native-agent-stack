@@ -258,6 +258,8 @@ class FrozenReportIssueTests(unittest.TestCase):
     """Native gh glue with a recording double; no GitHub issue or credential is created here."""
 
     def run_issue(self, numbers=(), missing_report=False, listing_error=0, interval_seconds=None):
+        if sys.platform == "darwin":
+            self.skipTest("Ubuntu issue-writer integration parses timestamps with GNU date --date; BSD date lacks it")
         with tempfile.TemporaryDirectory() as directory:
             scratch = Path(directory)
             environment = fixture_environment(scratch)

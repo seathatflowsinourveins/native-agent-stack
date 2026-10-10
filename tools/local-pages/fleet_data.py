@@ -17,11 +17,11 @@ import math
 import os
 from pathlib import Path
 import re
+import secrets
 import signal
 import stat
 import subprocess
 import sys
-import tempfile
 import time
 from typing import Any, Callable
 from urllib.parse import urlencode
@@ -242,8 +242,18 @@ def _execute_producer(path: Path, raw: bytes, receipt: dict, run: Callable[..., 
     execution = {"kind": "sealed memfd producer snapshot", "sha256": hashlib.sha256(raw).hexdigest(),
                  "bytes": len(raw), "status": "unavailable", "attempt_utc": _utc()}
     receipt["execution"] = execution
-    descriptor = os.memfd_create("native-fleet-producer", os.MFD_CLOEXEC | os.MFD_ALLOW_SEALING)
+    # CPython v3.13.16 Modules/posixmodule.c gates this API and its flags on
+    # HAVE_MEMFD_CREATE. Keep unsupported systems on their dated snapshot;
+    # no mutable pathname can supply the immutable producer guarantee.
+    if sys.platform != "linux" or not callable(getattr(os, "memfd_create", None)) or not all(
+        hasattr(os, name) for name in ("MFD_CLOEXEC", "MFD_ALLOW_SEALING")
+    ):
+        execution["reason"] = "native Linux sealed memfd snapshots unavailable"
+        raise OSError(execution["reason"])
+    descriptor = None
+    snapshot_ready = False
     try:
+        descriptor = os.memfd_create("native-fleet-producer", os.MFD_CLOEXEC | os.MFD_ALLOW_SEALING)
         with os.fdopen(descriptor, "wb", closefd=False) as snapshot:
             snapshot.write(raw)
             snapshot.flush()
@@ -251,6 +261,7 @@ def _execute_producer(path: Path, raw: bytes, receipt: dict, run: Callable[..., 
         if fcntl.fcntl(descriptor, _GET_SEALS) & _REQUIRED_SEALS != _REQUIRED_SEALS:
             raise ValueError("producer snapshot immutability was not established")
         os.lseek(descriptor, 0, os.SEEK_SET)
+        snapshot_ready = True
         # -I keeps CWD/PYTHONPATH/user-site code out of the bootstrap's imports.
         # The sibling path is added explicitly only after snapshot verification.
         runner = _run_producer if run is subprocess.run else run
@@ -263,8 +274,13 @@ def _execute_producer(path: Path, raw: bytes, receipt: dict, run: Callable[..., 
     except subprocess.TimeoutExpired:
         execution.update(status="timed out", timeout_seconds=PRODUCER_TIMEOUT_SECONDS)
         raise
+    except (OSError, ValueError):
+        execution["reason"] = ("producer transport unavailable" if snapshot_ready
+                               else "sealed producer snapshot unavailable")
+        raise
     finally:
-        os.close(descriptor)
+        if descriptor is not None:
+            os.close(descriptor)
 
 
 def _destination(directory: int, name: str) -> None:
@@ -277,11 +293,25 @@ def _destination(directory: int, name: str) -> None:
 
 
 def _write_cache(path: Path, value: dict) -> None:
-    """Use native secure temporary creation and one checked atomic replacement."""
+    """Create an exclusive temporary in the checked directory and replace once.
+
+    CPython v3.13.16 Lib/tempfile.py _mkstemp_inner supplies the random-name,
+    O_EXCL and 0o600 creation reference. tempfile.mkstemp has no dir_fd API;
+    public os.open keeps this adaptation bound to the checked descriptor on
+    POSIX systems without requiring Linux's /proc filesystem.
+    """
     with _directory(path.parent, create=True) as directory:
         _destination(directory, path.name)
-        descriptor, temporary = tempfile.mkstemp(prefix=".fleet-actions-", suffix=".tmp", dir=f"/proc/self/fd/{directory}")
-        name = Path(temporary).name
+        flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW | getattr(os, "O_CLOEXEC", 0)
+        for _ in range(100):
+            name = ".fleet-actions-" + secrets.token_hex(16) + ".tmp"
+            try:
+                descriptor = os.open(name, flags, mode=0o600, dir_fd=directory)
+            except FileExistsError:
+                continue
+            break
+        else:
+            raise FileExistsError("secure cache temporary name attempts exhausted")
         try:
             with os.fdopen(descriptor, "w", encoding="utf-8") as stream:
                 json.dump(value, stream, allow_nan=False)

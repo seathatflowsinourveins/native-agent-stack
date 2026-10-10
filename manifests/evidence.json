@@ -5016,8 +5016,8 @@
     },
     {
       "path": ".github/workflows/adoption-bootstrap.yml",
-      "sha256": "96f4e9e7843827fa3e8689839fdb37d0adb98e37198c187f68f286a0880a301d",
-      "bytes": 56981
+      "sha256": "daeb9dcbbcc2ba9d185b403c0defdf691d4dac80ab2b49f3ca9f38bce8d8701d",
+      "bytes": 57155
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
@@ -5026,13 +5026,13 @@
     },
     {
       "path": ".github/workflows/claude-pr-review.yml",
-      "sha256": "e13d993405c7774d931ef5aa0e053963815d40c905299f1e24e1b39358ca4ead",
-      "bytes": 37867
+      "sha256": "b617f6cc04d1789a6245d58aa3942773e3dcbb51e575aafad13b823095982022",
+      "bytes": 37887
     },
     {
       "path": ".github/workflows/claude-pr-toolkit-review.yml",
-      "sha256": "6f4cd72c95d6970b773bfd1d1f0a3c2c61ee43cb4ad23c840820e6d4566c64ba",
-      "bytes": 33316
+      "sha256": "03731abcdcc8705f000432dae23f357c933b124d34119db6f427f60095e75375",
+      "bytes": 33336
     },
     {
       "path": ".github/workflows/dependency-review.yml",
@@ -18242,7 +18242,7 @@
     },
     {
       "path": "docs/decisions/2026-10-06-native-lane-invocation-observability.md",
-      "sha256": "cfdd6259ea84da1f9aaf5735baea509ac32c83224a126461aa62cf39f6f6ccb6",
+      "sha256": "1adf78d56686b1fbe0d183d83e4770792167b4e919089806af287dd63523315f",
       "bytes": 42616
     },
     {
@@ -18419,6 +18419,11 @@
       "path": "docs/decisions/2026-10-09-skills-blinded-trials.md",
       "sha256": "65d2fb708f07afb6c46b8bfeb57950374f52d529cb8b785083cc50efdb02b4d0",
       "bytes": 7510
+    },
+    {
+      "path": "docs/decisions/2026-10-09-validate-macos-portability.md",
+      "sha256": "9bb4b115138f4abf6d74c0893e8ea1da50fef295598cfcf8a2ffe85e62089042",
+      "bytes": 11363
     },
     {
       "path": "docs/direct-results.md",
@@ -59772,8 +59777,8 @@
     },
     {
       "path": "tests/test_catalog_freshness_propose.py",
-      "sha256": "e6779fe4339908a1173ff4351da75e6b816fd4b6cd94ec34c3a0acbba259b65a",
-      "bytes": 62213
+      "sha256": "b941755e00c05e08751e64c55eac8ab7f5827a71b4bb8903e6ce229be9c29611",
+      "bytes": 63830
     },
     {
       "path": "tests/test_catalog_freshness_runtime.py",
@@ -59817,13 +59822,13 @@
     },
     {
       "path": "tests/test_claude_pr_review_workflow.py",
-      "sha256": "cfaa2b171fcffdd1c31ce65269482efe15a5d6b9a515330f81aa314bd8274759",
-      "bytes": 59337
+      "sha256": "3a188cd59922be9f30a6ff25035f004335df5a1b7d37a09f62ba578815b8b049",
+      "bytes": 60463
     },
     {
       "path": "tests/test_claude_pr_toolkit_review_workflow.py",
-      "sha256": "f69c19cbc1eb3d3e306fb35c5e308b85cf905c218fb210b66a5f5b62124c3c61",
-      "bytes": 75282
+      "sha256": "e77e385bbc17985a85106b525685068fcfc5f302741d55f35dc07a24f1aaae15",
+      "bytes": 76217
     },
     {
       "path": "tests/test_claude_recovery.py",
@@ -59977,8 +59982,8 @@
     },
     {
       "path": "tests/test_frozen_evidence_reporting.py",
-      "sha256": "d1a1b72bc3e7ac350da86508b545624a230c38b0520097cf1bda24c4abbd1fbf",
-      "bytes": 22800
+      "sha256": "159a8fe158ad5c32b681766f86a2bc73ab95fe9bcf68de22c670c047700c3e7b",
+      "bytes": 22956
     },
     {
       "path": "tests/test_frozen_macos_variant_no_use.py",
@@ -60297,13 +60302,13 @@
     },
     {
       "path": "tests/test_new_wsl_client_config.py",
-      "sha256": "e7a1a2761c138bb91be87336e65327452e0f208880dfd576ffd3dd47f5c89bc0",
-      "bytes": 345309
+      "sha256": "c676e551f2cdb9c4bef41f7bd306b2cd208e4c7da62b11eac533c76d8d7d08f6",
+      "bytes": 345461
     },
     {
       "path": "tests/test_new_wsl_definitive_defaults.py",
-      "sha256": "9d34ac271a74820d3d547157e8a97821d1894f79897f40bf2573ce261b2c194a",
-      "bytes": 308960
+      "sha256": "f46d7e33f64643356024e7b622809a6e88b014340f3e70b6ce6d4d5f9cedc376",
+      "bytes": 310516
     },
     {
       "path": "tests/test_new_wsl_handbook.py",
@@ -60452,8 +60457,8 @@
     },
     {
       "path": "tests/test_r3_verify.py",
-      "sha256": "16d60855563eea73ada829dc96f91cd7cc7dcc3d3754b8f192a2c17304f4b23b",
-      "bytes": 23418
+      "sha256": "3c9daa4270f4309cf73ac412808b3bbebe7489a9685eb03897f64d7db5810bed",
+      "bytes": 23428
     },
     {
       "path": "tests/test_receipt_staleness.py",
@@ -60722,8 +60727,8 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "02f1e54a06aabfe5976d454e99486984925608f0b598d7358be6166b3ee2e10a",
-      "bytes": 165701
+      "sha256": "7f16b2ad9aa5ef3886a24bf2a576f3304c1b9fda354520d89824b8dd7178ec18",
+      "bytes": 166541
     },
     {
       "path": "tests/test_workflow_policy.py",

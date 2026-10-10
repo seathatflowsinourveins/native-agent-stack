@@ -35,6 +35,7 @@ import subprocess
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 from scripts import freshness_propose as fp
 from scripts.validate import validate
@@ -704,6 +705,33 @@ class IsGitTrackedTests(unittest.TestCase):
         self.assertTrue(fp.is_git_tracked(self.root, "docs/index.html"))
 
 
+def _scratch_source_ignores(directory, names):
+    ignored = shutil.ignore_patterns(".git", "__pycache__", "*.pyc", ".pytest_cache")(directory, names)
+    # The gating workflow tees into the checkout root while tests run. Its runner diagnostics are not source.
+    # Keep nested, hash-registered evidence intact; only top-level full-suite logs belong to the active run.
+    if Path(directory).resolve() == ROOT.resolve():
+        ignored.update(name for name in names if re.fullmatch(r"full-suite(?:-[^.]+)?\.log", name))
+    return ignored
+
+
+class ScratchSourceCopyTests(unittest.TestCase):
+    def test_ci_log_is_excluded_from_checkout_root_but_evidence_logs_are_retained(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source, target = root / "source", root / "copy"
+            (source / "evidence").mkdir(parents=True)
+            (source / "full-suite-macos.log").write_text("synthetic runner diagnostic\n")
+            (source / "full-suite-linux.log").write_text("synthetic runner diagnostic\n")
+            (source / "evidence/full-suite-macos.log").write_text("retained evidence\n")
+            (source / "source.py").write_text("pass\n")
+            with mock.patch.dict(globals(), {"ROOT": source}):
+                guarded_copytree(source, target, ignore=_scratch_source_ignores)
+            self.assertFalse((target / "full-suite-macos.log").exists())
+            self.assertFalse((target / "full-suite-linux.log").exists())
+            self.assertEqual((target / "evidence/full-suite-macos.log").read_text(), "retained evidence\n")
+            self.assertEqual((target / "source.py").read_text(), "pass\n")
+
+
 def _init_scratch_git(path: Path) -> None:
     git_env = ["-c", "user.email=scratch@example.invalid", "-c", "user.name=scratch"]
     subprocess.run(["git", "init", "-q"], cwd=path, check=True)
@@ -765,7 +793,7 @@ class RebuildExplorerSubprocessTests(unittest.TestCase):
         cls.scratch = Path(tempfile.mkdtemp(prefix="freshness-default-scratch-"))
         guarded_copytree(
             ROOT, cls.scratch, dirs_exist_ok=True,
-            ignore=shutil.ignore_patterns(".git", "__pycache__", "*.pyc", ".pytest_cache"),
+            ignore=_scratch_source_ignores,
         )
         _init_scratch_git(cls.scratch)
         assert not fp.is_git_tracked(cls.scratch, fp.EXPLORER_PATH), \
@@ -809,7 +837,7 @@ class TrackedExplorerSubprocessTests(unittest.TestCase):
         cls.scratch = Path(tempfile.mkdtemp(prefix="freshness-tracked-scratch-"))
         guarded_copytree(
             ROOT, cls.scratch, dirs_exist_ok=True,
-            ignore=shutil.ignore_patterns(".git", "__pycache__", "*.pyc", ".pytest_cache"),
+            ignore=_scratch_source_ignores,
         )
         built = subprocess.run(
             ["python3", "scripts/build_ecosystem.py", "--write"],

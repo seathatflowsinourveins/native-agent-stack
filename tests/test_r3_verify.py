@@ -34,7 +34,7 @@ class R3VerifierTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory(prefix="r3-verify-")
         self.addCleanup(self.temp.cleanup)
-        self.root = Path(self.temp.name) / "packet"
+        self.root = Path(self.temp.name).resolve() / "packet"
         self.root.mkdir()
         self.members = [line[66:] for line in (PACKET / "SHA256SUMS").read_text().splitlines()]
         for name in self.members:

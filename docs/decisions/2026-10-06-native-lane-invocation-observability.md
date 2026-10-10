@@ -452,7 +452,7 @@ new health-check comment. The canonical pin remains in the stack manifest;
 the health route is unchanged and no new repin location is introduced.
 
 Finding F8 preserves the landed isolated-render contract at
-`tests/test_new_wsl_client_config.py:639-654`. The Grafana renderer and its
+`tests/test_new_wsl_client_config.py:641-656`. The Grafana renderer and its
 render-only checker can validate a private candidate without inspecting a
 live user-unit installation. `grafana-check --installed-units` explicitly adds
 the existing byte comparison for installation acceptance; all three acceptance

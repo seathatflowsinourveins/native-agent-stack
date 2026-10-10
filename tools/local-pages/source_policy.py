@@ -3,6 +3,8 @@
 Adapter seam: repository tools/north-star/build_readiness.py Receipts.get/linked
 at 0d86b53d1b8647cbf61085124403defe5b0fbc25, SHA-256 59428d63e09bab10e216e86af377891f8546aca6b3f9cc08c59d0803573b57b0.
 The unchanged reader at 2ecce6ec2221704db642ddec8f70f7152ed2afb6 has the same hash.
+The reviewed root-alias compatibility update is pinned in source_policy.json;
+its original SDK declarations remain independently checked before file opens.
 Original native functions perform parsing, binding and rendering. This module
 adds permission checks and native bounded no-symlink file handles only.
 Python3.13 references: os.open(dir_fd, O_NOFOLLOW), os.fstat, os.fdopen and
@@ -389,13 +391,25 @@ def guard_native(native, root, state_root, spec_path, *, policy_path=POLICY_PATH
 
         def linked(self, source_root, path, expected=None):
             caller = inspect.currentframe().f_back
+            declared_path = None
             if caller.f_code is native.build_layers.__code__ and caller.f_lineno == 224:
                 role = "linked:supporting"
-            elif caller.f_code is native.build_sdks.__code__ and caller.f_lineno in {255, 271}:
-                role = "linked:sdk_item" if caller.f_lineno == 255 else "linked:sdk_raw"
+            elif caller.f_code is native.build_sdks.__code__ and caller.f_lineno in {256, 275}:
+                role = "linked:sdk_item" if caller.f_lineno == 256 else "linked:sdk_raw"
+                # The pinned native reader canonicalizes SDK paths for root
+                # aliases. Bind its original lexical declaration as well, so
+                # that cannot hide a descendant symlink or traversal selector.
+                declared_path = Path(caller.f_locals["absolute" if role == "linked:sdk_item" else "raw_path"]).absolute()
             else:
                 raise SourcePolicyError("native linked receipt has an unapproved call role")
             policy.validate(role, source_root, path)
+            if declared_path is not None:
+                try:
+                    declared_relative = declared_path.relative_to(roots[source_root]).as_posix()
+                except ValueError as error:
+                    raise SourcePolicyError("native linked declaration escapes its approved root") from error
+                policy.validate(role, source_root, declared_relative)
+                _check_target(declared_path, allow_missing=True)
             name = f"{source_root}:{path}" + (f"@{expected}" if expected else "")
             self.link_roles[name] = role
             return super().linked(source_root, path, expected)
