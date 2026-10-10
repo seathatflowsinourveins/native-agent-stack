@@ -111,33 +111,13 @@ EXEMPTIONS = {
     # bootstrap-macos no longer runs on pull_request (macOS CI advisory, docs/decisions/2026-10-05-macos-ci-advisory.md),
     # so its former exemption is gone; test_each_exemption_is_still_needed keeps this table honest.
     "pull-request-cache-mode": {},
-    # 2026-10-08 (docs/decisions/2026-10-04-ci-least-privilege.md, "Federation exemption (2026-10-08)").
-    "id-token-write": {
-        # 2026-10-08 (docs/decisions/2026-10-08-claude-actions-pr-review.md): a second job on the same federation rule.
-        "claude-pr-review.yml:review": "Anthropic workload identity federation, not provenance. Dispatch and the "
-                                       "15-minute schedule on main (never a pull_request run), owner-triggered; "
-                                       "no write scope, read-only model tools",
-        "harness-audit.yml:audit": "Anthropic workload identity federation, not provenance: the action exchanges the "
-                                   "job's GitHub OIDC token for a short-lived Claude API token. The federation rule "
-                                   "accepts workflows on this repository's main and never pull requests; which "
-                                   "workflows may request a token is the reviewed WRITE_GRANTS inventory. Schedule "
-                                   "and dispatch only, on main",
-        # 2026-10-09 (docs/decisions/2026-10-09-claude-actions-pr-toolkit-review.md): another job on that rule.
-        "claude-pr-toolkit-review.yml:review": "Anthropic workload identity federation, not provenance. Manual "
-                                               "dispatch on main by the owner only; no pull_request trigger, no "
-                                               "write scope, read-only model tools and the Agent tool",
-    },
+    # The federation exemption of 2026-10-08 is withdrawn: the owner's ruling of 2026-10-10 moved CI Claude review to
+    # an API key (docs/decisions/2026-10-08-claude-actions-pr-review.md), so no job holds id-token for it.
+    "id-token-write": {},
 }
 # Every write grant in the repository, by job. A new one is a reviewed change to this inventory.
 WRITE_GRANTS = {
     "catalog-freshness.yml:propose": ["contents: write", "pull-requests: write"],
-    # Federation needs id-token (EXEMPTIONS, id-token-write); the review goes to the job summary, not to the PR.
-    "claude-pr-review.yml:review": ["id-token: write"],
-    # Federation needs id-token (EXEMPTIONS, id-token-write); the reports go to the job summary, not to the PR.
-    "claude-pr-toolkit-review.yml:review": ["id-token: write"],
-    # Federation needs id-token (EXEMPTIONS, id-token-write). The report goes to the job summary from a model-free
-    # step, so the job holds no other write scope (docs/decisions/2026-10-08-claude-actions-harness-audit-bounds.md).
-    "harness-audit.yml:audit": ["id-token: write"],
     "publish-catalog.yml:publish": ["id-token: write", "attestations: write"],
     "publish-catalog.yml:release": ["contents: write"],
     "saturation-tracking.yml:issue": ["issues: write"],

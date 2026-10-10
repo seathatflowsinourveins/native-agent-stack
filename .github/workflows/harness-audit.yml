@@ -1,19 +1,14 @@
 name: harness-audit
 
 # Weekly audit of the always-loaded harness context with the owner's chosen reference, the claude-code-ultimate-guide
-# audit prompt v5.0 (pinned commit and sha256 below). Authenticates by Anthropic workload identity federation: GitHub
-# issues a short-lived OIDC token per run and no Anthropic key is stored in this repository. Main presents the immutable
-# subject `repo:seathatflowsinourveins@234074349/native-agent-stack@1376766892:ref:refs/heads/main`.
-# Acceptance still depends on the Console rule matching that subject; the denied historical run is not acceptance.
-# The main-only design excludes pull requests; which workflows may request an OIDC token is governed by
-# the reviewed write-grant inventory (id-token: write) that tests.test_workflow_policy enforces. id-token: write here is
-# a reviewed exemption from the tripwire's id-token-write rule (docs/decisions/2026-10-04-ci-least-privilege.md,
-# "Federation exemption (2026-10-08)").
+# audit prompt v5.0 (pinned commit and sha256 below). Authenticates with an Anthropic API key, ANTHROPIC_API_KEY of the
+# main-only claude-review environment (the owner's ruling of 2026-10-10;
+# docs/decisions/2026-10-08-claude-actions-pr-review.md). It runs on schedule and dispatch on main only, never on a pull request, and the job holds no id-token: the federation
+# exemption of docs/decisions/2026-10-04-ci-least-privilege.md is withdrawn.
 #
 # Bounded since 2026-10-08 (docs/decisions/2026-10-08-claude-actions-harness-audit-bounds.md): Claude has Read, Glob and
 # Grep only and a $5 client budget, and a run of more than 20 assistant turns fails the bounds check after it ends (there
-# is no client turn limit); the job holds no write scope beyond the OIDC token;
-# a model-free step copies the report
+# is no client turn limit); the job holds no write scope; a model-free step copies the report
 # to the job summary and keeps the run's token and cost numbers. The job runs only while the repository variable
 # CLAUDE_HARNESS_AUDIT_ENABLED is 'true', and only on the first attempt of a run: a re-run would spend again without a
 # new schedule tick or request, so it is skipped.
@@ -41,9 +36,11 @@ jobs:
       (github.actor == github.repository_owner && github.triggering_actor == github.repository_owner))
     runs-on: ubuntu-24.04
     timeout-minutes: 30
+    # The key is an environment secret: `claude-review` deploys from main only, so a workflow pushed on another
+    # branch and dispatched from there gets no key (repository secrets reach any branch's workflow).
+    environment: claude-review
     permissions:
       contents: read
-      id-token: write # the GitHub OIDC token the action exchanges for a short-lived Claude API token; no attestation
     steps:
       - name: Harden the runner (audit-only network egress)
         uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -87,8 +84,9 @@ jobs:
           curl -fsSL "https://raw.githubusercontent.com/FlorianBruniaux/claude-code-ultimate-guide/585c2030cd590e991d84dae4d6614cd449f245b1/tools/audit-prompt.md" -o "$RUNNER_TEMP/harness-audit/audit-prompt.md"
           echo "1d1fb98d87d40d0141b5243d60afe898d982a14f6e02c1d2d2931df89a7c0ede  $RUNNER_TEMP/harness-audit/audit-prompt.md" | sha256sum -c -
 
-      # Federation inputs only: the action prefers a static key over federation when both are present, and this
-      # workflow passes none. --restricted removes the tools that run code and WebFetch, ignores every settings file
+      # The API key is the only Claude credential: no OAuth token and no federation input (the owner's ruling of
+      # 2026-10-10). github_token is passed, so the action requests no GitHub OIDC token and the job holds no
+      # id-token. --restricted removes the tools that run code and WebFetch, ignores every settings file
       # and keeps the file tools inside the checkout and the prompt directory; --permission-prompts none denies
       # whatever would ask; --settings carries the deny rules, because a settings file would be ignored. The tool
       # list, not the prompt, is what keeps the run read-only.
@@ -103,10 +101,7 @@ jobs:
           # (base-action/src/parse-sdk-options.ts:279 at the pin).
           CLAUDE_CODE_DISABLE_CLAUDE_MDS: '1'
         with:
-          anthropic_federation_rule_id: ${{ vars.ANTHROPIC_FEDERATION_RULE_ID }}
-          anthropic_organization_id: ${{ vars.ANTHROPIC_ORGANIZATION_ID }}
-          anthropic_service_account_id: ${{ vars.ANTHROPIC_SERVICE_ACCOUNT_ID }}
-          anthropic_workspace_id: ${{ vars.ANTHROPIC_WORKSPACE_ID }}
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
           show_full_output: 'false'
           display_report: 'false'

@@ -6,21 +6,17 @@ name: claude-pr-review
 # reviews every open, non-draft pull request head not reviewed yet ("Every pull request (2026-10-09)"). The PR head is
 # checked out as data into the `pr-head` subdirectory with main at the workspace root, the pattern the action's
 # docs/security.md prescribes, and nothing from it is executed. Claude has Read, Glob and Grep only and a $5 client
-# budget; a run of more than 30 assistant turns fails its bounds check. The review job holds no write scope beyond the
-# OIDC token: a model-free step copies the review to the job summary, and nothing is posted to the pull request. The
-# review is advisory; no check is required.
+# budget; a run of more than 30 assistant turns fails its bounds check. The review job holds no write scope: a
+# model-free step copies the review to the job summary, and nothing is posted to the pull request. The review is
+# advisory; no check is required.
 #
-# Authentication is Anthropic workload identity federation (no Anthropic key in this repository). A dispatch or a
-# schedule run on main presents the immutable subject
-# `repo:seathatflowsinourveins@234074349/native-agent-stack@1376766892:ref:refs/heads/main`.
-# Acceptance still depends on the Console rule matching that subject. A pull_request run's derived form is
-# `repo:OWNER@OWNER-ID/REPO@REPO-ID:pull_request`: native REST sub_claim_prefix plus the separately documented
-# pull_request suffix (retained OIDC snapshot:332-336, revision 35d79cb1, decision 2026-10-10).
-# It would run the pull request's own copy of this
-# file, and workflow_run is a trigger this repository's zizmor gate and policy refuse, so the schedule is how every
-# pull request is reached. The resolve job, which holds no token, picks the heads and checks each through the API;
-# the review job checks again with its own read before any token is requested. Both run only while the repository
-# variable CLAUDE_PR_REVIEW_ENABLED is 'true'; the schedule also needs CLAUDE_PR_REVIEW_EVERY_PR set to 'true'. A
+# Authentication is an Anthropic API key, ANTHROPIC_API_KEY of the main-only claude-review environment (the
+# owner's ruling of 2026-10-10; docs/decisions/2026-10-08-claude-actions-pr-review.md). Only a dispatch or a schedule
+# run on main reaches it: a pull_request run would run the pull request's own copy of this file, and workflow_run
+# is a trigger this repository's zizmor gate and policy refuse, so the schedule is how every pull request is reached.
+# The resolve job, which holds no secret, picks the heads and checks each through the API; the review job checks
+# again with its own read before the key is used. Both run only while the repository variable
+# CLAUDE_PR_REVIEW_ENABLED is 'true'; the schedule also needs CLAUDE_PR_REVIEW_EVERY_PR set to 'true'. A
 # run goes ahead only on its first attempt: a re-run would spend again without a new request, so it is skipped.
 on:
   workflow_dispatch:
@@ -190,11 +186,13 @@ jobs:
       cancel-in-progress: false
     runs-on: ubuntu-24.04
     timeout-minutes: 30
+    # The key is an environment secret: `claude-review` deploys from main only, so a workflow pushed on another
+    # branch and dispatched from there gets no key (repository secrets reach any branch's workflow).
+    environment: claude-review
     permissions:
       contents: read
       pull-requests: read # the pull request's state, base and head, read once to bind the request to it
       actions: read # the completion markers, rechecked once this job holds its pull request's and head's group
-      id-token: write # the GitHub OIDC token the action exchanges for a short-lived Claude API token; no attestation
     steps:
       - name: Harden the runner (audit-only network egress)
         uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -363,8 +361,9 @@ jobs:
           fi
           echo "Diff: $size bytes from merge base $base"
 
-      # Federation inputs only: the action prefers a static key over federation when both are present, and this
-      # workflow passes none. --restricted removes the tools that run code and WebFetch, ignores every settings file
+      # The API key is the only Claude credential: no OAuth token and no federation input (the owner's ruling of
+      # 2026-10-10). github_token is passed, so the action requests no GitHub OIDC token and the job holds no
+      # id-token. --restricted removes the tools that run code and WebFetch, ignores every settings file
       # and keeps the file tools inside the workspace and the diff directory; --permission-prompts none denies
       # whatever would ask; --settings carries the deny rules, because a settings file would be ignored. The tool
       # list, not the prompt, is what keeps the run read-only. There is no --max-turns: the pinned action fails its
@@ -378,10 +377,7 @@ jobs:
           # The action turns full output on when this is "true" in its environment; pin it off for this step.
           ACTIONS_STEP_DEBUG: 'false'
         with:
-          anthropic_federation_rule_id: ${{ vars.ANTHROPIC_FEDERATION_RULE_ID }}
-          anthropic_organization_id: ${{ vars.ANTHROPIC_ORGANIZATION_ID }}
-          anthropic_service_account_id: ${{ vars.ANTHROPIC_SERVICE_ACCOUNT_ID }}
-          anthropic_workspace_id: ${{ vars.ANTHROPIC_WORKSPACE_ID }}
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
           show_full_output: 'false'
           display_report: 'false'

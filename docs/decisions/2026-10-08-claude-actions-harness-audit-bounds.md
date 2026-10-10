@@ -649,6 +649,10 @@ The command center asked for both threads to be fixed before landing (2026-10-09
 
 The module runs 34 tests, up from 33.
 
+## Authentication by API key (2026-10-10)
+
+Since 2026-10-10 the owner ruled on 2026-10-10 that CI Claude review authenticates with an Anthropic API key, `ANTHROPIC_API_KEY` of the main-only `claude-review` environment, not federation (`docs/decisions/2026-10-08-claude-actions-pr-review.md`, "Authentication by API key"). The audit job passes `anthropic_api_key` and no federation input, and holds `contents: read` only. The bounds, the schedule and dispatch on main, the first-attempt guard and the reviewed input set (now without the four federation inputs) are unchanged.
+
 ## Alternatives considered
 
 - **Keep `gh issue create`.** Rejected: it is the one write path the model had, and `--body-file` makes it a read

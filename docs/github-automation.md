@@ -69,36 +69,35 @@ The Actions allow-list and harness description below were checked against live s
   [`2dca132ff0e0c4094ce6048b422c6915a071210b`](https://github.com/anthropics/claude-code-action/blob/2dca132ff0e0c4094ce6048b422c6915a071210b/action.yml),
   only while the repository variable `CLAUDE_HARNESS_AUDIT_ENABLED` is `true`, only on a run's first attempt, and,
   when dispatched by hand, only when the repository owner is both `github.actor` and `github.triggering_actor`.
-  Its job grants `contents: read` and `id-token: write` over an empty workflow permission default.
-  Anthropic workload identity federation exchanges GitHub's OIDC token using the four configured repository variables;
+  Its job grants `contents: read` over an empty workflow permission default.
+  It authenticates with `ANTHROPIC_API_KEY`, a secret of the main-only `claude-review` environment (the owner's ruling
+  of 2026-10-10, which replaced
+  workload identity federation; [decision](decisions/2026-10-08-claude-actions-pr-review.md));
   the workflow fetches a pinned, SHA-256-verified audit prompt and asks for a project-scoped read-only audit. Claude
   has Read, Glob and Grep only, at most 20 assistant turns (checked after the run) and a $5 client budget; a
   model-free step copies the report to the
   job summary and keeps the run's token and cost numbers
   ([decision](decisions/2026-10-08-claude-actions-harness-audit-bounds.md)). Hosted acceptance remains open after
   [run 37739403956 failed](https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/37739403956).
-  The owner checks the native [Claude Console federation history](https://platform.claude.com/settings/workload-identity-federation?tab=history)
-  for the reason and corrects the relevant rule or claim; the Console denial reason is not established by the retained
-  workflow evidence.
+  That run, and the review dispatch of 2026-10-10 (run 38056354892), were refused under federation; the likely cause
+  is a rule subject that does not match the repository's immutable OIDC subject. The API key replaces federation.
 - **Pull request review, every head and on demand.** [`claude-pr-review.yml`](../.github/workflows/claude-pr-review.yml)
   reviews each open, non-draft, same-repository pull request head targeting main until one review of it completes
   (a trusted completion marker, kept 90 days), from a 15-minute schedule (at
   most 2 heads a tick, up to the daily ceiling `CLAUDE_PR_REVIEW_DAILY_USD`, default 55), and can be dispatched by
   hand from `main` with a pull request number and the exact head commit. It runs only while the repository variable
   `CLAUDE_PR_REVIEW_ENABLED` is `true`, and the schedule only while `CLAUDE_PR_REVIEW_EVERY_PR` is also `true`; a
-  tokenless resolve job chooses the heads, and the review is advisory. It uses the action pin v1.0.247 (`2dca132f`) and the federation
-  variables `ANTHROPIC_FEDERATION_RULE_ID`, `ANTHROPIC_ORGANIZATION_ID`, `ANTHROPIC_SERVICE_ACCOUNT_ID` and
-  `ANTHROPIC_WORKSPACE_ID`. `main` is at the workspace root and the pull request head is data under `pr-head/`; Claude has Read, Glob
+  tokenless resolve job chooses the heads, and the review is advisory. It uses the action pin v1.0.247 (`2dca132f`) and the
+  `ANTHROPIC_API_KEY` of the main-only `claude-review` environment (since 2026-10-10; no federation input). `main` is at the workspace root and the pull request head is data under `pr-head/`; Claude has Read, Glob
   and Grep only, a $5 client budget and at most 30 assistant turns; the job grants `contents: read`, `pull-requests: read` and
-  `id-token: write`. A model-free step copies the review to the job summary; nothing is posted to the pull request
+  `actions: read`. A model-free step copies the review to the job summary; nothing is posted to the pull request
   ([decision](decisions/2026-10-08-claude-actions-pr-review.md)).
   [Scheduled run 37988961127](https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/37988961127)
-  completed with failure on 2026-10-09; this is execution evidence, not accepted federation or model usage.
-  The immutable main subject is
-  `repo:seathatflowsinourveins@234074349/native-agent-stack@1376766892:ref:refs/heads/main`.
-  All three federation workflows retain `zero_cost_error_without_model_usage` when an error result has zero cost
+  completed with failure on 2026-10-09 under federation; this is execution evidence, not accepted model usage.
+  All three Claude workflows retain `zero_cost_error_without_model_usage` when an error result has zero cost
   and empty model usage, and still fail their bounds check. Raw provider messages are excluded. The class does not
-  identify a Console deny reason; see the [P1 diagnosis and acceptance procedure](decisions/2026-10-10-claude-federation-diagnostics.md).
+  identify a deny reason; see the [federation diagnosis](decisions/2026-10-10-claude-federation-diagnostics.md),
+  kept as the record of why the owner moved CI review to an API key.
 - **Pre-cue toolkit read** (`claude-pr-toolkit-review.yml`, added 2026-10-09): Anthropic's pr-review-toolkit agents
   `pr-test-analyzer` and `silent-failure-hunter`, from `anthropics/claude-code` at
   `602df92bf481ed904533e95c09f740f40aab5aed` (checked out with its three files' SHA-256 verified, loaded with

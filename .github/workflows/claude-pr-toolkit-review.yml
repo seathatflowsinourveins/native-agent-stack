@@ -7,11 +7,11 @@ name: claude-pr-toolkit-review
 # request description does not declare. The toolkit is checked out at a full commit of anthropics/claude-code and
 # loaded with --plugin-dir; nothing is installed from a marketplace at run time. The workflow code is main's; the PR
 # head is checked out as data into `pr-head` with main at the workspace root. Claude has Read, Glob, Grep and the
-# Agent tool only, a $22 client budget, and a time limit scaled by the diff's size. The job holds no write scope beyond
-# the OIDC token: a model-free step copies the two reports to the job summary, and nothing is posted to the pull
-# request. The output is an input to the command center before its cue, never a designated read.
+# Agent tool only, a $22 client budget, and a time limit scaled by the diff's size. The job holds no write scope: a
+# model-free step copies the two reports to the job summary, and nothing is posted to the pull request. The output is an input to the command center before its cue, never a designated read.
 #
-# Authentication is Anthropic workload identity federation (no Anthropic key in this repository). The job runs only
+# Authentication is an Anthropic API key, ANTHROPIC_API_KEY of the main-only claude-review environment (the
+# owner's ruling of 2026-10-10; docs/decisions/2026-10-08-claude-actions-pr-review.md); dispatch on main only. The job runs only
 # while the repository variable CLAUDE_PR_TOOLKIT_ENABLED is 'true', and only on the first attempt of a run: a re-run
 # would spend again without a new request, so it is skipped.
 on:
@@ -50,10 +50,12 @@ jobs:
       vars.CLAUDE_PR_TOOLKIT_ENABLED == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 45
+    # The key is an environment secret: `claude-review` deploys from main only, so a workflow pushed on another
+    # branch and dispatched from there gets no key (repository secrets reach any branch's workflow).
+    environment: claude-review
     permissions:
       contents: read
       pull-requests: read # the pull request's state, base, head and description, read once to bind the request to it
-      id-token: write # the GitHub OIDC token the action exchanges for a short-lived Claude API token; no attestation
     steps:
       - name: Harden the runner (audit-only network egress)
         uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -203,8 +205,9 @@ jobs:
             exit 2
           fi
 
-      # Federation inputs only: the action prefers a static key over federation when both are present, and this
-      # workflow passes none. --restricted removes the tools that run code and WebFetch, ignores every settings file
+      # The API key is the only Claude credential: no OAuth token and no federation input (the owner's ruling of
+      # 2026-10-10). github_token is passed, so the action requests no GitHub OIDC token and the job holds no
+      # id-token. --restricted removes the tools that run code and WebFetch, ignores every settings file
       # and keeps the file tools inside the workspace and the diff directory; --permission-prompts none denies
       # whatever would ask; --settings carries the deny rules, because a settings file would be ignored. The agents
       # run as background subagents, so CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=0 keeps the session waiting for them
@@ -218,10 +221,7 @@ jobs:
           ACTIONS_STEP_DEBUG: 'false'
           CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS: '0'
         with:
-          anthropic_federation_rule_id: ${{ vars.ANTHROPIC_FEDERATION_RULE_ID }}
-          anthropic_organization_id: ${{ vars.ANTHROPIC_ORGANIZATION_ID }}
-          anthropic_service_account_id: ${{ vars.ANTHROPIC_SERVICE_ACCOUNT_ID }}
-          anthropic_workspace_id: ${{ vars.ANTHROPIC_WORKSPACE_ID }}
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
           show_full_output: 'false'
           display_report: 'false'

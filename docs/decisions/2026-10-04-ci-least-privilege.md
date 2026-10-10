@@ -450,6 +450,10 @@ model-free step. The job's only write grant is now `id-token: write`, the review
 `tests/test_workflow_policy.py` says so, and this exemption is unchanged. The action pin moves to v1.0.247
 (`2dca132ff0e0c4094ce6048b422c6915a071210b`), whose federation inputs are the four named above.
 
+### Withdrawn (2026-10-10): no job holds id-token for Claude any more
+
+The federation exemption above is withdrawn: the owner ruled on 2026-10-10 that CI Claude review authenticates with an Anthropic API key, `ANTHROPIC_API_KEY` of the main-only `claude-review` environment, not federation (`docs/decisions/2026-10-08-claude-actions-pr-review.md`, "Authentication by API key"). `claude-pr-review.yml:review`, `claude-pr-toolkit-review.yml:review` and `harness-audit.yml:audit` hold no `id-token`, their entries are gone from the `id-token-write` exemptions and from `WRITE_GRANTS` in `tests/test_workflow_policy.py`, and `test_each_exemption_is_still_needed` keeps the empty table honest. The only `id-token: write` left is `publish-catalog.yml:publish`, which attests provenance.
+
 ## Alternatives considered
 
 - **Keep workflow-level `contents: read`.** It already met OpenSSF Scorecard's Token-Permissions top score (read-only
