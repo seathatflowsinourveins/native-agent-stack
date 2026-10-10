@@ -474,6 +474,38 @@ class ManagedMcpDefaultLocations(unittest.TestCase):
         with mock.patch.object(os.path, "isfile", isfile), mock.patch.object(os, "access", access):
             yield
 
+    def test_an_absolute_path_that_is_not_normalised_is_not_a_managed_config(self):
+        # A spelling with a dot-dot, dot or doubled-separator segment reaches the same file through the filesystem, but it is
+        # not the path the client reads (its My() returns the directory and OCn() joins the file name), so it does not count:
+        # the check requires abspath(name) == name, which the relative-name test above cannot exercise because a relative
+        # name already fails isabs (the co-op's GPT read of #967 at 3de3dda8, P3: the equality could be removed with every
+        # test green). Real files, no fake host, so it runs on every platform.
+        folder = Path(self.enterContext(tempfile.TemporaryDirectory()))
+        (folder / "child").mkdir()
+        (folder / "managed-mcp.json").write_text("{}", encoding="utf-8")
+        sep = os.sep
+        spellings = {"dot-dot": f"{folder}{sep}child{sep}..{sep}managed-mcp.json",
+                     "dot": f"{folder}{sep}.{sep}managed-mcp.json",
+                     "doubled separator": f"{folder}{sep}{sep}managed-mcp.json"}
+        normalised = str(folder / "managed-mcp.json")
+        self.assertEqual(os.path.abspath(normalised), normalised)  # the positive control is itself normalised
+        for label, spelling in spellings.items():
+            with self.subTest(spelling=label):
+                self.assertTrue(os.path.isfile(spelling))  # the same file, reached through the filesystem
+                self.assertNotEqual(os.path.abspath(spelling), spelling)
+                self.assertEqual(S.skill_doctor_argv([spelling]), self.FENCED)
+                with mock.patch.object(S, "MANAGED_MCP_CONFIG_PATHS", (spelling,)):
+                    self.assertEqual(S.skill_doctor_argv(), self.FENCED)
+        # pathlib drops dot and doubled-separator segments when it builds a Path but keeps a dot-dot one, so only that
+        # spelling stays non-normalised as a Path.
+        self.assertEqual(str(Path(spellings["dot-dot"])), spellings["dot-dot"])
+        self.assertEqual(S.skill_doctor_argv([Path(spellings["dot-dot"])]), self.FENCED)
+        # The normalised spelling of the same file is a managed config, and one counted candidate is enough.
+        self.assertEqual(S.skill_doctor_argv([normalised]), self.MANAGED)
+        self.assertEqual(S.skill_doctor_argv([spellings["dot-dot"], normalised]), self.MANAGED)
+        with mock.patch.object(S, "MANAGED_MCP_CONFIG_PATHS", (normalised,)):
+            self.assertEqual(S.skill_doctor_argv(), self.MANAGED)
+
     def test_a_documented_string_counts_only_where_it_is_an_absolute_path(self):
         counts = {name: self.counts_here(location) for name, location in self.LOCATIONS.items()}
         if os.name == "nt":
