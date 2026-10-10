@@ -65,12 +65,33 @@ commands; camel case and hyphens are normalized. Nested command containers
 retain that role. `argv`/`args` lists remain literal tokens, including quoted
 text within an argument; a command list containing separate model-flag tokens
 is also recognized as argv. This is lexical extraction, not shell execution
-or evaluation of computed commands. The short `-m` flag selects a model only
-for `codex`/`claude`, including the known `env`/`rtk`/`timeout` wrappers;
-Git commit messages and Python module flags are separate argument roles.
-The selector field's first value is parsed without requiring its explanatory
-tail to be shell syntax. It covers active lane configuration too; `.md` and `lanes/`
-are not blanket exemptions. `--host` adds the two named user settings files,
+or evaluation of computed commands. Codex's short `-m` model flag retains its
+meaning behind wrapper chains when Codex is the invoked program, following
+[Codex rust-v0.162.0's shared option](https://github.com/openai/codex/blob/rust-v0.162.0/codex-rs/utils/cli/src/shared_options.rs#L22-L23).
+The checker resolves executable positions through `env`, `rtk proxy`, `timeout`,
+`nice`, `nohup`, `flock`, and shell `command`/`exec`, consuming each wrapper's
+option and pathname operands. Unknown programs are not guessed to be wrappers.
+Claude Code 2.1.296 advertises `--model`, without short `-m`. Git messages,
+Python module names and ordinary operands named `codex`/`claude` do not establish
+native-client context. Markdown command spans use the matching backtick
+delimiters described by [CommonMark 0.31.2 section 6.1](https://spec.commonmark.org/0.31.2/#code-spans);
+independent spans stay separate, and formatting/prose punctuation is outside
+the command value. A flag and value may use separate adjacent spans.
+Shell operators create command boundaries in command strings; in literal argv
+they remain ordinary argument data and cannot introduce another executable.
+Each text selector field contributes only its first lexical value; its
+explanatory tail is not scanned for further values and need not be shell syntax.
+Structured JSON selector lists and command/argv values retain their own
+traversal rules. It covers active lane configuration too; `.md` and `lanes/`
+are not blanket exemptions.
+
+The exact dated [G5 compact landscape catalogue](https://github.com/seathatflowsinourveins/native-agent-stack/blob/ff69fc865ce72a6717a36a8f06fdac79038bd515/catalogs/landscape/grand-catalog-20261008.json)
+is a comparison record whose model references are source metadata; the full
+selector grammar extracts no active selections from that published snapshot.
+Its exact path is exempt before the bounded text read. An active copy or another
+large model-bearing source retains the ordinary selector and size-gap checks.
+
+`--host` adds the two named user settings files,
 agent directories, launcher directories, CC/co-op/API-action tools and the
 named `~/code/us-equities-trading` repository when present. There is no
 home-directory or disk crawl. Findings contain a locator and model IDs;

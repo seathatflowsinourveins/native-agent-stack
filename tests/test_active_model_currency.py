@@ -9,6 +9,7 @@ import json
 import os
 from pathlib import Path
 import shutil
+import shlex
 import subprocess
 import tempfile
 import unittest
@@ -248,6 +249,122 @@ class ActiveModelCurrencyTests(unittest.TestCase):
         self.write("tools/message.sh", 'git commit -m "codex -m gpt-6-sol"\n')
         self.assertEqual(self.cli("check")[0], 0)
 
+    def test_real_git_messages_in_client_named_directories_are_not_selectors(self):
+        environment = {
+            "GIT_CONFIG_NOSYSTEM": "1", "GIT_CONFIG_GLOBAL": os.devnull,
+            "GIT_AUTHOR_NAME": "Synthetic Fixture", "GIT_AUTHOR_EMAIL": "fixture@example.invalid",
+            "GIT_COMMITTER_NAME": "Synthetic Fixture", "GIT_COMMITTER_EMAIL": "fixture@example.invalid",
+        }
+        executable = shutil.which("git")
+        self.assertIsNotNone(executable)
+        with tempfile.TemporaryDirectory() as temporary:
+            parent = Path(temporary)
+            for name in ("codex", "claude"):
+                subprocess.run([executable, "init", "-q", "--template=", str(parent / name)],
+                               check=True, capture_output=True, env=environment)
+                argv = ["git", "-C", name, "-c", "commit.gpgSign=false",
+                        "commit", "--allow-empty", "-m", "gpt-6-sol"]
+                subprocess.run([executable, *argv[1:]], cwd=parent, env=environment,
+                               check=True, capture_output=True)
+                subject = subprocess.check_output([executable, "-C", name, "log", "-1", "--format=%s"],
+                                                  cwd=parent, env=environment, text=True).strip()
+                self.assertEqual(subject, "gpt-6-sol")
+                for form in ("command", "argv"):
+                    with self.subTest(directory=name, form=form):
+                        self.write("config/commands.json", json.dumps({
+                            form: argv if form == "argv" else shlex.join(argv),
+                        }))
+                        self.assertEqual(self.check()["stale_count"], 0)
+
+    def test_path_and_message_operands_do_not_establish_native_short_flag_context(self):
+        commands = [
+            ["echo", "codex", "-m", "gpt-6-sol"],
+            ["echo", "claude", "-m", "gpt-6-sol"],
+            ["python", "-m", "codex", "-m", "gpt-6-sol"],
+            ["python", "script.py", "claude", "-m", "gpt-6-sol"],
+            ["env", "-C", "codex", "git", "commit", "-m", "gpt-6-sol"],
+            ["flock", "codex", "git", "commit", "-m", "gpt-6-sol"],
+            ["nice", "-n", "5", "git", "-C", "codex", "commit", "-m", "gpt-6-sol"],
+            ["exec", "-a", "codex", "git", "commit", "-m", "gpt-6-sol"],
+            ["timeout", "-s", "codex", "5", "git", "commit", "-m", "gpt-6-sol"],
+        ]
+        for argv in commands:
+            for form in ("command", "argv"):
+                with self.subTest(argv=argv, form=form):
+                    self.write("config/commands.json", json.dumps({
+                        form: argv if form == "argv" else shlex.join(argv),
+                    }))
+                    self.assertEqual(self.check()["stale_count"], 0)
+
+    def test_native_context_stops_at_the_next_command_boundary(self):
+        self.write("config/commands.json", json.dumps({"commands": [
+            "codex exec -m gpt-6.1-sol && git -C codex commit -m gpt-6-sol",
+            "codex exec -m gpt-6.1-sol # native client\necho codex -m gpt-6-sol",
+        ]}))
+        self.assertEqual(self.check()["stale_count"], 0)
+
+    def test_literal_argv_shell_punctuation_does_not_create_an_executable_position(self):
+        for delimiter in ("&&", ";", "\n"):
+            with self.subTest(delimiter=delimiter):
+                self.write("config/commands.json", json.dumps({
+                    "argv": ["echo", delimiter, "codex", "-m", "gpt-6-sol"],
+                }))
+                self.assertEqual(self.check()["stale_count"], 0)
+
+    def test_independent_markdown_spans_do_not_join_client_mentions_to_messages(self):
+        self.write("docs/client-messages.md",
+                   "Use `codex` alongside `git -C codex commit -m gpt-6-sol`.\n"
+                   "Compare `codex exec -m gpt-6.1-sol` and `echo codex -m gpt-6-sol`.\n")
+        self.assertEqual(self.check()["stale_count"], 0)
+
+    def test_claude_has_only_the_advertised_long_model_flag(self):
+        self.write("config/commands.json", json.dumps({"commands": [
+            "claude -m claude-opus-5", "nice -n 5 claude -m claude-opus-5",
+            "claude --model claude-opus-5", "nohup claude --model claude-opus-5",
+        ]}))
+        result = self.check()
+        self.assertEqual(result["stale_count"], 2)
+        self.assertEqual({item["json_pointer"] for item in result["findings"]}, {"/commands/2", "/commands/3"})
+
+    def test_wrapper_option_operands_and_nested_wrappers_preserve_invoked_codex(self):
+        prefixes = [
+            ["env", "-C", "/tmp/codex", "-u", "MODEL", "FOO=bar", "/usr/bin/codex", "exec"],
+            ["timeout", "-k", "2s", "-s", "TERM", "10s", "codex", "exec"],
+            ["exec", "-a", "claude", "codex", "exec"],
+            ["rtk", "--skip-env", "proxy", "codex", "exec"],
+            ["nice", "--adjustment=5", "nohup", "flock", "-w", "2", "/tmp/claude",
+             "timeout", "10", "codex", "exec"],
+            ["command", "-p", "codex", "exec"],
+        ]
+        for prefix in prefixes:
+            argv = [*prefix, "-m", "gpt-6-sol"]
+            for form in ("command", "argv"):
+                with self.subTest(prefix=prefix, form=form):
+                    self.write("config/commands.json", json.dumps({
+                        form: argv if form == "argv" else shlex.join(argv),
+                    }))
+                    result = self.check()
+                    self.assertEqual(result["stale_count"], 1)
+                    finding, = result["findings"]
+                    self.assertEqual(finding["model"], "gpt-6-sol")
+                    pointer = f"/argv/{len(argv) - 1}" if form == "argv" else "/command"
+                    self.assertEqual(finding["json_pointer"], pointer)
+
+    def test_published_g5_catalog_record_does_not_mask_active_copies_or_size_gaps(self):
+        name = "catalogs/landscape/grand-catalog-20261008.json"
+        document = {"schema_version": 1, "kind": "g5-compact-landscape", "release_tag": "v2026.10.08",
+                    "rows": [{"source_model_ids": ["gpt-6-sol"]}], "padding": "x" * mc.MAX_BYTES}
+        text = json.dumps(document)
+        path = self.write(name, text)
+        self.assertEqual(self.check()["status"], "current")
+        self.assertEqual(path.read_text(), text)
+        active = self.write("config/grand-catalog-20261008.json", text)
+        self.assertEqual(self.check()["status"], "unknown")
+        active.write_text(json.dumps({"model": "gpt-6-sol"}))
+        result = self.check()
+        self.assertEqual(result["status"], "stale")
+        self.assertEqual(result["stale_count"], 1)
+
     def test_multiline_commands_keep_comment_boundaries_for_short_flags(self):
         self.write("config/commands.json", json.dumps({"commands": [
             'codex exec --model gpt-6.1-sol # accepted\ngit commit -m "gpt-6-sol"',
@@ -267,7 +384,7 @@ class ActiveModelCurrencyTests(unittest.TestCase):
 
     def test_native_short_model_flags_are_still_checked(self):
         self.write("config/commands.json", json.dumps({"commands": [
-            "codex exec -m gpt-6-sol", "rtk claude -m claude-opus-5",
+            "codex exec -m gpt-6-sol", "rtk claude --model claude-opus-5",
             "git status && codex exec -m gpt-6-sol",
         ]}))
         self.assertEqual(self.check()["stale_count"], 3)
@@ -278,7 +395,8 @@ class ActiveModelCurrencyTests(unittest.TestCase):
                    (["/opt/bin/claude"], "claude-opus-5"))
         for wrapper in wrappers:
             for client, model in clients:
-                argv = [*wrapper, *client, "-m", model]
+                flag = "-m" if Path(client[0]).name == "codex" else "--model"
+                argv = [*wrapper, *client, flag, model]
                 for form in ("command", "argv", "shell"):
                     with self.subTest(wrapper=wrapper[0], client=client[0], form=form):
                         if form == "shell":

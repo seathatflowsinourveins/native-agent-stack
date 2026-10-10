@@ -179,6 +179,10 @@ def exempt(path: str) -> str | None:
         return "dated decision record"
     if path in {"manifests/evidence.json", "catalogs/foundation/model-currency.json"}:
         return "file registration or dated age-review inventory; not a runtime selector"
+    if path == "catalogs/landscape/grand-catalog-20261008.json":
+        # Published schema-1 g5-compact-landscape on main ff69fc86 contains
+        # reference rows; the full selector grammar extracts no active values.
+        return "dated G5 compact landscape comparison record; model references are source metadata"
     if path.startswith(FROZEN_EXPERIMENTS):
         return "frozen completed experiment and exact replay source"
     if path == "blueprints/convergence-practice/omniroute-runtime-workers/experiment.json":
@@ -268,13 +272,72 @@ def command_identifiers(value: str | list[str], locate: bool = False):
     except ValueError:
         raise CurrencyError("active command string could not be parsed") from None
     def native_short_flag(prefix):
-        # Git v2.53.0 commit -m is a message; Python -m selects a module.
-        # Native clients retain model -m behind arbitrary command wrappers.
-        return any(Path(token).name in {"codex", "claude"} for token in prefix)
+        # Codex rust-v0.162.0 shared_options.rs advertises -m; Claude 2.1.296
+        # advertises only --model. Resolve executable positions, never operands.
+        # Wrapper grammar: uutils/coreutils 0.10.0 nice/env/timeout/nohup;
+        # util-linux v2.41.3 flock.c; existing rtk proxy and shell builtins.
+        values = {
+            "nice": {"-n", "--adjustment"},
+            "env": {"-u", "--unset", "-C", "--chdir", "-a", "--argv0", "-f", "--file"},
+            "timeout": {"-k", "--kill-after", "-s", "--signal"},
+            "flock": {"-w", "--timeout", "-E", "--conflict-exit-code"},
+            "exec": {"-a"},
+        }
+        switches = {
+            "nice": set(), "nohup": set(),
+            "env": {"-i", "--ignore-environment", "-v", "--debug"},
+            "timeout": {"-f", "--foreground", "-p", "--preserve-status", "-v", "--verbose"},
+            "flock": {"-s", "--shared", "-x", "--exclusive", "-u", "--unlock", "-n", "--nonblock",
+                      "-o", "--close", "-F", "--no-fork", "--fcntl", "--verbose"},
+            "rtk": {"-v", "--verbose", "--ultra-compact", "--skip-env"},
+            "exec": {"-c", "-l"}, "command": {"-p"},
+        }
+        index = 0
+        while index < len(prefix):
+            if re.match(r"^[A-Za-z_]\w*=", prefix[index]):
+                index += 1
+                continue
+            program = Path(prefix[index]).name
+            index += 1
+            if program == "codex":
+                return True
+            if program not in switches:
+                return False
+            while index < len(prefix) and prefix[index].startswith("-"):
+                token = prefix[index]
+                if token == "--" or (program == "env" and token == "-"):
+                    index += 1
+                    break
+                option = token.split("=", 1)[0]
+                if option in values.get(program, set()):
+                    index += 1 if "=" in token else 2
+                elif token in switches[program]:
+                    index += 1
+                elif any(token.startswith(short) and len(token) > len(short)
+                         for short in values.get(program, set()) if len(short) == 2):
+                    index += 1
+                elif program == "nice" and re.fullmatch(r"-\d+", token):
+                    index += 1
+                elif program == "rtk" and re.fullmatch(r"-v+", token):
+                    index += 1
+                else:
+                    return False
+            if program == "env":
+                while index < len(prefix) and re.match(r"^[A-Za-z_]\w*=", prefix[index]):
+                    index += 1
+            elif program == "timeout":
+                if index >= len(prefix) or not re.fullmatch(r"(?:\d+(?:\.\d*)?|\.\d+)[smhd]?", prefix[index]):
+                    return False
+                index += 1  # duration operand
+            elif program == "flock":
+                index += 1  # lock pathname or descriptor operand
+            elif program == "rtk" and index < len(prefix) and prefix[index] == "proxy":
+                index += 1
+        return False
     result = []
     start = 0
     for index, token in enumerate(tokens):
-        if token and set(token) <= set("\n;&|()"):
+        if isinstance(value, str) and token and set(token) <= set("\n;&|()"):
             start = index + 1
             continue
         flag = token.rstrip(",")
@@ -405,7 +468,10 @@ def selectors(text: str, path: Path):
     historical_setup = prose and bool(re.search(r"setup below records.*?earlier.*?historical", text[:1500], re.S | re.I))
     record_section = False
     for number, line in enumerate(text.splitlines(), 1):
+        code_spans = []
         if path.suffix == ".md":
+            # CommonMark 0.31.2 section 6.1: matching backtick delimiters.
+            code_spans = [match[2] for match in re.finditer(r"(?<!`)(`+)(?!`)(.*?)(?<!`)\1(?!`)", line)]
             # Formatting delimiters separate code from adjacent prose punctuation.
             line = line.replace("`", " ")
         stripped = line.strip()
@@ -434,9 +500,16 @@ def selectors(text: str, path: Path):
             for identifier in identifiers(value, cli, sentence=prose):
                 results.append((number, identifier))
         if argument:
-            logical = line.rstrip().removesuffix("\\")
+            commands = code_spans or [line]
+            selected = []
             try:
-                selected = command_identifiers(logical)
+                for index, command in enumerate(commands):
+                    # A model flag and its value may use separate adjacent spans.
+                    # Do not combine independent commands or bare client mentions.
+                    if (code_spans and index + 1 < len(commands)
+                            and re.search(r"(?:--model(?:-id)?|-m)\s*$", command)):
+                        command += " " + commands[index + 1]
+                    selected.extend(command_identifiers(command.rstrip().removesuffix("\\")))
             except CurrencyError:
                 if prose:
                     selected = identifiers(line.split("#", 1)[0], cli, sentence=True)
