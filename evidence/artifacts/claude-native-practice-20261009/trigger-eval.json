@@ -1,0 +1,236 @@
+{
+ "schema": "claude-native-practice-trigger-eval/2",
+ "harness": "anthropics/skills skill-creator scripts/run_eval.py (pinned skill per adoption/skills/manifest.json)",
+ "command": "python3 -m scripts.run_eval --eval-set trigger-eval.json --skill-path .claude/skills/claude-native-practice --num-workers 1 --runs-per-query 3 --timeout 120",
+ "eval_set": [
+  {
+   "query": "Before I add a PreToolUse hook that blocks force pushes in this repo, what is our current Claude Code practice for hooks and their failure mode?",
+   "should_trigger": true
+  },
+  {
+   "query": "Which model and effort should a headless claude -p reviewer job use here, and should it run with --bare?",
+   "should_trigger": true
+  },
+  {
+   "query": "We want to register a Postgres MCP server for Claude Code on this host. How should it be scoped and loaded so it doesn't bloat every session?",
+   "should_trigger": true
+  },
+  {
+   "query": "Set up a weekly claude-code-action triage workflow for this repository. What does our practice say about authentication, pinning and debug output?",
+   "should_trigger": true
+  },
+  {
+   "query": "For a six-way parallel code review in this repo, should I use agent teams, a Workflow, or plain subagents?",
+   "should_trigger": true
+  },
+  {
+   "query": "Is SuperClaude or oh-my-claudecode worth adopting on top of native Claude Code for our orchestration?",
+   "should_trigger": true
+  },
+  {
+   "query": "Fix the failing unit test in tests/test_practice_references.py; it complains about a pin_date later than checked_at.",
+   "should_trigger": false
+  },
+  {
+   "query": "Summarize the paper-lane policy for the trading lane in two paragraphs.",
+   "should_trigger": false
+  },
+  {
+   "query": "Write a Python function that parses ISO 8601 timestamps with timezone offsets and add tests.",
+   "should_trigger": false
+  },
+  {
+   "query": "What does the G5 grand catalog currently say about qmd's disposition in the document-retrieval layer?",
+   "should_trigger": false
+  }
+ ],
+ "runs": [
+  {
+   "run": "run3",
+   "description": "Current Claude Code native practice, one evidenced default per role slot. Use when deciding Claude Code configuration (settings, hooks, skills, MCP, subagents), harness or workflow choices (agent teams, Workflows, model and effort routing), or Claude GitHub Actions setup.",
+   "summary": {
+    "total": 10,
+    "passed": 10,
+    "failed": 0
+   },
+   "results": [
+    {
+     "query": "Before I add a PreToolUse hook that blocks force pushes in this repo, what is our current Claude Code practice for hooks and their failure mode?",
+     "should_trigger": true,
+     "trigger_rate": 1.0,
+     "triggers": 3,
+     "runs": 3,
+     "pass": true
+    },
+    {
+     "query": "Which model and effort should a headless claude -p reviewer job use here, and should it run with --bare?",
+     "should_trigger": true,
+     "trigger_rate": 1.0,
+     "triggers": 3,
+     "runs": 3,
+     "pass": true
+    },
+    {
+     "query": "We want to register a Postgres MCP server for Claude Code on this host. How should it be scoped and loaded so it doesn't bloat every session?",
+     "should_trigger": true,
+     "trigger_rate": 1.0,
+     "triggers": 3,
+     "runs": 3,
+     "pass": true
+    },
+    {
+     "query": "Set up a weekly claude-code-action triage workflow for this repository. What does our practice say about authentication, pinning and debug output?",
+     "should_trigger": true,
+     "trigger_rate": 1.0,
+     "triggers": 3,
+     "runs": 3,
+     "pass": true
+    },
+    {
+     "query": "For a six-way parallel code review in this repo, should I use agent teams, a Workflow, or plain subagents?",
+     "should_trigger": true,
+     "trigger_rate": 1.0,
+     "triggers": 3,
+     "runs": 3,
+     "pass": true
+    },
+    {
+     "query": "Is SuperClaude or oh-my-claudecode worth adopting on top of native Claude Code for our orchestration?",
+     "should_trigger": true,
+     "trigger_rate": 1.0,
+     "triggers": 3,
+     "runs": 3,
+     "pass": true
+    },
+    {
+     "query": "Fix the failing unit test in tests/test_practice_references.py; it complains about a pin_date later than checked_at.",
+     "should_trigger": false,
+     "trigger_rate": 0.0,
+     "triggers": 0,
+     "runs": 3,
+     "pass": true
+    },
+    {
+     "query": "Summarize the paper-lane policy for the trading lane in two paragraphs.",
+     "should_trigger": false,
+     "trigger_rate": 0.0,
+     "triggers": 0,
+     "runs": 3,
+     "pass": true
+    },
+    {
+     "query": "Write a Python function that parses ISO 8601 timestamps with timezone offsets and add tests.",
+     "should_trigger": false,
+     "trigger_rate": 0.0,
+     "triggers": 0,
+     "runs": 3,
+     "pass": true
+    },
+    {
+     "query": "What does the G5 grand catalog currently say about qmd's disposition in the document-retrieval layer?",
+     "should_trigger": false,
+     "trigger_rate": 0.0,
+     "triggers": 0,
+     "runs": 3,
+     "pass": true
+    }
+   ],
+   "started_utc": "2026-10-09T04:40:28Z",
+   "ended_utc": "2026-10-09T04:44:01Z"
+  },
+  {
+   "run": "run4",
+   "description": "Current Claude Code native practice, one evidenced default per role slot, newer than repository notes or memory. Use it first when deciding or answering how to configure Claude Code (settings, permissions, hooks, skills, MCP, subagents), harness or workflow choices (agent teams, Workflows, model and effort routing), or Claude GitHub Actions setup.",
+   "summary": {
+    "total": 10,
+    "passed": 10,
+    "failed": 0
+   },
+   "results": [
+    {
+     "query": "Before I add a PreToolUse hook that blocks force pushes in this repo, what is our current Claude Code practice for hooks and their failure mode?",
+     "should_trigger": true,
+     "trigger_rate": 1.0,
+     "triggers": 3,
+     "runs": 3,
+     "pass": true
+    },
+    {
+     "query": "Which model and effort should a headless claude -p reviewer job use here, and should it run with --bare?",
+     "should_trigger": true,
+     "trigger_rate": 1.0,
+     "triggers": 3,
+     "runs": 3,
+     "pass": true
+    },
+    {
+     "query": "We want to register a Postgres MCP server for Claude Code on this host. How should it be scoped and loaded so it doesn't bloat every session?",
+     "should_trigger": true,
+     "trigger_rate": 1.0,
+     "triggers": 3,
+     "runs": 3,
+     "pass": true
+    },
+    {
+     "query": "Set up a weekly claude-code-action triage workflow for this repository. What does our practice say about authentication, pinning and debug output?",
+     "should_trigger": true,
+     "trigger_rate": 1.0,
+     "triggers": 3,
+     "runs": 3,
+     "pass": true
+    },
+    {
+     "query": "For a six-way parallel code review in this repo, should I use agent teams, a Workflow, or plain subagents?",
+     "should_trigger": true,
+     "trigger_rate": 1.0,
+     "triggers": 3,
+     "runs": 3,
+     "pass": true
+    },
+    {
+     "query": "Is SuperClaude or oh-my-claudecode worth adopting on top of native Claude Code for our orchestration?",
+     "should_trigger": true,
+     "trigger_rate": 1.0,
+     "triggers": 3,
+     "runs": 3,
+     "pass": true
+    },
+    {
+     "query": "Fix the failing unit test in tests/test_practice_references.py; it complains about a pin_date later than checked_at.",
+     "should_trigger": false,
+     "trigger_rate": 0.0,
+     "triggers": 0,
+     "runs": 3,
+     "pass": true
+    },
+    {
+     "query": "Summarize the paper-lane policy for the trading lane in two paragraphs.",
+     "should_trigger": false,
+     "trigger_rate": 0.0,
+     "triggers": 0,
+     "runs": 3,
+     "pass": true
+    },
+    {
+     "query": "Write a Python function that parses ISO 8601 timestamps with timezone offsets and add tests.",
+     "should_trigger": false,
+     "trigger_rate": 0.0,
+     "triggers": 0,
+     "runs": 3,
+     "pass": true
+    },
+    {
+     "query": "What does the G5 grand catalog currently say about qmd's disposition in the document-retrieval layer?",
+     "should_trigger": false,
+     "trigger_rate": 0.0,
+     "triggers": 0,
+     "runs": 3,
+     "pass": true
+    }
+   ],
+   "started_utc": "2026-10-09T07:11:19Z",
+   "ended_utc": "2026-10-09T07:15:20Z"
+  }
+ ],
+ "note": "run3 tested the first description; run4 tested the shipped description (SKILL.md in this pull request)."
+}

@@ -1,0 +1,743 @@
+{
+ "schema": "claude-native-practice-fresh-session/1",
+ "where": "fresh claude -p sessions in a checkout of this branch (the project skill), 2026-10-09T06:5xZ-07:04Z",
+ "queries": {
+  "Q1": "Guard hook behaviour on failure or a missing script (slot hooks)",
+  "Q2": "Model, effort and permission flags for a headless claude -p reviewer (slots model-effort-routing, headless-sdk)",
+  "Q3": "Sharing one serena MCP server across sessions (slot mcp-shared-servers)"
+ },
+ "runs": [
+  {
+   "file": "proof1.jsonl",
+   "client": "2.1.295",
+   "model": "claude-sonnet-5-5",
+   "skill_invoked": false,
+   "tools": [
+    "Read",
+    "Bash",
+    "Bash"
+   ],
+   "cost_usd": 0.2128,
+   "transcript_sha256": "bcc92ba206addea951c84923c41cd060fa1ed278561a495c44ce4ecb2439e914",
+   "variant": "description v1, default model",
+   "query": "Q1",
+   "skill_first_tool": false,
+   "slots_page": null,
+   "reference_pages_read": []
+  },
+  {
+   "file": "proof2.jsonl",
+   "client": "2.1.295",
+   "model": "claude-opus-5-5",
+   "skill_invoked": true,
+   "tools": [
+    "Skill",
+    "Bash",
+    "Bash"
+   ],
+   "cost_usd": 0.5062,
+   "transcript_sha256": "5aa37504c8df2ebee8b5630ce277a635d40f1a8a99bbbb08de9815d0da9a9010",
+   "variant": "description v1",
+   "query": "Q1",
+   "skill_first_tool": true,
+   "slots_page": "grep",
+   "reference_pages_read": [
+    "slots.md"
+   ]
+  },
+  {
+   "file": "proof3-sonnet-1.jsonl",
+   "client": "2.1.295",
+   "model": "claude-sonnet-5-5",
+   "skill_invoked": true,
+   "tools": [
+    "Skill",
+    "Read",
+    "Bash",
+    "Bash"
+   ],
+   "cost_usd": 0.2199,
+   "transcript_sha256": "be6d977ca97a9a1ab94722900c8c1c702dbbcbc4ad2e6607727329aa467f562b",
+   "variant": "description v2 (newer than notes or memory)",
+   "query": "Q1",
+   "skill_first_tool": true,
+   "slots_page": "grep",
+   "reference_pages_read": [
+    "native-clients.md",
+    "slots.md"
+   ]
+  },
+  {
+   "file": "proof3-sonnet-2.jsonl",
+   "client": "2.1.295",
+   "model": "claude-sonnet-5-5",
+   "skill_invoked": true,
+   "tools": [
+    "Skill",
+    "Read",
+    "Bash",
+    "Bash"
+   ],
+   "cost_usd": 0.2283,
+   "transcript_sha256": "c03f9a4ee09268b8c9b4f675af24f10b954f15ec29082af93cb49bc754c889ec",
+   "variant": "description v2 (newer than notes or memory)",
+   "query": "Q1",
+   "skill_first_tool": true,
+   "slots_page": "grep",
+   "reference_pages_read": [
+    "native-clients.md",
+    "slots.md"
+   ]
+  },
+  {
+   "file": "proof3-sonnet-3.jsonl",
+   "client": "2.1.295",
+   "model": "claude-sonnet-5-5",
+   "skill_invoked": false,
+   "tools": [
+    "Read",
+    "Bash",
+    "Bash"
+   ],
+   "cost_usd": 0.2097,
+   "transcript_sha256": "af4f19d7000e0ccdf42825faff4000ccba1c5db558f7d76e84f66a5a14817ead",
+   "variant": "description v2 (newer than notes or memory)",
+   "query": "Q1",
+   "skill_first_tool": false,
+   "slots_page": null,
+   "reference_pages_read": []
+  },
+  {
+   "file": "proof4-1.jsonl",
+   "client": "2.1.295",
+   "model": "claude-sonnet-5-5",
+   "skill_invoked": false,
+   "tools": [
+    "Read",
+    "Bash",
+    "Bash",
+    "Bash",
+    "Bash"
+   ],
+   "cost_usd": 0.2418,
+   "transcript_sha256": "e382500a23adecac9d5377e8cc78bf4783622fe751c5373683caf45b0d9d2986",
+   "variant": "description v2 and body: start by reading reference/slots.md",
+   "query": "Q1",
+   "skill_first_tool": false,
+   "slots_page": null,
+   "reference_pages_read": []
+  },
+  {
+   "file": "proof4-2.jsonl",
+   "client": "2.1.295",
+   "model": "claude-sonnet-5-5",
+   "skill_invoked": true,
+   "tools": [
+    "Skill",
+    "Read",
+    "Bash",
+    "Bash",
+    "Read",
+    "Read",
+    "Bash"
+   ],
+   "cost_usd": 0.2896,
+   "transcript_sha256": "26641c073923ee588b55300a22d5d414a3960feb2c60c1868994cd915d902ff1",
+   "variant": "description v2 and body: start by reading reference/slots.md",
+   "query": "Q2",
+   "skill_first_tool": true,
+   "slots_page": "whole",
+   "reference_pages_read": [
+    "agent-sdks.md",
+    "native-clients.md",
+    "slots.md"
+   ]
+  },
+  {
+   "file": "proof4-3.jsonl",
+   "client": "2.1.295",
+   "model": "claude-sonnet-5-5",
+   "skill_invoked": true,
+   "tools": [
+    "Skill",
+    "Grep",
+    "Read",
+    "Bash"
+   ],
+   "cost_usd": 0.2309,
+   "transcript_sha256": "9dcbe69e57934bb2818ce13081be96341bf0d23b579cd89983fdeb3ec9604bff",
+   "variant": "description v2 and body: start by reading reference/slots.md",
+   "query": "Q3",
+   "skill_first_tool": true,
+   "slots_page": "whole",
+   "reference_pages_read": [
+    "mcp-surfaces.md",
+    "slots.md"
+   ]
+  },
+  {
+   "file": "proof4-4.jsonl",
+   "client": "2.1.295",
+   "model": "claude-opus-5-5",
+   "skill_invoked": true,
+   "tools": [
+    "Skill",
+    "Bash",
+    "Bash",
+    "Bash"
+   ],
+   "cost_usd": 0.4491,
+   "transcript_sha256": "8cc9c81efc71f556116b09b1ad5b05651e7ad552c80f2a3aaacb42411351fbd9",
+   "variant": "description v2 and body: start by reading reference/slots.md",
+   "query": "Q1",
+   "skill_first_tool": true,
+   "slots_page": "whole",
+   "reference_pages_read": [
+    "native-clients.md",
+    "slots.md"
+   ]
+  },
+  {
+   "file": "proof4-5.jsonl",
+   "client": "2.1.295",
+   "model": "claude-opus-5-5",
+   "skill_invoked": true,
+   "tools": [
+    "Skill",
+    "Bash",
+    "Bash",
+    "Bash",
+    "Bash",
+    "Bash",
+    "Bash"
+   ],
+   "cost_usd": 0.6153,
+   "transcript_sha256": "1d8c517d438a76e727ae8f62d1c6268baaeccd09c4a18b6091a41734b6129a00",
+   "variant": "description v2 and body: start by reading reference/slots.md",
+   "query": "Q2",
+   "skill_first_tool": true,
+   "slots_page": "whole",
+   "reference_pages_read": [
+    "agent-sdks.md",
+    "native-clients.md",
+    "slots.md"
+   ]
+  },
+  {
+   "file": "proof4-6.jsonl",
+   "client": "2.1.295",
+   "model": "claude-opus-5-5",
+   "skill_invoked": true,
+   "tools": [
+    "Skill",
+    "Bash",
+    "Read"
+   ],
+   "cost_usd": 0.4051,
+   "transcript_sha256": "3f4d8c842e436c54e333e09a571e5a07d9268229f32b204e4a16cb80df5a41a9",
+   "variant": "description v2 and body: start by reading reference/slots.md",
+   "query": "Q3",
+   "skill_first_tool": true,
+   "slots_page": "grep",
+   "reference_pages_read": [
+    "mcp-surfaces.md",
+    "slots.md"
+   ]
+  }
+ ],
+ "final_variant_rate": {
+  "skill_first_tool": "5/6",
+  "slots_page_read_whole": "4/6",
+  "slots_page_grepped_only": "1/6",
+  "by_model": {
+   "claude-opus-5-5": "skill first 3/3, slots page whole 2/3, grepped only 1/3",
+   "claude-sonnet-5-5": "skill first 2/3, slots page whole 2/3, grepped only 0/3"
+  },
+  "definitions": "skill first: the session's first tool call is Skill with claude-native-practice; slots page whole: reference/slots.md read by Read or by cat in a shell command; grepped only: a grep naming that page and no whole read. Every counted call is listed with its position under activation_excerpts[].skill_directory_reads."
+ },
+ "note": "Misses cluster on Q1, where this host's auto memory and the 2026-10-08 guard record already hold the answer. Transcripts are kept privately; only their sha256 is published.",
+ "organic_activation": {
+  "status": "observed",
+  "requests_naming_the_skill": 0,
+  "statement": "No initial request of the 11 runs names the skill or skills. With the shipped description, 5 of 6 sessions invoked claude-native-practice as their first tool call. 4 of 6 then read reference/slots.md whole (2 by Read, 2 by cat in a shell command) and 1 grepped it without a whole read; 1 answered from a search over the skill directory without invoking the skill. activation_excerpts lists, per run, the launch command, the exact request, the first Skill invocation with its arguments and every tool call that read from the skill directory (its position, tool and exact path or command), copied from the private transcripts, so these rates recompute.",
+  "limits": [
+   "one host and one client release (2.1.295)",
+   "three questions, one run each per model",
+   "the sessions ran in a checkout of this branch, where the project skill is installed; the user-scope install and the us-equities and Codex proofs are owed after landing"
+  ]
+ },
+ "activation_excerpts": [
+  {
+   "run": "proof1.jsonl",
+   "variant": "description v1",
+   "client": "2.1.295",
+   "model": "claude-sonnet-5-5",
+   "cwd": "<checkout> (a checkout of this branch; the project skill was the only claude-native-practice copy)",
+   "launch_command": "env -u CLAUDECODE timeout 600 claude -p \"Before I add a PreToolUse hook here that blocks force pushes, what is our current Claude Code practice for how a guard hook should behave when it fails or its script is missing? Answer in at most three sentences, naming the exact setting and the minimum client version.\" --max-turns 10 --max-budget-usd 3 --output-format stream-json --verbose < /dev/null",
+   "initial_request": "Before I add a PreToolUse hook here that blocks force pushes, what is our current Claude Code practice for how a guard hook should behave when it fails or its script is missing? Answer in at most three sentences, naming the exact setting and the minimum client version.",
+   "request_names_the_skill": false,
+   "first_tool": "Read",
+   "first_skill_invocation": null,
+   "first_reference_read": null,
+   "slots_page": null,
+   "skill_directory_reads": []
+  },
+  {
+   "run": "proof2.jsonl",
+   "variant": "description v1",
+   "client": "2.1.295",
+   "model": "claude-opus-5-5",
+   "cwd": "<checkout> (a checkout of this branch; the project skill was the only claude-native-practice copy)",
+   "launch_command": "env -u CLAUDECODE timeout 600 claude -p \"Before I add a PreToolUse hook here that blocks force pushes, what is our current Claude Code practice for how a guard hook should behave when it fails or its script is missing? Answer in at most three sentences, naming the exact setting and the minimum client version.\" --model claude-opus-5-5 --max-turns 10 --max-budget-usd 3 --output-format stream-json --verbose < /dev/null",
+   "initial_request": "Before I add a PreToolUse hook here that blocks force pushes, what is our current Claude Code practice for how a guard hook should behave when it fails or its script is missing? Answer in at most three sentences, naming the exact setting and the minimum client version.",
+   "request_names_the_skill": false,
+   "first_tool": "Skill",
+   "first_skill_invocation": {
+    "tool_call": 1,
+    "name": "Skill",
+    "input": {
+     "skill": "claude-native-practice"
+    }
+   },
+   "first_reference_read": {
+    "tool_call": 3,
+    "tool": "Bash",
+    "input": "cd ~/.cache/cc-native-practice/pr-practice; grep -n -i -E 'hook' .claude/skills/claude-native-practice/reference/slots.md | head -20; echo ---; sed -n '61p;94p' docs/decisions/2026-10-09-claude-code-native-practice.md; echo ---; grep -rn -i -E 'onFailure|client_version|fail.?closed|missing' .claude/skills/claude-native-practice/reference/*.md | head -30",
+    "reference_pages": [
+     "slots.md"
+    ],
+    "slots_page": "grep"
+   },
+   "slots_page": "grep",
+   "skill_directory_reads": [
+    {
+     "tool_call": 2,
+     "tool": "Bash",
+     "input": "cat ~/.claude/projects/<claude-project-dir>/memory/reference-claude-hooks-failclosed-2295.md; echo ---; claude --version; echo ---; grep -n -i -E 'onFailure|fail.?closed|missing|minimum|2\\.1\\.' docs/claude-native-practice.md docs/decisions/2026-10-09-claude-code-native-practice.md .claude/skills/claude-native-practice/*.md 2>/dev/null | head -60",
+     "reference_pages": [],
+     "slots_page": null
+    },
+    {
+     "tool_call": 3,
+     "tool": "Bash",
+     "input": "cd ~/.cache/cc-native-practice/pr-practice; grep -n -i -E 'hook' .claude/skills/claude-native-practice/reference/slots.md | head -20; echo ---; sed -n '61p;94p' docs/decisions/2026-10-09-claude-code-native-practice.md; echo ---; grep -rn -i -E 'onFailure|client_version|fail.?closed|missing' .claude/skills/claude-native-practice/reference/*.md | head -30",
+     "reference_pages": [
+      "slots.md"
+     ],
+     "slots_page": "grep"
+    }
+   ]
+  },
+  {
+   "run": "proof3-sonnet-1.jsonl",
+   "variant": "description v2",
+   "client": "2.1.295",
+   "model": "claude-sonnet-5-5",
+   "cwd": "<checkout> (a checkout of this branch; the project skill was the only claude-native-practice copy)",
+   "launch_command": "env -u CLAUDECODE timeout 600 claude -p \"Before I add a PreToolUse hook here that blocks force pushes, what is our current Claude Code practice for how a guard hook should behave when it fails or its script is missing? Answer in at most three sentences, naming the exact setting and the minimum client version.\" --model claude-sonnet-5-5 --max-turns 10 --max-budget-usd 3 --output-format stream-json --verbose < /dev/null",
+   "initial_request": "Before I add a PreToolUse hook here that blocks force pushes, what is our current Claude Code practice for how a guard hook should behave when it fails or its script is missing? Answer in at most three sentences, naming the exact setting and the minimum client version.",
+   "request_names_the_skill": false,
+   "first_tool": "Skill",
+   "first_skill_invocation": {
+    "tool_call": 1,
+    "name": "Skill",
+    "input": {
+     "skill": "claude-native-practice"
+    }
+   },
+   "first_reference_read": {
+    "tool_call": 3,
+    "tool": "Bash",
+    "input": "cd <checkout>/.claude/skills/claude-native-practice/reference && grep -n -i -E \"hook|onFailure|fail\" slots.md | head -40; claude --version; grep -n -i \"client_version\" *.md | head",
+    "reference_pages": [
+     "slots.md"
+    ],
+    "slots_page": "grep"
+   },
+   "slots_page": "grep",
+   "skill_directory_reads": [
+    {
+     "tool_call": 3,
+     "tool": "Bash",
+     "input": "cd <checkout>/.claude/skills/claude-native-practice/reference && grep -n -i -E \"hook|onFailure|fail\" slots.md | head -40; claude --version; grep -n -i \"client_version\" *.md | head",
+     "reference_pages": [
+      "slots.md"
+     ],
+     "slots_page": "grep"
+    },
+    {
+     "tool_call": 4,
+     "tool": "Bash",
+     "input": "awk '/^## hooks|^### hooks|\\{#hooks\\}|^#+ .*hooks/{f=1} f{print NR\": \"$0} /^#+ /&&f&&!/hooks/{exit}' native-clients.md | head -50; grep -n -i \"client_version\\|^client\" native-clients.md | head",
+     "reference_pages": [
+      "native-clients.md"
+     ],
+     "slots_page": null
+    }
+   ]
+  },
+  {
+   "run": "proof3-sonnet-2.jsonl",
+   "variant": "description v2",
+   "client": "2.1.295",
+   "model": "claude-sonnet-5-5",
+   "cwd": "<checkout> (a checkout of this branch; the project skill was the only claude-native-practice copy)",
+   "launch_command": "env -u CLAUDECODE timeout 600 claude -p \"Before I add a PreToolUse hook here that blocks force pushes, what is our current Claude Code practice for how a guard hook should behave when it fails or its script is missing? Answer in at most three sentences, naming the exact setting and the minimum client version.\" --model claude-sonnet-5-5 --max-turns 10 --max-budget-usd 3 --output-format stream-json --verbose < /dev/null",
+   "initial_request": "Before I add a PreToolUse hook here that blocks force pushes, what is our current Claude Code practice for how a guard hook should behave when it fails or its script is missing? Answer in at most three sentences, naming the exact setting and the minimum client version.",
+   "request_names_the_skill": false,
+   "first_tool": "Skill",
+   "first_skill_invocation": {
+    "tool_call": 1,
+    "name": "Skill",
+    "input": {
+     "skill": "claude-native-practice"
+    }
+   },
+   "first_reference_read": {
+    "tool_call": 3,
+    "tool": "Bash",
+    "input": "cd <checkout>/.claude/skills/claude-native-practice && claude --version; grep -n -i -E \"hook|onFailure|guard\" reference/slots.md | head -30; grep -rn -i \"onFailure\" reference/ | head -20",
+    "reference_pages": [
+     "slots.md"
+    ],
+    "slots_page": "grep"
+   },
+   "slots_page": "grep",
+   "skill_directory_reads": [
+    {
+     "tool_call": 3,
+     "tool": "Bash",
+     "input": "cd <checkout>/.claude/skills/claude-native-practice && claude --version; grep -n -i -E \"hook|onFailure|guard\" reference/slots.md | head -30; grep -rn -i \"onFailure\" reference/ | head -20",
+     "reference_pages": [
+      "slots.md"
+     ],
+     "slots_page": "grep"
+    },
+    {
+     "tool_call": 4,
+     "tool": "Bash",
+     "input": "grep -n \"client_version\" reference/native-clients.md | head -3; gh api repos/anthropics/claude-code/contents/CHANGELOG.md -H \"Accept: application/vnd.github.raw\" 2>&1 | grep -n -i -B3 \"onFailure\" | head -20; cd ~/.cache/cc-native-practice/pr-practice && sed -n 1,40p docs/decisions/2026-10-08-guard-hook-fails-closed.md 2>/dev/null | head -40",
+     "reference_pages": [
+      "native-clients.md"
+     ],
+     "slots_page": null
+    }
+   ]
+  },
+  {
+   "run": "proof3-sonnet-3.jsonl",
+   "variant": "description v2",
+   "client": "2.1.295",
+   "model": "claude-sonnet-5-5",
+   "cwd": "<checkout> (a checkout of this branch; the project skill was the only claude-native-practice copy)",
+   "launch_command": "env -u CLAUDECODE timeout 600 claude -p \"Before I add a PreToolUse hook here that blocks force pushes, what is our current Claude Code practice for how a guard hook should behave when it fails or its script is missing? Answer in at most three sentences, naming the exact setting and the minimum client version.\" --model claude-sonnet-5-5 --max-turns 10 --max-budget-usd 3 --output-format stream-json --verbose < /dev/null",
+   "initial_request": "Before I add a PreToolUse hook here that blocks force pushes, what is our current Claude Code practice for how a guard hook should behave when it fails or its script is missing? Answer in at most three sentences, naming the exact setting and the minimum client version.",
+   "request_names_the_skill": false,
+   "first_tool": "Read",
+   "first_skill_invocation": null,
+   "first_reference_read": null,
+   "slots_page": null,
+   "skill_directory_reads": [
+    {
+     "tool_call": 2,
+     "tool": "Bash",
+     "input": "claude --version; grep -rn -i \"onFailure\" docs/claude-native-practice.md .claude/skills/claude-native-practice docs/decisions/2026-10-09-claude-code-native-practice.md | head -30",
+     "reference_pages": [],
+     "slots_page": null
+    }
+   ]
+  },
+  {
+   "run": "proof4-1.jsonl",
+   "variant": "description v2 + body",
+   "client": "2.1.295",
+   "model": "claude-sonnet-5-5",
+   "cwd": "<checkout> (a checkout of this branch; the project skill was the only claude-native-practice copy)",
+   "launch_command": "env -u CLAUDECODE timeout 600 claude -p \"Before I add a PreToolUse hook here that blocks force pushes, what is our current Claude Code practice for how a guard hook should behave when it fails or its script is missing? Answer in at most three sentences, naming the exact setting and the minimum client version.\" --model claude-sonnet-5-5 --max-turns 10 --max-budget-usd 3 --output-format stream-json --verbose < /dev/null",
+   "initial_request": "Before I add a PreToolUse hook here that blocks force pushes, what is our current Claude Code practice for how a guard hook should behave when it fails or its script is missing? Answer in at most three sentences, naming the exact setting and the minimum client version.",
+   "request_names_the_skill": false,
+   "first_tool": "Read",
+   "first_skill_invocation": null,
+   "first_reference_read": null,
+   "slots_page": null,
+   "skill_directory_reads": [
+    {
+     "tool_call": 2,
+     "tool": "Bash",
+     "input": "claude --version; ls .claude/skills/claude-native-practice/; grep -rniE \"onFailure|fail.?closed|missing\" .claude/skills/claude-native-practice/ docs/claude-native-practice.md | head -40",
+     "reference_pages": [],
+     "slots_page": null
+    }
+   ]
+  },
+  {
+   "run": "proof4-2.jsonl",
+   "variant": "description v2 + body",
+   "client": "2.1.295",
+   "model": "claude-sonnet-5-5",
+   "cwd": "<checkout> (a checkout of this branch; the project skill was the only claude-native-practice copy)",
+   "launch_command": "env -u CLAUDECODE timeout 600 claude -p \"Which model and effort should a new headless claude -p reviewer job in this repository use, and which permission flags should it pass? Answer in at most three sentences.\" --model claude-sonnet-5-5 --max-turns 10 --max-budget-usd 3 --output-format stream-json --verbose < /dev/null",
+   "initial_request": "Which model and effort should a new headless claude -p reviewer job in this repository use, and which permission flags should it pass? Answer in at most three sentences.",
+   "request_names_the_skill": false,
+   "first_tool": "Skill",
+   "first_skill_invocation": {
+    "tool_call": 1,
+    "name": "Skill",
+    "input": {
+     "skill": "claude-native-practice"
+    }
+   },
+   "first_reference_read": {
+    "tool_call": 2,
+    "tool": "Read",
+    "path": "<checkout>/.claude/skills/claude-native-practice/reference/slots.md",
+    "reference_pages": [
+     "slots.md"
+    ],
+    "slots_page": "whole"
+   },
+   "slots_page": "whole",
+   "skill_directory_reads": [
+    {
+     "tool_call": 2,
+     "tool": "Read",
+     "path": "<checkout>/.claude/skills/claude-native-practice/reference/slots.md",
+     "reference_pages": [
+      "slots.md"
+     ],
+     "slots_page": "whole"
+    },
+    {
+     "tool_call": 4,
+     "tool": "Bash",
+     "input": "cd <checkout>/.claude/skills/claude-native-practice/reference && grep -n '^#' agent-sdks.md native-clients.md | grep -iE 'headless|model-effort|^agent-sdks' ",
+     "reference_pages": [
+      "agent-sdks.md",
+      "native-clients.md"
+     ],
+     "slots_page": null
+    },
+    {
+     "tool_call": 5,
+     "tool": "Read",
+     "path": "<checkout>/.claude/skills/claude-native-practice/reference/agent-sdks.md",
+     "reference_pages": [
+      "agent-sdks.md"
+     ],
+     "slots_page": null
+    },
+    {
+     "tool_call": 6,
+     "tool": "Read",
+     "path": "<checkout>/.claude/skills/claude-native-practice/reference/native-clients.md",
+     "reference_pages": [
+      "native-clients.md"
+     ],
+     "slots_page": null
+    }
+   ]
+  },
+  {
+   "run": "proof4-3.jsonl",
+   "variant": "description v2 + body",
+   "client": "2.1.295",
+   "model": "claude-sonnet-5-5",
+   "cwd": "<checkout> (a checkout of this branch; the project skill was the only claude-native-practice copy)",
+   "launch_command": "env -u CLAUDECODE timeout 600 claude -p \"We want to share one serena MCP server across all Claude sessions on this host to save memory. What does our current practice say? Answer in at most three sentences.\" --model claude-sonnet-5-5 --max-turns 10 --max-budget-usd 3 --output-format stream-json --verbose < /dev/null",
+   "initial_request": "We want to share one serena MCP server across all Claude sessions on this host to save memory. What does our current practice say? Answer in at most three sentences.",
+   "request_names_the_skill": false,
+   "first_tool": "Skill",
+   "first_skill_invocation": {
+    "tool_call": 1,
+    "name": "Skill",
+    "input": {
+     "skill": "claude-native-practice"
+    }
+   },
+   "first_reference_read": {
+    "tool_call": 3,
+    "tool": "Read",
+    "path": "<checkout>/.claude/skills/claude-native-practice/reference/slots.md",
+    "reference_pages": [
+     "slots.md"
+    ],
+    "slots_page": "whole"
+   },
+   "slots_page": "whole",
+   "skill_directory_reads": [
+    {
+     "tool_call": 2,
+     "tool": "Grep",
+     "input": "{\"pattern\": \"(?i)serena\", \"path\": \"<checkout>/.claude/skills/claude-native-practice\"}",
+     "reference_pages": [],
+     "slots_page": null
+    },
+    {
+     "tool_call": 3,
+     "tool": "Read",
+     "path": "<checkout>/.claude/skills/claude-native-practice/reference/slots.md",
+     "reference_pages": [
+      "slots.md"
+     ],
+     "slots_page": "whole"
+    },
+    {
+     "tool_call": 4,
+     "tool": "Bash",
+     "input": "cd <checkout>/.claude/skills/claude-native-practice/reference && grep -n -i -B2 -A40 '^## .*mcp-shared-servers\\|^### .*mcp-shared-servers' mcp-surfaces.md | head -120; echo ----; grep -n -i serena *.md | head -40",
+     "reference_pages": [
+      "mcp-surfaces.md"
+     ],
+     "slots_page": null
+    }
+   ]
+  },
+  {
+   "run": "proof4-4.jsonl",
+   "variant": "description v2 + body",
+   "client": "2.1.295",
+   "model": "claude-opus-5-5",
+   "cwd": "<checkout> (a checkout of this branch; the project skill was the only claude-native-practice copy)",
+   "launch_command": "env -u CLAUDECODE timeout 600 claude -p \"Before I add a PreToolUse hook here that blocks force pushes, what is our current Claude Code practice for how a guard hook should behave when it fails or its script is missing? Answer in at most three sentences, naming the exact setting and the minimum client version.\" --model claude-opus-5-5 --max-turns 10 --max-budget-usd 3 --output-format stream-json --verbose < /dev/null",
+   "initial_request": "Before I add a PreToolUse hook here that blocks force pushes, what is our current Claude Code practice for how a guard hook should behave when it fails or its script is missing? Answer in at most three sentences, naming the exact setting and the minimum client version.",
+   "request_names_the_skill": false,
+   "first_tool": "Skill",
+   "first_skill_invocation": {
+    "tool_call": 1,
+    "name": "Skill",
+    "input": {
+     "skill": "claude-native-practice",
+     "args": "guard hook failure behavior: what happens when a PreToolUse guard hook fails or its script is missing; exact setting and minimum client version"
+    }
+   },
+   "first_reference_read": {
+    "tool_call": 2,
+    "tool": "Bash",
+    "input": "cd <checkout>/.claude/skills/claude-native-practice && ls reference && cat reference/slots.md && claude --version",
+    "reference_pages": [
+     "slots.md"
+    ],
+    "slots_page": "whole"
+   },
+   "slots_page": "whole",
+   "skill_directory_reads": [
+    {
+     "tool_call": 2,
+     "tool": "Bash",
+     "input": "cd <checkout>/.claude/skills/claude-native-practice && ls reference && cat reference/slots.md && claude --version",
+     "reference_pages": [
+      "slots.md"
+     ],
+     "slots_page": "whole"
+    },
+    {
+     "tool_call": 3,
+     "tool": "Bash",
+     "input": "awk '/^## hooks/,/^## statusline/' reference/native-clients.md",
+     "reference_pages": [
+      "native-clients.md"
+     ],
+     "slots_page": null
+    }
+   ]
+  },
+  {
+   "run": "proof4-5.jsonl",
+   "variant": "description v2 + body",
+   "client": "2.1.295",
+   "model": "claude-opus-5-5",
+   "cwd": "<checkout> (a checkout of this branch; the project skill was the only claude-native-practice copy)",
+   "launch_command": "env -u CLAUDECODE timeout 600 claude -p \"Which model and effort should a new headless claude -p reviewer job in this repository use, and which permission flags should it pass? Answer in at most three sentences.\" --model claude-opus-5-5 --max-turns 10 --max-budget-usd 3 --output-format stream-json --verbose < /dev/null",
+   "initial_request": "Which model and effort should a new headless claude -p reviewer job in this repository use, and which permission flags should it pass? Answer in at most three sentences.",
+   "request_names_the_skill": false,
+   "first_tool": "Skill",
+   "first_skill_invocation": {
+    "tool_call": 1,
+    "name": "Skill",
+    "input": {
+     "skill": "claude-native-practice"
+    }
+   },
+   "first_reference_read": {
+    "tool_call": 2,
+    "tool": "Bash",
+    "input": "cd <checkout>/.claude/skills/claude-native-practice && cat reference/slots.md && ls reference && claude --version",
+    "reference_pages": [
+     "slots.md"
+    ],
+    "slots_page": "whole"
+   },
+   "slots_page": "whole",
+   "skill_directory_reads": [
+    {
+     "tool_call": 2,
+     "tool": "Bash",
+     "input": "cd <checkout>/.claude/skills/claude-native-practice && cat reference/slots.md && ls reference && claude --version",
+     "reference_pages": [
+      "slots.md"
+     ],
+     "slots_page": "whole"
+    },
+    {
+     "tool_call": 3,
+     "tool": "Bash",
+     "input": "cd <checkout>/.claude/skills/claude-native-practice/reference && cat agent-sdks.md && awk '/^## .*model-effort-routing|id=\"model-effort-routing\"|^## Model/{f=1} f&&/^## /&&!/model-effort|Model/{if(p)exit} f{print;p=1}' native-clients.md",
+     "reference_pages": [
+      "agent-sdks.md",
+      "native-clients.md"
+     ],
+     "slots_page": null
+    }
+   ]
+  },
+  {
+   "run": "proof4-6.jsonl",
+   "variant": "description v2 + body",
+   "client": "2.1.295",
+   "model": "claude-opus-5-5",
+   "cwd": "<checkout> (a checkout of this branch; the project skill was the only claude-native-practice copy)",
+   "launch_command": "env -u CLAUDECODE timeout 600 claude -p \"We want to share one serena MCP server across all Claude sessions on this host to save memory. What does our current practice say? Answer in at most three sentences.\" --model claude-opus-5-5 --max-turns 10 --max-budget-usd 3 --output-format stream-json --verbose < /dev/null",
+   "initial_request": "We want to share one serena MCP server across all Claude sessions on this host to save memory. What does our current practice say? Answer in at most three sentences.",
+   "request_names_the_skill": false,
+   "first_tool": "Skill",
+   "first_skill_invocation": {
+    "tool_call": 1,
+    "name": "Skill",
+    "input": {
+     "skill": "claude-native-practice",
+     "args": "Share one serena MCP server across all Claude sessions on this host to save memory — what does current practice say?"
+    }
+   },
+   "first_reference_read": {
+    "tool_call": 2,
+    "tool": "Bash",
+    "input": "cd <checkout>/.claude/skills/claude-native-practice && ls reference && grep -n -i -E 'serena|mcp|shared|share' reference/slots.md | head -50; claude --version",
+    "reference_pages": [
+     "slots.md"
+    ],
+    "slots_page": "grep"
+   },
+   "slots_page": "grep",
+   "skill_directory_reads": [
+    {
+     "tool_call": 2,
+     "tool": "Bash",
+     "input": "cd <checkout>/.claude/skills/claude-native-practice && ls reference && grep -n -i -E 'serena|mcp|shared|share' reference/slots.md | head -50; claude --version",
+     "reference_pages": [
+      "slots.md"
+     ],
+     "slots_page": "grep"
+    },
+    {
+     "tool_call": 3,
+     "tool": "Read",
+     "path": "<checkout>/.claude/skills/claude-native-practice/reference/mcp-surfaces.md",
+     "reference_pages": [
+      "mcp-surfaces.md"
+     ],
+     "slots_page": null
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,926 @@
+{
+  "schema_version": 1,
+  "kind": "practice_references",
+  "checked_at": "2026-10-09",
+  "scope": "The Claude Code practice references read by the 2026-09-27 community sweep: the 22 community repositories it surveyed and the four upstream Anthropic repositories its two syntheses cited by pin as primary sources, one of them the rejected anthropics/claude-code-security-review. Other pinned sources the syntheses cite, such as git/git at v2.43.0, are not Claude Code practice references and are not tracked. The decision record named by each entry carries the practices, dispositions and overturn conditions; this file only tracks the pins. The freshness check reports drift and maintenance status and never changes a pin, a disposition or a practice. The 2026-10-09 review (docs/decisions/2026-10-09-claude-code-native-practice.md) re-read every reference at its current head and added the eleven sources it graded; prior_pin keeps the 2026-09-28 pin.",
+  "pin_rule": "pin is the full commit SHA the sweep read; pin_date is that commit's committer date in UTC, from gh api repos/{repository}/commits/{pin} (.commit.committer.date), read 2026-09-28.",
+  "stars_at_check_rule": "GitHub stargazers_count from gh api repos/{repository}, read 2026-10-09. Discovery metadata only: stars guide discovery and are never evidence of quality, maintenance or fitness (AGENTS.md top rule).",
+  "freshness_check": {
+    "tool": "tools/sota-convergence/practice_references.py",
+    "workflow": ".github/workflows/practice-references-freshness.yml"
+  },
+  "dimensions": [
+    {
+      "id": "harness-and-token-practice",
+      "description": "The sweep's main synthesis: context, compaction, effort, model tiering, delegation, MCP, instruction-file, permission, plugin and skill practice for the Claude Code harness.",
+      "topics": [
+        "Auto-compact threshold on the 1M Opus 5.5 window",
+        "Fixed context percentages and a 300-400K 'rot boundary'",
+        "Disabling or blocking auto-compaction",
+        "Default effort on Opus 5.5",
+        "Thinking-budget controls",
+        "Cheaper models for subagents, teammates, planning and main",
+        "MCP tool loading",
+        "Standing self-verification instructions",
+        "Delegation volume",
+        "Effort changes and the prompt cache",
+        "CLAUDE.md size",
+        "Generated or compressed instruction files",
+        "Permission mode",
+        "Completion loops",
+        "Agent teams",
+        "1-hour prompt-cache TTL",
+        "MCP output cap",
+        "Plugin and marketplace pinning",
+        "Subagent tool restriction",
+        "Skill description wording"
+      ]
+    },
+    {
+      "id": "git-review-and-automation",
+      "description": "The sweep's supplement synthesis: commit, pull-request, review, CI, scheduling and headless (claude -p) automation practice.",
+      "topics": [
+        "Commit message format",
+        "AI review of every PR",
+        "Human approval before merge",
+        "Action reference pinning",
+        "PR size",
+        "Permission bypass on a real host",
+        "Unattended permission route",
+        "--bare for scripted calls",
+        "Completion loops",
+        "-p JSON output shape",
+        "Scheduler durability and /loop lifetime",
+        "Model routing for CI cost",
+        "Commit attribution",
+        "Security review layers",
+        "Off-minute schedules",
+        "Notifications for waiting sessions",
+        "Headless background waits"
+      ]
+    },
+    {
+      "id": "claude-native-role-slots",
+      "description": "The 2026-10-09 review of Claude Code native practice at client 2.1.295: one default per role slot across 33 slots, with the community sources graded on their own quality.",
+      "topics": [
+        "client-core",
+        "instruction-files",
+        "auto-memory",
+        "settings-permissions",
+        "hooks",
+        "statusline",
+        "checkpoints-rewind",
+        "model-effort-routing",
+        "config-managers",
+        "skills-library",
+        "plugin-marketplaces",
+        "output-styles",
+        "commands",
+        "practice-references",
+        "subagent-definitions",
+        "agent-teams",
+        "background-workflows",
+        "orchestration-frameworks",
+        "planning-persistence",
+        "loops-completion",
+        "scheduled-tasks",
+        "sandbox",
+        "worktrees",
+        "mcp-config-tool-search",
+        "mcp-shared-servers",
+        "headless-sdk",
+        "github-action",
+        "pr-review-pre-cue",
+        "release-tracking",
+        "context-compaction",
+        "prompt-caching",
+        "output-compression",
+        "usage-cost-monitoring"
+      ]
+    }
+  ],
+  "references": [
+    {
+      "repository": "obra/superpowers",
+      "role": "community",
+      "pin": "8ca22dba9a94f28898bbce59f2537ff4d87c747d",
+      "pin_date": "2026-09-25",
+      "stars_at_check": 296643,
+      "used_for": [
+        {
+          "dimension": "harness-and-token-practice",
+          "use": "verification-before-completion skill (installed byte-identical as a trial skill until its removal on 2026-09-28 under the skills trial's conflict rule; superpowers stays an alternative), subagent context and TDD practice"
+        },
+        {
+          "dimension": "git-review-and-automation",
+          "use": "Review before merge, a fresh reviewer, worktrees, the headless test harness."
+        },
+        {
+          "dimension": "claude-native-role-slots",
+          "use": "Re-read at the 2026-10-09 head for the role-slot review."
+        }
+      ],
+      "record": "docs/decisions/2026-10-09-claude-code-native-practice.md"
+    },
+    {
+      "repository": "affaan-m/ECC",
+      "role": "community",
+      "pin": "ef648e01899ba3e8dc6371642deaaf64b4477775",
+      "pin_date": "2026-10-02",
+      "stars_at_check": 275515,
+      "used_for": [
+        {
+          "dimension": "harness-and-token-practice",
+          "use": "token-optimization defaults (MAX_THINKING_TOKENS, SUBAGENT_MODEL=haiku), strategic-compact thresholds, hooks"
+        },
+        {
+          "dimension": "git-review-and-automation",
+          "use": "Practices: pre-commit hooks, SHA pinning, external cron. Stale claims: includeCoAuthoredBy, `claude agents`."
+        },
+        {
+          "dimension": "claude-native-role-slots",
+          "use": "Re-read at the 2026-10-09 head for the role-slot review."
+        }
+      ],
+      "record": "docs/decisions/2026-10-09-claude-code-native-practice.md",
+      "prior_pin": {
+        "pin": "eaeef53a15854e68cb2be336c2ba47e111fa25c3",
+        "release": "default-branch commit of 2026-09-27"
+      }
+    },
+    {
+      "repository": "shanraisshan/claude-code-best-practice",
+      "role": "community",
+      "pin": "cde5cf9a8e00e0a29eb76f93830bbc829aaa49a0",
+      "pin_date": "2026-10-09",
+      "stars_at_check": 67286,
+      "used_for": [
+        {
+          "dimension": "harness-and-token-practice",
+          "use": "repository named by the user: context, compaction, effort (Opus 4.7-era), settings and tips"
+        },
+        {
+          "dimension": "git-review-and-automation",
+          "use": "Practices: small PRs, squash merge, /code-review, auto mode, /loop, --bare, background tasks, attribution. Stale claims: /review, /security-review flags, the 3-day /loop, the PRINT_BG_WAIT description."
+        },
+        {
+          "dimension": "claude-native-role-slots",
+          "use": "Re-read at the 2026-10-09 head for the role-slot review."
+        }
+      ],
+      "record": "docs/decisions/2026-10-09-claude-code-native-practice.md",
+      "prior_pin": {
+        "pin": "59dc4f047f850a21dabbdde7685be07c2e3ca5bd",
+        "release": "default-branch commit of 2026-09-27"
+      }
+    },
+    {
+      "repository": "hesreallyhim/awesome-claude-code",
+      "role": "community",
+      "pin": "7eddf4aaebeba52820f6a050650106b5177d0474",
+      "pin_date": "2026-10-09",
+      "stars_at_check": 55290,
+      "used_for": [
+        {
+          "dimension": "harness-and-token-practice",
+          "use": "curation list, used for discovery only"
+        },
+        {
+          "dimension": "git-review-and-automation",
+          "use": "Discovery; the stale claude-code-security-review listing; a cron counter-example."
+        },
+        {
+          "dimension": "claude-native-role-slots",
+          "use": "Re-read at the 2026-10-09 head for the role-slot review."
+        }
+      ],
+      "record": "docs/decisions/2026-10-09-claude-code-native-practice.md",
+      "prior_pin": {
+        "pin": "c1cb4c1705b92c6a0808c2769fbe2c0d53108a1c",
+        "release": "default-branch commit of 2026-09-27"
+      }
+    },
+    {
+      "repository": "shareAI-lab/learn-claude-code",
+      "role": "community",
+      "pin": "ce8f9f186058939da54c9d6fead78dfb5d0fd6c3",
+      "pin_date": "2026-09-28",
+      "stars_at_check": 78198,
+      "used_for": [
+        {
+          "dimension": "harness-and-token-practice",
+          "use": "subagent context isolation and harness patterns"
+        },
+        {
+          "dimension": "git-review-and-automation",
+          "use": "The SDK subprocess-cost dissent; worktrees; background tasks."
+        },
+        {
+          "dimension": "claude-native-role-slots",
+          "use": "Re-read at the 2026-10-09 head for the role-slot review."
+        }
+      ],
+      "record": "docs/decisions/2026-10-09-claude-code-native-practice.md",
+      "prior_pin": {
+        "pin": "0dcafa2ae053a1ddd6a72f265431104b08a5aa13",
+        "release": "default-branch commit of 2026-08-26"
+      }
+    },
+    {
+      "repository": "luongnv89/claude-howto",
+      "role": "community",
+      "pin": "556af8d52327525d241f17574ef3f11976982fc8",
+      "pin_date": "2026-09-30",
+      "stars_at_check": 41779,
+      "used_for": [
+        {
+          "dimension": "harness-and-token-practice",
+          "use": "commands, settings, hooks and effort tutorials"
+        },
+        {
+          "dimension": "git-review-and-automation",
+          "use": "Practices: no --no-verify, headless flags, --permission-prompts. The wrong ultrareview exit-code claim."
+        },
+        {
+          "dimension": "claude-native-role-slots",
+          "use": "Re-read at the 2026-10-09 head for the role-slot review."
+        }
+      ],
+      "record": "docs/decisions/2026-10-09-claude-code-native-practice.md",
+      "prior_pin": {
+        "pin": "4f5703855c723a1d0ab0285a497ad0e0ecc5b69a",
+        "release": "default-branch commit of 2026-09-26"
+      }
+    },
+    {
+      "repository": "Yeachan-Heo/oh-my-claudecode",
+      "role": "community",
+      "pin": "454bae017356ed1d056182cd929b6eb6cf6143ad",
+      "pin_date": "2026-10-06",
+      "stars_at_check": 39718,
+      "used_for": [
+        {
+          "dimension": "harness-and-token-practice",
+          "use": "orchestration and per-folder context generation"
+        },
+        {
+          "dimension": "git-review-and-automation",
+          "use": "Review and commit rules; the bypass-risk dissent; the conditional --bare."
+        },
+        {
+          "dimension": "claude-native-role-slots",
+          "use": "Re-read at the 2026-10-09 head for the role-slot review."
+        }
+      ],
+      "record": "docs/decisions/2026-10-09-claude-code-native-practice.md",
+      "prior_pin": {
+        "pin": "9fd35ece5d6de65b511bf43b55e42c499e4fc194",
+        "release": "default-branch commit of 2026-09-22"
+      }
+    },
+    {
+      "repository": "wshobson/agents",
+      "role": "community",
+      "pin": "46891e7e60da0e52baf1050b7b6391b64e84c6d9",
+      "pin_date": "2026-10-04",
+      "stars_at_check": 40305,
+      "used_for": [
+        {
+          "dimension": "harness-and-token-practice",
+          "use": "model tiering, model: inherit, agent design"
+        },
+        {
+          "dimension": "git-review-and-automation",
+          "use": "Review governance, atomic commits, squash merge, a cron counter-example."
+        },
+        {
+          "dimension": "claude-native-role-slots",
+          "use": "Re-read at the 2026-10-09 head for the role-slot review."
+        }
+      ],
+      "record": "docs/decisions/2026-10-09-claude-code-native-practice.md",
+      "prior_pin": {
+        "pin": "9b15b34b0bfc13a815cbfc2366e14ea549e09422",
+        "release": "default-branch commit of 2026-09-26"
+      }
+    },
+    {
+      "repository": "ruvnet/ruflo",
+      "role": "community",
+      "pin": "6287f1993808889668f028ac58e2f092475312ce",
+      "pin_date": "2026-10-09",
+      "stars_at_check": 74156,
+      "used_for": [
+        {
+          "dimension": "harness-and-token-practice",
+          "use": "compaction settings, hooks, subagent depth ADR"
+        },
+        {
+          "dimension": "git-review-and-automation",
+          "use": "Headless fan-out and budget caps; the non-UUID --session-id."
+        },
+        {
+          "dimension": "claude-native-role-slots",
+          "use": "Re-read at the 2026-10-09 head for the role-slot review."
+        }
+      ],
+      "record": "docs/decisions/2026-10-09-claude-code-native-practice.md",
+      "prior_pin": {
+        "pin": "b14c79e6f7793a358f13b7e3f9b5eb27317b4988",
+        "release": "default-branch commit of 2026-09-27"
+      }
+    },
+    {
+      "repository": "bmad-code-org/BMAD-METHOD",
+      "role": "community",
+      "pin": "bda3c5929f672019b90f39a3ea27259d35d00974",
+      "pin_date": "2026-10-06",
+      "stars_at_check": 53965,
+      "used_for": [
+        {
+          "dimension": "harness-and-token-practice",
+          "use": "subagent reconnaissance and instruction-file practice"
+        },
+        {
+          "dimension": "git-review-and-automation",
+          "use": "Conventional Commits, pre-commit install, the background-wait dissent."
+        },
+        {
+          "dimension": "claude-native-role-slots",
+          "use": "Re-read at the 2026-10-09 head for the role-slot review."
+        }
+      ],
+      "record": "docs/decisions/2026-10-09-claude-code-native-practice.md",
+      "prior_pin": {
+        "pin": "5e33d3c03ba53187a40ab679d5479cdd4b6ac2fb",
+        "release": "default-branch commit of 2026-09-25"
+      }
+    },
+    {
+      "repository": "thedotmack/claude-mem",
+      "role": "community",
+      "pin": "fa8ab09f06aa05f958c5225cf3756ce52a3ebb96",
+      "pin_date": "2026-10-09",
+      "stars_at_check": 98672,
+      "used_for": [
+        {
+          "dimension": "harness-and-token-practice",
+          "use": "memory and context-engineering practice"
+        },
+        {
+          "dimension": "git-review-and-automation",
+          "use": "dontAsk tests, the Stop-hook retry hazard, the CI-failure gate caveat."
+        },
+        {
+          "dimension": "claude-native-role-slots",
+          "use": "Re-read at the 2026-10-09 head for the role-slot review."
+        }
+      ],
+      "record": "docs/decisions/2026-10-09-claude-code-native-practice.md",
+      "prior_pin": {
+        "pin": "7d0355413c2aaa3fa57fe6788b2ba2717fa7ff6f",
+        "release": "default-branch commit of 2026-09-26"
+      }
+    },
+    {
+      "repository": "ykdojo/claude-code-tips",
+      "role": "community",
+      "pin": "577ac89252195d61283b334c4b9d292b52c82203",
+      "pin_date": "2026-09-25",
+      "stars_at_check": 10202,
+      "used_for": [
+        {
+          "dimension": "harness-and-token-practice",
+          "use": "session, compaction and status-line tips"
+        },
+        {
+          "dimension": "git-review-and-automation",
+          "use": "gh-driven and draft PRs, interactive review, the auto-mode caution."
+        },
+        {
+          "dimension": "claude-native-role-slots",
+          "use": "Re-read at the 2026-10-09 head for the role-slot review."
+        }
+      ],
+      "record": "docs/decisions/2026-10-09-claude-code-native-practice.md"
+    },
+    {
+      "repository": "FlorianBruniaux/claude-code-ultimate-guide",
+      "role": "community",
+      "pin": "585c2030cd590e991d84dae4d6614cd449f245b1",
+      "pin_date": "2026-10-07",
+      "stars_at_check": 6128,
+      "used_for": [
+        {
+          "dimension": "harness-and-token-practice",
+          "use": "broad guide; Headroom MCP-mode advice; caveman figures"
+        },
+        {
+          "dimension": "git-review-and-automation",
+          "use": "Practices: CI caps, the multi-provider review caveat. Rejected: @main and direct_prompt examples, Haiku routing, --timeout, the Ralph bash loop."
+        },
+        {
+          "dimension": "claude-native-role-slots",
+          "use": "Re-read at the 2026-10-09 head for the role-slot review."
+        }
+      ],
+      "record": "docs/decisions/2026-10-09-claude-code-native-practice.md",
+      "prior_pin": {
+        "pin": "dfb8bc67d10d52c3005a7e6ed2f4c6b53d3d7e09",
+        "release": "default-branch commit of 2026-09-27"
+      }
+    },
+    {
+      "repository": "zebbern/claude-code-guide",
+      "role": "community",
+      "pin": "9cde8986ec0b5b67a1ab41bc12886da9e898aef9",
+      "pin_date": "2026-10-09",
+      "stars_at_check": 4652,
+      "used_for": [
+        {
+          "dimension": "harness-and-token-practice",
+          "use": "settings and tuning restatements, including stale tunings"
+        },
+        {
+          "dimension": "git-review-and-automation",
+          "use": "The SHA-pin tip, secrets, bypass only in sandboxes, --bare."
+        },
+        {
+          "dimension": "claude-native-role-slots",
+          "use": "Re-read at the 2026-10-09 head for the role-slot review."
+        }
+      ],
+      "record": "docs/decisions/2026-10-09-claude-code-native-practice.md",
+      "prior_pin": {
+        "pin": "0cb35f7f17b212930e14b30deac96fae0e48af1f",
+        "release": "default-branch commit of 2026-09-26"
+      }
+    },
+    {
+      "repository": "centminmod/my-claude-code-setup",
+      "role": "community",
+      "pin": "7d5c3743942606a9c5756de47ecdb41e2317c8b6",
+      "pin_date": "2026-10-08",
+      "stars_at_check": 2657,
+      "used_for": [
+        {
+          "dimension": "harness-and-token-practice",
+          "use": "Compact Instructions and CLAUDE.md practice"
+        },
+        {
+          "dimension": "git-review-and-automation",
+          "use": "Scoped tools, timeouts, the notifier, the JSON-array observation, the deprecated includeCoAuthoredBy."
+        },
+        {
+          "dimension": "claude-native-role-slots",
+          "use": "Re-read at the 2026-10-09 head for the role-slot review."
+        }
+      ],
+      "record": "docs/decisions/2026-10-09-claude-code-native-practice.md",
+      "prior_pin": {
+        "pin": "f41310c11cfaa01e4a479eb9d4a2ebd92e810839",
+        "release": "default-branch commit of 2026-09-25"
+      }
+    },
+    {
+      "repository": "feiskyer/claude-code-settings",
+      "role": "community",
+      "pin": "95dab59a62b2031adcb7abf25ae0a60b8a13fdb2",
+      "pin_date": "2026-09-27",
+      "stars_at_check": 1658,
+      "used_for": [
+        {
+          "dimension": "harness-and-token-practice",
+          "use": "settings examples (effort, thinking)"
+        },
+        {
+          "dimension": "git-review-and-automation",
+          "use": "-p subprocesses, --allowedTools, --resume, the per-subgoal rule (rejected)."
+        },
+        {
+          "dimension": "claude-native-role-slots",
+          "use": "Re-read at the 2026-10-09 head for the role-slot review."
+        }
+      ],
+      "record": "docs/decisions/2026-10-09-claude-code-native-practice.md"
+    },
+    {
+      "repository": "fcakyon/claude-codex-settings",
+      "role": "community",
+      "pin": "7a519d87d5578a1515e0abc70fe43d303a782c94",
+      "pin_date": "2026-10-07",
+      "stars_at_check": 1171,
+      "used_for": [
+        {
+          "dimension": "harness-and-token-practice",
+          "use": "PreCompact priorities reference, status line, advisor"
+        },
+        {
+          "dimension": "git-review-and-automation",
+          "use": "No --no-verify, the defaultMode auto config, an off-minute cron."
+        },
+        {
+          "dimension": "claude-native-role-slots",
+          "use": "Re-read at the 2026-10-09 head for the role-slot review."
+        }
+      ],
+      "record": "docs/decisions/2026-10-09-claude-code-native-practice.md",
+      "prior_pin": {
+        "pin": "8c25677efb55b473f7b0bbbb3658273ebc8eb993",
+        "release": "default-branch commit of 2026-09-24"
+      }
+    },
+    {
+      "repository": "Piebald-AI/claude-code-system-prompts",
+      "role": "community",
+      "pin": "e5fac17e4e1085ecaf156440e88bed7cc8acfac5",
+      "pin_date": "2026-10-08",
+      "stars_at_check": 12859,
+      "used_for": [
+        {
+          "dimension": "harness-and-token-practice",
+          "use": "extracted harness prompts, used as behaviour evidence and not counted"
+        },
+        {
+          "dimension": "git-review-and-automation",
+          "use": "Extracted built-in prompts, treated as copies of the primary side; scheduler and Monitor guidance."
+        },
+        {
+          "dimension": "claude-native-role-slots",
+          "use": "Re-read at the 2026-10-09 head for the role-slot review."
+        }
+      ],
+      "record": "docs/decisions/2026-10-09-claude-code-native-practice.md",
+      "prior_pin": {
+        "pin": "2b5a6b763bd090d1b99e04a0cba43bbca23dfa07",
+        "release": "default-branch commit of 2026-09-26"
+      }
+    },
+    {
+      "repository": "JuliusBrussee/caveman",
+      "role": "community",
+      "pin": "2e08b9177c07bb7249a8a2d1a6758e5db281d002",
+      "pin_date": "2026-10-08",
+      "stars_at_check": 110621,
+      "used_for": [
+        {
+          "dimension": "harness-and-token-practice",
+          "use": "terse-output compression and its cited studies"
+        },
+        {
+          "dimension": "git-review-and-automation",
+          "use": "Conventional Commits, small PRs, no attribution, -p evals."
+        },
+        {
+          "dimension": "claude-native-role-slots",
+          "use": "Re-read at the 2026-10-09 head for the role-slot review."
+        }
+      ],
+      "record": "docs/decisions/2026-10-09-claude-code-native-practice.md",
+      "prior_pin": {
+        "pin": "2fd153c67988e980fb0b2455c90832159a6a5a25",
+        "release": "default-branch commit of 2026-09-22"
+      }
+    },
+    {
+      "repository": "addyosmani/agent-skills",
+      "role": "community",
+      "pin": "1401c8b8030e023baeebb31781a6653fe8e93026",
+      "pin_date": "2026-10-03",
+      "stars_at_check": 103471,
+      "used_for": [
+        {
+          "dimension": "harness-and-token-practice",
+          "use": "skills and agents practice"
+        },
+        {
+          "dimension": "git-review-and-automation",
+          "use": "Review before merge, fast hooks, worktrees, the non-interactive skip rule."
+        },
+        {
+          "dimension": "claude-native-role-slots",
+          "use": "Re-read at the 2026-10-09 head for the role-slot review."
+        }
+      ],
+      "record": "docs/decisions/2026-10-09-claude-code-native-practice.md",
+      "prior_pin": {
+        "pin": "2686b620fc1fed2e8f60c704839c766b8594c6b6",
+        "release": "default-branch commit of 2026-09-26"
+      }
+    },
+    {
+      "repository": "anthropics/skills",
+      "role": "community",
+      "pin": "683bc88e56f3e09ba94f7055977f3d3aa499f202",
+      "pin_date": "2026-10-05",
+      "stars_at_check": 180035,
+      "used_for": [
+        {
+          "dimension": "harness-and-token-practice",
+          "use": "skill-creator, prompt-audit and model-migration guidance"
+        },
+        {
+          "dimension": "git-review-and-automation",
+          "use": "The distinction between the Agent SDK and the Tool Runner."
+        },
+        {
+          "dimension": "claude-native-role-slots",
+          "use": "Re-read at the 2026-10-09 head for the role-slot review."
+        }
+      ],
+      "record": "docs/decisions/2026-10-09-claude-code-native-practice.md",
+      "prior_pin": {
+        "pin": "33375500bcea98d610eb30ce10ac4e59b89c390d",
+        "release": "default-branch commit of 2026-09-24"
+      }
+    },
+    {
+      "repository": "anthropics/claude-plugins-official",
+      "role": "community",
+      "pin": "315c4e48967d9541c29c3c656441dded353ca7aa",
+      "pin_date": "2026-10-08",
+      "stars_at_check": 37563,
+      "used_for": [
+        {
+          "dimension": "harness-and-token-practice",
+          "use": "security-guidance and LSP plugins, plugin development"
+        },
+        {
+          "dimension": "git-review-and-automation",
+          "use": "The code-review, commit-commands, security-guidance, ralph-loop and code-modernization plugins (PRINT_BG_WAIT)."
+        },
+        {
+          "dimension": "claude-native-role-slots",
+          "use": "Re-read at the 2026-10-09 head for the role-slot review."
+        }
+      ],
+      "record": "docs/decisions/2026-10-09-claude-code-native-practice.md",
+      "prior_pin": {
+        "pin": "fa59bc9037741ecfa131aa27938272605710d7b2",
+        "release": "default-branch commit of 2026-09-25"
+      }
+    },
+    {
+      "repository": "anthropics/claude-code",
+      "role": "primary",
+      "pin": "e47cc82bdbd27b5f799acd5b05fd0c29d33bb48c",
+      "pin_date": "2026-10-08",
+      "stars_at_check": 149759,
+      "used_for": [
+        {
+          "dimension": "harness-and-token-practice",
+          "use": "version facts 2.1.32 to 2.1.283 (prompt-audit, Opus 5.5 default, effort defaults, cacheTtl, summarize)"
+        },
+        {
+          "dimension": "git-review-and-automation",
+          "use": "2.0.62 attribution; 2.1.81 --bare; 2.1.223 /review alias; 2.1.229 --no-verify; 2.1.248 --restricted and self-paced /loop; 2.1.259 --permission-prompts; 2.1.269 and 2.1.281 attribution; the 2.1.281 --max-turns fix; 2.1.282 OTel scope; 2.1.283 routine minutes."
+        },
+        {
+          "dimension": "claude-native-role-slots",
+          "use": "Re-read at the 2026-10-09 head for the role-slot review."
+        }
+      ],
+      "record": "docs/decisions/2026-10-09-claude-code-native-practice.md",
+      "paths_read": [
+        "CHANGELOG.md"
+      ],
+      "prior_pin": {
+        "pin": "7779afb12e3635f46f56ec823979d68350ae000b",
+        "release": "default-branch commit of 2026-09-25"
+      }
+    },
+    {
+      "repository": "anthropics/claude-code-action",
+      "role": "primary",
+      "pin": "2dca132ff0e0c4094ce6048b422c6915a071210b",
+      "pin_date": "2026-10-08",
+      "stars_at_check": 9454,
+      "used_for": [
+        {
+          "dimension": "harness-and-token-practice",
+          "use": "CI hardening entry (HOST-09)"
+        },
+        {
+          "dimension": "git-review-and-automation",
+          "use": "docs/security.md (triggers, checkout, restore, signing, show_full_output), docs/usage.md (deprecations), action.yml (the nested setup-bun pin), examples/claude.yml."
+        },
+        {
+          "dimension": "claude-native-role-slots",
+          "use": "Re-read at the 2026-10-09 head for the role-slot review."
+        }
+      ],
+      "record": "docs/decisions/2026-10-09-claude-code-native-practice.md",
+      "paths_read": [
+        "docs/security.md",
+        "docs/usage.md",
+        "action.yml",
+        "examples/claude.yml"
+      ],
+      "release": "v1.0.247",
+      "prior_pin": {
+        "pin": "756cc22e19660d20e8cc9496b4f242475a7f7790",
+        "release": "v1.0.235"
+      }
+    },
+    {
+      "repository": "anthropics/claude-agent-sdk-python",
+      "role": "primary",
+      "pin": "a8e7ce3cf2d7b18f815f55d5ef3b770d8bfe9cd9",
+      "pin_date": "2026-10-09",
+      "stars_at_check": 8229,
+      "used_for": [
+        {
+          "dimension": "git-review-and-automation",
+          "use": "The upstream reference for selecting the message whose type is 'result' (A10 parser)."
+        },
+        {
+          "dimension": "claude-native-role-slots",
+          "use": "Re-read at the 2026-10-09 head for the role-slot review."
+        }
+      ],
+      "record": "docs/decisions/2026-10-09-claude-code-native-practice.md",
+      "paths_read": [
+        "src/claude_agent_sdk/_internal/message_parser.py:95,308"
+      ],
+      "prior_pin": {
+        "pin": "36f95486ee9fc49d8ee1ed56811f07b5e8e23ac6",
+        "release": "default-branch commit of 2026-09-25"
+      }
+    },
+    {
+      "repository": "anthropics/claude-code-security-review",
+      "role": "primary",
+      "pin": "0c6a49f1fa56a1d472575da86a94dbc1edb78eda",
+      "pin_date": "2026-02-11",
+      "stars_at_check": 6324,
+      "used_for": [
+        {
+          "dimension": "git-review-and-automation",
+          "use": "Rejected: README.md:45 warns it is not hardened against prompt injection."
+        },
+        {
+          "dimension": "claude-native-role-slots",
+          "use": "Re-read at the 2026-10-09 head for the role-slot review."
+        }
+      ],
+      "record": "docs/decisions/2026-10-09-claude-code-native-practice.md",
+      "paths_read": [
+        "README.md:45"
+      ]
+    },
+    {
+      "repository": "SuperClaude-Org/SuperClaude_Framework",
+      "role": "community",
+      "pin": "fe68862c8ed9e2afb8120c2d9e27d0c3a7ce73a2",
+      "pin_date": "2026-09-27",
+      "stars_at_check": 23908,
+      "used_for": [
+        {
+          "dimension": "claude-native-role-slots",
+          "use": "Framework ranked on its own quality for the orchestration and recipe slots; overlaps native skills and plugins."
+        }
+      ],
+      "record": "docs/decisions/2026-10-09-claude-code-native-practice.md"
+    },
+    {
+      "repository": "EveryInc/compound-engineering-plugin",
+      "role": "community",
+      "pin": "67035e931c5cb26e80f198a7019a4502a9788273",
+      "pin_date": "2026-10-07",
+      "stars_at_check": 25436,
+      "used_for": [
+        {
+          "dimension": "claude-native-role-slots",
+          "use": "Framework ranked first among recipe sources on its own quality (tests, evals, native packaging); overlaps native skills and plugins."
+        }
+      ],
+      "record": "docs/decisions/2026-10-09-claude-code-native-practice.md"
+    },
+    {
+      "repository": "VoltAgent/awesome-claude-code-subagents",
+      "role": "community",
+      "pin": "721e9734670bfaf7283194e234ebb88e94c82dcd",
+      "pin_date": "2026-10-05",
+      "stars_at_check": 25597,
+      "used_for": [
+        {
+          "dimension": "claude-native-role-slots",
+          "use": "Subagent-definition collection and model-routing assertions read for the subagent-definitions and model-effort-routing slots."
+        }
+      ],
+      "record": "docs/decisions/2026-10-09-claude-code-native-practice.md"
+    },
+    {
+      "repository": "OthmanAdi/planning-with-files",
+      "role": "community",
+      "pin": "41f60aeca8bae0b145ec0e9421a7abd747ae2b69",
+      "pin_date": "2026-10-06",
+      "stars_at_check": 27349,
+      "used_for": [
+        {
+          "dimension": "claude-native-role-slots",
+          "use": "Planning-persistence candidate read for the planning-persistence slot."
+        }
+      ],
+      "record": "docs/decisions/2026-10-09-claude-code-native-practice.md"
+    },
+    {
+      "repository": "davila7/claude-code-templates",
+      "role": "community",
+      "pin": "46b4d8b1c051e9fd0f8fdd739b15f7f5e8942608",
+      "pin_date": "2026-10-09",
+      "stars_at_check": 32484,
+      "used_for": [
+        {
+          "dimension": "claude-native-role-slots",
+          "use": "Template collection read for subagent, command and config-manager slots."
+        }
+      ],
+      "record": "docs/decisions/2026-10-09-claude-code-native-practice.md"
+    },
+    {
+      "repository": "cobusgreyling/loop-engineering",
+      "role": "community",
+      "pin": "d25c2f4d94a8ddc83309b00e023c5cd00e7742a9",
+      "pin_date": "2026-10-09",
+      "stars_at_check": 11444,
+      "used_for": [
+        {
+          "dimension": "claude-native-role-slots",
+          "use": "Loop and completion pattern library read for the loops-completion slot."
+        }
+      ],
+      "record": "docs/decisions/2026-10-09-claude-code-native-practice.md"
+    },
+    {
+      "repository": "OrchestratorInc/agent-orchestrator",
+      "role": "community",
+      "pin": "d26270f84fbb555ee4027a7c6c65206a1edac2ea",
+      "pin_date": "2026-10-09",
+      "stars_at_check": 12960,
+      "used_for": [
+        {
+          "dimension": "claude-native-role-slots",
+          "use": "Cross-family session supervisor read for the orchestration-frameworks slot; bounded adoption recorded in docs/decisions/2026-10-08-ao-adoption.md."
+        }
+      ],
+      "record": "docs/decisions/2026-10-09-claude-code-native-practice.md"
+    },
+    {
+      "repository": "Chachamaru127/claude-code-harness",
+      "role": "community",
+      "pin": "2b2b74805321089bd9b660a1064fa97556299703",
+      "pin_date": "2026-09-06",
+      "stars_at_check": 3158,
+      "used_for": [
+        {
+          "dimension": "claude-native-role-slots",
+          "use": "Harness framework ranked on its own quality for the recipe and orchestration slots."
+        }
+      ],
+      "record": "docs/decisions/2026-10-09-claude-code-native-practice.md"
+    },
+    {
+      "repository": "NirDiamant/Prompt_Engineering",
+      "role": "community",
+      "pin": "2724f4f4c2bf322e56788fa39e3dfbbb986b1278",
+      "pin_date": "2026-09-21",
+      "stars_at_check": 7893,
+      "used_for": [
+        {
+          "dimension": "claude-native-role-slots",
+          "use": "Prompt-engineering reference read for generated and compressed instruction files."
+        }
+      ],
+      "record": "docs/decisions/2026-10-09-claude-code-native-practice.md"
+    },
+    {
+      "repository": "nexu-io/html-anything",
+      "role": "community",
+      "pin": "553ed98c283f9c0f489902d035416a972d6a9699",
+      "pin_date": "2026-09-15",
+      "stars_at_check": 9043,
+      "used_for": [
+        {
+          "dimension": "claude-native-role-slots",
+          "use": "Read for output and artifact practice; no role slot taken."
+        }
+      ],
+      "record": "docs/decisions/2026-10-09-claude-code-native-practice.md"
+    },
+    {
+      "repository": "tradermonty/claude-trading-skills",
+      "role": "community",
+      "pin": "eab8d5cb97b9982d915944cdaa2df972fa396b22",
+      "pin_date": "2026-10-05",
+      "stars_at_check": 2972,
+      "used_for": [
+        {
+          "dimension": "claude-native-role-slots",
+          "use": "Trading-domain skills read under the trading subtree rules for the skills-library slot; no default taken."
+        }
+      ],
+      "record": "docs/decisions/2026-10-09-claude-code-native-practice.md"
+    }
+  ]
+}

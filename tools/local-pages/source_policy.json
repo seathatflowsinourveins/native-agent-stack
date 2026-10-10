@@ -1802,6 +1802,10 @@
   "architecture_inventory": [
     {
       "root": "repo",
+      "path": ".claude/skills/claude-native-practice/SKILL.md"
+    },
+    {
+      "root": "repo",
       "path": ".claude/skills/omniroute-runtime-worker/SKILL.md"
     },
     {

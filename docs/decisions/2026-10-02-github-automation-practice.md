@@ -114,3 +114,13 @@ Nothing here was installed or measured.
 - LLM A/B harness: https://github.com/promptfoo/promptfoo.
 - In-repository records: `docs/decisions/2026-09-22-github-automation-closure.md`,
   `docs/decisions/2026-09-28-community-sweep.md` (M45), `evidence/artifacts/betterleaks-parity-20260927/`.
+
+## Addendum (2026-10-09): the required-check list was superseded on 2026-10-05
+
+The eight required checks in [Decision](#decision) are this record's 2026-10-02 observation. On 2026-10-05
+[the macOS CI advisory decision](2026-10-05-macos-ci-advisory.md) (#711) removed `validate-macos` from live
+ruleset 23739774 and superseded the required macOS check. A read-only `gh api` GET of that ruleset on 2026-10-09
+returned seven required contexts: `validate`, `token-report`, `secret-scan`, `dependency-review`, `osv-scanner`,
+`verdict-review-gate` and `sota-sources`. `.github/main-ruleset.json`, the "Current practice (2026-10-05)" section of
+`docs/github-automation.md` and the `current_practice_20261005` block of `catalogs/foundation/automation.json`
+carry the same seven. The text above stays as dated history.
