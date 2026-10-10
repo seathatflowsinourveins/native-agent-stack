@@ -73,7 +73,9 @@ COMMENT_LIMIT = 60_000
 DESCRIPTION_LIMIT = 140
 RULES_LIMIT_BYTES = 65_536
 FILES_API_CAP = 3000  # GET /pulls/{n}/files lists at most 3000 files; a list that long is treated as essential
-DEFAULT_KEYS = ("anthropic-api-3", "anthropic-api-4", "anthropic-api-2")
+# Single-key mode (owner direction, command center 2026-10-10 01:49Z): anthropic-api-4 is the one key; the other two
+# are cold spares, tried only after a credit-exhausted refusal, and every run on a spare is logged as a warning.
+DEFAULT_KEYS = ("anthropic-api-4", "anthropic-api-3", "anthropic-api-2")
 DEFAULT_CLAUDE_BIN = "~/.local/share/claude/versions/2.1.296"
 DEFAULT_STATE = "~/.local/state/native-agent-stack/claude-review-worker"
 DEFAULT_TIMEOUT_SECONDS = 2700
@@ -1274,11 +1276,17 @@ def build_prompt(repo: Repo, pr: int, sha: str, main_dir: Path, main_view: str, 
                          main=main_view, upstream=block)
 
 
+def journal_line(message: str) -> None:
+    """One log line for the journal; a leading "<N>" priority prefix stays at the start of the line, where systemd reads it."""
+    level, rest = (message[:3], message[3:]) if re.match(r"<[0-7]>", message) else ("", message)
+    print(f"{level}claude-review-worker: {rest}", flush=True)
+
+
 class Worker:
     def __init__(self, repos: list, settings: Settings, env: dict, *, launcher=None, clock=utc_now, log=None,
                  bwrap: str | None = None):
         self.repos, self.settings, self.env, self.clock = repos, settings, dict(env), clock
-        self.log = log or (lambda message: print(f"claude-review-worker: {message}", flush=True))
+        self.log = log or journal_line
         self.state = settings.state
         self.gh = GitHub(self.env)
         self.git_env = git_environment(self.env)
@@ -1677,6 +1685,10 @@ class Worker:
                 break
             if on_debit is not None:
                 on_debit(index, key, ref)
+            if index > 0:
+                # "<4>" makes the journal record this line at warning priority (systemd SyslogLevelPrefix, on by default).
+                self.log(f"<4>WARNING {label}: the primary key {self.settings.keys[0]} is out of credit; this run uses the "
+                         f"cold spare {key}; tell the command center")
             stream_path = report_dir / f"stream-{index + 1}.jsonl"
             plan.config_dir = Path(tempfile.mkdtemp(prefix="config-", dir=ensure_dir(self.state / "tmp")))
             try:

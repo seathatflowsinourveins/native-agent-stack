@@ -6,9 +6,11 @@ bubblewrap cannot create a user namespace or the host pipes crash dumps (credent
 """
 from __future__ import annotations
 
+import contextlib
 import dataclasses
 import datetime as dt
 import importlib.util
+import io
 import json
 import os
 import pwd
@@ -35,7 +37,7 @@ crw = load("claude_review_worker", TOOL / "worker.py")
 probes = load("claude_review_worker_probes", TOOL / "probes.py")  # it reuses the module loaded above
 assert probes.crw is crw
 
-KEYS = ("anthropic-api-3", "anthropic-api-4", "anthropic-api-2")
+KEYS = ("anthropic-api-4", "anthropic-api-3", "anthropic-api-2")
 GIT_ID = {"GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@example.invalid", "GIT_COMMITTER_NAME": "t",
           "GIT_COMMITTER_EMAIL": "t@example.invalid"}
 
@@ -580,6 +582,19 @@ class ReviewRunTest(unittest.TestCase):
                 attempt = h.record(repo, 3, sha)["attempts"][0]
                 self.assertEqual((attempt["outcome"], attempt["keys"]), ("completed", [KEYS[0], KEYS[1]]))
                 self.assertEqual(len(set(attempt["ledger_refs"])), 2)
+                # Single-key mode: a run on a cold spare is logged at warning priority.
+                spare = [line for line in h.logs if line.startswith("<4>WARNING") and f"cold spare {KEYS[1]}" in line]
+                self.assertEqual(len(spare), 1, h.logs)
+
+    def test_the_default_key_order_is_api_4_then_the_cold_spares(self):
+        self.assertEqual(crw.DEFAULT_KEYS, ("anthropic-api-4", "anthropic-api-3", "anthropic-api-2"))
+
+    def test_a_journal_priority_prefix_stays_at_the_start_of_the_line(self):
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            crw.journal_line("<4>WARNING spare")
+            crw.journal_line("plain")
+        self.assertEqual(out.getvalue(), "<4>claude-review-worker: WARNING spare\nclaude-review-worker: plain\n")
 
     def test_any_other_refusal_stops_at_once_and_is_final(self):
         h = Harness(self)

@@ -88,9 +88,13 @@ requests now. It reuses the repository's own fence: main at the working director
    - `CLAUDE_CODE_DISABLE_AUTO_MEMORY=1`, `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1` and `DISABLE_AUTOUPDATER=1`;
    - `HOME`, `CLAUDE_CONFIG_DIR` (fresh per run), `TMPDIR`, `USER`, `PATH` and `LANG`.
 
-   The keys are tried in the order of `CLAUDE_REVIEW_KEYS` (default `anthropic-api-3,anthropic-api-4,anthropic-api-2`).
-   The worker moves to the next key only on a credit-exhausted refusal (HTTP 402, or 400 with "credit balance is too
-   low"). Each key try is its own ledger ref.
+   Single-key mode (owner direction, relayed by the command center on 2026-10-10 at 01:49Z): `anthropic-api-4` is the
+   one key. `anthropic-api-3` and `anthropic-api-2` are cold spares. The keys are tried in the order of
+   `CLAUDE_REVIEW_KEYS` (default `anthropic-api-4,anthropic-api-3,anthropic-api-2`), and the worker moves to the next key
+   only on a credit-exhausted refusal (HTTP 402, or 400 with "credit balance is too low"). A run on a spare is logged at
+   warning priority in the journal ("the primary key … is out of credit; this run uses the cold spare …; tell the
+   command center"). Each key try is its own ledger ref. The key is still injected per command by the credential
+   runner, never through a shared gateway or a lane's environment.
 5. **Prompt:**
    - main's `AGENTS.md` plus `REVIEW.md` (`us-equities-trading`), or main's `AGENTS.md` plus
      `.github/pull_request_template.md` (`native-agent-stack`), each capped at 64 KiB;
