@@ -1,0 +1,348 @@
+{
+  "schema": "local-architecture-mapping/1",
+  "reviewed_utc": "2026-10-09",
+  "source_checkout": "2ecce6ec2221704db642ddec8f70f7152ed2afb6",
+  "scope": "Exact-name architecture associations supplement canonical winner component-ID and repository joins. Associations describe responsibility, not installation, execution, winner status or acceptance. Unknown new names remain unmapped.",
+  "sources": [
+    "catalogs/landscape/manifest.json",
+    "catalogs/landscape/foundation.json",
+    "catalogs/landscape/us-equities.json",
+    "adoption/skills/manifest.json",
+    "manifests/stack.json",
+    "local CC automation-projection/1 registration basenames"
+  ],
+  "mappings": [
+    {
+      "kinds": ["skill"],
+      "names": ["agentic-actions-auditor", "codebase-design", "codebase-memory", "codeql", "diagnosing-bugs", "find-skills", "fp-check", "frontend-design", "gh-address-comments", "gh-fix-ci", "hcom-agent-messaging", "hf-cli", "imagegen", "iterative-retrieval", "loki", "mcp-builder", "mineru", "modern-python", "native-stack-research", "native-stack-worker", "omniroute-runtime-worker", "openai-docs", "promptfoo-evals", "property-based-testing", "qmd", "review-agent", "sarif-parsing", "search-first", "security-audit", "security-best-practices", "security-threat-model", "skill-creator", "skill-installer", "supply-chain-risk-auditor", "tdd", "typesafe-ai", "variant-analysis", "writing-for-agents"],
+      "layer_keys": ["foundation/instructions-skills"],
+      "reason": "These installed SKILL.md entrypoints are instruction and skill surfaces; their specialist responsibility is associated separately below.",
+      "source_refs": ["catalogs/landscape/foundation.json#/layers/1", "adoption/skills/manifest.json"]
+    },
+    {
+      "kinds": ["skill"], "names": ["codebase-memory", "codebase-design", "diagnosing-bugs", "variant-analysis"],
+      "layer_keys": ["foundation/code-navigation"],
+      "reason": "The named skills support source navigation, module understanding and bounded code diagnosis.",
+      "source_refs": ["catalogs/landscape/foundation.json#/layers/4"]
+    },
+    {
+      "kinds": ["skill"], "names": ["qmd", "mineru"],
+      "layer_keys": ["foundation/document-retrieval"],
+      "reason": "The named tools retrieve or parse documents through their skill entrypoints.",
+      "source_refs": ["catalogs/landscape/foundation.json#/layers/5"]
+    },
+    {
+      "kinds": ["skill"], "names": ["native-stack-research", "search-first", "hf-cli", "openai-docs"],
+      "layer_keys": ["foundation/web-research"],
+      "reason": "The named entrypoints acquire upstream sources, product documentation or research references.",
+      "source_refs": ["catalogs/landscape/foundation.json#/layers/8"]
+    },
+    {
+      "kinds": ["skill"], "names": ["native-stack-worker", "omniroute-runtime-worker", "hcom-agent-messaging", "iterative-retrieval"],
+      "layer_keys": ["foundation/workers", "foundation/agent-sdks"],
+      "reason": "These named entrypoints coordinate or dispatch bounded runtime worker tasks; presence does not establish successful dispatch.",
+      "source_refs": ["catalogs/landscape/foundation.json#/layers/2", "catalogs/landscape/foundation.json#/layers/16"]
+    },
+    {
+      "kinds": ["skill"], "names": ["review-agent", "tdd", "property-based-testing", "promptfoo-evals", "fp-check"],
+      "layer_keys": ["foundation/quality-evaluation"],
+      "reason": "The named entrypoints implement review, test and finding-verification responsibilities.",
+      "source_refs": ["catalogs/landscape/foundation.json#/layers/10"]
+    },
+    {
+      "kinds": ["skill"], "names": ["agentic-actions-auditor", "codeql", "sarif-parsing", "security-audit", "security-best-practices", "security-threat-model", "supply-chain-risk-auditor"],
+      "layer_keys": ["foundation/ci-supply-chain", "foundation/secrets-credentials"],
+      "reason": "The named security and dependency-review entrypoints support the security and supply-chain responsibilities.",
+      "source_refs": ["catalogs/landscape/foundation.json#/layers/11", "catalogs/landscape/foundation.json#/layers/18"]
+    },
+    {
+      "kinds": ["skill"], "names": ["gh-address-comments", "gh-fix-ci"],
+      "layer_keys": ["foundation/git-github-automation"],
+      "reason": "These GitHub entrypoints handle PR review and check triage.",
+      "source_refs": ["catalogs/landscape/foundation.json#/layers/19"]
+    },
+    {
+      "kinds": ["skill"], "names": ["loki"],
+      "layer_keys": ["foundation/observation-inference"],
+      "reason": "The Loki entrypoint supports log observation and analysis.",
+      "source_refs": ["catalogs/landscape/foundation.json#/layers/15"]
+    },
+    {
+      "kinds": ["skill"], "names": ["mcp-builder"],
+      "layer_keys": ["foundation/mcp-surfaces"],
+      "reason": "The MCP builder entrypoint supports MCP server and client surfaces.",
+      "source_refs": ["catalogs/landscape/foundation.json#/layers/17"]
+    },
+    {
+      "kinds": ["skill"], "names": ["frontend-design", "imagegen"],
+      "layer_keys": ["foundation/hosting-services"],
+      "reason": "The named visual-design entrypoints support application interfaces and their assets.",
+      "source_refs": ["catalogs/landscape/foundation.json#/layers/13"]
+    },
+    {
+      "kinds": ["skill"], "names": ["modern-python"],
+      "layer_keys": ["foundation/recovery-portability"],
+      "reason": "The Python environment entrypoint supports reproducible packaging and environment reconstruction.",
+      "source_refs": ["catalogs/landscape/foundation.json#/layers/14"]
+    },
+    {
+      "kinds": ["agent", "role"],
+      "names": ["blind-adjudicator", "blind-judge", "blind-lane-reviewer", "codebase-memory", "codebase-memory-auditor", "codebase-memory-scout", "evidence-reviewer", "isolated-builder", "landscape-sweep-worker", "security-reviewer", "semantic-evidence-reviewer", "semble-search", "source-scout", "stack-researcher", "stack-verifier"],
+      "layer_keys": ["foundation/workers"],
+      "reason": "These named agent or role files are task-ownership surfaces; a role file is not evidence of an accepted runtime worker.",
+      "source_refs": ["catalogs/landscape/foundation.json#/layers/2", "adoption/agents"]
+    },
+    {
+      "kinds": ["agent", "role"], "names": ["codebase-memory", "codebase-memory-auditor", "codebase-memory-scout", "semble-search"],
+      "layer_keys": ["foundation/code-navigation", "foundation/semantic-rag"],
+      "reason": "These named search roles navigate source and retrieve code context.",
+      "source_refs": ["catalogs/landscape/foundation.json#/layers/4", "catalogs/landscape/foundation.json#/layers/6"]
+    },
+    {
+      "kinds": ["agent", "role"], "names": ["blind-adjudicator", "blind-judge", "blind-lane-reviewer", "evidence-reviewer", "semantic-evidence-reviewer", "stack-verifier"],
+      "layer_keys": ["foundation/quality-evaluation"],
+      "reason": "These named review roles challenge or verify task and evidence results.",
+      "source_refs": ["catalogs/landscape/foundation.json#/layers/10"]
+    },
+    {
+      "kinds": ["agent", "role"], "names": ["landscape-sweep-worker", "source-scout", "stack-researcher"],
+      "layer_keys": ["foundation/web-research"],
+      "reason": "These named research roles inspect upstream sources and the tool landscape.",
+      "source_refs": ["catalogs/landscape/foundation.json#/layers/8"]
+    },
+    {
+      "kinds": ["agent", "role"], "names": ["isolated-builder"],
+      "layer_keys": ["foundation/isolation"],
+      "reason": "The isolated-builder role associates task production with the isolation responsibility; isolation acceptance is separate.",
+      "source_refs": ["catalogs/landscape/foundation.json#/layers/3"]
+    },
+    {
+      "kinds": ["agent", "role"], "names": ["security-reviewer"],
+      "layer_keys": ["foundation/ci-supply-chain", "foundation/secrets-credentials"],
+      "reason": "The named reviewer carries security-review responsibility.",
+      "source_refs": ["catalogs/landscape/foundation.json#/layers/11", "catalogs/landscape/foundation.json#/layers/18"]
+    },
+    {
+      "kinds": ["workflow"],
+      "names": ["action-compatibility", "adoption-bootstrap", "catalog-freshness", "dependency-review", "frozen-evidence-risk", "hardware-profile-smoke", "harness-audit", "native-foundation-e2e", "native-offhost-app-state", "native-offhost-restore", "native-service-reboot", "native-token-e2e", "practice-references-freshness", "publish-catalog", "receipt-staleness", "runtime-worker-skills-freshness", "saturation-tracking", "scorecard", "security-scan", "sota-sources-gate", "supply-chain", "token-report", "validate"],
+      "layer_keys": ["foundation/ci-supply-chain"],
+      "reason": "These exact GitHub workflow filenames are repository CI surfaces; workflow presence and pinned actions do not establish a passing run.",
+      "source_refs": ["catalogs/landscape/foundation.json#/layers/11", ".github/workflows"]
+    },
+    {
+      "kinds": ["workflow"], "names": ["native-foundation-e2e", "native-token-e2e", "harness-audit", "action-compatibility"],
+      "layer_keys": ["foundation/quality-evaluation"],
+      "reason": "The named workflows provide evaluation and compatibility checks.",
+      "source_refs": ["catalogs/landscape/foundation.json#/layers/10"]
+    },
+    {
+      "kinds": ["workflow"], "names": ["native-offhost-app-state", "native-offhost-restore", "adoption-bootstrap", "hardware-profile-smoke"],
+      "layer_keys": ["foundation/recovery-portability"],
+      "reason": "The named workflows exercise restore, environment installation or hardware portability boundaries.",
+      "source_refs": ["catalogs/landscape/foundation.json#/layers/14"]
+    },
+    {
+      "kinds": ["workflow"], "names": ["native-service-reboot"],
+      "layer_keys": ["foundation/scheduling-supervision"],
+      "reason": "The named workflow checks service supervision across reboot.",
+      "source_refs": ["catalogs/landscape/foundation.json#/layers/12"]
+    },
+    {
+      "kinds": ["workflow"], "names": ["native-token-e2e", "token-report"],
+      "layer_keys": ["foundation/token-efficiency"],
+      "reason": "The named workflows check or report native usage observations.",
+      "source_refs": ["catalogs/landscape/foundation.json#/layers/9"]
+    },
+    {
+      "kinds": ["action"],
+      "names": ["actions/attest", "actions/cache", "actions/checkout", "actions/dependency-review-action", "actions/download-artifact", "actions/github-script", "actions/setup-go", "actions/setup-node", "actions/setup-python", "actions/upload-artifact", "anthropics/claude-code-action", "github/codeql-action", "ossf/scorecard-action", "step-security/harden-runner"],
+      "layer_keys": ["foundation/ci-supply-chain"],
+      "reason": "These exact action repository identities are pinned references within repository CI workflows.",
+      "source_refs": ["catalogs/landscape/foundation.json#/layers/11", ".github/workflows"]
+    },
+    {
+      "kinds": ["script"],
+      "names": ["adoption_status", "build_ecosystem", "catalog_decisions", "component_matrix", "currency_due", "env_freshness", "evidence_manifest", "freshness_propose", "host_receipts", "host_requests", "landscape", "new_host_grand_list", "platform_status", "receipt_staleness", "release_due", "saturation_ledger", "upstream_surface_watch", "validate", "validate_catalogs", "validate_convergence", "validate_foundation", "validate_shards", "verdict_flip_candidates", "verdict_review_gate"],
+      "layer_keys": ["foundation/ci-supply-chain", "foundation/git-github-automation"],
+      "reason": "These exact repository scripts maintain catalog, source, receipt and validation records used by CI and GitHub review.",
+      "source_refs": ["catalogs/landscape/foundation.json#/layers/11", "catalogs/landscape/foundation.json#/layers/19", "scripts"]
+    },
+    {
+      "kinds": ["script"], "names": ["build_new_wsl_handbook", "hardware_profile", "new_wsl_profile"],
+      "layer_keys": ["foundation/recovery-portability"],
+      "reason": "The named scripts describe or check reproducible host and hardware setup.",
+      "source_refs": ["catalogs/landscape/foundation.json#/layers/14"]
+    },
+    {
+      "kinds": ["script"], "names": ["credential_boot_receipt", "credential_status", "kernel_keyring", "path_safety"],
+      "layer_keys": ["foundation/secrets-credentials"],
+      "reason": "The named scripts support credential availability and secret-path boundaries; their bodies and credential values are not exposed by the inventory.",
+      "source_refs": ["catalogs/landscape/foundation.json#/layers/18"]
+    },
+    {
+      "kinds": ["script"], "names": ["codex_quota", "native_token_ci", "recount-tokens"],
+      "layer_keys": ["foundation/token-efficiency"],
+      "reason": "The named scripts inspect or recount client quota and token observations.",
+      "source_refs": ["catalogs/landscape/foundation.json#/layers/9"]
+    },
+    {
+      "kinds": ["script"], "names": ["skills_status"],
+      "layer_keys": ["foundation/instructions-skills"],
+      "reason": "The named status script concerns installed skill entrypoints.",
+      "source_refs": ["catalogs/landscape/foundation.json#/layers/1"]
+    },
+    {
+      "kinds": ["script"], "names": ["trading_gates"],
+      "layer_keys": ["us-equities/execution-broker", "us-equities/evaluation-experiments"],
+      "reason": "The named script records trading readiness gates; the association does not advance any broker or strategy gate.",
+      "source_refs": ["catalogs/landscape/us-equities.json#/layers/6", "catalogs/landscape/us-equities.json#/layers/8"]
+    },
+    {
+      "kinds": ["script"], "names": ["verify_nautilus_ci"],
+      "layer_keys": ["us-equities/backtesting-engine", "foundation/ci-supply-chain"],
+      "reason": "The named verifier associates Nautilus CI evidence with engine and CI responsibilities.",
+      "source_refs": ["catalogs/landscape/us-equities.json#/layers/5", "catalogs/landscape/foundation.json#/layers/11"]
+    },
+    {
+      "kinds": ["hook"], "names": ["rtk", "context-mode-cache-heal.mjs"],
+      "layer_keys": ["foundation/token-efficiency"],
+      "reason": "The sanitized registered basenames identify RTK command reduction and Context Mode cache maintenance; execution is unverified.",
+      "source_refs": ["catalogs/landscape/foundation.json#/layers/9"]
+    },
+    {
+      "kinds": ["hook"], "names": ["ai-memory"],
+      "layer_keys": ["foundation/durable-memory"],
+      "reason": "The sanitized registered basename identifies the memory integration; execution is unverified.",
+      "source_refs": ["catalogs/landscape/foundation.json#/layers/7"]
+    },
+    {
+      "kinds": ["hook"], "names": ["codebase-memory-mcp", "serena-hooks"],
+      "layer_keys": ["foundation/code-navigation"],
+      "reason": "The sanitized registered basenames identify source-navigation integrations; execution is unverified.",
+      "source_refs": ["catalogs/landscape/foundation.json#/layers/4"]
+    },
+    {
+      "kinds": ["hook"], "names": ["currency-due-notice.py", "research-routing-guard.py"],
+      "layer_keys": ["foundation/web-research", "foundation/instructions-skills"],
+      "reason": "The sanitized registered basenames identify research currency and routing instruction boundaries; execution is unverified.",
+      "source_refs": ["catalogs/landscape/foundation.json#/layers/8", "catalogs/landscape/foundation.json#/layers/1"]
+    },
+    {
+      "kinds": ["hook"], "names": ["effort-default-guard.py"],
+      "layer_keys": ["foundation/native-clients", "foundation/instructions-skills"],
+      "reason": "The sanitized registered basename identifies a native-client effort default instruction boundary; execution is unverified.",
+      "source_refs": ["catalogs/landscape/foundation.json#/layers/0", "catalogs/landscape/foundation.json#/layers/1"]
+    },
+    {
+      "kinds": ["hook"], "names": ["secret_path_guard.py"],
+      "layer_keys": ["foundation/secrets-credentials"],
+      "reason": "The sanitized registered basename identifies a secret-path boundary; no raw client settings or hook source is consulted.",
+      "source_refs": ["catalogs/landscape/foundation.json#/layers/18"]
+    },
+    {
+      "kinds": ["hook"], "names": ["jq"],
+      "unmapped_reason": "The sanitized projection identifies only the jq interpreter. Its architectural responsibility cannot be recovered from a basename without consulting omitted arguments or raw hook sources."
+    },
+    {
+      "kinds": ["hook"], "names": ["unknown"],
+      "unmapped_reason": "The sanitized projection could not identify the registered program. No canonical component or architecture responsibility is available from this projected registration."
+    },
+    {
+      "kinds": ["unit", "timer"], "names": ["agentsview", "native-agent-pages", "native-agent-pages-refresh"],
+      "layer_keys": ["foundation/hosting-services", "foundation/observation-inference"],
+      "reason": "These exact local unit names are session or architecture observation services; refresh schedules do not establish successful refreshes.",
+      "source_refs": ["catalogs/landscape/foundation.json#/layers/13", "catalogs/landscape/foundation.json#/layers/15"]
+    },
+    {
+      "kinds": ["unit", "timer"], "names": ["ai-memory", "hindsight-research"],
+      "layer_keys": ["foundation/durable-memory"],
+      "reason": "These exact local unit names associate memory services with durable memory; their health and selection are separate claims.",
+      "source_refs": ["catalogs/landscape/foundation.json#/layers/7"]
+    },
+    {
+      "kinds": ["unit", "timer"], "names": ["dagu"],
+      "layer_keys": ["foundation/scheduling-supervision", "us-equities/data-quality-orchestration"],
+      "reason": "The local Dagu service name associates the workflow supervisor with the catalog's scheduling and data-orchestration responsibilities.",
+      "source_refs": ["catalogs/landscape/foundation.json#/layers/12", "catalogs/landscape/us-equities.json#/layers/3"]
+    },
+    {
+      "kinds": ["unit", "timer"], "names": ["clock-change-check", "clock-offset-check", "disk-headroom-guard", "native-wsl-distro-metrics", "ns2604-coop-checkpoint-backstop-20261009", "ns2604-overnight-wsl-restart-20261009", "wu-watch-20261006"],
+      "layer_keys": ["foundation/scheduling-supervision", "foundation/observation-inference"],
+      "reason": "These exact local timer and unit names identify host checks or supervised scheduled maintenance; filename observation does not establish their execution.",
+      "source_refs": ["catalogs/landscape/foundation.json#/layers/12", "catalogs/landscape/foundation.json#/layers/15"]
+    },
+    {
+      "kinds": ["unit", "timer"], "names": ["docker"],
+      "layer_keys": ["foundation/hosting-services", "foundation/isolation"],
+      "reason": "The local Docker unit associates container hosting and isolation responsibilities; containment acceptance remains separate.",
+      "source_refs": ["catalogs/landscape/foundation.json#/layers/13", "catalogs/landscape/foundation.json#/layers/3"]
+    },
+    {
+      "kinds": ["unit", "timer"], "names": ["git-maintenance@", "git-maintenance@daily", "git-maintenance@hourly", "git-maintenance@weekly"],
+      "layer_keys": ["foundation/git-github-automation", "foundation/scheduling-supervision"],
+      "reason": "These exact Git maintenance template and timer names associate scheduled repository maintenance with Git automation.",
+      "source_refs": ["catalogs/landscape/foundation.json#/layers/19", "catalogs/landscape/foundation.json#/layers/12"]
+    },
+    {
+      "kinds": ["unit", "timer"], "names": ["headroom-ns2604-headroom"],
+      "layer_keys": ["foundation/token-efficiency"],
+      "reason": "The exact Headroom service name associates a context/usage-efficiency service without asserting adoption or current health.",
+      "source_refs": ["catalogs/landscape/foundation.json#/layers/9"]
+    },
+    {
+      "kinds": ["unit", "timer"], "names": ["mineru", "native-stack-qmd-shared"],
+      "layer_keys": ["foundation/document-retrieval"],
+      "reason": "These exact local MinerU and QMD unit names identify document parsing and retrieval services.",
+      "source_refs": ["catalogs/landscape/foundation.json#/layers/5"]
+    },
+    {
+      "kinds": ["unit", "timer"], "names": ["native-grafana-monitoring-validation", "native-node-exporter", "native-nvidia-gpu-exporter", "native-process-exporter", "ns2604-alertmanager", "ns2604-grafana", "ns2604-loki", "ns2604-otelcol-contrib", "ns2604-prometheus", "stack-alert@"],
+      "layer_keys": ["foundation/observation-inference", "foundation/hosting-services"],
+      "reason": "These exact monitoring, exporter and alert unit names identify hosted observation responsibilities; alert delivery and service health are unverified.",
+      "source_refs": ["catalogs/landscape/foundation.json#/layers/15", "catalogs/landscape/foundation.json#/layers/13"]
+    },
+    {
+      "kinds": ["unit", "timer"], "names": ["ns2604-research-progress"],
+      "layer_keys": ["foundation/web-research", "foundation/observation-inference", "foundation/scheduling-supervision"],
+      "reason": "The exact research-progress service and timer names identify supervised research observation.",
+      "source_refs": ["catalogs/landscape/foundation.json#/layers/8", "catalogs/landscape/foundation.json#/layers/15", "catalogs/landscape/foundation.json#/layers/12"]
+    },
+    {
+      "kinds": ["unit", "timer"], "names": ["ollama"],
+      "layer_keys": ["foundation/observation-inference", "foundation/hosting-services"],
+      "reason": "The exact Ollama unit name identifies hosted local inference; a service filename does not prove a usable model.",
+      "source_refs": ["catalogs/landscape/foundation.json#/layers/15", "catalogs/landscape/foundation.json#/layers/13"]
+    },
+    {
+      "kinds": ["unit", "timer"], "names": ["omniroute"],
+      "layer_keys": ["foundation/hosting-services", "us-equities/observability-hosting"],
+      "reason": "The exact OmniRoute unit name associates the hosted routing service with service hosting; no gateway endpoint is queried by this inventory.",
+      "source_refs": ["catalogs/landscape/foundation.json#/layers/13", "catalogs/landscape/us-equities.json#/layers/10"]
+    },
+    {
+      "kinds": ["unit", "timer"], "names": ["openhands-job@"],
+      "layer_keys": ["foundation/workers", "foundation/agent-sdks", "foundation/scheduling-supervision"],
+      "reason": "The exact OpenHands job template associates supervised SDK worker jobs with runtime task ownership; no job is launched by inventorying it.",
+      "source_refs": ["catalogs/landscape/foundation.json#/layers/2", "catalogs/landscape/foundation.json#/layers/16", "catalogs/landscape/foundation.json#/layers/12"]
+    },
+    {
+      "kinds": ["unit", "timer"],
+      "names": ["paper-alert@", "paper-ext-20261006", "paper-n2-ctl-20261008", "paper-n2-gate-decision-20261009", "paper-n2-gate-go-20261009", "paper-n2-open-20261008", "paper-n2-open-20261009", "paper-n2-wake-20261009", "paper-pre-20261006", "paper-recover-a2-gate-20261006"],
+      "layer_keys": ["us-equities/execution-broker", "us-equities/observability-hosting", "foundation/scheduling-supervision"],
+      "reason": "These exact paper-lane unit and timer names identify supervised broker-boundary operations. The architecture association neither changes nor establishes a paper gate, broker entitlement or strategy acceptance.",
+      "source_refs": ["catalogs/landscape/us-equities.json#/layers/6", "catalogs/landscape/us-equities.json#/layers/10", "catalogs/landscape/foundation.json#/layers/12"]
+    },
+    {
+      "kinds": ["unit", "timer"], "names": ["restic-backup-nativestack2604", "restic-prune-nativestack2604"],
+      "layer_keys": ["foundation/recovery-portability", "foundation/scheduling-supervision"],
+      "reason": "These exact Restic unit and timer names identify scheduled backup maintenance; recoverability requires its own receipts.",
+      "source_refs": ["catalogs/landscape/foundation.json#/layers/14", "catalogs/landscape/foundation.json#/layers/12"]
+    },
+    {
+      "kinds": ["unit", "timer"], "names": ["vllm-embed"],
+      "layer_keys": ["foundation/semantic-rag", "foundation/hosting-services"],
+      "reason": "The exact vLLM embedding unit name associates hosted embeddings with semantic retrieval; retrieval quality and service health remain separate.",
+      "source_refs": ["catalogs/landscape/foundation.json#/layers/6", "catalogs/landscape/foundation.json#/layers/13"]
+    }
+  ]
+}

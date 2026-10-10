@@ -1,7 +1,7 @@
 # Local engineering pages
 
 `build_pages.py` presents the CC current view, native readiness receipts,
-gap board, roadmap, fleet and sources as six complete local HTML documents. It uses the existing
+gap board, roadmap, fleet, architecture and sources as seven complete local HTML documents. It uses the existing
 `tools/north-star/build_readiness.py` functions `build`, `render` and
 `render_fragment`; it adds presentation and refresh custody without deciding
 gate acceptance. The initial reference is repository commit
@@ -158,13 +158,169 @@ labelled estimates. Recorded actual spend uses the native producer's
 
 `adoption_view.py` reads the CC-owned
 `coordination/command-center/pages/adoption-now.json` (`adoption-now/1`).
-Readiness shows layer/server activity and Fleet exposes all published role
-labels in collapsible tables. The co-op alone runs its hourly collector;
+Readiness shows layer/server activity. Fleet groups Codex instances into lane
+roles using dated launch windows from the co-op registry, with the instance
+mapping collapsed by default. Ambiguous labels remain unattributed and the
+published call/population totals are conserved. Claude and Codex orchestration
+and measured `sdk:` rows retain their source values; absent SDK measurements
+remain unreported. The co-op alone runs its hourly collector;
 page refreshes make no Loki query or collector invocation. Exact server
 aliases follow the producer's memberships and each raw server row counts
 once. Sparse maps show zero recorded calls, while unknown values stay
 unreported. Counts describe the stated retrospective window and do not prove
 adoption acceptance, fresh-session use or workflow improvement.
+
+`architecture_builder.py` generates `architecture.html` from the canonical
+catalogs named by `catalogs/landscape/manifest.json`, the current retained G5
+asset, exact source metadata inventories and the hashed hourly Adoption
+snapshot. Full mode requires one section per canonical layer; `--first-layer`
+supports an early source-complete preview without changing the canonical
+count. Selected choices, winners, alternatives, rejection reasons and pins
+remain dated source records. Grand candidates stay pending G5 while the CC
+gate is not MET. The four program stages come from `cc-now.json`; missing
+per-tool stage data is unreported. Readiness labels dated selections as catalog
+pins and shows observed host-version differences with their source time.
+
+Inventory rows use canonical winner component-ID and candidate repository
+joins, followed by the reviewed `architecture_mapping.json` for remaining
+skills, agents, workflows and runtime automation. Each remaining unmapped item
+has its specific reason. File/hash equality remains metadata provenance.
+Hook and cron registrations come only from the CC's sanitized
+`coordination/command-center/pages/automation-projection.json`; its digest and
+stated limits are bound in the receipt. The reader does not open raw hook
+sources, client configuration, credentials, env files or crontab contents.
+
+State-root host receipts come only from the CC's sanitized
+`coordination/command-center/pages/host-receipts-index.json`. Its path/hash and
+each index-provided title/path/hash/byte count/mtime are retained in a separate
+collapsed detail table labelled `local host receipt (state root)`. Receipt
+hashes are declared by the index and mtime is file metadata; no referenced
+markdown bodies are opened, and no execution date, command, result or E2E
+acceptance is inferred. The mixed `e2e-truth-20261006` directory is excluded.
+
+Architecture's native manifest identity and instance-to-role mapping come from
+the retained `research/fullspeed-20261008/g5-stars-gap/local-pages/refresh-receipt.json`
+projection. Its own path, byte hash and generation date are bound separately
+from the reported native manifest hash. Architecture does not call the native
+readiness builder against the state root or follow that projection's input
+paths. Retained role attribution keeps its observation window; a different
+invocation window retains published counts with attribution marked unassigned.
+The complete inventory input set is declared in `inventory_sources`, with
+computed hashes/bytes for approved content, and separate metadata-only
+observations for user agent and service configurations. No user configuration
+body is opened or hashed. Metadata-only entries have no computed content hash
+and an explicit scope reason. Aliases are labels only after their canonical
+target has independent approval.
+
+Architecture source, projection and registered receipt selections also bind
+independent exact roles in `source_policy.json` before parsing or hashing.
+The shared bounded reader rejects leaf and ancestor symlinks. A protected or
+unapproved catalog or receipt stops publication while preserving the last
+successful output. Immutable Adoption candidates require the exact
+`adoption-now-[a-f0-9]{16}.json` form in the reviewed snapshot directory before
+any byte read; invalid names are ignored, and symlink candidates are refused.
+An approved receipt above its existing read limit remains explicitly unmeasured
+without widening that limit. The G5 archive is hashed and streamed to zstd
+through its authorized descriptor, which avoids reopening its pathname.
+
+Inventory uses that same independently approved reader for every content
+hash and metadata parse, including its catalogs, manifests, checksum lists,
+mapping and sanitized automation projection. The committed
+`architecture_inventory` role contains 132 exact content paths; installed user
+content is restricted to exact `SKILL.md` assets. The separate
+`architecture_inventory_metadata` role contains 94 exact user agent/unit paths
+and cannot authorize a content open. Native descriptor-relative no-follow
+stat supplies their file metadata. Shared protected checks apply to both
+lexical and canonical paths before reads. Ordinary unapproved discoveries are
+reduced to counts by source root and kind before public inventory, custody or
+detail rendering, with no candidate stat, resolve, open or hash. Individual
+unapproved names and paths never enter served documents. Their asset presence
+and runtime use remain unmeasured. Protected input
+or a poisoned known alias still refuses the Architecture observation; the
+composer preserves its last page while refreshing the other documents, or
+publishes an explicit UNREPORTED placeholder on its first failure. Hashes and
+parsed metadata derive from the same captured approved bytes. Unknown names
+enter only cache signatures outside the serving root, so additions, removals
+and renames invalidate the observation without publishing those names. Each
+successful Architecture publication removes superseded generated detail HTML
+from its fixed architecture/layers namespace before replacing the receipt;
+cache reuse also removes details outside its retained output set.
+
+`scripts/local_pages_policy_grants.py --pin <full-source-sha>` prints a static
+proposal from native Git tree/registered-path metadata for review. Runtime
+discovery never adds a grant. Receipt proposals also apply the pinned frozen
+eligibility declaration from the repository tripwire. The receipt grant set
+was reviewed at `c945ea1f011e4c7e69a0b5f19052717b2af9d46e`: removing the two
+unused frozen permissions leaves 4648 exact JSON receipt paths. This remains
+the reviewed pinned union; the current main proposal's 4725 eligible paths
+do not add permissions without independent review.
+Derivation does not open referenced receipt or frozen artifact bodies and
+does not add descriptive-pin exceptions. Separately reviewed user canonical
+filenames are metadata during permission generation. The shared reader uses
+64 KiB chunks so a large logical bound does not allocate that bound for a small
+file. Inventory cache signatures bind approved bytes, metadata tuples and
+the policy digest before a prior render can be reused.
+
+`inventory_user_names.json` contains only independently reviewed bindings
+and safe provenance that reproduce the 41 skill, 94 metadata and one design
+grant. Its source pin is the reachable rebased snapshot
+`994ab9b279c8915cbdb637e1786aaa41d1306e57`; the reviewed binding bytes are
+unchanged from the CC-read head. User directory listings and unapproved names
+are not committed.
+Runtime discoveries never create permissions. The 33 exact alias
+bindings name an already approved canonical target; the reader must verify
+that target before any content or metadata observation. The CI grant test
+compares committed repo grants with `inventory_paths(git ls-files)`. The
+authorized landing rebase onto main `3c01bdddc66896f8e36f9f21d452710808a9557e`
+retains the reviewed workflow paths and adds the committed host-name scanner,
+yielding 90 repository grants. Regenerate the proposal after an authorized
+rebase, using committed paths rather than runtime discovery. No raw user file
+body is used for these derivations.
+
+Directory-listing failures remain UNREPORTED rather than implying an empty
+inventory, and unapproved rows receive no name-based evidence joins. Optional
+Architecture archive/time-limit failures and Adoption attribution failures
+leave the other pages available; receipts expose exception categories only.
+
+Adoption role attribution uses the same native protected-name and no-follow
+parent/leaf descriptor reader for fixed registries and reviewed receipt
+families. Parking enumeration opens only its named directory with no-follow
+semantics. Refused/missing/malformed metadata contributes an UNREPORTED source
+error and no binding, source hash or invented attribution; published call
+counts remain measured even when a role cannot be assigned.
+
+Each component row reports observational use from the retained hash-verified
+snapshot. Client components use session counts; unmeasured rows explain the
+producer boundary, including missing Bash-run CLI counters. Registered receipts
+are verified against `manifests/evidence.json` `files[]` hashes; the class falls
+back from the receipt and registration `evidence_class` to `kind`. The newest
+receipt retains its date, command count/program, result and path/hash, including
+failures or an absent result field. Native host E2E and local receipts remain
+distinct from vendor test-suite runs. Receipt presence, metadata completeness
+and a successful qualifying result are separate facts.
+
+The initial HTML contains layer choices and closed detail summaries. Component
+tables are generated as per-layer pages and fetched only on expansion, using
+native [HTML details](https://html.spec.whatwg.org/multipage/interactive-elements.html#the-details-element)
+and [Fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch).
+Every component table stays collapsed with its count in the summary. Each
+summary links the ordinary detail page as a fallback; failed loads can be retried.
+The builder enforces initial HTML below1,500,000 bytes and records HTML/detail
+sizes. Installed Playwright's native browser measures the served response and
+checks deferred loading separately from the Python fixture contracts.
+
+The existing refresh service rebuilds Architecture on a changed hourly
+snapshot or relevant source/code metadata, and otherwise uses its nonserved
+receipt/cache. Source hashes, installed frontend-design path/pin/hash, builder
+and helper hashes, canonical/rendered counts and mapping coverage remain in
+the Architecture receipt outside the serving root. The G5 archive is read
+through the installed zstd stream without extraction; unrelated raw members
+are not consumed as content.
+
+```sh
+nice -n 10 ionice -c2 -n7 timeout 600 python3 tools/local-pages/architecture_builder.py \
+  --root /path/to/native-source-checkout --state-root /path/to/native-state
+```
 
 `--current-source` selects the exact approved read-only `cc-now/1` JSON path,
 currently only `state-root/coordination/command-center/pages/cc-now.json`.
@@ -256,6 +412,7 @@ nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p t
 nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_current_view.py
 nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_sanitization.py
 nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_source_policy.py
+nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_policy_grants.py
 nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_north_star_readiness.py
 nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_fleet_data.py
 nice -n 10 ionice -c2 -n7 timeout 600 python3 -m unittest discover -s tests -p test_local_pages_fleet_execution.py

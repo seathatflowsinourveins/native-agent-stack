@@ -181,9 +181,43 @@
     restoreFilters();
   }
 
+  function setupArchitectureDetails() {
+    for (const details of document.querySelectorAll("details[data-layer-src]")) {
+      let loading = false;
+      details.addEventListener("toggle", async () => {
+        if (!details.open || details.dataset.loaded === "true" || loading) return;
+        const target = details.querySelector(".architecture-detail-content");
+        const source = new URL(details.dataset.layerSrc, document.baseURI);
+        if (!target || source.origin !== window.location.origin || !source.pathname.includes("/architecture/layers/")) return;
+        loading = true;
+        target.setAttribute("aria-busy", "true");
+        try {
+          const response = await fetch(source.href, { mode: "same-origin", credentials: "omit" });
+          if (!response.ok) throw new Error(`Detail page returned HTTP ${response.status}`);
+          const parsed = new DOMParser().parseFromString(await response.text(), "text/html");
+          const content = parsed.getElementById("architecture-detail-content");
+          if (!content) throw new Error("Detail page has no component content");
+          target.replaceChildren(...Array.from(content.childNodes, (node) => document.importNode(node, true)));
+          details.dataset.loaded = "true";
+        } catch (error) {
+          const message = document.createElement("p");
+          message.textContent = `Details could not be loaded: ${error.message}. Close and expand to retry, or open the detail page.`;
+          const link = document.createElement("a");
+          link.href = source.href;
+          link.textContent = "Open the detail page";
+          target.replaceChildren(message, link);
+        } finally {
+          target.removeAttribute("aria-busy");
+          loading = false;
+        }
+      });
+    }
+  }
+
   function setup() {
     setupTheme();
     setupGaps();
+    setupArchitectureDetails();
   }
 
   if (document.readyState === "loading") {
