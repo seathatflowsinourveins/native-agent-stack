@@ -1198,8 +1198,7 @@ class RepositoryWorkflowTests(unittest.TestCase):
                     self.assertIn(path, derived.advisory.files)
                 else:
                     self.assertEqual(protected.rule(path), rule)
-        # A file a step only lists as a `case` pattern (adoption-bootstrap.yml's `changes` step and its
-        # MACOS_PATTERNS globs, main e0c329ae9) adds no explicit workflow category. Read-derived
+        # A file a step only lists as a `case` pattern adds no explicit workflow category. Read-derived
         # execution and sys.path inventories remain advisory even when those paths also occur here.
         self.assertIsNone(derived.files.get("scripts/credential_boot_receipt.py"))
         self.assertEqual(derived.prefixes.get("tools/sota-convergence"), "ci_import")

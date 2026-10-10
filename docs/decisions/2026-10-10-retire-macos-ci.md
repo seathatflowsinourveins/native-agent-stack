@@ -51,6 +51,13 @@ This retirement is bounded to the three adoption jobs. The separate
 `hardware-profile-smoke.yml` diagnostic has its own owner and scope. Historical
 records and artifacts are preserved.
 
+The generated WSL handbook records the normalized adoption manifest digest.
+Its maintained builder refreshes that reference and the output receipt when
+the historical hosted-smoke row gains retirement metadata. The resolver's
+repository fixture also stops assuming the retired Mac job supplies a literal
+tests directory. Its workflow-derived enforcement and advisory read-inventory
+implementation is unchanged.
+
 ## Superseded decisions
 
 This policy replaces the adoption macOS job/scope/coverage requirements in:
@@ -92,6 +99,11 @@ fixture check does not establish a native macOS run.
   [`a56f85e8397751d36fdbdc03910f15ac877ad00c`](https://github.com/seathatflowsinourveins/native-agent-stack/tree/a56f85e8397751d36fdbdc03910f15ac877ad00c):
   `.github/workflows/adoption-bootstrap.yml`, the workflow contract tests and
   the landed #948 portable repairs.
+- The same maintained source pin's
+  scripts/build_new_wsl_handbook.py, --write/--check, and
+  blueprints/runtime-workers/openhands/resolver/push_gate.py,
+  derive_ci_protected: supported handbook regeneration and the distinction
+  between workflow-named protection and advisory read-derived inventory.
 - CI tool pins: `.github/workflows/validate.yml` selects
   [`kjanat/actionlint` v1.17.0](https://github.com/kjanat/actionlint/releases/tag/v1.17.0)
   with its SHA256-verified release archive; `.github/requirements-ci.txt`

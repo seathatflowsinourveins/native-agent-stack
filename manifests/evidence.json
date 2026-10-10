@@ -18547,8 +18547,8 @@
     },
     {
       "path": "docs/decisions/2026-10-10-retire-macos-ci.md",
-      "sha256": "e1cf74c9822cc44e5ea12b2a0b7c90174169b06bb955facbb58b63eccd57a3f8",
-      "bytes": 5415
+      "sha256": "3d9c4867892d90241e14c05ffc222f3032472eb793fabcf11fcef82d91f34ab1",
+      "bytes": 6130
     },
     {
       "path": "docs/direct-results.md",
@@ -41797,8 +41797,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "3300e5c3eca756825a0cd33b23b21dc31c688cdf68e352419b1463906f906db0",
-      "bytes": 63050
+      "sha256": "50ff0719cdc657bf2dbd58381c492ef55b23c2784075027701684160493a465d",
+      "bytes": 66061
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/slot-state-and-core-recipes.json",
@@ -59807,8 +59807,8 @@
     },
     {
       "path": "tests/test_adoption_bootstrap.py",
-      "sha256": "2833ea0a7e6342cc8d2c0ff50ccf9499546618572f84164ecb4ae713658dadf5",
-      "bytes": 105995
+      "sha256": "58e541faa0bd735e6cc44e1da47120c772712458acc4370e58fc78c6105f9fe0",
+      "bytes": 105822
     },
     {
       "path": "tests/test_adoption_bootstrap_linux_platform.py",
@@ -60697,8 +60697,8 @@
     },
     {
       "path": "tests/test_runtime_worker_openhands_push_gate.py",
-      "sha256": "2f15a21eb88102db5b5f9bc9d44c000133627ff4c10faf2511616af690fd13f3",
-      "bytes": 162179
+      "sha256": "d001a02fa54a16fe8afc749238cdc963310543bce055ff48d328f8d394339ef3",
+      "bytes": 162082
     },
     {
       "path": "tests/test_runtime_worker_openhands_resolver.py",
