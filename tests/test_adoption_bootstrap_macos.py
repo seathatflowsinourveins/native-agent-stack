@@ -751,6 +751,21 @@ class ScriptStructureTests(unittest.TestCase):
         )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
+    def test_bootstrap_re_verifies_any_cached_file_via_fetch(self):
+        # Confirms the invariant the step ordering above depends on:
+        # install_embed_model (called unconditionally by bootstrap-macos.sh)
+        # routes through fetch(), whose own existing-destination check is a
+        # checksum match, not a bare existence check -- so a cache restore
+        # that lands a WRONG file at the destination is transparently
+        # re-downloaded and re-verified, on the exact same path a genuine
+        # cache miss already takes, never silently trusted.
+        text = SCRIPT_PATH.read_text()
+        fetch_body = re.search(r"(?ms)^fetch\(\) \{\n.*?^\}\n", text)
+        self.assertIsNotNone(fetch_body, "fetch() not found")
+        self.assertIn('verify_sha256', fetch_body.group(0))
+        self.assertIn('shasum -a 256 --check --status', _shell_functions(text, "verify_sha256"))
+        self.assertIn("install_embed_model", text)
+
 
 @unittest.skipUnless(BASH32, "no real bash 3.2 binary reachable (set BASH32_BINARY, or run on a real Mac)")
 class ScriptBehaviorUnderRealBash32Tests(unittest.TestCase):
@@ -3511,258 +3526,6 @@ class PrerequisitesBeforeAndAfterBrewTests(unittest.TestCase):
 EMBED_ACCEPTANCE_SCRIPT = ROOT / "tools" / "adoption" / "embed_acceptance.py"
 EMBED_REFERENCE_PATH = ROOT / "evidence" / "artifacts" / "macos-embed-reference-20260923" \
     / "macos-embed-reference-20260923.json"
-
-
-WORKFLOW_PATH = ROOT / ".github" / "workflows" / "adoption-bootstrap.yml"
-
-
-class CIEmbedModelCacheOrderTests(unittest.TestCase):
-    """Round 3i (Codex Medium): the cache restore must run BEFORE
-    bootstrap's own checksum verification (a restore running after could
-    silently overwrite the just-verified model with stale cached bytes,
-    with nothing left to re-check them), and its key must be DERIVED from
-    the pin's own sha256, never a literal hardcoded hash string (which
-    would keep matching a stale cache entry after the pin itself
-    changed)."""
-
-    def setUp(self):
-        # PyYAML is optional here, as in tests/test_workflow_hardening.py; the
-        # Linux validate job has it, so these structural checks still run in CI.
-        try:
-            import yaml
-        except ImportError:
-            self.skipTest("PyYAML not installed; these structural workflow checks run where it is")
-        with WORKFLOW_PATH.open() as handle:
-            self.workflow = yaml.safe_load(handle)
-        self.steps = self.workflow["jobs"]["bootstrap-macos"]["steps"]
-
-    def _step_index(self, name_substring: str) -> int:
-        for index, step in enumerate(self.steps):
-            if name_substring in step.get("name", ""):
-                return index
-        self.fail(f"no step with {name_substring!r} in its name")
-
-    def test_the_sha256_read_step_precedes_the_cache_restore(self):
-        read_index = self._step_index("Read the pinned embedding model's sha256")
-        cache_index = self._step_index("Restore the cached pinned embedding model")
-        self.assertLess(read_index, cache_index,
-                         "the pin's sha256 must be read before the cache step that keys on it")
-        read_step = self.steps[read_index]
-        self.assertEqual(read_step.get("id"), "embed-model-pin")
-        # Reads the pin file itself, not a hardcoded value.
-        self.assertIn("pins-macos-arm64.json", read_step["run"])
-        self.assertIn("models[0].sha256", read_step["run"])
-
-    def test_the_cache_restore_precedes_the_bootstrap_step(self):
-        cache_index = self._step_index("Restore the cached pinned embedding model")
-        bootstrap_index = self._step_index("Run the macOS bootstrap into a disposable prefix")
-        self.assertLess(cache_index, bootstrap_index,
-                         "restoring the cache after bootstrap's own checksum verification could "
-                         "silently overwrite the just-verified model with unverified stale bytes")
-
-    def test_the_cache_key_is_derived_from_the_pin_not_a_literal_hash(self):
-        cache_index = self._step_index("Restore the cached pinned embedding model")
-        cache_step = self.steps[cache_index]
-        # Restore only since 2026-10-04 (docs/decisions/2026-10-04-ci-least-privilege.md): the separate save
-        # step below writes the entry, on trusted events alone.
-        self.assertEqual(cache_step["uses"].split("@")[0], "actions/cache/restore")
-        key = cache_step["with"]["key"]
-        self.assertIn("${{ steps.embed-model-pin.outputs.sha256 }}", key)
-        # No literal 64-hex-char sha256 anywhere in the key: a changed pin
-        # must always produce a different, freshly-derived key.
-        self.assertIsNone(re.search(r"(?<![{}.a-zA-Z0-9])[0-9a-f]{64}(?![0-9a-f])", key), key)
-        # The cache step's own PATH must still be the exact destination
-        # install_embed_model (adoption/bootstrap-macos.sh) writes to.
-        self.assertEqual(
-            cache_step["with"]["path"],
-            "${{ runner.temp }}/eco/state/models/embeddinggemma-300M-Q8_0.gguf",
-        )
-
-    def test_only_one_cache_step_exists_not_a_leftover_duplicate(self):
-        cache_steps = [step for step in self.steps if "Cache the pinned embedding model" in step.get("name", "")
-                       or "Restore the cached pinned embedding model" in step.get("name", "")]
-        self.assertEqual(len(cache_steps), 1, cache_steps)
-
-    def test_the_cache_is_saved_only_off_pull_requests_after_the_bootstrap_verified_it(self):
-        # A pull_request run executes the pull request's code, so it only restores; the verified model is saved
-        # on push, schedule and workflow_dispatch, under the restore step's own primary key, and only on a miss
-        # (actions/cache save/README.md at the pinned v6.1.0, "Always save cache").
-        uses = [step.get("uses", "").split("@")[0] for step in self.steps]
-        self.assertNotIn("actions/cache", uses, "the combined action saves in its post step on every event")
-        self.assertEqual(uses.count("actions/cache/restore"), 1)
-        self.assertEqual(uses.count("actions/cache/save"), 1)
-        restore = self.steps[uses.index("actions/cache/restore")]
-        save_index = uses.index("actions/cache/save")
-        save = self.steps[save_index]
-        self.assertGreater(save_index, self._step_index("Run the macOS bootstrap into a disposable prefix"))
-        self.assertEqual(restore.get("id"), "embed-model-cache")
-        self.assertEqual(save["if"], "github.event_name != 'pull_request' && "
-                                     "steps.embed-model-cache.outputs.cache-hit != 'true'")
-        self.assertEqual(save["with"], {"path": restore["with"]["path"],
-                                        "key": "${{ steps.embed-model-cache.outputs.cache-primary-key }}"})
-        self.assertEqual(restore["uses"].split("@")[1], save["uses"].split("@")[1], "both from one actions/cache commit")
-        self.assertNotIn("cache-mode", self.workflow["jobs"]["bootstrap-macos"],
-                         "cache-mode takes no expression; read would skip the trusted-event save")
-
-    def test_bootstrap_re_verifies_any_cached_file_via_fetch(self):
-        # Confirms the invariant the step ordering above depends on:
-        # install_embed_model (called unconditionally by bootstrap-macos.sh)
-        # routes through fetch(), whose own existing-destination check is a
-        # checksum match, not a bare existence check -- so a cache restore
-        # that lands a WRONG file at the destination is transparently
-        # re-downloaded and re-verified, on the exact same path a genuine
-        # cache miss already takes, never silently trusted.
-        text = SCRIPT_PATH.read_text()
-        fetch_body = re.search(r"(?ms)^fetch\(\) \{\n.*?^\}\n", text)
-        self.assertIsNotNone(fetch_body, "fetch() not found")
-        self.assertIn('verify_sha256', fetch_body.group(0))
-        self.assertIn('shasum -a 256 --check --status', _shell_functions(text, "verify_sha256"))
-        self.assertIn("install_embed_model", text)
-
-
-class CIRecordingToolingSmokeTests(unittest.TestCase):
-    """Round 3i (2026-09-23 peer-update-audit gap, adoption_macos, medium):
-    the catalog's own recording and verdict scripts had never run on macOS
-    CI or against macOS's own system Python. Structural checks only -- the
-    steps themselves only ever run on a real macos-15 runner; see
-    adoption/platforms/macos-arm64.md's "Recording and verdict scripts"."""
-
-    def setUp(self):
-        # PyYAML is optional in this repository (tests/test_workflow_hardening.py
-        # skips the same way): the setup-python interpreter on the macos-15
-        # validate job has no PyYAML, while the Linux validate job does, so these
-        # structural checks still run in CI there.
-        try:
-            import yaml
-        except ImportError:
-            self.skipTest("PyYAML not installed; these structural workflow checks run where it is")
-        with WORKFLOW_PATH.open() as handle:
-            self.workflow = yaml.safe_load(handle)
-        self.steps = self.workflow["jobs"]["validate-macos"]["steps"]
-
-    def _step_index(self, name_substring: str) -> int:
-        for index, step in enumerate(self.steps):
-            if name_substring in step.get("name", ""):
-                return index
-        self.fail(f"no step with {name_substring!r} in its name")
-
-    def test_every_recording_and_verdict_script_is_gated(self):
-        run_text = "\n".join(step.get("run", "") for step in self.steps)
-        for expected in (
-            "scripts/host_receipts.py validate",
-            "scripts/component_matrix.py --check",
-            "scripts/new_host_grand_list.py --check",
-            "tools/sota-convergence/build_verdicts.py --check",
-            "scripts/validate_convergence.py --all-recorded",
-            "scripts/release_due.py",
-        ):
-            self.assertIn(expected, run_text, expected)
-
-    def test_release_due_is_report_only_never_strict(self):
-        step = self.steps[self._step_index(
-            "Report any new-machine paths main documents but the pinned release lacks")]
-        self.assertNotIn("--strict", step["run"])
-
-    def test_bootstrap_precedes_the_recording_smoke(self):
-        bootstrap_index = self._step_index("Run the macOS bootstrap into a disposable prefix "
-                                            "(recording-script smoke)")
-        smoke_index = self._step_index("Recording smoke: record a real receipt")
-        self.assertLess(bootstrap_index, smoke_index)
-
-    def test_the_recording_smoke_uses_a_throwaway_copy_never_the_real_checkout(self):
-        step = self.steps[self._step_index("Recording smoke: record a real receipt")]
-        run_text = step["run"]
-        self.assertIn("rec_dir=\"$RUNNER_TEMP/rec\"", run_text)
-        self.assertIn("rm -rf \"$rec_dir\"", run_text)
-        # host_receipts.py record/component_matrix.py --write/new_host_grand_
-        # list.py --write all run with cwd inside $rec_dir, never $GITHUB_
-        # WORKSPACE -- the subshell `cd "$rec_dir"` wrapping them is what
-        # keeps every write there, never in the real checkout.
-        self.assertIn('cd "$rec_dir"', run_text)
-
-    def test_the_recording_smoke_uses_native_proven_and_a_valid_host_id(self):
-        step = self.steps[self._step_index("Recording smoke: record a real receipt")]
-        run_text = step["run"]
-        self.assertIn("--evidence-class native_proven", run_text)
-        self.assertIn("--from-stack-commands", run_text)
-        host_id_match = re.search(r"--host-id\s+([A-Za-z0-9-]+)", run_text)
-        self.assertIsNotNone(host_id_match, "no --host-id found")
-        # scripts/host_receipts.py's own HOST_ID_PATTERN: lowercase/digits/
-        # hyphens, ending in an 8-digit date.
-        self.assertRegex(host_id_match.group(1), r"^[a-z0-9-]+-[0-9]{8}$")
-
-    def test_the_recording_smoke_runs_against_both_pinned_and_system_python(self):
-        step = self.steps[self._step_index("Recording smoke: record a real receipt")]
-        run_text = step["run"]
-        self.assertIn('run_smoke python3 "the manifest-pinned Python line', run_text)
-        self.assertIn("/usr/bin/python3", run_text)
-        self.assertIn("meets_min", run_text)
-        # A below-minimum system Python is skipped, not failed.
-        self.assertIn("skipping the system-Python recording smoke", run_text)
-
-    def test_the_minimum_python_version_is_39_everywhere_it_is_declared(self):
-        step = self.steps[self._step_index("Recording smoke: record a real receipt")]
-        self.assertIn('min_version="3.9"', step["run"])
-        for doc_path in (ROOT / "adoption" / "bootstrap.md", PAGE_PATH):
-            text = doc_path.read_text()
-            self.assertIn("Python 3.9", text, doc_path)
-
-
-class CIWorkflowTriggerPathsTests(unittest.TestCase):
-    """Round 3j (Codex P2 thread 6): the push paths trigger must include every
-    input the macOS jobs actually consume, not just adoption/** and
-    tools/adoption/** -- a change to, say, scripts/host_receipts.py would
-    otherwise never re-run this workflow at all on push, even though
-    validate-macos's recording-tooling gate and recording smoke both depend
-    on it directly.
-
-    2026-10-05 (docs/decisions/2026-10-05-macos-ci-advisory.md): all three
-    macOS jobs skip pull_request and are absent from required contexts.
-    The unfiltered pull_request trigger and `changes` job still serve the
-    path-gated Linux bootstrap. Its PATTERNS list is asserted to match
-    `push`'s `paths:` list in
-    tests.test_workflow_hardening.AdoptionBootstrapMacosAdvisoryTests
-    (that assertion needs the embedded-shell text parser, not YAML).
-
-    2026-10-03 (docs/decisions/2026-10-03-macos-ci-scope.md, D8): every input
-    listed below is also in the `changes` job's MACOS_PATTERNS, so a pull
-    request that changes one is classified as full by the historical selector, except
-    manifests/evidence.json, which stays only in the push paths as the
-    post-merge net (D11). tests.test_workflow_hardening.MacosPatternsTests
-    reads this list and asserts that."""
-
-    def setUp(self):
-        try:
-            import yaml
-        except ImportError:
-            self.skipTest("PyYAML not installed; these structural workflow checks run where it is")
-        with WORKFLOW_PATH.open() as handle:
-            self.workflow = yaml.safe_load(handle)
-        # "on" is a YAML 1.1 boolean keyword; PyYAML's SafeLoader parses
-        # the bare "on:" key as the Python value True, not the string "on".
-        self.triggers = self.workflow[True]
-
-    def test_every_macos_job_input_is_a_push_trigger_path(self):
-        for expected in (
-            ".github/requirements-calendar.txt",
-            "evidence/artifacts/macos-embed-reference-20260923/**",
-            "scripts/host_receipts.py",
-            "scripts/component_matrix.py",
-            "scripts/new_host_grand_list.py",
-            "tools/sota-convergence/build_verdicts.py",
-            "scripts/platform_status.py",
-            "scripts/validate_convergence.py",
-            "scripts/release_due.py",
-            "scripts/landscape.py",
-            "manifests/evidence.json",
-        ):
-            self.assertIn(expected, self.triggers["push"]["paths"], expected)
-
-    def test_pull_request_trigger_has_no_path_filter(self):
-        # A bare `pull_request:` key parses as None. The changes job uses the
-        # PR diff to gate bootstrap-linux; every macOS job skips PRs under the
-        # 2026-10-05 advisory policy, regardless of that diff.
-        self.assertIsNone(self.triggers["pull_request"])
 
 
 class EmbedAcceptanceScriptTests(unittest.TestCase):

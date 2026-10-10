@@ -517,17 +517,16 @@ to its historical `denylist` default
 
 ## What a hosted run proves
 
-Since the [2026-10-05 advisory decision](../../docs/decisions/2026-10-05-macos-ci-advisory.md),
-the Mac is portable or remote-control only. `validate-macos`, `bootstrap-macos`
-and `bootstrap-macos-brew` skip every pull request and are not required checks.
-They run nightly at 06:47 UTC, on main pushes selected by the workflow's paths
-filter, and on manual dispatch. A failing nightly or main-push run is fixed in
-a follow-up PR.
+The [2026-10-10 retirement decision](../../docs/decisions/2026-10-10-retire-macos-ci.md)
+removes the three adoption macOS CI jobs and their selector. Manual bootstrap
+instructions and portable tests remain available. The hosted CI procedures and
+recorded runs below describe historical evidence; they provide no current
+scheduled coverage or workstation acceptance.
 
-The `platform_profiles` row for `macos-arm64` names a hosted smoke job
-(`.github/workflows/adoption-bootstrap.yml`, jobs `bootstrap-macos`,
-`bootstrap-macos-brew` and `validate-macos`) whose status is
-`green_on_hosted_runner`. The current run is **`35875188590`** at head
+The `platform_profiles` row for `macos-arm64` retains its historical hosted smoke
+reference (`.github/workflows/adoption-bootstrap.yml`, retired jobs `bootstrap-macos`,
+`bootstrap-macos-brew` and `validate-macos`), marked retired on 2026-10-10. Its
+recorded status is `green_on_hosted_runner`. The retained run is **`35875188590`** at head
 `75a6e0d` (PR #94, `workflow_dispatch`, runner label `macos-15`, macOS
 15.7.9 build 24G830), every job green, recorded in
 [`evidence/receipts/adoption-macos-hosted-smoke-20260923.json`](../../evidence/receipts/adoption-macos-hosted-smoke-20260923.json).
@@ -899,17 +898,15 @@ core pattern that pipes crash dumps to a collector reads
 `/proc/sys/kernel/core_pattern`, which macOS lacks, so that check is skipped
 there; what a Mac's crash reporter keeps of a crashed command's environment
 has not been checked. Key acceptance on a Mac is
-the runner, guard and status test suites on the macOS CI job, then a new Mac
+the runner, guard and status test suites on the actual Mac, then a new Mac
 host receipt that separates the steps run from those not run. WSL receipts
-do not certify the Mac. Since 2026-10-05, that macOS CI job
-(`adoption-bootstrap.yml`'s `validate-macos`) skips every pull request and runs
-the full suite on matching main pushes, nightly schedules and manual dispatch
-([advisory decision](../../docs/decisions/2026-10-05-macos-ci-advisory.md)).
+do not certify the Mac. The adoption macOS CI job is retired under the
+[2026-10-10 decision](../../docs/decisions/2026-10-10-retire-macos-ci.md).
 The runner, guard and status suites (`tests/test_credential_run.py`,
 `tests/test_secret_path_guard.py`, `tests/test_effort_default_guard.py`,
 `tests/test_adoption_status.py` and `tests/test_credential_status.py`) are on
-the retained Mac-relevant input list, as is the code they test. Portability
-checks happen after merge or on the nightly schedule; a failure gets a follow-up PR.
+the manual portability-check surface, along with the code they test. A future
+macOS adopter can supply those native results and trigger review of the retired CI policy.
 
 ## Qdrant collections
 

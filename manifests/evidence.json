@@ -5086,8 +5086,8 @@
     },
     {
       "path": ".github/workflows/adoption-bootstrap.yml",
-      "sha256": "daeb9dcbbcc2ba9d185b403c0defdf691d4dac80ab2b49f3ca9f38bce8d8701d",
-      "bytes": 57155
+      "sha256": "b2683c824796a7b4e037afc1d00fb611794cc89f2909c4ffdde9ae3c5f2c3a29",
+      "bytes": 10651
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
@@ -5476,8 +5476,8 @@
     },
     {
       "path": "adoption/manifest.json",
-      "sha256": "0574d44ab020bc9ac419b2bd12103769e2970a0732a71129c48ec3441c254233",
-      "bytes": 20095
+      "sha256": "a6df838a2d56945fb95535e56a9c229aaac0518cfbbc2db32b45102556e48e61",
+      "bytes": 20210
     },
     {
       "path": "adoption/mcp/claude-user.json",
@@ -5576,8 +5576,8 @@
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "64a3a09799108270d4604231d68ce32abf89d1942663ec4c3bc1231ff5583347",
-      "bytes": 66990
+      "sha256": "886f06cc4bb3e1666b2cc81f82066dbe20ee73730e5f2aefe0351acb095443a8",
+      "bytes": 66851
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -17017,8 +17017,8 @@
     },
     {
       "path": "catalogs/foundation/automation.json",
-      "sha256": "6c9fd66ad582103f454dac9d53925bdd3ea1a412073e83efd4579298b05ee46b",
-      "bytes": 36223
+      "sha256": "42097070a283e8c93f659b14a0ceae7aab8b597377754eaff2f219f333223fce",
+      "bytes": 37380
     },
     {
       "path": "catalogs/foundation/community-practice-20260920.json",
@@ -18067,13 +18067,13 @@
     },
     {
       "path": "docs/decisions/2026-10-03-macos-ci-scope.md",
-      "sha256": "fa966cdfdb55751e6673c137d2365627abd660edf0d20d31a840fa54c5aab5a0",
-      "bytes": 84790
+      "sha256": "e3834666ac376f3b5cc213264aec73db0d27cd00f5369e502b658b9408af21d3",
+      "bytes": 85020
     },
     {
       "path": "docs/decisions/2026-10-03-macos-full-suite-coverage.md",
-      "sha256": "6c1099993e992b8bdfaf1d9d582fb9f2dace0d8b48846072ac44548bb8b928a8",
-      "bytes": 23777
+      "sha256": "a9fc9cab334e419d96405f9ae1da3c6c3e00894fbb9fe88d0e92fc05c079313e",
+      "bytes": 24000
     },
     {
       "path": "docs/decisions/2026-10-03-omniroute-3851-pin.md",
@@ -18259,6 +18259,11 @@
       "path": "docs/decisions/2026-10-05-harness-context-budget.md",
       "sha256": "fb88f3d136176bbfddc51ca512a70c70b1ad74c4520a4f1257c68752e880dda3",
       "bytes": 60419
+    },
+    {
+      "path": "docs/decisions/2026-10-05-macos-ci-advisory.md",
+      "sha256": "2d113d1d2ae104c5ebf44bef3b547aaa1baccf79d6dcefba20dff12b229d52ad",
+      "bytes": 10296
     },
     {
       "path": "docs/decisions/2026-10-05-main-checkout-backup-disposition.md",
@@ -18532,13 +18537,18 @@
     },
     {
       "path": "docs/decisions/2026-10-09-validate-macos-portability.md",
-      "sha256": "9bb4b115138f4abf6d74c0893e8ea1da50fef295598cfcf8a2ffe85e62089042",
-      "bytes": 11363
+      "sha256": "8f35989d1552dc0b6167c1776f828977d60125bbb2a8fb56932b70949d7fee34",
+      "bytes": 11618
     },
     {
       "path": "docs/decisions/2026-10-10-openhands-shard-discovery-protection.md",
       "sha256": "634ea007962339fed50e933bdc7d407da28041b0cb21c610215f47a4455138e6",
       "bytes": 2956
+    },
+    {
+      "path": "docs/decisions/2026-10-10-retire-macos-ci.md",
+      "sha256": "e1cf74c9822cc44e5ea12b2a0b7c90174169b06bb955facbb58b63eccd57a3f8",
+      "bytes": 5415
     },
     {
       "path": "docs/direct-results.md",
@@ -18667,8 +18677,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "b5e80791e416eec587e8202253c764aac9454290d5afc6561187a045eee1747b",
-      "bytes": 105989
+      "sha256": "9dd7ef1882d43952e07fd8467813a213a1ff6edcf1d8f4d886d17956a54e76ad",
+      "bytes": 105961
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -18817,12 +18827,12 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "96d182f3554119c4dc85deb2e97910e4bff84133e8fcf179fbee4bcc726b0479",
+      "sha256": "090c59206178ba9605678430d2232d5125047e2936422f0288549962a65769d6",
       "bytes": 693491
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "1d23732ee73842b85cb799a220492715418be74be329daf7f4f8e8e815fed19c",
+      "sha256": "2a9a484d30e516756f0a0c88191a455f66d754ed222263c80c0c17c4ec568bdb",
       "bytes": 369468
     },
     {
@@ -59807,8 +59817,8 @@
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",
-      "sha256": "25d12e0cc419d176760dff7e604b9548d26d20af77f0b71636fc42395f2718b5",
-      "bytes": 230677
+      "sha256": "ad7175273aa60cf619e2950cb52942295dca2e24fb9f5539ae94b8e1ecd19cbb",
+      "bytes": 217468
     },
     {
       "path": "tests/test_adoption_bootstrap_parity.py",
@@ -60317,8 +60327,8 @@
     },
     {
       "path": "tests/test_landscape_sweep_skills.py",
-      "sha256": "4f789458553548cae2b40545c83dcd52cc810faa73b28a724cdfc3cd5aa89a9b",
-      "bytes": 184120
+      "sha256": "88308af6ecf78cdf9850b4739933ed4a17fb45db1d2296bc0bc23010e2fb768d",
+      "bytes": 183846
     },
     {
       "path": "tests/test_lane_packets.py",
@@ -60737,8 +60747,8 @@
     },
     {
       "path": "tests/test_shell_parser_ci.py",
-      "sha256": "7b3a98932fe40fd8fe13409d1fff2e85ad0d01a8cbdc910f70e52961c1f1a51c",
-      "bytes": 44140
+      "sha256": "abbe643e6d448ef7cd0e84e31548a708c198922a4736e612663b3737dbab7297",
+      "bytes": 43278
     },
     {
       "path": "tests/test_sim_capacity.py",
@@ -60907,13 +60917,13 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "932313de8026909dad900fcca7da06df65304416cd501da31285e5441050e604",
-      "bytes": 173584
+      "sha256": "a69454b03f54fd523fd805add6490ae93c07d37a38da46ebe71704e6697c8a3d",
+      "bytes": 125540
     },
     {
       "path": "tests/test_workflow_policy.py",
-      "sha256": "2c132e9fee2c59d15bac9b42d28c6bb9b53ecfebcf331066199b9178fecf065f",
-      "bytes": 85103
+      "sha256": "30ec845fb82ba40388fe6e53902dd7912c5cac3468c1caed498b1d6978f09338",
+      "bytes": 84968
     },
     {
       "path": "tests/test_workflow_security.py",

@@ -1,5 +1,9 @@
 # Decision: scope the required macOS check to macOS-relevant changes and changed tests (2026-10-03)
 
+**Superseded on 2026-10-10:** the adoption macOS jobs and their selector are
+retired by [Retire adoption macOS CI](2026-10-10-retire-macos-ci.md).
+This record's measurements and implementation history remain historical evidence.
+
 > Superseded 2026-10-05: macOS CI is advisory; see [docs/decisions/2026-10-05-macos-ci-advisory.md](2026-10-05-macos-ci-advisory.md).
 
 **Status:** implemented in the pull request that adds this record (branch `c5/macos-ci-scope`, cut from the

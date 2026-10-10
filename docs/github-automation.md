@@ -17,7 +17,7 @@ The [PR #26 qualification record](https://github.com/seathatflowsinourveins/nati
 links the final hosted revision, integration and publication outcomes; local
 implementation records below remain dated observations.
 
-## Current practice (2026-10-05)
+## Current practice (2026-10-10)
 
 This section is the current practice. The dated sections below are history; where they differ, this section and the
 live settings win. The user chose the advisory option at 2026-10-05T01:41:33Z;
@@ -26,14 +26,17 @@ the coordinator removed `validate-macos` from live ruleset 23739774 at 2026-10-0
 The coordinator's read-back at 02:52Z confirmed the seven contexts below, strict false and enforcement active.
 The committed target [`.github/main-ruleset.json`](../.github/main-ruleset.json) carries the same contexts.
 
+The adoption macOS policy below follows the [2026-10-10 retirement decision](decisions/2026-10-10-retire-macos-ci.md).
+Other settings observations retain their stated dates.
+
 The Actions allow-list and harness description below were checked against live settings and pinned sources on 2026-10-08.
 
 - **Required checks** (job IDs from GitHub Actions, app ID 15368; strict up-to-date checks off): `validate`,
   `token-report`, `secret-scan`, `dependency-review`, `osv-scanner`, `verdict-review-gate` and
   `sota-sources`. Renaming one of these jobs, or giving it a job-level `name:`, orphans its required check.
-- **macOS is advisory.** `validate-macos`, `bootstrap-macos` and `bootstrap-macos-brew` skip every pull request.
-  Nightly runs at 06:47 UTC and main pushes selected by the workflow's paths filter retain portability coverage;
-  a failure is fixed in a follow-up PR ([decision](decisions/2026-10-05-macos-ci-advisory.md)).
+- **Adoption macOS CI is retired.** The three macOS jobs and their selector are removed under the
+  [2026-10-10 decision](decisions/2026-10-10-retire-macos-ci.md). The Linux bootstrap retains its
+  daily 06:47 UTC run, PR path gate and main/dispatch behavior. Portable repairs and Darwin test guards remain.
 - **Merging.** Squash merges only; merge commits and rebase merges are off. The ruleset adds linear history, deletion
   and non-fast-forward rules, resolved review threads, no human approval count and a CodeQL code-scanning rule.
   Auto-merge is allowed by the repository settings but is not used for bot PRs: Dependabot PRs and the
@@ -388,27 +391,25 @@ maintainer), concurrency limits on stateful or manually dispatched workflows, an
 informational naming notes. Static checks execute no job; a pull request's own runs
 remain the execution evidence.
 
-## Scheduled portability and report-only lanes, 2026-10-05
+## Scheduled bootstrap and report-only lanes, 2026-10-10
 
 Three lanes run on a schedule and are not required checks: `catalog-freshness.yml`
 (Mondays 06:17 UTC, plus manual dispatch with a `max_repos` bound), the
 `sbom-vuln` job in `supply-chain.yml` (weekly, plus push/PR when its own paths
-change) and `adoption-bootstrap.yml`'s `bootstrap-linux`, `bootstrap-macos` and
-`bootstrap-macos-brew` jobs (nightly 06:47 UTC, plus pushes to `main` matching
+change) and `adoption-bootstrap.yml`'s `bootstrap-linux`
+job (nightly 06:47 UTC, plus pushes to `main` matching
 the workflow's existing paths filter, and manual dispatch). `bootstrap-linux`
 also runs on pull requests whose diff matches that filter, through the `changes`
 job. None of these appear in `main-ruleset.json`'s required status checks.
 Update 2026-09-22: `sbom-vuln` is no longer report-only; it
 fails its own job on a High or Critical grype match (see "Secret and
 supply-chain scanning"), but it is still not a required check.
-`validate-macos`, `bootstrap-macos` and `bootstrap-macos-brew` are advisory
-since [the 2026-10-05 decision](decisions/2026-10-05-macos-ci-advisory.md).
-Their job-level `if:` excludes every `pull_request`, regardless of changed paths
-or a failed `changes` job. They run in full on matching main pushes, the nightly
-schedule and manual dispatch; `!cancelled()` keeps them reachable when their
-`changes` dependency is skipped. The workflow retains its unfiltered PR trigger
-and plain-git detector for Linux. The old macOS classifier remains for its
-historical measurements and controls and no longer enables a PR job.
+The [2026-10-10 decision](decisions/2026-10-10-retire-macos-ci.md) retires the
+three adoption macOS jobs and their classifier/drift guard. The workflow retains
+its unfiltered PR trigger and plain-git detector for Linux. `!cancelled()` keeps
+the Linux job reachable when its `changes` dependency is skipped off PRs;
+missing or failed detector outputs also enable the Linux bootstrap. The previous
+advisory schedules and Mac classifier measurements remain historical evidence.
 
 GitHub documents the job condition in [workflow syntax](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#jobsjob_idif).
 Its [schedule event](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule)

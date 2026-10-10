@@ -40,7 +40,9 @@
         "status": "green_on_hosted_runner",
         "run_id": "35875188590",
         "receipt": "evidence/receipts/adoption-macos-hosted-smoke-20260923.json",
-        "previous_receipt": "evidence/receipts/adoption-macos-hosted-smoke-20260922.json"
+        "previous_receipt": "evidence/receipts/adoption-macos-hosted-smoke-20260922.json",
+        "retired_on": "2026-10-10",
+        "retirement_decision": "docs/decisions/2026-10-10-retire-macos-ci.md"
       },
       "evidence_ref": null
     }
