@@ -224,8 +224,10 @@ SKILL_DOCTOR_ARGV = ["claude", "-p", "/skill-doctor", "--output-format", "json",
 # alone (byte 247738504). This check drops the flag for any file it can read, parsed or not, and keeps it when the file is
 # absent, unreadable or not a regular file, the cases in which the client does not refuse it.
 # System paths: the same page's configuration summary ("/Library/Application Support/ClaudeCode/", "/etc/claude-code/",
-# "C:\Program Files\ClaudeCode\"); all three are checked, because another system's path cannot exist on this one, so no
-# platform branch is needed (Linux covers WSL).
+# "C:\Program Files\ClaudeCode\"); all three are checked on every system, so no platform branch is needed (Linux covers
+# WSL), but a path counts only when it is absolute: on POSIX the Windows path is a relative filename, and a file of that
+# name in the working directory is not a managed config (found by the command center's micro of #925 at 46cc5dd1 and
+# reproduced by the co-op's GPT reads of #925 at 46cc5dd1 and 715229c7).
 MANAGED_MCP_CONFIG_PATHS = (
     "/Library/Application Support/ClaudeCode/managed-mcp.json",
     "/etc/claude-code/managed-mcp.json",
@@ -233,10 +235,17 @@ MANAGED_MCP_CONFIG_PATHS = (
 )
 
 
+def _readable_system_file(path) -> bool:
+    """Whether `path` is an absolute, normalised path to a readable file (a relative name is a file in the working
+    directory, never a system path)."""
+    name = os.fspath(path)
+    return os.path.isabs(name) and os.path.abspath(name) == name and os.path.isfile(name) and os.access(name, os.R_OK)
+
+
 def skill_doctor_argv(managed_paths=None) -> list:
-    """SKILL_DOCTOR_ARGV, without --strict-mcp-config when a readable managed MCP config is deployed."""
+    """SKILL_DOCTOR_ARGV, without --strict-mcp-config when a readable managed MCP config is deployed at an absolute path."""
     paths = MANAGED_MCP_CONFIG_PATHS if managed_paths is None else managed_paths
-    if any(os.path.isfile(path) and os.access(path, os.R_OK) for path in paths):
+    if any(_readable_system_file(path) for path in paths):
         return [word for word in SKILL_DOCTOR_ARGV if word != "--strict-mcp-config"]
     return list(SKILL_DOCTOR_ARGV)
 
