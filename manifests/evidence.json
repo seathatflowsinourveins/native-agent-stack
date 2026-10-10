@@ -16992,13 +16992,13 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-baseline.json",
-      "sha256": "8d4d28f94c10dae40e405bb5f7392f75dadaeae2656eaaf995cb39f0f23c24a5",
-      "bytes": 75469
+      "sha256": "d95bbcc8d78a91f3632be198ee01c821a41a2b3b93f6f03f8cae963b63942204",
+      "bytes": 79507
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "7b7ee4cf2f492917f3f9616cc6cd6a7c4908c29e6b38a66c14d4da96123090fa",
-      "bytes": 160022
+      "sha256": "f155096fc07b4da2134e6c25cfc3418bbbaf00c61382231eb89ee529a0596ef7",
+      "bytes": 190320
     },
     {
       "path": "catalogs/landscape/README.md",
