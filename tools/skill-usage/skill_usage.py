@@ -217,6 +217,12 @@ SKILL_DOCTOR_ARGV = ["claude", "-p", "/skill-doctor", "--output-format", "json",
 # present" (read 2026-10-10), and https://code.claude.com/docs/en/managed-mcp (read 2026-10-10) says "If a user passes it
 # while such a file is deployed, Claude Code exits at startup on a workstation and in a cloud session alike". The file
 # already keeps every other server out, so on such a host the argv drops only that flag and keeps the other fences.
+# What the client checks, read from the 2.1.296 binary (sha256
+# 24972e3bc859fab2b46ed4c1e51f7d6130f06d3bd550811a114640de3370d0de, 2026-10-10): its refusal applies only when the file is
+# present and loads without a read, JSON or schema error (the reader at byte 217796118, the refusal at byte 217799919), so a
+# present file it cannot read or parse gets no refusal, and its own `plugin eval init` launcher drops the flag on presence
+# alone (byte 247738504). This check drops the flag for any file it can read, parsed or not, and keeps it when the file is
+# absent, unreadable or not a regular file, the cases in which the client does not refuse it.
 # System paths: the same page's configuration summary ("/Library/Application Support/ClaudeCode/", "/etc/claude-code/",
 # "C:\Program Files\ClaudeCode\"); all three are checked, because another system's path cannot exist on this one, so no
 # platform branch is needed (Linux covers WSL).

@@ -18197,7 +18197,7 @@
     },
     {
       "path": "docs/decisions/2026-10-04-pwsh7-windows-guidance.md",
-      "sha256": "10216d89b0c658f498a67c707e10edf416c328d63f207729fd9a7e0e4981b8a1",
+      "sha256": "54adce07e1970736e12bcf50fa036515356e4694a4c0fad62ad351bd98654de5",
       "bytes": 16799
     },
     {
@@ -60752,8 +60752,8 @@
     },
     {
       "path": "tests/test_skill_usage.py",
-      "sha256": "a31f9038db3f4d4a09e3762a5d226a856c7d607fd7f83e0a988d2479dd27ca57",
-      "bytes": 258439
+      "sha256": "8d330d1446c4a06e6b77df60b28063882af54a0b1ae498fce3706495d532c2ce",
+      "bytes": 265105
     },
     {
       "path": "tests/test_skills_manifest.py",
@@ -61197,13 +61197,13 @@
     },
     {
       "path": "tools/skill-usage/README.md",
-      "sha256": "42882bd76dd3aa2602d0aa09e575cc24efe6586c9019176a9934444f0c8cd677",
-      "bytes": 55411
+      "sha256": "1dba321ff638013a83c5a4107b76b14ee88a0176469ee8307795d6f7dc34c693",
+      "bytes": 55795
     },
     {
       "path": "tools/skill-usage/skill_usage.py",
-      "sha256": "2973967052f932e0a51248dc9be667c4fb686b6f4798a5d4fe6e1195d40f5b18",
-      "bytes": 151726
+      "sha256": "ca647358c22a1b7709c1ec0a9d300bf3009b048411f1f929c7c897daa925ba17",
+      "bytes": 152377
     },
     {
       "path": "tools/sota-convergence/README.md",

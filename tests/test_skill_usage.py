@@ -257,9 +257,17 @@ class RunSkillDoctor(unittest.TestCase):
         refusal = "You cannot use --strict-mcp-config when an enterprise MCP config is present"
         self.assertIn(refusal, comment)
         self.assertIn("https://code.claude.com/docs/en/managed-mcp", comment)
+        # The client's own distinction, read from the pinned binary (co-op GPT read of #925 at 46cc5dd1): a refusal
+        # needs a present file that loads without error, while its launcher drops the flag on presence alone.
+        self.assertIn("24972e3bc859fab2b46ed4c1e51f7d6130f06d3bd550811a114640de3370d0de", comment)
+        self.assertIn("present and loads without a read, JSON or schema error", comment)
+        self.assertIn("drops the flag on presence alone", comment)
         readme = (ROOT / "tools/skill-usage/README.md").read_text(encoding="utf-8")
-        self.assertIn(refusal, " ".join(readme.split()))
+        flat_readme = " ".join(readme.split())
+        self.assertIn(refusal, flat_readme)
         self.assertIn("drop `--strict-mcp-config`", readme)
+        self.assertIn("present and loads without a read, JSON or schema error", flat_readme)
+        self.assertIn("drops the flag on presence alone", flat_readme)
 
     def test_runs_exact_argv_with_devnull_stdin_and_timeout(self):
         captured = {}
@@ -379,6 +387,98 @@ class RunSkillDoctor(unittest.TestCase):
         result = S.run_skill_doctor(runner=raising_runner)
         self.assertIn("error", result)
         self.assertIn("TimeoutExpired", result["error"])
+
+
+class ManagedMcpDefaultLocations(unittest.TestCase):
+    """skill_doctor_argv() through its default route, with the host reporting one documented system location at a time
+    (co-op GPT read of #925 at 46cc5dd1, P2). RunSkillDoctor injects its own paths and hides the module's, so dropping
+    a location, or the default route itself, left it green. A fake filesystem answers for the documented strings only
+    (a real file backs each present state), so no test here depends on a managed-mcp.json that exists on the host
+    running it and none plants a file at a system path."""
+
+    # Independent literals: the documented command with and without the one flag Claude Code 2.1.296 refuses while a
+    # managed config is deployed; every other fence keeps its words and its order.
+    FENCED = ["claude", "-p", "/skill-doctor", "--output-format", "json", "--permission-mode", "dontAsk",
+              "--permission-prompts", "none", "--tools", "", "--strict-mcp-config", "--max-turns", "1",
+              "--max-budget-usd", "0.05"]
+    MANAGED = ["claude", "-p", "/skill-doctor", "--output-format", "json", "--permission-mode", "dontAsk",
+               "--permission-prompts", "none", "--tools", "", "--max-turns", "1", "--max-budget-usd", "0.05"]
+    # https://code.claude.com/docs/en/managed-mcp, configuration summary (read 2026-10-10), spelled apart from the module.
+    LOCATIONS = {"macOS": "/Library/Application Support/ClaudeCode/managed-mcp.json",
+                 "Linux": "/etc/claude-code/managed-mcp.json",
+                 "Windows": "C:\\Program Files\\ClaudeCode\\managed-mcp.json"}
+    # The file the host holds at the location. The 2.1.296 client refuses the flag only for a file that loads without
+    # a read, JSON or schema error, and its own `plugin eval init` launcher drops the flag on presence alone (the
+    # comment above MANAGED_MCP_CONFIG_PATHS cites both); this module drops it for any file it can read, and keeps it
+    # when the file is absent, unreadable or not a regular file, the cases in which the client does not refuse it.
+    CONTENT = {"parsed": '{"mcpServers": {}}\n', "unparsable": "{not json"}
+    EXPECTED = {None: FENCED, "parsed": MANAGED, "unparsable": MANAGED, "unreadable": FENCED, "directory": FENCED}
+
+    @contextlib.contextmanager
+    def host(self, location, state):
+        """The documented strings answer as a host with `state` at `location` (None, 'parsed', 'unparsable',
+        'unreadable' or 'directory') and nothing at the others; every other path answers truthfully."""
+        backing = None
+        if state is not None:
+            backing = Path(self.enterContext(tempfile.TemporaryDirectory())) / "managed-mcp.json"
+            if state == "directory":
+                backing.mkdir()
+            else:
+                backing.write_text(self.CONTENT.get(state, "{}"), encoding="utf-8")
+        documented = set(self.LOCATIONS.values()) | set(REAL_MANAGED_MCP_CONFIG_PATHS)
+        real_isfile, real_access = os.path.isfile, os.access
+
+        def isfile(path):
+            if path in documented:
+                return path == location and backing is not None and real_isfile(backing)
+            return real_isfile(path)
+
+        def access(path, mode, **kwargs):
+            if path in documented:
+                return (path == location and backing is not None and state != "unreadable"
+                        and real_access(backing, mode, **kwargs))
+            return real_access(path, mode, **kwargs)
+
+        with mock.patch.object(os.path, "isfile", isfile), mock.patch.object(os, "access", access):
+            yield
+
+    def test_each_documented_location_decides_the_form_alone(self):
+        for name, location in self.LOCATIONS.items():
+            for state, expected in self.EXPECTED.items():
+                with self.subTest(location=name, state=state), self.host(location, state):
+                    self.assertEqual(S.skill_doctor_argv(), expected)
+
+    def test_dropping_a_locations_detection_fails_its_cases(self):
+        # The matrix is sensitive to each location: with one documented path removed from the module's tuple, that
+        # location's present states keep the strict flag (so the matrix above fails on that location alone), the
+        # other locations still decide the form, and with all three removed no present state is seen.
+        for name, location in self.LOCATIONS.items():
+            kept = tuple(path for path in REAL_MANAGED_MCP_CONFIG_PATHS if path != location)
+            self.assertEqual(len(kept), len(REAL_MANAGED_MCP_CONFIG_PATHS) - 1, location)
+            with mock.patch.object(S, "MANAGED_MCP_CONFIG_PATHS", kept):
+                for state in ("parsed", "unparsable"):
+                    with self.subTest(dropped=name, state=state), self.host(location, state):
+                        self.assertEqual(S.skill_doctor_argv(), self.FENCED)
+                for other_name, other in self.LOCATIONS.items():
+                    if other != location:
+                        with self.subTest(dropped=name, still_seen=other_name), self.host(other, "parsed"):
+                            self.assertEqual(S.skill_doctor_argv(), self.MANAGED)
+        with mock.patch.object(S, "MANAGED_MCP_CONFIG_PATHS", ()):
+            for name, location in self.LOCATIONS.items():
+                with self.subTest(dropped="all", location=name), self.host(location, "parsed"):
+                    self.assertEqual(S.skill_doctor_argv(), self.FENCED)
+
+    def test_run_skill_doctor_takes_the_default_route(self):
+        captured = {}
+
+        def fake_runner(argv, **kwargs):
+            captured["argv"] = argv
+            return subprocess.CompletedProcess(argv, 0, "[]", "")
+
+        for state, expected in ((None, self.FENCED), ("parsed", self.MANAGED)):
+            with self.subTest(state=state), self.host(self.LOCATIONS["Linux"], state):
+                S.run_skill_doctor(runner=fake_runner)
+                self.assertEqual(captured["argv"], expected)
 
 
 class CodexRolloutScan(unittest.TestCase):

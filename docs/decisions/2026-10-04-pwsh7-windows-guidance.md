@@ -193,7 +193,7 @@ docs-consistency, handbook, client-configuration and profile modules returned
 `Ran 592 tests in 159.155s` and `FAILED (failures=6, skipped=9)` (exit 1).
 All six failures are the unchanged call-ledger fixtures: their temporary paths
 are inside this Git worktree, and
-`tools/skill-usage/skill_usage.py:2417-2423` rejects that location before the
+`tools/skill-usage/skill_usage.py:2423-2429` rejects that location before the
 conditions those cases exercise. This matches the earlier recorded fixture
 limitation; the prescribed temporary directory and guard were retained.
 The handbook `--check` and native `bash -n` on the extracted gate each returned

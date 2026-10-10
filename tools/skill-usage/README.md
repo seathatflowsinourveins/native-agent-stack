@@ -63,7 +63,10 @@ On a host with a managed MCP config, drop `--strict-mcp-config` from the command
 `C:\Program Files\ClaudeCode\` on Windows) already holds exclusive control of the MCP servers, and Claude Code
 refuses the flag while it is there: 2.1.296 prints "You cannot use --strict-mcp-config when an enterprise MCP config is
 present", and the [managed MCP page](https://code.claude.com/docs/en/managed-mcp) says Claude Code "exits at startup"
-(both read 2026-10-10). `--run-skill-doctor` drops the flag itself when it finds that file readable.
+(both read 2026-10-10). The 2.1.296 binary (sha256 `24972e3bc859`…) refuses the flag only for a file that is present and
+loads without a read, JSON or schema error, and its own `plugin eval init` launcher drops the flag on presence alone, so
+`--run-skill-doctor` drops it when it finds that file readable, parsed or not, and keeps it when the file is absent,
+unreadable or not a regular file; the byte offsets are in the comment above `MANAGED_MCP_CONFIG_PATHS` in `skill_usage.py`.
 
 Or let the tool run it directly. It runs the command above (`SKILL_DOCTOR_ARGV` in `skill_usage.py`, without
 `--strict-mcp-config` on a host with a managed MCP config) with stdin from `/dev/null` and a timeout, and refuses to
