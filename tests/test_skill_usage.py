@@ -7,6 +7,7 @@ import contextlib
 import importlib.util
 import io
 import json
+import ntpath
 import os
 import re
 import shlex
@@ -14,6 +15,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import types
 import unittest
 from pathlib import Path
 from unittest import mock
@@ -473,6 +475,70 @@ class ManagedMcpDefaultLocations(unittest.TestCase):
 
         with mock.patch.object(os.path, "isfile", isfile), mock.patch.object(os, "access", access):
             yield
+
+    def test_an_absolute_path_that_is_not_normalised_is_not_a_managed_config(self):
+        # A spelling with a dot-dot, dot or doubled-separator segment reaches the same file through the filesystem, but it is
+        # not the path the client reads (its My() returns the directory and OCn() joins the file name), so it does not count:
+        # the check requires abspath(name) == name, which the relative-name test above cannot exercise because a relative
+        # name already fails isabs (the co-op's GPT read of #967 at 3de3dda8, P3: the equality could be removed with every
+        # test green). Real files, no fake host, so it runs on every platform.
+        folder = Path(self.enterContext(tempfile.TemporaryDirectory()))
+        (folder / "child").mkdir()
+        (folder / "managed-mcp.json").write_text("{}", encoding="utf-8")
+        sep = os.sep
+        spellings = {"dot-dot": f"{folder}{sep}child{sep}..{sep}managed-mcp.json",
+                     "dot": f"{folder}{sep}.{sep}managed-mcp.json",
+                     "doubled separator": f"{folder}{sep}{sep}managed-mcp.json"}
+        normalised = str(folder / "managed-mcp.json")
+        self.assertEqual(os.path.abspath(normalised), normalised)  # the positive control is itself normalised
+        for label, spelling in spellings.items():
+            with self.subTest(spelling=label):
+                self.assertTrue(os.path.isfile(spelling))  # the same file, reached through the filesystem
+                self.assertNotEqual(os.path.abspath(spelling), spelling)
+                self.assertEqual(S.skill_doctor_argv([spelling]), self.FENCED)
+                with mock.patch.object(S, "MANAGED_MCP_CONFIG_PATHS", (spelling,)):
+                    self.assertEqual(S.skill_doctor_argv(), self.FENCED)
+        # pathlib drops dot and doubled-separator segments when it builds a Path but keeps a dot-dot one, so only that
+        # spelling stays non-normalised as a Path.
+        self.assertEqual(str(Path(spellings["dot-dot"])), spellings["dot-dot"])
+        self.assertEqual(S.skill_doctor_argv([Path(spellings["dot-dot"])]), self.FENCED)
+        # The normalised spelling of the same file is a managed config, and one counted candidate is enough.
+        self.assertEqual(S.skill_doctor_argv([normalised]), self.MANAGED)
+        self.assertEqual(S.skill_doctor_argv([spellings["dot-dot"], normalised]), self.MANAGED)
+        with mock.patch.object(S, "MANAGED_MCP_CONFIG_PATHS", (normalised,)):
+            self.assertEqual(S.skill_doctor_argv(), self.MANAGED)
+
+    def test_the_windows_path_rules_count_the_windows_string_and_not_the_posix_ones(self):
+        # os.path is posixpath on a POSIX host, so the Windows side of the check was only argued from ntpath's functions
+        # (the command center's note on landing #967). This swaps the module's os for one whose path functions are ntpath's
+        # and whose file checks answer yes for every candidate, so the path rule alone decides, on every host and on the
+        # CI interpreter. Under Python 3.12 ntpath.isabs accepts a leading separator, so the POSIX strings pass isabs and
+        # only the normalisation equality rejects them (abspath adds a drive and turns the separators); from 3.13 isabs
+        # rejects them first. The equality clause is therefore covered here under 3.12 and the isabs clause under 3.13.
+        # ntpath.abspath is its pure-Python fallback on a POSIX host (no _getfullpathname), which is all these cases need.
+        ntos = types.SimpleNamespace(
+            fspath=os.fspath, R_OK=os.R_OK, access=lambda path, mode: True,
+            path=types.SimpleNamespace(isabs=ntpath.isabs, abspath=ntpath.abspath, isfile=lambda path: True))
+        windows = self.LOCATIONS["Windows"]
+        with mock.patch.object(S, "os", ntos):
+            for name, location in self.LOCATIONS.items():
+                with self.subTest(documented=name):
+                    self.assertEqual(S.skill_doctor_argv([location]), self.MANAGED if location == windows else self.FENCED)
+            for label, spelling in {"dot-dot": "C:\\Program Files\\ClaudeCode\\..\\ClaudeCode\\managed-mcp.json",
+                                    "dot": "C:\\Program Files\\.\\ClaudeCode\\managed-mcp.json",
+                                    "forward slashes": "C:/Program Files/ClaudeCode/managed-mcp.json",
+                                    "doubled separator": "C:\\Program Files\\ClaudeCode\\\\managed-mcp.json",
+                                    "relative name": "managed-mcp.json",
+                                    "drive-relative name": "C:managed-mcp.json"}.items():
+                with self.subTest(windows_spelling=label):
+                    self.assertEqual(S.skill_doctor_argv([spelling]), self.FENCED)
+            # One counted candidate among rejected ones still decides the form.
+            self.assertEqual(S.skill_doctor_argv([self.LOCATIONS["Linux"], windows]), self.MANAGED)
+            with mock.patch.object(S, "MANAGED_MCP_CONFIG_PATHS", REAL_MANAGED_MCP_CONFIG_PATHS):
+                self.assertEqual(S.skill_doctor_argv(), self.MANAGED)
+        # The normalisation equality is what rejects the POSIX strings under 3.12's ntpath.
+        if ntpath.isabs(self.LOCATIONS["Linux"]):
+            self.assertNotEqual(ntpath.abspath(self.LOCATIONS["Linux"]), self.LOCATIONS["Linux"])
 
     def test_a_documented_string_counts_only_where_it_is_an_absolute_path(self):
         counts = {name: self.counts_here(location) for name, location in self.LOCATIONS.items()}
